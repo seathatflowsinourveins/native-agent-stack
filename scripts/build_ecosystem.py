@@ -32,6 +32,7 @@ except ImportError:
 CONFIG = "docs/ecosystem/manifest.json"
 TEMPLATE = "docs/ecosystem/template.html"
 OUTPUT = "docs/ecosystem/index.html"
+TOPICS = {"memory-rag": ("docs/ecosystem/memory-rag.template.html", "docs/ecosystem/memory-rag.html")}
 INDEX = "catalogs/us-equities/decision-index.json"
 STACK = "manifests/stack.json"
 EVIDENCE = "manifests/evidence.json"
@@ -487,6 +488,189 @@ def token_topic_card(card, edition_date, stack_version, root):
     return dict(card), drift, None
 
 
+def build_runtime_worker_review(root, path, *, read, track, file_url, current_public_paths):
+    """Use the optional memory review's publication contract for a runtime review.
+
+    Original catalog and receipt records remain available alongside their display
+    links. A citation or a rendered receipt does not change its evidence class.
+    """
+    original = read(path)
+    require(original.get("schema_version") == 1
+            and original.get("kind") == "runtime_worker_landscape_review",
+            "unsupported runtime worker review")
+    candidates = original.get("candidates", [])
+    require(isinstance(candidates, list) and candidates
+            and len(candidates) == original.get("candidate_count"),
+            "runtime worker review candidate count mismatch")
+    identifiers = set()
+    for row in candidates:
+        require(isinstance(row, dict) and all(isinstance(row.get(key), str)
+                and row[key].strip() for key in ("id", "role", "disposition", "evidence_class")),
+                "runtime worker candidate needs role, disposition and evidence class")
+        require(row["id"] not in identifiers, "duplicate runtime worker candidate")
+        identifiers.add(row["id"])
+        if row.get("repository") is not None:
+            repository_key(row["repository"])
+            require(isinstance(row.get("revision"), str)
+                    and bool(re.fullmatch(r"[a-f0-9]{40}", row["revision"])),
+                    "runtime worker candidate revision must be a full commit")
+        else:
+            require(row.get("revision") is None and row.get("version") is None,
+                    "documentation-only runtime candidate cannot imply a repository pin")
+        require(row.get("version") is None or isinstance(row["version"], str),
+                "runtime worker version must be text or null")
+        require(isinstance(row.get("sources"), list) and row["sources"],
+                "runtime worker candidate needs primary sources")
+    for key in ("evidence_manifest", "qualified_enhancement_components"):
+        require(isinstance(original.get(key, []), list), f"runtime worker {key} must be a list")
+
+    local_paths, citations = set(), {}
+
+    def local_source(source_path):
+        require(isinstance(source_path, str), "runtime worker source path must be text")
+        track(source_path)  # safe_file rejects escapes; missing citations fail the build.
+        current_public_paths.add(source_path)
+        local_paths.add(source_path)
+        item = {"path": source_path, "url": file_url(source_path)}
+        citations[item["url"]] = item
+        return item
+
+    def source_link(source):
+        if isinstance(source, str):
+            if source.startswith(("https:", "http:")):
+                require(bool(public_url(source)), "runtime worker source must be public HTTPS")
+                citations[source] = {"url": source, "title": "Primary source"}
+                return source
+            return local_source(source)
+        require(isinstance(source, dict), "runtime worker source must be a URL or path record")
+        if "path" in source:
+            if source.get("url") is not None:
+                require(bool(public_url(source["url"])), "runtime worker source must be public HTTPS")
+            return {**source, **local_source(source["path"])}
+        require(bool(public_url(source.get("url"))), "runtime worker source must be public HTTPS")
+        citations[source["url"]] = dict(source)
+        return dict(source)
+
+    path_keys = {"path", "report", "dispatch_guide", "receipt", "convergence_record",
+                 "experiment", "assurance_record", "resolution_record", "native_lifecycle", "skill_trial"}
+    source_keys = {"sources", "evidence_refs", "upstream_sources", "source_paths", "native_evidence_records"}
+
+    def normalize(value):
+        if isinstance(value, list):
+            return [normalize(item) for item in value]
+        if not isinstance(value, dict):
+            return value
+        result = {}
+        for key, item in value.items():
+            if key in source_keys and isinstance(item, list):
+                result[key] = [source_link(source) for source in item]
+            elif key == "source" and isinstance(item, str):
+                result[key] = source_link(item)
+            elif key in path_keys and isinstance(item, str):
+                local_source(item)
+                result[key] = item
+            elif key == "repository" and item is not None:
+                require(bool(public_url(item)), "runtime worker repository must be public HTTPS")
+                result[key] = item
+            else:
+                result[key] = normalize(item)
+        return result
+
+    local_source(path)
+    review = normalize(original)
+
+    def receipt_sources(value):
+        """Receipt source maps retain their upstream path metadata, not local paths."""
+        links = []
+        if isinstance(value, str) and value.startswith(("https:", "http:")):
+            links.append(source_link(value))
+        elif isinstance(value, dict):
+            for item in value.values():
+                links.extend(receipt_sources(item))
+        elif isinstance(value, list):
+            for item in value:
+                links.extend(receipt_sources(item))
+        return links
+
+    evidence_documents = []
+    for evidence_path in sorted({row.get("path") for row in original.get("evidence_manifest", [])
+                                 if isinstance(row, dict) and isinstance(row.get("path"), str)
+                                 and row["path"].endswith(".json")}):
+        document = read(evidence_path)
+        evidence_documents.append({**local_source(evidence_path), "document": document,
+                                   "sources": receipt_sources(document.get("sources", []))})
+    return {**review, "original": original, "url": file_url(path),
+            "source_links": list(citations.values()), "evidence_documents": evidence_documents,
+            "offline_guides": sorted(item for item in local_paths if item.endswith(".md"))}
+
+
+def build_all_layer_resolution(root, path, *, read, track, file_url, current_public_paths):
+    """Reuse optional review ingestion; supplied statuses are never promoted."""
+    original = read(path)
+    require(original.get("schema_version") == 1
+            and original.get("kind") == "all_layer_next_gap_resolution",
+            "unsupported all-layer resolution")
+    layers = original.get("layers")
+    require(isinstance(layers, list) and len(layers) == 32,
+            "all-layer resolution needs exactly 32 layers")
+    identifiers, foundation_count, trading_count = set(), 0, 0
+    for row in layers:
+        require(isinstance(row, dict) and isinstance(row.get("id"), str) and row["id"].strip(),
+                "all-layer resolution needs explicit layer identities")
+        require(row["id"] not in identifiers, "duplicate all-layer resolution identity")
+        identifiers.add(row["id"])
+        require(row.get("lane") in {"foundation", "trading", "us-equities"},
+                "all-layer resolution has an unknown lane")
+        foundation_count += row["lane"] == "foundation"
+        trading_count += row["lane"] in {"trading", "us-equities"}
+        for key in ("title", "current_status", "next_gate"):
+            require(row.get(key) is None or isinstance(row[key], str),
+                    f"all-layer resolution {key} must be text when recorded")
+    require((foundation_count, trading_count) == (20, 12),
+            "all-layer resolution needs 20 foundation and 12 trading layers")
+    for key in ("executions", "corrections", "limitations"):
+        require(isinstance(original.get(key, []), list), f"all-layer resolution {key} must be a list")
+    require(all(isinstance(row, dict) for row in original.get("executions", [])),
+            "all-layer resolution executions must be records")
+
+    citations = {}
+
+    def source(source_path):
+        require(isinstance(source_path, str) and source_path.strip() and "://" not in source_path,
+                "all-layer resolution evidence reference must be a repository path")
+        track(source_path)
+        current_public_paths.add(source_path)
+        item = {"path": source_path, "url": file_url(source_path)}
+        citations[source_path] = item
+        return item
+
+    def with_evidence(row):
+        references = row.get("evidence_refs", [])
+        require(isinstance(references, list), "all-layer resolution evidence_refs must be a list")
+        return {**row, "sources": [source(reference) for reference in references]}
+
+    source(path)
+    if original.get("source_review") is not None:
+        source(original["source_review"])
+    output_layers = [{**with_evidence(row),
+                      "display_lane": "foundation" if row["lane"] == "foundation" else "trading"}
+                     for row in layers]
+    executions = [with_evidence(row) for row in original.get("executions", [])]
+    corrections = [with_evidence(row) if isinstance(row, dict) else row
+                   for row in original.get("corrections", [])]
+    documents = []
+    for source_path, link in sorted(citations.items()):
+        if source_path.endswith(".json"):
+            raw = safe_file(root, source_path).read_bytes()
+            require(len(raw) <= PUBLIC_ARTIFACT_LIMIT, f"all-layer evidence too large: {source_path}")
+            documents.append({**link, "text": raw.decode("utf-8"), "bytes": len(raw), "sha256": digest(raw)})
+    return {**original, "original": original, "layers": output_layers,
+            "executions": executions, "corrections": corrections,
+            "url": file_url(path), "source_links": list(citations.values()), "documents": documents,
+            "offline_guides": sorted(item for item in citations if item.endswith(".md")),
+            "lane_counts": {"foundation": foundation_count, "trading": trading_count}}
+
+
 def build_data(root):
     documents, inputs = {}, {}
     current_public_paths = set()
@@ -529,6 +713,93 @@ def build_data(root):
         new_catalog = new_catalog or path.startswith(("evidence/artifacts/ultracode-token-routing-20260921/", "evidence/artifacts/portable-claude-native-qualification-20260921/", "evidence/artifacts/blind-catalog-convergence-20260921/", "blueprints/blind-catalog-convergence/", "blueprints/memory-lifecycle-probe/", "evidence/artifacts/memory-lifecycle-probe-20260921/", "evidence/receipts/memory-lifecycle-probe-"))
         revision = publication_ref if path.startswith("docs/ecosystem/") or path in NEW_PUBLIC_FILES or new_catalog or new_practice or path in current_public_paths else config["source_revision"]
         return f'{config["repository_url"]}/blob/{revision}/{quote(path, safe="/")}'
+
+    memory_review = None
+    if config.get("memory_rag_review"):
+        path = config["memory_rag_review"]
+        memory_review = dict(read(path))
+        require(memory_review.get("schema_version") == 1
+                and memory_review.get("kind") == "memory_rag_foundation_review",
+                "unsupported memory/RAG review")
+        candidates = memory_review.get("candidates", [])
+        require(isinstance(candidates, list) and candidates
+                and len(candidates) == memory_review.get("candidate_count"),
+                "memory/RAG review candidate count mismatch")
+        candidate_ids = set()
+        for candidate in candidates:
+            require(isinstance(candidate, dict) and all(isinstance(candidate.get(key), str)
+                    and candidate[key].strip() for key in ("id", "name", "latest_version",
+                    "source_revision", "license", "role", "disposition", "rationale", "evidence_class")),
+                    "memory/RAG candidate needs explicit decision and evidence fields")
+            require(candidate["id"] not in candidate_ids, "duplicate memory/RAG candidate")
+            candidate_ids.add(candidate["id"])
+            repository_key(candidate["repository"])
+            require(bool(re.fullmatch(r"[a-f0-9]{40}", candidate["source_revision"])),
+                    "memory/RAG candidate revision must be a full commit")
+            require(isinstance(candidate.get("sources"), list) and candidate["sources"],
+                    "memory/RAG candidate needs primary sources")
+            for source in candidate["sources"]:
+                public_url(source)
+        decision = memory_review.get("decision", {})
+        candidate_names = {row["name"] for row in candidates}
+        require((decision.get("final_candidate") in candidate_names
+                 or (decision.get("final_candidate") is None
+                     and decision.get("best_backbone_status") == "unresolved"
+                     and decision.get("operational_baseline") in candidate_names))
+                and isinstance(decision.get("final_verdict"), str) and decision["final_verdict"].strip(),
+                "memory/RAG review needs a scoped selection or explicit unresolved verdict")
+        require(isinstance(decision.get("selection_reasons"), list) and decision["selection_reasons"]
+                and all(isinstance(reason, str) and reason.strip() for reason in decision["selection_reasons"]),
+                "memory/RAG review needs selection reasons")
+        if decision.get("recommended_target"):
+            require(decision["recommended_target"] in candidate_names
+                    and decision.get("recommendation_basis") == "fit_based_shared_native_memory_target",
+                    "memory/RAG recommendation needs a reviewed candidate and explicit fit basis")
+        source_paths = [path] + [memory_review[key] for key in ("report", "receipt", "convergence_record")]
+        if memory_review.get("assurance_record"):
+            assurance_path = memory_review["assurance_record"]
+            assurance = read(assurance_path)
+            require(assurance.get("kind") == "source_evidence_assurance"
+                    and isinstance(assurance.get("rows"), list) and assurance["rows"],
+                    "memory/RAG assurance needs an explicit evidence matrix")
+            for row in assurance["rows"]:
+                require(row.get("id") in candidate_ids and all(isinstance(row.get(key), str)
+                        and row[key].strip() for key in ("name", "role", "observed_result",
+                        "token_cost_scope", "acceptance_gap")), "invalid memory/RAG evidence row")
+                for source in row.get("sources", []):
+                    public_url(source)
+            memory_review["assurance"] = assurance
+            source_paths.append(assurance_path)
+        if memory_review.get("resolution_record"):
+            resolution_path = memory_review["resolution_record"]
+            resolution = read(resolution_path)
+            require(resolution.get("schema_version") == 1
+                    and resolution.get("kind") == "memory_runtime_resolution"
+                    and resolution.get("reference_profile") == "foundation-cpu"
+                    and isinstance(resolution.get("memory_candidates"), list)
+                    and resolution["memory_candidates"],
+                    "memory/RAG resolution needs a scoped runtime qualification")
+            require(all(row.get("id") in candidate_ids for row in resolution["memory_candidates"]),
+                    "memory/RAG resolution candidate is outside the source review")
+            memory_review["resolution"] = resolution
+            source_paths.append(resolution_path)
+            source_paths.extend(resolution.get("native_evidence_records", []))
+        current_public_paths.update(source_paths)
+        for source_path in source_paths:
+            track(source_path)
+        memory_review["url"] = file_url(path)
+        memory_review["sources"] = [{"path": item, "url": file_url(item)} for item in source_paths]
+
+    runtime_worker_review = None
+    if config.get("runtime_worker_review"):
+        runtime_worker_review = build_runtime_worker_review(
+            root, config["runtime_worker_review"], read=read, track=track,
+            file_url=file_url, current_public_paths=current_public_paths)
+    all_layer_resolution = None
+    if config.get("all_layer_resolution"):
+        all_layer_resolution = build_all_layer_resolution(
+            root, config["all_layer_resolution"], read=read, track=track,
+            file_url=file_url, current_public_paths=current_public_paths)
 
     index, stack, evidence, stars, review = (read(path) for path in (INDEX, STACK, EVIDENCE, STARS, REVIEW))
     star_map = {row["repository"].casefold(): row for row in stars["repositories"]}
@@ -706,6 +977,12 @@ def build_data(root):
             guide_paths.extend(["docs/native-skill-practice-20260921.md", "blueprints/native-skill-practice/README.md"])
         if landscape_manifest["sources"].get("research_state"):
             guide_paths.extend(["docs/landscape-continuation.md", "docs/hosting-container-practice.md"])
+    if memory_review:
+        guide_paths.append(memory_review["report"])
+    if runtime_worker_review:
+        guide_paths.extend(runtime_worker_review["offline_guides"])
+    if all_layer_resolution:
+        guide_paths.extend(all_layer_resolution["offline_guides"])
     documents_to_embed = sorted(set(adoption["recipe_map"].values()) | set(guide_paths))
     recipes = []
     for path in documents_to_embed:
@@ -872,6 +1149,16 @@ def build_data(root):
         landscape = build_landscape(root, config["landscape_manifest"], read=read,
                                     track=track, file_url=file_url)
     convergence = build_convergence(root, read, file_url)
+    if memory_review and memory_review.get("assurance"):
+        alignment = memory_review["assurance"]["runtime_alignment"]
+        components = {component["id"]: component for component in stack["components"]}
+        ids = alignment["core_component_ids"] + alignment["optional_component_ids"]
+        require(all(identifier in components for identifier in ids),
+                "memory/RAG runtime alignment must use canonical selected component IDs")
+        alignment["components"] = [{"id": identifier, "version": components[identifier]["version"],
+                                    "role": components[identifier]["role"],
+                                    "optional": identifier in alignment["optional_component_ids"]}
+                                   for identifier in ids]
     return {"schema_version": 1, "snapshot_date": config["snapshot_date"],
             "repository_url": config["repository_url"], "source_revision": config["source_revision"],
             "stars_observed_at": stars_observed_at, "historical_star_audit_count": stars["count"],
@@ -882,6 +1169,9 @@ def build_data(root):
                        "executed": sum(row["executed"] for row in output)},
             "layers": layers, "repositories": output, "integrations": integrations, "awesome": awesome,
             "grand_catalogs": grand_catalogs, "landscape": landscape, "convergence": convergence,
+            "memory_review": memory_review,
+            "runtime_worker_review": runtime_worker_review,
+            "all_layer_resolution": all_layer_resolution,
             "setup": {"components": selected, "profiles": profiles, "recipes": recipes,
                       "default_profile": adoption["default_profile"],
                       "supported_platforms": adoption.get("supported_platforms", []),
@@ -927,8 +1217,41 @@ class InlineScripts(HTMLParser):
             self.body = None
 
 
-def render_from_data(data, root):
-    template = safe_file(root, TEMPLATE).read_text(encoding="utf-8")
+def build_topic_data(root, topic):
+    """Reuse the validated catalog join; embed only explicitly selected topic evidence."""
+    require(topic == "memory-rag", "unsupported topic")
+    full = build_data(root)
+    review = full.get("memory_review")
+    require(review is not None, "memory/RAG topic needs the configured review")
+    sources = {row["path"]: row["url"] for row in review["sources"]}
+    continuity = "docs/landscape-continuation.md"
+    sources[continuity] = f'{full["repository_url"]}/blob/main/{continuity}'
+    inputs = {row["path"]: row for row in full["inputs"]}
+    documents = []
+    for path, url in sorted(sources.items()):
+        raw = safe_file(root, path).read_bytes()
+        require(len(raw) <= PUBLIC_ARTIFACT_LIMIT, f"topic artifact too large: {path}")
+        require(path in inputs and inputs[path]["sha256"] == digest(raw),
+                f"topic source changed during build: {path}")
+        documents.append({"path": path, "url": url, "sha256": digest(raw),
+                          "bytes": len(raw), "text": raw.decode("utf-8")})
+    selected_inputs = set(sources) | {CONFIG, STACK}
+    return {"schema_version": 1, "kind": "memory_rag_topic_manifest", "topic": topic,
+            "repository_url": full["repository_url"], "source_revision": full["source_revision"],
+            "review": review, "documents": documents,
+            "inputs": [inputs[path] for path in sorted(selected_inputs) if path in inputs],
+            "scope": "Offline topic publication; source review, publisher benchmarks and local native fixtures retain their separate scopes."}
+
+
+def render_from_data(data, root, topic=None):
+    template_path = TOPICS[topic][0] if topic else TEMPLATE
+    template = safe_file(root, template_path).read_text(encoding="utf-8")
+    if topic:
+        shared = safe_file(root, TEMPLATE).read_text(encoding="utf-8")
+        style = re.search(r"<style>([\s\S]*?)</style>", shared)
+        require(style is not None and template.count("@@STYLE@@") == 1,
+                "topic template needs the shared explorer stylesheet")
+        template = template.replace("@@STYLE@@", style.group(1))
     require(template.count("@@DATA@@") == 1, "template must have one embedded data marker")
     encoded = canonical_json(data).replace("&", "\\u0026").replace("<", "\\u003c").replace(
         ">", "\\u003e").replace("\u2028", "\\u2028").replace("\u2029", "\\u2029")
@@ -944,45 +1267,56 @@ def render_from_data(data, root):
     return result.replace("@@SCRIPT_HASH@@", script_hash).encode("utf-8")
 
 
-def render(root):
-    return render_from_data(build_data(root), root)
+def render(root, topic=None):
+    data = build_topic_data(root, topic) if topic else build_data(root)
+    return render_from_data(data, root, topic)
 
 
-def input_digest(data, root):
+def input_digest(data, root, topic=None):
     """sha256 over the sorted list of every input path this build actually read
     (path, sha256, bytes, scope) plus the HTML template render_from_data reads,
     so the report is tied to exact source content."""
     template = safe_file(root, TEMPLATE).read_bytes()
-    return digest(canonical_json({"inputs": data["inputs"],
-                                  "template": {"path": str(TEMPLATE), "sha256": digest(template)}}).encode())
+    if not topic:
+        return digest(canonical_json({"inputs": data["inputs"],
+                                      "template": {"path": TEMPLATE, "sha256": digest(template)}}).encode())
+    dependencies = [{"path": TEMPLATE, "sha256": digest(template)}]
+    if topic:
+        path = TOPICS[topic][0]
+        dependencies.append({"path": path, "sha256": digest(safe_file(root, path).read_bytes())})
+    return digest(canonical_json({"inputs": data["inputs"], "templates": dependencies}).encode())
 
 
-def check(root):
+def check(root, topic=None):
     """Build twice, each time into its own temporary directory, and require
     byte-identical output. docs/ecosystem/index.html is no longer committed,
     so --check has nothing checked-in to compare against; this instead
     verifies the build is deterministic from the current repository state."""
     with tempfile.TemporaryDirectory() as first, tempfile.TemporaryDirectory() as second:
-        data = build_data(root)
-        (Path(first) / "index.html").write_bytes(render_from_data(data, root))
+        data = build_topic_data(root, topic) if topic else build_data(root)
+        (Path(first) / "index.html").write_bytes(render_from_data(data, root, topic))
         first_bytes = (Path(first) / "index.html").read_bytes()
         # The second build runs in a separate interpreter with a different hash seed, so
         # set/dict-order nondeterminism that one process would hide still fails the check.
         target = Path(second) / "index.html"
+        command = [sys.executable, str(Path(__file__).resolve()), "--root", str(root), "--render-to", str(target)]
+        if topic:
+            command += ["--topic", topic]
         proc = subprocess.run(
-            [sys.executable, str(Path(__file__).resolve()), "--root", str(root), "--render-to", str(target)],
+            command,
             env=dict(os.environ, PYTHONHASHSEED="1" if os.environ.get("PYTHONHASHSEED") != "1" else "2"),
             capture_output=True, text=True, check=False)
         require(proc.returncode == 0, f"second-process explorer build failed: {(proc.stdout + proc.stderr)[-400:]}")
         second_bytes = target.read_bytes()
     require(first_bytes == second_bytes,
             "explorer build is not deterministic across two independent builds (separate processes and hash seeds)")
-    return first_bytes, input_digest(data, root)
+    return first_bytes, input_digest(data, root, topic)
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--root", type=Path, default=Path(__file__).resolve().parents[1])
+    parser.add_argument("--topic", choices=sorted(TOPICS), help="Build a focused offline topic manifest")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--write", action="store_true", help="Rebuild the public HTML (writes it locally; not committed)")
     mode.add_argument("--check", action="store_true", help="Check deterministic rebuild (default)")
@@ -991,14 +1325,14 @@ def main(argv=None):
     try:
         root = args.root.resolve()
         if args.render_to:
-            args.render_to.write_bytes(render(root))
+            args.render_to.write_bytes(render(root, args.topic))
             return 0
         if args.write:
-            result = render(root)
-            safe_file(root, OUTPUT).write_bytes(result)
+            result = render(root, args.topic)
+            safe_file(root, TOPICS[args.topic][1] if args.topic else OUTPUT).write_bytes(result)
             report = {"status": "written", "bytes": len(result), "sha256": digest(result)}
         else:
-            result, source_digest = check(root)
+            result, source_digest = check(root, args.topic)
             report = {"status": "passed", "bytes": len(result), "output_sha256": digest(result),
                       "input_sha256": source_digest}
     except (InvalidDecisionIndex, OSError, ValueError, KeyError, TypeError) as error:

@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "kind": "native_cross_session_messaging",
+  "observed_at": "2026-10-01T00:32:29.179015+00:00",
+  "authorization": "User explicitly requested cross-session SOTA peer messaging.",
+  "source_contract": {
+    "installed_client": "Claude Code 2.1.286",
+    "upstream_release": "https://github.com/anthropics/claude-code/releases/tag/v2.1.286",
+    "release_revision": "f5f60250a032caa72d1eb47f9ca5f29becc7066f",
+    "installed_binary_sha256": "fe503f65c6289d59c23e5b21ae44f03583f997dd33a2cbfc75ab4f96fb8fc73f",
+    "send_message_schema_sha256": "e046e02d7f854cdddd27e5b870b863e018af25ea4255ca9c8cafc75c1432a09f",
+    "sources": [
+      "https://code.claude.com/docs/en/cross-session-messaging#non-interactive-sessions",
+      "https://code.claude.com/docs/en/cross-session-messaging#message-another-session",
+      "https://code.claude.com/docs/en/cross-session-messaging#message-delivery"
+    ]
+  },
+  "native_command": "rtk timeout --signal=TERM --kill-after=5s 180s claude -p --model sonnet --effort max --tools ListAgents,SendMessage --allowedTools ListAgents,SendMessage --output-format stream-json --verbose < owned-private-prompt > owned-private-returned-jsonl",
+  "exit_code": 0,
+  "returned_stream_sha256": "8bad53db21652cf87c4e756a3084f976a2f0bf1f091f8fa2d593a266300634b8",
+  "returned_stream_bytes": 324564,
+  "result_subtype": "success",
+  "result_is_error": false,
+  "model_observed": "claude-sonnet-5-5",
+  "sends": [
+    {
+      "target": "native-agent-stack-88",
+      "tool": "SendMessage",
+      "is_error": false,
+      "success": true,
+      "delivery_state": "queued",
+      "returned_message": "\u201cSOTA resolution evidence handoff \u2014 all lanes\u201d \u2192 native-agent-stack-88 (another Claude session on this machine; queued there \u2014 a [Cross-session delivery notice] follows if that session holds it (different permission mode: its user must approve first) or refuses it)",
+      "message_id_sha256": "f38d0d56bae29a300befebbd3eb8b4d250244b66eced672640491c20f446aa04",
+      "sent_body_sha256": "aa7219e1aff60459dbb76ed7c4c8ff68e9c1ed616ddf1aed351bee4934fa8dcf"
+    },
+    {
+      "target": "native-agent-stack-6d",
+      "tool": "SendMessage",
+      "is_error": false,
+      "success": true,
+      "delivery_state": "queued",
+      "returned_message": "\u201cSOTA resolution evidence handoff \u2014 all lanes\u201d \u2192 native-agent-stack-6d (another Claude session on this machine; queued there \u2014 a [Cross-session delivery notice] follows if that session holds it (different permission mode: its user must approve first) or refuses it)",
+      "message_id_sha256": "78fc03121e802ab7492d3741f32fabc0fd777404cdd6fd92956e84231dd13038",
+      "sent_body_sha256": "aa7219e1aff60459dbb76ed7c4c8ff68e9c1ed616ddf1aed351bee4934fa8dcf"
+    },
+    {
+      "target": "sota-default-harness-setup",
+      "tool": "SendMessage",
+      "is_error": false,
+      "success": true,
+      "delivery_state": "queued",
+      "returned_message": "\u201cSOTA resolution evidence handoff \u2014 all lanes\u201d \u2192 sota-default-harness-setup (another Claude session on this machine; queued there \u2014 a [Cross-session delivery notice] follows if that session holds it (different permission mode: its user must approve first) or refuses it)",
+      "message_id_sha256": "67eac630138511d51549e97b42ce663244ee4116be05f4ccf5d39ffed213c543",
+      "sent_body_sha256": "aa7219e1aff60459dbb76ed7c4c8ff68e9c1ed616ddf1aed351bee4934fa8dcf"
+    },
+    {
+      "target": "terminal-notification-tuning",
+      "tool": "SendMessage",
+      "is_error": false,
+      "success": true,
+      "delivery_state": "queued",
+      "returned_message": "\u201cSOTA resolution evidence handoff \u2014 all lanes\u201d \u2192 terminal-notification-tuning (another Claude session on this machine; queued there \u2014 a [Cross-session delivery notice] follows if that session holds it (different permission mode: its user must approve first) or refuses it)",
+      "message_id_sha256": "e33749793c5f4e08425ffa28d255b5d9819ce20d7c5a08bf71fec5cfc213999c",
+      "sent_body_sha256": "aa7219e1aff60459dbb76ed7c4c8ff68e9c1ed616ddf1aed351bee4934fa8dcf"
+    },
+    {
+      "target": "native-agent-stack-ae",
+      "tool": "SendMessage",
+      "is_error": false,
+      "success": true,
+      "delivery_state": "queued",
+      "returned_message": "\u201cSOTA resolution evidence handoff \u2014 all lanes\u201d \u2192 native-agent-stack-ae (another Claude session on this machine; queued there \u2014 a [Cross-session delivery notice] follows if that session holds it (different permission mode: its user must approve first) or refuses it)",
+      "message_id_sha256": "bd779032e3ccb075f17addeee4ee041094f4783f39f096d168e6d646ac833f4f",
+      "sent_body_sha256": "aa7219e1aff60459dbb76ed7c4c8ff68e9c1ed616ddf1aed351bee4934fa8dcf"
+    },
+    {
+      "target": "codex-runtime-litellm-handoff-20260930-2340",
+      "tool": "SendMessage",
+      "is_error": false,
+      "success": true,
+      "delivery_state": "queued",
+      "returned_message": "\u201cSOTA resolution evidence handoff \u2014 all lanes\u201d \u2192 codex-runtime-litellm-handoff-20260930-2340 (another Claude session on this machine; queued there \u2014 a [Cross-session delivery notice] follows if that session holds it (different permission mode: its user must approve first) or refuses it)",
+      "message_id_sha256": "8ad0db22e02bf3e1ceffd123ad51f235a61ae115bfd6adb21a03f88e2f863431",
+      "sent_body_sha256": "aa7219e1aff60459dbb76ed7c4c8ff68e9c1ed616ddf1aed351bee4934fa8dcf"
+    }
+  ],
+  "usage": {
+    "scope": "Final native cumulative total_cost_usd and modelUsage snapshot, counted once. The separate usage object describes only the final turn; cache categories and thinking subsets are not added to their parent counters.",
+    "total_cost_usd": 0.6886326,
+    "final_turn_usage_snapshot": {
+      "input_tokens": 2,
+      "cache_creation_input_tokens": 2753,
+      "cache_read_input_tokens": 104560,
+      "output_tokens": 1917,
+      "output_tokens_details": {
+        "thinking_tokens": 1102
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 2753,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "not_available",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 1917,
+          "cache_read_input_tokens": 104560,
+          "cache_creation_input_tokens": 2753,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 2753
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "cumulative_native_model_usage": {
+      "claude-sonnet-5-5": {
+        "inputTokens": 12,
+        "outputTokens": 16289,
+        "cacheReadInputTokens": 482333,
+        "cacheCreationInputTokens": 107313,
+        "webSearchRequests": 0,
+        "costUSD": 0.6886326,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 128000,
+        "thinkingTokens": 5243,
+        "canonicalModel": "claude-sonnet-5-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    },
+    "native_result_record_count": 4,
+    "billing_boundary": "Native client reported usage/cost; independent provider bill reconciliation was not performed."
+  },
+  "boundaries": [
+    "Six successful native queued tool results; read, acceptance and task completion are unobserved.",
+    "Fresh native ListAgents lookup preceded exact-target sends; no wildcard broadcast or acknowledgment loop.",
+    "Private stream retained outside checkout; public receipt excludes session ids and raw message bodies.",
+    "Codex queue/agents supported by installed0.159.2 help/source; default daemon registry not reachable in peer investigation. No daemon started and no Codex live delivery claimed."
+  ],
+  "corrections": [
+    {
+      "claim": "The final result usage object is relay-wide aggregate token usage.",
+      "correction": "It is final-turn usage. The final modelUsage and total_cost_usd are cumulative snapshots; retain them separately and count once.",
+      "verification": "Astra/max independent original-stream review; four result records, final cumulative modelUsage read from original stream.",
+      "original_stream_sha256": "8bad53db21652cf87c4e756a3084f976a2f0bf1f091f8fa2d593a266300634b8"
+    }
+  ]
+}

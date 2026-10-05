@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "kind": "read_only_native_cli_configuration_audit",
+  "recorded_at_utc": "2026-10-01T00:50:36Z",
+  "scope": "Current Linux host; configured defaults and native discovery, without message delivery or new model execution",
+  "status": "selected_quality_defaults_enabled_with_messaging_and_rollout_gaps",
+  "codex": {
+    "installed_version": "0.159.2",
+    "latest_stable_release_observed": "0.159.3",
+    "coordinator": {"model": "gpt-6.1-sol", "effort": "ultra"},
+    "primary_workers": {"model": "gpt-6.1-sol", "effort": "max", "maximum_concurrent_children": 3},
+    "escalation_policy": "Astra/Max for documented consequential architecture, conflicting primary evidence, or a failure unresolved after one bounded Sol repair",
+    "ultra_boundary": "Native Sol metadata selects proactive delegation and normalizes the inference effort to xhigh; Ultra is not a claim of Max effort on each inference",
+    "approval_policy": "never",
+    "sandbox_mode": "danger-full-access",
+    "web_search": "live",
+    "daemon_auto_start": false,
+    "messaging": {
+      "native_queue_command_supported": true,
+      "shared_daemon_probe_exit_code": 1,
+      "shared_daemon_probe_result": "No reachable app-server control socket observed",
+      "message_delivery_tested": false,
+      "verdict": "Supported independent-session queue interface; seamless shared-session transport not verified active"
+    },
+    "production_rollout": "Existing finalization record remains qualified_with_pending_idle_activation; this audit does not certify that rollout"
+  },
+  "claude": {
+    "installed_version": "2.1.286",
+    "latest_release_matches_installed": true,
+    "model_alias": "opus",
+    "interactive_launcher_effort": "max when a terminal launch supplies no explicit effort or headless flag",
+    "saved_effort": "xhigh",
+    "ultracode": true,
+    "subagent_fallback_model": "opus",
+    "global_effort_override_present_in_inspected_environment_and_settings": false,
+    "permission_mode": "bypassPermissions",
+    "messaging": {
+      "crossSessionInbound": "accept",
+      "native_agent_listing_exit_code": 0,
+      "discovered_live_peers": 6,
+      "message_delivery_tested": false,
+      "verdict": "Native same-machine cross-session inbound messaging configured to accept"
+    }
+  },
+  "cross_client_bridge": "No enabled Codex-to-Claude native messaging bridge established by this audit",
+  "sources": [
+    "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
+    "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+    "https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/core/config.schema.json",
+    "https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/models-manager/models.json",
+    "https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/protocol/src/openai_models/reasoning_effort.rs",
+    "https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/core/src/session/multi_agents.rs",
+    "https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/tui/src/session_queue_commands.rs#L27",
+    "https://github.com/openai/codex/blob/rust-v0.159.2/codex-rs/tui/src/session_archive_commands.rs#L250",
+    "https://learn.chatgpt.com/docs/config-file/config-reference",
+    "https://github.com/anthropics/claude-code/releases/tag/v2.1.286",
+    "https://github.com/anthropics/claude-code/blob/v2.1.286/CHANGELOG.md",
+    "https://code.claude.com/docs/en/model-config",
+    "https://code.claude.com/docs/en/permissions",
+    "https://code.claude.com/docs/en/cross-session-messaging",
+    "docs/decisions/2026-09-30-sol-primary-quality-defaults.md",
+    "docs/decisions/2026-09-30-sota-native-finalization.md"
+  ],
+  "anti_pattern_log": [
+    {
+      "attempt": "rtk codex --strict-config features list",
+      "exit_code": 1,
+      "returned_error": "Error: `--strict-config` is not supported for `codex features`",
+      "correction": "Do not use features list as a strict configuration validator",
+      "verification_path": "Installed native debug-model catalog and the tagged upstream configuration schema were inspected separately; no successful strict-config validation is claimed"
+    }
+  ],
+  "limitations": [
+    "Configuration and discovery do not prove delivery, resolved provider behavior, comparative model quality, or all SOTA settings",
+    "Current native metadata and command results are distinct from historical fixture acceptance",
+    "Direct-native and headless Claude calls require an explicit effort argument for Max; saved settings use xhigh",
+    "No client configuration, native sign-in, live session, or daemon lifecycle was intentionally changed",
+    "Existing dirty checkout work belongs to other active sessions and was preserved"
+  ]
+}

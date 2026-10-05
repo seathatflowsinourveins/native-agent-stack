@@ -1,0 +1,403 @@
+{
+  "schema_version": 1,
+  "kind": "memory_runtime_latestness_review",
+  "checked_at": "2026-09-30T22:41:57.145391+00:00",
+  "scope": "Five memory finalists, independently versioned Hindsight integration, six supporting foundation tools and WSL; the other reviewed candidates retain their earlier same-day source review. Freshness is not runtime or quality acceptance.",
+  "method": "Fresh native gh release/tag and immutable commit API output plus installed version probes; registry metadata and pinned source separately verified. Repository namespaces and package language are explicit.",
+  "release_checks": [
+    {
+      "id": "hindsight-server",
+      "api_endpoint": "repos/vectorize-io/hindsight/releases/tags/v0.10.2",
+      "exit_code": 0,
+      "stdout_sha256": "bfa337da1aae5dda45302d5a76b43f45830649dad708614bae5fe76acc9e6a8f",
+      "stdout_bytes": 84865,
+      "tag_name": "v0.10.2",
+      "published_at": "2026-09-29T10:06:40Z",
+      "html_url": "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.2",
+      "draft": false,
+      "prerelease": false,
+      "commit_api_exit_code": 0,
+      "revision": "5fc4ce20917b916240cef27c212c387a177f115b"
+    },
+    {
+      "id": "hindsight-coding-agents",
+      "api_endpoint": "repos/vectorize-io/hindsight/releases/tags/integrations/coding-agents/v0.8.0",
+      "exit_code": 1,
+      "stdout_sha256": "010563d2cfb8f1e87f700936ce59ee3a33364da46e3db41b0049227918ece74d",
+      "stdout_bytes": 133,
+      "error_summary": "gh: Not Found (HTTP 404)\n"
+    },
+    {
+      "id": "ai-memory",
+      "api_endpoint": "repos/akitaonrails/ai-memory/releases/tags/v2.5.0",
+      "exit_code": 0,
+      "stdout_sha256": "afcbc23b220d7563ed4bc5abd613a486f4898c26b6c2245bd6d5d154d9e47fb7",
+      "stdout_bytes": 43985,
+      "tag_name": "v2.5.0",
+      "published_at": "2026-09-30T20:31:52Z",
+      "html_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.0",
+      "draft": false,
+      "prerelease": false,
+      "commit_api_exit_code": 0,
+      "revision": "a8757a05a960f96a0ba510b6341bcd520cf80bb2"
+    },
+    {
+      "id": "agentmemory",
+      "api_endpoint": "repos/rohitg00/agentmemory/releases/tags/v0.9.29",
+      "exit_code": 0,
+      "stdout_sha256": "c19c7a7633e39c1f233c65d1fa92b16f844946057bac01c38eb61c4b622f5c3b",
+      "stdout_bytes": 3914,
+      "tag_name": "v0.9.29",
+      "published_at": "2026-08-16T13:56:45Z",
+      "html_url": "https://github.com/rohitg00/agentmemory/releases/tag/v0.9.29",
+      "draft": false,
+      "prerelease": false,
+      "commit_api_exit_code": 0,
+      "revision": "2d38dafede67d0d4ed920cde94d2106e98825b8a"
+    },
+    {
+      "id": "mempalace",
+      "api_endpoint": "repos/MemPalace/mempalace/releases/tags/v3.10.0",
+      "exit_code": 0,
+      "stdout_sha256": "de7141adcb303ebf57263a172552922295f35fe7caf629e56ca4b22a5f44ad78",
+      "stdout_bytes": 54670,
+      "tag_name": "v3.10.0",
+      "published_at": "2026-09-16T00:24:11Z",
+      "html_url": "https://github.com/MemPalace/mempalace/releases/tag/v3.10.0",
+      "draft": false,
+      "prerelease": false,
+      "commit_api_exit_code": 0,
+      "revision": "22fd87f09c19d5ffb2d6966486483353937931c0"
+    },
+    {
+      "id": "mem0-python",
+      "api_endpoint": "repos/mem0ai/mem0/releases/tags/v2.2.1",
+      "exit_code": 0,
+      "stdout_sha256": "3a89a3638b71b1125d1ec6c75b70bd5a1bab913bc1f5bda887ba9fd6a1579d64",
+      "stdout_bytes": 3661,
+      "tag_name": "v2.2.1",
+      "published_at": "2026-09-25T17:35:20Z",
+      "html_url": "https://github.com/mem0ai/mem0/releases/tag/v2.2.1",
+      "draft": false,
+      "prerelease": false,
+      "commit_api_exit_code": 0,
+      "revision": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd"
+    },
+    {
+      "id": "codex",
+      "api_endpoint": "repos/openai/codex/releases/latest",
+      "exit_code": 0,
+      "stdout_sha256": "41c21409441bdaa2d1094aacb646e483a1ce601bb943917e428ad6f74a6fe021",
+      "stdout_bytes": 299972,
+      "tag_name": "rust-v0.159.2",
+      "published_at": "2026-09-29T23:57:16Z",
+      "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
+      "draft": false,
+      "prerelease": false
+    },
+    {
+      "id": "claude-code",
+      "api_endpoint": "repos/anthropics/claude-code/releases/latest",
+      "exit_code": 0,
+      "stdout_sha256": "fa7484efad35bdd96bca2f0e1fc77bf4cb27028d03bc40b2c3918336c27e1fb3",
+      "stdout_bytes": 30053,
+      "tag_name": "v2.1.286",
+      "published_at": "2026-09-30T19:10:13Z",
+      "html_url": "https://github.com/anthropics/claude-code/releases/tag/v2.1.286",
+      "draft": false,
+      "prerelease": false
+    },
+    {
+      "id": "context-mode",
+      "api_endpoint": "repos/mksglu/context-mode/releases/latest",
+      "exit_code": 0,
+      "stdout_sha256": "97c0af65d4aaae169d0f68f3805464740f4ff8a25ac7489dcfd6f706836e11f7",
+      "stdout_bytes": 3041,
+      "tag_name": "v1.0.169",
+      "published_at": "2026-06-29T18:18:53Z",
+      "html_url": "https://github.com/mksglu/context-mode/releases/tag/v1.0.169",
+      "draft": false,
+      "prerelease": false
+    },
+    {
+      "id": "qmd",
+      "api_endpoint": "repos/tobi/qmd/releases/latest",
+      "exit_code": 0,
+      "stdout_sha256": "da288fa90d1dcc04ca9ea47566182aa73be1e66c1a542e9cee3446e8785f0014",
+      "stdout_bytes": 26205,
+      "tag_name": "v2.8.3",
+      "published_at": "2026-08-16T22:30:34Z",
+      "html_url": "https://github.com/tobi/qmd/releases/tag/v2.8.3",
+      "draft": false,
+      "prerelease": false
+    },
+    {
+      "id": "rtk",
+      "api_endpoint": "repos/rtk-ai/rtk/releases/latest",
+      "exit_code": 0,
+      "stdout_sha256": "09da6fda2d5f63e4586ce5f1f1b9570834f32820e75acacaa26dfccbd0259c3d",
+      "stdout_bytes": 25906,
+      "tag_name": "v0.50.0",
+      "published_at": "2026-09-24T10:02:31Z",
+      "html_url": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
+      "draft": false,
+      "prerelease": false
+    },
+    {
+      "id": "mcporter",
+      "api_endpoint": "repos/openclaw/mcporter/releases/latest",
+      "exit_code": 0,
+      "stdout_sha256": "6cf47d5005b12446ef2df552317f452ca7f51a1c3e16554db346fc8a1f4f1952",
+      "stdout_bytes": 10435,
+      "tag_name": "v0.14.1",
+      "published_at": "2026-09-24T13:16:08Z",
+      "html_url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.1",
+      "draft": false,
+      "prerelease": false
+    },
+    {
+      "id": "wsl",
+      "api_endpoint": "repos/microsoft/WSL/releases/latest",
+      "exit_code": 0,
+      "stdout_sha256": "4fdd524b3b3bc2677d0efc658d498abec8f8dcf77b6d024e531b780b2927081d",
+      "stdout_bytes": 9578,
+      "tag_name": "3.0.1",
+      "published_at": "2026-09-29T17:18:57Z",
+      "html_url": "https://github.com/microsoft/WSL/releases/tag/3.0.1",
+      "draft": false,
+      "prerelease": false
+    }
+  ],
+  "installed_version_checks": [
+    {
+      "id": "codex",
+      "command": "rtk codex --version",
+      "exit_code": 0,
+      "stdout": "codex-cli 0.159.2",
+      "stdout_sha256": "48784a39efd6841c30aff4c70ab315bea1dccee48519515cb308652cdef3ea57"
+    },
+    {
+      "id": "claude-code",
+      "command": "rtk claude --version",
+      "exit_code": 0,
+      "stdout": "2.1.286 (Claude Code)",
+      "stdout_sha256": "137c91ab68b8a7a011de6f45c0bdbb962abd1fa261daafa7f7fe4dbac82ba604"
+    },
+    {
+      "id": "rtk",
+      "command": "rtk rtk --version",
+      "exit_code": 0,
+      "stdout": "rtk 0.50.0",
+      "stdout_sha256": "46f7775514198d33a9a9f7b1a8cab6e6e02af8f7e75b43520d93ea077bf72181"
+    },
+    {
+      "id": "qmd",
+      "command": "rtk qmd --version",
+      "exit_code": 0,
+      "stdout": "qmd 2.8.3 (facd35e)",
+      "stdout_sha256": "f2fde0f2ce1957393ab2348fc31dae60a39e4684689ae9e95845a0ee5d8396ab"
+    },
+    {
+      "id": "mcporter",
+      "command": "rtk mcporter --version",
+      "exit_code": 0,
+      "stdout": "0.14.1",
+      "stdout_sha256": "c6fb87657a4ee72e2b549cdd39c12854fdbecbdfef033c04f523d4bfcb02aa4c"
+    },
+    {
+      "id": "ai-memory",
+      "command": "rtk ai-memory --version",
+      "exit_code": 0,
+      "stdout": "ai-memory 2.4.2",
+      "stdout_sha256": "73833eef29691b57a140cf07076aec07aca85359efd2ddf816f9317fa749181a"
+    }
+  ],
+  "integration_registry_check": {
+    "id": "hindsight-coding-agents",
+    "package": "@vectorize-io/hindsight-coding-agents",
+    "version": "0.8.0",
+    "revision": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c",
+    "published_at": "2026-09-29T11:41:37.822Z",
+    "source": "https://registry.npmjs.org/@vectorize-io%2Fhindsight-coding-agents",
+    "response_sha256": "fb78ac1aafab0679a63b6d1e51a691edd3d66de1560db28bdbf08ecd862092e9",
+    "response_bytes": 180578,
+    "dist_integrity": "sha512-CViWmh2fnVjhQM8kqOJ2GIGC0kp/Gv4t5X+j+kzpzP+T54PiKQPsrQOunvmluEE3JCGnRQOIcz91Vu/0QUcZow=="
+  },
+  "integration_git_tag_check": {
+    "repository": "vectorize-io/hindsight",
+    "ref": "refs/tags/integrations/coding-agents/v0.8.0",
+    "ref_api_exit_code": 0,
+    "tag_api_exit_code": 0,
+    "tag_object": "8d43a979641e3c4d6aa458ec35127aa3ac80ca5a",
+    "revision": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c",
+    "tagger_date": "2026-09-29T11:37:52Z"
+  },
+  "mem0_python_registry_check": {
+    "package": "mem0ai",
+    "version": "2.2.1",
+    "source": "https://pypi.org/pypi/mem0ai/json",
+    "response_sha256": "ce4def67122bc744b07c5fdae5c1554a971deb0a9331a4c80c775863cc6c3d9e",
+    "response_bytes": 313980
+  },
+  "current_source_heads": [
+    {
+      "id": "agentmemory",
+      "repository": "rohitg00/agentmemory",
+      "revision": "29ecfde4df5998d913991049629014baa024600a",
+      "committed_at": "2026-09-30T09:51:36Z",
+      "url": "https://github.com/rohitg00/agentmemory/commit/29ecfde4df5998d913991049629014baa024600a",
+      "exit_code": 0
+    },
+    {
+      "id": "mempalace",
+      "repository": "MemPalace/mempalace",
+      "revision": "22fd87f09c19d5ffb2d6966486483353937931c0",
+      "committed_at": "2026-09-16T00:22:41Z",
+      "url": "https://github.com/MemPalace/mempalace/commit/22fd87f09c19d5ffb2d6966486483353937931c0",
+      "exit_code": 0
+    },
+    {
+      "id": "mem0-python",
+      "repository": "mem0ai/mem0",
+      "revision": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+      "committed_at": "2026-09-25T17:34:12Z",
+      "url": "https://github.com/mem0ai/mem0/commit/94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+      "exit_code": 0
+    },
+    {
+      "id": "hindsight-benchmark",
+      "repository": "vectorize-io/agent-memory-benchmark",
+      "revision": "f618ed7b1f0eb9cad7b42e876f91a42f0eadb150",
+      "committed_at": "2026-09-30T11:53:01Z",
+      "url": "https://github.com/vectorize-io/agent-memory-benchmark/commit/f618ed7b1f0eb9cad7b42e876f91a42f0eadb150",
+      "exit_code": 0
+    }
+  ],
+  "agentmemory_source_comparison": {
+    "files": [
+      {
+        "path": "eval/runner/adapters/agentmemory.ts",
+        "trial_sha256": "c01442a4eb4f74f7197415414bdd001122bf2eb85a8f020302247e97510c8ff5",
+        "main_sha256": "c01442a4eb4f74f7197415414bdd001122bf2eb85a8f020302247e97510c8ff5",
+        "identical": true,
+        "source": "https://github.com/rohitg00/agentmemory/blob/29ecfde4df5998d913991049629014baa024600a/eval/runner/adapters/agentmemory.ts"
+      },
+      {
+        "path": "src/state/memory-utils.ts",
+        "trial_sha256": "b3417fb3be5dde49fbd07c85f5eea182896fa83e6802f3806c35928c3a0fa7c3",
+        "main_sha256": "b3417fb3be5dde49fbd07c85f5eea182896fa83e6802f3806c35928c3a0fa7c3",
+        "identical": true,
+        "source": "https://github.com/rohitg00/agentmemory/blob/29ecfde4df5998d913991049629014baa024600a/src/state/memory-utils.ts"
+      },
+      {
+        "path": "src/config.ts",
+        "trial_sha256": "9935d8237f7c9420d66f766abeaefd86bcaab1cec3159c0cfd488534d087c0b4",
+        "main_sha256": "3dea53670bee1287de8cfcc93d66bd678b03131ec591bf48cfa677a665832596",
+        "identical": false,
+        "source": "https://github.com/rohitg00/agentmemory/blob/29ecfde4df5998d913991049629014baa024600a/src/config.ts"
+      },
+      {
+        "path": "src/providers/embedding/index.ts",
+        "trial_sha256": "908c100aba9be7ad69940892dedd2e33399faa09126212f9755c7008c5680215",
+        "main_sha256": "908c100aba9be7ad69940892dedd2e33399faa09126212f9755c7008c5680215",
+        "identical": true,
+        "source": "https://github.com/rohitg00/agentmemory/blob/29ecfde4df5998d913991049629014baa024600a/src/providers/embedding/index.ts"
+      }
+    ],
+    "embedding_provider_function_identical": true,
+    "function_sha256": "9556358d1716a8d59178d2a1ab1c21f8adaef63eecd1cdae615afdcb8b378050",
+    "interpretation": "The whole config file changed, but detectEmbeddingProvider is byte-identical. Evaluator, memory mapping and embedding factory remain identical; the observed session mapping and keyless default gaps remain."
+  },
+  "wsl_version_check": {
+    "command": "rtk proxy wsl.exe --version",
+    "exit_code": 0,
+    "stdout": "WSL version: 2.7.13.0\r\nKernel version: 6.18.33.2-2\r\nWSLg version: 1.0.73.2\r\nMSRDC version: 1.2.7214\r\nDirect3D version: 1.611.1-81528511\r\nDXCore version: 10.0.26100.1-240331-1435.ge-release\r\nWindows version: 10.0.26200.9168"
+  },
+  "ai_memory_release_delta": {
+    "version": "2.5.0",
+    "revision": "a8757a05a960f96a0ba510b6341bcd520cf80bb2",
+    "changelog_source": "https://raw.githubusercontent.com/akitaonrails/ai-memory/a8757a05a960f96a0ba510b6341bcd520cf80bb2/CHANGELOG.md",
+    "changelog_sha256": "d927223b096938f4e51d105acb900f07d9be55cd27707d8e1488744a798548f6",
+    "changelog_bytes": 492221,
+    "source_reviewed_changes": [
+      "Named per-repository server profiles and explicit repository identity improve routing; storage adds V68-V70 migrations.",
+      "Optional external capture ownership and a durable companion relay support producer retries; the documented idempotency window is 30 days.",
+      "Managed run can finalize supported sessions whose harness lacks a native terminal hook.",
+      "Consolidation applies a default 0.8 safety margin to an approximate input budget; default bootstrap chunk output requests are capped at 16K."
+    ],
+    "execution_status": "Source-reviewed only. Existing native execution tested 2.4.2; no 2.5.0 migration, capture, recovery or quality/cost acceptance is claimed.",
+    "sources": [
+      "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.0",
+      "https://github.com/akitaonrails/ai-memory/blob/a8757a05a960f96a0ba510b6341bcd520cf80bb2/CHANGELOG.md",
+      "https://github.com/akitaonrails/ai-memory/blob/a8757a05a960f96a0ba510b6341bcd520cf80bb2/docs/external-lifecycle.md",
+      "https://github.com/akitaonrails/ai-memory/blob/a8757a05a960f96a0ba510b6341bcd520cf80bb2/docs/marker-file.md"
+    ]
+  },
+  "version_interpretation": [
+    "Hindsight server 0.10.2 and separately released coding integration 0.8.0 remain current stable pins.",
+    "Codex 0.159.2, Claude 2.1.286, QMD 2.8.3, RTK 0.50.0 and MCPorter 0.14.1 native probes match current upstream stable releases. Context-mode 1.0.169 latest matches the canonical recipe and retained metadata probe; no new live doctor execution.",
+    "ai-memory current CLI probe reports 2.4.2; canonical accepted pin at this observation remains 2.4.1. The running service and any concurrent cutover were not requalified by this version probe. Latest upstream is 2.5.0.",
+    "WSL reports 2.7.13.0; latest upstream is 3.0.1. No OS upgrade or new distribution was executed.",
+    "The remaining twenty catalog candidates retain their earlier same-day review. This focused refresh does not assert a new exhaustive landscape audit or universal SOTA ranking."
+  ],
+  "corrections": [
+    {
+      "claim": "The earlier latest-version field identified ai-memory 2.4.2.",
+      "correction": "A fresh release API and immutable tag check identify 2.5.0, published 2026-09-30T20:31:52Z. Historical 2.4.2 execution retains its actual pin.",
+      "verification": "release_checks[id=ai-memory] and ai_memory_release_delta"
+    },
+    {
+      "claim": "The guessed coding integration release API route returned 404.",
+      "correction": "The integration Git tag exists and resolves to npm's release commit. A missing GitHub release object does not establish a missing tag or package.",
+      "verification": "integration_git_tag_check and integration_registry_check; original failed route retained in release_checks"
+    }
+  ],
+  "final_recheck": {
+    "checked_at": "2026-10-01T00:22:46.431362+00:00",
+    "scope": "Final source/release recheck; earlier installed qualification remains unchanged.",
+    "release_checks": [
+      {
+        "id": "codex",
+        "command": "rtk proxy gh api repos/openai/codex/releases/latest",
+        "exit_code": 0,
+        "stdout_sha256": "1376e100323088ffe1691fe42e5c4c763dd750c93413476d7af1466e9d051ddf",
+        "stdout_bytes": 299611,
+        "tag_name": "rust-v0.159.3",
+        "published_at": "2026-09-30T22:57:34Z",
+        "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+        "draft": false,
+        "prerelease": false
+      },
+      {
+        "id": "hindsight",
+        "command": "rtk proxy gh api repos/vectorize-io/hindsight/releases/latest",
+        "exit_code": 0,
+        "stdout_sha256": "9324b6901a324d91aec9d0c29cf41623de59539182b6357c9e097c8fc087c41e",
+        "stdout_bytes": 84865,
+        "tag_name": "v0.10.2",
+        "published_at": "2026-09-29T10:06:40Z",
+        "html_url": "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.2",
+        "draft": false,
+        "prerelease": false
+      },
+      {
+        "id": "ai-memory",
+        "command": "rtk proxy gh api repos/akitaonrails/ai-memory/releases/latest",
+        "exit_code": 0,
+        "stdout_sha256": "b4bf343c695d001e6dfe0155da1ef959fcf1fd342048b269df6e60b0df8486d1",
+        "stdout_bytes": 43990,
+        "tag_name": "v2.5.0",
+        "published_at": "2026-09-30T20:31:52Z",
+        "html_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.0",
+        "draft": false,
+        "prerelease": false
+      }
+    ],
+    "codex_commit": {
+      "revision": "01fc69f4026735edfdf6789820549727a4867b11",
+      "exit_code": 0,
+      "stdout_sha256": "fa9bbf0a0042daa551d8172ac057956cf5bf712cb9ddac927cfa301210aebae1",
+      "stdout_bytes": 4515
+    }
+  }
+}

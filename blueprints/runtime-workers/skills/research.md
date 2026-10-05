@@ -229,6 +229,17 @@ needed relaying; [validation](validation.json) now lists them under
 
 ## Source pins
 
+The 2026-09-30 foundation source review retired upstream-removed
+`resolving-merge-conflicts` and refreshed the three changed adoption references.
+The current catalog has 136 entries; its budget is 1,020,382 SKILL.md bytes and
+36,856 description characters. These are catalog sums. Source-table revisions
+below retain the original discovery snapshot; each entry's exact revision,
+including a newer `reuse_ref`, is authoritative. This update does not install
+the runtime catalog or qualify its other candidates.
+
+Sources: [Matt removal](https://github.com/mattpocock/skills/blob/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/.changeset/remove-resolving-merge-conflicts.md),
+[Semgrep](https://github.com/trailofbits/skills/tree/82fe8226252622fa807643bdca1710901198553a/plugins/static-analysis/skills/semgrep).
+
 <!-- source-pins -->
 
 | Repository | Commit resolved with gh api | Selected skills |
@@ -237,7 +248,7 @@ needed relaying; [validation](validation.json) now lists them under
 | affaan-m/ECC | `2b6e839771e53096d8451a213d40dc64ec8acac0` | 2 |
 | anthropics/skills | `33375500bcea98d610eb30ce10ac4e59b89c390d` | 9 |
 | assafelovic/gpt-researcher | `0957c301ed06c2a5857b834358c7227c739041d4` | 1 |
-| mattpocock/skills | `c55ee46073ed923f86ce59a5eb3b6d895095d1b7` | 12 |
+| mattpocock/skills | `c55ee46073ed923f86ce59a5eb3b6d895095d1b7` | 11 |
 | obra/superpowers | `8ca22dba9a94f28898bbce59f2537ff4d87c747d` | 14 |
 | openai/skills | `49f948faa9258a0c61caceaf225e179651397431` | 6 |
 | trailofbits/skills | `0cc1c73a5e96749ab32d7ea5e14892fafa6972ae` | 9 |

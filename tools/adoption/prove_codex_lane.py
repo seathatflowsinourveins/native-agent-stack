@@ -3,7 +3,9 @@
 
 These checks, including --live, are local integration, not host acceptance. The JSON
 retains summaries only; native events, invocation arguments and returned output are
-not retained. See docs/acceptance-evidence-policy.md and the JSON evidence fields.
+not retained. Beside its rows it names no path and no identifier of one: `codex_home_is_default`
+(true only for ~/.codex) stands in for the Codex home. See
+docs/acceptance-evidence-policy.md and the JSON evidence fields.
 
 Static checks (no model call):
   marker        `env -C / codex debug prompt-input probe < /dev/null | grep -c 'native-agent-stack:top-rule'` is 1;
@@ -16,12 +18,22 @@ Static checks (no model call):
                 RTK_TELEMETRY_DISABLED, no forwarded variables; `codex mcp list --json` names context-mode once
   profile       `codex -p stack-worker debug prompt-input` carries max effort's "do not spawn sub-agents unless
                 asked" and the markers; `codex -p stack-worker mcp get` shows the template's tool lists
+  roles         the two role carriers under $CODEX_HOME/agents equal their rows in adoption/agents/codex/SHA256SUMS, the
+                agents folder holds exactly two *.toml files, and the live config.toml, the worker profile and the
+                system layer (/etc/codex) declare no other role: counts and booleans only, no model call. There is no
+                live role check here: the --live workers below run with --ephemeral, which persists no rollout, and
+                the exec JSONL stream cannot tell a found role from an unknown one. At openai/codex rust-v0.157.1 with
+                multi-agent V2, a successful spawn_agent emits a SubAgentActivity item that exec's mapping drops
+                (codex-rs/exec/src/event_processor_with_jsonl_output.rs, its catch-all arm; core/src/tools/handlers/
+                multi_agents_v2/spawn.rs), a failed spawn (an unknown agent_type) emits no item, and wait_agent's
+                item has empty receiver_thread_ids and agents_states (multi_agents_v2/wait.rs). Only the child's own
+                rollout, from a non-ephemeral run, shows the role; those probes are the capability-gate follow-up.
   rtk-exactness in a scratch repository whose committed big.txt is over 8 KiB: `rtk git status` exits 0,
                 native `git show HEAD:big.txt` is byte-exact, and `rtk git show HEAD:big.txt` is not (the
                 reason it is an exception)
 Live checks (--live; each worker is a model call on the shared allowance, so scripts/codex_quota.py --gate runs
 first and a reached gate refuses them):
-  workers       two concurrent `codex exec -p stack-worker -m gpt-6-astra -c model_reasoning_effort="max"
+  workers       two concurrent `codex exec -p stack-worker -m gpt-6.1-sol -c model_reasoning_effort="max"
                 -c web_search="live" -s read-only --skip-git-repo-check` workers (every live worker carries those
                 pins, since a project config outranks the profile), one started in its directory and one with -C
                 from another, each asked to call ctx_execute with `pwd`: the completed mcp_tool_call item's output
@@ -59,6 +71,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import apply_codex_lane as lane  # noqa: E402
+import codex_roles  # noqa: E402
 from scripts import adoption_status  # noqa: E402
 from scripts.codex_quota import group_alive  # noqa: E402
 
@@ -133,6 +146,37 @@ def make_repo(path: Path) -> bytes:
 # ---------------------------------------------------------------------------------------------------------------
 # static checks
 
+def roles_row(codex_home: Path, system_dir: Path | None = None) -> tuple[bool, str]:
+    """The `roles` row: how many of the two installed role carriers equal their rows in adoption/agents/codex/
+    SHA256SUMS, the *.toml files under $CODEX_HOME/agents, the [agents.<name>] tables of the live config.toml and
+    worker profile, and the roles of the system layer (/etc/codex). It passes only with 2/2, 2, 0 and 0: exactly
+    the two carriers, installed by discovery, with nothing else that Codex would load as a role in any arm. A count
+    that is unknown is shown as "unknown" and never passes: a link to a folder below agents (Codex enters it, so what
+    lies behind it is not attested here) or a part that cannot be read. Counts and booleans only; no name, path or
+    content."""
+    try:
+        pins = codex_roles.sha256sums(lane.ROLES_SOURCE / codex_roles.SHA256SUMS_NAME)
+    except (OSError, ValueError):
+        pins = {}
+    agents = codex_home / "agents"
+    equal = 0
+    if codex_roles.path_kind(agents) == "dir":
+        for name in codex_roles.ROLE_FILES:
+            try:
+                equal += (codex_roles.path_kind(agents / name) == "file"
+                          and lane.sha256_file(agents / name) == pins.get(name))
+            except OSError:
+                pass
+    count = codex_roles.agents_toml_count(agents)
+    tables = codex_roles.live_role_tables(codex_home)
+    system = codex_roles.system_role_count(lane.SYSTEM_CODEX_DIR if system_dir is None else system_dir)
+    expected = len(codex_roles.ROLE_FILES)
+    shown = ["unknown" if value is None else value for value in (count, tables, system)]
+    ok = equal == expected and count == expected and tables == 0 and system == 0
+    return ok, (f"installed {equal}/{expected} equal to SHA256SUMS; *.toml under agents {shown[0]}; "
+                f"role tables {shown[1]}; system roles {shown[2]}")
+
+
 def static_checks(codex: str, codex_home: Path, eco_root: str, checkout: Path, repo: Path, blob: bytes,
                   results: Results) -> None:
     env = lane.codex_env(codex_home)
@@ -173,6 +217,8 @@ def static_checks(codex: str, codex_home: Path, eco_root: str, checkout: Path, r
     problems = lane.check_readbacks(found, eco_root)
     results.add("profile", not problems, "; ".join(problems) or
                 f"-p {lane.PROFILE_NAME}: {found['prompt_input_profile']}; servers {found['profile_servers']}")
+    ok, detail = roles_row(codex_home)
+    results.add("roles", ok, detail)
 
     rtk = shutil.which("rtk")
     if not rtk:
@@ -556,7 +602,10 @@ def main(argv: list[str] | None = None) -> int:
     failed = [row["check"] for row in results.rows if not row["ok"]]
     print(f"result: {'PASS' if not failed else 'FAIL'} ({len(results.rows) - len(failed)} pass, {len(failed)} fail)")
     if args.json:
-        Path(args.json).write_text(json.dumps({**EVIDENCE, "started_utc": started, "codex_home": str(codex_home),
+        # No path and no identifier of one beside the rows: an unsalted digest of /home/<user>/.codex would let anyone
+        # confirm a guessed user name. Only whether the resolved home is the default ~/.codex is reported.
+        Path(args.json).write_text(json.dumps({**EVIDENCE, "started_utc": started,
+                                               "codex_home_is_default": codex_home == Path.home() / ".codex",
                                                "checks": results.rows, "live_runs": runs}, indent=2) + "\n",
                                    encoding="utf-8")
     return 0 if not failed else 1

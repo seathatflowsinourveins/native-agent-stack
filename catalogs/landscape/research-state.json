@@ -51,385 +51,465 @@
       "catalog": "foundation",
       "layer_id": "native-clients",
       "status": "on_requirement_change",
-      "next_action": "Compare a native client and supported SDK only for a missing event, tool or recovery requirement; freeze identical task/account/effect checks.",
+      "next_action": "Qualify latest Codex 0.159.3 in the existing isolated install/update/rollback recipe; current Claude recovery uses observed 2.1.286. Preserve earlier 0.159.2 acceptance and the Claude minimum-floor policy.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "docs/foundation-closure-20260921.md",
-        "docs/full-stack-convergence.md"
+        "docs/full-stack-convergence.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Foundation client/pin owner"
     },
     {
       "catalog": "foundation",
       "layer_id": "instructions-skills",
       "status": "on_requirement_change",
-      "next_action": "Use a selected pinned skill on its matching task; retain discovery, loaded sections, concrete findings and baseline conflict/effort before adding another pack.",
+      "next_action": "Use a selected pinned skill on a real matching task; freeze acceptance oracle and baseline before claiming skill-driven quality or whole-task savings.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "docs/foundation-closure-20260921.md",
-        "catalogs/foundation/community-practice-20260920.json"
+        "catalogs/foundation/community-practice-20260920.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json",
+        "evidence/receipts/token-lifecycle-resolution-20260930.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Skill lifecycle owner"
     },
     {
       "catalog": "foundation",
       "layer_id": "workers",
       "status": "comparison_required",
-      "next_action": "Freeze one representative coding/research task with output, cancellation and edit-ownership checks; compare native single-agent and selected worker graph with complete returned usage and independent acceptance.",
+      "next_action": "Freeze one representative single-agent versus worker-graph comparison with edit ownership, cancellation, independent acceptance and complete attempt usage; reuse Sept30 role-workflow, builder handback and Codex-child evidence.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "docs/full-stack-convergence.md",
-        "docs/foundation-convergence-20260921.md"
+        "docs/foundation-convergence-20260921.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json",
+        "evidence/receipts/token-lifecycle-resolution-20260930.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Worker coordinator"
     },
     {
       "catalog": "foundation",
       "layer_id": "isolation",
       "status": "on_requirement_change",
-      "next_action": "For the intended untrusted workload, compare the current sandbox with one OCI/VM candidate on filesystem/network/resource enforcement, state cleanup and host compatibility.",
+      "next_action": "Qualify the named claude-code-sandbox-profile gate in a disposable supported settings trial, including outside-worktree, Windows-executable, synthetic credential, network and systemd-bus negatives; dependencies alone do not establish enforcement.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "catalogs/foundation/decisions.json",
-        "catalogs/us-equities/hosting-source-review.json"
+        "catalogs/us-equities/hosting-source-review.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Foundation coordinator"
     },
     {
       "catalog": "foundation",
       "layer_id": "code-navigation",
       "status": "on_requirement_change",
-      "next_action": "Seal representative target-language questions with exact source/reference answers; include index build/update cost and known-source reads in the comparison.",
+      "next_action": "Qualify changed/deleted symbols and references in the selected target language/project; reuse exact-source and Sept30 Serena parity within their existing scope.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "catalogs/foundation/decisions.json",
-        "docs/token-native-saturation.md"
+        "docs/token-native-saturation.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json",
+        "evidence/receipts/token-lifecycle-resolution-20260930.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Project/index owner"
     },
     {
       "catalog": "foundation",
       "layer_id": "document-retrieval",
       "status": "comparison_required",
-      "next_action": "Seal a representative document corpus and relevance judgments; repeat randomized lexical/hybrid retrieval plus selected difficult-layout ingestion before changing defaults.",
+      "next_action": "Seal document corpus hashes, independent relevance judgments and negatives; repeat randomized lexical/hybrid warm/cold retrieval and required difficult-layout ingestion before changing QMD defaults.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "docs/foundation-rd-readiness.md",
-        "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json"
+        "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Retrieval owner"
     },
     {
       "catalog": "foundation",
       "layer_id": "semantic-rag",
       "status": "on_requirement_change",
-      "next_action": "Freeze target-project questions and expected source spans; measure retrieval/watcher correctness, latency, memory and restore on the destination hardware.",
+      "next_action": "Qualify selected-project watcher/update/deletion/restore correctness on destination hardware; held-out retrieval quality needs a sealed source-span oracle.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "docs/full-stack-convergence.md",
-        "docs/hf-memory-model-qualification.md"
+        "docs/hf-memory-model-qualification.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "RAG runtime/project owner"
     },
     {
       "catalog": "foundation",
       "layer_id": "durable-memory",
       "status": "comparison_required",
-      "next_action": "Run source-grounded recall and abstention cases with scoped capture, useful-write quality, deletion and isolated restore; compare complete usage without duplicating memory owners.",
+      "next_action": "Provider allowance restored per user. Keep Hindsight0.10.2/integration0.8.0 as finalized fit-based target and measured-winner fields null; qualify ordinary trusted current-client capture/isolation/freshness/replay/deletion and independent empty-target recovery before valid matched quality and complete-cost promotion. ai-memory2.5.0 remains source-only.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "docs/memory-landscape-maintenance.md",
-        "docs/native-memory-rag-lifecycle.md"
+        "docs/native-memory-rag-lifecycle.md",
+        "catalogs/foundation/memory-rag-20260930.json",
+        "docs/memory-rag-foundation-20260930.md",
+        "blueprints/convergence-practice/memory-runtime-resolution-20260930/manifest.json",
+        "evidence/artifacts/memory-runtime-resolution-20260930/latestness.json",
+        "evidence/artifacts/memory-runtime-resolution-20260930/provider-quota-capability.json",
+        "docs/landscape-continuation.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Memory resolution coordinator"
     },
     {
       "catalog": "foundation",
       "layer_id": "web-research",
       "status": "on_requirement_change",
-      "next_action": "Freeze required primary-source coverage and citation checks; add a crawler or research service only if current native retrieval demonstrably misses the requirement.",
+      "next_action": "Freeze a demonstrated primary-source coverage gap and citation oracle before adding Map/Crawl/Research or another service; retain existing native browser/literature/Tavily scope.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "catalogs/foundation/decisions.json",
-        "docs/full-stack-convergence.md"
+        "docs/full-stack-convergence.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Research owner"
     },
     {
       "catalog": "foundation",
       "layer_id": "token-efficiency",
       "status": "comparison_required",
-      "next_action": "Repeat a matched task at equal quality with original-context recovery; include failed attempts and separate complete provider use from cache subsets and artifact estimates.",
+      "next_action": "Measure an equal-quality matched whole task, preserving failed attempts and raw recovery; keep complete provider usage separate from cache subsets and artifact estimates. Reuse Sept30 tool lifecycle evidence.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "docs/full-stack-convergence.md",
-        "docs/token-native-saturation.md"
+        "docs/token-native-saturation.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json",
+        "evidence/receipts/token-lifecycle-resolution-20260930.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Token lane owner"
     },
     {
       "catalog": "foundation",
       "layer_id": "quality-evaluation",
       "status": "comparison_required",
-      "next_action": "Evaluate semantic advice on fresh independently labeled task cases, retain uncertain disagreements and a safe negative control; do not tune on the existing eight-case diagnostic.",
+      "next_action": "Use fresh independently labeled cases, disagreement handling, a negative control and injected regression; do not tune on the existing diagnostic cases.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "docs/acceptance-evidence-policy.md",
-        "docs/promptfoo-upstream-retrieval.md"
+        "docs/promptfoo-upstream-retrieval.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Evaluation owner"
     },
     {
       "catalog": "foundation",
       "layer_id": "ci-supply-chain",
       "status": "on_requirement_change",
-      "next_action": "Use the installed CI skill when a real Actions check fails; qualify log recovery and repair. Add vulnerability tooling only for a defined artifact/database gap.",
+      "next_action": "Use the installed CI skill for a real failing Actions check; qualify a defined vulnerability/database artifact gap separately. Preserve maintained actionlint provenance.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "catalogs/foundation/automation.json",
-        "docs/github-automation.md"
+        "docs/github-automation.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "GitHub automation owner"
     },
     {
       "catalog": "foundation",
       "layer_id": "scheduling-supervision",
       "status": "on_requirement_change",
-      "next_action": "If jobs must survive host loss or long waits, qualify one durable scheduler against explicit effect/retry/cancellation/recovery cases and operating cost.",
+      "next_action": "Reuse bounded Dagu/systemd graph acceptance; qualify physical-host loss, remote cancellation/billing cessation and external exactly-once effects only for the selected deployment requirement.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "docs/foundation-convergence-20260921.md",
-        "catalogs/foundation/decisions.json"
+        "catalogs/foundation/decisions.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Scheduler/effect owner"
     },
     {
       "catalog": "foundation",
       "layer_id": "hosting-services",
       "status": "on_requirement_change",
-      "next_action": "Choose deployment requirements first: local development, remote service or GPU job. Qualify one host/container option on data, network, rollback, persistence and measured workload cost.",
+      "next_action": "When deployment is selected, independently restore database/application state and qualify required production access, persistence and rollback on the chosen host.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "catalogs/foundation/decisions.json",
-        "docs/foundation-closure-20260921.md"
+        "docs/foundation-closure-20260921.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Application/deployment owner"
     },
     {
       "catalog": "foundation",
       "layer_id": "recovery-portability",
       "status": "new_host_required",
-      "next_action": "On the destination PC, select a small profile; establish native sign-ins, scoped tool calls and useful tasks, then independently restore selected application state and keys.",
+      "next_action": "On the destination PC, select a small profile, establish native sign-ins and a useful scoped task, then independently restore selected application state and keys.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "adoption/research.json",
-        "adoption/lifecycle.md"
+        "adoption/lifecycle.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Destination-host operator"
     },
     {
       "catalog": "foundation",
       "layer_id": "observation-inference",
       "status": "on_requirement_change",
-      "next_action": "Reconcile one real task across native counters and telemetry; qualify any new model route on actual output, privacy, latency and recovery without duplicate capture.",
+      "next_action": "Reconcile one actual task across native counters and matching telemetry without duplicate capture; qualify changed routes on output/privacy/latency/recovery.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "docs/native-telemetry-resolution.md",
-        "docs/dashboard-gap-resolution.md"
+        "docs/dashboard-gap-resolution.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Observability and run owner"
     },
     {
       "catalog": "us-equities",
       "layer_id": "market-data-reference",
       "status": "comparison_required",
-      "next_action": "Freeze the intended universe/history and rights; obtain auditable delisting, ticker-reuse, action/currency and publication-revision evidence before accepting an as-known research dataset.",
+      "next_action": "Freeze intended universe/history/rights; resolve historical delisting, action/currency, original availability and publication revisions. Reuse bounded AAPL native acquisition; paid Databento arm remains unexecuted.",
       "decision_ref": "catalogs/landscape/us-equities.json",
       "evidence_refs": [
         "catalogs/us-equities/data-research.json",
-        "catalogs/us-equities/runtime-target.json"
+        "catalogs/us-equities/runtime-target.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Trading data owner"
     },
     {
       "catalog": "us-equities",
       "layer_id": "identity-provenance",
       "status": "comparison_required",
-      "next_action": "Freeze the intended universe/history and rights; obtain auditable delisting, ticker-reuse, action/currency and publication-revision evidence before accepting an as-known research dataset.",
+      "next_action": "Reuse anchored FB/META observations; obtain auditable historical identities, ticker collision and delisting resolution for the frozen universe before accepting asset-master joins.",
       "decision_ref": "catalogs/landscape/us-equities.json",
       "evidence_refs": [
         "catalogs/us-equities/data-research.json",
-        "catalogs/us-equities/runtime-target.json"
+        "catalogs/us-equities/runtime-target.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Trading identity owner"
     },
     {
       "catalog": "us-equities",
       "layer_id": "storage-compute",
       "status": "comparison_required",
-      "next_action": "Freeze the intended universe/history and rights; obtain auditable delisting, ticker-reuse, action/currency and publication-revision evidence before accepting an as-known research dataset.",
+      "next_action": "Qualify historically available issuer/security/price joins and the as-known data contract before a broader storage comparison; retain recorded DuckDB/Parquet repeatability.",
       "decision_ref": "catalogs/landscape/us-equities.json",
       "evidence_refs": [
         "catalogs/us-equities/data-research.json",
-        "catalogs/us-equities/runtime-target.json"
+        "catalogs/us-equities/runtime-target.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Trading data/storage owner"
     },
     {
       "catalog": "us-equities",
       "layer_id": "data-quality-orchestration",
       "status": "on_requirement_change",
-      "next_action": "Exercise a chosen real research worker job end to end; preserve source packet, complete output, cancellation, process ownership and usage before extending scheduler or host scope.",
+      "next_action": "Reopen the synthetic snapshot-promotion gate for a selected real research job or scope expansion; retain source packet, complete output, cancellation, ownership and usage.",
       "decision_ref": "catalogs/landscape/us-equities.json",
       "evidence_refs": [
         "catalogs/us-equities/agents-operations.json",
-        "docs/foundation-closure-20260921.md"
+        "docs/foundation-closure-20260921.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Trading integration owner"
     },
     {
       "catalog": "us-equities",
       "layer_id": "research-factors-ml",
       "status": "comparison_required",
-      "next_action": "Freeze retained SPY/LEAN order, fill, dividend and cash oracles; qualify Nautilus parity, then native in-flight failure/reconciliation separately for IBKR and Alpaca. Strategy qualification remains independent.",
+      "next_action": "Continue daily/intraday catalyst research only with required as-known data and a frozen evaluation protocol; retain strategy merit separately from engine parity. The inspected2021 control cannot become a fresh holdout.",
       "decision_ref": "catalogs/landscape/us-equities.json",
       "evidence_refs": [
         "catalogs/us-equities/engines-strategies.json",
-        "catalogs/us-equities/runtime-target.json"
+        "catalogs/us-equities/runtime-target.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Trading research owner"
     },
     {
       "catalog": "us-equities",
       "layer_id": "backtesting-engine",
       "status": "comparison_required",
-      "next_action": "Freeze retained SPY/LEAN order, fill, dividend and cash oracles; qualify Nautilus parity, then native in-flight failure/reconciliation separately for IBKR and Alpaca. Strategy qualification remains independent.",
+      "next_action": "Reuse bounded PASS one_zero SPY/LEAN parity (136 checks,106 execution passes,zero failures/skips), disclosed prior replays and accepted deviation; extend only for a named additional economic case.",
       "decision_ref": "catalogs/landscape/us-equities.json",
       "evidence_refs": [
         "catalogs/us-equities/engines-strategies.json",
-        "catalogs/us-equities/runtime-target.json"
+        "catalogs/us-equities/runtime-target.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Recorded peer:sota-workflow-resolution; live identity requested"
     },
     {
       "catalog": "us-equities",
       "layer_id": "execution-broker",
       "status": "comparison_required",
-      "next_action": "Freeze retained SPY/LEAN order, fill, dividend and cash oracles; qualify Nautilus parity, then native in-flight failure/reconciliation separately for IBKR and Alpaca. Strategy qualification remains independent.",
+      "next_action": "Preserve separate IBKR/Alpaca gates. Qualify rc5 IBKR destination and reconnect/restart reconciliation on privately verified native paper inputs; do not substitute1.231.0 Python-adapter acceptance. Issue4983/PR5041 remain open/unmerged.",
       "decision_ref": "catalogs/landscape/us-equities.json",
       "evidence_refs": [
         "catalogs/us-equities/engines-strategies.json",
-        "catalogs/us-equities/runtime-target.json"
+        "catalogs/us-equities/runtime-target.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Trading broker owner; native paper inputs required"
     },
     {
       "catalog": "us-equities",
       "layer_id": "portfolio-risk",
       "status": "comparison_required",
-      "next_action": "Freeze retained SPY/LEAN order, fill, dividend and cash oracles; qualify Nautilus parity, then native in-flight failure/reconciliation separately for IBKR and Alpaca. Strategy qualification remains independent.",
+      "next_action": "Qualify the frozen1x ladder before2x, then4x; retain first attempt needs_attention,0.151x achieved,zero seconds above0.5x,failed conditions and200requests/minute budget. Requalify changed native-fault source bytes with independent observations.",
       "decision_ref": "catalogs/landscape/us-equities.json",
       "evidence_refs": [
         "catalogs/us-equities/engines-strategies.json",
-        "catalogs/us-equities/runtime-target.json"
+        "catalogs/us-equities/runtime-target.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Recorded peer:sota-workflow-resolution; live identity requested"
     },
     {
       "catalog": "us-equities",
       "layer_id": "evaluation-experiments",
       "status": "on_requirement_change",
-      "next_action": "Exercise a chosen real research worker job end to end; preserve source packet, complete output, cancellation, process ownership and usage before extending scheduler or host scope.",
+      "next_action": "Reopen for a named real research-worker experiment with timestamps, complete output/usage and cancellation; do not substitute catalog validation or synthetic fixtures.",
       "decision_ref": "catalogs/landscape/us-equities.json",
       "evidence_refs": [
         "catalogs/us-equities/agents-operations.json",
-        "docs/foundation-closure-20260921.md"
+        "docs/foundation-closure-20260921.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Trading evaluation owner"
     },
     {
       "catalog": "us-equities",
       "layer_id": "agents-models-workers",
       "status": "comparison_required",
-      "next_action": "Create held-out finance/document/code relevance judgments; compare fidelity, abstention and total task cost while preserving source timestamps, project isolation and original recovery.",
+      "next_action": "Use held-out finance/document/code judgments to compare fidelity, abstention and complete task cost while preserving timestamps, project isolation and original recovery.",
       "decision_ref": "catalogs/landscape/us-equities.json",
       "evidence_refs": [
         "catalogs/us-equities/foundation-memory.json",
-        "evidence/receipts/foundation-native-20260920.json"
+        "evidence/receipts/foundation-native-20260920.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Trading model/evaluation owner"
     },
     {
       "catalog": "us-equities",
       "layer_id": "observability-hosting",
       "status": "on_requirement_change",
-      "next_action": "Exercise a chosen real research worker job end to end; preserve source packet, complete output, cancellation, process ownership and usage before extending scheduler or host scope.",
+      "next_action": "Qualify a selected real-job/host expansion with independent alert and worker lifecycle observation; retain synthetic broker alerts and harness-reported throughput scope.",
       "decision_ref": "catalogs/landscape/us-equities.json",
       "evidence_refs": [
         "catalogs/us-equities/agents-operations.json",
-        "docs/foundation-closure-20260921.md"
+        "docs/foundation-closure-20260921.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Trading observability owner"
     },
     {
       "catalog": "us-equities",
       "layer_id": "security-supply-chain",
       "status": "on_requirement_change",
-      "next_action": "Exercise a chosen real research worker job end to end; preserve source packet, complete output, cancellation, process ownership and usage before extending scheduler or host scope.",
+      "next_action": "Preserve dated native rc5 supply-chain and local credential-integration scopes; reopen on changed source/dependency/host or a selected real-job boundary.",
       "decision_ref": "catalogs/landscape/us-equities.json",
       "evidence_refs": [
         "catalogs/us-equities/agents-operations.json",
-        "docs/foundation-closure-20260921.md"
+        "docs/foundation-closure-20260921.md",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Trading integration owner"
     },
     {
       "catalog": "foundation",
       "layer_id": "agent-sdks",
       "status": "on_requirement_change",
-      "next_action": "Qualify a concrete application need (durable multi-host state, explicit graph checkpoints, a remote/container worker or programmatic Claude session control) before promoting a deferred SDK alternative; the SDK table in docs/foundation-closure-20260921.md (lines 78-84) has not been revisited by any lane since 2026-09-21.",
+      "next_action": "Reuse Sept30 official Codex SDK0.159.2 worker/resume/recovery and native Claude callsite evidence. Freeze a concrete application requirement before a three-arm SDK comparison; retain failed Claude-SDK bridge, unknown complete cost/cancellation/backend attestation.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "docs/foundation-closure-20260921.md",
-        "catalogs/foundation/decisions.json"
+        "catalogs/foundation/decisions.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json",
+        "evidence/receipts/omniroute-runtime-workers-20260930.json",
+        "evidence/receipts/omniroute-claude-callsite-20260930.json",
+        "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Runtime SDK owner"
     },
     {
       "catalog": "foundation",
       "layer_id": "mcp-surfaces",
       "status": "on_requirement_change",
-      "next_action": "Review a specific MCP registry entry, such as punkpeye/awesome-mcp-servers, only against a concrete surface gap; do not adopt a new server from a registry listing alone.",
+      "next_action": "Reuse mcporter0.14.1 and Inspector2.8.0 scoped qualification; select a concrete changed process-root/shared-daemon, OAuth/remote or registration-cleanup gap before extending acceptance.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "recipes/README.md",
-        "catalogs/foundation/decisions.json"
+        "catalogs/foundation/decisions.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json",
+        "evidence/receipts/token-lifecycle-resolution-20260930.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "MCP integration owner"
     },
     {
       "catalog": "foundation",
       "layer_id": "secrets-credentials",
       "status": "on_requirement_change",
-      "next_action": "Qualify openbao, or a comparable secret manager, only against a concrete multi-host or multi-operator secret-sharing need; broker credential handling stays a trading gate, not a foundation selection.",
+      "next_action": "Preserve native sign-ins and credential policy; qualify OpenBao only for a concrete multi-host/operator secret-sharing requirement.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "adoption/manifest.json",
-        "catalogs/foundation/decisions.json"
+        "catalogs/foundation/decisions.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Credential policy owner"
     },
     {
       "catalog": "foundation",
       "layer_id": "git-github-automation",
       "status": "on_requirement_change",
-      "next_action": "Qualify gh CLI's own lifecycle evidence and a changed codex-for-claude review-bridge version before extending acceptance beyond worktrunk, gh and difftastic.",
+      "next_action": "Qualify gh CLI's own lifecycle and changed review-bridge recovery before extending Worktrunk/Difftastic acceptance.",
       "decision_ref": "catalogs/landscape/foundation.json",
       "evidence_refs": [
         "docs/github-automation.md",
-        "catalogs/foundation/decisions.json"
+        "catalogs/foundation/decisions.json",
+        "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
       ],
-      "saturation": "not_established"
+      "saturation": "not_established",
+      "resolution_owner": "Git/GitHub tooling owner"
     }
-  ]
+  ],
+  "latest_resolution_record": "evidence/artifacts/full-lanes-resolution-20260930/manifest.json",
+  "resolution_checked_at": "2026-09-30"
 }

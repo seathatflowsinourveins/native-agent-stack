@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "kind": "guarded_native_idle_rollout",
+  "status": "disarmed_pending_idle_activation",
+  "recorded_at_utc": "2026-09-30T07:35:16Z",
+  "source": {
+    "repository": "systemd/systemd",
+    "revision": "db11bab38ccf1ed257f310d29070843d4c58ea01",
+    "tag": "v255",
+    "installed_package": "255.4-1ubuntu8.17",
+    "files": [
+      "man/systemd-run.xml",
+      "man/systemd.service.xml",
+      "man/systemd.timer.xml",
+      "src/shared/bus-unit-util.c"
+    ]
+  },
+  "updater_source": {
+    "path": "tools/adoption/apply_codex_lane.py",
+    "source_references": [
+      "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/app-server/src/config_manager_service.rs",
+      "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/config/src/loader/mod.rs"
+    ]
+  },
+  "reviewed_host_hashes": {
+    "config": "a9d9febf29186b0fc887d6f8e502f534a4f0a20932a5b543b584e0979eb383ad",
+    "agents": "50524adf7e4eef59dec3a367839f328f356e5a6e96e70c002108dc34bfb5dd14",
+    "profile": "658246460ef25fd56a1c7d8adcd22ca5018390ad4594b448abc27d686dc32557"
+  },
+  "frozen_source_inputs": [
+    {
+      "path": "tools/adoption/apply_codex_lane.py",
+      "sha256": "73ab2454bcfe54199e7dd0e9910e8d00ac9b370e9f4695d767acc2f5a8cbff0b"
+    },
+    {
+      "path": "scripts/adoption_status.py",
+      "sha256": "00a8e0751c4dd472fe57c6b79c1929390f96ee58fd7d2e1db16abe7086882533"
+    },
+    {
+      "path": "adoption/templates/codex.config.template.toml",
+      "sha256": "20f2e03684a9c4731b0690fbd745f82011fd6c9bafb8e9cdf016d2cbb26f8dcb"
+    },
+    {
+      "path": "adoption/templates/codex.stack-worker.config.toml",
+      "sha256": "7cc85870cfd7557b6e5fb776391c4baaf12da13da4c3d66328e02b146de310b9"
+    },
+    {
+      "path": "adoption/templates/codex.AGENTS.template.md",
+      "sha256": "947641bf204afa9707ad76ef89ab145e3e71722a9ac65243326c84713e213b6d"
+    },
+    {
+      "path": "adoption/pins-linux-x86_64.json",
+      "sha256": "05e707137bb1a27d10e6b257295559ad9094c07247c2eb75db138830bb3f21b0"
+    }
+  ],
+  "controls": {
+    "native_manager": "user",
+    "type": "oneshot",
+    "retry_interval": "1 minute",
+    "source_guard": "ExecStartPre runs native sha256sum --check over exact reviewed source inputs.",
+    "host_guard": "Existing updater exact-version, owned-source digest, reviewed config/AGENTS/profile hashes and no-running-Codex preconditions remain unchanged.",
+    "completion": "ExecStartPost stops the retry timer only after updater exit zero.",
+    "expiry": "A second native transient timer stops the retry timer after 24 hours.",
+    "state": "Private native logs, journal/backup and checksum file. No model calls, auth-store copies or client termination.",
+    "persistence": "Transient current user-manager lifetime; not restart-persistent or second-host evidence."
+  },
+  "prototype_acceptance": [
+    {
+      "case": "updater-like failure",
+      "native_main_exit": 1,
+      "timer_active": true,
+      "post_action_not_run": true
+    },
+    {
+      "case": "updater-like success",
+      "native_main_exit": 0,
+      "timer_active": false,
+      "post_action_ran": true
+    }
+  ],
+  "prototype_cleanup": {
+    "native_stop_exit": 5,
+    "reason": "Successful transient units had already been unloaded; failed prototype timer/service were stopped and reset successfully."
+  },
+  "application_state": "No production application observed. Original queue attempts refused while active Codex clients remained. Both owned timers were stopped after the native Claude review found stale upstream integration and an omitted imported dependency in the frozen checksum closure. The historical queue acceptance below is retained; no current armed queue is claimed.",
+  "disarm_acceptance": {
+    "observed_at_utc": "2026-09-30T08:05:11Z",
+    "native_stop_exit": 0,
+    "native_observation_exit": 0,
+    "retry_timer_state": "inactive/dead",
+    "expiry_timer_state": "inactive/dead",
+    "reason": "Resolve actual upstream main code overlap and freeze the complete imported local dependency closure before any rollout.",
+    "gate_a_window_w_activity": "unknown; reviewer inference was not a live owner or seal-state observation",
+    "host_hashes_unchanged": true
+  },
+  "repaired_source_guard": {
+    "integration_artifact": "evidence/artifacts/sota-finalization-20260930/upstream-codex-integration.json",
+    "integration_artifact_sha256": "4a9596c5f4877c81b803b1e150cd244aeb2c6c73a872d26b020b5bef76ad5bdf",
+    "local_modules": 5,
+    "resources": 11,
+    "native_checksum_exit": 0,
+    "checksum_input_count": 16,
+    "checksum_failures": 0,
+    "state": "Complete selected source/resource checksum guard prepared and observed against current root; not armed or applied.",
+    "limits": "No whole-standard-library/package-tree hash. Existing updater version/idle/owned-file guards remain mandatory. Live Window-W state remains unknown."
+  },
+  "queue_acceptance": {
+    "creation_exit_codes": [
+      0,
+      0
+    ],
+    "service_main_exit": 2,
+    "service_result": "exit-code",
+    "retry_timer_active": true,
+    "expiry_timer_active": true,
+    "returned_result": "refused: nothing written",
+    "stderr_bytes": 0,
+    "host_hashes_unchanged": true,
+    "source_checksum_precondition_passed": true
+  }
+}

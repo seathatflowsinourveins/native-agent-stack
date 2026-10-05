@@ -125,9 +125,10 @@ class RenderConfigTests(unittest.TestCase):
         # PR-F and H4 of the 2026-09-27 settings synthesis (codex rows 8, 10, 20 and 21), each read at openai/codex
         # rust-v0.157.1: live search in every sandbox (core/src/config/mod.rs), no startup update check on a pinned
         # client (config/src/config_toml.rs L520-523), no shell snapshot of exported variables
-        # (shell-command/src/shell_snapshot_exports.rs), children at max unless the spawn call picks an effort
-        # (core/src/agent/child_config.rs), and no trust for dated directories that no longer exist. The interactive
-        # effort stays `ultra`: moving it is a user decision. The gateway route lives only in the omniroute profile.
+        # (shell-command/src/shell_snapshot_exports.rs), and no trust for dated directories that no longer exist.
+        # The user's 2026-09-30 defaults are Sol/Ultra coordination and Sol/Max generic children, supported by
+        # rust-v0.159.2 models-manager/models.json and core/src/agent/child_config.rs L204-249. Selected role
+        # configs still apply afterwards (L62-73). The gateway route lives only in the omniroute profile.
         import tomllib  # Python 3.11+, as above
 
         text = (TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8")
@@ -135,8 +136,11 @@ class RenderConfigTests(unittest.TestCase):
         self.assertEqual(user["web_search"], "live")
         self.assertIs(user["check_for_update_on_startup"], False)
         self.assertIs(user["features"]["shell_snapshot"], False)  # exported secrets never land in a snapshot file
+        self.assertIs(user["agents"]["enabled"], True)
+        self.assertEqual(user["agents"]["max_concurrent_threads_per_session"], 3)
         self.assertEqual(user["agents"]["default_subagent_reasoning_effort"], "max")
-        self.assertNotIn("default_subagent_model", user["agents"])  # alone it would give the catalog's `low`
+        self.assertEqual(user["agents"]["default_subagent_model"], "gpt-6.1-sol")
+        self.assertEqual(user["model"], "gpt-6.1-sol")
         self.assertEqual(user["model_reasoning_effort"], "ultra")
         self.assertEqual(sorted(user["projects"]), [FIXTURE_VALUES["PROJECT_ROOT"],
                                                     FIXTURE_VALUES["HOME"] + "/code/native-agent-stack-publication"])

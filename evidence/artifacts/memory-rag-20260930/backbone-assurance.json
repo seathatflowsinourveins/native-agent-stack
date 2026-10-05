@@ -1,0 +1,293 @@
+{
+  "schema_version": 1,
+  "kind": "source_evidence_assurance",
+  "checked_at": "2026-09-30",
+  "lane": "foundation",
+  "objective": "Select a clean shared native Claude/Codex memory backbone that meets matched task correctness, freshness, isolation and recovery requirements with acceptable latency and complete operating cost.",
+  "verdict": "Recommend Hindsight as the fit-based shared-native target. No overall or token-efficiency winner is established; ai-memory remains the canonical operational reference, agentmemory is a retrieval challenger and MemPalace is a reserve.",
+  "evidence_scope": "Original published benchmark artifacts were read and their metrics checked. Historical Mac measurements remain a sanitized transcription of a dated source report. This is source review, not new memory/model execution.",
+  "architecture_review": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "trigger": "Consequential new clean-runtime backbone decision; conflicting quality metrics, version identities and incomplete token/cost boundaries.",
+    "acceptance": "Accepted comparison-open verdict. Do not label Hindsight, agentmemory or another challenger the final backbone winner before matched quality, native lifecycle and complete-cost acceptance."
+  },
+  "rows": [
+    {
+      "id": "ai-memory",
+      "name": "ai-memory",
+      "role": "Operational reference; no best-backbone claim",
+      "observed_result": "Historical native cross-client capture/query/recovery receipts. Separate author benchmark at 0ac0dcf: 470 questions, hit@5 0.823 and fractional recall@5 0.680 with 2 KB capture.",
+      "token_cost_scope": "Local retrieval can avoid external inference calls. Optional consolidation, reranking and synthesis add separate work; total lifecycle savings are unmeasured.",
+      "acceptance_gap": "Canonical accepted 2.4.1, fresh CLI probe 2.4.2, qualified trial 2.4.2 and upstream 2.5.0 source review remain distinct. Scoped 2.4.2 lifecycle/recovery and 42 upstream scope tests passed; failures retained. Native capture, production reranker comparison and complete cost remain outstanding; no 2.5.0 acceptance.",
+      "sources": [
+        "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/docs/benchmarks/longmemeval-s-2026-09-01-local.md",
+        "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/docs/lifecycle-ops.md",
+        "https://github.com/akitaonrails/ai-memory/blob/a8757a05a960f96a0ba510b6341bcd520cf80bb2/CHANGELOG.md"
+      ]
+    },
+    {
+      "id": "hindsight",
+      "name": "Hindsight",
+      "role": "Quality and shared-lifecycle challenger",
+      "observed_result": "Author AMB artifacts: LongMemEval 473/500 = 94.6%; LoCoMo 1417/1540 = 92.013%. Same-harness hybrid controls: 74.0% and 79.091%. Publisher attributes Hindsight 0.4.19. Publisher SDE-bench: 61 unique bug-fix tasks repeated three times per arm. Claude corrections/task 0.847 to 0.361, solved 181/183 to 183/183; Codex 1.344 to 0.470, solved 182/183 to 183/183. No-memory control, not finalist comparison.",
+      "token_cost_scope": "Mean retrieved answering context: 43,624.5 vs 23,221.7 tokens on LongMemEval, and 36,235.4 vs 22,156.5 on LoCoMo. This is a quality/context tradeoff; ingestion, maintenance, reflection and downstream costs are not fully measured. SDE-bench reported coding-agent cost reductions of 24.04% (Claude Sonnet 5) and 52.26% (GPT-5.4-mini) exclude Hindsight processing and hosting; no total lifecycle savings claim.",
+      "acceptance_gap": "Subsequent 0.10.2 no-LLM chunk backend passed restart and bank transfer in one owned profile. Full extraction/consolidation/reflection and native capture remain unrun. Published QA uses Gemini 3.1 Pro Preview/2.5 Flash Lite and omits server/extraction deployment pins; it does not qualify the current runtime. Published Docker client/plugin inputs are not completely pinned; latest harness fixes do not attest every prior run.",
+      "sources": [
+        "https://github.com/vectorize-io/agent-memory-benchmark/tree/f618ed7b1f0eb9cad7b42e876f91a42f0eadb150",
+        "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/blog/2026-03-23-agent-memory-benchmark.mdx",
+        "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-system-evals/README.md",
+        "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/api/memory-banks.mdx",
+        "https://github.com/vectorize-io/agent-memory-benchmark/blob/f618ed7b1f0eb9cad7b42e876f91a42f0eadb150/results-manifest.json",
+        "https://github.com/vectorize-io/agent-memory-benchmark/blob/f618ed7b1f0eb9cad7b42e876f91a42f0eadb150/sdebench/harness/run.py#L829",
+        "https://github.com/vectorize-io/sde-bench/blob/afcce15c1f608242e28e48832c301f39c5aed708/DATASET.md"
+      ]
+    },
+    {
+      "id": "agentmemory",
+      "name": "agentmemory",
+      "role": "Strongest retained controlled REST retrieval challenger",
+      "observed_result": "Historical Mac full track n=470: recall_all@5 0.821 vs ai-memory reranker-off 0.570; difference +0.251, 95% CI [+0.203,+0.299], Holm p=0.0001. This is descriptive and not a new host run. Separate publisher headline is recall_any@5 95.2%.",
+      "token_cost_scope": "Publisher retrieval test has no answering/judge LLM. Local embedding and a short retrieved payload do not account for optional compression or the coding agent's complete usage.",
+      "acceptance_gap": "Current unchanged coding-life harness execution is non-comparable because synthetic session IDs bypass fixture mapping. Native ingestion/search worked; keyless default was BM25-only. Valid current-host comparison, native capture, production reranker control, full restore and complete cost/latency remain pending.",
+      "sources": [
+        "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/benchmark/LONGMEMEVAL.md",
+        "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/eval/README.md",
+        "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/src/functions/snapshot.ts"
+      ]
+    },
+    {
+      "id": "mempalace",
+      "name": "MemPalace",
+      "role": "Raw session-retrieval challenger",
+      "observed_result": "Original 500-row raw artifact mean recall_any@5 0.966. Author-labelled held-out 450-row hybrid artifact: 0.984444. These artifacts do not contain recall_all@5; neither result is generated-answer accuracy.",
+      "token_cost_scope": "Raw retrieval benchmark avoids provider inference. That does not measure downstream answering, local compute or optional LLM reranking.",
+      "acceptance_gap": "Current native short-session capture, updated/deleted knowledge, scope negatives and clean-target recovery require acceptance; author-labelled held-out performance is not independent generalization proof.",
+      "sources": [
+        "https://github.com/MemPalace/mempalace/blob/22fd87f09c19d5ffb2d6966486483353937931c0/benchmarks/results_mempal_raw_session_20260414_1629.jsonl",
+        "https://github.com/MemPalace/mempalace/blob/22fd87f09c19d5ffb2d6966486483353937931c0/benchmarks/results_mempal_hybrid_v4_held_out_session_20260414_1634.jsonl",
+        "https://github.com/MemPalace/mempalace/blob/22fd87f09c19d5ffb2d6966486483353937931c0/benchmarks/longmemeval_bench.py"
+      ]
+    },
+    {
+      "id": "mem0",
+      "name": "Mem0",
+      "role": "Conditional managed efficiency/quality challenger",
+      "observed_result": "Managed committed top-200 artifacts: LongMemEval 467/500 = 93.4%; LoCoMo 1410/1540 = 91.558%. Current documentation headlines 94.4%/92.5% do not match those committed artifacts. Artifact models are GPT-5, unlike Hindsight's AMB run.",
+      "token_cost_scope": "Documentation reports 6,787/6,956 retrieved tokens/query. These are managed/query-context figures, not complete self-hosted lifecycle/provider costs.",
+      "acceptance_gap": "Headline/artifact discrepancy remains unresolved. Managed scores do not establish OSS 2.2.1 acceptance, and native Platform plugin routes are not drop-in-compatible with the bundled OSS server.",
+      "sources": [
+        "https://github.com/mem0ai/memory-benchmarks/blob/4b61c5d31b9c668a12b4f5e78064248a02c82d2b/results/platform/longmemeval_results.json",
+        "https://github.com/mem0ai/memory-benchmarks/blob/4b61c5d31b9c668a12b4f5e78064248a02c82d2b/results/platform/locomo_results.json",
+        "https://github.com/mem0ai/mem0/blob/dae67f74f5cc7bf138c7d7d6f9cec5ce4b4373b3/docs/core-concepts/memory-evaluation.mdx"
+      ]
+    }
+  ],
+  "artifact_observations": [
+    {
+      "repository": "vectorize-io/agent-memory-benchmark",
+      "revision": "f618ed7b1f0eb9cad7b42e876f91a42f0eadb150",
+      "path": "outputs/longmemeval/hindsight/rag/s.json.gz",
+      "sha256": "d0bcc75fb4060f0a395239a353d2066d3f7d252bbe16d674c951d9855deaf9cf",
+      "bytes": 28305823,
+      "n": 500,
+      "correct": 473,
+      "accuracy": 0.946,
+      "avg_context_tokens": 43624.5,
+      "avg_retrieve_time_ms": 674.9,
+      "ingestion_time_ms": 30090034.3,
+      "answerer": "gemini:gemini-3.1-pro-preview",
+      "judge": "gemini:gemini-2.5-flash-lite"
+    },
+    {
+      "repository": "vectorize-io/agent-memory-benchmark",
+      "revision": "f618ed7b1f0eb9cad7b42e876f91a42f0eadb150",
+      "path": "outputs/locomo/locomo-hindsight/rag/locomo10.json.gz",
+      "sha256": "2c70253b80555de105d19ceaca6cea3fd10a0ddee030623991f597bc8007dc1c",
+      "bytes": 53806862,
+      "n": 1540,
+      "correct": 1417,
+      "accuracy": 0.9201298701298701,
+      "avg_context_tokens": 36235.4,
+      "avg_retrieve_time_ms": 964.1,
+      "ingestion_time_ms": 330205.8,
+      "answerer": "gemini:gemini-3.1-pro-preview",
+      "judge": "gemini:gemini-2.5-flash-lite"
+    },
+    {
+      "repository": "vectorize-io/agent-memory-benchmark",
+      "revision": "f618ed7b1f0eb9cad7b42e876f91a42f0eadb150",
+      "path": "outputs/longmemeval/hybrid-search/rag/s.json.gz",
+      "sha256": "0f0dd90b6d15c80f5fc6d7598c9cb4a098a14c73f2ff30abc4d839f14e3c05a7",
+      "bytes": 16787011,
+      "n": 500,
+      "correct": 370,
+      "accuracy": 0.74,
+      "avg_context_tokens": 23221.7,
+      "avg_retrieve_time_ms": 1599.5,
+      "answerer": "gemini:gemini-3.1-pro-preview",
+      "judge": "gemini:gemini-2.5-flash-lite"
+    },
+    {
+      "repository": "vectorize-io/agent-memory-benchmark",
+      "revision": "f618ed7b1f0eb9cad7b42e876f91a42f0eadb150",
+      "path": "outputs/locomo/hybrid-search/rag/locomo10.json.gz",
+      "sha256": "2b26fbec092e59dddc979b9e8ae92c5e09a6af3591d24e7264c5014fb632d4db",
+      "bytes": 33119551,
+      "n": 1540,
+      "correct": 1218,
+      "accuracy": 0.7909090909090909,
+      "avg_context_tokens": 22156.5,
+      "avg_retrieve_time_ms": 219.3,
+      "answerer": "gemini:gemini-3.1-pro-preview",
+      "judge": "gemini:gemini-2.5-flash-lite"
+    },
+    {
+      "repository": "MemPalace/mempalace",
+      "revision": "22fd87f09c19d5ffb2d6966486483353937931c0",
+      "path": "benchmarks/results_mempal_raw_session_20260414_1629.jsonl",
+      "sha256": "2b71b5e514279c28443736561e2ac453045520b0f8832ff092e8a6143965e5d1",
+      "bytes": 13113499,
+      "n": 500,
+      "mean_recall_any_at_5": 0.966,
+      "mean_recall_all_at_5": null
+    },
+    {
+      "repository": "MemPalace/mempalace",
+      "revision": "22fd87f09c19d5ffb2d6966486483353937931c0",
+      "path": "benchmarks/results_mempal_hybrid_v4_held_out_session_20260414_1634.jsonl",
+      "sha256": "5f5849e8facdbdec673967dfbd9dd288323983ae824ca787ffa89110dd1b588d",
+      "bytes": 11796774,
+      "n": 450,
+      "mean_recall_any_at_5": 0.9844444444444445,
+      "mean_recall_all_at_5": null
+    },
+    {
+      "repository": "mem0ai/memory-benchmarks",
+      "revision": "4b61c5d31b9c668a12b4f5e78064248a02c82d2b",
+      "path": "results/platform/longmemeval_results.json",
+      "sha256": "58bd6d8934a54d8cd568ef481bbd3e37270c2c74a5d59713b661d4c3ddb332a1",
+      "bytes": 446141,
+      "n": 500,
+      "correct": 467,
+      "accuracy": 0.934,
+      "answerer": "gpt-5",
+      "judge": "gpt-5",
+      "cutoff": 200
+    },
+    {
+      "repository": "mem0ai/memory-benchmarks",
+      "revision": "4b61c5d31b9c668a12b4f5e78064248a02c82d2b",
+      "path": "results/platform/locomo_results.json",
+      "sha256": "36338fa6c1ca38bcf9e3fc33a5cbc3b6e53bdc4bafaeeaee0947cf13b5527911",
+      "bytes": 1068458,
+      "n": 1540,
+      "correct": 1410,
+      "accuracy": 0.9155844155844156,
+      "answerer": "gpt-5",
+      "judge": "gpt-5",
+      "cutoff": 200,
+      "reported_errors": 1
+    }
+  ],
+  "historical_controlled_result": {
+    "path": "evidence/artifacts/memory-stack-20260925/convergence.json",
+    "pointer": "/neutral_measurements",
+    "evidence_class": "historical_descriptive_report_transcription",
+    "original_report_sha256": "62c0079136d575f21f5c96c5606bb2d84407ec94b13b7c525c3ebcb5cac3f120",
+    "n": 470,
+    "metric": "recall_all@5",
+    "agentmemory_minilm": 0.821,
+    "ai_memory_c3_reranker_off": 0.57,
+    "delta": 0.251,
+    "ci95": [
+      0.203,
+      0.299
+    ],
+    "holm_p": 0.0001,
+    "production_c4_reranker_on": null,
+    "native_capture_comparison": null,
+    "source_availability": "Sanitized transcription and original hash retained; original report itself is not committed. No new execution or independent reconstruction is claimed."
+  },
+  "failed_reads": [
+    {
+      "operation": "Initial MemPalace metric derivation",
+      "exit_code": 1,
+      "error": "KeyError: recall_all@5",
+      "resolution": "Original JSONL has only recall_any/ndcg_any fields. Corrected read recomputed recall_any and keeps unavailable recall_all null."
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "Hindsight was labelled the final foundation target.",
+      "correction": "That was a source-fit recommendation, not a measured overall winner. Withdraw final-winner designation; keep Hindsight as quality/lifecycle challenger.",
+      "verification": "Original AMB artifacts, runtime 0.4.19 attribution, complete-cost gaps and Astra/max assurance adjudication."
+    },
+    {
+      "claim": "MythologIQ-Labs-LLC/agent-memory benchmark belongs to rohitg00/agentmemory.",
+      "correction": "Different GitHub repository IDs: 1291527731 and 1166408297. Exclude the unrelated score.",
+      "verification": "Authenticated gh api repos/<owner>/<repo> returned separate IDs/full_name values."
+    },
+    {
+      "claim": "Mem0 current managed headline is reproduced by committed result artifacts.",
+      "correction": "Docs 94.4%/92.5% versus artifacts 93.4%/91.558% remain different. Do not resolve the discrepancy by assuming equivalent runs.",
+      "verification": "Pinned documentation dae67f7 and benchmark artifacts at 4b61c5d."
+    },
+    {
+      "claim": "The former Hindsight document-transfer examples are the preferred new recovery path.",
+      "correction": "Current 0.10.2 docs mark document export/import superseded. Use bank transfer export/import restore with a nonexistent target; copied webhooks/config require source-target independence checks.",
+      "verification": "Pinned memory-banks.mdx bank-transfer and superseded sections."
+    },
+    {
+      "claim": "Directly relevant published support covers only conversational QA and source fit.",
+      "correction": "Pinned AMB source contains native coding no-memory comparisons; costs cover coding agents only.",
+      "verification": "evidence/artifacts/memory-runtime-resolution-20260930/published-coding-evidence.json"
+    }
+  ],
+  "runtime_alignment": {
+    "reference_profile": "foundation-cpu",
+    "source": "adoption/manifest.json",
+    "canonical_pins_source": "manifests/stack.json",
+    "core_component_ids": [
+      "codex",
+      "claude-code",
+      "context-mode",
+      "qmd",
+      "rtk",
+      "ai-memory",
+      "mcporter"
+    ],
+    "optional_component_ids": [
+      "serena",
+      "socraticode",
+      "dagu"
+    ],
+    "status_command": "python3 scripts/adoption_status.py --profile foundation-cpu --json",
+    "observed_prerequisite_status": "prerequisites_present",
+    "runtime_acceptance_verified": false,
+    "scope": "Preserve native client accounts, model routes, cache and compaction. QMD keeps document retrieval; code tools stay project-scoped. A new isolated prefix starts with unknown acceptance. No client wiring, server start or production migration was performed."
+  },
+  "selection_gate": {
+    "quality": "Same dataset partition and native coding tasks; current pinned deployable profiles; same answerer/judge and retrieval budget; correctness, freshness and abstention thresholds before efficiency.",
+    "lifecycle": "Both native clients with ordinary hook trust; isolated project/bank identities and cross-scope negatives; interruption/replay; deletion without reseeding; empty-target restore and source/target independence.",
+    "cost": "Initial retain/seed, embedding, extraction, consolidation, page refresh, retrieval/reranking, reflection, retries and resulting coding-agent calls; separate input/output/cache-read/cache-write/storage billing scopes and cold/warm latency.",
+    "upstream_sources": [
+      "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-system-evals/README.md",
+      "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/eval/README.md"
+    ],
+    "existing_decision_sources": [
+      "catalogs/landscape/foundation.json",
+      "catalogs/foundation/memory-stack-20260925.json",
+      "docs/acceptance-evidence-policy.md"
+    ]
+  },
+  "usage": {
+    "new_memory_model_run": false,
+    "comparative_provider_tokens": null,
+    "comparative_provider_cost": null,
+    "research_provider_usage": null,
+    "complete_lifecycle_savings": null
+  },
+  "published_native_coding_evidence": "evidence/artifacts/memory-runtime-resolution-20260930/published-coding-evidence.json",
+  "latestness_record": "evidence/artifacts/memory-runtime-resolution-20260930/latestness.json"
+}

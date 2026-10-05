@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "kind": "native_published_catalog_recovery",
+  "checked_at_utc": "2026-10-01T03:11:20.173492Z",
+  "source_run": {
+    "id": 36254080289,
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36254080289",
+    "source_digest": "771f25f824a7851a6cb46ebcfa2922b54cb88d9e",
+    "source_ref": "refs/tags/v2026.09.26.2"
+  },
+  "installed_native_client": {
+    "name": "gh",
+    "version": "2.101.0",
+    "release": "https://github.com/cli/cli/releases/tag/v2.101.0",
+    "release_target_commit": "0cf1092493af067646fc5f3db9421c6a6ec9c938"
+  },
+  "artifact_metadata": {
+    "command": [
+      "rtk",
+      "gh",
+      "api",
+      "repos/seathatflowsinourveins/native-agent-stack/actions/artifacts/10909293922"
+    ],
+    "exit_code": 0,
+    "returned_subset": {
+      "id": 10909293922,
+      "name": "native-agent-stack-771f25f824a7851a6cb46ebcfa2922b54cb88d9e.tar.gz",
+      "size_in_bytes": 29379537,
+      "expired": false,
+      "created_at": "2026-09-26T16:04:30Z",
+      "expires_at": "2026-10-03T16:04:29Z",
+      "digest": "sha256:01938ebb65125d9a94f0461f516e4be125e313a68a1c6914617a5655a1b03e07"
+    }
+  },
+  "download": {
+    "command": [
+      "rtk",
+      "proxy",
+      "gh",
+      "api",
+      "repos/seathatflowsinourveins/native-agent-stack/actions/artifacts/10909293922/zip"
+    ],
+    "exit_code": 0,
+    "bytes": 29379537,
+    "sha256": "01938ebb65125d9a94f0461f516e4be125e313a68a1c6914617a5655a1b03e07",
+    "native_metadata_digest_matches": true,
+    "archive_extracted_or_executed": false,
+    "output_location": "Owned private output outside checkout"
+  },
+  "attestation_verification": {
+    "command": [
+      "rtk",
+      "gh",
+      "attestation",
+      "verify",
+      "<owned-output>/native-agent-stack-771f25f824a7851a6cb46ebcfa2922b54cb88d9e.tar.gz",
+      "--repo",
+      "seathatflowsinourveins/native-agent-stack",
+      "--signer-workflow",
+      "seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml",
+      "--source-ref",
+      "refs/tags/v2026.09.26.2",
+      "--source-digest",
+      "771f25f824a7851a6cb46ebcfa2922b54cb88d9e",
+      "--deny-self-hosted-runners",
+      "--format",
+      "json"
+    ],
+    "command_path_sanitized": true,
+    "exit_code": 0,
+    "original_private_stdout_sha256": "b8d35f71911a0de1da6095142928cfd0cebc7eba4d3bed94a8724ed8f29d6301",
+    "original_private_stdout_mode": "0600",
+    "returned_subject": [
+      {
+        "name": "native-agent-stack-771f25f824a7851a6cb46ebcfa2922b54cb88d9e.tar.gz",
+        "digest": {
+          "sha256": "01938ebb65125d9a94f0461f516e4be125e313a68a1c6914617a5655a1b03e07"
+        }
+      }
+    ],
+    "returned_verified_identity": {
+      "subjectAlternativeName": {
+        "subjectAlternativeName": "",
+        "regexp": "^https://github\\.com/seathatflowsinourveins/native-agent-stack/\\.github/workflows/publish-catalog\\.yml"
+      },
+      "issuer": {
+        "issuer": "",
+        "regexp": ".*"
+      },
+      "runnerEnvironment": "github-hosted"
+    },
+    "returned_workflow_inputs": {
+      "workflow": {
+        "path": ".github/workflows/publish-catalog.yml",
+        "ref": "refs/tags/v2026.09.26.2",
+        "repository": "https://github.com/seathatflowsinourveins/native-agent-stack"
+      }
+    },
+    "returned_source_dependencies": [
+      {
+        "digest": {
+          "gitCommit": "771f25f824a7851a6cb46ebcfa2922b54cb88d9e"
+        },
+        "uri": "git+https://github.com/seathatflowsinourveins/native-agent-stack@refs/tags/v2026.09.26.2"
+      }
+    ]
+  },
+  "release_view": {
+    "command": [
+      "rtk",
+      "gh",
+      "release",
+      "view",
+      "v2026.09.26.2",
+      "--repo",
+      "seathatflowsinourveins/native-agent-stack",
+      "--json",
+      "isDraft,isImmutable,assets,url"
+    ],
+    "exit_code": 0,
+    "returned_subset": {
+      "assets": [
+        {
+          "name": "native-agent-stack-771f25f824a7851a6cb46ebcfa2922b54cb88d9e.spdx.json",
+          "size": 2472759,
+          "digest": "sha256:831bf8c371b66a09b05002ca1a37a0098a5b349c3a62a5f1cc7fa7238321ad4e",
+          "state": "uploaded"
+        },
+        {
+          "name": "native-agent-stack-771f25f824a7851a6cb46ebcfa2922b54cb88d9e.tar.gz",
+          "size": 29379537,
+          "digest": "sha256:01938ebb65125d9a94f0461f516e4be125e313a68a1c6914617a5655a1b03e07",
+          "state": "uploaded"
+        }
+      ],
+      "isDraft": false,
+      "isImmutable": true,
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/releases/tag/v2026.09.26.2"
+    }
+  },
+  "release_asset_verification": {
+    "command": [
+      "rtk",
+      "gh",
+      "release",
+      "verify-asset",
+      "v2026.09.26.2",
+      "<owned-output>/native-agent-stack-771f25f824a7851a6cb46ebcfa2922b54cb88d9e.tar.gz",
+      "--repo",
+      "seathatflowsinourveins/native-agent-stack",
+      "--format",
+      "json"
+    ],
+    "command_path_sanitized": true,
+    "exit_code": 0,
+    "original_private_stdout_sha256": "d0389bf011c3d6252517c3d9f98426498d6a55278b3d6a23dfd28b3c79f1fa2e",
+    "original_private_stdout_mode": "0600",
+    "returned_verified_identity": {
+      "subjectAlternativeName": {
+        "subjectAlternativeName": "",
+        "regexp": "^https://dotcom\\.releases\\.github\\.com$"
+      },
+      "issuer": {
+        "issuer": "",
+        "regexp": ".*"
+      }
+    },
+    "returned_subject": [
+      {
+        "uri": "pkg:github/seathatflowsinourveins/native-agent-stack@v2026.09.26.2",
+        "digest": {
+          "sha1": "554377587b302e699266ac8856bae5be2665158c"
+        }
+      },
+      {
+        "name": "native-agent-stack-771f25f824a7851a6cb46ebcfa2922b54cb88d9e.spdx.json",
+        "digest": {
+          "sha256": "831bf8c371b66a09b05002ca1a37a0098a5b349c3a62a5f1cc7fa7238321ad4e"
+        }
+      },
+      {
+        "name": "native-agent-stack-771f25f824a7851a6cb46ebcfa2922b54cb88d9e.tar.gz",
+        "digest": {
+          "sha256": "01938ebb65125d9a94f0461f516e4be125e313a68a1c6914617a5655a1b03e07"
+        }
+      }
+    ]
+  },
+  "preserved_failures": [
+    {
+      "id": "native-run-download-raw-archive",
+      "command": [
+        "rtk",
+        "gh",
+        "run",
+        "download",
+        "36254080289",
+        "--name",
+        "native-agent-stack-771f25f824a7851a6cb46ebcfa2922b54cb88d9e.tar.gz",
+        "--dir",
+        "<owned-output>"
+      ],
+      "exit_code": 1,
+      "returned_error": "error downloading native-agent-stack-771f25f824a7851a6cb46ebcfa2922b54cb88d9e.tar.gz: error extracting zip archive: zip: not a valid zip file",
+      "scope": "Installed client tries ZIP extraction for a raw archive; artifact presence/expiry separately observed."
+    },
+    {
+      "id": "direct-download-missing-owned-directory",
+      "exit_code": 1,
+      "returned_error": "<owned-output>/<archive>: No such file or directory",
+      "scope": "Shell redirection failed before native API execution; creating only the owned directory resolved this prerequisite."
+    }
+  ],
+  "primary_sources": [
+    "https://docs.github.com/en/rest/actions/artifacts?apiVersion=2026-03-10#download-an-artifact",
+    "https://github.com/actions/upload-artifact/blob/043fb46d1a93c77aae656e7c1c64a875d1fc6a0a/README.md",
+    "https://github.com/cli/cli/issues/13012",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/blob/771f25f824a7851a6cb46ebcfa2922b54cb88d9e/.github/workflows/publish-catalog.yml",
+    "https://github.com/seathatflowsinourveins/native-agent-stack/releases/tag/v2026.09.26.2"
+  ],
+  "acceptance_scope": "Fresh native retrieval, exact artifact digest and provenance/release-asset verification for the historical immutable v2026.09.26.2 catalog archive. This is independent of current checkout HTML generation, runtime/model/broker acceptance and archive contents correctness.",
+  "limitations": [
+    "No new workflow was dispatched and no release published or changed.",
+    "SBOM and explorer assets are metadata-observed here; their file bytes and attestations were not downloaded/verified in this step.",
+    "Native gh maintenance remains with its existing owner. Supported direct API avoids the observed raw-file ZIP assumption; no custom downloader or global upgrade was introduced."
+  ]
+}

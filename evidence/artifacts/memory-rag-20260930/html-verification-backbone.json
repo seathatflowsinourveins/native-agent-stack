@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "kind": "presentation_integration_check",
+  "checked_at": "2026-09-30",
+  "lane": "foundation",
+  "edition": "backbone_comparison_open",
+  "evidence_class": "our_integration_check",
+  "scope": "Revised offline HTML evidence matrix and canonical native-runtime alignment. No new memory-model run or production adoption.",
+  "output": {
+    "path": "docs/ecosystem/index.html",
+    "entry_fragment": "memory-review",
+    "generated_gitignored": true,
+    "bytes": 14223407,
+    "sha256": "a6b272f51c66eef02feb18ee4798003a6e041116f35d7b2fc713cc18c51d97c3"
+  },
+  "supersedes_presentation": "evidence/artifacts/memory-rag-20260930/html-verification.json",
+  "checks": [
+    {
+      "command": "python3 scripts/build_ecosystem.py --check",
+      "exit_code": 0,
+      "returned_output": {
+        "bytes": 14223407,
+        "input_sha256": "9134565d75469fa35aab468dea62154044cd3cc112f6bc8e4dc0e53709a2fddd",
+        "output_sha256": "a6b272f51c66eef02feb18ee4798003a6e041116f35d7b2fc713cc18c51d97c3",
+        "status": "passed"
+      }
+    },
+    {
+      "command": "python3 -m unittest tests.test_ecosystem_manifest -v",
+      "exit_code": 0,
+      "returned_summary": "Ran 64 tests in 22.757s\n\nOK"
+    },
+    {
+      "check": "Whole generated page via existing Node DOM harness",
+      "exit_code": 0,
+      "headline": "Backbone winner: not established",
+      "candidate_cards": 25,
+      "finalist_evidence_rows": 5,
+      "canonical_runtime_components": 10,
+      "all_declared_text_and_primary_sources_preserved": true,
+      "page_errors": [],
+      "missing_elements": [],
+      "external_assets": []
+    },
+    {
+      "command": "python3 scripts/validate.py --scan-file docs/ecosystem/index.html",
+      "exit_code": 0,
+      "returned_output": "{\"scanned_files\": 1, \"status\": \"passed\"}"
+    }
+  ],
+  "limitations": [
+    "Node DOM execution is not a real-browser visual test.",
+    "Published benchmark-artifact reading is not a new model run.",
+    "This local generated page is not committed or published; complete shared-checkout publication validation is separate.",
+    "No best-backbone or total token-savings claim is accepted."
+  ],
+  "publication_check": {
+    "command": "python3 scripts/validate.py",
+    "exit_code": 0,
+    "returned_output": "{\"components\": 69, \"hashed_files\": 8242, \"profiles\": 4, \"receipts\": 175, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+    "owned_registered_paths": 15,
+    "owned_hash_or_size_errors": []
+  }
+}

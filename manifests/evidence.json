@@ -2,6 +2,111 @@
   "schema_version": 1,
   "receipts": [
     {
+      "id": "token-lifecycle-resolution-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "rtk",
+        "context-mode",
+        "serena",
+        "qmd",
+        "repomix",
+        "toon",
+        "mcporter",
+        "markitdown",
+        "ast-grep",
+        "ccusage",
+        "codebase-memory-mcp",
+        "headroom",
+        "jcodemunch-mcp",
+        "ai-memory",
+        "context-hub",
+        "agentsview"
+      ],
+      "claim": "A fresh selected native token-tool installation passed 259 returned commands and 82 integration checks after a source-verified exact Serena reference repair. Three unchanged personal Claude workflows were installed/reused safely; live Claude role Workflow, cached saved-audit recovery, ordinary builder handback and native Codex V2 Astra/max child completed. Final Claude parent continuations exited cleanly.",
+      "limitations": [
+        "Scoped host and synthetic task acceptance; no equal-quality whole-task token saving or universal SOTA ranking.",
+        "The full token-efficiency profile remains drafted; this does not qualify every catalog candidate/tool inside each client.",
+        "Failed native caller timeouts/turn-limit attempts and partial or unknown usage remain retained; task completion is distinct from parent exit.",
+        "Native client accounts retained. Claude reinstall is not a fresh OS/account simulation; Codex platform attestation does not separately attest the wrapper.",
+        "Local integration assertions and tests remain separate from unchanged upstream verification."
+      ],
+      "path": "evidence/receipts/token-lifecycle-resolution-20260930.json"
+    },
+    {
+      "id": "omniroute-claude-callsite-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "omniroute"
+      ],
+      "claim": "A native Claude Opus5.5/Max coordinator discovered and read the project dispatcher, invoked the official Sol-Max Codex SDK worker through native Bash, and the retained original shows one unchanged fixture test with exit0.",
+      "limitations": [
+        "One bounded read-only callsite and existing arithmetic oracle; no universal quality or SDK winner claim.",
+        "Coordinator tool scope was Bash/Read/Skill for this acceptance; other coordinator tools and optional MCP services are not qualified.",
+        "Native Claude and external Codex SDK usage remain separate scopes; parent list-price cost is not complete provider billing.",
+        "The separate Claude SDK Devin bridge remains failed/unqualified; this native Claude-account coordinator run does not promote it.",
+        "Provider backend identity, overall task usage, failed/interrupted calls, remote cancellation and token savings remain unverified."
+      ],
+      "path": "evidence/receipts/omniroute-claude-callsite-20260930.json"
+    },
+    {
+      "id": "omniroute-runtime-workers-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code",
+        "omniroute"
+      ],
+      "claim": "The retained official Codex SDK Sol-Max worker passed one upstream coding fixture, native resume and fresh recovery through the selected OmniRoute Responses lane. Interrupted usage and Claude bridge qualification remain unknown/failed.",
+      "limitations": [
+        "One arithmetic fixture and lifecycle acceptance; no universal SDK or model quality ranking.",
+        "Actual provider trials invoked the SDK from root, rather than through a Claude coordinator. Native project dispatch skill is supplied and structurally checked; its coordinator invocation remains unmeasured.",
+        "Native Codex SDK remains the incumbent. The separate frozen three-arm SDK gate remains unresolved.",
+        "Native gateway requested/returned model labels are not backend attestation.",
+        "All 136 skills are available in the owned project, with two bodies exercised; full role coverage and optional service acceptance remain incomplete.",
+        "Native Codex repeated in-process fixtures emit stdout/stderr ResourceWarnings; standalone per-invocation child exit is qualified separately.",
+        "Complete provider usage, spending, remote cancellation and token savings remain unknown.",
+        "Public record is sanitized selected actual return fields and independent observations; original private returned artifacts remain outside the checkout."
+      ],
+      "path": "evidence/receipts/omniroute-runtime-workers-20260930.json"
+    },
+    {
+      "id": "codex-01592-host-finalization-20260930",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex"
+      ],
+      "claim": "Current Linux/WSL Codex 0.159.2 package provenance and native scratch config/updater lifecycle qualified at rust-v0.159.2. The installed binary matches the verified native package; production clients were not restarted or killed.",
+      "limitations": [
+        "One Linux/WSL host; second-machine checks explicitly deferred by user.",
+        "Scratch native acceptance is separate from production global rollout and live provider acceptance.",
+        "No unchanged upstream cargo test suite ran; repository tests and scratch client probes are integration checks.",
+        "The invalid-effort fixture was corrected after tagged source and native behavior established forward-compatible ReasoningEffort::Custom support; failed attempts remain in the artifact.",
+        "Active client processes and differing owned profile are guarded; production rollout must use the qualified ownership migration and idle guard."
+      ],
+      "path": "evidence/receipts/codex-01592-host-finalization-20260930.json"
+    },
+    {
+      "id": "foundation-quality-defaults-20260930",
+      "kind": "compatibility_attempt",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Applied and independently read back user-selected Sol/Ultra coordination and Sol/Max primary workers on the existing Codex 0.159.2 host. Explicit Sol/Max and Astra/Max native fixture calls both passed the local oracle. Native Opus 5.5/max analytical review returned conditional approval; its required observable routing records are documented.",
+      "limitations": [
+        "This does not establish universal model superiority, comparative token savings, unchanged upstream test acceptance or full Claude tool integration.",
+        "Native Codex events identify requested routes and complete usage, but contain no independent resolved-backend model/effort attestation.",
+        "Four prior peer attempts failed to return a verdict; their provider usage remains unknown.",
+        "Gate A carrier/role qualification and upstream-first advisor accounting remain owner-managed on PR #528. The handoff was posted; no owner completion is asserted.",
+        "Sol readiness requires verified native metadata: 0.159.2 is the checked bundled baseline; older pinned clients parse the keys but lack bundled Sol 6.1. Their refreshed-catalog path and macOS execution remain unqualified. Bootstrap/update guidance gates activation accordingly."
+      ],
+      "path": "evidence/receipts/foundation-quality-defaults-20260930.json"
+    },
+    {
       "id": "memory-lifecycle-probe-20260921",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -3581,6 +3686,29 @@
         "The run-shape statistics describe this host and window. They do not show that fewer or shorter children lower cost at equal quality, and data.derived is arithmetic on generic price ratios; no quality comparison was run."
       ],
       "path": "evidence/receipts/claude-spend-attribution-20260929.json"
+    },
+    {
+      "id": "omniroute-runtime-enhancements-20260930",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "codex",
+        "omniroute",
+        "context-mode",
+        "serena",
+        "dagu"
+      ],
+      "claim": "A scoped native Codex SDK Sol-Max worker completed skill use, selected Context Mode/Serena MCP calls, one Astra-Max native judge and an unchanged oracle through OmniRoute in a successful bounded Dagu graph.",
+      "limitations": [
+        "One unchanged arithmetic fixture and bounded integration; no universal highest-quality model, framework or SDK ranking.",
+        "169 enabled skills were visible through native discovery. This run read using-superpowers and exercised three selected MCP calls; it does not qualify every installed skill, tool, language server, plugin or hook.",
+        "Native hook support and live web search are configured, but their execution is unmeasured here. No scheduler, schedule, hook or global account configuration was installed by this kit.",
+        "Native parent and child cumulative usage are separate scopes. Cached input and reasoning are subsets; observer response counters corroborate the same usage and must not be added. Failed/interrupted and complete provider usage, billing and token savings remain unknown.",
+        "Each observed completed stream also has an unclassified flow_error record. Native results completed; transport is not described as error-free, and requested model/provider labels are not backend identity attestation.",
+        "The separate Claude SDK Devin bridge retains its failed/unqualified status. Earlier native Claude-to-SDK acceptance is a historical separate callsite, not a rerun against this source.",
+        "The follow-up native Claude cooperation session was stopped after no confirmed SendMessage/final packet; no peer approval or new owner-contact count is claimed.",
+        "The isolated kit is a scoped private worker configuration. Live owners retain shared worker policy, host-wide catalogs/defaults and dashboard checkpoint ownership."
+      ],
+      "path": "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
     }
   ],
   "files": [
@@ -3588,6 +3716,11 @@
       "path": ".claude/settings.json",
       "sha256": "a1ec95b039955774e7873393a5146ce6001a711aaf6278d76f387d853a057806",
       "bytes": 2884
+    },
+    {
+      "path": ".claude/skills/omniroute-runtime-worker/SKILL.md",
+      "sha256": "505b5c176666acc202a348b736838c74c463200ad3f77aa51c3aa3704c5cbb7b",
+      "bytes": 2999
     },
     {
       "path": ".gitattributes",
@@ -3621,8 +3754,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "c0025db3159bef98f27abaa32cbd1522067a7d3f114f5c339893883d6fc39dcd",
-      "bytes": 10060
+      "sha256": "2022223f013b7a264b44d57aaacd5249dabb2e8b73b1099581290085c7ee3cb8",
+      "bytes": 10364
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -3716,8 +3849,8 @@
     },
     {
       "path": ".gitignore",
-      "sha256": "831ef0e5ac7d5e2c3f308894d31a0f3d058e7f7bb097a6b435862ffa89cb95d2",
-      "bytes": 3341
+      "sha256": "c4cf60814c22a6abea3879f886feae7a10ab61e712352f3aa71f8183707b9c87",
+      "bytes": 3373
     },
     {
       "path": ".gitleaks.toml",
@@ -3736,8 +3869,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "c188d822fdca21e256696cee1c9fb4d34b4974d73aafe71077170fb6b322170c",
-      "bytes": 11450
+      "sha256": "14b706af240a353735619c0a4a1faf3f6c1f7a8fb469631ef86ce4438d1e65e9",
+      "bytes": 12054
     },
     {
       "path": "CLAUDE.md",
@@ -3800,6 +3933,21 @@
       "bytes": 3799
     },
     {
+      "path": "adoption/agents/codex/SHA256SUMS",
+      "sha256": "6c0f818d9eadc0d8fa361c2012735f4159404fc0cafcf6d266032bb556b6203a",
+      "bytes": 174
+    },
+    {
+      "path": "adoption/agents/codex/stack-researcher.toml",
+      "sha256": "ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00",
+      "bytes": 7223
+    },
+    {
+      "path": "adoption/agents/codex/stack-verifier.toml",
+      "sha256": "281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd",
+      "bytes": 6349
+    },
+    {
       "path": "adoption/bootstrap-linux.sh",
       "sha256": "94e3daf91408b4ed71c969f91e553d7887055a590aa5bf242262360c503aeffc",
       "bytes": 41075
@@ -3811,8 +3959,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "b255c1f62275d1632913cf67b09ce8b8141c1eb4ead9a53c503981f4ba5ec577",
-      "bytes": 46441
+      "sha256": "9fd2b4504f682ee73844b205985b3de33203ef885037cb5e487eaee592be51b5",
+      "bytes": 47093
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -3946,8 +4094,8 @@
     },
     {
       "path": "adoption/pins-linux-x86_64.json",
-      "sha256": "88f727fbd2c8e9ca5ab7d6c70d5a6b7215860faecef065df6a31282591eabfb0",
-      "bytes": 31905
+      "sha256": "05e707137bb1a27d10e6b257295559ad9094c07247c2eb75db138830bb3f21b0",
+      "bytes": 31875
     },
     {
       "path": "adoption/pins-macos-arm64.json",
@@ -4000,24 +4148,29 @@
       "bytes": 77578
     },
     {
+      "path": "adoption/skills/lifecycle.md",
+      "sha256": "2af6341bac2444b8f6a55689e025e522a8340faa2c4b8be8881e2b89bd58f7ad",
+      "bytes": 6808
+    },
+    {
       "path": "adoption/skills/manifest.json",
-      "sha256": "d1a76acad46578d314529b1ab57fce987b4382c6eca95e78cc9f576230a62d72",
-      "bytes": 50612
+      "sha256": "6044ee66070ff128e0aa29d8439604920fc20b75a4ac6962e4804f9730fda50e",
+      "bytes": 50187
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "6c4035f957c5eee4fa91a2e7b207a845e97f84acd44b48e1af37b38d31efe4e0",
-      "bytes": 11144
+      "sha256": "a25eb747b3ce4625991fc2996263ec8a7128e748340b30f0a9f108e39c46529e",
+      "bytes": 11145
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "dd2788672367552755285c8ef504985a6cfe66c228d675e395eeb02da48af6d3",
-      "bytes": 3371
+      "sha256": "947641bf204afa9707ad76ef89ab145e3e71722a9ac65243326c84713e213b6d",
+      "bytes": 3822
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "f84f0e0836db9bc59cf0676bfceff94b0812c1f972d7844a004a165a7df0f6a6",
-      "bytes": 12118
+      "sha256": "4ea5e839ec78aa1364ce772997eb9c8ae2d27df83de5122942be624a8c0ff897",
+      "bytes": 13074
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -4026,8 +4179,8 @@
     },
     {
       "path": "adoption/templates/codex.stack-worker.config.toml",
-      "sha256": "a8b2198116337a9530abd0ae39df4a10c5767c1277816f17fd52e66bb7c4428a",
-      "bytes": 4458
+      "sha256": "7cc85870cfd7557b6e5fb776391c4baaf12da13da4c3d66328e02b146de310b9",
+      "bytes": 4573
     },
     {
       "path": "adoption/templates/project.codex.config.template.toml",
@@ -4066,8 +4219,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "555afb2bff6a5661d5d8fb09f6f863836f4e04fd8621fd0a3d35b7a5794f1df8",
-      "bytes": 20960
+      "sha256": "4ffc6ab69166171b3161ee69d9be5123742c6521c8a9dadc55499e0063585c16",
+      "bytes": 21803
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -4626,6 +4779,11 @@
       "bytes": 3223
     },
     {
+      "path": "blueprints/convergence-practice/foundation-model-defaults/experiment.json",
+      "sha256": "ac4226030fa2989c82cc1bbe45341c050f355db076350911cea4ff27c61a3697",
+      "bytes": 18110
+    },
+    {
       "path": "blueprints/convergence-practice/gpt6-family-tiering-20260926/README.md",
       "sha256": "e46bbf1918e63dbb1dd816d58cee63f02a10eb236e01ab27a38c780775676e0a",
       "bytes": 22730
@@ -5016,6 +5174,16 @@
       "bytes": 1129
     },
     {
+      "path": "blueprints/convergence-practice/memory-runtime-resolution-20260930/README.md",
+      "sha256": "a3a1895fa30abe91f06753c643c7ca50d29d144c319bf4f84df0135a497e06c2",
+      "bytes": 5416
+    },
+    {
+      "path": "blueprints/convergence-practice/memory-runtime-resolution-20260930/manifest.json",
+      "sha256": "0dbd0cc7e3492c98ccb991d474ced524ebacac3317b5a461c34003d84e7fb259",
+      "bytes": 21422
+    },
+    {
       "path": "blueprints/convergence-practice/native-recovery/README.md",
       "sha256": "05e0ce2d521dad837452ee23a1527f76822b9897908c151d3430a891a9055987",
       "bytes": 4319
@@ -5386,6 +5554,16 @@
       "bytes": 56660
     },
     {
+      "path": "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
+      "sha256": "819124da985301f216fd0e3178d7b1aa4986e0c3812d18a75505723d85dbdfcc",
+      "bytes": 29678
+    },
+    {
+      "path": "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
+      "sha256": "6d4812ea4906789e2f55cf206d03863af6116c7137d667d542d2395ac985ce31",
+      "bytes": 29902
+    },
+    {
       "path": "blueprints/convergence-practice/protocol.json",
       "sha256": "7176889bb4f8e3839c5230918c1e23ff89bdd3778a8f333db2ea881731a08e45",
       "bytes": 2595
@@ -5644,6 +5822,11 @@
       "path": "blueprints/convergence-practice/service-reboot/upstream-tests.sh",
       "sha256": "8143d570f8f321db56b5deefc718c9e7aa7e4e00676c7f146f196b55272d0e7c",
       "bytes": 2816
+    },
+    {
+      "path": "blueprints/convergence-practice/token-lifecycle-resolution-20260930/experiment.json",
+      "sha256": "20a3cef80f36fda6fc7d6bd625ecfa77db2420ba6a6684c96112f95d6371af46",
+      "bytes": 35185
     },
     {
       "path": "blueprints/convergence-practice/validation.json",
@@ -8741,6 +8924,11 @@
       "bytes": 2690
     },
     {
+      "path": "blueprints/runtime-workers/README.md",
+      "sha256": "ed04c71299ee05023cf6e4d8c45eb9e5da247f0793dc45ce38bc9a72771f9911",
+      "bytes": 6094
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/README.md",
       "sha256": "23bb0ae8f02c4d40baf0f65f20b169808f5348b3e9010e8d3a80d9be9afd46c9",
       "bytes": 71896
@@ -8992,8 +9180,8 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/README.md",
-      "sha256": "4a367abac888f8ac75da50b0cc3b37fe98f112630c1f98195f32b9f68130efac",
-      "bytes": 44212
+      "sha256": "138df92995fc2a25bf2465508755e344330fa7a8b2e39a4abfe4c3ead0d14a65",
+      "bytes": 44372
     },
     {
       "path": "blueprints/runtime-workers/skills/freshness-20260927.json",
@@ -9002,13 +9190,13 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/manifest.json",
-      "sha256": "3bc75e2e29e624de301227da157d427d81f1590526f837bb7a0c4b74f0b65439",
-      "bytes": 186305
+      "sha256": "6b92a9bd8c91f75e2eac03e60372cb84b6d21d5fce01b2e1a8e2441e6fe74a3f",
+      "bytes": 185060
     },
     {
       "path": "blueprints/runtime-workers/skills/research.md",
-      "sha256": "e5aa7711fd73817f95c63188ebea90728cbf64da0b21ef48179be47e4ea67c8a",
-      "bytes": 15834
+      "sha256": "b78194a59ccac99315d7b09cb89c33d88be263d169e69fe9b54a2806100be81e",
+      "bytes": 16637
     },
     {
       "path": "blueprints/runtime-workers/skills/validation.json",
@@ -11114,6 +11302,86 @@
       "path": "blueprints/us-equities/adaptive-paper/trials/20260923j-regular-no-signals/scheduled-trial.log",
       "sha256": "9cc3aa18b3b73a9dec5e635d4c5b7c52d3a37294018ac701207b7d7bd1a71c21",
       "bytes": 642
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md",
+      "sha256": "14d165861b70403e3000a6b7bfbb5c909dc03ef9c1e3c773e509e9799979b926",
+      "bytes": 19202
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/chain-4.console",
+      "sha256": "3102dfbb292565a98a0238f312192046e9cce062d771e160b69d0b9808b541a7",
+      "bytes": 2982
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/frozen-3058b237.SHA256SUMS",
+      "sha256": "77de4228864b73c5aa436399359c13a5e2c4388956ca1e8c200c97282b41134e",
+      "bytes": 5886
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/mover-paper-2.json",
+      "sha256": "8c736cc29228d6d0421a4c0df51f61fa5ba9beb66ce3fd46fba2958c5bf8301c",
+      "bytes": 3715
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/mover-paper-3.json",
+      "sha256": "baf34d865c31c261ac690431ab866547672652624d2a41b98578d7e1b24db538",
+      "bytes": 134531
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/mover-paper-4.json",
+      "sha256": "dd9182517eac75770c1124ffd9f111852ed7f85af376951cd4d0afed17ffdb6b",
+      "bytes": 3715
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/mover-paper-5.json",
+      "sha256": "ce9789e5cef06d43182e838fd60988988ef6a8ddbe7016a1493c9e39033c7787",
+      "bytes": 3715
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/mover-paper-6.json",
+      "sha256": "c6632f2f8ebda18666b9a85b54fbae3b6a1e492f347856ca6a21c156f221fe52",
+      "bytes": 3715
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/mover-paper-7.json",
+      "sha256": "38dfc092ded4b6d0adbfa4df20e3576de04b1d1f519416447a058e17802fba11",
+      "bytes": 3715
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/mover-paper-8.json",
+      "sha256": "9892e9a5f67825abc3e06f6a2fa36f42c31b74f94c03204d6e2aa3084321aa66",
+      "bytes": 130053
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/receipt.json",
+      "sha256": "3c229834f08a9617e08ca9e4f24b97900b04351cd45c2659c7a582d5f026a3c5",
+      "bytes": 62301
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/reconcile-ext-series.stdout.json",
+      "sha256": "ba554311f8a69b59d305942492a49d34af0291b92da922cd9e06b60e872eb677",
+      "bytes": 8043
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/reconcile_ext_series.py",
+      "sha256": "50b9da4c17f16b6a84cd418ed9fbb7afca6b4a9e26fc56a6b6753c15e2a6cbff",
+      "bytes": 11812
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/trial-1.console",
+      "sha256": "1c284307623b190ff293d8d8c326175babc008f45219ffd91fe7a1a7350b7947",
+      "bytes": 342
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/trial-2.console",
+      "sha256": "c5c082ded9e43e33e834ca5763f2680fcd3f997cf77859729e323a4eb99057cd",
+      "bytes": 505
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/trial-r3.console",
+      "sha256": "4f3944cc6faf0dac1594a2d1c8d8a33cddc93e162fa42a74e1bf0927c22c37f9",
+      "bytes": 637
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/trials/ladder-1x-20260924a-needs-attention/README.md",
@@ -13767,8 +14035,8 @@
     },
     {
       "path": "catalogs/foundation/README.md",
-      "sha256": "2d2956d1dd037480afaf4baebdfd7201141b9b6037017815ec3822864f69453e",
-      "bytes": 15250
+      "sha256": "415f258ce7f16c6e7bf48c5b3f30bca61603e6a12b13685c0460a13e48086b52",
+      "bytes": 15991
     },
     {
       "path": "catalogs/foundation/automation.json",
@@ -13787,8 +14055,13 @@
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "5bafe8e14b940cffa918a4976580d23eee964e769b46da9926b174ecc1e5f494",
-      "bytes": 25723
+      "sha256": "c9bd2d41c8255e7fabedece516ece16f874dcd48a8eba03888af75f9e53102eb",
+      "bytes": 25880
+    },
+    {
+      "path": "catalogs/foundation/memory-rag-20260930.json",
+      "sha256": "c77f4cdb0a2375d7e2c12ebdb3ff93bc35ae43c4e3f9bcdd30985f4ac36269cc",
+      "bytes": 36212
     },
     {
       "path": "catalogs/foundation/memory-stack-20260925.json",
@@ -13799,6 +14072,11 @@
       "path": "catalogs/foundation/practice-references.json",
       "sha256": "6c7eb7a582477eff724de4c807eb08adbf752664abfdce9dd02e3e78a2397c00",
       "bytes": 20197
+    },
+    {
+      "path": "catalogs/foundation/runtime-worker-landscape-20260930.json",
+      "sha256": "5678cc399f9bbdd74cb1a65f61790d700d374ebf610b741ee2109ff829e68484",
+      "bytes": 53875
     },
     {
       "path": "catalogs/foundation/surfaces.json",
@@ -13887,13 +14165,13 @@
     },
     {
       "path": "catalogs/landscape/research-state.json",
-      "sha256": "f47edec17a486e4e3de14bc2e3ef3a6224f3cf09b3830cb336b16bc6480050e1",
-      "bytes": 21131
+      "sha256": "9a0394a5e68b7fbddfe4cfb0761ee4a60798ca9929949efde6c2520cf77b382d",
+      "bytes": 26649
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "2ebd9157605dd694ded3bc79506680161cc1f461383f02517488160f1a700440",
-      "bytes": 248908
+      "sha256": "c90389949391381d7b4b7290a972e2fa09f63c740ebc4189ce4dcf640bcc70bf",
+      "bytes": 250382
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -14357,8 +14635,8 @@
     },
     {
       "path": "docs/convergence-architecture.md",
-      "sha256": "7e4c209d461beaa5cad93050c2abb40af88714a89a2fd67c9129c4cb23baf8e7",
-      "bytes": 15150
+      "sha256": "899e63f28a0463d344f771314edd2b73451c29f944a77a23ea2113cefdb9b400",
+      "bytes": 15350
     },
     {
       "path": "docs/convergence-audit.md",
@@ -14546,14 +14824,39 @@
       "bytes": 25335
     },
     {
+      "path": "docs/decisions/2026-09-30-native-skill-lifecycle.md",
+      "sha256": "95e071dc3a360fad967dc17ad920d9dc89d07d9594e4ba36c18798690118e2a4",
+      "bytes": 9607
+    },
+    {
+      "path": "docs/decisions/2026-09-30-omniroute-runtime-workers.md",
+      "sha256": "ea1ea0bc6d9ab5cea0263cedf43cc392f65838b42546bdb15fbca20e7b0a6343",
+      "bytes": 10413
+    },
+    {
+      "path": "docs/decisions/2026-09-30-sol-primary-quality-defaults.md",
+      "sha256": "762e669686582bc5c71c5f5cb2052be0364be4fce2d0e564bbccc15b9850a7f4",
+      "bytes": 11027
+    },
+    {
+      "path": "docs/decisions/2026-09-30-sota-native-finalization.md",
+      "sha256": "49f733b4837fc7add75022caeb41d43cc97d1f5f65ae44b17e602800eda2c21e",
+      "bytes": 12956
+    },
+    {
+      "path": "docs/decisions/2026-09-30-token-lifecycle-resolution.md",
+      "sha256": "410bed25d3deafc8b51e58a4f32d3436bbd8d398c2f0ec7dd985ddf5fdfafd95",
+      "bytes": 16899
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
     },
     {
       "path": "docs/ecosystem/README.md",
-      "sha256": "21fa9fe27e1e18ff2bdb2072a296f987e92157e66da4472386c9406d7552fec2",
-      "bytes": 14383
+      "sha256": "e00c4e8671df428264bd99232954c074e0f3fdb5086a7f6bf3c98eebe08e36b8",
+      "bytes": 16342
     },
     {
       "path": "docs/ecosystem/claude-repository-evidence.html",
@@ -14572,8 +14875,13 @@
     },
     {
       "path": "docs/ecosystem/manifest.json",
-      "sha256": "0885a5ef19e36623e41104fd8d32286ad875bcf1f1e49fcf8a8313db09600fa5",
-      "bytes": 41473
+      "sha256": "89e78eb41049e4d7ee6c1920cbbc53bd82a6882bc0fdddcf54bd2e890b9c60e0",
+      "bytes": 42491
+    },
+    {
+      "path": "docs/ecosystem/memory-rag.template.html",
+      "sha256": "b52ef1222e820a10e9afacae026bd7cf3f37cf46e6b06c676f7b586403caeb35",
+      "bytes": 16393
     },
     {
       "path": "docs/ecosystem/readiness-observation.json",
@@ -14592,8 +14900,8 @@
     },
     {
       "path": "docs/ecosystem/template.html",
-      "sha256": "b54245b21caa7eb86b97e83cb473daed085660ab42dc0270198afd64e253e2c2",
-      "bytes": 115792
+      "sha256": "c0b386674bd9e73e93bd417509152f722597ea5abf861afa64549c6c595155ac",
+      "bytes": 145290
     },
     {
       "path": "docs/evidence.md",
@@ -14677,8 +14985,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "c9d239413bbcfdf4b0f437cd67bd951cacf25d2de45cdfe676993889fd361eaa",
-      "bytes": 78820
+      "sha256": "dfc003909b5482f3dbca8369491c58dd3f48329e30f72d20153a005b0083106d",
+      "bytes": 103518
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -14697,8 +15005,8 @@
     },
     {
       "path": "docs/landscape-continuation.md",
-      "sha256": "73b0fb9cbdbcbcda1920efcd01411e31cccc813f721a0ef7a1b1409c49f5f3ef",
-      "bytes": 6818
+      "sha256": "0b7460a96a7f801191758098987ca842794f9b4beec127005c2bf4b6ad77ecfc",
+      "bytes": 10106
     },
     {
       "path": "docs/landscape-domain-notes.md",
@@ -14729,6 +15037,11 @@
       "path": "docs/memory-landscape-maintenance.md",
       "sha256": "656958c2f7a373052514a8929e880ef7fa933d4e09838e6b90868704f6f73804",
       "bytes": 13119
+    },
+    {
+      "path": "docs/memory-rag-foundation-20260930.md",
+      "sha256": "69f1716abe1a4f388686d2b9dda0246258aaa8096507d273f868de3020d03a0e",
+      "bytes": 30692
     },
     {
       "path": "docs/memory-rag-native-practice.md",
@@ -14776,6 +15089,11 @@
       "bytes": 10597
     },
     {
+      "path": "docs/native-stack-gap-audit-20261001.md",
+      "sha256": "0ba8896570aad86983e322ed8b0351957fc2da89392b1137d4b77e9326fa425e",
+      "bytes": 5261
+    },
+    {
       "path": "docs/native-telemetry-resolution.md",
       "sha256": "3ba6612f7eb83a47de8ca959eae57efcb36de3e3d8bff0ff4d5a61dc59de55c1",
       "bytes": 5499
@@ -14811,6 +15129,11 @@
       "bytes": 14441
     },
     {
+      "path": "docs/omni-harness-native-resolution-20260930.md",
+      "sha256": "f078c0efb7fa5cf90a9d826d86f8fa7a7d0f88e9a43380bd51eefff7ed04b305",
+      "bytes": 6360
+    },
+    {
       "path": "docs/paper-lane-policy.md",
       "sha256": "a9fef28df97bf6318119b0d2e55e502d47301ec07ea217106f3886402a43b77a",
       "bytes": 3337
@@ -14834,6 +15157,11 @@
       "path": "docs/restricted-worker-compatibility.md",
       "sha256": "aac2349d063fffcf90c5dba0cbce89741962b41279a7b07d1453f0c261242954",
       "bytes": 4106
+    },
+    {
+      "path": "docs/runtime-worker-landscape-20260930.md",
+      "sha256": "6d2d3205ff75f4d1d695318f50ff07ea0c4803cb75517bb0a9e578f069084a7c",
+      "bytes": 27337
     },
     {
       "path": "docs/secret-storage.md",
@@ -14917,8 +15245,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "bb936e1921b19769528c48b5d341f75f9c4e1daa9d35f8f6f13c8cc011630406",
-      "bytes": 88615
+      "sha256": "03f997888a64fec6351a8ca69387c8e74c23d42201b36f7f067afb9055ec8d99",
+      "bytes": 89211
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -15299,6 +15627,56 @@
       "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/codex_capture_count.py",
       "sha256": "0ab020d17171b4c51a31aa19a9349ec51cdd1afd8a7b732ee47d03df0a3ecd79",
       "bytes": 1244
+    },
+    {
+      "path": "evidence/artifacts/all-layer-next-gap-resolution-20261001/README.md",
+      "sha256": "12203bc0a9633281028791e2359aef1beed5c697a4f9f2e5b01637cd4bbadd32",
+      "bytes": 6333
+    },
+    {
+      "path": "evidence/artifacts/all-layer-next-gap-resolution-20261001/browser-observation.json",
+      "sha256": "1afa43c2e6b253bd2add9435d052995dead258f1ab732c5266b8d0bbc161144c",
+      "bytes": 2724
+    },
+    {
+      "path": "evidence/artifacts/all-layer-next-gap-resolution-20261001/hosted-ci-observation.json",
+      "sha256": "fadf34a261efe50dfb55a38d825d869936ce0d331e9b1a1f0e03f7372c81b213",
+      "bytes": 8931
+    },
+    {
+      "path": "evidence/artifacts/all-layer-next-gap-resolution-20261001/independent-review.json",
+      "sha256": "fb0df4c7e4097576dc72caec491b7bbb0453e94f2a6248a28ce595b7305c83ef",
+      "bytes": 3816
+    },
+    {
+      "path": "evidence/artifacts/all-layer-next-gap-resolution-20261001/manifest.json",
+      "sha256": "3c2f7b953e30c8a6d57820c172ae18932c99c02a10a079f25417f6affcdbaf17",
+      "bytes": 41639
+    },
+    {
+      "path": "evidence/artifacts/all-layer-next-gap-resolution-20261001/native-coordination-recovery.json",
+      "sha256": "efc748bc346b4896bdcc8493266c0c96e739dfadef5d3b2ed27d44588ca70ff4",
+      "bytes": 1579
+    },
+    {
+      "path": "evidence/artifacts/all-layer-next-gap-resolution-20261001/native-quota-observation.json",
+      "sha256": "aae94f0f57a302d5827eca8d825949cc05d97d110cf1f6d2f7984884d2b5d43d",
+      "bytes": 1086
+    },
+    {
+      "path": "evidence/artifacts/all-layer-next-gap-resolution-20261001/published-catalog-recovery.json",
+      "sha256": "f2e01c6e7939ab77cee0df32b2f1adef0ab3012936b2ebf2cddd43b91d5771c0",
+      "bytes": 8242
+    },
+    {
+      "path": "evidence/artifacts/all-layer-next-gap-resolution-20261001/recovery-observation.json",
+      "sha256": "1a9e2622748e2a65150eea59e83d4b3d2345180f567252fbe5b4e6f1fe148b98",
+      "bytes": 10126
+    },
+    {
+      "path": "evidence/artifacts/all-layer-next-gap-resolution-20261001/validation.json",
+      "sha256": "82afc8b10c7945c01fde728674a1586470b8725d5eba703041fc67b4928f549e",
+      "bytes": 5381
     },
     {
       "path": "evidence/artifacts/alpaca-platform-landscape-20260926/README.md",
@@ -15966,6 +16344,11 @@
       "bytes": 85934
     },
     {
+      "path": "evidence/artifacts/cli-settings-audit-20260930/audit.json",
+      "sha256": "8102f246c4529fb400b967ae6f69ad28367a1ab8fca5d8e88f51565b837d8b55",
+      "bytes": 4729
+    },
+    {
       "path": "evidence/artifacts/cloudflare-audit-skill-trial-20260927/README.md",
       "sha256": "ac8f50fbaa4fdcf80422360cf3d2acb3df857daf3862c36a7b07e1b08b1614d1",
       "bytes": 16064
@@ -16024,6 +16407,21 @@
       "path": "evidence/artifacts/codeql-quality-measure-20260927/triage_verdicts.json",
       "sha256": "1e74f31476c5f582b2708da4a2e829901852edc87c458382acd115302c783cde",
       "bytes": 11808
+    },
+    {
+      "path": "evidence/artifacts/codex-01592-qualification-20260930/profile-command-correction.json",
+      "sha256": "c9f7a5fd4c5bab7ccb7c665a926fc68da63a50aa5f8d9fb2bc5a5b87320b532e",
+      "bytes": 6327
+    },
+    {
+      "path": "evidence/artifacts/codex-01592-qualification-20260930/profile-migration.json",
+      "sha256": "6b53645368ed34655d6c799b661697a95f3d5cc9a5056c21797378388ee74bec",
+      "bytes": 12094
+    },
+    {
+      "path": "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
+      "sha256": "7d634ff5a9195a589923f9be2bf64070fe507bf50b2efc82629150e967ec896e",
+      "bytes": 14536
     },
     {
       "path": "evidence/artifacts/codex-use-20260926-5/SHA256SUMS",
@@ -16646,6 +17044,21 @@
       "bytes": 7711
     },
     {
+      "path": "evidence/artifacts/foundation-quality-defaults-20260930/final-checks.json",
+      "sha256": "383053173cd42837a3c8999d127de6e902a2754dc2193b80ef8ccaadb34f1a35",
+      "bytes": 3837
+    },
+    {
+      "path": "evidence/artifacts/foundation-quality-defaults-20260930/model-checks.json",
+      "sha256": "dac35f23314570c98eab9fd7fce78d39f7043875e5ea7c4304cb6363dccb9082",
+      "bytes": 7917
+    },
+    {
+      "path": "evidence/artifacts/foundation-quality-defaults-20260930/returned-blob.txt",
+      "sha256": "79cb30c3a0f46cd75a4ed5168e6050e22affbe6ff0285a9d8a72c373e13c5678",
+      "bytes": 21300
+    },
+    {
       "path": "evidence/artifacts/foundation-rd-20260921/native-review.json",
       "sha256": "e0608d9ee7caacc76910965ef4cb2a673324c5fadb24ed6ed6475a753b7e51d1",
       "bytes": 4767
@@ -16659,6 +17072,26 @@
       "path": "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
       "sha256": "0c0216ddb2a4bf29c42eea18126602b4f4fdef6e6bb957759fd1bc31e18c3653",
       "bytes": 3338
+    },
+    {
+      "path": "evidence/artifacts/full-lanes-resolution-20260930/README.md",
+      "sha256": "a96744420276817ee2d669963db684c15840c721bb04705d76bbbb8eb0be7655",
+      "bytes": 2020
+    },
+    {
+      "path": "evidence/artifacts/full-lanes-resolution-20260930/independent-review.json",
+      "sha256": "fbc544c66c2454f186c77492c90bf227cec27ef76957a6425dfb146adee8ea78",
+      "bytes": 3038
+    },
+    {
+      "path": "evidence/artifacts/full-lanes-resolution-20260930/manifest.json",
+      "sha256": "7dfbcef82ac08d4cc643de60c11c3cedbab687bac101609ba0b4e91614efe612",
+      "bytes": 49221
+    },
+    {
+      "path": "evidence/artifacts/full-lanes-resolution-20260930/peer-messaging.json",
+      "sha256": "fe3bc5ca53d2e9b65028034f7db91d7c60c8f86d3014798017dfe6c90bd50544",
+      "bytes": 8520
     },
     {
       "path": "evidence/artifacts/full-stack-convergence-20260921/agentsview-aggregate-safe.png",
@@ -32241,6 +32674,41 @@
       "bytes": 3915
     },
     {
+      "path": "evidence/artifacts/memory-rag-20260930/backbone-assurance.json",
+      "sha256": "34d856678776da8a030c02875aab1a2ebd739c8a37e364eb4a5351e62a889de3",
+      "bytes": 18160
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-20260930/convergence.json",
+      "sha256": "06f9803caf9f1a2c9038b362accd61c810a6766466dae155527492f9cfb10e78",
+      "bytes": 11809
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-20260930/html-verification-backbone.json",
+      "sha256": "22a967ba32160edb189a91c79808d413cae62c7847b6e7ba0e7f62ee52ec2d13",
+      "bytes": 2550
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-20260930/html-verification.json",
+      "sha256": "187be8b40871d9896e64efd9e35866785b2183b1a626201a59b2c479b4cc7d6d",
+      "bytes": 4200
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-20260930/preregistration.json",
+      "sha256": "1286b69ff36d5d0b144f56ccc98370c7f203c6bcae31cafd1d891103078bfe49",
+      "bytes": 4388
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-20260930/upstream-package.json",
+      "sha256": "44bc8ae8d37dac08ae9e60799be44f10fb99dd07b675f225da8ef0e9a23c7da2",
+      "bytes": 4223
+    },
+    {
+      "path": "evidence/artifacts/memory-rag-20260930/upstream-vitest.config.ts",
+      "sha256": "0c3aa7993f529dbb014ea02ab18eade3e468a40275447b1111d91f08419dc89d",
+      "bytes": 1174
+    },
+    {
       "path": "evidence/artifacts/memory-rag-lifecycle-20260921/catalog-lifecycle.png",
       "sha256": "7e2bce14ded57666c62edd5a7de74a5f7b9f7e2ad7caef8aedd60490bd16d9d3",
       "bytes": 118237
@@ -32274,6 +32742,56 @@
       "path": "evidence/artifacts/memory-rag-lifecycle-20260921/upstream-release-observation.json",
       "sha256": "d7a07aff13bad911dec59bc2a3c47f6dea57be792f30bbad45183b61bb6ada98",
       "bytes": 4187
+    },
+    {
+      "path": "evidence/artifacts/memory-runtime-resolution-20260930/agentmemory-native.json",
+      "sha256": "def07ee060847021efb64e8366000a0bb0df38260868aee82d0e43846425e668",
+      "bytes": 17239
+    },
+    {
+      "path": "evidence/artifacts/memory-runtime-resolution-20260930/ai-memory-native.json",
+      "sha256": "b025bb1b0e2d6869a6d3711a5ba79f3a3c4314826cb4fbb5b3397a07548cb89a",
+      "bytes": 30055
+    },
+    {
+      "path": "evidence/artifacts/memory-runtime-resolution-20260930/foundation-prefix.json",
+      "sha256": "5d438f9ebb36edda75093d775ae3ba5501b6d568e0e91ab1f52fe99e4d29078c",
+      "bytes": 5531
+    },
+    {
+      "path": "evidence/artifacts/memory-runtime-resolution-20260930/hindsight-chunk-native.json",
+      "sha256": "d24ee1ecb2c0e3aec052f13e2da395f58527d07b82eb3f3a69adf157d93390ec",
+      "bytes": 14346
+    },
+    {
+      "path": "evidence/artifacts/memory-runtime-resolution-20260930/latestness.json",
+      "sha256": "400f24ed23a21a7107a98200e9ecfc39a0a36291dcd1dc110f8a06327b774ff6",
+      "bytes": 18229
+    },
+    {
+      "path": "evidence/artifacts/memory-runtime-resolution-20260930/observation-manifest.json",
+      "sha256": "ed2f167c31eb4c95831b1c00dadeb79728f7ceecc45152575fd542851f48a8da",
+      "bytes": 24327
+    },
+    {
+      "path": "evidence/artifacts/memory-runtime-resolution-20260930/provider-quota-capability.json",
+      "sha256": "ad45c754ad7fbfda5f519524e37788f6e9e15be424fdabdfd22904ef0451e7f0",
+      "bytes": 4997
+    },
+    {
+      "path": "evidence/artifacts/memory-runtime-resolution-20260930/publication-verification.json",
+      "sha256": "b09585d6d3f4a2ef58a988d0b285ffc95396bfde46f180217589a8acb0c395df",
+      "bytes": 12694
+    },
+    {
+      "path": "evidence/artifacts/memory-runtime-resolution-20260930/published-coding-evidence.json",
+      "sha256": "a0553cbbaee42ecc1d6976e7aab59423613c0ad73d1fde0289ebd5d41c35fb4e",
+      "bytes": 16391
+    },
+    {
+      "path": "evidence/artifacts/memory-runtime-resolution-20260930/topic-publication-verification.json",
+      "sha256": "04580371ccb7297c01bb36933baf4d24e989ad21639f382ed250a6fd91a22f56",
+      "bytes": 5296
     },
     {
       "path": "evidence/artifacts/memory-stack-20260925/README.md",
@@ -33471,6 +33989,76 @@
       "bytes": 110896
     },
     {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/README.md",
+      "sha256": "56a4263174d05b0cc8e183405f73dab187b1decf8b1290577492a8e728250e74",
+      "bytes": 5499
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/edit-followup-preregistration.json",
+      "sha256": "71bab9abe0757ef7cafdc35c5adbeeeb434291c22397579bf2707271404fddbe",
+      "bytes": 5770
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/followup-preregistration.json",
+      "sha256": "ea036dc0c5ca708de353f51d210dffa0127212366e5d62a692ccbc01735b24d7",
+      "bytes": 4351
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/operations.json",
+      "sha256": "5d3fff78473c1deb4f6da3a2d2574b8e6817e4e1b398ba48c845b5bbd69c812b",
+      "bytes": 16663
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/preregistered-cases.json",
+      "sha256": "04c85c5255644c5c3fba840e7286b3dd2cffd76825dda620e2ad056f7af5ee18",
+      "bytes": 14401
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/preregistration.md",
+      "sha256": "4ea694af8008e43b78b9c691d21927bc4eeebccd14ab6aea96296d6f55282e4b",
+      "bytes": 2423
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/results.json",
+      "sha256": "63b65d8b9bed4ce96dfe365a94d7d4e7e5956173384cee3c44d5cc329a1e4120",
+      "bytes": 138745
+    },
+    {
+      "path": "evidence/artifacts/native-skill-finalization-20260930/usage-summary.json",
+      "sha256": "d855ed4a4c3b05031efa5e2f534a612accdd9e194e0dda790e16722879af2c33",
+      "bytes": 3474
+    },
+    {
+      "path": "evidence/artifacts/native-skill-lifecycle-20260930/convergence.json",
+      "sha256": "b661e2962903251db9cfc5d6b69a9209c267122d327046561ce8ed1ec29f0741",
+      "bytes": 15358
+    },
+    {
+      "path": "evidence/artifacts/native-skill-lifecycle-20260930/probes.json",
+      "sha256": "16549c1eb5865d53f3efa15fc98087a96e3a22d9539f044d255e0c51e4ff36c8",
+      "bytes": 1870
+    },
+    {
+      "path": "evidence/artifacts/native-skill-lifecycle-20260930/publication-checks.json",
+      "sha256": "767d9f550c0ddf8d3852fea8c402f5fd488a985d5ac8f8b485128331d81ecfbc",
+      "bytes": 3046
+    },
+    {
+      "path": "evidence/artifacts/native-skill-lifecycle-20260930/receipt.json",
+      "sha256": "4c9c018b58c55698c450aecee3b58361f3fb38439604ec21a1fe1a4a71905571",
+      "bytes": 31330
+    },
+    {
+      "path": "evidence/artifacts/native-skill-lifecycle-20260930/verification.json",
+      "sha256": "d4747f71862589212f501c7b28a998ac512f4d5b72943621f90ffc69d7fdacc2",
+      "bytes": 2466
+    },
+    {
+      "path": "evidence/artifacts/native-stack-gap-audit-20261001/manifest.json",
+      "sha256": "746d8114edb145b382f14d9b50863ccc9d0c0f823c6463ddf3b1d30c5ae57291",
+      "bytes": 22351
+    },
+    {
       "path": "evidence/artifacts/native-terminal-profiles-20260920/native-processes.txt",
       "sha256": "0669f843035324a6a4578fdc56189f794187442efefc35e5d8125e043828da6a",
       "bytes": 96
@@ -33966,6 +34554,21 @@
       "bytes": 629655
     },
     {
+      "path": "evidence/artifacts/omni-harness-native-resolution-20260930/independent-review.json",
+      "sha256": "2616421bc2055ccd3ccc2afd95bbb965766ea40c6970d4a0e1fe453411d8ae7f",
+      "bytes": 3163
+    },
+    {
+      "path": "evidence/artifacts/omni-harness-native-resolution-20260930/manifest.json",
+      "sha256": "3d11ea1b94a41bd990a9d76d540003fc87861ff78c2bdcf1e7a7a56a06a15cb9",
+      "bytes": 14605
+    },
+    {
+      "path": "evidence/artifacts/omni-harness-native-resolution-20260930/peer-messaging.json",
+      "sha256": "7ab319f68d44aa3758905ffc4537627fe46483bc439ac520809a634c150f83a9",
+      "bytes": 2389
+    },
+    {
       "path": "evidence/artifacts/omniroute-gateway-20260927/README.md",
       "sha256": "aae1e5f0997531625cc684ff088b17a68a4f605592065b1756ab90d3895ccabd",
       "bytes": 25609
@@ -34264,6 +34867,56 @@
       "path": "evidence/artifacts/omniroute-routing-20260928/scripts/stage_receipts.py.txt",
       "sha256": "a3fb9cee8dab79992e1178a684ab264f53a64ade4d1894f28f15c0b8b7a5ba83",
       "bytes": 23100
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/deadline300-judge-oracle-output.txt",
+      "sha256": "b9032a013f9d5b050a0940a2c8142d75ff75d6e560e88e77c58383d4c94fc679",
+      "bytes": 179
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/initial-runtime-worker.yaml.txt",
+      "sha256": "82dd567b9e0fd8cc300b516fed535584472a499f63431ddeb030a36065c91426",
+      "bytes": 1047
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/initial-runtime.config.template.toml.txt",
+      "sha256": "5c023dcf0c9c80a3aaf303dda47a268250c61b054551e3f8ccf213033609c72e",
+      "bytes": 2183
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/post-env-import-runtime-worker.yaml.txt",
+      "sha256": "46cab557d04fcb6bc5ad1be96c5b46d4dd82a8bfc25fe719fb095deb64a7e756",
+      "bytes": 1282
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/pre-dispatch-default-skill.md",
+      "sha256": "14593cbbbe7a89507c0559dd975dff4a2273a46f0e828a7689f79d650767d28f",
+      "bytes": 2565
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/repaired-judge-oracle-output.txt",
+      "sha256": "7b49b6e997017b1cde21f9aa33af3d5510926ad182f3211d0dd40cd71762a44a",
+      "bytes": 179
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-enhancements-20260930/selected-skills-manifest.json.txt",
+      "sha256": "3bc75e2e29e624de301227da157d427d81f1590526f837bb7a0c4b74f0b65439",
+      "bytes": 186305
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-dispatcher.md",
+      "sha256": "857a00f0c3f4088a20662f32f422b30c4697d0c267c0db1f9dbb95dfcbe39ce5",
+      "bytes": 2248
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-test_worker.py.txt",
+      "sha256": "ea30d5bd0568f1e179e6460647ef61f2ca1ca025bda574f5f35a315eeee2ae2a",
+      "bytes": 12585
+    },
+    {
+      "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-worker.py.txt",
+      "sha256": "8dfa1799dc2ce034548eb2581befe61bef480728cc541a451e960bb48decc651",
+      "bytes": 11517
     },
     {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
@@ -36794,6 +37447,101 @@
       "path": "evidence/artifacts/sota-convergence-review-20260923/manifest-citation-review.json",
       "sha256": "4905a791f7c0571659916daab4f149e7ee0c4cb4da50225ee6d0964447e9d635",
       "bytes": 86206
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/allowed-tree-drift.json",
+      "sha256": "e0699d300b63a206b81ed90247ffa5e00febb3b566d01e36a4d3e6dad64130fb",
+      "bytes": 8516
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/catalog-scope.json",
+      "sha256": "28e439bb67a1da5d828a417ab5d3905c03d511e191e114c80eec86ead30feda8",
+      "bytes": 1486
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/claude-review-inputs.json",
+      "sha256": "e88bea465b41660258b05c40cc2390c014638e006698b4dbff4eaf84b97a9ffd",
+      "bytes": 5599
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/claude-review.json",
+      "sha256": "4b00417ade566d965844476ae66afa3d08db86b5587665045f94ce6f615f186a",
+      "bytes": 37765
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/claude-source-verification.json",
+      "sha256": "2ebadc30bd9e52ae01b462c686ecc6d6ce7f05dc87c798a9f69e46c850e19142",
+      "bytes": 7974
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/convergence.json",
+      "sha256": "e50c03d19cc5057c74a6b49aa5c00063231d8c0e52fbdbc4aa394986ffe4efa4",
+      "bytes": 69769
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/idle-rollout.json",
+      "sha256": "31e18f68af05c84110eda7ea94374285d7e8d7b5571230d7181fa32c9b982b17",
+      "bytes": 5301
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/installed-skills.json",
+      "sha256": "6a97cccc2c4a4555913d28abfcaf119f52dccf82ac256dd9d7dcf051bfdbf943",
+      "bytes": 13929
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/native-actions.json",
+      "sha256": "e9dffb690deef552e57f74445f9b7662dc4ecbd5f191be0ba6572a894678c967",
+      "bytes": 7178
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/owner-reconciliation.json",
+      "sha256": "530ec09b4ce090ed1324f54b106fe99a2f495af474005280413d39e62be08183",
+      "bytes": 15331
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/plan.json",
+      "sha256": "3dde5fa6158eeb003e3629a2f7d95cdd2b2fc3cd4beadd77e31b1b402416341d",
+      "bytes": 4009
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/pre-reconciliation-checks.json",
+      "sha256": "3564fa1e8595d0cff49fafba4039992f82f8a65f3c8dca2d91238d1a2261e9d9",
+      "bytes": 3970
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/publication-checks.json",
+      "sha256": "1ebb8f30e8a9c2cbafee299a0df4b4e7bd0fb0a573fa2d55ccd47c470179b18d",
+      "bytes": 5158
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/receipt.json",
+      "sha256": "0bfe99ffb8a0451390954bad4dba61ecfb2b38af6f4c530b0fbb9e1be86813b5",
+      "bytes": 4785
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/repair-verification.json",
+      "sha256": "60c22af21154697bea7749b8caddb3b76ba02e74f33fb07ec0cefe3ec810b844",
+      "bytes": 3874
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/source-review.json",
+      "sha256": "531cea77c0e0439e152c9b0d06f7b3dae7ab554794ed79f7bb1cffa033618c52",
+      "bytes": 5312
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/upstream-codex-integration.json",
+      "sha256": "4a9596c5f4877c81b803b1e150cd244aeb2c6c73a872d26b020b5bef76ad5bdf",
+      "bytes": 28884
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/upstream-tests.json",
+      "sha256": "d4300c679ba959d2d6117d954c9906e82617e0d3c98608d2990f6206030e5e30",
+      "bytes": 1710
+    },
+    {
+      "path": "evidence/artifacts/sota-finalization-20260930/verification.json",
+      "sha256": "a761aaba8b156256b45472a3d4a0107f19318447c2c03d831851a72810385ddc",
+      "bytes": 4524
     },
     {
       "path": "evidence/artifacts/sota-refresh-20260923/hw-profiles/README.md",
@@ -39611,6 +40359,386 @@
       "bytes": 24371
     },
     {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/README.md",
+      "sha256": "2b68579d2fedec225245c7642c2964b5bbf39323ea7f821a40ba30feacd88cb8",
+      "bytes": 3687
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/ai-memory-2.4.2-native/receipt.json",
+      "sha256": "cd3a927e13ce312dc4d79019607fe742789ce63c393ba721e4d3992d01a69292",
+      "bytes": 226001
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/ai-memory-binary-rollback/receipt.json",
+      "sha256": "c939eaf3d07179ff163b7344b8beadb1fcd1d170339c599b87edc37afde4103d",
+      "bytes": 68221
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-complete.json",
+      "sha256": "0c87e7ff001441b6a82026d71e44e0866f0b4e18965457141053845505dd6326",
+      "bytes": 4227
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-final-handoff-prompt.txt",
+      "sha256": "34754620796d5311f03244c07046d7da8dfbed0bc08a255384876d42dbec48f2",
+      "bytes": 567
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-prompt.txt",
+      "sha256": "7ccbfa5ea9e9c9c789719e74f68120109d432bf416288cb78dbc75f27c5bad4a",
+      "bytes": 1229
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-recovery-prompt.txt",
+      "sha256": "56542233289097db043ac9508707808a383fc10b2c19c1badf65cd096f8edd2c",
+      "bytes": 808
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-recovery.json",
+      "sha256": "3a2c87f60dd936bfdbbe47a0c29574b7d9d5cf199cef22884359ad5cd531ca24",
+      "bytes": 3188
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-timeout.json",
+      "sha256": "d92bf4163f90d1efcf89273b2da8ca2a518e33fa9800ea59a9fdeee4f654c8b5",
+      "bytes": 1280
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-client-install.json",
+      "sha256": "caa20a522b106c48972246eb2b811b77cf8a9231a348398ac30e4dc2c333d9ec",
+      "bytes": 2113
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-role-marker.json",
+      "sha256": "b47dbd05d24497364438bc0c20435504902e47cb676ed2b2191cbbce417b3455",
+      "bytes": 2087
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-complete.json",
+      "sha256": "d3c5de0a4a7417f4224566354f1344ddb4dc6bb4a0516d841c8a7ebbf7137416",
+      "bytes": 3360
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-final-reply-prompt.txt",
+      "sha256": "20b0bab4a95af99de93e8285b6bf004d8af40edcc251cf30e1525d89b851ec36",
+      "bytes": 504
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-parent-close-prompt.txt",
+      "sha256": "546d224aab9479306f93761917040b4ba07a19c1aecefd5522e40afebea781e7",
+      "bytes": 607
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-parent-complete.json",
+      "sha256": "f3bded5184e8677f6d1ffffe2e3e1eb23d5a2db5cdeba450c52651be715462fe",
+      "bytes": 2807
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-parent-limit.json",
+      "sha256": "f6510dd97211b0fb77e5255bf32cb41697aedcb18e4fb0b5c415f89e2f053f69",
+      "bytes": 2956
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-partial.json",
+      "sha256": "d27f01c19c78798fa14c1fa064ec3be6d8863bf6b52a3c7bcf82d8d37c9494d5",
+      "bytes": 2994
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-recovery-prompt.txt",
+      "sha256": "ec1c8276b4bde3427a62ba18a37fb84964133be564670270634917853debfc28",
+      "bytes": 875
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-recovery.json",
+      "sha256": "de9dead88a0d9ea3243c8968eb87acf1be12648fb667e700801b0887ec6c1573",
+      "bytes": 4096
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-workflow-prompt.txt",
+      "sha256": "8feadc30ece52b6e7d7d0c3bfcc00f5f751478ceee4a6d491917262f49917c8a",
+      "bytes": 851
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow-children.json",
+      "sha256": "fb01638d1f60c4c8affe848fc9a335fc11048890349c0511b97567057b375ea0",
+      "bytes": 2883
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow-prompt.txt",
+      "sha256": "350caea80633287e579f81dc66283d8893230cffc41e2ffa919ce16f54d28691",
+      "bytes": 2047
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow.json",
+      "sha256": "b233c36fc17b6b6fd9f7212d5f47dedbaccc83dbe5a984e5ac024ab66181133d",
+      "bytes": 21001
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/markitdown-greeting.md",
+      "sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/markitdown-multi-element.md",
+      "sha256": "bfa9a1277bb79c975c38382ecf335c957a486401bc316f66e17a4c53db4fdafd",
+      "bytes": 631
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/qmd-input.md",
+      "sha256": "6fd148f20e3aeac8e835cd8509090aa02d2d0fa7818453776fbc62124f82e32a",
+      "bytes": 388
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/receipt.json",
+      "sha256": "3432d68aafd022311ec6b4a1df1f3917d389db429e1acf96ce5257e1a0c313fa",
+      "bytes": 732035
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/records.recovered.json",
+      "sha256": "fbb7def43d291ae3f375cd83c04f367a993044fea454e6851fc499dccd4cec34",
+      "bytes": 172
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/records.toon",
+      "sha256": "9446df1ab35a750ac3bccc1777934ce0f979bad805e4efa3b21c7fbbe7a505e3",
+      "bytes": 60
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/repomix-originals.xml",
+      "sha256": "a860736a54fbdac8e9babf486ad87180cca6c490f946f76e4a2dad2482f45cd6",
+      "bytes": 289
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/repomix-structure.xml",
+      "sha256": "7c8e37eb454f14dc58f308ed94957aace08cb2505aff26dbf428e04cecdbc2f7",
+      "bytes": 195
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/markitdown-greeting.md",
+      "sha256": "6196d91e3223d43a9fc4e99cd3c9e9b94fee57b0a91ae70b2030607b277681a2",
+      "bytes": 76
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/markitdown-multi-element.md",
+      "sha256": "bfa9a1277bb79c975c38382ecf335c957a486401bc316f66e17a4c53db4fdafd",
+      "bytes": 631
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/qmd-input.md",
+      "sha256": "6fd148f20e3aeac8e835cd8509090aa02d2d0fa7818453776fbc62124f82e32a",
+      "bytes": 388
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/receipt.json",
+      "sha256": "e313ad548fcb3265352b8843c589c4031d3e9b1241c76a2a344a084bc4758c88",
+      "bytes": 730468
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/records.recovered.json",
+      "sha256": "fbb7def43d291ae3f375cd83c04f367a993044fea454e6851fc499dccd4cec34",
+      "bytes": 172
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/records.toon",
+      "sha256": "9446df1ab35a750ac3bccc1777934ce0f979bad805e4efa3b21c7fbbe7a505e3",
+      "bytes": 60
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/repomix-originals.xml",
+      "sha256": "a860736a54fbdac8e9babf486ad87180cca6c490f946f76e4a2dad2482f45cd6",
+      "bytes": 289
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/repomix-structure.xml",
+      "sha256": "7c8e37eb454f14dc58f308ed94957aace08cb2505aff26dbf428e04cecdbc2f7",
+      "bytes": 195
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/cleanup.json",
+      "sha256": "8a4fd5942397d0619433a10d13e83c017c841d9c75962c28899dc8dc6382572c",
+      "bytes": 1201
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-clean-install.json",
+      "sha256": "2da7abd4734f99c9bc808e47a731e7c978428d14e80a0835041903705b1f9ae1",
+      "bytes": 2279
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-incomplete.json",
+      "sha256": "1b1fd20dec3e47011b5b24cb23d9a58a995e75e1bd189beb35eeb32e30a134b4",
+      "bytes": 3619
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-observation.json",
+      "sha256": "711b5695debcec0e16d5b3fa307d966732091b11e214a84944f13546993f304b",
+      "bytes": 4163
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-prompt.txt",
+      "sha256": "5790564708258335a692e160ac87fb2454d68551caa6543d29ce434360246bbe",
+      "bytes": 1011
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/hindsight-upstream/installer-test.stdout.txt",
+      "sha256": "5c989e59e51c1a9cac2280b2bc03b2e2e4a3c8bd369740daf9a25cc024046f39",
+      "bytes": 369
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/independent-review.json",
+      "sha256": "ca163016f8b766e123ce6092d95459ed6a6e1144082e8edc739688eb910741d3",
+      "bytes": 2815
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/privacy.json",
+      "sha256": "80296a839fd5ff6e8424456306894f393b72e4e0dc5f933e1b18b117919e1e2a",
+      "bytes": 2941
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/publication-validation.json",
+      "sha256": "6ed89cb295ebf69441d2c88f25fb11910a537e3a3f6672238f4c57d81d4dde51",
+      "bytes": 2120
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/qmd-index-refresh.json",
+      "sha256": "c1fbecc07eb31dc2938d1dc9710aa77184ec5f0b5ef463f701afbf29afe77b77",
+      "bytes": 868
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-existing/receipt.json",
+      "sha256": "59ad10ed93cc69b302d648ce5e34d122a9e782888d9459030c8928dfeea88c3d",
+      "bytes": 90114
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/README.md",
+      "sha256": "e5edda23cc5ff7998e3cdf73711118e385643f5a32b18b70da5fecfcbf0cb0e1",
+      "bytes": 6568
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/changed-schema-claude/receipt.json",
+      "sha256": "d22e63ed95ce40b1d79a9f50433efd75a0c2de0b3202994fe6c5e257417738c2",
+      "bytes": 91478
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/changed-schema-codex/receipt.json",
+      "sha256": "20bd33cb404c00e7db31a5d89578e48bdfb55b8cf2658e9b9bcef6851c37ff35",
+      "bytes": 91487
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/controls-observation.json",
+      "sha256": "45a24f61e8a2b872a005f6b69c047df823643e5c8777fca33f8d2ad60f24216f",
+      "bytes": 2310
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/final-unit-suite.txt",
+      "sha256": "c8c8fbb9a8e3cf21635bb7432ffcdd6dacf21e8a591d47b65602b0206ac21f11",
+      "bytes": 231
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/green-existing/receipt.json",
+      "sha256": "af05563b9f0c1deff9ce4c4545127f748f48e9c9e428930e6922f552d19255e0",
+      "bytes": 91621
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/green-regression.txt",
+      "sha256": "fb0578c63a599272724e1b9d6f3cd8105c1f3e8885f88dae3915df29041442cb",
+      "bytes": 211
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/green-unit-suite.txt",
+      "sha256": "67d4f4f467dd30124bffbfb4c0fdd5a2d75ad2ec11bf1d0efa3035b7e21200ae",
+      "bytes": 231
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/claude-code.stderr.txt",
+      "sha256": "9a4c6e08eff9b4ef064133699a15f7b735ce8cd27f7184763f9f5e41e2c95b14",
+      "bytes": 8986
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/claude-code.stdout.txt",
+      "sha256": "c34c2dcb08b92a60e040ba0c8d7378b0ce2904643d76db0fa5831dfbb6e1031d",
+      "bytes": 25825
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/codex.stderr.txt",
+      "sha256": "eda7467d375d6f915f4591480de55a6514626395a17a1d7e0d098d6c5f4c1016",
+      "bytes": 8721
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/codex.stdout.txt",
+      "sha256": "d8843d03ad5f0066ef626fb9bcc2b96db1e46ac0737725d5d40572937e0572ad",
+      "bytes": 30548
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent/observation.json",
+      "sha256": "2bda24d355d476afcb96eacea190c5b4ad75602199435a3eb6cedd2e0f062921",
+      "bytes": 4721
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/independent_probe.py",
+      "sha256": "be854d87c058eae712efd38097c1cdce35f76c7bc907346bdb5385916ab198da",
+      "bytes": 5596
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/inspect_controls.py",
+      "sha256": "a49ad3b45adfa140781318b340c87b3b39fcab099350f1c72e45791326544337",
+      "bytes": 3311
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/red-existing/receipt.json",
+      "sha256": "04ecdc57d20b319242c828d44dd404eec52ccde92bfd8f1ca195e8c31d552dcb",
+      "bytes": 91108
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/red-regression-observation.json",
+      "sha256": "1fcb32b555632bbb7ac6398a89cdd2b2c7591fc326ecc454d0de43124a275e31",
+      "bytes": 553
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/red-regression.txt",
+      "sha256": "0505c8f3dbc3c92e06ff90e778629f9f5043951f9d62c95a48cbec010ab66526",
+      "bytes": 1523
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/repair.patch",
+      "sha256": "b160ec7d8fa433de9ef8399a2ad40d8cca960b28e4dfad0ec0eabf80af658f8d",
+      "bytes": 6954
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/run_fixture.py",
+      "sha256": "f70e25e32f862d04f336307ff569eb6c4105e2b8dc23a63d8f1fd37ec509842a",
+      "bytes": 4136
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/source-identity.json",
+      "sha256": "4318aaad04aae171b6703957dbdbb102326c1d0f897eebb4eefd5a95e1bdd0d9",
+      "bytes": 34036
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/validation.txt",
+      "sha256": "9efb6b3aa73d04734c756b2e61c2297f1535e4c1c7e9e1544f5b119999553082",
+      "bytes": 2563
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/verify_source.py",
+      "sha256": "68ec456fdbc85b29fdfabf100864b7cfb89b5618b46548d04a715c71188e05b8",
+      "bytes": 3511
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/workflow-installer/README.md",
+      "sha256": "71df39560678cb43f83fa842e86dceba5e783408ba055dfd905668ced31b544c",
+      "bytes": 2228
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/workflow-installer/focused-tests.txt",
+      "sha256": "f722c2960f9425896acde852873ff81fc6eefb82ab01ed7373e2fbe85f6f1a8f",
+      "bytes": 848
+    },
+    {
+      "path": "evidence/artifacts/token-lifecycle-resolution-20260930/workflow-installer/source-checksums.txt",
+      "sha256": "6dcb032720780d4bca43cef97abc6fd23e959bcb0f789364a3f93201b44cc431",
+      "bytes": 507
+    },
+    {
       "path": "evidence/artifacts/token-stack-cards-20260927/README.md",
       "sha256": "7c04fec29e4fbbf5be5fcce0d65469bf6b3f873af41e3a840edbba32b086b1f6",
       "bytes": 13531
@@ -41341,6 +42469,11 @@
       "bytes": 21813
     },
     {
+      "path": "evidence/receipts/codex-01592-host-finalization-20260930.json",
+      "sha256": "e55772fb5c5ba894e90fcc26f332e96f3f275d227b033d71ccf81e8babec8f13",
+      "bytes": 1909
+    },
+    {
       "path": "evidence/receipts/codex-desktop-live-20260920.json",
       "sha256": "4333ca2c8b4f78caee98f9e38ae624104e6cbd410134a9f103153d47d5c97551",
       "bytes": 12905
@@ -41409,6 +42542,11 @@
       "path": "evidence/receipts/foundation-native-20260920.json",
       "sha256": "92a1f872fc730bac644b6eac27ace8e3102b13829273c79945e408a0075f89a5",
       "bytes": 25017
+    },
+    {
+      "path": "evidence/receipts/foundation-quality-defaults-20260930.json",
+      "sha256": "b777966f07d349826aa0afaa2082e854476d4f48be7e1b2812d9b81520de4c6c",
+      "bytes": 14097
     },
     {
       "path": "evidence/receipts/foundation-rd-20260921.json",
@@ -41489,6 +42627,11 @@
       "path": "evidence/receipts/memory-lifecycle-probe-20260921.json",
       "sha256": "fa38a4da448b427fac146affb7199ac6fff610eaa1fd156ce64172a5fefa52be",
       "bytes": 2496
+    },
+    {
+      "path": "evidence/receipts/memory-rag-20260930.json",
+      "sha256": "6fbf52c0989004ed1a16023d54f6b5a305952cd76bce5d4989d310c91846e498",
+      "bytes": 19922
     },
     {
       "path": "evidence/receipts/native-ai-memory-maintenance-20260920.json",
@@ -41711,6 +42854,21 @@
       "bytes": 867
     },
     {
+      "path": "evidence/receipts/omniroute-claude-callsite-20260930.json",
+      "sha256": "a1dd584094ebb8aa1c58da0ac34d1d7b7ddb9fcf5e78b67732c7d3b3a0ba6ce3",
+      "bytes": 6238
+    },
+    {
+      "path": "evidence/receipts/omniroute-runtime-enhancements-20260930.json",
+      "sha256": "913b02edf8b557a86a0f16f672a3bcaf8e28609ef608e05a192d1e3cb5c7fb06",
+      "bytes": 27429
+    },
+    {
+      "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+      "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e",
+      "bytes": 17754
+    },
+    {
       "path": "evidence/receipts/pit-availability.json",
       "sha256": "1bbae79fec7cd519571f42470e05b4784e36d72d21da34a210ab8adc864823f4",
       "bytes": 107713
@@ -41779,6 +42937,11 @@
       "path": "evidence/receipts/terminal-experience-20260928.json",
       "sha256": "1975f87640e986ca29681bd2819a9deb582a5675e8325d37bdf6cea0be40bb47",
       "bytes": 16066
+    },
+    {
+      "path": "evidence/receipts/token-lifecycle-resolution-20260930.json",
+      "sha256": "58457849b0d132e18d2bf8c0e3751a4869d0bda40c3d92f36d0d7fc4a7b76e29",
+      "bytes": 6177
     },
     {
       "path": "evidence/receipts/token-native-retained-functional-20260920.json",
@@ -41907,8 +43070,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "23fb608c6236c806d50e7df7e3bad007e0a2357bf86c712da02616948d9201ff",
-      "bytes": 9765
+      "sha256": "31333cad4ced8f8d3bef5c635de053c6f76d8ec01bd447a6b170ab12e6f2fcd8",
+      "bytes": 9780
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -41957,8 +43120,8 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "45d3115d2f869cef8566fb97a7208993c6f6a2aa4c8d1f812aa3fa526b84eb98",
-      "bytes": 59308
+      "sha256": "9e2138540f25bff2ae057483535c9025c5828b36edea4b7e6ae3c4a7b942e2b1",
+      "bytes": 61957
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
@@ -42021,6 +43184,36 @@
       "bytes": 8495
     },
     {
+      "path": "examples/claude-runtime-sdk/README.md",
+      "sha256": "eb8e0d9f5f794c5fe66d3c7d402dc850ee666a2317c3fc66763f5ebd275fb87c",
+      "bytes": 9939
+    },
+    {
+      "path": "examples/claude-runtime-sdk/tests/check_controls.py",
+      "sha256": "21a79c84a780a900fb365c0478bf79af5ed1d55a9c20f59b5859368b71fe9dcf",
+      "bytes": 1010
+    },
+    {
+      "path": "examples/claude-runtime-sdk/tests/test_worker.py",
+      "sha256": "2e748b56185fc8aa8eb519a371d4524327fe5fe9f4bfdfda4f60bb6510f96dea",
+      "bytes": 17488
+    },
+    {
+      "path": "examples/claude-runtime-sdk/verification.md",
+      "sha256": "980b4f2ffbf49ee9ca2ab0127a4bc90c1d56c401c2cbb74d78b9a9dbe1f05ae1",
+      "bytes": 8558
+    },
+    {
+      "path": "examples/claude-runtime-sdk/worker.py",
+      "sha256": "92b6077da5f659a9798d61433b73920903dd2637dd4b4ee914e42995d111abf9",
+      "bytes": 19866
+    },
+    {
+      "path": "examples/claude-runtime-sdk/worker.py.lock",
+      "sha256": "79f1e72c87e1a934cf532a6ee929e22b1defcb2476317e24d68c1124913235c8",
+      "bytes": 96322
+    },
+    {
       "path": "examples/codex-mcp.toml.example",
       "sha256": "6203fdcb819d183fae1ac01ae2eda447252f2f8d07de53d82cf947845a07e6c0",
       "bytes": 1474
@@ -42046,6 +43239,16 @@
       "bytes": 4287
     },
     {
+      "path": "examples/codex-native/agents/stack-researcher.toml",
+      "sha256": "ac77b1624fc0ac264ff5b9807e05889d20137440dea9c016441bba38b1ea8c00",
+      "bytes": 7223
+    },
+    {
+      "path": "examples/codex-native/agents/stack-verifier.toml",
+      "sha256": "281d7e8b985414d072396cc613a75adb3740570ebaaefd1a437ff2c099d5f2bd",
+      "bytes": 6349
+    },
+    {
       "path": "examples/codex-native/config.agents.toml.example",
       "sha256": "c3247195b40f2c1b042b70c90b6273412f5019c5cc0b3d814241d25910b769fd",
       "bytes": 2139
@@ -42064,6 +43267,66 @@
       "path": "examples/native-stack-qdrant.service.example",
       "sha256": "4b5e20c8785fc6d9d81a6cbaf752648e79afc5a32888300b525a2f4b64f09e63",
       "bytes": 378
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/README.md",
+      "sha256": "b1b48386e9ae9cd9f11841eb08765ad7cf5b68da65fab18a259ac7e487b469df",
+      "bytes": 10848
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
+      "sha256": "5b046e6e30802bbe66d837030ae3c215d6fd401d524d48f51302269450d65d94",
+      "bytes": 1889
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/agents/runtime-judge.toml",
+      "sha256": "0a0b549d3007c75ccb35be3a1d765de31d0504abdd35dfad1e3d68ad4daead55",
+      "bytes": 1053
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/checks.json",
+      "sha256": "26dab6f4fa94512bbe8965f51fb29845ca07e8c4664765e484cd56bc80f9b610",
+      "bytes": 4632
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/enhancements.md",
+      "sha256": "b72f71251afdcf432bb404cbca5a0a7441c000bcd9b6c8f02c660fa45cea5f59",
+      "bytes": 9337
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/rerun-plan.json",
+      "sha256": "3f4e9c441ca1b34c9a425cc3e8344e979b99757370506970fd7f760ac55d8730",
+      "bytes": 1813
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/runtime-worker.yaml",
+      "sha256": "b3093a32ad708f09b81893f9d65975f9f01f99078976929e82830e6ec1b6a7b4",
+      "bytes": 1294
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/runtime.config.template.toml",
+      "sha256": "3602da96a99c2cc4a6f211695dcf0b8f46cd408cd10290b8b54537e38f0258d6",
+      "bytes": 3027
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/test_worker.py",
+      "sha256": "b31d70450151925ac506e9cd018740e9d3d4ca4529a70f3a9d4f8b845d7e8da8",
+      "bytes": 26008
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/test_worker.py.lock",
+      "sha256": "15e5e7cfeec11ac86d8f081742c726c0d70326b480894a81e5cc76a7d9225c44",
+      "bytes": 12842
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/worker.py",
+      "sha256": "d93e4bb0e54f436d15b6c06375126eba51289f8b1513e5ef52dfacaa8a65a074",
+      "bytes": 22008
+    },
+    {
+      "path": "examples/omniroute-codex-sdk/worker.py.lock",
+      "sha256": "15e5e7cfeec11ac86d8f081742c726c0d70326b480894a81e5cc76a7d9225c44",
+      "bytes": 12842
     },
     {
       "path": "examples/promptfoo-nemotron-upstream/promptfooconfig.yaml",
@@ -42182,8 +43445,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "ec451a769bc1fd3c64ff18695a9306d8656d7d6a6441105af2c9f4ffeaa1f1ac",
-      "bytes": 96080
+      "sha256": "f5ed44161817094f61594e53141219d1dbe7de4804431d3725feb8e3df7402d4",
+      "bytes": 96402
     },
     {
       "path": "observability/README.md",
@@ -42377,8 +43640,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "2b5bf3226eb5018e8b9097508fee255f3b1b094c0f5143ef2b95116463b9bdd9",
-      "bytes": 18234
+      "sha256": "1a4061d7bd2e4800fa3d2acae70bafb970f3bfd4846e1ebeed1d9cf62aec5c96",
+      "bytes": 21357
     },
     {
       "path": "observability/memory-scheduled-20260923.json",
@@ -42462,8 +43725,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "0551a170707f0845237942f210ce67f10b3118cdb7c6c9c5f775d84b71e83596",
-      "bytes": 121895
+      "sha256": "5eb540d1e6745244997783cd04e2ff471953696a7ceaded7a24c0df6f685a930",
+      "bytes": 121508
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -42507,13 +43770,13 @@
     },
     {
       "path": "scripts/adoption_status.py",
-      "sha256": "00a8e0751c4dd472fe57c6b79c1929390f96ee58fd7d2e1db16abe7086882533",
-      "bytes": 69847
+      "sha256": "4cd653e094020644e9afb577c1c74b6a6d162ba4b47b6d9fceb7fee6b9f4a988",
+      "bytes": 80117
     },
     {
       "path": "scripts/build_ecosystem.py",
-      "sha256": "f149113c39259e3139df66c844bfbffbde01a5d154a62f1c1e0cff440efecfce",
-      "bytes": 64697
+      "sha256": "d2cdf726ad37d714bd80aa787f3925769bf0e371996150c624ee38df94d2cf5f",
+      "bytes": 84337
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -42577,8 +43840,8 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "df9d794668e8942a053cc3c76f2cb5e063c55671f286abdb14788b3dde04737b",
-      "bytes": 114715
+      "sha256": "cace071899ba46fa60f49ed3256c2320beb9622b5cf5cf59b877763eacb8867e",
+      "bytes": 114987
     },
     {
       "path": "scripts/path_safety.py",
@@ -43037,8 +44300,8 @@
     },
     {
       "path": "tests/test_codex_agents.py",
-      "sha256": "1c0f6253a26296ce7bfd9d672756034270d72af9cdaedcbf0ad981093fe5c30e",
-      "bytes": 2288
+      "sha256": "d40fc76be4ff84d73800c0a1c63f391c87e7ef55083c85d8806e0c4e1890fec6",
+      "bytes": 37676
     },
     {
       "path": "tests/test_codex_quota.py",
@@ -43046,9 +44309,14 @@
       "bytes": 17722
     },
     {
+      "path": "tests/test_codex_roles.py",
+      "sha256": "6b276979114ebe2eb74a3e251f5cd2ae38638a85c1b2b6ce3687946c07e76efc",
+      "bytes": 11010
+    },
+    {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "41dc80dcfc66c88b597ecd4fc3591210b86f30e77573afd37fff7d4bdb04096e",
-      "bytes": 95142
+      "sha256": "2253534ac185cde47d30299c00d645d2c3a7cd576e9158223006cbdc89a0e50a",
+      "bytes": 159171
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -43097,8 +44365,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "bd66847310779aa1e03510931a25ea55897543b4275148715dc9d9ab49e9f8c7",
-      "bytes": 99866
+      "sha256": "4e2e305424b2c679f809b896ee26bfe45b6793f4db62662a051d2c2d6ee9081b",
+      "bytes": 131222
     },
     {
       "path": "tests/test_effort_default_guard.py",
@@ -43212,8 +44480,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "f5c88d88e8fce91ce8ec01f9da0f64a301dcb0cbb20cd1162602a905e5c5f734",
-      "bytes": 65209
+      "sha256": "940d2afa2f58608ac187c43762076aaca0a73d45209c787d0200feb4f6ab462e",
+      "bytes": 79170
     },
     {
       "path": "tests/test_install_skills.py",
@@ -43279,6 +44547,11 @@
       "path": "tests/test_memory_lifecycle_v2.py",
       "sha256": "56d285d7cb593c576239478d889aa53209d02804cc2e2df5ce380d79c275d3a0",
       "bytes": 55929
+    },
+    {
+      "path": "tests/test_memory_topic.py",
+      "sha256": "2ddaed7f51d7f03edae863232ccf3074aebe1a65b4565e3ba995cdd296b6d22c",
+      "bytes": 7017
     },
     {
       "path": "tests/test_mover_coverage_asof.py",
@@ -43347,8 +44620,8 @@
     },
     {
       "path": "tests/test_native_token_ci.py",
-      "sha256": "d233c0148973fca20352b6df2e93e75fde68b65fee3ee11b9ba282aff8f604e0",
-      "bytes": 104999
+      "sha256": "e4c1dc072ce02be77f89dcd8f3fc0adfabe2b3d4382d43fe4fd9e1708582094a",
+      "bytes": 108181
     },
     {
       "path": "tests/test_native_worker_fixture.py",
@@ -43417,8 +44690,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "16c28c3e8ce639349a6a1f0cf8ef2dc167b85ffa299320bc86b9895f1a103df6",
-      "bytes": 37014
+      "sha256": "2f2b4ea058756dd01fd44983f8b603c06b6d7ed17720738b23f78e62b66d272c",
+      "bytes": 37498
     },
     {
       "path": "tests/test_path_safety.py",
@@ -43477,8 +44750,8 @@
     },
     {
       "path": "tests/test_render_config.py",
-      "sha256": "162e942e2bc0cbea9e47f8e95da937e1066d02af4ba5c4d9706d38774a4ac9fc",
-      "bytes": 35227
+      "sha256": "bb849e782f57d20c0add73a5b3f825702d2ffb27c8677c27cfcd5632963f8849",
+      "bytes": 35487
     },
     {
       "path": "tests/test_research_efficiency.py",
@@ -43557,8 +44830,8 @@
     },
     {
       "path": "tests/test_skills_manifest.py",
-      "sha256": "711f14f03fa9a8950f582ef98e1fdc8f78a539b0475901b8b7c699322770126d",
-      "bytes": 10490
+      "sha256": "77fe32416bbaec6b6bcf2091ef886eba296cb120981bb9dc32f497efbf3c9374",
+      "bytes": 10736
     },
     {
       "path": "tests/test_skills_status.py",
@@ -43687,8 +44960,13 @@
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
-      "sha256": "a5605cb436cb5fad97394d7c35634e3901c2321a1f7aa33a8aa293a8e4f159db",
-      "bytes": 62148
+      "sha256": "324f01b27f6f1e3cae47e18f92cfd1cca92cb99b787c2c7e6fc3de4893b77cd7",
+      "bytes": 80456
+    },
+    {
+      "path": "tools/adoption/codex_roles.py",
+      "sha256": "b5815aefab0fd22eca39233207e4bdab199b0815f858c5a147e3994d133ffd6d",
+      "bytes": 27202
     },
     {
       "path": "tools/adoption/embed_acceptance.py",
@@ -43697,8 +44975,8 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "c0bfa5d33a78703574ae97a8e90963f036f1a96546e45d79c2b7be55bb15b733",
-      "bytes": 14697
+      "sha256": "8a6212b310a68a2642bee3c47f96d5731d32f102d1848583482e8f95888c6687",
+      "bytes": 21557
     },
     {
       "path": "tools/adoption/install_skills.py",
@@ -43707,8 +44985,8 @@
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
-      "sha256": "a399117aa14bec57fd5be59badc0121523148449ae758d7d37ecf052f7c92e23",
-      "bytes": 31531
+      "sha256": "9dcff7ea43326166f0bc085ba638165894bbdd87d94075bcf953a9ce9a2dcfeb",
+      "bytes": 35137
     },
     {
       "path": "tools/adoption/render_config.py",
@@ -43794,6 +45072,31 @@
       "path": "tools/capability-gate/run_gate.py",
       "sha256": "3efdc4b54ba33b11c67f8f2449167de03b558e8c53c7e09cdb5a9f66593311a7",
       "bytes": 22476
+    },
+    {
+      "path": "tools/runtime-worker-evidence/README.md",
+      "sha256": "b614d175056395e2f88818b57f27c76f435b97512afa4ef7444b43316a041c8d",
+      "bytes": 2383
+    },
+    {
+      "path": "tools/runtime-worker-evidence/checks.json",
+      "sha256": "094cd7785fabc277508bc4ed90bac60a4e98dacdca7b51f50f5731608cc5e80c",
+      "bytes": 3851
+    },
+    {
+      "path": "tools/runtime-worker-evidence/gateway_observer.py",
+      "sha256": "d4569ed6efef53015eb1619bf5591f91530476896fd6e18f4c2ba44ec07a6f97",
+      "bytes": 5702
+    },
+    {
+      "path": "tools/runtime-worker-evidence/osv-check.json",
+      "sha256": "0d31c8900e8f5475c2fbe04f26d09493e2e507354c8c99e5b35a50c079e318b7",
+      "bytes": 2778
+    },
+    {
+      "path": "tools/runtime-worker-evidence/test_gateway_observer.py",
+      "sha256": "b5cba9a4a0ffacba92a1194644ee6cde96e267246bc24f302876d4ad5bf5e8db",
+      "bytes": 4010
     },
     {
       "path": "tools/skill-usage/README.md",
@@ -44017,6 +45320,12 @@
     }
   ],
   "convergence_records": [
+    "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
+    "blueprints/convergence-practice/token-lifecycle-resolution-20260930/experiment.json",
+    "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
+    "evidence/artifacts/memory-rag-20260930/convergence.json",
+    "evidence/artifacts/sota-finalization-20260930/convergence.json",
+    "blueprints/convergence-practice/foundation-model-defaults/experiment.json",
     "blueprints/blind-catalog-convergence/experiment.json",
     "blueprints/blind-catalog-convergence/memory-experiment.json",
     "blueprints/catalog-runtime-review/experiment.json",

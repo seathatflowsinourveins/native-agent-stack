@@ -1,0 +1,261 @@
+{
+  "schema_version": 1,
+  "kind": "native_upstream_package_qualification",
+  "checked_at": "2026-09-30",
+  "scope": "Current-session Linux x86_64 native package build, upstream unit/integration fixtures, inactive runtime staging and embedded CLI launcher; no active client/server/model-quality acceptance.",
+  "upstream": {
+    "repository": "https://github.com/vectorize-io/hindsight",
+    "revision": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c",
+    "integration_version": "0.8.0",
+    "server_release": "0.10.2",
+    "server_revision": "5fc4ce20917b916240cef27c212c387a177f115b",
+    "test_command": "npm test -- --reporter=json --outputFile=<OWNED_REPORT>",
+    "test_source": "hindsight-integrations/coding-agents/package.json"
+  },
+  "runtime": {
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "claude_code": "2.1.285",
+    "codex": "0.159.2",
+    "ai_memory": "2.4.1",
+    "qmd": "2.8.3"
+  },
+  "attempts": [
+    {
+      "artifact": "hindsight-upstream-tests.json",
+      "sha256": "1ea7e3e46796663d2eb1faebb8b1266ff0ccb4ba2a2919587a6ee63e72cea75c",
+      "bytes": 440681,
+      "exit_code": 1,
+      "summary": {
+        "success": false,
+        "numTotalTests": 1285,
+        "numPassedTests": 1267,
+        "numFailedTests": 12,
+        "numPendingTests": 6
+      },
+      "source_test_files": 79,
+      "failures": [
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/bank-missing-dir.test.ts",
+          "test": "project resolution when the working directory is gone uses an exported project root when the walk lands outside the repository",
+          "returned_message_first_line": "AssertionError: expected 'coding-agent::tmp' to be 'coding-agent::hs-gone-BBGZQ7' // Object.is equality"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/bank-missing-dir.test.ts",
+          "test": "project resolution when the working directory is gone still yields a name for a directory that is not a repository",
+          "returned_message_first_line": "AssertionError: expected 'coding-agent::tmp' to be 'coding-agent::hs-plain-qOR4CZ' // Object.is equality"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/bank-missing-dir.test.ts",
+          "test": "project resolution when the working directory is gone keeps ONE bank when the agent navigates below a non-repository session root",
+          "returned_message_first_line": "AssertionError: expected 'coding-agent::tmp' to be 'coding-agent::hs-plain-5VfwgC' // Object.is equality"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/bank-missing-dir.test.ts",
+          "test": "project resolution when the working directory is gone names the session's repository when the agent steps outside it",
+          "returned_message_first_line": "AssertionError: expected 'coding-agent::tmp' to be 'coding-agent::hs-gone-1WT1Hh' // Object.is equality"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/git-layout.test.ts",
+          "test": "git layout resolution reports absence — not failure — outside any repository",
+          "returned_message_first_line": "AssertionError: expected { status: 'resolved', …(2) } to deeply equal { status: 'absent' }"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/git-layout.test.ts",
+          "test": "git layout resolution does not mistake a `.git` file with no gitdir pointer for a repository",
+          "returned_message_first_line": "AssertionError: expected { status: 'resolved', …(2) } to deeply equal { status: 'absent' }"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/git-layout.test.ts",
+          "test": "a worktree whose administrative directory was pruned does not name the dangling gitdir (that basename IS the worktree)",
+          "returned_message_first_line": "AssertionError: expected { status: 'resolved', …(2) } to deeply equal { status: 'absent' }"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/knowledge-tools.test.ts",
+          "test": "buildKnowledgeTools hindsight_sync_status returns the syncStatus JSON for the given repoDir",
+          "returned_message_first_line": "AssertionError: expected { bank: 'repo-a', …(10) } to deeply equal { bank: 'repo-a', …(10) }"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/opt-in.test.ts",
+          "test": "optInOnly carries path approval and bank mapping from a checkout to its linked worktree",
+          "returned_message_first_line": "AssertionError: expected false to be true // Object.is equality"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/opt-in.test.ts",
+          "test": "optInOnly resolves a removed worktree's mapping from the session root, with no harness env var",
+          "returned_message_first_line": "AssertionError: expected 'coding-agent::tmp' to be 'client-x' // Object.is equality"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/retain-stamp.test.ts",
+          "test": "buildRetainStamp resolves {gitProject} from the session root outside a repository",
+          "returned_message_first_line": "AssertionError: expected [ 'project:tmp', 'dir:analysis' ] to deeply equal [ …(2) ]"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/status.test.ts",
+          "test": "syncStatus gitDiffTarget is null for a non-git repoDir; gitlog match is by repo basename",
+          "returned_message_first_line": "AssertionError: expected false to be true // Object.is equality"
+        }
+      ],
+      "skips": [
+        {
+          "file": "hindsight-integrations/coding-agents/src/installer.test.ts",
+          "test": "traecode installer install seeds the enable switch for opted-in repos that already have a Trae window",
+          "status": "skipped"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/installer.test.ts",
+          "test": "traecode installer uninstall removes the workspace enable switches the hook seeded, and only those",
+          "status": "skipped"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/traecode-mcp.test.ts",
+          "test": "workspace enable switch seed seeds the switch in the matching workspace's DB, then reports on",
+          "status": "skipped"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/traecode-mcp.test.ts",
+          "test": "workspace enable switch seed matches the repo by its file:// URL only",
+          "status": "skipped"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/traecode-mcp.test.ts",
+          "test": "workspace enable switch seed fails (and does not throw) when the DB is unreadable",
+          "status": "skipped"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/traecode-mcp.test.ts",
+          "test": "ensureTraecodeWorkspaceMcp hint selection silent when the gate is on and the seed succeeds",
+          "status": "skipped"
+        }
+      ]
+    },
+    {
+      "artifact": "hindsight-upstream-tests-isolated-tmp.json",
+      "sha256": "20400c8a896b94ba2b035d037b98e042885fbf926fd3d5b167ae7f06e4d86408",
+      "bytes": 422177,
+      "exit_code": 0,
+      "summary": {
+        "success": true,
+        "numTotalTests": 1285,
+        "numPassedTests": 1279,
+        "numFailedTests": 0,
+        "numPendingTests": 6
+      },
+      "source_test_files": 79,
+      "failures": [],
+      "skips": [
+        {
+          "file": "hindsight-integrations/coding-agents/src/installer.test.ts",
+          "test": "traecode installer install seeds the enable switch for opted-in repos that already have a Trae window",
+          "status": "skipped"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/installer.test.ts",
+          "test": "traecode installer uninstall removes the workspace enable switches the hook seeded, and only those",
+          "status": "skipped"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/traecode-mcp.test.ts",
+          "test": "workspace enable switch seed seeds the switch in the matching workspace's DB, then reports on",
+          "status": "skipped"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/traecode-mcp.test.ts",
+          "test": "workspace enable switch seed matches the repo by its file:// URL only",
+          "status": "skipped"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/traecode-mcp.test.ts",
+          "test": "workspace enable switch seed fails (and does not throw) when the DB is unreadable",
+          "status": "skipped"
+        },
+        {
+          "file": "hindsight-integrations/coding-agents/src/core/traecode-mcp.test.ts",
+          "test": "ensureTraecodeWorkspaceMcp hint selection silent when the gate is on and the seed succeeds",
+          "status": "skipped"
+        }
+      ]
+    }
+  ],
+  "installations": [
+    {
+      "command": "npx --yes @vectorize-io/hindsight-coding-agents@0.8.0 update",
+      "exit_code": 0,
+      "stdout": "┌  Hindsight coding agents  v0.8.0\n│\n│  ✓ runtime staged at ~/.hindsight/coding-agents\n│  ✓ runtime updated — every wired agent picks it up on its next session\n│\n└  ✓ Runtime up to date (v0.8.0)\n",
+      "scope": "Official runtime staging only; no client configuration wiring.",
+      "independent_observation": {
+        "package_version": "0.8.0",
+        "package_sha256": "44bc8ae8d37dac08ae9e60799be44f10fb99dd07b675f225da8ef0e9a23c7da2",
+        "installer_sha256": "8b9d24b4170c63d1ca228030831af12695d2cc48487d74cd3d20425f2f0fd8b5",
+        "claude_stop_entrypoint_present": true,
+        "codex_stop_entrypoint_present": true,
+        "companion_skill_present": true
+      }
+    },
+    {
+      "command": "UV_TOOL_DIR=<OWNED_PREFIX>/uv-tools UV_TOOL_BIN_DIR=<OWNED_PREFIX>/bin uv tool install hindsight-embed==0.10.2",
+      "exit_code": 0,
+      "observed": "Native uv installed 14 dependencies and hindsight-embed 0.10.2 executable. The installed CLI --help returned exit zero.",
+      "scope": "Embedded CLI launcher only. Backend/ML dependencies are lazily installed on daemon start; no daemon was started."
+    }
+  ],
+  "controls": {
+    "disabled": true,
+    "autoUpdate": false,
+    "optInOnly": true,
+    "optInPaths": [],
+    "embedVersion": "0.10.2",
+    "gitIngest": "none",
+    "autoSeed": false,
+    "codebaseSurvey": false,
+    "retainSessions": false,
+    "pageTriggerType": "manual",
+    "private_config_sha256": "0abc7315c4f09e815e0db679a4248748f30e062f5fa5d6dfe2515fe125b7a73b"
+  },
+  "sanitization": {
+    "original_reports": "Retained under the owned private run prefix; artifact basenames and exact SHA-256 values identify them without publishing host paths.",
+    "public_projection": "Runner counters, test-relative source paths, native returned failure first lines and skip names only. Full failure stack traces and absolute host paths remain in the original reports.",
+    "command_placeholders": "Private installation/source/report locations replaced by <OWNED_PREFIX>, <OWNED_REPORT> or source-relative paths; no credential values loaded."
+  },
+  "limitations": [
+    "Ordinary npm test excludes **/*.e2e.test.ts. Six reported skipped cases are retained as skips.",
+    "Current upstream Docker harness explicitly marks Claude Code fresh-container E2E unsupported; this review did not run real native harness E2E.",
+    "The first run failed; the unchanged suite passed after changing only TMPDIR to an owned directory outside the source checkout. Original cause is not established by this observation alone.",
+    "No live extraction, consolidation, memory-quality comparison, scoped live deletion, bank export/restore or native hook trust acceptance occurred.",
+    "npm ci reported 14 dependency advisories (13 moderate, 1 high) for the upstream locked source development environment. No audit fix or source/dependency substitution was made.",
+    "No production memory store or existing client hook/MCP configuration was replaced."
+  ],
+  "usage": {
+    "provider_tokens": null,
+    "provider_cost": null,
+    "comparative_savings": null,
+    "interpretation": "Unknown; package acceptance does not establish provider savings."
+  },
+  "prerequisites": [
+    {
+      "command": "npm ci",
+      "exit_code": 0,
+      "returned_output": "added 484 packages, and audited 485 packages in 18s\n86 packages are looking for funding\n  run `npm fund` for details\n14 vulnerabilities (13 moderate, 1 high)\nTo address all issues, run:\n  npm audit fix\nRun `npm audit` for details.\nnpm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead\nnpm warn deprecated glob@10.5.0: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me\nnpm warn install-scripts 3 packages have install scripts not yet covered by allowScripts:\nnpm warn install-scripts   esbuild@0.28.2 (postinstall: node install.js)\nnpm warn install-scripts   msgpackr-extract@3.0.4 (install: node-gyp-build-optional-packages)\nnpm warn install-scripts   protobufjs@7.6.6 (postinstall: node scripts/postinstall)\nnpm warn install-scripts\nnpm warn install-scripts Run `npm install-scripts ls` to review, or `npm install-scripts approve <pkg>` to allow.\n",
+      "scope": "Unchanged pinned upstream package-lock.json"
+    },
+    {
+      "command": "npm run build",
+      "exit_code": 0,
+      "returned_output": "> tsup\nCLI Building entry: {\"index\":\"src/index.ts\",\"opencode2\":\"src/opencode2.ts\",\"kilo\":\"src/kilo.ts\",\"deepen\":\"src/deepen.ts\",\"installer\":\"src/installer.ts\",\"status\":\"src/status.ts\",\"claude-hook\":\"src/claude-hook.ts\",\"claude-stop-hook\":\"src/claude-stop-hook.ts\",\"claude-sessionstart-hook\":\"src/claude-sessionstart-hook.ts\",\"cursor-hook\":\"src/cursor-hook.ts\",\"cursor-sessionstart-hook\":\"src/cursor-sessionstart-hook.ts\",\"cursor-stop-hook\":\"src/cursor-stop-hook.ts\",\"copilot-hook\":\"src/copilot-hook.ts\",\"copilot-sessionstart-hook\":\"src/copilot-sessionstart-hook.ts\",\"copilot-stop-hook\":\"src/copilot-stop-hook.ts\",\"cline\":\"src/cline.ts\",\"dsh\":\"src/dsh.ts\",\"pi\":\"src/pi.ts\",\"prime-agent\":\"src/prime-agent.ts\",\"kimi-hook\":\"src/kimi-hook.ts\",\"kimi-sessionstart-hook\":\"src/kimi-sessionstart-hook.ts\",\"kimi-stop-hook\":\"src/kimi-stop-hook.ts\",\"qwen-hook\":\"src/qwen-hook.ts\",\"qwen-sessionstart-hook\":\"src/qwen-sessionstart-hook.ts\",\"qwen-stop-hook\":\"src/qwen-stop-hook.ts\",\"grok-hook\":\"src/grok-hook.ts\",\"grok-sessionstart-hook\":\"src/grok-sessionstart-hook.ts\",\"grok-stop-hook\":\"src/grok-stop-hook.ts\",\"codex-hook\":\"src/codex-hook.ts\",\"codex-sessionstart-hook\":\"src/codex-sessionstart-hook.ts\",\"codex-stop-hook\":\"src/codex-stop-hook.ts\",\"dcode-hook\":\"src/dcode-hook.ts\",\"dcode-sessionstart-hook\":\"src/dcode-sessionstart-hook.ts\",\"dcode-stop-hook\":\"src/dcode-stop-hook.ts\",\"antigravity-hook\":\"src/antigravity-hook.ts\",\"antigravity-stop-hook\":\"src/antigravity-stop-hook.ts\",\"antigravity-statusline\":\"src/antigravity-statusline.ts\",\"devin-hook\":\"src/devin-hook.ts\",\"devin-sessionstart-hook\":\"src/devin-sessionstart-hook.ts\",\"devin-stop-hook\":\"src/devin-stop-hook.ts\",\"zcode-hook\":\"src/zcode-hook.ts\",\"zcode-sessionstart-hook\":\"src/zcode-sessionstart-hook.ts\",\"zcode-stop-hook\":\"src/zcode-stop-hook.ts\",\"traecode-hook\":\"src/traecode-hook.ts\",\"traecode-sessionstart-hook\":\"src/traecode-sessionstart-hook.ts\",\"traecode-stop-hook\":\"src/traecode-stop-hook.ts\",\"droid-hook\":\"src/droid-hook.ts\",\"droid-sessionstart-hook\":\"src/droid-sessionstart-hook.ts\",\"droid-stop-hook\":\"src/droid-stop-hook.ts\",\"daemon-start\":\"src/daemon-start.ts\",\"survey-supervisor\":\"src/survey-supervisor.ts\",\"mcp-server\":\"src/mcp-server.ts\",\"hindsight-seed\":\"src/hindsight-seed.ts\"}\nCLI Using tsconfig: tsconfig.json\nCLI tsup v8.5.1\nCLI Using tsup config: <OWNED_PREFIX>/hindsight-source/hindsight-integrations/coding-agents/tsup.config.ts\nCLI Target: node18\nCLI Cleaning output folder\nESM Build start\nDTS Build start\nESM dist/status.js                     83.23 KB\nESM dist/claude-hook.js                160.75 KB\nESM dist/installer.js                  225.89 KB\nESM dist/cursor-hook.js                160.75 KB\nESM dist/claude-stop-hook.js           164.16 KB\nESM dist/claude-sessionstart-hook.js   183.80 KB\nESM dist/copilot-hook.js               160.75 KB\nESM dist/cursor-stop-hook.js           164.16 KB\nESM dist/cursor-sessionstart-hook.js   183.80 KB\nESM dist/copilot-sessionstart-hook.js  183.80 KB\nESM dist/copilot-stop-hook.js          164.16 KB\nESM dist/kimi-sessionstart-hook.js     183.79 KB\nESM dist/kimi-stop-hook.js             164.16 KB\nESM dist/deepen.js                     102.89 KB\nESM dist/qwen-hook.js                  160.75 KB\nESM dist/grok-hook.js                  160.75 KB\nESM dist/qwen-stop-hook.js             164.16 KB\nESM dist/grok-stop-hook.js             164.16 KB\nESM dist/grok-sessionstart-hook.js     183.79 KB\nESM dist/codex-hook.js                 160.75 KB\nESM dist/codex-stop-hook.js            164.15 KB\nESM dist/codex-sessionstart-hook.js    183.79 KB\nESM dist/dcode-hook.js                 160.75 KB\nESM dist/antigravity-hook.js           160.76 KB\nESM dist/dcode-sessionstart-hook.js    183.79 KB\nESM dist/antigravity-statusline.js     32.68 KB\nESM dist/antigravity-stop-hook.js      164.17 KB\nESM dist/dcode-stop-hook.js            164.15 KB\nESM dist/devin-stop-hook.js            164.16 KB\nESM dist/kimi-hook.js                  160.75 KB\nESM dist/devin-sessionstart-hook.js    183.79 KB\nESM dist/qwen-sessionstart-hook.js     183.79 KB\nESM dist/devin-hook.js                 160.75 KB\nESM dist/zcode-stop-hook.js            164.15 KB\nESM dist/zcode-hook.js                 160.75 KB\nESM dist/traecode-stop-hook.js         164.16 KB\nESM dist/droid-sessionstart-hook.js    183.80 KB\nESM dist/droid-hook.js                 160.75 KB\nESM dist/survey-supervisor.js          1.97 KB\nESM dist/daemon-start.js               35.81 KB\nESM dist/droid-stop-hook.js            164.16 KB\nESM dist/hindsight-seed.js             30.46 KB\nESM dist/traecode-sessionstart-hook.js 183.80 KB\nESM dist/traecode-hook.js              160.75 KB\nESM dist/zcode-sessionstart-hook.js    183.79 KB\nESM dist/index.js                      1.12 MB\nESM dist/dsh.js                        706.65 KB\nESM dist/pi.js                         702.95 KB\nESM dist/prime-agent.js                702.98 KB\nESM dist/cline.js                      702.58 KB\nESM dist/opencode2.js                  1.12 MB\nESM dist/kilo.js                       1.12 MB\nESM dist/mcp-server.js                 1.18 MB\nESM ⚡️ Build success in 453ms\nDTS ⚡️ Build success in 2196ms\nDTS dist/index.d.ts 213.00 B\n",
+      "scope": "Unchanged pinned upstream build command"
+    },
+    {
+      "command": "git status --short",
+      "exit_code": 0,
+      "returned_output": "",
+      "scope": "Pinned upstream source checkout after build and both test attempts; no tracked changes"
+    }
+  ],
+  "independent_test_observation": {
+    "role": "bounded Sol/Max read-only diagnosis",
+    "original_report_verified": true,
+    "corrected_report_verified": true,
+    "every_previously_failed_assertion_passes": true,
+    "causal_limit": "Successful owned-TMPDIR isolation; no observed original /tmp repository state."
+  }
+}

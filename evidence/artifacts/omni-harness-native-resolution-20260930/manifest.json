@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "kind": "native_omni_harness_resolution",
+  "lane": "foundation",
+  "checked_at": "2026-10-01T01:30:09Z",
+  "objective": "Install and qualify maintained native Claude/Codex SDK workflows through OmniRoute, retaining owned state and source-backed acceptance.",
+  "selection": {
+    "recommended_path": "Native Claude coordinator → official Codex Python SDK → native Codex app-server → OmniRoute Responses",
+    "accepted_incumbent_sdk": "0.159.2",
+    "new_sdk": "0.159.3",
+    "new_sdk_status": "Installed side by side; discovery and selected upstream API tests passed; real provider turn failed HTTP 429.",
+    "universal_framework_winner": null,
+    "complete_cost_winner": null,
+    "canonical_pins_changed": false
+  },
+  "sources": {
+    "codex": {
+      "repository": "https://github.com/openai/codex",
+      "tag": "rust-v0.159.3",
+      "revision": "01fc69f4026735edfdf6789820549727a4867b11",
+      "sdk_reference_revision": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "sdk_reference_version": "0.159.2",
+      "url": "https://github.com/openai/codex/tree/01fc69f4026735edfdf6789820549727a4867b11/sdk/python",
+      "sdk_changes_between_releases": 0
+    },
+    "omniroute": {
+      "repository": "https://github.com/diegosouzapw/OmniRoute",
+      "tag": "v3.8.51",
+      "revision": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "url": "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51",
+      "package_git_head": null,
+      "source_package_identity_limit": "Published npm metadata has no gitHead; the reviewed release source and installed registry artifact are separately identified."
+    }
+  },
+  "candidates": [
+    {
+      "id": "codex-python-sdk",
+      "name": "Official Codex Python SDK",
+      "version": "0.159.3",
+      "disposition": "Selected native GPT coding worker; new revision awaits real-provider acceptance.",
+      "reason": "Uses the same native app-server, skills, MCP tools, thread state, model/effort settings and lifecycle API rather than replacing the client harness.",
+      "sources": [
+        "https://github.com/openai/codex/tree/01fc69f4026735edfdf6789820549727a4867b11/sdk/python"
+      ]
+    },
+    {
+      "id": "openai-agents-sdk",
+      "name": "OpenAI Agents SDK",
+      "version": "0.22.3",
+      "revision": "fdf21db62c303a3db54b0dfbee82de2141fa2799",
+      "disposition": "Conditional application orchestration; not installed in this trial.",
+      "reason": "Useful when application handoffs, guardrails, sessions or MCP orchestration are required. Native coding state integration needs its own acceptance.",
+      "sources": [
+        "https://github.com/openai/openai-agents-python/tree/fdf21db62c303a3db54b0dfbee82de2141fa2799"
+      ]
+    },
+    {
+      "id": "langgraph",
+      "name": "LangGraph",
+      "version": "1.2.12",
+      "revision": "49cce0ca852be4cfb567a1cbe0e511ff325a1682",
+      "disposition": "Conditional durable application graph; not installed in this trial.",
+      "reason": "Checkpointed durable graphs fit workflows that require them. The native coding lifecycle does not by itself establish that requirement.",
+      "sources": [
+        "https://github.com/langchain-ai/langgraph/tree/49cce0ca852be4cfb567a1cbe0e511ff325a1682"
+      ]
+    },
+    {
+      "id": "openhands-sdk",
+      "name": "OpenHands SDK",
+      "version": "1.50.1",
+      "revision": "1e1390acc8788346ba4804c34323284009bf3f5e",
+      "disposition": "Conditional isolated-worker candidate; not installed in this trial.",
+      "reason": "A separate worker runtime requires frozen isolation, task, lifecycle and quality comparisons before adoption. Its SDK and CLI versions are separate.",
+      "sources": [
+        "https://github.com/OpenHands/software-agent-sdk/tree/1e1390acc8788346ba4804c34323284009bf3f5e"
+      ]
+    },
+    {
+      "id": "claude-agent-sdk-omni-bridge",
+      "name": "Claude Agent SDK through OmniRoute",
+      "version": "0.2.162",
+      "disposition": "Existing translated-model bridge remains unqualified.",
+      "reason": "Prior bridge failures do not qualify a GPT model inside the Claude harness. Native Claude can delegate a GPT worker through the official Codex SDK.",
+      "sources": [
+        "https://platform.claude.com/docs/en/agent-sdk/overview",
+        "evidence/receipts/omniroute-runtime-workers-20260930.json"
+      ]
+    }
+  ],
+  "native_installation": {
+    "codex_sdk": {
+      "command": "uv add --script <owned-worker> --python 3.13 openai-codex==0.159.3; uv lock --script <owned-worker>; uv run --locked --script <owned-worker> --preflight",
+      "exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "published_sdk": "0.159.3",
+      "bundled_cli": "0.159.3",
+      "worker_sha256": "cdb79df1572677916fde4b591ef2584af649f61b7791c41384c6e499589bdb4d",
+      "lock_sha256": "c857733a8ede1790caa41c56aba5a81bc7d948950eed6042743208706bbb8b2f",
+      "sdk_wheel_sha256": "5148065fb13cfb3f106c6493f3a5dc26457da98f6350e193e85eda8b65263b8f",
+      "cli_wheel_sha256": "0e6f205d6fe623eef20a7f3775f030a9ee949fedc993870275af436e1e0887de",
+      "installed_source_files_match_pinned_sdk": true
+    },
+    "omniroute": {
+      "command": "npm install --global --prefix <unused-owned-prefix> omniroute@3.8.51",
+      "exit_code": 0,
+      "added_packages": 1153,
+      "node_version": "24.21.0",
+      "version_exit_code": 0,
+      "help_exit_code": 0,
+      "reported_version": "3.8.51",
+      "health_exit_code": 0,
+      "health_status": "healthy",
+      "health_target": "Existing loopback gateway",
+      "health_stdout_sha256": "5a67f0a2003c34c78a088d209d2a7ad573f37e1e8152594ab3e863024f6410b5",
+      "package_json_sha256": "b002c54561bd762f41c7f4cafe6809ac5d5e58bbe175ce0399eb7c1df5b0baf6",
+      "npm_dist_integrity": "sha512-VwwSt+bP9lJiPJXFJMz0nNGGuoewPZU3nFe1SLuO11ADgdSwTegGCxhg8Ov75+31m/cocPxHiO63zygn1XQ0MQ==",
+      "npm_dist_shasum": "12e56f049e617edca50cc17835ea807dbf8c2042",
+      "warnings": [
+        "Upstream peer dependency overrides and deprecated prebuild-install.",
+        "npm warned that seven lifecycle scripts were not allowlisted. CLI version/help/health succeeded; fresh published server startup was not qualified."
+      ],
+      "active_gateway_replaced": false
+    },
+    "skill": {
+      "name": "using-superpowers",
+      "installer": "Existing native skills installer 1.7.0",
+      "exit_code": 0,
+      "source_tree": "4c777432715fe58984d212a36aedc6a18472e512",
+      "scope": "Project-scoped installation into the trial checkout"
+    }
+  },
+  "discovery": {
+    "exit_code": 0,
+    "status": "ready",
+    "evidence_scope": "Native catalog discovery only",
+    "native_cli": "0.159.3",
+    "model": "cx/gpt-6.1-sol-max",
+    "effort": "max",
+    "model_inference_submitted": false,
+    "mcp": [
+      {
+        "name": "context-mode",
+        "tool_count": 9,
+        "catalog_ready": true
+      },
+      {
+        "name": "serena",
+        "tool_count": 5,
+        "catalog_ready": true
+      }
+    ],
+    "enabled_skills": 34,
+    "required_skill_present": true,
+    "cleanup_status": "closed",
+    "runtime_status": null,
+    "provider_usage": null
+  },
+  "upstream_api_tests": {
+    "command": "uv run --no-project --python 3.13 --with openai-codex==0.159.3 --with pytest==9.0.3 python -m pytest --noconftest -c /dev/null -q sdk/python/tests/test_public_api_signatures.py -k 'lifecycle_methods_are_codex_scoped or initialize_metadata'",
+    "exit_code": 0,
+    "passed": 3,
+    "deselected": 17,
+    "oracle_sha256": "c71fae97be240f1b9e93af271315359e4ddeac7a310fd94850b407b4d7e633b5",
+    "oracle_diff_bytes": 0,
+    "scope": "Unchanged selected upstream API tests against the published wheel; not a model task or complete upstream suite.",
+    "warning": "Pytest could not create its cache under /dev; test execution passed."
+  },
+  "live_attempt": {
+    "parent_cli": "Claude Code 2.1.286",
+    "parent_model": "claude-sonnet-5-5",
+    "parent_effort": "max",
+    "parent_exit_code": 0,
+    "parent_result_subtype": "success",
+    "native_bash_invoked_sdk": true,
+    "worker_exit_code": 2,
+    "worker_runtime": "0.159.3",
+    "requested_model": "cx/gpt-6.1-sol-max",
+    "requested_effort": "max",
+    "phase": "turn_run",
+    "status": "failed",
+    "model_inference_submitted": true,
+    "native_completion_http_status": 429,
+    "native_error_category": "response_too_many_failed_attempts",
+    "native_turn_duration_ms": 975,
+    "cleanup_status": "closed",
+    "actual_task_success": false,
+    "actual_mcp_execution_accepted": false,
+    "resume_acceptance": false,
+    "parent_original": {
+      "bytes": 186562,
+      "sha256": "142637cd4b1e04097c2625d200a020c8bf2e83befd50a3cf542347644bbf15f2"
+    },
+    "rollout_original": {
+      "bytes": 119124,
+      "sha256": "8f3e1986617bc7745e6f6a6c463c88d375e3e4f920e3d14d43d0b9d218e7fb0d"
+    },
+    "usage": {
+      "parent_cumulative_cost_usd": 0.2888852,
+      "parent_cumulative_model_usage": {
+        "input_tokens": 6,
+        "output_tokens": 1834,
+        "cache_read_input_tokens": 118746,
+        "cache_creation_input_tokens": 61696,
+        "thinking_tokens_reported_subset": 1067
+      },
+      "worker_usage": null,
+      "complete_provider_billing": null,
+      "backend_identity": null
+    },
+    "provider_reset_performed": false
+  },
+  "local_integration_fixtures": {
+    "source": "Existing local synthetic protocol/lifecycle fixtures, copied with the published package pin updated.",
+    "attempts": [
+      {
+        "tests": 13,
+        "exit_code": 1,
+        "result": "FAILED (errors=1)",
+        "duration_seconds": 13.476,
+        "error": "TemporaryDirectory cleanup OSError39 under native plugin clone directory.",
+        "original_stdout": {
+          "bytes": 7339,
+          "sha256": "04dc8e0f0f0ee45bf651b81f5056a8d3b9449875bec8733363faad5ebd981f93"
+        }
+      },
+      {
+        "tests": 13,
+        "exit_code": 1,
+        "result": "FAILED (errors=1)",
+        "duration_seconds": 14.88,
+        "error": "Same cleanup error under an owned TMPDIR; isolation did not repair it."
+      },
+      {
+        "tests": 13,
+        "exit_code": 0,
+        "result": "OK",
+        "duration_seconds": 18.679,
+        "evidence_scope": "Local integration fixtures with synthetic provider responses; strict fixture housekeeping added.",
+        "original_stdout": {
+          "bytes": 8046,
+          "sha256": "33d3f0e3d8d169b13a66f9612902fbac43fa4024ac4c0304d5d2166cf6db4195"
+        }
+      }
+    ],
+    "repair_status": "Passed after Astra/Max fixture-only owned-process quiescence; production SDK descendant cleanup remains unqualified.",
+    "native_limit": "SDK close terminates/waits for the immediate app-server. Native plugin Git descendant cleanup is not established by that API.",
+    "sources": [
+      "https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/sdk/python/src/openai_codex/client.py#L268",
+      "https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/codex-rs/core-plugins/src/manager.rs#L3284",
+      "https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/codex-rs/core-plugins/src/startup_sync.rs#L683"
+    ],
+    "fixture_repair": {
+      "patched_fixture_sha256": "373d1fc4b1cc9901541721da24b372307e8bce228ac411e5090af37890c3d3e2",
+      "original_assertion_method_count": 13,
+      "original_test_method_asts_unchanged": true,
+      "structural_verification_exit_code": 0,
+      "cleanup": "Same-UID processes with CWD inside the unique fixture directory are observed, pinned by pidfd and awaited before strict deletion; 30-second bound errors and preserves residue.",
+      "signals_sent": false,
+      "owned_git_survived_sdk_close_observed": true,
+      "observed_process_count": 11,
+      "post_run_observed_processes_gone": true,
+      "prior_failed_residue_preserved": true,
+      "private_receipt_sha256": "ba2cbb97a69d94a9315ca9161da9a32f4bb2e1174c628895844c70d950c7616d",
+      "sources": [
+        "https://man7.org/linux/man-pages/man2/pidfd_open.2.html",
+        "https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/sdk/python/src/openai_codex/client.py#L268",
+        "https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/codex-rs/core-plugins/src/manager.rs#L3284",
+        "https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/codex-rs/core-plugins/src/startup_sync.rs#L683"
+      ],
+      "warnings": "SDK stdout/stderr ResourceWarnings remain."
+    }
+  },
+  "architecture_review": {
+    "role": "Astra/Max source research",
+    "trigger": "Consequential framework and native lifecycle selection.",
+    "result": "Recommended official native Codex SDK path; no universal framework winner.",
+    "cleanup_escalation_trigger": "Same failure after one bounded Sol diagnosis/retry."
+  },
+  "peer_record": "evidence/artifacts/omni-harness-native-resolution-20260930/peer-messaging.json",
+  "next_gates": [
+    "Gateway owner supplies native provider readiness or repairs the retained HTTP429 condition.",
+    "Complete one real bounded GPT tool task, selected MCP execution and native thread resume on SDK0.159.3; retain actual original items and cumulative usage.",
+    "Promote a new canonical pin only after these changed-input gates pass; keep matching incumbent evidence."
+  ],
+  "corrections": [
+    "A native parent success result does not establish worker success; the actual Bash tool result was exit2 and the owned native rollout records HTTP429.",
+    "A healthy gateway endpoint does not establish provider inference readiness.",
+    "Dedicated TMPDIR did not repair the native plugin clone cleanup race.",
+    "The guessed catalogs/landscape/memory-rag-20260930.json path was wrong; rg --files located catalogs/foundation/memory-rag-20260930.json."
+  ],
+  "limits": [
+    "No measured universal framework, memory backbone or token-efficiency winner.",
+    "No new WSL distribution was created; this trial uses owned prefixes on the existing WSL host.",
+    "Peer queued acknowledgments and summarized ownership replies are not acceptance of their work.",
+    "No private authentication values, raw conversations or machine-specific active client configuration are published."
+  ],
+  "route_dry_run": {
+    "supported_help_exit_code": 0,
+    "exit_code": 1,
+    "stdout_bytes": 292,
+    "stdout_sha256": "a82c8304e6f6b4f4092d9b0ac710238ccf669b073d288b731f2b527203f63df2",
+    "status": "Native CLI dry run failed; no model inference submitted; error category not established.",
+    "provider_actions": false
+  }
+}

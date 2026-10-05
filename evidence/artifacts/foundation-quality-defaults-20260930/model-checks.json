@@ -1,0 +1,227 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-30T05:31:18Z",
+  "evidence_class": "local integration on a real provider with a repository-authored fixture",
+  "native_version": "0.159.2",
+  "is_unchanged_upstream_test": false,
+  "invocation": {
+    "launcher": "codex",
+    "stdin": "closed",
+    "profile": "stack-worker",
+    "model": "per requested_model",
+    "effort": "max",
+    "web_search": "live",
+    "sandbox": "read-only",
+    "ephemeral": true,
+    "json": true,
+    "prompt_reference": "tools/adoption/prove_codex_lane.py::RTK_PROMPT",
+    "argv_projection": [
+      "codex",
+      "exec",
+      "-p",
+      "stack-worker",
+      "-m",
+      "<requested_model>",
+      "-c",
+      "model_reasoning_effort=\"max\"",
+      "-c",
+      "web_search=\"live\"",
+      "-s",
+      "read-only",
+      "--skip-git-repo-check",
+      "--ephemeral",
+      "--json",
+      "-C",
+      "<owned-fixture-repository>",
+      "<RTK_PROMPT>"
+    ],
+    "supervision": [
+      "rtk",
+      "timeout",
+      "--signal=TERM",
+      "--kill-after=5s",
+      "450s",
+      "rtk",
+      "proxy"
+    ]
+  },
+  "fixture": {
+    "source": "tools/adoption/prove_codex_lane.py::make_repo,big_blob,rtk_verdict",
+    "returned_output": "evidence/artifacts/foundation-quality-defaults-20260930/returned-blob.txt",
+    "bytes": 21300,
+    "lines": 300,
+    "source_base_revision": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+    "original_source_sha256": "a399117aa14bec57fd5be59badc0121523148449ae758d7d37ecf052f7c92e23",
+    "returned_output_sha256": "79cb30c3a0f46cd75a4ed5168e6050e22affbe6ff0285a9d8a72c373e13c5678"
+  },
+  "runs": [
+    {
+      "requested_model": "gpt-6.1-sol",
+      "independently_observed_resolved_model": null,
+      "exit_code": 0,
+      "timed_out": false,
+      "oracle_ok": true,
+      "oracle_detail": "status command rtk-prefixed True, exit 0 True; blob read \"/bin/bash -lc 'rtk proxy git show HEAD:big.txt'\": raw True, exit 0, 21300 of 21300 bytes, byte-exact True",
+      "command_exit_codes": [
+        0,
+        0
+      ],
+      "usage": {
+        "input_tokens": 55982,
+        "cached_input_tokens": 43520,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 916,
+        "reasoning_output_tokens": 754
+      },
+      "original_artifacts": {
+        "argv.json": {
+          "bytes": 546,
+          "sha256": "097e9d4ce3af9e42da320c99c05f45634b7f510830b98575d48d5d887c4b2c12"
+        },
+        "events.jsonl": {
+          "bytes": 22896,
+          "sha256": "9c4ba9ffd58bdcf82fe202f377742247d0c32394976ba7fe55ba6afe16b01dc9"
+        },
+        "stderr.log": {
+          "bytes": 39,
+          "sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+        }
+      },
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "item.started",
+        "item.completed",
+        "item.started",
+        "item.completed",
+        "item.completed",
+        "turn.completed"
+      ],
+      "commands": [
+        {
+          "command": "/bin/bash -lc 'rtk git status --short'",
+          "exit_code": 0,
+          "status": "completed",
+          "returned_output": "?? .serena/",
+          "returned_output_artifact": null
+        },
+        {
+          "command": "/bin/bash -lc 'rtk proxy git show HEAD:big.txt'",
+          "exit_code": 0,
+          "status": "completed",
+          "returned_output": null,
+          "returned_output_artifact": "evidence/artifacts/foundation-quality-defaults-20260930/returned-blob.txt"
+        }
+      ],
+      "terminal_event": {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 55982,
+          "cached_input_tokens": 43520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 916,
+          "reasoning_output_tokens": 754
+        }
+      },
+      "command_event_ordinals": [
+        5,
+        7
+      ],
+      "terminal_event_ordinal": 9,
+      "original_command_event_line_sha256": [
+        "3057e89061a3dbaf47c64e50217c148b9e1a34b0eaf2ce84bfc5fe175c8983fc",
+        "994b84a4912895f061cf100d9d81aea0c44f436a531955f11b33be335246dcad"
+      ],
+      "original_usage_event_line_sha256": "5be72cb486294b83eff197c8850602ad64a9bf5aed472c12b482b6ffdda2c917"
+    },
+    {
+      "requested_model": "gpt-6-astra",
+      "independently_observed_resolved_model": null,
+      "exit_code": 0,
+      "timed_out": false,
+      "oracle_ok": true,
+      "oracle_detail": "status command rtk-prefixed True, exit 0 True; blob read \"/bin/bash -lc 'rtk proxy git show HEAD:big.txt'\": raw True, exit 0, 21300 of 21300 bytes, byte-exact True",
+      "command_exit_codes": [
+        0,
+        0
+      ],
+      "usage": {
+        "input_tokens": 55537,
+        "cached_input_tokens": 36096,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 667,
+        "reasoning_output_tokens": 516
+      },
+      "original_artifacts": {
+        "argv.json": {
+          "bytes": 546,
+          "sha256": "5f8e1ba132a58b905c5be1f23a668ef6f6fc6f0eda6ffa3df199c8cd3f8be704"
+        },
+        "events.jsonl": {
+          "bytes": 22921,
+          "sha256": "7fe65b1191747b8944d8365be246f6b94fb6e0dc251d8bcbb6119a3e46e9a586"
+        },
+        "stderr.log": {
+          "bytes": 39,
+          "sha256": "1aa26269eb1cc57f86b235a03cda53c004edb5b1e9fc99d4da4f00843293d721"
+        }
+      },
+      "event_types": [
+        "thread.started",
+        "turn.started",
+        "item.completed",
+        "item.started",
+        "item.completed",
+        "item.started",
+        "item.completed",
+        "item.completed",
+        "turn.completed"
+      ],
+      "commands": [
+        {
+          "command": "/bin/bash -lc 'rtk git status --short'",
+          "exit_code": 0,
+          "status": "completed",
+          "returned_output": "?? .serena/",
+          "returned_output_artifact": null
+        },
+        {
+          "command": "/bin/bash -lc 'rtk proxy git show HEAD:big.txt'",
+          "exit_code": 0,
+          "status": "completed",
+          "returned_output": null,
+          "returned_output_artifact": "evidence/artifacts/foundation-quality-defaults-20260930/returned-blob.txt"
+        }
+      ],
+      "terminal_event": {
+        "type": "turn.completed",
+        "usage": {
+          "input_tokens": 55537,
+          "cached_input_tokens": 36096,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 667,
+          "reasoning_output_tokens": 516
+        }
+      },
+      "command_event_ordinals": [
+        5,
+        7
+      ],
+      "terminal_event_ordinal": 9,
+      "original_command_event_line_sha256": [
+        "3057e89061a3dbaf47c64e50217c148b9e1a34b0eaf2ce84bfc5fe175c8983fc",
+        "994b84a4912895f061cf100d9d81aea0c44f436a531955f11b33be335246dcad"
+      ],
+      "original_usage_event_line_sha256": "aacbeb9028a56c2babfd2eb2ca36f6dffa923e760df6b8ec5d59392934aa708f"
+    }
+  ],
+  "sanitization": "Personal launcher/cwd paths and native thread/item identifiers omitted. The generated fixture prompt is represented by its source and source hash. Exact returned command strings, non-blob command output and native usage retained; shared byte-identical native blob output retained once. Agent-message prose omitted. No conversations, credentials or reasoning text included.",
+  "limitations": [
+    "This is local integration on a real provider with a repository-authored fixture, not unchanged upstream tests or evidence of model superiority.",
+    "Model identifiers are those pinned on native invocation argv; no independent provider backend attestation is claimed.",
+    "Full invocation, native events and stderr remain private; public evidence requires sanitization.",
+    "Per-call native usage categories are retained separately. Enclosing coordinator usage, billing and savings remain unknown.",
+    "Observed orchestration and completion timestamps do not establish individual model wall times."
+  ]
+}

@@ -1,5 +1,18 @@
 # Offline ecosystem manifest
 
+For the focused memory/RAG decision and its complete selected evidence, run
+`python3 scripts/build_ecosystem.py --topic memory-rag --write`, then open
+`docs/ecosystem/memory-rag.html`. This generated, gitignored file embeds the
+25-candidate review, five-finalist evidence matrix, native qualification records,
+published coding comparison, all 32 current lane next gates, peer notification
+receipt and continuation instructions. Each source record
+can be read or downloaded offline with its exact byte count and SHA-256.
+`--topic memory-rag --check` verifies deterministic publication. This exporter
+extends the maintained joins, source confinement, JSON escaping and CSP in
+`scripts/build_ecosystem.py` and reuses `template.html`'s stylesheet; its consumer
+contracts are checked in `tests/test_memory_topic.py`. Publication checks do not
+establish a new memory benchmark or native model run.
+
 **Build `index.html` first, then open it (not `template.html`).** `index.html`
 is generated and gitignored, not committed (see
 [the decision record](../decisions/2026-09-23-generated-explorer-sorted-manifest.md));
@@ -29,7 +42,7 @@ fetch missing data, or depend on the template being beside it. A standalone copy
 still works offline; the guide and manifest links require the checkout layout.
 
 The views connect a layered ecosystem map, foundation and trading capabilities,
-current choices and alternatives, the repository explorer, selected-stack setup,
+current choices and alternatives, the final memory/RAG verdict, the repository explorer, selected-stack setup,
 token-efficiency evidence, and dated source provenance. Every
 current public index identity and the existing 342-star snapshot are retained. The separate
 current-integrations lane makes newly observed Tavily setup searchable without
@@ -127,6 +140,13 @@ Receipts without public attachments say so explicitly.
 
 ## Rebuild and check
 
+The **Memory & RAG verdict** tab (`index.html#memory-review`) reads the dated
+[candidate manifest](../../catalogs/foundation/memory-rag-20260930.json). It shows
+the unresolved best-backbone verdict, the ai-memory reference and qualification
+challengers, five finalists' quality/cost evidence, native runtime alignment,
+all 25 candidate reasons and pins, primary sources, and the full review offline.
+Its separate review date does not update historical catalog dates.
+
 From the repository root, using Python 3.10 or newer and its standard library:
 
 ```sh
@@ -222,3 +242,13 @@ The [cross-layer native acceptance](../../blueprints/convergence-practice/layer-
 adds Mac application/PDF/container proofs and VelaNext recovery/quality tools.
 Repository identities still resolve to immutable content revisions; current-host
 readiness requires that host’s own recorded acceptance.
+
+## Current WSL memory qualification
+
+The Memory & RAG verdict tab includes the current WSL resolution wave alongside
+the five-finalist published evidence matrix. Its source is
+`blueprints/convergence-practice/memory-runtime-resolution-20260930/manifest.json`;
+four native records distinguish foundation installation, scoped ai-memory
+recovery, Hindsight chunk-only storage and the unresolved agentmemory evaluator
+contract. The new-distro command is a proposal, and the best-backbone/token
+verdict remains open. Rebuild with the existing generator after changing it.

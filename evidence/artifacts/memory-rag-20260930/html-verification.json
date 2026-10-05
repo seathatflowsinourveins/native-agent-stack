@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "kind": "presentation_integration_check",
+  "checked_at": "2026-09-30",
+  "lane": "foundation",
+  "evidence_class": "our_integration_check",
+  "scope": "Generated offline memory/RAG HTML manifest. No new memory model, capture, recovery or comparative-quality run.",
+  "source": "Existing scripts/build_ecosystem.py, docs/ecosystem/template.html and tests/test_ecosystem_manifest.py whole-page Node DOM harness.",
+  "output": {
+    "path": "docs/ecosystem/index.html",
+    "entry_fragment": "memory-review",
+    "generated_gitignored": true,
+    "bytes": 14195352,
+    "sha256": "8fa910b901f7558ca17ddcfc9b46503ba083392d8872ed6fecddc654a820738a"
+  },
+  "checks": [
+    {
+      "command": "python3 scripts/build_ecosystem.py --check",
+      "exit_code": 0,
+      "returned_output": {
+        "bytes": 14195352,
+        "input_sha256": "9a708059c35b857a20fd01f3e44f6892eb1f0532d18858f2460b32a9b65c1aee",
+        "output_sha256": "8fa910b901f7558ca17ddcfc9b46503ba083392d8872ed6fecddc654a820738a",
+        "status": "passed"
+      }
+    },
+    {
+      "command": "python3 -m unittest tests.test_ecosystem_manifest -v",
+      "exit_code": 0,
+      "returned_summary": "Ran 64 tests in 16.515s\n\nOK"
+    },
+    {
+      "check": "Generated whole-page inline JavaScript via existing Node DOM harness",
+      "exit_code": 0,
+      "candidate_cards": 25,
+      "missing_elements": [],
+      "page_errors": [],
+      "all_candidate_names_rationales_dispositions_versions_revisions_roles_licenses_and_sources_preserved": true,
+      "memory_tab_and_panel_visible": true,
+      "offline_report_embedded": true,
+      "review_inputs_hashed": [
+        "catalogs/foundation/memory-rag-20260930.json",
+        "docs/memory-rag-foundation-20260930.md",
+        "evidence/artifacts/memory-rag-20260930/convergence.json",
+        "evidence/receipts/memory-rag-20260930.json"
+      ],
+      "external_assets": []
+    },
+    {
+      "command": "python3 scripts/validate.py --scan-file docs/ecosystem/index.html",
+      "exit_code": 0,
+      "returned_output": "{\"scanned_files\": 1, \"status\": \"passed\"}"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "scripts/build_ecosystem.py",
+      "sha256": "982a6afcdb570912691288aae68f6456123225b1a7355061fdd5d2f236aeb658",
+      "bytes": 67421
+    },
+    {
+      "path": "docs/ecosystem/template.html",
+      "sha256": "6dbb976aba58d3c59a0fb03077acd2d79bde7eaec469433d2631129e0e293698",
+      "bytes": 120575
+    },
+    {
+      "path": "docs/ecosystem/manifest.json",
+      "sha256": "4b27833951d511b5ba855ae29ea78be9c84ffc15dc84b39052f1089a085d2ccb",
+      "bytes": 41544
+    },
+    {
+      "path": "catalogs/foundation/memory-rag-20260930.json",
+      "sha256": "a9a46a486d0a04b7e9a50a954d23ea9da19f694d0298cf99acefe26cce62381d",
+      "bytes": 30518
+    },
+    {
+      "path": "docs/memory-rag-foundation-20260930.md",
+      "sha256": "6e2a8f06298f036cb10df1be86ebf7958a18f77c9e60ec0e3e9b2550edea7527",
+      "bytes": 19407
+    }
+  ],
+  "limitations": [
+    "Node DOM execution is not a real-browser visual test.",
+    "This integration check does not promote the staged Hindsight packages or prove live cross-client memory acceptance.",
+    "Generated HTML is a local artifact, not a published or committed page.",
+    "Complete shared-checkout publication validation remains separate."
+  ],
+  "publication_check": {
+    "command": "python3 scripts/validate.py",
+    "exit_code": 1,
+    "returned_error_count": 70,
+    "errors_in_owned_paths": [],
+    "owned_registered_paths": 13,
+    "owned_hash_or_size_errors": [],
+    "returned_error_excerpt": [
+      "examples/claude-native/workflows/README.md: SHA-256 mismatch",
+      "examples/claude-native/workflows/README.md: byte count mismatch",
+      "scripts/native_token_ci.py: SHA-256 mismatch",
+      "scripts/native_token_ci.py: byte count mismatch",
+      "tests/test_install_claude_profile.py: SHA-256 mismatch"
+    ],
+    "excerpt_is_not_complete_output": true,
+    "interpretation": "All 13 owned paths matched their evidence registrations. Other concurrent shared-checkout changes prevent complete publication validation; this local HTML artifact is not committed or published."
+  }
+}

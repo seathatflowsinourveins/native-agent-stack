@@ -1,0 +1,1087 @@
+{
+  "schema_version": 1,
+  "kind": "runtime_worker_landscape_review",
+  "checked_at": "2026-09-30",
+  "lane": "foundation",
+  "status": "source_review_complete_retained_worker_qualification_scoped",
+  "scope": "Native Claude coordination with GPT-6 runtime workers through OmniRoute; task-selected enhancements and optional alternate native interfaces.",
+  "base_revision_observed": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+  "report": "docs/runtime-worker-landscape-20260930.md",
+  "dispatch_guide": "blueprints/runtime-workers/README.md",
+  "selection_policy": "Retain demonstrated role-specific execution. A newer release, starred repository, skill inventory, provider setting or unchanged upstream test is not comparative superiority or host acceptance.",
+  "discovery": {
+    "public_stars": {
+      "account": "seathatflowsinourveins",
+      "count_reviewed": 352,
+      "evidence_class": "bounded_researcher_discovery",
+      "source": "https://api.github.com/users/seathatflowsinourveins/starred?per_page=100"
+    },
+    "awesome_lists": [
+      "https://github.com/bradagi/awesome-cli-coding-agents",
+      "https://github.com/e2b-dev/awesome-ai-agents"
+    ],
+    "channels": [
+      "Installed commands and help",
+      "Authenticated public GitHub releases, tag references and pinned source",
+      "npm and PyPI publication metadata",
+      "Available research skills and existing native skill manifests",
+      "Official provider and harness documentation"
+    ],
+    "limits": "Role-bounded landscape, not an exhaustive census. Discovery lists and popularity do not establish capabilities. Researcher findings are linked to original upstream sources."
+  },
+  "retained_worker": {
+    "repository": "https://github.com/openai/codex",
+    "version": "0.159.2",
+    "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+    "interface": "Official Python SDK and matching native CLI; Claude native Bash callsite",
+    "model": "cx/gpt-6.1-sol-max",
+    "effort": "max",
+    "transport": "Child-scoped OmniRoute Responses lane",
+    "judgment_model": "cx/gpt-6-astra-max",
+    "invocation_requirements": [
+      "Explicit owned --workspace",
+      "Explicit prepared private --codex-home",
+      "New private --native-result",
+      "Bounded task, allowed files, base revision, unchanged acceptance oracle and deadline"
+    ],
+    "evidence_refs": [
+      "evidence/receipts/omniroute-runtime-workers-20260930.json",
+      "evidence/receipts/omniroute-claude-callsite-20260930.json"
+    ],
+    "evidence_class": "retained_dated_live_execution_not_rerun",
+    "accepted_scope": "Recorded direct SDK lifecycle and one bounded native Claude read-only caller invocation",
+    "unresolved": [
+      "Comparative three-arm SDK winner",
+      "Broader writing and optional extension qualification",
+      "Backend identity",
+      "Complete provider billing and failed/interrupted usage",
+      "Remote cancellation"
+    ]
+  },
+  "gateway_source_boundary": {
+    "repository": "https://github.com/diegosouzapw/OmniRoute",
+    "current_public_release": "3.8.51",
+    "current_public_revision": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+    "recorded_running_base_revision": "2f42a9ac19d1a247ec9ce5473b790843724b3061",
+    "catalog_component_pin_observed": "3.8.50",
+    "disposition": "preserve_owned_running_lane_no_upgrade_by_this_review",
+    "meaning": "The recorded running base has owned patches and differs from the public release tag. Version labels, source review and matching native execution are separate evidence; this review did not inspect private configuration or change the gateway.",
+    "sources": [
+      "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51",
+      "https://github.com/diegosouzapw/OmniRoute/commit/c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "docs/decisions/2026-09-30-omniroute-runtime-workers.md"
+    ]
+  },
+  "architecture_review": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "trigger": "Consequential runtime integration architecture and conflicting installed/upstream background-session behavior",
+    "verdict": "Accept minimal dispatch integration within existing qualification boundaries; require explicit workspace, private home and original native result. Do not promote alternate runtimes or universal superiority.",
+    "mode": "Read-only original-source and local-artifact review; no provider trial"
+  },
+  "host_observations": {
+    "claude_version": {
+      "exit_code": 0,
+      "returned": "2.1.285 (Claude Code)"
+    },
+    "codex_version": {
+      "exit_code": 0,
+      "returned": "codex-cli 0.159.2"
+    },
+    "omniroute_path_command": {
+      "exit_code": 127,
+      "meaning": "Named executable did not resolve in PATH. Existing retained running-gateway evidence remains separate."
+    },
+    "openhands": {
+      "executable_in_path": false,
+      "declared_blueprint_prefix_present": false,
+      "meaning": "No OpenHands installation or model run on this host by this review."
+    },
+    "alternate_path_checks": {
+      "pi": 127,
+      "opencode": 127,
+      "goose": 127,
+      "meaning": "PATH observations only; no upstream capability absence assertion."
+    }
+  },
+  "cooperation": {
+    "native_accounts_and_owner_implementations_preserved": true,
+    "active_owner_names_observed": [
+      "runtime-enhancement-coop",
+      "omniroute-token-save-pi-practice",
+      "sota-default-harness-setup"
+    ],
+    "source": "https://github.com/anthropics/claude-code/releases/tag/v2.1.285",
+    "attempts": [
+      {
+        "id": "native_headless_contact",
+        "mode": "Native Opus/Max inherited session tools, requested ListAgents/SendMessage",
+        "deadline_seconds": 90,
+        "final_result_received": false,
+        "outcome": "timeout",
+        "usage": null,
+        "acknowledgement": null
+      },
+      {
+        "id": "headless_background_resume",
+        "exit_code": 1,
+        "outcome": "Installed client refused running-background resume",
+        "stderr_sanitized": "Error: That session is running in the background (<session>). Run claude attach <session> to open it, or claude stop <session> first to resume it here. Add --fork-session to branch off a copy instead."
+      },
+      {
+        "id": "interactive_background_resume",
+        "exit_code": 1,
+        "outcome": "Same installed running-background refusal in a PTY"
+      },
+      {
+        "id": "native_attach_handoff",
+        "interface": "claude attach <owned-target>; prompt entered in native UI",
+        "owned_frontend_detach": "Ctrl+Z",
+        "owned_frontend_exit_code": 0,
+        "outcome": "Handoff text submitted; recipient acknowledgement and completed review unconfirmed",
+        "usage": null
+      }
+    ],
+    "peer_approval_received": false,
+    "limits": "No stop/fork/unsupported IPC workaround; session identifiers, paths and raw conversations omitted. A submitted prompt and an architecture review do not establish peer approval."
+  },
+  "enhancement_policy": {
+    "skill_trial": "blueprints/runtime-workers/skills/manifest.json",
+    "selected_count": 136,
+    "pinned_source_count": 12,
+    "inventory_status": "trial_not_host_installed_by_this_review",
+    "selection": "Choose relevant native skills for each task. Shared SKILL.md compatibility does not install plugins, hooks, MCP servers or executable extensions.",
+    "next_gate": "One skill: frozen realistic positive and adjacent negative, actual instruction read, unchanged task oracle, result contract and native usage. Compare the retained worker with and without that same extension.",
+    "native_lifecycle": "adoption/skills/lifecycle.md",
+    "separate_layers": [
+      "Task skills",
+      "MCP tools",
+      "Native plugins/hooks",
+      "Execution isolation",
+      "Context/cache/compaction",
+      "Durable memory",
+      "Observation and truthful usage"
+    ]
+  },
+  "candidates": [
+    {
+      "id": "codex-sdk",
+      "repository_license_metadata": "Apache-2.0",
+      "source_revision_resolved": true,
+      "role": "Primary coding worker",
+      "repository": "https://github.com/openai/codex",
+      "version": "0.159.2",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "disposition": "retain_scoped",
+      "evidence_class": "retained_dated_live_execution",
+      "sources": [
+        "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
+        "https://github.com/openai/codex/tree/ff6aec96948b70d94983af2641a6b67c94faeff5/sdk/python"
+      ]
+    },
+    {
+      "id": "claude-agent-sdk",
+      "repository_license_metadata": "MIT",
+      "source_revision_resolved": true,
+      "role": "Claude harness through translated gateway trial",
+      "repository": "https://github.com/anthropics/claude-agent-sdk-python",
+      "version": "0.2.162",
+      "revision": "f2204bb956bab02907aaf3cb88eb9dead28eaa35",
+      "disposition": "trial_provider_unqualified",
+      "evidence_class": "retained_failed_provider_attempts_and_separate_upstream_tests",
+      "reason": "Two recorded HTTP500/timeout attempts with zero tool calls; upstream tests do not override provider failure.",
+      "sources": [
+        "https://github.com/anthropics/claude-agent-sdk-python/tree/f2204bb956bab02907aaf3cb88eb9dead28eaa35",
+        "evidence/receipts/omniroute-runtime-workers-20260930.json"
+      ]
+    },
+    {
+      "id": "openhands-sdk",
+      "repository_license_metadata": "MIT",
+      "source_revision_resolved": true,
+      "role": "Optional isolated coding worker",
+      "repository": "https://github.com/OpenHands/software-agent-sdk",
+      "version": "1.50.0",
+      "revision": "dcf401af7a9a302ef92cb7d092e1df9bb659daa5",
+      "retained_blueprint_version": "1.49.6",
+      "retained_blueprint_revision": "fcc102a697874d54a357e36004e02c95040dbdc0",
+      "disposition": "preserve_frozen_o1_trial_review_upgrade",
+      "evidence_class": "current_release_and_pinned_source_not_host_execution",
+      "provider_contract": "Explicit api_mode=responses, base_url, native tools, provider-neutral effort, model canonical name, overrides and headers; LiteLLM full Responses is a distinct wire path.",
+      "native_extensions": [
+        "load_skills_from_dir and AgentContext",
+        "PluginSource and Conversation plugins",
+        "MCPServer mcp_config",
+        "Native spawn/delegate and conversation lifecycle",
+        "DockerWorkspace and native metrics"
+      ],
+      "gate": "Resolve owned revision and installation/import prerequisites, then existing O1 isolation/dispatch gates before model execution; retain official grading and recovery gates.",
+      "sources": [
+        "https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.50.0",
+        "https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-sdk/openhands/sdk/llm/llm.py",
+        "https://github.com/OpenHands/software-agent-sdk/tree/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/examples/05_skills_and_plugins",
+        "blueprints/runtime-workers/openhands/README.md"
+      ]
+    },
+    {
+      "id": "openhands-cli",
+      "repository_license_metadata": "MIT",
+      "source_revision_resolved": true,
+      "role": "Optional terminal/ACP interface with its own SDK",
+      "repository": "https://github.com/OpenHands/OpenHands-CLI",
+      "version": "1.16.0",
+      "revision": "2963442dacc7cea44e39b7c4e73724295c853465",
+      "disposition": "separate_preflight_candidate",
+      "evidence_class": "current_release_and_pinned_source",
+      "requires_python": "==3.12.*",
+      "pinned_sdk": "1.21.0",
+      "pinned_tools": "1.21.0",
+      "pinned_workspace": "1.11.1",
+      "reason": "Separate dependency graph; no demonstrated equivalent to current Max/O1 worker contract.",
+      "sources": [
+        "https://github.com/OpenHands/OpenHands-CLI/releases/tag/1.16.0",
+        "https://github.com/OpenHands/OpenHands-CLI/blob/2963442dacc7cea44e39b7c4e73724295c853465/pyproject.toml",
+        "https://github.com/OpenHands/OpenHands-CLI/blob/2963442dacc7cea44e39b7c4e73724295c853465/README.md"
+      ]
+    },
+    {
+      "id": "openhands-extensions",
+      "repository_license_metadata": "MIT",
+      "source_revision_resolved": true,
+      "role": "Task skills and native plugin sources",
+      "repository": "https://github.com/OpenHands/extensions",
+      "version": "0.25.0",
+      "revision": "bea7a20c59c44ec4dacddac3fc0efe58b9c73880",
+      "disposition": "task_selected_existing_trial_inventory",
+      "evidence_class": "current_release_and_existing_source_manifest",
+      "reason": "SDK/API/automation skills guide development; plugin installation and MCP wiring remain distinct.",
+      "sources": [
+        "https://github.com/OpenHands/extensions/releases/tag/v0.25.0",
+        "https://github.com/OpenHands/extensions/tree/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills",
+        "blueprints/runtime-workers/skills/manifest.json"
+      ]
+    },
+    {
+      "id": "openhands-application",
+      "repository_license_metadata": "MIT",
+      "source_revision_resolved": true,
+      "role": "Separate application/deployment surface",
+      "repository": "https://github.com/OpenHands/OpenHands",
+      "version": "1.24.0",
+      "revision": "7dc6805406ea3c76cb4a3ce407c3c72d481b0ac6",
+      "disposition": "defer_no_worker_gap_demonstrated",
+      "evidence_class": "current_upstream_release",
+      "reason": "Application deployment does not establish this local runtime-worker contract.",
+      "sources": [
+        "https://github.com/OpenHands/OpenHands/releases/tag/v1.24.0"
+      ]
+    },
+    {
+      "id": "pi",
+      "repository_license_metadata": "MIT",
+      "source_revision_resolved": true,
+      "role": "Extensible SDK/RPC worker comparison",
+      "repository": "https://github.com/earendil-works/pi",
+      "package": "@earendil-works/pi-coding-agent",
+      "version": "0.99.1",
+      "revision": "d86654abb8862e201933517d6f1fce9f88dd117f",
+      "disposition": "source_review_preserve_owned_conditional_trial",
+      "evidence_class": "current_release_registry_and_source",
+      "native_interfaces": [
+        "SDK",
+        "Print/JSON/RPC",
+        "Task-loaded skills",
+        "Executable extensions and built-in MCP extension"
+      ],
+      "gate": "Coordinate canonical repository/package change with Pi owner; same frozen task, model/effort/wire contract, extension oracle, lifecycle and complete usage.",
+      "sources": [
+        "https://github.com/earendil-works/pi/releases/tag/v0.99.1",
+        "https://github.com/earendil-works/pi/blob/d86654abb8862e201933517d6f1fce9f88dd117f/packages/coding-agent/docs/sdk.md",
+        "https://github.com/earendil-works/pi/blob/d86654abb8862e201933517d6f1fce9f88dd117f/packages/coding-agent/docs/models.md",
+        "https://github.com/earendil-works/pi/blob/d86654abb8862e201933517d6f1fce9f88dd117f/packages/coding-agent/docs/skills.md",
+        "https://github.com/earendil-works/pi/tree/d86654abb8862e201933517d6f1fce9f88dd117f/packages/coding-agent/src/extensions/mcp"
+      ]
+    },
+    {
+      "id": "opencode",
+      "repository_license_metadata": "MIT",
+      "source_revision_resolved": true,
+      "role": "SDK/server or ACP worker comparison",
+      "repository": "https://github.com/anomalyco/opencode",
+      "version": "1.18.33",
+      "revision": "51ef4be1d3c122f18fefb510dca8d778571f4f18",
+      "disposition": "source_review_candidate",
+      "evidence_class": "current_release_registry_and_source",
+      "provider_contract": "Select @ai-sdk/openai for Responses; @ai-sdk/openai-compatible selects Chat Completions.",
+      "gate": "Observed model/effort/tool wire, scoped state, actual skill/plugin invocation, session interruption and recovery.",
+      "sources": [
+        "https://github.com/anomalyco/opencode/releases/tag/v1.18.33",
+        "https://github.com/anomalyco/opencode/blob/51ef4be1d3c122f18fefb510dca8d778571f4f18/packages/web/src/content/docs/sdk.mdx",
+        "https://github.com/anomalyco/opencode/blob/51ef4be1d3c122f18fefb510dca8d778571f4f18/packages/web/src/content/docs/providers.mdx",
+        "https://github.com/anomalyco/opencode/blob/51ef4be1d3c122f18fefb510dca8d778571f4f18/packages/web/src/content/docs/skills.mdx"
+      ]
+    },
+    {
+      "id": "goose",
+      "repository_license_metadata": "Apache-2.0",
+      "source_revision_resolved": true,
+      "role": "MCP/workflow runtime and ACP comparison",
+      "repository": "https://github.com/aaif-goose/goose",
+      "version": "1.52.0",
+      "revision": "302b60806639ea9f0ae8f053f49f8bf0e88b26f4",
+      "disposition": "source_review_candidate",
+      "evidence_class": "current_release_and_source",
+      "reason": "GDK SDK is a provider library; full agent tool loop requires the separate runtime/ACP surface.",
+      "sources": [
+        "https://github.com/aaif-goose/goose/releases/tag/v1.52.0",
+        "https://github.com/aaif-goose/goose/blob/302b60806639ea9f0ae8f053f49f8bf0e88b26f4/documentation/docs/gdk/sdk/index.md",
+        "https://github.com/aaif-goose/goose/blob/302b60806639ea9f0ae8f053f49f8bf0e88b26f4/documentation/docs/gdk/acp/index.md"
+      ]
+    },
+    {
+      "id": "oh-my-pi",
+      "repository_license_metadata": "MIT",
+      "source_revision_resolved": true,
+      "role": "Separate enhancement-rich runtime comparison",
+      "repository": "https://github.com/can1357/oh-my-pi",
+      "package": "@oh-my-pi/pi-coding-agent",
+      "version": "18.4.4",
+      "revision": "8ac1309bd8adaddc891eeb389c545345073875be",
+      "disposition": "source_review_candidate",
+      "evidence_class": "current_release_registry_and_source",
+      "reason": "Separate runtime, not a portable SKILL.md package or qualified OmniRoute worker.",
+      "sources": [
+        "https://github.com/can1357/oh-my-pi/releases/tag/v18.4.4",
+        "https://github.com/can1357/oh-my-pi/tree/8ac1309bd8adaddc891eeb389c545345073875be"
+      ]
+    },
+    {
+      "id": "codex-for-claude",
+      "repository_license_metadata": "Apache-2.0",
+      "source_revision_resolved": true,
+      "role": "Official Claude command/review interface",
+      "repository": "https://github.com/openai/codex-plugin-cc",
+      "version": "1.0.6",
+      "revision": "db52e28f4d9ded852ab3942cea316258ae4ef346",
+      "disposition": "compare_existing_optional_interface",
+      "evidence_class": "current_release_and_source_not_new_gateway_execution",
+      "provider_contract": "Source respects CODEX_HOME and provider requiresOpenaiAuth=false through App Server. Supported source configuration is not observed OmniRoute acceptance.",
+      "gate": "Separate scoped-provider auth, session broker/hooks, original result, actual Claude invocation and lifecycle acceptance.",
+      "sources": [
+        "https://github.com/openai/codex-plugin-cc/releases/tag/v1.0.6",
+        "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/README.md",
+        "https://github.com/openai/codex-plugin-cc/blob/db52e28f4d9ded852ab3942cea316258ae4ef346/plugins/codex/scripts/lib/codex.mjs#L817"
+      ]
+    },
+    {
+      "id": "codex-acp",
+      "repository_license_metadata": "NOASSERTION",
+      "source_revision_resolved": true,
+      "role": "Maintained Codex ACP adapter",
+      "repository": "https://github.com/agentclientprotocol/codex-acp",
+      "package": "@agentclientprotocol/codex-acp",
+      "version": "2.0.1",
+      "revision": "7a8e00fe46b299264f5ebe9f250288636f1485cc",
+      "disposition": "source_review_optional_transport",
+      "evidence_class": "current_release_registry_and_source",
+      "sources": [
+        "https://github.com/agentclientprotocol/codex-acp/releases/tag/v2.0.1",
+        "https://github.com/agentclientprotocol/codex-acp/blob/7a8e00fe46b299264f5ebe9f250288636f1485cc/README.md"
+      ]
+    },
+    {
+      "id": "acpx",
+      "repository_license_metadata": "MIT",
+      "source_revision_resolved": true,
+      "role": "Headless persistent ACP client for Claude Bash",
+      "repository": "https://github.com/openclaw/acpx",
+      "version": "0.19.3",
+      "revision": "6b4714c7aaac8c38b1fe38354848d2546f65d87d",
+      "disposition": "source_review_optional_interface",
+      "evidence_class": "current_release_registry_and_source",
+      "sources": [
+        "https://github.com/openclaw/acpx/releases/tag/v0.19.3",
+        "https://github.com/openclaw/acpx/blob/6b4714c7aaac8c38b1fe38354848d2546f65d87d/docs/CLI.md"
+      ]
+    },
+    {
+      "id": "oh-my-codex",
+      "repository_license_metadata": "MIT",
+      "source_revision_resolved": true,
+      "role": "Additional Codex orchestration choice",
+      "repository": "https://github.com/Yeachan-Heo/oh-my-codex",
+      "version": "0.21.6",
+      "revision": "cdc24a71408ebd6bd0362f52170f0d7998f77007",
+      "disposition": "defer_pending_measured_role_gap",
+      "evidence_class": "current_release_and_source",
+      "reason": "Require demonstrated benefit and ownership compatibility before adding another orchestration layer.",
+      "sources": [
+        "https://github.com/Yeachan-Heo/oh-my-codex/releases/tag/v0.21.6",
+        "https://github.com/Yeachan-Heo/oh-my-codex/blob/cdc24a71408ebd6bd0362f52170f0d7998f77007/README.md"
+      ]
+    },
+    {
+      "id": "agentskills",
+      "repository_license_metadata": "Apache-2.0",
+      "source_revision_resolved": true,
+      "role": "Portable task instruction format",
+      "repository": "https://github.com/agentskills/agentskills",
+      "revision": "69ef37e9424c0a7ea9dd2293b559e43ec8176379",
+      "version": null,
+      "disposition": "retain_format_task_selected",
+      "evidence_class": "current_specification_and_source_review",
+      "sources": [
+        "https://agentskills.io/specification",
+        "https://github.com/agentskills/agentskills/tree/69ef37e9424c0a7ea9dd2293b559e43ec8176379"
+      ]
+    },
+    {
+      "id": "vercel-skills",
+      "repository_license_metadata": "MIT",
+      "source_revision_resolved": true,
+      "role": "Supported skill discovery and installation",
+      "repository": "https://github.com/vercel-labs/skills",
+      "version": "1.7.0",
+      "revision": "7407f3893ad4dceab546ac002c3ef806e4000c73",
+      "disposition": "retain_selected_native_lifecycle",
+      "evidence_class": "current_source_and_existing_lifecycle_evidence",
+      "sources": [
+        "https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md",
+        "adoption/skills/lifecycle.md"
+      ]
+    },
+    {
+      "id": "managed-agents-api",
+      "role": "Separate managed Codex harness application option",
+      "repository": null,
+      "version": null,
+      "revision": null,
+      "disposition": "defer_separate_hosted_api_scope",
+      "evidence_class": "official_documentation_read_20260930",
+      "reason": "Managed sessions, tools, skills and recovery are a separate API scope; no local OmniRoute contract or entitlement is qualified.",
+      "sources": [
+        "https://developers.openai.com/api/docs/guides/agents-api/overview"
+      ]
+    }
+  ],
+  "corrections": [
+    {
+      "claim": "Simplify Pi's documented installation to npm install -g",
+      "correction": "The pinned upstream README requires --ignore-scripts; the report now preserves that flag. No installation was performed.",
+      "verification": "Independent verifier checked packages/coding-agent/README.md at the exact current revision, line 24; command corrected before execution.",
+      "sources": [
+        "https://github.com/earendil-works/pi/blob/d86654abb8862e201933517d6f1fce9f88dd117f/packages/coding-agent/README.md#L24"
+      ]
+    },
+    {
+      "claim": "Carry zed-industries/codex-acp as the maintained adapter",
+      "correction": "GitHub metadata reports it archived; the maintained current adapter is agentclientprotocol/codex-acp2.0.1.",
+      "verification": "gh api repository archived field, maintained release and pinned README",
+      "sources": [
+        "https://api.github.com/repos/zed-industries/codex-acp",
+        "https://github.com/agentclientprotocol/codex-acp/releases/tag/v2.0.1"
+      ]
+    },
+    {
+      "claim": "The v2.1.285 release-note background resume improvement implies this installed invocation can send a prompt to a running session",
+      "correction": "Both headless and interactive installed invocations rejected the running-background target with exit1. Native attach is the observed supported entry. Recipient acknowledgement remains unconfirmed.",
+      "verification": "Installed claude --version/--help, gh api v2.1.285 release, retained sanitized stderr and separate PTY exit",
+      "sources": [
+        "https://github.com/anthropics/claude-code/releases/tag/v2.1.285"
+      ]
+    },
+    {
+      "claim": "An OpenHands CLI install would qualify the current SDK/O1 worker",
+      "correction": "CLI1.16.0 pins SDK1.21.0; current SDK1.50.0 and frozen1.49.6 are separate targets.",
+      "verification": "Pinned CLI pyproject.toml, SDK release and current blueprint",
+      "sources": [
+        "https://github.com/OpenHands/OpenHands-CLI/blob/2963442dacc7cea44e39b7c4e73724295c853465/pyproject.toml"
+      ]
+    }
+  ],
+  "new_worker_provider_trials": 0,
+  "native_cooperation_model_attempts": 5,
+  "native_cooperation_model_attempts_scope": "One earlier native headless contact, two timed-out reset-notice contacts, one completed six-peer reset broadcast and one completed four-owner checkpoint notice. These count intended native model-enabled contact calls; submission and usage remain unknown for timeouts. Parser refusals and existing owner-session attach activity are separate. No worker provider trial was added.",
+  "new_worker_installations": 0,
+  "repository_validation": {
+    "status": "runtime_checks_passed_shared_publication_requires_owner_reconciliation",
+    "checks": [
+      {
+        "command": "rtk python3 scripts/validate_foundation.py --root . --json",
+        "exit_code": 0,
+        "scope": "Existing canonical foundation manifest and decisions; not automatic validation of this standalone review."
+      },
+      {
+        "command": "rtk python3 scripts/validate_catalogs.py",
+        "exit_code": 0,
+        "scope": "Existing catalogs and declared evidence classes; source claims and native executions not rerun."
+      },
+      {
+        "command": "rtk python3 scripts/build_ecosystem.py --check",
+        "exit_code": 0,
+        "scope": "Generated guide rendering with the added report and dispatch links."
+      },
+      {
+        "command": "rtk git diff --check",
+        "exit_code": 0,
+        "scope": "Working-tree whitespace integrity."
+      },
+      {
+        "command": "Read-only scoped catalog integrity assertions",
+        "exit_code": 0,
+        "scope": "17 unique entries, immutable revision syntax, local references, 136 existing skill selections and both guide entries."
+      }
+    ],
+    "source_metadata": {
+      "repository_queries": 16,
+      "revision_queries": 16,
+      "all_exit_codes": 0,
+      "all_revisions_resolved": true,
+      "license_scope": "Current repository SPDX metadata only; codex-acp reports NOASSERTION and needs license-file review before adoption."
+    },
+    "initial_publication_validation": {
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 1,
+      "reason": "Four owned guide-link hashes need refresh; separate concurrent memory/harness changes and evidence files also fail integrity validation."
+    },
+    "previous_publication_validation": {
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 1,
+      "scope": "Observed after the four owned guide-link hashes were refreshed; remaining failures belong to concurrent memory/harness work.",
+      "remaining_conditions": [
+        "Concurrent memory-runtime README/manifest hash mismatches",
+        "Concurrent harness-defaults hash mismatch",
+        "New memory/token-lifecycle evidence missing hash registration",
+        "A concurrent memory artifact flagged for a possible personal home path"
+      ],
+      "owner_policy": "Preserve the live owners' changes; publication remains gated until they reconcile and sanitize their evidence."
+    },
+    "passed_publication_validation": {
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 0,
+      "returned_summary": {
+        "components": 69,
+        "hashed_files": 8283,
+        "profiles": 4,
+        "receipts": 177,
+        "status": "passed"
+      },
+      "scope": "Integrity and scope checks only; no live provider or GPU execution. This passed observation preceded a new concurrent CLI audit artifact."
+    },
+    "latest_publication_validation": {
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 1,
+      "returned_error": "evidence/artifacts/cli-settings-audit-20260930/audit.json: evidence file is not hash-listed",
+      "scope": "New concurrently authored native CLI audit requires hash registration by its owner. All eleven runtime-owned file hashes match; generated HTML public scan passes. This condition does not invalidate recorded runtime acceptance.",
+      "owner_policy": "Preserve the active owner's source and evidence entries; do not silently register or accept unfinished foreign evidence."
+    },
+    "public_html_scan": {
+      "command": "rtk python3 scripts/validate.py --scan-file docs/ecosystem/index.html",
+      "exit_code": 0,
+      "returned_summary": {
+        "scanned_files": 1,
+        "status": "passed"
+      }
+    },
+    "enhancement_convergence_validation": {
+      "command": "rtk python3 scripts/validate_convergence.py blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json --root . --json",
+      "exit_code": 0,
+      "returned_summary": {
+        "records": [
+          {
+            "errors": [],
+            "observations": 16,
+            "path": "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
+            "valid": true
+          }
+        ],
+        "valid": true
+      },
+      "scope": "Declared experiment consistency checked; native receipt and primary sources independently read, not rerun."
+    },
+    "enhancement_independent_verification": {
+      "role": "stack-verifier",
+      "verdict": "Eight source hashes, selected actions, four cumulative usage scopes, pinned skill digest/RTK revision and native reset policy confirmed. Earlier failures and 23 flow_error events retained. No consequential errors found.",
+      "source": "evidence/receipts/omniroute-runtime-enhancements-20260930.json",
+      "limits": "No provider rerun, account method or reset consumed by verifier. Native notices confirmed only as reported queued; no read acknowledgement."
+    },
+    "independent_verification": {
+      "role": "stack-verifier",
+      "verdict": "Key capability, pinned-source, invocation and evidence-boundary claims confirmed; one Pi installation flag corrected before execution.",
+      "command_exit_codes": {
+        "validate_foundation": 0,
+        "validate_catalogs": 0,
+        "build_ecosystem_check": 0,
+        "git_diff_check": 0
+      },
+      "limits": "Candidate installations, candidate tests and model trials not run; this does not qualify alternative workers."
+    }
+  },
+  "candidate_count": 17,
+  "evidence_manifest": [
+    {
+      "id": "direct-sdk-lifecycle",
+      "title": "Direct Codex SDK lifecycle through OmniRoute",
+      "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+      "status": "historical_native_acceptance",
+      "evidence_class": "native_provider_execution",
+      "scope": "Recorded Sol/Max repair, unchanged task oracle, resume, invalid-resume rejection, deadline request and fresh recovery.",
+      "source_current": "Historical source; not rerun against the enhanced worker.",
+      "observed_actions": [
+        "Repair",
+        "Unchanged npm test",
+        "Native resume",
+        "Invalid resume rejected",
+        "Deadline and fresh recovery"
+      ],
+      "sources": [
+        "https://github.com/openai/codex/tree/ff6aec96948b70d94983af2641a6b67c94faeff5/sdk/python",
+        "docs/decisions/2026-09-30-omniroute-runtime-workers.md"
+      ],
+      "limitations": [
+        "Receipt reuse is not a new model run.",
+        "This lifecycle result does not qualify every extension or alternative runtime."
+      ]
+    },
+    {
+      "id": "native-claude-sdk-callsite",
+      "title": "Native Claude dispatcher and Bash SDK callsite",
+      "path": "evidence/receipts/omniroute-claude-callsite-20260930.json",
+      "status": "historical_native_acceptance",
+      "evidence_class": "native_caller_execution",
+      "scope": "Native Claude 2.1.285 Opus 5.5/Max read the project dispatcher and made one bounded read-only Sol SDK call with unchanged npm test exit 0.",
+      "source_current": "Historical separate caller; not rerun against the enhanced worker.",
+      "observed_actions": [
+        "Dispatcher read",
+        "Bash SDK invocation",
+        "Original test result retained"
+      ],
+      "sources": [
+        "https://github.com/anthropics/claude-code/releases/tag/v2.1.285",
+        "blueprints/runtime-workers/README.md"
+      ],
+      "limitations": [
+        "One bounded read-only caller scope.",
+        "The separate failed Claude SDK bridge remains unqualified."
+      ]
+    },
+    {
+      "id": "enhanced-sdk-native-judge",
+      "title": "Qualified skill, MCP, Dagu and native Astra judge workflow",
+      "path": "evidence/receipts/omniroute-runtime-enhancements-20260930.json",
+      "status": "adopt_within_scope",
+      "evidence_class": "native_provider_execution_with_independent_observation",
+      "scope": "Bounded Sol-Max SDK skill/MCP/native-judge workflow through OmniRoute; graph-repaired and judge-repaired qualification runs.",
+      "source_current": "All eight receipt source hashes match the reviewed working-tree files; no new provider run by this manifest review.",
+      "observed_actions": [
+        "using-superpowers body read, exit 0",
+        "Serena initial_instructions",
+        "context-mode ctx_execute",
+        "Serena get_symbols_overview",
+        "Dagu graph readiness and recovered execution",
+        "One native Astra/Max judge",
+        "Unchanged arithmetic fixture oracle, exit 0"
+      ],
+      "sources": [
+        "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
+        "examples/omniroute-codex-sdk/acceptance-plan.json",
+        "examples/omniroute-codex-sdk/rerun-plan.json"
+      ],
+      "limitations": [
+        "169 enabled skills were discoverable; one skill body and three selected MCP calls were exercised.",
+        "Earlier readiness and 300-second deadline failures remain recorded.",
+        "Completed streams contain unclassified flow_error events; this is not error-free acceptance.",
+        "Hooks, live web search, schedules, all other tools and global configuration were not qualified.",
+        "Backend identity, billing, complete failed-attempt usage and savings remain unknown.",
+        "The native Claude caller receipt is a historical separate source scope."
+      ],
+      "usage_scopes": [
+        {
+          "scope": "repaired-parent",
+          "model": "cx/gpt-6.1-sol-max",
+          "effort": "max",
+          "terminal_event": "task_complete",
+          "counter_scope": "latest_native_thread_cumulative",
+          "input_tokens": 151525,
+          "cached_input_tokens": 131712,
+          "output_tokens": 2288,
+          "reasoning_output_tokens": 1122,
+          "total_tokens": 153813
+        },
+        {
+          "scope": "repaired-judge",
+          "model": "cx/gpt-6-astra-max",
+          "effort": "max",
+          "terminal_event": "task_complete",
+          "counter_scope": "latest_native_thread_cumulative",
+          "input_tokens": 64556,
+          "cached_input_tokens": 61952,
+          "output_tokens": 1488,
+          "reasoning_output_tokens": 878,
+          "total_tokens": 66044
+        },
+        {
+          "scope": "deadline300-parent",
+          "model": "cx/gpt-6.1-sol-max",
+          "effort": "max",
+          "terminal_event": "turn_aborted",
+          "counter_scope": "latest_native_thread_cumulative_partial_failed_attempt",
+          "input_tokens": 209699,
+          "cached_input_tokens": 178816,
+          "output_tokens": 3365,
+          "reasoning_output_tokens": 1625,
+          "total_tokens": 213064
+        },
+        {
+          "scope": "deadline300-judge",
+          "model": "cx/gpt-6-astra-max",
+          "effort": "max",
+          "terminal_event": "task_complete",
+          "counter_scope": "latest_native_thread_cumulative_earlier_attempt",
+          "input_tokens": 105465,
+          "cached_input_tokens": 76160,
+          "output_tokens": 1908,
+          "reasoning_output_tokens": 1050,
+          "total_tokens": 107373
+        }
+      ],
+      "usage_rule": "Count each latest cumulative scope once. Cache and reasoning are subsets. Observer counters corroborate these scopes; do not add them as further usage. Do not combine the successful and failed attempts into a savings claim."
+    },
+    {
+      "id": "claude-sdk-bridge-failure",
+      "title": "Separate Claude Agent SDK gateway bridge failure",
+      "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+      "status": "trial_provider_unqualified",
+      "evidence_class": "failed_native_provider_execution",
+      "scope": "Two recorded HTTP 500/timeout attempts, exit 1, zero tool calls.",
+      "observed_actions": [
+        "Failed bridge attempt 1",
+        "Failed bridge attempt 2"
+      ],
+      "sources": [
+        "https://github.com/anthropics/claude-agent-sdk-python/tree/f2204bb956bab02907aaf3cb88eb9dead28eaa35"
+      ],
+      "limitations": [
+        "Passing unchanged upstream SDK tests is distinct from provider acceptance.",
+        "Successful native Claude Bash-to-Codex execution does not promote this bridge."
+      ]
+    }
+  ],
+  "qualified_enhancement_components": [
+    {
+      "id": "official-codex-sdk",
+      "role": "Typed native thread lifecycle and native judge",
+      "repository": "https://github.com/openai/codex",
+      "version": "0.159.2",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "evidence_scope": "Recorded enhanced worker receipt; source hashes verified",
+      "sources": [
+        "https://github.com/openai/codex/tree/ff6aec96948b70d94983af2641a6b67c94faeff5/sdk/python",
+        "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
+      ]
+    },
+    {
+      "id": "context-mode",
+      "role": "Selected ctx_execute MCP call and bounded processing",
+      "repository": "https://github.com/mksglu/context-mode",
+      "version": "1.0.169",
+      "revision": "589d8214d56740a28b5f7bf63167743d586b0b40",
+      "evidence_scope": "One selected MCP call, not all tools",
+      "sources": [
+        "https://github.com/mksglu/context-mode/tree/589d8214d56740a28b5f7bf63167743d586b0b40",
+        "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
+      ]
+    },
+    {
+      "id": "serena",
+      "role": "Native initial instructions and symbol overview",
+      "repository": "https://github.com/oraios/serena",
+      "version": null,
+      "revision": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "evidence_scope": "Two selected MCP calls on the unchanged fixture",
+      "sources": [
+        "https://github.com/oraios/serena/tree/c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+        "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
+      ]
+    },
+    {
+      "id": "dagu",
+      "role": "Bounded readiness and recoverable graph execution",
+      "repository": "https://github.com/dagucloud/dagu",
+      "version": "2.16.6",
+      "revision": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+      "evidence_scope": "Third graph succeeded; two earlier graph failures retained",
+      "sources": [
+        "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/spec/dag.go#L694",
+        "examples/omniroute-codex-sdk/runtime-worker.yaml"
+      ]
+    },
+    {
+      "id": "mitmproxy-observer",
+      "role": "Independent bounded gateway observation",
+      "repository": "https://github.com/mitmproxy/mitmproxy",
+      "version": "12.2.3",
+      "revision": "6c09d56e4c29a92f5ad01b03199977584b8ea14f",
+      "evidence_scope": "Corroborates native parent/judge scopes; not extra usage or backend billing",
+      "sources": [
+        "https://github.com/mitmproxy/mitmproxy/tree/6c09d56e4c29a92f5ad01b03199977584b8ea14f",
+        "tools/runtime-worker-evidence/gateway_observer.py"
+      ]
+    },
+    {
+      "id": "using-superpowers",
+      "role": "Task-selected native skill body",
+      "repository": "https://github.com/obra/superpowers",
+      "version": null,
+      "revision": "8ca22dba9a94f28898bbce59f2537ff4d87c747d",
+      "evidence_scope": "One actual body read with returned output digest; adjacent negative preflight retained",
+      "sources": [
+        "https://github.com/obra/superpowers/blob/8ca22dba9a94f28898bbce59f2537ff4d87c747d/skills/using-superpowers/SKILL.md",
+        "blueprints/runtime-workers/skills/manifest.json"
+      ]
+    },
+    {
+      "id": "omniroute-fixture",
+      "role": "Unchanged upstream arithmetic task oracle",
+      "repository": "https://github.com/diegosouzapw/OmniRoute",
+      "version": "3.8.51",
+      "revision": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "evidence_scope": "Fixture source pin; running gateway identity remains separately scoped",
+      "sources": [
+        "https://github.com/diegosouzapw/OmniRoute/tree/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/fixtures/devin-bridge/e2e-workspace",
+        "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
+      ]
+    },
+    {
+      "id": "rtk",
+      "role": "Native command output filtering with documented exceptions",
+      "repository": "https://github.com/rtk-ai/rtk",
+      "version": "0.50.0",
+      "revision": "1d87b8e719ce0a50c223cd93ca64dd16921f9aec",
+      "evidence_scope": "Selected worker commands use RTK; no independently measured savings claim",
+      "sources": [
+        "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/hooks/rtk-awareness-full.md",
+        "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
+      ],
+      "pin_verification": {
+        "tag_ref_exit_code": 0,
+        "hook_file_exit_code": 0,
+        "tag_object_type": "commit"
+      }
+    }
+  ],
+  "usage_limit_policy": {
+    "title": "Native Codex earned-reset recovery",
+    "status": "native_ordinary_usage_allowed_reset_credit_available_not_consumed",
+    "scope": "Native Codex-backend included usage only. A generic OmniRoute provider child has separate eligibility.",
+    "steps": [
+      "On a real usage denial, preserve the worker thread, worktree and explicit model/effort.",
+      "Read account/rateLimits/read through the official native client. ordinary_usage_allowed is backend-validated; null remains unknown.",
+      "If ordinary usage is denied and an eligible earned reset exists, redeem one through /usage or account/rateLimitResetCredit/consume. Use an idempotencyKey and reuse it for retries of that same redemption.",
+      "Refresh native limits after reset or alreadyRedeemed; neither outcome alone proves restored capacity.",
+      "Resume once after confirmed recovery. If no eligible reset exists, retain the checkpoint and await a server reset or confirmed state change.",
+      "Preserve unknown usage and failed attempts. Avoid repeated unchanged quota failures. Paid purchases and account/provider changes are separate scopes."
+    ],
+    "sources": [
+      "https://learn.chatgpt.com/docs/developer-commands",
+      "https://learn.chatgpt.com/docs/app-server",
+      "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
+      "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/app-server-protocol/src/protocol/v2/account.rs#L330",
+      "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/app-server/src/request_processors/account_processor/rate_limit_resets.rs#L100",
+      "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/sdk/python/src/openai_codex/generated/v2_all.py#L1084"
+    ],
+    "user_report": "User reports Codex usage allowance reset and requests all sessions continue with highest quality resolution.",
+    "execution": "No earned reset consumed, purchase made or account changed by this review. Research workers resumed after the user notice; this is not a global account quota attestation.",
+    "readiness_observation": {
+      "observed_at": "2026-10-01T02:54:36Z",
+      "method": "Supported native scripts/codex_quota.py --json account/rateLimits/read observation",
+      "ordinary_usage_allowed": true,
+      "available_earned_reset_count": 1,
+      "read_exit_code": 0,
+      "attempts": 1,
+      "model_turns": 0,
+      "resets_consumed": 0,
+      "evidence": "evidence/artifacts/all-layer-next-gap-resolution-20261001/native-quota-observation.json",
+      "interpretation": "Native Codex ordinary usage is currently allowed and one reset credit is available. No credit redemption or administrative reset was performed; other client/account limits remain separate."
+    },
+    "initial_readiness_observation": {
+      "observed_at": "2026-10-01T00:36:45Z",
+      "method": "Official openai-codex 0.159.2 AsyncCodexClient.request account/rateLimits/read with generated response type",
+      "ordinary_usage_allowed": null,
+      "available_earned_reset_count": null,
+      "read_exit_code": 1,
+      "unknown_error_class": "InvalidRequestError",
+      "attempts": 1,
+      "model_turns": 0,
+      "resets_consumed": 0,
+      "interpretation": "Native quota readiness and available earned resets remain unknown; no retry or inference from timestamps."
+    }
+  },
+  "session_notice": {
+    "user_report": "Codex usage allowance reset; continue authorized work with highest quality resolution.",
+    "local_delivery": "Reset notice delivered to the active Codex research, verification and HTML workstream agents; previously errored research workers resumed and completed their bounded tasks.",
+    "native_delivery": "Native peer discovery succeeded. A scoped Opus/Max call returned success, exit 0, and reported all six SendMessage deliveries queued. Reading, continuation and peer approval remain unconfirmed.",
+    "native_recipients": [
+      "native-agent-stack-88",
+      "native-agent-stack-6d",
+      "sota-default-harness-setup",
+      "terminal-notification-tuning",
+      "native-agent-stack-ae",
+      "codex-runtime-litellm-handoff-20260930-2340"
+    ],
+    "native_delivery_observation": {
+      "interface": "Installed Claude -p, SendMessage only; per-call hooks disabled and empty strict MCP configuration; native account preserved",
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "client_version_reported": "2.1.286",
+      "exit_code": 0,
+      "terminal_reason": "completed",
+      "num_turns": 7,
+      "duration_ms": 42755,
+      "queued_recipients_reported": 6,
+      "errors_reported": 0,
+      "reading_confirmed": false,
+      "peer_approval_received": false,
+      "usage": {
+        "input_tokens": 4,
+        "cache_creation_input_tokens": 11572,
+        "cache_read_input_tokens": 14523,
+        "output_tokens": 4783,
+        "thinking_tokens_subset": 2977
+      },
+      "usage_scope": "One bounded native communication call; earlier timed-out communication usage remains unknown; cost returned at list basis is not backend billing proof."
+    },
+    "broadcast_attempts": [
+      {
+        "interface": "Inherited native ListAgents/SendMessage headless call",
+        "deadline_seconds": 75,
+        "outcome": "timeout_without_confirmed_delivery",
+        "usage": null
+      },
+      {
+        "interface": "Scoped native flags, variadic --tools without prompt separator",
+        "exit_code": 1,
+        "outcome": "argument_parsing_refused_missing_input",
+        "model_turns": 0
+      },
+      {
+        "interface": "Scoped native flags with -- prompt separator",
+        "deadline_seconds": 75,
+        "outcome": "peer_discovery_succeeded_then_timeout_before_confirmed_SendMessage",
+        "usage": null
+      },
+      {
+        "interface": "Scoped SendMessage-only call to previously observed native peer names",
+        "deadline_seconds": 240,
+        "exit_code": 0,
+        "outcome": "six_deliveries_reported_queued",
+        "reading_confirmed": false
+      }
+    ],
+    "argument_correction": "Variadic --tools consumed the prompt without --; installed error exit 1 was corrected with the end-of-options separator before the prompt. Exact native invocation then reached discovery and the later SendMessage-only call completed."
+  },
+  "dashboard_checkpoint": {
+    "path": "observability/grand-dashboard/state.json",
+    "gate_id": "runtime-worker-landscape-20260930",
+    "worker_id": "omniroute-enhanced-sdk-20260930",
+    "owned_references_present": true,
+    "source_pattern": "observability/grand-dashboard/README.md and progress.py native bounded public checkpoint contract",
+    "full_snapshot_observation": {
+      "status": "passed_at_recorded_checkpoint",
+      "native_exit_code": 0,
+      "records": 112,
+      "independent_observed_at_utc": "2026-10-01T02:43:09.184856+00:00",
+      "checkpoint_sha256": "228655836c3207378019a81fc0135a42c1791f06629631ad9220920cf6799677",
+      "recovery_evidence": "evidence/artifacts/all-layer-next-gap-resolution-20261001/recovery-observation.json",
+      "independent_review": "evidence/artifacts/all-layer-next-gap-resolution-20261001/independent-review.json",
+      "scope": "Exact16-file historical restoration and existing metadata contract repair; retained failures, no new paper execution. Future concurrent edits require revalidation."
+    },
+    "owner_notification": {
+      "native_exit_code": 0,
+      "native_tool_successes": 4,
+      "reported_state": "queued",
+      "duration_ms": 33793,
+      "num_turns": 5,
+      "private_original_sha256": "6d4876be4f11d823c0d7ef717338da4e419caeae7a538b7127c98128e2964f91",
+      "private_original_mode": "0600",
+      "reading_confirmed": false,
+      "usage": {
+        "input_tokens": 4,
+        "cache_creation_input_tokens": 9707,
+        "cache_read_input_tokens": 16151,
+        "output_tokens": 3702
+      },
+      "usage_scope": "One native four-owner checkpoint notification call; distinct from reset broadcast and worker acceptance."
+    },
+    "freshness_rule": "Recorded checkpoint, emitter freshness, native process liveness and worker acceptance remain distinct.",
+    "initial_full_snapshot_observation": {
+      "status": "failed_preexisting_foreign_reference",
+      "error_class": "ValueError",
+      "error": "missing evidence reference",
+      "missing_reference": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md",
+      "scope": "Existing paper row outside the runtime workstream; owning native sessions notified. No paper state changed or evidence invented."
+    }
+  },
+  "late_upstream_release_observation": {
+    "component": "codex-cli",
+    "retained_worker_sdk_and_bundled_cli": "0.159.2",
+    "latest_public_cli_release": "0.159.3",
+    "published_at": "2026-09-30T22:57:34Z",
+    "revision": "01fc69f4026735edfdf6789820549727a4867b11",
+    "release_notes_scope": "Optional account-security setup reminders for eligible local sessions signed in with ChatGPT.",
+    "selection": "Retain the receipt-qualified SDK/bundled CLI 0.159.2 worker. This newer CLI release is source-reviewed metadata, not a new SDK/provider qualification or a measured quality improvement.",
+    "sources": [
+      "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+      "https://github.com/openai/codex/tree/01fc69f4026735edfdf6789820549727a4867b11"
+    ],
+    "verification": {
+      "latest_release_api_exit_code": 0,
+      "tag_ref_api_exit_code": 0,
+      "annotated_tag_peel_exit_code": 0
+    },
+    "new_client_installations": 0,
+    "new_model_trials": 0
+  },
+  "html_view": {
+    "generator": "scripts/build_ecosystem.py",
+    "template": "docs/ecosystem/template.html",
+    "output": "docs/ecosystem/index.html",
+    "panel": "Runtime workers",
+    "source_pattern": "Existing repository optional memory_rag_review ingestion and offline catalog panels; preserve shared builder/template changes.",
+    "scope": "Offline searchable source landscape, qualified evidence, distinct native usage scopes, native reset policy, original manifest download and embedded linked guides. Generated output is local and not committed.",
+    "validation": {
+      "classification": "Locally authored renderer and integration checks; not upstream runtime tests or a new model trial.",
+      "checks": [
+        {
+          "command": "rtk python3 -m unittest tests.test_ecosystem_manifest",
+          "exit_code": 0,
+          "returned_summary": "Ran 69 tests in 20.731s; OK"
+        },
+        {
+          "command": "rtk python3 scripts/build_ecosystem.py --check",
+          "exit_code": 0,
+          "returned_status": "passed"
+        },
+        {
+          "command": "rtk git diff --check",
+          "exit_code": 0,
+          "returned_output": ""
+        }
+      ],
+      "coverage": [
+        "All 17 candidates",
+        "Docs-only null pins",
+        "Four evidence records and three distinct linked receipts",
+        "Eight enhancement cards",
+        "Local citation input hashing",
+        "Optional absent sections",
+        "Filters and reset",
+        "Four separate native usage counters",
+        "Original-data JSON download",
+        "Node execution of the complete generated page"
+      ],
+      "new_runtime_model_trials": 0
+    }
+  },
+  "all_layer_followup": "evidence/artifacts/all-layer-next-gap-resolution-20261001/manifest.json"
+}

@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "kind": "all_layer_integration_validation",
+  "checked_at_utc": "2026-10-01T03:37:07.483816Z",
+  "classification": "Local repository integration and artifact/declaration checks, not unchanged upstream tests or new provider/broker acceptance.",
+  "checks": [
+    {
+      "command": [
+        "rtk",
+        "proxy",
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_ecosystem_manifest"
+      ],
+      "exit_code": 0,
+      "returned_stdout": "",
+      "returned_stderr": "..........................................................................\n----------------------------------------------------------------------\nRan 74 tests in 20.320s\n\nOK\n",
+      "returned_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_stderr_sha256": "94047e8879c3875fd83a287b2d6f6525f5e73ab8db8418c56c0d94d9a15798c1"
+    },
+    {
+      "command": [
+        "rtk",
+        "python3",
+        "scripts/validate.py"
+      ],
+      "exit_code": 0,
+      "returned_stdout": "{\"components\": 69, \"hashed_files\": 8318, \"profiles\": 4, \"receipts\": 177, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+      "returned_stderr": "",
+      "returned_stdout_sha256": "1c30cc43bbc5033c8d2ff206a08fdc61173bd6230acf1c5028a0304d6901bf3a",
+      "returned_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "rtk",
+        "python3",
+        "scripts/build_ecosystem.py",
+        "--check"
+      ],
+      "exit_code": 0,
+      "returned_stdout": "{\"bytes\": 17193263, \"input_sha256\": \"f881506ed3b638f4c3a05d95cd5abc639cf7b8feebe7e7f34b910ccf26a3a3ef\", \"output_sha256\": \"6562943b7562911f7cb75403999992f3094c4504de38cc500e7d72f853db759b\", \"status\": \"passed\"}\n",
+      "returned_stderr": "",
+      "returned_stdout_sha256": "fe3c4361dd70142f3894ce1a1da4ca33abc0f15aa421629ff954e2696b7b5b1b",
+      "returned_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "rtk",
+        "python3",
+        "scripts/validate_convergence.py",
+        "blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json",
+        "--json"
+      ],
+      "exit_code": 0,
+      "returned_stdout": "{\"records\": [{\"errors\": [], \"observations\": 16, \"path\": \"blueprints/convergence-practice/omniroute-runtime-enhancements/experiment.json\", \"valid\": true}], \"valid\": true}\n",
+      "returned_stderr": "",
+      "returned_stdout_sha256": "03c788cf2dcca56251468320de8cdc5f8c04d16732a312a480989c6754e38ade",
+      "returned_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "rtk",
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0,
+      "returned_stdout": "",
+      "returned_stderr": "",
+      "returned_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "returned_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "preserved_observation": "Initial ctx_batch test summary retrieval did not expose a complete native stderr/exit summary; proxy rerun retains actual returned output. Initial HTML snapshot before copy/review edits differed from current manifest; final rebuild/equality verification follows.",
+  "usage_claim": "none",
+  "final_metadata_and_privacy_observation": {
+    "status": "passed",
+    "observed_at_utc": "2026-10-01T03:37:07.483816Z",
+    "records": 113,
+    "checkpoint_stable_during_snapshot": true,
+    "checkpoint_sha256": "1a4061d7bd2e4800fa3d2acae70bafb970f3bfd4846e1ebeed1d9cf62aec5c96",
+    "public_files_scanned": 11,
+    "public_artifact_scan_errors": {},
+    "acceptance_scope": "Current local native snapshot and public artifact scanner only; later shared edits require revalidation. Generated-page privacy scan is for the prior snapshot, before the final rebuild."
+  },
+  "real_generated_page_observation": {
+    "observed_snapshot_bytes": 17144411,
+    "observed_snapshot_sha256": "5b799a8158b47e813e7f351a4da37ad83be42352b9fc1d70165b310618597e0a",
+    "native_node_exit_codes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "layer_cards": 32,
+    "evidence_hrefs": 125,
+    "execution_cards": 5,
+    "lane_counts": [
+      20,
+      12
+    ],
+    "runtime_counts": {
+      "candidates": 17,
+      "evidence": 4,
+      "enhancements": 8
+    },
+    "js_errors": 0,
+    "missing_dom_ids": 0,
+    "download_equality": "passed_against_embedded_originals",
+    "freshness": "Older snapshot predates subsequent native quota/review/copy edits; final rebuild/current-file equality follows.",
+    "classification": "Locally authored real generated-page integration checks, not native provider acceptance."
+  },
+  "native_browser_observation": "evidence/artifacts/all-layer-next-gap-resolution-20261001/browser-observation.json",
+  "freshness_contract": "The 74-test code acceptance and browser controls remain reusable while their code is unchanged. Build-check digests identify that invocation; the final generated file is rebuilt after this receipt is registered, then its manifest downloads are compared with current source files without mutating inputs."
+}

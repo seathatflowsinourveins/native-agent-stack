@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "kind": "independent_native_evidence_review",
+  "role": "Astra/Max stack-verifier",
+  "verdict": "No material false acceptance found; SDK0.159.3 remains a candidate after the actual provider failure.",
+  "checks": [
+    {"claim":"Published SDK/bundled CLI0.159.3 match locks and installed metadata; selected SDK source files match the exact pin","verdict":"confirmed"},
+    {"claim":"Native Claude invoked the SDK worker with native serverInfo0.159.3 and requested Sol/Max","verdict":"confirmed"},
+    {"claim":"Real SDK task succeeded","verdict":"refuted; actual native Bash exit2 and owned rollout HTTP429, duration975ms"},
+    {"claim":"Parent success implies worker acceptance","verdict":"refuted; parent cumulative cost0.2888852 verified, worker usage null"},
+    {"claim":"Parent and rollout original digests match the manifest","verdict":"confirmed"},
+    {"claim":"Repaired local fixtures passed13 tests in18.679s","verdict":"confirmed from recovered original output; recorded run exit0; not rerun"},
+    {"claim":"All13 original test-method ASTs remain unchanged","verdict":"confirmed against canonical workspace file with matching recorded source hash"},
+    {"claim":"Fixture cleanup suppresses errors or qualifies production descendant cleanup","verdict":"refuted; strict owned pidfd wait errors on timeout; production cleanup remains unqualified"},
+    {"claim":"Eleven owned processes subsequently exited and old failed residue remains","verdict":"confirmed independently"},
+    {"claim":"Six initial sends and two provider handoff sends returned successful queued acknowledgments","verdict":"confirmed enqueue only; original reply bodies and provider repair acceptance unobserved"},
+    {"claim":"Selected upstream API oracle remains unchanged","verdict":"confirmed exact pinned source and zero byte difference"},
+    {"claim":"Selected upstream API test execution","verdict":"Root observed native exit0,3 passed/17 deselected; original output was not independently recovered in this review"},
+    {"claim":"Installed OmniRoute npm package equals the reviewed source SHA","verdict":"not established; version and registry integrity confirmed, package gitHead absent"}
+  ],
+  "corrections": [
+    "Peer citation pointed to agent-teams; corrected to the cross-session-messaging documentation used by both native receipts.",
+    "Git main: lookup exited128 and HEAD: lookup exited128 because the canonical fixture is absent from HEAD; AST comparison uses the workspace file bound by its recorded SHA.",
+    "Native plugin staging names do not establish git clone argv; pinned source uses git -C init/fetch/reset."
+  ],
+  "scope": "Read-only comparison of original native returns, artifacts, pinned source, metadata and current owned process absence. No fixture/model/provider/service runs or resets by this reviewer.",
+  "sources": [
+    "https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/sdk/python/src/openai_codex/client.py#L283",
+    "https://code.claude.com/docs/en/cross-session-messaging",
+    "https://github.com/anthropics/claude-code/tree/f5f60250a032caa72d1eb47f9ca5f29becc7066f"
+  ]
+}

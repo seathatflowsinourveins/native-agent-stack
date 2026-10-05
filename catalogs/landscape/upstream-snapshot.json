@@ -634,8 +634,8 @@
       "component_id": "codex",
       "repository": "https://github.com/openai/codex",
       "selected_repository_url": "https://github.com/openai/codex",
-      "selected_version": "0.157.1",
-      "selected_source_pin": null,
+      "selected_version": "0.159.2",
+      "selected_source_pin": "ff6aec96948b70d94983af2641a6b67c94faeff5",
       "checks": [
         {
           "endpoint": "repos/openai/codex",
@@ -668,33 +668,57 @@
           "ended_at": "2026-09-26T05:12:19.618765+00:00",
           "stdout_sha256": "da5250b703846ff273554e3333b550d0a4aacfd9178871c1a420faccfb1947d7",
           "status": "ok"
+        },
+        {
+          "endpoint": "repos/openai/codex",
+          "exit_code": 0,
+          "stdout_sha256": "9cef916efe9cbea8ea536c1742ab93237580c0f5309421f143712ecd2e17fb25",
+          "status": "ok",
+          "time_scope": "Original native capture in this 2026-09-30 scoped refresh; exact per-call timestamps not retained after parsing failure."
+        },
+        {
+          "endpoint": "repos/openai/codex/releases/latest",
+          "exit_code": 0,
+          "stdout_sha256": "5bab52b8b3f7550b86ef64b249c95efe53dd7a7dfc40f330e760bb6ce93f221c",
+          "status": "ok",
+          "time_scope": "Original native capture in this 2026-09-30 scoped refresh; exact per-call timestamps not retained after parsing failure."
+        },
+        {
+          "endpoint": "repos/openai/codex/commits/ff6aec96948b70d94983af2641a6b67c94faeff5",
+          "exit_code": 0,
+          "stdout_sha256": "37036561aac82823f696952f3dfc1117a6a0fe3dc3922eeedce5fc3fcbfac95b",
+          "status": "ok",
+          "response_representation": "Native gh --jq selected public commit fields."
         }
       ],
       "canonical_repository": "https://github.com/openai/codex",
       "archived": false,
       "disabled": false,
       "default_branch": "main",
-      "pushed_at": "2026-09-26T05:05:20Z",
+      "pushed_at": "2026-09-30T07:15:31Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "rust-v0.157.1",
-        "published_at": "2026-09-26T01:02:31Z",
-        "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.157.1",
+        "tag_name": "rust-v0.159.2",
+        "published_at": "2026-09-29T23:57:16Z",
+        "html_url": "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "latest_release_source": {
-        "ref": "rust-v0.157.1",
-        "sha": "36650394c5b38c2990ccf2a3457165ca3e9d9726",
-        "html_url": "https://github.com/openai/codex/commit/36650394c5b38c2990ccf2a3457165ca3e9d9726",
-        "committed_at": "2026-09-25T23:41:40Z"
+        "ref": "rust-v0.159.2",
+        "sha": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+        "html_url": "https://github.com/openai/codex/commit/ff6aec96948b70d94983af2641a6b67c94faeff5",
+        "committed_at": "2026-09-29T22:57:04Z"
       },
       "status": "metadata_checked",
-      "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "adoption_recommendation": "retain_current_host_qualified_selection",
+      "source_pin_kind": "commit",
       "primary_repository": "https://github.com/openai/codex",
-      "release_relationship": "selected_version_matches_latest_stable"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "selection_refreshed_at_utc": "2026-09-30T07:26:04Z",
+      "selection_qualification_ref": "evidence/receipts/codex-01592-host-finalization-20260930.json",
+      "refresh_scope": "Only this row refreshed; original global scan counts and dates retain their prior scope. Latest release metadata is separate from native current-host package/config qualification."
     },
     {
       "component_id": "codex-for-claude",

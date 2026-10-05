@@ -1,0 +1,294 @@
+{
+  "schema_version": 1,
+  "kind": "memory_runtime_resolution",
+  "checked_at": "2026-09-30",
+  "lane": "foundation",
+  "status": "recommendation_finalized_native_acceptance_pending",
+  "objective": "Choose a current pinned memory backbone that passes the same native Claude/Codex correctness, freshness, isolation and recoverable lifecycle requirements at measured complete operating cost.",
+  "candidate_list_status": "finalized_for_this_qualification_wave",
+  "backbone_winner": null,
+  "reference_profile": "foundation-cpu",
+  "canonical_component_source": "manifests/stack.json",
+  "canonical_install_source": "adoption/pins-linux-x86_64.json",
+  "foundation_installation_record": "evidence/artifacts/memory-runtime-resolution-20260930/foundation-prefix.json",
+  "native_evidence_records": [
+    "evidence/artifacts/memory-runtime-resolution-20260930/foundation-prefix.json",
+    "evidence/artifacts/memory-runtime-resolution-20260930/ai-memory-native.json",
+    "evidence/artifacts/memory-runtime-resolution-20260930/hindsight-chunk-native.json",
+    "evidence/artifacts/memory-runtime-resolution-20260930/agentmemory-native.json",
+    "evidence/artifacts/memory-runtime-resolution-20260930/latestness.json",
+    "evidence/artifacts/memory-runtime-resolution-20260930/published-coding-evidence.json",
+    "evidence/artifacts/memory-runtime-resolution-20260930/provider-quota-capability.json",
+    "evidence/artifacts/full-lanes-resolution-20260930/manifest.json",
+    "evidence/artifacts/full-lanes-resolution-20260930/peer-messaging.json",
+    "evidence/artifacts/full-lanes-resolution-20260930/independent-review.json",
+    "evidence/artifacts/omni-harness-native-resolution-20260930/manifest.json",
+    "evidence/artifacts/omni-harness-native-resolution-20260930/peer-messaging.json",
+    "evidence/artifacts/omni-harness-native-resolution-20260930/independent-review.json",
+    "docs/omni-harness-native-resolution-20260930.md",
+    "evidence/artifacts/native-stack-gap-audit-20261001/manifest.json",
+    "docs/native-stack-gap-audit-20261001.md"
+  ],
+  "platform": {
+    "profile": "linux-wsl2-x86_64",
+    "native_recipe": "adoption/platforms/linux-wsl2.md",
+    "deployment_shape": "New owned installation prefix on the existing WSL host, with separate candidate state and no active client wiring.",
+    "new_wsl_distribution_created": false,
+    "second_machine_acceptance": false,
+    "runtime_acceptance_verified": false
+  },
+  "new_distribution_proposal": {
+    "status": "prepared_not_executed",
+    "distribution": "Ubuntu-24.04",
+    "name": "NativeStackResolution",
+    "reason": "Ubuntu24.04 is offered by the installed WSL client and matches the repository's retained Ubuntu24.04 userspace qualification. Offered Ubuntu26.04 is not accepted by those historical receipts.",
+    "windows_native_command": "wsl.exe --install Ubuntu-24.04 --name NativeStackResolution --version 2 --no-launch --location <OWNED_WINDOWS_LOCATION>",
+    "execution_boundary": "A proposed command only. No distro install, WSL update, kernel replacement or default-distro change ran.",
+    "installed_wsl_version": "2.7.13.0",
+    "current_upstream_wsl_release": "3.0.1",
+    "wsl_upgrade_status": "Source-reviewed current release; upgrade and runtime acceptance unexecuted.",
+    "observations": {
+      "version_exit_code": 0,
+      "online_distribution_list_exit_code": 0,
+      "help_exit_code": 255,
+      "help_scope": "Installed help text lists name/location/no-launch/version flags despite exit255; the official command documentation supports the proposed syntax."
+    },
+    "sources": [
+      "https://github.com/microsoft/WSL/releases/tag/2.7.13",
+      "https://github.com/microsoft/WSL/releases/tag/3.0.1",
+      "https://learn.microsoft.com/en-us/windows/wsl/basic-commands",
+      "https://developers.openai.com/codex/windows/wsl/",
+      "adoption/platforms/linux-wsl2.md",
+      "docs/portable-userspace-install-20260921.md"
+    ],
+    "follow_on": [
+      "Create the normal Linux user through the native distro first-launch flow.",
+      "Place the repository under the Linux home filesystem and check out the attested catalog release; current client-pin adoption needs its own qualified release.",
+      "Run the native profile bootstrap, sign in through native client flows, and apply only the selected supported integrations.",
+      "Execute fresh-host native capture, isolation, recovery and complete usage gates; existing-host receipts remain historical."
+    ]
+  },
+  "core_component_ids": [
+    "codex",
+    "claude-code",
+    "context-mode",
+    "qmd",
+    "rtk",
+    "ai-memory",
+    "mcporter"
+  ],
+  "project_scoped_component_ids": [
+    "serena",
+    "socraticode"
+  ],
+  "optional_component_ids": [
+    "dagu"
+  ],
+  "memory_candidates": [
+    {
+      "id": "ai-memory",
+      "role": "Operational reference and current-patch lifecycle qualification",
+      "accepted_version": "2.4.1",
+      "trial_version": "2.4.2",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "revision": "a0ca8d1a5fbd5920799411fa891fe6d49c90efc1",
+      "execution_status": "scoped_native_lifecycle_and_recovery_passed_full_capture_pending",
+      "observed_result": "101 lifecycle and 65 recovery integration checks passed; 42 unchanged upstream scope tests passed. First restore refusal and full-store timeout retained. No production upgrade or automatic capture acceptance.",
+      "native_record": "evidence/artifacts/memory-runtime-resolution-20260930/ai-memory-native.json",
+      "sources": [
+        "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/docs/install.md",
+        "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/docs/lifecycle-ops.md",
+        "blueprints/memory-lifecycle-v2/README.md"
+      ],
+      "promotion_limit": "Fresh-prefix local lifecycle execution does not establish model-quality superiority or change the accepted production pin.",
+      "latest_upstream_version": "2.5.0",
+      "latest_upstream_revision": "a8757a05a960f96a0ba510b6341bcd520cf80bb2",
+      "latest_upstream_status": "source_review_only_not_executed",
+      "cli_version_observed_on_fresh_check": "2.4.2"
+    },
+    {
+      "id": "hindsight",
+      "role": "Shared native lifecycle and conversational-quality challenger",
+      "server_version": "0.10.2",
+      "server_revision": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "integration_version": "0.8.0",
+      "integration_revision": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "execution_status": "chunk_only_backend_qualified_integration_capture_disabled",
+      "observed_result": "Two-document chunk retain/recall, restart, bank transfer and independent source/target deletion controls passed. Restore used different banks in one profile; no observations, pages, reflection or native-client capture accepted.",
+      "native_record": "evidence/artifacts/memory-runtime-resolution-20260930/hindsight-chunk-native.json",
+      "evidence": "evidence/receipts/memory-rag-20260930.json",
+      "provider_status": "Upstream none-provider chunk-only mode qualified with explicit local embeddings/reranker; full retain/reflect quality and complete cost remain pending",
+      "sources": [
+        "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/README.md",
+        "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/docs/developer/api/memory-banks.mdx",
+        "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-system-evals/README.md"
+      ],
+      "promotion_limit": "1279 passing package fixtures and launcher installation do not accept a running backend, live native capture, a restored bank or a quality/token winner.",
+      "recommendation_status": "recommended_shared_native_target_full_acceptance_pending"
+    },
+    {
+      "id": "agentmemory",
+      "role": "Controlled local retrieval challenger",
+      "trial_version": "0.9.29",
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "revision": "2d38dafede67d0d4ed920cde94d2106e98825b8a",
+      "runtime_dependency": "iii 0.11.2; Node >=20",
+      "execution_status": "current_upstream_evaluator_contract_unresolved",
+      "observed_result": "Two unchanged eval runs completed but 0/15 scores are invalid for backend quality because returned session IDs bypass fixture mapping. Native HTTP verified 15 records and six search results. Keyless default was BM25-only; owned worker leaks were explicitly cleaned up.",
+      "native_record": "evidence/artifacts/memory-runtime-resolution-20260930/agentmemory-native.json",
+      "sources": [
+        "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/INSTALL_FOR_AGENTS.md",
+        "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/eval/README.md"
+      ],
+      "promotion_limit": "The upstream coding-life retrieval fixture does not prove native hook capture, complete empty-target recovery or a production replacement."
+    },
+    {
+      "id": "mempalace",
+      "role": "Reserve local retrieval challenger",
+      "trial_version": "3.10.0",
+      "repository": "https://github.com/MemPalace/mempalace",
+      "revision": "22fd87f09c19d5ffb2d6966486483353937931c0",
+      "execution_status": "source_review_only_not_selected_for_this_execution_wave",
+      "reason": "Published any-session retrieval is strong; independently accepted native capture and full recovery are outstanding."
+    },
+    {
+      "id": "mem0",
+      "role": "Conditional managed alternative",
+      "oss_version": "2.2.1",
+      "repository": "https://github.com/mem0ai/mem0",
+      "revision": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+      "execution_status": "source_review_only_managed_profile_unselected",
+      "reason": "Managed benchmarks and Platform plugin routes do not establish the local OSS integration or its complete cost."
+    }
+  ],
+  "native_operations": [
+    {
+      "id": "prerequisites",
+      "source": "scripts/adoption_status.py",
+      "command": "rtk python3 scripts/adoption_status.py --profile foundation-cpu --json",
+      "observed_status": "prerequisites_present",
+      "acceptance_scope": "Read-only command and recipe presence; runtime_acceptance_verified remains false."
+    },
+    {
+      "id": "clean_prefix_install",
+      "source": "adoption/bootstrap-linux.sh",
+      "command": "ECO_INSTALL_ROOT=<OWNED_PREFIX>/runtime rtk bash <FROZEN_SOURCE>/adoption/bootstrap-linux.sh --profile foundation-cpu --skip-system-packages",
+      "observed_status": "exit_0_ten_verified_zero_failed",
+      "acceptance_scope": "Supported pinned package installation and bounded version probes only; existing Claude2.1.285 and npm cache retained, so this is not an independent full userspace."
+    },
+    {
+      "id": "agentmemory_retrieval",
+      "source": "agentmemory eval/README.md and eval/scripts/sandbox.sh at the candidate pin",
+      "command": "source eval/scripts/sandbox.sh; cd <PINNED_SOURCE>; rtk npm run eval:coding-life -- --adapters grep,agentmemory",
+      "observed_status": "two_exit_0_runs_invalid_backend_quality_scores",
+      "acceptance_scope": "Unchanged upstream keyless retrieval harness with unique SANDBOX_ROOT; source resets cwd, so caller returns to pinned source. The mapping mismatch remains unmodified. Owned-process leaks explicitly stopped and temporary roots removed."
+    },
+    {
+      "id": "ai_memory_lifecycle",
+      "source": "ai-memory docs/lifecycle-ops.md at the candidate pin; unchanged blueprints/memory-lifecycle-v2 fixture",
+      "observed_status": "scoped_native_fixture_and_42_upstream_tests_passed",
+      "acceptance_scope": "101 lifecycle and 65 recovery integration checks; native backup and empty-target restore. First guard refusal and full-store timeout retained. No production store, automatic capture or model-quality benchmark."
+    },
+    {
+      "id": "hindsight_chunk_backend",
+      "source": "Hindsight0.10.2 config.py, none_llm.py and bank-transfer API",
+      "observed_status": "chunk_only_storage_restart_transfer_isolation_passed",
+      "acceptance_scope": "No-LLM mode in a new profile with local embedding/reranker. Two-document restore in a different bank of the same profile; no separate instance or observation/page/reflect acceptance. Owned API/database stopped natively."
+    }
+  ],
+  "isolation": {
+    "active_client_configuration_changed": false,
+    "production_memory_migrated": false,
+    "authentication_store_read_or_copied": false,
+    "native_signins": "Preserve existing native client sign-ins; another distro must sign in through each supported native flow.",
+    "hook_trust": "Ordinary client trust. The Hindsight container E2E copies native Codex auth and bypasses hook trust, so it cannot satisfy this gate.",
+    "private_evidence": "Actual output stays in owned private prefixes; public receipts contain bounded sanitized results, hashes and explicit scope."
+  },
+  "architecture_review": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "trigger": "Consequential clean-runtime architecture/provider trust, then conflicting primary evaluator/default evidence unresolved after one bounded Sol diagnosis",
+    "accepted_result": "Accept the qualification wave and finalist roles, preserving all failures. Keep ai-memory as the operational reference; Hindsight is the priority quality/lifecycle challenger, and agentmemory's current evaluator qualification is blocked by session identity. No final backbone/token winner. Another embedding run cannot repair evaluator IDs. Use a maintained correction or supported matched harness before comparative quality/cost promotion.",
+    "correction": "Linux bootstrap has no --plan flag; parser and native exit2 establish this. Do not generalize the macOS-only option.",
+    "dispatch_limit": "The first follow-up dispatch hit the active-thread limit. Retried successfully after worker completion freed slots; this is dispatch capacity, not a native provider retry.",
+    "latest_recommendation_acceptance": "Astra/max accepts Hindsight as fit-based shared-native target, strengthened by published SDE-bench comparisons. New ai-memory 2.5.0 features strengthen the competing fit but are source-only; no overall/token winner."
+  },
+  "corrections": [
+    {
+      "earlier_interpretation": "agentmemory 0/15 implied no useful backend retrieval.",
+      "verified_correction": "Native ingestion stored all 15 fixture records and smart-search returned results. The unchanged adapter prefers synthetic sessionId=memory, suppressing its fallback observation-to-session map. Both zero-score attempts are invalid for backend quality, while the current upstream harness qualification remains unresolved.",
+      "verification_sources": [
+        "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/src/state/memory-utils.ts#L14",
+        "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/eval/runner/adapters/agentmemory.ts#L81"
+      ]
+    },
+    {
+      "earlier_interpretation": "The default keyless agentmemory run uses local MiniLM embeddings.",
+      "verified_correction": "At the executed pin, detectEmbeddingProvider returns null without EMBEDDING_PROVIDER or a recognized provider key, and createEmbeddingProvider then returns null. A future local hybrid comparison must explicitly select the documented local provider. The current run did not establish MiniLM hybrid quality.",
+      "verification_sources": [
+        "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/src/config.ts#L265",
+        "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/src/providers/embedding/index.ts#L30"
+      ]
+    },
+    {
+      "earlier_interpretation": "The refused ai-memory restore created wiki scope directories.",
+      "verified_correction": "Independent target inspection found logging scaffolding, not wiki scope directories. The native refusal and unchanged-target fixture failure are both retained. A bounded clean PID/network namespace retry passed without disabling the native global sibling-process guard.",
+      "verification_sources": [
+        "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/crates/ai-memory-cli/src/process_guard.rs",
+        "blueprints/memory-lifecycle-v2/README.md"
+      ]
+    },
+    {
+      "claim": "Latest release and tested version are interchangeable.",
+      "correction": "ai-memory latest 2.5.0 is source-only; earlier qualified native fixture is 2.4.2. Current CLI probe and canonical accepted pin are separately reported.",
+      "verification": "evidence/artifacts/memory-runtime-resolution-20260930/latestness.json"
+    }
+  ],
+  "selection_gate_source": "evidence/artifacts/memory-rag-20260930/backbone-assurance.json",
+  "binding_replacement_rules": [
+    "catalogs/landscape/foundation.json",
+    "catalogs/foundation/memory-stack-20260925.json"
+  ],
+  "next_acceptance": [
+    "Identify a maintained upstream evaluator correction or supported matched harness that preserves fixture identity; the current agentmemory coding-life adapter cannot establish comparable scores.",
+    "Execute both native clients in disposable projects with ordinary trust and scope-isolation negatives.",
+    "Observe freshness, interruption/replay, deletion with seeding disabled, and independent empty-target recovery.",
+    "Run the binding matched quality comparison on current deployable profiles, including the production ai-memory reranker control.",
+    "Record initial and ongoing model, embedding, refresh, reranking, retry and downstream usage; keep cache and billing scopes distinct, and unknown usage unknown.",
+    "Promote one memory configuration only after those gates pass; a new distro and version probes cannot substitute for them."
+  ],
+  "usage": {
+    "qualification_provider_requests": null,
+    "research_usage": "unknown",
+    "token_efficiency_winner": null
+  },
+  "recorded_limitations": [
+    "Qualification is on the existing WSL kernel and host.",
+    "Candidate selection for execution is not a final backbone award.",
+    "No retrospective preregistration or new matched-quality result is claimed.",
+    "The current source snapshot may include uncommitted reviewed adoption pins; published release qualification remains separate."
+  ],
+  "recommended_target": "hindsight",
+  "recommendation_basis": "fit_based_shared_native_memory_target",
+  "latestness_record": "evidence/artifacts/memory-runtime-resolution-20260930/latestness.json",
+  "published_coding_evidence": "evidence/artifacts/memory-runtime-resolution-20260930/published-coding-evidence.json",
+  "evidence_record_interpretation": "Linked records distinguish native local execution, fresh release/source observations and publisher benchmark aggregation; the published coding study is not a new host execution.",
+  "continuation": {
+    "scope": "Provider usage quota recovery and cross-session evidence continuity",
+    "protocol": "docs/landscape-continuation.md",
+    "queue": "catalogs/landscape/research-state.json#/layers (foundation/durable-memory)",
+    "quota_reset_preference": "Use an eligible provider-native earned/free reset when an applicable limit is reached; otherwise continue after the provider allowance window resets.",
+    "codex_reset_contract": "Read account/rateLimits/read; when eligible, use account/rateLimitResetCredit/consume with one logical idempotencyKey reused on retries. Re-read limits after reset/alreadyRedeemed.",
+    "claude_reset_contract": "Eligible reset offer uses the native browser/Desktop Settings > Usage > Resets flow; account-specific availability is unknown here.",
+    "native_capability_evidence": "evidence/artifacts/memory-runtime-resolution-20260930/provider-quota-capability.json",
+    "reset_execution_status": "Not executed; no account allowance query, credit consumption or automatic reset controller installation.",
+    "handoff_contract": "Carry requirement, recommended versus accepted state, exact pins, actual receipts, failures, unknown usage and next bounded gate. Preserve native account/model/effort choices.",
+    "sota_refresh": "On resume, refresh changed evidence for the selected layer in installed-client, release changelog, immutable source, official-doc order; reuse matching acceptance receipts.",
+    "current_verdict": "Hindsight fit-based target; canonical ai-memory reference retained; measured backbone and complete-cost winner fields remain null. Latest ai-memory 2.5.0 is source-only.",
+    "resume_message": "Continue foundation/durable-memory from catalogs/landscape/research-state.json and the 20260930 memory runtime resolution manifest. Refresh changed upstream evidence, retain scoped failures and proceed through the next native acceptance gate."
+  },
+  "full_lanes_resolution_record": "evidence/artifacts/full-lanes-resolution-20260930/manifest.json",
+  "native_harness_resolution_record": "evidence/artifacts/omni-harness-native-resolution-20260930/manifest.json",
+  "native_stack_gap_record": "evidence/artifacts/native-stack-gap-audit-20261001/manifest.json"
+}

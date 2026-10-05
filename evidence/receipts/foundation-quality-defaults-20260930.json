@@ -1,0 +1,333 @@
+{
+  "schema_version": 1,
+  "id": "foundation-quality-defaults-20260930",
+  "kind": "compatibility_attempt",
+  "recorded_at_utc": "2026-09-30T05:40:47Z",
+  "component_ids": [
+    "codex",
+    "claude-code"
+  ],
+  "claim": "Applied and independently read back user-selected Sol/Ultra coordination and Sol/Max primary workers on the existing Codex 0.159.2 host. Explicit Sol/Max and Astra/Max native fixture calls both passed the local oracle. Native Opus 5.5/max analytical review returned conditional approval; its required observable routing records are documented.",
+  "limitations": [
+    "This does not establish universal model superiority, comparative token savings, unchanged upstream test acceptance or full Claude tool integration.",
+    "Native Codex events identify requested routes and complete usage, but contain no independent resolved-backend model/effort attestation.",
+    "Four prior peer attempts failed to return a verdict; their provider usage remains unknown.",
+    "Gate A carrier/role qualification and upstream-first advisor accounting remain owner-managed on PR #528. The handoff was posted; no owner completion is asserted.",
+    "Sol readiness requires verified native metadata: 0.159.2 is the checked bundled baseline; older pinned clients parse the keys but lack bundled Sol 6.1. Their refreshed-catalog path and macOS execution remain unqualified. Bootstrap/update guidance gates activation accordingly."
+  ],
+  "host_scope": "Existing Linux x86_64 host; private native sign-ins preserved; no other host qualification.",
+  "data": {
+    "sources": [
+      {
+        "repository": "https://github.com/openai/codex",
+        "tag": "rust-v0.159.2",
+        "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5"
+      },
+      {
+        "repository": "https://github.com/anthropics/claude-code",
+        "tag": "v2.1.285",
+        "revision": "ec44ca97dc86c33d934c8d55b24959aabf076871"
+      },
+      {
+        "repository": "https://github.com/seathatflowsinourveins/agent-lab",
+        "revision": "eced71c572671fc3e381381c068d05b2a7a5bb22",
+        "scope": "Advisor accounting source lead; owner-managed completion, not rerun here."
+      }
+    ],
+    "application": {
+      "writer_reference": "tools/adoption/apply_codex_lane.py::AppServer,batch_write,atomic_write",
+      "base_config_api": "config/batchWrite",
+      "expected_version": true,
+      "returned_status": "ok",
+      "exit_code": 0,
+      "profile_and_instructions": "Digest-guarded narrow atomic writes; unrelated text/settings preserved.",
+      "owned_keys": [
+        "model",
+        "model_reasoning_effort",
+        "agents.default_subagent_model",
+        "agents.default_subagent_reasoning_effort"
+      ],
+      "private_rollback": "Owned previous values and instructions/profile hashes retained outside checkout; --rollback restores only still-matching values."
+    },
+    "independent_readback": {
+      "command": "Native config/read through existing AppServer helper; allowlisted profile TOML; codex debug prompt-input probe with and without -p stack-worker",
+      "exit_code": 0,
+      "model": "gpt-6.1-sol",
+      "effort": "ultra",
+      "child_model": "gpt-6.1-sol",
+      "child_effort": "max",
+      "children_enabled": true,
+      "concurrency": 3,
+      "worker_model": "gpt-6.1-sol",
+      "worker_effort": "max",
+      "lead_prompt_excerpt": "Proactive multi-agent delegation is active.",
+      "worker_prompt_excerpt": "Do not spawn sub-agents unless the user or applicable AGENTS.md/skill instructions explicitly ask",
+      "reviewer": "Independent stack-verifier; read-only native observation and tagged source review; no model invocation.",
+      "review_commands_exit_code": 0
+    },
+    "claude_retained_defaults": {
+      "model": "opus",
+      "saved_effort": "xhigh",
+      "ultracode": true,
+      "advisor_model": "fable",
+      "unnamed_subagent_fallback": "opus",
+      "global_effort_override_present": false,
+      "session_effort": "max via native launcher",
+      "activation": "Native advisor billing consent preserved."
+    },
+    "peer_attempts": [
+      {
+        "id": "peer-1",
+        "kind": "customized context-mode RPC",
+        "limit_seconds": 300,
+        "status": "failed",
+        "exit_code": null,
+        "usage": {
+          "uncached_input": null,
+          "cache_creation": null,
+          "cache_read": null,
+          "output": null,
+          "reasoning_in_output": null,
+          "total": null,
+          "native_retries": null
+        }
+      },
+      {
+        "id": "peer-2",
+        "kind": "customized subprocess wrapper",
+        "limit_seconds": 600,
+        "status": "failed",
+        "exit_code": null,
+        "usage": {
+          "uncached_input": null,
+          "cache_creation": null,
+          "cache_read": null,
+          "output": null,
+          "reasoning_in_output": null,
+          "total": null,
+          "native_retries": null
+        }
+      },
+      {
+        "id": "peer-3",
+        "kind": "supplied-packet safe-mode review",
+        "limit_seconds": 180,
+        "status": "failed",
+        "exit_code": null,
+        "usage": {
+          "uncached_input": null,
+          "cache_creation": null,
+          "cache_read": null,
+          "output": null,
+          "reasoning_in_output": null,
+          "total": null,
+          "native_retries": null
+        }
+      },
+      {
+        "id": "peer-4",
+        "kind": "normal-plugin analytical diagnostic, zero tools/MCP",
+        "observed_seconds": 180.524,
+        "status": "failed",
+        "exit_code": -15,
+        "usage": {
+          "uncached_input": null,
+          "cache_creation": null,
+          "cache_read": null,
+          "output": null,
+          "reasoning_in_output": null,
+          "total": null,
+          "native_retries": null
+        },
+        "native_progress": "Initialized and streamed thinking; insufficient retained timing to explain delay."
+      },
+      {
+        "id": "peer-5",
+        "kind": "normal-plugin supervised analytical review, zero tools/MCP",
+        "status": "passed",
+        "source_client": "anthropics/claude-code v2.1.285",
+        "limits": {
+          "total_seconds": 900,
+          "no_native_event_seconds": 120,
+          "stop_on_native_error": true
+        },
+        "elapsed_seconds": 163.692,
+        "exit_code": 0,
+        "native_result_metadata": {
+          "subtype": "success",
+          "is_error": false,
+          "duration_ms": 162409,
+          "duration_api_ms": 162121,
+          "num_turns": 1,
+          "total_cost_usd": 0.5278626000000001,
+          "usage": {
+            "input_tokens": 2,
+            "cache_creation_input_tokens": 20620,
+            "cache_read_input_tokens": 3073,
+            "output_tokens": 18114,
+            "output_tokens_details": {
+              "thinking_tokens": 17648
+            },
+            "server_tool_use": {
+              "web_search_requests": 0,
+              "web_fetch_requests": 0
+            },
+            "service_tier": "standard",
+            "cache_creation": {
+              "ephemeral_1h_input_tokens": 20620,
+              "ephemeral_5m_input_tokens": 0
+            },
+            "inference_geo": "not_available",
+            "iterations": [
+              {
+                "input_tokens": 2,
+                "output_tokens": 18114,
+                "cache_read_input_tokens": 3073,
+                "cache_creation_input_tokens": 20620,
+                "cache_creation": {
+                  "ephemeral_5m_input_tokens": 0,
+                  "ephemeral_1h_input_tokens": 20620
+                },
+                "type": "message"
+              }
+            ],
+            "speed": "standard",
+            "fallback_credit": null
+          },
+          "modelUsage": {
+            "claude-opus-5-5": {
+              "inputTokens": 2,
+              "outputTokens": 18114,
+              "cacheReadInputTokens": 3073,
+              "cacheCreationInputTokens": 20620,
+              "webSearchRequests": 0,
+              "costUSD": 0.5278626000000001,
+              "contextWindow": 1000000,
+              "maxOutputTokens": 128000,
+              "thinkingTokens": 17648,
+              "canonicalModel": "claude-opus-5-5",
+              "provider": "firstParty",
+              "costBasis": "list"
+            }
+          }
+        },
+        "verdict_excerpt": "architecturally sound; approve with one required change",
+        "required_change_excerpt": "**Required change:**\n- Decide \"complex architecture\" at intake by a written rule.\n- Make \"conflicting evidence\" trigger mechanically: a verifier disagrees, two workers disagree on the same claim, or an acceptance or oracle check fails.\n- Log every decision to escalate or not, with its reason, as bounded task evidence.",
+        "source_receipt_sha256": "e5ae01a034ffa07a7b929300c3884364ef912df63278ef276d95e57740e10c43",
+        "integration_acceptance": false,
+        "unverified_claims": "Relative model judgment and self-correction prediction were peer leads and are not adopted as facts."
+      }
+    ],
+    "local_checks": [
+      {
+        "command": "rtk python3 -m unittest discover -s tests -p test_render_config.py -q",
+        "exit_code": 0,
+        "tests": 29,
+        "skipped": 0,
+        "returned_summary": "Ran 29 tests in 1.080s; OK"
+      },
+      {
+        "command": "rtk python3 -m unittest discover -s tests -p '*effort*' -q",
+        "exit_code": 0,
+        "tests": 28,
+        "skipped": 0,
+        "returned_summary": "Ran 28 tests in 1.158s; OK"
+      },
+      {
+        "command": "rtk python3 -m unittest discover -s tests -p test_codex_worker_lane.py -q",
+        "attempt": 1,
+        "exit_code": 1,
+        "tests": 58,
+        "skipped": 8,
+        "returned_summary": "FAILED (failures=2, skipped=8); recipe launch and base-user default expected Astra."
+      },
+      {
+        "command": "rtk python3 -m unittest discover -s tests -p test_codex_worker_lane.py -q",
+        "attempt": 2,
+        "exit_code": 1,
+        "tests": 58,
+        "skipped": 8,
+        "returned_summary": "FAILED (failures=1, skipped=8); staged instruction hash expected prior block."
+      },
+      {
+        "command": "rtk python3 -m unittest discover -s tests -p test_codex_worker_lane.py -q",
+        "attempt": 3,
+        "exit_code": 0,
+        "tests": 58,
+        "skipped": 8,
+        "returned_summary": "Ran 58 tests in 25.287s; OK (skipped=8)",
+        "diagnostic": "Existing synthetic subprocess tests emit a ResourceWarning; native integration cases are opt-in and were skipped."
+      },
+      {
+        "command": "rtk python3 -m unittest discover -s tests -p test_adoption_docs_consistency.py -q",
+        "exit_code": 0,
+        "tests": 37,
+        "skipped": 1,
+        "returned_summary": "Ran 37 tests in 10.917s; OK (skipped=1)"
+      },
+      {
+        "command": "rtk python3 scripts/validate.py",
+        "attempt": 1,
+        "exit_code": 1,
+        "returned_summary": "Publication validation failed on hashes/byte counts for the edited registered files before evidence refresh.",
+        "scope": "Intermediate publication state; final registration/check retained separately."
+      }
+    ],
+    "native_model_checks": "evidence/artifacts/foundation-quality-defaults-20260930/model-checks.json",
+    "owner_handoff": {
+      "command": "rtk gh pr comment 528 --repo seathatflowsinourveins/native-agent-stack --body-file <bounded-handoff>",
+      "exit_code": 0,
+      "returned_output": "ok commented #528",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/528#issuecomment-5904600203",
+      "status": "Posted; owner completion unconfirmed."
+    },
+    "routing_record": "docs/decisions/2026-09-30-sol-primary-quality-defaults.md",
+    "usage_assessment": {
+      "claim": "none",
+      "coverage": "partial",
+      "note": "Peer failures and coordinator/preparation provider usage are unknown. Native cache/read/reasoning subsets are never summed twice; native list-price metadata is not observed billing."
+    },
+    "compatibility": {
+      "old_versions_executed_on": "Linux",
+      "versions": [
+        "0.155.1",
+        "0.157.1"
+      ],
+      "settings_parse_exit_codes": [
+        0,
+        0
+      ],
+      "bundled_catalog_exit_codes": [
+        0,
+        0
+      ],
+      "bundled_sol_entry_present": [
+        false,
+        false
+      ],
+      "verified_bundled_baseline": "0.159.2",
+      "vendor_minimum_version_claim": false,
+      "older_refreshed_catalog_qualification": false,
+      "macos_qualification": false,
+      "source": "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/models-manager/models.json#L178"
+    },
+    "pin_owner_handoff": {
+      "owner": "sota-default-harness-setup",
+      "branch": "claude/sota-defaults-d4-codex-0159-20260930",
+      "revision": "1380c226efe7a508bbd12b6c3deb98ce1bec9287",
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/issues/140#issuecomment-5904975633",
+      "exit_code": 0,
+      "status": "Posted; preserve live owner's pin/manifest refresh; installer guard/native fixtures remain owner-managed."
+    },
+    "routing_disposition": {
+      "task": "Bounded native configuration changes and source compatibility verification",
+      "primary_route": "Sol default coordination/workers",
+      "astra_use": "Independent stack-verifier judgment and one explicit escalation-route fixture qualification",
+      "reason": "User-selected explicit judgment role and prerequisite verification, with no conflicting claim or failed model oracle requiring further escalation",
+      "acceptance": "Current-host config readback and bounded provider fixture checks passed; broader quality remains unqualified"
+    }
+  },
+  "provenance": {
+    "sanitization": "Selected portable routing values, native result metadata/excerpts, generated nonsecret fixture output, source pins and actual local check summaries only. Native identifiers and personal paths omitted. Private rollback and full original model events stay outside checkout."
+  }
+}

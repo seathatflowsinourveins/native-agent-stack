@@ -1,0 +1,57 @@
+{
+  "kind": "claude-native-client-reinstall-and-independent-observation",
+  "native_install": {
+    "command": "rtk claude install 2.1.285 --force",
+    "exit_code": 0,
+    "returned_status": "Claude Code successfully installed",
+    "claim_boundary": "Native reinstall on the existing signed-in host; no clean account or operating-system simulation."
+  },
+  "independent_observation": {
+    "command": "rtk proxy claude --version",
+    "exit_code": 0,
+    "returned_version": "2.1.285 (Claude Code)",
+    "binary_bytes": 240327864,
+    "binary_sha256": "33dad1ec615a2e08cc78b494f05c110e49916de2c79d78ec8799ebf46b233d29"
+  },
+  "official_native_release": {
+    "manifest_url": "https://downloads.claude.ai/claude-code-releases/2.1.285/manifest.json",
+    "manifest_build_commit": "afb212976052ab038df25d5e871f6c049e094d3b",
+    "github_changelog_tag_commit": "ec44ca97dc86c33d934c8d55b24959aabf076871",
+    "platform": "linux-x64",
+    "binary_bytes": 240327864,
+    "binary_sha256": "33dad1ec615a2e08cc78b494f05c110e49916de2c79d78ec8799ebf46b233d29",
+    "independent_bytes_and_sha256_match": true,
+    "signature_acceptance_performed": false
+  },
+  "settings_observation": {
+    "ultracode": true,
+    "agent_teams_enabled": true,
+    "saved_effort_fallback": "xhigh",
+    "probe_explicit_effort": "max",
+    "effort_environment_override_present": false
+  },
+  "personal_workflows": [
+    {
+      "name": "readiness-audit.js",
+      "bytes": 13135,
+      "sha256": "1d3d816cc219a252760a471a3b68a979057e2c417c429d6c094df4c474e612bb"
+    },
+    {
+      "name": "review-changes.js",
+      "bytes": 18059,
+      "sha256": "bb298f9ab63a6d43173d2c4f87ab31d00dd79184e961dc84d69cbef3966bce0b"
+    },
+    {
+      "name": "layer-verdict-lane.js",
+      "bytes": 17527,
+      "sha256": "fd77b74945e9d2bd0b26b7822aabcde00e7e650c327da16d852fdbfd5984c0d6"
+    }
+  ],
+  "workflow_adoption": {
+    "command": "rtk python3 tools/adoption/install_claude_profile.py --only workflows",
+    "exit_code": 0,
+    "independent_source_bytes_match": true,
+    "idempotent_rerun_exit_code": 0,
+    "active_workflows_retained": true
+  }
+}

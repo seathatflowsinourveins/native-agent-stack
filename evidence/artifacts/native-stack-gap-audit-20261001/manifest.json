@@ -1,0 +1,439 @@
+{
+  "schema_version": 1,
+  "kind": "native_stack_capability_gap_audit",
+  "lane": "foundation",
+  "checked_at": "2026-10-01T02:16:15Z",
+  "scope": "Selected foundation-cpu and native Claude/Codex SDK→OmniRoute workflow; repository hosting, containers and native CLI automation. No trading research or paid/cloud deployment.",
+  "verdict": "No missing mandatory SDK or base CLI dependency was found. Required maintenance, real-provider/lifecycle acceptance and portable release delivery remain open; additional SDKs and sandbox/hosting runtimes are capability-specific candidates.",
+  "native_observation": {
+    "commands_exit_code": 0,
+    "profile": "foundation-cpu",
+    "status": "prerequisites_present",
+    "required_commands_present": 11,
+    "recipe_paths_present": 3,
+    "repository": {
+      "isArchived": false,
+      "isEmpty": false,
+      "visibility": "PUBLIC"
+    },
+    "docker": {
+      "client_version": "29.8.1",
+      "server_version": "29.8.1",
+      "client_git_commit": "4a63305",
+      "server_git_commit": "464cd50"
+    },
+    "compose_version": "5.5.1",
+    "docker_security_options": [
+      "rootless",
+      "builtin seccomp",
+      "cgroup namespaces"
+    ],
+    "timers": [
+      {
+        "Id": "host-requests-workstation.timer",
+        "LoadState": "loaded",
+        "ActiveState": "active",
+        "SubState": "waiting",
+        "UnitFileState": "enabled"
+      },
+      {
+        "Id": "ecosystem-live-clone-sync.timer",
+        "LoadState": "loaded",
+        "ActiveState": "active",
+        "SubState": "waiting",
+        "UnitFileState": "enabled"
+      },
+      {
+        "Id": "ecosystem-research-progress.timer",
+        "LoadState": "loaded",
+        "ActiveState": "active",
+        "SubState": "waiting",
+        "UnitFileState": "enabled"
+      }
+    ],
+    "original_private_outputs": {
+      "prerequisites.json": {
+        "bytes": 2194,
+        "sha256": "877925a72d730ebe199aa8e74a18bb8b0d1a4a8e40de0d1ece1f54756e4c8856"
+      },
+      "hosting.json": {
+        "bytes": 59,
+        "sha256": "b3a6a5c9e090914ccd4f70d43f1a45c7b5ea3000324593469bdda10915ead00e"
+      },
+      "container.json": {
+        "bytes": 1412,
+        "sha256": "b9043af9e669e10ba7759fec4485689ff1b85a047ded593b49f60de9415c6c0a"
+      },
+      "timers.txt": {
+        "bytes": 334,
+        "sha256": "c46c3faab9f0bab0c744cebea4fa0c568d7b4c42450f76415fa54062ae6b1b92"
+      }
+    },
+    "originals_contain_no_published_host_paths": true,
+    "upstream_metadata_raw_outputs_retained": false,
+    "model_runs_this_audit": 0,
+    "installations_this_audit": 0
+  },
+  "host": {
+    "wsl_installed": "2.7.13.0",
+    "kernel": "6.18.33.2-2",
+    "wsl_version_probe_exit_code": 0,
+    "wsl_original_stdout_bytes": 448,
+    "wsl_original_stdout_sha256": "5f1bad2410056cb243cf06be041a41fec3ca519fc3bb7897130394766947027f",
+    "wsl_latest_candidate": "3.0.1",
+    "wsl_candidate_revision": "91f161fa240dc355c1a88daabc8aac4273e35ba5",
+    "wsl_containers_ga_status": "Upstream release, not adopted on this host",
+    "sbx_on_path": false,
+    "kvm_device_present": true,
+    "kvm_read_write_access": false,
+    "kvm_group_member": false,
+    "os_changes_performed": false
+  },
+  "rows": [
+    {
+      "id": "provider-sdk-acceptance",
+      "area": "Core SDK and routed GPT worker",
+      "classification": "Required acceptance",
+      "installed": "Codex CLI0.159.2; official SDK/CLI0.159.3 in an owned trial; native Claude2.1.286",
+      "gap": "Current new SDK's real Sol/Max turn failed HTTP429. API assertions and local fixtures do not close its real task, MCP execution or resume gates.",
+      "next": "Gateway owner supplies native provider readiness, followed by one bounded real tool task and same-thread resume.",
+      "owner": "Gateway and native worker owners",
+      "sources": [
+        "https://github.com/openai/codex/tree/01fc69f4026735edfdf6789820549727a4867b11/sdk/python",
+        "evidence/artifacts/omni-harness-native-resolution-20260930/manifest.json"
+      ]
+    },
+    {
+      "id": "gh-maintenance",
+      "area": "Repository CLI maintenance",
+      "classification": "Required maintenance",
+      "installed": "gh2.101.0; public repository and native repo/workflow API available",
+      "gap": "Current gh2.102.0 fixes four upstream advisories affecting downloads, attestation verification and interactive skill search.",
+      "next": "Qualify upstream2.102.0 in an owned prefix with native help and public release/provenance checks before the owner promotes it.",
+      "owner": "Host toolchain owner",
+      "candidate_revision": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "sources": [
+        "https://github.com/cli/cli/releases/tag/v2.102.0"
+      ]
+    },
+    {
+      "id": "portable-release",
+      "area": "Clean host and repository delivery",
+      "classification": "Required for a current portable release",
+      "installed": "Published adoption pin v2026.09.26.2@771f25f824a7851a6cb46ebcfa2922b54cb88d9e",
+      "gap": "The pre-publication release_due snapshot reported39 missing paths and113 changed paths. Current main/local evidence is ahead of the release used by a new host.",
+      "next": "Complete the maintained validated release/re-pin workflow; run release_due.py --strict for the concrete release candidate.",
+      "owner": "Repository release owner",
+      "sources": [
+        "adoption/update.md",
+        "adoption/manifest.json",
+        "scripts/release_due.py"
+      ]
+    },
+    {
+      "id": "sdk-lifecycle",
+      "area": "Worker recovery and isolation",
+      "classification": "Required for broader lifecycle claims",
+      "installed": "Retained same-thread resume and recovery after interruption, deadline interruption and selected native MCP/judge/Dagu acceptance",
+      "gap": "Production SDK descendant cleanup, provider-side cancellation, broader writing effects and independent-host recovery remain unqualified. An owned Git writer outlived SDK close in local fixtures.",
+      "next": "Use the matching maintained fixture for one selected missing boundary, retaining failed conditions and original observations.",
+      "owner": "Native runtime worker owner",
+      "sources": [
+        "https://github.com/openai/codex/blob/01fc69f4026735edfdf6789820549727a4867b11/sdk/python/src/openai_codex/client.py#L268",
+        "evidence/receipts/omniroute-runtime-enhancements-20260930.json",
+        "evidence/artifacts/omni-harness-native-resolution-20260930/manifest.json"
+      ]
+    },
+    {
+      "id": "host-request-e2e",
+      "area": "Native CLI request automation",
+      "classification": "Required for completed cross-host automation claims",
+      "installed": "Existing request, live-clone and dashboard timers active/enabled; request watcher is available",
+      "gap": "Public native request→worker→independent completion and duplicate/recovery acceptance was not found in the inspected receipts. Dated queue snapshot: claimed2,done0.",
+      "next": "Complete an already-authorized bounded request on the existing lane, then verify interruption/replay and independent completion. Add no duplicate watcher.",
+      "owner": "Host request lane owner",
+      "sources": [
+        "recipes/host-request-lane.md",
+        "adoption/templates/systemd/host-requests-workstation.service",
+        "scripts/host_requests.py"
+      ]
+    },
+    {
+      "id": "dagu-refresh",
+      "area": "Native graph and scheduler maintenance",
+      "classification": "Candidate lifecycle qualification",
+      "installed": "Dagu2.16.6; bounded graph acceptance retained",
+      "gap": "Current2.18.1 includes2.18.0 runtime condition abort/timeout propagation changes. Existing server readiness is separate from scheduler/model execution.",
+      "next": "Isolated2.18.1 graph validation, unchanged upstream retry checks and matching interruption/checkpoint fixture.",
+      "owner": "Automation runtime owner",
+      "candidate_revision": "3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7",
+      "sources": [
+        "https://github.com/dagucloud/dagu/releases/tag/v2.18.1",
+        "https://github.com/dagucloud/dagu/releases/tag/v2.18.0",
+        "blueprints/convergence-practice/job-recovery/README.md"
+      ]
+    },
+    {
+      "id": "docker-workflow",
+      "area": "Docker and Compose practice",
+      "classification": "Task-specific qualification",
+      "installed": "Docker client/server29.8.1; Compose5.5.1; reachable rootless engine",
+      "gap": "A running engine does not qualify the selected worker's filesystem/network isolation, mounts, restart, rollback, volume restore or cleanup.",
+      "next": "Choose a containerized service/worker and run its upstream/native lifecycle checks with owned images, volumes and state.",
+      "owner": "Selected workload owner",
+      "sources": [
+        "https://docs.docker.com/engine/release-notes/29/#2981",
+        "https://docs.docker.com/engine/security/rootless/",
+        "https://github.com/docker/compose/releases/tag/v5.5.1"
+      ]
+    },
+    {
+      "id": "agent-sandbox",
+      "area": "Docker microVM agent sandbox",
+      "classification": "Conditional candidate; prerequisites unmet",
+      "installed": "Independent sbx CLI not found on PATH",
+      "gap": "Current sbx0.46.0 is independent of Docker Engine/Desktop. This host has KVM but lacks device access and kvm membership.",
+      "next": "If this isolation boundary is selected, native OS consent/group/virtualization setup and sbx sign-in precede agent route, mount/network and lifecycle acceptance.",
+      "owner": "Host and isolation owners",
+      "candidate_revision": "cf6fa414ab8161b3d1beea1dfc5db8b22572e1c3",
+      "sources": [
+        "https://github.com/docker/sbx-releases/releases/tag/v0.46.0",
+        "https://github.com/docker/docs/blob/3de2f99327a1dfb76389e211157f0a963c37640e/content/manuals/ai/sandboxes/install.md#L9"
+      ]
+    },
+    {
+      "id": "wsl-container-candidate",
+      "area": "WSL container runtime",
+      "classification": "Conditional new host capability",
+      "installed": "WSL2.7.13.0; new distribution not created",
+      "gap": "UpstreamWSL3.0.1 declares WSL containers GA. Its native wslc/container path has no adoption or lifecycle acceptance here.",
+      "next": "Select the WSL container target and qualify its supported OS/runtime install, rollback and actual worker workload before adoption.",
+      "owner": "Host rollout owner",
+      "sources": [
+        "https://github.com/microsoft/WSL/releases/tag/3.0.1",
+        "https://blogs.windows.com/windowsdeveloper/2026/09/29/wsl-containers-now-generally-available/"
+      ]
+    },
+    {
+      "id": "service-hosting",
+      "area": "Repository and runtime hosting",
+      "classification": "Conditional deployment scope",
+      "installed": "Public repository and CI recipes present; local services have scoped readiness",
+      "gap": "Agent-lab private-hosting proposal, production authentication, actual cloud deployment and complete offhost recovery remain separate unqualified decisions.",
+      "next": "Choose the actual service and hosting boundary, then retain its own hosted smoke and restore results. Paid hosting remains separate.",
+      "owner": "Selected repository/service owner",
+      "sources": [
+        "docs/convergence-architecture.md",
+        "catalogs/foundation/manifest.json",
+        "https://docs.github.com/en/actions/concepts/runners/self-hosted-runners"
+      ]
+    },
+    {
+      "id": "gateway-package",
+      "area": "Published OmniRoute runtime",
+      "classification": "Required before promoting the published server",
+      "installed": "Published CLI3.8.51 version/help/health accepted against incumbent gateway",
+      "gap": "npm warned about unallowlisted lifecycle scripts; fresh server startup from that published package was not qualified. The serving modified build and installed registry package are separately identified.",
+      "next": "Use the supported owned-prefix install/start/health/restart/cleanup lifecycle for the chosen server artifact without transferring incumbent readiness.",
+      "owner": "Gateway rollout owner",
+      "sources": [
+        "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51",
+        "evidence/artifacts/omni-harness-native-resolution-20260930/manifest.json"
+      ]
+    },
+    {
+      "id": "optional-native-hooks",
+      "area": "Native hook and web tool execution",
+      "classification": "Task-specific acceptance",
+      "installed": "Selected MCP, skills, Astra judge and Dagu graph retain native evidence",
+      "gap": "Native hook execution and live web search remain unmeasured in the inspected enhancement receipts.",
+      "next": "Exercise only a task-selected hook/web capability through its supported native client with actual original output.",
+      "owner": "Native workflow owner",
+      "sources": [
+        "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
+      ]
+    },
+    {
+      "id": "uv-refresh",
+      "area": "Package runtime maintenance",
+      "classification": "Optional freshness qualification",
+      "installed": "uv0.12.17; locked SDK environment accepted within scope",
+      "gap": "Current uv0.12.21 is source-reviewed, not installed/qualified in this audit.",
+      "next": "Owned-prefix upstream install and existing frozen/hash-locked reproduction before changing the host pin.",
+      "owner": "Host toolchain owner",
+      "candidate_revision": "7af826859382eb191e47467540850caa8f493e5b",
+      "sources": [
+        "https://github.com/astral-sh/uv/releases/tag/0.12.21"
+      ]
+    }
+  ],
+  "conditional_sdks": [
+    {
+      "name": "Codex TypeScript SDK",
+      "reviewed_pin": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "role": "Node integration over native CLI JSONL",
+      "verdict": "Optional language interface; no mandatory Python-worker dependency.",
+      "sources": [
+        "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/sdk/typescript/README.md"
+      ]
+    },
+    {
+      "name": "OpenAI Agents SDK",
+      "reviewed_version": "0.22.3",
+      "reviewed_pin": "fdf21db62c303a3db54b0dfbee82de2141fa2799",
+      "role": "Application handoffs, guardrails, sessions and orchestration",
+      "verdict": "Conditional application layer; native coding state integration needs acceptance.",
+      "sources": [
+        "https://github.com/openai/openai-agents-python/tree/fdf21db62c303a3db54b0dfbee82de2141fa2799"
+      ]
+    },
+    {
+      "name": "Claude Agent SDK",
+      "reviewed_version": "0.2.162",
+      "reviewed_pin": "f2204bb956bab02907aaf3cb88eb9dead28eaa35",
+      "role": "Programmatic native Claude harness",
+      "verdict": "Supported separate application interface; translated OmniRoute bridge trial remains failed.",
+      "sources": [
+        "https://platform.claude.com/docs/en/agent-sdk/overview"
+      ]
+    },
+    {
+      "name": "Microsoft Agent Framework",
+      "reviewed_version": "python-1.19.0",
+      "reviewed_pin": "703fbce285ee0f026e5effcadfb9e65aab7f5d84",
+      "role": "Application orchestration with OpenAI and Claude SDK adapters",
+      "verdict": "Source-reviewed conditional application orchestrator omitted from the earlier17candidate set. Native Claude SDK adapter and custom Responses endpoint are documented; installed compatibility and Omni qualification remain unverified.",
+      "sources": [
+        "https://github.com/microsoft/agent-framework/releases/tag/python-1.19.0",
+        "https://github.com/microsoft/agent-framework/blob/703fbce285ee0f026e5effcadfb9e65aab7f5d84/python/packages/claude/README.md",
+        "https://github.com/microsoft/agent-framework/blob/703fbce285ee0f026e5effcadfb9e65aab7f5d84/python/packages/openai/agent_framework_openai/_chat_client.py"
+      ],
+      "dependencies": {
+        "claude_package": "agent-framework-claude1.0.0b260910 (beta)",
+        "claude_sdk_range": ">=0.1.46,<0.3",
+        "openai_package": "agent-framework-openai1.14.4",
+        "openai_sdk_range": ">=2.25.0,<4",
+        "python": ">=3.10"
+      }
+    },
+    {
+      "name": "LangGraph",
+      "reviewed_version": "1.2.12",
+      "reviewed_pin": "49cce0ca852be4cfb567a1cbe0e511ff325a1682",
+      "role": "Checkpointed application graphs",
+      "verdict": "Conditional durable graph; not an absent mandatory native client dependency.",
+      "sources": [
+        "https://github.com/langchain-ai/langgraph/tree/49cce0ca852be4cfb567a1cbe0e511ff325a1682"
+      ]
+    },
+    {
+      "name": "OpenHands SDK",
+      "reviewed_version": "1.50.1",
+      "reviewed_pin": "1e1390acc8788346ba4804c34323284009bf3f5e",
+      "role": "Separate isolated-worker runtime",
+      "verdict": "Source-reviewed alternative; frozen local blueprint1.49.6 and host adoption remain separate.",
+      "sources": [
+        "https://github.com/OpenHands/software-agent-sdk/tree/1e1390acc8788346ba4804c34323284009bf3f5e"
+      ]
+    },
+    {
+      "name": "Temporal SDK and CLI",
+      "reviewed_version": "SDK1.34.0 / CLI1.9.1",
+      "reviewed_pin": "a4c2bb38c3bad43498dfa6bd849e8d85bb684e94",
+      "cli_pin": "1de87a9f26991bf4f5c0a5ff96f2cea8d7a3cbde",
+      "role": "Persistent application workflow history/replay and separate workers/services",
+      "verdict": "Conditional when cross-host durable ownership/replay is required; no default worker dependency.",
+      "sources": [
+        "https://github.com/temporalio/sdk-python/releases/tag/1.34.0",
+        "https://github.com/temporalio/cli/releases/tag/v1.9.1"
+      ]
+    }
+  ],
+  "coverage_limit": "This is a bounded named-capability audit. It adds one credible SDK omission; no complete landscape exhaustion or measured universal framework winner is claimed.",
+  "corrections": [
+    "Native help was re-read through rtk proxy after direct prefixed --help returned wrapper help.",
+    "Service failure in a context-mode subprocess lacking the user-bus environment did not establish service absence; direct scoped native checks succeeded.",
+    "wsl.exe not found on PATH did not establish host-version absence; installed Windows executable reportedWSL2.7.13.0.",
+    "Docker release-object404 did not establish missingtags; installed CLI/Engine refs resolved independently.",
+    "GitHubCLI2.102.0 fixes four advisories, correcting an earlier narrower worker summary.",
+    "Foundation SDK next_gap statement saying no review sinceSeptember21 is superseded bySeptember30source/native evidence and this audit.",
+    "Temporal catalog version1.33.0 release tag resolves ab52fdde33ee8ed193402625bfdba25d240a762d, whereas reviewed snapshoteb642b14947bd8bcdf8816cffb6a63869803f5c6 is a separate source identity. Owner correction remains required.",
+    "Independent final review separated same-thread resume/recovery after interruption from the distinct native-child/cgroup fixture, and attached the retained SDK shutdown observation to its source artifact.",
+    "Peer relay original output was lost when its context-mode sandbox was cleaned. Root verified only the stable private derived digest and explicitly records original raw retention as false, not upstream acceptance."
+  ],
+  "model_usage": null,
+  "complete_provider_usage": null,
+  "canonical_pins_changed": false,
+  "architecture_review": {
+    "trigger": "Credible missing maintained SDK from the named prior candidate set.",
+    "role": "Astra/Max stack-researcher",
+    "status": "Completed; legitimate conditional application orchestrator, not a required dependency or replacement for accepted Codex worker.",
+    "acceptance": "Pinned source compatibility only; no OmniRoute or installed-runtime acceptance."
+  },
+  "independent_review": {
+    "reviewer": "Sol/Max SDK worker gap reviewer",
+    "scope": "New report SDK/Temporal claims against retained native observations and completed pinned-source MAF review",
+    "verdict": "Pass after bounded wording/source corrections; no new installations, provider trials or architectural replacement qualified."
+  },
+  "publication_checks": {
+    "topic_tests": {
+      "command": "python3 -m unittest discover -s tests -p test_memory_topic.py",
+      "exit_code": 0,
+      "tests": 5
+    },
+    "adoption_document_tests": {
+      "command": "python3 -m unittest discover -s tests -p test_adoption_docs_consistency.py",
+      "exit_code": 0,
+      "tests": 37,
+      "skipped": 1
+    },
+    "integrity_validator": {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "scope": "Integrity and declared scope only; no live provider/GPU execution."
+    }
+  },
+  "peer_coordination": {
+    "checked_at": "2026-10-01T02:34:03Z",
+    "native_cli": "Claude Code2.1.286",
+    "model": "claude-sonnet-5-5",
+    "effort": "max",
+    "attempts": 1,
+    "native_exit_code": 1,
+    "status": "Blocked by native account/session usage limit before messaging tools",
+    "list_agents_calls": 0,
+    "send_message_calls": 0,
+    "enqueue_acknowledgments": 0,
+    "targets": [],
+    "client_reported_usage": {
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "cache_creation_input_tokens": 0,
+      "cache_read_input_tokens": 0,
+      "final_cumulative_cost_usd": 0,
+      "model_usage": {}
+    },
+    "usage_scope": "Native failed relay result only; total coordinator/audit usage remains unknown.",
+    "original_observed": {
+      "bytes": 163494,
+      "sha256": "8331a8a47ed1a9260fb49346ec190dc01149846c27da84570774416eea56f625",
+      "private_retention_verified": false,
+      "raw_retained": false,
+      "digest_readback_verified": true,
+      "observation_level": "Worker-observed native result and root readback of derived private digest; original stream no longer available.",
+      "retention_limit": "Context-mode sandbox was cleaned before stable-host retention. Digest retained privately; raw output was not recreated."
+    },
+    "retry_performed": false,
+    "acceptance_limit": "No fresh peer listing, enqueue, delivery or completed peer maintenance was established. No account, configuration, installation or provider repair was attempted.",
+    "sources": [
+      "evidence/artifacts/omni-harness-native-resolution-20260930/peer-messaging.json",
+      "https://code.claude.com/docs/en/cross-session-messaging",
+      "https://code.claude.com/docs/en/cli-reference"
+    ],
+    "native_bounds": {
+      "max_turns": 4,
+      "deadline_seconds": 150,
+      "timed_out": false
+    }
+  }
+}

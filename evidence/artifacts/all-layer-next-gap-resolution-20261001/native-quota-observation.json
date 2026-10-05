@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "kind": "native_account_availability_observation",
+  "command": ["rtk", "python3", "-B", "scripts/codex_quota.py", "--json"],
+  "exit_code": 0,
+  "checked_at_utc": "2026-10-01T02:54:36Z",
+  "returned_value_free_subset": {
+    "ordinary_usage_allowed": true,
+    "rate_limit_reached_type": null,
+    "reset_credits_available": 1
+  },
+  "source": "scripts/codex_quota.py native account/rateLimits/read observation; command documented in recipes/README.md.",
+  "scope": "One current native Codex account observation. Availability is not proof that a reset was consumed or that every client/account has available usage.",
+  "reset_credit_consumed": false,
+  "administrative_reset_performed": false,
+  "prior_failures_preserved": "Earlier SDK reset-status protocol request returned InvalidRequestError; the current supported native quota command is a separate successful observation. Native Claude coordination still returned its own account session limit.",
+  "privacy": "Account identity, plan, host paths, authentication state and raw conversations omitted."
+}

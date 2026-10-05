@@ -1,0 +1,17 @@
+Command: rtk proxy sha256sum -c SHA256SUMS
+Working directory: examples/claude-native/workflows
+Evidence class: pinned source byte-integrity check, no native provider execution
+Exit: 0
+check-syntax.mjs: OK
+child-usage.mjs: OK
+codex-cross-review.mjs: OK
+test-child-usage.mjs: OK
+test-codex-envelope.mjs: OK
+test-contract-mutations.mjs: OK
+test-envelope.mjs: OK
+test-usage-receipts.mjs: OK
+layer-verdict-lane.js: OK
+readiness-audit.js: OK
+review-changes.js: OK
+contract.config.json: OK
+vendored-lanes.json: OK

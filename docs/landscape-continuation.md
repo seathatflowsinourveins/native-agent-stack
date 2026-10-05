@@ -50,6 +50,43 @@ validation commands. Public task records belong in Git. Private host paths,
 accounts and scoped ai-memory remain private; transfer selected application data
 through an independently tested recovery path, never authentication stores.
 
+## Continue after a provider usage limit
+
+Before a quota interruption, checkpoint the selected requirement, recommendation
+versus accepted configuration, exact source pins, actual receipts, failed attempts,
+unknown usage and the next bounded action in the layer's existing task record and
+research queue. Pass those references in cross-session and worker handoffs. Resume
+the same selected account, model and effort after the provider confirms allowance.
+A new conversation or context compaction alone does not establish a quota reset.
+
+Use a provider's available native reset when an eligible limit is reached. Codex
+0.159.2's installed protocol schema exposes `account/rateLimits/read` and
+`account/rateLimitResetCredit/consume`. The latter consumes an earned reset and
+requires an idempotency key; reuse it for retries of the same redemption, then
+read rate limits again. Account eligibility stays unknown until a native read;
+the schema check itself did not query this account or redeem anything.
+[Official OpenAI documentation](https://learn.chatgpt.com/docs/app-server),
+[installed schema and pinned source evidence](../evidence/artifacts/memory-runtime-resolution-20260930/provider-quota-capability.json).
+
+Claude's eligible reset offer is in Settings > Usage > Resets on its web or
+Desktop client. The official article says the button is unavailable in the
+Claude Code terminal/IDE. When no applicable reset is available, continue after
+the provider's recorded allowance reset time.
+[Native Claude reset](https://support.claude.com/en/articles/17007452-what-is-a-limit-reset).
+
+On resumption, refresh only the selected layer's changed client/release/source
+evidence using the verification order in `AGENTS.md`. Reuse matching acceptance
+receipts; changes in pins, behavior or inputs require new scoped qualification.
+Worker messages return primary source references and actual output locations.
+
+For the active memory/runtime comparison, the
+[current review](memory-rag-foundation-20260930.md) and
+[resolution manifest](../blueprints/convergence-practice/memory-runtime-resolution-20260930/manifest.json)
+carry the handoff: Hindsight is the fit-based target, the measured-winner fields
+remain null, and ai-memory 2.5.0 is source-only. Continue through current-version
+native capture and a valid matched quality/complete-cost evaluation before
+promoting a backbone.
+
 ## Native Codex and Claude practice
 
 Use one coordinator and bounded independent workers with owned writing
@@ -107,3 +144,7 @@ never closures: a layer still closes only through this queue's `closure_refs`. I
 weekly workflow (`.github/workflows/saturation-tracking.yml`) calls no model; it
 updates one tracking issue listing the due layers, and a person starts each sweep
 ([recipe](../recipes/saturation-sweep.md)), so the statement above still holds.
+
+## Native OmniRoute harness continuation, 2026-10-01
+
+The [native harness manifest](../evidence/artifacts/omni-harness-native-resolution-20260930/manifest.json) selects the official Codex Python SDK/app-server path from native Claude through OmniRoute. Published SDK/CLI0.159.3 and OmniRoute CLI3.8.51 are installed in owned prefixes; canonical0.159.2 acceptance is retained. Three unchanged upstream API tests and thirteen local integration fixtures passed with their separate scopes. The actual native Claude→Sol/Max worker turn failed HTTP429; SDK usage is unknown. Two targeted native messages handed that condition to the gateway and rollout owners. Wait for source-backed native provider readiness before the next bounded real tool task and resume gate. Do not reinterpret health, source compatibility, queued messages or fixture housekeeping as full-provider or production descendant-cleanup acceptance.

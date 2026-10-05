@@ -1,4 +1,9 @@
-model = "gpt-6-astra"
+# Sol readiness: verified bundled metadata in Codex 0.159.2, or explicitly checked refreshed native metadata.
+# Older platform pins parse these settings but do not bundle Sol 6.1; see the 2026-09-30 defaults decision.
+# User-selected native coordinator: Sol/Ultra. Ultra sends Sol's catalog multi-agent effort, xhigh,
+# and enables proactive delegation (openai/codex rust-v0.159.2 protocol/src/openai_models/reasoning_effort.rs
+# and models-manager/models.json).
+model = "gpt-6.1-sol"
 model_reasoning_effort = "ultra"
 approval_policy = "never"
 sandbox_mode = "danger-full-access"
@@ -15,14 +20,12 @@ check_for_update_on_startup = false
 [agents]
 enabled = true
 max_concurrent_threads_per_session = 3
-# A child whose spawn call names no effort otherwise keeps the parent's, `ultra` above, which for gpt-6-astra sends
-# xhigh and turns on proactive delegation in the child too. With this default it runs at max and spawns only when
-# asked (codex-rs/core/src/agent/child_config.rs L196-250; core/src/session/multi_agents.rs L77-111). Effort alone
-# keeps the parent's model; a default_subagent_model without an effort would give that model's catalog default, `low`
-# for gpt-6-astra. agents.max_depth is "Ignored by V2" (codex-rs/config/src/config_toml.rs L719-720) and gpt-6-astra
-# is a V2 model (models-manager/models.json), so nothing caps nesting depth here; max_concurrent_threads_per_session
-# still caps concurrent children at 3: V2 counts the root thread, adds one and subtracts it again
-# (core/src/config/mod.rs L2733-2746 and L1591-1605).
+# Generic children use Sol/Max: effort alone keeps the parent's model, while a model alone selects its catalog
+# default (low for Sol). Explicit spawn selections replace these defaults, then the selected role config applies,
+# preserving Astra judgment-role overrides (openai/codex rust-v0.159.2 core/src/agent/child_config.rs L62-73,
+# L204-249). Max sends API max and delegates only when asked; Ultra above sends xhigh and delegates proactively
+# (protocol/src/openai_models/reasoning_effort.rs and models-manager/models.json at the same pin).
+default_subagent_model = "gpt-6.1-sol"
 default_subagent_reasoning_effort = "max"
 
 # User scope, so every worktree Codex is launched from inherits these servers without a project-local
@@ -204,6 +207,14 @@ daemon_auto_start = false
 # README.md). Without it each command runs as `shell -lc`, the same login shell the snapshot would have captured
 # (core/src/tools/runtimes/mod.rs L268-276), at the cost of starting that shell per command.
 shell_snapshot = false
+
+# Notify only when Codex needs a decision: an approval (approval-requested), a plan-mode prompt or a `request_user_input` question (both
+# reported as plan-mode-prompt, tui/src/chatwidget/tool_requests.rs L449-458 at rust-v0.155.1 and rust-v0.157.1) or an asynchronous question
+# (async-question, added after 0.155.1, so inert at the macOS pin). `agent-turn-complete` (a finished turn) is left out on purpose. The list
+# is plain strings, so a misspelled kind loads cleanly and never notifies; the kinds are type_name() in
+# codex-rs/tui/src/chatwidget/notifications.rs. The channel stays Codex's own per-terminal `auto` (docs/decisions/2026-09-28-terminal-experience.md).
+[tui]
+notifications = ["approval-requested", "plan-mode-prompt", "async-question"]
 
 # Local ecosystem observation; content is removed before collector persistence.
 [otel]

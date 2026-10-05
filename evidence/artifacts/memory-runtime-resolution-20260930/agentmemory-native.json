@@ -1,0 +1,375 @@
+{
+  "schema_version": 1,
+  "recorded_on": "2026-09-30",
+  "scope": "Isolated current-host execution of unchanged upstream coding-agent-life-v1 retrieval harness; upstream fictional fixture, not production memory",
+  "result": "qualification_not_established_upstream_session_id_contract_mismatch",
+  "interpretation": "Execution completed, but candidate 0/15 is not comparable to grep fixture quality. Native ingestion succeeded and a native query returned six results. No backend recall failure or winner is inferred.",
+  "sources": {
+    "agentmemory": {
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "version": "0.9.29",
+      "commit": "2d38dafede67d0d4ed920cde94d2106e98825b8a",
+      "live_latest_release": "v0.9.29",
+      "source_install": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md#L748",
+      "evaluation": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/eval/README.md#L18",
+      "sandbox": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/eval/scripts/sandbox.sh"
+    },
+    "iii": {
+      "repository": "https://github.com/iii-hq/iii",
+      "version": "0.11.2",
+      "tag": "iii/v0.11.2",
+      "annotated_tag": "6f63c9c1517d996eb68577a7f127ab950fc83a82",
+      "commit": "2b445957701f94dc5f56f900af314e9d59f3b0f7",
+      "tag_api_signature_verified": false,
+      "release": "https://github.com/iii-hq/iii/releases/tag/iii/v0.11.2",
+      "asset": "iii-x86_64-unknown-linux-gnu.tar.gz",
+      "sha256": "9c83c47788b4ef4beeb65dd9bf37e94f993770cd3db874464c3ce1cdc92352cd",
+      "publisher_checksum_verified": true
+    }
+  },
+  "runtime": {
+    "platform": "Linux x86_64",
+    "node": "24.21.0",
+    "npm": "11.19.0",
+    "iii_sdk": "0.11.2",
+    "transformers": "4.3.0",
+    "onnxruntime_node": "1.30.0",
+    "install_mode": "Official pinned source; npm install with private cache; native generated package lock retained",
+    "environment": "env -i with isolated executable PATH, npm cache and SANDBOX_ROOT only; unchanged upstream sandbox sets HOME for its engine subprocess",
+    "native_client_integrations_activated": false
+  },
+  "commands": [
+    {
+      "command": "rtk git clone --filter=blob:none --no-checkout https://github.com/rohitg00/agentmemory.git <TRIAL>/source",
+      "exit_code": 0
+    },
+    {
+      "command": "rtk git fetch --depth 1 origin 2d38dafede67d0d4ed920cde94d2106e98825b8a",
+      "cwd": "<TRIAL>/source",
+      "exit_code": 0
+    },
+    {
+      "command": "rtk git checkout --detach 2d38dafede67d0d4ed920cde94d2106e98825b8a",
+      "cwd": "<TRIAL>/source",
+      "exit_code": 0
+    },
+    {
+      "command": "npm_config_cache=<TRIAL>/npm-cache rtk npm install",
+      "cwd": "<TRIAL>/source",
+      "exit_code": 0,
+      "log": "logs/npm-install.log",
+      "native_reported_seconds": 34
+    },
+    {
+      "command": "rtk npm run build",
+      "cwd": "<TRIAL>/source",
+      "exit_code": 0,
+      "log": "logs/npm-build.log",
+      "native_reported_milliseconds": 6965
+    },
+    {
+      "command": "rtk curl -fsSL --max-time 60 -o <TRIAL>/artifacts/iii-x86_64-unknown-linux-gnu.tar.gz https://github.com/iii-hq/iii/releases/download/iii/v0.11.2/iii-x86_64-unknown-linux-gnu.tar.gz",
+      "exit_code": 0
+    },
+    {
+      "command": "rtk curl -fsSL --max-time 60 -o <TRIAL>/artifacts/iii-x86_64-unknown-linux-gnu.sha256 https://github.com/iii-hq/iii/releases/download/iii/v0.11.2/iii-x86_64-unknown-linux-gnu.sha256",
+      "exit_code": 0
+    },
+    {
+      "command": "rtk sha256sum -c iii-x86_64-unknown-linux-gnu.sha256",
+      "cwd": "<TRIAL>/artifacts",
+      "exit_code": 0,
+      "log": "logs/iii-checksum.log"
+    },
+    {
+      "command": "rtk tar -xzf <TRIAL>/artifacts/iii-x86_64-unknown-linux-gnu.tar.gz -C <TRIAL>/bin",
+      "exit_code": 0
+    },
+    {
+      "command": "rtk chmod +x <TRIAL>/bin/iii",
+      "exit_code": 0
+    },
+    {
+      "command": "rtk <TRIAL>/bin/iii --version",
+      "exit_code": 0,
+      "output": "0.11.2",
+      "log": "logs/iii-version.log"
+    },
+    {
+      "command": "rtk <TRIAL>/bin/iii --help",
+      "exit_code": 0
+    },
+    {
+      "command": "source <PINNED_CHECKOUT>/eval/scripts/sandbox.sh; cd <PINNED_CHECKOUT>; rtk npm run eval:coding-life -- --adapters grep,agentmemory",
+      "wrapper": "rtk env -i with owned unique SANDBOX_ROOT and private PATH/npm cache; paths normalized here",
+      "exit_code": 0,
+      "log": "logs/eval-comparison.log",
+      "attempt": "comparison-run-1"
+    },
+    {
+      "command": "source <PINNED_CHECKOUT>/eval/scripts/sandbox.sh; cd <PINNED_CHECKOUT>; rtk npm run eval:coding-life -- --adapters agentmemory --out <TRIAL>/artifacts/diagnostic-run",
+      "wrapper": "rtk /usr/bin/time -p rtk env -i with second owned unique SANDBOX_ROOT; followed by four native curl observations before EXIT",
+      "exit_code": 0,
+      "log": "logs/eval-diagnostic.log",
+      "attempt": "diagnostic-run"
+    },
+    {
+      "command": "rtk npm run eval:coding-life -- --adapters ai-memory,hindsight",
+      "exit_code": 2,
+      "output": "unknown adapter: ai-memory. options: grep,vector,agentmemory",
+      "log": "logs/adapter-contract-probe.log",
+      "backend_initialization_reached": false
+    },
+    {
+      "command": "rtk git diff --exit-code HEAD -- eval src README.md INSTALL_FOR_AGENTS.md package.json",
+      "cwd": "<TRIAL>/source",
+      "exit_code": 0
+    },
+    {
+      "command": "rtk sha256sum -c artifacts/SHA256SUMS",
+      "cwd": "<TRIAL>",
+      "exit_code": 0,
+      "log": "logs/artifact-integrity.log",
+      "evidence_class": "Structural artifact integrity, not upstream behavior acceptance"
+    }
+  ],
+  "runs": [
+    {
+      "id": "comparison-run-1",
+      "exit_code": 0,
+      "k": 5,
+      "sessions": 15,
+      "queries": 15,
+      "score_rows": 30,
+      "summary": "artifacts/comparison-run-1/summary.json",
+      "scores": "artifacts/comparison-run-1/scores.ndjson",
+      "total_wall_seconds": null,
+      "wall_time_limit": "Not instrumented for this first attempt",
+      "metrics": {
+        "grep": {
+          "precision_at_k": 0.22666666666666668,
+          "recall_at_k": 0.9666666666666667,
+          "hit": 15,
+          "n": 15,
+          "latency_p50_ms": 0.03290100000000962
+        },
+        "agentmemory-hybrid": {
+          "precision_at_k": 0,
+          "recall_at_k": 0,
+          "hit": 0,
+          "n": 15,
+          "latency_p50_ms": 58.05861500000003,
+          "comparable_quality_metric": false
+        }
+      }
+    },
+    {
+      "id": "diagnostic-run",
+      "exit_code": 0,
+      "k": 5,
+      "sessions": 15,
+      "queries": 15,
+      "score_rows": 15,
+      "summary": "artifacts/diagnostic-run/summary.json",
+      "scores": "artifacts/diagnostic-run/scores.ndjson",
+      "native_time": {
+        "scope": "Sandbox startup, focused runner, four native HTTP observations, EXIT teardown",
+        "real_seconds": 4.83,
+        "user_seconds": 0.8,
+        "sys_seconds": 0.47
+      },
+      "metrics": {
+        "agentmemory-hybrid": {
+          "precision_at_k": 0,
+          "recall_at_k": 0,
+          "hit": 0,
+          "n": 15,
+          "latency_p50_ms": 52.317841999999985,
+          "comparable_quality_metric": false
+        }
+      }
+    }
+  ],
+  "native_http_observations": [
+    {
+      "operation": "GET /agentmemory/memories?count=true",
+      "curl_exit_code": 0,
+      "http_status": 200,
+      "total": 15,
+      "latest_count": 15,
+      "before_extra_probe": true,
+      "artifact": "artifacts/diagnostic-memory-count.json"
+    },
+    {
+      "operation": "GET /agentmemory/memories",
+      "curl_exit_code": 0,
+      "http_status": 200,
+      "records": 15,
+      "fixture_concepts": "sess-001 through sess-015",
+      "all_memory_session_ids": [],
+      "before_extra_probe": true,
+      "artifact": "artifacts/diagnostic-memories.json"
+    },
+    {
+      "operation": "POST /agentmemory/smart-search with first upstream query and limit=50",
+      "curl_exit_code": 0,
+      "http_status": 200,
+      "response_keys": [
+        "lessons",
+        "mode",
+        "results"
+      ],
+      "mode": "compact",
+      "results": 6,
+      "all_result_session_ids": "memory",
+      "result_obs_ids_match_stored_memories": true,
+      "artifact": "artifacts/diagnostic-smart-search.json"
+    },
+    {
+      "operation": "POST /agentmemory/remember with unchanged upstream install-verification probe",
+      "curl_exit_code": 0,
+      "http_status": 201,
+      "success": true,
+      "response_keys": [
+        "memory",
+        "success"
+      ],
+      "memory_id_present": true,
+      "memory_session_ids": [],
+      "after_scoring_and_count": true,
+      "artifact": "artifacts/diagnostic-remember.json",
+      "source": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/INSTALL_FOR_AGENTS.md"
+    }
+  ],
+  "diagnosis": {
+    "ingestion": "Native list and count show all fifteen upstream fixture records stored. Native smart-search returns non-empty results.",
+    "mismatch": "Durable memories have no real source session IDs, so runtime wraps them as sessionId=memory. Evaluator prefers this truthy value and skips its obsId-to-fixture-session mapping, yielding a fixture-unknown ID for every returned row.",
+    "source_evidence": [
+      {
+        "url": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/src/state/memory-utils.ts#L14",
+        "contract": "sessionId: memory.sessionIds?.[0] ?? \"memory\""
+      },
+      {
+        "url": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/eval/runner/adapters/agentmemory.ts#L81",
+        "contract": "let sessionId = row.sessionId; mapping through obsId occurs only if !sessionId"
+      },
+      {
+        "url": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/src/functions/remember.ts#L161",
+        "contract": "New remembered Memory has sessionIds: []"
+      },
+      {
+        "url": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/src/triggers/api.ts#L1036",
+        "contract": "remember payload whitelist has no fixture session-ID override"
+      }
+    ],
+    "repair": {
+      "performed": false,
+      "bounded_diagnosis_performed": true,
+      "reason": "No documented setup/invocation option resolves synthetic session-ID mapping. Editing/replacing evaluator is outside unchanged-upstream qualification. Coordinator instructed no extra local-embedding rerun."
+    }
+  },
+  "embedding_correction": {
+    "docs_claim": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md#L1329",
+    "docs_claim_description": "README describes local embeddings as default; zero-LLM startup text also mentions on-device embeddings.",
+    "verified_source": [
+      "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/src/config.ts#L265",
+      "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/src/providers/embedding/index.ts#L30"
+    ],
+    "verified_source_description": "With no keys and no EMBEDDING_PROVIDER override, detectEmbeddingProvider returns null and createEmbeddingProvider returns null. Runtime is configured for BM25-only despite the adapter name.",
+    "local_encoder_execution_established": false,
+    "explicit_local_supported_by_source": true,
+    "embedding_rerun_performed": false,
+    "llm_configuration": "noop; native agent-SDK fallback disabled by default",
+    "measured_provider_usage": null,
+    "measured_provider_cost": null
+  },
+  "teardown": {
+    "sandbox_trap_stopped_engines": true,
+    "sandbox_trap_left_node_workers_alive": true,
+    "owned_workers_observed": 2,
+    "worker_identity_verified": "Owned sandbox worker.pid and actual process command pointing to trial dist/index.mjs",
+    "term_command": "rtk /bin/kill -TERM <EXACT_OWNED_WORKER_PID>",
+    "term_exit_codes": [
+      0,
+      0
+    ],
+    "workers_still_observed_after_term": true,
+    "kill_command": "rtk /bin/kill -KILL <EXACT_OWNED_WORKER_PID>",
+    "kill_exit_codes": [
+      0,
+      0
+    ],
+    "final_ps_command": "rtk ps -p <FOUR_EXACT_OWNED_PIDS> -o pid,ppid,stat,args",
+    "final_ps_exit_code": 1,
+    "final_ps_output": "PID PPID STAT COMMAND header only; no process rows",
+    "process_log": "logs/teardown-processes.log",
+    "final_ss_exit_code": 0,
+    "final_ss_output": "Header only; no listener rows on exercised ports",
+    "ports_log": "logs/teardown-ports.log",
+    "synthetic_state_archives": [
+      "artifacts/sandbox-run-1.tar.gz",
+      "artifacts/sandbox-run-2.tar.gz"
+    ],
+    "owned_tmp_roots_deleted": true,
+    "delete_exit_code": 0,
+    "private_install_and_evidence_retained": true,
+    "production_hooks_or_client_config_changed": false,
+    "broad_process_kill_used": false
+  },
+  "adapter_contract": {
+    "installed_native_options": [
+      "grep",
+      "vector",
+      "agentmemory"
+    ],
+    "ai_memory_or_hindsight_not_found_in": "Installed runner allowed-adapter error and v0.9.29 changelog; pinned source ADAPTERS map confirms these three built-ins",
+    "source": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/eval/runner/coding-life.ts#L10",
+    "target_isolation": {
+      "agentmemory_base_url": "AGENTMEMORY_BASE_URL; defaults localhost:3111",
+      "agentmemory_auth": "Optional AGENTMEMORY_SECRET; absent in this trial",
+      "official_sandbox": "Owned /tmp root, alternate HTTP/stream ports, HOME scoped to engine subprocess",
+      "fixture_options": [
+        "--data",
+        "--adapters",
+        "--k",
+        "--out"
+      ]
+    },
+    "source_contract": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/eval/runner/adapters/agentmemory.ts#L43",
+    "metric_contract": "Precision@K uses hits/K; recall@K uses hits/gold count; any hit and p50 per-query latency; JSON/NDJSON results",
+    "metric_source": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/eval/runner/score.ts",
+    "capture_or_provider_usage_measured": false,
+    "custom_adapter_recipe": "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/eval/README.md#L93",
+    "custom_adapter_would_remain_unchanged_upstream": false
+  },
+  "artifact_hashes": {
+    "artifacts/comparison-run-1/scores.ndjson": "6d32e8b0654dbee30eefad8388178786902d395822458d73ec35a7254ffc36ed",
+    "artifacts/comparison-run-1/summary.json": "68dbfe1c179a1981b3b4716a90830222e74763ef7cb20c030153f8d24762f40c",
+    "artifacts/diagnostic-run/scores.ndjson": "35dcfb9a2bfeea6841a4863b84c88ed4dc8a4957941aa4f4ad7d2772fba40d1e",
+    "artifacts/diagnostic-run/summary.json": "ecdc01d406841ebabd18fe703e4b75ca3a8ce7549faea90aef79dfb9a62f92ea",
+    "artifacts/diagnostic-memory-count.json": "bf08df8b281c1cdcec07e8d9f26f6892d2df799849711bd020d78012ba444de7",
+    "artifacts/diagnostic-memories.json": "7b9382aef6c24513d5f71cf041ad948f36f938cc3adfa4680da1f23ba27cc84c",
+    "artifacts/diagnostic-smart-search.json": "a5353d3f55fb628d4200ce69ca9be4c6c0afa29b5e6ba8cafe27f6e3d20d80f1",
+    "artifacts/diagnostic-remember.json": "de769be76b1869f9f4c1848d87bdb4512647245749e6ee6f41de72753d844c17",
+    "source/eval/data/coding-agent-life-v1/sessions.json": "d32f0c3c35a35e6c5aa0ac1fd0bd92e1f413c132efe3b1262038595589df3f16",
+    "source/eval/data/coding-agent-life-v1/queries.json": "4f36fb00ea1e0ce3ccbefea9348fc4da027201a26a1fd7b5349391bcc69a24b4",
+    "source/eval/runner/adapters/agentmemory.ts": "c01442a4eb4f74f7197415414bdd001122bf2eb85a8f020302247e97510c8ff5",
+    "source/src/state/memory-utils.ts": "b3417fb3be5dde49fbd07c85f5eea182896fa83e6802f3806c35928c3a0fa7c3"
+  },
+  "complete_hash_manifest": "artifacts/SHA256SUMS",
+  "limitations": [
+    "Candidate fixture score cannot qualify backend recall at this upstream pin because session IDs do not satisfy evaluator mapping.",
+    "Keyless default configuration was BM25-only; on-device embedding execution was not established.",
+    "Sandbox EXIT cleanup alone leaked both owned workers; explicit scoped KILL was required.",
+    "Upstream fixture has fifteen fictional sessions and fifteen queries; no production capture, model-mediated lifecycle or cost comparison.",
+    "No repository-main edits, production memory access, native auth inspection or hook/MCP wiring.",
+    "Setup versions and structural checks are not model runs."
+  ],
+  "preserved_nonqualification_failures": [
+    "An initial source read raced unfinished checkout and returned ENOENT; checkout was awaited and pinned HEAD verified before rereading.",
+    "Speculative iii root install.sh source URL returned HTTP 404; documented release archive installation was used.",
+    "A source query included a missing optional file and returned rg exit 2; existing config/index source was then read directly.",
+    "An analysis-only regex syntax error and an orchestration parse error were corrected without affecting upstream runs.",
+    "One evidence-note patch context match failed and was corrected without changing native execution."
+  ]
+}

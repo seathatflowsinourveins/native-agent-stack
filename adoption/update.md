@@ -9,6 +9,11 @@ scope and failures; do not sum snapshots or rerun model trials on ordinary resum
 
 ## Resume an existing checkout
 
+For the 2026-09-30 Sol defaults, follow the [native metadata readiness
+check](../docs/decisions/2026-09-30-sol-primary-quality-defaults.md) before
+applying model changes. Current-host execution is distinct from platform pin
+qualification and a new machine's status.
+
 ```sh
 git status --short
 git rev-parse HEAD
@@ -283,3 +288,11 @@ not automatically install a candidate or change an accepted native pin.
 - Select an independent backup/key destination and intended hosting lifecycle, then exercise recovery and interruption behavior. Same-host restore and a running local history server are narrower results.
 
 A future session should pick a concrete unresolved gate, read its references, and make measurable progress. Repeatedly enlarging the catalog is not itself evidence that a runtime works.
+
+For the native token stack, the [2026-09-30 lifecycle resolution](../docs/decisions/2026-09-30-token-lifecycle-resolution.md)
+retains the current qualified pins and records the new disposable installation,
+native client checks and source-backed Serena reference repair. The Claude
+profile now installs unchanged reviewed personal saved workflows through
+`rtk python3 tools/adoption/install_claude_profile.py --only workflows`; scoped
+removal preserves customization. Its provider-run limitations remain explicit
+and do not change the drafted whole-profile acceptance status.

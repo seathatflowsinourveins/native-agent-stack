@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-@@SCRIPT_HASH@@'; style-src 'unsafe-inline'; img-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="color-scheme" content="light">
+<title>Memory &amp; RAG — final recommendation and evidence</title>
+<style>@@STYLE@@
+.topic-main{padding-top:34px;padding-bottom:70px}.topic-main section{margin:42px 0}.topic-main h2{margin-bottom:18px}.topic-main p{margin:12px 0}.topic-main li{margin:9px 0}.topic-main details{margin:12px 0}.topic-main .catalog-card{padding:22px}.topic-main .catalog-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px}.topic-main .table-wrap{overflow:auto}.topic-main table{width:100%;border-collapse:collapse;background:var(--white)}.topic-main th,.topic-main td{padding:14px;border:1px solid var(--line);text-align:left;vertical-align:top}.topic-main td{min-width:180px}.topic-main pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;max-height:65vh;overflow:auto}.topic-main code{overflow-wrap:anywhere}.topic-nav{display:flex;flex-wrap:wrap;gap:16px;padding:16px 0}.topic-main input{width:min(100%,560px);padding:12px;border:1px solid var(--line);border-radius:7px}.topic-main .decision{padding:24px;background:var(--ink);color:var(--white);border-radius:var(--radius)}.topic-main .decision a{color:var(--lime)}.topic-main .decision h1{font-size:clamp(42px,6vw,68px)}.topic-main .record{border:1px solid var(--line);border-radius:var(--radius);padding:18px;background:var(--white)}.topic-main .record[hidden]{display:none}@media(max-width:650px){.shell{padding:0 18px}}
+</style>
+</head>
+<body>
+<header><div class="shell masthead"><a class="brand" href="#decision"><span class="mark">n</span><strong>Native stack<span class="small">MEMORY &amp; RAG · EVIDENCE MANIFEST</span></strong></a><span class="edition" id="edition"></span></div></header>
+<main class="shell topic-main" id="topic-app">
+<nav class="topic-nav" aria-label="Topic sections"><a href="#decision">Decision</a><a href="#evidence">Evidence</a><a href="#native">Native trials</a><a href="#candidates">Candidates</a><a href="#runtime">Runtime</a><a href="#lanes">Full lanes</a><a href="#continuation">Continue</a><a href="#records">Source records</a></nav>
+<section class="decision" id="decision"><div class="eyebrow">Final recommendation · shared Claude / Codex memory</div><h1 id="recommendation"></h1><p id="verdict"></p><p id="adoption"></p><div id="actions"></div></section>
+<section><h2>Why this choice</h2><ul id="reasons"></ul><div id="priority-sources"></div></section>
+<section id="evidence"><h2>Five finalists · evidence and limits</h2><div class="table-wrap"><table><thead><tr><th>Candidate / role</th><th>Observed evidence</th><th>Cost scope</th><th>Open acceptance and sources</th></tr></thead><tbody id="evidence-rows"></tbody></table></div></section>
+<section id="coding"><h2>Published native coding comparison</h2><p>61 constructed bug-fix tasks, repeated three times per arm. The control is no memory. Reported cost covers coding agents and excludes Hindsight processing and hosting.</p><div class="table-wrap"><table><thead><tr><th>Agent / model</th><th>Corrections per task</th><th>Solved repeated task runs</th><th>Coding-agent cost reduction</th></tr></thead><tbody id="coding-rows"></tbody></table></div><div id="coding-limits"></div></section>
+<section id="lanes"><h2>Full lane resolution · current next gates</h2><p id="lane-summary"></p><p>Historical acceptance, current source review and pending runtime gates retain their separate scopes. Each row names the next concrete action and its recorded owner.</p><div class="table-wrap"><table><thead><tr><th>Lane / layer</th><th>Current evidence</th><th>Next gate / owner</th></tr></thead><tbody id="lane-rows"></tbody></table></div></section>
+<section id="native"><h2>What this host actually qualified</h2><p>Native backend and synthetic integration checks have narrower scopes than live coding-client capture or a matched quality/cost run.</p><div id="native-rows" class="catalog-grid"></div></section>
+<section id="candidates"><h2>All candidate verdicts</h2><label for="candidate-filter">Find a candidate, role or reason</label><p><input id="candidate-filter" type="search" placeholder="Hindsight, local retrieval, lifecycle…"></p><p class="small muted" id="candidate-count"></p><div id="candidate-cards" class="catalog-grid"></div></section>
+<section id="runtime"><h2>Clean runtime target and release freshness</h2><div id="runtime-facts"></div><div id="release-facts"></div><p>Latest release, installed version, tested version and accepted configuration remain distinct.</p><details class="record"><summary>New WSL distribution proposal</summary><div id="wsl-facts"></div></details></section>
+<section id="harness"><h2>Native GPT harness through OmniRoute</h2><p id="harness-summary"></p><div id="harness-facts"></div><div id="harness-candidates" class="catalog-grid"></div><p>Native install, catalog discovery, upstream API tests, local integration fixtures and real provider execution retain separate acceptance scopes.</p></section>
+<section id="continuation"><h2>Remaining acceptance and session continuity</h2><ol id="next-gates"></ol><div id="continuity-facts"></div></section>
+<section id="stack-gaps"><h2>Remaining SDK, hosting, Docker and CLI gaps</h2><p id="stack-gap-summary"></p><p id="stack-gap-peer"></p><div class="table-wrap"><table><thead><tr><th>Layer / class</th><th>Present and remaining gap</th><th>Next native gate</th></tr></thead><tbody id="stack-gap-rows"></tbody></table></div><h3>Conditional SDK choices</h3><div id="sdk-gap-candidates" class="catalog-grid"></div></section>
+<section id="records"><h2>Embedded source records</h2><p>Read or download these exact sanitized records offline. Hashes bind the included bytes; they do not prove independent execution or benchmark truth.</p><div id="record-list"></div></section>
+<footer><p class="small muted">Generated from the maintained native-agent-stack exporter. Primary sources remain linked. This file makes no network requests.</p></footer>
+<!--@@BODY@@-->
+</main>
+<script id="topic-data" type="application/json">@@DATA@@</script>
+<script>
+"use strict";
+(() => {
+const data = JSON.parse(document.getElementById("topic-data").textContent), review = data.review, decision = review.decision, resolution = review.resolution;
+const $ = id => document.getElementById(id);
+const make = (tag, cls, content) => { const node = document.createElement(tag); if(cls) node.className = cls; if(content !== undefined) node.textContent = content; return node; };
+const add = (parent, ...children) => { children.forEach(child => parent.appendChild(child)); return parent; };
+const readable = value => String(value).replaceAll("_", " ");
+const link = (label, url) => { const node = make("a", "", label); const parsed = new URL(url); if(!["https:", "http:"].includes(parsed.protocol)) throw new Error("Unsupported source URL"); node.href = parsed.href; node.target = "_blank"; node.rel = "noopener noreferrer"; return node; };
+const sourceURL = value => { if(/^https?:\/\//.test(value)) return value; if(typeof value !== "string" || value.startsWith("/") || value.split("/").some(part => !part || part === "." || part === "..") || value.includes(":")) throw new Error("Unsupported source path"); return data.repository_url + "/blob/main/" + value.split("/").map(encodeURIComponent).join("/"); };
+const sources = (parent, values) => { const row = make("div", "catalog-sources"); (values || []).forEach((value, i) => add(row, link(typeof value === "string" ? "Primary source " + (i+1) : value.path, sourceURL(typeof value === "string" ? value : value.url)))); add(parent, row); };
+const facts = (parent, values) => { const list = make("dl", "catalog-facts"); Object.entries(values).forEach(([key, value]) => { if(value === undefined) return; const cell = make("dd"); if(value === null) cell.textContent = "Not established"; else if(Array.isArray(value)) value.forEach(item => add(cell, make("p", "", typeof item === "string" ? item : JSON.stringify(item)))); else if(typeof value === "object") facts(cell, value); else cell.textContent = typeof value === "boolean" ? (value ? "Yes" : "No") : String(value); add(list, make("dt", "", readable(key)), cell); }); add(parent, list); };
+const download = (label, name, text, mime = "application/json") => { const button = make("button", "button secondary small", label); button.addEventListener("click", () => { const url = URL.createObjectURL(new Blob([text], {type:mime})); const anchor = make("a"); anchor.href = url; anchor.download = name; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); }); return button; };
+const documentByPath = new Map(data.documents.map(doc => [doc.path, doc]));
+if (resolution.native_stack_gap_record) {
+const gap = JSON.parse(documentByPath.get(resolution.native_stack_gap_record).text);
+$("stack-gap-summary").textContent = gap.verdict;
+if (gap.peer_coordination) $("stack-gap-peer").textContent = "Latest native peer relay: " + gap.peer_coordination.status + "; sends: " + gap.peer_coordination.send_message_calls + "; enqueue acknowledgments: " + gap.peer_coordination.enqueue_acknowledgments + ". " + gap.peer_coordination.acceptance_limit;
+gap.rows.forEach(row => { const next = add(make("td"), make("p", "", row.next), make("p", "small", "Owner: " + row.owner)); sources(next, row.sources); add($("stack-gap-rows"), add(make("tr"), add(make("td"), make("strong", "", row.area), make("p", "small", row.classification)), add(make("td"), make("p", "", row.installed), make("p", "", row.gap)), next)); });
+gap.conditional_sdks.forEach(row => { const card = add(make("article", "record"), make("h3", "", row.name), make("p", "", row.role), make("p", "", row.verdict)); facts(card, {reviewed_version:row.reviewed_version,reviewed_pin:row.reviewed_pin}); sources(card, row.sources); add($("sdk-gap-candidates"), card); });
+}
+if (resolution.native_harness_resolution_record) {
+const harness = JSON.parse(documentByPath.get(resolution.native_harness_resolution_record).text);
+$("harness-summary").textContent = harness.selection.recommended_path + ". " + harness.selection.new_sdk_status;
+facts($("harness-facts"), {accepted_incumbent_sdk:harness.selection.accepted_incumbent_sdk,installed_sdk:harness.selection.new_sdk,installed_omniroute:harness.native_installation.omniroute.reported_version,discovery:harness.discovery.status,upstream_api_tests:harness.upstream_api_tests.passed,local_integration_tests:harness.local_integration_fixtures.attempts.at(-1).tests,local_integration_exit:harness.local_integration_fixtures.attempts.at(-1).exit_code,real_provider_status:harness.live_attempt.native_completion_http_status,real_task_accepted:harness.live_attempt.actual_task_success,complete_cost_winner:harness.selection.complete_cost_winner,canonical_pins_changed:harness.selection.canonical_pins_changed});
+harness.candidates.forEach(row => { const card = add(make("article", "record"), make("h3", "", row.name + " · " + row.version), make("p", "", row.disposition), make("p", "", row.reason)); sources(card, row.sources); add($("harness-candidates"), card); });
+}
+const coding = JSON.parse(documentByPath.get(resolution.published_coding_evidence).text);
+const lanes = JSON.parse(documentByPath.get(resolution.full_lanes_resolution_record).text);
+$("lane-summary").textContent = lanes.row_counts.foundation + " foundation + " + lanes.row_counts["us-equities"] + " trading rows reconciled. " + lanes.peer_messaging.queued_count + " native peer notifications queued; acknowledgment and completion are unobserved.";
+lanes.rows.forEach(row => { const next = add(make("td"), make("p", "", row.next_action), make("p", "small", "Owner: " + row.owner)); sources(next, row.source_refs); add($("lane-rows"), add(make("tr"), add(make("td"), make("strong", "", row.catalog + " / " + row.layer_id), make("p", "small", readable(row.status))), make("td", "", row.evidence_interpretation), next)); });
+$("edition").textContent = "Reviewed " + review.checked_at;
+$("recommendation").textContent = decision.recommended_target || decision.final_candidate;
+$("verdict").textContent = decision.final_verdict;
+$("adoption").textContent = "Recommendation finalized. Current stable server " + review.priority_challenger.server_version + " / coding integration " + review.priority_challenger.coding_integration_version + ". Live coding-client capture and complete-cost acceptance remain pending.";
+add($("actions"), download("Download topic manifest", "memory-rag-manifest.json", JSON.stringify(data,null,2)+"\n"), link("Recommended repository ↗", review.priority_challenger.repository));
+decision.selection_reasons.forEach(reason => add($("reasons"), make("li", "", reason))); sources($("priority-sources"), review.priority_challenger.sources);
+review.assurance.rows.forEach(row => { const gap = add(make("td"), make("p", "", row.acceptance_gap)); sources(gap, row.sources); add($("evidence-rows"), add(make("tr"), add(make("td"), make("strong", "", row.name), make("p", "small", row.role)), make("td", "", row.observed_result), make("td", "", row.token_cost_scope), gap)); });
+coding.published_manifest.comparisons.forEach(row => add($("coding-rows"), add(make("tr"), make("td", "", row.agent + " / " + row.model), make("td", "", row.control_corrections_per_task.toFixed(3) + " → " + row.hindsight_corrections_per_task.toFixed(3)), make("td", "", row.control_solved + "/" + row.repeated_task_runs_per_arm + " → " + row.hindsight_solved + "/" + row.repeated_task_runs_per_arm), make("td", "", row.agent_cost_reduction_percent.toFixed(2) + "%"))));
+const limitations = make("ul"); coding.limitations.forEach(item => add(limitations, make("li", "", item))); add($("coding-limits"), limitations); sources($("coding-limits"), coding.sources);
+resolution.memory_candidates.forEach(row => { const card = add(make("article", "record"), make("h3", "", row.id), make("p", "", row.role), make("p", "", row.observed_result || row.reason)); facts(card, {status:row.execution_status, boundary:row.promotion_limit}); sources(card, row.sources); add($("native-rows"), card); });
+const cards = review.candidates.map(row => { const card = add(make("article", "record"), add(make("h3"), link(row.name + " ↗", row.repository)), make("p", "small muted", readable(row.disposition)), make("p", "", row.rationale)); facts(card, {role:row.role,latest_version:row.latest_version,revision:row.source_revision,license:row.license,evidence_class:row.evidence_class}); sources(card, row.sources); add($("candidate-cards"), card); return {card,text:JSON.stringify(row).toLowerCase()}; });
+function filterCandidates() { const query = $("candidate-filter").value.trim().toLowerCase(); let count = 0; cards.forEach(item => { item.card.hidden = !item.text.includes(query); if(!item.card.hidden) count++; }); $("candidate-count").textContent = count + " of " + cards.length + " reviewed candidates"; }
+$("candidate-filter").addEventListener("input", filterCandidates); filterCandidates();
+const runtime = review.assurance.runtime_alignment;
+facts($("runtime-facts"), {profile:runtime.reference_profile,configuration:resolution.status,measured_backbone_winner:resolution.backbone_winner,runtime_acceptance_verified:runtime.runtime_acceptance_verified});
+runtime.components.forEach(row => add($("runtime-facts"), make("p", "", row.id + " · " + row.version + " · " + row.role + (row.optional ? " · Optional / project-scoped" : ""))));
+facts($("release-facts"), review.latestness); facts($("wsl-facts"), resolution.new_distribution_proposal);
+resolution.next_acceptance.forEach(item => add($("next-gates"), make("li", "", item)));
+facts($("continuity-facts"), resolution.continuation);
+data.documents.forEach(doc => { const detail = add(make("details", "record"), make("summary", "", doc.path), make("p", "small mono", doc.bytes + " bytes · SHA256 " + doc.sha256), link("Published source ↗", doc.url), download("Download exact record", doc.path.split("/").pop(), doc.text, doc.path.endsWith(".json") ? "application/json" : "text/plain"), make("pre", "", doc.text)); add($("record-list"), detail); });
+})();
+</script>
+</body>
+</html>

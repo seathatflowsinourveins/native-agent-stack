@@ -1,0 +1,104 @@
+{
+  "kind": "claude-ordinary-agent-post-resume-observation",
+  "inspection_time_utc": "2026-09-30T16:35:06Z",
+  "source_classes": [
+    "owned native parent transcript",
+    "owned native child transcript",
+    "owned native child metadata"
+  ],
+  "parent_recovery": {
+    "original_tool": "Agent",
+    "original_result_is_error": true,
+    "original_outcome": "interrupted; outcome unknown",
+    "resume_tool": "SendMessage",
+    "resume_result_time_utc": "2026-09-30T16:06:32.936Z",
+    "success": true,
+    "resumedAgentId": "<owned-native-task-1>",
+    "same_child": true
+  },
+  "child": {
+    "agent_type": "isolated-builder",
+    "request_shape": "foreground",
+    "request_noninteractive": true,
+    "transcript_rows": 37,
+    "assistant_rows": 6,
+    "unique_assistant_message_ids": 2,
+    "model": "claude-opus-5-5",
+    "effort": "max",
+    "preload": {
+      "full_context_mode_skill_heading_present": true,
+      "role_token_lane_block_present": true
+    },
+    "tools": [
+      {
+        "name": "ToolSearch",
+        "result_time_utc": "2026-09-30T16:08:19.426Z",
+        "is_error": false,
+        "loaded_tools": [
+          "mcp__plugin_context-mode_context-mode__ctx_execute"
+        ]
+      },
+      {
+        "name": "mcp__plugin_context-mode_context-mode__ctx_execute",
+        "result_time_utc": "2026-09-30T16:08:41.808Z",
+        "is_error": false,
+        "returned_command_result": {
+          "exit_code": 0,
+          "stdout": "Python 3.13.15"
+        }
+      }
+    ],
+    "hooks": {
+      "successful_result_rows": 8,
+      "exit_code_counts": {
+        "0": 8
+      },
+      "event_counts": {
+        "SubagentStart": 4,
+        "PreToolUse:ToolSearch": 1,
+        "PostToolUse:ToolSearch": 1,
+        "PreToolUse:mcp__plugin_context-mode_context-mode__ctx_execute": 1,
+        "PostToolUse:mcp__plugin_context-mode_context-mode__ctx_execute": 1
+      },
+      "nonempty_stderr_result_rows": 0
+    },
+    "completion": {
+      "last_record_time_utc": "2026-09-30T16:08:42.821Z",
+      "final_assistant_end_turn_text_rows": 0,
+      "final_result_rows": 0,
+      "subagent_stop_events": 0,
+      "status": "unverified",
+      "current_liveness": "unknown"
+    }
+  },
+  "usage": {
+    "deduplication": "One last usage snapshot per unique assistant message ID; no streamed duplicate sum.",
+    "finalized_messages": [
+      {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 35141,
+        "cache_read_input_tokens": 0,
+        "output_tokens": 11743,
+        "thinking_tokens": 11487,
+        "stop_reason": "tool_use"
+      }
+    ],
+    "provisional_messages": [
+      {
+        "input_tokens": 2,
+        "cache_creation_input_tokens": 15150,
+        "cache_read_input_tokens": 35141,
+        "output_tokens": 8,
+        "final_output_tokens": null,
+        "stop_reason": null
+      }
+    ],
+    "initial_interrupted_attempt_final_usage": null,
+    "whole_run_final_usage": null
+  },
+  "qualification": {
+    "observed": "Post-resume skill preload, deferred discovery and successful native Context Mode command execution.",
+    "unverified": "Final builder handoff and complete agent lifecycle.",
+    "provider_hang_inferred": false
+  }
+}

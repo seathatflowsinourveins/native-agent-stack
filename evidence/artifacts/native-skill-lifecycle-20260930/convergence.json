@@ -1,0 +1,400 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Refresh selected maintained native skills and verify installation, removal, recovery and representative native task activation without claiming broad SOTA superiority.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/affaan-m/ECC/blob/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first/SKILL.md",
+      "revision": "c70874fae9eb0e5ad0365beb7e2955899fd1d30f"
+    },
+    {
+      "url": "https://github.com/vercel-labs/skills/tree/7407f3893ad4dceab546ac002c3ef806e4000c73",
+      "revision": "7407f3893ad4dceab546ac002c3ef806e4000c73"
+    },
+    {
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+      "revision": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60"
+    }
+  ],
+  "discovery_provenance": [
+    "Installed client inspection, upstream release/changelog review, exact pinned/current skill source comparison and official native skills/evaluation guidance."
+  ],
+  "license_and_compatibility": "Existing selected MIT/Apache-2.0 upstream tools and skills, reused through supported install commands on the current host.",
+  "baseline_and_candidate": {
+    "baseline": "Previously pinned selected skills; no new baseline model execution.",
+    "candidate": "Three maintained upstream revisions and compact native task-to-skill guidance."
+  },
+  "frozen_inputs": {
+    "base_revision": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+    "tasks": [
+      "lifecycle",
+      "explicit-search-first",
+      "implicit-agent-writing",
+      "adjacent-negative"
+    ],
+    "roles": [
+      "native-cli",
+      "native-codex"
+    ],
+    "sources": [
+      {
+        "path": "adoption/skills/manifest.json",
+        "sha256": "d039b76060e2c3e6f782749d756697272af1096ef28f2b21742726a3545aa5cf"
+      },
+      {
+        "path": "adoption/templates/codex.AGENTS.template.md",
+        "sha256": "fc41714fc1aa5a1c8a551dbe23752551194ace77af73eb8fed37bc34f665b402"
+      },
+      {
+        "path": "examples/claude-native/CLAUDE.md",
+        "sha256": "31333cad4ced8f8d3bef5c635de053c6f76d8ec01bd447a6b170ab12e6f2fcd8"
+      },
+      {
+        "path": "AGENTS.md",
+        "sha256": "92f28999db3be9c4b62cd0ef83945e2f625849eba07e925228237315c514ada3"
+      },
+      {
+        "path": "tools/adoption/install_skills.py",
+        "sha256": "ecbe9fc92cae18922f87f617fb075fdfb7620fce39180e4fb905dbb9d1235121"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "evidence/artifacts/native-skill-lifecycle-20260930/probes.json",
+        "sha256": "16549c1eb5865d53f3efa15fc98087a96e3a22d9539f044d255e0c51e4ff36c8"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/artifacts/native-skill-lifecycle-20260930/probes.json",
+        "sha256": "16549c1eb5865d53f3efa15fc98087a96e3a22d9539f044d255e0c51e4ff36c8"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Inspect native JSONL tool events for the expected SKILL.md read and inspect the actual task result. A name mention alone is insufficient. The negative should not read a skill. Keep failures, unknown usage and client visibility limits explicit. Lifecycle additionally requires observed install, removal, recovery and final cleanup in an owned disposable project.",
+    "usage_rule": "Keep native usage and failed attempts; unknown categories remain null. Coverage is partial and no savings claim is made."
+  },
+  "runtime_and_platform": {
+    "platform": "Current host, foundation native skills lane",
+    "tools": [
+      {
+        "name": "skills",
+        "version": "1.7.0"
+      },
+      {
+        "name": "codex",
+        "version": "0.159.2"
+      },
+      {
+        "name": "claude",
+        "version": "2.1.285"
+      }
+    ],
+    "isolation": "Read-only ephemeral Codex probes; private owned disposable project for lifecycle effects; accepted global selected skills retained."
+  },
+  "commands": [
+    "rtk python3 tools/adoption/install_skills.py --skills-bin <isolated-skills-bin> --project-dir <owned-project> --agent universal --only search-first --json; native list/remove in that project; repeat install/check-only; remove and inspect",
+    "rtk proxy codex exec --json --ephemeral -s read-only -c 'web_search=\"live\"' \"Use $search-first to recommend an existing maintained TOML parser for Python 3.13. Return a recommendation with its primary source. Follow the skill's research workflow. Do not edit files or install packages.\"",
+    "rtk proxy codex exec --json --ephemeral -s read-only -c 'web_search=\"live\"' \"Review this proposed AGENTS.md rule for agent instruction clarity: 'For every edit, load the entire docs folder and run every test ten times.' Suggest a concise replacement as prose and explain when supporting references should be loaded. Do not edit files.\"",
+    "rtk proxy codex exec --json --ephemeral -s read-only -c 'web_search=\"live\"' \"Correct the spelling in this sentence and return only the corrected sentence: 'The cat sat on teh mat.'\"",
+    "rtk python3 -m unittest tests.test_skills_manifest tests.test_skills_status tests.test_install_skills tests.test_codex_worker_lane tests.test_codex_agents tests.test_install_claude_profile tests.test_runtime_worker_skills",
+    "rtk python3 tools/adoption/apply_codex_lane.py"
+  ],
+  "observations": [
+    {
+      "id": "integration-initial",
+      "task": "lifecycle",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "offline_artifact_check",
+      "scope": "local-skill-integration",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-lifecycle-20260930/receipt.json",
+          "sha256": "4c9c018b58c55698c450aecee3b58361f3fb38439604ec21a1fe1a4a71905571"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-lifecycle-20260930/verification.json",
+          "sha256": "d4747f71862589212f501c7b28a998ac512f4d5b72943621f90ffc69d7fdacc2"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "native-lifecycle",
+      "task": "lifecycle",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "current-host-selected-skill-lifecycle-20260930",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-lifecycle-20260930/receipt.json",
+          "sha256": "4c9c018b58c55698c450aecee3b58361f3fb38439604ec21a1fe1a4a71905571"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-lifecycle-20260930/verification.json",
+          "sha256": "d4747f71862589212f501c7b28a998ac512f4d5b72943621f90ffc69d7fdacc2"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "integration-repaired",
+      "task": "lifecycle",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 4,
+      "evidence_class": "offline_artifact_check",
+      "scope": "local-skill-integration",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-lifecycle-20260930/receipt.json",
+          "sha256": "4c9c018b58c55698c450aecee3b58361f3fb38439604ec21a1fe1a4a71905571"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-lifecycle-20260930/verification.json",
+          "sha256": "d4747f71862589212f501c7b28a998ac512f4d5b72943621f90ffc69d7fdacc2"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "global-instructions-refused",
+      "task": "lifecycle",
+      "role": "native-cli",
+      "condition": "candidate",
+      "attempt": 4,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "global-user-instruction-rollout",
+      "status": "failed",
+      "exit_code": 2,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-lifecycle-20260930/receipt.json",
+          "sha256": "4c9c018b58c55698c450aecee3b58361f3fb38439604ec21a1fe1a4a71905571"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-lifecycle-20260930/verification.json",
+          "sha256": "d4747f71862589212f501c7b28a998ac512f4d5b72943621f90ffc69d7fdacc2"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "explicit-search-first",
+      "task": "explicit-search-first",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-selected-skill-lifecycle-20260930",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-lifecycle-20260930/receipt.json",
+          "sha256": "4c9c018b58c55698c450aecee3b58361f3fb38439604ec21a1fe1a4a71905571"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-lifecycle-20260930/verification.json",
+          "sha256": "d4747f71862589212f501c7b28a998ac512f4d5b72943621f90ffc69d7fdacc2"
+        }
+      ],
+      "usage": {
+        "uncached_input": 41479,
+        "cache_creation": 0,
+        "cache_read": 132864,
+        "output": 1269,
+        "reasoning_in_output": 65,
+        "total": 175612,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "implicit-agent-writing",
+      "task": "implicit-agent-writing",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-selected-skill-lifecycle-20260930",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-lifecycle-20260930/receipt.json",
+          "sha256": "4c9c018b58c55698c450aecee3b58361f3fb38439604ec21a1fe1a4a71905571"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-lifecycle-20260930/verification.json",
+          "sha256": "d4747f71862589212f501c7b28a998ac512f4d5b72943621f90ffc69d7fdacc2"
+        }
+      ],
+      "usage": {
+        "uncached_input": 23647,
+        "cache_creation": 0,
+        "cache_read": 20352,
+        "output": 244,
+        "reasoning_in_output": 0,
+        "total": 44243,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "adjacent-negative",
+      "task": "adjacent-negative",
+      "role": "native-codex",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 3,
+      "evidence_class": "model_task_execution",
+      "scope": "current-host-selected-skill-lifecycle-20260930",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/native-skill-lifecycle-20260930/receipt.json",
+          "sha256": "4c9c018b58c55698c450aecee3b58361f3fb38439604ec21a1fe1a4a71905571"
+        },
+        {
+          "path": "evidence/artifacts/native-skill-lifecycle-20260930/verification.json",
+          "sha256": "d4747f71862589212f501c7b28a998ac512f4d5b72943621f90ffc69d7fdacc2"
+        }
+      ],
+      "usage": {
+        "uncached_input": 13360,
+        "cache_creation": 0,
+        "cache_read": 7168,
+        "output": 11,
+        "reasoning_in_output": 0,
+        "total": 20539,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "integration-initial",
+      "reason": "Downstream runtime-worker reuse_ref identities still held prior pins; three entries were repaired and the retained second attempt passed."
+    },
+    {
+      "run_id": "global-instructions-refused",
+      "reason": "Global updater requires Codex 0.157.1; installed stable client is 0.159.2. Active sessions were preserved and no global rollout occurred."
+    }
+  ],
+  "limitations": [
+    "Representative single-run activation checks, not a broad quality benchmark.",
+    "Codex activation does not establish Claude activation.",
+    "No before/after efficiency or superiority claim.",
+    "Other selected skill sources and other hosts retain their prior evidence; core source review is not a complete ecosystem freshness audit.",
+    "Global portable user-instruction activation is distinct from this repository instruction change.",
+    "Only representative activation cases were frozen before model execution; preparation, source review and initial installation are separately recorded.",
+    "Local integration repair changed the downstream manifest; those attempts are not a fixed-input efficiency comparison.",
+    "Global user-instruction rollout is unqualified under a different scope; representative Claude implicit activation remains unmeasured.",
+    "Native child usage is retained once per completed turn; coordinator, research and verifier usage is outside this partial accounting."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "current-host-selected-skill-lifecycle-20260930",
+    "qualification_run_ids": [
+      "native-lifecycle",
+      "explicit-search-first",
+      "implicit-agent-writing",
+      "adjacent-negative"
+    ]
+  },
+  "rollback": "Re-add prior immutable source pins through the existing installer and verify; retain private previous folders, lock metadata and manifest. Remove only the owned disposable project skill.",
+  "next_decision_changing_test": "Qualify the global updater for the installed client and its required idle state; test realistic implicit research and Claude activation within their listing states at the trial review.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [
+      "integration-initial",
+      "integration-repaired",
+      "global-instructions-refused",
+      "native-lifecycle",
+      "explicit-search-first",
+      "implicit-agent-writing",
+      "adjacent-negative"
+    ],
+    "coverage_artifact": null
+  }
+}

@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "kind": "topic_publication_verification",
+  "checked_at": "2026-10-01T00:50:38Z",
+  "source_implementation": [
+    "scripts/build_ecosystem.py",
+    "docs/ecosystem/template.html",
+    "docs/ecosystem/memory-rag.template.html",
+    "tests/test_ecosystem_manifest.py",
+    "tests/test_memory_topic.py"
+  ],
+  "html": {
+    "path": "docs/ecosystem/memory-rag.html",
+    "bytes": 454415,
+    "sha256": "20112e35d47df516991a1bb82e2ad97bfae5bcf0e78867b4434bf65116d0c47c",
+    "embedded_records": 17,
+    "input_sha256": "cfd8fad7b1a1578dfc142d89ad5af154aa3f23c6b4da1784ca1975ed3811ddac",
+    "candidates": 25,
+    "lane_rows": 32
+  },
+  "checks": [
+    {
+      "command": "rtk python3 -m unittest tests.test_ecosystem_manifest",
+      "exit_code": 0,
+      "tests": 64,
+      "scope": "Existing explorer contracts after adding optional topic exporter."
+    },
+    {
+      "command": "rtk python3 -m unittest tests.test_memory_topic",
+      "exit_code": 0,
+      "tests": 5,
+      "scope": "Exact selected bytes/hash, sibling exclusion, stale evidence rejection, symlink confinement, script escaping, actual topic DOM rendering and candidate filtering."
+    },
+    {
+      "command": "rtk python3 -m unittest tests.test_adoption_docs_consistency.UpstreamVerificationSectionTests",
+      "exit_code": 0,
+      "tests": 3,
+      "scope": "Canonical correction log structure."
+    },
+    {
+      "command": "rtk python3 scripts/build_ecosystem.py --topic memory-rag --check",
+      "exit_code": 0,
+      "status": "passed",
+      "scope": "Independent-process deterministic output; exact hash recorded above."
+    },
+    {
+      "command": "rtk node --check",
+      "exit_code": 0,
+      "scope": "Complete inline topic application script."
+    },
+    {
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 0,
+      "status": "passed",
+      "components": 69,
+      "hashed_files": 8283,
+      "profiles": 4,
+      "receipts": 177,
+      "scope": "Integrity/scope only; no provider/GPU/broker acceptance."
+    },
+    {
+      "command": "rtk python3 scripts/validate_catalogs.py",
+      "exit_code": 0,
+      "scope": "Catalog/evidence-class structure only; source/native tests not replayed."
+    }
+  ],
+  "content_checks": {
+    "embedded_hashes_match": true,
+    "private_home_path_matches": 0,
+    "unresolved_template_markers": []
+  },
+  "native_browser_launch": {
+    "exit_code": 0,
+    "mechanism": "Windows PowerShell Start-Process of WSL file URI",
+    "visual_inspection": false,
+    "scope": "Successful launch request only; latest complete topic copy reopened."
+  },
+  "native_durable_memory": {
+    "isError": false,
+    "path": "decisions/memory-foundation-resolution-20260930.md",
+    "full_lane_record_present": true,
+    "pin_scope_present": true,
+    "scope": "Explicit local/native-agent-stack native write/readback; no auth values or transcripts"
+  },
+  "failed_attempts": [
+    {
+      "operation": "New test module initial import",
+      "exit_code": 1,
+      "result": "Importlib loading outside the scripts namespace broke the relative import. Corrected to maintained scripts package import; subsequent consumer tests pass."
+    },
+    {
+      "operation": "First adapted existing DOM harness",
+      "exit_code": 1,
+      "result": "Harness still named ecosystem-data; adjusted the harness binding to topic-data."
+    },
+    {
+      "operation": "Actual full-topic DOM rendering",
+      "exit_code": 1,
+      "result": "Repository-relative lifecycle source was passed directly to URL. Added confined relative-source resolution; real-topic test now covers this path."
+    },
+    {
+      "operation": "Five topic tests after full-lane queue reconciliation",
+      "exit_code": 1,
+      "result": "research state schema or date differs from landscape. Restored sealed checked_at and recorded resolution_checked_at separately."
+    },
+    {
+      "operation": "First current publication validation",
+      "exit_code": 1,
+      "result": ".gitignore hash/byte mismatch and two concurrent runtime-worker catalog/doc metadata mismatches. Updated exact registry metadata without altering peer content; subsequent validation passed."
+    },
+    {
+      "operation": "Independent usage-scope source review",
+      "result": "Final-turn usage was mislabeled as relay aggregate. Preserved final-turn snapshot and added exact final cumulative modelUsage/cost; independent recheck exited0 with no material finding remaining."
+    }
+  ],
+  "boundaries": [
+    "Consumer and artifact checks do not establish memory quality, complete-cost superiority or a new runtime/model run.",
+    "Generated HTML is gitignored; exact source files and receipts are maintained in the checkout.",
+    "No visual browser inspection or recipient acknowledgment is claimed.",
+    "Additional receipt registration can increase integrity counts; recorded passing counts describe their actual returned run."
+  ],
+  "prior_verified_html": {
+    "path": "docs/ecosystem/memory-rag.html",
+    "bytes": 454415,
+    "sha256": "20112e35d47df516991a1bb82e2ad97bfae5bcf0e78867b4434bf65116d0c47c",
+    "embedded_records": 17,
+    "candidates": 25,
+    "lane_rows": 32
+  },
+  "independent_review_record": "evidence/artifacts/full-lanes-resolution-20260930/independent-review.json"
+}

@@ -1,0 +1,5 @@
+Run the installed personal saved workflow /readiness-audit through the native Workflow tool. Preserve the saved implementation byte-for-byte; select it by its native saved name or native personal scriptPath. Do not generate another workflow script.
+
+Supply args: {"docs":["adoption/agents/claude/source-scout.md"],"commands":["python3 --version"],"question":"Verify the exact source-scout role model and effort binding and the current returned Python version."}
+
+Wait for its actual completion and return the actual saved-workflow JSON result. Report native errors or an incomplete result plainly. Do not modify files, install tools, read credentials, launch unrelated agents or load the entire catalog. This is a bounded synthetic native client integration qualification of the adopted saved workflow, not a universal quality or token-savings trial.

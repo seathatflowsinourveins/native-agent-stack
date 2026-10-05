@@ -13,6 +13,15 @@ change the decision. Open Choices & alternatives
 `python3 scripts/build_ecosystem.py --write` -- not committed, or download it
 from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only)) for the searchable offline view.
 
+The [September 30 memory and RAG review](../../docs/memory-rag-foundation-20260930.md)
+and its [current candidate manifest](memory-rag-20260930.json) refresh the shared
+Claude/Codex alternatives and keep the best-backbone verdict unresolved.
+ai-memory remains the reference; Hindsight and agentmemory are quality/lifecycle
+and retrieval challengers. Pinned Hindsight packages are staged with capture disabled.
+The generated HTML has a dedicated `index.html#memory-review` verdict tab with
+all 25 candidate reasons and primary sources.
+The accepted ai-memory control and existing memory replacement gates remain in force.
+
 The catalog references 61 selected components through 51 capability decisions. Its
 registered evidence references are listed per capability. These are coverage counts, not a
 score of complete installation, execution or lifecycle acceptance.
@@ -61,7 +70,7 @@ and original results remain in the canonical manifests linked below.
 | Hosting and services | FastAPI, Next.js/React, PostgreSQL, MCPorter/Inspector; platform-specific containers | [Native application installation and checks](../../blueprints/convergence-practice/wsl-application/README.md), [application contract](../../blueprints/convergence-practice/application-delivery/README.md) |
 | Recovery and portability | Restic, ai-memory, Qdrant, Dagu, systemd, native session continuation | [Lifecycle operations](../../adoption/lifecycle.md), [off-host application restore](../../blueprints/convergence-practice/offhost-app-state/README.md) |
 | Observation and inference | OpenTelemetry Collector/otel-tui, Prometheus, Grafana, Loki, Alertmanager, ntfy, AgentsView, ccusage; vLLM/llama.cpp | [Observation setup](../../observability/README.md), [native backends](../../observability/backends/README.md), [GPU compatibility evidence](../../blueprints/convergence-practice/gpu-inference/README.md) |
-| Agent SDKs and runtime workers | Codex CLI/SDK; Claude Agent SDK, OpenHands SDK, Temporal, LangGraph remain deferred | [Native client installation](../../recipes/README.md#component-catalog-install-and-check), [SDK table review](../../docs/foundation-closure-20260921.md#sdk-and-runtime-decisions) |
+| Agent SDKs and runtime workers | Codex SDK through OmniRoute has scoped Claude caller acceptance; OpenHands O1 and alternate runtimes retain separate trial gates | [Runtime dispatch guide](../../blueprints/runtime-workers/README.md), [September 30 landscape and source pins](../../docs/runtime-worker-landscape-20260930.md), [historical SDK table](../../docs/foundation-closure-20260921.md#sdk-and-runtime-decisions) |
 | MCP servers and client surfaces | mcporter, mcp-inspector | [Native project MCP](../../recipes/README.md#native-project-mcp), [other native commands](../../recipes/README.md) |
 | Secrets and credentials | Native per-client login, Gitleaks | [Native CI/security verification](../../blueprints/convergence-practice/ci-security/README.md), [lifecycle operations](../../adoption/lifecycle.md) |
 | Git practice and GitHub automation | Worktrunk, gh CLI, Difftastic, codex-for-claude review bridge | [GitHub automation handbook](../../docs/github-automation.md), [optional Codex for Claude](../../recipes/README.md#optional-codex-for-claude) |

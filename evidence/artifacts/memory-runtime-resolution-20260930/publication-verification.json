@@ -1,0 +1,239 @@
+{
+  "schema_version": 1,
+  "kind": "memory_resolution_publication_verification",
+  "checked_at": "2026-09-30",
+  "scope": "Fresh stable release/source review, fit-based Hindsight recommendation, publisher coding evidence aggregation and generated HTML; no new model-quality execution or accepted backbone promotion.",
+  "html": {
+    "path": "docs/ecosystem/index.html",
+    "sha256": "dbc71d510979ee92f15151e6f92928b7a6aa49fd94806a72867b3fb614f701ce",
+    "bytes": 14271806,
+    "generated_not_committed": true,
+    "native_browser_launch_exit_code": null,
+    "visual_browser_inspection_performed": false,
+    "javascript_syntax_exit_code": 0,
+    "candidate_count": 25,
+    "finalist_count": 5,
+    "completed_wave_surface_observed": true,
+    "private_home_path_pattern_absent": true,
+    "contains_current_ai_release": true,
+    "contains_recommendation_basis": true,
+    "contains_published_coding_cost": true,
+    "continuation_export_present": true,
+    "native_quota_capability_record_present": true,
+    "browser_observation_scope": "Earlier Hindsight recommendation surface was opened successfully; this subsequent continuity-data update was not reopened or visually inspected."
+  },
+  "checks": {
+    "html_builder_unittests": {
+      "command": "rtk python3 -m unittest tests.test_ecosystem_manifest",
+      "exit_code": 0,
+      "tests": 64,
+      "actual_aggregate": "................................................................\n----------------------------------------------------------------------\nRan 64 tests in 26.936s\n\nOK",
+      "reuse_scope": "64 existing tests passed earlier against the unchanged renderer code. Subsequent continuation work changed documentation and data; syntax, deterministic output, catalog and publication checks reran."
+    },
+    "retained_convergence_record": {
+      "command": "rtk python3 scripts/validate_convergence.py evidence/artifacts/memory-rag-20260930/convergence.json --json",
+      "exit_code": 0,
+      "valid": true,
+      "observations": 4,
+      "scope": "Earlier frozen package/staging record; the new wave is separately scoped qualification evidence."
+    },
+    "publication_validation": {
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 0,
+      "actual_returned_summary": {
+        "components": 69,
+        "hashed_files": 8278,
+        "profiles": 4,
+        "receipts": 177,
+        "status": "passed"
+      },
+      "phase": "Observed before this continuity verification update was re-registered. Integrity and scope only."
+    },
+    "deterministic_build": {
+      "command": "rtk python3 scripts/build_ecosystem.py --check",
+      "exit_code": 0,
+      "output_sha256": "dbc71d510979ee92f15151e6f92928b7a6aa49fd94806a72867b3fb614f701ce",
+      "input_sha256": "c110e2c388910e43e81d2891e805e2dc8bfb66b10d5d73f97fe0f03a9b9f347e"
+    },
+    "continuity_catalog_validation": {
+      "command": "rtk python3 scripts/validate_catalogs.py",
+      "exit_code": 0,
+      "actual_output": "{\"beyond_star_catalog_repositories\": 102, \"models\": 20, \"public_stars\": 357, \"repository_entries\": 154, \"starred_catalog_repositories\": 46, \"unique_catalog_repositories\": 148}\nCatalog structure and evidence classes validated; source claims and native executions were not rerun.",
+      "scope": "Structural/evidence classes, no source or native executions rerun."
+    }
+  },
+  "retained_publication_failures": [
+    {
+      "exit_code": 1,
+      "cause": "Two concurrently added token-lifecycle evidence files were not hash-registered.",
+      "repair": "Scoped additive SHA256/byte registration using the existing evidence registry convention; source files retained."
+    },
+    {
+      "exit_code": 1,
+      "cause": "The ai-memory summary contained four synthetic home-like argv operands caught by the publication guard; a third concurrent evidence file was not hash-registered.",
+      "repair": "Declare and apply <SYNTHETIC_HOME> publication substitutions, retaining original private summary and native-output hashes; add only missing registry metadata."
+    },
+    {
+      "operation": "native apply_patch",
+      "cause": "Sanitization hunks were initially out of source order, so patch verification failed without applying the change.",
+      "repair": "Sort hunks by original source offset and apply the declared substitutions."
+    }
+  ],
+  "native_authority": "The linked records distinguish original native output hashes, unchanged upstream tests, local integration fixtures and generated summaries. Coordinator independently read actual ai-memory outcomes/test aggregates, agentmemory HTTP bodies/score summaries and Hindsight health/recall/transfer/isolation responses.",
+  "architecture_review": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "trigger": "Consequential shared-native recommendation with newly reviewed native coding comparisons and ai-memory 2.5.0 release.",
+    "accepted_result": "Recommend Hindsight as fit-based shared-native target; no measured overall or complete-cost winner. Current-version native capture and matched complete-cost qualification remain open."
+  },
+  "activation": {
+    "production_memory_migration": false,
+    "native_client_wiring_changed": false,
+    "new_wsl_distribution_created": false,
+    "wsl_or_kernel_updated": false,
+    "owned_trial_processes_stopped": true
+  },
+  "usage": {
+    "complete_research_usage": "unknown",
+    "token_savings_claim": null
+  },
+  "prior_surface_observations": [
+    {
+      "html": {
+        "path": "docs/ecosystem/index.html",
+        "sha256": "4cc6850872fb6182643364a95f9110c29c65ccac32454ef7982ff9014d61f3ba",
+        "bytes": 14263414,
+        "generated_not_committed": true,
+        "native_browser_launch_exit_code": 0,
+        "visual_browser_inspection_performed": false,
+        "javascript_syntax_exit_code": 0,
+        "candidate_count": 25,
+        "finalist_count": 5,
+        "completed_wave_surface_observed": true,
+        "private_home_path_pattern_absent": true,
+        "contains_current_ai_release": true,
+        "contains_recommendation_basis": true,
+        "contains_published_coding_cost": true
+      },
+      "checks": {
+        "html_builder_unittests": {
+          "command": "rtk python3 -m unittest tests.test_ecosystem_manifest",
+          "exit_code": 0,
+          "tests": 64,
+          "actual_aggregate": "................................................................\n----------------------------------------------------------------------\nRan 64 tests in 26.936s\n\nOK"
+        },
+        "retained_convergence_record": {
+          "command": "rtk python3 scripts/validate_convergence.py evidence/artifacts/memory-rag-20260930/convergence.json --json",
+          "exit_code": 0,
+          "valid": true,
+          "observations": 4,
+          "scope": "Earlier frozen package/staging record; the new wave is separately scoped qualification evidence."
+        },
+        "publication_validation": {
+          "command": "rtk python3 scripts/validate.py",
+          "exit_code": 0,
+          "actual_returned_summary": {
+            "components": 69,
+            "hashed_files": 8277,
+            "profiles": 4,
+            "receipts": 177,
+            "status": "passed"
+          },
+          "phase": "Observed before this final verification record was updated and re-registered. Integrity and scope only."
+        },
+        "deterministic_build": {
+          "command": "rtk python3 scripts/build_ecosystem.py --check",
+          "exit_code": 0,
+          "output_sha256": "4cc6850872fb6182643364a95f9110c29c65ccac32454ef7982ff9014d61f3ba",
+          "input_sha256": "2489919b5008056b11c9e29c528dbfeccf886a65dd9155edc8da6e6c3b70494b"
+        }
+      },
+      "architecture_review": {
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "trigger": "Consequential shared-native recommendation with newly reviewed native coding comparisons and ai-memory 2.5.0 release.",
+        "accepted_result": "Recommend Hindsight as fit-based shared-native target; no measured overall or complete-cost winner. Current-version native capture and matched complete-cost qualification remain open."
+      }
+    },
+    {
+      "html": {
+        "path": "docs/ecosystem/index.html",
+        "sha256": "dbc71d510979ee92f15151e6f92928b7a6aa49fd94806a72867b3fb614f701ce",
+        "bytes": 14271806,
+        "generated_not_committed": true,
+        "native_browser_launch_exit_code": null,
+        "visual_browser_inspection_performed": false,
+        "javascript_syntax_exit_code": 0,
+        "candidate_count": 25,
+        "finalist_count": 5,
+        "completed_wave_surface_observed": true,
+        "private_home_path_pattern_absent": true,
+        "contains_current_ai_release": true,
+        "contains_recommendation_basis": true,
+        "contains_published_coding_cost": true,
+        "continuation_export_present": true,
+        "native_quota_capability_record_present": true,
+        "browser_observation_scope": "Earlier Hindsight recommendation surface was opened successfully; this subsequent continuity-data update was not reopened or visually inspected."
+      },
+      "checks": {
+        "html_builder_unittests": {
+          "command": "rtk python3 -m unittest tests.test_ecosystem_manifest",
+          "exit_code": 0,
+          "tests": 64,
+          "actual_aggregate": "................................................................\n----------------------------------------------------------------------\nRan 64 tests in 26.936s\n\nOK",
+          "reuse_scope": "64 existing tests passed earlier against the unchanged renderer code. Subsequent continuation work changed documentation and data; syntax, deterministic output, catalog and publication checks reran."
+        },
+        "retained_convergence_record": {
+          "command": "rtk python3 scripts/validate_convergence.py evidence/artifacts/memory-rag-20260930/convergence.json --json",
+          "exit_code": 0,
+          "valid": true,
+          "observations": 4,
+          "scope": "Earlier frozen package/staging record; the new wave is separately scoped qualification evidence."
+        },
+        "publication_validation": {
+          "command": "rtk python3 scripts/validate.py",
+          "exit_code": 0,
+          "actual_returned_summary": {
+            "components": 69,
+            "hashed_files": 8278,
+            "profiles": 4,
+            "receipts": 177,
+            "status": "passed"
+          },
+          "phase": "Observed before this continuity verification update was re-registered. Integrity and scope only."
+        },
+        "deterministic_build": {
+          "command": "rtk python3 scripts/build_ecosystem.py --check",
+          "exit_code": 0,
+          "output_sha256": "dbc71d510979ee92f15151e6f92928b7a6aa49fd94806a72867b3fb614f701ce",
+          "input_sha256": "c110e2c388910e43e81d2891e805e2dc8bfb66b10d5d73f97fe0f03a9b9f347e"
+        },
+        "continuity_catalog_validation": {
+          "command": "rtk python3 scripts/validate_catalogs.py",
+          "exit_code": 0,
+          "actual_output": "{\"beyond_star_catalog_repositories\": 102, \"models\": 20, \"public_stars\": 357, \"repository_entries\": 154, \"starred_catalog_repositories\": 46, \"unique_catalog_repositories\": 148}\nCatalog structure and evidence classes validated; source claims and native executions were not rerun.",
+          "scope": "Structural/evidence classes, no source or native executions rerun."
+        }
+      },
+      "architecture_review": {
+        "model": "gpt-6-astra",
+        "effort": "max",
+        "trigger": "Consequential shared-native recommendation with newly reviewed native coding comparisons and ai-memory 2.5.0 release.",
+        "accepted_result": "Recommend Hindsight as fit-based shared-native target; no measured overall or complete-cost winner. Current-version native capture and matched complete-cost qualification remain open."
+      }
+    }
+  ],
+  "source_records": [
+    "evidence/artifacts/memory-runtime-resolution-20260930/latestness.json",
+    "evidence/artifacts/memory-runtime-resolution-20260930/published-coding-evidence.json",
+    "evidence/artifacts/memory-runtime-resolution-20260930/provider-quota-capability.json"
+  ],
+  "continuity_review": {
+    "status": "native_reset_contract_and_durable_handoff_recorded",
+    "provider_reset_executed": false,
+    "automatic_reset_controller_installed": false,
+    "native_schema_generator_exit_code": 0,
+    "cross_session_message_source": "blueprints/convergence-practice/memory-runtime-resolution-20260930/manifest.json#/continuation",
+    "source_capability_record": "evidence/artifacts/memory-runtime-resolution-20260930/provider-quota-capability.json"
+  }
+}

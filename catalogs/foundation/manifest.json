@@ -167,7 +167,7 @@
       "selection": "Retain the existing Codex CLI/SDK integration (component codex) for supported start/run/resume workflows; Claude Agent SDK, OpenHands SDK, Temporal and LangGraph remain unselected alternatives.",
       "activation": "Use the native CLI for ordinary work; reach for an official SDK only when an application needs structured events, custom tools or programmatic session control.",
       "lifecycle_scope": "Codex CLI/SDK use is accepted within its recorded tests; Claude Agent SDK, OpenHands SDK, Temporal and LangGraph have no adoption lifecycle here, only source-reviewed version pins.",
-      "next_gap": "The SDK table in docs/foundation-closure-20260921.md lines 78-84 has not been revisited by any lane since 2026-09-21; qualify a concrete application need before promoting a deferred alternative."
+      "next_gap": "The 2026-09-30 runtime-worker review and docs/native-stack-gap-audit-20261001.md supersede the 2026-09-21 SDK table. Retain scoped Codex SDK0.159.2 acceptance; qualify current OmniRoute provider readiness, SDK0.159.3 real tool execution/resume and broader lifecycle boundaries. Deferred SDKs require concrete application requirements before promotion."
     },
     {
       "id": "mcp-surfaces",

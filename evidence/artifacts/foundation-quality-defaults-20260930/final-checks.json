@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-09-30T06:07:24Z",
+  "scope": "Local integrity, contract and public checkpoint checks; no upstream/provider acceptance implied.",
+  "checks": [
+    {
+      "command": "rtk python3 scripts/validate.py",
+      "attempt": 1,
+      "exit_code": 1,
+      "returned_output": "Publication validation failed on SHA-256/byte-count mismatches for edited registered files before registration; receipt retains the intermediate state."
+    },
+    {
+      "command": "rtk python3 scripts/validate.py",
+      "attempt": 2,
+      "exit_code": 1,
+      "returned_output": "Publication validation failed:\nreceipt foundation-quality-defaults-20260930: payload claim differs from manifest\nreceipt foundation-quality-defaults-20260930: payload limitations differs from manifest\nevidence/artifacts/sota-finalization-20260930/plan.json: evidence file is not hash-listed"
+    },
+    {
+      "command": "rtk python3 scripts/validate.py",
+      "attempt": 3,
+      "exit_code": 1,
+      "returned_output": "Publication validation failed:\ndocs/harness-defaults.md: SHA-256 mismatch\ndocs/harness-defaults.md: byte count mismatch",
+      "condition": "Concurrent source edit after prior hash registration."
+    },
+    {
+      "command": "rtk python3 scripts/validate.py",
+      "attempt": 4,
+      "exit_code": 0,
+      "returned_output": "{\"components\": 69, \"hashed_files\": 8096, \"profiles\": 4, \"receipts\": 172, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution."
+    },
+    {
+      "command": "rtk python3 observability/grand-dashboard/progress.py --repo .",
+      "attempt": 1,
+      "exit_code": 1,
+      "returned_error": "ValueError: invalid public metadata token",
+      "condition": "Pre-existing skills-trial-window row was166 characters; shortened metadata to the supported160-character bound without changing its claim."
+    },
+    {
+      "command": "rtk python3 observability/grand-dashboard/progress.py --repo .",
+      "attempt": 2,
+      "exit_code": 0,
+      "output_projection": {
+        "entities": 106,
+        "defaults_gate_present": true
+      },
+      "scope": "Checkpoint snapshot only; no process liveness or Loki/Grafana runtime acceptance."
+    },
+    {
+      "command": "rtk python3 scripts/validate_convergence.py blueprints/convergence-practice/foundation-model-defaults/experiment.json --root . --json",
+      "exit_code": 0,
+      "returned_output": "{\"records\": [{\"errors\": [], \"observations\": 12, \"path\": \"blueprints/convergence-practice/foundation-model-defaults/experiment.json\", \"valid\": true}], \"valid\": true}"
+    },
+    {
+      "command": "rtk git diff --check",
+      "exit_code": 0,
+      "returned_output": ""
+    },
+    {
+      "command": "rtk qmd --index native-agent-stack-catalog update",
+      "exit_code": 0,
+      "returned_excerpt": "All collections updated.",
+      "scope": "Refresh only the adopted named catalog index; unrelated folders not indexed."
+    },
+    {
+      "command": "rtk qmd --index native-agent-stack-catalog embed",
+      "exit_code": 0,
+      "returned_output_excerpt": "Model: embeddinggemma-300M-Q8_0.gguf\nDone! Embedded 772 chunks from 40 documents in 6m 56s",
+      "scope": "Native local index maintenance; no comparative efficiency, model-quality or GPU acceptance claim."
+    }
+  ],
+  "limitations": [
+    "Intermediate publication diagnostics include compact projections where stated; full returned model usage and native tool output are retained separately.",
+    "The independently authored new plan was hash-registered only; listing it does not accept or authorize its proposed work.",
+    "The final validation count describes that exact pre-artifact snapshot. This check artifact is registered and integrity validation is run again before finishing."
+  ]
+}

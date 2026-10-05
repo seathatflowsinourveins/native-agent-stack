@@ -39,7 +39,9 @@ TRACKED = re.compile(
 # File names OSV-Scanner infers without a parser prefix, and the parsers this inventory uses.
 # package-lock.json is listed in the pinned v2.6.0 supported-lockfiles documentation.
 INFERRED = {"requirements.txt", "uv.lock", "package-lock.json", "pnpm-lock.yaml", "packages.lock.json"}
-PARSERS = {"requirements.txt", "packages.lock.json"}
+# OSV-Scanner v2.6.0 lockfile.go maps "uv.lock" to the native UV extractor;
+# an explicit parser also supports the native uv PEP 723 script-lock basename.
+PARSERS = {"requirements.txt", "packages.lock.json", "uv.lock"}
 
 
 # osv-scanner 2.6.0 matches [[IgnoredVulns]] by id in every lockfile it scans (ShouldIgnore checks only the id and
@@ -133,7 +135,7 @@ def python_pins(path, parser=None):
     includes, each read once (a shared or cyclic include is not read again). package is None for a line the guard
     cannot parse strictly, an include that names no file among them; version then holds the line. Nothing for the npm
     and NuGet lock formats, which cannot pin a PyPI package."""
-    if path.name == "uv.lock":
+    if parser == "uv.lock" or path.name == "uv.lock":
         data = tomllib.loads(path.read_text(encoding="utf-8"))
         return [(path, canonical(p["name"]), p.get("version")) if "name" in p else (path, None, str(p))
                 for p in data.get("package", [])]
@@ -440,6 +442,9 @@ class IgnorePolicyTests(unittest.TestCase):
         self.assertEqual(scratch_findings({"uv.lock": lock}, scanned="uv.lock", parser=None),
                          [("uv.lock", "nltk", "3.10.3", "GHSA-8mgp-746c-j5xp"),
                           ("uv.lock", "setuptools", "80.10.2", "GHSA-h35f-9h28-mq5c")])
+        self.assertEqual(scratch_findings({"worker.py.lock": lock}, scanned="worker.py.lock", parser="uv.lock"),
+                         [("worker.py.lock", "nltk", "3.10.3", "GHSA-8mgp-746c-j5xp"),
+                          ("worker.py.lock", "setuptools", "80.10.2", "GHSA-h35f-9h28-mq5c")])
 
     def test_no_other_suppression_mechanism_bypasses_the_policy(self):
         config = tomllib.loads(CONFIG.read_text(encoding="utf-8"))

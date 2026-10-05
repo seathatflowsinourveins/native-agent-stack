@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "kind": "native_cross_session_coordination",
+  "lane": "foundation",
+  "sources": [
+    "https://github.com/anthropics/claude-code/releases",
+    "https://code.claude.com/docs/en/cross-session-messaging"
+  ],
+  "initial_relay": {
+    "native_cli": "2.1.286",
+    "model": "claude-sonnet-5-5",
+    "effort": "max",
+    "native_exit_code": 0,
+    "list_agents_calls": 1,
+    "send_message_calls": 6,
+    "native_success_acknowledgments": 6,
+    "status": "queued",
+    "targets": [
+      "native-agent-stack-6d",
+      "terminal-notification-tuning",
+      "native-agent-stack-88",
+      "sota-default-harness-setup",
+      "codex-runtime-litellm-handoff-20260930-2340",
+      "native-agent-stack-ae"
+    ],
+    "cwd_match_confirmed": true,
+    "scope_listing_sequence_limit": "Second scoped CLI verification followed sends; earlier root-scoped listing already matched. No duplicate sends.",
+    "original_stream": {
+      "bytes": 387153,
+      "sha256": "c05dc62e9f4c61f294fbf178fce74f4e56a12b6d467941ffc444b787d1a6e9ed"
+    },
+    "usage": {
+      "final_cumulative_cost_usd": 0.5782792,
+      "input_tokens": 14,
+      "output_tokens": 24161,
+      "cache_read_input_tokens": 668426,
+      "cache_creation_input_tokens": 50739,
+      "thinking_tokens_reported_subset": 16365,
+      "counted_once": true
+    },
+    "reply_summary_count": 4,
+    "original_reply_bodies_observed": 0
+  },
+  "provider_429_handoff": {
+    "native_exit_code": 0,
+    "list_agents_calls": 1,
+    "send_message_calls": 2,
+    "native_success_acknowledgments": 2,
+    "status": "queued",
+    "targets": [
+      "native-agent-stack-88",
+      "sota-default-harness-setup"
+    ],
+    "fresh_scoped_metadata_verified_before_relay": true,
+    "original_stream": {
+      "bytes": 186142,
+      "sha256": "8c8e9179e3182c4dfa29c18d6896be0beba569637187f72fbd362ecfc0774f30"
+    },
+    "usage": {
+      "final_cumulative_cost_usd": 0.1799258,
+      "counted_once": true
+    },
+    "reply_count_before_exit": 0,
+    "provider_actions": false,
+    "configuration_changes": false
+  },
+  "acceptance_limit": "Native queued acknowledgments establish successful enqueue, not delivery, completed peer work or repaired provider readiness. Ownership reply summaries remain unverified leads.",
+  "independent_review": "evidence/artifacts/omni-harness-native-resolution-20260930/independent-review.json"
+}

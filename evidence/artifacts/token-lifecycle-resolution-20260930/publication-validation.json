@@ -1,0 +1,24 @@
+{
+  "kind": "required-publication-validation",
+  "attempts": [
+    {
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 1,
+      "stdout": "Publication validation failed:\nreceipt token-lifecycle-resolution-20260930: payload component_ids differs from manifest\nreceipt token-lifecycle-resolution-20260930: payload claim differs from manifest\nreceipt token-lifecycle-resolution-20260930: payload limitations differs from manifest\nevidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-timeout.json: contains possible local session identifier\nevidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-recovery.json: contains possible local session identifier\nevidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow.json: contains possible local session identifier\nevidence/artifacts/token-lifecycle-resolution-20260930/codex-native-incomplete.json: contains possible local session identifier\nevidence/artifacts/token-lifecycle-resolution-20260930/codex-native-observation.json: contains possible local session identifier\n",
+      "stderr": ""
+    },
+    {
+      "command": "rtk python3 scripts/validate.py",
+      "exit_code": 0,
+      "stdout": "{\"components\": 69, \"hashed_files\": 8242, \"profiles\": 4, \"receipts\": 175, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+      "stderr": ""
+    },
+    {
+      "command": "rtk python3 scripts/validate_convergence.py blueprints/convergence-practice/token-lifecycle-resolution-20260930/experiment.json --json",
+      "exit_code": 0,
+      "stdout": "{\"records\": [{\"errors\": [], \"observations\": 21, \"path\": \"blueprints/convergence-practice/token-lifecycle-resolution-20260930/experiment.json\", \"valid\": true}], \"valid\": true}\n",
+      "stderr": ""
+    }
+  ],
+  "correction": "Exact registry receipt metadata and stable public native-identifier aliases were corrected. Registered sanitized views passed required publication validation; all 21 scoped convergence observations are consistent. These checks do not execute provider/GPU tasks."
+}

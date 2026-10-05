@@ -5,6 +5,8 @@ Reuse maintained upstream tools, runtimes and orchestration patterns through the
 Check capability claims in order: installed client (commands, --help, settings), upstream changelog for that version (gh api), upstream source at that tag, official docs. Absence claims need the first two, else say "not found in X, Y".
 Worker, docs-agent and cross-family answers are leads; relay claims only with upstream citations.
 Process large output outside the model.
+Default to Sol/Ultra coordination and Sol/Max workers; preserve explicit model choices and role definitions. Use Astra/Max for consequential architecture, conflicting primary evidence or a failure unresolved after one bounded Sol repair, and record the trigger and acceptance result.
+Match available skill descriptions to the task; read each selected SKILL.md before acting and follow its native workflow. Load supporting references only when needed.
 When a claim proves wrong, record the correction and its verification path that turn.
 
 <!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->

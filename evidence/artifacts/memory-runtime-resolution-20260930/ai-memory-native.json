@@ -1,0 +1,873 @@
+{
+  "schema_version": 1,
+  "component_id": "ai-memory",
+  "qualification": "controlled_clean_prefix_native_integration",
+  "status": "passed_scoped_native_operations_with_retained_failures",
+  "date": "2026-09-30",
+  "scope": {
+    "host": "current WSL2 Linux x86_64 host",
+    "second_machine": false,
+    "production_upgrade": false,
+    "production_store_opened": false,
+    "client_authentication_store_read": false,
+    "native_client_registration_changed": false,
+    "main_checkout_authored_edits": false,
+    "quality_winner_claim": false,
+    "model_calls_exercised": false,
+    "automatic_capture_exercised": false,
+    "native_capture_sessions_or_observations_accepted": false,
+    "accepted_memory_operation": "explicit scoped synthetic wiki writes, reads, lexical query, restart, native backup and restore",
+    "provider_usage": "unknown; no model/provider feature was invoked by these native fixtures"
+  },
+  "sources": {
+    "upstream_repository": "https://github.com/akitaonrails/ai-memory",
+    "tag": "v2.4.2",
+    "commit": "a0ca8d1a5fbd5920799411fa891fe6d49c90efc1",
+    "source_commit_observed_exit": 0,
+    "release_published_at": "2026-09-29T17:39:11Z",
+    "release_api": "https://api.github.com/repos/akitaonrails/ai-memory/releases/tags/v2.4.2",
+    "release_url": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.4.2",
+    "install": "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/docs/install.md",
+    "lifecycle": "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/docs/lifecycle-ops.md",
+    "backup": "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/crates/ai-memory-cli/src/commands/backup.rs",
+    "restore": "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/crates/ai-memory-cli/src/commands/restore.rs",
+    "guard": "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/crates/ai-memory-cli/src/process_guard.rs",
+    "ci": "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/.github/workflows/ci.yml",
+    "toolchain": "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/rust-toolchain.toml",
+    "installed_client_observation": {
+      "argv": [
+        "rtk",
+        "ai-memory",
+        "--version"
+      ],
+      "exit_code": 0,
+      "stdout": "ai-memory 2.4.1"
+    },
+    "capability_verification_order": [
+      "installed version and --help/backup --help/restore --help",
+      "official GitHub release APIs for installed v2.4.1 and candidate v2.4.2",
+      "candidate pinned source",
+      "candidate official docs"
+    ],
+    "local_fixture_repository": "native-agent-stack local checkout",
+    "local_fixture_revision": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+    "fixture_paths": [
+      "blueprints/memory-lifecycle-v2/README.md",
+      "blueprints/memory-lifecycle-v2/run.py",
+      "blueprints/memory-lifecycle-v2/exercise.py",
+      "blueprints/memory-lifecycle-v2/analyze.py",
+      "blueprints/convergence-practice/wsl-memory-maintenance/README.md",
+      "blueprints/convergence-practice/wsl-memory-maintenance/run.py",
+      "blueprints/convergence-practice/wsl-memory-maintenance/config.toml",
+      "blueprints/convergence-practice/wsl-memory-maintenance/oracle.json"
+    ],
+    "recovery_runner_unchanged": true,
+    "recovery_config_unchanged": true,
+    "recovery_oracle_unchanged": true,
+    "recovery_pin_only_adaptation": "Verified v2.4.2 release, archive, sidecar and binary identities replace historical v2.3.2 pin values in the owned copy."
+  },
+  "publication_sanitization": {
+    "original_summary_sha256": "3cafd3aecf0ad98aec24d93b8d3ec77b128b36f0b0a2e6305e67ece5d64d96cb",
+    "original_summary_bytes": 29627,
+    "publication_substitution": "Four synthetic home-directory argv operands normalized to <SYNTHETIC_HOME> because the publication guard treats home-like fixture paths as personal. Original private summary and native-output hashes retained."
+  },
+  "sanitization": {
+    "command_placeholders": {
+      "<trial>": "the private owned qualification prefix",
+      "<checkout>": "the main checkout"
+    },
+    "original_outputs_retained_private": true,
+    "original_outputs_modified": false,
+    "public_summary_contains_personal_paths": false,
+    "original_output_hashes_bind_unmodified_private_bytes": true,
+    "raw_client_credentials_or_production_data_copied": false,
+    "trial_bearer_values_published": false
+  },
+  "installation": {
+    "distribution": "complete official Linux x86_64 release archive extracted into an empty owned install prefix",
+    "binary_version": "ai-memory 2.4.2",
+    "binary_version_exit_code": 0,
+    "archive_sidecar_check_exit_code": 0,
+    "archive_and_sidecar_api_digest_match": true,
+    "binary_sha256": "ee868e68f1756230a55e78ec51691052aa28489438aa65ffce460200dc247f93",
+    "commands": [
+      [
+        "rtk",
+        "proxy",
+        "git",
+        "clone",
+        "--branch",
+        "v2.4.2",
+        "--depth",
+        "1",
+        "https://github.com/akitaonrails/ai-memory.git",
+        "<trial>/source"
+      ],
+      [
+        "rtk",
+        "proxy",
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "https://github.com/akitaonrails/ai-memory/releases/download/v2.4.2/ai-memory-linux-x86_64.tar.gz",
+        "--output",
+        "<trial>/download/ai-memory-linux-x86_64.tar.gz"
+      ],
+      [
+        "rtk",
+        "proxy",
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "https://github.com/akitaonrails/ai-memory/releases/download/v2.4.2/ai-memory-linux-x86_64.tar.gz.sha256",
+        "--output",
+        "<trial>/download/ai-memory-linux-x86_64.tar.gz.sha256"
+      ],
+      [
+        "rtk",
+        "sha256sum",
+        "-c",
+        "ai-memory-linux-x86_64.tar.gz.sha256"
+      ],
+      [
+        "rtk",
+        "proxy",
+        "tar",
+        "-xzf",
+        "<trial>/download/ai-memory-linux-x86_64.tar.gz",
+        "-C",
+        "<trial>/install"
+      ],
+      [
+        "rtk",
+        "<trial>/install/ai-memory",
+        "--version"
+      ]
+    ],
+    "commands_exit_codes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "integration_trials": [
+    {
+      "id": "lifecycle-attempt-1",
+      "evidence_class": "local integration with frozen synthetic fixture",
+      "command": [
+        "rtk",
+        "proxy",
+        "env",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "python3",
+        "blueprints/memory-lifecycle-v2/run.py",
+        "--binary",
+        "<trial>/install/ai-memory",
+        "--out",
+        "<trial>/lifecycle-attempt-1"
+      ],
+      "cwd": "<checkout>",
+      "driver_exit_code": 0,
+      "started_utc": "2026-09-30T18:16:54.302646+00:00",
+      "finished_utc": "2026-09-30T18:17:02.044731+00:00",
+      "passed": true,
+      "pre": {
+        "checks": 82,
+        "passed_checks": 82,
+        "native_tool_calls": 71,
+        "native_server_exit_code": 0
+      },
+      "post": {
+        "checks": 19,
+        "passed_checks": 19,
+        "native_tool_calls": 18,
+        "native_server_exit_code": 0
+      },
+      "scope": "scoped pages, cross-scope query/read negatives, TTL expiration/sweep, retained future/durable pages, page history, second-process restart",
+      "fixture_is_upstream_test": false,
+      "network_isolated": true,
+      "host_home_account_store_mounted": false
+    },
+    {
+      "id": "recovery-attempt-1",
+      "evidence_class": "local integration with frozen synthetic fixture",
+      "command": [
+        "rtk",
+        "proxy",
+        "env",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "python3",
+        "<trial>/backup-fixture/run.py",
+        "--run-dir",
+        "<trial>/recovery-attempt-1",
+        "--archive",
+        "<trial>/download/ai-memory-linux-x86_64.tar.gz",
+        "--sidecar",
+        "<trial>/download/ai-memory-linux-x86_64.tar.gz.sha256"
+      ],
+      "driver_exit_code": 1,
+      "passed": false,
+      "python": "3.13.15",
+      "checks": 46,
+      "failed_checks": [
+        "restore_refusal_target_unchanged"
+      ],
+      "native_tool_calls": 27,
+      "backup": {
+        "exit_code": 0,
+        "status": "passed",
+        "semantics": "HTTP online snapshot while owned server runs"
+      },
+      "restore": {
+        "exit_code": 1,
+        "status": "blocked_by_native_sibling_process_guard",
+        "force": false,
+        "guard_bypass": false
+      },
+      "target_side_effects": [
+        "logs/",
+        "logs/ai-memory.log.2026-09-30"
+      ],
+      "target_contains_restored_wiki_or_database": false,
+      "owned_native_process_exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "forced_termination": false,
+      "host_namespace": true,
+      "original_receipt_retained_unchanged": true
+    },
+    {
+      "id": "recovery-attempt-2",
+      "evidence_class": "local integration with frozen synthetic fixture",
+      "command": [
+        "rtk",
+        "proxy",
+        "timeout",
+        "90",
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--new-session",
+        "--cap-drop",
+        "ALL",
+        "--clearenv",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--ro-bind",
+        "/lib",
+        "/lib",
+        "--ro-bind",
+        "/lib64",
+        "/lib64",
+        "--ro-bind",
+        "/etc/ld.so.cache",
+        "/etc/ld.so.cache",
+        "--bind",
+        "<trial>",
+        "/run",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--dir",
+        "<SYNTHETIC_HOME>",
+        "--setenv",
+        "HOME",
+        "<SYNTHETIC_HOME>",
+        "--setenv",
+        "PATH",
+        "/usr/bin:/bin",
+        "--setenv",
+        "PYTHONDONTWRITEBYTECODE",
+        "1",
+        "--chdir",
+        "/run",
+        "--info-fd",
+        "3",
+        "/usr/bin/python3",
+        "/run/backup-fixture/run.py",
+        "--run-dir",
+        "/run/recovery-attempt-2",
+        "--archive",
+        "/run/download/ai-memory-linux-x86_64.tar.gz",
+        "--sidecar",
+        "/run/download/ai-memory-linux-x86_64.tar.gz.sha256"
+      ],
+      "driver_exit_code": 0,
+      "started_utc": "2026-09-30T18:25:19.167816+00:00",
+      "finished_utc": "2026-09-30T18:25:20.503399+00:00",
+      "passed": true,
+      "python": "3.12.3",
+      "checks": 65,
+      "passed_checks": 65,
+      "failed_checks": [],
+      "native_tool_calls": 39,
+      "backup": {
+        "exit_code": 0,
+        "status": "passed",
+        "transport": "owned authenticated loopback HTTP",
+        "archive": "recovery-attempt-2/native-backup.tar.gz"
+      },
+      "restore": {
+        "exit_code": 0,
+        "status": "passed",
+        "initially_empty_target": true,
+        "force": false,
+        "guard_bypass": false
+      },
+      "owned_native_process_exit_codes": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "forced_termination": false,
+      "namespaces": {
+        "pid": 4026532196,
+        "network": 4026532198,
+        "mount": 4026532193
+      },
+      "guard_explanation": "process_guard.rs lines 19-61 scans every other process named ai-memory in its PID namespace; it does not compare data directories. The existing bubblewrap pattern gives the unchanged fixture a controlled PID namespace with the native guard enabled.",
+      "comparison_conditions_changed": [
+        "PID/network/mount namespace",
+        "Python 3.13.15 to 3.12.3"
+      ],
+      "performance_comparison_claim": false,
+      "historical_receipt_scope": "WSL2 Linux x86_64 synthetic 2.3.2 maintenance",
+      "actual_binary_correction": "Unchanged runner retains its historical descriptive scope string. Native --version, server version and exact binary SHA256 independently bind this execution to 2.4.2."
+    }
+  ],
+  "native_recovery_commands": {
+    "argv_paths_are_actual_in_namespace": true,
+    "backup_template": [
+      "/run/recovery-attempt-2/dist/ai-memory",
+      "--data-dir",
+      "/run/recovery-attempt-2/data",
+      "--config",
+      "/run/recovery-attempt-2/frozen/config.toml",
+      "backup",
+      "--to",
+      "/run/recovery-attempt-2/native-backup.tar.gz"
+    ],
+    "restore_template": [
+      "/run/recovery-attempt-2/dist/ai-memory",
+      "--data-dir",
+      "/run/recovery-attempt-2/restored",
+      "--config",
+      "/run/recovery-attempt-2/frozen/config.toml",
+      "restore",
+      "--from",
+      "/run/recovery-attempt-2/native-backup.tar.gz"
+    ],
+    "exact_native_argv_authority": [
+      "recovery-attempt-2/backup.command.private.json",
+      "recovery-attempt-2/restore.command.private.json"
+    ],
+    "native_command_templates_checked_against_retained_private_argv": true,
+    "fixture_bearer": "private per-run token generated by existing runner, no native client credentials"
+  },
+  "negative_controls": {
+    "integration_conditions_absent": [
+      "positive own-scope lexical retrieval paired with wrong-scope empty query and explicit not-found read",
+      "reserved Git page path is rejected",
+      "superseded marker is absent after replacement",
+      "TTL page is present before expiry and absent after expiry/sweep",
+      "invalid/missing/combined scopes and invalid expiry rejected"
+    ],
+    "stopped_server_backup": {
+      "command": [
+        "rtk",
+        "proxy",
+        "timeout",
+        "30",
+        "/usr/bin/bwrap",
+        "--unshare-all",
+        "--die-with-parent",
+        "--new-session",
+        "--cap-drop",
+        "ALL",
+        "--clearenv",
+        "--ro-bind",
+        "/usr",
+        "/usr",
+        "--ro-bind",
+        "/lib",
+        "/lib",
+        "--ro-bind",
+        "/lib64",
+        "/lib64",
+        "--ro-bind",
+        "/etc/ld.so.cache",
+        "/etc/ld.so.cache",
+        "--bind",
+        "<trial>",
+        "/run",
+        "--proc",
+        "/proc",
+        "--dev",
+        "/dev",
+        "--tmpfs",
+        "/tmp",
+        "--dir",
+        "<SYNTHETIC_HOME>",
+        "--setenv",
+        "HOME",
+        "<SYNTHETIC_HOME>",
+        "--setenv",
+        "PATH",
+        "/usr/bin:/bin",
+        "--setenv",
+        "AI_MEMORY_SERVER_URL",
+        "http://127.0.0.1:1",
+        "/run/install/ai-memory",
+        "--data-dir",
+        "/run/recovery-attempt-2/data",
+        "--config",
+        "/run/backup-fixture/config.toml",
+        "backup",
+        "--to",
+        "/run/stopped-server-control.tar.gz"
+      ],
+      "exit_code": 1,
+      "native_error": "requesting backup from server; TCP connection refused (os error 111)",
+      "archive_exists": false,
+      "paired_running_server_backup_exit_code": 0
+    }
+  },
+  "upstream_tests": {
+    "evidence_class": "unchanged pinned upstream tests, run by existing local isolation/evidence runner",
+    "runner_path": "blueprints/memory-lifecycle-v2/upstream-20260926/run_upstream_tests.py",
+    "rustup_install_source": "https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init",
+    "rustup_sidecar_source": "https://static.rust-lang.org/rustup/dist/x86_64-unknown-linux-gnu/rustup-init.sha256",
+    "rustup_download_sha256": "dda7234360b7f578ca8b0ddcb80145646fa61a67c1720a5abc7051b35c9fcb71",
+    "rustup_sidecar_check_exit_code": 0,
+    "rust_install_command": [
+      "rtk",
+      "proxy",
+      "timeout",
+      "90",
+      "env",
+      "RUSTUP_HOME=<trial>/rust/rustup",
+      "CARGO_HOME=<trial>/rust/cargo",
+      "<trial>/download/rustup-init",
+      "-y",
+      "--no-modify-path",
+      "--profile",
+      "minimal",
+      "--default-toolchain",
+      "1.95",
+      "--component",
+      "rustfmt",
+      "--component",
+      "clippy"
+    ],
+    "rust_install_exit_code": 0,
+    "locked_fetch_command": [
+      "rtk",
+      "proxy",
+      "timeout",
+      "60",
+      "env",
+      "RUSTUP_HOME=<trial>/rust/rustup",
+      "CARGO_HOME=<trial>/rust/cargo",
+      "<trial>/rust/cargo/bin/cargo",
+      "fetch",
+      "--locked"
+    ],
+    "locked_fetch_cwd": "<trial>/source",
+    "locked_fetch_exit_code": 0,
+    "rustc": "rustc 1.95.0 (59807616e 2026-04-14)",
+    "cargo": "cargo 1.95.0 (f2d3ce0bd 2026-03-21)",
+    "tracked_upstream_source_modified": false,
+    "network_during_tests": "unshared, offline Cargo; only owned source/toolchain and system runtime mounted",
+    "full_store_attempt": {
+      "native_command": [
+        "cargo",
+        "test",
+        "-p",
+        "ai-memory-store",
+        "--all-targets"
+      ],
+      "driver_command": [
+        "rtk",
+        "proxy",
+        "env",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "python3",
+        "<checkout>/blueprints/memory-lifecycle-v2/upstream-20260926/run_upstream_tests.py",
+        "--scratch",
+        "<trial>",
+        "--tag",
+        "v2.4.2",
+        "--out",
+        "<trial>/upstream-tests",
+        "--package",
+        "ai-memory-store",
+        "--label",
+        "store-lifecycle",
+        "--timeout",
+        "150"
+      ],
+      "driver_exit_code": 1,
+      "native_exit_code": null,
+      "timed_out": true,
+      "duration_seconds": 150,
+      "tests_selected_signal": "running 505 tests",
+      "observed_ok_terminal_lines": 330,
+      "observed_failed_terminal_lines": 0,
+      "complete_aggregate_result_lines": 0,
+      "full_suite_accepted": false,
+      "unresolved": "Complete full-store aggregate remains unknown after the time bound; 330 observed per-test ok lines are not 505 passes."
+    },
+    "scope_subset": {
+      "native_command": [
+        "cargo",
+        "test",
+        "-p",
+        "ai-memory-store",
+        "--all-targets",
+        "scope"
+      ],
+      "driver_command": [
+        "rtk",
+        "proxy",
+        "env",
+        "PYTHONDONTWRITEBYTECODE=1",
+        "python3",
+        "<checkout>/blueprints/memory-lifecycle-v2/upstream-20260926/run_upstream_tests.py",
+        "--scratch",
+        "<trial>",
+        "--tag",
+        "v2.4.2",
+        "--out",
+        "<trial>/upstream-tests",
+        "--package",
+        "ai-memory-store",
+        "--filter",
+        "scope",
+        "--label",
+        "store-scope-subset",
+        "--timeout",
+        "20"
+      ],
+      "driver_exit_code": 0,
+      "native_exit_code": 0,
+      "timed_out": false,
+      "duration_seconds": 16.1,
+      "started_utc": "2026-09-30T18:37:10.249455+00:00",
+      "finished_utc": "2026-09-30T18:37:26.344633+00:00",
+      "passed": 42,
+      "failed": 0,
+      "ignored": 0,
+      "filtered_out": 463,
+      "test_binaries": 1,
+      "exact_test_names_artifact": "upstream-tests/store-scope-subset.receipt.json",
+      "source_file_mapping_method": "Names matched to function definitions in unchanged pinned source; this is a name-based mapping.",
+      "mapped_source_paths": [
+        "crates/ai-memory-store/src/error.rs",
+        "crates/ai-memory-store/src/ops.rs",
+        "crates/ai-memory-store/src/migrations.rs",
+        "crates/ai-memory-store/src/scope.rs",
+        "crates/ai-memory-store/src/reader.rs",
+        "crates/ai-memory-store/src/lib.rs",
+        "crates/ai-memory-store/tests/suite/session_ids_touching_scope.rs",
+        "crates/ai-memory-store/tests/suite/audit_contamination.rs",
+        "crates/ai-memory-store/tests/suite/most_recently_active_scope.rs",
+        "crates/ai-memory-store/tests/suite/session_observations.rs",
+        "crates/ai-memory-store/tests/suite/handoff_ownership.rs",
+        "crates/ai-memory-store/tests/suite/sessions_by_agent.rs",
+        "crates/ai-memory-store/tests/suite/session_scope_from_observations.rs"
+      ],
+      "claim_boundary": "42 unchanged scope-name upstream tests on Rust 1.95/Linux; other workspace packages, 463 filtered store tests, doc tests, ignored/model/runtime tests, retrieval-quality benchmarks and other platforms are not accepted."
+    },
+    "no_further_suites": true
+  },
+  "independent_observation": {
+    "method": "Python standard-library SQLite read-only URI inspection and tarfile/hashlib comparison; distinct from parsing the fixture's passed field",
+    "lifecycle_database": {
+      "integrity": "ok",
+      "migration": 67,
+      "workspaces": 2,
+      "projects": 4,
+      "page_versions": 9,
+      "sessions": 0,
+      "observations": 0,
+      "page_embeddings": 0
+    },
+    "recovery_original_snapshot_restored_each": {
+      "integrity": "ok",
+      "migration": 67,
+      "workspaces": 1,
+      "projects": 2,
+      "page_versions": 4,
+      "sessions": 0,
+      "observations": 0,
+      "page_embeddings": 0
+    },
+    "exact_markdown_files_compared_each": 6,
+    "markdown_original_native_archive_restored_identical": true,
+    "stable_page_rows_compared_each": 4,
+    "stable_page_rows_original_snapshot_restored_identical": true,
+    "raw_whole_page_rows_identical": false,
+    "differing_columns": [
+      "access_count",
+      "last_accessed_at"
+    ],
+    "stable_page_comparison_excluded_columns": [
+      "access_count",
+      "last_accessed_at"
+    ],
+    "comparison_correction": "backup-snapshot contains the extracted DB only; exact wiki comparison used actual native tar members.",
+    "process_cleanup_observation": {
+      "method": "Read /proc comm; for build/test candidate names only, inspect cmdline/cwd for the owned prefix. No process environment reads.",
+      "candidate_build_test_processes": 0,
+      "owned_prefix_process_matches": 0
+    },
+    "unchanged_production_service_claim_boundary": "Worker did not inspect production configs/state or terminate any unowned PID; no host-wide production health claim."
+  },
+  "corrections": [
+    {
+      "incorrect_claim": "Restore sibling-process guard compares data directories.",
+      "corrected_claim": "It is global to the process namespace.",
+      "verification": "Pinned process_guard.rs lines 19-61; restore.rs lines 16-23; actual host-namespace refusal after all owned servers exited."
+    },
+    {
+      "incorrect_claim": "Refused target gained wiki scope directories.",
+      "corrected_claim": "Only logs/ and one native log file were created.",
+      "verification": "Independent refused-target traversal; failed restore_refusal_target_unchanged preserved."
+    },
+    {
+      "historical_label": "synthetic 2.3.2 maintenance",
+      "actual_execution": "2.4.2",
+      "verification": "Exact official binary SHA256, native --version and MCP server version; original receipt retained."
+    }
+  ],
+  "original_artifacts": [
+    {
+      "path": "release-v2.4.1.json",
+      "bytes": 37025,
+      "sha256": "dcb9fae7695e193955bed61b1057a04cf38eead3964a705e62b924ac0c19d43f"
+    },
+    {
+      "path": "release-v2.4.2.json",
+      "bytes": 36814,
+      "sha256": "c6e66545cadb44f9656ad04542310de18c2cd08afaddb519446301bb9c6293a0"
+    },
+    {
+      "path": "download/ai-memory-linux-x86_64.tar.gz",
+      "bytes": 16096931,
+      "sha256": "e23bd078ff1c84ff1917ca9dba3a6332560b9bb6d6dce2d5df6b6c66166b69e3"
+    },
+    {
+      "path": "download/ai-memory-linux-x86_64.tar.gz.sha256",
+      "bytes": 96,
+      "sha256": "1e8e30c6488e6151a4886b27c96a3cde6fe0ec860efb2bf69315900d96d0ddce"
+    },
+    {
+      "path": "download/verification.log",
+      "bytes": 233,
+      "sha256": "e19b8f526fb54c1505f15deeb54f3f9c9582be92070afc30d6f72286fa381a62"
+    },
+    {
+      "path": "install/ai-memory",
+      "bytes": 38928904,
+      "sha256": "ee868e68f1756230a55e78ec51691052aa28489438aa65ffce460200dc247f93"
+    },
+    {
+      "path": "backup-fixture/run.py",
+      "bytes": 22528,
+      "sha256": "5abefd6083f2ac6057cd6ca6f64cf2fc77a68e6213b35f64bddfa5d18b169a3e"
+    },
+    {
+      "path": "backup-fixture/config.toml",
+      "bytes": 290,
+      "sha256": "5ee5fb3ddcb790c9a234143fdfa2f99b80ecf752a45c9e8cad625d75e9311331"
+    },
+    {
+      "path": "backup-fixture/oracle.json",
+      "bytes": 2594,
+      "sha256": "20c0a8d4c5a19e4257b9c59e88a8abbd963529d63c35baa13095b403e91043c0"
+    },
+    {
+      "path": "backup-fixture/pins.json",
+      "bytes": 835,
+      "sha256": "c22aff4b272607d75a51caa9508d826f2576a0ea594199a4ac975a38541be65d"
+    },
+    {
+      "path": "lifecycle-attempt-1.driver.log",
+      "bytes": 890,
+      "sha256": "1b7cc324516d3708344f6a2f6c8efd281590644d59a40611b5edc90c85ff97a3"
+    },
+    {
+      "path": "lifecycle-attempt-1/run.json",
+      "bytes": 415,
+      "sha256": "3dda58f4d12442baee0654cfdec911066fcbabfc0dd9b59f4ee9cd628b09969a"
+    },
+    {
+      "path": "lifecycle-attempt-1/acceptance.json",
+      "bytes": 9310,
+      "sha256": "10916704e7f5e1afdc2239ac9ac6b6ab3a3fea4aeb81e7df693a26c4a82f5bc5"
+    },
+    {
+      "path": "lifecycle-attempt-1/phase-pre/records.json",
+      "bytes": 159935,
+      "sha256": "96715afaf2ea74fec62b8a5897cf66b4be5ad1cce2870aa35144f727fdc2bef2"
+    },
+    {
+      "path": "lifecycle-attempt-1/phase-post/records.json",
+      "bytes": 111693,
+      "sha256": "e40233e45a99fefb5bd4fb96cef74c302cca30689e2904e7f5763ad782c8fee4"
+    },
+    {
+      "path": "lifecycle-attempt-1/phase-pre/shutdown.json",
+      "bytes": 28,
+      "sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce"
+    },
+    {
+      "path": "lifecycle-attempt-1/phase-post/shutdown.json",
+      "bytes": 28,
+      "sha256": "d4aebe464025d49d2bf2b74c89b26bc140b5f5297724ad3df0c7811396f517ce"
+    },
+    {
+      "path": "recovery-attempt-1.driver.log",
+      "bytes": 625,
+      "sha256": "e477dad79cd7a63dccf9d7ec226cf50f8f2dab38162e763155a790bfaea7c800"
+    },
+    {
+      "path": "recovery-attempt-1/receipt.json",
+      "bytes": 8407,
+      "sha256": "e583d1f28b590bdc6fed6bf3baeed0f51bee9eb019b7d0b1c4fb2c9d27ef0d25"
+    },
+    {
+      "path": "recovery-attempt-1/native-facts.json",
+      "bytes": 9470,
+      "sha256": "bd63568e18e1a92de82aec5f0e9ac0aa1a392785c1a1ef97332253cd7560795d"
+    },
+    {
+      "path": "recovery-attempt-2.driver.log",
+      "bytes": 703,
+      "sha256": "889245fdecc792fd7f6d0d317382fb90efbb47c13c65cb2dd7e4d4272a5671db"
+    },
+    {
+      "path": "recovery-attempt-2.namespace.json",
+      "bytes": 229,
+      "sha256": "b3c8f67e8d99d7fa536a1d34f46b74866408689ce18a2e4878c6c054f1ba32a5"
+    },
+    {
+      "path": "recovery-attempt-2/receipt.json",
+      "bytes": 10762,
+      "sha256": "50d21d3de7bdb83ed1df1b7302f003a99c904bd441164d49adbc8edd67fdb09e"
+    },
+    {
+      "path": "recovery-attempt-2/native-facts.json",
+      "bytes": 13614,
+      "sha256": "ee1d0a348588a876bd437e85bad0df3b79a7784446c4dc639830e99ab01b0d59"
+    },
+    {
+      "path": "recovery-attempt-2/native-backup.tar.gz",
+      "bytes": 44773,
+      "sha256": "7b901b2d85117896ae07d0ffabb5ada611373ff5352c5d62d8c66818df7144c6"
+    },
+    {
+      "path": "recovery-attempt-2/fresh.protocol.json",
+      "bytes": 107817,
+      "sha256": "d50ae6a7103ee20b13a8d2f958fea8e8f8e585ac1d95fa6dc333436e32ffd9b3"
+    },
+    {
+      "path": "recovery-attempt-2/restart.protocol.json",
+      "bytes": 105998,
+      "sha256": "7552e0ced17798c3dcbbc4b1a8aeaf19dda337759eea42a4cfc0bdde5bba0b95"
+    },
+    {
+      "path": "recovery-attempt-2/restored.protocol.json",
+      "bytes": 105998,
+      "sha256": "7552e0ced17798c3dcbbc4b1a8aeaf19dda337759eea42a4cfc0bdde5bba0b95"
+    },
+    {
+      "path": "stopped-server-backup-control.log",
+      "bytes": 748,
+      "sha256": "8bdfeb410e3ae218ded8a664166113fca34401921e583f5ebb712f375a4820ef"
+    },
+    {
+      "path": "rust-install.log",
+      "bytes": 1768,
+      "sha256": "e5de58979ce36d10923a79d0cbc91f2599eaf4777e3ae291b9c5f47c31722681"
+    },
+    {
+      "path": "cargo-fetch.log",
+      "bytes": 16163,
+      "sha256": "84d4a6ff4fda037050a93904d62de0b084ee5b5a3c609cca324254ceacd52d35"
+    },
+    {
+      "path": "upstream-tests/store-lifecycle.log",
+      "bytes": 32233,
+      "sha256": "a0dc1aa32ab3f68a49dabc19056506478b31bb49424e7787d4ff9d8e64d1cece"
+    },
+    {
+      "path": "upstream-tests/store-lifecycle.receipt.json",
+      "bytes": 55978,
+      "sha256": "8344b49e838af15a813942939ee86d85739515fc81839a2959496c26aeaf9f88"
+    },
+    {
+      "path": "store-lifecycle.driver.log",
+      "bytes": 237,
+      "sha256": "b936ee04fd3c81966b92f6c31369f051353c854b43a42f671e3238a953c6d6fe"
+    },
+    {
+      "path": "upstream-tests/store-scope-subset.log",
+      "bytes": 3944,
+      "sha256": "addf4a06b40343ebc6b846571d66621d7fa5bf4293cbfa8f803f9022eb92249e"
+    },
+    {
+      "path": "upstream-tests/store-scope-subset.receipt.json",
+      "bytes": 10108,
+      "sha256": "be32caccabb539f9a0d25eb098148852418f39af1c8f31c8601896181ed649a2"
+    },
+    {
+      "path": "store-scope-subset.driver.log",
+      "bytes": 243,
+      "sha256": "c593bf47ebf1510676c356bba9851ef4b357119dd15d048119f2780187f3b7fc"
+    }
+  ],
+  "local_runner_source_hashes": [
+    {
+      "path": "blueprints/memory-lifecycle-v2/run.py",
+      "bytes": 7481,
+      "sha256": "491af233323171368b911925e048a90d3296d8e1251ee4053fbe3ff5a65e88bc"
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/exercise.py",
+      "bytes": 19625,
+      "sha256": "6d6cfb5764daab0bddbf6ab7002da8375627af08b103c558b3b3ff4090cb701e"
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/analyze.py",
+      "bytes": 17123,
+      "sha256": "bc99f5a38650740a16070be23f6c522e4ca0df67152b55befbe9067b94227625"
+    },
+    {
+      "path": "blueprints/memory-lifecycle-v2/upstream-20260926/run_upstream_tests.py",
+      "bytes": 10318,
+      "sha256": "fdc180afc88c6f038fb5895c7a2cb401a09e0ee9e5e2f4a6afa3ab734bd490c0"
+    }
+  ],
+  "limits": [
+    "Scoped synthetic native operation qualifies this controlled current-host prefix only.",
+    "No production migration, native client reconnect/service registration, model calls, embeddings, automatic capture or retrieval quality acceptance.",
+    "No second-machine portability claim, host-wide concurrent restore safety claim or SOTA quality winner.",
+    "Historical fixture label and changed Python/namespace conditions are explicitly preserved.",
+    "Complete full-store aggregate remains unresolved after timeout; only the 42-test scope subset is accepted."
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "kind": "native_clean_prefix_installation",
+  "checked_at": "2026-09-30",
+  "profile": "foundation-cpu",
+  "status": "installed_version_probes_passed_runtime_unaccepted",
+  "source_scope": "Current reviewed checkout files frozen before execution; this is not installation of published release v2026.09.26.2.",
+  "base_revision": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+  "command": "ECO_INSTALL_ROOT=<OWNED_PREFIX>/runtime rtk bash <FROZEN_SOURCE>/adoption/bootstrap-linux.sh --profile foundation-cpu --skip-system-packages",
+  "exit_code": 0,
+  "source_inputs": [
+    {
+      "path": "adoption/bootstrap-linux.sh",
+      "sha256": "94e3daf91408b4ed71c969f91e553d7887055a590aa5bf242262360c503aeffc",
+      "bytes": 41075
+    },
+    {
+      "path": "adoption/manifest.json",
+      "sha256": "a0c1177befa8cb9b2ffabe63c6bc0adb9a7dcf3bf54a21d0a9f61281790fa121",
+      "bytes": 19316
+    },
+    {
+      "path": "adoption/pins-linux-x86_64.json",
+      "sha256": "05e707137bb1a27d10e6b257295559ad9094c07247c2eb75db138830bb3f21b0",
+      "bytes": 31875
+    }
+  ],
+  "native_report": {
+    "name": "installed-versions.txt",
+    "sha256": "53f957702f056234022fd02f504b756c658a4e991b20c2382dfda2c43bc12eb5",
+    "bytes": 1859,
+    "actual_returned_output": "Version report at 2026-09-30T18:12:59Z for profile foundation-cpu\nEach installed pin is checked with its version_probe from pins-linux-x86_64.json; other executables are listed, not run (npm-metadata probes run only bin/npm).\nUbuntu 24.04.5 LTS (x86_64)\ngit version 2.43.0\n-- node 24.21.0: node --version --\nv24.21.0\nresult: verified (exact 24.21.0)\n-- uv 0.12.17: uv --version --\nuv 0.12.17 (x86_64-unknown-linux-gnu)\nresult: verified (exact 0.12.17)\n-- gh 2.101.0: gh --version --\ngh version 2.101.0 (2026-09-15)\nhttps://github.com/cli/cli/releases/tag/v2.101.0\nresult: verified (exact 2.101.0)\n-- codex 0.159.2: codex --version --\ncodex-cli 0.159.2\nresult: verified (exact 0.159.2)\n-- claude-code 2.1.284: claude --version --\n2.1.285 (Claude Code)\nresult: verified (minimum 2.1.284)\n-- context-mode 1.0.169: npm ls context-mode (package metadata; the package is not run) --\ncontext-mode@1.0.169\nresult: verified (exact 1.0.169)\n-- qmd 2.8.3: qmd --version --\nqmd 2.8.3 (facd35e)\nresult: verified (exact 2.8.3)\n-- rtk 0.50.0: rtk --version --\nrtk 0.50.0\nresult: verified (exact 0.50.0)\n-- ai-memory 2.4.1: ai-memory --version --\nai-memory 2.4.1\nresult: verified (exact 2.4.1)\n-- mcporter 0.14.1: mcporter --version --\n0.14.1\nresult: verified (exact 0.14.1)\n-- every entry in bin with its link target (this listing runs nothing) --\nai-memory -> tools/ai-memory-2.4.1/ai-memory\nclaude -> (file)\ncodex -> tools/codex-0.159.2/bin/codex\ncontext-mode -> tools/context-mode-1.0.169/bin/context-mode\ncorepack -> tools/node-24.21.0/bin/corepack\ngh -> tools/gh-2.101.0/gh\nmcporter -> tools/mcporter-0.14.1/bin/mcporter\nnode -> tools/node-24.21.0/bin/node\nnpm -> tools/node-24.21.0/bin/npm\nnpx -> tools/node-24.21.0/bin/npx\nqmd -> tools/qmd-2.8.3/bin/qmd\nrtk -> tools/rtk-0.50.0/rtk\nuv -> tools/uv-0.12.17/uv\nuvx -> tools/uv-0.12.17/uvx\nsummary: 10 verified, 0 failed\n"
+  },
+  "native_bootstrap_log": {
+    "sha256": "57bafe2b31caa6def2bb664f20e7e495d7fd5fd8f499d5284b386aff78f3d381",
+    "bytes": 5229,
+    "retention": "Original private output retained; not published because it contains the owned host prefix."
+  },
+  "independent_observation": {
+    "command": "PATH=<OWNED_PREFIX>/runtime/bin:<ORIGINAL_PATH> rtk python3 scripts/adoption_status.py --profile foundation-cpu --pinned-versions --json",
+    "exit_code": 0,
+    "status": "prerequisites_present",
+    "pinned_versions_match": true,
+    "matched": [
+      "codex",
+      "claude-code",
+      "qmd",
+      "rtk",
+      "ai-memory",
+      "mcporter"
+    ],
+    "unchecked": [
+      "context-mode"
+    ],
+    "runtime_acceptance_verified": false,
+    "context_mode_scope": "The bootstrap independently verified npm metadata1.0.169; adoption_status deliberately does not exec this package as a version probe."
+  },
+  "isolation": {
+    "new_owned_prefix": true,
+    "claude_launcher": "Existing native2.1.285 retained above minimum2.1.284; fresh wrapper points to host launcher.",
+    "npm_cache": "Bootstrap uses existing npm cache; not a fully isolated userspace.",
+    "active_client_wiring_changed": false,
+    "production_memory_migrated": false,
+    "authentication_store_read_or_copied": false,
+    "new_distribution_created": false,
+    "provider_request_performed_by_bootstrap": false
+  },
+  "upstream_sources": [
+    "adoption/bootstrap-linux.sh",
+    "adoption/bootstrap.md",
+    "adoption/platforms/linux-wsl2.md",
+    "adoption/pins-linux-x86_64.json",
+    "manifests/stack.json"
+  ],
+  "architecture_review": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "trigger": "Consequential clean-runtime architecture and provider trust",
+    "accepted_result": "Tool staging supported; fresh prefix reuses Claude native launcher and npm cache, so full runtime independence and acceptance remain unestablished. Linux --plan is unsupported; native profile/config application is separate."
+  },
+  "limitations": [
+    "Installation/version probes do not prove native memory capture, model quality, full recovery, cost or another machine.",
+    "The native metadata/profile source can move independently of the frozen installed inputs."
+  ],
+  "usage": {
+    "complete_research_usage": "unknown",
+    "token_efficiency_claim": null
+  }
+}

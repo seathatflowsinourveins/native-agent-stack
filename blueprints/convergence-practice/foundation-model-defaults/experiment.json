@@ -1,0 +1,516 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "User-selected highest-quality foundation defaults require supported native routing, independent observation, bounded escalation and retained failed attempts. This record tests configuration and bounded fixtures rather than ranking models.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/openai/codex",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5"
+    },
+    {
+      "url": "https://github.com/anthropics/claude-code",
+      "revision": "ec44ca97dc86c33d934c8d55b24959aabf076871"
+    }
+  ],
+  "discovery_provenance": [
+    "Installed client/version/settings, tagged changelog/source and official model guidance were checked before changing defaults.",
+    "Claude native analytical peer review and independent native readback/source verification informed bounded acceptance; peer claims remain leads until verified."
+  ],
+  "license_and_compatibility": "Codex Apache-2.0 source; Claude licensed native client. Existing Linux Codex0.159.2 and Claude2.1.285 execution. Older metadata refresh and macOS qualification remain unknown; no new dependency installed.",
+  "baseline_and_candidate": {
+    "baseline": "Host Sol/Low lead, effort-only Max children, Astra/Max worker profile; existing token architecture.",
+    "candidate": "User-selected Sol/Ultra lead, Sol/Max children/profile, explicit Astra/Max judgments and observable routing records; preserve native token architecture."
+  },
+  "frozen_inputs": {
+    "base_revision": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+    "tasks": [
+      "configuration",
+      "provider-fixture",
+      "peer-review",
+      "worker-contract",
+      "publication"
+    ],
+    "roles": [
+      "coordinator",
+      "sol-worker",
+      "astra-judge",
+      "claude-peer",
+      "deterministic-checker"
+    ],
+    "sources": [
+      {
+        "path": "adoption/templates/codex.config.template.toml",
+        "sha256": "20f2e03684a9c4731b0690fbd745f82011fd6c9bafb8e9cdf016d2cbb26f8dcb"
+      },
+      {
+        "path": "adoption/templates/codex.stack-worker.config.toml",
+        "sha256": "7cc85870cfd7557b6e5fb776391c4baaf12da13da4c3d66328e02b146de310b9"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "docs/decisions/2026-09-30-sol-primary-quality-defaults.md",
+        "sha256": "762e669686582bc5c71c5f5cb2052be0364be4fce2d0e564bbccc15b9850a7f4"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "tools/adoption/prove_codex_lane.py",
+        "sha256": "d40a9fcf55092d7f08075dd626d836f959097665f83c05ad5087cd529062b0f3"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Before native fixture calls, require two successful commands, RTK-prefixed status and byte-exact native/proxy blob output under the existing oracle. Read back config separately. Analytical peer review qualifies no tool integration or superiority.",
+    "usage_rule": "Retain exact native counters once and unknown fields null; no matched baseline, savings claim or complete task-usage coverage."
+  },
+  "runtime_and_platform": {
+    "platform": "Existing Linux x86_64 host",
+    "tools": [
+      {
+        "name": "codex",
+        "version": "0.159.2"
+      },
+      {
+        "name": "claude-code",
+        "version": "2.1.285"
+      }
+    ],
+    "isolation": "Source changes in separate worktrees; provider calls used an owned scratch fixture and read-only native workers. Native MCP startup created scratch-local Serena state; not OS-wide isolation."
+  },
+  "commands": [
+    "rtk proxy codex app-server --listen stdio://; native config/read and conditional config/batchWrite via existing helper; digest-guarded profile/instructions write",
+    "rtk proxy codex exec -p stack-worker -m gpt-6.1-sol -c model_reasoning_effort=\"max\" -c web_search=\"live\" -s read-only --skip-git-repo-check --ephemeral --json -C <owned-fixture> <RTK_PROMPT>",
+    "rtk proxy codex exec -p stack-worker -m gpt-6-astra -c model_reasoning_effort=\"max\" -c web_search=\"live\" -s read-only --skip-git-repo-check --ephemeral --json -C <owned-fixture> <RTK_PROMPT>",
+    "rtk proxy claude -p <bounded-policy-packet> --model claude-opus-5-5 --effort max --tools '' --strict-mcp-config --no-session-persistence --output-format stream-json --verbose --include-partial-messages; earlier failed wrappers retained in receipt",
+    "rtk python3 -m unittest discover -s tests -p test_codex_worker_lane.py -q",
+    "rtk python3 scripts/validate.py"
+  ],
+  "observations": [
+    {
+      "id": "config-1",
+      "task": "configuration",
+      "role": "coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Existing host selected route keys and native prompt contract",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/foundation-quality-defaults-20260930.json",
+          "sha256": "b777966f07d349826aa0afaa2082e854476d4f48be7e1b2812d9b81520de4c6c"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "sol-fixture-1",
+      "task": "provider-fixture",
+      "role": "sol-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "model_task_execution",
+      "scope": "Existing host bounded RTK fixture, explicit requested route, not backend attestation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/foundation-quality-defaults-20260930/model-checks.json",
+          "sha256": "dac35f23314570c98eab9fd7fce78d39f7043875e5ea7c4304cb6363dccb9082"
+        }
+      ],
+      "usage": {
+        "uncached_input": 12462,
+        "cache_creation": 0,
+        "cache_read": 43520,
+        "output": 916,
+        "reasoning_in_output": 754,
+        "total": 56898,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "astra-fixture-1",
+      "task": "provider-fixture",
+      "role": "astra-judge",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "model_task_execution",
+      "scope": "Existing host bounded RTK fixture, explicit requested route, not backend attestation",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/foundation-quality-defaults-20260930/model-checks.json",
+          "sha256": "dac35f23314570c98eab9fd7fce78d39f7043875e5ea7c4304cb6363dccb9082"
+        }
+      ],
+      "usage": {
+        "uncached_input": 19441,
+        "cache_creation": 0,
+        "cache_read": 36096,
+        "output": 667,
+        "reasoning_in_output": 516,
+        "total": 56204,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "peer-1",
+      "task": "peer-review",
+      "role": "claude-peer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 3,
+      "evidence_class": "model_task_execution",
+      "scope": "Bounded analytical peer review, zero tool integration qualification",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/foundation-quality-defaults-20260930.json",
+          "sha256": "b777966f07d349826aa0afaa2082e854476d4f48be7e1b2812d9b81520de4c6c"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "peer-2",
+      "task": "peer-review",
+      "role": "claude-peer",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 3,
+      "evidence_class": "model_task_execution",
+      "scope": "Bounded analytical peer review, zero tool integration qualification",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/foundation-quality-defaults-20260930.json",
+          "sha256": "b777966f07d349826aa0afaa2082e854476d4f48be7e1b2812d9b81520de4c6c"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "peer-3",
+      "task": "peer-review",
+      "role": "claude-peer",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 3,
+      "evidence_class": "model_task_execution",
+      "scope": "Bounded analytical peer review, zero tool integration qualification",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/foundation-quality-defaults-20260930.json",
+          "sha256": "b777966f07d349826aa0afaa2082e854476d4f48be7e1b2812d9b81520de4c6c"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "peer-4",
+      "task": "peer-review",
+      "role": "claude-peer",
+      "condition": "candidate",
+      "attempt": 4,
+      "command_index": 3,
+      "evidence_class": "model_task_execution",
+      "scope": "Bounded analytical peer review, zero tool integration qualification",
+      "status": "failed",
+      "exit_code": -15,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/foundation-quality-defaults-20260930.json",
+          "sha256": "b777966f07d349826aa0afaa2082e854476d4f48be7e1b2812d9b81520de4c6c"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "peer-5",
+      "task": "peer-review",
+      "role": "claude-peer",
+      "condition": "candidate",
+      "attempt": 5,
+      "command_index": 3,
+      "evidence_class": "model_task_execution",
+      "scope": "Bounded analytical peer review, zero tool integration qualification",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/foundation-quality-defaults-20260930.json",
+          "sha256": "b777966f07d349826aa0afaa2082e854476d4f48be7e1b2812d9b81520de4c6c"
+        }
+      ],
+      "usage": {
+        "uncached_input": 2,
+        "cache_creation": 20620,
+        "cache_read": 3073,
+        "output": 18114,
+        "reasoning_in_output": 17648,
+        "total": 41809,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "worker-contract-1",
+      "task": "worker-contract",
+      "role": "deterministic-checker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Local contract tests; eight opt-in native integration cases skipped",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/foundation-quality-defaults-20260930.json",
+          "sha256": "b777966f07d349826aa0afaa2082e854476d4f48be7e1b2812d9b81520de4c6c"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "worker-contract-2",
+      "task": "worker-contract",
+      "role": "deterministic-checker",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 4,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Local contract tests; eight opt-in native integration cases skipped",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/foundation-quality-defaults-20260930.json",
+          "sha256": "b777966f07d349826aa0afaa2082e854476d4f48be7e1b2812d9b81520de4c6c"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "worker-contract-3",
+      "task": "worker-contract",
+      "role": "deterministic-checker",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 4,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Local contract tests; eight opt-in native integration cases skipped",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/foundation-quality-defaults-20260930.json",
+          "sha256": "b777966f07d349826aa0afaa2082e854476d4f48be7e1b2812d9b81520de4c6c"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "publication-1",
+      "task": "publication",
+      "role": "deterministic-checker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Intermediate edited files before evidence registration",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/foundation-quality-defaults-20260930.json",
+          "sha256": "b777966f07d349826aa0afaa2082e854476d4f48be7e1b2812d9b81520de4c6c"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "peer-1",
+      "reason": "Native peer response deadline exceeded; final verdict/complete usage unavailable."
+    },
+    {
+      "run_id": "peer-2",
+      "reason": "Native peer response deadline exceeded; final verdict/complete usage unavailable."
+    },
+    {
+      "run_id": "peer-3",
+      "reason": "Native peer response deadline exceeded; final verdict/complete usage unavailable."
+    },
+    {
+      "run_id": "peer-4",
+      "reason": "Native peer response deadline exceeded; final verdict/complete usage unavailable."
+    },
+    {
+      "run_id": "worker-contract-1",
+      "reason": "Local expected-default/instruction-contract assertions failed before corresponding integration correction."
+    },
+    {
+      "run_id": "worker-contract-2",
+      "reason": "Local expected-default/instruction-contract assertions failed before corresponding integration correction."
+    },
+    {
+      "run_id": "publication-1",
+      "reason": "Edited registered files had stale hashes before final evidence registration."
+    }
+  ],
+  "limitations": [
+    "This is a post-execution consistency record; frozen_inputs identifies the retained final artifacts, not a pre-execution registered comparison.",
+    "No matched baseline, universal quality ranking, token improvement or complete task usage. Coordinator/preparation and failed peer usage are unknown.",
+    "Explicit Codex requests succeeded, but native events do not independently attest resolved backend identity.",
+    "Conditional Claude analytical requirements are addressed by the documented routing policy; full tool integration remains unqualified.",
+    "Owner-held Gate A carrier/roles/advisor accounting and Linux pin/installer refresh are handed off and not completed here. Older refreshed catalogs and macOS remain unqualified.",
+    "Local render/effort/docs checks are retained in the receipt; skipped native cases, source/version diagnostics and surrounding orchestration are outside this bounded attempt inventory."
+  ],
+  "decision_and_scope": {
+    "decision": "trial",
+    "scope": "User-selected routing contract on the current host and bounded provider fixture integration only",
+    "qualification_run_ids": []
+  },
+  "rollback": "Use private owned-key record and one-time controller --rollback with native expectedVersion; restore only still-matching route values/profile model and remove the managed inserted instruction. Preserve unrelated and concurrent edits.",
+  "next_decision_changing_test": "A frozen comparable representative workload with independent accepted outcomes and complete attempt/usage coverage could overturn routing. The live pin owner qualifies portable installer/metadata separately.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

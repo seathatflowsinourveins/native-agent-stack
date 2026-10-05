@@ -1,0 +1,67 @@
+{
+  "evidence_class": "independent_artifact_observation",
+  "method": "Exact initialize bytes, JSON tree deltas, tool names, native exit codes and runtime fault markers",
+  "limits": [
+    "Local deliberate faults; they do not establish any historical dependency cause"
+  ],
+  "controls": [
+    {
+      "control": "changed-schema-claude",
+      "target": "claude-code",
+      "observations": [
+        {
+          "context": "claude-code",
+          "native_exit_code": 0,
+          "initialize_bytes_unchanged": true,
+          "tool_names_unchanged": true,
+          "schema_differences": [
+            {
+              "path": "result.tools[0].inputSchema.properties.needle.type",
+              "before": "string",
+              "after": "integer"
+            }
+          ],
+          "tools_list_sha256": "d8c78a0738b9832323b51b0e04a575c9a85152b0e9545ed501ba3693d7889684"
+        },
+        {
+          "context": "codex",
+          "native_exit_code": 0,
+          "initialize_bytes_unchanged": true,
+          "tool_names_unchanged": true,
+          "schema_differences": [],
+          "tools_list_sha256": "2fe0460cd748ae5df612496585404a47f282ad90747a94d3c17a1149ee0f194f"
+        }
+      ],
+      "receipt_sha256": "d22e63ed95ce40b1d79a9f50433efd75a0c2de0b3202994fe6c5e257417738c2"
+    },
+    {
+      "control": "changed-schema-codex",
+      "target": "codex",
+      "observations": [
+        {
+          "context": "claude-code",
+          "native_exit_code": 0,
+          "initialize_bytes_unchanged": true,
+          "tool_names_unchanged": true,
+          "schema_differences": [],
+          "tools_list_sha256": "22be876d89f3e90c780f5ca31b6af290a509b6c34e3628d736d7e9b0a5a9c2b0"
+        },
+        {
+          "context": "codex",
+          "native_exit_code": 0,
+          "initialize_bytes_unchanged": true,
+          "tool_names_unchanged": true,
+          "schema_differences": [
+            {
+              "path": "result.tools[4].inputSchema.properties.substring_pattern.type",
+              "before": "string",
+              "after": "integer"
+            }
+          ],
+          "tools_list_sha256": "c99dfc464045cbeaf88f9761c471fa9a4bfbcd7c4ea2998c3ca74e7bc0eafb3c"
+        }
+      ],
+      "receipt_sha256": "20bd33cb404c00e7db31a5d89578e48bdfb55b8cf2658e9b9bcef6851c37ff35"
+    }
+  ]
+}

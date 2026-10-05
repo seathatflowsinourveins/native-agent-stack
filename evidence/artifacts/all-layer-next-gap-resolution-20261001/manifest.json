@@ -1,0 +1,749 @@
+{
+  "schema_version": 1,
+  "kind": "all_layer_next_gap_resolution",
+  "checked_at_utc": "2026-10-01T02:44:54.900683Z",
+  "source_review": "evidence/artifacts/full-lanes-resolution-20260930/manifest.json",
+  "source_review_sha256": "7dfbcef82ac08d4cc643de60c11c3cedbab687bac101609ba0b4e91614efe612",
+  "scope": "All 20 foundation and 12 US-equities layers: additive execution/operational overlay preserving frozen source verdicts and acceptance gates.",
+  "row_counts": {
+    "foundation": 20,
+    "trading": 12
+  },
+  "source_queue_status_counts": {
+    "on_requirement_change": 18,
+    "comparison_required": 13,
+    "new_host_required": 1
+  },
+  "layers": [
+    {
+      "id": "foundation--native-clients",
+      "layer_id": "native-clients",
+      "lane": "foundation",
+      "title": "Native clients",
+      "current_status": "Qualified Codex 0.159.2 retained / 0.159.3 provider trial owner active",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "Latest Codex source is reviewed; current Claude is above the recipe floor.",
+      "next_gate": "Reuse the isolated supported install/update/rollback contract with matching SDK/native versions. The runtime owner retains 0.159.3 provider qualification; HTTP 429 remains a failed attempt.",
+      "owner": "Foundation client/pin owner",
+      "evidence_refs": [
+        "docs/foundation-closure-20260921.md",
+        "docs/full-stack-convergence.md",
+        "catalogs/landscape/foundation.json",
+        "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
+        "evidence/artifacts/native-stack-gap-audit-20261001/manifest.json"
+      ]
+    },
+    {
+      "id": "foundation--instructions-skills",
+      "layer_id": "instructions-skills",
+      "lane": "foundation",
+      "title": "Instructions skills",
+      "current_status": "on_requirement_change",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "Native selected-skill discovery/execution evidence remains scoped.",
+      "next_gate": "Use a selected pinned skill on a real matching task; freeze acceptance oracle and baseline before claiming skill-driven quality or whole-task savings.",
+      "owner": "Skill lifecycle owner",
+      "evidence_refs": [
+        "docs/foundation-closure-20260921.md",
+        "catalogs/foundation/community-practice-20260920.json",
+        "evidence/receipts/token-lifecycle-resolution-20260930.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "id": "foundation--workers",
+      "layer_id": "workers",
+      "lane": "foundation",
+      "title": "Workers",
+      "current_status": "comparison_required",
+      "queue_status": "comparison_required",
+      "acceptance_scope": "Scoped native worker acceptance is not a matched efficiency winner.",
+      "next_gate": "Freeze one representative single-agent versus worker-graph comparison with edit ownership, cancellation, independent acceptance and complete attempt usage; reuse Sept30 role-workflow, builder handback and Codex-child evidence.",
+      "owner": "Worker coordinator",
+      "evidence_refs": [
+        "docs/full-stack-convergence.md",
+        "docs/foundation-convergence-20260921.md",
+        "evidence/receipts/token-lifecycle-resolution-20260930.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "id": "foundation--isolation",
+      "layer_id": "isolation",
+      "lane": "foundation",
+      "title": "Isolation",
+      "current_status": "Native dependencies observed / integrated sandbox gate open",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "bwrap/socat presence observed by worker; the AppArmor sysctl key was absent (exit 1). No sandbox enforcement trial ran.",
+      "next_gate": "Run the full registered disposable claude --settings trial after native account availability: filesystem and real-store denial without reading values, Windows launch denial, both network arms, systemd-bus isolation and required gh/git-push/Codex/paper functionality.",
+      "owner": "Foundation coordinator",
+      "evidence_refs": [
+        "catalogs/foundation/decisions.json",
+        "catalogs/us-equities/hosting-source-review.json",
+        "catalogs/landscape/foundation.json",
+        "catalogs/foundation/manifest.json",
+        "docs/decisions/2026-09-24-secret-storage.md"
+      ]
+    },
+    {
+      "id": "foundation--code-navigation",
+      "layer_id": "code-navigation",
+      "lane": "foundation",
+      "title": "Code navigation",
+      "current_status": "on_requirement_change",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "Destination questions and source oracle are required for broader coverage.",
+      "next_gate": "Qualify changed/deleted symbols and references in the selected target language/project; reuse exact-source and Sept30 Serena parity within their existing scope.",
+      "owner": "Project/index owner",
+      "evidence_refs": [
+        "catalogs/foundation/decisions.json",
+        "docs/token-native-saturation.md",
+        "evidence/receipts/token-lifecycle-resolution-20260930.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "id": "foundation--document-retrieval",
+      "layer_id": "document-retrieval",
+      "lane": "foundation",
+      "title": "Document retrieval",
+      "current_status": "comparison_required",
+      "queue_status": "comparison_required",
+      "acceptance_scope": "QMD2.8.3 BM25 retained; corpus/evaluator acceptance remains open.",
+      "next_gate": "Seal document corpus hashes, independent relevance judgments and negatives; repeat randomized lexical/hybrid warm/cold retrieval and required difficult-layout ingestion before changing QMD defaults.",
+      "owner": "Retrieval owner",
+      "evidence_refs": [
+        "docs/foundation-rd-readiness.md",
+        "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "id": "foundation--semantic-rag",
+      "layer_id": "semantic-rag",
+      "lane": "foundation",
+      "title": "Semantic rag",
+      "current_status": "on_requirement_change",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "SocratiCode1.15.0, Qdrant1.19.1 and vLLM0.30.0 retain distinct scoped evidence.",
+      "next_gate": "Qualify selected-project watcher/update/deletion/restore correctness on destination hardware; held-out retrieval quality needs a sealed source-span oracle.",
+      "owner": "RAG runtime/project owner",
+      "evidence_refs": [
+        "docs/full-stack-convergence.md",
+        "docs/hf-memory-model-qualification.md",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "id": "foundation--durable-memory",
+      "layer_id": "durable-memory",
+      "lane": "foundation",
+      "title": "Durable memory",
+      "current_status": "ai-memory 2.4.1 incumbent / Hindsight staged recommendation",
+      "queue_status": "comparison_required",
+      "acceptance_scope": "Recommendation finalized; native capture, full recovery and measured overall superiority remain unaccepted.",
+      "next_gate": "Keep staged capture disabled until an opt-in disposable current-client trial proves bank isolation, freshness, replay, deletion and independent restore with complete task usage. No incumbent switch follows from a recommendation.",
+      "owner": "Memory resolution coordinator",
+      "evidence_refs": [
+        "docs/memory-landscape-maintenance.md",
+        "docs/native-memory-rag-lifecycle.md",
+        "catalogs/foundation/memory-rag-20260930.json",
+        "docs/memory-rag-foundation-20260930.md",
+        "blueprints/convergence-practice/memory-runtime-resolution-20260930/manifest.json",
+        "evidence/artifacts/memory-runtime-resolution-20260930/latestness.json",
+        "evidence/artifacts/memory-runtime-resolution-20260930/provider-quota-capability.json",
+        "docs/landscape-continuation.md",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "id": "foundation--web-research",
+      "layer_id": "web-research",
+      "lane": "foundation",
+      "title": "Web research",
+      "current_status": "on_requirement_change",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "Additional services are conditional on a concrete unmet retrieval requirement.",
+      "next_gate": "Freeze a demonstrated primary-source coverage gap and citation oracle before adding Map/Crawl/Research or another service; retain existing native browser/literature/Tavily scope.",
+      "owner": "Research owner",
+      "evidence_refs": [
+        "catalogs/foundation/decisions.json",
+        "docs/full-stack-convergence.md",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "id": "foundation--token-efficiency",
+      "layer_id": "token-efficiency",
+      "lane": "foundation",
+      "title": "Token efficiency",
+      "current_status": "comparison_required",
+      "queue_status": "comparison_required",
+      "acceptance_scope": "16 tools/259 returned commands/82 integration checks do not establish whole-task savings.",
+      "next_gate": "Measure an equal-quality matched whole task, preserving failed attempts and raw recovery; keep complete provider usage separate from cache subsets and artifact estimates. Reuse Sept30 tool lifecycle evidence.",
+      "owner": "Token lane owner",
+      "evidence_refs": [
+        "docs/full-stack-convergence.md",
+        "docs/token-native-saturation.md",
+        "evidence/receipts/token-lifecycle-resolution-20260930.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "id": "foundation--quality-evaluation",
+      "layer_id": "quality-evaluation",
+      "lane": "foundation",
+      "title": "Quality evaluation",
+      "current_status": "comparison_required",
+      "queue_status": "comparison_required",
+      "acceptance_scope": "Independent held-out oracle remains missing.",
+      "next_gate": "Use fresh independently labeled cases, disagreement handling, a negative control and injected regression; do not tune on the existing diagnostic cases.",
+      "owner": "Evaluation owner",
+      "evidence_refs": [
+        "docs/acceptance-evidence-policy.md",
+        "docs/promptfoo-upstream-retrieval.md",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "id": "foundation--ci-supply-chain",
+      "layer_id": "ci-supply-chain",
+      "lane": "foundation",
+      "title": "Ci supply chain",
+      "current_status": "Hosted CI observed / historical archive freshly recovered and provenance verified",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "No actual failing check or new vulnerability gap was selected in this reconciliation.",
+      "next_gate": "Reuse successful hosted runs and native historical archive/tag verification at their immutable source commits. Required branch policy and any current-checkout publication/release remain separately qualified; report-only Scorecard is not a rating threshold.",
+      "owner": "GitHub automation owner",
+      "evidence_refs": [
+        "catalogs/foundation/automation.json",
+        "docs/github-automation.md",
+        "catalogs/landscape/foundation.json",
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/hosted-ci-observation.json",
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/published-catalog-recovery.json"
+      ]
+    },
+    {
+      "id": "foundation--scheduling-supervision",
+      "layer_id": "scheduling-supervision",
+      "lane": "foundation",
+      "title": "Scheduling supervision",
+      "current_status": "Native Dagu model graph qualified within its Sept30 scope",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "These effect and recovery scopes remain separate from local fixture acceptance.",
+      "next_gate": "Reuse the actual recovered model graph; qualify physical-host failure, selected remote ownership, cancellation/recovery and complete billing only when required by the actual destination.",
+      "owner": "Scheduler/effect owner",
+      "evidence_refs": [
+        "docs/foundation-convergence-20260921.md",
+        "catalogs/foundation/decisions.json",
+        "catalogs/landscape/foundation.json",
+        "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
+      ]
+    },
+    {
+      "id": "foundation--hosting-services",
+      "layer_id": "hosting-services",
+      "lane": "foundation",
+      "title": "Hosting services",
+      "current_status": "on_requirement_change",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "Target hosting requirements remain unselected; local application acceptance is retained.",
+      "next_gate": "When deployment is selected, independently restore database/application state and qualify required production access, persistence and rollback on the chosen host.",
+      "owner": "Application/deployment owner",
+      "evidence_refs": [
+        "catalogs/foundation/decisions.json",
+        "docs/foundation-closure-20260921.md",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "id": "foundation--recovery-portability",
+      "layer_id": "recovery-portability",
+      "lane": "foundation",
+      "title": "Recovery portability",
+      "current_status": "new_host_required",
+      "queue_status": "new_host_required",
+      "acceptance_scope": "Current WSL fresh-prefix evidence is not a new distro or another-PC acceptance.",
+      "next_gate": "On the destination PC, select a small profile, establish native sign-ins and a useful scoped task, then independently restore selected application state and keys.",
+      "owner": "Destination-host operator",
+      "evidence_refs": [
+        "adoption/research.json",
+        "adoption/lifecycle.md",
+        "catalogs/landscape/foundation.json",
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/published-catalog-recovery.json"
+      ]
+    },
+    {
+      "id": "foundation--observation-inference",
+      "layer_id": "observation-inference",
+      "lane": "foundation",
+      "title": "Observation inference",
+      "current_status": "on_requirement_change",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "Matching real-task accounting remains required.",
+      "next_gate": "Reconcile one actual task across native counters and matching telemetry without duplicate capture; qualify changed routes on output/privacy/latency/recovery.",
+      "owner": "Observability and run owner",
+      "evidence_refs": [
+        "docs/native-telemetry-resolution.md",
+        "docs/dashboard-gap-resolution.md",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "id": "trading--market-data-reference",
+      "layer_id": "market-data-reference",
+      "lane": "trading",
+      "title": "Market data reference",
+      "current_status": "comparison_required",
+      "queue_status": "comparison_required",
+      "acceptance_scope": "25 daily bars/two actions are scoped acquisition evidence, not a complete as-known dataset.",
+      "next_gate": "Freeze intended universe/history/rights; resolve historical delisting, action/currency, original availability and publication revisions. Reuse bounded AAPL native acquisition; paid Databento arm remains unexecuted.",
+      "owner": "Trading data owner",
+      "evidence_refs": [
+        "catalogs/us-equities/data-research.json",
+        "catalogs/us-equities/runtime-target.json",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "id": "trading--identity-provenance",
+      "layer_id": "identity-provenance",
+      "lane": "trading",
+      "title": "Identity provenance",
+      "current_status": "comparison_required",
+      "queue_status": "comparison_required",
+      "acceptance_scope": "235 ticker collisions and original dated identities remain unresolved.",
+      "next_gate": "Reuse anchored FB/META observations; obtain auditable historical identities, ticker collision and delisting resolution for the frozen universe before accepting asset-master joins.",
+      "owner": "Trading identity owner",
+      "evidence_refs": [
+        "catalogs/us-equities/data-research.json",
+        "catalogs/us-equities/runtime-target.json",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "id": "trading--storage-compute",
+      "layer_id": "storage-compute",
+      "lane": "trading",
+      "title": "Storage compute",
+      "current_status": "comparison_required",
+      "queue_status": "comparison_required",
+      "acceptance_scope": "Materialization does not qualify historical availability.",
+      "next_gate": "Qualify historically available issuer/security/price joins and the as-known data contract before a broader storage comparison; retain recorded DuckDB/Parquet repeatability.",
+      "owner": "Trading data/storage owner",
+      "evidence_refs": [
+        "catalogs/us-equities/data-research.json",
+        "catalogs/us-equities/runtime-target.json",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "id": "trading--data-quality-orchestration",
+      "layer_id": "data-quality-orchestration",
+      "lane": "trading",
+      "title": "Data quality orchestration",
+      "current_status": "on_requirement_change",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "Synthetic gate evidence remains explicit.",
+      "next_gate": "Reopen the synthetic snapshot-promotion gate for a selected real research job or scope expansion; retain source packet, complete output, cancellation, ownership and usage.",
+      "owner": "Trading integration owner",
+      "evidence_refs": [
+        "catalogs/us-equities/agents-operations.json",
+        "docs/foundation-closure-20260921.md",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "id": "trading--research-factors-ml",
+      "layer_id": "research-factors-ml",
+      "lane": "trading",
+      "title": "Research factors ml",
+      "current_status": "comparison_required",
+      "queue_status": "comparison_required",
+      "acceptance_scope": "Engine parity does not qualify strategy quality.",
+      "next_gate": "Continue daily/intraday catalyst research only with required as-known data and a frozen evaluation protocol; retain strategy merit separately from engine parity. The inspected2021 control cannot become a fresh holdout.",
+      "owner": "Trading research owner",
+      "evidence_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/runtime-target.json",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "id": "trading--backtesting-engine",
+      "layer_id": "backtesting-engine",
+      "lane": "trading",
+      "title": "Backtesting engine",
+      "current_status": "comparison_required",
+      "queue_status": "comparison_required",
+      "acceptance_scope": "Recorded owner is not proof of an active peer.",
+      "next_gate": "Reuse bounded PASS one_zero SPY/LEAN parity (136 checks,106 execution passes,zero failures/skips), disclosed prior replays and accepted deviation; extend only for a named additional economic case.",
+      "owner": "Recorded peer:sota-workflow-resolution; live identity requested",
+      "evidence_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/runtime-target.json",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "id": "trading--execution-broker",
+      "layer_id": "execution-broker",
+      "lane": "trading",
+      "title": "Execution broker",
+      "current_status": "rc5 IBKR stock-order upstream blocker open / alternate 1.231.0 separate",
+      "queue_status": "comparison_required",
+      "acceptance_scope": "Paper arithmetic readiness is distinct from adapter/account readiness.",
+      "next_gate": "Continue privately verified read-only readiness and independent broker-specific paper contracts under existing authorization. Selected rc5 Rust ibapi 3.3.0 stays fixed; PR 5041 now proposes4.2.0 and remains open/unmerged, so it does not qualify rc5 stock orders.",
+      "owner": "Trading broker owner; native paper inputs required",
+      "evidence_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/runtime-target.json",
+        "catalogs/landscape/us-equities.json",
+        "blueprints/us-equities/engine-nautilus/acceptance-plan.md"
+      ]
+    },
+    {
+      "id": "trading--portfolio-risk",
+      "layer_id": "portfolio-risk",
+      "lane": "trading",
+      "title": "Portfolio risk",
+      "current_status": "Historical fault receipt retained / 3 current-source bindings changed",
+      "queue_status": "comparison_required",
+      "acceptance_scope": "Three native-fault source bindings are stale; a gate note cannot clear them.",
+      "next_gate": "Obtain live owner acknowledgment, then rerun the supported native-fault harness against current runner/safety/transport with independent observation. Preserve the historical receipt and original needs_attention ladder. Qualify frozen 1x before 2x and 4x.",
+      "owner": "Recorded peer:sota-workflow-resolution; live identity requested",
+      "evidence_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/runtime-target.json",
+        "catalogs/landscape/us-equities.json",
+        "blueprints/us-equities/adaptive-paper/native-faults/receipt.json",
+        "blueprints/us-equities/adaptive-paper/trials/ladder-1x-20260924a-needs-attention/paper-output.json"
+      ]
+    },
+    {
+      "id": "trading--evaluation-experiments",
+      "layer_id": "evaluation-experiments",
+      "lane": "trading",
+      "title": "Evaluation experiments",
+      "current_status": "on_requirement_change",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "Real-job boundary remains to be selected.",
+      "next_gate": "Reopen for a named real research-worker experiment with timestamps, complete output/usage and cancellation; do not substitute catalog validation or synthetic fixtures.",
+      "owner": "Trading evaluation owner",
+      "evidence_refs": [
+        "catalogs/us-equities/agents-operations.json",
+        "docs/foundation-closure-20260921.md",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "id": "trading--agents-models-workers",
+      "layer_id": "agents-models-workers",
+      "lane": "trading",
+      "title": "Agents models workers",
+      "current_status": "comparison_required",
+      "queue_status": "comparison_required",
+      "acceptance_scope": "No measured memory winner or new held-out judgment acceptance is established.",
+      "next_gate": "Use held-out finance/document/code judgments to compare fidelity, abstention and complete task cost while preserving timestamps, project isolation and original recovery.",
+      "owner": "Trading model/evaluation owner",
+      "evidence_refs": [
+        "catalogs/us-equities/foundation-memory.json",
+        "evidence/receipts/foundation-native-20260920.json",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "id": "trading--observability-hosting",
+      "layer_id": "observability-hosting",
+      "lane": "trading",
+      "title": "Observability hosting",
+      "current_status": "Exact paper artifacts recovered / local dashboard snapshot restored",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "Independent order listings matched counts only, not rate/latency claims.",
+      "next_gate": "Retain mechanics-only ext-20260928 evidence and the timestamped 112-record snapshot. Verify the separate emitter and a real selected job/host with independent alert/worker-lifecycle observation before expansion.",
+      "owner": "Trading observability owner",
+      "evidence_refs": [
+        "catalogs/us-equities/agents-operations.json",
+        "docs/foundation-closure-20260921.md",
+        "catalogs/landscape/us-equities.json",
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/recovery-observation.json",
+        "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md",
+        "blueprints/us-equities/adaptive-paper/trials/ext-20260928/receipt.json"
+      ]
+    },
+    {
+      "id": "trading--security-supply-chain",
+      "layer_id": "security-supply-chain",
+      "lane": "trading",
+      "title": "Security supply chain",
+      "current_status": "on_requirement_change",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "Credentials remain private; no broader security acceptance is inferred.",
+      "next_gate": "Preserve dated native rc5 supply-chain and local credential-integration scopes; reopen on changed source/dependency/host or a selected real-job boundary.",
+      "owner": "Trading integration owner",
+      "evidence_refs": [
+        "catalogs/us-equities/agents-operations.json",
+        "docs/foundation-closure-20260921.md",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "id": "foundation--agent-sdks",
+      "layer_id": "agent-sdks",
+      "lane": "foundation",
+      "title": "Agent sdks",
+      "current_status": "Sept30 enhanced SDK qualified within scope / newer provider trial open",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "The old claim that no lane revisited SDKs since Sept21 is corrected by three Sept30 receipts.",
+      "next_gate": "Reuse the actual September30 native skill/MCP/Dagu/judge evidence. A concrete application task and independent oracle, matched comparison and complete failed-attempt usage are still required. Earlier 'not revisited since September21' prose is superseded.",
+      "owner": "Runtime SDK owner",
+      "evidence_refs": [
+        "docs/foundation-closure-20260921.md",
+        "catalogs/foundation/decisions.json",
+        "evidence/receipts/omniroute-runtime-workers-20260930.json",
+        "evidence/receipts/omniroute-claude-callsite-20260930.json",
+        "evidence/receipts/omniroute-runtime-enhancements-20260930.json",
+        "catalogs/landscape/foundation.json",
+        "catalogs/foundation/runtime-worker-landscape-20260930.json"
+      ]
+    },
+    {
+      "id": "foundation--mcp-surfaces",
+      "layer_id": "mcp-surfaces",
+      "lane": "foundation",
+      "title": "Mcp surfaces",
+      "current_status": "on_requirement_change",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "Registry discovery alone cannot promote a server.",
+      "next_gate": "Reuse mcporter0.14.1 and Inspector2.8.0 scoped qualification; select a concrete changed process-root/shared-daemon, OAuth/remote or registration-cleanup gap before extending acceptance.",
+      "owner": "MCP integration owner",
+      "evidence_refs": [
+        "recipes/README.md",
+        "catalogs/foundation/decisions.json",
+        "evidence/receipts/token-lifecycle-resolution-20260930.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "id": "foundation--secrets-credentials",
+      "layer_id": "secrets-credentials",
+      "lane": "foundation",
+      "title": "Secrets credentials",
+      "current_status": "on_requirement_change",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "No credential value or authentication store was read.",
+      "next_gate": "Preserve native sign-ins and credential policy; qualify OpenBao only for a concrete multi-host/operator secret-sharing requirement.",
+      "owner": "Credential policy owner",
+      "evidence_refs": [
+        "adoption/manifest.json",
+        "catalogs/foundation/decisions.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "id": "foundation--git-github-automation",
+      "layer_id": "git-github-automation",
+      "lane": "foundation",
+      "title": "Git github automation",
+      "current_status": "Installed gh 2.101.0 observed /2.102.0 maintenance remains owned",
+      "queue_status": "on_requirement_change",
+      "acceptance_scope": "Installed gh version alone is not useful lifecycle acceptance.",
+      "next_gate": "Preserve qualified disposable Worktrunk/Difftastic and foreground review evidence. The native client owner retains gh maintenance; establish gh's own pinned lifecycle and requested ruleset acceptance separately from successful read-only run listings.",
+      "owner": "Git/GitHub tooling owner",
+      "evidence_refs": [
+        "docs/github-automation.md",
+        "catalogs/foundation/decisions.json",
+        "catalogs/landscape/foundation.json",
+        "evidence/artifacts/native-stack-gap-audit-20261001/manifest.json",
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/hosted-ci-observation.json",
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/published-catalog-recovery.json"
+      ]
+    }
+  ],
+  "executions": [
+    {
+      "id": "exact-paper-artifact-recovery",
+      "status": "passed",
+      "acceptance_scope": "All 16 public ext-20260928 files restored byte-for-byte from immutable commit 40375e1ecf432749e0f04b521d754866a41ee9d9 and publicly scanned. Historical 2 of 8 / 10 orders / 23 fills / -8.9100 mechanics-only outcome preserved; zero new orders.",
+      "evidence_refs": [
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/recovery-observation.json",
+        "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md",
+        "blueprints/us-equities/adaptive-paper/trials/ext-20260928/receipt.json",
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/independent-review.json"
+      ]
+    },
+    {
+      "id": "native-current-checkout-dashboard-snapshot",
+      "status": "passed_at_recorded_checkpoint",
+      "acceptance_scope": "Native 112-record snapshot after repairing source reference and ASCII160-character labels. Concurrent owner invalid-label retry retained. Checkpoint freshness differs from emitter/process/runtime acceptance.",
+      "evidence_refs": [
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/recovery-observation.json",
+        "observability/grand-dashboard/progress.py",
+        "observability/grand-dashboard/state.json",
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/independent-review.json"
+      ]
+    },
+    {
+      "id": "hosted-ci-native-observation",
+      "status": "passed_within_scope",
+      "acceptance_scope": "Read-only native gh returned completed success rows for security-scan, report-only Scorecard and publish-catalog at their recorded headSha. No new dispatch or publication; this dirty checkout is not those commits.",
+      "evidence_refs": [
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/hosted-ci-observation.json",
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/independent-review.json"
+      ]
+    },
+    {
+      "id": "native-claude-peer-coordination",
+      "status": "failed_native_account_limit",
+      "acceptance_scope": "One native Opus/Max call returned exit 1 / is_error=true: session limit resets 11:20 p.m. America/New_York. No SendMessage tool call; returned native input/cache/output counters all 0. Native reset report is account-scoped and no administrative reset was performed.",
+      "evidence_refs": [
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/README.md"
+      ]
+    },
+    {
+      "id": "native-claude-integrated-sandbox-trial",
+      "status": "not_executed_account_recovery_unconfirmed",
+      "acceptance_scope": "Registered gate remains open. bwrap 0.9.0/socat 1.8.0.0 and native CLI 2.1.286 observed; missing AppArmor sysctl entry(exit 1) does not establish enforcement or unsupported sandbox. No saved client settings changed.",
+      "evidence_refs": [
+        "catalogs/foundation/manifest.json",
+        "docs/decisions/2026-09-24-secret-storage.md"
+      ]
+    },
+    {
+      "id": "native-codex-ordinary-usage-availability",
+      "status": "passed_read_only_observation",
+      "acceptance_scope": "Supported native quota command exited 0 and returned ordinary usage allowed, no reached-limit flag, and one reset credit available at 02:54 UTC. No credit consumed; current native Claude availability is unconfirmed after a separate bounded deadline.",
+      "evidence_refs": [
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/native-quota-observation.json"
+      ]
+    },
+    {
+      "id": "published-catalog-native-recovery",
+      "status": "passed_within_historical_release_scope",
+      "acceptance_scope": "Native artifact API retrieved 29,379,537 exact bytes; digest matched. Native source-workflow/tag/ref/commit/hosted-runner attestation and immutable release-asset verification passed. Installed gh ZIP-extraction failure and missing-directory preflight retained. No extraction, execution or new publication.",
+      "evidence_refs": [
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/published-catalog-recovery.json"
+      ]
+    },
+    {
+      "id": "native-coordination-post-reset-recovery",
+      "status": "failed_bounded_deadline",
+      "acceptance_scope": "One native Opus/Max request after the reported reset time reached its 180-second deadline (exit 124). Retained stdout was empty; tool delivery, partial work, usage and current Claude availability remain unknown. No further unchanged retry or backend reset.",
+      "evidence_refs": [
+        "evidence/artifacts/all-layer-next-gap-resolution-20261001/native-coordination-recovery.json"
+      ]
+    }
+  ],
+  "corrections": [
+    {
+      "id": "accepted-memory-incumbent",
+      "correction": "A recommended staged Hindsight target does not supersede accepted ai-memory 2.4.1.",
+      "verification": "catalogs/foundation/memory-rag-20260930.json accepted_memory_of_record/recommendation_status and independent Astra review."
+    },
+    {
+      "id": "nautilus-alternate-version",
+      "correction": "Root shorthand12.31 and a4-loop typed-contract lead were incorrect/unsupported. The retained alternate is1.231.0; selected rc5 and adapter readiness scopes are separate.",
+      "verification": "catalogs/us-equities/runtime-target.json and blueprints/us-equities/engine-nautilus/acceptance-plan.md original source."
+    },
+    {
+      "id": "current-ibapi-pr",
+      "correction": "Live unmerged PR 5041 now proposes ibapi 4.2.0; prospective4.1.0 was a dated snapshot. Selected rc5 pins3.3.0.",
+      "verification": "Fresh upstream gh api exits0; Cargo.toml at 7a88a0c9645c3ce4fb7b077ebb18aca2ca2b7866."
+    },
+    {
+      "id": "trading-architecture-location",
+      "correction": "Canonical architecture README is blueprints/us-equities/architecture/README.md; a shorter speculative path was absent.",
+      "verification": "Original repository path lookup and source read."
+    },
+    {
+      "id": "layer-source-schema",
+      "correction": "The existing full-lanes source uses rows, not layers; no source record was changed.",
+      "verification": "Original top-level keys and row_counts32=20+12."
+    },
+    {
+      "id": "publication-workflow-name",
+      "correction": "Guessed workflow name Publish ecosystem catalog failed(exit 1). Existing publish-catalog.yml is named Publish attested catalog archive; supported filename lookup returned exit 0.",
+      "verification": ".github/workflows/publish-catalog.yml and retained native hosted-ci observation."
+    },
+    {
+      "id": "native-patch-format",
+      "correction": "A derived patch initially selected an echoed code marker and then used unsupported numbered hunk headers; both attempts failed without mutation. Native patch boundaries and unnumbered hunks fixed registration. During finalization, stripping a zero-context hunk's position misplaced one validation field after the JSON object; the JSON parser rejected it. A scoped contextual patch repaired it, and later patches preserved surrounding lines.",
+      "verification": "Native apply_patch failed outputs then successful exact 16-file hash registration; Python JSONDecodeError at line 119 followed by successful parsing of the five-check validation receipt. Final integrity verification follows."
+    },
+    {
+      "id": "returned-summary-labels",
+      "correction": "Summary-only command classification initially mislabeled the adoption result, and a gh-workflow summary selected argument --limit. Original returned records/commands were correct; receipts retain original command arrays.",
+      "verification": "Native commands and returnedJSON preserved; no acceptance depended on those labels."
+    },
+    {
+      "id": "raw-native-artifact-transport",
+      "correction": "Artifact presence did not make the installed gh run-download ZIP extractor compatible with archive:false. Native documented API returned exact raw archive bytes; supported attestation and release checks qualified historical retrieval. A missing owned directory first prevented redirection before API execution.",
+      "verification": "Native failures exit1 retained; direct API download, digest check, attestation, releaseview and release-asset checks exit0, source-cited in published-catalog recovery."
+    },
+    {
+      "id": "qualified-current-codex-recipe",
+      "correction": "Operational Codex recipe still selected0.157.1; updated it to the accepted0.159.2 isolated native contract, preserving historical qualification links and the separately owned0.159.3 provider attempt.",
+      "verification": "Original recipes/README.md row, codex-01592 qualification upstreamff6aec96948b70d94983af2641a6b67c94faeff5 and native-stack-gap-audit-20261001."
+    }
+  ],
+  "primary_sources": [
+    "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.2",
+    "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/README.md",
+    "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.0",
+    "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+    "https://github.com/openai/codex/tree/ff6aec96948b70d94983af2641a6b67c94faeff5",
+    "https://github.com/anthropics/claude-code/blob/f5f60250a032caa72d1eb47f9ca5f29becc7066f/CHANGELOG.md",
+    "https://github.com/nautechsystems/nautilus_trader/issues/4983",
+    "https://github.com/nautechsystems/nautilus_trader/pull/5041",
+    "https://code.claude.com/docs/en/cross-session-messaging",
+    "https://github.com/cli/cli/releases/tag/v2.101.0",
+    "https://github.com/nautechsystems/nautilus_trader/blob/7a88a0c9645c3ce4fb7b077ebb18aca2ca2b7866/Cargo.toml",
+    "https://code.claude.com/docs/en/sandboxing",
+    "https://docs.github.com/en/rest/actions/artifacts?apiVersion=2026-03-10#download-an-artifact",
+    "https://github.com/cli/cli/issues/13012"
+  ],
+  "architecture_review": {
+    "role": "Astra/Max independent verifier",
+    "trigger": "Consequential all-layer ordering, historical recovery boundaries, native sandbox complete gate and memory replacement policy.",
+    "verdict": "Accepted ordering with full registered acceptance gates; recovery original bytes independently accepted. No mass installation, default promotion or historical requalification."
+  },
+  "limitations": [
+    "A complete inventory and HTML view is not all-layer live acceptance. Conditional, comparison and destination-host gates remain explicit.",
+    "Codex user-reported allowance reset is distinct from the observed native Claude account limit. No allowance reset, credit purchase or unlimited quota is claimed.",
+    "Matched whole-task quality/cost comparisons require frozen real inputs and independent oracles; unknown failed-attempt usage stays unknown.",
+    "Changed native paper-fault sources require acknowledged ownership, a fresh supported rerun and independent observation. Historical hashes are never rebound.",
+    "Provider429, the unconfirmed native account recovery, selected rc5 upstream blocker, unselected/second-host destinations and historical data rights/availability remain external or qualification gaps.",
+    "Existing paper authorization continues; no paid data acquisition, live trading, production hosting or automatic memory migration was performed."
+  ],
+  "verification_records": [
+    "evidence/artifacts/all-layer-next-gap-resolution-20261001/independent-review.json",
+    "evidence/artifacts/all-layer-next-gap-resolution-20261001/validation.json",
+    "evidence/artifacts/all-layer-next-gap-resolution-20261001/browser-observation.json"
+  ],
+  "durable_corrections": {
+    "anti_pattern_log": "docs/harness-defaults.md",
+    "native_memory_page": "decisions/all-layer-next-gap-resolution-20261001.md",
+    "native_memory_write_status": "accepted",
+    "scope": "Explicit repository correction policy; stored historical evidence, not new operating authority."
+  },
+  "session_notice": {
+    "native_claude_sendmessage_attempt": {
+      "process_exit_code": 1,
+      "tool_calls": 0,
+      "reason": "Native account session limit"
+    },
+    "codex_quota_collaboration_notices": {
+      "accepted": 3,
+      "one_additional_attempt_failed": "agent thread limit reached",
+      "reading_confirmed": "renderer acknowledged; other reading not assumed"
+    },
+    "interpretation": "Current native Codex usage is allowed. No all-session reset attestation or successful new native Claude broadcast is claimed.",
+    "post_reset_native_recovery": {
+      "process_exit_code": 124,
+      "native_tool_calls": null,
+      "queued_recipient_count": null,
+      "current_claude_availability": "unconfirmed",
+      "evidence": "evidence/artifacts/all-layer-next-gap-resolution-20261001/native-coordination-recovery.json"
+    }
+  }
+}

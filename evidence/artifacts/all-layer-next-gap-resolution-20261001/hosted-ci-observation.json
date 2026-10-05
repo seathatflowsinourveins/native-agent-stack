@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "kind": "native_hosted_ci_observation",
+  "checked_at_utc": "2026-10-01T02:38:45.075159Z",
+  "repository": "seathatflowsinourveins/native-agent-stack",
+  "execution_scope": "Read-only native gh observation of existing hosted runs; no dispatch, publication or workflow modification.",
+  "observations": [
+    {
+      "command": [
+        "rtk",
+        "gh",
+        "run",
+        "list",
+        "--workflow",
+        "security-scan.yml",
+        "--limit",
+        "5",
+        "--json",
+        "databaseId,workflowName,status,conclusion,createdAt,updatedAt,headSha,url"
+      ],
+      "exit_code": 0,
+      "returned_json": [
+        {
+          "conclusion": "success",
+          "createdAt": "2026-10-01T02:35:12Z",
+          "databaseId": 36806530852,
+          "headSha": "c99a482eec2d79baf515d8a7a1f94d542c1f09ce",
+          "status": "completed",
+          "updatedAt": "2026-10-01T02:36:19Z",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36806530852",
+          "workflowName": "Dependency and workflow security scan"
+        },
+        {
+          "conclusion": "success",
+          "createdAt": "2026-10-01T01:42:49Z",
+          "databaseId": 36802400600,
+          "headSha": "e537228f1497dcd00d8fd37e8d1f19986d8f5aa3",
+          "status": "completed",
+          "updatedAt": "2026-10-01T01:43:13Z",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36802400600",
+          "workflowName": "Dependency and workflow security scan"
+        },
+        {
+          "conclusion": "success",
+          "createdAt": "2026-10-01T01:42:34Z",
+          "databaseId": 36802380128,
+          "headSha": "c422994a24bc68cd8f459920fd56e5906adebd10",
+          "status": "completed",
+          "updatedAt": "2026-10-01T01:42:58Z",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36802380128",
+          "workflowName": "Dependency and workflow security scan"
+        },
+        {
+          "conclusion": "success",
+          "createdAt": "2026-10-01T01:41:07Z",
+          "databaseId": 36802271810,
+          "headSha": "dca821cca85dce3647fa7b488d5a23fbe5b85d4a",
+          "status": "completed",
+          "updatedAt": "2026-10-01T01:42:14Z",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36802271810",
+          "workflowName": "Dependency and workflow security scan"
+        },
+        {
+          "conclusion": "success",
+          "createdAt": "2026-10-01T01:38:48Z",
+          "databaseId": 36802088884,
+          "headSha": "b06bdf36fd110af0bd5585ad673ed9ef2a8d10a7",
+          "status": "completed",
+          "updatedAt": "2026-10-01T01:39:12Z",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36802088884",
+          "workflowName": "Dependency and workflow security scan"
+        }
+      ],
+      "returned_stdout_sha256": "35e3bfc2f8d9a22a6074153d065c3cb510d3ce48a8a2a94b6bddc31eda5e4fd4",
+      "returned_stderr": ""
+    },
+    {
+      "command": [
+        "rtk",
+        "gh",
+        "run",
+        "list",
+        "--workflow",
+        "scorecard.yml",
+        "--limit",
+        "5",
+        "--json",
+        "databaseId,workflowName,status,conclusion,createdAt,updatedAt,headSha,url"
+      ],
+      "exit_code": 0,
+      "returned_json": [
+        {
+          "conclusion": "success",
+          "createdAt": "2026-10-01T02:35:13Z",
+          "databaseId": 36806531579,
+          "headSha": "c99a482eec2d79baf515d8a7a1f94d542c1f09ce",
+          "status": "completed",
+          "updatedAt": "2026-10-01T02:36:06Z",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36806531579",
+          "workflowName": "OpenSSF Scorecard (report-only)"
+        },
+        {
+          "conclusion": "success",
+          "createdAt": "2026-10-01T01:41:07Z",
+          "databaseId": 36802271792,
+          "headSha": "dca821cca85dce3647fa7b488d5a23fbe5b85d4a",
+          "status": "completed",
+          "updatedAt": "2026-10-01T01:41:58Z",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36802271792",
+          "workflowName": "OpenSSF Scorecard (report-only)"
+        },
+        {
+          "conclusion": "success",
+          "createdAt": "2026-10-01T00:57:27Z",
+          "databaseId": 36798741082,
+          "headSha": "46365ea812c3a680b19c8c8c9c3bb198bf3b38ab",
+          "status": "completed",
+          "updatedAt": "2026-10-01T00:58:45Z",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36798741082",
+          "workflowName": "OpenSSF Scorecard (report-only)"
+        },
+        {
+          "conclusion": "success",
+          "createdAt": "2026-10-01T00:56:50Z",
+          "databaseId": 36798691257,
+          "headSha": "45f1330456567e616f07052e7cfc81c490783988",
+          "status": "completed",
+          "updatedAt": "2026-10-01T00:57:55Z",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36798691257",
+          "workflowName": "OpenSSF Scorecard (report-only)"
+        },
+        {
+          "conclusion": "success",
+          "createdAt": "2026-10-01T00:22:11Z",
+          "databaseId": 36795829269,
+          "headSha": "74cc5468691ada09674f325ebb2cddbdfe4ad68c",
+          "status": "completed",
+          "updatedAt": "2026-10-01T00:22:58Z",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36795829269",
+          "workflowName": "OpenSSF Scorecard (report-only)"
+        }
+      ],
+      "returned_stdout_sha256": "312baedc4d1187b6d83c271ec352a8b977a0350a8b63600b90448fa5df6b0e8f",
+      "returned_stderr": ""
+    },
+    {
+      "command": [
+        "rtk",
+        "gh",
+        "run",
+        "list",
+        "--workflow",
+        "publish-catalog.yml",
+        "--limit",
+        "5",
+        "--json",
+        "databaseId,workflowName,status,conclusion,createdAt,updatedAt,headSha,url"
+      ],
+      "exit_code": 0,
+      "returned_json": [
+        {
+          "conclusion": "success",
+          "createdAt": "2026-09-26T16:03:16Z",
+          "databaseId": 36254080289,
+          "headSha": "771f25f824a7851a6cb46ebcfa2922b54cb88d9e",
+          "status": "completed",
+          "updatedAt": "2026-09-26T16:04:59Z",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36254080289",
+          "workflowName": "Publish attested catalog archive"
+        },
+        {
+          "conclusion": "success",
+          "createdAt": "2026-09-26T15:21:38Z",
+          "databaseId": 36251662095,
+          "headSha": "5008c30cd6676c72fe1159c7221309feba460b08",
+          "status": "completed",
+          "updatedAt": "2026-09-26T15:23:32Z",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36251662095",
+          "workflowName": "Publish attested catalog archive"
+        },
+        {
+          "conclusion": "success",
+          "createdAt": "2026-09-26T01:44:54Z",
+          "databaseId": 36209458005,
+          "headSha": "ff20470b8fc00fee288916f309123586b15668ec",
+          "status": "completed",
+          "updatedAt": "2026-09-26T01:46:35Z",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36209458005",
+          "workflowName": "Publish attested catalog archive"
+        },
+        {
+          "conclusion": "success",
+          "createdAt": "2026-09-25T22:41:34Z",
+          "databaseId": 36197912860,
+          "headSha": "d0d8c5b82e9480c60e1e3d7a45edbebe47e89d5c",
+          "status": "completed",
+          "updatedAt": "2026-09-25T22:43:02Z",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36197912860",
+          "workflowName": "Publish attested catalog archive"
+        },
+        {
+          "conclusion": "success",
+          "createdAt": "2026-09-25T20:39:30Z",
+          "databaseId": 36187069785,
+          "headSha": "f5812d3f2266399b0c3df3ea76aa6720c7f3e598",
+          "status": "completed",
+          "updatedAt": "2026-09-25T20:41:01Z",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/36187069785",
+          "workflowName": "Publish attested catalog archive"
+        }
+      ],
+      "returned_stdout_sha256": "d1701d09bc8285750cfbed29885c14aedf7cdb61f6292ecb703c89071e119d06",
+      "returned_stderr": ""
+    }
+  ],
+  "limitations": [
+    "Hosted run conclusions apply only to their recorded immutable headSha, not this dirty checkout.",
+    "Report-only Scorecard completion is not a security rating threshold or branch protection acceptance.",
+    "Catalog publication/release acceptance needs the exact archive, attestation, download and release gates; a run listing alone does not qualify those."
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "kind": "independent_all_layer_review",
+  "role": "Astra/Max stack-verifier",
+  "trigger": "Consequential all-layer ordering and acceptance boundaries; recovered historical artifacts and current public metadata failure.",
+  "architecture_verdict": "Accepted ordering with full registered completion gates.",
+  "original_blob_checks": {
+    "source_revision": "40375e1ecf432749e0f04b521d754866a41ee9d9",
+    "files": 16,
+    "byte_identical": 16,
+    "original_read_exit_codes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "acceptance_scope": "Historical public artifact restoration; no new broker execution."
+  },
+  "native_snapshot": {
+    "exit_code": 0,
+    "observed_at_utc": "2026-10-01T02:43:09.184856+00:00",
+    "checkpoint_sha256": "228655836c3207378019a81fc0135a42c1791f06629631ad9220920cf6799677",
+    "checkpoint_bytes": 20962,
+    "checkpoint_stable_during_snapshot": true,
+    "all_titles_states_fit160ascii": true,
+    "rows": 112,
+    "unique_entities": 112
+  },
+  "hosted_ci_checks": [
+    {
+      "run_id": 36806530852,
+      "exit_code": 0,
+      "conclusion": "success",
+      "head_sha": "c99a482eec2d79baf515d8a7a1f94d542c1f09ce"
+    },
+    {
+      "run_id": 36806531579,
+      "exit_code": 0,
+      "conclusion": "success",
+      "head_sha": "c99a482eec2d79baf515d8a7a1f94d542c1f09ce"
+    },
+    {
+      "run_id": 36254080289,
+      "exit_code": 0,
+      "conclusion": "success",
+      "head_sha": "771f25f824a7851a6cb46ebcfa2922b54cb88d9e"
+    }
+  ],
+  "preservation": {
+    "source_review_sha256": "7dfbcef82ac08d4cc643de60c11c3cedbab687bac101609ba0b4e91614efe612",
+    "source_review_matches_registry": true,
+    "source_review_git_head_comparison_exit_code": 128,
+    "source_review_git_head_interpretation": "File absent from HEAD; registered source hash comparison passed.",
+    "paper_receipt_sha256": "3c229834f08a9617e08ca9e4f24b97900b04351cd45c2659c7a582d5f026a3c5",
+    "paper_receipt_matches_registry": true
+  },
+  "limitations": [
+    "The independent verifier did not have the pre-repair checkpoint; whole-checkpoint compaction-only preservation could not be independently proven from HEAD. Root's scoped native patches changed display fields; concurrent owners may change other fields.",
+    "Timestamped snapshot acceptance can be invalidated by future shared edits.",
+    "Hosted conclusions are tied to returned immutable head_sha; no new workflow dispatch, model run or broker acceptance was performed."
+  ],
+  "published_catalog_native_verification": {
+    "verdict": "confirmed_historical_artifact_identity_and_provenance",
+    "source_ref": "refs/tags/v2026.09.26.2",
+    "source_digest": "771f25f824a7851a6cb46ebcfa2922b54cb88d9e",
+    "archive_bytes": 29379537,
+    "archive_sha256": "01938ebb65125d9a94f0461f516e4be125e313a68a1c6914617a5655a1b03e07",
+    "native_checks": [
+      {
+        "name": "sha256sum",
+        "exit_code": 0
+      },
+      {
+        "name": "gh attestation verify with repo/workflow/ref/digest/hosted-runner constraints",
+        "exit_code": 0
+      },
+      {
+        "name": "gh release verify-asset",
+        "exit_code": 0
+      },
+      {
+        "name": "fresh release API lookup",
+        "exit_code": 0
+      }
+    ],
+    "returned_public_provenance": {
+      "workflow": "seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml",
+      "runner": "github-hosted",
+      "release_immutable": true,
+      "release_draft": false,
+      "asset_count": 2
+    },
+    "limitation": "Original private packet was outside context-mode workspace boundary; verdict uses fresh independent native verification. No extraction, execution, provider call or credential-store read."
+  }
+}

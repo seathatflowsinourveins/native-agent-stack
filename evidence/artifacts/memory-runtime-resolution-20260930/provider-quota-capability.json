@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "kind": "native_provider_quota_reset_capability_review",
+  "checked_at": "2026-09-30",
+  "scope": "Installed Codex protocol-schema generation and immutable source/official provider documentation only; no account allowance query, credit redemption or live quota reset.",
+  "installed_client": {
+    "version": "0.159.2",
+    "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+    "source": "https://github.com/openai/codex/releases/tag/rust-v0.159.2"
+  },
+  "native_observation": {
+    "command": "rtk codex app-server generate-json-schema --out <OWNED_NATIVE_SCHEMA_DIR>",
+    "exit_code": 0,
+    "experimental_schema_fields_requested": false,
+    "total_generated_schema_files": 314,
+    "selected_schema_metadata": [
+      {
+        "path": "v2/GetAccountRateLimitsResponse.json",
+        "sha256": "cb9655e68130116f634ed9353e45b336492e6069a6628f424d1cd52e54eda0e0",
+        "bytes": 8204,
+        "required": [
+          "rateLimits"
+        ],
+        "properties": [
+          "accountId",
+          "ordinaryUsageAllowed",
+          "rateLimitResetCredits",
+          "rateLimitUpsell",
+          "rateLimits",
+          "rateLimitsByLimitId"
+        ],
+        "enum": null,
+        "definition_names": [
+          "CreditsSnapshot",
+          "PlanType",
+          "RateLimitReachedType",
+          "RateLimitResetCredit",
+          "RateLimitResetCreditStatus",
+          "RateLimitResetCreditsSummary",
+          "RateLimitResetType",
+          "RateLimitSnapshot",
+          "RateLimitWindow",
+          "SpendControlLimitSnapshot"
+        ]
+      },
+      {
+        "path": "v2/ConsumeAccountRateLimitResetCreditResponse.json",
+        "sha256": "6d4144c00dcb7f73be6ad24693ff7e539bad56064e4432f7f2bf8d20b3bab724",
+        "bytes": 1177,
+        "required": [
+          "outcome"
+        ],
+        "properties": [
+          "outcome"
+        ],
+        "enum": null,
+        "definition_names": [
+          "ConsumeAccountRateLimitResetCreditOutcome"
+        ]
+      },
+      {
+        "path": "v2/ConsumeAccountRateLimitResetCreditParams.json",
+        "sha256": "ce36a9f59ce3b8138fccdca042538f723e93d0e34d08441e6846d3153ee0b291",
+        "bytes": 594,
+        "required": [
+          "idempotencyKey"
+        ],
+        "properties": [
+          "creditId",
+          "idempotencyKey"
+        ],
+        "enum": null,
+        "definition_names": []
+      }
+    ],
+    "native_client_request_methods": [
+      "account/rateLimitResetCredit/consume",
+      "account/rateLimits/read"
+    ]
+  },
+  "pinned_protocol_source": {
+    "url": "https://raw.githubusercontent.com/openai/codex/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/app-server-protocol/src/protocol/v2/account.rs",
+    "sha256": "f52c03c9f98f8fd496824616ec1669954f35470cbd2ff15101ce4b7e6a57b2ad",
+    "bytes": 31165,
+    "definition_lines": [
+      403,
+      423
+    ],
+    "required_reset_parameter": "idempotencyKey",
+    "optional_reset_parameter": "creditId",
+    "documented_outcomes": [
+      "reset",
+      "alreadyRedeemed",
+      "nothingToReset",
+      "noCredit"
+    ]
+  },
+  "provider_contracts": {
+    "codex": {
+      "read_method": "account/rateLimits/read",
+      "reset_method": "account/rateLimitResetCredit/consume",
+      "eligibility": "Provider must return an available earned reset and an eligible current window; this review did not inspect this account's eligibility.",
+      "retry": "Reuse the same idempotencyKey for one logical redemption; refresh native rate limits after reset or alreadyRedeemed.",
+      "source": "https://learn.chatgpt.com/docs/app-server"
+    },
+    "claude": {
+      "eligibility": "Occasional reset offers for eligible plans; availability is account-specific and unobserved here.",
+      "native_ui": "Settings > Usage > Resets > Reset for free, in the browser or Claude Desktop.",
+      "terminal_support_scope": "The official reset article says the button is unavailable in the Claude Code terminal/IDE; native browser/Desktop reset is shared across account surfaces.",
+      "source": "https://support.claude.com/en/articles/17007452-what-is-a-limit-reset"
+    }
+  },
+  "execution": {
+    "account_queried": false,
+    "reset_credit_consumed": false,
+    "live_quota_reset_verified": false,
+    "automatic_quota_reset_controller_installed": false
+  },
+  "failed_source_reads": [
+    {
+      "url": "https://raw.githubusercontent.com/openai/codex/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/app-server-protocol/src/protocol/v2.rs",
+      "result": "HTTP 404",
+      "recovery": "Pinned Git-tree lookup located v2/account.rs; installed native schema and corrected source verified the contract."
+    }
+  ],
+  "continuity_rule": "Checkpoint the selected layer, pins, actual evidence, unknown usage and next bounded gate. Resume after verified provider reset or scheduled allowance reset; refresh changed upstream evidence before decisions. A fresh conversation or context compaction does not itself establish a quota reset."
+}

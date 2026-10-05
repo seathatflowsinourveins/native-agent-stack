@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "kind": "bounded_native_coordination_recovery",
+  "reported_reset_boundary_utc": "2026-10-01T03:20:00Z",
+  "retry_started_at_utc": "2026-10-01T03:20:36Z",
+  "observed_completion_at_utc": "2026-10-01T03:24:50Z",
+  "command_contract": "rtk timeout 180 rtk claude -p --model opus --effort max --output-format json --settings per-call-disableAllHooks --strict-mcp-config --mcp-config empty --tools SendMessage -- factual-owner-notice",
+  "execution_scope": "One owned native retry after the account's previously reported reset boundary; no backend reset or credit redemption.",
+  "process_exit_code": 124,
+  "retained_stdout_bytes": 0,
+  "retained_stdout_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "native_tool_calls": null,
+  "queued_recipient_count": null,
+  "reading_confirmed": null,
+  "usage": {
+    "input_tokens": null,
+    "cache_creation_input_tokens": null,
+    "cache_read_input_tokens": null,
+    "output_tokens": null
+  },
+  "current_native_claude_availability": "unknown_after_deadline",
+  "interpretation": "A timer boundary is not proof of recovered availability or delivered notices. The native process exhausted the bounded deadline without a retained final packet; partial work and usage remain unknown. Earlier explicit quota denial and earlier successful notices remain separate observations.",
+  "further_same_condition_retries": 0,
+  "acceptance_scope": "Failed bounded recovery attempt retained; no successful native broadcast, model quality, sandbox enforcement or broker acceptance claimed."
+}

@@ -1,6 +1,9 @@
 {
   "schema_version": 1,
   "landscape_manifest": "catalogs/landscape/manifest.json",
+  "memory_rag_review": "catalogs/foundation/memory-rag-20260930.json",
+  "runtime_worker_review": "catalogs/foundation/runtime-worker-landscape-20260930.json",
+  "all_layer_resolution": "evidence/artifacts/all-layer-next-gap-resolution-20261001/manifest.json",
   "snapshot_date": "2026-09-21",
   "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
   "source_revision": "35cf9e35913f91d838b16dc518109ef2f8747e01",
@@ -312,6 +315,18 @@
     }
   ],
   "guides": [
+    {
+      "title": "Claude runtime workers: current interfaces and enhancement gates",
+      "body": "Retained Codex SDK through OmniRoute, 17 pinned or documented component choices, OpenHands CLI/SDK separation, task-selected extensions and native cooperation limits. Source review and scoped runtime acceptance remain distinct.",
+      "path": "docs/runtime-worker-landscape-20260930.md",
+      "category": "evaluation"
+    },
+    {
+      "title": "Dispatch GPT-6 workers from native Claude",
+      "body": "Complete native SDK invocation with owned workspace, private worker state and original result; runtime alternatives retain their existing acceptance gates.",
+      "path": "blueprints/runtime-workers/README.md",
+      "category": "setup"
+    },
     {
       "title": "Live Claude: upstream commands, returns and screenshots",
       "body": "38 rows distinguish 14 functional calls, 18 readiness checks and 6 version/help checks. Corrected native results, full-output provenance, bounded lifetime figures and three dashboard views.",

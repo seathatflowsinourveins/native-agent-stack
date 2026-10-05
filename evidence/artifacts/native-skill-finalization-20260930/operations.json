@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "evidence_kind": "local_native_integration_evaluation",
+  "upstream_test_claim": false,
+  "scope": "Two selected global skills, 25 original fresh native runs and four separately preregistered follow-ups. No global installation or client configuration mutation by this evaluator.",
+  "source_checks": {
+    "capability_order": "Installed help and version, upstream changelog/release, pinned source, official documentation.",
+    "installed_clients": [
+      {
+        "client": "codex",
+        "version": "0.159.2",
+        "checks": [
+          {
+            "command": "rtk codex --help",
+            "outer_exit": 0
+          },
+          {
+            "command": "rtk codex exec --help",
+            "outer_exit": 0
+          },
+          {
+            "command": "rtk codex features list",
+            "outer_exit": 0
+          }
+        ]
+      },
+      {
+        "client": "claude",
+        "version": "2.1.285",
+        "checks": [
+          {
+            "command": "rtk claude --help",
+            "outer_exit": 0
+          },
+          {
+            "command": "rtk claude plugin eval --help",
+            "outer_exit": 0
+          }
+        ]
+      }
+    ],
+    "immutable_native_sources": [
+      {
+        "url": "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
+        "source_fetch_outer_exit": 0,
+        "tag_object": "8b9fa496bbf2c47aebd62e85a080b9a522a455b5",
+        "commit": "ff6aec96948b70d94983af2641a6b67c94faeff5"
+      },
+      {
+        "url": "https://github.com/anthropics/claude-code/blob/ec44ca97dc86c33d934c8d55b24959aabf076871/CHANGELOG.md",
+        "source_fetch_outer_exit": 0,
+        "reviewed_version": "2.1.285"
+      }
+    ],
+    "official_docs": [
+      "https://developers.openai.com/codex/skills.md",
+      "https://code.claude.com/docs/en/cli-reference",
+      "https://code.claude.com/docs/en/skills"
+    ],
+    "raw_capture_hashes": [
+      {
+        "file": "codex-help.txt",
+        "bytes": 5791,
+        "sha256": "a3340c662f9f12824ddc2fee0eace8611528e9e493812f88c9b791b4e3f697c7"
+      },
+      {
+        "file": "codex-exec-help.txt",
+        "bytes": 4053,
+        "sha256": "45074bdd401090301bd5e8ba5030a33af35905806bfe94b3f8f546825bd65b32"
+      },
+      {
+        "file": "codex-features.txt",
+        "bytes": 10004,
+        "sha256": "7a3824a215ee3d8ac6be53879c3a0a4276f22a70095465499dc166adb4211270"
+      },
+      {
+        "file": "claude-help.txt",
+        "bytes": 22366,
+        "sha256": "09cefa436ec4a82a1e0c715f06c223dbb56ceeb972ea76856b41ce513fa113d4"
+      },
+      {
+        "file": "claude-plugin-eval-help.txt",
+        "bytes": 6194,
+        "sha256": "1b84d0678f6917ca404872fd445f059381126257b5ccc52b8dcefedb67458c90"
+      },
+      {
+        "file": "codex-changelog.txt",
+        "bytes": 299881,
+        "sha256": "bdd2387007899d50d178e7b9c3828368398daadfade8bdb7f02c4183f55d1dac"
+      },
+      {
+        "file": "codex-tag-object.json",
+        "bytes": 660,
+        "sha256": "4cb9e0e16e22df3084a00f4c5d04accd1d2a8b295e8edf52063f9eed7e0605c0"
+      },
+      {
+        "file": "claude-changelog.txt",
+        "bytes": 859208,
+        "sha256": "4f8ab2b80066ecb7fc888d8566e2c9dd9bc70ca838e8632f409d47f312cf4334"
+      },
+      {
+        "file": "claude-changelog-pin.txt",
+        "bytes": 3692,
+        "sha256": "4897aa211e69ac39a3e72eced68cb58b81d127e9e025f7bfb565a3b9590ba01a"
+      },
+      {
+        "file": "codex-source-tree.json",
+        "bytes": 1056753,
+        "sha256": "10e6404b73cf3dc6b26a2c393f34c1f708298851d09d34f33077c7cbfc3000d5"
+      },
+      {
+        "file": "codex-skills-directory.txt",
+        "bytes": 219,
+        "sha256": "22cd56f971781bd9077368939fddd30610263c29185326e876084ef7ce8234a9"
+      }
+    ],
+    "installed_help_verified_flags": [
+      "--disable-slash-commands",
+      "--debug-file",
+      "--json-schema",
+      "--effort",
+      "--skip-git-repo-check",
+      "--sandbox",
+      "--config"
+    ],
+    "source_attempt_failures": [
+      {
+        "attempt": "Codex full source-tree retrieval",
+        "outer_exit": null,
+        "cause": "No retained cause; the captured tree output does not parse as complete JSON. No capability or absence claim uses this attempt."
+      },
+      {
+        "attempt": "Guessed codex-rs/core/src/skills directory lookup at rust-v0.159.2",
+        "outer_exit": 1,
+        "actual_stderr": "gh: Not Found (HTTP 404)\n",
+        "assessment": "A failed guessed path is not evidence that the capability is absent."
+      }
+    ],
+    "native_plugin_eval": "Installed native help succeeded. Not executed: this task supplied global skill directories, not an eval-enabled plugin target. Server availability was not tested; global skills were not repackaged."
+  },
+  "frozen_selected_scope": [
+    {
+      "name": "writing-for-agents",
+      "url": "https://github.com/mattpocock/skills/blob/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/productivity/writing-for-agents/SKILL.md",
+      "skill_md_sha256": "551adca942227b44192edba88acd4e8db911f0121ce58ad16944ccf6a896a74a",
+      "tree": "ad2925850efb8973a72d2e666f7a975f9a2d4a9b",
+      "codex_enabled": true,
+      "claude_listing_declared": "on",
+      "description_boundary": "Creating/editing skills or modifying AGENTS.md or CLAUDE.md. Human prose mentioning those names is a negative."
+    },
+    {
+      "name": "search-first",
+      "url": "https://github.com/affaan-m/ECC/blob/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first/SKILL.md",
+      "skill_md_sha256": "76835db48dd910061d2e4271b1151793d2fddbabeb2d2866eed068b3580c55d5",
+      "tree": "3ac0daf42ee5c7d0cbe28c399f02ff057283b889",
+      "codex_enabled": true,
+      "claude_listing_declared": "name-only",
+      "description_boundary": "Starting a feature, adding a dependency/integration, or about to write a utility that may already exist. Claude explicit eligible only in this evaluation."
+    }
+  ],
+  "native_inventory_observation": {
+    "kind": "Prior independent native zero-turn inventory; distinct from these task executions and from manifest declarations.",
+    "selected_actual_lines": [
+      "writing-for-agents             userSettings      ~40      55.9m     2×  1 day",
+      "search-first                   userSettings     < 20          -    90×  today"
+    ],
+    "limit": "Startup names and UI metadata do not establish which description was in the model prompt or prove a task-level load."
+  },
+  "corrections": [
+    {
+      "issue": "Initial relative apply_patch paths resolved in the main checkout rather than the assigned worktree.",
+      "action": "Moved only the evaluator's two new preregistration files into the assigned worktree; verified they were absent from main and present in the worktree. All subsequent patches used absolute assigned-worktree paths.",
+      "verification": "Native move exit 0 and independent path-existence checks."
+    },
+    {
+      "issue": "Explicit CLI expansion did not expose a complete selected instruction body in the model trace.",
+      "action": "Checked native --debug-file support and added private diagnostic instrumentation after the first explicit case. Retained the original first attempt and three original explicit-load observation limits.",
+      "verification": "Native argv sets retain the instrumentation difference. No unobserved load was promoted to a pass."
+    },
+    {
+      "issue": "Initial Claude native scoped tool grants omitted two read-only context-mode tools.",
+      "action": "Added only ctx_fetch_and_index and ctx_search grants for future calls after actual permission denials. Paired baseline and candidate retained identical original controls.",
+      "verification": "Per-run native control references and actual returned errors are preserved; no global configuration changed."
+    },
+    {
+      "issue": "The w05 frozen total-output word-count grader differed from the task's replacement-section word limit.",
+      "action": "Retained the original frozen failure: entire returned output 152 whitespace words. Recorded the separate 39-word replacement-section content pass; no retry or retrospective reclassification.",
+      "verification": "Original prompt, frozen criterion, complete native final output, and both counts are in the linked artifacts."
+    },
+    {
+      "issue": "The original w10 final text used a JSON code fence.",
+      "action": "Retained the strict JSON parsing failure. Preregistered an unchanged-prompt follow-up with verified native --json-schema and graded result.structured_output.",
+      "verification": "The follow-up has a distinct condition and passed; no custom fence-stripping repair was used."
+    },
+    {
+      "issue": "Original read-only Codex w02 and w04 proposals did not load the selected skill.",
+      "action": "Retained both misses. Separately preregistered actual modifications of disposable AGENTS.md and CLAUDE.md fixtures under native workspace-write.",
+      "verification": "Both follow-ups show complete instruction-file reads plus independently observed file changes and native diff exit 1 (changed)."
+    },
+    {
+      "issue": "Two evaluator orchestration syntax errors occurred before any native model call.",
+      "action": "Corrected malformed orchestration expressions and retained the resulting attempt boundaries.",
+      "verification": "No model execution or usage was attributed to these syntax errors."
+    },
+    {
+      "issue": "Context-mode execute_file denied direct access to the evaluator's private data outside the main workspace.",
+      "action": "Kept the host/tool configuration intact and used a native RTK-wrapped local summary of the evaluator-owned sanitized file.",
+      "verification": "No client/configuration mutation and no native model calls were affected."
+    },
+    {
+      "issue": "Repository publication validation detected a native thread UUID in the f03 stderr excerpt, beyond the focused host-path/signature scan.",
+      "action": "Replaced only the native identifier with <private-session-id>; preserved the error text and raw-capture hash. Expanded the publication scan to include the repository's UUID rule.",
+      "verification": "The original validator failure remains recorded; final focused scan checks thread/session identifiers as well as paths and signatures."
+    }
+  ],
+  "disposable_fixture_lifecycle": {
+    "actual_edits": [
+      {
+        "run_id": "codex-f03_w02_actual_agents-with_skill",
+        "fixture": "AGENTS.md",
+        "after_sha256": "e907fc21d389365ab23e3d8fd43bdb0fc5f532d1fccfeb54c38433753f79bb38",
+        "independent_diff_outer_exit": 1
+      },
+      {
+        "run_id": "codex-f04_w04_actual_claude-with_skill",
+        "fixture": "CLAUDE.md",
+        "after_sha256": "e13d727bf2b4256562420825572c3baecfede3c48211e4c04e26b7a05f3601d2",
+        "independent_diff_outer_exit": 1
+      }
+    ],
+    "retained_private_before_after_and_diff": true,
+    "copy_after_files_outer_exits": [
+      0,
+      0
+    ],
+    "owned_workspace_removal_outer_exit": 0,
+    "independent_absence_verified": true,
+    "retained_after_hashes_match": true
+  },
+  "limitations": [
+    "One repetition per condition, no statistical variability estimate and no universal quality claim.",
+    "Acceptance scope covers only the two named skills; metadata/tree qualification of other selected skills is not task-outcome evidence.",
+    "Three original explicit CLI calls have no complete load body observable in their traces; their task outcomes are graded separately.",
+    "The native baseline disables all skills and slash commands, rather than ablating only writing-for-agents. Project instructions, hooks, and native account state remain active.",
+    "Named worktree instruction/settings hashes remained identical across all 29 before/after snapshots. The complete effective system prompt and imported instruction paths were not captured. Native Claude diagnostics resolve project skill roots through the main checkout; main AGENTS.md differed while root continued its own work, so complete main/worktree prompt equivalence is not asserted.",
+    "The installed Codex trace did not expose a resolved model identifier; requested gpt-6.1-sol/ultra is recorded separately from unknown resolution. Claude requested opus/max and reports claude-opus-5-5, with native advisor model usage scoped separately.",
+    "Eight inner native tool errors and six inner command failures remain in results.json, despite all 29 outer exits being zero.",
+    "One cumulative native result per run. Main usage and model scopes are retained separately; cache and reasoning fields are subsets. Advisor/model buckets are not added to main usage. Native costUSD fields are list estimates, not an invoice. These counters omit the coordinator and worker orchestration sessions. No quality or efficiency gain is established.",
+    "Codex f03 stderr reports a failed collaboration spawn because a thread rollout was not found. The selected instruction read, file outcome and native outer exit remain successful. No completed nested tool call or separate child usage is present in the captured trace; no hidden child execution claim is made."
+  ],
+  "verification": {
+    "original_focused_check": {
+      "passed": true,
+      "errors": [],
+      "private_scan_scope": "Host paths, provider signatures and private-key markers; later expanded to session UUIDs."
+    },
+    "original_repository_validator": {
+      "kind": "repository_validation",
+      "command": "rtk python3 scripts/validate.py",
+      "outer_exit": 1,
+      "signal": null,
+      "error": null,
+      "stdout_sha256": "c1495d86f188a844dd243634c7e99580dc8b24fbd7a44f5b5156d71413102336",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_returned_excerpt": "Publication validation failed:\nevidence/artifacts/native-skill-finalization-20260930/README.md: evidence file is not hash-listed\nevidence/artifacts/native-skill-finalization-20260930/edit-followup-preregistration.json: evidence file is not hash-listed\nevidence/artifacts/native-skill-finalization-20260930/followup-preregistration.json: evidence file is not hash-listed\nevidence/artifacts/native-skill-finalization-20260930/operations.json: evidence file is not hash-listed\nevidence/artifacts/native-skill-finalization-20260930/preregistered-cases.json: evidence file is not hash-listed\nevidence/artifacts/native-skill-finalization-20260930/preregistration.md: evidence file is not hash-listed\nevidence/artifacts/native-skill-finalization-20260930/results.json: evidence file is not hash-listed\nevidence/artifacts/native-skill-finalization-20260930/results.json: contains possible local session identifier\nevidence/artifacts/native-skill-finalization-20260930/usage-summary.json: evidence file is not hash-listed"
+    },
+    "final_focused_publication_check": {
+      "passed": true,
+      "errors": [],
+      "scope": "All eight artifact JSON/text files parsed/scanned for prohibited host paths, signatures, private-key markers and session UUIDs; 29 native exits and original failure/miss counts preserved."
+    },
+    "final_repository_validator": {
+      "kind": "final_repository_validation",
+      "command": "rtk python3 scripts/validate.py",
+      "outer_exit": 1,
+      "signal": null,
+      "error": null,
+      "stdout_sha256": "1bcd40215de10d6396c929e6267eb06db1105b096597ee93f222fc193f41a84a",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "actual_returned_excerpt": "Publication validation failed:\nevidence/artifacts/native-skill-finalization-20260930/README.md: evidence file is not hash-listed\nevidence/artifacts/native-skill-finalization-20260930/edit-followup-preregistration.json: evidence file is not hash-listed\nevidence/artifacts/native-skill-finalization-20260930/followup-preregistration.json: evidence file is not hash-listed\nevidence/artifacts/native-skill-finalization-20260930/operations.json: evidence file is not hash-listed\nevidence/artifacts/native-skill-finalization-20260930/preregistered-cases.json: evidence file is not hash-listed\nevidence/artifacts/native-skill-finalization-20260930/preregistration.md: evidence file is not hash-listed\nevidence/artifacts/native-skill-finalization-20260930/results.json: evidence file is not hash-listed\nevidence/artifacts/native-skill-finalization-20260930/usage-summary.json: evidence file is not hash-listed"
+    },
+    "remaining_integration_requirement": "The root coordinator owns manifests/evidence.json and must hash-list these eight artifacts after transfer. The evaluator made no evidence-manifest edits."
+  }
+}

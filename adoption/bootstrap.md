@@ -235,7 +235,15 @@ GitHub-hosted macOS runner; see
    [`docs/secret-storage.md`](../docs/secret-storage.md) and check with
    `python3 scripts/credential_status.py` (both added after `v2026.09.24.1`).
 
-4. **Render configs.** Use [`tools/adoption/render_config.py`](../tools/adoption/render_config.py)
+4. **Render configs.** The 2026-09-30 templates select Sol 6.1/Ultra coordination
+   and Sol 6.1/Max workers. Before applying them, verify the actual client has
+   Sol 6.1 metadata with Max/Ultra, multi-agent V2 and its native tool mode:
+   Codex 0.159.2 is the verified bundled-metadata baseline. Older platform pins
+   parse the settings but lack that bundled entry; a refreshed native catalog
+   needs its own explicit check. Preserve the previously qualified route until
+   that check passes. This is a metadata/readiness condition, not the vendor's
+   minimum supported version; see the [dated contract](../docs/decisions/2026-09-30-sol-primary-quality-defaults.md).
+   Use [`tools/adoption/render_config.py`](../tools/adoption/render_config.py)
    with the selected host's `adoption/hosts/<host>.json` (gitignored; copy
    [`adoption/hosts/example.json`](hosts/example.json) and fill in this host's
    `HOME`, `ECO_ROOT`, `PROJECT_ROOT`, `HOST_PATH`, `CODE_INDEX_PATH`,

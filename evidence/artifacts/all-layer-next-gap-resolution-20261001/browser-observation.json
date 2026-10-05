@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "kind": "native_browser_html_observation",
+  "classification": "Real generated-page local UI integration; not model/broker/upstream runtime acceptance.",
+  "observer": "Sol/Max isolated renderer worker",
+  "native_client": {
+    "name": "agent-browser",
+    "version": "0.38.1",
+    "version_exit_code": 0,
+    "help_exit_code": 0,
+    "upstream_release_read_exit_code": 0,
+    "source": "https://github.com/vercel-labs/agent-browser/releases/tag/v0.38.1",
+    "recipe": "recipes/README.md#browser-workflow"
+  },
+  "observed_html": {
+    "bytes": 17186986,
+    "sha256": "c06c9ce7d3ff2ef8b170a0a64a7fcae3025301edd6ca3dd413716710fca9f296",
+    "layer_cards": 32,
+    "execution_cards": 7,
+    "runtime_counts": {
+      "candidates": 17,
+      "evidence": 4,
+      "enhancements": 8
+    }
+  },
+  "native_observations": [
+    {
+      "name": "open owned browser session and generated file",
+      "exit_code": 0
+    },
+    {
+      "name": "select All layers and evaluate actual DOM",
+      "exit_code": 0,
+      "returned": {
+        "layer_cards": 32,
+        "execution_cards": 7,
+        "next_gates": 32,
+        "evidence_hrefs": 128
+      }
+    },
+    {
+      "name": "foundation lane filter",
+      "exit_code": 0,
+      "returned": {
+        "cards": 20
+      }
+    },
+    {
+      "name": "trading lane filter",
+      "exit_code": 0,
+      "returned": {
+        "cards": 12
+      }
+    },
+    {
+      "name": "reset filters",
+      "exit_code": 0,
+      "returned": {
+        "cards": 32
+      }
+    },
+    {
+      "name": "console",
+      "exit_code": 0,
+      "returned": {
+        "messages": []
+      }
+    },
+    {
+      "name": "errors",
+      "exit_code": 0,
+      "returned": {
+        "errors": []
+      }
+    },
+    {
+      "name": "viewport and screenshot",
+      "exit_code": 0,
+      "returned": {
+        "width": 1280,
+        "height": 577
+      }
+    },
+    {
+      "name": "close only the owned browser session",
+      "exit_code": 0,
+      "returned": {
+        "closed": true
+      }
+    }
+  ],
+  "screenshot": {
+    "filename": "all-layer-html-20261001.png",
+    "bytes": 78213,
+    "sha256": "dc27ea2d1a5c4fb588ea41ef060018ba5e79ff1f264e5e56014f025f5439a07b",
+    "location": "Owned output outside checkout",
+    "visually_inspected_by_worker": true
+  },
+  "node_snapshot_check": {
+    "exit_code": 0,
+    "all_layer_download_equals_current_source_at_check": true,
+    "runtime_download_equals_current_source_at_check": true
+  },
+  "freshness": "Observed immutable seven-execution snapshot predates the later preserved native coordination deadline. Final eight-execution rebuild/current-file equality is checked separately; no repeated browser filter suite required."
+}

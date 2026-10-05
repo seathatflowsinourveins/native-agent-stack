@@ -1,0 +1,70 @@
+{
+  "schema_version": 1,
+  "kind": "independent_native_skill_verification",
+  "checked_at": "2026-09-30",
+  "source": "Read-only stack-verifier inspection of original private native JSONL/final outputs and retained per-blob/Claude results; no model calls or file fixes.",
+  "claims": [
+    {
+      "claim": "Both positive SKILL.md reads are complete, byte-identical to their installed files and exit zero",
+      "verdict": "confirmed",
+      "tool_exit_codes": [
+        0,
+        0
+      ],
+      "read_bytes": {
+        "search-first": 8210,
+        "writing-for-agents": 10886
+      }
+    },
+    {
+      "claim": "Negative case returns exact expected sentence and calls no tools",
+      "verdict": "confirmed"
+    },
+    {
+      "claim": "Three installed hashes match current manifest",
+      "verdict": "confirmed"
+    },
+    {
+      "claim": "All 28 required native metadata checks pass",
+      "verdict": "confirmed",
+      "rerun_exit_code": 0,
+      "returned_result": "ok",
+      "stdout_matches_receipt": true
+    },
+    {
+      "claim": "Per-blob check has only the allowlisted uv.lock difference",
+      "verdict": "confirmed from original output and current installed blobs",
+      "original_exit_code": 0,
+      "matching": 12,
+      "total": 13,
+      "missing": [],
+      "extra": [],
+      "outside_allowed_set": []
+    },
+    {
+      "claim": "Owned disposable project is absent and global skill remains",
+      "verdict": "confirmed",
+      "dangling_symlink": false
+    },
+    {
+      "claim": "Published JSONL/final hashes and retained native usage match originals",
+      "verdict": "confirmed"
+    },
+    {
+      "claim": "Claude inventory was zero-turn, zero-token and zero-cost",
+      "verdict": "confirmed"
+    },
+    {
+      "claim": "Global updater is not qualified for installed client",
+      "verdict": "confirmed",
+      "rerun_exit_code": 2,
+      "returned_failure": "[fail] codex version: codex-cli 0.159.2 (pin 0.157.1)"
+    }
+  ],
+  "independent_limits": [
+    "Outer process exits are coordinator tool-result observations; JSONL completion is separately confirmed.",
+    "Verifier did not rerun install/removal/recovery, model tasks or the 279-test suite.",
+    "Active process counts are dated observations and can change."
+  ],
+  "correction": "A supplementary current-content check initially treated a tilde path literally; the known installed directory was then checked with zero blob mismatches and zero read errors."
+}

@@ -1,0 +1,1153 @@
+{
+  "schema_version": 1,
+  "kind": "full_lanes_resolution",
+  "checked_at": "2026-10-01T00:31:32.428817+00:00",
+  "status": "next_gates_reconciled_native_peer_notifications_queued",
+  "scope": "All20 foundation and12 trading queue rows reconciled with retained receipts and fresh nonmutating native checks. No new benchmark, broker run, installation, migration, model-quality winner or full-runtime acceptance is claimed.",
+  "research_queue_before_sha256": "88eda4fe33dd711ee39fc5f758ae05d6b8713df642389d9a52fb54bd326a9d8a",
+  "source_base": "66043ed0c147a397789381b0633dd899008e08c4",
+  "source_contract": [
+    "docs/convergence-architecture.md",
+    "docs/acceptance-evidence-policy.md",
+    "docs/lanes.md",
+    "docs/paper-lane-policy.md",
+    "blueprints/us-equities/AGENTS.md"
+  ],
+  "native_checks": [
+    {
+      "command": "rtk python3 scripts/landscape.py",
+      "exit_code": 0,
+      "stdout_sha256": "f2ffcf6bb1442024fdf17236278925740ad8416a239fe8aa8133c7b75cabeadb",
+      "stdout_bytes": 731,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "returned": {
+        "counts": {
+          "applied_skills": 3,
+          "comparison_candidates": 365,
+          "comparison_repositories": 161,
+          "current_public_stars": 343,
+          "dispositions": {
+            "conditional": 164,
+            "measured_tradeoff": 9,
+            "out_of_scope": 9,
+            "overlap": 14,
+            "selected": 136,
+            "unqualified": 33
+          },
+          "domain_layers": 4,
+          "explained_components": 69,
+          "foundation_decisions": 54,
+          "foundation_layers": 20,
+          "foundation_statuses": {
+            "accepted_within_scope": 44,
+            "partial_acceptance": 2,
+            "source_review": 8
+          },
+          "historical_candidate_cards": 154,
+          "layers": 32,
+          "quality_review_repositories": 16,
+          "research_queue_layers": 32,
+          "research_repositories": 875,
+          "selected_components": 69
+        },
+        "scope": "Coverage and reference integrity; no new runtime or ranking acceptance.",
+        "status": "passed"
+      }
+    },
+    {
+      "command": "rtk python3 scripts/trading_gates.py --check --json",
+      "exit_code": 0,
+      "stdout_sha256": "894e8ae6552edc9b051146a3836108d32aba361c8b9d41486403cd13fae98899",
+      "stdout_bytes": 9785,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "returned": {
+        "blocking": {
+          "live": [
+            "leverage-ladder-1x",
+            "leverage-ladder-2x",
+            "leverage-ladder-4x",
+            "ibkr-local-acceptance",
+            "live-go"
+          ],
+          "paper": [],
+          "sim": []
+        },
+        "counts": {
+          "live": {
+            "established": 1,
+            "not_established": 4,
+            "user_decision": 1
+          },
+          "paper": {
+            "established": 4
+          },
+          "sim": {
+            "established": 6,
+            "not_established": 3,
+            "paid_entitlement": 1
+          }
+        },
+        "errors": [],
+        "flip_candidates": [],
+        "gates": 20,
+        "rows": [
+          {
+            "condition_holds": true,
+            "detail": "/local_tests/exit_code == 0",
+            "evidence_class": "native_proven",
+            "id": "equity-replay",
+            "owner": "this-effort",
+            "receipt_path": "blueprints/us-equities/engine-nautilus/equity-replay/receipt.json",
+            "required": true,
+            "rung": "sim",
+            "status": "established"
+          },
+          {
+            "condition_holds": true,
+            "detail": "/verdict == \"PASS\"",
+            "evidence_class": "native_proven",
+            "id": "spy-lean-parity",
+            "owner": "peer:sota-workflow-resolution",
+            "receipt_path": "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json",
+            "required": true,
+            "rung": "sim",
+            "status": "established"
+          },
+          {
+            "condition_holds": true,
+            "detail": "/status == \"closed\"",
+            "evidence_class": "native_proven",
+            "id": "dividend-sim-module",
+            "owner": "peer:sota-workflow-resolution",
+            "receipt_path": "blueprints/us-equities/engine-nautilus/spy-parity/dividend-module-receipt.json",
+            "required": true,
+            "rung": "sim",
+            "status": "established"
+          },
+          {
+            "condition_holds": true,
+            "detail": "/status == \"pass\"",
+            "evidence_class": "synthetic",
+            "id": "snapshot-promotion-gate",
+            "owner": "this-effort",
+            "receipt_path": "blueprints/us-equities/data/fixtures/good-gate-result.json",
+            "required": true,
+            "rung": "sim",
+            "status": "established"
+          },
+          {
+            "condition_holds": true,
+            "detail": "/status == \"passed_scoped_scan_zero_findings\"",
+            "evidence_class": "native_proven",
+            "id": "rc5-supply-chain-scan",
+            "owner": "this-effort",
+            "receipt_path": "blueprints/us-equities/supply-chain/scan-nautilus-rc5-20260922/receipt.json",
+            "required": true,
+            "rung": "sim",
+            "status": "established"
+          },
+          {
+            "condition_holds": true,
+            "detail": "/components contains id 'exchange-calendars': True",
+            "evidence_class": "local_integration",
+            "id": "exchange-calendars-in-stack",
+            "owner": "this-effort",
+            "receipt_path": "manifests/stack.json",
+            "required": false,
+            "rung": "sim",
+            "status": "established"
+          },
+          {
+            "condition_holds": false,
+            "detail": "pointer absent: /coverage_status",
+            "evidence_class": "none",
+            "id": "pre-2020-delisting",
+            "owner": "user-decision",
+            "receipt_path": "evidence/receipts/pre-2020-delisting-coverage.json",
+            "required": false,
+            "rung": "sim",
+            "status": "not_established"
+          },
+          {
+            "condition_holds": false,
+            "detail": "receipt missing",
+            "evidence_class": "none",
+            "id": "dated-security-identity",
+            "owner": "user-decision",
+            "receipt_path": "evidence/receipts/dated-security-identity.json",
+            "required": false,
+            "rung": "sim",
+            "status": "not_established"
+          },
+          {
+            "condition_holds": false,
+            "detail": "pointer absent: /pit_status",
+            "evidence_class": "none",
+            "id": "pit-news-filings",
+            "owner": "user-decision",
+            "receipt_path": "evidence/receipts/pit-availability.json",
+            "required": false,
+            "rung": "sim",
+            "status": "not_established"
+          },
+          {
+            "condition_holds": false,
+            "detail": "receipt missing",
+            "evidence_class": "none",
+            "id": "databento-arm-b",
+            "owner": "user-decision",
+            "receipt_path": "evidence/receipts/data-research-databento-arm-b.json",
+            "required": false,
+            "rung": "sim",
+            "status": "paid_entitlement"
+          },
+          {
+            "condition_holds": true,
+            "detail": "/kind == \"native_cli_e2e\"",
+            "evidence_class": "native_proven",
+            "id": "alpaca-paper-smoke",
+            "owner": "this-effort",
+            "receipt_path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
+            "required": true,
+            "rung": "paper",
+            "status": "established"
+          },
+          {
+            "condition_holds": true,
+            "detail": "/broker_readiness/status == \"passed\"",
+            "evidence_class": "native_proven",
+            "id": "adaptive-paper-broker-trial",
+            "owner": "peer:sota-workflow-resolution",
+            "receipt_path": "blueprints/us-equities/adaptive-paper/receipt.json",
+            "required": true,
+            "rung": "paper",
+            "status": "established"
+          },
+          {
+            "condition_holds": true,
+            "detail": "/evidence_class == \"synthetic\"",
+            "evidence_class": "synthetic",
+            "id": "broker-path-alerts",
+            "owner": "this-effort",
+            "receipt_path": "observability/backends/broker-path-rules-receipt.json",
+            "required": true,
+            "rung": "paper",
+            "status": "established"
+          },
+          {
+            "condition_holds": true,
+            "detail": "receipt present (non-empty; content not judged)",
+            "evidence_class": "local_integration",
+            "id": "credential-handling",
+            "owner": "this-effort",
+            "receipt_path": "docs/decisions/2026-09-22-broker-credential-handling.md",
+            "required": true,
+            "rung": "paper",
+            "status": "established"
+          },
+          {
+            "condition_holds": false,
+            "detail": "receipt missing",
+            "evidence_class": "none",
+            "id": "leverage-ladder-1x",
+            "owner": "peer:sota-workflow-resolution",
+            "receipt_path": "blueprints/us-equities/adaptive-paper/ladder/1x/receipt.json",
+            "required": true,
+            "rung": "live",
+            "status": "not_established"
+          },
+          {
+            "condition_holds": false,
+            "detail": "receipt missing",
+            "evidence_class": "none",
+            "id": "leverage-ladder-2x",
+            "owner": "peer:sota-workflow-resolution",
+            "receipt_path": "blueprints/us-equities/adaptive-paper/ladder/2x/receipt.json",
+            "required": true,
+            "rung": "live",
+            "status": "not_established"
+          },
+          {
+            "condition_holds": false,
+            "detail": "receipt missing",
+            "evidence_class": "none",
+            "id": "leverage-ladder-4x",
+            "owner": "peer:sota-workflow-resolution",
+            "receipt_path": "blueprints/us-equities/adaptive-paper/ladder/4x/receipt.json",
+            "required": true,
+            "rung": "live",
+            "status": "not_established"
+          },
+          {
+            "condition_holds": true,
+            "detail": "/status == \"native_faults_passed\"",
+            "evidence_class": "native_proven",
+            "id": "native-fault-behaviour",
+            "owner": "peer:sota-workflow-resolution",
+            "receipt_path": "blueprints/us-equities/adaptive-paper/native-faults/receipt.json",
+            "required": true,
+            "rung": "live",
+            "status": "established"
+          },
+          {
+            "condition_holds": false,
+            "detail": "receipt missing",
+            "evidence_class": "none",
+            "id": "ibkr-local-acceptance",
+            "owner": "user-decision",
+            "receipt_path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/receipt.json",
+            "required": true,
+            "rung": "live",
+            "status": "not_established"
+          },
+          {
+            "condition_holds": false,
+            "detail": "receipt missing",
+            "evidence_class": "none",
+            "id": "live-go",
+            "owner": "user-decision",
+            "receipt_path": "docs/decisions/live-go.md",
+            "required": true,
+            "rung": "live",
+            "status": "user_decision"
+          }
+        ],
+        "rung_ready": {
+          "live": false,
+          "paper": true,
+          "sim": true
+        },
+        "scope": "Arithmetic over recorded receipts; no reviewer or model opinion; nothing is flipped by this checker.",
+        "source_bindings": {
+          "native-fault-behaviour": {
+            "bound": 6,
+            "checked": true,
+            "stale": 3
+          }
+        },
+        "status": "passed",
+        "warnings": [
+          {
+            "detail": "receipt binds f157be180d0c, but the tree has 27bc3fdc8047, and source-hashes.json lists 27bc3fdc8047; the receipt qualifies the recorded bytes until a re-run rebinds it",
+            "id": "native-fault-behaviour",
+            "manifest_sha256": "27bc3fdc80472c3ee218d3723e506288ebc6eef536dafc8365b30474213a6ae4",
+            "path": "blueprints/us-equities/adaptive-paper/runner.py",
+            "receipt_sha256": "f157be180d0cf19393137e41871318476db24aea775d05a5b3b95ea8bd5dc1a6",
+            "tree_sha256": "27bc3fdc80472c3ee218d3723e506288ebc6eef536dafc8365b30474213a6ae4"
+          },
+          {
+            "detail": "receipt binds 7e00d5bb60db, but the tree has c2d44faa1e4d, and source-hashes.json lists c2d44faa1e4d; the receipt qualifies the recorded bytes until a re-run rebinds it",
+            "id": "native-fault-behaviour",
+            "manifest_sha256": "c2d44faa1e4d369b8882dec9782ef32174c404b723edd2419833146b24eb2357",
+            "path": "blueprints/us-equities/adaptive-paper/safety.py",
+            "receipt_sha256": "7e00d5bb60db2f214ffab5966d086e1d2c705ef40489fa147ec24884b802d3ed",
+            "tree_sha256": "c2d44faa1e4d369b8882dec9782ef32174c404b723edd2419833146b24eb2357"
+          },
+          {
+            "detail": "receipt binds 2653682b325f, but the tree has e3038bd5562f, and source-hashes.json lists e3038bd5562f; the receipt qualifies the recorded bytes until a re-run rebinds it",
+            "id": "native-fault-behaviour",
+            "manifest_sha256": "e3038bd5562fecc7cea52df47c4ff6b94ddae7e85ce545d6684e651b856b89d9",
+            "path": "blueprints/us-equities/adaptive-paper/transport.py",
+            "receipt_sha256": "2653682b325f3349465abe1f7d324c49e89e8ae48697c1f4d8802a6cc55d86dc",
+            "tree_sha256": "e3038bd5562fecc7cea52df47c4ff6b94ddae7e85ce545d6684e651b856b89d9"
+          }
+        ]
+      }
+    },
+    {
+      "command": "rtk python3 scripts/adoption_status.py --profile foundation-cpu --profile research-runtime --profile trading-nautilus --json",
+      "exit_code": 0,
+      "stdout_sha256": "911316a8b6c2c83a6c675585ad785ebeacc8ca812910d1fb965195c7f5e5799c",
+      "stdout_bytes": 5967,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderr_bytes": 0,
+      "returned": {
+        "schema_version": 1,
+        "status": "prerequisites_present",
+        "platform": {
+          "os": "linux",
+          "architecture": "x86_64",
+          "python": "3.13.15",
+          "supported": true
+        },
+        "manifest": {
+          "status": "valid",
+          "schema_version": 1
+        },
+        "profiles": [
+          {
+            "id": "foundation-cpu",
+            "commands": [
+              {
+                "name": "git",
+                "present": true
+              },
+              {
+                "name": "python3",
+                "present": true
+              },
+              {
+                "name": "node",
+                "present": true
+              },
+              {
+                "name": "npm",
+                "present": true
+              },
+              {
+                "name": "uv",
+                "present": true
+              },
+              {
+                "name": "codex",
+                "present": true
+              },
+              {
+                "name": "claude",
+                "present": true
+              },
+              {
+                "name": "qmd",
+                "present": true
+              },
+              {
+                "name": "rtk",
+                "present": true
+              },
+              {
+                "name": "ai-memory",
+                "present": true
+              },
+              {
+                "name": "mcporter",
+                "present": true
+              }
+            ],
+            "recipes": [
+              {
+                "path": "recipes/README.md",
+                "present": true
+              },
+              {
+                "path": "recipes/claude-native-profile.md",
+                "present": true
+              },
+              {
+                "path": "adoption/README.md",
+                "present": true
+              }
+            ],
+            "status": "prerequisites_present"
+          },
+          {
+            "id": "research-runtime",
+            "commands": [
+              {
+                "name": "git",
+                "present": true
+              },
+              {
+                "name": "python3",
+                "present": true
+              },
+              {
+                "name": "uv",
+                "present": true
+              },
+              {
+                "name": "dagu",
+                "present": true
+              },
+              {
+                "name": "dotnet",
+                "present": true
+              },
+              {
+                "name": "bwrap",
+                "present": true
+              },
+              {
+                "name": "systemd-run",
+                "present": true
+              },
+              {
+                "name": "systemctl",
+                "present": true
+              }
+            ],
+            "recipes": [
+              {
+                "path": "adoption/sdk/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/research-runtime/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/workers/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/engine/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/execution-realism/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/point-in-time/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/order-contract/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/nanosecond-replay/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/worker-supervision/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/historical-simulation/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/research-evaluation/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/catalyst-provenance/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/simulation-research/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/data-readiness/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/catalyst-dataset/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/corporate-action-readiness/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/alpaca-historical/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/authenticated-data/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/identity-readiness/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/security-identity/README.md",
+                "present": true
+              },
+              {
+                "path": "blueprints/us-equities/data/README.md",
+                "present": true
+              }
+            ],
+            "status": "prerequisites_present"
+          },
+          {
+            "id": "trading-nautilus",
+            "commands": [
+              {
+                "name": "python3",
+                "present": true
+              },
+              {
+                "name": "uv",
+                "present": true
+              },
+              {
+                "name": "bwrap",
+                "present": true
+              }
+            ],
+            "recipes": [
+              {
+                "path": "blueprints/us-equities/engine-nautilus/README.md",
+                "present": true
+              },
+              {
+                "path": "catalogs/us-equities/runtime-target.json",
+                "present": true
+              }
+            ],
+            "status": "prerequisites_present"
+          }
+        ],
+        "errors": [],
+        "runtime_acceptance_verified": false,
+        "limitations": [
+          "Executable presence does not verify its version, installation integrity, activation, or E2E behavior.",
+          "Historical acceptance remains historical; no provider, service, GPU, hook, or broker acceptance runs here.",
+          "Git comparison reports source identity only; changed worktree files are not inspected.",
+          "No credentials, client configuration, environment values, network endpoints, or running processes are inspected."
+        ],
+        "git": {
+          "baseline_commit": "8f1da51757e925d319e2a50f080b02742e7e7168",
+          "current_commit": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+          "comparison": "baseline_differs"
+        }
+      }
+    }
+  ],
+  "native_check_output_policy": "Returned JSON values retained with original stdout hashes/byte counts; summaries do not replace upstream tests or native model acceptance.",
+  "peer_messaging": {
+    "receipt": "evidence/artifacts/full-lanes-resolution-20260930/peer-messaging.json",
+    "queued_count": 6
+  },
+  "durable_memory_page": {
+    "workspace": "local",
+    "project": "native-agent-stack",
+    "path": "decisions/memory-foundation-resolution-20260930.md",
+    "native_write_and_readback_observed": true
+  },
+  "latest_selected_sources": [
+    {
+      "component": "hindsight-server",
+      "version": "0.10.2",
+      "revision": "5fc4ce20917b916240cef27c212c387a177f115b",
+      "role": "fit-based recommended target"
+    },
+    {
+      "component": "hindsight-coding-agents",
+      "version": "0.8.0",
+      "revision": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c",
+      "role": "separately versioned integration; native capture pending"
+    },
+    {
+      "component": "codex",
+      "version": "0.159.3",
+      "revision": "01fc69f4026735edfdf6789820549727a4867b11",
+      "role": "latest source; installed/qualified0.159.2 unchanged"
+    },
+    {
+      "component": "ai-memory",
+      "version": "2.5.0",
+      "revision": "a8757a05a960f96a0ba510b6341bcd520cf80bb2",
+      "role": "source-only; canonical2.4.1, isolated2.4.2 qualification separate"
+    }
+  ],
+  "primary_sources": [
+    "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.2",
+    "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/README.md",
+    "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.0",
+    "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
+    "https://github.com/openai/codex/tree/ff6aec96948b70d94983af2641a6b67c94faeff5",
+    "https://github.com/anthropics/claude-code/blob/f5f60250a032caa72d1eb47f9ca5f29becc7066f/CHANGELOG.md",
+    "https://github.com/nautechsystems/nautilus_trader/issues/4983",
+    "https://github.com/nautechsystems/nautilus_trader/pull/5041",
+    "https://code.claude.com/docs/en/cross-session-messaging"
+  ],
+  "corrections": [
+    {
+      "claim": "Sealed landscape winner pins are stale operational pins.",
+      "correction": "They are intentionally sealed dated verdict packets; later host receipts remain unbound until a new verdict wave.",
+      "verification": [
+        "catalogs/landscape/foundation.json",
+        "manifests/stack.json"
+      ]
+    },
+    {
+      "claim": "Claude matches_pin means observed exact2.1.284.",
+      "correction": "The native recipe declares match=minimum; observed2.1.286 correctly passes the2.1.284 floor.",
+      "verification": [
+        "adoption/pins-linux-x86_64.json",
+        "scripts/adoption_status.py"
+      ]
+    },
+    {
+      "claim": "No lane revisited SDKs since2026-09-21.",
+      "correction": "Three Sept30 official Codex SDK/native Claude callsite/Dagu enhancement receipts supersede that absence claim without closing the frozen SDK comparison.",
+      "verification": [
+        "evidence/receipts/omniroute-runtime-workers-20260930.json",
+        "evidence/receipts/omniroute-claude-callsite-20260930.json",
+        "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
+      ]
+    },
+    {
+      "claim": "Pinned Hindsight coding integration source is integrations/coding-agents.",
+      "correction": "Correct source directory is hindsight-integrations/coding-agents; native durable page corrected by a supported write.",
+      "verification": [
+        "catalogs/foundation/memory-rag-20260930.json"
+      ]
+    },
+    {
+      "claim": "The research queue snapshot date can advance independently of the sealed landscape.",
+      "correction": "scripts/landscape.py requires identical checked_at dates. Preserve the sealed snapshot date and record this new reconciliation under resolution_checked_at/latest_resolution_record.",
+      "verification": [
+        "scripts/landscape.py",
+        "catalogs/landscape/manifest.json"
+      ],
+      "failed_check": "rtk python3 -m unittest tests.test_memory_topic exited1: research state schema or date differs from landscape."
+    }
+  ],
+  "row_counts": {
+    "foundation": 20,
+    "us-equities": 12
+  },
+  "status_counts": {
+    "on_requirement_change": 18,
+    "comparison_required": 13,
+    "new_host_required": 1
+  },
+  "rows": [
+    {
+      "catalog": "foundation",
+      "layer_id": "native-clients",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "Latest Codex source is reviewed; current Claude is above the recipe floor.",
+      "next_action": "Qualify latest Codex 0.159.3 in the existing isolated install/update/rollback recipe; current Claude recovery uses observed 2.1.286. Preserve earlier 0.159.2 acceptance and the Claude minimum-floor policy.",
+      "owner": "Foundation client/pin owner",
+      "source_refs": [
+        "docs/foundation-closure-20260921.md",
+        "docs/full-stack-convergence.md",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "instructions-skills",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "Native selected-skill discovery/execution evidence remains scoped.",
+      "next_action": "Use a selected pinned skill on a real matching task; freeze acceptance oracle and baseline before claiming skill-driven quality or whole-task savings.",
+      "owner": "Skill lifecycle owner",
+      "source_refs": [
+        "docs/foundation-closure-20260921.md",
+        "catalogs/foundation/community-practice-20260920.json",
+        "evidence/receipts/token-lifecycle-resolution-20260930.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "workers",
+      "status": "comparison_required",
+      "evidence_interpretation": "Scoped native worker acceptance is not a matched efficiency winner.",
+      "next_action": "Freeze one representative single-agent versus worker-graph comparison with edit ownership, cancellation, independent acceptance and complete attempt usage; reuse Sept30 role-workflow, builder handback and Codex-child evidence.",
+      "owner": "Worker coordinator",
+      "source_refs": [
+        "docs/full-stack-convergence.md",
+        "docs/foundation-convergence-20260921.md",
+        "evidence/receipts/token-lifecycle-resolution-20260930.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "isolation",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "bwrap/socat presence observed by worker; the AppArmor sysctl key was absent (exit1). No sandbox enforcement trial ran.",
+      "next_action": "Qualify the named claude-code-sandbox-profile gate in a disposable supported settings trial, including outside-worktree, Windows-executable, synthetic credential, network and systemd-bus negatives; dependencies alone do not establish enforcement.",
+      "owner": "Foundation coordinator",
+      "source_refs": [
+        "catalogs/foundation/decisions.json",
+        "catalogs/us-equities/hosting-source-review.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "code-navigation",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "Destination questions and source oracle are required for broader coverage.",
+      "next_action": "Qualify changed/deleted symbols and references in the selected target language/project; reuse exact-source and Sept30 Serena parity within their existing scope.",
+      "owner": "Project/index owner",
+      "source_refs": [
+        "catalogs/foundation/decisions.json",
+        "docs/token-native-saturation.md",
+        "evidence/receipts/token-lifecycle-resolution-20260930.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "document-retrieval",
+      "status": "comparison_required",
+      "evidence_interpretation": "QMD2.8.3 BM25 retained; corpus/evaluator acceptance remains open.",
+      "next_action": "Seal document corpus hashes, independent relevance judgments and negatives; repeat randomized lexical/hybrid warm/cold retrieval and required difficult-layout ingestion before changing QMD defaults.",
+      "owner": "Retrieval owner",
+      "source_refs": [
+        "docs/foundation-rd-readiness.md",
+        "evidence/artifacts/foundation-rd-20260921/qmd-comparison.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "semantic-rag",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "SocratiCode1.15.0, Qdrant1.19.1 and vLLM0.30.0 retain distinct scoped evidence.",
+      "next_action": "Qualify selected-project watcher/update/deletion/restore correctness on destination hardware; held-out retrieval quality needs a sealed source-span oracle.",
+      "owner": "RAG runtime/project owner",
+      "source_refs": [
+        "docs/full-stack-convergence.md",
+        "docs/hf-memory-model-qualification.md",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "durable-memory",
+      "status": "comparison_required",
+      "evidence_interpretation": "Recommendation finalized; native capture, full recovery and measured overall superiority remain unaccepted.",
+      "next_action": "Provider allowance restored per user. Keep Hindsight0.10.2/integration0.8.0 as finalized fit-based target and measured-winner fields null; qualify ordinary trusted current-client capture/isolation/freshness/replay/deletion and independent empty-target recovery before valid matched quality and complete-cost promotion. ai-memory2.5.0 remains source-only.",
+      "owner": "Memory resolution coordinator",
+      "source_refs": [
+        "docs/memory-landscape-maintenance.md",
+        "docs/native-memory-rag-lifecycle.md",
+        "catalogs/foundation/memory-rag-20260930.json",
+        "docs/memory-rag-foundation-20260930.md",
+        "blueprints/convergence-practice/memory-runtime-resolution-20260930/manifest.json",
+        "evidence/artifacts/memory-runtime-resolution-20260930/latestness.json",
+        "evidence/artifacts/memory-runtime-resolution-20260930/provider-quota-capability.json",
+        "docs/landscape-continuation.md",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "web-research",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "Additional services are conditional on a concrete unmet retrieval requirement.",
+      "next_action": "Freeze a demonstrated primary-source coverage gap and citation oracle before adding Map/Crawl/Research or another service; retain existing native browser/literature/Tavily scope.",
+      "owner": "Research owner",
+      "source_refs": [
+        "catalogs/foundation/decisions.json",
+        "docs/full-stack-convergence.md",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "token-efficiency",
+      "status": "comparison_required",
+      "evidence_interpretation": "16 tools/259 returned commands/82 integration checks do not establish whole-task savings.",
+      "next_action": "Measure an equal-quality matched whole task, preserving failed attempts and raw recovery; keep complete provider usage separate from cache subsets and artifact estimates. Reuse Sept30 tool lifecycle evidence.",
+      "owner": "Token lane owner",
+      "source_refs": [
+        "docs/full-stack-convergence.md",
+        "docs/token-native-saturation.md",
+        "evidence/receipts/token-lifecycle-resolution-20260930.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "quality-evaluation",
+      "status": "comparison_required",
+      "evidence_interpretation": "Independent held-out oracle remains missing.",
+      "next_action": "Use fresh independently labeled cases, disagreement handling, a negative control and injected regression; do not tune on the existing diagnostic cases.",
+      "owner": "Evaluation owner",
+      "source_refs": [
+        "docs/acceptance-evidence-policy.md",
+        "docs/promptfoo-upstream-retrieval.md",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "ci-supply-chain",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "No actual failing check or new vulnerability gap was selected in this reconciliation.",
+      "next_action": "Use the installed CI skill for a real failing Actions check; qualify a defined vulnerability/database artifact gap separately. Preserve maintained actionlint provenance.",
+      "owner": "GitHub automation owner",
+      "source_refs": [
+        "catalogs/foundation/automation.json",
+        "docs/github-automation.md",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "scheduling-supervision",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "These effect and recovery scopes remain separate from local fixture acceptance.",
+      "next_action": "Reuse bounded Dagu/systemd graph acceptance; qualify physical-host loss, remote cancellation/billing cessation and external exactly-once effects only for the selected deployment requirement.",
+      "owner": "Scheduler/effect owner",
+      "source_refs": [
+        "docs/foundation-convergence-20260921.md",
+        "catalogs/foundation/decisions.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "hosting-services",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "Target hosting requirements remain unselected; local application acceptance is retained.",
+      "next_action": "When deployment is selected, independently restore database/application state and qualify required production access, persistence and rollback on the chosen host.",
+      "owner": "Application/deployment owner",
+      "source_refs": [
+        "catalogs/foundation/decisions.json",
+        "docs/foundation-closure-20260921.md",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "recovery-portability",
+      "status": "new_host_required",
+      "evidence_interpretation": "Current WSL fresh-prefix evidence is not a new distro or another-PC acceptance.",
+      "next_action": "On the destination PC, select a small profile, establish native sign-ins and a useful scoped task, then independently restore selected application state and keys.",
+      "owner": "Destination-host operator",
+      "source_refs": [
+        "adoption/research.json",
+        "adoption/lifecycle.md",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "observation-inference",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "Matching real-task accounting remains required.",
+      "next_action": "Reconcile one actual task across native counters and matching telemetry without duplicate capture; qualify changed routes on output/privacy/latency/recovery.",
+      "owner": "Observability and run owner",
+      "source_refs": [
+        "docs/native-telemetry-resolution.md",
+        "docs/dashboard-gap-resolution.md",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "market-data-reference",
+      "status": "comparison_required",
+      "evidence_interpretation": "25 daily bars/two actions are scoped acquisition evidence, not a complete as-known dataset.",
+      "next_action": "Freeze intended universe/history/rights; resolve historical delisting, action/currency, original availability and publication revisions. Reuse bounded AAPL native acquisition; paid Databento arm remains unexecuted.",
+      "owner": "Trading data owner",
+      "source_refs": [
+        "catalogs/us-equities/data-research.json",
+        "catalogs/us-equities/runtime-target.json",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "identity-provenance",
+      "status": "comparison_required",
+      "evidence_interpretation": "235 ticker collisions and original dated identities remain unresolved.",
+      "next_action": "Reuse anchored FB/META observations; obtain auditable historical identities, ticker collision and delisting resolution for the frozen universe before accepting asset-master joins.",
+      "owner": "Trading identity owner",
+      "source_refs": [
+        "catalogs/us-equities/data-research.json",
+        "catalogs/us-equities/runtime-target.json",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "storage-compute",
+      "status": "comparison_required",
+      "evidence_interpretation": "Materialization does not qualify historical availability.",
+      "next_action": "Qualify historically available issuer/security/price joins and the as-known data contract before a broader storage comparison; retain recorded DuckDB/Parquet repeatability.",
+      "owner": "Trading data/storage owner",
+      "source_refs": [
+        "catalogs/us-equities/data-research.json",
+        "catalogs/us-equities/runtime-target.json",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "data-quality-orchestration",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "Synthetic gate evidence remains explicit.",
+      "next_action": "Reopen the synthetic snapshot-promotion gate for a selected real research job or scope expansion; retain source packet, complete output, cancellation, ownership and usage.",
+      "owner": "Trading integration owner",
+      "source_refs": [
+        "catalogs/us-equities/agents-operations.json",
+        "docs/foundation-closure-20260921.md",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "research-factors-ml",
+      "status": "comparison_required",
+      "evidence_interpretation": "Engine parity does not qualify strategy quality.",
+      "next_action": "Continue daily/intraday catalyst research only with required as-known data and a frozen evaluation protocol; retain strategy merit separately from engine parity. The inspected2021 control cannot become a fresh holdout.",
+      "owner": "Trading research owner",
+      "source_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/runtime-target.json",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "backtesting-engine",
+      "status": "comparison_required",
+      "evidence_interpretation": "Recorded owner is not proof of an active peer.",
+      "next_action": "Reuse bounded PASS one_zero SPY/LEAN parity (136 checks,106 execution passes,zero failures/skips), disclosed prior replays and accepted deviation; extend only for a named additional economic case.",
+      "owner": "Recorded peer:sota-workflow-resolution; live identity requested",
+      "source_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/runtime-target.json",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "execution-broker",
+      "status": "comparison_required",
+      "evidence_interpretation": "Paper arithmetic readiness is distinct from adapter/account readiness.",
+      "next_action": "Preserve separate IBKR/Alpaca gates. Qualify rc5 IBKR destination and reconnect/restart reconciliation on privately verified native paper inputs; do not substitute1.231.0 Python-adapter acceptance. Issue4983/PR5041 remain open/unmerged.",
+      "owner": "Trading broker owner; native paper inputs required",
+      "source_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/runtime-target.json",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "portfolio-risk",
+      "status": "comparison_required",
+      "evidence_interpretation": "Three native-fault source bindings are stale; a gate note cannot clear them.",
+      "next_action": "Qualify the frozen1x ladder before2x, then4x; retain first attempt needs_attention,0.151x achieved,zero seconds above0.5x,failed conditions and200requests/minute budget. Requalify changed native-fault source bytes with independent observations.",
+      "owner": "Recorded peer:sota-workflow-resolution; live identity requested",
+      "source_refs": [
+        "catalogs/us-equities/engines-strategies.json",
+        "catalogs/us-equities/runtime-target.json",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "evaluation-experiments",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "Real-job boundary remains to be selected.",
+      "next_action": "Reopen for a named real research-worker experiment with timestamps, complete output/usage and cancellation; do not substitute catalog validation or synthetic fixtures.",
+      "owner": "Trading evaluation owner",
+      "source_refs": [
+        "catalogs/us-equities/agents-operations.json",
+        "docs/foundation-closure-20260921.md",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "agents-models-workers",
+      "status": "comparison_required",
+      "evidence_interpretation": "No measured memory winner or new held-out judgment acceptance is established.",
+      "next_action": "Use held-out finance/document/code judgments to compare fidelity, abstention and complete task cost while preserving timestamps, project isolation and original recovery.",
+      "owner": "Trading model/evaluation owner",
+      "source_refs": [
+        "catalogs/us-equities/foundation-memory.json",
+        "evidence/receipts/foundation-native-20260920.json",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "observability-hosting",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "Independent order listings matched counts only, not rate/latency claims.",
+      "next_action": "Qualify a selected real-job/host expansion with independent alert and worker lifecycle observation; retain synthetic broker alerts and harness-reported throughput scope.",
+      "owner": "Trading observability owner",
+      "source_refs": [
+        "catalogs/us-equities/agents-operations.json",
+        "docs/foundation-closure-20260921.md",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "catalog": "us-equities",
+      "layer_id": "security-supply-chain",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "Credentials remain private; no broader security acceptance is inferred.",
+      "next_action": "Preserve dated native rc5 supply-chain and local credential-integration scopes; reopen on changed source/dependency/host or a selected real-job boundary.",
+      "owner": "Trading integration owner",
+      "source_refs": [
+        "catalogs/us-equities/agents-operations.json",
+        "docs/foundation-closure-20260921.md",
+        "catalogs/landscape/us-equities.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "agent-sdks",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "The old claim that no lane revisited SDKs since Sept21 is corrected by three Sept30 receipts.",
+      "next_action": "Reuse Sept30 official Codex SDK0.159.2 worker/resume/recovery and native Claude callsite evidence. Freeze a concrete application requirement before a three-arm SDK comparison; retain failed Claude-SDK bridge, unknown complete cost/cancellation/backend attestation.",
+      "owner": "Runtime SDK owner",
+      "source_refs": [
+        "docs/foundation-closure-20260921.md",
+        "catalogs/foundation/decisions.json",
+        "evidence/receipts/omniroute-runtime-workers-20260930.json",
+        "evidence/receipts/omniroute-claude-callsite-20260930.json",
+        "evidence/receipts/omniroute-runtime-enhancements-20260930.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "mcp-surfaces",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "Registry discovery alone cannot promote a server.",
+      "next_action": "Reuse mcporter0.14.1 and Inspector2.8.0 scoped qualification; select a concrete changed process-root/shared-daemon, OAuth/remote or registration-cleanup gap before extending acceptance.",
+      "owner": "MCP integration owner",
+      "source_refs": [
+        "recipes/README.md",
+        "catalogs/foundation/decisions.json",
+        "evidence/receipts/token-lifecycle-resolution-20260930.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "secrets-credentials",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "No credential value or authentication store was read.",
+      "next_action": "Preserve native sign-ins and credential policy; qualify OpenBao only for a concrete multi-host/operator secret-sharing requirement.",
+      "owner": "Credential policy owner",
+      "source_refs": [
+        "adoption/manifest.json",
+        "catalogs/foundation/decisions.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    },
+    {
+      "catalog": "foundation",
+      "layer_id": "git-github-automation",
+      "status": "on_requirement_change",
+      "evidence_interpretation": "Installed gh version alone is not useful lifecycle acceptance.",
+      "next_action": "Qualify gh CLI's own lifecycle and changed review-bridge recovery before extending Worktrunk/Difftastic acceptance.",
+      "owner": "Git/GitHub tooling owner",
+      "source_refs": [
+        "docs/github-automation.md",
+        "catalogs/foundation/decisions.json",
+        "catalogs/landscape/foundation.json"
+      ]
+    }
+  ],
+  "acceptance_boundaries": [
+    "Provider allowance reset is user-reported; no native reset redemption performed.",
+    "All six peer tool results are queued only; acknowledgment/completion remain unobserved.",
+    "Current trading gate arithmetic sim/paper readiness does not qualify native broker/account/destination readiness.",
+    "Changed native-fault source requires measured owner rerun; historical receipt remains retained.",
+    "Missing task/corpus/oracle/deployment inputs are identified per row rather than replaced by arbitrary benchmarks.",
+    "No optional service activation, auth-store read, paid data acquisition or live trading occurred."
+  ]
+}

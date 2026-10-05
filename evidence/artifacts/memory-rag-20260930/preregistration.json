@@ -1,0 +1,64 @@
+{
+  "schema_version": 1,
+  "kind": "memory_rag_foundation_review",
+  "checked_at": "2026-09-30",
+  "lane": "foundation",
+  "status": "research_and_native_package_qualification_in_progress",
+  "scope": "Shared project memory for native Claude Code and Codex, with separate document and code retrieval. This review does not qualify a production migration or transfer another host's acceptance.",
+  "current_accepted_memory": {
+    "component_id": "ai-memory",
+    "installed_version_observed": "2.4.1",
+    "source_revision": "433a19f3d54dea287571b1423591db2a89965fa9",
+    "acceptance": "Existing dated host evidence; no new production capture, restore or model-quality run in this review."
+  },
+  "priority_challenger": {
+    "component_id": "hindsight",
+    "repository": "https://github.com/vectorize-io/hindsight",
+    "server_version": "0.10.2",
+    "server_revision": "5fc4ce20917b916240cef27c212c387a177f115b",
+    "coding_integration_package": "@vectorize-io/hindsight-coding-agents",
+    "coding_integration_version": "0.8.0",
+    "coding_integration_revision": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c",
+    "evidence_level": "current_official_source_and_package_registry_review",
+    "sources": [
+      "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.2",
+      "https://registry.npmjs.org/@vectorize-io%2fhindsight-coding-agents/0.8.0",
+      "https://pypi.org/project/hindsight-embed/0.10.2/",
+      "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/README.md",
+      "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/src/installer.ts"
+    ]
+  },
+  "native_qualification_contract": {
+    "installation": "Install the pinned upstream coding runtime without writing native client hooks or MCP configuration; use the official update staging command only if source and package integrity match. Qualify unchanged upstream install/config/scope/lifecycle tests in an owned source checkout.",
+    "production_capture": "Preserve the current authoritative store and active native client configuration during source/package qualification. No automatic import of existing project conversations.",
+    "runtime_pin": "Set autoUpdate=false and embedVersion=0.10.2 before any future capture trial.",
+    "isolation": "Explicit unique mapPathToBank IDs, optInOnly=true and a disposable opted-in project; same-name repository and unapproved-project negative checks.",
+    "promotion": "The existing catalogs/landscape/foundation.json durable-memory verdict rule and catalogs/foundation/memory-stack-20260925.json replacement rule remain binding. A matched executed comparison and native capture, deletion and clean-target recovery acceptance are required before replacement.",
+    "rollback": "Disable opted-in capture and historical seeding before deleting test banks; native uninstall removes installer-owned wiring but is not bank/state erasure."
+  },
+  "architecture_review": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "trigger": "Consequential shared memory and lifecycle architecture spanning native Claude Code and Codex.",
+    "acceptance": "Pending primary-source judgment; final decision remains scoped to evidence."
+  },
+  "corrections": [
+    {
+      "claim": "The server release and coding integration share one version/pin.",
+      "correction": "Server v0.10.2 contains integration package 0.7.0; the current published npm integration is 0.8.0 at a separate source revision.",
+      "verification": "Pinned server package.json compared with npm version/gitHead and package.json at that gitHead."
+    },
+    {
+      "claim": "The Hindsight Codex README feature flag alone establishes activation.",
+      "correction": "The current installer accepts old codex_hooks or modern hooks keys, and logs a required hooks=true edit if an existing features section lacks both. Native trust and fresh-session activation require observation.",
+      "verification": "Current upstream installer.ts Codex installer compared with the installed Codex 0.159.2 version."
+    }
+  ],
+  "comparative_quality": "Not established by vendor benchmarks or package tests.",
+  "usage": {
+    "research_provider_usage": null,
+    "comparative_provider_usage": null,
+    "billing": null,
+    "unknowns_remain_unknown": true
+  }
+}

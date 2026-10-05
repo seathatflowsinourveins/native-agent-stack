@@ -9,8 +9,12 @@ binds effort `max`, models unchanged
 `review-changes.js`, `readiness-audit.js` and `layer-verdict-lane.js` are
 byte-identical to agent-lab `b31f640` (the `max` change is agent-lab #43; the lane is
 pinned at agent-lab `e070125` in `vendored-lanes.json`). The
-qualification ran at the earlier efforts (Sonnet/medium, Opus/high); no native
-run at `max` is recorded yet. These are local integration assets, not upstream
+qualification ran at the earlier efforts (Sonnet/medium, Opus/high). The
+[2026-09-30 lifecycle record](../../../docs/decisions/2026-09-30-token-lifecycle-resolution.md)
+adds native personal saved-script discovery, two completed Sonnet/max audit
+readers and a completed Opus/max verifier after cached-prefix recovery. The
+earlier enclosing parent needed supervised termination; its final continuation
+exited cleanly without rerunning children. These are local integration assets, not upstream
 tests. The separate `semantic-evidence-reviewer` example received a later
 explicit Opus declaration and reporting instruction to satisfy the combined
 portable contract; that change has local checks and no new native provider
@@ -19,8 +23,12 @@ definitions: `isolated-builder` holds only Serena's read tools and preloads cont
 (its verification-before-completion preload was removed on 2026-09-28 with that skill's
 trial, [skills-trial record](../../../docs/decisions/2026-09-25-skills-trial-and-usage.md#addendum-2026-09-28-verification-before-completion-removed-conflict-rule));
 `stack-researcher`, `stack-verifier` and
-`security-reviewer` are new roles with local checks and no native run recorded yet.
-The new builder preload also has no native qualification
+`security-reviewer` are new roles with local checks. The 2026-09-30 native ad-hoc
+Workflow qualifies `source-scout` Sonnet/max and `stack-verifier` Opus/max for
+the recorded synthetic version-check task; `stack-researcher` and
+`security-reviewer` have no new native Claude qualification here.
+The builder's post-resume Context Mode preload, discovery, tool use and native
+handback/completed notice passed for that synthetic task, with clean parent exit
 ([decision](../../../docs/decisions/2026-09-26-stack-agents-role-dispatch.md)).
 ## Byte-identity check
 
@@ -39,6 +47,37 @@ for settings, authoring, worker models and lifecycle boundaries, and
 the Codex side.
 
 ## Adopt
+
+For the selected personal profile, run the existing adopter from this checkout:
+
+```sh
+rtk python3 tools/adoption/install_claude_profile.py --only workflows --dry-run
+rtk python3 tools/adoption/install_claude_profile.py --only workflows
+```
+
+The default profile also includes this step. It installs only `readiness-audit.js`,
+`review-changes.js` and `layer-verdict-lane.js` in the native personal
+`~/.claude/workflows/` location. All source bytes must match this directory's
+`SHA256SUMS` before any workflow is written. Existing identical files are reused;
+a conflicting file or target symlink fails the step before mutation. Failed
+creation or readback rolls back only that attempt's new files. A personal
+`.claude` directory managed through a symlink remains supported, following the
+[native save-location rule](https://code.claude.com/docs/en/workflows#save-the-workflow-for-reuse).
+The reviewed script sources remain
+[agent-lab `b31f64020ab4900cd92341cd2aa92c3d98367758`](https://github.com/seathatflowsinourveins/agent-lab/tree/b31f64020ab4900cd92341cd2aa92c3d98367758/.claude/workflows)
+for readiness and review, and
+[`e070125dae03b4e44484ccb78d2d65057ad38f40`](https://github.com/seathatflowsinourveins/agent-lab/blob/e070125dae03b4e44484ccb78d2d65057ad38f40/.claude/workflows/layer-verdict-lane.js)
+for the verdict lane.
+
+For an owned disposable home, pass `--home <scratch-home>`. Scoped cleanup uses
+`--only workflows --remove-workflows` (add `--dry-run` to inspect first): it
+removes only the selected byte-matching scripts, preserves edited/custom entries
+and target symlinks, and returns nonzero when a selected entry was preserved.
+After reviewing and privately relocating a conflicting file, rerun the install
+to recover. The focused installer tests exercise clean installation, readback,
+reuse, refusal, rollback and recovery as local integration fixtures; they do not
+establish native provider acceptance. A fresh native invocation and its returned
+usage remain a separate host check.
 
 1. Copy `agents/` into the destination project's `.claude/agents/` and the
    `.js`/`.mjs` files here into `.claude/workflows/`. Preserve existing

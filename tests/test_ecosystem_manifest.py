@@ -1271,6 +1271,398 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
     def use_real_template(self):
         self.write("docs/ecosystem/template.html", (ROOT / "docs/ecosystem/template.html").read_text())
 
+    # The runtime review uses the same optional ingestion and whole-page harness
+    # as the memory/convergence sections. These are synthetic renderer checks,
+    # not upstream worker acceptance or a replay claimed as a new model run.
+    RUNTIME_REVIEW = "catalogs/foundation/runtime-worker-review.json"
+
+    def runtime_review_fixture(self):
+        identifiers = ["codex-sdk", "claude-agent-sdk", "openhands-sdk", "openhands-cli",
+                       "openhands-extensions", "openhands-application", "pi", "opencode", "goose",
+                       "oh-my-pi", "codex-for-claude", "codex-acp", "acpx", "oh-my-codex",
+                       "agentskills", "vercel-skills", "managed-agents-api"]
+        candidates = [{"id": identifier, "repository": "https://github.com/example/" + identifier,
+                       "version": "1.0." + str(index), "revision": "b" * 40,
+                       "role": "Coding worker" if index < 2 else "Optional interface",
+                       "disposition": "retain_scoped" if index == 0 else "source_review_candidate",
+                       "evidence_class": "retained_dated_live_execution" if index == 0 else "pinned_source_review",
+                       "sources": ["https://github.com/example/" + identifier + "/blob/" + "b" * 40 + "/README.md"]}
+                      for index, identifier in enumerate(identifiers)]
+        candidates[0]["sources"].append("docs/runtime-source.md")
+        candidates[0]["gate"] = "Actual extension invocation and unchanged oracle before broader qualification."
+        candidates[-2]["reason"] = "Use the supported task-selected skill lifecycle."
+        candidates[-3]["version"] = None  # A pinned specification need not have a release version.
+        candidates[-1].update(repository=None, version=None, revision=None,
+                              role="Managed application API", evidence_class="official_documentation_read",
+                              reason="Separate hosted scope; entitlement and local provider integration unqualified.",
+                              sources=["https://docs.example/managed-agents"])
+        rows = [
+            {"id": "direct", "title": "Retained direct SDK", "path": "evidence/runtime-direct.json",
+             "evidence_class": "historical_native_execution", "status": "retained_not_rerun",
+             "scope": "Bounded direct SDK lifecycle", "observed_actions": ["Owned workspace and native result"],
+             "limitations": ["No comparative SDK winner"], "sources": candidates[0]["sources"][:1]},
+            {"id": "claude", "title": "Retained native Claude callsite", "path": "evidence/runtime-claude.json",
+             "evidence_class": "historical_native_execution", "status": "retained_not_rerun",
+             "scope": "One read-only caller", "limitations": ["No new enhanced Claude callsite"], "sources": []},
+            {"id": "enhanced", "title": "Bounded enhanced Dagu graph", "path": "evidence/runtime-enhanced.json",
+             "evidence_class": "scoped_native_execution", "status": "accepted_within_scope",
+             "scope": "One fixture; selected skill, MCP and judge", "source_current": True,
+             "observed_actions": ["One using-superpowers read", "Three MCP calls", "One Astra judge"],
+             "usage_scopes": [{"scope": "repaired parent", "total_tokens": 153813},
+                              {"scope": "repaired judge", "total_tokens": 66044}],
+             "limitations": ["169 discovered skills are not 169 qualified skills", "Hooks, search and schedules unmeasured"],
+             "sources": ["https://github.com/example/dagu/blob/" + "c" * 40 + "/README.md"]},
+            {"id": "failed", "title": "Claude SDK provider attempt", "path": "evidence/runtime-failed.json",
+             "evidence_class": "retained_failed_provider_attempt", "status": "unqualified",
+             "scope": "HTTP 500 and deadline; zero tool calls", "limitations": ["Upstream tests do not qualify this provider"],
+             "sources": []},
+        ]
+        self.runtime_review = {
+            "schema_version": 1, "kind": "runtime_worker_landscape_review", "checked_at": "2026-09-30",
+            "candidate_count": len(candidates), "candidates": candidates,
+            "status": "source_review_complete_retained_worker_qualification_scoped",
+            "scope": "Native Claude coordination with explicit runtime routes.",
+            "selection_policy": "Retain demonstrated role-specific execution; source review is not acceptance.",
+            "report": "docs/runtime-review.md", "dispatch_guide": "blueprints/runtime-workers/README.md",
+            "convergence_record": "catalogs/runtime-experiment.json",
+            "retained_worker": {"model": "cx/gpt-6.1-sol-max", "effort": "max",
+                                "judgment_model": "cx/gpt-6-astra-max", "transport": "Child-scoped Responses",
+                                "accepted_scope": "Historical bounded lifecycle", "evidence_refs": [rows[0]["path"]]},
+            "gateway_source_boundary": {"meaning": "Owned running revision differs from public tag.",
+                                        "sources": ["https://github.com/example/gateway/releases/tag/v1.0"]},
+            "enhancement_policy": {"selection": "Task-selected skill use; no universal skill qualification."},
+            "evidence_manifest": rows,
+            "qualified_enhancement_components": [{"id": "context-mode", "role": "Selected MCP calls",
+                "repository": "https://github.com/example/context-mode", "version": "1.0.169", "revision": "c" * 40,
+                "evidence_scope": "One bounded graph; not all tools", "sources": [rows[2]["path"]]}],
+            "usage_limit_policy": {"title": "Use the selected account's native usage policy",
+                "status": "user_reported_reset", "scope": "Native account and gateway scopes remain distinct",
+                "steps": ["Inspect the native account's ordinary usage allowance", "Use the supported credit/reset contract"],
+                "user_report": "Already reset", "execution": "No additional reset consumed",
+                "sources": ["https://docs.example/native-usage"]},
+            "session_notice": {"user_report": "Quota reset", "local_delivery": "Coding workers resumed",
+                               "native_delivery": "ListAgents observed; SendMessage delivery unknown"},
+            "repository_validation": {"status": "scoped_checks_passed_publication_gated",
+                "checks": [{"command": "native integration check", "exit_code": 0, "scope": "Scoped fixture"}],
+                "publication_gate": "Concurrent owner evidence still requires reconciliation"},
+            "new_worker_provider_trials": 0, "new_worker_installations": 0,
+        }
+        for path in ("docs/runtime-review.md", "blueprints/runtime-workers/README.md", "docs/runtime-source.md"):
+            self.write(path, "# Runtime offline source\n\nNative dispatch with explicit owned workspace and result.\n")
+        self.write("catalogs/runtime-experiment.json", {"status": "scoped", "usage": None})
+        for row in rows:
+            self.write(row["path"], {"id": row["id"], "claim": row["scope"], "limitations": row["limitations"]})
+        self.write(rows[2]["path"], {"id": "enhanced", "kind": "native_model_e2e",
+            "sources": {"dagu": {"repository": "https://github.com/example/dagu", "version": "2.16.6",
+                                 "revision": "c" * 40, "path": "upstream/native/dag.go"}},
+            "readiness": {"skills": {"enabled_count": 169}, "scope": "Discovery only"},
+            "native_execution": {"status": "completed", "duration_ms": 181548,
+                                 "skill_read": "using-superpowers", "mcp_execution": {"calls": 3},
+                                 "native_threads": [{"model": "cx/gpt-6-astra-max", "effort": "max"}]},
+            "failures": {"second_graph": {"status": "deadline_exceeded", "usage": None},
+                         "earlier_scopes": [{"parent_total": 213064}, {"judge_total": 107373}]},
+            "limitations": rows[2]["limitations"]})
+        self.config["runtime_worker_review"] = self.RUNTIME_REVIEW
+        self.save_runtime_review()
+
+    def save_runtime_review(self):
+        self.write(self.RUNTIME_REVIEW, self.runtime_review)
+        self.save()
+
+    def test_runtime_review_retains_originals_and_hashes_all_local_citations(self):
+        self.runtime_review_fixture()
+        page, _ = self.build()
+        data = json.loads(page.data)
+        review = data["runtime_worker_review"]
+        self.assertEqual(review["original"], self.runtime_review)
+        self.assertEqual(len(review["candidates"]), 17)
+        self.assertEqual(review["candidates"][-1]["revision"], None)
+        self.assertEqual(review["candidates"][-1]["repository"], None)
+        inputs = {row["path"]: row for row in data["inputs"]}
+        source_paths = {self.RUNTIME_REVIEW, self.runtime_review["report"], self.runtime_review["dispatch_guide"],
+                        self.runtime_review["convergence_record"], "docs/runtime-source.md"}
+        source_paths.update(row["path"] for row in self.runtime_review["evidence_manifest"])
+        for path in source_paths:
+            with self.subTest(path=path):
+                self.assertEqual(inputs[path]["sha256"], hashlib.sha256((self.root / path).read_bytes()).hexdigest())
+                self.assertEqual(inputs[path]["bytes"], (self.root / path).stat().st_size)
+        local = {row["path"]: row["url"] for row in review["source_links"] if "path" in row}
+        for path in source_paths:
+            self.assertIn("/blob/main/" + path, local[path])
+        recipes = {row["path"]: row["text"] for row in data["setup"]["recipes"]}
+        self.assertIn("Native dispatch", recipes[self.runtime_review["report"]])
+        self.assertIn("Native dispatch", recipes[self.runtime_review["dispatch_guide"]])
+        documents = {row["path"]: row["document"] for row in review["evidence_documents"]}
+        for path, document in documents.items():
+            self.assertEqual(document, json.loads((self.root / path).read_text()))
+        self.assertNotIn("upstream/native/dag.go", inputs)  # Upstream-relative receipt metadata is not a local source.
+        self.assert_check_digest_changes(lambda: self.write("evidence/runtime-enhanced.json", {"changed_receipt": True}))
+
+    def test_runtime_review_rejects_unsafe_citations_or_invented_pins(self):
+        mutations = (
+            lambda row: row["candidates"][0]["sources"].append("javascript:alert(1)"),
+            lambda row: row["candidates"][0]["sources"].append("https://user:secret@docs.example/private"),
+            lambda row: row["candidates"][0]["sources"].append("../outside.json"),
+            lambda row: row["candidates"][0].update(revision="latest"),
+            lambda row: row["candidates"][-1].update(version="1.0"),
+        )
+        for mutate in mutations:
+            with self.subTest(mutate=mutate):
+                self.runtime_review_fixture()
+                mutate(self.runtime_review)
+                self.save_runtime_review()
+                self.assertNotEqual(self.run_generator("--write").returncode, 0)
+
+    @unittest.skipUnless(shutil.which("node"), "Generated runtime review script needs Node")
+    def test_runtime_review_optional_sections_and_no_data_panel_are_safe(self):
+        self.use_real_template()
+        _, without = self.build()
+        observed = self.run_page(without, tab="runtime-workers")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertEqual((observed["app_hidden"], observed["recovery_hidden"]), (False, True))
+        self.assertEqual((observed["runtime_review"]["tab_hidden"], observed["runtime_review"]["panel_hidden"]),
+                         (True, True))
+        self.runtime_review_fixture()
+        for key in ("evidence_manifest", "qualified_enhancement_components", "usage_limit_policy", "session_notice"):
+            self.runtime_review.pop(key)
+        self.save_runtime_review()
+        _, minimal = self.build()
+        observed = self.run_page(minimal, tab="runtime-workers")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertEqual(len(observed["runtime_review"]["candidate_ids"]), 17)
+        self.assertEqual(observed["runtime_review"]["optional_hidden"], [True, True, True, True])
+
+    @unittest.skipUnless(shutil.which("node"), "Generated runtime review script needs Node")
+    def test_runtime_review_renders_all_candidates_evidence_and_downloads_original_data(self):
+        self.use_real_template()
+        self.runtime_review_fixture()
+        _, text = self.build()
+        observed = self.run_page(text, tab="runtime-workers", actions=[{"id": "runtime-review-download", "type": "click"}])
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        rendered = observed["runtime_review"]
+        self.assertEqual((rendered["tab_hidden"], rendered["panel_hidden"]), (False, False))
+        self.assertEqual(rendered["candidate_ids"], [row["id"] for row in self.runtime_review["candidates"]])
+        for candidate, text in zip(self.runtime_review["candidates"], rendered["candidate_text"]):
+            for field in ("role", "disposition", "evidence_class"):
+                self.assertIn(candidate[field].replace("_", " ").replace("-", " "), text)
+            if candidate["revision"]:
+                self.assertIn(candidate["revision"], text)
+            if candidate["version"]:
+                self.assertIn(candidate["version"], text)
+        self.assertIn("Documentation-only scope; no repository revision", rendered["candidate_text"][-1])
+        self.assertIn("No release version recorded; source is pinned", rendered["candidate_text"][-3])
+        self.assertEqual(len(rendered["evidence_rows"]), 4)
+        evidence = " ".join(rendered["evidence_rows"])
+        for expected in ("169 discovered skills are not 169 qualified skills", "153813", "66044",
+                         "Three MCP calls", "One Astra judge", "No new enhanced Claude callsite", "zero tool calls"):
+            self.assertIn(expected, evidence)
+        for expected in ("181548", "deadline_exceeded", "213064", "107373", "using-superpowers", "2.16.6"):
+            self.assertIn(expected, rendered["documents"])
+        self.assertIn("1.0.169", rendered["enhancements"])
+        self.assertIn("No additional reset consumed", rendered["usage"])
+        self.assertIn("Concurrent owner evidence still requires reconciliation", rendered["checks"])
+        self.assertIn("SendMessage delivery unknown", rendered["session"])
+        for candidate in self.runtime_review["candidates"]:
+            for source in candidate["sources"]:
+                if source.startswith("https:"):
+                    self.assertIn(source, rendered["hrefs"])
+                else:
+                    self.assertTrue(any(url.endswith("/blob/main/" + source) for url in rendered["hrefs"]))
+        self.assertIn("https://github.com/example/dagu", rendered["hrefs"])
+        self.assertEqual(json.loads(observed["downloads"][0]), self.runtime_review)
+        self.assertEqual(observed["download_names"], ["runtime-workers-2026-09-30.json"])
+
+    @unittest.skipUnless(shutil.which("node"), "Generated runtime review filtering needs Node")
+    def test_runtime_review_filters_and_resets_by_role_disposition_evidence_and_text(self):
+        self.use_real_template()
+        self.runtime_review_fixture()
+        _, html = self.build()
+        filters = [("runtime-review-role", "Managed application API", ["managed-agents-api"]),
+                   ("runtime-review-disposition", "retain_scoped", ["codex-sdk"]),
+                   ("runtime-review-evidence-class", "official_documentation_read", ["managed-agents-api"]),
+                   ("runtime-review-search", "unchanged oracle", ["codex-sdk"])]
+        for identifier, value, expected in filters:
+            with self.subTest(filter=identifier):
+                action = {"id": identifier, "value": value, "type": "input" if "search" in identifier else "change"}
+                observed = self.run_page(html, tab="runtime-workers", actions=[action])
+                self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+                self.assertEqual(observed["runtime_review"]["candidate_ids"], expected)
+                reset = self.run_page(html, tab="runtime-workers", actions=[action, {"id": "runtime-review-reset", "type": "click"}])
+                self.assertEqual(len(reset["runtime_review"]["candidate_ids"]), 17)
+
+    ALL_LAYER_RESOLUTION = "evidence/artifacts/all-layer-next-gap-resolution-20261001/manifest.json"
+
+    def all_layer_fixture(self):
+        layers = []
+        for lane, count in (("foundation", 20), ("trading", 12)):
+            for index in range(count):
+                layers.append({"id": lane + "-" + str(index), "lane": lane,
+                               "title": lane.title() + " layer " + str(index), "current_status": "source_review",
+                               "next_gate": "Scoped native check " + str(index),
+                               "evidence_refs": ["evidence/all-layer/check.json"]})
+        layers[0].update(title="Memory lifecycle", current_status="pending_native_acceptance",
+                         next_gate="Same-task persistent read/write oracle",
+                         evidence_refs=["evidence/all-layer/check.json", "docs/all-layer-guide.md"])
+        layers[20]["evidence_refs"].append("evidence/all-layer/paper-readiness.log")
+        self.all_layer = {
+            "schema_version": 1, "kind": "all_layer_next_gap_resolution", "checked_at_utc": "2026-10-01T05:00:00Z",
+            "source_review": "evidence/artifacts/full-lanes-resolution-20260930/manifest.json", "layers": layers,
+            "executions": [
+                {"id": "local-native-check", "status": "passed_within_scope",
+                 "acceptance_scope": "Local integration fixture only; no model trial",
+                 "observed_result": {"exit_code": 0}, "evidence_refs": ["evidence/all-layer/check.json"]},
+                {"id": "paper-readiness", "status": "blocked_missing_reference",
+                 "acceptance_scope": "Read-only paper readiness; no order acceptance",
+                 "evidence_refs": ["evidence/all-layer/paper-readiness.log"]},
+            ],
+            "corrections": [{"claim": "A recorded check means all layers passed",
+                             "correction": "Preserve each bounded result and unresolved gate",
+                             "evidence_refs": ["evidence/all-layer/check.json"]},
+                            "The missing reference remains recorded."],
+            "limitations": ["No all-layer runtime acceptance is established.", "No paper order submitted."],
+        }
+        self.write(self.all_layer["source_review"], {"kind": "historical_source_review",
+            "evidence_refs": ["evidence/all-layer/unrelated.json"]})
+        self.write("evidence/all-layer/unrelated.json", {"outside_selected_reference_scope": True})
+        self.write("evidence/all-layer/check.json", {"status": "passed", "scope": "Unchanged bounded fixture"})
+        self.write("evidence/all-layer/paper-readiness.log", "missing_reference: retained condition\n")
+        self.write("docs/all-layer-guide.md", "# Offline all-layer guide\n\nFollow the supplied native next gate.\n")
+        self.config["all_layer_resolution"] = self.ALL_LAYER_RESOLUTION
+        self.save_all_layer()
+
+    def save_all_layer(self):
+        self.write(self.ALL_LAYER_RESOLUTION, self.all_layer)
+        self.save()
+
+    def test_all_layer_resolution_preserves_original_records_and_scoped_input_hashes(self):
+        self.all_layer_fixture()
+        # The established catalog lane spelling is a display alias, not rewritten source data.
+        self.all_layer["layers"][20]["lane"] = "us-equities"
+        self.save_all_layer()
+        page, _ = self.build()
+        data = json.loads(page.data)
+        resolution = data["all_layer_resolution"]
+        self.assertEqual(resolution["original"], self.all_layer)
+        self.assertEqual(resolution["lane_counts"], {"foundation": 20, "trading": 12})
+        self.assertEqual(resolution["layers"][20]["lane"], "us-equities")
+        self.assertEqual(resolution["layers"][20]["display_lane"], "trading")
+        inputs = {item["path"]: item for item in data["inputs"]}
+        paths = {self.ALL_LAYER_RESOLUTION, self.all_layer["source_review"], "evidence/all-layer/check.json",
+                 "evidence/all-layer/paper-readiness.log", "docs/all-layer-guide.md"}
+        self.assertEqual({item["path"] for item in resolution["source_links"]}, paths)
+        for path in paths:
+            with self.subTest(path=path):
+                raw = (self.root / path).read_bytes()
+                self.assertEqual((inputs[path]["sha256"], inputs[path]["bytes"]),
+                                 (hashlib.sha256(raw).hexdigest(), len(raw)))
+                self.assertEqual(inputs[path]["scope"], "whole file")
+                self.assertTrue(any(item["path"] == path and "/blob/main/" + path in item["url"]
+                                    for item in resolution["source_links"]))
+        self.assertNotIn("evidence/all-layer/unrelated.json", inputs)
+        documents = {item["path"]: item["text"] for item in resolution["documents"]}
+        self.assertEqual(documents["evidence/all-layer/check.json"],
+                         (self.root / "evidence/all-layer/check.json").read_text())
+        self.assertIn("docs/all-layer-guide.md", {item["path"] for item in data["setup"]["recipes"]})
+        self.assert_check_digest_changes(lambda: self.write("evidence/all-layer/check.json", {"status": "changed"}))
+
+    def test_all_layer_resolution_rejects_bad_schema_counts_and_unsafe_references(self):
+        cases = [
+            (lambda value: value.update(kind="invented_acceptance"), "unsupported all-layer resolution"),
+            (lambda value: value["layers"].pop(), "exactly 32 layers"),
+            (lambda value: value["layers"][1].update(id=value["layers"][0]["id"]), "duplicate all-layer"),
+            (lambda value: value["layers"][0].update(lane="trading"), "20 foundation and 12 trading"),
+            (lambda value: value["layers"][0].update(lane="unknown"), "unknown lane"),
+            (lambda value: value["layers"][0].update(current_status={"invented": "passed"}), "must be text"),
+            (lambda value: value["layers"][0].update(evidence_refs="evidence/all-layer/check.json"), "must be a list"),
+            (lambda value: value["layers"][0].update(evidence_refs=["https://invalid.example/evidence"]), "repository path"),
+            (lambda value: value["layers"][0].update(evidence_refs=["../outside.json"]), None),
+            (lambda value: value["layers"][0].update(evidence_refs=["evidence/does-not-exist.json"]), None),
+            (lambda value: value.update(source_review="/tmp/outside.json"), None),
+        ]
+        for mutate, expected in cases:
+            with self.subTest(expected=expected):
+                self.all_layer_fixture()
+                mutate(self.all_layer)
+                self.save_all_layer()
+                result = self.run_generator("--write")
+                self.assertNotEqual(result.returncode, 0)
+                if expected:
+                    self.assertIn(expected, result.stdout)
+
+    @unittest.skipUnless(shutil.which("node"), "Generated all-layer script needs Node")
+    def test_all_layer_resolution_no_data_and_optional_fields_are_safe(self):
+        self.use_real_template()
+        _, html = self.build()
+        observed = self.run_page(html, tab="all-layers")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertEqual((observed["all_layers"]["tab_hidden"], observed["all_layers"]["panel_hidden"]), (True, True))
+        self.all_layer_fixture()
+        self.all_layer = {"schema_version": 1, "kind": "all_layer_next_gap_resolution",
+                          "layers": [{"id": row["id"], "lane": row["lane"]} for row in self.all_layer["layers"]]}
+        self.save_all_layer()
+        _, html = self.build()
+        observed = self.run_page(html, tab="all-layers")
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        self.assertEqual((observed["app_hidden"], observed["recovery_hidden"]), (False, True))
+        self.assertEqual(len(observed["all_layers"]["layer_ids"]), 32)
+        self.assertTrue(observed["all_layers"]["execution_section_hidden"])
+        for card in observed["all_layers"]["cards"]:
+            self.assertIn("not recorded", card.lower())
+            self.assertIn("Evidence references not recorded", card)
+
+    @unittest.skipUnless(shutil.which("node"), "Generated all-layer script needs Node")
+    def test_all_layer_resolution_renders_every_gate_outcome_limit_and_original_download(self):
+        self.use_real_template()
+        self.all_layer_fixture()
+        hostile = '</script><script src="https://invalid.example/unwanted.js"></script>'
+        self.all_layer["layers"][-1]["title"] = hostile
+        self.save_all_layer()
+        page, html = self.build()
+        self.assertEqual(len(page.scripts), 2)
+        self.assertEqual(page.external_assets, [])
+        observed = self.run_page(html, tab="all-layers", actions=[{"id": "all-layer-download", "type": "click"}])
+        self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+        rendered = observed["all_layers"]
+        self.assertEqual((rendered["tab_hidden"], rendered["panel_hidden"]), (False, False))
+        self.assertEqual(rendered["layer_ids"], [row["id"] for row in self.all_layer["layers"]])
+        for row, card in zip(self.all_layer["layers"], rendered["cards"]):
+            self.assertIn(row["title"], card)
+            self.assertIn(row["current_status"].replace("_", " "), card)
+            self.assertIn(row["next_gate"], card)
+        for execution in self.all_layer["executions"]:
+            self.assertIn(execution["status"].replace("_", " "), rendered["executions"])
+            self.assertIn(execution["acceptance_scope"], rendered["executions"])
+        for limit in self.all_layer["limitations"]:
+            self.assertIn(limit, rendered["limitations"])
+        self.assertIn("Preserve each bounded result", rendered["corrections"])
+        self.assertIn("Unchanged bounded fixture", rendered["documents"])
+        for path in [self.ALL_LAYER_RESOLUTION, self.all_layer["source_review"], "evidence/all-layer/check.json",
+                     "evidence/all-layer/paper-readiness.log", "docs/all-layer-guide.md"]:
+            self.assertTrue(any(url.endswith("/blob/main/" + path) for url in rendered["hrefs"]), path)
+        self.assertEqual(json.loads(observed["downloads"][0]), self.all_layer)
+        self.assertEqual(observed["download_names"], ["all-layer-resolution.json"])
+
+    @unittest.skipUnless(shutil.which("node"), "Generated all-layer filtering needs Node")
+    def test_all_layer_resolution_filters_by_lane_status_text_and_reset(self):
+        self.use_real_template()
+        self.all_layer_fixture()
+        _, html = self.build()
+        filters = [
+            ({"id": "all-layer-lane", "type": "change", "value": "foundation"}, 20),
+            ({"id": "all-layer-lane", "type": "change", "value": "trading"}, 12),
+            ({"id": "all-layer-status", "type": "change", "value": "pending_native_acceptance"}, 1),
+            ({"id": "all-layer-search", "type": "input", "value": "persistent read/write"}, 1),
+            ({"id": "all-layer-search", "type": "input", "value": "no matching layer"}, 0),
+        ]
+        for action, count in filters:
+            with self.subTest(action=action):
+                observed = self.run_page(html, tab="all-layers", actions=[action])
+                self.assertEqual((observed["errors"], observed["missing"]), ([], []))
+                self.assertEqual(len(observed["all_layers"]["layer_ids"]), count)
+                self.assertIn(str(count) + " of 32", observed["all_layers"]["count"])
+                reset = self.run_page(html, tab="all-layers", actions=[action, {"id": "all-layer-reset", "type": "click"}])
+                self.assertEqual(len(reset["all_layers"]["layer_ids"]), 32)
+
     def test_convergence_is_absent_without_the_generated_matrix(self):
         self.use_real_template()
         page, _ = self.build()
@@ -1452,6 +1844,11 @@ process.stdout.write(JSON.stringify(probes.map(safeHref)));
     PAGE_HARNESS = r'''
 const vm = require("node:vm");
 const input = JSON.parse(require("node:fs").readFileSync(0, "utf8"));
+const downloads = [], downloadNames = [];
+class PageURL extends URL {
+  static createObjectURL(blob) { downloads.push(blob.parts.join("")); return "blob:runtime-manifest"; }
+  static revokeObjectURL() {}
+}
 class Element {
   constructor(tag, attrs) {
     this.tagName = tag.toUpperCase(); this.attrs = {...attrs}; this.children = []; this.text = "";
@@ -1469,7 +1866,8 @@ class Element {
   setAttribute(key, value) { this.attrs[key] = String(value); }
   getAttribute(key) { return key in this.attrs ? this.attrs[key] : null; }
   addEventListener(type, listener) { (this.listeners[type] ||= []).push(listener); }
-  focus() {} click() {} showModal() { this.open = true; } close() { this.open = false; }
+  focus() {} click() { if(this.download) downloadNames.push(this.download); }
+  showModal() { this.open = true; } close() { this.open = false; }
   getBoundingClientRect() { return {left: 0, right: 0, top: 0, bottom: 0}; }
 }
 const byId = {}, ordered = [], missing = [], errors = [];
@@ -1489,15 +1887,48 @@ const document = {
 };
 const location = {hash: "#" + input.tab, href: "https://catalog.example/index.html"};
 vm.runInNewContext(input.script, {document, location, window: {scrollTo() {}, addEventListener() {}, location},
-  history: {replaceState() {}}, requestAnimationFrame(callback) { callback(); }, URL, Blob: class {}, setTimeout, atob,
+  history: {replaceState() {}}, requestAnimationFrame(callback) { callback(); }, URL: PageURL,
+  Blob: class { constructor(parts) { this.parts = parts; } }, setTimeout(callback) { callback(); }, atob,
   console: {error(message, error) { errors.push(String((error && error.stack) || error || message)); }}});
+for(const action of input.actions || []) {
+  const element = byId[action.id];
+  if(!element) { missing.push(action.id); continue; }
+  if(action.value !== undefined) element.value = action.value;
+  for(const listener of element.listeners[action.type] || []) listener({target: element});
+}
 const text = id => byId[id] ? byId[id].children.map(child => child.textContent) : null;
+const allText = id => byId[id] ? byId[id].textContent : null;
+const walk = element => element ? [element, ...element.children.flatMap(walk)] : [];
+const runtimeContainers = ["runtime-review-actions", "runtime-review-candidates", "runtime-review-evidence-rows",
+  "runtime-review-documents", "runtime-review-routes", "runtime-review-enhancements", "runtime-review-usage",
+  "runtime-review-checks", "runtime-review-session"];
+const runtime = {
+  tab_hidden: (byId["tab-runtime-workers"] || {}).hidden, panel_hidden: (byId["runtime-workers"] || {}).hidden,
+  candidate_ids: (byId["runtime-review-candidates"] || {children: []}).children.map(card => card.dataset.runtimeCandidate).filter(Boolean),
+  candidate_text: text("runtime-review-candidates"), evidence_rows: text("runtime-review-evidence-rows"),
+  documents: allText("runtime-review-documents"), enhancements: allText("runtime-review-enhancements"),
+  usage: allText("runtime-review-usage"), checks: allText("runtime-review-checks"), session: allText("runtime-review-session"),
+  optional_hidden: ["runtime-review-evidence", "runtime-review-enhancement-section", "runtime-review-usage-section",
+                    "runtime-review-session-section"].map(id => (byId[id] || {}).hidden),
+  hrefs: runtimeContainers.flatMap(id => walk(byId[id])).filter(node => node.tagName === "A").map(node => node.href),
+};
+const allLayerContainers = ["all-layer-actions", "all-layer-cards", "all-layer-executions", "all-layer-corrections",
+                           "all-layer-documents"];
+const allLayers = {
+  tab_hidden: (byId["tab-all-layers"] || {}).hidden, panel_hidden: (byId["all-layers"] || {}).hidden,
+  layer_ids: (byId["all-layer-cards"] || {children: []}).children.map(card => card.dataset.allLayer).filter(Boolean),
+  cards: text("all-layer-cards"), count: allText("all-layer-count"), executions: allText("all-layer-executions"),
+  limitations: allText("all-layer-limitations"), corrections: allText("all-layer-corrections"),
+  documents: allText("all-layer-documents"), execution_section_hidden: (byId["all-layer-execution-section"] || {}).hidden,
+  hrefs: allLayerContainers.flatMap(id => walk(byId[id])).filter(node => node.tagName === "A").map(node => node.href),
+};
 process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-app"].hidden,
   recovery_hidden: byId["catalog-recovery"].hidden, tab_hidden: (byId["tab-convergence"] || {}).hidden,
   panel_hidden: (byId["convergence"] || {}).hidden,
   rows: (byId["convergence-rows"] || {children: []}).children.map(row => row.children.map(cell => cell.textContent)),
   summary: text("convergence-summary"), definitions: byId["convergence-definitions"] ? byId["convergence-definitions"].textContent : null,
-  token_topic: byId["token-topic"] ? byId["token-topic"].textContent : null}));
+  token_topic: byId["token-topic"] ? byId["token-topic"].textContent : null,
+  runtime_review: runtime, all_layers: allLayers, downloads, download_names: downloadNames}));
 '''
 
     @staticmethod
@@ -1516,11 +1947,12 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
         parser.feed(html_text)
         return parser.found
 
-    def run_page(self, html_text, tab="convergence"):
+    def run_page(self, html_text, tab="convergence", actions=None):
         page = Page(html_text)
         script, = page.inline_scripts
         result = subprocess.run(["node", "-e", self.PAGE_HARNESS], input=json.dumps({
-            "script": script, "data": page.data, "elements": self.page_elements(html_text), "tab": tab}),
+            "script": script, "data": page.data, "elements": self.page_elements(html_text), "tab": tab,
+            "actions": actions or []}),
             capture_output=True, text=True, timeout=60)
         self.assertEqual(result.returncode, 0, result.stderr)
         return json.loads(result.stdout)

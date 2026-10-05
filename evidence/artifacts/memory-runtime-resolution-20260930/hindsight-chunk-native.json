@@ -1,0 +1,346 @@
+{
+  "schema_version": 1,
+  "evidence_class": "Upstream native API operations with the published synthetic chunk fixture; local lifecycle and isolation observations.",
+  "status": "qualified_chunk_only_backend",
+  "completed_at_utc": "2026-09-30T18:45:25Z",
+  "source": {
+    "repository": "vectorize-io/hindsight",
+    "server_version": "0.10.2",
+    "server_tag": "v0.10.2",
+    "server_commit": "5fc4ce20917b916240cef27c212c387a177f115b",
+    "integration_checkout_commit": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c",
+    "reviewed_source_files_match_server_tag": true,
+    "original_source_hashes": "source-files.json",
+    "references": [
+      {
+        "purpose": "Supported named-profile create and native daemon commands",
+        "url": "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-embed/hindsight_embed/cli.py"
+      },
+      {
+        "purpose": "Named profile config/log/lock scope and unique pg0 instance name",
+        "url": "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-embed/hindsight_embed/profile_manager.py#L508",
+        "database_url_source": "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-embed/hindsight_embed/daemon_embed_manager.py#L259"
+      },
+      {
+        "purpose": "Published explicit local embedding and reranker defaults",
+        "url": "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-api-slim/hindsight_api/config.py#L1211"
+      },
+      {
+        "purpose": "Chunk-only no-LLM mode and rejection boundary",
+        "url": "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-api-slim/hindsight_api/engine/providers/none_llm.py"
+      },
+      {
+        "purpose": "Unchanged official chunk fixture, bank export and target-id restore recipe",
+        "url": "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-docs/examples/api/memory-banks.sh#L72"
+      },
+      {
+        "purpose": "Native per-bank document read and delete used for isolation",
+        "url": "https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/hindsight-api-slim/hindsight_api/api/http.py#L7743"
+      }
+    ]
+  },
+  "scope": {
+    "new_profile": "native-stack-chunk-trial-20260930",
+    "listen_address": "127.0.0.1",
+    "api_port": 19092,
+    "new_pg0_instance": "hindsight-embed-native-stack-chunk-trial-20260930",
+    "source_bank": "native-chunk-source-20260930",
+    "restored_bank": "native-chunk-restored-20260930",
+    "restore_scope": "Different bank IDs within the same owned profile and database instance.",
+    "separate_instance_restore_tested": false,
+    "main_checkout_authored_changes": [],
+    "active_profile_changed": false,
+    "integration_capture": "Left disabled and untouched.",
+    "child_environment": "Allowlisted nonsecret daemon environment; original HOME preserved; owned cwd with empty .env; local cache and temp directories.",
+    "auth_stores_read_or_copied": false,
+    "production_endpoint_requests": false,
+    "paid_llm_provider_configured": false
+  },
+  "models": {
+    "llm_provider": "none",
+    "llm_model_selected": null,
+    "embeddings_provider": "local",
+    "reranker_provider": "local",
+    "force_cpu": true,
+    "downloaded_local_models": [
+      {
+        "name": "models--BAAI--bge-small-en-v1.5",
+        "snapshots": [
+          "5c38ec7c405ec4b44b94cc5a9bb96e735b38267a"
+        ],
+        "downloadedBlobFiles": 11,
+        "downloadedBlobBytes": 134505940
+      },
+      {
+        "name": "models--cross-encoder--ms-marco-MiniLM-L-6-v2",
+        "snapshots": [
+          "233902d25c440f23af6f7d6e94d2946bac0bee0a"
+        ],
+        "downloadedBlobFiles": 6,
+        "downloadedBlobBytes": 91815758
+      }
+    ],
+    "installed_backend_distributions": [
+      {
+        "Name": "hindsight-api",
+        "Version": "0.10.2"
+      },
+      {
+        "Name": "hindsight-api-slim",
+        "Version": "0.10.2"
+      },
+      {
+        "Name": "pg0-embedded",
+        "Version": "0.15.2"
+      },
+      {
+        "Name": "torch",
+        "Version": "2.14.1"
+      }
+    ],
+    "install_scope": "Supported hindsight-embed lazy uvx hindsight-api@0.10.2 startup. Backend dependencies included NVIDIA packages despite CPU model flags.",
+    "paid_provider_usage": "No paid LLM provider was configured. The retain operation's native LLM counters were all zero; other provider or billing counters were not reported."
+  },
+  "native_results": {
+    "initial_banks": {
+      "http_status": 200,
+      "native_exit": 0,
+      "total": 0,
+      "artifact": "logs/banks-start.body.json"
+    },
+    "initial_start": {
+      "native_exit": 0,
+      "started_utc": "2026-09-30T18:28:18.187Z",
+      "ended_utc": "2026-09-30T18:29:06.820Z",
+      "elapsed_seconds": 48.633,
+      "start_budget_seconds": 300,
+      "repair_attempts": 0,
+      "record": "start-01.json"
+    },
+    "initial_health": {
+      "http_status": 200,
+      "native_exit": 0,
+      "status": "healthy",
+      "database": "connected"
+    },
+    "absent_source_control": {
+      "http_status": 404,
+      "native_exit": 22,
+      "artifact": "logs/recall-before.body.json"
+    },
+    "retain": {
+      "http_status": 200,
+      "native_exit": 0,
+      "items_count": 2,
+      "async": false,
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "total_tokens": 0,
+        "cached_tokens": 0,
+        "thoughts_tokens": 0
+      }
+    },
+    "recall": {
+      "http_status": 200,
+      "native_exit": 0,
+      "verbatim_chunks": 2,
+      "local_reranker_scores_present": true
+    },
+    "first_stop": {
+      "native_exit": 0,
+      "record": "stop-01.json",
+      "independent_listener_observation": "logs/listeners-stopped.stdout",
+      "api_and_database_listeners_absent": true
+    },
+    "first_stopped_health": {
+      "native_exit": 28,
+      "observation": "Request timed out after five seconds; socket observation independently showed both listeners absent."
+    },
+    "restart": {
+      "native_exit": 0,
+      "elapsed_seconds": 22.896,
+      "record": "start-02.json",
+      "health_http_status": 200,
+      "health_native_exit": 0,
+      "recall_http_status": 200,
+      "recall_native_exit": 0,
+      "same_original_record_ids": true,
+      "same_original_text": true
+    },
+    "reflection": {
+      "http_status": 400,
+      "native_exit": 22,
+      "result": "Documented rejection because provider=none",
+      "artifact": "logs/reflect-rejection.body.json"
+    },
+    "target_absent_before_restore": {
+      "http_status": 404,
+      "native_exit": 22,
+      "artifact": "logs/recall-target-before.body.json"
+    },
+    "export": {
+      "submit_http_status": 200,
+      "submit_native_exit": 0,
+      "operation_status": "completed",
+      "operation_native_exit": 0,
+      "include_bank_config": false,
+      "archive_bytes": 2713,
+      "download_http_status": 200,
+      "download_native_exit": 0,
+      "unzip_native_exit": 0,
+      "operation_artifact": "logs/export-operation.body.json"
+    },
+    "restore": {
+      "submit_http_status": 202,
+      "submit_native_exit": 0,
+      "operation_status": "completed",
+      "operation_native_exit": 0,
+      "documents_imported": 2,
+      "facts_imported": 2,
+      "observations_imported": 0,
+      "webhooks_imported": 0,
+      "knowledge_pages_imported": 0,
+      "recall_http_status": 200,
+      "recall_native_exit": 0,
+      "new_record_ids": true,
+      "remapped_chunk_ids": true,
+      "operation_artifact": "logs/import-operation.body.json"
+    },
+    "isolation": {
+      "source_doc1_delete_native_exit": 0,
+      "source_doc1_absent_http_status": 404,
+      "source_doc1_absent_native_exit": 22,
+      "target_doc1_present_http_status": 200,
+      "target_doc1_present_native_exit": 0,
+      "target_doc2_delete_native_exit": 0,
+      "target_doc2_absent_http_status": 404,
+      "target_doc2_absent_native_exit": 22,
+      "source_doc2_present_http_status": 200,
+      "source_doc2_present_native_exit": 0,
+      "final_source_recall": "Bob moved to the Berlin office.",
+      "final_target_recall": "Alice leads the payments team.",
+      "final_recalls_native_exit": 0,
+      "controls": "Both deletion directions observed through independent native GET and recall endpoints. Frozen export still preserves both original documents."
+    },
+    "teardown": {
+      "native_stop_exit": 0,
+      "record": "stop-final.json",
+      "listener_observation_exit": 0,
+      "api_listener_present": false,
+      "database_listener_present": false,
+      "listener_artifact": "logs/listeners-final.stdout",
+      "stopped_health_native_exit": 28,
+      "stopped_health_record": "health-final-stopped.command.json",
+      "state_and_model_cache_preserved": true
+    }
+  },
+  "command_recipes": [
+    "rtk hindsight-embed profile create native-stack-chunk-trial-20260930 --port 19092 --env KEY=VALUE ... (all explicit settings retained in profile-settings.json)",
+    "rtk hindsight-embed -p native-stack-chunk-trial-20260930 daemon start|status|stop",
+    "rtk curl --fail-with-body --silent --show-error --request POST --header 'Content-Type: application/json' --data-binary @retain-request.json BASE/v1/default/banks/SOURCE/memories",
+    "rtk curl --fail-with-body --silent --show-error --request POST --header 'Content-Type: application/json' --data-binary @recall-request.json BASE/v1/default/banks/BANK/memories/recall",
+    "rtk curl --fail-with-body --silent --show-error --request POST BASE/v1/default/banks/SOURCE/transfer/export?include_bank_config=false",
+    "rtk curl --fail-with-body --silent --show-error BASE/v1/default/banks/SOURCE/operations/OPERATION_ID",
+    "rtk curl --fail-with-body --silent --show-error --output transfer-bank.zip BASE/DOWNLOAD_PATH",
+    "rtk unzip -tq transfer-bank.zip",
+    "rtk curl --fail-with-body --silent --show-error --form file=@transfer-bank.zip BASE/v1/default/banks/SOURCE/transfer/import?target_bank_id=TARGET",
+    "rtk curl --fail-with-body --silent --show-error --request DELETE BASE/v1/default/banks/BANK/documents/DOCUMENT_ID",
+    "rtk curl --fail-with-body --silent --show-error BASE/v1/default/banks/BANK/documents/DOCUMENT_ID",
+    "rtk ss -ltnp 'sport = :19092 or sport = :5432'"
+  ],
+  "exact_command_records": "Native daemon commands and later API operations retain exact argument vectors, timestamps, exits and stdout/stderr in adjacent *.json and logs files. Earlier direct API operations retain native response headers and bodies; their actual returned exits are recorded above.",
+  "failures": {
+    "backend_setup_or_start_failures": [],
+    "expected_negative_controls": [
+      "Source absent before retain: HTTP404/curl22",
+      "Target absent before restore: HTTP404/curl22",
+      "Reflect forbidden in none mode: HTTP400/curl22",
+      "Deleted source/target document controls: HTTP404/curl22",
+      "Stopped endpoint health: curl28 with no listener"
+    ],
+    "source_lookup_corrections": [
+      {
+        "mistake": "Guessed hindsight_api/db.py or db directory for embedded database source.",
+        "returned_exit": 2,
+        "correction": "Resolved and read pinned hindsight_api/pg0.py; confirmed new profile instance via native status and postgres argv."
+      },
+      {
+        "mistake": "Unescaped {bank_id} in one rg regular expression.",
+        "returned_exit": 2,
+        "correction": "Repeated source lookup with supported literal rg -F and bounded reads; source files matched tag."
+      }
+    ]
+  },
+  "claim_boundaries": [
+    "No unchanged upstream test suite or benchmark was run; this is native operation evidence with synthetic published text.",
+    "No full LLM extraction, consolidation, observations or successful reflection was qualified.",
+    "No native Codex/Claude session capture, hook, memory plugin operation or sign-in flow was exercised.",
+    "Same-profile bank restore does not establish another-host or independent-daemon/database restore.",
+    "Daemon stop/start persistence does not establish machine reboot recovery.",
+    "Artifact hashes and this summary are structural evidence; original native responses remain the acceptance evidence."
+  ],
+  "observation_manifest": {
+    "path": "observation-manifest.json",
+    "bytes": 24326,
+    "sha256": "026ae0103bfb69a8f58e5e920ab6b2cfd85f08a064c9ac4e25b311a54be2b748",
+    "artifactCount": 150
+  },
+  "native_observations": [
+    {
+      "path": "logs/health-start.body.json",
+      "bytes": 137,
+      "sha256": "ffd73846bbd42ad282e9cf52b706bd9fe6c7b08192f3f147c1158f994aba6e0c"
+    },
+    {
+      "path": "logs/retain-source.body.json",
+      "bytes": 228,
+      "sha256": "610e91f7c5e89ce63b469ce5a83033633e54ccbb82d6aa848cbbfcf742b23601"
+    },
+    {
+      "path": "logs/recall-before.body.json",
+      "bytes": 58,
+      "sha256": "1f87ea3d8cf90a2450658bdcee348faeb401ca0b0259ea3d5bdc7f403127d66e"
+    },
+    {
+      "path": "logs/recall-source.body.json",
+      "bytes": 1077,
+      "sha256": "159ee3413a0441e8633bde1b56d48e87e08d30ccd6c0e5caba6e6359c5dd32fb"
+    },
+    {
+      "path": "logs/recall-restart.body.json",
+      "bytes": 1077,
+      "sha256": "40cddcd1b8ebcaa174046f8bb3584d185ee3af0f93c152d8676c686a3caeb339"
+    },
+    {
+      "path": "logs/recall-restored.body.json",
+      "bytes": 1082,
+      "sha256": "1d7cef065191ea26d8e9c4e22f9a872fdc492066fbc5c660255c764cc16af34b"
+    },
+    {
+      "path": "logs/import-operation.body.json",
+      "bytes": 898,
+      "sha256": "3979e4fa8d24c91eb430de2c551c76c67b985e92358b43b215b01414c4539a99"
+    },
+    {
+      "path": "logs/listeners-final.stdout",
+      "bytes": 64,
+      "sha256": "14f4ea5bdea2bd6f8d856ec28619243555e53de100d4bca155a751876e97a843"
+    },
+    {
+      "path": "logs/stop-final.stdout",
+      "bytes": 461,
+      "sha256": "2882ef0d81901b7a9606d320d82b515cd580dab8691dac8d1bf83f5f257c2211"
+    },
+    {
+      "path": "logs/reflect-rejection.body.json",
+      "bytes": 166,
+      "sha256": "cfa6703edc0bd50d8828d375440bbd779aaf1cf0209da596b5eef71623595fe0"
+    },
+    {
+      "path": "transfer-bank.zip",
+      "bytes": 2713,
+      "sha256": "0bbe5f1bc6fb8e8ae5b68819c427db29eaecf0b433e71866bc3c814935a56d98"
+    }
+  ]
+}

@@ -1,0 +1,911 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "access-recovery",
+  "task_and_failure": "Resolve selected native token-tool clean installation and Claude/Codex native lifecycle. Initial exact parity and caller deadlines failed; source-backed repair and native same-ID/cached-prefix recovery retained all failed conditions.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/oraios/serena",
+      "revision": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+    },
+    {
+      "url": "https://github.com/openai/codex",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5"
+    },
+    {
+      "url": "https://github.com/anthropics/claude-code",
+      "revision": "ec44ca97dc86c33d934c8d55b24959aabf076871"
+    },
+    {
+      "url": "https://github.com/mksglu/context-mode",
+      "revision": "6f0cc6841c687e754059f36714a11233fda1a02b"
+    },
+    {
+      "url": "https://github.com/seathatflowsinourveins/agent-lab",
+      "revision": "b31f64020ab4900cd92341cd2aa92c3d98367758"
+    }
+  ],
+  "discovery_provenance": [
+    "Installed commands/settings, tagged release changelogs, immutable source and official docs were reviewed in that order.",
+    "Sol/max bounded research and separate-worktree repairs; Astra/max triggered for consequential selection/conflicting Serena evidence and unresolved bounded Claude parent recovery.",
+    "Current candidate review retains failed correctness gates and defers unqualified upgrades; no popularity-based superiority claim."
+  ],
+  "license_and_compatibility": "Retain existing selected native licenses and integration formats: Claude native proprietary client, official Codex release, Context Mode Elastic-2.0 and Serena MIT. No new whole-client proxy or store migration.",
+  "baseline_and_candidate": {
+    "baseline": "Selected fixture with stale Claude Serena response reference and no owned saved-workflow installer lifecycle.",
+    "candidate": "Same immutable tools, corrected independently observed exact reference with strict live schema guards; owned unchanged saved scripts and supported native continuation."
+  },
+  "frozen_inputs": {
+    "base_revision": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+    "tasks": [
+      "claude-agent",
+      "claude-saved-audit",
+      "claude-workflow",
+      "codex-native",
+      "codex-signatures",
+      "schema-fault-claude",
+      "schema-fault-codex",
+      "selected-clean-install",
+      "serena-parity",
+      "serena-tests",
+      "workflow-adoption"
+    ],
+    "roles": [
+      "claude-coordinator",
+      "codex-child",
+      "codex-coordinator",
+      "fixture",
+      "observer"
+    ],
+    "sources": [
+      {
+        "path": "scripts/native_token_ci.py",
+        "sha256": "cace071899ba46fa60f49ed3256c2320beb9622b5cf5cf59b877763eacb8867e"
+      },
+      {
+        "path": "tools/adoption/install_claude_profile.py",
+        "sha256": "8a6212b310a68a2642bee3c47f96d5731d32f102d1848583482e8f95888c6687"
+      },
+      {
+        "path": "examples/claude-native/workflows/readiness-audit.js",
+        "sha256": "1d3d816cc219a252760a471a3b68a979057e2c417c429d6c094df4c474e612bb"
+      },
+      {
+        "path": "examples/claude-native/workflows/SHA256SUMS",
+        "sha256": "633a5d511261b5df04ef74bdc8c873cd5b2a1f7cc6cceacb755b9b50a2d4da20"
+      },
+      {
+        "path": "blueprints/convergence-practice/native-recovery/claude/run.py",
+        "sha256": "946e6f558fc7778156aa7990e257fa41c5dac398d214a5086bb955f5ef6498ce"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-final-handoff-prompt.txt",
+        "sha256": "34754620796d5311f03244c07046d7da8dfbed0bc08a255384876d42dbec48f2"
+      },
+      {
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-prompt.txt",
+        "sha256": "7ccbfa5ea9e9c9c789719e74f68120109d432bf416288cb78dbc75f27c5bad4a"
+      },
+      {
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-recovery-prompt.txt",
+        "sha256": "56542233289097db043ac9508707808a383fc10b2c19c1badf65cd096f8edd2c"
+      },
+      {
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-final-reply-prompt.txt",
+        "sha256": "20b0bab4a95af99de93e8285b6bf004d8af40edcc251cf30e1525d89b851ec36"
+      },
+      {
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-parent-close-prompt.txt",
+        "sha256": "546d224aab9479306f93761917040b4ba07a19c1aecefd5522e40afebea781e7"
+      },
+      {
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-recovery-prompt.txt",
+        "sha256": "ec1c8276b4bde3427a62ba18a37fb84964133be564670270634917853debfc28"
+      },
+      {
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-workflow-prompt.txt",
+        "sha256": "8feadc30ece52b6e7d7d0c3bfcc00f5f751478ceee4a6d491917262f49917c8a"
+      },
+      {
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow-prompt.txt",
+        "sha256": "350caea80633287e579f81dc66283d8893230cffc41e2ffa919ce16f54d28691"
+      },
+      {
+        "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-prompt.txt",
+        "sha256": "5790564708258335a692e160ac87fb2454d68551caa6543d29ce434360246bbe"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "tests/test_native_token_ci.py",
+        "sha256": "e4c1dc072ce02be77f89dcd8f3fc0adfabe2b3d4382d43fe4fd9e1708582094a"
+      },
+      {
+        "path": "tests/test_install_claude_profile.py",
+        "sha256": "940d2afa2f58608ac187c43762076aaca0a73d45209c787d0200feb4f6ab462e"
+      },
+      {
+        "path": "blueprints/convergence-practice/contract.schema.json",
+        "sha256": "c544cfe4294316bee825eb3ae976b1321a63e848d326214b3efb065a990daaae"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Existing fixture exact-byte and semantic guards remain mandatory. Native client task prompts require exact command result, requested model/effort and independently observed completion. Negative schema controls must remain rejected. This is a lifecycle resolution, not a predeclared provider-efficiency benchmark.",
+    "usage_rule": "Retain native scopes once, failed attempts and unknown totals. Codex parent/child disjoint snapshots stay separate; Claude interrupted totals remain null here and their partial raw native fields remain in artifacts. Do not add cumulative result records, cached subsets, transcript/workflow metrics or list-price dollars."
+  },
+  "runtime_and_platform": {
+    "platform": "Linux x64 authoring host, 2026-09-30. Existing native accounts retained.",
+    "isolation": "Owned disposable installation prefixes, three bounded worktrees, explicit native session/child/run IDs and private supervisor logs; owned worktrees removed only after byte-equal evidence integration.",
+    "tools": [
+      {
+        "name": "claude-code",
+        "version": "2.1.285"
+      },
+      {
+        "name": "codex",
+        "version": "0.159.2"
+      },
+      {
+        "name": "rtk",
+        "version": "0.50.0"
+      },
+      {
+        "name": "context-mode",
+        "version": "1.0.169"
+      },
+      {
+        "name": "serena",
+        "version": "c6fbd1c5932df2494ffa0020af5a9fbe80b82143"
+      }
+    ]
+  },
+  "commands": [
+    "rtk python3 scripts/native_token_ci.py --install --output evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix",
+    "rtk python3 scripts/native_token_ci.py --install --output evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired",
+    "rtk python3 evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/run_fixture.py --output evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/red-existing",
+    "rtk python3 evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/run_fixture.py --output evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/green-existing",
+    "rtk python3 evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/run_fixture.py --output evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/changed-schema-claude --changed-schema-context claude-code",
+    "rtk python3 evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/run_fixture.py --output evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/changed-schema-codex --changed-schema-context codex",
+    "rtk proxy python3 -m unittest discover -s tests -p test_install_claude_profile.py",
+    "rtk proxy claude -p --model opus --effort max --permission-mode auto --permission-prompts none --max-turns 8 --output-format stream-json --verbose --include-hook-events < evidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow-prompt.txt",
+    "rtk proxy claude -p --model opus --effort max --permission-mode auto --permission-prompts none --output-format stream-json --verbose --include-hook-events < evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-prompt.txt",
+    "rtk proxy claude -p --resume <owned-builder-session> --model opus --effort max --permission-mode auto --permission-prompts none --output-format stream-json --verbose --include-hook-events < evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-recovery-prompt.txt",
+    "rtk proxy claude -p --resume <owned-builder-session> --model opus --effort max --max-turns 6 --output-format stream-json --verbose --include-hook-events < evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-final-handoff-prompt.txt",
+    "rtk proxy claude -p --model opus --effort max --output-format stream-json --verbose --include-hook-events < evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-workflow-prompt.txt",
+    "rtk proxy claude -p --resume <owned-audit-session> --model opus --effort max --max-turns 10 --output-format stream-json --verbose --include-hook-events < evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-recovery-prompt.txt",
+    "rtk proxy claude -p --resume <owned-audit-session> --model opus --effort max --max-turns 4 --output-format stream-json --verbose --include-hook-events < evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-final-reply-prompt.txt",
+    "rtk proxy claude -p --resume <owned-audit-session> --model opus --effort max --max-turns 8 --output-format stream-json --verbose --include-hook-events < evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-parent-close-prompt.txt",
+    "rtk proxy codex exec --strict-config -m gpt-6.1-sol -c model_reasoning_effort=\"ultra\" --json - < evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-prompt.txt",
+    "rtk npm install --global --prefix <owned-prefix> --no-audit --no-fund @openai/codex@0.159.2",
+    "rtk proxy npm audit signatures --json --include-attestations --prefix <owned-prefix>",
+    "rtk proxy npm audit signatures --json --include-attestations",
+    "rtk proxy python3 -m unittest discover -s tests -p test_native_token_ci.py"
+  ],
+  "observations": [
+    {
+      "id": "clean-original",
+      "task": "selected-clean-install",
+      "role": "fixture",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pinned selected native token-tool fixture clean installation, exact parity and owned temporary-directory cleanup.",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix/receipt.json",
+          "sha256": "e313ad548fcb3265352b8843c589c4031d3e9b1241c76a2a344a084bc4758c88"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "clean-repaired",
+      "task": "selected-clean-install",
+      "role": "fixture",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pinned selected native token-tool fixture clean installation, exact parity and owned temporary-directory cleanup.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/clean-prefix-repaired/receipt.json",
+          "sha256": "3432d68aafd022311ec6b4a1df1f3917d389db429e1acf96ce5257e1a0c313fa"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "serena-red-existing",
+      "task": "serena-parity",
+      "role": "fixture",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pinned selected native token-tool fixture clean installation, exact parity and owned temporary-directory cleanup.",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/red-existing/receipt.json",
+          "sha256": "04ecdc57d20b319242c828d44dd404eec52ccde92bfd8f1ca195e8c31d552dcb"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "serena-green-existing",
+      "task": "serena-parity",
+      "role": "fixture",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pinned selected native token-tool fixture clean installation, exact parity and owned temporary-directory cleanup.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/green-existing/receipt.json",
+          "sha256": "af05563b9f0c1deff9ce4c4545127f748f48e9c9e428930e6922f552d19255e0"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "serena-schema-claude",
+      "task": "schema-fault-claude",
+      "role": "fixture",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pinned selected native token-tool fixture clean installation, exact parity and owned temporary-directory cleanup.",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/changed-schema-claude/receipt.json",
+          "sha256": "d22e63ed95ce40b1d79a9f50433efd75a0c2de0b3202994fe6c5e257417738c2"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "serena-schema-codex",
+      "task": "schema-fault-codex",
+      "role": "fixture",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Pinned selected native token-tool fixture clean installation, exact parity and owned temporary-directory cleanup.",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/changed-schema-codex/receipt.json",
+          "sha256": "20bd33cb404c00e7db31a5d89578e48bdfb55b8cf2658e9b9bcef6851c37ff35"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "workflow-installer-tests",
+      "task": "workflow-adoption",
+      "role": "fixture",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 6,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Owned saved-script create/reuse/conflict/rollback/removal integration tests.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/workflow-installer/focused-tests.txt",
+          "sha256": "f722c2960f9425896acde852873ff81fc6eefb82ab01ed7373e2fbe85f6f1a8f"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-role-workflow",
+      "task": "claude-workflow",
+      "role": "claude-coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 7,
+      "evidence_class": "model_task_execution",
+      "scope": "Frozen synthetic native role/version question; Sonnet/max and Opus/max children.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-workflow.json",
+          "sha256": "b233c36fc17b6b6fd9f7212d5f47dedbaccc83dbe5a984e5ac024ab66181133d"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-agent-initial",
+      "task": "claude-agent",
+      "role": "claude-coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 8,
+      "evidence_class": "model_task_execution",
+      "scope": "Initial ordinary isolated-builder invocation.",
+      "status": "failed",
+      "exit_code": 124,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-timeout.json",
+          "sha256": "d92bf4163f90d1efcf89273b2da8ca2a518e33fa9800ea59a9fdeee4f654c8b5"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-agent-resume-cutoff",
+      "task": "claude-agent",
+      "role": "claude-coordinator",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 9,
+      "evidence_class": "recovery_execution",
+      "scope": "Existing child continuation after initial interruption.",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-recovery.json",
+          "sha256": "3a2c87f60dd936bfdbbe47a0c29574b7d9d5cf199cef22884359ad5cd531ca24"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-agent-final",
+      "task": "claude-agent",
+      "role": "claude-coordinator",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 10,
+      "evidence_class": "recovery_execution",
+      "scope": "Same child ID; native handback and completed notice, no forced parent termination.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-agent-complete.json",
+          "sha256": "0c87e7ff001441b6a82026d71e44e0866f0b4e18965457141053845505dd6326"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-saved-original",
+      "task": "claude-saved-audit",
+      "role": "claude-coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 11,
+      "evidence_class": "model_task_execution",
+      "scope": "Saved native audit discovery and first execution.",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-partial.json",
+          "sha256": "d27f01c19c78798fa14c1fa064ec3be6d8863bf6b52a3c7bcf82d8d37c9494d5"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-saved-parent-cutoff",
+      "task": "claude-saved-audit",
+      "role": "claude-coordinator",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 12,
+      "evidence_class": "recovery_execution",
+      "scope": "Same-session native cached-prefix resume; parent process only.",
+      "status": "failed",
+      "exit_code": -15,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-recovery.json",
+          "sha256": "de9dead88a0d9ea3243c8968eb87acf1be12648fb667e700801b0887ec6c1573"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-saved-parent-limit",
+      "task": "claude-saved-audit",
+      "role": "claude-coordinator",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 13,
+      "evidence_class": "recovery_execution",
+      "scope": "Parent final reply after already completed audit.",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-parent-limit.json",
+          "sha256": "f6510dd97211b0fb77e5255bf32cb41697aedcb18e4fb0b5c415f89e2f053f69"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-saved-parent-final",
+      "task": "claude-saved-audit",
+      "role": "claude-coordinator",
+      "condition": "candidate",
+      "attempt": 4,
+      "command_index": 14,
+      "evidence_class": "recovery_execution",
+      "scope": "Final same-session parent reply; completed audit source coverage, no tools or child rerun.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/claude-saved-parent-complete.json",
+          "sha256": "f3bded5184e8677f6d1ffffe2e3e1eb23d5a2db5cdeba450c52651be715462fe"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-stream-incomplete",
+      "task": "codex-native",
+      "role": "observer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 15,
+      "evidence_class": "offline_artifact_check",
+      "scope": "Original processed stream and incorrect lifecycle requirement.",
+      "status": "failed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-incomplete.json",
+          "sha256": "1b1fd20dec3e47011b5b24cb23d9a58a995e75e1bd189beb35eeb32e30a134b4"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-native-parent",
+      "task": "codex-native",
+      "role": "codex-coordinator",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 15,
+      "evidence_class": "model_task_execution",
+      "scope": "Original live Codex invocation, codex-coordinator thread only; independently observed later via read-only native app-server, not a new provider run. Exit0 is the original containing exec client.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-observation.json",
+          "sha256": "711b5695debcec0e16d5b3fa307d966732091b11e214a84944f13546993f304b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 26627,
+        "cache_creation": 0,
+        "cache_read": 208768,
+        "output": 2353,
+        "reasoning_in_output": 1373,
+        "total": 237748,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-native-child",
+      "task": "codex-native",
+      "role": "codex-child",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 15,
+      "evidence_class": "model_task_execution",
+      "scope": "Original live Codex invocation, codex-child thread only; independently observed later via read-only native app-server, not a new provider run. Exit0 is the original containing exec client.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-native-observation.json",
+          "sha256": "711b5695debcec0e16d5b3fa307d966732091b11e214a84944f13546993f304b"
+        }
+      ],
+      "usage": {
+        "uncached_input": 41347,
+        "cache_creation": 0,
+        "cache_read": 135552,
+        "output": 1909,
+        "reasoning_in_output": 737,
+        "total": 178808,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-signature-wrong-cwd",
+      "task": "codex-signatures",
+      "role": "fixture",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 17,
+      "evidence_class": "native_cli_execution",
+      "scope": "Disposable Codex installation signature command.",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": null,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-clean-install.json",
+          "sha256": "2da7abd4734f99c9bc808e47a731e7c978428d14e80a0835041903705b1f9ae1"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "codex-signatures-corrected",
+      "task": "codex-signatures",
+      "role": "fixture",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 18,
+      "evidence_class": "native_cli_execution",
+      "scope": "Installed wrapper cwd; platform dependency signature/provenance, wrapper not independently attested.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/codex-clean-install.json",
+          "sha256": "2da7abd4734f99c9bc808e47a731e7c978428d14e80a0835041903705b1f9ae1"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "serena-unit-green",
+      "task": "serena-tests",
+      "role": "fixture",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 19,
+      "evidence_class": "offline_artifact_check",
+      "scope": "48 focused unit tests with native preimages and changed-schema synthetic regression.",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/token-lifecycle-resolution-20260930/serena-repair/final-unit-suite.txt",
+          "sha256": "c8c8fbb9a8e3cf21635bb7432ffcdd6dacf21e8a591d47b65602b0206ac21f11"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "clean-original",
+      "reason": "Stale exact Claude Serena listTools reference; owned installation still cleaned."
+    },
+    {
+      "run_id": "serena-red-existing",
+      "reason": "Independent existing pinned executable reproduced the stale reference."
+    },
+    {
+      "run_id": "serena-schema-claude",
+      "reason": "Expected guard rejection of independently injected native inputSchema type change; not an upstream defect."
+    },
+    {
+      "run_id": "serena-schema-codex",
+      "reason": "Expected guard rejection of independently injected native inputSchema type change; not an upstream defect."
+    },
+    {
+      "run_id": "claude-agent-initial",
+      "reason": "External180s cutoff; no initial handoff. Final usage unknown."
+    },
+    {
+      "run_id": "claude-agent-resume-cutoff",
+      "reason": "300s MCP transport cutoff; tool work completed, final handoff not yet observed. Native exit/final usage unknown."
+    },
+    {
+      "run_id": "claude-saved-original",
+      "reason": "300s MCP transport cutoff; two readers complete, original verifier incomplete. Native exit/final caller usage unknown."
+    },
+    {
+      "run_id": "claude-saved-parent-cutoff",
+      "reason": "Audit itself completed natively with cached readers; enclosing parent exceeded480s and was terminated. Separate complete task artifact retained."
+    },
+    {
+      "run_id": "claude-saved-parent-limit",
+      "reason": "Parent-only existing-output review reached requested four-turn limit; no Workflow rerun."
+    },
+    {
+      "run_id": "codex-stream-incomplete",
+      "reason": "Original interpretation/filtering omitted Code Mode spawn and incorrectly required V1 close_agent; does not negate native V2 completion."
+    },
+    {
+      "run_id": "codex-signature-wrong-cwd",
+      "reason": "Native npm reported no installed dependencies to audit from prefix root."
+    }
+  ],
+  "limitations": [
+    "Command strings sanitize owned private paths; exact subprocess returns remain in bounded artifacts/private logs.",
+    "Scoped observer corrections are not new provider tasks. Exit0 for the Codex child refers to its original containing exec client; task_complete and turncompleted independently establish child completion.",
+    "Claude partial interrupted native usage is retained in artifacts and not normalized into a complete experiment total. No whole-task savings claim.",
+    "Three preexisting optional PyYAML test skips remain; the installer tests are local integration, not upstream acceptance.",
+    "No freshaccount/OS install, independent-host restore, whole-profile acceptance, exhaustive per-client tool coverage or universal quality ranking.",
+    "The native fixture upstream executable checks and local assertions have distinct evidence classes; version checks are not inference.",
+    "Published prompt/artifact IDs and encoded project keys are stable owned aliases. privacy.json retains original artifact hashes; exact private submitted inputs/native streams remain outside the checkout."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "Pinned selected native token-tool fixture clean installation, exact parity and owned temporary-directory cleanup.",
+    "qualification_run_ids": [
+      "clean-repaired"
+    ]
+  },
+  "rollback": "Remove only unchanged selected saved scripts through installer; restore a reference only with its verified native preimage; uninstall only owned disposable prefixes. Preserve native accounts/indexes/customization and other worktrees.",
+  "next_decision_changing_test": "Frozen equal-quality native task comparison with complete per-attempt usage including discovery/startup/recovery, and selected useful-operation coverage in each client.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}

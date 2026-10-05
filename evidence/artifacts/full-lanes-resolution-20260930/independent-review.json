@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "kind": "independent_source_evidence_review",
+  "reviewer_role": "stack-verifier",
+  "model_family": "Astra",
+  "effort": "max",
+  "trigger": "Consequential acceptance boundaries and conflicting primary usage-scope evidence.",
+  "status": "accepted_after_scoped_usage_correction",
+  "initial_findings": [
+    {
+      "claim": "Relay-wide tokens copied from final usage object",
+      "verdict": "refuted",
+      "correction": "Retain final_turn_usage_snapshot separately from final cumulative_native_model_usage; cost and cumulative snapshots counted once."
+    }
+  ],
+  "confirmed_claims": [
+    "All32 unique rows match queue statuses and next actions:20foundation/12trading;18conditional/13comparisons/1target-host gate.",
+    "Fresh trading output matches original stdout hash;3stale source bindings retained and sim/paper arithmetic separated from native broker readiness.",
+    "Canonical, observed qualification and latest-source pins remain separate; upstream availability not independently refreshed by reviewer.",
+    "No measured Hindsight full-cost winner promoted.",
+    "Original stream verifies six exact successful native queued sends, fresh target discovery and correctly scoped sent bodies.",
+    "No recipient configuration/permission override directive detected; recipient acknowledgment/completion remains unobserved."
+  ],
+  "commands": [
+    {
+      "command": "rtk python3 scripts/landscape.py",
+      "exit_code": 0,
+      "status": "passed"
+    },
+    {
+      "command": "rtk python3 scripts/trading_gates.py --check --json",
+      "exit_code": 0,
+      "status": "passed",
+      "warnings": 3
+    }
+  ],
+  "correction_recheck": {
+    "comparison_exit_code": 0,
+    "final_turn_usage_exact_match": true,
+    "cumulative_native_model_usage_exact_match": true,
+    "cumulative_cost_usd": 0.6886326,
+    "cost_exact_match": true,
+    "result_records": 4,
+    "stream_hash_and_bytes_exact_match": true,
+    "material_findings_remaining": 0,
+    "acceptance_commands_rerun": false,
+    "repaired_receipt_sha256": "fe3bc5ca53d2e9b65028034f7db91d7c60c8f86d3014798017dfe6c90bd50544"
+  },
+  "reviewed_sources": [
+    {
+      "path": "evidence/artifacts/full-lanes-resolution-20260930/manifest.json",
+      "sha256": "7dfbcef82ac08d4cc643de60c11c3cedbab687bac101609ba0b4e91614efe612"
+    },
+    {
+      "path": "evidence/artifacts/full-lanes-resolution-20260930/peer-messaging.json",
+      "sha256": "fe3bc5ca53d2e9b65028034f7db91d7c60c8f86d3014798017dfe6c90bd50544"
+    },
+    {
+      "path": "owned-private-original-relay-stream",
+      "sha256": "8bad53db21652cf87c4e756a3084f976a2f0bf1f091f8fa2d593a266300634b8",
+      "bytes": 324564
+    }
+  ],
+  "boundaries": [
+    "Read-only source review and named nonmutating checks; no installation, broker, GPU or provider/model acceptance run.",
+    "Current source/release identities were checked by coordinator and remain separate from reviewer revalidation.",
+    "No raw conversations, private session ids or credential values published."
+  ]
+}

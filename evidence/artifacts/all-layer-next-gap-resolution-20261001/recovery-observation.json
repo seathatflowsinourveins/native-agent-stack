@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "kind": "bounded_public_recovery_observation",
+  "checked_at_utc": "2026-10-01T02:41:37.073537Z",
+  "source_revision": "40375e1ecf432749e0f04b521d754866a41ee9d9",
+  "recovered_directory": "blueprints/us-equities/adaptive-paper/trials/ext-20260928",
+  "recovery_command": [
+    "rtk",
+    "git",
+    "restore",
+    "--source=40375e1ecf432749e0f04b521d754866a41ee9d9",
+    "--worktree",
+    "--",
+    "blueprints/us-equities/adaptive-paper/trials/ext-20260928"
+  ],
+  "recovery_exit_code": 0,
+  "files": [
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md",
+      "original_read_exit_code": 0,
+      "sha256": "14d165861b70403e3000a6b7bfbb5c909dc03ef9c1e3c773e509e9799979b926",
+      "bytes": 19202,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/chain-4.console",
+      "original_read_exit_code": 0,
+      "sha256": "3102dfbb292565a98a0238f312192046e9cce062d771e160b69d0b9808b541a7",
+      "bytes": 2982,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/frozen-3058b237.SHA256SUMS",
+      "original_read_exit_code": 0,
+      "sha256": "77de4228864b73c5aa436399359c13a5e2c4388956ca1e8c200c97282b41134e",
+      "bytes": 5886,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/mover-paper-2.json",
+      "original_read_exit_code": 0,
+      "sha256": "8c736cc29228d6d0421a4c0df51f61fa5ba9beb66ce3fd46fba2958c5bf8301c",
+      "bytes": 3715,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/mover-paper-3.json",
+      "original_read_exit_code": 0,
+      "sha256": "baf34d865c31c261ac690431ab866547672652624d2a41b98578d7e1b24db538",
+      "bytes": 134531,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/mover-paper-4.json",
+      "original_read_exit_code": 0,
+      "sha256": "dd9182517eac75770c1124ffd9f111852ed7f85af376951cd4d0afed17ffdb6b",
+      "bytes": 3715,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/mover-paper-5.json",
+      "original_read_exit_code": 0,
+      "sha256": "ce9789e5cef06d43182e838fd60988988ef6a8ddbe7016a1493c9e39033c7787",
+      "bytes": 3715,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/mover-paper-6.json",
+      "original_read_exit_code": 0,
+      "sha256": "c6632f2f8ebda18666b9a85b54fbae3b6a1e492f347856ca6a21c156f221fe52",
+      "bytes": 3715,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/mover-paper-7.json",
+      "original_read_exit_code": 0,
+      "sha256": "38dfc092ded4b6d0adbfa4df20e3576de04b1d1f519416447a058e17802fba11",
+      "bytes": 3715,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/mover-paper-8.json",
+      "original_read_exit_code": 0,
+      "sha256": "9892e9a5f67825abc3e06f6a2fa36f42c31b74f94c03204d6e2aa3084321aa66",
+      "bytes": 130053,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/receipt.json",
+      "original_read_exit_code": 0,
+      "sha256": "3c229834f08a9617e08ca9e4f24b97900b04351cd45c2659c7a582d5f026a3c5",
+      "bytes": 62301,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/reconcile-ext-series.stdout.json",
+      "original_read_exit_code": 0,
+      "sha256": "ba554311f8a69b59d305942492a49d34af0291b92da922cd9e06b60e872eb677",
+      "bytes": 8043,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/reconcile_ext_series.py",
+      "original_read_exit_code": 0,
+      "sha256": "50b9da4c17f16b6a84cd418ed9fbb7afca6b4a9e26fc56a6b6753c15e2a6cbff",
+      "bytes": 11812,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/trial-1.console",
+      "original_read_exit_code": 0,
+      "sha256": "1c284307623b190ff293d8d8c326175babc008f45219ffd91fe7a1a7350b7947",
+      "bytes": 342,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/trial-2.console",
+      "original_read_exit_code": 0,
+      "sha256": "c5c082ded9e43e33e834ca5763f2680fcd3f997cf77859729e323a4eb99057cd",
+      "bytes": 505,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/trial-r3.console",
+      "original_read_exit_code": 0,
+      "sha256": "4f3944cc6faf0dac1594a2d1c8d8a33cddc93e162fa42a74e1bf0927c22c37f9",
+      "bytes": 637,
+      "byte_identical_to_original": true,
+      "public_scan_errors": []
+    }
+  ],
+  "dashboard_snapshot": {
+    "command": [
+      "rtk",
+      "python3",
+      "-c",
+      "from pathlib import Path; import importlib.util,json; p=Path('observability/grand-dashboard/progress.py'); s=importlib.util.spec_from_file_location('progress',p); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); rows=m.snapshot(Path('.')); print(json.dumps({'records':len(rows),'kinds':sorted(set(x['record_kind'] for x in rows))}))"
+    ],
+    "exit_code": 0,
+    "returned_stdout": "{\"records\": 112, \"kinds\": [\"decision\", \"experiment\", \"gate\", \"lane\", \"summary\", \"wave\", \"worker\", \"workflow\"]}\n",
+    "returned_stderr": "",
+    "returned_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "checkpoint_sha256": "228655836c3207378019a81fc0135a42c1791f06629631ad9220920cf6799677",
+    "checked_at_utc": "2026-10-01T02:42:59.107381Z"
+  },
+  "preserved_failures": [
+    {
+      "operation": "initial_dashboard_snapshot",
+      "exception": "ValueError",
+      "message": "missing evidence reference",
+      "reference": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md"
+    },
+    {
+      "operation": "snapshot_after_original_recovery",
+      "exception": "ValueError",
+      "message": "invalid public metadata token",
+      "cause": "Six display states exceeded 160 characters or contained unsupported punctuation; one title contained commas."
+    },
+    {
+      "operation": "concurrent_owner_status_append",
+      "exception": "ValueError",
+      "message": "invalid public metadata token",
+      "cause": "Another owner appended native quota detail to the repaired audit state; the new232-character state was compacted to the existing160-character contract.",
+      "scope": "Current-checkout snapshot is timestamped and hash-bound; future shared edits need their own check."
+    }
+  ],
+  "repair_scope": "Restore all sixteen originally absent public artifacts from immutable Git blobs. Compact display labels using the existing ASCII/160-character token contract. Evidence links and domain acceptance stay intact.",
+  "acceptance_scope": "Historical artifact integrity and native current-checkout public snapshot. No new paper order, strategy acceptance, model trial, timer emission or remote publication.",
+  "independent_verification": "Astra/Max verifier re-read every original Git blob, exit0 each, and accepted byte-identical restoration; separate post-repair snapshot/hosted observations follow.",
+  "preserved_native_snapshot_retry": {
+    "command": [
+      "rtk",
+      "python3",
+      "-c",
+      "from pathlib import Path; import importlib.util,json; p=Path('observability/grand-dashboard/progress.py'); s=importlib.util.spec_from_file_location('progress',p); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); rows=m.snapshot(Path('.')); print(json.dumps({'records':len(rows),'kinds':sorted(set(x['record_kind'] for x in rows))}))"
+    ],
+    "exit_code": 1,
+    "returned_stdout": "",
+    "returned_stderr": "Traceback (most recent call last):\n  File \"<string>\", line 1, in <module>\n    from pathlib import Path; import importlib.util,json; p=Path('observability/grand-dashboard/progress.py'); s=importlib.util.spec_from_file_location('progress',p); m=importlib.util.module_from_spec(s); s.loader.exec_module(m); rows=m.snapshot(Path('.')); print(json.dumps({'records':len(rows),'kinds':sorted(set(x['record_kind'] for x in rows))}))\n                                                                                                                                                                                                                                           ~~~~~~~~~~^^^^^^^^^^^\n  File \"[checkout]/observability/grand-dashboard/progress.py\", line 175, in snapshot\n    add(kind, row['id'], row['title'], row['state'], ref)\n    ~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"[checkout]/observability/grand-dashboard/progress.py\", line 164, in add\n    state=token(status), evidence_ref=ref,\n          ~~~~~^^^^^^^^\n  File \"[checkout]/observability/grand-dashboard/progress.py\", line 48, in token\n    raise ValueError('invalid public metadata token')\nValueError: invalid public metadata token\n",
+    "checkpoint_sha256": "b408adae1ec18ecb88a2814f92c85f11e5ce9fd81b79e7652d7eaec96d0b9177",
+    "returned_stderr_sha256": "6ae60a2658e2ca52362055a8a232035b843dc873644e5b0f93df0ab4a91b4e4e"
+  }
+}

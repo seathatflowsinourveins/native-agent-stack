@@ -294,7 +294,7 @@
     {
       "id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.157.1",
+      "version": "0.159.2",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Native subscription coding client",
@@ -335,14 +335,16 @@
         "ultracode-token-routing-20260921",
         "portable-claude-native-qualification-20260921",
         "claude-repository-evidence-20260921",
-        "codex-01571-qualification-20260926"
+        "codex-01571-qualification-20260926",
+        "codex-01592-host-finalization-20260930"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex",
-        "https://github.com/openai/codex/releases/tag/rust-v0.157.1"
+        "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
+        "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/app-server/src/config_manager_service.rs"
       ],
-      "source_pin": null,
-      "freshness": "0.157.1 serves bin/codex on the NativeStack WSL2 host since 2026-09-26, switched with the qualification receipt's data.switch commands after a matched comparison against 0.155.1 in a loopback sandbox (the landscape-sweep lane argv, the 429 usage-limit mapping, --search and state migration behaved the same); automatic start of the 0.157.x self-updating app-server daemon is off (daemon_auto_start false, also in adoption/templates/codex.config.template.toml). 0.155.1 is kept for rollback, the macOS pin stays 0.155.1 until its own qualification, and the landscape winner pin stays 0.155.1 until a new verdict wave."
+      "source_pin": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+      "freshness": "Installed Linux/WSL client 0.159.2 was qualified on 2026-09-30 against its installed help, stable release, immutable source and official docs. The npm wrapper and Linux package integrity/signatures/attestations passed; the staged binary is byte-identical to this host's installed binary. Native scratch config version conflicts, invalid types, null deletion, owned updater apply/idempotence and rollback passed. daemon_auto_start remains false. Live skill fixture execution is separate evidence; this qualification alone does not attest provider/backend, macOS, whole-stack acceptance or global owned-profile rollout. Historical qualification receipts and the landscape verdict pin retain their original scopes."
     },
     {
       "id": "codex-for-claude",

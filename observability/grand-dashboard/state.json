@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-09-29T02:02:44Z",
-  "meaning": "Recorded checkpoint combining preserved paper/simulation records with current foundation source review and separate Workflow/context-policy records. Linked receipts retain their own dates and acceptance scopes; emitter freshness is separate from task acceptance.",
+  "recorded_at_utc": "2026-10-01T02:51:01Z",
+  "meaning": "Recorded checkpoint preserving existing paper/simulation and token records; current memory resolution, native peer handoffs and runtime-worker evidence view. Emitter freshness remains distinct from acceptance and this checkpoint date.",
   "lanes": [
     {
       "kind": "lane",
@@ -13,9 +13,9 @@
     {
       "kind": "lane",
       "id": "paper",
-      "title": "Dedicated Alpaca paper account",
-      "state": "engine P0 + cancel identity + margin model 09-25 / cross-family fixes + startup fills + per-fill loss 09-26 / 1x ladder blocked (paper keys HTTP 401) / flat",
-      "evidence_ref": "blueprints/us-equities/adaptive-paper/receipt.json"
+      "title": "Alpaca paper accounts 1 and 2",
+      "state": "acct 1 401 cleared 09-28 (new keys) / HTTP 200 + flat 09-29 / RTH series frozen / acct 2 ext-20260928 2 of 8 passed 10 filled -8.91 USD reconciled flat",
+      "evidence_ref": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md"
     },
     {
       "kind": "lane",
@@ -93,8 +93,8 @@
       "kind": "gate",
       "id": "token-efficiency-wiring",
       "title": "Token-efficiency wiring for every session",
-      "state": "fresh-worktree coverage complete / Codex MCP at user scope / 12 of 14 versions match pins / 2 unchecked (npm metadata) / probes fail closed",
-      "evidence_ref": "evidence/artifacts/token-coverage-20260926/README.md"
+      "state": "Prereqs present / 16 pinned tools clean-install passed / Claude saved workflows recovered / whole profile drafted",
+      "evidence_ref": "evidence/receipts/token-lifecycle-resolution-20260930.json"
     },
     {
       "kind": "gate",
@@ -205,8 +205,8 @@
       "kind": "gate",
       "id": "foundation-convergence",
       "title": "Current native foundation convergence",
-      "state": "six stable versions retained / Claude research returned and source claims adjudicated",
-      "evidence_ref": "evidence/receipts/foundation-convergence-20260921.json"
+      "state": "Qualified token pins retained / Serena reference repaired / upgrades deferred / matched provider savings unproven",
+      "evidence_ref": "evidence/receipts/token-lifecycle-resolution-20260930.json"
     },
     {
       "kind": "gate",
@@ -282,8 +282,8 @@
       "kind": "gate",
       "id": "token-stack-subagent-e2e",
       "title": "Token stack inside Ultracode subagents",
-      "state": "16 of 16 tools used in Sonnet workflow subagents with passing checks / RTK +56527 run-only / Headroom +183904 lifetime / Codex workers blocked until 2026-09-30",
-      "evidence_ref": "evidence/artifacts/token-e2e-ultracode-20260925/receipt.json"
+      "state": "Historical Sonnet 16-tool receipt / Claude Max workflows and Codex V2 Astra Max child completed / full per-client coverage drafted",
+      "evidence_ref": "evidence/receipts/token-lifecycle-resolution-20260930.json"
     },
     {
       "kind": "gate",
@@ -338,8 +338,50 @@
       "kind": "gate",
       "id": "skills-trial-window",
       "title": "Skills trial window 2026-09-25 to 2026-10-25",
-      "state": "listing restored to manifest 2026-09-28 / verification-before-completion removed 2026-09-28 / 28 skills / Mac check issue 472 / review issue 474",
-      "evidence_ref": "docs/decisions/2026-09-25-skills-trial-and-usage.md"
+      "state": "27 selected / 3 repins / 29 fixture runs with misses / no baseline gain / Codex1592 lifecycle qualified / global pending / retry timers DISARMED",
+      "evidence_ref": "docs/decisions/2026-09-30-sota-native-finalization.md"
+    },
+    {
+      "kind": "gate",
+      "id": "foundation-model-defaults",
+      "title": "Foundation model defaults",
+      "state": "Sol Ultra lead / Sol Max workers / fixtures passed / Claude conditions addressed / Gate A handoff recorded / Window W unknown / macOS unqualified",
+      "evidence_ref": "evidence/receipts/foundation-quality-defaults-20260930.json"
+    },
+    {
+      "kind": "gate",
+      "id": "memory-foundation-resolution-20260930",
+      "title": "Shared native memory foundation resolution",
+      "state": "Hindsight fit-based target finalized / native capture and complete-cost winner pending / qualified pins separate from newest sources",
+      "evidence_ref": "blueprints/convergence-practice/memory-runtime-resolution-20260930/manifest.json"
+    },
+    {
+      "kind": "gate",
+      "id": "runtime-worker-landscape-20260930",
+      "title": "Runtime worker source landscape and evidence HTML",
+      "state": "17 source-reviewed candidates / 4 evidence scopes / 8 pinned enhancements / 69 renderer tests and public scan pass / alternatives not installed",
+      "evidence_ref": "catalogs/foundation/runtime-worker-landscape-20260930.json"
+    },
+    {
+      "kind": "gate",
+      "id": "omni-native-sdk1593-20260930",
+      "title": "Native OmniRoute SDK 0.159.3 qualification",
+      "state": "Installed / native discovery ready / 3 upstream API tests and 13 local fixtures passed / real provider turn HTTP429 / canonical1592 retained",
+      "evidence_ref": "evidence/artifacts/omni-harness-native-resolution-20260930/manifest.json"
+    },
+    {
+      "kind": "gate",
+      "id": "native-stack-gap-audit-20261001",
+      "title": "Native SDK hosting container and CLI gap review",
+      "state": "Prereqs present / Docker ready / gh2.102.0 upkeep pending / SDK1593 HTTP429 / lifecycle and release gates open / extra SDKs conditional / relay quota blocked",
+      "evidence_ref": "evidence/artifacts/native-stack-gap-audit-20261001/manifest.json"
+    },
+    {
+      "kind": "gate",
+      "id": "all-layer-next-gap-resolution-20261001",
+      "title": "All layers next-gap execution and HTML",
+      "state": "32 layers mapped / 16 paper originals recovered / native dashboard repaired / hosted CI observed / remaining acceptance gates retained",
+      "evidence_ref": "evidence/artifacts/all-layer-next-gap-resolution-20261001/manifest.json"
     }
   ],
   "workers": [
@@ -384,6 +426,20 @@
       "title": "Broad-universe builders and reviewers",
       "state": "3 builders + 3 Opus reviewers + 3 fix builders in owned worktrees / Codex foreground lane 4 passes / all findings resolved",
       "evidence_ref": "blueprints/us-equities/broad-universe/receipt.json"
+    },
+    {
+      "kind": "worker",
+      "id": "full-lanes-sota-handoff-20260930",
+      "title": "Full lane SOTA reconciliation and native peer handoff",
+      "state": "20 foundation +12 trading next gates reconciled / six native messages queued / recipient completion unobserved",
+      "evidence_ref": "evidence/artifacts/full-lanes-resolution-20260930/manifest.json"
+    },
+    {
+      "kind": "worker",
+      "id": "omniroute-enhanced-sdk-20260930",
+      "title": "OmniRoute Sol-Max SDK worker and native Astra-Max judge",
+      "state": "bounded skill/MCP/Dagu/judge scope accepted / 8 receipt source hashes match / earlier failures and flow_error retained / Claude caller historical",
+      "evidence_ref": "evidence/receipts/omniroute-runtime-enhancements-20260930.json"
     }
   ],
   "plan_ref": "blueprints/us-equities/catalyst-convergence/plan.json",

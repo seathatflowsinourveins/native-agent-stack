@@ -177,7 +177,8 @@ class ExcludedEntryTests(unittest.TestCase):
 
 class TemplateSkillOverridesConsistencyTests(unittest.TestCase):
     """adoption/templates/claude.settings.template.json's skillOverrides must name every
-    manifest skill exactly once, at its manifest claude_listing (settings_propagation)."""
+    manifest skill exactly once, at its manifest claude_listing (settings_propagation),
+    plus explicit off overrides for upstream-retired skills named in excluded."""
 
     @classmethod
     def setUpClass(cls):
@@ -186,6 +187,9 @@ class TemplateSkillOverridesConsistencyTests(unittest.TestCase):
 
     def test_skill_overrides_equals_name_to_claude_listing(self):
         expected = {skill["name"]: skill["claude_listing"] for skill in self.manifest["skills"]}
+        for retired in self.manifest["excluded"]:
+            if retired["skills"] == "resolving-merge-conflicts":
+                expected[retired["skills"]] = "off"
         self.assertEqual(self.template.get("skillOverrides"), expected)
 
 

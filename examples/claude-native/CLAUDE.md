@@ -20,7 +20,7 @@ Decide by evidence and research convergence: a choice stands when current primar
 
 ## Token practice (base layer)
 
-- Keep context small: load only the skill and source the current task needs; tool inventories and specialized workflows belong in on-demand skills and project documentation.
+- Match available skill descriptions to the task and read the selected `SKILL.md` before acting. Load only its needed references; keep tool inventories and specialized workflows on demand.
 - Use a focused read for known identifiers, scoped search for prose and scoped semantic retrieval for unfamiliar code; select one sufficient retrieval or compression lane per artifact, and verify original source before editing or judging compressed or retrieved code.
 - Process large output outside the model; retain failures and a full-output recovery path. Preserve the existing RTK-managed import when that component is installed.
 - Delegate a step when only its conclusion is needed, and return concise findings with source or artifact locations.

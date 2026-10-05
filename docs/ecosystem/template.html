@@ -41,6 +41,9 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <button role="tab" id="tab-foundation" aria-controls="foundation" aria-selected="false" tabindex="-1" data-tab="foundation" data-catalog-tab hidden>Foundation</button>
 <button role="tab" id="tab-trading" aria-controls="trading" aria-selected="false" tabindex="-1" data-tab="trading" data-catalog-tab hidden>Trading</button>
 <button role="tab" id="tab-landscape" aria-controls="landscape" aria-selected="false" tabindex="-1" data-tab="landscape" hidden>Choices & alternatives</button>
+<button role="tab" id="tab-memory-review" aria-controls="memory-review" aria-selected="false" tabindex="-1" data-tab="memory-review" hidden>Memory & RAG verdict</button>
+<button role="tab" id="tab-runtime-workers" aria-controls="runtime-workers" aria-selected="false" tabindex="-1" data-tab="runtime-workers" hidden>Runtime workers</button>
+<button role="tab" id="tab-all-layers" aria-controls="all-layers" aria-selected="false" tabindex="-1" data-tab="all-layers" hidden>All layers</button>
 <button role="tab" id="tab-convergence" aria-controls="convergence" aria-selected="false" tabindex="-1" data-tab="convergence" hidden>Convergence by layer</button>
 <button role="tab" id="tab-explorer" aria-controls="explorer" aria-selected="false" tabindex="-1" data-tab="explorer"><span class="tab-number">02</span>Repository explorer</button>
 <button role="tab" id="tab-setup" aria-controls="setup" aria-selected="false" tabindex="-1" data-tab="setup"><span class="tab-number">03</span>Selected stack & setup</button>
@@ -80,6 +83,57 @@ header{position:sticky;top:0;z-index:5;background:var(--paper)}[role=tabpanel]{s
 <div class="filter-row"><p id="landscape-count" class="result-count" role="status" aria-live="polite"></p><button class="button secondary small" id="landscape-reset">Reset comparison filters</button></div>
 <p class="small muted">An observed failure applies to its recorded version, host and test. An alternative can remain competitive even when the current choice is retained. Historical candidate cards keep their original dates and do not override the current decision.</p>
 <div id="landscape-layers" class="landscape-grid"></div>
+</section>
+<section id="memory-review" role="tabpanel" aria-labelledby="tab-memory-review" hidden>
+<div class="page-heading"><div><div class="eyebrow" id="memory-review-date">Shared native Claude / Codex memory</div><h2 id="memory-review-heading">The memory foundation verdict.</h2><p id="memory-review-verdict"></p></div></div>
+<div id="memory-review-summary" class="scope-note landscape-summary"></div>
+<div id="memory-review-actions" class="landscape-actions"></div>
+<div id="memory-review-assurance" hidden>
+<div class="section-head"><div><div class="eyebrow">Comparable outcomes and their limits</div><h2>What the evidence actually selects.</h2></div></div>
+<p class="scope-note">Answer accuracy, any-session retrieval, all-session retrieval and complete operating cost are different measures. These rows are an evidence matrix, not a common leaderboard.</p>
+<div class="table-wrap"><table class="token-table"><thead><tr><th>Candidate / role</th><th>Observed evidence</th><th>Token and cost scope</th><th>Acceptance gap / primary sources</th></tr></thead><tbody id="memory-review-evidence-rows"></tbody></table></div>
+<details class="catalog-card" open><summary>Clean runtime alignment and selection gate</summary><div id="memory-review-runtime"></div></details>
+</div>
+<div class="section-head"><div><div class="eyebrow">Selection and acceptance</div><h2 id="memory-review-selection">The reasons and passed checks.</h2></div></div>
+<div id="memory-review-reasons" class="catalog-card"></div>
+<details class="catalog-card" open><summary>Native installation, cutover and recovery</summary><div id="memory-review-lifecycle"></div></details>
+<details class="catalog-card" id="memory-review-resolution" open hidden><summary>WSL evidence resolution · current execution</summary><div id="memory-review-resolution-body"></div></details>
+<div class="section-head"><div><div class="eyebrow" id="memory-review-count">Dated candidate review</div><h2>Every candidate and its reason.</h2></div></div>
+<div id="memory-review-candidates" class="catalog-grid"></div>
+</section>
+<section id="runtime-workers" role="tabpanel" aria-labelledby="tab-runtime-workers" hidden>
+<div class="page-heading"><div><div class="eyebrow" id="runtime-review-date">Native coordination / scoped workers</div><h2>Runtime workers and their evidence.</h2><p id="runtime-review-scope"></p></div></div>
+<div id="runtime-review-summary" class="scope-note landscape-summary"></div>
+<div id="runtime-review-actions" class="landscape-actions"><button id="runtime-review-download" class="button secondary small">Download runtime manifest</button></div>
+<div class="section-head"><div><div class="eyebrow">Model, effort and transport</div><h2>The retained routes and boundaries.</h2></div></div>
+<div id="runtime-review-routes" class="catalog-grid"></div>
+<div id="runtime-review-evidence" hidden>
+<div class="section-head"><div><div class="eyebrow">Original receipts / independent observations</div><h2>What ran, and what remains open.</h2></div></div>
+<p class="scope-note">Source review, discovery, unchanged upstream tests and scoped native execution retain their separate evidence classes. Discovery of a skill or tool does not qualify its execution. Counter scopes remain separate; cached and observer counters are not an extra total.</p>
+<div class="table-wrap"><table class="token-table"><thead><tr><th>Evidence / class</th><th>Status and scope</th><th>Observed actions</th><th>Usage and limitations</th><th>Sources</th></tr></thead><tbody id="runtime-review-evidence-rows"></tbody></table></div>
+<div id="runtime-review-documents"></div>
+</div>
+<div id="runtime-review-enhancement-section" hidden><div class="section-head"><div><div class="eyebrow">Task-selected components</div><h2>Enhancements and their qualified scope.</h2></div></div><div id="runtime-review-enhancements" class="catalog-grid"></div></div>
+<details id="runtime-review-usage-section" class="catalog-card" open hidden><summary>Usage limits and reset policy</summary><div id="runtime-review-usage"></div></details>
+<details class="catalog-card" open><summary>Scoped checks and publication gates</summary><div id="runtime-review-checks"></div></details>
+<details id="runtime-review-session-section" class="catalog-card" hidden><summary>Session notice and delivery evidence</summary><div id="runtime-review-session"></div></details>
+<div class="section-head"><div><div class="eyebrow">Dated source review</div><h2>Every candidate, pin and next gate.</h2></div></div>
+<div class="controls"><div class="control"><label for="runtime-review-search">Find a candidate or gate</label><input id="runtime-review-search" type="search" placeholder="Try SDK, MCP, Claude, recovery…" autocomplete="off"></div><div class="control"><label for="runtime-review-role">Role</label><select id="runtime-review-role"><option value="">All roles</option></select></div><div class="control"><label for="runtime-review-disposition">Disposition</label><select id="runtime-review-disposition"><option value="">All dispositions</option></select></div><div class="control"><label for="runtime-review-evidence-class">Evidence class</label><select id="runtime-review-evidence-class"><option value="">All evidence classes</option></select></div></div>
+<div class="filter-row"><p id="runtime-review-count" class="result-count" role="status" aria-live="polite"></p><button id="runtime-review-reset" class="button secondary small">Reset worker filters</button></div>
+<div id="runtime-review-candidates" class="catalog-grid"></div>
+</section>
+<section id="all-layers" role="tabpanel" aria-labelledby="tab-all-layers" hidden>
+<div class="page-heading"><div><div class="eyebrow" id="all-layer-date">All-layer next-gap resolution</div><h2>Every layer and its next gate.</h2><p>Inspect each recorded status, the next check, and the evidence for bounded execution. Each outcome retains its stated acceptance scope.</p></div></div>
+<div id="all-layer-summary" class="scope-note landscape-summary"></div>
+<div id="all-layer-actions" class="landscape-actions"><button id="all-layer-download" class="button secondary small">Download all-layer manifest</button></div>
+<div id="all-layer-execution-section" hidden><div class="section-head"><div><div class="eyebrow">Scoped outcomes</div><h2>Execution and remaining conditions.</h2></div></div><div id="all-layer-executions" class="catalog-grid"></div></div>
+<details id="all-layer-limitations-section" class="catalog-card" open><summary>Explicit limits</summary><div id="all-layer-limitations"></div></details>
+<details id="all-layer-corrections-section" class="catalog-card" hidden><summary>Recorded corrections</summary><div id="all-layer-corrections"></div></details>
+<div class="section-head"><div><div class="eyebrow">Foundation and trading</div><h2>Find the layer and follow its evidence.</h2></div></div>
+<div class="controls"><div class="control"><label for="all-layer-search">Find a layer or next gate</label><input id="all-layer-search" type="search" placeholder="Try memory, orchestration, data, paper…" autocomplete="off"></div><div class="control"><label for="all-layer-lane">Lane</label><select id="all-layer-lane"><option value="">Both lanes</option><option value="foundation">Foundation</option><option value="trading">Trading</option></select></div><div class="control"><label for="all-layer-status">Recorded status</label><select id="all-layer-status"><option value="">All recorded statuses</option></select></div></div>
+<div class="filter-row"><p id="all-layer-count" class="result-count" role="status" aria-live="polite"></p><button id="all-layer-reset" class="button secondary small">Reset layer filters</button></div>
+<div id="all-layer-cards" class="catalog-grid"></div>
+<details id="all-layer-documents-section" class="catalog-card"><summary>Read linked evidence offline</summary><div id="all-layer-documents"></div></details>
 </section>
 <section id="convergence" role="tabpanel" aria-labelledby="tab-convergence" hidden>
 <div class="page-heading"><div><div class="eyebrow">One frozen metric / every layer</div><h2>Convergence by layer</h2><p>For each layer: how many of its in-use manifest rows are the recorded winner, at a current pin, with host evidence, in a layer that no later completed sweep reopened. Counts are layer-component rows, so a component in several layers counts once per layer. Each factor stays true, false or unknown, and nothing is blended into one score. Every count, definition and date below is read from the generated component evidence matrix.</p></div></div>
@@ -156,6 +210,9 @@ const link = (label, url) => { const node = make("a", "", label); node.href = sa
 const layerNames = new Map(data.layers.map(layer => [layer.id, layer.name]));
 document.querySelectorAll("[data-catalog-tab]").forEach(tab => { tab.hidden = !data.grand_catalogs; });
 $("tab-landscape").hidden = !data.landscape;
+$("tab-memory-review").hidden = !data.memory_review;
+$("tab-runtime-workers").hidden = !data.runtime_worker_review;
+$("tab-all-layers").hidden = !data.all_layer_resolution;
 $("tab-convergence").hidden = !data.convergence;
 const tabs = [...document.querySelectorAll("[data-tab]")].filter(tab => !tab.hidden);
 function showTab(id, focus = false) {
@@ -204,7 +261,7 @@ const readable = value => String(value || "Not recorded").replaceAll("_", " ").r
 const reviewLabels = {accepted_within_scope: "Accepted within scope", partial_acceptance: "Partly accepted", source_review: "Source reviewed", discovery: "Discovery", not_established: "Not established"};
 function catalogSources(parent, sources) {
   const links = make("div", "catalog-sources");
-  (sources || []).forEach((source, index) => add(links, link(typeof source === "string" ? "Primary source " + (index + 1) + " ↗" : source.path + " ↗", typeof source === "string" ? source : source.url)));
+  (sources || []).forEach((source, index) => add(links, link(typeof source === "string" ? "Primary source " + (index + 1) + " ↗" : (source.title || source.label || source.path || "Primary source " + (index + 1)) + " ↗", typeof source === "string" ? source : source.url)));
   if(links.childElementCount) add(parent, links);
 }
 function catalogFacts(parent, values) {
@@ -362,6 +419,232 @@ function renderGrandCatalogs() {
   renderFoundation();
 }
 renderGrandCatalogs();
+function initializeMemoryReview() {
+  if(!data.memory_review) return;
+  const review = data.memory_review, decision = review.decision;
+  $("memory-review-date").textContent = "Shared native Claude / Codex memory · reviewed " + review.checked_at;
+  $("memory-review-heading").textContent = decision.final_candidate ? "Final candidate: " + decision.final_candidate : decision.recommended_target ? "Recommended target: " + decision.recommended_target : "Backbone winner: not established";
+  $("memory-review-verdict").textContent = decision.final_verdict;
+  $("memory-review-selection").textContent = decision.final_candidate || decision.recommended_target ? "Why " + (decision.final_candidate || decision.recommended_target) + ", and what has passed." : "The reference configuration and challengers.";
+  add($("memory-review-summary"), make("strong", "", "Production memory of record: " + decision.accepted_memory_of_record), make("p", "", decision.basis), make("p", "", review.coverage), make("p", "", "Retrieval challenger: " + decision.recommended_retrieval_trial + ". Other shortlisted trial: " + decision.other_shortlisted_trial + "."));
+  add($("memory-review-summary"), make("p", "", "Document retrieval: QMD. " + review.separate_existing_roles.join(". ") + "."));
+  if(decision.recommended_target && !decision.final_candidate) add($("memory-review-summary"), make("p", "", "Fit-based recommendation. Measured backbone and complete-cost winner: pending."));
+  if(review.latestness) catalogFacts($("memory-review-summary"), review.latestness);
+  const reasons = make("ul");
+  decision.selection_reasons.forEach(reason => add(reasons, make("li", "", reason)));
+  add($("memory-review-reasons"), reasons);
+  catalogSources($("memory-review-reasons"), review.priority_challenger.sources);
+  catalogFacts($("memory-review-lifecycle"), review.native_qualification_contract);
+  catalogFacts($("memory-review-lifecycle"), {server_version: review.priority_challenger.server_version, server_revision: review.priority_challenger.server_revision, coding_integration_version: review.priority_challenger.coding_integration_version, coding_integration_revision: review.priority_challenger.coding_integration_revision, comparative_quality: review.comparative_quality, production_scope: decision.scope});
+  const exportButton = make("button", "button secondary small", "Download memory manifest");
+  exportButton.addEventListener("click", () => {
+    const url = URL.createObjectURL(new Blob([JSON.stringify(review,null,2)+"\n"],{type:"application/json"}));
+    const anchor = make("a"); anchor.href=url; anchor.download="memory-rag-"+review.checked_at+".json"; anchor.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+  });
+  add($("memory-review-actions"), exportButton, recipeButton(review.report, "Read the full review offline"));
+  catalogSources($("memory-review-actions"), review.sources);
+  if(review.resolution) {
+    $("memory-review-resolution").hidden = false;
+    const resolution = review.resolution;
+    const body = $("memory-review-resolution-body");
+    catalogFacts(body, {status: resolution.status, candidate_list: resolution.candidate_list_status, profile: resolution.reference_profile, deployment: resolution.platform.deployment_shape, runtime_acceptance_verified: resolution.platform.runtime_acceptance_verified, new_wsl_distribution_created: resolution.platform.new_wsl_distribution_created});
+    resolution.memory_candidates.forEach(row => add(body, make("p", "", row.id + " · " + row.role + " · " + readable(row.execution_status) + (row.observed_result ? ". " + row.observed_result : ""))));
+    if(resolution.new_distribution_proposal) catalogFacts(body, {new_distribution_proposal: resolution.new_distribution_proposal.status, distribution: resolution.new_distribution_proposal.distribution, installed_wsl: resolution.new_distribution_proposal.installed_wsl_version, current_upstream_wsl: resolution.new_distribution_proposal.current_upstream_wsl_release, wsl_upgrade: resolution.new_distribution_proposal.wsl_upgrade_status});
+    resolution.native_operations.forEach(row => add(body, make("p", "", readable(row.id) + ": " + readable(row.observed_status) + ". " + row.acceptance_scope)));
+    const next = make("ul"); resolution.next_acceptance.forEach(item => add(next, make("li", "", item))); add(body, next);
+  }
+  if(review.assurance) {
+    $("memory-review-assurance").hidden = false;
+    review.assurance.rows.forEach(row => {
+      const sources = add(make("td"), make("p", "", row.acceptance_gap)); catalogSources(sources, row.sources);
+      add($("memory-review-evidence-rows"), add(make("tr"), add(make("td"), make("strong", "", row.name), make("p", "small", row.role)), make("td", "", row.observed_result), make("td", "", row.token_cost_scope), sources));
+    });
+    const runtime = review.assurance.runtime_alignment;
+    catalogFacts($("memory-review-runtime"), {profile: runtime.reference_profile, status: runtime.observed_prerequisite_status, runtime_acceptance_verified: runtime.runtime_acceptance_verified, scope: runtime.scope});
+    runtime.components.forEach(component => add($("memory-review-runtime"), make("p", "", component.id + " · " + component.version + " · " + (component.optional ? "Optional / project-scoped" : "Reference core") + " · " + component.role)));
+    const gate = review.assurance.selection_gate;
+    catalogFacts($("memory-review-runtime"), {quality: gate.quality, lifecycle: gate.lifecycle, cost: gate.cost});
+    catalogSources($("memory-review-runtime"), gate.upstream_sources);
+  }
+  $("memory-review-count").textContent = review.candidate_count + " candidates · current pinned source review";
+  review.candidates.forEach(row => {
+    const card = add(make("article", "landscape-candidate"), add(make("h3"), link(row.name + " ↗", row.repository)));
+    card.dataset.memoryCandidate = row.id;
+    add(card, add(make("div", "badges"), make("span", "landscape-tag", readable(row.disposition)), make("span", "badge", readable(row.evidence_class))), make("p", "", row.rationale));
+    catalogFacts(card, {role: row.role, version: row.latest_version, revision: row.source_revision, license: row.license});
+    catalogSources(card, row.sources); add($("memory-review-candidates"), card);
+  });
+  add($("foundation-guides"), catalogAction("memory-review", "Final memory / RAG verdict →"));
+  $("catalog-entry-points").hidden = false;
+  add($("catalog-entry-points"), add(make("article", "catalog-entry"), make("div", "eyebrow", "Memory / RAG · " + review.checked_at), make("h2", "", decision.final_candidate ? decision.final_candidate + " selected" : decision.recommended_target ? decision.recommended_target + " recommended; qualification open" : "Backbone comparison open"), make("p", "", decision.final_verdict), catalogAction("memory-review", "Read all candidate reasons →")));
+}
+initializeMemoryReview();
+function runtimeRecord(parent, record, omitted = []) {
+  if(!record) return;
+  const excluded = new Set(["sources", ...omitted]);
+  catalogFacts(parent, Object.fromEntries(Object.entries(record).filter(([key]) => !excluded.has(key))));
+  if(Array.isArray(record.sources)) catalogSources(parent, record.sources);
+  else if(record.sources) catalogFacts(parent, {source_metadata: record.sources});
+}
+function runtimeCandidateCard(row) {
+  const title = row.name || readable(row.id);
+  const card = make("article", "landscape-candidate"); card.dataset.runtimeCandidate = row.id;
+  add(card, row.repository ? add(make("h3"), link(title + " ↗", row.repository)) : make("h3", "", title));
+  add(card, add(make("div", "badges"), make("span", "landscape-tag", readable(row.disposition)), make("span", "badge", readable(row.evidence_class))));
+  add(card, make("p", "", row.reason || row.rationale || "An individual reason is not recorded in this row; read the route, review policy and remaining scope."));
+  catalogFacts(card, {role: row.role, version: row.version === null || row.version === undefined ? (row.revision ? "No release version recorded; source is pinned" : "Documentation-only scope; no release pin") : row.version, revision: row.revision || "Documentation-only scope; no repository revision", repository_license_metadata: row.repository_license_metadata || "Not recorded"});
+  const details = add(make("details", "catalog-detail"), make("summary", "", "Provider contract, enhancements and next gate"));
+  runtimeRecord(details, row, ["id", "name", "repository", "version", "revision", "role", "disposition", "evidence_class", "reason", "rationale", "repository_license_metadata"]);
+  add(card, details); return card;
+}
+function renderRuntimeCandidates() {
+  if(!data.runtime_worker_review) return;
+  const review = data.runtime_worker_review;
+  const query = $("runtime-review-search").value.toLowerCase().trim(), role = $("runtime-review-role").value;
+  const disposition = $("runtime-review-disposition").value, evidenceClass = $("runtime-review-evidence-class").value;
+  const candidates = review.candidates.filter(row => (!role || row.role === role) && (!disposition || row.disposition === disposition) && (!evidenceClass || row.evidence_class === evidenceClass) && (!query || JSON.stringify(row).toLowerCase().includes(query)));
+  $("runtime-review-candidates").replaceChildren();
+  candidates.forEach(row => add($("runtime-review-candidates"), runtimeCandidateCard(row)));
+  if(!candidates.length) add($("runtime-review-candidates"), make("p", "empty", "No candidates match these filters."));
+  $("runtime-review-count").textContent = candidates.length + " of " + review.candidate_count + " candidates · recorded evidence and scope";
+}
+function initializeRuntimeReview() {
+  if(!data.runtime_worker_review) return;
+  const review = data.runtime_worker_review;
+  $("runtime-review-date").textContent = "Native coordination / scoped workers · reviewed " + review.checked_at;
+  $("runtime-review-scope").textContent = review.scope;
+  add($("runtime-review-summary"), make("strong", "", readable(review.status)), make("p", "", review.selection_policy));
+  catalogFacts($("runtime-review-summary"), {new_worker_provider_trials: review.new_worker_provider_trials, new_worker_installations: review.new_worker_installations});
+  $("runtime-review-download").addEventListener("click", () => {
+    const url = URL.createObjectURL(new Blob([JSON.stringify(review.original, null, 2) + "\n"], {type: "application/json"}));
+    const anchor = make("a"); anchor.href = url; anchor.download = "runtime-workers-" + review.checked_at + ".json"; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+  if(review.report) add($("runtime-review-actions"), recipeButton(review.report, "Read the full review offline"));
+  if(review.dispatch_guide) add($("runtime-review-actions"), recipeButton(review.dispatch_guide, "Read the dispatch guide offline"));
+  const citationDetail = add(make("details", "catalog-card"), make("summary", "", "Every catalog source and local artifact"));
+  catalogSources(citationDetail, review.source_links); add($("runtime-review-actions"), citationDetail);
+  [["Retained worker route", review.retained_worker], ["Gateway source and running lane", review.gateway_source_boundary], ["Architecture judgment", review.architecture_review], ["Task-selected enhancement policy", review.enhancement_policy]].forEach(([title, record]) => {
+    if(!record) return;
+    const card = add(make("article", "catalog-card"), make("h3", "", title)); runtimeRecord(card, record); add($("runtime-review-routes"), card);
+  });
+  const evidence = review.evidence_manifest || [];
+  $("runtime-review-evidence").hidden = !evidence.length;
+  evidence.forEach(row => {
+    const identity = add(make("td"), make("strong", "", row.title || readable(row.id)), make("p", "small", readable(row.evidence_class)));
+    const status = add(make("td"), make("p", "", readable(row.status)), make("p", "", row.scope));
+    if(row.source_current !== undefined) catalogFacts(status, {source_current: row.source_current});
+    const actions = make("td"); catalogFacts(actions, {observed_actions: row.observed_actions});
+    const usage = make("td"); catalogFacts(usage, {usage_scopes: row.usage_scopes, limitations: row.limitations});
+    const sources = make("td"); catalogSources(sources, row.sources);
+    const local = (review.source_links || []).find(source => source.path === row.path); if(local) catalogSources(sources, [local]);
+    add($("runtime-review-evidence-rows"), add(make("tr"), identity, status, actions, usage, sources));
+  });
+  (review.evidence_documents || []).forEach(record => {
+    const details = add(make("details", "catalog-card"), make("summary", "", "Original receipt · " + record.path));
+    runtimeRecord(details, record.document); catalogSources(details, record.sources); catalogSources(details, [record]); add($("runtime-review-documents"), details);
+  });
+  const enhancements = review.qualified_enhancement_components || [];
+  $("runtime-review-enhancement-section").hidden = !enhancements.length;
+  enhancements.forEach(row => {
+    const card = add(make("article", "catalog-card"), make("h3", "", row.name || readable(row.id)));
+    runtimeRecord(card, row); add($("runtime-review-enhancements"), card);
+  });
+  $("runtime-review-usage-section").hidden = !review.usage_limit_policy;
+  if(review.usage_limit_policy) runtimeRecord($("runtime-review-usage"), review.usage_limit_policy);
+  runtimeRecord($("runtime-review-checks"), review.repository_validation);
+  if(review.host_observations) runtimeRecord($("runtime-review-checks"), {host_observations: review.host_observations});
+  $("runtime-review-session-section").hidden = !review.session_notice;
+  if(review.session_notice) runtimeRecord($("runtime-review-session"), review.session_notice);
+  [["runtime-review-role", "role"], ["runtime-review-disposition", "disposition"], ["runtime-review-evidence-class", "evidence_class"]].forEach(([id, key]) => {
+    [...new Set(review.candidates.map(row => row[key]))].sort().forEach(value => {
+      const option = make("option", "", readable(value)); option.value = value; add($(id), option);
+    });
+    $(id).addEventListener("change", renderRuntimeCandidates);
+  });
+  $("runtime-review-search").addEventListener("input", renderRuntimeCandidates);
+  $("runtime-review-reset").addEventListener("click", () => {
+    ["runtime-review-search", "runtime-review-role", "runtime-review-disposition", "runtime-review-evidence-class"].forEach(id => { $(id).value = ""; }); renderRuntimeCandidates();
+  });
+  renderRuntimeCandidates();
+  add($("foundation-guides"), catalogAction("runtime-workers", "Runtime workers and scoped evidence →"));
+  $("catalog-entry-points").hidden = false;
+  add($("catalog-entry-points"), add(make("article", "catalog-entry"), make("div", "eyebrow", "Runtime workers · " + review.checked_at), make("h2", "", review.candidate_count + " candidates, explicit scope"), make("p", "", review.selection_policy), catalogAction("runtime-workers", "Inspect routes, receipts and candidates →")));
+}
+initializeRuntimeReview();
+function allLayerRecord(parent, record, omitted = []) {
+  const excluded = new Set(["sources", "evidence_refs", "display_lane", ...omitted]);
+  catalogFacts(parent, Object.fromEntries(Object.entries(record).filter(([key]) => !excluded.has(key))));
+  catalogSources(parent, record.sources);
+}
+function allLayerStatus(row) {
+  return row.current_status && row.current_status.trim() ? row.current_status : "not_recorded";
+}
+function renderAllLayers() {
+  if(!data.all_layer_resolution) return;
+  const resolution = data.all_layer_resolution;
+  const query = $("all-layer-search").value.toLowerCase().trim(), lane = $("all-layer-lane").value;
+  const status = $("all-layer-status").value;
+  const layers = resolution.layers.filter(row => (!lane || row.display_lane === lane) && (!status || allLayerStatus(row) === status) && (!query || JSON.stringify(row).toLowerCase().includes(query)));
+  $("all-layer-cards").replaceChildren();
+  layers.forEach(row => {
+    const card = add(make("article", "catalog-card"), make("h3", "", row.title || readable(row.id)));
+    card.dataset.allLayer = row.id;
+    add(card, add(make("div", "badges"), make("span", "badge", readable(row.display_lane)), make("span", "landscape-tag", readable(allLayerStatus(row)))));
+    catalogFacts(card, {next_gate: row.next_gate || "Not recorded"});
+    const details = add(make("details", "catalog-detail"), make("summary", "", "Evidence and recorded detail"));
+    allLayerRecord(details, row, ["id", "title", "lane", "current_status", "next_gate"]);
+    if(!row.sources.length) add(details, make("p", "small muted", "Evidence references not recorded."));
+    add(card, details); add($("all-layer-cards"), card);
+  });
+  if(!layers.length) add($("all-layer-cards"), make("p", "empty", "No layers match these filters."));
+  $("all-layer-count").textContent = layers.length + " of " + resolution.layers.length + " layers · recorded status and next gate";
+}
+function initializeAllLayerResolution() {
+  if(!data.all_layer_resolution) return;
+  const resolution = data.all_layer_resolution;
+  $("all-layer-date").textContent = "All-layer next-gap resolution · " + (resolution.checked_at_utc || "Date not recorded");
+  catalogFacts($("all-layer-summary"), {status: resolution.status, scope: resolution.scope, layers: resolution.layers.length, foundation: resolution.lane_counts.foundation, trading: resolution.lane_counts.trading});
+  add($("all-layer-summary"), make("p", "", "A recorded next-gate resolution does not qualify every layer's runtime. Follow each execution's acceptance scope and remaining conditions."));
+  $("all-layer-download").addEventListener("click", () => {
+    const url = URL.createObjectURL(new Blob([JSON.stringify(resolution.original, null, 2) + "\n"], {type: "application/json"}));
+    const anchor = make("a"); anchor.href = url; anchor.download = "all-layer-resolution.json"; anchor.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
+  });
+  (resolution.offline_guides || []).forEach(path => add($("all-layer-actions"), recipeButton(path, "Read " + path + " offline")));
+  const citations = add(make("details", "catalog-card"), make("summary", "", "Source review and all supplied evidence links"));
+  catalogSources(citations, resolution.source_links); add($("all-layer-actions"), citations);
+  const executions = resolution.executions || [];
+  $("all-layer-execution-section").hidden = !executions.length;
+  executions.forEach((row, index) => {
+    const card = add(make("article", "catalog-card"), make("h3", "", row.title || (row.id ? readable(row.id) : "Execution outcome " + (index + 1))), make("span", "landscape-tag", readable(row.status)));
+    catalogFacts(card, {acceptance_scope: row.acceptance_scope || "Not recorded"});
+    allLayerRecord(card, row, ["id", "title", "status", "acceptance_scope"]); add($("all-layer-executions"), card);
+  });
+  if(resolution.limitations && resolution.limitations.length) catalogFacts($("all-layer-limitations"), {limitations: resolution.limitations});
+  else add($("all-layer-limitations"), make("p", "", "Additional limitations not recorded."));
+  const corrections = resolution.corrections || [];
+  $("all-layer-corrections-section").hidden = !corrections.length;
+  corrections.forEach(row => {
+    if(typeof row === "string") add($("all-layer-corrections"), make("p", "", row));
+    else if(row && typeof row === "object") allLayerRecord($("all-layer-corrections"), row);
+  });
+  (resolution.documents || []).forEach(record => {
+    const details = add(make("details", "catalog-detail"), make("summary", "", record.path), codeBlock(record.text));
+    catalogSources(details, [record]); add($("all-layer-documents"), details);
+  });
+  $("all-layer-documents-section").hidden = !(resolution.documents || []).length;
+  [...new Set(resolution.layers.map(allLayerStatus))].sort().forEach(value => {
+    const option = make("option", "", readable(value)); option.value = value; add($("all-layer-status"), option);
+  });
+  $("all-layer-search").addEventListener("input", renderAllLayers);
+  ["all-layer-lane", "all-layer-status"].forEach(id => $(id).addEventListener("change", renderAllLayers));
+  $("all-layer-reset").addEventListener("click", () => {
+    ["all-layer-search", "all-layer-lane", "all-layer-status"].forEach(id => { $(id).value = ""; }); renderAllLayers();
+  });
+  renderAllLayers();
+  $("catalog-entry-points").hidden = false;
+  add($("catalog-entry-points"), add(make("article", "catalog-entry"), make("div", "eyebrow", "All layers · dated next-gap resolution"), make("h2", "", resolution.layers.length + " layers, explicit next gates"), make("p", "", "Foundation and trading retain separate recorded statuses and bounded execution evidence."), catalogAction("all-layers", "Inspect all layer gates →")));
+}
+initializeAllLayerResolution();
 const dispositionLabels = {selected:"Selected for this scope",observed_failure:"Observed test failure",measured_tradeoff:"Measured tradeoff",overlap:"Overlapping capability",out_of_scope:"Outside this requirement",unqualified:"Not qualified",conditional:"Conditional alternative"};
 const landscapeDecisionLabels = {retain:"Retained",adjust:"Adjusted with evidence",keep_but_compare:"Retained; comparison remains open"};
 function landscapeAction(catalog, layerId = "") {

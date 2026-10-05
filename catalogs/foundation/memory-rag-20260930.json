@@ -1,0 +1,570 @@
+{
+  "schema_version": 1,
+  "kind": "memory_rag_foundation_review",
+  "checked_at": "2026-09-30",
+  "lane": "foundation",
+  "status": "resolution_wave_complete_backbone_winner_unresolved_native_capture_pending",
+  "scope": "Shared project memory for native Claude Code and Codex, with separate document and code retrieval. This review does not qualify a production migration or transfer another host's acceptance.",
+  "current_accepted_memory": {
+    "component_id": "ai-memory",
+    "installed_version_observed": "2.4.1",
+    "source_revision": "433a19f3d54dea287571b1423591db2a89965fa9",
+    "acceptance": "Existing dated host evidence; no new production capture, restore or model-quality run in this review.",
+    "current_upstream_version": "2.5.0",
+    "current_upstream_revision": "a8757a05a960f96a0ba510b6341bcd520cf80bb2",
+    "current_upstream_source": "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.0",
+    "upgrade_status": "Latest 2.5.0 source reviewed only. Separate 2.4.2 trial passed scoped lifecycle/recovery and 42 upstream scope tests; initial refusal and broader suite timeout remain recorded. No 2.5.0 migration, capture or recovery acceptance is claimed.",
+    "qualified_trial_version": "2.4.2",
+    "qualified_trial_revision": "a0ca8d1a5fbd5920799411fa891fe6d49c90efc1",
+    "latest_cli_version_observed": "2.4.2",
+    "installed_version_observation_scope": "Earlier 2.4.1 observation and canonical accepted pin retained; fresh CLI probe reports 2.4.2. Running service or concurrent migration acceptance was not requalified by this probe."
+  },
+  "priority_challenger": {
+    "component_id": "hindsight",
+    "repository": "https://github.com/vectorize-io/hindsight",
+    "server_version": "0.10.2",
+    "server_revision": "5fc4ce20917b916240cef27c212c387a177f115b",
+    "coding_integration_package": "@vectorize-io/hindsight-coding-agents",
+    "coding_integration_version": "0.8.0",
+    "coding_integration_revision": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c",
+    "evidence_level": "current_official_source_and_package_registry_review",
+    "sources": [
+      "https://github.com/vectorize-io/hindsight/releases/tag/v0.10.2",
+      "https://registry.npmjs.org/@vectorize-io%2fhindsight-coding-agents/0.8.0",
+      "https://pypi.org/project/hindsight-embed/0.10.2/",
+      "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/README.md",
+      "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/src/installer.ts"
+    ]
+  },
+  "native_qualification_contract": {
+    "installation": "Install the pinned upstream coding runtime without writing native client hooks or MCP configuration; use the official update staging command only if source and package integrity match. Qualify unchanged upstream install/config/scope/lifecycle tests in an owned source checkout.",
+    "production_capture": "Preserve the current authoritative store and active native client configuration during source/package qualification. No automatic import of existing project conversations.",
+    "runtime_pin": "Set autoUpdate=false and embedVersion=0.10.2 before any future capture trial.",
+    "isolation": "Explicit unique mapPathToBank IDs, optInOnly=true and a disposable opted-in project; same-name repository and unapproved-project negative checks.",
+    "promotion": "The existing catalogs/landscape/foundation.json durable-memory verdict rule and catalogs/foundation/memory-stack-20260925.json replacement rule remain binding. A matched executed comparison and native capture, deletion and clean-target recovery acceptance are required before replacement.",
+    "rollback": "Disable opted-in capture and historical seeding before deleting test banks; native uninstall removes installer-owned wiring but is not bank/state erasure.",
+    "observed": "Pinned integration npm ci/build completed; unchanged upstream suite second attempt passed 1279 tests, six skipped. Original first attempt 1267 passed, 12 failed, six skipped is retained. Owned TMPDIR isolated the successful rerun without test/source edits.",
+    "installed_runtime": "Official npx pinned update staging completed; independently verified package version and hook entry points. New config disables capture. Native client configs were not wired.",
+    "installed_launcher": "hindsight-embed 0.10.2 installed with supported uv. Subsequent isolated none-provider daemon execution qualified chunk retain/recall, restart and same-profile bank transfer; local models/backend downloaded. Owned API/database stopped. Full LLM/native-client capture acceptance remains pending."
+  },
+  "architecture_review": {
+    "model": "gpt-6-astra",
+    "effort": "max",
+    "trigger": "Consequential shared memory and lifecycle architecture spanning native Claude Code and Codex.",
+    "acceptance": "Accepted isolated Hindsight qualification with explicit project identity, deletion/reseed controls, independent runtime/server pins and native acceptance gates. Incumbent retained; no measured quality winner.",
+    "recommendation_review": {
+      "model": "gpt-6-astra",
+      "effort": "max",
+      "trigger": "Consequential fit-based recommendation after newer published coding evidence and ai-memory 2.5.0 release.",
+      "accepted_result": "Recommend Hindsight as the shared-native target; preserve null final_candidate/backbone_winner and complete native/cost gates."
+    }
+  },
+  "corrections": [
+    {
+      "claim": "The server release and coding integration share one version/pin.",
+      "correction": "Server v0.10.2 contains integration package 0.7.0; the current published npm integration is 0.8.0 at a separate source revision.",
+      "verification": "Pinned server package.json compared with npm version/gitHead and package.json at that gitHead."
+    },
+    {
+      "claim": "The Hindsight Codex README feature flag alone establishes activation.",
+      "correction": "The current installer accepts old codex_hooks or modern hooks keys, and logs a required hooks=true edit if an existing features section lacks both. Native trust and fresh-session activation require observation.",
+      "verification": "Current upstream installer.ts Codex installer compared with the installed Codex 0.159.2 version."
+    },
+    {
+      "claim": "Native Codex support is absent in Claude-mem or Basic Memory.",
+      "correction": "Current source ships Codex integration/plugin paths.",
+      "verification": "Pinned Claude-mem CodexCliInstaller.ts and Basic Memory plugins/codex/README.md."
+    },
+    {
+      "claim": "MemPalace relies on model-driven blocking save prompts.",
+      "correction": "Current default silent_save=True directly saves using Python; the blocking prompt is a legacy alternative.",
+      "verification": "Pinned mempalace/config.py default and hooks_cli.py direct-save implementation."
+    },
+    {
+      "claim": "Attemory MCP is only planned; GBrain requires hosted retrieval.",
+      "correction": "Attemory ships a read-only MCP module; current GBrain offers keyless keyword retrieval.",
+      "verification": "Pinned Attemory python/attemory/mcp.py and GBrain 0.60.11.0 README."
+    },
+    {
+      "claim": "Mem0 stock native plugins work with its bundled OSS server by changing base URL.",
+      "correction": "Plugin routes /v3/memories/add/, /v3/memories/search/ and /v1/event differ from bundled OSS /memories and /search. Drop-in parity is unqualified.",
+      "verification": "Pinned agent-plugin-core/python/memory_core.py compared with server/main.py."
+    },
+    {
+      "claim": "The failed test run proves a Git repository existed at /tmp.",
+      "correction": "The original report shows tmp identity interference, but later native Git and marker probes found no repository. Owned TMPDIR cleared every failure; original transient cause remains unobserved.",
+      "verification": "Original and corrected report hashes, original filesystem-walking resolver, bounded independent Sol diagnosis."
+    },
+    {
+      "claim": "Earlier assurance described published Hindsight support as conversational QA and architectural fit.",
+      "correction": "The current pinned AMB manifest also contains 18 native coding comparison runs, across three model/client pairs. Agent-only cost is narrower than complete memory lifecycle cost.",
+      "verification": "evidence/artifacts/memory-runtime-resolution-20260930/published-coding-evidence.json"
+    },
+    {
+      "claim": "Earlier current-upstream field identified ai-memory 2.4.2.",
+      "correction": "Fresh release/tag/source checks identify 2.5.0 published September 30; previous 2.4.2 execution retains its actual pin.",
+      "verification": "evidence/artifacts/memory-runtime-resolution-20260930/latestness.json"
+    }
+  ],
+  "comparative_quality": "Not established by vendor benchmarks or package tests.",
+  "usage": {
+    "research_provider_usage": null,
+    "comparative_provider_usage": null,
+    "billing": null,
+    "unknowns_remain_unknown": true
+  },
+  "report": "docs/memory-rag-foundation-20260930.md",
+  "receipt": "evidence/receipts/memory-rag-20260930.json",
+  "convergence_record": "evidence/artifacts/memory-rag-20260930/convergence.json",
+  "assurance_record": "evidence/artifacts/memory-rag-20260930/backbone-assurance.json",
+  "resolution_record": "blueprints/convergence-practice/memory-runtime-resolution-20260930/manifest.json",
+  "coverage": "20 memory candidates plus five document/application retrieval candidates; a broad shortlist rather than every existing repository.",
+  "decision": {
+    "final_candidate": null,
+    "best_backbone_status": "unresolved",
+    "operational_baseline": "ai-memory",
+    "final_verdict": "Recommend Hindsight as the shared native memory target for the new Claude/Codex runtime. Current stable pins, supported lifecycle controls and published native coding comparisons support this choice. A measured overall or token-efficiency winner is still unestablished; retain ai-memory as the operational reference until the replacement gates pass.",
+    "selection_reasons": [
+      "Hindsight combines supported Claude/Codex integration and bank lifecycle controls with published conversational QA and native coding comparisons; our no-LLM backend trial passed scoped persistence, transfer and deletion checks.",
+      "Published SDE-bench comparisons report fewer corrections and 24.04% Claude / 52.26% Codex coding-agent cost reductions against no memory. They do not compare the five memory systems or include memory processing and hosting costs.",
+      "ai-memory remains the canonical operational reference. Latest 2.5.0 adds relevant routing and lifecycle features, but our 2.4.2 qualification does not qualify its new migrations or behavior.",
+      "agentmemory remains a retrieval challenger; its current upstream evaluator mapping prevents comparable quality scores. MemPalace is a reserve retrieval challenger, and Mem0 managed is a conditional comparator.",
+      "Only current deployable native capture, matched task quality and complete lifecycle usage can establish an accepted replacement winner. Keep the final-candidate field null until those gates pass."
+    ],
+    "accepted_memory_of_record": "ai-memory retained",
+    "recommended_lifecycle_trial": "Hindsight",
+    "recommended_retrieval_trial": "agentmemory",
+    "other_shortlisted_trial": "MemPalace",
+    "overall_measured_replacement_winner": null,
+    "basis": "Fit-based recommendation accepted by Astra/max after review of immutable published QA/coding evidence, actual scoped native outcomes and fresh upstream releases. Publisher coding comparisons use a no-memory control and older task-matched models; no new matched five-system quality or complete-cost run.",
+    "scope": "Fresh-prefix foundation installation and isolated current-host native store qualification. ai-memory 2.4.2 passed scoped lifecycle/recovery; Hindsight 0.10.2 passed no-LLM chunk backend checks; agentmemory's current upstream evaluator contract remains unresolved. No production migration, native coding-client capture or matched model-quality/cost acceptance.",
+    "recommended_target": "Hindsight",
+    "recommendation_basis": "fit_based_shared_native_memory_target",
+    "recommendation_status": "priority_target_full_native_capture_and_complete_cost_pending"
+  },
+  "candidates": [
+    {
+      "id": "hindsight",
+      "name": "Hindsight",
+      "repository": "https://github.com/vectorize-io/hindsight",
+      "latest_version": "server 0.10.2 / integration 0.8.0",
+      "source_revision": "f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c",
+      "license": "MIT",
+      "role": "shared native coding-agent lifecycle",
+      "disposition": "priority_quality_lifecycle_trial",
+      "rationale": "Strong shared lifecycle fit and published QA challenger. Current 0.10.2 passed chunk-only retain/recall, restart, bank transfer and source/target deletion controls; integration capture stays disabled. Published QA uses 0.4.19 and substantial answering context. Full extraction/consolidation/reflection, native capture, matched quality and complete cost remain unqualified.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/README.md",
+        "https://github.com/vectorize-io/hindsight/blob/f9d9e2ab88bd237a81bba12f0ac5cf173aafd46c/hindsight-integrations/coding-agents/src/installer.ts"
+      ]
+    },
+    {
+      "id": "ai-memory",
+      "name": "ai-memory",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "latest_version": "2.5.0",
+      "source_revision": "a8757a05a960f96a0ba510b6341bcd520cf80bb2",
+      "license": "MIT",
+      "role": "accepted scoped cross-client memory",
+      "disposition": "retain_accepted_control",
+      "rationale": "Canonical accepted control remains 2.4.1; the fresh CLI version probe reports 2.4.2 without requalifying a running service. Latest 2.5.0 adds server routing, repository identity and optional external lifecycle delivery, source-reviewed only. The earlier 2.4.2 trial passed 101 lifecycle and 65 recovery integration checks plus 42 upstream scope tests; those results do not qualify 2.5.0 migrations or comparative quality/cost.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/akitaonrails/ai-memory/releases/tag/v2.5.0",
+        "https://github.com/akitaonrails/ai-memory/blob/a8757a05a960f96a0ba510b6341bcd520cf80bb2/CHANGELOG.md",
+        "https://github.com/akitaonrails/ai-memory/blob/a8757a05a960f96a0ba510b6341bcd520cf80bb2/docs/external-lifecycle.md",
+        "https://github.com/akitaonrails/ai-memory/blob/a0ca8d1a5fbd5920799411fa891fe6d49c90efc1/docs/lifecycle-ops.md"
+      ]
+    },
+    {
+      "id": "agentmemory",
+      "name": "agentmemory",
+      "repository": "https://github.com/rohitg00/agentmemory",
+      "latest_version": "0.9.29",
+      "source_revision": "2d38dafede67d0d4ed920cde94d2106e98825b8a",
+      "license": "Apache-2.0",
+      "role": "local native coding memory and retrieval",
+      "disposition": "priority_retrieval_trial",
+      "rationale": "Retained Mac REST-path retrieval remains a strong lead. Current unchanged eval stored 15 records and returned search results, but synthetic session IDs bypass the evaluator map, making two 0/15 scores non-comparable. Default keyless resolution is BM25-only unless local embeddings are selected explicitly. Native hooks, production C4 and complete cost remain pending.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/INSTALL_FOR_AGENTS.md",
+        "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/src/cli/connect/codex-hooks.ts",
+        "https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/src/functions/snapshot.ts"
+      ]
+    },
+    {
+      "id": "mempalace",
+      "name": "MemPalace",
+      "repository": "https://github.com/MemPalace/mempalace",
+      "latest_version": "3.10.0",
+      "source_revision": "22fd87f09c19d5ffb2d6966486483353937931c0",
+      "license": "MIT",
+      "role": "local project memory with transcript capture",
+      "disposition": "shortlisted_trial",
+      "rationale": "Current default saves directly with Python. Test short Codex sessions and full restore; vendor retrieval scores do not establish shipped capture quality.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/MemPalace/mempalace/blob/22fd87f09c19d5ffb2d6966486483353937931c0/.codex-plugin/README.md",
+        "https://github.com/MemPalace/mempalace/blob/22fd87f09c19d5ffb2d6966486483353937931c0/mempalace/hooks_cli.py",
+        "https://github.com/MemPalace/mempalace/blob/22fd87f09c19d5ffb2d6966486483353937931c0/mempalace/config.py",
+        "https://github.com/MemPalace/mempalace/blob/22fd87f09c19d5ffb2d6966486483353937931c0/mempalace/backups.py"
+      ]
+    },
+    {
+      "id": "mem0",
+      "name": "Mem0",
+      "repository": "https://github.com/mem0ai/mem0",
+      "latest_version": "OSS Python 2.2.1 / TS 3.3.1 / plugins 0.3.3",
+      "source_revision": "94c3fe9f238f3dbf29c9ce98643bd71eb13077cd",
+      "license": "Apache-2.0",
+      "role": "application memory and Platform native-agent plugins",
+      "disposition": "conditional_managed_alternative",
+      "rationale": "Official Claude/Codex plugins ship, but their Platform API contract differs from the bundled OSS server; URL override alone does not establish local drop-in plugin compatibility.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/mem0ai/mem0/blob/94c3fe9f238f3dbf29c9ce98643bd71eb13077cd/integrations/claude-code-plugin/README.md",
+        "https://github.com/mem0ai/mem0/blob/94c3fe9f238f3dbf29c9ce98643bd71eb13077cd/integrations/agent-plugin-core/python/memory_core.py",
+        "https://github.com/mem0ai/mem0/blob/94c3fe9f238f3dbf29c9ce98643bd71eb13077cd/server/main.py"
+      ]
+    },
+    {
+      "id": "claude-mem",
+      "name": "Claude-mem",
+      "repository": "https://github.com/thedotmack/claude-mem",
+      "latest_version": "13.28.0",
+      "source_revision": "57c38303734482a596b3e2a052b969b30584be0d",
+      "license": "Apache-2.0",
+      "role": "session capture compression search and inspection",
+      "disposition": "conditional_capture_alternative",
+      "rationale": "Current Codex native installer ships; compare scoped capture, provider use, deletion and restore before replacing current writer.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/thedotmack/claude-mem/blob/57c38303734482a596b3e2a052b969b30584be0d/README.md",
+        "https://github.com/thedotmack/claude-mem/blob/57c38303734482a596b3e2a052b969b30584be0d/src/services/integrations/CodexCliInstaller.ts",
+        "https://github.com/thedotmack/claude-mem/blob/57c38303734482a596b3e2a052b969b30584be0d/docs/public/usage/export-import.mdx"
+      ]
+    },
+    {
+      "id": "basic-memory",
+      "name": "Basic Memory",
+      "repository": "https://github.com/basicmachines-co/basic-memory",
+      "latest_version": "0.23.2",
+      "source_revision": "c0bd87c6d5a4a58034b1d6c8c5018e443b0bd048",
+      "license": "AGPL-3.0-or-later",
+      "role": "human-editable Markdown knowledge and native plugins",
+      "disposition": "conditional_notes_alternative",
+      "rationale": "Both client plugins ship. Existing synthetic lexical operations are narrower than semantic or whole-lifecycle quality; deployment license is an explicit profile attribute.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/basicmachines-co/basic-memory/blob/c0bd87c6d5a4a58034b1d6c8c5018e443b0bd048/plugins/codex/README.md",
+        "https://github.com/basicmachines-co/basic-memory/blob/c0bd87c6d5a4a58034b1d6c8c5018e443b0bd048/plugins/claude-code/docs/architecture.md"
+      ]
+    },
+    {
+      "id": "supermemory",
+      "name": "Supermemory",
+      "repository": "https://github.com/supermemoryai/supermemory",
+      "latest_version": "server-v0.0.8",
+      "source_revision": "5d2b5855fe492a3682a1cde4a255e2db0c4db595",
+      "license": "MIT repository; distributed engine coverage not qualified",
+      "role": "memory search and profile service",
+      "disposition": "conditional_alternative",
+      "rationale": "Native integrations and local endpoints exist. Keep current documentation source ce4facf662b278713578450f704ab2d7d11b1865 separate from older released server; engine provenance and lifecycle need qualification.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/supermemoryai/supermemory/blob/5d2b5855fe492a3682a1cde4a255e2db0c4db595/README.md"
+      ]
+    },
+    {
+      "id": "graphiti",
+      "name": "Graphiti",
+      "repository": "https://github.com/getzep/graphiti",
+      "latest_version": "0.30.2",
+      "source_revision": "eaa4128681bc53487138a4bbc22d58336ebe70d2",
+      "license": "Apache-2.0",
+      "role": "temporal graph MCP",
+      "disposition": "conditional_graph_specialist",
+      "rationale": "Temporal identities and relations are a distinct requirement; upstream Docker backup/restore ships. Managed Zep QA scores do not establish OSS Graphiti quality.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/getzep/graphiti/blob/eaa4128681bc53487138a4bbc22d58336ebe70d2/mcp_server/README.md",
+        "https://github.com/getzep/graphiti/blob/eaa4128681bc53487138a4bbc22d58336ebe70d2/mcp_server/docker/README.md"
+      ]
+    },
+    {
+      "id": "letta-code",
+      "name": "Letta Code",
+      "repository": "https://github.com/letta-ai/letta-code",
+      "latest_version": "0.34.0",
+      "source_revision": "96eb977b9477045423005a3630e5f9293140249a",
+      "license": "Apache-2.0",
+      "role": "stateful agent runtime",
+      "disposition": "conditional_worker_architecture",
+      "rationale": "A stateful harness/delegation choice rather than the same shared-hook integration shape. Latest Memory Palace feature is Cloud-only.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/letta-ai/letta-code/blob/96eb977b9477045423005a3630e5f9293140249a/README.md"
+      ]
+    },
+    {
+      "id": "cognee",
+      "name": "Cognee",
+      "repository": "https://github.com/topoteretes/cognee",
+      "latest_version": "1.6.2",
+      "source_revision": "ba3631f2ed363a6ea50d649c34c56885af6b36fe",
+      "license": "Apache-2.0",
+      "role": "graph and context processing",
+      "disposition": "conditional_graph_context_trial",
+      "rationale": "Current local GLiNER extraction can build memory without an LLM API key; local models still download. Select and qualify provider and integration profile.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/topoteretes/cognee/blob/ba3631f2ed363a6ea50d649c34c56885af6b36fe/README.md"
+      ]
+    },
+    {
+      "id": "openviking",
+      "name": "OpenViking",
+      "repository": "https://github.com/volcengine/OpenViking",
+      "latest_version": "0.4.22",
+      "source_revision": "e8716760934d95ef73414484a45bfe475b9296e2",
+      "license": "AGPL-3.0",
+      "role": "hierarchical resource memory skill context",
+      "disposition": "conditional_unified_context_trial",
+      "rationale": "Both clients have native hooks/MCP. Trial when fragmented context is a measured problem; evaluate selected embedding/VLM configuration.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/volcengine/OpenViking/blob/e8716760934d95ef73414484a45bfe475b9296e2/README.md"
+      ]
+    },
+    {
+      "id": "honcho",
+      "name": "Honcho",
+      "repository": "https://github.com/plastic-labs/honcho",
+      "latest_version": "3.2.1",
+      "source_revision": "79cb31645f4efdef626d1bd9316a648adb5da89b",
+      "license": "AGPL-3.0",
+      "role": "peer and session reasoning memory",
+      "disposition": "conditional_peer_modeling_trial",
+      "rationale": "Current coding-agent integrations and local/self-hosted CLI exist. Background worker/database and provider profile require acceptance.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/plastic-labs/honcho/blob/79cb31645f4efdef626d1bd9316a648adb5da89b/README.md"
+      ]
+    },
+    {
+      "id": "everos",
+      "name": "EverOS from EverMemOS",
+      "repository": "https://github.com/EverMind-AI/EverMemOS",
+      "latest_version": "1.4.1",
+      "source_revision": "462ebf9fd59b55c03fefb8eec855c62500f2a3cf",
+      "license": "Apache-2.0",
+      "role": "local Markdown SQLite LanceDB memory",
+      "disposition": "conditional_local_trial",
+      "rationale": "Current architecture is local-first; do not retain older mandatory MongoDB/Elasticsearch/Redis descriptions as current truth.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/EverMind-AI/EverMemOS/blob/462ebf9fd59b55c03fefb8eec855c62500f2a3cf/README.md"
+      ]
+    },
+    {
+      "id": "memos",
+      "name": "MemOS",
+      "repository": "https://github.com/MemTensor/MemOS",
+      "latest_version": "2.0.34",
+      "source_revision": "41bf5c7fa89ee08ebedf3c662638b06fc29aca8d",
+      "license": "Apache-2.0",
+      "role": "memory APIs and multiple agent plugin profiles",
+      "disposition": "conditional_application_trial",
+      "rationale": "Profiles vary materially between local SQLite plugins and heavier server stacks. Select intended client/profile and measure it.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/MemTensor/MemOS/blob/41bf5c7fa89ee08ebedf3c662638b06fc29aca8d/README.md"
+      ]
+    },
+    {
+      "id": "attemory",
+      "name": "Attemory",
+      "repository": "https://github.com/AttemorySystem/attemory",
+      "latest_version": "0.1.3",
+      "source_revision": "603c03afa9a04e48b778922eae156a0024752f37",
+      "license": "MIT repository; core artifact coverage unqualified",
+      "role": "local attention retrieval",
+      "disposition": "defer_core_qualification",
+      "rationale": "A read-only Python MCP adapter now ships; core distribution/source/license coverage and matched lifecycle remain gaps.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/AttemorySystem/attemory/blob/603c03afa9a04e48b778922eae156a0024752f37/python/attemory/mcp.py"
+      ]
+    },
+    {
+      "id": "gbrain",
+      "name": "GBrain",
+      "repository": "https://github.com/garrytan/gbrain",
+      "latest_version": "0.60.11.0",
+      "source_revision": "f8d1e3936d908935ce96e18c14249aecd85fb5b2",
+      "license": "MIT",
+      "role": "persistent knowledge retrieval",
+      "disposition": "optional_local_retrieval_trial",
+      "rationale": "Current quickstart supports keyless keyword retrieval. Older hosted-model results do not qualify this configuration.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/garrytan/gbrain/blob/f8d1e3936d908935ce96e18c14249aecd85fb5b2/README.md"
+      ]
+    },
+    {
+      "id": "memento-mcp",
+      "name": "memento-mcp",
+      "repository": "https://github.com/lfrmonteiro99/memento-mcp",
+      "latest_version": "2.3.0",
+      "source_revision": "63e6d0d236f11859a20c359909f89d32b5846718",
+      "license": "MIT",
+      "role": "typed SQLite coding memory",
+      "disposition": "lower_priority_lightweight_alternative",
+      "rationale": "Actual installer supports Claude/Cursor/manual; advertised Codex support is not a demonstrated one-shot native installer.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/lfrmonteiro99/memento-mcp/blob/63e6d0d236f11859a20c359909f89d32b5846718/src/cli/install.ts",
+        "https://github.com/lfrmonteiro99/memento-mcp/blob/63e6d0d236f11859a20c359909f89d32b5846718/README.md"
+      ]
+    },
+    {
+      "id": "memento-memory",
+      "name": "Shane Farkas Memento",
+      "repository": "https://github.com/shane-farkas/memento-memory",
+      "latest_version": "PyPI 0.1.0; current reviewed source",
+      "source_revision": "3dec57ae5e22a3ae2c2580b6f6ffcffba28b8a21",
+      "license": "MIT",
+      "role": "bitemporal graph MCP memory",
+      "disposition": "conditional_graph_trial",
+      "rationale": "Forgetting is soft archival; QA benchmark differs from registered recall metric, and Codex YAML recipe is stale.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/shane-farkas/memento-memory/blob/3dec57ae5e22a3ae2c2580b6f6ffcffba28b8a21/src/memento/mcp_server.py",
+        "https://github.com/shane-farkas/memento-memory/blob/3dec57ae5e22a3ae2c2580b6f6ffcffba28b8a21/BENCHMARKS.md"
+      ]
+    },
+    {
+      "id": "memento-vault",
+      "name": "Memento Vault",
+      "repository": "https://github.com/sandsower/memento-vault",
+      "latest_version": "5.0.0",
+      "source_revision": "c3fef1db59e125a152ac386db2c79dab0dc0cc32",
+      "license": "MIT",
+      "role": "Markdown git note vault",
+      "disposition": "conditional_notes_trial",
+      "rationale": "Claude lifecycle and MCP exist; native Codex lifecycle remains unqualified.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/sandsower/memento-vault/blob/c3fef1db59e125a152ac386db2c79dab0dc0cc32/README.md"
+      ]
+    },
+    {
+      "id": "qmd",
+      "name": "QMD",
+      "repository": "https://github.com/tobi/qmd",
+      "latest_version": "2.8.3",
+      "source_revision": "facd35e01359e59d938bc9418e93fb9318addee3",
+      "license": "MIT",
+      "role": "selected document retrieval",
+      "disposition": "retain_selected_document_role",
+      "rationale": "Local BM25 and optional hybrid/vector/reranking remain scoped retrieval, not automatic durable session capture.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/tobi/qmd/blob/facd35e01359e59d938bc9418e93fb9318addee3/README.md"
+      ]
+    },
+    {
+      "id": "llamaindex",
+      "name": "LlamaIndex",
+      "repository": "https://github.com/run-llama/llama_index",
+      "latest_version": "0.14.25",
+      "source_revision": "f12d46acab73f5b2243ef49c2f00101617b38ce4",
+      "license": "MIT",
+      "role": "application document RAG SDK",
+      "disposition": "conditional_application_pipeline",
+      "rationale": "Useful application framework; adding it does not establish improved native-client capture. Current upstream emphasis includes document parsing.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/run-llama/llama_index/blob/f12d46acab73f5b2243ef49c2f00101617b38ce4/README.md"
+      ]
+    },
+    {
+      "id": "haystack",
+      "name": "Haystack",
+      "repository": "https://github.com/deepset-ai/haystack",
+      "latest_version": "3.2.0",
+      "source_revision": "cf1dfe80dc6cb0286aebb23c93455895e559668e",
+      "license": "Apache-2.0",
+      "role": "application RAG and agent pipeline SDK",
+      "disposition": "conditional_application_pipeline",
+      "rationale": "Prefer for a deliberately engineered retrieval application with explicit component controls; native-client memory acceptance is separate.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/deepset-ai/haystack/blob/cf1dfe80dc6cb0286aebb23c93455895e559668e/README.md"
+      ]
+    },
+    {
+      "id": "lightrag",
+      "name": "LightRAG",
+      "repository": "https://github.com/HKUDS/LightRAG",
+      "latest_version": "1.5.7",
+      "source_revision": "28ff1b05f2ac3f3e6fa14dd2cd33656579bd0c9c",
+      "license": "MIT",
+      "role": "graph and document RAG",
+      "disposition": "conditional_application_pipeline",
+      "rationale": "Requires selected inference/embedding/storage profile and representative corpus; not a proven shared native-client lifecycle replacement.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/HKUDS/LightRAG/blob/28ff1b05f2ac3f3e6fa14dd2cd33656579bd0c9c/README.md"
+      ]
+    },
+    {
+      "id": "ragflow",
+      "name": "RAGFlow",
+      "repository": "https://github.com/infiniflow/ragflow",
+      "latest_version": "1.0.0-rc1 preview",
+      "source_revision": "14bb02ee4584c1ab18f0c722c48beecd6bbf9860",
+      "license": "Apache-2.0",
+      "role": "document ingestion and retrieval platform",
+      "disposition": "independent_preview_trial",
+      "rationale": "Newest release is a preview rewrite with irreversible migration warning. Keep isolated from simple native-memory adoption.",
+      "evidence_class": "current_pinned_source_review",
+      "sources": [
+        "https://github.com/infiniflow/ragflow/blob/14bb02ee4584c1ab18f0c722c48beecd6bbf9860/README.md"
+      ]
+    }
+  ],
+  "candidate_count": 25,
+  "separate_existing_roles": [
+    "Scoped code RAG with SocratiCode/Qdrant and accepted embedding runtime",
+    "Exact source navigation with Serena/ast-grep/static graph",
+    "Transient tool-output/session context with Context Mode",
+    "Task/dependency state where Beads is selected"
+  ],
+  "freshness_method": "Installed version/help, authenticated gh release/tag API, pinned source and registry metadata. Anonymous API rate-limit failures were retained as channel failures and recovered with gh; they do not imply missing capabilities.",
+  "repository_validation": {
+    "catalog_structure": "passed",
+    "scoped_convergence_record": "passed",
+    "publication_validator_exit_code": 0,
+    "publication_errors_in_this_review_paths": 0,
+    "publication_errors_elsewhere_at_observation": 0,
+    "interpretation": "Fresh full publication validator passed: 69 components, 8277 hashed files, 4 profiles, 177 receipts. Integrity and scope checks only, no live provider/GPU execution. Earlier concurrent publication failures remain in prior_observation and the publication record.",
+    "prior_observation": {
+      "publication_validator_exit_code": 1,
+      "publication_errors_in_this_review_paths": 0,
+      "publication_errors_elsewhere_at_observation": 33,
+      "interpretation": "Concurrent shared-checkout hash changes and unregistered artifacts remain with their owning work. This review's files are registered; no commit or complete publication acceptance is claimed."
+    }
+  },
+  "latestness": {
+    "checked_at": "2026-10-01T00:22:46.431362+00:00",
+    "scope": "Focused fresh check of the five finalists and supporting native foundation; other candidates retain earlier same-day review.",
+    "record": "evidence/artifacts/memory-runtime-resolution-20260930/latestness.json",
+    "memory_release_summary": "Hindsight server 0.10.2 / integration 0.8.0; ai-memory 2.5.0; agentmemory 0.9.29; MemPalace 3.10.0; Mem0 Python 2.2.1 (TS 3.3.1 is separate).",
+    "native_client_summary": "Installed Codex 0.159.2 remains the qualified client. Latest stable Codex 0.159.3 @01fc69f4026735edfdf6789820549727a4867b11 was released at 2026-09-30T22:57:34Z; no 0.159.3 migration or new qualification is claimed. Claude 2.1.286, QMD 2.8.3, RTK 0.50.0 and MCPorter 0.14.1 match the retained stable release checks. Context-mode 1.0.169 matches retained recipe/metadata evidence.",
+    "remaining_version_gaps": "Codex installed/qualified 0.159.2 versus latest 0.159.3. ai-memory CLI 2.4.2 versus latest 2.5.0, with canonical accepted pin 2.4.1. WSL 2.7.13.0 versus upstream 3.0.1. New release migrations and OS upgrade remain unaccepted.",
+    "evidence_interpretation": "Latest release identity is not evidence of best quality, least cost or runtime acceptance."
+  }
+}

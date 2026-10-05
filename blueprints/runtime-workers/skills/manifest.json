@@ -456,10 +456,10 @@
     {
       "name": "codebase-design",
       "source": "mattpocock/skills",
-      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/codebase-design",
-      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/codebase-design",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
       "path": "skills/engineering/codebase-design",
-      "tree_sha": "344e3efc88ee60663b2e989555c2efdb548fbd42",
+      "tree_sha": "07ba1cd60efc12d0d3a083005c1d9651cf15e39a",
       "skill_md_sha256": "2c20617f87ec8af6a434859f381b2f061a69b530444e74eb39e78bb016a6d1e2",
       "skill_md_bytes": 6446,
       "description_chars": 265,
@@ -474,7 +474,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Provides interface and module-boundary criteria for testable caller integrations. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/engineering/codebase-design/SKILL.md:1",
+      "merit_note": "Provides interface and module-boundary criteria for testable caller integrations. Source: mattpocock/skills@d81f3a183412e71a5b1e84ca21bc1a35eea03a60 skills/engineering/codebase-design/SKILL.md:1",
       "reuse_ref": "adoption/skills/manifest.json"
     },
     {
@@ -545,12 +545,12 @@
     {
       "name": "diagnosing-bugs",
       "source": "mattpocock/skills",
-      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/diagnosing-bugs",
-      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/diagnosing-bugs",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
       "path": "skills/engineering/diagnosing-bugs",
-      "tree_sha": "99bd56983e42bc752c52da67f1112e4121781cd1",
-      "skill_md_sha256": "77f3cf31bc99b2f49af943222526531fcc9fc41d047626d3640e875e85af3e84",
-      "skill_md_bytes": 8529,
+      "tree_sha": "de4236cf34757c4e9ea7afe78d46c023213ff254",
+      "skill_md_sha256": "9168404abda0967a5d32977e3498cd95fda6807018852f3de736a78357c82b40",
+      "skill_md_bytes": 8530,
       "description_chars": 156,
       "upstream_disable_model_invocation": false,
       "scenarios": [
@@ -563,7 +563,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Uses hypothesis-driven diagnosis and root-cause evidence before proposing fixes. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/engineering/diagnosing-bugs/SKILL.md:1",
+      "merit_note": "Uses hypothesis-driven diagnosis and root-cause evidence before proposing fixes. Source: mattpocock/skills@d81f3a183412e71a5b1e84ca21bc1a35eea03a60 skills/engineering/diagnosing-bugs/SKILL.md:1",
       "reuse_ref": "adoption/skills/manifest.json"
     },
     {
@@ -1254,12 +1254,12 @@
     {
       "name": "improve-codebase-architecture",
       "source": "mattpocock/skills",
-      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/improve-codebase-architecture",
-      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/improve-codebase-architecture",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
       "path": "skills/engineering/improve-codebase-architecture",
-      "tree_sha": "3d35cd438f4067b03c8b3792e038960e4ac11526",
-      "skill_md_sha256": "d1ac25511a936ff4250a48dbcefda363837d6bb9321b3cba73df99fa37270a75",
-      "skill_md_bytes": 5993,
+      "tree_sha": "39bd9cc130f7dfcc4e3ea0b3613f6ebed0d0ad2b",
+      "skill_md_sha256": "552240a5ab5cec6b67c15dd1ad6e9f6962b1bca6ce870059a8c2713760c20392",
+      "skill_md_bytes": 6000,
       "description_chars": 125,
       "upstream_disable_model_invocation": true,
       "scenarios": [
@@ -1272,7 +1272,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Provides interface and module-boundary criteria for testable caller integrations. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/engineering/improve-codebase-architecture/SKILL.md:1",
+      "merit_note": "Provides interface and module-boundary criteria for testable caller integrations. Source: mattpocock/skills@d81f3a183412e71a5b1e84ca21bc1a35eea03a60 skills/engineering/improve-codebase-architecture/SKILL.md:1",
       "reuse_ref": "adoption/skills/manifest.json"
     },
     {
@@ -2101,29 +2101,6 @@
       "merit_note": "Defines recurring source-led research briefs with verifiable sources; Tavily/Notion integrations require native setup and publishing authority. Source: OpenHands/extensions@bea7a20c59c44ec4dacddac3fc0efe58b9c73880 skills/research-brief/SKILL.md:1"
     },
     {
-      "name": "resolving-merge-conflicts",
-      "source": "mattpocock/skills",
-      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/resolving-merge-conflicts",
-      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
-      "path": "skills/engineering/resolving-merge-conflicts",
-      "tree_sha": "77f0d7de3143abbf03e55a63522d30bff31ae908",
-      "skill_md_sha256": "9d8114f8ef0b31f535a265fc05c364bd8cf2e2895a830040e06c22acb11f54b0",
-      "skill_md_bytes": 918,
-      "description_chars": 70,
-      "upstream_disable_model_invocation": false,
-      "scenarios": [
-        "github-issue-to-pr",
-        "github-pr-review"
-      ],
-      "roles": [
-        "coding",
-        "orchestration"
-      ],
-      "status": "trial",
-      "merit_note": "Covers source-control state, conflicts and integration steps through native git/GitHub operations. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/engineering/resolving-merge-conflicts/SKILL.md:1",
-      "reuse_ref": "adoption/skills/manifest.json"
-    },
-    {
       "name": "sarif-parsing",
       "source": "trailofbits/skills",
       "url": "https://github.com/trailofbits/skills/tree/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae/plugins/static-analysis/skills/sarif-parsing",
@@ -2192,13 +2169,13 @@
     {
       "name": "search-first",
       "source": "affaan-m/ECC",
-      "url": "https://github.com/affaan-m/ECC/tree/2b6e839771e53096d8451a213d40dc64ec8acac0/skills/search-first",
-      "ref": "2b6e839771e53096d8451a213d40dc64ec8acac0",
+      "url": "https://github.com/affaan-m/ECC/tree/c70874fae9eb0e5ad0365beb7e2955899fd1d30f/skills/search-first",
+      "ref": "c70874fae9eb0e5ad0365beb7e2955899fd1d30f",
       "path": "skills/search-first",
-      "tree_sha": "89e0ce14188958a85fbfc7ae0bdc30a0dc9681e1",
-      "skill_md_sha256": "d66d744228b9cf860acf35f8a90cbbe8195e61367860da9d3632f9fc65706733",
-      "skill_md_bytes": 8021,
-      "description_chars": 141,
+      "tree_sha": "3ac0daf42ee5c7d0cbe28c399f02ff057283b889",
+      "skill_md_sha256": "76835db48dd910061d2e4271b1151793d2fddbabeb2d2866eed068b3580c55d5",
+      "skill_md_bytes": 8210,
+      "description_chars": 328,
       "upstream_disable_model_invocation": false,
       "scenarios": [
         "research",
@@ -2211,7 +2188,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Compares existing repositories, packages and skills before writing integration code, directly supporting coding and orchestration work. Source: affaan-m/ECC@2b6e839771e53096d8451a213d40dc64ec8acac0 skills/search-first/SKILL.md:1",
+      "merit_note": "Compares existing repositories, packages and skills before writing integration code, directly supporting coding and orchestration work. Source: affaan-m/ECC@c70874fae9eb0e5ad0365beb7e2955899fd1d30f skills/search-first/SKILL.md:1",
       "reuse_ref": "adoption/skills/manifest.json"
     },
     {
@@ -2285,12 +2262,12 @@
     {
       "name": "semgrep",
       "source": "trailofbits/skills",
-      "url": "https://github.com/trailofbits/skills/tree/0cc1c73a5e96749ab32d7ea5e14892fafa6972ae/plugins/static-analysis/skills/semgrep",
-      "ref": "0cc1c73a5e96749ab32d7ea5e14892fafa6972ae",
+      "url": "https://github.com/trailofbits/skills/tree/82fe8226252622fa807643bdca1710901198553a/plugins/static-analysis/skills/semgrep",
+      "ref": "82fe8226252622fa807643bdca1710901198553a",
       "path": "plugins/static-analysis/skills/semgrep",
-      "tree_sha": "7503c4bec67cbe758ee488a2bd4caaf618facbfb",
-      "skill_md_sha256": "04df36a7685632ee39271aa432a4d32e1203b326e4a8091e6f5c0eb191ef90f1",
-      "skill_md_bytes": 15531,
+      "tree_sha": "32c70e1f8ab600ce747ae84821f987ae05242c60",
+      "skill_md_sha256": "52162605593f871cf45f48f9cf00b7c2d7e0759ccb7507981088442b7cc5d76c",
+      "skill_md_bytes": 15678,
       "description_chars": 707,
       "upstream_disable_model_invocation": false,
       "scenarios": [
@@ -2301,7 +2278,7 @@
         "orchestration"
       ],
       "status": "trial",
-      "merit_note": "Supplies maintained security scanning or finding triage with explicit evidence and false-positive handling. Source: trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae plugins/static-analysis/skills/semgrep/SKILL.md:1",
+      "merit_note": "Supplies maintained security scanning or finding triage with explicit evidence and false-positive handling. Source: trailofbits/skills@82fe8226252622fa807643bdca1710901198553a plugins/static-analysis/skills/semgrep/SKILL.md:1",
       "reuse_ref": "adoption/skills/manifest.json"
     },
     {
@@ -2570,12 +2547,12 @@
     {
       "name": "tdd",
       "source": "mattpocock/skills",
-      "url": "https://github.com/mattpocock/skills/tree/c55ee46073ed923f86ce59a5eb3b6d895095d1b7/skills/engineering/tdd",
-      "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
+      "url": "https://github.com/mattpocock/skills/tree/d81f3a183412e71a5b1e84ca21bc1a35eea03a60/skills/engineering/tdd",
+      "ref": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
       "path": "skills/engineering/tdd",
-      "tree_sha": "79288be15c67b849f22b6572056601090fd20913",
-      "skill_md_sha256": "cb01f66bebfaa25fa1f88e6b7e769cd9fd9f35b1120b8563749820738814c927",
-      "skill_md_bytes": 3549,
+      "tree_sha": "bf1bf5ffcd63aa8abce830f2955a853c121fb463",
+      "skill_md_sha256": "93ea419b76e9caaf26153b828e984f7c3fb136f4caa67b14af95f32ea965a1cc",
+      "skill_md_bytes": 3550,
       "description_chars": 149,
       "upstream_disable_model_invocation": false,
       "scenarios": [
@@ -2587,7 +2564,7 @@
         "extraction-caller"
       ],
       "status": "trial",
-      "merit_note": "Defines a red/green loop and behavior-level tests; callers can test deterministic extraction contracts. Source: mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7 skills/engineering/tdd/SKILL.md:1",
+      "merit_note": "Defines a red/green loop and behavior-level tests; callers can test deterministic extraction contracts. Source: mattpocock/skills@d81f3a183412e71a5b1e84ca21bc1a35eea03a60 skills/engineering/tdd/SKILL.md:1",
       "reuse_ref": "adoption/skills/manifest.json"
     },
     {
@@ -3408,7 +3385,6 @@
         "github-issue-triage",
         "github-repo-monitor",
         "jira-issue-to-pr",
-        "resolving-merge-conflicts",
         "ticket-to-code-change",
         "upstream-fork-sync"
       ],
@@ -3419,7 +3395,6 @@
         "github-issue-triage",
         "github-repo-monitor",
         "jira-issue-to-pr",
-        "resolving-merge-conflicts",
         "ticket-to-code-change",
         "upstream-fork-sync"
       ],
@@ -3438,7 +3413,6 @@
         "github-pr-reviewer",
         "receiving-code-review",
         "requesting-code-review",
-        "resolving-merge-conflicts",
         "setup-pr-review",
         "upstream-fork-sync"
       ],
@@ -3453,7 +3427,6 @@
         "github-pr-reviewer",
         "receiving-code-review",
         "requesting-code-review",
-        "resolving-merge-conflicts",
         "setup-pr-review",
         "upstream-fork-sync"
       ],
@@ -4533,7 +4506,7 @@
       "ref": "c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
       "resolved_via": "gh api repos/mattpocock/skills/commits/c55ee46073ed923f86ce59a5eb3b6d895095d1b7",
       "commit_date": "2026-09-18T10:12:29Z",
-      "selected_skills": 12,
+      "selected_skills": 11,
       "tree_response_truncated": false
     },
     {
@@ -4594,9 +4567,9 @@
     }
   ],
   "budget": {
-    "selected_count": 137,
-    "skill_md_bytes": 1020955,
-    "description_chars": 36739,
+    "selected_count": 136,
+    "skill_md_bytes": 1020382,
+    "description_chars": 36856,
     "provider_input_tokens_before": null,
     "provider_input_tokens_after": null,
     "meaning": "Catalog byte/character sums only, not first-prompt tokens. Measure native requests as specified in README."
