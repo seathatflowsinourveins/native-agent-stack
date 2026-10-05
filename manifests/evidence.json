@@ -16676,8 +16676,8 @@
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-rebuild.md",
-      "sha256": "b2d99153c8dffb6169923e9129cfb6e4343cd9f5fc443ad8839fa5f162e20c1e",
-      "bytes": 37375
+      "sha256": "b4fdfffd261e8884ca1b7ce4ab9c89fc05fdcfcff44cd57b42cfcc05210dbb2b",
+      "bytes": 37510
     },
     {
       "path": "docs/decisions/2026-09-30-omniroute-runtime-workers.md",
@@ -16925,6 +16925,11 @@
       "bytes": 129176
     },
     {
+      "path": "docs/decisions/2026-10-05-omniroute-gateway-composition.md",
+      "sha256": "2859b9a07848be5666856121e1bd350e0c08389826718e96334354dd0ac9ecc7",
+      "bytes": 22114
+    },
+    {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
       "sha256": "976b8e8c3ede42aa2ce26c01dbca5184cf45e329419a065e169bc0936f093051",
       "bytes": 14176
@@ -17026,8 +17031,8 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "c5211cd4fdf9824db1638fba1290dfb012a448a7f0fb06289d36ddd24239eec9",
-      "bytes": 41611
+      "sha256": "9d49b5052129b31a081f356c0bc750480ac4e5cc98d7b9606f6d4df7b9471357",
+      "bytes": 41689
     },
     {
       "path": "docs/full-stack-convergence.md",
@@ -41568,6 +41573,131 @@
       "path": "evidence/artifacts/omniroute-sol-max-20260930/scripts/trap_smoke_inner.sh.txt",
       "sha256": "c65f28d30ccd96cb4430d7c66b746ea663888b9006acf07a0842a33ec3b49069",
       "bytes": 2149
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/README.md",
+      "sha256": "4616f2215931190f7f59b66acf1a5c6a0ce2d642acb7c751a838a0b257ed1cf5",
+      "bytes": 6762
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/checks/affinity-patch-source.diff",
+      "sha256": "ebc2daab1268ad8ebfac23602a05737125f98cf58cf78c88d17c3c13f509ac2c",
+      "bytes": 8691
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/checks/affinity-test-results.txt",
+      "sha256": "695e703ac013ed5f7729a3d20bd8ac1b1310a920c338d7af6097f27dc245a716",
+      "bytes": 5952
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/checks/build-notes.txt",
+      "sha256": "a74791ed8b520316a9dabc45f8abe321b9dce1c371bb33cfd0a7e4781314c95f",
+      "bytes": 3770
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/checks/composition-trees.txt",
+      "sha256": "18560993f504fce6d834c80107abec4afeb328841e8fd90565cfbf52fa97dfef",
+      "bytes": 1042
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/checks/gateway-record-before.json",
+      "sha256": "fcfcd86bb65ce5730533bbee7e17b224a2756bac381cfd2e9faebeb4b07d3eaf",
+      "bytes": 2806
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/checks/live-effort.json",
+      "sha256": "c9cffe0c7a267133beb6f5b4a744b8bcacd481162c5106d5417a9244339aed97",
+      "bytes": 3711
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/checks/live-requests.json",
+      "sha256": "f13e0dbd965a63d6e5c964aa5f15566d91566e7576287186de40cf5b8939f5dc",
+      "bytes": 7917
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/checks/pr13788-carried-patch-ids.txt",
+      "sha256": "42c5901a82dde297cf74b4a264d8d638ddddc6c0f7276db155b809c4028e7938",
+      "bytes": 1895
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/checks/source-identity.json",
+      "sha256": "7fc7fe16d2f635199b4a020750e378fd30899c3726ab1a7d22132b944f574013",
+      "bytes": 2954
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/checks/usage-7d.json",
+      "sha256": "ec965b5b1f31c65e3a9a6ea9014ac808e92b7dabd25a3b5c03b9d9b25605676c",
+      "bytes": 839
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/checks/wire-probe-with-15167.txt",
+      "sha256": "d4dd59744ff6c985e6a9ed824832aa98d76c2ee5c8215b500547daff657b3d16",
+      "bytes": 873
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/checks/wire-probe-without-15167.txt",
+      "sha256": "6c5ea0fa367f13f8d0c6deda66f36f24220a35324ff29804da402639f56d8974",
+      "bytes": 897
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/patches/045aa81f3.patch",
+      "sha256": "e1006768090218fdac18edb0f9732e9e2ef892fbbadfb7aa8afc8e96e4993c69",
+      "bytes": 21294
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/patches/045aa81f3.review-note.txt",
+      "sha256": "e1b2b05bfa440852ed39f0b3d819f4034324f3aac54644be2bc6970df35758a3",
+      "bytes": 1013
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/scripts/affinity-test.sh.txt",
+      "sha256": "35c18fc4f6aee0f55c59297113a6323a690fee75a7e8c5ccfbf9bf4dc72ea4a3",
+      "bytes": 6236
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/scripts/build-15167-affinity.sh.txt",
+      "sha256": "1bf2490a3e64348526012ec1fbe878b0403df8bc0589e79d9fcc8869253596d5",
+      "bytes": 1171
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/scripts/build-affinity.sh.txt",
+      "sha256": "e0211db4c1b5d7694ebaf9701210fda2d1c8ff5d8c53f69656101bd9d8abf074",
+      "bytes": 2182
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/scripts/cache-share.py.txt",
+      "sha256": "2593c53c914f23d106c706bdaeaf31c95f6719acd68a8b4a80ea3798df320771",
+      "bytes": 2627
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/scripts/collect_evidence.py.txt",
+      "sha256": "8ddaec5f7614371d9b12d750cc86bf5b6ddfb3ac7e8b011f7a69e4ad2751936a",
+      "bytes": 5754
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/scripts/effort_live.py.txt",
+      "sha256": "f43b9228b8a054c3e2d15fd192e92b6075f179883f8200ec1feaf746d9a37e95",
+      "bytes": 1937
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/scripts/smoke.sh.txt",
+      "sha256": "fc4e7e956d79eda5af4cdc16cace6bea224340e8e485a7b715010bdf664fa54d",
+      "bytes": 1386
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/scripts/stickiness-probe.sh.txt",
+      "sha256": "a8ac783c1a974da57e512a99ed6313e1bd1329015396733c00eb25d87d7085ea",
+      "bytes": 1610
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/scripts/usage_7d.py.txt",
+      "sha256": "208880a588cd23bea0cc3568daa110af207eafffa6c28e572e2ef840aae5cadf",
+      "bytes": 1879
+    },
+    {
+      "path": "evidence/artifacts/omniroute-wire-effort-20261005/scripts/wire-probe.mts.txt",
+      "sha256": "9ca3af2dbe348bd7b072b4846d10434180b997594028e8b1e31cf96cad04e4f5",
+      "bytes": 1849
     },
     {
       "path": "evidence/artifacts/openhands-oauthlib-review-535-20260930/README.md",

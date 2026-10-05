@@ -128,7 +128,7 @@ Every claim carries the evidence class used in the receipt (`receipt.json`, `evi
 | `lsof` shim on `PATH` | both units | port preflight on a free port | redundant now: upstream #14812 (`8183e9b79`, `resolveServeBusyPids`) is in 2f42a9ac1; drop at the next rebuild after a free-port start passes without it |
 | settings above (512, `compressToolResults` false, headroom off in the engines map) | 20129 | defect mitigations | upstream fixes the defects |
 
-While the affinity patch runs, create no OAuth (Codex) routing combo on 20128 (standing constraint F1, the same rule as
+While the affinity patch runs, create no OAuth (Codex) routing combo on 20128, nor (extended 2026-10-05, `2026-10-05-omniroute-gateway-composition.md`) on 21128 and 21129 for as long as the composition runs there (standing constraint F1, the same rule as
 in `docs/foundation-stack.md`). Basis: the patch changes what the combo availability check does to session pins (its
 commit message, on `chat.ts:1096-1108`: the check "passes no reserveOAuthSession, and the dispatch reuses the pin it
 writes"); its regression test (e) covers that path with a fixture only, and no routing combo over Codex accounts has
