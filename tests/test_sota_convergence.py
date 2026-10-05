@@ -107,10 +107,15 @@ class FreshnessReviewThreadTests(unittest.TestCase):
              ("FreshnessReviewThreadTests.test_refetch_skips_unrelated_non_dict_records_and_normalizes_alias_urls",)),
             ("Claiming anti-pattern verification beyond the checked rows and methods", "tests/test_sota_convergence.py",
              ("FreshnessReviewThreadTests.test_prior_repairs_have_unique_anti_pattern_rows_with_prevention_and_verification",
-              "FreshnessReviewThreadTests.test_anti_pattern_verification_rejects_missing_rows_and_invalid_citations")),
+              "FreshnessReviewThreadTests.test_anti_pattern_verification_rejects_missing_rows_and_invalid_citations",
+              "FreshnessReviewThreadTests.test_anti_pattern_controls_detect_disabled_ast_checks")),
             ("Comparing a prerelease package pin against an unrelated release fallback", "tests/test_catalog_freshness_runtime.py",
              ("RuntimeTagPatternRowTests.test_prerelease_tag_misses_do_not_compare_another_packages_release",
-              "RuntimeTagPatternRowTests.test_tag_declared_prerelease_keeps_release_fallback_when_the_tag_list_is_missing")),
+              "RuntimeTagPatternRowTests.test_tag_declared_prerelease_keeps_release_fallback_when_the_tag_list_is_missing",
+              "RuntimeTagPatternRowTests.test_stable_tag_miss_keeps_the_release_fallback_comparison")),
+            ("Changing a shared freshness renderer without running its trading consumer tests",
+             "tests/test_catalog_freshness_trading.py",
+             ("TradingReportTests.test_table_lists_every_trading_row_with_dormancy",)),
         )
         for mistake, path, methods in expected:
             with self.subTest(mistake=mistake):
@@ -145,21 +150,42 @@ class FreshnessReviewThreadTests(unittest.TestCase):
         for mistake in thread_mistakes:
             row = next(line for line in original_log.splitlines(keepends=True)
                        if f"| {mistake} |" in line)
-            mutations[f"missing {mistake}"] = {log_path: original_log.replace(row, "")}
-            mutations[f"duplicate {mistake}"] = {log_path: original_log.replace(row, row + row)}
-        for method in (
-            "test_no_release_in_pinned_major_is_unknown_in_drift_report",
-            "test_tag_declared_prerelease_keeps_release_fallback_when_the_tag_list_is_missing",
+            diagnostic = f"missing or duplicate anti-pattern row: {mistake}"
+            mutations[f"missing {mistake}"] = ({log_path: original_log.replace(row, "")}, mistake, diagnostic)
+            mutations[f"duplicate {mistake}"] = ({log_path: original_log.replace(row, row + row)}, mistake, diagnostic)
+        for method, mistake in (
+            ("test_no_release_in_pinned_major_is_unknown_in_drift_report",
+             "Reporting an unknown release stream as an empty release history"),
+            ("test_tag_declared_prerelease_keeps_release_fallback_when_the_tag_list_is_missing",
+             "Fetching unused release metadata for a declared-tag row"),
         ):
-            mutations[f"invalid second method {method}"] = {
-                log_path: original_log.replace(method, "test_missing_verification_method")}
-        mutations["wrong cited class"] = {log_path: original_log.replace(
-            "BuildManifestImportTests.", "MissingImportTests.")}
+            row = next(line for line in original_log.splitlines(keepends=True) if f"| {mistake} |" in line)
+            mutations[f"invalid second method {method}"] = ({log_path: original_log.replace(
+                row, row.replace(method, "test_missing_verification_method"))}, mistake, "missing cited Class.method")
+        import_mistake = "Executing a freshness sibling while importing a verdict helper"
+        mutations["wrong cited class"] = ({log_path: original_log.replace(
+            "BuildManifestImportTests.", "MissingImportTests.")}, import_mistake, "missing cited Class.method")
         source = ROOT / "tests/test_catalog_freshness_trading.py"
-        mutations["missing declaring class"] = {source: original_read(source).replace(
-            "class BuildManifestImportTests(", "class RenamedImportTests(")}
+        mutations["missing declaring class"] = ({source: original_read(source).replace(
+            "class BuildManifestImportTests(", "class RenamedImportTests(")}, import_mistake,
+            "missing cited class: BuildManifestImportTests.test_import_does_not_load_currency_or_call_network_or_file_helpers")
 
-        for label, changed in mutations.items():
+        source = ROOT / "tests/test_catalog_freshness_propose.py"
+        original_source = original_read(source)
+        method = "test_no_release_in_pinned_major_is_unknown_in_drift_report"
+        mistake = "Reporting an unknown release stream as an empty release history"
+        diagnostic = f"missing cited method: BuildDriftReportTests.{method}"
+        mutations["renamed source method"] = ({source: original_source.replace(
+            f"def {method}(", f"def renamed_{method}(")}, mistake, diagnostic)
+        owner = next(node for node in ast.parse(original_source).body
+                     if isinstance(node, ast.ClassDef) and node.name == "BuildDriftReportTests")
+        definition = next(node for node in owner.body if isinstance(node, ast.FunctionDef) and node.name == method)
+        lines = original_source.splitlines(keepends=True)
+        moved = "".join(lines[:definition.lineno - 1] + lines[definition.end_lineno:])
+        moved += "\nclass OtherVerificationTests:\n" + "".join(lines[definition.lineno - 1:definition.end_lineno])
+        mutations["source method moved to another class"] = ({source: moved}, mistake, diagnostic)
+
+        for label, (changed, mistake, diagnostic) in mutations.items():
             with self.subTest(mutation=label):
                 def read_text(path, *args, **kwargs):
                     return changed[path] if path in changed else original_read(path, *args, **kwargs)
@@ -170,7 +196,32 @@ class FreshnessReviewThreadTests(unittest.TestCase):
                 with mock.patch.object(Path, "read_text", read_text):
                     case.run(result)
                 self.assertFalse(result.errors, result.errors)
-                self.assertTrue(result.failures, f"accepted invalid verification: {label}")
+                self.assertEqual([test.id() for test, _ in result.failures],
+                                 [case.id() + f" (mistake={mistake!r})"], f"wrong failure for {label}")
+                self.assertIn(diagnostic, result.failures[0][1])
+
+    def test_anti_pattern_controls_detect_disabled_ast_checks(self):
+        original_assert_in = unittest.TestCase.assertIn
+        expected = {
+            "missing cited class": ["missing declaring class"],
+            "missing cited method": ["renamed source method", "source method moved to another class"],
+        }
+        for diagnostic, labels in expected.items():
+            with self.subTest(disabled=diagnostic):
+                def assert_in(case, member, container, msg=None):
+                    if msg and msg.startswith(diagnostic + ":"):
+                        return
+                    return original_assert_in(case, member, container, msg)
+
+                case = FreshnessReviewThreadTests(
+                    "test_anti_pattern_verification_rejects_missing_rows_and_invalid_citations")
+                result = unittest.TestResult()
+                with mock.patch.object(unittest.TestCase, "assertIn", assert_in):
+                    case.run(result)
+                self.assertFalse(result.errors, result.errors)
+                self.assertEqual([test.id() for test, _ in result.failures],
+                                 [case.id() + f" (mutation={label!r})" for label in labels],
+                                 f"wrong controls detected disabled check: {diagnostic}")
 
     def test_refetch_skips_unrelated_non_dict_records_and_normalizes_alias_urls(self):
         import tempfile

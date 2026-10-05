@@ -584,7 +584,8 @@ class TradingReportTests(unittest.TestCase):
         self.assertEqual(result["trading"], ["engine", "hftbacktest"])
         self.assertEqual(result["dormant"], ["hftbacktest"])
         self.assertEqual((result["archived"], result["trading_unfetched"]), ([], []))
-        self.assertRegex(text, r"1 dormant upstream\(s\) \(no release or default-branch commit in 180\+ days\)")
+        self.assertRegex(text, r"1 dormant upstream\(s\) \(no release activity considered for the row "
+                              r"or default-branch commit in 180\+ days\)")
 
     def test_dormant_rows_are_not_drift(self):
         self._write_trading()

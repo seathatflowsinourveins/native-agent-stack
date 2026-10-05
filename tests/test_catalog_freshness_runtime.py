@@ -1153,6 +1153,17 @@ class RuntimeTagPatternRowTests(unittest.TestCase):
                 self.assertEqual((row["pin_comparison"], row["pin_behind_upstream"],
                                   row.get("pin_comparison_reason")), ("not_compared", None, reason))
 
+    def test_stable_tag_miss_keeps_the_release_fallback_comparison(self):
+        for matching_tags, reason in (({}, "tag_pattern_unfetched"), ({"": []}, "tag_pattern_unmatched")):
+            with self.subTest(source=reason):
+                record = _inspect_record(matching_tags=matching_tags, latest_release={
+                    "tag": "v0.3.999", "published_at": "2026-10-01T00:00:00Z"})
+                row = self._row(_inspect_entry(pin="0.3.273"), {INSPECT_REPOSITORY: record})
+                self.assertEqual((row["upstream"]["latest"], row["upstream"]["latest_source"]),
+                                 ("v0.3.999", reason))
+                self.assertEqual((row["pin_comparison"], row["pin_behind_upstream"],
+                                  row.get("pin_comparison_reason")), ("compared", True, None))
+
     def test_prerelease_pin_keeps_numeric_comparison_for_a_prefixed_tag_declaration(self):
         prefix = "inspect-tool-support-"
         entry = _inspect_entry(pin="1.1.0rc5", tags={"prefix": prefix,

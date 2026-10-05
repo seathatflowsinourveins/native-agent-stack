@@ -16573,8 +16573,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-nautilus-prerelease-freshness.md",
-      "sha256": "6b10125f848acd0233bd07a1b40584a7ae51e09d51f87d205cf687dd5c0399d1",
-      "bytes": 17447
+      "sha256": "d2970fdbec345d22375f1c42a20449ce6dae4073555464a6a5ff330005877616",
+      "bytes": 20018
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-changelog-parity.md",
@@ -16753,8 +16753,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "f197348cbc5c5a8b86826dc35e5d028e9a13a49a330ef3fa7e182b59837409b6",
-      "bytes": 193226
+      "sha256": "c4100622c2d925f1675ecd0dae543494c8cda03cde13db770420e09433962fd4",
+      "bytes": 194054
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -53278,13 +53278,13 @@
     },
     {
       "path": "tests/test_catalog_freshness_runtime.py",
-      "sha256": "739cbcc79e6f60b85fbf9098b87a6e3837fbec7fa644db82baa54f40750fb341",
-      "bytes": 118596
+      "sha256": "1eff93310ff8c4ee6589a9864940e01c911e8aca2eceb342eeb727a381a0b0c0",
+      "bytes": 119415
     },
     {
       "path": "tests/test_catalog_freshness_trading.py",
-      "sha256": "d1789f4a67eaf987214c6aff4a9c8c27b9e39f5e4abab04da9c89278a5abb120",
-      "bytes": 35428
+      "sha256": "5de4a7a8de9d860c541e1649b005e55bccca18b76ba8bdffbcd61474c644d4ea",
+      "bytes": 35494
     },
     {
       "path": "tests/test_catalogs.py",
@@ -53978,8 +53978,8 @@
     },
     {
       "path": "tests/test_sota_convergence.py",
-      "sha256": "5733db8807749eaf6a4fb474acda2bd4d089754d0dadbb868c1a285305d96740",
-      "bytes": 178372
+      "sha256": "e95a6683694382ff58ef71fe2c031aef877de19f46de06fd3360a8ca77f56a0a",
+      "bytes": 182187
     },
     {
       "path": "tests/test_sota_sources_gate.py",

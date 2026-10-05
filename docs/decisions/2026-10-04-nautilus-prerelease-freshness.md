@@ -228,7 +228,7 @@ to make the canonical URL the new representative and adding the tag-miss fallbac
 case, the second pre-fix run exited **1** (eight tests). All five threads had a
 discriminating failure. The post-fix focused run passed eight tests, exit **0**.
 These are synthetic/local integration checks, not upstream or hosted execution.
-Targeted acceptance is `tests.test_catalog_freshness_runtime`,
+The t1 targeted run covered `tests.test_catalog_freshness_runtime`,
 `tests.test_catalog_freshness_propose`, `tests.test_sota_convergence`,
 `scripts/validate.py`, `scripts/evidence_manifest.py --check` and `git diff --check`.
 Scratch files use the authorized cache outside both the worktree and `/tmp`, under
@@ -247,7 +247,9 @@ mistakes. It verifies every cited `Class.method` against the class's definitions
 in the named test file. Negative controls remove or duplicate each of the four
 thread rows, corrupt both second-method citations, change a cited class, or rename
 the declaring class in the source; every control is rejected. The uncertainty row
-now qualifies its second method with its class name.
+now qualifies its second method with its class name. Those twelve controls did not
+prove AST method ownership: t3 below adds source-side method renaming and moving
+with exact failure attribution.
 
 The per-row dormancy rule and its deliberate stable-pin guard remain unchanged.
 The README and rendered trading/runtime explanations now state which activity
@@ -263,7 +265,45 @@ checker accepted all twelve invalid metadata controls, and both tag-miss fixture
 reported `compared`. The first post-fix run exited **1** because the alias fixture
 also uppercased the URL scheme and host, outside the existing parser's supported
 form; it now varies only owner/repository case. The final run passed all four
-tests, exit **0**. These are synthetic/local integration checks. Acceptance remains
+tests, exit **0**. These are synthetic/local integration checks. That round ran only
 the three requested freshness modules and the validate, evidence-manifest and diff
-checks named above; CI owns the full suite. Scratch stays outside the checkout and
+checks named above, omitting the trading consumer of the changed renderer. CI owns
+the full suite. Scratch stays outside the checkout and
 `/tmp`, under `nice -n 19`.
+
+## Repair round freshness-t3 — 2026-10-05
+
+The p1 and p2 were confirmed against `dcd25f66c`. The existing trading report test
+failed on the obsolete dormancy-summary sentence; its assertion now matches the
+per-row wording. Trading tests are included in this round's targeted acceptance.
+The renderer and dormancy computation are unchanged.
+
+The anti-pattern controls now include source-side renaming of a cited method and
+moving it to another class, leaving the log unchanged. All fourteen controls
+require the exact failing subtest and its expected diagnostic; unrelated failures
+and errors cannot satisfy them. A regression disables each AST check in turn and
+requires failures from its specific controls. With the t2 control body, disabling
+method ownership went undetected and the new regression exited **1**. The repaired
+controls detect both disabled checks. The existing log row records this correction
+and the new trading-consumer mistake has its own row.
+
+The nv stable-pin coverage gap now has a fixture for both unfetched and unmatched
+tag lists with a version-shaped fallback release, asserting `compared` and behind.
+A guard mutation that treats stable pins as prereleases makes that fixture exit
+**1**; the unchanged guard passes it. No runtime comparison behavior changed.
+
+The first focused p1/p2 run exited **1** (two tests); the final focused run passed
+four tests, exit **0**. The t2 nv reproduction also ran the four historical test
+bodies against retained sources: `048dc5696` with its original checker exits **1**,
+and the reviewed `dcd25f66c` exits **0**. Initial minimal snapshots omitted three
+import dependencies and both exited **1**; those incomplete-fixture runs are not
+evidence for the historical claim. Only the completed source snapshots are used.
+
+Targeted acceptance includes `tests.test_catalog_freshness_trading`,
+`tests.test_catalog_freshness_runtime`, `tests.test_catalog_freshness_propose`,
+`tests.test_sota_convergence`, `tests.test_catalog_freshness_pins` and
+`tests.test_adoption_docs_consistency.UpstreamVerificationSectionTests`, plus
+`scripts/validate.py`, `scripts/evidence_manifest.py --check` and `git diff --check`.
+These are local integration and artifact checks; no hosted CI observation or
+full-suite pass is claimed. Scratch remains in the authorized cache outside the
+checkout and `/tmp`, under `nice -n 19`.
