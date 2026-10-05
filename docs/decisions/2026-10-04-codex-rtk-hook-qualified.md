@@ -115,10 +115,11 @@ its summary is the E2E's own.
 
 The upstream command `rtk init -g --codex` appends an inert `@<Codex home>/RTK.md` pointer to the Codex `AGENTS.md` and creates `RTK.md`
 (`rtk-init-codex-probe.json`; there is no hook-only mode with `--codex`). That is an instruction-file edit, which the earlier reply about
-authorization settings does not name, so the command center put it to the user as one yes/no question and relayed the answer at about 00:55Z
-on 2026-10-05: "yes for rtk pointer", together with a standing rule: "for the practice like rtk, always proceed with sota convergence highest
-quality practice with upstream repos". The session that wrote this record heard neither quotation itself; both are the user's words as the
-command center relayed them, and the row's behaviour rests on that reading, which the user may withdraw.
+authorization settings does not name, so the command center put it to the user as one yes/no question and relayed the answer. By the command center's transcript the user wrote,
+on 2026-10-05, "yes for rtk pointer" at 00:49:16Z (part of a longer message) and, as a queued message at 00:50:08Z, a standing rule: "for the
+practice like rtk, always proceed with sota convergence highest quality practice with upstream repos". (The command center first relayed
+them as "about 00:55Z", an estimate, and corrected the times afterwards.) The session that wrote this record heard neither quotation itself;
+both are the user's words as the command center relayed them, and the row's behaviour rests on that reading, which the user may withdraw.
 
 Effect: the install plan's `command-output` row runs `rtk init -g --codex` as upstream implements it, pointer line and `RTK.md` included, and
 the same rule covers future upstream installer side effects of this kind (each still recorded with its measurement). `rtk init -g --codex
