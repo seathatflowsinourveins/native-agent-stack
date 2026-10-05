@@ -7528,8 +7528,13 @@
   "schema_version": 1,
   "sources": [
     {
+      "excludes": [
+        "source.release_tag",
+        "source.release_commit",
+        "updated_at"
+      ],
       "path": "adoption/manifest.json",
-      "sha256": "7bb179e8440be17b75484c21495e66385ea8eb959a491d43d2488056ddede09a"
+      "sha256": "159ad1f56a9a654951eb16a4a66645378d225d8b924eede282815f49342add55"
     },
     {
       "path": "adoption/new-wsl-profile.json",

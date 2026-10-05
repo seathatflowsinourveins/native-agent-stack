@@ -301,7 +301,7 @@ which are not in the `macos-arm64-foundation` component list.
 
 **Context Hub opt-out (0.1.4).** Set `telemetry: false` and `feedback: false` in
 `~/.chub/config.yaml`, as documented in upstream
-[`docs/cli-reference.md:215–229`](https://github.com/andrewyng/context-hub/blob/v0.1.4/docs/cli-reference.md#L215-L229)
+[context-hub's `cli-reference.md:215–229`](https://github.com/andrewyng/context-hub/blob/v0.1.4/docs/cli-reference.md#L215-L229)
 and [`SECURITY.md:28`](https://github.com/andrewyng/context-hub/blob/v0.1.4/SECURITY.md#L28).
 Use the environment form `CHUB_TELEMETRY=0 CHUB_FEEDBACK=0` only where an invocation overrides
 `HOME` or `CHUB_DIR`, such as a worker using another home; upstream

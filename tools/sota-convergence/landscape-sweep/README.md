@@ -494,15 +494,27 @@ provides it.
   (with `superseded_by`), not among the children, and still counts its usage in `by_resolved_model`. Usage such an
   attempt holds that `by_resolved_model` cannot count (an assistant message without provider usage or without a
   resolved model, or no transcript) is its `usage_issues` and makes the status `incomplete`.
-  `make_result.py` also needs every child and superseded attempt measured at effort `max` alone, or recorded as an
-  `effort_deviation` retained failure, and `measurement.exit_code` 0 (1 only for such recorded deviations). Every
+  Since 2026-10-04, `usage_record.py` also links children whose issues include `no result entry in journal` to
+  later complete attempts with the same label. This requires the sweep's one-logical-call-per-label-per-run
+  precondition; runtime retries can produce multiple attempts, but a label with more than one complete child
+  is ambiguous and links nothing. It uses the tool's journal order, retains `superseded_by` and the observed
+  reason (call keys are not compared), and leaves `by_resolved_model` unchanged. The wrapper's exit code follows the
+  post-processed status and uncovered effort mismatches; `measurement.exit_code` remains the raw tool exit and
+  `raw_output_sha256` remains the hash of its original stdout. `measurement.post_processing` retains
+  `source_status`, `source_reason`, `linked_agent_ids`, `covered_agent_ids` and `covered_effort_mismatches`, along
+  with the linking and coverage counts. `multi_model_children` is recomputed after a move. The printed summary
+  distinguishes `raw_exit_code` from the wrapper's `exit_code`. A linked attempt's `usage_issues` still keep the record incomplete.
+  `make_result.py` also needs every attempt measured at effort `max` alone, covered by its completed same-label
+  max-effort re-run, or recorded as an `effort_deviation` retained failure. It accepts `measurement.exit_code` 0,
+  or 1 explained by recovered superseded attempts or such recorded deviations. Every
   child and attempt must also carry a measured `web_search`, and each one with a capped WebSearch call must be a
   `web_search_capped` retained failure. Both are checked per worker and per layer: a `<role>:<layer>` worker's
   failure in its own layer, the critic's in every layer of the record.
 - **Failures.** A failed part of the lane never leaves a clean layer. `convert.py` lists each layer's retained
   failures under `failures/<layer>` in `returns.json`: a lost round, a discovery family that did not return, a
   missing vote, a lost critic, a critic-flagged layer beyond the follow-up cap, a GPT-6 copy problem, and (with
-  `--usage`) a worker measured at another effort than max (`effort_deviation`) or a worker with a WebSearch call
+  `--usage`) a worker measured at another effort than max without a completed same-label max-effort re-run
+  (`effort_deviation`) or a worker with a WebSearch call
   the session's cap refused (`web_search_capped`); the critic's belongs to every layer. It gives
   that layer the reopen entry `{"trigger": "retained_failure", "ref": "<returns_ref>#/failures/<layer>"}`, which
   resets the layer's clean count. `make_result.py` refuses a layer whose failures lack that entry.
@@ -648,12 +660,99 @@ the report and the run; they are added to the `retained_failure` entries `conver
 Record a stopped run by hand, as recipe section 4 describes (`status: stopped`, `lower_bound_usage: true`,
 `votes: not_returned`, `lost_workers`). Retain the smoke's usage record under `$A-attempts/` as a run of its own.
 
+**2026-10-04, step 7 resume recovery.** Run step 7 again after a usage-limit resume, including when changed
+earlier-stage outputs changed the waiting agents' call keys (`wf_7e4cef36-e0c` exposed two critics and one
+follow-up facts refuter in this condition). The wrapper requires `no result entry in journal` in the child's
+issues and links only to a later complete same-label attempt in this run. The sweep issues one logical call
+per label per run; runtime retries may produce several attempts, and more than one complete child for a label
+prevents linking. The record carries journal order, neither keys nor timestamps, so the reason states only
+`no result entry; a later complete attempt with the same label returned; call keys not compared`.
+With no incomplete children or superseded usage-integrity gaps left, it reports complete, states the
+number linked, and can exit 0 while preserving the tool's raw exit 1 in the measurement. Superseded attempts
+whose re-run completed at max remain under `superseded_retained` per layer; they do not reopen a layer for effort.
+Uncovered effort deviations and capped WebSearch calls still retain their failures and reopen entries.
+`measurement.post_processing` preserves the tool's original `source_status` and `source_reason`, the
+`linked_agent_ids`, `covered_agent_ids`, and full `covered_effort_mismatches`. It records the counts alongside
+these details, including when only some attempts link and the status stays incomplete. `multi_model_children`
+reflects the remaining children. The printed `raw_exit_code` names the tool's result; `exit_code` names the wrapper's.
+
+Offline source review extended agent-lab's `summarizeRun` and `effortMismatches` in the unchanged
+[vendored child-usage.mjs](../../../examples/claude-native/workflows/child-usage.mjs), as retained at
+native-agent-stack `8c32a84b246da66e43a6188c973741b09329e223`, SHA256
+`3e5189342734135e88a2295c1c2152275d9e26c0c7731ed5cbc8905bbccd98a4`.
+The selected `search-first`, `diagnosing-bugs` and `tdd` skills informed the bounded integration repair; the
+builder's no-network scope precluded a live registry or upstream search. The regression fixtures cover
+same-key and changed-key resumes, critic and follow-up labels, earlier and unfinished attempts, result-bearing
+failures, ambiguous labels, partial recovery, usage-integrity gaps, provenance, and max-effort qualification.
+The native transcript fixtures execute the unchanged tool locally; they are integration evidence, not a new
+provider/model run or upstream end-to-end qualification. This recovery serves completed foundation landscape
+records and the North Star R&D readiness they support.
+
+**2026-10-04, step 8 project-directory redaction.** Before writing converted artifacts or printing the summary,
+`convert.py` derives encoded local paths from the home, resolved checkout, optional work directory and their
+realpaths, replacing every character outside ASCII letters and digits with `-`, following
+[sweep_common.host_replacements](sweep_common.py). It replaces each whole segment, bare or with a
+project-directory suffix, with `<project-dir>` even without a directory prefix. Local and generic rules run
+over the whole text, including URLs, queries, fragments and assignments. Privacy takes priority over retaining
+an encoded user-profile slug in a source URL. The generic roots and boundary derive from
+[#697](https://github.com/seathatflowsinourveins/native-agent-stack/pull/697) at `0d2a38b2`, now landed in
+`scripts/validate.py` as `encoded home path`: `-home-` is case-sensitive, while `-Users-`,
+`-mnt-<drive>-Users-` and `<drive>--Users-` ignore case, with the `(?<![\w-])` left boundary.
+The converter deliberately covers more tails than the publication rule. A name must start with
+`[A-Za-z0-9_.]`; redaction needs no restricted terminator, so punctuation such as commas, colons, asterisks
+and `&`, and Unicode or control tails, receive redaction in bare text, `projects/` and `claude-<uid>/`
+anchors, URL paths, queries and fragments, assignments, and JSON keys and values. For example, a query's
+`&tab=1` can follow the replaced name directly. The replacement consumes Unicode word characters, dots,
+dashes and project suffixes. In comparison, #697 requires a dash or `/`, backslash, quote, whitespace,
+backtick, `)`, `]` or end after its ASCII username.
+Lowercase `example` followed by a dash, end or a character outside `[A-Za-z0-9_.]` is exempt, including
+`example,`; `ExAmPlE`, `example.person` and `exampleuser` redact. Dots-only names are removed too.
+The converter also covers Windows encodings with more than two separators after the drive letter and
+known local home, checkout and work-directory encodings outside the generic roots or exemption.
+Local continuations consume Unicode-aware `\w`, dots and dashes as part of the same segment, including
+`.smith` followed by non-ASCII word characters, so those name fragments cannot survive a replaced local prefix.
+WSL checkouts under a Windows profile are covered even when the native home is a Linux path; encoded Windows
+segments can begin with the drive letter. Native `projects/` and `claude-<uid>/` anchors use the same generic
+rule as other contexts, including punctuation tails; an anchor is not required. Redaction covers deeper
+strings and nested JSON fields and keys and preserves sentence-ending
+periods. Ordinary words such as `home-assistant` and `my-home-page` remain unchanged; encoded profile forms
+in prose receive the same privacy treatment as paths.
+The implementation follows the recursive string/key traversal of
+[sweep_common.sanitize](sweep_common.py) at the same `8c32a84b2` source baseline; it uses Python's standard-library
+regular expressions and the existing angle-bracket placeholder style. Both the host-path and encoded-path
+stages reject distinct keys that would redact to the same text: exit 3 with a `redaction key collision`
+finding before any converted artifacts or summary are written. Collision locators contain only dictionary-key
+and list indices. Private-content findings replace every matching key with its document-order index, including
+when that key is an ancestor of a matching value; neither diagnostic prints matching key text.
+Fixtures cover notes, nested strings,
+bare local and anchored homes, all four profile forms, WSL checkouts, work directories, dict keys, the printed
+summary, publication-rule username and boundary cases, bare-home terminators, case-sensitive example-user
+exemptions, prose, sentence endings, URL redaction, path line fragments, assignments, all macOS root case
+variants, dots-only names, punctuation tails, complete Unicode local names and key collisions.
+The converter's private-content check uses the selected checkout's own `PRIVATE_CONTENT` patterns on both
+decoded documents and the exact JSON text prepared for emission, returning exit 3 for any retained match
+(including UUIDs) before creating or updating `--out` or printing the summary. Artifacts use the serialization
+shared with [sweep_common.write_json](sweep_common.py): indentation 1, `ensure_ascii=False`, and a final newline,
+written as UTF-8. The summary uses that same text format and keeps Unicode characters unescaped.
+Scanning the serialized text also covers backslashes introduced by JSON's control-character escaping;
+serialized-only findings use a fixed locator and never echo matching text.
+The policy regression loads the actual landed `encoded home path` rule from `scripts/validate.py` by name
+and checks decoded and serialized redactor output. CLI fixtures check written artifact bytes and stdout
+with Unicode and control tails, inject a redaction failure to verify exit 3 without publication, and verify
+`--repo-root` selects the validator without mocking. These are local integration fixtures, not provider runs.
+This repair does not edit `scripts/validate.py`.
+
 Read these fields of `convert.py`'s summary before appending:
 
 - **`retained_failures`** and **`reopened_layers`**: each layer's failures (`<round>:<cause>`), all of them reopened.
   `degraded_discovery`, `critic_lost`, `effort_deviations` and each vote's `notes` give the detail.
   `effort_deviations_unmapped` lists a worker at another effort whose label names no layer of this sweep;
   `make_result.py` refuses the record until it is resolved.
+- **`superseded_retained`** (2026-10-04): each layer's superseded attempts whose same-label re-run completed at
+  max, with `round`, `child`, `agent_id` when present, `superseded_by` and `reason`. The same field is retained
+  in `returns.json`. These attempts' usage remains counted, but their earlier effort is covered by the re-run
+  and creates no `effort_deviation`. The critic is listed for every layer; a follow-up worker only in its own
+  layer's follow-up round. `superseded_retained_unmapped` lists a covered attempt whose label names no layer.
 - **`web_search`**, **`web_search_capped`** and **`web_search_capped_unmapped`**: the run's WebSearch calls and
   capped calls, the workers with a capped call (each a retained failure of its layer), and any capped worker whose
   label names no layer of this sweep (`make_result.py` refuses the record until it is resolved). A capped worker
@@ -1061,6 +1160,18 @@ The deliberate changes:
   - `make_result.py` checked failure coverage over all layers at once, so one layer could lose its critic failure
     and its reopen entry (and count as clean) while another layer's `critic` failure satisfied the check. Coverage
     is now checked per worker and per layer.
+- **Usage-limit resume repairs (2026-10-04).** Changed upstream-stage returns changed three waiting agents'
+  call keys, so same-key supersession left a completed run incomplete. Empty effort lists of recovered killed
+  attempts also reopened every layer. The wrapper links only no-journal-result attempts to a later complete
+  attempt in this run under the sweep's one-call-per-label precondition, refusing ambiguous complete labels.
+  It keeps the observed reason, raw measurement provenance and usage-integrity gaps, and the consumers require an identified,
+  complete same-label max-effort re-run before treating an earlier effort mismatch as covered. The attempts
+  remain visible under `superseded_retained`; missing, unfinished or non-max re-runs cover no deviation.
+- **Project-directory redaction repair (2026-10-04).** Literal host-prefix replacement missed the encoded home
+  directory in returned notes, and the publication gate matched only the slash form. Conversion now redacts
+  the local encoded home, bare or suffixed, and other homes anchored in native project directories before writing
+  artifacts or printing the summary. Fixtures cover embedded text, nested fields and keys, the printed summary,
+  prose false positives and preserved sentence endings.
 
 ## Tests
 
@@ -1075,5 +1186,6 @@ The suite uses synthetic fixtures and makes no network or model calls:
 - `sweep.js` runs under node with stubbed `agent`, `parallel` and `pipeline`.
 - The converted evidence is appended to a synthetic ledger checkout with `saturation_ledger.py` itself.
 
-Node, `shellcheck` and `BASH32_BINARY` (a real bash 3.2, as on macOS) are optional; each test that needs one is
-skipped without it.
+Node is required by the native changed-key recovery fixture; it fails with a clear message when node is absent.
+The existing validation CI job already runs node workflow contract suites before the Python suite. Other node
+fixtures, `shellcheck` and `BASH32_BINARY` (a real bash 3.2, as on macOS) retain their existing optional skips.
