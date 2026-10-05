@@ -1398,14 +1398,36 @@ and `build_verdicts.py --check`. Run it locally with:
 python3 scripts/verdict_review_gate.py --base origin/main
 ```
 
-The workflow's `pull_request` trigger adds the `edited` type to the default
-three, so a PR whose base branch changes runs again, and the job fails closed
-on any `pull_request` event whose base branch (`GITHUB_BASE_REF`, passed
-through the step's environment) is not `main`. A PR first judged against
-another branch and then retargeted to `main` therefore cannot merge on its
-earlier green run. The merge commit's first parent, which the gate compares
-with, must also be a commit on `origin/main`, so a merge commit still built on
-a branch that merely contains `main`'s tip fails closed.
+`pr-metadata.yml` owns `sota-sources` and `verdict-review-gate`, keeping their
+required check names. It subscribes to `pull_request` types `opened`,
+`synchronize`, `reopened` and `edited`, push to `main` and manual dispatch.
+`validate.yml` drops `edited`, so a description edit or retarget starts the
+metadata gates without starting or cancelling the full validation suite.
+The metadata workflow queues per PR with `queue: max` and no
+`cancel-in-progress`. GitHub permits up to 100 pending runs, cancels
+additional runs at that limit and does not guarantee dispatch order; the
+gates therefore read current metadata rather than depend on queue order
+([GitHub concurrency source at `336b7f546d94`](https://github.com/github/docs/blob/336b7f546d94/data/reusables/actions/actions-group-concurrency.md)).
+
+Both gates use `github.rest.pulls.get` through
+[`actions/github-script` v9.0.0, `3a2844b7`](https://github.com/actions/github-script/tree/3a2844b7e9c422d3c10d287c895573f7108da1b3),
+with job-local `pull-requests: read`; a retrieval error fails the action.
+`sota-sources` checks the current body, keeping description text out of the
+shell. Its reusable `sota-sources-gate.yml` job stays byte-identical and the
+scaffold caller grants the read permission. Existing callers adopt the
+change only when they update their commit pin
+([Get a pull request](https://docs.github.com/en/rest/pulls/pulls#get-a-pull-request)).
+
+`verdict-review-gate` first requires the current base branch and SHA to match
+the event's base, failing closed if the PR was retargeted or the base advanced
+while this run waited. It also fails closed when the event's base branch
+(`GITHUB_BASE_REF`, passed through the step's environment) is not `main`.
+A PR first judged against another branch and then retargeted to `main`
+therefore cannot merge on its earlier green run. The merge commit still must
+have exactly two parents with the event's PR head as its second parent. Its
+first parent, which the gate compares with, must also be a commit on
+`origin/main`, so a merge commit still built on a branch that merely contains
+`main`'s tip fails closed.
 
 After a retarget, the `edited` run checks out the merge commit still built on
 the old base. This was measured on 2026-09-23 with throwaway PR #143, and the
@@ -1419,7 +1441,7 @@ base has none and this change adds `scripts/verdict_review_gate.py` (the
 bootstrap PR); a base without the gate otherwise fails closed.
 
 One residual is accepted. A pull request runs the job definition from its
-own `validate.yml`, so a PR that rewrites this job's step can disable the
+own `pr-metadata.yml`, so a PR that rewrites this job's step can disable the
 check for itself. The tests that pin the job's shape
 (`tests/test_workflow_hardening.py`) and the gate's rules
 (`tests/test_verdict_review_gate.py`) are the head's copies too, so such a PR

@@ -1,19 +1,20 @@
 name: SOTA sources gate
 
-# The reusable form of validate.yml's required sota-sources job, for other repositories: the new-repository scaffold's
+# The reusable form of pr-metadata.yml's required sota-sources job, for other repositories: the new-repository scaffold's
 # .github/workflows/sota-sources.yml (adoption/scaffold/, written by tools/adoption/scaffold_repo.py) calls this file at
-# a pinned commit of this repository's main. From its `if:` line on, the job below is validate.yml's job byte for byte
-# (tests/test_sota_sources_gate.py); change both together. validate.yml keeps its own copy because .github/
+# a pinned commit of this repository's main. From its `if:` line on, the job below is pr-metadata.yml's job byte for byte
+# (tests/test_sota_sources_gate.py); change both together. pr-metadata.yml keeps its own copy because .github/
 # main-ruleset.json requires that job's check here. A called workflow runs in its caller's context, so
-# github.event_name and the pull_request payload are the caller's, and it can only reduce the caller's token
+# github.event_name and the PR number are the caller's, and it can only reduce the caller's token
 # permissions (docs.github.com/en/actions/reference/workflows-and-actions/reusing-workflow-configurations, "github
 # context" and "Supported keywords for jobs that call a reusable workflow").
 
 on:
   workflow_call:
 
-# No token scope and no cache access (docs/decisions/2026-10-04-ci-least-privilege.md): the job reads only the caller's
-# pull_request payload. No concurrency group here: in a called workflow ${{ github.workflow }} is the caller's name.
+# No default token scope and no cache access (docs/decisions/2026-10-04-ci-least-privilege.md). The job grants only
+# pull-requests: read to fetch the current body; callers must grant it too and bump their commit pin to adopt this
+# change. No concurrency group here: in a called workflow ${{ github.workflow }} is the caller's name.
 permissions: {}
 cache-mode: none
 
@@ -21,10 +22,12 @@ jobs:
   sota-sources:
     # Top rule: every change names the maintained repository or published reference it installs or follows. This job
     # fails a pull request whose description lacks a non-empty "SOTA sources" section (## or ###), reading the body
-    # from the caller's pull_request payload through actions/github-script; no body text reaches a shell.
+    # from the current PR through actions/github-script; a retrieval error fails the action and no body text reaches a shell.
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-24.04
     timeout-minutes: 2
+    permissions:
+      pull-requests: read
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
@@ -34,7 +37,12 @@ jobs:
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         with:
           script: |
-            const body = (context.payload.pull_request && context.payload.pull_request.body) || '';
+            const {data: pullRequest} = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            const body = pullRequest.body || '';
             const match = body.match(/^#{2,3}[ \t]+SOTA sources[ \t]*$([\s\S]*?)(?=^#{2,3}[ \t]|(?![\s\S]))/m);
             const content = match ? match[1].replace(/<!--[\s\S]*?-->/g, '').trim() : '';
             if (!content) {

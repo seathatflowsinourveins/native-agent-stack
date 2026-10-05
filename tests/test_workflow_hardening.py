@@ -550,7 +550,7 @@ class VerdictReviewGateTests(unittest.TestCase):
     """The required verdict-review-gate job (docs/decisions/2026-09-22-github-automation-closure.md,
     "verdict-review-gate (2026-09-23)")."""
 
-    text = (WORKFLOWS / "validate.yml").read_text(encoding="utf-8")
+    text = (WORKFLOWS / "pr-metadata.yml").read_text(encoding="utf-8")
     job = jobs(text)["verdict-review-gate"]
 
     def test_runs_on_every_pull_request_without_a_path_filter(self):
@@ -559,10 +559,10 @@ class VerdictReviewGateTests(unittest.TestCase):
         self.assertNotIn("paths", trigger)
         self.assertNotIn("branches", trigger.split("pull_request:", 1)[1].split("workflow_dispatch:", 1)[0])
         self.assertIn("push:", trigger)
-        self.assertIsNone(block_if(self.job), "a required check must run on every event")
+        self.assertIsNone(block_if(self.job.split("\n    steps:\n", 1)[0]), "a required check must run on every event")
 
     def test_read_only_hardened_and_without_persisted_credentials(self):
-        self.assertEqual(scopes(self.job), [{"contents": "read"}])
+        self.assertEqual(scopes(self.job), [{"contents": "read", "pull-requests": "read"}])
         step = first_step(self.job)
         self.assertIn(HARDEN, step)
         self.assertIn("egress-policy: audit", step)
@@ -577,6 +577,47 @@ class VerdictReviewGateTests(unittest.TestCase):
         pull_request = trigger.split("pull_request:", 1)[1].split("workflow_dispatch:", 1)[0]
         (types,) = re.findall(r"(?m)^    types: \[([^\]]*)\]$", pull_request)
         self.assertEqual([item.strip() for item in types.split(",")], ["opened", "synchronize", "reopened", "edited"])
+
+    def test_validate_does_not_run_for_metadata_edits_or_duplicate_the_metadata_jobs(self):
+        text = (WORKFLOWS / "validate.yml").read_text(encoding="utf-8")
+        trigger = text.split("\non:\n", 1)[1].split("\n\n", 1)[0]
+        pull_request = trigger.split("pull_request:", 1)[1].split("workflow_dispatch:", 1)[0]
+        (types,) = re.findall(r"(?m)^    types: \[([^\]]*)\]$", pull_request)
+        self.assertEqual([item.strip() for item in types.split(",")], ["opened", "synchronize", "reopened"])
+        self.assertNotIn("edited", types)
+        self.assertTrue({"sota-sources", "verdict-review-gate"}.isdisjoint(jobs(text)))
+        self.assertEqual(set(jobs(self.text)), {"sota-sources", "verdict-review-gate"})
+
+    def test_metadata_edits_queue_without_cancelling_and_without_default_permissions_or_cache(self):
+        self.assertIn("\npermissions: {}\ncache-mode: none\n", self.text)
+        self.assertIn("  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.run_id }}\n",
+                      self.text)
+        self.assertIn("\n  queue: max\n", self.text)
+        self.assertNotIn("cancel-in-progress:", self.text)
+
+    @unittest.skipUnless(shutil.which("node"), "node unavailable; CI's runner images carry it")
+    def test_the_current_base_check_passes_only_for_this_events_base_and_fails_on_retrieval_error(self):
+        from tests.test_sota_sources_gate import inline_script, run_check
+        step = step_block(self.job, "Require the current PR base")
+        self.assertEqual(block_if(step), "github.event_name == 'pull_request'")
+        self.assertIn("actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0", step)
+        self.assertNotIn("continue-on-error", step)
+        self.assertLess(self.job.index("Require the current PR base"), self.job.index("Require sealed cross-family"))
+        event_base = {"ref": "main", "sha": "a" * 40}
+        payload = {"pull_request": {"number": 42, "base": event_base}}
+        same, retargeted, advanced, unavailable = run_check(inline_script(step), [
+            payload,
+            {**payload, "current_pull_request": {"base": {**event_base, "ref": "develop"}}},
+            {**payload, "current_pull_request": {"base": {**event_base, "sha": "b" * 40}}},
+            {**payload, "retrieval_error": "request denied"},
+        ])
+        self.assertIsNone(same["failed"], same)
+        for outcome in (retargeted, advanced):
+            self.assertIn("current PR base differs from the event base; failing closed", outcome["failed"])
+        self.assertIn("request denied", unavailable["failed"])
+        for outcome in (same, retargeted, advanced, unavailable):
+            self.assertEqual(outcome["requests"], [{"owner": "fixture-owner", "repo": "fixture-repo",
+                                                  "pull_number": 42}])
 
     def run_script(self):
         return step_block(self.job, "Require sealed cross-family review").split("run: |", 1)[1]
@@ -744,7 +785,7 @@ class VerdictReviewGateTests(unittest.TestCase):
         # Review of #123, finding 2 (accepted residual): the push-to-main run re-checks after merge.
         trigger = self.text.split("\non:\n", 1)[1].split("\n\n", 1)[0]
         self.assertRegex(trigger, r"(?m)^  push:\n    branches: \[main\]$")
-        self.assertIsNone(block_if(self.job))
+        self.assertIsNone(block_if(self.job.split("\n    steps:\n", 1)[0]))
         self.assertIsNone(block_if(step_block(self.job, "Require sealed cross-family review")))
         run = self.run_script()
         push = run.split("push)", 1)[1].split(";;", 1)[0]
@@ -766,7 +807,7 @@ class VerdictReviewGateTests(unittest.TestCase):
         self.assertIn("set -euo pipefail", run.split('python3 "$gate"', 1)[0])
 
     def test_no_dangerous_trigger_is_added_for_the_residual(self):
-        # The accepted residual (the PR's own validate.yml can disable the job) is not closed with a
+        # The accepted residual (the PR's own pr-metadata.yml can disable the job) is not closed with a
         # privileged trigger: zizmor's dangerous-triggers audit runs with --no-config --no-ignores.
         for workflow in WORKFLOWS.glob("*.yml"):
             text = workflow.read_text(encoding="utf-8")
@@ -1042,6 +1083,42 @@ class WholeSuiteHeadroomAndDiagnostics(unittest.TestCase):
         self.assertIsInstance(name, str, "the uploader must declare its artifact name")
         self.assertIn("${{ matrix.shard }}", name, "each matrix cell must retain a distinct log and report")
         self.assertLess(job.index(self.SUITE_STEPS[self.VALIDATE]), job.index(self.UPLOAD_STEP))
+
+    def test_validate_reports_native_counts_after_the_suite_without_changing_its_result(self):
+        job = self.jobs[self.VALIDATE]
+        summary = step_block(job, "Report unittest counts")
+        self.assertEqual(block_if(summary), "always()")
+        self.assertIn("continue-on-error: true", summary)
+        self.assertLess(job.index(self.SUITE_STEPS[self.VALIDATE]), job.index("Report unittest counts"))
+        self.assertLess(job.index("Report unittest counts"), job.index(self.UPLOAD_STEP))
+        cases = [
+            ("Ran 12 tests in 0.123s\n\nOK (skipped=2)\n", "ran 12 tests; skipped 2"),
+            ("Ran 1 test in 0.123s\n\nFAILED (failures=1, skipped=1)\n", "ran 1 tests; skipped 1"),
+            ("Ran 4 tests in 0.123s\n\nOK\n", "ran 4 tests; skipped unknown"),
+            ("interrupted before unittest's summary\n", "ran unknown tests; skipped unknown"),
+            (None, "ran unknown tests; skipped unknown"),
+        ]
+        with tempfile.TemporaryDirectory() as temporary:
+            directory = Path(temporary)
+            log = directory / "suite/unittest-verbose.log"
+            log.parent.mkdir()
+            environment = {**os.environ, "RUNNER_TEMP": str(directory),
+                           "GITHUB_STEP_SUMMARY": str(directory / "summary.md")}
+            for contents, expected in cases:
+                with self.subTest(log=contents):
+                    if contents is None:
+                        log.unlink(missing_ok=True)
+                    else:
+                        log.write_text(contents, encoding="utf-8")
+                    result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", run_block(summary)],
+                                            env=environment, capture_output=True, text=True)
+                    self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                    self.assertIn(expected, (directory / "summary.md").read_text().splitlines()[-1])
+            # An unwritable summary destination cannot turn a passing suite into a failing job.
+            environment["GITHUB_STEP_SUMMARY"] = str(directory)
+            result = subprocess.run(["bash", "-e", "-o", "pipefail", "-c", run_block(summary)],
+                                    env=environment, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_validate_uploader_guard_rejects_renamed_or_missing_path_input(self):
         """Exercise the real guard with valid YAML mutations, not a duplicate path predicate."""
