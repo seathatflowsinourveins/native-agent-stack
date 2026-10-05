@@ -1,7 +1,8 @@
 #!/bin/bash
 # Boot smoke of an OmniRoute install prefix on a FREE port with an EMPTY scratch data dir (no credentials, no live unit touched).
 # The child runs in its own process group (set -m). Success needs a health reply while the child is alive AND a listener on the port that belongs to that group,
-# so another OmniRoute instance on any port can neither make this smoke pass nor be killed by it (cleanup signals only the owned process group, never a name match).
+# so another OmniRoute instance on any port can neither make this smoke pass nor be killed by it (cleanup signals only the owned process group, never a name match),
+# and the smoke succeeds only when that group is empty again afterwards (members are selected on the real PGID column, not with `ps -g`, which selects by session).
 # usage: omniroute-smoke-20261005.sh <prefix directory name under tools/>   e.g. omniroute-3.8.51-npm
 set -u
 set -m
@@ -32,6 +33,8 @@ owned_listener() {
   done
   echo no
 }
+# members of the owned process group: select on the real PGID column (`ps -g` selects by session, not by process group)
+members() { ps -eo pid=,pgid= 2>/dev/null | awk -v g="$PGID" '$2 == g { print $1 }'; }
 ok=no
 owned=no
 for _ in $(seq 1 60); do
@@ -47,10 +50,17 @@ for _ in $(seq 1 60); do
   fi
 done
 echo "prefix=$NAME port=$PORT health_ok=$ok listener_owned_by_child=$owned body=${body:-none} child_alive=$(kill -0 "$PID" 2>/dev/null && echo yes || echo no)"
+echo "processes in the owned process group $PGID before cleanup: $(members | wc -l)"
 echo "--- first log lines:"
 head -c 1500 "$S/serve.log" | head -14
-kill -- "-$PGID" 2>/dev/null; sleep 2; kill -9 -- "-$PGID" 2>/dev/null
-sleep 1
-echo "processes left in the owned group: $(ps -o pid= -g "$PGID" 2>/dev/null | wc -l)"
+kill -- "-$PGID" 2>/dev/null
+for _ in 1 2 3 4 5 6 7 8 9 10; do [ -z "$(members)" ] && break; sleep 0.5; done
+if [ -n "$(members)" ]; then
+  kill -9 -- "-$PGID" 2>/dev/null
+  for _ in 1 2 3 4 5 6; do [ -z "$(members)" ] && break; sleep 0.5; done
+fi
+wait "$PID" 2>/dev/null
+left=$(members | wc -l)
+echo "processes left in the owned process group $PGID: $left"
 echo "scratch dir: $S (remove with rm -rf after reading)"
-[ "$ok" = yes ]
+[ "$ok" = yes ] && [ "$left" -eq 0 ]
