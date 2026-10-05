@@ -118,7 +118,15 @@ print("both top-level copy sites refused before copying")
                         and isinstance(node.args[0], ast.Name)
                         and node.args[0].id in {"ROOT", "REPO_ROOT", "REPOSITORY_ROOT"}):
                     unguarded.append(f"{path.relative_to(ROOT)}:{node.lineno}")
-        self.assertEqual(unguarded, [], "Unprotected root-tree copies: " + ", ".join(unguarded))
+        # tests/test_wsl_retrieval.py is a frozen evaluation input of the convergence record
+        # blueprints/convergence-practice/wsl-retrieval/experiment.json (frozen_inputs.evaluation[2]); its ROOT is the WSL
+        # retrieval fixture subtree, not the checkout, so its copies stay as frozen and are a recorded residual
+        # (docs/decisions/2026-10-05-disk-headroom-enospc.md). Any other file must use the shared guard.
+        exempt = {"tests/test_wsl_retrieval.py"}
+        self.assertTrue(any(entry.split(":")[0] in exempt for entry in unguarded) or not exempt,
+                        "a stale exemption: the frozen file no longer copies its subtree")
+        remaining = [entry for entry in unguarded if entry.split(":")[0] not in exempt]
+        self.assertEqual(remaining, [], "Unprotected root-tree copies: " + ", ".join(remaining))
 
 
 class RepositoryCopyGuardTests(unittest.TestCase):
