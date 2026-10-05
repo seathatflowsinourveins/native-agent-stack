@@ -52,6 +52,9 @@ jobs:
         with:
           python-version: '3.13'
           check-latest: false
+      - name: Install the hash-locked session calendar
+        run: |
+          python3 -m pip install --require-hashes --only-binary=:all: -r .github/requirements-calendar.txt
       - name: Extract deterministic working files (no network)
         run: |
           mkdir -p "$RUNNER_TEMP/freshness"

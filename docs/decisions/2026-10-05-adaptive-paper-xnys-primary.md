@@ -8,7 +8,7 @@ path. This change does not advance a broker-observed paper gate.
 ## Decision and sources
 
 Use the required **exchange-calendars 4.13.2 XNYS** calendar for trading dates,
-holidays, regular-session closing times and previous/next session navigation.
+holidays, regular-session opening/closing times and previous/next session navigation.
 The upstream tag resolves to
 `dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a` (Apache-2.0). The installed source
 files used here were byte-compared with their originals at that commit.
@@ -21,13 +21,16 @@ files used here were byte-compared with their originals at that commit.
 
 For each queried date `d`, pass **December 1 of `d.year - 1` through January 31
 of `d.year + 1`**, explicitly. Padding includes year-boundary holidays and
-neighboring sessions. Use upstream's cache and `date_to_session` rather than
-keeping the engine's bounded ten-day search. Calendar construction, missing
+neighboring sessions. Use upstream's `date_to_session` rather than
+keeping the engine's bounded ten-day search. A four-entry `functools.lru_cache`
+retains calendars by query year: upstream's factory cache keeps only the latest
+bounds per calendar name, so it does not cover alternating years. Calendar construction, missing
 dependencies and range errors remain visible. No broker or other network call
 was added to `sessions.py`.
 
 The module derives its result from explicit inputs and timezone conversion.
-PRE 04:00–09:30 and POST through 20:00 Eastern remain engine policy. The
+PRE starts at 04:00 and ends at XNYS's `session_open`; POST ends at 20:00
+Eastern. These extended-hours endpoints remain engine policy. The
 session policy, reconciliation and boundary-receipt functions are unchanged.
 An early-close flag now comes from XNYS's actual local close, including years
 outside 2026/2027.
@@ -142,15 +145,22 @@ weekends, year-crossing navigation, real `DateOutOfBounds` propagation,
 construction errors and an unsupported upstream timestamp range. Saturday
 New Year has **no preceding-Friday closure**; Sunday is observed Monday
 ([pinned rule](https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/exchange_calendars/us_holidays.py#L45-L49)).
-Calendar tests use explicit timestamps and reject socket/wall-clock calls
-during a session query; the session module's preflight
-freshness oracle is frozen to an explicit fixture value.
+Calendar tests use explicit timestamps. The guarded query test rejects
+`socket.socket`, `time.time`, pandas `Timestamp.now`, and the sessions module's
+`datetime.now`/`today` calls during a cold query; it does not instrument every
+clock or networking API. Poisoned upstream default globals and explicit factory
+argument assertions independently guard the bounds. Only the preflight test
+classes replace runner's `time` binding for the freshness oracle; the shared
+process `time.time` is left intact.
 
 The declared CI interpreter dependencies previously included only zizmor, while its
 promotion-gate venv remained isolated. `.github/requirements-ci.txt` now
 includes a separately hash-locked calendar-only subset of the qualified
-engine environment. This supplies the new required calendar to CI without
-installing NautilusTrader in that interpreter.
+engine environment. Linux validate/security-scan install that subset via
+requirements-ci. The repair also installs the hash-locked calendar subset in
+adoption-bootstrap's required Python 3.13 macOS job (both modes) and in
+catalog-freshness before unittest. These test interpreters do not install
+NautilusTrader.
 
 ## Corrections and limits observed during qualification
 
@@ -167,7 +177,11 @@ stop; the corrected check verifies that the prior session is confirmed and
 the stop is armed. Supplemental suites also exposed two tests whose injected
 calendar failure had depended on the removed table's year limit. They now
 inject the actual error explicitly. A missing `mock` import in one of those
-edits was corrected. The final affected suites pass.
+edits was corrected. The listed 320-test selection passed; that selection
+omitted ingestion, the source-hash contract, mover suites and the full CI
+suite. The first-round statement that all affected suites passed was too
+broad. The repair evidence below covers the omitted consumers and reports
+the complete suite's actual outcome.
 
 The first broader 322-test run exited 1. In addition to the corrected
 calendar-test issues, six credential-fixture outcomes fail in the mandated
@@ -177,11 +191,13 @@ unrelated to calendar resolution. No credential guard, ancestor permissions,
 live credential or host service was changed. The final 320-test affected
 selection does not claim to qualify those credential fixtures.
 
-Qualification is Linux x86_64 / Python 3.12 only. A different platform needs
-its own resolved lock and checks. Scheduled future holidays are projections
+Engine qualification is Linux x86_64 / Python 3.12 only. A different platform needs
+its own resolved engine lock and checks. The repair checks wheel availability
+for the separate calendar-only Python 3.13 macOS arm64 test environment;
+it does not execute macOS tests. Scheduled future holidays are projections
 of the pinned upstream rules; unforeseen closures require a qualified pin
-update. PRE/POST policy and modern 09:30 RTH opens remain the existing
-engine contract, not a historical extended-hours calendar qualification.
+update. PRE/POST policy remains the existing engine contract, not a
+historical extended-hours or broker qualification; RTH opens come from XNYS.
 
 ## Alternatives, cross-check and overturn conditions
 
@@ -219,6 +235,106 @@ change, and genuine provider bounds versus the retired table's coverage
 limit. These now have tests. Exceptional closures and other host/platform
 environments remain the next calendar qualification sweep's scope; no
 unexecuted upstream or broker test is promoted to acceptance.
+
+## Repair round 2 (2026-10-05)
+
+The cross-family verdict identified three p1 and six p2 findings. Each
+behavioral repair has a regression executed red before its implementation
+and green afterward. Documentary corrections require no new behavior tests.
+The [repair qualification](../../blueprints/us-equities/adaptive-paper/receipts/xnys-primary-20261005/repair-round-2.json)
+retains command exits, test counts, output digests and sanitized summaries.
+First-round attempts remain historical evidence.
+
+- **Ingestion:** expose public `is_trading_day` as a direct native XNYS
+  membership query, and migrate ingestion's import and callback. A synthetic
+  `main()` regression completes a Labor Day snapshot using the real calendar,
+  with transport and credentials replaced at their boundaries. The scheduled
+  script is unchanged; no scheduled or broker process was run.
+- **Privacy contract:** remove the engine `.lock` entry from source-hashes.
+  Its digest remains in the evidence registry. The narrow key pattern and
+  matching gitleaks allowlist stay intact; a regression enforces both the
+  absence from source-hashes and the registry's actual-content attestation.
+- **CI interpreters:** both omitted workflows install the hash-locked
+  calendar before their tests. Workflow contracts verify placement and all-mode
+  installation. Native pip downloaded all nine hashed wheels for Python 3.13
+  macOS arm64, including numpy/pandas cp313 wheels. Hosted macOS execution
+  remains a coordinator/CI check. Editing adoption-bootstrap selects full mode.
+- **Stale explanations and offline instructions:** runner, native strategy,
+  financing and its tests describe query-year bounds and actual provider
+  errors. The repository and offline throughput instructions now require the
+  calendar subset or the qualified engine interpreter.
+- **Native opening time:** `_boundaries` uses
+  [upstream `session_open`](https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/exchange_calendars/exchange_calendar.py#L1006-L1010).
+  A provider-boundary delayed-open fixture demonstrates PRE continuing until
+  10:00 and RTH starting then. The pinned XNYS has no scheduled late opens;
+  this fixture checks adaptation, not a historical NYSE event.
+- **Calendar reuse:** stdlib LRU glue retains four query years because
+  [upstream retains one bounds tuple per name](https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/exchange_calendars/calendar_utils.py#L212-L235).
+  Alternating year-end CLOSED queries construct three calendars once;
+  ordinary queries reuse the first close. Cold-cache fault-injection tests
+  still prove construction/range errors and explicit bounds.
+- **Mover X1:** the former table returned a nominal close on non-sessions;
+  XNYS correctly refuses them. `plan_timing` now translates native non-session
+  membership into `MoverRefusal("mover_x1_non_session")`, with weekend and
+  holiday regressions. Construction and range failures continue to propagate.
+- **Clock fixture:** freshness fixtures replace only runner's time binding
+  inside their two test classes. A regression verifies the process clock is
+  unchanged; the cold query also guards pandas `Timestamp.now`. The evidence
+  claim now names exactly the APIs guarded.
+
+Native `timeit` used the scratch engine, `-n 40 -r 5`, and an explicit warm-up
+for ordinary 2026-03-10 16:00 UTC and year-boundary 2027-01-01 02:00 UTC
+(2026-12-31 21:00 Eastern). Best repeat per call before/after:
+
+| Query | First-round implementation | Repaired implementation |
+| --- | --- | --- |
+| Ordinary RTH | 190 microseconds | 138 microseconds |
+| Year-boundary CLOSED | 242 milliseconds | 302 microseconds |
+
+These are local warm-call probes under niceness 19, including construction
+thrashing in the first-round boundary query, not cold-start or live-order
+latency qualification. The bounded cache affects cost only; results still
+derive from explicit inputs and retain upstream range checks.
+
+Scratch engine imports for XNYS 4.13.2, Alpaca 0.44.0 and NautilusTrader's
+LiveNode passed. A native sync dry-run reports all 25 locked packages unchanged
+in that scratch engine. This does not inspect or attest the live engine's drift.
+Deployment must separately review the live environment before syncing it.
+
+The resumed final selection ran 179 engine tests covering sessions, ingestion,
+source hashes and financing (exit 0, no skips), and 117 workflow-hardening
+tests (exit 0, two unchanged skips). Earlier unchanged-input results include
+98 mover/native-mover tests and 131 native/corporate-action tests, both exit 0
+with no skips. The numpy/pandas qualification selection ran 151 tests (exit 0,
+27 optional-runtime skips); the newly enabled mover/statistics and pandas
+cases passed.
+
+Two broader targeted runs require a coordinator host: the 310-test runner /
+native / corporate-action run exited 1 with six credential-fixture outcomes,
+and the 76-test throughput module exited 1 on its credential fixture. The
+unchanged guard rejects this sandbox's root/home ancestor owner UID 65534.
+The supplemental macOS-bootstrap test selection exited 1 with two native
+`npm pack` calls returning 226; no host launcher or service was adjusted.
+
+The full CI-equivalent suite was started with the pinned calendar/numpy/pandas
+environment, but the previous turn deadline interrupted it. Its retained log
+has 8,131 verbose outcome lines from a discovery of 10,962 cases, ending
+during `test_secret_path_guard.K4GuardTests.test_k4_timing`; these lines include
+subtests and omit multiline descriptions, so they are not a completed-case
+count. No final summary or process exit was captured. Partial failures span
+29 modules, including host credential, launcher, scratch-root and gitleaks
+access checks; they have not all been diagnosed. The repaired calendar,
+ingestion and source-hash cases observed in that run had no failed outcomes.
+This is an incomplete check, and the coordinator must rerun the full suite
+and host-dependent targeted checks. The resumed turn reused the bounded
+passing evidence and did not restart the long suite.
+
+Completeness review of this repair covered ingestion before the scheduler's
+gate, every suite-running CI interpreter, source-hash privacy, mover refusal,
+and year-boundary cache behavior. The retained parity oracle still covers all
+2026/2027 dates. Broker early-close after-hours policy and the alternative
+calendar's PRE/POST support remain unqualified leads; no broker call or new
+calendar comparison was authorized for this repair.
 
 ## Registry and deployment boundary
 

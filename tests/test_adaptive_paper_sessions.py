@@ -9,6 +9,7 @@ from decimal import Decimal as D
 import importlib.util
 from pathlib import Path
 import sys
+import time
 import unittest
 from unittest import mock
 from zoneinfo import ZoneInfo
@@ -31,22 +32,19 @@ except ImportError:
     from adaptive_paper_hermetic import patch_default_stop, restore_default_stop  # noqa: E402
 
 _HERMETIC_TOKEN = None
-_WALL_CLOCK_PATCH = None
+_PROCESS_TIME = time.time
 
 # Fixture timestamps and the preflight freshness oracle are explicit inputs.
 _FIXED_NOW = datetime(2026, 3, 10, 16, tzinfo=timezone.utc).timestamp()
 
 
 def setUpModule():
-    global _HERMETIC_TOKEN, _WALL_CLOCK_PATCH
+    global _HERMETIC_TOKEN
     _HERMETIC_TOKEN = patch_default_stop()
-    _WALL_CLOCK_PATCH = mock.patch("runner.time.time", return_value=_FIXED_NOW)
-    _WALL_CLOCK_PATCH.start()
 
 
 def tearDownModule():
     restore_default_stop(_HERMETIC_TOKEN)
-    _WALL_CLOCK_PATCH.stop()
 
 
 NY = ZoneInfo("America/New_York")
@@ -82,6 +80,47 @@ def ny(y, m, d, hh, mm, ss=0):
 
 
 class SessionClockTests(unittest.TestCase):
+    def setUp(self):
+        # Factory fault injection and bound assertions must exercise a cold
+        # query-year cache; no test may pass because another test warmed it.
+        sess._xnys_calendar_for_year.cache_clear()
+        self.addCleanup(sess._xnys_calendar_for_year.cache_clear)
+
+    def test_module_fixture_preserves_process_clock(self):
+        self.assertIs(time.time, _PROCESS_TIME)
+
+    def test_alternating_query_years_reuse_bounded_calendars(self):
+        # Upstream retains only the most recent bounds for a calendar name.
+        # Each year must be constructed once across repeated CLOSED queries.
+        with mock.patch.object(sess.xcals, "get_calendar", wraps=sess.xcals.get_calendar) as get:
+            for _ in range(3):
+                for ts, expected in ((ny(2026, 12, 31, 21, 0), ny(2027, 1, 4, 4, 0)),
+                                     (ny(2027, 12, 31, 21, 0), ny(2028, 1, 3, 4, 0))):
+                    self.assertEqual(sess.session_at(ts).next_open, expected)
+            self.assertEqual(get.call_count, 3, "one calendar per query year, including 2028")
+
+    def test_rth_query_reads_provider_close_once(self):
+        cal = sess.xcals.get_calendar("XNYS", start="2025-12-01", end="2027-01-31")
+        with mock.patch.object(cal, "session_close", wraps=cal.session_close) as close:
+            info = sess.session_at(ny(2026, 3, 10, 12, 0))
+            self.assertEqual(info.close, ny(2026, 3, 10, 16, 0))
+            self.assertFalse(info.is_early_close)
+            close.assert_called_once()
+
+    def test_provider_delayed_open_defers_rth_and_extends_pre(self):
+        # XNYS 4.13.2 has no late opens. Inject one at the upstream API
+        # boundary so a duplicated 09:30 constant cannot satisfy the test.
+        cal = sess.xcals.get_calendar("XNYS", start="2025-12-01", end="2027-01-31")
+        late_open = exchange_calendar.pd.Timestamp("2026-03-10T14:00:00Z")
+        with mock.patch.object(type(cal), "session_open", return_value=late_open):
+            before = sess.session_at(ny(2026, 3, 10, 9, 45))
+            self.assertEqual(before.kind, sess.SessionKind.PRE)
+            self.assertEqual(before.close, ny(2026, 3, 10, 10, 0))
+            self.assertEqual(before.seconds_to_close, 15 * 60)
+            after = sess.session_at(ny(2026, 3, 10, 10, 0))
+            self.assertEqual(after.kind, sess.SessionKind.RTH)
+            self.assertEqual(after.open, ny(2026, 3, 10, 10, 0))
+
     def test_pre_session_before_open(self):
         info = sess.session_at(ny(2026, 3, 10, 7, 0))  # Tuesday, ordinary trading day
         self.assertEqual(info.kind, sess.SessionKind.PRE)
@@ -215,6 +254,7 @@ class SessionClockTests(unittest.TestCase):
     def test_session_query_uses_no_network_or_wall_clock(self):
         with mock.patch("socket.socket", side_effect=AssertionError("network_read")), \
                 mock.patch("time.time", side_effect=AssertionError("wall_clock_read")), \
+                mock.patch.object(exchange_calendar.pd.Timestamp, "now", side_effect=AssertionError("wall_clock_read")), \
                 mock.patch.object(sess, "datetime", wraps=datetime) as clock:
             clock.now.side_effect = AssertionError("wall_clock_read")
             clock.today.side_effect = AssertionError("wall_clock_read")
@@ -235,6 +275,7 @@ class SessionClockTests(unittest.TestCase):
             self.assertEqual(info.kind, sess.SessionKind.RTH)
             self.assertTrue(info.is_early_close)
             self.assertEqual(info.close, ny(2031, 7, 3, 13, 0))
+            self.assertGreater(get.call_count, 0)
             for call in get.call_args_list:
                 self.assertEqual(call.args, ("XNYS",))
                 self.assertEqual(call.kwargs, {"start": "2030-12-01", "end": "2032-01-31"})
@@ -1309,7 +1350,16 @@ class OvernightGrossCapLiveConsumerTests(unittest.TestCase):
         ledger.close()
 
 
-class PreflightGuardSplitTests(unittest.TestCase):
+class _PreflightClockFixture:
+    def setUp(self):
+        # Replace only runner's time binding for freshness tests, leaving
+        # the shared process clock and other test classes untouched.
+        clock = mock.Mock(wraps=time)
+        clock.time.return_value = _FIXED_NOW
+        self.enterContext(mock.patch("runner.time", clock))
+
+
+class PreflightGuardSplitTests(_PreflightClockFixture, unittest.TestCase):
     """D4: overnight_holds must relax only the flat-account/open-orders gate,
     not the cash/equity floor, window sizing, universe or benchmark checks."""
 
@@ -1355,7 +1405,7 @@ class PreflightGuardSplitTests(unittest.TestCase):
             validate_preflight(obs, self.config(), require_open=True)
 
 
-class SessionAwareRequireOpenTests(unittest.TestCase):
+class SessionAwareRequireOpenTests(_PreflightClockFixture, unittest.TestCase):
     """D9: require_open must allow a PRE/POST start when extended_hours is
     enabled, using the broker clock's own timestamp, while the default policy
     keeps relying on the broker's is_open flag exactly as before."""
@@ -1363,7 +1413,7 @@ class SessionAwareRequireOpenTests(unittest.TestCase):
     def observation_at(self, ny_dt, *, is_open):
         # The session clock uses the synthetic ny_dt (this is the whole point
         # of the test); the benchmark-quote freshness gate is independent of
-        # the session clock. Its wall-clock oracle is frozen by setUpModule,
+        # the session clock. Its runner-local freshness oracle is frozen by setUp,
         # so quote timestamps use that explicit fixture value.
         now_ns = int(ny_dt.astimezone(timezone.utc).timestamp() * 1e9)
         real_now_ns = int(_FIXED_NOW * 1e9)

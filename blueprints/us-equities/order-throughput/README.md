@@ -167,6 +167,21 @@ evidence of strategy quality.
 
 ### Offline (fixture, no credentials, no network)
 
+Use the adaptive-paper engine venv, or install the calendar subset in an
+isolated test interpreter first. Set `TMPDIR` to a writable scratch directory
+outside the checkout:
+
+```sh
+python3 -m venv "$TMPDIR/capacity-tests"
+"$TMPDIR/capacity-tests/bin/python" -m pip install --require-hashes --only-binary=:all: \
+  -r .github/requirements-calendar.txt
+source "$TMPDIR/capacity-tests/bin/activate"
+```
+
+In the commands below, `python3` means that prepared interpreter. The
+offline capacity module imports the required XNYS session clock. Package
+installation needs network access; the fixture run uses no network.
+
 ```sh
 python3 blueprints/us-equities/order-throughput/capacity.py offline --output /tmp/capacity-offline-200.json
 python3 blueprints/us-equities/order-throughput/capacity.py offline --limit-header 1000 --cap 1000 \
@@ -385,4 +400,3 @@ of which there were none: the harness already writes `<path>` for argv
 paths and stores no credentials, account identifiers or broker order IDs,
 so the four committed receipts are byte-identical to the originals. The run
 journals and stdout captures stay private and only their hashes are recorded.
-

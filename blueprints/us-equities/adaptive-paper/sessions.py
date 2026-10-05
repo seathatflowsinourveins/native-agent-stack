@@ -5,18 +5,18 @@ query takes an explicit date or timezone-aware ``datetime`` and derives the
 NYSE session (PRE / RTH / POST / CLOSED), with ``zoneinfo`` for DST-correct
 America/New_York conversion.
 
-Session boundaries (Eastern local time, applied on every trading day):
+Normal session boundaries (Eastern local time; RTH follows XNYS's schedule):
     PRE     04:00 - 09:30
     RTH     09:30 - 16:00 (13:00 on a scheduled early-close day)
     POST    16:00 - 20:00 (13:00 - 20:00 on a scheduled early-close day)
     CLOSED  outside the above, and all day on a weekend or full-closure holiday
 
-The source for trading dates, holidays and RTH closing times is XNYS from the
-required exchange-calendars 4.13.2, gerrymanoim/exchange_calendars commit
+The source for trading dates, holidays and RTH opening/closing times is XNYS
+from required exchange-calendars 4.13.2, gerrymanoim/exchange_calendars commit
 dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a:
 https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/exchange_calendars/exchange_calendar_xnys.py
-The native get_calendar/is_session/session_close/date_to_session APIs provide
-the schedule and session navigation; PRE/POST windows remain engine policy.
+Native get_calendar/is_session/session_open/session_close/date_to_session APIs
+provide the schedule and session navigation; PRE/POST endpoints remain engine policy.
 
 Every calendar is constructed with explicit bounds: December 1 of the year
 before the queried date through January 31 of the following year. Results
@@ -30,6 +30,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, time as dtime, timedelta
 from decimal import Decimal
 from enum import Enum
+from functools import lru_cache
 from zoneinfo import ZoneInfo
 
 import exchange_calendars as xcals
@@ -37,7 +38,6 @@ import exchange_calendars as xcals
 NY = ZoneInfo("America/New_York")
 
 PRE_OPEN = dtime(4, 0)
-RTH_OPEN = dtime(9, 30)
 RTH_CLOSE = dtime(16, 0)
 POST_CLOSE = dtime(20, 0)
 
@@ -59,10 +59,24 @@ class SessionInfo:
     seconds_to_close: float | None
 
 
+@lru_cache(maxsize=4)
+def _xnys_calendar_for_year(year: int):
+    """Retain padded calendars for four query years, without consulting today.
+
+    Upstream's factory retains only one bounds tuple per name:
+    calendar_utils.py:212-235 at dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a.
+    """
+    return xcals.get_calendar("XNYS", start=f"{year - 1:04d}-12-01",
+                              end=f"{year + 1:04d}-01-31")
+
+
 def _xnys_calendar(d: date):
-    """Use native calendar caching with deterministic, padded query bounds."""
-    return xcals.get_calendar("XNYS", start=f"{d.year - 1:04d}-12-01",
-                              end=f"{d.year + 1:04d}-01-31")
+    return _xnys_calendar_for_year(d.year)
+
+
+def is_trading_day(d: date) -> bool:
+    """XNYS session membership for an explicit date; provider errors propagate."""
+    return _xnys_calendar(d).is_session(d.isoformat())
 
 
 def _exchange_calendars_day(d: date) -> tuple[bool, dtime | None]:
@@ -88,10 +102,13 @@ def _prev_trading_day(d: date) -> date:
     return _xnys_calendar(d).date_to_session(d - timedelta(days=1), direction="previous").date()
 
 
-def _boundaries(d: date):
-    close_t = _rth_close_time(d)
+def _boundaries(d: date, close_t: dtime | None = None):
+    if close_t is None:
+        close_t = _rth_close_time(d)
     pre_open = datetime.combine(d, PRE_OPEN, NY)
-    rth_open = datetime.combine(d, RTH_OPEN, NY)
+    # Native session_open: exchange_calendars/exchange_calendar.py:1006-1010
+    # at dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a (4.13.2).
+    rth_open = _xnys_calendar(d).session_open(d.isoformat()).tz_convert(NY).to_pydatetime()
     rth_close = datetime.combine(d, close_t, NY)
     post_close = datetime.combine(d, POST_CLOSE, NY)
     return pre_open, rth_open, rth_close, post_close
@@ -112,7 +129,7 @@ def session_at(ts: datetime) -> SessionInfo:
     is_early = is_trading_day and close_t < RTH_CLOSE
 
     if is_trading_day:
-        pre_open, rth_open, rth_close, post_close = _boundaries(d)
+        pre_open, rth_open, rth_close, post_close = _boundaries(d, close_t)
         if ts_ny < pre_open:
             return SessionInfo(SessionKind.CLOSED, d, None, None, is_early, pre_open, None)
         if pre_open <= ts_ny < rth_open:

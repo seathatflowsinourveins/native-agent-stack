@@ -419,6 +419,17 @@ class SessionsSizingAndTiming(unittest.TestCase):
             mover.build_plan(self.settings, self.limits, scan, session, trial_id="t1", evidence_class="LIVE",
                              t0=SCAN_TIME + 25, equity=D(10000))
 
+    def test_x1_timing_refuses_weekends_and_holidays_with_mover_refusal(self):
+        data = config_data()
+        data["mover"].update(session_scope="any_session", exit="X1", trial_end_et="16:00",
+                             rule="14:50|G20|V1000000|any")
+        _, limits, settings = load(data)
+        for day in (datetime(2026, 9, 26).date(), datetime(2026, 11, 26).date()):
+            with self.subTest(session_date=day):
+                with self.assertRaisesRegex(mover.MoverRefusal, "mover_x1_non_session"):
+                    mover.plan_timing(settings, limits, t0=mover.et_epoch(day, dtime(11, 51)),
+                                      session_date=day)
+
     def test_hard_flatten_is_the_trial_end_or_the_ledger_sell_window(self):
         date = datetime(2026, 9, 24).date()
         t0 = mover.et_epoch(date, dtime(8, 0, 30))
