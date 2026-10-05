@@ -131,7 +131,10 @@
   "runtime_prerequisite_observation": {
     "qdrant_direct_health_exit_code": 28,
     "qdrant_observation": "connection timed out; no selected-service listener observed by read-only inventory",
-    "service_start_attempted": false
+    "service_start_attempted": false,
+    "classification": "expected pending configuration and owner frozen qualification, not a fault or successful retrieval acceptance",
+    "source": "native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json:1031-1032,1073; docs/decisions/2026-10-04-token-full-stack-owner-default.md:131-140",
+    "owner_route": "frozen semble 0.6.1 versus SocratiCode 1.15.0 comparison decides the arm; no supporting-service installation or separate readiness handoff from this lane"
   },
   "host_application": {
     "command": "python3 tools/adoption/new_wsl_client_config.py --apply --host nativestack2604 --with-authorization-settings --skip claude-hooks --skip claude-agents --skip claude-mcp --skip claude-settings --skip claude-launcher --skip claude-md --skip codex-md --skip login-path --skip verify",
@@ -139,7 +142,7 @@
     "result": "refused config and profile writes: 14 Codex processes running",
     "worker_profile_bytes_unchanged": true,
     "rtk_host_install_and_trust": "not attempted after writer refusal; existing host RTK hook absent",
-    "next_step": "An idle owner window is required for the guarded profile apply and fresh deployed-session acceptance. Do not bypass the guard or stop peer sessions. The earlier real-home RTK retry is superseded: PR 705 owns RTK adoption; this lane will not run real-home init or trust apply."
+    "next_step": "Historical command only, not a lane retry instruction. No host apply from this lane in any window: no client-config apply, real-home RTK init or hook trust apply. The command center or user owns host configuration; session 99/PR 705 exclusively owns RTK adoption. Draft 716 cannot land before the v2026.10.05 re-pin and command-center cross-family read."
   },
   "failed_development_attempts": [
     {
