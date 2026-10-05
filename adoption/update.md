@@ -74,11 +74,14 @@ flow, recorded so a host can check what it receives.
      --repo seathatflowsinourveins/native-agent-stack \
      --signer-workflow seathatflowsinourveins/native-agent-stack/.github/workflows/publish-catalog.yml \
      --source-ref refs/tags/<tag> --source-digest <commit>
+   gh release verify <tag> --repo seathatflowsinourveins/native-agent-stack
    gh release verify-asset <tag> native-agent-stack-<commit>.tar.gz \
      --repo seathatflowsinourveins/native-agent-stack
    ```
-   [`docs/catalog-provenance.md`](../docs/catalog-provenance.md) covers the
-   attestation model and detached-bundle verification.
+   Stop on any verification failure. Native `gh release verify` checks the
+   release integrity; it does not replace provenance attestation or the asset
+   check. [`docs/catalog-provenance.md`](../docs/catalog-provenance.md) covers
+   the attestation model and detached-bundle verification.
 3. Open a re-pin PR that sets `source.release_tag` and `source.release_commit`
    (and `updated_at`) in `adoption/manifest.json` and re-registers its hash in
    `manifests/evidence.json`. `python3 scripts/release_due.py --strict` must
@@ -88,16 +91,29 @@ flow, recorded so a host can check what it receives.
    ruleset does not require an up-to-date branch and the post-merge push run of
    `validate.yml` is not strict);
    `validate.yml` runs
-   `release_due.py --strict-if-repinned origin/main`, which is strict because
-   the pinned commit changed, and `tests/test_release_pin_contents.py` checks
-   that the tag resolves to the pinned commit and that the release's own
-   documents reference only paths it contains. The "added after `vT`" and
+   `release_due.py --strict-if-repinned origin/main`, which becomes strict
+   when either member of the `(release_tag, release_commit)` tuple changes.
+   That re-pin path invokes
+   `gh release verify <tag> --repo seathatflowsinourveins/native-agent-stack --format json`
+   exactly once; an unavailable base is conservatively treated as a re-pin.
+   Native failure, unavailability or malformed JSON fails the gate. Default
+   reporting, an unchanged tuple and `--strict` alone make no verification or
+   network calls; this is a re-pin check, not a daily verification task.
+   `--strict` remains the local before-cut content check, and the report's
+   `status`, `due` and `changed` still describe content; re-pin verification
+   is reported separately as `release_verification` and through the exit code.
+   `tests/test_release_pin_contents.py` checks that the tag resolves to the
+   pinned commit and that the release's own documents reference only paths
+   it contains. The "added after `vT`" and
    "changed after `vT`" notes and the "(X at `vT`)" pin-coverage notes name the
    release they were written against, so they stay true at the new tag and
    the re-pin PR does not have to edit them;
    `tests/test_adoption_docs_consistency.py` then requires notes only for
    what the new release still lacks or runs differently, naming the new tag.
    Stale history notes can be dropped in any later PR.
+
+The [re-pin verification decision](../docs/decisions/2026-10-05-ci-release-repin-verification.md)
+records the verification boundary and evidence.
 
 **3. What the host re-runs after moving.** Receipts bind to the component
 version they recorded, so a pin change retires them for that component.

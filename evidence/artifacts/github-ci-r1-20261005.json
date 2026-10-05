@@ -1,0 +1,236 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-05T13:00:00Z",
+  "scope": "GitHub estate campaign r2 A8 R1; independently prepared unowned re-pin and update paths only",
+  "base_commit": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
+  "evidence_class": "local_integration",
+  "sources": [
+    {
+      "repository": "cli/cli",
+      "pin": "v2.102.0",
+      "path": "pkg/cmd/release/verify/verify.go",
+      "lines": "172-187",
+      "url": "https://github.com/cli/cli/blob/v2.102.0/pkg/cmd/release/verify/verify.go#L172-L187",
+      "git_blob": "c1a9ae4a20a019133f1bac6ef4d5039eda00e5cc",
+      "bytes": 6725,
+      "sha256": "db5f261eae8b6cb5471eac1f77a3357b06fa16ab6c9689caf868bd21f3854394"
+    },
+    {
+      "url": "https://cli.github.com/manual/gh_release_verify",
+      "feature": "Native release verification and supported flags"
+    },
+    {
+      "url": "https://docs.github.com/en/code-security/how-tos/secure-your-supply-chain/secure-your-dependencies/verify-release-integrity",
+      "feature": "Vendor native release-integrity verification"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
+      "path": "scripts/release_due.py",
+      "lines": "136,260-294",
+      "feature": "Existing pin/report seams extended only for NAS tuple comparison and native command integration"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
+      "path": "docs/lanes.md",
+      "lines": "94-121",
+      "feature": "Registry-last protocol"
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
+      "path": "docs/acceptance-evidence-policy.md",
+      "feature": "Keep actual native execution, integration checks, and fixtures separate"
+    },
+    {
+      "url": "https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-github-cli",
+      "feature": "Existing workflow owner must provide native GH_TOKEN for invoking step"
+    }
+  ],
+  "change": {
+    "paths": [
+      "scripts/release_due.py",
+      "tests/test_release_pin_contents.py",
+      "adoption/update.md",
+      "docs/decisions/2026-10-05-ci-release-repin-verification.md"
+    ],
+    "tuple": [
+      "release_tag",
+      "release_commit"
+    ],
+    "native_verification": "exactly once for strict-if-repinned tuple change or unavailable comparable base",
+    "offline_paths": [
+      "default report",
+      "unchanged tuple",
+      "--strict local before-cut check"
+    ],
+    "failure_contract": "Native nonzero/unavailable or malformed JSON with missing, empty or incorrectly typed attestation/verificationResult fails; extra fields allowed; errors omit raw vendor stderr",
+    "not_implemented": [
+      "publisher guard and ordering",
+      "bootstrap consumer path",
+      "Existing workflow release-due step native GH authentication wiring"
+    ]
+  },
+  "ownership": {
+    "evidence_class": "source_review",
+    "open_prs": 41,
+    "metadata_pages": 1,
+    "reused_unchanged_heads": 27,
+    "refreshed_file_lists": 14,
+    "refreshed_file_pages": 14,
+    "max_page_files": 77,
+    "explicit_get_commands": 15,
+    "all_exit_codes": 0,
+    "owned_path_intersections": [],
+    "new_decision_unchanged_head_native_cat_file_exit": 0,
+    "held_owners": {
+      "publisher": [
+        642
+      ],
+      "bootstrap": [
+        642,
+        706
+      ]
+    },
+    "scope": "One fresh open-PR metadata GET, changed-head file GETs, unchanged exact-head evidence reuse; point-in-time ownership only",
+    "held_workflow_prerequisite": {
+      "path": ".github/workflows/validate.yml",
+      "open_owner_heads": {
+        "706": "929ba811f9ca9fa037bf840ed55e56459da3e7ec",
+        "596": "7221607ba2813e2b99d9ff79c5e0027f49c10009",
+        "595": "7f6a1781a5d8803a04baddb36f936c237e5ce8ba"
+      },
+      "lines": "109-113",
+      "observation": "Step env sets BASE_REF only; GH_TOKEN at line77 is confined to zizmor",
+      "native_help_environment_exit": 0,
+      "evidence_class": "source_review",
+      "handoff": "Q15; no owned workflow or credential-reading workaround edited"
+    }
+  },
+  "native_sdk_attempts": [
+    {
+      "id": "ns2604-ci-r1-20261005",
+      "result": "stopped after owner discovery",
+      "edits": 0,
+      "model_requests": null,
+      "provider_usage": null,
+      "evidence_class": "source_review",
+      "limitation": "No native completion report; stopped before owned-path edits. Not acceptance."
+    },
+    {
+      "id": "ns2604-ci-r1-unowned-20261005",
+      "result": "finished",
+      "success": true,
+      "requests_to_model": 10,
+      "service_start_wait_exit_code": 0,
+      "service_result": "success",
+      "execution_status": "finished",
+      "allowed_files": 4,
+      "tests_executed": false,
+      "evidence_class": "source_review",
+      "run_report_original": {
+        "bytes": 500,
+        "sha256": "2ab9abdf0374d00971084a7b9ddb0726051bee8702c3aecd3fefc882111d233f"
+      },
+      "native_reported_metrics": {
+        "prompt_tokens": 538764,
+        "completion_tokens": 13236,
+        "cache_read_tokens": 454656,
+        "cache_write_tokens": 0,
+        "reasoning_tokens": 5481,
+        "accumulated_cost": 0
+      },
+      "counter_boundary": "Returned SDK counters only. Cache/read and reasoning are subsets, not additional totals; reported cost is not independent billing evidence."
+    }
+  ],
+  "native_release_verification": {
+    "evidence_class": "native_proven",
+    "installed_gh": "2.102.0",
+    "help_exit_code": 0,
+    "source_explicit_get_exit_code": 0,
+    "sandbox_source_preflight_exit_code": 0,
+    "command": "gh release verify v2026.10.05.1 --repo seathatflowsinourveins/native-agent-stack --format json",
+    "exit_code": 0,
+    "release_tag": "v2026.10.05.1",
+    "pinned_commit": "77d7516d81a94b1cb0e77a7b6c910c28c8104dc9",
+    "returned_output_bytes": 4743,
+    "returned_json_keys": [
+      "attestation",
+      "verificationResult"
+    ],
+    "original_receipt": {
+      "bytes": 5311,
+      "sha256": "fa01794a97ea5dffe80c0962e23e43c2b31166c1ac74b11d6e9de65464e3f240"
+    },
+    "scope": "One unchanged upstream command verified the named release. This does not execute the new NAS re-pin gate, verify a future release, or accept the held publisher/bootstrap paths."
+  },
+  "local_checks": [
+    {
+      "command": "python3 -m unittest discover -s tests -p test_release_pin_contents.py",
+      "exit_code": 0,
+      "tests": 30,
+      "evidence_class": "local_integration",
+      "controls_evidence_class": "synthetic",
+      "result": "Real local Git/report paths; GH success, tag-only/commit-only calls, zero-call paths, failure/unavailability/malformed-output controls use mocked subprocess results.",
+      "final_duration_seconds": 34.611
+    },
+    {
+      "command": "PYTHONPATH=tests python3 -m unittest test_adoption_docs_consistency.ReleasePinQuotesTests test_adoption_docs_consistency.RelativeLinkTests test_adoption_docs_consistency.ExclusiveFlagTests test_adoption_docs_consistency.ScriptPathTests test_adoption_docs_consistency.UnreleasedStepMarkerTests",
+      "exit_code": 0,
+      "tests": 21,
+      "evidence_class": "local_integration",
+      "final_duration_seconds": 17.938
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "components": 69,
+      "hashed_files": 10145,
+      "profiles": 4,
+      "receipts": 203,
+      "evidence_class": "local_integration",
+      "scope": "Integrity and declared scope only; not upstream acceptance"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "evidence_class": "local_integration",
+      "scope": "Whitespace consistency"
+    }
+  ],
+  "corrections": [
+    {
+      "observed": "Worker accepted any nonempty JSON object, including unsupported status-only output.",
+      "cause": "Return-shape check broader than native successful exporter output",
+      "verification": "Independent exact-source critic plus retained native output; narrowed to native attestation/verificationResult objects and reran malformed-shape fixture controls",
+      "evidence_class": "local_integration"
+    },
+    {
+      "command": "python3 scripts/host_receipts.py register_file --help",
+      "exit_code": 2,
+      "correction": "register_file is the documented importable Python function, not a CLI subcommand; use the docs/lanes.md recipe",
+      "evidence_class": "source_review"
+    },
+    {
+      "command": "git rebase origin/main",
+      "exit_code": 1,
+      "correction": "Unstaged changes safely prevented redundant rebase. Earlier pre-worker rebase exited0; fresh fetch and exact HEAD/origin/main comparison both c148e049efee75f8ea8a9a009e7b96b1e97f5c28 confirmed no base movement.",
+      "evidence_class": "source_review"
+    }
+  ],
+  "decision": "docs/decisions/2026-10-05-ci-release-repin-verification.md",
+  "limitations": [
+    "Explicitly partial R1; publisher #642 and bootstrap #642/#706 remain held.",
+    "No .github change, hosted new-gate execution, workflow rerun, release creation, setting/protection change, merge or transfer.",
+    "Old tagged workflows retain their historical event ref; default-branch edits do not update old tags.",
+    "Local checks and SDK completion do not establish GitHub acceptance. Draft requires command-center cross-family review and landing.",
+    "A real future re-pin needs existing workflow owner-provided native GH authentication; no workflow credential wiring changed in this partial draft."
+  ],
+  "integrity_check_scope": "Run scripts/validate.py after registration; integrity and declared-scope check only, not execution acceptance.",
+  "completeness_review": {
+    "evidence_class": "source_review",
+    "result": "Accepted exact repaired source after independent critic; root additionally verified owned deployment seam and retained Q15 prerequisite",
+    "module_sha256": "43ce0b26852d97d5bdb3a29d48f4615e8dddc42ed1298a9f975411456e530c21"
+  }
+}

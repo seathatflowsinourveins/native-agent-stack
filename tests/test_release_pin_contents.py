@@ -9,6 +9,7 @@ PR that documents a new script is not blocked. Found by the cross-session readin
 """
 from __future__ import annotations
 
+import io
 import json
 import os
 import shutil
@@ -16,7 +17,9 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
+from unittest import mock
 
 from scripts import release_due as rd
 
@@ -255,11 +258,133 @@ class ReleaseDueContentDriftTests(unittest.TestCase):
                          (1, "release_due", ["adoption/platforms/macos-arm64.md", "scripts/new.py"],
                           ["adoption/bootstrap.md"]))
 
+    def native_report(self, *args, result=None, error=None):
+        """Synthetic GH output only; the Git fixture and release-report code run unchanged."""
+        verify = mock.Mock(return_value=result if result is not None else subprocess.CompletedProcess(
+            ["gh"], 0, json.dumps({"attestation": {"fixture": "bundle"},
+                                  "verificationResult": {"fixture": "verified"},
+                                  "extra": "forward-compatible"}), ""), side_effect=error)
+        run = subprocess.run
+
+        def native_run(command, **kwargs):
+            if command[0] == "gh":
+                return verify(command, **kwargs)
+            return run(command, **kwargs)
+
+        out, err = io.StringIO(), io.StringIO()
+        with mock.patch.object(rd, "ROOT", self.repo), mock.patch.object(
+                rd.subprocess, "run", side_effect=native_run), redirect_stdout(out), redirect_stderr(err):
+            code = rd.main(list(args))
+        return code, json.loads(out.getvalue()), err.getvalue(), verify
+
+    def change_pin(self, **source):
+        manifest = json.loads((self.repo / "adoption/manifest.json").read_text(encoding="utf-8"))
+        manifest["source"].update(source)
+        self.write("adoption/manifest.json", json.dumps(manifest) + "\n")
+        self.commit("change release tuple")
+
+    def assert_native_verify_once(self, verify, tag="vT"):
+        verify.assert_called_once_with(
+            ["gh", "release", "verify", tag, "--repo", "seathatflowsinourveins/native-agent-stack",
+             "--format", "json"], capture_output=True, text=True, encoding="utf-8", timeout=60)
+
     def test_strict_if_repinned_is_strict_only_after_a_re_pin(self):
         self.write("scripts/tool.py", "print('v2')\n")
         self.commit("a script change")
-        self.assertEqual(self.report("--strict-if-repinned", self.release)[0], 1)  # the base pins 000...0
-        self.assertEqual(self.report("--strict-if-repinned", "HEAD")[0], 0)  # same pin: report only
+        code, report, _, verify = self.native_report("--strict-if-repinned", self.release)
+        self.assertEqual((code, report["strict"], report["changed"]), (1, True, ["scripts/tool.py"]))
+        self.assert_native_verify_once(verify)
+        code, report, _, verify = self.native_report("--strict-if-repinned", "HEAD")
+        self.assertEqual((code, report["strict"], report["changed"]), (0, False, ["scripts/tool.py"]))
+        self.assertNotIn("release_verification", report)
+        verify.assert_not_called()
+
+    def test_default_and_strict_never_verify_even_when_the_tuple_changed(self):
+        self.change_pin(release_tag="vU")
+        for args, strict in (((), False), (("--strict",), True)):
+            with self.subTest(args=args):
+                code, report, _, verify = self.native_report(*args)
+                self.assertEqual((code, report["status"], report["strict"]), (0, "current", strict))
+                self.assertNotIn("release_verification", report)
+                verify.assert_not_called()
+        self.write("scripts/tool.py", "print('v2')\n")
+        self.commit("local before-cut drift")
+        code, report, _, verify = self.native_report("--strict")
+        self.assertEqual((code, report["status"]), (1, "content_changed"))
+        verify.assert_not_called()
+
+    def test_unchanged_tuple_does_not_verify_when_other_manifest_fields_change(self):
+        base = self.git("rev-parse", "HEAD").stdout.strip()
+        self.repin(default_profile="gpu")
+        with mock.patch.object(rd, "ROOT", self.repo):
+            self.assertFalse(rd.repinned(base))
+        code, report, _, verify = self.native_report("--strict-if-repinned", base)
+        self.assertEqual((code, report["strict"], report["changed"]), (0, False, ["adoption/manifest.json"]))
+        self.assertNotIn("release_verification", report)
+        verify.assert_not_called()
+
+    def test_tag_only_change_is_a_repin_and_verifies_once(self):
+        base = self.git("rev-parse", "HEAD").stdout.strip()
+        self.change_pin(release_tag="vU")
+        with mock.patch.object(rd, "ROOT", self.repo):
+            self.assertTrue(rd.repinned(base))
+        code, report, _, verify = self.native_report("--strict-if-repinned", base)
+        self.assertEqual((code, report["release_tag"], report["release_commit"], report["strict"],
+                          report["status"]), (0, "vU", self.release, True, "current"))
+        self.assertEqual(report["release_verification"], {"status": "verified"})
+        self.assert_native_verify_once(verify, "vU")
+
+    def test_commit_only_change_is_a_repin_and_verifies_once(self):
+        base = self.git("rev-parse", "HEAD").stdout.strip()
+        self.change_pin(release_commit=base)
+        with mock.patch.object(rd, "ROOT", self.repo):
+            self.assertTrue(rd.repinned(base))
+        code, report, _, verify = self.native_report("--strict-if-repinned", base)
+        self.assertEqual((code, report["release_tag"], report["release_commit"], report["strict"],
+                          report["status"]), (0, "vT", base, True, "current"))
+        self.assertEqual(report["release_verification"], {"status": "verified"})
+        self.assert_native_verify_once(verify)
+
+    def test_failed_native_verification_fails_a_current_repin_without_raw_output(self):
+        result = subprocess.CompletedProcess(["gh"], 1, "synthetic-private-stdout", "synthetic-private-stderr")
+        code, report, err, verify = self.native_report("--strict-if-repinned", self.release, result=result)
+        self.assertEqual((code, report["status"], report["strict"], report["due"], report["changed"]),
+                         (1, "current", True, [], []))
+        self.assertEqual(report["release_verification"]["status"], "failed")
+        self.assertNotIn("synthetic-private", json.dumps(report) + err)
+        self.assert_native_verify_once(verify)
+
+    def test_unavailable_native_verification_fails_without_exception_details(self):
+        for error in (FileNotFoundError("synthetic-private-path"),
+                      subprocess.TimeoutExpired(["gh"], 60, output="synthetic-private-output")):
+            with self.subTest(error=type(error).__name__):
+                code, report, err, verify = self.native_report("--strict-if-repinned", self.release, error=error)
+                self.assertEqual((code, report["status"], report["release_verification"]["status"]),
+                                 (1, "current", "failed"))
+                self.assertNotIn("synthetic-private", json.dumps(report) + err)
+                self.assert_native_verify_once(verify)
+
+    def test_malformed_native_verification_fails_a_current_repin(self):
+        for output in ("", "not JSON", "{", "null", "[]", "{}", '"verified"',
+                       '{"status": "failed"}', '{"fixture": "unsupported shape"}',
+                       '{"attestation": {"fixture": true}}',
+                       '{"verificationResult": {"fixture": true}}',
+                       '{"attestation": {}, "verificationResult": {"fixture": true}}',
+                       '{"attestation": {"fixture": true}, "verificationResult": []}',
+                       '{"attestation": "bundle", "verificationResult": {"fixture": true}}'):
+            with self.subTest(output=output):
+                result = subprocess.CompletedProcess(["gh"], 0, output, "synthetic-private-stderr")
+                code, report, err, verify = self.native_report("--strict-if-repinned", self.release, result=result)
+                self.assertEqual((code, report["status"], report["release_verification"]["status"]),
+                                 (1, "current", "failed"))
+                self.assertNotIn("synthetic-private", json.dumps(report) + err)
+                self.assert_native_verify_once(verify)
+
+    def test_unavailable_base_remains_strict_and_verifies_once(self):
+        result = subprocess.CompletedProcess(["gh"], 1, "", "")
+        code, report, _, verify = self.native_report("--strict-if-repinned", "missing-base", result=result)
+        self.assertEqual((code, report["strict"], report["release_verification"]["status"]), (1, True, "failed"))
+        self.assert_native_verify_once(verify)
 
 
 if __name__ == "__main__":

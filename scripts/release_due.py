@@ -20,9 +20,10 @@ Modes:
   (default)                       report only, exit 0
   --strict                        exit 1 if anything is due or changed (use before cutting/re-pinning
                                   a release)
-  --strict-if-repinned BASE_REF   exit 1 if anything is due or changed AND this tree's
-                                  source.release_commit differs from BASE_REF's (a re-pin PR must pin
-                                  a release that has what main documents); report only otherwise
+  --strict-if-repinned BASE_REF   if the (release_tag, release_commit) tuple differs from BASE_REF's,
+                                  verify the release once with native gh and exit 1 if verification
+                                  fails or anything is due or changed; report only otherwise.
+                                  An unavailable base is conservatively treated as a re-pin.
 
 tests/test_release_pin_contents.py separately requires the pinned release to be self-consistent
 (its own documents only reference paths it contains).
@@ -261,7 +262,27 @@ def repinned(base_ref: str) -> bool:
     base = git("show", f"{base_ref}:adoption/manifest.json")
     if base.returncode != 0:
         return True  # no comparable base: treat as a re-pin and be strict
-    return pin(base.stdout)[1] != pin((ROOT / "adoption/manifest.json").read_text(encoding="utf-8"))[1]
+    return pin(base.stdout) != pin((ROOT / "adoption/manifest.json").read_text(encoding="utf-8"))
+
+
+def verify_release(tag: str) -> dict[str, str]:
+    try:
+        result = subprocess.run(
+            ["gh", "release", "verify", tag, "--repo", "seathatflowsinourveins/native-agent-stack",
+             "--format", "json"], capture_output=True, text=True, encoding="utf-8", timeout=60)
+    except (OSError, subprocess.TimeoutExpired, UnicodeError):
+        return {"status": "failed", "error": "native release verification unavailable"}
+    if result.returncode:
+        return {"status": "failed", "error": "native release verification failed"}
+    try:
+        verified = json.loads(result.stdout)
+    except json.JSONDecodeError:
+        verified = None
+    if not isinstance(verified, dict) or any(
+            not isinstance(verified.get(field), dict) or not verified[field]
+            for field in ("attestation", "verificationResult")):
+        return {"status": "failed", "error": "native release verification returned malformed JSON"}
+    return {"status": "verified"}
 
 
 def main(argv=None) -> int:
@@ -279,9 +300,13 @@ def main(argv=None) -> int:
         return 2
     missing = due(commit)
     drift = changed(commit)
-    strict = args.strict or (args.strict_if_repinned is not None and repinned(args.strict_if_repinned))
+    is_repin = args.strict_if_repinned is not None and repinned(args.strict_if_repinned)
+    strict = args.strict or is_repin
     report = {"release_tag": tag, "release_commit": commit, "due": missing, "changed": drift, "strict": strict,
               "status": "release_due" if missing else "content_changed" if drift else "current"}
+    verification = verify_release(tag) if is_repin else None
+    if verification is not None:
+        report["release_verification"] = verification
     print(json.dumps(report, indent=1))
     if missing:
         print(f"\n{len(missing)} path(s) documented on main are not in {tag}.", file=sys.stderr)
@@ -291,6 +316,9 @@ def main(argv=None) -> int:
     if missing or drift:
         print("Cut a new release and re-pin adoption/manifest.json source.release_tag/release_commit.",
               file=sys.stderr)
+    if verification is not None and verification["status"] != "verified":
+        print("Re-pin gate failed: " + verification["error"] + ".", file=sys.stderr)
+        return 1
     return 1 if (strict and (missing or drift)) else 0
 
 
