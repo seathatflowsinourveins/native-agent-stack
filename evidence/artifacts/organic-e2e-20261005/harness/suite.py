@@ -15,7 +15,7 @@ SUITE_SHA_PREFIX = "cd26427ae9cd7c89"   # protocol header
 
 # Aliases a prompt or launch string could use for an item (R2 (a)); the item's own name is always included.
 ALIASES = {
-    "ast-grep": ("sg", "ast grep", "astgrep"), "difftastic": ("difft",), "context-mode": ("context mode", "ctx_"),
+    "ast-grep": ("sg", "ast grep", "astgrep"), "difftastic": ("difft",), "context-mode": ("context mode",),
     "codebase-memory": ("codebase memory", "codebase-memory-mcp"), "worktrunk": ("wt",),
     "chub": ("context-hub", "context hub"), "ai-memory": ("ai memory", "aimemory"), "jcodemunch": ("jcode munch",),
     "socraticode": ("socratic code",), "promptfoo": ("prompt foo",), "skill-creator": ("skill creator",),

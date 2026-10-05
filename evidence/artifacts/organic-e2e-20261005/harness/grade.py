@@ -148,6 +148,16 @@ def skill_catalog(client: str, clone: Path | None = None) -> dict[str, str]:
     return catalog
 
 
+def _skill_body(catalog: dict, skill: str | None) -> str:
+    """The consulted skill's SKILL.md text, read from the catalog by name (one command can read several SKILL.md files,
+    so its output is not one skill's body)."""
+    path = next((p for p, n in catalog.items() if n == skill), None)
+    try:
+        return Path(path).read_text(encoding="utf-8", errors="replace") if path else ""
+    except OSError:
+        return ""
+
+
 def skill_item(name: str) -> str:
     """Skill catalog name -> suite item name: plugin skills fold to their plugin (context-mode:ctx-doctor -> context-mode)."""
     if ":" in name:
@@ -252,12 +262,39 @@ def _text_of(content) -> str:
     return "" if content is None else str(content)
 
 
-def parse_claude_events(events: list, source: str = "stream") -> dict:
-    calls, results, hooks, rate, init, result, order = {}, {}, [], [], None, None, 0
+def _hook_output(event: dict) -> dict:
+    """additionalContext and updatedInput of a stream hook_response (the hook's own JSON output), when present."""
+    out = {}
+    for field in ("output", "stdout"):
+        text = event.get(field)
+        if not isinstance(text, str) or not text.strip().startswith("{"):
+            continue
+        try:
+            data = json.loads(text)
+        except ValueError:
+            continue
+        specific = data.get("hookSpecificOutput") if isinstance(data, dict) else None
+        if isinstance(specific, dict):
+            if specific.get("additionalContext"):
+                out["additional_context"] = str(specific["additionalContext"])
+            if isinstance(specific.get("updatedInput"), dict):
+                out["updated_input"] = specific["updatedInput"]
+        if isinstance(data, dict) and data.get("systemMessage"):
+            out["system_message"] = str(data["systemMessage"])
+        if out:
+            break
+    return out
+
+
+def parse_claude_events(events: list, source: str = "stream", base: int = 0) -> dict:
+    """Tool calls paired with their results, every call and result carrying the index of its event (`order`, offset by
+    base), plus hook outputs with their index, so the R1 tagger can tell what came first."""
+    calls, results, hooks, hook_outputs, rate, init, result = {}, {}, [], [], [], None, None
     session_ids = set()
-    for event in events:
+    for index, event in enumerate(events):
         if not isinstance(event, dict):
             continue
+        order = base + index
         sid = event.get("session_id") or event.get("sessionId")   # stream-json and transcript spellings
         if sid:
             session_ids.add(sid)
@@ -266,15 +303,23 @@ def parse_claude_events(events: list, source: str = "stream") -> dict:
             init = event
         elif kind == "system" and str(event.get("subtype", "")).startswith("hook"):
             hooks.append(event)
+            if event.get("subtype") == "hook_response":
+                output = _hook_output(event)
+                if output:
+                    hook_outputs.append({"order": order, "hook_name": event.get("hook_name"), **output})
         elif kind == "rate_limit_event":
             rate.append(event)
         elif kind == "result":
             result = event
+        elif kind == "attachment" and isinstance(event.get("attachment"), dict):
+            attachment = event["attachment"]
+            if attachment.get("type") == "hook_additional_context":
+                hook_outputs.append({"order": order, "hook_name": attachment.get("hookName") or attachment.get("hook_name"),
+                                     "additional_context": _text_of(attachment.get("content"))})
         message = event.get("message") if isinstance(event.get("message"), dict) else None
         if kind == "assistant" and message:
             for block in message.get("content") or []:
                 if isinstance(block, dict) and block.get("type") == "tool_use":
-                    order += 1
                     calls[block["id"]] = {"id": block["id"], "name": block.get("name"), "input": block.get("input") or {},
                                           "parent": event.get("parent_tool_use_id"), "order": order, "source": source}
         elif kind == "user" and message:
@@ -287,14 +332,14 @@ def parse_claude_events(events: list, source: str = "stream") -> dict:
         res = results.get(call_id)
         call["result"] = res
         call["status"] = "no_result" if res is None else ("error" if res["is_error"] else "ok")
-    return {"calls": list(calls.values()), "hooks": hooks, "rate_limit_events": rate, "init": init, "result": result,
-            "session_ids": sorted(session_ids)}
+    return {"calls": list(calls.values()), "hooks": hooks, "hook_outputs": hook_outputs, "rate_limit_events": rate,
+            "init": init, "result": result, "session_ids": sorted(session_ids)}
 
 
-def parse_transcript(path: Path) -> dict:
+def parse_transcript(path: Path, base: int = 0) -> dict:
     """A Claude transcript: the same pairs plus attachments (instructions, hook context, memory)."""
     rows = read_jsonl(path)
-    parsed = parse_claude_events(rows, source=f"transcript:{path.name}")
+    parsed = parse_claude_events(rows, source=f"transcript:{path.name}", base=base)
     attachments = [r.get("attachment") for r in rows if r.get("type") == "attachment" and isinstance(r.get("attachment"), dict)]
     parsed["attachments"] = attachments
     return parsed
@@ -340,9 +385,17 @@ def parse_codex_stream(events: list) -> dict:
     return {"thread_id": thread, "items": items, "usage": usage, "errors": errors, "turn_failed": failed}
 
 
+STREAM_TOOL_TYPES = {"mcp_tool_call", "command_execution", "file_change", "web_search"}
+ROLLOUT_TOOL_TYPES = {"McpToolCall", "CommandExecution", "FileChange", "WebSearch"}
+
+
 def parse_rollout(path: Path) -> dict:
+    """A Codex rollout: completed items by id (in record order), messages with the number of tool items completed before
+    each (the ordering key the R1 tagger shares with the exec stream's tool items), code-mode wrappers and function
+    calls."""
     rows = read_jsonl(path)
     meta, items, messages, wrappers, functions, turn_context = None, {}, [], [], [], None
+    tools_done = 0
     for row in rows:
         payload = row.get("payload") or {}
         kind = row.get("type")
@@ -354,12 +407,14 @@ def parse_rollout(path: Path) -> dict:
             item = payload.get("item") or {}
             if item.get("id"):
                 items[item["id"]] = item
+            if item.get("type") in ROLLOUT_TOOL_TYPES:
+                tools_done += 1
         elif kind == "response_item":
             ptype = payload.get("type")
             if ptype == "message":
                 text = "".join(c.get("text", "") for c in payload.get("content") or [] if isinstance(c, dict))
                 kinds = ((payload.get("internal_chat_message_metadata_passthrough") or {}).get("content_item_kinds"))
-                messages.append({"role": payload.get("role"), "text": text, "kinds": kinds})
+                messages.append({"role": payload.get("role"), "text": text, "kinds": kinds, "tools_before": tools_done})
             elif ptype == "custom_tool_call":
                 wrappers.append({"name": payload.get("name"), "call_id": payload.get("call_id")})
             elif ptype == "function_call":
@@ -490,8 +545,10 @@ def codex_uses(item: dict, catalog: dict, cwd: str | None) -> list[dict]:
 # Provenance (R1).
 
 def item_tokens(item: str, lexicon: dict, tools_by_server: dict) -> list[str]:
+    """The strings that name an item in a text block: its name, code-like aliases (no plain-English phrases such as
+    "search first", which ordinary prose contains), its MCP tool names of 7+ characters and its mcp__<server>__ prefix."""
     from suite import ALIASES
-    tokens = {item.lower()} | {a.lower() for a in ALIASES.get(item, ())}
+    tokens = {item.lower()} | {a.lower() for a in ALIASES.get(item, ()) if " " not in a}
     for server, tools in tools_by_server.items():
         if MCP_SERVER_ITEMS.get(server, server) == item:
             tokens |= {t.lower() for t in tools if len(t) > 6} | {f"mcp__{server}__".lower()}
@@ -535,6 +592,11 @@ def tag_uses(trial: dict, ctx: dict) -> None:
         if not item or use.get("descriptive") or use["kind"] == "unparsed":
             use["tag"] = "n/a"
             continue
+        if use.get("hook_rewritten"):
+            # A hook's updatedInput rewrite is no model call, so tags 1-6 (why a model chose an item) cannot apply.
+            use["tag"] = "hook-rewritten"
+            use["fixture_mentioned"] = False
+            continue
         tokens = item_tokens(item, ctx["lexicon"], ctx["tools_by_server"])
         order, actor = use.get("order", 0), use.get("actor", "main")
         mention = prompt_mentions(ctx["prompt"], tokens)
@@ -549,16 +611,19 @@ def tag_uses(trial: dict, ctx: dict) -> None:
             tag = "agent-definition-directed"
         elif any(b["order"] < order and b["actor"] == actor and names_item(b["text"], tokens) for b in ctx["registry_results"]):
             tag = "fixture-directed"
-        elif any(b["order"] <= order and names_item(b["text"], tokens) for b in ctx["store_blocks"]):
+        elif any(b["order"] < order and b.get("actor", "main") == actor and b.get("source_item") != item
+                 and names_item(b["text"], tokens) for b in ctx["store_blocks"]):
+            # Same actor only (a subagent has its own context). An item's own output (ctx_search text naming ctx_*
+            # tools) does not direct that same item.
             tag = "store-directed"
         elif ctx["arm"] == "env" and any(names_item(t, tokens) for t in ctx["harness_texts"]):
             tag = "policy-named"
-        elif use.get("hook_rewritten"):
-            tag = "hook-rewritten"
-        elif any(b["order"] <= order and names_item(b["text"], tokens) for b in ctx["hook_blocks"]):
+        elif any(b["order"] < order and b.get("actor", "main") == actor and names_item(b["text"], tokens)
+                 for b in ctx["hook_blocks"]):
             tag = "hook-nudged"
         else:
-            directing = [s for s in ctx["skill_bodies"] if s["order"] < order and s["skill"] != use.get("skill")
+            directing = [s for s in ctx["skill_bodies"] if s["order"] < order and s.get("actor", "main") == actor
+                         and s["skill"] != use.get("skill") and skill_item(s["skill"] or "") != item
                          and names_item(s["text"], tokens)]
             if directing:
                 tag = "skill-directed:harness" if any(s["harness"] for s in directing) else "skill-directed:upstream"
@@ -592,14 +657,19 @@ def grade_claude_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) ->
     events = parse_stream_text(stream_path.read_text(encoding="utf-8", errors="replace")) if stream_path.exists() else []
     stream = parse_claude_events(events)
     transcript = parse_transcript(root / "transcripts" / tid / "main.jsonl") if (root / "transcripts" / tid / "main.jsonl").exists() else {"calls": [], "attachments": []}
-    child_calls = []
+    child_calls, child_hooks = [], []
     children_dir = root / "transcripts" / tid / "children"
     if children_dir.exists():
-        for path in sorted(children_dir.rglob("*.jsonl")):
-            parsed = parse_transcript(path)
+        # A child's events sort after the main stream's (base 10^7, 10^5 apart per file); a child's own blocks are
+        # compared within the child.
+        for number, path in enumerate(sorted(p for p in children_dir.rglob("*.jsonl") if p.name != "journal.jsonl"), 1):
+            parsed = parse_transcript(path, base=10**7 + number * 10**5)
+            actor = f"subagent:{path.stem}"
             for call in parsed["calls"]:
-                call["actor"] = f"subagent:{path.stem}"
+                call["actor"] = actor
                 child_calls.append(call)
+            for hook in parsed["hook_outputs"]:
+                child_hooks.append({**hook, "actor": actor})
     stream_ids = {c["id"] for c in stream["calls"]}
     calls = list(stream["calls"])
     for call in calls:
@@ -619,6 +689,25 @@ def grade_claude_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) ->
             use.update({"call_id": call["id"], "order": call["order"], "actor": call["actor"], "actor_type": call.get("actor_type"),
                         "tool_name": call.get("name"), "source": call.get("source")})
             uses.append(use)
+    # S6 and R1 tag 7: an RTK PreToolUse rewrite (updatedInput) of a main-stream Bash call, matched by the command with
+    # its rtk prefixes removed, between the call and its result.
+    rewrites = [h for h in stream["hook_outputs"] if (h.get("updated_input") or {}).get("command", "").lstrip().startswith("rtk ")]
+    bash_calls = [c for c in stream["calls"] if c.get("name") == "Bash"]
+    rewritten = 0
+    for call in bash_calls:
+        original = " ".join(((call.get("input") or {}).get("command") or "").split())
+        end = (call.get("result") or {}).get("order", 10**9)
+        for hook in rewrites:
+            updated = " ".join(re.sub(r"(^|(?<=[\s;&|(]))rtk\s+", "", hook["updated_input"]["command"]).split())
+            if call["order"] < hook["order"] < end and updated == original and not original.startswith("rtk "):
+                uses.append({"item": "rtk", "kind": "hook", "level": "completion" if call.get("status") == "ok" else "request",
+                             "hook_rewritten": True, "call_id": call["id"], "order": hook["order"], "actor": "main",
+                             "tool_name": "Bash", "source": "stream hook_response", "via": "PreToolUse updatedInput"})
+                rewritten += 1
+                break
+    rtk_s6 = {"main_stream_bash_calls": len(bash_calls), "rewritten": rewritten,
+              "rewritten_share_of_all_bash": round(rewritten / len(bash_calls), 4) if bash_calls else None,
+              "note": "the denominator is every main-stream Bash call; RTK eligibility replay (skill_usage --rtk-check) is not applied"}
     loki = load_json(root / "loki" / f"{tid}.json") if (root / "loki" / f"{tid}.json").exists() else {}
     by_session = loki.get("by_session_id") or []
     by_task = loki.get("by_ecosystem_task_id") or []
@@ -630,15 +719,21 @@ def grade_claude_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) ->
     joins["pass"] = joins["stream_session_id"] and joins["loki_session_rows"] > 0 and joins["loki_task_rows"] > 0 and joins["loki_task_rows_same_session"]
     # G3 agreement on MCP and Skill calls, by tool_use_id.
     loki_results = {r.get("tool_use_id"): r for r in by_session if r.get("event_name") == "tool_result" and r.get("tool_use_id")}
-    disagreements, checked = [], 0
+    disagreements, checked, checked_children, unresolved = [], 0, 0, 0
     for call in calls:
         name = call.get("name") or ""
         if not (name.startswith("mcp__") or name == "Skill"):
             continue
-        if call.get("source") == "child-transcript":
+        row = loki_results.get(call["id"])
+        if call.get("status") == "no_result":
+            # Killed before its result: agreement means neither source holds a completion.
+            if row is not None:
+                disagreements.append({"tool_use_id": call["id"], "issue": "Loki has a result the transcript lacks"})
+            unresolved += 1
             continue
         checked += 1
-        row = loki_results.get(call["id"])
+        if call.get("source") == "child-transcript":
+            checked_children += 1
         if row is None:
             disagreements.append({"tool_use_id": call["id"], "issue": "missing in Loki"})
             continue
@@ -652,7 +747,8 @@ def grade_claude_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) ->
     stream_call_ids = {c["id"] for c in calls}
     extra_loki = [k for k, r in loki_results.items() if (r.get("mcp_server_name") or r.get("tool_name") == "Skill") and k not in stream_call_ids]
     skill_rows = [r for r in by_session if r.get("event_name") == "skill_activated"]
-    agreement = {"checked": checked, "disagreements": disagreements, "loki_only_mcp_or_skill": len(extra_loki),
+    agreement = {"checked": checked, "checked_child_transcript_calls": checked_children, "unresolved_both_sides": unresolved,
+                 "disagreements": disagreements, "loki_only_mcp_or_skill": len(extra_loki),
                  "skill_activated_rows": [{k: r.get(k) for k in ("skill_name", "invocation_trigger")} for r in skill_rows]}
     agreement["pass"] = not disagreements and not extra_loki
     # Markers (G5) and instruction records.
@@ -686,7 +782,15 @@ def grade_claude_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) ->
                      "denied_tools_absent": [t for t in ("CronCreate", "RemoteTrigger", "PushNotification") if t not in tools],
                      "memory_paths": init.get("memory_paths")},
             "tools_by_server": tools_by_server, "rate_limit_events": len(stream["rate_limit_events"]),
-            "hook_events": len(stream["hooks"]), "cwd": cwd}
+            "hook_events": len(stream["hooks"]), "cwd": cwd, "child_hooks": child_hooks, "rtk_s6": rtk_s6,
+            "hook_sources": _count([h.get("hook_name") for h in stream["hooks"] if h.get("subtype") == "hook_response"])}
+
+
+def _count(values) -> dict:
+    out = {}
+    for value in values:
+        out[str(value)] = out.get(str(value), 0) + 1
+    return dict(sorted(out.items(), key=lambda kv: -kv[1]))
 
 
 def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> dict:
@@ -701,17 +805,31 @@ def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> 
     clone = root / "clones" / tid
     catalog = skill_catalog("codex", clone)
     uses = []
-    for index, item in enumerate(stream["items"], 1):
+    # Ordering key: the tool item's ordinal (1-based) among the session's tool items; a rollout message's key is the
+    # number of tool items completed before it plus 0.5. Child threads are offset by 10^6 per child.
+    ordinal = 0
+    for item in stream["items"]:
+        if item.get("type") in STREAM_TOOL_TYPES:
+            ordinal += 1
+        item["_ordinal"] = ordinal
+        item["_actor"] = "main"
         for use in codex_uses(item, catalog, cwd):
-            use.update({"call_id": item.get("id"), "order": index, "actor": "main", "source": "stream"})
+            use.update({"call_id": item.get("id"), "order": ordinal, "actor": "main", "source": "stream"})
             uses.append(use)
     child_rollouts = [r for r in rollouts if r is not main]
-    for rollout in child_rollouts:
-        for index, item in enumerate(rollout["items"].values(), 1):
+    for number, rollout in enumerate(child_rollouts, 1):
+        ordinal = 0
+        rollout["_offset"] = number * 10**6
+        for item in rollout["items"].values():
+            if item.get("type") in ROLLOUT_TOOL_TYPES:
+                ordinal += 1
+            item["_ordinal"] = rollout["_offset"] + ordinal
+            item["_actor"] = f"child:{(rollout.get('meta') or {}).get('id')}"
             for use in codex_uses(item, catalog, cwd):
-                use.update({"call_id": item.get("id"), "order": 10_000 + index, "actor": f"child:{(rollout.get('meta') or {}).get('id')}",
-                            "source": "child-rollout"})
+                use.update({"call_id": item.get("id"), "order": item["_ordinal"],
+                            "actor": f"child:{(rollout.get('meta') or {}).get('id')}", "source": "child-rollout"})
                 uses.append(use)
+    subagent_activity = sum(1 for r in rollouts for it in r["items"].values() if it.get("type") == "SubAgentActivity")
     loki = load_json(root / "loki" / f"{tid}.json") if (root / "loki" / f"{tid}.json").exists() else {}
     rows = loki.get("by_env") or []
     conv_ids = sorted({r.get("conversation_id") for r in rows if r.get("conversation_id")})
@@ -763,6 +881,9 @@ def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> 
             "uses": uses, "joins": joins, "agreement": agreement, "markers": markers, "effort": effort,
             "rollouts": [Path(r["path"]).name for r in rollouts], "model_provider": (main or {}).get("meta", {}).get("model_provider") if main else None,
             "hook_context_items": sum(1 for r in rollouts for m in r["messages"] if m.get("kinds") and "hooks.additional_context" in json.dumps(m["kinds"])),
+            "hook_context_items_nonempty": sum(1 for r in rollouts for m in r["messages"] if m.get("kinds")
+                                               and "hooks.additional_context" in json.dumps(m["kinds"]) and m["text"].strip()),
+            "subagent_activity_items": subagent_activity, "child_rollouts": child_rollouts,
             "cwd": cwd, "items": stream["items"], "rollout_main": main}
 
 
@@ -772,66 +893,83 @@ def provenance_context(root: Path, cfg: dict, trial: dict, graded: dict, task: d
     registry = set((load_json(root / "registry.json") or {}).get("provisional_reviewed") or [])
     cwd = graded.get("cwd") or ""
     store_blocks, hook_blocks, registry_results, fixture_results, skill_bodies, agent_returns = [], [], [], [], [], []
-    harness_texts = []
-    if arm == "env":
-        harness_texts = [(HOME / ".claude/CLAUDE.md").read_text(encoding="utf-8", errors="replace")] if client == "claude" else \
-                        [(HOME / ".codex/AGENTS.md").read_text(encoding="utf-8", errors="replace")]
+    own_memory = f"/.claude/projects/{_claude_slug(cwd)}/memory/" if cwd else None
+
+    def is_store_injection(text: str) -> bool:
+        low = (text or "").lower()
+        return "ai-memory" in low or "pending handoff" in low or "handoff from previous session" in low
+
     if client == "claude":
-        for event in graded["stream"]["hooks"]:
-            text = json.dumps(event)
-            hook_name = str(event.get("hook_name") or event.get("hook_event_name") or event.get("subtype"))
-            block = {"order": 0, "actor": "main", "text": text, "source": hook_name}
-            (store_blocks if "ai-memory" in text or "ai_memory" in text else hook_blocks).append(block)
-        for attachment in graded["transcript"].get("attachments") or []:
-            kind = attachment.get("type")
-            text = json.dumps(attachment)
-            if kind in ("hook_additional_context",):
-                block = {"order": 0, "actor": "main", "text": text, "source": kind}
-                (store_blocks if "ai-memory" in text or "pending handoff" in text.lower() else hook_blocks).append(block)
-            elif kind and "memory" in kind:
-                store_blocks.append({"order": 0, "actor": "main", "text": text, "source": kind})
+        # The env arm's harness text is what the client loaded (the transcript's instructions records), never the file
+        # as it is at grading time.
+        harness_texts = claude_instruction_texts(graded["transcript"]) if arm == "env" else []
+        for hook in list(graded["stream"].get("hook_outputs") or []) + list(graded.get("child_hooks") or []):
+            text = "\n".join(str(hook.get(k) or "") for k in ("additional_context", "system_message"))
+            if not text.strip():
+                continue
+            block = {"order": hook["order"], "actor": hook.get("actor", "main"), "text": text, "source": hook.get("hook_name")}
+            (store_blocks if is_store_injection(text) else hook_blocks).append(block)
         for call in graded["calls"]:
             result = (call.get("result") or {}).get("text") or ""
-            order, actor = call["order"], call.get("actor", "main")
+            order = (call.get("result") or {}).get("order", call["order"])
+            actor = call.get("actor", "main")
             name, args = call.get("name") or "", call.get("input") or {}
-            if STORE_TOOLS.match(name):
-                store_blocks.append({"order": order, "actor": actor, "text": result, "source": name})
             touched = json.dumps(args)
+            if STORE_TOOLS.match(name):
+                store_blocks.append({"order": order, "actor": actor, "text": result, "source": name,
+                                     "source_item": "ai-memory" if "ai-memory" in name else "context-mode"})
+            elif own_memory and own_memory in os.path.expanduser(touched).replace(str(HOME), ""):
+                # Claude auto memory: a read of the trial's own memory directory is a store retrieval. Text that the
+                # reading tool wraps around it (a ctx_* summary naming ctx_* tools) does not direct that tool's item.
+                reader = name.split("__")[1] if name.startswith("mcp__") else name
+                store_blocks.append({"order": order, "actor": actor, "text": result, "source": "auto-memory read",
+                                     "source_item": MCP_SERVER_ITEMS.get(reader, reader)})
             if any(path in touched for path in registry) and call.get("status") == "ok":
                 registry_results.append({"order": order, "actor": actor, "text": result})
-            elif cwd and cwd in touched or name in ("Read", "Grep", "Glob", "Bash"):
+            elif (cwd and cwd in touched) or name in ("Read", "Grep", "Glob", "Bash"):
                 fixture_results.append({"order": order, "actor": actor, "text": result})
-            if name in ("Task", "Agent") and args.get("subagent_type") in cfg.get("harness_agents", {}):
+            if name in ("Task", "Agent") and args.get("subagent_type") in (cfg.get("harness_agents") or {}):
                 agent_returns.append({"order": order, "actor": actor, "text": result})
+        catalog = skill_catalog("claude")
         for use in graded["uses"]:
             if use["kind"] == "skill-consultation" and use.get("level") in ("completion", "completed-ctx"):
                 call = next((c for c in graded["calls"] if c["id"] == use["call_id"]), None)
-                text = ((call or {}).get("result") or {}).get("text") or ""
-                if use.get("via") == "Skill":
-                    path = next((p for p, n in skill_catalog("claude").items() if n == use.get("skill")), None)
-                    text = Path(path).read_text(encoding="utf-8", errors="replace") if path else text
-                skill_bodies.append({"order": use["order"], "skill": use.get("skill"), "text": text,
+                skill_bodies.append({"order": ((call or {}).get("result") or {}).get("order", use["order"]),
+                                     "skill": use.get("skill"), "actor": use.get("actor", "main"),
+                                     "text": _skill_body(catalog, use.get("skill")),
                                      "harness": skill_item(use.get("skill") or "") in HARNESS_SKILLS})
     else:
         main = graded.get("rollout_main") or {}
-        for message in main.get("messages") or []:
-            if message.get("kinds") and "hooks.additional_context" in json.dumps(message["kinds"]):
-                block = {"order": 0, "actor": "main", "text": message["text"], "source": "hooks.additional_context"}
-                (store_blocks if "pending handoff" in message["text"].lower() or "ai-memory" in message["text"].lower() else hook_blocks).append(block)
-        for index, item in enumerate(graded["items"], 1):
+        harness_texts = [t for t in codex_instruction_texts(main) if "AGENTS.md instructions" in t] if arm == "env" else []
+        rollouts = [(main, 0)] + [(r, r.get("_offset", 0)) for r in graded.get("child_rollouts") or []]
+        for rollout, offset in rollouts:
+            actor = "main" if offset == 0 else f"child:{(rollout.get('meta') or {}).get('id')}"
+            for message in rollout.get("messages") or []:
+                if message.get("kinds") and "hooks.additional_context" in json.dumps(message["kinds"]) and message["text"].strip():
+                    block = {"order": offset + message.get("tools_before", 0) + 0.5, "actor": actor, "text": message["text"],
+                             "source": "hooks.additional_context"}
+                    (store_blocks if is_store_injection(message["text"]) else hook_blocks).append(block)
+        items = list(graded["items"]) + [it for r in graded.get("child_rollouts") or [] for it in r["items"].values()]
+        for item in items:
+            if item.get("type") not in STREAM_TOOL_TYPES | ROLLOUT_TOOL_TYPES:
+                continue
+            order = item.get("_ordinal", 0) + 0.25   # the result exists once the item completed
             text = json.dumps(item.get("result") or item.get("aggregated_output") or "")
             args = json.dumps(item.get("arguments") or item.get("command") or "")
-            if item.get("type") == "mcp_tool_call" and (item.get("server") == "ai-memory" or (item.get("tool") or "") == "ctx_search"):
-                store_blocks.append({"order": index, "actor": "main", "text": text, "source": f"{item.get('server')}/{item.get('tool')}"})
+            server, tool = item.get("server") or "", item.get("tool") or ""
+            actor = item.get("_actor", "main")
+            if item.get("type") in ("mcp_tool_call", "McpToolCall") and (server in ("ai-memory", "ai_memory") or tool == "ctx_search"):
+                store_blocks.append({"order": order, "actor": actor, "text": text, "source": f"{server}/{tool}",
+                                     "source_item": MCP_SERVER_ITEMS.get(server, server)})
             if any(path in args for path in registry):
-                registry_results.append({"order": index, "actor": "main", "text": text})
+                registry_results.append({"order": order, "actor": actor, "text": text})
             else:
-                fixture_results.append({"order": index, "actor": "main", "text": text})
+                fixture_results.append({"order": order, "actor": actor, "text": text})
+        catalog = skill_catalog("codex", root / "clones" / trial["trial_id"])
         for use in graded["uses"]:
-            if use["kind"] == "skill-consultation":
-                item = graded["items"][use["order"] - 1] if 0 < use["order"] <= len(graded["items"]) else {}
-                skill_bodies.append({"order": use["order"], "skill": use.get("skill"),
-                                     "text": json.dumps(item.get("aggregated_output") or item.get("result") or ""),
+            if use["kind"] == "skill-consultation" and use.get("level") in ("completion", "completed-ctx"):
+                skill_bodies.append({"order": use["order"] + 0.25, "skill": use.get("skill"), "actor": use.get("actor", "main"),
+                                     "text": _skill_body(catalog, use.get("skill")),
                                      "harness": skill_item(use.get("skill") or "") in HARNESS_SKILLS})
     prompt = task.get("prompt") or ""
     prompt_paths = [t for t in re.findall(r"[\w./-]+/[\w./-]+|\./[\w./-]+", prompt)]
@@ -839,7 +977,8 @@ def provenance_context(root: Path, cfg: dict, trial: dict, graded: dict, task: d
     def prompt_paths_in_call(use):
         return any(p in json.dumps(use) for p in prompt_paths)
 
-    return {"prompt": prompt, "arm": arm, "lexicon": cfg["lexicon"], "tools_by_server": graded.get("tools_by_server") or {},
+    return {"prompt": prompt, "arm": arm, "lexicon": cfg["lexicon"],
+            "tools_by_server": graded.get("tools_by_server") or cfg.get("tools_by_server") or {},
             "harness_texts": harness_texts, "harness_agents": cfg.get("harness_agents") or {}, "store_blocks": store_blocks,
             "hook_blocks": hook_blocks, "registry_results": registry_results, "fixture_results": fixture_results,
             "skill_bodies": skill_bodies, "agent_returns": agent_returns, "prompt_paths_in_call": prompt_paths_in_call}
@@ -895,20 +1034,36 @@ def watcher(graded: dict, client: str) -> list[dict]:
     return hits
 
 
+def _claude_slug(path: str) -> str:
+    return "".join(ch if ch.isalnum() else "-" for ch in path or "")
+
+
 def coordination_reads(graded: dict, client: str) -> list[str]:
-    """G13: reads that reach coordination paths or other sessions' transcripts."""
+    """G13: calls that reach coordination paths or other sessions' transcripts. The trial's own project directory
+    (its auto memory, exempt and logged under §8.4) is not another session's."""
     found = []
+    own = f".claude/projects/{_claude_slug(graded.get('cwd') or '')}/" if graded.get("cwd") else None
+    texts = []
     if client == "claude":
-        for call in graded["calls"]:
-            text = json.dumps(call.get("input") or {})
-            if COORDINATION.search(text):
-                found.append(call["id"])
+        texts = [(call["id"], json.dumps(call.get("input") or {})) for call in graded["calls"]]
     else:
-        for item in graded["items"]:
-            text = json.dumps(item.get("command") or item.get("arguments") or "")
-            if COORDINATION.search(text):
-                found.append(item.get("id"))
+        texts = [(item.get("id"), json.dumps(item.get("command") or item.get("arguments") or "")) for item in graded["items"]]
+        texts += [(item.get("id"), json.dumps(item.get("command") or item.get("arguments") or ""))
+                  for r in graded.get("child_rollouts") or [] for item in r["items"].values()]
+    for call_id, text in texts:
+        if own:
+            text = text.replace(own, "<own-project>/")
+        if COORDINATION.search(text):
+            found.append(call_id)
     return found
+
+
+def own_memory_reads(graded: dict) -> list[str]:
+    """Calls that read the trial's own auto-memory directory (exempt, logged as a cross-trial-store event)."""
+    if not graded.get("cwd"):
+        return []
+    own = f".claude/projects/{_claude_slug(graded['cwd'])}/memory"
+    return [c["id"] for c in graded.get("calls") or [] if own in json.dumps(c.get("input") or {})]
 
 
 def grade_run(root: Path) -> dict:
@@ -925,8 +1080,12 @@ def grade_run(root: Path) -> dict:
                     ledger[row["trial_id"]][key] = row[key]
     blocks = read_jsonl(root / "blocks.jsonl")
     table, per_item = [], {}
+    # MCP tool names by server for the tagger's item tokens: run.json's (stage 1) or, for an older run, the first Claude
+    # init in this run (the same host MCP servers serve both clients). Claude trials sort first for that reason.
+    run_tools: dict = dict(cfg.get("tools_by_server") or {})
     gate_rows = {g: [] for g in ("G2", "G3", "G5", "G6", "G7", "G8", "G9", "G11", "G13", "G14")}
-    for tid, trial in sorted(ledger.items(), key=lambda kv: kv[1]["rows"].get("pre-launch", {}).get("at", "")):
+    for tid, trial in sorted(ledger.items(), key=lambda kv: (kv[1].get("client") != "claude",
+                                                             kv[1]["rows"].get("pre-launch", {}).get("at", ""))):
         rows = trial["rows"]
         exit_row = rows.get("exit", {})
         launched = "launched" in rows or trial.get("cell") == "codex-app-server"
@@ -939,6 +1098,10 @@ def grade_run(root: Path) -> dict:
             continue
         task = tasks.get((trial.get("task"), trial.get("instance")), {})
         graded = grade_claude_trial(root, cfg, trial, rows) if trial.get("client") == "claude" else grade_codex_trial(root, cfg, trial, rows)
+        if trial.get("client") == "claude" and graded.get("tools_by_server"):
+            run_tools.update({k: v for k, v in graded["tools_by_server"].items() if k not in run_tools})
+        elif not graded.get("tools_by_server"):
+            graded["tools_by_server"] = cfg.get("tools_by_server") or run_tools
         ctx = provenance_context(root, cfg, trial, graded, task)
         tag_uses(graded, ctx)
         uses = graded["uses"]
@@ -958,6 +1121,7 @@ def grade_run(root: Path) -> dict:
         record["valid"] = bool(graded["joins"]["pass"] and marker_ok and not exit_row.get("censored"))
         record["watcher"] = watcher(graded, trial.get("client"))
         record["coordination_reads"] = coordination_reads(graded, trial.get("client"))
+        record["own_auto_memory_reads"] = own_memory_reads(graded) if trial.get("client") == "claude" else []
         draft_ok = (root / "draft" / tid).exists() and (root / "manifests" / f"{tid}.fixture.json").exists()
         fixture_kept = bool(rows.get("prepared", {}).get("fixture_private") and Path(rows["prepared"]["fixture_private"]).exists())
         record["kept"] = {"draft_copy": draft_ok, "fixture_manifest": (root / "manifests" / f"{tid}.fixture.json").exists(),
@@ -971,10 +1135,13 @@ def grade_run(root: Path) -> dict:
                                 "hook_events": graded["hook_events"], "meter_first": exit_row.get("meter_first"),
                                 "meter_last": exit_row.get("meter_last"), "cost_usd_result": graded["cost_usd_result"],
                                 "cost_usd_loki": graded["cost_usd_loki"], "init": graded["init"],
-                                "instruction_files": graded["instruction_files"]}
+                                "instruction_files": graded["instruction_files"], "rtk_s6": graded["rtk_s6"],
+                                "hook_sources": graded["hook_sources"]}
         else:
             record["codex"] = {"effort": graded["effort"], "stream": graded["stream"], "rollouts": graded["rollouts"],
-                               "model_provider": graded["model_provider"], "hook_context_items": graded["hook_context_items"]}
+                               "model_provider": graded["model_provider"], "hook_context_items": graded["hook_context_items"],
+                               "hook_context_items_nonempty": graded["hook_context_items_nonempty"],
+                               "subagent_activity_items": graded["subagent_activity_items"]}
         table.append(record)
         gate_rows["G2"].append(graded["joins"]["pass"])
         gate_rows["G3"].append(graded["agreement"]["pass"])
@@ -1026,7 +1193,9 @@ def grade_run(root: Path) -> dict:
                                for b in blocks if b.get("outcomes")) and all((r.get("host_s7") or {}).get("equal", True) for r in table if r.get("launched")),
                    "blocks": len([b for b in blocks if b.get("outcomes")])}
     gates["G15"] = {"observed": observed, "gaps": [k for k, v in observed.items() if not v]}
-    return {"graded_at": utc_now(), "run_id": cfg["run_id"], "trials": table, "oir": oir, "gates": gates,
+    from common import sha256_file
+    return {"graded_at": utc_now(), "run_id": cfg["run_id"], "grader_sha256": sha256_file(Path(__file__)),
+            "common_sha256": sha256_file(HERE / "common.py"), "trials": table, "oir": oir, "gates": gates,
             "notes": ["Outcome grading (D then R oracles, 0-4) is the coordinator's blind GPT step; none is computed here.",
                       "Labels (R4) are pending, so OIR uses each task's own item as the target; no verdict is derived.",
                       "fixture-directed uses the provisional routing registry until the hint reader's review replaces it."]}

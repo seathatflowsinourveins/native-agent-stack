@@ -201,6 +201,11 @@ def main(argv=None) -> int:
     tasks = suite.pilot_tasks(items)
     init = reference_init()
     tool_functions = sorted({t.split("__", 2)[2] for t in (init or {}).get("tools", []) if t.startswith("mcp__") and t.count("__") >= 2})
+    tools_by_server = {}
+    for tool in (init or {}).get("tools", []):
+        if tool.startswith("mcp__") and tool.count("__") >= 2:
+            _, server, function = tool.split("__", 2)
+            tools_by_server.setdefault(server, []).append(function)
     lex = suite.lexicon(items, tool_functions)
     roots = [HOME / ".agents/skills", HOME / ".claude/plugins/cache", CODEX_HOME_REAL / "skills", CODEX_HOME_REAL / "plugins/cache"]
     descriptions = suite.skill_descriptions(roots)
@@ -362,7 +367,7 @@ def main(argv=None) -> int:
                     "reused": fx.get("reused", False)},
         "registry": {"path": str(root / "registry.json"), "sha256": fx["registry_sha256"], "counts": fx["registry_counts"],
                      "status": "provisional (hint-reader review pending)"},
-        "lexicon": lex, "lint": lint, "harness_agents": harness_agent_items(lex["names"]),
+        "lexicon": lex, "lint": lint, "harness_agents": harness_agent_items(lex["names"]), "tools_by_server": tools_by_server,
         "claude_settings": claude_settings, "claude_settings_sha256": {a: sha256_json(s) for a, s in claude_settings.items()},
         "credential_denies_source_sha256": credential["source_sha256"],
         "codex_rules_sha256": sha256_bytes(rules_text.encode()), "codex_rules_check": rules_check,
