@@ -622,7 +622,7 @@ def make_catalog(tmp: Path) -> Path:
     files = [cfg.MAP_REL, cfg.MANIFEST_REL, cfg.BOOTSTRAP_REL, cfg.HOST_TEMPLATE_REL, *cfg.TEMPLATES.values(),
              *cfg.TEMPLATE_ADDITIONS.values(), *cfg.BLOCK_TEXT_REL.values(), *cfg.GENERATED_BLOCKS.values(), f"{cfg.PLAN_REL}/install-plan.json",
              f"{cfg.PLAN_REL}/config/otel.yaml", f"{cfg.PLAN_REL}/config/omniroute.env.example",
-             cfg.SKILLS_MANIFEST_REL]
+             cfg.SKILLS_MANIFEST_REL, cfg.managed_block.RTK_AWARENESS_REL]
     # The dated records that the map's `directive` fields name: --check requires each to be a file of the checkout.
     files += sorted({entry["directive"] for entry in json.loads((ROOT / cfg.MAP_REL).read_text(encoding="utf-8"))["entries"]
                      if "directive" in entry})
@@ -1398,7 +1398,7 @@ SENTENCE_STOP = r"[.!?][\"')\]`*_]*"
 
 
 def source_lines(piece: str) -> list:
-    return (ROOT / cfg.BLOCK_TEXT_REL[piece]).read_text(encoding="utf-8").split("\n")
+    return cfg.block_text(ROOT, piece).split("\n")
 
 
 def generated_text(piece: str) -> str:
@@ -1897,6 +1897,27 @@ class ApplyCase(unittest.TestCase):
         patcher.start()
         self.addCleanup(patcher.stop)
         self.eco = self.home / ".local/share/codex-ecosystem"
+        native_run = subprocess.run
+
+        def synthetic_rtk(command, **kwargs):
+            home = Path(kwargs.get("env", {}).get("HOME", str(self.home)))
+            if command == [str(home / ".local/share/codex-ecosystem/bin/rtk"), "init", "-g", "--no-patch"]:
+                self.assertTrue(home.is_relative_to(self.base), "synthetic native init escaped the temporary home")
+                target = home / ".claude"
+                target.mkdir(exist_ok=True)
+                (target / "RTK.md").write_text("Synthetic native RTK awareness.\n")
+                path = target / "CLAUDE.md"
+                current = path.read_text() if path.exists() else ""
+                if "@RTK.md" not in current.splitlines():
+                    path.write_text(current + ("\n" if current and not current.endswith("\n") else "") + "@RTK.md\n")
+                return subprocess.CompletedProcess(command, 0, "Synthetic RTK init.\n", "")
+            return native_run(command, **kwargs)
+
+        # Cover direct run_main calls and alternate temporary homes as well as
+        # this helper, without executing a real RTK installation in integration tests.
+        patcher = mock.patch.object(subprocess, "run", side_effect=synthetic_rtk)
+        patcher.start()
+        self.addCleanup(patcher.stop)
 
     def apply(self, *extra: str, dry: bool = False, claude: Path | None = None):
         argv = ["--apply", "--host", EXAMPLE_HOST, "--home", str(self.home), "--claude-bin", str(claude or self.claude),
@@ -1913,6 +1934,28 @@ class ApplyCase(unittest.TestCase):
 
 
 class ApplyTests(ApplyCase):
+    def test_apply_keeps_the_owned_skill_listing_fraction_and_host_only_settings(self):
+        self.installed_state()
+        target = self.home / ".claude/settings.json"
+        target.parent.mkdir()
+        original = {"skillListingBudgetFraction": 0.05, "hostOnly": {"keep": 1}}
+        target.write_text(json.dumps(original) + "\n", encoding="utf-8")
+        before = target.read_bytes()
+        code, out, _ = self.apply(dry=True)
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(target.read_bytes(), before)
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        settings = json.loads(target.read_text())
+        self.assertEqual(settings["skillListingBudgetFraction"], 0.05)
+        self.assertEqual(settings["hostOnly"], {"keep": 1})
+        backups = list(target.parent.glob("settings.json.bak.*"))
+        self.assertEqual([p.read_bytes() for p in backups], [before])
+        once = tree(self.home)
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(tree(self.home), once)
+
     def test_a_dry_run_writes_nothing_and_runs_no_client(self):
         self.installed_state()
         before = tree(self.home)
@@ -1943,7 +1986,14 @@ class ApplyTests(ApplyCase):
         for step in ("claude-hooks", "claude-agents", "claude-mcp", "claude-settings", "claude-launcher", "claude-md",
                      "codex-config", "codex-files", "codex-md", "login-path"):
             self.assertIn(f"{step} current", summary)
-        self.assertEqual([p for p in self.home.rglob("*") if ".bak." in p.name], [])
+        # Native RTK first creates the import; adopting our managed block backs
+        # that original file up once. The complete tree comparison above proves
+        # the second adoption neither changes files nor adds another backup.
+        backups = [p for p in self.home.rglob("*") if ".bak." in p.name]
+        self.assertEqual(len(backups), 1)
+        self.assertEqual(backups[0].parent, self.home / ".claude")
+        self.assertTrue(backups[0].name.startswith("CLAUDE.md.bak."))
+        self.assertEqual(backups[0].read_text(encoding="utf-8"), "@RTK.md\n")
 
     def test_the_first_run_writes_what_the_wired_pieces_name_and_nothing_else(self):
         self.installed_state()
@@ -1976,7 +2026,8 @@ class ApplyTests(ApplyCase):
         self.assertEqual((codex / "AGENTS.md").read_text(), generated_text(cfg.CODEX_MD_PIECE))
         self.assertNotIn("never rewritten", out)
         claude_md = (self.home / ".claude" / "CLAUDE.md").read_text()
-        self.assertTrue(claude_md.startswith(managed_block.CLAUDE_BEGIN_LINE + "\n"))
+        self.assertTrue(claude_md.startswith("@RTK.md\n\n" + managed_block.CLAUDE_BEGIN_LINE + "\n"))
+        self.assertEqual(claude_md.splitlines().count("@RTK.md"), 1)
         self.assertTrue(claude_md.endswith(generated_text(cfg.CLAUDE_MD_PIECE).rstrip("\n") + "\n" + managed_block.CLAUDE_END + "\n"))
         self.assertEqual(name_hits(claude_md + (codex / "AGENTS.md").read_text(), unwired_names_independently()), [])
 
@@ -4126,9 +4177,10 @@ class RecordTests(unittest.TestCase):
 
     def test_the_counts_that_the_record_states_are_the_ones_check_prints(self):
         text = " ".join(self.RECORD.read_text(encoding="utf-8").split())
-        match = re.search(r"Today: (\d+) pieces, (\d+) wired \((\d+) practice, (\d+) through a slot\), (\d+) not wired "
-                          r"\((\d+) through a slot that does not install, (\d+) by their own entry\) and (\d+) authorization "
-                          r"pieces", text)
+        matches = list(re.finditer(r"Today: (\d+) pieces, (\d+) wired \((\d+) practice, (\d+) through a slot\), (\d+) not wired "
+                                  r"\((\d+) through a slot that does not install, (\d+) by their own entry\) and (\d+) authorization "
+                                  r"pieces", text))
+        match = matches[-1] if matches else None  # Latest dated projection; historical counts remain intact.
         self.assertIsNotNone(match, "Decision 2 no longer states the counts in that shape")
         rows = json.loads(run_main("--check", "--json")[1])
 
@@ -4186,6 +4238,51 @@ class RecipeCommandTests(unittest.TestCase):
             for word in command.split():
                 if word.endswith((".sh", ".py")) and "/" in word:
                     self.assertTrue((ROOT / word.strip("'")).is_file(), word)
+
+
+
+class RtkNativeLayoutTests(unittest.TestCase):
+    def apply(self, temporary, dry=False, wired=True):
+        args = cfg.build_parser().parse_args(["--apply", "--home", str(temporary)] + (["--dry-run"] if dry else []))
+        runner = cfg.Apply(args)
+        runner.eco = Path(temporary) / "eco"
+        runner.wired = {"step/rtk-claude-init": True} if wired else {}
+        return runner
+
+    def test_dry_run_and_unwired_slot_do_not_execute_the_native_installer(self):
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(subprocess, "run") as run:
+            for dry, wired, expected in ((True, True, "planned"), (False, False, "left out")):
+                runner = self.apply(tmp, dry, wired)
+                with contextlib.redirect_stdout(io.StringIO()):
+                    runner.step_rtk_claude_init()
+                self.assertEqual(runner.outcomes, [("rtk-claude-init", expected)])
+            run.assert_not_called()
+
+    def test_native_global_default_is_used_and_its_files_are_read_back(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            runner = self.apply(tmp)
+            def native(argv, **kwargs):
+                self.assertEqual(argv, [str(runner.eco / "bin/rtk"), "init", "-g", "--no-patch"])
+                self.assertEqual(kwargs["env"]["HOME"], tmp)
+                target = Path(tmp) / ".claude"
+                target.mkdir()
+                (target / "RTK.md").write_text("Native synthetic RTK instructions.\n")
+                (target / "CLAUDE.md").write_text("@RTK.md\n")
+                return subprocess.CompletedProcess(argv, 0, "Native init succeeded.\n", "")
+            with mock.patch.object(subprocess, "run", side_effect=native), contextlib.redirect_stdout(io.StringIO()):
+                runner.step_rtk_claude_init()
+            self.assertEqual(runner.outcomes, [("rtk-claude-init", "applied")])
+
+    def test_exit_zero_without_the_native_import_fails_readback(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            runner = self.apply(tmp)
+            target = Path(tmp) / ".claude"
+            target.mkdir()
+            (target / "RTK.md").write_text("Synthetic file without import.\n")
+            with mock.patch.object(subprocess, "run", return_value=subprocess.CompletedProcess([], 0, "", "")), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                runner.step_rtk_claude_init()
+            self.assertEqual(runner.outcomes, [("rtk-claude-init", "failed")])
 
 
 if __name__ == "__main__":

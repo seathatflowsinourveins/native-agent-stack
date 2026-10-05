@@ -257,3 +257,37 @@ These are structural checks on text, pins and registration, not a behavior test.
   - SDK branch head `404b821cd3af25800ea418dc6145cc5cb6fe33c5`: `evidence/artifacts/runtime-sdk-20260930/usage-scope-receipt.json`, `tests/test_sdk_usage_scope.py`;
   - [OpenHands `software-agent-sdk@dcf401af` `build.py`](https://github.com/OpenHands/software-agent-sdk/blob/dcf401af7a9a302ef92cb7d092e1df9bb659daa5/openhands-agent-server/openhands/agent_server/docker/build.py), lines 581 and 925;
   - GitHub Actions runs 36695388851 and 36690153586, read through the REST jobs API on 2026-09-30.
+
+## Addendum (2026-10-05): PR #726 disclosure and common rules
+
+The October 5 context-budget decision replaces the rising word baseline with fixed
+rendered startup byte ceilings. This amends the rejection of pointers above:
+version-pinned Claude mechanics and trading references now have explicit task
+triggers, while common research, cross-family dispatch and the A/B-backed
+StructuredOutput instruction stay at startup. The schema sentence is restored
+verbatim in the portable user block; no new A/B overturns its accepted result.
+
+One discovery conditional now applies on all three sources, the scaffold and both
+generated carriers: when no skill fits, use installed `find-skills` or Skills CLI `find` and `skill-creator` for verification or A/B; check client exposure and the skills lifecycle. Its lifecycle reference is
+`adoption/skills/lifecycle.md`, which distinguishes Codex's bundled skill-creator
+from Claude's selected Anthropic copy and checks user-only exposure. The Codex
+source retains its recorded bounded-worker variant of the coordinator prefix.
+The installed host mismatch in the October 5 audit motivates the explicit Skills
+CLI fallback; the selected Vercel CLI source above remains the implementation.
+
+The never-rebuild sentence now permits only glue for a demonstrated gap cited at
+a pin; the earlier fork/wrap wording is our interpretation, not a user quote.
+The Codex dispatch-contract path is removed from portable Codex/scaffold text
+because other projects lack that repository path. The full routing paragraph
+remains in root AGENTS.md until the coordinator renders and reads back both hosts
+after landing. The cross-family gateway sentence remains inline on root, Codex
+and portable Claude. This explicitly amends the earlier one-wording/no-pointers
+choice, rather than claiming the dropped path moved verbatim.
+
+[Claude memory](https://code.claude.com/docs/en/memory) documents startup imports
+and nested rule discovery; [Codex's loader at rust-v0.159.3](https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/core/src/agents_md.rs)
+selects the root-to-cwd project chain and prefers overrides.
+[The budget record](2026-10-05-harness-context-budget.md) records exact bytes,
+fixtures, alternatives and the two-host gate. A missed rule at its task trigger
+reopens disclosure; a same-version A/B or a demonstrated client fix is required
+to remove the StructuredOutput guard.

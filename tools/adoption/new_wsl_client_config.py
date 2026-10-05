@@ -154,7 +154,7 @@ GENERATED_BLOCKS = {CLAUDE_MD_PIECE: "adoption/new-wsl/claude-user-instructions.
                     CODEX_MD_PIECE: "adoption/new-wsl/codex-user-instructions.md"}
 RENDERED_BLOCKS = {CLAUDE_MD_PIECE: "claude-user-instructions.md", CODEX_MD_PIECE: "codex-user-instructions.md"}
 STEP_PIECES = ("step/claude-launcher", "step/login-path-block", "step/skills", "path/local-bin", "path/mise-shims",
-               "step/codex-remote-plugin-rules")
+               "step/codex-remote-plugin-rules", "step/rtk-claude-init")
 REMOTE_PLUGIN_PIECE = STEP_PIECES[5]
 # The account's remote plugins, which no row of the definitive manifest selects: Codex keeps their bundles under
 # <Codex home>/plugins/cache/<marketplace>/<plugin>/<version>/ (core-plugin-common/src/installed.rs PLUGINS_CACHE_DIR,
@@ -194,7 +194,7 @@ AUTHORIZATION_STEP = {"claude/settings": "claude-settings", "claude/overlay": "c
 EXAMPLE_HOST = "example"   # the host value file whose render --check scans
 LAUNCHER_PIECE, PATH_BLOCK_PIECE = STEP_PIECES[0], STEP_PIECES[1]
 # The steps --apply runs, in order; --skip names one.
-STEPS = ("claude-hooks", "claude-agents", "claude-mcp", "claude-settings", "claude-launcher", "claude-md",
+STEPS = ("claude-hooks", "claude-agents", "claude-mcp", "claude-settings", "claude-launcher", "rtk-claude-init", "claude-md",
          "codex-config", "codex-files", "codex-md", "login-path", "verify")
 # Command words a practice hook may run besides the files the repository copies: the shell's own words, python3 (the
 # interpreter of every tool in tools/adoption/) and jq (F4 of adoption/platforms/linux-wsl2-new-distro.md installs it and
@@ -205,9 +205,11 @@ LIST_ITEM = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+")
 HEADING = re.compile(r"^(#{1,6})\s")
 SENTENCE_BREAK = re.compile(r"(?<=[.!?])(\s+)(?=[A-Z`\[(<\"'*_])")
 SENTENCE_END = re.compile(r"[.!?][\"')\]`*_]*$")
-# The wrap width of the RTK awareness text that adoption/templates/codex.AGENTS.template.md carries verbatim
-# (rtk-ai/rtk hooks/rtk-awareness-full.md): a run of lines that are all this short, with a sentence running on from
-# one line into the next, is one wrapped paragraph; longer lines are one statement each.
+# Wrap width of the verbatim rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md.
+# The rendered Codex carrier is 8,373 bytes; the local 8,192-byte test covers only
+# adoption/templates/codex.AGENTS.template.md's compact source (7,307 bytes).
+# A run of lines this short with a sentence running into the next line is one
+# wrapped paragraph; longer lines are one statement each.
 WRAP_WIDTH = 80
 HOST_NAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]*")  # the bootstrap's --host rule
 # What the repository's tools print when they change something (install_claude_profile, apply_claude_settings,
@@ -708,7 +710,8 @@ def scan_names(text: str, names: list) -> list:
 
 
 def block_text(root: Path, piece_key: str) -> str:
-    return (root / BLOCK_TEXT_REL[piece_key]).read_text(encoding="utf-8")
+    text = (root / BLOCK_TEXT_REL[piece_key]).read_text(encoding="utf-8")
+    return managed_block.codex_block(text, root=root) if piece_key == CODEX_MD_PIECE else text
 
 
 @dataclasses.dataclass(frozen=True)
@@ -2161,16 +2164,19 @@ class Apply:
                 drop_path(wanted, tuple(path))
             else:
                 found[verdict.piece.key] = "added"
+        # Keep the configured listing fraction under the 2026-09-30 directive.
+        # An omitted host key stays through main's ordinary settings merge.
         merged = file_io.merge_settings(current, wanted)
         if target.is_file() and merged == current:
             self.record("claude-settings", "current", f"{target} already holds the wired settings")
         elif self.dry:
-            changed = sorted(key for key in merged if merged.get(key) != current.get(key))
+            changed = sorted(key for key in merged.keys() | current.keys() if merged.get(key) != current.get(key))
             self.record("claude-settings", "planned", f"would merge into {target}: {', '.join(changed)}")
         else:
             (self.stage / "settings.merged.json").write_text(json.dumps(wanted, indent=2) + "\n", encoding="utf-8")
-            ok = self.tool("claude-settings", [str(ROOT / "tools/adoption/apply_claude_settings.py"), "--template",
-                                               str(self.stage / "settings.merged.json"), "--target", str(target)])
+            argv = [str(ROOT / "tools/adoption/apply_claude_settings.py"), "--template",
+                    str(self.stage / "settings.merged.json"), "--target", str(target)]
+            ok = self.tool("claude-settings", argv)
             self.done("claude-settings", ok)
         if self.outcomes[-1][1] != "failed":
             self.authorization.update({key: status for key, status in found.items() if is_authorization_piece(key)})
@@ -2210,6 +2216,29 @@ class Apply:
         argv = [str(ROOT / "tools/adoption/managed_block.py"), "--home", str(self.home)]
         argv += ["--dry-run"] if self.dry else []
         self.done(step, self.tool(step, argv + subcommand))
+
+    def step_rtk_claude_init(self) -> None:
+        """RTK 0.51.0's native global default owns RTK.md and the @RTK.md import.
+        Source: rtk-ai/rtk@e001f773:src/hooks/init/claude.rs:305. No local RTK file renderer.
+        """
+        step = "rtk-claude-init"
+        if "step/rtk-claude-init" not in self.wired:
+            self.record(step, "left out", "the command-output slot does not wire RTK")
+            return
+        argv = [str(self.eco / "bin" / "rtk"), "init", "-g", "--no-patch"]
+        if self.dry:
+            self.record(step, "planned", "would run " + shlex.join(argv))
+            return
+        result = subprocess.run(argv, env=self.env(), stdin=subprocess.DEVNULL,
+                                capture_output=True, text=True, timeout=300)
+        for line in (result.stdout + result.stderr).splitlines():
+            self.say(step, "  " + line)
+        target = self.home / ".claude"
+        current, _ = managed_block.read_target(target / "CLAUDE.md")
+        ready = (result.returncode == 0 and (target / "RTK.md").is_file()
+                 and any(managed_block.RTK_IMPORT.fullmatch(line) for line in current.splitlines()))
+        self.record(step, "applied" if ready else "failed",
+                    f"native init exit {result.returncode}; RTK.md and @RTK.md " + ("present" if ready else "not verified"))
 
     def step_claude_md(self) -> None:
         self.instruction_step("claude-md", CLAUDE_MD_PIECE, [

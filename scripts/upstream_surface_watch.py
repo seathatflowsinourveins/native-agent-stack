@@ -343,11 +343,14 @@ def bounded(name: str, values, bound_key: str):
 # --------------------------------------------------------------------------- network primitives
 
 
-def http_get(url: str, timeout: int = HTTP_TIMEOUT) -> bytes:
+def http_get(url: str, timeout: int = HTTP_TIMEOUT, *, accept: str | None = None) -> bytes:
     """GET ``url`` (urllib follows redirects) and return the body. Raises OSError, ValueError or HTTPException.
     ``timeout`` is urllib's, for each blocking socket operation (the connect, each read), not for the whole fetch:
     the unit's TimeoutStartSec= bounds the run."""
-    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
+    headers = {"User-Agent": USER_AGENT}
+    if accept:
+        headers["Accept"] = accept
+    request = urllib.request.Request(url, headers=headers)
     with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310 - fixed https sources
         body = response.read(MAX_BYTES + 1)
     if len(body) > MAX_BYTES:
@@ -396,8 +399,8 @@ def gh_fetch(arguments: list[str]):
     return fetch
 
 
-def http_fetch(url: str):
-    return lambda: http_get(url)
+def http_fetch(url: str, *, accept: str | None = None):
+    return lambda: http_get(url, accept=accept) if accept else http_get(url)
 
 
 # --------------------------------------------------------------------------- cache and fetcher
@@ -1208,6 +1211,12 @@ def validate_dispositions(document) -> list[str]:
         version = row.get("version")
         if not isinstance(version, str) or not version.strip() or len(version) > 80:
             errors.append(f"{label}: version must be a nonempty string")
+        if isinstance(key, str) and ":doc:" in key and disposition == "enabled":
+            digest = row.get("value", {}).get("sha256") if isinstance(row.get("value"), dict) else None
+            if not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest):
+                errors.append(f"{label}: an enabled doc watch needs value.sha256 (64 lowercase hex characters)")
+            if not isinstance(source, str) or not source.startswith("https://"):
+                errors.append(f"{label}: an enabled doc watch needs an https source")
     return errors
 
 
@@ -1217,6 +1226,25 @@ def load_dispositions(path: Path) -> dict:
     if errors:
         raise InputError("; ".join(errors[:5]) + (f" (and {len(errors) - 5} more)" if len(errors) > 5 else ""))
     return document
+
+
+def observe_documents(fetcher: Fetcher, dispositions: dict) -> list[dict]:
+    """Reopen a reviewed audit when an enabled doc row's fetched body changes.
+    Reuse the existing fetch/cache/freshness path. No automatic digest re-baseline:
+    the row's carrier is the audit to review before updating value.sha256.
+    """
+    documents = []
+    for row in dispositions["rows"]:
+        if ":doc:" not in row["key"] or row["disposition"] != "enabled":
+            continue
+        body = fetcher.obtain(row["key"].replace(":", "-"), row["source"],
+                              http_fetch(row["source"], accept="text/markdown"), version=row["version"])
+        observed = sha256_hex(body)
+        expected = row["value"]["sha256"]
+        documents.append({"key": row["key"], "source": row["source"], "carrier": row["carrier"],
+                          "expected_sha256": expected, "observed_sha256": observed,
+                          "changed": observed != expected})
+    return documents
 
 
 # --------------------------------------------------------------------------- observation and diff
@@ -1557,6 +1585,7 @@ def run(args) -> tuple[dict, str]:
 
     fetcher = Fetcher(state, args.network, now_text)
     observed = observe(fetcher, args.claude_channel, codex_binary)
+    documents = observe_documents(fetcher, dispositions)
     if baseline is not None:
         check_floors(observed["names"], baseline, observed["key_sources"])
     changelog_body = fetcher.obtain("claude-changelog", CHANGELOG_URL, http_fetch(CHANGELOG_URL))
@@ -1569,6 +1598,8 @@ def run(args) -> tuple[dict, str]:
                                                observed["key_sources"])
     reviewed = {row["key"] for row in dispositions["rows"]}
     unreviewed = [item["key"] for item in new if item["key"] not in reviewed]
+    changed_documents = [item["key"] for item in documents if item["changed"]]
+    unreviewed += changed_documents  # These rows reopen even though their names were already reviewed.
     crossed = cross_check(fetcher, observed) if args.cross_check else None
 
     release, sdk = observed["release"], observed["sdk"]
@@ -1615,6 +1646,10 @@ def run(args) -> tuple[dict, str]:
         "notes": notes,
     }
     counts = ([f"{len(unreviewed)} unreviewed of {len(new)} new"] if new else ["nothing new"])
+    if changed_documents:
+        # These are document-body changes, not newly discovered surface names.
+        counts = ([f"{len(unreviewed) - len(changed_documents)} unreviewed of {len(new)} new"] if new else [])
+        counts.append(f"{len(changed_documents)} instruction doc change(s)")
     if removed:
         counts.append(f"{len(removed)} removed")
     if stage_changed:
@@ -1632,6 +1667,7 @@ def run(args) -> tuple[dict, str]:
         "stage_changed": stage_changed,
         "changelog": changelog,
         "unreviewed": unreviewed,
+        "documents": documents,
         "coverage": coverage,
         "cross_check": crossed,
         "summary_line": summary_line(counts, tail, candidates, label),
