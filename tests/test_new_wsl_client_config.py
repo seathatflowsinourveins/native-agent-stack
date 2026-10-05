@@ -617,6 +617,133 @@ class ObservabilityMigrationRepairTests(unittest.TestCase):
                         else:
                             self.assertNotEqual(case, "operator_custody")
 
+    def test_grafana_absent_legacy_paths_allow_publish_and_check(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config"
+            unrelated = config / "owner-backup/ns2604.yaml"
+            unrelated.parent.mkdir(parents=True)
+            unrelated.write_bytes(b"unrelated owner bytes\n")
+            env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
+            env["NS2604_OBSERVABILITY_DATA"] = str(root / "data")
+            for action in ("grafana", "grafana-check"):
+                result = subprocess.run(
+                    [sys.executable, str(PLAN / "config/observability_config.py"), action,
+                     "--config-root", str(config), "--source-root", str(PLAN / "config")],
+                    env=env, capture_output=True, text=True, timeout=10)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(unrelated.read_bytes(), b"unrelated owner bytes\n")
+            self.assertTrue((config / "grafana-provisioning/datasources/native-stack.yaml").is_file())
+            self.assertTrue((config / "grafana-provisioning/dashboards/native-stack.yaml").is_file())
+            self.assertTrue((config / "grafana-dashboards/token-layer.json").is_file())
+
+    def test_grafana_legacy_preflight_preserves_every_path_before_publish_or_check(self):
+        legacy_paths = (
+            "grafana-provisioning/datasources/ns2604.yaml",
+            "grafana-provisioning/dashboards/token-layer.yaml",
+            "grafana-dashboards/token-layer/token-layer.json",
+        )
+
+        def snapshot(root):
+            result = {}
+            for path in root.rglob("*"):
+                info = path.lstat()
+                payload = (os.readlink(path) if path.is_symlink() else
+                           path.read_bytes() if path.is_file() else None)
+                result[path.relative_to(root).as_posix()] = (
+                    info.st_mode, info.st_ino, info.st_mtime_ns, payload)
+            return result
+
+        for name in legacy_paths:
+            for case in ("file", "empty", "ledger_owned", "directory", "live_symlink", "dangling_symlink", "loop_symlink"):
+                for action in ("grafana", "grafana-check"):
+                    with self.subTest(name=name, case=case, action=action), tempfile.TemporaryDirectory() as tmp:
+                        root = Path(tmp)
+                        config = root / "config"
+                        env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
+                        env["NS2604_OBSERVABILITY_DATA"] = str(root / "data")
+                        command = [sys.executable, str(PLAN / "config/observability_config.py"),
+                                   "--config-root", str(config), "--source-root", str(PLAN / "config")]
+                        initial = subprocess.run(command + ["grafana"], env=env, capture_output=True, text=True, timeout=10)
+                        self.assertEqual(initial.returncode, 0, initial.stderr)
+                        target = config / name
+                        target.parent.mkdir(parents=True, exist_ok=True)
+                        if case == "directory":
+                            target.mkdir()
+                            (target / "preserved").write_bytes(b"directory-owned bytes\n")
+                        elif case.endswith("symlink"):
+                            linked = root / "linked-owner-file"
+                            if case == "live_symlink":
+                                linked.write_bytes(b"symlink target bytes\n")
+                            target.symlink_to(target.name if case == "loop_symlink" else linked)
+                        else:
+                            target.write_bytes(b"" if case == "empty" else b"legacy owner bytes\n")
+                            if case == "ledger_owned":
+                                ledger = config / ".g4-source-digests.json"
+                                values = json.loads(ledger.read_text())
+                                values[name] = hashlib.sha256(target.read_bytes()).hexdigest()
+                                ledger.write_text(json.dumps(values))
+                        before = snapshot(root)
+                        env["NS2604_OBSERVABILITY_DATA"] = str(root / "never-created-data")
+                        result = subprocess.run(command + [action], env=env, capture_output=True, text=True, timeout=10)
+                        self.assertNotEqual(result.returncode, 0, result.stderr)
+                        self.assertIn("needs_owner:", result.stderr)
+                        self.assertIn(name, result.stderr)
+                        self.assertEqual(snapshot(root), before)
+                        self.assertFalse((root / "never-created-data").exists())
+
+    def test_all_grafana_acceptance_stages_preflight_current_source_before_native_work(self):
+        row = next(row for row in json.loads((PLAN / "install-plan.json").read_text())["owners"]
+                   if row["slot"] == "grafana")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config"
+            legacy = config / "grafana-provisioning/datasources/ns2604.yaml"
+            legacy.parent.mkdir(parents=True)
+            legacy.write_bytes(b"synthetic legacy configuration\n")
+            marker = root / "unexpected-native-work"
+            installed = config / "observability_config.py"
+            installed.write_text("from pathlib import Path\nPath(" + repr(str(marker)) + ").touch()\n")
+            bin_dir = root / "bin"
+            bin_dir.mkdir()
+            for name in ("grafana", "curl", "flock", "uv", "claude"):
+                stub = bin_dir / name
+                stub.write_text("#!/bin/sh\ntouch \"$NATIVE_FIXTURE_MARKER\"\nexit 93\n")
+                stub.chmod(0o700)
+            env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
+            env.update({"PATH": str(bin_dir) + os.pathsep + os.environ["PATH"],
+                        "plan_dir": str(PLAN), "config_root": str(config),
+                        "NATIVE_FIXTURE_MARKER": str(marker),
+                        "NS2604_OBSERVABILITY_DATA": str(root / "data")})
+            for stage, entry in row["acceptance"].items():
+                with self.subTest(stage=stage):
+                    result = subprocess.run(["bash", "-euo", "pipefail", "-c", entry["command"]],
+                                            env=env, capture_output=True, text=True, timeout=10)
+                    self.assertNotEqual(result.returncode, 0, result.stderr)
+                    self.assertIn("needs_owner:", result.stderr)
+                    self.assertFalse(marker.exists(), "preflight must precede installed helpers and native work")
+                    self.assertFalse((root / "data").exists())
+                    self.assertEqual(legacy.read_bytes(), b"synthetic legacy configuration\n")
+
+    def test_grafana_uninspectable_legacy_path_needs_owner_before_any_output(self):
+        adapter = Round2RepairIntegrationTests.source_module("observability_config.py")
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            original_lstat = Path.lstat
+
+            def unreadable(path, *args, **kwargs):
+                if path == root / "grafana-provisioning/datasources/ns2604.yaml":
+                    raise PermissionError("synthetic metadata denial")
+                return original_lstat(path, *args, **kwargs)
+
+            for action in ("grafana", "grafana-check"):
+                with self.subTest(action=action), mock.patch.object(Path, "lstat", unreadable), \
+                        mock.patch.object(sys, "argv", ["observability_config.py", action, "--config-root", str(root)]), \
+                        mock.patch.object(adapter, "atomic") as writer:
+                    with self.assertRaisesRegex(ValueError, "needs_owner: cannot verify legacy Grafana path"):
+                        adapter.main()
+                    writer.assert_not_called()
+
     def test_validator_refusal_preserves_operator_config_and_ledger(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

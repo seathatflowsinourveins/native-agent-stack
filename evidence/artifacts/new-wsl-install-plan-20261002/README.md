@@ -279,6 +279,14 @@ alone do not certify dashboard readiness. The maintained Prometheus startup
 feature flags for first counter samples are recorded in the G4 decision and
 must be carried by the service owner.
 
+Grafana publishing and all three acceptance stages preflight the three retired
+wave-1 provisioning paths before reading the ledger or writing Grafana assets.
+Any reappearance, including a dangling symlink, returns nonzero `needs_owner`;
+no digest grants permission to migrate or retire it. The current plan helper
+supplies this check, so an older installed helper cannot bypass it. On
+NativeStack2604 the co-op holds the preserved backup until the command-center
+soak permits retirement; see the A30 custody record in the followup receipt.
+
 Alerting supports webhook/ntfy, Telegram and an on-host destination, retaining
 the disarmed sink until the selected receiver's private files exist. ntfy.sh was
 the coordinator's delegated pick on 2026-10-04. The user personally configured
