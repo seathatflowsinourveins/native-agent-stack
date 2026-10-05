@@ -101,6 +101,15 @@ without merges, and prints no notice (50 lines against git's 66, 66 and 68; `src
 lines; `--oneline -n 66`: 66). A fixture shorter than 50 commits cannot show that default, and an earlier draft of this README, run
 on 16 commits, called those forms uncapped.
 
+Mutating commands and execution rules (`rtk-behaviour-probe.json`, `codex_hook_check`; `plan-row-scratch-run.json`, `execpolicy_check`). `rtk hook check
+--agent codex` rewrites 36 of 55 commands, among them mutating ones (`git push`, `git commit`, `git add`, `git checkout`, `git pull`, `gh pr merge`,
+`docker run`, `kubectl apply`, `pip install`, `curl -X POST`, `aws s3 rm`), and leaves `rm -rf`, `mv`, `chmod`, `sed -i`, `git reset --hard`,
+`terraform apply` and 13 others alone; the five `exclude_commands` change none of them. Codex replaces the call with the hook's `updatedInput` before its
+handler's approval path (`registry.rs` L603-L660 at rust-v0.159.3 and rust-v0.160.0) and matches execution rules against the rewritten command's words:
+`codex execpolicy check` on 0.159.3 returns `forbidden` for `git push` and no decision for `rtk git push` under the same rule. The trust tool therefore
+refuses `--apply` while `<codex home>/rules` holds a rules file, unless `--allow-exec-rules` (the scratch run: refused with exit 2, accepted with 0). The
+decision record's 2026-10-05 addendum on #705 carries the sources, the alternatives and the untested boundary (no live session with a forbidding rule).
+
 ## What this does not show
 
 One run per arm: no variance, no cost comparison, no claim about tokens saved (the A/B of the folding of `grep -l` output is a separate

@@ -77,7 +77,7 @@
   },
   "consensus": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-   "sha256": "53b5dc9c43c6e40d5e9bb62c8cf9967ba61388ab1b9b2c13f77d3eaafe38b892"
+   "sha256": "f0faa52e4c9350ad3d01d63dabfddc7ccab0aadcae55796b27573fdafd32c13d"
   }
  },
  "counts": {
@@ -1825,18 +1825,19 @@
     "outcome": "added_by_owner_decision",
     "by": "the owner's decision of 2026-10-04",
     "batch": "wave3",
-    "reason": "the owner's order installs the token-efficiency repositories by default; RTK is the first core row of docs/token-efficiency-stack.json (compact supported command outputs, keep failure and raw recovery). Claude Code's Bash hook rewrites supported commands; Codex calls rtk explicitly at this pin",
+    "reason": "the owner's order installs the token-efficiency repositories by default; RTK is the first core row of docs/token-efficiency-stack.json (compact supported command outputs, keep failure and raw recovery). Claude Code's Bash hook rewrites supported commands; Codex's PreToolUse hook rewrites them too from the decision of 2026-10-04 (it was explicit rtk commands at the 0.50.0 pin)",
     "pin": "tag v0.51.0; release asset rtk-x86_64-unknown-linux-musl.tar.gz, sha256 5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5 (adoption/pins-linux-x86_64.json; the release's checksums.txt and the GitHub asset digest read 2026-10-04 state the same digest)",
     "install": "the install plan's command-output function: the release archive through the plan's checksum-verified download, extracted into ${ECO_ROOT}/tools/rtk-0.51.0 and linked into ${ECO_ROOT}/bin",
     "usage_rules": [
      "the pin follows main 14048b840 after PR #693: v0.51.0 requires --shell for executable positional scripts that need shell expansion; the plan uses direct git/proxy arguments and hook-check inspection strings",
-     "retain explicit rtk commands for Codex; this plan never runs rtk init --global --codex (docs/token-session-handbook.md:397)",
+     "Codex calls rtk through its PreToolUse hook: the plan's command-output row runs rtk init -g --codex and then codex_hook_trust.py --apply (the decision of 2026-10-04, docs/decisions/2026-10-04-codex-rtk-hook-qualified.md; rtk-ai/rtk v0.51.0 README.md L133)",
      "RTK_TELEMETRY_DISABLED=1 in both clients; rtk proxy returns the raw output when a condensed result is unusable"
     ],
     "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without RTK against the full stack and the lean base), or the fresh-session invocation census, reports that RTK adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
     "open_acceptance_gates": [
      "${ECO_ROOT}/bin/rtk reports 0.51.0, and rtk git log -3 and rtk proxy git log -3 both return in a checkout",
-     "a Claude Code Bash call to a supported command is rewritten by the hook, and rtk gain --format json reads back the session's counters"
+     "a Claude Code Bash call to a supported command is rewritten by the hook, and rtk gain --format json reads back the session's counters",
+     "a fresh codex exec, told to add no prefix, runs rtk git status with exit 0 (the after_sign_in check of the command-output row)"
     ],
     "sources": [
      "docs/decisions/2026-10-04-token-full-stack-owner-default.md",

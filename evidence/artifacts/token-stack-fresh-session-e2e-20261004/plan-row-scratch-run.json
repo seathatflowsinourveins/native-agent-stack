@@ -3,7 +3,7 @@
   "evidence_class": "local_integration: one run, one host, a scratch HOME (the stream is synthetic)",
   "rtk": "rtk 0.51.0",
   "codex": "codex-cli 0.159.3",
-  "deviation": "3 codex process(es) were running on the host, so the trust command carries --codex-process-name no-such-process-name (the tool would otherwise refuse, exit 2)",
+  "deviation": "1 codex process(es) were running on the host, so the trust command carries --codex-process-name no-such-process-name (the tool would otherwise refuse, exit 2)",
   "steps": [
     {
       "step": "--check before any rtk hook exists",
@@ -54,7 +54,7 @@
       "stdout_tail": [
         "hooks named in <scratch>/fake-home/.codex:",
         "  <scratch>/fake-home/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/fake-home/.codex/config.toml.bak.20261005T015102Z",
+        "backup: <scratch>/fake-home/.codex/config.toml.bak.20261005T032549Z",
         "trusted 1 hook(s) in <scratch>/fake-home/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -64,9 +64,9 @@
       "exit": 0,
       "expected_exit": 0,
       "stdout_tail": [
-        "    F9 owner list and its test changed with the install plan's Codex hook row, so validate_convergence.py --all-recorded reported a SHA-256",
-        "    mismatch on both. Their hashes and base_revision are updated to this pull request's base, as #694 did when it changed the same files.",
+        "    not run. plan-row-scratch-run.json retains the output; the artifact README lists both.",
         "    Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>",
+        "    (cherry picked from commit ee8219c060c1a13c5bddac02d7517b85a46f6577)",
         "hooks named in <scratch>/fake-home/.codex:",
         "  <scratch>/fake-home/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is trusted",
         "every named hook is trusted at its current hash"
@@ -74,13 +74,170 @@
       "stderr_tail": []
     },
     {
-      "step": "the after_sign_in jq filter on a synthetic codex exec stream (the model call is not run)",
+      "step": "the after_sign_in filter and test on a synthetic stream: the rewritten command ran and exited 0 (the model call is not run)",
       "exit": 0,
       "expected_exit": 0,
       "stdout_tail": [
-        "/bin/bash -lc 'rtk git status --short'"
+        "true"
       ],
       "stderr_tail": []
+    },
+    {
+      "step": "the after_sign_in filter and test on a synthetic stream: the rewritten command failed (rtk not on the launcher's PATH: exit 127) (the model call is not run)",
+      "exit": 1,
+      "expected_exit": 1,
+      "stdout_tail": [
+        "false"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "the after_sign_in filter and test on a synthetic stream: the rewritten command completed with a non-zero exit status (the model call is not run)",
+      "exit": 1,
+      "expected_exit": 1,
+      "stdout_tail": [
+        "false"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "the after_sign_in filter and test on a synthetic stream: the rewritten command was declined (the model call is not run)",
+      "exit": 1,
+      "expected_exit": 1,
+      "stdout_tail": [
+        "false"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "the after_sign_in filter and test on a synthetic stream: the command ran without the rtk prefix (no hook) (the model call is not run)",
+      "exit": 1,
+      "expected_exit": 1,
+      "stdout_tail": [
+        "false"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "the after_sign_in filter and test on a synthetic stream: no command item at all (the model call is not run)",
+      "exit": 1,
+      "expected_exit": 1,
+      "stdout_tail": [
+        "false"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "a second Codex home with an execution rules file: rtk init -g --codex",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/fake-home-2/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "the plan's trust command is refused while the rules file is there",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "hooks named in <scratch>/fake-home-2/.codex:",
+        "  <scratch>/fake-home-2/.codex/hooks.json:pre_tool_use:2:0: preToolUse Bash 'rtk hook codex' is untrusted",
+        "  note: execution rules in default.rules: the hook rewrites `git push` to `rtk git push` before Codex matches rules, so a rule on `git push` does not match it"
+      ],
+      "stderr_tail": [
+        "refused: the user layer holds execution rules (<scratch>/fake-home-2/.codex/rules/default.rules). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each comma"
+      ]
+    },
+    {
+      "step": "--check still reports the hook untrusted",
+      "exit": 5,
+      "expected_exit": 5,
+      "stdout_tail": [
+        "hooks named in <scratch>/fake-home-2/.codex:",
+        "  <scratch>/fake-home-2/.codex/hooks.json:pre_tool_use:2:0: preToolUse Bash 'rtk hook codex' is untrusted",
+        "  note: execution rules in default.rules: the hook rewrites `git push` to `rtk git push` before Codex matches rules, so a rule on `git push` does not match it"
+      ],
+      "stderr_tail": [
+        "not trusted: <scratch>/fake-home-2/.codex/hooks.json:pre_tool_use:2:0: preToolUse Bash 'rtk hook codex' is untrusted"
+      ]
+    },
+    {
+      "step": "the explicit acceptance: the trust command with --allow-exec-rules",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "hooks named in <scratch>/fake-home-2/.codex:",
+        "  <scratch>/fake-home-2/.codex/hooks.json:pre_tool_use:2:0: preToolUse Bash 'rtk hook codex' is untrusted",
+        "  note: execution rules in default.rules: the hook rewrites `git push` to `rtk git push` before Codex matches rules, so a rule on `git push` does not match it",
+        "backup: <scratch>/fake-home-2/.codex/config.toml.bak.20261005T032551Z",
+        "trusted 1 hook(s) in <scratch>/fake-home-2/.codex/config.toml; read back from hooks/list by key and hash"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "--check after the accepted trust",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "hooks named in <scratch>/fake-home-2/.codex:",
+        "  <scratch>/fake-home-2/.codex/hooks.json:pre_tool_use:2:0: preToolUse Bash 'rtk hook codex' is trusted",
+        "every named hook is trusted at its current hash"
+      ],
+      "stderr_tail": []
+    }
+  ],
+  "execpolicy_check": [
+    {
+      "command": "git push origin main",
+      "exit": 0,
+      "decision": "forbidden",
+      "matched_prefixes": [
+        [
+          "git",
+          "push"
+        ]
+      ]
+    },
+    {
+      "command": "rtk git push origin main",
+      "exit": 0,
+      "decision": null,
+      "matched_prefixes": []
+    },
+    {
+      "command": "git commit -m x",
+      "exit": 0,
+      "decision": "prompt",
+      "matched_prefixes": [
+        [
+          "git",
+          "commit"
+        ]
+      ]
+    },
+    {
+      "command": "rtk git commit -m x",
+      "exit": 0,
+      "decision": null,
+      "matched_prefixes": []
+    },
+    {
+      "command": "git status",
+      "exit": 0,
+      "decision": null,
+      "matched_prefixes": []
+    },
+    {
+      "command": "rtk git status",
+      "exit": 0,
+      "decision": null,
+      "matched_prefixes": []
     }
   ],
   "all_as_expected": true

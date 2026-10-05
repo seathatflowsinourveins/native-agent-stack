@@ -124,3 +124,54 @@ both are the user's words as the command center relayed them, and the row's beha
 Effect: the install plan's `command-output` row runs `rtk init -g --codex` as upstream implements it, pointer line and `RTK.md` included, and
 the same rule covers future upstream installer side effects of this kind (each still recorded with its measurement). `rtk init -g --codex
 --uninstall` removes the hook, `RTK.md` and the pointer together.
+
+## Addendum (2026-10-05, review of #705): approval and execution rules
+
+The Codex review of #705 asked whether the rewrite happens before or after Codex's approval and policy evaluation, and whether a mutating command such as
+`git push` can pass as `rtk git push` with a different approval class. The answer, from the upstream sources at both Codex pins (rust-v0.159.3 `01fc69f40267`
+and rust-v0.160.0 `a956835d0207`, identical lines) and rtk v0.51.0 (`e001f773f80b`):
+
+1. **The rewrite comes first.** `codex-rs/core/src/tools/registry.rs` L603-L660 runs the PreToolUse hook (`run_pre_tool_use_hooks`, L604) and, when the hook
+   returns `updatedInput`, replaces the call (`invocation = updated_invocation`, L632); only then does the handler, with its approval and sandbox path, run
+   (`handle_any_tool`, L689). A hook's `permissionDecision: "allow"` is the protocol shape that lets `updatedInput` through, not an approval
+   (`codex-rs/hooks/src/events/pre_tool_use.rs` L388-L405; `deny` blocks, L357). rtk says the same (`hooks/codex/README.md` L14-L24: Codex "applies the
+   replacement before its normal command approval and sandbox checks ... classification is based on the rewritten command ... This can add prompts for
+   known-safe commands or obscure signals for wrapped mutating commands such as `git push`"; `src/hooks/hook_cmd.rs` L975-L989).
+2. **Approval sees the rewritten command's words.** `codex-rs/core/src/exec_policy.rs` L327-L420 builds the approval requirement from the command words:
+   execution rules are matched by prefix (`check_multiple_with_options`, L375) and an unmatched command falls to the approval-policy fallback
+   (`render_decision_for_unmatched_command_for_platform`, L770-L850: `never` allows and relies on the sandbox, `untrusted` prompts for every unmatched command,
+   L816). On codex-cli 0.159.3, `codex execpolicy check` with a rule forbidding `git push` and one prompting `git commit` returns `forbidden` and `prompt` for
+   those commands and no decision for `rtk git push` and `rtk git commit` (`plan-row-scratch-run.json`, `execpolicy_check`).
+3. **The one built-in dangerous-command heuristic is not touched.** `codex-rs/shell-command/src/command_safety/is_dangerous_command.rs` L133 flags only a forced
+   `rm` (and unwraps `sudo`, L138, and `env`, L143, not `rtk`), and rtk 0.51.0 does not rewrite `rm`, `mv`, `chmod`, `sed -i`, `tee` or `dd`
+   (`rtk-behaviour-probe.json`, `codex_hook_check`: `rtk hook check --agent codex` over 55 commands).
+4. **rtk does rewrite mutating commands.** Of the 55, 36 are rewritten, among them `git push` (also `--force`), `git commit`, `git add`, `git checkout`,
+   `git pull`, `git stash`, `git worktree add`, `gh pr merge`, `gh pr create`, `gh api -X DELETE`, `docker run`, `docker exec`, `docker build`, `kubectl apply`,
+   `helm install`, `pulumi up`, `pip install`, `cargo install`, `make install`, `curl -X POST`, `wget`, `rsync --delete`, `aws s3 rm` and `iptables -F`; 19 are
+   not (`git reset --hard`, `git clean -fd`, `git rebase`, `git merge`, `git rm`, `docker rm`, `kubectl delete`, `terraform apply`, `npm install`, `npm publish`,
+   `cargo publish`, `systemctl stop`, `rm -rf` and the others above). The five `exclude_commands` change none of these decisions. "RTK never rewrites mutating
+   commands" is false, so it cannot be the proof; rtk itself reads no Codex rules (`src/hooks/permissions.rs` L64-L72: Codex "enforces its native execution
+   rules after updatedInput").
+5. **What changes, for whom.** On a host with no execution rules the class of a rewritten mutating command does not change: an unmatched command's decision
+   depends on the approval policy and the sandbox, not on its words, except for the forced-`rm` heuristic, which rtk leaves alone; under `untrusted` every
+   unmatched command prompts anyway, and rtk notes that known-safe commands may gain prompts. On a host whose rules name commands rtk rewrites, the rule no
+   longer matches the rewritten form, so a `forbidden` or `prompt` rule on `git push` is bypassed for `rtk git push`. NativeStack2604 runs the authorization
+   settings (approvals off), where no rule is consulted.
+
+**Decision.** Keep the upstream install, and make activation conditional on the one host state that changes the class. `codex_hook_trust.py --apply`
+refuses (exit 2) while the user layer's `rules/` directory holds a rules file with content, names the files, and proceeds only with `--allow-exec-rules`,
+the explicit acceptance after the rtk forms of the rules are written or the commands are excluded in rtk's `exclude_commands`; `--check` and the dry run only
+name the rules. Six tests were written first (five red); the scratch run shows the refusal (exit 2), `--check` still 5, the accepted trust 0, and the
+evaluator's decisions (`plan-row-scratch-run.json`). The operating rule for rule authors: write both forms (`prefix_rule(pattern = ["rtk", "git", "push"],
+decision = "forbidden")` beside the plain one) and verify with `codex execpolicy check`. Limits: rules in a project's `.codex/rules` or a managed layer are not
+visible to the tool, and rules written after the grant are not re-checked. No live Codex session was run with a forbidding rule and the hook active; the
+session behaviour is derived from the dispatch order above and the same evaluator that `codex execpolicy check` runs (untested boundary).
+
+**Alternatives.** (a) *Limit the hook to a read-only rewrite set with `exclude_commands`*: rtk's option is exclusion-only (`src/core/config.rs` L119-L123;
+`src/discover/registry.rs` L1548-L1582: a pattern starting with `^` is a regex without look-around, any other is a literal prefix, and a trivial pattern is
+ignored), so an allow-list cannot be written, and a deny-list of every state-changing prefix among the registry's 96 patterns (`src/discover/rules.rs`) would
+track upstream's registry, change the shared config that the Claude hook and the recipe's five-entry table also read, and cost compression only on short
+mutating-command output; not done here, and it is the first thing to do if a rule bypass is ever observed. (b) *Prove rtk never rewrites mutating commands*:
+false (item 4). (c) *Hold the Codex hook out again*: against the user's directive of 2026-10-04. (d) *Ship `rtk ...` rules with the plan*: under
+`approval_policy = "never"` a `prompt` rule is rejected by policy and becomes `forbidden` (`exec_policy.rs` L216-L236 and the match at L407-L415), which would block the
+authorization-settings hosts.

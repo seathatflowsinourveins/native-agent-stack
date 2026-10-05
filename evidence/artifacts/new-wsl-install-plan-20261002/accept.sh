@@ -630,14 +630,14 @@ python3 "$repo_root/tools/adoption/codex_hook_trust.py" --command "rtk hook code
       ;;
     after_sign_in)
       # Kind: smoke; Source: https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L133
-      # Planned. Source: https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L133 (the Codex hook rewrites the command: Codex reports the rewritten command it executed); a fresh codex exec session told to add no prefix runs git status through the hook, so the executed command carries rtk.
+      # Planned. Source: https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L133 (the Codex hook rewrites the command: Codex reports the rewritten command it executed); a fresh codex exec session told to add no prefix runs git status through the hook, so the executed command carries rtk, and it must have completed with exit status 0: Codex's JSONL command item carries exit_code and status (https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/exec/src/exec_events.rs#L161-L166), and a rewritten command that failed (for example rtk not on the launcher's PATH) must not pass.
       check command-output smoke 'probe=$(mktemp -d)
 trap '\''rm -rf "$probe"'\'' EXIT
 cd "$probe"
 git init -q .
 timeout 300 codex exec --json --ephemeral --skip-git-repo-check -c model_reasoning_effort='\''"low"'\'' '\''Run exactly this one shell command and nothing else, adding no prefix of any kind: git status --short'\'' > "$probe/out.jsonl" < /dev/null
-executed=$(jq -rs '\''map(select(.type=="item.completed" and .item.type=="command_execution")) | (.[0].item.command // "")'\'' "$probe/out.jsonl")
-[[ "$executed" == *"rtk git status"* ]]'
+ran=$(jq -rs '\''map(select(.type=="item.completed" and .item.type=="command_execution" and ((.item.command // "") | contains("rtk git status")))) | (.[0].item // {}) | (.exit_code == 0 and .status == "completed")'\'' "$probe/out.jsonl")
+[[ "$ran" == "true" ]]'
       ;;
     *) skipped command-output ;;
   esac
