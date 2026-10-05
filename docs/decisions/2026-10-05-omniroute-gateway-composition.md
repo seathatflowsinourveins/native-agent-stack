@@ -19,30 +19,36 @@ The running build ids are `cf6748d04` (20128) and `87c4c488d` (20129).
 
 **Which PR 15167 head runs where.** The running 20128 build carries the PR's head of 2026-09-30, `f5d8e150b` (5 files, +23: the Codex registry, `reasoningSuffix.ts`, `codexFastTier.ts`, the pricing constants and one test;
 `evidence/artifacts/omniroute-sol-max-20260930/checks/upstream-pr-15167-identity.txt`). The build kept for the second host carries the head of 2026-10-05, `0585aba55` (17 files, +153/-27: those five files, with larger pricing
-constants, and 12 more). The 12 files only the newer head has: `src/shared/constants/codexClient.ts` (`DEFAULT_CODEX_CLIENT_VERSION` 0.156.1 to 0.159.2, the default Codex client version in the gateway's Codex client headers,
-so the version the gateway presents to the Codex backend changes), `Dockerfile` (`@openai/codex` 0.156.1 to 0.159.2, the Docker image only), `open-sse/translator/request/openai-responses/helpers.ts` and
+constants, and 12 more). The 12 files only the newer head has: `src/shared/constants/codexClient.ts` (`DEFAULT_CODEX_CLIENT_VERSION` 0.156.1 to 0.159.2, the default Codex client version in the gateway's Codex client headers; every deployment overrides it with `CODEX_CLIENT_VERSION`, as the file's own comment and `open-sse/config/codexClient.ts` say, and both units set it: the 20128 unit to 0.159.1
+(`omniroute.service.after-switch.txt` of the 2026-09-30 record), the 2604 serve wrapper to 0.160.0 (the co-op's ledger row 165024Z, as relayed), so the default bump changes no header on either unit), `Dockerfile` (`@openai/codex` 0.156.1 to 0.159.2, the Docker image only), `open-sse/translator/request/openai-responses/helpers.ts` and
 `src/shared/reasoning/effortStandardization.ts` (the Responses translator's and `extendCodexGpt56EffortValues`' model patterns accept `gpt-6.<n>-` families such as `gpt-6.1-sol`), `open-sse/executors/github.ts` (Responses routing for
 `^gpt-6` models on the GitHub Copilot executor), the GitHub and GHE Copilot registries (+18 lines each: `gpt-6-astra`, `gpt-6.1-sol`), `src/lib/usage/costCalculator.ts` (GPT-6.1 long-context pricing above 272K input tokens and the
 family pattern: reported cost only), `tests/snapshots/provider/translate-path.json` and three unit tests (`8951-github-gpt56-responses`, `codex-gpt6-sol-luna`, `executor-codex`). The 13 test files that cover the shared and the extra pieces
 (the PR's touched unit tests, the translate-path snapshot test, and the tests that import the client constants or the effort patterns) pass on the composition, 145 of 145 (`checks/affinity-test-results.txt`, last block); that is an
-upstream-test result on a built tree, not a live one. The wire-level difference from the running build, the version in the client headers, is outside the 20128 evidence below and is observed only by the second host's read-back.
+upstream-test result on a built tree, not a live one. The 12 extra files are outside the 20128 evidence below; on the second host they ran in the co-op's read-back (next paragraphs).
 
 **Reproducing the composition from public refs.** Apply `patches/045aa81f3.patch` to the `v3.8.51` tag commit (its tree is `0f58d8df20c0c2ae4336b432b3f39837119b6eed`); the result has tree `cdbac0178bb18f5043f9cdaf7f90d540595e9061`, the tree of the cherry-pick `e14d1e8e0`.
 Then apply PR 15167's commit `0585aba55` (its own tree is `59ee12362c0e312d75db3959c245ced37e7f7587`); the result has tree `f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f`, the tree of `5f4b3d577` (`checks/composition-trees.txt`). Then build with upstream's scripts (`checks/build-notes.txt`). That build exists: tarball
 `omniroute-3.8.51.tgz`, sha256 `d3fda90c297ed1ecbaa82ca42298735ce0b393db9a07bad0b4b79efce118ebe2` (131 MiB), `dist/BUILD_SHA` `5f4b3d577`, kept on the workstation (it is not in the repository) so the second host installs the same bytes.
 
-**Second host (NativeStack2604).** The 2604 co-op takes that tarball for 21128 and 21129 after #713; it carries #15167 and the affinity patch and not #13788. NativeStack 20128 delivers max today (evidence below); 2604 delivery
-is not observed: the co-op's install read-back must show HTTP 200 for `cx/gpt-6.1-sol-max`, `cx/gpt-6.1-sol-xhigh` and the bare `gpt-6.1-sol-max` with `effort=max` reaching the provider request as `max` (the probe of
-`evidence/artifacts/omniroute-sol-max-20260930/checks/probe-gate-after-switch.json`), and this record claims nothing for 2604 until it reports. The 2604 plan of record still selects the published `omniroute@3.8.51` with Sol at xhigh
-and no PR 15167: `evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json` (the install command and its notes), `catalogs/foundation/new-wsl-architecture-20261001.json` (the gateway-lane step),
-`adoption/new-wsl/client-config-map.json` (the gateway slot notes) and, as a record, `evidence/artifacts/final-architecture-round2-20261004/verdicts.json` (it gets a dated supersession note, not an edit). This change does not edit
-those rows: the 2604 co-op's fixwave-defects lane holds the plan files through #723, so the plan owner amends them to this composition (the tarball above) after the read-back passes; until then they and this record differ for 2604 on
-purpose, and this record governs the NativeStack gateways. Standing constraint F1 (no OAuth (Codex) routing combo while the affinity patch runs) extends to 21128 and 21129 for as long as the composition runs there;
-`docs/decisions/2026-09-30-omniroute-rebuild.md` and `docs/foundation-stack.md` carry the extension.
+**Second host (NativeStack2604).** The 2604 co-op took this tarball for 21128; it carries #15167 and the affinity patch and not #13788. NativeStack 20128 delivers max today (evidence below). On 2604 the co-op
+switched 21128 to the tarball at 16:48Z, and its read-back at 16:50Z (ledger row 165024Z; `gateway-switch-20261005/readback.json` and `readback-join.json` in its private coordination record, which is not in this repository; relayed by the
+command center) gave HTTP 200 for `cx/gpt-6.1-sol-max`, `cx/gpt-6.1-sol-xhigh`, the bare `gpt-6.1-sol-max` and `astra-max`, and upstream effort `max` on `sol-max` by an exact `X-Correlation-Id` join; the request headers stayed
+unobservable. The expected upstream effort of each route is `max` for `cx/gpt-6.1-sol-max`, the bare id and `astra-max`, and `xhigh` for `cx/gpt-6.1-sol-xhigh`, because the model suffix takes precedence over the client's effort
+(`open-sse/executors/codex.ts` at `0585aba55`, `rawEffort = forced || modelEffort || explicitReasoning || ...`); the relayed read-back states `max` for `sol-max` only, and no read-back of 21129 is cited here.
+
+The 2604 plan on main differs from what now runs on 21128. Since #713 (`1796303f9`) the install plan selects the published `omniroute@3.8.51` as the clean default, with no local PR, patch or source build
+(`evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json`, `owners[75]`: the `npm install` command and the notes: `gpt-6.1-sol` is absent from the alias sets, native Codex is the only Sol/max route, and the gateway re-pins when an
+upstream release contains PR 15167's alias correction and a gateway request shows wire `reasoning.effort=max`); the architecture catalog's gateway-lane step says the same (`catalogs/foundation/new-wsl-architecture-20261001.json`), and the
+client-config map renders the omniroute profile as Sol/xhigh on 21128 (`adoption/new-wsl/client-config-map.json`, the gateway entries). Before #713 the plan selected a carried 3.8.52-canary (base `23a11484`, PR 13788's two commits and PR 15167 at
+`0585aba55`; `docs/decisions/2026-10-04-2604-e2e-fix-wave.md`, row `cross:gpt6-harnesses/gpt-gateway`); the tarball is neither of the two (the 3.8.51 content, the affinity patch and PR 15167). This change edits none of those rows: the co-op's
+fixwave-defects lane holds the plan files through #723, so the plan owner amends the plan, the catalog step and the map to the tarball (the user's 2026-10-05 choice of true Sol max, this record's evidence and the co-op's read-back) or
+reverts the host; the round-2 verdict record (`evidence/artifacts/final-architecture-round2-20261004/verdicts.json`, on main since #713) gets a dated supersession note, not an edit. Standing constraint F1 (no OAuth (Codex) routing combo
+while the affinity patch runs) extends to 21128 and 21129 for as long as the composition runs there; `docs/decisions/2026-09-30-omniroute-rebuild.md` and `docs/foundation-stack.md` carry the extension.
 
 **Rollback.** For 20128 the kept rollback prefix is `omniroute-3.8.51-2f42a9ac-pr13788-affinity2` (the previous 20128 prefix, build `ae5539a56`, the pre-#15167 build of receipt C7): pointing the unit's `ExecStart` and `PATH` back at it restores
-that build, but it lacks #15167, so `cx/gpt-6.1-sol-max` and `-xhigh`, the SDK worker's default route among them, answer HTTP 400 and `cx/gpt-6.1-sol` with `max` clamps to `xhigh`. Use it only if the composition fails to start, and
-expect those routes to fail until the unit is moved back.
+that build, but it lacks #15167, so `cx/gpt-6.1-sol-max` and `-xhigh`, the SDK worker's default route among them, answer HTTP 400 and `cx/gpt-6.1-sol` with `max` clamps to `xhigh`. It also carries the lsof shim v1, so a restart can fail its preflight while a client such as hindsight-api holds a CLOSE-WAIT socket (`evidence/artifacts/omniroute-sol-max-20260930/receipt.json`, its recorded limits). Use it only if the
+composition fails to start, and expect those routes to fail until the unit is moved back.
 
 ## Context: the user's choices (relayed by the command center; the writing session heard none of them)
 
@@ -50,7 +56,7 @@ At 2026-10-05T13:22:24Z the user picked the option "Published 3.8.51 (Recommende
 `xhigh` limit as its cost. The running build is `release/v3.8.51`-based and also carries the affinity patch; this session read the facts below and asked for a choice among A (published only),
 B (published plus the affinity patch) and C (keep). The user picked "Published + affinity patch (Recommended)" and then, in the command center's verbatim relay: "we need highest quality resolution
 and interms ofthe never rebuilt rule, never build with sota reference and evidances, in this case we have them so our actions is not gated and the sota resolution is needed for seamless workflow".
-Read with its context, the never-rebuild rule forbids building without SOTA references and evidence; here each carried change is a cited upstream PR or cited glue with a removal condition, so the
+Read with its context, the never-rebuild rule (`docs/harness-defaults.md:75`: write local code only for a recorded gap that no maintained upstream closes, and cite the reference implementation it follows) forbids building without SOTA references and evidence; here each carried change is a cited upstream PR or cited glue with a removal condition, so the
 current composition is allowed and max quality is wanted. The relay is the basis of this record and the user may withdraw it.
 
 ## What the published-only swap would have changed (read-only measurements, 2026-10-05)
@@ -81,8 +87,8 @@ Last 7 days of `/v1/responses` on 20128 (`checks/usage-7d.json`): 20,371 success
 
    The right-hand column is what the executor does with a request that reaches it. On the pre-#15167 build the live gateway does not let the `-max` and `-xhigh` names get that far: the probe of 2026-09-30T05:59Z
    (`evidence/artifacts/omniroute-sol-max-20260930/checks/probe-gate-before-switch.json`, receipt C7) got HTTP 400 "Model 'gpt-6.1-sol-max' is not available in the active live catalog for provider 'codex'" for `cx/gpt-6.1-sol-max`, the same for
-   `cx/gpt-6.1-sol-xhigh`, HTTP 401 for the bare `gpt-6.1-sol-max`, and 200 with upstream `xhigh` for `cx/gpt-6.1-sol` with `max`; after the switch (`probe-gate-after-switch.json`, 06:33Z) those four answered 200 with upstream `max`, `max`, `xhigh`
-   and `max`. So the published-only package would not merely clamp to `xhigh`: it would reject the `-max` and `-xhigh` names, which breaks the SDK worker's default route `cx/gpt-6.1-sol-max`. (An earlier executor-level record on the
+   `cx/gpt-6.1-sol-xhigh`, HTTP 401 for the bare `gpt-6.1-sol-max`, and 200 with upstream `xhigh` for `cx/gpt-6.1-sol` with `max`; after the switch (`probe-gate-after-switch.json`, 06:33Z) all four answered 200: `cx/gpt-6.1-sol-max` with upstream `max`, `cx/gpt-6.1-sol-xhigh` with upstream `xhigh` (its own effort),
+   the bare `gpt-6.1-sol-max` with `max`, and `cx/gpt-6.1-sol` with `max` with `max`. So the published-only package would not merely clamp to `xhigh`: it would reject the `-max` and `-xhigh` names, which breaks the SDK worker's default route `cx/gpt-6.1-sol-max`. (An earlier executor-level record on the
    2026-09-30 builds, `evidence/artifacts/omniroute-sol-max-20260930/checks/effort-wire-*.json`, shows the same effort mapping.)
 3. **The deployed code is the probed code** (`checks/source-identity.json`): `open-sse/executors/codex.ts`, `codex/reasoningSuffix.ts`, the Codex registry and `codexFastTier.ts` of the 20128 prefix are byte-identical to the
    probe tree; the live compiled bundle has 40 files with the literal `gpt-6.1-sol` and 8 with `pickMoreAvailableOAuthPeer`, the clean npm bundle has 0 and 0.
@@ -103,7 +109,7 @@ without the gateway.
 
 The upstream-effort column comes from the provider request the attempt captured and is NULL where the response had no encrypted reasoning (1,643 `gpt-6.1-sol` and 881 `gpt-6.1-sol-max` rows of the week); whether
 the backend applies `max` is not observable from our side; the gateway's pipeline capture is off and was left off. The probe applies the PR's head of 2026-10-05 (`0585aba55`) to the tag, while the running build carries the
-PR's head of 2026-09-30 (`f5d8e150b`) on its own base; the five files compared are identical except the pricing constants (`src/shared/constants/pricing/oauth-subscriptions.ts`, 11 lines), which do not touch the wire. The 20128 evidence does not cover the 12 files that only the newer head has, the default Codex client version in the request headers among them.
+PR's head of 2026-09-30 (`f5d8e150b`) on its own base; the five files compared are identical except the pricing constants (`src/shared/constants/pricing/oauth-subscriptions.ts`, 11 lines), which do not touch the wire. The 20128 evidence does not cover the 12 files that only the newer head has (the default client version among them is overridden by `CODEX_CLIENT_VERSION` on both units); the second host's read-back is cited above.
 The cache cost of dropping the affinity patch is unmeasured.
 
 ## Overturn
