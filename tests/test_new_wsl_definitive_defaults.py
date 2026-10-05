@@ -3138,29 +3138,129 @@ class FixwaveAcceptanceRepairs(unittest.TestCase):
                     self.assertIn("independent owner observation", bound["gateway_wire_model_effort"])
                     self.assertEqual(bound["observation_deadline_seconds"]["sequential_total"], 2400)
 
-    def test_ollama_health_requires_enabled_and_active_even_when_server_list_passes(self):
+    def test_ollama_health_loads_once_before_exact_positive_gpu_residency(self):
         command = self.row("local-model-server")["acceptance"]["service_health"]["command"]
-        for enabled, active in ((True, True), (False, True), (True, False), (False, False)):
-            with self.subTest(enabled=enabled, active=active), tempfile.TemporaryDirectory() as directory:
+        canonical = "qwen3-embedding-8k:latest"
+        healthy_model = {"name": canonical, "model": canonical, "size": 4096, "size_vram": 4096}
+        cases = ("valid", "disabled", "inactive", "embed_http_error", "empty_vector", "wrong_embedder",
+                 "ps_http_error", "missing_model", "other_model_gpu", "wrong_tag", "name_model_mismatch",
+                 "cpu", "partial_gpu", "zero_sizes", "missing_sizes", "string_sizes", "duplicate")
+        for case in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
                 root = Path(directory)
+                trace = root / "trace.jsonl"
+                vector = {"model": "qwen3-embedding-8k", "embeddings": [[0.1, 0.2]]}
+                models = [dict(healthy_model)]
+                if case == "empty_vector":
+                    vector["embeddings"] = [[]]
+                elif case == "wrong_embedder":
+                    vector["model"] = "another-embedder"
+                elif case in ("missing_model", "other_model_gpu"):
+                    models = [] if case == "missing_model" else [dict(healthy_model, name="another:latest", model="another:latest")]
+                elif case == "wrong_tag":
+                    models[0].update(name="qwen3-embedding-8k:old", model="qwen3-embedding-8k:old")
+                elif case == "name_model_mismatch":
+                    models[0]["model"] = "another:latest"
+                elif case == "cpu":
+                    models[0]["size_vram"] = 0
+                elif case == "partial_gpu":
+                    models[0]["size_vram"] = 2048
+                elif case == "zero_sizes":
+                    models[0].update(size=0, size_vram=0)
+                elif case == "missing_sizes":
+                    models[0].pop("size")
+                    models[0].pop("size_vram")
+                elif case == "string_sizes":
+                    models[0].update(size="4096", size_vram="4096")
+                elif case == "duplicate":
+                    models.append(dict(healthy_model))
+                (root / "embed.json").write_text(json.dumps(vector))
+                (root / "ps.json").write_text(json.dumps({"models": models}))
                 systemctl = root / "systemctl"
-                systemctl.write_text("#!/usr/bin/env python3\nimport os,sys\n"
-                                     "kind=sys.argv[2]\nassert sys.argv[1]=='--user' and sys.argv[3]=='ollama.service'\n"
-                                     "sys.exit(0 if os.environ['FIXTURE_'+kind.upper().replace('-','_')]=='1' else 1)\n")
+                systemctl.write_text("#!/usr/bin/env python3\nimport os,sys,pathlib,json\n"
+                                     "assert sys.argv[1]=='--user' and sys.argv[3]=='ollama.service'\n"
+                                     "kind=sys.argv[2]\n"
+                                     "with open(os.environ['FIXTURE_TRACE'],'a') as f: f.write(json.dumps(kind)+'\\n')\n"
+                                     "sys.exit(1 if (kind=='is-enabled' and os.environ['FIXTURE_CASE']=='disabled') or "
+                                     "(kind=='is-active' and os.environ['FIXTURE_CASE']=='inactive') else 0)\n")
                 systemctl.chmod(0o700)
-                ollama = root / "ollama"
-                ollama.write_text("#!/usr/bin/env python3\nimport os,pathlib,sys\n"
-                                  "assert sys.argv[1:]==['ls']\n"
-                                  "pathlib.Path(os.environ['FIXTURE_LIST_MARKER']).write_text('listed')\n")
-                ollama.chmod(0o700)
-                env = {**{key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ},
-                       "PATH": str(root) + os.pathsep + os.environ["PATH"],
-                       "FIXTURE_IS_ENABLED": "1" if enabled else "0", "FIXTURE_IS_ACTIVE": "1" if active else "0",
-                       "FIXTURE_LIST_MARKER": str(root / "listed")}
+                curl = root / "curl"
+                curl.write_text("#!/usr/bin/env python3\nimport os,sys,pathlib,json\n"
+                                "args=sys.argv[1:]; endpoint=next(x for x in args if x.startswith('http://'))\n"
+                                "assert endpoint.startswith('http://127.0.0.1:21434/api/')\n"
+                                "operation=endpoint.rsplit('/',1)[1]\n"
+                                "with open(os.environ['FIXTURE_TRACE'],'a') as f: f.write(json.dumps(operation)+'\\n')\n"
+                                "if operation=='embed':\n"
+                                "    assert json.loads(args[args.index('-d')+1])=={'model':'qwen3-embedding-8k','input':'Hello world'}\n"
+                                "elif operation=='ps': assert '-d' not in args\n"
+                                "else: raise AssertionError(operation)\n"
+                                "if os.environ['FIXTURE_CASE']==operation+'_http_error': sys.exit(22)\n"
+                                "print((pathlib.Path(os.environ['FIXTURE_ROOT'])/(operation+'.json')).read_text())\n")
+                curl.chmod(0o700)
+                env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
+                env.update({"PATH": str(root) + os.pathsep + os.environ["PATH"],
+                            "FIXTURE_TRACE": str(trace), "FIXTURE_ROOT": str(root), "FIXTURE_CASE": case})
                 checked = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
                                          env=env, capture_output=True, text=True, timeout=20)
-                self.assertEqual(checked.returncode == 0, enabled and active, checked.stderr)
-                self.assertEqual((root / "listed").exists(), enabled and active)
+                self.assertEqual(checked.returncode == 0, case == "valid", checked.stderr)
+                actual = [json.loads(line) for line in trace.read_text().splitlines()]
+                expected = ["is-enabled"] if case == "disabled" else ["is-enabled", "is-active"]
+                if case not in ("disabled", "inactive"):
+                    expected.append("embed")
+                    if case not in ("embed_http_error", "empty_vector", "wrong_embedder"):
+                        expected.append("ps")
+                self.assertEqual(actual, expected)
+
+    def test_ollama_unit_placement_preserves_unrelated_warmup_and_foreign_units(self):
+        row = self.row("local-model-server")
+        command = row["commands"][1]
+        self.assertFalse((PLAN / "config/ollama-warmup.sh").exists())
+        self.assertNotIn("ollama-warmup.sh", json.dumps(row))
+        expected = (PLAN / "config/ollama.service").read_bytes()
+        self.assertEqual(hashlib.sha256(expected).hexdigest(),
+                         "5e8e8bc42306f2d1ebc6da912e34daa28c6ce73eccf793d3155851733dccc6db")
+        self.assertNotIn(b"ExecStartPost=", expected)
+        for case in ("absent", "same", "different", "directory", "live_symlink", "dangling_symlink"):
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                fixture_home = root / "home"
+                unit = fixture_home / ".config/systemd/user/ollama.service"
+                unit.parent.mkdir(parents=True)
+                config = root / "config"
+                config.mkdir()
+                (config / "ollama.service").write_bytes(expected)
+                old_warmup = fixture_home / ".local/share/new-wsl-native-stack/bin/ollama-warmup.sh"
+                old_warmup.parent.mkdir(parents=True)
+                old_warmup.write_bytes(b"unreferenced host-owned warmup bytes\n")
+                if case == "same":
+                    unit.write_bytes(expected)
+                elif case == "different":
+                    unit.write_bytes(b"operator unit\n")
+                elif case == "directory":
+                    unit.mkdir()
+                    (unit / "preserved").write_bytes(b"operator directory bytes\n")
+                elif case.endswith("symlink"):
+                    target = root / "operator-unit"
+                    if case == "live_symlink":
+                        target.write_bytes(b"operator target bytes\n")
+                    unit.symlink_to(target)
+                info = unit.lstat() if case != "absent" else None
+                env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
+                env.update({"HOME": str(fixture_home), "config_root": str(config)})
+                checked = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                                         env=env, capture_output=True, text=True, timeout=20)
+                passed = case in ("absent", "same")
+                self.assertEqual(checked.returncode == 0, passed, checked.stderr)
+                if passed:
+                    self.assertEqual(unit.read_bytes(), expected)
+                else:
+                    self.assertIn("needs_owner:", checked.stderr)
+                    self.assertEqual(unit.lstat().st_ino, info.st_ino)
+                    if case == "different": self.assertEqual(unit.read_bytes(), b"operator unit\n")
+                    elif case == "directory": self.assertEqual((unit / "preserved").read_bytes(), b"operator directory bytes\n")
+                    elif case == "live_symlink": self.assertEqual(target.read_bytes(), b"operator target bytes\n")
+                    else: self.assertFalse(target.exists())
+                self.assertEqual(old_warmup.read_bytes(), b"unreferenced host-owned warmup bytes\n")
 
     def test_prometheus_health_requires_exact_plan_startup_features(self):
         row = self.row("prometheus")

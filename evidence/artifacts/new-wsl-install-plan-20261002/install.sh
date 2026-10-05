@@ -692,11 +692,10 @@ local-model-server() {
   run_command 'mise use -g ollama@0.35.0' || return "$?"
   refresh_path || return "$?"
   copy_config 'ollama.env.example' || return "$?"
-  # D-ollama: lasting GPU owner; local-model decision254–257; upstream0.35.0 linux.mdx:53–85 user-unit adaptation.
+  # D-ollama: lasting GPU owner; local-model decision254–257; upstream0.35.0 linux.mdx:57–89; D-ollama-2 native30m/on-demand unit.
   copy_config 'ollama.service' || return "$?"
-  copy_config 'ollama-warmup.sh' || return "$?"
   # Planned. Source: https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/linux.mdx#L57 (user-unit adaptation; D-ollama).
-  run_command 'ollama_unit_path="$HOME/.config/systemd/user/ollama.service"; ollama_warmup_path="$HOME/.local/share/new-wsl-native-stack/bin/ollama-warmup.sh"; if [[ -L "$ollama_unit_path" || -L "$ollama_warmup_path" ]] || { [[ -e "$ollama_unit_path" ]] && ! cmp -s -- "$config_root/ollama.service" "$ollama_unit_path"; } || { [[ -e "$ollama_warmup_path" ]] && ! cmp -s -- "$config_root/ollama-warmup.sh" "$ollama_warmup_path"; }; then   printf '\''needs_owner: retained differing Ollama unit or warmup script.\n'\'' >&2;   exit 3; fi; install -d -m 0700 -- "$HOME/.config/systemd/user" "$HOME/.local/share/new-wsl-native-stack/bin" && install -m 0600 -- "$config_root/ollama.service" "$ollama_unit_path" && install -m 0755 -- "$config_root/ollama-warmup.sh" "$ollama_warmup_path"' || return "$?"
+  run_command 'ollama_unit_path="$HOME/.config/systemd/user/ollama.service"; if [[ -L "$ollama_unit_path" ]] || { [[ -e "$ollama_unit_path" ]] && ! cmp -s -- "$config_root/ollama.service" "$ollama_unit_path"; }; then   printf '\''needs_owner: retained differing Ollama unit.\n'\'' >&2;   exit 3; fi; install -d -m 0700 -- "$HOME/.config/systemd/user" && install -m 0600 -- "$config_root/ollama.service" "$ollama_unit_path"' || return "$?"
   # Planned. Source: https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/linux.mdx#L88 (native user-unit startup adaptation).
   run_command 'systemctl --user daemon-reload && systemctl --user enable --now ollama.service' || return "$?"
 }

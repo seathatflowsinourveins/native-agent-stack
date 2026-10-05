@@ -1231,10 +1231,11 @@ local-model-server() {
       check local-model-server 'version only' 'OLLAMA_HOST=127.0.0.1:21434 ollama --version'
       ;;
     service_health)
-      # Kind: health; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/cli.mdx#L97
+      # Kind: health; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1736
       check local-model-server health 'systemctl --user is-enabled ollama.service
 systemctl --user is-active ollama.service
-OLLAMA_HOST=127.0.0.1:21434 ollama ls'
+curl -fsS --connect-timeout 5 --max-time 120 http://127.0.0.1:21434/api/embed -d '\''{"model":"qwen3-embedding-8k","input":"Hello world"}'\'' | jq -e '\''.model == "qwen3-embedding-8k" and (.embeddings | type == "array" and length == 1) and (.embeddings[0] | type == "array" and length > 0 and all(.[]; type == "number"))'\'' >/dev/null
+curl -fsS --connect-timeout 5 --max-time 30 http://127.0.0.1:21434/api/ps | jq -e '\''.models | select(type == "array") | map(select(.name == "qwen3-embedding-8k:latest" and .model == "qwen3-embedding-8k:latest")) | length == 1 and (.[0] | (.size | type == "number" and . > 0) and (.size_vram | type == "number") and .size_vram == .size)'\'' >/dev/null'
       ;;
     after_sign_in)
       # The embedding-model row, which installs only when named, creates the model this check calls. Until that model's

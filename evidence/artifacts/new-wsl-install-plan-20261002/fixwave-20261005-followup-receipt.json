@@ -2091,5 +2091,176 @@
       "python/cpython@v3.13.16:Lib/pathlib/_abc.py:432-437",
       "seathatflowsinourveins/native-agent-stack@86268eb193700714fe4b6df5eb956f485b91bbe6:evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py:98,115-141,227-247"
     ]
+  },
+  "d_ollama_2_followup": {
+    "recorded_at_utc": "2026-10-05T18:44:27Z",
+    "scope": "Superseding owner unit and on-demand acceptance; historical records preserved",
+    "source_freeze_parent": "64f11b1069455e7c3a6483974524896c62cb4281",
+    "executed_source_files": [
+      {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+        "bytes": 189401,
+        "sha256": "d18663c48ed9927cec7506aa89656649f6650249a4b9efa7cd05defb7c6ab808"
+      },
+      {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "bytes": 445988,
+        "sha256": "23c88c5503744825fe39f295d0fbf30f6f83cc535de3b4b7d5a41e2ba261532f"
+      },
+      {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/ollama.service",
+        "bytes": 1369,
+        "sha256": "5e8e8bc42306f2d1ebc6da912e34daa28c6ce73eccf793d3155851733dccc6db"
+      }
+    ],
+    "unit": {
+      "sha256": "5e8e8bc42306f2d1ebc6da912e34daa28c6ce73eccf793d3155851733dccc6db",
+      "bytes": 1369,
+      "source": "Explicitly directed noncredential host-unit read",
+      "keep_alive": "30m",
+      "ExecStartPost": false,
+      "warmup_row_asset_removed": true,
+      "host_apply_or_warmup_removal_by_lane": false,
+      "previous_unit_sha256": "94e03d7b35b57327086b74a1ea7b189bf362c970e756703dc8a1f42340618c50",
+      "previous_warmup_sha256": "2236dc865fde718d7cd44a9182b17fb55dcd36a0bbd601e9f4bd81d1c35892e5",
+      "historical_bytes_revision": "64f11b1069455e7c3a6483974524896c62cb4281"
+    },
+    "decision": {
+      "described_not_quoted": true,
+      "reported_user_decision_utc": "2026-10-05 about15:05Z",
+      "reported_inputs_not_remeasured": true,
+      "overturn": "Organic-use/reload costs exceed benefit of freed VRAM",
+      "exact_host_header_approximate_utc": "15:08Z"
+    },
+    "installed_capability": {
+      "command": "ollama serve --help",
+      "exit_code": 0,
+      "version": "0.35.0",
+      "KEEP_ALIVE_builtin_default": "5m",
+      "version_command_exit_code": 0
+    },
+    "local_checks": {
+      "touched": {
+        "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config",
+        "exit_code": 0,
+        "tests": 321,
+        "skipped": 3,
+        "seconds": 98.563,
+        "log": {
+          "path": "ollama2-touched-tests.log",
+          "bytes": 434,
+          "sha256": "449ff19681471c0745f30c2294312c6993c76c981f7220ae0d70b1fc7a7d5b4e"
+        }
+      },
+      "focused": {
+        "exit_code": 0,
+        "tests": 2,
+        "seconds": 1.694,
+        "health_cases": 17,
+        "placement_cases": 6
+      },
+      "check_plan": {
+        "exit_code": 0,
+        "rows": 84,
+        "installed_rows": 63,
+        "commands": 189,
+        "acceptance_entries": 113,
+        "configuration_assets": 62
+      },
+      "client_config_check": 0,
+      "bash_n_install": 0,
+      "bash_n_accept": 0,
+      "source_critic": "No material issue found; read-only review, no native calls"
+    },
+    "native_plan_stages": [
+      {
+        "stage": "post_install",
+        "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only local-model-server --stage post_install </dev/null",
+        "outer_timeout_seconds": 180,
+        "exit_code": 0,
+        "stdout_stderr": {
+          "path": "ollama2-native-post.log",
+          "bytes": 38,
+          "sha256": "96e92373d4fe3865b7fee960ac5aaf42246d33fab38c03707ebdcfbe70ab0195"
+        },
+        "recipe_sha256": "474fbac276014bb2173e5393133e5c2a897535ec9f8b0c7e9d837b5b92bb5faf",
+        "evidence_class": "LOCAL INTEGRATION/native endpoint check; not unchanged upstream test or full host acceptance"
+      },
+      {
+        "stage": "service_health",
+        "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only local-model-server --stage service_health </dev/null",
+        "outer_timeout_seconds": 180,
+        "exit_code": 0,
+        "stdout_stderr": {
+          "path": "ollama2-native-health.log",
+          "bytes": 40,
+          "sha256": "8880af82831af79db393b69c5412969d09237dee6a4612a80d4dc953a816dace"
+        },
+        "recipe_sha256": "662f60ea2ddb535c0ba5bbd14e9aae17016ba088d40806ff33c13edd105e4d57",
+        "evidence_class": "LOCAL INTEGRATION/native endpoint check; not unchanged upstream test or full host acceptance"
+      },
+      {
+        "stage": "after_sign_in",
+        "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only local-model-server --stage after_sign_in </dev/null",
+        "outer_timeout_seconds": 180,
+        "exit_code": 0,
+        "stdout_stderr": {
+          "path": "ollama2-native-after.log",
+          "bytes": 39,
+          "sha256": "15bff9ccc53dadae79e737b87101a37d762f675a15d0c7db6673d4d9d35aa797"
+        },
+        "recipe_sha256": "76f05d1b9ea4c4118d0b4f4b2b9f203a8da2f1e54232a0d4db279fba41056b52",
+        "evidence_class": "LOCAL INTEGRATION/native endpoint check; not unchanged upstream test or full host acceptance"
+      }
+    ],
+    "independent_observation": {
+      "command": "GET /api/ps after service_health",
+      "exit_code": 0,
+      "name": "qwen3-embedding-8k:latest",
+      "model": "qwen3-embedding-8k:latest",
+      "size": 2857191341,
+      "size_vram": 2857191341,
+      "server_reported_expires_at": "2026-10-05T15:11:57.183575102-04:00",
+      "evidence_class": "LOCAL INTEGRATION/native endpoint observation",
+      "exact_observation_timestamp": "not separately captured"
+    },
+    "request_scope": "One embed inside service_health followed by ps; separate unchanged after_sign_in makes one embed; independent observation GET only",
+    "source": "ollama/ollama@cc4069396f3ad2c370c53eed2e4a42ac13adab84:docs/api.md:1659-1704,1736-1771; envconfig/config.go:126-143; server/routes.go:1143-1145,2422-2440; server/sched.go:517-519; types/model/name.go:230-247; cmd/cmd.go:1217-1220; docs/linux.mdx:57-89",
+    "failed_pre_mutation_generation": [
+      {
+        "exit_code": 1,
+        "cause": "Unicode exact-match assumption",
+        "source_mutated": false
+      },
+      {
+        "exit_code": 1,
+        "cause": "Nested indentation assumption",
+        "source_mutated": false
+      },
+      {
+        "tool_status": "SyntaxError",
+        "cause": "JavaScript template/backtick conflict",
+        "source_mutated": false
+      }
+    ],
+    "not_claimed": [
+      "unchanged upstream tests",
+      "full host acceptance",
+      "cold-start load",
+      "timed idle unload",
+      "future residency",
+      "organic-use or reported decision figures remeasured",
+      "native numeric LLM usage"
+    ],
+    "owner_boundaries": "Sole co-op host apply; native whole cross/research retries deferred until owner-directed post-landing apply; canonical route, Telegram, Prometheus and draft read unchanged",
+    "validation_attempts": [
+      {
+        "exit_code": 1,
+        "cause": "Git publication enumeration still included unstaged warmup deletion; registry correctly omitted current file",
+        "resolution": "Stage deletion before required validation; preserve prior receipt hashes with historical source revision",
+        "correction": "Initial diagnosis attributed missing-file error to historical receipt; scripts/validate.py:263-282 proves index enumeration cause",
+        "source_mutated_by_failed_validation": false
+      }
+    ]
   }
 }
