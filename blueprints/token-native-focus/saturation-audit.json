@@ -882,7 +882,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",

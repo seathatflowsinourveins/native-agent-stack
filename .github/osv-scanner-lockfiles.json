@@ -198,6 +198,10 @@
       "parser": "requirements.txt"
     },
     {
+      "path": "blueprints/us-equities/overfitting-controls/requirements-riskl-parity.lock",
+      "parser": "requirements.txt"
+    },
+    {
       "path": "blueprints/native-skill-practice/p1/requirements-scoring.in",
       "parser": "requirements.txt"
     },
@@ -254,6 +258,10 @@
     {
       "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.in",
       "lockfile": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock"
+    },
+    {
+      "path": "blueprints/us-equities/overfitting-controls/requirements-riskl-parity.in",
+      "lockfile": "blueprints/us-equities/overfitting-controls/requirements-riskl-parity.lock"
     }
   ],
   "dependency_free": [

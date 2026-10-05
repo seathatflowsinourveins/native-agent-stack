@@ -22,6 +22,7 @@ import os
 import re
 import tempfile
 import unittest
+from unittest import mock
 from contextlib import redirect_stdout
 from io import StringIO
 from pathlib import Path
@@ -43,6 +44,24 @@ def load_module(name, filename):
 extract_layers = load_module("extract_layers_trading", "extract_layers.py")
 build_manifest = load_module("build_manifest_trading", "build_manifest.py")
 github_freshness = load_module("github_freshness_trading", "github_freshness.py")
+
+
+class BuildManifestImportTests(unittest.TestCase):
+    def test_import_does_not_load_currency_or_call_network_or_file_helpers(self):
+        spec = importlib.util.spec_from_file_location("build_manifest_import_check", TOOL_DIR / "build_manifest.py")
+        module = importlib.util.module_from_spec(spec)
+        with mock.patch("importlib.util.spec_from_file_location",
+                        side_effect=AssertionError("currency must not load during import")), \
+                mock.patch("subprocess.run") as run, \
+                mock.patch("urllib.request.urlopen") as urlopen, \
+                mock.patch.object(Path, "read_text") as read_text, \
+                mock.patch.object(Path, "write_text") as write_text:
+            spec.loader.exec_module(module)
+            run.assert_not_called()
+            urlopen.assert_not_called()
+            read_text.assert_not_called()
+            write_text.assert_not_called()
+
 
 # The selected trading components R23 names that live on catalogs/us-equities cards
 # (card ids, not manifests/stack.json ids).
@@ -197,6 +216,165 @@ class GithubFreshnessReadsTradingPinsTests(unittest.TestCase):
                 {"entries": [{"repository": "https://github.com/example/pinned"}]}), encoding="utf-8")
             self.assertEqual(github_freshness.collect_repository_urls(work),
                              {"https://github.com/example/card", "https://github.com/example/pinned"})
+
+
+NAUTILUS_SLUG = "nautechsystems/nautilus_trader"
+NAUTILUS_URL = f"https://github.com/{NAUTILUS_SLUG}"
+
+
+def _release(tag, published_at="2026-10-04T00:00:00Z", *, draft=False, prerelease=True):
+    return {"tag_name": tag, "published_at": published_at, "draft": draft, "prerelease": prerelease}
+
+
+class PrereleaseCurrencyTests(unittest.TestCase):
+    """Synthetic published-release pages, through the real fetch/build/report seams."""
+
+    def _row(self, record, pin="v2.0.0rc5"):
+        return build_manifest.build_trading_freshness({
+            "taxonomy": {"backtesting-engine": []},
+            "layers": {"backtesting-engine": [{"id": "nautilustrader", "repository": NAUTILUS_URL,
+                                                "decision": "default", "version_or_commit": pin}]},
+        }, None, {NAUTILUS_URL: record}, "2026-10-04")["entries"][0]
+
+    def _fetch(self, pages, *, include_prereleases=True, latest_error=None):
+        calls = []
+
+        def api(path, timeout=60, *, paginate=False):
+            calls.append((path, paginate))
+            if path == f"repos/{NAUTILUS_SLUG}":
+                return {"full_name": NAUTILUS_SLUG, "default_branch": "main",
+                        "pushed_at": "2026-10-04T00:00:00Z"}, None
+            if path == f"repos/{NAUTILUS_SLUG}/releases/latest":
+                return (None, latest_error) if latest_error else (_release("v1.231.0", prerelease=False), None)
+            if path == f"repos/{NAUTILUS_SLUG}/tags?per_page=1":
+                return [{"name": "v2.0.0rc99"}], None
+            if path == f"repos/{NAUTILUS_SLUG}/commits/main":
+                return {"sha": "abc", "commit": {"committer": {"date": "2026-10-04T00:00:00Z"}}}, None
+            prefix = f"repos/{NAUTILUS_SLUG}/releases?per_page={github_freshness.RELEASES_PER_PAGE}&page="
+            if path.startswith(prefix):
+                page = int(path[len(prefix):])
+                value = pages[page - 1]
+                return (None, value) if isinstance(value, str) else (value, None)
+            self.fail(f"unexpected API path: {path}")
+
+        with mock.patch.object(github_freshness, "gh_api", side_effect=api):
+            record = github_freshness.fetch_repository(NAUTILUS_SLUG, include_prereleases=include_prereleases)
+        return record, calls
+
+    def test_rc6_is_drift_in_the_manifest_and_trading_report(self):
+        record = {"slug": NAUTILUS_SLUG, "pushed_at": "2026-10-04T00:00:00Z",
+                  "latest_release": {"tag": "v1.231.0", "published_at": "2026-10-03T00:00:00Z",
+                                     "prerelease": False},
+                  "release_list": {"releases": [{"tag": "v2.0.0rc6", "published_at": "2026-10-04T00:00:00Z",
+                                                  "prerelease": True}], "truncated": False}}
+        row = self._row(record)
+        self.assertEqual(row["upstream"]["latest"], "v2.0.0rc6")
+        self.assertIs(row["pin_behind_upstream"], True)
+        markdown, _ = fp.render_trading_markdown({"entries": [row], "checked_at": "2026-10-04",
+                                                 "dormancy_threshold_days": 180})
+        self.assertIn("v2.0.0rc6", markdown)
+        cells = fp.trading_freshness_rows({"entries": [row]})[0][0]
+        self.assertEqual(cells[4], "yes")
+
+    def test_backport_created_after_rc6_does_not_hide_it_on_a_later_page(self):
+        backport = _release("v1.231.1", "2026-10-05T00:00:00Z", prerelease=False)
+        record, calls = self._fetch([[backport] * github_freshness.RELEASES_PER_PAGE,
+                                    [_release("v2.0.0rc6")]])
+        self.assertEqual(self._row(record)["upstream"]["latest"], "v2.0.0rc6")
+        self.assertIs(self._row(record)["pin_behind_upstream"], True)
+        release_calls = [call for call in calls if "/releases?" in call[0]]
+        self.assertEqual(release_calls, [
+            (f"repos/{NAUTILUS_SLUG}/releases?per_page=100&page=1", False),
+            (f"repos/{NAUTILUS_SLUG}/releases?per_page=100&page=2", False),
+        ])
+
+    def test_drafts_unpublished_releases_and_other_majors_are_ignored(self):
+        record, _ = self._fetch([[_release("v2.0.0rc7", draft=True),
+                                 _release("v2.0.0rc8", published_at=None),
+                                 _release("v3.0.0rc1"), _release("v2.0.0rc6")]])
+        row = self._row(record)
+        self.assertEqual(row["upstream"]["latest"], "v2.0.0rc6")
+        self.assertIs(row["pin_behind_upstream"], True)
+
+    def test_cap_reached_is_explicit_unknown_even_if_a_candidate_was_seen(self):
+        record, calls = self._fetch([
+            [_release("v2.0.0rc6")] * github_freshness.RELEASES_PER_PAGE
+            for _ in range(github_freshness.RELEASES_PAGE_CAP)
+        ])
+        self.assertEqual(len([call for call in calls if "/releases?" in call[0]]), 3)
+        self.assertIs(record["release_list"]["truncated"], True)
+        row = self._row(record)
+        self.assertIsNone(row["pin_behind_upstream"])
+        self.assertEqual(row["pin_comparison_reason"], "unknown beyond cap")
+        markdown, _ = fp.render_trading_markdown({"entries": [row], "checked_at": "2026-10-04",
+                                                 "dormancy_threshold_days": 180})
+        self.assertIn("unknown beyond cap", markdown)
+
+    def test_stable_pin_and_fetch_keep_the_latest_release_path(self):
+        record, calls = self._fetch([], include_prereleases=False)
+        self.assertFalse(any("/releases?" in call[0] for call in calls))
+        self.assertNotIn("release_list", record)
+        row = self._row(record, pin="v1.230.0")
+        self.assertEqual(row["upstream"]["latest"], "v1.231.0")
+        self.assertIs(row["pin_behind_upstream"], True)
+
+    def test_prerelease_comparison_orders_rc_numbers_and_the_final_release(self):
+        for upstream, behind in (("v2.0.0rc4", False), ("v2.0.0rc5", False),
+                                 ("v2.0.0rc6", True), ("v2.0.0rc10", True), ("v2.0.0", True)):
+            with self.subTest(upstream=upstream):
+                self.assertIs(build_manifest.classify_pin("v2.0.0rc5", NAUTILUS_URL, upstream)["behind"], behind)
+
+    def test_missing_release_list_and_failed_page_do_not_fall_back_to_1x_or_tags(self):
+        old_record = {"latest_release": {"tag": "v1.231.0"}, "pushed_at": "2026-10-04T00:00:00Z"}
+        self.assertIsNone(self._row(old_record)["pin_behind_upstream"])
+        record, _ = self._fetch(["HTTP 503: Service Unavailable"])
+        self.assertIn("release_list", record["partial_errors"])
+        self.assertIsNone(self._row(record)["pin_behind_upstream"])
+        record, _ = self._fetch([[_release("v2.0.0rc6")]], latest_error="HTTP 404: Not Found")
+        self.assertEqual(self._row(record)["upstream"]["latest"], "v2.0.0rc6")
+        self.assertNotIn("partial_errors", record)
+
+    def test_newest_publication_in_the_pinned_major_is_selected_independent_of_list_order(self):
+        record, _ = self._fetch([[_release("v2.0.0rc5", "2026-10-02T00:00:00Z"),
+                                 _release("v2.0.0rc6", "2026-10-04T00:00:00Z"),
+                                 _release("v1.231.1", "2026-10-05T00:00:00Z", prerelease=False)]])
+        self.assertEqual(self._row(record)["upstream"]["latest"], "v2.0.0rc6")
+
+    def test_failed_second_page_and_malformed_page_are_unknown_not_partial_candidates(self):
+        for pages in ([[_release("v2.0.0rc6")] * 100, "HTTP 503: Service Unavailable"],
+                      [{"unexpected": "object"}]):
+            with self.subTest(pages=type(pages[-1]).__name__):
+                record, _ = self._fetch(pages)
+                self.assertIn("release_list", record["partial_errors"])
+                self.assertIsNone(self._row(record)["pin_behind_upstream"])
+                self.assertEqual(self._row(record)["pin_comparison_reason"], "release list unavailable")
+
+    def test_collection_and_resume_require_the_new_list_only_for_prerelease_pins(self):
+        stable_url = "https://github.com/example/stable"
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            (work / "foundation-layers.json").write_text(json.dumps({"layers": [{"components": [
+                {"repository": stable_url, "version": "1.0.0"},
+                {"repository": NAUTILUS_URL, "version": "2.0.0rc5"}]}]}))
+            (work / "trading-catalog.json").write_text(json.dumps({"entries": [
+                {"repository": NAUTILUS_URL, "version_or_commit": "v2.0.0rc5"}]}))
+            (work / "trading-pins.json").write_text(json.dumps({"entries": [
+                {"repository": NAUTILUS_URL + "/releases/tag/v2.0.0rc5", "pin": "2.0.0rc5"}]}))
+            (work / "runtime-pins.json").write_text(json.dumps({"entries": [
+                {"repository": NAUTILUS_URL, "pin": "2.0.0rc5"}]}))
+            self.assertEqual(github_freshness.collect_prerelease_slugs(work), {NAUTILUS_SLUG})
+            old_record = {"slug": NAUTILUS_SLUG, "latest_release": {"tag": "v1.231.0"}}
+            stable_record = {"slug": "example/stable", "latest_release": {"tag": "v1.0.0"}}
+            (work / "github-freshness.json").write_text(json.dumps({
+                "repositories": {NAUTILUS_URL: old_record, stable_url: stable_record}}))
+            new_record, _ = self._fetch([[_release("v2.0.0rc6")]])
+            with mock.patch.object(github_freshness, "fetch_repository", return_value=new_record) as fetch, \
+                    redirect_stdout(StringIO()):
+                self.assertEqual(github_freshness.main(["--work-dir", str(work), "--workers", "1"]), 0)
+            fetch.assert_called_once_with(NAUTILUS_SLUG, tag_prefixes=(), include_prereleases=True)
+            with mock.patch.object(github_freshness, "fetch_repository") as fetch, redirect_stdout(StringIO()):
+                self.assertEqual(github_freshness.main(["--work-dir", str(work), "--workers", "1"]), 0)
+            fetch.assert_not_called()
 
 
 class ComputeDormancyTests(unittest.TestCase):
@@ -406,7 +584,8 @@ class TradingReportTests(unittest.TestCase):
         self.assertEqual(result["trading"], ["engine", "hftbacktest"])
         self.assertEqual(result["dormant"], ["hftbacktest"])
         self.assertEqual((result["archived"], result["trading_unfetched"]), ([], []))
-        self.assertRegex(text, r"1 dormant upstream\(s\) \(no release or default-branch commit in 180\+ days\)")
+        self.assertRegex(text, r"1 dormant upstream\(s\) \(no release activity considered for the row "
+                              r"or default-branch commit in 180\+ days\)")
 
     def test_dormant_rows_are_not_drift(self):
         self._write_trading()

@@ -78,7 +78,33 @@ control lane. It does not tune, promote or reject any future strategy.
   recomputation. The DSR unit test reproduces the paper's numerical example
   (SR0 0.1132, DSR 0.9004). Those constants are transcribed from the paper,
   which was not re-fetched offline. The PBO tests are locally constructed
-  synthetic fixtures. No upstream implementation was executed.
+  synthetic fixtures. No upstream implementation was executed for this
+  September 24 receipt.
+
+## Optional RiskLabAI parity check — October 5, 2026
+
+[`tests/test_overfitting_riskl_parity.py`](../../../tests/test_overfitting_riskl_parity.py)
+compares fixed synthetic inputs with a clean, hash-locked RiskLabAI 3.2.0 install
+at [`7d5aa112`](https://github.com/RiskLabAI/RiskLabAI.py/commit/7d5aa11271c70d83a7069d5900d80bb08b29e481).
+Regular PSR, both benchmark APIs, native DSR, Sharpe and every CSCV logit agree
+with absolute tolerance `1e-12` and relative tolerance `1e-12` (`1e-11` for the
+supplied-N benchmark and native DSR because upstream rounds Euler's constant).
+Five policy differences remain; the list-based singleton benchmark differs,
+while upstream's separate expected-max function already accepts independent
+trial count and dispersion. Fourteen tests cover parity, the six numbered
+cases and repair regressions. The [decision](../../../docs/decisions/2026-10-05-overfitting-riskl-parity.md)
+lists their source lines, the retained policies and the adoption trigger; the
+[parity receipt](riskl-parity-receipt.json) records actual runs and a failing
+control with an intentionally wrong oracle.
+
+This is an optional research check. It skips when that exact version is absent
+or cannot be imported. Parity execution adds no CI dependency or required job;
+the research lock participates in the existing required OSV scan. The trading
+lane owns advisory response: bump and re-qualify the pins or record a reasoned,
+time-limited ignore under the repository's OSV policy. The controls,
+frozen parameters, retained ledger and strategy gates keep their existing
+behavior. Reproduction commands and the separate research lock are in the
+decision; the September 24 results above remain historical evidence.
 
 ## Reproduce
 

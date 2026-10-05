@@ -195,6 +195,16 @@ def _freshness_record_has_error(repository, raw_repositories: dict) -> bool:
     return bool(record.get("error")) or bool(record.get("partial_errors"))
 
 
+def _release_stream_unknown_reason(row: dict) -> str | None:
+    """The release-list policy withheld latest; it is not an empty repository."""
+    flag = (row.get("upstream") or {}).get("latest_flag") or {}
+    for reason in (flag.get("reason"), row.get("pin_comparison_reason")):
+        if reason in ("release list not fetched", "release list unavailable",
+                      "unknown beyond cap", "no published release in pinned major"):
+            return reason
+    return None
+
+
 def compute_drift(published_rows: dict, rebuilt_rows: dict, raw_repositories: dict | None = None):
     """Compare two manifest_component_rows() outputs.
 
@@ -211,7 +221,8 @@ def compute_drift(published_rows: dict, rebuilt_rows: dict, raw_repositories: di
       never fetched that repository this run, e.g. a bounded ``--max-repos``
       run or a full fetch failure) or the raw freshness record shows a
       fetch problem for it (see ``_freshness_record_has_error``, e.g. a
-      releases-endpoint error papered over by a tags-endpoint fallback).
+      releases-endpoint error papered over by a tags-endpoint fallback), or the
+      release-stream policy withheld latest with an explicit unknown reason.
       Their upstream comparison is excluded from ``drifted`` and ``no_release``.
     - ``no_release``: ids that *were* reliably fetched this run
       (``pushed_at`` present, no recorded fetch problem) but whose
@@ -230,7 +241,7 @@ def compute_drift(published_rows: dict, rebuilt_rows: dict, raw_repositories: di
         old_latest = (old.get("upstream") or {}).get("latest")
         fetch_unreliable = new_upstream.get("pushed_at") is None or _freshness_record_has_error(
             new.get("repository"), raw_repositories,
-        )
+        ) or _release_stream_unknown_reason(new) is not None
         # The pin comes from the local catalogs, not from upstream, so a pin change is
         # real drift whatever the fetch reliability of this run (Codex verification of
         # 7a483f7: the original skills-ref 0.1.0 -> 0.1.1 repro without pushed_at).
@@ -271,14 +282,20 @@ def render_drift_markdown(published_path, rebuilt_name: str, published: dict, re
     if unfetched:
         # "fetch problem" is a partial error; a failed matching-tags list never is one
         # (``_freshness_record_has_error``), so it never puts a component here.
+        rebuilt_rows = manifest_component_rows(rebuilt)
         lines += [
             "",
             f"{len(unfetched)} component(s) have no reliable upstream data this run (an "
-            "unfinished/bounded fetch, or a releases/tags/commit fetch problem for that repository) "
+            "unfinished/bounded fetch, a releases/tags/commit fetch problem for that repository, "
+            "or an unknown release stream) "
             "so their upstream comparison is excluded above (a pin change on such a row is still "
             "listed as drift, with its fresh upstream fields empty):",
             "",
-            ", ".join(md_cell(component_id) for component_id in sorted(unfetched)),
+            ", ".join(
+                md_cell(component_id) + (f" (unknown: {md_cell(reason)})" if reason else "")
+                for component_id in sorted(unfetched)
+                for reason in (_release_stream_unknown_reason(rebuilt_rows.get(component_id, {})),)
+            ),
         ]
     if no_release:
         lines += [
@@ -357,7 +374,8 @@ def render_trading_markdown(document: dict, raw_repositories: dict | None = None
         "change since the published manifest: each selected (`default`/`conditional`) "
         "`catalogs/us-equities` card, plus the trading pins that blueprint or runtime records declare "
         "outside those cards (`tools/sota-convergence/extract_layers.py` `TRADING_PIN_SOURCES`). A "
-        f"dormant upstream has no GitHub release and no default-branch commit in the last {threshold} "
+        f"dormant row has no activity in the release dates considered for that row or its "
+        f"default-branch commit in the last {threshold} "
         f"days as of `{document.get('checked_at')}`. Dormant and archived rows are not drift. They "
         "select nothing.", "",
     ]
@@ -368,7 +386,7 @@ def render_trading_markdown(document: dict, raw_repositories: dict | None = None
     else:
         lines.append("No pinned trading component was found.")
     for ids, sentence in (
-        (dormant, f"dormant upstream(s) (no release or default-branch commit in {threshold}+ days)"),
+        (dormant, f"dormant upstream(s) (no release activity considered for the row or default-branch commit in {threshold}+ days)"),
         (archived, "archived upstream repository(ies)"),
         (unfetched, "trading component(s) with no reliable upstream data this run"),
     ):
@@ -509,9 +527,10 @@ def render_runtime_markdown(document: dict, raw_repositories: dict | None = None
         "belong to other packages. The same upstreams' `manifests/stack.json` pins and selected "
         "(`default`/`conditional`) trading card pins stay in the tables above; an `alternative` card's pin "
         "is compared in no table. Rows here select nothing, are never drift and never change "
-        "`drift-status.txt`. The last-release and last-commit columns describe the repository's activity "
-        "(its latest GitHub release, which in a monorepo can belong to another package, and its default "
-        "branch), not the tag in the latest column. A dormant upstream has no GitHub release and no "
+        "`drift-status.txt`. The last-release and last-commit columns describe the activity considered "
+        "for each row: releases/latest (which in a monorepo can belong to another package), that row's "
+        "selected release-stream publication if any, and the default branch; matching tags supply no "
+        "publication date. A dormant row has no activity in its considered release dates or "
         f"default-branch commit in the last {threshold} days as of `{document.get('checked_at')}`.", "",
     ]
     if rows:
@@ -524,7 +543,7 @@ def render_runtime_markdown(document: dict, raw_repositories: dict | None = None
         (flagged["runtime_behind"], "pinned runtime row(s) behind upstream latest"),
         ([f"{item} ({errors.get(item)})" for item in flagged["runtime_unresolved"]],
          "runtime source(s) that did not resolve, each with its reason (the row stays, not compared)"),
-        (flagged["runtime_dormant"], f"dormant upstream(s) (no release or default-branch commit in {threshold}+ days)"),
+        (flagged["runtime_dormant"], f"dormant upstream(s) (no release activity considered for the row or default-branch commit in {threshold}+ days)"),
         (flagged["runtime_archived"], "archived upstream repository(ies)"),
         (flagged["runtime_unfetched"], "runtime row(s) with no reliable upstream data this run"),
         (runtime_only_failures, RUNTIME_ONLY_FAILURE_SENTENCE),

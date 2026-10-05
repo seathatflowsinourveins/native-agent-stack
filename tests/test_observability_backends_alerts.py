@@ -115,11 +115,11 @@ class RulesTemplateTests(unittest.TestCase):
         self.assertIn('job!~"acceptance-fixture|adaptive-paper"', match.group(1))
 
     @unittest.skipUnless(HAVE_YAML, "optional PyYAML structural check")
-    def test_rendered_yaml_is_well_formed_and_has_twenty_one_rules(self):
+    def test_rendered_yaml_is_well_formed_and_has_twenty_six_rules(self):
         placeholder = self.text.replace("@CONFIG_ROOT@", "/tmp/x").replace("@DATA_ROOT@", "/tmp/y")
         doc = yaml.safe_load(placeholder)
         rule_count = sum(len(group["rules"]) for group in doc["groups"])
-        self.assertEqual(rule_count, 21)
+        self.assertEqual(rule_count, 26)
         names = {rule["alert"] for group in doc["groups"] for rule in group["rules"] if "alert" in rule}
         self.assertTrue(EXPECTED_ALERTS.issubset(names))
 
@@ -269,7 +269,7 @@ class RenderedNativeValidationTests(unittest.TestCase):
             capture_output=True, text=True,
         )
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        self.assertIn("21 rules found", result.stdout)
+        self.assertIn("26 rules found", result.stdout)
 
     def test_promtool_check_config(self):
         result = subprocess.run(
@@ -356,6 +356,158 @@ def render_backends(root: Path) -> Path:
         check=True, capture_output=True, text=True,
     )
     return root / "config"
+
+
+@unittest.skipUnless(PROMTOOL.exists(), "promtool not installed at the documented ecosystem tool path")
+class RootFilesystemRuleTests(unittest.TestCase):
+    """Pinned promtool evaluates the rendered rules over local synthetic filesystem series.
+
+    The three states preserve a fixed total size, including reserved bytes. These
+    are integration fixtures, not upstream tests or evidence of live alert delivery.
+    """
+
+    GIB = 1024 ** 3
+    ALERTS = ("EcosystemRootFilesystemSpaceFillingUp",
+              "EcosystemRootFilesystemAlmostOutOfSpace", "EcosystemRootFilesystemBurstFill")
+    FILESYSTEM = {"device": "root-test", "mode": "rw", "mountpoint": "/", "type": "ext4",
+                  "job": "otelcol", "instance": "host-test"}
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.rules = render_backends(self.root) / "ecosystem-prometheus-rules.yml"
+        group = self.rules.read_text().split("  - name: ecosystem-local\n", 1)[1].split("\n  - name: ", 1)[0]
+        self.by_key = {}
+        for name, block in re.findall(r"- alert: (\w+)\n(.*?)(?=\n      - alert: |\Z)", group, re.S):
+            if name not in self.ALERTS:
+                continue
+            labels = dict(re.findall(r"^          (severity|scope): (\S+)$", block, re.M))
+            annotations = {key: re.search(rf"^ +{key}: '((?:[^']|'')*)'$", block, re.M).group(1).replace("''", "'")
+                           for key in ("summary", "description")}
+            self.by_key[name, labels["severity"]] = {"labels": labels, "annotations": annotations}
+
+    def firing(self, alert, *severities):
+        return [{"exp_labels": {**self.FILESYSTEM, "state": "free", **self.by_key[alert, severity]["labels"]},
+                 "exp_annotations": self.by_key[alert, severity]["annotations"]}
+                for severity in severities]
+
+    def filesystem(self, free_gib, **labels):
+        labels = {**self.FILESYSTEM, **labels}
+        label_text = ",".join(f'{key}="{value}"' for key, value in labels.items())
+        free = [round(value * self.GIB) for value in free_gib]
+        reserved = 50 * self.GIB
+        used = [1000 * self.GIB - reserved - value for value in free]
+        return [{"series": f'ecosystem_system_filesystem_usage_bytes{{{label_text},state="{state}"}}',
+                 "values": " ".join(str(value) for value in values)}
+                for state, values in (("free", free), ("used", used), ("reserved", [reserved] * len(free)))]
+
+    def check(self, cases, *, interval="1m"):
+        document = {"rule_files": [str(self.rules)], "evaluation_interval": interval, "tests": [
+            {"interval": interval, "input_series": inputs,
+             "alert_rule_test": [{"eval_time": at, "alertname": alert, "exp_alerts": expected}
+                                 for at, alert, expected in checks]}
+            for inputs, checks in cases]}
+        path = self.root / "root-filesystem.test.yml"
+        path.write_text(json.dumps(document))  # JSON is valid YAML; no PyYAML dependency.
+        result = subprocess.run([str(PROMTOOL), "test", "rules", str(path)], capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("SUCCESS", result.stdout + result.stderr)
+
+    def test_space_filling_warning_fires_after_one_hour_and_resolves_at_forty_percent(self):
+        alert = "EcosystemRootFilesystemSpaceFillingUp"
+        # Two samples first establish the negative slope at 1m; the 1h delay ends at 61m.
+        free = [350 - 0.3 * minute for minute in range(361)] + [400] * 10
+        self.check([(self.filesystem(free), [("60m", alert, []),
+                                           ("61m", alert, self.firing(alert, "warning")),
+                                           ("6h", alert, self.firing(alert, "warning")),
+                                           ("6h1m", alert, [])])])
+
+    def test_space_filling_critical_requires_four_hour_prediction_and_resolves(self):
+        alert = "EcosystemRootFilesystemSpaceFillingUp"
+        # 20% is crossed long before the four-hour prediction turns negative at 594m.
+        free = [250 - 0.3 * minute for minute in range(661)] + [500] * 10
+        warning = self.firing(alert, "warning")
+        both = self.firing(alert, "warning", "critical")
+        self.check([(self.filesystem(free), [("60m", alert, []), ("61m", alert, warning),
+                                           ("653m", alert, warning), ("654m", alert, both),
+                                           ("660m", alert, both), ("661m", alert, [])])])
+
+    def test_almost_out_warning_counts_reserved_in_size_and_resolves(self):
+        alert = "EcosystemRootFilesystemAlmostOutOfSpace"
+        # 48 / 1000 < 5%; omitting the 50 GiB reserve would incorrectly suppress it.
+        free = [48] * 32 + [200] * 10
+        self.check([(self.filesystem(free), [("29m", alert, []),
+                                           ("30m", alert, self.firing(alert, "warning")),
+                                           ("31m", alert, self.firing(alert, "warning")),
+                                           ("32m", alert, [])])])
+
+    def test_almost_out_critical_fires_with_warning_and_resolves(self):
+        alert = "EcosystemRootFilesystemAlmostOutOfSpace"
+        # 29 / 1000 < 3%; omitting the reserve or counting it as free changes this result.
+        free = [29] * 32 + [200] * 10
+        both = self.firing(alert, "warning", "critical")
+        self.check([(self.filesystem(free), [("29m", alert, []), ("30m", alert, both),
+                                           ("31m", alert, both), ("32m", alert, [])])])
+
+    def test_runaway_burst_fires_before_four_and_five_minute_exhaustion_and_resolves(self):
+        alert = "EcosystemRootFilesystemBurstFill"
+        baseline = 6 * 60 * 60
+        cases = []
+        for duration, fires_after in ((240, 225), (300, 285)):
+            # Counterfactual 128 GiB loss in four/five minutes, not a measured rate.
+            # Collector observations update every 30s, scraped/evaluated every 15s.
+            # Deliberately lag observations by 60s, exceeding the configured
+            # 1s batch + 15s scrape + 15s evaluation phases. Recovery follows the
+            # physical exhaustion by 30s, so its observation arrives 90s later.
+            free = []
+            for elapsed in range(-baseline, duration + 151, 15):
+                sampled_at = max(0, (elapsed - 60) // 30 * 30)
+                value = max(0, 128 * (1 - sampled_at / duration))
+                free.append(128 if sampled_at >= duration + 30 else value)
+            checks = [(f"{baseline + elapsed}s", alert, [])
+                      for elapsed in range(0, fires_after, 15)]
+            checks += [(f"{baseline + fires_after}s", alert, self.firing(alert, "critical")),
+                       (f"{baseline + duration}s", alert, self.firing(alert, "critical")),
+                       (f"{baseline + fires_after}s", "EcosystemRootFilesystemSpaceFillingUp", []),
+                       (f"{baseline + fires_after}s", "EcosystemRootFilesystemAlmostOutOfSpace", []),
+                       (f"{baseline + duration + 90}s", alert, [])]
+            self.assertLess(fires_after, duration)  # assertion time precedes physical exhaustion
+            cases.append((self.filesystem(free), checks))
+        self.check(cases, interval="15s")
+
+    def test_thirty_gib_legitimate_burst_stays_silent_from_normal_and_recovered_headroom(self):
+        alert = "EcosystemRootFilesystemBurstFill"
+        baseline = 6 * 60 * 60
+        cases = []
+        for initial in (151, 128):
+            # A 30 GiB transfer completes in 60s. Follow the settled gauge for
+            # twenty minutes to catch delayed false positives from older trends.
+            free = [initial - min(30, max(0, (elapsed - 60) // 30 * 15))
+                    for elapsed in range(-baseline, 20 * 60 + 1, 15)]
+            checks = [(f"{baseline + elapsed}s", alert, []) for elapsed in range(0, 20 * 60 + 1, 15)]
+            cases.append((self.filesystem(free), checks))
+        self.check(cases, interval="15s")
+
+    def test_burst_is_silent_below_fifty_gib_without_imminent_exhaustion(self):
+        alert = "EcosystemRootFilesystemBurstFill"
+        # The absolute floor alone must not page: steady and slow writes retain
+        # far more than two minutes of runway. Repeated samples model 30s collection.
+        checks = [(f"{elapsed}s", alert, []) for elapsed in range(0, 20 * 60 + 1, 15)]
+        self.check([(self.filesystem([49] * 81), checks),
+                    (self.filesystem([49 - (tick // 2) * 0.05 for tick in range(81)]), checks)],
+                   interval="15s")
+
+    def test_steady_disk_does_not_fire_any_new_alert(self):
+        # Below both upstream filling thresholds, but no negative prediction.
+        self.check([(self.filesystem([80] * 721), [(at, alert, [])
+                                                 for at in ("1h", "6h", "12h") for alert in self.ALERTS])])
+
+    def test_other_mountpoints_and_readonly_roots_are_excluded(self):
+        free = [128 - 16 * minute for minute in range(9)] + [0] * 120
+        checks = [(at, alert, []) for at in ("8m", "1h", "2h") for alert in self.ALERTS]
+        self.check([(self.filesystem(free, mountpoint="/scratch"), checks),
+                    (self.filesystem(free, mode="ro"), checks)])
 
 
 @unittest.skipUnless(PROMTOOL.exists(), "promtool not installed at the documented ecosystem tool path")
