@@ -1,135 +1,216 @@
-# Native research workflow hosting
+# Unattended US-equities research and journal recovery
 
-**Latest:** [Cited research runtime](../research-runtime/README.md) adds a fresh
-two-step native Dagu packet/Parquet acceptance and a standalone Claude Opus 5
-report with reconciled telemetry. The paired Astra → Claude recipe is validated
-but allowance-blocked. [Native restic acceptance](backup/README.md) demonstrates
-encrypted backup and byte-identical restore of 22 selected public reference files.
-Neither adds a scheduled broker service or off-host durability.
+The templates run the named `nyse-post-close-evidence` research job with Dagu
+**2.16.6** and recover selected research SQLite journals with restic **0.19.1**.
+This serves US-equities research and historical simulation: the DAG summarizes
+an operator-supplied local LEAN simulation and validates its evidence. It neither
+acquires market data nor executes broker orders.
 
-Dagu 2.16.6 now hosts local research run history on loopback port 18525. Its
-upstream CLI completed the three-step [workflow](equity-research-evidence.yaml): DuckDB
-summarized six LEAN simulated events into three orders, then both evidence
-validators passed. The native history retained successful, failed and cancelled
-runs after a service restart. This is local research hosting, not broker recovery
-or a hosted autonomous trading system.
+The [decision](../../../../docs/decisions/2026-10-05-trading-unattended-hosting-recovery.md)
+records the alternatives, scheduler comparison and remaining gates. These are
+portable examples. PR-4 installed no unit, started no scheduler and used no
+existing host service. Operating-host and alert selection is **user decision 2**.
 
-The pinned Linux amd64 release archive matched the publisher's SHA-256:
-`06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717`.
-The [receipt](receipt.json) retains the initial schema/environment failures and
-the corrected run. Dagu step IDs require underscores; execution requires explicit
-environment passthrough in this version. No model inference was needed.
+## One Dagu process and an explicit job environment
 
-## Native commands
+[dagu-equities.service.example](dagu-equities.service.example) runs `dagu start-all`
+with `Restart=on-failure`, combining the web UI and scheduler in one process.
+[config.yaml.example](config.yaml.example) disables the optional coordinator in
+that file; it otherwise defaults to enabled. Sources:
+`dagucloud/dagu@v2.16.6:internal/cmd/startall.go:32-45` and
+`internal/cmn/config/loader.go:1311-1319`
+([start-all](https://github.com/dagucloud/dagu/blob/v2.16.6/internal/cmd/startall.go#L32),
+[default](https://github.com/dagucloud/dagu/blob/v2.16.6/internal/cmn/config/loader.go#L1311)).
 
-Set `DAGU`, `RESEARCH_HOME`, `STACK_REPO`, `SDK_ENV`, `LEAN_EVENTS` and a fresh
-`RESEARCH_OUTPUT` directory to your own installed paths. The environment names are
-explicitly allowed in [config.yaml.example](config.yaml.example). Install that
-configuration privately with mode 0600. Its upstream `auth.mode: none` serves a
-passwordless dashboard on `127.0.0.1` only, with DAG write/run permissions disabled.
-Do not expose this local mode through a network listener or tunnel. The release contains the binary,
-license and current workflow schema. No Docker or cloud account is required.
+Replace every `/path/to/...` in a **private copy** of the unit and DAG. Put the
+four job variables `STACK_REPO`, `SDK_ENV`, `LEAN_EVENTS` and `RESEARCH_OUTPUT`
+in the DAG's `env:` block. This keeps the job complete when invoked by either
+the scheduler or native CLI. `SDK_ENV` is the existing locked trading runtime.
+An `Environment=` line in the unit cannot supply them: `env -i` discards that
+inherited environment. Sources: `coreutils/coreutils@v9.4:src/env.c:824-838`
+([implementation](https://github.com/coreutils/coreutils/blob/v9.4/src/env.c#L824)) and
+`dagucloud/dagu@v2.16.6:internal/spec/dag.go:1663-1673`
+([DAG env](https://github.com/dagucloud/dagu/blob/v2.16.6/internal/spec/dag.go#L1663)).
+The four passthrough entries remain available for other native CLI definitions;
+this DAG obtains its values from its own block.
+
+Deploy only the private research DAG to the chosen Dagu DAG directory, with its
+local input and output paths adapted. Each run writes
+`order-events-${DAG_RUN_ID}.parquet`, preserving earlier outputs and avoiding the
+summarizer's overwrite refusal on the following session. Dagu supplies this
+identifier (`dagucloud/dagu@v2.16.6:internal/runctx/context_env.go:28`,
+`internal/cmn/runenv/keys.go:12-13`
+[source](https://github.com/dagucloud/dagu/blob/v2.16.6/internal/cmn/runenv/keys.go#L12)).
+
+The UI listens on loopback and keeps `permissions.run_dags: false` and
+`permissions.write_dags: false`. On 2.16.6 the run permission is an API guard;
+the scheduler's local dispatch path starts its subprocess independently. This
+is a **source finding**, awaiting observation in the operating-host drill.
+Sources: `dagucloud/dagu@v2.16.6:internal/service/frontend/api/v1/dagruns.go:163-167`
+([API guard](https://github.com/dagucloud/dagu/blob/v2.16.6/internal/service/frontend/api/v1/dagruns.go#L163))
+and `internal/service/scheduler/dag_executor.go:280-321`
+([local dispatch](https://github.com/dagucloud/dagu/blob/v2.16.6/internal/service/scheduler/dag_executor.go#L280)).
+Anonymous loopback observation requires a trusted local user; these permissions
+do not cover all administration APIs. DAG artifact storage stays off.
+
+## NYSE session schedule
+
+[equity-research-evidence.yaml](equity-research-evidence.yaml) names its schedule
+contract **nyse-post-close-evidence** in the description and tag. Its cron is
+`CRON_TZ=America/New_York 30 16 * * 1-5`: one attempt at 16:30 New York time on
+each weekday, with daylight-saving changes handled by the explicit time zone.
+This pin has no separate schedule-name field; its cron object permits an
+expression and optional runtime profile. Sources:
+`dagucloud/dagu@v2.16.6:internal/cmn/schema/dag.schema.json:855-876`,
+`internal/ir/schedule.go:281-305`, `go.mod:65`, and the locked parser
+`robfig/cron@v3.0.1:parser.go:93-103`
+([timezone parser](https://github.com/robfig/cron/blob/v3.0.1/parser.go#L93)).
+
+Cron cannot skip exchange holidays. The normal `calendar_check` step runs
+[session_day.py](session_day.py) in `SDK_ENV`, checks exchange-calendars **4.13.2**,
+and queries XNYS for today's New York date and actual close. A non-session prints
+`non_session`; the `nyse_session` precondition skips that step and its dependents.
+Import, package-version or calendar failures fail the normal check step instead
+of being mistaken for a holiday. A manual run before close prints `before_close`
+and skips the research chain.
+
+The calendar is locked in
+`blueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml:11`
+(PR-1 revision `d00e4e6eeb92c7c99066ea5d0bd85f379c931c4f`). The brief's shorter
+`runtime-2604/pyproject.toml` path is absent at this PR's base; the nested bundled
+file was read directly, and `manifests/stack.json` independently carries 4.13.2.
+PR-4 adds no lock or dependency installation. Calendar sources:
+`gerrymanoim/exchange_calendars@4.13.2:exchange_calendars/exchange_calendar.py:1012-1016,1263-1279`
+and `exchange_calendars/exchange_calendar_xnys.py:157-165`
+([session API](https://github.com/gerrymanoim/exchange_calendars/blob/4.13.2/exchange_calendars/exchange_calendar.py#L1263),
+[close times](https://github.com/gerrymanoim/exchange_calendars/blob/4.13.2/exchange_calendars/exchange_calendar_xnys.py#L157)).
+**Early-close days still run at 16:30**, after their earlier close, with no
+additional cron or run. Step skip and dependency propagation come from
+`dagucloud/dagu@v2.16.6:internal/runtime/runner.go:1633-1648,1267-1281`
+([precondition result](https://github.com/dagucloud/dagu/blob/v2.16.6/internal/runtime/runner.go#L1633)).
+
+## Journal snapshot and restic procedure
+
+[journal_recovery.py](journal_recovery.py) stays in `hosting/` alongside the job
+and operator drills. It owns recovery of selected research files without coupling
+to a broker adapter or changing an order-state writer. It is stdlib integration
+glue around CPython's published Online Backup example and native restic commands.
+
+Select **every journal required by the research consumer**, with explicit required
+tables. The procedure opens each source read-only and uses
+`sqlite3.Connection.backup` to a new staging directory, then closes the destination
+in DELETE journal mode. Never copy an active SQLite, WAL or SHM file directly.
+Sources: `python/cpython@v3.12.3:Doc/library/sqlite3.rst:1107-1155`
+([concurrent backup and example](https://github.com/python/cpython/blob/v3.12.3/Doc/library/sqlite3.rst#L1107))
+and `Modules/_sqlite/connection.c:2067-2077`. Each journal is independently
+consistent; this does not create an atomic transaction across journals.
+Consumers needing one must quiesce their writers before taking the snapshots.
+
+The frozen inventory records every staged file's relative path, SHA-256, bytes,
+`PRAGMA integrity_check` and required tables' row counts. It is written inside
+staging and as a separate immutable **external oracle**. Retain that oracle
+independently from the restored copy. Staging stays frozen through backup; a
+failed snapshot operation never becomes an accepted inventory.
+
+Every nonzero native restic exit fails the procedure, including **exit 3**, when
+restic creates a snapshot but cannot read all source files. Snapshot existence
+is insufficient for acceptance. Source:
+`restic/restic@v0.19.1:doc/040_backup.rst:787-806`
+([exit codes](https://github.com/restic/restic/blob/v0.19.1/doc/040_backup.rst#L787)).
+
+Run the cycle at least once every **24 hours**, including weekends and holidays,
+using one private rotation-state file per repository. Default checks rotate
+`1/7` through `7/7`; all partitions are read within **seven days**. The cursor
+advances only after successful native checking. A gap over 24 hours or reversed
+clock refuses continuation until `--full-check` successfully reads all data and
+resets the rotation. This is an operator execution requirement; no backup timer
+was enabled by PR-4. Every cycle also restores and compares its snapshot.
+Source: `restic/restic@v0.19.1:doc/045_working_with_repos.rst:482-521`
+([deterministic partitions](https://github.com/restic/restic/blob/v0.19.1/doc/045_working_with_repos.rst#L482)).
+
+Restore the exact returned snapshot ID's staging subtree to a **new** directory,
+with `--verify --overwrite never`. Compare the exact restored file set, inventory
+bytes and every file's SHA-256 and byte count against the external oracle; then
+check journal integrity and required row counts. **integrity_check and row counts
+alone do not prove completeness**: altered records can preserve both.
+Source: `restic/restic@v0.19.1:doc/050_restore.rst:55-73`
+([subfolder restore](https://github.com/restic/restic/blob/v0.19.1/doc/050_restore.rst#L55)).
+
+For an already initialized **local** repository and its operator-owned password
+file, the template command is:
 
 ```sh
-gh release download v2.16.6 --repo dagucloud/dagu \
-  --pattern dagu_2.16.6_linux_amd64.tar.gz --pattern checksums.txt
-sha256sum dagu_2.16.6_linux_amd64.tar.gz
-awk '$2 == "dagu_2.16.6_linux_amd64.tar.gz"' checksums.txt | sha256sum --check --strict
-"$DAGU" version
-mkdir -p "$RESEARCH_OUTPUT"
-env -i HOME="$HOME" PATH=/usr/bin:/bin \
-  STACK_REPO="$STACK_REPO" SDK_ENV="$SDK_ENV" \
-  LEAN_EVENTS="$LEAN_EVENTS" RESEARCH_OUTPUT="$RESEARCH_OUTPUT" \
-  "$DAGU" start --context local --dagu-home "$RESEARCH_HOME" \
-  --run-id "$RUN_ID" "$STACK_REPO/blueprints/us-equities/hosting/equity-research-evidence.yaml"
-"$DAGU" history --context local --dagu-home "$RESEARCH_HOME" --format json
+rtk env TMPDIR="$PRIVATE_TMP" nice -n 19 python3 \
+  blueprints/us-equities/hosting/journal_recovery.py cycle \
+  --restic-bin "$RESTIC_BIN" --repository "$LOCAL_REPOSITORY" \
+  --password-file "$RESTIC_PASSWORD_FILE" --work "$NEW_PRIVATE_WORK" \
+  --rotation-state "$PRIVATE_ROTATION_STATE" \
+  --journal "research=$RESEARCH_JOURNAL" --required-table research=events \
+  --journal "evidence=$EVIDENCE_JOURNAL" --required-table evidence=runs
 ```
 
-For a new host, adapt the binary/home paths in the example user unit, install it
-as `~/.config/systemd/user/dagu-equities.service`, and then run:
+Adapt names and tables to the consumer's contract; `events` and `runs` are the
+fixture tables. The work directory must be new. The password file must be outside
+staging; its contents are never read or printed by the Python script. Keep the
+repository, raw output, state and oracle private. If a crash leaves a `.lock` or
+`.new` rotation file, preserve the failed output and resolve that private state
+before retrying; do not reset the cursor to conceal a missed interval.
+Remote repository URLs are outside this local procedure. A second-host consumer
+can run `verify --restored "$RESTORE" --inventory "$FROZEN_INVENTORY"` against
+its independently retained oracle after the separately approved destination
+restore. Key recovery belongs to user decision 3.
+
+## Same-host operator drills and proof
+
+Run [drill_process_restart.py](drill_process_restart.py) **later on the operating
+host**, shortly before the next eligible 16:30 slot, using its locked trading
+Python. Supply `--dagu-bin`, `--dagu-home`, `--config`, this one DAG's
+`--dag-history` directory and the exact aware `--due-at` timestamp. The script
+verifies an existing unit's MainPID and executable, kills `start-all` with
+SIGKILL, observes automatic restart and waits for the next successful due run.
+Native history plus original `status.jsonl` must attest the exact `scheduleTime`
+and scheduler trigger while the deployed UI has `run_dags: false`. A manual run
+does not count. The script installs, enables and starts no unit. SIGKILL induces
+failure; under `Restart=on-failure`, clean SIGTERM need not trigger restart
+(`systemd/systemd@v255:man/systemd.service.xml:818-836`
+[source](https://github.com/systemd/systemd/blob/v255/man/systemd.service.xml#L818)).
+
+**A process-restart drill is not reboot, missed-run or independent-alert acceptance.**
+It observes one process failure and the following slot. Host boot, downtime across
+slots, catch-up, duplicate runs and independent notification need separate host
+receipts and the chosen alert path.
+
+Run the disposable local backup-check-restore drill with:
 
 ```sh
-systemctl --user daemon-reload
-systemctl --user enable --now dagu-equities.service
-systemctl --user restart dagu-equities.service
-"$DAGU" history --context local --dagu-home "$RESEARCH_HOME" --format json
+rtk env TMPDIR="$PRIVATE_TMP" nice -n 19 python3 \
+  blueprints/us-equities/hosting/drill_local_recovery.py \
+  --restic-bin "$RESTIC_BIN" --output "$NEW_SANITIZED_REPORT"
 ```
 
-Choose a new `RUN_ID` and output directory for each run. The summarizer refuses
-to overwrite an existing Parquet. Native `dagu stop --run-id ... <dag-name>`
-cancelled an intentionally long local step; `history` reported `aborted` even
-though that cancelled CLI process returned zero. Consumers must inspect native
-status, not only process exit codes. A separate exit-23 fixture recorded `failed`
-and aborted its dependent step.
+It generates and later deletes a throwaway password, creates two synthetic WAL
+journals and commits to each while its Online Backup copy is active. It backs
+up, reads subset **1/1** (every pack in this small proof), restores and independently
+compares bytes, hashes and required state. Stdlib unittest separately exercises
+the default seven-part rotation. It also runs these controls:
 
-**DAG name (2026-09-25).** The workflow file was renamed from
-`research-evidence.yaml` to `equity-research-evidence.yaml`, and its top-level
-`name:` was removed. Dagu now derives the DAG name, `equity-research-evidence`,
-from the filename. That is the same name the 2026-09-19 runs used.
+- `--control snapshot` makes one staged file unreadable: native backup must exit
+  **3** and the procedure must exit nonzero before checking or restoring.
+- `--control restore` deletes a required file after native restore: comparison
+  must make the procedure exit nonzero.
 
-The old file failed `dagu validate` under its own name on both 2.16.6 and
-2.17.2, with "entrypoint document must not define name". Only a copy whose
-filename matched `name:` passed.
+The [sanitized offline proof](evidence/offline-proof.json) and
+[local integration receipt](../../../../evidence/receipts/trading-unattended-hosting-recovery-20261005.json)
+retain actual native output and command exits with separate observations.
+The fixture is our integration check, using the unchanged restic 0.19.1 executable.
+Neither operator drill was run on an operating service.
 
-The renamed file validates on both versions. `dagu dry` reports
-`equity-research-evidence` on both. The [receipt](receipt.json) keeps the old
-path and its sha256 as historical evidence.
+**The same-host drill cannot close the off-host-recovery gate.** Closure needs
+**user decision 3**: an independent destination, key recovery and a restore by a
+consumer on a second host, checked against the independent oracle and required
+state. Its recovery-time objective must still be selected and measured. The
+scratch proof establishes no off-host durability, retention deletion or alert.
 
-## Service boundary
-
-The installed [user service](dagu-equities.service.example) runs `dagu server`,
-not the scheduler, with a minimal inherited environment and no provider or broker
-credentials. It is enabled for future user-service sessions. The current local
-dashboard uses upstream `auth.mode: none`: anonymous API reads return 200 without
-a Basic-auth challenge. The previous Basic mode returned 401 and repeatedly
-prompted the browser. Remove its `auth.basic` subsection when changing modes:
-upstream config validation rejects an `auth.basic` block under `none`, and the
-server refuses to start (re-observed on 2.16.6 on 2026-09-23). Basic headers on
-requests are a separate matter: under `none` they are ignored. On 2026-09-23 the
-running service served `authMode: "none"` and answered 200 to both an anonymous
-and a dummy-Basic GET of `/api/v1/dags`, while loopback control instances of the
-same binary returned 401 anonymous under `basic`; that
-[dated receipt](../../../evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/2-dashboard-auth-mode.json)
-supersedes the 2026-09-19 basic-auth status codes in [receipt.json](receipt.json).
-
-DAG execution and DAG/wiki writes remain disabled by `run_dags: false` and
-`write_dags: false`. These are not blanket read-only controls: base configuration,
-views and managed-secret administration use separate role checks and remain
-available to trusted local users without authentication. Keep this configuration
-on loopback. Use upstream builtin/OIDC authentication for access beyond this PC.
-Manual native CLI commands remain the workflow execution lane. Private
-configuration and history are stored beneath the user's local application data.
-
-**Anonymous reads under `auth.mode: none` (2026-09-25).** Every read route is
-anonymous under `none`, not only the DAG list and status. On 2.16.6 that
-includes the per-run artifact file tree, preview and download.
-
-Two things keep observation to DAG list and status today:
-- the loopback-only listener;
-- no deployed DAG writing artifacts.
-
-Dagu does not enforce it. Artifact storage is on by default. On both 2.16.6 and
-2.17.2, native scratch runs showed:
-- a DAG with no `artifacts` key stored the file its step wrote;
-- a DAG-level `artifacts: {enabled: false}` stored nothing;
-- `base.yaml` did not pass that key on, although its `env` did reach the step.
-
-The research workflow therefore disables artifacts itself.
-
-Dagu 2.17.2 also adds an anonymous cross-run `GET /api/v1/artifacts`, which
-cannot be disabled under `none`. The host stays on 2.16.6 until a need for
-2.17.2 justifies that surface. The first-run example DAGs Dagu creates are
-never run here (`run_dags: false`); `example-05` writes artifacts if anything
-runs it.
-
-`systemctl --user disable --now dagu-equities.service` stops and disables it
-without deleting evidence. The service restarts on process failure; the accepted
-restart check establishes history persistence, not resumption of in-flight work.
-Windows/WSL shutdown stops this host. No availability guarantee, remote access,
-automatic schedule, cloud deployment, recurring model dispatch or broker order
-writer is implied. Same-user host commands are not a security sandbox.
-
-Upstream: [release](https://github.com/dagucloud/dagu/releases/tag/v2.16.6),
-[pinned schema](https://github.com/dagucloud/dagu/blob/v2.16.6/README_SCHEMA.md),
-[native CLI](https://docs.dagu.sh/getting-started/cli),
-[systemd deployment](https://docs.dagu.sh/server-admin/deployment/systemd).
+Historical [Dagu receipt](receipt.json) and
+[static-file backup acceptance](backup/README.md) retain their original scopes;
+neither attests execution of the new scheduled templates.

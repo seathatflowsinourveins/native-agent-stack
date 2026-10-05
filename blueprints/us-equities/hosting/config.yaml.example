@@ -2,18 +2,15 @@ host: 127.0.0.1
 port: 18525
 check_updates: false
 metrics: private
+# dagucloud/dagu@v2.16.6:internal/cmd/startall.go:32-45 starts both services;
+# internal/cmn/config/loader.go:1311-1319 defaults this optional coordinator on.
+coordinator:
+  enabled: false
 env_passthrough:
   - STACK_REPO
   - SDK_ENV
   - LEAN_EVENTS
   - RESEARCH_OUTPUT
-  - LEAN_RESULTS
-  - RESEARCH_WORKSPACE
-  - NATIVE_CODEX_HOME
-  - NATIVE_CODEX_BIN
-  - NATIVE_CLAUDE_BIN
-  - NATIVE_RUNTIME_PATH
-  - SDK_OBSERVATION_DIR
 auth:
   mode: none
 permissions:

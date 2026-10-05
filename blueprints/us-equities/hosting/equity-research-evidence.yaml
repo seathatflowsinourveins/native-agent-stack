@@ -1,5 +1,18 @@
-description: Summarize a local LEAN simulation and validate its evidence catalog.
+description: 'nyse-post-close-evidence: summarize local simulation evidence once per NYSE session after close.'
 type: graph
+tags: [nyse-post-close-evidence]
+# Schedule contract name: nyse-post-close-evidence (the DAG name is its filename).
+# dagucloud/dagu@v2.16.6:internal/ir/schedule.go:281-305;
+# go.mod:65 pins robfig/cron@v3.0.1:parser.go:93-103 (CRON_TZ).
+# 16:30 ET also follows a 13:00 early close; holidays are skipped below.
+schedule: 'CRON_TZ=America/New_York 30 16 * * 1-5'
+# dagucloud/dagu@v2.16.6:internal/spec/dag.go:1663-1673.
+# Replace these placeholders in the private deployed DAG. env -i needs no inheritance.
+env:
+  STACK_REPO: /path/to/native-agent-stack
+  SDK_ENV: /path/to/trading-runtime/.venv
+  LEAN_EVENTS: /path/to/research-input/order-events.json
+  RESEARCH_OUTPUT: /path/to/research-output
 working_dir: ${STACK_REPO}
 timeout_sec: 180
 max_active_runs: 1
@@ -8,8 +21,26 @@ max_active_runs: 1
 artifacts:
   enabled: false
 steps:
+  # A normal command surfaces import/version/calendar failures instead of silently skipping.
+  - id: calendar_check
+    run: '"${SDK_ENV}/bin/python" "${STACK_REPO}/blueprints/us-equities/hosting/session_day.py"'
+    output: SESSION_DAY
+  # dagucloud/dagu@v2.16.6:internal/runtime/runner.go:1633-1648, 1267-1281:
+  # a false step precondition skips this step and its dependents, without failure.
+  - id: nyse_session
+    preconditions:
+      - condition: '${SESSION_DAY}'
+        expected: session
+    run: 'true'
+    depends: [calendar_check]
+  - id: prepare_output
+    run: 'mkdir -p "${RESEARCH_OUTPUT}"'
+    depends: [nyse_session]
   - id: summarize
-    run: '"${SDK_ENV}/bin/python" "${STACK_REPO}/blueprints/us-equities/data/summarize_backtest.py" "${LEAN_EVENTS}" "${RESEARCH_OUTPUT}/order-events.parquet"'
+    # dagucloud/dagu@v2.16.6:internal/runctx/context_env.go:28 and
+    # internal/cmn/runenv/keys.go:12-13: isolate each run; never overwrite earlier evidence.
+    run: '"${SDK_ENV}/bin/python" "${STACK_REPO}/blueprints/us-equities/data/summarize_backtest.py" "${LEAN_EVENTS}" "${RESEARCH_OUTPUT}/order-events-${DAG_RUN_ID}.parquet"'
+    depends: [prepare_output]
   - id: baseline_evidence
     run: python3 scripts/validate.py
     depends: [summarize]
