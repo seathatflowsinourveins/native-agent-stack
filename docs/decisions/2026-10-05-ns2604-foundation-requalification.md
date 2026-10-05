@@ -9,22 +9,28 @@ historical simulation before independently qualified paper operation.
 
 The earlier **40/80**, conditional **44/80**, roadmap **37/80** and command-center
 **32/80** proposals are superseded by the command center's exact-head rulings
-for #715 at `2432f951`. Its old-bar provisional result is **30/80 (37.5%),
+for #715 at `2432f951`. Its captured-status provisional result is **30/80 (37.5%),
 pending the coordinator's final verified E2E**. This is the command center's
 reported result as of **11:44Z**, excluding credential custody's **13:02Z**
-BY_DESIGN change; no new numerator is derived here. The correction excludes
+BY_DESIGN change; no new numerator is derived here. This provisional30 includes
+difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured
+status despite fresh-session use not evidenced. It is not measured qualification
+on the #700 bar. The correction excludes
 ccusage, command-output, native-clients/codex, session-analytics, alerting,
 Serena and MinerU from READY. Serena and MinerU have the same open
 condition-absent controls as ccusage. The sources and dated objections are in
 `evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json`,
 including its `bounded_repair_rulings` record.
 
-Every count and READY verdict retained in this publication uses the **old bar**:
-installed, with its checks passing. The user's new bar, introduced around
-15:12Z, requires organic **native-arm** use in fresh sessions whose prompts
-and harness rules do not name the tool. No new-bar count is published here;
+The official baseline uses **the #700 bar: upstream acceptance, wiring and
+fresh-session use, with the harness text present**. The frozen method also
+requires presence at the applicable version and fresh-session use when
+client-facing. Captured-status proposals and original model verdicts are
+source-review leads, not measured qualification on that bar. The user's new bar,
+introduced around15:12Z, differs in one respect: no harness text names the tool
+in the organic **native arm**. No new-bar count is published here;
 it comes only from the command center's final verified E2E (**S4**), with
-independent review and adjudication. Old-bar labels and installation-time
+independent review and adjudication. Captured-status labels and installation-time
 checks do not establish organic use.
 
 The last fully adjudicated aggregate remains the historical **30/80 (37.5%)**
@@ -37,7 +43,7 @@ adjudication. A review of this PR or its public projection does not lift
 provisional status. The generated correction sets current/conditional values to
 null with this decision as its pointer. Its earlier #713 ownership hold ended
 when #713 landed at15:58Z as1796303f9; its application on2604 ran16:01–16:46Z.
-The publication is reconciled with current main2d849ba1, after #748;
+The publication is reconciled with current main424b8a77, after #730;
 older coupled projections supply no current readiness authority.
 
 ## Sources and reuse
@@ -101,7 +107,7 @@ raw conversations or host paths.
 | Plan-wrapper census/stage checks and locally authored probes | `local_integration` | Our integration only; not unchanged upstream tests |
 | Opus/GPT judgments and drift review | `source_review` | Review of retained evidence; not independent execution |
 | Earlier 40/80, 44/80, roadmap37/80 and CC32/80 projections | superseded `source_review` scenarios | Exact-head ruling task-ns2604-coop-20261005T170827Z; not current readiness |
-| CC old-bar30/80 as of11:44Z | `source_review`, provisional | Excludes custody13:02Z; final verified E2E remains pending |
+| CC captured-status30/80 as of11:44Z | `source_review`, provisional | Excludes custody13:02Z; includes five fresh-session-use-not-evidenced statuses; not measured #700 qualification |
 | Early invocation snapshot | `historical_inventory` | Install exposure window and native counter scope only |
 | Skipped stages or missing raw proof | `none_recorded` | No successful operation inferred |
 | Generators, hashes, tests and validator | `structural_validation` | Publication consistency; not host or provider acceptance |
@@ -436,5 +442,21 @@ tests/test_new_wsl_handbook.py:243–263, :1046, :1158, :1233;
 catalogs/foundation/new-wsl-architecture-20261001.json;
 evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json#/owners/57
 and #/owners/71; docs/lanes.md:94–128. The exact-head command-center Claude read
-remains pending and cannot replace the final verified E2E. Official30/80 and
-null current/conditional values remain; the reported32 proposal stays provisional.
+is limited to the three R2 items and cannot replace the final verified E2E.
+Official30/80 and null current/conditional values remain; the reported32 proposal
+is superseded. The provisional captured-status30 includes five fresh-session-use-
+not-evidenced slots and is not measured qualification on the #700 bar.
+
+## Three-item micro-repair after the command-center delta read
+
+The command center corrected its earlier bar wording in item
+task-ns2604-coop-20261005T181852Z:12–17, original SHA256
+fa512269d639605a344f690166c436a208fffb79403bb0f55b2b48f0c9a7ef63.
+The frozen source is native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:evidence/artifacts/ns2604-e2e-20261004/method.md:60.
+Official30/80 remains the #700 qualification; provisional captured-status30
+includes the five fresh-session-use-not-evidenced slots and is not measured
+qualification on that bar. The organic native arm differs only in the absence
+of harness text naming the tool. The reported32 proposal is superseded.
+Publication is rebased onto424b8a77, including #730/e8c1edec; registry is taken
+from main and own evidence re-registered. The next command-center check covers
+only these three items before its ACK; it is not a final S4 or readiness lift.

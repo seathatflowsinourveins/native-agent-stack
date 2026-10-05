@@ -281,7 +281,7 @@
       "status": "pending"
     },
     "publication_date_utc": "2026-10-05",
-    "qualification_scope": "Historical old-bar publication: installed, with checks passing. CC provisional30/80 is asof11:44Z and excludes custody13:02Z BY_DESIGN; earlier37/40/44/32proposals are superseded by review-715-corrections.json#/bounded_repair_rulings. The new bar requires organic native-arm use in fresh sessions with no prompt or harness rules naming the tool; no new-bar count is supplied until final verified E2E S4, independent review and adjudication. Native outputs, local checks and source review remain distinct; no new acceptance or execution.",
+    "qualification_scope": "Historical documentary publication. The official baseline uses the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present. CC captured-status provisional30/80 is asof11:44Z and excludes custody13:02Z BY_DESIGN. It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar. The organic native arm differs in one respect: no harness text names the tool; upstream acceptance, wiring and fresh-session use remain required. No new-bar count is supplied until final verified E2E S4, independent review and adjudication. Earlier37/40/44/32proposals are superseded by review-715-corrections.json#/micro_repair_rulings. Evidence classes remain distinct; no new acceptance or execution.",
     "readiness": {
       "bar": "old-bar",
       "baseline": {
@@ -7842,7 +7842,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "8c674e80c62bd843b5b89e020211d43a6083999dd0d5b7a147c9809cb782cc49"
+      "sha256": "98c81644a1e6c1ffe656575fb2b138575d68b5e89c907d2830842396929c03b8"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -7854,7 +7854,7 @@
     },
     {
       "path": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
-      "sha256": "59085b3087ade23723f68235fe312a29154e28a4e2828b5022f59f9a9e6f43db"
+      "sha256": "f5e2ac671236b940d0270d15a225bc78db9800b3a3a5db17c787e2fa41182dd9"
     },
     {
       "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
@@ -7986,7 +7986,7 @@
     },
     {
       "path": "evidence/receipts/ns2604-requalification-20261005.json",
-      "sha256": "f5c2b445bdb83ad4292b3849d8647557ce616865c5443c3a689b70685b168ba4"
+      "sha256": "544b7a262226b7372ef6a28965b1720485a4ccb30f8c8dee7e62e3c7d76c2472"
     }
   ],
   "stage_order": [

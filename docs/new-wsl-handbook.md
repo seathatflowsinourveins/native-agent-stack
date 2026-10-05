@@ -16,9 +16,9 @@ The architecture edition supplies the row inventory and reference links only. It
 
 Published 2026-10-05; source: [evidence/receipts/ns2604-requalification-20261005.json](../evidence/receipts/ns2604-requalification-20261005.json).
 
-Official old-bar readiness remains the qualified 2026-10-04 baseline: installed, with its checks passing. Current and conditional figures, when supplied, are provisional source projections without an independently verified 80-slot join.
+Official readiness remains the qualified 2026-10-04 baseline on the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present. Current and conditional figures, when supplied, are provisional source projections without an independently verified 80-slot join.
 
-- Official old-bar readiness (qualified 2026-10-04): **30/80 (37.5%)**.
+- Official #700-bar readiness (qualified 2026-10-04): **30/80 (37.5%)**.
 
 No aggregate established for: current, conditional.
 
@@ -26,13 +26,13 @@ Decision record: [docs/decisions/2026-10-05-ns2604-foundation-requalification.md
 
 An updated official readiness figure requires the command center's new dated qualification of the same 80 slots, followed by independent review and adjudication. This receipt projection or its public review alone does not change the official figure.
 
-The new bar requires organic native-arm use in fresh sessions without prompts or harness rules naming the tool. Its count comes only from the final verified E2E (S4), independent review and adjudication.
+The organic native arm differs in one respect: no harness text names the tool. Upstream acceptance, wiring and fresh-session use remain required. Its count comes only from the final verified E2E (S4), independent review and adjudication.
 
 Formula: (READY + BY_DESIGN) / all 80 PR #700 foundation slots; PARTIAL, FAIL, INTERIM and UNJUDGED contribute zero; BY_DESIGN is an intentional disposition, not execution.
 
 Source class: Historical native client outputs, local plan-integration checks and source review. Official readiness 30/80 is retained from receipt #700; current/conditional are null. New proposals are attributed in the decision record.
 
-Qualification scope: Historical old-bar publication: installed, with checks passing. CC provisional30/80 is asof11:44Z and excludes custody13:02Z BY_DESIGN; earlier37/40/44/32proposals are superseded by review-715-corrections.json#/bounded_repair_rulings. The new bar requires organic native-arm use in fresh sessions with no prompt or harness rules naming the tool; no new-bar count is supplied until final verified E2E S4, independent review and adjudication. Native outputs, local checks and source review remain distinct; no new acceptance or execution.
+Qualification scope: Historical documentary publication. The official baseline uses the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present. CC captured-status provisional30/80 is asof11:44Z and excludes custody13:02Z BY_DESIGN. It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar. The organic native arm differs in one respect: no harness text names the tool; upstream acceptance, wiring and fresh-session use remain required. No new-bar count is supplied until final verified E2E S4, independent review and adjudication. Earlier37/40/44/32proposals are superseded by review-715-corrections.json#/micro_repair_rulings. Evidence classes remain distinct; no new acceptance or execution.
 
 Recorded token-review disagreements: `token-efficiency/code-index`, `token-efficiency/command-output`, `token-efficiency/output-compression`, `token-efficiency/repo-packing`.
 
@@ -2162,10 +2162,10 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | [adoption/manifest.json](../adoption/manifest.json) | `159ad1f56a9a654951eb16a4a66645378d225d8b924eede282815f49342add55` (without source.release_tag, source.release_commit, updated_at) |
 | [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json) | `7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04` |
 | [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `4e505c4e7ca64d769bb0f9be4e506526dfaed79231e4a30a26bb811bcb967abe` |
-| [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `8c674e80c62bd843b5b89e020211d43a6083999dd0d5b7a147c9809cb782cc49` |
+| [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `98c81644a1e6c1ffe656575fb2b138575d68b5e89c907d2830842396929c03b8` |
 | [catalogs/landscape/research-state.json](../catalogs/landscape/research-state.json) | `fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a` |
 | [catalogs/landscape/us-equities.json](../catalogs/landscape/us-equities.json) | `cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618` |
-| [docs/decisions/2026-10-05-ns2604-foundation-requalification.md](../docs/decisions/2026-10-05-ns2604-foundation-requalification.md) | `59085b3087ade23723f68235fe312a29154e28a4e2828b5022f59f9a9e6f43db` |
+| [docs/decisions/2026-10-05-ns2604-foundation-requalification.md](../docs/decisions/2026-10-05-ns2604-foundation-requalification.md) | `f5e2ac671236b940d0270d15a225bc78db9800b3a3a5db17c787e2fa41182dd9` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json) | `ad86d1d4c2cddeeebc2bc327fddc897b161cec092706db24c779603321246bc7` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json) | `eff4adb3683062fb31acb63f494fb15c39d08bd50627a68ca32262c007adb519` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json) | `dc62fdbbebd6ed1ab837663ee00407a78031f86c8f302f6fcc1139ab1744505c` |
@@ -2198,4 +2198,4 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | [evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md](../evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md) | `3a638294fd3f818f032fd226eddde760f40fcbc0f3313af64ff09e96130f65e6` |
 | [evidence/artifacts/new-wsl-final-architecture-20261002/convergence/combined.json](../evidence/artifacts/new-wsl-final-architecture-20261002/convergence/combined.json) | `8b8234eabf4f3f66b9acc6e1b74e0809bccd79b70ca381635c2eae5ae8527b25` |
 | [evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json](../evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json) | `a34fb8c01429177cd2787a07a1edf0a0668d31898ff35fd798056964d5dab82e` |
-| [evidence/receipts/ns2604-requalification-20261005.json](../evidence/receipts/ns2604-requalification-20261005.json) | `f5c2b445bdb83ad4292b3849d8647557ce616865c5443c3a689b70685b168ba4` |
+| [evidence/receipts/ns2604-requalification-20261005.json](../evidence/receipts/ns2604-requalification-20261005.json) | `544b7a262226b7372ef6a28965b1720485a4ccb30f8c8dee7e62e3c7d76c2472` |

@@ -5,7 +5,7 @@
   "evidence_class": "source_review",
   "provisional": true,
   "new_execution": false,
-  "publication_reconciliation": {"base":"2d849ba1fe1b879144cfa470f0514d3ac3b8e487","released_by":"#713 merged1796303f; co-op J-GC2026-10-05T16:11:01Z","previous_ownership_fields":"Retained pre-merge preparation-phase observations. The generated paths are now released; merge does not establish any host/client acceptance.","landing_application":{"merged_at_utc":"2026-10-05T15:58:00Z","merged_commit":"1796303f957c522e78b92667e553c06840fae3a2","applied_on_2604_start_utc":"2026-10-05T16:01:00Z","applied_on_2604_end_utc":"2026-10-05T16:46:00Z","scope":"The merge/application ends the ownership hold; it does not close D04 or qualify changed pins."}},
+  "publication_reconciliation": {"base":"424b8a778222ae8857aade42c49ae6f7a13b3138","released_by":"#713 merged1796303f; co-op J-GC2026-10-05T16:11:01Z","previous_ownership_fields":"Retained pre-merge preparation-phase observations. The generated paths are now released; merge does not establish any host/client acceptance.","landing_application":{"merged_at_utc":"2026-10-05T15:58:00Z","merged_commit":"1796303f957c522e78b92667e553c06840fae3a2","applied_on_2604_start_utc":"2026-10-05T16:01:00Z","applied_on_2604_end_utc":"2026-10-05T16:46:00Z","scope":"The merge/application ends the ownership hold; it does not close D04 or qualify changed pins."}},
   "aggregate_derivation_performed": false,
   "claim_boundary": "Apply the adopted criterion-2 reading to all17 affected slots in one documentary pass. Eligibility of an upstream example/native operation is separate from retaining and independently joining its actual pinned output, controls, wiring and fresh-client use. No historical label or qualified whole-slot status changes under this reading alone. Custody/base dispositions are dated source review pending the coordinator's final verified same80-slot E2E. Official readiness remains30/80; no new aggregate is derived.",
   "sources": {
@@ -213,9 +213,9 @@
   "locator_roots":{"coord":"Private co-op coordination tree","coordination-root":"Private common coordination root","roadmap":"sources.roadmap.locator plus the following exact JSON pointer","scratch":"Selected retained original/archive tree declared in sources.json","repo":"Repository-relative source"},
   "sanitization":"No credential values/files, raw conversations, host paths, account/session identities or active client configuration copied. Private originals remain private; hashes prove byte identity only.",
   "qualification_bar": {
-    "old_bar": "installed, with its checks passing",
-    "scope": "All retained counts and READY verdicts are old-bar. Original labels and reviews remain historical.",
-    "new_bar": "Organic native-arm use in fresh sessions with no prompt or harness rules naming the tool; introduced around15:12Z.",
+    "old_bar": "the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present",
+    "scope": "The official baseline uses the #700 bar. Captured-status counts and model READY leads remain source_review; they are not measured qualification at that bar.",
+    "new_bar": "Same upstream acceptance, wiring and fresh-session use, but no harness text names the tool in the organic native arm; introduced around15:12Z.",
     "new_bar_count": null,
     "new_bar_count_authority": "Command center final verified E2E S4, independent review and adjudication."
   },
@@ -228,6 +228,7 @@
     "bar": "old-bar",
     "as_of_utc": "2026-10-05T11:44:00Z",
     "custody_1302_by_design_included": false,
+    "captured_status_boundary": "It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar.",
     "ruling": "review-715-corrections.json#/bounded_repair_rulings"
   },
   "dated_control_demotions": [

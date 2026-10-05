@@ -1,13 +1,13 @@
 {
   "schema_version": 1,
   "kind": "new-wsl-handbook-profile-integration",
-  "source_main": "2d849ba1fe1b879144cfa470f0514d3ac3b8e487",
+  "source_main": "424b8a778222ae8857aade42c49ae6f7a13b3138",
   "evidence_class": "local_integration",
-  "generator_sha256": "5988ddf8737a3b613d8c0babc2d3aa72a4977feec8fc5f755cba840e5ef1b363",
+  "generator_sha256": "d6dba4004564275b53cd1b44a86f2ae04349ca278e6a05b9bb9803569d5166ee",
   "profile_sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04",
   "outputs": {
-    "docs/new-wsl-handbook.md": "d5a8f9c9481c8fe139a3ab2bd9f759bb97d7e42e01718e670222d9d2d7228318",
-    "docs/new-wsl-handbook.json": "7f4c6c7aaf06f5c0513d5d8619021015271956703c19a4fb7117c48145484e75"
+    "docs/new-wsl-handbook.md": "2e101dc51d736495f25a9e54ee3efd60d2ae7b316f090397d9de139143d7265b",
+    "docs/new-wsl-handbook.json": "8ef7beeea33ed43f78c3d80a602751369c5e2ea2fa8c55ce7603dcedbd72f60a"
   },
   "inventory": {
     "layers": 37,
@@ -336,6 +336,25 @@
         "docs/new-wsl-handbook.json": "7f4c6c7aaf06f5c0513d5d8619021015271956703c19a4fb7117c48145484e75"
       },
       "source": "seathatflowsinourveins/native-agent-stack@2d849ba1:scripts/build_new_wsl_handbook.py",
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "recorded_at_utc": "2026-10-05T19:21:36Z",
+      "source_main": "424b8a778222ae8857aade42c49ae6f7a13b3138",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "evidence_class": "local_integration",
+      "cause": "J-715R2 three-item micro-repair: correct the #700 bar to upstream acceptance, wiring and fresh-session use with harness text present; captured-status provisional30 includes five slots with fresh-session use not evidenced and is not measured #700 qualification. Supersede32; preserve official30/current-null/conditional-null and owner fields. No new execution or acceptance.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "d5a8f9c9481c8fe139a3ab2bd9f759bb97d7e42e01718e670222d9d2d7228318",
+        "docs/new-wsl-handbook.json": "7f4c6c7aaf06f5c0513d5d8619021015271956703c19a4fb7117c48145484e75"
+      },
+      "output_sha256": {
+        "docs/new-wsl-handbook.md": "2e101dc51d736495f25a9e54ee3efd60d2ae7b316f090397d9de139143d7265b",
+        "docs/new-wsl-handbook.json": "8ef7beeea33ed43f78c3d80a602751369c5e2ea2fa8c55ce7603dcedbd72f60a"
+      },
+      "source": "seathatflowsinourveins/native-agent-stack@424b8a778222ae8857aade42c49ae6f7a13b3138:scripts/build_new_wsl_handbook.py",
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
     }
   ]

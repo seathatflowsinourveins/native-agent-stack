@@ -1478,9 +1478,9 @@
     "Source critic checked22selected hashes; output-only wrapper footer results are reported_stage_result, not independently retained process exits."
   ],
   "qualification_bar": {
-    "old_bar": "installed, with its checks passing",
-    "scope": "All retained counts and READY verdicts are old-bar. Original labels and reviews remain historical.",
-    "new_bar": "Organic native-arm use in fresh sessions with no prompt or harness rules naming the tool; introduced around15:12Z.",
+    "old_bar": "the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present",
+    "scope": "The official baseline uses the #700 bar. Captured-status counts and model READY leads remain source_review; they are not measured qualification at that bar.",
+    "new_bar": "Same upstream acceptance, wiring and fresh-session use, but no harness text names the tool in the organic native arm; introduced around15:12Z.",
     "new_bar_count": null,
     "new_bar_count_authority": "Command center final verified E2E S4, independent review and adjudication."
   },
