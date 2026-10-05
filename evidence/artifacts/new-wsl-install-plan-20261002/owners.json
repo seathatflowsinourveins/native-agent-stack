@@ -1,6 +1,6 @@
 {
  "generated_at_utc": "2026-10-02T02:12:15Z",
- "revised_at_utc": "2026-10-04T14:22:30Z",
+ "revised_at_utc": "2026-10-04T23:58:00Z",
  "source": "origin/main definitive manifest, one row per foundation row",
  "owners": [
   {
@@ -493,10 +493,11 @@
   {
    "layer": "quality-evaluation",
    "slot": "promptfoo",
-   "owner": "Not installed: prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it",
-   "repository": "",
-   "installed": false,
-   "note": "prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it"
+   "owner": "Promptfoo 0.123.1",
+   "repository": "https://github.com/promptfoo/promptfoo",
+   "installed": true,
+   "note": "Owner default under the owner's repository-quality rule of 2026-10-04 (consensus wave4: decide round 2 named promptfoo for paired skill verification); the original blind exclusion remains in the canonical manifest under overturned. Destination acceptance UNRUN.",
+   "tag_name": "0.123.1"
   },
   {
    "layer": "ci-supply-chain",

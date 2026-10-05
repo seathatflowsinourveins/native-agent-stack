@@ -1,0 +1,19 @@
+# Composition: OpenHands/software-agent-sdk@v1.50.1 examples/01_standalone_sdk/01_hello_world.py:9-28;
+# anthropic-experimental/sandbox-runtime@v0.0.78 README.md (srt --settings).
+# This is a per-job user unit, registered but never enabled as a persistent service.
+[Unit]
+Description=OpenHands SDK 1.50.1 bounded job %i (srt)
+Documentation=https://github.com/OpenHands/software-agent-sdk/tree/v1.50.1
+
+[Service]
+Type=exec
+Environment=PATH=%h/.local/share/mise/shims:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=OH_PERSISTENCE_DIR=%h/.local/state/native-agent-stack/runtime-workers/openhands/%i/openhands-home
+WorkingDirectory=%h
+ExecStartPre=/usr/bin/mkdir -p -m 0700 %h/.local/state/native-agent-stack/runtime-workers/openhands/%i/openhands-home
+ExecStart=%h/.local/share/mise/shims/srt --settings %h/.config/new-wsl-native-stack/openhands/srt-%i.json -- %h/.local/share/new-wsl-native-stack/tools/agent-runtime-worker/bin/python %h/.config/new-wsl-native-stack/openhands/worker.py --job %i
+RuntimeMaxSec=1500
+Restart=no
+MemoryMax=8G
+TasksMax=512
+SyslogIdentifier=openhands-job

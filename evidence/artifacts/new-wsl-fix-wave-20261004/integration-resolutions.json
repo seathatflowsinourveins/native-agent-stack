@@ -1,0 +1,97 @@
+[
+  {
+    "group": "g1-clients",
+    "clean": true,
+    "conflicts": [],
+    "resolution": "All additions applied. Native temporary Git index/object store used because the shared Git directory is read-only."
+  },
+  {
+    "group": "g2-mcp-workers",
+    "clean": false,
+    "conflicts": [
+      "docs/new-wsl-handbook.json",
+      "docs/new-wsl-handbook.md",
+      "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md"
+    ],
+    "resolution": "Retained both G1 and G2 appended source sections. Generated handbook conflicts resolved by regenerating from merged inputs; current-head source references retained."
+  },
+  {
+    "group": "g3-code-docs",
+    "clean": false,
+    "conflicts": [
+      "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
+      "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py"
+    ],
+    "resolution": "Kept complete G1/G2 and G3 appended README/source sections and both checker contract functions. Preserved the broader @-aware config filename regex and added the MinerU scoped-manifest inventory check."
+  },
+  {
+    "group": "g4-observability",
+    "clean": false,
+    "conflicts": [
+      "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "docs/new-wsl-handbook.json",
+      "docs/new-wsl-handbook.md",
+      "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
+      "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py"
+    ],
+    "resolution": "Kept complete appended sections. Selected G4 Collector/Grafana pin and recipe updates, retaining earlier slot edits and rebinding shifted stack citations later. Combined G2 outgoing-gateway filtering with G4 outgoing observability-port filtering. Generated handbook regenerated; current-head receipt retained for final hash update. Corrected the cleanup assertion count and verified JSON/Python syntax before further groups."
+  },
+  {
+    "group": "g5-analytics-eval",
+    "clean": false,
+    "conflicts": [
+      "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
+      "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md"
+    ],
+    "resolution": "Retained both prior builders and complete G5 appended README/source sections. Per-slot functions and rows applied cleanly."
+  },
+  {
+    "group": "g6-eval-supply",
+    "clean": false,
+    "conflicts": [
+      "adoption/new-wsl-profile.md",
+      "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "docs/new-wsl-handbook.json",
+      "docs/new-wsl-handbook.md",
+      "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
+      "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json"
+    ],
+    "resolution": "Kept appended sections and both G1/G3 and G6 checker contracts. Kept ccusage 20.0.26 executable identity from current head within G6 expanded functional/fixture acceptance. Recomputed exclusion loop to omit both MCP Inspector and Promptfoo. Combined G2/G4 port filtering with Promptfoo outgoing gateway check. Selected Syft 1.54.0 source updates and regenerated handbook rather than merging provenance hashes; preserved current-head receipt metadata."
+  },
+  {
+    "group": "g7-git",
+    "clean": false,
+    "conflicts": [
+      "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "docs/new-wsl-handbook.json",
+      "docs/new-wsl-handbook.md",
+      "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
+      "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py"
+    ],
+    "resolution": "Selected Worktrunk 0.80.0 source changes and retained previous slot edits. Kept complete README additions. Recomputed exclusion loop removing cross-family review along with prior G2/G6 additions. Combined native-capability acceptance-only rows with G2 on-demand rows in function/stage/loop validation. Handbook regenerated, retaining current-head receipt metadata for final binding."
+  },
+  {
+    "group": "g8-base-gateway",
+    "clean": false,
+    "conflicts": [
+      "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "docs/new-wsl-handbook.json",
+      "docs/new-wsl-handbook.md",
+      "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+      "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
+      "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py"
+    ],
+    "resolution": "Kept all appended sections and prior MCP/SDK acceptance functions. Selected srt 0.0.78 and scoped OmniRoute canary source updates. Recomputed skipped-loop slots excluding the base prerequisite plus earlier Inspector/Promptfoo/review changes. Combined base-prerequisite function/acceptance/dispatch checks with existing G1/G2/G3/G6/G7 contracts, preserving both scoped config consumers and the broader filename regex. Generated handbook/receipt rebuilt from merged inputs."
+  }
+]

@@ -33,7 +33,7 @@ ROW_KINDS = {"judged", "first_round", "pinned", "project_practice", "no_blind_de
 # interim it amends. What a decision replaced stays on its row under overturned.
 OWNER_ADDED = ["command-output", "output-compression", "code-index", "code-graph", "repo-packing", "structured-data",
                "doc-conversion", "api-docs", "trace-viewer", "token-lane-carriers"]
-OWNER_DEFAULTS = {"context-supply", "ccusage", "session-analytics"}
+OWNER_DEFAULTS = {"context-supply", "ccusage", "session-analytics", "promptfoo"}
 OWNER_INTERIM = {"code-search"}
 # What the rounds decided on a row: an amendment by direct consensus is recorded beside these and carries none of them.
 PROTECTED = {"default", "state", "definitive", "repository", "installs_nothing_extra", "row_kind"}
@@ -121,7 +121,9 @@ class Manifest(unittest.TestCase):
         # The wave-3 batch (2026-10-04, amendment 4): the owner's rows, and its owner defaults and interim amendment.
         cls.wave3 = cls.consensus["wave3"]
         cls.owner_rows = {row["slot_id"]: row for row in cls.wave3["add_rows"]}
-        cls.owner_amends = {entry["slot_id"]: entry for entry in cls.wave3["amend_rows"]}
+        cls.wave4 = cls.consensus["wave4"]
+        cls.owner_amends = {entry["slot_id"]: entry for batch in (cls.wave3, cls.wave4)
+                            for entry in batch["amend_rows"]}
         cls.rows = cls.manifest["slots"]
 
     def as_decided(self, row):
@@ -456,6 +458,7 @@ class Manifest(unittest.TestCase):
         # amendment 4 of its wave-3 batch (the owner's decision of 2026-10-04), in the batches' order.
         self.assertTrue(rule.endswith(" " + self.consensus["rule"] + " " + self.wave2["interim_rule"] + " "
                                       + self.wave3["owner_rule"]))
+        self.assertEqual(rule.count(self.wave3["owner_rule"]), 1)
         self.assertLess(rule.index("decision-round"), rule.index(self.consensus["rule"]))
         self.assertTrue(self.wave2["interim_rule"].startswith("Amendment 3 "))
         self.assertTrue(self.wave3["owner_rule"].startswith("Amendment 4 "))
@@ -463,6 +466,7 @@ class Manifest(unittest.TestCase):
         self.assertEqual(self.manifest["no_install_rule"], self.foundation["no_install_rule"])
         self.assertEqual(self.manifest["no_install_rule_exception"],
                          self.wave2["no_install_rule_exception"] + " " + self.wave3["no_install_rule_exception"])
+        self.assertEqual(self.manifest["no_install_rule_exception"].count(self.wave3["no_install_rule_exception"]), 1)
         self.assertIn("exception to the no-install rule", self.manifest["no_install_rule_exception"])
         self.assertIn("second exception to the no-install rule", self.wave3["no_install_rule_exception"])
 
@@ -809,8 +813,8 @@ class Manifest(unittest.TestCase):
         self.assertEqual(by_catalog, {"foundation": 80, "us-equities": 20})
         self.assertEqual(counts["layers"], 37)
         # 56 after the layer consensus, 57 with its wave-2 statusline row, 59 with the two local-model slots settled by their
-        # measurement (2026-10-03), and 72 with the wave-3 batch: its ten owner rows and three owner defaults.
-        self.assertEqual(counts["installed"], 72)
+        # measurement (2026-10-03), 72 with wave 3, and 73 with the wave-4 Promptfoo owner default.
+        self.assertEqual(counts["installed"], 73)
         # Three interims under amendment 3; the context-supply owner default replaced one of them.
         self.assertEqual(counts["interim"], 2)
         self.assertEqual(counts["by_row_kind"]["consensus"], 6)
@@ -1312,7 +1316,8 @@ class Manifest(unittest.TestCase):
                 # Installed now, resolved, never definitive, and labelled as what it is.
                 self.assertTrue(assembler.installs(row))
                 self.assertEqual((row["state"], row["definitive"], row["measurement"]), ("resolved", False, None))
-                self.assertTrue(row["label"].startswith("owner decision of 2026-10-04 (wave 3, amendment 4)"), row["label"])
+                batch_number = 4 if sid == "promptfoo" else 3
+                self.assertTrue(row["label"].startswith(f"owner decision of 2026-10-04 (wave {batch_number}, amendment 4)"), row["label"])
                 self.assertIn("not a blind round, not a consensus and not a measurement", row["label"])
                 self.assertTrue(row["repository"].startswith("https://github.com/"), row["repository"])
                 resolution = row["resolution"]
@@ -1334,7 +1339,8 @@ class Manifest(unittest.TestCase):
         components = {"command-output": "rtk", "output-compression": "headroom", "code-index": "jcodemunch-mcp",
                       "code-graph": "codebase-memory-mcp", "repo-packing": "repomix", "structured-data": "toon",
                       "doc-conversion": "markitdown", "api-docs": "context-hub", "trace-viewer": "otel-tui",
-                      "ccusage": "ccusage", "session-analytics": "agentsview", "context-supply": "context-mode"}
+                      "ccusage": "ccusage", "session-analytics": "agentsview", "context-supply": "context-mode",
+                      "promptfoo": "promptfoo"}
         self.assertEqual(set(components), set(OWNER_ADDED) - {"token-lane-carriers"} | OWNER_DEFAULTS)
         rows = {row["slot_id"]: row for row in self.rows}
         for sid, component in components.items():
@@ -1364,7 +1370,8 @@ class Manifest(unittest.TestCase):
                 self.assertEqual((row["state"], row["definitive"], row["measurement"], row["installs_nothing_extra"]),
                                  ("resolved", False, None, False))
                 self.assertEqual(row["resolution"]["outcome"], "owner_default")
-                self.assertTrue(row["label"].startswith("owner decision of 2026-10-04 (wave 3, amendment 4)"), row["label"])
+                batch_number = 4 if sid == "promptfoo" else 3
+                self.assertTrue(row["label"].startswith(f"owner decision of 2026-10-04 (wave {batch_number}, amendment 4)"), row["label"])
                 # What it replaced is kept: the decided fields, an interim it dropped, and the amendment that replaced them.
                 kept = row["overturned"]
                 self.assertEqual(kept["fields"], {key: before[sid][key] for key in assembler.OVERTURNED_FIELDS})
@@ -1386,7 +1393,7 @@ class Manifest(unittest.TestCase):
         text = (ROOT / ref["path"]).read_text(encoding="utf-8")
         self.assertIn(authority["verbatim"], text)
         self.assertTrue(authority["verbatim"].startswith("WE NEED TO ENABLE FULL SOTA STACKS FOR THE TOKEN EFFICIENCY REPOS "))
-        for sid in OWNER_ADDED + sorted(OWNER_DEFAULTS | OWNER_INTERIM):
+        for sid in OWNER_ADDED + sorted((OWNER_DEFAULTS - {"promptfoo"}) | OWNER_INTERIM):
             self.assertIn(f"`{sid}`", text, sid)
         for key in ("owner_rule", "no_install_rule_exception"):
             self.assertIn(batch[key], text, key)
@@ -1400,6 +1407,15 @@ class Manifest(unittest.TestCase):
         earlier = RECORD.read_text(encoding="utf-8")
         outside = earlier[:earlier.index("<!-- tables:begin")] + earlier[earlier.index("<!-- tables:end -->"):]
         self.assertIn(Path(ref["path"]).name, outside)
+        # The additive fix-wave uses the same hashed owner-batch contract for Promptfoo.
+        batch = self.wave4
+        ref = batch["records"]["decision_record"]
+        self.assertEqual(sha(ROOT / ref["path"]), ref["sha256"])
+        text = (ROOT / ref["path"]).read_text(encoding="utf-8")
+        self.assertIn(batch["authority"]["verbatim"], text)
+        self.assertIn("`promptfoo`", text)
+        self.assertIn("https://github.com/promptfoo/promptfoo", text)
+        self.assertEqual((batch["acknowledgements"], batch["acknowledgements_owed"]), ([], []))
 
     def test_the_assembler_refuses_an_owner_batch_outside_amendment_4(self):
         """Negative controls: each case changes one thing in a scratch copy of the layer-consensus record and the assembler
@@ -1523,7 +1539,7 @@ class InterimPlanChecks(unittest.TestCase):
 
     GATE_LINE = '  interim_acknowledged {slot} || return "$?"\n'
 
-    def run_check(self, change_rows=None, change_install=None):
+    def run_check(self, change_rows=None, change_install=None, change_manifest=None):
         """(exit status, output) of check_plan.py over a scratch copy of the plan and the manifest."""
         with tempfile.TemporaryDirectory() as scratch:
             scratch = Path(scratch)
@@ -1531,6 +1547,10 @@ class InterimPlanChecks(unittest.TestCase):
             shutil.copytree(PLAN, plan_dir, ignore=shutil.ignore_patterns("__pycache__"))
             manifest = scratch / "definitive-manifest.json"
             shutil.copy2(ART / "definitive-manifest.json", manifest)
+            if change_manifest:
+                data = load(manifest)
+                change_manifest(data)
+                manifest.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
             if change_rows:
                 for name in ("install-plan.json", "owners.json"):    # the two files list the same rows
                     data = load(plan_dir / name)
@@ -1547,6 +1567,17 @@ class InterimPlanChecks(unittest.TestCase):
         code, out = self.run_check()
         self.assertEqual(code, 0, out)
         self.assertTrue(out.startswith("OK: "), out)
+
+    def test_promptfoo_cannot_override_the_manifest_exclusion(self):
+        def exclude(data):
+            row = next(r for r in data["slots"] if r["slot_id"] == "promptfoo")
+            row.update(default="Not installed: prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it",
+                       repository="", installs_nothing_extra=True, state="resolved",
+                       resolution={"outcome": "not_installed"})
+        code, out = self.run_check(change_manifest=exclude)
+        self.assertEqual(code, 1, out)
+        self.assertIn("[manifest]", out)
+        self.assertIn("promptfoo", out)
 
     def test_an_interim_the_plan_does_not_install_is_refused(self):
         code, out = self.run_check(change_rows=lambda rows: rows["code-search"].update(installed=False))
