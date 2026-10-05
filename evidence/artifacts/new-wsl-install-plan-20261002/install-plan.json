@@ -1,7 +1,7 @@
 {
   "schema_version": 2,
   "generated_at_utc": "2026-10-02T02:41:24Z",
-  "revised_at_utc": "2026-10-04T23:58:00Z",
+  "revised_at_utc": "2026-10-05",
   "base": "Ubuntu 26.04.1 WSL 2",
   "status": "revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision. As generated, the revised commands were unrun; on 2026-10-02 (12:54Z to 13:17Z) they ran once in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution, the one meant to stay; the record of that run is private, and its public receipt comes with that distribution's acceptance. Five rows were added after the clean run, from the layer consensus of 2026-10-02, which makes 69 foundation rows: skill-discovery and skill-authoring install, and their install and acceptance commands have not run anywhere, neither in a throwaway distribution nor on the destination; research-skill, credential-custody and cross-family-review install nothing. On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable, after their measurement settled them in the manifest: they are created through the running model server, which the plan does not start, so the default run skips them and --only installs each; as plan rows their install and acceptance commands have not run anywhere (the measurement created and ran the same models in a throwaway distribution). Wave 2 (2026-10-03), 70 foundation rows: four rows install for the first time, from the wave-2 records of the layer consensus (memory-owner, code-search and context-supply as interim installs under amendment 3 of the manifest's decision rule, and the added statusline row), and research-harnesses, tobi-qmd and gpt-gateway are revised; the three skills rows run tools/adoption/install_skills.py; each interim install's function first calls interim_acknowledged, which refuses while the wave-2 batch owes an acknowledgement; none of these commands or checks has run anywhere, neither in a throwaway distribution nor on the destination. Wave 3 (2026-10-04), 80 foundation rows: on the owner's decision of that day (amendment 4 of the manifest's decision rule), ten owner rows are added in token-efficiency (command-output, output-compression, code-index, code-graph, repo-packing, structured-data, doc-conversion, api-docs, trace-viewer, token-lane-carriers), ccusage and session-analytics install their owner defaults, context-supply installs as an owner default without the interim gate, and code-search installs both arms of its confirmatory; none of these commands has run anywhere. Fix-wave/wave-4 repair in this PR (2026-10-04): promptfoo follows the written manifest; repaired installation/prerequisites, isolated client probes and ownership migration. Destination commands remain UNRUN; local regression and artifact checks are recorded separately.",
   "owners": [
@@ -827,7 +827,7 @@
       "config_paths": [
         "$config_root/srt-client-accept.sh"
       ],
-      "notes": "Pinned sandbox-runtime 0.0.78, reconciled with the stack/profile/architecture selectors. The unchanged upstream smoke is srt echo \"hello world\"; the after_sign_in check is separate native-client integration. Supply the executor's existing disposable policy and denyRead, protected-write and denied-domain fixtures, with unsandboxed controls; the script requires a fresh Claude native Bash use and successful policy enforcement in returned tool_use/tool_result events. SRT_ACCEPT_CLIENT=codex uses Codex's native command_execution/turn.completed events and is recommended as the second client proof. A version call cannot satisfy it. The designed consumer remains per-job srt, not a session-wide sandbox or a mandatory ~/.srt-settings.json. The runtime-worker owner must also bind an OpenHands check_report or exit 0 under srt; starts alone are not successful job evidence. This plan check is unrun in this builder job.",
+      "notes": "2026-10-05 NativeStack2604 currency qualification: scoped installation and all defined plan stages passed; undefined stages are skipped, not passed. See evidence/receipts/ns2604-currency-qualification-20261005.json. Pinned sandbox-runtime 0.0.78, reconciled with the stack/profile/architecture selectors. The unchanged upstream smoke is srt echo \"hello world\"; the after_sign_in check is separate native-client integration. Supply the executor's existing disposable policy and denyRead, protected-write and denied-domain fixtures, with unsandboxed controls; the script requires a fresh Claude native Bash use and successful policy enforcement in returned tool_use/tool_result events. SRT_ACCEPT_CLIENT=codex uses Codex's native command_execution/turn.completed events and is recommended as the second client proof. A version call cannot satisfy it. The designed consumer remains per-job srt, not a session-wide sandbox or a mandatory ~/.srt-settings.json. The runtime-worker owner must also bind an OpenHands check_report or exit 0 under srt; starts alone are not successful job evidence. This plan check is unrun in this builder job.",
       "supporting_sources": [
         {
           "url": "https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L174",
@@ -839,7 +839,12 @@
         {
           "url": "https://developers.openai.com/codex/noninteractive"
         }
-      ]
+      ],
+      "currency_qualification": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Only selected installation and defined acceptance stages; earlier notes retain their authoring-time evidence boundaries."
+      }
     },
     {
       "layer": "isolation",
@@ -1705,13 +1710,13 @@
     {
       "layer": "token-efficiency",
       "slot": "code-index",
-      "owner": "jcodemunch-mcp 1.108.319",
+      "owner": "jcodemunch-mcp 1.108.327",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
-      "release": "v1.108.319",
+      "release": "v1.108.327",
       "installed": true,
       "route": "uv-tool",
       "commands": [
-        "UV_TOOL_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools\" UV_TOOL_BIN_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin\" uv tool install --python 3.13 jcodemunch-mcp==1.108.319"
+        "UV_TOOL_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools\" UV_TOOL_BIN_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin\" uv tool install --python 3.13 jcodemunch-mcp==1.108.327"
       ],
       "needs": {
         "sudo": false,
@@ -1723,16 +1728,16 @@
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91",
+        "url": "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/v1.108.327/README.md#L91",
         "line": 91
       },
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "[[ \"$(\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\" --version)\" == \"jcodemunch-mcp 1.108.319\" ]]",
+          "command": "[[ \"$(\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\" --version)\" == \"jcodemunch-mcp 1.108.327\" ]]",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L113",
+            "url": "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/v1.108.327/README.md#L113",
             "line": 113
           }
         }
@@ -1741,7 +1746,12 @@
         "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools/jcodemunch-mcp",
         "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"
       ],
-      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). The pin is manifests/stack.json's at f77a35eb (source 8f7b34abe16fb459e0bf1c04747d584216dfe32e), installed where the project template runs ${ECO_ROOT}/bin/jcodemunch-mcp (recipes/README.md, Focused jCodeMunch retrieval); no artifact digest is recorded for it, so uv's index hashes are the only artifact check. It is registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md, which overturns the per-project rule of 2026-09-25 for this distribution), as the pinned README documents (claude mcp add -s user jcodemunch jcodemunch-mcp), with JCODEMUNCH_SHARE_SAVINGS=0 in the server's env block; jcodemunch-mcp init, which writes a prompt policy and hooks, is not run."
+      "notes": "2026-10-05 NativeStack2604 currency qualification: scoped installation and all defined plan stages passed; undefined stages are skipped, not passed. See evidence/receipts/ns2604-currency-qualification-20261005.json. Owner row under amendment 4 on the owner decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md). Currency qualification selects jcodemunch-mcp 1.108.327, source 6d5ae86c130f96624e2ca2d797fa3b853c210b9d; the published wheel and sdist SHA256 digests matched downloaded bytes. The unchanged upstream locked harness passes 14210 tests with 28 skips after its full-history checkout prerequisite is met. Installation uses the ecosystem tool root; the user-scope registration and JCODEMUNCH_SHARE_SAVINGS=0 directive remain. init is not run. Native-client MCP retrieval/counter acceptance is separate historical evidence, not exercised by this wave.",
+      "currency_qualification": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Only selected installation and defined acceptance stages; earlier notes retain their authoring-time evidence boundaries."
+      }
     },
     {
       "layer": "token-efficiency",
@@ -2909,8 +2919,13 @@
         }
       },
       "config_paths": [],
-      "notes": "Planned. README first Linux script targets /usr/local/bin via sudo; choose registry mise for user-level ownership. Documented public-container scan needs network; alpine:latest is upstream's smoke input, not a reproducible image pin. Fix-wave-g6-eval-supply (2026-10-04): reconcile the allowed foundation/profile/stack pins to the already selected 1.54.0 release (cc326e45a6213360266dda4b30cc68095946d676). The upstream scan is retained and its returned SBOM must contain packages including alpine-baselayout, with the exact executable release checked separately. This CLI has no client MCP/hook requirement and no slot-defined fresh-session gate. Workflow pins and coordinator unit/evidence metadata remain outside this builder's edit ownership.",
-      "mise_tool": "syft"
+      "notes": "2026-10-05 NativeStack2604 currency qualification: scoped installation and all defined plan stages passed; undefined stages are skipped, not passed. See evidence/receipts/ns2604-currency-qualification-20261005.json. Planned. README first Linux script targets /usr/local/bin via sudo; choose registry mise for user-level ownership. Documented public-container scan needs network; alpine:latest is upstream's smoke input, not a reproducible image pin. Fix-wave-g6-eval-supply (2026-10-04): reconcile the allowed foundation/profile/stack pins to the already selected 1.54.0 release (cc326e45a6213360266dda4b30cc68095946d676). The upstream scan is retained and its returned SBOM must contain packages including alpine-baselayout, with the exact executable release checked separately. This CLI has no client MCP/hook requirement and no slot-defined fresh-session gate. Workflow pins and coordinator unit/evidence metadata remain outside this builder's edit ownership.",
+      "mise_tool": "syft",
+      "currency_qualification": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Only selected installation and defined acceptance stages; earlier notes retain their authoring-time evidence boundaries."
+      }
     },
     {
       "layer": "ci-supply-chain",
@@ -3004,11 +3019,11 @@
       "slot": "dagu",
       "owner": "Dagu",
       "repository": "https://github.com/dagucloud/dagu",
-      "release": "v2.18.1",
+      "release": "v2.18.2",
       "installed": true,
       "route": "native-installer",
       "commands": [
-        "curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/scripts/installer.sh | bash -s -- --version v2.18.1 --no-prompt --service yes --service-scope user --host 127.0.0.1 --port 21080 --open-browser no"
+        "curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh | bash -s -- --version v2.18.2 --no-prompt --service yes --service-scope user --host 127.0.0.1 --port 21080 --open-browser no"
       ],
       "needs": {
         "sudo": false,
@@ -3020,7 +3035,7 @@
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/README.md#L105",
+        "url": "https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/README.md#L105",
         "line": 105
       },
       "service": {
@@ -3033,7 +3048,7 @@
           "command": "dagu version",
           "kind": "version only",
           "source": {
-            "url": "https://raw.githubusercontent.com/dagucloud/dagu/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/internal/cmd/version.go#L15",
+            "url": "https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/internal/cmd/version.go#L15",
             "line": 15
           }
         },
@@ -3041,7 +3056,7 @@
           "command": "curl -fsS http://127.0.0.1:21080/api/v1/health",
           "kind": "health",
           "source": {
-            "url": "https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/scripts/installer.sh#L1997",
+            "url": "https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh#L1997",
             "line": 1997
           }
         }
@@ -3050,7 +3065,12 @@
         "$HOME/.config/systemd/user/dagu.service",
         "$HOME/.config/dagu/dagu.env"
       ],
-      "notes": "Planned. First user-level Linux installer beats mise. Use upstream version/no-prompt/user-service/host/port/browser flags (installer:109-121). No admin bootstrap secrets. Installer owns unit and starts service; may add PATH startup entries, but does not change default shell. Coordinator native default free50055, source loopback verified."
+      "notes": "2026-10-05 NativeStack2604 currency qualification: scoped installation and all defined plan stages passed; undefined stages are skipped, not passed. See evidence/receipts/ns2604-currency-qualification-20261005.json. Planned. First user-level Linux installer beats mise. Use upstream version/no-prompt/user-service/host/port/browser flags (installer:109-121). No admin bootstrap secrets. Installer owns unit and starts service; may add PATH startup entries, but does not change default shell. Coordinator native default free50055, source loopback verified.",
+      "currency_qualification": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Only selected installation and defined acceptance stages; earlier notes retain their authoring-time evidence boundaries."
+      }
     },
     {
       "layer": "hosting-services",
@@ -3406,7 +3426,7 @@
           }
         },
         "after_sign_in": {
-          "command": "cd \"$repo_root\"\numask 077\nstate_root=\"${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/worktrunk\"\nmkdir -p -- \"$state_root\"\nrun_dir=\"$(mktemp -d \"$state_root/run.XXXXXX\")\"\nprintf -v task 'Use your shell tool to run exactly: bash %q --only %q --stage post_install. This must execute the functional upstream examples and controls; a version report or a final answer without a tool call is insufficient. Report the command exit status. Modify only the disposable fixture this acceptance program owns.' \"$plan_dir/accept.sh\" worktrunk\nclaude -p --model sonnet --effort max --max-turns 6 --output-format stream-json --verbose --allowedTools 'Bash(bash *),Bash(rtk bash *)' \"$task\" > \"$run_dir/claude.jsonl\" 2> \"$run_dir/claude.stderr\"\ncodex exec -m gpt-6.1-sol -c 'model_reasoning_effort=\"max\"' --sandbox workspace-write --ephemeral --json -o \"$run_dir/codex-last.txt\" \"$task\" < /dev/null > \"$run_dir/codex.jsonl\" 2> \"$run_dir/codex.stderr\"\npython3 - \"$run_dir\" worktrunk <<'PY'\nimport json, pathlib, sys\ndirectory, slot = pathlib.Path(sys.argv[1]), sys.argv[2]\ndef events(name):\n    return [json.loads(line) for line in (directory / name).read_text().splitlines() if line.strip()]\nc, g = events(\"claude.jsonl\"), events(\"codex.jsonl\")\nuses = {block[\"id\"] for e in c if e.get(\"type\") == \"assistant\" for block in e.get(\"message\", {}).get(\"content\", []) if block.get(\"type\") == \"tool_use\" and block.get(\"name\") == \"Bash\" and \"accept.sh\" in block.get(\"input\", {}).get(\"command\", \"\") and slot in block.get(\"input\", {}).get(\"command\", \"\")}\nassert uses, \"Claude did not execute the acceptance command\"\nassert any(block.get(\"type\") == \"tool_result\" and block.get(\"tool_use_id\") in uses and not block.get(\"is_error\", False) and f\"{slot} | post_install | 0\" in str(block.get(\"content\", \"\")) for e in c if e.get(\"type\") == \"user\" for block in e.get(\"message\", {}).get(\"content\", [])), \"Claude's functional tool result is missing or failed\"\nassert any(e.get(\"type\") == \"result\" and e.get(\"subtype\") == \"success\" and not e.get(\"is_error\", False) for e in c), \"Claude stream did not complete\"\nassert any(e.get(\"type\") == \"item.completed\" and e.get(\"item\", {}).get(\"type\") == \"command_execution\" and \"accept.sh\" in e[\"item\"].get(\"command\", \"\") and slot in e[\"item\"].get(\"command\", \"\") and e[\"item\"].get(\"exit_code\") == 0 and f\"{slot} | post_install | 0\" in e[\"item\"].get(\"aggregated_output\", \"\") for e in g), \"Codex's functional command result is missing or failed\"\nassert any(e.get(\"type\") == \"turn.completed\" for e in g), \"Codex stream did not complete\"\nassert not any(e.get(\"type\") in (\"error\", \"turn.failed\") for e in g), \"Codex reported an error\"\nPY\nprintf 'Complete native event streams retained in %s\\n' \"$run_dir\" >&2",
+          "command": "cd \"$repo_root\"\numask 077\nstate_root=\"${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/worktrunk\"\nmkdir -p -- \"$state_root\"\nrun_dir=\"$(mktemp -d \"$state_root/run.XXXXXX\")\"\nprintf -v task 'Use your shell tool to run exactly: bash %q --only %q --stage post_install. This must execute the functional upstream examples and controls; a version report or a final answer without a tool call is insufficient. Report the command exit status. Modify only the disposable fixture this acceptance program owns.' \"$plan_dir/accept.sh\" worktrunk\nclaude -p --model sonnet --effort max --max-turns 12 --output-format stream-json --verbose --allowedTools 'Bash(bash *),Bash(rtk bash *)' -- \"$task\" > \"$run_dir/claude.jsonl\" 2> \"$run_dir/claude.stderr\"\n(cd \"$run_dir\" && codex exec --skip-git-repo-check --add-dir \"${TMPDIR:-$run_dir}\" -m gpt-6.1-sol -c 'model_reasoning_effort=\"max\"' --sandbox workspace-write --ephemeral --json -o \"$run_dir/codex-last.txt\" \"$task\" < /dev/null > \"$run_dir/codex.jsonl\" 2> \"$run_dir/codex.stderr\")\npython3 - \"$run_dir\" worktrunk <<'PY'\nimport json, pathlib, sys\ndirectory, slot = pathlib.Path(sys.argv[1]), sys.argv[2]\ndef events(name):\n    return [json.loads(line) for line in (directory / name).read_text().splitlines() if line.strip()]\nc, g = events(\"claude.jsonl\"), events(\"codex.jsonl\")\nuses = {block[\"id\"] for e in c if e.get(\"type\") == \"assistant\" for block in e.get(\"message\", {}).get(\"content\", []) if block.get(\"type\") == \"tool_use\" and block.get(\"name\") == \"Bash\" and \"accept.sh\" in block.get(\"input\", {}).get(\"command\", \"\") and slot in block.get(\"input\", {}).get(\"command\", \"\")}\nassert uses, \"Claude did not execute the acceptance command\"\nassert any(block.get(\"type\") == \"tool_result\" and block.get(\"tool_use_id\") in uses and not block.get(\"is_error\", False) and f\"{slot} | post_install | 0\" in str(block.get(\"content\", \"\")) for e in c if e.get(\"type\") == \"user\" for block in e.get(\"message\", {}).get(\"content\", [])), \"Claude's functional tool result is missing or failed\"\nassert any(e.get(\"type\") == \"result\" and e.get(\"subtype\") == \"success\" and not e.get(\"is_error\", False) for e in c), \"Claude stream did not complete\"\nassert any(e.get(\"type\") == \"item.completed\" and e.get(\"item\", {}).get(\"type\") == \"command_execution\" and \"accept.sh\" in e[\"item\"].get(\"command\", \"\") and slot in e[\"item\"].get(\"command\", \"\") and e[\"item\"].get(\"exit_code\") == 0 and f\"{slot} | post_install | 0\" in e[\"item\"].get(\"aggregated_output\", \"\") for e in g), \"Codex's functional command result is missing or failed\"\nassert any(e.get(\"type\") == \"turn.completed\" for e in g), \"Codex stream did not complete\"\nassert not any(e.get(\"type\") in (\"error\", \"turn.failed\") for e in g), \"Codex reported an error\"\nPY\nprintf 'Complete native event streams retained in %s\\n' \"$run_dir\" >&2",
           "kind": "smoke",
           "source": {
             "url": "https://developers.openai.com/codex/noninteractive/",
@@ -3419,8 +3439,13 @@
         "~/.claude/plugins",
         "~/.codex/plugins"
       ],
-      "notes": "v0.80.0 remains the selected mise pin. Upstream wt installs Bash integration and each client plugin without an interactive prompt. claude-hud remains the selected statusline. Post-install runs upstream switch/list/remove examples in a disposable repo with an isolated Git identity and config, checks dirty-removal refusal and fresh Bash activation, and requires enabled native plugin listings. The Codex plugin provides configuration guidance and activity tracking; worktree isolation hooks are Claude-only. after_sign_in requires actual successful functional tool results in both fresh clients and keeps complete event streams privately. These are upstream native operations plus local integration assertions, not cargo test or destination E2E acceptance.",
-      "mise_tool": "worktrunk"
+      "notes": "2026-10-05 NativeStack2604 currency qualification: scoped installation and all defined plan stages passed; undefined stages are skipped, not passed. See evidence/receipts/ns2604-currency-qualification-20261005.json. v0.80.0 remains the selected mise pin. Upstream wt installs Bash integration and each client plugin without an interactive prompt. claude-hud remains the selected statusline. Post-install runs upstream switch/list/remove examples in a disposable repo with an isolated Git identity and config, checks dirty-removal refusal and fresh Bash activation, and requires enabled native plugin listings. The Codex plugin provides configuration guidance and activity tracking; worktree isolation hooks are Claude-only. after_sign_in requires actual successful functional tool results in both fresh clients and keeps complete event streams privately. These are upstream native operations plus local integration assertions, not cargo test or destination E2E acceptance.",
+      "mise_tool": "worktrunk",
+      "currency_qualification": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Only selected installation and defined acceptance stages; earlier notes retain their authoring-time evidence boundaries."
+      }
     },
     {
       "layer": "git-github-automation",
@@ -3562,11 +3587,11 @@
       "slot": "mise",
       "owner": "mise",
       "repository": "https://github.com/jdx/mise",
-      "release": "v2026.10.0",
+      "release": "v2026.10.1",
       "installed": true,
       "route": "native-installer",
       "commands": [
-        "curl -fsSL https://mise.run | MISE_VERSION=v2026.10.0 sh"
+        "curl -fsSL https://mise.run | MISE_VERSION=v2026.10.1 sh"
       ],
       "needs": {
         "sudo": false,
@@ -3578,7 +3603,7 @@
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/docs/installing-mise.md#L82",
+        "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.1/docs/installing-mise.md#L82",
         "line": 82
       },
       "service": null,
@@ -3595,7 +3620,12 @@
       "config_paths": [
         "${XDG_CONFIG_HOME:-$HOME/.config}/mise/config.toml"
       ],
-      "notes": "Planned. README's first Linux route; MISE_VERSION pin documented at docs/installing-mise.md:128. Shell activation optional and omitted. Runtimes node 24.21.0, python 3.13.16, uv 0.12.22 are bootstrap prerequisites. Full doctor needs activation or shims; process-scoped mise env alone does not activate the shell. Add the default shims directory to this process's PATH; preserve every doctor check and all version pins. Doctor runs in the owned global tool directory so a selective install does not select the inventory manifest's optional tools."
+      "notes": "2026-10-05 NativeStack2604 currency qualification: scoped installation and all defined plan stages passed; undefined stages are skipped, not passed. See evidence/receipts/ns2604-currency-qualification-20261005.json. Planned. README's first Linux route; MISE_VERSION pin documented at docs/installing-mise.md:128. Shell activation optional and omitted. Runtimes node 24.21.0, python 3.13.16, uv 0.12.22 are bootstrap prerequisites. Full doctor needs activation or shims; process-scoped mise env alone does not activate the shell. Add the default shims directory to this process's PATH; preserve every doctor check and all version pins. Doctor runs in the owned global tool directory so a selective install does not select the inventory manifest's optional tools.",
+      "currency_qualification": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Only selected installation and defined acceptance stages; earlier notes retain their authoring-time evidence boundaries."
+      }
     },
     {
       "layer": "recovery-portability",

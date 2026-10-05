@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-currency-20261005--worktrunk--use--20261005-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "ns2604-currency-20261005",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "recorded_by": {
+    "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+  },
+  "component_id": "worktrunk",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only worktrunk --stage post_install </dev/null",
+      "exit": 0,
+      "duration_s": 2.099,
+      "output_sha256": "d951096d7a781e300cebf820266267ca00df1312e3f6282db72f4597a63c99f1",
+      "output_excerpt": "worktrunk | post_install | 0\nbash: cannot set terminal process group (2234447): Inappropriate ioctl for device\nbash: no job control in this shell\n\n\u25cb Showing 25 worktrees, 10 with changes, 16 ahead\n\u2713 Created branch native-stack-acceptance from main and worktree @ ~/.cache/ns2604-currency/tmp/tmp.V87eVhrkdt/native-stack-acceptance\n\u25cb Switched to worktree for main @ ~/.cache/ns2604-currency/tmp/tmp.V8"
+    },
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only worktrunk --stage service_health </dev/null",
+      "exit": 0,
+      "duration_s": 0.014,
+      "output_sha256": "869e87a8035de6a1db52ecac99bc1eeced11e6886db42114f7f915984a2e7d3b",
+      "output_excerpt": "worktrunk | service_health | skipped\n"
+    },
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only worktrunk --stage after_sign_in </dev/null",
+      "exit": 1,
+      "duration_s": 91.106,
+      "output_sha256": "a2f6dfb79473365a413dd8bf1cddb479dcdba8a9f2e0dd4dc0726a3937997d09",
+      "output_excerpt": "worktrunk | after_sign_in | 1\n"
+    }
+  ],
+  "tool_versions": {
+    "worktrunk": "0.80.0"
+  },
+  "observed_at_utc": "2026-10-05T04:26:00Z",
+  "result": "fail",
+  "claim": "Worktrunk destination functional examples and native client acceptance after correcting CLI prompt boundaries; undefined service stage is skipped.",
+  "limitations": [
+    "The first failed native-client attempt is retained. This is native client integration of disposable upstream worktree examples, not an unchanged upstream Rust suite or recovery benchmark."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-05T04:26:00Z",
+      "reviewer": {
+        "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "git-github-automation"
+    }
+  ],
+  "supersedes": "ns2604-currency-20261005--worktrunk--use--20261005"
+}

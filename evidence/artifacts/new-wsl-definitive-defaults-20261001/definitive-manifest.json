@@ -77,7 +77,7 @@
   },
   "consensus": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-   "sha256": "53b5dc9c43c6e40d5e9bb62c8cf9967ba61388ab1b9b2c13f77d3eaafe38b892"
+   "sha256": "d2b0caa8e229d2b269d411088df923404acc8eab8bf19f4aba41bd62598218ee"
   }
  },
  "counts": {
@@ -1895,7 +1895,7 @@
    "layer_id": "token-efficiency",
    "slot_id": "code-index",
    "row_kind": "owner_decision",
-   "default": "jcodemunch-mcp 1.108.319",
+   "default": "jcodemunch-mcp 1.108.327",
    "repository": "https://github.com/jgravelle/jcodemunch-mcp",
    "installs_nothing_extra": false,
    "definitive": false,
@@ -1910,17 +1910,17 @@
     "outcome": "added_by_owner_decision",
     "by": "the owner's decision of 2026-10-04",
     "batch": "wave3",
-    "reason": "the owner's order installs the token-efficiency repositories by default; jcodemunch-mcp is a core row of docs/token-efficiency-stack.json (explicitly scoped code index and exact symbol retrieval)",
-    "pin": "PyPI jcodemunch-mcp==1.108.319, source 8f7b34abe16fb459e0bf1c04747d584216dfe32e (manifests/stack.json); the Linux pins file records no artifact digest for it, so uv's index hashes are the only artifact check",
-    "install": "the install plan's code-index function: uv tool install --python 3.13 jcodemunch-mcp==1.108.319 with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
+    "reason": "the owner's order installs the token-efficiency repositories by default; jcodemunch-mcp is a core row of docs/token-efficiency-stack.json (explicitly scoped code index and exact symbol retrieval); the 2026-10-05 currency brief retains this owner and qualifies package1.108.327, with the initial1.108.319/source8f7b34abe16fb459e0bf1c04747d584216dfe32e selection retained as history",
+    "pin": "PyPI jcodemunch-mcp==1.108.327, source6d5ae86c130f96624e2ca2d797fa3b853c210b9d; published wheel/sdist digests match downloaded bytes. Current qualification: evidence/receipts/ns2604-currency-qualification-20261005.json; source: docs/decisions/2026-10-05-ns2604-currency-wave.md and https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327.",
+    "install": "the install plan's code-index function: uv tool install --python 3.13 jcodemunch-mcp==1.108.327 with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
     "usage_rules": [
-     "registered per project, never at user scope (docs/token-session-handbook.md:108)",
+     "Registered at user scope for Claude Code and Codex on the direct2026-10-04 instruction; docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md supersedes the earlier project-only rule. JCODEMUNCH_SHARE_SAVINGS=0; init is not run.",
      "index only the selected code; sharing, AI summaries, watchers, cross-repository defaults and external context providers off (manifests/stack.json, jcodemunch-mcp command_scope)"
     ],
     "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without jcodemunch-mcp against the full stack and the lean base), or the fresh-session invocation census, reports that it adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
     "open_acceptance_gates": [
      "${ECO_ROOT}/bin/jcodemunch-mcp runs from the uv tool",
-     "a project-scoped registration indexes a selected folder, and order search_symbols then get_symbol_source returns the requested definition"
+     "the current user-scoped registration indexes only a selected folder, and order search_symbols then get_symbol_source returns the requested definition; this client gate remains open for the327 currency wave"
     ],
     "sources": [
      "docs/decisions/2026-10-04-token-full-stack-owner-default.md",

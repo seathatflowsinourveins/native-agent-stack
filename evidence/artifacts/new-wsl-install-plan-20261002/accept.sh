@@ -637,12 +637,12 @@ output-compression() {
   esac
 }
 code-index() {
-  # jcodemunch-mcp 1.108.319 (owner row, amendment 4); https://github.com/jgravelle/jcodemunch-mcp
+  # jcodemunch-mcp 1.108.327 (owner row, amendment 4); https://github.com/jgravelle/jcodemunch-mcp
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan.
   case "$stage" in
     post_install)
-      # Kind: smoke; Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L113 (jcodemunch-mcp --version); https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/recipes/README.md#L525 (its output at the pin)
-      check code-index smoke '[[ "$("${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp" --version)" == "jcodemunch-mcp 1.108.319" ]]'
+      # Kind: smoke; Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/v1.108.327/README.md#L113 (jcodemunch-mcp --version); docs/decisions/2026-10-05-ns2604-currency-wave.md (eligible pin)
+      check code-index smoke '[[ "$("${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp" --version)" == "jcodemunch-mcp 1.108.327" ]]'
       ;;
     *) skipped code-index ;;
   esac
@@ -1319,7 +1319,7 @@ dagu() {
       check dagu 'version only' 'dagu version'
       ;;
     service_health)
-      # Kind: health; Source: https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/scripts/installer.sh#L1997
+      # Kind: health; Source: https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh#L1997
       check dagu health 'curl -fsS http://127.0.0.1:21080/api/v1/health'
       ;;
     *) skipped dagu ;;
@@ -1427,8 +1427,8 @@ state_root="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptanc
 mkdir -p -- "$state_root"
 run_dir="$(mktemp -d "$state_root/run.XXXXXX")"
 printf -v task '"'"'Use your shell tool to run exactly: bash %q --only %q --stage post_install. This must execute the functional upstream examples and controls; a version report or a final answer without a tool call is insufficient. Report the command exit status. Modify only the disposable fixture this acceptance program owns.'"'"' "$plan_dir/accept.sh" worktrunk
-claude -p --model sonnet --effort max --max-turns 6 --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"' "$task" > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr"
-codex exec -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --ephemeral --json -o "$run_dir/codex-last.txt" "$task" < /dev/null > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr"
+claude -p --model sonnet --effort max --max-turns 12 --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"' -- "$task" > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr"
+(cd "$run_dir" && codex exec --skip-git-repo-check --add-dir "${TMPDIR:-$run_dir}" -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --ephemeral --json -o "$run_dir/codex-last.txt" "$task" < /dev/null > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr")
 python3 - "$run_dir" worktrunk <<'"'"'PY'"'"'
 import json, pathlib, sys
 directory, slot = pathlib.Path(sys.argv[1]), sys.argv[2]

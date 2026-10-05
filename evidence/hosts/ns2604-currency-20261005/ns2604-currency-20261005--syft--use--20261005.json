@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-currency-20261005--syft--use--20261005",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "ns2604-currency-20261005",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "recorded_by": {
+    "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+  },
+  "component_id": "syft",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only syft --stage post_install </dev/null",
+      "exit": 0,
+      "duration_s": 1.798,
+      "output_sha256": "14de9fa500fe21e91932f971e7aad66babb0febf9e2d7e043c3be45e1b10598c",
+      "output_excerpt": "syft | post_install | 0\n"
+    },
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only syft --stage service_health </dev/null",
+      "exit": 0,
+      "duration_s": 0.014,
+      "output_sha256": "c7f07718fc6ddf1383c09e9771a1cd159d729c5f7cc5afda1e9e14b2ba85ac7a",
+      "output_excerpt": "syft | service_health | skipped\n"
+    },
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only syft --stage after_sign_in </dev/null",
+      "exit": 0,
+      "duration_s": 0.013,
+      "output_sha256": "f425b619c6e192b6f04cb74a479b05207c631de134b76224773455354c6dc07e",
+      "output_excerpt": "syft | after_sign_in | skipped\n"
+    }
+  ],
+  "tool_versions": {
+    "syft": "1.54.0"
+  },
+  "observed_at_utc": "2026-10-05T04:23:05Z",
+  "result": "pass",
+  "claim": "syft 1.54.0 native destination acceptance stages, preserving stages with no command as skips.",
+  "limitations": [
+    "Native smoke/client operations are scoped to the destination recipe; skipped stages are not passes, and historical host evidence is not a new run."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-05T04:23:05Z",
+      "reviewer": {
+        "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "ci-supply-chain"
+    }
+  ]
+}

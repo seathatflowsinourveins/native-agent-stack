@@ -4,16 +4,16 @@
   "source_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
   "evidence_class": "local_integration",
   "generator_sha256": "8a66e5eebe1429924d62545e2eee389f1fdd58e6c2f679d8280cec3e99027cf8",
-  "profile_sha256": "8be6b5bb2981843c3beca082169211fb0bd7071abf0e5abccdc9f31632152841",
+  "profile_sha256": "1c1c84be9e1591dfb3fa6273ea799c5bb8e11d387e0a237e06ab0d747272e22e",
   "outputs": {
-    "docs/new-wsl-handbook.md": "e4c94b2a748ed09a86c63129bba9a9acf5eb11475a354a1ec17660af052b16d0",
-    "docs/new-wsl-handbook.json": "a62a12a6b48f3ef9183893aa4eadce2e37aa1ad35350d7af0a347b603ca89a36"
+    "docs/new-wsl-handbook.md": "491926bed720f982e1bbb3fe5e999c67aa4094d2b25fba49020c5f48b409fee6",
+    "docs/new-wsl-handbook.json": "6fd04fceb4c1c014f7fdd8b11d3817c33e23e5fe348bbc1f49630ede44a2f231"
   },
   "inventory": {
     "layers": 37,
     "profile_entries": 78,
     "projected_tools": 82,
-    "canonical_package_ids": 25
+    "canonical_package_ids": 26
   },
   "validation": [
     {
@@ -128,5 +128,21 @@
     "adoption/new-wsl-profile.json",
     "docs/decisions/2026-10-01-new-wsl-handbook-generator.md"
   ],
-  "repair_round": "this PR: bounded job 058, 2026-10-04; hashes regenerated in place, destination acceptance remains owed"
+  "repair_round": "this PR: bounded job 058, 2026-10-04; hashes regenerated in place, destination acceptance remains owed",
+  "currency_regeneration": {
+    "recorded_date_utc": "2026-10-05",
+    "command": "python3 scripts/build_new_wsl_handbook.py --write",
+    "evidence_class": "local generator output and exact byte hashes; no model or host acceptance",
+    "previous_profile_sha256": "8be6b5bb2981843c3beca082169211fb0bd7071abf0e5abccdc9f31632152841",
+    "previous_outputs": {
+      "docs/new-wsl-handbook.md": "e4c94b2a748ed09a86c63129bba9a9acf5eb11475a354a1ec17660af052b16d0",
+      "docs/new-wsl-handbook.json": "a62a12a6b48f3ef9183893aa4eadce2e37aa1ad35350d7af0a347b603ca89a36"
+    },
+    "previous_inventory": {
+      "layers": 37,
+      "profile_entries": 78,
+      "projected_tools": 82,
+      "canonical_package_ids": 25
+    }
+  }
 }

@@ -1,0 +1,76 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-currency-20261005--jcodemunch-mcp--use--20261005",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "ns2604-currency-20261005",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "recorded_by": {
+    "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+  },
+  "component_id": "jcodemunch-mcp",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only code-index --stage post_install </dev/null",
+      "exit": 0,
+      "duration_s": 0.921,
+      "output_sha256": "18b3f68555e520ffb5a1248814d595b169c70aed780b5e57610e83bc14e7953a",
+      "output_excerpt": "code-index | post_install | 0\n"
+    },
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only code-index --stage service_health </dev/null",
+      "exit": 0,
+      "duration_s": 0.016,
+      "output_sha256": "bf0567e5bd87627d6c678c81c8eb87672dbd5c8cb9f41643d75716462c72fc49",
+      "output_excerpt": "code-index | service_health | skipped\n"
+    },
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only code-index --stage after_sign_in </dev/null",
+      "exit": 0,
+      "duration_s": 0.014,
+      "output_sha256": "627fb4dc71f412508f8f046073c342d84c138b7b949043cb77741051662d01ef",
+      "output_excerpt": "code-index | after_sign_in | skipped\n"
+    },
+    {
+      "cmd": "cd \"$HOME/.cache/ns2604-currency/jcodemunch-source\" && rtk env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" uv sync --locked --group dev --extra watch </dev/null",
+      "exit": 0,
+      "duration_s": 0.717,
+      "output_sha256": "debbfe75e05fcf7320f644361cf9b782af500bc02a852d59318bca7e777f4681",
+      "output_excerpt": "Using CPython 3.12.3 interpreter at: ~/.local/bin/python3.12\nCreating virtual environment at: .venv\nResolved 152 packages in 2ms\n   Building jcodemunch-mcp @ file://~/.cache/ns2604-currency/jcodemunch-source\nDownloading tiktoken (1.1MiB)\nDownloading pydantic-core (2.0MiB)\nDownloading ruff (11.0MiB)\n Downloaded tiktoken\n Downloaded pydantic-core\n Downloaded ruff\n      Built jcodemunch-mcp @ file://"
+    },
+    {
+      "cmd": "cd \"$HOME/.cache/ns2604-currency/jcodemunch-source\" && rtk env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" uv run python -m harness full --summary \"$HOME/.cache/ns2604-currency/logs/jcodemunch-harness-summary.md\" --annotate </dev/null",
+      "exit": 1,
+      "duration_s": 168.753,
+      "output_sha256": "d1b8d9fd0d7654401aaf9886a50c0bdcc7b3cca836b0307368637dbfc25f0fb2",
+      "output_excerpt": "== warm tokenizer asset cl100k_base: ok 1.0s\n== full tier: tests/ with --cov-fail-under=74\n   1 failed, 14209 passed, 28 skipped, 275 warnings, 1 error in 165.17s (0:02:45)\ncp/tools/get_file_risk.py                        111     19    83%\nsrc/jcodemunch_mcp/tools/get_file_tree.py                         67      4    94%\nsrc/jcodemunch_mcp/tools/get_group_contracts.py                  247     36  "
+    }
+  ],
+  "tool_versions": {
+    "jcodemunch-mcp": "1.108.327"
+  },
+  "observed_at_utc": "2026-10-05T04:17:29Z",
+  "result": "fail",
+  "claim": "jCodeMunch 1.108.327 destination version gate and unchanged upstream full harness; omitted destination stages are explicitly skipped.",
+  "limitations": [
+    "The unchanged upstream harness runs its tagged source and synthetic cases; it is separate from the installed tool version gate and from a production-client MCP cutover."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-05T04:17:29Z",
+      "reviewer": {
+        "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+      }
+    }
+  ]
+}

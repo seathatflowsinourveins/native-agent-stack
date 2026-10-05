@@ -1923,8 +1923,8 @@
       "component_id": "sandbox-runtime",
       "repository": "https://github.com/anthropics/sandbox-runtime",
       "selected_repository_url": "https://github.com/anthropics/sandbox-runtime",
-      "selected_version": "0.0.77",
-      "selected_source_pin": "6fa731368807419ee157f9a3fac955fefe1019c6",
+      "selected_version": "0.0.78",
+      "selected_source_pin": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
       "checks": [
         {
           "endpoint": "repos/anthropics/sandbox-runtime",
@@ -1966,31 +1966,53 @@
       "pushed_at": "2026-09-21T20:40:59Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "v0.0.77",
-        "published_at": "2026-09-18T22:09:16Z",
-        "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77",
+        "tag": "v0.0.78",
+        "published_at": "2026-09-30T01:09:22Z",
+        "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.78",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "6fa731368807419ee157f9a3fac955fefe1019c6",
-        "sha": "6fa731368807419ee157f9a3fac955fefe1019c6",
-        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/6fa731368807419ee157f9a3fac955fefe1019c6",
-        "committed_at": "2026-09-18T20:54:45Z"
+        "ref": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "sha": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "committed_at": "2026-09-30T01:08:11Z"
       },
       "latest_release_source": {
-        "ref": "v0.0.77",
-        "sha": "6fa731368807419ee157f9a3fac955fefe1019c6",
-        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/6fa731368807419ee157f9a3fac955fefe1019c6",
-        "committed_at": "2026-09-18T20:54:45Z"
+        "ref": "v0.0.78",
+        "sha": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "html_url": "https://github.com/anthropics/sandbox-runtime/commit/6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "committed_at": "2026-09-30T01:08:11Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/anthropics/sandbox-runtime",
       "release_relationship": "selected_version_matches_latest_stable",
-      "selected_pin_matches_latest_release_commit": true
+      "selected_pin_matches_latest_release_commit": true,
+      "currency_reconciliation": {
+        "recorded_date_utc": "2026-10-05",
+        "selected_source_url": "https://github.com/anthropics/sandbox-runtime/tree/6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
+        "qualification": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Selection reconciled after bounded Linux destination qualification; prior release/check timestamps remain unchanged.",
+        "previous_selected_pin_source": {
+          "ref": "6fa731368807419ee157f9a3fac955fefe1019c6",
+          "sha": "6fa731368807419ee157f9a3fac955fefe1019c6",
+          "html_url": "https://github.com/anthropics/sandbox-runtime/commit/6fa731368807419ee157f9a3fac955fefe1019c6",
+          "committed_at": "2026-09-18T20:54:45Z"
+        },
+        "original_latest_stable_release": {
+          "tag_name": "v0.0.77",
+          "published_at": "2026-09-18T22:09:16Z",
+          "html_url": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.77",
+          "target_commitish": "main",
+          "prerelease": false,
+          "draft": false
+        },
+        "original_release_relationship": "selected_version_matches_latest_stable",
+        "observed_date_utc": "2026-10-05"
+      }
     },
     {
       "component_id": "serena",
@@ -2396,8 +2418,8 @@
       "component_id": "worktrunk",
       "repository": "https://github.com/max-sixty/worktrunk",
       "selected_repository_url": "https://github.com/max-sixty/worktrunk",
-      "selected_version": "0.79.0",
-      "selected_source_pin": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+      "selected_version": "0.80.0",
+      "selected_source_pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
       "checks": [
         {
           "endpoint": "repos/max-sixty/worktrunk",
@@ -2439,31 +2461,53 @@
       "pushed_at": "2026-09-21T21:25:43Z",
       "license_spdx": "NOASSERTION",
       "latest_stable_release": {
-        "tag_name": "v0.79.0",
-        "published_at": "2026-09-21T01:01:42Z",
-        "html_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0",
-        "target_commitish": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+        "tag": "v0.80.0",
+        "published_at": "2026-09-27T21:18:46Z",
+        "html_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
+        "target_commitish": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
-        "sha": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
-        "html_url": "https://github.com/max-sixty/worktrunk/commit/5ba6f148e8505c20794f2d8bc706aa4f26335c95",
-        "committed_at": "2026-09-21T00:48:07Z"
+        "ref": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "sha": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "html_url": "https://github.com/max-sixty/worktrunk/commit/b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "committed_at": "2026-09-27T20:55:48Z"
       },
       "latest_release_source": {
-        "ref": "v0.79.0",
-        "sha": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
-        "html_url": "https://github.com/max-sixty/worktrunk/commit/5ba6f148e8505c20794f2d8bc706aa4f26335c95",
-        "committed_at": "2026-09-21T00:48:07Z"
+        "ref": "v0.80.0",
+        "sha": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "html_url": "https://github.com/max-sixty/worktrunk/commit/b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "committed_at": "2026-09-27T20:55:48Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/max-sixty/worktrunk",
       "release_relationship": "selected_version_matches_latest_stable",
-      "selected_pin_matches_latest_release_commit": true
+      "selected_pin_matches_latest_release_commit": true,
+      "currency_reconciliation": {
+        "recorded_date_utc": "2026-10-05",
+        "selected_source_url": "https://github.com/max-sixty/worktrunk/tree/b49ca7eea9b03145791a5b94eccaf9c59412ed37",
+        "qualification": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Selection reconciled after destination qualification; existing checks and release metadata retain their original observation dates.",
+        "previous_selected_pin_source": {
+          "ref": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+          "sha": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+          "html_url": "https://github.com/max-sixty/worktrunk/commit/5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+          "committed_at": "2026-09-21T00:48:07Z"
+        },
+        "original_latest_stable_release": {
+          "tag_name": "v0.79.0",
+          "published_at": "2026-09-21T01:01:42Z",
+          "html_url": "https://github.com/max-sixty/worktrunk/releases/tag/v0.79.0",
+          "target_commitish": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+          "prerelease": false,
+          "draft": false
+        },
+        "original_release_relationship": "selected_version_matches_latest_stable",
+        "observed_date_utc": "2026-10-05"
+      }
     },
     {
       "component_id": "opentelemetry-collector-contrib",
@@ -3030,8 +3074,8 @@
       "component_id": "dagu",
       "repository": "https://github.com/dagucloud/dagu",
       "selected_repository_url": "https://github.com/dagucloud/dagu",
-      "selected_version": "2.16.6",
-      "selected_source_pin": "v2.16.6",
+      "selected_version": "2.18.2",
+      "selected_source_pin": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
       "checks": [
         {
           "endpoint": "repos/dagucloud/dagu",
@@ -3073,30 +3117,52 @@
       "pushed_at": "2026-09-21T13:05:30Z",
       "license_spdx": "GPL-3.0",
       "latest_stable_release": {
-        "tag_name": "v2.17.0",
-        "published_at": "2026-09-21T13:31:48Z",
-        "html_url": "https://github.com/dagucloud/dagu/releases/tag/v2.17.0",
+        "tag": "v2.18.2",
+        "published_at": "2026-10-04T03:54:02Z",
+        "html_url": "https://github.com/dagucloud/dagu/releases/tag/v2.18.2",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "v2.16.6",
-        "sha": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
-        "html_url": "https://github.com/dagucloud/dagu/commit/58fed633d58c1dd1319091fdb2c2f6158ecfa053",
-        "committed_at": "2026-09-14T14:09:43Z"
+        "ref": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+        "sha": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+        "html_url": "https://github.com/dagucloud/dagu/commit/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+        "committed_at": "2026-10-04T03:12:18Z"
       },
       "latest_release_source": {
-        "ref": "v2.17.0",
-        "sha": "f501e3fefb2e52f9430d56b8ac7a055ec97ce320",
-        "html_url": "https://github.com/dagucloud/dagu/commit/f501e3fefb2e52f9430d56b8ac7a055ec97ce320",
-        "committed_at": "2026-09-21T13:04:58Z"
+        "ref": "v2.18.2",
+        "sha": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+        "html_url": "https://github.com/dagucloud/dagu/commit/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+        "committed_at": "2026-10-04T03:12:18Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/dagucloud/dagu",
-      "release_relationship": "newer_stable_release_review_pending"
+      "release_relationship": "selected_version_matches_latest_stable",
+      "currency_reconciliation": {
+        "recorded_date_utc": "2026-10-05",
+        "selected_source_url": "https://github.com/dagucloud/dagu/tree/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+        "qualification": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Selection reconciled after destination qualification; existing checks and release metadata retain their original observation dates.",
+        "previous_selected_pin_source": {
+          "ref": "v2.16.6",
+          "sha": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+          "html_url": "https://github.com/dagucloud/dagu/commit/58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+          "committed_at": "2026-09-14T14:09:43Z"
+        },
+        "original_latest_stable_release": {
+          "tag_name": "v2.17.0",
+          "published_at": "2026-09-21T13:31:48Z",
+          "html_url": "https://github.com/dagucloud/dagu/releases/tag/v2.17.0",
+          "target_commitish": "main",
+          "prerelease": false,
+          "draft": false
+        },
+        "original_release_relationship": "newer_stable_release_review_pending",
+        "observed_date_utc": "2026-10-05"
+      }
     },
     {
       "component_id": "lean",
@@ -3174,8 +3240,8 @@
       "component_id": "syft",
       "repository": "https://github.com/anchore/syft",
       "selected_repository_url": "https://github.com/anchore/syft",
-      "selected_version": "1.52.0",
-      "selected_source_pin": "02ba369d13b4248395b20a504eca94b0cab564d8",
+      "selected_version": "1.54.0",
+      "selected_source_pin": "cc326e45a6213360266dda4b30cc68095946d676",
       "checks": [
         {
           "endpoint": "repos/anchore/syft",
@@ -3217,31 +3283,53 @@
       "pushed_at": "2026-09-18T13:30:43Z",
       "license_spdx": "Apache-2.0",
       "latest_stable_release": {
-        "tag_name": "v1.52.0",
-        "published_at": "2026-09-17T14:38:17Z",
-        "html_url": "https://github.com/anchore/syft/releases/tag/v1.52.0",
+        "tag": "v1.54.0",
+        "published_at": "2026-10-01T20:54:29Z",
+        "html_url": "https://github.com/anchore/syft/releases/tag/v1.54.0",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "02ba369d13b4248395b20a504eca94b0cab564d8",
-        "sha": "02ba369d13b4248395b20a504eca94b0cab564d8",
-        "html_url": "https://github.com/anchore/syft/commit/02ba369d13b4248395b20a504eca94b0cab564d8",
-        "committed_at": "2026-09-17T14:09:46Z"
+        "ref": "cc326e45a6213360266dda4b30cc68095946d676",
+        "sha": "cc326e45a6213360266dda4b30cc68095946d676",
+        "html_url": "https://github.com/anchore/syft/commit/cc326e45a6213360266dda4b30cc68095946d676",
+        "committed_at": "2026-10-01T19:00:50Z"
       },
       "latest_release_source": {
-        "ref": "v1.52.0",
-        "sha": "02ba369d13b4248395b20a504eca94b0cab564d8",
-        "html_url": "https://github.com/anchore/syft/commit/02ba369d13b4248395b20a504eca94b0cab564d8",
-        "committed_at": "2026-09-17T14:09:46Z"
+        "ref": "v1.54.0",
+        "sha": "cc326e45a6213360266dda4b30cc68095946d676",
+        "html_url": "https://github.com/anchore/syft/commit/cc326e45a6213360266dda4b30cc68095946d676",
+        "committed_at": "2026-10-01T19:00:50Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/anchore/syft",
       "release_relationship": "selected_version_matches_latest_stable",
-      "selected_pin_matches_latest_release_commit": true
+      "selected_pin_matches_latest_release_commit": true,
+      "currency_reconciliation": {
+        "recorded_date_utc": "2026-10-05",
+        "selected_source_url": "https://github.com/anchore/syft/tree/cc326e45a6213360266dda4b30cc68095946d676",
+        "qualification": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Selection reconciled after destination qualification; existing checks and release metadata retain their original observation dates.",
+        "previous_selected_pin_source": {
+          "ref": "02ba369d13b4248395b20a504eca94b0cab564d8",
+          "sha": "02ba369d13b4248395b20a504eca94b0cab564d8",
+          "html_url": "https://github.com/anchore/syft/commit/02ba369d13b4248395b20a504eca94b0cab564d8",
+          "committed_at": "2026-09-17T14:09:46Z"
+        },
+        "original_latest_stable_release": {
+          "tag_name": "v1.52.0",
+          "published_at": "2026-09-17T14:38:17Z",
+          "html_url": "https://github.com/anchore/syft/releases/tag/v1.52.0",
+          "target_commitish": "main",
+          "prerelease": false,
+          "draft": false
+        },
+        "original_release_relationship": "selected_version_matches_latest_stable",
+        "observed_date_utc": "2026-10-05"
+      }
     },
     {
       "component_id": "alpaca-py",
@@ -3996,8 +4084,8 @@
       "component_id": "jcodemunch-mcp",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
       "selected_repository_url": "https://github.com/jgravelle/jcodemunch-mcp",
-      "selected_version": "1.108.319",
-      "selected_source_pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "selected_version": "1.108.327",
+      "selected_source_pin": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
       "checks": [
         {
           "endpoint": "repos/jgravelle/jcodemunch-mcp",
@@ -4039,31 +4127,53 @@
       "pushed_at": "2026-09-21T20:58:37Z",
       "license_spdx": "NOASSERTION",
       "latest_stable_release": {
-        "tag_name": "v1.108.319",
-        "published_at": "2026-09-16T14:04:32Z",
-        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+        "tag": "v1.108.328",
+        "published_at": "2026-10-04T14:25:17Z",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.328",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "sha": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "committed_at": "2026-09-16T11:26:45Z"
+        "ref": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+        "sha": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+        "committed_at": "2026-10-02T18:09:09Z"
       },
       "latest_release_source": {
-        "ref": "v1.108.319",
-        "sha": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "committed_at": "2026-09-16T11:26:45Z"
+        "ref": "v1.108.328",
+        "sha": "b647cf599b4396dfd10829ea3c3225ffcbbed044",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/b647cf599b4396dfd10829ea3c3225ffcbbed044",
+        "committed_at": "2026-10-04T14:11:30Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/jgravelle/jcodemunch-mcp",
-      "release_relationship": "selected_version_matches_latest_stable",
-      "selected_pin_matches_latest_release_commit": true
+      "release_relationship": "newer_stable_release_review_pending",
+      "selected_pin_matches_latest_release_commit": true,
+      "currency_reconciliation": {
+        "recorded_date_utc": "2026-10-05",
+        "selected_source_url": "https://github.com/jgravelle/jcodemunch-mcp/tree/6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
+        "qualification": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Selection reconciled after destination qualification; existing checks and release metadata retain their original observation dates.",
+        "previous_selected_pin_source": {
+          "ref": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+          "sha": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+          "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+          "committed_at": "2026-09-16T11:26:45Z"
+        },
+        "original_latest_stable_release": {
+          "tag_name": "v1.108.319",
+          "published_at": "2026-09-16T14:04:32Z",
+          "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+          "target_commitish": "main",
+          "prerelease": false,
+          "draft": false
+        },
+        "original_release_relationship": "selected_version_matches_latest_stable",
+        "observed_date_utc": "2026-10-05"
+      }
     },
     {
       "component_id": "nextjs",

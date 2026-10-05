@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "kind": "qualification_input_bytes",
+  "observed_date_utc": "2026-10-05",
+  "scope": "Final reviewed source and recipe bytes for this branch. The final PR commit binds these bytes; native collector base catalog_revision alone did not capture uncommitted changes. This manifest is provenance, not execution acceptance.",
+  "files": [
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "bytes": 316551,
+      "sha256": "05640ef28b6ef8935bb969e81580137aaf12376d80d34beed93059b42154a27e"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
+      "bytes": 33311,
+      "sha256": "052a706885e2dfb261e8a4de580cf2d9f03cec2026f363446a8f04f6f71882ac"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "bytes": 102199,
+      "sha256": "97f54324a6159503f291dc2ccbdd0bf29e8c5807cb99d1f2cba8ec8a4e2ff6bd"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+      "bytes": 127844,
+      "sha256": "bdc459e836283c6dff5845060efa18578c4fdbec3ff603bcc7ea7c8b0b4a1a07"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "bytes": 147613,
+      "sha256": "cc69999fc3217c9079570ee781625e3c23bcc0845150dba7a385229d23a366ac"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/srt-client-accept.sh",
+      "bytes": 6376,
+      "sha256": "524ac314254d684ae5ee464a70d6da826a28cf06ffc7d265a8b50423a6ce6eea"
+    },
+    {
+      "path": "adoption/new-wsl-profile.json",
+      "bytes": 258074,
+      "sha256": "1c1c84be9e1591dfb3fa6273ea799c5bb8e11d387e0a237e06ab0d747272e22e"
+    },
+    {
+      "path": "adoption/new-wsl/client-config-map.json",
+      "bytes": 46809,
+      "sha256": "a35717837534636378074314d1c4568687222ffbdec1f6555cf21b66487fcfd3"
+    },
+    {
+      "path": "scripts/native_token_ci.py",
+      "bytes": 117733,
+      "sha256": "95d45da579b1035c4cfa54f330f1ab179b949bbdb49555dd82c5163d2367300a"
+    }
+  ]
+}

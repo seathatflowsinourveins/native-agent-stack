@@ -452,10 +452,10 @@ output-compression() {
 }
 
 code-index() {
-  # jcodemunch-mcp 1.108.319 | uv-tool | planned
+  # jcodemunch-mcp 1.108.327 | uv-tool | planned
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04 (the owner's decision, amendment 4), after every recorded run of this plan.
-  # Planned. Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91 (uv tool install jcodemunch-mcp); https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/recipes/README.md#L523 (the pin, --python 3.13 and the ecosystem root)
-  run_command 'UV_TOOL_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools" UV_TOOL_BIN_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin" uv tool install --python 3.13 jcodemunch-mcp==1.108.319' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/v1.108.327/README.md#L91 (uv tool install jcodemunch-mcp); docs/decisions/2026-10-05-ns2604-currency-wave.md (eligible pin and integrity); https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/recipes/README.md#L523 (--python 3.13 and the ecosystem root)
+  run_command 'UV_TOOL_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools" UV_TOOL_BIN_DIR="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin" uv tool install --python 3.13 jcodemunch-mcp==1.108.327' || return "$?"
 }
 
 code-graph() {
@@ -692,8 +692,8 @@ actionlint-kjanat() {
 
 dagu() {
   # Dagu | native-installer | planned
-  # Planned. Source: https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/README.md#L105
-  run_command 'curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/scripts/installer.sh | bash -s -- --version v2.18.1 --no-prompt --service yes --service-scope user --host 127.0.0.1 --port 21080 --open-browser no' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/README.md#L105
+  run_command 'curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh | bash -s -- --version v2.18.2 --no-prompt --service yes --service-scope user --host 127.0.0.1 --port 21080 --open-browser no' || return "$?"
 }
 
 docker-compose() {
@@ -767,8 +767,8 @@ difftastic() {
 
 mise() {
   # mise | native-installer | planned
-  # Planned. Source: https://raw.githubusercontent.com/jdx/mise/v2026.10.0/docs/installing-mise.md#L82
-  run_command 'curl -fsSL https://mise.run | MISE_VERSION=v2026.10.0 sh' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/jdx/mise/v2026.10.1/docs/installing-mise.md#L82
+  run_command 'curl -fsSL https://mise.run | MISE_VERSION=v2026.10.1 sh' || return "$?"
 }
 
 restic() {
@@ -889,7 +889,7 @@ if $list; then
   printf '%s\n' 'statusline | claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line | none | planned'
   printf '%s\n' 'command-output | RTK 0.51.0 | release-binary | planned'
   printf '%s\n' 'output-compression | Headroom 0.37.0 (headroom-ai[mcp], MCP server only) | uv-tool | planned'
-  printf '%s\n' 'code-index | jcodemunch-mcp 1.108.319 | uv-tool | planned'
+  printf '%s\n' 'code-index | jcodemunch-mcp 1.108.327 | uv-tool | planned'
   printf '%s\n' 'code-graph | codebase-memory-mcp 0.11.0 | release-binary | planned'
   printf '%s\n' 'repo-packing | Repomix 1.18.1 | none | planned'
   printf '%s\n' 'structured-data | TOON 4.1.1 (@toon-format/cli) | none | planned'

@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-currency-20261005--sandbox-runtime--install--20261005-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "ns2604-currency-20261005",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "recorded_by": {
+    "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+  },
+  "component_id": "sandbox-runtime",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only sandbox-runtime-srt </dev/null",
+      "exit": 0,
+      "duration_s": 5.111,
+      "output_sha256": "495639f5a5755420c2763c7b9b4e6c7f226fb32df77ba903152bcd4c793b11bd",
+      "output_excerpt": "Hit:1 http://security.ubuntu.com/ubuntu resolute-security InRelease\nHit:2 https://download.docker.com/linux/ubuntu resolute InRelease\nHit:3 http://archive.ubuntu.com/ubuntu resolute InRelease\nHit:4 http://archive.ubuntu.com/ubuntu resolute-updates InRelease\nHit:5 http://archive.ubuntu.com/ubuntu resolute-backports InRelease\nReading package lists...\nReading package lists...\nBuilding dependency tree"
+    }
+  ],
+  "tool_versions": {
+    "sandbox-runtime": "0.0.78"
+  },
+  "observed_at_utc": "2026-10-05T04:33:32Z",
+  "result": "pass",
+  "claim": "Reapplied the SRT 0.0.78 destination installer to deploy the bounded native-client probe and preserve failed event streams.",
+  "limitations": [
+    "Installer execution is separate from native-client behavior and fixture acceptance; the first installation receipt is retained."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-05T04:33:32Z",
+      "reviewer": {
+        "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+      }
+    }
+  ],
+  "supersedes": "ns2604-currency-20261005--sandbox-runtime--install--20261005"
+}

@@ -2647,7 +2647,7 @@
     {
       "component_id": "dagu",
       "repository": "https://github.com/dagucloud/dagu",
-      "version": "2.16.6",
+      "version": "2.18.2",
       "profile": "supporting",
       "role": "Manual native research workflows and private local run history",
       "installation_assessment": "runtime present at retained native operation date",
@@ -2729,6 +2729,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "ns2604-currency-qualification-20261005",
+            "path": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -2749,7 +2754,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "v2.16.6",
+      "source_pin": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
@@ -2812,6 +2817,11 @@
         "retained_artifact_comparisons": 0,
         "matched_lifetime_provider_baseline": "not_established",
         "regression_policy": "Keep the cheaper adequate native path when a candidate expands tokens or fails required information/quality checks."
+      },
+      "currency_reconciliation": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Destination installation and selected native use only; earlier lifecycle stages are historical, and this aggregation does not recertify the host."
       }
     },
     {
@@ -4124,7 +4134,7 @@
     {
       "component_id": "jcodemunch-mcp",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
-      "version": "1.108.319",
+      "version": "1.108.327",
       "profile": "supporting",
       "role": "Explicitly scoped code index and exact symbol retrieval through a six-tool MCP surface",
       "installation_assessment": "Clean isolated upstream uv installation and native uninstall passed on the existing Linux/WSL host; the working installation was preserved.",
@@ -4206,6 +4216,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "ns2604-currency-qualification-20261005",
+            "path": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "new_native_client_scope": "One bounded task in each native client passed project-file Context Mode reading and exact jCodeMunch symbol retrieval; six MCP calls, no failures. Consumption is separate from savings.",
@@ -4265,7 +4280,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "source_pin": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d",
       "lifecycle_stages": {
         "install": {
           "status": "accepted_within_scope",
@@ -4314,6 +4329,11 @@
         "retained_artifact_comparisons": 4,
         "matched_lifetime_provider_baseline": "not_established",
         "regression_policy": "Keep the cheaper adequate native path when a candidate expands tokens or fails required information/quality checks."
+      },
+      "currency_reconciliation": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Destination installation and selected native use only; earlier lifecycle stages are historical, and this aggregation does not recertify the host."
       }
     },
     {
@@ -7579,7 +7599,7 @@
     {
       "component_id": "sandbox-runtime",
       "repository": "https://github.com/anthropics/sandbox-runtime",
-      "version": "0.0.77",
+      "version": "0.0.78",
       "profile": "supporting",
       "role": "On-demand OS isolation for selected native commands",
       "installation_assessment": "runtime present at retained native operation date",
@@ -7619,6 +7639,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "ns2604-currency-qualification-20261005",
+            "path": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -7640,7 +7665,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "6fa731368807419ee157f9a3fac955fefe1019c6",
+      "source_pin": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
@@ -7687,6 +7712,11 @@
         "retained_artifact_comparisons": 0,
         "matched_lifetime_provider_baseline": "not_established",
         "regression_policy": "Keep the cheaper adequate native path when a candidate expands tokens or fails required information/quality checks."
+      },
+      "currency_reconciliation": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Destination install and native Claude shell policy controls only; previous lifecycle evidence remains dated. Interactive resize, Windows and Codex route unqualified."
       }
     },
     {
@@ -8429,7 +8459,7 @@
     {
       "component_id": "syft",
       "repository": "https://github.com/anchore/syft",
-      "version": "1.52.0",
+      "version": "1.54.0",
       "profile": "supporting",
       "role": "Scoped native SDK dependency inventory; no vulnerability verdict",
       "installation_assessment": "runtime present at retained native operation date",
@@ -8465,6 +8495,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "ns2604-currency-qualification-20261005",
+            "path": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -8495,7 +8530,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "02ba369d13b4248395b20a504eca94b0cab564d8",
+      "source_pin": "cc326e45a6213360266dda4b30cc68095946d676",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
@@ -8543,6 +8578,11 @@
         "retained_artifact_comparisons": 1,
         "matched_lifetime_provider_baseline": "not_established",
         "regression_policy": "Keep the cheaper adequate native path when a candidate expands tokens or fails required information/quality checks."
+      },
+      "currency_reconciliation": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Destination installation and selected native use only; earlier lifecycle stages are historical, and this aggregation does not recertify the host."
       }
     },
     {
@@ -8975,7 +9015,7 @@
     {
       "component_id": "worktrunk",
       "repository": "https://github.com/max-sixty/worktrunk",
-      "version": "0.79.0",
+      "version": "0.80.0",
       "profile": "optional",
       "role": "Native Git worktree convenience CLI",
       "installation_assessment": "runtime present at retained native operation date",
@@ -9030,6 +9070,11 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "ns2604-currency-qualification-20261005",
+            "path": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+            "kind": "native_cli_e2e"
           }
         ],
         "retained_operation_ids": [
@@ -9053,7 +9098,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "5ba6f148e8505c20794f2d8bc706aa4f26335c95",
+      "source_pin": "b49ca7eea9b03145791a5b94eccaf9c59412ed37",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
@@ -9103,6 +9148,11 @@
         "retained_artifact_comparisons": 0,
         "matched_lifetime_provider_baseline": "not_established",
         "regression_policy": "Keep the cheaper adequate native path when a candidate expands tokens or fails required information/quality checks."
+      },
+      "currency_reconciliation": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Destination installation and selected native use only; earlier lifecycle stages are historical, and this aggregation does not recertify the host."
       }
     },
     {

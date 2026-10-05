@@ -199,7 +199,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "53b5dc9c43c6e40d5e9bb62c8cf9967ba61388ab1b9b2c13f77d3eaafe38b892"
+          "sha256": "d2b0caa8e229d2b269d411088df923404acc8eab8bf19f4aba41bd62598218ee"
         },
         "convergence": {
           "file": "convergence.json",
@@ -2432,7 +2432,7 @@
             "catalog": "foundation",
             "claude": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
             "coincides_with_lane_record": null,
-            "default": "jcodemunch-mcp 1.108.319",
+            "default": "jcodemunch-mcp 1.108.327",
             "definitive": false,
             "gpt": "not judged: an owner decision of 2026-10-04 (wave 3); no family review is on record yet",
             "installs_nothing_extra": false,
@@ -2444,15 +2444,15 @@
             "resolution": {
               "batch": "wave3",
               "by": "the owner's decision of 2026-10-04",
-              "install": "the install plan's code-index function: uv tool install --python 3.13 jcodemunch-mcp==1.108.319 with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
+              "install": "the install plan's code-index function: uv tool install --python 3.13 jcodemunch-mcp==1.108.327 with UV_TOOL_DIR ${ECO_ROOT}/python-tools and UV_TOOL_BIN_DIR ${ECO_ROOT}/bin",
               "open_acceptance_gates": [
                 "${ECO_ROOT}/bin/jcodemunch-mcp runs from the uv tool",
-                "a project-scoped registration indexes a selected folder, and order search_symbols then get_symbol_source returns the requested definition"
+                "the current user-scoped registration indexes only a selected folder, and order search_symbols then get_symbol_source returns the requested definition; this client gate remains open for the327 currency wave"
               ],
               "outcome": "added_by_owner_decision",
               "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without jcodemunch-mcp against the full stack and the lean base), or the fresh-session invocation census, reports that it adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
-              "pin": "PyPI jcodemunch-mcp==1.108.319, source 8f7b34abe16fb459e0bf1c04747d584216dfe32e (manifests/stack.json); the Linux pins file records no artifact digest for it, so uv's index hashes are the only artifact check",
-              "reason": "the owner's order installs the token-efficiency repositories by default; jcodemunch-mcp is a core row of docs/token-efficiency-stack.json (explicitly scoped code index and exact symbol retrieval)",
+              "pin": "PyPI jcodemunch-mcp==1.108.327, source6d5ae86c130f96624e2ca2d797fa3b853c210b9d; published wheel/sdist digests match downloaded bytes. Current qualification: evidence/receipts/ns2604-currency-qualification-20261005.json; source: docs/decisions/2026-10-05-ns2604-currency-wave.md and https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327.",
+              "reason": "the owner's order installs the token-efficiency repositories by default; jcodemunch-mcp is a core row of docs/token-efficiency-stack.json (explicitly scoped code index and exact symbol retrieval); the 2026-10-05 currency brief retains this owner and qualifies package1.108.327, with the initial1.108.319/source8f7b34abe16fb459e0bf1c04747d584216dfe32e selection retained as history",
               "sources": [
                 "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
                 "docs/token-efficiency-stack.json (rows[component_id=jcodemunch-mcp].upstream_commands)",
@@ -2460,7 +2460,7 @@
                 "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319"
               ],
               "usage_rules": [
-                "registered per project, never at user scope (docs/token-session-handbook.md:108)",
+                "Registered at user scope for Claude Code and Codex on the direct2026-10-04 instruction; docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md supersedes the earlier project-only rule. JCODEMUNCH_SHARE_SAVINGS=0; init is not run.",
                 "index only the selected code; sharing, AI summaries, watchers, cross-repository defaults and external context providers off (manifests/stack.json, jcodemunch-mcp command_scope)"
               ]
             },
@@ -2843,7 +2843,7 @@
         "c5b338e36ff85e30",
         "d84254df4394d981",
         "241665cdd8a01f24",
-        "857277b3c0a29324",
+        "4870207283d44346",
         "249bdf3269fe042a",
         "23a366ec99f1a56c",
         "0e3bccb32f167d87",
@@ -7532,7 +7532,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "8be6b5bb2981843c3beca082169211fb0bd7071abf0e5abccdc9f31632152841"
+      "sha256": "1c1c84be9e1591dfb3fa6273ea799c5bb8e11d387e0a237e06ab0d747272e22e"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -7540,7 +7540,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "0cd26fdab18ab685ea2fb0f5d996416befbade4e3bcefb0fcb0c5b2f904cc2bc"
+      "sha256": "287fc3304fd739f9e73d50d2c529ea4566ef23eabad0e38741c96f497f16edd0"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -7652,7 +7652,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "9982349afc6b914a5fc5a6a085f3b343f49a9d3bb863bf5d949c1deb3b32752e"
+      "sha256": "5081cdaa23938e4fecf6cc02fd258147f3b2ffabdaf7ed8a2f4ef6c17c92dd3f"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -7676,7 +7676,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "53b5dc9c43c6e40d5e9bb62c8cf9967ba61388ab1b9b2c13f77d3eaafe38b892"
+      "sha256": "d2b0caa8e229d2b269d411088df923404acc8eab8bf19f4aba41bd62598218ee"
     }
   ],
   "stage_order": [
@@ -8271,7 +8271,8 @@
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md",
         "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+        "evidence/receipts/ns2604-currency-qualification-20261005.json"
       ],
       "install": {
         "command": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/max-sixty/worktrunk/releases/download/v0.80.0/worktrunk-installer.sh | sh && wt config shell install",
@@ -8347,7 +8348,8 @@
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md",
         "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md",
-        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g8-base-gateway.md"
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g8-base-gateway.md",
+        "evidence/receipts/ns2604-currency-qualification-20261005.json"
       ],
       "install": {
         "command": "npm install -g @anthropic-ai/sandbox-runtime@0.0.78",
@@ -10190,7 +10192,8 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md",
-        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md"
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md",
+        "evidence/receipts/ns2604-currency-qualification-20261005.json"
       ],
       "install": {
         "command": "mise use -g syft@1.54.0",
@@ -10419,7 +10422,7 @@
       "acceptance": {
         "command": "make test",
         "evidence_class": "upstream_test_command_not_executed",
-        "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md"
+        "source": "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md"
       },
       "aliases": [
         "Dagu"
@@ -10428,8 +10431,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.16.6",
-        "value": "06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717"
+        "source": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.18.2",
+        "value": "5a84c093b9ba9d02b7a60e106bb91d46f9383fd01c62bd51560e41193f05792b"
       },
       "documented_install": [
         {
@@ -10442,19 +10445,19 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/scheduling-supervision.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
-        "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md"
+        "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md",
+        "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md",
+        "evidence/receipts/ns2604-currency-qualification-20261005.json"
       ],
       "install": {
-        "command": "npm install -g --ignore-scripts=false @dagucloud/dagu@2.16.6",
-        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
-        "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md"
+        "command": "curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh | bash -s -- --version v2.18.2",
+        "scope": "Native pinned installer from the current install plan; destination execution is recorded separately.",
+        "source": "https://github.com/dagucloud/dagu/blob/v2.18.2/README.md#L105"
       },
       "name": "Dagu",
       "owner_layer_id": "scheduling-supervision",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "2.16.6",
+      "pin": "2.18.2",
       "position": 6,
       "provisioning_status": "unprovisioned_optional_service",
       "repository": "https://github.com/dagucloud/dagu",
@@ -11106,11 +11109,11 @@
         "evidence_class": "upstream_test_command_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Run from the v2026.9.18 source checkout after its documented development setup: suitable Rust, a working mise meeting min_version, git/host dependencies, mise install and mise run build.",
+          "Run from the v2026.10.1 source checkout after its documented development setup: suitable Rust, a working mise meeting min_version, git/host dependencies, mise install and mise run build.",
           "The E2E selector is the documented basename regex ^test_use$; it does not select the full suite."
         ],
         "scope": "Documented unit suite plus one selected upstream E2E case, both UNRUN. No host installation, lifecycle or new-host acceptance.",
-        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/contributing.md",
+        "source": "https://github.com/jdx/mise/blob/v2026.10.1/docs/contributing.md",
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "aliases": [
@@ -11120,8 +11123,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://api.github.com/repos/jdx/mise/releases/tags/v2026.9.18",
-        "value": "4312f8fd72a8d6a869cd2aca7444929e2a0ef6f45d2c6f2866a1eacc5bdc2e84"
+        "source": "https://api.github.com/repos/jdx/mise/releases/tags/v2026.10.1",
+        "value": "9b92aa39b8fde54b28c8f974a68f2501925a1523d6c05a52719145df3acdd75a"
       },
       "documented_install": [
         {
@@ -11134,23 +11137,24 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/recovery-portability.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
-        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+        "https://github.com/jdx/mise/blob/v2026.10.1/docs/installing-mise.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json",
+        "evidence/receipts/ns2604-currency-qualification-20261005.json"
       ],
       "install": {
-        "command": "curl -fsSL https://mise.run | MISE_VERSION=v2026.9.18 sh",
+        "command": "curl -fsSL https://mise.run | MISE_VERSION=v2026.10.1 sh",
         "execution_status": "UNRUN",
         "prerequisites": [
           "curl, sh and a chosen owned installation target; no installer was executed.",
           "The selected installer source's resolve_release function removes the leading v from MISE_VERSION at line 300. The live mise.run endpoint is the guide's installer route, not an independently frozen installer-byte artifact."
         ],
-        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
+        "source": "https://github.com/jdx/mise/blob/v2026.10.1/docs/installing-mise.md",
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "name": "mise",
       "owner_layer_id": "recovery-portability",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "2026.9.18",
+      "pin": "2026.10.1",
       "position": 1,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/jdx/mise",
@@ -11765,21 +11769,17 @@
           "A project-scoped registration and an index of the selected code."
         ],
         "scope": "Upstream's confirmation after a search_symbols and get_symbol_source answer, in a project that registered the server; its counter is an upstream estimate in its own scope, not a provider saving.",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L141"
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L141"
       },
       "aliases": [
         "jcodemunch-mcp"
       ],
-      "blocking_gaps": [
-        "No artifact digest is recorded for this pin: the checksum is the source commit (manifests/stack.json), and uv's index hashes are the only artifact check.",
-        "checksum: real SHA-256 and its source pending in W-PROF",
-        "checksum: source identity does not verify an install artifact or lockfile"
-      ],
+      "blocking_gaps": [],
       "checksum": {
-        "algorithm": "git-sha1",
-        "kind": "source",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
-        "value": "8f7b34abe16fb459e0bf1c04747d584216dfe32e"
+        "algorithm": "sha256",
+        "kind": "artifact",
+        "source": "https://pypi.org/pypi/jcodemunch-mcp/1.108.327/json",
+        "value": "9e2f639456e740a9497f4f238d095c9b995d54074edf01d9c61cf3517afcf88a"
       },
       "documented_install": [],
       "evidence_refs": [
@@ -11787,21 +11787,23 @@
         "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
         "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
         "docs/token-efficiency-stack.json",
-        "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91"
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91",
+        "evidence/receipts/ns2604-currency-qualification-20261005.json"
       ],
       "install": {
-        "command": "uv tool install jcodemunch-mcp==1.108.319",
+        "command": "uv tool install jcodemunch-mcp==1.108.327",
         "execution_status": "UNRUN",
         "prerequisites": [
           "uv with CPython 3.13."
         ],
         "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. Registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md); jcodemunch-mcp init, which writes a prompt policy and hooks, is not run.",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91"
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91"
       },
       "name": "jcodemunch-mcp",
       "owner_layer_id": "token-efficiency",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "1.108.319",
+      "package_id": "pypi:jcodemunch-mcp",
+      "pin": "1.108.327",
       "position": 17,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
@@ -11814,7 +11816,7 @@
       ],
       "stage": "native-extensions",
       "status": "picked",
-      "tool_id": "857277b3c0a29324",
+      "tool_id": "4870207283d44346",
       "used_by": [
         "token-efficiency"
       ]

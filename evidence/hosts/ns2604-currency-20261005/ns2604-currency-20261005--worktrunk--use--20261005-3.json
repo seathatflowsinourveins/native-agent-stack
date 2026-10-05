@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-currency-20261005--worktrunk--use--20261005-3",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "ns2604-currency-20261005",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "recorded_by": {
+    "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+  },
+  "component_id": "worktrunk",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only worktrunk --stage after_sign_in </dev/null",
+      "exit": 0,
+      "duration_s": 128.833,
+      "output_sha256": "b1fce541da0c6598f5f63d661dbe92f6eef28435cca69e35eac389e418be7503",
+      "output_excerpt": "worktrunk | after_sign_in | 0\nComplete native event streams retained in ~/.local/state/new-wsl-native-stack/acceptance/worktrunk/run.5TjbSw\n"
+    }
+  ],
+  "tool_versions": {
+    "worktrunk": "0.80.0"
+  },
+  "observed_at_utc": "2026-10-05T04:34:07Z",
+  "result": "pass",
+  "claim": "Worktrunk native client acceptance with corrected CLI prompt boundaries and a bounded twelve-turn Claude probe.",
+  "limitations": [
+    "Earlier prompt parsing and turn-limit failures remain; this is disposable upstream-example native client integration, not the unchanged Rust suite or a recovery benchmark."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-05T04:34:07Z",
+      "reviewer": {
+        "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "git-github-automation"
+    }
+  ],
+  "supersedes": "ns2604-currency-20261005--worktrunk--use--20261005-2"
+}

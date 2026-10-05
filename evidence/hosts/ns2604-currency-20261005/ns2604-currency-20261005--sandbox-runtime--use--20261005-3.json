@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-currency-20261005--sandbox-runtime--use--20261005-3",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "ns2604-currency-20261005",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "recorded_by": {
+    "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+  },
+  "component_id": "sandbox-runtime",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" SRT_ACCEPT_FIXTURE_ROOT=\"$HOME/.cache/ns2604-currency/srt-fixture\" SRT_ACCEPT_POLICY=\"$HOME/.cache/ns2604-currency/srt-fixture/policy.json\" SRT_ACCEPT_DENY_READ=\"$HOME/.cache/ns2604-currency/srt-fixture/deny-read-control.txt\" SRT_ACCEPT_DENY_WRITE=\"$HOME/.cache/ns2604-currency/srt-fixture/deny-write-control.txt\" SRT_ACCEPT_ALLOWED_DIR=\"$HOME/.cache/ns2604-currency/srt-fixture/allowed\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only sandbox-runtime-srt --stage after_sign_in </dev/null",
+      "exit": 0,
+      "duration_s": 635.231,
+      "output_sha256": "865f79713e4bd3b4836acca759636353703033ebfbe9ca8c3ef0be297b533652",
+      "output_excerpt": "sandbox-runtime-srt | after_sign_in | 0\nsrt | fresh-claude-shell=passed | policy-controls=passed\n"
+    }
+  ],
+  "tool_versions": {
+    "sandbox-runtime": "0.0.78"
+  },
+  "observed_at_utc": "2026-10-05T04:33:37Z",
+  "result": "pass",
+  "claim": "SRT 0.0.78 fresh Claude-native deny/allow controls with a bounded twelve-turn probe and failed-stream retention.",
+  "limitations": [
+    "Earlier missing-fixture and native-client failures remain. Policy/files are synthetic and private; interactive resize and native Windows behavior are not qualified."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-05T04:33:37Z",
+      "reviewer": {
+        "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "isolation"
+    }
+  ],
+  "supersedes": "ns2604-currency-20261005--sandbox-runtime--use--20261005-2"
+}

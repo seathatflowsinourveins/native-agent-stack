@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-currency-20261005--jcodemunch-mcp--use--20261005-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "ns2604-currency-20261005",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "recorded_by": {
+    "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+  },
+  "component_id": "jcodemunch-mcp",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only code-index --stage post_install </dev/null",
+      "exit": 0,
+      "duration_s": 0.721,
+      "output_sha256": "18b3f68555e520ffb5a1248814d595b169c70aed780b5e57610e83bc14e7953a",
+      "output_excerpt": "code-index | post_install | 0\n"
+    },
+    {
+      "cmd": "cd \"$HOME/.cache/ns2604-currency/jcodemunch-source\" && git rev-parse HEAD && git rev-parse --is-shallow-repository && rtk env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" uv run python -m harness full --summary \"$HOME/.cache/ns2604-currency/logs/jcodemunch-harness-summary-2.md\" --failures \"$HOME/.cache/ns2604-currency/logs/jcodemunch-harness-failures-2.txt\" --annotate </dev/null",
+      "exit": 0,
+      "duration_s": 151.551,
+      "output_sha256": "8a4e652b95c959be993099d34ca964582a601642437a900bf8a158507db99e8e",
+      "output_excerpt": "6d5ae86c130f96624e2ca2d797fa3b853c210b9d\nfalse\n== warm tokenizer asset cl100k_base: ok 0.2s\n== full tier: tests/ with --cov-fail-under=74\n   14210 passed, 28 skipped, 259 warnings in 149.40s (0:02:29)\ncoverage.min                             crit N2  floor >= 74           observed 83           PASS\nci.skips_ubuntu                          crit N7  floor <= 30           observed 28           PASS\ns"
+    }
+  ],
+  "tool_versions": {
+    "jcodemunch-mcp": "1.108.327"
+  },
+  "observed_at_utc": "2026-10-05T04:27:34Z",
+  "result": "pass",
+  "claim": "jCodeMunch unchanged upstream full tier after supplying its required full-history checkout; the first failed attempt remains retained.",
+  "limitations": [
+    "The original full run had a ledger failure and watcher teardown error; the ledger and watcher cases subsequently passed individually after the supported history fetch. This run is unchanged upstream test code, separate from installed MCP-client behavior. Original full traceback was not retained by the truncated collector; original counts, exit and upstream summary remain."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-05T04:27:34Z",
+      "reviewer": {
+        "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+      }
+    }
+  ],
+  "supersedes": "ns2604-currency-20261005--jcodemunch-mcp--use--20261005"
+}

@@ -1,0 +1,454 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-currency-qualification-20261005",
+  "kind": "native_cli_e2e",
+  "recorded_date_utc": "2026-10-05",
+  "component_ids": [
+    "jcodemunch-mcp",
+    "dagu",
+    "sandbox-runtime",
+    "worktrunk",
+    "syft"
+  ],
+  "plan_prerequisites": [
+    "mise"
+  ],
+  "claim": "Five canonical stack owners and one plan prerequisite have destination installation and selected native use qualification on NativeStack2604. Scope and evidence classes are per owner; no whole-stack or full-lifecycle recertification.",
+  "base_public_commit": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "recipe_provenance": "Native receipt catalog_revision identifies the base checkout, not its uncommitted recipe edits. input-files.json binds the final reviewed recipe/source bytes; earlier failing recipe revisions are preserved by this branch diff and native failure receipts.",
+  "inputs_ref": "evidence/artifacts/ns2604-currency-20261005/input-files.json",
+  "integrity_ref": "evidence/artifacts/ns2604-currency-20261005/artifact-integrity.json",
+  "upstream_harness_original_output": "evidence/artifacts/ns2604-currency-20261005/jcodemunch-upstream-harness-output.md",
+  "operations": [
+    {
+      "component_id": "jcodemunch-mcp",
+      "selected_version": "1.108.327",
+      "result": "accepted_within_scope",
+      "scope": "Installed console-script identity plus unchanged pinned full upstream harness: 14210 passed,28 skipped,83 percent coverage. No new client MCP retrieval/counter acceptance.",
+      "evidence_classes": [
+        "native_install",
+        "unchanged_upstream_harness"
+      ],
+      "observations": [
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--jcodemunch-mcp--install--20261005.json",
+          "id": "ns2604-currency-20261005--jcodemunch-mcp--install--20261005",
+          "stage": "install",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:16:56Z",
+          "native_command_exits": [
+            0
+          ],
+          "output_sha256": [
+            "495639f5a5755420c2763c7b9b4e6c7f226fb32df77ba903152bcd4c793b11bd"
+          ]
+        },
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--jcodemunch-mcp--use--20261005-2.json",
+          "id": "ns2604-currency-20261005--jcodemunch-mcp--use--20261005-2",
+          "stage": "use",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:27:34Z",
+          "native_command_exits": [
+            0,
+            0
+          ],
+          "output_sha256": [
+            "18b3f68555e520ffb5a1248814d595b169c70aed780b5e57610e83bc14e7953a",
+            "8a4e652b95c959be993099d34ca964582a601642437a900bf8a158507db99e8e"
+          ]
+        },
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--jcodemunch-mcp--use--20261005.json",
+          "id": "ns2604-currency-20261005--jcodemunch-mcp--use--20261005",
+          "stage": "use",
+          "result": "fail",
+          "observed_at_utc": "2026-10-05T04:17:29Z",
+          "native_command_exits": [
+            0,
+            0,
+            0,
+            0,
+            1
+          ],
+          "output_sha256": [
+            "18b3f68555e520ffb5a1248814d595b169c70aed780b5e57610e83bc14e7953a",
+            "bf0567e5bd87627d6c678c81c8eb87672dbd5c8cb9f41643d75716462c72fc49",
+            "627fb4dc71f412508f8f046073c342d84c138b7b949043cb77741051662d01ef",
+            "debbfe75e05fcf7320f644361cf9b782af500bc02a852d59318bca7e777f4681",
+            "d1b8d9fd0d7654401aaf9886a50c0bdcc7b3cca836b0307368637dbfc25f0fb2"
+          ]
+        }
+      ],
+      "stages": "All three defined stage selectors executed with stdin closed. Undefined checks return skipped; those are not passes. Later retries reuse passing unchanged stages and replace only the failed stage."
+    },
+    {
+      "component_id": "dagu",
+      "selected_version": "2.18.2",
+      "result": "accepted_within_scope",
+      "scope": "Native plan/service health and success/failure/history operations on unchanged upstream CLI fixtures. Local result assertions; no Go suite, retry/crash recovery or reboot qualification.",
+      "evidence_classes": [
+        "native_install",
+        "native_upstream_fixture_operations",
+        "local_integration"
+      ],
+      "observations": [
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--dagu--install--20261005.json",
+          "id": "ns2604-currency-20261005--dagu--install--20261005",
+          "stage": "install",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:18:32Z",
+          "native_command_exits": [
+            0
+          ],
+          "output_sha256": [
+            "32ebac63361835f77061455f69a3247bfaf2b6ea32008067401e67a61889cbe4"
+          ]
+        },
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--dagu--use--20261005.json",
+          "id": "ns2604-currency-20261005--dagu--use--20261005",
+          "stage": "use",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:19:30Z",
+          "native_command_exits": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "output_sha256": [
+            "c5ca35b487c2a7507c5e53176e0bb6caccc17a34d58c09d75bda6898532726e7",
+            "8cd03be88a740d883dd8e2598f1a33457757fa57d62595518fd9453b38123c83",
+            "19e17d3dfe90865346211145c5a760529c9eed9a46882dbd21c9ffa158a8d0cc",
+            "d231b5d1bae4c278e6e2b9cdda59b05be8dc410d9086f647069778626dd1065a",
+            "bb500e145d879cdd6356b160ff8fc55f92d14bdc9b68cbd6eb6006f7b30cdde0",
+            "ef77e8c7f4a70cbfa0aa40eb30ebc4314ed86e9b919d6ed021bf1cccdc080aa8"
+          ]
+        }
+      ],
+      "stages": "All three defined stage selectors executed with stdin closed. Undefined checks return skipped; those are not passes. Later retries reuse passing unchanged stages and replace only the failed stage."
+    },
+    {
+      "component_id": "sandbox-runtime",
+      "selected_version": "0.0.78",
+      "result": "accepted_within_scope",
+      "scope": "Native upstream smoke plus fresh Claude shell policy controls with owned synthetic disposable fixtures; no Codex route, Windows, interactive resize, worker-job containment or full lifecycle qualification.",
+      "evidence_classes": [
+        "native_install",
+        "native_upstream_example",
+        "native_client_integration",
+        "synthetic_fixtures"
+      ],
+      "observations": [
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--sandbox-runtime--install--20261005-2.json",
+          "id": "ns2604-currency-20261005--sandbox-runtime--install--20261005-2",
+          "stage": "install",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:33:32Z",
+          "native_command_exits": [
+            0
+          ],
+          "output_sha256": [
+            "495639f5a5755420c2763c7b9b4e6c7f226fb32df77ba903152bcd4c793b11bd"
+          ]
+        },
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--sandbox-runtime--install--20261005.json",
+          "id": "ns2604-currency-20261005--sandbox-runtime--install--20261005",
+          "stage": "install",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:19:55Z",
+          "native_command_exits": [
+            0
+          ],
+          "output_sha256": [
+            "308dd3056996299d217037ee0c7e1e0d57fd1b7476463b9bde2095f7d658d439"
+          ]
+        },
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--sandbox-runtime--use--20261005-2.json",
+          "id": "ns2604-currency-20261005--sandbox-runtime--use--20261005-2",
+          "stage": "use",
+          "result": "fail",
+          "observed_at_utc": "2026-10-05T04:26:30Z",
+          "native_command_exits": [
+            0,
+            0,
+            1
+          ],
+          "output_sha256": [
+            "a9a0c31b1eefef2eaaaf1bbe8fde81cbd849e024889ba628dc157059f96ec542",
+            "aae313ba5247505efd2792bc5e89200fbc5cfe3044f2b55603181e2d0508ba7a",
+            "067d8162df2d1e6658bffbd67fbe8aaa61986d525fe77ab996feb359cdf2fe1e"
+          ]
+        },
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--sandbox-runtime--use--20261005-3.json",
+          "id": "ns2604-currency-20261005--sandbox-runtime--use--20261005-3",
+          "stage": "use",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:33:37Z",
+          "native_command_exits": [
+            0
+          ],
+          "output_sha256": [
+            "865f79713e4bd3b4836acca759636353703033ebfbe9ca8c3ef0be297b533652"
+          ]
+        },
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--sandbox-runtime--use--20261005.json",
+          "id": "ns2604-currency-20261005--sandbox-runtime--use--20261005",
+          "stage": "use",
+          "result": "fail",
+          "observed_at_utc": "2026-10-05T04:22:58Z",
+          "native_command_exits": [
+            0,
+            0,
+            1
+          ],
+          "output_sha256": [
+            "a9a0c31b1eefef2eaaaf1bbe8fde81cbd849e024889ba628dc157059f96ec542",
+            "aae313ba5247505efd2792bc5e89200fbc5cfe3044f2b55603181e2d0508ba7a",
+            "63cc5a5a38d2dc9ef332a4f809be57b92ac31a218a9dcea345aa7f2f4317f0c8"
+          ]
+        }
+      ],
+      "stages": "All three defined stage selectors executed with stdin closed. Undefined checks return skipped; those are not passes. Later retries reuse passing unchanged stages and replace only the failed stage."
+    },
+    {
+      "component_id": "worktrunk",
+      "selected_version": "0.80.0",
+      "result": "accepted_within_scope",
+      "scope": "Disposable switch/list/remove operations and dirty-removal control, native plugin/shell wiring, fresh Claude/Codex tool-event acceptance. No unchanged Rust suite or recovery benchmark.",
+      "evidence_classes": [
+        "native_install",
+        "native_upstream_cli_operations",
+        "native_client_integration",
+        "synthetic_fixtures"
+      ],
+      "observations": [
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--worktrunk--install--20261005.json",
+          "id": "ns2604-currency-20261005--worktrunk--install--20261005",
+          "stage": "install",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:20:01Z",
+          "native_command_exits": [
+            0
+          ],
+          "output_sha256": [
+            "308dd3056996299d217037ee0c7e1e0d57fd1b7476463b9bde2095f7d658d439"
+          ]
+        },
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--worktrunk--use--20261005-2.json",
+          "id": "ns2604-currency-20261005--worktrunk--use--20261005-2",
+          "stage": "use",
+          "result": "fail",
+          "observed_at_utc": "2026-10-05T04:26:00Z",
+          "native_command_exits": [
+            0,
+            0,
+            1
+          ],
+          "output_sha256": [
+            "d951096d7a781e300cebf820266267ca00df1312e3f6282db72f4597a63c99f1",
+            "869e87a8035de6a1db52ecac99bc1eeced11e6886db42114f7f915984a2e7d3b",
+            "a2f6dfb79473365a413dd8bf1cddb479dcdba8a9f2e0dd4dc0726a3937997d09"
+          ]
+        },
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--worktrunk--use--20261005-3.json",
+          "id": "ns2604-currency-20261005--worktrunk--use--20261005-3",
+          "stage": "use",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:34:07Z",
+          "native_command_exits": [
+            0
+          ],
+          "output_sha256": [
+            "b1fce541da0c6598f5f63d661dbe92f6eef28435cca69e35eac389e418be7503"
+          ]
+        },
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--worktrunk--use--20261005.json",
+          "id": "ns2604-currency-20261005--worktrunk--use--20261005",
+          "stage": "use",
+          "result": "fail",
+          "observed_at_utc": "2026-10-05T04:22:59Z",
+          "native_command_exits": [
+            0,
+            0,
+            1
+          ],
+          "output_sha256": [
+            "fcf46aefadca0044bd10521c3e296b21dc7dbd3b61d715c2b0ec0d35460991b2",
+            "869e87a8035de6a1db52ecac99bc1eeced11e6886db42114f7f915984a2e7d3b",
+            "a2f6dfb79473365a413dd8bf1cddb479dcdba8a9f2e0dd4dc0726a3937997d09"
+          ]
+        }
+      ],
+      "stages": "All three defined stage selectors executed with stdin closed. Undefined checks return skipped; those are not passes. Later retries reuse passing unchanged stages and replace only the failed stage."
+    },
+    {
+      "component_id": "syft",
+      "selected_version": "1.54.0",
+      "result": "accepted_within_scope",
+      "scope": "Native Alpine inventory and exact version/commit gate; empty synthetic SBOM is rejected. Alpine latest is mutable. No upstream Go suite, whole-host/SDK inventory or vulnerability verdict.",
+      "evidence_classes": [
+        "native_install",
+        "native_upstream_example",
+        "local_integration",
+        "synthetic_control"
+      ],
+      "observations": [
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--syft--install--20261005.json",
+          "id": "ns2604-currency-20261005--syft--install--20261005",
+          "stage": "install",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:20:13Z",
+          "native_command_exits": [
+            0
+          ],
+          "output_sha256": [
+            "495639f5a5755420c2763c7b9b4e6c7f226fb32df77ba903152bcd4c793b11bd"
+          ]
+        },
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--syft--use--20261005-2.json",
+          "id": "ns2604-currency-20261005--syft--use--20261005-2",
+          "stage": "use",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:40:27Z",
+          "native_command_exits": [
+            0
+          ],
+          "output_sha256": [
+            "851b6d72d6b1fe3d892d6318eedf2eda2ebaef5385617882b3ffd669c5f47746"
+          ]
+        },
+        {
+          "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--syft--use--20261005.json",
+          "id": "ns2604-currency-20261005--syft--use--20261005",
+          "stage": "use",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:23:05Z",
+          "native_command_exits": [
+            0,
+            0,
+            0
+          ],
+          "output_sha256": [
+            "14de9fa500fe21e91932f971e7aad66babb0febf9e2d7e043c3be45e1b10598c",
+            "c7f07718fc6ddf1383c09e9771a1cd159d729c5f7cc5afda1e9e14b2ba85ac7a",
+            "f425b619c6e192b6f04cb74a479b05207c631de134b76224773455354c6dc07e"
+          ]
+        }
+      ],
+      "stages": "All three defined stage selectors executed with stdin closed. Undefined checks return skipped; those are not passes. Later retries reuse passing unchanged stages and replace only the failed stage."
+    },
+    {
+      "component_id": "mise",
+      "selected_version": "2026.10.1",
+      "result": "accepted_within_scope",
+      "scope": "Native installer, doctor and exact installed-binary SHA256 after observed drift/reapply. No upstream suite or durable immunity from other host writers. Plan prerequisite, absent from stack and saturation audit.",
+      "evidence_classes": [
+        "native_install",
+        "native_upstream_cli_operation",
+        "independent_binary_observation"
+      ],
+      "observations": [
+        {
+          "path": "evidence/artifacts/ns2604-currency-20261005/prerequisite-receipts/ns2604-currency-20261005--mise--install--20261005-2.json",
+          "id": "ns2604-currency-20261005--mise--install--20261005-2",
+          "stage": "install",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:39:56Z",
+          "native_command_exits": [
+            0
+          ],
+          "output_sha256": [
+            "308dd3056996299d217037ee0c7e1e0d57fd1b7476463b9bde2095f7d658d439"
+          ]
+        },
+        {
+          "path": "evidence/artifacts/ns2604-currency-20261005/prerequisite-receipts/ns2604-currency-20261005--mise--install--20261005.json",
+          "id": "ns2604-currency-20261005--mise--install--20261005",
+          "stage": "install",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:16:28Z",
+          "native_command_exits": [
+            0
+          ],
+          "output_sha256": [
+            "32ebac63361835f77061455f69a3247bfaf2b6ea32008067401e67a61889cbe4"
+          ]
+        },
+        {
+          "path": "evidence/artifacts/ns2604-currency-20261005/prerequisite-receipts/ns2604-currency-20261005--mise--use--20261005-2.json",
+          "id": "ns2604-currency-20261005--mise--use--20261005-2",
+          "stage": "use",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:40:11Z",
+          "native_command_exits": [
+            0,
+            0
+          ],
+          "output_sha256": [
+            "420fd3eb33b4be0dd53c091ed65d46b9555de2a12a35817f8350bac7d42d3554",
+            "d4000ba8f48dc05148b279f951f28c5263f2493b8382c0e9561b0fd7b017e087"
+          ]
+        },
+        {
+          "path": "evidence/artifacts/ns2604-currency-20261005/prerequisite-receipts/ns2604-currency-20261005--mise--use--20261005.json",
+          "id": "ns2604-currency-20261005--mise--use--20261005",
+          "stage": "use",
+          "result": "pass",
+          "observed_at_utc": "2026-10-05T04:16:55Z",
+          "native_command_exits": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "output_sha256": [
+            "d879d910e1533bf4d8b8b2504a953b50083cb9ce47e224e675392f2e7870164e",
+            "420fd3eb33b4be0dd53c091ed65d46b9555de2a12a35817f8350bac7d42d3554",
+            "79da880272d1a4b16898c1d43df63717a73f41f62ff4ce3ed50897535fec6916",
+            "4d9cc852c25f9652b739c67df1e740246c8ae55cc8db4d64079ad58fa3bd9dc6"
+          ]
+        }
+      ],
+      "stages": "All three defined stage selectors executed with stdin closed. Undefined checks return skipped; those are not passes. Later retries reuse passing unchanged stages and replace only the failed stage."
+    }
+  ],
+  "failed_attempts": [
+    "jCodeMunch initial shallow clone: ledger test failure plus one watcher error,14209 passed,28 skipped. Full upstream checkout prerequisite restored without test edits; full rerun14210 passed. Watcher failure did not recur and is not independently classified.",
+    "SRT initial required-fixture precondition failed; next native wrapper failed and the old trap deleted its stream, leaving its cause unclassified. The bounded twelve-turn wrapper with failed-stream retention passed. No causal claim that only the turn cap fixed the earlier failure.",
+    "Worktrunk first native Claude invocation lost its positional prompt to variadic allowedTools. The argument boundary repair then reached a native error_max_turns at six turns. Twelve-turn retry and the user-required non-Git Codex launch passed.",
+    "Mise first install/doctor passed, then independent read-back saw2026.10.0. Attribution unknown. Reapply/doctor and exact binary digest passed; prior observations remain dated.",
+    "Receipt collectors refused incorrect platform or omitted layer arguments before execution; collector return0 means record persistence, never native command success."
+  ],
+  "limitations": [
+    "Prior receipts and lifecycle stages retain their original hosts, dates and pins. The saturation audit aggregation remains current_host_recertified_by_this_audit=false.",
+    "Version checks, release/advisory review, registry integrity, native examples, local assertions, synthetic controls and unchanged upstream tests are different evidence classes.",
+    "Original full output from the first jCodeMunch failure was truncated by the collector; its returned summary/exits remain, but missing traceback detail is not reconstructed. The later unchanged harness summary is retained verbatim.",
+    "Raw native conversations and policy fixture paths remain private. The successful SRT stream is deleted by the native wrapper; its stdout success predicate and output hash are retained. Worktrunk streams remain private.",
+    "No permission/client account/model/effort settings, OS restart, trading operation or main checkout change was performed.",
+    "No causal provider-token, savings, cost or convergence superiority claim. Open holds are documented in the currency decision.",
+    "The native collector recorded mise with --allow-unbound-version, but its host validator rejects IDs absent from canonical component catalogs. The four original mise receipt bytes are retained unchanged as prerequisite artifacts outside the component census; they are not valid catalog host-enrollment receipts.",
+    "Second independent mise drift to2026.10.0 at05:05Z; final authorized reapply/doctor/version/digest pass at05:07:28Z is an immediate observation only. Durable shared-host state remains a coordinator serialization question."
+  ],
+  "sources": [
+    "docs/decisions/2026-10-05-ns2604-currency-wave.md",
+    "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+    "docs/acceptance-evidence-policy.md"
+  ],
+  "final_mise_observation": "evidence/artifacts/ns2604-currency-20261005/mise-final-observation.json"
+}

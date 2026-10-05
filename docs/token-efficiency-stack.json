@@ -1727,7 +1727,7 @@
       "purpose": "Explicitly scoped code index and exact symbol retrieval through a six-tool MCP surface",
       "upstream_commands": {
         "install": [
-          "uv tool install jcodemunch-mcp==1.108.319"
+          "uv tool install jcodemunch-mcp==1.108.327"
         ],
         "use": [
           "order({\"action\":\"search_symbols\",\"args\":{\"repo\":\"RETURNED_REPOSITORY_ID\",\"query\":\"requested_function\",\"kind\":\"function\",\"max_results\":1}})",
@@ -2129,6 +2129,12 @@
           ],
           "source": "evidence/artifacts/token-stack-cards-20260927/gpt6-reviews.json"
         }
+      },
+      "currency_reconciliation": {
+        "recorded_date_utc": "2026-10-05",
+        "selected_version": "1.108.327",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Current install command updated; previous counter snapshots and native-client measurements remain historical and nonadditive."
       }
     },
     {

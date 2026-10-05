@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-currency-20261005--dagu--install--20261005",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "ns2604-currency-20261005",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "recorded_by": {
+    "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+  },
+  "component_id": "dagu",
+  "stage": "install",
+  "commands": [
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only dagu </dev/null",
+      "exit": 0,
+      "duration_s": 9.82,
+      "output_sha256": "32ebac63361835f77061455f69a3247bfaf2b6ea32008067401e67a61889cbe4",
+      "output_excerpt": "Hit:1 https://download.docker.com/linux/ubuntu resolute InRelease\nHit:2 http://archive.ubuntu.com/ubuntu resolute InRelease\nHit:3 http://security.ubuntu.com/ubuntu resolute-security InRelease\nHit:4 http://archive.ubuntu.com/ubuntu resolute-updates InRelease\nHit:5 http://archive.ubuntu.com/ubuntu resolute-backports InRelease\nReading package lists...\nReading package lists...\nBuilding dependency tree"
+    }
+  ],
+  "tool_versions": {
+    "dagu": "2.18.2"
+  },
+  "observed_at_utc": "2026-10-05T04:18:32Z",
+  "result": "pass",
+  "claim": "NativeStack2604 Dagu 2.18.2 installation and user service through the pinned upstream installer in the destination plan.",
+  "limitations": [
+    "Installation does not qualify scheduler crash recovery or agent orchestration."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-05T04:18:32Z",
+      "reviewer": {
+        "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+      }
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-currency-20261005--syft--use--20261005-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "ns2604-currency-20261005",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "recorded_by": {
+    "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+  },
+  "component_id": "syft",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "set +e; jq -e '.source.type == \"image\" and (.artifacts | length) > 0 and any(.artifacts[]; .name == \"alpine-baselayout\")' evidence/artifacts/ns2604-currency-20261005/syft-empty-control.json >/dev/null; rc=$?; printf \"empty SBOM predicate exit=%s\\n\" \"$rc\"; test \"$rc\" -eq 1",
+      "exit": 0,
+      "duration_s": 0.004,
+      "output_sha256": "851b6d72d6b1fe3d892d6318eedf2eda2ebaef5385617882b3ffd669c5f47746",
+      "output_excerpt": "empty SBOM predicate exit=1\n"
+    }
+  ],
+  "tool_versions": {
+    "syft": "1.54.0"
+  },
+  "observed_at_utc": "2026-10-05T04:40:27Z",
+  "result": "pass",
+  "claim": "Native jq predicate from the Syft plan rejects an empty synthetic SBOM; the earlier native Alpine inventory remains separate passing evidence.",
+  "limitations": [
+    "Synthetic control is local integration evidence, not an unchanged upstream suite or vulnerability verdict."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-05T04:40:27Z",
+      "reviewer": {
+        "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "ci-supply-chain"
+    }
+  ],
+  "supersedes": "ns2604-currency-20261005--syft--use--20261005"
+}

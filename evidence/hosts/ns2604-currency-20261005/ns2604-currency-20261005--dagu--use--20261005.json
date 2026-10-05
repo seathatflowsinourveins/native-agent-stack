@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-currency-20261005--dagu--use--20261005",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "ns2604-currency-20261005",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "recorded_by": {
+    "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+  },
+  "component_id": "dagu",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only dagu --stage post_install </dev/null",
+      "exit": 0,
+      "duration_s": 0.075,
+      "output_sha256": "c5ca35b487c2a7507c5e53176e0bb6caccc17a34d58c09d75bda6898532726e7",
+      "output_excerpt": "dagu | post_install | 0\n"
+    },
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only dagu --stage service_health </dev/null",
+      "exit": 0,
+      "duration_s": 0.038,
+      "output_sha256": "8cd03be88a740d883dd8e2598f1a33457757fa57d62595518fd9453b38123c83",
+      "output_excerpt": "dagu | service_health | 0\n"
+    },
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only dagu --stage after_sign_in </dev/null",
+      "exit": 0,
+      "duration_s": 0.015,
+      "output_sha256": "19e17d3dfe90865346211145c5a760529c9eed9a46882dbd21c9ffa158a8d0cc",
+      "output_excerpt": "dagu | after_sign_in | skipped\n"
+    },
+    {
+      "cmd": "cd \"$HOME/.cache/ns2604-currency/dagu-fixtures\" && DAGU_HOME=\"$HOME/.cache/ns2604-currency/dagu-fixture-home\" DAGU_DAGS_DIR=\"$PWD\" dagu start --run-id=currency-pass simple.yaml </dev/null && test \"$(cat hello.out)\" = hi && DAGU_HOME=\"$HOME/.cache/ns2604-currency/dagu-fixture-home\" DAGU_DAGS_DIR=\"$PWD\" dagu status --run-id=currency-pass simple.yaml",
+      "exit": 0,
+      "duration_s": 0.24,
+      "output_sha256": "d231b5d1bae4c278e6e2b9cdda59b05be8dc410d9086f647069778626dd1065a",
+      "output_excerpt": "Succeeded - 2026-10-05T00:19:30-04:00\n\ndag: simple (0s)\n\u251c\u2500log: ~/.cache/ns2604-currency/dagu-fixture-home/logs/simple/dag-run_20261005_041930Z_currency-pass/dag-run_20261005.001930.554.currency.log\n\u2502\n\u2514\u2500hello (0s) [succeeded]\n  \u2514\u2500printf 'hi\\n' > hello.out\n\nResult: Succeeded\n\nSucceeded - 2026-10-05T00:19:30-04:00\n\ndag: simple (0s)\n\u251c\u2500log: ~/.cache/ns2604-currency/dagu-fixture-home/logs/simple/dag-run"
+    },
+    {
+      "cmd": "cd \"$HOME/.cache/ns2604-currency/dagu-fixtures\" && rc=0; DAGU_HOME=\"$HOME/.cache/ns2604-currency/dagu-fixture-home\" DAGU_DAGS_DIR=\"$PWD\" dagu start --run-id=currency-fail failing.yaml </dev/null || rc=$?; printf \"CONTROL start_exit=%s\\n\" \"$rc\"; test \"$rc\" -eq 1 && test \"$(cat attempts.out)\" = attempt && DAGU_HOME=\"$HOME/.cache/ns2604-currency/dagu-fixture-home\" DAGU_DAGS_DIR=\"$PWD\" dagu status --run-id=currency-fail failing.yaml",
+      "exit": 0,
+      "duration_s": 0.234,
+      "output_sha256": "bb500e145d879cdd6356b160ff8fc55f92d14bdc9b68cbd6eb6006f7b30cdde0",
+      "output_excerpt": "Failed - 2026-10-05T00:19:30-04:00\n\ndag: failing (0s)\n\u251c\u2500log: ~/.cache/ns2604-currency/dagu-fixture-home/logs/failing/dag-run_20261005_041930Z_currency-fail/dag-run_20261005.001930.769.currency.log\n\u2502\n\u2514\u2500boom (0s) [failed]\n  \u2514\u2500error: exit status 1\n\nResult: Failed\n\nCONTROL start_exit=1\nFailed - 2026-10-05T00:19:30-04:00\n\ndag: failing (0s)\n\u251c\u2500log: ~/.cache/ns2604-currency/dagu-fixture-home/logs/failing/"
+    },
+    {
+      "cmd": "cd \"$HOME/.cache/ns2604-currency/dagu-fixtures\" && DAGU_HOME=\"$HOME/.cache/ns2604-currency/dagu-fixture-home\" DAGU_DAGS_DIR=\"$PWD\" dagu history --format json simple.yaml && DAGU_HOME=\"$HOME/.cache/ns2604-currency/dagu-fixture-home\" DAGU_DAGS_DIR=\"$PWD\" dagu history --format json failing.yaml",
+      "exit": 0,
+      "duration_s": 0.098,
+      "output_sha256": "ef77e8c7f4a70cbfa0aa40eb30ebc4314ed86e9b919d6ed021bf1cccdc080aa8",
+      "output_excerpt": "[\n  {\n    \"name\": \"simple\",\n    \"dagRunId\": \"currency-pass\",\n    \"status\": \"succeeded\",\n    \"startedAt\": \"2026-10-05T00:19:30-04:00\",\n    \"finishedAt\": \"2026-10-05T00:19:30-04:00\",\n    \"duration\": \"\\u003c 1s\",\n    \"workerId\": \"local\"\n  }\n]\n[\n  {\n    \"name\": \"failing\",\n    \"dagRunId\": \"currency-fail\",\n    \"status\": \"failed\",\n    \"startedAt\": \"2026-10-05T00:19:30-04:00\",\n    \"finishedAt\": \"2026-10-0"
+    }
+  ],
+  "tool_versions": {
+    "dagu": "2.18.2"
+  },
+  "observed_at_utc": "2026-10-05T04:19:30Z",
+  "result": "pass",
+  "claim": "Dagu 2.18.2 destination version and service health, and unchanged upstream success/failure fixtures with terminal-result and output-file checks.",
+  "limitations": [
+    "Fixtures come from dagucloud/dagu@5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4:conformance/cli/testdata; shell predicates are local integration checks, not the unchanged Go conformance suite or SIGKILL recovery qualification. after_sign_in has no destination check and is skipped."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-05T04:19:30Z",
+      "reviewer": {
+        "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "scheduling-supervision"
+    }
+  ]
+}

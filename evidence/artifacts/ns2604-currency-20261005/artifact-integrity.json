@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "kind": "artifact_integrity_observation",
+  "observed_date_utc": "2026-10-05",
+  "scope": "Independent root hash observations for retained complete upstream archive bytes and fresh PyPI downloads; source/integrity evidence only. No cryptographic signature/provenance or complete transitive vulnerability claim.",
+  "artifacts": [
+    {
+      "component_id": "sandbox-runtime",
+      "artifact": "sandbox-runtime-0.0.78.tgz",
+      "bytes": 3948109,
+      "observed_sha256": "a9cf9e35068a4c71d2d94de8b0abe8de51c7d44daef537cc92906848ccc67240",
+      "release_source": "https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.78",
+      "registry_source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.78",
+      "published_integrity": "sha512-YAIcybXTp7MZkBjasnkR1E3yxnf7u6kUkyW0vZrtsAZ9tyJGMaugWETmquPZs0YvW0sR0VnZeMfS0gsN/wQiVQ==",
+      "observed_integrity": "sha512-YAIcybXTp7MZkBjasnkR1E3yxnf7u6kUkyW0vZrtsAZ9tyJGMaugWETmquPZs0YvW0sR0VnZeMfS0gsN/wQiVQ==",
+      "matches_published": true
+    },
+    {
+      "component_id": "worktrunk",
+      "artifact": "worktrunk-x86_64-unknown-linux-musl.tar.xz",
+      "bytes": 8173256,
+      "observed_sha256": "532ce3ed5eecb1be274c925b5887f61671e2434a4ca2561b9a8ac9379dbba199",
+      "release_source": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
+      "published_sha256": "532ce3ed5eecb1be274c925b5887f61671e2434a4ca2561b9a8ac9379dbba199",
+      "matches_published": true,
+      "checksum_source": "https://api.github.com/repos/max-sixty/worktrunk/releases/tags/v0.80.0"
+    },
+    {
+      "component_id": "syft",
+      "artifact": "syft_1.54.0_linux_amd64.tar.gz",
+      "bytes": 29217540,
+      "observed_sha256": "54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860",
+      "release_source": "https://github.com/anchore/syft/releases/tag/v1.54.0",
+      "published_sha256": "54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860",
+      "matches_published": true,
+      "checksum_source": "https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_checksums.txt"
+    },
+    {
+      "component_id": "jcodemunch-mcp",
+      "artifact": "jcodemunch_mcp-1.108.327-py3-none-any.whl",
+      "bytes": 1734964,
+      "source": "https://files.pythonhosted.org/packages/5f/0a/7027d053796993db79ccf341b6f4a5e00be3b8cb23eb81f7aef525dd8a08/jcodemunch_mcp-1.108.327-py3-none-any.whl",
+      "checksum_source": "https://pypi.org/pypi/jcodemunch-mcp/1.108.327/json",
+      "published_sha256": "9e2f639456e740a9497f4f238d095c9b995d54074edf01d9c61cf3517afcf88a",
+      "observed_sha256": "9e2f639456e740a9497f4f238d095c9b995d54074edf01d9c61cf3517afcf88a",
+      "matches_published": true,
+      "yanked": false
+    },
+    {
+      "component_id": "jcodemunch-mcp",
+      "artifact": "jcodemunch_mcp-1.108.327.tar.gz",
+      "bytes": 5849454,
+      "source": "https://files.pythonhosted.org/packages/89/4d/06d0751a2daa2be9336135bf4e0f3909f8a913925dde7f8410b764052992/jcodemunch_mcp-1.108.327.tar.gz",
+      "checksum_source": "https://pypi.org/pypi/jcodemunch-mcp/1.108.327/json",
+      "published_sha256": "8c467e6f0bae20d8c82b8c2a47f50e692dd3f386344d079ad05c63ba4e41f43b",
+      "observed_sha256": "8c467e6f0bae20d8c82b8c2a47f50e692dd3f386344d079ad05c63ba4e41f43b",
+      "matches_published": true,
+      "yanked": false
+    },
+    {
+      "component_id": "mise",
+      "artifact": "mise-v2026.10.1-linux-x64.tar.gz",
+      "published_sha256": "9b92aa39b8fde54b28c8f974a68f2501925a1523d6c05a52719145df3acdd75a",
+      "observed_sha256": "9b92aa39b8fde54b28c8f974a68f2501925a1523d6c05a52719145df3acdd75a",
+      "matches_published": true,
+      "retained_original_output": [
+        "DOWNLOADED_HASH mise https://github.com/jdx/mise/releases/download/v2026.10.1/mise-v2026.10.1-linux-x64.tar.gz bytes 51221451 sha256 9b92aa39b8fde54b28c8f974a68f2501925a1523d6c05a52719145df3acdd75a MATCH True"
+      ],
+      "original_tool_return_sha256": "8a2c62c8d7c20b6dfdb4338d7a067b173ecb2dda68386b341c875b70fedf3b5a",
+      "correction": "The mise checksum manifest uses a ./ filename prefix; the earlier exact-name comparison returned no match, then the exact prefixed line was verified."
+    },
+    {
+      "component_id": "dagu",
+      "artifact": "dagu_2.18.2_linux_amd64.tar.gz",
+      "published_sha256": "5a84c093b9ba9d02b7a60e106bb91d46f9383fd01c62bd51560e41193f05792b",
+      "observed_sha256": "5a84c093b9ba9d02b7a60e106bb91d46f9383fd01c62bd51560e41193f05792b",
+      "matches_published": true,
+      "retained_original_output": [
+        "DOWNLOADED_HASH dagu https://github.com/dagucloud/dagu/releases/download/v2.18.2/dagu_2.18.2_linux_amd64.tar.gz bytes 54238739 sha256 5a84c093b9ba9d02b7a60e106bb91d46f9383fd01c62bd51560e41193f05792b MATCH True"
+      ],
+      "original_tool_return_sha256": "8a2c62c8d7c20b6dfdb4338d7a067b173ecb2dda68386b341c875b70fedf3b5a",
+      "correction": null
+    }
+  ]
+}

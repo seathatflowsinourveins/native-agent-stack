@@ -780,7 +780,7 @@
         "evidence_class": "documented_upstream_example_not_executed"
       },
       "provisioning_status": "unprovisioned_source_review",
-      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "provisioning_reason": "The original source-profile review performed no destination acceptance. Scoped NativeStack2604 installation and defined plan acceptance are now recorded separately in evidence/receipts/ns2604-currency-qualification-20261005.json; the documented example is not promoted into execution evidence.",
       "evidence_refs": [
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
@@ -788,14 +788,20 @@
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md",
         "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md",
-        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g8-base-gateway.md"
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g8-base-gateway.md",
+        "evidence/receipts/ns2604-currency-qualification-20261005.json"
       ],
       "release": {
         "tag": "0.0.78",
         "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.78",
         "kind": "native_package_release"
       },
-      "source_pin_kind": "release_or_artifact_version"
+      "source_pin_kind": "release_or_artifact_version",
+      "currency_host_observation": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Scoped destination installation and defined plan acceptance. The separate documented acceptance example retains its unexecuted evidence class."
+      }
     },
     {
       "name": "Worktrunk",
@@ -841,7 +847,7 @@
         "scope": "README default cargo test unit suite only; shell integration has a separate feature-enabled suite requiring bash, zsh, fish, nushell, pwsh and jq. No shell integration was qualified. The observed host release 0.79.0 is below the selected release 0.80.0; acceptance is owed on the new host."
       },
       "provisioning_status": "unprovisioned_source_review",
-      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "provisioning_reason": "The original source-profile review performed no destination acceptance. Scoped NativeStack2604 installation and defined plan acceptance are now recorded separately in evidence/receipts/ns2604-currency-qualification-20261005.json; the documented example is not promoted into execution evidence.",
       "evidence_refs": [
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
@@ -849,14 +855,20 @@
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md",
         "https://github.com/max-sixty/worktrunk/blob/b49ca7eea9b03145791a5b94eccaf9c59412ed37/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+        "evidence/receipts/ns2604-currency-qualification-20261005.json"
       ],
       "release": {
         "tag": "v0.80.0",
         "source": "https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0",
         "published_at": "2026-09-27T21:18:46Z"
       },
-      "source_pin_kind": "release_or_artifact_version"
+      "source_pin_kind": "release_or_artifact_version",
+      "currency_host_observation": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Scoped destination installation and defined plan acceptance. The separate documented acceptance example retains its unexecuted evidence class."
+      }
     },
     {
       "name": "Serena",
@@ -1189,7 +1201,7 @@
       "repository": "https://github.com/jgravelle/jcodemunch-mcp",
       "layer_id": "token-efficiency",
       "owner_layer_id": "token-efficiency",
-      "pin": "1.108.319",
+      "pin": "1.108.327",
       "component_id": "jcodemunch-mcp",
       "source_selection_layer": "token-efficiency",
       "source_selection_name": "jcodemunch-mcp",
@@ -1199,23 +1211,21 @@
       "comparison_group": null,
       "default_precedence": null,
       "default_install": true,
-      "blocking_gaps": [
-        "No artifact digest is recorded for this pin: the checksum is the source commit (manifests/stack.json), and uv's index hashes are the only artifact check."
-      ],
+      "blocking_gaps": [],
       "artifact": {
-        "name": "jcodemunch-mcp==1.108.319",
-        "url": "https://pypi.org/project/jcodemunch-mcp/1.108.319/"
+        "name": "jcodemunch_mcp-1.108.327-py3-none-any.whl",
+        "url": "https://pypi.org/project/jcodemunch-mcp/1.108.327/"
       },
       "checksum": {
-        "algorithm": "git-sha1",
-        "value": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
-        "kind": "source"
+        "algorithm": "sha256",
+        "value": "9e2f639456e740a9497f4f238d095c9b995d54074edf01d9c61cf3517afcf88a",
+        "source": "https://pypi.org/pypi/jcodemunch-mcp/1.108.327/json",
+        "kind": "artifact"
       },
-      "integrity_observation": "source_identity_only",
+      "integrity_observation": "downloaded_artifact_matches_published_digest",
       "install": {
-        "command": "uv tool install jcodemunch-mcp==1.108.319",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91",
+        "command": "uv tool install jcodemunch-mcp==1.108.327",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91",
         "execution_status": "UNRUN",
         "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. Registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md); jcodemunch-mcp init, which writes a prompt policy and hooks, is not run.",
         "prerequisites": [
@@ -1224,7 +1234,7 @@
       },
       "acceptance": {
         "command": "order({\"action\":\"get_session_stats\",\"args\":{}})",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L141",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L141",
         "evidence_class": "documented_upstream_example_not_executed",
         "execution_status": "UNRUN",
         "scope": "Upstream's confirmation after a search_symbols and get_symbol_source answer, in a project that registered the server; its counter is an upstream estimate in its own scope, not a provider saving.",
@@ -1233,20 +1243,26 @@
         ]
       },
       "provisioning_status": "unprovisioned_source_review",
-      "provisioning_reason": "Owner default of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): installed by default on the destination through the install plan's code-index row, not by iterating over these entries. Source review only here: no tool, service, account, model, provider, GPU or destination WSL installation or acceptance was performed. Net provider savings stay unmeasured.",
+      "provisioning_reason": "The original source-profile review performed no destination acceptance. Scoped NativeStack2604 installation and defined plan acceptance are now recorded separately in evidence/receipts/ns2604-currency-qualification-20261005.json; the documented example is not promoted into execution evidence.",
       "evidence_refs": [
         "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
         "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
         "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
         "docs/token-efficiency-stack.json",
-        "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91"
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91",
+        "evidence/receipts/ns2604-currency-qualification-20261005.json"
       ],
       "release": {
-        "tag": "v1.108.319",
-        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
-        "kind": "native_package_release"
+        "tag": "v1.108.327",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.327",
+        "published_at": "2026-10-02T18:21:53Z"
       },
-      "source_pin_kind": "release_or_artifact_version"
+      "source_pin_kind": "release_or_artifact_version",
+      "currency_host_observation": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Scoped destination installation and defined plan acceptance. The separate documented acceptance example retains its unexecuted evidence class."
+      }
     },
     {
       "name": "codebase-memory-mcp",
@@ -3737,7 +3753,7 @@
       "repository": "https://github.com/dagucloud/dagu",
       "layer_id": "scheduling-supervision",
       "owner_layer_id": "scheduling-supervision",
-      "pin": "2.16.6",
+      "pin": "2.18.2",
       "component_id": "dagu",
       "source_selection_layer": "scheduling-supervision",
       "source_selection_name": "Dagu",
@@ -3749,43 +3765,48 @@
       "default_install": false,
       "blocking_gaps": [],
       "artifact": {
-        "name": "dagu_2.16.6_linux_amd64.tar.gz",
-        "url": "https://github.com/dagucloud/dagu/releases/download/v2.16.6/dagu_2.16.6_linux_amd64.tar.gz"
+        "name": "dagu_2.18.2_linux_amd64.tar.gz",
+        "url": "https://github.com/dagucloud/dagu/releases/download/v2.18.2/dagu_2.18.2_linux_amd64.tar.gz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717",
-        "source": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.16.6",
+        "value": "5a84c093b9ba9d02b7a60e106bb91d46f9383fd01c62bd51560e41193f05792b",
+        "source": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.18.2",
         "kind": "artifact"
       },
-      "integrity_observation": "published_digest_not_rehashed",
+      "integrity_observation": "downloaded_artifact_matches_published_digest",
       "install": {
-        "command": "npm install -g --ignore-scripts=false @dagucloud/dagu@2.16.6",
-        "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
-        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+        "command": "curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh | bash -s -- --version v2.18.2",
+        "source": "https://github.com/dagucloud/dagu/blob/v2.18.2/README.md#L105",
+        "scope": "Native pinned installer from the current install plan; destination execution is recorded separately."
       },
       "acceptance": {
         "command": "make test",
-        "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
+        "source": "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md",
         "evidence_class": "upstream_test_command_not_executed"
       },
       "provisioning_status": "unprovisioned_optional_service",
-      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "provisioning_reason": "The original source-profile review performed no destination acceptance. Scoped NativeStack2604 installation and defined plan acceptance are now recorded separately in evidence/receipts/ns2604-currency-qualification-20261005.json; the documented example is not promoted into execution evidence.",
       "evidence_refs": [
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/scheduling-supervision.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
-        "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md"
+        "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md",
+        "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md",
+        "evidence/receipts/ns2604-currency-qualification-20261005.json"
       ],
       "release": {
-        "tag": "v2.16.6",
-        "source": "https://github.com/dagucloud/dagu/releases/tag/v2.16.6",
-        "published_at": "2026-09-14T14:45:57Z"
+        "tag": "v2.18.2",
+        "source": "https://github.com/dagucloud/dagu/releases/tag/v2.18.2",
+        "published_at": "2026-10-04T03:54:02Z"
       },
-      "source_pin_kind": "release_or_artifact_version"
+      "source_pin_kind": "release_or_artifact_version",
+      "currency_host_observation": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Scoped destination installation and defined plan acceptance. The separate documented acceptance example retains its unexecuted evidence class."
+      }
     },
     {
       "name": "Docker Compose",
@@ -3847,7 +3868,7 @@
       "repository": "https://github.com/jdx/mise",
       "layer_id": "recovery-portability",
       "owner_layer_id": "recovery-portability",
-      "pin": "2026.9.18",
+      "pin": "2026.10.1",
       "component_id": null,
       "source_selection_layer": "recovery-portability",
       "source_selection_name": "mise",
@@ -3859,19 +3880,19 @@
       "default_install": false,
       "blocking_gaps": [],
       "artifact": {
-        "name": "mise-v2026.9.18-linux-x64.tar.gz",
-        "url": "https://github.com/jdx/mise/releases/download/v2026.9.18/mise-v2026.9.18-linux-x64.tar.gz"
+        "name": "mise-v2026.10.1-linux-x64.tar.gz",
+        "url": "https://github.com/jdx/mise/releases/download/v2026.10.1/mise-v2026.10.1-linux-x64.tar.gz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "4312f8fd72a8d6a869cd2aca7444929e2a0ef6f45d2c6f2866a1eacc5bdc2e84",
-        "source": "https://api.github.com/repos/jdx/mise/releases/tags/v2026.9.18",
+        "value": "9b92aa39b8fde54b28c8f974a68f2501925a1523d6c05a52719145df3acdd75a",
+        "source": "https://api.github.com/repos/jdx/mise/releases/tags/v2026.10.1",
         "kind": "artifact"
       },
-      "integrity_observation": "published_digest_not_rehashed",
+      "integrity_observation": "downloaded_artifact_matches_published_digest",
       "install": {
-        "command": "curl -fsSL https://mise.run | MISE_VERSION=v2026.9.18 sh",
-        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
+        "command": "curl -fsSL https://mise.run | MISE_VERSION=v2026.10.1 sh",
+        "source": "https://github.com/jdx/mise/blob/v2026.10.1/docs/installing-mise.md",
         "execution_status": "UNRUN",
         "prerequisites": [
           "curl, sh and a chosen owned installation target; no installer was executed.",
@@ -3881,28 +3902,38 @@
       },
       "acceptance": {
         "command": "mise run test:unit && mise run test:e2e '^test_use$'",
-        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/contributing.md",
+        "source": "https://github.com/jdx/mise/blob/v2026.10.1/docs/contributing.md",
         "evidence_class": "upstream_test_command_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Run from the v2026.9.18 source checkout after its documented development setup: suitable Rust, a working mise meeting min_version, git/host dependencies, mise install and mise run build.",
+          "Run from the v2026.10.1 source checkout after its documented development setup: suitable Rust, a working mise meeting min_version, git/host dependencies, mise install and mise run build.",
           "The E2E selector is the documented basename regex ^test_use$; it does not select the full suite."
         ],
         "scope": "Documented unit suite plus one selected upstream E2E case, both UNRUN. No host installation, lifecycle or new-host acceptance.",
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "provisioning_status": "unprovisioned_source_review",
-      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "provisioning_reason": "The original source-profile review performed no destination acceptance. Scoped NativeStack2604 installation and defined plan acceptance are now recorded separately in evidence/receipts/ns2604-currency-qualification-20261005.json; the documented example is not promoted into execution evidence.",
       "evidence_refs": [
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/recovery-portability.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
-        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+        "https://github.com/jdx/mise/blob/v2026.10.1/docs/installing-mise.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json",
+        "evidence/receipts/ns2604-currency-qualification-20261005.json"
       ],
-      "release": null,
-      "source_pin_kind": "release_or_artifact_version"
+      "release": {
+        "tag": "v2026.10.1",
+        "source": "https://github.com/jdx/mise/releases/tag/v2026.10.1",
+        "published_at": "2026-10-03T14:12:48Z"
+      },
+      "source_pin_kind": "release_or_artifact_version",
+      "currency_host_observation": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Scoped destination installation and defined plan acceptance. The separate documented acceptance example retains its unexecuted evidence class."
+      }
     },
     {
       "name": "Restic",
@@ -4272,21 +4303,27 @@
         "source_review_ref": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md"
       },
       "provisioning_status": "unprovisioned_source_review",
-      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "provisioning_reason": "The original source-profile review performed no destination acceptance. Scoped NativeStack2604 installation and defined plan acceptance are now recorded separately in evidence/receipts/ns2604-currency-qualification-20261005.json; the documented example is not promoted into execution evidence.",
       "evidence_refs": [
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md",
-        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md"
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md",
+        "evidence/receipts/ns2604-currency-qualification-20261005.json"
       ],
       "release": {
         "tag": "v1.54.0",
         "source": "https://github.com/anchore/syft/releases/tag/v1.54.0",
         "published_at": "2026-10-01T20:54:29Z"
       },
-      "source_pin_kind": "release_or_artifact_version"
+      "source_pin_kind": "release_or_artifact_version",
+      "currency_host_observation": {
+        "recorded_date_utc": "2026-10-05",
+        "receipt": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+        "scope": "Scoped destination installation and defined plan acceptance. The separate documented acceptance example retains its unexecuted evidence class."
+      }
     },
     {
       "name": "Dependabot",

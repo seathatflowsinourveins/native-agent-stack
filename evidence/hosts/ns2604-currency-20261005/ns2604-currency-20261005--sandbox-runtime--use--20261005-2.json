@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-currency-20261005--sandbox-runtime--use--20261005-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "ns2604-currency-20261005",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "recorded_by": {
+    "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+  },
+  "component_id": "sandbox-runtime",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only sandbox-runtime-srt --stage post_install </dev/null",
+      "exit": 0,
+      "duration_s": 0.376,
+      "output_sha256": "a9a0c31b1eefef2eaaaf1bbe8fde81cbd849e024889ba628dc157059f96ec542",
+      "output_excerpt": "sandbox-runtime-srt | post_install | 0\n"
+    },
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only sandbox-runtime-srt --stage service_health </dev/null",
+      "exit": 0,
+      "duration_s": 0.015,
+      "output_sha256": "aae313ba5247505efd2792bc5e89200fbc5cfe3044f2b55603181e2d0508ba7a",
+      "output_excerpt": "sandbox-runtime-srt | service_health | skipped\n"
+    },
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" SRT_ACCEPT_FIXTURE_ROOT=\"$HOME/.cache/ns2604-currency/srt-fixture\" SRT_ACCEPT_POLICY=\"$HOME/.cache/ns2604-currency/srt-fixture/policy.json\" SRT_ACCEPT_DENY_READ=\"$HOME/.cache/ns2604-currency/srt-fixture/deny-read-control.txt\" SRT_ACCEPT_DENY_WRITE=\"$HOME/.cache/ns2604-currency/srt-fixture/deny-write-control.txt\" SRT_ACCEPT_ALLOWED_DIR=\"$HOME/.cache/ns2604-currency/srt-fixture/allowed\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only sandbox-runtime-srt --stage after_sign_in </dev/null",
+      "exit": 1,
+      "duration_s": 145.713,
+      "output_sha256": "067d8162df2d1e6658bffbd67fbe8aaa61986d525fe77ab996feb359cdf2fe1e",
+      "output_excerpt": "sandbox-runtime-srt | after_sign_in | 1\n"
+    }
+  ],
+  "tool_versions": {
+    "sandbox-runtime": "0.0.78"
+  },
+  "observed_at_utc": "2026-10-05T04:26:30Z",
+  "result": "fail",
+  "claim": "SRT 0.0.78 destination smoke and fresh Claude-native deny/allow fixture operations after supplying the documented fixture inputs.",
+  "limitations": [
+    "The first missing-fixture refusal is retained. Fixture policy and files are synthetic and private; interactive resize and native Windows behavior are not qualified. No service_health command exists, so that stage is skipped."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-05T04:26:30Z",
+      "reviewer": {
+        "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "isolation"
+    }
+  ],
+  "supersedes": "ns2604-currency-20261005--sandbox-runtime--use--20261005"
+}

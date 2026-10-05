@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-currency-20261005--mise--use--20261005-2",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "ns2604-currency-20261005",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "recorded_by": {
+    "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+  },
+  "component_id": "mise",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only mise --stage post_install </dev/null",
+      "exit": 0,
+      "duration_s": 0.067,
+      "output_sha256": "420fd3eb33b4be0dd53c091ed65d46b9555de2a12a35817f8350bac7d42d3554",
+      "output_excerpt": "mise | post_install | 0\n"
+    },
+    {
+      "cmd": "mise --version; sha256sum \"$HOME/.local/bin/mise\"; test \"$(sha256sum \"$HOME/.local/bin/mise\" | cut -d \" \" -f1)\" = 31e6859cf639ed4594906da3fcd0fe2055e9daddae75e9786dbe50b3fb3c0f4a",
+      "exit": 0,
+      "duration_s": 0.248,
+      "output_sha256": "d4000ba8f48dc05148b279f951f28c5263f2493b8382c0e9561b0fd7b017e087",
+      "output_excerpt": "2026.10.1 linux-x64 (2026-10-03)\n31e6859cf639ed4594906da3fcd0fe2055e9daddae75e9786dbe50b3fb3c0f4a  ~/.local/bin/mise\n"
+    }
+  ],
+  "tool_versions": {
+    "mise": "2026.10.1"
+  },
+  "observed_at_utc": "2026-10-05T04:40:11Z",
+  "result": "pass",
+  "claim": "Pinned mise passes its native doctor and independent binary digest read-back after reapplication.",
+  "limitations": [
+    "Dated read-back does not establish immunity from concurrent host changes; no upstream test suite was run."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-05T04:40:11Z",
+      "reviewer": {
+        "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+      }
+    }
+  ],
+  "supersedes": "ns2604-currency-20261005--mise--use--20261005"
+}

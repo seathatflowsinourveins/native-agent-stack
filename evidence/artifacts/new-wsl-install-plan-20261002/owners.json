@@ -1,6 +1,6 @@
 {
  "generated_at_utc": "2026-10-02T02:12:15Z",
- "revised_at_utc": "2026-10-04T23:58:00Z",
+ "revised_at_utc": "2026-10-05",
  "source": "origin/main definitive manifest, one row per foundation row",
  "owners": [
   {
@@ -309,10 +309,14 @@
   {
    "layer": "token-efficiency",
    "slot": "code-index",
-   "owner": "jcodemunch-mcp 1.108.319",
+   "owner": "jcodemunch-mcp 1.108.327",
    "repository": "https://github.com/jgravelle/jcodemunch-mcp",
    "installed": true,
-   "note": "added by the wave-3 batch of the layer consensus (2026-10-04, the owner's decision, amendment 4); the pin is in install-plan.json; repository metadata was not read for this row"
+   "note": "Owner default from wave 3; currency update 2026-10-05 follows the latest eligible release under the user's 24-hour rule. 1.108.328 is held for age; source and integrity evidence are in docs/decisions/2026-10-05-ns2604-currency-wave.md.",
+   "tag_name": "v1.108.327",
+   "published_at": "2026-10-02T18:21:53Z",
+   "pushed_at": "2026-10-05T02:00:27Z",
+   "default_branch": "main"
   },
   {
    "layer": "token-efficiency",
@@ -574,9 +578,9 @@
    "repository": "https://github.com/dagucloud/dagu",
    "installed": true,
    "note": "",
-   "tag_name": "v2.18.1",
-   "published_at": "2026-09-29T15:24:51Z",
-   "pushed_at": "2026-10-02T01:19:01Z",
+   "tag_name": "v2.18.2",
+   "published_at": "2026-10-04T03:54:02Z",
+   "pushed_at": "2026-10-05T00:44:54Z",
    "default_branch": "main"
   },
   {
@@ -716,9 +720,9 @@
    "repository": "https://github.com/jdx/mise",
    "installed": true,
    "note": "",
-   "tag_name": "v2026.10.0",
-   "published_at": "2026-10-02T01:42:32Z",
-   "pushed_at": "2026-10-02T02:08:56Z",
+   "tag_name": "v2026.10.1",
+   "published_at": "2026-10-03T14:12:48Z",
+   "pushed_at": "2026-10-05T04:10:17Z",
    "default_branch": "main"
   },
   {

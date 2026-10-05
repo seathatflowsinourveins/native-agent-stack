@@ -25,7 +25,7 @@ test -f "$SRT_ACCEPT_DENY_WRITE"
 test -d "$SRT_ACCEPT_ALLOWED_DIR"
 export SRT_ACCEPT_POLICY SRT_ACCEPT_DENY_READ SRT_ACCEPT_DENY_WRITE SRT_ACCEPT_ALLOWED_DIR SRT_ACCEPT_DENIED_URL
 srt_session_probe="$(mktemp -d)"
-trap 'rm -rf -- "$srt_session_probe"' EXIT
+trap 'srt_probe_rc=$?; if (( srt_probe_rc != 0 )); then printf "Failed native event stream retained in %s\n" "$srt_session_probe" >&2; else rm -rf -- "$srt_session_probe"; fi' EXIT
 srt_native_recipe="$(cat <<'SRT'
 set -euo pipefail
 srt echo "hello world"
@@ -62,7 +62,7 @@ srt_prompt="Use your native shell tool to execute the following Bash recipe as o
 $srt_native_recipe"
 case "${SRT_ACCEPT_CLIENT:-claude}" in
   claude)
-    claude -p --effort max --output-format stream-json --verbose --allowedTools Bash --max-turns 4 "$srt_prompt" > "$srt_session_probe/events.jsonl"
+    claude -p --effort max --output-format stream-json --verbose --allowedTools Bash --max-turns 12 "$srt_prompt" > "$srt_session_probe/events.jsonl"
     ;;
   codex)
     codex exec --json --ephemeral "$srt_prompt" </dev/null > "$srt_session_probe/events.jsonl"

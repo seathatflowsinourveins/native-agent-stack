@@ -1,0 +1,68 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-currency-20261005--worktrunk--use--20261005",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "ns2604-currency-20261005",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "recorded_by": {
+    "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+  },
+  "component_id": "worktrunk",
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only worktrunk --stage post_install </dev/null",
+      "exit": 0,
+      "duration_s": 3.96,
+      "output_sha256": "fcf46aefadca0044bd10521c3e296b21dc7dbd3b61d715c2b0ec0d35460991b2",
+      "output_excerpt": "worktrunk | post_install | 0\nbash: cannot set terminal process group (2129547): Inappropriate ioctl for device\nbash: no job control in this shell\n\n\u25cb Showing 24 worktrees, 9 with changes, 16 ahead\n\u2713 Created branch native-stack-acceptance from main and worktree @ ~/.cache/ns2604-currency/tmp/tmp.XQZxdhg9Kg/native-stack-acceptance\n\u25cb Switched to worktree for main @ ~/.cache/ns2604-currency/tmp/tmp.XQZ"
+    },
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only worktrunk --stage service_health </dev/null",
+      "exit": 0,
+      "duration_s": 0.013,
+      "output_sha256": "869e87a8035de6a1db52ecac99bc1eeced11e6886db42114f7f915984a2e7d3b",
+      "output_excerpt": "worktrunk | service_health | skipped\n"
+    },
+    {
+      "cmd": "env TMPDIR=\"$HOME/.cache/ns2604-currency/tmp\" bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only worktrunk --stage after_sign_in </dev/null",
+      "exit": 1,
+      "duration_s": 1.659,
+      "output_sha256": "a2f6dfb79473365a413dd8bf1cddb479dcdba8a9f2e0dd4dc0726a3937997d09",
+      "output_excerpt": "worktrunk | after_sign_in | 1\n"
+    }
+  ],
+  "tool_versions": {
+    "worktrunk": "0.80.0"
+  },
+  "observed_at_utc": "2026-10-05T04:22:59Z",
+  "result": "fail",
+  "claim": "worktrunk 0.80.0 native destination acceptance stages, preserving stages with no command as skips.",
+  "limitations": [
+    "Native smoke/client operations are scoped to the destination recipe; skipped stages are not passes, and historical host evidence is not a new run."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "scripts/host_receipts.py record",
+      "verdict": "agree",
+      "at_utc": "2026-10-05T04:22:59Z",
+      "reviewer": {
+        "identity_sha256": "02f447d7d8b8c35f8d8f004da0af082c266f2a7aea68a8ff08454896a486d178"
+      }
+    }
+  ],
+  "layer_refs": [
+    {
+      "catalog": "foundation",
+      "layer_id": "git-github-automation"
+    }
+  ]
+}
