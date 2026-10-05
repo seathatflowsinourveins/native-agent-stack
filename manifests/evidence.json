@@ -9669,8 +9669,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/owned-path-gate-fail-first.txt",
-      "sha256": "eee72bc8be21db645270c928e43b67d52d1e736d1fbb1e8144cada855710304f",
-      "bytes": 56803
+      "sha256": "a64a87c1b8dcf212b47f4c4c72c07c57295642e99ff7ffa666631801a5037b80",
+      "bytes": 57859
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/phase1-commands.json",

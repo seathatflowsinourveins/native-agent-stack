@@ -389,3 +389,9 @@ Gate-only: push_gate.py's instruction-prefix constant/comment and normalized com
 Instruction/enablement: resolver.py's resolver_instruction wording; the resolver SKILL.md refusal list; the parsed-list protocol test in test_runtime_worker_openhands_resolver.py. The import guard, startup self-test and public entry behavior are unchanged.
 Docs/evidence: RESOLVER.md's prefix/inventory explanation, the decision record's R5 correction and this receipt.
 Every changed authored file is registered last. Read-only validate.py, evidence_manifest --check and git diff --check results follow in the handoff.
+
+Coordinator rerun with a writable gitleaks runtime lock (2026-10-05, session native-agent-stack-5f, at 9b8a37b840ff26163cdfe239f04965275aac9edf):
+TMPDIR=/var/tmp/claude-resr5 (outside /tmp, the checkout and the home directory) nice -n 19 python3 -m unittest tests.test_runtime_worker_openhands_push_gate tests.test_runtime_worker_openhands_resolver tests.test_runtime_worker_openhands -v
+exit 0; returned lines: Ran 381 tests in 69.818s; OK (skipped=1).
+Skip line: test_the_reader_matches_pyyaml_on_every_workflow (tests.test_runtime_worker_openhands_push_gate.RepositoryWorkflowTests.test_the_reader_matches_pyyaml_on_every_workflow) ... skipped 'PyYAML is not installed for this interpreter'
+With TMPDIR outside the home directory, the two host-path subcontrols ran and passed, and the installed-gitleaks control ran and passed. The same suite with the home-relative TMPDIR ~/.cache/resr5c returned exit 0; Ran 381 tests in 68.039s; OK (skipped=3). There, the two host-path subcontrols skip because a home-relative TMPDIR matches PRIVATE_CONTENT first.
