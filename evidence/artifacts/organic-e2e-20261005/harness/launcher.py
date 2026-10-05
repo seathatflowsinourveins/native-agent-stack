@@ -33,7 +33,7 @@ sys.path.insert(0, str(HERE))
 from common import (CLAUDE_LOCK, KILL_AFTER, KILL_FIVE_HOUR, KILL_FIVE_HOUR_RISE, KILL_SEVEN_DAY, LANE, LOCK_WAIT_S,  # noqa: E402
                     PRIOR_FIVE_HOUR, PRIOR_SEVEN_DAY, T_SECONDS, append_jsonl, clean_login_env, gateway_build, load_json,
                     manifest_digest, newest_meter_reading, prior_allows, rate_limit_readings, s7_compare, s7_snapshot,
-                    sha256_bytes, sha256_file, tree_manifest, utc_now, write_json)
+                    sha256_bytes, sha256_file, trial_dir, tree_manifest, utc_now, write_json)
 
 RATE_LIMIT_WORDS = ("rate limit", "rate_limit", "429", "usage limit", "too many requests", "quota")
 
@@ -156,10 +156,20 @@ def codex_line(cfg: dict, trial_id: str, fixture: Path, clone: Path, prompt_file
             f"-o {q(str(last_file))} - < {q(str(prompt_file))}")
 
 
+def _neutral_bin(cfg: dict, name: str, fallback: str) -> str:
+    """A neutral path in the run's trial root (bin/py, bin/run.py, bin/run.mjs, bin/sdk), so a process listing shows
+    no experiment or arm word; runs prepared before trial_root existed use the original path."""
+    base = cfg.get("trial_root")
+    return str(Path(base) / "bin" / name) if base and (Path(base) / "bin" / name).exists() else fallback
+
+
 def claude_sdk_line(cfg: dict, trial_id: str, fixture: Path, prompt_file: Path, settings_file: Path, lane: str) -> str:
     q = shlex.quote
+    script = _neutral_bin(cfg, "run.py", "")
+    # bin/run.py puts the SDK venv's site-packages on sys.path itself, so the base interpreter (a neutral path) runs it.
+    interpreter = cfg["binaries"]["python"] if script else cfg["binaries"]["claude_sdk_python"]
     return (f"timeout --signal=TERM --kill-after={KILL_AFTER} {T_SECONDS} "
-            f"{q(cfg['binaries']['claude_sdk_python'])} -B {q(str(HERE / 'sdk_claude.py'))} "
+            f"{q(interpreter)} -B {q(script or str(HERE / 'sdk_claude.py'))} "
             f"--trial-id {trial_id} --cwd {q(str(fixture))} --prompt-file {q(str(prompt_file))} "
             f"--settings {q(str(settings_file))} --cli-path {q(cfg['binaries']['claude']['path'])} "
             f"--otel {q(otel_attributes(trial_id, lane))} --gh-config-dir {q(cfg['gh_config_dir'])}")
@@ -169,9 +179,9 @@ def codex_sdk_line(cfg: dict, trial_id: str, fixture: Path, clone: Path, prompt_
                    lane: str) -> str:
     q = shlex.quote
     return (f"cd {q(str(fixture))} && timeout --signal=TERM --kill-after={KILL_AFTER} {T_SECONDS} "
-            f"{q(cfg['binaries']['node'])} {q(str(HERE / 'sdk_codex.mjs'))} "
+            f"{q(cfg['binaries']['node'])} {q(_neutral_bin(cfg, 'run.mjs', str(HERE / 'sdk_codex.mjs')))} "
             f"--trial-id {trial_id} --cwd {q(str(fixture))} --prompt-file {q(str(prompt_file))} --codex-home {q(str(clone))} "
-            f"--codex-path {q(cfg['binaries']['codex']['path'])} --sdk-dir {q(cfg['binaries']['codex_sdk_dir'])} "
+            f"--codex-path {q(cfg['binaries']['codex']['path'])} --sdk-dir {q(_neutral_bin(cfg, 'sdk', cfg['binaries']['codex_sdk_dir']))} "
             f"--sandbox {q(sandbox)} --effort {effort} --otel {q(otel_attributes(trial_id, lane))}")
 
 
@@ -353,19 +363,20 @@ def launch(cell: str, prompt: str, options: dict, context: dict) -> dict:
             raise Censored("network_on_unsupported_in_pilot")
         from fixture import extract_fixture
         fixture = extract_fixture(Path(cfg["fixture"]["tar_path"]), cfg["fixture"]["tar_sha256"])
-        prompt_file = root / "prompts" / f"{trial_id}.txt"
+        work = trial_dir(cfg, root)   # neutral: these paths reach the client's argv or environment
+        prompt_file = work / "prompts" / f"{trial_id}.txt"
         prompt_file.parent.mkdir(parents=True, exist_ok=True)
         prompt_file.write_text(prompt, encoding="utf-8")
         trial_files = {"fixture_tar": cfg["fixture"]["tar_path"]}
         prepared = {"fixture_private": str(fixture), "session_name": f"s-{short}"}
         settings_file = clone = None
         if client == "claude":
-            settings_file = root / "settings" / f"{trial_id}.json"
+            settings_file = work / "settings" / f"{trial_id}.json"
             prepared["settings_sha256"] = write_json(settings_file, cfg["claude_settings"][arm], 0o600)
             trial_files["settings"] = str(settings_file)
         else:
             from arms import build_clone
-            clone = root / "clones" / trial_id
+            clone = work / "clones" / trial_id
             rules_text = (root / "codex-rules" / "organic-e2e.rules").read_text(encoding="utf-8")
             record = build_clone(clone, arm, Path(cfg["gh_config_dir"]), rules_text)
             prepared["clone"] = record
@@ -396,7 +407,7 @@ def launch(cell: str, prompt: str, options: dict, context: dict) -> dict:
             if not allowed:
                 raise Censored("meter_prior")
         (root / "raw").mkdir(exist_ok=True)
-        (root / "last").mkdir(exist_ok=True)
+        (work / "last").mkdir(exist_ok=True)
         stream_path, err_path = root / "raw" / f"{trial_id}.stream.jsonl", root / "raw" / f"{trial_id}.err"
         sandbox = test_vars.get("sandbox") or "read-only"
         if client == "claude" and kind == "cli":
@@ -404,7 +415,7 @@ def launch(cell: str, prompt: str, options: dict, context: dict) -> dict:
         elif client == "claude" and kind == "sdk":
             line = claude_sdk_line(cfg, trial_id, fixture, prompt_file, settings_file, lane)
         elif client == "codex" and kind == "cli":
-            line = codex_line(cfg, trial_id, fixture, clone, prompt_file, root / "last" / f"{trial_id}.txt", sandbox,
+            line = codex_line(cfg, trial_id, fixture, clone, prompt_file, work / "last" / f"{trial_id}.txt", sandbox,
                               cell_cfg["effort"], lane)
         elif client == "codex" and kind == "sdk":
             line = codex_sdk_line(cfg, trial_id, fixture, clone, prompt_file, sandbox, cell_cfg["effort"], lane)

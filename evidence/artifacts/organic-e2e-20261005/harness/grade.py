@@ -25,7 +25,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 from common import (CLI_PROGRAMS, CLI_WRAPPERS, HOME, MARKERS, MCP_SERVER_ITEMS, V1_ROOT, load_json, parse_stream_text,  # noqa: E402
-                    read_jsonl, utc_now, write_json)
+                    read_jsonl, trial_dir, utc_now, write_json)
 
 HARNESS_SKILLS = {"native-stack-research", "native-stack-worker", "standing-delegation"}
 READ_PROGRAMS = {"cat", "sed", "head", "tail", "nl", "less", "rg", "grep", "bat", "more"}
@@ -811,7 +811,7 @@ def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> 
                   "items": [dict(it) for it in main_rollout["items"].values()]}
         stream_source = "rollout (no exec stream)"
     main = next((r for r in rollouts if (r.get("meta") or {}).get("id") == stream["thread_id"]), rollouts[0] if rollouts else None)
-    clone = root / "clones" / tid
+    clone = trial_dir(cfg, root) / "clones" / tid
     catalog = skill_catalog("codex", clone)
     uses = []
     # Ordering key: the tool item's ordinal (1-based) among the session's tool items; a rollout message's key is the
@@ -974,7 +974,7 @@ def provenance_context(root: Path, cfg: dict, trial: dict, graded: dict, task: d
                 registry_results.append({"order": order, "actor": actor, "text": text})
             else:
                 fixture_results.append({"order": order, "actor": actor, "text": text})
-        catalog = skill_catalog("codex", root / "clones" / trial["trial_id"])
+        catalog = skill_catalog("codex", trial_dir(cfg, root) / "clones" / trial["trial_id"])
         for use in graded["uses"]:
             if use["kind"] == "skill-consultation" and use.get("level") in ("completion", "completed-ctx"):
                 skill_bodies.append({"order": use["order"] + 0.25, "skill": use.get("skill"), "actor": use.get("actor", "main"),

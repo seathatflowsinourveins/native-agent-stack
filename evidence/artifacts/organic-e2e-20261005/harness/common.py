@@ -23,6 +23,15 @@ RUNS_ROOT = COORD / "organic-e2e-20261005" / "v11"     # the brief's run root (p
 V1_ROOT = COORD / "organic-e2e-20261005"                # v1 captures: stage-0 material only (§12.1)
 CLAUDE_LOCK = COORD / "claude-session.lock"            # §4.1 step 5, the host's shared Claude lock
 NEUTRAL_ROOT = HOME / ".cache" / "ws"                  # §4.1 NEUTRAL_ROOT: no experiment, tool, client, arm or task word
+# Per-trial files whose paths reach a client's argv or environment (settings, prompt, -o file, CODEX_HOME clone). A
+# process listing shows argv to the model, so R2 (f) applies to these paths too: they live under a neutral per-run
+# directory, never under the run root (whose path names the experiment). Records stay in the run root.
+TRIAL_ROOT_BASE = HOME / ".cache" / "wsr"
+
+
+def trial_dir(cfg: dict, run_root: Path) -> Path:
+    """The run's neutral per-trial directory (run.json trial_root); runs prepared before it existed used the run root."""
+    return Path(cfg["trial_root"]) if cfg.get("trial_root") else Path(run_root)
 FIXTURE_CACHE = HOME / ".cache" / "ns2604-organic-fixtures" / "v11"   # templates and tarballs (never a trial cwd)
 USER_CLAUDE_MD = HOME / ".claude" / "CLAUDE.md"
 CODEX_HOME_REAL = HOME / ".codex"

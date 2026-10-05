@@ -25,6 +25,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 from common import (CODEX_HOME_REAL, FREEZE_COMMIT, HOME, LANE, LANE_PROMPTED, NEUTRAL_ROOT, PROTOCOL_ID, RUNS_ROOT, T_SECONDS,  # noqa: E402
+                    TRIAL_ROOT_BASE,
                     gateway_build, load_json, newest_meter_reading, parse_stream_text, prior_allows, run, s7_snapshot,
                     sha256_bytes, sha256_file, sha256_json, utc_now, write_json)
 import arms  # noqa: E402
@@ -182,11 +183,20 @@ def main(argv=None) -> int:
     if (timing["blackout"] or not timing["settled"]["settled"]) and not args.allow_timing:
         print(json.dumps({"refused": "timing", **timing}))
         return 2
-    for sub in ("harness", "launchers", "cells", "codex-rules", "prompts", "settings", "clones", "raw", "last", "draft",
-                "manifests", "s7", "clone-samples", "promptfoo-home", "loki", "rollouts", "transcripts", "gateway",
-                "agentsview", "call-ledgers", "grades"):
+    for sub in ("harness", "launchers", "cells", "codex-rules", "raw", "draft", "manifests", "s7", "clone-samples",
+                "promptfoo-home", "loki", "rollouts", "transcripts", "gateway", "agentsview", "call-ledgers", "grades"):
         (root / sub).mkdir(parents=True, exist_ok=True)
     os.chmod(root, 0o700)
+    # The neutral per-run trial root: settings, prompts, -o files, CODEX_HOME clones and the SDK launchers, whose paths
+    # reach a client's argv or environment (a process listing shows them), so R2 (f) applies to them.
+    import secrets as _secrets
+    TRIAL_ROOT_BASE.mkdir(parents=True, exist_ok=True)
+    trial_root = TRIAL_ROOT_BASE / _secrets.token_hex(4)
+    while trial_root.exists():
+        trial_root = TRIAL_ROOT_BASE / _secrets.token_hex(4)
+    for sub in ("settings", "prompts", "last", "clones", "bin"):
+        (trial_root / sub).mkdir(parents=True, exist_ok=True)
+    os.chmod(trial_root, 0o700)
     # Freeze the harness code into the run root.
     harness_hashes = {}
     for name in HARNESS_FILES:
@@ -197,6 +207,15 @@ def main(argv=None) -> int:
     # The quota gate's script, frozen beside the harness (§9.2 runs it before every Codex block).
     shutil.copy2(repo / "scripts/codex_quota.py", root / "harness" / "codex_quota.py")
     harness_hashes["codex_quota.py (scripts/)"] = sha256_file(repo / "scripts/codex_quota.py")
+    # SDK launchers under neutral names in the trial root (CL6 runs on the base interpreter with the SDK venv's
+    # site-packages first on sys.path; CL7 imports the SDK through a neutral symlink).
+    sdk_venv_site = sorted((HOME / ".local/share/new-wsl-native-stack/tools/claude-agent-sdk/lib").glob("python3*/site-packages"))
+    header = f"import sys\nsys.path.insert(0, {json.dumps(str(sdk_venv_site[0]))})\n" if sdk_venv_site else ""
+    (trial_root / "bin" / "run.py").write_text(header + (HERE / "sdk_claude.py").read_text(encoding="utf-8"), encoding="utf-8")
+    shutil.copy2(HERE / "sdk_codex.mjs", trial_root / "bin" / "run.mjs")
+    sdk_dir = HOME / ".local/share/new-wsl-native-stack/tools/codex-sdk/node_modules/@openai/codex-sdk"
+    if sdk_dir.exists():
+        os.symlink(sdk_dir, trial_root / "bin" / "sdk")
     # Suite, amendments, lexicon.
     loaded = suite.load_suite(Path(args.suite))
     items, amend_log = suite.amend(loaded["items"])
@@ -315,7 +334,7 @@ def main(argv=None) -> int:
             for index, test in enumerate(tests):
                 trial_id = str(_uuid.uuid4())
                 fixture_dir = extract_fixture(Path(fx["tar"]["path"]), fx["tar"]["sha256"])
-                clone = root / "clones" / trial_id
+                clone = trial_root / "clones" / trial_id
                 clone_record = arms.build_clone(clone, spec["arm"], GH_EMPTY, rules_text)
                 sub = cell_dir / f"t{index}"
                 sub.mkdir(exist_ok=True)
@@ -357,6 +376,7 @@ def main(argv=None) -> int:
     run_json = {
         "run_id": args.run_id, "protocol": PROTOCOL_ID, "created_at": utc_now(), "seed": seed, "lane": args.lane,
         "repo": str(repo), "repo_head": fixture.git(repo, "rev-parse", "HEAD").decode().strip(),
+        "trial_root": str(trial_root),
         "protocol_file_sha256": sha256_file(HERE.parent / "PROTOCOL-v1.1.md") if (HERE.parent / "PROTOCOL-v1.1.md").exists() else None,
         "pilot_spec_file_sha256": sha256_file(HERE.parent / "PILOT-SPEC-v1.1.md") if (HERE.parent / "PILOT-SPEC-v1.1.md").exists() else None,
         "harness_sha256": harness_hashes, "binaries": bins, "host_fanout": host_fanout(), "timing": timing,
