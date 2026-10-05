@@ -16006,8 +16006,8 @@
     },
     {
       "path": "catalogs/saturation/ledger.json",
-      "sha256": "6290a70eb9f04486e3baabf9c11b2db27b1a457ce94025378a11794ddf773800",
-      "bytes": 513182
+      "sha256": "bbb3d025579f51649e8127fb6ba25b1c462a4f11cb8f09c2761cabe043e6367c",
+      "bytes": 541722
     },
     {
       "path": "catalogs/sota-convergence/README.md",
@@ -16043,6 +16043,11 @@
       "path": "catalogs/sota-convergence/manifest-20261005-skills-ns2604-fu1.json",
       "sha256": "2ec1e936f8bb65dd5c6594049c7d5da0ada64b54da0cbab6b1bfa0dcd8b5f09a",
       "bytes": 343467
+    },
+    {
+      "path": "catalogs/sota-convergence/manifest-20261005-skills-ns2604-fu2.json",
+      "sha256": "82b5d440bde71c39598be9283bbb5ff4b7039c175706510c50926832566af0ec",
+      "bytes": 419091
     },
     {
       "path": "catalogs/sota-convergence/manifest-20261005-skills-ns2604.json",
@@ -16973,6 +16978,11 @@
       "path": "docs/decisions/2026-10-05-skills-landscape-sweep-fu1.md",
       "sha256": "85b6abd51cc5e088c4063c3fada035df2d82127f463c257cdddb0f8ff3024ebf",
       "bytes": 8229
+    },
+    {
+      "path": "docs/decisions/2026-10-05-skills-landscape-sweep-fu2.md",
+      "sha256": "40455c9d7dc87927b5e4f2d7631f395f93be8703a4cf854abe9c0ccb371568da",
+      "bytes": 9259
     },
     {
       "path": "docs/decisions/2026-10-05-skills-landscape-sweep.md",
@@ -45918,6 +45928,146 @@
       "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu1/warpdotdev-common-skills-resolve-merge-conflicts.json",
       "sha256": "efd7c722bd055041dd4d7eada1184641c13e507fdc684765cc8e6802816c8226",
       "bytes": 3200
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2-attempts/child-usage-wf_4b9c7d98-ffd.json",
+      "sha256": "fce0cbb987bb8f49de7f9678f3be18eacb2e40702052ee0f67fe466c8a5b18ba",
+      "bytes": 903073
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2-attempts/convert-wf_4b9c7d98-ffd.log",
+      "sha256": "a14bfd5b016188d562e610f39300c7da388d1b7627be04d900a3026141d1062b",
+      "bytes": 2653
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2-attempts/make-result.stderr",
+      "sha256": "e2b3b268d5f1ce6728bc34e7b41240e7d6fe38507b84da398b39737f278f2372",
+      "bytes": 1026
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2-attempts/sanitization.json",
+      "sha256": "da1341d7c6fd040760f9018f3a5aa7c7daed2b75989bef65901102b0e02d8ba5",
+      "bytes": 578
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2-attempts/source-reviews.stderr",
+      "sha256": "f1f33244f053d6a30e27fd323757e112c553b8ec0062883afa339a5e0274586e",
+      "bytes": 587
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/README.md",
+      "sha256": "3b31f553734663d169c37978eda18f7bc63336862cd96476dd6c4707002778b0",
+      "bytes": 1978
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/RESULT-input.json",
+      "sha256": "daf9152dfd57969c4c72a1a70dcd77816d0b97aa36ca27ef1e7f39d239cc3324",
+      "bytes": 27112
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/agent-sh-agnix-agnix.json",
+      "sha256": "b0d2da36bbead14c21b4dc177ef328f91c0680e5b83a4de74c7d1a4a260bc13e",
+      "bytes": 3098
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/anthropics-claude-plugins-official-claude-md-improver.json",
+      "sha256": "6589e7a27384ee88d4beada054c6a2b3dc272c1c7eaa00174fd20454a77f36c7",
+      "bytes": 3373
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/ast-grep-agent-skill-ast-grep.json",
+      "sha256": "18d5c6b5f844d458ddb7f490a11569426566009340d380ac8cd5f2bb3d8a90c8",
+      "bytes": 3549
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/boundaryml-baml-baml-core.json",
+      "sha256": "6e6062499b7281403736ae7ef8a80b218fc682f39dbcf6623c4627156e289514",
+      "bytes": 3664
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/checks.json",
+      "sha256": "a1ef5c76a30938e15c9bcb4599daf6b365a3ec082ace26ab26627e0b07342cd0",
+      "bytes": 5567
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/dyoshikawa-rulesync-rulesync.json",
+      "sha256": "03604e7f6c3a91caaa518be61e9431a5c7c6b2d751a6554bb61a9a0e24228472",
+      "bytes": 3159
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/everyinc-compound-engineering-plugin-ce-babysit-pr.json",
+      "sha256": "452b1a4d9e89f4dd18cd32055e98716341be3a5aedd625fa92a7561969fb6664",
+      "bytes": 3589
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/getsentry-skills-agents-md.json",
+      "sha256": "4375326e3255699468994eccf2a4dd599e2e4bd28f7a8dfe67b028aee793fba7",
+      "bytes": 3445
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/lanes.json",
+      "sha256": "0838dfbee0ef8fc1a3d683d56f895efdf17a7fb36de5991c3e8821062d93e285",
+      "bytes": 352750
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/layers.json",
+      "sha256": "3c46ca9e43b00ef862d8bbd21ab0524ba5e3fcb997dc62062130b89de6ae3875",
+      "bytes": 13810
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/mattpocock-skills-code-review.json",
+      "sha256": "04228b9951235c23a0cf9f93c7d2e90b2ca9cd33f6bb621b76728d47d95e3cf5",
+      "bytes": 3243
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/mblode-agent-skills-agents-md.json",
+      "sha256": "486d8ffd529944163119fd5507ecfe65629818b948a2e0f8f4bbd8a6476ce347",
+      "bytes": 3696
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/parcha-ai-parcha-skills-review-loop.json",
+      "sha256": "c9bcb72a050140eece2ade1f9600700c5b6e91df524cbc538df5f09c1c9a0ecf",
+      "bytes": 3615
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/publication.json",
+      "sha256": "c94e51c3f485bfc5b01b09284935d1250f24c68a1fd5cd059eb388421528f19e",
+      "bytes": 5829
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/returns.json",
+      "sha256": "7e8f59f47610d311805400b25ae1a33bbaeb86597cad7248f7afeaca68ffe562",
+      "bytes": 630455
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/source-review-index.json",
+      "sha256": "8f7bde7b3e19b457b53562c0e9edf12d0a6117c4d3bf0609ce8e9701c0bbefc6",
+      "bytes": 3248
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/survivors.json",
+      "sha256": "530e3205cb790aad671e7e4fd8ff92c8dcb19bed4402b390812f864845a57243",
+      "bytes": 3885
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/warpdotdev-common-skills-diagnose-ci-failures.json",
+      "sha256": "426313f076e7ad82379d4af6f87ed81907dbfbcfad5883b46954b773208443ba",
+      "bytes": 3229
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/warpdotdev-common-skills-resolve-merge-conflicts.json",
+      "sha256": "c97c47a6e19b7b0ac0afab006ecad3e4abb552f6f94a904cc7ffb5fa15bc6332",
+      "bytes": 3221
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/warpdotdev-common-skills-respond-to-pr-comments-in-blocklist.json",
+      "sha256": "38c06a2ae6f16ada572fb1ca99c7a060f59f33a480f9b4baca39ced5b86298bd",
+      "bytes": 4045
+    },
+    {
+      "path": "evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/zandereins-schliff-schliff.json",
+      "sha256": "f4fe2e88ad88160ac610773b4ef2d275e53434d1948fde4c694583a7d163e5fb",
+      "bytes": 2969
     },
     {
       "path": "evidence/artifacts/skills-lifecycle-landscape-20261005/README.md",
