@@ -2733,6 +2733,9 @@ class FixwaveAcceptanceRepairs(unittest.TestCase):
                         events[1]["message"]["content"][0]["content"] = ""
                     elif case == "soft_exit":
                         events[1]["message"]["content"][0]["content"] = "Prepared only\nExit code: 1\n"
+                    # Metadata is not a tool event; exercise every failure gate with it present.
+                    events[:0] = [{"type": "system", "subtype": "permission_denied", "message": value}
+                                  for value in ("Native notice", None, [], 1, True)]
                     self.assertEqual(namespace["completed_foreground_shell_calls"](events),
                                      {"call"} if case in ("valid", "empty") else set())
             # A quoted marker in source text is not a native partial-output header.
@@ -2877,6 +2880,9 @@ class FixwaveAcceptanceRepairs(unittest.TestCase):
                                 result = {"type": "tool_result", "tool_use_id": "call-1", "content": "Fixture operation completed", "is_error": False}
                                 events = [{"message": {"content": [tool]}}, {"message": {"content": [result]}},
                                           {"type": "result", "subtype": "success", "is_error": False}]
+                                events[:0] = [{"type": "system", "subtype": "permission_denied",
+                                              "message": value}
+                                             for value in ("Native notice", None, [], 1, True)]
                                 if case == "background":
                                     args["background" if route == "mcp" else "run_in_background"] = True
                                 elif case == "partial":
@@ -3227,7 +3233,7 @@ class FixwaveAcceptanceRepairs(unittest.TestCase):
         report = {"reviewed_head": gpt_head, "verdict": "findings",
                   "findings": [{"file": "fixture.py", "line": 8, "description": "Concrete fixture defect"}],
                   "summary": "Completed review of the immutable fixture."}
-        cases = ("valid_findings", "valid_no_findings", "status_only", "list_output", "wrong_head", "missing_head",
+        cases = ("valid_findings", "valid_no_findings", "valid_native_system_metadata", "status_only", "list_output", "wrong_head", "missing_head",
                  "inconsistent_verdict", "unknown_verdict", "string_findings", "bool_line", "zero_line",
                  "blank_file", "blank_description", "blank_summary", "unexpected_field", "native_failure",
                  "duplicate_terminal", "native_error", "workflow_handoff", "background_terminated")
@@ -3264,7 +3270,11 @@ class FixwaveAcceptanceRepairs(unittest.TestCase):
                 elif case == "native_failure":
                     terminal.update(subtype="error_max_turns", is_error=True)
                 claude = [terminal]
-                if case == "duplicate_terminal":
+                if case == "valid_native_system_metadata":
+                    claude[:0] = [{"type": "system", "subtype": "permission_denied",
+                                   "message": "Synthetic native permission notice", "tool_name": tool}
+                                  for tool in ("Read", "Grep")]
+                elif case == "duplicate_terminal":
                     claude.append(copy.deepcopy(terminal))
                 elif case == "native_error":
                     claude.insert(0, {"type": "error", "error": "Synthetic native failure"})
@@ -3277,8 +3287,38 @@ class FixwaveAcceptanceRepairs(unittest.TestCase):
                     "Terminated background workflow at session exit\n" if case == "background_terminated" else "")
                 checked = subprocess.run(["python3", "-c", proof, str(root), claude_head, str(ROOT), gpt_head],
                                          capture_output=True, text=True, timeout=20)
-                self.assertEqual(checked.returncode == 0, case in ("valid_findings", "valid_no_findings"), checked.stderr)
+                self.assertEqual(checked.returncode == 0, case in ("valid_findings", "valid_no_findings", "valid_native_system_metadata"), checked.stderr)
                 self.assertEqual((root / "claude-review.json").exists(), checked.returncode == 0)
+
+    def test_inspector_native_metadata_preserves_linked_recipe_requirement(self):
+        import hashlib
+        import shlex
+        command = self.row("mcp-inspector")["acceptance"]["after_sign_in"]["command"]
+        proof = next(b for b in re.findall(r"<<'PY'\n(.*?)\nPY", command, re.S)
+                     if "Frozen Inspector recipe changed" in b)
+        for case in ("valid", "missing_result", "tool_error", "wrong_recipe"):
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                (root / "probe.sh").write_text("Synthetic frozen probe\n")
+                digest = hashlib.sha256((root / "probe.sh").read_bytes()).hexdigest()
+                recipe = shlex.join(["bash", str(root / "probe.sh"), str(root), "claude"])
+                events = [{"type": "system", "subtype": "permission_denied", "message": value}
+                          for value in ("Native notice", None, [], 1, True)]
+                events.append({"type": "assistant", "message": {"content": [{
+                    "type": "tool_use", "id": "probe", "name": "Bash", "input": {
+                        "command": recipe if case != "wrong_recipe" else "bash /different/probe.sh"}}]}})
+                if case != "missing_result":
+                    events.append({"type": "user", "message": {"content": [{
+                        "type": "tool_result", "tool_use_id": "probe", "is_error": case == "tool_error",
+                        "content": "INSPECTOR_CLI_OK\nINSPECTOR_WEB_OK\nINSPECTOR_STOPPED\n"}]}})
+                events.append({"type": "result", "subtype": "success", "is_error": False})
+                (root / "claude.jsonl").write_text("\n".join(json.dumps(e) for e in events))
+                (root / "claude-tools.json").write_text(json.dumps({"tools": [{"name": "fixture"}]}))
+                (root / "claude-page.html").write_text("<html>synthetic fixture</html>")
+                (root / "claude-env.txt").write_text("false\n")
+                checked = subprocess.run(["python3", "-c", proof, str(root), "claude", digest],
+                                         capture_output=True, text=True, timeout=20)
+                self.assertEqual(checked.returncode == 0, case == "valid", checked.stderr)
 
     def test_inspect_example_resolves_from_its_checkout(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -1622,7 +1622,7 @@ def completed_foreground_shell_calls(events):
     partial = ("_(timed out after ", "_(process backgrounded after ",
                "Command did not complete within its ", "Command was manually backgrounded by user with ID:", "Command was moved to the background (ID:", "Command running in background with ID:", "Exit code:")
     for event in events:
-        content = (event.get("message") or {}).get("content", [])
+        content = (event.get("message") if isinstance(event.get("message"), dict) else {}).get("content", [])
         if not isinstance(content, list):
             continue
         for block in content:
@@ -1641,10 +1641,10 @@ def completed_foreground_shell_calls(events):
     return complete
 
 c, g = events("claude.jsonl"), events("codex.jsonl")
-uses = {block["id"] for e in c if e.get("type") == "assistant" for block in e.get("message", {}).get("content", []) if block.get("type") == "tool_use" and block.get("name") == "Bash" and "accept.sh" in block.get("input", {}).get("command", "") and slot in block.get("input", {}).get("command", "")}
+uses = {block["id"] for e in c if e.get("type") == "assistant" for block in (e.get("message") if isinstance(e.get("message"), dict) else {}).get("content", []) if block.get("type") == "tool_use" and block.get("name") == "Bash" and "accept.sh" in block.get("input", {}).get("command", "") and slot in block.get("input", {}).get("command", "")}
 uses &= completed_foreground_shell_calls(c)
 assert uses, "Claude did not complete foreground acceptance execution"
-assert any(block.get("type") == "tool_result" and block.get("tool_use_id") in uses and not block.get("is_error", False) and f"{slot} | post_install | 0" in str(block.get("content", "")) for e in c if e.get("type") == "user" for block in e.get("message", {}).get("content", [])), "Claude'"'"'s functional tool result is missing or failed"
+assert any(block.get("type") == "tool_result" and block.get("tool_use_id") in uses and not block.get("is_error", False) and f"{slot} | post_install | 0" in str(block.get("content", "")) for e in c if e.get("type") == "user" for block in (e.get("message") if isinstance(e.get("message"), dict) else {}).get("content", [])), "Claude'"'"'s functional tool result is missing or failed"
 assert any(e.get("type") == "result" and e.get("subtype") == "success" and not e.get("is_error", False) for e in c), "Claude stream did not complete"
 assert any(e.get("type") == "item.completed" and e.get("item", {}).get("type") == "command_execution" and "accept.sh" in e["item"].get("command", "") and slot in e["item"].get("command", "") and e["item"].get("exit_code") == 0 and f"{slot} | post_install | 0" in e["item"].get("aggregated_output", "") for e in g), "Codex'"'"'s functional command result is missing or failed"
 assert any(e.get("type") == "turn.completed" for e in g), "Codex stream did not complete"
@@ -1698,7 +1698,7 @@ def completed_foreground_shell_calls(events):
     partial = ("_(timed out after ", "_(process backgrounded after ",
                "Command did not complete within its ", "Command was manually backgrounded by user with ID:", "Command was moved to the background (ID:", "Command running in background with ID:", "Exit code:")
     for event in events:
-        content = (event.get("message") or {}).get("content", [])
+        content = (event.get("message") if isinstance(event.get("message"), dict) else {}).get("content", [])
         if not isinstance(content, list):
             continue
         for block in content:
@@ -1717,10 +1717,10 @@ def completed_foreground_shell_calls(events):
     return complete
 
 c, g = events("claude.jsonl"), events("codex.jsonl")
-uses = {block["id"] for e in c if e.get("type") == "assistant" for block in e.get("message", {}).get("content", []) if block.get("type") == "tool_use" and block.get("name") == "Bash" and "accept.sh" in block.get("input", {}).get("command", "") and slot in block.get("input", {}).get("command", "")}
+uses = {block["id"] for e in c if e.get("type") == "assistant" for block in (e.get("message") if isinstance(e.get("message"), dict) else {}).get("content", []) if block.get("type") == "tool_use" and block.get("name") == "Bash" and "accept.sh" in block.get("input", {}).get("command", "") and slot in block.get("input", {}).get("command", "")}
 uses &= completed_foreground_shell_calls(c)
 assert uses, "Claude did not complete foreground acceptance execution"
-assert any(block.get("type") == "tool_result" and block.get("tool_use_id") in uses and not block.get("is_error", False) and f"{slot} | post_install | 0" in str(block.get("content", "")) for e in c if e.get("type") == "user" for block in e.get("message", {}).get("content", [])), "Claude'"'"'s functional tool result is missing or failed"
+assert any(block.get("type") == "tool_result" and block.get("tool_use_id") in uses and not block.get("is_error", False) and f"{slot} | post_install | 0" in str(block.get("content", "")) for e in c if e.get("type") == "user" for block in (e.get("message") if isinstance(e.get("message"), dict) else {}).get("content", [])), "Claude'"'"'s functional tool result is missing or failed"
 assert any(e.get("type") == "result" and e.get("subtype") == "success" and not e.get("is_error", False) for e in c), "Claude stream did not complete"
 assert any(e.get("type") == "item.completed" and e.get("item", {}).get("type") == "command_execution" and "accept.sh" in e["item"].get("command", "") and slot in e["item"].get("command", "") and e["item"].get("exit_code") == 0 and f"{slot} | post_install | 0" in e["item"].get("aggregated_output", "") for e in g), "Codex'"'"'s functional command result is missing or failed"
 assert any(e.get("type") == "turn.completed" for e in g), "Codex stream did not complete"
@@ -1788,7 +1788,7 @@ def completed_foreground_shell_calls(events):
                "[Request interrupted", "Interrupted", "Exit code:",
                "<error>Command was aborted before completion</error>")
     for event in events:
-        content = (event.get("message") or {}).get("content", [])
+        content = (event.get("message") if isinstance(event.get("message"), dict) else {}).get("content", [])
         if not isinstance(content, list):
             continue
         for block in content:
@@ -1854,7 +1854,7 @@ def immutable_read(events, commit, repository):
 assert immutable_read(g, sys.argv[2], sys.argv[3]), "GPT did not complete the immutable source-read control"
 assert not any(e.get("type") in ("error", "turn.failed") for e in g), "GPT review failed"
 assert any(e.get("type") == "item.completed" and e.get("item", {}).get("type") == "agent_message" and e["item"].get("text") for e in g), "GPT returned no review"
-claude_shell_ids = {b["id"] for e in c for b in (e.get("message") or {}).get("content", [])
+claude_shell_ids = {b["id"] for e in c for b in (e.get("message") if isinstance(e.get("message"), dict) else {}).get("content", [])
                     if isinstance(b, dict) and b.get("type") == "tool_use"
                     and (b.get("name") == "Bash" or (b.get("name", "").endswith("__ctx_execute")
                          and b.get("input", {}).get("language") == "shell"))}
@@ -1879,7 +1879,7 @@ for finding in findings:
 assert not any(b.get("type") == "tool_use" and
                (b.get("name") in ("Workflow", "Agent", "Bash", "Write", "Edit", "EnterPlanMode", "ExitPlanMode")
                 or str(b.get("name", "")).startswith("mcp__"))
-               for e in c for b in (e.get("message") or {}).get("content", []) if isinstance(b, dict)), "Claude used a tool outside the read-only review surface"
+               for e in c for b in (e.get("message") if isinstance(e.get("message"), dict) else {}).get("content", []) if isinstance(b, dict)), "Claude used a tool outside the read-only review surface"
 stderr = (d / "claude-review.stderr").read_text()
 assert not re.search(r"(?i)(?:terminat|cancel|interrupt)\w*[^\n]*background|background[^\n]*(?:terminat|cancel|interrupt)", stderr), "Claude review terminated background work"
 (d / "claude-review.json").write_text(json.dumps(report, indent=2) + "\n")
@@ -2094,7 +2094,7 @@ def completed_foreground_shell_calls(events):
     partial = ("_(timed out after ", "_(process backgrounded after ",
                "Command did not complete within its ", "Command was manually backgrounded by user with ID:", "Command was moved to the background (ID:", "Command running in background with ID:", "Exit code:")
     for event in events:
-        content = (event.get("message") or {}).get("content", [])
+        content = (event.get("message") if isinstance(event.get("message"), dict) else {}).get("content", [])
         if not isinstance(content, list):
             continue
         for block in content:
@@ -2143,7 +2143,7 @@ else:
                and not e.get("is_error", False) for e in events), "Claude did not complete"
     calls = {}
     for event in events:
-        content = event.get("message", {}).get("content", [])
+        content = (event.get("message") if isinstance(event.get("message"), dict) else {}).get("content", [])
         if not isinstance(content, list):
             continue
         for block in content:
@@ -2294,7 +2294,7 @@ def native_commands(path, client, expected, completion_patterns):
     assert any(e.get("type") == "result" and e.get("subtype") == "success" and not e.get("is_error", False) for e in events), "Native Claude did not complete"
     calls, done = {}, []
     for event in events:
-        content = event.get("message", {}).get("content", [])
+        content = (event.get("message") if isinstance(event.get("message"), dict) else {}).get("content", [])
         if not isinstance(content, list):
             continue
         for block in content:
@@ -2458,7 +2458,7 @@ def native_commands(path, client, expected, completion_patterns):
     assert any(e.get("type") == "result" and e.get("subtype") == "success" and not e.get("is_error", False) for e in events), "Native Claude did not complete"
     calls, done = {}, []
     for event in events:
-        content = event.get("message", {}).get("content", [])
+        content = (event.get("message") if isinstance(event.get("message"), dict) else {}).get("content", [])
         if not isinstance(content, list):
             continue
         for block in content:

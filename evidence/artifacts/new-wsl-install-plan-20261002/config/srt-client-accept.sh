@@ -91,7 +91,7 @@ def completed_foreground_shell_calls(events):
     partial = ("_(timed out after ", "_(process backgrounded after ",
                "Command did not complete within its ", "Command was manually backgrounded by user with ID:", "Command was moved to the background (ID:", "Command running in background with ID:", "Exit code:")
     for event in events:
-        content = (event.get("message") or {}).get("content", [])
+        content = (event.get("message") if isinstance(event.get("message"), dict) else {}).get("content", [])
         if not isinstance(content, list):
             continue
         for block in content:
@@ -116,7 +116,7 @@ if sys.argv[2] == 'claude':
     calls = {}
     successful = set()
     for event in events:
-        for block in (event.get('message') or {}).get('content', []):
+        for block in (event.get('message') if isinstance(event.get('message'), dict) else {}).get('content', []):
             if isinstance(block, dict) and block.get('type') == 'tool_use' and block.get('name') == 'Bash':
                 command = (block.get('input') or {}).get('command', '')
                 if all(part in command for part in required):

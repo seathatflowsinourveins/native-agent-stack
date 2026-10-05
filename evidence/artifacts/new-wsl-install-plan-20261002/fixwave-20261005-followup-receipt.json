@@ -1,4 +1,170 @@
 {
+  "post713_native_review_parser_followup": {
+    "recorded_at_utc": "2026-10-05T17:25:00Z",
+    "native_whole_stage_exit": 1,
+    "native_attempt_scope": "Exactly one A31 frozen read-only retry; both directions completed, whole-stage local oracle failed.",
+    "native_source_commit": "7098936765b762b7b6ff631e4094fdf2646ce4c3",
+    "failure": "AttributeError on two system/permission_denied events with message=str.",
+    "native_claude_terminal": {
+      "subtype": "success",
+      "is_error": false,
+      "num_turns": 62,
+      "duration_ms": 1032616,
+      "duration_api_ms": 1025273,
+      "total_cost_usd": 6.230016400000001
+    },
+    "native_claude_usage": {
+      "input_tokens": 86,
+      "cache_creation_input_tokens": 200239,
+      "cache_read_input_tokens": 5764117,
+      "output_tokens": 77365,
+      "output_tokens_details": {
+        "thinking_tokens": 63306
+      },
+      "server_tool_use": {
+        "web_search_requests": 0,
+        "web_fetch_requests": 0
+      },
+      "service_tier": "standard",
+      "cache_creation": {
+        "ephemeral_1h_input_tokens": 193594,
+        "ephemeral_5m_input_tokens": 0
+      },
+      "inference_geo": "not_available",
+      "iterations": [
+        {
+          "input_tokens": 2,
+          "output_tokens": 3770,
+          "cache_read_input_tokens": 193231,
+          "cache_creation_input_tokens": 363,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 363
+          },
+          "type": "message"
+        },
+        {
+          "input_tokens": 198294,
+          "output_tokens": 4188,
+          "cache_read_input_tokens": 0,
+          "cache_creation_input_tokens": 0,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 0,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "advisor_message",
+          "model": "claude-opus-5-5"
+        },
+        {
+          "input_tokens": 2,
+          "output_tokens": 2033,
+          "cache_read_input_tokens": 193594,
+          "cache_creation_input_tokens": 4950,
+          "cache_creation": {
+            "ephemeral_5m_input_tokens": 4950,
+            "ephemeral_1h_input_tokens": 0
+          },
+          "type": "message"
+        }
+      ],
+      "speed": "standard",
+      "fallback_credit": null
+    },
+    "usage_scope": "One unique terminal snapshot; nested iterations and modelUsage are not added to its totals. GPT exact usage remains unknown here.",
+    "native_claude_tool_counts": {
+      "Glob": 3,
+      "Read": 14,
+      "Grep": 43,
+      "StructuredOutput": 1
+    },
+    "native_claude_unique_assistant_ids": 41,
+    "max_turns_from_argv": 48,
+    "counter_scope": "Installed successful num_turns and enforcement turnCount are distinct; actual guard count and relationship to assistant IDs are unobserved.",
+    "native_claude_delivery": {
+      "reviewed_head": "b9dbe3c5a09cdefca435cd78c7f3dad46ca883a4",
+      "verdict": "findings",
+      "findings_count": 2
+    },
+    "local_retained_stream_replay": {
+      "evidence_class": "local_integration",
+      "delivered_review_oracle_exit": 0,
+      "native_bindings_oracle_exit": 0,
+      "original_streams_unchanged": true,
+      "not_a_new_native_stage_or_provider_run": true
+    },
+    "native_binding_summary": {
+      "gpt_target_type": "custom",
+      "gpt_model_from_argv": "gpt-6.1-sol",
+      "gpt_effort_from_argv": "max",
+      "immutable_git_show_completed": true,
+      "claude": {
+        "model_from_argv": "opus",
+        "effort_from_argv": "max",
+        "model_from_native_init": "claude-opus-5-5",
+        "effort_from_native_init": null
+      },
+      "observation_deadline_seconds": {
+        "each_direction": 1200,
+        "sequential_total": 2400,
+        "kill_grace": 15
+      },
+      "gateway_wire_model_effort": "Independent owner observation still required."
+    },
+    "retained_artifacts": [
+      {
+        "alias": "post713-cross-gpt-review.jsonl",
+        "bytes": 287800,
+        "sha256": "c708bf7a5b9a506442635861381bc806dafb57495db260f3c4d73cb41886ac5d"
+      },
+      {
+        "alias": "post713-cross-claude-review.jsonl",
+        "bytes": 917737,
+        "sha256": "f29a877d59053cfcc6054745bc303578f179cb47d885a9339a802b4e16e9a136"
+      },
+      {
+        "alias": "post713-cross-claude-review.argv.json",
+        "bytes": 1561,
+        "sha256": "8c1cf3a8a5e5d84a70d6295c14f92f8a47d625e05864f34bfb62f255f7e0f48f"
+      },
+      {
+        "alias": "post713-cross-gpt-review.argv.json",
+        "bytes": 974,
+        "sha256": "0f722cdfd100cf18ffd64b19bf2985be5322a8e24f820ae09fe7d555ccf3fcd3"
+      },
+      {
+        "alias": "post713-cross-gpt-authored.diff",
+        "bytes": 31164,
+        "sha256": "c9a9de5292c962c77bff54bbfc081db691556fcf4a06cb6e4238b0626647e9c6"
+      },
+      {
+        "alias": "post713-cross-commits.txt",
+        "bytes": 164,
+        "sha256": "1fe1576eabbacf321a28266e8824d7618753129f10010ee0f2685a53240e0112"
+      },
+      {
+        "alias": "post713-cross-claude-review.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "alias": "post713-cross-gpt-review.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "alias": "post713-cross-claude-review.json",
+        "bytes": 5131,
+        "sha256": "52ad80afccb59af06e7be68b19f958382fce8d1bc506db4e6fa972bed19b7d3c"
+      },
+      {
+        "alias": "post713-cross-review-binding.json",
+        "bytes": 899,
+        "sha256": "668963274c07853cdc3755a469faea4edb90586e598a796219b6f2e43c28e4d3"
+      }
+    ],
+    "receiver_repair_scope": "Owned plan/script receivers only; trading-owned executable variants handed off and historical artifacts preserved.",
+    "next_native_cross_retry": "Owner direction required: A31 one-run allowance consumed."
+  },
   "schema_version": 1,
   "kind": "ns2604-install-plan-acceptance-defect-followup",
   "evidence_class": "local_integration",
