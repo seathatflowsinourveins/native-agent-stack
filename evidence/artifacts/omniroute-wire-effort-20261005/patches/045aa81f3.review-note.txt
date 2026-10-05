@@ -1,0 +1,5 @@
+Review round 2 (Claude source review + GPT-6 gpt-6-astra max, 2026-09-28): wording corrections to this commit's message and test header (lines 13-15), non-blocking; carry them into the next re-application.
+(a) Replace 'no pin can expire between two reads' with: each non-lease selection reads the pin (L317), decides (L345) and writes (L347) with no await in between. Upsert and touch still read internally, and an inherited expiry during the reuse-branch touch can return an account with no pin.
+(b) Replace 'the dispatch reuses the pin it writes' with: the dispatch reuses a check-written pin only while that pin is present and eligible, and a check-written pin may never be dispatched, because prescreen visits several targets and later gates can reject one.
+(c) 'Once' means one fresh leaf decision, not one occupancy read.
+(d) No request-construction code changed, but the payload, model and effort still follow the selected account's configuration, and continuity after an account change is not guaranteed.

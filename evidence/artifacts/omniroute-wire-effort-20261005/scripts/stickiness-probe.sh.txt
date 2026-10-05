@@ -1,0 +1,17 @@
+#!/bin/bash
+# One native Codex SDK turn with a dependent chain of shell calls through the live gateway (20128); prints the window of /v1/responses calls it caused
+# (time, input and cache-read tokens, anonymised connection index). A sticky session stays on one connection. Cost: about 9 calls of ~17-20k tokens, ~95% cached.
+set -u
+LABEL="${1:-probe}"
+W=$(mktemp -d "$HOME/.cache/omniroute-probe-XXXXXX")
+printf 'alpha\n' > "$W/a.txt"
+T0=$(date -u +%Y-%m-%dT%H:%M:%S.000Z)
+cd "$HOME/code/.worktrees/native-agent-stack/99/hooktrust2" || exit 2
+timeout 420 uv run --locked --script examples/omniroute-codex-sdk/worker.py --workspace "$W" --codex-home "$HOME/.local/state/native-agent-stack/peer-99-gpt-worker/codex-home" \
+  --sandbox read-only --approval-mode deny_all --timeout 360 --native-result "$W/result.json" \
+  --prompt "Do this as eight separate shell calls, one command per call, waiting for each output before choosing the next, never batching or combining: (1) date -u +%s ; (2) printf '%s\n' <the number from step 1> | wc -c ; (3) echo step3 <the number from step 2> ; (4) expr <the number from step 2> + 1 ; (5) echo step5 <the result of step 4> ; (6) expr <the result of step 4> + 1 ; (7) echo step7 <the result of step 6> ; (8) expr <the result of step 6> + 1. After step 8 reply with the single word DONE." > "$W/worker.out" 2>&1
+RC=$?
+T1=$(date -u +%Y-%m-%dT%H:%M:%S.999Z)
+echo "$LABEL worker_exit=$RC window=$T0..$T1"
+python3 "$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-probe-window-20261005.py" "$T0" "$T1"
+rm -rf "$W"

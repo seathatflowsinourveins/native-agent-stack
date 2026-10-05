@@ -1,0 +1,65 @@
+import hashlib
+import json
+import sqlite3
+import subprocess
+from pathlib import Path
+
+home = Path.home()
+O = home / ".local/state/native-agent-stack/omniroute-switch-20261005/evidence-20261005"
+tools = home / ".local/share/codex-ecosystem/tools"
+live = tools / "omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167/lib/node_modules/omniroute"
+clean = tools / "omniroute-3.8.51-npm/lib/node_modules/omniroute"
+work = home / ".cache/omniroute-build-20261005/src"
+clone = home / ".local/share/codex-ecosystem/sources/omniroute-a58000c7-pr14904"
+
+
+def git(*args, cwd=clone):
+    return subprocess.run(["git", *args], cwd=cwd, capture_output=True, text=True).stdout.strip()
+
+
+def sha(p):
+    return hashlib.sha256(Path(p).read_bytes()).hexdigest()
+
+
+files = ["open-sse/executors/codex.ts", "open-sse/executors/codex/reasoningSuffix.ts", "open-sse/config/providers/registry/codex/index.ts", "src/lib/providers/codexFastTier.ts"]
+identity = {
+    "schema": "omniroute-source-identity/1",
+    "taken_utc": subprocess.run(["date", "-u", "+%Y-%m-%dT%H:%M:%SZ"], capture_output=True, text=True).stdout.strip(),
+    "base": {
+        "release_branch_commit": git("rev-parse", "2f42a9ac1"), "release_branch_tree": git("rev-parse", "2f42a9ac1^{tree}"),
+        "v3_8_51_tag_commit": git("rev-parse", "c1e30b767"), "v3_8_51_tag_tree": git("rev-parse", "c1e30b767^{tree}"),
+        "git_diff_between_them_empty": subprocess.run(["git", "diff", "--quiet", "2f42a9ac1", "c1e30b767"], cwd=clone).returncode == 0,
+        "npm_omniroute_3_8_51": {"published": "2026-09-30T02:54:04Z", "integrity": "sha512-VwwSt+bP9lJiPJXFJMz0nNGGuoewPZU3nFe1SLuO11ADgdSwTegGCxhg8Ov75+31m/cocPxHiO63zygn1XQ0MQ==", "dist_BUILD_SHA": (clean / "dist/BUILD_SHA").read_text().strip()},
+    },
+    "patches": {"upstream_15167_pr_head": git("rev-parse", "0585aba55"), "affinity_patch_local": git("rev-parse", "045aa81f3"), "affinity_cherry_pick_on_tag": git("rev-parse", "e14d1e8e0", cwd=work),
+                "15167_cherry_pick_on_tag_plus_affinity": git("rev-parse", "5f4b3d577", cwd=work)},
+    "deployed_20128": {"prefix": "omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167", "dist_BUILD_SHA": (live / "dist/BUILD_SHA").read_text().strip()},
+    "probe_tree_with_15167": {"commit": (O / "with-15167.commit").read_text().strip()},
+    "probe_tree_without_15167": {"commit": (O / "without-15167.commit").read_text().strip()},
+    "file_sha256": {f: {"deployed_live": sha(live / f), "probe_with_15167": sha(work / f) if False else hashlib.sha256(subprocess.run(["git", "show", f"5f4b3d577:{f}"], cwd=work, capture_output=True).stdout).hexdigest(),
+                        "clean_published_npm": sha(clean / f)} for f in files},
+    "bundle_files_containing_gpt_6_1_sol": {
+        "deployed_live": int(subprocess.run(f"grep -rIl 'gpt-6.1-sol' {live}/dist/.build/next/server/chunks | wc -l", shell=True, capture_output=True, text=True).stdout.strip()),
+        "clean_published_npm": int(subprocess.run(f"grep -rIl 'gpt-6.1-sol' {clean}/dist/.build/next/server/chunks | wc -l", shell=True, capture_output=True, text=True).stdout.strip())},
+    "bundle_files_containing_pickMoreAvailableOAuthPeer": {
+        "deployed_live": int(subprocess.run(f"grep -rIl 'pickMoreAvailableOAuthPeer' {live}/dist/.build/next/server/chunks | wc -l", shell=True, capture_output=True, text=True).stdout.strip()),
+        "clean_published_npm": int(subprocess.run(f"grep -rIl 'pickMoreAvailableOAuthPeer' {clean}/dist/.build/next/server/chunks | wc -l", shell=True, capture_output=True, text=True).stdout.strip())},
+}
+for f, row in identity["file_sha256"].items():
+    row["deployed_equals_probe_with_15167"] = row["deployed_live"] == row["probe_with_15167"]
+(O / "source-identity.json").write_text(json.dumps(identity, indent=1) + "\n")
+
+con = sqlite3.connect(f"file:{home/'.local/share/omniroute/storage.sqlite'}?mode=ro", uri=True)
+rows = con.execute("select timestamp, model, status, tokens_in, tokens_cache_read, tokens_out, tokens_reasoning, connection_id, artifact_relpath from call_logs where path='/v1/responses' and timestamp >= '2026-10-05T14:07:00.000Z' and timestamp <= '2026-10-05T14:12:00.000Z' order by timestamp").fetchall()
+idx, out = {}, []
+for ts, model, status, tin, cache, tout, treason, conn, rel in rows:
+    art = json.loads((home / ".local/share/omniroute/call_logs" / rel).read_text())
+    req = art.get("requestBody", {})
+    out.append({"time_utc": ts, "model": model, "status": status, "tokens_in": tin, "tokens_cache_read": cache, "tokens_out": tout, "tokens_reasoning": treason,
+                "connection_index": idx.setdefault(conn, len(idx)), "client_request_model": req.get("model"), "client_request_reasoning": req.get("reasoning"),
+                "service_tier": req.get("service_tier")})
+(O / "live-requests.json").write_text(json.dumps({"schema": "omniroute-live-requests/1", "note": "calls of the baseline probe sessions through the live 20128 gateway (SDK worker, default cx/gpt-6.1-sol-max route); connection ids and accounts are not recorded; /v1/responses correlation ids are gateway-generated, so the join to the worker's turns is by time window",
+                                                      "calls": out}, indent=1) + "\n")
+print(json.dumps({k: identity[k] for k in ("base", "bundle_files_containing_gpt_6_1_sol", "bundle_files_containing_pickMoreAvailableOAuthPeer")}, indent=1)[:1500])
+print({f: r["deployed_equals_probe_with_15167"] for f, r in identity["file_sha256"].items()})
+print(len(out), "live calls recorded;", sorted({(c["model"], json.dumps(c["client_request_reasoning"]), c["status"]) for c in out}))

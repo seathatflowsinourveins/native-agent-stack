@@ -1,0 +1,20 @@
+import json
+import sqlite3
+from pathlib import Path
+
+con = sqlite3.connect(f"file:{Path.home()/'.local/share/omniroute/storage.sqlite'}?mode=ro", uri=True)
+since = con.execute("select strftime('%Y-%m-%dT%H:%M:%fZ','now','-7 days')").fetchone()[0]
+until = con.execute("select strftime('%Y-%m-%dT%H:%M:%fZ','now')").fetchone()[0]
+base = "path='/v1/responses' and status between 200 and 299 and timestamp >= ? and timestamp < ?"
+calls, tin, cache = con.execute(f"select count(*), sum(tokens_in), sum(tokens_cache_read) from call_logs where {base}", (since, until)).fetchone()
+models = con.execute(f"select model, count(*) from call_logs where {base} group by model order by 2 desc", (since, until)).fetchall()
+conns = [(n, a, b) for n, a, b in con.execute(f"select count(*), sum(tokens_in), sum(tokens_cache_read) from call_logs where {base} group by connection_id order by 1 desc", (since, until))]
+maxultra = sum(n for m, n in models if m.endswith("-max") or m.endswith("-ultra"))
+alpha = con.execute("select count(*) from call_logs where path like '%alpha%'").fetchone()[0]
+out = {"schema": "omniroute-usage-7d/1", "window_utc": [since, until], "path": "/v1/responses (2xx)", "calls": calls, "input_tokens": tin, "cache_read_tokens": cache,
+       "cache_share_pct": round(100.0 * cache / tin, 1), "models": dict(models), "calls_on_max_or_ultra_model_names": maxultra,
+       "share_on_max_or_ultra_pct": round(100.0 * maxultra / calls, 1), "connections": len(conns),
+       "per_connection_cache_share_pct": [round(100.0 * b / a, 1) for n, a, b in conns], "alpha_search_calls_all_time": alpha,
+       "note": "counts only; no account, connection id or credential column is read or recorded"}
+print(json.dumps(out, indent=1))
+(Path.home() / ".local/state/native-agent-stack/omniroute-switch-20261005/evidence-20261005/usage-7d.json").write_text(json.dumps(out, indent=1) + "\n")

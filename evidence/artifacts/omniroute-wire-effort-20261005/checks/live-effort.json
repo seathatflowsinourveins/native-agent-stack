@@ -1,0 +1,146 @@
+{
+ "schema": "omniroute-live-effort/1",
+ "store": "omniroute (20128)",
+ "read": "mode=ro; columns reasoning_effort_requested, reasoning_effort_upstream, reasoning_source, model, timestamp only",
+ "meaning": "reasoning_effort_upstream is the effort in the provider request the attempt captured; filled only for rows whose response carried encrypted reasoning (reasoning_source='encrypted'); '-' means NULL, not 'none sent'",
+ "fresh_probe_rows_2026-10-05T14:07Z_to_14:12Z": [
+  {
+   "model": "gpt-6.1-sol-max",
+   "requested": "-",
+   "upstream": "-",
+   "reasoning_source": "-",
+   "rows": 13,
+   "first": "2026-10-05T14:07:34.865Z",
+   "last": "2026-10-05T14:11:10.564Z"
+  },
+  {
+   "model": "gpt-6-astra-max",
+   "requested": "max",
+   "upstream": "max",
+   "reasoning_source": "encrypted",
+   "rows": 3,
+   "first": "2026-10-05T14:10:06.126Z",
+   "last": "2026-10-05T14:11:38.656Z"
+  },
+  {
+   "model": "gpt-6.1-sol-max",
+   "requested": "max",
+   "upstream": "max",
+   "reasoning_source": "encrypted",
+   "rows": 2,
+   "first": "2026-10-05T14:09:31.056Z",
+   "last": "2026-10-05T14:09:57.793Z"
+  },
+  {
+   "model": "gpt-6-astra-max",
+   "requested": "-",
+   "upstream": "-",
+   "reasoning_source": "-",
+   "rows": 1,
+   "first": "2026-10-05T14:09:45.393Z",
+   "last": "2026-10-05T14:09:45.393Z"
+  }
+ ],
+ "last_7_days_gpt_6_1_sol": [
+  {
+   "model": "gpt-6.1-sol",
+   "requested": "max",
+   "upstream": "max",
+   "reasoning_source": "encrypted",
+   "rows": 7550,
+   "first": "2026-09-30T06:33:12.914Z",
+   "last": "2026-10-05T06:02:19.355Z"
+  },
+  {
+   "model": "gpt-6.1-sol-max",
+   "requested": "max",
+   "upstream": "max",
+   "reasoning_source": "encrypted",
+   "rows": 2728,
+   "first": "2026-09-30T17:14:02.344Z",
+   "last": "2026-10-05T14:09:57.793Z"
+  },
+  {
+   "model": "gpt-6.1-sol",
+   "requested": "-",
+   "upstream": "-",
+   "reasoning_source": "-",
+   "rows": 1643,
+   "first": "2026-09-29T23:00:01.054Z",
+   "last": "2026-10-05T06:02:28.411Z"
+  },
+  {
+   "model": "gpt-6.1-sol",
+   "requested": "max",
+   "upstream": "xhigh",
+   "reasoning_source": "encrypted",
+   "rows": 1165,
+   "first": "2026-09-30T00:47:41.738Z",
+   "last": "2026-09-30T06:29:46.092Z"
+  },
+  {
+   "model": "gpt-6.1-sol-max",
+   "requested": "-",
+   "upstream": "-",
+   "reasoning_source": "-",
+   "rows": 881,
+   "first": "2026-09-30T06:36:26.388Z",
+   "last": "2026-10-05T14:11:10.564Z"
+  },
+  {
+   "model": "gpt-6.1-sol",
+   "requested": "xhigh",
+   "upstream": "xhigh",
+   "reasoning_source": "encrypted",
+   "rows": 773,
+   "first": "2026-09-29T22:59:56.611Z",
+   "last": "2026-10-03T06:36:53.452Z"
+  },
+  {
+   "model": "gpt-6.1-sol-max",
+   "requested": "low",
+   "upstream": "max",
+   "reasoning_source": "encrypted",
+   "rows": 34,
+   "first": "2026-10-04T21:51:18.865Z",
+   "last": "2026-10-04T22:17:22.073Z"
+  },
+  {
+   "model": "gpt-6.1-sol-ultra",
+   "requested": "ultra",
+   "upstream": "max",
+   "reasoning_source": "encrypted",
+   "rows": 5,
+   "first": "2026-10-03T06:40:13.565Z",
+   "last": "2026-10-03T07:25:47.325Z"
+  },
+  {
+   "model": "gpt-6.1-sol-max",
+   "requested": "-",
+   "upstream": "max",
+   "reasoning_source": "encrypted",
+   "rows": 3,
+   "first": "2026-09-30T06:33:22.294Z",
+   "last": "2026-09-30T06:34:09.044Z"
+  },
+  {
+   "model": "gpt-6.1-sol-high",
+   "requested": "-",
+   "upstream": "high",
+   "reasoning_source": "encrypted",
+   "rows": 1,
+   "first": "2026-10-02T02:22:58.684Z",
+   "last": "2026-10-02T02:22:58.684Z"
+  },
+  {
+   "model": "gpt-6.1-sol-xhigh",
+   "requested": "-",
+   "upstream": "xhigh",
+   "reasoning_source": "encrypted",
+   "rows": 1,
+   "first": "2026-09-30T06:33:31.803Z",
+   "last": "2026-09-30T06:33:31.803Z"
+  }
+ ],
+ "window_start": "2026-09-28T14:20:15.137Z"
+}

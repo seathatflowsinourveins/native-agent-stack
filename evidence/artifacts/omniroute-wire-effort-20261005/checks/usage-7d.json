@@ -1,0 +1,38 @@
+{
+ "schema": "omniroute-usage-7d/1",
+ "window_utc": [
+  "2026-09-28T14:18:55.558Z",
+  "2026-10-05T14:18:55.558Z"
+ ],
+ "path": "/v1/responses (2xx)",
+ "calls": 20371,
+ "input_tokens": 1576063034,
+ "cache_read_tokens": 1469610624,
+ "cache_share_pct": 93.2,
+ "models": {
+  "gpt-6.1-sol": 10566,
+  "gpt-6-astra": 5127,
+  "gpt-6.1-sol-max": 3124,
+  "gpt-6-astra-max": 934,
+  "gpt-6-astra-ultra": 360,
+  "gpt-6-sol": 223,
+  "gpt-6-luna": 30,
+  "gpt-6.1-sol-ultra": 5,
+  "gpt-6.1-sol-xhigh": 1,
+  "gpt-6.1-sol-high": 1
+ },
+ "calls_on_max_or_ultra_model_names": 4423,
+ "share_on_max_or_ultra_pct": 21.7,
+ "connections": 7,
+ "per_connection_cache_share_pct": [
+  93.3,
+  92.9,
+  93.8,
+  92.5,
+  93.5,
+  93.6,
+  92.8
+ ],
+ "alpha_search_calls_all_time": 0,
+ "note": "counts only; no account, connection id or credential column is read or recorded"
+}

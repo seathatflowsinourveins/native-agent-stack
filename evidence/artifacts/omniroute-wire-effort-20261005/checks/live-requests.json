@@ -1,0 +1,310 @@
+{
+ "schema": "omniroute-live-requests/1",
+ "note": "calls of the baseline probe sessions through the live 20128 gateway (SDK worker, default cx/gpt-6.1-sol-max route); connection ids and accounts are not recorded; /v1/responses correlation ids are gateway-generated, so the join to the worker's turns is by time window",
+ "calls": [
+  {
+   "time_utc": "2026-10-05T14:07:34.865Z",
+   "model": "gpt-6.1-sol-max",
+   "status": 200,
+   "tokens_in": 17078,
+   "tokens_cache_read": 16768,
+   "tokens_out": 32,
+   "tokens_reasoning": 0,
+   "connection_index": 0,
+   "client_request_model": "codex/gpt-6.1-sol-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:07:47.604Z",
+   "model": "gpt-6.1-sol-max",
+   "status": 200,
+   "tokens_in": 17355,
+   "tokens_cache_read": 17024,
+   "tokens_out": 5,
+   "tokens_reasoning": 0,
+   "connection_index": 0,
+   "client_request_model": "codex/gpt-6.1-sol-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:08:33.333Z",
+   "model": "gpt-6.1-sol-max",
+   "status": 200,
+   "tokens_in": 16954,
+   "tokens_cache_read": 16512,
+   "tokens_out": 36,
+   "tokens_reasoning": 0,
+   "connection_index": 1,
+   "client_request_model": "codex/gpt-6.1-sol-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:08:37.213Z",
+   "model": "gpt-6.1-sol-max",
+   "status": 200,
+   "tokens_in": 17051,
+   "tokens_cache_read": 16768,
+   "tokens_out": 39,
+   "tokens_reasoning": 0,
+   "connection_index": 1,
+   "client_request_model": "codex/gpt-6.1-sol-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:08:54.805Z",
+   "model": "gpt-6.1-sol-max",
+   "status": 200,
+   "tokens_in": 17148,
+   "tokens_cache_read": 16896,
+   "tokens_out": 36,
+   "tokens_reasoning": 0,
+   "connection_index": 1,
+   "client_request_model": "codex/gpt-6.1-sol-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:09:11.917Z",
+   "model": "gpt-6.1-sol-max",
+   "status": 200,
+   "tokens_in": 17533,
+   "tokens_cache_read": 17280,
+   "tokens_out": 5,
+   "tokens_reasoning": 0,
+   "connection_index": 1,
+   "client_request_model": "codex/gpt-6.1-sol-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:09:31.056Z",
+   "model": "gpt-6.1-sol-max",
+   "status": 200,
+   "tokens_in": 110905,
+   "tokens_cache_read": 108928,
+   "tokens_out": 196,
+   "tokens_reasoning": 163,
+   "connection_index": 2,
+   "client_request_model": "codex/gpt-6.1-sol-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:09:45.393Z",
+   "model": "gpt-6-astra-max",
+   "status": 200,
+   "tokens_in": 22937,
+   "tokens_cache_read": 0,
+   "tokens_out": 262,
+   "tokens_reasoning": 0,
+   "connection_index": 3,
+   "client_request_model": "codex/gpt-6-astra-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:09:48.531Z",
+   "model": "gpt-6.1-sol-max",
+   "status": 200,
+   "tokens_in": 16631,
+   "tokens_cache_read": 0,
+   "tokens_out": 66,
+   "tokens_reasoning": 0,
+   "connection_index": 4,
+   "client_request_model": "codex/gpt-6.1-sol-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:09:57.793Z",
+   "model": "gpt-6.1-sol-max",
+   "status": 200,
+   "tokens_in": 16699,
+   "tokens_cache_read": 16512,
+   "tokens_out": 172,
+   "tokens_reasoning": 121,
+   "connection_index": 4,
+   "client_request_model": "codex/gpt-6.1-sol-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:10:06.126Z",
+   "model": "gpt-6-astra-max",
+   "status": 200,
+   "tokens_in": 23212,
+   "tokens_cache_read": 22784,
+   "tokens_out": 548,
+   "tokens_reasoning": 229,
+   "connection_index": 3,
+   "client_request_model": "codex/gpt-6-astra-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:10:17.224Z",
+   "model": "gpt-6.1-sol-max",
+   "status": 200,
+   "tokens_in": 17089,
+   "tokens_cache_read": 16768,
+   "tokens_out": 40,
+   "tokens_reasoning": 0,
+   "connection_index": 4,
+   "client_request_model": "codex/gpt-6.1-sol-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:10:21.196Z",
+   "model": "gpt-6.1-sol-max",
+   "status": 200,
+   "tokens_in": 17154,
+   "tokens_cache_read": 16896,
+   "tokens_out": 36,
+   "tokens_reasoning": 0,
+   "connection_index": 4,
+   "client_request_model": "codex/gpt-6.1-sol-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:10:27.661Z",
+   "model": "gpt-6.1-sol-max",
+   "status": 200,
+   "tokens_in": 17283,
+   "tokens_cache_read": 16896,
+   "tokens_out": 5,
+   "tokens_reasoning": 0,
+   "connection_index": 4,
+   "client_request_model": "codex/gpt-6.1-sol-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:10:44.023Z",
+   "model": "gpt-6.1-sol-max",
+   "status": 200,
+   "tokens_in": 16925,
+   "tokens_cache_read": 16512,
+   "tokens_out": 31,
+   "tokens_reasoning": 0,
+   "connection_index": 0,
+   "client_request_model": "codex/gpt-6.1-sol-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:10:49.538Z",
+   "model": "gpt-6-astra-max",
+   "status": 200,
+   "tokens_in": 23734,
+   "tokens_cache_read": 23040,
+   "tokens_out": 200,
+   "tokens_reasoning": 107,
+   "connection_index": 3,
+   "client_request_model": "codex/gpt-6-astra-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:10:58.338Z",
+   "model": "gpt-6.1-sol-max",
+   "status": 200,
+   "tokens_in": 17108,
+   "tokens_cache_read": 16896,
+   "tokens_out": 31,
+   "tokens_reasoning": 0,
+   "connection_index": 0,
+   "client_request_model": "codex/gpt-6.1-sol-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:11:10.564Z",
+   "model": "gpt-6.1-sol-max",
+   "status": 200,
+   "tokens_in": 17477,
+   "tokens_cache_read": 17152,
+   "tokens_out": 5,
+   "tokens_reasoning": 0,
+   "connection_index": 0,
+   "client_request_model": "codex/gpt-6.1-sol-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  },
+  {
+   "time_utc": "2026-10-05T14:11:38.656Z",
+   "model": "gpt-6-astra-max",
+   "status": 200,
+   "tokens_in": 23902,
+   "tokens_cache_read": 23552,
+   "tokens_out": 1144,
+   "tokens_reasoning": 1054,
+   "connection_index": 3,
+   "client_request_model": "codex/gpt-6-astra-max",
+   "client_request_reasoning": {
+    "effort": "max",
+    "context": "all_turns"
+   },
+   "service_tier": null
+  }
+ ]
+}

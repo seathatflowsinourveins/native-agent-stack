@@ -1,0 +1,66 @@
+{
+ "schema": "omniroute-source-identity/1",
+ "taken_utc": "2026-10-05T14:16:57Z",
+ "base": {
+  "release_branch_commit": "2f42a9ac19d1a247ec9ce5473b790843724b3061",
+  "release_branch_tree": "0f58d8df20c0c2ae4336b432b3f39837119b6eed",
+  "v3_8_51_tag_commit": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+  "v3_8_51_tag_tree": "0f58d8df20c0c2ae4336b432b3f39837119b6eed",
+  "git_diff_between_them_empty": true,
+  "npm_omniroute_3_8_51": {
+   "published": "2026-09-30T02:54:04Z",
+   "integrity": "sha512-VwwSt+bP9lJiPJXFJMz0nNGGuoewPZU3nFe1SLuO11ADgdSwTegGCxhg8Ov75+31m/cocPxHiO63zygn1XQ0MQ==",
+   "dist_BUILD_SHA": "c1e30b7"
+  }
+ },
+ "patches": {
+  "upstream_15167_pr_head": "0585aba5589d5a1f49243a13a8db249558e7c9e3",
+  "affinity_patch_local": "045aa81f30cb9a1fc4f6b426ed940c1956cceda2",
+  "affinity_cherry_pick_on_tag": "e14d1e8e0034468ddd1ab3fc1c9983b25d2d8ace",
+  "15167_cherry_pick_on_tag_plus_affinity": "5f4b3d577d247ae86796d47c9db6bfed0efd75ce"
+ },
+ "deployed_20128": {
+  "prefix": "omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167",
+  "dist_BUILD_SHA": "cf6748d04"
+ },
+ "probe_tree_with_15167": {
+  "commit": "5f4b3d577d247ae86796d47c9db6bfed0efd75ce"
+ },
+ "probe_tree_without_15167": {
+  "commit": "e14d1e8e0034468ddd1ab3fc1c9983b25d2d8ace"
+ },
+ "file_sha256": {
+  "open-sse/executors/codex.ts": {
+   "deployed_live": "1cfeb46527e23c6a830a066b4a14aca9184aa6583b446c283384616a517867cd",
+   "probe_with_15167": "1cfeb46527e23c6a830a066b4a14aca9184aa6583b446c283384616a517867cd",
+   "clean_published_npm": "1cfeb46527e23c6a830a066b4a14aca9184aa6583b446c283384616a517867cd",
+   "deployed_equals_probe_with_15167": true
+  },
+  "open-sse/executors/codex/reasoningSuffix.ts": {
+   "deployed_live": "e6709380c42b76fe115861df83afc9a00be64bba3e5fdf615ec910094d5901c9",
+   "probe_with_15167": "e6709380c42b76fe115861df83afc9a00be64bba3e5fdf615ec910094d5901c9",
+   "clean_published_npm": "19fde125e10934338c885d30793e585b3f5403135e8a04f1675b50f8d950ef6e",
+   "deployed_equals_probe_with_15167": true
+  },
+  "open-sse/config/providers/registry/codex/index.ts": {
+   "deployed_live": "cb2a82f1fe8661468b51df578ede6409cb57a359591f8e25541969cf9f71f469",
+   "probe_with_15167": "cb2a82f1fe8661468b51df578ede6409cb57a359591f8e25541969cf9f71f469",
+   "clean_published_npm": "79d856f4aaf4c3c62e40118813244976985edce9b33303ef396a74475e8d21af",
+   "deployed_equals_probe_with_15167": true
+  },
+  "src/lib/providers/codexFastTier.ts": {
+   "deployed_live": "f43181235e2dd5032d29535daec6d3b04b024cc6d4171b791d07859503acd982",
+   "probe_with_15167": "f43181235e2dd5032d29535daec6d3b04b024cc6d4171b791d07859503acd982",
+   "clean_published_npm": "533680ca4f255ec166d95a28d98dc1d751b37f536db4ea69314b2c50648449bf",
+   "deployed_equals_probe_with_15167": true
+  }
+ },
+ "bundle_files_containing_gpt_6_1_sol": {
+  "deployed_live": 40,
+  "clean_published_npm": 0
+ },
+ "bundle_files_containing_pickMoreAvailableOAuthPeer": {
+  "deployed_live": 8,
+  "clean_published_npm": 0
+ }
+}

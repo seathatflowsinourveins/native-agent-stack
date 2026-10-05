@@ -1,0 +1,28 @@
+# Does the gateway deliver true GPT-6.1 Sol max, and what would the published-only package change? 2026-10-05
+
+Evidence for [`docs/decisions/2026-10-05-omniroute-gateway-composition.md`](../../../docs/decisions/2026-10-05-omniroute-gateway-composition.md). Nothing was switched: a planned swap of the
+workstation gateways to the published `omniroute@3.8.51` was cancelled before any unit changed. The units are as `checks/gateway-record-before.json` records them (read at 13:51Z, before the
+cancellation, with `tools/omniroute/gateway_record.py`). Host paths are masked (`<HOME>`); no account, connection id, credential or request body is recorded.
+
+| File | What it is | Class |
+| --- | --- | --- |
+| `checks/live-effort.json` | the call log's `reasoning_effort_requested` and `reasoning_effort_upstream` (the effort in the provider request the attempt captured; filled only for rows whose response carried encrypted reasoning, NULL otherwise) for the fresh probe rows and the last 7 days of `gpt-6.1-sol*` | our read-only check of the live store (metadata columns) |
+| `checks/live-requests.json` | the 19 calls of the baseline probe sessions: model, status, tokens, anonymised connection index, and the client request's `model` and `reasoning` from the stored request artifact | our read-only check |
+| `checks/wire-probe-with-15167.txt`, `checks/wire-probe-without-15167.txt` | what the Codex executor's `transformRequest` builds for seven requests, on the v3.8.51 tag plus the affinity patch plus #15167 and on the v3.8.51 tag plus the affinity patch alone (the published-only behaviour for these paths); nothing was sent | `local_integration` (upstream code, our probe) |
+| `checks/source-identity.json` | the base commit and tree against the tag commit and the npm package, the carried commits, byte equality of the four executor and registry files between the deployed prefix and the probe tree, and bundle counts of two literals | `local_integration` and git facts |
+| `checks/affinity-patch-source.diff` | the affinity patch's two source files as cherry-picked onto the tag (`e14d1e8e0`; the third file of `045aa81f3` is its test) | git fact |
+| `checks/usage-7d.json` | counts for the last 7 days of `/v1/responses` (calls, tokens, cache share, model names, connections), and `/alpha` calls of all time | our read-only check |
+| `checks/gateway-record-before.json` | the owner record of both gateways (units, build ids, route digests) at 13:51Z | our tool, read-only |
+| `checks/composition-trees.txt` | the tree ids that the patch file and PR 15167's commit reproduce from the tag commit, against the trees of the two built commits | git facts |
+| `checks/build-notes.txt` | two builds of 2026-10-05, not deployed: the published tag plus the affinity patch (alternative B, artifacts deleted) and the composition (tag, affinity patch, PR 15167; its tarball is kept): upstream's `build:release`, `check:pack-artifact`, `npm pack`, `check:pack-boot`, with each exit code and the failed attempts | upstream checks on our builds |
+| `patches/045aa81f3.patch` | the affinity patch as `git format-patch` (sha256 `e1006768090218fdac18edb0f9732e9e2ef892fbbadfb7aa8afc8e96e4993c69`): the commit is on no GitHub ref; it applies to the `v3.8.51` tag commit and adds its unit test `tests/unit/affinity-outranks-occupancy-8940.test.ts` | git fact (our commit) |
+| `patches/045aa81f3.review-note.txt` | the review note kept on the commit (`git notes`, 2026-09-28): wording corrections to the commit message and the test header, non-blocking, for the next re-application; the published patch is the as-built one, unchanged | review record |
+| `scripts/` | the probe (`wire-probe.mts.txt`), the collectors, the build and smoke scripts and the stickiness probe as they ran, with `.txt` appended | our tools, not upstream |
+
+Rerun the probe: in an OmniRoute checkout at the tag with `npm ci` done, copy `scripts/wire-probe.mts.txt` to `wire-probe.mts` at the root and run
+`DISABLE_SQLITE_AUTO_BACKUP=true node --import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts wire-probe.mts` (upstream's unit-test flags; the data
+directory is isolated). The live columns are read with `scripts/effort_live.py.txt` (it opens the store with `mode=ro`).
+
+Limits: the upstream effort column is captured from the provider request, not from the backend's own report, so whether the backend applies `max` is not observable here; the cache effect of
+removing the affinity patch was not measured (no build without it was deployed); the probe applies PR 15167's single commit `0585aba55` to the tag, while the deployed build carries the same
+change as `f5d8e150b` on its base, and the executor, suffix, registry and fast-tier files are byte-identical between the two.
