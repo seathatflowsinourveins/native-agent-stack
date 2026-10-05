@@ -827,7 +827,7 @@ class SkillsStatusTests(unittest.TestCase):
         data = json.loads(result.stdout)
         self.assertEqual(set(data), {"schema_version", "lock", "claude_settings", "codex_config", "skills",
                                      "extra_skills", "unlocked_folders", "budget", "folder_trees", "result"})
-        self.assertEqual(set(data["folder_trees"]), {"ok", "runtime_artifacts", "drift", "missing", "unreadable"})
+        self.assertEqual(set(data["folder_trees"]), {"ok", "runtime_artifacts", "drift", "missing", "unreadable", "held"})
         self.assertEqual(len(data["skills"]), 2)
         for skill in data["skills"]:
             self.assertEqual(set(skill), {"name", "pass", "canonical", "lock", "claude_link",
@@ -1069,7 +1069,7 @@ class SkillsStatusTests(unittest.TestCase):
         real = ss.load_manifest(ROOT / "adoption" / "skills" / "manifest.json")
         budget = ss.inspect(real, self.home, self.env)["budget"]
         self.assertEqual(budget["codex_configured_budget_tokens"], 6000)
-        self.assertEqual(budget["codex_catalog_skills"], 25)
+        self.assertEqual(budget["codex_catalog_skills"], 24)  # 25 until semgrep was retired on 2026-10-03
         self.assertTrue(budget["codex_catalog_description_chars"]["matches_manifest"])
         self.assertLess(budget["codex_catalog_estimated_tokens"], 6000)
         self.assertTrue(budget["codex_within_budget"])
@@ -1077,6 +1077,74 @@ class SkillsStatusTests(unittest.TestCase):
     def test_a_non_boolean_implicit_invocation_flag_is_a_manifest_error(self):
         manifest, alpha, beta = self.setup_pair()
         manifest["skills"][0]["upstream_allow_implicit_invocation"] = "false"
+        path = self.tmp / "manifest.json"
+        path.write_text(json.dumps(manifest))
+        with self.assertRaises(ss.ManifestError):
+            ss.load_manifest(path)
+
+    # -- held and Claude-Code-only copy entries (wave-2 skills ruling, change 6) ------------------------------------
+    # A held skill is reported as held, never missing; a Claude-Code-only copy is checked in Claude Code's own folder.
+
+    def held_manifest(self):
+        manifest, alpha, beta = self.setup_pair()
+        held = dict(self.make_skill("held-skill"), status="held", held_for="a measurement")
+        shutil.rmtree(self.home / ".agents" / "skills" / "held-skill")  # not installed while held
+        manifest["skills"].append(held)
+        return manifest
+
+    def copy_manifest(self, shared_too=False, as_link=False):
+        manifest, alpha, beta = self.setup_pair()
+        skill = dict(self.make_skill("copy-skill", codex_enabled=False), agents=["claude-code"], copy=True)
+        canonical = self.home / ".agents" / "skills" / "copy-skill"
+        claude_copy = self.home / ".claude" / "skills" / "copy-skill"
+        if as_link:
+            claude_copy.symlink_to(canonical, target_is_directory=True)
+        else:
+            shutil.copytree(canonical, claude_copy)
+        if not shared_too and not as_link:
+            shutil.rmtree(canonical)
+        self.write_lock(self.lock_entries_for([alpha, beta, skill]))
+        manifest["skills"].append(skill)
+        return manifest
+
+    def test_a_held_skill_is_reported_held_and_never_fails_the_run(self):
+        report = self.report(self.held_manifest())
+        held = self.skill_result(report, "held-skill")
+        self.assertTrue(held["pass"])
+        self.assertTrue(held["held"])
+        self.assertFalse(held["present"])
+        self.assertEqual(held["canonical"]["state"], "held")
+        self.assertEqual(report["folder_trees"]["held"], ["held-skill"])
+        self.assertEqual(report["result"], "ok")
+
+    def test_a_held_skill_left_installed_is_reported_present(self):
+        manifest = self.held_manifest()
+        self.write_canonical("held-skill", b"# left from an earlier install\n")
+        held = self.skill_result(self.report(manifest), "held-skill")
+        self.assertTrue(held["pass"])
+        self.assertTrue(held["present"])
+
+    def test_a_claude_code_copy_passes_in_claude_codes_folder(self):
+        report = self.report(self.copy_manifest())
+        copy = self.skill_result(report, "copy-skill")
+        self.assertTrue(copy["pass"], copy)
+        self.assertEqual(copy["scope"], "claude-code copy")
+        self.assertEqual(copy["claude_link"], {"state": "ok", "kind": "copy"})
+        self.assertEqual(report["result"], "ok")
+
+    def test_a_shared_folder_fails_a_claude_code_copy(self):
+        shared = self.skill_result(self.report(self.copy_manifest(shared_too=True)), "copy-skill")
+        self.assertFalse(shared["pass"])
+        self.assertEqual(shared["codex_disable"]["state"], "shared_copy_present")
+
+    def test_a_link_fails_a_claude_code_copy(self):
+        linked = self.skill_result(self.report(self.copy_manifest(as_link=True)), "copy-skill")
+        self.assertFalse(linked["pass"])
+        self.assertEqual(linked["claude_link"]["state"], "is_a_symlink")
+
+    def test_a_copy_entry_for_codex_is_a_manifest_error(self):
+        manifest, alpha, beta = self.setup_pair()
+        manifest["skills"][0]["copy"] = True
         path = self.tmp / "manifest.json"
         path.write_text(json.dumps(manifest))
         with self.assertRaises(ss.ManifestError):

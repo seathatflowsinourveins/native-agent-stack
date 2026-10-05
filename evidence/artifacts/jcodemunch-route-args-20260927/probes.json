@@ -1,0 +1,30 @@
+{
+  "recorded_by": "coordinator Claude session, native jcodemunch MCP tools of this session (server cwd = the main checkout at c8362c02)",
+  "recorded_at_utc": "2026-09-27T20:22Z (approximate; the three calls ran back to back in one turn)",
+  "server": {"package": "jcodemunch-mcp", "version": "1.108.319", "install": "uv tool (python-tools/jcodemunch-mcp), dist-info METADATA Version 1.108.319"},
+  "source_read": [
+    {"file": "jcodemunch_mcp/counter.py (installed 1.108.319)", "lines": "584-590", "fact": "_QUERY_ARG maps search_symbols and search_text to \"query\", assemble_task_context to \"task\", plan_turn to \"query\", get_file_outline to \"file_path\""},
+    {"file": "jcodemunch_mcp/counter.py (installed 1.108.319)", "lines": "616-630", "fact": "shape_execute_args(action, repo, task) returns {\"repo\": repo, qarg: task}: route(execute=true) passes the whole task text as the action's query argument; it returns None without repo or for get_file_outline"}
+  ],
+  "probes": [
+    {
+      "call": "order",
+      "arguments": {"action": "search_symbols", "args": {"repo": ".", "query": "register_file", "kind": "function", "max_results": 1}},
+      "returned": "#MUNCH/1 tool=search_symbols enc=ss1 result_count=1; s,scripts/host_receipts.py::register_file#function,register_file,function,scripts/host_receipts.py,710,,\"def register_file(root: Path, relative_path: str) -> None\",Update relative_path in manifests/evidence.",
+      "reading": "one call; the target symbol with file, line and signature; repo \".\" resolved to the server's working directory"
+    },
+    {
+      "call": "route",
+      "arguments": {"task": "register_file", "repo": ".", "execute": true},
+      "returned": "recommended: register_edit (state_changing true), get_file_content, get_file_outline; executed false; execute_error \"Cannot auto-build args for 'register_edit' from (repo, task). Call order('register_edit', args) with explicit arguments.\"",
+      "reading": "an identifier alone as the task routes to a catalog action whose name matches it (here a state-changing one) and executes nothing"
+    },
+    {
+      "call": "route",
+      "arguments": {"task": "find the function register_file in scripts/host_receipts.py", "repo": "."},
+      "returned": "recommended: search_symbols with args_template {\"repo\": \".\", \"query\": \"find the function register_file in scripts/host_receipts.py\"}; alternate search_text with the same query",
+      "reading": "route picks the right action but its template query is the whole sentence; the caller must write the query (the identifier) itself"
+    }
+  ],
+  "corroborating_measurement": "token-efficiency-gpt6-workers session, 2026-09-27 20:09-20:15Z, promptfoo 0.123.1 openai:codex-sdk, codex exec -p stack-worker in the main checkout: route {task: 'find the function register_file in scripts/host_receipts.py', repo: 'native-agent-stack', execute: true} ran in 1 call in 6 of 6 runs and returned neither target symbol in its 10 results (that session's harness PR records the runs)"
+}

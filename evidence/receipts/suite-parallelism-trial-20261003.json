@@ -1,0 +1,3182 @@
+{
+  "schema_version": 1,
+  "id": "suite-parallelism-trial-20261003",
+  "kind": "compatibility_attempt",
+  "evidence_class": "Mixed and labelled per claim in data.evidence_classes. The per-run observations are also in the validated observed convergence record evidence/artifacts/suite-parallelism-trial-20261003/experiment.json. Native execution on GitHub-hosted ubuntu-24.04 with retained hashes and sanitized excerpts (template class native_proven) for the per-run exit codes, seconds, outcomes and the oracle verdict; synthetic fixtures executed on the hosted runner (template class synthetic) for the control and crash-control results; independent observation of platform records (read-only gh REST GET calls on 2026-10-03) for the job, step, artifact and macOS-queue records; local integration for the reproductions (the toy modules on CPython 3.12.3 and 3.13.16, the three real modules on 3.12.3 only, the order-throughput module on both); source review at pinned commits for unittest-parallel main.py and README, CPython and the GitHub documentation, and unpinned GET reads for unittest-parallel issue 27, the compare against its default branch, the repository record and PyPI JSON. Not an upstream test and not acceptance of any change.",
+  "kind_basis": "compatibility_attempt as docs/evidence.md defines it ('A new release was installed or executed with a recorded success/failure'; 'Failed attempts remain visible and cannot certify the active runtime'): unittest-parallel 1.8.6 was installed from a hash lock and executed against this repository's whole suite on hosted runners, and failed.",
+  "claim": "Hosted run 37109532421 (workflow 'Suite parallelism trial (draft pull request only)', the pull_request run of draft pull request #646 at head 1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de, run_attempt 1) executed the preregistered whole-suite comparison on GitHub-hosted ubuntu-24.04 (runner image 20260927.320.1, CPython 3.12.3, 4 CPUs, X64). The serial arm S (python3 -m unittest -v --durations 25) ran 9,823 tests, OK (skipped=967), exit 0, in all three runs, with test-step seconds 1,688, 1,659, 1,186. All nine unittest-parallel 1.8.6 runs exited 1 with TypeError: cannot pickle '_contextvars.Context' object, raised from pool.map at unittest_parallel/main.py line 160, and printed no 'Ran N tests' line: L4 (-j 4 --level module) 649, 438, 459 s, L4F (L4 plus --disable-process-pooling) 539, 692, 710 s, L4C (-j 4 --level class) 667, 659, 704 s. In every module-level run 199 inventory ids never ran, and 82 in every class-level run, all in tests/test_adaptive_paper_fees.py, tests/test_adaptive_paper_transport.py and tests/test_adoption_version_probes.py; in the serial runs 90 of the 199 and 8 of the 82 were ok and the rest skipped. The frozen oracle (compare.py) marked all nine runs ineligible and gave ubuntu-24.04 the outcome reject (no parallel arm is eligible); every control and crash control (synthetic fixtures executed on the hosted runner) passed, the base-to-trial id mapping was ok and every checkout stayed clean. The coordinator cancelled the run at 2026-10-03T09:12:40Z, 15 s after the last Linux arm job finished; none of the 20 macos-15 jobs had received a runner, so macos-15 has no verdict and nothing was measured on macOS. Local reproductions (the toy modules on CPython 3.12.3 and 3.13.16, the three real modules on 3.12.3) show two causes: unittest.IsolatedAsyncioTestCase instances hold a contextvars.Context, which cannot be pickled (on this runner all 66 such tests were skipped in every serial run, and their suites still could not be sent), and four dynamically built TestCase classes cannot be found under their qualified names. unittest-parallel 1.8.6 is not adopted. The validated observed convergence record is evidence/artifacts/suite-parallelism-trial-20261003/experiment.json.",
+  "limitations": [
+    "Only ubuntu-24.04 ran. The 20 macos-15 jobs never received a runner (zero steps), so this receipt shows nothing about macOS timing, macOS correctness or a macOS verdict.",
+    "Every parallel run crashed before its summary. Its seconds cover the tests that ran (9,624 ids with a result record in each L4 and L4F run and 9,741 in each L4C run, of 9,823; L4C-r3 has 9,743 records for its 9,741 ids because tests.test_secret_path_guard.K4GuardTests.test_k4_timing produced three subtest FAIL records there) and the crash, not a complete suite. The serial seconds of most missing tests were not measured: the --durations 25 tables list only each S run's 25 slowest tests, and the only missing ids they list are two in S-r3 (tests.test_adoption_version_probes.MacosReportUnderbashTests.test_every_probe_is_bounded_classified_and_nothing_else_runs, 5.594 s, and tests.test_adoption_version_probes.LinuxReportUnderbashTests.test_every_probe_is_bounded_classified_and_nothing_else_runs, 5.546 s). The speed ratios are therefore not a whole-suite speed result.",
+    "Most ids that never ran under unittest-parallel were skipped in the serial runs on ubuntu-24.04: at module level 90 of the 199 were ok and 109 skipped, at class level 8 of the 82 were ok and 74 skipped, identically in all three S runs (per class in data.missing_ids). All 66 IsolatedAsyncioTestCase tests (FeeSnapshot 7, AsyncTransport 59) and the 8 bash32 tests were among the skipped, so the two async classes break unittest-parallel at pickling although none of their tests runs on this runner: IsolatedAsyncioTestCase.__init__ stores contextvars.copy_context() when the loader builds each instance, and a class-level skip applies only when the test runs (data.root_causes.async_test_cases). The serial outcome of these tests on macOS is unknown: no macOS job ran.",
+    "The speed ratios inside the preregistered bounds (median at most 0.60 of S's median and slowest at most 0.75 of S's fastest) hold for all three parallel arms (L4 0.2767 and 0.5472; L4F 0.4171 and 0.5987; L4C 0.4020 and 0.5936), but no arm is eligible, so they are not an adoption claim.",
+    "The serial baseline varied on one runner type and image: S test steps of 1,186 to 1,688 s (jobs of 1,212 to 1,724 s). The cause of that spread is not known.",
+    "Each arm ran three times on shared hosted runners, so its median and extremes, and therefore the speed ratios, rest on n=3, and each max-over-fastest ratio divides by the single fastest S run (1,186 s) inside a serial spread of 1,186 to 1,688 s. The preregistration recorded that three repeats bound runner noise but do not remove it; a new trial should set its repeat count with this noise in view.",
+    "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network was ERROR in 3 of 3 L4F runs and ok in all S, L4 and L4C runs. Its cause is not known: unittest-parallel prints its error report only after pool.map returns (main.py:193-211 at bda5d77), so the crash suppressed the traceback. The module alone passes locally (Ran 76 tests, OK (skipped=1)) both serially and unpooled under unittest-parallel on CPython 3.12.3 and 3.13.16.",
+    "tests.test_secret_path_guard.K4GuardTests.test_k4_timing failed in 3 of 3 L4C runs, on different subtests each time, and passed in all 3 S runs and all 6 module-level runs (L4 and L4F, each with 4 workers). It is the slowest serial test (30.7 to 60.0 s). Whether the class-level failures come from CPU contention alone is not shown.",
+    "The hosted logs show only one exception per run, the TypeError, because CPython's MapResult keeps only the first exception of a map (Lib/multiprocessing/pool.py:822 at v3.12.3). The PicklingError of the four dynamic classes in tests/test_adoption_version_probes.py was reproduced locally; its hosted effect is inferred from the missing ids (exactly those four classes at class level).",
+    "GitHub's 90-day run retention covers the run and job records, and the 18 artifacts expire on 2026-11-02. The full result.json (815,073 bytes), the raw logs and the two 9,823-id inventories are not published; their sha256 values are kept here with sanitized excerpts and a trimmed oracle output.",
+    "The cancellation was the coordinator's decision, not part of the preregistered rule. No macOS job had started, so no macOS attempt was voided or hidden. The macOS queue observation counts this repository's macOS jobs only; other repositories that draw on the same account's macOS concurrency were not read.",
+    "Sanitization: runner paths in the retained excerpts became <workspace> and <runner-home>, and local paths in the local reproductions became <venv-3.12.3>, <venv-3.13.16>, <cpython-3.12.3> and <cpython-3.13.16>. summary.md, checkout-status.json and the preregistered experiment record are byte copies.",
+    "The convergence record of this trial is the observed record evidence/artifacts/suite-parallelism-trial-20261003/experiment.json (status observed, decision reject, 36 observations), which scripts/validate_convergence.py validates and manifests/evidence.json lists in convergence_records. It lives beside the retained artifacts rather than beside the preregistered experiment.json, because that directory exists only on the unmerged trial branch and adding to it would re-run the trial. This receipt keeps the detailed per-run data and the claim text. The preregistered experiment record is kept as preregistration-experiment.json.txt (sha256 305fc2fa2ddd2c0a0eba4d85d748807db87302bde59a6b6489de866bee416c08, equal to the original at the trial head), because its frozen_inputs name files that exist only on the trial branch, so it cannot validate on main. The observed record's frozen_inputs cite byte copies of the 15 files the preregistration froze, written under frozen/ with git show at the trial head 1e4bb5ab, each equal to its original and to its preregistered sha256 (15 of 15), in the preregistration's role lists and order, with the preregistration copy at the end of sources; result-trimmed.json is an observation artifact, not a frozen input.",
+    "The local reproductions ran on this worker's WSL2 host in existing virtual environments with unittest-parallel 1.8.6 and coverage 7.16.2 (local integration evidence), not on a hosted runner: the toy modules on CPython 3.12.3 and 3.13.16, the three real modules on 3.12.3 only and the order-throughput module on both. The coordinator also saw the version-probes PicklingError on 3.13.16; that output is not in the retained artifacts.",
+    "Usage: the hosted jobs ran deterministic commands and no model. Runner time is the per-job seconds in data.jobs (job_seconds), for the 18 ubuntu-24.04 jobs only, 11,524 s in total, 11,461 s of them in the 16 arm and control jobs that the observed record holds; the 20 macos-15 jobs were never assigned a runner. The observed record keeps token usage null (unknown), not the preregistered observed zeros. The model usage of the planning, build and review sessions is unknown: it is not recorded here and is not counted as zero (data.usage)."
+  ],
+  "scope": "The preregistered suite-parallelism trial of draft pull request #646 (head 1e4bb5ab) on GitHub-hosted ubuntu-24.04 only: run 37109532421, attempt 1. No macOS evidence, no adoption, no private-repository data and no billing figures.",
+  "source": {
+    "description": "The raw downloads of the run's 18 artifacts (read 2026-10-03), the run, job and artifact records read with gh GET, the preregistered files at the trial head and this worker's local reproduction outputs. The raw files are not published; their sha256 values are in data.original_files and data.hosted_artifacts, and data.retained_files lists every file kept in the artifacts directory: the sanitized excerpts, the byte copies (among them the 15 files the preregistration froze, under frozen/), the README and the observed convergence record.",
+    "run_id": 37109532421,
+    "artifacts_expire_at": "2026-11-02",
+    "result_json": {
+      "sha256": "f26cb0c1c460029ffd481a844bc524ae5e83c84b73fda52cc3efe3496475eb9a",
+      "bytes": 815073
+    }
+  },
+  "registration": "files[] of manifests/evidence.json only (sha256 and bytes through register_file in scripts/host_receipts.py, docs/lanes.md Hot-file protocol). There is no receipts[] entry by design: the receipt records a CI trial of this repository, not a manifests/stack.json component, and a receipts[] entry requires component_ids.",
+  "decision_record": "docs/decisions/2026-10-03-suite-parallelism-trial-outcome.md",
+  "convergence_record": "evidence/artifacts/suite-parallelism-trial-20261003/experiment.json",
+  "data": {
+    "repository": "seathatflowsinourveins/native-agent-stack",
+    "measured_on": "2026-10-03",
+    "trial": {
+      "pull_request": 646,
+      "state_when_recorded": "open draft, never merged; the coordinator closes it unmerged after this record's pull request opens",
+      "head_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+      "head_commit_time": "2026-10-03T08:20:29Z (before the run was created at 08:23:23Z)",
+      "head_branch": "foundation/macos-suite-parallelism-trial-20261003",
+      "trial_base": "e88d59e4b4670ca19211a9ab2adb45e1a28901c7",
+      "workflow": ".github/workflows/macos-suite-parallel-trial.yml at the head; lines 41-44: on: pull_request: paths: [.github/workflows/macos-suite-parallel-trial.yml]",
+      "preregistered_rule": "experiment.json predeclared_metrics.quality_rule: an arm is eligible only with at least three runs, every run eligible under both oracle parts (zero mismatches against the first eligible S run, the exact command, run_attempt 1, a clean checkout) and its controls and crash control passed; adopt the fastest eligible arm only if its median is at most 0.60 of S's median and its slowest run at most 0.75 of S's fastest (exact fractions); otherwise reject; prefer L4F over L4 within 1.10 of L4's median",
+      "oracle": "compare.py at the head (sha256 415d648bf76c0519571c993191f0c70eaa59c392e54908a5684d54607264a3ad); control_expectations.json sha256 24ad74995d07e13dfd27217af9465390bd1cc3a3a9e510da8661b199eb18308a, equal to result.json inputs.control_expectations_sha256",
+      "inventories": "9,823 ids each; sha256 59ffb6b2...a062 (base) and 4ef86269...420c (trial), equal to result.json inputs"
+    },
+    "runtime": {
+      "os": "ubuntu-24.04",
+      "runner_image": "20260927.320.1",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "python": "3.12.3 (system /usr/bin/python3)",
+      "cpu_count": 4,
+      "runner_arch": "X64",
+      "packages": {
+        "unittest-parallel": "1.8.6",
+        "coverage": "7.16.2"
+      },
+      "all_runs_same": true
+    },
+    "verdicts": {
+      "ubuntu-24.04": {
+        "outcome": "reject",
+        "reasons": [
+          "no parallel arm is eligible"
+        ],
+        "selected_arm": null,
+        "flaky_ids_in_S": 0
+      },
+      "macos-15": {
+        "outcome": "no verdict",
+        "reasons": [
+          "no run directory"
+        ]
+      },
+      "id_mapping": "ok: 29 ids mapped, 6 classes, the single prefix tests.test_native_maintenance.",
+      "checkout_status": "ok: all 20 run directories' git-status.txt exist and are empty",
+      "failed_control_runs": []
+    },
+    "run": {
+      "id": 37109532421,
+      "name": "Suite parallelism trial (draft pull request only)",
+      "path": ".github/workflows/macos-suite-parallel-trial.yml",
+      "event": "pull_request",
+      "status": "completed",
+      "conclusion": "cancelled",
+      "run_attempt": 1,
+      "run_number": 1,
+      "head_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+      "head_branch": "foundation/macos-suite-parallelism-trial-20261003",
+      "created_at": "2026-10-03T08:23:23Z",
+      "run_started_at": "2026-10-03T08:23:23Z",
+      "updated_at": "2026-10-03T09:13:12Z",
+      "pull_request": 646
+    },
+    "job_counts": {
+      "total": 38,
+      "ubuntu_24_04": 18,
+      "macos_15": 20,
+      "macos_with_steps": 0,
+      "last_linux_arm_or_control_job_completed_at": "2026-10-03T09:12:25Z"
+    },
+    "cancellation": {
+      "by": "the coordinator (not part of the preregistered rule)",
+      "at": "2026-10-03T09:12:40Z (the completed_at of every macOS job; the run's conclusion is cancelled)",
+      "state_when_cancelled": "all 16 Linux arm and control jobs and the inventory job had succeeded; the last arm job, arms-linux (3, S), finished at 09:12:25Z; none of the 20 macos-15 jobs (15 arm jobs, 5 control jobs) had received a runner or reported a step",
+      "compare_job": "the compare job (if: always()) ran 09:12:42Z to 09:13:11Z and uploaded result.json, summary.md and checkout-status.json",
+      "reasons": [
+        "the failure is deterministic: one exception, at the same line, in 9 of 9 parallel runs, with identical sets of ids that never ran in every run of a level",
+        "it does not depend on the platform: IsolatedAsyncioTestCase holds a contextvars.Context on CPython 3.12.3 and 3.13.16 (the 3.13 line the macOS arms would have used through setup-python's '3.13'; 3.13.16 is the local interpreter, and the hosted patch release was never recorded), and pickling looks a class up by its qualified name on every platform; the toy reproductions fail the same way on both versions, so every macOS parallel arm would hit the same three modules and macOS could only end in reject or no verdict (an inference, not a macOS run)",
+        "the shared macOS pool was held up: five of this repository's macOS jobs held runners in 46 of 50 sampled minutes (macos_queue_observation); had they started, the 20 trial jobs would have held runners while other pull requests' required checks waited"
+      ],
+      "macos_queue_observation": {
+        "method": "read-only jobs API GETs for every Adoption bootstrap smoke run created 2026-10-03T06:00Z to 09:13Z and for three earlier ones still active after 08:23Z (adoption-bootstrap.yml and hardware-profile-smoke.yml are the only workflows with macOS jobs, and no hardware-profile run was created in the window); a job holds a runner from started_at to completed_at when it reports steps, and a job still in progress at the read time has held one since its started_at",
+        "window": "2026-10-03T08:23:23Z to 09:12:40Z, sampled each minute",
+        "minutes_sampled": 50,
+        "minutes_with_five_macos_jobs_running": 46,
+        "min_running": 4,
+        "max_running": 5,
+        "macos_jobs_with_a_runner_in_or_near_the_window": 44,
+        "trial_macos_jobs_started": 0
+      }
+    },
+    "arms_ubuntu_24_04": {
+      "S": {
+        "step_seconds_r1_r2_r3": [
+          1688,
+          1659,
+          1186
+        ],
+        "median": 1659,
+        "min": 1186,
+        "max": 1688,
+        "job_seconds_r1_r2_r3": [
+          1724,
+          1705,
+          1212
+        ],
+        "exit_codes": [
+          0,
+          0,
+          0
+        ],
+        "oracle_eligible_runs": 3,
+        "oracle_arm_eligible": true,
+        "oracle_reasons": [],
+        "controls_passed": true,
+        "crash_passed": true
+      },
+      "L4": {
+        "step_seconds_r1_r2_r3": [
+          649,
+          438,
+          459
+        ],
+        "median": 459,
+        "min": 438,
+        "max": 649,
+        "job_seconds_r1_r2_r3": [
+          685,
+          466,
+          491
+        ],
+        "exit_codes": [
+          1,
+          1,
+          1
+        ],
+        "median_over_s_median": "153/553",
+        "median_over_s_median_decimal": 0.2767,
+        "max_over_s_fastest": "649/1186",
+        "max_over_s_fastest_decimal": 0.5472,
+        "speed_ratios_within_rule": true,
+        "oracle_eligible_runs": 0,
+        "oracle_arm_eligible": false,
+        "oracle_reasons": [
+          "3 ineligible runs"
+        ],
+        "controls_passed": true,
+        "crash_passed": true
+      },
+      "L4F": {
+        "step_seconds_r1_r2_r3": [
+          539,
+          692,
+          710
+        ],
+        "median": 692,
+        "min": 539,
+        "max": 710,
+        "job_seconds_r1_r2_r3": [
+          574,
+          725,
+          744
+        ],
+        "exit_codes": [
+          1,
+          1,
+          1
+        ],
+        "median_over_s_median": "692/1659",
+        "median_over_s_median_decimal": 0.4171,
+        "max_over_s_fastest": "355/593",
+        "max_over_s_fastest_decimal": 0.5987,
+        "speed_ratios_within_rule": true,
+        "oracle_eligible_runs": 0,
+        "oracle_arm_eligible": false,
+        "oracle_reasons": [
+          "3 ineligible runs"
+        ],
+        "controls_passed": true,
+        "crash_passed": true
+      },
+      "L4C": {
+        "step_seconds_r1_r2_r3": [
+          667,
+          659,
+          704
+        ],
+        "median": 667,
+        "min": 659,
+        "max": 704,
+        "job_seconds_r1_r2_r3": [
+          698,
+          688,
+          733
+        ],
+        "exit_codes": [
+          1,
+          1,
+          1
+        ],
+        "median_over_s_median": "667/1659",
+        "median_over_s_median_decimal": 0.402,
+        "max_over_s_fastest": "352/593",
+        "max_over_s_fastest_decimal": 0.5936,
+        "speed_ratios_within_rule": true,
+        "oracle_eligible_runs": 0,
+        "oracle_arm_eligible": false,
+        "oracle_reasons": [
+          "3 ineligible runs"
+        ],
+        "controls_passed": true,
+        "crash_passed": true
+      }
+    },
+    "runs": [
+      {
+        "name": "ubuntu-24.04-S-r1",
+        "arm": "S",
+        "repeat": 1,
+        "command": "python3 -m unittest -v --durations 25",
+        "exit_code": 0,
+        "step_seconds": 1688,
+        "jobs_api_test_step_seconds": 1688,
+        "job_seconds": 1724,
+        "job_id": 111164592004,
+        "job_started_at": "2026-10-03T08:23:27Z",
+        "job_completed_at": "2026-10-03T08:52:11Z",
+        "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+        "python_version": "3.12.3",
+        "runner_image": "20260927.320.1",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "cpu_count": 4,
+        "runner_arch": "X64",
+        "run_attempt": 1,
+        "packages": {
+          "coverage": "7.16.2",
+          "unittest-parallel": "1.8.6"
+        },
+        "git_status_empty": true,
+        "unittest_parallel_header": null,
+        "ran_line": "Ran 9823 tests in 1683.570s",
+        "status_line": "OK (skipped=967)",
+        "traceback_count": 0,
+        "error_report_separator_lines": 0,
+        "last_line": "}",
+        "result_records_by_outcome": {
+          "ok": 8856,
+          "FAIL": 0,
+          "ERROR": 0,
+          "skipped": 967,
+          "expected failure": 0,
+          "unexpected success": 0
+        },
+        "result_records_total": 9823,
+        "oracle_eligible": true,
+        "oracle_reasons_count": 0,
+        "missing_total": 0,
+        "mismatch_total": 0,
+        "extra_total": 0
+      },
+      {
+        "name": "ubuntu-24.04-S-r2",
+        "arm": "S",
+        "repeat": 2,
+        "command": "python3 -m unittest -v --durations 25",
+        "exit_code": 0,
+        "step_seconds": 1659,
+        "jobs_api_test_step_seconds": 1659,
+        "job_seconds": 1705,
+        "job_id": 111164592081,
+        "job_started_at": "2026-10-03T08:40:51Z",
+        "job_completed_at": "2026-10-03T09:09:16Z",
+        "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+        "python_version": "3.12.3",
+        "runner_image": "20260927.320.1",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "cpu_count": 4,
+        "runner_arch": "X64",
+        "run_attempt": 1,
+        "packages": {
+          "coverage": "7.16.2",
+          "unittest-parallel": "1.8.6"
+        },
+        "git_status_empty": true,
+        "unittest_parallel_header": null,
+        "ran_line": "Ran 9823 tests in 1654.267s",
+        "status_line": "OK (skipped=967)",
+        "traceback_count": 0,
+        "error_report_separator_lines": 0,
+        "last_line": "}",
+        "result_records_by_outcome": {
+          "ok": 8856,
+          "FAIL": 0,
+          "ERROR": 0,
+          "skipped": 967,
+          "expected failure": 0,
+          "unexpected success": 0
+        },
+        "result_records_total": 9823,
+        "oracle_eligible": true,
+        "oracle_reasons_count": 0,
+        "missing_total": 0,
+        "mismatch_total": 0,
+        "extra_total": 0
+      },
+      {
+        "name": "ubuntu-24.04-S-r3",
+        "arm": "S",
+        "repeat": 3,
+        "command": "python3 -m unittest -v --durations 25",
+        "exit_code": 0,
+        "step_seconds": 1186,
+        "jobs_api_test_step_seconds": 1186,
+        "job_seconds": 1212,
+        "job_id": 111164591986,
+        "job_started_at": "2026-10-03T08:52:13Z",
+        "job_completed_at": "2026-10-03T09:12:25Z",
+        "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+        "python_version": "3.12.3",
+        "runner_image": "20260927.320.1",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "cpu_count": 4,
+        "runner_arch": "X64",
+        "run_attempt": 1,
+        "packages": {
+          "coverage": "7.16.2",
+          "unittest-parallel": "1.8.6"
+        },
+        "git_status_empty": true,
+        "unittest_parallel_header": null,
+        "ran_line": "Ran 9823 tests in 1182.714s",
+        "status_line": "OK (skipped=967)",
+        "traceback_count": 0,
+        "error_report_separator_lines": 0,
+        "last_line": "}",
+        "result_records_by_outcome": {
+          "ok": 8856,
+          "FAIL": 0,
+          "ERROR": 0,
+          "skipped": 967,
+          "expected failure": 0,
+          "unexpected success": 0
+        },
+        "result_records_total": 9823,
+        "oracle_eligible": true,
+        "oracle_reasons_count": 0,
+        "missing_total": 0,
+        "mismatch_total": 0,
+        "extra_total": 0
+      },
+      {
+        "name": "ubuntu-24.04-L4-r1",
+        "arm": "L4",
+        "repeat": 1,
+        "command": "python3 -m unittest_parallel -j 4 --level module -v",
+        "exit_code": 1,
+        "step_seconds": 649,
+        "jobs_api_test_step_seconds": 649,
+        "job_seconds": 685,
+        "job_id": 111164591959,
+        "job_started_at": "2026-10-03T08:23:26Z",
+        "job_completed_at": "2026-10-03T08:34:51Z",
+        "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+        "python_version": "3.12.3",
+        "runner_image": "20260927.320.1",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "cpu_count": 4,
+        "runner_arch": "X64",
+        "run_attempt": 1,
+        "packages": {
+          "coverage": "7.16.2",
+          "unittest-parallel": "1.8.6"
+        },
+        "git_status_empty": true,
+        "unittest_parallel_header": "Running 233 test suites (9823 total tests) across 4 workers",
+        "ran_line": null,
+        "status_line": null,
+        "traceback_count": 1,
+        "error_report_separator_lines": 0,
+        "last_line": "TypeError: cannot pickle '_contextvars.Context' object",
+        "result_records_by_outcome": {
+          "ok": 8766,
+          "FAIL": 0,
+          "ERROR": 0,
+          "skipped": 858,
+          "expected failure": 0,
+          "unexpected success": 0
+        },
+        "result_records_total": 9624,
+        "oracle_eligible": false,
+        "oracle_reasons_count": 4,
+        "missing_total": 199,
+        "mismatch_total": 199,
+        "extra_total": 0
+      },
+      {
+        "name": "ubuntu-24.04-L4-r2",
+        "arm": "L4",
+        "repeat": 2,
+        "command": "python3 -m unittest_parallel -j 4 --level module -v",
+        "exit_code": 1,
+        "step_seconds": 438,
+        "jobs_api_test_step_seconds": 438,
+        "job_seconds": 466,
+        "job_id": 111164592000,
+        "job_started_at": "2026-10-03T08:33:03Z",
+        "job_completed_at": "2026-10-03T08:40:49Z",
+        "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+        "python_version": "3.12.3",
+        "runner_image": "20260927.320.1",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "cpu_count": 4,
+        "runner_arch": "X64",
+        "run_attempt": 1,
+        "packages": {
+          "coverage": "7.16.2",
+          "unittest-parallel": "1.8.6"
+        },
+        "git_status_empty": true,
+        "unittest_parallel_header": "Running 233 test suites (9823 total tests) across 4 workers",
+        "ran_line": null,
+        "status_line": null,
+        "traceback_count": 1,
+        "error_report_separator_lines": 0,
+        "last_line": "TypeError: cannot pickle '_contextvars.Context' object",
+        "result_records_by_outcome": {
+          "ok": 8766,
+          "FAIL": 0,
+          "ERROR": 0,
+          "skipped": 858,
+          "expected failure": 0,
+          "unexpected success": 0
+        },
+        "result_records_total": 9624,
+        "oracle_eligible": false,
+        "oracle_reasons_count": 4,
+        "missing_total": 199,
+        "mismatch_total": 199,
+        "extra_total": 0
+      },
+      {
+        "name": "ubuntu-24.04-L4-r3",
+        "arm": "L4",
+        "repeat": 3,
+        "command": "python3 -m unittest_parallel -j 4 --level module -v",
+        "exit_code": 1,
+        "step_seconds": 459,
+        "jobs_api_test_step_seconds": 459,
+        "job_seconds": 491,
+        "job_id": 111164592053,
+        "job_started_at": "2026-10-03T08:59:15Z",
+        "job_completed_at": "2026-10-03T09:07:26Z",
+        "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+        "python_version": "3.12.3",
+        "runner_image": "20260927.320.1",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "cpu_count": 4,
+        "runner_arch": "X64",
+        "run_attempt": 1,
+        "packages": {
+          "coverage": "7.16.2",
+          "unittest-parallel": "1.8.6"
+        },
+        "git_status_empty": true,
+        "unittest_parallel_header": "Running 233 test suites (9823 total tests) across 4 workers",
+        "ran_line": null,
+        "status_line": null,
+        "traceback_count": 1,
+        "error_report_separator_lines": 0,
+        "last_line": "TypeError: cannot pickle '_contextvars.Context' object",
+        "result_records_by_outcome": {
+          "ok": 8766,
+          "FAIL": 0,
+          "ERROR": 0,
+          "skipped": 858,
+          "expected failure": 0,
+          "unexpected success": 0
+        },
+        "result_records_total": 9624,
+        "oracle_eligible": false,
+        "oracle_reasons_count": 4,
+        "missing_total": 199,
+        "mismatch_total": 199,
+        "extra_total": 0
+      },
+      {
+        "name": "ubuntu-24.04-L4F-r1",
+        "arm": "L4F",
+        "repeat": 1,
+        "command": "python3 -m unittest_parallel -j 4 --level module --disable-process-pooling -v",
+        "exit_code": 1,
+        "step_seconds": 539,
+        "jobs_api_test_step_seconds": 539,
+        "job_seconds": 574,
+        "job_id": 111164592017,
+        "job_started_at": "2026-10-03T08:23:27Z",
+        "job_completed_at": "2026-10-03T08:33:01Z",
+        "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+        "python_version": "3.12.3",
+        "runner_image": "20260927.320.1",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "cpu_count": 4,
+        "runner_arch": "X64",
+        "run_attempt": 1,
+        "packages": {
+          "coverage": "7.16.2",
+          "unittest-parallel": "1.8.6"
+        },
+        "git_status_empty": true,
+        "unittest_parallel_header": "Running 233 test suites (9823 total tests) across 4 workers",
+        "ran_line": null,
+        "status_line": null,
+        "traceback_count": 1,
+        "error_report_separator_lines": 0,
+        "last_line": "TypeError: cannot pickle '_contextvars.Context' object",
+        "result_records_by_outcome": {
+          "ok": 8765,
+          "FAIL": 0,
+          "ERROR": 1,
+          "skipped": 858,
+          "expected failure": 0,
+          "unexpected success": 0
+        },
+        "result_records_total": 9624,
+        "oracle_eligible": false,
+        "oracle_reasons_count": 4,
+        "missing_total": 199,
+        "mismatch_total": 200,
+        "extra_total": 0
+      },
+      {
+        "name": "ubuntu-24.04-L4F-r2",
+        "arm": "L4F",
+        "repeat": 2,
+        "command": "python3 -m unittest_parallel -j 4 --level module --disable-process-pooling -v",
+        "exit_code": 1,
+        "step_seconds": 692,
+        "jobs_api_test_step_seconds": 692,
+        "job_seconds": 725,
+        "job_id": 111164591989,
+        "job_started_at": "2026-10-03T08:34:53Z",
+        "job_completed_at": "2026-10-03T08:46:58Z",
+        "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+        "python_version": "3.12.3",
+        "runner_image": "20260927.320.1",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "cpu_count": 4,
+        "runner_arch": "X64",
+        "run_attempt": 1,
+        "packages": {
+          "coverage": "7.16.2",
+          "unittest-parallel": "1.8.6"
+        },
+        "git_status_empty": true,
+        "unittest_parallel_header": "Running 233 test suites (9823 total tests) across 4 workers",
+        "ran_line": null,
+        "status_line": null,
+        "traceback_count": 1,
+        "error_report_separator_lines": 0,
+        "last_line": "TypeError: cannot pickle '_contextvars.Context' object",
+        "result_records_by_outcome": {
+          "ok": 8765,
+          "FAIL": 0,
+          "ERROR": 1,
+          "skipped": 858,
+          "expected failure": 0,
+          "unexpected success": 0
+        },
+        "result_records_total": 9624,
+        "oracle_eligible": false,
+        "oracle_reasons_count": 4,
+        "missing_total": 199,
+        "mismatch_total": 200,
+        "extra_total": 0
+      },
+      {
+        "name": "ubuntu-24.04-L4F-r3",
+        "arm": "L4F",
+        "repeat": 3,
+        "command": "python3 -m unittest_parallel -j 4 --level module --disable-process-pooling -v",
+        "exit_code": 1,
+        "step_seconds": 710,
+        "jobs_api_test_step_seconds": 710,
+        "job_seconds": 744,
+        "job_id": 111164592020,
+        "job_started_at": "2026-10-03T08:46:49Z",
+        "job_completed_at": "2026-10-03T08:59:13Z",
+        "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+        "python_version": "3.12.3",
+        "runner_image": "20260927.320.1",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "cpu_count": 4,
+        "runner_arch": "X64",
+        "run_attempt": 1,
+        "packages": {
+          "coverage": "7.16.2",
+          "unittest-parallel": "1.8.6"
+        },
+        "git_status_empty": true,
+        "unittest_parallel_header": "Running 233 test suites (9823 total tests) across 4 workers",
+        "ran_line": null,
+        "status_line": null,
+        "traceback_count": 1,
+        "error_report_separator_lines": 0,
+        "last_line": "TypeError: cannot pickle '_contextvars.Context' object",
+        "result_records_by_outcome": {
+          "ok": 8765,
+          "FAIL": 0,
+          "ERROR": 1,
+          "skipped": 858,
+          "expected failure": 0,
+          "unexpected success": 0
+        },
+        "result_records_total": 9624,
+        "oracle_eligible": false,
+        "oracle_reasons_count": 4,
+        "missing_total": 199,
+        "mismatch_total": 200,
+        "extra_total": 0
+      },
+      {
+        "name": "ubuntu-24.04-L4C-r1",
+        "arm": "L4C",
+        "repeat": 1,
+        "command": "python3 -m unittest_parallel -j 4 --level class -v",
+        "exit_code": 1,
+        "step_seconds": 667,
+        "jobs_api_test_step_seconds": 667,
+        "job_seconds": 698,
+        "job_id": 111164592031,
+        "job_started_at": "2026-10-03T08:23:26Z",
+        "job_completed_at": "2026-10-03T08:35:04Z",
+        "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+        "python_version": "3.12.3",
+        "runner_image": "20260927.320.1",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "cpu_count": 4,
+        "runner_arch": "X64",
+        "run_attempt": 1,
+        "packages": {
+          "coverage": "7.16.2",
+          "unittest-parallel": "1.8.6"
+        },
+        "git_status_empty": true,
+        "unittest_parallel_header": "Running 1475 test suites (9823 total tests) across 4 workers",
+        "ran_line": null,
+        "status_line": null,
+        "traceback_count": 1,
+        "error_report_separator_lines": 0,
+        "last_line": "TypeError: cannot pickle '_contextvars.Context' object",
+        "result_records_by_outcome": {
+          "ok": 8847,
+          "FAIL": 1,
+          "ERROR": 0,
+          "skipped": 893,
+          "expected failure": 0,
+          "unexpected success": 0
+        },
+        "result_records_total": 9741,
+        "oracle_eligible": false,
+        "oracle_reasons_count": 4,
+        "missing_total": 82,
+        "mismatch_total": 83,
+        "extra_total": 0
+      },
+      {
+        "name": "ubuntu-24.04-L4C-r2",
+        "arm": "L4C",
+        "repeat": 2,
+        "command": "python3 -m unittest_parallel -j 4 --level class -v",
+        "exit_code": 1,
+        "step_seconds": 659,
+        "jobs_api_test_step_seconds": 659,
+        "job_seconds": 688,
+        "job_id": 111164591983,
+        "job_started_at": "2026-10-03T08:35:18Z",
+        "job_completed_at": "2026-10-03T08:46:46Z",
+        "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+        "python_version": "3.12.3",
+        "runner_image": "20260927.320.1",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "cpu_count": 4,
+        "runner_arch": "X64",
+        "run_attempt": 1,
+        "packages": {
+          "coverage": "7.16.2",
+          "unittest-parallel": "1.8.6"
+        },
+        "git_status_empty": true,
+        "unittest_parallel_header": "Running 1475 test suites (9823 total tests) across 4 workers",
+        "ran_line": null,
+        "status_line": null,
+        "traceback_count": 1,
+        "error_report_separator_lines": 0,
+        "last_line": "TypeError: cannot pickle '_contextvars.Context' object",
+        "result_records_by_outcome": {
+          "ok": 8847,
+          "FAIL": 1,
+          "ERROR": 0,
+          "skipped": 893,
+          "expected failure": 0,
+          "unexpected success": 0
+        },
+        "result_records_total": 9741,
+        "oracle_eligible": false,
+        "oracle_reasons_count": 4,
+        "missing_total": 82,
+        "mismatch_total": 83,
+        "extra_total": 0
+      },
+      {
+        "name": "ubuntu-24.04-L4C-r3",
+        "arm": "L4C",
+        "repeat": 3,
+        "command": "python3 -m unittest_parallel -j 4 --level class -v",
+        "exit_code": 1,
+        "step_seconds": 704,
+        "jobs_api_test_step_seconds": 704,
+        "job_seconds": 733,
+        "job_id": 111164591993,
+        "job_started_at": "2026-10-03T08:47:35Z",
+        "job_completed_at": "2026-10-03T08:59:48Z",
+        "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+        "python_version": "3.12.3",
+        "runner_image": "20260927.320.1",
+        "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+        "cpu_count": 4,
+        "runner_arch": "X64",
+        "run_attempt": 1,
+        "packages": {
+          "coverage": "7.16.2",
+          "unittest-parallel": "1.8.6"
+        },
+        "git_status_empty": true,
+        "unittest_parallel_header": "Running 1475 test suites (9823 total tests) across 4 workers",
+        "ran_line": null,
+        "status_line": null,
+        "traceback_count": 1,
+        "error_report_separator_lines": 0,
+        "last_line": "TypeError: cannot pickle '_contextvars.Context' object",
+        "result_records_by_outcome": {
+          "ok": 8847,
+          "FAIL": 3,
+          "ERROR": 0,
+          "skipped": 893,
+          "expected failure": 0,
+          "unexpected success": 0
+        },
+        "result_records_total": 9743,
+        "oracle_eligible": false,
+        "oracle_reasons_count": 4,
+        "missing_total": 82,
+        "mismatch_total": 83,
+        "extra_total": 0
+      }
+    ],
+    "controls": [
+      {
+        "name": "ubuntu-24.04-S-controls",
+        "command": "python3 -m unittest -v",
+        "bound": "timeout --kill-after=30 300",
+        "exit_code": 1,
+        "step_seconds": 0,
+        "ran": 8,
+        "status_word": "FAILED",
+        "oracle_passed": true,
+        "run_attempt": 1,
+        "checkout_clean": true
+      },
+      {
+        "name": "ubuntu-24.04-S-crash",
+        "command": "python3 -m unittest -v",
+        "bound": "timeout --kill-after=30 300",
+        "exit_code": 3,
+        "step_seconds": 0,
+        "ran": null,
+        "status_word": null,
+        "oracle_passed": true,
+        "run_attempt": 1,
+        "checkout_clean": true
+      },
+      {
+        "name": "ubuntu-24.04-L4-controls",
+        "command": "python3 -m unittest_parallel -j 4 --level module -v",
+        "bound": "timeout --kill-after=30 300",
+        "exit_code": 5,
+        "step_seconds": 0,
+        "ran": 8,
+        "status_word": "FAILED",
+        "oracle_passed": true,
+        "run_attempt": 1,
+        "checkout_clean": true
+      },
+      {
+        "name": "ubuntu-24.04-L4-crash",
+        "command": "python3 -m unittest_parallel -j 4 --level module -v",
+        "bound": "timeout --kill-after=30 300",
+        "exit_code": 124,
+        "step_seconds": 300,
+        "ran": null,
+        "status_word": null,
+        "oracle_passed": true,
+        "run_attempt": 1,
+        "checkout_clean": true
+      },
+      {
+        "name": "ubuntu-24.04-L4F-controls",
+        "command": "python3 -m unittest_parallel -j 4 --level module --disable-process-pooling -v",
+        "bound": "timeout --kill-after=30 300",
+        "exit_code": 5,
+        "step_seconds": 1,
+        "ran": 8,
+        "status_word": "FAILED",
+        "oracle_passed": true,
+        "run_attempt": 1,
+        "checkout_clean": true
+      },
+      {
+        "name": "ubuntu-24.04-L4F-crash",
+        "command": "python3 -m unittest_parallel -j 4 --level module --disable-process-pooling -v",
+        "bound": "timeout --kill-after=30 300",
+        "exit_code": 124,
+        "step_seconds": 300,
+        "ran": null,
+        "status_word": null,
+        "oracle_passed": true,
+        "run_attempt": 1,
+        "checkout_clean": true
+      },
+      {
+        "name": "ubuntu-24.04-L4C-controls",
+        "command": "python3 -m unittest_parallel -j 4 --level class -v",
+        "bound": "timeout --kill-after=30 300",
+        "exit_code": 5,
+        "step_seconds": 0,
+        "ran": 8,
+        "status_word": "FAILED",
+        "oracle_passed": true,
+        "run_attempt": 1,
+        "checkout_clean": true
+      },
+      {
+        "name": "ubuntu-24.04-L4C-crash",
+        "command": "python3 -m unittest_parallel -j 4 --level class -v",
+        "bound": "timeout --kill-after=30 300",
+        "exit_code": 124,
+        "step_seconds": 300,
+        "ran": null,
+        "status_word": null,
+        "oracle_passed": true,
+        "run_attempt": 1,
+        "checkout_clean": true
+      }
+    ],
+    "controls_note": "Each control file runs alone in an empty directory under the arm's command. The controls file must report Ran 8 and FAILED (failures=2, errors=2, skipped=1, expected failures=1, unexpected successes=1) with a non-zero exit: serial exit 1, unittest-parallel exit 5 (2 failures + 2 errors + 1 unexpected success, main.py:240-242). The crash control (os._exit(3)) under timeout --kill-after=30 300 exited 3 serially and hung every parallel arm until the 300 s bound (exit 124), which the preregistration counts as fail-closed.",
+    "missing_ids": {
+      "module_level (L4 and L4F, each of 6 runs)": {
+        "total": 199,
+        "by_module": {
+          "tests.test_adaptive_paper_fees": 61,
+          "tests.test_adaptive_paper_transport": 116,
+          "tests.test_adoption_version_probes": 22
+        },
+        "by_module_and_class": {
+          "tests.test_adaptive_paper_fees": {
+            "AdaptiveLaneFees": 9,
+            "FeeCheckpoint": 3,
+            "FeeHTTPBoundary": 2,
+            "FeeLedger": 16,
+            "FeeNormalization": 6,
+            "FeeReconciliation": 6,
+            "FeeSnapshot": 7,
+            "MoverFeeHelpers": 3,
+            "MoverLaneFees": 9
+          },
+          "tests.test_adaptive_paper_transport": {
+            "AsyncTransport": 59,
+            "ConfiguredQuoteFeed": 5,
+            "DataFeedSelection": 5,
+            "HTTPBoundary": 12,
+            "HaltFeedSeed": 8,
+            "LeverageNormalizeAccountTests": 4,
+            "Normalization": 9,
+            "OrderContractBoundary": 6,
+            "TradingStatusParsing": 8
+          },
+          "tests.test_adoption_version_probes": {
+            "DeclaredProbeTests": 3,
+            "LinuxReportUnderbash32Tests": 4,
+            "LinuxReportUnderbashTests": 4,
+            "MacosReportUnderbash32Tests": 4,
+            "MacosReportUnderbashTests": 4,
+            "ReportStructureTests": 3
+          }
+        },
+        "s_outcome_totals": {
+          "ok": 90,
+          "skipped": 109
+        },
+        "s_outcome_by_module": {
+          "tests.test_adaptive_paper_fees": {
+            "ok": 38,
+            "skipped": 23
+          },
+          "tests.test_adaptive_paper_transport": {
+            "ok": 38,
+            "skipped": 78
+          },
+          "tests.test_adoption_version_probes": {
+            "ok": 14,
+            "skipped": 8
+          }
+        },
+        "s_outcome_by_module_and_class": {
+          "tests.test_adaptive_paper_fees": {
+            "AdaptiveLaneFees": {
+              "ok": 7,
+              "skipped": 2
+            },
+            "FeeCheckpoint": {
+              "ok": 0,
+              "skipped": 3
+            },
+            "FeeHTTPBoundary": {
+              "ok": 0,
+              "skipped": 2
+            },
+            "FeeLedger": {
+              "ok": 16,
+              "skipped": 0
+            },
+            "FeeNormalization": {
+              "ok": 6,
+              "skipped": 0
+            },
+            "FeeReconciliation": {
+              "ok": 6,
+              "skipped": 0
+            },
+            "FeeSnapshot": {
+              "ok": 0,
+              "skipped": 7
+            },
+            "MoverFeeHelpers": {
+              "ok": 3,
+              "skipped": 0
+            },
+            "MoverLaneFees": {
+              "ok": 0,
+              "skipped": 9
+            }
+          },
+          "tests.test_adaptive_paper_transport": {
+            "AsyncTransport": {
+              "ok": 0,
+              "skipped": 59
+            },
+            "ConfiguredQuoteFeed": {
+              "ok": 0,
+              "skipped": 5
+            },
+            "DataFeedSelection": {
+              "ok": 3,
+              "skipped": 2
+            },
+            "HTTPBoundary": {
+              "ok": 0,
+              "skipped": 12
+            },
+            "HaltFeedSeed": {
+              "ok": 8,
+              "skipped": 0
+            },
+            "LeverageNormalizeAccountTests": {
+              "ok": 4,
+              "skipped": 0
+            },
+            "Normalization": {
+              "ok": 9,
+              "skipped": 0
+            },
+            "OrderContractBoundary": {
+              "ok": 6,
+              "skipped": 0
+            },
+            "TradingStatusParsing": {
+              "ok": 8,
+              "skipped": 0
+            }
+          },
+          "tests.test_adoption_version_probes": {
+            "DeclaredProbeTests": {
+              "ok": 3,
+              "skipped": 0
+            },
+            "LinuxReportUnderbash32Tests": {
+              "ok": 0,
+              "skipped": 4
+            },
+            "LinuxReportUnderbashTests": {
+              "ok": 4,
+              "skipped": 0
+            },
+            "MacosReportUnderbash32Tests": {
+              "ok": 0,
+              "skipped": 4
+            },
+            "MacosReportUnderbashTests": {
+              "ok": 4,
+              "skipped": 0
+            },
+            "ReportStructureTests": {
+              "ok": 3,
+              "skipped": 0
+            }
+          }
+        }
+      },
+      "class_level (L4C, each of 3 runs)": {
+        "total": 82,
+        "by_module": {
+          "tests.test_adaptive_paper_fees": 7,
+          "tests.test_adaptive_paper_transport": 59,
+          "tests.test_adoption_version_probes": 16
+        },
+        "by_module_and_class": {
+          "tests.test_adaptive_paper_fees": {
+            "FeeSnapshot": 7
+          },
+          "tests.test_adaptive_paper_transport": {
+            "AsyncTransport": 59
+          },
+          "tests.test_adoption_version_probes": {
+            "LinuxReportUnderbash32Tests": 4,
+            "LinuxReportUnderbashTests": 4,
+            "MacosReportUnderbash32Tests": 4,
+            "MacosReportUnderbashTests": 4
+          }
+        },
+        "s_outcome_totals": {
+          "ok": 8,
+          "skipped": 74
+        },
+        "s_outcome_by_module": {
+          "tests.test_adaptive_paper_fees": {
+            "ok": 0,
+            "skipped": 7
+          },
+          "tests.test_adaptive_paper_transport": {
+            "ok": 0,
+            "skipped": 59
+          },
+          "tests.test_adoption_version_probes": {
+            "ok": 8,
+            "skipped": 8
+          }
+        },
+        "s_outcome_by_module_and_class": {
+          "tests.test_adaptive_paper_fees": {
+            "FeeSnapshot": {
+              "ok": 0,
+              "skipped": 7
+            }
+          },
+          "tests.test_adaptive_paper_transport": {
+            "AsyncTransport": {
+              "ok": 0,
+              "skipped": 59
+            }
+          },
+          "tests.test_adoption_version_probes": {
+            "LinuxReportUnderbash32Tests": {
+              "ok": 0,
+              "skipped": 4
+            },
+            "LinuxReportUnderbashTests": {
+              "ok": 4,
+              "skipped": 0
+            },
+            "MacosReportUnderbash32Tests": {
+              "ok": 0,
+              "skipped": 4
+            },
+            "MacosReportUnderbashTests": {
+              "ok": 4,
+              "skipped": 0
+            }
+          }
+        }
+      },
+      "s_outcome_source": "each missing id's outcome in each of the three S runs, parsed from the S logs: identical in all three runs, and equal to the S side of result.json's mismatch records for that id (564 ok and 876 skipped records over the nine parallel runs: 90 x 6 + 8 x 3 and 109 x 6 + 74 x 3). Skip reasons at module level, the same in all three S runs: 'requires isolated reviewed alpaca-py runtime' for 92 ids (both IsolatedAsyncioTestCase classes among them), 'requires pinned combined native runtime' for the 9 MoverLaneFees ids and 'no bash 3.2 binary (set BASH32_BINARY, or run on a Mac)' for the 8 bash32 ids. The serial outcome of these ids on macOS is unknown (no macOS run).",
+      "listed_in_s_durations_tables": {
+        "ubuntu-24.04-S-r1": {},
+        "ubuntu-24.04-S-r2": {},
+        "ubuntu-24.04-S-r3": {
+          "tests.test_adoption_version_probes.MacosReportUnderbashTests.test_every_probe_is_bounded_classified_and_nothing_else_runs": 5.594,
+          "tests.test_adoption_version_probes.LinuxReportUnderbashTests.test_every_probe_is_bounded_classified_and_nothing_else_runs": 5.546
+        }
+      }
+    },
+    "non_missing_mismatches": [
+      {
+        "run": "ubuntu-24.04-L4F-r1",
+        "id": "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+        "serial": [
+          [
+            "test",
+            "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+            "ok"
+          ]
+        ],
+        "arm": [
+          [
+            "test",
+            "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+            "ERROR"
+          ]
+        ]
+      },
+      {
+        "run": "ubuntu-24.04-L4F-r2",
+        "id": "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+        "serial": [
+          [
+            "test",
+            "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+            "ok"
+          ]
+        ],
+        "arm": [
+          [
+            "test",
+            "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+            "ERROR"
+          ]
+        ]
+      },
+      {
+        "run": "ubuntu-24.04-L4F-r3",
+        "id": "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+        "serial": [
+          [
+            "test",
+            "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+            "ok"
+          ]
+        ],
+        "arm": [
+          [
+            "test",
+            "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+            "ERROR"
+          ]
+        ]
+      },
+      {
+        "run": "ubuntu-24.04-L4C-r1",
+        "id": "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+        "serial": [
+          [
+            "test",
+            "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+            "ok"
+          ]
+        ],
+        "arm": [
+          [
+            "derived",
+            "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+            "FAIL"
+          ],
+          [
+            "subtest",
+            "tests.test_secret_path_guard.K4GuardTests.test_k4_timing (helper='k4_needs_walk')",
+            "FAIL"
+          ]
+        ]
+      },
+      {
+        "run": "ubuntu-24.04-L4C-r2",
+        "id": "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+        "serial": [
+          [
+            "test",
+            "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+            "ok"
+          ]
+        ],
+        "arm": [
+          [
+            "derived",
+            "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+            "FAIL"
+          ],
+          [
+            "subtest",
+            "tests.test_secret_path_guard.K4GuardTests.test_k4_timing (row='T-STORE-STAGES')",
+            "FAIL"
+          ]
+        ]
+      },
+      {
+        "run": "ubuntu-24.04-L4C-r3",
+        "id": "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+        "serial": [
+          [
+            "test",
+            "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+            "ok"
+          ]
+        ],
+        "arm": [
+          [
+            "derived",
+            "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+            "FAIL"
+          ],
+          [
+            "subtest",
+            "tests.test_secret_path_guard.K4GuardTests.test_k4_timing (helper='k4_runner_environment')",
+            "FAIL"
+          ],
+          [
+            "subtest",
+            "tests.test_secret_path_guard.K4GuardTests.test_k4_timing (helper='k4_runner_start')",
+            "FAIL"
+          ],
+          [
+            "subtest",
+            "tests.test_secret_path_guard.K4GuardTests.test_k4_timing (row='T-STORE-STAGES')",
+            "FAIL"
+          ]
+        ]
+      }
+    ],
+    "crash_signature": {
+      "exception": "TypeError: cannot pickle '_contextvars.Context' object",
+      "raised_from": "<runner-home>/.local/lib/python3.12/site-packages/unittest_parallel/main.py, line 160, in main: results = pool.map(test_fn, test_suites, chunksize=1)",
+      "frames": [
+        "unittest_parallel/__main__.py line 12 main()",
+        "unittest_parallel/main.py line 160 pool.map(test_fn, test_suites, chunksize=1)",
+        "/usr/lib/python3.12/multiprocessing/pool.py line 367 map",
+        "/usr/lib/python3.12/multiprocessing/pool.py line 774 get: raise self._value",
+        "/usr/lib/python3.12/multiprocessing/pool.py line 540 _handle_tasks: put(task)",
+        "/usr/lib/python3.12/multiprocessing/connection.py line 206 send",
+        "/usr/lib/python3.12/multiprocessing/reduction.py line 51 dumps"
+      ],
+      "runs": "all nine parallel runs (L4, L4F, L4C, three repeats each): one traceback each, as the last line of the log; no 'Ran N tests' line; no error report (zero separator lines)",
+      "retained_tails": [
+        "evidence/artifacts/suite-parallelism-trial-20261003/crash-tail-L4-r1.txt",
+        "evidence/artifacts/suite-parallelism-trial-20261003/crash-tail-L4F-r1.txt",
+        "evidence/artifacts/suite-parallelism-trial-20261003/crash-tail-L4C-r1.txt"
+      ]
+    },
+    "root_causes": {
+      "async_test_cases": {
+        "modules": {
+          "tests/test_adaptive_paper_fees.py": "class FeeSnapshot(FeePrivacyCapture, unittest.IsolatedAsyncioTestCase) at line 295; 7 tests",
+          "tests/test_adaptive_paper_transport.py": "class AsyncTransport(unittest.IsolatedAsyncioTestCase) at line 478; 59 tests"
+        },
+        "only_users": "these two files are the only test files that use IsolatedAsyncioTestCase at the trial head (rg over tests/)",
+        "mechanism": "unittest-parallel sends each suite of live TestCase instances to a spawned worker by pickling it; an IsolatedAsyncioTestCase instance holds a contextvars.Context, which cannot be pickled, so a module suite (or, at class level, a class suite) that contains one is never sent and its tests never run",
+        "evidence": "hosted: the TypeError ends all nine parallel runs, and at class level exactly FeeSnapshot (7) and AsyncTransport (59) are missing from these two modules; local: a toy module with one plain and one IsolatedAsyncioTestCase class fails at module level and runs only its plain class at class level, and a plain-only module passes, on CPython 3.12.3 and 3.13.16; the two real modules fail the same way on CPython 3.12.3 (at class level all but these two classes report results); source: async_case.py and pool.py as cited",
+        "skipped_on_ubuntu": "all 66 tests were skipped in every S run ('requires isolated reviewed alpaca-py runtime'; both classes carry @unittest.skipUnless(HAS_SDK, ...)), yet their suites could not be sent: a class-level skip only marks the class (Lib/unittest/case.py:159-161 at v3.12.3), the loader builds one instance per test name (Lib/unittest/loader.py:94) and the skip applies only when a test runs (case.py:612-617), so every instance already holds its context when unittest-parallel pickles the suite. Their serial outcome on macOS is unknown (no macOS run)."
+      },
+      "dynamic_classes": {
+        "module": "tests/test_adoption_version_probes.py",
+        "construction": "behavior_case(platform_id, shell, label) (lines 431-437) returns unittest.skipUnless(shell, reason)(type(f\"{platform_id.capitalize()}ReportUnder{label.replace(' ', '').replace('.', '')}Tests\", (ReportBehaviorMixin, unittest.TestCase), {...})); lines 440-443 bind the results as LinuxReportUnderBashTests, MacosReportUnderBashTests, LinuxReportUnderBash32Tests and MacosReportUnderBash32Tests",
+        "mismatch": "type() gives each class the __qualname__ LinuxReportUnderbashTests, MacosReportUnderbashTests, LinuxReportUnderbash32Tests or MacosReportUnderbash32Tests (lower-case 'bash' from the label), and the module has no attribute of that name, so pickling looks the class up under a name that does not exist",
+        "tests": "4 classes with 4 tests each (16); the module's other two classes, DeclaredProbeTests (3) and ReportStructureTests (3), are importable",
+        "evidence": "local: _pickle.PicklingError: Can't pickle <class 'tests.test_adoption_version_probes.LinuxReportUnderbash32Tests'>: attribute lookup LinuxReportUnderbash32Tests on tests.test_adoption_version_probes failed (module level and class level, CPython 3.12.3; the coordinator saw the same at module level on 3.13.16, an output that is not in the retained artifacts); hosted: masked by the first exception, inferred from the missing ids",
+        "s_outcome": "LinuxReportUnderbashTests and MacosReportUnderbashTests (8 tests) were ok in every S run, and LinuxReportUnderbash32Tests and MacosReportUnderbash32Tests (8 tests) were skipped ('no bash 3.2 binary (set BASH32_BINARY, or run on a Mac)'); at class level those 8 ok tests are the only missing ids that ran in S. Their serial outcome on macOS is unknown (no macOS run).",
+        "related": "the same class of defect as the B1 wrapper fixed on the trial branch (classes not importable under the name pickle looks up)"
+      }
+    },
+    "serial_durations": {
+      "ubuntu-24.04-S-r1": {
+        "slowest_test": "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+        "slowest_seconds": 48.928,
+        "top25_sum_seconds": 397.557,
+        "ran_line_seconds": 1683.57,
+        "slowest_share": 0.0291,
+        "top25_share": 0.236,
+        "k4_timing_seconds": 48.928
+      },
+      "ubuntu-24.04-S-r2": {
+        "slowest_test": "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+        "slowest_seconds": 59.987,
+        "top25_sum_seconds": 407.417,
+        "ran_line_seconds": 1654.267,
+        "slowest_share": 0.0363,
+        "top25_share": 0.246,
+        "k4_timing_seconds": 59.987
+      },
+      "ubuntu-24.04-S-r3": {
+        "slowest_test": "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+        "slowest_seconds": 30.677,
+        "top25_sum_seconds": 269.919,
+        "ran_line_seconds": 1182.714,
+        "slowest_share": 0.0259,
+        "top25_share": 0.228,
+        "k4_timing_seconds": 30.677
+      }
+    },
+    "local_reproductions": [
+      {
+        "case": "toy-async-module",
+        "interpreter": "CPython 3.12.3 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest_parallel -j 2 --level module -v",
+        "working_directory": "a directory holding only test_async_demo.py",
+        "exit_code": 1,
+        "header": "Running 1 test suites (2 total tests) across 1 workers",
+        "ran_line": null,
+        "status_line": null,
+        "result_lines": 0,
+        "final_error": "TypeError: cannot pickle '_contextvars.Context' object"
+      },
+      {
+        "case": "toy-async-module",
+        "interpreter": "CPython 3.13.16 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest_parallel -j 2 --level module -v",
+        "working_directory": "a directory holding only test_async_demo.py",
+        "exit_code": 1,
+        "header": "Running 1 test suites (2 total tests) across 1 workers",
+        "ran_line": null,
+        "status_line": null,
+        "result_lines": 0,
+        "final_error": "TypeError: cannot pickle '_contextvars.Context' object"
+      },
+      {
+        "case": "toy-async-class",
+        "interpreter": "CPython 3.12.3 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest_parallel -j 2 --level class -v",
+        "working_directory": "a directory holding only test_async_demo.py",
+        "exit_code": 1,
+        "header": "Running 2 test suites (2 total tests) across 2 workers",
+        "ran_line": null,
+        "status_line": null,
+        "result_lines": 1,
+        "final_error": "TypeError: cannot pickle '_contextvars.Context' object"
+      },
+      {
+        "case": "toy-async-class",
+        "interpreter": "CPython 3.13.16 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest_parallel -j 2 --level class -v",
+        "working_directory": "a directory holding only test_async_demo.py",
+        "exit_code": 1,
+        "header": "Running 2 test suites (2 total tests) across 2 workers",
+        "ran_line": null,
+        "status_line": null,
+        "result_lines": 1,
+        "final_error": "TypeError: cannot pickle '_contextvars.Context' object"
+      },
+      {
+        "case": "toy-plain-module",
+        "interpreter": "CPython 3.12.3 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest_parallel -j 2 --level module -v",
+        "working_directory": "a directory holding only test_plain_only.py",
+        "exit_code": 0,
+        "header": "Running 1 test suites (2 total tests) across 1 workers",
+        "ran_line": "Ran 2 tests in 0.089s",
+        "status_line": "OK",
+        "result_lines": 2,
+        "final_error": null
+      },
+      {
+        "case": "toy-plain-module",
+        "interpreter": "CPython 3.13.16 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest_parallel -j 2 --level module -v",
+        "working_directory": "a directory holding only test_plain_only.py",
+        "exit_code": 0,
+        "header": "Running 1 test suites (2 total tests) across 1 workers",
+        "ran_line": "Ran 2 tests in 0.088s",
+        "status_line": "OK",
+        "result_lines": 2,
+        "final_error": null
+      },
+      {
+        "case": "version-probes-module",
+        "interpreter": "CPython 3.12.3 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest_parallel -j 2 --level module -s tests -t . -p test_adoption_version_probes.py",
+        "working_directory": "the checkout root",
+        "exit_code": 1,
+        "header": "Running 1 test suites (22 total tests) across 1 workers",
+        "ran_line": null,
+        "status_line": null,
+        "result_lines": 0,
+        "final_error": "_pickle.PicklingError: Can't pickle <class 'tests.test_adoption_version_probes.LinuxReportUnderbash32Tests'>: attribute lookup LinuxReportUnderbash32Tests on tests.test_adoption_version_probes failed"
+      },
+      {
+        "case": "paper-fees-module",
+        "interpreter": "CPython 3.12.3 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest_parallel -j 2 --level module -s tests -t . -p test_adaptive_paper_fees.py",
+        "working_directory": "the checkout root",
+        "exit_code": 1,
+        "header": "Running 1 test suites (61 total tests) across 1 workers",
+        "ran_line": null,
+        "status_line": null,
+        "result_lines": 0,
+        "final_error": "TypeError: cannot pickle '_contextvars.Context' object"
+      },
+      {
+        "case": "paper-transport-module",
+        "interpreter": "CPython 3.12.3 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest_parallel -j 2 --level module -s tests -t . -p test_adaptive_paper_transport.py",
+        "working_directory": "the checkout root",
+        "exit_code": 1,
+        "header": "Running 1 test suites (116 total tests) across 1 workers",
+        "ran_line": null,
+        "status_line": null,
+        "result_lines": 0,
+        "final_error": "TypeError: cannot pickle '_contextvars.Context' object"
+      },
+      {
+        "case": "version-probes-class",
+        "interpreter": "CPython 3.12.3 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest_parallel -j 4 --level class -v -s tests -t . -p test_adoption_version_probes.py",
+        "working_directory": "the checkout root",
+        "exit_code": 1,
+        "header": "Running 6 test suites (22 total tests) across 4 workers",
+        "ran_line": null,
+        "status_line": null,
+        "result_lines": 6,
+        "final_error": "_pickle.PicklingError: Can't pickle <class 'tests.test_adoption_version_probes.LinuxReportUnderbash32Tests'>: attribute lookup LinuxReportUnderbash32Tests on tests.test_adoption_version_probes failed"
+      },
+      {
+        "case": "paper-fees-class",
+        "interpreter": "CPython 3.12.3 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest_parallel -j 4 --level class -v -s tests -t . -p test_adaptive_paper_fees.py",
+        "working_directory": "the checkout root",
+        "exit_code": 1,
+        "header": "Running 9 test suites (61 total tests) across 4 workers",
+        "ran_line": null,
+        "status_line": null,
+        "result_lines": 54,
+        "final_error": "TypeError: cannot pickle '_contextvars.Context' object"
+      },
+      {
+        "case": "paper-transport-class",
+        "interpreter": "CPython 3.12.3 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest_parallel -j 4 --level class -v -s tests -t . -p test_adaptive_paper_transport.py",
+        "working_directory": "the checkout root",
+        "exit_code": 1,
+        "header": "Running 9 test suites (116 total tests) across 4 workers",
+        "ran_line": null,
+        "status_line": null,
+        "result_lines": 57,
+        "final_error": "TypeError: cannot pickle '_contextvars.Context' object"
+      },
+      {
+        "case": "order-throughput-serial",
+        "interpreter": "CPython 3.12.3 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest tests.test_order_throughput",
+        "working_directory": "the checkout root",
+        "exit_code": 0,
+        "header": null,
+        "ran_line": "Ran 76 tests in 9.405s",
+        "status_line": "OK (skipped=1)",
+        "result_lines": 0,
+        "final_error": null
+      },
+      {
+        "case": "order-throughput-unpooled",
+        "interpreter": "CPython 3.12.3 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest_parallel -j 2 --level module --disable-process-pooling -s tests -t . -p test_order_throughput.py",
+        "working_directory": "the checkout root",
+        "exit_code": 0,
+        "header": "Running 1 test suites (76 total tests) across 1 workers",
+        "ran_line": "Ran 76 tests in 9.391s",
+        "status_line": "OK (skipped=1)",
+        "result_lines": 0,
+        "final_error": null
+      },
+      {
+        "case": "order-throughput-serial",
+        "interpreter": "CPython 3.13.16 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest tests.test_order_throughput",
+        "working_directory": "the checkout root",
+        "exit_code": 0,
+        "header": null,
+        "ran_line": "Ran 76 tests in 7.038s",
+        "status_line": "OK (skipped=1)",
+        "result_lines": 0,
+        "final_error": null
+      },
+      {
+        "case": "order-throughput-unpooled",
+        "interpreter": "CPython 3.13.16 (unittest-parallel 1.8.6, coverage 7.16.2)",
+        "command": "python -m unittest_parallel -j 2 --level module --disable-process-pooling -s tests -t . -p test_order_throughput.py",
+        "working_directory": "the checkout root",
+        "exit_code": 0,
+        "header": "Running 1 test suites (76 total tests) across 1 workers",
+        "ran_line": "Ran 76 tests in 7.168s",
+        "status_line": "OK (skipped=1)",
+        "result_lines": 0,
+        "final_error": null
+      }
+    ],
+    "toy_module_sources": {
+      "test_async_demo.py": "import unittest\n\n\nclass PlainCase(unittest.TestCase):\n    def test_plain(self):\n        self.assertTrue(True)\n\n\nclass AsyncCase(unittest.IsolatedAsyncioTestCase):\n    async def test_async(self):\n        self.assertTrue(True)\n",
+      "test_plain_only.py": "import unittest\n\n\nclass OnlyPlain(unittest.TestCase):\n    def test_a(self):\n        self.assertTrue(True)\n\n    def test_b(self):\n        self.assertTrue(True)\n"
+    },
+    "upstream": {
+      "unittest_parallel": {
+        "repository": "https://github.com/craigahobbs/unittest-parallel",
+        "release_commit": "bda5d77dc1a2fa2df90f5f5a7de297ea375e345c",
+        "release_commit_message_and_date": "unittest-parallel 1.8.6, 2026-08-22T17:28:34Z",
+        "main_py": {
+          "url": "https://github.com/craigahobbs/unittest-parallel/blob/bda5d77dc1a2fa2df90f5f5a7de297ea375e345c/src/unittest_parallel/main.py",
+          "sha256": "ae1bf2f5831ec21c8dc80f1f2b62dd85530b0f4751cff109c854ca33faa0b179",
+          "lines": 422,
+          "spawn_pool": "150-158: multiprocessing.get_context(method='spawn'); maxtasksperchild 1 under --disable-process-pooling",
+          "pool_map": "160: results = pool.map(test_fn, test_suites, chunksize=1)",
+          "report_after_map": "164-211: results are aggregated, the error report printed and the 'Ran N tests' and OK/FAILED lines written only after pool.map returns",
+          "exit_status": "240-242: exit status min(255, errors + failures + unexpected successes)",
+          "thread_option": "62-63: --thread, 'Use a thread pool for parallelization' (not part of this trial)"
+        },
+        "readme": {
+          "url": "https://github.com/craigahobbs/unittest-parallel/blob/bda5d77dc1a2fa2df90f5f5a7de297ea375e345c/README.md",
+          "sha256": "f88d280f41731ed8dcb98075a0dce09db29b2573b693d8241ec45f47e9a7f518",
+          "lines": 184,
+          "search": "a case-insensitive search for async, contextvar, pickl, spawn and IsolatedAsyncio finds nothing; the sections are 'Parallelism Level' (43-56) and 'Process and Thread Pools' (59-71)"
+        },
+        "issue_27": {
+          "url": "https://github.com/craigahobbs/unittest-parallel/issues/27",
+          "title": "TypeError: cannot pickle '_contextvars.Context' object",
+          "opened_at": "2025-08-24T19:28:26Z",
+          "closed_at": "2025-08-24T19:34:45Z",
+          "state_reason": "completed",
+          "closed_by": "the reporter",
+          "comments": 1,
+          "summary": "The reporter's only comment says they had probably mixed in asyncio unit tests not shown in the report and that the shown tests then ran in parallel; there is no maintainer comment."
+        },
+        "default_branch_after_release": {
+          "compare": "https://github.com/craigahobbs/unittest-parallel/compare/bda5d77dc1a2fa2df90f5f5a7de297ea375e345c...main",
+          "ahead_by": 2,
+          "commits": [
+            "fd491ed78317259a94a163e93973db02637da90f 2026-08-24 use python-build SKILL.md from AGENTS.md",
+            "822378bee3ae3bdced83d64baf8651fba18817f2 2026-08-25 don't list dependency and Python versions in AGENTS.md"
+          ],
+          "files_changed": [
+            "AGENTS.md"
+          ]
+        },
+        "repository_state": "not archived; pushed_at 2026-08-25T17:21:15Z; 0 tags; MIT (GitHub API, 2026-10-03)",
+        "pypi": {
+          "url": "https://pypi.org/pypi/unittest-parallel/json",
+          "checked_at": "2026-10-03T09:24:24Z",
+          "latest": "1.8.6",
+          "wheel_sha256": "7f04b0ada502f6b3d655ef49ea2a785f0e37869f9d0ce7a075c1a18ec204ac93",
+          "wheel_uploaded_at": "2026-08-22T17:28:46Z",
+          "yanked": false,
+          "requires_dist": [
+            "coverage>=5.1"
+          ]
+        }
+      },
+      "cpython": {
+        "v3_12_3": "tag v3.12.3 points to commit f6650f9ad73359051f3e558c2431a109bc016664 (the hosted runners' version)",
+        "v3_13_16": "annotated tag object 3b55c23ff4a6aa32f77be661802a3978d7324f88 dereferences to commit cbc944f4bc59639a444dd971c737788ba2283a91",
+        "async_case": {
+          "v3_12_3": "https://github.com/python/cpython/blob/f6650f9ad73359051f3e558c2431a109bc016664/Lib/unittest/async_case.py#L35-L38",
+          "v3_13_16": "https://github.com/python/cpython/blob/cbc944f4bc59639a444dd971c737788ba2283a91/Lib/unittest/async_case.py#L42",
+          "fact": "IsolatedAsyncioTestCase.__init__ stores self._asyncioTestContext = contextvars.copy_context() (line 38 at v3.12.3, line 42 at v3.13.16), so every instance holds a _contextvars.Context",
+          "local_install_identity": "the local CPython 3.12.3 and 3.13.16 async_case.py files are byte-identical to these two upstream files (cmp)"
+        },
+        "unittest_skip_and_loader": {
+          "case_py": "https://github.com/python/cpython/blob/f6650f9ad73359051f3e558c2431a109bc016664/Lib/unittest/case.py#L148-L182",
+          "loader_py": "https://github.com/python/cpython/blob/f6650f9ad73359051f3e558c2431a109bc016664/Lib/unittest/loader.py#L81-L95",
+          "fact": "skipUnless(condition, reason) returns skip(reason) when the condition is false (case.py:176-182); on a class, skip's decorator only sets __unittest_skip__ and __unittest_skip_why__ and returns the class (159-161); TestCase.run checks those attributes and adds the skip when the test runs (612-617); loadTestsFromTestCase builds one instance per test name, self.suiteClass(map(testCaseClass, testCaseNames)) (loader.py:94). Read with gh api --method GET at the pin on 2026-10-03."
+        },
+        "pool": {
+          "url": "https://github.com/python/cpython/blob/f6650f9ad73359051f3e558c2431a109bc016664/Lib/multiprocessing/pool.py#L528-L546",
+          "fact": "_handle_tasks pickles each task in put(task) (540); an exception is stored through cache[job]._set(idx, (False, e)) (544); MapResult._set keeps only the first exception (822) and marks the result ready only once all jobs are done (826); get() raises it (774); map is line 367. The same line numbers hold at v3.13.16.",
+          "hosted_traceback_match": "the hosted frames pool.py 367, 774 and 540, connection.py 206 and reduction.py 51 match v3.12.3"
+        },
+        "pickle": {
+          "url": "https://github.com/python/cpython/blob/f6650f9ad73359051f3e558c2431a109bc016664/Modules/_pickle.c#L3646-L3704",
+          "fact": "save_global reads the class's __qualname__ (3664), imports its module (3688), looks the dotted name up (3697) and otherwise raises \"Can't pickle %R: attribute lookup %S on %S failed\" (3700-3702)"
+        }
+      },
+      "github_docs": {
+        "paths_filter": "https://github.com/github/docs/blob/068546469ae7f079368d12f969991a045121c4a0/data/reusables/actions/workflows/triggering-a-workflow-paths5.md",
+        "fact": "for pull requests the paths filter evaluates the three-dot diff of the topic branch against the commit where it was last synced with the base, so a pull request that adds the trial workflow matches its own paths filter on every push"
+      }
+    },
+    "evidence_classes": {
+      "per-run exit codes, step seconds, outcomes, missing ids and their serial outcomes, mismatches, oracle verdict": "native execution on GitHub-hosted ubuntu-24.04, retained as hashes and sanitized excerpts (native_proven)",
+      "control and crash-control results": "synthetic fixtures executed on the hosted runner (template class synthetic): an injected controls file and an os._exit(3) crash file, frozen at the trial head with their expected results (control_expectations.json, sha256 in data.trial.oracle) and run alone under each arm's command; full logs retained, sanitized, in control-logs.txt",
+      "job, step, artifact and run records; macOS queue concurrency": "independent observation of platform records, read-only gh REST GET on 2026-10-03 (nearest template class source_review)",
+      "jobs API test-step seconds equal meta.json step_seconds for all 12 timed runs": "independent observation cross-checked against the native artifact",
+      "speed ratios": "computed from the measured seconds (exact fractions, as compare.py)",
+      "root cause (a), IsolatedAsyncioTestCase": "local_integration (the toy modules on CPython 3.12.3 and 3.13.16, the two real modules on 3.12.3 only) plus source_review (async_case.py, case.py, loader.py, pool.py) plus the hosted missing-id pattern and the serial skips",
+      "root cause (b), dynamic classes": "local_integration (real module, CPython 3.12.3) plus source_review (Modules/_pickle.c); hosted effect inferred from the missing ids",
+      "L4F order-throughput error cause": "unknown",
+      "K4 timing failures at class level": "native execution (observed); cause not established",
+      "unittest-parallel upstream facts, PyPI, CPython lines, GitHub docs": "source_review at the pins named in data.upstream for main.py, the README, CPython and the GitHub documentation; unpinned GET reads for issue 27, the compare against main, the repository record and PyPI JSON",
+      "cancellation reasons": "coordinator decision, recorded with the run and job records it rests on",
+      "usage": "data.usage: hosted job seconds from the jobs API; model usage unknown",
+      "observed convergence record": "evidence/artifacts/suite-parallelism-trial-20261003/experiment.json: 16 native_cli_execution observations of hosted ubuntu-24.04 jobs (12 timed runs; 4 control jobs, whose fixtures are synthetic) and 20 skipped macos-15 observations, generated from the raw run directories, the jobs API and result.json; scripts/validate_convergence.py checks declared consistency and artifact hashes, not truth"
+    },
+    "usage": {
+      "hosted_jobs": "deterministic commands only; no model ran in any hosted job",
+      "runner_time": "the per-job seconds in data.jobs (job_seconds, from the jobs API's started_at and completed_at): the 18 ubuntu-24.04 jobs only, 11,524 s in total; the 20 macos-15 jobs were never assigned a runner (zero steps)",
+      "ubuntu_24_04_job_seconds_total": 11524,
+    "observed_arm_and_control_job_seconds_total": 11461,
+    "observed_record": "evidence/artifacts/suite-parallelism-trial-20261003/experiment.json keeps every token field null (unknown, not zero), native_retries 0 for its 16 executed observations (run_attempt 1 everywhere) and null for its 20 skipped ones, and each executed observation's job seconds in its scope text, since the contract has no runner-time field",
+      "model_usage": "the model usage of the planning, build and review sessions is unknown: it is not recorded here and is not counted as zero"
+    },
+    "jobs": [
+      {
+        "id": 111164592047,
+        "name": "arms-macos (1, P3)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:23:23Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592010,
+        "name": "arms-macos (1, P3C)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:23:23Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592051,
+        "name": "arms-macos (1, P3F)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:23:23Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592043,
+        "name": "arms-macos (1, P4)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:23:23Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592135,
+        "name": "arms-macos (1, S)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:24Z",
+        "started_at": "2026-10-03T08:23:24Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592120,
+        "name": "arms-macos (2, P3)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:24Z",
+        "started_at": "2026-10-03T08:23:24Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592038,
+        "name": "arms-macos (2, P3C)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:23:23Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592015,
+        "name": "arms-macos (2, P3F)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:23:23Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592145,
+        "name": "arms-macos (2, P4)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:24Z",
+        "started_at": "2026-10-03T08:23:24Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592036,
+        "name": "arms-macos (2, S)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:23:23Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592758,
+        "name": "arms-macos (3, P3)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:24Z",
+        "started_at": "2026-10-03T08:23:24Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592164,
+        "name": "arms-macos (3, P3C)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:24Z",
+        "started_at": "2026-10-03T08:23:24Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592096,
+        "name": "arms-macos (3, P3F)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:24Z",
+        "started_at": "2026-10-03T08:23:24Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592737,
+        "name": "arms-macos (3, P4)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:24Z",
+        "started_at": "2026-10-03T08:23:24Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592729,
+        "name": "arms-macos (3, S)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:24Z",
+        "started_at": "2026-10-03T08:23:24Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592094,
+        "name": "controls-macos (P3)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:24Z",
+        "started_at": "2026-10-03T08:23:24Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592160,
+        "name": "controls-macos (P3C)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:24Z",
+        "started_at": "2026-10-03T08:23:24Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592128,
+        "name": "controls-macos (P3F)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:24Z",
+        "started_at": "2026-10-03T08:23:24Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592063,
+        "name": "controls-macos (P4)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:23:23Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164592108,
+        "name": "controls-macos (S)",
+        "labels": [
+          "macos-15"
+        ],
+        "conclusion": "cancelled",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:24Z",
+        "started_at": "2026-10-03T08:23:24Z",
+        "completed_at": "2026-10-03T09:12:40Z",
+        "steps_reported": 0
+      },
+      {
+        "id": 111164591959,
+        "name": "arms-linux (1, L4)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:23:26Z",
+        "completed_at": "2026-10-03T08:34:51Z",
+        "steps_reported": 16,
+        "job_seconds": 685,
+        "test_step": {
+          "number": 11,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:23:58Z",
+          "completed_at": "2026-10-03T08:34:47Z",
+          "seconds": 649
+        }
+      },
+      {
+        "id": 111164592031,
+        "name": "arms-linux (1, L4C)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:23:26Z",
+        "completed_at": "2026-10-03T08:35:04Z",
+        "steps_reported": 16,
+        "job_seconds": 698,
+        "test_step": {
+          "number": 11,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:23:52Z",
+          "completed_at": "2026-10-03T08:34:59Z",
+          "seconds": 667
+        }
+      },
+      {
+        "id": 111164592017,
+        "name": "arms-linux (1, L4F)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:23:27Z",
+        "completed_at": "2026-10-03T08:33:01Z",
+        "steps_reported": 16,
+        "job_seconds": 574,
+        "test_step": {
+          "number": 11,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:23:57Z",
+          "completed_at": "2026-10-03T08:32:56Z",
+          "seconds": 539
+        }
+      },
+      {
+        "id": 111164592004,
+        "name": "arms-linux (1, S)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:23:27Z",
+        "completed_at": "2026-10-03T08:52:11Z",
+        "steps_reported": 16,
+        "job_seconds": 1724,
+        "test_step": {
+          "number": 11,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:23:58Z",
+          "completed_at": "2026-10-03T08:52:06Z",
+          "seconds": 1688
+        }
+      },
+      {
+        "id": 111164592000,
+        "name": "arms-linux (2, L4)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:33:03Z",
+        "completed_at": "2026-10-03T08:40:49Z",
+        "steps_reported": 16,
+        "job_seconds": 466,
+        "test_step": {
+          "number": 11,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:33:26Z",
+          "completed_at": "2026-10-03T08:40:44Z",
+          "seconds": 438
+        }
+      },
+      {
+        "id": 111164591983,
+        "name": "arms-linux (2, L4C)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:35:18Z",
+        "completed_at": "2026-10-03T08:46:46Z",
+        "steps_reported": 16,
+        "job_seconds": 688,
+        "test_step": {
+          "number": 11,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:35:44Z",
+          "completed_at": "2026-10-03T08:46:43Z",
+          "seconds": 659
+        }
+      },
+      {
+        "id": 111164591989,
+        "name": "arms-linux (2, L4F)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:34:53Z",
+        "completed_at": "2026-10-03T08:46:58Z",
+        "steps_reported": 16,
+        "job_seconds": 725,
+        "test_step": {
+          "number": 11,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:35:20Z",
+          "completed_at": "2026-10-03T08:46:52Z",
+          "seconds": 692
+        }
+      },
+      {
+        "id": 111164592081,
+        "name": "arms-linux (2, S)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:40:51Z",
+        "completed_at": "2026-10-03T09:09:16Z",
+        "steps_reported": 16,
+        "job_seconds": 1705,
+        "test_step": {
+          "number": 11,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:41:32Z",
+          "completed_at": "2026-10-03T09:09:11Z",
+          "seconds": 1659
+        }
+      },
+      {
+        "id": 111164592053,
+        "name": "arms-linux (3, L4)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:59:15Z",
+        "completed_at": "2026-10-03T09:07:26Z",
+        "steps_reported": 16,
+        "job_seconds": 491,
+        "test_step": {
+          "number": 11,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:59:42Z",
+          "completed_at": "2026-10-03T09:07:21Z",
+          "seconds": 459
+        }
+      },
+      {
+        "id": 111164591993,
+        "name": "arms-linux (3, L4C)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:47:35Z",
+        "completed_at": "2026-10-03T08:59:48Z",
+        "steps_reported": 16,
+        "job_seconds": 733,
+        "test_step": {
+          "number": 11,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:48:00Z",
+          "completed_at": "2026-10-03T08:59:44Z",
+          "seconds": 704
+        }
+      },
+      {
+        "id": 111164592020,
+        "name": "arms-linux (3, L4F)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:46:49Z",
+        "completed_at": "2026-10-03T08:59:13Z",
+        "steps_reported": 16,
+        "job_seconds": 744,
+        "test_step": {
+          "number": 11,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:47:18Z",
+          "completed_at": "2026-10-03T08:59:08Z",
+          "seconds": 710
+        }
+      },
+      {
+        "id": 111164591986,
+        "name": "arms-linux (3, S)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:52:13Z",
+        "completed_at": "2026-10-03T09:12:25Z",
+        "steps_reported": 16,
+        "job_seconds": 1212,
+        "test_step": {
+          "number": 11,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:52:35Z",
+          "completed_at": "2026-10-03T09:12:21Z",
+          "seconds": 1186
+        }
+      },
+      {
+        "id": 111172345569,
+        "name": "compare",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T09:12:40Z",
+        "started_at": "2026-10-03T09:12:42Z",
+        "completed_at": "2026-10-03T09:13:11Z",
+        "steps_reported": 16,
+        "job_seconds": 29
+      },
+      {
+        "id": 111164592078,
+        "name": "controls-linux (L4)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:23:25Z",
+        "completed_at": "2026-10-03T08:28:54Z",
+        "steps_reported": 14,
+        "job_seconds": 329,
+        "test_step": {
+          "number": 9,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:23:50Z",
+          "completed_at": "2026-10-03T08:28:50Z",
+          "seconds": 300
+        }
+      },
+      {
+        "id": 111164592114,
+        "name": "controls-linux (L4C)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:24Z",
+        "started_at": "2026-10-03T08:23:26Z",
+        "completed_at": "2026-10-03T08:28:55Z",
+        "steps_reported": 14,
+        "job_seconds": 329,
+        "test_step": {
+          "number": 9,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:23:51Z",
+          "completed_at": "2026-10-03T08:28:51Z",
+          "seconds": 300
+        }
+      },
+      {
+        "id": 111164591955,
+        "name": "controls-linux (L4F)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:23:26Z",
+        "completed_at": "2026-10-03T08:28:52Z",
+        "steps_reported": 14,
+        "job_seconds": 326,
+        "test_step": {
+          "number": 9,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:23:47Z",
+          "completed_at": "2026-10-03T08:28:48Z",
+          "seconds": 301
+        }
+      },
+      {
+        "id": 111164592101,
+        "name": "controls-linux (S)",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:24Z",
+        "started_at": "2026-10-03T08:23:26Z",
+        "completed_at": "2026-10-03T08:23:58Z",
+        "steps_reported": 14,
+        "job_seconds": 32,
+        "test_step": {
+          "number": 9,
+          "conclusion": "success",
+          "started_at": "2026-10-03T08:23:53Z",
+          "completed_at": "2026-10-03T08:23:53Z",
+          "seconds": 0
+        }
+      },
+      {
+        "id": 111164591827,
+        "name": "inventory",
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "conclusion": "success",
+        "run_attempt": 1,
+        "created_at": "2026-10-03T08:23:23Z",
+        "started_at": "2026-10-03T08:23:26Z",
+        "completed_at": "2026-10-03T08:24:00Z",
+        "steps_reported": 12,
+        "job_seconds": 34
+      }
+    ],
+    "hosted_artifacts": [
+      {
+        "name": "arm-ubuntu-24.04-L4-r1",
+        "size_in_bytes": 356552,
+        "digest": "sha256:8e206f1c55d1a95a4647d8f9a151e404abb33e8c99dbfdbc705527909c2375ea",
+        "created_at": "2026-10-03T08:34:48Z",
+        "expires_at": "2026-11-02T08:34:47Z"
+      },
+      {
+        "name": "arm-ubuntu-24.04-L4-r2",
+        "size_in_bytes": 356349,
+        "digest": "sha256:4528f1c308bfaaec594ddf53119bcca57816e94269d28cd6725d58d47bf448e5",
+        "created_at": "2026-10-03T08:40:45Z",
+        "expires_at": "2026-11-02T08:40:44Z"
+      },
+      {
+        "name": "arm-ubuntu-24.04-L4-r3",
+        "size_in_bytes": 356472,
+        "digest": "sha256:47be338d7392d768b4032d382e0bf030d0465e99375aa1b032119a2aed425e19",
+        "created_at": "2026-10-03T09:07:22Z",
+        "expires_at": "2026-11-02T09:07:21Z"
+      },
+      {
+        "name": "arm-ubuntu-24.04-L4C-r1",
+        "size_in_bytes": 358844,
+        "digest": "sha256:f95a26a43711ea4dad23857cb4e68a2ddd5e46519cf8805b45b7ffbe4ee0fdcd",
+        "created_at": "2026-10-03T08:35:01Z",
+        "expires_at": "2026-11-02T08:35:00Z"
+      },
+      {
+        "name": "arm-ubuntu-24.04-L4C-r2",
+        "size_in_bytes": 358998,
+        "digest": "sha256:09a1ad30c3238d195652433a8e2399ca1383dd9f5190dcdf542f8cb3baca45a7",
+        "created_at": "2026-10-03T08:46:44Z",
+        "expires_at": "2026-11-02T08:46:43Z"
+      },
+      {
+        "name": "arm-ubuntu-24.04-L4C-r3",
+        "size_in_bytes": 358992,
+        "digest": "sha256:410e008631c718f81fb69ee34c30bee655ab15d7c24dabfae3cfceb8b7ea4499",
+        "created_at": "2026-10-03T08:59:45Z",
+        "expires_at": "2026-11-02T08:59:44Z"
+      },
+      {
+        "name": "arm-ubuntu-24.04-L4F-r1",
+        "size_in_bytes": 355676,
+        "digest": "sha256:b6b4e250227873292446a21d834960e0315aaf7d27ed68cfef92ddc22fa2ad01",
+        "created_at": "2026-10-03T08:32:57Z",
+        "expires_at": "2026-11-02T08:32:56Z"
+      },
+      {
+        "name": "arm-ubuntu-24.04-L4F-r2",
+        "size_in_bytes": 355378,
+        "digest": "sha256:582ad42d118fdeee07f48f6026de075dc66c77c477a5817d5b4e58c9063e4557",
+        "created_at": "2026-10-03T08:46:54Z",
+        "expires_at": "2026-11-02T08:46:53Z"
+      },
+      {
+        "name": "arm-ubuntu-24.04-L4F-r3",
+        "size_in_bytes": 355151,
+        "digest": "sha256:70d348ba064afeb8ea64d7a9783959beb522583539e819217c0a945ae6094aef",
+        "created_at": "2026-10-03T08:59:10Z",
+        "expires_at": "2026-11-02T08:59:09Z"
+      },
+      {
+        "name": "arm-ubuntu-24.04-S-r1",
+        "size_in_bytes": 289711,
+        "digest": "sha256:73cff565b7c790806071e7fe02923cd31b3d4884aadce7e18f9f4e3ff048f64e",
+        "created_at": "2026-10-03T08:52:08Z",
+        "expires_at": "2026-11-02T08:52:07Z"
+      },
+      {
+        "name": "arm-ubuntu-24.04-S-r2",
+        "size_in_bytes": 289749,
+        "digest": "sha256:2c84b0f2ebf10b329b171b08a1304f98361410ed48bde5be6432ba777ae6b724",
+        "created_at": "2026-10-03T09:09:13Z",
+        "expires_at": "2026-11-02T09:09:12Z"
+      },
+      {
+        "name": "arm-ubuntu-24.04-S-r3",
+        "size_in_bytes": 289629,
+        "digest": "sha256:d478bb291311710f4dfa673767c15d55341921e8c92f4dd4ce2adc62e5cb65d2",
+        "created_at": "2026-10-03T09:12:22Z",
+        "expires_at": "2026-11-02T09:12:21Z"
+      },
+      {
+        "name": "compare",
+        "size_in_bytes": 75852,
+        "digest": "sha256:bc0136254601b3ece5ecfec7c2a0525bcbc60c0f606de1b03c05ff7c729d6f2c",
+        "created_at": "2026-10-03T09:13:08Z",
+        "expires_at": "2026-11-02T09:13:07Z"
+      },
+      {
+        "name": "control-ubuntu-24.04-L4",
+        "size_in_bytes": 4592,
+        "digest": "sha256:e05fd796ff94d352f2cbd050fd0d1b291ddbf515b4924da7ce65a4c32cef8c71",
+        "created_at": "2026-10-03T08:28:51Z",
+        "expires_at": "2026-11-02T08:28:51Z"
+      },
+      {
+        "name": "control-ubuntu-24.04-L4C",
+        "size_in_bytes": 4626,
+        "digest": "sha256:95d65d32236739648fad304abfdf772362f8438d3c35e31a9f517c699a3d1192",
+        "created_at": "2026-10-03T08:28:53Z",
+        "expires_at": "2026-11-02T08:28:52Z"
+      },
+      {
+        "name": "control-ubuntu-24.04-L4F",
+        "size_in_bytes": 4694,
+        "digest": "sha256:744a32aab3f275d30799402345040acc2f22ad0cb8e57c0815075142c14a2a43",
+        "created_at": "2026-10-03T08:28:49Z",
+        "expires_at": "2026-11-02T08:28:48Z"
+      },
+      {
+        "name": "control-ubuntu-24.04-S",
+        "size_in_bytes": 4239,
+        "digest": "sha256:4ee09dc4222efea68dbd679074bbd1d34e70e5f147311de4ac4d148b77235073",
+        "created_at": "2026-10-03T08:23:55Z",
+        "expires_at": "2026-11-02T08:23:54Z"
+      },
+      {
+        "name": "inventory",
+        "size_in_bytes": 397920,
+        "digest": "sha256:0430d692e16651b9418683a2effbebfb3d120ab1b00f90a6d2e4ecf48d4809f0",
+        "created_at": "2026-10-03T08:23:57Z",
+        "expires_at": "2026-11-02T08:23:56Z"
+      }
+    ],
+    "original_files": {
+      "result.json": {
+        "sha256": "f26cb0c1c460029ffd481a844bc524ae5e83c84b73fda52cc3efe3496475eb9a",
+        "bytes": 815073
+      },
+      "summary.md": {
+        "sha256": "b1450c88a517fafbf7471af6b7f8c3f6051cb2c1952bbeb696038812503a142b",
+        "bytes": 1302
+      },
+      "checkout-status.json": {
+        "sha256": "cf7037bb37995b6563e6f4ac26fe1c13080e18affe5506576a062a472aced23c",
+        "bytes": 2430
+      },
+      "inventory-base.txt": {
+        "sha256": "59ffb6b2ec53eeafb040da310f1eb01a5dbe228dd1f4dc402a85f019de6fa062",
+        "bytes": 1024330
+      },
+      "inventory-trial.txt": {
+        "sha256": "4ef8626973e3d971ba64de20464d3abeed21f18df7e3c25c48dc16280b8f420c",
+        "bytes": 1025200
+      },
+      "experiment.json (preregistered)": {
+        "path_at_trial_head": "blueprints/convergence-practice/macos-suite-parallelism-20261003/experiment.json",
+        "sha256": "305fc2fa2ddd2c0a0eba4d85d748807db87302bde59a6b6489de866bee416c08",
+        "bytes": 43208
+      },
+      "decision record (preregistered)": {
+        "path_at_trial_head": "docs/decisions/2026-10-03-macos-suite-parallelism-trial.md",
+        "sha256": "dda340f8e62a3f1e2dcf450336eee5ae7cce24ffef0bd0fd40a1768bb7a4c992",
+        "bytes": 29646
+      },
+      "run_directories": {
+        "ubuntu-24.04-S-r1": {
+          "command.txt": {
+            "sha256": "6414cf5e9fd510722ad79160ebbd4e3f7af4501ea512f5715cd6f5dba077479b",
+            "bytes": 38
+          },
+          "exit-code.txt": {
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "log.txt": {
+            "sha256": "0e163819c20ef77d4262ac1f90f2a4a9def66b6e68c1a490622e7be178082d9d",
+            "bytes": 1806277
+          },
+          "meta.json": {
+            "sha256": "f2decff61545585444efc6a72a33077ea09e77443e90ac71be48dead07570641",
+            "bytes": 325
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "f8dac85c6401d17b0d35a3ed1c3c019bb38482249afc606e535fd09ca2d7d21b",
+            "bytes": 5
+          }
+        },
+        "ubuntu-24.04-S-r2": {
+          "command.txt": {
+            "sha256": "6414cf5e9fd510722ad79160ebbd4e3f7af4501ea512f5715cd6f5dba077479b",
+            "bytes": 38
+          },
+          "exit-code.txt": {
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "log.txt": {
+            "sha256": "69488a22a7900c0339923caa0d1344a5f188e43e39d7216ba77076811cbc1e90",
+            "bytes": 1806336
+          },
+          "meta.json": {
+            "sha256": "82ff639009f781c8350098b41c2e8beb6ed03833cb4d4a5e231ee6e3861fd1d8",
+            "bytes": 325
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "f3a841d1c7b5c2abc47fb88046be8211df5bf8f1330e6ff5edfd9c4da726a2c4",
+            "bytes": 5
+          }
+        },
+        "ubuntu-24.04-S-r3": {
+          "command.txt": {
+            "sha256": "6414cf5e9fd510722ad79160ebbd4e3f7af4501ea512f5715cd6f5dba077479b",
+            "bytes": 38
+          },
+          "exit-code.txt": {
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "log.txt": {
+            "sha256": "58e3b9e89a1f6ec0eba553f2601e0b29515b9883a3338a25b6da9bcda6794658",
+            "bytes": 1806247
+          },
+          "meta.json": {
+            "sha256": "cab3bf13af5216c2e194de6c5d0581b6ab0914306b75263903edfc2e6fe3b5e8",
+            "bytes": 325
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "ca86d0d1c7ceff503199d67dc22c13dc9fe329c8f8b8108c714b7c055c5a611b",
+            "bytes": 5
+          }
+        },
+        "ubuntu-24.04-L4-r1": {
+          "command.txt": {
+            "sha256": "73fb32017afe2d51d6da11d69871ed5f2f08b16b58ba266710587c7429267e14",
+            "bytes": 52
+          },
+          "exit-code.txt": {
+            "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "log.txt": {
+            "sha256": "c048666bf5fecae0ec6cec1c4a8bd200c5ef4989714069f57a72116634d68893",
+            "bytes": 3381346
+          },
+          "meta.json": {
+            "sha256": "e29198f30c5a5e552aa05e07d85bb896c9ff0f93e5398e18acc9ce4d54e19756",
+            "bytes": 339
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "4114b0a30886c59a27c101d2280dd71b51b66450fa468de8766bb022adac15ec",
+            "bytes": 4
+          }
+        },
+        "ubuntu-24.04-L4-r2": {
+          "command.txt": {
+            "sha256": "73fb32017afe2d51d6da11d69871ed5f2f08b16b58ba266710587c7429267e14",
+            "bytes": 52
+          },
+          "exit-code.txt": {
+            "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "log.txt": {
+            "sha256": "13eb262bb07ec33e42d212f9ba9bd53921ea6611a4a4363e82f2a13e26aedef9",
+            "bytes": 3381346
+          },
+          "meta.json": {
+            "sha256": "c68f54ed592ef1a4705db97d4b13af739579c47591aec69494892bf27d171947",
+            "bytes": 339
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "a97d621ec6b93d9b869e8cdb134516925f2baf2fa1c8186a387f6fc35ffb77ad",
+            "bytes": 4
+          }
+        },
+        "ubuntu-24.04-L4-r3": {
+          "command.txt": {
+            "sha256": "73fb32017afe2d51d6da11d69871ed5f2f08b16b58ba266710587c7429267e14",
+            "bytes": 52
+          },
+          "exit-code.txt": {
+            "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "log.txt": {
+            "sha256": "307b9e20efb70bb5a8a541d63b006f030afb27c2b654d479c55c4474bc68637e",
+            "bytes": 3381348
+          },
+          "meta.json": {
+            "sha256": "4dc0f3e276eb9c89ecf8fe93ed01dc663419afd04759a1d820abc23173561c20",
+            "bytes": 339
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "7757df589d2dcf60b6ef20aca61d7174620e3e109a7eb27bcd49115a976b40e9",
+            "bytes": 4
+          }
+        },
+        "ubuntu-24.04-L4F-r1": {
+          "command.txt": {
+            "sha256": "b80eff435c36ffceb8549b01452eaca5e1af396bbc30a82ca86d62ee08074892",
+            "bytes": 78
+          },
+          "exit-code.txt": {
+            "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "log.txt": {
+            "sha256": "3938375e1328af599b11db08140c5fdc1e3d611c63523d6934d46a8db6651049",
+            "bytes": 3381349
+          },
+          "meta.json": {
+            "sha256": "ad58b83b8240ccc288a8acbd3e0a4024d409f4fe64dfa3fdf251097ababe3d97",
+            "bytes": 366
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "86bfd50a5846007080bb35d1827a1af63cc1c280e0db4e122d70836512f4af40",
+            "bytes": 4
+          }
+        },
+        "ubuntu-24.04-L4F-r2": {
+          "command.txt": {
+            "sha256": "b80eff435c36ffceb8549b01452eaca5e1af396bbc30a82ca86d62ee08074892",
+            "bytes": 78
+          },
+          "exit-code.txt": {
+            "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "log.txt": {
+            "sha256": "32c0ed722d828fefc20f03e8b4eeb7dbf7cc6a2eaf60a8e7b3a4f1d19bbabbd6",
+            "bytes": 3381351
+          },
+          "meta.json": {
+            "sha256": "4a63807ad03720ccda65a33143b48869bfb87623fde699ce346fe70647c5d2be",
+            "bytes": 366
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "389279ba3b0ae113e6fcc96131da61d17c7da49a0e5eb6891d94d80e32142951",
+            "bytes": 4
+          }
+        },
+        "ubuntu-24.04-L4F-r3": {
+          "command.txt": {
+            "sha256": "b80eff435c36ffceb8549b01452eaca5e1af396bbc30a82ca86d62ee08074892",
+            "bytes": 78
+          },
+          "exit-code.txt": {
+            "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "log.txt": {
+            "sha256": "f8c43c8e2ff5aa253d9216f8b998d52d85c5c7a5b6c8f01276aeb0d45c066914",
+            "bytes": 3381349
+          },
+          "meta.json": {
+            "sha256": "b631385add302b618db6aaf5723b1c52827c57d06ad1ed7c4d59a108c2d6ee3b",
+            "bytes": 366
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "bf20ffe36bcdff531fca83d6f21a32dce1e2c201fe2d8791af29b4b2f910d47f",
+            "bytes": 4
+          }
+        },
+        "ubuntu-24.04-L4C-r1": {
+          "command.txt": {
+            "sha256": "c812d278e938c4992ecf61943b28e1524b3d805f5e43ac3132f311f8a01dbd02",
+            "bytes": 51
+          },
+          "exit-code.txt": {
+            "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "log.txt": {
+            "sha256": "6dff8a8d5713eeffda8fb2991f07b048932bb68b720f0fbd18a0997d8082cda6",
+            "bytes": 3424330
+          },
+          "meta.json": {
+            "sha256": "bb260efbd243287205a7523e599c9ae6dfa9acff4e1b47cd9fd918aaa5a14a5f",
+            "bytes": 339
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "054071ccab67fb8dc30d3a0d83122c29cb25ced9864380815fce35d65a155d94",
+            "bytes": 4
+          }
+        },
+        "ubuntu-24.04-L4C-r2": {
+          "command.txt": {
+            "sha256": "c812d278e938c4992ecf61943b28e1524b3d805f5e43ac3132f311f8a01dbd02",
+            "bytes": 51
+          },
+          "exit-code.txt": {
+            "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "log.txt": {
+            "sha256": "ebb829d1fb66736d2fd12b3ce08a62161c465c8131bbde0e001aee70f1e52996",
+            "bytes": 3424328
+          },
+          "meta.json": {
+            "sha256": "6f861ec008ce06325c9896ad1eb281dae241328a100ae1a7ac630ced42b0a10d",
+            "bytes": 339
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "2415e01b88c1283eb54fa6917b7204aa6840bcea15564738b459b3e56b2b3eb2",
+            "bytes": 4
+          }
+        },
+        "ubuntu-24.04-L4C-r3": {
+          "command.txt": {
+            "sha256": "c812d278e938c4992ecf61943b28e1524b3d805f5e43ac3132f311f8a01dbd02",
+            "bytes": 51
+          },
+          "exit-code.txt": {
+            "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "log.txt": {
+            "sha256": "523e60f8d8dd09a5f089665476cad6e13a793fd53c1e92fc6f22757f8aaa07e6",
+            "bytes": 3424558
+          },
+          "meta.json": {
+            "sha256": "9cddddb57804f96ae68e2669bd8014e982ddc9ac99105a4df1c462997e40ced5",
+            "bytes": 339
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "65ca2cdfad81f20951852c2e4943c8fd42f5b963bd0aceeae277619d97101e45",
+            "bytes": 4
+          }
+        },
+        "ubuntu-24.04-S-controls": {
+          "command.txt": {
+            "sha256": "b827a9eb14695080d10f08e6ec8df6ccaa0456f2c5f9fe5a64e4ae3938c3b928",
+            "bytes": 23
+          },
+          "exit-code.txt": {
+            "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "limit.txt": {
+            "sha256": "84a270b658bb14e37cae73a0372eabb813132b1ade5ad7028092ae09d5d8ca95",
+            "bytes": 28
+          },
+          "log.txt": {
+            "sha256": "51ca0ca9bed43e49c731de3ca3b24616d61ec1648fda17307a7e993cf3fbeb59",
+            "bytes": 3234
+          },
+          "meta.json": {
+            "sha256": "5f16756d8bf31464cd65b69634ceacc6eb23e99d62bb113bc0b6272c677dd251",
+            "bytes": 328
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+            "bytes": 2
+          }
+        },
+        "ubuntu-24.04-S-crash": {
+          "command.txt": {
+            "sha256": "b827a9eb14695080d10f08e6ec8df6ccaa0456f2c5f9fe5a64e4ae3938c3b928",
+            "bytes": 23
+          },
+          "exit-code.txt": {
+            "sha256": "1121cfccd5913f0a63fec40a6ffd44ea64f9dc135c66634ba001d10bcf4302a2",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "limit.txt": {
+            "sha256": "84a270b658bb14e37cae73a0372eabb813132b1ade5ad7028092ae09d5d8ca95",
+            "bytes": 28
+          },
+          "log.txt": {
+            "sha256": "9755b350b787423925119ef581f153648bd08982bbcc036ee931a39eb05e9f4d",
+            "bytes": 52
+          },
+          "meta.json": {
+            "sha256": "5f16756d8bf31464cd65b69634ceacc6eb23e99d62bb113bc0b6272c677dd251",
+            "bytes": 328
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+            "bytes": 2
+          }
+        },
+        "ubuntu-24.04-L4-controls": {
+          "command.txt": {
+            "sha256": "73fb32017afe2d51d6da11d69871ed5f2f08b16b58ba266710587c7429267e14",
+            "bytes": 52
+          },
+          "exit-code.txt": {
+            "sha256": "f0b5c2c2211c8d67ed15e75e656c7862d086e9245420892a7de62cd9ec582a06",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "limit.txt": {
+            "sha256": "84a270b658bb14e37cae73a0372eabb813132b1ade5ad7028092ae09d5d8ca95",
+            "bytes": 28
+          },
+          "log.txt": {
+            "sha256": "040efb1949ccc58d991c3cc1583d4ec180266eab8fb7b6034d34f41895faa101",
+            "bytes": 3996
+          },
+          "meta.json": {
+            "sha256": "3707bf6f44c1554a99369a1dc91efec5f0e5f130ccba31373de898e50318b7d8",
+            "bytes": 358
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+            "bytes": 2
+          }
+        },
+        "ubuntu-24.04-L4-crash": {
+          "command.txt": {
+            "sha256": "73fb32017afe2d51d6da11d69871ed5f2f08b16b58ba266710587c7429267e14",
+            "bytes": 52
+          },
+          "exit-code.txt": {
+            "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+            "bytes": 4
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "limit.txt": {
+            "sha256": "84a270b658bb14e37cae73a0372eabb813132b1ade5ad7028092ae09d5d8ca95",
+            "bytes": 28
+          },
+          "log.txt": {
+            "sha256": "c96014bc03c221e0f8a43e53004faa479763e101f7f80e3af525ca02aae30d02",
+            "bytes": 330
+          },
+          "meta.json": {
+            "sha256": "3707bf6f44c1554a99369a1dc91efec5f0e5f130ccba31373de898e50318b7d8",
+            "bytes": 358
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "f807fe6dc767be2e7021d41540114b33b30fa7784f6de5521251f23a3eb66468",
+            "bytes": 4
+          }
+        },
+        "ubuntu-24.04-L4F-controls": {
+          "command.txt": {
+            "sha256": "b80eff435c36ffceb8549b01452eaca5e1af396bbc30a82ca86d62ee08074892",
+            "bytes": 78
+          },
+          "exit-code.txt": {
+            "sha256": "f0b5c2c2211c8d67ed15e75e656c7862d086e9245420892a7de62cd9ec582a06",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "limit.txt": {
+            "sha256": "84a270b658bb14e37cae73a0372eabb813132b1ade5ad7028092ae09d5d8ca95",
+            "bytes": 28
+          },
+          "log.txt": {
+            "sha256": "cb71b1d51694c2787b6fcc67216ae1dc4f1990c1c46c9aa5ea27379f500fe9b6",
+            "bytes": 3996
+          },
+          "meta.json": {
+            "sha256": "17ed07bd68870efe26ed513d346a564bf1fa06fa88cfd9ce5e39e838a2348e56",
+            "bytes": 385
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
+            "bytes": 2
+          }
+        },
+        "ubuntu-24.04-L4F-crash": {
+          "command.txt": {
+            "sha256": "b80eff435c36ffceb8549b01452eaca5e1af396bbc30a82ca86d62ee08074892",
+            "bytes": 78
+          },
+          "exit-code.txt": {
+            "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+            "bytes": 4
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "limit.txt": {
+            "sha256": "84a270b658bb14e37cae73a0372eabb813132b1ade5ad7028092ae09d5d8ca95",
+            "bytes": 28
+          },
+          "log.txt": {
+            "sha256": "c96014bc03c221e0f8a43e53004faa479763e101f7f80e3af525ca02aae30d02",
+            "bytes": 330
+          },
+          "meta.json": {
+            "sha256": "17ed07bd68870efe26ed513d346a564bf1fa06fa88cfd9ce5e39e838a2348e56",
+            "bytes": 385
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "f807fe6dc767be2e7021d41540114b33b30fa7784f6de5521251f23a3eb66468",
+            "bytes": 4
+          }
+        },
+        "ubuntu-24.04-L4C-controls": {
+          "command.txt": {
+            "sha256": "c812d278e938c4992ecf61943b28e1524b3d805f5e43ac3132f311f8a01dbd02",
+            "bytes": 51
+          },
+          "exit-code.txt": {
+            "sha256": "f0b5c2c2211c8d67ed15e75e656c7862d086e9245420892a7de62cd9ec582a06",
+            "bytes": 2
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "limit.txt": {
+            "sha256": "84a270b658bb14e37cae73a0372eabb813132b1ade5ad7028092ae09d5d8ca95",
+            "bytes": 28
+          },
+          "log.txt": {
+            "sha256": "670f1a9b4d62b294af940739fc7699c7a3041bdf9fb9392f2e9b1eaa13797755",
+            "bytes": 3996
+          },
+          "meta.json": {
+            "sha256": "0bccc1cfedee10f41ca1649b0973ae1d767e6407bd55784e701535c235026716",
+            "bytes": 358
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+            "bytes": 2
+          }
+        },
+        "ubuntu-24.04-L4C-crash": {
+          "command.txt": {
+            "sha256": "c812d278e938c4992ecf61943b28e1524b3d805f5e43ac3132f311f8a01dbd02",
+            "bytes": 51
+          },
+          "exit-code.txt": {
+            "sha256": "ca2ebdf97d7469496b1f4b78958f9dc8447efdcb623953fee7b6996b762f6fff",
+            "bytes": 4
+          },
+          "git-status.txt": {
+            "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+            "bytes": 0
+          },
+          "limit.txt": {
+            "sha256": "84a270b658bb14e37cae73a0372eabb813132b1ade5ad7028092ae09d5d8ca95",
+            "bytes": 28
+          },
+          "log.txt": {
+            "sha256": "c96014bc03c221e0f8a43e53004faa479763e101f7f80e3af525ca02aae30d02",
+            "bytes": 330
+          },
+          "meta.json": {
+            "sha256": "0bccc1cfedee10f41ca1649b0973ae1d767e6407bd55784e701535c235026716",
+            "bytes": 358
+          },
+          "runtime.json": {
+            "sha256": "7f579cd29d71c5e72324b9644225f5da098093ca95ce96b7c1a36b5e537d182d",
+            "bytes": 294
+          },
+          "step-seconds.txt": {
+            "sha256": "f807fe6dc767be2e7021d41540114b33b30fa7784f6de5521251f23a3eb66468",
+            "bytes": 4
+          }
+        }
+      }
+    },
+    "retained_files": {
+      "evidence/artifacts/suite-parallelism-trial-20261003/README.md": {
+        "sha256": "0a9faceaf4268eb54b76c174609ea8e597d50a9ea39170317944f62caea474e4",
+        "bytes": 9207
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/experiment.json": {
+        "sha256": "0853aab40b7745a9afb54afb30589633ebbb387da730260f44e1274cff03c35b",
+        "bytes": 123174
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/checkout-status.json": {
+        "sha256": "cf7037bb37995b6563e6f4ac26fe1c13080e18affe5506576a062a472aced23c",
+        "bytes": 2430
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/control-logs.txt": {
+        "sha256": "e21ed422218924a05d4dec74d54fb880d16bad75c348e9c8bc163499a91c82d0",
+        "bytes": 17277
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/crash-tail-L4-r1.txt": {
+        "sha256": "161a16e7e48323cd3ddd7e526cfd49c15366bd00a5029550bc916fde2f04f1e3",
+        "bytes": 1359
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/crash-tail-L4C-r1.txt": {
+        "sha256": "20fdf36730c2106258e74d61708eccfa7a2c6d181a5b96577a8edc2534a1b7a3",
+        "bytes": 1632
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/crash-tail-L4F-r1.txt": {
+        "sha256": "ee0c3d6a9213ff922b86c884aa5020245d4d06e92cf587ebd940be4ead301c33",
+        "bytes": 2365
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/local-reproductions.txt": {
+        "sha256": "1875800ead9944345772cae4b31c782c90dec96308141b8cec60d8657e588f44",
+        "bytes": 18191
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/log-key-lines.txt": {
+        "sha256": "7b8f8adf608fb36b5777448d510a28bd0c9b47aba19b2aab68ba0f1467c4eccc",
+        "bytes": 4599
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/preregistration-experiment.json.txt": {
+        "sha256": "305fc2fa2ddd2c0a0eba4d85d748807db87302bde59a6b6489de866bee416c08",
+        "bytes": 43208
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/result-trimmed.json": {
+        "sha256": "be82af38a075959f7a21d96e326e7f076abfaba283ed761603438e7342df332d",
+        "bytes": 71682
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/serial-durations-S.txt": {
+        "sha256": "2a802072a19bf06adbc9ca9781bbd03d6c0adb5cf43d94ecd89b80a0da960c47",
+        "bytes": 13465
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/summary.md": {
+        "sha256": "b1450c88a517fafbf7471af6b7f8c3f6051cb2c1952bbeb696038812503a142b",
+        "bytes": 1302
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-ci-suite-linux-pins.frozen": {
+        "sha256": "76f2a544d1d5c5724fa9607edfcfa2f5afd02bc7e013a0aef8bbcfb63135a92c",
+        "bytes": 1316
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-ci-suite-macos-pins.frozen": {
+        "sha256": "673c36d4f323d4e412f61e893ab6183a750856869292b330e325090f9b10a5c3",
+        "bytes": 1136
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/github-workflows-macos-suite-parallel-trial.yml.txt": {
+        "sha256": "0f0bb9e6aa523890c7c783afeb5569e251015fc1ab82f72a62b76fcb43af1db3",
+        "bytes": 56566
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/tests-test_native_maintenance.py.txt": {
+        "sha256": "565ad15ac3f00618ac4504dd25f4764c44292ca246a5aea1ef1df71b8eecf8a1",
+        "bytes": 2389
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-README.md.txt": {
+        "sha256": "6e221d59d5143f94738275e80b8698cbdd670e21e4412f1e154c347bc578f35f",
+        "bytes": 24695
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-compare.py.txt": {
+        "sha256": "415d648bf76c0519571c993191f0c70eaa59c392e54908a5684d54607264a3ad",
+        "bytes": 79570
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-controls-control_expectations.json.txt": {
+        "sha256": "24ad74995d07e13dfd27217af9465390bd1cc3a3a9e510da8661b199eb18308a",
+        "bytes": 3131
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-controls-crash_control-test_crash.py.txt": {
+        "sha256": "b81adbf771eaa7ea789721812d9b98bd9a7f18374edb3662cbe1f59e344f661a",
+        "bytes": 476
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-controls-test_zz_trial_controls.py.txt": {
+        "sha256": "262e368ec33d3854179afc618a7b74f276507b7f403f7af183ba080f608222d1",
+        "bytes": 1975
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-fixtures-index.json.txt": {
+        "sha256": "6b605c4d7bd5b8b4fa9a5343d23f8760d5ba49dbf7b6f11de15c8a5c73312a39",
+        "bytes": 11011
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-fixtures-inventory-controls.txt.txt": {
+        "sha256": "111b7f2d8e3c0b22dd31f6b10bd00b7211aa1007cf4a2ad185c843b791a72d15",
+        "bytes": 492
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-ids.py.txt": {
+        "sha256": "e5d416fb0f50f0d21aadadf0f1c8b3f181cd772f65a705f7db161173f8a9aa9a",
+        "bytes": 3438
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-make_fixtures.py.txt": {
+        "sha256": "930e286d80cd5dc46e73d7f7d0845686f280984d7dc274eabe1be6ea8554e6b2",
+        "bytes": 12699
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-test_b1_failure_mode.py.txt": {
+        "sha256": "3e9678ff0e2fe74557459c1cc06e8239a2fc3a3929533bc9cd5de757464472ca",
+        "bytes": 7586
+      },
+      "evidence/artifacts/suite-parallelism-trial-20261003/frozen/trial-test_compare.py.txt": {
+        "sha256": "0b2dc0633e5e873f926323c97599d18a11c640d4eb133fb0e35a11f0bb0b93e3",
+        "bytes": 57574
+      }
+    }
+  }
+}

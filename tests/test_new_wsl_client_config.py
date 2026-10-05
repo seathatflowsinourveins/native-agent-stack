@@ -66,15 +66,24 @@ elif a[:2] == ["mcp", "get"]:
     if spec is None:
         print("No MCP server found with name: " + a[2], file=sys.stderr)
         sys.exit(1)
-    print(a[2] + ":\\n  Scope: User config (available in all your projects)\\n  Status: Connected\\n  Type: stdio")
-    print("  Command: " + spec["command"] + "\\n  Args: " + " ".join(spec["args"]) + "\\n  Environment:")
-    for key in spec["env"]:
-        print("    " + key + "=" + spec["env"][key])
+    print(a[2] + ":\\n  Scope: User config (available in all your projects)\\n  Status: Connected\\n  Type: " + spec["type"])
+    if spec["type"] == "stdio":
+        print("  Command: " + spec["command"] + "\\n  Args: " + " ".join(spec["args"]) + "\\n  Environment:")
+        for key in spec["env"]:
+            print("    " + key + "=" + spec["env"][key])
+    else:
+        print("  URL: " + spec["url"])
     print("\\nTo remove this server, run: claude mcp remove " + a[2] + " -s user")
 elif a[:2] == ["mcp", "add"]:
     rest = a[2:]
     assert rest[:2] == ["--scope", "user"], rest
     rest, env = rest[2:], {}
+    if rest[:1] == ["--transport"]:
+        data[rest[2]] = {"type": rest[1], "url": rest[3]}
+        assert len(rest) == 4, rest
+        json.dump(data, open(state, "w"))
+        print("Added " + rest[1] + " MCP server " + rest[2])
+        sys.exit(0)
     name, rest = rest[0], rest[1:]
     while rest and rest[0] != "--":
         assert rest[0] == "-e", rest
@@ -146,6 +155,18 @@ DESTINATION_CODEX = ('[marketplaces.trailofbits]\nsource_type = "git"\nsource = 
 DESTINATION_CLAUDE = {"extraKnownMarketplaces": {"trailofbits": {"source": {
     "source": "git", "url": PLAN_MARKETPLACE_URL}}}, "theme": "auto"}
 FAILING_CLAUDE = "#!/bin/sh\nexit 3\n"
+# The wave-2 batch owes both acknowledgements until its pull request has them, and --apply refuses to wire an interim
+# install meanwhile (AcknowledgementGateTests, with the real function). Every other test applies as if both were recorded.
+REAL_OWED_ACKNOWLEDGEMENTS = cfg.owed_acknowledgements
+ACKNOWLEDGED = mock.patch.object(cfg, "owed_acknowledgements", return_value=[])
+
+
+def setUpModule():
+    ACKNOWLEDGED.start()
+
+
+def tearDownModule():
+    ACKNOWLEDGED.stop()
 
 
 def write_exe(path: Path, text: str) -> Path:
@@ -168,8 +189,12 @@ def make_catalog(tmp: Path) -> Path:
     filtered blocks are copied too, so the copy starts clean."""
     root = tmp / "catalog"
     files = [cfg.MAP_REL, cfg.MANIFEST_REL, cfg.BOOTSTRAP_REL, cfg.HOST_TEMPLATE_REL, *cfg.TEMPLATES.values(),
-             *cfg.BLOCK_TEXT_REL.values(), *cfg.GENERATED_BLOCKS.values(), f"{cfg.PLAN_REL}/install-plan.json",
-             f"{cfg.PLAN_REL}/config/otel.yaml", f"{cfg.PLAN_REL}/config/omniroute.env.example"]
+             *cfg.TEMPLATE_ADDITIONS.values(), *cfg.BLOCK_TEXT_REL.values(), *cfg.GENERATED_BLOCKS.values(), f"{cfg.PLAN_REL}/install-plan.json",
+             f"{cfg.PLAN_REL}/config/otel.yaml", f"{cfg.PLAN_REL}/config/omniroute.env.example",
+             cfg.SKILLS_MANIFEST_REL]
+    # The dated records that the map's `directive` fields name: --check requires each to be a file of the checkout.
+    files += sorted({entry["directive"] for entry in json.loads((ROOT / cfg.MAP_REL).read_text(encoding="utf-8"))["entries"]
+                     if "directive" in entry})
     for rel in files:
         (root / rel).parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / rel, root / rel)
@@ -188,6 +213,15 @@ def edit_json(path: Path, change) -> None:
     data = json.loads(path.read_text(encoding="utf-8"))
     change(data)
     path.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
+
+def without_interim(slot: str):
+    """A change for edit_json on the manifest: the foundation row `slot` without its interim install (amendment 3 of the
+    decision rule), so the row is what it was before the wave-2 records."""
+    def change(data):
+        row = next(r for r in data["slots"] if r["slot_id"] == slot and r["catalog"] == "foundation")
+        assert row.pop("interim", None), f"{slot} carries no interim"
+    return change
 
 
 def tree(home: Path) -> dict:
@@ -221,7 +255,7 @@ class MapTests(unittest.TestCase):
         code, out, err = run_main("--check")
         self.assertEqual((code, err), (0, ""), out[-400:])
         self.assertIn("check passed", out)
-        self.assertRegex(out, rf"pieces: 3\d\d; wired: \d+; not wired: \d+; authorization: {len(AuthorizationTests.ALL)}\n")
+        self.assertRegex(out, rf"pieces: [34]\d\d; wired: \d+; not wired: \d+; authorization: {len(AuthorizationTests.ALL)}\n")
 
     def test_every_piece_has_one_line_and_every_unwired_one_says_why(self):
         results, *_ = cfg.analyse(ROOT)
@@ -277,7 +311,9 @@ class MapTests(unittest.TestCase):
         entry = next(e for e in json.loads(MAP.read_text())["entries"] if e["match"] == ["claude/settings/setting/theme"])
         self.assertEqual((entry["wiring"], entry["keep_existing"]), ("practice", True))
         results, *_ = cfg.analyse(ROOT)
-        self.assertEqual([v.piece.key for v in results if v.entry.keep_existing], ["claude/settings/setting/theme"])
+        # The theme, and the status line that claude-hud's setup.mjs writes with the runtime that ran it.
+        self.assertEqual(sorted(v.piece.key for v in results if v.entry.keep_existing),
+                         ["claude/settings/setting/statusLine", "claude/settings/setting/theme"])
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
             edit_json(root / cfg.MAP_REL, lambda d: d["entries"].append(
@@ -340,10 +376,62 @@ class MapTests(unittest.TestCase):
                 entry = next(e for e in data["entries"] if e["match"] ==
                              ["claude/settings/hook/PreToolUse/matcher=Bash/rtk hook claude"])
                 entry["wiring"] = "practice"
+                entry.pop("directive", None)    # a directive belongs to a slot entry only
             edit_json(root / cfg.MAP_REL, change)
             errors = cfg.analyse(root)[3]
         self.assertIn("claude/settings/hook/PreToolUse/matcher=Bash/rtk hook claude: a practice piece runs `rtk`, which "
                       "is not in the repository", errors)
+
+    def test_a_directive_adds_its_owner_while_the_slot_installs_and_needs_its_record(self):
+        hook = "claude/settings/hook/PreToolUse/matcher=Bash/rtk hook claude"
+        verdicts = {v.piece.key: v for v in cfg.analyse(ROOT)[0]}
+        self.assertTrue(verdicts[hook].wired)
+        self.assertIn("slot command-output installs RTK 0.51.0", verdicts[hook].reason)
+        with tempfile.TemporaryDirectory() as tmp:     # a directive adds an owner beside a different installed default
+            root = make_catalog(Path(tmp))
+
+            def other_owner(data):
+                row = next(row for row in data["slots"]
+                           if row.get("catalog") == "foundation" and row["slot_id"] == "command-output")
+                row.pop("interim", None)
+                row.update(default="Other command-output tool", installs_nothing_extra=False)
+
+            edit_json(root / cfg.MANIFEST_REL, other_owner)
+            record = next(e["directive"] for e in json.loads((root / cfg.MAP_REL).read_text())["entries"]
+                          if e["match"] == [hook])
+            verdicts = {v.piece.key: v for v in cfg.analyse(root)[0]}
+            self.assertTrue(verdicts[hook].wired)
+            self.assertIn("the owner's directive (", verdicts[hook].reason)
+            self.assertIn(record, verdicts[hook].reason)
+            # With the very same installed default, removing the directive removes the hook.
+            edit_json(root / cfg.MAP_REL, lambda d: next(e for e in d["entries"] if e["match"] == [hook]).pop(
+                "directive"))
+            verdicts = {v.piece.key: v for v in cfg.analyse(root)[0]}
+            self.assertFalse(verdicts[hook].wired)
+            self.assertIn("not 'rtk'", verdicts[hook].reason)
+        with tempfile.TemporaryDirectory() as tmp:     # the record the directive names is gone
+            root = make_catalog(Path(tmp))
+            record = next(e["directive"] for e in json.loads((root / cfg.MAP_REL).read_text())["entries"] if "directive" in e)
+            (root / record).unlink()
+            errors = cfg.analyse(root)[3]
+        self.assertTrue([e for e in errors if "its directive record" in e and record in e], errors)
+        with tempfile.TemporaryDirectory() as tmp:     # the slot comes to install nothing: the owner unwires with it
+            root = make_catalog(Path(tmp))
+
+            def no_layer(data):
+                for row in data["slots"]:
+                    if row.get("catalog") == "foundation" and row["slot_id"] == "command-output":
+                        row.pop("interim", None)
+                        row["installs_nothing_extra"] = True
+            edit_json(root / cfg.MANIFEST_REL, no_layer)
+            verdicts = {v.piece.key: v for v in cfg.analyse(root)[0]}
+        self.assertFalse(verdicts[hook].wired)
+        with tempfile.TemporaryDirectory() as tmp:     # a directive on an entry that is not a slot entry is refused
+            root = make_catalog(Path(tmp))
+            edit_json(root / cfg.MAP_REL, lambda d: next(e for e in d["entries"] if e["match"] == [hook]).update(
+                wiring="practice"))
+            with self.assertRaises(cfg.ConfigError):
+                cfg.load_map(root)
 
     def test_a_practice_hook_may_run_only_files_that_the_repository_copies(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -390,25 +478,36 @@ class MapTests(unittest.TestCase):
 class AgentGapTests(unittest.TestCase):
     """What each project agent names that this distribution will not have, derived from the frontmatter."""
 
-    def test_the_gaps_are_the_servers_and_skills_the_agents_name_beyond_serena_qmd_and_the_plans_skills(self):
+    def test_the_gaps_are_the_servers_and_skills_the_agents_name_beyond_the_wired_ones_and_the_plans_skills(self):
         results, _, plan, errors, warnings = cfg.analyse(ROOT)
         self.assertEqual(errors, [])
         gaps = cfg.agent_gaps(ROOT, results, plan)
-        wired_servers = {"serena", "qmd"}
+        # Wave 3 wires the token servers; context-mode's plugin tools and skill retain their native names.
+        wired_servers = {"serena", "qmd", "ai-memory", "semble", "socraticode", "headroom", "codebase-memory",
+                         "jcodemunch", "plugin_context-mode_context-mode"}
         for path in sorted((ROOT / cfg.CLAUDE_AGENTS_REL).glob("*.md")):
             text = path.read_text()
             head = re.match(r"---\n(.*?)\n---\n", text, re.S).group(1)
             named = set(re.findall(r"mcp__([A-Za-z0-9_-]+?)__[A-Za-z0-9_]+", head))
             skills = re.findall(r"^  - (\S+)$", head, re.M)
             expected_servers = named - wired_servers
-            expected_skills = [skill for skill in skills if skill not in plan["skills"]]
+            expected_skills = [skill for skill in skills if skill not in plan["skills"]
+                               and not skill.startswith("context-mode:")]
             gap = gaps.get(path.name, {"mcp_tools": [], "skills": []})
             self.assertEqual({tool.split("__")[1] for tool in gap["mcp_tools"]}, expected_servers, path.name)
             self.assertEqual(gap["skills"], expected_skills, path.name)
-        self.assertEqual(sorted(gaps), ["evidence-reviewer.md", "isolated-builder.md", "security-reviewer.md",
-                                        "semantic-evidence-reviewer.md", "stack-researcher.md", "stack-verifier.md"])
-        self.assertEqual(plan["skills"], frozenset({"tdd", "diagnosing-bugs", "codebase-design", "domain-modeling",
-                                                    "writing-for-agents", "setup-matt-pocock-skills"}))
+        # The owner-selected token stack supplies every server and skill the project agents name; jCodeMunch is registered
+        # at user scope (the user's directive of 2026-10-04, docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md).
+        self.assertEqual(gaps, {})
+        # The skills rows run install_skills.py over adoption/skills/manifest.json (wave-2 skills ruling, change 7): the
+        # selected rows, without the retired, pruned and held ones.
+        selected = {skill["name"] for skill in json.loads((ROOT / cfg.SKILLS_MANIFEST_REL).read_text())["skills"]
+                    if skill.get("status") not in ("pruned", "held")}
+        self.assertEqual(plan["skills"], frozenset(selected))
+        self.assertEqual(len(plan["skills"]), 24)
+        self.assertTrue({"tdd", "diagnosing-bugs", "codebase-design", "writing-for-agents", "skill-creator"} <= plan["skills"])
+        self.assertEqual({"grill-me", "improve-codebase-architecture", "semgrep", "agent-browser", "domain-modeling",
+                          "setup-matt-pocock-skills"} & plan["skills"], set())
         self.assertTrue(any("MCP_AUTO_OPEN_ENABLED" in w and "mcp-inspector" in w for w in warnings), warnings)
 
     def test_a_server_that_becomes_wired_leaves_the_gap(self):
@@ -419,11 +518,16 @@ class AgentGapTests(unittest.TestCase):
                 row = next(r for r in data["slots"] if r["slot_id"] == "code-search" and r["catalog"] == "foundation")
                 row.update(installs_nothing_extra=False, state="definitive", default="SocratiCode")
                 row["resolution"] = {"outcome": "final"}
+                row.pop("interim", None)       # a decided default replaces the interim install
+            # Keep the absent-server control now that the committed interim installs SocratiCode too.
+            edit_json(root / cfg.MANIFEST_REL, lambda data: next(
+                r for r in data["slots"] if r["slot_id"] == "code-search" and r["catalog"] == "foundation")[
+                    "interim"].update(default="semble 0.6.1"))
             before = cfg.agent_gaps(root, *[cfg.analyse(root)[i] for i in (0, 2)])
             edit_json(root / cfg.MANIFEST_REL, install)
             after = cfg.agent_gaps(root, *[cfg.analyse(root)[i] for i in (0, 2)])
         self.assertIn("socraticode", json.dumps(before["evidence-reviewer.md"]))
-        self.assertNotIn("socraticode", json.dumps(after["evidence-reviewer.md"]))
+        self.assertNotIn("evidence-reviewer.md", after)    # jCodeMunch is wired too, so no gap remains
 
 
 class ManifestRuleTests(unittest.TestCase):
@@ -435,7 +539,8 @@ class ManifestRuleTests(unittest.TestCase):
         planned = {slot for slot, row in plan.items() if row["installed"]}
         self.assertEqual(installing - planned, {"mcp-inspector", "base-distribution"})
         self.assertEqual(planned - installing, set())
-        self.assertEqual(len(planned), 36)
+        # The 44 previously installed rows plus wave 3's ten new rows, ccusage and session-analytics.
+        self.assertEqual(len(planned), 56)
 
     def test_a_split_slot_that_is_changed_to_installing_wires_its_piece_and_back(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -453,10 +558,11 @@ class ManifestRuleTests(unittest.TestCase):
                 files = cfg.render(root, plan[0], plan[2], cfg.host_values(EXAMPLE_HOST, plan[2], None, []))
                 return json.loads(files["mcp-servers.json"])["mcpServers"], files["codex.config.toml"]
 
+            # Wave 3's split-slot interim installs both semble and SocratiCode.
             before = wired()
-            self.assertEqual([before[k] for k in keys], [False, False])
-            self.assertNotIn("socraticode", servers()[0])
-            self.assertNotIn("socraticode", servers()[1])
+            self.assertEqual([before[k] for k in keys], [True, True])
+            self.assertIn("socraticode", servers()[0])
+            self.assertIn("socraticode", servers()[1])
             manifest = root / cfg.MANIFEST_REL
             original = manifest.read_text()
 
@@ -464,6 +570,7 @@ class ManifestRuleTests(unittest.TestCase):
                 row = next(r for r in data["slots"] if r["slot_id"] == "code-search" and r["catalog"] == "foundation")
                 row.update(installs_nothing_extra=False, state="definitive", default=default)
                 row["resolution"] = {"outcome": "final"}
+                row.pop("interim", None)       # a decided default replaces the interim install
             edit_json(manifest, install)
             after = wired()
             self.assertEqual([after[k] for k in keys], [True, True])
@@ -471,8 +578,8 @@ class ManifestRuleTests(unittest.TestCase):
             self.assertIn("[mcp_servers.socraticode]", servers()[1])
             manifest.write_text(original, encoding="utf-8")
             restored = wired()
-            self.assertEqual([restored[k] for k in keys], [False, False])
-            self.assertNotIn("socraticode", servers()[0])
+            self.assertEqual([restored[k] for k in keys], [True, True])
+            self.assertIn("socraticode", servers()[0])
             # The slot installs a different owner: the piece for SocratiCode stays out, and the check says so.
             edit_json(manifest, lambda data: install(data, default="semble"))
             other = wired()
@@ -496,10 +603,14 @@ class ManifestRuleTests(unittest.TestCase):
         slots = {e["wiring"][5:] for e in entries if e["wiring"].startswith("slot:")}
         self.assertTrue(slots <= set(rows), slots - set(rows))
         not_installing = {s for s in slots if not cfg.installs(rows[s])}
-        self.assertEqual(not_installing, {"context-supply", "memory-owner", "code-search"})
+        self.assertEqual(not_installing, set())
+        # Wave 3 gives context-supply its owner default and adds five slots with client configuration pieces.
         self.assertEqual({s for s in slots if cfg.installs(rows[s])},
                          {"serena", "tobi-qmd", "otel-collector-contrib", "gpt-gateway", "claude-code", "mise",
-                          "mcp-inspector"})
+                          "mcp-inspector", "context-supply", "memory-owner", "code-search", "statusline",
+                          "container-engine", "command-output", "output-compression", "code-index", "code-graph",
+                          "api-docs"})
+        self.assertEqual({s for s in slots if rows[s].get("interim")}, {"memory-owner", "code-search"})
 
 
 class RenderTests(unittest.TestCase):
@@ -542,34 +653,101 @@ class RenderTests(unittest.TestCase):
 
     def test_settings_keep_the_practice_pieces_and_drop_the_old_profile_pieces(self):
         settings = json.loads(self.files["settings.json"])
-        self.assertEqual(settings["model"], "opus[1m]")
+        # The user's choice of 2026-10-04, Opus 5.5, pinned by its full model name (the map's model entry overrides the
+        # shared template's opus[1m], which other hosts keep); the advisor is Opus 5.5 too, by the map's override, the user's
+        # decision of 2026-10-04 and the value NativeStack carries.
+        self.assertEqual(settings["model"], "claude-opus-5-5")
+        self.assertEqual(settings["advisorModel"], "opus")
+        self.assertEqual(json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text())["model"],
+                         "opus[1m]")
         self.assertEqual(settings["effortLevel"], "xhigh")
         self.assertNotIn("defaultMode", settings["permissions"])        # an authorization setting: not by default
+        self.assertNotIn("allow", settings["permissions"])              # an allow rule is one too
         self.assertNotIn("skipDangerousModePermissionPrompt", settings)
-        for gone in ("statusLine", "enabledPlugins", "extraKnownMarketplaces"):
-            self.assertNotIn(gone, settings)
+        # The wave-2 rows: context-mode's plugin (an interim install) and claude-hud 0.10.0 (the statusline row), whose
+        # status line is the command its setup.mjs writes; the codex plugin for Claude Code stays out.
+        self.assertEqual(settings["enabledPlugins"], {"context-mode@context-mode": True, "claude-hud@claude-hud": True,
+                                                      "cc-plugin-you-should-know@builtin": True})
+        self.assertEqual(sorted(settings["extraKnownMarketplaces"]), ["claude-hud", "context-mode"])
+        self.assertEqual(settings["extraKnownMarketplaces"]["claude-hud"]["source"]["ref"], "v0.10.0")
+        self.assertEqual(settings["statusLine"], {
+            "type": "command", "refreshInterval": 5,
+            "command": "'/home/example/.local/share/mise/installs/node/24.21.0/bin/node' "
+                       "'/home/example/.claude/plugins/claude-hud/statusline.mjs'"})
         events = {event: [h["command"] for g in groups for h in g["hooks"]] for event, groups in settings["hooks"].items()}
-        self.assertEqual(sorted(events), ["PreToolUse", "SessionEnd", "SessionStart"])
-        self.assertEqual(sum(len(v) for v in events.values()), 3)
-        self.assertTrue(all(".claude/hooks/" in command for v in events.values() for command in v))
-        self.assertFalse([e for e in settings["permissions"]["deny"] if e.startswith(("Bash(rtk", "Agent(codex"))])
+        commands = [command for v in events.values() for command in v]
+        # Each hook runs a file the repository copies, ai-memory (an interim install) at the link the plan's
+        # memory-owner row makes, rtk (the owner's directive of 2026-10-04), or the logging-only ConfigChange audit command
+        # that NativeStack runs; context-mode writes its own cache-heal hook.
+        ai_memory = "/home/example/.local/bin/ai-memory "
+        audit = "jq -c '{timestamp: now | todate, source: .source, file: .file_path}' >> ~/claude-config-audit.log || true"
+        self.assertEqual(events["ConfigChange"], [audit])
+        self.assertEqual(sum(".claude/hooks/" in command for command in commands), 4)
+        self.assertTrue(all(".claude/hooks/" in command or command.startswith(ai_memory) or command in ("rtk hook claude", audit)
+                            for command in commands), commands)
+        self.assertTrue(any(command.startswith(ai_memory) for command in events["SessionStart"]), events)
+        self.assertEqual([command for command in commands if "cache-heal" in command], [])
+        self.assertFalse([e for e in settings["permissions"]["deny"] if e.startswith("Agent(codex")])
+        self.assertEqual(len([e for e in settings["permissions"]["deny"] if e.startswith("Bash(rtk git push")]), 6)
         self.assertIn("Bash(git push --force *)", settings["permissions"]["deny"])
         self.assertEqual(settings["env"]["MCP_AUTO_OPEN_ENABLED"], "false")
-        self.assertNotIn("RTK_TELEMETRY_DISABLED", settings["env"])
+        # rtk and agent teams: the owner's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-token-layer-default.md).
+        self.assertEqual(settings["env"]["RTK_TELEMETRY_DISABLED"], "1")
+        self.assertEqual(settings["env"]["CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"], "1")
+        self.assertEqual(events["PreToolUse"][0], "rtk hook claude")
+        # The token-lane carriers are this repository's own adaptation, so the clean default holds them out (the owner's
+        # directive of 2026-10-04): neither the SubagentStart nor the SessionStart hook runs a carrier file.
+        self.assertEqual([c for c in commands if "token-lanes" in c], [])
+        self.assertTrue([c for c in events["SessionStart"] if "currency-due-notice.py" in c], events)
 
     def test_the_overlay_keeps_its_bell_and_the_notification_channel(self):
         overlay = json.loads(self.files["settings.linux-wsl2.overlay.json"])
         self.assertEqual(overlay, json.loads((ROOT / cfg.TEMPLATES["claude/overlay"]).read_text()))
 
-    def test_only_serena_and_qmd_are_registered_and_by_the_command_their_readmes_give(self):
+    def test_the_wired_servers_are_registered_and_serena_and_qmd_by_the_command_their_readmes_give(self):
         servers = json.loads(self.files["mcp-servers.json"])["mcpServers"]
-        self.assertEqual(list(servers), ["serena", "qmd"])
+        # The owner-selected token stack joins Serena, QMD and the interim memory/search installs.
+        self.assertEqual(list(servers), ["ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd",
+                                         "jcodemunch", "semble"])
         self.assertEqual(servers["serena"]["command"], "serena")
         self.assertEqual(servers["serena"]["args"][:1] + servers["serena"]["args"][3:6],
                          ["start-mcp-server", "--project-from-cwd", "--context", "claude-code"])
         self.assertEqual((servers["qmd"]["command"], servers["qmd"]["args"][-1]), ("qmd", "mcp"))
+        host = json.loads((ROOT / "adoption/hosts/example.json").read_text())
+        self.assertEqual(servers["ai-memory"], {"type": "http", "url": f"http://{host['AI_MEMORY_URL']}/mcp"})
+        # semble: the pinned model's local snapshot and Claude Code's own cache (wave-2 code-search ruling, changes 4, 5);
+        # ${HOME} is filled when install_claude_profile.py registers the file.
+        self.assertEqual((servers["semble"]["command"], servers["semble"]["args"]), ("semble", []))
+        self.assertEqual(servers["semble"]["env"], {
+            "SEMBLE_MODEL_NAME": "${HOME}/.local/share/semble/potion-code-16M-v2-e9d2a44c",
+            "SEMBLE_CACHE_LOCATION": "${HOME}/.cache/semble-claude"})
         config = tomllib.loads(self.files["codex.config.toml"])
-        self.assertEqual(list(config["mcp_servers"]), ["serena", "qmd"])
+        # semble comes from the new distribution's additions, merged after the shared template's servers.
+        self.assertEqual(list(config["mcp_servers"]), ["serena", "ai-memory", "socraticode", "headroom", "codebase-memory",
+                                                      "qmd", "context-mode", "jcodemunch", "semble"])
+        pinned_search = host["ECO_ROOT"] + "/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
+        self.assertEqual(servers["socraticode"]["args"], [pinned_search.replace(host["ECO_ROOT"], "${ECO_ROOT}")])
+        self.assertEqual(config["mcp_servers"]["socraticode"]["args"], [pinned_search])
+        # jCodeMunch at user scope, with the documented opt-out of its anonymous savings counter in the server's env block
+        # (the user's directive of 2026-10-04; JCODEMUNCH_SHARE_SAVINGS=0, CONFIGURATION.md at the pinned revision).
+        self.assertEqual(servers["jcodemunch"], {"type": "stdio", "command": "${ECO_ROOT}/bin/jcodemunch-mcp", "args": [],
+                                                 "env": {"JCODEMUNCH_SHARE_SAVINGS": "0"}})
+        # The Codex entry is the one the project template registers per project (startup allowance, the three verbs of the
+        # front door, the savings opt-out); its approval mode is an authorization piece, written only with the option.
+        self.assertEqual(config["mcp_servers"]["jcodemunch"], {
+            "command": host["ECO_ROOT"] + "/bin/jcodemunch-mcp", "startup_timeout_sec": 60,
+            "enabled_tools": ["route", "menu", "order"],
+            "env": {"RTK_TELEMETRY_DISABLED": "1", "PATH": config["mcp_servers"]["context-mode"]["env"]["PATH"],
+                    "JCODEMUNCH_SHARE_SAVINGS": "0"}})
+        self.assertTrue(config["mcp_servers"]["jcodemunch"]["env"]["PATH"].startswith(host["ECO_ROOT"] + "/bin:"))
+        self.assertEqual(config["mcp_servers"]["ai-memory"], {"url": f"http://{host['AI_MEMORY_URL']}/mcp"})
+        semble = config["mcp_servers"]["semble"]
+        self.assertEqual((semble["command"], semble["enabled_tools"]), ("semble", ["search", "find_related"]))
+        self.assertEqual(semble["env"]["SEMBLE_CACHE_LOCATION"], "/home/example/.cache/semble-codex")
+        self.assertEqual(semble["env"]["SEMBLE_MODEL_NAME"], servers["semble"]["env"]["SEMBLE_MODEL_NAME"].replace(
+            "${HOME}", "/home/example"))
+        for server in config["mcp_servers"].values():      # an approval mode is an authorization setting
+            self.assertNotIn("default_tools_approval_mode", server)
         self.assertEqual(config["mcp_servers"]["serena"]["command"], "serena")
         self.assertIn("--context", config["mcp_servers"]["serena"]["args"])
         self.assertEqual(config["mcp_servers"]["serena"]["args"][config["mcp_servers"]["serena"]["args"].index(
@@ -578,10 +756,36 @@ class RenderTests(unittest.TestCase):
     def test_the_codex_config_meets_what_the_codex_home_tool_requires(self):
         config = tomllib.loads(self.files["codex.config.toml"])
         self.assertIs(config["features"]["daemon_auto_start"], False)
+        # The changelog parity of 2026-10-04: the experimental allowance-history feature (the shared template's, on both hosts)
+        # and the fast service tier (this distribution's additions; NativeStack runs both).
+        self.assertIs(config["features"]["analytics_plan_history"], True)
+        self.assertEqual(config["service_tier"], "fast")
         eco = json.loads((ROOT / "adoption/hosts/example.json").read_text())["ECO_ROOT"]
         self.assertEqual(config["shell_environment_policy"]["set"]["PATH"].split(":")[0], eco + "/bin")
-        for absent in ("projects", "hooks", "plugins", "marketplaces"):
-            self.assertNotIn(absent, config)
+        self.assertNotIn("projects", config)
+        # context-mode (an interim install): its marketplace, its plugin with the plugin's own server off (the user-scope
+        # entry serves it), and the trust of its six hooks, the only [hooks.state] entries rendered (wave-2 context ruling,
+        # change 9; codex_home.py leaves them out of a file it creates, and the merge adds them).
+        self.assertEqual(list(config["marketplaces"]), ["context-mode"])
+        self.assertEqual(config["plugins"], {"context-mode@context-mode": {
+            "enabled": True, "mcp_servers": {"context-mode": {"enabled": False}}}})
+        self.assertEqual(list(config["hooks"]), ["state"])
+        self.assertEqual(sorted(key.rsplit(":", 3)[1] for key in config["hooks"]["state"]),
+                         ["post_tool_use", "pre_compact", "pre_tool_use", "session_start", "stop", "user_prompt_submit"])
+        self.assertTrue(all(key.startswith("context-mode@context-mode:") for key in config["hooks"]["state"]))
+        # The footer (the statusline row) and the shell environment policy (wave-2 custody ruling, change 7).
+        self.assertEqual(config["tui"]["status_line"], ["model-with-reasoning", "project-name", "git-branch",
+                                                        "context-used", "five-hour-limit", "weekly-limit"])
+        policy = config["shell_environment_policy"]
+        self.assertEqual(policy["inherit"], "none")
+        self.assertEqual(sorted(policy["set"]), ["DOCKER_HOST", "HOME", "LANG", "MCP_AUTO_OPEN_ENABLED", "PATH",
+                                                 "RTK_TELEMETRY_DISABLED", "TERM", "TMPDIR", "XDG_RUNTIME_DIR"])
+        self.assertEqual(policy["set"]["HOME"], "/home/example")
+        # The user's systemd runtime directory, for systemctl --user and the messaging courier, and the rootless Docker
+        # socket in it (wave-2 custody ruling, change 7; synthesis X12): the id of the user the tool runs as.
+        self.assertEqual(policy["set"]["XDG_RUNTIME_DIR"], f"/run/user/{os.getuid()}")
+        self.assertRegex(policy["set"]["XDG_RUNTIME_DIR"], r"\A/run/user/[0-9]+\Z")
+        self.assertEqual(policy["set"]["DOCKER_HOST"], f"unix://{policy['set']['XDG_RUNTIME_DIR']}/docker.sock")
         self.assertEqual(config["model"], "gpt-6.1-sol")
         self.assertNotIn("check_for_update_on_startup", config)
         self.assertEqual(self.files["codex.hooks.json"].strip().replace(" ", "").replace("\n", ""), '{"hooks":{}}')
@@ -593,15 +797,29 @@ class RenderTests(unittest.TestCase):
         with self.assertRaises(cfg.ConfigError):
             cfg.emit_toml({"bad": object()}, "")
 
-    def test_the_stack_worker_profile_keeps_only_serena_and_the_settings_that_need_no_tool(self):
+    def test_the_stack_worker_profile_keeps_the_wired_servers_and_the_settings_that_need_no_tool(self):
         profile = tomllib.loads(self.files["codex.stack-worker.config.toml"])
-        self.assertEqual(set(profile), {"model", "model_reasoning_effort", "web_search", "mcp_servers"})
-        self.assertEqual(profile["mcp_servers"], {"serena": {"startup_timeout_sec": 60}})
+        self.assertEqual(set(profile), {"model", "model_reasoning_effort", "web_search", "mcp_servers",
+                                        "shell_environment_policy"})
+        self.assertEqual(profile["shell_environment_policy"], {"set": {"CHUB_TELEMETRY": "0", "CHUB_FEEDBACK": "0"}})
+        # All installed servers' worker policies remain; without the option no approval mode.
+        self.assertEqual(profile["mcp_servers"], {
+            "serena": {"startup_timeout_sec": 60, "required": True},
+            "codebase-memory": {"startup_timeout_sec": 60},
+            "ai-memory": {"enabled_tools": ["memory_query", "memory_read_page", "memory_recent", "memory_status",
+                                            "memory_briefing"]},
+            "socraticode": {"enabled_tools": ["codebase_search", "codebase_status", "codebase_list_projects", "codebase_health"],
+                             "env": {"SOCRATICODE_WATCHER": "manual"}},
+            "headroom": {"enabled_tools": ["headroom_compress", "headroom_retrieve", "headroom_stats"]},
+            "context-mode": {"disabled_tools": ["ctx_upgrade", "ctx_purge"]}})
 
     def test_no_text_names_a_tool_that_the_manifest_does_not_install(self):
         names = unwired_names_independently()
-        self.assertTrue({"rtk", "ai-memory", "socraticode", "headroom", "codebase-memory", "context-mode",
-                         "claude-hud", "openai-codex"} <= {n.lower() for n in names}, names)
+        self.assertTrue({"codex-plugin-cc", "codex-rescue", "context-mode-cache-heal", "hcom", "openai-codex"} <= {
+            n.lower() for n in names}, names)
+        # The owner defaults and interim installs are wired, so their names are no longer scanned for.
+        self.assertEqual({"ai-memory", "context-mode", "claude-hud", "semble", "rtk", "socraticode", "headroom",
+                          "codebase-memory", "jcodemunch", "chub"} & {n.lower() for n in names}, set())
         with tempfile.TemporaryDirectory() as tmp:    # the render with the authorization settings is scanned too
             self.assertEqual(run_main("--render", "--host", EXAMPLE_HOST, "--out", tmp, "--with-authorization-settings")[0], 0)
             with_option = {path.name: path.read_text(encoding="utf-8") for path in Path(tmp).iterdir()}
@@ -619,7 +837,7 @@ class RenderTests(unittest.TestCase):
         old = render_config.render_all(values)
         names = unwired_names_independently()
         found = {n for text in old.values() for n in names if name_hits(text, [n])}
-        self.assertTrue({"rtk", "ai-memory", "socraticode", "headroom", "codebase-memory", "context-mode"} <= {
+        self.assertTrue({"codex-plugin-cc", "codex-rescue", "context-mode-cache-heal", "openai-codex"} <= {
             n.lower() for n in found}, found)
 
     def test_the_ports_are_the_install_plans(self):
@@ -633,7 +851,7 @@ class RenderTests(unittest.TestCase):
                          f"http://127.0.0.1:{ports['http']}/v1/metrics")
         omniroute = tomllib.loads(self.files["codex.omniroute.config.toml"])
         self.assertEqual(omniroute["model_providers"]["omniroute"]["base_url"], f"http://127.0.0.1:{ports['gateway']}/v1")
-        for workstation in ("14318", "24318", "20128", "20129", "49374"):
+        for workstation in ("14318", "24318", "20128", "20129"):
             for name, text in self.files.items():
                 if name != "wiring.json":
                     self.assertNotIn(workstation, text, name)
@@ -641,6 +859,17 @@ class RenderTests(unittest.TestCase):
         host = json.loads(string.Template((ROOT / cfg.HOST_TEMPLATE_REL).read_text()).substitute(WSL_USER="example"))
         self.assertEqual(f"http://{host['OTEL_ENDPOINT']}", settings["env"]["OTEL_EXPORTER_OTLP_ENDPOINT"])
         self.assertEqual(host["OTEL_ENDPOINT"], f"127.0.0.1:{ports['http']}")
+        # ai-memory's port is the host file's AI_MEMORY_URL in both clients (the example host names the repository
+        # default); the new distribution's host template names 29374, the bind of the plan's memory-owner row (X5).
+        example = json.loads((ROOT / "adoption/hosts/example.json").read_text())["AI_MEMORY_URL"]
+        self.assertEqual(json.loads(self.files["mcp-servers.json"])["mcpServers"]["ai-memory"]["url"],
+                         f"http://{example}/mcp")
+        self.assertEqual(config["mcp_servers"]["ai-memory"]["url"], f"http://{example}/mcp")
+        self.assertEqual(host["AI_MEMORY_URL"], "127.0.0.1:29374")
+        memory = next(row for row in json.loads((ROOT / cfg.PLAN_REL / "install-plan.json").read_text())["owners"]
+                      if row["slot"] == "memory-owner")
+        self.assertTrue(any(f'bind = "{host["AI_MEMORY_URL"]}"' in command for command in memory["commands"]),
+                        memory["commands"])
 
     def test_the_render_follows_the_plan_and_refuses_a_plan_that_states_a_port_twice(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -686,11 +915,25 @@ class RenderTests(unittest.TestCase):
                 for group in groups:
                     for hook in group["hooks"]:
                         referenced.update(re.findall(r"\.claude/hooks/([A-Za-z0-9_.-]+)", hook["command"]))
-        self.assertEqual(referenced, {"secret_path_guard.py", "effort-default-guard.py"})
+        self.assertEqual(referenced, {"secret_path_guard.py", "effort-default-guard.py", "currency-due-notice.py"})
         for name in referenced:
             source = icp.HOOKS[name]
             self.assertTrue(source.is_file(), name)
             self.assertEqual(hashlib.sha256(source.read_bytes()).hexdigest(), icp.expected_sha256(source), name)
+
+    def test_the_token_lane_carriers_are_held_out_of_the_clean_default(self):
+        # The carriers are this repository's own adaptation, not a feature of an upstream tool, so the owner's directive of
+        # 2026-10-04 (a clean install: upstream installers with upstream defaults) holds them out of the new distribution:
+        # the two hook entries and the nine files install_claude_profile.py copies are unwired, and no rendered file other
+        # than the wiring record runs or names one.
+        carriers = [v for v in cfg.analyse(ROOT)[0] if "token-lanes" in v.piece.key]
+        self.assertEqual(len(carriers), 11, [v.piece.key for v in carriers])
+        for v in carriers:
+            self.assertFalse(v.wired, v.piece.key)
+            self.assertIn("own adaptation", v.reason)
+        for name, text in self.files.items():
+            if name != "wiring.json":
+                self.assertNotIn("token-lanes", text, name)
 
     def test_a_checksum_that_does_not_match_fails_the_check_and_the_install(self):
         def wrong_for_the_guard(source):
@@ -747,6 +990,54 @@ def line_is_verbatim(line: str, sources: list) -> bool:
         else:
             return True
     return False
+
+
+class TemplateAdditionsTests(unittest.TestCase):
+    """The new distribution's additions (adoption/new-wsl/templates/): keys only this tool renders, so the shared templates
+    stay what render_config.py, install_claude_profile.py and the bootstrap render on every other host."""
+
+    def test_the_shared_templates_carry_none_of_the_additions(self):
+        codex = tomllib.loads((ROOT / cfg.TEMPLATES["codex/config"]).read_text(encoding="utf-8"))
+        self.assertNotIn("inherit", codex["shell_environment_policy"])
+        self.assertEqual(sorted(codex["shell_environment_policy"]["set"]),
+                         ["MCP_AUTO_OPEN_ENABLED", "PATH", "RTK_TELEMETRY_DISABLED"])
+        self.assertNotIn("semble", codex["mcp_servers"])
+        self.assertEqual(codex["mcp_servers"]["ai-memory"], {"url": "http://${AI_MEMORY_URL}/mcp"})
+        self.assertNotIn("semble", json.loads((ROOT / cfg.TEMPLATES["claude/mcp"]).read_text())["mcpServers"])
+        self.assertNotIn("allow", json.loads((ROOT / cfg.TEMPLATES["claude/settings"]).read_text())["permissions"])
+        for group, rel in cfg.TEMPLATE_ADDITIONS.items():     # each addition adds a key its template lacks
+            base = leaves(cfg.read_template(ROOT / cfg.TEMPLATES[group]))
+            extra = leaves({k: v for k, v in cfg.read_template(ROOT / rel).items() if k != "_comment"})
+            self.assertTrue(extra, rel)
+            self.assertEqual(set(base) & set(extra), set(), rel)
+        # The render of the shared Codex template that every other host takes has no policy of the new distribution.
+        shared = tomllib.loads(render_config.render_one(ROOT / cfg.TEMPLATES["codex/config"],
+                                                        render_config.load_host_values(EXAMPLE_HOST)))
+        self.assertNotIn("inherit", shared["shell_environment_policy"])
+        self.assertNotIn("semble", shared["mcp_servers"])
+
+    def test_the_render_merges_the_additions_into_their_templates(self):
+        results, *_ = cfg.analyse(ROOT)
+        keys = {v.piece.key for v in results}
+        for key in ("codex/config/shell_environment_policy.inherit", "codex/config/shell_environment_policy.set.XDG_RUNTIME_DIR",
+                    "codex/config/shell_environment_policy.set.DOCKER_HOST", "codex/config/mcp_servers.semble.command",
+                    "codex/config/mcp_servers.ai-memory.default_tools_approval_mode", "claude/mcp/server/semble",
+                    "claude/settings/permission/allow/mcp__semble__search"):
+            self.assertIn(key, keys)
+        self.assertFalse([key for key in keys if "_comment" in key])    # a file's note is not a piece
+
+    def test_an_addition_that_names_a_key_of_its_template_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+            path = root / cfg.TEMPLATE_ADDITIONS["codex/config"]
+            path.write_text(path.read_text(encoding="utf-8") + '\n[mcp_servers.serena]\ncommand = "other"\n',
+                            encoding="utf-8")
+            with self.assertRaises(cfg.ConfigError) as caught:
+                cfg.analyse(root)
+            self.assertIn("mcp_servers.serena.command", str(caught.exception))
+            code, _, err = run_main("--check", "--root", str(root))
+        self.assertEqual(code, 1)
+        self.assertIn("which its shared template defines too", err)
 
 
 class InstructionBlockTests(unittest.TestCase):
@@ -819,14 +1110,14 @@ class InstructionBlockTests(unittest.TestCase):
 
     def test_no_tool_that_is_not_wired_is_named_in_either_block(self):
         names = unwired_names_independently()
-        self.assertTrue({"rtk", "ai-memory", "socraticode", "headroom", "codebase-memory", "context-mode",
-                         "promptfoo"} <= {n.lower() for n in names}, names)
+        self.assertTrue({"codex-plugin-cc", "codex-rescue", "context-mode-cache-heal", "openai-codex", "promptfoo"} <= {
+            n.lower() for n in names}, names)
         for piece in self.PIECES:
             self.assertTrue(name_hits("\n".join(source_lines(piece)), names), f"the sources name some: {piece}")
             self.assertEqual(name_hits(generated_text(piece), names), [], piece)
         # Control: the same scan finds a name that is added back, whole or in a different case.
-        self.assertIn("rtk", name_hits(generated_text(cfg.CODEX_MD_PIECE) + "Use rtk.\n", names))
-        self.assertIn("ai-memory", name_hits(generated_text(cfg.CLAUDE_MD_PIECE) + "Ask AI-Memory.\n", names))
+        self.assertIn("Promptfoo", name_hits(generated_text(cfg.CODEX_MD_PIECE) + "Use promptfoo.\n", names))
+        self.assertIn("Promptfoo", name_hits(generated_text(cfg.CLAUDE_MD_PIECE) + "Ask PROMPTFOO.\n", names))
 
     def test_the_kept_and_the_dropped_text_together_are_the_whole_source(self):
         results, manifest, *_ = cfg.analyse(ROOT)
@@ -853,9 +1144,10 @@ class InstructionBlockTests(unittest.TestCase):
                     dependents.append(unit.text)
                     continue
                 self.assertTrue(name_hits(unit.text, names), (piece, unit.line, unit.text))
-        self.assertGreaterEqual(total, 20)
-        self.assertEqual(len(dependents), 2)   # one in each block
-        self.assertTrue(all(text.startswith("Check relevance; retry without pin priority") for text in dependents))
+        self.assertEqual(total, 2)           # the installed token lanes now stay; only the two Promptfoo units go
+        # ai-memory is wired (the memory-owner row's interim install), so the sentence that depends on its sentence stays;
+        # test_the_two_blocks_lose_the_sentence_that_only_made_sense_with_the_ai_memory_one_and_list_it runs that case.
+        self.assertEqual(dependents, [])
 
     def test_the_dropped_list_is_printed_in_full_by_the_check_and_by_write_blocks(self):
         results, manifest, *_ = cfg.analyse(ROOT)
@@ -939,8 +1231,14 @@ class InstructionBlockTests(unittest.TestCase):
         self.assertEqual(cfg.filter_block("- Keep. Drop alpha-tool. Follows it.\n", names, dependents)[0], "- Keep.\n")
 
     def test_the_two_blocks_lose_the_sentence_that_only_made_sense_with_the_ai_memory_one_and_list_it(self):
-        results, manifest, *_ = cfg.analyse(ROOT)
-        for piece, (_, text, dropped) in cfg.generate_blocks(ROOT, cfg.unwired_names(results, manifest)).items():
+        # ai-memory is wired while the memory-owner row carries its interim install; without it, as before wave 2, the
+        # sentence that names ai-memory goes and takes the declared dependent with it.
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+            edit_json(root / cfg.MANIFEST_REL, without_interim("memory-owner"))
+            results, manifest, *_ = cfg.analyse(root, check_blocks=False)
+            generated = cfg.generate_blocks(root, cfg.unwired_names(results, manifest))
+        for piece, (_, text, dropped) in generated.items():
             self.assertNotIn("Check relevance; retry without pin priority", text, piece)
             sources = source_lines(piece)
             unit = next(u for u in dropped if cfg.DEPENDS_NOTE in u.note)
@@ -977,6 +1275,11 @@ class InstructionBlockTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
             blocks = {piece: root / cfg.GENERATED_BLOCKS[piece] for piece in self.PIECES}
+            for path in blocks.values():         # the committed blocks: ai-memory is an interim install
+                self.assertEqual(path.read_text().count("query scoped ai-memory"), 1)
+            # Without the interim, as before wave 2, the memory-owner row installs nothing and the sentence goes.
+            edit_json(root / cfg.MANIFEST_REL, without_interim("memory-owner"))
+            write_blocks(root)
             for path in blocks.values():
                 self.assertNotIn("query scoped ai-memory", path.read_text())
                 self.assertNotIn("Check relevance; retry without pin priority", path.read_text())
@@ -1036,10 +1339,11 @@ class BlocksSentenceTests(unittest.TestCase):
 
 
 class CarrierTests(unittest.TestCase):
-    """The two Codex role carriers name context-mode, ai-memory and qmd tools, and rtk. A filtered copy would break the
-    repository's own rules for them, so the map leaves them out."""
+    """The two Codex role carriers name context-mode, ai-memory and qmd tools, and rtk (stack-researcher jcodemunch too).
+    A filtered copy would break the repository's own rules for them, so the map leaves them out: they require the RTK
+    block (wave-2 context ruling, change 14)."""
 
-    def test_the_carriers_are_not_wired_and_a_filtered_copy_fails_the_three_rules_that_pin_them(self):
+    def test_the_carriers_are_not_wired_and_only_the_researcher_names_a_tool_that_is_not_wired(self):
         results, manifest, *_ = cfg.analyse(ROOT)
         verdicts = {v.piece.key: v for v in results}
         names = cfg.unwired_names(results, manifest)
@@ -1055,30 +1359,46 @@ class CarrierTests(unittest.TestCase):
             self.assertEqual(codex_roles.structural_problems(role, role, data), [])
             self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), sums[role_file])
             hits = {n.lower() for n in name_hits(data["developer_instructions"], names)}
-            self.assertTrue({"context-mode", "rtk"} <= hits, hits)
-            # Filtered the way the two blocks are, it loses the working-directory bullet, the exact-command-shapes
-            # bullet and the RTK block that the rules require.
+            # The owner defaults now include jCodeMunch; both carriers name only wired tools.
+            self.assertEqual(hits, set(), role_file)
+            # Filtered the way the two blocks are, a carrier keeps the three rules; a dropped sentence changes the bytes
+            # its pinned hash covers.
             text, dropped = cfg.filter_block(data["developer_instructions"], names)
-            self.assertGreaterEqual(len(dropped), 20, role_file)
+            self.assertEqual(bool(dropped), bool(hits), role_file)
             self.assertEqual(name_hits(text, names), [], role_file)
+            self.assertEqual(text != data["developer_instructions"], bool(dropped), role_file)
             problems = codex_roles.structural_problems(role, role, dict(data, developer_instructions=text))
-            self.assertEqual(sorted(problems), ["cwd_rule", "exact_shapes", "f4_block"], role_file)
+            self.assertEqual(problems, [], role_file)
 
 
 def installing_independently(row: dict) -> bool:
-    """The install plan's rule, written out again here instead of called."""
+    """The install plan's rule, written out again here instead of called: a row that carries an interim install
+    (amendment 3 of the manifest's decision rule) installs it; any other row installs its default when it names one,
+    installs something extra, is not resolved as not installed and is not split."""
+    if row.get("interim"):
+        return True
     return (bool(row["default"]) and not row["installs_nothing_extra"]
             and (row.get("resolution") or {}).get("outcome") != "not_installed" and (row.get("state") or "") != "split")
 
 
+def slot_wires_independently(entry: dict, row: dict) -> bool:
+    """Whether a slot entry is wired, written out again: its slot installs, and what it installs (the interim's default
+    while the row carries one, otherwise the decided default) names the entry's owner."""
+    installed = str((row.get("interim") or {}).get("default") or row["default"])
+    return installing_independently(row) and entry["owner"].casefold() in installed.casefold()
+
+
 def map_unwired_names_independently() -> set:
-    """The names the map lists for its unwired entries (not_wired, or a slot that does not install), read from the map
-    file. An authorization entry carries none: its tool's other pieces do."""
+    """The names the map lists for its unwired entries (not_wired, or a slot that does not install the owner the entry
+    names), read from the map file. An authorization entry carries none: its tool's other pieces do."""
     rows = foundation_rows()
     names = set()
     for entry in json.loads(MAP.read_text())["entries"]:
         wiring = entry["wiring"]
-        if wiring.startswith("not_wired") or (wiring.startswith("slot:") and not installing_independently(rows[wiring[5:]])):
+        if wiring.startswith("not_wired") or (wiring.startswith("slot:")
+                                              and not slot_wires_independently(entry, rows[wiring[5:]])
+                                              and not (entry.get("directive")
+                                                       and installing_independently(rows[wiring[5:]]))):
             names.update(entry.get("names", []))
     return names
 
@@ -1179,14 +1499,18 @@ class ApplyTests(ApplyCase):
         code, out, _ = self.apply()
         self.assertEqual(code, 0, out[-800:])
         hooks = sorted(p.name for p in (self.home / ".claude/hooks").iterdir())
-        self.assertEqual(hooks, ["effort-default-guard.py", "secret_path_guard.py"])
+        self.assertEqual(hooks, ["currency-due-notice.py", "effort-default-guard.py", "secret_path_guard.py"])
         for name in hooks:
             self.assertEqual(hashlib.sha256((self.home / ".claude/hooks" / name).read_bytes()).hexdigest(),
                              icp.expected_sha256(icp.HOOKS[name]))
         self.assertEqual(len(list((self.home / ".claude/agents").iterdir())), 11)
-        self.assertEqual(sorted(json.loads((self.home / ".stub-claude-mcp.json").read_text())), ["qmd", "serena"])
+        self.assertEqual(sorted(json.loads((self.home / ".stub-claude-mcp.json").read_text())),
+                         ["ai-memory", "codebase-memory", "headroom", "jcodemunch", "qmd", "semble", "serena", "socraticode"])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
-        self.assertEqual(sorted(settings["hooks"]), ["Notification", "PreToolUse", "SessionEnd", "SessionStart"])
+        # The repository's hooks and the overlay's Notification, and the events ai-memory's hooks take (an interim install).
+        self.assertEqual(sorted(settings["hooks"]), ["ConfigChange", "Notification", "PostToolUse", "PreCompact", "PreToolUse",
+                                                     "SessionEnd", "SessionStart", "Stop", "SubagentStart",
+                                                     "SubagentStop"])
         self.assertEqual(settings["env"]["PATH"].split(":")[:3],
                          [f"{self.eco}/bin", f"{self.home}/.local/bin", f"{self.home}/.local/share/mise/shims"])
         codex = self.home / ".codex"
@@ -1393,7 +1717,10 @@ class ApplyTests(ApplyCase):
         code, out, _ = self.apply()
         self.assertEqual(code, 0, out[-800:])
         settings = json.loads((claude / "settings.json").read_text())
-        self.assertEqual(settings["extraKnownMarketplaces"], DESTINATION_CLAUDE["extraKnownMarketplaces"])
+        # The destination's own marketplace stays, beside the two the wave-2 rows wire (context-mode and claude-hud).
+        self.assertEqual(settings["extraKnownMarketplaces"]["trailofbits"],
+                         DESTINATION_CLAUDE["extraKnownMarketplaces"]["trailofbits"])
+        self.assertEqual(sorted(settings["extraKnownMarketplaces"]), ["claude-hud", "context-mode", "trailofbits"])
         self.assertEqual(settings["theme"], "auto")
         self.assertIn('kept your theme: "auto" (the render has "dark")', out)
         for key in ("model", "effortLevel", "hooks", "permissions", "env"):
@@ -1457,6 +1784,35 @@ class ApplyTests(ApplyCase):
         self.assertIn("CLAUDE_CONFIG_DIR or CODEX_HOME is set", err)
         self.assertEqual(list(self.home.iterdir()), [])
 
+    def test_a_host_value_file_whose_home_is_the_root_is_refused_and_nothing_is_moved_or_written(self):
+        # The example host's values with its home at the root: HOME "/" (or "//"), its home paths written from the root
+        # and HOST_PATH as it is. Without its trailing slashes such a HOME is empty, a prefix of every absolute path:
+        # the code before the fix moved /usr/local/sbin, HOST_PATH's first entry, under the new home and applied that.
+        example = json.loads((render_config.HOSTS / f"{EXAMPLE_HOST}.json").read_text(encoding="utf-8"))
+        hosts = self.base / "hosts"
+        hosts.mkdir()
+        plan = cfg.analyse(ROOT)[2]
+        for declared in ("/", "//"):
+            root_home = {k: (declared if k == "HOME" else v.replace(example["HOME"], "")) for k, v in example.items()}
+            (hosts / "root-home.json").write_text(json.dumps(root_home, indent=2) + "\n", encoding="utf-8")
+            with self.subTest(declared=declared), mock.patch.object(render_config, "HOSTS", hosts):
+                code, out, err = run_main("--apply", "--host", "root-home", "--home", str(self.home), "--claude-bin",
+                                          str(self.claude), "--codex-bin", str(self.codex), "--codex-process-name",
+                                          NO_PROCESS)
+                self.assertEqual(code, 1, out[-600:])
+                self.assertTrue(err.startswith(f"apply failed: the host value file declares HOME as {declared!r}"), err)
+                self.assertEqual(list(self.home.iterdir()), [])
+                self.assertFalse(self.marker.exists(), "a client ran")
+                with self.assertRaises(cfg.ConfigError):
+                    cfg.host_values("root-home", plan, self.home, [])
+                # With the new home at the root as well nothing moves: the values are those of a render without --home.
+                self.assertEqual(cfg.host_values("root-home", plan, Path("/"), []),
+                                 cfg.host_values("root-home", plan, None, []))
+        # A home below the root moves the paths under it and leaves the system's directories where they are.
+        values = cfg.host_values(EXAMPLE_HOST, plan, self.home, [])
+        self.assertEqual((values["HOME"], values["ECO_ROOT"], values["HOST_PATH"]),
+                         (str(self.home), str(self.eco), example["HOST_PATH"]))
+
 
 def leaves(node, prefix=()):
     """{key path: JSON text of the value} of every leaf of a parsed settings or config tree."""
@@ -1469,19 +1825,42 @@ def leaves(node, prefix=()):
 
 
 class AuthorizationTests(ApplyCase):
-    """The four settings that grant a permission or suppress a confirmation are written only on request."""
+    """The settings that grant a permission or suppress a confirmation are written only on request: the five that stand
+    alone, the main checkout's Codex trust grant, and the tool approval modes and allow rules tied to the slot that wires
+    their server."""
 
-    FOUR = ("claude/settings/setting/permissions.defaultMode", "claude/settings/setting/skipDangerousModePermissionPrompt",
-            "codex/config/approval_policy", "codex/config/sandbox_mode")
-    # The tool approval modes of four MCP servers: each is tied to the slot that wires its server, which installs nothing today.
-    APPROVAL = ("codex/config/mcp_servers.context-mode.default_tools_approval_mode",
+    STANDALONE = ("claude/settings/setting/permissions.defaultMode", "claude/settings/setting/skipDangerousModePermissionPrompt",
+                  "codex/config/approval_policy", "codex/config/sandbox_mode",
+                  # the user's directive of 2026-10-04 (the wave-2 messaging ruling left it unset)
+                  "claude/settings/setting/crossSessionInbound")
+    # The coordinator's decision of 2026-10-04: the main checkout is trusted, and Codex looks a linked worktree's trust
+    # up under it (codex-rs/git-utils/src/trust.rs at rust-v0.160.0); every other project still asks.
+    TRUST = ('codex/config/projects."${PROJECT_ROOT}".trust_level',)
+    # The tool approval modes of six MCP servers, each tied to its installed owner's slot; wave 3 installs them all.
+    APPROVAL = ("codex/config/mcp_servers.ai-memory.default_tools_approval_mode",
+                "codex/config/mcp_servers.semble.default_tools_approval_mode",
+                "codex/config/mcp_servers.context-mode.default_tools_approval_mode",
+                "codex/config/mcp_servers.jcodemunch.default_tools_approval_mode",
                 "codex/stack-worker/mcp_servers.ai-memory.default_tools_approval_mode",
                 "codex/stack-worker/mcp_servers.socraticode.default_tools_approval_mode",
                 "codex/stack-worker/mcp_servers.headroom.default_tools_approval_mode")
-    ALL = FOUR + APPROVAL
-    SLOT_OF = dict(zip(APPROVAL, (("context-supply", "context-mode"), ("memory-owner", "ai-memory"),
-                                  ("code-search", "SocratiCode"), ("context-supply", "headroom"))))
+    # semble's exact-name allow rules for Claude Code (wave-2 code-search ruling, change 3).
+    ALLOW = ("claude/settings/permission/allow/mcp__semble__search",
+             "claude/settings/permission/allow/mcp__semble__find_related")
+    ALL = STANDALONE + TRUST + APPROVAL + ALLOW
+    SLOT_OF = dict(zip(APPROVAL + ALLOW, (("memory-owner", "ai-memory"), ("code-search", "semble"),
+                                          ("context-supply", "context-mode"), ("code-index", "jcodemunch"),
+                                          ("memory-owner", "ai-memory"),
+                                          ("code-search", "SocratiCode"), ("output-compression", "headroom"),
+                                          ("code-search", "semble"), ("code-search", "semble"))))
+    WAITING = APPROVAL[5:]                        # negative-control fixtures remove these two installed owners
+    WRITTEN = STANDALONE + TRUST + APPROVAL + ALLOW     # what the option writes today
     OPTION = "--with-authorization-settings"
+    DEFAULT_LINE = ("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode, "
+                    "skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy and sandbox_mode, the trust_level of the wired "
+                    "Codex projects, and the tool approval modes and allow rules of the wired MCP servers are not written, "
+                    "and a value of theirs that a file has is not touched; --with-authorization-settings adds the ones a "
+                    "file lacks)")
 
     def render(self, *extra: str):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1514,74 +1893,156 @@ class AuthorizationTests(ApplyCase):
             self.assertIn("not written unless --with-authorization-settings is given", by_key[key].reason)
             self.assertEqual(by_key[key].entry.wiring.partition(":")[0], "authorization")
             self.assertTrue(by_key[key].entry.wiring.partition(":")[2].strip(), "a reason")
-            # The four settings stand alone; a tool approval mode is tied to the slot that wires its server as well.
+            # The four settings and the trust grant stand alone; a tool approval mode or an allow rule is tied to the slot
+            # that wires its server as well.
             self.assertEqual((by_key[key].entry.slot, by_key[key].entry.owner), self.SLOT_OF.get(key, ("", "")), key)
         deny = [v for v in results if "/permission/deny/" in v.piece.key and v.entry.wiring == "practice"]
         self.assertGreater(len(deny), 100)
         self.assertTrue(all(v.wired for v in deny))
         with_option, *_ = cfg.analyse(ROOT, authorization=True)
-        self.assertEqual({v.piece.key for v in with_option if v.authorization and v.wired}, set(self.FOUR))
-        for verdict in with_option:       # a tool approval mode waits for its slot, which installs nothing today
-            if verdict.piece.key in self.APPROVAL:
+        self.assertEqual({v.piece.key for v in with_option if v.authorization and v.wired}, set(self.WRITTEN))
+        with tempfile.TemporaryDirectory() as tmp:   # preserve the absent-owner control after wave 3 installs both
+            root = make_catalog(Path(tmp))
+            def without_owners(data):
+                for row in data["slots"]:
+                    if row.get("catalog") == "foundation" and row["slot_id"] in ("code-search", "output-compression"):
+                        row.pop("interim", None)
+                        row.update(default="semble", installs_nothing_extra=False, state="definitive")
+                        row["resolution"] = {"outcome": "final"}
+            edit_json(root / cfg.MANIFEST_REL, without_owners)
+            absent_owners, *_ = cfg.analyse(root, authorization=True)
+        for verdict in absent_owners:       # a tool approval mode waits while its slot installs another owner
+            if verdict.piece.key in self.WAITING:
                 self.assertFalse(verdict.wired, verdict.piece.key)
-                self.assertIn(f"not written although {self.OPTION} was given: slot {self.SLOT_OF[verdict.piece.key][0]}",
-                              verdict.reason)
+                self.assertIn(f"not written although {self.OPTION} was given: slot {self.SLOT_OF[verdict.piece.key][0]} "
+                              "installs", verdict.reason)
         self.assertEqual({v.piece.key for v in with_option if v.wired} - {v.piece.key for v in results if v.wired},
-                         set(self.FOUR))
+                         set(self.WRITTEN))
 
-    def test_the_default_render_has_none_of_the_four_keys_and_the_option_adds_those_four_and_nothing_else(self):
+    def test_the_default_render_has_none_of_the_authorization_keys_and_the_option_adds_those_and_nothing_else(self):
         settings, codex = self.render()
         self.assertNotIn("defaultMode", settings["permissions"])
+        self.assertNotIn("allow", settings["permissions"])
         self.assertNotIn("skipDangerousModePermissionPrompt", settings)
+        self.assertNotIn("crossSessionInbound", settings)
         self.assertNotIn("approval_policy", codex)
         self.assertNotIn("sandbox_mode", codex)
+        self.assertNotIn("projects", codex)
+        self.assertEqual([name for name, server in codex["mcp_servers"].items() if "default_tools_approval_mode" in server],
+                         [])
         settings_on, codex_on = self.render(self.OPTION)
         self.assertEqual(settings_on["permissions"]["defaultMode"], "bypassPermissions")
         self.assertIs(settings_on["skipDangerousModePermissionPrompt"], True)
+        self.assertEqual(settings_on["crossSessionInbound"], "accept")
+        self.assertEqual(settings_on["permissions"]["allow"], ["mcp__semble__search", "mcp__semble__find_related"])
         self.assertEqual((codex_on["approval_policy"], codex_on["sandbox_mode"]), ("never", "danger-full-access"))
-        # The two renders differ in those four keys and in nothing else; the deny list is in both.
+        self.assertEqual({name: server["default_tools_approval_mode"] for name, server in codex_on["mcp_servers"].items()
+                          if "default_tools_approval_mode" in server},
+                         {"ai-memory": "approve", "semble": "approve", "context-mode": "approve", "jcodemunch": "approve"})
+        # One trust grant, for the host's main checkout (PROJECT_ROOT) and nothing else: no parent directory, and not
+        # the publication checkout the shared template also names.
+        project_root = json.loads((ROOT / "adoption/hosts/example.json").read_text())["PROJECT_ROOT"]
+        self.assertEqual(codex_on["projects"], {project_root: {"trust_level": "trusted"}})
+        # The two renders differ in those keys and in nothing else; the deny list is in both.
         for off, on in ((settings, settings_on), (codex, codex_on)):
             self.assertEqual(sorted(set(leaves(on)) - set(leaves(off))), sorted(
-                [("permissions", "defaultMode"), ("skipDangerousModePermissionPrompt",)] if on is settings_on else
-                [("approval_policy",), ("sandbox_mode",)]))
+                [("permissions", "defaultMode"), ("skipDangerousModePermissionPrompt",), ("crossSessionInbound",),
+                 ("permissions", "allow")]
+                if on is settings_on else
+                [("approval_policy",), ("sandbox_mode",), ("mcp_servers", "ai-memory", "default_tools_approval_mode"),
+                 ("mcp_servers", "semble", "default_tools_approval_mode"),
+                 ("mcp_servers", "context-mode", "default_tools_approval_mode"),
+                 ("mcp_servers", "jcodemunch", "default_tools_approval_mode"),
+                 ("projects", project_root, "trust_level")]))
             self.assertEqual(set(leaves(off)) - set(leaves(on)), set())
             self.assertEqual({k: v for k, v in leaves(on).items() if k in leaves(off)}, leaves(off))
         self.assertEqual(settings["permissions"]["deny"], settings_on["permissions"]["deny"])
         self.assertGreater(len(settings["permissions"]["deny"]), 100)
 
-    def test_a_fresh_apply_writes_none_by_default_and_all_four_with_the_option(self):
+    # In the order of the pieces: the additions (semble's allow rules and server) merge after the shared template's keys.
+    ALLOW_LABELS = "Claude Code allow rule mcp__semble__search, Claude Code allow rule mcp__semble__find_related"
+    ADDED_CLAUDE = (f"added: Claude Code permissions.defaultMode, {ALLOW_LABELS}, Claude Code skipDangerousModePermissionPrompt, "
+                    "Claude Code crossSessionInbound")
+    CODEX_CONFIG = ("Codex approval_policy, Codex sandbox_mode, Codex mcp_servers.ai-memory.default_tools_approval_mode, "
+                    "Codex mcp_servers.context-mode.default_tools_approval_mode, "
+                    "Codex mcp_servers.jcodemunch.default_tools_approval_mode, "
+                    "Codex mcp_servers.semble.default_tools_approval_mode, "
+                    'Codex projects."${PROJECT_ROOT}".trust_level')
+    STACK_WORKER = ("Codex stack-worker profile mcp_servers.ai-memory.default_tools_approval_mode, "
+                    "Codex stack-worker profile mcp_servers.socraticode.default_tools_approval_mode, "
+                    "Codex stack-worker profile mcp_servers.headroom.default_tools_approval_mode")
+    TRUST_LABEL = 'Codex projects."${PROJECT_ROOT}".trust_level'
+
+    def test_a_fresh_apply_writes_none_by_default_and_all_of_them_with_the_option(self):
         self.seed()
         code, out, _ = self.apply()
         self.assertEqual(code, 0, out[-800:])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         config = tomllib.loads((self.home / ".codex/config.toml").read_text())
         self.assertNotIn("defaultMode", settings["permissions"])
+        self.assertNotIn("allow", settings["permissions"])
         self.assertNotIn("skipDangerousModePermissionPrompt", settings)
         self.assertEqual({"approval_policy", "sandbox_mode"} & set(config), set())
-        self.assertEqual(self.authorization_line(out),
-                         "authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode "
-                         "and skipDangerousModePermissionPrompt and Codex approval_policy and sandbox_mode are not "
-                         "written, and a value of theirs that a file has is not touched; --with-authorization-settings "
-                         "adds the ones a file lacks)")
-        # Negative control: the same home with the option gets all four, in both clients.
+        self.assertEqual([name for name, server in config["mcp_servers"].items() if "default_tools_approval_mode" in server],
+                         [])
+        self.assertEqual(self.authorization_line(out), self.DEFAULT_LINE)
+        # Negative control: the same home with the option gets every one, in both clients and the stack-worker profile.
         code, out, _ = self.apply(self.OPTION)
         self.assertEqual(code, 0, out[-800:])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         config = tomllib.loads((self.home / ".codex/config.toml").read_text())
         self.assertEqual(settings["permissions"]["defaultMode"], "bypassPermissions")
+        self.assertEqual(settings["permissions"]["allow"], ["mcp__semble__search", "mcp__semble__find_related"])
         self.assertIs(settings["skipDangerousModePermissionPrompt"], True)
         self.assertEqual((config["approval_policy"], config["sandbox_mode"]), ("never", "danger-full-access"))
+        for server in ("ai-memory", "semble", "context-mode"):
+            self.assertEqual(config["mcp_servers"][server]["default_tools_approval_mode"], "approve", server)
+        # The stack-worker profile is created only when absent, so the profile the plain run created stays as it was.
         line = self.authorization_line(out)
-        self.assertTrue(line.startswith("authorization settings: applied (--with-authorization-settings; added: Claude Code "
-                                        "permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt, Codex "
-                                        "approval_policy, Codex sandbox_mode"), line)
+        self.assertEqual(line, f"authorization settings: applied (--with-authorization-settings; {self.ADDED_CLAUDE}, "
+                               f"{self.CODEX_CONFIG}; kept your value: {self.STACK_WORKER})")
         # A second run with the option has nothing left to add: the settings are the same, and the line says kept.
         code, out, _ = self.apply(self.OPTION)
         self.assertEqual(code, 0, out[-800:])
-        self.assertTrue(self.authorization_line(out).startswith("authorization settings: kept (--with-authorization-settings; "
-                                                                "already the same:"), out[-600:])
+        line = self.authorization_line(out)
+        self.assertEqual(line, f"authorization settings: kept (--with-authorization-settings; kept your value: "
+                               f"{self.STACK_WORKER}; already the same: {self.ADDED_CLAUDE[len('added: '):]}, "
+                               f"{self.CODEX_CONFIG})")
 
-    def test_the_destinations_files_gain_the_four_only_with_the_option(self):
+    def test_a_new_codex_home_with_the_option_keeps_the_trust_grant_and_a_second_run_finds_it_the_same(self):
+        # codex_home.py --keep-project-trust: the grant the render holds survives the creation of config.toml, so the
+        # line's "added" is true; the merge of the second run looks the grant up under the path the render filled in
+        # for ${PROJECT_ROOT}, finds it and adds nothing.
+        self.seed()
+        self.assertFalse((self.home / ".codex/config.toml").exists())
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        text = (self.home / ".codex/config.toml").read_text()
+        self.assertTrue(text.startswith("# Written by tools/adoption/codex_home.py --keep-hook-trust "
+                                        "--keep-project-trust from the user config"), text[:200])
+        main_checkout = str(self.home / "code/agent-lab")   # the example host's PROJECT_ROOT, moved under --home
+        self.assertEqual(tomllib.loads(text)["projects"], {main_checkout: {"trust_level": "trusted"}})
+        trust = self.TRUST_LABEL
+        self.assertIn(trust, self.authorization_line(out).split("added: ", 1)[1].split("; ", 1)[0].split(", "))
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        line = self.authorization_line(out)
+        self.assertNotIn("added: ", line)
+        self.assertIn(trust, line.split("already the same: ", 1)[1].split("; ", 1)[0].split(", "))
+        self.assertEqual(tomllib.loads((self.home / ".codex/config.toml").read_text())["projects"],
+                         {main_checkout: {"trust_level": "trusted"}})
+
+    def test_a_trust_answer_the_file_already_has_is_kept_and_named(self):
+        # The person said no to the folder once: the merge keeps the file's answer, and the line says so.
+        main_checkout = str(self.home / "code/agent-lab")
+        self.seed(codex_text=f'[projects."{main_checkout}"]\ntrust_level = "untrusted"\n')
+        code, out, _ = self.apply(self.OPTION)
+        self.assertEqual(code, 0, out[-800:])
+        config = tomllib.loads((self.home / ".codex/config.toml").read_text())
+        self.assertEqual(config["projects"], {main_checkout: {"trust_level": "untrusted"}})
+        self.assertIn(self.TRUST_LABEL, self.authorization_line(out).split("kept your value: ", 1)[1])
+
+    def test_the_destinations_files_gain_them_only_with_the_option(self):
         self.seed(DESTINATION_CLAUDE, DESTINATION_CODEX)
         for extra, present in (((), False), ((self.OPTION,), True)):
             with self.subTest(option=bool(extra)):
@@ -1590,9 +2051,13 @@ class AuthorizationTests(ApplyCase):
                 settings = json.loads((self.home / ".claude/settings.json").read_text())
                 config = tomllib.loads((self.home / ".codex/config.toml").read_text())
                 self.assertEqual("defaultMode" in settings["permissions"], present)
+                self.assertEqual("allow" in settings["permissions"], present)
                 self.assertEqual("skipDangerousModePermissionPrompt" in settings, present)
                 self.assertEqual("approval_policy" in config, present)
                 self.assertEqual("sandbox_mode" in config, present)
+                self.assertEqual("projects" in config, present)
+                for server in ("ai-memory", "semble", "context-mode"):
+                    self.assertEqual("default_tools_approval_mode" in config["mcp_servers"][server], present, server)
                 self.assertEqual(settings["theme"], "auto")                       # the destination's own keys stay
                 self.assertEqual(config["marketplaces"]["trailofbits"]["ref"], PLAN_COMMIT)
 
@@ -1618,9 +2083,14 @@ class AuthorizationTests(ApplyCase):
                                      '"danger-full-access"'):
                         self.assertIn(expected, out)
                     self.assertIn("codex-config merged with conflicts kept", out.split("summary: ")[1])
-                    self.assertTrue(self.authorization_line(out).startswith("authorization settings: kept (--with-"
-                                                                            "authorization-settings; kept your value: Claude "
-                                                                            "Code permissions.defaultMode"), out[-900:])
+                    # The person's four values stay; what the files lack (the allow rules and approval modes) is added.
+                    line = self.authorization_line(out)
+                    self.assertTrue(line.startswith("authorization settings: applied (--with-authorization-settings; "
+                                                    f"added: {self.ALLOW_LABELS}, "), line)
+                    # The stack-worker profile the plain run created is kept too (profiles are created only when absent).
+                    self.assertIn("kept your value: Claude Code permissions.defaultMode, Claude Code "
+                                  "skipDangerousModePermissionPrompt, Codex approval_policy, Codex sandbox_mode, "
+                                  f"{self.STACK_WORKER})", line)
                 else:
                     self.assertNotIn("kept your permissions.defaultMode", out)
                     self.assertNotIn("conflict kept: approval_policy", out)
@@ -1638,7 +2108,10 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual(config["sandbox_mode"], "read-only")                           # kept
         self.assertEqual(config["approval_policy"], "never")                            # added
         line = self.authorization_line(out)
-        self.assertIn("added: Claude Code skipDangerousModePermissionPrompt, Codex approval_policy", line)
+        added = line.split("added: ", 1)[1].split("; ", 1)[0].split(", ")
+        self.assertTrue({"Claude Code skipDangerousModePermissionPrompt", "Codex approval_policy"} <= set(added), added)
+        self.assertNotIn("Claude Code permissions.defaultMode", added)
+        self.assertNotIn("Codex sandbox_mode", added)
         self.assertIn("kept your value: Claude Code permissions.defaultMode, Codex sandbox_mode", line)
 
     def test_a_dry_run_with_the_option_writes_nothing_and_says_what_would_be_applied(self):
@@ -1649,25 +2122,23 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual(tree(self.home), before)
         self.assertTrue(self.authorization_line(out).startswith("authorization settings: would be applied ("), out[-600:])
 
-    ADDED_CLAUDE = "added: Claude Code permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt"
-    CODEX_PAIR = "Codex approval_policy, Codex sandbox_mode"
-
     def test_the_apply_line_says_not_applied_when_every_step_that_would_write_the_settings_is_skipped(self):
         self.seed()
-        code, out, _ = self.apply(self.OPTION, "--skip", "claude-settings", "--skip", "codex-config")
+        code, out, _ = self.apply(self.OPTION, "--skip", "claude-settings", "--skip", "codex-config",
+                                  "--skip", "codex-files")
         self.assertEqual(code, 0, out[-600:])
         self.assertEqual(self.authorization_line(out), (
             "authorization settings: not applied (--with-authorization-settings; not reached, its step claude-settings was "
-            "skipped: Claude Code permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt; not reached, its "
-            f"step codex-config was skipped: {self.CODEX_PAIR})"))
+            f"skipped: {self.ADDED_CLAUDE[len('added: '):]}; not reached, its step codex-config was skipped: "
+            f"{self.CODEX_CONFIG}; not reached, its step codex-files was skipped: {self.STACK_WORKER})"))
 
     def test_a_skipped_step_leaves_the_line_partly_applied_and_says_it_was_skipped(self):
         self.seed()
         code, out, _ = self.apply(self.OPTION, "--skip", "codex-config")
         self.assertEqual(code, 0, out[-600:])
         self.assertEqual(self.authorization_line(out), (
-            f"authorization settings: partly applied (--with-authorization-settings; {self.ADDED_CLAUDE}; not reached, its "
-            f"step codex-config was skipped: {self.CODEX_PAIR})"))
+            f"authorization settings: partly applied (--with-authorization-settings; {self.ADDED_CLAUDE}, "
+            f"{self.STACK_WORKER}; not reached, its step codex-config was skipped: {self.CODEX_CONFIG})"))
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         self.assertEqual(settings["permissions"]["defaultMode"], "bypassPermissions")    # what was reached is written
         self.assertFalse((self.home / ".codex/config.toml").exists())                      # what was not, is not
@@ -1677,8 +2148,8 @@ class AuthorizationTests(ApplyCase):
         code, out, _ = self.apply(self.OPTION)
         self.assertEqual(code, 1)
         self.assertEqual(self.authorization_line(out), (
-            f"authorization settings: partly applied (--with-authorization-settings; {self.ADDED_CLAUDE}; not reached, its "
-            f"step codex-config failed: {self.CODEX_PAIR})"))
+            f"authorization settings: partly applied (--with-authorization-settings; {self.ADDED_CLAUDE}, "
+            f"{self.STACK_WORKER}; not reached, its step codex-config failed: {self.CODEX_CONFIG})"))
         self.assertEqual((self.home / ".codex/config.toml").read_text(), "[tui\nbroken = \n")
 
     def test_a_dry_run_with_a_skipped_step_says_it_would_be_partly_applied(self):
@@ -1687,25 +2158,34 @@ class AuthorizationTests(ApplyCase):
         code, out, _ = self.apply(self.OPTION, "--skip", "codex-config", dry=True)
         self.assertEqual(code, 0, out[-600:])
         self.assertEqual(self.authorization_line(out), (
-            f"authorization settings: would be partly applied (--with-authorization-settings; {self.ADDED_CLAUDE}; not "
-            f"reached, its step codex-config was skipped: {self.CODEX_PAIR})"))
+            f"authorization settings: would be partly applied (--with-authorization-settings; {self.ADDED_CLAUDE}, "
+            f"{self.STACK_WORKER}; not reached, its step codex-config was skipped: {self.CODEX_CONFIG})"))
         self.assertEqual(tree(self.home), before)
 
     def test_settings_that_are_kept_beside_a_step_that_is_not_reached_say_not_applied(self):
-        self.seed({"permissions": {"defaultMode": "default"}, "skipDangerousModePermissionPrompt": False})
-        code, out, _ = self.apply(self.OPTION, "--skip", "codex-config")
+        # The file already has every Claude Code one (three of its own values, and semble's two allow rules), and the steps
+        # that write the Codex ones are skipped: nothing is added.
+        self.seed({"permissions": {"defaultMode": "default", "allow": ["mcp__semble__search", "mcp__semble__find_related"]},
+                   "skipDangerousModePermissionPrompt": False, "crossSessionInbound": "hold"})
+        code, out, _ = self.apply(self.OPTION, "--skip", "codex-config", "--skip", "codex-files")
         self.assertEqual(code, 0, out[-600:])
         self.assertEqual(self.authorization_line(out), (
             "authorization settings: not applied (--with-authorization-settings; kept your value: Claude Code "
-            "permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt; not reached, its step codex-config was "
-            f"skipped: {self.CODEX_PAIR})"))
+            f"permissions.defaultMode, Claude Code skipDangerousModePermissionPrompt, Claude Code crossSessionInbound; "
+            f"already the same: {self.ALLOW_LABELS}; "
+            f"not reached, its step codex-config was skipped: {self.CODEX_CONFIG}; not reached, its step codex-files was "
+            f"skipped: {self.STACK_WORKER})"))
 
     def test_the_line_says_so_when_the_map_wires_no_authorization_setting(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
 
             def drop(data):
-                next(e for e in data["entries"] if self.FOUR[0] in e["match"])["wiring"] = "not_wired:a decision to drop them"
+                for entry in data["entries"]:
+                    if entry["wiring"].startswith("authorization:"):
+                        entry["wiring"] = "not_wired:a decision to drop them"
+                        entry.pop("slot", None)
+                        entry.pop("owner", None)
             edit_json(root / cfg.MAP_REL, drop)
             self.seed()
             code, out, _ = self.apply(self.OPTION, "--root", str(root))
@@ -1714,27 +2194,27 @@ class AuthorizationTests(ApplyCase):
             "authorization settings: not applied (--with-authorization-settings; no authorization setting is wired: the map "
             "leaves each out, or its slot does not install)"))
 
-    def scenario(self, name: str, *extra: str, dry: bool = False, **seed) -> str:
-        """The authorization line of one --apply in a home of its own."""
+    def scenario(self, name: str, *extra: str, dry: bool = False, twice: bool = False, **seed) -> str:
+        """The authorization line of one --apply in a home of its own (of the second, with twice=True)."""
         self.home = self.base / f"home-{name}"
         self.home.mkdir()
         self.eco = self.home / ".local/share/codex-ecosystem"
         self.seed(**seed)
-        code, out, _ = self.apply(*extra, dry=dry)
-        self.assertEqual(code, 0, (name, out[-500:]))
+        for _ in range(2 if twice else 1):
+            code, out, _ = self.apply(*extra, dry=dry)
+            self.assertEqual(code, 0, (name, out[-500:]))
         return self.authorization_line(out)
 
     def test_the_line_has_seven_outcomes_and_the_four_documents_name_every_one(self):
-        same = {"settings": {"permissions": {"defaultMode": "bypassPermissions"}, "skipDangerousModePermissionPrompt": True},
-                "codex_text": 'approval_policy = "never"\nsandbox_mode = "danger-full-access"\n'}
         lines = {
             "left to the clients' own defaults": self.scenario("plain"),
             "applied": self.scenario("applied", self.OPTION),
             "would be applied": self.scenario("would", self.OPTION, dry=True),
             "partly applied": self.scenario("partly", self.OPTION, "--skip", "codex-config"),
             "would be partly applied": self.scenario("would-partly", self.OPTION, "--skip", "codex-config", dry=True),
-            "kept": self.scenario("kept", self.OPTION, **same),
-            "not applied": self.scenario("not", self.OPTION, "--skip", "claude-settings", "--skip", "codex-config"),
+            "kept": self.scenario("kept", self.OPTION, twice=True),    # the second run finds every one already there
+            "not applied": self.scenario("not", self.OPTION, "--skip", "claude-settings", "--skip", "codex-config",
+                                         "--skip", "codex-files"),
         }
         for expected, line in lines.items():
             self.assertTrue(line.startswith(f"authorization settings: {expected} ("), (expected, line))
@@ -1753,7 +2233,7 @@ class AuthorizationTests(ApplyCase):
             self.assertIn(recipe_tests.AUTHORIZATION_LINE_SENTENCE, " ".join(places[place].split()), place)
 
     def test_the_map_refuses_an_authorization_setting_classed_practice_or_slot(self):
-        for key in self.FOUR:
+        for key in self.STANDALONE:
             for wiring, owner in (("practice", None), ("slot:serena", "serena")):
                 with self.subTest(piece=key, wiring=wiring), tempfile.TemporaryDirectory() as tmp:
                     root = make_catalog(Path(tmp))
@@ -1761,6 +2241,8 @@ class AuthorizationTests(ApplyCase):
                     def reclass(data):
                         entry = next(e for e in data["entries"] if key in e["match"])
                         entry["match"].remove(key)
+                        if not entry["match"]:
+                            data["entries"].remove(entry)
                         data["entries"].insert(0, {"match": [key], "wiring": wiring, **({"owner": owner} if owner else {})})
                     edit_json(root / cfg.MAP_REL, reclass)
                     errors = cfg.analyse(root)[3]
@@ -1815,6 +2297,10 @@ class AuthorizationTests(ApplyCase):
                 ("claude/settings/permission/allow/Bash(ls)", None, True),
                 ("claude/settings/permission/deny/Bash(rm *)", None, False),
                 ("codex/config/approval_policy", "never", True),
+                ('codex/config/projects."/srv/repo".trust_level', "trusted", True),
+                ('codex/config/projects."/srv/repo".trust_level', "untrusted", True),     # a saved answer, either way
+                ('codex/stack-worker/projects."/srv/repo".trust_level', "trusted", True),
+                ('codex/config/projects."/srv/repo".other', "x", False),
                 ("codex/config/model", "gpt-6.1-sol", False)):
             self.assertEqual(cfg.is_authorization_piece(key, value), expected, (key, value))
         # Without the value only the key decides.
@@ -1882,16 +2368,11 @@ class AuthorizationTests(ApplyCase):
                 self.assertEqual(run_main("--check", "--root", str(root))[0], 1 if caught else 0)
 
     def test_when_the_slot_of_a_server_installs_its_approval_mode_is_still_written_only_with_the_option(self):
-        key = self.APPROVAL[1]                  # codex/stack-worker/mcp_servers.ai-memory.default_tools_approval_mode
+        key = "codex/stack-worker/mcp_servers.ai-memory.default_tools_approval_mode"
+        self.assertIn(key, self.APPROVAL)
         with tempfile.TemporaryDirectory() as tmp:
+            # The memory-owner slot installs ai-memory (its interim install, amendment 3).
             root = make_catalog(Path(tmp))
-
-            def install(data):
-                row = next(r for r in data["slots"] if r["slot_id"] == "memory-owner" and r["catalog"] == "foundation")
-                row.update(installs_nothing_extra=False, state="definitive", default="ai-memory")
-                row["resolution"] = {"outcome": "final"}
-            edit_json(root / cfg.MANIFEST_REL, install)
-            write_blocks(root)
             self.assertEqual(cfg.analyse(root)[3], [])
             for option, present in ((False, False), (True, True)):
                 results, manifest, plan, errors, _ = cfg.analyse(root, authorization=option)
@@ -1918,7 +2399,8 @@ class AuthorizationTests(ApplyCase):
                 line = self.authorization_line(out)
                 if option:
                     self.assertTrue(line.startswith("authorization settings: applied ("), line)
-                    self.assertIn("Codex mcp_servers.ai-memory.default_tools_approval_mode", line.split("added: ")[1])
+                    self.assertIn("Codex stack-worker profile mcp_servers.ai-memory.default_tools_approval_mode",
+                                  line.split("added: ")[1])
                 else:
                     self.assertTrue(line.startswith("authorization settings: left to the clients' own defaults"))
 
@@ -1935,13 +2417,13 @@ class AuthorizationTests(ApplyCase):
             root = make_catalog(Path(tmp))
 
             def drop(data):
-                entry = next(e for e in data["entries"] if self.FOUR[2] in e["match"])
-                entry["match"].remove(self.FOUR[2])
-                data["entries"].insert(0, {"match": [self.FOUR[2]], "wiring": "not_wired:a decision to drop it"})
+                entry = next(e for e in data["entries"] if self.STANDALONE[2] in e["match"])
+                entry["match"].remove(self.STANDALONE[2])
+                data["entries"].insert(0, {"match": [self.STANDALONE[2]], "wiring": "not_wired:a decision to drop it"})
             edit_json(root / cfg.MAP_REL, drop)
             self.assertEqual(cfg.analyse(root)[3], [])
             results, *_ = cfg.analyse(root, authorization=True)
-        self.assertFalse(next(v for v in results if v.piece.key == self.FOUR[2]).wired)
+        self.assertFalse(next(v for v in results if v.piece.key == self.STANDALONE[2]).wired)
         # An allow rule would grant too: the tool classes it as authorization whatever the map says.
         self.assertTrue(cfg.is_authorization_piece("claude/settings/permission/allow/Bash(git status)"))
         self.assertFalse(cfg.is_authorization_piece("claude/settings/permission/deny/Bash(git push -f *)"))
@@ -1956,12 +2438,16 @@ class AuthorizationTests(ApplyCase):
         self.assertIn('codex/config/sandbox_mode = "danger-full-access"', block)
         listed = [line for line in block.splitlines() if line.startswith("  claude/") or line.startswith("  codex/")]
         self.assertEqual(len(listed), len(self.ALL))
-        # A tool approval mode says which slot it also waits for; the four settings say nothing of the kind.
+        # A tool approval mode or an allow rule says which slot it also waits for; the four settings and the trust grant
+        # say nothing of the kind.
         for key in self.APPROVAL:
             slot, owner = self.SLOT_OF[key]
             self.assertIn(f'  {key} = "approve"  (and only while slot {slot} installs {owner})', block)
-        self.assertEqual([line for line in listed if "only while slot" in line and not any(k in line for k in self.APPROVAL)],
-                         [])
+        for key in self.ALLOW:
+            slot, owner = self.SLOT_OF[key]
+            self.assertIn(f'  {key} = "{key.rsplit("/", 1)[1]}"  (and only while slot {slot} installs {owner})', block)
+        self.assertEqual([line for line in listed if "only while slot" in line
+                          and not any(k in line for k in self.APPROVAL + self.ALLOW)], [])
         not_wired = [line for line in out.splitlines() if line.startswith("not wired")]
         self.assertFalse([line for line in not_wired if any(key in line for key in self.ALL)])
         rows = {row["piece"]: row for row in json.loads(run_main("--check", "--json")[1])}
@@ -1977,17 +2463,60 @@ class AuthorizationTests(ApplyCase):
             rows_of_key = [row for row in tables[1].splitlines() if key in row]
             self.assertEqual(len(rows_of_key), 1, key)
             slot_cell = rows_of_key[0].rstrip("|").rsplit("|", 1)[1].strip()
-            self.assertEqual(slot_cell, "-" if key in self.FOUR else "slot `%s` installing `%s`" % self.SLOT_OF[key], key)
+            self.assertEqual(slot_cell, "-" if key in self.STANDALONE + self.TRUST else
+                             "slot `%s` installing `%s`" % self.SLOT_OF[key], key)
 
     def test_the_help_text_names_the_option_what_it_writes_and_who_it_is_for(self):
         helped = " ".join(cfg.build_parser().format_help().split())
         self.assertIn("--with-authorization-settings", helped)
         for phrase in ("grant a permission or suppress a confirmation", "permissions.defaultMode",
                        "skipDangerousModePermissionPrompt", "approval_policy", "sandbox_mode",
+                       "the trust_level of the host's main checkout in Codex",
                        "neither rendered nor written and a value a file already has is never touched",
                        "a differing one is kept and printed beside the render's",
                        "only on a host whose owner asked for the repository's permission practice"):
             self.assertIn(phrase, helped)
+
+
+class AcknowledgementGateTests(ApplyCase):
+    """--apply wires no interim install (amendment 3 of the manifest's decision rule) while the layer consensus's wave-2
+    batch owes an acknowledgement: a real run refuses and writes nothing, and a dry run says that a real run would refuse
+    (wave-2 code-search ruling, change 1; install.sh's interim_acknowledged is the plan's side of the same gate)."""
+
+    def test_the_list_is_read_from_the_committed_batch(self):
+        owed = json.loads((ROOT / cfg.CONSENSUS_REL).read_text(encoding="utf-8"))["wave2"]["acknowledgements_owed"]
+        self.assertEqual(REAL_OWED_ACKNOWLEDGEMENTS(ROOT), owed)
+
+    def test_a_list_that_cannot_be_read_is_an_error_and_an_empty_one_is_not(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / cfg.CONSENSUS_REL
+            path.parent.mkdir(parents=True)
+            for broken in ({}, {"wave2": {}}, {"wave2": {"acknowledgements_owed": "gpt"}},
+                           {"wave2": {"acknowledgements_owed": [""]}}):
+                with self.subTest(consensus=broken):
+                    path.write_text(json.dumps(broken), encoding="utf-8")
+                    with self.assertRaises(cfg.ConfigError):
+                        REAL_OWED_ACKNOWLEDGEMENTS(Path(tmp))
+            path.write_text(json.dumps({"wave2": {"acknowledgements_owed": []}}), encoding="utf-8")
+            self.assertEqual(REAL_OWED_ACKNOWLEDGEMENTS(Path(tmp)), [])
+
+    def test_a_real_apply_refuses_while_one_is_owed_and_a_dry_run_says_so(self):
+        self.installed_state()
+        before = tree(self.home)
+        with mock.patch.object(cfg, "owed_acknowledgements", return_value=["claude", "gpt"]):
+            code, out, err = self.apply()
+            self.assertEqual(code, 1, out + err)
+            self.assertIn("apply refused: the render wires the interim installs of code-search, "
+                          "memory-owner (amendment 3 of the manifest's decision rule), and the acknowledgement of the "
+                          "wave-2 batch is still owed by claude, gpt", err)
+            self.assertNotIn("summary:", out)                  # no step ran
+            self.assertEqual(tree(self.home), before)
+            self.assertFalse(self.marker.exists())             # and no client was called
+            code, out, err = self.apply(dry=True)
+            self.assertEqual(code, 0, out + err)
+            self.assertIn("note: a real run refuses now: the render wires the interim installs of code-search, "
+                          "memory-owner", out)
+        self.assertEqual(tree(self.home), before)
 
 
 class RenderedScanTests(unittest.TestCase):
@@ -2001,36 +2530,36 @@ class RenderedScanTests(unittest.TestCase):
     def test_a_name_in_a_rendered_file_fails_the_check_and_the_message_says_which_render(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
-            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["env"].update(SCAN_PROBE="use rtk here"))
+            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["env"].update(SCAN_PROBE="use promptfoo here"))
             edit_json(root / cfg.MAP_REL, lambda d: d["entries"].insert(0, {
                 "match": ["claude/settings/env/SCAN_PROBE"], "wiring": "practice"}))
             code, _, err = run_main("--check", "--root", str(root))
         self.assertEqual(code, 1)
-        self.assertIn("the render for the example host without --with-authorization-settings: settings.json names rtk, "
+        self.assertIn("the render for the example host without --with-authorization-settings: settings.json names Promptfoo, "
                       "which is not wired", err)
-        self.assertIn("the render for the example host with --with-authorization-settings: settings.json names rtk", err)
+        self.assertIn("the render for the example host with --with-authorization-settings: settings.json names Promptfoo", err)
 
     def test_a_name_that_only_an_authorization_setting_carries_is_found_in_the_render_with_the_option_only(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
-            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["permissions"].update(defaultMode="rtk-default"))
+            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["permissions"].update(defaultMode="promptfoo-default"))
             errors = cfg.rendered_name_errors(root)
             code, _, err = run_main("--check", "--root", str(root))
         self.assertEqual(code, 1)
         self.assertEqual(errors, ["the render for the example host with --with-authorization-settings: settings.json "
-                                  "names rtk, which is not wired"])
-        self.assertIn("with --with-authorization-settings: settings.json names rtk", err)
+                                  "names Promptfoo, which is not wired"])
+        self.assertIn("with --with-authorization-settings: settings.json names Promptfoo", err)
 
     def test_a_name_in_an_instruction_block_or_the_codex_config_is_found_too(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
             path = root / cfg.TEMPLATES["codex/config"]
-            path.write_text(path.read_text().replace('web_search = "live"', 'web_search = "live"\nprobe_note = "ai-memory"'),
+            path.write_text(path.read_text().replace('web_search = "live"', 'web_search = "live"\nprobe_note = "promptfoo"'),
                             encoding="utf-8")
             edit_json(root / cfg.MAP_REL, lambda d: d["entries"].insert(0, {
                 "match": ["codex/config/probe_note"], "wiring": "practice"}))
             errors = cfg.rendered_name_errors(root)
-        self.assertTrue(any("codex.config.toml names ai-memory" in error for error in errors), errors)
+        self.assertTrue(any("codex.config.toml names Promptfoo" in error for error in errors), errors)
 
     def test_a_render_that_fails_is_reported_and_not_taken_for_a_clean_scan(self):
         with mock.patch.object(cfg, "render", side_effect=cfg.ConfigError("boom")):
@@ -2154,7 +2683,9 @@ class CodexMergeTests(unittest.TestCase):
         self.assertIs(merged["features"]["daemon_auto_start"], False)
         # What the file had is as it was: every old line in order, the marketplace table equal, [tui] only extended.
         self.assertTrue(keeps_lines(DESTINATION_CODEX, merged_text))
-        self.assertEqual(merged["marketplaces"], tomllib.loads(DESTINATION_CODEX)["marketplaces"])
+        # The trailofbits table as it was, and context-mode's beside it (the context-supply slot's interim install).
+        self.assertEqual(merged["marketplaces"], {**tomllib.loads(DESTINATION_CODEX)["marketplaces"],
+                                                  "context-mode": rendered["marketplaces"]["context-mode"]})
         self.assertTrue(merged["tui"]["screen_reader_detection_done"])
         self.assertEqual(sorted(merged["tui"]), sorted({"screen_reader_detection_done", *rendered["tui"]}))
         self.assertIn("[tui]\nscreen_reader_detection_done = true\n", merged_text)
@@ -2326,8 +2857,11 @@ class CodexMergeTests(unittest.TestCase):
         self.assertEqual(code, 0, out[-600:])
         self.assertEqual(stat.S_IMODE(self.codex_home.stat().st_mode), 0o700)
         self.assertEqual(stat.S_IMODE(self.config.stat().st_mode), 0o600)
+        # codex_home.py --keep-hook-trust: the whole render, the wired [hooks.state] approvals included, so a second run
+        # (a merge) finds nothing to add.
         self.assertEqual(tomllib.loads(self.config.read_text()), self.rendered())
-        self.assertTrue(self.config.read_text().startswith("# Written by adoption/bootstrap-linux.sh"))
+        self.assertTrue(self.config.read_text().startswith("# Written by tools/adoption/codex_home.py --keep-hook-trust"))
+        self.assertIn("hooks", tomllib.loads(self.config.read_text()))
         self.assertEqual(self.backups(), [])
         self.assertIn("written from the rendered user config", out)
         self.assertEqual(self.calls(), [])
@@ -2639,6 +3173,196 @@ class CodexMergeTests(unittest.TestCase):
         self.assertIsNone(cfg.first_difference({"a": {"b": 1}}, {"a": {"b": 1}}))
 
 
+class RemotePluginRuleTests(unittest.TestCase):
+    """The local fallback for the account's remote Codex plugins (wave-2 skills ruling, change 5): --apply reads the plugin
+    cache and adds a name rule per plugin skill and an off switch per plugin MCP server, as Codex names them. The cache here
+    is a fixture of this project's own, in the shapes of the cached bundles (manifest, skills/, .mcp.json)."""
+
+    SKILL = "---\nname: {name}\ndescription: A fixture skill.\n---\nBody.\n"
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.base = Path(self.tmp.name)
+        self.home = self.base / "home"
+        self.home.mkdir()
+        self.codex_home = self.home / ".codex"
+        self.config = self.codex_home / "config.toml"
+        self.claude = write_exe(self.base / "bin" / "claude", STUB_CLAUDE)
+        self.codex = write_exe(self.base / "bin" / "codex", STUB_CODEX)
+        patcher = mock.patch.dict(os.environ, {"STUB_MARKER": str(self.base / "client-calls.txt")})
+        patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def plugin(self, plugin: str, version: str, manifest=None, skills=None, servers=()) -> Path:
+        """A cached remote plugin: `manifest` is its plugin.json (None: none), `skills` maps a directory under skills/ to its
+        SKILL.md text, `servers` names the MCP servers of its .mcp.json."""
+        root = self.codex_home / "plugins/cache" / cfg.REMOTE_MARKETPLACE / plugin / version
+        root.mkdir(parents=True)
+        if manifest is not None:
+            (root / ".codex-plugin").mkdir()
+            (root / ".codex-plugin/plugin.json").write_text(json.dumps(manifest), encoding="utf-8")
+        for directory, text in (skills or {}).items():
+            (root / "skills" / directory).mkdir(parents=True)
+            (root / "skills" / directory / "SKILL.md").write_text(text, encoding="utf-8")
+        if servers:
+            (root / ".mcp.json").write_text(json.dumps({"mcpServers": {name: {"command": "node"} for name in servers}}),
+                                            encoding="utf-8")
+        return root
+
+    def apply(self):
+        return run_main("--apply", "--host", EXAMPLE_HOST, "--home", str(self.home), "--claude-bin", str(self.claude),
+                        "--codex-bin", str(self.codex), "--codex-process-name", NO_PROCESS, *ONLY_CODEX_CONFIG)
+
+    def test_the_names_are_the_ones_codex_gives_and_the_servers_are_each_plugins(self):
+        self.plugin("superpowers", "6.4.2", {"name": "superpowers", "skills": "./skills/"}, {
+            "brainstorming": self.SKILL.format(name="brainstorming"),
+            "cli": self.SKILL.format(name="hf-cli"),                           # the frontmatter's name, not the folder's
+            "quoted": self.SKILL.format(name="'quoted-skill'"),
+            "spaced": self.SKILL.format(name="two   words  # a comment"),
+            "unnamed": "---\ndescription: No name, so the folder's.\n---\n",
+            "no-frontmatter": "Just text, which Codex does not load as a skill.\n"})
+        self.plugin("superpowers", "6.3.0", {"name": "superpowers"}, {"old": self.SKILL.format(name="old-skill")})
+        self.plugin("openai-developers", "1.3.6", {"name": "openai-developers", "mcpServers": "./.mcp.json"},
+                    {"agents": self.SKILL.format(name="agents")}, servers=("local-confirmation",))
+        self.plugin("blank-name", "0.1.0", {"name": " "}, {"x": self.SKILL.format(name="x")})   # the root's own name
+        self.plugin("no-manifest", "1.0.0", None, {"y": self.SKILL.format(name="y")})        # Codex loads no plugin
+        names, servers = cfg.remote_plugin_rules(self.codex_home)
+        self.assertEqual(names, ["0.1.0:x", "openai-developers:agents", "superpowers:brainstorming", "superpowers:hf-cli",
+                                 "superpowers:old-skill", "superpowers:quoted-skill", "superpowers:two words",
+                                 "superpowers:unnamed"])
+        self.assertEqual(servers, {"openai-developers@openai-curated-remote": ["local-confirmation"]})
+        self.assertEqual(cfg.remote_plugin_rules(self.base / "no-codex-home"), ([], {}))
+
+    def test_a_name_this_tool_cannot_read_is_refused_rather_than_guessed(self):
+        self.plugin("p", "1.0.0", {"name": "p"}, {"folded": "---\nname: >-\n  folded\ndescription: d\n---\n"})
+        with self.assertRaises(cfg.ConfigError) as caught:
+            cfg.remote_plugin_rules(self.codex_home)
+        self.assertIn("is not a one-line value this tool reads", str(caught.exception))
+        code, _, err = self.apply()
+        self.assertEqual(code, 1)
+        self.assertIn("apply failed: the account's remote plugins in", err)
+        self.assertFalse(self.config.exists())
+
+    def test_an_apply_adds_the_rules_and_a_later_one_adds_only_the_new_rules_after_the_files_own(self):
+        self.plugin("superpowers", "6.4.2", {"name": "superpowers"}, {"brainstorming": self.SKILL.format(name="brainstorming")})
+        self.plugin("openai-developers", "1.3.6", {"name": "openai-developers"}, servers=("local-confirmation",))
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        # Planned when read, in place only after the codex-config step's write and read-back (finding 2 of the Codex root
+        # lane's read of b6828c7d): the line never says the rules are on before the file holds them.
+        self.assertIn("remote plugins: 1 skill name rule(s) and 1 plugin MCP server off switch(es) planned", out)
+        self.assertNotIn("turned off", out)
+        text = self.config.read_text()
+        config = tomllib.loads(text)
+        # Relative, so Codex resolves it against the Codex home that holds this config.toml (the template's comment).
+        installer = {"path": "skills/.system/skill-installer/SKILL.md", "enabled": False}
+        self.assertEqual(config["skills"]["config"], [installer, {"name": "superpowers:brainstorming", "enabled": False}])
+        self.assertEqual(text.count("[[skills.config]]"), 2)                # an array of tables, so it can grow as text
+        self.assertEqual(config["plugins"]["openai-developers@openai-curated-remote"],
+                         {"enabled": False, "mcp_servers": {"local-confirmation": {"enabled": False}}})
+        # The account gains a plugin skill: the next run adds its rule after the file's own and changes nothing else.
+        (self.codex_home / "plugins/cache" / cfg.REMOTE_MARKETPLACE / "superpowers/6.4.2/skills/debugging").mkdir()
+        (self.codex_home / "plugins/cache" / cfg.REMOTE_MARKETPLACE / "superpowers/6.4.2/skills/debugging/SKILL.md"
+         ).write_text(self.SKILL.format(name="systematic-debugging"), encoding="utf-8")
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        self.assertIn("rules added to skills.config: 1, after the file's own", out)
+        merged = tomllib.loads(self.config.read_text())
+        self.assertEqual(merged["skills"]["config"], config["skills"]["config"] + [
+            {"name": "superpowers:systematic-debugging", "enabled": False}])
+        self.assertTrue(keeps_lines(text, self.config.read_text()))
+        # The check that X11 asks for after an apply still passes (it reads the repository, never the host's files).
+        code, out, err = run_main("--check")
+        self.assertEqual(code, 0, err[-400:])
+        self.assertIn("check passed", out)
+
+    def test_a_file_with_rules_of_its_own_keeps_them_first(self):
+        self.plugin("superpowers", "6.4.2", {"name": "superpowers"}, {"brainstorming": self.SKILL.format(name="brainstorming")})
+        own = '[[skills.config]]\nname = "my-skill"\nenabled = false\n\n[tui]\nscreen_reader_detection_done = true\n'
+        self.codex_home.mkdir(mode=0o700, exist_ok=True)
+        self.config.write_text(own, encoding="utf-8")
+        self.config.chmod(0o600)
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        rules = tomllib.loads(self.config.read_text())["skills"]["config"]
+        self.assertEqual(rules[0], {"name": "my-skill", "enabled": False})
+        self.assertIn({"name": "superpowers:brainstorming", "enabled": False}, rules[1:])
+        self.assertNotIn("conflict kept: skills.config", out)
+        self.assertTrue(keeps_lines(own, self.config.read_text()))
+
+    def test_a_rule_list_written_inline_is_refused_and_the_file_stays_as_it_was(self):
+        self.plugin("superpowers", "6.4.2", {"name": "superpowers"}, {"brainstorming": self.SKILL.format(name="brainstorming")})
+        inline = '[skills]\nconfig = [{ name = "my-skill", enabled = false }]\n'
+        self.codex_home.mkdir(mode=0o700, exist_ok=True)
+        self.config.write_text(inline, encoding="utf-8")
+        self.config.chmod(0o600)
+        code, out, _ = self.apply()
+        self.assertEqual(code, 1)
+        self.assertIn("the file defines it as an inline array, which text cannot extend", out)
+        self.assertEqual(self.config.read_text(), inline)
+
+    def test_an_existing_rule_list_gains_the_rules_or_is_refused_and_an_empty_one_is_never_kept_as_a_conflict(self):
+        """Finding 2 of the Codex root lane's read of b6828c7d: an existing, valid `[skills] config = []` was not taken for a
+        rule list, so the render's disable rules became a kept conflict and were lost while the step ended `merged with
+        conflicts kept`. The empty list is a rule list now: the plan appends the render's rules to it, and since TOML writes
+        an empty array only inline (and TOML 1.0 forbids adding [[skills.config]] items to a statically defined array, even
+        an empty one), the text edit refuses it and writes nothing. A non-empty array of tables is extended after its own
+        rules. The plan-level assertions on the empty list are the negative control: the earlier plan_merge kept it as a
+        conflict with no appends."""
+        installer = {"path": "/h/.codex/skills/.system/skill-installer/SKILL.md", "enabled": False}
+        remote = {"name": "superpowers:brainstorming", "enabled": False}
+        own = {"name": "my-skill", "enabled": False}
+        rendered = {"skills": {"config": [installer, remote]}}
+        for name, existing, appended, merged in (
+                ("empty", [], [installer, remote], [installer, remote]),
+                ("non-empty", [own, remote], [installer], [own, remote, installer])):
+            with self.subTest(existing=name):
+                plan = cfg.plan_merge({"skills": {"config": existing}}, rendered)
+                self.assertEqual(plan.conflicts, [])
+                self.assertEqual(plan.appends, [(("skills", "config"), appended)])
+                self.assertEqual(plan.expected, {"skills": {"config": merged}})
+                self.assertEqual(cfg.merge_report(plan), [f"rules added to skills.config: {len(appended)}, after the file's own"])
+        # The writer still writes an empty list as a plain `key = []`, never as nothing.
+        self.assertEqual(tomllib.loads(cfg.emit_toml({"skills": {"config": []}}, "# h")), {"skills": {"config": []}})
+        self.plugin("superpowers", "6.4.2", {"name": "superpowers"}, {"brainstorming": self.SKILL.format(name="brainstorming")})
+        self.codex_home.mkdir(mode=0o700, exist_ok=True)
+        # The empty list, as a file: refused, nothing written, and no conflict reported in place of the rules.
+        empty = '[skills]\nconfig = []\n\n[tui]\nscreen_reader_detection_done = true\n'
+        self.config.write_text(empty, encoding="utf-8")
+        self.config.chmod(0o600)
+        code, out, _ = self.apply()
+        self.assertEqual(code, 1, out[-800:])
+        self.assertIn("cannot add 2 item(s) to skills.config: the file defines it as an inline array, which text cannot "
+                      "extend; write it as [[skills.config]] items; it is empty, so removing the key is enough", out)
+        self.assertNotIn("conflict kept: skills.config", out)
+        self.assertNotIn("merged with conflicts kept", out)
+        self.assertEqual(self.config.read_text(), empty)
+        # The way out the message names: without the key, the next run adds both rules as [[skills.config]] items.
+        self.config.write_text(empty.replace("[skills]\nconfig = []\n\n", ""), encoding="utf-8")
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        self.assertEqual(tomllib.loads(self.config.read_text())["skills"]["config"],
+                         [{"path": "skills/.system/skill-installer/SKILL.md", "enabled": False}, remote])
+        # A non-empty array of tables, as a file: extended after its own rule, every line it had kept.
+        tables = '[[skills.config]]\nname = "my-skill"\nenabled = false\n\n[tui]\nscreen_reader_detection_done = true\n'
+        self.config.write_text(tables, encoding="utf-8")
+        code, out, _ = self.apply()
+        self.assertEqual(code, 0, out[-800:])
+        self.assertIn("rules added to skills.config: 2, after the file's own", out)
+        self.assertEqual(tomllib.loads(self.config.read_text())["skills"]["config"],
+                         [own, {"path": "skills/.system/skill-installer/SKILL.md", "enabled": False}, remote])
+        self.assertTrue(keeps_lines(tables, self.config.read_text()))
+
+    def test_the_toml_writer_writes_a_list_of_tables_as_an_array_of_tables(self):
+        data = {"skills": {"max_context_tokens": 6000, "config": [{"path": "/a", "enabled": False},
+                                                                 {"name": "p:s", "enabled": False}]},
+                "plugins": {"x@m": {"enabled": False, "mcp_servers": {"s": {"enabled": False}}}}}
+        text = cfg.emit_toml(data, "# h")
+        self.assertEqual(text.count("[[skills.config]]"), 2)
+        self.assertEqual(tomllib.loads(text), data)
+
+
 class CommandLineTests(unittest.TestCase):
     """How the guard reads the command line of a process to find Codex's app-server: through /proc where Linux has one, and
     through `ps` where there is none (macOS). Only the hint of the refusal depends on it; the refusal is `pgrep -x`'s."""
@@ -2820,6 +3544,103 @@ class AdditiveOptionTests(unittest.TestCase):
         self.assertIn('PATH="$HOME/.local/bin${PATH:+:$PATH}"', text)
 
 
+class PlanConfigurationTests(unittest.TestCase):
+    """Run only the plan's configuration writes in scratch homes, without installing tools or contacting providers."""
+
+    def config_command(self, slot, filename):
+        plan = json.loads((ROOT / cfg.PLAN_REL / "install-plan.json").read_text())
+        row = next(row for row in plan["owners"] if row["slot"] == slot)
+        commands = [command for command in row["commands"] if f"config/{filename}" in command]
+        self.assertEqual(len(commands), 1, f"{slot} must persist {filename} before client hooks are wired")
+        return commands[0]
+
+    def test_rtk_install_persists_the_recipe_exclusions_and_preserves_existing_configuration(self):
+        command = self.config_command("command-output", "rtk-config.toml")
+        source = ROOT / cfg.PLAN_REL / "config/rtk-config.toml"
+        recipe = (ROOT / "recipes/README.md").read_text()
+        expected = re.search(r"```toml\n(\[hooks\]\nexclude_commands = \[.*?\n\])\n```", recipe, re.S).group(1) + "\n"
+        self.assertEqual(source.read_text(), expected)
+        for xdg in (None, "absolute", "relative"):
+            with self.subTest(xdg=xdg), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp) / "home"
+                config_root = Path(tmp) / "xdg" if xdg == "absolute" else home / ".config"
+                target = config_root / "rtk/config.toml"
+                env = dict(os.environ, HOME=str(home), plan_dir=str(ROOT / cfg.PLAN_REL),
+                           ECO_ROOT=str(Path(tmp) / "ecosystem"))
+                env.pop("XDG_CONFIG_HOME", None)
+                if xdg:
+                    env["XDG_CONFIG_HOME"] = str(config_root) if xdg == "absolute" else "relative-config"
+
+                def write_config():
+                    result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                                            cwd=tmp, env=env, capture_output=True, text=True)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    return result
+
+                self.assertFalse(target.exists())
+                write_config()
+                self.assertEqual(target.read_text(), expected)
+                self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o600)
+                self.assertEqual(write_config().stderr, "")   # an identical rerun has no warning
+                target.write_text("# operator configuration\n[hooks]\nexclude_commands = [\"curl\"]\n")
+                original = target.read_bytes()
+                result = write_config()
+                self.assertEqual(target.read_bytes(), original)
+                self.assertIn("differs; retained", result.stderr)
+                self.assertFalse((Path(tmp) / "relative-config/rtk/config.toml").exists())
+
+    def test_chub_install_persists_both_opt_outs_and_preserves_existing_configuration(self):
+        command = self.config_command("api-docs", "chub-config.yaml")
+        source = ROOT / cfg.PLAN_REL / "config/chub-config.yaml"
+        self.assertEqual([line for line in source.read_text().splitlines() if not line.startswith("#")],
+                         ["telemetry: false", "feedback: false"])
+        for override in (False, True):
+            with self.subTest(chub_dir=override), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp) / "home"
+                target = (Path(tmp) / "custom-chub" if override else home / ".chub") / "config.yaml"
+                env = dict(os.environ, HOME=str(home), plan_dir=str(ROOT / cfg.PLAN_REL),
+                           XDG_CONFIG_HOME=str(Path(tmp) / "xdg"), ECO_ROOT=str(Path(tmp) / "ecosystem"))
+                env.pop("CHUB_DIR", None)
+                if override:
+                    env["CHUB_DIR"] = str(target.parent)
+
+                def write_config():
+                    result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                                            cwd=tmp, env=env, capture_output=True, text=True)
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    return result
+
+                self.assertFalse(target.exists())
+                write_config()
+                self.assertEqual(target.read_bytes(), source.read_bytes())
+                self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o600)
+                self.assertEqual(write_config().stderr, "")
+                target.write_text("# operator configuration\ntelemetry: true\nfeedback: true\n")
+                original = target.read_bytes()
+                result = write_config()
+                self.assertEqual(target.read_bytes(), original)
+                self.assertIn("differs; retained", result.stderr)
+                if override:
+                    self.assertFalse((home / ".chub/config.yaml").exists())
+
+    def test_plan_checker_counts_direct_config_installs_and_refuses_an_uncopied_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            plan_dir = Path(tmp) / "plan"
+            shutil.copytree(ROOT / cfg.PLAN_REL, plan_dir)
+            args = [sys.executable, "-B", str(ROOT / cfg.PLAN_REL / "check_plan.py"), "--plan-dir", str(plan_dir),
+                    "--manifest", str(ROOT / cfg.MANIFEST_REL)]
+            result = subprocess.run(args, cwd=tmp, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            self.assertIn("acceptance entries agree with the scripts", result.stdout)
+            (plan_dir / "config/uncopied-config.yaml").write_text("telemetry: false\n")
+            # A filename mentioned in an installation comment cannot turn an uncopied file into an installed one.
+            with (plan_dir / "install.sh").open("a") as stream:
+                stream.write('\n# install -m 0600 -- "$plan_dir/config/uncopied-config.yaml" "$HOME/config.yaml"\n')
+            result = subprocess.run(args, cwd=tmp, capture_output=True, text=True)
+            self.assertNotEqual(result.returncode, 0)
+            self.assertIn("config/uncopied-config.yaml is copied by no install function", result.stdout)
+
+
 class RecordTests(unittest.TestCase):
     RECORD = ROOT / "docs/decisions/2026-10-02-new-wsl-client-configuration.md"
     FILES = (RECORD, ROOT / "tools/adoption/new_wsl_client_config.py", MAP, Path(__file__),
@@ -2835,9 +3656,9 @@ class RecordTests(unittest.TestCase):
         manifest = cfg.load_manifest(ROOT)
         listed = cfg.dropped_markdown(ROOT, cfg.generate_blocks(ROOT, cfg.unwired_names(results, manifest))).rstrip("\n")
         self.assertIn(listed, text, "regenerate the record's dropped list with `--check --markdown`")
-        self.assertGreater(listed.count("\nline "), 20)
+        self.assertEqual(listed.count("\nline "), 2)          # only the two Promptfoo units go after wave 3
         # Control: a table whose row differs from the tool's is not in the record.
-        self.assertNotIn(tables.replace("| `slot:context-supply` |", "| `slot:other` |", 1), text)
+        self.assertNotIn(tables.replace("| `not_wired` |", "| `slot:other` |", 1), text)
         piece_rows = tables.split("\n\n")[0].splitlines()[2:]
         self.assertEqual(len(piece_rows), sum(1 for v in results if not v.wired and not v.authorization))
         # The authorization settings are a table of their own, and none of them is among the pieces that are not wired.

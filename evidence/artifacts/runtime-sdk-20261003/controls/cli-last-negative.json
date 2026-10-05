@@ -1,0 +1,1 @@
+{"artifact": "exec-last.txt", "expected_marker": "WRONG_EXPECTED_MARKER", "match": false, "observed_marker": "CLI_01600_GATEWAY_CANARY_OK"}

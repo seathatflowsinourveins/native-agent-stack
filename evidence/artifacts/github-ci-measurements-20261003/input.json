@@ -1,0 +1,107 @@
+{
+  "schema_note": "Neutral input for a repository receipt. Public-repository CI measurements only; no billing figures, no private-repository data. Aggregated counts do not expire with Actions run retention; run ids are kept as secondary pointers.",
+  "repository": "seathatflowsinourveins/native-agent-stack",
+  "window_utc": {"from": "2026-09-25", "to": "2026-10-02"},
+  "measured_on": "2026-10-03",
+  "measured_by": "read-only gh REST GET calls (about 587 by the measuring agent's own tally) plus independent recomputation of the Oct 1-2 cells by the coordinator; the agent's and the coordinator's Oct 1-2 cells were identical",
+  "caps_and_partitions": "Filtered run queries cap at 1,000 results (GitHub changelog 2026-09-25). Days over the cap were split into UTC 6-hour created windows; the per-day sum equals the endpoint total_count and no partition reached 1,000.",
+  "runs_per_day": {"2026-09-25": 1699, "2026-09-26": 1216, "2026-09-27": 1422, "2026-09-28": 782, "2026-09-29": 935, "2026-09-30": 948, "2026-10-01": 1101, "2026-10-02": 679, "total": 8782},
+  "pull_request_runs": {
+    "validate_published_evidence": {
+      "workflow_file": "validate.yml",
+      "per_day": {"2026-09-25": {"n": 220, "success": 161, "failure": 13, "cancelled": 46}, "2026-09-26": {"n": 164, "success": 105, "failure": 11, "cancelled": 48}, "2026-09-27": {"n": 250, "success": 143, "failure": 26, "cancelled": 81}, "2026-09-28": {"n": 128, "success": 78, "failure": 6, "cancelled": 44}, "2026-09-29": {"n": 129, "success": 92, "failure": 3, "cancelled": 34}, "2026-09-30": {"n": 166, "success": 98, "failure": 7, "cancelled": 60, "action_required": 1}, "2026-10-01": {"n": 176, "success": 85, "failure": 13, "cancelled": 78}, "2026-10-02": {"n": 121, "success": 54, "failure": 9, "cancelled": 58}},
+      "total": {"n": 1354, "success": 816, "failure": 88, "cancelled": 449, "action_required": 1}
+    },
+    "adoption_bootstrap_smoke": {
+      "workflow_file": "adoption-bootstrap.yml",
+      "per_day": {"2026-09-25": {"n": 177, "success": 133, "failure": 13, "cancelled": 31}, "2026-09-26": {"n": 133, "success": 103, "failure": 9, "cancelled": 21}, "2026-09-27": {"n": 180, "success": 128, "failure": 12, "cancelled": 40}, "2026-09-28": {"n": 92, "success": 72, "failure": 2, "cancelled": 18}, "2026-09-29": {"n": 100, "success": 76, "failure": 7, "cancelled": 17}, "2026-09-30": {"n": 126, "success": 65, "failure": 15, "cancelled": 45, "action_required": 1}, "2026-10-01": {"n": 134, "success": 73, "failure": 9, "cancelled": 52}, "2026-10-02": {"n": 86, "success": 50, "failure": 8, "cancelled": 28}},
+      "total": {"n": 1028, "success": 700, "failure": 75, "cancelled": 252, "action_required": 1}
+    }
+  },
+  "push_runs_to_main": {
+    "validate_published_evidence": {"total": 350, "per_day": {"2026-09-25": 90, "2026-09-26": 59, "2026-09-27": 43, "2026-09-28": 30, "2026-09-29": 50, "2026-09-30": 19, "2026-10-01": 38, "2026-10-02": 21}, "success": 343, "failure": 6, "cancelled": 1},
+    "adoption_bootstrap_smoke": {"total": 339, "per_day": {"2026-09-25": 85, "2026-09-26": 59, "2026-09-27": 43, "2026-09-28": 30, "2026-09-29": 48, "2026-09-30": 19, "2026-10-01": 36, "2026-10-02": 19}, "success": 329, "failure": 10, "cancelled": 0},
+    "note": "Push concurrency groups are per run id, so push runs are never cancelled by newer pushes; none of the 689 push runs was cancelled except one Validate run."
+  },
+  "cancelled_run_supersession": {
+    "rule": "a cancelled run X is superseded if a run Y with the same workflow, head branch and event was created in (X.created_at, X.updated_at]",
+    "validate_pull_request": {"cancelled": 449, "superseded": 425, "superseded_by_run_on_same_head_sha": 241, "not_superseded": 24},
+    "adoption_pull_request": {"cancelled": 252, "superseded": 243, "superseded_by_run_on_same_head_sha": 2, "not_superseded": 9},
+    "other_workflows": {"cancelled": 11, "superseded": 4, "not_superseded": 7},
+    "total": {"cancelled": 712, "superseded": 672, "share_superseded": 0.944, "not_superseded": 40},
+    "inference": "Validate's pull_request types include edited (validate.yml:9) and Adoption uses the default types, which fits 241 same-SHA supersessions against 2; the runs API does not expose the PR action type, so the link is an inference."
+  },
+  "reruns_and_flake_proxies": {
+    "run_attempt_above_1": {"adoption": {"n": 14, "success": 12, "failure": 1, "cancelled": 1}, "validate": {"n": 13, "success": 11, "failure": 1, "cancelled": 1}},
+    "failed_run_followed_by_later_success_same_workflow_sha_event": {"validate": "8 of 96", "adoption": "0 of 87", "security_scan": "2 of 71"},
+    "limit": "a re-run overwrites a run's conclusion, so re-run clearances are not visible in conclusion counts"
+  },
+  "failure_anatomy_non_cancelled": {
+    "unit": "failing job-instances",
+    "validate_failed_runs": {"runs": 80, "instances": 86, "real_test_or_gate": 65, "policy_gate": 21, "infra_or_flake_by_step_type": 0, "install_undetermined": 0, "timeout": 0, "by_step": {"validate: unittest step": 47, "validate: host evidence contribution receipts": 4, "validate: new-host grand list": 3, "validate: declared convergence evidence and scope": 3, "validate: release-due report": 2, "validate: landscape choices": 2, "validate: manifests and evidence integrity": 2, "validate: actionlint": 1, "validate: foundation capability claims": 1, "sota-sources": 13, "verdict-review-gate": 7, "secret-scan": 1}},
+    "adoption_failed_runs": {"runs": 75, "instances": 77, "real_test_or_gate": 72, "policy_gate": 0, "infra_or_flake_by_step_type": 2, "install_undetermined": 3, "timeout": 0, "by_step": {"validate-macos: full test suite": 54, "validate-macos: declared convergence evidence": 4, "validate-macos: host receipts": 4, "validate-macos: gate on adoption test modules": 3, "validate-macos: new-host grand list": 2, "validate-macos: landscape choices": 2, "validate-macos: manifests and evidence integrity": 2, "validate-macos: foundation capability claims": 1, "install steps (bootstrap smoke, bootstrap-macos, bootstrap-macos-brew)": 3, "bootstrap-macos: upload status report": 2}},
+    "other_workflows": {"runs": 10, "osv_scanner": 7, "dependency_review": 2, "native_token_tools_install": 1, "population": "security-scan 71 failures (66 pull_request, 5 push), dependency-review 4, native-token-e2e 1; 48 of the security-scan pull_request failures fell on 2026-09-30"},
+    "timeouts": "none: timed_out is 0 in every cell and no failing job had a cancelled step; maximum failing Validate job 1,787 s against the 2,400 s limit (validate.yml:31) and 2,302 s for validate-macos against 3,600 s (adoption-bootstrap.yml:610)"
+  },
+  "validate_macos_step_medians_seconds": {
+    "sample": "12 most recent successful pull_request Adoption runs, run ids 37062901624 to 37085568588, created 2026-10-02T20:48Z to 2026-10-03T01:18Z",
+    "job": {"median": 2154, "min": 1932, "max": 2394, "queue_seconds": "6-11"},
+    "steps": {"Run the full test suite (gating on macOS)": {"median": 1818.5, "max": 2077}, "Gate on the adoption test modules": {"median": 122.5, "max": 128}, "Run the macOS bootstrap into a disposable prefix": {"median": 93.5, "max": 118}, "Validate manifests and evidence integrity": {"median": 26.5, "max": 32}, "Recording smoke": {"median": 23, "max": 28}, "Report new-machine paths (release_due)": {"median": 18.5, "max": 27}, "Check out the event commit": {"median": 13, "max": 19}, "Check offline ecosystem explorer rebuild": {"median": 6, "max": 8}},
+    "share": "the full-suite step is 84% of the median job; the two test steps together are 90%",
+    "coordinator_sample": "8 newest successful pull_request runs of 2026-10-02 (run ids 37075955141, 37074856595, 37074855233, 37071277786, 37069795453, 37068859273, 37065384019, 37064290319): full-suite median 1,842 s of about 2,270 s"
+  },
+  "linux_validate_job_seconds": {"observed_pull_request_runs": "1727-1745 (runs 37088360538, 37086567708, 37085570699)", "observed_push_runs": "1167-1828", "limit_seconds": 2400, "failed_runs_job_seconds_by_day": {"2026-09-25": 385, "2026-09-29": "707-710", "2026-09-30": 1400, "2026-10-01": "985-1478", "2026-10-02": "1682-1787"}},
+  "suite_size_and_growth": {"serial_macos_runs": {"2026-09-25": {"tests": 5596, "seconds": 489.251, "skipped": 789}, "2026-10-01": {"tests": 9139, "seconds": 1598.337, "skipped": 1191}, "2026-10-02": {"tests": 9483, "seconds": 1830.0, "skipped": 1326}}, "latest_seen": {"tests": 9750, "seconds": 1589.416, "skipped": 1326}, "def_test_lines_at_head_56473e4b": 9698, "test_files": 233, "fifteen_largest_files_share_of_def_test": 0.268, "largest_file": "tests/test_token_e2e_grader.py with 632 tests in 8,441 lines", "per_test_seconds_serial_macos": {"2026-09-25": 0.087, "2026-10-02": 0.193}, "recorded_at_pr_126": {"tests": 3156, "skipped": 435}}
+  ,
+  "macos_unique_failures": {
+    "method": "pull_request head SHAs paired across the Linux validate run (workflow Validate published evidence) and the macOS run (Adoption bootstrap smoke); run-level conclusions, with job-level checks for each failure and the 30-day log artifact for test names; cross-checked on two endpoints (identical 1,025-SHA matrices)",
+    "head_shas": 1025,
+    "both_passed": 695,
+    "both_failed": 46,
+    "macos_failed_linux_passed": 30,
+    "linux_failed_macos_passed": 8,
+    "incomplete": 246,
+    "share_macos_only_of_shas": 0.029,
+    "share_macos_only_of_decisive_pairs": 0.039,
+    "decisive_pairs": 779,
+    "incomplete_breakdown": {"both_cancelled": 146, "linux_passed_macos_cancelled_before_a_verdict": 80, "linux_failed_macos_cancelled": 12, "other": 8},
+    "per_day_both_passed_both_failed_macos_only_linux_only_incomplete": {"2026-09-25": [133, 8, 5, 1, 31], "2026-09-26": [97, 7, 1, 2, 26], "2026-09-27": [126, 7, 5, 2, 38], "2026-09-28": [71, 2, 0, 0, 18], "2026-09-29": [80, 2, 5, 0, 15], "2026-09-30": [67, 6, 9, 0, 43], "2026-10-01": [73, 8, 3, 1, 47], "2026-10-02": [48, 6, 2, 2, 28]},
+    "failing_step": {"full test suite": 29, "bootstrap recording smoke": 1},
+    "failing_tests_for_15_of_the_30": [
+      {"run": 36193242827, "day": "2026-09-25", "ran": 5596, "failing": "tests.test_adoption_bootstrap.RtkConfigReminderTests (8 failures)"},
+      {"run": 36195615601, "day": "2026-09-25", "ran": 5619, "failing": "RtkConfigReminderTests x8"},
+      {"run": 36110886232, "day": "2026-09-25", "ran": 4837, "failing": "tests.test_host_receipts.ReviewAppendSafetyTests.test_two_sequential_reviews_both_persist"},
+      {"run": 36351247715, "day": "2026-09-27", "ran": 6761, "failing": "tests.test_runtime_worker_openhands: OpenHandsDispatchTests x4, OpenHandsUpstreamAdapterTests x1, OpenHandsReceiptTests x1 (2 failures, 4 errors)"},
+      {"run": 36354429337, "day": "2026-09-27", "ran": 6729, "failing": "tests.test_codex_worker_lane.ApplyFlowTests.test_the_dry_run_relaxes_required_servers_and_the_apply_read_back_starts_them"},
+      {"run": 36285440956, "day": "2026-09-27", "ran": 6425, "failing": "tests.test_observability_writer_identity.LauncherTests x5"},
+      {"run": 36617653643, "day": "2026-09-29", "ran": 7650, "failing": "tests.test_catalog_index.ConservationTests.test_role_record_pointers_resolve_and_read_set_equals_inputs"},
+      {"run": 36520431293, "day": "2026-09-29", "ran": 7313, "failing": "tests.test_runtime_worker_openhands_resolver (ResolverRunTests x15, ResolverResultTests x8, PatchValidatorTests x3, ResolverHostTests x2) and tests.test_codex_lane.InterruptionTests x1 (17 failures, 12 errors)"},
+      {"run": 36667219887, "day": "2026-09-30", "ran": 8455, "failing": "tests.test_credential_run.InjectionTests.test_strips_other_inventory_names_from_the_child"},
+      {"run": 36752399506, "day": "2026-09-30", "ran": 8674, "failing": "tests.test_child_usage_suite.ChildUsageNodeSuite.test_node_suite_passes x1; tests.test_currency_due: DetailsCommandTests x3, IncompleteSkillCheckTests x1, DueFileTests x1"},
+      {"run": 36763451365, "day": "2026-09-30", "ran": 8631, "failing": "ChildUsageNodeSuite.test_node_suite_passes"},
+      {"run": 36733726477, "day": "2026-09-30", "ran": 8632, "failing": "ChildUsageNodeSuite.test_node_suite_passes"},
+      {"run": 36751526079, "day": "2026-09-30", "ran": 8627, "failing": "ChildUsageNodeSuite.test_node_suite_passes"},
+      {"run": 36829361647, "day": "2026-10-01", "ran": 9139, "failing": "tests.test_secret_path_guard.K4GuardTests.test_k4_timing x2 (subtests row='T-STORE-PRINTF' and helper='k4_runner_commands')"},
+      {"run": 36833587488, "day": "2026-10-01", "ran": 9139, "failing": "tests.test_secret_path_guard.K4GuardTests.test_k4_timing (row='T-STORE-PRINTF')"},
+      {"run": 36946376402, "day": "2026-10-02", "ran": 9483, "failing": "tests.test_credential_run.ProcessTests.test_exit_code_and_signal_propagate (signal='SIGQUIT')"},
+      {"run": 37042100443, "day": "2026-10-02", "ran": 9750, "failing": "tests.test_new_wsl_client_config.CodexMergeTests: test_a_conflict_keeps_the_files_value_shows_both_and_the_step_says_so and test_the_message_names_the_app_server_daemon_and_how_to_stop_it (tests added by the PR itself)"}
+    ],
+    "limits": "failing test names were read for 16 runs covering 15 distinct head SHAs plus one duplicate case; the other 15 macOS-only SHAs were not itemized; the 146 both-cancelled SHAs were not examined at job level; whether a failure is real or flaky cannot be read from step names"
+  },
+  "caches_and_artifacts": {
+    "caches": {"active": 130, "bytes": 11064664169, "mib": 10552, "by_prefix": {"codeql-overlay-base-database": {"count": 130, "mib": 10253.3}, "macos-embed-model": {"count": 1, "mib": 298.8}}, "workflow_defined_cache": "actions/cache at adoption-bootstrap.yml:306-310 only (the embed-model cache); the CodeQL overlay caches come from the dynamic CodeQL workflow (inference)"},
+    "artifacts_created_in_the_7_days_before_2026-10-03T02:32Z": {"count": 4630, "mib": 302.3, "largest_prefix": {"adoption-bootstrap-full-suite-macos": {"count": 965, "mib": 192.1, "retention_days": 30}}, "note": "by-prefix table covers 4,500 of 4,630 artifacts"}
+  },
+  "push_versus_pull_request_duplication": {
+    "workflows_with_both_triggers": ["validate.yml", "adoption-bootstrap.yml", "security-scan.yml", "token-report.yml", "action-compatibility.yml", "native-foundation-e2e.yml", "native-token-e2e.yml", "supply-chain.yml"],
+    "finding": "jobs and steps are identical on both sides except event conditions; push has osv-sarif-upload, zizmor-online and zizmor-sarif-upload (security-scan) that pull_request lacks; pull_request has sota-sources (validate) and the changes job (adoption) that push lacks",
+    "median_wall_seconds_and_billed_minutes": {"validate_pull_request": [1749, 44], "validate_push": [1740, 42], "adoption_pull_request": [2202, 45], "adoption_push": [2163, 43], "security_scan_pull_request": [25, 1], "security_scan_push": [58, 4]}
+  },
+  "limitations": [
+    "Counts are run-level unless stated; a re-run overwrites a run's conclusion.",
+    "Timeouts among the 712 cancelled runs were not classified; 40 cancelled runs have no superseding run.",
+    "The by-prefix artifact table covers 97% of artifacts.",
+    "Linux sample runs for supply-chain and action-compatibility date from 2026-09-22 to 09-26 (no later success runs).",
+    "Evidence class: measured via gh read-only on 2026-10-03 (platform records, independent observation), not an upstream test."
+  ]
+}

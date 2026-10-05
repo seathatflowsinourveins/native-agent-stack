@@ -20,7 +20,11 @@ HOOK = ROOT / "adoption/hooks/claude/token-lanes-subagent-start.py"
 BLOCK = HOOK.with_name("token-lanes-block.md")
 AGENTS = ROOT / "adoption/agents/claude"
 HANDBOOK = ROOT / "docs/token-session-handbook.md"
-BUDGET_BYTES = 4_100  # 4,088 measured bytes; verification-line addendum in docs/decisions/2026-09-27-token-lanes-subagent-start.md
+BUDGET_BYTES = 4_100  # 4,099 measured bytes; jCodeMunch-route-arguments addendum in docs/decisions/2026-09-27-token-lanes-subagent-start.md
+# counter.py L616-630, blob 0605443d87ed6ec035b14831e99fb7c6540f7b12 at 8f7b34ab and v1.108.327:
+# route(execute=true) sends the whole task as the query; evidence/artifacts/jcodemunch-route-args-20260927/.
+JCODEMUNCH_MENU_CLAUSE = 'jcodemunch route(task, repo: ".") (no execute), menu(query?), order(action, own args) on indexed repos;'
+JCODEMUNCH_CLAUSE = 'jcodemunch route(task, repo: ".") (no execute), order(action, own args) on indexed repos;'
 # Exact agent_type -> sibling block; every other non-blind type receives BLOCK.
 ROLE_BLOCKS = {
     "stack-researcher": "token-lanes-block.researcher.md",
@@ -158,6 +162,27 @@ class TokenLanesHookTests(unittest.TestCase):
                      "mcp__headroom__headroom_retrieve"):
             with self.subTest(tool=tool):
                 self.assertIn(tool, bootstrap)
+
+    def test_injected_jcodemunch_rule_leaves_execute_off(self):
+        # Ported from #435: counter.py L616-630 at 8f7b34ab and v1.108.327 has the same blob above.
+        # The historical native probes are in evidence/artifacts/jcodemunch-route-args-20260927/.
+        clauses = {
+            "workflow-subagent": JCODEMUNCH_MENU_CLAUSE,
+            "stack-researcher": JCODEMUNCH_MENU_CLAUSE[:-1] + ".",
+            "isolated-builder": JCODEMUNCH_CLAUSE,
+            "evidence-reviewer": JCODEMUNCH_CLAUSE,
+            "security-reviewer": JCODEMUNCH_CLAUSE,
+        }
+        for agent_type, clause in clauses.items():
+            with self.subTest(agent_type=agent_type):
+                context = self.injected(agent_type)
+                rule = next(line for line in context.splitlines() if line.startswith("- Use Serena"))
+                self.assertIn(clause, rule)
+                self.assertNotIn("execute?", context)
+                if agent_type in ("workflow-subagent", "stack-researcher"):
+                    self.assertIn("menu(query?)", rule)
+                else:
+                    self.assertNotIn("menu(", rule)
 
     def test_injected_web_rule_routes_fetches_and_quotes_to_source_text(self):
         # context-mode v1.0.169 src/server.ts L3423-3478; Claude WebFetch contract:
@@ -343,6 +368,12 @@ class TokenLanesHookTests(unittest.TestCase):
 
 
 class TokenLanesTextTests(unittest.TestCase):
+    def test_jcodemunch_carriers_and_handbook_omit_execute_option(self):
+        for path in sorted(HOOK.parent.glob("token-lanes-block*.md")):
+            with self.subTest(block=path.name):
+                self.assertNotIn("execute?", path.read_text(encoding="utf-8"))
+        self.assertNotIn("execute?", HANDBOOK.read_text(encoding="utf-8"))
+
     def test_budget_counts_utf8_bytes_not_characters(self):
         # 3,880 characters but 4,120 UTF-8 bytes: a character count would accept it.
         text = "é" * 240 + "x" * 3_640

@@ -13,19 +13,26 @@ on:
     # Thursday 06:41 UTC. Off the top of the hour, which GitHub names as a high-load time
     # when scheduled runs can be delayed or dropped
     # (https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule),
-    # and on a day without the Monday lanes: GITHUB_TOKEN's REST budget is 1,000 requests per
-    # hour per repository (https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api),
-    # and catalog-freshness.yml's Monday fetch alone covers about 480 repositories.
+    # with the repository's GITHUB_TOKEN REST budget shared across these workflows
+    # (https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api).
+    # The daily catalog report is scheduled 24 minutes earlier; this timing does not prove
+    # that their execution or API use cannot overlap. No quota impact is measured here.
     - cron: '41 6 * * 4'
   workflow_dispatch:
 
-permissions:
-  contents: read
+# No token scope by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
 
 jobs:
   practice-references:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
+    permissions:
+      contents: read
     steps:
       - name: Harden the runner (audit-only network egress)
         uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1

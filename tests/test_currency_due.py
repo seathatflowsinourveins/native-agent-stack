@@ -25,6 +25,7 @@ from pathlib import Path
 from unittest import mock
 
 from scripts import currency_due as cd
+from scripts import upstream_surface_watch as usw
 
 ROOT = Path(__file__).resolve().parents[1]
 SYSTEMD_DIR = ROOT / "adoption/templates/systemd"
@@ -191,6 +192,9 @@ class Checkout:
         self.set(PINNED, pinned_report())
         self.set(SATURATION, saturation_report([("foundation/workers", False, "sweep-a")]))
         self.write_ledger(ledger(("sweep-a", "2026-09-29", "completed")))
+        # The user manager's answer that run() hands the script instead of this host's: {unit: properties}, or a string
+        # saying why it could not be asked. No unit by default.
+        self.units = {}
 
     def set(self, relative: str, report=None, *, stdout: str | None = None, code: int = 0,
             output_file: str | None = None) -> None:
@@ -225,9 +229,15 @@ class Checkout:
 
     def run(self, *extra: str) -> tuple[int, str, str]:
         stdout, stderr = io.StringIO(), io.StringIO()
-        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr), \
+                mock.patch.object(cd, "query_units", lambda units, systemctl="systemctl": self.units):
             code = cd.main(["--root", str(self.root), "--state-dir", str(self.state), "--now", NOW, *extra])
         return code, stdout.getvalue(), stderr.getvalue()
+
+    def write_record(self, name: str, record) -> None:
+        """A status record in the state directory, as the backup and restore-check DAGs write it."""
+        self.state.mkdir(mode=0o700, parents=True, exist_ok=True)
+        (self.state / name).write_text(record if isinstance(record, str) else json.dumps(record), encoding="utf-8")
 
     @property
     def due_file(self) -> Path:
@@ -259,7 +269,7 @@ class DueFileTests(unittest.TestCase):
                                           "details"])
         self.assertEqual(document["generated_at"], NOW)
         self.assertEqual(document["due"], {"pins_behind": 1, "stale_receipts": 2, "due_layers": 0,
-                                           "reopen_triggers": 1})
+                                           "reopen_triggers": 1, "host_alerts": 0})
         # The counts give way to the command when TMPDIR makes the checkout's path long (SummaryLineTests covers
         # the shortening), so the exact text is checked around the command.
         self.assertTrue(document["summary_line"].startswith("stack currency: 1 pin behind, 2 stale receipts, 1 layer"),
@@ -494,7 +504,7 @@ class AggregateShapeTests(unittest.TestCase):
         # The unmodified reports: codex's pin, a drifted skill, an invalid skill pin and the skills CLI make four.
         document = cd.aggregate(self.reports(), NOW_DATETIME, NOW, 30)
         self.assertEqual(document["due"], {"pins_behind": 4, "stale_receipts": 1, "due_layers": 1,
-                                           "reopen_triggers": 1})
+                                           "reopen_triggers": 1, "host_alerts": 0})
         exercised = 0
         for name in ("receipts", "pins", "layers", "skills"):
             for path in json_paths(self.reports()[name]):
@@ -620,7 +630,7 @@ class IncompleteSkillCheckTests(unittest.TestCase):
         self.assertEqual(code, 0, stderr)
         document = json.loads(checkout.due_file.read_text(encoding="utf-8"))
         self.assertEqual(document["due"], {"pins_behind": 1, "stale_receipts": 2, "due_layers": 0,
-                                           "reopen_triggers": 1})
+                                           "reopen_triggers": 1, "host_alerts": 0})
         coverage = document["details"][-1]
         self.assertEqual((coverage["skills_complete"], coverage["skills_fetch_errors"], coverage["skills_unresolved"]),
                          (False, 1, 1))
@@ -719,7 +729,7 @@ class DetailsCommandTests(unittest.TestCase):
         checkout.set(SKILLS, stdout="{}", output_file=json.dumps(skills_report(("skill-drift",))))
         document = self.notice(checkout, "--network")
         self.assertEqual(document["due"], {"pins_behind": 1, "stale_receipts": 0, "due_layers": 0,
-                                           "reopen_triggers": 0})
+                                           "reopen_triggers": 0, "host_alerts": 0})
         self.assertEqual(document["summary_line"], f"stack currency: 1 pin behind; details: {checkout.command('--network')}")
         again = self.reproduced(checkout, document)
         self.assertEqual((again["due"], again["summary_line"]), (document["due"], document["summary_line"]))
@@ -909,6 +919,9 @@ class SummaryLineTests(unittest.TestCase):
     def test_the_line_names_only_nonzero_counts_and_the_command(self):
         line = cd.summary_line({"pins_behind": 2, "stale_receipts": 1, "due_layers": 3, "reopen_triggers": 0})
         self.assertEqual(line, f"stack currency: 2 pins behind, 1 stale receipt, 3 layers due; details: {COMMAND}")
+        line = cd.summary_line({"pins_behind": 0, "stale_receipts": 0, "due_layers": 0, "reopen_triggers": 0,
+                                "host_alerts": 1})
+        self.assertEqual(line, f"stack currency: 1 host alert; details: {COMMAND}")
         self.assertEqual(cd.summary_line(dict.fromkeys(cd.DUE_KEYS, 0)), "stack currency: nothing due")
 
     def test_the_line_stays_within_160_characters_and_keeps_the_command(self):
@@ -941,6 +954,627 @@ class StateDirectoryTests(unittest.TestCase):
         for environ, expected in cases:
             with self.subTest(environ=environ):
                 self.assertEqual(cd.default_state_dir(environ), expected)
+
+
+class HostAlertTests(unittest.TestCase):
+    """The host's own alerts (wave-2 lifecycle ruling, changes 7 and 8) from synthetic status records and unit states;
+    the clock is NOW, 2026-09-30T12:00:00Z."""
+
+    @staticmethod
+    def record(success: str | None = "2026-09-30T05:00:00Z", result: str = "ok", exit_code: int = 0,
+               attempt: str = "2026-09-30T05:00:00Z") -> dict:
+        record = {"last_attempt": {"result": result, "exit_code": exit_code, "time": attempt}}
+        if success is not None:
+            record["last_success"] = {"snapshot_id": "a1b2c3d4", "time": success}
+        return record
+
+    @staticmethod
+    def unit(state: str = "active", enabled: str = "enabled", sub: str = "running", result: str = "success") -> dict:
+        return {"UnitFileState": enabled, "ActiveState": state, "SubState": sub, "Result": result}
+
+    def document(self, checkout: Checkout) -> dict:
+        code, stdout, stderr = checkout.run("--dry-run", "--json")
+        self.assertEqual(code, 0, stderr)
+        return json.loads(stdout)
+
+    def alerts(self, checkout: Checkout) -> list:
+        return [item for item in self.document(checkout)["details"]
+                if item["kind"].startswith(("backup_", "restore_check_", "unit_", "dagu_"))]
+
+    def test_no_record_and_no_enabled_unit_is_no_alert(self):
+        document = self.document(Checkout(self))
+        self.assertEqual(document["due"]["host_alerts"], 0)
+        coverage = document["details"][-1]
+        self.assertEqual((coverage["host_units"], coverage["backup_record"], coverage["restore_record"]),
+                         ("checked", "absent", "absent"))
+
+    def test_a_fresh_backup_and_restore_check_are_no_alert(self):
+        checkout = Checkout(self)
+        checkout.write_record(cd.BACKUP_RECORD, self.record("2026-09-29T13:00:00Z"))          # 47 h before NOW
+        checkout.write_record(cd.RESTORE_RECORD, self.record("2026-09-23T13:00:00Z"))         # 7 days before NOW
+        self.assertEqual(self.alerts(checkout), [])
+
+    def test_a_failed_or_partial_backup_is_an_alert_beside_the_last_success_it_keeps(self):
+        for result, exit_code in (("failed", 1), ("partial", 3), ("ok", 3)):
+            with self.subTest(result=result, exit_code=exit_code):
+                checkout = Checkout(self)
+                checkout.write_record(cd.BACKUP_RECORD, self.record(result=result, exit_code=exit_code))
+                self.assertEqual(self.alerts(checkout), [{"kind": "backup_failed", "result": result,
+                                                          "exit_code": exit_code, "time": "2026-09-30T05:00:00Z"}])
+
+    def test_a_backup_older_than_48_hours_or_never_successful_is_overdue(self):
+        for success, expected in (("2026-09-28T11:00:00Z", 49), (None, None)):
+            with self.subTest(success=success):
+                checkout = Checkout(self)
+                checkout.write_record(cd.BACKUP_RECORD, self.record(success))
+                self.assertEqual(self.alerts(checkout), [{"kind": "backup_overdue", "last_success": success,
+                                                          "age_hours": expected, "max_age_hours": 48}])
+
+    def test_a_restore_check_older_than_8_days_or_failed_is_an_alert(self):
+        checkout = Checkout(self)
+        checkout.write_record(cd.RESTORE_RECORD, self.record("2026-09-21T11:00:00Z", result="failed", exit_code=1))
+        self.assertEqual([item["kind"] for item in self.alerts(checkout)],
+                         ["restore_check_failed", "restore_check_overdue"])
+
+    def test_an_unreadable_record_is_an_alert_and_not_an_error_of_the_run(self):
+        for text, error in (("{not json", "not JSON"), ("[]", "not a JSON object")):
+            with self.subTest(text=text):
+                checkout = Checkout(self)
+                checkout.write_record(cd.BACKUP_RECORD, text)
+                self.assertEqual(self.alerts(checkout), [{"kind": "backup_record_unreadable", "error": error}])
+        checkout = Checkout(self)
+        checkout.write_record(cd.BACKUP_RECORD, {"last_success": {"snapshot_id": "a", "time": "2026-09-30T05:00:00Z"}})
+        self.assertEqual(self.alerts(checkout), [{"kind": "backup_record_unreadable", "error": "no last_attempt object"}])
+
+    def test_an_enabled_unit_that_failed_or_hit_its_start_limit_and_an_inactive_dagu_are_alerts(self):
+        checkout = Checkout(self)
+        checkout.units = {"omniroute.service": self.unit("failed", sub="failed", result="start-limit-hit"),
+                          "ollama.service": self.unit("inactive", enabled="disabled", sub="dead"),
+                          "ai-memory.service": self.unit(),
+                          "ecosystem-otelcol.service": self.unit("activating", sub="auto-restart", result="exit-code"),
+                          "dagu.service": self.unit("inactive", sub="dead")}
+        self.assertEqual(self.alerts(checkout), [
+            {"kind": "unit_not_active", "unit": "omniroute.service", "active_state": "failed", "sub_state": "failed",
+             "result": "start-limit-hit"},
+            {"kind": "dagu_not_active", "unit": "dagu.service", "active_state": "inactive", "sub_state": "dead",
+             "result": "success"}])
+        # A unit this host does not enable (Ollama before the GPU handover) and one that is restarting are no alert.
+
+    def test_a_user_manager_that_cannot_be_asked_is_coverage_not_an_alert(self):
+        checkout = Checkout(self)
+        checkout.units = "no systemctl on this host"
+        document = self.document(checkout)
+        self.assertEqual(document["due"]["host_alerts"], 0)
+        self.assertEqual(document["details"][-1]["host_units"], "no systemctl on this host")
+
+    def test_host_alerts_write_the_notice_and_the_details_name_them(self):
+        checkout = Checkout(self)
+        checkout.write_record(cd.BACKUP_RECORD, self.record(result="failed", exit_code=1))
+        checkout.units = {"dagu.service": self.unit("failed", sub="failed", result="exit-code")}
+        code, _, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        document = json.loads(checkout.due_file.read_text(encoding="utf-8"))
+        self.assertEqual(document["due"]["host_alerts"], 2)
+        self.assertTrue(document["summary_line"].startswith("stack currency: 2 host alerts; details: "),
+                        document["summary_line"])
+        text = cd.render_text(document)
+        self.assertIn("  backup: the last attempt ended failed (exit code 1) at 2026-09-30T05:00:00Z", text)
+        self.assertIn("  unit: dagu.service is enabled and failed (failed, result exit-code)", text)
+        self.assertIn("units: systemctl --user status <unit>", text)
+        self.assertIn("backups: dagu history restic-backup", text)
+
+    def test_query_units_reads_the_blocks_of_systemctl_show_and_names_why_it_could_not_ask(self):
+        with tempfile.TemporaryDirectory(dir=short_temp_base()) as temporary:
+            showing = Path(temporary) / "systemctl"
+            showing.write_text("#!/bin/sh\nprintf 'Id=omniroute.service\\nUnitFileState=enabled\\nActiveState=failed\\n"
+                               "SubState=failed\\nResult=start-limit-hit\\n\\nId=dagu.service\\nUnitFileState=enabled\\n"
+                               "ActiveState=active\\nSubState=running\\nResult=success\\n'\n", encoding="utf-8")
+            showing.chmod(0o755)
+            states = cd.query_units(("omniroute.service", "dagu.service"), str(showing))
+            self.assertEqual(states["omniroute.service"]["Result"], "start-limit-hit")
+            self.assertEqual(states["dagu.service"]["ActiveState"], "active")
+            refusing = Path(temporary) / "refusing"
+            refusing.write_text("#!/bin/sh\necho 'Failed to connect to bus: No medium found' >&2\nexit 1\n",
+                                encoding="utf-8")
+            refusing.chmod(0o755)
+            self.assertEqual(cd.query_units(("dagu.service",), str(refusing)),
+                             "systemctl --user show exited 1: Failed to connect to bus: No medium found")
+            self.assertEqual(cd.query_units(("dagu.service",), str(Path(temporary) / "absent")),
+                             "no systemctl on this host")
+
+
+class SurfaceWatchTests(unittest.TestCase):
+    """The sixth count: scripts/upstream_surface_watch.py's latest.json in the state directory's surface-watch/,
+    read offline, counted only while its data is at most three days old (synthetic reports in the watch's shape, not
+    watch output; tests/test_upstream_surface_watch.py FreshnessTests feeds real watch output to surface_findings)."""
+
+    KEYS = ["claude:setting:newSetting", "claude:env:CLAUDE_CODE_NEW", "codex:feature:brand_new"]
+    MALFORMED_BYTES = {"huge integer": (b'{"integer":' + b"9" * 5000 + b"}", {"error": "not JSON"}),
+                       "lone surrogate": (b'{"value":"\xed\xa0\x80"}', {"error": "unreadable (UnicodeDecodeError)"}),
+                       "NUL": (b'{"value":"\x00"}', {"error": "not JSON"}),
+                       "BOM": (b"\xef\xbb\xbf{}", {"error": "not JSON"})}
+
+    def test_bounded_malformed_json_inputs_are_unreadable_records(self):
+        """Synthetic fixtures, not upstream tests: integer limits and malformed UTF-8/JSON cannot escape read_record."""
+        for label, (raw, expected) in self.MALFORMED_BYTES.items():
+            with self.subTest(report=label):
+                checkout = Checkout(self)
+                self.report(checkout)
+                path = checkout.state / cd.SURFACE_DIR / cd.SURFACE_FILE
+                self.assertLess(len(raw), cd.RECORD_MAX_BYTES)
+                path.write_bytes(raw)
+                self.assertEqual(cd.read_record(path), expected)
+
+    def test_bounded_malformed_reports_do_not_crash_currency_or_clear_the_notice(self):
+        """Local integration check, not an upstream test: every malformed report keeps known findings and exits zero."""
+        for label, (raw, _) in self.MALFORMED_BYTES.items():
+            with self.subTest(report=label):
+                checkout = Checkout(self)
+                self.report(checkout)
+                checkout.due_file.write_bytes(b'{"earlier": true}\n')
+                before = checkout.due_file.read_bytes()
+                (checkout.state / cd.SURFACE_DIR / cd.SURFACE_FILE).write_bytes(raw)
+                code, stdout, stderr = checkout.run()
+                self.assertEqual(code, 0, stderr)
+                self.assertEqual(checkout.due_file.read_bytes(), before)
+                self.assertIn("surface watch unreadable", stdout)
+                self.assertLessEqual(len(stdout.split(" (kept ", 1)[0]), 160)
+
+    def test_a_path_encoding_error_is_an_unreadable_record(self):
+        """Synthetic fixture, not an upstream test: a UnicodeError during file access is an unreadable record."""
+        checkout = Checkout(self)
+        self.assertEqual(cd.read_record(checkout.state / "\ud800"), {"error": "unreadable (UnicodeEncodeError)"})
+
+    @staticmethod
+    def source(name: str, origin: str, fetched_utc: str, cross_check: bool = False) -> dict:
+        return {"source": name, "url": f"https://example.com/{name}", "version": None, "fetched_utc": fetched_utc,
+                "sha256": "0" * 64, "bytes": 1, "origin": origin, "required": not cross_check,
+                "cross_check": cross_check}
+
+    NO_VERSION = object()  # report(schema_version=...): write no schema_version key
+
+    def report(self, checkout: Checkout, generated_at: str = "2026-09-29T12:00:00Z", unreviewed=None,
+               raw: str | None = None, sources=None, run_at: str | None = None, kinds_not_observed=None,
+               schema_version: object = 1) -> None:
+        path = checkout.state / "surface-watch" / "latest.json"
+        path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+        if sources is None:
+            sources = [self.source("claude-env-vars-page", "network", generated_at)]
+        document = {"schema_version": schema_version, "generated_at": generated_at, "run_at": run_at or generated_at,
+                    "new": [], "removed": [], "stage_changed": [],
+                    "unreviewed": self.KEYS if unreviewed is None else unreviewed,
+                    "coverage": {"mode": "network", "from_cache": [], "sources": sources,
+                                 "kinds_not_observed": {} if kinds_not_observed is None else kinds_not_observed},
+                    "summary_line": "surface watch: 3 unreviewed of 3 new; details: python3 x --dry-run"}
+        if schema_version is self.NO_VERSION:
+            del document["schema_version"]
+        path.write_text(raw if raw is not None else json.dumps(document), encoding="utf-8")
+
+    def document(self, checkout: Checkout) -> dict:
+        code, stdout, stderr = checkout.run("--dry-run", "--json")
+        self.assertEqual(code, 0, stderr)
+        return json.loads(stdout)
+
+    def earlier_surface_notice(self, checkout: Checkout) -> bytes:
+        self.report(checkout, unreviewed=["codex:feature:brand_new"])
+        code, _, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        before = checkout.due_file.read_bytes()
+        document = json.loads(before)
+        self.assertEqual(document["due"]["surface_unreviewed"], 1)
+        finding = next(item for item in document["details"] if item["kind"] == "surface_unreviewed")
+        self.assertEqual(finding["keys"], ["codex:feature:brand_new"])
+        return before
+
+    def assert_surface_gap_keeps_notice(self, checkout: Checkout, before: bytes,
+                                      state: str = "surface watch incomplete") -> dict:
+        code, stdout, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        self.assertTrue(checkout.due_file.exists(), stdout)
+        self.assertEqual(checkout.due_file.read_bytes(), before)
+        self.assertIn(f"(kept {checkout.due_file})", stdout)
+        self.assertNotIn("nothing due", stdout)
+        self.assertLessEqual(len(stdout.split(" (kept ", 1)[0]), 160)
+        document = self.document(checkout)
+        self.assertEqual(document["details"][-1]["surface_watch"], state)
+        self.assertTrue(cd.incomplete(document))
+        self.assertNotIn("surface_unreviewed", document["due"])
+        self.assertNotIn("nothing due", document["summary_line"])
+        _, text, _ = checkout.run("--dry-run")
+        self.assertIn(state, text)
+        self.assertIn("surface watch: journalctl --user -u upstream-surface-watch.service", text)
+        return document
+
+    def test_coverage_unobserved_kinds_keep_previous_findings(self):
+        checkout = Checkout(self)
+        before = self.earlier_surface_notice(checkout)
+        self.report(checkout, unreviewed=[], kinds_not_observed={"codex:feature": "binary not found"})
+        document = self.assert_surface_gap_keeps_notice(checkout, before)
+        self.assertIn("codex:feature", document["details"][-1]["surface_watch_reason"])
+        self.assertIn("surface watch incomplete", document["summary_line"])
+
+    def test_coverage_unavailable_or_skipped_sources_keep_previous_findings(self):
+        for origin in ("unavailable", "skipped"):
+            for required in (True, False):
+                with self.subTest(origin=origin, required=required):
+                    checkout = Checkout(self)
+                    before = self.earlier_surface_notice(checkout)
+                    source = self.source("codex-features-list", origin, NOW)
+                    source["required"] = required
+                    self.report(checkout, unreviewed=[], sources=[source])
+                    document = self.assert_surface_gap_keeps_notice(checkout, before)
+                    reason = document["details"][-1]["surface_watch_reason"]
+                    self.assertIn("codex-features-list", reason)
+                    self.assertIn(origin, reason)
+
+    def test_coverage_complete_report_clears_previous_findings(self):
+        checkout = Checkout(self)
+        self.earlier_surface_notice(checkout)
+        self.report(checkout, unreviewed=[], kinds_not_observed={})
+        code, stdout, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        self.assertFalse(checkout.due_file.exists())
+        self.assertTrue(stdout.startswith("stack currency: nothing due (removed "), stdout)
+        document = self.document(checkout)
+        self.assertEqual(document["details"][-1]["surface_watch"], "fresh")
+        self.assertEqual(document["due"]["surface_unreviewed"], 0)
+        self.assertFalse(cd.incomplete(document))
+
+    def test_coverage_unavailable_or_skipped_cross_checks_still_clear_previous_findings(self):
+        for origin in ("unavailable", "skipped"):
+            with self.subTest(origin=origin):
+                checkout = Checkout(self)
+                self.earlier_surface_notice(checkout)
+                self.report(checkout, unreviewed=[], sources=[
+                    self.source("claude-env-vars-page", "network", NOW),
+                    self.source("xc-chenrui-lifecycle", origin, NOW, cross_check=True)])
+                code, stdout, stderr = checkout.run()
+                self.assertEqual(code, 0, stderr)
+                self.assertFalse(checkout.due_file.exists())
+                self.assertTrue(stdout.startswith("stack currency: nothing due (removed "), stdout)
+                document = self.document(checkout)
+                self.assertEqual(document["details"][-1]["surface_watch"], "fresh")
+                self.assertEqual(document["due"]["surface_unreviewed"], 0)
+                self.assertFalse(cd.incomplete(document))
+
+    def test_coverage_malformed_unobserved_kinds_are_unreadable(self):
+        for value in (None, [], "codex:feature", False, 1, {"codex:feature": None},
+                      {"codex:feature": []}, {"codex:feature": 1}):
+            with self.subTest(kinds_not_observed=value):
+                checkout = Checkout(self)
+                before = self.earlier_surface_notice(checkout)
+                self.report(checkout, raw=json.dumps({"schema_version": 1, "generated_at": NOW, "unreviewed": [], "coverage": {
+                    "sources": [self.source("claude-env-vars-page", "network", NOW)],
+                    "kinds_not_observed": value}}))
+                self.assert_surface_gap_keeps_notice(checkout, before, "surface watch output unreadable")
+
+    def test_a_report_of_another_schema_version_is_unreadable_and_keeps_the_notice(self):
+        # latest.json carries schema_version. After an upgrade, a rollback or a partly updated live checkout an older
+        # currency_due.py must not read a report whose generated_at and unreviewed fields may mean something else.
+        for label, version in (("a newer one", 2), ("an older one", 0), ("a string", "1"), ("a boolean", True),
+                               ("a float", 1.0), ("null", None), ("absent", self.NO_VERSION)):
+            with self.subTest(schema_version=label):
+                checkout = Checkout(self)
+                before = self.earlier_surface_notice(checkout)
+                self.report(checkout, unreviewed=[], schema_version=version)
+                document = self.assert_surface_gap_keeps_notice(checkout, before, "surface watch output unreadable")
+                self.assertIn("schema_version", document["details"][-1]["surface_watch_reason"])
+
+    def test_a_report_of_the_supported_schema_version_is_still_read(self):
+        # Control: the refusals above are not a blanket refusal of every report.
+        checkout = Checkout(self)
+        self.report(checkout, unreviewed=["codex:feature:brand_new"], schema_version=cd.SURFACE_SCHEMA_VERSION)
+        document = self.document(checkout)
+        self.assertEqual(document["due"].get("surface_unreviewed"), 1)
+
+    def test_the_supported_schema_version_is_the_one_the_watch_writes(self):
+        self.assertEqual(cd.SURFACE_SCHEMA_VERSION, usw.SCHEMA_VERSION)
+
+    def test_coverage_malformed_sources_are_unreadable(self):
+        for sources in (None, {}, "source", 1, [None], [[]], ["source"], [{}], [{"origin": None}],
+                        [{"origin": []}], [{"origin": 1}]):
+            with self.subTest(sources=sources):
+                checkout = Checkout(self)
+                before = self.earlier_surface_notice(checkout)
+                self.report(checkout, raw=json.dumps({"schema_version": 1, "generated_at": NOW, "unreviewed": [], "coverage": {
+                    "sources": sources, "kinds_not_observed": {}}}))
+                self.assert_surface_gap_keeps_notice(checkout, before, "surface watch output unreadable")
+
+    def test_coverage_gaps_without_previous_findings_write_no_notice(self):
+        for label, options in (("kind", {"kinds_not_observed": {"codex:feature": "binary not found"}}),
+                               ("source", {"sources": [self.source("codex-features-list", "unavailable", NOW)]})):
+            with self.subTest(gap=label):
+                checkout = Checkout(self)
+                self.report(checkout, unreviewed=[], **options)
+                code, stdout, stderr = checkout.run()
+                self.assertEqual(code, 0, stderr)
+                self.assertFalse(checkout.due_file.exists())
+                self.assertIn("surface watch incomplete", stdout)
+                self.assertIn("(no due-file)", stdout)
+                self.assertNotIn("nothing due", stdout)
+
+    def test_coverage_gaps_beside_other_counts_write_them_and_name_the_gap(self):
+        for label, options in (("kind", {"kinds_not_observed": {"codex:feature": "binary not found"}}),
+                               ("source", {"sources": [self.source("codex-features-list", "skipped", NOW)]})):
+            with self.subTest(gap=label):
+                checkout = Checkout(self)
+                checkout.something_due()
+                self.report(checkout, unreviewed=[], **options)
+                code, stdout, stderr = checkout.run()
+                self.assertEqual(code, 0, stderr)
+                self.assertIn("surface watch incomplete", stdout)
+                document = json.loads(checkout.due_file.read_text(encoding="utf-8"))
+                self.assertEqual(document["due"]["pins_behind"], 1)
+                self.assertNotIn("surface_unreviewed", document["due"])
+                self.assertEqual(document["details"][-1]["surface_watch"], "surface watch incomplete")
+                self.assertTrue(cd.incomplete(document))
+
+    def test_coverage_partial_report_does_not_count_remaining_findings(self):
+        checkout = Checkout(self)
+        before = self.earlier_surface_notice(checkout)
+        self.report(checkout, kinds_not_observed={"codex:feature": "probe failed"})
+        self.assert_surface_gap_keeps_notice(checkout, before)
+
+    def test_no_watch_report_is_a_coverage_note_and_no_count(self):
+        checkout = Checkout(self)
+        document = self.document(checkout)
+        self.assertEqual(list(document["due"]), list(cd.DUE_KEYS))
+        coverage = document["details"][-1]
+        self.assertEqual((coverage["surface_watch"], coverage["surface_watch_reason"]),
+                         ("surface watch not run", "no latest.json"))
+        _, text, _ = checkout.run("--dry-run")
+        self.assertIn("surface watch not run (no latest.json)", text)
+
+    def test_a_lost_report_after_a_watch_run_keeps_the_previous_findings(self):
+        """Local integration check, not an upstream test: deleting latest.json preserves the earlier notice."""
+        checkout = Checkout(self)
+        self.report(checkout)
+        code, _, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        before = checkout.due_file.read_bytes()
+        report = checkout.state / cd.SURFACE_DIR / cd.SURFACE_FILE
+        report.unlink()
+        self.assertEqual(stat.S_IMODE(report.parent.stat().st_mode), 0o700)
+        code, stdout, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        self.assertTrue(checkout.due_file.exists(), stdout)
+        self.assertEqual(checkout.due_file.read_bytes(), before)
+        line = stdout.split(" (kept ", 1)[0]
+        self.assertEqual(line, f"stack currency: nothing known due, surface watch stale; details: {checkout.command()}")
+        self.assertLessEqual(len(line), 160)
+        document = self.document(checkout)
+        self.assertEqual(document["details"][-1]["surface_watch"], "surface watch stale")
+
+    def test_an_observed_watch_without_a_usable_report_writes_no_empty_notice(self):
+        """Synthetic fixtures, not upstream tests: missing, unreadable and non-regular reports are gaps."""
+        for label, contents in (("missing", None), ("unreadable", b"{not json"), ("directory", None),
+                                ("fifo", None), ("dangling symlink", None)):
+            with self.subTest(report=label):
+                checkout = Checkout(self)
+                report = checkout.state / cd.SURFACE_DIR / cd.SURFACE_FILE
+                report.parent.mkdir(mode=0o700, parents=True)
+                if contents is not None:
+                    report.write_bytes(contents)
+                elif label == "directory":
+                    report.mkdir()
+                elif label == "fifo":
+                    os.mkfifo(report)
+                elif label == "dangling symlink":
+                    report.symlink_to(report.parent / "lost.json")
+                code, stdout, stderr = checkout.run()
+                self.assertEqual(code, 0, stderr)
+                self.assertFalse(checkout.due_file.exists())
+                self.assertTrue(stdout.startswith("stack currency: nothing known due, surface watch "), stdout)
+                self.assertIn("(no due-file)", stdout)
+                line = stdout.split(" (no due-file)", 1)[0]
+                self.assertTrue(line.endswith(f"; details: {checkout.command()}"), line)
+                self.assertLessEqual(len(line), 160)
+
+    def test_a_fresh_report_adds_the_sixth_count_and_writes_the_notice(self):
+        checkout = Checkout(self)
+        self.report(checkout)
+        code, _, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        document = json.loads(checkout.due_file.read_text(encoding="utf-8"))
+        self.assertEqual(document["due"], {"pins_behind": 0, "stale_receipts": 0, "due_layers": 0,
+                                           "reopen_triggers": 0, "host_alerts": 0, "surface_unreviewed": 3})
+        line = document["summary_line"]
+        self.assertTrue(line.startswith("stack currency: 3 unreviewed upstream switches; details: "), line)
+        self.assertTrue(line.endswith(f"; details: {checkout.command()}"), line)
+        self.assertLessEqual(len(line), 160)
+        found = next(item for item in document["details"] if item["kind"] == "surface_unreviewed")
+        self.assertEqual((found["count"], found["keys"], found["generated_at"]), (3, self.KEYS, "2026-09-29T12:00:00Z"))
+        self.assertEqual(document["details"][-1]["surface_watch"], "fresh")
+        _, text, _ = checkout.run("--dry-run")
+        self.assertIn("upstream switches: 3 new without a disposition (watch of 2026-09-29T12:00:00Z)", text)
+        self.assertIn("upstream switches: python3 scripts/upstream_surface_watch.py --dry-run", text)
+
+    def test_the_count_joins_the_others_in_the_line(self):
+        checkout = Checkout(self)
+        checkout.something_due()
+        self.report(checkout)
+        line = self.document(checkout)["summary_line"]
+        self.assertTrue(line.startswith("stack currency: 1 pin behind, 2 stale receipts, 1 layer"), line)
+        self.assertLessEqual(len(line), 160)
+
+    def test_the_report_counts_for_three_days_and_no_longer(self):
+        cases = {"2026-09-27T12:00:00Z": 3, "2026-09-27T11:59:59Z": None, "2026-09-30T12:59:00Z": 3,
+                 "2026-09-30T13:00:01Z": None}
+        for generated_at, expected in cases.items():
+            with self.subTest(generated_at=generated_at):
+                checkout = Checkout(self)
+                self.report(checkout, generated_at)
+                document = self.document(checkout)
+                self.assertEqual(document["due"].get("surface_unreviewed"), expected)
+                coverage = document["details"][-1]
+                if expected is None:
+                    self.assertEqual(coverage["surface_watch"], "surface watch stale")
+                    self.assertIn(generated_at, coverage["surface_watch_reason"])
+
+    def test_a_report_is_aged_by_its_oldest_cached_source_not_by_generated_at_alone(self):
+        # H1: a --network run whose fetch fell back to the cache is as old as that cache. The watch writes
+        # generated_at so; this report says otherwise, and the per-source records still age it. A cross-check from
+        # the cache is report-only and does not.
+        old, fresh = "2026-09-26T12:00:00Z", "2026-09-30T06:00:00Z"
+        cases = {
+            "a required source from the cache": ([self.source("claude-env-vars-page", "network", fresh),
+                                                  self.source("claude-mods-overview-page",
+                                                              "cache; the network fetch failed: OSError: x", old)],
+                                                 None),
+            "an offline replay": ([self.source("claude-env-vars-page", "cache", old)], None),
+            "a cross-check from the cache": ([self.source("claude-env-vars-page", "network", fresh),
+                                              self.source("xc-chenrui-lifecycle", "cache", old, cross_check=True)],
+                                             3),
+        }
+        for label, (sources, expected) in cases.items():
+            with self.subTest(case=label):
+                checkout = Checkout(self)
+                self.report(checkout, fresh, sources=sources)
+                document = self.document(checkout)
+                self.assertEqual(document["due"].get("surface_unreviewed"), expected)
+                coverage = document["details"][-1]
+                if expected is None:
+                    self.assertEqual(coverage["surface_watch"], "surface watch stale")
+                    self.assertIn(f"data of {old} is more than 3 days old", coverage["surface_watch_reason"])
+
+    def test_an_unreadable_report_is_an_incomplete_check_never_an_error(self):
+        cases = {"not JSON": "{not json", "an array": "[]",
+                 "no unreviewed list": json.dumps({"schema_version": 1, "generated_at": NOW, "unreviewed": "x"}),
+                 "keys that are not strings": json.dumps({"schema_version": 1, "generated_at": NOW, "unreviewed": [1]}),
+                 "no time": json.dumps({"schema_version": 1, "generated_at": "yesterday", "unreviewed": []}),
+                 "no per-source records": json.dumps({"schema_version": 1, "generated_at": NOW, "unreviewed": []}),
+                 "a cached source without a time": json.dumps({"schema_version": 1, "generated_at": NOW, "unreviewed": [], "coverage": {
+                     "sources": [{"source": "s", "origin": "cache", "fetched_utc": None}]}}),
+                 "nested too deeply": "[" * 200000 + "]" * 200000}
+        for label, raw in cases.items():
+            with self.subTest(report=label):
+                checkout = Checkout(self)
+                self.report(checkout, raw=raw)
+                code, stdout, stderr = checkout.run()
+                self.assertEqual(code, 0, stderr)
+                self.assertFalse(checkout.due_file.exists())
+                self.assertIn("(no due-file)", stdout)
+                document = self.document(checkout)
+                self.assertNotIn("surface_unreviewed", document["due"])
+                self.assertEqual(document["details"][-1]["surface_watch"], "surface watch output unreadable")
+                self.assertEqual(document["summary_line"], "stack currency: nothing known due, surface watch "
+                                                           f"unreadable; details: {checkout.command()}")
+
+    def test_a_stale_or_unreadable_report_keeps_the_earlier_due_file_and_never_says_nothing_due(self):
+        # M4: a report that exists but could not answer is a check that could not answer, as an incomplete skill
+        # check is: the earlier notice stays byte-identical and the line names the gap with a runnable command.
+        for label, change in (("stale", lambda c: self.report(c, "2026-09-26T12:00:00Z")),
+                              ("future-dated", lambda c: self.report(c, "2026-09-30T14:00:00Z")),
+                              ("unreadable", lambda c: self.report(c, raw="{not json"))):
+            with self.subTest(report=label):
+                checkout = Checkout(self)
+                change(checkout)
+                checkout.state.mkdir(parents=True, exist_ok=True)
+                checkout.due_file.write_text('{"earlier": true}\n', encoding="utf-8")
+                before = checkout.due_file.read_bytes()
+                code, stdout, stderr = checkout.run()
+                self.assertEqual(code, 0, stderr)
+                self.assertEqual(checkout.due_file.read_bytes(), before)
+                self.assertIn(f"(kept {checkout.due_file})", stdout)
+                line = stdout.split(" (kept ", 1)[0]
+                self.assertTrue(line.startswith("stack currency: nothing known due, surface watch "), line)
+                self.assertNotIn("nothing due", line.replace("nothing known due", ""))
+                self.assertTrue(line.endswith(f"; details: {checkout.command()}"), line)
+                self.assertLessEqual(len(line), 160)
+                _, text, _ = checkout.run("--dry-run")
+                self.assertIn("surface watch: journalctl --user -u upstream-surface-watch.service", text)
+
+    def test_a_missing_report_stays_silent_and_nothing_due_still_clears_the_notice(self):
+        # No latest.json: the watch unit may not be installed on this host, so it is only the coverage note.
+        checkout = Checkout(self)
+        checkout.state.mkdir(parents=True, exist_ok=True)
+        checkout.due_file.write_text('{"earlier": true}\n', encoding="utf-8")
+        code, stdout, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        self.assertFalse(checkout.due_file.exists())
+        self.assertTrue(stdout.startswith("stack currency: nothing due (removed "), stdout)
+
+    def test_a_stale_report_beside_other_counts_writes_them_and_names_the_gap(self):
+        checkout = Checkout(self)
+        checkout.something_due()
+        self.report(checkout, "2026-09-26T12:00:00Z")
+        code, stdout, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        self.assertIn("; surface watch stale", stdout)
+        document = json.loads(checkout.due_file.read_text(encoding="utf-8"))
+        self.assertNotIn("surface_unreviewed", document["due"])
+        self.assertTrue(document["summary_line"].startswith("stack currency: 1 pin behind"), document["summary_line"])
+        self.assertEqual(document["details"][-1]["surface_watch"], "surface watch stale")
+
+    def test_the_gap_line_keeps_the_skill_only_form_and_its_limit(self):
+        zero = {key: 0 for key in cd.DUE_KEYS}
+        command = "python3 ~/code/native-agent-stack-live/scripts/currency_due.py --dry-run --network"
+        self.assertEqual(cd.summary_line(zero, command, False), "stack currency: nothing known due, skill check "
+                                                                 "incomplete")
+        self.assertEqual(cd.summary_line(zero, command, True, [], ("surface watch stale",)),
+                         f"stack currency: nothing known due, surface watch stale; details: {command}")
+        short = "python3 ~/live/scripts/currency_due.py --dry-run --network"
+        self.assertEqual(cd.summary_line(zero, short, False, [], ("surface watch stale",)),
+                         "stack currency: nothing known due, skill check incomplete, surface watch stale; details: "
+                         f"{short}")
+        # Both gaps and this command exceed 160 characters: the line keeps the gaps and drops the command.
+        self.assertEqual(cd.summary_line(zero, command, False, [], ("surface watch stale",)),
+                         "stack currency: nothing known due, skill check incomplete, surface watch stale")
+        long_line = cd.summary_line(zero, "python3 " + "z" * 150 + " --dry-run", True, ["cat /x"],
+                                    ("surface watch stale",))
+        self.assertEqual(long_line, "stack currency: nothing known due, surface watch stale")
+
+    def test_read_record_is_bounded_and_never_raises(self):
+        # L3: deep nesting (RecursionError in the json module), an oversized file, a directory and a FIFO (whose read
+        # would block) are each an unreadable record, never a traceback.
+        with tempfile.TemporaryDirectory(dir=short_temp_base()) as scratch:
+            base = Path(scratch)
+            deep = base / "deep.json"
+            deep.write_text("[" * 200000 + "]" * 200000, encoding="utf-8")
+            self.assertEqual(cd.read_record(deep), {"error": "not JSON"})
+            big = base / "big.json"
+            big.write_bytes(b" " * (cd.RECORD_MAX_BYTES + 1))
+            self.assertEqual(cd.read_record(big), {"error": f"larger than {cd.RECORD_MAX_BYTES} bytes"})
+            self.assertEqual(cd.read_record(base), {"error": "not a regular file"})
+            fifo = base / "fifo"
+            os.mkfifo(fifo)
+            self.assertEqual(cd.read_record(fifo), {"error": "not a regular file"})
+            self.assertIsNone(cd.read_record(base / "absent.json"))
+            self.assertEqual(cd.read_record(base / "absent.json" / "below"), None)
+
+    def test_a_fresh_report_with_nothing_unreviewed_is_zero_and_clears_the_notice(self):
+        checkout = Checkout(self)
+        self.report(checkout, unreviewed=[])
+        checkout.due_file.write_text('{"earlier": true}\n', encoding="utf-8")
+        code, _, stderr = checkout.run()
+        self.assertEqual(code, 0, stderr)
+        self.assertFalse(checkout.due_file.exists())
+        self.assertEqual(self.document(checkout)["due"]["surface_unreviewed"], 0)
+
+    def test_the_report_is_read_offline(self):
+        import socket
+
+        def refuse(*args, **kwargs):
+            raise AssertionError("currency_due.py opened a socket")
+
+        checkout = Checkout(self)
+        self.report(checkout)
+        with mock.patch.object(socket, "socket", side_effect=refuse), \
+                mock.patch.object(socket, "create_connection", side_effect=refuse):
+            document = self.document(checkout)
+        self.assertEqual(document["due"]["surface_unreviewed"], 3)
+
+    def test_a_direct_aggregate_without_a_state_directory_checks_nothing(self):
+        document = cd.aggregate(AggregateShapeTests.reports(), NOW_DATETIME, NOW, 30)
+        self.assertNotIn("surface_unreviewed", document["due"])
+        self.assertIsNone(document["details"][-1]["surface_watch"])
+
+    def test_the_line_keeps_its_limit_with_all_six_counts(self):
+        due = {key: 9999 for key in cd.COUNT_KEYS}
+        line = cd.summary_line(due, "python3 ~/code/native-agent-stack-live/scripts/currency_due.py --dry-run")
+        self.assertLessEqual(len(line), 160)
+        self.assertTrue(line.endswith("; details: python3 ~/code/native-agent-stack-live/scripts/currency_due.py "
+                                      "--dry-run"))
 
 
 class ThisCheckoutTests(unittest.TestCase):
@@ -994,6 +1628,32 @@ class UnitTemplateTests(unittest.TestCase):
         self.assertEqual(code, 0, stderr)
         summary = json.loads(checkout.due_file.read_text(encoding="utf-8"))["summary_line"]
         self.assertEqual(shlex.split(summary.split("; details: ", 1)[1])[2:], ["--dry-run", *flags])
+
+    def test_the_service_runs_the_surface_watch_first_and_never_waits_on_its_success(self):
+        # Wants= is weak and After= only orders (systemd.unit(5)); a hard dependency would let a failed watch block
+        # the currency run.
+        self.assertIn("Wants=upstream-surface-watch.service", self.service)
+        self.assertIn("After=upstream-surface-watch.service", self.service)
+        directives = [line for line in self.service if line and not line.startswith("#")]
+        hard = ("Requires=", "Requisite=", "BindsTo=", "PartOf=", "Upholds=")
+        self.assertFalse([line for line in directives if line.startswith(hard)])
+        self.assertLess(directives.index("After=upstream-surface-watch.service"), directives.index("[Service]"))
+
+    def test_the_surface_watch_is_a_guarded_networked_oneshot_that_only_the_currency_service_starts(self):
+        watch = (SYSTEMD_DIR / "upstream-surface-watch.service").read_text(encoding="utf-8").splitlines()
+        for setting in ("Type=oneshot", "UMask=0077", "NoNewPrivileges=true", "Environment=PYTHONDONTWRITEBYTECODE=1",
+                        "ExecStart=/usr/bin/python3 @REPOSITORY@/scripts/upstream_surface_watch.py --network"):
+            self.assertIn(setting, watch)
+        self.assertNotIn("[Install]", watch)
+        directives = [line for line in watch if line and not line.startswith("#")]
+        self.assertTrue(any(line.startswith("TimeoutStartSec=") for line in directives))
+        search_path = next(line for line in directives if line.startswith("Environment=PATH="))
+        self.assertIn("%h/.local/share/codex-ecosystem/bin", search_path)  # gh and codex resolve through PATH
+        self.assertTrue((ROOT / "scripts/upstream_surface_watch.py").is_file())
+        # The watch writes the directory this script reads.
+        from scripts import upstream_surface_watch as usw
+        self.assertEqual(usw.default_state_dir({"HOME": "/h"}), cd.default_state_dir({"HOME": "/h"}) / cd.SURFACE_DIR)
+        self.assertEqual(usw.LATEST_FILE, cd.SURFACE_FILE)
 
     def test_the_timer_runs_daily_catches_up_and_spreads_its_start(self):
         for setting in ("OnCalendar=daily", "Persistent=true", "RandomizedDelaySec=15m",

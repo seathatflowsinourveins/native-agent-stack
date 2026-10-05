@@ -1,19 +1,36 @@
-"""Synthetic fixtures for scripts/trading_gates.py (local integration; no receipts are replayed)."""
+"""Synthetic fixtures for scripts/trading_gates.py (local integration; no receipts are replayed).
+
+The live-go signature tests run the host's real ssh-keygen -Y sign/verify with
+throwaway keys made in temporary directories; they skip on a host without
+ssh-keygen, and no key or signature is committed."""
 from __future__ import annotations
 
+import contextlib
 import copy
 import hashlib
+import io
 import json
+import os
+import shutil
+import subprocess
 import sys
 import tempfile
 from decimal import Decimal
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 
 import trading_gates  # noqa: E402
+
+SSH_KEYGEN = shutil.which("ssh-keygen")
+SIGNER = "live-go-signer"
+NAMESPACE = "live-go@native-agent-stack"
+LIVE_GO_MD = "docs/decisions/live-go.md"
+LIVE_GO_SIG = "docs/decisions/live-go.md.sig"
+LIVE_GO_SIGNERS = "docs/decisions/live-go.allowed_signers"
 
 
 def gate(**overrides):
@@ -69,11 +86,59 @@ def write_ladder_sources(root: Path) -> None:
         path.write_bytes(data)
 
 
-def document(*gates):
-    return {"schema_version": 1, "rungs": ["sim", "paper", "live"], "gates": list(gates)}
+def document(*gates, authorship=None):
+    doc = {"schema_version": 1, "rungs": ["sim", "paper", "live"], "gates": list(gates)}
+    if authorship is not None:
+        doc["authorship"] = authorship
+    return doc
 
 
-class TradingGatesTests(unittest.TestCase):
+def live_go(**overrides):
+    """A live-go row in the repository's shape: owned by user-decision, null flip condition."""
+    return gate(**{"id": "live-go", "rung": "live", "layer": "cross-layer", "status": "user_decision",
+                   "owner": "user-decision", "evidence_class": "none", "receipt_path": LIVE_GO_MD,
+                   "flip_condition": None, **overrides})
+
+
+def live_go_control(**overrides):
+    control = {"method": "ssh-keygen -Y verify", "signature_path": LIVE_GO_SIG,
+               "allowed_signers_path": LIVE_GO_SIGNERS, "principal": SIGNER, "namespace": NAMESPACE, "note": ""}
+    control.update(overrides)
+    return control
+
+
+def run_ssh_keygen(*args):
+    """The host's ssh-keygen without an agent socket; stdin is closed so a prompt fails instead of waiting."""
+    env = {key: value for key, value in os.environ.items() if key != "SSH_AUTH_SOCK"}
+    return subprocess.run([SSH_KEYGEN, *args], stdin=subprocess.DEVNULL, capture_output=True, env=env,
+                          timeout=60, check=True)
+
+
+class ThrowawaySigner:
+    """An ed25519 key generated for one test in its own temporary directory,
+    outside the synthetic tree under test. Nothing here is committed: the
+    directory is removed when the test ends."""
+
+    def __init__(self, directory: Path, name: str):
+        self.key = directory / f"{name}_ed25519"
+        run_ssh_keygen("-q", "-t", "ed25519", "-N", "", "-C", name, "-f", str(self.key))
+
+    def allowed_signers_line(self, principal=SIGNER, options=f'namespaces="{NAMESPACE}"'):
+        kind, blob = Path(f"{self.key}.pub").read_text(encoding="utf-8").split()[:2]
+        return f"{principal} {options} {kind} {blob}\n"
+
+    def sign(self, data: bytes, namespace=NAMESPACE) -> bytes:
+        """Sign a fresh copy (ssh-keygen -Y sign prompts before overwriting a .sig) and return the signature."""
+        with tempfile.TemporaryDirectory() as scratch:
+            copy_path = Path(scratch) / "document"
+            copy_path.write_bytes(data)
+            run_ssh_keygen("-Y", "sign", "-f", str(self.key), "-n", namespace, str(copy_path))
+            return Path(f"{copy_path}.sig").read_bytes()
+
+
+class GateTreeCase(unittest.TestCase):
+    """A synthetic repository tree in a temporary directory."""
+
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
@@ -87,10 +152,25 @@ class TradingGatesTests(unittest.TestCase):
         path.write_text(json.dumps(payload), encoding="utf-8")
         return path
 
+    def put(self, relative, data: bytes):
+        path = self.root / relative
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+        return path
+
     def run_check(self, doc):
         path = self.write("gates.json", doc)
         return trading_gates.check(self.root, path)
 
+    def ladder(self, live_go_row, control=None):
+        """Every other required gate established with a holding receipt, so live-go alone decides the live rung."""
+        self.write("r.json", {"ok": True})
+        return document(gate(id="sim-gate", rung="sim"), gate(id="paper-gate", rung="paper"),
+                        gate(id="live-gate", rung="live"), live_go_row,
+                        authorship={"live-go": control or live_go_control()})
+
+
+class TradingGatesTests(GateTreeCase):
     def test_established_gate_with_matching_receipt_passes(self):
         self.write("r.json", {"ok": True})
         result = self.run_check(document(gate()))
@@ -161,8 +241,8 @@ class TradingGatesTests(unittest.TestCase):
         self.write("r.json", {"ok": True})
         sim = gate(id="sim-gate", rung="sim")
         paper = gate(id="paper-gate", rung="paper", status="not_established")
-        live = gate(id="live-go", rung="live", status="user_decision", evidence_class="none", flip_condition=None)
-        result = self.run_check(document(sim, paper, live))
+        # live-go now needs its authorship control named (and is owned by user-decision, as in the repository).
+        result = self.run_check(document(sim, paper, live_go(), authorship={"live-go": live_go_control()}))
         self.assertTrue(result["rung_ready"]["sim"])
         self.assertFalse(result["rung_ready"]["paper"])
         self.assertFalse(result["rung_ready"]["live"])
@@ -295,6 +375,18 @@ class TradingGatesTests(unittest.TestCase):
                 holds, detail = trading_gates.condition_holds(self.root, gate(flip_condition=condition))
                 self.assertFalse(holds, detail)
                 self.assertIn("source_matches", detail)
+        # A symlink loop at the source path is refused, not raised: Path.resolve() raises
+        # RuntimeError on a loop in Python 3.12 and earlier (OSError from 3.13).
+        with self.subTest(case="path_symlink_loop"):
+            loop = self.root / "src" / "loop.json"
+            try:
+                loop.symlink_to(loop.name)
+            except (OSError, NotImplementedError):
+                self.skipTest("symbolic links are unavailable here")
+            self.write("r.json", {**good, "source": {**good["source"], "path": "src/loop.json"}})
+            holds, detail = trading_gates.condition_holds(self.root, gate(flip_condition=condition))
+            self.assertFalse(holds, detail)
+            self.assertIn("source_matches: src/loop.json cannot be resolved", detail)
         # A source that hashes correctly but is not JSON is refused, not crashed on.
         (self.root / "src" / "out.json").write_bytes(b"not json")
         self.write("r.json", {**good, "source": {**good["source"], "sha256": hashlib.sha256(b"not json").hexdigest()}})
@@ -616,6 +708,390 @@ class LeverageLadderFlipConditionTests(unittest.TestCase):
                 holds, detail = self.holds(gate_id, stitched)
                 self.assertFalse(holds, detail)
                 self.assertIn("/leverage != source /leverage", detail)
+
+
+class UserDecisionEvidenceTests(GateTreeCase):
+    """Checker hardening (2026-09-25), item 1: an evidence class for user
+    decisions, valid only for a gate owned by user-decision whose flip_condition
+    is null."""
+
+    def test_user_decision_is_an_evidence_class(self):
+        self.assertIn("user_decision", trading_gates.EVIDENCE)
+
+    def test_valid_only_for_user_owned_gates_without_a_flip_condition(self):
+        for status in ("established", "user_decision", "not_established"):
+            with self.subTest(status=status):
+                trading_gates.validate_document(document(gate(
+                    id="choice", owner="user-decision", flip_condition=None, evidence_class="user_decision",
+                    status=status)))
+        for case, bad in {
+            "owned by this-effort": gate(owner="this-effort", flip_condition=None, evidence_class="user_decision"),
+            "owned by the peer": gate(owner="peer:sota-workflow-resolution", flip_condition=None,
+                                      evidence_class="user_decision"),
+            "equals flip condition": gate(owner="user-decision", evidence_class="user_decision"),
+            "exists flip condition": gate(owner="user-decision", flip_condition={"type": "exists"},
+                                          evidence_class="user_decision"),
+            "not established either": gate(owner="user-decision", status="not_established",
+                                           evidence_class="user_decision"),
+        }.items():
+            with self.subTest(case=case):
+                with self.assertRaises(trading_gates.GateError) as caught:
+                    trading_gates.validate_document(document(bad))
+                self.assertIn("evidence_class user_decision is valid only for a gate owned by user-decision",
+                              str(caught.exception))
+
+    def test_other_gates_keep_their_evidence_rules(self):
+        # A user-decision gate with a flip condition still records any other class,
+        # and a null-condition gate that is not live-go keeps the presence rule.
+        trading_gates.validate_document(document(gate(owner="user-decision", evidence_class="native_proven")))
+        self.put("decision.md", b"# decision\n")
+        result = self.run_check(document(gate(receipt_path="decision.md", flip_condition=None)))
+        self.assertEqual(result["status"], "passed")
+        self.assertEqual(result["authorship"], {})
+
+
+class ReadinessRequiresHoldingEvidenceTests(GateTreeCase):
+    """Checker hardening (2026-09-25), item 2. Simulation V1 of the readiness
+    plan showed status failed alongside rung_ready.live true, because rung_ready
+    and blocking read only the recorded status. A required gate now counts only
+    while it is recorded established and its condition holds."""
+
+    def test_established_gate_whose_condition_fails_blocks_its_rung_and_every_later_rung(self):
+        self.write("sim.json", {"ok": True})
+        self.write("paper.json", {"ok": False})
+        self.write("live.json", {"ok": True})
+        gates = (gate(id="sim-gate", rung="sim", receipt_path="sim.json"),
+                 gate(id="paper-gate", rung="paper", receipt_path="paper.json"),
+                 gate(id="live-gate", rung="live", receipt_path="live.json"))
+        result = self.run_check(document(*gates))
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(len(result["errors"]), 1)
+        self.assertIn("paper-gate: recorded established but", result["errors"][0])
+        self.assertEqual(result["rung_ready"], {"sim": True, "paper": False, "live": False})
+        self.assertEqual(result["blocking"], {"sim": [], "paper": ["paper-gate"], "live": ["paper-gate"]})
+        self.write("paper.json", {"ok": True})
+        result = self.run_check(document(*gates))
+        self.assertEqual(result["status"], "passed")
+        self.assertEqual(result["rung_ready"], {"sim": True, "paper": True, "live": True})
+        self.assertEqual(result["blocking"], {"sim": [], "paper": [], "live": []})
+
+    def test_established_gate_with_a_missing_or_empty_receipt_blocks(self):
+        (self.root / "empty.md").write_text("", encoding="utf-8")
+        for case, row in {
+            "missing receipt": gate(id="g", receipt_path="absent.json"),
+            "empty presence-only receipt": gate(id="g", receipt_path="empty.md", flip_condition={"type": "exists"}),
+        }.items():
+            with self.subTest(case=case):
+                result = self.run_check(document(row))
+                self.assertEqual(result["status"], "failed")
+                self.assertFalse(result["rung_ready"]["sim"])
+                self.assertEqual(result["blocking"]["sim"], ["g"])
+
+    def test_optional_established_gate_that_fails_is_an_error_but_does_not_block(self):
+        self.write("r.json", {"ok": True})
+        self.write("opt.json", {"ok": False})
+        result = self.run_check(document(gate(), gate(id="opt", required=False, receipt_path="opt.json")))
+        self.assertEqual(result["status"], "failed")
+        self.assertTrue(result["rung_ready"]["sim"])
+        self.assertEqual(result["blocking"]["sim"], [])
+
+    def test_repository_ladder_recorded_established_without_receipts_is_not_ready(self):
+        # Simulation V1 on the repository's own rows: every required gate is
+        # recorded established (live-go with user_decision evidence) in a tree
+        # that holds none of their receipts.
+        path = ROOT / trading_gates.GATES
+        if not path.exists():
+            self.skipTest("gate ladder not yet recorded in this tree")
+        doc = copy.deepcopy(trading_gates.load_json(path))
+        required = []
+        for row in doc["gates"]:
+            if row["required"]:
+                row["status"] = "established"
+                row["evidence_class"] = "user_decision" if row["id"] == "live-go" else "synthetic"
+                required.append(row)
+        result = self.run_check(doc)
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(result["rung_ready"], {"sim": False, "paper": False, "live": False})
+        self.assertEqual(result["blocking"]["live"], [row["id"] for row in required])
+        self.assertEqual(result["blocking"]["sim"], [row["id"] for row in required if row["rung"] == "sim"])
+        self.assertIn("live-go", result["blocking"]["live"])
+
+
+class LiveGoAuthorshipTests(GateTreeCase):
+    """Checker hardening (2026-09-25), item 3: live-go counts only when a
+    detached SSH signature over its receipt verifies with ssh-keygen -Y verify
+    against the allowed_signers file the catalog names. Every case here fails
+    before ssh-keygen would run, or replaces it with a stub."""
+
+    def established(self):
+        return live_go(status="established", evidence_class="user_decision")
+
+    def assert_fails_closed(self, result, reason):
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(len(result["errors"]), 1, result["errors"])
+        self.assertTrue(result["errors"][0].startswith("live-go: recorded established but "), result["errors"])
+        self.assertIn(reason, result["errors"][0])
+        self.assertFalse(result["rung_ready"]["live"])
+        self.assertEqual(result["blocking"]["live"], ["live-go"])
+        self.assertFalse(result["authorship"]["live-go"]["verified"])
+        self.assertIn(reason, result["authorship"]["live-go"]["detail"])
+
+    def test_live_go_must_name_its_control(self):
+        with self.assertRaises(trading_gates.GateError) as caught:
+            trading_gates.validate_document(document(live_go()))
+        self.assertIn("live-go: the catalog must name its authorship control", str(caught.exception))
+        trading_gates.validate_document(document(live_go(), authorship={"live-go": live_go_control()}))
+
+    def test_control_shape_errors_are_rejected(self):
+        row = live_go()
+        control = live_go_control()
+        cases = {
+            "authorship is a list": document(row, authorship=[control]),
+            "authorship is null": {**document(row), "authorship": None},
+            "unknown gate": document(row, authorship={"live-go": control, "ghost": control}),
+            "gate with a flip condition": document(row, gate(id="cond", owner="user-decision"),
+                                                   authorship={"live-go": control, "cond": control}),
+            "gate not owned by user-decision": document(live_go(owner="this-effort"), authorship={"live-go": control}),
+            "control is not an object": document(row, authorship={"live-go": "ssh-keygen -Y verify"}),
+            "missing field": document(row, authorship={"live-go": {k: v for k, v in control.items() if k != "namespace"}}),
+            "extra field": document(row, authorship={"live-go": {**control, "public_key": "ssh-ed25519 AAAA"}}),
+            "other method": document(row, authorship={"live-go": live_go_control(method="gpg --verify")}),
+            "absolute signature path": document(row, authorship={"live-go": live_go_control(signature_path="/etc/x.sig")}),
+            "escaping signers path": document(row, authorship={"live-go": live_go_control(allowed_signers_path="../signers")}),
+            "backslash path": document(row, authorship={"live-go": live_go_control(signature_path="docs\\live-go.md.sig")}),
+            "empty path": document(row, authorship={"live-go": live_go_control(allowed_signers_path="")}),
+            "non-string path": document(row, authorship={"live-go": live_go_control(signature_path=7)}),
+            "signature is the receipt": document(row, authorship={"live-go": live_go_control(signature_path=LIVE_GO_MD)}),
+            "signers file is the receipt": document(row, authorship={"live-go": live_go_control(
+                allowed_signers_path="docs/decisions/./live-go.md")}),
+            "signers file is the signature": document(row, authorship={"live-go": live_go_control(
+                allowed_signers_path=LIVE_GO_SIG)}),
+            "empty principal": document(row, authorship={"live-go": live_go_control(principal="")}),
+            "option-like principal": document(row, authorship={"live-go": live_go_control(principal="-Overify-time=1")}),
+            "principal with a space": document(row, authorship={"live-go": live_go_control(principal="live go")}),
+            "principal with a newline": document(row, authorship={"live-go": live_go_control(principal="live\ngo")}),
+            "non-string namespace": document(row, authorship={"live-go": live_go_control(namespace=None)}),
+            "option-like namespace": document(row, authorship={"live-go": live_go_control(namespace="-n")}),
+            "non-string note": document(row, authorship={"live-go": live_go_control(note=None)}),
+            "established with another evidence class": document(
+                live_go(status="established", evidence_class="native_proven"), authorship={"live-go": control}),
+        }
+        for case, doc in cases.items():
+            with self.subTest(case=case), self.assertRaises(trading_gates.GateError):
+                trading_gates.validate_document(doc)
+
+    def test_live_go_fails_closed_without_its_signature_or_allowed_signers_file(self):
+        document_bytes = b"# live go\n"
+        cases = {
+            "nothing written": ({}, "receipt missing"),
+            "document only": ({LIVE_GO_MD: document_bytes}, "allowed_signers file missing"),
+            "document and signature": ({LIVE_GO_MD: document_bytes, LIVE_GO_SIG: b"signature"},
+                                       "allowed_signers file missing"),
+            "document and allowed_signers": ({LIVE_GO_MD: document_bytes, LIVE_GO_SIGNERS: b"signer line\n"},
+                                             "signature missing"),
+            "empty document": ({LIVE_GO_MD: b"", LIVE_GO_SIG: b"signature", LIVE_GO_SIGNERS: b"signer line\n"},
+                               "receipt present but empty"),
+            "empty allowed_signers file": ({LIVE_GO_MD: document_bytes, LIVE_GO_SIG: b"signature",
+                                            LIVE_GO_SIGNERS: b""}, "allowed_signers file empty"),
+            "empty signature": ({LIVE_GO_MD: document_bytes, LIVE_GO_SIG: b"", LIVE_GO_SIGNERS: b"signer line\n"},
+                                "signature empty"),
+        }
+        for case, (files, reason) in cases.items():
+            with self.subTest(case=case):
+                for relative in (LIVE_GO_MD, LIVE_GO_SIG, LIVE_GO_SIGNERS):
+                    (self.root / relative).unlink(missing_ok=True)
+                for relative, data in files.items():
+                    self.put(relative, data)
+                # Nothing is verified when a file is absent or empty: ssh-keygen never runs.
+                with mock.patch.object(trading_gates.subprocess, "run",
+                                       side_effect=AssertionError("ssh-keygen must not run")):
+                    self.assert_fails_closed(self.run_check(self.ladder(self.established())), reason)
+                    # Not recorded established, the same tree is simply not ready: no error.
+                    result = self.run_check(self.ladder(live_go()))
+                self.assertEqual(result["status"], "passed")
+                self.assertEqual(result["blocking"]["live"], ["live-go"])
+                self.assertEqual(result["flip_candidates"], [])
+
+    def test_live_go_fails_closed_when_ssh_keygen_is_missing_or_does_not_verify(self):
+        self.put(LIVE_GO_MD, b"# live go\n")
+        self.put(LIVE_GO_SIG, b"signature")
+        self.put(LIVE_GO_SIGNERS, b"signer line\n")
+        with mock.patch.object(trading_gates.shutil, "which", return_value=None):
+            self.assert_fails_closed(self.run_check(self.ladder(self.established())), "ssh-keygen not found")
+        for error in (subprocess.TimeoutExpired(cmd="ssh-keygen", timeout=30), OSError("exec format error")):
+            with self.subTest(error=type(error).__name__), \
+                    mock.patch.object(trading_gates.shutil, "which", return_value="ssh-keygen"), \
+                    mock.patch.object(trading_gates.subprocess, "run", side_effect=error):
+                self.assert_fails_closed(self.run_check(self.ladder(self.established())), "did not complete")
+        # The exit status decides: a non-zero exit is a refusal whatever the tool printed.
+        refused = subprocess.CompletedProcess(args=[], returncode=255, stdout=b'Good "x" signature for y\n', stderr=b"")
+        with mock.patch.object(trading_gates.shutil, "which", return_value="ssh-keygen"), \
+                mock.patch.object(trading_gates.subprocess, "run", return_value=refused) as run:
+            self.assert_fails_closed(self.run_check(self.ladder(self.established())), "does not verify")
+        command = run.call_args.args[0]
+        self.assertEqual(command[:3], ["ssh-keygen", "-Y", "verify"])
+        self.assertEqual(command[3:], ["-f", f"./{LIVE_GO_SIGNERS}", "-I", SIGNER, "-n", NAMESPACE,
+                                       "-s", f"./{LIVE_GO_SIG}"])
+        self.assertEqual(run.call_args.kwargs["input"], b"# live go\n")
+        self.assertEqual(Path(run.call_args.kwargs["cwd"]), self.root.resolve())
+
+    def test_paths_that_resolve_outside_the_tree_fail_closed(self):
+        self.put(LIVE_GO_MD, b"# live go\n")
+        self.put(LIVE_GO_SIG, b"signature")
+        link = self.root / LIVE_GO_SIGNERS
+        with tempfile.TemporaryDirectory() as outside:
+            target = Path(outside) / "allowed_signers"
+            target.write_text("signer line\n", encoding="utf-8")
+            try:
+                link.symlink_to(target)
+            except (OSError, NotImplementedError):
+                self.skipTest("symbolic links are unavailable here")
+            with mock.patch.object(trading_gates.subprocess, "run",
+                                   side_effect=AssertionError("ssh-keygen must not run")):
+                self.assert_fails_closed(self.run_check(self.ladder(self.established())),
+                                         f"allowed_signers file {LIVE_GO_SIGNERS} resolves outside the tree")
+        # A symlink loop fails closed the same way. Path.resolve() raises RuntimeError on a
+        # loop in Python 3.12 and earlier (OSError from 3.13), which main() would not catch.
+        link.unlink()
+        link.symlink_to(link.name)
+        reason = f"allowed_signers file {LIVE_GO_SIGNERS} cannot be resolved"
+        with mock.patch.object(trading_gates.subprocess, "run",
+                               side_effect=AssertionError("ssh-keygen must not run")):
+            result = self.run_check(self.ladder(self.established()))
+            self.assert_fails_closed(result, reason)
+            printed = io.StringIO()
+            with contextlib.redirect_stdout(printed):
+                code = trading_gates.main(["--root", str(self.root), "--path", "gates.json"])
+        # main() reports the loop as JSON with exit 1, and no host path reaches its output.
+        self.assertEqual(code, 1)
+        output = json.loads(printed.getvalue())
+        self.assertEqual(output["status"], "failed")
+        self.assertEqual(output["blocking"]["live"], ["live-go"])
+        self.assertIn(reason, output["authorship"]["live-go"]["detail"])
+        for host_path in {str(self.root), str(self.root.resolve())}:
+            self.assertNotIn(host_path, printed.getvalue())
+            self.assertNotIn(host_path, json.dumps(result))
+
+    def test_live_go_never_holds_on_presence_alone(self):
+        self.put(LIVE_GO_MD, b"# live go\n")
+        holds, detail = trading_gates.condition_holds(self.root, self.established())
+        self.assertFalse(holds)
+        self.assertIn("never counts on presence alone", detail)
+        # Any other null-condition gate keeps the earlier presence rule.
+        holds, _ = trading_gates.condition_holds(self.root, gate(id="choice", receipt_path=LIVE_GO_MD,
+                                                                 flip_condition=None))
+        self.assertTrue(holds)
+
+    def test_the_checker_writes_nothing(self):
+        self.put(LIVE_GO_MD, b"# live go\n")
+        gates_path = self.write("gates.json", self.ladder(self.established()))
+
+        def snapshot():
+            return {path.relative_to(self.root).as_posix(): path.read_bytes()
+                    for path in sorted(self.root.rglob("*")) if path.is_file()}
+
+        before = snapshot()
+        result = trading_gates.check(self.root, gates_path)
+        self.assertEqual(result["status"], "failed")
+        self.assertEqual(snapshot(), before)
+
+
+@unittest.skipUnless(SSH_KEYGEN, "ssh-keygen is not installed on this host")
+class LiveGoSignatureTests(GateTreeCase):
+    """Real ssh-keygen -Y sign and -Y verify with throwaway ed25519 keys made in
+    a separate temporary directory per test (removed afterwards; no key,
+    signature or allowed_signers entry is committed)."""
+
+    def setUp(self):
+        super().setUp()
+        self.keys = tempfile.TemporaryDirectory()
+        self.signer = ThrowawaySigner(Path(self.keys.name), "throwaway-signer")
+
+    def tearDown(self):
+        self.keys.cleanup()
+        super().tearDown()
+
+    def established(self):
+        return live_go(status="established", evidence_class="user_decision")
+
+    def sign_tree(self, text=b"# live go\n", *, signer=None, namespace=NAMESPACE, allowed=None):
+        self.put(LIVE_GO_MD, text)
+        self.put(LIVE_GO_SIG, (signer or self.signer).sign(text, namespace))
+        self.put(LIVE_GO_SIGNERS, (allowed or self.signer.allowed_signers_line()).encode("utf-8"))
+
+    def test_a_valid_signature_lets_live_go_count_as_established(self):
+        self.sign_tree()
+        gates_path = self.write("gates.json", self.ladder(self.established()))
+        before = {path: path.read_bytes() for path in sorted(self.root.rglob("*")) if path.is_file()}
+        result = trading_gates.check(self.root, gates_path)
+        # Verification writes nothing into the tree.
+        self.assertEqual({path: path.read_bytes() for path in sorted(self.root.rglob("*")) if path.is_file()}, before)
+        self.assertEqual(result["errors"], [])
+        self.assertEqual(result["status"], "passed")
+        self.assertEqual(result["rung_ready"], {"sim": True, "paper": True, "live": True})
+        self.assertEqual(result["blocking"]["live"], [])
+        self.assertTrue(result["authorship"]["live-go"]["verified"])
+        self.assertIn(f'Good "{NAMESPACE}" signature for {SIGNER}', result["authorship"]["live-go"]["detail"])
+        # Verified but not yet recorded established: still blocking, never a flip candidate.
+        result = self.run_check(self.ladder(live_go()))
+        self.assertTrue(result["authorship"]["live-go"]["verified"])
+        self.assertEqual(result["blocking"]["live"], ["live-go"])
+        self.assertEqual(result["flip_candidates"], [])
+
+    def test_every_mismatch_fails_closed(self):
+        other = ThrowawaySigner(Path(self.keys.name), "other-signer")
+        another_namespace = "other@native-agent-stack"
+        cases = {
+            "document edited after signing": dict(edit=b"# live go, edited\n"),
+            "signed by a key the file does not list": dict(signer=other),
+            "signed in the generic file namespace": dict(namespace="file"),
+            "signed in another namespace": dict(namespace=another_namespace),
+            "file lists the key for another principal": dict(
+                allowed=self.signer.allowed_signers_line(principal="someone-else")),
+            "file restricts the key to another namespace": dict(
+                allowed=self.signer.allowed_signers_line(options=f'namespaces="{another_namespace}"')),
+            "file lists an expired key": dict(
+                allowed=self.signer.allowed_signers_line(options=f'namespaces="{NAMESPACE}",valid-before="20200101"')),
+            "file holds no key": dict(allowed="not a key line\n"),
+            "catalog names another principal": dict(control=live_go_control(principal="someone-else")),
+            "catalog names another namespace": dict(control=live_go_control(namespace=another_namespace)),
+            "signature of another document": dict(signature=self.signer.sign(b"# another document\n")),
+            "signature is not a signature": dict(
+                signature=b"-----BEGIN SSH SIGNATURE-----\nAAAA\n-----END SSH SIGNATURE-----\n"),
+        }
+        for case, spec in cases.items():
+            with self.subTest(case=case):
+                self.sign_tree(signer=spec.get("signer"), namespace=spec.get("namespace", NAMESPACE),
+                               allowed=spec.get("allowed"))
+                if "edit" in spec:
+                    self.put(LIVE_GO_MD, spec["edit"])
+                if "signature" in spec:
+                    self.put(LIVE_GO_SIG, spec["signature"])
+                result = self.run_check(self.ladder(self.established(), spec.get("control")))
+                self.assertEqual(result["status"], "failed")
+                self.assertIn("does not verify", result["errors"][0])
+                self.assertFalse(result["rung_ready"]["live"])
+                self.assertEqual(result["blocking"]["live"], ["live-go"])
+                self.assertFalse(result["authorship"]["live-go"]["verified"])
+
+
+class RepositoryLiveGoControlTests(unittest.TestCase):
+    def test_repository_live_go_names_an_ssh_signature_control_and_the_checker_writes_none_of_its_files(self):
+        path = ROOT / trading_gates.GATES
+        if not path.exists():
+            self.skipTest("gate ladder not yet recorded in this tree")
+        document_ = trading_gates.load_json(path)
+        row = {gate_["id"]: gate_ for gate_ in document_["gates"]}["live-go"]
+        self.assertEqual((row["rung"], row["owner"], row["required"], row["flip_condition"]),
+                         ("live", "user-decision", True, None))
+        control = document_["authorship"]["live-go"]
+        self.assertEqual(control["method"], "ssh-keygen -Y verify")
+        self.assertEqual((control["signature_path"], control["allowed_signers_path"]),
+                         (f"{row['receipt_path']}.sig", "docs/decisions/live-go.allowed_signers"))
+        files = [ROOT / row["receipt_path"], ROOT / control["signature_path"], ROOT / control["allowed_signers_path"]]
+        before = [(file.exists(), file.read_bytes() if file.is_file() else None) for file in files]
+        trading_gates.check(ROOT, path)
+        self.assertEqual([(file.exists(), file.read_bytes() if file.is_file() else None) for file in files], before)
 
 
 if __name__ == "__main__":

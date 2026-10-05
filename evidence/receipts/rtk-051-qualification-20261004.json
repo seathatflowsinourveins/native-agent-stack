@@ -1,0 +1,426 @@
+{
+  "schema_version": 1,
+  "id": "rtk-051-qualification-20261004",
+  "kind": "native_cli_e2e",
+  "recorded_at_utc": "2026-10-04T08:06:10Z",
+  "component_ids": [
+    "rtk"
+  ],
+  "claim": "The retained NativeStack WSL2 run on 2026-10-04 installed rtk 0.51.0 from the checksummed Linux release archive and returned rtk 0.51.0 with exit 0. rtk verify returned 151/151 inline self-tests with exit 0; 24 hook payloads matched 0.50.0 output and exits (16 rewritten, 0 differing), and 26 permission-deny hook decisions matched with no auto-allows. Direct git/proxy calls succeeded and the existing tracking database was read and later updated. This receipt republishes bounded sanitized facts from the historical host records; it is not a new host or model run.",
+  "limitations": [
+    "No macOS execution; the Darwin archive is artifact-checked only. No upstream cargo test suite was run in these records; rtk verify is the native inline self-test, and the 115-test parser run (14 skipped) is local integration.",
+    "rtk gain, session and cc-economics are tool self-reports, not provider counts, invoice data or causal savings. Cumulative snapshots are not added together.",
+    "No fresh live-client acceptance or rtk init re-run was recorded. The --shell compatibility review is source-based; the host hook comparison covered only its 24 payloads and 26 deny entries. Existing exact-output exceptions and dated replay gates remain scoped to their original evidence.",
+    "gh attestation verification returned HTTP 404 (exit 1); no signature verification or source rebuild was recorded. Later upstream fixes and issue #4404 are follow-ups, not included in this stable pin.",
+    "NativeStack runs AgentsView 0.44.0 ahead of the repository pin. The 2026-09-27 qualification hold stands: synthetic_ccusage_parity failed, fresh_four_native_lanes is blocked, and the v0.44.0 MCP reported zero Codex counters. The recorded recipe rewire and qualification must pass in a separate follow-up before a repository pin move.",
+    "RTK replay is unavailable at 0.51.0: vendored child-usage.mjs and the test_token_measurement.py/test_skill_usage.py replay gates require exactly rtk 0.50.0. Skipped replay tests are not coverage; the kernel and gates remain unchanged.",
+    "The repair-round placeholder guard probes allowed the --shell form rtk test --shell sh 'cat ~/.ssh/config' (exit 0), while rtk proxy cat ~/.ssh/config was blocked (exit 2). These strings were guard input only; no credential reader was executed. This finding belongs to PR #685; the guard is unchanged in this pin move."
+  ],
+  "data": {
+    "observed_date_utc": "2026-10-04",
+    "host_scope": "NativeStack, WSL2 Linux x86_64; historical user-level installation",
+    "previous_version": "0.50.0",
+    "version": "0.51.0",
+    "release": "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+    "tag_commit": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+    "host_recorded_at_utc": "2026-10-04T08:06:10Z",
+    "verify_exit": 0,
+    "evidence_classes": [
+      "upstream_native_operation",
+      "local_integration",
+      "artifact_check"
+    ],
+    "host_source_locator": "$HOME/.local/state/native-agent-stack/coordination/token-layer-20261004/nativestack-exec",
+    "sanitization": "Only component-scoped commands, exit codes, times, versions, checksums and bounded verification summaries are published. Private installation prefixes become <stack-home>, the execution directory becomes <host-run>, worktree paths become <owned-worktree>, and home paths become $HOME. No credentials, raw transcripts, user names or email addresses are copied.",
+    "steps": [
+      {
+        "step": "gain_before",
+        "cmd": "<stack-home>/bin/rtk gain -f json",
+        "rc": 0,
+        "at": "2026-10-04T07:54:43Z"
+      },
+      {
+        "step": "show_before",
+        "cmd": "<stack-home>/bin/rtk init -g --show",
+        "rc": 0,
+        "at": "2026-10-04T07:54:44Z"
+      },
+      {
+        "step": "download",
+        "cmd": "gh release download v0.51.0 --repo rtk-ai/rtk --pattern rtk-x86_64-unknown-linux-musl.tar.gz --pattern checksums.txt --dir <stack-home>/downloads/rtk-0.51.0 --clobber",
+        "rc": 0,
+        "at": "2026-10-04T07:54:46Z"
+      },
+      {
+        "step": "checksum",
+        "cmd": "bash -c cd '<stack-home>/downloads/rtk-0.51.0' && sha256sum --check --ignore-missing checksums.txt",
+        "rc": 0,
+        "at": "2026-10-04T07:54:47Z"
+      },
+      {
+        "step": "attestation",
+        "cmd": "gh attestation verify <stack-home>/downloads/rtk-0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz --repo rtk-ai/rtk",
+        "rc": 1,
+        "at": "2026-10-04T07:54:47Z"
+      },
+      {
+        "step": "extract",
+        "cmd": "bash -c cd '<stack-home>/downloads/rtk-0.51.0' && tar -xf rtk-x86_64-unknown-linux-musl.tar.gz -C '<stack-home>/tools/rtk-0.51.0'",
+        "rc": 0,
+        "at": "2026-10-04T07:54:50Z"
+      },
+      {
+        "step": "verify_versioned",
+        "cmd": "<stack-home>/tools/rtk-0.51.0/rtk --version",
+        "rc": 0,
+        "at": "2026-10-04T07:54:50Z"
+      },
+      {
+        "step": "verify_new_selftest",
+        "cmd": "<stack-home>/tools/rtk-0.51.0/rtk verify",
+        "rc": 0,
+        "at": "2026-10-04T07:54:50Z"
+      },
+      {
+        "step": "hook_compat",
+        "cmd": "python3 <host-run>/rtk_hook_compat.py <stack-home>/tools/rtk-0.50.0/rtk <stack-home>/tools/rtk-0.51.0/rtk",
+        "rc": 0,
+        "at": "2026-10-04T07:54:51Z"
+      },
+      {
+        "step": "after_version",
+        "cmd": "<stack-home>/bin/rtk --version",
+        "rc": 0,
+        "at": "2026-10-04T07:54:52Z"
+      },
+      {
+        "step": "verify_after",
+        "cmd": "<stack-home>/bin/rtk verify",
+        "rc": 0,
+        "at": "2026-10-04T07:54:52Z"
+      },
+      {
+        "step": "show_after",
+        "cmd": "<stack-home>/bin/rtk init -g --show",
+        "rc": 0,
+        "at": "2026-10-04T07:54:52Z"
+      },
+      {
+        "step": "gain_after",
+        "cmd": "<stack-home>/bin/rtk gain -f json",
+        "rc": 0,
+        "at": "2026-10-04T07:54:52Z"
+      },
+      {
+        "step": "usage_git_log",
+        "cmd": "<stack-home>/bin/rtk git log -3",
+        "rc": 0,
+        "at": "2026-10-04T07:54:53Z"
+      },
+      {
+        "step": "usage_proxy_git_log",
+        "cmd": "<stack-home>/bin/rtk proxy git log -3",
+        "rc": 0,
+        "at": "2026-10-04T07:54:53Z"
+      },
+      {
+        "step": "usage_session",
+        "cmd": "timeout 120 nice -n 19 <stack-home>/bin/rtk session",
+        "rc": 0,
+        "at": "2026-10-04T07:57:17Z"
+      },
+      {
+        "step": "deny_rules_compat",
+        "cmd": "python3 <host-run>/rtk_deny_compat.py <stack-home>/tools/rtk-0.50.0/rtk <stack-home>/tools/rtk-0.51.0/rtk",
+        "rc": 0,
+        "at": "2026-10-04T08:03:24Z"
+      },
+      {
+        "step": "gain_later",
+        "cmd": "<stack-home>/bin/rtk gain -f json",
+        "rc": 0,
+        "at": "2026-10-04T08:03:25Z"
+      },
+      {
+        "step": "usage_cc_economics",
+        "cmd": "timeout 150 nice -n 19 <stack-home>/bin/rtk cc-economics",
+        "rc": 0,
+        "at": "2026-10-04T08:03:25Z"
+      },
+      {
+        "step": "usage_discover",
+        "cmd": "timeout 150 nice -n 19 <stack-home>/bin/rtk discover",
+        "rc": 0,
+        "at": "2026-10-04T08:03:32Z"
+      }
+    ],
+    "artifact_checks": [
+      {
+        "platform": "linux-x86_64",
+        "asset": "rtk-x86_64-unknown-linux-musl.tar.gz",
+        "sha256": "5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5",
+        "checksum_matches": true,
+        "evidence_class": "host_checksum_and_execution"
+      },
+      {
+        "platform": "macos-arm64",
+        "asset": "rtk-aarch64-apple-darwin.tar.gz",
+        "sha256": "8817d8b71afc02ac8bf06eb24bcc41c306592ab735b68e8fee9db1ba0de7cb59",
+        "checksum_matches": true,
+        "evidence_class": "artifact_checked_no_host_execution",
+        "fresh_download_bytes": 4143723,
+        "fresh_download_sha256": "8817d8b71afc02ac8bf06eb24bcc41c306592ab735b68e8fee9db1ba0de7cb59",
+        "check_date_utc": "2026-10-04"
+      }
+    ],
+    "verification_summaries": {
+      "native_verify": "151/151 tests passed; exit 0, compared with 154/154 at 0.50.0",
+      "hook_compatibility": {
+        "payloads": 24,
+        "rewritten": 16,
+        "differing": 0,
+        "exit": 0
+      },
+      "deny_rule_compatibility": {
+        "bash_entries": 26,
+        "total_rules": 87,
+        "identical": 26,
+        "auto_allows": 0
+      },
+      "init_show": "Before/after output byte-identical; init was not run",
+      "gain_snapshot": {
+        "scope": "self_reported_cumulative_tool_output_estimates",
+        "before_and_immediate_after_commands": 243259,
+        "later_commands": 243297,
+        "delta_commands": 38,
+        "later_saved_token_delta": 31126,
+        "saved_percentage": 10.0,
+        "provider_counts": null
+      },
+      "local_parser_test": "115 unittest tests OK, 14 skipped; exit 0; local integration only"
+    },
+    "research": {
+      "workflow": "Installed search-first/SKILL.md; bounded selection from the four requested maintained upstream stable releases, with source checks retained in catalogs/landscape/upstream-snapshot.json.",
+      "template_commit": "3058b2379086677871d092cc6197e907445a03a9",
+      "upstream_check_source": "upstream-checks.json; recorded 2026-10-04; private locator $HOME/.local/state/native-agent-stack/coordination/bounded-jobs-20261004/job-009-token-pin-move/upstream",
+      "completeness_critic": "Covered stable release/tag commits, Linux execution, Darwin artifacts, npm integrity/provenance, native plugin installation and RTK positional-shell migration. Missing modalities remain explicit: macOS execution, new live-client/provider acceptance and upstream suites. No alternative tool adoption, skill installation, gateway route or account changes are needed for this bounded pin move.",
+      "north_star_action": "Maintain the native context and observation foundation supporting US-equities research and historical simulation."
+    },
+    "private_source_hashes": [
+      {
+        "file": "RECORD.json",
+        "sha256": "14d4be237b5498c78839dcf314eec1dd1f1521a9a4065df87000c0d8ed651388"
+      },
+      {
+        "file": "components/rtk.json",
+        "sha256": "887fe1be410f5d92673c5150efa8aca214ac4e2c3c12171bba40281a35a8e5f8"
+      },
+      {
+        "file": "rtk.log",
+        "sha256": "13b7314c8285a326971c945071a38d1fefb313a53f0af646b659255c858b3e37"
+      },
+      {
+        "file": "rtk.note.txt",
+        "sha256": "15aec3091d19e342bffd74a5415838914b17cbdfd28e09fb7759ff20013295c9"
+      },
+      {
+        "file": "steps.jsonl",
+        "sha256": "93c27b4653da9418185f0c9abe154327340e908e3bd29bc0ee5335e81658297e"
+      }
+    ],
+    "compatibility_review": {
+      "source": "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+      "breaking_change": "Executable positional scripts that relied on implicit shell expansion require --shell; for example, rtk test --shell sh 'cargo test && cargo clippy'.",
+      "executable_sites_requiring_conversion": 0,
+      "shell_sites": [
+        {
+          "file": "scripts/native_token_ci.py",
+          "line": 698,
+          "action": "Run.command executes argv directly; no implicit RTK shell expansion."
+        },
+        {
+          "file": "scripts/native_token_ci.py",
+          "line": 836,
+          "action": "Version, gain, git, proxy and verify fixtures use direct argv."
+        },
+        {
+          "file": "scripts/native_token_ci.py",
+          "line": 869,
+          "action": "Long-log fixture passes git options as literal argv."
+        },
+        {
+          "file": "scripts/native_token_ci.py",
+          "line": 1384,
+          "action": "hook check receives compound command strings as inspection data."
+        },
+        {
+          "file": "scripts/native_token_ci.py",
+          "line": 1477,
+          "action": "Exactness arms use direct argv; *.txt and jq expressions are literal arguments."
+        },
+        {
+          "file": "recipes/README.md",
+          "line": 47,
+          "action": "Archive recipe expands variables in its outer shell."
+        },
+        {
+          "file": "recipes/README.md",
+          "line": 107,
+          "action": "Current RTK row documents the --shell migration and explicit sh example."
+        },
+        {
+          "file": "recipes/README.md",
+          "line": 152,
+          "action": "init uses direct CLI arguments."
+        },
+        {
+          "file": "recipes/README.md",
+          "line": 177,
+          "action": "Quoted hook-check commands are inspection inputs."
+        },
+        {
+          "file": "docs/token-efficiency-stack.json",
+          "line": 227,
+          "action": "Installation variables expand in the outer guarded shell; git/proxy/gain are direct argv; install_note and notes document --shell."
+        },
+        {
+          "file": "docs/foundation-stack.md",
+          "line": 128,
+          "action": "gain/help commands use direct CLI arguments."
+        },
+        {
+          "file": "docs/token-practice.md",
+          "line": 199,
+          "action": "Historical gain commands use direct CLI arguments; dated observations retain their pins."
+        },
+        {
+          "file": "tools/token-report/README.md",
+          "line": 69,
+          "action": "gain commands use direct CLI arguments; install variables expand in the outer shell."
+        },
+        {
+          "file": "adoption/bootstrap-linux.sh",
+          "line": 1057,
+          "action": "Reminder sends each command to hook check for inspection."
+        },
+        {
+          "file": "adoption/bootstrap-macos.sh",
+          "line": 1223,
+          "action": "Reminder inspects the config and prints advice; it executes no positional RTK script."
+        },
+        {
+          "file": "tests/test_native_token_ci.py",
+          "line": 989,
+          "action": "Hook probes are inspection fixtures; exactness dispatch checks direct argv."
+        },
+        {
+          "file": "tests/test_codex_worker_lane.py",
+          "line": 1667,
+          "action": "Recorded scripts specify an outer bash -lc interpreter."
+        },
+        {
+          "file": "tests/test_codex_worker_skill.py",
+          "line": 33,
+          "action": "Recorded shell read uses explicit bash -lc and shlex quoting."
+        },
+        {
+          "file": "tests/test_skill_usage.py",
+          "line": 1035,
+          "action": "Recorded scripts specify an outer bash -lc interpreter; other command forms are parser fixtures."
+        },
+        {
+          "file": "scripts/hooks/secret_path_guard.py",
+          "line": 1234,
+          "action": "rtk run forms are parsed as adversarial input rather than executed."
+        },
+        {
+          "file": "tests/test_secret_path_guard.py",
+          "line": 548,
+          "action": "rtk run shell forms exercise guard parsing; no migration of an executed recipe."
+        }
+      ],
+      "missing_diff_operand": {
+        "source": "https://github.com/rtk-ai/rtk/commit/bf23cff467aa3b4aa314d6a4b956630f1e275a5f",
+        "source_file": "src/cmds/git/diff_cmd.rs",
+        "upstream_test": "tests/diff_byte_accuracy_test.rs:missing_operand_exits_two_and_names_the_failed_path",
+        "integration_change": "The active CI predicate expects native and RTK exit 2; synthetic controls reject the prior RTK exit 1. This is source review and local integration, not a new native fixture run."
+      },
+      "macos_config_source": {
+        "tag": "v0.51.0",
+        "files": [
+          "src/core/config.rs:510",
+          "src/core/user_dirs.rs:47",
+          "Cargo.lock"
+        ],
+        "finding": "The tagged implementation delegates to dirs::config_dir() with dirs 5.0.1; macOS keeps ~/Library/Application Support/rtk/config.toml and ignores XDG_CONFIG_HOME."
+      },
+      "historical_evidence": "Dated catalogs, sweep manifests, decisions, receipts, dated stack cards and byte-pinned RTK awareness blocks retain their original evidence pins. The exact token replay gate still requires its originally qualified version.",
+      "proxy_execution": {
+        "source_scope": "Harmless native argv probes of installed rtk 0.50.0 and 0.51.0 on 2026-10-04.",
+        "probes": [
+          {
+            "cmd": "rtk proxy TMPDIR=/tmp true",
+            "rtk": "0.50.0",
+            "exit": 1,
+            "result": "rtk: Failed to execute command: TMPDIR=/tmp: No such file or directory (os error 2)"
+          },
+          {
+            "cmd": "rtk proxy cd /tmp",
+            "rtk": "0.50.0",
+            "exit": 1,
+            "result": "rtk: Failed to execute command: cd: No such file or directory (os error 2)"
+          },
+          {
+            "cmd": "rtk proxy TMPDIR=/tmp true",
+            "rtk": "0.51.0",
+            "exit": 1,
+            "result": "rtk: Failed to execute command: TMPDIR=/tmp: No such file or directory (os error 2)"
+          },
+          {
+            "cmd": "rtk proxy cd /tmp",
+            "rtk": "0.51.0",
+            "exit": 1,
+            "result": "rtk: Failed to execute command: cd: No such file or directory (os error 2)"
+          }
+        ],
+        "guidance": "rtk proxy executes an executable argv, not shell assignments or builtins. Put TMPDIR=/tmp before rtk proxy, or use rtk proxy env TMPDIR=/tmp true; run shell builtins in the calling shell without an RTK prefix."
+      },
+      "replay_prerequisite": {
+        "kernel_source": "examples/claude-native/workflows/child-usage.mjs:2296",
+        "gate_sources": [
+          "tests/test_token_measurement.py:29",
+          "tests/test_skill_usage.py:33"
+        ],
+        "requires_self_reported_version": "rtk 0.50.0",
+        "installed_self_reported_version": "rtk 0.51.0",
+        "status": "unavailable_at_0.51.0",
+        "evidence_class": "local_integration_skip_observation",
+        "skipped_test_ids": [
+          "tests.test_token_measurement.TokenMeasurement.test_aggregate_sums_d7_only_for_codex_measurements",
+          "tests.test_token_measurement.TokenMeasurement.test_b8_an_unknown_call_counts_once_and_leaves_the_eligible_denominators",
+          "tests.test_token_measurement.TokenMeasurement.test_b8_explicit_rtk_counts_even_when_replay_cannot_classify_the_call",
+          "tests.test_token_measurement.TokenMeasurement.test_b8_heredoc_and_arithmetic_calls_are_classified_not_unknown",
+          "tests.test_token_measurement.TokenMeasurement.test_b8_status_is_incomplete_only_when_unknown_calls_exceed_five_percent_of_calls",
+          "tests.test_token_measurement.TokenMeasurement.test_rtk_agent_codex_replays_without_claude_permission_rules",
+          "tests.test_token_measurement.TokenMeasurement.test_rtk_explicit_exclusions_proxy_and_quoted_operators",
+          "tests.test_token_measurement.TokenMeasurement.test_rtk_log_find_are_advisory_with_per_part_review",
+          "tests.test_token_measurement.TokenMeasurement.test_rtk_native_replay_parts_and_call_controls",
+          "tests.test_token_measurement.TokenMeasurement.test_rtk_parts_join_eligible_calls_to_their_m14_state",
+          "tests.test_token_measurement.TokenMeasurement.test_rtk_proxy_parts_are_outside_eligible_population",
+          "tests.test_token_measurement.TokenMeasurement.test_rtk_quoted_greater_than_is_data_and_redirect_is_syntax",
+          "tests.test_token_measurement.TokenMeasurement.test_unresolved_bash_calls_are_unknown_calls_under_b8_and_d7_stays_strict",
+          "tests.test_token_measurement.TokenMeasurement.test_whole_call_substitution_does_not_hide_eligible_prefix",
+          "tests.test_skill_usage.CodexCommandNormalization.test_rtk_replay_reads_the_script_of_a_c_option_cluster",
+          "tests.test_skill_usage.CodexCommandNormalization.test_rtk_replay_reports_an_unresolved_command_as_unknown",
+          "tests.test_skill_usage.CodexRtkReplay.test_an_unresolved_command_counts_by_b8_and_refreshes_the_share",
+          "tests.test_skill_usage.CodexRtkReplay.test_an_unresolved_command_leaves_d7_incomplete_and_groups_sum_d7",
+          "tests.test_skill_usage.CodexRtkReplay.test_codex_replay_ignores_claude_permission_rules",
+          "tests.test_skill_usage.CodexRtkReplay.test_d7_excludes_reviewed_log_find_parts_and_counts_wrapped_exceptions",
+          "tests.test_skill_usage.CodexRtkReplay.test_group_d7_is_strict_whatever_the_split_across_actors",
+          "tests.test_skill_usage.CodexRtkReplay.test_the_same_unknown_count_reads_alike_from_an_unresolved_and_an_unreadable_command"
+        ],
+        "coverage": "These skipped replay tests are not coverage. Vendored kernel and version gates are unchanged."
+      }
+    }
+  }
+}

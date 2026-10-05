@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "id": "native-runtime-role-resolution-20260930",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "omniroute",
+    "claude-code"
+  ],
+  "claim": "One host installed separately versioned OpenHands CLI1.16.0/SDK1.50.1 and DeepAgents0.7.21 candidates through native supported interfaces. CLI108 and final SDK184 unchanged upstream tests passed; DeepAgents361 passed with1 expected failure in its separate upstream-lock environment. Actual OmniRoute Sol-Max requests passed one OpenHands native LLM exact-output round-trip and bounded DeepAgents selected-skill/single-specialist research, saved-context repair and fresh-process SQLite continuation. All results are scoped, not a universal framework winner or global default promotion.",
+  "limitations": [
+    "CLI SDK1.21 Jinja cache hard-codes real user home; strict cache isolation remains held.",
+    "Final SDK native configuration/tests exercise skills/plugins/MCP/condenser interfaces; production MCP, full Conversation/condenser/provider execution and optional extensions are not qualified by them.",
+    "Original DeepAgents24-step attempt failed; one changed32-step saved-context repair passed. No arbitrary interrupted-tool replay, OS confinement or comparative winner is qualified.",
+    "Complete provider billing/backend identity and whole-task token savings remain unknown; cached/reasoning counters are subsets.",
+    "Native Claude Opus/Max peer timed out180s exit124 without a verdict; later peer turns reached account usage limits. Completed earlier reviews are preserved; no new acknowledgement/approval is claimed.",
+    "Original full output stays private with exact hashes; public excerpts replace private paths and omit raw conversations, marker values, credentials and flow identifiers.",
+    "Exact executed sources are archived. Initial whitespace/comment cleanup had identical ASTs; the current worker subsequently adopts native secret-aware serialization after CodeQL, verified by native fixture and fresh saved-state checks. No new provider run is claimed."
+  ],
+  "evidence_class": "native_proven_and_local_integration_with_source_review",
+  "recorded_at_utc": "2026-10-01T00:52:25Z",
+  "host_scope": "One existing Linux host; owned private environments and state, separate candidate roles.",
+  "data": {
+    "source_packet": "evidence/artifacts/native-runtime-role-resolution-20260930/role-packet-20260930.json",
+    "discovery": {
+      "public_stars": 352,
+      "maintained_awesome_lists": 4,
+      "role_rows": 19,
+      "meaning": "Discovery coverage only; primary native/pinned sources determine role decisions."
+    },
+    "artifacts": [
+      "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-install.json",
+      "evidence/artifacts/native-runtime-role-resolution-20260930/deepagents-install.json",
+      "evidence/artifacts/native-runtime-role-resolution-20260930/deepagents-task.json",
+      "evidence/artifacts/native-runtime-role-resolution-20260930/openhands-llm.json",
+      "evidence/artifacts/native-runtime-role-resolution-20260930/root-verification.json",
+      "evidence/artifacts/native-runtime-role-resolution-20260930/execution-source-bindings.json",
+      "evidence/artifacts/native-runtime-role-resolution-20260930/secret-aware-serialization.json"
+    ],
+    "completed_reviews": {
+      "architecture": "Astra/Max source-level role and native configuration acceptance, including source-supported SDK persistence repair.",
+      "openhands_setup": "Independent Astra/Max stack-verifier confirmed named source/install/no-provider evidence; original tests and OSV scans were not repeated.",
+      "post_provider": "Root reran unchanged initial/resume/empty-thread/restored oracles with exits0/0/2/0 and independently reproduced27 unique graph-update AI IDs. A second post-provider peer review was unavailable."
+    },
+    "cooperation": {
+      "runtime_handoff": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/535#issuecomment-5921005952",
+      "claude_defaults_handoff": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/548#issuecomment-5921006227",
+      "earlier_claude_dispatch_acceptance": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/548#issuecomment-5918936194",
+      "new_handoff_acknowledgement": "unconfirmed",
+      "native_claude_peer": {
+        "model": "opus",
+        "effort": "max",
+        "permission_mode": "plan",
+        "selected_tools": [
+          "Read",
+          "Grep",
+          "Glob"
+        ],
+        "strict_empty_mcp": true,
+        "deadline_seconds": 180,
+        "exit_code": 124,
+        "stdout_bytes": 0,
+        "stderr_bytes": 0,
+        "verdict": null,
+        "usage": null
+      }
+    },
+    "observer_cleanup": {
+      "status": "completed",
+      "stopped_owned_process_count": 1,
+      "session_exit_code": 0,
+      "loopback25371_closed": true,
+      "scope": "Only argv1=mitmdump with exact owned script and port; native parent gateway retained.",
+      "correction": "Initial guard assumed executable argv0 was mitmdump; actual Python launcher places mitmdump at argv1. First guard matched0 and closed-port check failed1; corrected exact argv1 guard stopped1 and closed-port check passed0."
+    },
+    "ownership": "Existing O1 sandbox, shared skills/defaults/gateway/pins, all peer-owned main paths and trading work remain owner-managed. No command changed their active configuration.",
+    "token_practice": "Task-selected skill body/tools, explicit model/effort, native caching/condenser/compaction/checkpoint interfaces, bounded workers, stable-message usage dedup and failed-attempt preservation. No measured savings assertion."
+  },
+  "anti_patterns": [
+    {
+      "mistake": "Equal SQLite version inferred released source-byte identity.",
+      "correction": "Pinned49cce differed; published source matches b2926a0 native files, sdist/wheel hashes retained."
+    },
+    {
+      "mistake": "CLI OPENHANDS_PERSISTENCE_DIR inferred SDK cache scope.",
+      "correction": "Native SDK uses OH_PERSISTENCE_DIR before import. First184-pass run failed scope; private naming retry182/2 failed; Astra source-accepted .openhands suffix passed original184 and scope."
+    },
+    {
+      "mistake": "Bare cx alias construction inferred supported provider resolution.",
+      "correction": "Native LiteLLM1.93.2 openai/cx prefix resolves provider/wire model; actual single generation passed."
+    },
+    {
+      "mistake": "OSV guessed parser/lock extractor.",
+      "correction": "Original exit127 preserved; native requirements.txt extractor scans actual209/187/62 environments with no reported findings/ignores."
+    },
+    {
+      "mistake": "24-step trial cap ended before native final node; exact262-character quote initially misdiagnosed as paraphrase.",
+      "correction": "Source proved quote exact but above240 bound. One native32-step saved-context repair with explicit short-quote prompt passed unchanged oracle."
+    },
+    {
+      "mistake": "Observer source guessed missing path at peer head; failed blob lookup created empty addon and launch proceeded without exit gating.",
+      "correction": "No provider had started. Owned empty-addon process stopped; exact published0e86 sourceSHA d456 verified before successful observation. Failed source exits/attempt retained."
+    },
+    {
+      "mistake": "First root usage processor selected nonexistent kind key and returned0 records; first shutdown guard assumed mitmdump argv0.",
+      "correction": "Original event/native format reproduces27 unique AI IDs; native Python launch has mitmdump argv1. Correct guarded stop and closed-port oracle passed; original failed conditions retained."
+    }
+  ],
+  "provenance": {
+    "plans": [
+      "examples/openhands-native-capabilities/acceptance-plan.json",
+      "examples/openhands-native-capabilities/llm-trial-plan.json",
+      "examples/deepagents-omniroute/acceptance-plan.json",
+      "examples/deepagents-omniroute/task-trial-plan.json",
+      "examples/deepagents-omniroute/task-repair-plan.json"
+    ],
+    "source": "Named upstream revisions and files in role packet, native recipes, frozen plans and returned-output artifacts.",
+    "retained_coding_lane": "Draft PR551 enhanced CodexSDK/Dagu acceptance remains historical/scoped; not rerun or reclassified here."
+  }
+}

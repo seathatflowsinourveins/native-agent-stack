@@ -1,0 +1,1099 @@
+name: Suite parallelism trial (draft pull request only)
+
+# Preregistered trial of craigahobbs/unittest-parallel 1.8.6 (release commit
+# bda5d77dc1a2fa2df90f5f5a7de297ea375e345c) for the two required whole-suite jobs, validate (validate.yml) and
+# validate-macos (adoption-bootstrap.yml). It belongs to a DRAFT pull request that is never merged; none of its job
+# names is a required context in .github/main-ruleset.json, and it edits no other workflow. Record and oracle:
+# blueprints/convergence-practice/macos-suite-parallelism-20261003/ (ids.py, compare.py, controls/).
+#
+# Jobs: inventory lists the test ids of the trial head and of the base it was cut from, with the trial lock
+# installed; controls-macos and controls-linux run each arm's exact command on the control file and on the crash
+# control, each copied alone into an empty directory, apart from the timed arms; arms-macos and arms-linux run the
+# whole suite once per arm and repeat on GitHub-hosted runners; compare runs the oracle's own tests on its
+# interpreter, then compare.py over every artifact with the pull request head as the frozen corpus (compare.py
+# applies both oracle parts, the second being a clean checkout after every run: git-status.txt exists and is empty),
+# then repeats the second part as its own step. The controls are two jobs, not one job over a matrix of runner
+# labels, because tests/test_workflow_hardening.py needs a literal ubuntu or macos runs-on label in every job.
+#
+# Every job checks out the pull request head (a pull_request checkout is otherwise the merge commit) and asserts it.
+# Each timed run writes <os>-<arm>-r<N>/ and each control run <os>-<arm>-controls/ or <os>-<arm>-crash/, all in one
+# results tree: log.txt (stdout and stderr), exit-code.txt, meta.json, git-status.txt and runtime.json (with the run
+# attempt), which compare.py reads, plus command.txt, step-seconds.txt and, for control runs, limit.txt. The exit
+# status is recorded and never fails the step: the oracle decides.
+#
+# Re-runs: the trial is repeated only as a whole, by a new synchronize of the draft pull request, never by re-running
+# jobs. Every upload sets overwrite: false (actions/upload-artifact action.yml at the pin: the action fails if an
+# artifact of that name already exists), so a re-run cannot replace an earlier attempt's artifact, and compare.py
+# makes any run whose runtime.json records a run_attempt above 1, or none, ineligible.
+#
+# Discovery: unittest-parallel defaults to -s '.', -p 'test*.py' and no -t (src/unittest_parallel/main.py lines
+# 45-50 at the pin), which are the defaults `python -m unittest` discovers with when it is given no test name
+# (CPython Lib/unittest/main.py lines 122-126 and 231-234 at v3.13.16, 133-137 and 242-245 at v3.12.3), so both
+# runners collect the same ids from the repository root. Workers are spawned processes (main.py lines 150-158); a
+# failed run exits with the number of errors, failures and unexpected successes, capped at 255 (lines 240-242).
+#
+# Suite environment: the Linux arms reproduce the steps validate.yml runs before its suite (the zizmor lock, the
+# promotion-gate venv and the two npm pins); the macOS arms add the two npm pins to validate-macos's interpreter,
+# because the runtime tripwires in tests/test_shell_parser_ci.py and tests/test_landscape_sweep_skills.py fail in any
+# job that is neither validate.yml's validate nor a recorded gap. The trial lock (unittest-parallel and coverage) is
+# installed in every arm, the serial one included.
+
+on:
+  pull_request:
+    paths:
+      - .github/workflows/macos-suite-parallel-trial.yml
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+env:
+  # The commit the trial branch is based on (rebased onto it before the first push): the unmodified suite whose ids
+  # the inventory maps onto the trial head.
+  TRIAL_BASE_SHA: e88d59e4b4670ca19211a9ab2adb45e1a28901c7
+  TRIAL_DIR: blueprints/convergence-practice/macos-suite-parallelism-20261003
+
+jobs:
+  inventory:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out the pull request head with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Assert the checkout is the pull request head, not a merge commit
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          if [ "$actual" != "$PR_HEAD_SHA" ]; then
+            echo "checked out $actual, not the pull request head $PR_HEAD_SHA" >&2
+            exit 1
+          fi
+          echo "testing the pull request head $actual"
+      - name: Check out the trial base beside the head
+        run: |
+          set -euo pipefail
+          if ! git merge-base --is-ancestor "$TRIAL_BASE_SHA" HEAD; then
+            echo "the trial base $TRIAL_BASE_SHA is not an ancestor of the head; update TRIAL_BASE_SHA" >&2
+            exit 1
+          fi
+          git worktree add --detach "$RUNNER_TEMP/base" "$TRIAL_BASE_SHA"
+          test "$(git -C "$RUNNER_TEMP/base" rev-parse HEAD)" = "$TRIAL_BASE_SHA"
+      - name: Install the hash-locked trial runner before collecting ids
+        # The oracle's README ("Limits") asks for the inventory to be generated on the runner after installing the
+        # lock, since module-level skips and import errors become ids of their own; the Linux arms install it too.
+        run: >-
+          python3 -m pip install --disable-pip-version-check --no-input
+          --only-binary=:all: --require-hashes
+          --index-url https://pypi.org/simple
+          -r .github/requirements-ci-suite-linux.txt
+      - name: List the test ids of the base and of the trial head (collection only)
+        run: |
+          set -euo pipefail
+          inventory="$RUNNER_TEMP/inventory"
+          mkdir -p "$inventory"
+          (cd "$RUNNER_TEMP/base" && python3 "$GITHUB_WORKSPACE/$TRIAL_DIR/ids.py" --root .) > "$inventory/inventory-base.txt"
+          python3 "$TRIAL_DIR/ids.py" --root . > "$inventory/inventory-trial.txt"
+          python3 --version
+          wc -l "$inventory/inventory-base.txt" "$inventory/inventory-trial.txt"
+          git status --porcelain=v1 --untracked-files=all
+      - name: Upload the inventories
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: inventory
+          path: ${{ runner.temp }}/inventory/
+          if-no-files-found: error
+          retention-days: 30
+          overwrite: false
+
+  controls-macos:
+    runs-on: macos-15
+    timeout-minutes: 30
+    env:
+      OS_LABEL: macos-15
+    strategy:
+      fail-fast: false
+      # The controls are not timed; one at a time leaves the plan's macOS slots to the timed arms and other workflows.
+      max-parallel: 1
+      matrix:
+        arm: [S, P3, P3F, P3C, P4]
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out the pull request head with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Assert the checkout is the pull request head, not a merge commit
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          if [ "$actual" != "$PR_HEAD_SHA" ]; then
+            echo "checked out $actual, not the pull request head $PR_HEAD_SHA" >&2
+            exit 1
+          fi
+          echo "testing the pull request head $actual"
+      - name: Set up the manifest-supported Python line
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Provision the pinned tree-sitter-bash parser for the token-measurement lane tests
+        # The control runs do not use it, but the arm's serial command below is the whole-suite form that the
+        # tests/test_shell_parser_ci.py ratchet reads, so this job carries validate.yml's step unchanged.
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("examples/claude-native/workflows/shell-parser.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("CHILD_USAGE_SHELL_PARSER=" + directory + "\n")
+          PYEOF
+      - name: Provision the pinned yaml package for the skills-modality SKILL.md reader tests
+        # Likewise for the tests/test_landscape_sweep_skills.py ratchet; the control runs do not use it.
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("tools/sota-convergence/landscape-sweep/skills-yaml.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("LANDSCAPE_SWEEP_SKILLS_YAML=" + directory + "\n")
+          PYEOF
+      - name: Install the hash-locked trial runner
+        run: >-
+          python3 -m pip install --disable-pip-version-check --no-input
+          --only-binary=:all: --require-hashes
+          --index-url https://pypi.org/simple
+          -r .github/requirements-ci-suite-macos.txt
+      - name: Run the arm's command on each control file alone in an empty directory (300 s limit each)
+        env:
+          ARM: ${{ matrix.arm }}
+        run: |
+          set -euo pipefail
+          # The run contract of controls/control_expectations.json: the control file alone in an empty directory,
+          # the arm's exact command run there, the run stored beside the timed runs as <os>-<arm>-controls or
+          # <os>-<arm>-crash. The limit is GNU timeout where the image has it (exit 124 when it fires); macos-15
+          # ships perl but not coreutils, so there it is an alarm that survives perl's exec (exit 142). A hang or
+          # a kill at the limit leaves a non-zero exit, which the crash control counts as fail-closed.
+          limited() {
+            if command -v timeout >/dev/null 2>&1; then
+              timeout --kill-after=30 "$@"
+            else
+              perl -e 'alarm shift @ARGV; exec(@ARGV) or die "exec failed\n"' "$@"
+            fi
+          }
+          if command -v timeout >/dev/null 2>&1; then limit="timeout --kill-after=30 300"; else limit="perl alarm 300"; fi
+          case "$ARM" in
+            S)
+              set -- python3 -m unittest -v
+              ;;
+            P3)
+              set -- python3 -m unittest_parallel -j 3 --level module -v
+              ;;
+            P3F)
+              set -- python3 -m unittest_parallel -j 3 --level module --disable-process-pooling -v
+              ;;
+            P3C)
+              set -- python3 -m unittest_parallel -j 3 --level class -v
+              ;;
+            P4)
+              set -- python3 -m unittest_parallel -j 4 --level module -v
+              ;;
+            *)
+              echo "unknown arm: $ARM" >&2
+              exit 1
+              ;;
+          esac
+          run_control() {
+            kind="$1"
+            control_file="$2"
+            shift 2
+            out="$RUNNER_TEMP/results/$OS_LABEL-$ARM-$kind"
+            work="$RUNNER_TEMP/control-$kind"
+            rm -rf "$work"
+            mkdir -p "$out" "$work"
+            cp "$control_file" "$work/"
+            printf '%s\n' "$*" > "$out/command.txt"
+            printf '%s\n' "$limit" > "$out/limit.txt"
+            start="$(date +%s)"
+            set +e
+            (cd "$work" && limited 300 "$@") >"$out/log.txt" 2>&1
+            code=$?
+            set -e
+            end="$(date +%s)"
+            printf '%s\n' "$code" > "$out/exit-code.txt"
+            printf '%s\n' "$((end - start))" > "$out/step-seconds.txt"
+            echo "$kind with arm $ARM: exit $code after $((end - start)) s"
+            tail -n 5 "$out/log.txt"
+          }
+          run_control controls "$TRIAL_DIR/controls/test_zz_trial_controls.py" "$@"
+          run_control crash "$TRIAL_DIR/controls/crash_control/test_crash.py" "$@"
+      - name: Record the control runs' metadata and the checkout's status
+        if: always()
+        env:
+          ARM: ${{ matrix.arm }}
+        run: |
+          python3 - <<'PYEOF'
+          import importlib.metadata, json, os, platform, subprocess, sys
+
+          results = os.path.join(os.environ["RUNNER_TEMP"], "results")
+
+          def git(*args):
+              done = subprocess.run(["git", *args], capture_output=True, text=True, check=False)
+              return done.stdout if done.returncode == 0 else None
+
+          head, status = git("rev-parse", "HEAD"), git("status", "--porcelain=v1", "--untracked-files=all")
+          packages = {}
+          for package in ("coverage", "unittest-parallel"):
+              try:
+                  packages[package] = importlib.metadata.version(package)
+              except importlib.metadata.PackageNotFoundError:
+                  packages[package] = None
+          # The same runtime record as a timed run; compare.py reads run_attempt from it (a re-run voids the run).
+          runtime = {"image_os": os.environ.get("ImageOS", ""), "runner_arch": os.environ.get("RUNNER_ARCH", ""),
+                     "cpu_count": os.cpu_count(), "python_executable": sys.executable, "python_full_version": sys.version,
+                     "packages": packages, "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT", "")}
+          for kind in ("controls", "crash"):
+              out = os.path.join(results, f"{os.environ['OS_LABEL']}-{os.environ['ARM']}-{kind}")
+              os.makedirs(out, exist_ok=True)
+
+              def read(name):
+                  path = os.path.join(out, name)
+                  if not os.path.exists(path):
+                      return None
+                  with open(path, encoding="utf-8") as handle:
+                      return handle.read().strip()
+
+              # No step_seconds: the controls are not timed (their duration stays in step-seconds.txt).
+              meta = {"os": os.environ["OS_LABEL"], "arm": os.environ["ARM"], "repeat": 1, "command": read("command.txt"),
+                      "python_version": platform.python_version(), "platform": platform.platform(),
+                      "runner_image": os.environ.get("ImageVersion", ""), "checkout_sha": head.strip() if head else None,
+                      "limit": read("limit.txt")}
+              with open(os.path.join(out, "meta.json"), "w", encoding="utf-8") as handle:
+                  json.dump(meta, handle, indent=2, sort_keys=True)
+                  handle.write("\n")
+              with open(os.path.join(out, "git-status.txt"), "w", encoding="utf-8") as handle:
+                  handle.write(status if status is not None else "git status failed\n")
+              with open(os.path.join(out, "runtime.json"), "w", encoding="utf-8") as handle:
+                  json.dump(runtime, handle, indent=2, sort_keys=True)
+                  handle.write("\n")
+          PYEOF
+      - name: Upload the control runs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: control-macos-15-${{ matrix.arm }}
+          path: ${{ runner.temp }}/results/
+          if-no-files-found: error
+          retention-days: 30
+          overwrite: false
+
+  controls-linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      OS_LABEL: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        arm: [S, L4, L4F, L4C]
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out the pull request head with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Assert the checkout is the pull request head, not a merge commit
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          if [ "$actual" != "$PR_HEAD_SHA" ]; then
+            echo "checked out $actual, not the pull request head $PR_HEAD_SHA" >&2
+            exit 1
+          fi
+          echo "testing the pull request head $actual"
+      - name: Provision the pinned tree-sitter-bash parser for the token-measurement lane tests
+        # The control runs do not use it, but the arm's serial command below is the whole-suite form that the
+        # tests/test_shell_parser_ci.py ratchet reads, so this job carries validate.yml's step unchanged.
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("examples/claude-native/workflows/shell-parser.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("CHILD_USAGE_SHELL_PARSER=" + directory + "\n")
+          PYEOF
+      - name: Provision the pinned yaml package for the skills-modality SKILL.md reader tests
+        # Likewise for the tests/test_landscape_sweep_skills.py ratchet; the control runs do not use it.
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("tools/sota-convergence/landscape-sweep/skills-yaml.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("LANDSCAPE_SWEEP_SKILLS_YAML=" + directory + "\n")
+          PYEOF
+      - name: Install the hash-locked trial runner
+        run: >-
+          python3 -m pip install --disable-pip-version-check --no-input
+          --only-binary=:all: --require-hashes
+          --index-url https://pypi.org/simple
+          -r .github/requirements-ci-suite-linux.txt
+      - name: Run the arm's command on each control file alone in an empty directory (300 s limit each)
+        env:
+          ARM: ${{ matrix.arm }}
+        run: |
+          set -euo pipefail
+          # The run contract of controls/control_expectations.json: the control file alone in an empty directory,
+          # the arm's exact command run there, the run stored beside the timed runs as <os>-<arm>-controls or
+          # <os>-<arm>-crash. The limit is GNU timeout where the image has it (exit 124 when it fires); macos-15
+          # ships perl but not coreutils, so there it is an alarm that survives perl's exec (exit 142). A hang or
+          # a kill at the limit leaves a non-zero exit, which the crash control counts as fail-closed.
+          limited() {
+            if command -v timeout >/dev/null 2>&1; then
+              timeout --kill-after=30 "$@"
+            else
+              perl -e 'alarm shift @ARGV; exec(@ARGV) or die "exec failed\n"' "$@"
+            fi
+          }
+          if command -v timeout >/dev/null 2>&1; then limit="timeout --kill-after=30 300"; else limit="perl alarm 300"; fi
+          case "$ARM" in
+            S)
+              set -- python3 -m unittest -v
+              ;;
+            L4)
+              set -- python3 -m unittest_parallel -j 4 --level module -v
+              ;;
+            L4F)
+              set -- python3 -m unittest_parallel -j 4 --level module --disable-process-pooling -v
+              ;;
+            L4C)
+              set -- python3 -m unittest_parallel -j 4 --level class -v
+              ;;
+            *)
+              echo "unknown arm: $ARM" >&2
+              exit 1
+              ;;
+          esac
+          run_control() {
+            kind="$1"
+            control_file="$2"
+            shift 2
+            out="$RUNNER_TEMP/results/$OS_LABEL-$ARM-$kind"
+            work="$RUNNER_TEMP/control-$kind"
+            rm -rf "$work"
+            mkdir -p "$out" "$work"
+            cp "$control_file" "$work/"
+            printf '%s\n' "$*" > "$out/command.txt"
+            printf '%s\n' "$limit" > "$out/limit.txt"
+            start="$(date +%s)"
+            set +e
+            (cd "$work" && limited 300 "$@") >"$out/log.txt" 2>&1
+            code=$?
+            set -e
+            end="$(date +%s)"
+            printf '%s\n' "$code" > "$out/exit-code.txt"
+            printf '%s\n' "$((end - start))" > "$out/step-seconds.txt"
+            echo "$kind with arm $ARM: exit $code after $((end - start)) s"
+            tail -n 5 "$out/log.txt"
+          }
+          run_control controls "$TRIAL_DIR/controls/test_zz_trial_controls.py" "$@"
+          run_control crash "$TRIAL_DIR/controls/crash_control/test_crash.py" "$@"
+      - name: Record the control runs' metadata and the checkout's status
+        if: always()
+        env:
+          ARM: ${{ matrix.arm }}
+        run: |
+          python3 - <<'PYEOF'
+          import importlib.metadata, json, os, platform, subprocess, sys
+
+          results = os.path.join(os.environ["RUNNER_TEMP"], "results")
+
+          def git(*args):
+              done = subprocess.run(["git", *args], capture_output=True, text=True, check=False)
+              return done.stdout if done.returncode == 0 else None
+
+          head, status = git("rev-parse", "HEAD"), git("status", "--porcelain=v1", "--untracked-files=all")
+          packages = {}
+          for package in ("coverage", "unittest-parallel"):
+              try:
+                  packages[package] = importlib.metadata.version(package)
+              except importlib.metadata.PackageNotFoundError:
+                  packages[package] = None
+          # The same runtime record as a timed run; compare.py reads run_attempt from it (a re-run voids the run).
+          runtime = {"image_os": os.environ.get("ImageOS", ""), "runner_arch": os.environ.get("RUNNER_ARCH", ""),
+                     "cpu_count": os.cpu_count(), "python_executable": sys.executable, "python_full_version": sys.version,
+                     "packages": packages, "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT", "")}
+          for kind in ("controls", "crash"):
+              out = os.path.join(results, f"{os.environ['OS_LABEL']}-{os.environ['ARM']}-{kind}")
+              os.makedirs(out, exist_ok=True)
+
+              def read(name):
+                  path = os.path.join(out, name)
+                  if not os.path.exists(path):
+                      return None
+                  with open(path, encoding="utf-8") as handle:
+                      return handle.read().strip()
+
+              # No step_seconds: the controls are not timed (their duration stays in step-seconds.txt).
+              meta = {"os": os.environ["OS_LABEL"], "arm": os.environ["ARM"], "repeat": 1, "command": read("command.txt"),
+                      "python_version": platform.python_version(), "platform": platform.platform(),
+                      "runner_image": os.environ.get("ImageVersion", ""), "checkout_sha": head.strip() if head else None,
+                      "limit": read("limit.txt")}
+              with open(os.path.join(out, "meta.json"), "w", encoding="utf-8") as handle:
+                  json.dump(meta, handle, indent=2, sort_keys=True)
+                  handle.write("\n")
+              with open(os.path.join(out, "git-status.txt"), "w", encoding="utf-8") as handle:
+                  handle.write(status if status is not None else "git status failed\n")
+              with open(os.path.join(out, "runtime.json"), "w", encoding="utf-8") as handle:
+                  json.dump(runtime, handle, indent=2, sort_keys=True)
+                  handle.write("\n")
+          PYEOF
+      - name: Upload the control runs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: control-ubuntu-24.04-${{ matrix.arm }}
+          path: ${{ runner.temp }}/results/
+          if-no-files-found: error
+          retention-days: 30
+          overwrite: false
+
+  arms-macos:
+    runs-on: macos-15
+    # validate-macos allows 60 minutes for its whole job; the arm step below has its own hang guard.
+    timeout-minutes: 100
+    env:
+      OS_LABEL: macos-15
+    strategy:
+      fail-fast: false
+      # 15 jobs share the plan's 5 macOS slots with the repository's other workflows.
+      max-parallel: 2
+      matrix:
+        # Repeat-major, each repeat rotated by one arm so that no arm always starts first.
+        include:
+          - {repeat: 1, arm: S}
+          - {repeat: 1, arm: P3}
+          - {repeat: 1, arm: P3F}
+          - {repeat: 1, arm: P3C}
+          - {repeat: 1, arm: P4}
+          - {repeat: 2, arm: P3}
+          - {repeat: 2, arm: P3F}
+          - {repeat: 2, arm: P3C}
+          - {repeat: 2, arm: P4}
+          - {repeat: 2, arm: S}
+          - {repeat: 3, arm: P3F}
+          - {repeat: 3, arm: P3C}
+          - {repeat: 3, arm: P4}
+          - {repeat: 3, arm: S}
+          - {repeat: 3, arm: P3}
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out the pull request head with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Full history, as validate-macos: the suite resolves receipt revisions and the pinned release commit.
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Assert the checkout is the pull request head, not a merge commit
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          if [ "$actual" != "$PR_HEAD_SHA" ]; then
+            echo "checked out $actual, not the pull request head $PR_HEAD_SHA" >&2
+            exit 1
+          fi
+          echo "testing the pull request head $actual"
+      - name: Set up the manifest-supported Python line
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.13'
+          check-latest: false
+      - name: Provision the pinned tree-sitter-bash parser for the token-measurement lane tests
+        # The step validate.yml runs before its suite, unchanged: the shell-parser tripwire fails a job that is not a
+        # recorded gap and has no verified install.
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("examples/claude-native/workflows/shell-parser.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("CHILD_USAGE_SHELL_PARSER=" + directory + "\n")
+          PYEOF
+      - name: Provision the pinned yaml package for the skills-modality SKILL.md reader tests
+        # The step validate.yml runs before its suite, unchanged: the skills-yaml tripwire fails a job that is not a
+        # recorded gap and has no verified install.
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("tools/sota-convergence/landscape-sweep/skills-yaml.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("LANDSCAPE_SWEEP_SKILLS_YAML=" + directory + "\n")
+          PYEOF
+      - name: Install the hash-locked trial runner (every arm, the serial one included)
+        run: >-
+          python3 -m pip install --disable-pip-version-check --no-input
+          --only-binary=:all: --require-hashes
+          --index-url https://pypi.org/simple
+          -r .github/requirements-ci-suite-macos.txt
+      - name: Run the arm's command on the whole suite (exit status recorded, never failing the step)
+        timeout-minutes: 80
+        env:
+          ARM: ${{ matrix.arm }}
+          REPEAT: ${{ matrix.repeat }}
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/results/$OS_LABEL-$ARM-r$REPEAT"
+          mkdir -p "$out"
+          case "$ARM" in
+            S)
+              set -- python3 -m unittest -v
+              # --durations needs CPython 3.12 or newer (Lib/unittest/main.py line 184 at v3.12.3).
+              if python3 -c 'import sys; raise SystemExit(sys.version_info < (3, 12))'; then
+                set -- "$@" --durations 25
+              fi
+              ;;
+            P3)
+              set -- python3 -m unittest_parallel -j 3 --level module -v
+              ;;
+            P3F)
+              set -- python3 -m unittest_parallel -j 3 --level module --disable-process-pooling -v
+              ;;
+            P3C)
+              set -- python3 -m unittest_parallel -j 3 --level class -v
+              ;;
+            P4)
+              set -- python3 -m unittest_parallel -j 4 --level module -v
+              ;;
+            *)
+              echo "unknown arm: $ARM" >&2
+              exit 1
+              ;;
+          esac
+          printf '%s\n' "$*" > "$out/command.txt"
+          start="$(date +%s)"
+          set +e
+          "$@" >"$out/log.txt" 2>&1
+          code=$?
+          set -e
+          end="$(date +%s)"
+          printf '%s\n' "$code" > "$out/exit-code.txt"
+          printf '%s\n' "$((end - start))" > "$out/step-seconds.txt"
+          echo "arm $ARM, repeat $REPEAT: exit $code after $((end - start)) s"
+          tail -n 5 "$out/log.txt"
+      - name: Record the run's metadata, runtime and checkout status
+        if: always()
+        env:
+          ARM: ${{ matrix.arm }}
+          REPEAT: ${{ matrix.repeat }}
+        run: |
+          python3 - <<'PYEOF'
+          import importlib.metadata, json, os, platform, subprocess, sys
+
+          out = os.path.join(os.environ["RUNNER_TEMP"], "results",
+                             f"{os.environ['OS_LABEL']}-{os.environ['ARM']}-r{os.environ['REPEAT']}")
+          os.makedirs(out, exist_ok=True)
+
+          def read(name):
+              path = os.path.join(out, name)
+              if not os.path.exists(path):
+                  return None
+              with open(path, encoding="utf-8") as handle:
+                  return handle.read().strip()
+
+          def git(*args):
+              done = subprocess.run(["git", *args], capture_output=True, text=True, check=False)
+              return done.stdout if done.returncode == 0 else None
+
+          def write(name, text):
+              with open(os.path.join(out, name), "w", encoding="utf-8") as handle:
+                  handle.write(text)
+
+          head, seconds = git("rev-parse", "HEAD"), read("step-seconds.txt")
+          meta = {"os": os.environ["OS_LABEL"], "arm": os.environ["ARM"], "repeat": int(os.environ["REPEAT"]),
+                  "command": read("command.txt"), "python_version": platform.python_version(),
+                  "platform": platform.platform(), "runner_image": os.environ.get("ImageVersion", ""),
+                  "checkout_sha": head.strip() if head else None, "step_seconds": int(seconds) if seconds else None}
+          write("meta.json", json.dumps(meta, indent=2, sort_keys=True) + "\n")
+          status = git("status", "--porcelain=v1", "--untracked-files=all")
+          write("git-status.txt", status if status is not None else "git status failed\n")
+          packages = {}
+          for package in ("coverage", "unittest-parallel"):
+              try:
+                  packages[package] = importlib.metadata.version(package)
+              except importlib.metadata.PackageNotFoundError:
+                  packages[package] = None
+          runtime = {"image_os": os.environ.get("ImageOS", ""), "runner_arch": os.environ.get("RUNNER_ARCH", ""),
+                     "cpu_count": os.cpu_count(), "python_executable": sys.executable, "python_full_version": sys.version,
+                     "packages": packages, "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT", "")}
+          write("runtime.json", json.dumps(runtime, indent=2, sort_keys=True) + "\n")
+          PYEOF
+      - name: Upload the arm run
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: arm-macos-15-${{ matrix.arm }}-r${{ matrix.repeat }}
+          path: ${{ runner.temp }}/results/
+          if-no-files-found: error
+          retention-days: 30
+          overwrite: false
+
+  arms-linux:
+    runs-on: ubuntu-24.04
+    # validate allows 40 minutes for its whole job; the arm step below has its own hang guard.
+    timeout-minutes: 75
+    env:
+      OS_LABEL: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        # Repeat-major, each repeat rotated by one arm so that no arm always starts first.
+        include:
+          - {repeat: 1, arm: S}
+          - {repeat: 1, arm: L4}
+          - {repeat: 1, arm: L4F}
+          - {repeat: 1, arm: L4C}
+          - {repeat: 2, arm: L4}
+          - {repeat: 2, arm: L4F}
+          - {repeat: 2, arm: L4C}
+          - {repeat: 2, arm: S}
+          - {repeat: 3, arm: L4F}
+          - {repeat: 3, arm: L4C}
+          - {repeat: 3, arm: S}
+          - {repeat: 3, arm: L4}
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out the pull request head with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          # Full history, as validate: the suite resolves receipt revisions and the pinned release commit.
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Assert the checkout is the pull request head, not a merge commit
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          if [ "$actual" != "$PR_HEAD_SHA" ]; then
+            echo "checked out $actual, not the pull request head $PR_HEAD_SHA" >&2
+            exit 1
+          fi
+          echo "testing the pull request head $actual"
+      # The four steps validate.yml runs before its suite, unchanged, so that the serial arm is the production
+      # suite step: the zizmor lock (its tests skip without zizmor), the promotion-gate venv and the two npm pins.
+      - name: Install checksum-locked CI analyzer
+        run: >-
+          python3 -m pip install --disable-pip-version-check --no-input
+          --only-binary=:all: --require-hashes
+          --index-url https://pypi.org/simple
+          -r .github/requirements-ci.txt
+      - name: Provision the promotion gate's isolated venv
+        env:
+          UV_VERSION: '0.12.17'
+          # https://github.com/astral-sh/uv/releases/download/0.12.17/uv-x86_64-unknown-linux-gnu.tar.gz.sha256
+          UV_SHA256: fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63
+        run: |
+          mkdir -p "$RUNNER_TEMP/uv"
+          curl --fail --silent --show-error --location --retry 3 \
+            "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-x86_64-unknown-linux-gnu.tar.gz" \
+            --output "$RUNNER_TEMP/uv/archive.tar.gz"
+          printf '%s  %s\n' "$UV_SHA256" "$RUNNER_TEMP/uv/archive.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/uv/archive.tar.gz" -C "$RUNNER_TEMP/uv" --strip-components=1
+          "$RUNNER_TEMP/uv/uv" --version
+          "$RUNNER_TEMP/uv/uv" venv --python /usr/bin/python3 "$RUNNER_TEMP/promotion-gate-venv"
+          "$RUNNER_TEMP/uv/uv" pip sync --python "$RUNNER_TEMP/promotion-gate-venv/bin/python3" --require-hashes \
+            blueprints/us-equities/data/requirements.lock
+          echo "PROMOTION_GATE_PYTHON=$RUNNER_TEMP/promotion-gate-venv/bin/python3" >> "$GITHUB_ENV"
+          echo "REQUIRE_PROMOTION_GATE_VENV=1" >> "$GITHUB_ENV"
+      - name: Provision the pinned tree-sitter-bash parser for the token-measurement lane tests
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("examples/claude-native/workflows/shell-parser.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("CHILD_USAGE_SHELL_PARSER=" + directory + "\n")
+          PYEOF
+      - name: Provision the pinned yaml package for the skills-modality SKILL.md reader tests
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, shlex, string, subprocess
+
+          with open("tools/sota-convergence/landscape-sweep/skills-yaml.pin.json", encoding="utf-8") as handle:
+              pin = json.load(handle)
+          name = os.path.basename(pin["install"]["default_directory"])
+          alphanumeric = string.ascii_letters + string.digits
+          if not name or name[0] not in alphanumeric or any(char not in alphanumeric + "._-" for char in name):
+              raise SystemExit("the pin names an install directory outside [A-Za-z0-9._-]")
+          words = shlex.split(pin["install"]["command"])
+          if words[:2] != ["npm", "install"] or words.count("<directory>") != 1:
+              raise SystemExit("the pin's install command is not an npm install with one <directory>")
+          directory = os.path.join(os.environ["RUNNER_TEMP"], name)
+          os.makedirs(directory, exist_ok=True)
+          subprocess.run([directory if word == "<directory>" else word for word in words], check=True)
+          with open(os.environ["GITHUB_ENV"], "a", encoding="utf-8") as env_file:
+              env_file.write("LANDSCAPE_SWEEP_SKILLS_YAML=" + directory + "\n")
+          PYEOF
+      - name: Install the hash-locked trial runner (every arm, the serial one included)
+        run: >-
+          python3 -m pip install --disable-pip-version-check --no-input
+          --only-binary=:all: --require-hashes
+          --index-url https://pypi.org/simple
+          -r .github/requirements-ci-suite-linux.txt
+      - name: Run the arm's command on the whole suite (exit status recorded, never failing the step)
+        timeout-minutes: 60
+        env:
+          ARM: ${{ matrix.arm }}
+          REPEAT: ${{ matrix.repeat }}
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/results/$OS_LABEL-$ARM-r$REPEAT"
+          mkdir -p "$out"
+          case "$ARM" in
+            S)
+              set -- python3 -m unittest -v
+              # --durations needs CPython 3.12 or newer (Lib/unittest/main.py line 184 at v3.12.3).
+              if python3 -c 'import sys; raise SystemExit(sys.version_info < (3, 12))'; then
+                set -- "$@" --durations 25
+              fi
+              ;;
+            L4)
+              set -- python3 -m unittest_parallel -j 4 --level module -v
+              ;;
+            L4F)
+              set -- python3 -m unittest_parallel -j 4 --level module --disable-process-pooling -v
+              ;;
+            L4C)
+              set -- python3 -m unittest_parallel -j 4 --level class -v
+              ;;
+            *)
+              echo "unknown arm: $ARM" >&2
+              exit 1
+              ;;
+          esac
+          printf '%s\n' "$*" > "$out/command.txt"
+          start="$(date +%s)"
+          set +e
+          "$@" >"$out/log.txt" 2>&1
+          code=$?
+          set -e
+          end="$(date +%s)"
+          printf '%s\n' "$code" > "$out/exit-code.txt"
+          printf '%s\n' "$((end - start))" > "$out/step-seconds.txt"
+          echo "arm $ARM, repeat $REPEAT: exit $code after $((end - start)) s"
+          tail -n 5 "$out/log.txt"
+      - name: Record the run's metadata, runtime and checkout status
+        if: always()
+        env:
+          ARM: ${{ matrix.arm }}
+          REPEAT: ${{ matrix.repeat }}
+        run: |
+          python3 - <<'PYEOF'
+          import importlib.metadata, json, os, platform, subprocess, sys
+
+          out = os.path.join(os.environ["RUNNER_TEMP"], "results",
+                             f"{os.environ['OS_LABEL']}-{os.environ['ARM']}-r{os.environ['REPEAT']}")
+          os.makedirs(out, exist_ok=True)
+
+          def read(name):
+              path = os.path.join(out, name)
+              if not os.path.exists(path):
+                  return None
+              with open(path, encoding="utf-8") as handle:
+                  return handle.read().strip()
+
+          def git(*args):
+              done = subprocess.run(["git", *args], capture_output=True, text=True, check=False)
+              return done.stdout if done.returncode == 0 else None
+
+          def write(name, text):
+              with open(os.path.join(out, name), "w", encoding="utf-8") as handle:
+                  handle.write(text)
+
+          head, seconds = git("rev-parse", "HEAD"), read("step-seconds.txt")
+          meta = {"os": os.environ["OS_LABEL"], "arm": os.environ["ARM"], "repeat": int(os.environ["REPEAT"]),
+                  "command": read("command.txt"), "python_version": platform.python_version(),
+                  "platform": platform.platform(), "runner_image": os.environ.get("ImageVersion", ""),
+                  "checkout_sha": head.strip() if head else None, "step_seconds": int(seconds) if seconds else None}
+          write("meta.json", json.dumps(meta, indent=2, sort_keys=True) + "\n")
+          status = git("status", "--porcelain=v1", "--untracked-files=all")
+          write("git-status.txt", status if status is not None else "git status failed\n")
+          packages = {}
+          for package in ("coverage", "unittest-parallel"):
+              try:
+                  packages[package] = importlib.metadata.version(package)
+              except importlib.metadata.PackageNotFoundError:
+                  packages[package] = None
+          runtime = {"image_os": os.environ.get("ImageOS", ""), "runner_arch": os.environ.get("RUNNER_ARCH", ""),
+                     "cpu_count": os.cpu_count(), "python_executable": sys.executable, "python_full_version": sys.version,
+                     "packages": packages, "run_attempt": os.environ.get("GITHUB_RUN_ATTEMPT", "")}
+          write("runtime.json", json.dumps(runtime, indent=2, sort_keys=True) + "\n")
+          PYEOF
+      - name: Upload the arm run
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: arm-ubuntu-24.04-${{ matrix.arm }}-r${{ matrix.repeat }}
+          path: ${{ runner.temp }}/results/
+          if-no-files-found: error
+          retention-days: 30
+          overwrite: false
+
+  compare:
+    needs: [inventory, controls-macos, controls-linux, arms-macos, arms-linux]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Harden the runner (audit-only network egress)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+      - name: Check out the pull request head with full history
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Assert the checkout is the pull request head, not a merge commit
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          actual="$(git rev-parse HEAD)"
+          if [ "$actual" != "$PR_HEAD_SHA" ]; then
+            echo "checked out $actual, not the pull request head $PR_HEAD_SHA" >&2
+            exit 1
+          fi
+          echo "testing the pull request head $actual"
+      - name: Download the inventories
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: inventory
+          path: ${{ runner.temp }}/inventory
+      - name: Download the timed arm runs
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: arm-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/results
+      # compare.py reads the control runs (<os>-<arm>-controls, <os>-<arm>-crash) from the same directory.
+      - name: Download the control runs
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: control-*
+          merge-multiple: true
+          path: ${{ runner.temp }}/results
+      # The oracle was tested locally on CPython 3.12.3, 3.13.16 and 3.14.4 (its README, "Run it"); this job runs it
+      # on the image's python3. An oracle that fails its own tests here gives no verdict: the step fails and
+      # compare.py is skipped (fail-closed), while every arm and control artifact stays downloadable.
+      - name: Run the oracle's own tests on this interpreter (fail-closed)
+        run: python3 -m unittest discover -s "$TRIAL_DIR" -p test_compare.py -v
+      - name: Compare every arm run with the serial arm of its runner (compare.py)
+        env:
+          # The frozen corpus: compare.py marks an arm run ineligible when its checkout_sha differs.
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/compare"
+          ls -1 "$RUNNER_TEMP/results" || echo "no arm run was downloaded"
+          python3 "$TRIAL_DIR/compare.py" \
+            --results "$RUNNER_TEMP/results" \
+            --inventory-base "$RUNNER_TEMP/inventory/inventory-base.txt" \
+            --inventory-trial "$RUNNER_TEMP/inventory/inventory-trial.txt" \
+            --expected-sha "$PR_HEAD_SHA" \
+            --out "$RUNNER_TEMP/compare/result.json" \
+            --summary-md "$RUNNER_TEMP/compare/summary.md"
+      # The preregistered oracle's second part (the experiment record), repeated as a second check of compare.py's
+      # own: every run directory's `git status --porcelain=v1 --untracked-files=all` (git-status.txt) exists and is
+      # empty. A missing file or the recorder's "git status failed" counts as dirty. A dirty run makes its arm
+      # ineligible.
+      - name: Check that every run left the checkout clean (git status, second part of the oracle)
+        if: always()
+        run: |
+          python3 - <<'PYEOF'
+          import json, os, sys
+
+          results = os.path.join(os.environ["RUNNER_TEMP"], "results")
+          out_dir = os.path.join(os.environ["RUNNER_TEMP"], "compare")
+          os.makedirs(out_dir, exist_ok=True)
+          names = sorted(name for name in os.listdir(results) if os.path.isdir(os.path.join(results, name))) \
+              if os.path.isdir(results) else []
+          runs = []
+          for name in names:
+              path = os.path.join(results, name, "git-status.txt")
+              if not os.path.isfile(path):
+                  runs.append({"name": name, "clean": False, "status": None, "reason": "git-status.txt is missing"})
+                  continue
+              with open(path, encoding="utf-8", errors="replace") as handle:
+                  status = handle.read()
+              clean = status == ""
+              runs.append({"name": name, "clean": clean, "status": status[:4000],
+                           "reason": None if clean else "the checkout was not clean after the run"})
+          dirty = [run["name"] for run in runs if not run["clean"]]
+          report = {"schema": "suite-parallelism-checkout-status/1",
+                    "rule": "every run directory's git-status.txt exists and is empty",
+                    "runs": runs, "dirty": dirty, "ok": bool(runs) and not dirty}
+          with open(os.path.join(out_dir, "checkout-status.json"), "w", encoding="utf-8") as handle:
+              json.dump(report, handle, indent=2, sort_keys=True)
+              handle.write("\n")
+          with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as summary:
+              summary.write(f"\n### Clean checkout after every run\n\n{len(runs)} run directories; "
+                            f"dirty or unrecorded: {', '.join(dirty) if dirty else 'none'}\n")
+          if not runs:
+              sys.exit("no run directory was downloaded")
+          if dirty:
+              sys.exit(f"{len(dirty)} run directories without a clean checkout: {', '.join(dirty)}")
+          PYEOF
+      - name: Write the summary and list the control runs (report only)
+        if: always()
+        run: |
+          set -euo pipefail
+          summary="$RUNNER_TEMP/compare/summary.md"
+          if [ -f "$summary" ]; then
+            cat "$summary" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "compare.py wrote no summary; see the compare step's log." >> "$GITHUB_STEP_SUMMARY"
+          fi
+          {
+            echo
+            echo "### Control runs (exit status and last status line; compare.py judges them against control_expectations.json)"
+            echo
+            echo "~~~"
+            for dir in "$RUNNER_TEMP"/results/*-controls/ "$RUNNER_TEMP"/results/*-crash/; do
+              [ -d "$dir" ] || continue
+              name="$(basename "$dir")"
+              code="$(cat "$dir/exit-code.txt" 2>/dev/null || echo missing)"
+              last="$(grep -E '^(OK|FAILED)' "$dir/log.txt" 2>/dev/null | tail -n 1 || true)"
+              printf '%s exit=%s %s\n' "$name" "$code" "${last:-no status line}"
+            done
+            echo "~~~"
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload the comparison
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: compare
+          path: ${{ runner.temp }}/compare/
+          if-no-files-found: warn
+          retention-days: 30
+          overwrite: false

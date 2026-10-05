@@ -201,9 +201,13 @@ processors:
           # deleted, never rewritten. IsMatch converts any value type and returns false for nil
           # (opentelemetry-collector-contrib v0.161.0, pkg/ottl/ottlfuncs/README.md#ismatch).
           - delete_key(attributes, "env") where attributes["env"] != nil and not IsMatch(attributes["env"], "^[A-Za-z0-9][A-Za-z0-9_.:-]{0,127}$")
+          # The Codex lane name: each lane's launch exports OTEL_RESOURCE_ATTRIBUTES=ecosystem.lane=<lane>
+          # (codex-identity-launcher.sh.example). Metrics carry it as the ecosystem_lane label, so only a short
+          # lowercase name is kept; any other value is deleted, never rewritten. Same check in metric_statements.
+          - delete_key(attributes, "ecosystem.lane") where attributes["ecosystem.lane"] != nil and not IsMatch(attributes["ecosystem.lane"], "^[a-z][a-z0-9_-]{0,31}$")
           # Claude Code custom resource attributes (including the RUNBOOK's run key):
           # https://code.claude.com/docs/en/monitoring-usage#multi-team-organization-support
-          - keep_keys(attributes, ["service.name", "service.version", "service.instance.id", "deployment.environment", "env", "ecosystem.task.id", "ecosystem.client.scope"])
+          - keep_keys(attributes, ["service.name", "service.version", "service.instance.id", "deployment.environment", "env", "ecosystem.task.id", "ecosystem.client.scope", "ecosystem.lane"])
       - context: scope
         statements:
           - keep_keys(attributes, [])
@@ -235,7 +239,9 @@ processors:
           # (OTEL_RESOURCE_ATTRIBUTES service.instance.id) is kept and made per session; else the session is the writer.
           - set(attributes["service.instance.id"], Concat([attributes["service.instance.id"], attributes["session.id"]], "/")) where attributes["service.instance.id"] != nil and attributes["session.id"] != nil
           - set(attributes["service.instance.id"], attributes["session.id"]) where attributes["service.instance.id"] == nil and attributes["session.id"] != nil
-          - keep_keys(attributes, ["service.name", "service.version", "service.instance.id", "deployment.environment", "ecosystem.client.scope"])
+          # The lane name, checked as in log_statements; exporters.prometheus makes it the ecosystem_lane label.
+          - delete_key(attributes, "ecosystem.lane") where attributes["ecosystem.lane"] != nil and not IsMatch(attributes["ecosystem.lane"], "^[a-z][a-z0-9_-]{0,31}$")
+          - keep_keys(attributes, ["service.name", "service.version", "service.instance.id", "deployment.environment", "ecosystem.client.scope", "ecosystem.lane"])
       - context: scope
         statements:
           - keep_keys(attributes, [])
@@ -268,8 +274,12 @@ exporters:
   prometheus:
     endpoint: 127.0.0.1:18889
     namespace: ecosystem
-    resource_to_telemetry_conversion:
-      enabled: false
+    # Only the lane name becomes a label (ecosystem_lane); other resource attributes stay on target_info.
+    # resource_constant_labels replaces the deprecated resource_to_telemetry_conversion, whose enabled: false was the
+    # default; configuring both is a validation error (opentelemetry-collector-contrib v0.161.0,
+    # exporter/prometheusexporter/README.md:30-35, config.go:76-77).
+    resource_constant_labels:
+      included: ["ecosystem.lane"]
   otlphttp/loki:
     endpoint: http://127.0.0.1:13100/otlp
     sending_queue:

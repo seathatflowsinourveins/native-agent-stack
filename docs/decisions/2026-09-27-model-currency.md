@@ -510,3 +510,21 @@ pin as it fills `SOCRATICODE_VERSION`: `gpt-6.1-sol` from Codex 0.159.1 and `gpt
 only the two model values were set back to `gpt-6.1-sol` (2026-09-30; a Linux build standing in for the Mac client of
 the same version, not macOS evidence). The stack-worker profile keeps its `gpt-6.1-sol` literal: `apply_codex_lane.py`
 installs it verbatim, passes its model as `-m` and refuses any Codex but its `CODEX_VERSION`, the Linux pin.
+
+### Addendum 2026-10-04: template advisor becomes Opus 5.5
+
+The user chose Opus 5.5 as the advisor on 2026-10-04 at about 15:10Z. The template
+`adoption/templates/claude.settings.template.json` now carries `"advisorModel": "opus"`. See
+[the October 4 advisor decision](2026-10-04-coordinator-dispatch-and-spend.md#advisor-model) and
+[PR #691](https://github.com/seathatflowsinourveins/native-agent-stack/pull/691) for the user's choice, historical
+Fable cost share and supplied workstation read-back. The
+[native advisor setting](https://code.claude.com/docs/en/advisor#set-advisormodel-in-settings) supports this alias.
+The north-star action is to preserve research and historical-simulation capacity while attributing coordinator spend.
+
+This supersedes the template's Fable selection in the original scope, advisor row, "The advisor in the template",
+verification and unresolved passages. Those dated statements and the historical Fable measurements remain intact;
+they describe the September 27 state. The
+[September 30 routing record's October 4 addendum](2026-09-30-task-model-routing.md#addendum-2026-10-04-advisor-selection-supersedes-the-fable-row)
+also points forward and retains its old quote through this record's unchanged line 132. Keeping Fable was the previous
+selection; Opus replaces it at the user's request, with post-change savings and quality still unmeasured. Revisit the
+selection through the October 4 record's observation contract or a subsequent user decision.

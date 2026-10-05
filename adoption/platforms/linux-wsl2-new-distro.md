@@ -16,11 +16,55 @@ default and is never shut down.
 The page rehearses both image arms on separate throwaway names, which R1 then removes, before running for the real
 `<Name>` ([Rehearsal first](#rehearsal-first)). Each run starts with P1 to P3, `sh` checks in the workstation's
 distribution that change nothing on the host; it shares the kernel and already has Ubuntu's keyring and cloud-init.
-Stage 1 (W1 to W7) runs on the
-Windows host in PowerShell. A session inside the workstation's WSL distribution runs each
+Stage 1 (W1 to W7) requires **PowerShell 7 installed on the Windows host**; a stock Windows installation does not
+include it. This guidance uses [PowerShell v7.6.6](https://github.com/PowerShell/PowerShell/releases/tag/v7.6.6)
+(2026-09-08; current stable release checked 2026-10-04). In a Windows command shell, install the MSI package with
+`winget install --id Microsoft.PowerShell --source winget --installer-type wix --version 7.6.6`
+([Microsoft's install instructions](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.6#install-powershell-using-winget),
+[WinGet install reference: `--version` selects an exact version](https://learn.microsoft.com/en-us/windows/package-manager/winget/install#options)).
+The MSI installer creates `C:\Program Files\PowerShell\7` by default. WinGet's default since 7.6 is MSIX, so keep
+`--installer-type wix` for this recipe's path
+([installation options](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.6#install-the-msi-package-with-command-line-options)).
+If `/mnt/c/Program Files/PowerShell/7/pwsh.exe` is absent, stop the Windows-side steps and install it first. If WinGet
+is unavailable, download the **7.6.6 MSI** from the [reviewed release](https://github.com/PowerShell/PowerShell/releases/tag/v7.6.6)
+and follow [Microsoft's MSI installation steps](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.6#install-the-msi-package):
+double-click it and follow the prompts, retaining the default installation directory; then run the version gate below
+before resuming ([Microsoft's installer steps, lines 84–92](https://github.com/MicrosoftDocs/PowerShell-Docs/blob/a3de8f22552170e70852470d46cd52cd9ca471ec/reference/docs-conceptual/install/install-powershell-on-windows.md#L84-L92)).
+Do not fall back to Windows PowerShell 5.1.
+
+## PowerShell version gate (before W1)
+
+Before any Windows-side block, including Stage 1 (W1) and R1's rehearsal, run this gate from **bash in the
+workstation distribution**. The shared `PowerShell\7\pwsh.exe` path does not identify the installed patch.
+The command prints `$PSVersionTable.PSVersion` as a version string, records it in a new private temporary log,
+and exits nonzero unless it is **7.6.6 or a later stable 7.6 patch**. Retain that log with the run's checklist.
+`pipefail` preserves a failed PowerShell exit through `tee`; only exit 0 permits the Windows-side blocks.
+
+```bash
+PWSH_VERSION_LOG="$(mktemp)" || exit 1
+printf 'PowerShell version log: %s\n' "$PWSH_VERSION_LOG"
+set -o pipefail
+'/mnt/c/Program Files/PowerShell/7/pwsh.exe' -NoLogo -NoProfile -Command '$PSVersionTable.PSVersion.ToString(); if ($PSVersionTable.PSVersion.Major -ne 7 -or $PSVersionTable.PSVersion.Minor -ne 6 -or $PSVersionTable.PSVersion.Patch -lt 6 -or $PSVersionTable.PSVersion.PreReleaseLabel) { exit 1 }' 2>&1 | tee "$PWSH_VERSION_LOG" || exit 1
+```
+
+The single-quoted `-Command` argument leaves `$PSVersionTable` for PowerShell instead of expanding it in bash
+([about_pwsh: `-Command`](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh?view=powershell-7.6#-command---c)).
+The version fields are the reviewed release's
+[`SemanticVersion` properties](https://github.com/PowerShell/PowerShell/blob/f260eb9c31ec72c5282f98e5ea24d9be4f8d7536/src/System.Management.Automation/engine/PSVersionInfo.cs#L559-L574).
+If the printed version is older than 7.6.6, run
+`winget upgrade --id Microsoft.PowerShell --source winget --installer-type wix --version 7.6.6`
+in a Windows command shell, then rerun the gate and retain the new version log before W1
+([WinGet upgrade reference: `--version` and `--installer-type`](https://learn.microsoft.com/en-us/windows/package-manager/winget/upgrade#options)).
+When WinGet is unavailable, use the 7.6.6 MSI fallback above and rerun the same gate. A different minor release,
+a prerelease, an unreadable version or a failed launch stops the recipe.
+
+Stage 1 runs in PowerShell 7. A session inside the workstation's WSL distribution runs each
 PowerShell block as a `.ps1` file with
-`/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w step.ps1)"`
-([Windows-side commands from WSL](linux-wsl2.md#windows-side-commands-from-wsl)). Open each block's file with
+`'/mnt/c/Program Files/PowerShell/7/pwsh.exe' -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(wslpath -w step.ps1)"`
+([Windows-side commands from WSL](linux-wsl2.md#windows-side-commands-from-wsl)). NativeStack disables
+`appendWindowsPath`, so use the quoted absolute path. `-File` takes the `.ps1` path, and `-NonInteractive` makes
+attempts to prompt fail instead of waiting for input
+([about_pwsh](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh?view=powershell-7.6)). Open each block's file with
 `Start-Transcript -LiteralPath 'Z:\WSL\downloads\<Name>-stage1.log' -Append`, placed in W1 right after its first line
 (which creates that folder), and end the file with `Stop-Transcript`. That private transcript is the raw install log the
 receipt is cut from. The first boot (F1 to F11) runs inside the new
@@ -160,10 +204,11 @@ wsl.exe -d '<Name>' --exec bash -lc 'uv run --no-project --python 3.13 python --
 wsl.exe -d '<Name>' --exec bash -lc 'node --version'
 ```
 
-The first probe prints `<WSL_USER>,directory` and `<WSL_USER>,socket`. No command that a PowerShell block hands to
-`wsl.exe` carries a double quote inside its single-quoted argument: Windows PowerShell 5.1 does not escape it for a
-native program, and the argument breaks apart (run 3, 2026-10-02: the earlier `stat -c "%U %F"` form returned
-`stat: missing operand`, and a quoted `for` loop returned `unexpected EOF`).
+The first probe prints `<WSL_USER>,directory` and `<WSL_USER>,socket`. The recipe retains the convention that no
+command a PowerShell block hands to `wsl.exe` carries a double quote inside its single-quoted argument. Its origin
+is historical: Windows PowerShell 5.1 broke those arguments in run 3 (2026-10-02), where the earlier
+`stat -c "%U %F"` form returned `stat: missing operand`, and a quoted `for` loop returned `unexpected EOF`.
+The maintained Windows-side blocks now run in PowerShell 7.
 
 Record these per-arm observations in `comparison_arms` alongside each rehearsal's schema, ownership, storage and idle
 observations. The inspected 26.04.1 system interpreter is Python 3.14.4-1ubuntu0.1 (its `python3` metapackage is
@@ -1020,10 +1065,11 @@ sets), so each client keeps its own defaults and a value a person set is never t
 
 After the `--apply` line, run `codex login`, then `claude`, by hand (leave it once it is signed in). Then run the plan's
 after-sign-in checks one owner at a time, `bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only <slot>
---stage after_sign_in`, for `codex`, `claude-agent-sdk`, `codex-sdk-and-codex-exec-app-server`, `local-model-server`,
-`agent-runtime-worker` and `research-harnesses`, the owners whose plan row has that stage. No trust grant or hook
-approval of another host is carried over, so a project's own `.codex/config.toml` stays disabled until Codex
-trusts its directory; Codex has no hook wired here.
+--stage after_sign_in`, for `codex`, `claude-agent-sdk`, `codex-sdk-and-codex-exec-app-server`, `tobi-qmd`,
+`local-model-server`, `agent-runtime-worker` and `research-harnesses`, the owners whose plan row has that stage. No trust
+grant or hook approval of another host is carried over, so a project's own `.codex/config.toml` stays disabled until
+Codex trusts its directory; the only Codex hooks wired here are the context-mode plugin's six, whose approvals the tool
+writes once their hashes were read back and compared on this host.
 
 Proof: `accept.sh` exits 0 (a `skipped` line is not a pass); `--check` ends with `check passed`; `--apply` ends with a
 `summary:` line in which no step is `failed` (`merged with conflicts kept` is not a failure: the step printed each key

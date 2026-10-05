@@ -169,7 +169,7 @@
     "defaultMode": "bypassPermissions"
   },
   "model": "opus[1m]",
-  "advisorModel": "fable",
+  "advisorModel": "opus",
   "hooks": {
     "PreToolUse": [
       {
@@ -230,6 +230,16 @@
           {
             "type": "command",
             "command": "python3 \"${HOME}/.claude/hooks/currency-due-notice.py\" 2>/dev/null || true",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "startup|resume|clear|compact|fork",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${HOME}/.claude/hooks/token-lanes-session-start.py\" 2>/dev/null || true",
             "timeout": 5
           }
         ]
@@ -343,7 +353,7 @@
       "source": {
         "source": "github",
         "repo": "jarrodwatts/claude-hud",
-        "ref": "v0.8.0"
+        "ref": "v0.10.0"
       }
     },
     "openai-codex": {
@@ -385,11 +395,11 @@
     "tdd": "on",
     "codebase-design": "on",
     "resolving-merge-conflicts": "off",
-    "grill-me": "user-invocable-only",
-    "improve-codebase-architecture": "user-invocable-only",
+    "grill-me": "off",
+    "improve-codebase-architecture": "off",
     "security-threat-model": "on",
     "gh-address-comments": "on",
-    "semgrep": "on",
+    "semgrep": "off",
     "codeql": "on",
     "supply-chain-risk-auditor": "on",
     "agentic-actions-auditor": "on",

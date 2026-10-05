@@ -1,0 +1,78 @@
+# The new WSL distribution's additions to adoption/templates/codex.config.template.toml. Only
+# tools/adoption/new_wsl_client_config.py reads this file: it merges it into the shared template (a key both files define
+# is refused) and wires each piece through adoption/new-wsl/client-config-map.json like any template piece. The shared
+# template stays what every other host renders (tools/adoption/render_config.py, the bootstrap's full profile), so
+# nothing here reaches another host. Placeholders are the host values of the render; XDG_RUNTIME_DIR is the systemd user
+# runtime directory of the user the tool runs as, /run/user/<uid> (user@.service(5): user-runtime-dir@UID.service
+# creates /run/user/UID; pam_systemd(8) sets $XDG_RUNTIME_DIR to it, systemd 255), which the tool fills from that
+# user's id.
+
+# The fast service tier, the user's choice of 2026-10-03 for every route that honours it, which NativeStack runs (measured
+# 2026-10-03: 61 against 33 output tokens per second through the gateway). The 0.160.0 config schema (codex-rs/core/
+# config.schema.json, service_tier) calls `fast` the legacy spelling of the `priority` tier and says it still works. Fast
+# counts 2.5 times against included usage, so the user's later policy of 2026-10-04 ("Fast where it matters") keeps bulk
+# fan-out jobs on the standard tier in their own worker homes; this is the interactive default.
+service_tier = "fast"
+
+# ai-memory, the memory slot's interim install (definitive manifest, amendment 3): its tools carry no MCP annotations, so
+# under approval_policy = "never" Codex refuses every call unless the approval mode approves it (codex-rs/core/src/
+# mcp_tool_call.rs at rust-v0.160.0). The new distribution's standing requirement is no permission prompts (wave-2
+# memory ruling, change 13; ai-memory 2.5.2's own install-mcp --client codex writes the same key, install_mcp.rs L1078,
+# L1203-1206 at 7580b74d). The map classes the key authorization, so it is written only with
+# --with-authorization-settings and only while the memory slot installs ai-memory.
+[mcp_servers.ai-memory]
+default_tools_approval_mode = "approve"
+
+# jgravelle/jcodemunch-mcp 1.108.319, README.md at 8f7b34abe16fb459e0bf1c04747d584216dfe32e (L119-122: `claude mcp add -s user
+# jcodemunch jcodemunch-mcp`): the native MCP registration at user scope, on the user's directive of 2026-10-04 that every fresh
+# session starts with the tools ready (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md). JCODEMUNCH_SHARE_SAVINGS=0 in
+# the server's env block is the documented opt-out of its anonymous savings counter (CONFIGURATION.md L231, SECURITY.md L311 at the
+# same revision). The code-index install-plan row installs this console script; `jcodemunch-mcp init`, which writes a prompt
+# policy and hooks, is not run here. The entry is the one adoption/templates/project.codex.config.template.toml registers per
+# project, moved to user scope: its tools carry no MCP annotations, so under approval_policy = "never" Codex refuses every call
+# unless the approval mode approves them (codex-rs/codex-mcp/src/mcp/mod.rs L89-L98 at rust-v0.157.1; authorization, as above),
+# and enabled_tools names the three verbs of its front door (jcodemunch-mcp 1.108.319, counter.py FRONT_DOOR). CODE_INDEX_PATH
+# stays unset: upstream's default is ~/.code-index (README.md L225).
+[mcp_servers.jcodemunch]
+command = "${ECO_ROOT}/bin/jcodemunch-mcp"
+startup_timeout_sec = 60
+enabled_tools = ["route", "menu", "order"]
+default_tools_approval_mode = "approve"
+
+[mcp_servers.jcodemunch.env]
+RTK_TELEMETRY_DISABLED = "1"
+PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
+JCODEMUNCH_SHARE_SAVINGS = "0"
+
+# semble 0.6.1 (MinishLab/semble, a uv tool), the code-search slot's interim install (definitive manifest, amendment 3;
+# wave-2 code-search ruling, changes 2-5). Stdio, CPU only, no port. Its two tools carry no MCP annotations, so Codex
+# 0.160.0 asks before each call unless the approval mode approves them (authorization, as above); enabled_tools names
+# them. SEMBLE_MODEL_NAME is the local snapshot of the pinned model (minishlab/potion-code-16M-v2 at e9d2a44c), and
+# SEMBLE_CACHE_LOCATION is this client's own absolute cache (Claude Code's is semble-claude): a cache shared by two
+# processes can keep serving an index another process rebuilt.
+[mcp_servers.semble]
+command = "semble"
+enabled_tools = ["search", "find_related"]
+default_tools_approval_mode = "approve"
+
+[mcp_servers.semble.env]
+SEMBLE_MODEL_NAME = "${HOME}/.local/share/semble/potion-code-16M-v2-e9d2a44c"
+SEMBLE_CACHE_LOCATION = "${HOME}/.cache/semble-codex"
+
+# Shells start from an empty environment plus the set table (the shared template's PATH and two telemetry switches, and
+# the variables below), so no credential or broker variable of the launcher reaches them (docs/secret-storage.md, Codex;
+# the one Codex-side measure credential_status.py --client-guards checks; wave-2 custody ruling, change 7). Codex adds
+# its own variables, CODEX_THREAD_ID among them, after this step (codex-rs/protocol/src/shell_environment.rs L14-20,
+# L100-102 and L152-157 at rust-v0.160.0). XDG_RUNTIME_DIR lets `systemctl --user` reach the user manager and the
+# messaging courier run (wave-2 synthesis X12), and DOCKER_HOST is the rootless Docker socket in it, the value the
+# install plan's container stage exports (install.sh; https://docs.docker.com/engine/security/rootless/).
+[shell_environment_policy]
+inherit = "none"
+
+[shell_environment_policy.set]
+HOME = "${HOME}"
+LANG = "C.UTF-8"
+TERM = "xterm-256color"
+TMPDIR = "/tmp"
+XDG_RUNTIME_DIR = "${XDG_RUNTIME_DIR}"
+DOCKER_HOST = "unix://${XDG_RUNTIME_DIR}/docker.sock"

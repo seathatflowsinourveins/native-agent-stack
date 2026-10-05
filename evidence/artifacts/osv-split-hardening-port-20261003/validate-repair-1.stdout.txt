@@ -1,0 +1,2 @@
+{"components": 69, "hashed_files": 9595, "profiles": 4, "receipts": 193, "status": "passed"}
+Integrity and scope checks only; no live provider or GPU execution.

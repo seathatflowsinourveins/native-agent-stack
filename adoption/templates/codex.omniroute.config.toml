@@ -5,12 +5,11 @@
 # `tools/adoption/render_config.py --check` keeps comparing a host's base config with it. Install it with
 # `tools/adoption/apply_codex_lane.py --omniroute-profile` as $CODEX_HOME/omniroute.config.toml. A worker has one
 # --profile slot, which stack-worker holds, so the landscape sweep's gateway lane writes its own lane home
-# (tools/sota-convergence/landscape-sweep/build_args.py) with this file's model, effort, provider and [features]
-# keys, and tests/test_codex_worker_lane.py checks each one it writes against this file. That home has no
-# env_key_instructions and no [shell_environment_policy.filters]; its web_search = "live" comes from the
-# stack-worker profile and the runner's -c flag. Without the filter Codex hands commands its whole environment
-# (inherit "all", default excludes ignored: codex-rs/config/src/shell_environment_policy.rs L135-136 at
-# rust-v0.157.1), so a real OMNIROUTE_API_KEY exported for a sweep reaches the commands its model runs.
+# (tools/sota-convergence/landscape-sweep/build_args.py stage_lane_home) with this file's model, effort, provider,
+# [features] and key filter, and tests/test_codex_worker_lane.py checks each one it writes against this file.
+# That home's config.toml writes [shell_environment_policy.filters] OMNIROUTE_API_KEY = "exclude"
+# (build_args.py:356-357 at the current base), keeping the exported gateway key out of model-run commands.
+# The home has no env_key_instructions; its web_search = "live" comes from the stack-worker profile and runner flag.
 #
 # Effort: OmniRoute 3.8.50 caps any model missing from MAX_EFFORT_BY_MODEL at xhigh, gpt-6-astra included
 # (open-sse/executors/codex.ts L331-355 at 5458026c). release/v3.8.51 at a58000c7 caps gpt-6-astra at ultra, one

@@ -18,8 +18,9 @@ import uuid
 
 from recipe import read_json
 from host import (AGENT_LIMITS, DEFAULT_PORT, docker_args, grade, logged_command, owned_port, private_file,
-                  result_exit, session_files, teardown_attempt, utc_now, verify_isolation, write_json)
-from receipt import create_receipt, read_bounded
+                  resolver_git_env, result_exit, session_files, teardown_attempt, utc_now, verify_isolation,
+                  write_json)
+from receipt import FAILURE_STAGES, create_receipt, read_bounded
 
 
 TERMINAL = {"finished", "error", "stuck"}
@@ -171,7 +172,66 @@ def stop_server(result, status=None):
         return False
 
 
-def finish_result(result, status, window):
+def export_resolver_patch(result, base):
+    """Resolver mode's export: finish_result's `add -A` and cached diff against the base, with
+    the resolver's neutral git (host.resolver_git_env) and full object names (git-diff(1)
+    --full-index), so that the driver's re-export of its commit can be compared byte for
+    byte. The installer's .agents and skills-lock.json stay out through .git/info/exclude
+    (host.install_workspace_skills)."""
+    workspace = result / "workspace"
+    env = resolver_git_env(result / "git-home")
+    if logged_command(["git", "-C", str(workspace), "add", "-A"], result / "stage-patch.log", cwd=result, timeout=60,
+                      env=env):
+        raise RuntimeError("patch_export_failed")
+    diff = subprocess.run(["git", "-C", str(workspace), "--no-pager", "diff", "--no-color", "--no-ext-diff",
+                           "--no-textconv", "--full-index", "--cached", base], capture_output=True, check=True,
+                          timeout=60, env=env)
+    return diff.stdout.decode("utf-8", "surrogateescape")
+
+
+def finish_resolver(result, window, *, removed, termination, resolver):
+    """Resolver mode after the attempt (RESOLVER.md "Stage 2"): export, then the driver.
+
+    Only a REST "finished" attempt reaches the driver; an agent limit opens nothing, and
+    any other end stays an "agent" failure. Without the in-process driver (the
+    `dispatch.py result` CLI) it refuses before any GitHub step. The driver validates,
+    applies, commits, pushes and opens the draft PR (resolver.ResolverAttempt.finish);
+    nothing the model wrote runs on the host. Its outcome is host-written, beside the
+    receipt, and the receipt reads it through fixed fields only (receipt.resolver_summary).
+    """
+    outcome = {"status": None}
+    stage = "export"
+    try:
+        if not removed:
+            raise RuntimeError("worker_removal_not_confirmed")
+        if resolver is None:
+            raise RuntimeError("resolver_driver_required")
+        if termination != "finished":
+            outcome = {"status": "agent_not_finished"}
+            if termination not in AGENT_LIMITS:
+                window["failure_stage"] = "agent"
+        else:
+            identity = json.loads(read_bounded(result / "resolver-identity.json"))
+            patch_text = export_resolver_patch(result, identity["base_sha"])
+            (result / "resolver-patch.diff").write_bytes(patch_text.encode("utf-8", "surrogateescape"))
+            response = json.loads(read_bounded(result / "final-response.json"))
+            message = response.get("response") if isinstance(response, dict) else None
+            finished = resolver.finish(result, patch_text=patch_text,
+                                       final_message=message if isinstance(message, str) else "")
+            if not isinstance(finished, dict):
+                raise RuntimeError("resolver_outcome_invalid")
+            outcome = finished
+            if outcome.get("failure_stage") in FAILURE_STAGES:
+                window["failure_stage"] = outcome["failure_stage"]
+    except (Exception, KeyboardInterrupt):
+        window["failure_stage"] = stage
+    write_json(result / "resolver-outcome.json", outcome)
+    write_json(result / "window.json", window)
+    write_json(result / "check.json", {"upstream_resolved": None, "grader_exit_code": None})
+    return create_receipt(result)
+
+
+def finish_result(result, status, window, resolver=None):
     removed = stop_server(result, status)
     execution = status.get("execution_status")
     termination = status.get("agent_termination") or execution
@@ -180,6 +240,8 @@ def finish_result(result, status, window):
         termination = "error"
     window["agent_termination"] = termination
     window["worker_exit_code"] = 0 if termination == "finished" else 1
+    if resolver is not None or (result / "resolver-identity.json").exists():
+        return finish_resolver(result, window, removed=removed, termination=termination, resolver=resolver)
     # A partial patch after an agent limit is still officially graded; only
     # other native errors skip export (exit 3).
     graded = termination == "finished" or termination in AGENT_LIMITS
@@ -218,8 +280,12 @@ def finish_result(result, status, window):
     return create_receipt(result)
 
 
-def execute(action, state, run_id, arm):
-    """Exactly one native POST, bounded polling, deterministic host receipt."""
+def execute(action, state, run_id, arm, *, resolver=None):
+    """Exactly one native POST, bounded polling, deterministic host receipt.
+
+    `resolver` is the in-process resolver.ResolverAttempt that host.run passes in
+    resolver mode; the CLI never has one (finish_result).
+    """
     if not re.fullmatch(r"rw-openhands-[a-z0-9-]{1,64}", run_id) or arm not in {"control", "engines-on"}:
         print(json.dumps({"run_id": run_id, "arm": arm, "receipt": None, "failure_stage": "preflight",
                           "task_passed": False, "evidence_complete": False}))
@@ -310,7 +376,7 @@ def execute(action, state, run_id, arm):
                 raise ValueError("native_final_response_contract")
             write_json(result / "final-response.json", response)
             status["agent_termination"] = agent_termination(conversation_id, status.get("execution_status"), port, headers)
-            receipt = finish_result(result, status, window)
+            receipt = finish_result(result, status, window, resolver=resolver)
             write_json(receipt_path, receipt)
             code = result_exit(receipt)
             status.update(status="collected")

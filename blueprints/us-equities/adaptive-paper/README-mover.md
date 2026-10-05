@@ -155,19 +155,28 @@ exits, `floor(max_order_notional_usd / bid)` whole shares.
   ledger cap, the largest position exits (`gross_cap_guard`). The ledger halts
   permanently above its cap, and a rising mover would otherwise trip it.
 - **Reconciliation.** It runs at start (flat, no open orders), every 30 s while nothing
-  is in flight, and at the end: flat, and cash delta equal to this trial's fills plus
-  the broker FEE activities recorded from the snapshot. Before every trial, a budgeted
-  F1/account/F2 checkpoint refuses differing fee maps, books stable fees, then computes
-  baseline as checkpoint cash minus ledger cash delta before beginning the trial. The
-  lineage's `fee_window_start` is saved and reused by every paper/recover snapshot;
+  is in flight, and at the end: flat, and cash delta equal to the lineage's ledger fills
+  plus the broker FEE activities recorded from the snapshot. Before every trial, a budgeted
+  F1/account/F2 checkpoint refuses differing fee maps and books stable fees. Only the
+  first trial computes baseline as checkpoint cash minus ledger cash delta; every next
+  trial keeps the `baseline_cash` stored in `trial.json`. This is the first trial's
+  value for lineages started on this engine, and the last saved value for a lineage
+  migrated from an engine that recomputed it each trial. Checkpoint cash is compared
+  with that stored baseline plus the ledger cash delta after booking fees. An unexplained
+  difference above 0.01 USD refuses with `next_trial_cash_mismatch` (`not_started`),
+  before consuming a new trial identity or building a port. A missing or null stored baseline refuses
+  with `next_trial_baseline_missing`; malformed values refuse with
+  `next_trial_baseline_invalid`. The lineage's `fee_window_start` is saved and reused
+  by every paper/recover snapshot;
   legacy recovery without that key retains `current_trial_started_at`. This assumes
   fee activity visibility coincides with its inclusion in cash. A checkpoint refusal
   leaves the trial unentered for a later retry. The receipt and the recovery receipt
   report `fees_recorded` (count,
   total and sub-types, no ids); see README-safety.md, "Broker FEE activities". The
-  engine's between-trial cash check is kept as an observation rather than a refusal:
-  the receipt carries `inter_trial_cash_changed`, and the private `trial.json` holds
-  the delta. Quote-driven orders are suspended while a snapshot is in flight.
+  admitted trial's receipt sets `inter_trial_cash_changed` to `false` for every
+  admitted next trial and `null` for a lineage's first trial. The private `trial.json`
+  holds the between-trial delta within the tolerance. Quote-driven orders are
+  suspended while a snapshot is in flight.
 
 ## Recovery
 
@@ -193,6 +202,28 @@ and `share_exceeds_ledger_order_cap`. A trial that needed a forced recovery stay
 `needs_attention` even when the recovery passed; `recover` then takes a fresh broker
 proof and, when it passes, sets `trial.json` back to `finished`.
 
+**Frozen recovery config (decision, 2026-10-04, PR #667).** Recovery keeps the
+whole-file SHA-256 binding and requires the trial's exact frozen config bytes through
+`recover --config`. Any edit, including formatting or notes, refuses with
+`recovery_config_differs_from_frozen_trial`. Binding only the risk-relevant config
+fields was rejected: whole-file binding matches the recovery check in
+[runner.py](runner.py) and fails closed on every config change.
+
+Reopen this choice if a frozen paper trial cannot reach recovery readiness under
+its own watchdog and has no in-hours recovery window, or if a required config change
+must apply to an in-flight lineage. Overturn it only if a comparison on that frozen
+case shows that binding only explicitly identified risk-relevant fields permits the
+required recovery while preserving the 3 s order gate and the admission and recovery
+guards.
+
+A trial that needs a longer `mover.stream_quote_timeout_seconds` watchdog for
+recovery must be frozen with that value from the start. The watchdog is separate
+from the 3 s order quote-age gate, which still applies to every buy and sell. The
+recovery-only 30 s copy
+[`config-mover-mac-20260924c-recover30.json`](trials/mac-2026-09-24-mover-c/config-mover-mac-20260924c-recover30.json)
+stays as dated 2026-09-24 history and is no longer a supported recovery path for the
+trial frozen with a 3 s watchdog.
+
 ## Commands
 
 ```sh
@@ -201,7 +232,8 @@ $PY mover_runner.py check --scan "$SCAN" [--assume-fresh]                  # no 
 $PY mover_runner.py paper --env-file "$PAPER_ENV_FILE" --scan "$SCAN" --trial mover-YYYYMMDD \
     --output "$PRIVATE_OUTPUT/mover-paper.json" [--config config-mover.json] [--state-root DIR] \
     [--live-dir DIR] [--gate-result G --snapshot S] [--allow-shared-account]
-$PY mover_runner.py recover --env-file "$PAPER_ENV_FILE" --output "$PRIVATE_OUTPUT/mover-recovery.json"
+$PY mover_runner.py recover --env-file "$PAPER_ENV_FILE" --config "$FROZEN_TRIAL_CONFIG" \
+    --output "$PRIVATE_OUTPUT/mover-recovery.json" [--state-root DIR]
 $PY mover_runner.py synthetic --scan "$SCAN" --output out.json [--allow-stale-scan] [--hold-seconds 4]
 ```
 
@@ -245,8 +277,12 @@ credential.
   it freeze on its next snapshot. The mover itself ignores foreign *terminal* orders
   and still fails closed on foreign open orders and on any cash or position effect.
   `paper` refuses when the same state root holds an adaptive lane for the account,
-  unless `--allow-shared-account` is given. Use a separate paper account, or change the
-  adaptive lane first.
+  unless `--allow-shared-account` is given. That override only bypasses this directory
+  guard; it keeps the mover's cash continuity and reconciliation guards. Another lane's
+  cash activity between mover trials that leaves an unexplained change above 0.01 USD
+  permanently blocks subsequent trials on the retained mover lineage with
+  `next_trial_cash_mismatch`: each new trial keeps the `baseline_cash` stored in
+  `trial.json`. Use a separate paper account.
 - **Lifetime budgets.** The ledger's `max_gross_loss_usd` and `max_drawdown_usd` are at
   most capital / 10 and are lifetime budgets of the mover ledger: gross losses are
   never netted and the drawdown runs from the all-time P&L peak. They are exhausted

@@ -1,0 +1,1 @@
+{"artifact": "gateway-canary.json", "expected_marker": "WRONG_EXPECTED_MARKER", "match": false, "observed_marker": "SDK_01600_GATEWAY_CANARY_OK"}
