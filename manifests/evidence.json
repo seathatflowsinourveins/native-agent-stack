@@ -15039,28 +15039,33 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/README.md",
-      "sha256": "4dcea6c5864cb99fee4374c369c42d56912190bce23dcffaa9c25d3a664d72f6",
-      "bytes": 18311
+      "sha256": "d5c7d12ffba57cd571cef85a002823e8831041bbb99104adb6c459aab3dd5647",
+      "bytes": 21367
     },
     {
       "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
-      "sha256": "a05527fbb1b2186a3da7ed9c781df33c25cd13c8f301b5ec76803070dfd0e4fd",
-      "bytes": 13219
+      "sha256": "f540971c2cb0e517531645514c130e01ebf99f003ab9143e9e7cd2406030845a",
+      "bytes": 13216
     },
     {
       "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
-      "sha256": "aa2f2dcd9ae794baa57d0bd8d35f51cc35ba116067f46fba4a5459263a0d9022",
-      "bytes": 19085
+      "sha256": "e2c4b87e26e2296563eac60805a0aba8748e5cad02d726f5c3af2d801e864f80",
+      "bytes": 19350
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/sync-trading-2604.sh",
+      "sha256": "4df2974e7fbc27fe7feea90ccdc6d180d0bd2c6b254cb5265dfd5e3368756f9a",
+      "bytes": 1259
     },
     {
       "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml",
-      "sha256": "f71b08811eb580cf5c3772da7327ec5554154b81839b80c6259d69eae6bd1338",
-      "bytes": 515
+      "sha256": "36b85fd48566fedff258ec4a8bef496cace0ea00954afd7c9255bffda0894fdb",
+      "bytes": 767
     },
     {
       "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
-      "sha256": "6b4e6a4d4fc61cbda56c36d1ee0c65c263a5e938d968ce2806cc32330a8335f1",
-      "bytes": 353069
+      "sha256": "4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2",
+      "bytes": 353312
     },
     {
       "path": "blueprints/us-equities/security-identity/README.md",
@@ -16439,8 +16444,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-trading-2604-preparation.md",
-      "sha256": "47ca2d2eb0c1f444b085b9817b84527ec70bf8249f23f5dafcae08493dd4f216",
-      "bytes": 27496
+      "sha256": "7f7b6339990e965017f75eb68bcb73b6793c8d228473adec6319d5f8d6791a9c",
+      "bytes": 34200
     },
     {
       "path": "docs/direct-results.md",
@@ -48728,6 +48733,11 @@
       "bytes": 30252
     },
     {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json",
+      "sha256": "a4a6254da40ac934dcb78592c693cca7c92d399b46ffa2cd19dc218ecf604ce9",
+      "bytes": 34164
+    },
+    {
       "path": "evidence/artifacts/trading-runtime-2604-20261004/result-summary.json",
       "sha256": "622621ea1c9b824ad899245575e74b9c7e28ab30617eabf1316827774111ae06",
       "bytes": 1158
@@ -50969,8 +50979,8 @@
     },
     {
       "path": "evidence/receipts/native-trading-runtime-2604-20261004.json",
-      "sha256": "e240d5d1658c29bebaf0de0ef0d34e9eec7ff5b876ed7aa425040f5b51b9aeeb",
-      "bytes": 19041
+      "sha256": "af732d4da1732b02097ad3f7d02c07c68c40f373e9d693d24059588eab7a040c",
+      "bytes": 21511
     },
     {
       "path": "evidence/receipts/native-ultracode-20260921.json",
@@ -53366,6 +53376,11 @@
       "path": "tests/test_token_measurement.py",
       "sha256": "e1fe9ef953ad3ceb52549bb8841e2d1b8b2f20a34852952f70d48aadcf77ec2c",
       "bytes": 237423
+    },
+    {
+      "path": "tests/test_trading_2604_lock.py",
+      "sha256": "8b68859f400b3bd571d722bf688f4a6e70cd3a077aa1d5bb70b44eb13e28eddd",
+      "bytes": 8839
     },
     {
       "path": "tests/test_trading_gates.py",

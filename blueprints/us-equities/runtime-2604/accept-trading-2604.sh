@@ -56,7 +56,7 @@ IFS= read -r recorded_owner < "$project/.trading-2604-owner" || blocked 73
 [[ $recorded_owner == native-stack-trading-2604-v1 ]] || blocked 73
 [[ -f "$project/.trading-2604-complete" ]] || blocked 69 'installation completion marker is missing'
 IFS= read -r recorded_completion < "$project/.trading-2604-complete" || blocked 73
-[[ $recorded_completion == native-stack-trading-2604-edgartools-5600-r2 ]] || blocked 69 'installation completion marker is stale'
+[[ $recorded_completion == native-stack-trading-2604-hashed-build-r3 ]] || blocked 69 'installation completion marker is stale'
 [[ -d "$adapter/.git" && -f "$project/.upstream/nautilus-quickstart.py" ]] || blocked 69
 for path in .python .venv .upstream .install-home .docker-config vendor vendor/adaptive-paper acceptance; do
     [[ ! -L "$project/$path" ]] || blocked 73

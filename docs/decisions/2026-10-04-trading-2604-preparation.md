@@ -412,3 +412,99 @@ private `/tmp` and no network preserves the production guard and passes all
 The installed uv 0.12.17 help lists both `--frozen` and `--no-sync`, but their
 combination is rejected (exit 2); `uv add --frozen` alone changes only the
 direct pin without a preliminary resolution or sync (exit 0).
+
+## Hash-pinned legacy build and shared sync — 2026-10-04, round c
+
+This implements trading unit T's PR-1 build closure for the research and
+historical-simulation runtime. The round-b2 base is `c435671f8`; its 5.60.0 lock
+SHA256 is `6b4e6a4d4fc61cbda56c36d1ee0c65c263a5e938d968ce2806cc32330a8335f1`.
+The final lock SHA256 is
+`4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2`.
+All **242 package entries and their archive metadata remain unchanged**; the
+relock only adds the manifest's hashed build constraint.
+
+`antlr4-python3-runtime==4.9.3` is the one nonvirtual distribution without a
+wheel. Its sdist has no project build-system declaration, so
+[uv 0.12.17's legacy backend](https://github.com/astral-sh/uv/blob/0.12.17/crates/uv-build-frontend/src/lib.rs#L53-L60)
+would separately resolve `setuptools>=40.8.0`. Following the
+[project build-hash documentation](https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/build.md#L61-L79)
+and [schema](https://github.com/astral-sh/uv/blob/0.12.17/uv.schema.json#L788-L815),
+the project's constraint pins `setuptools==84.0.0` with exactly the existing
+runtime lock entry's wheel and sdist hashes. The lock records that constraint,
+[checks it against the project](https://github.com/astral-sh/uv/blob/0.12.17/crates/uv-lock/src/lock/mod.rs#L4162-L4190),
+and [applies it during builds](https://github.com/astral-sh/uv/blob/0.12.17/crates/uv/src/commands/project/sync.rs#L860-L896).
+The explicitly authorized native **uv 0.12.17** performs this relock because
+mise is unavailable here. Managed CPython **3.12.3**, `--no-config`, prerelease
+`if-necessary`, the PyPI default index and `exclude-newer=2026-10-06T04:00:00Z`
+are retained. No other package may move under this change.
+
+[tests.test_trading_2604_lock](../../tests/test_trading_2604_lock.py) validates
+the normalized manifest/project constraint, its exact runtime-backend pin and
+archive hashes, and the one-sdist census, excluding virtual project metadata.
+Four planted fixtures each fail: a second package without a wheel, a different
+backend version, missing hashes and a mismatched manifest. The host/CI vector
+is now defined once in
+[sync-trading-2604.sh](../../blueprints/us-equities/runtime-2604/sync-trading-2604.sh),
+following [validate.yml's install-command pin reuse](../../.github/workflows/validate.yml#L196-L225).
+The installer verifies that file's hash, sources it and calls the function;
+future PR-2 CI can call the same source with its own clean environment and
+managed-interpreter/project paths. Tests compare every argv byte, reject copied
+or altered installer steps and a stale source digest, and prove that each of the
+three failures stops the sequence. No workflow is added in this round.
+
+The [build-constraint proof](../../evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json)
+retains native results and controls from scratch copies on this worker. The
+shared function's lock check, cold-cache locked/no-dev sync and dependency check
+all exit **0**; 238 applicable distributions install on Linux, and antlr4's
+installed WHEEL reads **`Generator: setuptools (84.0.0)`**. NC-1 changes one
+project digest and exits **1** at `lock --check`. A fresh NC-2 resolution with
+only an invalid digest exits **1**, with a setuptools hash mismatch. NC-3 puts
+that same invalid-only allowlist in project and manifest while preserving all
+runtime package hashes; cold-cache locked sync exits **2**, with no overlapping
+setuptools hashes. These are local integration and structural evidence, with no
+host installer, SEC request, paper run, broker or provider operation.
+
+Control correction: the first NC-2 and NC-3 mutations kept the correct sdist
+hash beside the incorrect wheel hash; both exited **0**. That was an allowed
+alternative, rather than an invalid-only allowlist. The native
+[hash combination rules](https://github.com/astral-sh/uv/blob/0.12.17/crates/uv-types/src/hash.rs#L577-L620)
+verify a matching allowed archive and intersect runtime/constraint hashes.
+The corrected controls permit only the incorrect digest; NC-2 also removes its
+scratch lock to force backend artifact resolution. Those preliminary results
+are retained alongside the final controls. A WHEEL read issued before a yielded
+sync finished exited **1** with missing distribution metadata; waiting for
+completion and reading the installed metadata returned **0**. It was a premature
+observation, not a sync or library failure.
+
+Alternatives were leaving the legacy backend unconstrained or creating a second
+pip lock. A constraint in the existing lock closes the one demonstrated build
+gap with one dependency source. A new no-wheel distribution, changed backend
+requirement, mismatched hash/manifest or reproducible failure of the final
+NativeStack2604 rerun would overturn this closure and require a reviewed update.
+The current installer recognizes only the final and exact approved round-1/b2
+metadata hashes and uses a new completion marker shared with acceptance.
+
+The original **25/25 summary is pre-relock evidence** at EdgarTools 5.58.0 and
+its original lock hash; every measured receipt field remains unchanged. The
+NativeStack2604 install/offline rerun on the final 5.60.0 lock is pending and
+gets a separate receipt. The supplied native SEC acceptance at 5.60.0 remains
+separate and valid; catalog selections and gate status do not change here.
+Python 3.12.3 versus 3.13 ratification and the earlier independent-receipt-review
+qualification remain open.
+
+Resume after storage interruption: the coordinator removed the earlier scratch
+state. The four completed proof results and output were already recorded, and
+their project/lock/shared-source hashes still match; those results are reused.
+Subsequent scratch uses `~/.cache/t2604-c`, with sequential proof operations,
+at least 60 GiB free before cold sync, and immediate scratch cleanup after each
+recorded outcome. No full cold-cache runtime sync was repeated. The targeted
+contract tests pass 11/11, and catalyst-dataset passes 14/14 without skips in
+an offline CPython 3.12.3 scratch environment using the lock's DuckDB/pytz hashes.
+
+Test setup correction: native uv 0.12.17 rejected `--prerelease` on `pip sync`
+(exit **2**); its installed `pip sync --help` (exit **0**) supplies the supported
+test-only command. The first dataset run skipped four checks without DuckDB;
+the next DuckDB-only run exited **1**, with three missing-`pytz` import errors.
+Adding already locked, hash-verified pytz to that scratch environment passes
+all 14 tests, exit **0**. Every scratch environment/cache was removed after its
+result was recorded. These corrections change no runtime dependency or sync flag.

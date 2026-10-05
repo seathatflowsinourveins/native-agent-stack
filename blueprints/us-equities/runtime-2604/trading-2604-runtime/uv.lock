@@ -10,6 +10,9 @@ resolution-markers = [
 [options]
 exclude-newer = "2026-10-06T04:00:00Z"
 
+[manifest]
+build-constraints = [{ name = "setuptools", specifier = "==84.0.0", hashes = ["sha256:51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670", "sha256:f4695c21257f0d9b537ec2692c941d02ee143b7cc1276941349a546573b2ef73"] }]
+
 [[package]]
 name = "aiofile"
 version = "3.12.3"

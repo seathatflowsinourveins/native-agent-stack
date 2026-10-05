@@ -19,6 +19,11 @@ dependencies = [
     "skfolio==1.2.9",
 ]
 
+[tool.uv]
+build-constraint-dependencies = [
+    { requirement = 'setuptools==84.0.0', hashes = ['sha256:51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670', 'sha256:f4695c21257f0d9b537ec2692c941d02ee143b7cc1276941349a546573b2ef73'] },
+]
+
 [[tool.uv.index]]
 url = "https://pypi.org/simple"
 default = true

@@ -403,6 +403,13 @@
       "sha256": "db1b9758dba57af083667b00816862aeb1700d8be39fba8236065987214629f1",
       "bytes": 42,
       "hash_scope": "published_sanitized_bytes"
+    },
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json",
+      "sha256": "a4a6254da40ac934dcb78592c693cca7c92d399b46ffa2cd19dc218ecf604ce9",
+      "bytes": 34164,
+      "hash_scope": "published_sanitized_bytes",
+      "scope": "Round-c this-host build-constraint proof; distinct from the recorded NativeStack2604 run."
     }
   ],
   "recipe": "blueprints/us-equities/runtime-2604/README.md",
@@ -416,12 +423,42 @@
     "recorded_run_edgartools": "5.58.0",
     "recorded_run_lock_sha256": "c6b5f25cd3198c1b847c1cb602fe5441dce7e038aa16976c46ecf5f0beb7b086",
     "current_bundle_edgartools": "5.60.0",
-    "current_bundle_lock_sha256": "6b4e6a4d4fc61cbda56c36d1ee0c65c263a5e938d968ce2806cc32330a8335f1",
-    "current_bundle_project_sha256": "f71b08811eb580cf5c3772da7327ec5554154b81839b80c6259d69eae6bd1338",
+    "current_bundle_lock_sha256": "4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2",
+    "current_bundle_project_sha256": "36b85fd48566fedff258ec4a8bef496cace0ea00954afd7c9255bffda0894fdb",
     "superseded_open_item": "The historical 5.59.1 overturn item is superseded by native SEC acceptance native-sec-edgartools-5600-20261004 on NativeStack; the original limitations above describe the recorded 5.58.0 run.",
     "native_sec_receipt": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json",
     "native_stack_2604_rerun": "pending; current bundle installation and offline acceptance require a separate receipt",
     "worker_check": "evidence/artifacts/edgartools-5600-20261004/this-host-import-smoke.json",
-    "worker_uv_route": "Native uv 0.12.17; Linux mise unavailable here, so prescribed wrapper verification remains pending."
+    "worker_uv_route": "Native uv 0.12.17; Linux mise unavailable here, so prescribed wrapper verification remains pending.",
+    "before_build_constraint_lock_sha256": "6b4e6a4d4fc61cbda56c36d1ee0c65c263a5e938d968ce2806cc32330a8335f1",
+    "before_build_constraint_project_sha256": "f71b08811eb580cf5c3772da7327ec5554154b81839b80c6259d69eae6bd1338"
+  },
+  "build_constraint_update_20261004": {
+    "round": "trading-2604-c",
+    "evidence_class": "local_integration",
+    "execution_scope": "this-host scratch copies; host installer and acceptance script not executed",
+    "previous_bundle_lock_sha256": "6b4e6a4d4fc61cbda56c36d1ee0c65c263a5e938d968ce2806cc32330a8335f1",
+    "final_bundle_lock_sha256": "4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2",
+    "constraint": {
+      "requirement": "setuptools==84.0.0",
+      "hashes": [
+        "sha256:51a52592b3b99e102b609654876bd65f19f999935166d1352678931132b0c670",
+        "sha256:f4695c21257f0d9b537ec2692c941d02ee143b7cc1276941349a546573b2ef73"
+      ]
+    },
+    "proof": "evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json",
+    "proof_exits": {
+      "positive": 0,
+      "NC-1": 1,
+      "NC-2": 1,
+      "NC-3": 2
+    },
+    "notes": [
+      "The earlier 25/25 summary is pre-relock evidence at EdgarTools 5.58.0 and its original lock hash. All historical measured fields and artifacts remain unchanged.",
+      "NativeStack2604 installation and offline acceptance on the final lock are pending and get their own receipt. This-host cold-cache build and corruption controls do not replace that rerun.",
+      "All 242 package entries remain unchanged from round b2. Only hashed build-constraint manifest metadata was added to the lock.",
+      "Native uv 0.12.17 was used because mise is unavailable to this worker, as explicitly authorized for round c. The host installation route remains mise.",
+      "Completed build proof results were retained before the coordinator removed scratch state after a storage interruption. Unchanged proof inputs were verified on resume; no additional full cold-cache runtime sync was run. Fresh targeted tests pass; their small scratch environments were removed after recording."
+    ]
   }
 }

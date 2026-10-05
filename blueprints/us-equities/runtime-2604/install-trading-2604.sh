@@ -77,19 +77,25 @@ readonly project="$HOME/projects/us-equities-runtime"
 # Both the pinned adapter requirements and accepted rc5 receipt use Python 3.12.
 # https://github.com/seathatflowsinourveins/native-agent-stack/blob/dca821cca85dce3647fa7b488d5a23fbe5b85d4a/blueprints/us-equities/adaptive-paper/requirements.txt
 # https://github.com/seathatflowsinourveins/native-agent-stack/blob/d323b53437e025be3d054b9b5e4d292fe396c75e/evidence/receipts/native-nautilus-v2-20260920.json
-readonly python_pin=3.12.3
-readonly uv_pin=0.12.17
-readonly exclude_newer=2026-10-06T04:00:00Z
 readonly owner='native-stack-trading-2604-v1'
-readonly completion='native-stack-trading-2604-edgartools-5600-r2'
+readonly completion='native-stack-trading-2604-hashed-build-r3'
 script_directory=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 readonly script_directory
+readonly sync_vector_hash=4df2974e7fbc27fe7feea90ccdc6d180d0bd2c6b254cb5265dfd5e3368756f9a
+[[ ! -L "$script_directory/sync-trading-2604.sh" && -f "$script_directory/sync-trading-2604.sh" ]] || die 'Shared sync vector is missing or symlinked.' 65
+printf '%s  %s\n' "$sync_vector_hash" "$script_directory/sync-trading-2604.sh" | sha256sum --check --status
+# BEGIN shared-sync-source
+source "$script_directory/sync-trading-2604.sh"
+# END shared-sync-source
 readonly lock_bundle="$script_directory/trading-2604-runtime"
-readonly project_hash=f71b08811eb580cf5c3772da7327ec5554154b81839b80c6259d69eae6bd1338
-readonly lock_hash=6b4e6a4d4fc61cbda56c36d1ee0c65c263a5e938d968ce2806cc32330a8335f1
-# Only the exact previously recorded bundle may migrate on the owned host.
-readonly previous_project_hash=581bbb38a265068791c1a8c92435f9859876fd613d3c2c87d618a223376b01e0
-readonly previous_lock_hash=c6b5f25cd3198c1b847c1cb602fe5441dce7e038aa16976c46ecf5f0beb7b086
+readonly project_hash=36b85fd48566fedff258ec4a8bef496cace0ea00954afd7c9255bffda0894fdb
+readonly lock_hash=4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2
+# Only exact approved bundles may migrate on the owned host: round b2 and the
+# originally recorded 5.58.0 run. No new host acceptance is inferred from either.
+readonly previous_project_hash=f71b08811eb580cf5c3772da7327ec5554154b81839b80c6259d69eae6bd1338
+readonly previous_lock_hash=6b4e6a4d4fc61cbda56c36d1ee0c65c263a5e938d968ce2806cc32330a8335f1
+readonly recorded_project_hash=581bbb38a265068791c1a8c92435f9859876fd613d3c2c87d618a223376b01e0
+readonly recorded_lock_hash=c6b5f25cd3198c1b847c1cb602fe5441dce7e038aa16976c46ecf5f0beb7b086
 readonly engine_commit=1b0a49d2792a9432a3aca3fcb617ce7a630d905e
 readonly adapter_commit=dca821cca85dce3647fa7b488d5a23fbe5b85d4a
 readonly quickstart_hash=487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53
@@ -188,21 +194,22 @@ requirements=(
 # --check, without installing packages. Copying its byte-verified metadata and
 # lock avoids a new target-host resolution, even while the retained cutoff is
 # still in the future. Both files are validated before either is replaced. Only
-# the exact previous/current pair (including an interrupted migration) is accepted;
+# the exact approved metadata (including an interrupted migration) is accepted;
 # arbitrary local edits are refused. Each replacement is atomic within the project.
 # https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/sync.md
 step=locked-project
 [[ ! -L "$lock_bundle" && -d "$lock_bundle" ]] || die 'Verified runtime lock bundle is missing or symlinked.' 65
-for entry in "pyproject.toml|$project_hash|$previous_project_hash" "uv.lock|$lock_hash|$previous_lock_hash"; do
-    IFS='|' read -r filename expected_hash previous_hash <<< "$entry"
+for entry in "pyproject.toml|$project_hash|$previous_project_hash|$recorded_project_hash" "uv.lock|$lock_hash|$previous_lock_hash|$recorded_lock_hash"; do
+    IFS='|' read -r filename expected_hash previous_hash recorded_hash <<< "$entry"
     [[ ! -L "$lock_bundle/$filename" && -f "$lock_bundle/$filename" ]] || die "Verified bundle file is unavailable: $filename" 65
     printf '%s  %s\n' "$expected_hash" "$lock_bundle/$filename" | sha256sum --check --status
     [[ ! -L "$project/$filename" ]] || die "Owned project file is symlinked: $filename" 73
     if [[ -e "$project/$filename" ]]; then
         [[ -f "$project/$filename" && -O "$project/$filename" ]] || die "Owned project file is not an owned regular file: $filename" 73
         if ! printf '%s  %s\n' "$expected_hash" "$project/$filename" | sha256sum --check --status &&
-            ! printf '%s  %s\n' "$previous_hash" "$project/$filename" | sha256sum --check --status; then
-            die "Owned project file differs from both verified bundles: $filename" 73
+            ! printf '%s  %s\n' "$previous_hash" "$project/$filename" | sha256sum --check --status &&
+            ! printf '%s  %s\n' "$recorded_hash" "$project/$filename" | sha256sum --check --status; then
+            die "Owned project file differs from all verified bundles: $filename" 73
         fi
     fi
 done
@@ -225,16 +232,9 @@ assert project["requires-python"] == "==" + sys.argv[2], "Owned project interpre
 assert sys.version.split()[0] == sys.argv[2]
 assert sorted(project["dependencies"]) == sorted(sys.argv[3:]), "Direct requirement matrix differs"
 PY
-step=lock-check
-"${safe[@]}" uv --no-config lock --check --project "$project" --python "$runtime_python" \
-    --no-python-downloads --prerelease if-necessary \
-    --default-index https://pypi.org/simple --exclude-newer "$exclude_newer"
-step=package-sync
-"${safe[@]}" uv --no-config sync --project "$project" --python "$runtime_python" \
-    --no-python-downloads --locked --no-dev --prerelease if-necessary \
-    --default-index https://pypi.org/simple --exclude-newer "$exclude_newer"
-step=dependency-check
-"${safe[@]}" uv --no-config pip check --python "$project/.venv/bin/python"
+# BEGIN shared-sync-call
+sync_trading_2604
+# END shared-sync-call
 
 # Retain unchanged upstream code now, so acceptance requires no network.
 # No market dataset is fetched; this quickstart generates its own synthetic bars.

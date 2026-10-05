@@ -16,10 +16,12 @@ the command center's rerun**, which must receive a separate receipt. The existin
 receipt continues to describe its 5.58.0 execution.
 
 The current lock SHA256 is
-`6b4e6a4d4fc61cbda56c36d1ee0c65c263a5e938d968ce2806cc32330a8335f1`.
+`4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2`.
 The [lock comparison](../../../evidence/artifacts/edgartools-5600-20261004/runtime-lock-change.json)
-records only the EdgarTools version/artifact change and the project requirement
-metadata; all other 240 entries are unchanged. The
+records the preceding EdgarTools version/artifact change and project requirement
+metadata; all other 240 entries were unchanged. The build-constraint relock below
+adds only lock manifest metadata; all 242 package entries remain identical to
+that 5.60.0 lock. The
 [this-host import smoke](../../../evidence/artifacts/edgartools-5600-20261004/this-host-import-smoke.json)
 passes the exact acceptance import/version assertion in a hash-locked 42-package
 CPython 3.12.3 environment with networking disabled; its old-version control
@@ -48,13 +50,13 @@ matrix below. These supplemental pins remain subject to trading-lane ratificatio
 
 ## Files and use
 
-Keep the two scripts beside `trading-2604-runtime/`. Its `pyproject.toml` and
+Keep both host scripts and `sync-trading-2604.sh` beside `trading-2604-runtime/`. Its `pyproject.toml` and
 `uv.lock` now carry the directed 5.60.0 pin move from the original staged project.
 The lock contains
 242 package entries, including project metadata; it is not a claim of 242
 installed distributions. The installer checks both embedded SHA256 values and
 refuses arbitrary modified project metadata on rerun. It can migrate the exact
-previously recorded project/lock hashes, including a partly completed migration;
+approved round-1 or round-b2 project/lock hashes, including a partly completed migration;
 both files are checked before either is replaced atomically. It checks the lock,
 runs `uv sync --locked --no-dev`, then runs `uv pip check` on the project
 environment, failing closed at every step. The mise route below supplies uv
@@ -89,6 +91,47 @@ an unavailable daemon blocks installation before Python work. The installer
 removes a stale completion marker and writes a replacement atomically only after
 both immutable images have been inspected. Acceptance requires that marker and
 both images. An incomplete install blocks all 25 checks.
+
+## Hash-pinned source build and shared sync
+
+The only nonvirtual lock distribution without a wheel is
+`antlr4-python3-runtime==4.9.3`. Its source archive lacks `pyproject.toml`, so
+[uv 0.12.17's legacy backend](https://github.com/astral-sh/uv/blob/0.12.17/crates/uv-build-frontend/src/lib.rs#L53-L60)
+otherwise resolves `setuptools>=40.8.0` separately. The project now uses uv's
+[hash-carrying build constraint](https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/build.md#L61-L79)
+and [schema](https://github.com/astral-sh/uv/blob/0.12.17/uv.schema.json#L788-L815)
+to pin **setuptools 84.0.0** with exactly the runtime lock entry's wheel and
+sdist SHA256 values. The lock manifest records both hashes. Native uv 0.12.17
+performed this relock because mise remains unavailable to the packaging worker;
+Python 3.12.3, prerelease `if-necessary`, the PyPI default index and
+`exclude-newer=2026-10-06T04:00:00Z` are unchanged. No package version or archive moved.
+
+[tests.test_trading_2604_lock](../../../tests/test_trading_2604_lock.py) checks the
+pyproject/manifest agreement, the backend version and exact archive hashes, and
+the single-sdist census. Planted fixtures reject a second source build, a
+different backend version, missing hashes and a differing manifest. The virtual
+project entry has no distribution archive and is excluded from that census.
+
+[sync-trading-2604.sh](sync-trading-2604.sh) defines the sole host/CI argument
+vector and its Python/uv/cutoff pins. The installer verifies its SHA256 before
+sourcing and calling `sync_trading_2604`; future trading-native CI will source
+and call the same function with its own clean `safe` command-prefix array,
+`project` and managed `runtime_python`. It checks the lock, syncs with
+`--locked --no-dev`, then checks installed dependencies, stopping on any error.
+The test compares every recorded argv byte between the installer call and a
+direct shared-source call, rejects retyped or altered installer calls and stale
+source hashes, and plants failures at all three steps. This follows the
+[repository's install-command pin pattern](../../../.github/workflows/validate.yml#L196-L225).
+
+The [build-constraint proof](../../../evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json)
+records a this-host cold-cache sync with managed CPython 3.12.3 and antlr4's
+installed WHEEL generator, plus three negative controls. Invalid-only hash
+controls remove the valid alternative archive hash; retaining that alternative
+can legitimately succeed. A fresh resolution exercises the backend download,
+while the locked-sync control preserves runtime archive hashes. These are local
+integration and structural checks. The earlier 25/25 summary is **pre-relock
+evidence**; NativeStack2604's rerun on this final lock requires its own receipt.
+The final completion marker also differs from the prior bundles.
 
 ## Pinned sources
 
