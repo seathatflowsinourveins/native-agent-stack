@@ -67,7 +67,8 @@ The `protobuf` pin is needed (added 2026-10-05):
 
 - The 10.45.1 wheel declares no dependencies; its PyPI metadata has no `Requires-Dist`.
 - Its generated `ibapi/protobuf/*_pb2.py` modules were built for protobuf 5.29.5. They call
-  `ValidateProtobufRuntimeVersion(5, 29, 5, …)` at import, so a 5.x runtime of at least 5.29.5 is required.
+  `ValidateProtobufRuntimeVersion(5, 29, 5, …)` at import. The installed runtime's check (protobuf
+  `runtime_version.py`) rejects any runtime older than that, so at least 5.29.5 is required.
 - Without `protobuf`, `import ibapi.client` fails with `ModuleNotFoundError: No module named 'google'`.
 - `protobuf==5.29.6` is the pin that NautilusTrader 1.231.0's own `ib` extra declares for the same nautilus-ibapi
   10.45.1 (`https://pypi.org/pypi/nautilus_trader/1.231.0/json`).
