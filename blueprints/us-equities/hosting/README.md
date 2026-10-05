@@ -380,8 +380,9 @@ env TMPDIR="$PRIVATE_TMP" nice -n 19 python3 \
   --restic-bin "$RESTIC_BIN" --output "$NEW_SANITIZED_REPORT"
 ```
 
-It generates and later deletes a throwaway password, creates two synthetic WAL
-journals and commits to each while its Online Backup copy is active. It backs
+It generates a 0600 throwaway unlock file for restic and later deletes it,
+reporting the cleanup boolean as `throwaway_unlock_file_deleted`. It creates two
+synthetic WAL journals and commits to each while its Online Backup copy is active. It backs
 up, reads subset **1/1** (every pack in this small proof), restores and independently
 compares bytes, hashes and required state. Stdlib unittest separately exercises
 the default seven-part rotation. It also runs these controls:

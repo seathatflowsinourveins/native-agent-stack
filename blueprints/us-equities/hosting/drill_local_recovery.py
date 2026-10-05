@@ -69,9 +69,9 @@ def sanitize(value, *, root: Path, lexical_root: Path, binary: Path):
 def drill(binary: Path, scratch_root: Path) -> dict:
     os.umask(0o077)
     root, lexical_root = scratch_directory(scratch_root)
-    password = root / "throwaway-password"
-    password.write_text(secrets.token_urlsafe(48) + "\n")
-    password.chmod(0o600)
+    unlock_file = root / "throwaway-unlock-file"
+    unlock_file.write_text(secrets.token_urlsafe(48) + "\n")
+    unlock_file.chmod(0o600)
     writers = {}
     stops, threads, commits, writer_errors = {}, {}, {}, []
     journals = {}
@@ -122,7 +122,7 @@ def drill(binary: Path, scratch_root: Path) -> dict:
 
         work = root / "accepted"
         work.mkdir(mode=0o700)
-        runner = recovery.Restic(binary, root / "repository", password, work)
+        runner = recovery.Restic(binary, root / "repository", unlock_file, work)
         runner.run("init", "--json")
         for name in journals:
             stops[name], commits[name] = threading.Event(), []
@@ -163,7 +163,7 @@ def drill(binary: Path, scratch_root: Path) -> dict:
         for control in ("snapshot", "restore"):
             control_work = root / ("control-" + control)
             args = [sys.executable, str(Path(recovery.__file__)), "cycle", "--restic-bin", str(binary),
-                    "--repository", str(root / "repository"), "--password-file", str(password),
+                    "--repository", str(root / "repository"), "--password-file", str(unlock_file),
                     "--work", str(control_work), "--rotation-state", str(root / "rotation-one.json"),
                     "--check-parts", "1", "--control", control]
             for name, (path, tables) in journals.items():
@@ -199,8 +199,8 @@ def drill(binary: Path, scratch_root: Path) -> dict:
             thread.join(timeout=10)
         for db in writers.values():
             db.close()
-        password.unlink(missing_ok=True)
-    report["throwaway_password_deleted"] = not password.exists()
+        unlock_file.unlink(missing_ok=True)
+    report["throwaway_unlock_file_deleted"] = not unlock_file.exists()
     report["completed_at_utc"] = datetime.now(timezone.utc).isoformat()
     return sanitize(report, root=root, lexical_root=lexical_root, binary=binary)
 
@@ -222,7 +222,7 @@ def main(argv=None) -> int:
                           "checked_subset": report["comparison"]["checked_subset"],
                           "snapshot_control_exit": report["controls"]["snapshot"]["exit"],
                           "restore_control_exit": report["controls"]["restore"]["exit"],
-                          "throwaway_password_deleted": report["throwaway_password_deleted"]}, sort_keys=True))
+                          "throwaway_unlock_file_deleted": report["throwaway_unlock_file_deleted"]}, sort_keys=True))
         return 0
     except (ValueError, OSError, sqlite3.Error, subprocess.TimeoutExpired) as error:
         print(json.dumps({"result": "failed", "reason": type(error).__name__}))
