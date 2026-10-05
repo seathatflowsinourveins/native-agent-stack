@@ -60,8 +60,11 @@ are inferred. Claude records only whether `env` has `CLAUDE_CODE_SHELL`. The
 probe reads `~/.codex/config.toml` and `~/.claude/settings.json`; it does not
 resolve profile overlays, managed settings, project settings or environment
 overrides. Parse failures omit exception text to avoid disclosing values.
-Only a value equal to the current home, or beginning with that complete home
-component followed by `/`, is normalized to `~`. Prefix-sharing sibling paths
+Absolute path values use stdlib `posixpath.normpath` before checking membership
+in the current home, without resolving symlinks. An absolute value containing a
+`..` component fails closed, including traversal that ends inside the home.
+Only a normalized path equal to the current home, or beginning with that complete
+home component followed by `/`, is converted to `~`. Prefix-sharing sibling paths
 and embedded home references remain unchanged and make the output fail closed.
 The same normalization applies recursively to keys and values. Remaining home
 paths anywhere in the document make the output fail closed. The personal-home
@@ -95,6 +98,7 @@ parent path is checked. The exact default launcher parent
 label: an optional `GNU` prefix, the declared tool name or Codex's `codex-cli`
 brand, and an immediate parenthesized repetition such as `(GNU Time)` or `(GDB)`.
 Claude's numeric version followed by `(Claude Code)` is its leading label.
+Any prerelease or build suffix stays in the text checked for login tokens.
 Later tool-name words remain checked, including account annotations such as
 `gid=N(<login>)`, `--owner <login>` and `Built by <login>`. The OS-release ID is
 exempt only in a vendor group immediately following the leading tool label on

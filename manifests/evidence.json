@@ -16593,8 +16593,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-host-baseline-recorder.md",
-      "sha256": "9ef55a32757e36e65f54fadf3360943c885f3bf51031130aa106ebd8760cf5c7",
-      "bytes": 25010
+      "sha256": "9eaaf48e92d6a9368af7706ad2632f69de68426544a1ee82272da9739d11f94a",
+      "bytes": 27155
     },
     {
       "path": "docs/decisions/2026-10-04-nautilus-prerelease-freshness.md",
@@ -53608,8 +53608,8 @@
     },
     {
       "path": "tests/test_host_baseline_probe.py",
-      "sha256": "495b8d02036f5240f88edc5b1a2abfdbef010fbd73d82f7f4bee840e81e6f4a6",
-      "bytes": 31719
+      "sha256": "4914554be9c1d340ab904aed4f5804087407f0fbeaf3bd1c01dd02104a86a0f8",
+      "bytes": 34131
     },
     {
       "path": "tests/test_host_receipts.py",
@@ -54243,13 +54243,13 @@
     },
     {
       "path": "tools/adoption/host-baseline.md",
-      "sha256": "7bed0cbee248b9700ec34f736d2fa1909497f2b63b7093b350f3bc6b512ee992",
-      "bytes": 16100
+      "sha256": "8757c511f09a5fbfde0fde6fb1d364b01f43f7d088d7c87dd8491576a82c9b07",
+      "bytes": 16420
     },
     {
       "path": "tools/adoption/host_baseline_probe.py",
-      "sha256": "a3dcf5d27e29587101818f71a99cd0acfeed75fcfad3d13aacbeb4778dfabb55",
-      "bytes": 17646
+      "sha256": "8baadc0bcb82d2e8135b46e643547a0bbf31ad7d21db65257c9a9802a5d74e98",
+      "bytes": 17891
     },
     {
       "path": "tools/adoption/install_claude_profile.py",

@@ -15,6 +15,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import posixpath
 import pwd
 import re
 import shlex
@@ -196,8 +197,14 @@ def canonical_source_bytes():
 
 def normalize_home(value, home):
     if isinstance(value, str):
-        home_text = str(home)
-        return "~" + value[len(home_text):] if home_text != "/" and (value == home_text or value.startswith(home_text + "/")) else value
+        home_text = posixpath.normpath(str(home))
+        if value.startswith("/"):
+            if ".." in value.split("/"):
+                raise PrivacyFailure()
+            path_text = posixpath.normpath(value)
+            if home_text != "/" and (path_text == home_text or path_text.startswith(home_text + "/")):
+                return "~" + path_text[len(home_text):]
+        return value
     if isinstance(value, dict):
         return {normalize_home(key, home): normalize_home(item, home) for key, item in value.items()}
     if isinstance(value, list):
@@ -252,7 +259,7 @@ def assert_private_output_absent(document, login):
                 prefix = r"\A(?:GNU[ \t]+)?" + label + r"(?=[ \t(]|$)(?:[ \t]+\((?:GNU[ \t]+)?" + re.escape(name) + r"\))?"
                 value = re.sub(prefix, "", value, count=1, flags=re.I)
                 if name == "claude":
-                    value = re.sub(r"\A[0-9]+(?:\.[0-9]+)+(?:[-+][a-z0-9.-]+)?[ \t]+\(Claude[ \t]+Code\)", "", value, count=1, flags=re.I)
+                    value = re.sub(r"\A[0-9]+(?:\.[0-9]+)+([-+][a-z0-9.-]+)?[ \t]+\(Claude[ \t]+Code\)", r"\1", value, count=1, flags=re.I)
             elif len(argv) == 4 and argv[:2] == ["dpkg-query", "-W"] and argv[2].startswith("-f="):
                 fields = value.split()
                 if isinstance(vendor_id, str) and len(fields) in (2, 3) and fields[0] == argv[3] and re.fullmatch(r"[0-9][A-Za-z0-9.+:~\-]*", fields[1]):
