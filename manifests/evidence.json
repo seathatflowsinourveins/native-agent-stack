@@ -4218,7 +4218,7 @@
         "worktrunk",
         "syft"
       ],
-      "claim": "Five canonical stack owners and one plan prerequisite have destination installation and selected native use qualification on NativeStack2604. Scope and evidence classes are per owner; no whole-stack or full-lifecycle recertification.",
+      "claim": "Dated NativeStack2604 installation and selected native use observations for five canonical stack owners and one plan prerequisite, offered to the existing W1/W1b owners. Scope and evidence classes are per owner; no current plan-of-record advancement, whole-stack or full-lifecycle recertification.",
       "limitations": [
         "Prior receipts and lifecycle stages retain their original hosts, dates and pins. The saturation audit aggregation remains current_host_recertified_by_this_audit=false.",
         "Version checks, release/advisory review, registry integrity, native examples, local assertions, synthetic controls and unchanged upstream tests are different evidence classes.",
@@ -4227,7 +4227,9 @@
         "No permission/client account/model/effort settings, OS restart, trading operation or main checkout change was performed.",
         "No causal provider-token, savings, cost or convergence superiority claim. Open holds are documented in the currency decision.",
         "The native collector recorded mise with --allow-unbound-version, but its host validator rejects IDs absent from canonical component catalogs. The four original mise receipt bytes are retained unchanged as prerequisite artifacts outside the component census; they are not valid catalog host-enrollment receipts.",
-        "Second independent mise drift to2026.10.0 at05:05Z; final authorized reapply/doctor/version/digest pass at05:07:28Z is an immediate observation only. Durable shared-host state remains a coordinator serialization question."
+        "Second independent mise drift to2026.10.0 at05:05Z; final reapply/doctor/version/digest pass at05:07:28Z is an immediate observation only. The coordinator subsequently fixed main's 4c897418f install plan as the shared-host plan of record until the release re-pin; no further currency installs or reinstalls are allowed on that host.",
+        "Coordinator observation: its 04:58-05:06Z agent-runtime-worker, promptfoo and Worktrunk applies, plus fixwave-defects reruns, use main's plan and mise2026.10.0. Plan-revision contention is the likely mise flip-flop cause; exact process attribution remains unproved. Future pin qualification uses an isolated tool root or throwaway StackMeasure2604, never the shared host.",
+        "Worktrunk and Difftastic prompt-boundary repair belongs to fixwave-defects item1. Currency's Worktrunk acceptance edit was dropped; this receipt preserves the original dated results, not acceptance of the later reverted implementation."
       ],
       "path": "evidence/receipts/ns2604-currency-qualification-20261005.json"
     }
@@ -16641,8 +16643,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-ns2604-currency-wave.md",
-      "sha256": "aef8ae59915a30466c6725eca7624f409cc206619599665af1c1a2f0dabf92fa",
-      "bytes": 12315
+      "sha256": "007281f12512439ca81282a99b406f0201c56976521e85a25809953b6b3306eb",
+      "bytes": 15297
     },
     {
       "path": "docs/direct-results.md",
@@ -38946,8 +38948,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "cc69999fc3217c9079570ee781625e3c23bcc0845150dba7a385229d23a366ac",
-      "bytes": 147613
+      "sha256": "39ffa7b5bf3a5fa15bae721d003af639e8737bc7c274f6bfa6ba39cd147e3cb0",
+      "bytes": 147910
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -38956,8 +38958,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "bdc459e836283c6dff5845060efa18578c4fdbec3ff603bcc7ea7c8b0b4a1a07",
-      "bytes": 127844
+      "sha256": "af32aea0a8b06a7b5acefcf9fe04e10b24136af6ca1cf2a1d892c090d67f0c22",
+      "bytes": 127767
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
@@ -39221,8 +39223,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "05640ef28b6ef8935bb969e81580137aaf12376d80d34beed93059b42154a27e",
-      "bytes": 316551
+      "sha256": "508fe7d4898ed503b4de52d1d2aed991a1b256f7eb955d3e564d42b00d603ac3",
+      "bytes": 316909
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -39921,8 +39923,8 @@
     },
     {
       "path": "evidence/artifacts/ns2604-currency-20261005/input-files.json",
-      "sha256": "ea03df2ada4906153ab2a4c49a8b39dfee1ce765ee748b07d01dde991b552fda",
-      "bytes": 2066
+      "sha256": "e25c33630c5a1b4217a172bcd41409a738f09634a11dbb2228aece51dbb44d6c",
+      "bytes": 2410
     },
     {
       "path": "evidence/artifacts/ns2604-currency-20261005/jcodemunch-upstream-harness-output.md",
@@ -51771,8 +51773,8 @@
     },
     {
       "path": "evidence/receipts/ns2604-currency-qualification-20261005.json",
-      "sha256": "553560251dc043bf633c9414b776df90664f588cbc13bd6125b8b2c30a69b16e",
-      "bytes": 21668
+      "sha256": "6073c5b86146bed910e56e161f5bad0b90511b3ffd1ca65171952e68fa753948",
+      "bytes": 22712
     },
     {
       "path": "evidence/receipts/ns2604-e2e-20261004.json",
