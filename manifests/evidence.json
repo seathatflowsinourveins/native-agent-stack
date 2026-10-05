@@ -2929,7 +2929,7 @@
         "codex",
         "claude-code"
       ],
-      "claim": "The new-machine handbook (adoption/bootstrap.md, adoption/platforms/*.md), the three native client config templates and tools/adoption/render_config.py were built and locally verified on this Linux/WSL2 host: render_config.py --check reproduced this host's live ~/.claude/settings.json, ~/.codex/config.toml and agent-lab/.codex/config.toml byte-for-byte from the templates plus this host's own gitignored adoption/hosts/wsl-seath.json values, and the new unit tests plus every existing repository validator pass against the three new catalogs/foundation/decisions.json rows. Hosted GitHub Actions execution for the new-pc-bootstrap-ci decision is explicitly pending, not claimed here.",
+      "claim": "The new-machine handbook (adoption/bootstrap.md, adoption/platforms/*.md), the three native client config templates and tools/adoption/render_config.py were built and locally verified on this Linux/WSL2 host: render_config.py --check reproduced this host's live ~/.claude/settings.json, ~/.codex/config.toml and agent-lab/.codex/config.toml byte-for-byte from the templates plus this host's own gitignored adoption/hosts/wsl-<user>.json values, and the new unit tests plus every existing repository validator pass against the three new catalogs/foundation/decisions.json rows. Hosted GitHub Actions execution for the new-pc-bootstrap-ci decision is explicitly pending, not claimed here.",
       "limitations": [
         "Byte-identical --check is native evidence for this one host's three live files only; a different host still needs its own adoption/hosts/<host>.json and its own --check run.",
         "adoption/platforms/macos-arm64.md is drafted, not accepted: no command on that page has run on macOS.",
@@ -4838,8 +4838,8 @@
     },
     {
       "path": "blueprints/blind-catalog-convergence/experiment.json",
-      "sha256": "d825ca043915cd78c2287050ddf84fe8829b2bfb035b659cbc179f09cb887331",
-      "bytes": 12895
+      "sha256": "f2a6a88be67f47d99fe687a7f1497c9497279c65e8d4a9d8f9ffadd55b045e0c",
+      "bytes": 15245
     },
     {
       "path": "blueprints/blind-catalog-convergence/memory-experiment.json",
@@ -7679,33 +7679,33 @@
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/with_1.stdout",
-      "sha256": "44dec266d0169e7018eed464e81093d6c906c5cc938066376cd16bebe2934332",
-      "bytes": 12138
+      "sha256": "255a7f5a515727b2bcd85c663bac50c3e1cdfb9a91feac4bc58b6d9719183cf2",
+      "bytes": 12139
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/with_2.stdout",
-      "sha256": "4e0d901180eeedea997f9e2fafb9e2e8555fa74cf5d873c28908a64ca89fb585",
-      "bytes": 13899
+      "sha256": "17765899b255330155061db97c5e1cbce743a42e537898c152d44561cce183a3",
+      "bytes": 13900
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/with_3.stdout",
-      "sha256": "d3d8c2c78e0887e89b7561c06622d8b7e2a178d103eae9e3fe8c2b7cfa23627c",
-      "bytes": 12143
+      "sha256": "f4c157553b7e8df076c62a049f64266c34c6bdead3ce6ce05c8f3a6b59075b07",
+      "bytes": 12144
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/without_1.stdout",
-      "sha256": "3e7670a9b5a3b2b95fe03bcb421ffcafacf50b43648f7cb027350c125f073f37",
-      "bytes": 10859
+      "sha256": "0a39727c926ccdfc9673972c674f6a6d66e1669ff5fec104f19d07b35f114f2f",
+      "bytes": 10860
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/without_2.stdout",
-      "sha256": "33353ac3d5547661a8c8faee2a16a350a60a687c50e3155402c4021a6319c812",
-      "bytes": 12789
+      "sha256": "96b76e3499a970c06c3b9fdd126883f4cc29972b4a7d26d09544abbd30bf46cf",
+      "bytes": 12790
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/without_3.stdout",
-      "sha256": "bd40389d38d1d63a41b7c6d6563c4d3a38fd0ee1e73c756b023632de4492a604",
-      "bytes": 10838
+      "sha256": "274cf43cec762da29d422a0c436a9422b12539fa2ba9dae7fe6f074446d4ce24",
+      "bytes": 10839
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/socraticode-mcp.json",
@@ -16654,8 +16654,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "5ea6aab2571aa0f7d4077666473271cd89e46440b60134606415214818803b7a",
-      "bytes": 184183
+      "sha256": "c49dc1046c214ffd0367d1fedbb2fc08807d4f3602e9bfab6de46da5ecfcb2bc",
+      "bytes": 184906
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -16869,8 +16869,8 @@
     },
     {
       "path": "docs/tasks/2026-09-22-github-automation-newpc.md",
-      "sha256": "24ca1c63044562444803bc7a9b56bf433f2c5815f62cc8bb10a1535684b1911f",
-      "bytes": 6790
+      "sha256": "1156645223eee5d17d14de9be1753376faec26f4468660953afb1b96b33ae33a",
+      "bytes": 6792
     },
     {
       "path": "docs/tasks/2026-09-22-new-machine-install.md",
@@ -17459,8 +17459,8 @@
     },
     {
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
-      "sha256": "c1a6cad2d0b2dca4a1bb94a869e5b253b6d22c65905364e87af7e38ecd8383b2",
-      "bytes": 534950
+      "sha256": "c9d859091f6ba166a73b45ec0dd5984721417c150a15f9ad4db31a43ae86b253",
+      "bytes": 534955
     },
     {
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-final-layers.json",
@@ -17504,8 +17504,8 @@
     },
     {
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/closure-provenance.json",
-      "sha256": "e12c91de527ee15caef4616d1fe7f1d7f58ef85888f4a08a650dfaa3f1743940",
-      "bytes": 7918
+      "sha256": "640d4d2bfeda3d2410ec4e166665c6cafb43c368db7c31b63584201782660b8c",
+      "bytes": 8203
     },
     {
       "path": "evidence/artifacts/blind-catalog-convergence-20260921/codex-provenance.json",
@@ -25629,8 +25629,8 @@
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/recovery-portability/restic-mtime-sparse-uid-extension.json",
-      "sha256": "70d752c951efca8e91a5fc040b7cb7efead1981760f963a030f2332ab3f8a38f",
-      "bytes": 22609
+      "sha256": "9de748e0b534a1553b36a0d7becd21ce67888fbb2d84dacab3404798934af8c6",
+      "bytes": 22611
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/recovery-portability/restic-vs-litestream-uv-vs-mise.json",
@@ -25694,8 +25694,8 @@
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/qdrant-restart-reconnect.json",
-      "sha256": "a1c904e005417130fc4619b242599338cd4a0c4363701ea7e9146ce1f8d94a15",
-      "bytes": 5816
+      "sha256": "dd04058ec531c90cdc8453b3590433ca714dc3bb94c4cbce183e18ede171c911",
+      "bytes": 5818
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/raw/arm_a_index_result.json",
@@ -25759,8 +25759,8 @@
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-token-comparison.json",
-      "sha256": "a5eddee147e890c4e66c42c80ba7ad865d1f80cfa854cf8ae7b1ebd8ce7c8769",
-      "bytes": 15474
+      "sha256": "b741f59e6b0ac07f9afa8c62869de34ce2ea8504e0960101a85bfc97d92c4e80",
+      "bytes": 15905
     },
     {
       "path": "evidence/artifacts/gap-wave2-20260923/semantic-rag/socraticode-vs-baselines.json",
@@ -50689,8 +50689,8 @@
     },
     {
       "path": "evidence/receipts/github-automation-newpc-20260922.json",
-      "sha256": "531713a7a8062ff78d8f541ea92ea57eb665d28c7a1f875f538fe3cd26d38a63",
-      "bytes": 5836
+      "sha256": "acc1cbe95b2f3dfbd7b29a6136dbfb6d77d7c5a5e9fb4556522bba0dfd5ef776",
+      "bytes": 5839
     },
     {
       "path": "evidence/receipts/github-ci-measurements-20261003.json",
@@ -52239,8 +52239,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "e379c0c1e9ef6d30c5c9a5beb2781d7d09bcab19ad33f9c050b2fadb0541d379",
-      "bytes": 26206
+      "sha256": "2deb008f40032fd860c1386e11518bc8d8f5b21df40b5ff70f13ef4151ca69ab",
+      "bytes": 26751
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -53384,13 +53384,13 @@
     },
     {
       "path": "tests/test_token_e2e_grader.py",
-      "sha256": "0cc598f6cb6fb0d227fd7caed1a1d887ed75ffaffd3eddd03f564f184f05b054",
-      "bytes": 524371
+      "sha256": "42708be8476b880f4288f8cfc44622123ea18e8ae8198ca0c98a379460932cd3",
+      "bytes": 524375
     },
     {
       "path": "tests/test_token_e2e_preregistration.py",
-      "sha256": "4e7f464773f6bf8324e7622522d64367d501e76758ebf96930f2094a5e824055",
-      "bytes": 55079
+      "sha256": "fc17071363e296334797043025b5bdc9994d6e88e56a07f6164b9c2d4d2d1ec5",
+      "bytes": 55188
     },
     {
       "path": "tests/test_token_e2e_receipt_checks.py",
@@ -53439,8 +53439,8 @@
     },
     {
       "path": "tests/test_validate.py",
-      "sha256": "a4236a158789418581150b454b996df3ae2d17826e89728e56f1cffbfa019b60",
-      "bytes": 29398
+      "sha256": "505b9e65352d8683e6f85848d6962836ea836e6d906151e9983587a1dbcb5021",
+      "bytes": 37188
     },
     {
       "path": "tests/test_verdict_lane_vendoring.py",

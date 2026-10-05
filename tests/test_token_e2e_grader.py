@@ -7612,7 +7612,7 @@ class F29b_CheckHtml(GraderCase):
         uuid = "-".join(["3f2b8c1e", "0000", "4000", "8000", "000000000000"])
         cases = {"run token": RUN_TOKEN, "identity": run.ident("B", "seed-main-output"), "uuid": uuid,
                  "tool_use id": "toolu" + "_" + "01ABCDEFGHIJKL", "call id": "call" + "_" + "abcdefghijkl1234",
-                 "user name": "fixtureuser99", "home slug": "-home-fixtureuser99-project"}
+                 "user name": "fixtureuser99", "home slug": "-home-" + home.name + "-project"}
         for label, planted in cases.items():
             with self.subTest(label):
                 html = self.rendered({"note": f"x {planted} y"})
