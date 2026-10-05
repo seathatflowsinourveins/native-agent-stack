@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Current integration: 110 primary acceptance stages and two additional checks (112 total), from the merged 84-row plan.
+# Current integration: 111 primary acceptance stages and two additional checks (113 total), from the merged 84-row plan.
 # Historical 64-row revision ran on 2026-10-02 in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution; the record of that run is private, and its public receipt comes with that distribution's acceptance.
 # Five rows were added after the throwaway run, from the layer consensus of 2026-10-02 (69 foundation rows). The checks of skill-discovery and skill-authoring have not run anywhere; research-skill and credential-custody install nothing and have nothing to check; the fix-wave adds native review checks.
 # On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable after their measurement; like their installation, their checks run only with --only, and as plan rows they have not run anywhere.
@@ -229,9 +229,11 @@ skill-discovery() {
       check skill-discovery smoke 'want=76a98a285cb0434f3d39e1a873823556330e398b
 lock="${XDG_STATE_HOME:+$XDG_STATE_HOME/skills/.skill-lock.json}"
 lock="${lock:-$HOME/.agents/.skill-lock.json}"
-listing="$(npx --yes skills@1.7.0 list -g -a claude-code codex --json)"
+listing="$(mktemp)"
+trap '"'"'rm -f -- "$listing"'"'"' EXIT
+npx --yes skills@1.7.0 list -g -a claude-code codex --json > "$listing"
 for agent in '"'"'Claude Code'"'"' Codex; do
-  jq -e --arg agent "$agent" '"'"'any(.[]; .name == "find-skills" and (.agents | index($agent) != null))'"'"' <<<"$listing" >/dev/null
+  jq -e --arg agent "$agent" '"'"'any(.[]; .name == "find-skills" and (.agents | index($agent) != null))'"'"' "$listing" >/dev/null
 done
 jq -e --arg hash "$want" '"'"'.skills["find-skills"].skillFolderHash == $hash'"'"' "$lock" >/dev/null'
       ;;
@@ -922,10 +924,10 @@ umask 077
 state_root="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/session-analytics"
 mkdir -p "$state_root"
 run_dir="$(mktemp -d "$state_root/service.XXXXXX")"
+"$a" sync > "$run_dir/sync.txt"
 "$a" daemon status > "$run_dir/daemon.txt"
 grep -Eq '"'"'^agentsview running at '"'"' "$run_dir/daemon.txt"
 if grep -Eqi '"'"'not responding|incompatible|multiple writable'"'"' "$run_dir/daemon.txt"; then exit 1; fi
-"$a" sync > "$run_dir/sync.txt"
 for agent in claude codex; do
   "$a" session list --agent "$agent" --include-one-shot --include-automated --limit 1 --json > "$run_dir/$agent-sessions.json"
   jq -e --arg agent "$agent" '"'"'(.sessions | length) > 0 and all(.sessions[]; .agent == $agent and .message_count > 0)'"'"' "$run_dir/$agent-sessions.json"

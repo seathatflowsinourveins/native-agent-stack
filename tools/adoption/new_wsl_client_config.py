@@ -2104,7 +2104,7 @@ class Apply:
                   "skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy and sandbox_mode, the trust_level of the wired "
                   "Codex projects, and the tool approval modes and allow rules of the wired MCP servers are not written, "
                   f"and a value of theirs that a file has is not touched; {AUTHORIZATION_OPTION} adds the ones a file "
-                  "lacks)")
+                  "lacks, except existing create-only profile files)")
             return
         verdict_of = {v.piece.key: v for v in self.results if v.authorization and v.wired}
         by_status = {status: [authorization_label(key) for key in verdict_of if self.authorization.get(key) == status]
@@ -2574,20 +2574,39 @@ class Apply:
         states = []
         for source, target in items:
             data = source.read_bytes()
-            state = lane.file_state(target.read_bytes() if target.is_file() else None, data)
+            original = target.read_bytes() if target.is_file() else None
+            state = lane.file_state(original, data)
+            found = {}
+            profile_verdicts = [v for v in self.results if v.authorization and v.wired
+                                and target in groups and v.piece.group == groups[target]]
+            if profile_verdicts:
+                try:
+                    rendered = tomllib.loads(data.decode("utf-8"))
+                    existing = tomllib.loads(original.decode("utf-8")) if original is not None else {}
+                except (tomllib.TOMLDecodeError, UnicodeDecodeError) as error:
+                    raise MergeError(f"{target}: cannot classify the profile's authorization settings: {error}") from error
+                for verdict in profile_verdicts:
+                    path = [string.Template(part).safe_substitute(self.values) if isinstance(part, str) else part
+                            for part in verdict.piece.path]
+                    have = lane.get_path(existing, path)
+                    if state == "create":
+                        found[verdict.piece.key] = "added"
+                    elif have[0]:
+                        found[verdict.piece.key] = ("same" if strict_equal(
+                            have[1], lane.get_path(rendered, path)[1]) else "kept")
+                    # A create-only existing profile is preserved; absent keys were not reached.
             if state == "create" and not self.dry:
                 target.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
                 os.chmod(target.parent, 0o700)
                 lane.atomic_write(target, data, 0o600, None, create_only=True)
-            if target in groups:   # an authorization setting of the profile: added with the file, or the file's own stays
-                self.authorization.update({v.piece.key: {"create": "added", "same": "same", "differs": "kept"}[state]
-                                           for v in self.results if v.authorization and v.wired
-                                           and v.piece.group == groups[target]})
+            self.authorization.update(found)   # only after a requested create succeeds
             states.append(state)
             shown = {"create": "would create" if self.dry else "created", "same": "already there",
                      "differs": "differs from the render and is never overwritten"}[state]
             self.say("codex-files", f"  {target.name}: {shown}")
         done = ("planned" if self.dry else "applied") if "create" in states else "current"
+        if "differs" in states:
+            done = (done + "; " if "create" in states else "") + "differs, not written"
         self.record("codex-files", done, f"{len(items)} file(s)")
 
     # -- login shell

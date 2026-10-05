@@ -1,6 +1,118 @@
 {
+  "ready_roadmap_jobs3_5_followup": {
+    "recorded_at_utc": "2026-10-05T17:43:45Z",
+    "evidence_class": "local_integration",
+    "source_scope": "Regular Skills capture; unchanged Betterleaks test output retention; explicit SRT controls/completion; native AgentsView startup order; parsed D05 preservation status; exact documented provider namespace compatibility.",
+    "synthetic_full_checks": [
+      {
+        "tests": 315,
+        "exit_code": 0,
+        "skips": 3,
+        "seconds": 93.925
+      },
+      {
+        "tests": 316,
+        "exit_code": 0,
+        "skips": 3,
+        "seconds": 105.595
+      }
+    ],
+    "fixture_environment_followup": {
+      "scope": "Four new synthetic fixtures use only PATH and explicitly required synthetic bindings; no broad environment inheritance.",
+      "focused_tests": 4,
+      "exit_code": 0,
+      "seconds": 4.453
+    },
+    "failed_fixture_retained": {
+      "tests": 2,
+      "exit_code": 1,
+      "cause": "Codex partial case used a Claude output header with a completed status. Corrected to native in_progress; both focused tests then passed.",
+      "not_a_host_sandbox_failure": true
+    },
+    "native_stage_checks": [
+      {
+        "row": "skill-discovery",
+        "stage": "post_install",
+        "exit_code": 0
+      },
+      {
+        "row": "session-analytics",
+        "stage": "service_health",
+        "exit_code": 0
+      }
+    ],
+    "whole_research_attempt": {
+      "exit_code": 1,
+      "direct_gptr_report_completed": true,
+      "deerflow_started": false,
+      "fresh_claude_started": false,
+      "fresh_codex_started": false,
+      "native_polling_qualified": false,
+      "failed_gate": "Installed observer requires cx requestedModel namespace; returned metadata uses equivalent codex namespace."
+    },
+    "metadata_diagnostic": {
+      "evidence_class": "local_integration",
+      "join": "session",
+      "window_scope": "Bounded diagnostic17:23Z-17:31Z; exact original invocation timestamps were not retained.",
+      "status200_calls": 4,
+      "provider_counts": {
+        "codex": 4
+      },
+      "model_counts": {
+        "gpt-6.1-sol": 3,
+        "gpt-6.1-sol-high": 1
+      },
+      "requested_routes": [
+        "codex/gpt-6.1-sol",
+        "codex/gpt-6.1-sol-high"
+      ],
+      "candidate_replay_exit": 0,
+      "not_new_provider_execution": true,
+      "delivered_wire_effort": "unobserved"
+    },
+    "native_observer_before": {
+      "installed_candidate_equal": true,
+      "sha256": "31eeb4c45f9f5c3d53c5294438ee0ad8a749e705035db8db57a1782bf235e6e5"
+    },
+    "metadata_repair_source": "diegosouzapw/OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e:open-sse/config/providers/registry/codex/index.ts:9-13;open-sse/services/model.ts:484-490;open-sse/handlers/chatCore/requestSetup.ts:48-50;src/lib/usage/callLogs.ts:613-619.",
+    "next_native_research": "Sole plan writer must apply observer; another whole-run direction required. Original whole1 retained.",
+    "native_betterleaks_and_srt": "Pending serial reruns; synthetic tests are not upstream acceptance.",
+    "retained_artifacts": [
+      {
+        "alias": "post713-whole-research-metadata-failure",
+        "bytes": 6077,
+        "sha256": "c6f49f438766f539c4f796df04a769cfee5b7c528b28d1dca9bd292ca63e3a75"
+      },
+      {
+        "alias": "skills-regular-file-native",
+        "bytes": 35,
+        "sha256": "1469592dc3102561583484a769f6e908923a9a4b6c08fac90b1b0fee3dbe036b"
+      },
+      {
+        "alias": "agentsview-sync-first-native",
+        "bytes": 39,
+        "sha256": "b7b0137803fe9a051bb75d3a7fe2d47f557d0b24f8a93e96e6529aa7a673e965"
+      },
+      {
+        "alias": "ready-jobs315-integration",
+        "bytes": 428,
+        "sha256": "0d34a571a4ed24ef848a850fd099b2e1e29742b3133f35eeccfa3324fe987ae4"
+      },
+      {
+        "alias": "ready-jobs316-integration",
+        "bytes": 430,
+        "sha256": "ddadbdd9eb6ae58f737e911e0226e9389515e8a31027d8cf58a22bd12a39e4ee"
+      },
+      {
+        "alias": "completed-direct-gptr-report",
+        "bytes": 28696,
+        "sha256": "6da433f8636138355431c07a3e496ffb9837003d3208f9133d8036bcc5a673d7"
+      }
+    ]
+  },
   "post713_native_review_parser_followup": {
-    "recorded_at_utc": "2026-10-05T17:25:00Z",
+    "recorded_at_utc": "2026-10-05T17:22:54Z",
+    "recorded_at_scope": "Source commit67259e3 timestamp. Exact record creation time unobserved; corrects manually entered17:25 timestamp.",
     "native_whole_stage_exit": 1,
     "native_attempt_scope": "Exactly one A31 frozen read-only retry; both directions completed, whole-stage local oracle failed.",
     "native_source_commit": "7098936765b762b7b6ff631e4094fdf2646ce4c3",
