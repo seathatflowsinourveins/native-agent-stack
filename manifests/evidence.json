@@ -4882,8 +4882,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "57bbddca2429266953c09f770a2caff524a19ec32ed3affc9cea00a83cca8651",
-      "bytes": 57558
+      "sha256": "3199e41f7722adb694906ba78d09d765be2c7ec63c111183645db73c95567508",
+      "bytes": 57818
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -4902,8 +4902,8 @@
     },
     {
       "path": "adoption/new-wsl/templates/codex.config.additions.toml",
-      "sha256": "ed5181e95d843a49b197ca04c0e671c8ded3b31e0e484706bebe813378110db0",
-      "bytes": 4479
+      "sha256": "16a2942d0538d7a3ffbf5fbe8a57db3aaefb036253350fae229cb824ade6dc6b",
+      "bytes": 4579
     },
     {
       "path": "adoption/paired/README.md",
@@ -16668,8 +16668,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "3eb5161caa86df7fc1edb86c84a208700ae9243240501df468acfddbd237cdb6",
-      "bytes": 146232
+      "sha256": "1c20e7da87850c067b1fe174f100f57747d2ae7de693284f25fd9d8c6f18d852",
+      "bytes": 146558
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -16868,8 +16868,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "549a70f992717568f6fe8811b3f4d7ffbe3299015458686643fffe54a6f86d7b",
-      "bytes": 134812
+      "sha256": "17220f1d3866439d8b0a7ccd1c73aafe05354f94d7ec67dd685ad937833f7313",
+      "bytes": 135333
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -17008,8 +17008,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-changelog-parity.md",
-      "sha256": "aa1e7b5ad354b6a86c9dac099053944aaadcfd951c08ec861430812a64552805",
-      "bytes": 6304
+      "sha256": "b8087bb88987388183aa06f8055448192e7f596d14f739edfee4f2b4dfa1c368",
+      "bytes": 7630
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-clean-default-holdouts.md",
@@ -39508,8 +39508,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "a69d283901b99052ab209bd5f18e61ce66df02e8813b96e03a1afd76c1f831e9",
-      "bytes": 79371
+      "sha256": "913041489fd8145fcb8b15047107c80f0f4395e711a3042db2adf5bf72125196",
+      "bytes": 79782
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
@@ -39663,8 +39663,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/harbor-worker-telemetry-accept.sh",
-      "sha256": "27a18055eb97e4696c3ccec06d1bdfadc882053a862ddd47946528dee7aac02e",
-      "bytes": 5456
+      "sha256": "a79b419cd4fe40faa26e9f45810d6111dfc932200b03cda04bd113e33a2d2490",
+      "bytes": 5470
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/harbor-worker-telemetry-contract.md",
@@ -39828,8 +39828,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "5cab5a09a793a78bc48ac4d31d9ec2b409d75c58831b06426dae41776db4ba05",
-      "bytes": 387919
+      "sha256": "c4546b76fb2d7eb9dddd44b416716307d313781235c09b7945d844c5df686c0d",
+      "bytes": 388443
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -54783,8 +54783,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "fc53272498f2f2222cc604cfcd485935ad20c4896fff4fc415774fb8bb78ed0f",
-      "bytes": 282444
+      "sha256": "52dc24297f5f2caca8b1cffb6c43701f20ba640d138415335af169423f9101e0",
+      "bytes": 282993
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
