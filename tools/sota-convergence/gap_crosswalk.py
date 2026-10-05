@@ -9,7 +9,7 @@ Code owns candidate generation, labels, thresholds and output; the model only an
 one closed-set question per (gap, receipt) pair and one blocker question per gap, and it
 sets no final decision (ROUTING).
 """
-import argparse, concurrent.futures as cf, hashlib, json, os, pathlib, re, subprocess, sys, time, urllib.request, urllib.error
+import argparse, concurrent.futures as cf, hashlib, json, os, pathlib, re, subprocess, sys, time
 
 MODEL = "jev-1.13.0"
 URL = "https://api.typesafe.ai/v1/systemone"
@@ -117,22 +117,28 @@ def request_body(root, it):
 
 
 def call(body, key):
-    data = json.dumps(body).encode()
-    for attempt in range(5):
-        req = urllib.request.Request(URL, data=data, method="POST", headers={
-            "Content-Type": "application/json", "Authorization": f"Bearer {key}",
-            "User-Agent": "agent-lab-gap-crosswalk/1 (python-urllib)"})
-        t0 = time.monotonic()
-        try:
-            with urllib.request.urlopen(req, timeout=60) as resp:
-                j = json.loads(resp.read())
-                return j, resp.headers.get("x-typesafe-request-id"), time.monotonic() - t0, attempt
-        except urllib.error.HTTPError as e:
-            if e.code in (429, 529) and attempt < 4:
-                time.sleep(2 ** attempt)
-                continue
-            raise RuntimeError(f"HTTP {e.code}: {e.read()[:300]!r}")
-    raise RuntimeError("retries exhausted")
+    # Lazy and pinned: offline build/score use only the standard library.
+    install = "prefix your original judge command (including --set and --out) with: uv run --with typesafe-sdk==0.7.2"
+    try:
+        from typesafe_sdk import RetryPolicy, TypeSafeClient, __version__
+    except ImportError:
+        raise SystemExit(f"judge requires typesafe-sdk==0.7.2; {install}") from None
+    if __version__ != "0.7.2":
+        raise SystemExit(f"judge requires typesafe-sdk==0.7.2 (found {__version__}); {install}")
+
+    # typesafe-ai/typesafe-sdk-python@v0.7.2:
+    # src/typesafe_sdk/_core/retry.py:52-123 (decision record pins the commit).
+    retry = RetryPolicy(max_retries=4, backoff_initial=1, backoff_max=8, backoff_jitter=0,
+                        http_statuses={429, 529}, respect_retry_after=False,
+                        api_connection_error=False, api_timeout_error=False, timeout=None)
+    with TypeSafeClient(api_key=key, base_url=URL.removesuffix("/v1/systemone"),
+                        timeout=60, retry=retry) as client:
+        result = client.system_one(state=body["state"], questions=body["questions"], model=body["model"])
+        raw = result.raw_http_response
+        # Public HTTP metadata retains the final attempt's latency and retry count.
+        # The SDK owns User-Agent; see docs/decisions/2026-10-05-typesafe-sdk-transport.md.
+        return (result.model_dump(mode="json"), raw.headers.get("x-typesafe-request-id"),
+                raw.elapsed.total_seconds(), int(raw.request.headers.get("x-typesafe-retry-count", "0")))
 
 
 def validate(j, body):
