@@ -98,6 +98,8 @@ documents the hook as the Codex integration (rtk-ai/rtk v0.51.0, commit e001f773
   `rtk hook codex` or `rtk init -g --codex` changes the hook's definition (its hash changes and the grant must be repeated).
 - The user withdrawing the reading of "yes frictionless" for this grant: the row then stops after `rtk init -g --codex` and leaves the review to `/hooks`.
 
+2026-10-05 update: the [published RTK fold Harbor phase-2 record](2026-10-05-rtk-fold-harbor-phase2.md) resolves the study trigger above with `remedy_triggered=false`; the default stays within the studied grep scope, with broader remedy coverage unresolved.
+
 ## Residuals
 
 The install edits the Codex instruction file (the inert pointer line) and creates `RTK.md`; whether the user accepts that edit with the rest of the

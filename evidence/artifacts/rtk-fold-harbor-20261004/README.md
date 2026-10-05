@@ -12,11 +12,15 @@ This directory publishes the retained phases 1 and 2 study. The [decision](../..
 | [phase2-analysis.json](phase2-analysis.json) | Original comparison/version metadata; trial records reduced to identifiers, counts, coverage flags and token categories |
 | [PROTOCOL.frozen.md](PROTOCOL.frozen.md) | Review protocol added to the preregistered single-reviewer procedure; coordinator session identifier omitted |
 | [adjudication-summary.json](adjudication-summary.json) | Original summary augmented with verified label/coverage joins, sample reproduction and the no-positive-audit limitation |
-| [phase2-measures.adjudications.csv](phase2-measures.adjudications.csv) | All 264 call IDs and final labels; short primary/audit status notes replace original rationale text |
+| [phase2-measures.adjudications.csv](phase2-measures.adjudications.csv) | All 264 job/trial/call keys and final labels; short primary/audit status notes replace original rationale text |
+| [audit-rows.json](audit-rows.json) | Original seed, negative population size and 53 selected `(trial, call_id)` pairs; no trajectories or rationales |
+| [grep-audit.csv](grep-audit.csv) | All 24 B discovery calls, ten direct follow-up rewrites and three successful Python-child greps; flag spellings, phases, file-list status and hook decisions only |
+| [hook-coverage.md](hook-coverage.md) | Frozen flag definition, task clustering, scoped exclusion coverage, deferred/unreached mentions, A's nested-return decoder miss and source excerpts |
+| [premeasurement-acceptance.json](premeasurement-acceptance.json) | Sanitized original readiness gate, smoke counters and gate/first-trial timing; no commands or tool outputs |
 | [per-arm-summary.csv](per-arm-summary.csv) | Counts and native token means/medians computed from adjudicated per-trial fields; token columns explicitly exploratory |
 | [source-hashes.json](source-hashes.json) | Hashes/byte lengths of private originals and per-job result files, original/public hash distinction and the freeze correction |
 
-`<state>` denotes the private source root, whose actual location is omitted. `<trial>` replaces native result-directory identifiers in source locators; `<session-id>` replaces session identifiers embedded in freeze-manifest locators. Protocol text and the preparation draft are sanitized historical documents; they do not authorize a new run. The analysis projection, adjudication counts and token summaries do not contain raw trajectories, tool arguments, tool output, hook logs, auth material or host login names. Those originals remain private and unchanged.
+`<state>` denotes the private source root, whose actual location is omitted. `<trial>` replaces native result-directory identifiers in source locators; stable task-trial keys are retained in the keyed CSV and sample list to reproduce the audit. `<session-id>` replaces session identifiers embedded in freeze-manifest locators. Protocol text and the preparation draft are sanitized historical documents; they do not authorize a new run. The analysis projection, adjudication counts, coverage table and token summaries omit raw trajectories, full tool arguments, tool output, hook logs, auth material and host login names. The coverage note quotes only local extractor source. Those originals remain private and unchanged.
 
 The original filled CSV SHA256 is `8c28dd3b07c7825b846d06b1e10bd470dcb4434fac76caeca17adb15ad1efb7c`; the adjudicated JSON SHA256 is `119bafb9bc62ffdf3a5d0b91ae7f40886d672c3d43c6324190bddd1def905f48`. Full original hashes, including the analysis and protocol, are recorded in `source-hashes.json`. They authenticate byte identity only. Public file hashes/lengths are registered separately through `scripts/host_receipts.py:register_file` in `manifests/evidence.json`.
 
@@ -27,3 +31,23 @@ The study source is Harbor v0.23.0 (`1e5c5c6db929a10a140d05e606882c671ae20729`),
 The statistical output is retained, not newly recomputed. Arithmetic summaries and label/sample joins were independently checked against the original inputs. The native-model receipt reports an upstream native operation on local synthetic fixtures, with local integration analysis and independent observations. Publication acceptance is structural validation and private-pattern scanning only. New path/output modalities, other clients/models, actual exclusion bypasses, real repositories and maintained executor-decoder candidates remain the completeness critique for future authorized work.
 
 The initial full validator and individual scans of both `.sha256` files exited 1 because path-only sanitization retained UUID session identifiers inside two sets of manifest locators. The repair uses the existing validator's session-identifier pattern, redacts those locator occurrences and preserves every original input digest. Initial failures and corrected scan results remain distinct in the builder acceptance handoff; no historical execution was repeated. `source-hashes.json` records the correction and its verification path.
+
+The 2026-10-05 PR #722 repair inspected the original per-trial RTK audit logs and retained native arguments/returns. It explains B's eight flags as content follow-ups and A's fold-08-r3 flag as a decoder miss, while preserving all frozen trial flags, outcomes and analysis. It also publishes the exact audit sample and readiness evidence, and names the public host and gateway scope. The adjudication protocol was added after execution and frozen before any labels. This repair used no network, trials or model calls; hashes of the additional private sources identify the observations.
+
+The audit selection can be reproduced offline from this directory's public files using the original Python sampling call. `trial` is the native task-trial key; `job` supplies the public arm/repetition join. The coordinator sorted the selected pairs when storing them, so compare the sorted selected list:
+
+```python
+import csv, json, math, random
+from pathlib import Path
+
+artifacts = Path("evidence/artifacts/rtk-fold-harbor-20261004")
+with (artifacts / "phase2-measures.adjudications.csv").open() as source:
+    rows = list(csv.DictReader(source))
+negatives = [(r["trial"], r["call_id"]) for r in rows if r["wrong_path_action"] == "0"]
+selected = random.Random(20261004).sample(sorted(negatives), math.ceil(0.2 * len(negatives)))
+audit = json.loads((artifacts / "audit-rows.json").read_text())
+assert len(negatives) == audit["negatives_total"] == 264
+assert len(selected) == 53
+assert sorted(selected) == [tuple(pair) for pair in audit["negative_sample"]]
+assert set(selected) == {(r["trial"], r["call_id"]) for r in rows if r["notes"] == "Primary negative; audit agrees"}
+```

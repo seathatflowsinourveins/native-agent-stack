@@ -147,6 +147,21 @@
       "source": "<state>/logs/phase2-freeze-check.txt",
       "sha256": "01c578d40983951c762cb4a45e6742feb41e89dfb648e1b42dd7c0f734bd2783",
       "bytes": 76275
+    },
+    {
+      "source": "<state>/trajectory_decode.py",
+      "sha256": "7ad6b51ec8e6efcbbb3c3bbcfaabac826f5f159f7c5b84a04cb05237f65c40d3",
+      "bytes": 3781
+    },
+    {
+      "source": "<state>/smoke2-receipt.json",
+      "sha256": "d0076d263d4d13d930720d24ceda28c9fc1db3f2cf188635a8b6abd2d38d7169",
+      "bytes": 27321
+    },
+    {
+      "source": "<state>/tasks.json",
+      "sha256": "edf8a37a3b6ddb6ebe7f3f22d3be789fe890746becd13acd9137472655d29f49",
+      "bytes": 12932
     }
   ],
   "measured_result_files": [
@@ -548,5 +563,170 @@
       "FREEZE.sha256": 4
     },
     "verification_path": "Explicit validate.py --scan-file checks on both manifests and full validate.py, followed by re-registration. Failed outputs retained outside the checkout."
+  },
+  "hook_audit_files": [
+    {
+      "job": "p2-fold-01-r1-B",
+      "source": "<state>/jobs/p2-fold-01-r1-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "c3c0bc74eae0d342a91c048f04469795d9afaa19ed5b4d94fcf165b48a674a2e",
+      "bytes": 5097
+    },
+    {
+      "job": "p2-fold-01-r2-B",
+      "source": "<state>/jobs/p2-fold-01-r2-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "f538ea1e08ce674c14b271be48a36af94d912b642b03a207ae93d4aacbc8aa41",
+      "bytes": 4579
+    },
+    {
+      "job": "p2-fold-01-r3-B",
+      "source": "<state>/jobs/p2-fold-01-r3-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "90b3de027d9cb571f35ca29955f8ae468b3ac0de3b0c130f1b87ee4d116c4271",
+      "bytes": 4593
+    },
+    {
+      "job": "p2-fold-02-r1-B",
+      "source": "<state>/jobs/p2-fold-02-r1-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "ac75dfcd7b1a3dda310ccc4802de4fc39067d2c4d05457c37ee27b640702c2d9",
+      "bytes": 5529
+    },
+    {
+      "job": "p2-fold-02-r2-B",
+      "source": "<state>/jobs/p2-fold-02-r2-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "c728f6a91f0c822ddb43db6ac7cca58dc182c5e5004edd63dd9e5120a94cb3c7",
+      "bytes": 6276
+    },
+    {
+      "job": "p2-fold-02-r3-B",
+      "source": "<state>/jobs/p2-fold-02-r3-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "dda3441bcc48a3c6913b4a9ec35706473ef907a7c15aa6c12b9ad98e03453a3d",
+      "bytes": 4180
+    },
+    {
+      "job": "p2-fold-03-r1-B",
+      "source": "<state>/jobs/p2-fold-03-r1-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "84c988f3cdebd64e7ae4eecaa80b680f8a3825c70e334ccfeb4254698eec668a",
+      "bytes": 5706
+    },
+    {
+      "job": "p2-fold-03-r2-B",
+      "source": "<state>/jobs/p2-fold-03-r2-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "f4b983426c8c43334922704181ca4938d3ad5d7d35a8be82406f224341518342",
+      "bytes": 4851
+    },
+    {
+      "job": "p2-fold-03-r3-B",
+      "source": "<state>/jobs/p2-fold-03-r3-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "0406847739a284a62b486ae34c3b0d2aef57ce33421ea1a25e7039bd552f7784",
+      "bytes": 4292
+    },
+    {
+      "job": "p2-fold-04-r1-B",
+      "source": "<state>/jobs/p2-fold-04-r1-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "1d9349c0ec440736b1bcbfa09bd2ded8eaa9f7b6d0e97ad0c96e77d914776942",
+      "bytes": 4949
+    },
+    {
+      "job": "p2-fold-04-r2-B",
+      "source": "<state>/jobs/p2-fold-04-r2-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "fe2838375fd499cefe6e006dc65a4aa51f48a721df26aeeb19771e2607e4336e",
+      "bytes": 4545
+    },
+    {
+      "job": "p2-fold-04-r3-B",
+      "source": "<state>/jobs/p2-fold-04-r3-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "8affb75e8a751375ef6303b6d342a50f46f548b7ca08ea5e1740de56def02e6b",
+      "bytes": 4196
+    },
+    {
+      "job": "p2-fold-05-r1-B",
+      "source": "<state>/jobs/p2-fold-05-r1-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "1d51e3a2cbd08c6355591f6af915366ee33440123b7d2318a37e63ee1d7ff788",
+      "bytes": 4724
+    },
+    {
+      "job": "p2-fold-05-r2-B",
+      "source": "<state>/jobs/p2-fold-05-r2-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "0a8e35daff5ec48c50ea8cb1523c82084ec2db78c1973d746308a30f2291151e",
+      "bytes": 5804
+    },
+    {
+      "job": "p2-fold-05-r3-B",
+      "source": "<state>/jobs/p2-fold-05-r3-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "ab2cb44ec2bf7ffbf5e6d2abd97d0441691f533936b75db57bc3a3b2115df4d4",
+      "bytes": 6388
+    },
+    {
+      "job": "p2-fold-06-r1-B",
+      "source": "<state>/jobs/p2-fold-06-r1-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "3bb28b2988dd30c8c978fda7b330cd8fac73335d015d17c9e78d21a1d1cfb207",
+      "bytes": 6553
+    },
+    {
+      "job": "p2-fold-06-r2-B",
+      "source": "<state>/jobs/p2-fold-06-r2-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "1a6fcf6acb1d88f35622ac8ff0a6bcc94128a449e80265d5c1877430a72585b0",
+      "bytes": 4537
+    },
+    {
+      "job": "p2-fold-06-r3-B",
+      "source": "<state>/jobs/p2-fold-06-r3-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "b8c88e996d87b525a43efd73389840d491b72849f1a5e56ee21e89b3d6f28eb0",
+      "bytes": 4348
+    },
+    {
+      "job": "p2-fold-07-r1-B",
+      "source": "<state>/jobs/p2-fold-07-r1-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "0f7429e8a6a85d40afb42a5fa4f91f68aa678dbfb7655009f4a95746e1483960",
+      "bytes": 5627
+    },
+    {
+      "job": "p2-fold-07-r2-B",
+      "source": "<state>/jobs/p2-fold-07-r2-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "b05ab9ded651a47993a9e25aebc835cbdd8fc5c659604038259f69149ac5a27d",
+      "bytes": 3496
+    },
+    {
+      "job": "p2-fold-07-r3-B",
+      "source": "<state>/jobs/p2-fold-07-r3-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "53fb9e68a0065853b68e0e3e7abe7277031203f2cac7e2ef3a41b6c1ee4fb2fd",
+      "bytes": 4331
+    },
+    {
+      "job": "p2-fold-08-r1-B",
+      "source": "<state>/jobs/p2-fold-08-r1-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "e8f5fbf2123af49bc4f257240d797fc206bd81cb5ea6d438a177148f92815682",
+      "bytes": 4959
+    },
+    {
+      "job": "p2-fold-08-r2-B",
+      "source": "<state>/jobs/p2-fold-08-r2-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "3da55497f757a316567bbbb2042619ab85cb757e6778165dd2ac8110dd890339",
+      "bytes": 3807
+    },
+    {
+      "job": "p2-fold-08-r3-A",
+      "source": "<state>/jobs/p2-fold-08-r3-A/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "0a490ecb0404a3f1d9dd36a528fcf412f21a3a966c463de3bdcd290ef9014330",
+      "bytes": 5330
+    },
+    {
+      "job": "p2-fold-08-r3-B",
+      "source": "<state>/jobs/p2-fold-08-r3-B/<trial>/agent/rtk-hook-audit.log",
+      "sha256": "dc262d10a65156bb4f869a6ddc4c28f86ef12835acc51b6756daf3b4f0c36298",
+      "bytes": 4367
+    }
+  ],
+  "repair_verification": {
+    "date": "2026-10-05",
+    "base_head": "fbcf12f64006b6cd2762539f90e293b393d75ba3",
+    "source_state_read_only": true,
+    "network_used": false,
+    "new_trials": 0,
+    "new_model_calls": 0,
+    "coverage_table": "grep-audit.csv",
+    "coverage_record": "hook-coverage.md",
+    "sample_file": "audit-rows.json",
+    "readiness_projection": "premeasurement-acceptance.json",
+    "frozen_results_changed": false
   }
 }

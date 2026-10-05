@@ -9,11 +9,12 @@
   "claim": "The retained 2026-10-05 upstream Harbor 0.23.0 study executed 72 live Codex 0.160.0 trials on eight local synthetic grep tasks with three repetitions in A/B/C. Every arm had zero adjudicated wrong-path actions and reward 1.0 in all 24 trials; both confirmatory A-C Holm p-values were 1.0 and remedy_triggered was false. This publication preserves historical model-driven execution and makes no new live-run or saving claim.",
   "limitations": [
     "Eight related synthetic task clusters and three repetitions limit power and external validity; zero observed errors does not establish equivalence or universal safety.",
-    "One pinned Codex 0.160.0 client and GPT-6.1 Sol route were measured; D was dropped prospectively and contributes no Claude-client outcome.",
+    "One pinned Codex 0.160.0 client was measured through the local nginx+socat proxy to OmniRoute cx/gpt-6.1-sol-max, configured at max effort; model and effort are route configuration, not per-run provider attestation. D was dropped prospectively and contributes no Claude-client outcome.",
     "A/B installed RTK at /usr/local/bin/rtk for container login PATH resolution; host PATH and other installation locations are outside this qualification.",
     "Only the five registered GNU grep spellings, plain ASCII newline-separated paths and one topology were studied; other search and path modalities remain unqualified.",
     "Blinding was imperfect; six primary model readers and the added 53-row blind negative audit do not establish positive-label sensitivity or eliminate shared systematic errors.",
-    "B hook_fired was 8/24 although grep_hook_invoked was 24/24 and folds were 0/24; rewriting, invocation and observed folding must remain separate.",
+    "B hook_fired was 8/24 because the frozen predicate counts ten non-file-list follow-up rewrites, contrary to the marker-matched Amendment 1 intention. All 24 discovery greps skipped rewriting and returned exact unfolded lists; broader exclusion coverage remains unresolved. The retained B fold flag is 0/24.",
+    "The retained A fold flag is 23/24; original inspection found a successful discovery fold in fold-08-r3-A that the frozen nested-result decoder missed. This is an extraction limitation; no frozen result or adjudication label was changed.",
     "Tokens are secondary exploratory native fields with uncontrolled cache and incomplete enclosing-workflow usage; no token, cost or time saving claim is made.",
     "This is a sanitized historical native-model study on local fixtures, not an unchanged upstream test suite, a fresh provider run, host-install acceptance or independently attested billing telemetry."
   ],
@@ -75,11 +76,11 @@
     "raw_logs_and_trajectories": "retained privately; not published"
   },
   "evidence_classification": {
-    "receipt_kind_reason": "A real native client called a live provider, used tools and produced verifier-backed task results under upstream Harbor. Historical republication keeps this execution class without claiming a new run.",
-    "native_execution": "Upstream example or native operation on locally authored synthetic Harbor tasks",
-    "installation_bridge_and_analysis": "Local integration check",
+    "receipt_kind_reason": "On the public NativeStack rootless-Docker host, a real Codex client made live provider requests through the local nginx+socat proxy to OmniRoute route cx/gpt-6.1-sol-max, configured at max effort, used tools and produced verifier-backed task results under upstream Harbor. Model/effort are route configuration, without per-run provider attestation. Historical republication keeps this execution class without claiming a new run.",
+    "native_execution": "Upstream example or native operation: fresh Harbor containers on NativeStack, using locally authored synthetic tasks and the local proxy to OmniRoute cx/gpt-6.1-sol-max",
+    "installation_bridge_and_analysis": "Local integration check: installation bridge, frozen offline exposure extraction, adjudication and analysis",
     "task_corpus": "Synthetic fixture",
-    "publication_observation": "Independent inspection of original results/log, label joins, audit seed and source hashes",
+    "publication_observation": "Independent inspection of original results/logs, grep audits and returns, label joins, exact public audit sample, readiness timing and source hashes",
     "publication_acceptance": "Structural validation and explicit per-file private-pattern scans; no live provider or model execution"
   },
   "results": {
@@ -266,12 +267,16 @@
     "requested_v4_manifest_sha256": "6522f2289afb28360aae14b5d51f5b37e29cd9c6ee63c11e01d545e6ea5961f8",
     "effective_measured_freeze_version": 5,
     "effective_manifest_sha256": "819f87338f079bded755071bba299244fa2d63dda2884d258e9eb8a64c4bed3f",
-    "original_analysis_sha256": "9af49853d0204bc32d9f977d144b17f9bab075b2e74066b8ae892880e5b1fae0"
+    "original_analysis_sha256": "9af49853d0204bc32d9f977d144b17f9bab075b2e74066b8ae892880e5b1fae0",
+    "grep_spelling_table": "evidence/artifacts/rtk-fold-harbor-20261004/grep-audit.csv",
+    "hook_coverage": "evidence/artifacts/rtk-fold-harbor-20261004/hook-coverage.md",
+    "audit_sample": "evidence/artifacts/rtk-fold-harbor-20261004/audit-rows.json",
+    "premeasurement_acceptance": "evidence/artifacts/rtk-fold-harbor-20261004/premeasurement-acceptance.json"
   },
   "sanitization": [
     "Private paths replaced by <state>; session identifier omitted from protocol and session identifiers in freeze-manifest locators replaced by <session-id>.",
     "Analysis trials retain only selected identifiers, counters, flags and token categories; raw tool arguments, outputs, fold text and hook logs omitted.",
-    "CSV retains call IDs and labels with short review-status notes; original reviewer rationales and observations omitted.",
+    "CSV retains job/trial/call keys and labels with short review-status notes; the sample list contains trial/call pairs only. Original reviewer rationales and observations are omitted.",
     "Original hashes describe private bytes; manifests/evidence.json records sanitized public bytes.",
     "No raw trajectories, auth material, login names or host-specific paths are published."
   ],
@@ -290,11 +295,12 @@
       "claim": "The retained 2026-10-05 upstream Harbor 0.23.0 study executed 72 live Codex 0.160.0 trials on eight local synthetic grep tasks with three repetitions in A/B/C. Every arm had zero adjudicated wrong-path actions and reward 1.0 in all 24 trials; both confirmatory A-C Holm p-values were 1.0 and remedy_triggered was false. This publication preserves historical model-driven execution and makes no new live-run or saving claim.",
       "limitations": [
         "Eight related synthetic task clusters and three repetitions limit power and external validity; zero observed errors does not establish equivalence or universal safety.",
-        "One pinned Codex 0.160.0 client and GPT-6.1 Sol route were measured; D was dropped prospectively and contributes no Claude-client outcome.",
+        "One pinned Codex 0.160.0 client was measured through the local nginx+socat proxy to OmniRoute cx/gpt-6.1-sol-max, configured at max effort; model and effort are route configuration, not per-run provider attestation. D was dropped prospectively and contributes no Claude-client outcome.",
         "A/B installed RTK at /usr/local/bin/rtk for container login PATH resolution; host PATH and other installation locations are outside this qualification.",
         "Only the five registered GNU grep spellings, plain ASCII newline-separated paths and one topology were studied; other search and path modalities remain unqualified.",
         "Blinding was imperfect; six primary model readers and the added 53-row blind negative audit do not establish positive-label sensitivity or eliminate shared systematic errors.",
-        "B hook_fired was 8/24 although grep_hook_invoked was 24/24 and folds were 0/24; rewriting, invocation and observed folding must remain separate.",
+        "B hook_fired was 8/24 because the frozen predicate counts ten non-file-list follow-up rewrites, contrary to the marker-matched Amendment 1 intention. All 24 discovery greps skipped rewriting and returned exact unfolded lists; broader exclusion coverage remains unresolved. The retained B fold flag is 0/24.",
+        "The retained A fold flag is 23/24; original inspection found a successful discovery fold in fold-08-r3-A that the frozen nested-result decoder missed. This is an extraction limitation; no frozen result or adjudication label was changed.",
         "Tokens are secondary exploratory native fields with uncontrolled cache and incomplete enclosing-workflow usage; no token, cost or time saving claim is made.",
         "This is a sanitized historical native-model study on local fixtures, not an unchanged upstream test suite, a fresh provider run, host-install acceptance or independently attested billing telemetry."
       ]
@@ -313,5 +319,10 @@
       },
       "verification_path": "Explicit validate.py --scan-file checks on both manifests and full validate.py, followed by re-registration. Failed outputs retained outside the checkout."
     }
+  },
+  "host_scope": {
+    "host": "NativeStack",
+    "platform": "Linux task containers on the NativeStack rootless-Docker workstation",
+    "identity": "One public workstation; fresh Harbor task containers running pinned Codex 0.160.0"
   }
 }
