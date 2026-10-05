@@ -1447,7 +1447,7 @@
         "https://github.com/alpacahq/alpaca-py/tree/v0.44.0",
         "https://pypi.org/project/alpaca-py/0.44.0/"
       ],
-      "source_pin": null,
+      "source_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
       "freshness": "Installed0.44.0 from accepted SDK lock; native read-only historical acquisition on2026-09-20. Exact scope and missing currency/PIT limits in receipt; no broker execution."
     },
     {

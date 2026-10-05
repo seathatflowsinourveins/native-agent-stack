@@ -285,6 +285,12 @@
       "kind": "research_supplement"
     },
     {
+      "path": "catalogs/us-equities/convergence-20260926.json",
+      "collection": "/forward_notes/0/repository_decisions",
+      "repository_field": "repository",
+      "kind": "research_supplement"
+    },
+    {
       "path": "catalogs/us-equities/convergence-program/foundation.json",
       "collection": "/discovery_only_leads",
       "repository_field": "repository",
@@ -404,7 +410,7 @@
     "repositories": 875,
     "public_star_repositories": 357,
     "beyond_public_stars": 518,
-    "references": 2051,
+    "references": 2054,
     "repositories_by_record_type": {
       "catalog_card": 148,
       "component_record": 69,
@@ -1447,6 +1453,16 @@
           "pointer": "/repositories/1",
           "decision": "conditional_separately_scoped_broker_access",
           "evidence_level": "selected_readme_source"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-20260926.json",
+          "pointer": "/forward_notes/0/repository_decisions/0",
+          "id": "alpaca-mcp-server-research-boundary-20261005",
+          "decision": "accept_read_only_research_toolsets_reject_paper_order_path",
+          "disposition": "research_only",
+          "review_level": "source_review",
+          "evidence_level": "selected_primary_files"
         }
       ]
     },
@@ -1637,6 +1653,16 @@
           "pointer": "/candidates/17",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-20260926.json",
+          "pointer": "/forward_notes/0/repository_decisions/1",
+          "id": "alpaca-skills-research-boundary-20261005",
+          "decision": "research_only",
+          "disposition": "research_only",
+          "review_level": "source_review",
+          "evidence_level": "selected_primary_files"
         }
       ]
     },
@@ -1876,6 +1902,16 @@
           "pointer": "/candidates/29",
           "decision": "discovery_only",
           "evidence_depth": "Attributed documentary discovery; no runtime execution or controlled comparative acceptance"
+        },
+        {
+          "kind": "research_supplement",
+          "path": "catalogs/us-equities/convergence-20260926.json",
+          "pointer": "/forward_notes/0/repository_decisions/2",
+          "id": "alpaca-cli-reconciliation-disposition-20261005",
+          "decision": "retain_refuted_reconciliation_collector",
+          "disposition": "not_adopted",
+          "review_level": "source_review",
+          "evidence_level": "selected_primary_files"
         }
       ]
     },
