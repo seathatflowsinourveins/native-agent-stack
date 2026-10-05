@@ -1,0 +1,15 @@
+F
+======================================================================
+FAIL: test_rtk_exactness_checks_reject_passthrough_and_broken_recovery (tests.test_native_token_ci.NativeTokenCIContracts.test_rtk_exactness_checks_reject_passthrough_and_broken_recovery) (case='t6-grep-file-list', arm='rtk', response={'exit': 0, 'stdout': 'src/deep/pkg/ (3 files)\nf1.txt\r\nf2.txt\nf3.txt\n'})
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/tests/test_native_token_ci.py", line 1197, in test_rtk_exactness_checks_reject_passthrough_and_broken_recovery
+    self.assertEqual(checks, {label: label != failing for label in labels})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'rtk[452 chars]ss': True, 'rtk-exactness-grep-non-plain-path-[83 chars]True} != {'rtk[452 chars]ss': False, 'rtk-exactness-grep-non-plain-path[84 chars]True}
+Diff is 837 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 1 test in 0.013s
+
+FAILED (failures=1)

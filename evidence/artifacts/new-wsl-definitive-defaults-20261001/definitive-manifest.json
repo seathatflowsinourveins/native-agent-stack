@@ -10,11 +10,21 @@
  "consensus_wave2": {
   "date_utc": "2026-10-03",
   "meaning": "the wave-2 batch of 2026-10-03: one row added and two amendments recorded by direct consensus of both model families, and three interim installs under amendment 3 on the owner's decisions of that day; selection records only: no comparison named here has run, and this record changes nothing on any host",
-  "acknowledgements": [],
-  "acknowledgements_owed": [
-   "claude",
-   "gpt"
-  ]
+  "acknowledgements": [
+   {
+    "family": "claude",
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5984844347",
+    "at": "2026-10-04T21:59:16Z",
+    "covers": "the Claude lane's acknowledgement of the wave-2 batch as a selection record over wave2-records.json sha256 c091152f…: the statusline addition, the credential-guard amendment, the credential-custody amendment's decision (custody change 15) and the three amendment-3 interim installs (memory-owner ai-memory 2.5.2, code-search semble 0.6.1, context-supply context-mode 1.0.169) on the owner's decisions of 2026-10-03; it excludes, until the hashed records carry them, the custody amendment's eligibility-gate criteria and systemd-creds sentences (custody changes 1-3) and the memory backup line's attribution to synthesis X6"
+   },
+   {
+    "family": "gpt",
+    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5984844445",
+    "at": "2026-10-04T21:59:16Z",
+    "covers": "the GPT family's acknowledgement (bounded GPT-6.1 Sol review) of the wave-2 batch: amendment 3 and its no-install-rule exception, the statusline addition, the credential-custody and credential-guard amendments, and the owner-authorized memory-owner, code-search and context-supply interims, with its recorded GPT conditions and open acceptance gates; no objections"
+   }
+  ],
+  "acknowledgements_owed": []
  },
  "consensus_wave3": {
   "date_utc": "2026-10-04",
@@ -56,7 +66,7 @@
   },
   "consensus": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-   "sha256": "3de80d94c8a14c870714dad764ab085c1a074dbe9492b7e6e765e00c1ee47d4a"
+   "sha256": "62b83a096aa044c9fdbb3daf769ae1672395dcefe17d1e8b746220f6fad2e0f6"
   }
  },
  "counts": {
@@ -1749,7 +1759,7 @@
    "repository": "https://github.com/jarrodwatts/claude-hud",
    "installs_nothing_extra": false,
    "definitive": false,
-   "label": "both families by direct consensus on primary sources (wave 2, 2026-10-03; both pull-request acknowledgements owed); not a blind round, not a measurement",
+   "label": "both families by direct consensus on primary sources (wave 2, 2026-10-03; both pull-request acknowledgements recorded on #608, 2026-10-04); not a blind round, not a measurement",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
@@ -3056,7 +3066,7 @@
    "amendments": [
     {
      "date_utc": "2026-10-03",
-     "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements owed)",
+     "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements recorded on #608, 2026-10-04; the Claude acknowledgement excludes custody changes 1-3 (the eligibility-gate criteria and systemd-creds sentences) until the hashed records carry them)",
      "decision": "keep the measurement; gate each arm on eligibility before it is scored; HASP 1.0.44 is ineligible on Linux as documented; systemd-creds --user becomes the deciding storage comparison",
      "text": "The row's state stays measurement and it still installs nothing extra. Before any arm is scored it passes an eligibility gate: resuming after a restart needs no interactive input and no stored or exported unlock secret; no unlock secret sits in an environment or client configuration an agent can see; the delivery path has no approval prompt. At v1.0.44 HASP's documented Linux keyring default and launch path predict that it fails the gate, so the practice stays; its arm reopens only when a release adds a Linux unlock that needs no stored or exported password. systemd-creds --user, scoped to the storage part alone (the runner reading a --user ciphertext against the 0600 file, the other six parts of the practice kept), is the deciding storage comparison. Its gain is limited to passive reads as the distribution's default user and to partial copies that leave out the host's credential secret; there is none against a same-user agent or a process that can start the distribution as root.",
      "sources": [
@@ -3571,7 +3581,7 @@
     },
     {
      "date_utc": "2026-10-03",
-     "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements owed)",
+     "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements recorded on #608, 2026-10-04)",
      "decision": "cover the destination gateway's ports 21128 and 21129 with the guard's gateway rule before that gateway holds accounts",
      "text": "The guard's gateway rule recognised 20128 and 20129 only. The destination's own OmniRoute listens on 21128 (with its live socket on 21129), so the rule takes both ports before any account is signed in there: a management route on 21128 is held to the same frozen matrix as on 20128, and every management route on 21129 is refused. The guard's documented scope stays Claude Code's Bash tool: a context-mode ctx_execute call and a Codex shell are not covered, which belongs to the enforcement comparison already held on this row.",
      "sources": [

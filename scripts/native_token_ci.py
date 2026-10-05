@@ -1470,6 +1470,15 @@ def rtk_exactness_fixture(run: Run) -> None:
     git("worktree-feature", "worktree", "add", "--quiet", str(base / "wt-feature"), "feature", cwd=clone)
     rows = base / "rows.json"
     rows.write_text(json.dumps(rtk_exact_rows()) + "\n")
+    # Upstream 3223a80: folding a name ending in CR would drop it via lines().
+    # Use explicit files outside src so t6's plain-path control stays unchanged.
+    non_plain_paths = [f"grep-non-plain/deep/pkg/f{number}.txt" + ("\r" if number == 1 else "")
+                       for number in (1, 2, 3)]
+    # Matched -l sibling: only the CR suffix differs, so this shape must fold.
+    plain_paths = [path.removesuffix("\r") for path in non_plain_paths]
+    (clone / "grep-non-plain/deep/pkg").mkdir(parents=True)
+    for path in [*non_plain_paths, *plain_paths]:
+        (clone / path).write_text("needle\n")
 
     def arms(label: str, argv: list[str], cwd: Path = clone) -> dict[str, dict]:
         outcome = {}
@@ -1487,6 +1496,8 @@ def rtk_exactness_fixture(run: Run) -> None:
              "t4b-git-log-subjects": arms("t4b-git-log-subjects", ["git", "log", "--format=%s"]),
              "t5-find-missing-dir": arms("t5-find-missing-dir", ["find", "nosuchdir", "-name", "*.txt"]),
              "t6-grep-file-list": arms("t6-grep-file-list", ["grep", "-rl", "needle", "src"]),
+             "t6b-grep-non-plain-file-list": arms("t6b-grep-non-plain-file-list", ["grep", "-l", "needle", *non_plain_paths]),
+             "t6c-grep-plain-file-list": arms("t6c-grep-plain-file-list", ["grep", "-l", "needle", *plain_paths]),
              "t7-jq-rows": arms("t7-jq-rows", ["jq", "-r", RTK_EXACT_JQ_FILTER, str(rows)], cwd=base)}
     run.report["rtk_exactness"] = {case: {arm: {"exit": result["exit"], "bytes": len(result["stdout"].encode()),
                                                 "lines": len(result["stdout"].splitlines()),
@@ -1498,10 +1509,12 @@ def rtk_exactness_fixture(run: Run) -> None:
 
 
 def rtk_exactness_checks(cases: dict[str, dict[str, dict]], blob: str) -> dict[str, bool]:
-    """Exactness arms at the current pin; v0.51.0 fixes missing-file diff status.
+    """Exactness arms at the current pin; v0.51.0 fixes diff status and folds file lists.
 
     Upstream: rtk-ai/rtk@e001f773, src/cmds/git/diff_cmd.rs; repair bf23cff.
-    Remaining predicates retain the 0.50.0 fixture and must still be observed natively.
+    File-list format: src/cmds/system/search.rs:612-674,1345-1354; feac25d.
+    Non-plain-path guard: search.rs:631-639,1337-1342; repair 3223a80.
+    Other predicates retain the 0.50.0 corpus and are observed natively by this fixture.
     """
     def lines(case: str, arm: str) -> list[str]:
         return cases[case][arm]["stdout"].splitlines()
@@ -1511,6 +1524,20 @@ def rtk_exactness_checks(cases: dict[str, dict[str, dict]], blob: str) -> dict[s
     native_log, rtk_log = lines("t4-git-log", "native"), lines("t4-git-log", "rtk")
     native_subjects, rtk_subjects = lines("t4b-git-log-subjects", "native"), lines("t4b-git-log-subjects", "rtk")
     native_rows, rtk_rows = lines("t7-jq-rows", "native"), lines("t7-jq-rows", "rtk")
+    def fold_lossless(case: str) -> bool:
+        # Split only LF records; splitlines() would hide a corrupted CR tail.
+        native_paths, rtk_paths = (cases[case][arm]["stdout"].removesuffix("\n").split("\n")
+                                  for arm in ("native", "rtk"))
+        # search.rs:613,670-674 emits tails in engine order; :1345-1354 rebuilds
+        # the original sequence by literal prefix + tail, without normalization.
+        path_header = re.fullmatch(r"(.+/) \(([0-9]+) files\)", rtk_paths[0]) if rtk_paths else None
+        expanded_paths = [path_header[1] + tail for tail in rtk_paths[1:]] if path_header else []
+        return (cases[case]["native"]["exit"] == cases[case]["rtk"]["exit"] == 0
+                and len(native_paths) == len(set(native_paths)) == 3
+                and path_header is not None and int(path_header[2]) == len(expanded_paths) == 3
+                and expanded_paths == native_paths)
+
+    non_plain_list = cases["t6b-grep-non-plain-file-list"]["native"]
     return {
         "rtk-exactness-git-show-blob-window-changes-its-tail": all(
             cases[case]["native"]["stdout"] == blob and cases[case]["rtk"]["exit"] == 0
@@ -1537,11 +1564,17 @@ def rtk_exactness_checks(cases: dict[str, dict[str, dict]], blob: str) -> dict[s
             and len(rtk_rows) == RTK_JQ_MAX_LINES + 2 and max(map(len, rtk_rows)) <= RTK_JQ_MAX_WIDTH
             and rtk_rows[RTK_JQ_MAX_LINES] == f"... ({RTK_EXACT_JQ_ROWS - RTK_JQ_MAX_LINES} lines truncated)"
             and re.fullmatch(r"\[full output: rtk recall [0-9a-f]+\]", rtk_rows[-1]) is not None),
-        "rtk-exactness-controls-diff-and-grep-unchanged": (
+        "rtk-exactness-controls-diff-unchanged-and-grep-fold-lossless": (
             cases["t2b-diff-two-files"]["rtk"] == cases["t2b-diff-two-files"]["native"]
             and cases["t2b-diff-two-files"]["native"]["exit"] == 1
-            and cases["t6-grep-file-list"]["rtk"] == cases["t6-grep-file-list"]["native"]
-            and len(lines("t6-grep-file-list", "native")) == 3),
+            and fold_lossless("t6-grep-file-list")),
+        "rtk-exactness-grep-non-plain-path-list-stays-verbatim": (
+            non_plain_list["exit"] == 0 and "\r\n" in non_plain_list["stdout"]
+            and len(non_plain_list["stdout"].split("\n")) == 4
+            and cases["t6b-grep-non-plain-file-list"]["rtk"] == non_plain_list),
+        "rtk-exactness-grep-explicit-plain-path-list-folds-losslessly": (
+            "\r" not in cases["t6c-grep-plain-file-list"]["native"]["stdout"]
+            and fold_lossless("t6c-grep-plain-file-list")),
         "rtk-exactness-proxy-restores-native-output-and-exit": all(
             outcome["proxy"] == outcome["native"] for outcome in cases.values()),
     }

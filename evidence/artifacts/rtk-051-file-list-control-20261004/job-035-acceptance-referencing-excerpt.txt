@@ -1,0 +1,6 @@
+Selected final terminal summary; middle failure tracebacks omitted.
+
+----------------------------------------------------------------------
+Ran 914 tests in 111.437s
+
+FAILED (failures=198, skipped=35)

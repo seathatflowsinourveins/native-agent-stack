@@ -74,11 +74,21 @@
     },
     "metadata": {
       "consensus_wave2": {
-        "acknowledgements": [],
-        "acknowledgements_owed": [
-          "claude",
-          "gpt"
+        "acknowledgements": [
+          {
+            "at": "2026-10-04T21:59:16Z",
+            "covers": "the Claude lane's acknowledgement of the wave-2 batch as a selection record over wave2-records.json sha256 c091152f…: the statusline addition, the credential-guard amendment, the credential-custody amendment's decision (custody change 15) and the three amendment-3 interim installs (memory-owner ai-memory 2.5.2, code-search semble 0.6.1, context-supply context-mode 1.0.169) on the owner's decisions of 2026-10-03; it excludes, until the hashed records carry them, the custody amendment's eligibility-gate criteria and systemd-creds sentences (custody changes 1-3) and the memory backup line's attribution to synthesis X6",
+            "family": "claude",
+            "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5984844347"
+          },
+          {
+            "at": "2026-10-04T21:59:16Z",
+            "covers": "the GPT family's acknowledgement (bounded GPT-6.1 Sol review) of the wave-2 batch: amendment 3 and its no-install-rule exception, the statusline addition, the credential-custody and credential-guard amendments, and the owner-authorized memory-owner, code-search and context-supply interims, with its recorded GPT conditions and open acceptance gates; no objections",
+            "family": "gpt",
+            "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5984844445"
+          }
         ],
+        "acknowledgements_owed": [],
         "date_utc": "2026-10-03",
         "meaning": "the wave-2 batch of 2026-10-03: one row added and two amendments recorded by direct consensus of both model families, and three interim installs under amendment 3 on the owner's decisions of that day; selection records only: no comparison named here has run, and this record changes nothing on any host"
       },
@@ -178,7 +188,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "3de80d94c8a14c870714dad764ab085c1a074dbe9492b7e6e765e00c1ee47d4a"
+          "sha256": "62b83a096aa044c9fdbb3daf769ae1672395dcefe17d1e8b746220f6fad2e0f6"
         },
         "convergence": {
           "file": "convergence.json",
@@ -2272,7 +2282,7 @@
             "gpt": "agreed with conditions on 2026-10-03 after its own primary-source check (gpt-6-astra); the whole-wave read keeps the row conditional on the destination's readback",
             "installs_nothing_extra": false,
             "job": "the interactive status line of the two clients (context and plan usage at a glance)",
-            "label": "both families by direct consensus on primary sources (wave 2, 2026-10-03; both pull-request acknowledgements owed); not a blind round, not a measurement",
+            "label": "both families by direct consensus on primary sources (wave 2, 2026-10-03; both pull-request acknowledgements recorded on #608, 2026-10-04); not a blind round, not a measurement",
             "layer_id": "token-efficiency",
             "measurement": null,
             "repository": "https://github.com/jarrodwatts/claude-hud",
@@ -4743,7 +4753,7 @@
           "record": {
             "amendments": [
               {
-                "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements owed)",
+                "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements recorded on #608, 2026-10-04; the Claude acknowledgement excludes custody changes 1-3 (the eligibility-gate criteria and systemd-creds sentences) until the hashed records carry them)",
                 "date_utc": "2026-10-03",
                 "decision": "keep the measurement; gate each arm on eligibility before it is scored; HASP 1.0.44 is ineligible on Linux as documented; systemd-creds --user becomes the deciding storage comparison",
                 "sources": [
@@ -7198,7 +7208,7 @@
                 "text": "HOL Guard 3.17.1 declares native interception and managed launches beyond the guard's text check of Claude Code shell commands; the managed launch is declared for Codex only, and for Claude Code it declares hooks alone, in the project's local settings file. Its support matrix is a source claim: native client compatibility, failure behaviour and the preservation of existing hooks are not qualified. The comparison is about enforcement and stays separate from the custody comparison; the two are not merged into one winner."
               },
               {
-                "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements owed)",
+                "by": "direct consensus of both model families (wave 2; both pull-request acknowledgements recorded on #608, 2026-10-04)",
                 "date_utc": "2026-10-03",
                 "decision": "cover the destination gateway's ports 21128 and 21129 with the guard's gateway rule before that gateway holds accounts",
                 "sources": [
@@ -7597,7 +7607,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "5c52af47584bfaf324a9c89dc925c96604a87ed6d4cb4f292582d274983d954f"
+      "sha256": "daff08da80c204c9fbd7e0aa790676b55836d828461e0cfd9adfc11c590f672b"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -7621,7 +7631,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "3de80d94c8a14c870714dad764ab085c1a074dbe9492b7e6e765e00c1ee47d4a"
+      "sha256": "62b83a096aa044c9fdbb3daf769ae1672395dcefe17d1e8b746220f6fad2e0f6"
     }
   ],
   "stage_order": [
