@@ -4632,7 +4632,7 @@
     },
     {
       "path": "adoption/manifest.json",
-      "sha256": "7bb179e8440be17b75484c21495e66385ea8eb959a491d43d2488056ddede09a",
+      "sha256": "f3e325c8b5dcd1852a613136bb1152bf1a1f39c0dd6861f3c4752ac0d5e32c0a",
       "bytes": 20102
     },
     {
@@ -4727,8 +4727,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "0ce2e9b995ada2a316a4a8abdd94f161297e8101f7ff099491c27520ba355b13",
-      "bytes": 65341
+      "sha256": "d500961c71dc2aec4b944780480ee4216980ab6ef1d7529891b24f1d8ea7ac73",
+      "bytes": 65350
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -16883,13 +16883,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "a62a12a6b48f3ef9183893aa4eadce2e37aa1ad35350d7af0a347b603ca89a36",
-      "bytes": 651837
+      "sha256": "97360d359377f9eedbbc9c580e3080038b326eab09fba6a2e627d8401e97041e",
+      "bytes": 651950
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "e4c94b2a748ed09a86c63129bba9a9acf5eb11475a354a1ec17660af052b16d0",
-      "bytes": 354052
+      "sha256": "b72ec0299a300da82d9f35bc7ed98658bd167c9ee156a5ef5a7466f59e277149",
+      "bytes": 354116
     },
     {
       "path": "docs/next-host-stages.md",
@@ -18700,6 +18700,11 @@
       "path": "evidence/artifacts/direct-desktop-search.txt",
       "sha256": "228c4bc674c606fc6cfbbb57fba4164fe30066de34bba396fe68a335799f035f",
       "bytes": 2166
+    },
+    {
+      "path": "evidence/artifacts/disk-headroom-enospc-20261005/receipt.json",
+      "sha256": "c0fc8c156929ec9af44a020753b5175e252ba665e4474e34461ce10ea3691348",
+      "bytes": 25377
     },
     {
       "path": "evidence/artifacts/env-freshness-20260924/wsl-ubuntu-main.json",
@@ -38908,8 +38913,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "3c54a5a4e9a03c67ae52f161c8403559f33faf64229484470d4e932c85a396cd",
-      "bytes": 4790
+      "sha256": "30669b9f6f5ef26003a1e9f32cfb6ebdf998c199a1db4bcf18557079e40a2551",
+      "bytes": 5760
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -52468,8 +52473,8 @@
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus-rules.yml.example",
-      "sha256": "2f0284939d4ad0c90dfc4d4f6e677d8c2b880a3d73c950b219a60b88b6cd88f4",
-      "bytes": 16292
+      "sha256": "cda25710e34c4235c784d451037e5d8ae614c58139ee827ae6d614a7188702a4",
+      "bytes": 21890
     },
     {
       "path": "observability/backends/templates/ecosystem-prometheus.yml.example",
@@ -52713,8 +52718,8 @@
     },
     {
       "path": "scripts/build_new_wsl_handbook.py",
-      "sha256": "8a66e5eebe1429924d62545e2eee389f1fdd58e6c2f679d8280cec3e99027cf8",
-      "bytes": 75103
+      "sha256": "f12da714276918f4951f8220a3fb95e0bfd9d5d25022c4b22dc6d7a65bb310ef",
+      "bytes": 75926
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -52818,8 +52823,8 @@
     },
     {
       "path": "scripts/release_due.py",
-      "sha256": "690e855c0eb680e7b0541f8dcb7f09c97e11ac0b2fc7ff4adb6b6fd5473bfc71",
-      "bytes": 13776
+      "sha256": "c6de7480f2fe7f68a6ebe389f1d73990ba4ac2880d5ed5c829e4d9b244f5c31d",
+      "bytes": 14662
     },
     {
       "path": "scripts/saturation_ledger.py",
@@ -52868,8 +52873,8 @@
     },
     {
       "path": "tests/__init__.py",
-      "sha256": "7207b2b3e0d7ebd7fd3b436ad8bc1c6cef7abc772fd08ef49ec4467ff5d6f23d",
-      "bytes": 3001
+      "sha256": "5f32f38f71e5e8ad9c26bd4c83080b4ce1584802b92dd6a7c860678a241c8461",
+      "bytes": 3802
     },
     {
       "path": "tests/adaptive_paper_hermetic.py",
@@ -53273,8 +53278,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "0f8f306b5c8ddcbf5f24dfcfddfe6328865c403e57f1a9f6813cf8ac83f26309",
-      "bytes": 62089
+      "sha256": "e6779fe4339908a1173ff4351da75e6b816fd4b6cd94ec34c3a0acbba259b65a",
+      "bytes": 62213
     },
     {
       "path": "tests/test_catalog_freshness_runtime.py",
@@ -53583,8 +53588,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "d1ff35c05eeca0d86ef7a557ad269225425557e3fdc88af8d70c808e7a429bf7",
-      "bytes": 309826
+      "sha256": "67134665e936bb3b9f7ffe89e9108a96911cafe7f173412b91c1e5989fe4a260",
+      "bytes": 377423
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -53728,8 +53733,8 @@
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
-      "sha256": "5946d48892b5609a2578d2ac0fb5a6dedef45864590ba8d3347cca9ddd856118",
-      "bytes": 83945
+      "sha256": "b2980380533ca95d583261f9dcbc3905f7f75e3970b70b0271c2c5b3792609b2",
+      "bytes": 85368
     },
     {
       "path": "tests/test_new_wsl_profile.py",
@@ -53743,8 +53748,8 @@
     },
     {
       "path": "tests/test_observability_backends_alerts.py",
-      "sha256": "256a60345e905991852d0500343202436f452623a8e3e5231232533d4969f12c",
-      "bytes": 31542
+      "sha256": "fa3ab3ed890fd3beaa88ea3be0629c5ec8eb7d36556a4777e564926d5d8ed8eb",
+      "bytes": 41001
     },
     {
       "path": "tests/test_observability_run_correlation.py",
@@ -53858,8 +53863,8 @@
     },
     {
       "path": "tests/test_release_pin_contents.py",
-      "sha256": "d354bfc35e2403779bbfdb2d71784a84e11b7187d45153b79a3e67c292676216",
-      "bytes": 12926
+      "sha256": "cc79f9bf73b53f5304fe0b14059bcd8c089040d93960df8bba4ed51aa8157d8f",
+      "bytes": 15007
     },
     {
       "path": "tests/test_render_config.py",
@@ -54378,8 +54383,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
-      "sha256": "70e9b928087eac704b20e255b63447adac719e1dca6df9c7f362a22c38a7a584",
-      "bytes": 101473
+      "sha256": "f12c5749eff044ed59fdf26a78fa127236262a46ece7a590d0e1baf45a683a86",
+      "bytes": 112622
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
@@ -54403,8 +54408,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/convert.py",
-      "sha256": "4a70bb84855deda2b6125c4e8dacbfc686e667ecf506ac5684cd911c8637caf8",
-      "bytes": 47756
+      "sha256": "fbb6f93bbc003737b4a9e1e27077ea09a8fb74f928ea715f941d165aac397671",
+      "bytes": 54787
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/make_prompt.py",
@@ -54413,8 +54418,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/make_result.py",
-      "sha256": "72477f5b6a58598688eda9171e9f0fb7c59810e5a11f0c479ee0d64171e83848",
-      "bytes": 32121
+      "sha256": "822f7e3414e7ab35cb1d97144931c0a1a6da8f02a529ef67b92c8b979604733e",
+      "bytes": 32631
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/schemas/critic.json",
@@ -54473,8 +54478,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/sweep_common.py",
-      "sha256": "0b5d28818da27103c529ceb117a800d7c1a04806cfc14a2d20737e073aa67a7c",
-      "bytes": 8442
+      "sha256": "e8ee10a5e527125af8ddd3c2fda0322510c8c81d0b7cfa1c1bd73fc483f8f117",
+      "bytes": 9411
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/templates.json",
@@ -54483,8 +54488,8 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/usage_record.py",
-      "sha256": "de2377990fa015fe8666b8ebb9176968c5600a3f3f2c85c2a9f927c0af7d1cae",
-      "bytes": 8214
+      "sha256": "e41116e16f3c864a232645fc0123dfc315ec7d6de7bc04b54158b4e467952baf",
+      "bytes": 15753
     },
     {
       "path": "tools/sota-convergence/lane-prompt.md",
