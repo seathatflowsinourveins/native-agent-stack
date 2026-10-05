@@ -246,17 +246,27 @@ class Round2RepairIntegrationTests(unittest.TestCase):
                 self.assertEqual(done.returncode, expected)
 
     def test_cross_family_review_receives_the_bounded_diff_on_stdin(self):
-        line, = [line for line in (PLAN / "accept.sh").read_text().splitlines()
-                 if line.startswith("claude -p --model opus --effort max --permission-mode plan")]
+        plan = json.loads((PLAN / "install-plan.json").read_text())
+        row = next(r for r in plan["owners"] if r["slot"] == "cross-family-review")
+        lines = row["acceptance"]["after_sign_in"]["command"].splitlines()
+        assignment, = [line for line in lines if line.startswith("claude_review_argv=(")]
+        invocation, = [line for line in lines if 'flock -w 3600' in line and
+                       '"${claude_review_argv[@]}"' in line]
         with tempfile.TemporaryDirectory() as scratch:
             path = Path(scratch)
+            binary = path / "bin" / "claude"
+            binary.parent.mkdir()
+            binary.write_text("#!/bin/sh\ncat > \"$run_dir/seen.diff\"\n")
+            binary.chmod(0o755)
             diff = "diff --git a/example b/example\n-old\n+new\n"
             (path / "gpt-authored.diff").write_text(diff)
-            script = 'claude() { cat > "$run_dir/seen.diff"; }\n' + line
-            done = subprocess.run(["bash", "-euo", "pipefail", "-c", script],
-                                  env={"PATH": os.environ["PATH"], "run_dir": scratch,
-                                       "gpt_base": "synthetic-base", "gpt_head": "synthetic-head"}, capture_output=True)
-            self.assertEqual(done.returncode, 0)
+            done = subprocess.run(["bash", "-euo", "pipefail", "-c", assignment + "\n" + invocation],
+                                  env={"PATH": str(binary.parent) + os.pathsep + os.environ["PATH"],
+                                       "run_dir": scratch, "plan_dir": str(PLAN),
+                                       "gpt_base": "synthetic-base", "gpt_head": "synthetic-head",
+                                       "NATIVE_STACK_CLAUDE_SESSION_LOCK": str(path / "private-fixture.lock")},
+                                  capture_output=True, timeout=20)
+            self.assertEqual(done.returncode, 0, done.stderr)
             self.assertEqual((path / "seen.diff").read_text(), diff)
 
     def test_chrome_acceptance_allows_updates_and_requires_the_google_origin(self):
@@ -382,6 +392,90 @@ class Round3AlertReceiverRepairTests(unittest.TestCase):
 class ObservabilityMigrationRepairTests(unittest.TestCase):
     """Synthetic integration control; does not claim native collector acceptance."""
 
+    def test_prometheus_unit_render_consumes_plan_and_preserves_custody(self):
+        import copy
+        original_plan = json.loads((PLAN / "install-plan.json").read_text())
+        cases = ("valid", "changed_owned", "edited", "symlink", "operator_custody",
+                 "empty_features", "string_features", "duplicate_features", "unsafe_feature",
+                 "string_port", "invalid_release", "unsafe_path")
+        for case in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                config = root / ("config space" if case == "unsafe_path" else "config")
+                config.mkdir()
+                source_plan = root / "plan.json"
+                plan = copy.deepcopy(original_plan)
+                row = next(r for r in plan["owners"] if r["slot"] == "prometheus")
+                source_plan.write_text(json.dumps(plan))
+                data = root / "data"
+                tools = root / "tools"
+                tools.mkdir()
+                systemctl = tools / "systemctl"
+                systemctl.write_text("#!/bin/sh\nprintf activated > " + str(root / "activation") + "\nexit 99\n")
+                systemctl.chmod(0o700)
+                active = root / "active-user-units" / "ns2604-prometheus.service"
+                active.parent.mkdir()
+                active.write_text("Existing operator-owned active unit\n")
+                env = {**{key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ},
+                       "PATH": str(tools) + os.pathsep + os.environ["PATH"],
+                       "NS2604_OBSERVABILITY_DATA": str(data)}
+                command = [sys.executable, str(PLAN / "config/observability_config.py"), "prometheus",
+                           "--config-root", str(config), "--source-root", str(PLAN / "config"),
+                           "--tools-root", str(tools), "--plan-file", str(source_plan)]
+                target = config / "ns2604-prometheus.service"
+                ledger = config / ".g4-source-digests.json"
+                if case in ("valid", "changed_owned", "edited", "symlink", "operator_custody"):
+                    first = subprocess.run(command, env=env, capture_output=True, text=True)
+                    self.assertEqual(first.returncode, 0, first.stderr)
+                    unit = target.read_text()
+                    required = ",".join(row["service"]["enable_features"])
+                    self.assertIn("--enable-feature=" + required, unit)
+                    self.assertIn("--web.listen-address=127.0.0.1:" + str(row["service"]["port"]), unit)
+                    self.assertIn(str(tools / "prometheus/prometheus-3.15.0.linux-amd64/prometheus"), unit)
+                    self.assertIn("WorkingDirectory=" + str(data / "prometheus"), unit)
+                    self.assertNotIn("@PROMETHEUS_", unit)
+                    self.assertEqual(json.loads(ledger.read_text())["ns2604-prometheus.service"],
+                                     hashlib.sha256(unit.encode()).hexdigest())
+                    if case == "changed_owned":
+                        row["service"]["enable_features"].reverse()
+                    elif case == "edited":
+                        target.write_text("Operator-edited candidate unit\n")
+                    elif case == "symlink":
+                        target.unlink()
+                        target.symlink_to(active)
+                    elif case == "operator_custody":
+                        ledger.write_text(json.dumps({"operator_migrations": {"ns2604-prometheus.service": "operator"}}))
+                else:
+                    target.write_text("Retained unit fixture\n")
+                    ledger.write_text(json.dumps({"fixture": "retain"}))
+                    if case == "empty_features":
+                        row["service"]["enable_features"] = []
+                    elif case == "string_features":
+                        row["service"]["enable_features"] = "created-timestamp-zero-ingestion"
+                    elif case == "duplicate_features":
+                        row["service"]["enable_features"] *= 2
+                    elif case == "unsafe_feature":
+                        row["service"]["enable_features"] = ["bad feature\nExecStart=injected"]
+                    elif case == "string_port":
+                        row["service"]["port"] = str(row["service"]["port"])
+                    elif case == "invalid_release":
+                        row["release"] = "v3.15.0\nExecStart=injected"
+                source_plan.write_text(json.dumps(plan))
+                before_target, before_ledger = target.read_bytes(), ledger.read_bytes()
+                checked = subprocess.run(command, env=env, capture_output=True, text=True)
+                passed = case in ("valid", "changed_owned")
+                self.assertEqual(checked.returncode == 0, passed, checked.stderr)
+                if passed:
+                    self.assertIn("--enable-feature=" + ",".join(row["service"]["enable_features"]), target.read_text())
+                else:
+                    self.assertEqual(target.read_bytes(), before_target)
+                    self.assertEqual(ledger.read_bytes(), before_ledger)
+                    if case in ("edited", "symlink", "operator_custody"):
+                        self.assertIn("needs_owner:", checked.stderr)
+                self.assertEqual(active.read_text(), "Existing operator-owned active unit\n")
+                self.assertFalse((root / "activation").exists())
+                self.assertFalse(data.exists(), "render-only publisher must not prepare service runtime state")
+
     def test_migrated_operator_pipelines_survive_reruns_and_are_never_owned(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
@@ -393,12 +487,14 @@ class ObservabilityMigrationRepairTests(unittest.TestCase):
             original = "extensions:\n  file_storage:\n    directory: /otelcol/queue\nservice:\n  pipelines:\n    operator-custom: {}\n"
             target = config / "otel.yaml"
             target.write_text(original)
-            env = {**os.environ, "PATH": str(root) + os.pathsep + os.environ["PATH"],
+            env = {**{key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ},
+                   "PATH": str(root) + os.pathsep + os.environ["PATH"],
                    "NS2604_OBSERVABILITY_DATA": str(root / "data")}
             command = [sys.executable, str(PLAN / "config/observability_config.py"), "otel",
                        "--config-root", str(config), "--source-root", str(PLAN / "config")]
             first = subprocess.run(command, env=env, capture_output=True, text=True)
-            self.assertEqual(first.returncode, 0, first.stderr)
+            self.assertEqual(first.returncode, 3, first.stderr)
+            self.assertIn("needs_owner:", first.stderr)
             migrated = target.read_text()
             self.assertIn("operator-custom", migrated)
             self.assertNotIn("/otelcol/queue\n", migrated)
@@ -406,13 +502,15 @@ class ObservabilityMigrationRepairTests(unittest.TestCase):
             ledger = json.loads(ledger_path.read_text())
             self.assertNotIn("otel.yaml", ledger)
             second = subprocess.run(command, env=env, capture_output=True, text=True)
-            self.assertEqual(second.returncode, 0, second.stderr)
+            self.assertEqual(second.returncode, 3, second.stderr)
+            self.assertIn("needs_owner:", second.stderr)
             self.assertEqual(target.read_text(), migrated)
             # Recover the old erroneous ownership ledger using the retained migration backup.
             ledger["otel.yaml"] = hashlib.sha256(migrated.encode()).hexdigest()
             ledger_path.write_text(json.dumps(ledger))
             third = subprocess.run(command, env=env, capture_output=True, text=True)
-            self.assertEqual(third.returncode, 0, third.stderr)
+            self.assertEqual(third.returncode, 3, third.stderr)
+            self.assertIn("needs_owner:", third.stderr)
             self.assertEqual(target.read_text(), migrated)
             self.assertNotIn("otel.yaml", json.loads(ledger_path.read_text()))
 
@@ -441,10 +539,93 @@ class ObservabilityMigrationRepairTests(unittest.TestCase):
                     else:
                         target.write_text(text)
                     result = subprocess.run(command, capture_output=True, text=True,
-                                            env={**os.environ, "NS2604_OBSERVABILITY_DATA": str(root / "data")})
-                    self.assertEqual(result.returncode, 0, result.stderr)
+                                            env={**{key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ},
+                                                 "NS2604_OBSERVABILITY_DATA": str(root / "data")})
+                    self.assertEqual(result.returncode, 3, result.stderr)
+                    self.assertIn("needs_owner:", result.stderr)
                     self.assertNotIn("otel.yaml", json.loads(ledger_path.read_text()))
                     self.assertEqual(target.read_text() if target.exists() else None, text)
+
+    def test_historical_plan_render_digest_is_exact_and_operator_custody_wins(self):
+        historical = {
+            "otel.yaml": "d928bbb9dbd61a5245933e94c4e371289e8b7bf0013488116c6d76de5c346a1e",
+            "prometheus.yaml": "1568a5025ee2e6cab6e0a853031e438d7f04ae03a0d700aa5eb6a406b3e89e65",
+        }
+        source = (PLAN / "config/observability_config.py").read_text()
+        for name, known in historical.items():
+            earlier = "service:\n  pipelines: {}\n# synthetic earlier render\n" if name == "otel.yaml" else (
+                "global:\n  scrape_interval: 15s\nscrape_configs: []\n# synthetic earlier render\n")
+            self.assertEqual(source.count(known), 1)
+            for case in ("known", "one_byte_edit", "unknown", "empty_unknown", "operator_custody", "dangling_backup"):
+                if case == "dangling_backup" and name != "otel.yaml":
+                    continue
+                with self.subTest(name=name, case=case), tempfile.TemporaryDirectory() as tmp:
+                    root = Path(tmp)
+                    config = root / "config"
+                    config.mkdir()
+                    script = root / "observability_config.py"
+                    # Locally designated stand-in for a historical render; this is
+                    # synthetic ownership-transition evidence, never native acceptance.
+                    script.write_text(source.replace(known, hashlib.sha256(earlier.encode()).hexdigest()))
+                    target = config / name
+                    original = earlier + " " if case == "one_byte_edit" else (
+                        "" if case == "empty_unknown" else
+                        "# unknown valid configuration\nservice: {}\n" if case == "unknown" else earlier)
+                    target.write_text(original)
+                    ledger_path = config / ".g4-source-digests.json"
+                    if case == "dangling_backup":
+                        target.with_name("otel.yaml.pre-g4-observability").symlink_to(config / "absent-backup")
+                    if case == "operator_custody":
+                        ledger_path.write_text(json.dumps({"operator_migrations": {name: "fixture-owner"}}))
+                    env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
+                    env.update({"NS2604_OBSERVABILITY_DATA": str(root / "data"),
+                                "XDG_CONFIG_HOME": str(root / "isolated-config"),
+                                "NATIVE_STACK_ALERT_RECEIVER": "on-host"})
+                    result = subprocess.run(
+                        [sys.executable, str(script), "otel" if name == "otel.yaml" else "alerting",
+                         "--config-root", str(config), "--source-root", str(PLAN / "config")],
+                        env=env, capture_output=True, text=True, timeout=10)
+                    if case == "known":
+                        self.assertEqual(result.returncode, 0, result.stderr)
+                        self.assertEqual(target.read_text(), (PLAN / "config" / name).read_text())
+                        self.assertEqual(json.loads(ledger_path.read_text())[name],
+                                         hashlib.sha256(target.read_bytes()).hexdigest())
+                    else:
+                        self.assertNotEqual(result.returncode, 0, result.stderr)
+                        self.assertIn("needs_owner:", result.stderr)
+                        self.assertEqual(target.read_text(), original)
+                        if ledger_path.exists():
+                            self.assertNotIn(name, json.loads(ledger_path.read_text()))
+                        else:
+                            self.assertNotEqual(case, "operator_custody")
+
+    def test_validator_refusal_preserves_operator_config_and_ledger(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config"
+            config.mkdir()
+            binary = root / "otelcol-contrib"
+            binary.write_text("#!/bin/sh\nexit 29\n")
+            binary.chmod(0o700)
+            original = "extensions:\n  file_storage:\n    directory: /otelcol/queue\nservice:\n  pipelines:\n    operator-custom: {}\n"
+            target = config / "otel.yaml"
+            target.write_text(original)
+            ledger_path = config / ".g4-source-digests.json"
+            ledger = {"prometheus.yaml": "unrelated-fixture-digest"}
+            ledger_path.write_text(json.dumps(ledger))
+            env = {key: os.environ[key] for key in ("PATH", "TMPDIR") if key in os.environ}
+            env.update({"PATH": str(root) + os.pathsep + os.environ["PATH"],
+                        "NS2604_OBSERVABILITY_DATA": str(root / "data")})
+            result = subprocess.run(
+                [sys.executable, str(PLAN / "config/observability_config.py"), "otel",
+                 "--config-root", str(config), "--source-root", str(PLAN / "config")],
+                env=env, capture_output=True, text=True, timeout=10)
+            self.assertNotEqual(result.returncode, 0, result.stderr)
+            self.assertIn("upstream validator refused", result.stderr)
+            self.assertEqual(target.read_text(), original)
+            self.assertEqual(json.loads(ledger_path.read_text()), ledger)
+
+
 
 
 class GatewayCanaryBindingRepairTests(unittest.TestCase):
@@ -3403,6 +3584,76 @@ class RenderedScanTests(unittest.TestCase):
         for text in ("Use RTK here", "artkb and rtks", "rtk-default", "(ai-memory), socraticode.", "xheadroom headroom_x",
                      "CONTEXT-MODE:context-mode", "rtk2 2rtk rtk", "promptfoo/Promptfoo", "ai-memoryx", "no name here"):
             self.assertEqual(cfg.name_hits(text, names), independent_name_hits(text, names), text)
+
+
+class McpEndpointRepairTests(unittest.TestCase):
+    """Local integration regressions for co-op D02, not upstream acceptance.
+
+    Native formats: https://code.claude.com/docs/en/mcp and
+    https://developers.openai.com/codex/mcp. SocratiCode's endpoint variables:
+    giancarloerra/SocratiCode@f6191f076a42405f0d5508139f3a8b505cfef93a:README.md,
+    Configuration (QDRANT_URL and LMSTUDIO_URL, including the /v1 suffix).
+    """
+
+    def test_alternate_host_render_uses_the_same_endpoints_and_keeps_other_env(self):
+        host = render_config.load_host_values(EXAMPLE_HOST)
+        host.update(QDRANT_URL="127.0.0.1:21633", EMBED_URL="127.0.0.1:28231")
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.object(
+                render_config, "load_host_values", return_value=host):
+            code, _, err = run_main("--render", "--host", EXAMPLE_HOST, "--out", tmp)
+            self.assertEqual((code, err), (0, ""))
+            claude = json.loads((Path(tmp) / "mcp-servers.json").read_text())["mcpServers"]["socraticode"]
+            codex = tomllib.loads((Path(tmp) / "codex.config.toml").read_text())["mcp_servers"]["socraticode"]
+        self.assertEqual(claude["env"]["QDRANT_URL"], "http://127.0.0.1:21633")
+        self.assertEqual(claude["env"]["LMSTUDIO_URL"], "http://127.0.0.1:28231/v1")
+        for key in ("QDRANT_URL", "LMSTUDIO_URL"):
+            self.assertEqual(claude["env"][key], codex["env"][key], key)
+        # A partial host override must retain the native provider/model/dimension settings.
+        template = json.loads((ROOT / cfg.TEMPLATES["claude/mcp"]).read_text())["mcpServers"]["socraticode"]
+        self.assertEqual({k: v for k, v in claude["env"].items() if k not in ("QDRANT_URL", "LMSTUDIO_URL")},
+                         {k: v for k, v in template["env"].items() if k not in ("QDRANT_URL", "LMSTUDIO_URL")})
+
+    def test_check_accepts_matching_host_endpoints_with_client_specific_cache_paths(self):
+        code, out, err = run_main("--check")
+        self.assertEqual((code, err), (0, ""), out[-300:])
+        self.assertIn("check passed", out)
+
+    def test_check_rejects_the_missing_env_override_even_when_the_example_matches(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+
+            def remove_host_env(data):
+                entry = next(e for e in data["entries"] if e["match"] == ["claude/mcp/server/socraticode"])
+                entry["override"].pop("env", None)
+
+            edit_json(root / cfg.MAP_REL, remove_host_env)
+            code, _, err = run_main("--check", "--root", str(root))
+        self.assertEqual(code, 1)
+        for field in ("env.QDRANT_URL", "env.LMSTUDIO_URL"):
+            self.assertIn(f"MCP server socraticode {field} differs between Claude and Codex renders", err)
+
+    def test_check_rejects_a_hardcoded_http_url_for_another_shared_server(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+
+            def freeze_host_url(data):
+                entry = next(e for e in data["entries"] if e["match"] == ["claude/mcp/server/ai-memory"])
+                host = render_config.load_host_values(EXAMPLE_HOST)
+                entry["override"]["url"] = f"http://{host['AI_MEMORY_URL']}/mcp"
+
+            edit_json(root / cfg.MAP_REL, freeze_host_url)
+            code, _, err = run_main("--check", "--root", str(root))
+        self.assertEqual(code, 1)
+        self.assertIn("MCP server ai-memory url differs between Claude and Codex renders", err)
+
+    def test_check_rejects_a_host_endpoint_missing_from_one_client(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+            path = root / cfg.TEMPLATES["codex/config"]
+            path.write_text(path.read_text().replace('QDRANT_URL = "http://${QDRANT_URL}"\n', ""))
+            code, _, err = run_main("--check", "--root", str(root))
+        self.assertEqual(code, 1)
+        self.assertIn("MCP server socraticode env.QDRANT_URL differs between Claude and Codex renders", err)
 
 
 ONLY_CODEX_CONFIG = tuple(arg for step in cfg.STEPS if step != "codex-config" for arg in ("--skip", step))

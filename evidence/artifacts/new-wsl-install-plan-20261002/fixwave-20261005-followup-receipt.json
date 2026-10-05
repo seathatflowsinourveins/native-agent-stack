@@ -1,0 +1,1083 @@
+{
+  "schema_version": 1,
+  "kind": "ns2604-install-plan-acceptance-defect-followup",
+  "evidence_class": "local_integration",
+  "recorded_at_utc": "2026-10-05T10:25:00Z",
+  "base_commit": "f946c6d4ca988a17b6fa4392ecb488909f147883",
+  "previous_published_revision": "b8397edd3991481c9340fc305ffc414e09a92b3a",
+  "scope": "Foreground native acceptance, keyless DeerFlow failure/availability handling, unchanged OpenHands subprocess terminal control and anti-pattern corrections on one existing host.",
+  "north_star_action": "Reliable foundation acceptance before independently qualified broker paper operation.",
+  "decision_record": "docs/decisions/2026-10-05-ns2604-acceptance-defect-repairs.md",
+  "publication": {
+    "pr": 723,
+    "draft": true,
+    "lane": "lane:foundation",
+    "required_rebase_after_pr713": "pending",
+    "cross_family_read": "command_center_owned_pending"
+  },
+  "current_stage_identities": [
+    {
+      "row": "mcp-inspector",
+      "stage": "after_sign_in",
+      "command_bytes": 7061,
+      "command_sha256": "a19faf7b1dffdda5ffb05e26a9b71fbcc0d6e0458793d7580041a8d4581f027b"
+    },
+    {
+      "row": "sandbox-runtime-srt",
+      "stage": "after_sign_in",
+      "command_bytes": 44,
+      "command_sha256": "4703f621399c3d87f3681e727d0def2dc6a74aa504928222f95172ab768f3b93"
+    },
+    {
+      "row": "worktrunk",
+      "stage": "after_sign_in",
+      "command_bytes": 5288,
+      "command_sha256": "6cf95417cfea9467885dad29a9ca4aee7315f6c6435c395683a76e66a869daac"
+    },
+    {
+      "row": "difftastic",
+      "stage": "after_sign_in",
+      "command_bytes": 5173,
+      "command_sha256": "e24dc829b47606df8bf65fb868fd67b710652bd8585d6cbe3d6cb12e0445c135"
+    },
+    {
+      "row": "cross-family-review",
+      "stage": "after_sign_in",
+      "command_bytes": 9597,
+      "command_sha256": "ec07d612309099c9060fcf0ecd74672371f0059aac748e0f45546a0c7bf11342"
+    },
+    {
+      "row": "agent-runtime-worker",
+      "stage": "after_sign_in",
+      "command_bytes": 9589,
+      "command_sha256": "8113117efe6df9bd27357c0cbfe8b6c72bc5994b3fda32fd318c5fdb444d2172"
+    },
+    {
+      "row": "research-harnesses",
+      "stage": "after_sign_in",
+      "command_bytes": 10149,
+      "command_sha256": "3bfc53b2608bd313283623d3f0c69f0a6e0ef9a402378f6d1141c85c97a41d15"
+    }
+  ],
+  "historical_pre_foreground_recipe_identities": {
+    "records": [
+      {
+        "slot": "mcp-inspector",
+        "stage": "after_sign_in",
+        "command_sha256": "a19faf7b1dffdda5ffb05e26a9b71fbcc0d6e0458793d7580041a8d4581f027b",
+        "command_bytes": 7061
+      },
+      {
+        "slot": "sandbox-runtime-srt",
+        "stage": "after_sign_in",
+        "command_sha256": "4703f621399c3d87f3681e727d0def2dc6a74aa504928222f95172ab768f3b93",
+        "command_bytes": 44
+      },
+      {
+        "slot": "worktrunk",
+        "stage": "after_sign_in",
+        "command_sha256": "6cf95417cfea9467885dad29a9ca4aee7315f6c6435c395683a76e66a869daac",
+        "command_bytes": 5288
+      },
+      {
+        "slot": "difftastic",
+        "stage": "after_sign_in",
+        "command_sha256": "e24dc829b47606df8bf65fb868fd67b710652bd8585d6cbe3d6cb12e0445c135",
+        "command_bytes": 5173
+      },
+      {
+        "slot": "cross-family-review",
+        "stage": "after_sign_in",
+        "command_sha256": "8b348a32f3c581e3da6ce2b6cfb32be29e9c18c9da02b9c0fd00d9ff5375aba2",
+        "command_bytes": 8641
+      },
+      {
+        "slot": "agent-runtime-worker",
+        "stage": "after_sign_in",
+        "command_sha256": "8113117efe6df9bd27357c0cbfe8b6c72bc5994b3fda32fd318c5fdb444d2172",
+        "command_bytes": 9589
+      },
+      {
+        "slot": "research-harnesses",
+        "stage": "after_sign_in",
+        "command_sha256": "3bfc53b2608bd313283623d3f0c69f0a6e0ef9a402378f6d1141c85c97a41d15",
+        "command_bytes": 10149
+      }
+    ],
+    "files": [
+      {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+        "sha256": "64f9cef6574fbcefb3b67392885831666aa7e2855bd7973194de5c306b5a5210",
+        "bytes": 153604
+      },
+      {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "sha256": "ef90064d2627fbb023988717f3f903c85899d0d1467d1afa973cca3cc55dfaa2",
+        "bytes": 344815
+      },
+      {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/srt-client-accept.sh",
+        "sha256": "cd26012111709074a659840e2c25d5fdf1a13e7a16feaafc68e1eb308a8d5817",
+        "bytes": 9281
+      },
+      {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/deer-flow-research.sh",
+        "sha256": "074758fc9e6b19df38e7dee4923d97844faf100f8b46ef7165a69da2f0e2d079",
+        "bytes": 7215
+      },
+      {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/deer-flow-config.yaml",
+        "sha256": "2461ead04d344c567fe17c1413fb5acc0c85c3cb3bda9833d861e7d3449c2e72",
+        "bytes": 741
+      },
+      {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/research-harnesses-skill.md",
+        "sha256": "56c92c43afb4be1c30d872d980a3c718f4a064128a4442b1f5b54014a24024d0",
+        "bytes": 2606
+      },
+      {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/inspector-client-probe.sh",
+        "sha256": "2f82b600dcebf957cfbec84bd85ba64b5abbafde20283392b03ff5dfa150f811",
+        "bytes": 2197
+      }
+    ]
+  },
+  "recipe_identity_scope": "Current row-command hashes identify reproducible recipes, not retrospectively observed whole-file digests. Cross-review changed only its local completion oracle after the retained failed native run. The worker's supplied native commands remain unchanged; stricter post-run stream inspection is local, not a new model run. Earlier stage/source identities remain historical.",
+  "checks": [
+    {
+      "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config",
+      "exit_code": 0,
+      "tests": 272,
+      "existing_skips": 3,
+      "seconds": 67.227,
+      "evidence_class": "local_integration",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-owned-tmp-touched-tests.log",
+        "bytes": 385,
+        "sha256": "c267de11de7f8ec8f9fc506d04f4045462228060f520ba7dbb59580410cfc4ad"
+      }
+    },
+    {
+      "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config",
+      "exit_code": 1,
+      "tests": 273,
+      "existing_skips": 3,
+      "seconds": 65.737,
+      "evidence_class": "local_integration",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-cross-completion-touched-tests.log",
+        "bytes": 1977,
+        "sha256": "2962221d46cbe3eeaffdc7536e0d0c2cb09707d2d77812fc5e04d150db23a81a"
+      }
+    },
+    {
+      "command": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config",
+      "exit_code": 0,
+      "tests": 273,
+      "existing_skips": 3,
+      "seconds": 66.154,
+      "evidence_class": "local_integration",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-cross-completion-touched-tests-retry1.log",
+        "bytes": 386,
+        "sha256": "a3eeddc5a96a192d09d2bdeb622b38359fd38e5d63420584861f0e434c303c89"
+      }
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "scope": "Branch baseline consistency; preceding two-dot registration scope superseded by final scoped refresh.",
+      "evidence_class": "structural_validation",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-owned-tmp-validate.log",
+        "bytes": 162,
+        "sha256": "f4cd65fffd0c9b9312947efbbdfc65d5c8a88fe1a06ce26d3d1001ba4eaf14e7"
+      }
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 1,
+      "scope": "Copied newer-main registry before gated rebase;42 newer-main paths absent in branch.",
+      "evidence_class": "structural_validation",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-keyless-pre-native-validate.log",
+        "bytes": 2112,
+        "sha256": "0071630c68c339784262fefa13186d1df4d1fef08146d81215ebdbc5bf52d0d8"
+      }
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "scope": "Restored branch baseline; this earlier two-dot scope still registered four unrelated branch files and is superseded.",
+      "evidence_class": "structural_validation",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-keyless-pre-native-validate.retry.log",
+        "bytes": 162,
+        "sha256": "f4cd65fffd0c9b9312947efbbdfc65d5c8a88fe1a06ce26d3d1001ba4eaf14e7"
+      }
+    },
+    {
+      "command": "python3 evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "exit_code": 0,
+      "evidence_class": "structural_validation",
+      "scope": "Current follow-up branch baseline, before required713 rebase; own scoped entries.",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-followup-final-plan.log",
+        "bytes": 202,
+        "sha256": "f01762aa300eee8482139ebbcf40447ed0a7a3238d6d342777ed0c9beb1af1a8"
+      }
+    },
+    {
+      "command": "python3 tools/adoption/new_wsl_client_config.py --check",
+      "exit_code": 0,
+      "evidence_class": "structural_validation",
+      "scope": "Current follow-up branch baseline, before required713 rebase; own scoped entries.",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-followup-final-client-config.log",
+        "bytes": 51415,
+        "sha256": "a00b1e84acee3d631039c59f3425b8a63d3b3cba4a3e91586a58eb59986c2fb3"
+      }
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "evidence_class": "structural_validation",
+      "scope": "Current follow-up branch baseline, before required713 rebase; own scoped entries.",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-followup-final-validate.log",
+        "bytes": 162,
+        "sha256": "9782b3a6c145b190a0fece80fad51a3282e2b46f041b9bf3c05fc61d53869dc5"
+      }
+    },
+    {
+      "command": "bash -n accept.sh; bash -n config/deer-flow-research.sh; bash -n config/srt-client-accept.sh",
+      "individual_exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "evidence_class": "structural_validation",
+      "scope": "Each changed shell file checked separately."
+    }
+  ],
+  "attempts": [
+    {
+      "stage": "after_sign_in",
+      "started_at_utc": "2026-10-05 09:27:54 UTC",
+      "finished_at_utc": "2026-10-05 09:30:42 UTC",
+      "wrapper_exit_code": 0,
+      "check_exit_code": 0,
+      "row": "difftastic",
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only difftastic --stage after_sign_in </dev/null",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-difftastic.after.log",
+        "bytes": 152,
+        "sha256": "ff5827f051f8c96c3ab0b978f8beab74f4a1a6dd8c312168c418b574d55f9c31"
+      },
+      "evidence_class": "native_proven",
+      "outcome": "passed"
+    },
+    {
+      "stage": "after_sign_in",
+      "started_at_utc": "2026-10-05 09:30:42 UTC",
+      "finished_at_utc": "2026-10-05 09:33:34 UTC",
+      "wrapper_exit_code": 0,
+      "check_exit_code": 0,
+      "row": "worktrunk",
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only worktrunk --stage after_sign_in </dev/null",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-worktrunk.after.log",
+        "bytes": 150,
+        "sha256": "7b523ae5472c6923d8ad9bf8e1607bec3372fc478480f2e67d1ff4e823a73816"
+      },
+      "evidence_class": "native_proven",
+      "outcome": "passed"
+    },
+    {
+      "stage": "after_sign_in",
+      "client": "claude",
+      "started_at_utc": "2026-10-05 09:40:44 UTC",
+      "finished_at_utc": "2026-10-05 09:43:26 UTC",
+      "wrapper_exit_code": 0,
+      "check_exit_code": 0,
+      "row": "sandbox-runtime-srt",
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only sandbox-runtime-srt --stage after_sign_in </dev/null",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-srt-claude.after.log",
+        "bytes": 97,
+        "sha256": "0d82b183508d68a266e6eed0714e0f3a9c5033700bb6932e9b10616cd4a5f1ff"
+      },
+      "evidence_class": "native_proven",
+      "outcome": "passed"
+    },
+    {
+      "stage": "after_sign_in",
+      "client": "codex",
+      "started_at_utc": "2026-10-05 09:43:26 UTC",
+      "finished_at_utc": "2026-10-05 09:44:30 UTC",
+      "wrapper_exit_code": 0,
+      "check_exit_code": 0,
+      "row": "sandbox-runtime-srt",
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only sandbox-runtime-srt --stage after_sign_in </dev/null",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-srt-codex.after.log",
+        "bytes": 96,
+        "sha256": "a3c402e552abbb9b667991e067b967b79815e54aa09ac0df473d766f47cba020"
+      },
+      "evidence_class": "native_proven",
+      "outcome": "passed"
+    },
+    {
+      "stage": "after_sign_in",
+      "started_at_utc": "2026-10-05 09:44:30 UTC",
+      "finished_at_utc": "2026-10-05 09:47:34 UTC",
+      "wrapper_exit_code": 0,
+      "check_exit_code": 0,
+      "row": "mcp-inspector",
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only mcp-inspector --stage after_sign_in </dev/null",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-inspector.after.log",
+        "bytes": 34,
+        "sha256": "f1ada666ca46fba7e7e9bb4cf73642487ba6ff2e72dc84cd8ae83d89de4fa465"
+      },
+      "evidence_class": "native_proven",
+      "outcome": "passed"
+    },
+    {
+      "stage": "after_sign_in",
+      "started_at_utc": "2026-10-05 09:47:34 UTC",
+      "finished_at_utc": "2026-10-05 10:07:47 UTC",
+      "wrapper_exit_code": 124,
+      "check_exit_code": null,
+      "failure_class": "outer_timeout_no_qualified_claude_review",
+      "row": "cross-family-review",
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only cross-family-review --stage after_sign_in </dev/null",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-cross-review.after.log",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "evidence_class": "native_proven",
+      "outcome": "failed"
+    },
+    {
+      "stage": "after_sign_in",
+      "started_at_utc": "2026-10-05 10:07:47 UTC",
+      "finished_at_utc": "2026-10-05 10:19:30 UTC",
+      "wrapper_exit_code": 1,
+      "check_exit_code": 1,
+      "failure_class": "fresh_claude_native_session_limit",
+      "row": "research-harnesses",
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only research-harnesses --stage after_sign_in </dev/null",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-research.after.log",
+        "bytes": 4855,
+        "sha256": "1a42709541ed47550a5cc1ad569c2e621b5d5386e6e2e45bec32c7705a9dee78"
+      },
+      "evidence_class": "native_proven",
+      "outcome": "failed"
+    },
+    {
+      "row": "agent-runtime-worker",
+      "stage": "after_sign_in",
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only agent-runtime-worker --stage after_sign_in </dev/null",
+      "wrapper_exit_code": 1,
+      "check_exit_code": 1,
+      "qualified": false,
+      "outcome": "failed_or_unqualified",
+      "reason": "Native session returned before background job report.",
+      "retained_output": {
+        "locator": "private-lane-cache/additional-agent-runtime-worker.after.log",
+        "bytes": 1299,
+        "sha256": "dd5e3a14fa44d6ba9374c2fe9ef17c53c15db6333fe8cc02a57f6b204e55f0f9"
+      },
+      "evidence_class": "native_proven"
+    },
+    {
+      "row": "agent-runtime-worker",
+      "stage": "after_sign_in",
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only agent-runtime-worker --stage after_sign_in </dev/null",
+      "wrapper_exit_code": 0,
+      "check_exit_code": 0,
+      "qualified": false,
+      "outcome": "failed_or_unqualified",
+      "reason": "Soft MCP failure stopped exact recipe after prepare; modified later calls produced artifacts.",
+      "retained_output": {
+        "locator": "private-lane-cache/additional-agent-runtime-worker.after-retry.log",
+        "bytes": 314,
+        "sha256": "e0ab2e31a40b94e7c75b168fc2cf98ccc16a7e693036001abfde694040336e0e"
+      },
+      "evidence_class": "native_proven"
+    },
+    {
+      "row": "agent-runtime-worker",
+      "stage": "after_sign_in",
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only agent-runtime-worker --stage after_sign_in </dev/null",
+      "wrapper_exit_code": 1,
+      "check_exit_code": 143,
+      "qualified": false,
+      "outcome": "failed_or_unqualified",
+      "reason": "Nested command escaping; own timeout safely terminated; original diagnostic probes relocated to owned cache.",
+      "retained_output": {
+        "locator": "private-lane-cache/additional-agent-runtime-worker.after-final.log",
+        "bytes": 277,
+        "sha256": "2f2b90bc657a5336e2ad36cf2dc1467ca2abc8687f4a68a8f59d34d1733dcc97"
+      },
+      "evidence_class": "native_proven"
+    },
+    {
+      "row": "agent-runtime-worker",
+      "stage": "after_sign_in",
+      "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only agent-runtime-worker --stage after_sign_in </dev/null",
+      "wrapper_exit_code": 0,
+      "check_exit_code": 0,
+      "qualified": true,
+      "outcome": "passed",
+      "reason": "Both original foreground calls passed anchored completion proof; independent units inactive/dead/success, result55, three reported model responses each.",
+      "retained_output": {
+        "locator": "private-lane-cache/additional-agent-runtime-worker.after-direct-bus.log",
+        "bytes": 314,
+        "sha256": "55af1739b942b0850288d5fe8b76e1d8bd93fa07df193da1aa093faacc6315d0"
+      },
+      "evidence_class": "native_proven"
+    },
+    {
+      "row": "sandbox-runtime-srt",
+      "stage": "after_sign_in",
+      "wrapper_exit_code": 1,
+      "check_exit_code": 1,
+      "outcome": "prerequisite_failed_before_client_execution",
+      "reason": "Disposable fixture variables absent in resumed parent.",
+      "retained_output": {
+        "locator": "private-lane-cache/foreground-srt.after.log",
+        "bytes": 256,
+        "sha256": "1d4a56f7d9fa637508aa3212f583997ca1aefb7143a5bb7fd8d546a034d40049"
+      },
+      "evidence_class": "local_integration"
+    },
+    {
+      "row": "cross-family-review",
+      "stage": "after_sign_in",
+      "started_at_utc": "2026-10-05T11:31:28Z",
+      "outer_deadline_at_utc": "2026-10-05T11:51:28Z",
+      "outer_timeout_seconds": 1200,
+      "wrapper_exit_code": 124,
+      "check_exit_code": null,
+      "qualified": false,
+      "outcome": "incomplete_native_stage_after_observer_deadline",
+      "evidence_class": "native_execution_incomplete",
+      "gpt_events": 50,
+      "gpt_terminal": "turn.completed",
+      "claude_events": 591,
+      "claude_terminal": null,
+      "usage": null,
+      "retained_artifacts": [
+        {
+          "locator": "private-lane-cache/cross-family-review.after-reset.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "locator": "private-native-cross/after-reset/gpt-review.jsonl",
+          "bytes": 243909,
+          "sha256": "e098e83ee12cfce60dd10112d0c1ad5cfa7b58601b77e3b886505377f39305ce"
+        },
+        {
+          "locator": "private-native-cross/after-reset/claude-review.jsonl",
+          "bytes": 655051,
+          "sha256": "37da485fab4dab81ece571fbc5a9aaf0ff040c2c720c44d283aaf5b2968492a8"
+        },
+        {
+          "locator": "private-native-cross/after-reset/gpt-review.txt",
+          "bytes": 1011,
+          "sha256": "647507bc58204ad4c6100220e0d8d5e880abf75eb32d85225d8fbb1e2e9f3a96"
+        }
+      ],
+      "scope": "The sequential GPT arm completed before Claude started. No native final Claude result, completed report or whole-stage acceptance is claimed. Partial events are not turns."
+    }
+  ],
+  "direct_keyless_gatherers": {
+    "gpt_researcher": {
+      "kind": "direct_keyless_gatherer",
+      "evidence_class": "native_proven",
+      "distinct_reference_urls": 8,
+      "retained_report": {
+        "locator": "private-native-research/direct-gptr/report.md",
+        "bytes": 26256,
+        "sha256": "dbc51e0583e6099b24d2af76dbbface2e4401dcdd62274146ea08dccc4c873c3"
+      },
+      "native_usage": null,
+      "scope": "Completed report/independent reference count; no answer accuracy, full stdout or complete provider-usage claim."
+    },
+    "deerflow": {
+      "kind": "direct_keyless_gatherer",
+      "evidence_class": "native_proven",
+      "native_exit_code": 0,
+      "integration_exit_code": 0,
+      "integration_observation": {
+        "native_exit_code": 0,
+        "integration_exit_code": 0,
+        "acceptance_status": "passed",
+        "gatherer_status": "complete",
+        "provider_status": "available",
+        "matched_search_successes": 8,
+        "matched_search_failures": 0,
+        "matched_provider_empty_results": 2,
+        "terminal_end_events": 1,
+        "malformed_event_lines": 0,
+        "final_answer_citations_in_results": 2,
+        "native_end_usage": {
+          "input_tokens": 125494,
+          "output_tokens": 6350,
+          "total_tokens": 131844
+        },
+        "failure_reasons": [],
+        "answer_status": "final_cited"
+      },
+      "retained_artifacts": [
+        {
+          "locator": "private-native-research/direct-keyless/events.jsonl",
+          "bytes": 653789,
+          "sha256": "ea5bf34a6ff6f33861168834b12e25c6a3198cffdde65436cd8eee0db5a5bd70"
+        },
+        {
+          "locator": "private-native-research/direct-keyless/cli.stderr",
+          "bytes": 206,
+          "sha256": "fdac0fc47648691f31278e0c4ca2792241cb91ec8181823ecbb079d74a92d685"
+        },
+        {
+          "locator": "private-native-research/direct-keyless/answer.md",
+          "bytes": 875,
+          "sha256": "c7ac6dfb838636940d580c3e6df605513b0435b2b25d77ac5516960c8f702649"
+        },
+        {
+          "locator": "private-native-research/direct-keyless/integration-check.json",
+          "bytes": 532,
+          "sha256": "ce399a75644a89263fbcab75ba107b293db529b63ebf90843d18a38701f7be3f"
+        }
+      ],
+      "usage_scope": "Unique native DeerFlow end only, counted once; no provider binding or accuracy claim."
+    }
+  },
+  "worker_final": {
+    "evidence_class": "native_proven",
+    "stage_exit_code": 0,
+    "clients": [
+      {
+        "client": "claude",
+        "native_report_success": true,
+        "native_requests_to_model": 3,
+        "independently_observed_output": "55",
+        "unit_properties": [
+          "ActiveState=inactive",
+          "SubState=dead",
+          "Result=success"
+        ],
+        "native_terminal": {
+          "type": "result",
+          "subtype": "success",
+          "num_turns": 7
+        },
+        "retained_artifacts": [
+          {
+            "locator": "private-native-worker/final/claude/run-report.json",
+            "bytes": 492,
+            "sha256": "ac087e59d73f8923ba3ddb1b04dd4e4d7a18e6189b10ec6f04c9b55ad127b1a6"
+          },
+          {
+            "locator": "private-native-worker/final/claude/result.txt",
+            "bytes": 3,
+            "sha256": "4c82a221b575ce7fe118b2e8cdf0764bf4ef570a3017e80b6d3438af9095f376"
+          },
+          {
+            "locator": "private-native-worker/final/claude/claude.jsonl",
+            "bytes": 119380,
+            "sha256": "95fd28d0749bfbbe0dab4bd3803d04b138a8213df51ab157ecb41ec197110414"
+          }
+        ]
+      },
+      {
+        "client": "codex",
+        "native_report_success": true,
+        "native_requests_to_model": 3,
+        "independently_observed_output": "55",
+        "unit_properties": [
+          "ActiveState=inactive",
+          "SubState=dead",
+          "Result=success"
+        ],
+        "native_terminal": {
+          "turn_completed": true
+        },
+        "retained_artifacts": [
+          {
+            "locator": "private-native-worker/final/codex/run-report.json",
+            "bytes": 491,
+            "sha256": "d9ebf83e7d6666c4cabd1930e06eade34e4beb2bd2b470e85e411e69d9db5fc9"
+          },
+          {
+            "locator": "private-native-worker/final/codex/result.txt",
+            "bytes": 3,
+            "sha256": "4c82a221b575ce7fe118b2e8cdf0764bf4ef570a3017e80b6d3438af9095f376"
+          },
+          {
+            "locator": "private-native-worker/final/codex/codex.jsonl",
+            "bytes": 29591,
+            "sha256": "679f449154aaa32fa97c1c77a64122f145c608b17953bbbc7c188a30c4fc062c"
+          }
+        ]
+      }
+    ],
+    "negative_control": {
+      "closed_port": true,
+      "native_requests_to_model": 0,
+      "reason": "preflight_failed"
+    },
+    "post_run_reinspection": {
+      "evidence_class": "local_integration",
+      "records": [
+        {
+          "client": "claude",
+          "local_reinspection_exit_code": 0,
+          "original_native_file_sha256": "95fd28d0749bfbbe0dab4bd3803d04b138a8213df51ab157ecb41ec197110414",
+          "previously_qualified_command_sha256": [
+            "8ebf0b6e182fa59fff1bac60e4d1c9428fe230db27e1d4bcde0337209c7a49e5"
+          ],
+          "scope": "Previously qualified original foreground records; stricter background-header inspection only; no new model run."
+        },
+        {
+          "client": "codex",
+          "local_reinspection_exit_code": 0,
+          "original_native_file_sha256": "679f449154aaa32fa97c1c77a64122f145c608b17953bbbc7c188a30c4fc062c",
+          "previously_qualified_command_sha256": [
+            "ded54993e07ff8d3ba0463a5a2ff0552744a3b2dbb24cc1c73a7ee648ce3ef43"
+          ],
+          "scope": "Previously qualified original foreground records; stricter background-header inspection only; no new model run."
+        }
+      ],
+      "new_model_run": false
+    },
+    "scope": "Real native jobs and independent output/unit controls under unchanged Unix-socket policy; no general worker capability or model accuracy claim."
+  },
+  "failed_client_gates": {
+    "cross_family_review": {
+      "wrapper_exit_code": 124,
+      "qualified": false,
+      "claude_terminal": [
+        {
+          "type": "result",
+          "subtype": "success",
+          "is_error": true,
+          "num_turns": 25,
+          "native_session_limit": true
+        }
+      ],
+      "gpt_terminal": [
+        {
+          "type": "turn.completed",
+          "subtype": null,
+          "is_error": null,
+          "num_turns": null,
+          "native_session_limit": false
+        }
+      ],
+      "retained_artifacts": [
+        {
+          "locator": "private-native-cross/failed/claude-review.jsonl",
+          "bytes": 590271,
+          "sha256": "a5d177edb8b3902bdad90882d262a4720a73a4b34c22d14812f8f31e8ff53f36"
+        },
+        {
+          "locator": "private-native-cross/failed/gpt-review.jsonl",
+          "bytes": 327151,
+          "sha256": "9eadfb0b91539a910890f27649521fd748c7352d6c442ab9ca5e49e100b40c7d"
+        }
+      ]
+    },
+    "research_harnesses": {
+      "stage_exit_code": 1,
+      "qualified": false,
+      "claude_terminal": [
+        {
+          "type": "result",
+          "subtype": "success",
+          "is_error": true,
+          "num_turns": 1,
+          "native_session_limit": true
+        }
+      ],
+      "codex_executed": false,
+      "retained_artifacts": [
+        {
+          "locator": "private-native-research/failed-fresh/claude.jsonl",
+          "bytes": 26602,
+          "sha256": "91a7963ae1a7971721ea5b8afa1452e22a215fab6d79cc10120a8f2b1ecccb86"
+        }
+      ]
+    },
+    "reported_native_reset_at_utc": "2026-10-05T11:30:00Z",
+    "scope": "Native session limits are separate from configured turn budgets and provider availability; no retries or account/control changes bypass them.",
+    "cross_family_review_after_reset": {
+      "row": "cross-family-review",
+      "stage": "after_sign_in",
+      "started_at_utc": "2026-10-05T11:31:28Z",
+      "outer_deadline_at_utc": "2026-10-05T11:51:28Z",
+      "outer_timeout_seconds": 1200,
+      "wrapper_exit_code": 124,
+      "check_exit_code": null,
+      "qualified": false,
+      "outcome": "incomplete_native_stage_after_observer_deadline",
+      "evidence_class": "native_execution_incomplete",
+      "gpt_events": 50,
+      "gpt_terminal": "turn.completed",
+      "claude_events": 591,
+      "claude_terminal": null,
+      "usage": null,
+      "retained_artifacts": [
+        {
+          "locator": "private-lane-cache/cross-family-review.after-reset.log",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "locator": "private-native-cross/after-reset/gpt-review.jsonl",
+          "bytes": 243909,
+          "sha256": "e098e83ee12cfce60dd10112d0c1ad5cfa7b58601b77e3b886505377f39305ce"
+        },
+        {
+          "locator": "private-native-cross/after-reset/claude-review.jsonl",
+          "bytes": 655051,
+          "sha256": "37da485fab4dab81ece571fbc5a9aaf0ff040c2c720c44d283aaf5b2968492a8"
+        },
+        {
+          "locator": "private-native-cross/after-reset/gpt-review.txt",
+          "bytes": 1011,
+          "sha256": "647507bc58204ad4c6100220e0d8d5e880abf75eb32d85225d8fbb1e2e9f3a96"
+        }
+      ],
+      "scope": "The sequential GPT arm completed before Claude started. No native final Claude result, completed report or whole-stage acceptance is claimed. Partial events are not turns."
+    }
+  },
+  "conditional_search_candidate": {
+    "status": "conditional_proposal_only",
+    "selected_default": "keyless DDGS",
+    "candidate": "tagged Tavily adapter",
+    "availability_observations": [
+      {
+        "rep": 1,
+        "query": 1,
+        "adapter": "auto",
+        "process_exit_code": 1,
+        "observed_native_empty_error": true,
+        "distinct_returned_urls": 0,
+        "artifact_alias": "v2.r1.q1.auto.log",
+        "sha256": "08a3c7a73d6c5a5e310e49eeb6b0b5e441625531a2f728754af2fc333fd6be4f",
+        "bytes": 112
+      },
+      {
+        "rep": 1,
+        "query": 1,
+        "adapter": "tavily",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r1.q1.tavily.log",
+        "sha256": "5dacb2c054acbc6648de9506667a639a33723000b5f1ac71ba74b00c1fe5f695",
+        "bytes": 6461
+      },
+      {
+        "rep": 1,
+        "query": 2,
+        "adapter": "auto",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r1.q2.auto.log",
+        "sha256": "714554525c80d967b5eb2ab976c875ce4a6a3347159f6843f234cad00e02b222",
+        "bytes": 1953
+      },
+      {
+        "rep": 1,
+        "query": 2,
+        "adapter": "tavily",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r1.q2.tavily.log",
+        "sha256": "dd186e3bf0c159469958d9c9b92b9c2d38b4e284c82cb0b31f38d8f2866132eb",
+        "bytes": 7666
+      },
+      {
+        "rep": 2,
+        "query": 1,
+        "adapter": "tavily",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r2.q1.tavily.log",
+        "sha256": "5dacb2c054acbc6648de9506667a639a33723000b5f1ac71ba74b00c1fe5f695",
+        "bytes": 6461
+      },
+      {
+        "rep": 2,
+        "query": 1,
+        "adapter": "auto",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r2.q1.auto.log",
+        "sha256": "dc4a1d19a5882c66356e6ad3907ab2b6757d41692683e9736818da227c8394c3",
+        "bytes": 2690
+      },
+      {
+        "rep": 2,
+        "query": 2,
+        "adapter": "tavily",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r2.q2.tavily.log",
+        "sha256": "04908b96e1c197f48dc3c87af0a69911a81b6b4f5ded99aee8ff5fdd70496ab3",
+        "bytes": 6983
+      },
+      {
+        "rep": 2,
+        "query": 2,
+        "adapter": "auto",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r2.q2.auto.log",
+        "sha256": "714554525c80d967b5eb2ab976c875ce4a6a3347159f6843f234cad00e02b222",
+        "bytes": 1953
+      },
+      {
+        "rep": 3,
+        "query": 1,
+        "adapter": "auto",
+        "process_exit_code": 1,
+        "observed_native_empty_error": true,
+        "distinct_returned_urls": 0,
+        "artifact_alias": "v2.r3.q1.auto.log",
+        "sha256": "08a3c7a73d6c5a5e310e49eeb6b0b5e441625531a2f728754af2fc333fd6be4f",
+        "bytes": 112
+      },
+      {
+        "rep": 3,
+        "query": 1,
+        "adapter": "tavily",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r3.q1.tavily.log",
+        "sha256": "5dacb2c054acbc6648de9506667a639a33723000b5f1ac71ba74b00c1fe5f695",
+        "bytes": 6461
+      },
+      {
+        "rep": 3,
+        "query": 2,
+        "adapter": "auto",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r3.q2.auto.log",
+        "sha256": "714554525c80d967b5eb2ab976c875ce4a6a3347159f6843f234cad00e02b222",
+        "bytes": 1953
+      },
+      {
+        "rep": 3,
+        "query": 2,
+        "adapter": "tavily",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r3.q2.tavily.log",
+        "sha256": "04908b96e1c197f48dc3c87af0a69911a81b6b4f5ded99aee8ff5fdd70496ab3",
+        "bytes": 6983
+      },
+      {
+        "rep": 4,
+        "query": 1,
+        "adapter": "tavily",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r4.q1.tavily.log",
+        "sha256": "5dacb2c054acbc6648de9506667a639a33723000b5f1ac71ba74b00c1fe5f695",
+        "bytes": 6461
+      },
+      {
+        "rep": 4,
+        "query": 1,
+        "adapter": "auto",
+        "process_exit_code": 1,
+        "observed_native_empty_error": true,
+        "distinct_returned_urls": 0,
+        "artifact_alias": "v2.r4.q1.auto.log",
+        "sha256": "08a3c7a73d6c5a5e310e49eeb6b0b5e441625531a2f728754af2fc333fd6be4f",
+        "bytes": 112
+      },
+      {
+        "rep": 4,
+        "query": 2,
+        "adapter": "tavily",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r4.q2.tavily.log",
+        "sha256": "5d6d3b7cf355d9473024572a28083c527d84d7ecc01a04f31534a965dbffc603",
+        "bytes": 7870
+      },
+      {
+        "rep": 4,
+        "query": 2,
+        "adapter": "auto",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r4.q2.auto.log",
+        "sha256": "54303a41ed3d0f96db34f0f815eab0968a565b063328dfc649e51790459e7a53",
+        "bytes": 2044
+      },
+      {
+        "rep": 5,
+        "query": 1,
+        "adapter": "auto",
+        "process_exit_code": 1,
+        "observed_native_empty_error": true,
+        "distinct_returned_urls": 0,
+        "artifact_alias": "v2.r5.q1.auto.log",
+        "sha256": "08a3c7a73d6c5a5e310e49eeb6b0b5e441625531a2f728754af2fc333fd6be4f",
+        "bytes": 112
+      },
+      {
+        "rep": 5,
+        "query": 1,
+        "adapter": "tavily",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r5.q1.tavily.log",
+        "sha256": "5dacb2c054acbc6648de9506667a639a33723000b5f1ac71ba74b00c1fe5f695",
+        "bytes": 6461
+      },
+      {
+        "rep": 5,
+        "query": 2,
+        "adapter": "auto",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r5.q2.auto.log",
+        "sha256": "b78fb8b3b8f610d446dddb2a4a6b5b1f0a06dc5c298ec6a71470b9ce75aa197b",
+        "bytes": 2088
+      },
+      {
+        "rep": 5,
+        "query": 2,
+        "adapter": "tavily",
+        "process_exit_code": 0,
+        "observed_native_empty_error": false,
+        "distinct_returned_urls": 5,
+        "artifact_alias": "v2.r5.q2.tavily.log",
+        "sha256": "25fa1a7ea92fd7e1b6db9ff6f56da6ea7cef3a729639f387cf4f95372c6fc2e8",
+        "bytes": 7913
+      }
+    ],
+    "comparison_scope": "Five counterbalanced repetitions of each of two frozen queries using documented native adapters. DDGS current-month1/5, Tavily5/5; documentation5/5 each. Local assertion failures are separate from native empty objects. Single-host functional observations; duplicate outputs are not independent samples. Earlier preliminary calls and design retained privately.",
+    "native_cli_candidate_history": {
+      "initial_exit_code": 2,
+      "corrected_exit_code": 0,
+      "unique_native_end_usage": {
+        "input_tokens": 200464,
+        "output_tokens": 7250,
+        "total_tokens": 207714
+      },
+      "usage_counted_once": true,
+      "scope": "Earlier conditional keyed-route candidate only; no new candidate run in this foreground follow-up.",
+      "retained_artifacts": [
+        {
+          "locator": "private-conditional-search/initial.events.jsonl",
+          "bytes": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "locator": "private-conditional-search/initial.stderr",
+          "bytes": 21,
+          "sha256": "fb438574bce1ff44609e2264b0f934a1198cd26a373596d8dd2c3882507bb27c"
+        },
+        {
+          "locator": "private-conditional-search/corrected.events.jsonl",
+          "bytes": 1091344,
+          "sha256": "b6bac9e99f3ae9ab70cd5ac695c11fe562c707087298d64d2c149a11dc89f4c4"
+        },
+        {
+          "locator": "private-conditional-search/corrected.stderr",
+          "bytes": 126,
+          "sha256": "6b84e72b1b153b8fed4df7d212746bf256d7d261201bb77d3691d704ab801eee"
+        }
+      ]
+    },
+    "owner_gate": "Existing keyless custody ruling and separate thirty-query owner measurement remain unchanged.",
+    "public_inventory_pointer": {
+      "path": "adoption/credential-inventory.json",
+      "id": "tavily",
+      "variable": "TAVILY_API_KEY",
+      "carrier": "tools/credentials/credential_run.py"
+    },
+    "returned_url_observation_scope": "Independent local reinspection of original hash-verified returned JSON lists. Initial extractor mishandled bare lists; verified counts replace zeros and undecodable counts remain null/unknown. No new provider/model call."
+  },
+  "upstream_test_scope": [
+    {
+      "upstream": "OpenHands/software-agent-sdk@1e1390acc8788346ba4804c34323284009bf3f5e",
+      "test": "tests/tools/terminal/test_terminal_tool_auto_detection.py::test_forced_terminal_types",
+      "native_test_exit_codes": {
+        "isolated_srt_0.0.77": 0,
+        "isolated_srt_0.0.78": 0
+      },
+      "unchanged_source": true,
+      "scope": "Actual forced-subprocess terminal action under the existing worker sandbox; default-tmux controls fail under both pins, and original plan already pins78."
+    },
+    {
+      "upstream": "bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e",
+      "native_test_exit_code": 0,
+      "tests": 36,
+      "scope": "Unchanged mocked search/time-range contracts, not provider acceptance."
+    }
+  ],
+  "reused_evidence": {
+    "receipt": "evidence/artifacts/new-wsl-install-plan-20261002/fixwave-20261005-receipt.json",
+    "scope": "Prior unchanged Inspector post-install, Inspect relative task, AgentsView integration, client-config render and carrier holdout stages; not new provider runs."
+  },
+  "not_claimed": [
+    "Whole research or cross-family foreground acceptance while native client gates fail",
+    "Search-provider owner selection or changing keyless credential custody",
+    "Statistical independence, general adapter superiority or answer accuracy",
+    "Physical provider binding or complete combined provider usage",
+    "Whole-plan/new-host qualification, worker generality, review findings/dispositions or paper/broker status"
+  ],
+  "privacy": "Raw streams, credential values, conversations, active client configuration and actual host paths remain private. Public locators are symbolic hashes; native usage counters are metadata.",
+  "isolated_srt_install_controls": [
+    {
+      "version": "0.0.77",
+      "exit_code": 0,
+      "scope": "Supported isolated npm-prefix install, not host-plan apply or native acceptance.",
+      "retained_output": {
+        "locator": "private-isolated-srt/0.0.77/install.log",
+        "bytes": 260,
+        "sha256": "af515713c7b9464637b183895aa506a33a7713fc81c077aeeff7e9e1f75e5a67"
+      }
+    },
+    {
+      "version": "0.0.78",
+      "exit_code": 0,
+      "scope": "Supported isolated npm-prefix install, not host-plan apply or native acceptance.",
+      "retained_output": {
+        "locator": "private-isolated-srt/0.0.78/install.log",
+        "bytes": 54,
+        "sha256": "70bc8970e7741d0581b912c8a2e1802ff3339d1af4fb765e518d718f4a1a3fe6"
+      }
+    }
+  ],
+  "final_validation_scope": "Final registered sources and publication index checked before commit/push; source/evidence consistency only, not native acceptance."
+}

@@ -368,7 +368,7 @@ sandbox-runtime-srt() {
       ;;
     after_sign_in)
       # Kind: native client integration; Source: https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L168
-      check sandbox-runtime-srt 'native client integration' 'bash "$config_root/srt-client-accept.sh"'
+      check sandbox-runtime-srt 'native client integration' 'bash "$plan_dir/config/srt-client-accept.sh"'
       ;;
     *) skipped sandbox-runtime-srt ;;
   esac
@@ -392,7 +392,7 @@ mkdir -p -- "$native_receipts"
 native_probe="$(mktemp -d "$native_receipts/serena.XXXXXX")"
 cd "$repo_root"
 prompt='"'"'Use the configured Serena MCP server. Activate the current directory as the project and follow its session initialization if required. Call find_symbol with name_path_pattern register_file, relative_path scripts/host_receipts.py and include_body true. Then call find_referencing_symbols with name_path register_file and the same relative_path. Both calls must succeed and return the definition and real callers. Do not substitute shell or file-reading tools. Report a failure if either call fails.'"'"'
-claude -p "$prompt" --output-format stream-json --verbose --allowedTools mcp__serena__activate_project,mcp__serena__initial_instructions,mcp__serena__check_onboarding_performed,mcp__serena__find_symbol,mcp__serena__find_referencing_symbols > "$native_probe/claude.jsonl" </dev/null
+flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" claude -p "$prompt" --output-format stream-json --verbose --allowedTools mcp__serena__activate_project,mcp__serena__initial_instructions,mcp__serena__check_onboarding_performed,mcp__serena__find_symbol,mcp__serena__find_referencing_symbols > "$native_probe/claude.jsonl" </dev/null
 jq -s -e '"'"'def returned($tool):
   [ .[] | select(.type == "assistant") | .message.content[]? |
     select(.type == "tool_use" and .name == $tool) | .id ] as $ids |
@@ -522,7 +522,7 @@ mkdir -p -- "$native_receipts"
 native_probe="$(mktemp -d "$native_receipts/mineru-native.XXXXXX")"
 cd "$repo_root"
 prompt="Use the installed mineru skill to read the public fixture $tool_root/mineru/demo1.pdf locally. Run mineru parse on that absolute path with --tier standard --pages 1 --wait 600 --json in one tool call. Then use a returned doc locator (choose page 1) in a separate mineru read call with --json. Both tool results must contain the first-page text about afforestation. Do not use --remote, another parser, a pipeline, or a model-written summary as a substitute. Report failure if either command fails."
-claude -p "$prompt" --output-format stream-json --verbose --allowedTools Skill,Bash > "$native_probe/claude.jsonl" </dev/null
+flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" claude -p "$prompt" --output-format stream-json --verbose --allowedTools Skill,Bash > "$native_probe/claude.jsonl" </dev/null
 jq -s -e '"'"'def returned($operation):
   [ .[] | select(.type == "assistant") | .message.content[]? |
     select(.type == "tool_use" and .name == "Bash" and (.input.command | contains($operation))) | .id ] as $ids |
@@ -585,7 +585,7 @@ grep -Eq '"'"'^[[:space:]]*Args: -y chrome-devtools-mcp@1\.10\.1 --headless --is
 codex mcp get chrome-devtools --json > "$native_probe/codex-registration.json"
 jq -e '"'"'.transport.type == "stdio" and .transport.command == "npx" and .transport.args == ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"]'"'"' "$native_probe/codex-registration.json" >/dev/null
 prompt="Use only the configured chrome-devtools MCP server for this browser acceptance. Call navigate_page to $fixture_url. Then call take_snapshot and list_console_messages for that page (use its pageId when returned). The title must be NativeStack Chrome MCP acceptance and the console must include native-stack-chrome-devtools-ready. Report failure if a required call fails. Do not substitute shell tools, file-reading tools, another browser server or another browser registration."
-claude -p "$prompt" --model opus --effort max --max-turns 8 --output-format stream-json --verbose --allowedTools mcp__chrome-devtools__navigate_page,mcp__chrome-devtools__take_snapshot,mcp__chrome-devtools__list_console_messages > "$native_probe/claude.jsonl" </dev/null
+flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" claude -p "$prompt" --model opus --effort max --max-turns 8 --output-format stream-json --verbose --allowedTools mcp__chrome-devtools__navigate_page,mcp__chrome-devtools__take_snapshot,mcp__chrome-devtools__list_console_messages > "$native_probe/claude.jsonl" </dev/null
 jq -s -e --arg url "$fixture_url" '"'"'def returned($tool; $needle):
   [ .[] | select(.type == "assistant") | .message.content[]? |
     select(.type == "tool_use" and .name == $tool) | .id ] as $ids |
@@ -715,7 +715,7 @@ mkdir -p -- "$run"
 chmod 0700 "$run"
 printf -v claude_cmd '"'"'set -o pipefail; %q claude daily --since %q --timezone UTC --offline --no-cost --json | jq -c .totals'"'"' "$meter" "$day"
 printf -v codex_cmd '"'"'set -o pipefail; %q codex daily --since %q --timezone UTC --offline --no-cost --speed standard --json | jq -c .totals'"'"' "$meter" "$day"
-claude -p --effort max --max-turns 4 --tools Bash --allowedTools Bash --verbose --output-format stream-json "Run this exact read-only meter command once: $claude_cmd. Report only its numeric totals; read no authentication or credential files." > "$run/claude.jsonl" 2> "$run/claude.stderr" </dev/null
+flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" claude -p --effort max --max-turns 4 --tools Bash --allowedTools Bash --verbose --output-format stream-json "Run this exact read-only meter command once: $claude_cmd. Report only its numeric totals; read no authentication or credential files." > "$run/claude.jsonl" 2> "$run/claude.stderr" </dev/null
 codex exec --json -c '"'"'model_reasoning_effort="max"'"'"' --skip-git-repo-check "Run this exact read-only meter command once: $codex_cmd. Report only its numeric totals; read no authentication or credential files." </dev/null > "$run/codex.jsonl" 2> "$run/codex.stderr"
 jq -s -e --arg client claude --arg meter "$meter" -f "$config_root/ccusage-session.jq" "$run/claude.jsonl" >/dev/null
 jq -s -e --arg client codex --arg meter "$meter" -f "$config_root/ccusage-session.jq" "$run/codex.jsonl" >/dev/null
@@ -897,8 +897,8 @@ token-lane-carriers() {
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan.
   case "$stage" in
     post_install)
-      # Kind: unavailable; Source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/docs/token-session-handbook.md#L197
-      # Unavailable: The client configuration writes the carriers after this plan runs (tools/adoption/new_wsl_client_config.py, then its --check); this plan installs nothing for them and has nothing to check.
+      # Kind: unavailable; Source: https://github.com/seathatflowsinourveins/native-agent-stack/blob/4c897418fe35a030a1188ae447eaf31c893f8eff/docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md#L24
+      # Unavailable: The current clean default holds out the repository token-lane carriers: the shared Claude template registers neither carrier hook, and the default profile install copies no carrier files. This retained historical owner row installs nothing and has no post-install check.
       skipped token-lane-carriers
       ;;
     *) skipped token-lane-carriers ;;
@@ -995,7 +995,26 @@ prometheus() {
       ;;
     service_health)
       # Kind: health; Source: https://raw.githubusercontent.com/prometheus/prometheus/v3.15.0/docs/management_api.md#L22
-      check prometheus health 'curl -fsS http://127.0.0.1:21090/-/ready'
+      check prometheus health 'curl -fsS http://127.0.0.1:21090/-/ready
+umask 077
+prometheus_flags_state="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/prometheus"
+mkdir -p -- "$prometheus_flags_state"
+prometheus_flags_run="$(mktemp -d "$prometheus_flags_state/run.XXXXXX")"
+curl -fsS --output "$prometheus_flags_run/native-flags.json" http://127.0.0.1:21090/api/v1/status/flags
+python3 - "$plan_dir/install-plan.json" "$prometheus_flags_run/native-flags.json" <<'"'"'PY'"'"'
+import json
+import sys
+from pathlib import Path
+plan = json.loads(Path(sys.argv[1]).read_text())
+row = next(row for row in plan["owners"] if row["slot"] == "prometheus")
+required = row["service"]["enable_features"]
+assert isinstance(required, list) and required and all(isinstance(flag, str) and flag for flag in required), "invalid plan Prometheus features"
+response = json.loads(Path(sys.argv[2]).read_text())
+assert response.get("status") == "success", "native Prometheus flags request failed"
+flags = response.get("data", {}).get("enable-feature")
+assert isinstance(flags, str), "native Prometheus flags response is malformed"
+assert set(required) <= set(flags.split(",")), "required Prometheus startup features are missing"
+PY'
       ;;
     *) skipped prometheus ;;
   esac
@@ -1053,9 +1072,12 @@ fixture="$config_root/acceptance-targets.json"
 jq -e '"'"'. == []'"'"' "$fixture" >/dev/null
 python3 - <<'"'"'PY'"'"'
 import socket
+import subprocess
 with socket.socket() as s:
     s.settimeout(1)
-    assert s.connect_ex(("127.0.0.1", 21997)) == 111, "fixture requires a confirmed closed loopback port"
+    assert s.connect_ex(("127.0.0.1", 21997)) != 0, "fixture requires a failed loopback connection"
+listeners = subprocess.run(["ss", "-ltnH", "sport = :21997"], check=True, capture_output=True, text=True)
+assert not listeners.stdout.strip(), "fixture port has a listening socket"
 PY
 before="$(mktemp)"
 after="$(mktemp)"
@@ -1145,7 +1167,7 @@ curl -fsS -H '\''Content-Type: application/json'\'' --data '\''{"from":"now-5m",
     after_sign_in)
       # Kind: smoke; Source: https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/data_source.md#L657
       check grafana 'smoke' 'export NS2604_OBSERVABILITY_DATA="${NS2604_OBSERVABILITY_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability}"
-claude -p --effort max "Reply exactly NS2604_GRAFANA_NATIVE_ACCEPTANCE" >/dev/null </dev/null
+flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" claude -p --effort max "Reply exactly NS2604_GRAFANA_NATIVE_ACCEPTANCE" >/dev/null </dev/null
 uv run --locked --script "$repo_root/examples/omniroute-codex-sdk/worker.py" --workspace "$repo_root" --sandbox read-only --prompt "Reply exactly NS2604_GRAFANA_SDK_ACCEPTANCE" | python3 -c '\''
 import json, os, pathlib, sys, uuid
 rows = [json.loads(line) for line in sys.stdin if line.strip()]
@@ -1206,7 +1228,9 @@ local-model-server() {
       ;;
     service_health)
       # Kind: health; Source: https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/cli.mdx#L97
-      check local-model-server health 'OLLAMA_HOST=127.0.0.1:21434 ollama ls'
+      check local-model-server health 'systemctl --user is-enabled ollama.service
+systemctl --user is-active ollama.service
+OLLAMA_HOST=127.0.0.1:21434 ollama ls'
       ;;
     after_sign_in)
       # The embedding-model row, which installs only when named, creates the model this check calls. Until that model's
@@ -1259,7 +1283,8 @@ umask 077
 state_root="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/inspect-ai"
 mkdir -p "$state_root"
 run_dir="$(mktemp -d "$state_root/eval.XXXXXX")"
-example="$tool_root/inspect-ai-0.3.273/examples/theory_of_mind.py"
+cd -- "$tool_root/inspect-ai-0.3.273"
+example="examples/theory_of_mind.py"
 model="openai-api/omniroute/cx/gpt-6.1-sol"
 base_url="http://127.0.0.1:21128/v1"
 inspect eval "$example" --model "$model" --model-base-url "$base_url" --limit 1 --max-retries 0 --log-format eval --log-dir "$run_dir/positive"
@@ -1373,18 +1398,15 @@ codex mcp get promptfoo --json | jq -e --arg pf "$pf" '"'"'.transport.command ==
     after_sign_in)
       # Kind: smoke; Source: https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/examples/openai-compatible-gateway/README.md#L22
       check promptfoo smoke 'pf="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/promptfoo"
-gateway="${PROMPTFOO_GATEWAY_CONFIG:-$config_root/promptfoo-gateway.yaml}"
-export GATEWAY_API_KEY="${GATEWAY_API_KEY:-keyless-loopback}"
-if rg -q '"'"'your-gpt-model-id|your-claude-model-id|your-model-id|gateway.example.com'"'"' "$gateway"; then
-  printf '"'"'needs_user: select the two exact existing GPT/Claude gateway model IDs and its apiBaseUrl in %s.\n'"'"' "$gateway" >&2
-  exit 78
-fi
+# Native config reads the active plan'"'"'s nonsecret gateway topology.
+gateway="$plan_dir/config/promptfoo-gateway.cjs"
+expected="$(node -e '"'"'process.stdout.write(JSON.stringify(require(process.argv[1]).providers.map(provider => provider.id)))'"'"' "$gateway")"
 export PROMPTFOO_CONFIG_DIR="$config_root/promptfoo-state" PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1
 run="$config_root/promptfoo-acceptance/$(date -u +%Y%m%dT%H%M%SZ)-$$"
 mkdir -p -- "$run"
 chmod 0700 "$run"
 "$pf" eval --config "$gateway" --no-cache --no-share --no-table --no-progress-bar --output "$run/gateway.json"
-jq -e '"'"'.results.stats.successes == 2 and .results.stats.failures == 0 and .results.stats.errors == 0 and ([.results.results[].provider.id] | unique | length) == 2 and all(.results.results[]; .success == true and (.provider.id | startswith("openai:chat:")))'"'"' "$run/gateway.json" >/dev/null
+jq -e --argjson expected "$expected" '"'"'.results.stats.successes == 2 and .results.stats.failures == 0 and .results.stats.errors == 0 and ([.results.results[].provider.id] | unique | length) == 2 and ([.results.results[].provider.id] | sort) == ($expected | sort) and all(.results.results[]; .success == true and (.provider.id | startswith("openai:chat:")))'"'"' "$run/gateway.json" >/dev/null
 # Supported Promptfoo SDK harness, with unchanged pinned fixtures in paired on/off workspaces.
 python3 - "$config_root/promptfoo-skills.json" "$run/skills" "$tool_root/promptfoo-skill-fixtures" <<'"'"'PY'"'"'
 import json, os, shutil, sys
@@ -1422,10 +1444,10 @@ env -u OPENAI_API_KEY -u CODEX_API_KEY -u ANTHROPIC_API_KEY "$pf" eval --config 
 jq -e '"'"'.results.stats | .successes == 0 and .failures == 2 and .errors == 0'"'"' "$run/skills/fail.json" >/dev/null
 args="$(jq -cn --arg path "$gateway" '"'"'{configPath:$path,cache:false,write:false,share:false,maxConcurrency:1,resultLimit:20}'"'"')"
 prompt="Call the promptfoo MCP run_evaluation tool once with these exact arguments: $args. Report only the evaluation ID and pass/fail counts. Read no authentication or credential files; use the inherited gateway environment."
-claude -p --effort max --max-turns 4 --allowedTools mcp__promptfoo__run_evaluation --verbose --output-format stream-json "$prompt" > "$run/claude.jsonl" 2> "$run/claude.stderr" </dev/null
-codex exec --json --sandbox workspace-write -C "$run" -c '"'"'mcp_servers.promptfoo.tools.run_evaluation.approval_mode="approve"'"'"' -c '"'"'model_reasoning_effort="max"'"'"' --skip-git-repo-check "$prompt" </dev/null > "$run/codex.jsonl" 2> "$run/codex.stderr"
-jq -s -e --arg client claude -f "$config_root/promptfoo-session.jq" "$run/claude.jsonl" >/dev/null
-jq -s -e --arg client codex -f "$config_root/promptfoo-session.jq" "$run/codex.jsonl" >/dev/null'
+CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1 flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" claude -p "$prompt Execute the requested tool once in the foreground and wait for its complete returned result before ending. Do not start background work, retry a failed evaluation, change providers or read authentication/credential files." --model opus --effort max --max-turns 48 --append-system-prompt-file "$plan_dir/config/acceptance-execution-instructions.txt" --allowedTools mcp__promptfoo__run_evaluation --verbose --output-format stream-json > "$run/claude.jsonl" 2> "$run/claude.stderr" </dev/null
+codex exec --json -c '"'"'mcp_servers.promptfoo.env_vars=["OMNIROUTE_API_KEY"]'"'"' --sandbox workspace-write -C "$run" -c '"'"'mcp_servers.promptfoo.tools.run_evaluation.approval_mode="approve"'"'"' -c '"'"'model_reasoning_effort="max"'"'"' --skip-git-repo-check "$prompt" </dev/null > "$run/codex.jsonl" 2> "$run/codex.stderr"
+jq -s -e --arg client claude --argjson expected "$expected" -f "$plan_dir/config/promptfoo-session.jq" "$run/claude.jsonl" >/dev/null
+jq -s -e --arg client codex --argjson expected "$expected" -f "$plan_dir/config/promptfoo-session.jq" "$run/codex.jsonl" >/dev/null'
       ;;
     *) skipped promptfoo ;;
   esac
@@ -1552,7 +1574,9 @@ claude plugin list --json | python3 -c '"'"'import json,sys; assert any(p.get("i
 codex plugin list --json | python3 -c '"'"'import json,sys; assert any(p.get("pluginId") == "worktrunk@worktrunk" and p.get("installed") is True and p.get("enabled") is True for p in json.load(sys.stdin)["installed"])'"'"'
 bash -ic '"'"'test "$(type -t wt)" = function'"'"'
 wt list
-fixture="$(mktemp -d)"
+fixture_root="${XDG_CACHE_HOME:-$HOME/.cache}/new-wsl-native-stack/worktrunk"
+mkdir -p -- "$fixture_root"
+fixture="$(mktemp -d "$fixture_root/run.XXXXXX")"
 trap '"'"'cd "$repo_root"; rm -rf -- "$fixture"'"'"' EXIT
 export GIT_CONFIG_GLOBAL="$fixture/gitconfig" GIT_CONFIG_NOSYSTEM=1
 : > "$GIT_CONFIG_GLOBAL"
@@ -1585,16 +1609,41 @@ state_root="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptanc
 mkdir -p -- "$state_root"
 run_dir="$(mktemp -d "$state_root/run.XXXXXX")"
 printf -v task '"'"'Use your shell tool to run exactly: bash %q --only %q --stage post_install. This must execute the functional upstream examples and controls; a version report or a final answer without a tool call is insufficient. Report the command exit status. Modify only the disposable fixture this acceptance program owns.'"'"' "$plan_dir/accept.sh" worktrunk
-claude -p --model sonnet --effort max --max-turns 6 --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"' "$task" > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr" </dev/null
-codex exec -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --ephemeral --json -o "$run_dir/codex-last.txt" "$task" > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr" </dev/null
+(cd "$run_dir" && XDG_CACHE_HOME="$run_dir/cache" TMPDIR="$run_dir" env CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1 flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" claude -p "$task" --max-turns 48 --append-system-prompt-file "$plan_dir/config/acceptance-execution-instructions.txt" --model sonnet --effort max --tools Bash --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"') > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr" </dev/null
+codex exec -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --skip-git-repo-check -C "$run_dir" -c "sandbox_workspace_write.writable_roots=[\"$tool_root\"]" -c "shell_environment_policy.set.TMPDIR=\"$run_dir\"" -c "shell_environment_policy.set.XDG_CACHE_HOME=\"$run_dir/cache\"" --ephemeral --json -o "$run_dir/codex-last.txt" "$task" < /dev/null > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr"
 python3 - "$run_dir" worktrunk <<'"'"'PY'"'"'
 import json, pathlib, sys
 directory, slot = pathlib.Path(sys.argv[1]), sys.argv[2]
 def events(name):
     return [json.loads(line) for line in (directory / name).read_text().splitlines() if line.strip()]
+def completed_foreground_shell_calls(events):
+    # Claude 2.1.289 native tool IDs and background semantics; integration proof.
+    calls, complete = {}, set()
+    partial = ("_(timed out after ", "_(process backgrounded after ",
+               "Command did not complete within its ", "Command was manually backgrounded by user with ID:", "Command was moved to the background (ID:", "Command running in background with ID:", "Exit code:")
+    for event in events:
+        content = (event.get("message") or {}).get("content", [])
+        if not isinstance(content, list):
+            continue
+        for block in content:
+            if block.get("type") == "tool_use":
+                name, args = block.get("name", ""), block.get("input", {})
+                if name == "Bash":
+                    calls[block["id"]] = not args.get("run_in_background", False)
+                elif name.endswith("__ctx_execute") and args.get("language") == "shell":
+                    calls[block["id"]] = not args.get("background", False)
+            elif block.get("type") == "tool_result" and calls.get(block.get("tool_use_id")) and not block.get("is_error", False):
+                value = block.get("content", "")
+                text = value if isinstance(value, str) else "\n".join(
+                    b.get("text", "") for b in value if isinstance(b, dict) and b.get("type") == "text")
+                if not any(line.startswith(partial) for line in text.splitlines()):
+                    complete.add(block["tool_use_id"])
+    return complete
+
 c, g = events("claude.jsonl"), events("codex.jsonl")
 uses = {block["id"] for e in c if e.get("type") == "assistant" for block in e.get("message", {}).get("content", []) if block.get("type") == "tool_use" and block.get("name") == "Bash" and "accept.sh" in block.get("input", {}).get("command", "") and slot in block.get("input", {}).get("command", "")}
-assert uses, "Claude did not execute the acceptance command"
+uses &= completed_foreground_shell_calls(c)
+assert uses, "Claude did not complete foreground acceptance execution"
 assert any(block.get("type") == "tool_result" and block.get("tool_use_id") in uses and not block.get("is_error", False) and f"{slot} | post_install | 0" in str(block.get("content", "")) for e in c if e.get("type") == "user" for block in e.get("message", {}).get("content", [])), "Claude'"'"'s functional tool result is missing or failed"
 assert any(e.get("type") == "result" and e.get("subtype") == "success" and not e.get("is_error", False) for e in c), "Claude stream did not complete"
 assert any(e.get("type") == "item.completed" and e.get("item", {}).get("type") == "command_execution" and "accept.sh" in e["item"].get("command", "") and slot in e["item"].get("command", "") and e["item"].get("exit_code") == 0 and f"{slot} | post_install | 0" in e["item"].get("aggregated_output", "") for e in g), "Codex'"'"'s functional command result is missing or failed"
@@ -1636,16 +1685,41 @@ state_root="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptanc
 mkdir -p -- "$state_root"
 run_dir="$(mktemp -d "$state_root/run.XXXXXX")"
 printf -v task '"'"'Use your shell tool to run exactly: bash %q --only %q --stage post_install. This must execute the functional upstream examples and controls; a version report or a final answer without a tool call is insufficient. Report the command exit status. Modify only the disposable fixture this acceptance program owns.'"'"' "$plan_dir/accept.sh" difftastic
-claude -p --model sonnet --effort max --max-turns 6 --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"' "$task" > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr" </dev/null
-codex exec -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --ephemeral --json -o "$run_dir/codex-last.txt" "$task" > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr" </dev/null
+(cd "$run_dir" && env CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1 flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" claude -p "$task" --max-turns 48 --append-system-prompt-file "$plan_dir/config/acceptance-execution-instructions.txt" --model sonnet --effort max --tools Bash --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"') > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr" </dev/null
+codex exec -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --skip-git-repo-check -C "$run_dir" -c "sandbox_workspace_write.writable_roots=[\"$tool_root\"]" -c "shell_environment_policy.set.TMPDIR=\"$run_dir\"" --ephemeral --json -o "$run_dir/codex-last.txt" "$task" < /dev/null > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr"
 python3 - "$run_dir" difftastic <<'"'"'PY'"'"'
 import json, pathlib, sys
 directory, slot = pathlib.Path(sys.argv[1]), sys.argv[2]
 def events(name):
     return [json.loads(line) for line in (directory / name).read_text().splitlines() if line.strip()]
+def completed_foreground_shell_calls(events):
+    # Claude 2.1.289 native tool IDs and background semantics; integration proof.
+    calls, complete = {}, set()
+    partial = ("_(timed out after ", "_(process backgrounded after ",
+               "Command did not complete within its ", "Command was manually backgrounded by user with ID:", "Command was moved to the background (ID:", "Command running in background with ID:", "Exit code:")
+    for event in events:
+        content = (event.get("message") or {}).get("content", [])
+        if not isinstance(content, list):
+            continue
+        for block in content:
+            if block.get("type") == "tool_use":
+                name, args = block.get("name", ""), block.get("input", {})
+                if name == "Bash":
+                    calls[block["id"]] = not args.get("run_in_background", False)
+                elif name.endswith("__ctx_execute") and args.get("language") == "shell":
+                    calls[block["id"]] = not args.get("background", False)
+            elif block.get("type") == "tool_result" and calls.get(block.get("tool_use_id")) and not block.get("is_error", False):
+                value = block.get("content", "")
+                text = value if isinstance(value, str) else "\n".join(
+                    b.get("text", "") for b in value if isinstance(b, dict) and b.get("type") == "text")
+                if not any(line.startswith(partial) for line in text.splitlines()):
+                    complete.add(block["tool_use_id"])
+    return complete
+
 c, g = events("claude.jsonl"), events("codex.jsonl")
 uses = {block["id"] for e in c if e.get("type") == "assistant" for block in e.get("message", {}).get("content", []) if block.get("type") == "tool_use" and block.get("name") == "Bash" and "accept.sh" in block.get("input", {}).get("command", "") and slot in block.get("input", {}).get("command", "")}
-assert uses, "Claude did not execute the acceptance command"
+uses &= completed_foreground_shell_calls(c)
+assert uses, "Claude did not complete foreground acceptance execution"
 assert any(block.get("type") == "tool_result" and block.get("tool_use_id") in uses and not block.get("is_error", False) and f"{slot} | post_install | 0" in str(block.get("content", "")) for e in c if e.get("type") == "user" for block in e.get("message", {}).get("content", [])), "Claude'"'"'s functional tool result is missing or failed"
 assert any(e.get("type") == "result" and e.get("subtype") == "success" and not e.get("is_error", False) for e in c), "Claude stream did not complete"
 assert any(e.get("type") == "item.completed" and e.get("item", {}).get("type") == "command_execution" and "accept.sh" in e["item"].get("command", "") and slot in e["item"].get("command", "") and e["item"].get("exit_code") == 0 and f"{slot} | post_install | 0" in e["item"].get("aggregated_output", "") for e in g), "Codex'"'"'s functional command result is missing or failed"
@@ -1674,24 +1748,211 @@ state_root="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptanc
 mkdir -p -- "$state_root"
 run_dir="$(mktemp -d "$state_root/run.XXXXXX")"
 git status --porcelain=v1 -z > "$run_dir/status-before"
+git --no-pager diff --no-ext-diff --no-textconv --binary HEAD > "$run_dir/worktree-before.diff"
+git --no-pager diff --no-ext-diff --no-textconv --cached --binary HEAD > "$run_dir/index-before.diff"
 printf '"'"'%s\n'"'"' "$claude_base" "$claude_head" "$gpt_base" "$gpt_head" > "$run_dir/commits.txt"
-codex exec review --commit "$claude_head" -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' -c '"'"'sandbox_mode="read-only"'"'"' --ephemeral --json -o "$run_dir/gpt-review.txt" > "$run_dir/gpt-review.jsonl" 2> "$run_dir/gpt-review.stderr" </dev/null
+printf -v review_prompt '"'"'Review read-only immutable Claude-authored commit %s in repository %q. First read the original repository AGENTS.md, then execute exactly rtk proxy git -C %q show %s using native Bash or ctx_execute with language=shell as the immutable source-read control. Read the original files for correctness findings. Report file:line findings. Do not edit or publish.'"'"' "$claude_head" "$repo_root" "$repo_root" "$claude_head"
+gpt_review_argv=(codex exec -p omniroute --skip-git-repo-check -C "$run_dir" -m gpt-6.1-sol -c '"'"'review_model="gpt-6.1-sol"'"'"' -c '"'"'model_reasoning_effort="max"'"'"' -c '"'"'sandbox_mode="read-only"'"'"' --json -o "$run_dir/gpt-review.txt" review "$review_prompt")
+python3 -c '"'"'import json,sys; json.dump(sys.argv[1:],sys.stdout)'"'"' "${gpt_review_argv[@]}" > "$run_dir/gpt-review.argv.json"
+OMNIROUTE_API_KEY="${OMNIROUTE_API_KEY:-ns2604-keyless-loopback}" timeout --kill-after=15s 1200s "${gpt_review_argv[@]}" < /dev/null > "$run_dir/gpt-review.jsonl" 2> "$run_dir/gpt-review.stderr"
 git diff "$gpt_base" "$gpt_head" > "$run_dir/gpt-authored.diff"
 test -s "$run_dir/gpt-authored.diff"
-claude -p --model opus --effort max --permission-mode plan --max-turns 14 --output-format stream-json --verbose "Review the GPT-authored diff supplied on stdin read-only; report file:line correctness findings. The immutable base is $gpt_base and head is $gpt_head. Read the original repository files for each finding. Do not edit or publish." > "$run_dir/claude-review.jsonl" 2> "$run_dir/claude-review.stderr" < "$run_dir/gpt-authored.diff"
+claude_review_argv=(claude -p "Review this GPT-authored diff read-only; report file:line correctness findings. The immutable base is $gpt_base and head is $gpt_head. Read the original repository files for each finding. Do not edit or publish." --tools Read,Glob,Grep --disallowedTools '"'"'Workflow,Agent,mcp__*'"'"' --json-schema "$(cat "$plan_dir/cross-review-delivery.schema.json")" --max-turns 48 --append-system-prompt-file "$plan_dir/config/acceptance-execution-instructions.txt" --model opus --effort max --permission-mode dontAsk --output-format stream-json --verbose)
+python3 -c '"'"'import json,sys; json.dump(sys.argv[1:],sys.stdout)'"'"' "${claude_review_argv[@]}" > "$run_dir/claude-review.argv.json"
+timeout --kill-after=15s 1200s env CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1 flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" "${claude_review_argv[@]}" < "$run_dir/gpt-authored.diff" > "$run_dir/claude-review.jsonl" 2> "$run_dir/claude-review.stderr"
 git status --porcelain=v1 -z > "$run_dir/status-after"
 cmp -- "$run_dir/status-before" "$run_dir/status-after"
+git --no-pager diff --no-ext-diff --no-textconv --binary HEAD > "$run_dir/worktree-after.diff"
+git --no-pager diff --no-ext-diff --no-textconv --cached --binary HEAD > "$run_dir/index-after.diff"
+cmp -- "$run_dir/worktree-before.diff" "$run_dir/worktree-after.diff"
+cmp -- "$run_dir/index-before.diff" "$run_dir/index-after.diff"
 test -s "$run_dir/gpt-review.txt"
-python3 - "$run_dir" <<'"'"'PY'"'"'
-import json, pathlib, sys
+python3 - "$run_dir" "$claude_head" "$repo_root" "$gpt_head" <<'"'"'PY'"'"'
+import json, pathlib, re, shlex, sys
 d = pathlib.Path(sys.argv[1])
 g = [json.loads(s) for s in (d / "gpt-review.jsonl").read_text().splitlines() if s.strip()]
 c = [json.loads(s) for s in (d / "claude-review.jsonl").read_text().splitlines() if s.strip()]
 assert any(e.get("type") == "turn.completed" for e in g), "GPT review stream did not complete"
+# openai/codex@rust-v0.160.0:codex-rs/exec/src/exec_events.rs:161,286
+# context-mode@6f0cc684:src/server.ts:1844 and src/exit-classify.ts:22
+def completed_foreground_shell_calls(events):
+    # Installed Claude 2.1.289 native formatter and official linked tool-result contract.
+    # https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls
+    # A completed failed analysis command is distinct from an unfinished review.
+    import re
+    calls, bash_calls, complete = {}, set(), set()
+    partial = ("_(timed out after ", "_(process backgrounded after ",
+               "Command did not complete within its ", "Command was manually backgrounded by user with ID:",
+               "Command was moved to the background (ID:", "Command running in background with ID:",
+               "Command timed out after ", "Command was interrupted", "Command was aborted",
+               "[Request interrupted", "Interrupted", "Exit code:",
+               "<error>Command was aborted before completion</error>")
+    for event in events:
+        content = (event.get("message") or {}).get("content", [])
+        if not isinstance(content, list):
+            continue
+        for block in content:
+            if block.get("type") == "tool_use":
+                name, args = block.get("name", ""), block.get("input", {})
+                if name == "Bash":
+                    calls[block["id"]] = not args.get("run_in_background", False)
+                    bash_calls.add(block["id"])
+                elif name.endswith("__ctx_execute") and args.get("language") == "shell":
+                    calls[block["id"]] = not args.get("background", False)
+            elif block.get("type") == "tool_result" and calls.get(block.get("tool_use_id")):
+                value = block.get("content", "")
+                text = value if isinstance(value, str) else "\n".join(
+                    b.get("text", "") for b in value if isinstance(b, dict) and b.get("type") == "text")
+                if any(line.startswith(partial) for line in text.splitlines()):
+                    continue
+                if not block.get("is_error", False):
+                    complete.add(block["tool_use_id"])
+                elif block.get("is_error") is True and block["tool_use_id"] in bash_calls:
+                    header = re.fullmatch(r"Exit code ([1-9][0-9]*)", text.split("\n", 1)[0])
+                    # Conservative ordinary-process failures only; exclude timeout and signals.
+                    if header and 0 < int(header[1]) < 128 and int(header[1]) != 124:
+                        complete.add(block["tool_use_id"])
+    return complete
+
+def immutable_read(events, commit, repository):
+    expected = ["git", "-C", repository, "show", commit]
+    def exact_command(command):
+        try:
+            argv = shlex.split(command)
+            if len(argv) == 3 and pathlib.Path(argv[0]).name == "bash" and argv[1] in ("-lc", "-c"):
+                argv = shlex.split(argv[2])
+            if argv[:2] == ["rtk", "proxy"]:
+                argv = argv[2:]
+            elif argv[:1] == ["rtk"]:
+                argv = argv[1:]
+            return argv == expected
+        except ValueError:
+            return False
+    started = {e["item"]["id"]: e["item"] for e in events if e.get("type") == "item.started"
+               and e.get("item", {}).get("type") == "mcp_tool_call"}
+    for event in events:
+        if event.get("type") != "item.completed":
+            continue
+        item = event.get("item", {})
+        if item.get("type") == "command_execution" and item.get("status") == "completed" and item.get("exit_code") == 0 and exact_command(item.get("command", "")):
+            return True
+        if item.get("type") != "mcp_tool_call" or item.get("status") != "completed" or item.get("error"):
+            continue
+        initial = started.get(item.get("id"), {})
+        args, result = item.get("arguments", {}), item.get("result") or {}
+        if item.get("tool") != "ctx_execute" or initial.get("tool") != "ctx_execute" or initial.get("server") != item.get("server") or initial.get("arguments") != args:
+            continue
+        if args.get("language") != "shell" or args.get("background", False) or not exact_command(args.get("code", "")):
+            continue
+        if result.get("isError") or result.get("is_error"):
+            continue
+        output = "\n".join(b.get("text", "") for b in result.get("content", []) if b.get("type") == "text")
+        if output and "_(timed out after " not in output and "_(process backgrounded after " not in output and "Exit code:" not in output:
+            return True
+    return False
+
+assert immutable_read(g, sys.argv[2], sys.argv[3]), "GPT did not complete the immutable source-read control"
 assert not any(e.get("type") in ("error", "turn.failed") for e in g), "GPT review failed"
 assert any(e.get("type") == "item.completed" and e.get("item", {}).get("type") == "agent_message" and e["item"].get("text") for e in g), "GPT returned no review"
-assert any(e.get("type") == "result" and e.get("subtype") == "success" and not e.get("is_error", False) and e.get("result") for e in c), "Claude returned no completed review"
+claude_shell_ids = {b["id"] for e in c for b in (e.get("message") or {}).get("content", [])
+                    if isinstance(b, dict) and b.get("type") == "tool_use"
+                    and (b.get("name") == "Bash" or (b.get("name", "").endswith("__ctx_execute")
+                         and b.get("input", {}).get("language") == "shell"))}
+assert claude_shell_ids <= completed_foreground_shell_calls(c), "Claude review contains incomplete/background shell execution"
+# A terminal status sentence is not a delivered review. Inspect native structured_output.
+terminals = [e for e in c if e.get("type") == "result"]
+assert len(terminals) == 1 and terminals[0].get("subtype") == "success" and not terminals[0].get("is_error", False) and terminals[0].get("result"), "Claude returned no completed review"
+assert not any(e.get("type") == "error" for e in c), "Claude review emitted a native error"
+report = terminals[0].get("structured_output")
+assert isinstance(report, dict) and set(report) == {"reviewed_head", "verdict", "findings", "summary"}, "Claude returned no structured review"
+assert report["reviewed_head"] == sys.argv[4], "Claude reviewed the wrong immutable head"
+assert report["verdict"] in ("findings", "no_findings"), "Claude review verdict is invalid"
+assert isinstance(report["summary"], str) and report["summary"].strip(), "Claude review summary is empty"
+findings = report["findings"]
+assert isinstance(findings, list), "Claude review findings must be an array"
+assert bool(findings) == (report["verdict"] == "findings"), "Claude review verdict and findings disagree"
+for finding in findings:
+    assert isinstance(finding, dict) and set(finding) == {"file", "line", "description"}, "Claude finding shape is invalid"
+    assert isinstance(finding["file"], str) and finding["file"].strip(), "Claude finding file is missing"
+    assert type(finding["line"]) is int and finding["line"] > 0, "Claude finding line is invalid"
+    assert isinstance(finding["description"], str) and finding["description"].strip(), "Claude finding description is empty"
+assert not any(b.get("type") == "tool_use" and
+               (b.get("name") in ("Workflow", "Agent", "Bash", "Write", "Edit", "EnterPlanMode", "ExitPlanMode")
+                or str(b.get("name", "")).startswith("mcp__"))
+               for e in c for b in (e.get("message") or {}).get("content", []) if isinstance(b, dict)), "Claude used a tool outside the read-only review surface"
+stderr = (d / "claude-review.stderr").read_text()
+assert not re.search(r"(?i)(?:terminat|cancel|interrupt)\w*[^\n]*background|background[^\n]*(?:terminat|cancel|interrupt)", stderr), "Claude review terminated background work"
+(d / "claude-review.json").write_text(json.dumps(report, indent=2) + "\n")
 PY
+python3 - "$run_dir" <<'"'"'BINDING'"'"'
+# openai/codex@a956835d:tasks/review.rs:123-139; protocol.rs:3140,3335,3352.
+# Actual client argv is retained from the very arrays invoked above; never inspect auth.
+import hashlib, json, os, pathlib, sys, uuid
+d = pathlib.Path(sys.argv[1])
+gpt_argv = json.loads((d / "gpt-review.argv.json").read_text())
+claude_argv = json.loads((d / "claude-review.argv.json").read_text())
+def argument(argv, flag):
+    assert argv.count(flag) == 1, f"Missing or duplicate native {flag}"
+    index = argv.index(flag)
+    assert index + 1 < len(argv), f"Missing value for native {flag}"
+    return argv[index + 1]
+assert gpt_argv[:2] == ["codex", "exec"] and gpt_argv.count("review") == 1
+assert argument(gpt_argv, "-m") == "gpt-6.1-sol"
+configs = [gpt_argv[i + 1] for i, value in enumerate(gpt_argv[:-1]) if value == "-c"]
+assert configs.count('"'"'model_reasoning_effort="max"'"'"') == 1
+assert configs.count('"'"'review_model="gpt-6.1-sol"'"'"') == 1
+assert gpt_argv[-2] == "review" and gpt_argv[-1].startswith("Review read-only immutable Claude-authored commit ")
+assert not any(flag in gpt_argv for flag in ("--commit", "--base", "--uncommitted", "--ephemeral"))
+assert claude_argv[:2] == ["claude", "-p"]
+assert argument(claude_argv, "--model") == "opus" and argument(claude_argv, "--effort") == "max"
+assert argument(claude_argv, "--max-turns") == "48"
+assert argument(claude_argv, "--tools") == "Read,Glob,Grep"
+assert argument(claude_argv, "--disallowedTools") == "Workflow,Agent,mcp__*"
+assert argument(claude_argv, "--permission-mode") == "dontAsk"
+g = [json.loads(line) for line in (d / "gpt-review.jsonl").read_text().splitlines() if line.strip()]
+threads = [event["thread_id"] for event in g if event.get("type") == "thread.started"]
+assert len(threads) == 1 and str(uuid.UUID(threads[0])) == threads[0], "Missing native Codex thread binding"
+codex_home = pathlib.Path(os.environ.get("CODEX_HOME", str(pathlib.Path.home() / ".codex")))
+rollouts = list((codex_home / "sessions").glob("*/*/*/rollout-*" + threads[0] + ".jsonl"))
+assert len(rollouts) == 1, "Missing or ambiguous native Codex session metadata"
+reviewers = []
+for candidate in rollouts[0].parent.glob("rollout-*.jsonl"):
+    with candidate.open("rb") as stream:
+        first = stream.readline()
+    if not first:
+        continue
+    meta = json.loads(first)
+    payload = meta.get("payload") or {}
+    if (meta.get("type") == "session_meta" and payload.get("parent_thread_id") == threads[0]
+            and payload.get("source") == {"subagent": "review"}):
+        reviewers.append(candidate)
+assert len(reviewers) == 1, "Missing or ambiguous native review child session"
+contexts, session = [], {}
+digest = hashlib.sha256()
+with reviewers[0].open("rb") as source:
+    for line in source:
+        digest.update(line)
+        event = json.loads(line)
+        payload = event.get("payload") or {}
+        if event.get("type") == "session_meta":
+            session = {key: payload.get(key) for key in ("cli_version", "model_provider", "source")}
+        elif event.get("type") == "turn_context":
+            contexts.append({key: payload.get(key) for key in ("model", "effort")})
+assert contexts and all(context == {"model": "gpt-6.1-sol", "effort": "max"} for context in contexts), "Codex reviewer model/effort differs from argv"
+c = [json.loads(line) for line in (d / "claude-review.jsonl").read_text().splitlines() if line.strip()]
+initial = [event for event in c if event.get("type") == "system" and event.get("subtype") == "init"]
+assert len(initial) == 1 and isinstance(initial[0].get("model"), str) and initial[0]["model"], "Missing native Claude model binding"
+binding = {
+    "gpt": {"target_type": "custom", "model_from_argv": argument(gpt_argv, "-m"), "effort_from_argv": "max",
+            "immutable_git_show_completed": True, "native_session": session, "native_turn_contexts": contexts,
+            "native_session_sha256": digest.hexdigest()},
+    "claude": {"model_from_argv": argument(claude_argv, "--model"), "effort_from_argv": argument(claude_argv, "--effort"),
+               "model_from_native_init": initial[0]["model"], "effort_from_native_init": initial[0].get("effort")},
+    "gateway_wire_model_effort": "independent owner observation required before qualification",
+    "observation_deadline_seconds": {"each_direction": 1200, "sequential_total": 2400, "kill_grace": 15},
+    }
+(d / "review-binding.json").write_text(json.dumps(binding, indent=2) + "\n")
+BINDING
 printf '"'"'Both native reviews completed; retain %s for independent findings, dispositions, actual model/effort binding and later verification before closing the qualification gate.\n'"'"' "$run_dir" >&2'
       ;;
     *) skipped cross-family-review ;;
@@ -1783,6 +2044,10 @@ mcp-inspector() {
       check mcp-inspector smoke 'state="${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/mcp-inspector"
 install -d -m 0700 -- "$state"
 scratch="$(mktemp -d "$state/pack.XXXXXXXX")"
+# Upstream pack:verify uses os.tmpdir(); use this owned scratch directory.
+export TMPDIR="$scratch"
+# Chromium host libraries: install.sh --only mcp-inspector.
+# Source: https://github.com/microsoft/playwright/blob/v1.62.1/docs/src/browsers.md#L104
 trap '"'"'rm -rf -- "$scratch/source"'"'"' EXIT
 git clone --depth 1 --branch 2.9.0 https://github.com/modelcontextprotocol/inspector.git "$scratch/source"
 cd "$scratch/source"
@@ -1800,53 +2065,102 @@ PY'
       ;;
     after_sign_in)
       # Kind: smoke; Source: https://github.com/modelcontextprotocol/inspector/blob/2.9.0/clients/launcher/README.md#L15
-      check mcp-inspector smoke 'state="${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/mcp-inspector"
+      check mcp-inspector smoke 'umask 077
+state="${XDG_STATE_HOME:-$HOME/.local/state}/native-agent-stack/mcp-inspector"
 install -d -m 0700 -- "$state"
 session="$(mktemp -d "$state/clients.XXXXXXXX")"
+install -m 0600 -- "$plan_dir/inspector-client-probe.sh" "$session/probe.sh"
+probe_sha="$(sha256sum "$session/probe.sh" | awk '"'"'{print $1}'"'"')"
 for client in claude codex; do
-  prompt="Use your native shell to assert the inherited MCP_AUTO_OPEN_ENABLED is exactly false. Run MCP_INSPECTOR_SECRET_STORE=memory npx -y @modelcontextprotocol/inspector@2.9.0 --cli qmd --index native-agent-stack-catalog mcp -- --method tools/list and save its actual JSON as $session/$client-tools.json. Then boot the published Inspector Web mode with the same QMD positional command: MCP_INSPECTOR_SECRET_STORE=memory HOST=127.0.0.1 CLIENT_PORT=26399 setsid npx -y @modelcontextprotocol/inspector@2.9.0 --web -- qmd --index native-agent-stack-catalog mcp. Poll http://127.0.0.1:26399/ with curl and save the served page to $session/$client-page.html. Stop its process group in a shell trap and wait for it before finishing. Keep its authentication enabled. Write $session/$client-env.txt with the inherited MCP_AUTO_OPEN_ENABLED after the assertion succeeds."
+  mkdir -p -- "$session/$client-tmp"
+  printf -v prompt '"'"'Execute exactly bash %q %q %q with your native shell tool in the foreground (use a 300000 ms tool timeout). This frozen, source-reviewed acceptance recipe asserts the inherited MCP_AUTO_OPEN_ENABLED=false, runs the pinned Inspector CLI and Web probes, stores all output privately and cleans up its own process group. Preserve the script unchanged and report its three actual markers. Keep native hooks and authentication enabled.'"'"' "$session/probe.sh" "$session" "$client"
   if [[ "$client" == claude ]]; then
-    (cd "$session" && timeout 600 claude -p --model opus --effort max --max-turns 12 --permission-mode bypassPermissions --output-format stream-json --verbose "$prompt") >"$session/claude.jsonl" </dev/null
+    (cd "$session" && TMPDIR="$session/claude-tmp" timeout 600 env CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1 flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" claude -p "$prompt" --max-turns 48 --append-system-prompt-file "$plan_dir/config/acceptance-execution-instructions.txt" --model opus --effort max --tools Bash --permission-mode bypassPermissions --output-format stream-json --verbose) >"$session/claude.jsonl" 2>"$session/claude.stderr" </dev/null
   else
     OMNIROUTE_API_KEY=local-loopback timeout 600 codex exec -p omniroute -m gpt-6.1-sol -c model_reasoning_effort=max  </dev/null \
       --sandbox workspace-write -c sandbox_workspace_write.network_access=true \
       -c "shell_environment_policy.set.npm_config_cache=\"$session/npm-cache\"" \
+      -c "shell_environment_policy.set.TMPDIR=\"$session/codex-tmp\"" \
       -c "sandbox_workspace_write.writable_roots=[\"$state\"]" \
-      --skip-git-repo-check -C "$session" --json "$prompt" </dev/null >"$session/codex.jsonl"
+      --skip-git-repo-check -C "$session" --ephemeral --json "$prompt" </dev/null >"$session/codex.jsonl" 2>"$session/codex.stderr"
   fi
-  python3 - "$session" "$client" <<'"'"'PY'"'"'
-import json, sys
+  python3 - "$session" "$client" "$probe_sha" <<'"'"'PY'"'"'
+import hashlib, json, shlex, sys
 from pathlib import Path
 
-def native_commands(path, client):
-    # Original native JSONL is retained. Match completed tool calls, not a model'"'"'s verdict.
-    events = [json.loads(line) for line in path.read_text().splitlines() if line.startswith("{")]
-    if client == "codex":
-        return [e["item"]["command"] for e in events if e.get("type") == "item.completed"
-                and e.get("item", {}).get("type") == "command_execution"
-                and e["item"].get("exit_code") == 0 and e["item"].get("status") == "completed"]
-    calls, done = {}, set()
+def completed_foreground_shell_calls(events):
+    # Claude 2.1.289 native tool IDs and background semantics; integration proof.
+    calls, complete = {}, set()
+    partial = ("_(timed out after ", "_(process backgrounded after ",
+               "Command did not complete within its ", "Command was manually backgrounded by user with ID:", "Command was moved to the background (ID:", "Command running in background with ID:", "Exit code:")
+    for event in events:
+        content = (event.get("message") or {}).get("content", [])
+        if not isinstance(content, list):
+            continue
+        for block in content:
+            if block.get("type") == "tool_use":
+                name, args = block.get("name", ""), block.get("input", {})
+                if name == "Bash":
+                    calls[block["id"]] = not args.get("run_in_background", False)
+                elif name.endswith("__ctx_execute") and args.get("language") == "shell":
+                    calls[block["id"]] = not args.get("background", False)
+            elif block.get("type") == "tool_result" and calls.get(block.get("tool_use_id")) and not block.get("is_error", False):
+                value = block.get("content", "")
+                text = value if isinstance(value, str) else "\n".join(
+                    b.get("text", "") for b in value if isinstance(b, dict) and b.get("type") == "text")
+                if not any(line.startswith(partial) for line in text.splitlines()):
+                    complete.add(block["tool_use_id"])
+    return complete
+
+def shell_tokens(command):
+    try:
+        argv = shlex.split(command)
+        if len(argv) == 3 and Path(argv[0]).name == "bash" and argv[1] in ("-lc", "-c"):
+            argv = shlex.split(argv[2])
+        return argv
+    except ValueError:
+        return []
+
+def text_content(content):
+    if isinstance(content, str):
+        return content
+    return "\n".join(b.get("text", "") for b in content if isinstance(b, dict))
+
+root, client, expected_sha = Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+assert hashlib.sha256((root / "probe.sh").read_bytes()).hexdigest() == expected_sha, "Frozen Inspector recipe changed"
+events = [json.loads(line) for line in (root / f"{client}.jsonl").read_text().splitlines() if line.startswith("{")]
+completed = []
+foreground_ids = completed_foreground_shell_calls(events)
+if client == "codex":
+    assert any(e.get("type") == "turn.completed" for e in events), "Codex did not complete"
+    assert not any(e.get("type") in ("error", "turn.failed") for e in events), "Codex failed"
+    completed = [(e["item"].get("command", ""), e["item"].get("aggregated_output", ""))
+                 for e in events if e.get("type") == "item.completed"
+                 and e.get("item", {}).get("type") == "command_execution"
+                 and e["item"].get("exit_code") == 0 and e["item"].get("status") == "completed"]
+else:
+    assert any(e.get("type") == "result" and e.get("subtype") == "success"
+               and not e.get("is_error", False) for e in events), "Claude did not complete"
+    calls = {}
     for event in events:
         content = event.get("message", {}).get("content", [])
         if not isinstance(content, list):
             continue
         for block in content:
-            if block.get("type") == "tool_use" and block.get("name") == "Bash":
+            if block.get("type") == "tool_use" and block.get("name") == "Bash" and not block.get("input", {}).get("run_in_background", False):
                 calls[block["id"]] = block.get("input", {}).get("command", "")
-            elif block.get("type") == "tool_result" and not block.get("is_error", False):
-                done.add(block.get("tool_use_id"))
-    return [command for key, command in calls.items() if key in done]
-
-root, client = Path(sys.argv[1]), sys.argv[2]
-calls = native_commands(root / f"{client}.jsonl", client)
-assert any("@modelcontextprotocol/inspector@2.9.0" in cmd and "tools/list" in cmd for cmd in calls), "No completed native Inspector CLI call"
-assert any("@modelcontextprotocol/inspector@2.9.0" in cmd and "--web" in cmd and "MCP_AUTO_OPEN_ENABLED" in "\n".join(calls) for cmd in calls), "No completed native Web launch/environment probe"
+            elif block.get("type") == "tool_result" and block.get("tool_use_id") in foreground_ids and not block.get("is_error", False) and block.get("tool_use_id") in calls:
+                completed.append((calls[block["tool_use_id"]], text_content(block.get("content", ""))))
+expected = ["bash", str(root / "probe.sh"), str(root), client]
+markers = ("INSPECTOR_CLI_OK", "INSPECTOR_WEB_OK", "INSPECTOR_STOPPED")
+assert any(shell_tokens(command) in (expected, ["rtk"] + expected, ["rtk", "proxy"] + expected)
+           and all(marker in output for marker in markers) for command, output in completed), "No completed native frozen Inspector probe"
 data = json.loads((root / f"{client}-tools.json").read_text())
 assert data.get("tools") or data.get("result", {}).get("tools")
 assert "<html" in (root / f"{client}-page.html").read_text().lower()
 assert (root / f"{client}-env.txt").read_text().strip() == "false"
 PY
-  if ss -H -ltn | awk '"'"'{print $4}'"'"' | grep -Eq '"'"':26399$'"'"'; then
+  if ss -H -ltn | awk '"'"'{print $4}'"'"' | grep -Eq '"'"':16399$'"'"'; then
     printf '"'"'Inspector Web process was not stopped by the native session\n'"'"' >&2; exit 1
   fi
 done'
@@ -1873,15 +2187,17 @@ test -s "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/native-stack-worker/SKILL.md
 test -s "$HOME/.agents/skills/native-stack-worker/SKILL.md"'
       ;;
     after_sign_in)
-      # Kind: smoke; Source: https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/examples/01_standalone_sdk/01_hello_world.py#L9
+      # Kind: smoke; Source: https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/tests/tools/terminal/test_terminal_tool_auto_detection.py#L69
       check agent-runtime-worker smoke 'cfg="$config_root/openhands"
 worker_state="$HOME/.local/state/native-agent-stack/runtime-workers/openhands"
 install -d -m 0700 -- "$worker_state"
 run="$(mktemp -d "$worker_state/accept.XXXXXXXX")"
 stamp="${run##*/}"
 stamp="${stamp//./-}"
-# Unchanged upstream example under the same per-job srt boundary.
-mkdir -m 0700 -- "$run/home" "$run/openhands-home"
+# Unchanged upstream forced-subprocess terminal execution test under the per-job srt boundary.
+# OpenHands/software-agent-sdk@v1.50.1:tests/tools/terminal/test_terminal_tool_auto_detection.py:69-86.
+# The default tmux example fails with AF_UNIX blocked on both srt 0.0.77 and 0.0.78.
+mkdir -m 0700 -- "$run/home" "$run/tmp"
 python3 - "$cfg/srt-template.json" "$run" <<'"'"'PY'"'"'
 import json, sys
 from pathlib import Path
@@ -1890,11 +2206,11 @@ policy = json.loads(Path(sys.argv[1]).read_text())
 policy["filesystem"]["denyRead"] = [str(Path(p).expanduser()) for p in policy["filesystem"]["denyRead"]]
 policy["filesystem"]["allowWrite"] = [str(root)]
 policy["network"]["allowedDomains"] = ["127.0.0.1:21128"]
-(root / "hello-srt.json").write_text(json.dumps(policy))
+(root / "terminal-srt.json").write_text(json.dumps(policy))
 PY
-(cd "$run" && HOME="$run/home" OH_PERSISTENCE_DIR="$run/openhands-home" NO_PROXY= no_proxy= LLM_BASE_URL=http://127.0.0.1:21128/v1 LLM_MODEL=openai/cx/gpt-6.1-sol-xhigh LLM_API_KEY=local-loopback \
-  srt --settings "$run/hello-srt.json" -- env NO_PROXY= no_proxy= "$tool_root/agent-runtime-worker/bin/python" "$tool_root/openhands-source/examples/01_standalone_sdk/01_hello_world.py")
-test -s "$run/FACTS.txt"
+(cd "$run" && HOME="$run/home" srt --settings "$run/terminal-srt.json" -- env TMPDIR="$run/tmp" PYTHONDONTWRITEBYTECODE=1 CI=true \
+  "$tool_root/openhands-source/.venv/bin/python" -m pytest -q -p no:cacheprovider \
+  "$tool_root/openhands-source/tests/tools/terminal/test_terminal_tool_auto_detection.py::test_forced_terminal_types")
 # The closed-port negative preserves its journal and proves no model request occurred.
 negative="negative-$stamp"
 python3 "$cfg/worker.py" --prepare "$negative" --negative
@@ -1910,40 +2226,94 @@ systemctl --user reset-failed "openhands-job@$negative.service"
 # Fresh native sessions discover the installed skill and dispatch separate positive jobs.
 for client in claude codex; do
   id="$client-$stamp"
-  prompt="Use the native-stack-worker skill to prepare job $id with its default Python sum(range(1,11)) task and default owned workspace. Dispatch it with systemctl --user start --wait openhands-job@$id.service, then inspect its run-report.json and result.txt. Complete the real job; a preflight is insufficient."
+  printf -v worker_command '"'"'rtk proxy python3 %q --prepare %q && rtk proxy env XDG_RUNTIME_DIR=%q DBUS_SESSION_BUS_ADDRESS=%q TMPDIR=%q systemctl --user start --wait %q && rtk proxy python3 -c %q %q'"'"' "$cfg/worker.py" "$id" "${XDG_RUNTIME_DIR:?User runtime directory is required}" "${DBUS_SESSION_BUS_ADDRESS:-unix:path=$XDG_RUNTIME_DIR/bus}" "$run/tmp" "openhands-job@$id.service" '"'"'import json,sys; from pathlib import Path; p=Path(sys.argv[1]); r=json.loads((p/"run-report.json").read_text()); assert r["success"] and r["requests_to_model"]>0; assert (p/"workspace/result.txt").read_text().strip()=="55"; print("Completed worker job: 55; positive model responses:", r["requests_to_model"])'"'"' "$worker_state/$id"
+  prompt="Use native-stack-worker for job $id with its default Python sum(range(1,11)) task and owned workspace. Run the following exact recipe using a foreground shell call with a 600000 ms timeout. Wait until it returns and inspect the actual report/result. Keep scratch only in $run/tmp. Report any recipe failure directly and leave source repairs to the coordinator. Return only after the native unit completes; preflight or background dispatch alone is insufficient.
+$worker_command"
   if [[ "$client" == claude ]]; then
-    (cd "$run" && timeout 1800 claude -p --model opus --effort max --max-turns 12 --permission-mode bypassPermissions --output-format stream-json --verbose "$prompt") >"$run/claude.jsonl" </dev/null
+    (cd "$run" && timeout 1800 flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" claude -p "$prompt Report any recipe failure directly and leave source repairs to the coordinator. Return only after the native unit completes; preflight or background dispatch alone is insufficient." --max-turns 48 --append-system-prompt-file "$plan_dir/config/acceptance-execution-instructions.txt" --model opus --effort max --tools Bash,Skill --permission-mode bypassPermissions --output-format stream-json --verbose) >"$run/claude.jsonl" </dev/null
   else
     OMNIROUTE_API_KEY=local-loopback timeout 1800 codex exec -p omniroute -m gpt-6.1-sol -c model_reasoning_effort=max  </dev/null \
       --sandbox workspace-write -c sandbox_workspace_write.network_access=true \
       -c "sandbox_workspace_write.writable_roots=[\"$cfg\",\"$worker_state\"]" \
       --skip-git-repo-check -C "$run" --json "$prompt" </dev/null >"$run/codex.jsonl"
   fi
-  python3 - "$worker_state/$id" "$run/$client.jsonl" "$client" <<'"'"'PY'"'"'
-import json, sys
+  python3 - "$worker_state/$id" "$run/$client.jsonl" "$client" "$worker_command" '"'"'Completed worker job: 55; positive model responses: [1-9][0-9]*'"'"' <<'"'"'PY'"'"'
+import json, re, shlex, sys
 from pathlib import Path
 
-def native_commands(path, client):
-    # Original native JSONL is retained. Match completed tool calls, not a model'"'"'s verdict.
+def native_commands(path, client, expected, completion_patterns):
+    # Local proof of foreground native completion; original streams stay untouched.
     events = [json.loads(line) for line in path.read_text().splitlines() if line.startswith("{")]
+    def canonical(command):
+        try:
+            argv = shlex.split(command)
+            for _ in range(3):
+                if argv[:2] == ["rtk", "proxy"]:
+                    argv = argv[2:]
+                elif argv[:1] == ["rtk"]:
+                    argv = argv[1:]
+                elif len(argv) == 3 and Path(argv[0]).name == "bash" and argv[1] in ("-lc", "-c"):
+                    argv = shlex.split(argv[2])
+                else:
+                    break
+            return argv
+        except (ValueError, IndexError):
+            return None
+    wanted = [canonical(command) for command in expected]
+    def exact(command):
+        return canonical(command) in wanted
+    def complete_output(command, content):
+        if isinstance(content, list):
+            output = "\n".join(b.get("text", "") for b in content if isinstance(b, dict) and b.get("type") == "text")
+        else:
+            output = str(content or "")
+        markers = ("_(timed out after ", "_(process backgrounded after ", "Command did not complete within its ", "Command was manually backgrounded by user with ID:", "Command was moved to the background (ID:", "Command running in background with ID:", "Exit code:")
+        index = wanted.index(canonical(command))
+        return (bool(output) and not any(marker in output for marker in markers)
+                and re.search(r"(?m)^" + completion_patterns[index] + r"$", output) is not None)
     if client == "codex":
-        return [e["item"]["command"] for e in events if e.get("type") == "item.completed"
-                and e.get("item", {}).get("type") == "command_execution"
-                and e["item"].get("exit_code") == 0 and e["item"].get("status") == "completed"]
-    calls, done = {}, set()
+        assert any(e.get("type") == "turn.completed" for e in events), "Native Codex did not complete"
+        assert not any(e.get("type") in ("error", "turn.failed") for e in events), "Native Codex failed"
+        starts = {e["item"]["id"]: e["item"] for e in events if e.get("type") == "item.started" and e.get("item", {}).get("type") == "mcp_tool_call"}
+        done = []
+        for event in events:
+            if event.get("type") != "item.completed":
+                continue
+            item = event.get("item", {})
+            if item.get("type") == "command_execution" and item.get("status") == "completed" and item.get("exit_code") == 0 and exact(item.get("command", "")) and complete_output(item["command"], item.get("aggregated_output", "")):
+                done.append(item["command"])
+            elif item.get("type") == "mcp_tool_call" and item.get("status") == "completed" and not item.get("error"):
+                initial = starts.get(item.get("id"), {})
+                args, result = item.get("arguments", {}), item.get("result") or {}
+                if (item.get("tool") == initial.get("tool") == "ctx_execute" and item.get("server") == initial.get("server")
+                        and initial.get("arguments") == args and args.get("language") == "shell"
+                        and not args.get("background", False) and exact(args.get("code", ""))
+                        and not result.get("isError") and not result.get("is_error") and complete_output(args["code"], result.get("content"))):
+                    done.append(args["code"])
+        return done
+    assert any(e.get("type") == "result" and e.get("subtype") == "success" and not e.get("is_error", False) for e in events), "Native Claude did not complete"
+    calls, done = {}, []
     for event in events:
         content = event.get("message", {}).get("content", [])
         if not isinstance(content, list):
             continue
         for block in content:
-            if block.get("type") == "tool_use" and block.get("name") == "Bash":
-                calls[block["id"]] = block.get("input", {}).get("command", "")
-            elif block.get("type") == "tool_result" and not block.get("is_error", False):
-                done.add(block.get("tool_use_id"))
-    return [command for key, command in calls.items() if key in done]
+            if block.get("type") == "tool_use":
+                name, args = block.get("name", ""), block.get("input", {})
+                command = args.get("command", "") if name == "Bash" else args.get("code", "")
+                eligible = (name == "Bash" and not args.get("run_in_background", False)) or (name.endswith("__ctx_execute") and args.get("language") == "shell" and not args.get("background", False))
+                if eligible and exact(command):
+                    calls[block["id"]] = (command, name)
+            elif block.get("type") == "tool_result" and not block.get("is_error", False) and block.get("tool_use_id") in calls:
+                command, name = calls[block["tool_use_id"]]
+                output = block.get("content")
+                # Require the post-success marker as well as a linked native record.
+                if complete_output(command, output):
+                    done.append(command)
+    return done
 
 root = Path(sys.argv[1])
-calls = native_commands(Path(sys.argv[2]), sys.argv[3])
+calls = native_commands(Path(sys.argv[2]), sys.argv[3], [sys.argv[4]], [sys.argv[5]])
 assert any("systemctl" in cmd and "openhands-job@" in cmd and "start" in cmd for cmd in calls), "No completed native worker dispatch"
 report = json.loads((root / "run-report.json").read_text())
 assert report["success"] and report["requests_to_model"] > 0
@@ -1988,7 +2358,7 @@ test -s "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/native-stack-research/SKILL.
 test -s "$HOME/.agents/skills/native-stack-research/SKILL.md"'
       ;;
     after_sign_in)
-      # Kind: smoke; Source: https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md#L1658
+      # Kind: smoke; Source: https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md#L1837
       check research-harnesses smoke 'gptr_started="$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)"
 out="$(bash "$config_root/gpt-researcher.sh" "Ubuntu 26.04 WSL news this month")"
 gptr_finished="$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)"
@@ -1998,7 +2368,7 @@ refs="$(awk '"'"'/^#+ *References/{f=1} f'"'"' "$run"/outputs/*.md | grep -oE '"
 [[ "$refs" -ge 5 ]]
 python3 "$config_root/gateway-effort-accept.py" "gptr-${run##*/}" "$gptr_started" "$gptr_finished"
 deer_started="$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)"
-deer_out="$(bash "$config_root/deer-flow-research.sh" "Research Ubuntu 26.04 WSL news this month; return a short answer with primary source URLs.")"
+deer_out="$(DEER_FLOW_CONFIG_PATH="$plan_dir/config/deer-flow-config.yaml" bash "$plan_dir/config/deer-flow-research.sh" "Research Ubuntu 26.04 WSL news this month; return a short answer with primary source URLs.")"
 deer_finished="$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)"
 deer_run="$(sed -n '"'"'s/^run directory: //p'"'"' <<<"$deer_out")"
 [[ -d "$deer_run" ]]
@@ -2010,40 +2380,104 @@ session="$(mktemp -d "$state/native-agent-stack/research/client-checks/run.XXXXX
 for client in claude codex; do
   marker="$session/$client.started"
   touch "$marker"
-  prompt="Use native-stack-research to complete a short public research query about Ubuntu 26.04 WSL this month through BOTH installed gatherers: bash $config_root/gpt-researcher.sh and bash $config_root/deer-flow-research.sh. Include source URLs. Complete both real calls; preflight/import checks do not qualify. Inspect the two resulting reports and print their run directories."
+  client_state="$session/$client-state"
+  install -d -m 0700 -- "$client_state"
+  gpt_marker="native-stage-complete:$client:$session:gptr"
+  deer_marker="native-stage-complete:$client:$session:deerflow"
+  printf -v gpt_command '"'"'XDG_STATE_HOME=%q bash %q %q >%q 2>%q && printf "%%s\\n" %q'"'"' "$client_state" "$repo_root/tools/research/gpt_researcher.sh" "Ubuntu 26.04 WSL news this month" "$client_state/gptr.stdout" "$client_state/gptr.stderr" "$gpt_marker"
+  printf -v deer_command '"'"'XDG_STATE_HOME=%q DEER_FLOW_CONFIG_PATH=%q bash %q %q >%q 2>%q && printf "%%s\\n" %q'"'"' "$client_state" "$plan_dir/config/deer-flow-config.yaml" "$plan_dir/config/deer-flow-research.sh" "Research Ubuntu 26.04 WSL news this month; return a short answer with primary source URLs." "$client_state/deerflow.stdout" "$client_state/deerflow.stderr" "$deer_marker"
+  execution="foreground shell calls with 600000 ms timeouts, waiting for each to finish"
+  if [[ "$client" == codex ]]; then
+    execution="native exec_command with yield_time_ms=30000, polling each returned session_id with write_stdin (empty chars, yield_time_ms=30000) until its final exit before inspecting output or starting the next command. Do not run these long commands through an MCP tool; their large stdout/stderr are already redirected to private files"
+  fi
+  prompt="Use native-stack-research to complete BOTH real gatherers using $execution. Execute each supplied command once. If a call fails, inspect its retained receipt/stdout/stderr, report the actual failure and stop; do not retry or switch providers. Run these exact commands with their supplied keyless public config and isolated state. Inspect the retained call stdout/stderr in the supplied per-client state and both resulting reports; print their run directories. Preflight/import checks are insufficient.
+$gpt_command
+$deer_command"
   if [[ "$client" == claude ]]; then
-    (cd "$session" && timeout 3300 claude -p --model opus --effort max --max-turns 16 --permission-mode bypassPermissions --output-format stream-json --verbose "$prompt") >"$session/claude.jsonl" </dev/null
+    (cd "$session" && timeout 3300 flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" claude -p "$prompt Execute each supplied command once. If a call fails, inspect its retained receipt/stdout/stderr, report the actual failure and stop; do not retry or switch providers." --max-turns 48 --append-system-prompt-file "$plan_dir/config/acceptance-execution-instructions.txt" --model opus --effort max --permission-mode bypassPermissions --output-format stream-json --verbose) >"$session/claude.jsonl" </dev/null
   else
     timeout 3300 codex exec -m gpt-6.1-sol -c model_provider='"'"'"openai"'"'"' -c model_reasoning_effort=max  </dev/null \
       --sandbox workspace-write -c sandbox_workspace_write.network_access=true \
       -c "sandbox_workspace_write.writable_roots=[\"$state/new-wsl-native-stack/research\",\"$state/native-agent-stack/research\"]" \
       --skip-git-repo-check -C "$session" --json "$prompt" </dev/null >"$session/codex.jsonl"
   fi
-  python3 - "$state" "$marker" "$session/$client.jsonl" "$client" <<'"'"'PY'"'"'
-import json, re, sys
+  python3 - "$client_state" "$marker" "$session/$client.jsonl" "$client" "$gpt_command" "$deer_command" "$gpt_marker" "$deer_marker" <<'"'"'PY'"'"'
+import json, re, shlex, sys
 from pathlib import Path
 
-def native_commands(path, client):
-    # Original native JSONL is retained. Match completed tool calls, not a model'"'"'s verdict.
+def native_commands(path, client, expected, completion_patterns):
+    # Local proof of foreground native completion; original streams stay untouched.
     events = [json.loads(line) for line in path.read_text().splitlines() if line.startswith("{")]
+    def canonical(command):
+        try:
+            argv = shlex.split(command)
+            for _ in range(3):
+                if argv[:2] == ["rtk", "proxy"]:
+                    argv = argv[2:]
+                elif argv[:1] == ["rtk"]:
+                    argv = argv[1:]
+                elif len(argv) == 3 and Path(argv[0]).name == "bash" and argv[1] in ("-lc", "-c"):
+                    argv = shlex.split(argv[2])
+                else:
+                    break
+            return argv
+        except (ValueError, IndexError):
+            return None
+    wanted = [canonical(command) for command in expected]
+    def exact(command):
+        return canonical(command) in wanted
+    def complete_output(command, content):
+        if isinstance(content, list):
+            output = "\n".join(b.get("text", "") for b in content if isinstance(b, dict) and b.get("type") == "text")
+        else:
+            output = str(content or "")
+        markers = ("_(timed out after ", "_(process backgrounded after ", "Command did not complete within its ", "Command was manually backgrounded by user with ID:", "Command was moved to the background (ID:", "Command running in background with ID:", "Exit code:")
+        index = wanted.index(canonical(command))
+        return (bool(output) and not any(marker in output for marker in markers)
+                and re.search(r"(?m)^" + completion_patterns[index] + r"$", output) is not None)
     if client == "codex":
-        return [e["item"]["command"] for e in events if e.get("type") == "item.completed"
-                and e.get("item", {}).get("type") == "command_execution"
-                and e["item"].get("exit_code") == 0 and e["item"].get("status") == "completed"]
-    calls, done = {}, set()
+        assert any(e.get("type") == "turn.completed" for e in events), "Native Codex did not complete"
+        assert not any(e.get("type") in ("error", "turn.failed") for e in events), "Native Codex failed"
+        starts = {e["item"]["id"]: e["item"] for e in events if e.get("type") == "item.started" and e.get("item", {}).get("type") == "mcp_tool_call"}
+        done = []
+        for event in events:
+            if event.get("type") != "item.completed":
+                continue
+            item = event.get("item", {})
+            if item.get("type") == "command_execution" and item.get("status") == "completed" and item.get("exit_code") == 0 and exact(item.get("command", "")) and complete_output(item["command"], item.get("aggregated_output", "")):
+                done.append(item["command"])
+            elif item.get("type") == "mcp_tool_call" and item.get("status") == "completed" and not item.get("error"):
+                initial = starts.get(item.get("id"), {})
+                args, result = item.get("arguments", {}), item.get("result") or {}
+                if (item.get("tool") == initial.get("tool") == "ctx_execute" and item.get("server") == initial.get("server")
+                        and initial.get("arguments") == args and args.get("language") == "shell"
+                        and not args.get("background", False) and exact(args.get("code", ""))
+                        and not result.get("isError") and not result.get("is_error") and complete_output(args["code"], result.get("content"))):
+                    done.append(args["code"])
+        return done
+    assert any(e.get("type") == "result" and e.get("subtype") == "success" and not e.get("is_error", False) for e in events), "Native Claude did not complete"
+    calls, done = {}, []
     for event in events:
         content = event.get("message", {}).get("content", [])
         if not isinstance(content, list):
             continue
         for block in content:
-            if block.get("type") == "tool_use" and block.get("name") == "Bash":
-                calls[block["id"]] = block.get("input", {}).get("command", "")
-            elif block.get("type") == "tool_result" and not block.get("is_error", False):
-                done.add(block.get("tool_use_id"))
-    return [command for key, command in calls.items() if key in done]
+            if block.get("type") == "tool_use":
+                name, args = block.get("name", ""), block.get("input", {})
+                command = args.get("command", "") if name == "Bash" else args.get("code", "")
+                eligible = (name == "Bash" and not args.get("run_in_background", False)) or (name.endswith("__ctx_execute") and args.get("language") == "shell" and not args.get("background", False))
+                if eligible and exact(command):
+                    calls[block["id"]] = (command, name)
+            elif block.get("type") == "tool_result" and not block.get("is_error", False) and block.get("tool_use_id") in calls:
+                command, name = calls[block["tool_use_id"]]
+                output = block.get("content")
+                # Require the post-success marker as well as a linked native record.
+                if complete_output(command, output):
+                    done.append(command)
+    return done
 
-calls = native_commands(Path(sys.argv[3]), sys.argv[4])
-assert any("gpt-researcher.sh" in cmd and "--preflight-only" not in cmd for cmd in calls), "No completed native GPT Researcher call"
+calls = native_commands(Path(sys.argv[3]), sys.argv[4], sys.argv[5:7], [re.escape(s) for s in sys.argv[7:9]])
+assert any("gpt_researcher.sh" in cmd and "--preflight-only" not in cmd for cmd in calls), "No completed native GPT Researcher call"
 assert any("deer-flow-research.sh" in cmd for cmd in calls), "No completed native DeerFlow call"
 state, marker = map(Path, sys.argv[1:3])
 since = marker.stat().st_mtime_ns
@@ -2053,7 +2487,15 @@ def has_references(path):
     parts = re.split(r"(?m)^#+ *References", path.read_text())
     return len(parts) > 1 and len(set(re.findall(r"https?://[^\s)>]+", parts[-1]))) >= 5
 assert any(has_references(p) for p in gpt), "No completed new GPT Researcher report"
-assert any(p.read_text().strip() and re.search(r"https?://", p.read_text()) for p in deer), "No completed new cited DeerFlow answer"
+def completed_deer(path):
+    events = [json.loads(line) for line in (path.parent / "events.jsonl").read_text().splitlines() if line.strip()]
+    ends = [e for e in events if e.get("type") == "end"]
+    observation = json.loads((path.parent / "integration-check.json").read_text())
+    return (len(ends) == 1 and ends[0].get("data", {}).get("usage", {}).get("total_tokens", 0) > 0
+            and observation["acceptance_status"] == "passed" and observation["native_exit_code"] == 0
+            and observation["matched_search_successes"] > 0 and observation["final_answer_citations_in_results"] > 0
+            and path.read_text().strip() and re.search(r"https?://", path.read_text()))
+assert any(completed_deer(p) for p in deer), "No completed new native DeerFlow stream with matched search citations"
 PY
 done
 # Embedded acceptance starts no DeerFlow HTTP stack.

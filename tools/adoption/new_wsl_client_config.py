@@ -1145,6 +1145,10 @@ def render(root: Path, results: list, plan: dict, values: dict, manifest: dict |
             override = json.loads(string.Template(json.dumps(verdict.entry.raw.get("override", {}))).safe_substitute(
                 host_only))
             servers[name] = {**spec, **override}
+            if "env" in override:
+                # Native MCP env is a variable map (https://code.claude.com/docs/en/mcp). A host's partial override
+                # replaces those variables while retaining the pinned template's required provider/model settings.
+                servers[name]["env"] = {**spec.get("env", {}), **override["env"]}
     files["mcp-servers.json"] = json.dumps({"mcpServers": servers}, indent=2, ensure_ascii=False) + "\n"
     # Codex: the user config (placeholders filled), the hooks and the two profiles.
     keep, replaced = keep_of("codex/config")
@@ -1475,6 +1479,48 @@ def short(text: str, width: int = 170) -> str:
     return text if len(text) <= width else text[:width - 3] + "..."
 
 
+def rendered_mcp_endpoint_errors(root: Path) -> list:
+    """Local integration guard for the native MCP url/env fields in https://code.claude.com/docs/en/mcp and
+    https://developers.openai.com/codex/mcp (openai/codex@rust-v0.160.0:codex-rs/core/config.schema.json).
+    Compare shared servers after varying only host endpoint values. The synthetic render catches an example-host
+    literal even when the ordinary example render agrees. Client-specific paths and non-host env stay out.
+    """
+    try:
+        results, manifest, plan, _, _ = analyse(root, check_blocks=False)
+        values = host_values(EXAMPLE_HOST, plan, None, wired_path_dirs(results))
+        probe_values = dict(values)
+        endpoint_keys = sorted(key for key in values if key.endswith(("_URL", "_ENDPOINT", "_HOST")))
+        for index, key in enumerate(endpoint_keys):
+            probe_values[key] = f"127.0.0.2:{30000 + index}"
+        before = render(root, results, plan, values, manifest)
+        after = render(root, results, plan, probe_values, manifest)
+
+        def servers(files: dict) -> tuple:
+            return (json.loads(files["mcp-servers.json"])["mcpServers"],
+                    tomllib.loads(files["codex.config.toml"]).get("mcp_servers", {}))
+
+        def fields(spec: dict) -> dict:
+            return {**({"url": spec["url"]} if "url" in spec else {}),
+                    **{f"env.{key}": value for key, value in spec.get("env", {}).items()}}
+
+        claude_before, codex_before = servers(before)
+        claude_after, codex_after = servers(after)
+        errors = []
+        for name in sorted(claude_after.keys() & codex_after.keys()):
+            old_claude, old_codex = fields(claude_before[name]), fields(codex_before[name])
+            new_claude, new_codex = fields(claude_after[name]), fields(codex_after[name])
+            for field in sorted(old_claude.keys() | old_codex.keys() | new_claude.keys() | new_codex.keys()):
+                host_valued = (old_claude.get(field) != new_claude.get(field) or
+                               old_codex.get(field) != new_codex.get(field))
+                if host_valued and (old_claude.get(field) != old_codex.get(field) or
+                                   new_claude.get(field) != new_codex.get(field)):
+                    errors.append(f"the host endpoint probe: MCP server {name} {field} differs between Claude and "
+                                  "Codex renders")
+        return errors
+    except (ConfigError, render_config.RenderError, OSError, KeyError, ValueError) as error:
+        return [f"the host endpoint probe failed, so the renders could not be compared: {error}"]
+
+
 def cmd_check(args: argparse.Namespace) -> int:
     root = args.root
     try:
@@ -1482,7 +1528,7 @@ def cmd_check(args: argparse.Namespace) -> int:
     except (ConfigError, OSError, KeyError, ValueError) as error:
         print(f"check failed: {error}", file=sys.stderr)
         return 1
-    errors = errors + rendered_name_errors(root)
+    errors = errors + rendered_name_errors(root) + rendered_mcp_endpoint_errors(root)
     if args.json:
         sys.stdout.write(wiring_table(results))
     elif args.markdown:

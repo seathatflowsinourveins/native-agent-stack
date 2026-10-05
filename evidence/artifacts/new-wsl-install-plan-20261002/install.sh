@@ -84,7 +84,7 @@ copy_config() {
   local name="$1"
   mkdir -p -- "$config_root"
   case "$name" in
-    *.sh|*.py|*.rules|*.service|omniroute-canary-evidence.json)
+    *.sh|*.py|*.rules|*.service|omniroute-canary-evidence.json|acceptance-execution-instructions.txt)
       if ! cmp -s -- "$plan_dir/config/$name" "$config_root/$name"; then
         printf 'Updating plan-owned %s.\n' "$name" >&2
         install -m 0600 -- "$plan_dir/config/$name" "$config_root/$name"
@@ -98,7 +98,7 @@ copy_config() {
   fi
 }
 inspector_chromium_host_dependencies() {
-  # Inspector@2.9.0 clients/web/package-lock.json:7471; Playwright@v1.62.1 browsers.md:81.
+  # Inspector@2.9.0 clients/web/package-lock.json:7471; Playwright@v1.62.1 browsers.md:104.
   # Playwright's supported install-deps command requests privilege itself.
   npx -y playwright@1.62.1 install-deps chromium
 }
@@ -298,6 +298,7 @@ sandbox-runtime-srt() {
   # Planned. Source: https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L14
   run_command 'npm install -g @anthropic-ai/sandbox-runtime@0.0.78' || return "$?"
   copy_config 'srt-client-accept.sh' || return "$?"
+  copy_config 'acceptance-execution-instructions.txt' || return "$?"
 }
 
 serena() {
@@ -590,7 +591,7 @@ trace-viewer() {
 token-lane-carriers() {
   # token-lanes carriers: the SubagentStart block and a SessionStart main-session block (Claude Code hooks) | repository-recipe | planned
   # UNRUN on every distribution: added from the wave-3 batch of 2026-10-04 (the owner's decision, amendment 4), after every recorded run of this plan.
-  printf '%s\n' 'UNRUN. The client configuration writes the carriers after this plan runs (tools/adoption/new_wsl_client_config.py, then its --check); this plan installs nothing for them and has nothing to check. Recipe/source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/docs/token-session-handbook.md#L197'
+  printf '%s\n' 'The current clean default holds out the repository token-lane carriers: the shared Claude template registers neither carrier hook, and the default profile install copies no carrier files. This retained historical owner row installs nothing and has no post-install check. Recipe/source: https://github.com/seathatflowsinourveins/native-agent-stack/blob/4c897418fe35a030a1188ae447eaf31c893f8eff/docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md#L24'
 }
 
 session-analytics() {
@@ -598,7 +599,7 @@ session-analytics() {
   # Planned. Source: https://github.com/kenn-io/agentsview/releases/download/v0.43.0/SHA256SUMS
   run_command 'fetch_verified https://github.com/kenn-io/agentsview/releases/download/v0.43.0/agentsview_0.43.0_linux_amd64.tar.gz 4520c6698772d2db7220212abf58d7d58c0966d7435f0a5ab134371f874df6d9 "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/agentsview-0.43.0/agentsview_0.43.0_linux_amd64.tar.gz"' || return "$?"
   # Planned. Source: https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/README.md#L25; https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/config/config.go#L1920 (owned launcher/placement glue)
-  run_command 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; mkdir -p "$e/tools/agentsview-0.43.0" "$e/bin" "$HOME/.local/bin"; for alias in "$e/bin/agentsview" "$HOME/.local/bin/agentsview"; do if [[ -e "$alias" || -L "$alias" ]]; then [[ -L "$alias" && "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.43.0/launcher")" ]] || { printf "Existing agentsview alias belongs to another installation; retained.\n" >&2; exit 1; }; fi; done; tar -xf "$e/downloads/agentsview-0.43.0/agentsview_0.43.0_linux_amd64.tar.gz" -C "$e/tools/agentsview-0.43.0"; [[ -x "$e/tools/agentsview-0.43.0/agentsview" ]]; install -m 0600 -- "$plan_dir/config/agentsview.sh" "$e/tools/agentsview-0.43.0/launcher"; chmod 0755 "$e/tools/agentsview-0.43.0/launcher"; ln -sfn "$e/tools/agentsview-0.43.0/launcher" "$e/bin/agentsview"; ln -sfn "$e/tools/agentsview-0.43.0/launcher" "$HOME/.local/bin/agentsview"' || return "$?"
+  run_command 'e="${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}"; mkdir -p "$e/tools/agentsview-0.43.0" "$e/bin" "$HOME/.local/bin"; for alias in "$e/bin/agentsview" "$HOME/.local/bin/agentsview"; do if [[ -e "$alias" || -L "$alias" ]]; then [[ -L "$alias" && ( "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.43.0/launcher")" || "$(readlink -f -- "$alias")" == "$(readlink -m -- "$e/tools/agentsview-0.43.0/agentsview")" ) ]] || { printf "Existing agentsview alias belongs to another installation; retained.\n" >&2; exit 1; }; fi; done; tar -xf "$e/downloads/agentsview-0.43.0/agentsview_0.43.0_linux_amd64.tar.gz" -C "$e/tools/agentsview-0.43.0"; [[ -x "$e/tools/agentsview-0.43.0/agentsview" ]]; install -m 0600 -- "$plan_dir/config/agentsview.sh" "$e/tools/agentsview-0.43.0/launcher"; chmod 0755 "$e/tools/agentsview-0.43.0/launcher"; ln -sfn "$e/tools/agentsview-0.43.0/launcher" "$e/bin/agentsview"; ln -sfn "$e/tools/agentsview-0.43.0/launcher" "$HOME/.local/bin/agentsview"' || return "$?"
   # Planned. Source: https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/config/config.go#L688 (owned archive config)
   run_command 'd="${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/agentsview"; install -d -m 0700 "$d"; if [[ ! -e "$d/config.toml" ]]; then install -m 0600 -- "$plan_dir/config/agentsview.toml" "$d/config.toml"; elif ! cmp -s "$plan_dir/config/agentsview.toml" "$d/config.toml"; then printf "Existing agentsview config retained; review local archive settings before starting.\n" >&2; fi' || return "$?"
 }
@@ -627,6 +628,12 @@ prometheus() {
   # Planned. Source: https://raw.githubusercontent.com/prometheus/prometheus/v3.15.0/docs/getting_started.md#L18
   run_command 'install -m 0755 "$tool_root/prometheus/prometheus-3.15.0.linux-amd64/prometheus" "$HOME/.local/bin/prometheus"' || return "$?"
   copy_config 'prometheus.yaml' || return "$?"
+  # Render-only candidate from observability/backends/configure.py:100; G4:103–109.
+  copy_config 'ns2604-prometheus.service.example' || return "$?"
+  # Planned. Source: https://github.com/seathatflowsinourveins/native-agent-stack/blob/f946c6d4ca988a17b6fa4392ecb488909f147883/observability/backends/configure.py#L100 (A27 render only).
+  run_command 'install -m 0600 -- "$plan_dir/config/observability_config.py" "$config_root/observability_config.py"' || return "$?"
+  # Planned. Source: https://github.com/seathatflowsinourveins/native-agent-stack/blob/f946c6d4ca988a17b6fa4392ecb488909f147883/observability/backends/configure.py#L100 (A27 render only).
+  run_command 'NS2604_OBSERVABILITY_DATA="${NS2604_OBSERVABILITY_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability}" python3 "$config_root/observability_config.py" prometheus --config-root "$config_root" --source-root "$plan_dir/config" --tools-root "$tool_root" --plan-file "$plan_dir/install-plan.json"' || return "$?"
 }
 
 alerting() {
@@ -685,6 +692,13 @@ local-model-server() {
   run_command 'mise use -g ollama@0.35.0' || return "$?"
   refresh_path || return "$?"
   copy_config 'ollama.env.example' || return "$?"
+  # D-ollama: lasting GPU owner; local-model decision254–257; upstream0.35.0 linux.mdx:53–85 user-unit adaptation.
+  copy_config 'ollama.service' || return "$?"
+  copy_config 'ollama-warmup.sh' || return "$?"
+  # Planned. Source: https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/linux.mdx#L57 (user-unit adaptation; D-ollama).
+  run_command 'ollama_unit_path="$HOME/.config/systemd/user/ollama.service"; ollama_warmup_path="$HOME/.local/share/new-wsl-native-stack/bin/ollama-warmup.sh"; if [[ -L "$ollama_unit_path" || -L "$ollama_warmup_path" ]] || { [[ -e "$ollama_unit_path" ]] && ! cmp -s -- "$config_root/ollama.service" "$ollama_unit_path"; } || { [[ -e "$ollama_warmup_path" ]] && ! cmp -s -- "$config_root/ollama-warmup.sh" "$ollama_warmup_path"; }; then   printf '\''needs_owner: retained differing Ollama unit or warmup script.\n'\'' >&2;   exit 3; fi; install -d -m 0700 -- "$HOME/.config/systemd/user" "$HOME/.local/share/new-wsl-native-stack/bin" && install -m 0600 -- "$config_root/ollama.service" "$ollama_unit_path" && install -m 0755 -- "$config_root/ollama-warmup.sh" "$ollama_warmup_path"' || return "$?"
+  # Planned. Source: https://github.com/ollama/ollama/blob/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/linux.mdx#L88 (native user-unit startup adaptation).
+  run_command 'systemctl --user daemon-reload && systemctl --user enable --now ollama.service' || return "$?"
 }
 
 local-generation-model() {
@@ -736,6 +750,8 @@ promptfoo() {
   copy_config 'promptfoo-0.123.1-basic.yaml' || return "$?"
   copy_config 'promptfoo-0.123.1-failing.yaml' || return "$?"
   copy_config 'promptfoo-gateway.yaml' || return "$?"
+  # Source: https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/src/util/config/load.ts#L383
+  copy_config 'promptfoo-gateway.cjs' || return "$?"
   copy_config 'promptfoo-codex-env.py' || return "$?"
   copy_config 'promptfoo-session.jq' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/installation.md#L19; https://docs.npmjs.com/cli/v11/commands/npm-install
