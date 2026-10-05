@@ -4233,8 +4233,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "064d309189054b6f2c6ec37855fd3e3e6c09eee42197865cc1cc86d9233dcc20",
-      "bytes": 26117
+      "sha256": "0153fc7595f7dd64d077366b2b0251cbe78f13a47f90798ab6d3d746624c2aec",
+      "bytes": 25235
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -16421,11 +16421,6 @@
       "path": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
       "sha256": "d091a1021eff71b11bf409b7896577566713788ecbf33e8f8c629e4d45ad26e1",
       "bytes": 15230
-    },
-    {
-      "path": "docs/decisions/2026-10-04-nautilus-prerelease-freshness.md",
-      "sha256": "b5f641bc7bfee2f8592fb295708de3c094d0855e3d865eda09b7752f2c0422ff",
-      "bytes": 8755
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
@@ -53609,8 +53604,8 @@
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "sha256": "9bf26b27b5466eb58c7198035dcc560bf19e2a867271958b5035e1b0c888f877",
-      "bytes": 123580
+      "sha256": "91af1beac78818d9b414a4de7f099c92133b1f84d7db1ce0715932195122f78c",
+      "bytes": 121534
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
@@ -53634,8 +53629,8 @@
     },
     {
       "path": "tools/sota-convergence/github_freshness.py",
-      "sha256": "dbd2d6fbb79c60c39a5554024aa8c7985d3ee9903490671911250c1f874c1f8d",
-      "bytes": 34117
+      "sha256": "aa3964f31cedc9098354d9a4cdbd47170a1358662358b5e55e57d0ff600617b7",
+      "bytes": 27422
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
