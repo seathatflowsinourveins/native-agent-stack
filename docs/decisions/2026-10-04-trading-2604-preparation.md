@@ -499,9 +499,15 @@ Python 3.12.3 versus 3.13 ratification and the earlier independent-receipt-revie
 qualification remain open.
 
 The rerun receipt scopes `native_proven` to the unchanged `nautilus_quickstart`
-row and `local_integration` to the other 24 destination-host rows. Its per-row
-status lines remain private on the host; a sanitized row artifact is requested
-from the operator. The outer summary is retained without inventing row data.
+row and `local_integration` to the other 24 destination-host rows. On
+**2026-10-05**, the operator supplied the
+[sanitized row artifact](../../evidence/artifacts/trading-runtime-2604-20261004/rows-native-trading-runtime-2604-rerun-d02c0827.json),
+SHA256 `85d1bc135f47801d5e9f0a08740d1a7a21c8f662f4cf183da681c38a9f93c5c2`.
+The rerun receipt now carries the 25 row names, statuses and exits transcribed
+from that artifact; their order and status lines match exactly, and the install
+and acceptance exits agree with the recorded summary. This closes the operator
+artifact request. Per-check logs remain private on the host; independent review
+remains pending.
 
 Resume after storage interruption: the coordinator removed the earlier scratch
 state. The four completed proof results and output were already recorded, and

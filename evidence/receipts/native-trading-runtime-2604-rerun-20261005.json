@@ -32,7 +32,7 @@
   "limitations": [
     "Per-check logs stay private on the host; this receipt carries the outer status lines only.",
     "One run; no unchanged upstream test suite was run.",
-    "Per-row status lines remain private on the host. A sanitized artifact of the actual row statuses is requested from the operator; no row data is reconstructed in this receipt.",
+    "The 25 per-row status lines are now retained in the repository artifact evidence/artifacts/trading-runtime-2604-20261004/rows-native-trading-runtime-2604-rerun-d02c0827.json supplied by the operator; per-check logs still stay private on the host.",
     "native_proven applies only to the unchanged nautilus_quickstart row; the other 24 rows are local_integration on the destination host. The aggregate 25/25 result does not promote those rows to upstream acceptance.",
     "Independent review remains pending; the retained outer summary is not independent observation of the per-row results.",
     "This recorded execution qualifies the offline runtime on NativeStack2604 only; it is not paper, broker, live-trading, SEC network or point-in-time data acceptance."
@@ -61,7 +61,169 @@
     }
   },
   "operator_followup": {
-    "status": "pending",
-    "request": "Supply a sanitized artifact containing the actual per-row status lines from this rerun for independent review."
-  }
+    "status": "complete",
+    "request": "Supply a sanitized artifact containing the actual per-row status lines from this rerun for independent review.",
+    "completed_on": "2026-10-05",
+    "artifact_path": "evidence/artifacts/trading-runtime-2604-20261004/rows-native-trading-runtime-2604-rerun-d02c0827.json"
+  },
+  "artifacts": [
+    {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/rows-native-trading-runtime-2604-rerun-d02c0827.json",
+      "sha256": "85d1bc135f47801d5e9f0a08740d1a7a21c8f662f4cf183da681c38a9f93c5c2",
+      "bytes": 1375,
+      "hash_scope": "published_sanitized_bytes"
+    }
+  ],
+  "checks": [
+    {
+      "name": "offline_isolation",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "python",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "import_nautilus-trader",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "import_numpy",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "import_pandas",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "import_alpaca-py",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "import_edgartools",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "import_exchange-calendars",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "import_dvc",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "import_duckdb",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "import_pandera",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "import_skfolio",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "import_fincore",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "import_mlflow",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "import_arch",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "import_purgedcv",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "ibkr_adapter",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "alpaca_adapter_source",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "alpaca_adapter_import",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "nautilus_quickstart_sha256",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "nautilus_quickstart",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "native_proven"
+    },
+    {
+      "name": "duckdb_query",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "pandera_example",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "skfolio_example",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    },
+    {
+      "name": "arch_example",
+      "result": "pass",
+      "exit": 0,
+      "evidence_class": "local_integration"
+    }
+  ]
 }
