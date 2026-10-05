@@ -77,10 +77,21 @@ and `:backend/packages/harness/deerflow/client.py:1229`;
 (`this PR: tools/research/gpt_researcher.sh:27`).
 
 The conflicting research and topology verdicts are reconciled through #637's
-published 3.8.51 record. That gateway caps Sol at xhigh. Per-run session headers
-join both gatherers to native call logs; acceptance requires successful calls,
-zero `/v1/embeddings` requests, and the delivered provider request's model and
-reasoning effort, rather than the requested alias. DeerFlow's pinned
+published 3.8.51 record. That gateway caps Sol at xhigh. Per-run
+`x-omniroute-session-id` headers join both gatherers to native call-list metadata;
+acceptance requires successful logged Sol routes and rejects embeddings in the
+joined rows. The default API exposes no delivered-effort field. Conditional
+encrypted-reasoning effort columns exist in the DB but are not exposed by its
+summary API; pipeline capture is off by default and remains an operator decision
+because it retains prompts and completions. Acceptance reports source-based
+expected effort separately, without asserting delivered wire effort. If a
+session tag is unavailable in in-memory summaries, the explicit window/model
+fallback cannot prove attribution or whole-run zero embeddings. Paging stops
+at persisted rows older than the run start. These claims were checked at
+[the exact 3.8.51 tag](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/usage/callLogs.ts#L472)
+and are retained in
+[the source receipt](../../evidence/artifacts/final-architecture-round2-20261004/repair-round2-sources-20261005.json).
+DeerFlow's pinned
 `config/model_config.py:36` defaults `supports_reasoning_effort` to false, and
 `models/factory.py:283-285` drops the configured effort unless that flag is true;
 the read-back asserts the flag as well. These source-verified repairs supersede
@@ -176,8 +187,9 @@ installation integrity, native acceptance paths and execution boundaries.
 Sources include both SDK provider pages and the skills guide, both consumers'
 config implementations, the gateway's alias parser and effort clamp, and
 Harbor's native adapters, verifier/result model and validator. The live call,
-gateway wire effort and raw SDK/app-server/Collector modalities remain explicit
-acceptance items; version checks and ATIF validity do not substitute for them.
+gateway metadata and raw SDK/app-server/Collector modalities remain distinct
+acceptance items. Delivered wire effort remains unasserted under default logging;
+version checks and ATIF validity do not substitute for runtime acceptance.
 The next sweep must revisit a released PR #15167, the supplied native telemetry
 corpus and the paired Promptfoo/Harbor verification comparison. No new
 candidate class or service is adopted by this unit.

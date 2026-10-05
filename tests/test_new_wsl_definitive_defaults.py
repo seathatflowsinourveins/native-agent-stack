@@ -1597,6 +1597,14 @@ class InterimPlanChecks(unittest.TestCase):
 
     GATE_LINE = '  interim_acknowledged {slot} || return "$?"\n'
 
+    def test_chrome_privileged_declaration_cannot_drift_from_the_helper(self):
+        def stale(rows):
+            if "prerequisite_steps" in rows["playwright-cli"]:
+                rows["playwright-cli"]["prerequisite_steps"][0]["command"] = "dpkg -i unverified-current.deb"
+        code, out = self.run_check(change_rows=stale)
+        self.assertEqual(code, 1, out)
+        self.assertIn("privileged prerequisite declaration differs", out)
+
     def run_check(self, change_rows=None, change_install=None, change_manifest=None):
         """(exit status, output) of check_plan.py over a scratch copy of the plan and the manifest."""
         with tempfile.TemporaryDirectory() as scratch:

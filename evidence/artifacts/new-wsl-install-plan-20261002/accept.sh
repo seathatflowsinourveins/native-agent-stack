@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Current integration: 112 primary acceptance stages and two additional checks, from the merged 84-row plan.
+# Current integration: 110 primary acceptance stages and two additional checks (112 total), from the merged 84-row plan.
 # Historical 64-row revision ran on 2026-10-02 in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution; the record of that run is private, and its public receipt comes with that distribution's acceptance.
 # Five rows were added after the throwaway run, from the layer consensus of 2026-10-02 (69 foundation rows). The checks of skill-discovery and skill-authoring have not run anywhere; research-skill and credential-custody install nothing and have nothing to check; the fix-wave adds native review checks.
 # On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable after their measurement; like their installation, their checks run only with --only, and as plan rows they have not run anywhere.
@@ -536,9 +536,17 @@ browser_receipts="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acc
 mkdir -p -- "$browser_receipts"
 google-chrome-stable --version > "$browser_receipts/google-chrome-stable.version.txt"
 test -s "$browser_receipts/google-chrome-stable.version.txt"
-test "$(dpkg-query -W -f='"'"'${Version}'"'"' google-chrome-stable)" = 154.0.8037.97-1
+installed_chrome="$(dpkg-query -W -f='"'"'${Version}'"'"' google-chrome-stable)"
+printf '"'"'%s\n'"'"' "$installed_chrome" > "$browser_receipts/google-chrome-stable.package-version.txt"
+dpkg --compare-versions "$installed_chrome" ge 154.0.8037.97-1
 apt-cache policy google-chrome-stable > "$browser_receipts/google-chrome-stable.apt-policy.txt"
-rg -Fq "Signed-By: /etc/apt/keyrings/google-chrome.asc EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796" /etc/apt/sources.list.d/google-chrome.sources
+apt-cache madison google-chrome-stable | awk -F '"'"'|'"'"' -v installed="$installed_chrome" '"'"'
+{ gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2);
+  if ($2 == installed && $3 ~ /https:\/\/dl\.google\.com\/linux\/chrome\/deb\/?[[:space:]]+stable\/main[[:space:]]+amd64[[:space:]]+Packages/) found=1 }
+END { exit !found }'"'"'
+rg -Fq "Signed-By: /etc/apt/keyrings/google-chrome.asc EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796" /etc/apt/sources.list.d/native-stack-google-chrome.sources
+test ! -e /etc/apt/sources.list.d/google-chrome.sources
+test ! -e /etc/apt/sources.list.d/google-chrome.list
 cd "$tool_root/chrome-devtools-mcp-source"
 test "$(git rev-parse HEAD)" = e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df
 browser_run="$(mktemp -d "$browser_receipts/upstream.XXXXXX")"
@@ -554,8 +562,8 @@ native_probe="$(mktemp -d "$native_receipts/clients.XXXXXX")"
 fixture_url="file://$plan_dir/config/chrome-devtools-accept.html"
 cd "$repo_root"
 claude mcp get chrome-devtools > "$native_probe/claude-registration.txt"
-rg -q '"'"'^Command: npx$'"'"' "$native_probe/claude-registration.txt"
-rg -q '"'"'^Args: -y chrome-devtools-mcp@1\.10\.1 --headless --isolated --no-usage-statistics --no-performance-crux$'"'"' "$native_probe/claude-registration.txt"
+rg -q '"'"'^\s*Command: npx$'"'"' "$native_probe/claude-registration.txt"
+rg -q '"'"'^\s*Args: -y chrome-devtools-mcp@1\.10\.1 --headless --isolated --no-usage-statistics --no-performance-crux$'"'"' "$native_probe/claude-registration.txt"
 codex mcp get chrome-devtools --json > "$native_probe/codex-registration.json"
 jq -e '"'"'.transport.type == "stdio" and .transport.command == "npx" and .transport.args == ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"]'"'"' "$native_probe/codex-registration.json" >/dev/null
 prompt="Use only the configured chrome-devtools MCP server for this browser acceptance. Call navigate_page to $fixture_url. Then call take_snapshot and list_console_messages for that page (use its pageId when returned). The title must be NativeStack Chrome MCP acceptance and the console must include native-stack-chrome-devtools-ready. Report failure if a required call fails. Do not substitute shell tools, file-reading tools, another browser server or another browser registration."
@@ -994,6 +1002,7 @@ curl -fsS http://127.0.0.1:21090/api/v1/rules | jq -e '\''any(.data.groups[]; .n
     after_sign_in)
       local destination_rc=0
       python3 "$config_root/observability_config.py" alerting-ready --config-root "$config_root" --source-root "$plan_dir/config" >/dev/null || destination_rc=$?
+      if [[ "$destination_rc" == 78 ]]; then printf 'alerting | %s | needs_user (78)\n' "$stage"; return; fi
       if [[ "$destination_rc" == 3 ]]; then skipped alerting; return; fi
       if [[ "$destination_rc" != 0 ]]; then failed=1; printf "alerting | %s | %s\n" "$stage" "$destination_rc"; return; fi
       # Kind: smoke; Source: https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/cli/alert_add.go#L46
@@ -1650,7 +1659,7 @@ printf '"'"'%s\n'"'"' "$claude_base" "$claude_head" "$gpt_base" "$gpt_head" > "$
 codex exec review --commit "$claude_head" -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' -c '"'"'sandbox_mode="read-only"'"'"' --ephemeral --json -o "$run_dir/gpt-review.txt" > "$run_dir/gpt-review.jsonl" 2> "$run_dir/gpt-review.stderr" </dev/null
 git diff "$gpt_base" "$gpt_head" > "$run_dir/gpt-authored.diff"
 test -s "$run_dir/gpt-authored.diff"
-claude -p --model opus --effort max --permission-mode plan --max-turns 14 --output-format stream-json --verbose "Read the GPT-authored diff at $run_dir/gpt-authored.diff and review it read-only; report file:line correctness findings. The immutable base is $gpt_base and head is $gpt_head. Read the original repository files for each finding. Do not edit or publish." > "$run_dir/claude-review.jsonl" 2> "$run_dir/claude-review.stderr" </dev/null
+claude -p --model opus --effort max --permission-mode plan --max-turns 14 --output-format stream-json --verbose "Review the GPT-authored diff supplied on stdin read-only; report file:line correctness findings. The immutable base is $gpt_base and head is $gpt_head. Read the original repository files for each finding. Do not edit or publish." > "$run_dir/claude-review.jsonl" 2> "$run_dir/claude-review.stderr" < "$run_dir/gpt-authored.diff"
 git status --porcelain=v1 -z > "$run_dir/status-after"
 cmp -- "$run_dir/status-before" "$run_dir/status-after"
 test -s "$run_dir/gpt-review.txt"
@@ -1961,16 +1970,20 @@ test -s "$HOME/.agents/skills/native-stack-research/SKILL.md"'
       ;;
     after_sign_in)
       # Kind: smoke; Source: https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md#L1658
-      check research-harnesses smoke 'out="$(bash "$config_root/gpt-researcher.sh" "Ubuntu 26.04 WSL news this month")"
+      check research-harnesses smoke 'gptr_started="$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)"
+out="$(bash "$config_root/gpt-researcher.sh" "Ubuntu 26.04 WSL news this month")"
+gptr_finished="$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)"
 grep -q "^Report written to '"'"'outputs/" <<<"$out"
 run="$(sed -n '"'"'s/^run directory: //p'"'"' <<<"$out")"
 refs="$(awk '"'"'/^#+ *References/{f=1} f'"'"' "$run"/outputs/*.md | grep -oE '"'"'https?://[^) >]+'"'"' | sort -u | wc -l)"
 [[ "$refs" -ge 5 ]]
-python3 "$config_root/gateway-effort-accept.py" "gptr-${run##*/}"
+python3 "$config_root/gateway-effort-accept.py" "gptr-${run##*/}" "$gptr_started" "$gptr_finished"
+deer_started="$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)"
 deer_out="$(bash "$config_root/deer-flow-research.sh" "Research Ubuntu 26.04 WSL news this month; return a short answer with primary source URLs.")"
+deer_finished="$(date -u +%Y-%m-%dT%H:%M:%S.%NZ)"
 deer_run="$(sed -n '"'"'s/^run directory: //p'"'"' <<<"$deer_out")"
 [[ -d "$deer_run" ]]
-python3 "$config_root/gateway-effort-accept.py" "deerflow-${deer_run##*/}"
+python3 "$config_root/gateway-effort-accept.py" "deerflow-${deer_run##*/}" "$deer_started" "$deer_finished"
 # Both gatherers are exercised by each fresh native session, with actual outputs observed outside it.
 state="${XDG_STATE_HOME:-$HOME/.local/state}"
 install -d -m 0700 -- "$state/native-agent-stack/research/client-checks"

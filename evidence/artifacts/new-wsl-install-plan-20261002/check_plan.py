@@ -289,14 +289,22 @@ def browser_contract(by_slot, install_funcs, bad):
             or not any(step.get("name") == "chrome_devtools_linux_chrome"
                        and step.get("needs", {}).get("sudo") is True for step in steps)
             or "sudo apt-get install" not in helper
-            or "apt_release_version google-chrome-stable 154.0.8037.97" not in helper
+            or "sudo apt-get install -y --no-install-recommends google-chrome-stable ||" not in helper
             or "--with-colons --show-keys" not in helper
             or "Signed-By: /etc/apt/keyrings/google-chrome.asc EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796" not in helper
             or "chrome_devtools_linux_chrome ||" not in install_funcs.get("playwright-cli", "")):
         bad("playwright-cli", "Linux-side Google Chrome requires a declared and invoked privileged prerequisite")
+    if (len(steps) != 1 or steps[0].get("command") != "chrome_devtools_linux_chrome"
+            or steps[0].get("program") != helper):
+        bad("playwright-cli", "privileged prerequisite declaration differs from the actual Chrome helper")
+    if ("native-stack-google-chrome.sources" not in helper or 'repo_add_once="false"' not in helper
+            or "google-chrome-stable=$" in helper):
+        bad("playwright-cli", "current stable must use the separate restricted source with package repo creation disabled")
     post = row.get("acceptance", {}).get("post_install", {})
     if (post.get("kind") != "upstream tests" or "npm run test:no-build -- tests/index.test.ts" not in post.get("command", "")
-            or "google-chrome-stable --version >" not in post.get("command", "")):
+            or "google-chrome-stable --version >" not in post.get("command", "")
+            or 'dpkg --compare-versions "$installed_chrome" ge 154.0.8037.97-1' not in post.get("command", "")
+            or "apt-cache madison google-chrome-stable" not in post.get("command", "")):
         bad("playwright-cli", "unchanged upstream browser tests and the installed Chrome version record are required")
     native = row.get("acceptance", {}).get("after_sign_in", {})
     if (not native.get("needs_user")

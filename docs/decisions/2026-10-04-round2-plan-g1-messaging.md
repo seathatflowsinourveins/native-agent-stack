@@ -212,7 +212,13 @@ luna, hcom send -b @luna -- hi, uvx hcom kill luna and uvx hcom config all
 returned No rewrite for the command. The controls git push and git status
 returned rtk git push and rtk git status. RTK rewrites none of the hcom or
 uvx-hcom commands this deny set forbids, so that Codex hook cannot bypass them.
-The measured input is rtk-hcom-interaction-20261005.md supplied with this repair.
+The coordinator's historical observations, including the five no-rewrite
+probes and two git controls, are transcribed in
+[the sanitized source receipt](../../evidence/artifacts/final-architecture-round2-20261004/repair-round2-sources-20261005.json).
+This is supplied measurement evidence; this repair did not rerun the probes.
 PR #705's trust-tool guard refinement is a separate owner handoff; this repair
-keeps hcom-deny.rules byte-identical. The launch verbs above remain documented
-limits of the existing posture; extending the forbidden set needs its owner.
+preserves every executable pattern and match example in hcom-deny.rules. The
+second repair narrows its comments and explanatory strings to the documented
+limits and always refreshes the plan-owned copied .rules source. Operator-owned
+client-target policy keeps the adapter's existing conflict handling. Extending
+the forbidden set remains with its owner.

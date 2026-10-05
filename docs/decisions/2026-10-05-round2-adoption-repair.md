@@ -3,8 +3,11 @@
 This PR repairs the clean-install and acceptance contracts for the six wave-5
 owners. It serves the north-star action of reproducible native research and
 build coordination for complex systems before the separately authorized broker
-paper lane. The user pins this one repair round to GPT Sol at max; that pin is
-preserved. The 39 verified findings and all dispositions are recorded under
+paper lane. The coordinator's REPAIR-713.md brief pins this repair to GPT Sol
+at max; its exact Model field is retained in
+[the source receipt](../../evidence/artifacts/final-architecture-round2-20261004/repair-round2-sources-20261005.json).
+This is a coordinator launch pin, not an original user-record quotation.
+The 39 verified findings and all dispositions are recorded under
 `repair_round` in
 [the integration ledger](../../evidence/artifacts/final-architecture-round2-20261004/integration-resolutions.json).
 The four refuted proposals are not adopted.
@@ -48,12 +51,17 @@ The conflicting research and topology verdicts are reconciled through main
 #637's [published OmniRoute 3.8.51 record](2026-10-03-omniroute-3851-pin.md).
 Smart/strategic GPT Researcher and DeerFlow use plain `cx/gpt-6.1-sol` at xhigh;
 FAST retains the high suffix. OpenHands uses the supported xhigh suffix.
-Native Codex supplies Sol/max. The acceptance predicate joins each fresh run to
-native call logs and requires the actual serialized provider model and effort,
-successful calls and no embeddings route. A model label alone cannot qualify
-the binding.
+Native Codex supplies Sol/max. The second repair joins each fresh run with
+`x-omniroute-session-id` and its time window to default native call-list metadata.
+It asserts successful logged model routes, without reading pipeline bodies or
+claiming delivered wire effort. The API has no default effort field, including
+for the conditional encrypted-reasoning columns present in the DB. Source-based
+expected high/xhigh effort is explicitly separate. An in-memory window/model
+fallback cannot prove attribution or whole-run zero embeddings. Persisted rows
+older than the run start end pagination; prepended in-memory rows do not.
 [Reasoning aliases](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts),
-[actual prepared provider body](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/utils/providerRequestLogging.ts#L269).
+[default summary fields](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/usage/callLogs.ts#L472),
+[pipeline-capture default](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/db/migrations/014_unified_log_artifacts.sql#L7).
 
 Source review found a second effort path: DeerFlow v2.1.0 defaults
 `supports_reasoning_effort` to false and removes the configured effort in that
@@ -64,8 +72,13 @@ configuration read-back asserts it before live acceptance.
 
 Chrome installation uses Google's signed HTTPS apt repository with active
 primary fingerprint `EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796`, restricted
-Signed-By and exact `google-chrome-stable=154.0.8037.97-1` selection from verified
-metadata. A missing pin fails. The pinned Chrome MCP npm artifact's downloaded
+Signed-By and current-stable installation from verified repository metadata.
+Acceptance checks repository origin plus minimum 154.0.8037.97-1, permits later
+builds and records the installed version. Package postinst source inspection
+requires a separate native-stack-google-chrome.sources and repo_add_once=false
+before installation, with both package-managed source filenames absent. These
+prevent a second, conflicting Signed-By source; no postinst is run by this repair.
+The pinned Chrome MCP npm artifact's downloaded
 SHA256 is recorded alongside its SRI. Both client registrations disable usage
 statistics and CrUX, and acceptance checks both exact argument arrays.
 [Google's published key](https://www.google.com/linuxrepositories/),
@@ -96,12 +109,16 @@ and requires terminal injection and configuration to remain forbidden. G1
 records the per-run hook/hash/allow-list trust and the supplied RTK 0.51.0
 measurement: RTK rewrites none of the commands forbidden by this deny set, so
 its Codex hook cannot bypass them. The separate PR #705 guard refinement stays
-with its owner, and `hcom-deny.rules` remains unchanged.
+with its owner. The second repair narrows the deny file's explanations while
+preserving executable patterns and refreshes only its plan-owned copied source.
 [hcom roundtrip](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/tests/cli_smoke.rs#L330),
 [hcom Codex hook source](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L314),
 [G1 measurement record](2026-10-04-round2-plan-g1-messaging.md#repair-2026-10-05-transport-trust-and-measured-rtk-interaction).
 
-Every `codex exec` and `claude -p` closes stdin. Scanner acceptance exercises a
+Every `codex exec` and `claude -p` has bounded stdin: the cross-family Claude
+review consumes the already-created diff file, and every other invocation closes
+stdin with /dev/null. Its native output must still complete successfully.
+Scanner acceptance exercises a
 known-bad upstream fixture as well as the safe control, and DSPy tests require
 the installed environment's module under safe-path/importlib execution.
 Prerequisite exit 78 is reported as `needs_user`, separately from failure.
@@ -134,10 +151,13 @@ local integration evidence; destination provider/GPU and unchanged upstream
 runtime acceptance remain separate.
 
 The completeness critic accounts for all 39 findings and checks the install,
-authorization, provenance, consumer factory, delivered wire, transport and
+authorization, provenance, consumer factory, gateway observation, transport and
 native-client modalities. Its new missed modality was factory removal of a
 configured effort, now repaired for DeerFlow. The next sweeps are keyed to
 messaging activation/recovery, installation updates and qualification, research
 configuration, skill vetting/removal, and decision-record provenance. Existing
-owner handoffs and the three deferred P3s remain explicit; no new tool selection
-or local model trial is claimed.
+owner handoffs remain explicit. The second repair closes the deny-file wording
+and leaves the independently accepted R2-20 and R2-27 handoffs. Its delta read
+and all eight new findings, three named leftovers, source corrections and checks
+are recorded under repair_round_2 in the ledger. No new tool selection or local
+model trial is claimed.

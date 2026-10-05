@@ -532,20 +532,26 @@ removal check. This builder performs source review and the required structural
 checks, with no new browser or model trial.
 
 The privileged prerequisite is explicit in the row's `needs.sudo` and
-`prerequisite_steps`: download and `dpkg -i` the upstream WSL Linux-side
-`google-chrome-stable_current_amd64.deb`. If its dependencies are unmet, the
-helper uses Ubuntu's documented `apt-get -f install -y` repair, outside a
-command string. That repair is OS integration, not a candidate upstream test or
-an observed Ubuntu 26.04 pass. Chrome's upstream route has no immutable browser
-version or published checksum. `post_install` records the installed Chrome
-version and a separately labelled local archive SHA256 in the private acceptance
-state. The npm archive is checked against its published SHA512 before warming
-the exact release's npx cache.
+`prerequisite_steps`: the declared program must equal the actual helper.
+The helper verifies Google's active primary key fingerprint, installs its public
+keyring and a restricted Signed-By in native-stack-google-chrome.sources, and
+uses apt-get update/install for current stable and its dependencies. It sets
+repo_add_once=false before installing, preserves other defaults and requires
+the package-managed google-chrome.sources and google-chrome.list to be absent.
+The digest-verified package postinst recreates its own .sources whenever that
+file exists, even when repo_add_once is false; the separate filename avoids this
+overwrite and a conflicting Signed-By. Existing package sources need operator
+review. The package source and exact postinst locators are in
+[the source receipt](../final-architecture-round2-20261004/repair-round2-sources-20261005.json).
+Both installation and post_install record the installed Chrome version in
+private acceptance state. Acceptance requires minimum 154.0.8037.97-1 and the
+installed-version entry's Google repository origin, permitting later stable
+builds. The MCP package retains its exact npm pin and published SRI check.
 
 `post_install` runs six unchanged upstream test files with the release's own
 `npm run test:no-build` runner. Its preparation follows the release CI:
-submodules, `PUPPETEER_SKIP_DOWNLOAD=true npm ci`, `npx puppeteer browsers install
-chrome`, and `npm run bundle`. CI prepares Chrome for Testing. This row sets the documented
+submodules, `PUPPETEER_SKIP_DOWNLOAD=true npm ci` and `npm run bundle`.
+CI prepares Chrome for Testing. This row sets the documented
 `PUPPETEER_EXECUTABLE_PATH` to the installed Linux-side Google Chrome stable for
 its unchanged tests and also exercises that browser through both native clients. Remaining
 upstream suites and other CI matrix jobs are omitted, not claimed passed.
@@ -558,17 +564,14 @@ with native invocation events; assistant summaries alone cannot pass. Raw
 streams and upstream-test output remain under the private acceptance state,
 outside the checkout. READY requires both stages to return success.
 
-The tagged native CLI commands currently register both clients. The map writer
-can only wire existing template keys; the task's allowed-file boundary excludes
-the two templates that lack this server. The exact map and template additions
-are prepared in [the browser decision](../../../docs/decisions/2026-10-04-round2-plan-g2-browser.md)
-for coordinator integration. Remove the row's direct registration commands when
-the map owns them, so a clean install has one writer. The map boundary is an
-outstanding integration item, not a destination acceptance pass.
+The destination map and its template additions own both registrations. Native
+CLI read-back asserts their exact arguments, accepting the indentation in
+Claude's Command and Args fields. [The browser decision](../../../docs/decisions/2026-10-04-round2-plan-g2-browser.md)
+records the single writer and the destination acceptance still owed.
 
 Sources and scope: [SOURCES.md](SOURCES.md), "Wave 5 browser owner". The npm SRI
-is an upstream checksum; the Chrome archive hash is only the destination's local
-observation. `--no-usage-statistics` does not disable optional CrUX URL lookups;
+is an upstream checksum; browser installation is verified by signed apt metadata.
+`--no-usage-statistics` does not disable optional CrUX URL lookups;
 upstream documents `--no-performance-crux` for that separate choice.
 
 ## Round-2 G4 configuration (2026-10-04)
@@ -580,7 +583,7 @@ execution remains UNRUN; this builder runs repository checks only.
 | Existing owner | Configuration and native acceptance | Remaining input |
 | --- | --- | --- |
 | Promptfoo 0.123.1 | Its Test Agent Skills providers select the host's Claude and Codex executables through `path_to_claude_code_executable` and `codex_path_override`. Native Codex/openai carries Sol/max and its existing login. Post-install also checks both optional SDK dependencies; the existing upstream echo controls and paired skill controls remain. | Native sign-in if absent; the existing gateway A/B template's two exact provider model IDs. |
-| GPT Researcher v3.7.0 and embedded DeerFlow v2.1.0 | Both gatherers use OmniRoute `/v1` with keyless search. On the published 3.8.51 pin, smart/strategic GPT Researcher and DeerFlow request the plain Sol route at xhigh; FAST retains its high alias. DeerFlow enables supports_reasoning_effort so its factory retains the setting. Installed preflight, configuration read-back and per-run delivered provider effort checks qualify these bindings; the fresh native Codex caller uses native Sol/max. | Live cited runs from both gatherers and independent gateway status-200/zero-embeddings observation remain owed. |
+| GPT Researcher v3.7.0 and embedded DeerFlow v2.1.0 | Both gatherers use OmniRoute `/v1` with keyless search and per-run x-omniroute-session-id headers. On 3.8.51, smart/strategic GPT Researcher and DeerFlow request plain Sol/xhigh; FAST retains its high alias. DeerFlow enables supports_reasoning_effort. Preflight/configuration read-back and fresh successful logged Sol routes are asserted. Default call-list metadata exposes no delivered-effort field, so wire effort remains unasserted; pipeline capture remains an operator decision. A window/model fallback cannot prove attribution or whole-run zero embeddings. Native Codex uses native Sol/max. | Live cited gatherer runs and independent gateway metadata observation remain owed. Delivered wire effort is not certified by this recipe. |
 | OmniRoute 3.8.51 (selected recipe) | The recipe uses the published npm package with its registry SHA512 integrity, upstream doctor/readiness acceptance and a fresh pool/fallback turn. The client-config map renders Sol/xhigh. [The topology record](config/gpt-gateway-topology.json) assigns Sol/max to native Codex until a release includes PR #15167. Historical canary assets remain for historical tests and are not installed by this row. #637 already qualified the stack's 3.8.51 pin; the architecture now cites that existing pin. | Provider sign-in if absent; review a differing existing destination service unit. Start the installed user unit before service-health acceptance. |
 | Harbor 0.23.0 | Verify the published wheel SHA256 and run unchanged upstream ATIF unit tests. Retain the hello-user oracle/nop READY gate. Add [the worker telemetry-contract recipe](config/harbor-worker-telemetry-contract.md), using Harbor's native job runner and trajectory validator. | A maintained, commit-pinned native-verifier task corpus, public Harbor job config and container-reachable provider/Collector inputs. The recipe reports `needs_user` while these are absent. |
 

@@ -80,11 +80,11 @@ fetch_verified() {
   mv -- "$temporary" "$target"
 }
 copy_config() {
-  # Planned. Preserve existing operator configuration; never overwrite it on rerun.
+  # Refresh plan-owned helpers and reviewed rules; preserve operator configuration.
   local name="$1"
   mkdir -p -- "$config_root"
   case "$name" in
-    *.sh|*.py|*.service|omniroute-canary-evidence.json)
+    *.sh|*.py|*.rules|*.service|omniroute-canary-evidence.json)
       if ! cmp -s -- "$plan_dir/config/$name" "$config_root/$name"; then
         printf 'Updating plan-owned %s.\n' "$name" >&2
         install -m 0600 -- "$plan_dir/config/$name" "$config_root/$name"
@@ -358,7 +358,15 @@ chrome_devtools_linux_chrome() {
   # Source: https://www.google.com/linuxrepositories/ (active primary fingerprint).
   # Source: https://manpages.debian.org/bookworm/apt/sources.list.5.en.html (Signed-By).
   # Privilege belongs to this declared prerequisite; apt verifies repository signatures.
-  local key="$tool_root/chrome-devtools-mcp/google-chrome.asc" key_home version
+  # Package source: google-chrome-stable_154.0.8037.97-1_amd64.deb:postinst:429-466.
+  # Sanitized source receipt: ../final-architecture-round2-20261004/repair-round2-sources-20261005.json.
+  # Its postinst rewrites google-chrome.sources whenever it exists, even with
+  # repo_add_once=false. Use a separate source and disable its initial repo add.
+  if [[ -e /etc/apt/sources.list.d/google-chrome.sources || -e /etc/apt/sources.list.d/google-chrome.list ]]; then
+    printf 'needs_user: review existing package-managed Chrome sources before using the fingerprint-restricted source.\n' >&2
+    return 78
+  fi
+  local key="$tool_root/chrome-devtools-mcp/google-chrome.asc" key_home
   curl --proto '=https' --tlsv1.2 -fL https://dl.google.com/linux/linux_signing_key.pub -o "$key" || return "$?"
   key_home="$(mktemp -d)" || return "$?"
   if ! gpg --batch --no-options --homedir "$key_home" --with-colons --show-keys "$key" | \
@@ -370,7 +378,7 @@ chrome_devtools_linux_chrome() {
   rm -rf -- "$key_home"
   sudo install -m 0755 -d /etc/apt/keyrings || return "$?"
   sudo install -m 0644 -- "$key" /etc/apt/keyrings/google-chrome.asc || return "$?"
-  sudo tee /etc/apt/sources.list.d/google-chrome.sources >/dev/null <<'GOOGLE'
+  sudo tee /etc/apt/sources.list.d/native-stack-google-chrome.sources >/dev/null <<'GOOGLE' || return "$?"
 Types: deb
 URIs: https://dl.google.com/linux/chrome/deb/
 Suites: stable
@@ -378,11 +386,25 @@ Components: main
 Architectures: amd64
 Signed-By: /etc/apt/keyrings/google-chrome.asc EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796
 GOOGLE
+  # Preserve other defaults; suppress the package's additional apt source on
+  # first install and upgrades. Do this before apt can execute its postinst.
+  if [[ ! -e /etc/default/google-chrome ]]; then
+    sudo install -m 0644 /dev/null /etc/default/google-chrome || return "$?"
+  fi
+  sudo sed -i '/^[[:space:]]*repo_add_once=/d' /etc/default/google-chrome || return "$?"
+  printf 'repo_add_once="false"\n' | sudo tee -a /etc/default/google-chrome >/dev/null || return "$?"
   sudo apt-get update || return "$?"
   # Source: https://dl.google.com/linux/chrome/deb/dists/stable/main/binary-amd64/Packages
-  version="$(apt_release_version google-chrome-stable 154.0.8037.97)" || return "$?"
-  sudo apt-get install -y --no-install-recommends "google-chrome-stable=$version" || return "$?"
-  google-chrome-stable --version >/dev/null || return "$?"
+  sudo apt-get install -y --no-install-recommends google-chrome-stable || return "$?"
+  [[ ! -e /etc/apt/sources.list.d/google-chrome.sources && ! -e /etc/apt/sources.list.d/google-chrome.list ]] || return 1
+  (
+    umask 077
+    local receipts="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/chrome-devtools"
+    mkdir -p -- "$receipts" || exit "$?"
+    dpkg-query -W -f='${Version}\n' google-chrome-stable > "$receipts/google-chrome-stable.package-version.txt" || exit "$?"
+    google-chrome-stable --version > "$receipts/google-chrome-stable.version.txt" || exit "$?"
+    apt-cache policy google-chrome-stable > "$receipts/google-chrome-stable.apt-policy.txt"
+  ) || return "$?"
 }
 
 playwright-cli() {

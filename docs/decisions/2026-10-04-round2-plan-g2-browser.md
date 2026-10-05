@@ -41,10 +41,23 @@ The upstream WSL section requires Linux-side stable amd64 Chrome. Repair
 instead of an unchecked current .deb. The helper checks the active primary
 fingerprint EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796, restricts Signed-By to
 that fingerprint and its legitimate signing subkeys, updates authenticated apt
-metadata, and installs exactly google-chrome-stable=154.0.8037.97-1.
+metadata, and installs current stable without an exact browser-build pin.
 [Published package metadata](https://dl.google.com/linux/chrome/deb/dists/stable/main/binary-amd64/Packages)
-held that version on 2026-10-05. If it is no longer available, fail clearly;
-never fall back to the current package. Privilege remains in the declared helper.
+held only 154.0.8037.97-1 on 2026-10-05. The installed browser version goes into
+the host receipt; acceptance requires that minimum version and an installed-version
+entry from Google's repository, so later stable updates qualify. This restores
+the agreed owner default's current-stable wording in consensus.json and its
+generated definitive manifest. Privilege remains in the declared helper.
+
+The digest-verified package's postinst writes google-chrome.sources with its
+own keyring and removes or comments google-chrome.list. Setting repo_add_once=false
+alone does not protect an existing google-chrome.sources: the postinst recreates
+it. The helper therefore owns native-stack-google-chrome.sources, disables
+repo_add_once before apt installation, preserves other defaults, and requires
+both package-managed filenames to be absent. Existing files need operator review;
+they are never silently combined with a conflicting Signed-By. The exact package
+URL, published digest and postinst:429-466 source locators are in
+[the sanitized source receipt](../../evidence/artifacts/final-architecture-round2-20261004/repair-round2-sources-20261005.json).
 No package installation ran in this repair. Node 24.21.0 satisfies the MCP pin.
 The downloaded MCP artifact's SHA256 is
 012cbcf6e832d4f6709dad0c21d7bef17089e94adee9cf33179d15ea0a9adf2b;

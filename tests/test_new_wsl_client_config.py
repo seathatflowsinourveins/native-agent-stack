@@ -84,20 +84,131 @@ class Round2RepairIntegrationTests(unittest.TestCase):
                 else:
                     self.assertEqual(after["crossSessionInbound"], inbound)
 
-    def test_gateway_alias_label_cannot_replace_delivered_wire_effort(self):
+    def test_gateway_default_metadata_is_observed_without_pipeline_capture(self):
         gate = self.source_module("gateway-effort-accept.py")
-        rows = [{"id": "synthetic-call", "status": 200, "path": "/v1/responses",
-                 "requestedModel": "cx/gpt-6.1-sol"}]
-        wire = {"pipelinePayloads": {"providerRequest": {
-            "model": "gpt-6.1-sol", "reasoning": {"effort": "xhigh"}}}}
-        self.assertEqual(gate.delivered_efforts(rows, lambda _: wire), {"xhigh"})
-        for effort in ("max", "high", None):
-            with self.subTest(effort=effort):
-                wire["pipelinePayloads"]["providerRequest"]["reasoning"]["effort"] = effort
-                with self.assertRaisesRegex(ValueError, "delivered"):
-                    gate.delivered_efforts(rows, lambda _: wire)
+        rows = [{"id": "synthetic-call", "status": 200, "path": "/v1/chat/completions",
+                 "model": "gpt-6.1-sol", "requestedModel": "cx/gpt-6.1-sol"}]
+        self.assertEqual(gate.observed_routes(rows), {"cx/gpt-6.1-sol"})
+        for field, value in (("status", 503), ("path", "/v1/embeddings"),
+                             ("model", "another-model"), ("requestedModel", "cx/gpt-6.1-sol-max")):
+            with self.subTest(field=field), self.assertRaises(ValueError):
+                gate.observed_routes([dict(rows[0], **{field: value})])
         with self.assertRaisesRegex(ValueError, "no call log"):
-            gate.delivered_efforts([], lambda _: wire)
+            gate.observed_routes([])
+
+    def test_gateway_paging_stops_at_old_persisted_rows_and_joins_the_run(self):
+        gate = self.source_module("gateway-effort-accept.py")
+        started, finished = "2026-10-05T04:00:00+00:00", "2026-10-05T04:01:00+00:00"
+        fresh = {"id": "fresh", "timestamp": "2026-10-05T04:00:20Z", "sessionTag": "synthetic-run",
+                 "status": 200, "path": "/v1/chat/completions", "model": "gpt-6.1-sol",
+                 "requestedModel": "cx/gpt-6.1-sol"}
+        # An old active row heads the native API list; only persisted rows give
+        # the paging cutoff. Retention may be far larger than 6,400 entries.
+        active = dict(fresh, id="active", active=True, timestamp="2026-10-04T00:00:00Z")
+        page = [active, fresh] + [dict(fresh, id=f"other-{i}", sessionTag="other") for i in range(99)]
+        old = dict(fresh, id="old", timestamp="2026-10-05T03:59:59Z")
+        with mock.patch.object(gate, "get_json", side_effect=[page, [old]]) as native:
+            rows, join = gate.run_rows("synthetic-run", started, finished)
+        self.assertEqual((rows, join), ([fresh], "session"))
+        self.assertEqual(native.call_count, 2)
+        with mock.patch.object(gate, "get_json", return_value=[dict(fresh, sessionTag=None)]):
+            rows, join = gate.run_rows("synthetic-run", started, finished)
+        self.assertEqual(join, "time-window-plus-model")
+        with mock.patch.object(gate, "get_json", return_value=[old]):
+            with self.assertRaisesRegex(ValueError, "no call log"):
+                gate.observed_routes(gate.run_rows("synthetic-run", started, finished)[0])
+
+    def test_plan_owned_rules_refresh_without_overwriting_operator_configuration(self):
+        spec = importlib.util.spec_from_file_location("plan_checker", PLAN / "check_plan.py")
+        checker = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(checker)
+        body = checker.functions((PLAN / "install.sh").read_text())["copy_config"]
+        with tempfile.TemporaryDirectory() as scratch:
+            config = Path(scratch)
+            rules = config / "hcom-deny.rules"
+            rules.write_text("# stale copied deny policy\n")
+            operator = config / "deer-flow-config.yaml"
+            operator.write_text("# operator choice\n")
+            done = subprocess.run(["bash", "-euo", "pipefail", "-c",
+                                   "copy_config() {\n" + body + "\n}\n"
+                                   "copy_config hcom-deny.rules\ncopy_config deer-flow-config.yaml"],
+                                  env={"PATH": os.environ["PATH"], "config_root": str(config),
+                                       "plan_dir": str(PLAN)}, capture_output=True, text=True)
+            self.assertEqual(done.returncode, 0, done.stderr)
+            self.assertEqual(rules.read_bytes(), (PLAN / "config/hcom-deny.rules").read_bytes())
+            self.assertEqual(operator.read_text(), "# operator choice\n")
+
+    def test_alerting_without_destination_reports_needs_user(self):
+        spec = importlib.util.spec_from_file_location("plan_checker", PLAN / "check_plan.py")
+        checker = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(checker)
+        body = checker.functions((PLAN / "accept.sh").read_text())["alerting"]
+        script = ("stage=after_sign_in; failed=0; config_root=unused; plan_dir=unused\n"
+                  "python3() { return 78; }\n"
+                  "check() { echo 'unexpected delivery check'; return 1; }\n"
+                  "skipped() { echo skipped; }\nalerting() {\n" + body + "\n}\n"
+                  "alerting\nprintf 'failed=%s\\n' \"$failed\"\n")
+        done = subprocess.run(["bash", "-euo", "pipefail", "-c", script], capture_output=True, text=True)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        self.assertIn("alerting | after_sign_in | needs_user (78)", done.stdout)
+        self.assertIn("failed=0", done.stdout)
+
+    def test_claude_registration_accepts_the_native_indented_fields(self):
+        spec = importlib.util.spec_from_file_location("plan_checker", PLAN / "check_plan.py")
+        checker = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(checker)
+        body = checker.functions((PLAN / "accept.sh").read_text())["playwright-cli"]
+        program, = [command for stage, _, _, command in checker.checks_of(body) if stage == "after_sign_in"]
+        checks = "\n".join(line for line in program.splitlines() if "rg -q" in line and "claude-registration.txt" in line)
+        with tempfile.TemporaryDirectory() as scratch:
+            path = Path(scratch) / "claude-registration.txt"
+            for package, expected in (("1.10.1", 0), ("1.10.0", 1)):
+                path.write_text("  Command: npx\n  Args: -y chrome-devtools-mcp@" + package +
+                                " --headless --isolated --no-usage-statistics --no-performance-crux\n")
+                done = subprocess.run(["bash", "-euo", "pipefail", "-c", checks],
+                                      env={"PATH": os.environ["PATH"], "native_probe": scratch}, capture_output=True)
+                self.assertEqual(done.returncode, expected)
+
+    def test_cross_family_review_receives_the_bounded_diff_on_stdin(self):
+        line, = [line for line in (PLAN / "accept.sh").read_text().splitlines()
+                 if line.startswith("claude -p --model opus --effort max --permission-mode plan")]
+        with tempfile.TemporaryDirectory() as scratch:
+            path = Path(scratch)
+            diff = "diff --git a/example b/example\n-old\n+new\n"
+            (path / "gpt-authored.diff").write_text(diff)
+            script = 'claude() { cat > "$run_dir/seen.diff"; }\n' + line
+            done = subprocess.run(["bash", "-euo", "pipefail", "-c", script],
+                                  env={"PATH": os.environ["PATH"], "run_dir": scratch,
+                                       "gpt_base": "synthetic-base", "gpt_head": "synthetic-head"}, capture_output=True)
+            self.assertEqual(done.returncode, 0)
+            self.assertEqual((path / "seen.diff").read_text(), diff)
+
+    def test_chrome_acceptance_allows_updates_and_requires_the_google_origin(self):
+        spec = importlib.util.spec_from_file_location("plan_checker", PLAN / "check_plan.py")
+        checker = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(checker)
+        body = checker.functions((PLAN / "accept.sh").read_text())["playwright-cli"]
+        program, = [command for stage, _, _, command in checker.checks_of(body) if stage == "post_install"]
+        prefix = program.split('cd "$tool_root/chrome-devtools-mcp-source"', 1)[0]
+        with tempfile.TemporaryDirectory() as scratch:
+            path = Path(scratch)
+            sources = path / "sources"
+            sources.mkdir()
+            (sources / "native-stack-google-chrome.sources").write_text(
+                "Signed-By: /etc/apt/keyrings/google-chrome.asc EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796\n")
+            prefix = prefix.replace("/etc/apt/sources.list.d/", str(sources) + "/")
+            stubs = ('google-chrome-stable() { printf "Chrome %s\\n" "$build"; }\n'
+                     'dpkg-query() { printf "%s" "$build"; }\n'
+                     'apt-cache() { printf "google-chrome-stable | %s | %s stable/main amd64 Packages\\n" "$build" "$origin"; }\n')
+            for build, origin, expected in (("154.0.8037.97-1", "https://dl.google.com/linux/chrome/deb/", 0),
+                                            ("155.0.9000.1-1", "https://dl.google.com/linux/chrome/deb/", 0),
+                                            ("153.0.1.1-1", "https://dl.google.com/linux/chrome/deb/", 1),
+                                            ("155.0.9000.1-1", "https://other.invalid/chrome/deb/", 1)):
+                with self.subTest(build=build, origin=origin):
+                    done = subprocess.run(["bash", "-euo", "pipefail", "-c", stubs + prefix],
+                                          env={"PATH": os.environ["PATH"], "XDG_STATE_HOME": scratch,
+                                               "build": build, "origin": origin}, capture_output=True, text=True)
+                    self.assertEqual(done.returncode, expected, done.stderr)
 
     def test_harbor_openhands_adapter_must_match_the_installed_producer(self):
         text = (PLAN / "config/harbor-worker-telemetry-accept.sh").read_text()

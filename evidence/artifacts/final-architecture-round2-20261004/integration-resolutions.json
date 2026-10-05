@@ -26,7 +26,7 @@
       "file": "catalogs/landscape/upstream-snapshot.json",
       "builder": "G2",
       "resolution": "Preserve the base bytes. The requested central Chrome landscape registration and host-currency reconciliation belong to the currency PR.",
-      "source": "this PR:tests/test_stack_lifecycle.py:21; this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:244"
+      "source": "this PR:tests/test_stack_lifecycle.py:21; this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:257"
     },
     {
       "file": "adoption/new-wsl/client-config-map.json",
@@ -38,7 +38,7 @@
       "file": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
       "builder": "G2",
       "resolution": "Remove the two fallback CLI registration commands now that the destination map owns the client registrations; remove the matching JSON commands. Preserve the native package and browser preparation.",
-      "source": "this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:113; ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df:docs/client-configurations.md:71,109"
+      "source": "this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:126; ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df:docs/client-configurations.md:71,109"
     },
     {
       "file": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
@@ -86,7 +86,7 @@
       "file": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
       "builder": "G2",
       "resolution": "Replace stale installer-registration checks with strict validation of the destination map and both native additions; refuse duplicate CLI writers. Numeric summaries remain computed from actual rows.",
-      "source": "this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:113; ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df:docs/client-configurations.md:71,109"
+      "source": "this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:126; ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df:docs/client-configurations.md:71,109"
     },
     {
       "file": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
@@ -104,7 +104,7 @@
       "file": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
       "builder": "G2",
       "resolution": "Regenerate tables with the native --check --markdown command and update the four-piece browser increment: 397 pieces, 357 wired, 24 unwired and 16 authorization pieces.",
-      "source": "this PR:docs/decisions/2026-10-04-final-architecture-round2.md:24; this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:127"
+      "source": "this PR:docs/decisions/2026-10-04-final-architecture-round2.md:24; this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:140"
     },
     {
       "file": "tests/test_new_wsl_client_config.py",
@@ -116,7 +116,7 @@
       "file": "evidence/artifacts/new-wsl-install-plan-20261002/config/harbor-worker-telemetry-contract.md",
       "builder": "G4",
       "resolution": "Integrate Harbor's telemetry qualification unchanged. Record the unreconciled producer dependency: the existing worker recipe is 1.50.1, while the fixed telemetry verdict requires OpenHands SDK 1.51.0. Do not change the unowned worker pin. Superseded by repair R2-04: telemetry checks the installed producer, leaving future 1.51.0 qualification to its owner.",
-      "source": "this PR:docs/decisions/2026-10-04-final-architecture-round2.md:37; this PR:docs/decisions/2026-10-04-round2-plan-g4-config.md:221"
+      "source": "this PR:docs/decisions/2026-10-04-final-architecture-round2.md:37; this PR:docs/decisions/2026-10-04-round2-plan-g4-config.md:233"
     }
   ],
   "tests_changed": [
@@ -202,7 +202,7 @@
       "test": "tests.test_new_wsl_client_config.AuthorizationTests.test_the_default_render_has_none_of_the_authorization_keys_and_the_option_adds_those_and_nothing_else",
       "old": "Four main Codex server approvals and their exact leaf delta",
       "new": "Five, adding only Chrome; retain exact default absence, complete leaf deltas, unchanged shared values and deny lists",
-      "justification": "this PR:docs/decisions/2026-10-04-final-architecture-round2.md:24; this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:137"
+      "justification": "this PR:docs/decisions/2026-10-04-final-architecture-round2.md:24; this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:150"
     },
     {
       "test": "tests.test_new_wsl_handbook.NewWslHandbookTests.test_inventory_holds_all_104_manifest_rows_the_ten_added_the_six_consensus_and_the_fourteen_owner_ones",
@@ -232,7 +232,7 @@
       "test": "tests.test_new_wsl_client_config.AuthorizationTests shared expected fixtures",
       "old": "15 authorization pieces; no Chrome approval identity or label",
       "new": "16 pieces; add the exact fixed Chrome owner and label; preserve the same two absent-owner negative controls after index insertion",
-      "justification": "this PR:docs/decisions/2026-10-04-final-architecture-round2.md:24; this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:137"
+      "justification": "this PR:docs/decisions/2026-10-04-final-architecture-round2.md:24; this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:150"
     }
   ],
   "checks": {
@@ -428,7 +428,6 @@
     "hcom idle delivery into plain Claude remains unqualified under the no-wrapper posture; the documented start/listen route remains the implemented path.",
     "The coordinator owns staging and committing this repaired working tree. This repair writes neither the git index nor a commit.",
     "Scholarly retrievers and OPENALEX_EMAIL are explicitly deferred to the research-harnesses owner to reconcile the conflicting scholarly/search verdicts and its env-i keyless-search contract; DuckDuckGo remains operative.",
-    "R2-19: The launch-verb limits and overbroad claim are corrected in G1. The deny-file header remains unchanged because this job explicitly forbids changing hcom-deny.rules; its posture owner must reconcile that header or extend the policy.",
     "R2-20: Reviewed transitive locks, uv cooldown resolution, OmniRoute install-script sequencing/signature qualification and source-based conformance execution require their owners’ supported-route qualification. Changing these executable installation contracts without that evidence is not a safe local repair; top-level pins and current supported routes are preserved.",
     "R2-27: Both landscape phrases are annotated as unverified coordinator/verifier glosses while preserving the original verifier text. The cited user memory record could not be read under the never-approval policy, and the second quotation has no verified original record. No review-supplied replacement is promoted to a user quotation; exact-word provenance closure remains owed."
   ],
@@ -491,7 +490,7 @@
     "job": "r2-repair",
     "date_utc": "2026-10-05",
     "rounds": 1,
-    "model": "GPT Sol at max (user pin preserved)",
+    "model": "GPT Sol at max, per coordinator REPAIR-713.md Model field; this PR:evidence/artifacts/final-architecture-round2-20261004/repair-round2-sources-20261005.json:coordinator_brief",
     "trigger": "Independent four-lens Claude synthesis for PR #713, including the existing F9 owner-list repair.",
     "north_star_action": "Provide reproducible NativeStack2604 configuration and acceptance for complex systems and the north-star R&D before the separately authorized broker paper lane.",
     "inputs": [
@@ -530,7 +529,8 @@
       {
         "id": "R2-05",
         "severity": "P2",
-        "change": "Use honest gateway Sol/xhigh research routes, enable DeerFlow supports_reasoning_effort, and assert delivered provider effort from per-run native call logs. Use the supported xhigh alias for OpenHands."
+        "change": "Use honest gateway Sol/xhigh research routes, enable DeerFlow supports_reasoning_effort, and assert delivered provider effort from per-run native call logs. Use the supported xhigh alias for OpenHands.",
+        "amended_by": "repair_round_2; original first-repair description retained as history"
       },
       {
         "id": "R2-06",
@@ -575,7 +575,8 @@
       {
         "id": "R2-14",
         "severity": "P2",
-        "change": "Close stdin for every codex exec and claude -p in accept.sh; pass the review diff by an explicit file path in the prompt."
+        "change": "Close stdin for every codex exec and claude -p in accept.sh; pass the review diff by an explicit file path in the prompt.",
+        "amended_by": "repair_round_2; original first-repair description retained as history"
       },
       {
         "id": "R2-15",
@@ -645,12 +646,14 @@
       {
         "id": "R2-31",
         "severity": "P3",
-        "change": "Remove unused Chrome/conformance tarball and Chrome-for-Testing downloads; make the copied hcom rule source the adapter’s consumed input."
+        "change": "Remove unused Chrome/conformance tarball and Chrome-for-Testing downloads; make the copied hcom rule source the adapter’s consumed input.",
+        "amended_by": "repair_round_2; original first-repair description retained as history"
       },
       {
         "id": "R2-32",
         "severity": "P3",
-        "change": "Assert Claude’s native Command and Args against the same exact Chrome registration checked for Codex."
+        "change": "Assert Claude’s native Command and Args against the same exact Chrome registration checked for Codex.",
+        "amended_by": "repair_round_2; original first-repair description retained as history"
       },
       {
         "id": "R2-33",
@@ -670,7 +673,8 @@
       {
         "id": "R2-36",
         "severity": "P3",
-        "change": "Refresh script headers and recipe counts to 84 rows, 63 installed, 183 commands and 112 acceptance entries."
+        "change": "Refresh script headers and recipe counts to 84 rows, 63 installed, 183 commands and 112 acceptance entries.",
+        "amended_by": "repair_round_2; original first-repair description retained as history"
       },
       {
         "id": "R2-37",
@@ -692,7 +696,8 @@
       {
         "id": "R2-19",
         "severity": "P3",
-        "reason": "The launch-verb limits and overbroad claim are corrected in G1. The deny-file header remains unchanged because this job explicitly forbids changing hcom-deny.rules; its posture owner must reconcile that header or extend the policy."
+        "reason": "The launch-verb limits and overbroad claim are corrected in G1. The deny-file header remains unchanged because this job explicitly forbids changing hcom-deny.rules; its posture owner must reconcile that header or extend the policy.",
+        "resolved_by": "repair_round_2/R2-19 (explanatory wording only)"
       },
       {
         "id": "R2-20",
@@ -999,7 +1004,8 @@
         "unchanged": true
       },
       "evidence/artifacts/new-wsl-install-plan-20261002/config/hcom-deny.rules": {
-        "unchanged": true
+        "unchanged": true,
+        "scope": "First repair snapshot; second repair changes comments and justification text, preserving executable patterns/examples."
       }
     },
     "index_unchanged": true,
@@ -1022,5 +1028,443 @@
       "validate_registry_drift_only": true,
       "retained_output": "Closing native command output is retained in the job’s external TMPDIR; the sanitized counts and exits are recorded here."
     }
+  },
+  "repair_round_2": {
+    "date_utc": "2026-10-05",
+    "job": "r2-repair2",
+    "scope": "Working-tree-only delta repair for PR #713; no commit/index or protected registry/stack/landscape edits.",
+    "north_star_action": "Provide reproducible NativeStack2604 configuration and acceptance for complex systems and the north-star R&D before the separately authorized broker paper lane.",
+    "model": "GPT Sol at max, per coordinator REPAIR-713.md Model field; this PR:evidence/artifacts/final-architecture-round2-20261004/repair-round2-sources-20261005.json:coordinator_brief",
+    "input": "verdict-claude-713-delta.md, independent Claude Opus 5.5 delta read supplied by the coordinator",
+    "source_receipt": "this PR:evidence/artifacts/final-architecture-round2-20261004/repair-round2-sources-20261005.json",
+    "findings": [
+      {
+        "id": "R2-01",
+        "severity": "P1",
+        "status": "alt",
+        "reason": "Enforce the exact matching selected/named/measured dispatch, with three bounded exceptions for the existing mise, container-engine and docker-compose bootstrap/dependency guards. A blanket line-start quoted-selector regex rejects those valid prerequisite guards. The real checker’s negative control still rejects hcom hidden under srt; no Codex pre-dispatch was added. Independent delta read accepted this source-backed alternative."
+      },
+      {
+        "id": "R2-02",
+        "severity": "P1",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-03",
+        "severity": "P1",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-04",
+        "severity": "P2",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-05",
+        "severity": "P2",
+        "status": "fixed",
+        "reason": "Second repair closes the delta defect through N1: Send per-run x-omniroute-session-id from both gatherers. Observe default call-list metadata using the session and bounded run window, with an explicit weaker time-window-plus-model fallback. Stop at older persisted rows, account for prepended in-memory rows and never require pipeline capture. Report expected high/xhigh separately; delivered wire effort is not asserted. Exact-tag API summary lacks effort despite conditional DB columns."
+      },
+      {
+        "id": "R2-06",
+        "severity": "P2",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-07",
+        "severity": "P2",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-08",
+        "severity": "P2",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-09",
+        "severity": "P2",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-10",
+        "severity": "P2",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-11",
+        "severity": "P2",
+        "status": "fixed",
+        "reason": "Second repair closes the delta defect through N4: Install current stable from the fingerprint-checked restricted Signed-By repository, record its installed version and accept an installed-version Google origin plus minimum version. Keep the agreed cannot-be-pinned Chrome-binary wording in consensus and its generated manifest. Verify package postinst from its published digest, use a separate source filename with repo_add_once=false before installation and refuse conflicting pre-existing package source files."
+      },
+      {
+        "id": "R2-12",
+        "severity": "P2",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-13",
+        "severity": "P2",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-14",
+        "severity": "P2",
+        "status": "fixed",
+        "reason": "Second repair closes the delta defect through N7: Restore the bounded gpt-authored.diff stdin redirect for the cross-family Claude review; keep /dev/null on every other headless invocation. A synthetic command control proves the actual diff reaches stdin without a real model call."
+      },
+      {
+        "id": "R2-15",
+        "severity": "P2",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-16",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-17",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Second repair closes the delta defect through N3: Report alerting readiness exit 78 as needs_user (78), return without failing or attempting delivery and preserve failure behavior for other statuses."
+      },
+      {
+        "id": "R2-18",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-19",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Narrow deny-file comments and justification strings to the documented uncovered launch/flag/wrapper forms; preserve every executable pattern, match/not_match example and decision."
+      },
+      {
+        "id": "R2-20",
+        "severity": "P3",
+        "status": "left",
+        "reason": "Reviewed transitive locks, uv cooldown resolution, OmniRoute install-script sequencing/signature qualification and source-based conformance execution require their owners’ supported-route qualification. Changing these executable installation contracts without that evidence is not a safe local repair; top-level pins and current supported routes are preserved."
+      },
+      {
+        "id": "R2-21",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-22",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Remove Telegram/on-host alternatives from the selected ntfy-only destination metadata; keep owned 0600 destination files and independent receiver confirmation."
+      },
+      {
+        "id": "R2-23",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-24",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-25",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-26",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-27",
+        "severity": "P3",
+        "status": "left",
+        "reason": "Both landscape phrases are annotated as unverified coordinator/verifier glosses while preserving the original verifier text. The cited user memory record could not be read under the never-approval policy, and the second quotation has no verified original record. No review-supplied replacement is promoted to a user quotation; exact-word provenance closure remains owed."
+      },
+      {
+        "id": "R2-28",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Independent delta read accepted the repair; also add the original scanner-comparison delta.json citation beside its 6/7 and 4/7 controls."
+      },
+      {
+        "id": "R2-29",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-30",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-31",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Second repair closes the delta defect through N6: Always refresh plan-owned copied *.rules so the adapter checks the reviewed source. Retain its existing refusal to replace differing actual client-target rules and preserve operator-owned configuration."
+      },
+      {
+        "id": "R2-32",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Second repair closes the delta defect through N2: Accept native Claude MCP field indentation with ^\\s*Command: and ^\\s*Args: and synchronize the plan command. The regression accepts the actual indented shape and rejects a different MCP pin."
+      },
+      {
+        "id": "R2-33",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-34",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-35",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-36",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Align accept.sh with README: 110 primary stage entries plus 2 additional native checks, 112 total. No acceptance stage was added in this repair."
+      },
+      {
+        "id": "R2-37",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-38",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "R2-39",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Carried forward unchanged from repair_round; independent delta read accepted the first repair. This round performs no new fix for this finding."
+      },
+      {
+        "id": "N1",
+        "severity": "P2",
+        "status": "fixed",
+        "reason": "Send per-run x-omniroute-session-id from both gatherers. Observe default call-list metadata using the session and bounded run window, with an explicit weaker time-window-plus-model fallback. Stop at older persisted rows, account for prepended in-memory rows and never require pipeline capture. Report expected high/xhigh separately; delivered wire effort is not asserted. Exact-tag API summary lacks effort despite conditional DB columns.",
+        "source": "this PR:evidence/artifacts/final-architecture-round2-20261004/repair-round2-sources-20261005.json"
+      },
+      {
+        "id": "N2",
+        "severity": "P2",
+        "status": "fixed",
+        "reason": "Accept native Claude MCP field indentation with ^\\s*Command: and ^\\s*Args: and synchronize the plan command. The regression accepts the actual indented shape and rejects a different MCP pin.",
+        "source": "this PR:evidence/artifacts/final-architecture-round2-20261004/repair-round2-sources-20261005.json"
+      },
+      {
+        "id": "N3",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Report alerting readiness exit 78 as needs_user (78), return without failing or attempting delivery and preserve failure behavior for other statuses.",
+        "source": "this PR:evidence/artifacts/final-architecture-round2-20261004/repair-round2-sources-20261005.json"
+      },
+      {
+        "id": "N4",
+        "severity": "P2",
+        "status": "fixed",
+        "reason": "Install current stable from the fingerprint-checked restricted Signed-By repository, record its installed version and accept an installed-version Google origin plus minimum version. Keep the agreed cannot-be-pinned Chrome-binary wording in consensus and its generated manifest. Verify package postinst from its published digest, use a separate source filename with repo_add_once=false before installation and refuse conflicting pre-existing package source files.",
+        "source": "this PR:evidence/artifacts/final-architecture-round2-20261004/repair-round2-sources-20261005.json"
+      },
+      {
+        "id": "N5",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Replace stale dpkg/fix-broken root declarations and README with the actual signed-apt prerequisite. The checker compares its declared program byte-for-byte to the parsed helper; a stale declaration is rejected by a negative control.",
+        "source": "this PR:evidence/artifacts/final-architecture-round2-20261004/repair-round2-sources-20261005.json"
+      },
+      {
+        "id": "N6",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Always refresh plan-owned copied *.rules so the adapter checks the reviewed source. Retain its existing refusal to replace differing actual client-target rules and preserve operator-owned configuration.",
+        "source": "this PR:evidence/artifacts/final-architecture-round2-20261004/repair-round2-sources-20261005.json"
+      },
+      {
+        "id": "N7",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Restore the bounded gpt-authored.diff stdin redirect for the cross-family Claude review; keep /dev/null on every other headless invocation. A synthetic command control proves the actual diff reaches stdin without a real model call.",
+        "source": "this PR:evidence/artifacts/final-architecture-round2-20261004/repair-round2-sources-20261005.json"
+      },
+      {
+        "id": "N8",
+        "severity": "P3",
+        "status": "fixed",
+        "reason": "Retain sanitized coordinator RTK measurement and exact package/tag sources in a portable receipt. G1 links the receipt. Attribute Sol/max to the coordinator repair brief, retaining its verbatim Model field rather than presenting it as an original user quotation.",
+        "source": "this PR:evidence/artifacts/final-architecture-round2-20261004/repair-round2-sources-20261005.json"
+      }
+    ],
+    "fixed_this_round": [
+      "N1",
+      "N2",
+      "N3",
+      "N4",
+      "N5",
+      "N6",
+      "N7",
+      "N8",
+      "R2-19",
+      "R2-36",
+      "R2-22"
+    ],
+    "accepted_carry_forward_left": [
+      {
+        "id": "R2-20",
+        "reason": "Reviewed transitive locks, uv cooldown resolution, OmniRoute install-script sequencing/signature qualification and source-based conformance execution require their owners’ supported-route qualification. Changing these executable installation contracts without that evidence is not a safe local repair; top-level pins and current supported routes are preserved."
+      },
+      {
+        "id": "R2-27",
+        "reason": "Both landscape phrases are annotated as unverified coordinator/verifier glosses while preserving the original verifier text. The cited user memory record could not be read under the never-approval policy, and the second quotation has no verified original record. No review-supplied replacement is promoted to a user quotation; exact-word provenance closure remains owed."
+      }
+    ],
+    "acceptance": {
+      "check_plan": {
+        "cmd": "python3 evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+        "exit": 0,
+        "problems": 0,
+        "counts": "84 rows, 183 commands, 110 primary + 2 additional = 112 acceptance entries"
+      },
+      "handbook": {
+        "cmd": "python3 scripts/build_new_wsl_handbook.py --check",
+        "exit": 0
+      },
+      "build_ecosystem": {
+        "cmd": "python3 scripts/build_ecosystem.py --check",
+        "exit": 0
+      },
+      "validate": {
+        "cmd": "python3 scripts/validate.py",
+        "exit": 1,
+        "registry_drift_only": true,
+        "hash_mismatches": 17,
+        "byte_mismatches": 12,
+        "unlisted_evidence": 1
+      },
+      "bash_n": {
+        "exit": 0,
+        "files": {
+          "evidence/artifacts/new-wsl-install-plan-20261002/install.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/agentsview.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/base-distribution-accept.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/betterleaks-accept.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/deer-flow-research.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-client-accept.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/harbor-worker-telemetry-accept.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute-canary-install.sh": 0,
+          "evidence/artifacts/new-wsl-install-plan-20261002/config/srt-client-accept.sh": 0,
+          "tools/research/gpt_researcher.sh": 0
+        }
+      },
+      "regen": {
+        "exit": 0,
+        "command": "coordinator regen.sh \"$PWD\""
+      },
+      "client_config": {
+        "exit": 0,
+        "command": "python3 tools/adoption/new_wsl_client_config.py --check",
+        "observation": "Coordinator regeneration ran this exact native check and printed client-config check 0."
+      },
+      "git_diff_check": {
+        "exit": 0,
+        "command": "git diff --check"
+      }
+    },
+    "tests": {
+      "exit": 0,
+      "cmd": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config tests.test_new_wsl_handbook tests.test_new_wsl_profile tests.test_wsl_new_distro_recipe",
+      "counts": "Ran 460 tests in 104.782s\n\nOK"
+    },
+    "retained_attempts": [
+      {
+        "command": "python3 -B -m unittest selected Round2RepairIntegrationTests and Chrome declaration negative control",
+        "exit": 1,
+        "counts": "8 tests; 2 failures and 3 errors before the fixes (including one test fixture shape error subsequently corrected).",
+        "boundary": "Local synthetic integration controls; no producer/provider/install execution."
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_new_wsl_client_config.Round2RepairIntegrationTests tests.test_new_wsl_definitive_defaults.InterimPlanChecks.test_chrome_privileged_declaration_cannot_drift_from_the_helper",
+        "exit": 0,
+        "counts": "11 tests, OK",
+        "boundary": "Targeted controls after final executable fixes."
+      },
+      {
+        "command": "python3 scripts/validate.py",
+        "exit": 1,
+        "reason": "The first acceptance found expected registry drift plus an untracked regeneration log containing a local home path. Actual logs were moved outside the checkout; the rerun has registry drift only.",
+        "final_exit": 1,
+        "final_registry_drift": {
+          "cmd": "python3 scripts/validate.py",
+          "exit": 1,
+          "registry_drift_only": true,
+          "hash_mismatches": 17,
+          "byte_mismatches": 12,
+          "unlisted_evidence": 1
+        }
+      }
+    ],
+    "source_access": {
+      "ai_memory": "Scoped pin_first=true, limit=2 query was refused because the tool required approval under policy never; exact canonical and upstream tag/package sources were read.",
+      "upstream": "Exact public tag files were downloaded, and the Chrome package was digest-verified and its control files extracted. No package/postinst/install row was executed.",
+      "model_pin": "Coordinator REPAIR-713.md Model field is quoted only as coordinator provenance."
+    },
+    "completeness_critic": {
+      "coverage": "All 47 findings have fixed/alt/left dispositions; all 8 new findings and the 3 requested leftovers are repaired. R2-20 and R2-27 remain the independently accepted owner/provenance handoffs.",
+      "missed_modality": "Default API metadata and optionally captured wire content are distinct. DB effort columns are conditional and omitted from API summaries. Fresh session tags support default observations; the fallback is explicitly weaker.",
+      "next_sweep": [
+        "Operator-qualified delivered-effort observation without enabling prompt/completion retention implicitly.",
+        "Browser update/postinst source behavior and supported handling of prior package-managed source files.",
+        "Source-based publication/lock/cooldown qualification (R2-20) and original-record wording closure (R2-27)."
+      ]
+    },
+    "evidence_boundary": "These are source repairs and local integration checks. Destination installation, live provider/GPU research, upstream browser/runtime acceptance and Harbor telemetry remain unrun. RTK observations are historical coordinator measurements, not new runs.",
+    "protected_files": {
+      "manifests/evidence.json": {
+        "unchanged": true
+      },
+      "manifests/stack.json": {
+        "unchanged": true
+      },
+      "catalogs/landscape/upstream-snapshot.json": {
+        "unchanged": true
+      }
+    },
+    "git_index_unchanged": true,
+    "hcom_executable_policy_unchanged": true
   }
 }

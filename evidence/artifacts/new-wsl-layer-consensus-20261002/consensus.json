@@ -1423,7 +1423,7 @@
   "records": {
    "decision_record": {
     "path": "docs/decisions/2026-10-04-final-architecture-round2.md",
-    "sha256": "86e85604d0a2022abd39c5f5ee423357980f05f999221e1a0fa0c197b782cf5b"
+    "sha256": "0915316ee40aa248fb2a2cf1636c830d5d4df5f849c5beb71dd10464a5cfd26e"
    },
    "quality_rule": {
     "path": "docs/decisions/2026-10-04-repository-quality-rule.md",
