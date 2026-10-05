@@ -1065,6 +1065,16 @@ class RuntimeTagPatternRowTests(unittest.TestCase):
     def _row(self, entry, repositories):
         return build_manifest.build_runtime_freshness({"entries": [entry]}, repositories, CHECKED_AT)["entries"][0]
 
+    def test_prerelease_pin_keeps_numeric_comparison_for_a_prefixed_tag_declaration(self):
+        prefix = "inspect-tool-support-"
+        entry = _inspect_entry(pin="1.1.0rc5", tags={"prefix": prefix,
+                                                  "pattern": r"^inspect-tool-support-(\d+\.\d+\.\d+)$"})
+        record = _inspect_record(matching_tags={prefix: [prefix + "1.0.0", prefix + "1.2.0"]})
+        row = self._row(entry, {INSPECT_REPOSITORY: record})
+        self.assertEqual(row["upstream"]["latest"], prefix + "1.2.0")
+        self.assertEqual((row["pin_comparison"], row["pin_behind_upstream"], row.get("pin_comparison_reason")),
+                         ("compared", True, None))
+
     def test_the_inspect_row_is_compared_with_its_highest_version_tag(self):
         repositories = {INSPECT_REPOSITORY: _inspect_record()}
         row = self._row(_inspect_entry(), repositories)

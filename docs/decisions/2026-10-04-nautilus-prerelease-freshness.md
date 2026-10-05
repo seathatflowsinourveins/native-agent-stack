@@ -108,7 +108,7 @@ prevent recursive copies. Only scratch directories created by these interrupted
 runs were removed. Both are environment corrections, not passing acceptance
 results or changes to the existing fixtures.
 
-## Final checks and remaining acceptance limit
+## Initial checks and remaining acceptance limit
 
 The standalone check of `tests.test_catalog_freshness_pins`,
 `tests.test_catalog_freshness_trading`, `tests.test_catalog_freshness_runtime` and
@@ -134,3 +134,38 @@ the changed workflow step. Registry-covered files were finalized through
 `scripts/host_receipts.py`'s `register_file`; the two edited test modules were not
 previously registry-covered. These checks establish integration and artifact
 consistency, not a live upstream release observation or hosted CI acceptance.
+
+## Repair round freshness-r1
+
+The cross-family review identified an import-time dependency introduced by this
+change: importing `build_manifest.py` also executed `github_freshness.py`, outside
+the verdict gate's declared transitive trust paths. Following the coordinator's
+decision, the exact-path load now happens lazily inside the freshness functions
+that need the release policy. The import regression prohibits sibling discovery,
+network calls and file read/write helpers during import; it catches the original
+load regardless of an existing bytecode cache. No verdict rules were changed.
+
+The drift-report consumer now treats release-stream uncertainty as unfetched and
+prints **unknown** with the specific reason. Both `unknown beyond cap` and
+`no published release in pinned major` stay out of the generic claim that a
+repository has no GitHub release or tag at all. Report fixtures cover the initial
+transition from a stable latest and a subsequent manifest whose latest is already
+null, using either `latest_flag.reason` or `pin_comparison_reason`. Local pin
+changes still use the existing drift path even when upstream is unknown.
+
+Runtime rows with declared tag patterns retain the pre-change numeric comparison,
+including a prerelease-shaped pin and a prefixed upstream tag. The new fixture
+compares `1.1.0rc5` with `inspect-tool-support-1.2.0`; ordinary release-stream pins
+keep their RC ordinal comparison. This is a separate tag declaration path, not an
+extension of the published-release parser's documented grammar.
+
+The four focused regressions first exited **1**, reproducing all three findings.
+An intermediate run exited **1** because the new tag fixture indexed an optional
+reason field that is absent after a successful comparison; the fixture now uses
+`get`. The final focused run passed four tests, exit **0**. These are synthetic
+and local integration checks, not a hosted or upstream test run.
+
+For this repair, the coordinator superseded the earlier in-worktree TMPDIR
+recommendation with an owned cache directory outside both the checkout and
+`/tmp`, under `nice -n 19`. Only the three touched freshness test modules and the
+requested integrity checks are acceptance scope; CI owns the full-suite run.

@@ -81,14 +81,10 @@ import json
 import re
 from collections import Counter, defaultdict
 from datetime import date
+from functools import cache
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-# Load the sibling by exact path: both CLIs are also imported standalone in tests.
-# Selection/comparison and the workflow share github_freshness.py's stream policy.
-_currency_spec = importlib.util.spec_from_file_location("release_currency", HERE / "github_freshness.py")
-release_currency = importlib.util.module_from_spec(_currency_spec)
-_currency_spec.loader.exec_module(release_currency)
 # The catalog repository checkout this tool runs from: the default
 # --checkout-root, whose paths are published repository-relative.
 REPO_ROOT = HERE.parents[1]
@@ -113,6 +109,20 @@ DEFAULT_OS_PACKAGE_IDS = ("systemd",)
 VERSION_RE = re.compile(r"(\d+)\.(\d+)(?:\.(\d+))?")
 
 
+@cache
+def _load_release_currency():
+    """Load the shared stream policy only when a freshness function needs it.
+
+    Verdict validators import this module for other helpers; importing it must
+    not execute the sibling script. Both CLIs are also loaded standalone, so
+    resolve the sibling by exact path rather than changing the import search path.
+    """
+    spec = importlib.util.spec_from_file_location("release_currency", HERE / "github_freshness.py")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
 class LeakDetected(ValueError):
     """A sanitized manifest still contains a host path or a known secret prefix."""
 
@@ -135,7 +145,7 @@ def parse_version(text):
 
 
 def classify_pin(pin, repository, upstream_latest, component_id=None, os_package_ids=DEFAULT_OS_PACKAGE_IDS,
-                 upstream_unknown_reason=None):
+                 upstream_unknown_reason=None, use_release_stream=True):
     """Return {"behind": bool, "excluded": bool, "reason": str|None}.
 
     ``os_package_ids`` is an explicit allow-list of component/entry ids
@@ -148,7 +158,10 @@ def classify_pin(pin, repository, upstream_latest, component_id=None, os_package
         return {"behind": False, "excluded": True, "reason": "os_package_pin"}
     if pin and DEV_PIN_RE.search(pin):
         return {"behind": False, "excluded": True, "reason": "commit_pinned"}
-    if release_currency.is_prerelease_pin(pin):
+    # Declared tag patterns retain their numeric comparison, including prefixed
+    # tags. The prerelease release-stream parser requires a complete release tag.
+    release_currency = _load_release_currency() if use_release_stream else None
+    if release_currency is not None and release_currency.is_prerelease_pin(pin):
         if upstream_unknown_reason:
             return {"behind": False, "excluded": False, "reason": upstream_unknown_reason}
         pin_version = release_currency.release_version(pin)
@@ -237,6 +250,7 @@ def freshness_record(repository, repositories: dict) -> dict | None:
 
 
 def compute_upstream(repository, repositories: dict, pin=None) -> dict:
+    release_currency = _load_release_currency()
     record = freshness_record(repository, repositories) or {}
     release = record.get("latest_release") or {}
     latest = release.get("tag") or record.get("latest_tag")
@@ -650,7 +664,8 @@ def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, check
                 pin.get("pin"), repository, upstream.get("latest"),
                 component_id=pin.get("id"), os_package_ids=os_package_ids,
                 upstream_unknown_reason=(upstream.get("latest_flag") or {}).get("reason")
-                if not isinstance(tags, dict) else None))
+                if not isinstance(tags, dict) else None,
+                use_release_stream=not isinstance(tags, dict)))
         entries.append({
             "id": pin.get("id"), "group": pin.get("group"), "kind": pin.get("kind"),
             "repository": repository, "pin": pin.get("pin"), "pin_source": pin.get("pin_source"),

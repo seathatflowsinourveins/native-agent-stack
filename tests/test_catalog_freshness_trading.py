@@ -45,6 +45,24 @@ extract_layers = load_module("extract_layers_trading", "extract_layers.py")
 build_manifest = load_module("build_manifest_trading", "build_manifest.py")
 github_freshness = load_module("github_freshness_trading", "github_freshness.py")
 
+
+class BuildManifestImportTests(unittest.TestCase):
+    def test_import_does_not_load_currency_or_call_network_or_file_helpers(self):
+        spec = importlib.util.spec_from_file_location("build_manifest_import_check", TOOL_DIR / "build_manifest.py")
+        module = importlib.util.module_from_spec(spec)
+        with mock.patch("importlib.util.spec_from_file_location",
+                        side_effect=AssertionError("currency must not load during import")), \
+                mock.patch("subprocess.run") as run, \
+                mock.patch("urllib.request.urlopen") as urlopen, \
+                mock.patch.object(Path, "read_text") as read_text, \
+                mock.patch.object(Path, "write_text") as write_text:
+            spec.loader.exec_module(module)
+            run.assert_not_called()
+            urlopen.assert_not_called()
+            read_text.assert_not_called()
+            write_text.assert_not_called()
+
+
 # The selected trading components R23 names that live on catalogs/us-equities cards
 # (card ids, not manifests/stack.json ids).
 SELECTED_CARD_IDS = {

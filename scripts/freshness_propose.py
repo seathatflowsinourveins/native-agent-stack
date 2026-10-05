@@ -195,6 +195,16 @@ def _freshness_record_has_error(repository, raw_repositories: dict) -> bool:
     return bool(record.get("error")) or bool(record.get("partial_errors"))
 
 
+def _release_stream_unknown_reason(row: dict) -> str | None:
+    """The release-list policy withheld latest; it is not an empty repository."""
+    flag = (row.get("upstream") or {}).get("latest_flag") or {}
+    for reason in (flag.get("reason"), row.get("pin_comparison_reason")):
+        if reason in ("release list not fetched", "release list unavailable",
+                      "unknown beyond cap", "no published release in pinned major"):
+            return reason
+    return None
+
+
 def compute_drift(published_rows: dict, rebuilt_rows: dict, raw_repositories: dict | None = None):
     """Compare two manifest_component_rows() outputs.
 
@@ -211,7 +221,8 @@ def compute_drift(published_rows: dict, rebuilt_rows: dict, raw_repositories: di
       never fetched that repository this run, e.g. a bounded ``--max-repos``
       run or a full fetch failure) or the raw freshness record shows a
       fetch problem for it (see ``_freshness_record_has_error``, e.g. a
-      releases-endpoint error papered over by a tags-endpoint fallback).
+      releases-endpoint error papered over by a tags-endpoint fallback), or the
+      release-stream policy withheld latest with an explicit unknown reason.
       Their upstream comparison is excluded from ``drifted`` and ``no_release``.
     - ``no_release``: ids that *were* reliably fetched this run
       (``pushed_at`` present, no recorded fetch problem) but whose
@@ -230,7 +241,7 @@ def compute_drift(published_rows: dict, rebuilt_rows: dict, raw_repositories: di
         old_latest = (old.get("upstream") or {}).get("latest")
         fetch_unreliable = new_upstream.get("pushed_at") is None or _freshness_record_has_error(
             new.get("repository"), raw_repositories,
-        )
+        ) or _release_stream_unknown_reason(new) is not None
         # The pin comes from the local catalogs, not from upstream, so a pin change is
         # real drift whatever the fetch reliability of this run (Codex verification of
         # 7a483f7: the original skills-ref 0.1.0 -> 0.1.1 repro without pushed_at).
@@ -271,14 +282,20 @@ def render_drift_markdown(published_path, rebuilt_name: str, published: dict, re
     if unfetched:
         # "fetch problem" is a partial error; a failed matching-tags list never is one
         # (``_freshness_record_has_error``), so it never puts a component here.
+        rebuilt_rows = manifest_component_rows(rebuilt)
         lines += [
             "",
             f"{len(unfetched)} component(s) have no reliable upstream data this run (an "
-            "unfinished/bounded fetch, or a releases/tags/commit fetch problem for that repository) "
+            "unfinished/bounded fetch, a releases/tags/commit fetch problem for that repository, "
+            "or an unknown release stream) "
             "so their upstream comparison is excluded above (a pin change on such a row is still "
             "listed as drift, with its fresh upstream fields empty):",
             "",
-            ", ".join(md_cell(component_id) for component_id in sorted(unfetched)),
+            ", ".join(
+                md_cell(component_id) + (f" (unknown: {md_cell(reason)})" if reason else "")
+                for component_id in sorted(unfetched)
+                for reason in (_release_stream_unknown_reason(rebuilt_rows.get(component_id, {})),)
+            ),
         ]
     if no_release:
         lines += [

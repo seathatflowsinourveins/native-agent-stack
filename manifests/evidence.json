@@ -16424,8 +16424,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-nautilus-prerelease-freshness.md",
-      "sha256": "b5f641bc7bfee2f8592fb295708de3c094d0855e3d865eda09b7752f2c0422ff",
-      "bytes": 8755
+      "sha256": "ccee257d1b5bb15c31679437f17d85eac33befb82e27e058c1227b60df30a28c",
+      "bytes": 10989
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
@@ -52049,8 +52049,8 @@
     },
     {
       "path": "scripts/freshness_propose.py",
-      "sha256": "c96e99d80e922f257e6c95d8b28c9493e981e4aacd99cfbbe980b4053b55bcd1",
-      "bytes": 51393
+      "sha256": "2a28545967cf2a84f0de1f392b753b0744d3c269d619f4d415abc12bdf53e5a4",
+      "bytes": 52315
     },
     {
       "path": "scripts/git-hooks/pre-commit",
@@ -52564,8 +52564,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "9138d033a5c8441af3c26905ba27fc3a8726433c6610ee815e1b56864ec60cd2",
-      "bytes": 60024
+      "sha256": "0f8f306b5c8ddcbf5f24dfcfddfe6328865c403e57f1a9f6813cf8ac83f26309",
+      "bytes": 62089
     },
     {
       "path": "tests/test_catalogs.py",
@@ -53609,8 +53609,8 @@
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "sha256": "9bf26b27b5466eb58c7198035dcc560bf19e2a867271958b5035e1b0c888f877",
-      "bytes": 123580
+      "sha256": "fa33cf8bdbd5bdc11f094d2d714b9ac213bacb365454db2bc0325117f911f144",
+      "bytes": 124198
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
