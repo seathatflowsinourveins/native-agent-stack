@@ -1,0 +1,38 @@
+job,trial,call_id,grep_audit_record,spelling,phase,file_list,hook,scope
+p2-fold-01-r1-B,fold-01__a6LLS7n,call_sEafSZcApvLFYrNYborsIp0I,1,grep -rl,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-01-r2-B,fold-01__g7cTBrw,call_dZQyv3oCcUF560bg3OVafbqJ,1,grep -rl,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-01-r3-B,fold-01__ezj75Kw,call_fRnsvE91pQkmzEyIagtSKCoG,1,grep -rl,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-02-r1-B,fold-02__fvUhwHH,call_WnTWrRsdHYUg9Tt0ku4uyWsK,1,grep -lr,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-02-r2-B,fold-02__qV6xSiZ,call_Atgzd5VbJ0O20HdX9nvg5Fr4,1,grep -lr,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-02-r3-B,fold-02__xKpxfJa,call_P3LYSW2SwTM4T7xyEW9bOpO6,1,grep -lr,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-03-r1-B,fold-03__NxeZS8D,call_APwVtMjsCI2pv4ouF9SsYBtC,1,grep -l -r,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-03-r1-B,fold-03__NxeZS8D,call_SQOPvnGnHaic46AZ1yUX1X8R,2,grep -nH,follow-up,false,rewrite to rtk grep,direct Bash command
+p2-fold-03-r2-B,fold-03__VivJPjJ,call_BM2fBPmrrI0VNvWvjsjG6fTG,1,grep -l -r,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-03-r3-B,fold-03__sWTbg2X,call_xVWSWaVKDjfTQkRALaDJDOCY,1,grep -l -r,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-04-r1-B,fold-04__dRTbxms,call_WKGYoMbKWeKJaHbyU6im9GV2,1,grep -r -l,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-04-r2-B,fold-04__trYUmkp,call_50xCUFqZzaAJhroqFnKAH8DD,1,grep -r -l,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-04-r3-B,fold-04__3wPVo84,call_FDAjaVU2CJ5fYvFET1D0c4a7,1,grep -r -l,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-04-r3-B,fold-04__3wPVo84,call_7UYMTrAgbIRPDs5W7UzU6vrx,2,grep -r -l,follow-up,true,outer Python skip:defer; child bypasses Bash hook,Python subprocess; outer return exit 0
+p2-fold-05-r1-B,fold-05__xoFVYyt,call_RKfEJyqaLu0Ua62yAsPjkjAy,1,grep -l,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-05-r1-B,fold-05__xoFVYyt,call_txE4NPQjF9AhamPoV69LPODM,2,grep -nE,follow-up,false,rewrite to rtk grep,direct Bash command
+p2-fold-05-r2-B,fold-05__btGNSPq,call_eAjV7QNpIcNRjyl64mMTHnYM,1,grep -l,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-05-r2-B,fold-05__btGNSPq,call_UgcdBo0J1q9R5mXH0LxCYa8r,2,grep -n -e <marker> -e <assignment>,follow-up,false,rewrite to rtk grep,direct Bash command
+p2-fold-05-r3-B,fold-05__Wcx97cY,call_OSJ2CcwZSyLE9TmzrrxEynEK,1,grep -l,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-06-r1-B,fold-06__QLpwMRV,call_9gAgpsQRR0tEXaOg1vGzxZBa,1,grep -rl,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-06-r1-B,fold-06__QLpwMRV,call_MTEnhmF2XafZCVuSO0vUfRK6,2,grep -n -E,follow-up,false,rewrite to rtk grep,direct Bash command
+p2-fold-06-r1-B,fold-06__QLpwMRV,call_tJjkHkOzgYHmdOrlDcay3AyZ,4,grep -n -E,follow-up,false,rewrite to rtk grep,direct Bash command
+p2-fold-06-r2-B,fold-06__PKU46in,call_5YBjLyiYbGCMrujE3O5HnjMM,1,grep -rl,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-06-r2-B,fold-06__PKU46in,call_AejPNhyh0zRUDDvhazey7F3U,2,grep -n,follow-up,false,rewrite to rtk grep,direct Bash command
+p2-fold-06-r2-B,fold-06__PKU46in,call_cC1QuLdtSdx0rInpDdu7Iwv8,3,grep -n,follow-up,false,rewrite to rtk grep,direct Bash command
+p2-fold-06-r3-B,fold-06__hakNYaC,call_J9OWNJZvwuVYl0ZMs33C52yz,1,grep -rl,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-06-r3-B,fold-06__hakNYaC,call_AsvT0pa5nsM497XIcdzNKNto,2,grep -n,follow-up,false,rewrite to rtk grep,direct Bash command
+p2-fold-07-r1-B,fold-07__u7XRxdP,call_XuAWRCPs6sB2p2naHBfszNWV,1,grep -rl,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-07-r1-B,fold-07__u7XRxdP,call_MTt1J3D6LkCAkZuJnFKxU8TS,3,grep -rl,follow-up,true,outer Python skip:defer; child bypasses Bash hook,Python subprocess; outer return exit 0
+p2-fold-07-r1-B,fold-07__u7XRxdP,call_MTt1J3D6LkCAkZuJnFKxU8TS,3,grep -n -E,follow-up,false,outer Python skip:defer; child bypasses Bash hook,Python subprocess; outer return exit 0
+p2-fold-07-r2-B,fold-07__8NscJxz,call_mcnxnYlfDcOJhAHwqwTGOOPR,1,grep -rl,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-07-r3-B,fold-07__HngErEc,call_RiRTMCx5jrzXoITDNzlMXjw2,1,grep -rl,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-08-r1-B,fold-08__rzgFqmF,call_mLTOyx68M7BzPkO7XTrefWXe,1,grep -rl,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-08-r1-B,fold-08__rzgFqmF,call_WDuDHlSiwdfwmPzTS8X5k5if,2,grep -nE,follow-up,false,rewrite to rtk grep,direct Bash command
+p2-fold-08-r2-B,fold-08__egWpTYq,call_1G0cvjIdYwpWD8ZAhYm6QCXh,1,grep -rl,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-08-r3-B,fold-08__kqXqz9g,call_d7twJKl99D8Gn5nHZiYmA4Ux,1,grep -rl,discovery,true,skip:no_rewrite,direct Bash command
+p2-fold-08-r3-B,fold-08__kqXqz9g,call_s2P5ay54nqgjH0FtW7GTVIJL,2,grep -nFx,follow-up,false,rewrite to rtk grep,direct Bash command
