@@ -32,6 +32,112 @@ build_manifest_mod = load_module("build_manifest", "build_manifest.py")
 github_freshness = load_module("github_freshness", "github_freshness.py")
 
 
+class FreshnessReviewThreadTests(unittest.TestCase):
+    REPOSITORY = "https://github.com/nautechsystems/nautilus_trader"
+    SLUG = "nautechsystems/nautilus_trader"
+
+    def _record(self, releases):
+        return {"slug": self.SLUG, "pushed_at": "2025-01-01T00:00:00Z",
+                "latest_release": {"tag": "v1.231.0", "published_at": "2025-01-01T00:00:00Z"},
+                "head": {"date": "2025-01-01T00:00:00Z"},
+                "release_list": {"releases": releases, "truncated": False}}
+
+    def _trading_row(self, record, pin="2.0.0rc6"):
+        return build_manifest_mod.build_trading_freshness({"taxonomy": {}, "layers": {}},
+            {"entries": [{"id": "nautilustrader", "repository": self.REPOSITORY,
+                          "pin": pin, "layer": "backtesting-engine"}]},
+            {self.REPOSITORY: record}, "2026-10-05")["entries"][0]
+
+    def test_selected_rc_publication_prevents_false_dormancy_in_trading_and_runtime(self):
+        record = self._record([{"tag": "v2.0.0rc7", "published_at": "2026-10-01T00:00:00Z"}])
+        runtime_row = build_manifest_mod.build_runtime_freshness({"entries": [
+            {"id": "runtime:engine", "repository": self.REPOSITORY, "pin": "2.0.0rc6", "kind": "pin_source"}]},
+            {self.REPOSITORY: record}, "2026-10-05")["entries"][0]
+        for label, row in (("trading", self._trading_row(record)), ("runtime", runtime_row)):
+            with self.subTest(row=label):
+                self.assertEqual(row["upstream"]["latest"], "v2.0.0rc7")
+                self.assertIs(row["dormancy"]["dormant"], False)
+                self.assertEqual(row["dormancy"]["last_release_at"], "2026-10-01")
+                self.assertEqual(row["dormancy"]["days_since_activity"], 4)
+        self.assertIs(self._trading_row(record, pin="1.231.0")["dormancy"]["dormant"], True)
+
+    def test_republished_lower_rc_does_not_hide_higher_version_drift(self):
+        releases = [{"tag": "v2.0.0rc7", "published_at": "2026-10-01T00:00:00Z"},
+                    {"tag": "v2.0.0rc5", "published_at": "2026-10-02T00:00:00Z"}]
+        for ordered in (releases, list(reversed(releases))):
+            with self.subTest(order=[release["tag"] for release in ordered]):
+                row = self._trading_row(self._record(ordered))
+                self.assertEqual(row["upstream"]["latest"], "v2.0.0rc7")
+                self.assertIs(row["pin_behind_upstream"], True)
+
+    def test_publication_time_breaks_a_normalized_version_tie(self):
+        row = self._trading_row(self._record([
+            {"tag": "v2.0.0rc7", "published_at": "2026-10-01T00:00:00Z"},
+            {"tag": "2.0.0-rc7", "published_at": "2026-10-03T00:00:00Z"}]))
+        self.assertEqual(row["upstream"]["latest"], "2.0.0-rc7")
+        self.assertEqual(row["upstream"]["released_at"], "2026-10-03")
+
+    def test_prior_repairs_have_unique_anti_pattern_rows_with_prevention_and_verification(self):
+        lines = (ROOT / "docs/harness-defaults.md").read_text().splitlines()
+        header = next(index for index, line in enumerate(lines) if line.startswith("| Date | Anti-pattern |"))
+        table = []
+        for line in lines[header + 2:]:
+            if not line.startswith("|"):
+                break
+            table.append(line)
+        expected = (
+            ("Executing a freshness sibling while importing a verdict helper", "tests/test_catalog_freshness_trading.py",
+             "test_import_does_not_load_currency_or_call_network_or_file_helpers"),
+            ("Reporting an unknown release stream as an empty release history", "tests/test_catalog_freshness_propose.py",
+             "test_truncated_prerelease_list_is_unknown_in_drift_report"),
+            ("Applying the release-stream parser to a declared prefixed tag", "tests/test_catalog_freshness_runtime.py",
+             "test_prerelease_pin_keeps_numeric_comparison_for_a_prefixed_tag_declaration"),
+        )
+        for mistake, path, method in expected:
+            with self.subTest(mistake=mistake):
+                rows = [line for line in table if line.split("|")[2].strip() == mistake]
+                self.assertEqual(len(rows), 1, f"missing or duplicate anti-pattern row: {mistake}")
+                columns = [column.strip() for column in rows[0].split("|")[1:-1]]
+                self.assertEqual(len(columns), 5)
+                self.assertTrue(all(columns))
+                self.assertIn(path, columns[4])
+                self.assertIn(method, columns[4])
+                self.assertIn(f"def {method}(", (ROOT / path).read_text())
+
+    def test_refetch_replaces_every_stale_alias_and_resume_reads_the_fresh_record(self):
+        import tempfile
+        from contextlib import redirect_stdout
+        from io import StringIO
+        aliases = [self.REPOSITORY + "/tree/main",
+                   self.REPOSITORY + ".git/releases/tag/v2.0.0rc6"]
+        kept_url = "https://github.com/example/kept"
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            (work / "foundation-layers.json").write_text(json.dumps({"layers": [{"components": [
+                {"repository": url, "version": "2.0.0rc6"} for url in [self.REPOSITORY, *aliases]]}]}))
+            stale = {"slug": self.SLUG.upper(), "latest_release": {"tag": "v1.231.0"}}
+            (work / "github-freshness.json").write_text(json.dumps({"repositories": {
+                aliases[0]: stale, aliases[1]: {"latest_release": {"tag": "v1.231.0"}},
+                kept_url: {"slug": "example/kept", "latest_release": {"tag": "v9.0.0"}}}}))
+            fresh = self._record([{"tag": "v2.0.0rc7", "published_at": "2026-10-01T00:00:00Z"}])
+            args = ["--work-dir", str(work), "--workers", "1"]
+            with mock.patch.object(github_freshness, "fetch_repository", return_value=fresh) as fetch, \
+                    redirect_stdout(StringIO()):
+                self.assertEqual(github_freshness.main(args), 0)
+            fetch.assert_called_once_with(self.SLUG, tag_prefixes=(), include_prereleases=True)
+            with mock.patch.object(github_freshness, "fetch_repository") as fetch, redirect_stdout(StringIO()):
+                self.assertEqual(github_freshness.main(args), 0)
+            fetch.assert_not_called()
+            repositories = json.loads((work / "github-freshness.json").read_text())["repositories"]
+            for url in [self.REPOSITORY, *aliases]:
+                with self.subTest(url=url):
+                    upstream = build_manifest_mod.compute_upstream(url, repositories, pin="2.0.0rc6")
+                    self.assertEqual(upstream["latest"], "v2.0.0rc7")
+                    self.assertNotIn("latest_flag", upstream)
+            self.assertEqual(set(repositories), {self.REPOSITORY, kept_url})
+            self.assertEqual(repositories[kept_url]["latest_release"]["tag"], "v9.0.0")
+
+
 class TaxonomyExtractionTests(unittest.TestCase):
     def test_zero_unmapped_tags_for_a_fully_covered_fixture(self):
         taxonomy = {

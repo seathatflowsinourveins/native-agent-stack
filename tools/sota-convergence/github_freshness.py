@@ -64,11 +64,12 @@ and the next run fetches that repository again. A record that carries
 runtime-pins.json now declares for its repository, is pending too; the resume is
 per repository, so the next run fetches that whole repository again. --max-repos
 bounds a trial run to the first N (sorted) slugs that still need fetching.
-Prerelease pins in the extracted working files additionally request up to three
-100-release REST pages, alongside releases/latest; release_list retains compact
+Prerelease pins using the release stream in the extracted working files additionally
+request up to three 100-release REST pages, alongside releases/latest; release_list retains compact
 published, non-draft release metadata and its page/cap/exhaustion state. Older
 snapshots lacking this list are pending for those repositories. A full third page
 means unknown beyond cap, never a complete newest-release observation.
+Runtime pins with declared tag patterns use matching tags instead of this stream.
 """
 from __future__ import annotations
 
@@ -137,11 +138,11 @@ def is_prerelease_pin(pin) -> bool:
 
 
 def select_release_for_pin(pin, record):
-    """(release, unknown reason) for the newest published release in pin's major.
+    """(release, unknown reason) for the highest published version in pin's major.
 
-    Only prerelease pins use the bounded list. Publication time, rather than list
-    position or another major's stable backport, selects the release. Its version
-    key then determines drift. A missing, failed or capped list never falls back
+    Only prerelease pins use the bounded list. Version ranks first, so a lower
+    version republished later cannot hide currency drift; publication time breaks
+    version ties. A missing, failed or capped list never falls back
     to releases/latest or an unpublished Git tag.
     """
     if not is_prerelease_pin(pin):
@@ -162,7 +163,7 @@ def select_release_for_pin(pin, record):
             candidates.append(release)
     if not candidates:
         return None, "no published release in pinned major"
-    return max(candidates, key=lambda item: (item["published_at"], release_version(item["tag"]))), None
+    return max(candidates, key=lambda item: (release_version(item["tag"]), item["published_at"])), None
 
 WORKING_FILE_REPO_PATHS = (
     ("foundation-layers.json", lambda doc: (
@@ -246,7 +247,11 @@ def collect_declared_tag_prefixes(work_dir: Path) -> dict:
 
 
 def collect_prerelease_slugs(work_dir: Path) -> set:
-    """Repositories with prerelease pins in the extracted working files only."""
+    """Repositories with a pin that actually uses the prerelease release stream.
+
+    Runtime entries declaring tag patterns use matching tags. Another foundation,
+    trading or runtime stream pin for the same slug can still require this list.
+    """
     slugs = set()
     for filename in ("foundation-layers.json", "trading-catalog.json", "trading-pins.json", "runtime-pins.json"):
         path = work_dir / filename
@@ -256,6 +261,8 @@ def collect_prerelease_slugs(work_dir: Path) -> set:
         entries = (component for layer in doc.get("layers", []) for component in layer.get("components", [])) \
             if filename == "foundation-layers.json" else doc.get("entries", [])
         for entry in entries:
+            if filename == "runtime-pins.json" and isinstance(entry.get("tags"), dict):
+                continue
             pin = entry.get("version") or entry.get("version_or_commit") or entry.get("pin")
             slug = github_slug(entry.get("repository"))
             if slug and is_prerelease_pin(pin):
@@ -631,7 +638,13 @@ def main(argv=None) -> int:
         try:
             with ThreadPoolExecutor(max_workers=max(1, args.workers)) as pool:
                 for i, record in enumerate(pool.map(fetch, sorted(pending)), 1):
-                    results[pending[record["slug"]]] = record
+                    slug = record["slug"]
+                    # Exact URL lookups must not retain an older alias after a
+                    # refetch. Older records can omit slug, so check the URL too.
+                    for alias, retained in list(results.items()):
+                        if github_slug(alias) == slug or str(retained.get("slug") or "").lower() == slug:
+                            del results[alias]
+                    results[pending[slug]] = record
                     fetched_count = i
                     if i % 50 == 0:
                         print(f"fetched {i}", flush=True)

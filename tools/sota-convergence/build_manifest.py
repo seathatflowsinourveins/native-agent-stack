@@ -393,7 +393,8 @@ def build_baseline_trading(trading_by_layer: dict, repositories: dict,
 
 DORMANCY_THRESHOLD_DAYS = 180
 DORMANCY_RULE = (
-    "dormant when the newest of the latest GitHub release's published_at and the default-branch "
+    "dormant when the newest of the latest GitHub release's published_at, the selected "
+    "release-stream publication and the default-branch "
     "head commit date is at least threshold_days before checked_at; pushed_at stands in only when "
     "the head commit date is unknown (it also moves on non-default-branch pushes, so it can only "
     "shorten the idle span); null when the run has no reliable upstream data for the repository"
@@ -408,10 +409,12 @@ def _iso_day(value):
         return None
 
 
-def compute_dormancy(record, as_of, threshold_days=DORMANCY_THRESHOLD_DAYS) -> dict:
+def compute_dormancy(record, as_of, threshold_days=DORMANCY_THRESHOLD_DAYS, *, selected_release_at=None) -> dict:
     """Dormancy signal for one github-freshness.json record, relative to the
     fixed ``as_of`` day (the manifest's ``checked_at``), so the result is
-    deterministic for fixed inputs. It never reads the wall clock.
+    deterministic for fixed inputs. It never reads the wall clock. A selected
+    release-stream publication also counts, even if releases/latest and the
+    default branch are old; unknown/capped selections pass no additional date.
 
     ``dormant`` is null, never false, when the signal cannot be computed: no
     record, a failed primary fetch (``error``), no usable activity date, or
@@ -425,7 +428,11 @@ def compute_dormancy(record, as_of, threshold_days=DORMANCY_THRESHOLD_DAYS) -> d
     if record.get("error"):
         result["reason"] = "fetch_error"
         return result
-    release_at = _iso_day((record.get("latest_release") or {}).get("published_at"))
+    release_dates = [day for day in (
+        _iso_day((record.get("latest_release") or {}).get("published_at")),
+        _iso_day(selected_release_at),
+    ) if day]
+    release_at = max(release_dates, default=None)
     commit_at = _iso_day((record.get("head") or {}).get("date"))
     result["last_release_at"], result["last_commit_at"] = release_at, commit_at
     candidates = [day for day in (release_at, commit_at) if day]
@@ -488,7 +495,8 @@ def build_trading_freshness(trading_by_layer: dict, trading_pins: dict | None, r
     for row_id in sorted(rows):
         row = rows[row_id]
         row["dormancy"] = compute_dormancy(freshness_record(row["repository"], repositories), checked_at,
-                                           threshold_days=threshold_days)
+                                           threshold_days=threshold_days,
+                                           selected_release_at=row["upstream"].get("released_at"))
         entries.append(row)
     return {
         "schema": "trading-freshness/1",
@@ -644,8 +652,9 @@ def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, check
     entries = []
     for pin in sorted((runtime_pins or {}).get("entries", []), key=lambda item: str(item.get("id"))):
         repository = pin.get("repository")
-        upstream = compute_upstream(repository, repositories, pin=pin.get("pin")) if repository else {}
         tags = pin.get("tags")
+        upstream = compute_upstream(repository, repositories,
+                                    pin=pin.get("pin") if not isinstance(tags, dict) else None) if repository else {}
         if repository and isinstance(tags, dict):
             upstream = apply_tag_declaration(upstream, tags, freshness_record(repository, repositories))
         if pin.get("error"):
@@ -671,7 +680,8 @@ def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, check
             "repository": repository, "pin": pin.get("pin"), "pin_source": pin.get("pin_source"),
             "named_in": pin.get("named_in"), "error": pin.get("error"), "upstream": upstream, **pin_fields,
             "dormancy": compute_dormancy(freshness_record(repository, repositories) if repository else None,
-                                         checked_at, threshold_days=threshold_days),
+                                         checked_at, threshold_days=threshold_days,
+                                         selected_release_at=upstream.get("released_at")),
         })
     return {
         "schema": "runtime-freshness/1",

@@ -32,16 +32,27 @@ broker-paper qualification lane. This is report-only currency metadata.
 ## Decision and alternatives
 
 Keep `releases/latest` unchanged for stable pins. For a repository with a
-prerelease pin in the extracted working files, also request explicit REST pages
+prerelease pin using the release stream in the extracted working files, also request
+explicit REST pages
 of **100 releases, at most three pages (300 release records)**. Count every raw
 record toward page exhaustion before filtering drafts and unpublished releases.
 Store only compact release fields and the page/cap state.
 
-Select the newest `published_at` among non-draft, published releases whose parsed
-major matches the pin. Include both prereleases and a final release in that major;
-compare prerelease ordinals so `rc6 > rc5`, and a final release follows its RCs.
+Select the highest parsed version among non-draft, published releases whose major
+matches the pin; `published_at` breaks normalized version ties. A lower version
+republished later cannot hide a higher available version. Include both prereleases
+and a final release in that major; compare prerelease ordinals so `rc6 > rc5`, and
+a final release follows its RCs.
 The manifest, trading table and workflow's fixed-tool summary use this policy.
 Older snapshots without a release list are fetched again for prerelease pins.
+Refetching replaces every retained record of the normalized slug, including alias
+URLs and older records without a slug field, before storing the new representative.
+
+Runtime entries with declared tag patterns use the tag path and require no release
+list unless another entry of the same slug uses the release stream. A tag-list miss
+retains the ordinary release fallback. Trading and runtime dormancy include the
+selected release-stream publication alongside the stable release and default-branch
+head; unknown or capped selections supply no additional activity date.
 
 A short page establishes exhaustion. A full third page reports **unknown beyond
 cap**, even if a candidate appeared among the records read or the history happens
@@ -78,7 +89,8 @@ comparison that treated `2.0.0rc5` and `2.0.0rc6` as equal.
 Synthetic fixtures exercise the actual fetch, manifest/trading comparison and
 rendered report, as well as the Python read embedded in the workflow summary.
 They cover a later 1.x backport on the first page with rc6 on the second, drafts,
-missing publication time, another major, publication order, RC numeric ordering,
+missing publication time, another major, version ranking with publication
+tie-breaking, RC numeric ordering,
 the final release, a missing list, failed/malformed pages, cap exhaustion, stable
 pins and resuming an older snapshot. These are local integration/fixture checks,
 not an upstream test suite or a live rc6 observation.
@@ -158,6 +170,9 @@ including a prerelease-shaped pin and a prefixed upstream tag. The new fixture
 compares `1.1.0rc5` with `inspect-tool-support-1.2.0`; ordinary release-stream pins
 keep their RC ordinal comparison. This is a separate tag declaration path, not an
 extension of the published-release parser's documented grammar.
+The three proven mistakes now have individual prevention and verification rows in
+the [anti-pattern log](../harness-defaults.md#anti-pattern-log); they were missing
+from that log until the PR #707 thread repair below.
 
 The four focused regressions first exited **1**, reproducing all three findings.
 An intermediate run exited **1** because the new tag fixture indexed an optional
@@ -169,3 +184,37 @@ For this repair, the coordinator superseded the earlier in-worktree TMPDIR
 recommendation with an owned cache directory outside both the checkout and
 `/tmp`, under `nice -n 19`. Only the three touched freshness test modules and the
 requested integrity checks are acceptance scope; CI owns the full-suite run.
+
+## PR #707 review-thread repair — 2026-10-05
+
+All five thread premises were checked against `0c5695a556312d003f31537f86f0a34a8d0d8e20`
+and confirmed. The local regressions reproduced suppressed shared-repository drift
+from an unused release-list failure, false dormancy beside a fresh RC, a later rc5
+hiding rc7 from an rc6 pin, the three missing anti-pattern rows, and stale alias
+lookups persisting through resume. No network read was needed for this repair.
+
+The collector now excludes tag-declared runtime entries from release-stream
+requirements, while foundation, trading and untagged runtime stream pins of the
+same slug still require the bounded list. Tag-declared rows also bypass stream
+selection, retaining the documented stable-release fallback on a tag-list miss.
+Dormancy receives the definitively selected publication date for trading and
+runtime rows; stable pins keep their previous dates. Candidate ranking now uses
+version before publication time, with the latter only a tie-breaker. A refetch
+removes all records for its normalized slug before adding the new representative,
+preserving unrelated repositories and leaving every alias on the fresh snapshot.
+
+The anti-pattern log records the three freshness-r1 mistakes individually, and
+also records the four code defects proven in this thread repair. Its regression
+checks unique rows within the contiguous Markdown table, non-empty prevention
+and verification fields, and existing test methods at the cited paths.
+
+The first focused run exited **1** (seven tests); after refining the alias fixture
+to make the canonical URL the new representative and adding the tag-miss fallback
+case, the second pre-fix run exited **1** (eight tests). All five threads had a
+discriminating failure. The post-fix focused run passed eight tests, exit **0**.
+These are synthetic/local integration checks, not upstream or hosted execution.
+Targeted acceptance is `tests.test_catalog_freshness_runtime`,
+`tests.test_catalog_freshness_propose`, `tests.test_sota_convergence`,
+`scripts/validate.py`, `scripts/evidence_manifest.py --check` and `git diff --check`.
+Scratch files use the authorized cache outside both the worktree and `/tmp`, under
+`nice -n 19`; CI owns the full suite.
