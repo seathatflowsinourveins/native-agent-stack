@@ -158,7 +158,9 @@ def sha256_json(value) -> str:
 
 def tree_manifest(root: Path | str) -> dict:
     """{relative path: {"sha256" | "symlink", "bytes"}} for every file and symlink under root, sorted; directories are
-    implied. Symlinks are recorded by target and never followed."""
+    implied. Symlinks are recorded by target and never followed. A file that another process removes or locks during
+    the walk is recorded as unreadable, never fatal: a client's own background work (Codex's marketplace upgrade writes
+    temporary git objects into CODEX_HOME/.tmp) can outlive the client's exit."""
     root = Path(root)
     entries = {}
     for dirpath, dirnames, filenames in os.walk(root, followlinks=False):
@@ -167,10 +169,13 @@ def tree_manifest(root: Path | str) -> dict:
         for name in sorted(filenames) + sorted(d for d in dirnames if (base / d).is_symlink()):
             path = base / name
             rel = path.relative_to(root).as_posix()
-            if path.is_symlink():
-                entries[rel] = {"symlink": os.readlink(path)}
-            elif path.is_file():
-                entries[rel] = {"sha256": sha256_file(path), "bytes": path.stat().st_size}
+            try:
+                if path.is_symlink():
+                    entries[rel] = {"symlink": os.readlink(path)}
+                elif path.is_file():
+                    entries[rel] = {"sha256": sha256_file(path), "bytes": path.stat().st_size}
+            except (FileNotFoundError, PermissionError) as error:
+                entries[rel] = {"unreadable": type(error).__name__}
     return dict(sorted(entries.items()))
 
 

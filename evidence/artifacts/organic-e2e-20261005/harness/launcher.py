@@ -633,36 +633,45 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
         completed = stream_completed(client, stream_path)
         reason, post_result_terminated = trial_reason(client, policy, outcome, completed)
         result.update({"rc": outcome["rc"], "censored": reason is not None, "reason": reason})
-        after = s7_snapshot(trial_files)
-        write_json(root / "s7" / f"{trial_id}.after.json", after, 0o600)
-        host_compare = s7_compare(before, after)
-        fixture_manifest = tree_manifest(fixture)
-        write_json(root / "manifests" / f"{trial_id}.fixture.json", fixture_manifest, 0o600)
-        template_manifest = load_json(cfg["fixture"]["template_manifest_path"])
-        changed = sorted(k for k in fixture_manifest if template_manifest.get(k) != fixture_manifest[k])
-        removed = sorted(k for k in template_manifest if k not in fixture_manifest)
-        draft_src, draft_dst = fixture / "draft", root / "draft" / trial_id
-        if draft_src.exists():
-            shutil.copytree(draft_src, draft_dst, symlinks=True)
-        else:
-            draft_dst.mkdir(parents=True, exist_ok=True)
-        ledger(root, {**base, "phase": "exit", "at": utc_now(), **result,
-                      "completed_stream": completed, "duration_s": outcome["duration_s"],
-                      "completion_policy": policy["policy"] if client == "claude" else None, "t_seconds": t_seconds,
-                      "terminated_by": outcome["kill_reason"], "kill_at": outcome["kill_at"],
-                      "result_at": outcome["result_at"], "time_to_result_s": outcome["time_to_result_s"],
-                      "post_result_s": outcome["post_result_s"], "post_result_terminated": post_result_terminated,
-                      "meter_first": outcome["meter_first"], "meter_last": outcome["meter_last"],
-                      "meter_readings": outcome["meter_readings"], "nested_clients": outcome["nested"],
-                      "tree_exes": outcome["tree_exes"], "rate_limit_error": outcome["rate_limit_error"],
-                      "stream_sha256": sha256_file(stream_path), "stream_bytes": stream_path.stat().st_size,
-                      "fixture_manifest_sha256": manifest_digest(fixture_manifest),
-                      "fixture_changed": changed[:200], "fixture_changed_count": len(changed),
-                      "fixture_removed": removed[:200], "fixture_removed_count": len(removed),
-                      "draft_manifest_sha256": manifest_digest(tree_manifest(draft_dst)),
-                      "host_s7": {k: v for k, v in host_compare.items() if k != "new_trust_paths_private"},
-                      "host_s7_private": host_compare.get("new_trust_paths_private")})
-        if not host_compare["equal"] or any(host_compare["new_trust"].values()):
+        exit_row = {**base, "phase": "exit", **result,
+                    "completed_stream": completed, "duration_s": outcome["duration_s"],
+                    "completion_policy": policy["policy"] if client == "claude" else None, "t_seconds": t_seconds,
+                    "terminated_by": outcome["kill_reason"], "kill_at": outcome["kill_at"],
+                    "result_at": outcome["result_at"], "time_to_result_s": outcome["time_to_result_s"],
+                    "post_result_s": outcome["post_result_s"], "post_result_terminated": post_result_terminated,
+                    "meter_first": outcome["meter_first"], "meter_last": outcome["meter_last"],
+                    "meter_readings": outcome["meter_readings"], "nested_clients": outcome["nested"],
+                    "tree_exes": outcome["tree_exes"], "rate_limit_error": outcome["rate_limit_error"],
+                    "stream_sha256": sha256_file(stream_path), "stream_bytes": stream_path.stat().st_size}
+        host_compare = None
+        try:
+            # A launched trial always gets its exit row: a failure here is recorded, and G4 then fails for want of the
+            # host comparison instead of the trial vanishing from the ledger.
+            after = s7_snapshot(trial_files)
+            write_json(root / "s7" / f"{trial_id}.after.json", after, 0o600)
+            host_compare = s7_compare(before, after)
+            fixture_manifest = tree_manifest(fixture)
+            write_json(root / "manifests" / f"{trial_id}.fixture.json", fixture_manifest, 0o600)
+            template_manifest = load_json(cfg["fixture"]["template_manifest_path"])
+            changed = sorted(k for k in fixture_manifest if template_manifest.get(k) != fixture_manifest[k])
+            removed = sorted(k for k in template_manifest if k not in fixture_manifest)
+            draft_src, draft_dst = fixture / "draft", root / "draft" / trial_id
+            if draft_src.exists():
+                shutil.copytree(draft_src, draft_dst, symlinks=True)
+            else:
+                draft_dst.mkdir(parents=True, exist_ok=True)
+            exit_row.update({"fixture_manifest_sha256": manifest_digest(fixture_manifest),
+                             "fixture_changed": changed[:200], "fixture_changed_count": len(changed),
+                             "fixture_removed": removed[:200], "fixture_removed_count": len(removed),
+                             "draft_manifest_sha256": manifest_digest(tree_manifest(draft_dst)),
+                             "host_s7": {k: v for k, v in host_compare.items() if k != "new_trust_paths_private"},
+                             "host_s7_private": host_compare.get("new_trust_paths_private")})
+        except Exception as error:  # noqa: BLE001
+            exit_row["bookkeeping_error"] = f"{type(error).__name__}: {str(error)[:300]}"
+            with open(root / "launcher-errors.log", "a") as handle:
+                handle.write(f"{utc_now()} {trial_id} after exit: {traceback.format_exc()}\n")
+        ledger(root, {**exit_row, "at": utc_now()})
+        if host_compare is not None and (not host_compare["equal"] or any(host_compare["new_trust"].values())):
             (root / "STOP").write_text(f"{utc_now()} host exposure or trust changed during {trial_id}: "
                                        f"{host_compare['changed'][:6]} new_trust={host_compare['new_trust']}\n")
         return result
