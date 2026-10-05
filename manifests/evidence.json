@@ -16642,6 +16642,11 @@
       "bytes": 18701
     },
     {
+      "path": "docs/decisions/2026-10-05-github-estate-consolidation.md",
+      "sha256": "15fb5712678c7689e50b8fddc5eb889b6abf7cf21368d8c38e33034138ac8507",
+      "bytes": 14396
+    },
+    {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
       "sha256": "976b8e8c3ede42aa2ce26c01dbca5184cf45e329419a065e169bc0936f093051",
       "bytes": 14176
