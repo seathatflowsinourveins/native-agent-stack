@@ -4233,8 +4233,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "0153fc7595f7dd64d077366b2b0251cbe78f13a47f90798ab6d3d746624c2aec",
-      "bytes": 25235
+      "sha256": "064d309189054b6f2c6ec37855fd3e3e6c09eee42197865cc1cc86d9233dcc20",
+      "bytes": 26117
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -16421,6 +16421,11 @@
       "path": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
       "sha256": "d091a1021eff71b11bf409b7896577566713788ecbf33e8f8c629e4d45ad26e1",
       "bytes": 15230
+    },
+    {
+      "path": "docs/decisions/2026-10-04-nautilus-prerelease-freshness.md",
+      "sha256": "ccee257d1b5bb15c31679437f17d85eac33befb82e27e058c1227b60df30a28c",
+      "bytes": 10989
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
@@ -52044,8 +52049,8 @@
     },
     {
       "path": "scripts/freshness_propose.py",
-      "sha256": "c96e99d80e922f257e6c95d8b28c9493e981e4aacd99cfbbe980b4053b55bcd1",
-      "bytes": 51393
+      "sha256": "2a28545967cf2a84f0de1f392b753b0744d3c269d619f4d415abc12bdf53e5a4",
+      "bytes": 52315
     },
     {
       "path": "scripts/git-hooks/pre-commit",
@@ -52559,8 +52564,8 @@
     },
     {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "9138d033a5c8441af3c26905ba27fc3a8726433c6610ee815e1b56864ec60cd2",
-      "bytes": 60024
+      "sha256": "0f8f306b5c8ddcbf5f24dfcfddfe6328865c403e57f1a9f6813cf8ac83f26309",
+      "bytes": 62089
     },
     {
       "path": "tests/test_catalogs.py",
@@ -53604,8 +53609,8 @@
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "sha256": "91af1beac78818d9b414a4de7f099c92133b1f84d7db1ce0715932195122f78c",
-      "bytes": 121534
+      "sha256": "fa33cf8bdbd5bdc11f094d2d714b9ac213bacb365454db2bc0325117f911f144",
+      "bytes": 124198
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
@@ -53629,8 +53634,8 @@
     },
     {
       "path": "tools/sota-convergence/github_freshness.py",
-      "sha256": "aa3964f31cedc9098354d9a4cdbd47170a1358662358b5e55e57d0ff600617b7",
-      "bytes": 27422
+      "sha256": "dbd2d6fbb79c60c39a5554024aa8c7985d3ee9903490671911250c1f874c1f8d",
+      "bytes": 34117
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",
