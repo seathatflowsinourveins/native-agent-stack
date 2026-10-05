@@ -323,7 +323,36 @@ or wide quote leaves the run incomplete instead of paying up.
   of their SHA-256:
   - `run.py.9f6c08f1835f` is the harness of both regular-session receipts, from `c23525e6`;
   - `run.py.676a375a472a` is the harness of the after-hours receipt, from `c5468df1`;
+  - `run.py.1b697f237275` is the merged harness (this branch's `run.py` after the hardening above), behind the
+    2026-10-05 receipt;
   - `plan.json.9f2942c49bbd` and `plan-post.json.4500c917e11e` are the plans.
 
   A test checks that every receipt's `harness_sha256` and `plan_sha256` resolve to one of these or to a current
   file.
+
+## Run, 2026-10-05 (the merged, hardened bytes; the paper Gateway hosted on NativeStack2604)
+
+This is the first run of the merged `run.py` (sha256 `1b697f23…`, archived as `evidence/harness/run.py.1b697f237275`)
+with the same `plan.json` (`9f2942c4…`) as the 2026-09-23 runs.
+
+- **Setup.**
+  - NautilusTrader 1.231.0 and nautilus-ibapi 10.45.1 were installed by this README's uv recipe; the `ib` extra
+    also installed protobuf 5.29.6.
+  - The harness ran on NativeStack against the paper IB Gateway (gnzsnz/ib-gateway 10.51.1b, paper mode) that
+    NativeStack2604 hosts. It connected at 127.0.0.1:4002, over the WSL loopback both distributions share.
+  - The user unticked Read-Only API in the running Gateway beforehand, at about 14:09Z; the coordinator lane attested
+    this. No IB 321 was observed.
+- **Pre-check.** `run.py check` passed: 1 paper account, 0 positions, 0 open orders.
+- **Result.** 10:26 ET, `evidence/receipt-20261005-passed.json`: **passed** (exit 0, 11.5 s):
+
+  | Case | Nautilus events | Result |
+  |---|---|---|
+  | C1 resting buy, SPY 1 at half the bid (386.42) | Initialized, Submitted, Updated, Accepted | accepted |
+  | C2 cancel | PendingCancel, Updated, Accepted, Canceled | canceled |
+  | C3 marketable buy (limit 772.97) | through Filled | filled 772.93, commission 1.00 USD |
+  | C4 flatten (limit 772.84) | through Filled | filled 772.90, commission 1.02 USD |
+
+  - Gross −0.03 USD and net −2.05 USD against the 5 USD round-trip bound; Nautilus realized PnL agrees.
+  - 3 of 6 orders were used. There were no cleanup, unconfirmed or duplicate events.
+  - The independent official-ibapi flat proof (client 92) found 0 positions and 0 open orders.
+- **Console log.** Nautilus does not redact it, so it stayed private and is not committed.
