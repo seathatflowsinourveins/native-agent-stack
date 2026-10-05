@@ -4257,8 +4257,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "2be9f85160b9f3f6ac9f4fb11cc3ebb25c960aea20a72a6ffe6e32d7b3b30eef",
-      "bytes": 12367
+      "sha256": "167d60a2b8feb571602dbf78b4af15c5fa9aa0ebae6c75c1839928dba5879917",
+      "bytes": 12705
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -14902,6 +14902,26 @@
       "bytes": 10588
     },
     {
+      "path": "blueprints/us-equities/overfitting-controls/README.md",
+      "sha256": "5bd64aa1da1ea1d02a943aff16dfabc06bae29a198379b612315dc5c38703d84",
+      "bytes": 6394
+    },
+    {
+      "path": "blueprints/us-equities/overfitting-controls/requirements-riskl-parity.in",
+      "sha256": "bf09321accc61be05ccace59d7eb7c9fb2c1642da06c4c4b19287cc3e615d43e",
+      "bytes": 172
+    },
+    {
+      "path": "blueprints/us-equities/overfitting-controls/requirements-riskl-parity.lock",
+      "sha256": "d0e1dbf620c58d7763ee4a12929dc109b7739d5aa4759092b03b7dd8003b8e12",
+      "bytes": 30346
+    },
+    {
+      "path": "blueprints/us-equities/overfitting-controls/riskl-parity-receipt.json",
+      "sha256": "45a53612b2290c581ad0d9127a6bbbcc6f015eaf357101ffd3674b62bd76efc3",
+      "bytes": 8259
+    },
+    {
       "path": "blueprints/us-equities/overnight-volume/runs/20260929/README.md",
       "sha256": "f10be4a53c43bdef7fb9d9a0393a1c2104647b365b3b64721726b0c49f99315a",
       "bytes": 17022
@@ -16615,6 +16635,11 @@
       "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",
       "sha256": "1389de18bbaf5c41d8f22093a9642d982230a851f954183b7c8254e0b5890bce",
       "bytes": 18701
+    },
+    {
+      "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
+      "sha256": "cf5136ab52a9c0dbb61457cfa1c2ab2e3632bef4676f276052946090f14e9141",
+      "bytes": 9992
     },
     {
       "path": "docs/direct-results.md",
@@ -53780,6 +53805,11 @@
       "path": "tests/test_osv_lockfile_coverage.py",
       "sha256": "cb4d002908f17185127d1d98caaec8ef47b4fd23adefe9c28ee4b3050e53d3a3",
       "bytes": 75839
+    },
+    {
+      "path": "tests/test_overfitting_riskl_parity.py",
+      "sha256": "d04b4453cd58b259987d2d83867c29db19d1c9a5fffc322434f132a76832c015",
+      "bytes": 10668
     },
     {
       "path": "tests/test_path_safety.py",
