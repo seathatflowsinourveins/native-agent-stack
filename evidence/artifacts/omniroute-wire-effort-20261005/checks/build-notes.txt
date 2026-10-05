@@ -53,3 +53,7 @@ rerun (started 14:41Z, a new random port), exit code 0 at 14:45:38Z (the command
 [pack-boot] healthy: HTTP 200, version 3.8.51
 [pack-boot] value survived a clean shutdown + restart — disk persistence proven
 [pack-boot] ✅ the packed tarball boots AND persists — #7065 class gate green
+
+## the kept tarball against a fresh pack of the tested tree (2026-10-05T14:55Z)
+npm pack --dry-run --json in the build worktree (exit 0): shasum 138b8463b802ba72b07680d671255554a079f81a, size 137823643, 26762 entries.
+The kept tarball: sha1 138b8463b802ba72b07680d671255554a079f81a, same size; the sha512 integrity is equal as well. So the kept file is bit-identical to the pack of the tree that check:pack-boot packs and boots.

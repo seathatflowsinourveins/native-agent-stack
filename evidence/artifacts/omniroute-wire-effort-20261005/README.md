@@ -24,5 +24,5 @@ Rerun the probe: in an OmniRoute checkout at the tag with `npm ci` done, copy `s
 directory is isolated). The live columns are read with `scripts/effort_live.py.txt` (it opens the store with `mode=ro`).
 
 Limits: the upstream effort column is captured from the provider request, not from the backend's own report, so whether the backend applies `max` is not observable here; the cache effect of
-removing the affinity patch was not measured (no build without it was deployed); the probe applies PR 15167's single commit `0585aba55` to the tag, while the deployed build carries the same
-change as `f5d8e150b` on its base, and the executor, suffix, registry and fast-tier files are byte-identical between the two.
+removing the affinity patch was not measured (no build without it was deployed); the probe applies PR 15167's head of 2026-10-05 (`0585aba55`) to the tag, while the running build carries the
+PR's head of 2026-09-30 (`f5d8e150b`) on its base; the executor, suffix, registry and fast-tier files are byte-identical between the two (the pricing constants differ).
