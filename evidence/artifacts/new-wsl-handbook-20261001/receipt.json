@@ -6,8 +6,8 @@
   "generator_sha256": "d6dba4004564275b53cd1b44a86f2ae04349ca278e6a05b9bb9803569d5166ee",
   "profile_sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04",
   "outputs": {
-    "docs/new-wsl-handbook.md": "2e101dc51d736495f25a9e54ee3efd60d2ae7b316f090397d9de139143d7265b",
-    "docs/new-wsl-handbook.json": "8ef7beeea33ed43f78c3d80a602751369c5e2ea2fa8c55ce7603dcedbd72f60a"
+    "docs/new-wsl-handbook.md": "cfb5c3ea852d756268667802d66d203789024d5f357eeeb90023e631d7fc5316",
+    "docs/new-wsl-handbook.json": "c11d2d1affc274e0cfb15480110aa77f8b2695dea508e5ddd524273c2617ca57"
   },
   "inventory": {
     "layers": 37,
@@ -355,6 +355,26 @@
         "docs/new-wsl-handbook.json": "8ef7beeea33ed43f78c3d80a602751369c5e2ea2fa8c55ce7603dcedbd72f60a"
       },
       "source": "seathatflowsinourveins/native-agent-stack@424b8a778222ae8857aade42c49ae6f7a13b3138:scripts/build_new_wsl_handbook.py",
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "PR #703 refreshed onto main 2d849ba1f (after #713, #726, #736 and the other afternoon landings); its merged catalog and stack inputs changed the handbook's source digests; regenerated from this PR's tree.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "e8b739408bf4bd24c19ab2c88440bd18084582350c8aa108c575c0362f42c15d",
+        "docs/new-wsl-handbook.json": "c49d7d2457692e6d3895cd0896ed601d81d55a90b2f3dd9ff27cec6116da7a16"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "PR #715 refreshed onto main ecfa11276 (after #703 landed). The catalog merged cleanly as text from #703's and #715's changes, and #715's generator and inputs changed the handbook's source digests; regenerated with --write, and --check passed. The receipt's regenerations were united at the entry level: base 7, #715's 5 and main's #703 entry.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "2e101dc51d736495f25a9e54ee3efd60d2ae7b316f090397d9de139143d7265b",
+        "docs/new-wsl-handbook.json": "8ef7beeea33ed43f78c3d80a602751369c5e2ea2fa8c55ce7603dcedbd72f60a"
+      },
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
     }
   ]

@@ -1,0 +1,23 @@
+[project]
+name = "us-equities-runtime"
+version = "0.1.0"
+requires-python = "==3.12.3"
+dependencies = [
+    "alpaca-py==0.44.0",
+    "arch==8.0.0",
+    "duckdb==1.5.5",
+    "edgartools==5.60.0",
+    "exchange-calendars==4.13.2",
+    "fincore==0.5.1",
+    "mlflow[mcp]==3.16.1",
+    "nautilus-trader==2.0.0rc5",
+    "numpy==2.5.3",
+    "pandas==3.0.6",
+    "pandera[pandas]==0.33.1",
+    "purgedcv==0.1.10",
+    "skfolio==1.2.9",
+]
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
+default = true

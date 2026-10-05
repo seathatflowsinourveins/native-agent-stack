@@ -1,0 +1,35 @@
+uv 0.12.17 (x86_64-unknown-linux-gnu)
+Downloading cpython-3.12.3-linux-x86_64-gnu (download) (64.2MiB)
+ Downloaded cpython-3.12.3-linux-x86_64-gnu (download)
+Installed Python 3.12.3 in 1.84s
+ + cpython-3.12.3-linux-x86_64-gnu
+error: the argument `--managed-python` cannot be used with `--python-preference`
+install | FAIL | python-install
+install-exit=2
+offline_isolation | BLOCKED | 69
+python | BLOCKED | 69
+import_nautilus-trader | BLOCKED | 69
+BLOCKED: acceptance prerequisites unavailable
+import_numpy | BLOCKED | 69
+import_pandas | BLOCKED | 69
+import_alpaca-py | BLOCKED | 69
+import_edgartools | BLOCKED | 69
+import_exchange-calendars | BLOCKED | 69
+import_dvc | BLOCKED | 69
+import_duckdb | BLOCKED | 69
+import_pandera | BLOCKED | 69
+import_skfolio | BLOCKED | 69
+import_fincore | BLOCKED | 69
+import_mlflow | BLOCKED | 69
+import_arch | BLOCKED | 69
+import_purgedcv | BLOCKED | 69
+ibkr_adapter | BLOCKED | 69
+alpaca_adapter_source | BLOCKED | 69
+alpaca_adapter_import | BLOCKED | 69
+nautilus_quickstart_sha256 | BLOCKED | 69
+nautilus_quickstart | BLOCKED | 69
+duckdb_query | BLOCKED | 69
+pandera_example | BLOCKED | 69
+skfolio_example | BLOCKED | 69
+arch_example | BLOCKED | 69
+accept-exit=1

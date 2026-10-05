@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "native-stack-2604-20261004--nautilustrader--use--20261004",
+  "kind": "host_acceptance",
+  "host": {
+    "host_id": "native-stack-2604-20261004",
+    "platform_id": "linux-wsl2-x86_64",
+    "os": "linux",
+    "architecture": "x86_64",
+    "second_physical_machine": false
+  },
+  "catalog_revision": "d323b53437e025be3d054b9b5e4d292fe396c75e",
+  "recorded_by": {
+    "identity_sha256": "ce5a4f645815a5396c0e1c8fba6c7bd64e37d299dd25184a67f12571f6bb0137"
+  },
+  "component_id": "nautilustrader",
+  "layer_refs": [
+    {
+      "catalog": "us-equities",
+      "layer_id": "backtesting-engine"
+    }
+  ],
+  "stage": "use",
+  "commands": [
+    {
+      "cmd": "mise exec uv@0.12.17 -- bash install-trading-2604.sh && mise exec uv@0.12.17 -- bash accept-trading-2604.sh",
+      "exit": 0,
+      "duration_s": 373.0,
+      "output_sha256": "a911abb0633c794f45cd44d1c0deb0fc13d30f5377fa279aebfbad9bf4c3f781",
+      "output_excerpt": "install | PASS\ninstall-exit=0\noffline_isolation | PASS | 0\nimport_nautilus-trader | PASS | 0\nnautilus_quickstart_sha256 | PASS | 0\nnautilus_quickstart | PASS | 0\naccept-exit=0\n"
+    }
+  ],
+  "tool_versions": {
+    "nautilustrader": "2.0.0rc5",
+    "python": "3.12.3",
+    "uv": "0.12.17"
+  },
+  "observed_at_utc": "2026-10-04T21:23:33Z",
+  "result": "pass",
+  "claim": "Historical NativeStack2604 native offline use of the unchanged NautilusTrader 2.0.0rc5 synthetic EUR/USD quickstart passed after the delivered locked runtime install on 2026-10-04; 25/25 local harness rows and both outer script exits were successful.",
+  "limitations": [
+    "Historical native execution on NativeStack2604 on 2026-10-04; packaging does not rerun installation or acceptance and does not qualify another host.",
+    "No paper or broker execution, provider-data acquisition, model inference, live trading, container start or gateway sign-in occurred in this runtime run.",
+    "The unchanged Nautilus example uses synthetic EUR/USD bars. Bundled SP500 data and the three-row schema example do not qualify point-in-time US-equity data, strategies or economic performance.",
+    "The 25-row acceptance script is a local integration harness, not an unchanged upstream test suite. Imported software, hash checks and transcribed examples do not constitute whole-component qualification.",
+    "Only outer install/accept logs, timestamp files and the result summary were staged. Per-check output logs, engine reports, original outer coordinator argv and separate script durations were not staged; no independent post-run observation or discriminating controls for local checks are supplied.",
+    "CPython 3.12.3 versus 3.13 and complete canonical matrix ratification remain open.",
+    "The EdgarTools 5.59.1 filing-fix overturn comparison remains open; delivered EdgarTools stays at catalog 5.58.0.",
+    "The supplied handoff reports a second Claude r2 preparation review PASS, but its verdict artifact is absent; preparation review is separate from independent review of this run.",
+    "Images were pulled by immutable OCI index digest and inspected only. Source-to-image reproducibility, LEAN oracle parity and rc5 broker risk/recovery remain open.",
+    "Imported from the supplied historical job-031 bundle using the repository schema/helpers; host_receipts.py record was not run and no new native execution is implied.",
+    "commands[0].cmd is a normalized sequential display of the two scripts named by the supplied runner summary, not a retained exact outer shell argv. duration_s is the combined batch interval from started-3.txt. Its excerpt selects exact native log lines; the full sanitized transcript is retained in the companion receipt artifacts.",
+    "catalog_revision is the read-only source snapshot used to prepare the delivered recipe, not the later packaging base. The batch executed staged scripts outside that checkout.",
+    "recorded_by hashes the logical source-job label job-031 from the supplied handoff, not an unavailable native recorder session identity; exact original model/session provenance is not supplied.",
+    "The self entry reflects the supplied source result-summary.json. A post-run independent host-receipt review is requested; no platform status, selection or broker gate is advanced."
+  ],
+  "evidence_class": "native_proven",
+  "reviews": [
+    {
+      "kind": "self",
+      "ref": "evidence/artifacts/trading-runtime-2604-20261004/result-summary.json",
+      "verdict": "agree",
+      "at_utc": "2026-10-04T21:23:33Z"
+    }
+  ]
+}

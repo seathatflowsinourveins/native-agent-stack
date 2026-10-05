@@ -20,7 +20,12 @@ anchors are:
 - Latest source observation: `2026-09-19T23:48:29.649862Z`. Acceptance timestamps
   are from 2020; they do not establish when this system received the information.
 
-Stage A uses the existing EdgarTools **5.58.0** environment. It verifies the
+Stage A now requires EdgarTools **5.60.0** from the shared catalyst-provenance
+lock. The recorded September 20 execution used **5.58.0**; its native receipt
+and input/output hashes remain historical. A new parser run produces new anchors
+and needs its own dataset acceptance. The October 4
+[SEC index receipt](../catalyst-provenance/native-network-edgartools-5600-20261004.json)
+qualifies bounded index access, rather than this complete dataset bridge. It verifies the
 externally supplied receipt hash and every declared blob, then reuses
 `catalyst.packet()` and its current strict raw-header parser. It does not trust
 the original receipt's stale `selected[].event` values. Native
@@ -57,10 +62,11 @@ identify exhibits.
 
 ## Primary sources and limits
 
-- [EdgarTools 5.58.0 release](https://github.com/dgunning/edgartools/releases/tag/v5.58.0), MIT;
-  installed execution is pinned to 5.58.0, not changing default-branch HEAD.
-- [Pinned SGML header parser](https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/edgar/sgml/sgml_header.py)
-  and [native current-report taxonomy](https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/edgar/company_reports/current_report.py).
+- [EdgarTools 5.60.0 release](https://github.com/dgunning/edgartools/releases/tag/v5.60.0), MIT;
+  the current recipe is pinned to release commit `1e7a61b3a142dbf5d19bc82444f85239c1786348`.
+  The dated native execution below used 5.58.0.
+- [Pinned SGML header parser](https://github.com/dgunning/edgartools/blob/1e7a61b3a142dbf5d19bc82444f85239c1786348/edgar/sgml/sgml_header.py)
+  and [native current-report taxonomy](https://github.com/dgunning/edgartools/blob/1e7a61b3a142dbf5d19bc82444f85239c1786348/edgar/company_reports/current_report.py).
 - [Official Form 8-K](https://www.sec.gov/about/forms/form8-k.pdf): Items 5.02,
   7.01, 8.01 and 9.01 describe different reporting obligations. Native short
   labels are not a substitute for the full definitions; the 5.02 official title

@@ -135,13 +135,13 @@ def capture(root, anchor):
 
 
 def native_identity():
-    if importlib.metadata.version("edgartools") != "5.58.0":
+    if importlib.metadata.version("edgartools") != "5.60.0":
         raise ValueError("edgartools_version_mismatch")
     from edgar.documents import HTMLParser
     from edgar.sgml import FilingSGML, FilingHeader
     from edgar.sgml import sgml_parser
     paths = sorted({Path(inspect.getfile(x)) for x in [HTMLParser, FilingSGML, FilingHeader, sgml_parser]})
-    return {"kind": "native", "edgartools": "5.58.0", "sources": [B.digest("edgar/" + str(p).split("/edgar/", 1)[1], B.read(p)) for p in paths]}
+    return {"kind": "native", "edgartools": "5.60.0", "sources": [B.digest("edgar/" + str(p).split("/edgar/", 1)[1], B.read(p)) for p in paths]}
 
 
 def native_parse(source_id, raw):
@@ -300,7 +300,7 @@ def verify(root, anchor, reparse=False):
     if identity.get("kind") == "injected_test":
         if not result["synthetic"]:
             raise ValueError("native_identity_missing")
-    elif identity.get("kind") != "native" or identity.get("edgartools") != "5.58.0" or len(identity.get("sources", [])) != 4:
+    elif identity.get("kind") != "native" or identity.get("edgartools") != "5.60.0" or len(identity.get("sources", [])) != 4:
         raise ValueError("invalid_parser_identity")
     parsed = B.strict_json(files["parsed.json"])
     if set(parsed) != {s["source_id"] for s in data["sources"]}:

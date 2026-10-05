@@ -1,0 +1,39 @@
+{
+  "automatic_retries": 0,
+  "cohort_count": 2,
+  "day": "2020-03-02",
+  "edgartools": "5.60.0",
+  "finished_at": "2026-10-04T22:23:23.587203Z",
+  "first_observed_at": "2026-10-04T22:23:23.581117Z",
+  "fixture_sha256": "136ce3e0dba2fd3b34ecf79d4ee3f666ea4c8a3a9e21371b7bb852226bec92ba",
+  "forms": [
+    "8-K",
+    "8-K/A"
+  ],
+  "historical_point_in_time": false,
+  "http_observations": [],
+  "method": "read_pipe_delimited_index / Filings.filter",
+  "mode": "offline_fixture",
+  "native_context": "FILINGS COLLECTION\n\nTotal: 2 filings\nForms: 8-K, 8-K/A\nDate Range: 2020-03-02 to 2020-03-02\n\nAVAILABLE ACTIONS:\n  - Use .latest() to get most recent filing\n  - Use [index] to access specific filing (e.g., filings[0])\n  - Use .filter(form='C') to narrow by form type\n  - Use .docs for detailed API documentation",
+  "native_context_truncated": false,
+  "omitted_empty_proxy_variables": [],
+  "schema_version": 1,
+  "selected": [
+    {
+      "accession_number": "0000000001-20-000001",
+      "cik": 1,
+      "company": "Example A",
+      "filing_date": "2020-03-02T00:00:00.000",
+      "form": "8-K"
+    },
+    {
+      "accession_number": "0000000002-20-000002",
+      "cik": 2,
+      "company": "Example B",
+      "filing_date": "2020-03-02T00:00:00.000",
+      "form": "8-K/A"
+    }
+  ],
+  "started_at": "2026-10-04T22:23:23.486447Z",
+  "status": "complete"
+}

@@ -7,7 +7,13 @@
     "source": "blueprints/us-equities/adaptive-paper/README.md",
     "receipt": "blueprints/us-equities/adaptive-paper/receipt.json",
     "engine": "NautilusTrader2.0.0rc5 LiveNode with custom Python Alpaca adapter and alpaca-py0.44.0",
-    "policies": ["trend_momentum", "range_breakout", "mean_reversion", "relative_strength", "defensive_cash"],
+    "policies": [
+      "trend_momentum",
+      "range_breakout",
+      "mean_reversion",
+      "relative_strength",
+      "defensive_cash"
+    ],
     "max_total_requests_per_minute": 200,
     "max_submission_requests_per_minute": 180,
     "native_synthetic_capacity": "180 fills / 90 roundtrips in60.4282seconds;178.7246submissions/minute;flat;zero broker connections",
@@ -216,5 +222,34 @@
     "Native AAPL replay is a retrospective scheduled diagnostic with synthetic fills; it does not establish a profitable strategy, historical universe or SPY/LEAN parity.",
     "Paper fills omit market impact, realistic queue position and some costs; they cannot establish deployable profitability or execution capacity.",
     "No broker orders, paid hosting, purchases or live trading are authorized by catalog inclusion."
-  ]
+  ],
+  "offline_runtime_followup_20261004": {
+    "recorded_at_utc": "2026-10-04T21:23:33Z",
+    "host": "NativeStack2604",
+    "evidence_class": "native_proven",
+    "scope": "Historical host-local locked research installation and 25/25 offline smoke checks, including the unchanged synthetic Nautilus quickstart. Local probes/adapted examples retain their own evidence classes. No paper or broker execution; no selection or gate change.",
+    "python": "3.12.3",
+    "uv": "0.12.17",
+    "recipe": "blueprints/us-equities/runtime-2604/README.md",
+    "receipt": "evidence/receipts/native-trading-runtime-2604-20261004.json",
+    "host_receipt": "evidence/hosts/native-stack-2604-20261004/native-stack-2604-20261004--nautilustrader--use--20261004.json",
+    "open": [
+      "Ratify CPython 3.12.3 against 3.13 and the complete canonical runtime matrix.",
+      "Independent post-run host-receipt review, per-check outputs and all existing data, strategy, oracle and broker gates remain separate.",
+      "Re-run installation and the 24 offline checks on NativeStack2604 against current lock 1fb9f8ca6fef9c47 and record a new receipt; this lock is not yet qualified on that host. The 2604 co-op will run install-trading-2604.sh and accept-trading-2604.sh."
+    ],
+    "edgartools_pin_move_20261004": {
+      "runtime_pin": "5.60.0",
+      "catalog_entry": "data-edgartools",
+      "catalog_pin": "5.60.0",
+      "source_pin": "1e7a61b3a142dbf5d19bc82444f85239c1786348",
+      "resolved_item": "EdgarTools 5.59.1 filing-fix overturn comparison before moving catalog 5.58.0",
+      "resolution": "Superseded by directed 5.60.0 pin move and native SEC acceptance native-sec-edgartools-5600-20261004; the repository runtime bundle and current catalog now select the same release.",
+      "receipt_id": "native-sec-edgartools-5600-20261004",
+      "evidence_ref": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json",
+      "historical_2604_run_edgartools": "5.58.0",
+      "native_stack_2604_rerun": "recorded historical qualification: native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json); install PASS and 25/25 offline acceptance at d02c0827 on lock 4c98672d14147a1b (before the 2026-10-05 DVC removal), 2026-10-05T01:00:17Z-01:01:07Z, through mise exec uv@0.12.17; independent review pending. Current lock 1fb9f8ca6fef9c47 is not yet qualified on NativeStack2604; the 2604 co-op will re-run installation and accept-trading-2604.sh and write a separate receipt.",
+      "scope": "Bounded SEC index acceptance on NativeStack; no strategy, point-in-time data, paper or broker gate changes."
+    }
+  }
 }

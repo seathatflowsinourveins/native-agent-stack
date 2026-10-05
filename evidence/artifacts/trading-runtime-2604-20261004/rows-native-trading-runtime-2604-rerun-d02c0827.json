@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "kind": "host-run-rows",
+  "meaning": "the outer status rows of PR #703's install-trading-2604.sh and accept-trading-2604.sh on NativeStack2604 at d02c0827; per-check logs stay private on the host",
+  "host": "NativeStack2604",
+  "commit": "d02c0827",
+  "lock_sha256_prefix": "4c98672d14147a1b",
+  "install": {
+    "status_line": "install | PASS",
+    "exit": 0
+  },
+  "accept": {
+    "rows": [
+      "offline_isolation | PASS | 0",
+      "python | PASS | 0",
+      "import_nautilus-trader | PASS | 0",
+      "import_numpy | PASS | 0",
+      "import_pandas | PASS | 0",
+      "import_alpaca-py | PASS | 0",
+      "import_edgartools | PASS | 0",
+      "import_exchange-calendars | PASS | 0",
+      "import_dvc | PASS | 0",
+      "import_duckdb | PASS | 0",
+      "import_pandera | PASS | 0",
+      "import_skfolio | PASS | 0",
+      "import_fincore | PASS | 0",
+      "import_mlflow | PASS | 0",
+      "import_arch | PASS | 0",
+      "import_purgedcv | PASS | 0",
+      "ibkr_adapter | PASS | 0",
+      "alpaca_adapter_source | PASS | 0",
+      "alpaca_adapter_import | PASS | 0",
+      "nautilus_quickstart_sha256 | PASS | 0",
+      "nautilus_quickstart | PASS | 0",
+      "duckdb_query | PASS | 0",
+      "pandera_example | PASS | 0",
+      "skfolio_example | PASS | 0",
+      "arch_example | PASS | 0"
+    ],
+    "count": 25,
+    "exit": 0
+  }
+}
