@@ -43,6 +43,17 @@ class StackLifecycleTests(unittest.TestCase):
         self.assertEqual(sum(counts["exclusive_identity_groups"].values()), counts["catalog_identities"])
         self.assertEqual(counts["selected_components"] + counts["nonselected_catalog_identities"], counts["catalog_identities"])
 
+    def test_alpaca_source_pin_matches_both_selection_mirrors(self):
+        component = next(c for c in self.stack["components"] if c["id"] == "alpaca-py")
+        snapshot = json.loads((ROOT / "catalogs/landscape/upstream-snapshot.json").read_text())
+        freshness = next(row for row in snapshot["components"] if row["component_id"] == "alpaca-py")
+        self.assertRegex(component["source_pin"], r"^[0-9a-f]{40}$")
+        for name, pin in (("lifecycle audit", self.rows["alpaca-py"]["source_pin"]),
+                          ("freshness snapshot", freshness["selected_source_pin"])):
+            with self.subTest(mirror=name):
+                self.assertEqual(pin, component["source_pin"])
+        self.assertEqual(freshness["source_pin_kind"], "git_commit")
+
     def test_stage_states_require_scope_and_supported_local_references(self):
         stages = set(self.audit["stage_policy"]["stages"])
         statuses = set(self.audit["stage_policy"]["statuses"])

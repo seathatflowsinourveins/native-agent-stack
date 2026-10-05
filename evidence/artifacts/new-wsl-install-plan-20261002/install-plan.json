@@ -3004,11 +3004,11 @@
       "slot": "dagu",
       "owner": "Dagu",
       "repository": "https://github.com/dagucloud/dagu",
-      "release": "v2.18.1",
+      "release": "v2.18.2",
       "installed": true,
       "route": "native-installer",
       "commands": [
-        "curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/scripts/installer.sh | bash -s -- --version v2.18.1 --no-prompt --service yes --service-scope user --host 127.0.0.1 --port 21080 --open-browser no"
+        "curl -fsSL https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh | bash -s -- --version v2.18.2 --no-prompt --service yes --service-scope user --host 127.0.0.1 --port 21080 --open-browser no"
       ],
       "needs": {
         "sudo": false,
@@ -3020,29 +3020,29 @@
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/README.md#L105",
+        "url": "https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/README.md#L105",
         "line": 105
       },
       "service": {
         "form": "upstream systemd user unit dagu.service (scripts/installer.sh:1635,1666-1697)",
         "port": 21080,
-        "port_setting": "--host 127.0.0.1 --port 21080; DAGU_HOST/DAGU_PORT in upstream env file. Coordinator default 127.0.0.1:50055 (internal/cmn/config/loader.go:2017); start-all disables extra health listeners."
+        "port_setting": "--host 127.0.0.1 --port 21080; DAGU_HOST/DAGU_PORT in upstream env file. Coordinator default 127.0.0.1:50055 (internal/cmn/config/loader.go:2029-2031); start-all disables extra health listeners."
       },
       "acceptance": {
         "post_install": {
           "command": "dagu version",
           "kind": "version only",
           "source": {
-            "url": "https://raw.githubusercontent.com/dagucloud/dagu/3bb5b23d2b0b3b924dd6eafc4c04107baa9cafc7/internal/cmd/version.go#L15",
-            "line": 15
+            "url": "https://raw.githubusercontent.com/dagucloud/dagu/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/internal/cmd/version.go#L13",
+            "line": 13
           }
         },
         "service_health": {
           "command": "curl -fsS http://127.0.0.1:21080/api/v1/health",
           "kind": "health",
           "source": {
-            "url": "https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/scripts/installer.sh#L1997",
-            "line": 1997
+            "url": "https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh#L1989",
+            "line": 1989
           }
         }
       },
@@ -3050,7 +3050,7 @@
         "$HOME/.config/systemd/user/dagu.service",
         "$HOME/.config/dagu/dagu.env"
       ],
-      "notes": "Planned. First user-level Linux installer beats mise. Use upstream version/no-prompt/user-service/host/port/browser flags (installer:109-121). No admin bootstrap secrets. Installer owns unit and starts service; may add PATH startup entries, but does not change default shell. Coordinator native default free50055, source loopback verified."
+      "notes": "Independent Ubuntu 26.04 new-WSL pin 2.18.2; the workstation/trading stack stays held at 2.16.6. Storage changes #2784 (suspend flags under data_dir), #2776 (partitioned/indexed artifacts), and #2858 (DAG definition index under data_dir) make an existing-home upgrade different from a clean install. For a future upgrade of any existing owned installation, stop the owned unit and retain a complete pre-upgrade DAGU_HOME copy plus the prior binary, unit and environment. Conditional rollback stops the new unit, preserves post-upgrade state separately, restores the saved home and prior binary/unit/environment together, then verifies the native version and owned workflow. Do not open a shared home with mixed binary versions; 2.17.2 removes legacy dags/.dag.index. NativeStack2604 is already on 2.18.2 with no pre-upgrade copy, so its rollback is re-provisioning. See [Command center correction and NativeStack2604 state](../../../docs/decisions/2026-10-05-dagu-mise-pin-move.md#command-center-correction-and-nativestack2604-state-2026-10-05-r2b). No such host upgrade or rollback was executed in this builder round."
     },
     {
       "layer": "hosting-services",
@@ -3562,11 +3562,11 @@
       "slot": "mise",
       "owner": "mise",
       "repository": "https://github.com/jdx/mise",
-      "release": "v2026.10.0",
+      "release": "v2026.10.1",
       "installed": true,
       "route": "native-installer",
       "commands": [
-        "curl -fsSL https://mise.run | MISE_VERSION=v2026.10.0 sh"
+        "curl -fsSL https://mise.run | MISE_VERSION=v2026.10.1 sh"
       ],
       "needs": {
         "sudo": false,
@@ -3578,7 +3578,7 @@
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.0/docs/installing-mise.md#L82",
+        "url": "https://raw.githubusercontent.com/jdx/mise/v2026.10.1/docs/installing-mise.md#L82",
         "line": 82
       },
       "service": null,
@@ -3587,7 +3587,7 @@
           "command": "cd \"$tool_root\"\nPATH=\"${MISE_SHIMS_DIR:-${MISE_DATA_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/mise}/shims}:$PATH\" mise doctor",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/jdx/mise/bc11f90c74eba23bf0d7350efb540e62fb7d9ffd/src/cli/doctor/mod.rs#L532",
+            "url": "https://raw.githubusercontent.com/jdx/mise/050ce5a20287a0aafd872b1191699a5fdafff5ac/src/cli/doctor/mod.rs#L532",
             "line": 532
           }
         }

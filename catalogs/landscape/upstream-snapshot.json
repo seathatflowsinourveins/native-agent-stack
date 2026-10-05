@@ -36,7 +36,7 @@
       "poppler",
       "tavily-cli"
     ],
-    "api_commands": 281,
+    "api_commands": 284,
     "api_nonzero_results": 8,
     "corrected_invalid_archive_digest_ref_attempts": 2,
     "newer_stable_release_review_queue": [
@@ -52,8 +52,8 @@
         "canonical": "https://github.com/headroomlabs-ai/headroom"
       }
     ],
-    "recommendation": "Retain current qualified pins; review the four newer stable releases against actual capability gaps before upgrading. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
-    "selected_component_api_commands": 264,
+    "recommendation": "Retain current qualified pins; review the 4 newer stable releases against actual capability gaps before upgrading. Dagu 2.16.6 remains held by the trading lane; the separate new-WSL profile selects 2.18.2. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
+    "selected_component_api_commands": 267,
     "initial_star_delta_commands": 1,
     "complete_star_snapshot_commands": 7,
     "added_candidate_source_screen_commands": 9,
@@ -3064,6 +3064,32 @@
           "ended_at": "2026-09-21T22:33:20.357797+00:00",
           "stdout_sha256": "38197a85596834c6bf0f4edc47f83284e9fb567567d5937bd632086dd8d798b3",
           "status": "ok"
+        },
+        {
+          "endpoint": "repos/dagucloud/dagu/releases/tags/v2.18.2",
+          "exit_code": 0,
+          "started_at": "2026-10-05T08:21:36.735725+00:00",
+          "ended_at": "2026-10-05T08:21:36.908976+00:00",
+          "stdout_sha256": "e5e98b1881c48f4183f5cca0ee2b44b6a6790cde42f0cc25998bf3a8a66b3f25",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/dagucloud/dagu/commits/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+          "exit_code": 0,
+          "started_at": "2026-10-05T08:21:36.909141+00:00",
+          "ended_at": "2026-10-05T08:21:37.212245+00:00",
+          "stdout_sha256": "4de427e0447bc20d43379c1df2869ef2876f1f4bbd4c2e22a7ab1ebd14daec90",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/dagucloud/dagu/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-05T09:58:54.132800+00:00",
+          "ended_at": "2026-10-05T09:58:54.343594+00:00",
+          "stdout_sha256": "9b18505341f2b54036fa4f18ee3b160b61fdc912a8ee68e1f8cc6142cb3556b1",
+          "status": "ok",
+          "native_client": "curl; unauthenticated public GET",
+          "hash_scope": "Raw HTTP response body saved directly to the task cache; stdout_sha256 is the snapshot response-digest field."
         }
       ],
       "canonical_repository": "https://github.com/dagucloud/dagu",
@@ -3073,9 +3099,9 @@
       "pushed_at": "2026-09-21T13:05:30Z",
       "license_spdx": "GPL-3.0",
       "latest_stable_release": {
-        "tag_name": "v2.17.0",
-        "published_at": "2026-09-21T13:31:48Z",
-        "html_url": "https://github.com/dagucloud/dagu/releases/tag/v2.17.0",
+        "tag_name": "v2.18.2",
+        "published_at": "2026-10-04T03:54:02Z",
+        "html_url": "https://github.com/dagucloud/dagu/releases/tag/v2.18.2",
         "target_commitish": "main",
         "prerelease": false,
         "draft": false
@@ -3087,16 +3113,17 @@
         "committed_at": "2026-09-14T14:09:43Z"
       },
       "latest_release_source": {
-        "ref": "v2.17.0",
-        "sha": "f501e3fefb2e52f9430d56b8ac7a055ec97ce320",
-        "html_url": "https://github.com/dagucloud/dagu/commit/f501e3fefb2e52f9430d56b8ac7a055ec97ce320",
-        "committed_at": "2026-09-21T13:04:58Z"
+        "ref": "v2.18.2",
+        "sha": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+        "html_url": "https://github.com/dagucloud/dagu/commit/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
+        "committed_at": "2026-10-04T03:12:18Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/dagucloud/dagu",
-      "release_relationship": "newer_stable_release_review_pending"
+      "release_relationship": "newer_stable_release_review_pending",
+      "pin_move_checked_at": "2026-10-05T09:58:54.343594+00:00"
     },
     {
       "component_id": "lean",
@@ -3248,7 +3275,7 @@
       "repository": "https://github.com/alpacahq/alpaca-py",
       "selected_repository_url": "https://github.com/alpacahq/alpaca-py",
       "selected_version": "0.44.0",
-      "selected_source_pin": null,
+      "selected_source_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
       "checks": [
         {
           "endpoint": "repos/alpacahq/alpaca-py",
@@ -3297,7 +3324,7 @@
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/alpacahq/alpaca-py",
       "release_relationship": "selected_version_matches_latest_stable"
     },

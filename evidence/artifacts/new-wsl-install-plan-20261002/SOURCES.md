@@ -117,8 +117,8 @@ Each owner's install and acceptance source is in install-plan.json. The followin
 - Loki config: [source, line 1](https://raw.githubusercontent.com/grafana/loki/v3.7.8/cmd/loki/loki-local-config.yaml#L1).
 - Loki bind configuration: [source, line 6196](https://raw.githubusercontent.com/grafana/loki/v3.7.8/docs/sources/shared/configuration.md#L6196).
 - Grafana bind configuration: [source, line 50](https://raw.githubusercontent.com/grafana/grafana/v13.2.3/conf/defaults.ini#L50).
-- Dagu native installer options/unit: [source, line 109](https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/scripts/installer.sh#L109).
-- Dagu coordinator defaults: [source, line 2017](https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/internal/cmn/config/loader.go#L2017).
+- Dagu native installer options/unit: [source, line 109](https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh#L109).
+- Dagu coordinator defaults: [source, line 2029](https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/internal/cmn/config/loader.go#L2029).
 - Rootless Docker install: [source, line 75](https://raw.githubusercontent.com/docker/docs/2d7809c7a74ba1e99609a44f421a15cbf8a4a4bc/content/manuals/engine/security/rootless/_index.md#L75).
 - Rootless Docker user unit: [source, line 15](https://raw.githubusercontent.com/docker/docs/a20e3585feaf72f0be0ca0177e3bbb523f372ff2/content/manuals/engine/security/rootless/tips.md#L15).
 - Rootless dbus prerequisite: [source, line 219](https://raw.githubusercontent.com/docker/docs/0571430b6a9c6ff1742baede7c265c3c5e9e3322/content/manuals/engine/security/rootless/troubleshoot.md#L219).
@@ -688,3 +688,17 @@ GPT-runtime executor/review records plus an Opus check the coordinator relayed f
 The earlier job-030 patch/report was inspected; its changed slots do not include these four, so no unrelated hunk was ported.
 Scoped ai-memory retrieval with pin priority and limit two was unavailable because the MCP call required approval under
 this job's never-approval policy. Context Mode tools were not exposed in this session's enabled tool list; bounded native reads and RTK handled output.
+
+## 2026-10-05 Dagu/mise pin move
+
+The current Dagu installation row selects [v2.18.2](https://github.com/dagucloud/dagu/releases/tag/v2.18.2), commit `5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4`; its native installer reads the release archive and [checksums.txt](https://github.com/dagucloud/dagu/releases/download/v2.18.2/checksums.txt). The Linux amd64 archive's published sha256 is `5a84c093b9ba9d02b7a60e106bb91d46f9383fd01c62bd51560e41193f05792b`. Version-command and installer health locators were re-read at that pin (version.go:13, installer.sh:1989); coordinator binding defaults are loader.go:2029-2031, and effective enabled=true is loader.go:1314-1321.
+
+The current mise installation row selects [v2026.10.1](https://github.com/jdx/mise/releases/tag/v2026.10.1), annotated tag `b752bdc18b1b5961e4f9ba01a63bc3c11a0a1f79` / peeled commit `050ce5a20287a0aafd872b1191699a5fdafff5ac`. Its Linux x64 tar.gz sha256 from [SHASUMS256.txt](https://github.com/jdx/mise/releases/download/v2026.10.1/SHASUMS256.txt) is `9b92aa39b8fde54b28c8f974a68f2501925a1523d6c05a52719145df3acdd75a`; the current [installing guide](https://github.com/jdx/mise/blob/v2026.10.1/docs/installing-mise.md) documents the version pin and checksums, and doctor/mod.rs:532 still requires activation or shims. Other registry citations and prior source-read/repair observations above retain their reviewed revisions.
+
+Only the verified release assets were installed in a disposable root for version/validation/start-all/doctor qualification. No target-WSL install-plan run is added: the original validation/host receipts keep their bytes. The waiver, reader classification and qualification scope are in [the pin decision](../../../docs/decisions/2026-10-05-dagu-mise-pin-move.md); actual sanitized results are in [the new receipt](../../receipts/dagu-mise-pin-qualification-20261005.json).
+
+### Existing-home Dagu upgrade and conditional rollback (dagu-pin-r3)
+
+The current new-WSL row carries its own Dagu 2.18.2 pin. The workstation/trading stack remains held at 2.16.6; its hosting cutover belongs to the trading lane. [v2.17.0 release notes](https://github.com/dagucloud/dagu/releases/tag/v2.17.0) describe #2784 (default suspend flags under data_dir) and #2776 (partitioned/indexed artifacts); [v2.17.2](https://github.com/dagucloud/dagu/releases/tag/v2.17.2) describes #2858 (DAG definition index under data_dir). The [standing hold](../../../docs/decisions/2026-09-25-workstation-sota-refresh.md#held-by-the-trading-lane) records that 2.17.2 opening a DAG repository removes legacy dags/.dag.index.
+
+For a future upgrade of any existing owned installation, stop its owned unit and retain a complete pre-upgrade DAGU_HOME copy, together with the old checksum-verified binary, unit and environment. Keep newer commands away from the saved copy. Conditional rollback stops the new unit, preserves post-upgrade state separately, restores the saved home and prior binary/unit/environment together, then verifies the native version and owned workflow. A fresh empty installation has no prior home to restore. NativeStack2604 is already on 2.18.2 with no pre-upgrade copy, so its rollback is re-provisioning; its unit-file backups restore the unit, not the data. See [Command center correction and NativeStack2604 state](../../../docs/decisions/2026-10-05-dagu-mise-pin-move.md#command-center-correction-and-nativestack2604-state-2026-10-05-r2b). No host rollback or legacy-index rebuild was executed in this builder round.

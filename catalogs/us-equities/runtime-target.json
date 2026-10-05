@@ -149,7 +149,7 @@
     },
     {
       "id": "alpaca",
-      "selected_path": "Official alpaca-py0.44.0 for ingestion and separately qualified bounded deterministic paper lifecycle",
+      "selected_path": "Official alpaca-py 0.44.0 for bounded market-data ingestion (StockHistoricalDataClient, CorporateActionsClient and NewsClient; see local_data_acceptance) and the separately qualified bounded deterministic paper lifecycle (TradingClient order submission, lookup, cancellation and account/fill reconciliation; TradingStream trade updates; latest-quote and StockDataStream quote reads)",
       "upstream_nautilus_adapter_present": false,
       "local_data_acceptance": [
         "bounded AAPL SIP/raw daily bars and corporate actions",

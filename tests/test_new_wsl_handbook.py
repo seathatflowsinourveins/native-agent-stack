@@ -175,6 +175,31 @@ class NewWslHandbookTests(unittest.TestCase):
         self.write(handbook.PROFILE, profile)
         return profile, [package for _, _, package, _ in packages]
 
+    def test_a_re_pin_leaves_the_adoption_manifest_digest_unchanged(self):
+        """The handbook is a new-machine file: hashing the release pointer would make every re-pin stale it."""
+        manifest = {"schema_version": 1, "updated_at": "2026-10-04",
+                    "source": {"repository": "example/repo", "release_tag": "v1", "release_commit": "a" * 40},
+                    "profiles": {"workstation": ["step"]}}
+        digests = []
+        for change in (None, "repin", "content"):
+            data = deepcopy(manifest)
+            if change == "repin":
+                data["updated_at"] = "2026-10-05"
+                data["source"].update(release_tag="v2", release_commit="b" * 40)
+            elif change == "content":
+                data["profiles"]["workstation"].append("new step")
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                (root / "adoption").mkdir()
+                (root / handbook.ADOPTION).write_text(json.dumps(data, indent=2) + "\n")
+                inputs = handbook.Inputs(root)
+                inputs.read(handbook.ADOPTION)
+                record = inputs.sources[handbook.ADOPTION]
+                self.assertEqual(record["excludes"], list(handbook.ADOPTION_POINTER_FIELDS))
+                digests.append(record["sha256"])
+        self.assertEqual(digests[0], digests[1])
+        self.assertNotEqual(digests[0], digests[2])
+
     def test_cli_separates_installable_packages_in_one_repository(self):
         profile, packages = self.package_profile()
         result = self.public_cli()

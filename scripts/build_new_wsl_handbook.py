@@ -20,11 +20,13 @@ try:
     from .catalog_decisions import safe_file
     from .new_wsl_profile import validate_default_installs
     from .validate import PRIVATE_CONTENT
+    from .release_due import comparable_manifest
 except ImportError:
     from build_ecosystem import canonical_json, digest, require
     from catalog_decisions import safe_file
     from new_wsl_profile import validate_default_installs
     from validate import PRIVATE_CONTENT
+    from release_due import comparable_manifest
 
 
 BASE = "evidence/artifacts/new-wsl-clean-install-selection-20261001"
@@ -37,6 +39,7 @@ RESEARCH = "catalogs/landscape/research-state.json"
 TRADING = "catalogs/landscape/us-equities.json"
 DISTRO = "adoption/platforms/linux-wsl2-new-distro.md"
 ADOPTION = "adoption/manifest.json"
+ADOPTION_POINTER_FIELDS = ("source.release_tag", "source.release_commit", "updated_at")
 PROFILE = "adoption/new-wsl-profile.json"
 DEFAULTS_MANIFEST = "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json"
 OUTPUTS = ("docs/new-wsl-handbook.md", "docs/new-wsl-handbook.json")
@@ -185,6 +188,12 @@ class Inputs:
         path = public_path(path)
         raw = (override if override is not None else safe_file(self.root, path)).read_bytes()
         self.sources[path] = {"path": path, "sha256": digest(raw)}
+        if path == ADOPTION:
+            # A re-pin rewrites the release pointer, and this handbook is itself a new-machine file. Hash the manifest
+            # without the pointer, as scripts/release_due.py compares it, so a re-pin cannot make the release it
+            # points at look stale (CI validate run 37266900705).
+            self.sources[path] = {"path": path, "sha256": digest(comparable_manifest(raw.decode("utf-8")).encode()),
+                                  "excludes": list(ADOPTION_POINTER_FIELDS)}
         value = json.loads(raw) if as_json else raw.decode("utf-8")
         if override is not None:
             validate_payload(value)
@@ -1167,7 +1176,9 @@ def render_markdown(data):
             if tool["documented_install"]:
                 lines += [f"- {tool['name']} packet install reference (not a pinned recipe): {cell(tool['documented_install'])}"]
     lines += ["", "## Input provenance", "", "| Repository source | SHA-256 |", "| --- | --- |"]
-    lines += [f"| {link(source['path'])} | `{source['sha256']}` |" for source in data["sources"]]
+    lines += [f"| {link(source['path'])} | `{source['sha256']}`"
+              + (f" (without {', '.join(source['excludes'])})" if source.get("excludes") else "") + " |"
+              for source in data["sources"]]
     return ("\n".join(lines).rstrip() + "\n").encode()
 
 

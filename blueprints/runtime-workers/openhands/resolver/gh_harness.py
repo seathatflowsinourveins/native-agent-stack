@@ -664,13 +664,16 @@ class GhHarness:
     """
 
     def __init__(self, gh, *, base_env, workdir, git="/usr/bin/git", runner=subprocess.run, guard=None,
-                 timeout=600, push_gate=None):
+                 timeout=600, push_gate=None, owned_paths=None):
         self.gh = _executable(gh, "unsafe_gh_path")
         self.git = _executable(git, "unsafe_git_path")
         self.workdir = check_workdir(workdir)
         self.env = child_env(base_env, gh_path=self.gh, workdir=self.workdir)
         self.runner, self.guard, self.timeout = runner, guard, timeout
         self.push_gate = push_gate
+        # Coordinator-owned host memory from ResolverAttempt._session; never an
+        # export, issue, environment value or reread of resolver-identity.json.
+        self.owned_paths = tuple(owned_paths) if isinstance(owned_paths, (list, tuple)) else None
         self.writes, self.gates = [], []
         self._gated = set()
 
@@ -749,10 +752,18 @@ class GhHarness:
         gate_file = getattr(module, "__file__", None)
         if not isinstance(gate_file, str) or _inside(gate_file, trees):
             record = {"commit": head, "base": base, "status": "fail", "reasons": ["gate_inside_agent_tree"],
+                      "changed_path_count": None, "owned_path_count": None,
                       "paths": [], "trusted_commit": None, "protected": None,
                       "zizmor": {"version": None, "findings": None, "failing": []}}
         else:
-            record = self.push_gate.check(clone, base=base, head=head, agent_trees=tuple(agent_trees))
+            try:
+                record = self.push_gate.check(clone, base=base, head=head, owned_paths=self.owned_paths,
+                                              agent_trees=tuple(agent_trees))
+            except BaseException:  # A broken/interrupted gate journals a refusal and never pushes.
+                record = {"commit": head, "base": base, "status": "fail", "reasons": ["gate_exception"],
+                          "changed_path_count": None, "owned_path_count": None, "paths": [],
+                          "trusted_commit": None, "protected": None,
+                          "zizmor": {"version": None, "findings": None, "failing": []}}
         self.gates.append(dict(record) if isinstance(record, dict) else {"commit": head, "status": "fail",
                                                                          "reasons": ["gate_record_invalid"]})
         if not (isinstance(record, dict) and record.get("status") == "pass" and record.get("commit") == head

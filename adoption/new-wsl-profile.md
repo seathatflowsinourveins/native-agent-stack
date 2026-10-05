@@ -7,6 +7,8 @@ provider/model/GPU result or replacement-host acceptance.
 
 The RTK and mcporter source rows follow [PR #693](https://github.com/seathatflowsinourveins/native-agent-stack/pull/693), main `14048b840425c2569e0df60a6596e94e601da15b`: **RTK 0.51.0** and **mcporter 0.14.2**. The RTK archive SHA-256 is checked against the [release checksums](https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt); the mcporter tarball is rehashed and checked against [npm integrity](https://registry.npmjs.org/mcporter/0.14.2). This source refresh establishes no new host acceptance.
 
+The Dagu and mise rows follow the [2026-10-05 pin decision](../docs/decisions/2026-10-05-dagu-mise-pin-move.md): **Dagu 2.18.2** and **mise 2026.10.1**. These are independent fresh-WSL selections: the workstation/trading stack and its hosting unit remain held at **Dagu 2.16.6**. Both Linux archives matched their upstream checksum files in an isolated root. The [qualification receipt](../evidence/receipts/dagu-mise-pin-qualification-20261005.json) keeps the native checks, controls and archived validation failures; it establishes no destination-WSL or live-service acceptance.
+
 The native manifest profile is `new-wsl-clean-foundation`. Its component list is
 only Codex and Claude Code; the existing bootstrap adds its pinned Node, uv and
 gh prerequisites. CPython 3.13.15 is supplied through uv without replacing the
@@ -205,7 +207,7 @@ have no default-install precedence.
 
 | Entry | Source pin | Install citation |
 |---|---|---|
-| Node 24 | 24.21.0 | [reviewed install source](https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh), [upstream reproduction source](https://github.com/jdx/mise/blob/v2026.9.18/docs/cli/install.md), [official distribution integrity](https://nodejs.org/dist/v24.21.0/SHASUMS256.txt) |
+| Node 24 | 24.21.0 | [reviewed install source](https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh), [upstream reproduction source](https://github.com/jdx/mise/blob/v2026.10.1/docs/cli/install.md), [official distribution integrity](https://nodejs.org/dist/v24.21.0/SHASUMS256.txt) |
 | uv | 0.12.17 | [reviewed install source](https://github.com/astral-sh/uv/releases/tag/0.12.17) |
 | gh | 2.101.0 | [reviewed install source](https://github.com/seathatflowsinourveins/native-agent-stack/blob/20ea4ae23a18565676823b9e3a23541c2100bb39/adoption/bootstrap-linux.sh), [upstream Linux installation](https://github.com/cli/cli/blob/v2.101.0/docs/install_linux.md) |
 | CPython 3.13 | 3.13.15 | [reviewed install source](https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/install-python.md) |
@@ -236,8 +238,8 @@ have no default-install precedence.
 | sqz | 1.9.0 | [reviewed install source](https://github.com/ojuschugh1/sqz/blob/726e77bd7e9d6ae7529e2750da69d86e622ca699/README.md) |
 | Headroom | 0.37.0 | [reviewed install source](https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md); since 2026-10-04 the [uv tool form](https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/README.md#L92) with the `[mcp]` extra, not `[all]` |
 | Phoenix | 20.18.0 | [reviewed install source](https://github.com/Arize-ai/phoenix/blob/d2ad1d916fa8afa21ea218ef7918ef7e4df6ab60/README.md) |
-| Dagu | 2.16.6 | [reviewed install source](https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md) |
-| mise | 2026.9.18 | [tagged installation guide](https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md), [version normalization in the selected installer source](https://github.com/jdx/mise/blob/v2026.9.18/packaging/standalone/install.envsubst#L300) |
+| Dagu | 2.18.2 | [reviewed install source](https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md) |
+| mise | 2026.10.1 | [tagged installation guide](https://github.com/jdx/mise/blob/v2026.10.1/docs/installing-mise.md), [version normalization in the selected installer source](https://github.com/jdx/mise/blob/v2026.10.1/packaging/standalone/install.envsubst#L300) |
 | betterleaks | 1.9.0 | [reviewed install source](https://github.com/betterleaks/betterleaks/blob/81aff7a638638aae3a659845d089043e1d8fe9ac/README.md) |
 
 The inherited review retains the eight public CLI tests' initial red result,

@@ -1,5 +1,9 @@
 """Test package setup.
 
+The effective temporary directory must resolve outside the repository. Several tests
+copy this checkout into scratch; a TMPDIR inside it makes the copy include its own
+destination and recurse until the filesystem is full (2026-10-04 ENOSPC incident).
+
 Tests never read the developer's global or system git configuration. CI runners have
 none, so local runs must match: a host that installs a global ``core.hooksPath`` (for
 example a gitleaks pre-commit hook), ignore rules, aliases or identity must not change
@@ -31,8 +35,19 @@ that repository's shared config.
 
 import atexit
 import os
+from pathlib import Path
 import shutil
 import tempfile
+
+_REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
+_TEMPORARY_ROOT = Path(tempfile.gettempdir()).resolve()
+if _TEMPORARY_ROOT.is_relative_to(_REPOSITORY_ROOT):
+    raise RuntimeError(
+        f"Unsafe test temporary directory: {_TEMPORARY_ROOT}. "
+        f"TMPDIR must live in an existing writable directory outside the repository root "
+        f"({_REPOSITORY_ROOT}), for example /tmp or the CI runner's external RUNNER_TEMP. "
+        "Checkout-copy tests would otherwise recursively copy their own scratch."
+    )
 
 _HERMETIC_GIT_DIR = tempfile.mkdtemp(prefix="nas-tests-git-")
 atexit.register(shutil.rmtree, _HERMETIC_GIT_DIR, True)

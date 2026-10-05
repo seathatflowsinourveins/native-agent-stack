@@ -1,0 +1,24 @@
+{
+  "started_at_utc": "2026-10-04T08:04:47Z",
+  "finished_at_utc": "2026-10-04T08:05:03Z",
+  "versions_before": {
+    "coreutils-from-uutils": "0.0.0~ubuntu25",
+    "gnu-coreutils": "9.7-3ubuntu2.1",
+    "rust-coreutils": "0.8.0-0ubuntu3"
+  },
+  "versions_after": {
+    "coreutils-from-uutils": "0.0.0~ubuntu25",
+    "gnu-coreutils": "9.7-3ubuntu2.1",
+    "rust-coreutils": "0.10.0-1ubuntu2~26.04.1"
+  },
+  "utility_versions_after": {
+    "date": "0.10.0",
+    "timeout": "0.10.0",
+    "env": "0.10.0",
+    "readlink": "0.10.0",
+    "sha256sum": "0.10.0"
+  },
+  "exit_codes": {
+    "apt": 0
+  }
+}

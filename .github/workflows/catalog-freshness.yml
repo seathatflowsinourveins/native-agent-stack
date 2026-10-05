@@ -137,7 +137,24 @@ jobs:
               "grype|anchore/grype|0.119.0" \
               "nautilus_trader|nautechsystems/nautilus_trader|2.0.0rc5"; do
               IFS='|' read -r name repo pinned <<<"$spec"
-              latest=$(gh api "repos/$repo/releases/latest" --jq '.tag_name' 2>/dev/null || echo "unavailable")
+              # Stable pins retain releases/latest; prerelease pins also read at most
+              # three 100-release pages (unknown beyond cap on a full third page).
+              # https://docs.github.com/en/rest/releases/releases#list-releases
+              # https://docs.github.com/en/rest/releases/releases#get-the-latest-release
+              latest=$(python3 - "$repo" "$pinned" <<'PYEOF'
+          import sys
+          sys.path.insert(0, "tools/sota-convergence")
+          from github_freshness import gh_api, fetch_release_list, is_prerelease_pin, select_release_for_pin
+
+          slug, pin = sys.argv[1:]
+          release, error = gh_api(f"repos/{slug}/releases/latest")
+          if is_prerelease_pin(pin):
+              selected, reason = select_release_for_pin(pin, {"release_list": fetch_release_list(slug)})
+              print(reason or selected["tag"])
+          else:
+              print((release or {}).get("tag_name") or "unavailable")
+          PYEOF
+              )
               echo "| $name | $pinned | $latest |"
             done
             echo ""
