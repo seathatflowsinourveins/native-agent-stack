@@ -32,7 +32,7 @@ import fixture  # noqa: E402
 import suite  # noqa: E402
 
 HARNESS_FILES = ("common.py", "suite.py", "fixture.py", "arms.py", "launcher.py", "sdk_claude.py", "sdk_codex.mjs",
-                 "prepare.py", "block.py", "collect.py", "grade.py", "stage2-canaries.json")
+                 "prepare.py", "block.py", "collect.py", "grade.py", "pilot.py", "stage2-canaries.json")
 PROBE_HASHES = {"claude/CLAUDE.md": "b86ea2c4655637fa", "claude/settings.json": "861959ff0e49803f"}
 BLACKOUTS = (("10:35", "10:55"), ("13:20", "13:45"))
 GH_EMPTY = HOME / ".cache" / "ws-empty-config"   # neutral name: no experiment, tool, client, arm or task word
@@ -168,6 +168,8 @@ def main(argv=None) -> int:
     parser.add_argument("--force-fixture", action="store_true")
     parser.add_argument("--prompted", default=None, help="JSON list of prompted runs (stage 2 and 3): "
                         "[{key, cell, prompt, sandbox?, task_id?, instance?}]; lane organic-e2e-prompted")
+    parser.add_argument("--skip-tests", default="", help="test keys to leave out (comma-separated), e.g. the give-way "
+                        "rule's G1|claude-sdk when a Claude probe is required")
     args = parser.parse_args(argv)
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", args.run_id):
         parser.error("run id: letters, digits, dot, underscore and hyphen")
@@ -293,8 +295,10 @@ def main(argv=None) -> int:
         for name, (spec, tests) in grouped.items():
             spec.update({"repeat": 1, "pilot_block": "stage 2/3 (prompted)", "lane": LANE_PROMPTED})
             plan.append((name, spec, tests))
+    skip = {k for k in args.skip_tests.split(",") if k}
     cells, schedule = {}, []
     for cell, spec, tests in plan:
+        tests = [t for t in tests if t["test_key"] not in skip]
         if not tests:
             continue
         rng.shuffle(tests)
