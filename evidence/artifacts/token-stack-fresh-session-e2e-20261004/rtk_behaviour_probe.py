@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """Reproduce the rtk behaviours that the README of this directory states from a measurement: what `rtk rewrite` rewrites with
-rtk's upstream defaults and with this repository's hook exclusions, and how rtk's compact forms differ from the shell's (the log
+rtk's upstream defaults and with this repository's hook exclusions, and which commands the Codex hook rewrites (`rtk hook check --agent codex`, mutating ones included), and how rtk's compact forms differ from the shell's (the log
 cap and its notice, dropped merge commits, a dropped trailing newline, an error text, exit codes).
 
     python3 rtk_behaviour_probe.py [OUTFILE]    # default: ~/.local/state/native-agent-stack/e2e/rtk-behaviour-probe.json
@@ -33,6 +33,19 @@ REWRITE_CASES = (
     "ls /nonexistent", "cat a/x/util.py", "grep -rl needle .", "find /nonexistent -name x",
     "git status --short && echo done", "git log --oneline -3 | cat",
     "git show HEAD:a/x/util.py", "diff /nonexistent a/x/util.py", "jq . data.json", "git branch", "echo hi", "bash -c 'git status'",
+)
+
+# `rtk hook check --agent codex "<command>"`: the decision of the hook that `rtk init -g --codex` installs (Host::Codex: rtk reads no Codex rules, so
+# it never denies or asks; exit 0 prints the rewritten command, exit 1 says "No rewrite for"). Mutating and state-changing commands, then read-only ones.
+HOOK_CODEX_CASES = (
+    "git push origin main", "git push --force origin main", "git commit -m x", "git add -A", "git checkout -- .", "git checkout -b topic", "git pull",
+    "git stash", "git worktree add ../w", "git reset --hard HEAD~1", "git clean -fd", "git rebase main", "git merge topic", "git rm -r dir",
+    "gh pr merge 1", "gh pr create --fill", "gh api -X DELETE repos/o/r", "gh release create v1", "docker run --rm alpine sh", "docker exec c sh",
+    "docker build .", "docker rm c", "kubectl apply -f x.yaml", "kubectl delete pod x", "helm install r chart", "terraform apply", "pulumi up",
+    "pip install x", "pip uninstall x", "npm install", "npm publish", "cargo install x", "cargo publish", "make install", "curl -X POST http://x",
+    "wget http://x", "rsync -a --delete a/ b/", "aws s3 rm s3://b/k", "systemctl stop x", "iptables -F", "rm -rf build", "mv a b", "chmod 777 f",
+    "sed -i s/a/b/ f", "tee f", "dd if=a of=b",
+    "git status", "git log --oneline -3", "git diff", "ls -la", "cat a/x/util.py", "grep -rn needle .", "find . -name x", "pytest -q", "cargo test",
 )
 
 # Commands run in the fixture repository, once as the shell runs them and once with the `rtk` prefix (rtk's own compact forms;
@@ -98,6 +111,15 @@ def summarize(result: dict, scratch: str) -> dict:
     }
 
 
+def hook_checks(repo: Path, home: Path) -> list[dict]:
+    table = []
+    for command in HOOK_CODEX_CASES:
+        result = run(["rtk", "hook", "check", "--agent", "codex", command], repo, home)
+        rewritten = result["exit"] == 0
+        table.append({"command": command, "exit": result["exit"], "rewritten_to": result["stdout"].strip() if rewritten else None})
+    return table
+
+
 def rewrites(repo: Path, home: Path) -> list[dict]:
     table = []
     for command in REWRITE_CASES:
@@ -125,6 +147,7 @@ def main() -> int:
         versions = {"rtk": run(["rtk", "--version"], repo, plain)["stdout"].strip(),
                     "git": run(["git", "--version"], repo, plain)["stdout"].strip()}
         rewrite = {"upstream_defaults": rewrites(repo, plain), "repository_exclusions": rewrites(repo, excluding)}
+        codex_hook = {"upstream_defaults": hook_checks(repo, plain), "repository_exclusions": hook_checks(repo, excluding)}
         compared = []
         for command in COMPARE_CASES:
             argv = command.split()
@@ -135,10 +158,11 @@ def main() -> int:
     record = {"schema": "rtk-behaviour-probe/1", "evidence_class": "local_integration: one run, one host, a scratch repository",
               "versions": versions, "fixture": {"commits": commits, "merge_commits": merges},
               "exclusions_fixture_sha256": hashlib.sha256(EXCLUSIONS.read_bytes()).hexdigest(),
-              "rewrite": rewrite, "compared": compared}
+              "rewrite": rewrite, "codex_hook_check": codex_hook, "compared": compared}
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(record, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    print(f"wrote {target}: {len(REWRITE_CASES)} rewrite cases under two configurations, {len(compared)} compared commands")
+    print(f"wrote {target}: {len(REWRITE_CASES)} rewrite cases and {len(HOOK_CODEX_CASES)} Codex hook checks under two configurations, "
+          f"{len(compared)} compared commands")
     return 0
 
 

@@ -433,7 +433,7 @@ def pinned_requirements(requirement: str, runtime_target: dict) -> list[dict]:
     pins = (("NautilusTrader", "user_pinned_destination", "https://github.com/nautechsystems/nautilus_trader"),
             ("IBKR", "user_pinned_broker", None), ("Alpaca", "user_pinned_separate_adapter", "https://github.com/alpacahq/alpaca-py"),
             ("LEAN", "fixture_oracle", "https://github.com/quantconnect/lean"))
-    return [{"name": name, "role": role, "repository": repository, "source_ref": "AGENTS.md#trading-north-star"}
+    return [{"name": name, "role": role, "repository": repository, "source_ref": "blueprints/us-equities/AGENTS.md#trading-north-star"}
             for name, role, repository in pins if re.search(rf"\b{re.escape(name)}\b", requirement or "", re.I)]
 
 

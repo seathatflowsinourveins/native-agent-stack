@@ -31,9 +31,14 @@ ROW_KINDS = {"judged", "first_round", "pinned", "project_practice", "no_blind_de
              "owner_decision"}
 # Amendment 4 (wave 3, 2026-10-04): the slots the owner's decision adds, and the rows it gives an owner default or whose
 # interim it amends. What a decision replaced stays on its row under overturned.
-OWNER_ADDED = ["command-output", "output-compression", "code-index", "code-graph", "repo-packing", "structured-data",
-               "doc-conversion", "api-docs", "trace-viewer", "token-lane-carriers"]
-OWNER_DEFAULTS = {"context-supply", "ccusage", "session-analytics", "promptfoo"}
+WAVE3_OWNER_ADDED = ["command-output", "output-compression", "code-index", "code-graph", "repo-packing", "structured-data",
+                     "doc-conversion", "api-docs", "trace-viewer", "token-lane-carriers"]
+# Round 2's record, rows table (2026-10-04-final-architecture-round2.md:23-28),
+# and consensus.wave5, preserve the original batches and add these owners.
+WAVE5_OWNER_ADDED = ["lm-program-optimization", "skill-vetting", "mcp-protocol-conformance", "trajectory-analysis"]
+OWNER_ADDED = WAVE3_OWNER_ADDED + WAVE5_OWNER_ADDED
+WAVE5_OWNER_DEFAULTS = {"agent-messaging", "playwright-cli"}
+OWNER_DEFAULTS = {"context-supply", "ccusage", "session-analytics", "promptfoo"} | WAVE5_OWNER_DEFAULTS
 OWNER_INTERIM = {"code-search"}
 # What the rounds decided on a row: an amendment by direct consensus is recorded beside these and carries none of them.
 PROTECTED = {"default", "state", "definitive", "repository", "installs_nothing_extra", "row_kind"}
@@ -120,10 +125,16 @@ class Manifest(unittest.TestCase):
         cls.interims = {entry["slot_id"]: entry["interim"] for entry in cls.wave2["interim_rows"]}
         # The wave-3 batch (2026-10-04, amendment 4): the owner's rows, and its owner defaults and interim amendment.
         cls.wave3 = cls.consensus["wave3"]
-        cls.owner_rows = {row["slot_id"]: row for row in cls.wave3["add_rows"]}
         cls.wave4 = cls.consensus["wave4"]
-        cls.owner_amends = {entry["slot_id"]: entry for batch in (cls.wave3, cls.wave4)
+        cls.wave5 = cls.consensus["wave5"]
+        cls.owner_rows = {row["slot_id"]: row for batch in (cls.wave3, cls.wave5) for row in batch["add_rows"]}
+        cls.owner_amends = {entry["slot_id"]: entry for batch in (cls.wave3, cls.wave4, cls.wave5)
                             for entry in batch["amend_rows"]}
+        # Independent expected order: original source layers, then each batch's
+        # recorded additions within its layer, rather than generated row order.
+        cls.owner_order = [row["slot_id"]
+                           for layer in cls.foundation["layers"] + cls.foundation.get("cross_rows", [])
+                           for row in cls.owner_rows.values() if row["layer_id"] == layer["layer_id"]]
         cls.rows = cls.manifest["slots"]
 
     def as_decided(self, row):
@@ -270,6 +281,8 @@ class Manifest(unittest.TestCase):
     def test_shared_measurement_ids_have_identical_arms(self):
         measurements = {}
         for row in self.rows:
+            # Wave 5 keeps the unstarted browser/messaging splits under overturned.
+            row = self.as_decided(row)
             resolution = row["resolution"]
             if resolution["outcome"] == "split":
                 mid = resolution["measurement_id"]
@@ -455,9 +468,10 @@ class Manifest(unittest.TestCase):
         self.assertNotEqual(rule, self.foundation["decision_rule"])
         self.assertEqual(self.manifest.get("decision_rule_before_amendment_2"), self.foundation["decision_rule"])
         # The consensus record's rule is appended whole, after the rounds' rule, then amendment 3 of its wave-2 batch and
-        # amendment 4 of its wave-3 batch (the owner's decision of 2026-10-04), in the batches' order.
+        # amendment 4 of wave 3, reused unchanged by wave 5 and appended only once.
         self.assertTrue(rule.endswith(" " + self.consensus["rule"] + " " + self.wave2["interim_rule"] + " "
                                       + self.wave3["owner_rule"]))
+        self.assertEqual(self.wave5["owner_rule"], self.wave3["owner_rule"])
         self.assertEqual(rule.count(self.wave3["owner_rule"]), 1)
         self.assertLess(rule.index("decision-round"), rule.index(self.consensus["rule"]))
         self.assertTrue(self.wave2["interim_rule"].startswith("Amendment 3 "))
@@ -466,6 +480,9 @@ class Manifest(unittest.TestCase):
         self.assertEqual(self.manifest["no_install_rule"], self.foundation["no_install_rule"])
         self.assertEqual(self.manifest["no_install_rule_exception"],
                          self.wave2["no_install_rule_exception"] + " " + self.wave3["no_install_rule_exception"])
+        # Wave 5 changes the owner-rule preamble, while repeating the same
+        # exception; the manifest records the identical exception once.
+        self.assertEqual(self.wave5["no_install_rule_exception"], self.wave3["no_install_rule_exception"])
         self.assertEqual(self.manifest["no_install_rule_exception"].count(self.wave3["no_install_rule_exception"]), 1)
         self.assertIn("exception to the no-install rule", self.manifest["no_install_rule_exception"])
         self.assertIn("second exception to the no-install rule", self.wave3["no_install_rule_exception"])
@@ -808,23 +825,23 @@ class Manifest(unittest.TestCase):
         counts, by_catalog = self.manifest["counts"], {}
         for row in self.rows:
             by_catalog[row["catalog"]] = by_catalog.get(row["catalog"], 0) + 1
-        # 90 before the wave-3 batch, and its ten owner rows (2026-10-04).
-        self.assertEqual(counts["slots"], 100)
-        self.assertEqual(by_catalog, {"foundation": 80, "us-equities": 20})
+        # 90 before wave 3, ten wave-3 owner rows, and four round-2 rows in wave 5.
+        self.assertEqual(counts["slots"], 104)
+        self.assertEqual(by_catalog, {"foundation": 84, "us-equities": 20})
         self.assertEqual(counts["layers"], 37)
         # 56 after the layer consensus, 57 with its wave-2 statusline row, 59 with the two local-model slots settled by their
-        # measurement (2026-10-03), 72 with wave 3, and 73 with the wave-4 Promptfoo owner default.
-        self.assertEqual(counts["installed"], 73)
+        # measurement (2026-10-03), 72 with wave 3, 73 with Promptfoo, then six wave-5 installs.
+        self.assertEqual(counts["installed"], 79)
         # Three interims under amendment 3; the context-supply owner default replaced one of them.
         self.assertEqual(counts["interim"], 2)
         self.assertEqual(counts["by_row_kind"]["consensus"], 6)
-        self.assertEqual(counts["by_row_kind"]["owner_decision"], 10)
-        # 23, the ten owner rows, and context-supply, no longer definitive (ccusage and session-analytics stay resolved).
-        self.assertEqual(counts["by_state"]["resolved"], 34)
+        self.assertEqual(counts["by_row_kind"]["owner_decision"], 14)
+        # 23, the ten wave-3 owner rows, context-supply, the four wave-5 owner rows and the two wave-5 owner defaults (agent-messaging, playwright-cli) = 40.
+        self.assertEqual(counts["by_state"]["resolved"], 40)
         self.assertEqual(counts["by_state"]["definitive"], 30)
         self.assertEqual(counts["definitive"], 30)
         self.assertEqual(counts["by_state"]["measurement"], 6)
-        self.assertEqual(counts["by_state"]["split"], 5)
+        self.assertEqual(counts["by_state"]["split"], 3)
 
     def test_consensus_rows_are_the_records_rows_with_its_states(self):
         rows = {row["slot_id"]: row for row in self.rows}
@@ -1021,7 +1038,7 @@ class Manifest(unittest.TestCase):
         table = [[cell.strip() for cell in line.split("|")[1:-1]] for line in lines[start:end] if line.startswith("| ")]
         self.assertEqual(table[:2], [["Slot", "Date", "Decision", "Replaced"], ["---"] * 4])
         self.assertEqual([cells[0] for cells in table[2:]],
-                         OWNER_ADDED + [row["slot_id"] for row in self.rows if row.get("overturned")])
+                         self.owner_order + [row["slot_id"] for row in self.rows if row.get("overturned")])
         for cells in table[2:]:
             with self.subTest(owner_table=cells[0]):
                 self.assertEqual(cells[1], "2026-10-04")
@@ -1305,43 +1322,68 @@ class Manifest(unittest.TestCase):
         assembler = load_assembler()
         rows = {row["slot_id"]: row for row in self.rows}
         self.assertEqual(list(self.owner_rows), OWNER_ADDED)
-        self.assertEqual([row["slot_id"] for row in self.rows if row["row_kind"] == "owner_decision"], OWNER_ADDED)
+        self.assertEqual([row["slot_id"] for row in self.rows if row["row_kind"] == "owner_decision"], self.owner_order)
         for sid, recorded in self.owner_rows.items():
             row = rows[sid]
             with self.subTest(slot=sid):
                 # Copied as the batch gives it, with the manifest's row fields.
                 self.assertEqual(row, recorded)
                 self.assertEqual(tuple(row), assembler.ROW_FIELDS)
-                self.assertEqual((row["catalog"], row["layer_id"]), ("foundation", "token-efficiency"))
+                expected_layer = {
+                    "lm-program-optimization": "cross:gpt6-harnesses",
+                    "skill-vetting": "instructions-skills",
+                    "mcp-protocol-conformance": "mcp-surfaces",
+                    "trajectory-analysis": "quality-evaluation",
+                }.get(sid, "token-efficiency")
+                self.assertEqual((row["catalog"], row["layer_id"]), ("foundation", expected_layer))
                 # Installed now, resolved, never definitive, and labelled as what it is.
                 self.assertTrue(assembler.installs(row))
                 self.assertEqual((row["state"], row["definitive"], row["measurement"]), ("resolved", False, None))
-                batch_number = 4 if sid == "promptfoo" else 3
+                batch_number = 5 if sid in WAVE5_OWNER_ADDED else 3
                 self.assertTrue(row["label"].startswith(f"owner decision of 2026-10-04 (wave {batch_number}, amendment 4)"), row["label"])
-                self.assertIn("not a blind round, not a consensus and not a measurement", row["label"])
+                self.assertIn("not a blind result, a consensus or a measurement" if batch_number == 5 else
+                              "not a blind round, not a consensus and not a measurement", row["label"])
                 self.assertTrue(row["repository"].startswith("https://github.com/"), row["repository"])
                 resolution = row["resolution"]
-                self.assertEqual((resolution["outcome"], resolution["batch"]), ("added_by_owner_decision", "wave3"))
+                self.assertEqual((resolution["outcome"], resolution["batch"]),
+                                 ("added_by_owner_decision", f"wave{batch_number}"))
                 for key in ("by", "reason", "pin", "install", "overturn"):
                     self.assertTrue(resolution[key].strip(), key)
-                self.assertTrue(resolution["open_acceptance_gates"] and resolution["usage_rules"])
+                self.assertTrue(resolution["open_acceptance_gates"])
                 self.assertIn("removes nothing by itself", resolution["overturn"])
-                self.assertIn("docs/decisions/2026-10-04-token-full-stack-owner-default.md", resolution["sources"])
+                if batch_number == 3:
+                    self.assertTrue(resolution["usage_rules"])
+                else:
+                    # Wave-5 added rows carry usage/qualification in install and
+                    # open gates; its amended defaults also carry usage_rules.
+                    self.assertTrue(resolution["install"])
+                    self.assertTrue(resolution["open_acceptance_gates"])
+                self.assertIn(self.consensus[f"wave{batch_number}"]["records"]["decision_record"]["path"],
+                              resolution["sources"])
                 for family in ("claude", "gpt"):
-                    self.assertTrue(row[family].startswith("not judged"), row[family])
+                    if batch_number == 3:
+                        self.assertTrue(row[family].startswith("not judged"), row[family])
+                    else:
+                        # Round 2 carries its deciders/critic and Opus verification,
+                        # while still resolving on the owner's repository-quality rule.
+                        prefix = "Opus verification of decide round 2" if family == "claude" else "decide round 2"
+                        self.assertTrue(row[family].startswith(prefix), row[family])
         # After every other row of the layer, in the batch's order.
-        in_layer = [row["slot_id"] for row in self.rows if row["layer_id"] == "token-efficiency"]
-        self.assertEqual(in_layer[-len(OWNER_ADDED):], OWNER_ADDED)
+        for layer_id in {row["layer_id"] for row in self.owner_rows.values()}:
+            in_layer = [row["slot_id"] for row in self.rows if row["layer_id"] == layer_id]
+            added = [sid for sid, row in self.owner_rows.items() if row["layer_id"] == layer_id]
+            self.assertEqual(in_layer[-len(added):], added, layer_id)
 
     def test_owner_pins_are_the_repository_pins(self):
-        """Each owner row and owner default names the version manifests/stack.json records: the batch moves no pin."""
+        """The original owner pins follow the host stack; wave 5 adds destination owners without moving host pins."""
         stack = {component["id"]: component["version"] for component in load(ROOT / "manifests/stack.json")["components"]}
         components = {"command-output": "rtk", "output-compression": "headroom", "code-index": "jcodemunch-mcp",
                       "code-graph": "codebase-memory-mcp", "repo-packing": "repomix", "structured-data": "toon",
                       "doc-conversion": "markitdown", "api-docs": "context-hub", "trace-viewer": "otel-tui",
                       "ccusage": "ccusage", "session-analytics": "agentsview", "context-supply": "context-mode",
                       "promptfoo": "promptfoo"}
-        self.assertEqual(set(components), set(OWNER_ADDED) - {"token-lane-carriers"} | OWNER_DEFAULTS)
+        self.assertEqual(set(components), set(WAVE3_OWNER_ADDED) - {"token-lane-carriers"}
+                         | (OWNER_DEFAULTS - WAVE5_OWNER_DEFAULTS))
         rows = {row["slot_id"]: row for row in self.rows}
         for sid, component in components.items():
             with self.subTest(slot=sid):
@@ -1349,6 +1391,13 @@ class Manifest(unittest.TestCase):
         interim = rows["code-search"]["interim"]["default"]
         self.assertIn("SocratiCode " + stack["socraticode"], interim)
         self.assertIn("semble 0.6.1", interim)
+        wave5 = {r["slot_id"]: r for r in self.wave5["add_rows"]}
+        wave5.update({e["slot_id"]: e["owner_default"] for e in self.wave5["amend_rows"]})
+        self.assertEqual(set(wave5), set(WAVE5_OWNER_ADDED) | WAVE5_OWNER_DEFAULTS)
+        for sid, recorded in wave5.items():
+            with self.subTest(destination_pin=sid):
+                self.assertEqual(rows[sid]["default"], recorded["default"])
+                self.assertEqual(rows[sid]["resolution"]["pin"], recorded["resolution"]["pin"])
 
     def test_owner_defaults_keep_what_they_replace(self):
         assembler = load_assembler()
@@ -1370,7 +1419,7 @@ class Manifest(unittest.TestCase):
                 self.assertEqual((row["state"], row["definitive"], row["measurement"], row["installs_nothing_extra"]),
                                  ("resolved", False, None, False))
                 self.assertEqual(row["resolution"]["outcome"], "owner_default")
-                batch_number = 4 if sid == "promptfoo" else 3
+                batch_number = 5 if sid in WAVE5_OWNER_DEFAULTS else 4 if sid == "promptfoo" else 3
                 self.assertTrue(row["label"].startswith(f"owner decision of 2026-10-04 (wave {batch_number}, amendment 4)"), row["label"])
                 # What it replaced is kept: the decided fields, an interim it dropped, and the amendment that replaced them.
                 kept = row["overturned"]
@@ -1393,7 +1442,7 @@ class Manifest(unittest.TestCase):
         text = (ROOT / ref["path"]).read_text(encoding="utf-8")
         self.assertIn(authority["verbatim"], text)
         self.assertTrue(authority["verbatim"].startswith("WE NEED TO ENABLE FULL SOTA STACKS FOR THE TOKEN EFFICIENCY REPOS "))
-        for sid in OWNER_ADDED + sorted((OWNER_DEFAULTS - {"promptfoo"}) | OWNER_INTERIM):
+        for sid in WAVE3_OWNER_ADDED + sorted((OWNER_DEFAULTS - {"promptfoo"} - WAVE5_OWNER_DEFAULTS) | OWNER_INTERIM):
             self.assertIn(f"`{sid}`", text, sid)
         for key in ("owner_rule", "no_install_rule_exception"):
             self.assertIn(batch[key], text, key)
@@ -1415,6 +1464,15 @@ class Manifest(unittest.TestCase):
         self.assertIn(batch["authority"]["verbatim"], text)
         self.assertIn("`promptfoo`", text)
         self.assertIn("https://github.com/promptfoo/promptfoo", text)
+        self.assertEqual((batch["acknowledgements"], batch["acknowledgements_owed"]), ([], []))
+        batch = self.wave5
+        ref = batch["records"]["decision_record"]
+        self.assertEqual(ref["path"], "docs/decisions/2026-10-04-final-architecture-round2.md")
+        self.assertEqual(sha(ROOT / ref["path"]), ref["sha256"])
+        text = (ROOT / ref["path"]).read_text(encoding="utf-8")
+        self.assertIn(batch["authority"]["verbatim"], text)
+        for sid in WAVE5_OWNER_ADDED + sorted(WAVE5_OWNER_DEFAULTS):
+            self.assertIn(f"`{sid}`", text, sid)
         self.assertEqual((batch["acknowledgements"], batch["acknowledgements_owed"]), ([], []))
 
     def test_the_assembler_refuses_an_owner_batch_outside_amendment_4(self):
@@ -1539,6 +1597,14 @@ class InterimPlanChecks(unittest.TestCase):
 
     GATE_LINE = '  interim_acknowledged {slot} || return "$?"\n'
 
+    def test_chrome_privileged_declaration_cannot_drift_from_the_helper(self):
+        def stale(rows):
+            if "prerequisite_steps" in rows["playwright-cli"]:
+                rows["playwright-cli"]["prerequisite_steps"][0]["command"] = "dpkg -i unverified-current.deb"
+        code, out = self.run_check(change_rows=stale)
+        self.assertEqual(code, 1, out)
+        self.assertIn("privileged prerequisite declaration differs", out)
+
     def run_check(self, change_rows=None, change_install=None, change_manifest=None):
         """(exit status, output) of check_plan.py over a scratch copy of the plan and the manifest."""
         with tempfile.TemporaryDirectory() as scratch:
@@ -1562,6 +1628,13 @@ class InterimPlanChecks(unittest.TestCase):
             result = subprocess.run([sys.executable, "-B", str(PLAN / "check_plan.py"), "--plan-dir", str(plan_dir),
                                      "--manifest", str(manifest)], capture_output=True, text=True, timeout=180)
         return result.returncode, result.stdout + result.stderr
+
+    def test_messaging_cannot_hide_under_another_slots_selector(self):
+        code, out = self.run_check(change_install=lambda text: text.replace(
+            "if selected 'agent-messaging'; then run_slot 'agent-messaging'; fi",
+            "if selected 'sandbox-runtime-srt'; then run_slot 'agent-messaging'; fi"))
+        self.assertEqual(code, 1, out)
+        self.assertIn("install.sh never runs row agent-messaging", out)
 
     def test_the_unchanged_copy_passes(self):
         code, out = self.run_check()

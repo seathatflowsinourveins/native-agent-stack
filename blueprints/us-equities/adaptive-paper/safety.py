@@ -752,14 +752,15 @@ class Ledger:
         predate the last RTH close; that is a documented simplification, not
         a per-position age check.
 
-        A date outside the frozen session calendar's supported years (D7)
-        cannot be classified; this falls back to the ordinary cap rather than
-        raising, so the risk engine's default hot path never breaks for a
-        timestamp outside the calendar table (e.g. synthetic test fixtures)."""
+        XNYS bounds come from the queried date's year. A timestamp or
+        calendar range/construction ValueError uses the stricter of the
+        ordinary and overnight caps. Other provider errors propagate;
+        there is no fallback calendar."""
         try:
             info = _session_at(datetime.fromtimestamp(now, tz=timezone.utc))
         except ValueError:
-            return self.limits.max_gross_exposure_usd
+            return min(self.limits.max_gross_exposure_usd,
+                       self.limits.overnight_gross_exposure_cap_usd())
         if info.kind != SessionKind.RTH:
             return self.limits.overnight_gross_exposure_cap_usd()
         return self.limits.max_gross_exposure_usd
@@ -769,8 +770,9 @@ class Ledger:
         when `self.limits.leverage is not None`): the regime-independent
         upper bound over every session's schedule row, further reduced by
         the drawdown ladder and (when applicable) the overnight cap. Fails
-        closed (0) for a timestamp outside the frozen session calendar,
-        the same fail-closed contract as an unclassifiable session in
+        closed (0) for a timestamp or calendar range/construction ValueError.
+        XNYS bounds come from the queried date's year; other provider errors
+        propagate. This is the same contract as an unclassifiable session in
         leverage.LeveragePolicy.envelope/ceiling -- the policy layer
         (strategies.py) never even observes an unclassifiable session
         (native_strategy._leverage_inputs already sets session=None for

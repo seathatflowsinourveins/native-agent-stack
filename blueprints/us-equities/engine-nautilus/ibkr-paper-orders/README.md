@@ -323,7 +323,41 @@ or wide quote leaves the run incomplete instead of paying up.
   of their SHA-256:
   - `run.py.9f6c08f1835f` is the harness of both regular-session receipts, from `c23525e6`;
   - `run.py.676a375a472a` is the harness of the after-hours receipt, from `c5468df1`;
+  - `run.py.1b697f237275` is the merged harness (this branch's `run.py` after the hardening above), behind the
+    2026-10-05 receipt;
   - `plan.json.9f2942c49bbd` and `plan-post.json.4500c917e11e` are the plans.
 
   A test checks that every receipt's `harness_sha256` and `plan_sha256` resolve to one of these or to a current
   file.
+
+## Run, 2026-10-05 (the merged, hardened bytes; the paper Gateway hosted on NativeStack2604)
+
+This is the first retained receipt of the merged `run.py` (sha256 `1b697f23…`, archived as
+`evidence/harness/run.py.1b697f237275`). It uses the same `plan.json` (`9f2942c4…`) as the 2026-09-23 runs, which
+used the earlier bytes.
+
+- **Setup.** These facts are recorded by the coordinator (session 5f) and are not in the receipt, which records
+  only the versions (NautilusTrader 1.231.0, ibapi 10.45.1) and port 4002.
+  - The environment came from this README's uv recipe. The `ib` extra also installed protobuf 5.29.6 (`uv pip list`
+    in that environment).
+  - The harness ran on NativeStack against the paper IB Gateway that NativeStack2604 hosts (gnzsnz/ib-gateway
+    10.51.1b, paper mode). It connected at 127.0.0.1:4002, over the WSL loopback both distributions share.
+  - The user unticked Read-Only API in the running Gateway beforehand, at about 14:09Z, as the coordinator lane
+    attested. The receipt records no IB 321, and its orders were accepted and filled.
+- **Pre-check.** The standalone `run.py check`, run at 14:23:41Z, printed exactly
+  `{"status": "passed", "exit_code": 0, "account_count": 1, "positions": 0, "open_orders": 0}`. That line is retained
+  as `evidence/check-20261005-passed.json`. The run's own in-process pre-check, recorded in the receipt, passed with the
+  same counts.
+- **Result.** 10:26 ET, `evidence/receipt-20261005-passed.json`: **passed** (exit 0, 11.5 s):
+
+  | Case | Nautilus events | Result |
+  |---|---|---|
+  | C1 resting buy, SPY 1 at half the bid (386.42) | Initialized, Submitted, Updated, Accepted | accepted |
+  | C2 cancel | PendingCancel, Updated, Accepted, Canceled | canceled |
+  | C3 marketable buy (limit 772.97) | through Filled | filled 772.93, commission 1.00 USD |
+  | C4 flatten (limit 772.84) | through Filled | filled 772.90, commission 1.02 USD |
+
+  - Gross −0.03 USD and net −2.05 USD against the 5 USD round-trip bound; Nautilus realized PnL agrees.
+  - 3 of 6 orders were used. There were no cleanup, unconfirmed or duplicate events.
+  - The independent official-ibapi flat proof (client 92) found 0 positions and 0 open orders.
+- **Console log.** Nautilus does not redact it, so it stayed private and is not committed.

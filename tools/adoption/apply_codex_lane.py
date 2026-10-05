@@ -102,6 +102,7 @@ from scripts import adoption_status, codex_quota  # noqa: E402
 # static row of prove_codex_lane.py and the tests.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import codex_roles  # noqa: E402
+import managed_block  # noqa: E402
 from codex_roles import (  # noqa: E402,F401  (re-exported: the tests and prove_codex_lane.py reach them through here)
     ROLE_FILES, agents_toml_count, doctor_config_load, doctor_problem, doctor_role_state, live_role_tables, path_kind,
     role_table_count, system_role_count)
@@ -426,7 +427,10 @@ def effective_server_settings(layers: list, profile: dict, name: str) -> dict:
 
 
 def agents_block() -> str:
-    text = AGENTS_TEMPLATE.read_text(encoding="utf-8")
+    try:
+        text = managed_block.codex_block(AGENTS_TEMPLATE.read_text(encoding="utf-8"))
+    except managed_block.Refused as error:
+        raise Refused(str(error)) from None
     if not (text.startswith(BLOCK_BEGIN) and text.endswith(BLOCK_END + "\n")):
         raise Refused(f"{AGENTS_TEMPLATE} must be exactly one managed block")
     return text

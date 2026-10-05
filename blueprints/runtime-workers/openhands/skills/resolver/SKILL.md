@@ -50,14 +50,29 @@ The host side is `blueprints/runtime-workers/openhands/resolver.py`; see
 
 ## Monitoring-only decision, 2026-10-04
 
-The resolver entry point is disabled until the owned-path allowlist gate lands. Static
-read inventories are advisory only and authorize no task path or push. The later gate
-will default-deny changes outside the task's declared owned paths.
+The host independently checks the coordinator's owned paths on the exact commit before
+pushing. Static read inventories remain advisory. The driver's startup negative control
+must refuse a real unowned addition before any handler proceeds.
 
 ## What the push gate refuses
 
-Before the host pushes, a trusted gate checks your exact change. Even inside the owned
-paths, it refuses, with no push, a change to:
+Before the host pushes, a trusted gate checks your exact change and refuses every
+unowned path, including either end of a rename. Even inside the owned paths, it refuses:
+- a symlink, gitlink, mode/type change, unsafe path component (empty, . or .. components), absolute path, `.git`
+  or its HFS/NTFS aliases, or `.gitmodules` and its aliases;
+- compiled or bytecode artifacts (`compiled_module_artifact`): every `__pycache__`
+  component and `.pyc`, `.pyo`, `.so`, `.pyd`, `.dylib` or `.dll` suffix, anywhere;
+- Git semantic dot files (`git_semantic_file`) at any depth: `.git*` names including
+  `.gitattributes`, `.gitignore` and `.gitconfig`, plus `.mailmap`; `.git`, `.gitmodules`
+  and `.github` keep their existing refusals;
+- instruction files (`instruction_file`), by basename at any depth or by directory prefix:
+  `AGENTS.md`, `AGENTS.override.md`,
+  `AGENTS.template.md`, `codex.AGENTS.template.md`, `CLAUDE.md`, `CLAUDE.local.md`, `GEMINI.md`,
+  `SKILL.md`, `RTK.md`, `codex-user-instructions.md`, `claude-user-instructions.md`,
+  `token-lanes-block.md`, `token-lanes-block.builder.md`, `token-lanes-block.researcher.md`,
+  `token-lanes-block.reviewer.md`, `token-lanes-block.scout.md`, `token-lanes-block.verifier.md`
+  and `adoption/agents/` (all Claude definitions, Codex roles and their pin files);
+- a casefold or NFC/NFKC alias of a protected path, or a collision with another changed path;
 - `.github/`: workflows, local actions, rulesets and CI requirements;
 - a file named `CODEOWNERS`, anywhere;
 - the resolver's own gate and driver: `blueprints/runtime-workers/openhands/resolver/`
@@ -67,6 +82,9 @@ paths, it refuses, with no push, a change to:
   closure of those names, local actions and reusable workflows;
 - a workflow or action step that uses pull-request or issue text, and a workflow or action
   that zizmor flags.
+
+Case/Unicode and NTFS trailing-dot, space or stream forms are refused too; instruction
+and Git names also discard Git's HFS-ignorable characters. Ownership cannot authorize these files.
 
 If the fix needs any of these, including a new or changed test, change nothing: stop and
 report which file would need to change and why. The owner makes that change.

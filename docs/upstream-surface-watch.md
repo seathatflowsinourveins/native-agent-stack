@@ -90,6 +90,28 @@ first-column backticked names within two distinct keys. TypeScript hook and quot
 numeric escapes fail the anchor. These are local integration checks against cached SDK 0.3.289, Codex rust-v0.160.0
 and docs artifacts, with synthetic malformed-input controls.
 
+## Instruction-document watch (2026-10-05)
+
+Enabled `claude:doc:*` and `codex:doc:*` dispositions rows also watch the body
+of their HTTPS `source`, against the reviewed `value.sha256`. The three current
+rows cover Claude memory, Claude skills and the Codex AGENTS.md guide. Fetches
+request Markdown and reuse the existing bounded HTTP, cache and freshness
+path; a server that returns HTML instead is compared as that full body.
+
+Each result appears in `documents` with its expected and observed digest,
+`changed` flag and `carrier` audit record. A changed body adds the existing
+row's key to `unreviewed`, even though its name was already reviewed. The
+daily currency notice therefore reopens the instruction audit through its
+existing unreviewed count. A failed required fetch keeps the watch incomplete;
+an offline replay preserves the cached result and its actual fetch date.
+
+These are body-change alerts, not semantic judgments: site markup changes can
+also request review. `--write-baseline` does not accept a changed document.
+After rereading the upstream page and rerunning the
+[context audit](decisions/2026-10-05-harness-context-budget.md), update the
+row's digest and dated review explicitly. The local tests use synthetic
+document bodies; the committed digests were fetched from the named pages.
+
 ## What the watch does not cover
 
 It compares names from the sources above and nothing else:
@@ -117,7 +139,7 @@ It compares names from the sources above and nothing else:
 
 `latest.json` has the keys `schema_version`, `generated_at` (the time of the oldest data it holds), `run_at`,
 `versions` (watched, baseline and dist-tag versions; the SDK match), `new`, `removed`, `stage_changed`, `changelog`,
-`unreviewed`, `coverage` (mode; `from_cache`, the sources a `--network` run took from the cache; every source's URL,
+  `unreviewed`, `documents` (the instruction-document digest comparisons), `coverage` (mode; `from_cache`, the sources a `--network` run took from the cache; every source's URL,
 origin, fetch time, version, sha256, `required`, `cross_check` and, for a digest-published asset, `digest_check`;
 observed kinds; counts; notes) and `cross_check`, then `summary_line`.
 

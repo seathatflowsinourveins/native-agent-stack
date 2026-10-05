@@ -201,9 +201,9 @@ class HostBaselineProbeTests(unittest.TestCase):
             ("al", homes / "alice" / ".local/bin/env"),
             ("alice", Path("/backup") / "home/alice/bin/env"),
         )
-        for login, path in cases:
+        for case_index, (login, path) in enumerate(cases):
             for location in ("output", "stderr", "command", "key"):
-                with self.subTest(login=login, location=location, path_kind=path.name):
+                with self.subTest(login=login, location=location, path_kind=case_index):
                     record = {"command": "command -v env", "exit": 0, "output": ""}
                     if location == "key":
                         record[str(path)] = False
@@ -219,6 +219,75 @@ class HostBaselineProbeTests(unittest.TestCase):
                 self.assertEqual(code, 0)
                 self.assertEqual(json.loads(out)["env"]["output"], "~" + suffix)
                 self.assertEqual(err, "")
+
+    def test_sibling_home_subtest_ids_are_unique(self):
+        ids = []
+
+        class SubtestResult(unittest.TestResult):
+            def addSubTest(self, test, subtest, err):
+                ids.append(subtest.id())
+                super().addSubTest(test, subtest, err)
+
+        result = SubtestResult()
+        type(self)("test_prefix_sharing_home_paths_fail_closed_before_normalization").run(result)
+        self.assertTrue(result.wasSuccessful(), result.failures + result.errors)
+        self.assertTrue(ids)
+        self.assertEqual(len(ids), len(set(ids)))
+
+    def test_home_traversal_fails_closed_before_tilde_normalization(self):
+        home = Path("/") / "home" / "alice"
+        cases = (
+            ("sibling escape", str(home) + "/../bob/bin/env"),
+            ("prefix-sharing sibling escape", str(home) + "/../alicebob/bin/env"),
+            ("interior traversal", str(home) + "/bin/../env"),
+            ("newline traversal", str(home) + "/..\nfoo"),
+            ("carriage-return traversal", str(home) + "/..\r"),
+        )
+        for path_kind, path in cases:
+            for location in ("output", "stderr", "command", "key"):
+                with self.subTest(path_kind=path_kind, location=location):
+                    record = {"command": "command -v env", "exit": 0, "output": ""}
+                    if location == "key":
+                        record[path] = False
+                    else:
+                        record[location] = path
+                    self.assertEqual(self.mocked_main("alice", {"env": record}, home=home), (3, "", ""))
+        controls = (
+            ("child spelling", str(home) + "/./bin//env"),
+            ("parent spelling", str(home.parent) + "/./alice//bin/env"),
+        )
+        for path_kind, path in controls:
+            with self.subTest(control=path_kind):
+                document = {"env": {"command": "command -v env", "exit": 0, "output": path}}
+                code, out, err = self.mocked_main("alice", document, home=home)
+                self.assertEqual(code, 0)
+                self.assertEqual(json.loads(out)["env"]["output"], "~/bin/env")
+                self.assertEqual(err, "")
+
+    def test_home_prefix_replacement_preserves_trailing_text(self):
+        home = Path("/") / "home" / "alice"
+        suffixes = (
+            ("error line", "/bin/tool: see https://example.com/x/"),
+            ("combined stdout and stderr", "/bin/tool\nwarning: see https://example.com/x/"),
+            ("whitespace", "/bin/tool\tsee https://example.com/x/"),
+        )
+        for text_kind, suffix in suffixes:
+            for location in ("output", "stderr", "command", "key"):
+                with self.subTest(text_kind=text_kind, location=location):
+                    record = {"command": "command -v env", "exit": 0, "output": ""}
+                    if location == "key":
+                        record[str(home) + suffix] = False
+                    else:
+                        record[location] = str(home) + suffix
+                    code, out, err = self.mocked_main("alice", {"env": record}, home=home)
+                    self.assertEqual(code, 0)
+                    expected = {"command": "command -v env", "exit": 0, "output": ""}
+                    if location == "key":
+                        expected["~" + suffix] = False
+                    else:
+                        expected[location] = "~" + suffix
+                    self.assertEqual(json.loads(out), {"env": expected})
+                    self.assertEqual(err, "")
 
     def test_common_logins_do_not_reject_fixed_labels_or_command_names(self):
         document = {
@@ -299,6 +368,24 @@ class HostBaselineProbeTests(unittest.TestCase):
                     document = {"version": {"command": f"{login} --version", "exit": 0,
                                              "output": value}}
                     self.assertEqual(self.mocked_main(login, document), (3, "", ""))
+
+    def test_claude_version_suffixes_cannot_hide_login_tokens(self):
+        cases = (
+            ("alice", "2.1.289-alice (Claude Code)"),
+            ("alice", "2.1.289+build.alice (Claude Code)"),
+            ("claude", "2.1.289+claude (Claude Code)"),
+        )
+        for login, value in cases:
+            with self.subTest(login=login, value=value):
+                document = {"version": {"command": "claude --version", "exit": 0,
+                                         "output": value}}
+                self.assertEqual(self.mocked_main(login, document), (3, "", ""))
+        value = "2.1.289+build.agent (Claude Code)"
+        document = {"version": {"command": "claude --version", "exit": 0, "output": value}}
+        code, out, err = self.mocked_main("alice", document)
+        self.assertEqual(code, 0)
+        self.assertEqual(json.loads(out), document)
+        self.assertEqual(err, "")
 
     def test_account_annotations_after_leading_version_labels_fail_closed(self):
         banners = {

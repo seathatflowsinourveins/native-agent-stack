@@ -11,6 +11,7 @@ import contextlib
 from collections import Counter
 import fnmatch
 import importlib.util
+import inspect
 import io
 import json
 import os
@@ -32,7 +33,7 @@ from tests.test_runtime_worker_openhands_resolver import (
 ROOT = Path(__file__).resolve().parents[1]
 RESOLVER = "blueprints/runtime-workers/openhands/resolver"
 ENFORCING = (f"{RESOLVER}/push_gate.py", f"{RESOLVER}/patch_policy.py", f"{RESOLVER}/gate_reads.py",
-             f"{RESOLVER}/gh_harness.py")
+             f"{RESOLVER}/gh_harness.py", "blueprints/runtime-workers/openhands/resolver.py")
 # The zizmor version the gate enforces, read from the file and with the pattern the gate uses
 # (push_gate.ZIZMOR_PIN_FILE, push_gate.ZIZMOR_PIN), so a pin bump moves these tests with it and the real-zizmor test
 # keeps running against the newly pinned release instead of skipping.
@@ -116,17 +117,17 @@ GATE_FILES = {
 
 
 class GateFixture:
-    """A bare fixture origin whose main carries the three enforcing files, the trusted checkout
+    """A bare fixture origin whose main carries the enforcing sources and driver, the trusted checkout
     the gate runs from (a clone of that main), and agent clones with planted commits."""
 
-    def __init__(self, root, overrides=None):
+    def __init__(self, root, overrides=None, *, source=ROOT):
         self.root = Path(root)
         self.work = self.root / "origin-work"
         self.work.mkdir(parents=True)
         run_git(self.work, "init", "-q", "-b", "main")
         contents = {**GATE_FILES, **(overrides or {})}
         for rel in ENFORCING:
-            contents[rel] = (ROOT / rel).read_bytes()
+            contents[rel] = (Path(source) / rel).read_bytes()
         for rel, data in contents.items():
             if data is not None:
                 write_file(self.work, rel, data)
@@ -137,9 +138,9 @@ class GateFixture:
         self.trusted = self.clone("trusted")
         self.count = 0
 
-    def clone(self, name):
+    def clone(self, name, *, git_config=()):
         path = self.root / name
-        subprocess.run(["git", "clone", "-q", str(self.bare), str(path)], check=True, capture_output=True,
+        subprocess.run(["git", *git_config, "clone", "-q", str(self.bare), str(path)], check=True, capture_output=True,
                        env=hermetic_git_environment())
         return path
 
@@ -163,6 +164,30 @@ class GateFixture:
                 else:
                     write_file(clone, rel, data if number == 0 else f"{data}{number}\n")
             head = commit_all(clone, f"agent {number}")
+        return clone, head
+
+    def agent_index_commit(self, edits):
+        """An agent commit with exact index paths, independent of worktree filename folding."""
+        # git/git v2.43.0 t/t2107-update-index-basic.sh:59-69 builds index-only
+        # entries with hash-object --stdin and update-index --cacheinfo.
+        # Documentation/git-{write,commit}-tree.txt describes committing that index
+        # without restaging the worktree. Disable macOS argv normalization and case
+        # folding for every Git call so even aliases of existing files stay distinct.
+        config = ("-c", "core.precomposeunicode=false", "-c", "core.ignorecase=false")
+        self.count += 1
+        clone = self.clone(f"agent-{self.count}", git_config=config)
+        parent = run_git(clone, *config, "rev-parse", "HEAD").stdout.decode().strip()
+        for rel, data in edits.items():
+            if data is None:
+                run_git(clone, *config, "update-index", "--force-remove", "--", rel)
+            else:
+                raw = data if isinstance(data, bytes) else data.encode("utf-8")
+                oid = run_git(clone, *config, "hash-object", "-w", "--stdin", input=raw).stdout.decode().strip()
+                run_git(clone, *config, "update-index", "--add", "--cacheinfo", f"100644,{oid},{rel}")
+        tree = run_git(clone, *config, "write-tree").stdout.decode().strip()
+        head = run_git(clone, *config, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                       "commit-tree", tree, "-p", parent, "-m", "agent 0").stdout.decode().strip()
+        run_git(clone, *config, "update-ref", "HEAD", head, parent)
         return clone, head
 
 
@@ -470,6 +495,45 @@ class WorkflowReaderTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.g = load_gate(ROOT)
+
+    def test_git_v2430_dotgitmodules_path_utils_vectors(self):
+        # git/git v2.43.0 t/t0060-path-utils.sh:439-528, including both --not
+        # controls and the empty-prefix fallback names at :495-496. The helper
+        # t/helper/test-path-utils.c:406-409 checks HFS and NTFS equivalents.
+        matches = (
+            ".gitmodules", ".git\u200cmodules", ".Gitmodules", ".gitmoduleS",
+            ".gitmodules ", ".gitmodules.", ".gitmodules  ", ".gitmodules. ",
+            ".gitmodules .", ".gitmodules..", ".gitmodules   ", ".gitmodules.  ",
+            ".gitmodules . ", ".gitmodules  .",
+            ".Gitmodules ", ".Gitmodules.", ".Gitmodules  ", ".Gitmodules. ",
+            ".Gitmodules .", ".Gitmodules..", ".Gitmodules   ", ".Gitmodules.  ",
+            ".Gitmodules . ", ".Gitmodules  .",
+            "GITMOD~1", "gitmod~1", "GITMOD~2", "gitmod~3", "GITMOD~4",
+            "GITMOD~1 ", "gitmod~2.", "GITMOD~3  ", "gitmod~4. ",
+            "GITMOD~1 .", "gitmod~2   ", "GITMOD~3.  ", "gitmod~4 . ",
+            "GI7EBA~1", "gi7eba~9", "GI7EB~10", "GI7EB~11", "GI7EB~99",
+            "GI7EB~10", "GI7E~100", "GI7E~101", "GI7E~999", "~1000000", "~9999999",
+            ".gitmodules:$DATA", "gitmod~4 . :$DATA",
+        )
+        nonmatches = (
+            ".gitmodules x", ".gitmodules .x", " .gitmodules", "..gitmodules", "gitmodules",
+            ".gitmodule", ".gitmodules x ", ".gitmodules .x",
+            "GI7EBA~", "GI7EBA~0", "GI7EBA~~1", "GI7EBA~X", "Gx7EBA~1", "GI7EBX~1",
+            "GI7EB~1", "GI7EB~01", "GI7EB~1X", ".gitmodules,:$DATA",
+        )
+        for expected, vectors in ((True, matches), (False, nonmatches)):
+            for vector in vectors:
+                with self.subTest(vector=vector, expected=expected):
+                    self.assertEqual("gitmodules" in self.g.path_refusals("docs/" + vector), expected)
+
+    def test_git_v2430_dotgit_rejection_vectors(self):
+        # t0060 has is_dotgitmodules, not an is_ntfs_dotgit vector block.
+        # git/git v2.43.0 t/t1014-read-tree-confusing.sh:45-54 supplies these
+        # .git forms; path.c:1419-1453 supplies the component/suffix semantics.
+        for vector in (".git", ".GIT", "\u200c.Git", ".gI\u200cT", ".GiT\u200c", "git~1",
+                       ".git. ", ".\\.GIT\\foobar", ".git\\foobar", ".git...:alternate-stream"):
+            with self.subTest(vector=vector):
+                self.assertIn("git_component", self.g.path_refusals("docs/" + vector))
 
     def test_values_are_read_in_every_supported_form(self):
         text = ("on: [push, pull_request]\n"
@@ -1136,6 +1200,570 @@ class RepositoryWorkflowTests(unittest.TestCase):
         self.assertEqual(derived.unresolved, [])
 
 
+class OwnedPathGateTests(unittest.TestCase):
+    """Independent commit fixtures, using native git and unittest; never a live resolver.
+
+    OWNED_PATH_GATE_SOURCE selects only the fixture's enforcing source for a fail-first
+    replay at 3b8f9c8a. The old check has no owned_paths argument: omit it ONLY in that
+    replay, so a red assertion observes the old gate's actual decision, not a TypeError.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmp = Path(tempfile.mkdtemp(prefix="owned-path-gate-")).resolve()
+        source = Path(os.environ.get("OWNED_PATH_GATE_SOURCE", str(ROOT)))
+        cls.fixture = GateFixture(cls.tmp / "fixtures", source=source)
+        cls.module = load_gate(cls.fixture.trusted)
+        cls.zizmor, _ = fake_zizmor(cls.tmp)
+        cls.gate = cls.module.PushGate(git=REAL_GIT, zizmor=cls.zizmor)
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmp, ignore_errors=True)
+
+    def check(self, clone, head, owned=("docs",)):
+        kwargs = {"base": self.fixture.base, "head": head}
+        if "owned_paths" in inspect.signature(self.gate.check).parameters:
+            kwargs["owned_paths"] = owned
+            try:
+                independent = self.module.normalize_owned_paths(owned)
+            except self.module.GateError:
+                with self.assertRaises(ValueError):
+                    self.module.patch_policy.normalize_owned(owned)
+            else:
+                contract = self.module.patch_policy.normalize_owned(owned)
+                self.assertEqual(list(independent), contract)
+                # Independently inspect native names and compare both matchers for
+                # EVERY commit fixture, including malformed Git-object path fixtures.
+                names = run_git(clone, "diff-tree", "-r", "-z", "--no-renames", "--name-only",
+                                self.fixture.base, head).stdout.split(b"\0")[:-1]
+                for name in names:
+                    path = name.decode("utf-8", "surrogateescape")
+                    self.assertEqual(self.module.path_is_owned(path, independent),
+                                     self.module.patch_policy.is_owned(path, contract), path)
+        with contextlib.redirect_stderr(io.StringIO()):
+            return self.gate.check(str(clone), **kwargs)
+
+    def observe(self, control, record):
+        # Returned decisions, counts and refusal codes only, for the public fail-first receipt.
+        print(json.dumps({"control": control, "status": record["status"], "reasons": record["reasons"],
+                          "changed_path_count": record.get("changed_path_count"),
+                          "owned_path_count": record.get("owned_path_count")}, sort_keys=True))
+
+    def refuse(self, control, clone, head, reason, owned=("docs",)):
+        record = self.check(clone, head, owned)
+        self.observe(control, record)
+        self.assertEqual(record["status"], "fail", control)
+        self.assertIn(reason, record["reasons"], control)
+        return record
+
+    def literal_commit(self, name, mode="100644", data=b"fixture\n"):
+        """A deliberately unsafe tree entry that git add/verify_path would reject.
+
+        git-hash-object(1) --literally permits malformed trees; git-commit-tree(1) and
+        git-diff-tree(1) inspect the exact object. No checkout of the unsafe tree occurs.
+        This is a synthetic adversarial Git object, not upstream Git acceptance.
+        """
+        self.fixture.count += 1
+        clone = self.fixture.clone(f"literal-{self.fixture.count}")
+        blob = run_git(clone, "hash-object", "-w", "--stdin", input=data).stdout.strip()
+        original = run_git(clone, "ls-tree", "-z", self.fixture.base).stdout
+        entries = []
+        for entry in original.split(b"\0"):
+            if entry:
+                meta, entry_name = entry.split(b"\t", 1)
+                entry_mode, _, oid = meta.split()
+                entries.append((entry_name, entry_mode.lstrip(b"0"), oid))
+        entries.append((name.encode("utf-8"), mode.encode(), blob))
+        entries.sort(key=lambda item: item[0] + (b"/" if item[1] == b"40000" else b"\0"))
+        raw = b"".join(entry_mode + b" " + entry_name + b"\0" + bytes.fromhex(oid.decode())
+                       for entry_name, entry_mode, oid in entries)
+        tree = run_git(clone, "hash-object", "--literally", "-w", "-t", "tree", "--stdin", input=raw).stdout.strip()
+        head = run_git(clone, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                       "commit-tree", tree.decode(), "-p", self.fixture.base, "-m", "literal fixture").stdout.decode().strip()
+        return clone, head
+
+    def test_unowned_add_modify_delete_and_rename_ends(self):
+        cases = {
+            "unowned_add": {"src/new.txt": "new\n"},
+            "unowned_modify": {"src/app.py": "print('modified')\n"},
+            "unowned_delete": {"src/app.py": None},
+            "rename_unowned_destination": {"docs/a.md": None, "src/moved.md": "a\n"},
+            "rename_unowned_source": {"src/app.py": None, "docs/moved.py": "print('app')\n"},
+        }
+        for control, edits in cases.items():
+            with self.subTest(control=control):
+                clone, head = self.fixture.agent_commit(edits)
+                record = self.refuse(control, clone, head, "unowned_path")
+                self.assertEqual(record["changed_path_count"], len(edits))
+
+    def test_symlink_gitlink_mode_and_type_changes(self):
+        for control in ("symlink", "gitlink", "mode_change", "type_change"):
+            with self.subTest(control=control):
+                self.fixture.count += 1
+                clone = self.fixture.clone(f"mode-{self.fixture.count}")
+                if control in ("symlink", "type_change"):
+                    path = clone / ("docs/link" if control == "symlink" else "docs/a.md")
+                    if path.exists():
+                        path.unlink()
+                    path.symlink_to("guide.md")
+                elif control == "mode_change":
+                    (clone / "docs/a.md").chmod(0o755)
+                if control == "gitlink":
+                    run_git(clone, "update-index", "--add", "--cacheinfo",
+                            f"160000,{self.fixture.base},docs/submodule")
+                    run_git(clone, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                            "commit", "-q", "--no-verify", "-m", "gitlink fixture")
+                    head = run_git(clone, "rev-parse", "HEAD").stdout.decode().strip()
+                else:
+                    head = commit_all(clone, control)
+                self.refuse(control, clone, head, control)
+
+    def test_invalid_path_components_and_absolute_paths(self):
+        for control, path, reason in (("dotdot", "..", "invalid_path_component"),
+                                      ("dot", ".", "invalid_path_component"),
+                                      ("empty_component", "docs//escape", "invalid_path_component"),
+                                      ("absolute_path", "/escape", "absolute_path"),
+                                      ("dos_drive", "C:escape", "absolute_path")):
+            with self.subTest(control=control):
+                clone, head = self.literal_commit(path)
+                self.refuse(control, clone, head, reason)
+
+    def test_git_components_and_hfs_ntfs_equivalents(self):
+        # Every ignored HFS code point from git v2.43.0 utf8.c next_hfs_char, plus
+        # path.c is_ntfs_dotgit's case, trailing-dot/space, 8.3 and ADS classes.
+        ignored = [*range(0x200c, 0x2010), *range(0x202a, 0x202f), *range(0x206a, 0x2070), 0xfeff]
+        cases = {"git_literal": ".git", "git_case": ".GiT", "git_ntfs_suffix": ".git . . ",
+                 "git_ntfs_short": "git~1", "git_ntfs_short_suffix": "GiT~1. ",
+                 "git_ntfs_ads": ".git:stream", "git_ntfs_index": ".git::$INDEX_ALLOCATION",
+                 "git_ntfs_short_ads": "git~1:stream", "git_backslash": "docs\\.git\\escape"}
+        cases.update({f"git_hfs_{point:04x}": ".g" + chr(point) + "it" for point in ignored})
+        for control, component in cases.items():
+            with self.subTest(control=control):
+                path = component if "\\" in component else "docs/" + component + "/escape"
+                clone, head = self.literal_commit(path)
+                self.refuse(control, clone, head, "git_component")
+
+    def test_gitmodules_and_fsck_aliases(self):
+        for control, path in (("gitmodules", ".gitmodules"), ("gitmodules_case", ".GiTmOdUlEs"),
+                              ("gitmodules_hfs", ".git\u200cmodules"), ("gitmodules_ntfs", ".gitmodules. "),
+                              ("gitmodules_ads", ".gitmodules:stream"),
+                              *((f"gitmodules_short_{n}", f"gitmod~{n}") for n in range(1, 5)),
+                              ("gitmodules_fallback", "gi7eba~1")):
+            with self.subTest(control=control):
+                path = "docs/" + path
+                clone, head = self.literal_commit(path)
+                self.refuse(control, clone, head, "gitmodules")
+
+    def test_gitmodules_empty_prefix_fallback_refuses(self):
+        for path in ("docs/~1000000", "docs/~9999999"):
+            with self.subTest(path=path):
+                clone, head = self.literal_commit(path)
+                self.refuse("gitmodules_empty_prefix_fallback", clone, head, "gitmodules")
+
+    def test_git_semantic_dot_files_refuse_even_when_owned(self):
+        # git/git v2.43.0 Documentation/gitattributes.txt:69-82, :110-118:
+        # per-directory attributes affect checkout even of unchanged files.
+        # The .git* boundary is conservative; .github keeps its existing rule.
+        paths = (
+            ".gitattributes", "docs/.gitattributes", "docs/deep/.gitignore", "docs/.mailmap",
+            "docs/.gitconfig", "docs/.git-blame-ignore-revs", "docs/.gitfuture-policy",
+            "docs/.GITATTRIBUTES", "docs/.MAILMAP", "docs/.\uff47\uff49\uff54ignore",
+            "docs/.\uff4d\uff41\uff49\uff4c\uff4d\uff41\uff50", "docs/.git\u200cattributes",
+            "docs/.gitattributes. ", "docs/.gitignore:stream",
+        )
+        for path in paths:
+            with self.subTest(path=path):
+                clone, head = self.fixture.agent_commit({path: "fixture\n"})
+                owned = ("docs",) if path.startswith("docs/") else (path,)
+                self.refuse("git_semantic_add", clone, head, "git_semantic_file", owned)
+
+    def test_git_semantic_modify_and_delete_refuse(self):
+        paths = ("docs/.gitattributes", "docs/.gitignore", "docs/.mailmap", "docs/.gitconfig")
+        fixture = GateFixture(self.tmp / "git-semantic-existing", dict.fromkeys(paths, "fixture\n"),
+                              source=self.fixture.trusted)
+        gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        for path in paths:
+            for control, data in (("git_semantic_modify", "changed\n"), ("git_semantic_delete", None)):
+                with self.subTest(path=path, control=control):
+                    clone, head = fixture.agent_commit({path: data})
+                    with contextlib.redirect_stderr(io.StringIO()):
+                        record = gate.check(str(clone), base=fixture.base, head=head, owned_paths=("docs",))
+                    self.observe(control, record)
+                    self.assertEqual(record["status"], "fail")
+                    self.assertIn("git_semantic_file", record["reasons"])
+
+    def test_instruction_files_refuse_even_when_owned(self):
+        # Repository instruction names: RESOLVER.md's validator contract,
+        # recipes/README.md's native instruction/skill routing and
+        # adoption/platforms/linux-wsl2-new-distro.md's user-instruction files.
+        paths = (
+            "CLAUDE.md", "docs/AGENTS.md", "docs/deep/CLAUDE.md", "docs/GEMINI.md",
+            "docs/AGENTS.override.md", "docs/CLAUDE.local.md", "docs/AGENTS.template.md",
+            "docs/SKILL.md", "docs/RTK.md", "docs/codex-user-instructions.md", "docs/claude-user-instructions.md",
+            "docs/AgEnTs.Md", "docs/\uff21GENTS.md", "docs/AG\u200cENTS.md",
+            "docs/CLAUDE.md. ", "docs/GEMINI.md:stream",
+        )
+        for path in paths:
+            with self.subTest(path=path):
+                clone, head = self.fixture.agent_commit({path: "# fixture instructions\n"})
+                owned = ("docs",) if path.startswith("docs/") else (path,)
+                self.refuse("instruction_file_add", clone, head, "instruction_file", owned)
+
+    def test_instruction_file_modify_and_delete_refuse(self):
+        paths = ("docs/AGENTS.md", "docs/CLAUDE.md", "docs/GEMINI.md")
+        fixture = GateFixture(self.tmp / "instruction-existing", dict.fromkeys(paths, "# fixture\n"),
+                              source=self.fixture.trusted)
+        gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        for path in paths:
+            for control, data in (("instruction_file_modify", "# changed\n"), ("instruction_file_delete", None)):
+                with self.subTest(path=path, control=control):
+                    clone, head = fixture.agent_commit({path: data})
+                    with contextlib.redirect_stderr(io.StringIO()):
+                        record = gate.check(str(clone), base=fixture.base, head=head, owned_paths=("docs",))
+                    self.observe(control, record)
+                    self.assertEqual(record["status"], "fail")
+                    self.assertIn("instruction_file", record["reasons"])
+
+    def test_real_instruction_template_and_carrier_additions_refuse(self):
+        # 656f263dc tools/adoption/apply_codex_lane.py:111 names the real
+        # Codex template. token-lanes-subagent-start.py:16-23,33-38 selects
+        # the default carrier and five role variants for additionalContext.
+        paths = ("adoption/templates/codex.AGENTS.template.md",
+                 "adoption/hooks/claude/token-lanes-block.md",
+                 "adoption/hooks/claude/token-lanes-block.builder.md",
+                 "adoption/hooks/claude/token-lanes-block.researcher.md",
+                 "adoption/hooks/claude/token-lanes-block.reviewer.md",
+                 "adoption/hooks/claude/token-lanes-block.scout.md",
+                 "adoption/hooks/claude/token-lanes-block.verifier.md")
+        for path in paths:
+            with self.subTest(path=path):
+                clone, head = self.fixture.agent_commit({path: "# fixture instructions\n"})
+                self.refuse("real_instruction_add", clone, head, "instruction_file", (str(Path(path).parent),))
+
+    def test_real_instruction_template_and_carrier_modify_delete_refuse(self):
+        paths = ("adoption/templates/codex.AGENTS.template.md",
+                 "adoption/hooks/claude/token-lanes-block.md",
+                 "adoption/hooks/claude/token-lanes-block.builder.md",
+                 "adoption/hooks/claude/token-lanes-block.researcher.md",
+                 "adoption/hooks/claude/token-lanes-block.reviewer.md",
+                 "adoption/hooks/claude/token-lanes-block.scout.md",
+                 "adoption/hooks/claude/token-lanes-block.verifier.md")
+        fixture = GateFixture(self.tmp / "real-instruction-existing", dict.fromkeys(paths, "# fixture\n"),
+                              source=self.fixture.trusted)
+        gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        for path in paths:
+            for control, data in (("real_instruction_modify", "# changed\n"), ("real_instruction_delete", None)):
+                with self.subTest(path=path, control=control), contextlib.redirect_stderr(io.StringIO()):
+                    clone, head = fixture.agent_commit({path: data})
+                    record = gate.check(str(clone), base=fixture.base, head=head,
+                                        owned_paths=(str(Path(path).parent),))
+                    self.observe(control, record)
+                    self.assertEqual(record["status"], "fail")
+                    self.assertIn("instruction_file", record["reasons"])
+
+    def test_ordinary_adoption_config_template_remains_editable(self):
+        path = "adoption/templates/codex.config.template.toml"
+        fixture = GateFixture(self.tmp / "adoption-config-existing", {path: "# fixture config\n"},
+                              source=self.fixture.trusted)
+        gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        for control, current, data in (("ordinary_template_add", self.fixture, "# added config\n"),
+                                       ("ordinary_template_modify", fixture, "# changed config\n")):
+            with self.subTest(control=control), contextlib.redirect_stderr(io.StringIO()):
+                clone, head = current.agent_commit({path: data})
+                selected_gate = self.gate if current is self.fixture else gate
+                record = selected_gate.check(str(clone), base=current.base, head=head,
+                                             owned_paths=("adoption/templates",))
+                self.observe(control, record)
+                self.assertEqual(record["status"], "pass")
+
+    def test_adoption_agents_add_modify_delete_refuse_even_when_owned(self):
+        # At 0e2610d66, install_claude_profile.py:152-170 installs every
+        # adoption/agents/claude/*.md; apply_codex_lane.py:595-604,1234-1236
+        # installs Codex roles with pins from the same tree. Reserve the
+        # entire prefix, including future definitions and the pin files.
+        paths = {
+            "claude": "adoption/agents/claude/stack-researcher.md",
+            "codex": "adoption/agents/codex/stack-researcher.toml",
+            "new_definition": "adoption/agents/claude/general-purpose.md",
+            "pins": "adoption/agents/codex/SHA256SUMS",
+        }
+        fixture = GateFixture(self.tmp / "adoption-agents-existing", dict.fromkeys(paths.values(), "fixture\n"),
+                              source=self.fixture.trusted)
+        gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        for carrier, path in paths.items():
+            for operation, current, data in (("add", self.fixture, "added\n"),
+                                              ("modify", fixture, "changed\n"), ("delete", fixture, None)):
+                control = f"adoption_agents_{carrier}_{operation}"
+                with self.subTest(control=control), contextlib.redirect_stderr(io.StringIO()):
+                    clone, head = current.agent_commit({path: data})
+                    selected_gate = self.gate if current is self.fixture else gate
+                    record = selected_gate.check(str(clone), base=current.base, head=head,
+                                                 owned_paths=("adoption/agents",))
+                    self.observe(control, record)
+                    self.assertEqual(record["status"], "fail")
+                    self.assertIn("instruction_file", record["reasons"])
+
+    def test_adoption_agents_prefix_aliases_refuse_even_when_owned(self):
+        paths = (
+            "AdOpTiOn/AgEnTs/claude/new.md",
+            "\uff41doption/\uff41gents/claude/new.md",
+            "adoption\uff0fagents/claude/new.md",
+            "adop\u200ction/ag\u206bents/claude/new.md",
+            "adoption. /agents. /claude/new.md",
+            "adoption:stream/agents::$DATA/claude/new.md",
+            "adoption/agents/codex/workers/new.toml",
+            "adoption/agents",
+        )
+        for path in paths:
+            with self.subTest(path=path):
+                clone, head = self.fixture.agent_commit({path: "fixture\n"})
+                self.refuse("adoption_agents_prefix_alias", clone, head, "instruction_file", (path,))
+
+    def test_adoption_agents_prefix_boundary_remains_editable(self):
+        for path in ("adoption/agents-other/new.md", "adoption/agents.toml", "adoption-other/agents/new.md",
+                     "tools/adoption/agents/new.md"):
+            with self.subTest(path=path):
+                clone, head = self.fixture.agent_commit({path: "fixture\n"})
+                record = self.check(clone, head, (path,))
+                self.observe("adoption_agents_prefix_boundary", record)
+                self.assertEqual(record["status"], "pass")
+
+    def test_compiled_module_artifacts_refuse_even_when_owned(self):
+        # CI targets CPython v3.12.3 (.github/workflows/validate.yml:227-228).
+        # Its Lib/importlib/_bootstrap_external.py:1724-1732 tries extensions
+        # before source. :1095-1126 loads unchecked-hash caches without checking
+        # source (PEP 552); Doc/library/importlib.rst:1265-1308 maps PEP 3147 caches.
+        paths = (
+            "scripts/__pycache__/gate_helpers.cpython-312.pyc",
+            "scripts/gate_helpers.pyc", "scripts/gate_helpers.pyo", "scripts/gate_helpers.abi3.so",
+            "scripts/gate_helpers.pyd", "scripts/gate_helpers.dylib", "scripts/gate_helpers.dll",
+            "docs/outer/__pycache__/inventory.txt", "docs/__PYCACHE__/inventory.txt", "docs/m.SO",
+            "docs/__\uff50\uff59\uff43\uff41\uff43\uff48\uff45__/inventory.txt",
+            "docs/m.\uff53\uff4f", "docs/m.so. ", "docs/m.pyd:stream",
+        )
+        for path in paths:
+            with self.subTest(path=path):
+                clone, head = self.fixture.agent_commit({path: b"synthetic module artifact\n"})
+                self.refuse("compiled_module_add", clone, head, "compiled_module_artifact", ("docs", "scripts"))
+
+    def test_compiled_module_modify_and_delete_refuse(self):
+        path = "docs/m.abi3.so"
+        fixture = GateFixture(self.tmp / "compiled-existing", {path: b"existing artifact\n"})
+        gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        for control, data in (("compiled_module_modify", b"changed artifact\n"), ("compiled_module_delete", None)):
+            with self.subTest(control=control):
+                clone, head = fixture.agent_commit({path: data})
+                with contextlib.redirect_stderr(io.StringIO()):
+                    record = gate.check(str(clone), base=fixture.base, head=head, owned_paths=("docs",))
+                self.observe(control, record)
+                self.assertEqual(record["status"], "fail")
+                self.assertIn("compiled_module_artifact", record["reasons"])
+
+    def test_case_and_unicode_collisions(self):
+        for control, paths in (("case_collision", ("docs/Readme", "docs/readme")),
+                               ("unicode_nfc_collision", ("docs/caf\u00e9", "docs/cafe\u0301")),
+                               ("unicode_nfkc_collision", ("docs/A", "docs/\uff21"))):
+            with self.subTest(control=control):
+                clone, head = self.fixture.agent_index_commit(dict.fromkeys(paths, "fixture\n"))
+                names = run_git(clone, "-c", "core.precomposeunicode=false", "-c", "core.ignorecase=false",
+                                "ls-tree", "-r", "--name-only", "-z", head).stdout.split(b"\0")[:-1]
+                for path in paths:
+                    self.assertIn(path.encode("utf-8"), names, f"{control}: fixture tree lost {path!r}")
+                self.refuse(control, clone, head, "changed_path_collision")
+
+    def test_unicode_protected_alias_even_when_owned(self):
+        path = ".\uff47\uff49\uff54\uff48\uff55\uff42/guide.md"
+        clone, head = self.fixture.agent_commit({path: "fixture\n"})
+        self.refuse("protected_nfkc_alias", clone, head, "protected_path_alias", (".\uff47\uff49\uff54\uff48\uff55\uff42",))
+
+    def test_unchanged_protected_file_case_and_unicode_aliases_refuse(self):
+        path = "policy/caf\u00e9.toml"
+        workflow = CI_WORKFLOW.replace("policy/gate.toml", path)
+        fixture = GateFixture(self.tmp / "protected-aliases", {
+            ".github/workflows/ci.yml": workflow, path: "strict = true\n"}, source=self.fixture.trusted)
+        gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        for alias in ("policy/CAF\u00c9.toml", "policy/cafe\u0301.toml", "policy/\uff43af\u00e9.toml"):
+            with self.subTest(alias=alias):
+                # Preserve the unchanged policy file alongside its alias on APFS.
+                clone, head = fixture.agent_index_commit({alias: "strict = false\n"})
+                with contextlib.redirect_stderr(io.StringIO()):
+                    record = gate.check(str(clone), base=fixture.base, head=head, owned_paths=("policy",))
+                self.observe("unchanged_protected_alias", record)
+                self.assertEqual(record["status"], "fail")
+                self.assertIn("protected_path", record["reasons"])
+
+    def test_explicit_ownership_limits_top_level_and_unprotected_alias_checks(self):
+        # These are documented residuals, not proposed extra refusal classes.
+        clone, head = self.fixture.agent_commit({"new-top/file.txt": "fixture\n"})
+        self.refuse("unowned_new_top_level", clone, head, "unowned_path")
+        record = self.check(clone, head, ("new-top",))
+        self.observe("owned_new_top_level_residual", record)
+        self.assertEqual(record["status"], "pass")
+        for alias in ("docs/A.md", "docs/\uff41.md"):
+            with self.subTest(alias=alias):
+                # docs/a.md must remain unchanged while the alias is added.
+                clone, head = self.fixture.agent_index_commit({alias: "fixture\n"})
+                record = self.check(clone, head)
+                self.observe("unchanged_unprotected_alias_residual", record)
+                self.assertEqual(record["status"], "pass")
+
+    def test_transitive_stdlib_shadow_is_a_documented_scope_residual(self):
+        # CPython v3.12.3 Lib/json/decoder.py:3 imports re, and
+        # Modules/main.c:583-607 adds the script directory without safe_path.
+        # The gate does not derive the stdlib's own import closure. Do not
+        # execute the synthetic script or shadow module in this local test.
+        script = "blueprints/ci-check/audit.py"
+        fixture = GateFixture(self.tmp / "stdlib-residual", {
+            ".github/workflows/ci.yml": CI_WORKFLOW.replace("scripts/check_gate.py", script),
+            script: "import json\nprint('fixture')\n"}, source=self.fixture.trusted)
+        gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        clone, head = fixture.agent_commit({"blueprints/ci-check/re.py": "# synthetic shadow\n"})
+        for owned, status in ((("blueprints/ci-check",), "pass"), ((script,), "fail")):
+            with self.subTest(owned=owned), contextlib.redirect_stderr(io.StringIO()):
+                record = gate.check(str(clone), base=fixture.base, head=head, owned_paths=owned)
+                self.observe("stdlib_shadow_scope_residual", record)
+                self.assertEqual(record["status"], status)
+                if status == "fail":
+                    self.assertIn("unowned_path", record["reasons"])
+
+    def test_unreserved_exactly_owned_dot_file_and_instruction_like_name_pass(self):
+        # Cheap name refusals leave ordinary reviewed documentation editable.
+        clone, head = self.fixture.agent_commit({"docs/.notes": "fixture\n", "docs/AGENTS-guide.md": "fixture\n"})
+        record = self.check(clone, head, ("docs/.notes", "docs/AGENTS-guide.md"))
+        self.observe("unreserved_owned_names_positive", record)
+        self.assertEqual(record["status"], "pass")
+
+    def test_exception_refuses(self):
+        clone, head = self.fixture.agent_commit({"docs/a.md": "changed\n"})
+        with mock.patch.object(self.gate, "_changed", side_effect=RuntimeError("fixture error")):
+            self.refuse("gate_exception", clone, head, "gate_error_runtimeerror")
+
+    def test_unexpected_git_output_refuses(self):
+        clone, head = self.fixture.agent_commit({"docs/a.md": "changed\n"})
+        native_git = self.module._git
+        raw = b":100644 100644 " + b"1" * 40 + b" " + b"2" * 40 + b" M\0docs/a.md\0"
+        cases = {"diff_missing_nul": raw[:-1], "diff_incomplete_pair": raw.split(b"\0")[0] + b"\0",
+                 "diff_unknown_status": raw.replace(b" M\0", b" U\0"),
+                 "diff_rename_status": raw.replace(b" M\0", b" R100\0"),
+                 "diff_bad_mode": raw.replace(b"100644", b"100600", 1),
+                 "diff_zero_oid": raw.replace(b"1" * 40, b"0" * 40), "diff_duplicate_path": raw + raw}
+        for control, output in cases.items():
+            with self.subTest(control=control):
+                def git(*args, **kwargs):
+                    if "diff-tree" in args:
+                        return subprocess.CompletedProcess([], 0, output, b"")
+                    return native_git(*args, **kwargs)
+
+                with mock.patch.object(self.module, "_git", side_effect=git):
+                    self.refuse(control, clone, head, "diff_output_invalid")
+
+    def test_diff_tree_failure_reports_diff_failed_and_refuses(self):
+        clone, head = self.fixture.agent_commit({"docs/a.md": "changed\n"})
+        native_run = self.module.subprocess.run
+
+        def run(argv, *args, **kwargs):
+            if "diff-tree" in argv:
+                return subprocess.CompletedProcess(argv, 128, b"", b"fixture diff failure\n")
+            return native_run(argv, *args, **kwargs)
+
+        # Inject at subprocess, so _git's check=True cannot be bypassed by a
+        # fake high-level return value. The old code reports git_failed here.
+        with mock.patch.object(self.module.subprocess, "run", side_effect=run):
+            record = self.refuse("diff_tree_nonzero", clone, head, "diff_failed")
+        self.assertEqual(record["paths"], [])
+        self.assertIsNone(record["changed_path_count"])
+        self.assertEqual(record["owned_path_count"], 1)
+
+    def test_missing_and_invalid_owned_list_refuse(self):
+        clone, head = self.fixture.agent_commit({"docs/a.md": "changed\n"})
+        for control, owned, reason in (("owned_list_missing", None, "owned_paths_required"),
+                                      ("owned_list_empty", (), "owned_paths_required"),
+                                      ("owned_list_invalid", ("../docs",), "invalid_owned_path")):
+            with self.subTest(control=control):
+                self.refuse(control, clone, head, reason, owned)
+
+    def test_exact_commit_differs_from_the_validated_patch(self):
+        clone, validated_head = self.fixture.agent_commit({"docs/a.md": "validated\n"})
+        patch = run_git(clone, "diff", self.fixture.base, validated_head).stdout.decode()
+        verdict = self.module.patch_policy.validate_patch(
+            patch, tree=self.module.patch_policy.GitTree(clone, self.fixture.base, git=REAL_GIT), owned=["docs"])
+        self.assertEqual(verdict["status"], "accepted", verdict)
+        other, pushed_head = self.fixture.agent_commit({"docs/a.md": "validated\n", "src/app.py": "escaped\n"})
+        self.assertNotEqual(pushed_head, validated_head)
+        self.refuse("commit_differs_from_validated_patch", other, pushed_head, "unowned_path")
+
+    def test_owned_only_change_passes(self):
+        clone, head = self.fixture.agent_commit({"docs/a.md": "owned change\n"})
+        record = self.check(clone, head, ("docs/", "docs"))
+        self.observe("owned_only_positive", record)
+        self.assertEqual((record["status"], record["reasons"]), ("pass", []), record)
+        if "owned_paths" in inspect.signature(self.gate.check).parameters:
+            self.assertEqual((record["changed_path_count"], record["owned_path_count"]), (1, 1))
+
+
+class OwnedPathSemanticsTests(unittest.TestCase):
+    """Fixture agreement and a planted defect in patch_policy's matcher."""
+
+    def test_independent_owned_grammar_and_match_agree_on_every_fixture(self):
+        gate = load_resolver().push_gate
+        policy = gate.patch_policy
+        valid = [("docs",), ("docs/", "src/file.py", "docs", "docs///"),
+                 ("a/b", "a"), ("caf\u00e9", "cafe\u0301"), ("dir with spaces/file",)]
+        paths = ("docs", "docs/a.md", "docstring", "docs-other/a.md", "src/file.py", "src/file.py/child",
+                 "src/file.pyx", "a", "a/b", "a/b/c", "a/bb", "caf\u00e9", "cafe\u0301", "dir with spaces/file")
+        for entries in valid:
+            with self.subTest(entries=entries):
+                independent = gate.normalize_owned_paths(entries)
+                upstream_contract = policy.normalize_owned(entries)
+                self.assertEqual(list(independent), upstream_contract)
+                for path in paths:
+                    self.assertEqual(gate.path_is_owned(path, independent), policy.is_owned(path, upstream_contract),
+                                     (entries, path))
+        invalid = [None, (), [], "docs", b"docs", ("",), ("/docs",), ("docs//x",), ("docs/../x",),
+                   ("docs/./x",), (".",), ("..",), ("docs\\x",), (" docs",), ("docs ",),
+                   ("docs\0x",), ("docs\nx",), ("docs\rx",), (1,)]
+        for entries in invalid:
+            with self.subTest(entries=entries):
+                with self.assertRaises(gate.GateError):
+                    gate.normalize_owned_paths(entries)
+                with self.assertRaises(ValueError):
+                    policy.normalize_owned(entries)
+
+    def test_patch_policy_matcher_defect_cannot_expand_gate_ownership(self):
+        with tempfile.TemporaryDirectory(prefix="owned-independent-") as directory:
+            fixture = GateFixture(directory)
+            module = load_gate(fixture.trusted)
+            zizmor, _ = fake_zizmor(directory)
+            clone, head = fixture.agent_commit({"src/app.py": "unowned\n"})
+            with mock.patch.object(module.patch_policy, "is_owned", return_value=True), \
+                    mock.patch.object(module.patch_policy, "normalize_owned", return_value=["src"]), \
+                    contextlib.redirect_stderr(io.StringIO()):
+                record = module.PushGate(git=REAL_GIT, zizmor=zizmor).check(
+                    str(clone), base=fixture.base, head=head, owned_paths=("docs",))
+            self.assertEqual((record["status"], record["reasons"]), ("fail", ["unowned_path"]))
+
+    def test_fail_closed_includes_record_construction_output_and_interrupts(self):
+        with tempfile.TemporaryDirectory(prefix="owned-exceptions-") as directory:
+            fixture = GateFixture(directory)
+            module = load_gate(fixture.trusted)
+            zizmor, _ = fake_zizmor(directory)
+            clone, head = fixture.agent_commit({"docs/a.md": "owned\n"})
+            gate = module.PushGate(git=REAL_GIT, zizmor=zizmor)
+            cases = ((module, "advisory_gate_reads", RuntimeError("record fixture"), "gate_error_runtimeerror"),
+                     (gate, "_changed", KeyboardInterrupt(), "gate_error_keyboardinterrupt"),
+                     (gate, "_changed", SystemExit(17), "gate_error_systemexit"))
+            for target, name, exception, reason in cases:
+                with self.subTest(reason=reason), mock.patch.object(target, name, side_effect=exception), \
+                        contextlib.redirect_stderr(io.StringIO()):
+                    record = gate.check(str(clone), base=fixture.base, head=head, owned_paths=("docs",))
+                self.assertEqual((record["status"], record["reasons"]), ("fail", [reason]))
+            with mock.patch("builtins.print", side_effect=BrokenPipeError()), \
+                    contextlib.redirect_stderr(io.StringIO()):
+                record = gate.check(str(clone), base=fixture.base, head=head, owned_paths=("docs",))
+            self.assertEqual((record["status"], record["reasons"]), ("fail", ["gate_error_brokenpipeerror"]))
+
+
 class PushGateTests(unittest.TestCase):
     """PushGate.check on planted agent commits in fixture clones (local git, fake zizmor)."""
 
@@ -1156,7 +1784,8 @@ class PushGateTests(unittest.TestCase):
     def check(self, edits, *, fixture=None, gate=None, commits=1, base=None):
         fixture = fixture or self.fixture
         clone, head = fixture.agent_commit(edits, commits=commits)
-        return (gate or self.gate()).check(str(clone), base=base or fixture.base, head=head), head
+        return (gate or self.gate()).check(str(clone), base=base or fixture.base, head=head,
+                                          owned_paths=tuple(edits)), head
 
     def test_a_benign_commit_passes_and_records_the_trusted_commit(self):
         record, head = self.check({"docs/a.md": "a\nmore\n"})
@@ -1274,18 +1903,19 @@ class PushGateTests(unittest.TestCase):
         clone, head = self.fixture.agent_commit({"docs/a.md": "b\n"})
         planted = load_gate(clone)  # the agent clone carries a copy of the gate at the same path
         zizmor, log = fake_zizmor(self.tmp)
-        record = planted.PushGate(git=REAL_GIT, zizmor=zizmor).check(str(clone), base=self.fixture.base, head=head)
+        record = planted.PushGate(git=REAL_GIT, zizmor=zizmor).check(str(clone), base=self.fixture.base, head=head,
+                                                                 owned_paths=("docs",))
         self.assertEqual((record["status"], record["reasons"], record["trusted_commit"]),
                          ("fail", ["gate_inside_agent_tree"], None))
         self.assertEqual(zizmor_calls(log), [])
         # The trusted gate refuses too when the result directory holding the clone also holds it.
-        record = self.gate().check(str(clone), base=self.fixture.base, head=head,
+        record = self.gate().check(str(clone), base=self.fixture.base, head=head, owned_paths=("docs",),
                                    agent_trees=(str(self.fixture.root),))
         self.assertEqual(record["reasons"], ["gate_inside_agent_tree"])
         # So does a tool that lies inside an agent tree.
         inside = clone / "zizmor"
         shutil.copy(zizmor, inside)
-        record = self.gate(str(inside)).check(str(clone), base=self.fixture.base, head=head)
+        record = self.gate(str(inside)).check(str(clone), base=self.fixture.base, head=head, owned_paths=("docs",))
         self.assertEqual(record["reasons"], ["tool_inside_agent_tree"])
 
     def test_a_gate_file_that_differs_from_the_trusted_commit_refuses(self):
@@ -1297,6 +1927,24 @@ class PushGateTests(unittest.TestCase):
                 record, _ = self.check({"docs/a.md": "b\n"}, fixture=fixture,
                                        gate=self.gate(module=load_gate(fixture.trusted)))
                 self.assertEqual((record["status"], record["reasons"]), ("fail", ["gate_file_modified"]))
+
+    def test_a_locally_modified_resolver_driver_refuses(self):
+        fixture = GateFixture(self.tmp / f"driver-modified-{secrets.token_hex(3)}")
+        with open(fixture.trusted / "blueprints/runtime-workers/openhands/resolver.py", "a",
+                  encoding="utf-8") as handle:
+            handle.write("# uncommitted enforcement-input change\n")
+        record, _ = self.check({"docs/a.md": "b\n"}, fixture=fixture,
+                               gate=self.gate(module=load_gate(fixture.trusted)))
+        self.assertEqual((record["status"], record["reasons"]), ("fail", ["gate_file_modified"]))
+
+    def test_a_stale_resolver_driver_refuses(self):
+        fixture = GateFixture(self.tmp / f"driver-stale-{secrets.token_hex(3)}")
+        stale = load_gate(fixture.trusted)
+        driver = "blueprints/runtime-workers/openhands/resolver.py"
+        newer = fixture.advance({driver: (ROOT / driver).read_bytes() + b"# reviewed driver change\n"})
+        clone, head = fixture.agent_commit({"docs/a.md": "b\n"})
+        record = self.gate(module=stale).check(str(clone), base=newer, head=head, owned_paths=("docs",))
+        self.assertEqual((record["status"], record["reasons"]), ("fail", ["gate_differs_from_base"]))
 
     def test_a_trusted_checkout_off_main_refuses(self):
         fixture = GateFixture(self.tmp / f"offmain-{secrets.token_hex(3)}")
@@ -1310,7 +1958,7 @@ class PushGateTests(unittest.TestCase):
         stale = load_gate(fixture.trusted)
         newer = fixture.advance({ENFORCING[1]: (ROOT / ENFORCING[1]).read_text(encoding="utf-8") + "# reviewed\n"})
         clone, head = fixture.agent_commit({"docs/a.md": "b\n"})
-        record = self.gate(module=stale).check(str(clone), base=newer, head=head)
+        record = self.gate(module=stale).check(str(clone), base=newer, head=head, owned_paths=("docs",))
         self.assertEqual((record["status"], record["reasons"]), ("fail", ["gate_differs_from_base"]))
 
     def test_a_trusted_root_that_is_no_checkout_refuses(self):
@@ -1319,6 +1967,7 @@ class PushGateTests(unittest.TestCase):
             write_file(plain, rel, (ROOT / rel).read_bytes())
         clone, head = self.fixture.agent_commit({"docs/a.md": "b\n"})
         record = load_gate(plain).PushGate(git=REAL_GIT, zizmor=self.zizmor).check(str(clone), base=self.fixture.base,
+                                                                            owned_paths=("docs",),
                                                                                    head=head)
         self.assertEqual(record["status"], "fail")
         self.assertIn(record["reasons"][0], {"trusted_root_not_a_checkout", "gate_file_modified"})
@@ -1382,7 +2031,7 @@ class GateDataReadTests(unittest.TestCase):
     def check(self, edits, *, fixture=None, gate=None):
         fixture = fixture or self.fixture
         clone, head = fixture.agent_commit(edits)
-        return (gate or self.gate).check(str(clone), base=fixture.base, head=head)
+        return (gate or self.gate).check(str(clone), base=fixture.base, head=head, owned_paths=tuple(edits))
 
     def test_derived_reads_are_advisory_and_cannot_refuse(self):
         record = self.check({"policy/contract/contract.schema.json": "{}\n"})
@@ -1727,7 +2376,8 @@ class HarnessPushGateTests(unittest.TestCase):
         home = self.tmp / f"home-{secrets.token_hex(3)}"
         home.mkdir()
         return self.h.GhHarness(self.tools.gh, git=REAL_GIT, base_env=planted_base(home), runner=runner,
-                                workdir=self.h.private_workdir(str(self.tmp)), push_gate=gate)
+                                workdir=self.h.private_workdir(str(self.tmp)), push_gate=gate,
+                                owned_paths=("docs", "policy", "tools", ".github"))
 
     def test_a_planted_workflow_commit_is_refused_before_any_push(self):
         clone, head = self.fixture.agent_commit({".github/workflows/ci.yml": CI_WORKFLOW + "# planted\n"})
@@ -1741,6 +2391,31 @@ class HarnessPushGateTests(unittest.TestCase):
         [record] = harness.gates
         self.assertEqual((record["status"], record["commit"], record["reasons"]), ("fail", head, ["protected_path"]))
         self.assertEqual(record["paths"], [{"path": ".github/workflows/ci.yml", "rule": "github", "known": True}])
+
+    def test_an_unowned_commit_is_refused_before_any_push(self):
+        clone, head = self.fixture.agent_commit({"src/app.py": "unowned\n"})
+        calls = []
+        harness = self.harness(calls, self.module.PushGate(git=REAL_GIT, zizmor=self.zizmor))
+        with self.assertRaises(self.h.HarnessRefused) as refused:
+            harness.push(str(clone), "openhands/issue-12", base=self.fixture.base, head=head)
+        self.assertEqual(refused.exception.reason, "push_gate_refused")
+        self.assertFalse(any("push" in argv for argv in calls))
+        self.assertEqual(harness.writes, [])
+        [record] = harness.gates
+        self.assertEqual((record["status"], record["reasons"]), ("fail", ["unowned_path"]))
+        self.assertEqual((record["changed_path_count"], record["owned_path_count"]), (1, 4))
+
+    def test_a_gate_exception_is_journaled_and_never_pushes(self):
+        clone, head = self.fixture.agent_commit({"docs/a.md": "owned\n"})
+        calls = []
+        gate = self.module.PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        harness = self.harness(calls, gate)
+        with mock.patch.object(gate, "check", side_effect=RuntimeError("fixture failure")), \
+                self.assertRaises(self.h.HarnessRefused):
+            harness.push(str(clone), "openhands/issue-12", base=self.fixture.base, head=head)
+        self.assertEqual(harness.gates[0]["reasons"], ["gate_exception"])
+        self.assertFalse(any("push" in argv for argv in calls))
+        self.assertEqual(harness.writes, [])
 
     def test_a_schema_edit_is_advisory_and_does_not_block_the_mock_push(self):
         clone, head = self.reads.agent_commit({"policy/contract/contract.schema.json": '{"type": "object"}\n'})
@@ -1820,10 +2495,21 @@ class ReceiptProjectionTests(unittest.TestCase):
         self.assertEqual(summary, {
             "status": "fail", "commit": "c" * 40, "base": "a" * 40, "trusted_commit": "b" * 40,
             "reasons": ["protected_path", "zizmor_finding"],
+            "changed_path_count": None, "owned_path_count": None,
             "paths": [{"path": "CODEOWNERS", "rule": "codeowners"}], "unnamed_paths": 6,
             "zizmor": {"version": PIN, "findings": 2, "failing": ["template-injection"]}})
         self.assertEqual(self.receipt.push_gate_summary(None), [])
         self.assertEqual(self.receipt.push_gate_summary([{"status": "maybe", "commit": "HEAD"}])[0]["status"], None)
+
+    def test_owned_gate_counts_and_codes_survive_without_file_contents(self):
+        record = {"status": "fail", "reasons": ["unowned_path", "symlink"], "paths": [],
+                  "changed_path_count": 3, "owned_path_count": 2}
+        [summary] = self.receipt.push_gate_summary([record])
+        self.assertEqual((summary["changed_path_count"], summary["owned_path_count"]), (3, 2))
+        self.assertEqual(summary["reasons"], ["symlink", "unowned_path"])
+        for value in (True, -1, "3"):
+            [summary] = self.receipt.push_gate_summary([{**record, "changed_path_count": value}])
+            self.assertIsNone(summary["changed_path_count"])
 
     def test_unclassified_count_and_omissions_survive_receipt_filtering(self):
         record = {"advisory_gate_reads": {"unclassified_count": 7,
@@ -1895,6 +2581,21 @@ class AttemptPushGateTests(unittest.TestCase):
         for relative, data in edits.items():
             write_file(work, relative, data)
         return full_export(work, self.fixture.base)
+
+    def test_plan_allowlist_ignores_artifacts_and_copies_returned_identity(self):
+        owned = ["docs"]
+        attempt = self.attempt(ResolverGitHub(base=self.fixture.base), owned)
+        owned[:] = ["src"]
+        identity = attempt.identity()
+        identity["owned_paths"][:] = ["src"]
+        result = self.result_for("owned-provenance")
+        write_file(result, "worker/owned-paths.json", '{"owned_paths": ["src"]}\n')
+        write_file(result, "resolver-identity.json", '{"owned_paths": ["src"]}\n')
+        with mock.patch.dict(os.environ, {"OPENHANDS_OWNED_PATHS": "src", "OWNED_PATHS": "src"}):
+            attempt._session(result)
+        self.assertEqual(attempt.identity()["owned_paths"], ["docs"])
+        self.assertEqual(attempt.owned_paths, ("docs",))
+        self.assertEqual(attempt.harness.owned_paths, ("docs",))
 
     def test_an_owned_codeowners_change_is_refused_before_the_push(self):
         github = ResolverGitHub(base=self.fixture.base)

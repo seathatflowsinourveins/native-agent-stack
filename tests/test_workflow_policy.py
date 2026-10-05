@@ -108,10 +108,9 @@ EXEMPTIONS = {
         "catalog-freshness.yml": "job-scoped group on propose, its only writer; freshness reads only and may overlap "
                                  "(tests/test_catalog_freshness_propose.py)",
     },
-    "pull-request-cache-mode": {
-        "adoption-bootstrap.yml:bootstrap-macos": "saves its model cache on push, schedule and workflow_dispatch "
-                                                  "only; cache-mode takes no expression",
-    },
+    # bootstrap-macos no longer runs on pull_request (macOS CI advisory, docs/decisions/2026-10-05-macos-ci-advisory.md),
+    # so its former exemption is gone; test_each_exemption_is_still_needed keeps this table honest.
+    "pull-request-cache-mode": {},
 }
 # Every write grant in the repository, by job. A new one is a reviewed change to this inventory.
 WRITE_GRANTS = {

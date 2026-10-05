@@ -591,7 +591,7 @@ The tripwire stays a regression check there; it does not stand in for the gate.
   `contract.schema.json` and `catalogs/foundation/automation.json` are `ci_read`, that nothing is
   unresolved, and the breadth bound.
 
-**Proposed, not adopted (2026-10-04): the owned paths as an allowlist in the gate as well.** The
+**Proposal of 2026-10-04: addition 1 adopted below; addition 2 not adopted.** The
 task's owned paths already act as an allowlist, applied before the gate. `patch_policy.validate_patch`
 refuses any change outside them before the host commits, so the derivation only decides within the
 owned paths. A miss like P1's mattered only to a task that owns the schema's directory. Two
@@ -927,3 +927,425 @@ independent-review item; they are not waived, rewritten or called accepted by fi
 2026-10-04 — 489-r7 corrects the bounded Claude Opus r3 findings on merged head eb2fa338b280a95035d6b6656ef1a3432acfd98f (main 780bf5d05). The prior re-scope claim that the closure was unchanged was incorrect: executable_lines/names_in_text over workflow-named non-Python code and its recursively named non-Python code, plus the python_references import closure of Python reached through those names, are restored as enforced ci_read/ci_import categories. GateReads inventories, evaluator diagnostics and files followed only through reads/executed or sys.path re-resolution remain advisory. The enforced name closure and its construction/parse checks complete before monitoring; every advisory-followed queued Python file also receives a parse check outside monitoring error handling. Unparseable queued scripts and RecursionError at GateReads construction retain gate_input_unresolved; RecursionError inside reads()/executed() is advisory. GateError/OSError from tree reads propagate to check()'s existing fail-closed handling. The dormant run parser's no --gate / no --run-id assertions are restored through build_parser(), and the public refusal control asserts exit 3 while subprocess.run and socket.create_connection are patched to fail. The preceding entry's “native acceptance” wording for evidence part 14 is superseded: that part records native results with suite exit 1 and installed-gitleaks RuntimeError(gitleaks_failed), whose environmental cause was not independently verified; no passing native suite at the PR head is claimed. [Evidence part 15](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt) records this round's native results and measured retained closure: 645/10607 tracked files, 318/3451 outside evidence/tests/.github (cap 862), 4/2610 blueprints files outside gate code (cap 52), zero enforced parser failures, and 321 unclassified locations in 29 scripts. Item 1 changes neither that list nor its shapes, so the dated baseline is left unchanged. The reader receives no precision repair, the driver remains disabled, and the later default-deny owned-path allowlist gate remains the resolver-enablement precondition.
 
 2026-10-04 — 489-r8 addresses the sole P2 in the bounded Claude Opus r4 ACCEPT verdict at 677acc449c56c050a85c6f555ca580c2f4792acf. The preceding entry's tree-read exception statement is corrected: GitTree.read can raise KeyError or subprocess.CalledProcessError/TimeoutExpired, the latter two subclasses of subprocess.SubprocessError. Both monitoring exception boundaries now re-raise subprocess.SubprocessError and KeyError, alongside GateError/OSError, to check()'s existing fail-closed gate_error_* handling, including when an imported constant first reads its module inside reads()/executed(). The discriminating control covers all three real tree-read errors and keeps later non-monitor reads successful, while evaluator recursion remains advisory and the independent parser boundary remains enforced. This is an infrastructure-error propagation correction, not a read-derivation precision round; the monitoring-only decision, disabled driver and later owned-path allowlist enablement precondition remain. [Evidence part 15](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt) now records the coordinator-reported 2026-10-04 host run at 677acc449: python3 -m unittest tests.test_runtime_worker_openhands_push_gate tests.test_runtime_worker_openhands_resolver, 213 tests, OK (skipped=1), exit 0, TMPDIR=/tmp/t489, with the installed-gitleaks test passing; its version and duration were not supplied. This supersedes the earlier statement that no passing suite at that head was recorded, and does not turn the earlier failed sandbox runs into passes. [Evidence part 16](../../blueprints/runtime-workers/openhands/evidence/push-gate-fail-first.txt) retains this round's offline source references and failing-first/local results.
+
+## Owned-path allowlist adoption (2026-10-04)
+
+**Addition 1 adopted in this bounded change; addition 2 not adopted.** This serves the
+foundation north-star action of letting a contained research/build worker propose a
+bounded repository change while the deterministic host alone authorizes its push. The
+base is `3b8f9c8a1b938358d65bf422f61592dc3b89407d` (PR #489). The read derivation remains
+monitoring only. This is local integration and synthetic Git-object evidence, not a
+live resolver, upstream OpenHands acceptance, a provider run or a deployed-main claim.
+The coordinator lands the gate first and enablement last, after reviewing the independent
+controls. Required combined-suite results and remaining conditions are retained in
+[evidence/owned-path-gate-fail-first.txt](../../blueprints/runtime-workers/openhands/evidence/owned-path-gate-fail-first.txt);
+a passing focused control run does not turn a failed combined suite into a pass.
+
+### Research before implementation
+
+The builder read `search-first` and `writing-for-agents` and used the bounded source
+comparison below. No dependency installation, research agent, model call, provider call,
+GitHub write or live container operation was used. Package/MCP discovery was not used
+for this native-Git rule: the requested reference implementations and supported Git
+commands supply the mechanism, and the missing part is this repository's trusted plan
+transport. No general absence claim about all OpenHands capabilities follows.
+
+| Source and pin | Exact locator | Rule used |
+| --- | --- | --- |
+| Installed Git, `git version 2.43.0`, exit 0; git/git `v2.43.0` | [read-cache.c](https://github.com/git/git/blob/v2.43.0/read-cache.c#L896), `verify_dotfile`, `verify_path_internal` | Relative component checks; dot/dotdot, empty separators, DOS drive prefixes, case-insensitive `.git`; mode handling |
+| git/git `v2.43.0` | [utf8.c](https://github.com/git/git/blob/v2.43.0/utf8.c#L684), `next_hfs_char`, `is_hfs_dot_generic`, `is_hfs_dotgit` | Every HFS ignorable code point and `.git` equivalence |
+| git/git `v2.43.0` | [path.c](https://github.com/git/git/blob/v2.43.0/path.c#L1489), `is_ntfs_dotgit`, `is_ntfs_dot_generic`, `is_ntfs_dotgitmodules` | Trailing spaces/periods, `git~1`, ADS, backslash separators and `.gitmodules` regular/fallback 8.3 aliases; the fallback loop starts at zero and accepts an empty prefix (`~1000000`, `~9999999`). The first matcher missed that case; the 2026-10-05 repair below corrects it |
+| git/git `v2.43.0` | [fsck.c](https://github.com/git/git/blob/v2.43.0/fsck.c#L590), `fsck_tree`, `check_gitmodules` | Invalid tree names, dotgit aliases, gitmodules symlink and configuration checks; this gate conservatively refuses `.gitmodules` altogether without reading its contents |
+| git/git `v2.43.0` | [Documentation/diff-format.txt](https://github.com/git/git/blob/v2.43.0/Documentation/diff-format.txt#L1), [git-hash-object.txt](https://github.com/git/git/blob/v2.43.0/Documentation/git-hash-object.txt), [git-commit-tree.txt](https://github.com/git/git/blob/v2.43.0/Documentation/git-commit-tree.txt) | Native raw NUL-delimited mode/OID/status/path records, A/M/D/T, renames disabled; native temporary and adversarial-object fixtures |
+| GitHub docs, `82fb420ff85c1b3e66035c4f902bac339de3dd2d`, read 2026-10-04 | [repo-rules.md](https://github.com/github/docs/blob/82fb420ff85c1b3e66035c4f902bac339de3dd2d/data/reusables/gated-features/repo-rules.md), [push-rulesets-overview.md](https://github.com/github/docs/blob/82fb420ff85c1b3e66035c4f902bac339de3dd2d/data/reusables/repositories/push-rulesets-overview.md), [available-rules-for-rulesets.md](https://github.com/github/docs/blob/82fb420ff85c1b3e66035c4f902bac339de3dd2d/content/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets.md#L293) | Hosted file-path push restrictions are the analogue. Push rulesets cover private/internal repositories and their fork networks under the documented Team/Enterprise availability; they are unavailable for this User-owned public repository. Ordinary branch/tag ruleset availability does not confer push-path rules |
+| Stack SDK pin: OpenHands/software-agent-sdk `fcc102a697874d54a357e36004e02c95040dbdc0`, `v1.49.6` | `blueprints/runtime-workers/openhands/pins.json:3`; [agent_script.py](https://github.com/OpenHands/software-agent-sdk/blob/fcc102a697874d54a357e36004e02c95040dbdc0/examples/03_github_workflows/01_basic_action/agent_script.py) | The pinned example uses a default agent and current workspace; an exact-commit owned-path push check was not found in that file |
+| Stack resolver reference: OpenHands/extensions `bea7a20c59c44ec4dacddac3fc0efe58b9c73880` | [main.py](https://github.com/OpenHands/extensions/blob/bea7a20c59c44ec4dacddac3fc0efe58b9c73880/skills/github-issue-to-pr/scripts/main.py#L595), `_commit_agent_work`, `_push_branch`, implementation prompt at 807-857 | The prompt bounds unrelated changes and credentials/permissions. The commit/push functions accept remaining work and push HEAD; no owned-path gate was found in these functions. Reuse the workflow reference with the host-side gate required by this plan |
+| Stack Canvas pin: OpenHands/OpenHands `7dc6805406ea3c76cb4a3ce407c3c72d481b0ac6`, `v1.24.0`; retired resolver reference `7bc33009` | `pins.json:67`; [v1.24.0 source archive](https://codeload.github.com/OpenHands/OpenHands/tar.gz/7dc6805406ea3c76cb4a3ce407c3c72d481b0ac6); [resolve_issue.py](https://github.com/OpenHands/OpenHands/blob/7bc33009/openhands/resolver/resolve_issue.py), [issue_resolver.py](https://github.com/OpenHands/OpenHands/blob/7bc33009/openhands/resolver/issue_resolver.py#L376) | Canvas is pinned but not installed. Its archive contains no resolver/resolve_issue source paths. The retired source marks V0 deprecated and exports a staged Git diff in `complete_runtime`; no owned-path check was found in that function or its CLI arguments. It is comparison evidence, not an implementation to revive |
+| Installed CPython `3.13.15`, Unicode database `15.1.0` | [Doc/library/unicodedata.rst](https://github.com/python/cpython/blob/v3.13.15/Doc/library/unicodedata.rst), `normalize` | Standard NFC/NFKC normalization composed with casefold; no new normalization dependency |
+| This repository, `3b8f9c8a1b938358d65bf422f61592dc3b89407d` | `resolver/patch_policy.py:21-43`; this record's proposed addition 1 | The owned-path contract is implemented independently in the gate and compared against the patch validator on every commit fixture and the valid/invalid grammar fixtures |
+
+The GitHub tree API read for Canvas returned 403 and a guessed SDK resolver filename
+returned 404. The verified recovery paths were the pinned Canvas archive inventory and
+SDK's pinned recursive tree plus the exact example file; these failed discovery attempts
+are not evidence of missing capabilities.
+
+### Precondition proof: passes
+
+Every scope writer is the coordinator or trusted host code. Main `3b8f9c8a` has a
+transport gap: the attempt's existing normalized scope was not sent to the harness or
+`PushGate.check`. No intervening agent-owned input is necessary. This change fills that
+gap using frozen host-memory copies, rather than introducing a file/environment reader.
+Before implementing the gate the builder traced the existing inputs and mount boundary;
+the completed transport is shown here with exact source locations.
+
+| Hop | Source location | Writer and influence check |
+| --- | --- | --- |
+| Coordinator argv | `resolver.py:1818` (`run --owned-path`, required, append); `RESOLVER.md:423` | Coordinator writes process argv. There is no owned-path environment default; issue text and exported files do not supply arguments |
+| Owned parsing and plan | `resolver/patch_policy.py:21-43`; `resolver.py:1594`, `1677`, `1686` | Trusted `plan_run` normalizes only `args.owned_path`, records it in the plan and passes it explicitly into `ResolverAttempt`. No agent/container exists at this point |
+| Attempt memory and identity | `resolver.py:1286`, `1300`; `host.py:1741`; `RESOLVER.md:470-473` | Trusted constructor freezes its own tuple. `identity()` returns a list copy; trusted `host.run` writes `resolver-identity.json` beside the attempt. That artifact is a receipt, never an allowlist reader |
+| Mount boundary | `host.py:1848-1853`, `1659`, `1672` | Trusted host binds the venv/recipe/input read-only, workspace writable with read-only Git/skills overlays, and worker/server outputs separately. The attempt parent and its identity JSON are outside every model mount; neither any mounted writable path nor model output feeds the scope |
+| Host session to harness | `resolver.py:1322`; `resolver/gh_harness.py:676` | Trusted `_session` passes the frozen tuple directly; the harness freezes its own copy. Neither issue text, clone contents, identity JSON, export metadata nor environment is read for it |
+| Harness to exact-commit gate | `resolver/gh_harness.py:760-761`; `resolver/push_gate.py:1162`, `1173`, `1276`, `1306` | Trusted `push` passes only its captured scope, trusted base and exact head to `check`. The independent normalizer/matcher inspect native raw tree differences; `GhHarness.run` allows only that passed commit's fixed refspec. The agent influences the candidate diff, never the allowlist |
+
+The provenance controls mutate the original list, returned identity list, worker-owned
+scope JSON, a planted identity artifact and owned-path environment values. Both attempt
+and harness remain `("docs",)`. A planted `patch_policy` normalizer/matcher defect also
+cannot widen the independent gate. The driver exposes no `--gate` override.
+
+### Enforcement, enablement and comparison
+
+`PushGate.check` uses `git diff-tree -r -z --no-renames --raw --no-abbrev <base> <head>`.
+Only well-formed A/M/D/T records are accepted; duplicate records, malformed delimiters,
+unknown modes/statuses and inconsistent zero OIDs refuse. Every path must match a
+trusted exact entry or component-bounded descendant. Both old and new modes are checked,
+so deletion of a symlink/gitlink also refuses. Mode changes between present entries,
+type changes, unsafe path components, `.git` aliases, `.gitmodules` aliases, protected
+case/Unicode aliases and changed-path collisions refuse even inside scope. The old
+static/CI-category/zizmor/trusted-copy refusals remain. GateReads stays advisory.
+
+Tool/gate location checks precede even the diff invocation. Path violations can refuse
+before trusted ancestry/zizmor without granting a pass; an owned candidate still runs
+all the old checks. An outer boundary also refuses exceptions in record creation,
+record output and interrupts. The harness journals an exceptional gate failure before
+refusing, and never pushes it. Counts and reason codes survive the sanitized receipt;
+unknown counts remain unknown. No file contents enter that receipt.
+
+Enablement is separable. Gate hunks are `push_gate.py`, `gh_harness.py`, receipt counts,
+`resolver.py`'s constructor/identity/_session transport and their tests. Enablement hunks
+are `resolver.py`'s imports/import guard, instruction wording, `_startup_gate_self_test`,
+`DISABLED_MESSAGE` and public `main`, the corresponding CommandLineTests/public-entry
+fixture calls, and RESOLVER.md/SKILL.md enablement wording. The startup fixture uses a
+real tiny Git repository with an unowned addition; only a specific unowned refusal with
+one changed and one owned count qualifies. Import/control failure keeps exit 3 and one
+stderr refusal line; a successful control proceeds to the existing handlers.
+
+Addition 2 (plan-time pre-refusal from the read derivation) is not adopted: that derivation
+is monitoring only and has no enforcing read inventory to pre-check. Neither its
+unclassified inventory nor its costs becomes a plan or enablement condition.
+
+Alternatives were the hosted push ruleset (unavailable here), continuing to trust only
+patch text (does not independently check the pushed tree), and leaving the blanket
+exit-3 disabled driver in place. The native-Git allowlist with direct trusted-memory
+transport is the selected mechanism. Main already fails closed on a RuntimeError inside
+the gate: that retained exception control is green on main and green after, not a fabricated
+red. The new unsafe-path controls are red on main and green after; the owned-only positive
+passes both gates. Native unittest is the test harness, not a custom A/B or E2E runner.
+
+The first combined attempt exposed a metadata regression: early static refusal made
+previously known protected paths unknown in receipts. Static-category checks were returned
+to the existing trusted-tree path so their known-name projection remains unchanged;
+`PushGateTests`, `HarnessPushGateTests` and `AttemptPushGateTests` verify the correction.
+The failed attempt remains in the evidence. Existing host fixtures requiring private
+files outside the checkout conflict with this task's in-workspace TMPDIR, and the installed
+gitleaks test returned `gitleaks_failed`; required acceptance records retain actual exits
+rather than inferring a pass or weakening host policy.
+
+**Overturn: reuse the fork-isolation overturn above.** If the pre-push gate or allowlist
+transport cannot remain immutable to the agent, a gate check can be bypassed, or the
+exact commit cannot be checked before every push, switch to option 2 after qualifying
+its secret/token, cache, artifact and downstream boundaries. Reopen this implementation
+on an independent corpus that demonstrates an owned-path escape or a false pass at the
+exact pushed commit. A demonstrated escape, rather than source popularity, overturns it.
+
+**Completeness critic.** The source/control sweep includes add/modify/delete, both rename
+ends, symlink/gitlink and mode/type changes, literal malformed Git-object components,
+all Git HFS ignorable code points, NTFS suffix/8.3/ADS/backslash classes, sampled fsck gitmodules
+aliases (the empty-prefix fallback was missed and is corrected below), case/NFC/NFKC collisions, protected compatibility aliases, parser failures,
+missing/invalid scope, scope provenance, patch/gate independence and exceptions through
+output. The missed modality in a Linux fixture is native HFS/NTFS filesystem execution;
+these are source-derived synthetic Git objects, not a fresh macOS/Windows acceptance.
+The next resolver sweep should include those native filesystem modalities, source changes
+to Git's aliases/raw format, hosted availability changes, and an independently qualified
+live attempt on reviewed main. The lifecycle skill sweep for this change used research
+and agent-document writing; installation/activation/service management were out of scope.
+The preserved read-monitor limitations remain separate and are not repaired here.
+
+## Owned-path gate review repairs (2026-10-05)
+
+The correctness and adversarial reads accepted the gate without P1 findings. Repairs
+are partial: the inventory below distinguishes code repairs, new refusals and residuals
+instead of implying every review suggestion was implemented. The r2 starting head was
+`ee78a711a4c2e1ec92637c1b3f7b241aa1f9146e`, after gate `ed889cf62`, enablement
+`8ce7136dc` and registration. R3 starts at `56fced82727921f2de0d99790148acec0bdd11ca`,
+whose tree matches r2 `ffda8b1e2`; its delta read also accepted with no P1 and identified
+the remaining items recorded here. These changes serve the same foundation action: the
+trusted host authorizes the exact commit proposed by a contained worker. They retain
+addition 1, the trusted-memory ownership trace and the fork-isolation overturn.
+No new enablement code, live resolver, GitHub mutation, model/provider call or container
+start is part of the repair. New tests are local unittest integration checks with native
+Git, synthetic artifacts and fake zizmor, not upstream execution or filesystem acceptance.
+
+### Review-item dispositions
+
+Labels C and S refer to the original correctness and security reads; Delta refers to
+the r2 delta read. Retained behavior with no repair is labeled `already_covered`;
+`repaired` identifies an actual change. The residuals retain their coordinator preconditions.
+
+| Review item | Disposition | Evidence, reason and reopening condition |
+| --- | --- | --- |
+| C1 / S1: empty-prefix `.gitmodules` NTFS fallback | repaired | R2 ports Git's loop at index zero and retains its upstream vectors and exact-commit controls. |
+| C2: present-tense disabled-driver claims | repaired | R2 makes the #489 status historical in RESOLVER.md and current-true in `gate_reads.py`. |
+| C3: rule metadata and closed-set protocol test | repaired | R2 derives emissions from source and checks the receipt partition; r3 also checks phrases for every unnamed class and derives suffix/instruction-name coverage from their inventories. |
+| C4: gate-only commit docs and landing order | residual | The earlier gate commit already describes enablement, and r2 repairs followed enablement in branch history. Rewriting old commits is outside this repair and the issue is moot under a squash merge. The coordinator must re-split before any separate sequential landing; current gate fixes and instruction wording remain separate hunks. |
+| C5: unreachable `diff_failed` | repaired | R2 uses `check=False` with an explicit return-code check; a subprocess-level failure control returns `diff_failed` and refuses. |
+| S2: compiled-module aliases | repaired | R2 refuses every `__pycache__` component and `.pyc`, `.pyo`, `.so`, `.pyd`, `.dylib`, `.dll` suffix, independently of import resolution. |
+| S2(a): instruction files | newly_refused | R3 adds `instruction_file` for ten named basenames. R4 corrects the missing real Codex template and includes the default plus five role carrier blocks; native add/modify/delete controls are red before and green after. |
+| S2(b): Git semantic dot files | newly_refused | R3 adds `git_semantic_file` for `.mailmap` and `.git*` names at any depth; `.git`, `.gitmodules`, `.github` retain their categories. Git's checkout attributes justify the conservative name boundary. |
+| S2(b): other dot paths | residual | The gate does not blanket-refuse all dot paths; the validator requires exact ownership unless otherwise forbidden. A harmless exact-owned `.notes` fixture still passes. CI configuration reachable only through advisory reads remains subject to manual scope review. Reopen when a demonstrated semantic input needs an independent refusal, or a qualified enforcing inventory covers it. |
+| S2(c): new top-level entries | residual | `path_is_owned` denies an unowned new top-level entry, but explicit ownership can authorize one. There is no top-level comparison in `_check_paths`; the validator's separate `new_top_level_entry` rule remains the first layer. Both decisions are retained as fixtures. Never own a new top-level entry; reopen if this independent boundary must also cover a defect in that validator rule. |
+| S2(d): aliases of unchanged protected paths | already_covered | Retained existing coverage: `Protected` unions trusted/base/head rules and `_check` probes `path_aliases` even when the protected base path is unchanged. Native case/NFC/NFKC controls refuse; no new matching code is needed. |
+| S2(d): aliases of unchanged unprotected base paths | residual | `_check_paths` compares changed paths with one another, and `_check` compares them with protected paths, not all base entries. Case/NFKC aliases of unchanged ordinary docs pass the gate; the validator independently refuses base aliases. Do not own such aliases. Reopen for an independent whole-base collision requirement or a demonstrated false push. |
+| S3: resolver driver as enforcement input | repaired | R2 adds `resolver.py` to `ENFORCING_FILES`, with local-modification and trusted/base-mismatch refusals. |
+| S4: untraced CI execution after enablement | residual | Documentation and a coordinator precondition were added in r2; an advisory-only input is still not `Protected`. The inventory is monitoring only, so addition 2 cannot enforce it. Reopen under the qualified-inventory trigger below. |
+| S4: plan/receipt ownership-overlap display | residual | The suggested intersection with `advisory_gate_reads` is not displayed in the plan or receipt. R2 supplied only a manual precondition; no automatic scope check is claimed. Reopen when the coordinator scopes and qualifies a monitoring-only visibility change, or when addition 2 has an enforcing source. |
+| Delta 1: transitive stdlib shadowing | residual | The repository import closure omits imports made by the stdlib itself beside a CI script run by path. R3 records a pass fixture without executing it, expands the coordinator precondition to import environments, and names independent directory/closure/safe-path acceptance as the reopening trigger. |
+| Delta 3: agent-facing refusal-list drift | repaired | R3 names compiled artifacts and both new refusal classes in the skill and generated instruction; source-derived phrase checks include unnamed classes and fail on the old wording. |
+
+The scope decisions cite the unchanged r3 starting source: git tree `56fced827`,
+[path_is_owned:1068-1073](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56fced82727921f2de0d99790148acec0bdd11ca/blueprints/runtime-workers/openhands/resolver/push_gate.py#L1068),
+[Protected:995-1027](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56fced82727921f2de0d99790148acec0bdd11ca/blueprints/runtime-workers/openhands/resolver/push_gate.py#L995),
+[_check:1247-1261](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56fced82727921f2de0d99790148acec0bdd11ca/blueprints/runtime-workers/openhands/resolver/push_gate.py#L1247),
+and [_check_paths:1345-1369](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56fced82727921f2de0d99790148acec0bdd11ca/blueprints/runtime-workers/openhands/resolver/push_gate.py#L1345).
+The separate validator comparison is
+[_rule_reasons:864-899](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56fced82727921f2de0d99790148acec0bdd11ca/blueprints/runtime-workers/openhands/resolver/patch_policy.py#L864).
+
+### Pinned sources and corrections
+
+- Installed Git still reports `git version 2.43.0`. In git/git `v2.43.0`,
+  [path.c:1489-1510](https://github.com/git/git/blob/v2.43.0/path.c#L1489)
+  starts `is_ntfs_dot_generic`'s fallback loop at zero; its `.gitmodules` arguments are
+  [at 1524-1527](https://github.com/git/git/blob/v2.43.0/path.c#L1524).
+  The earlier prefix range of 1-6 was incorrect: the empty prefix is accepted too.
+  The repair ports the loop, including ASCII-only prefix/digit checks and its suffix
+  rule. [t/t0060-path-utils.sh:439-528](https://github.com/git/git/blob/v2.43.0/t/t0060-path-utils.sh#L439)
+  supplies the complete positive/negative `.gitmodules` vector block, including
+  `~1000000` and `~9999999`. Its command is `is_dotgitmodules`, dispatching both HFS
+  and NTFS checks in [t/helper/test-path-utils.c:406-409](https://github.com/git/git/blob/v2.43.0/t/helper/test-path-utils.c#L406).
+  The `.git` rejection vectors instead come from
+  [t/t1014-read-tree-confusing.sh:45-54](https://github.com/git/git/blob/v2.43.0/t/t1014-read-tree-confusing.sh#L45),
+  with [is_ntfs_dotgit at path.c:1419-1453](https://github.com/git/git/blob/v2.43.0/path.c#L1419).
+  Existing alias controls are retained. This corrects the earlier code and completeness
+  claim; it does not claim these locally ported vectors ran Git's upstream harness.
+- Git `v2.43.0` [Documentation/gitattributes.txt:69-82](https://github.com/git/git/blob/v2.43.0/Documentation/gitattributes.txt#L69)
+  gives per-directory attribute precedence and the index fallback at checkout;
+  [110-118](https://github.com/git/git/blob/v2.43.0/Documentation/gitattributes.txt#L110)
+  describes changes to working-tree contents, and
+  [391-409](https://github.com/git/git/blob/v2.43.0/Documentation/gitattributes.txt#L391)
+  documents configured smudge/process filters. A changed `.gitattributes` can therefore
+  affect an unchanged protected file in its directory. The gate now independently
+  refuses `.git*` names and `.mailmap`, with the three existing category exceptions.
+  This broader prefix is a conservative policy, not a claim that arbitrary `.git*`
+  files are automatically read. The other direct inputs are described in
+  [gitignore.txt:29-34](https://github.com/git/git/blob/v2.43.0/Documentation/gitignore.txt#L29),
+  [gitmailmap.txt:16-20](https://github.com/git/git/blob/v2.43.0/Documentation/gitmailmap.txt#L16)
+  and [config.txt:1-12, 86-101](https://github.com/git/git/blob/v2.43.0/Documentation/config.txt#L86).
+  Refusal at every depth is deliberately stricter than the default locations for
+  `.mailmap` and `.gitconfig`. Case/Unicode, NTFS suffix/ADS and HFS-ignorable forms
+  receive the same new code.
+- The independent instruction-name list includes `AGENTS.md`, `AGENTS.override.md`,
+  `AGENTS.template.md`, `codex.AGENTS.template.md`, `CLAUDE.md`, `CLAUDE.local.md`,
+  `GEMINI.md`, `SKILL.md`, `RTK.md`, `codex-user-instructions.md`,
+  `claude-user-instructions.md`, `token-lanes-block.md`, `token-lanes-block.builder.md`,
+  `token-lanes-block.researcher.md`, `token-lanes-block.reviewer.md`,
+  `token-lanes-block.scout.md` and `token-lanes-block.verifier.md`. The earlier policy
+  drew its references from `RESOLVER.md:299-300` at `56fced827`,
+  `recipes/README.md:184,212,218-220`, `docs/harness-defaults.md:208` and
+  `adoption/platforms/linux-wsl2-new-distro.md:1082-1083`; Gemini was required by r3's
+  scope. The original r3 claim to include the real instruction template was
+  wrong: `recipes/README.md:184` names `codex.AGENTS.template.md`, which the exact
+  basename check missed. R4 verifies the actual basename against
+  [tools/adoption/apply_codex_lane.py:111](https://github.com/seathatflowsinourveins/native-agent-stack/blob/656f263dc33bcbaa37c9e82628b47776679fae34/tools/adoption/apply_codex_lane.py#L111)
+  and includes it. Carrier blocks also contain instructions: the
+  [SubagentStart hook:16-23,33-38](https://github.com/seathatflowsinourveins/native-agent-stack/blob/656f263dc33bcbaa37c9e82628b47776679fae34/adoption/hooks/claude/token-lanes-subagent-start.py#L16)
+  selects the default and all five role variants, which R4 now refuses too. The generic
+  `AGENTS.template.md` basename stays conservatively reserved; no file at that starting
+  head has that basename. These are concrete listed carriers, not a claim that every
+  instruction-like file is protected or auto-loaded. The gate does not import the
+  validator's instruction-name list. R5 also reserves the component-bounded
+  `adoption/agents/` prefix, as recorded below. A newly adopted instruction filename
+  outside these basenames and this prefix reopens the policy. Each agent-facing list
+  is parsed and checked for set equality with the basename/prefix inventory.
+- CI's target is CPython **3.12.3**, recorded in `.github/workflows/validate.yml:227-228`
+  at the starting head. The host normalizer's 3.13.15 pin is a separate scope. CPython
+  `v3.12.3` [Doc/library/importlib.rst:959-970](https://github.com/python/cpython/blob/v3.12.3/Doc/library/importlib.rst#L959)
+  documents FileFinder's loader/suffix interface; its
+  [cache mapping at 1265-1308](https://github.com/python/cpython/blob/v3.12.3/Doc/library/importlib.rst#L1265)
+  implements PEP 3147 naming. The
+  [import reference at 714-739](https://github.com/python/cpython/blob/v3.12.3/Doc/reference/import.rst#L714)
+  and [PEP 552 description at whatsnew/3.7.rst:425-456](https://github.com/python/cpython/blob/v3.12.3/Doc/whatsnew/3.7.rst#L425)
+  explain unchecked hash caches. The exact import order is in
+  [Lib/importlib/_bootstrap_external.py:1724-1732](https://github.com/python/cpython/blob/v3.12.3/Lib/importlib/_bootstrap_external.py#L1724):
+  extension loaders precede source, then sourceless bytecode. Its
+  [SourceLoader at 1095-1126](https://github.com/python/cpython/blob/v3.12.3/Lib/importlib/_bootstrap_external.py#L1095)
+  can return unchecked cache bytecode without comparing the source hash. From these
+  sources, a compiled sibling or unchecked cache can replace a protected source
+  module's behavior. The gate therefore refuses every `__pycache__` component and
+  `.pyc`, `.pyo`, `.so`, `.pyd`, `.dylib`, `.dll` suffix anywhere, including owned
+  paths and case/normalization/NTFS equivalents, with `compiled_module_artifact`.
+  The broader historical/platform suffix list is a conservative policy; it does not
+  claim every suffix is a default import suffix on this Linux interpreter.
+
+`resolver.py` is now in `ENFORCING_FILES`: its frozen owned tuple, direct harness
+transport and startup control are enforcement inputs. The existing gate, patch policy,
+parser boundary and harness were already present. Receipt projection does not authorize
+pushes and adds no new enforcement input. A locally changed driver returns
+`gate_file_modified`; a trusted/base driver mismatch returns `gate_differs_from_base`.
+
+The instruction maps cover every path rule. Ownership, mode, unsafe-path, collision,
+compiled-artifact, Git-semantic and instruction-file rules deliberately remain
+**unnamed in sanitized receipts**, with codes and counts retained. Unnamed does not
+mean omitted from agent instructions. Their paths can be unsafe or agent-chosen;
+publishing additional path strings is unnecessary. The comments now state that policy.
+The keep-in-step test derives emitted rules from their code producers and checks their
+named/unnamed partition, instruction phrases and receipt allowlist. An added emission
+must be accounted for; a hard-coded closed expected set can no longer hide drift.
+
+`diff-tree` now runs with `_git(check=False)` and an explicit return-code check. A
+nonzero result reaches `diff_failed`, preserving fail-closed behavior; malformed output
+still reaches `diff_output_invalid`. The test injects failure at subprocess, so it cannot
+accidentally bypass `_git`'s return-code handling.
+
+### Known limits and coordinator precondition after enablement
+
+**Never own a path that holds files CI executes through untraced forms, or a directory
+containing a CI Python script run by path with an unsafe import search path, including
+an ancestor ownership scope.** Do not explicitly own sibling modules/packages that can
+shadow direct or transitive imports; prefer reviewed exact-file ownership for ordinary
+task files. Inside an
+owned path, a CI input reached only by GateReads advisory analysis still receives no
+`Protected` rule. A literal-path script started by `subprocess` is one example:
+`patch_policy.python_references:413-477` traces imports, importlib/runpy path loads and
+sys.path, but not that invocation. `Protected` excludes monitoring-only inventories.
+The owned-path gate proves scope and cannot determine whether every owned file is safe
+for CI to execute. The coordinator must inspect proposed ownership against execution
+forms and import environments; there is no automatic plan-time check or ownership/
+advisory-overlap display. This residual became operational when the driver was enabled
+and is prominent in RESOLVER.md's current Known limits section.
+
+**Transitive stdlib shadowing is still allowed by the gate when owned.** At `56fced827`,
+`.github/workflows/validate.yml:121` runs
+`blueprints/blind-catalog-convergence/audit_reports.py`, which imports `json` at :7,
+without `-P`, `-I` or `PYTHONSAFEPATH`. CPython `v3.12.3`
+[Doc/library/sys.rst:1300-1312](https://github.com/python/cpython/blob/v3.12.3/Doc/library/sys.rst#L1300)
+documents script-directory precedence; [Modules/main.c:583-607](https://github.com/python/cpython/blob/v3.12.3/Modules/main.c#L583)
+implements the `safe_path` branch. The stdlib JSON
+[initializer:106-107](https://github.com/python/cpython/blob/v3.12.3/Lib/json/__init__.py#L106)
+loads [decoder.py:3-7](https://github.com/python/cpython/blob/v3.12.3/Lib/json/decoder.py#L3),
+which imports `re` and `_json`. Inference: an owned sibling `re.py` can run during this
+CI check if it is not already cached. The gate traces repository imports, not the
+stdlib's transitive closure; its existing head-tree derivation still catches direct
+source/package aliases. The new synthetic pass fixture models `import json` beside a
+workflow-named script and an added `re.py`, without executing either. This establishes
+the gate's gap, not the actual runner's module-cache reachability, which is unverified.
+Reopen when independently qualified directory protection, a transitive import closure,
+or coordinator-owned safe-path workflow changes refuse the negative control on the
+actual CI interpreter. This repair adds no workflow change or new directory prefix.
+
+**Addition 2 remains not adopted.** Its adoption trigger is a reviewed, independently
+qualified enforcing inventory covering these execution forms and import environments,
+followed by an acceptable measured cost for the plan-time ownership intersection. The original cost trigger alone
+is insufficient while the derivation is monitoring only. No evaluator precision repair,
+advisory-to-enforcing promotion or plan-time pre-refusal is built in this round.
+
+For r3, the alternatives were a blanket dot-path refusal and whole-base/top-level
+collision checks, or the requested cheap independent Git/instruction name refusals.
+The latter adds no dependence on advisory derivation or the validator's matcher, while
+the unimplemented broader checks are explicitly residuals with manual preconditions.
+New adopted instruction names, a changed pinned Git rule or a demonstrated false pass
+reopen this boundary under the existing fork-isolation overturn.
+
+R2 alternatives were to add each compiled alias to the source-module closure, publish path
+names for every new rule, or leave the generic `git_failed` diagnostic. Blanket artifact
+refusal avoids a dependence on loader/platform suffix enumeration; code/count-only
+receipts preserve their existing data boundary; explicit diff failure makes the intended
+diagnostic reachable. A pinned upstream rule change or a demonstrated false pass reopens
+these choices under the existing fork-isolation overturn.
+
+R2 gate-only hunks are its path checks, enforcement-input list, rule metadata and diff
+handling in `push_gate.py`, receipt policy comment, and test/fixture changes. R3 gate
+hunks are its two independent name refusals, phrase metadata and native commit fixtures
+in `push_gate.py` and `tests/test_runtime_worker_openhands_push_gate.py`. The
+source-derived protocol test in `tests/test_runtime_worker_openhands_resolver.py`
+depends on the instruction wording and belongs with it when landing separately.
+R3 instruction/enablement hunks are only `resolver_instruction` in `resolver.py`, the
+resolver `SKILL.md` and that protocol test; the import guard, startup control and public
+entry point are unchanged. Documentation hunks are RESOLVER.md's rule/limit inventory,
+this corrected dated entry and fail-first evidence. The earlier gate-only commit's
+documentation remains a report-only historical issue, moot under squash merge.
+Fail-first evidence is appended to `evidence/owned-path-gate-fail-first.txt`; registration
+is the final repository mutation. Targeted acceptance runs offline with a private TMPDIR
+outside the checkout, correcting the previous builder's fixture placement.
+
+### R4 delta corrections (2026-10-05)
+
+The r3 delta verdict accepts without P1 and raises two P2 findings. R4 starts at
+`656f263dc33bcbaa37c9e82628b47776679fae34`. The first is repaired by matching the
+actual Codex template basename and the six concrete instruction carriers selected by
+the SubagentStart hook. Under directory ownership, native add/modify/delete controls
+for all seven names pass the old gate and refuse after repair. The ordinary
+`adoption/templates/codex.config.template.toml` add/modify control continues to pass;
+this repair does not blanket-refuse the adoption directory. Exact basenames keep the
+change scoped and independent of the validator. A new adopted carrier name reopens
+the inventory under the existing fork-isolation overturn.
+
+The second is a documentary correction: the protected-alias disposition is now
+`already_covered`, preserving its evidence without counting it as a repair. Its
+existing native negative controls are retained. Gate-only hunks are the basename
+inventory/comment in `push_gate.py` and three native fixture tests in
+`tests/test_runtime_worker_openhands_push_gate.py`. Instruction/enablement hunks are
+only `resolver_instruction` and the resolver skill's enumerated refusal list. Docs
+and evidence hunks record these corrections and actual returned checks. No import
+guard, startup control, public-entry behavior, advisory enforcement or addition 2
+changes are part of R4. Registration remains the final repository mutation.
+
+### R5 delta corrections (2026-10-05)
+
+The r4 delta verdict accepts with zero P1 and two P2 findings. R5 starts at
+`0e2610d664484f7736ca3ff2ff61a83126520a20` and repairs both.
+
+The first finding exposed instruction definitions that the basename inventory missed.
+At this pin, the [Claude installer:152-170](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0e2610d664484f7736ca3ff2ff61a83126520a20/tools/adoption/install_claude_profile.py#L152)
+copies every `adoption/agents/claude/*.md`; [its contract:29-35](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0e2610d664484f7736ca3ff2ff61a83126520a20/tools/adoption/install_claude_profile.py#L29)
+states that agent copies are always refreshed. These bodies are instructions, with
+[model/tool frontmatter in the Claude definition:1-9](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0e2610d664484f7736ca3ff2ff61a83126520a20/adoption/agents/claude/stack-researcher.md#L1).
+The [Codex installer:595-604](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0e2610d664484f7736ca3ff2ff61a83126520a20/tools/adoption/apply_codex_lane.py#L595)
+selects both ordinary and worker roles; [its pins:1234-1236](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0e2610d664484f7736ca3ff2ff61a83126520a20/tools/adoption/apply_codex_lane.py#L1234)
+come from `SHA256SUMS` in those same source directories. The
+[role body:14](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0e2610d664484f7736ca3ff2ff61a83126520a20/adoption/agents/codex/stack-researcher.toml#L14)
+is `developer_instructions`. The prior policy protected the role addenda while leaving
+these definitions and their source pins editable; that inventory claim was incomplete.
+
+Adopt the reviewer's first option: independently refuse the entire
+component-bounded `adoption/agents/` prefix as `instruction_file`, including its exact
+entry, all descendants, new definitions and pin files. Reuse the gate's existing
+casefold/NFC/NFKC aliases and semantic component normalization for HFS-ignorable
+characters and NTFS trailing-dot/space/ADS forms. This avoids enumerating every
+definition basename or relying on CI parity tests. The alternative of documenting a
+manual never-own precondition leaves a cheap deterministic refusal unimplemented.
+Native add/modify/delete fixtures for a Claude definition, Codex role, new Markdown
+definition and `SHA256SUMS` pass the unchanged r4 gate and refuse after repair; eight
+alias/nested/exact-prefix additions do likewise. Four component-boundary positives
+remain editable, including `adoption/agents-other/`; adoption is not a blanket prefix.
+
+The second finding exposed a vacuous documentation regression:
+`codex.agents.template.md` satisfied substring containment for `agents.template.md`,
+and extra names escaped the one-way check. Parse the skill's backticked instruction
+list and the generated instruction's comma-separated list, then assert set equality
+with `INSTRUCTION_FILE_NAMES` plus `INSTRUCTION_PATH_PREFIXES`. Removing only
+`AGENTS.template.md` from a scratch skill leaves the old test green and makes the new
+test fail. Extra-name and generated-instruction omission controls also fail; restoring
+the complete lists passes. Existing source-derived refusal-rule and receipt-partition
+checks remain in the same test. The prefix retains the existing unnamed receipt
+category and code/count-only projection.
+
+Gate-only hunks are the prefix inventory/predicate in `push_gate.py` and the three
+native fixture tests in `tests/test_runtime_worker_openhands_push_gate.py`.
+Instruction/enablement hunks are only `resolver_instruction`, the resolver skill's
+refusal list, and the parsed-list protocol regression in
+`tests/test_runtime_worker_openhands_resolver.py`. Documentation/evidence hunks are
+RESOLVER.md's inventory, this correction and the appended fail-first receipt.
+The public entry, startup self-test and addition 2 are unchanged. A changed installation
+source outside the protected inventory or a demonstrated false pass reopens this
+boundary under the existing fork-isolation overturn. Registration remains the final
+repository mutation; the receipt distinguishes the sandbox's gitleaks lock failure
+from the passing repair controls.

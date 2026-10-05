@@ -1,0 +1,351 @@
+{
+  "comparison": {
+    "checked_subset": "1/1",
+    "inventory_sha256": "6e5bb952d7fd0261828613e6b4b27821dd6d42fd671ac1f14b36d671e794f7ed",
+    "matched_bytes": 16531456,
+    "matched_files": 2,
+    "required_state": "matched",
+    "snapshot_id": "e173073f1aea68433d4502f2f7406cdde7a741f2fc8308a24ed9f49eb3d75e8b"
+  },
+  "completed_at_utc": "2026-10-05T05:32:33.774862+00:00",
+  "controls": {
+    "restore": {
+      "exit": 1,
+      "mutation_observation": {
+        "bytes_unchanged": true,
+        "mutation": "SQLite user_version header",
+        "required_state_unchanged": true,
+        "sha256_changed": true
+      },
+      "native_commands": [
+        {
+          "args": [
+            "version"
+          ],
+          "duration_s": 0.012312,
+          "exit": 0,
+          "output": "restic 0.19.1 compiled with go1.26.4 on linux/amd64\n"
+        },
+        {
+          "args": [
+            "backup",
+            "<scratch>/control-restore/stage",
+            "--host",
+            "equity-research-recovery",
+            "--tag",
+            "journal-recovery",
+            "--group-by",
+            "host,tags",
+            "--json"
+          ],
+          "duration_s": 0.83599,
+          "exit": 0,
+          "output": {
+            "representation": "parsed_json_lines",
+            "lines": [
+              {
+                "message_type": "summary",
+                "files_new": 3,
+                "files_changed": 0,
+                "files_unmodified": 0,
+                "dirs_new": 3,
+                "dirs_changed": 5,
+                "dirs_unmodified": 0,
+                "data_blobs": 1,
+                "tree_blobs": 9,
+                "data_added": 440024,
+                "data_added_packed": 4408,
+                "total_files_processed": 3,
+                "total_bytes_processed": 16532001,
+                "total_duration": 0.800409374,
+                "backup_start": "2026-10-05T01:32:31.299715116-04:00",
+                "backup_end": "2026-10-05T01:32:32.10012451-04:00",
+                "snapshot_id": "0f8689841dd2a17de838454f93f004cd439c69f8e9f685a1b76f0ced3945f2b0"
+              }
+            ]
+          }
+        },
+        {
+          "args": [
+            "check",
+            "--read-data-subset=1/1"
+          ],
+          "duration_s": 0.780648,
+          "exit": 0,
+          "output": "using temporary cache in <scratch>/control-restore/cache/restic-check-cache-3829689771\ncreate exclusive lock for repository\nload indexes\ncheck all packs\ncheck snapshots, trees and blobs\n[0:00] 100.00%  3 / 3 snapshots\nread group #1 of 6 data packs (out of total 6 packs in 1 groups\n[0:00] 100.00%  6 / 6 packs\nno errors were found\n"
+        },
+        {
+          "args": [
+            "restore",
+            "0f8689841dd2a17de838454f93f004cd439c69f8e9f685a1b76f0ced3945f2b0:<scratch>/control-restore/stage",
+            "--target",
+            "<scratch>/control-restore/restored",
+            "--verify",
+            "--overwrite",
+            "never",
+            "--json"
+          ],
+          "duration_s": 0.766378,
+          "exit": 0,
+          "output": {
+            "representation": "parsed_json_lines",
+            "lines": [
+              {
+                "message_type": "summary",
+                "total_files": 4,
+                "files_restored": 4,
+                "total_bytes": 16532001,
+                "bytes_restored": 16532001
+              }
+            ]
+          }
+        }
+      ],
+      "returned": {
+        "reason": "file sha256/bytes mismatch",
+        "result": "refused"
+      }
+    },
+    "snapshot": {
+      "exit": 1,
+      "native_commands": [
+        {
+          "args": [
+            "version"
+          ],
+          "duration_s": 0.015723,
+          "exit": 0,
+          "output": "restic 0.19.1 compiled with go1.26.4 on linux/amd64\n"
+        },
+        {
+          "args": [
+            "backup",
+            "<scratch>/control-snapshot/stage",
+            "--host",
+            "equity-research-recovery",
+            "--tag",
+            "journal-recovery",
+            "--group-by",
+            "host,tags",
+            "--json"
+          ],
+          "duration_s": 0.786509,
+          "exit": 3,
+          "output": {
+            "representation": "parsed_json_lines",
+            "lines": [
+              {
+                "message_type": "summary",
+                "files_new": 2,
+                "files_changed": 0,
+                "files_unmodified": 0,
+                "dirs_new": 3,
+                "dirs_changed": 5,
+                "dirs_unmodified": 0,
+                "data_blobs": 2,
+                "tree_blobs": 9,
+                "data_added": 439323,
+                "data_added_packed": 4764,
+                "total_files_processed": 2,
+                "total_bytes_processed": 8266273,
+                "total_duration": 0.759458587,
+                "backup_start": "2026-10-05T01:32:30.20588227-04:00",
+                "backup_end": "2026-10-05T01:32:30.965340857-04:00",
+                "snapshot_id": "32eac2d2e6d8e8a4b83723f540cf10a456cfc73011ef7ef7bf6882c65eb502fc"
+              },
+              {
+                "message_type": "error",
+                "error": {
+                  "message": "open <scratch>/control-snapshot/stage/journals/evidence.sqlite3: permission denied"
+                },
+                "during": "archival",
+                "item": "<scratch>/control-snapshot/stage/journals/evidence.sqlite3"
+              },
+              {
+                "message_type": "exit_error",
+                "code": 3,
+                "message": "Warning: at least one source file could not be read"
+              }
+            ]
+          }
+        }
+      ],
+      "returned": {
+        "reason": "restic backup refused (exit 3)",
+        "result": "refused"
+      }
+    }
+  },
+  "copy_observations": [
+    {
+      "committed_writes_during_native_call": 6,
+      "journal": "evidence",
+      "native_copy_duration_s": 0.049027458,
+      "pages": -1
+    },
+    {
+      "committed_writes_during_native_call": 9,
+      "journal": "research",
+      "native_copy_duration_s": 0.052331414,
+      "pages": -1
+    }
+  ],
+  "evidence_class": "local_integration",
+  "fixture_class": "synthetic SQLite WAL journals",
+  "frozen_inventory": {
+    "files": [
+      {
+        "bytes": 8265728,
+        "integrity_check": "ok",
+        "path": "journals/evidence.sqlite3",
+        "required_tables": {
+          "runs": 103
+        },
+        "sha256": "2672f026b8cf69cbf716b07037e263be7d5787171e4ed8599e89f0759a935334"
+      },
+      {
+        "bytes": 8265728,
+        "integrity_check": "ok",
+        "path": "journals/research.sqlite3",
+        "required_tables": {
+          "events": 126
+        },
+        "sha256": "4809d2613be676b45b97bae9704f8e8c61b7a63b1450a009fcb6d623c3eb1f4f"
+      }
+    ],
+    "schema_version": 1
+  },
+  "independent_observation": [
+    {
+      "bytes": 8265728,
+      "integrity_check": "ok",
+      "path": "journals/evidence.sqlite3",
+      "row_counts": {
+        "runs": 103
+      },
+      "sha256": "2672f026b8cf69cbf716b07037e263be7d5787171e4ed8599e89f0759a935334"
+    },
+    {
+      "bytes": 8265728,
+      "integrity_check": "ok",
+      "path": "journals/research.sqlite3",
+      "row_counts": {
+        "events": 126
+      },
+      "sha256": "4809d2613be676b45b97bae9704f8e8c61b7a63b1450a009fcb6d623c3eb1f4f"
+    }
+  ],
+  "limitations": [
+    "Same-host disposable repository and key; no off-host recovery.",
+    "No deployed scheduler, process restart, reboot, missed-run or independent alert drill.",
+    "Two per-journal snapshots; no atomic transaction spanning both journals.",
+    "Subset 1/1 only; seven-part rotation is tested separately with stdlib fixtures."
+  ],
+  "native_commands": [
+    {
+      "args": [
+        "init",
+        "--json"
+      ],
+      "duration_s": 3.024287,
+      "exit": 0,
+      "output": {
+        "representation": "parsed_json_lines",
+        "lines": [
+          {
+            "message_type": "initialized",
+            "id": "ae4d596bfa0825e01e55666740ec5e48b4908d963ed797f29c7766c789e81b93",
+            "repository": "<scratch>/repository"
+          }
+        ]
+      }
+    },
+    {
+      "args": [
+        "version"
+      ],
+      "duration_s": 0.015919,
+      "exit": 0,
+      "output": "restic 0.19.1 compiled with go1.26.4 on linux/amd64\n"
+    },
+    {
+      "args": [
+        "backup",
+        "<scratch>/accepted/stage",
+        "--host",
+        "equity-research-recovery",
+        "--tag",
+        "journal-recovery",
+        "--group-by",
+        "host,tags",
+        "--json"
+      ],
+      "duration_s": 0.816045,
+      "exit": 0,
+      "output": {
+        "representation": "parsed_json_lines",
+        "lines": [
+          {
+            "message_type": "summary",
+            "files_new": 3,
+            "files_changed": 0,
+            "files_unmodified": 0,
+            "dirs_new": 8,
+            "dirs_changed": 0,
+            "dirs_unmodified": 0,
+            "data_blobs": 17,
+            "tree_blobs": 9,
+            "data_added": 9312577,
+            "data_added_packed": 22498,
+            "total_files_processed": 3,
+            "total_bytes_processed": 16532001,
+            "total_duration": 0.77918784,
+            "backup_start": "2026-10-05T01:32:27.526759927-04:00",
+            "backup_end": "2026-10-05T01:32:28.305947767-04:00",
+            "snapshot_id": "e173073f1aea68433d4502f2f7406cdde7a741f2fc8308a24ed9f49eb3d75e8b"
+          }
+        ]
+      }
+    },
+    {
+      "args": [
+        "check",
+        "--read-data-subset=1/1"
+      ],
+      "duration_s": 0.765284,
+      "exit": 0,
+      "output": "using temporary cache in <scratch>/accepted/cache/restic-check-cache-653056309\ncreate exclusive lock for repository\nload indexes\ncheck all packs\ncheck snapshots, trees and blobs\n[0:00] 100.00%  1 / 1 snapshots\nread group #1 of 2 data packs (out of total 2 packs in 1 groups\n[0:00] 100.00%  2 / 2 packs\nno errors were found\n"
+    },
+    {
+      "args": [
+        "restore",
+        "e173073f1aea68433d4502f2f7406cdde7a741f2fc8308a24ed9f49eb3d75e8b:<scratch>/accepted/stage",
+        "--target",
+        "<scratch>/accepted/restored",
+        "--verify",
+        "--overwrite",
+        "never",
+        "--json"
+      ],
+      "duration_s": 0.738478,
+      "exit": 0,
+      "output": {
+        "representation": "parsed_json_lines",
+        "lines": [
+          {
+            "message_type": "summary",
+            "total_files": 4,
+            "files_restored": 4,
+            "total_bytes": 16532001,
+            "bytes_restored": 16532001
+          }
+        ]
+      }
+    }
+  ],
+  "restic_pin": "0.19.1",
+  "result": "passed",
+  "schema_version": 1,
+  "started_at_utc": "2026-10-05T05:32:23.230897+00:00",
+  "throwaway_password_deleted": true
+}

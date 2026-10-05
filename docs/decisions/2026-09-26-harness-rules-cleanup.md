@@ -219,3 +219,35 @@ Group 2: the block loaded into every session and every child that reads the proj
 - **Check and overturn.** A trading session, review or receipt that shows a moved rule was missed at the point of use moves the paragraph back
   to the root; so does a Claude Code or Codex release that changes how nested instruction files load. Agents that set `omitClaudeMd` never
   loaded the root `AGENTS.md`, and whether that setting also suppresses a nested load was not established here.
+
+## Addendum (2026-10-05): PR #726 root triggers and measured disclosure
+
+This amends the September 29 choice to keep the whole trading north star in the
+root. The surviving 1,077-byte north-star and paper-authorization section stays
+byte-identical in `blueprints/us-equities/AGENTS.md`; only its redundant self-pointer
+is removed. Root AGENTS.md now requires that file before trading research,
+experiments, data acquisition, strategy-gate changes, decision registration,
+paper/broker operation, or naming a coordinator unit's north-star action.
+This preserves the foundation coordinator's trigger as well as trading work.
+
+Codex still loads only its home instructions and project chain, as
+[its rust-v0.159.3 loader](https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/core/src/agents_md.rs)
+shows; disclosure depends on that explicit root trigger. Claude's
+[memory documentation](https://code.claude.com/docs/en/memory) describes imports
+and nested CLAUDE.md discovery. The October 5 audit measured the root startup
+cost and the repair widens the trigger after the cross-family read found its
+paper and foundation-naming branches missing. This is a reviewed departure from
+the earlier rejection of dropping root text, not a new native loading claim.
+
+The common discovery conditional is: when no skill fits, use installed `find-skills` or Skills CLI `find` and `skill-creator` for verification or A/B; check client exposure and the skills lifecycle.
+It refers to `adoption/skills/lifecycle.md` and names the installed Vercel Skills
+CLI fallback instead of assuming find-skills or Claude's skill-creator is exposed.
+The full Codex routing paragraph remains in root AGENTS.md pending both hosts'
+post-landing re-render and read-back. The common cross-family sentence and the
+A/B-backed StructuredOutput guard remain inline in their required client carriers.
+
+[The budget record](2026-10-05-harness-context-budget.md) binds relocated sections
+by heading and frozen passage bytes, records corrected self-pointers and budgets,
+and names the host rollout gate. A missed north-star or paper rule at any listed
+trigger restores the necessary root text; a native discovery change also reopens
+this disclosure decision. No host or provider acceptance is claimed by file tests.

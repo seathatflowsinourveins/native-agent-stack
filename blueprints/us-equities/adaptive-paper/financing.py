@@ -110,11 +110,11 @@ def settlement_date(trade_date: date) -> date:
     *trading* calendar, not the separate SIFMA bank/securities-settlement
     calendar -- a bank holiday on which NYSE is open (e.g. Columbus Day,
     Veterans Day) is treated as a normal settlement day here, though real
-    DTCC settlement does not occur on those days. Every 2026 NYSE
-    full-closure holiday in ``sessions.HOLIDAYS_2026`` is also a SIFMA bank
-    holiday, so this simplification never changes a 2026 result; it would
-    only matter for a trade/settlement window spanning Columbus Day or
-    Veterans Day, which this module does not exercise.
+    DTCC settlement does not occur on those days. XNYS supplies the next
+    trading session using bounds derived from the trade date's year;
+    DateOutOfBounds and calendar-construction errors propagate. This is
+    still a trading-calendar projection, not a settlement-calendar
+    qualification, including for Columbus Day and Veterans Day.
     """
     return next_trading_day(trade_date)
 

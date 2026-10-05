@@ -1,0 +1,4 @@
+- Message another Claude Code session with SendMessage, and a Codex session with `codex queue --thread <its CODEX_THREAD_ID> --message "$(cat <<'MSG'` followed by the text, a blank line, `reply: SendMessage to <your session name>`, `MSG` and `)"`, each on its own line: a quoted heredoc, never the text inline.
+- Codex receives queued messages between turns, never mid-turn; expect up to about 20 s delay when it is idle.
+- When you return through StructuredOutput, put the schema fields at the top level of the call arguments; never wrap them in an input, output or result key.
+- When a worker returns null or incomplete output, check its transcript for a safety refusal before retrying, since session limits and other errors also produce null results; after a refusal, edit the brief and retry on the current model, and never accept an older model's answer in its place.

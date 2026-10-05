@@ -3747,8 +3747,7 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
 
     def test_final_summary_fails_closed_when_the_calendar_itself_cannot_classify_now(self):
         """finding 6 (round 3)/H11 (fix round 5): when `session_at(now)`
-        itself raises ValueError (the instant falls outside the frozen
-        session calendar), the final summary must fail CLOSED -- every held
+        itself raises ValueError, the final summary must fail CLOSED -- every held
         symbol reported under `pending_needs_attention_held` -- never
         silently "clear" just because the calendar failed to classify this
         instant. A calendar failure is itself a reason for attention, not
@@ -3764,10 +3763,12 @@ class CorporateActionGuardRunnerWiringTests(unittest.TestCase):
                 self.corporate_action_guard = guard
                 self._ca_ever_flagged = set()
 
-        # Far outside the frozen session calendar's supported year range.
+        # XNYS can project 2099; inject an actual calendar error instead of
+        # depending on the removed hand table's supported year range.
         out_of_range_now = datetime(2099, 1, 1, tzinfo=timezone.utc).timestamp()
-        summary = runner_module._final_corporate_action_guard_summary(
-            Strategy(UnusedGuard()), {"AAPL"}, out_of_range_now)
+        with patch.object(runner_module, "session_at", side_effect=ValueError("calendar_failed")):
+            summary = runner_module._final_corporate_action_guard_summary(
+                Strategy(UnusedGuard()), {"AAPL"}, out_of_range_now)
         self.assertEqual(summary["pending_needs_attention_held"], ["AAPL"],
                          "a calendar failure must fail closed for every held symbol, not report clear")
         self.assertEqual(summary["pending_must_flatten"], [])

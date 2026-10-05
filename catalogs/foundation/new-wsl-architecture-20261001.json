@@ -126,36 +126,112 @@
           "repository": "https://github.com/affaan-m/ECC",
           "pin": "dd6ee538aee0f548d4a6b520118f875431fd749e",
           "pin_source": "manifests/stack.json:10",
-          "install": {"command": "python3 tools/adoption/install_skills.py --skills-bin \"$SKILLS_BIN\" --json", "kind": "repo_recipe", "source_path": "adoption/skills/lifecycle.md"},
-          "acceptance": {"command": "python3 scripts/skills_status.py --skills-bin \"$SKILLS_BIN\" --json", "evidence_class": "structural_validation", "source_path": "adoption/skills/lifecycle.md"},
-          "upstream_currency": {"latest_release": "v2.2.2 (2026-09-30); comparing the pinned commit with that tag returned not found", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "unknown", "url": "https://github.com/affaan-m/ECC/releases"}
+          "install": {
+            "command": "python3 tools/adoption/install_skills.py --skills-bin \"$SKILLS_BIN\" --json",
+            "kind": "repo_recipe",
+            "source_path": "adoption/skills/lifecycle.md"
+          },
+          "acceptance": {
+            "command": "python3 scripts/skills_status.py --skills-bin \"$SKILLS_BIN\" --json",
+            "evidence_class": "structural_validation",
+            "source_path": "adoption/skills/lifecycle.md"
+          },
+          "upstream_currency": {
+            "latest_release": "v2.2.2 (2026-09-30); comparing the pinned commit with that tag returned not found",
+            "checked_at": "2026-10-01T07:43Z",
+            "pin_is_latest": "unknown",
+            "url": "https://github.com/affaan-m/ECC/releases"
+          }
         },
         {
           "component_id": "skills-ref",
           "repository": "https://github.com/agentskills/agentskills",
           "pin": "0.1.0",
           "pin_source": "manifests/stack.json:1620",
-          "install": {"command": "git clone https://github.com/agentskills/agentskills.git \"$STACK_HOME/tools/agentskills\"; git -C \"$STACK_HOME/tools/agentskills\" checkout --detach 69ef37e9424c0a7ea9dd2293b559e43ec8176379; cd \"$STACK_HOME/tools/agentskills/skills-ref\" && uv sync --locked", "kind": "repo_recipe", "source_path": "recipes/README.md"},
-          "acceptance": {"command": "uv run skills-ref validate \"$SKILL_DIRECTORY\"", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
-          "upstream_currency": {"latest_release": "no GitHub release; PyPI skills-ref 0.1.1 (2026-01-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://pypi.org/project/skills-ref/"}
+          "install": {
+            "command": "git clone https://github.com/agentskills/agentskills.git \"$STACK_HOME/tools/agentskills\"; git -C \"$STACK_HOME/tools/agentskills\" checkout --detach 69ef37e9424c0a7ea9dd2293b559e43ec8176379; cd \"$STACK_HOME/tools/agentskills/skills-ref\" && uv sync --locked",
+            "kind": "repo_recipe",
+            "source_path": "recipes/README.md"
+          },
+          "acceptance": {
+            "command": "uv run skills-ref validate \"$SKILL_DIRECTORY\"",
+            "evidence_class": "upstream_example_or_native_operation",
+            "source_path": "recipes/README.md"
+          },
+          "upstream_currency": {
+            "latest_release": "no GitHub release; PyPI skills-ref 0.1.1 (2026-01-10)",
+            "checked_at": "2026-10-01T07:42Z",
+            "pin_is_latest": "no",
+            "url": "https://pypi.org/project/skills-ref/"
+          }
         },
         {
           "name": "openai/skills (gh-fix-ci, security-best-practices)",
           "repository": "https://github.com/openai/skills",
           "pin": "49f948faa9258a0c61caceaf225e179651397431",
           "pin_source": "adoption/skills/manifest.json:69",
-          "install": {"command": "python3 tools/adoption/install_skills.py --skills-bin \"$SKILLS_BIN\" --json", "kind": "repo_recipe", "source_path": "adoption/skills/lifecycle.md"},
-          "acceptance": {"command": "python3 tools/adoption/install_skills.py --skills-bin \"$SKILLS_BIN\" --check-only --json", "evidence_class": "structural_validation", "source_path": "adoption/skills/lifecycle.md"},
-          "upstream_currency": {"latest_release": "no GitHub release; the pinned commit is identical to the main branch head", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/openai/skills/commits/main"}
+          "install": {
+            "command": "python3 tools/adoption/install_skills.py --skills-bin \"$SKILLS_BIN\" --json",
+            "kind": "repo_recipe",
+            "source_path": "adoption/skills/lifecycle.md"
+          },
+          "acceptance": {
+            "command": "python3 tools/adoption/install_skills.py --skills-bin \"$SKILLS_BIN\" --check-only --json",
+            "evidence_class": "structural_validation",
+            "source_path": "adoption/skills/lifecycle.md"
+          },
+          "upstream_currency": {
+            "latest_release": "no GitHub release; the pinned commit is identical to the main branch head",
+            "checked_at": "2026-10-01T07:42Z",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/openai/skills/commits/main"
+          }
         },
         {
           "name": "typesafe-ai/skills (typesafe-ai)",
           "repository": "https://github.com/typesafe-ai/skills",
           "pin": "65a39f393687675ce170e6094757de20370365b9",
           "pin_source": "adoption/skills/manifest.json:44",
-          "install": {"command": "python3 tools/adoption/install_skills.py --skills-bin \"$SKILLS_BIN\" --json", "kind": "repo_recipe", "source_path": "adoption/skills/lifecycle.md"},
-          "acceptance": {"command": "python3 tools/adoption/install_skills.py --skills-bin \"$SKILLS_BIN\" --check-only --json", "evidence_class": "structural_validation", "source_path": "adoption/skills/lifecycle.md"},
-          "upstream_currency": {"latest_release": "tag v0.5.7; the pinned commit is identical to it", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://github.com/typesafe-ai/skills/tags"}
+          "install": {
+            "command": "python3 tools/adoption/install_skills.py --skills-bin \"$SKILLS_BIN\" --json",
+            "kind": "repo_recipe",
+            "source_path": "adoption/skills/lifecycle.md"
+          },
+          "acceptance": {
+            "command": "python3 tools/adoption/install_skills.py --skills-bin \"$SKILLS_BIN\" --check-only --json",
+            "evidence_class": "structural_validation",
+            "source_path": "adoption/skills/lifecycle.md"
+          },
+          "upstream_currency": {
+            "latest_release": "tag v0.5.7; the pinned commit is identical to it",
+            "checked_at": "2026-10-01T07:43Z",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/typesafe-ai/skills/tags"
+          }
+        },
+        {
+          "name": "SkillSpector",
+          "repository": "https://github.com/NVIDIA/skillspector",
+          "pin": "2.12.0",
+          "pin_source": "docs/decisions/2026-10-04-final-architecture-round2.md:26",
+          "install": {
+            "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only skill-vetting",
+            "kind": "repo_recipe",
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g3-tools.md"
+          },
+          "acceptance": {
+            "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only skill-vetting --stage post_install && bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only skill-vetting --stage after_sign_in",
+            "evidence_class": "none_recorded",
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g3-tools.md",
+            "scope": "Planned upstream tests and source-derived native integration gates; no destination execution."
+          },
+          "upstream_currency": {
+            "latest_release": "2.12.0",
+            "checked_at": "2026-10-04",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/NVIDIA/skillspector/releases"
+          },
+          "role": "selected wave-5 clean-install owner"
         }
       ],
       "verdict": "selection_of_record_open",
@@ -168,18 +244,50 @@
         "missing": "c1: the verdict records ECC at dd6ee538 while the skills manifest binds search-first at c70874fa and iterative-retrieval at 2b6e8397, and skills-ref's classification is unsettled; c2: the candidate set is not re-frozen with the 2026-09-23 to 09-29 sweep survivors; c3: the challenger arm on a frozen labelled set and a new-host install, discovery and activation receipt with a failing control have not run; c4: no independent review of a re-frozen set; c5: no closure record replaces the 2026-09-22 verdict's stale pins."
       },
       "reasons": [
-        {"text": "Canonical project instructions (CLAUDE.md and AGENTS.md) carry the rules; selected skills load progressively, installed through the upstream skills CLI from a pinned manifest.", "source_path": "catalogs/foundation/manifest.json"},
-        {"text": "The skills manifest pins every installed skill to a commit and installs it for both clients through tools/adoption/install_skills.py.", "source_path": "adoption/skills/manifest.json"},
-        {"text": "The layer record gives local integration as the weakest evidence class across the winners; the edition labels each winner by what its cited source records, so the skills' pin and metadata checks are structural validation. No receipt is an unchanged upstream test.", "source_path": "catalogs/landscape/foundation.json"},
-        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 3 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "source_path": "evidence/artifacts/new-wsl-layer-reviews-20261001/instructions-skills.json"}
+        {
+          "text": "Canonical project instructions (CLAUDE.md and AGENTS.md) carry the rules; selected skills load progressively, installed through the upstream skills CLI from a pinned manifest.",
+          "source_path": "catalogs/foundation/manifest.json"
+        },
+        {
+          "text": "The skills manifest pins every installed skill to a commit and installs it for both clients through tools/adoption/install_skills.py.",
+          "source_path": "adoption/skills/manifest.json"
+        },
+        {
+          "text": "The layer record gives local integration as the weakest evidence class across the winners; the edition labels each winner by what its cited source records, so the skills' pin and metadata checks are structural validation. No receipt is an unchanged upstream test.",
+          "source_path": "catalogs/landscape/foundation.json"
+        },
+        {
+          "text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 2 corrections to the layer records). It names 3 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.",
+          "source_path": "evidence/artifacts/new-wsl-layer-reviews-20261001/instructions-skills.json"
+        }
       ],
-      "evidence_class": "structural_validation",
+      "evidence_class": "none_recorded",
       "alternatives": [
-        {"name": "Trail of Bits skills", "verdict": "conditional, source review only; several installed as trial skills", "source_path": "catalogs/landscape/foundation.json"},
-        {"name": "Vercel agent-skills", "verdict": "conditional, source review only", "source_path": "catalogs/landscape/foundation.json"},
-        {"name": "Claude Code Templates", "verdict": "unqualified in the verdict", "source_path": "catalogs/landscape/foundation.json"},
-        {"name": "Anthropic skills (webapp-testing)", "verdict": "overlap; refuted on fit in the 2026-09-29 sweep", "source_path": "catalogs/saturation/ledger.json"},
-        {"name": "mattpocock/skills", "verdict": "listed as refuted on fit 2026-09-26, but that fit vote was missing rather than a refutation on merit", "source_path": "catalogs/saturation/ledger.json"}
+        {
+          "name": "Trail of Bits skills",
+          "verdict": "conditional, source review only; several installed as trial skills",
+          "source_path": "catalogs/landscape/foundation.json"
+        },
+        {
+          "name": "Vercel agent-skills",
+          "verdict": "conditional, source review only",
+          "source_path": "catalogs/landscape/foundation.json"
+        },
+        {
+          "name": "Claude Code Templates",
+          "verdict": "unqualified in the verdict",
+          "source_path": "catalogs/landscape/foundation.json"
+        },
+        {
+          "name": "Anthropic skills (webapp-testing)",
+          "verdict": "overlap; refuted on fit in the 2026-09-29 sweep",
+          "source_path": "catalogs/saturation/ledger.json"
+        },
+        {
+          "name": "mattpocock/skills",
+          "verdict": "listed as refuted on fit 2026-09-26, but that fit vote was missing rather than a refutation on merit",
+          "source_path": "catalogs/saturation/ledger.json"
+        }
       ],
       "new_host_steps": [
         "Install the skills CLI 1.7.0 into its isolated prefix from the pinned tarball, checking its sha256 and npm integrity, and set SKILLS_BIN to its absolute path (the bare `skills` command is not on PATH).",
@@ -190,7 +298,7 @@
       ],
       "gates": [],
       "owner_lane": "foundation",
-      "notes": "recipes/claude-native-profile.md says both ECC skills install at 2b6e8397, while adoption/skills/manifest.json pins search-first at c70874fa; the manifest is the installer's input."
+      "notes": "recipes/claude-native-profile.md says both ECC skills install at 2b6e8397, while adoption/skills/manifest.json pins search-first at c70874fa; the manifest is the installer's input. Wave-5 destination owner cells have no recorded destination acceptance; original host/reference winner evidence remains scoped to those winners."
     },
     {
       "layer_id": "workers",
@@ -202,18 +310,68 @@
           "repository": "https://github.com/anthropics/claude-code",
           "pin": "2.1.284",
           "pin_source": "manifests/stack.json:192",
-          "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
-          "acceptance": {"command": "", "evidence_class": "none_recorded", "source_path": "blueprints/convergence-practice/native-worker/README.md"},
-          "upstream_currency": {"latest_release": "v2.1.286 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/anthropics/claude-code/releases"}
+          "install": {
+            "command": "bash adoption/bootstrap-linux.sh --profile token-efficiency",
+            "kind": "repo_recipe",
+            "source_path": "adoption/bootstrap.md"
+          },
+          "acceptance": {
+            "command": "",
+            "evidence_class": "none_recorded",
+            "source_path": "blueprints/convergence-practice/native-worker/README.md"
+          },
+          "upstream_currency": {
+            "latest_release": "v2.1.286 (2026-09-30)",
+            "checked_at": "2026-10-01T07:41Z",
+            "pin_is_latest": "no",
+            "url": "https://github.com/anthropics/claude-code/releases"
+          }
         },
         {
           "component_id": "worktrunk",
           "repository": "https://github.com/max-sixty/worktrunk",
           "pin": "0.80.0",
           "pin_source": "manifests/stack.json:1067",
-          "install": {"command": "gh release view v0.80.0 --repo max-sixty/worktrunk --json assets; gh release download v0.80.0 --repo max-sixty/worktrunk (worktrunk-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix", "kind": "repo_recipe", "source_path": "recipes/native-upgrades-20260921.md"},
-          "acceptance": {"command": "wt list --format json", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
-          "upstream_currency": {"latest_release": "v0.80.0 (2026-09-27)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/max-sixty/worktrunk/releases"}
+          "install": {
+            "command": "gh release view v0.80.0 --repo max-sixty/worktrunk --json assets; gh release download v0.80.0 --repo max-sixty/worktrunk (worktrunk-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix",
+            "kind": "repo_recipe",
+            "source_path": "recipes/native-upgrades-20260921.md"
+          },
+          "acceptance": {
+            "command": "wt list --format json",
+            "evidence_class": "none_recorded",
+            "source_path": "recipes/README.md"
+          },
+          "upstream_currency": {
+            "latest_release": "v0.80.0 (2026-09-27)",
+            "checked_at": "2026-10-01T07:41Z",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/max-sixty/worktrunk/releases"
+          }
+        },
+        {
+          "name": "hcom",
+          "repository": "https://github.com/aannoo/hcom",
+          "pin": "0.7.27",
+          "pin_source": "docs/decisions/2026-10-04-final-architecture-round2.md:23",
+          "install": {
+            "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only agent-messaging",
+            "kind": "repo_recipe",
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g1-messaging.md"
+          },
+          "acceptance": {
+            "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only agent-messaging --stage post_install && bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only agent-messaging --stage after_sign_in",
+            "evidence_class": "none_recorded",
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g1-messaging.md",
+            "scope": "Planned upstream tests and source-derived native integration gates; no destination execution."
+          },
+          "upstream_currency": {
+            "latest_release": "0.7.27",
+            "checked_at": "2026-10-04",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/aannoo/hcom/releases"
+          },
+          "role": "selected wave-5 clean-install owner"
         }
       ],
       "verdict": "comparison_required",
@@ -226,19 +384,54 @@
         "missing": "c2: the 2026-09-22 frozen set predates the 09-23, 09-26 and 09-29 sweeps and omits openai/codex (a 09-29 survivor) and the 09-26 bernstein proposal; c3: the preregistered arms have not run on the frozen fixtures, and no new-host lifecycle receipt exists at the current pins; c4: no second independent review of a re-frozen set (the record carries ten open gaps); c5: no closure record, only the keep_but_compare verdict."
       },
       "reasons": [
-        {"text": "The verdict keeps Claude native workers and Worktrunk owned-worktree lifecycle, with a preregistered comparison still required.", "source_path": "catalogs/landscape/foundation.json"},
-        {"text": "The research state marks the layer comparison_required.", "source_path": "catalogs/landscape/research-state.json"},
-        {"text": "The worker fixture is author-written and has no runner; a rerun needs a fresh owned repository and a prompt built on its base commit.", "source_path": "blueprints/convergence-practice/native-worker/README.md"},
-        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 1 correction to the layer records). It names 3 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "source_path": "evidence/artifacts/new-wsl-layer-reviews-20261001/workers.json"},
-        {"text": "Merit winner undetermined: the listed selection is the source host's record and one arm of the comparison. On the new distribution each arm installs fresh by its upstream command, and the layer's comparison selects the winner on the repositories' own results (the user's rule of 2026-10-01).", "source_path": "docs/decisions/2026-10-01-new-wsl-architecture-edition.md"}
+        {
+          "text": "The verdict keeps Claude native workers and Worktrunk owned-worktree lifecycle, with a preregistered comparison still required.",
+          "source_path": "catalogs/landscape/foundation.json"
+        },
+        {
+          "text": "The research state marks the layer comparison_required.",
+          "source_path": "catalogs/landscape/research-state.json"
+        },
+        {
+          "text": "The worker fixture is author-written and has no runner; a rerun needs a fresh owned repository and a prompt built on its base commit.",
+          "source_path": "blueprints/convergence-practice/native-worker/README.md"
+        },
+        {
+          "text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 1 correction to the layer records). It names 3 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.",
+          "source_path": "evidence/artifacts/new-wsl-layer-reviews-20261001/workers.json"
+        },
+        {
+          "text": "Merit winner undetermined: the listed selection is the source host's record and one arm of the comparison. On the new distribution each arm installs fresh by its upstream command, and the layer's comparison selects the winner on the repositories' own results (the user's rule of 2026-10-01).",
+          "source_path": "docs/decisions/2026-10-01-new-wsl-architecture-edition.md"
+        }
       ],
       "evidence_class": "none_recorded",
       "alternatives": [
-        {"name": "Codex native workers", "verdict": "conditional, native-proven", "source_path": "catalogs/landscape/foundation.json"},
-        {"name": "Codex for Claude companion 1.0.6", "verdict": "conditional, native-proven for review only", "source_path": "catalogs/landscape/foundation.json"},
-        {"name": "Beads 1.3.0", "verdict": "conditional; refuted on fit in the 2026-09-29 sweep", "source_path": "catalogs/landscape/foundation.json"},
-        {"name": "DeerFlow", "verdict": "conditional; native-proven only at an older revision", "source_path": "catalogs/landscape/foundation.json"},
-        {"name": "OpenHands SDK", "verdict": "conditional, source review only; refuted on fit 2026-09-26 and 2026-09-29", "source_path": "catalogs/landscape/foundation.json"}
+        {
+          "name": "Codex native workers",
+          "verdict": "conditional, native-proven",
+          "source_path": "catalogs/landscape/foundation.json"
+        },
+        {
+          "name": "Codex for Claude companion 1.0.6",
+          "verdict": "conditional, native-proven for review only",
+          "source_path": "catalogs/landscape/foundation.json"
+        },
+        {
+          "name": "Beads 1.3.0",
+          "verdict": "conditional; refuted on fit in the 2026-09-29 sweep",
+          "source_path": "catalogs/landscape/foundation.json"
+        },
+        {
+          "name": "DeerFlow",
+          "verdict": "conditional; native-proven only at an older revision",
+          "source_path": "catalogs/landscape/foundation.json"
+        },
+        {
+          "name": "OpenHands SDK",
+          "verdict": "conditional, source review only; refuted on fit 2026-09-26 and 2026-09-29",
+          "source_path": "catalogs/landscape/foundation.json"
+        }
       ],
       "new_host_steps": [
         "After the native clients' install and sign-in (row native-clients), install Worktrunk 0.79.0 from its release archive with the checksum check; `gh release download` needs a signed-in gh.",
@@ -246,10 +439,14 @@
         "Rerun the native worker fixture in a fresh owned repository with a prompt built on its actual base commit, and record the lifecycle receipt."
       ],
       "gates": [
-        {"text": "The preregistered workers comparison decides the layer; the edition installs the selection of record until it runs.", "kind": "lane", "source_path": "catalogs/landscape/foundation.json"}
+        {
+          "text": "The preregistered workers comparison decides the layer; the edition installs the selection of record until it runs.",
+          "kind": "lane",
+          "source_path": "catalogs/landscape/foundation.json"
+        }
       ],
       "owner_lane": "foundation",
-      "notes": "Worktrunk is in no adoption profile and has no entry in adoption/pins-linux-x86_64.json, so no bootstrap run installs it."
+      "notes": "Worktrunk is in no adoption profile and has no entry in adoption/pins-linux-x86_64.json, so no bootstrap run installs it. Wave-5 destination owner cells have no recorded destination acceptance; original host/reference winner evidence remains scoped to those winners."
     },
     {
       "layer_id": "isolation",
@@ -635,9 +832,47 @@
           "repository": "https://github.com/vercel-labs/agent-browser",
           "pin": "0.38.1",
           "pin_source": "manifests/stack.json:38",
-          "install": {"command": "npm install --global --prefix \"$STACK_HOME/tools/agent-browser-0.38.1\" agent-browser@0.38.1; agent-browser install", "kind": "repo_recipe", "source_path": "recipes/README.md"},
-          "acceptance": {"command": "agent-browser --config examples/agent-browser.json --namespace native-stack --session selected-owned-session open \"file://${PROJECT_ROOT}/fixtures/greeting.html\"", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
-          "upstream_currency": {"latest_release": "v0.38.1 (2026-09-16)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/vercel-labs/agent-browser/releases"}
+          "install": {
+            "command": "npm install --global --prefix \"$STACK_HOME/tools/agent-browser-0.38.1\" agent-browser@0.38.1; agent-browser install",
+            "kind": "repo_recipe",
+            "source_path": "recipes/README.md"
+          },
+          "acceptance": {
+            "command": "agent-browser --config examples/agent-browser.json --namespace native-stack --session selected-owned-session open \"file://${PROJECT_ROOT}/fixtures/greeting.html\"",
+            "evidence_class": "none_recorded",
+            "source_path": "recipes/README.md"
+          },
+          "upstream_currency": {
+            "latest_release": "v0.38.1 (2026-09-16)",
+            "checked_at": "2026-10-01T07:41Z",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/vercel-labs/agent-browser/releases"
+          },
+          "role": "NativeStack host browser reference; superseded for the 2604 browser slot"
+        },
+        {
+          "repository": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+          "pin": "1.10.1",
+          "pin_source": "docs/decisions/2026-10-04-final-architecture-round2.md:24",
+          "install": {
+            "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only playwright-cli",
+            "kind": "repo_recipe",
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g2-browser.md"
+          },
+          "acceptance": {
+            "command": "npm run test:no-build -- tests/index.test.ts tests/tools/pages.test.ts tests/tools/snapshot.test.ts tests/tools/console.test.ts tests/tools/network.test.ts tests/tools/performance.test.ts",
+            "evidence_class": "none_recorded",
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g2-browser.md",
+            "scope": "Planned unchanged upstream subset and fresh native-client navigation/snapshot/console checks; no destination execution."
+          },
+          "upstream_currency": {
+            "latest_release": "chrome-devtools-mcp-v1.10.1 (2026-09-23)",
+            "checked_at": "2026-10-04",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp/releases/tag/chrome-devtools-mcp-v1.10.1"
+          },
+          "name": "Chrome DevTools MCP",
+          "role": "selected 2604 browser automation and diagnostics owner"
         },
         {
           "component_id": "openresearch",
@@ -682,7 +917,7 @@
         {"text": "Tavily calls need the user's own Tavily key in its 0600 provider file; the free native lanes need none.", "kind": "user_side", "source_path": "docs/secret-storage.md"}
       ],
       "owner_lane": "foundation",
-      "notes": "Tavily stays pinned for historical reproduction; new work prefers the free native lanes."
+      "notes": "Tavily stays pinned for historical reproduction; new work prefers the free native lanes. Wave 5 selects Chrome DevTools MCP 1.10.1 at e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df for the 2604 playwright-cli slot; it supersedes agent-browser and the measurement-only Playwright CLI for that slot. One chrome-devtools stdio server per native client uses --headless --isolated --no-usage-statistics; browser diagnostics share it. The Linux-side stable Chrome route records the installed version. The catalog retains the NativeStack agent-browser pin and historical receipts as a host reference, following the durable-memory host-reference role and the retained LEAN comparison-oracle cell; host stack changes require separate currency qualification."
     },
     {
       "layer_id": "token-efficiency",
@@ -793,27 +1028,90 @@
           "repository": "https://github.com/promptfoo/promptfoo",
           "pin": "0.123.1",
           "pin_source": "manifests/stack.json:708",
-          "install": {"command": "npm install --global --prefix \"$STACK_HOME/tools/promptfoo-0.123.1\" promptfoo@0.123.1", "kind": "repo_recipe", "source_path": "recipes/README.md"},
-          "acceptance": {"command": "PROMPTFOO_DISABLE_TELEMETRY=1 promptfoo eval --config \"$EVAL_CONFIG\" --no-cache --no-table --no-progress-bar --no-share --no-write --output \"$EVAL_RESULT\"", "evidence_class": "local_integration_check", "source_path": "recipes/README.md"},
-          "upstream_currency": {"latest_release": "0.123.1 (2026-09-18)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/promptfoo/promptfoo/releases"}
+          "install": {
+            "command": "npm install --global --prefix \"$STACK_HOME/tools/promptfoo-0.123.1\" promptfoo@0.123.1",
+            "kind": "repo_recipe",
+            "source_path": "recipes/README.md"
+          },
+          "acceptance": {
+            "command": "PROMPTFOO_DISABLE_TELEMETRY=1 promptfoo eval --config \"$EVAL_CONFIG\" --no-cache --no-table --no-progress-bar --no-share --no-write --output \"$EVAL_RESULT\"",
+            "evidence_class": "local_integration_check",
+            "source_path": "recipes/README.md"
+          },
+          "upstream_currency": {
+            "latest_release": "0.123.1 (2026-09-18)",
+            "checked_at": "2026-10-01T07:41Z",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/promptfoo/promptfoo/releases"
+          }
         },
         {
           "component_id": "playwright-test",
           "repository": "https://github.com/microsoft/playwright",
           "pin": "1.63.0",
           "pin_source": "manifests/stack.json:1866",
-          "install": {"command": "the wsl-application blueprint's pinned lock with the measured pnpm, plus the verified Chrome for Testing archive extracted into tools/chrome-linux64", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/wsl-application/README.md"},
-          "acceptance": {"command": "taskset -c 0-3 pnpm exec playwright test", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/wsl-application/README.md"},
-          "upstream_currency": {"latest_release": "v1.63.0 (2026-09-04)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/microsoft/playwright/releases"}
+          "install": {
+            "command": "the wsl-application blueprint's pinned lock with the measured pnpm, plus the verified Chrome for Testing archive extracted into tools/chrome-linux64",
+            "kind": "repo_recipe",
+            "source_path": "blueprints/convergence-practice/wsl-application/README.md"
+          },
+          "acceptance": {
+            "command": "taskset -c 0-3 pnpm exec playwright test",
+            "evidence_class": "local_integration_check",
+            "source_path": "blueprints/convergence-practice/wsl-application/README.md"
+          },
+          "upstream_currency": {
+            "latest_release": "v1.63.0 (2026-09-04)",
+            "checked_at": "2026-10-01T07:41Z",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/microsoft/playwright/releases"
+          }
         },
         {
           "name": "Harbor (containerized agent E2E runner)",
           "repository": "https://github.com/harbor-framework/harbor",
           "pin": "v0.23.0",
           "pin_source": "blueprints/runtime-workers/openhands/pins.json:62",
-          "install": {"command": "uv tool install harbor==0.23.0", "kind": "upstream_documented", "url": "https://github.com/harbor-framework/harbor"},
-          "acceptance": {"command": "the 288-trial Harbor v0.23.0 run (36 SWE-bench Verified tasks, 8 arms, graded by Harbor's verifier, preregistered; receipt blocks run, schedule, results and reproduction, where the preregistered analysis re-run reproduces the stored results byte for byte)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"},
-          "upstream_currency": {"latest_release": "v0.23.0 (2026-09-12)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/harbor-framework/harbor/releases"}
+          "install": {
+            "command": "uv tool install harbor==0.23.0",
+            "kind": "upstream_documented",
+            "url": "https://github.com/harbor-framework/harbor"
+          },
+          "acceptance": {
+            "command": "the 288-trial Harbor v0.23.0 run (36 SWE-bench Verified tasks, 8 arms, graded by Harbor's verifier, preregistered; receipt blocks run, schedule, results and reproduction, where the preregistered analysis re-run reproduces the stored results byte for byte)",
+            "evidence_class": "upstream_example_or_native_operation",
+            "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"
+          },
+          "upstream_currency": {
+            "latest_release": "v0.23.0 (2026-09-12)",
+            "checked_at": "2026-10-01T07:42Z",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/harbor-framework/harbor/releases"
+          }
+        },
+        {
+          "name": "Inspect Scout",
+          "repository": "https://github.com/meridianlabs-ai/inspect_scout",
+          "pin": "0.5.3",
+          "pin_source": "docs/decisions/2026-10-04-final-architecture-round2.md:28",
+          "install": {
+            "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only trajectory-analysis",
+            "kind": "repo_recipe",
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g3-tools.md"
+          },
+          "acceptance": {
+            "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only trajectory-analysis --stage post_install && bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only trajectory-analysis --stage after_sign_in",
+            "evidence_class": "none_recorded",
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g3-tools.md",
+            "scope": "Planned upstream tests and source-derived native integration gates; no destination execution."
+          },
+          "upstream_currency": {
+            "latest_release": "0.5.3",
+            "checked_at": "2026-10-04",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/meridianlabs-ai/inspect_scout/releases"
+          },
+          "role": "selected wave-5 clean-install owner"
         }
       ],
       "verdict": "comparison_required",
@@ -826,21 +1124,61 @@
         "missing": "c1: the layer record cites a superseded receipt, its candidate dispositions disagree with the verdict, and the Inspect AI and MLflow entries predate the gap-wave2 receipts; c2: seven of eight unclaimed manifest components carry no omission reason and the sweep candidates are not in the record; c3: no representative comparison of semantic advice on fresh, independently labelled cases, no lifecycle receipt from the new WSL host, and the Harbor pilot that forces subagent use has not run; c4: every layer-level review records open gaps; c5: no current closure record."
       },
       "reasons": [
-        {"text": "Harbor is the only upstream harness already run end to end on this stack: 288 trials over 36 SWE-bench Verified tasks with no infrastructure failure, its arm wrappers and analysis labelled as local integration code.", "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"},
-        {"text": "The forced-subagent pilot is NOT RUN: the receipt's subagent_scan shows 0 delegation calls in 308 stream logs and 308 client transcripts and no subagents directory, so Harbor's per-subagent attribution is untested.", "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"},
-        {"text": "Docker's rootless prerequisite is at least 65,536 subordinate ids, and a wider range is an image-set need: on the workstation the images of six matplotlib SWE-bench tasks logged `lchown <path>: invalid argument` at 65,536 subordinate ids, and the four of them in the final task set ran after the ranges were widened to 262,144.", "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"},
-        {"text": "E2E and A/B evaluations use an upstream harness, never a self-written runner.", "source_path": "docs/decisions/2026-09-30-rule-text-every-layer.md"},
-        {"text": "Frozen deterministic checks stay verifier scripts: the 2026-09-29 grader decision compared promptfoo 0.123.1 and inspect-ai 0.3.272 and rejected their model graders for determinism, key redaction and the blind cross-family judge.", "source_path": "docs/decisions/2026-09-29-frozen-check-grader.md"},
-        {"text": "Project and upstream tests come first; promptfoo stays the gateway and LLM A/B harness, and Playwright the browser acceptance.", "source_path": "catalogs/landscape/foundation.json"},
-        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 1 correction to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "source_path": "evidence/artifacts/new-wsl-layer-reviews-20261001/quality-evaluation.json"},
-        {"text": "Merit winner undetermined: the listed selection is the source host's record and one arm of the comparison. On the new distribution each arm installs fresh by its upstream command, and the layer's comparison selects the winner on the repositories' own results (the user's rule of 2026-10-01).", "source_path": "docs/decisions/2026-10-01-new-wsl-architecture-edition.md"}
+        {
+          "text": "Harbor is the only upstream harness already run end to end on this stack: 288 trials over 36 SWE-bench Verified tasks with no infrastructure failure, its arm wrappers and analysis labelled as local integration code.",
+          "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"
+        },
+        {
+          "text": "The forced-subagent pilot is NOT RUN: the receipt's subagent_scan shows 0 delegation calls in 308 stream logs and 308 client transcripts and no subagents directory, so Harbor's per-subagent attribution is untested.",
+          "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"
+        },
+        {
+          "text": "Docker's rootless prerequisite is at least 65,536 subordinate ids, and a wider range is an image-set need: on the workstation the images of six matplotlib SWE-bench tasks logged `lchown <path>: invalid argument` at 65,536 subordinate ids, and the four of them in the final task set ran after the ranges were widened to 262,144.",
+          "source_path": "evidence/receipts/harbor-e2e-token-tools-20260930.json"
+        },
+        {
+          "text": "E2E and A/B evaluations use an upstream harness, never a self-written runner.",
+          "source_path": "docs/decisions/2026-09-30-rule-text-every-layer.md"
+        },
+        {
+          "text": "Frozen deterministic checks stay verifier scripts: the 2026-09-29 grader decision compared promptfoo 0.123.1 and inspect-ai 0.3.272 and rejected their model graders for determinism, key redaction and the blind cross-family judge.",
+          "source_path": "docs/decisions/2026-09-29-frozen-check-grader.md"
+        },
+        {
+          "text": "Project and upstream tests come first; promptfoo stays the gateway and LLM A/B harness, and Playwright the browser acceptance.",
+          "source_path": "catalogs/landscape/foundation.json"
+        },
+        {
+          "text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 1 correction to the layer records). It names 2 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.",
+          "source_path": "evidence/artifacts/new-wsl-layer-reviews-20261001/quality-evaluation.json"
+        },
+        {
+          "text": "Merit winner undetermined: the listed selection is the source host's record and one arm of the comparison. On the new distribution each arm installs fresh by its upstream command, and the layer's comparison selects the winner on the repositories' own results (the user's rule of 2026-10-01).",
+          "source_path": "docs/decisions/2026-10-01-new-wsl-architecture-edition.md"
+        }
       ],
-      "evidence_class": "local_integration_check",
+      "evidence_class": "none_recorded",
       "alternatives": [
-        {"name": "Inspect AI", "verdict": "the Harbor fallback runner; unqualified, source review in the layer record, which predates later executions", "source_path": "catalogs/landscape/foundation.json"},
-        {"name": "ShellCheck 0.11.0", "verdict": "conditional, native-proven", "source_path": "catalogs/landscape/foundation.json"},
-        {"name": "Difftastic 0.71.0", "verdict": "overlap", "source_path": "catalogs/landscape/foundation.json"},
-        {"name": "TypeSafe semantic skill", "verdict": "conditional, one measured comparison", "source_path": "docs/native-skill-practice-20260921.md"}
+        {
+          "name": "Inspect AI",
+          "verdict": "the Harbor fallback runner; unqualified, source review in the layer record, which predates later executions",
+          "source_path": "catalogs/landscape/foundation.json"
+        },
+        {
+          "name": "ShellCheck 0.11.0",
+          "verdict": "conditional, native-proven",
+          "source_path": "catalogs/landscape/foundation.json"
+        },
+        {
+          "name": "Difftastic 0.71.0",
+          "verdict": "overlap",
+          "source_path": "catalogs/landscape/foundation.json"
+        },
+        {
+          "name": "TypeSafe semantic skill",
+          "verdict": "conditional, one measured comparison",
+          "source_path": "docs/native-skill-practice-20260921.md"
+        }
       ],
       "new_host_steps": [
         "Install promptfoo 0.123.1 into its prefix with npm (it is in no adoption profile) and Playwright from the wsl-application blueprint's lock with its verified Chrome for Testing archive.",
@@ -850,12 +1188,24 @@
         "Record install-and-control host receipts for promptfoo and Playwright, keeping every failed attempt."
       ],
       "gates": [
-        {"text": "The native Claude OAuth token for Harbor runs is minted by the user with `claude setup-token`.", "kind": "user_side", "source_path": "docs/decisions/2026-09-29-key-management.md"},
-        {"text": "The Gate A Harbor pilot (forced subagent use) runs before any Harbor result supports a multi-agent claim.", "kind": "lane", "source_path": "examples/claude-native/workflows/README.md"},
-        {"text": "The new-distro recipe that allocates the subordinate ids lands with its pull request.", "kind": "lane", "source_path": "adoption/platforms/linux-wsl2-new-distro.md"}
+        {
+          "text": "The native Claude OAuth token for Harbor runs is minted by the user with `claude setup-token`.",
+          "kind": "user_side",
+          "source_path": "docs/decisions/2026-09-29-key-management.md"
+        },
+        {
+          "text": "The Gate A Harbor pilot (forced subagent use) runs before any Harbor result supports a multi-agent claim.",
+          "kind": "lane",
+          "source_path": "examples/claude-native/workflows/README.md"
+        },
+        {
+          "text": "The new-distro recipe that allocates the subordinate ids lands with its pull request.",
+          "kind": "lane",
+          "source_path": "adoption/platforms/linux-wsl2-new-distro.md"
+        }
       ],
       "owner_lane": "foundation: Gate A",
-      "notes": "Harbor's prerequisites (rootless Docker, the egress allowlist, the Node v22.23.3 pre-step and the native OAuth token) come from the Gate A harness lane; the subordinate-id observation is in the Harbor receipt of PR #570, and the rest is not yet in the repository, so the pilot's record should land it. Inspect AI is the fallback runner. Harbor is the runner because top rule (e) requires an upstream harness and it is the only one run end to end on this stack, not because it beat Inspect AI, which was never compared; Inspect AI stays an arm of any comparison."
+      "notes": "Harbor's prerequisites (rootless Docker, the egress allowlist, the Node v22.23.3 pre-step and the native OAuth token) come from the Gate A harness lane; the subordinate-id observation is in the Harbor receipt of PR #570, and the rest is not yet in the repository, so the pilot's record should land it. Inspect AI is the fallback runner. Harbor is the runner because top rule (e) requires an upstream harness and it is the only one run end to end on this stack, not because it beat Inspect AI, which was never compared; Inspect AI stays an arm of any comparison. Wave-5 destination owner cells have no recorded destination acceptance; original host/reference winner evidence remains scoped to those winners."
     },
     {
       "layer_id": "ci-supply-chain",
@@ -948,7 +1298,7 @@
           "pin_source": "manifests/stack.json:1343",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary (the recipe omits this step)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
-          "upstream_currency": {"latest_release": "v2.18.1 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dagucloud/dagu/releases"}
+          "upstream_currency": {"latest_release": "v2.18.2 (2026-10-04)", "checked_at": "2026-10-05T09:58:54.343594+00:00", "pin_is_latest": "no", "url": "https://api.github.com/repos/dagucloud/dagu/releases/latest"}
         },
         {
           "component_id": "systemd",
@@ -1254,18 +1604,68 @@
           "repository": "https://github.com/openclaw/mcporter",
           "pin": "0.14.1",
           "pin_source": "manifests/stack.json:631",
-          "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
-          "acceptance": {"command": "mcporter --config \"$MCPORTER_CONFIG\" list socraticode --brief --no-oauth", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
-          "upstream_currency": {"latest_release": "v0.14.1 (2026-09-24)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/openclaw/mcporter/releases"}
+          "install": {
+            "command": "bash adoption/bootstrap-linux.sh --profile token-efficiency",
+            "kind": "repo_recipe",
+            "source_path": "adoption/bootstrap.md"
+          },
+          "acceptance": {
+            "command": "mcporter --config \"$MCPORTER_CONFIG\" list socraticode --brief --no-oauth",
+            "evidence_class": "upstream_example_or_native_operation",
+            "source_path": "recipes/README.md"
+          },
+          "upstream_currency": {
+            "latest_release": "v0.14.1 (2026-09-24)",
+            "checked_at": "2026-10-01T07:42Z",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/openclaw/mcporter/releases"
+          }
         },
         {
           "component_id": "mcp-inspector",
           "repository": "https://github.com/modelcontextprotocol/inspector",
           "pin": "2.8.0",
           "pin_source": "manifests/stack.json:606",
-          "install": {"command": "npm install --global --prefix \"$STACK_HOME/tools/mcp-inspector-2.8.0\" @modelcontextprotocol/inspector@2.8.0", "kind": "repo_recipe", "source_path": "recipes/README.md"},
-          "acceptance": {"command": "mcp-inspector --cli --config \"$PROJECT_ROOT/.mcp.json\" --server socraticode --method tools/list --format json --stored-auth-only --cwd \"$PROJECT_ROOT\"", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
-          "upstream_currency": {"latest_release": "2.9.0 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/modelcontextprotocol/inspector/releases"}
+          "install": {
+            "command": "npm install --global --prefix \"$STACK_HOME/tools/mcp-inspector-2.8.0\" @modelcontextprotocol/inspector@2.8.0",
+            "kind": "repo_recipe",
+            "source_path": "recipes/README.md"
+          },
+          "acceptance": {
+            "command": "mcp-inspector --cli --config \"$PROJECT_ROOT/.mcp.json\" --server socraticode --method tools/list --format json --stored-auth-only --cwd \"$PROJECT_ROOT\"",
+            "evidence_class": "upstream_example_or_native_operation",
+            "source_path": "recipes/README.md"
+          },
+          "upstream_currency": {
+            "latest_release": "2.9.0 (2026-09-30)",
+            "checked_at": "2026-10-01T07:42Z",
+            "pin_is_latest": "no",
+            "url": "https://github.com/modelcontextprotocol/inspector/releases"
+          }
+        },
+        {
+          "name": "MCP conformance suite",
+          "repository": "https://github.com/modelcontextprotocol/conformance",
+          "pin": "0.2.0-alpha.11",
+          "pin_source": "docs/decisions/2026-10-04-final-architecture-round2.md:27",
+          "install": {
+            "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only mcp-protocol-conformance",
+            "kind": "repo_recipe",
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g3-tools.md"
+          },
+          "acceptance": {
+            "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only mcp-protocol-conformance --stage post_install && bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only mcp-protocol-conformance --stage after_sign_in",
+            "evidence_class": "none_recorded",
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g3-tools.md",
+            "scope": "Planned upstream tests and source-derived native integration gates; no destination execution."
+          },
+          "upstream_currency": {
+            "latest_release": "0.2.0-alpha.12",
+            "checked_at": "2026-10-04",
+            "pin_is_latest": "no",
+            "url": "https://github.com/modelcontextprotocol/conformance/releases"
+          },
+          "role": "selected wave-5 clean-install owner; named-only, skipped by the default run"
         }
       ],
       "verdict": "selection_of_record_open",
@@ -1278,16 +1678,41 @@
         "missing": "c2: no consolidated frozen candidate set at the served pins folds in the 2026-09-23 manifest and ledger and the later sweeps; c3: the retained operations and the owned-daemon lifecycle fixture have not run at mcporter 0.14.1 and Inspector 2.8.0 on the target WSL host; c4: no independent cross-family review of a bounded set at the served pins (the 2.8.0 switch is unreviewed); c5: no closure record from a new verdict wave."
       },
       "reasons": [
-        {"text": "Native project MCP configuration is the policy; MCPorter and the Inspector inspect and bridge servers without replacing the clients' own MCP handling.", "source_path": "catalogs/foundation/decisions.json"},
-        {"text": "@wong2/mcp-cli 2.0.0 lost the executed head-to-head against mcporter and the Inspector on every list and call operation.", "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/README.md"},
-        {"text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 1 correction to the layer records). It names 3 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.", "source_path": "evidence/artifacts/new-wsl-layer-reviews-20261001/mcp-surfaces.json"}
+        {
+          "text": "Native project MCP configuration is the policy; MCPorter and the Inspector inspect and bridge servers without replacing the clients' own MCP handling.",
+          "source_path": "catalogs/foundation/decisions.json"
+        },
+        {
+          "text": "@wong2/mcp-cli 2.0.0 lost the executed head-to-head against mcporter and the Inspector on every list and call operation.",
+          "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/README.md"
+        },
+        {
+          "text": "Second independent review (closure item 4): the Codex lane reviewed this layer on 2026-10-01 (gpt-6.1-sol at effort max; verdict corrected, 1 correction to the layer records). It names 3 remaining gaps, so no review yet finds the bounded set free of material gaps, and the review also records each repository's upstream-documented install command, none of them run.",
+          "source_path": "evidence/artifacts/new-wsl-layer-reviews-20261001/mcp-surfaces.json"
+        }
       ],
-      "evidence_class": "upstream_example_or_native_operation",
+      "evidence_class": "none_recorded",
       "alternatives": [
-        {"name": "@wong2/mcp-cli 2.0.0", "verdict": "lost the executed head-to-head", "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/README.md"},
-        {"name": "punkpeye/awesome-mcp-servers", "verdict": "out of scope: a discovery list", "source_path": "catalogs/landscape/foundation.json"},
-        {"name": "MCPJam/inspector", "verdict": "refuted in the 2026-09-23, 09-26 and 09-29 sweeps", "source_path": "catalogs/saturation/ledger.json"},
-        {"name": "microsoft/mcp-gateway, docker/mcp-registry, modelcontextprotocol/registry", "verdict": "refuted by lens 1 in the 2026-09-23 sweep", "source_path": "catalogs/saturation/ledger.json"}
+        {
+          "name": "@wong2/mcp-cli 2.0.0",
+          "verdict": "lost the executed head-to-head",
+          "source_path": "evidence/artifacts/gap-wave2-20260923/foundation__mcp-surfaces/README.md"
+        },
+        {
+          "name": "punkpeye/awesome-mcp-servers",
+          "verdict": "out of scope: a discovery list",
+          "source_path": "catalogs/landscape/foundation.json"
+        },
+        {
+          "name": "MCPJam/inspector",
+          "verdict": "refuted in the 2026-09-23, 09-26 and 09-29 sweeps",
+          "source_path": "catalogs/saturation/ledger.json"
+        },
+        {
+          "name": "microsoft/mcp-gateway, docker/mcp-registry, modelcontextprotocol/registry",
+          "verdict": "refuted by lens 1 in the 2026-09-23 sweep",
+          "source_path": "catalogs/saturation/ledger.json"
+        }
       ],
       "new_host_steps": [
         "Install procps before MCPorter's daemon is used: mcporter 0.14.x needs ps on the daemon launcher's PATH, and the bootstrap neither installs nor checks it.",
@@ -1296,7 +1721,7 @@
       ],
       "gates": [],
       "owner_lane": "foundation",
-      "notes": "Both recorded checks need another layer's server (SocratiCode), so run them after row semantic-rag."
+      "notes": "Both recorded checks need another layer's server (SocratiCode), so run them after row semantic-rag. Wave-5 destination owner cells have no recorded destination acceptance; original host/reference winner evidence remains scoped to those winners."
     },
     {
       "layer_id": "secrets-credentials",
@@ -1661,7 +2086,7 @@
           "pin_source": "manifests/stack.json:1343",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
-          "upstream_currency": {"latest_release": "v2.18.1 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dagucloud/dagu/releases"}
+          "upstream_currency": {"latest_release": "v2.18.2 (2026-10-04)", "checked_at": "2026-10-05T09:58:54.343594+00:00", "pin_is_latest": "no", "url": "https://api.github.com/repos/dagucloud/dagu/releases/latest"}
         },
         {
           "component_id": "codex",
@@ -2105,7 +2530,7 @@
           "pin_source": "manifests/stack.json:1343",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
-          "upstream_currency": {"latest_release": "v2.18.1 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dagucloud/dagu/releases"}
+          "upstream_currency": {"latest_release": "v2.18.2 (2026-10-04)", "checked_at": "2026-10-05T09:58:54.343594+00:00", "pin_is_latest": "no", "url": "https://api.github.com/repos/dagucloud/dagu/releases/latest"}
         },
         {
           "component_id": "systemd",
@@ -2366,7 +2791,7 @@
           "pin_source": "manifests/stack.json:1343",
           "install": {"command": "gh release download v2.16.6 --repo dagucloud/dagu (the linux_amd64 archive and checksums.txt); check the checksum, extract and place the binary", "kind": "repo_recipe", "source_path": "blueprints/us-equities/hosting/README.md"},
           "acceptance": {"command": "dagu start --context local --dagu-home \"$RESEARCH_HOME\" --run-id evidence-20260919-ready \"$WORKFLOW\": the three-step equity-research-evidence workflow through the upstream CLI (DuckDB summarized six LEAN simulated events into three orders, then both evidence validators passed; exit 0), and the native history kept its succeeded, failed and cancelled runs after a service restart (Dagu 2.16.6, 2026-09-19)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/hosting/receipt.json"},
-          "upstream_currency": {"latest_release": "v2.18.1 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/dagucloud/dagu/releases"}
+          "upstream_currency": {"latest_release": "v2.18.2 (2026-10-04)", "checked_at": "2026-10-05T09:58:54.343594+00:00", "pin_is_latest": "no", "url": "https://api.github.com/repos/dagucloud/dagu/releases/latest"}
         },
         {
           "component_id": "opentelemetry-collector-contrib",
@@ -2621,31 +3046,68 @@
           "repository": "https://github.com/openai/codex",
           "pin": "0.159.2",
           "pin_source": "manifests/stack.json:298",
-          "install": {"command": "bash adoption/bootstrap-linux.sh --profile token-efficiency", "kind": "repo_recipe", "source_path": "adoption/bootstrap.md"},
-          "acceptance": {"command": "python3 tools/adoption/prove_codex_lane.py (add --live only when worker runs are intended)", "evidence_class": "none_recorded", "source_path": "tools/adoption/prove_codex_lane.py"},
-          "upstream_currency": {"latest_release": "rust-v0.159.3 (2026-09-30), the candidate for the new distribution", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/openai/codex/releases"}
+          "install": {
+            "command": "bash adoption/bootstrap-linux.sh --profile token-efficiency",
+            "kind": "repo_recipe",
+            "source_path": "adoption/bootstrap.md"
+          },
+          "acceptance": {
+            "command": "python3 tools/adoption/prove_codex_lane.py (add --live only when worker runs are intended)",
+            "evidence_class": "none_recorded",
+            "source_path": "tools/adoption/prove_codex_lane.py"
+          },
+          "upstream_currency": {
+            "latest_release": "rust-v0.159.3 (2026-09-30), the candidate for the new distribution",
+            "checked_at": "2026-10-01T07:41Z",
+            "pin_is_latest": "no",
+            "url": "https://github.com/openai/codex/releases"
+          }
         },
         {
           "component_id": "omniroute",
           "repository": "https://github.com/diegosouzapw/OmniRoute",
-          "pin": "3.8.52-canary (23a11484 + PR13788 + PR15167)",
+          "pin": "3.8.51",
           "pin_source": "manifests/stack.json:1887",
           "install": {
             "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only gpt-gateway",
             "kind": "repo_recipe",
-            "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute-canary-install.sh"
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g4-config.md"
           },
           "acceptance": {
             "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only gpt-gateway --stage post_install; repeat with --stage service_health and --stage after_sign_in",
             "evidence_class": "none_recorded",
-            "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute-canary-evidence.json"
+            "source_path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json"
           },
           "upstream_currency": {
             "latest_release": "v3.8.51 (2026-09-30)",
             "checked_at": "2026-10-01T07:42Z",
-            "pin_is_latest": "unknown",
+            "pin_is_latest": "yes",
             "url": "https://github.com/diegosouzapw/OmniRoute/releases"
           }
+        },
+        {
+          "name": "DSPy",
+          "repository": "https://github.com/stanfordnlp/dspy",
+          "pin": "3.4.0",
+          "pin_source": "docs/decisions/2026-10-04-final-architecture-round2.md:25",
+          "install": {
+            "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only lm-program-optimization",
+            "kind": "repo_recipe",
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g3-tools.md"
+          },
+          "acceptance": {
+            "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only lm-program-optimization --stage post_install && bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only lm-program-optimization --stage after_sign_in",
+            "evidence_class": "none_recorded",
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g3-tools.md",
+            "scope": "Planned upstream tests and source-derived native integration gates; no destination execution."
+          },
+          "upstream_currency": {
+            "latest_release": "3.4.0",
+            "checked_at": "2026-10-04",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/stanfordnlp/dspy/releases"
+          },
+          "role": "selected wave-5 clean-install owner"
         }
       ],
       "verdict": "comparison_required",
@@ -2658,31 +3120,65 @@
         "missing": "c1: the lane's pins and templates are recorded, but OmniRoute is in no adoption profile and the workstation runs rebuilt source builds rather than the 3.8.50 pin; c2: no frozen candidate set for the harness lane exists; c3: the Codex 0.159.3 qualification and a new-host lane proof have not run; c4: no review of a host run; c5: no closure record."
       },
       "reasons": [
-        {"text": "The Codex lane is rendered by tools/adoption/apply_codex_lane.py (dry run by default, applied against reviewed sha256 values) and checked by prove_codex_lane.py, whose checks, --live included, are local integration rather than host acceptance; the cited script records no run of its own beyond a code comment about the 2026-09-26 rehearsal.", "source_path": "tools/adoption/prove_codex_lane.py"},
-        {"text": "The stack-worker profile runs gpt-6.1-sol at max effort with live web search; gpt-6-astra stays for difficult judgment or escalation.", "source_path": "adoption/templates/codex.stack-worker.config.toml"},
-        {"text": "Codex 0.159.2 is the pin of record; 0.159.3 was reported on the Mac host in the 2026-09-30 routing record and is upstream's latest, a candidate until its own qualification lands.", "source_path": "docs/decisions/2026-09-30-bounded-native-decision-routing.md"},
-        {"text": "The workstation's gateway runs rebuilt release/v3.8.51 source builds with local carries, which the upstream npm command alone does not reproduce.", "source_path": "docs/decisions/2026-09-30-omniroute-rebuild.md"},
-        {"text": "OmniRoute's acceptance is the 2026-09-20 receipt's clean pinned 3.8.50 install with its scoped service, persistence and plaintext-restore checks; its boundary stands: gateway inference is not accepted in this wave (Claude returned 429 and the connected Codex accounts reached their configured quota threshold).", "source_path": "evidence/receipts/foundation-native-20260920.json"},
-        {"text": "Merit winner undetermined: the listed selection is the source host's record and one arm of the comparison. On the new distribution each arm installs fresh by its upstream command, and the layer's comparison selects the winner on the repositories' own results (the user's rule of 2026-10-01).", "source_path": "docs/decisions/2026-10-01-new-wsl-architecture-edition.md"}
+        {
+          "text": "The Codex lane is rendered by tools/adoption/apply_codex_lane.py (dry run by default, applied against reviewed sha256 values) and checked by prove_codex_lane.py, whose checks, --live included, are local integration rather than host acceptance; the cited script records no run of its own beyond a code comment about the 2026-09-26 rehearsal.",
+          "source_path": "tools/adoption/prove_codex_lane.py"
+        },
+        {
+          "text": "The stack-worker profile runs gpt-6.1-sol at max effort with live web search; gpt-6-astra stays for difficult judgment or escalation.",
+          "source_path": "adoption/templates/codex.stack-worker.config.toml"
+        },
+        {
+          "text": "Codex 0.159.2 is the pin of record; 0.159.3 was reported on the Mac host in the 2026-09-30 routing record and is upstream's latest, a candidate until its own qualification lands.",
+          "source_path": "docs/decisions/2026-09-30-bounded-native-decision-routing.md"
+        },
+        {
+          "text": "The workstation's gateway runs rebuilt release/v3.8.51 source builds with local carries, which the upstream npm command alone does not reproduce.",
+          "source_path": "docs/decisions/2026-09-30-omniroute-rebuild.md"
+        },
+        {
+          "text": "OmniRoute's acceptance is the 2026-09-20 receipt's clean pinned 3.8.50 install with its scoped service, persistence and plaintext-restore checks; its boundary stands: gateway inference is not accepted in this wave (Claude returned 429 and the connected Codex accounts reached their configured quota threshold).",
+          "source_path": "evidence/receipts/foundation-native-20260920.json"
+        },
+        {
+          "text": "Merit winner undetermined: the listed selection is the source host's record and one arm of the comparison. On the new distribution each arm installs fresh by its upstream command, and the layer's comparison selects the winner on the repositories' own results (the user's rule of 2026-10-01).",
+          "source_path": "docs/decisions/2026-10-01-new-wsl-architecture-edition.md"
+        }
       ],
       "evidence_class": "none_recorded",
       "alternatives": [
-        {"name": "Codex 0.159.3", "verdict": "candidate for the new distribution; comparison_required until its qualification lands", "url": "https://github.com/openai/codex/releases"},
-        {"name": "Codex Python SDK routed through the gateway", "verdict": "qualification on an open pull request (#560), not merged", "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/560"}
+        {
+          "name": "Codex 0.159.3",
+          "verdict": "candidate for the new distribution; comparison_required until its qualification lands",
+          "url": "https://github.com/openai/codex/releases"
+        },
+        {
+          "name": "Codex Python SDK routed through the gateway",
+          "verdict": "qualification on an open pull request (#560), not merged",
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/560"
+        }
       ],
       "new_host_steps": [
         "Codex installs with the token-efficiency profile at 0.159.2; sign in with `codex login --device-auth`.",
         "Render the Codex lane: `python3 tools/adoption/apply_codex_lane.py` (dry run), review, then `--apply --expect-config-sha256 <sha> --expect-agents-sha256 <sha>`; the codex-lane step of --configure-full-profile runs the same tool.",
         "Prove it with `python3 tools/adoption/prove_codex_lane.py`; add --live only when worker runs are intended.",
-        "For the 2604 gateway lane, use the install-plan's release/v3.8.52 @23a11484 plus PR13788 and PR15167 canary recipe, with its upstream tests/build/pack gates and npm 3.8.51 as rollback. The separate user service uses DATA_DIR ~/.local/share/omniroute and loopback 21128/21129/21131, keyless by the wave-2 ruling. Reuse the bound historical host gates and fresh Codex turn; fresh accounts sign in natively only when absent. The workstation stable 3.8.50 registry receipt is a separate historical scope.",
+        "For the 2604 gateway lane, use the published omniroute@3.8.51 install and identity acceptance, as main PR #637 qualified and handed to the configuration owner (docs/decisions/2026-10-03-omniroute-3851-pin.md:108). Preserve the carried-prefix composition check with tool_root; it cannot substitute for the selected release identity. The separate user service uses DATA_DIR ~/.local/share/omniroute and loopback 21128/21129/21131. The pool/fallback profile uses Sol/xhigh; native Codex supplies Sol/max until a published release carries PR #15167. Destination doctor, readiness and fresh-client acceptance remain unrun.",
         "Qualify Codex 0.159.3 on the new distribution (npm tarball hash, provenance, CLI surface) before moving the pin."
       ],
       "gates": [
-        {"text": "Provider accounts sign in natively on the new host; the gateway's provider connections are created in its own store, never copied.", "kind": "user_side", "source_path": "docs/decisions/2026-09-27-omniroute-account-pool.md"},
-        {"text": "The Codex 0.159.3 qualification decides the pin on the new distribution.", "kind": "lane", "url": "https://github.com/openai/codex/releases"}
+        {
+          "text": "Provider accounts sign in natively on the new host; the gateway's provider connections are created in its own store, never copied.",
+          "kind": "user_side",
+          "source_path": "docs/decisions/2026-09-27-omniroute-account-pool.md"
+        },
+        {
+          "text": "The Codex 0.159.3 qualification decides the pin on the new distribution.",
+          "kind": "lane",
+          "url": "https://github.com/openai/codex/releases"
+        }
       ],
       "owner_lane": "foundation",
-      "notes": "Both pins are stated: 0.159.2 of record, 0.159.3 the candidate."
+      "notes": "Both pins are stated: 0.159.2 of record, 0.159.3 the candidate. Wave-5 destination owner cells have no recorded destination acceptance; original host/reference winner evidence remains scoped to those winners."
     },
     {
       "layer_id": "cross:credential-practice",

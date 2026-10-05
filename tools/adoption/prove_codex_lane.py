@@ -492,7 +492,7 @@ def skill_prompt(skill: Path) -> str:
     """Request a native file read without supplying the expected first line.
 
     Codex's user skill directory: https://developers.openai.com/codex/skills/
-    Shell fallback follows rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md and
+    Shell fallback follows rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md and
     context-mode v1.0.169's project containment policy, not a permission override.
     """
     return (f"Read the installed skill file {str(skill)!r}. Prefer the context-mode tool ctx_execute_file with "

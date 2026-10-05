@@ -1,0 +1,283 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "observed_date": "2026-10-05",
+  "base_git_revision": "f946c6d4ca988a17b6fa4392ecb488909f147883",
+  "working_directory": "$REPO",
+  "execution": "All shell work ran under nice -n 19. TMPDIR and uv cache were outside the worktree. No live services, timers, processes or credentials were operated.",
+  "public_sanitization": "Personal checkout/scratch paths in excerpts are replaced with $REPO/$TMPDIR. Full returned command output remains private at the listed scratch locators; digests identify those exact bytes. Excerpts select returned result/failure lines or terminal output, never replace them with a fabricated pass.",
+  "tools": {
+    "python": "3.12.3",
+    "uv": "0.12.17"
+  },
+  "upstream": {
+    "repository": "https://github.com/gerrymanoim/exchange_calendars",
+    "tag": "4.13.2",
+    "commit": "dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a",
+    "source_files_sha256": {
+      "calendar_helpers.py": "26cc9e2a72e6418b8b36b4c5956500b800060da07a90930d4af609542e98457f",
+      "calendar_utils.py": "7d12d53482fe295bd5a9b272a635df2292528b8dc19538c93649fa4ee84b40e6",
+      "exchange_calendar.py": "7b8087892b698299fe448afbc4b3fb9300a34ba1605804999436525391c08de6",
+      "us_holidays.py": "a2444bd7aef3ff651faff3f9117c47a0d41e9e7c312f38ecf42403e4d996830e",
+      "exchange_calendar_xnys.py": "baa39f07163abafcf2800b69edc5d920c3db0a64f8bbb30dc7d522883d0b5bd7"
+    },
+    "installed_sources_match": true
+  },
+  "imports": {
+    "python": "3.12.3",
+    "native_imports_ok": true,
+    "versions": {
+      "nautilus-trader": "2.0.0rc5",
+      "alpaca-py": "0.44.0",
+      "exchange-calendars": "4.13.2"
+    },
+    "baseline_count": 20,
+    "qualified_count": 25,
+    "unchanged": [
+      "alpaca-py",
+      "annotated-types",
+      "certifi",
+      "charset-normalizer",
+      "idna",
+      "msgpack",
+      "nautilus-trader",
+      "numpy",
+      "pandas",
+      "pydantic",
+      "pydantic-core",
+      "python-dateutil",
+      "pytz",
+      "requests",
+      "six",
+      "sseclient-py",
+      "typing-extensions",
+      "typing-inspection",
+      "urllib3",
+      "websockets"
+    ],
+    "removed": [],
+    "changes": [
+      {
+        "name": "exchange-calendars",
+        "before": null,
+        "after": "4.13.2"
+      },
+      {
+        "name": "korean-lunar-calendar",
+        "before": null,
+        "after": "0.4.0"
+      },
+      {
+        "name": "pyluach",
+        "before": null,
+        "after": "2.3.0"
+      },
+      {
+        "name": "toolz",
+        "before": null,
+        "after": "1.1.0"
+      },
+      {
+        "name": "tzdata",
+        "before": null,
+        "after": "2026.5"
+      }
+    ],
+    "pinned_sources_match_installed": true
+  },
+  "import_probe_failed_attempt": {
+    "exit": 1,
+    "attempted_import": "from nautilus_trader.live.node import LiveNode",
+    "returned_error": "ModuleNotFoundError: No module named nautilus_trader.live.node",
+    "full_output_sha256": null,
+    "retention": "Error excerpt retained from the tool result; no full logfile was captured for this initial extra probe.",
+    "corrected_import": "from nautilus_trader.live import LiveNode",
+    "corrected_exit": 0
+  },
+  "policy_and_receipts_byte_identical": true,
+  "migration": {
+    "calendar_dates": 730,
+    "session_dates": 502,
+    "sessions_each_year": 251,
+    "early_closes": 3,
+    "oracle": "Immutable prior 2026/2027 table in tests/test_adaptive_paper_sessions.py copied from the base revision."
+  },
+  "commands": [
+    {
+      "command": "uv pip compile blueprints/us-equities/adaptive-paper/requirements.txt --python-version 3.12 --python-platform x86_64-unknown-linux-gnu --generate-hashes --index-url https://pypi.org/simple --custom-compile-command 'uv pip compile blueprints/us-equities/adaptive-paper/requirements.txt --python-version 3.12 --python-platform x86_64-unknown-linux-gnu --generate-hashes --index-url https://pypi.org/simple' --output-file '$TMPDIR/t-cal-r1/engine-baseline.lock'",
+      "exit": 0,
+      "classification": "local_integration",
+      "private_output_locator": "$TMPDIR/t-cal-r1/compile-baseline.log",
+      "output_sha256": "f07804f0077dff6c3778a8e72dd73d5ffbe4aef1d310b371630b8aee76fc514f",
+      "sanitized_output_excerpt": "    --hash=sha256:f8969ad228115ad8869b5fed801f899e52ab8ad376fdb165ba4760a277c8258a \\\n    --hash=sha256:f90bad2839c185a1edf8ee22a257cfc8a39e0e337a0490ab185dfa76ef04d1bd \\\n    --hash=sha256:faa763b677e96f1beccc6b4d7e8c079dfeed2f249f57a19debc321b519ee64ec \\\n    --hash=sha256:fb78fb4158c12f77a934a003006784108a27a6553cfc0c6f10483c9c02e94f48 \\\n    --hash=sha256:fcce735ffd72ac4056db05325d9f0232382b74826f0196eb6a15ca903abdaa0f\n    # via alpaca-py",
+      "argv": [
+        "uv",
+        "pip",
+        "compile",
+        "blueprints/us-equities/adaptive-paper/requirements.txt",
+        "--python-version",
+        "3.12",
+        "--python-platform",
+        "x86_64-unknown-linux-gnu",
+        "--generate-hashes",
+        "--index-url",
+        "https://pypi.org/simple",
+        "--custom-compile-command",
+        "uv pip compile blueprints/us-equities/adaptive-paper/requirements.txt --python-version 3.12 --python-platform x86_64-unknown-linux-gnu --generate-hashes --index-url https://pypi.org/simple",
+        "--output-file",
+        "$TMPDIR/t-cal-r1/engine-baseline.lock"
+      ],
+      "input_scope": "Ran before editing requirements.txt; original exact input bytes are identified by requirements_input_sha256_at_baseline."
+    },
+    {
+      "command": "uv venv --python /usr/bin/python3.12 $TMPDIR/t-cal-r1/engine",
+      "exit": 0,
+      "classification": "local_integration",
+      "private_output_locator": "$TMPDIR/t-cal-r1/venv.log",
+      "output_sha256": "891b0ad9753e8d59f70a8af12f7245b685781e03836c3425b576daefc69978f8",
+      "sanitized_output_excerpt": "Using CPython 3.12.3 interpreter at: /usr/bin/python3.12\nCreating virtual environment at: $TMPDIR/t-cal-r1/engine\nActivate with: source $TMPDIR/t-cal-r1/engine/bin/activate"
+    },
+    {
+      "command": "uv pip install --python $TMPDIR/t-cal-r1/engine/bin/python --require-hashes -r $TMPDIR/t-cal-r1/engine-baseline.lock",
+      "exit": 0,
+      "classification": "local_integration",
+      "private_output_locator": "$TMPDIR/t-cal-r1/install-baseline.log",
+      "output_sha256": "fb795256128e58e930a506071c4b8ae8d22eb28e38c1e1b3726cdf126641086f",
+      "sanitized_output_excerpt": " + six==1.17.0\n + sseclient-py==1.9.0\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + urllib3==2.8.0\n + websockets==17.2"
+    },
+    {
+      "command": "uv pip compile blueprints/us-equities/adaptive-paper/requirements.txt -c blueprints/us-equities/adaptive-paper/receipts/xnys-primary-20261005/engine-baseline.lock --python-version 3.12 --python-platform x86_64-unknown-linux-gnu --generate-hashes --index-url https://pypi.org/simple --no-annotate --output-file blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock",
+      "exit": 0,
+      "classification": "local_integration",
+      "private_output_locator": "$TMPDIR/t-cal-r1/compile-engine-lock.log",
+      "output_sha256": "c02cacd10fbf82fc913f78178a907b67b81087f12748be529597aac12bcc5b75",
+      "sanitized_output_excerpt": "    --hash=sha256:f7eac84d4969da82166d5e90d9c38d2f416fe24f9708a7013569b193745b9a31 \\\n    --hash=sha256:f8969ad228115ad8869b5fed801f899e52ab8ad376fdb165ba4760a277c8258a \\\n    --hash=sha256:f90bad2839c185a1edf8ee22a257cfc8a39e0e337a0490ab185dfa76ef04d1bd \\\n    --hash=sha256:faa763b677e96f1beccc6b4d7e8c079dfeed2f249f57a19debc321b519ee64ec \\\n    --hash=sha256:fb78fb4158c12f77a934a003006784108a27a6553cfc0c6f10483c9c02e94f48 \\\n    --hash=sha256:fcce735ffd72ac4056db05325d9f0232382b74826f0196eb6a15ca903abdaa0f"
+    },
+    {
+      "command": "uv venv --python /usr/bin/python3.12 $TMPDIR/t-cal-r1/engine-clean",
+      "exit": 0,
+      "classification": "local_integration",
+      "private_output_locator": "$TMPDIR/t-cal-r1/venv-clean.log",
+      "output_sha256": "898c4d55dc056a33f9baae23aac08b0aec03d488245a2f8a1ef4d92f9ed7c8b1",
+      "sanitized_output_excerpt": "Using CPython 3.12.3 interpreter at: /usr/bin/python3.12\nCreating virtual environment at: $TMPDIR/t-cal-r1/engine-clean\nActivate with: source $TMPDIR/t-cal-r1/engine-clean/bin/activate"
+    },
+    {
+      "command": "uv pip sync --python $TMPDIR/t-cal-r1/engine-clean/bin/python --require-hashes -r blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock",
+      "exit": 2,
+      "classification": "local_integration",
+      "private_output_locator": "$TMPDIR/t-cal-r1/install-clean.log",
+      "output_sha256": "0d551a559cf2e4b5da23b1a7e3e041df5a2f683e8fe568269bb2032adb86fcbf",
+      "sanitized_output_excerpt": "error: unexpected argument '-r' found"
+    },
+    {
+      "command": "uv pip sync --python $TMPDIR/t-cal-r1/engine-clean/bin/python --require-hashes blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock",
+      "exit": 0,
+      "classification": "local_integration",
+      "private_output_locator": "$TMPDIR/t-cal-r1/install-clean-corrected.log",
+      "output_sha256": "a34d0b1220e952336b2def2a894130e0358d0543a450a839c3d691a8ff613b16",
+      "sanitized_output_excerpt": " + toolz==1.1.0\n + typing-extensions==4.16.0\n + typing-inspection==0.4.4\n + tzdata==2026.5\n + urllib3==2.8.0\n + websockets==17.2"
+    },
+    {
+      "command": "uv pip check --python $TMPDIR/t-cal-r1/engine-clean/bin/python",
+      "exit": 0,
+      "classification": "local_integration",
+      "private_output_locator": "$TMPDIR/t-cal-r1/check-clean.log",
+      "output_sha256": "72358737c46b18b2df36af0635e675448f1770ab5e24f61125e92c22ad68e4c2",
+      "sanitized_output_excerpt": "Using Python 3.12.3 environment at: $TMPDIR/t-cal-r1/engine-clean\nChecked 25 packages in 0.60ms\nAll installed packages are compatible"
+    },
+    {
+      "command": "$TMPDIR/t-cal-r1/engine-clean/bin/python -m unittest tests.test_adaptive_paper_sessions -v",
+      "exit": 1,
+      "classification": "local_integration",
+      "private_output_locator": "$TMPDIR/t-cal-r1/sessions-tests.log",
+      "output_sha256": "32e49e72402ea4fc1ddba2d72faa0e6ef65bf6bc8862daf3128e9c0bcb6e287d",
+      "sanitized_output_excerpt": "FAIL: test_arming_at_year_boundary_uses_verified_prior_close (tests.test_adaptive_paper_sessions.CalendarBoundaryPreviousTradingDayTests.test_arming_at_year_boundary_uses_verified_prior_close)\nAssertionError: Items in the second set but not the first:\nRan 144 tests in 6.965s\nFAILED (failures=1)"
+    },
+    {
+      "command": "$TMPDIR/t-cal-r1/engine-clean/bin/python -m unittest tests.test_adaptive_paper_sessions -v",
+      "exit": 0,
+      "classification": "local_integration",
+      "private_output_locator": "$TMPDIR/t-cal-r1/sessions-tests-corrected.log",
+      "output_sha256": "4363405341e021270810a13782f77fc91c2dcb7acd9c04b0aa1e5edbaae2d007",
+      "sanitized_output_excerpt": "Ran 144 tests in 5.872s\nOK"
+    },
+    {
+      "command": "$TMPDIR/t-cal-r1/engine-clean/bin/python -m unittest tests.test_adaptive_paper_corporate_actions tests.test_adaptive_paper_financing tests.test_adaptive_paper_native tests.test_adaptive_paper_runner -v",
+      "exit": 1,
+      "classification": "local_integration",
+      "private_output_locator": "$TMPDIR/t-cal-r1/dependent-tests.log",
+      "output_sha256": "827acd0b79ad8be3a78118e180868d193971bb3eda8c1a419134b734f5e075c4",
+      "sanitized_output_excerpt": "ERROR: test_calendar_failure_blocks_entry_but_never_force_flattens (tests.test_adaptive_paper_corporate_actions.RebalanceCorporateActionGuardTests.test_calendar_failure_blocks_entry_but_never_force_flattens)\nERROR: test_0700_and_0755_owned_parent_directories_still_pass (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_0700_and_0755_owned_parent_directories_still_pass) (mode='0o700')\nsafety.SafetyError: credential_file_permissions:ancestor\nERROR: test_0700_and_0755_owned_parent_directories_still_pass (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_0700_and_0755_owned_parent_directories_still_pass) (mode='0o755')\nsafety.SafetyError: credential_file_permissions:ancestor\nERROR: test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_passing_case_outside_worktree_mode_0600_own_uid_returns_credentials)\nsafety.SafetyError: credential_file_permissions:ancestor\nERROR: test_symlink_to_a_valid_target_is_resolved_and_accepted (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_symlink_to_a_valid_target_is_resolved_and_accepted)\nsafety.SafetyError: credential_file_permissions:ancestor\nFAIL: test_final_summary_fails_closed_when_the_calendar_itself_cannot_classify_now (tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests.test_final_summary_fails_closed_when_the_calendar_itself_cannot_classify_now)\nAssertionError: evaluate() must never be reached once the calendar itself fails\nFAIL: test_non_ascii_content_is_rejected (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_non_ascii_content_is_rejected)\nsafety.SafetyError: credential_file_permissions:ancestor\nAssertionError: \"credential_file_permissions:encoding\" does not match \"credential_file_permissions:ancestor\"\nFAIL: test_oversized_file_is_rejected_not_silently_truncated_and_accepted (tests.test_adaptive_paper_runner.CredentialFilePermissions.test_oversized_file_is_rejected_not_silently_truncated_and_accepted)\nsafety.SafetyError: credential_file_permissions:ancestor\nAssertionError: \"credential_file_permissions:size\" does not match \"credential_file_permissions:ancestor\"\nRan 322 tests in 70.479s\nFAILED (failures=3, errors=5)"
+    },
+    {
+      "command": "$TMPDIR/t-cal-r1/engine-clean/bin/python -m unittest tests.test_adaptive_paper_sessions -v",
+      "exit": 0,
+      "classification": "local_integration",
+      "private_output_locator": "$TMPDIR/t-cal-r1/sessions-tests-final.log",
+      "output_sha256": "6d3ad28ab801d6e2c14d2776f7f6666dd276b80d1b8bc306cbf80856cca3d0c5",
+      "sanitized_output_excerpt": "Ran 145 tests in 8.705s\nOK"
+    },
+    {
+      "command": "$TMPDIR/t-cal-r1/engine-clean/bin/python -m unittest tests.test_adaptive_paper_sessions tests.test_adaptive_paper_corporate_actions tests.test_adaptive_paper_financing tests.test_adaptive_paper_native tests.test_adaptive_paper_runner.CorporateActionGuardRunnerWiringTests -v",
+      "exit": 0,
+      "classification": "local_integration",
+      "private_output_locator": "$TMPDIR/t-cal-r1/targeted-tests-final.log",
+      "output_sha256": "7f84a9a66938665579d80a1fcb34cd22c6b6402419bea28ae27383cb6c6baf18",
+      "sanitized_output_excerpt": "Ran 320 tests in 51.790s\nOK"
+    },
+    {
+      "command": "native unittest test_explicit_query_bounds_ignore_upstream_defaults with _xnys_calendar changed to get_calendar(\"XNYS\")",
+      "exit": 1,
+      "classification": "local_unit_fault_injection_expected_failure",
+      "private_output_locator": "$TMPDIR/t-cal-r1/default-bounds-negative-control.log",
+      "output_sha256": "8d82c36bcb1c702c1f42f3cde3bea13dda9bafaa33a674db7ee59f12fb226199",
+      "sanitized_output_excerpt": "ERROR: test_explicit_query_bounds_ignore_upstream_defaults (tests.test_adaptive_paper_sessions.SessionClockTests.test_explicit_query_bounds_ignore_upstream_defaults)\nTypeError: '>=' not supported between instances of 'NoneType' and 'NoneType'\nRan 1 test in 0.005s\nFAILED (errors=1)"
+    },
+    {
+      "command": "uv pip install --python $TMPDIR/t-cal-r1/ci-calendar/bin/python --require-hashes --only-binary :all: --index-url https://pypi.org/simple -r .github/requirements-ci.txt",
+      "exit": 0,
+      "classification": "local_integration",
+      "private_output_locator": "$TMPDIR/t-cal-r1/ci-install.log",
+      "output_sha256": "0560226dad6dd30d46c290468a55b687c9325db8973463c920fc2c595bee2048",
+      "sanitized_output_excerpt": " + pyluach==2.3.0\n + python-dateutil==2.9.0.post0\n + six==1.17.0\n + toolz==1.1.0\n + tzdata==2026.5\n + zizmor==1.30.1"
+    },
+    {
+      "command": "$TMPDIR/t-cal-r1/ci-calendar/bin/python -m unittest tests.test_adaptive_paper_sessions.SessionClockTests tests.test_workflow_hardening tests.test_catalog_freshness_pins -v",
+      "exit": 0,
+      "classification": "local_integration",
+      "private_output_locator": "$TMPDIR/t-cal-r1/ci-tests-final.log",
+      "output_sha256": "fb91eeeca366b2a04aa07eaa7ca54094e9e8fdebe614384d8f317a8d9add7fa3",
+      "sanitized_output_excerpt": "Ran 151 tests in 14.098s\nOK (skipped=2)"
+    }
+  ],
+  "limitations": [
+    "No unchanged upstream test suite, broker endpoint, live-host deployment or other platform was exercised.",
+    "A broader 322-test attempt has six unrelated credential-fixture failures because required TMPDIR traverses sandbox container ancestors owned by UID 65534. The unchanged guard rejects that ancestry. Two calendar-test issues from that attempt were corrected and the 320 affected tests pass.",
+    "Upstream initializes unused wall-clock defaults at import; explicit query bounds make results independent of them.",
+    "The two CI skips are no hash-frozen workflow exemptions and missing optional PyYAML.",
+    "Deployment of code and environment remains a separate operator action outside paper run windows."
+  ],
+  "requirements_input_sha256_at_baseline": "518afe4b77f901e87abd3a5d6faa126aa7e211db77eecec80cfe7ef42d82e07a",
+  "unchanged_policy_and_receipt_symbols": [
+    "validate_session_policy",
+    "order_extended_hours_flag",
+    "extended_session_close",
+    "reconciliation_receipt",
+    "boundary_receipt",
+    "must_end_flat"
+  ],
+  "final_import_probe": {
+    "exit": 0,
+    "returned_output_locator": "$TMPDIR/t-cal-r1/qualification-corrected.json",
+    "output_sha256": "80787f45c6f8fe850792f81f569e1a6ca8df781aab85d30839a91d446854f688",
+    "verified": [
+      "nautilus_trader",
+      "nautilus_trader.live.LiveNode",
+      "alpaca",
+      "alpaca.trading.client.TradingClient",
+      "exchange_calendars",
+      "all original distributions unchanged",
+      "five pinned source files match installed originals"
+    ]
+  }
+}
