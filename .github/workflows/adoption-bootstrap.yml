@@ -97,8 +97,8 @@ jobs:
           # so errexit is on unless disabled here. `set +e` turns it off: every
           # failure path below must still reach fail_safe instead of exiting
           # before writing an output, which is what left the three bootstrap-*
-          # jobs silently skipped (dispatch run 36085789483,
-          # "validate-macos required (2026-09-25)" below).
+          # jobs silently skipped (dispatch run 36085789483, recorded in
+          # docs/decisions/2026-09-22-github-automation-closure.md, "validate-macos required (2026-09-25)").
           set +e
           set -uo pipefail
           # The C locale keeps the module-name regex and `tr` ranges below ASCII-only.

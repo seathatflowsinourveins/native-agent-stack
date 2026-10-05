@@ -1,13 +1,16 @@
 # Decision: make macOS CI advisory (2026-10-05)
 
-**Status:** approved by the user at approximately 01:50 UTC on 2026-10-05;
-implemented by bounded builder job-064. The coordinator already removed
-`validate-macos` from live ruleset 23739774. Evidence registry updates remain
-with the coordinator.
+**Status:** the user chose the advisory option at **2026-10-05T01:41:33Z**.
+The coordinator then changed live ruleset 23739774 at **2026-10-05T01:42:03Z**,
+30 seconds later. [PR #711](https://github.com/seathatflowsinourveins/native-agent-stack/pull/711)
+followed with the workflow implementation by bounded builder job-064 and the
+coordinator's registry update.
 
-Asked how macOS should be handled now that the Mac is portable or remote-control
-only, the user answered: **"Advisory only (Recommended)"**. No pull request may
-wait on macOS.
+At 01:41:33Z, the user answered the AskUserQuestion
+**"How should macOS be handled, now that the Mac is portable or remote-control only?"**
+by choosing the option labelled **"Advisory only (Recommended)"**.
+"(Recommended)" is the asking agent's label for the option, not the user's
+words. No pull request may wait on macOS.
 
 **North-star action served:** keep foundation changes available for US-equities
 research and historical simulation while retaining macOS portability checks
@@ -42,14 +45,14 @@ push, schedule or dispatch runs. GitHub's [schedule event](https://docs.github.c
 runs the latest default-branch commit; the workflow must exist on that branch.
 Scheduled runs can be delayed or dropped under load, especially at the start
 of an hour. Registration of this schedule is structural evidence; hosted
-execution of the new policy follows after merge.
+nightly and main-push coverage follows after merge.
 
 The committed `.github/main-ruleset.json` matches the coordinator's seven
 required contexts: `validate`, `token-report`, `secret-scan`,
 `dependency-review`, `osv-scanner`, `verdict-review-gate` and `sota-sources`.
-A read-only GET of [ruleset 23739774](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774)
-confirmed those contexts, strict up-to-date checks off and squash-only merges;
-its returned update timestamp was 2026-10-05T01:42:03.690Z. The automation
+A coordinator read-back of [ruleset 23739774](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774)
+at **02:52Z** confirmed those seven contexts, **strict false** and
+**enforcement active**, following the 01:42:03Z change. The automation
 catalog gains `current_practice_20261005` and keeps its earlier dated snapshot.
 The merge guard's documented required-context count in `docs/lanes.md` changes
 from eight to seven; its existing count check fails before this correction and
@@ -62,8 +65,9 @@ This decision supersedes the **required** macOS check and its PR execution
 policy, including the two bootstrap jobs' PR gating, in
 [`2026-10-03-macos-ci-scope.md`](2026-10-03-macos-ci-scope.md), implemented by
 [#677](https://github.com/seathatflowsinourveins/native-agent-stack/pull/677).
-That record and `evidence/artifacts/macos-ci-scope-20261003/` remain unchanged.
-Their queue times, suite durations, classifications, replay results and stated
+That record gains a dated forward pointer; its measurements and
+`evidence/artifacts/macos-ci-scope-20261003/` are retained. Their queue times,
+suite durations, classifications, replay results and stated
 measurement limits remain historical evidence. This also replaces the older
 required-check policy cited from the 2026-09-25 automation closure.
 
@@ -96,29 +100,30 @@ when to compare those alternatives again.
 
 ## Acceptance and completeness
 
-The new PR-event test failed against the original workflow with one failure
-for each macOS job (exit 1), then passed after the job conditions changed
-(exit 0). With the final test's complete input matrix, restoring the original
-workflow from base `2875145812ebea1bb299ac15d1106261c679cca0` produced
-133 failing subtests (one test, exit 1). Restoring the new workflow byte for
-byte made that same final test pass (exit 0). The resumed job repeated this
-comparison with the original workflow supplied to the existing unittest test
-through a fixture override, preserving the working-tree workflow throughout;
-it again produced 133 failing subtests (exit 1), followed by a pass of the
-new workflow (exit 0). Separate controls rejected the original weekly cron and committed
-`validate-macos` requirement, then passed with the daily cron and seven
-contexts. A retained control evaluates the previous workflow's actual job
-condition against the advisory policy. These are local integration and
-synthetic checks using the existing unittest tests and expression oracle.
+[PR #711](https://github.com/seathatflowsinourveins/native-agent-stack/pull/711)
+reports **builder-run results**: the original workflow produced **133 failing
+subtests** in the PR-event control (exit 1), and the new workflow passed that
+control (exit 0). The builder's selected modules reported **388 tests OK,
+36 skipped**. These are local integration and synthetic checks using the
+existing unittest tests and expression oracle.
 
-The final local commands passed:
+[PR #711's adoption-bootstrap CI run](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37255957059)
+reports `validate-macos`, `bootstrap-macos` and `bootstrap-macos-brew` as
+skipped on the PR. Its
+[validation CI run](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37255957046)
+provides the separate hosted execution record; the 133 and 388 counts above
+are the builder-run results reported in the PR.
+
+The builder-run acceptance results for the submitted change were:
 
 | Command | Exit | Result |
 | --- | --- | --- |
+| Original workflow PR-event control | 1 | 133 failing subtests |
 | `python3 -m unittest tests.test_workflow_hardening` | 0 | 118 tests, 2 skipped |
 | `python3 -m unittest tests.test_adoption_bootstrap_macos` | 0 | 162 tests, 33 skipped |
 | `python3 -m unittest tests.test_github_automation_practice tests.test_codex_broker_reaper tests.test_shell_parser_ci` | 0 | 105 tests, 1 skipped |
-| `python3 -m unittest tests.test_merge_guard_doc` | 0 | 3 tests; stale count control failed with 1 failure, exit 1 |
+| `python3 -m unittest tests.test_merge_guard_doc` with the stale count (control) | 1 | 3 tests, 1 failure |
+| `python3 -m unittest tests.test_merge_guard_doc` with the corrected count (final) | 0 | 3 tests |
 | `git diff --check` | 0 | No whitespace errors |
 
 `command -v actionlint` returned exit 1, so the optional actionlint run is
@@ -130,17 +135,6 @@ only registry drift: SHA-256 and byte-count mismatches for changed registered
 files. The coordinator registers the changes; job-064
 does not edit `manifests/evidence.json`.
 
-Intermediate full-module failures are retained with the final result: an
-initial 16 failures came from applying the new execution-policy oracle to
-the historical selector; keeping its classification oracle fixed those.
-Two remaining assertions described the old summaries and were updated to
-assert advisory PR skips. The final 118-test run passed. Handoff reports in
-`.bounded-job-064/` retain the returned outputs with the worktree path
-sanitized as `<job-worktree>`.
-The first publication check flagged unsanitized worktree paths in five of
-those reports. Sanitizing the reports removed those findings; the subsequent
-check contained only the 14 expected registry mismatches.
-
 The completeness check covers all three adoption macOS jobs, PR exclusion, reachable
 main-push/nightly/dispatch runs, cancellation, the Linux detector, required
 contexts, the dated catalog snapshot and both maintained macOS guides. It
@@ -150,7 +144,7 @@ advisory coverage. `hardware-profile-smoke.yml:macos-profile` already sits
 outside the required contexts, and the merge guard reads only
 `gh pr checks --required`, so its existing PR smoke is advisory. That workflow
 has a separate owner and is unchanged. The
-remaining observation is the first hosted run after merge. Future reviews
+remaining observation is the first hosted nightly or main-push run after merge. Future reviews
 track the age of nightly failures against the seven-day overturn condition.
 
 ## SOTA sources

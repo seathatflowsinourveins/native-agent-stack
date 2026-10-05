@@ -231,7 +231,7 @@
       "version": "adoption-bootstrap.yml@2026-09-22",
       "source": ".github/workflows/adoption-bootstrap.yml",
       "command": "bash adoption/bootstrap-linux.sh --profile foundation-cpu (run inside the bootstrap-linux job on ubuntu-24.04)",
-      "selection": "New job bootstrap-linux (20-minute timeout) exercises adoption/bootstrap-linux.sh's real pinned-download/SHA-256-verify/isolated-prefix install path for the foundation-cpu profile from adoption/pins-linux-x86_64.json, on push to main, on pull requests touching adoption/** or blueprints/convergence-practice/wsl-native-tools/pins.json, weekly (Monday 06:47 UTC), and on manual dispatch.",
+      "selection": "bootstrap-linux (20-minute timeout) exercises adoption/bootstrap-linux.sh's real pinned-download/SHA-256-verify/isolated-prefix install path for the foundation-cpu profile from adoption/pins-linux-x86_64.json, on pushes to main matching adoption-bootstrap.yml's existing paths filter, on pull requests whose diff matches that filter through the changes job, nightly at 06:47 UTC, and on manual dispatch. Current scheduling follows docs/github-automation.md's 2026-10-05 scheduled portability and report-only lanes section.",
       "acceptance": "In-run scripts/adoption_status.py --profile foundation-cpu --json assertion that every required command is present, plus direct codex/claude/uv/node --version checks; workflow header records this as synthetic/local-integration evidence on a disposable runner, not a second-machine developer-laptop acceptance."
     },
     {

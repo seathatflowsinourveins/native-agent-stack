@@ -1481,22 +1481,23 @@ class AdoptionBootstrapMacosAdvisoryTests(unittest.TestCase):
             context = {"github.event_name": event, "cancelled()": False, "needs.changes.result": result,
                        "needs.changes.outputs.bootstrap": bootstrap, "needs.changes.outputs.macos": macos,
                        "needs.changes.outputs.macos_tests": modules}
-            with self.subTest(job=job_id, event=event, result=result, bootstrap=bootstrap, macos=macos,
-                              modules=modules):
-                self.assertEqual(expression_truthy(evaluate_expression(condition, context)),
-                                 event != "pull_request", "macOS must never run on a pull request")
+            # Raise directly so negative controls can exercise this helper with assertRaises.
+            self.assertEqual(expression_truthy(evaluate_expression(condition, context)),
+                             event != "pull_request", f"{job_id}: macOS event policy failed for {context}")
 
     def test_macos_jobs_skip_pull_requests_and_run_off_them(self):
         for job_id in ("validate-macos", "bootstrap-macos", "bootstrap-macos-brew"):
-            header = self.job_map[job_id].split("\n    steps:\n", 1)[0]
-            self.assertRegex(header, r"(?m)^    needs: changes$", job_id)
-            self.assert_macos_event_policy(block_if(header), job_id)
+            with self.subTest(job=job_id):
+                header = self.job_map[job_id].split("\n    steps:\n", 1)[0]
+                self.assertRegex(header, r"(?m)^    needs: changes$", job_id)
+                self.assert_macos_event_policy(block_if(header), job_id)
 
     def test_nightly_schedule_is_daily_off_the_hour_and_half_hour(self):
         trigger = self.text.split("\non:\n", 1)[1].split("\njobs:\n", 1)[0]
         schedule = trigger.split("\n  schedule:\n", 1)[1].split("\n  workflow_dispatch:", 1)[0]
         self.assertEqual(re.findall(r"(?m)^    - cron: '([^']+)'", schedule), ["47 6 * * *"])
         self.assertRegex(trigger, r"(?m)^  push:\n    branches: \[main\]$")
+        self.assertRegex(trigger, r"(?m)^  workflow_dispatch:\s*$")
 
     def test_bootstrap_linux_stays_path_gated_on_pull_request_and_still_runs_off_it(self):
         # Regression for "bootstrap jobs are skipped on push, schedule and dispatch"
@@ -1541,11 +1542,15 @@ class AdoptionBootstrapMacosAdvisoryTests(unittest.TestCase):
             self.assertRegex(pre_fix_condition, r"!cancelled\(\)|always\(\)")
         with self.assertRaises(AssertionError):
             self.assertIn("needs.changes.outputs.bootstrap != 'false'", pre_fix_condition)
-        _, condition, _ = self.validate_macos_gate()
-        without_status_function = condition.replace("!cancelled() && ", "")
-        self.assertNotEqual(without_status_function, condition, "the mutation applies")
-        with self.assertRaises(AssertionError):
-            self.assertRegex(without_status_function, r"!cancelled\(\)|always\(\)")
+        for job_id in ("validate-macos", "bootstrap-macos", "bootstrap-macos-brew"):
+            with self.subTest(job=job_id):
+                condition = block_if(self.job_map[job_id])
+                without_status_function = condition.replace("!cancelled() && ", "")
+                self.assertNotEqual(without_status_function, condition, "the mutation applies")
+                with self.assertRaises(AssertionError):
+                    self.assert_macos_event_policy(without_status_function, job_id)
+                with self.assertRaises(AssertionError):
+                    self.assert_macos_event_policy("${{ !cancelled() }}", job_id)
 
     def test_changes_job_runs_only_on_pull_request_and_diffs_paths_matching_push(self):
         job = self.job_map["changes"]

@@ -20,8 +20,10 @@ implementation records below remain dated observations.
 ## Current practice (2026-10-05)
 
 This section is the current practice. The dated sections below are history; where they differ, this section and the
-live settings win. The coordinator removed `validate-macos` from ruleset 23739774 on 2026-10-05;
-a read-only `gh api` GET confirmed the seven contexts below (updated 2026-10-05T01:42:03.690Z).
+live settings win. The user chose the advisory option at 2026-10-05T01:41:33Z;
+the coordinator removed `validate-macos` from live ruleset 23739774 at 2026-10-05T01:42:03Z, 30 seconds later.
+[PR #711](https://github.com/seathatflowsinourveins/native-agent-stack/pull/711) then proposed the workflow changes.
+The coordinator's read-back at 02:52Z confirmed the seven contexts below, strict false and enforcement active.
 The committed target [`.github/main-ruleset.json`](../.github/main-ruleset.json) carries the same contexts.
 
 - **Required checks** (job IDs from GitHub Actions, app ID 15368; strict up-to-date checks off): `validate`,
@@ -777,13 +779,14 @@ fails.
 `adoption-bootstrap.yml` is a separate, lower-stakes job
 (`bootstrap-linux`, 20-minute timeout, plain `ubuntu-24.04`, no elevated
 permissions) that runs `adoption/bootstrap-linux.sh --profile foundation-cpu`
-into `$RUNNER_TEMP/eco` on push to `main`, on pull requests touching
-`adoption/**` or `blueprints/convergence-practice/wsl-native-tools/pins.json`,
-weekly (Monday 06:47 UTC), and on manual dispatch, then asserts every
+into `$RUNNER_TEMP/eco` on pushes to `main` matching the workflow's existing paths filter,
+on pull requests whose diff matches that filter through the `changes` job,
+nightly at 06:47 UTC, and on manual dispatch, then asserts every
 `foundation-cpu` required command is present via
 `scripts/adoption_status.py --profile foundation-cpu --json`. Its workflow
 header records this as synthetic/local-integration evidence on a disposable
-runner, not a second-machine developer-laptop acceptance.
+runner, not a second-machine developer-laptop acceptance. The schedule and PR
+selection follow the [2026-10-05 section](#scheduled-portability-and-report-only-lanes-2026-10-05).
 
 ### Secret-scan coverage boundary (2026-09-22, updated 2026-09-23)
 
