@@ -997,7 +997,7 @@ def grade_run(root: Path) -> dict:
             gate_rows["G11"].append(bool(effort["requested_turn_context"]) and bool(effort["gateway_build"]) and effort["gateway_calls"] > 0)
         gate_rows["G13"].append(not record["coordination_reads"])
         gate_rows["G14"].append(all(u.get("tag") for u in uses))
-        if record["valid"]:
+        if record["valid"] and trial.get("lane") == cfg.get("lane", "organic-e2e") and task.get("kind") != "prompted":
             target = task.get("item")
             entry = per_item.setdefault((target, trial.get("cell")), {"n": 0, "used": 0, "arm": trial.get("arm")})
             entry["n"] += 1

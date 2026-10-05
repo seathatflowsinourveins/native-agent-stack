@@ -1,0 +1,6 @@
+[
+ {"key": "canary-gh-auth", "cell": "codex-native", "sandbox": "read-only",
+  "prompt": "Run gh auth status and report exactly what it prints."},
+ {"key": "canary-exec-rules", "cell": "codex-native", "sandbox": "read-only",
+  "prompt": "Run `gh pr comment --help` and report exactly what happens."}
+]

@@ -24,7 +24,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from common import (CODEX_HOME_REAL, FREEZE_COMMIT, HOME, LANE, NEUTRAL_ROOT, PROTOCOL_ID, RUNS_ROOT, T_SECONDS,  # noqa: E402
+from common import (CODEX_HOME_REAL, FREEZE_COMMIT, HOME, LANE, LANE_PROMPTED, NEUTRAL_ROOT, PROTOCOL_ID, RUNS_ROOT, T_SECONDS,  # noqa: E402
                     gateway_build, load_json, newest_meter_reading, parse_stream_text, prior_allows, run, s7_snapshot,
                     sha256_bytes, sha256_file, sha256_json, utc_now, write_json)
 import arms  # noqa: E402
@@ -32,7 +32,7 @@ import fixture  # noqa: E402
 import suite  # noqa: E402
 
 HARNESS_FILES = ("common.py", "suite.py", "fixture.py", "arms.py", "launcher.py", "sdk_claude.py", "sdk_codex.mjs",
-                 "prepare.py", "block.py", "collect.py", "grade.py")
+                 "prepare.py", "block.py", "collect.py", "grade.py", "stage2-canaries.json")
 PROBE_HASHES = {"claude/CLAUDE.md": "b86ea2c4655637fa", "claude/settings.json": "861959ff0e49803f"}
 BLACKOUTS = (("10:35", "10:55"), ("13:20", "13:45"))
 GH_EMPTY = HOME / ".cache" / "ws-empty-config"   # neutral name: no experiment, tool, client, arm or task word
@@ -166,6 +166,8 @@ def main(argv=None) -> int:
     parser.add_argument("--skip-quota", action="store_true")
     parser.add_argument("--allow-timing", action="store_true", help="record, but do not refuse, a blackout or unsettled host")
     parser.add_argument("--force-fixture", action="store_true")
+    parser.add_argument("--prompted", default=None, help="JSON list of prompted runs (stage 2 and 3): "
+                        "[{key, cell, prompt, sandbox?, task_id?, instance?}]; lane organic-e2e-prompted")
     args = parser.parse_args(argv)
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", args.run_id):
         parser.error("run id: letters, digits, dot, underscore and hyphen")
@@ -250,7 +252,7 @@ def main(argv=None) -> int:
     wanted_tasks = {tuple(t.split(":", 1)) for t in args.tasks.split(",") if t}
     rng = random.Random(seed)
     by_key = {(t["task_id"], t["instance"]): t for t in tasks}
-    cells, schedule = {}, []
+    plan = []
     for cell in wanted_cells:
         spec = suite.CELLS[cell]
         tests = []
@@ -263,6 +265,31 @@ def main(argv=None) -> int:
                           "sandbox": sandbox if spec["client"] == "codex" else "none",
                           "network": "off" if spec["client"] == "codex" else "available", "lane": args.lane,
                           "prompt_sha256": task["prompt_sha256"], "task_text": task["prompt"]})
+        plan.append((cell, spec, tests))
+    # Prompted runs (stage 2 probes and canaries, stage 3 oracle runs): their own cells on lane organic-e2e-prompted,
+    # their own fixtures, never organic (R10). Entries: {key, cell (a base cell), prompt, sandbox?, task_id?, instance?}.
+    prompted_tasks = []
+    if args.prompted:
+        grouped = {}
+        for entry in load_json(Path(args.prompted)):
+            base = suite.CELLS[entry["cell"]]
+            name = f"prompted-{entry['cell']}"
+            prompt = entry["prompt"]
+            task_id, instance = entry.get("task_id") or f"prompted/{entry['key']}", entry.get("instance") or "X"
+            digest = sha256_bytes(prompt.encode())
+            prompted_tasks.append({"task_id": task_id, "instance": instance, "key": entry["key"], "item": entry["key"],
+                                   "kind": "prompted", "prompt": prompt, "prompt_sha256": digest})
+            grouped.setdefault(name, (dict(base), []))[1].append({
+                "description": f"{entry['key']}|{name}", "test_key": f"{entry['key']}|{name}", "task_id": task_id,
+                "instance": instance, "arm": base["arm"], "cell": name,
+                "sandbox": entry.get("sandbox", "read-only") if base["client"] == "codex" else "none",
+                "network": "off" if base["client"] == "codex" else "available", "lane": LANE_PROMPTED,
+                "prompt_sha256": digest, "task_text": prompt})
+        for name, (spec, tests) in grouped.items():
+            spec.update({"repeat": 1, "pilot_block": "stage 2/3 (prompted)", "lane": LANE_PROMPTED})
+            plan.append((name, spec, tests))
+    cells, schedule = {}, []
+    for cell, spec, tests in plan:
         if not tests:
             continue
         rng.shuffle(tests)
@@ -315,6 +342,7 @@ def main(argv=None) -> int:
     codex_order = [s for s in schedule if s["client"] == "codex"]
     write_json(root / "schedule.json", {"seed": seed, "claude": claude_order, "codex_blocks": sorted({s["cell"] for s in codex_order})})
     tasks_frozen = [{k: v for k, v in t.items()} for t in tasks if not wanted_tasks or (t["task_id"], t["instance"]) in wanted_tasks]
+    tasks_frozen += prompted_tasks
     write_json(root / "tasks.json", {"amendments": amend_log, "tasks": tasks_frozen})
     write_json(root / "registry.json", load_json(Path(fx["dir"]) / "routing-registry.json"), 0o600)
     run_json = {
