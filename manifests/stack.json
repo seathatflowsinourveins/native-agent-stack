@@ -1538,7 +1538,8 @@
         "token-practice-coverage-20260920",
         "native-lifecycle-sample-20260920",
         "claude-repository-evidence-20260921",
-        "native-sec-edgartools-5600-20261004"
+        "native-sec-edgartools-5600-20261004",
+        "native-trading-runtime-2604-rerun-d02c0827-20261005"
       ],
       "profile": "supporting",
       "upstream_sources": [

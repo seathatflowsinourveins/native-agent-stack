@@ -134,7 +134,7 @@
           "component_id": "skills-ref",
           "repository": "https://github.com/agentskills/agentskills",
           "pin": "0.1.0",
-          "pin_source": "manifests/stack.json:1623",
+          "pin_source": "manifests/stack.json:1624",
           "install": {"command": "git clone https://github.com/agentskills/agentskills.git \"$STACK_HOME/tools/agentskills\"; git -C \"$STACK_HOME/tools/agentskills\" checkout --detach 69ef37e9424c0a7ea9dd2293b559e43ec8176379; cd \"$STACK_HOME/tools/agentskills/skills-ref\" && uv sync --locked", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "uv run skills-ref validate \"$SKILL_DIRECTORY\"", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/README.md"},
           "upstream_currency": {"latest_release": "no GitHub release; PyPI skills-ref 0.1.1 (2026-01-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://pypi.org/project/skills-ref/"}
@@ -356,7 +356,7 @@
           "component_id": "jcodemunch-mcp",
           "repository": "https://github.com/jgravelle/jcodemunch-mcp",
           "pin": "1.108.319",
-          "pin_source": "manifests/stack.json:1688",
+          "pin_source": "manifests/stack.json:1689",
           "install": {"command": "eco=\"${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}\"; UV_TOOL_DIR=\"$eco/python-tools\" UV_TOOL_BIN_DIR=\"$eco/bin\" uv tool install --python 3.13 jcodemunch-mcp==1.108.319", "kind": "repo_recipe", "source_path": "recipes/README.md"},
           "acceptance": {"command": "a deliberately scoped local code index, then search_symbols and get_symbol_source through jcodemunch-mcp's native MCP tools (called through mcporter): the exact requested function returned (2026-09-20)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/native-jcodemunch-20260920.json"},
           "upstream_currency": {"latest_release": "v1.108.320 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/jgravelle/jcodemunch-mcp/releases"}
@@ -423,7 +423,7 @@
           "component_id": "poppler",
           "repository": "https://github.com/tsdgeos/poppler_mirror",
           "pin": "26.09.0",
-          "pin_source": "manifests/stack.json:1821",
+          "pin_source": "manifests/stack.json:1822",
           "install": {"command": "", "kind": "none_recorded", "source_path": "blueprints/convergence-practice/document-ingestion/README.md"},
           "acceptance": {"command": "pdftotext -bbox-layout -enc UTF-8 on the frozen source list only", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/document-ingestion/README.md"},
           "upstream_currency": {"latest_release": "26.09.0 on the project's release page (the GitHub mirror lists no tags)", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://poppler.freedesktop.org/"}
@@ -517,7 +517,7 @@
           "name": "nvidia/Nemotron-3-Embed-1B-BF16 (embedding model)",
           "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
           "pin": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
-          "pin_source": "manifests/stack.json:2089",
+          "pin_source": "manifests/stack.json:2090",
           "install": {"command": "hf download nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 --local-dir \"${MODEL_DIRECTORY}\" --max-workers 2 --json", "kind": "repo_recipe", "source_path": "manifests/stack.json"},
           "acceptance": {"command": "an embeddings request to the vLLM service with the recipe's request body; the receipt records identical embeddings and identical top-10 code-index results after the switch to vLLM 0.30.0", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/vllm-030-switch-20260925.json"},
           "upstream_currency": {"latest_release": "model revision c0c9fea9 (last modified 2026-08-27) is the current head of the model repository", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16"}
@@ -625,7 +625,7 @@
           "component_id": "tavily-cli",
           "repository": "https://github.com/tavily-ai/tavily-cli",
           "pin": "0.1.8",
-          "pin_source": "manifests/stack.json:1929",
+          "pin_source": "manifests/stack.json:1930",
           "install": {"command": "uv tool install 'tavily-cli==0.1.8'", "kind": "repo_recipe", "source_path": "recipes/tavily.md"},
           "acceptance": {"command": "tvly search \"Codex CLI Claude Code native agent harness skills official documentation\" --depth basic --max-results 4 --include-domains developers.openai.com,code.claude.com --json", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/tavily.md"},
           "upstream_currency": {"latest_release": "no GitHub release; PyPI tavily-cli 0.1.8 (2026-09-02)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://pypi.org/project/tavily-cli/"}
@@ -801,7 +801,7 @@
           "component_id": "playwright-test",
           "repository": "https://github.com/microsoft/playwright",
           "pin": "1.63.0",
-          "pin_source": "manifests/stack.json:1869",
+          "pin_source": "manifests/stack.json:1870",
           "install": {"command": "the wsl-application blueprint's pinned lock with the measured pnpm, plus the verified Chrome for Testing archive extracted into tools/chrome-linux64", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/wsl-application/README.md"},
           "acceptance": {"command": "taskset -c 0-3 pnpm exec playwright test", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/wsl-application/README.md"},
           "upstream_currency": {"latest_release": "v1.63.0 (2026-09-04)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/microsoft/playwright/releases"}
@@ -866,7 +866,7 @@
           "component_id": "zizmor",
           "repository": "https://github.com/zizmorcore/zizmor",
           "pin": "1.30.1",
-          "pin_source": "manifests/stack.json:1576",
+          "pin_source": "manifests/stack.json:1577",
           "install": {"command": "uv tool install zizmor==1.30.1", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/ci-security/README.md"},
           "acceptance": {"command": "env -u GH_TOKEN -u GITHUB_TOKEN -u ZIZMOR_GITHUB_TOKEN zizmor --offline --no-config --no-ignores --no-progress --persona regular --strict-collection --format json --cache-dir \"$OWNED_CACHE\" \"$PROJECT_ROOT/.github/workflows\"", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/convergence-practice/ci-security/README.md"},
           "upstream_currency": {"latest_release": "v1.30.1 (2026-09-09)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/zizmorcore/zizmor/releases"}
@@ -1005,7 +1005,7 @@
           "component_id": "fastapi",
           "repository": "https://github.com/fastapi/fastapi",
           "pin": "0.141.1",
-          "pin_source": "manifests/stack.json:1772",
+          "pin_source": "manifests/stack.json:1773",
           "install": {"command": "make setup; make postgres-install; make postgres-init; make postgres-start", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "acceptance": {"command": "make verify", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "upstream_currency": {"latest_release": "0.142.2 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/fastapi/fastapi/releases"}
@@ -1014,7 +1014,7 @@
           "component_id": "nextjs",
           "repository": "https://github.com/vercel/next.js",
           "pin": "16.3.6",
-          "pin_source": "manifests/stack.json:1726",
+          "pin_source": "manifests/stack.json:1727",
           "install": {"command": "make setup", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "acceptance": {"command": "make verify", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "upstream_currency": {"latest_release": "v16.3.8 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/vercel/next.js/releases"}
@@ -1023,7 +1023,7 @@
           "component_id": "postgresql",
           "repository": "https://github.com/postgres/postgres",
           "pin": "18.6",
-          "pin_source": "manifests/stack.json:1794",
+          "pin_source": "manifests/stack.json:1795",
           "install": {"command": "make postgres-install; make postgres-init; make postgres-start", "kind": "repo_recipe", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "acceptance": {"command": "make verify", "evidence_class": "local_integration_check", "source_path": "blueprints/convergence-practice/application-delivery/README.md"},
           "upstream_currency": {"latest_release": "18.6 is the current 18.x release on the project's versioning page (the GitHub mirror publishes tags only)", "checked_at": "2026-10-01T07:43Z", "pin_is_latest": "yes", "url": "https://www.postgresql.org/support/versioning/"}
@@ -1205,7 +1205,7 @@
           "name": "openai-codex Python SDK with openai-codex-cli-bin",
           "repository": "https://github.com/openai/codex",
           "pin": "openai-codex==0.154.0",
-          "pin_source": "adoption/sdk/accepted-constraints.txt:19-20",
+          "pin_source": "adoption/sdk/accepted-constraints.txt:22-23",
           "install": {"command": "uv venv --python \"$PYTHON_BIN\" --no-python-downloads \"$SDK_ENV\"; uv pip sync --python \"$SDK_ENV/bin/python\" --require-hashes --no-build --strict --default-index https://pypi.org/simple --no-sources adoption/sdk/requirements-linux-x86_64-py313.lock", "kind": "repo_recipe", "source_path": "adoption/sdk/README.md"},
           "acceptance": {"command": "uv pip check --python \"$SDK_ENV/bin/python\"; \"$SDK_ENV/bin/python\" -m unittest discover -s tests -v", "evidence_class": "local_integration_check", "source_path": "adoption/sdk/README.md"},
           "upstream_currency": {"latest_release": "PyPI openai-codex 0.159.3 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://pypi.org/project/openai-codex/"}
@@ -1421,7 +1421,7 @@
           "component_id": "alpaca-py",
           "repository": "https://github.com/alpacahq/alpaca-py",
           "pin": "0.44.0",
-          "pin_source": "catalogs/us-equities/runtime-target.json:99",
+          "pin_source": "catalogs/us-equities/runtime-target.json:158",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the research-runtime profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
           "acceptance": {"command": "the September 20 run of installed alpaca-py 0.44.0: five authenticated GET requests, all returned HTTP 200", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/authenticated-data/README.md"},
           "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
@@ -1439,7 +1439,7 @@
           "component_id": "exchange-calendars",
           "repository": "https://github.com/gerrymanoim/exchange_calendars",
           "pin": "4.13.2",
-          "pin_source": "manifests/stack.json:1555",
+          "pin_source": "manifests/stack.json:1556",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json --calendar XNYS", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "4.13.2 (2026-03-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gerrymanoim/exchange_calendars/releases"}
@@ -1498,7 +1498,7 @@
           "component_id": "alpaca-py",
           "repository": "https://github.com/alpacahq/alpaca-py",
           "pin": "0.44.0",
-          "pin_source": "catalogs/us-equities/runtime-target.json:99",
+          "pin_source": "catalogs/us-equities/runtime-target.json:158",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the research-runtime profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
           "acceptance": {"command": "the September 20 run of installed alpaca-py 0.44.0: five authenticated GET requests, all returned HTTP 200", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/authenticated-data/README.md"},
           "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
@@ -1525,7 +1525,7 @@
           "component_id": "exchange-calendars",
           "repository": "https://github.com/gerrymanoim/exchange_calendars",
           "pin": "4.13.2",
-          "pin_source": "manifests/stack.json:1555",
+          "pin_source": "manifests/stack.json:1556",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json --calendar XNYS", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "4.13.2 (2026-03-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gerrymanoim/exchange_calendars/releases"}
@@ -1593,7 +1593,7 @@
           "component_id": "alpaca-py",
           "repository": "https://github.com/alpacahq/alpaca-py",
           "pin": "0.44.0",
-          "pin_source": "catalogs/us-equities/runtime-target.json:99",
+          "pin_source": "catalogs/us-equities/runtime-target.json:158",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the research-runtime profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
           "acceptance": {"command": "the September 20 run of installed alpaca-py 0.44.0: five authenticated GET requests, all returned HTTP 200", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/authenticated-data/README.md"},
           "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
@@ -1611,7 +1611,7 @@
           "component_id": "exchange-calendars",
           "repository": "https://github.com/gerrymanoim/exchange_calendars",
           "pin": "4.13.2",
-          "pin_source": "manifests/stack.json:1555",
+          "pin_source": "manifests/stack.json:1556",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" pandera==0.33.1 pandas exchange_calendars==4.13.2 pyarrow duckdb==1.5.5", "kind": "repo_recipe", "source_path": "blueprints/us-equities/data/README.md"},
           "acceptance": {"command": "\"$GATE_TOOL_DIR/.venv/bin/python3\" promotion_gate.py --input snapshot.parquet --out gate-result.json --calendar XNYS", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/data/README.md"},
           "upstream_currency": {"latest_release": "4.13.2 (2026-03-10)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/gerrymanoim/exchange_calendars/releases"}
@@ -1849,7 +1849,7 @@
           "role": "selected destination engine",
           "repository": "https://github.com/nautechsystems/nautilus_trader",
           "pin": "2.0.0rc5",
-          "pin_source": "catalogs/us-equities/runtime-target.json:26",
+          "pin_source": "catalogs/us-equities/runtime-target.json:32",
           "install": {"command": "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --index-url https://pypi.org/simple --pre nautilus_trader==2.0.0rc5 numpy==2.5.3 pandas==3.0.6", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine-nautilus/README.md"},
           "acceptance": {"command": "the one_zero SPY parity replay of NautilusTrader 2.0.0rc5 against the frozen LEAN oracle: verdict PASS, complete, 0 of 136 checks failed, the engine version check expecting and observing 2.0.0rc5", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/engine-nautilus/spy-parity/verdict-v2.json"},
           "upstream_currency": {"latest_release": "v2.0.0rc5 (pre-release, 2026-09-15) is the newest release; the latest stable is v1.231.0 (2026-08-02)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/nautechsystems/nautilus_trader/releases"}
@@ -1869,7 +1869,7 @@
           "role": "separate Alpaca path",
           "repository": "https://github.com/alpacahq/alpaca-py",
           "pin": "0.44.0",
-          "pin_source": "catalogs/us-equities/runtime-target.json:99",
+          "pin_source": "catalogs/us-equities/runtime-target.json:158",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the trading-nautilus profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
           "acceptance": {"command": "the 2026-09-29 pre-market Alpaca paper series through the adaptive-paper engine (alpaca-py 0.44.0 LimitOrderRequest orders, engine b528bb55): 3 of 3 attempts passed, 9 entries and 9 exits filled, every fill matched to the broker, flat at the series end", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/adaptive-paper/trials/pre-20260929/receipt.json"},
           "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
@@ -1924,7 +1924,7 @@
           "role": "selected IBKR path; local broker acceptance not established",
           "repository": "https://github.com/nautechsystems/nautilus_trader",
           "pin": "2.0.0rc5",
-          "pin_source": "catalogs/us-equities/runtime-target.json:26",
+          "pin_source": "catalogs/us-equities/runtime-target.json:32",
           "install": {"command": "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --index-url https://pypi.org/simple --pre nautilus_trader==2.0.0rc5 numpy==2.5.3 pandas==3.0.6", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine-nautilus/README.md"},
           "acceptance": {"command": "IBKR acceptance plan section 5 step 1 (read-only, execution disabled) against a signed-in paper IB Gateway: the official ibapi client probe and the NautilusTrader 2.0.0rc5 native adapter probe both returned passed (2026-09-23); steps 2 to 4 are not run", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/ibkr-readonly-acceptance-20260923.json"},
           "upstream_currency": {"latest_release": "v2.0.0rc5 (pre-release, 2026-09-15) is the newest release; the latest stable is v1.231.0 (2026-08-02)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/nautechsystems/nautilus_trader/releases"}
@@ -1934,7 +1934,7 @@
           "role": "Alpaca broker boundary",
           "repository": "https://github.com/alpacahq/alpaca-py",
           "pin": "0.44.0",
-          "pin_source": "catalogs/us-equities/runtime-target.json:99",
+          "pin_source": "catalogs/us-equities/runtime-target.json:158",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the trading-nautilus profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
           "acceptance": {"command": "bounded Alpaca paper roundtrips through the adaptive-paper engine in the 2026-09-29 pre-market series (engine b528bb55, alpaca-py 0.44.0): 3 of 3 attempts passed, every fill matched to the broker, flat at the series end", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/adaptive-paper/trials/pre-20260929/receipt.json"},
           "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
@@ -2009,7 +2009,7 @@
           "role": "engine of record for risk limits",
           "repository": "https://github.com/nautechsystems/nautilus_trader",
           "pin": "2.0.0rc5",
-          "pin_source": "catalogs/us-equities/runtime-target.json:26",
+          "pin_source": "catalogs/us-equities/runtime-target.json:32",
           "install": {"command": "uv pip install --python \"$NAUTILUS_ENV/bin/python\" --index-url https://pypi.org/simple --pre nautilus_trader==2.0.0rc5 numpy==2.5.3 pandas==3.0.6", "kind": "repo_recipe", "source_path": "blueprints/us-equities/engine-nautilus/README.md"},
           "acceptance": {"command": "a NautilusTrader 2.0.0rc5 backtest that fed the skfolio fold weights through RiskEngine limits (45,000 USD notional per order, 4 orders per second): the oversized and burst orders were denied with their reasons, the control arm filled them, and positions and cash reconciled in both arms (2026-09-23)", "evidence_class": "local_integration_check", "source_path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/6-nautilus-riskengine-denial.json"},
           "upstream_currency": {"latest_release": "v2.0.0rc5 (pre-release, 2026-09-15) is the newest release; the latest stable is v1.231.0 (2026-08-02)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/nautechsystems/nautilus_trader/releases"}
@@ -2029,7 +2029,7 @@
           "role": "Alpaca boundary",
           "repository": "https://github.com/alpacahq/alpaca-py",
           "pin": "0.44.0",
-          "pin_source": "catalogs/us-equities/runtime-target.json:99",
+          "pin_source": "catalogs/us-equities/runtime-target.json:158",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the trading-nautilus profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
           "acceptance": {"command": "the 2026-09-29 pre-market Alpaca paper series through the adaptive-paper engine (alpaca-py 0.44.0 LimitOrderRequest orders, engine b528bb55): 3 of 3 attempts passed, 9 entries and 9 exits filled, every fill matched to the broker, flat at the series end", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/adaptive-paper/trials/pre-20260929/receipt.json"},
           "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
@@ -2515,7 +2515,7 @@
           "name": "Ubuntu 24.04.5 LTS WSL image (Canonical)",
           "repository": "https://releases.ubuntu.com/24.04.5/",
           "pin": "sha256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e",
-          "pin_source": "adoption/platforms/linux-wsl2-new-distro.md:295",
+          "pin_source": "adoption/platforms/linux-wsl2-new-distro.md:105",
           "install": {"command": "The recipe, rehearsal first: R1 runs the page once on a throwaway name and removes it; P1 to P3 in the workstation distribution verify the signed checksums, the user-data schema and the storage-error baseline; then stage 1 on the Windows host (W1 to W7): verify the image hash against both publications, render the cloud-init user data, `wsl.exe --install --from-file` with `--no-launch`, the first launch with standard input at end of file, one terminate and the file-ownership probe", "kind": "repo_recipe", "source_path": "adoption/platforms/linux-wsl2-new-distro.md"},
           "acceptance": {"command": "W5 and F1 to F3 of the recipe: the first launch exits 0 as the cloud-init user, `systemctl is-system-running --wait` prints running, linger is enabled and the user bus is a socket owned by the user", "evidence_class": "none_recorded", "source_path": "adoption/platforms/linux-wsl2-new-distro.md"},
           "upstream_currency": {"latest_release": "Ubuntu 26.04.1 LTS is the newer LTS; it is queued as a bounded comparison before any switch", "checked_at": "2026-10-01", "pin_is_latest": "no", "url": "https://releases.ubuntu.com/"}
@@ -2629,7 +2629,7 @@
           "component_id": "omniroute",
           "repository": "https://github.com/diegosouzapw/OmniRoute",
           "pin": "3.8.52-canary (23a11484 + PR13788 + PR15167)",
-          "pin_source": "manifests/stack.json:1890",
+          "pin_source": "manifests/stack.json:1891",
           "install": {
             "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only gpt-gateway",
             "kind": "repo_recipe",

@@ -1,64 +1,182 @@
-"""Architecture citations identify current pin fields, independent of edition drift.
+"""Architecture citations identify named pin fields, independent of edition drift.
 
-The component walk follows the coordinator's fix_pin_source.py reference.
-Unlike build_ecosystem.py's path/bounds check, this checks the named record.
+Reuse scripts/build_ecosystem.py's locator validation (native-agent-stack at
+95cf94ca4); check the cited content against the winner's identity as well.
 """
 
 import json
 from pathlib import Path
 import re
+import tempfile
 import unittest
+
+from scripts.build_ecosystem import architecture_pin_source
 
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = "catalogs/foundation/new-wsl-architecture-20261001.json"
 
 
-class ArchitecturePinSourceTests(unittest.TestCase):
-    def test_stack_citations_point_to_the_named_component_pin(self):
-        stack_text = (ROOT / "manifests/stack.json").read_text(encoding="utf-8")
-        stack = json.loads(stack_text)
-        lines = stack_text.splitlines()
-        pin_lines = {}
-        for collection, field in (("components", "version"), ("models", "revision")):
-            for record in stack[collection]:
-                if field not in record:
-                    continue
-                identity = re.compile(r'(\s*)"id":\s*' + re.escape(json.dumps(record["id"])) + r",?")
-                starts = [(index, identity.fullmatch(line)) for index, line in enumerate(lines)
-                          if identity.fullmatch(line)]
-                self.assertEqual(len(starts), 1, record["id"])
-                start, match = starts[0]
-                indent = match[1]
-                end = next((index for index in range(start + 1, len(lines))
-                            if lines[index].strip() and not lines[index].startswith(indent)), len(lines))
-                fields = [index for index in range(start + 1, end)
-                          if lines[index].startswith(indent + json.dumps(field) + ":")]
-                self.assertEqual(len(fields), 1, (record["id"], field))
-                index = fields[0]
-                value = json.loads("{" + lines[index].strip().rstrip(",") + "}")[field]
-                self.assertEqual(value, record[field], record["id"])
-                pin_lines[record["id"]] = index + 1
+def record_fields(lines, identity_key, identity_value):
+    """Scalar sibling fields of each named JSON record, with one-based lines."""
+    identity = re.compile(r'(\s*)' + re.escape(json.dumps(identity_key)) + r':\s*'
+                          + re.escape(json.dumps(identity_value)) + r",?")
+    for start, line in enumerate(lines):
+        match = identity.fullmatch(line)
+        if match is None:
+            continue
+        indent = match[1]
+        first = start
+        while first > 0 and lines[first - 1].startswith(indent):
+            first -= 1
+        end = start + 1
+        while end < len(lines) and lines[end].startswith(indent):
+            end += 1
+        fields = {}
+        for index in range(first, end):
+            if not re.match(re.escape(indent) + r'"[^"\\]+":', lines[index]):
+                continue
+            try:
+                value = json.loads("{" + lines[index].strip().rstrip(",") + "}")
+            except json.JSONDecodeError:
+                continue  # A multiline object or array is not a pin field.
+            key, value = next(iter(value.items()))
+            fields[key] = (index + 1, value)
+        yield fields
 
+
+def expected_ranges(root, path, winner):
+    """Resolve the named source contract without consulting its stored locator."""
+    lines = (root / path).read_text(encoding="utf-8").splitlines()
+    repository = winner["repository"]
+    source_repo = repository.removeprefix("https://github.com/")
+    pin = winner["pin"]
+    if path == "manifests/stack.json":
+        stack = json.loads("\n".join(lines))
+        component = winner.get("component_id")
+        field = "version"
+        records = stack["components"]
+        if component is None:
+            records = [model for model in stack["models"]
+                       if repository == "https://huggingface.co/" + model["id"]]
+            if len(records) != 1:
+                raise AssertionError(f"unknown model: {repository}")
+            component, field = records[0]["id"], "revision"
+        record = next(record for record in records if record["id"] == component)
+        fields, = record_fields(lines, "id", component)
+        if fields[field][1] != record[field]:
+            raise AssertionError(f"wrong pin field: {component}")
+        return {(fields[field][0], fields[field][0])}
+    if path == "adoption/sdk/accepted-constraints.txt":
+        package = pin.split("==", 1)[0]
+        packages = (package, package + "-cli-bin")
+        entries = []
+        for name in packages:
+            matches = [(index + 1, line.split("==", 1)[1])
+                       for index, line in enumerate(lines) if line.startswith(name + "==")]
+            entry, = matches
+            entries.append(entry)
+        if entries[0][1] != entries[1][1]:
+            raise AssertionError("SDK and bundled CLI constraints must be paired")
+        return {(entries[0][0], entries[1][0])}
+    if path == "adoption/platforms/linux-wsl2-new-distro.md":
+        digest = pin.removeprefix("sha256 ")
+        release = repository.rstrip("/").rsplit("/", 1)[1]
+        return {(index + 1, index + 1) for index, line in enumerate(lines)
+                if digest in line and f"ubuntu-{release}-wsl-amd64.wsl" in line}
+    if path in {CATALOG, "evidence/receipts/guard-k4-verification-20261001.json"}:
+        key = "base_commit" if path == CATALOG else "guard_sha256"
+        return {(fields[key][0], fields[key][0]) for fields in record_fields(lines, key, pin)}
+
+    if path == "adoption/skills/manifest.json":
+        identity, value, keys = "source", source_repo, ("ref",)
+    elif path == "blueprints/runtime-workers/openhands/pins.json":
+        identity, value, keys = "repository", repository, ("tag",)
+    elif path == "adoption/pins-linux-x86_64.json":
+        slug = source_repo.rsplit("/", 1)[1]
+        identity, value, keys = "id", {"cli": "gh"}.get(slug, slug), ("version",)
+    elif path == "catalogs/foundation/automation.json":
+        identity, value = "repository", source_repo
+        keys = ("version", "revision") if " @ " in pin else ("version", "archive_sha256")
+    elif path == "catalogs/landscape/us-equities.json":
+        identity, value, keys = "repository", repository, ("pin",)
+    elif path == "catalogs/us-equities/runtime-target.json":
+        if winner["component_id"] == "nautilus-trader":
+            identity, value, keys = "repository", repository, ("requested_version",)
+        elif winner["component_id"] == "alpaca-py":
+            identity, value, keys = "id", "alpaca", ("selected_path",)
+        else:
+            raise AssertionError(f"unknown runtime component: {winner['component_id']}")
+    else:
+        raise AssertionError(f"uncovered pin_source file: {path}")
+
+    ranges = set()
+    for fields in record_fields(lines, identity, value):
+        if not all(key in fields for key in keys):
+            continue
+        if keys == ("pin",):
+            version = re.search(r"v?\d+(?:\.\d+)+(?:rc\d+)?", pin)[0].removeprefix("v")
+            if not re.search(r"(?<![\d.])" + re.escape(version) + r"(?![\d.])", fields["pin"][1]):
+                continue
+            ranges.add((fields["component_id"][0], fields["why_selected"][0]))
+        else:
+            values = [str(fields[key][1]) for key in keys]
+            if keys == ("selected_path",):
+                if winner["component_id"] + pin not in values[0]:
+                    continue
+            elif not all(value in pin for value in values):
+                continue
+            indices = [fields[key][0] for key in keys]
+            if path == "catalogs/foundation/automation.json":
+                indices.append(fields["repository"][0])
+            ranges.add((min(indices), max(indices)))
+            if "archive_sha256" in keys and fields["source"][1].startswith(
+                    f"{repository}/releases/download/v{fields['version'][1]}/"):
+                ranges.add((min(indices), fields["source"][0]))
+    return ranges
+
+
+class ArchitecturePinSourceTests(unittest.TestCase):
+    def test_all_line_citations_identify_the_winners_pin_fields(self):
         catalog = json.loads((ROOT / CATALOG).read_text(encoding="utf-8"))
+        cells = [winner for row in catalog["rows"] for winner in row["winners"]]
+        line_cells = sum(bool(re.search(r":\d+(?:-\d+)?$", winner["pin_source"])) for winner in cells)
         checked = 0
         for row in catalog["rows"]:
             for winner in row["winners"]:
-                source = winner["pin_source"]
-                if not source.startswith("manifests/stack.json:"):
+                citation = architecture_pin_source(winner["pin_source"], ROOT,
+                                                    lambda path: {"path": path, "url": path})
+                anchor = citation["url"].partition("#L")[2]
+                if not anchor:
                     continue
-                component = winner.get("component_id")
-                if component is None:
-                    models = [model["id"] for model in stack["models"]
-                              if winner.get("repository") == "https://huggingface.co/" + model["id"]]
-                    self.assertEqual(len(models), 1, winner.get("name"))
-                    component = models[0]
-                with self.subTest(row=row["layer_id"], component=component):
-                    self.assertIn(component, pin_lines)
-                    self.assertEqual(source, f"manifests/stack.json:{pin_lines[component]}",
-                                     "citation must identify the named component's version or model revision")
+                first, _, last = anchor.partition("-L")
+                actual = (int(first), int(last or first))
+                with self.subTest(row=row["layer_id"], component=winner.get("component_id", winner.get("name"))):
+                    expected = expected_ranges(ROOT, citation["path"], winner)
+                    self.assertTrue(expected, "no pin field matches the winner's identity and pin")
+                    self.assertIn(actual, expected,
+                                  f"{winner['pin_source']} must identify the named pin fields")
                 checked += 1
-        self.assertGreater(checked, 0, "the architecture must exercise stack citations")
+        self.assertGreater(line_cells, 0, "the architecture must exercise line citations")
+        self.assertEqual(checked, line_cells, "every line-bearing pin_source must be checked")
+
+    def test_delimiter_and_another_components_identical_version_are_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / "manifests").mkdir()
+            text = json.dumps({"components": [{"id": "target", "version": "1.0"},
+                                               {"id": "other", "version": "1.0"}],
+                               "models": []}, indent=2)
+            (root / "manifests/stack.json").write_text(text, encoding="utf-8")
+            winner = {"component_id": "target", "repository": "https://github.com/example/target",
+                      "pin": "1.0"}
+            ranges = expected_ranges(root, "manifests/stack.json", winner)
+            other, = record_fields(text.splitlines(), "id", "other")
+            wrong_line = other["version"][0]
+            delimiter = next(index + 1 for index, line in enumerate(text.splitlines())
+                             if line.strip() == "},")
+            self.assertNotIn((wrong_line, wrong_line), ranges)
+            self.assertNotIn((delimiter, delimiter), ranges)
 
 
 if __name__ == "__main__":

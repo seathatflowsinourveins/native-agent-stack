@@ -4268,7 +4268,8 @@
         "This worker could not execute the prescribed mise route (exit 127: Linux mise unavailable). Resolution and lock validation used the installed native uv 0.12.17 with identical settings; verification through mise remains pending."
       ],
       "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json",
-      "superseded_note_20261005": "2026-10-05: The EdgarTools 5.60.0 move, supported by native SEC acceptance native-sec-edgartools-5600-20261004, supersedes the historical sentence that the 5.59.1 overturn comparison remains open and delivered EdgarTools stays at catalog 5.58.0. NativeStack2604 installation PASS and 25/25 offline acceptance on the final 5.60.0 lock are recorded in native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json), at d02c0827 on lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z, with the install script's shared sync under mise exec uv@0.12.17: uv lock --check, uv sync --locked --no-dev and uv pip check, as blueprints/us-equities/runtime-2604/sync-trading-2604.sh:14 shows. Both relocks used the installed native uv 0.12.17 executable on the packaging worker, with mise unavailable: the EdgarTools upgrade (uv lock --upgrade-package edgartools) produced lock 6b4e6a4d, as recorded in evidence/artifacts/edgartools-5600-20261004/runtime-lock-change.json; the round-c build-constraint relock produced final lock 4c98672d14147a1b, as recorded in evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json. Neither relock ran through mise. This supersedes the earlier pending notes for the rerun and destination-host install sync; independent review remains pending. The recorded 2026-10-04 measurements, limitations and 5.58.0 runtime remain historical."
+      "superseded_note_20261005": "2026-10-05: The EdgarTools 5.60.0 move, supported by native SEC acceptance native-sec-edgartools-5600-20261004, supersedes the historical sentence that the 5.59.1 overturn comparison remains open and delivered EdgarTools stays at catalog 5.58.0. NativeStack2604 installation PASS and 25/25 offline acceptance on the final 5.60.0 lock are recorded in native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json), at d02c0827 on lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z, with the install script's shared sync under mise exec uv@0.12.17: uv lock --check, uv sync --locked --no-dev and uv pip check, as blueprints/us-equities/runtime-2604/sync-trading-2604.sh:14 shows. Both relocks used the installed native uv 0.12.17 executable on the packaging worker, with mise unavailable: the EdgarTools upgrade (uv lock --upgrade-package edgartools) produced lock 6b4e6a4d, as recorded in evidence/artifacts/edgartools-5600-20261004/runtime-lock-change.json; the round-c build-constraint relock produced final lock 4c98672d14147a1b, as recorded in evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json. Neither relock ran through mise. This supersedes the earlier pending notes for the rerun and destination-host install sync; independent review remains pending. The recorded 2026-10-04 measurements, limitations and 5.58.0 runtime remain historical.",
+      "pin_classification_correction_20261005": "2026-10-05: Correction to the 2026-10-04 pin-site classification relayed by this receipt: five sites previously labelled dated historical snapshot / keep_history are live selection mirrors that moved to 5.60.0 in pinsrc-b (95cf94ca4). The sites are saturation-audit.json:3209 (version), and upstream-snapshot.json:3496 (selected_version), :3539 (latest_stable_release/tag_name), :3541 (latest_stable_release/html_url) and :3553 (latest_release_source/ref); these line numbers are at the inventory base 29da752f5. The explicit classification_corrections_20261005 in evidence/artifacts/edgartools-5600-20261004/pin-site-classification.json supersede those five classifications while retaining the original records. upstream-snapshot.json:3524 is the dated v5.58.0 check endpoint and stays historical. Verification: inspect the EdgarTools rows at 95cf94ca4 and run python3 -m unittest tests.test_edgartools_pin_move."
     },
     {
       "id": "native-trading-runtime-2604-rerun-d02c0827-20261005",
@@ -15719,8 +15720,8 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "7e2b0704aa0b2cd7e50058c7e7976048f8f4283005fa43de5fdd6baa17a1e867",
-      "bytes": 309377
+      "sha256": "4092343d955ef39c8dd04339e5c524fb238549edb5f1d0640d3d7c45495e3ff6",
+      "bytes": 309383
     },
     {
       "path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
@@ -16894,8 +16895,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "7eb7c0d5e11593408c7cae68800042e03e0613b864777f4cdc3e56a7937dae59",
-      "bytes": 189059
+      "sha256": "c170237d3c20ceaa3fdd4c53805c9d78838cf1d8abca7a4974d02c16821930a2",
+      "bytes": 191280
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -18869,8 +18870,8 @@
     },
     {
       "path": "evidence/artifacts/edgartools-5600-20261004/pin-site-classification.json",
-      "sha256": "b063f472873e545e0b674b233c10a6b7baf8121650c5700a96f3547c38f219ca",
-      "bytes": 104645
+      "sha256": "519ac56085d56d1913273c33316e3818ac5642eb26fedd5dcd20fa118853cf33",
+      "bytes": 106957
     },
     {
       "path": "evidence/artifacts/edgartools-5600-20261004/release-evidence.json",
@@ -51469,8 +51470,8 @@
     },
     {
       "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json",
-      "sha256": "0159acfe8ce7b1e07f3f67504101cca4d9b692f961123d8e6b64c48ad405684e",
-      "bytes": 7026
+      "sha256": "ce425342337df74c77d2807ac544e43c4a3e5c2a4e4e105dc7a8b23b7b53937b",
+      "bytes": 7987
     },
     {
       "path": "evidence/receipts/env-freshness-wsl-ubuntu-main-20260924.json",
@@ -52624,8 +52625,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "619782534f606cef54be1aca3edaa359c0fd17645e88242416a3208bd22fc48e",
-      "bytes": 102926
+      "sha256": "a6d92915eaf5802c6ef696891373ef7497eeb1101f0656fce82596f2895512fc",
+      "bytes": 102989
     },
     {
       "path": "observability/README.md",
@@ -53474,8 +53475,8 @@
     },
     {
       "path": "tests/test_architecture_pin_source.py",
-      "sha256": "94214e3a06434c71bfc626ba31c6251ba0a9e2067c760609e17e4e87086ff72e",
-      "bytes": 3168
+      "sha256": "b5d628e8ee19a0fd9295b0b1269fe9f3e427223285c4a31a80e77c20e13f35c2",
+      "bytes": 9148
     },
     {
       "path": "tests/test_blind_layer_decisions.py",
@@ -53656,6 +53657,11 @@
       "path": "tests/test_ecosystem_manifest.py",
       "sha256": "d1990f63256a86d69eaa154217aba92548905ff0bafc61e574465425e9ba62bb",
       "bytes": 137485
+    },
+    {
+      "path": "tests/test_edgartools_pin_move.py",
+      "sha256": "7144a07b35ee807d363d7cf8e25c8e95d873d8635fcbffa3380f30524ba4a990",
+      "bytes": 4190
     },
     {
       "path": "tests/test_effort_default_guard.py",
