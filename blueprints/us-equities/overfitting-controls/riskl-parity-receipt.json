@@ -1,0 +1,187 @@
+{
+  "date": "2026-10-05",
+  "round": "t-parity-r1",
+  "lane": "trading",
+  "repository_base": "f946c6d4ca988a17b6fa4392ecb488909f147883",
+  "evidence_scope": "Optional synthetic parity; no change to controls, frozen protocols, strategy gates or market qualification.",
+  "upstream": {
+    "repository": "https://github.com/RiskLabAI/RiskLabAI.py",
+    "revision": "7d5aa11271c70d83a7069d5900d80bb08b29e481",
+    "installed_distribution": "RiskLabAI",
+    "installed_version": "3.2.0",
+    "wheel": "risklabai-3.2.0-py3-none-any.whl",
+    "wheel_sha256": "dca6e15b06524e47d553e89252015c51dd1e746c4ae7844f49d5c2a726b1c28c",
+    "python_requirement": ">=3.12,<3.15",
+    "source_matches_installed_bytes": [
+      {
+        "path": "src/RiskLabAI/backtest/probabilistic_sharpe_ratio.py",
+        "sha256": "3cd56f7c02e0d42ce04e395737db6039faea617b367e6bfbc2f0a74768fa7b49",
+        "byte_identical": true
+      },
+      {
+        "path": "src/RiskLabAI/backtest/probability_of_backtest_overfitting.py",
+        "sha256": "c14bb1e1179aac1d61d56acf6bf282bf2b9593b143a43e357dc7d9181c7da373",
+        "byte_identical": true
+      },
+      {
+        "path": "src/RiskLabAI/backtest/backtest_statistics.py",
+        "sha256": "d6365c332c46be6e6a176b39d3cc70da170301362a974609613fa370d710e643",
+        "byte_identical": true
+      }
+    ],
+    "installed_signatures_inspected": [
+      "probabilistic_sharpe_ratio",
+      "benchmark_sharpe_ratio",
+      "probability_of_backtest_overfitting",
+      "sharpe_ratio"
+    ]
+  },
+  "local": {
+    "path": "blueprints/us-equities/overfitting-controls/overfitting.py",
+    "sha256": "1747e058c0a5830db4ae43f4101cdd4a6825422f4b5b386fd8eb7e51f803811a",
+    "behavior_unchanged": true
+  },
+  "environment": {
+    "python": "CPython 3.12.3",
+    "platform": "Linux x86_64",
+    "uv": "0.12.17",
+    "scratch_only": true,
+    "outside_worktree_and_tmp": true,
+    "niceness": 19,
+    "lock": "blueprints/us-equities/overfitting-controls/requirements-riskl-parity.lock",
+    "lock_sha256": "d0e1dbf620c58d7763ee4a12929dc109b7739d5aa4759092b03b7dd8003b8e12",
+    "package_count": 19,
+    "hashes_required_at_install": true,
+    "binary_wheels_only": true,
+    "compile_exit": 0,
+    "sync_exit": 0,
+    "dependency_check_exit": 0,
+    "dependency_check_output": "Checked 19 packages in 0.70ms\nAll installed packages are compatible\n",
+    "working_research_environment_modified": false
+  },
+  "regular_case": {
+    "relative_tolerance": 1e-12,
+    "absolute_tolerance": 1e-12,
+    "psr_cases": 4,
+    "benchmark_and_dsr_cases": 3,
+    "sharpe_cases": 1,
+    "cscv_cases": [
+      {
+        "partitions": 4,
+        "metric": "mean",
+        "every_logit_compared": true
+      },
+      {
+        "partitions": 4,
+        "metric": "sharpe",
+        "every_logit_compared": true
+      },
+      {
+        "partitions": 8,
+        "metric": "mean",
+        "every_logit_compared": true
+      },
+      {
+        "partitions": 8,
+        "metric": "sharpe",
+        "every_logit_compared": true
+      }
+    ],
+    "uses_population_variance": true,
+    "network_during_tests": false
+  },
+  "known_differences": {
+    "confirmed": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6
+    ],
+    "explicit_tests": 6,
+    "qualifications": [
+      "Local zero-variance Sharpe raises only when mean is nonzero; constant zero returns agree.",
+      "Local trial count is a positive integer, not a fractional effective count.",
+      "Upstream PBO file is src/RiskLabAI/backtest/probability_of_backtest_overfitting.py."
+    ]
+  },
+  "observations": [
+    {
+      "kind": "unchanged-upstream-tests",
+      "command": "python -m pytest -q -p no:cacheprovider <UPSTREAM>/test/backtest/test_probabilistic_sharpe_ratio.py <UPSTREAM>/test/backtest/test_probability_of_backtest_overfitting.py",
+      "exit": 0,
+      "tests_executed": 8,
+      "tests_skipped": 0,
+      "returned_output_tail": "........                                                                 [100%]\n8 passed in 2.56s\n",
+      "private_log_name": "upstream-tests.log",
+      "private_log_sha256": "c3a2fd67d6bc12ac055562afc2b08379bebe6e2c7cca1203d69a4030a84522ce"
+    },
+    {
+      "kind": "local-integration-check-fixed-synthetic-inputs",
+      "command": "<PARITY_DIR>/venv/bin/python -m unittest tests.test_overfitting_riskl_parity -v",
+      "exit": 0,
+      "tests_executed": 10,
+      "tests_skipped": 0,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 10 tests in 0.024s\n\nOK\n",
+      "private_log_name": "parity-present.log",
+      "private_log_sha256": "d4a7e6581ff75664567e7ad7a52e1e3e10f4078622599b63a8c297b0f35ec048"
+    },
+    {
+      "kind": "optional-dependency-absent-control",
+      "command": "<PARITY_DIR>/without-riskl/bin/python -m unittest tests.test_overfitting_riskl_parity -v",
+      "exit": 0,
+      "tests_executed": 0,
+      "tests_skipped": 10,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 10 tests in 0.000s\n\nOK (skipped=10)\n",
+      "private_log_name": "parity-absent.log",
+      "private_log_sha256": "eb862ff9fa3f2b4bef1dda9829f280736a615cfe046bb97a77b9e206efcc8a7d"
+    },
+    {
+      "kind": "discriminating-control-wrong-oracle",
+      "command": "<PARITY_DIR>/venv/bin/python -m unittest discover -s <PARITY_DIR>/negative-tests -p test_overfitting_riskl_parity.py -k difference_3 -v",
+      "exit": 1,
+      "tests_executed": 1,
+      "tests_skipped": 0,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 1 test in 0.001s\n\nFAILED (failures=1)\n",
+      "private_log_name": "negative-control.log",
+      "private_log_sha256": "0933c593900faecb84832029e6f532e3fa4958416ff76390788a9f37c0b3df5f"
+    },
+    {
+      "kind": "existing-local-overfitting-tests",
+      "command": "python3 -m unittest tests.test_overfitting_controls -v",
+      "exit": 0,
+      "tests_executed": 14,
+      "tests_skipped": 0,
+      "returned_output_tail": "\n----------------------------------------------------------------------\nRan 14 tests in 1.711s\n\nOK\n",
+      "private_log_name": "existing-tests.log",
+      "private_log_sha256": "e6df0b9bf8484f48fde1caa716823daa16ad25f9223156d937429269a33d3975"
+    }
+  ],
+  "negative_control": {
+    "scope": "Scratch copy of the local test only; installed upstream and worktree test unchanged.",
+    "mutation": "Difference 3 expected upstream PBO changed from 1.0 to 0.5; ROOT in the scratch copy points to the worktree.",
+    "returned_assertion": "AssertionError: np.float64(1.0) != 0.5",
+    "expected_exit": 1
+  },
+  "failed_discovery_attempts": [
+    {
+      "command": "uv python list --only-installed --offline",
+      "exit": 2,
+      "cause": "Default uv cache was outside writable roots.",
+      "correction": "Set UV_CACHE_DIR under the requested scratch root; installed-interpreter listing, venv creation, compile and sync then exited 0."
+    },
+    {
+      "command": "sed -n 1,210p <UPSTREAM>/RiskLabAI/backtest/pbo.py",
+      "exit": 2,
+      "cause": "The adjudication used a shortened PBO filename.",
+      "correction": "Read the packaged src/RiskLabAI/backtest/probability_of_backtest_overfitting.py and matched it byte-for-byte to the installed module."
+    }
+  ],
+  "retention": {
+    "commands_normalized": "Successful environment and test commands were prefixed with rtk and ran with nice -n 19; TMPDIR and the uv cache were under the requested private scratch root. Interpreter, source and scratch locators above replace private absolute paths. Failed discovery attempts retain their corrections separately.",
+    "output": "Returned output tails are exact, without private path lines. Full stdout/stderr logs, install/compile logs and the wrong-oracle scratch copy remain private under the scratch job directory; hashes identify the test logs.",
+    "upstream_test_scope": "Two unchanged upstream PSR/PBO test modules, eight tests, using the installed wheel. The rest of the upstream suite and optional acceleration were not run.",
+    "structural_checks": "Final validate, evidence ordering, publication scans and diff checks are reported in the builder handoff after file registration."
+  }
+}

@@ -78,7 +78,26 @@ control lane. It does not tune, promote or reject any future strategy.
   recomputation. The DSR unit test reproduces the paper's numerical example
   (SR0 0.1132, DSR 0.9004). Those constants are transcribed from the paper,
   which was not re-fetched offline. The PBO tests are locally constructed
-  synthetic fixtures. No upstream implementation was executed.
+  synthetic fixtures. No upstream implementation was executed for this
+  September 24 receipt.
+
+## Optional RiskLabAI parity check — October 5, 2026
+
+[`tests/test_overfitting_riskl_parity.py`](../../../tests/test_overfitting_riskl_parity.py)
+compares fixed synthetic inputs with a clean, hash-locked RiskLabAI 3.2.0 install
+at [`7d5aa112`](https://github.com/RiskLabAI/RiskLabAI.py/commit/7d5aa11271c70d83a7069d5900d80bb08b29e481).
+Regular PSR, benchmark Sharpe/DSR, Sharpe and every CSCV logit agree with absolute
+and relative tolerances of `1e-12`. Six separate tests assert the known semantic
+differences. The [decision](../../../docs/decisions/2026-10-05-overfitting-riskl-parity.md)
+lists their source lines, the retained policies and the adoption trigger; the
+[parity receipt](riskl-parity-receipt.json) records actual runs and a failing
+control with an intentionally wrong oracle.
+
+This is an optional research check. It skips when that exact version is absent
+or cannot be imported. CI gains no dependency or required job. The controls,
+frozen parameters, retained ledger and strategy gates keep their existing
+behavior. Reproduction commands and the separate research lock are in the
+decision; the September 24 results above remain historical evidence.
 
 ## Reproduce
 
