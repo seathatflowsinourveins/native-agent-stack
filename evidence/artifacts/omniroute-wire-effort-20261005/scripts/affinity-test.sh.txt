@@ -3,13 +3,14 @@
 #   N  the v3.8.51 tag commit plus the patch's test file alone (negative control: the test is expected to fail on the published code)
 #   B  the tag commit plus the whole patch (alternative B)
 #   C  B plus upstream PR 15167's commit (the composition)
-# and the wire probe on B and C, compared with the committed probe files. A scratch clone shares the mirror's objects; nothing is written to the mirror.
+# and the wire probe on B and C, compared with the committed probe files, and the tests that cover PR 15167's extra pieces on C.
+# usage: EV=<path to evidence/artifacts/omniroute-wire-effort-20261005> omniroute-affinity-test.sh A scratch clone shares the mirror's objects; nothing is written to the mirror.
 # Every step logs its own exit code to $OUT/progress.txt. Run niced.
 set -u
 M=$HOME/.cache/omniroute-upstream-mirror-20261005.git
 T=$HOME/.cache/omniroute-test-744
 OUT=$HOME/.cache/omniroute-test-744-out
-EV=$HOME/code/.worktrees/native-agent-stack/99/omniroute-gw/evidence/artifacts/omniroute-wire-effort-20261005
+EV=${EV:?set EV to the evidence folder of this record, evidence/artifacts/omniroute-wire-effort-20261005 in a checkout of the repository}
 TAG=c1e30b7676975feb298b49eff6ff58923c04b89e
 PR=0585aba5589d5a1f49243a13a8db249558e7c9e3
 export PATH="$HOME/.local/share/codex-ecosystem/tools/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin"
@@ -54,6 +55,11 @@ run_test C
 cp "$EV/scripts/wire-probe.mts.txt" "$T/wire-probe.mts"
 ( cd "$T" && DISABLE_SQLITE_AUTO_BACKUP=true nice -n 19 node --import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts wire-probe.mts > "$OUT/probe-C.raw" 2> "$OUT/probe-C.err" ); rc=$?; log "wire probe C exit=$rc"
 rm -f "$T/wire-probe.mts"
+# the tests that cover PR 15167's extra pieces, on the composition: the unit tests the PR touches, the translate-path snapshot test, and the tests that import the Codex client constants or the effort patterns
+PRT="tests/unit/8951-github-gpt56-responses.test.ts tests/unit/codex-fast-tier.test.ts tests/unit/codex-gpt6-sol-luna.test.ts tests/unit/executor-codex.test.ts tests/unit/provider-translate-path-golden.test.ts tests/unit/codex-client-headers.test.ts tests/unit/codex-fingerprint-convergence.test.ts tests/unit/client-identity-profiles.test.ts tests/unit/claude-codex-identity-version-sync.test.ts tests/unit/codex-turn-state.test.ts tests/unit/provider-models-route-codex.test.ts tests/unit/effort-thinking-standardization-6241.test.ts tests/unit/openai-responses-request-split.test.ts"
+( cd "$T" && DISABLE_SQLITE_AUTO_BACKUP=true nice -n 19 node --import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts --test $PRT > "$OUT/test-C-pr15167.log" 2>&1 ); rc=$?
+log "pr15167 tests on C exit=$rc files=$(echo $PRT | wc -w) tests=$(grep -aE '^ℹ tests ' "$OUT/test-C-pr15167.log" | awk '{print $3}') pass=$(grep -aE '^ℹ pass ' "$OUT/test-C-pr15167.log" | awk '{print $3}') fail=$(grep -aE '^ℹ fail ' "$OUT/test-C-pr15167.log" | awk '{print $3}')"
+echo "$PRT" | tr ' ' '\n' > "$OUT/pr15167-test-files.txt"
 for v in B C; do
   sed -n 's/^WIRE //p' "$OUT/probe-$v.raw" > "$OUT/probe-$v.txt"
   if [ $v = B ]; then ref="$EV/checks/wire-probe-without-15167.txt"; else ref="$EV/checks/wire-probe-with-15167.txt"; fi
