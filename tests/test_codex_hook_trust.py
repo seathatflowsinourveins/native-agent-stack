@@ -313,5 +313,47 @@ class ApplyTests(Case):
         self.assertEqual(second.read_text(encoding="utf-8"), 'model = "y"\n')
 
 
+class CheckTests(Case):
+    """--check verifies and nothing else: no edit, no backup, no refusal beside a running codex."""
+
+    def test_every_named_hook_trusted_is_exit_0_and_writes_nothing(self):
+        server = FakeServer([hook(KEY, RTK, "trusted")])
+        code, out, err = self.run_tool(server, "--check", running=["4242"])
+        self.assertEqual(code, 0, err)
+        self.assertIn("every named hook is trusted", out)
+        self.assertEqual(server.writes(), [])
+        self.assertEqual([p.name for p in self.home.iterdir()], ["config.toml"])
+
+    def test_an_untrusted_or_modified_hook_is_exit_5_naming_the_key_and_writes_nothing(self):
+        for status in ("untrusted", "modified"):
+            with self.subTest(status=status):
+                server = FakeServer([hook(MEMORY_KEY, "ai-memory --data-dir x", "trusted"), hook(KEY, RTK, status)])
+                code, out, err = self.run_tool(server, "--check")
+                self.assertEqual(code, 5)
+                self.assertIn(KEY, err)
+                self.assertIn(status, err)
+                self.assertEqual(server.writes(), [])
+                self.assertEqual([p.name for p in self.home.iterdir()], ["config.toml"])
+
+    def test_no_hook_with_the_named_command_is_exit_4(self):
+        server = FakeServer([hook(MEMORY_KEY, "ai-memory --data-dir x", "trusted")])
+        code, _, err = self.run_tool(server, "--check")
+        self.assertEqual(code, 4)
+        self.assertIn("register it first", err)
+
+    def test_check_and_apply_together_are_refused_by_the_parser(self):
+        err = io.StringIO()
+        with contextlib.redirect_stderr(err), self.assertRaises(SystemExit) as caught:
+            trust.main(["--codex", str(self.codex), "--codex-home", str(self.home), "--command", RTK, "--check", "--apply"])
+        self.assertEqual(caught.exception.code, 2)
+        self.assertIn("not allowed with", err.getvalue())
+
+    def test_a_check_after_an_apply_agrees_with_it(self):
+        server = FakeServer([hook(KEY, RTK)])
+        self.assertEqual(self.run_tool(server, "--check")[0], 5)
+        self.assertEqual(self.run_tool(server, "--apply")[0], 0)
+        self.assertEqual(self.run_tool(server, "--check")[0], 0)
+
+
 if __name__ == "__main__":
     unittest.main()

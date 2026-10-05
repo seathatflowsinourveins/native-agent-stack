@@ -12,6 +12,7 @@ hooks of the base user layer whose command equals one named with --command, neve
 
   python3 tools/adoption/codex_hook_trust.py --command "rtk hook codex"            # dry run: each match, its status, its hash
   python3 tools/adoption/codex_hook_trust.py --command "rtk hook codex" --apply    # back up config.toml (0600), trust, read back
+  python3 tools/adoption/codex_hook_trust.py --command "rtk hook codex" --check    # verify: exit 0 only while every match is trusted
 
 A dry run makes no trust or config edit and no backup. It is not read-only: starting the app-server creates its own state files in
 the Codex home (SQLite databases, an installation id, the bundled skills; measured on a scratch home, 2026-10-04).
@@ -27,8 +28,10 @@ asks hooks/list again. expectedVersion guards config.toml, not the file a hook i
 for the command again: every hook that was named must still be listed under its key as a user-layer command hook, at the hash
 it had, and `trusted`; a hook that vanished, moved or changed during the write, and a discovery error that was not there before
 the write, are failures. It is idempotent: with every match already trusted it makes no edit.
-Exit status: 0 done or nothing to do, 2 refused before any write, 3 a write or the read-back failed, 4 no hook of the user layer
-has a named command (register it first), 1 unexpected.
+--check verifies and nothing else (the install plan's acceptance runs it): it makes no edit and no backup, and takes no part in the
+refusal beside a running codex, which only --apply has. Exit status: 0 done, nothing to do, or --check found every match trusted,
+2 refused before any write, 3 a write or the read-back failed, 4 no hook of the user layer has a named command (register it first),
+5 --check found a named hook that is not trusted (untrusted or modified), 1 unexpected.
 """
 
 from __future__ import annotations
@@ -105,7 +108,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--command", action="append", required=True, metavar="COMMAND",
                         help="trust the user-layer hook whose command is exactly this (repeatable)")
-    parser.add_argument("--apply", action="store_true", help="write the trust (default: dry run)")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--apply", action="store_true", help="write the trust (default: dry run)")
+    mode.add_argument("--check", action="store_true",
+                      help="verify only: exit 0 when every named hook is trusted at its current hash, 5 when one is not")
     parser.add_argument("--codex-home", help="the Codex home (default: $CODEX_HOME, else ~/.codex)")
     parser.add_argument("--codex", help="the codex executable (default: codex on PATH)")
     parser.add_argument("--cwd", help="the working directory hooks/list is asked for (default: the Codex home)")
@@ -139,6 +145,12 @@ def run(args: argparse.Namespace) -> int:
             for path, message in errors_before:
                 print(f"  note: hooks/list reports a discovery error before any write: {path}: {message}")
             todo = [hook for hook in found if hook.get("trustStatus") != "trusted"]
+            if args.check:
+                if todo:
+                    print("not trusted: " + "; ".join(describe(hook).strip() for hook in todo), file=sys.stderr)
+                    return 5
+                print("every named hook is trusted at its current hash")
+                return 0
             if not todo:
                 print("nothing to do: every named hook is trusted")
                 return 0
