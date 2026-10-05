@@ -17503,6 +17503,46 @@
       "bytes": 24195
     },
     {
+      "path": "evidence/artifacts/betterleaks-p1-20261005/README.md",
+      "sha256": "a5ed012d41e03b84d492715115a08cb3ce9123c8a22db9f7059687fe82c7f42b",
+      "bytes": 3983
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-p1-20261005/betterleaks-history-locations.json",
+      "sha256": "5934d619f3ed343ade31e04ef2fc5e181ee10dce78f711baf79fa240ebf1fa94",
+      "bytes": 22762
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-p1-20261005/envelope-clarifications.json",
+      "sha256": "8a59e43ce1424ae9b83321ec8e7fb68784bde3883a14948e68680f8024fdaf4d",
+      "bytes": 2620
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-p1-20261005/gitleaks-history-locations.json",
+      "sha256": "7110f4c2eb15d419b5f40de457a8be048a10cf8710052986938458852ed69478",
+      "bytes": 261
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-p1-20261005/preregistration.json",
+      "sha256": "5191f057bf6b8708c39b08c6a7f2a42d74099f831778c698d9f00bae875b54c3",
+      "bytes": 5543
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-p1-20261005/returned-summary.txt",
+      "sha256": "14c0b0fa9ec1b2a81b8cde020bb793e4877fa6effacae509f85a517476895f96",
+      "bytes": 880
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-p1-20261005/review.json",
+      "sha256": "dc0072f125750da785426a7e494c16f5589b2a2a7b6dff51cfd99d07bb7df73c",
+      "bytes": 2480
+    },
+    {
+      "path": "evidence/artifacts/betterleaks-p1-20261005/run-record.json",
+      "sha256": "17e57718b41ddf7f3b36c4d6e090a4ebf3064fde18e862366ec9a48b3621dc1e",
+      "bytes": 5853
+    },
+    {
       "path": "evidence/artifacts/betterleaks-parity-20260927/README.md",
       "sha256": "dc5585a83eb5718f90c092341cecaa68484064ff1d695b1a6c8f51c859bde445",
       "bytes": 40290
