@@ -13,12 +13,12 @@
   "limitations": [
     "Scratch local integration with synthetic research journals; not an unchanged upstream test suite or a real market/broker journal.",
     "Per-journal Online Backup is independently consistent; no atomic cross-journal transaction or research consumer application restart was accepted.",
-    "One-part check 1/1 read 2/2 packs; default seven-part daily rotation is covered separately by stdlib tests and requires operator execution every 24 hours.",
+    "Historical one-part check 1/1 read 2/2 packs. Round 1 enforced strict daily gaps in its synthetic rotation test; round 2 replaces that policy with a whole seven-subset rotation within seven days.",
     "Operating host and independent alert path are user decision 2. No systemd unit was installed, enabled or started; no process-restart drill or scheduler was run.",
     "A process-restart drill is not reboot, missed-run or independent-alert acceptance. permissions.run_dags scheduler behavior is source-reviewed and awaits the later host drill.",
     "Off-host recovery stays open until user decision 3 chooses an independent destination and key recovery and a consumer restores on a second host against the independent inventory and required state.",
     "Recovery-time objective, independent alerting and retention deletion remain unaccepted. No broker, credentials, live mode, model calls, commit or push was used.",
-    "The calendar lock lives in the nested PR-1 runtime bundle at the reviewed revision; this base has no runtime-2604/pyproject.toml. No trading runtime installation or calendar native execution is claimed."
+    "Historical round 1 cited an unlanded calendar bundle. Round 2 uses the on-base SDK_ENV lock adoption/sdk/requirements-linux-x86_64-py313.lock:241 and executes the already installed exchange-calendars 4.13.2 for real-calendar regressions; no new installation is claimed."
   ],
   "tool_versions": {
     "dagu": "2.16.6",
@@ -78,7 +78,8 @@
       "exit": 0,
       "returned_output": "{\"checked_subset\": \"1/1\", \"matched_journals\": 2, \"restore_control_exit\": 1, \"result\": \"passed\", \"snapshot_control_exit\": 1, \"throwaway_password_deleted\": true}\n",
       "started_at_utc": "2026-10-05T03:51:15.065593+00:00",
-      "completed_at_utc": "2026-10-05T03:51:24.642607+00:00"
+      "completed_at_utc": "2026-10-05T03:51:24.642607+00:00",
+      "invocation_proxy": "Historical builder used rtk env through its fallback. This is an execution record, not a portable prerequisite; the current README recipes use plain env TMPDIR=... nice -n 19 python3 ... ."
     },
     {
       "cmd": "python3 -m unittest tests.test_us_equities_hosting",

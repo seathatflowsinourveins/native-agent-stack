@@ -2,6 +2,8 @@
 
 Date: 2026-10-05. Lane: trading. Builder base:
 `4c897418fe35a030a1188ae447eaf31c893f8eff`.
+Repair round 2 base: `b3a01ce273952260df0b552d5075997b737b71ad`, whose tree
+matches the coordinator's round 1 commit. No commit or pin move by the builder.
 North-star action: run US-equities local research/evidence after each NYSE
 session and preserve the research journals needed to reproduce its state.
 This implements the coordinator's final `decision-record-T-final.md`, lines
@@ -62,7 +64,11 @@ operator commands and source-linked rule table. The verified original sources ar
 - `dagucloud/dagu@v2.16.6:internal/runtime/runner.go:1633-1648,1267-1281`
   skips a step on a false precondition and propagates the skip to dependents.
   A preceding normal calendar command exposes package/version/calendar failures;
-  a non-session token skips the research chain without failing it.
+  a covered non-session token skips the research chain without failing it.
+  Bracket the queried year with prior December 1/following January 31, since
+  `exchange_calendar.py:1257-1279` measures coverage by its first/last sessions.
+  A January 1-to-December 31 window falsely raised DateOutOfBounds on New Year
+  holidays; real 4.13.2 regressions reproduced that before the correction.
   [Precondition implementation](https://github.com/dagucloud/dagu/blob/v2.16.6/internal/runtime/runner.go#L1633).
 - `dagucloud/dagu@v2.16.6:internal/cmn/runenv/keys.go:12-13`,
   `internal/runctx/context_env.go:28` supplies `DAG_RUN_ID`, used in output
@@ -84,7 +90,7 @@ operator commands and source-linked rule table. The verified original sources ar
   [Exit codes](https://github.com/restic/restic/blob/v0.19.1/doc/040_backup.rst#L787).
 - `restic/restic@v0.19.1:doc/045_working_with_repos.rst:482-521` defines
   deterministic `n/t` partition checks. Our policy rotates all seven subsets
-  within seven days, at most 24 hours apart, persisting only successful checks;
+  within seven days **per whole rotation**, persisting only successful checks;
   an overdue rotation needs a successful full `--read-data` check before reset.
   [Partitions](https://github.com/restic/restic/blob/v0.19.1/doc/045_working_with_repos.rst#L482).
 - `restic/restic@v0.19.1:doc/050_restore.rst:55-73` restores an exact snapshot's
@@ -100,18 +106,101 @@ operator commands and source-linked rule table. The verified original sources ar
   History alone omits the slot/trigger, so it must be corroborated.
   [Restart policy](https://github.com/systemd/systemd/blob/v255/man/systemd.service.xml#L818).
 
-The calendar lock was read at PR-1's actual bundle path
-`blueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml:11`,
-revision `d00e4e6eeb92c7c99066ea5d0bd85f379c931c4f`. The brief's shorter
-`runtime-2604/pyproject.toml` path is absent at this base and in that worktree.
-`manifests/stack.json` independently carries 4.13.2. PR-4 adds no lock and claims
-no execution of the installed trading runtime.
+The SDK_ENV lock evidence at this base is
+`adoption/sdk/requirements-linux-x86_64-py313.lock:241` (exchange-calendars 4.13.2).
+Round 1 cited an unlanded runtime bundle; that is not main's SDK_ENV authority and
+has been removed from the current recipe. Round 2 executes the existing locked
+SDK for real-calendar tests; it installs no environment and adds no lock.
 
 Snapshot/restore glue and both drills belong in `hosting/`, which owns this
 research job's recovery without adapter coupling. Each journal gets its own
 Online Backup, an independently frozen file inventory and explicit required
 tables. This does not provide atomic cross-journal transactions. No new timer
-was enabled; the operator must meet the daily check interval.
+was enabled; the operator must run daily and complete every rotation within seven days.
+
+## Round 2 native reuse and repairs
+
+The 2026-10-05 standing rule applies on every new Linux/WSL operating host: use
+clean maintained upstream installations, replacing only the consumer's integration
+policy. The [native glue review](../../blueprints/us-equities/hosting/evidence/upstream-glue-review-r2.json)
+records pinned installed help, release notes and source. Checked restic 0.19.1's
+`--stdin-from-command`, SQLite 3.53.1's `.backup`/`.dump` and maintained
+`sqlite3_rsync`, CPython's native backup/subprocess/flock, Dagu 2.16.6's
+preconditions/retries/handlers and exchange_calendars 4.13.2's **ecal CLI**.
+The final T off-host-recovery row **102** keeps restic with stdlib Online Backup;
+the earlier hosting comparison deferred Litestream. This repair does not reopen
+the selection. The final row itself does not name Litestream, so the review
+records the earlier comparison separately rather than inventing a final-row quote.
+
+`restic/restic@v0.19.1:doc/040_backup.rst:679-703` captures a command's stdout.
+SQLite `.backup` writes a file (`sqlite/sqlite@version-3.53.1:src/shell.c.in:9074-9099`),
+so invoking it as a restic stdin producer would capture an empty stream. `.dump`
+emits logical SQL (`src/shell.c.in:3759`), not the frozen binary file inventory.
+SQLite's own `sqlite3_rsync` copies live databases
+(`tool/sqlite3_rsync.c:13-40`), without replacing restic's encrypted repository
+and the external consumer oracle. The existing CPython Online Backup API is the
+native copying function; we do not rebuild it.
+
+### Why this glue exists
+
+| Kept glue | One-line pin-cited reason |
+| --- | --- |
+| `session_day.py` | exchange_calendars `@4.13.2:pyproject.toml:67-68; exchange_calendars/ecal.py:100-149` ships calendar rendering, leaving our post-close and input-freshness token to compose its native session/close API. |
+| `journal_recovery.py` | restic `@v0.19.1:doc/040_backup.rst:679-703; doc/045_working_with_repos.rst:482-521; doc/050_restore.rst:55-73` supplies backup/check/restore, leaving the frozen external oracle, required tables, bounded rotation and controls as consumer policy. |
+| `drill_process_restart.py` | systemd `@v255:man/systemd.service.xml:818-836` supplies supervision and Dagu `@v2.16.6:internal/cmd/history.go:568-602` supplies history without slot/trigger, leaving the guarded signal and exact-slot correlation as acceptance glue. |
+| `drill_local_recovery.py` | CPython `@v3.12.3:Modules/_sqlite/connection.c:2067-2102` supplies copying and restic `@v0.19.1:doc/050_restore.rst:55-73` supplies restore, leaving synthetic concurrent writers, failure controls and sanitized evidence as our integration fixture. |
+
+**Replaced** the exclusive-create lock sentinel with native `fcntl.flock`
+(`python/cpython@v3.12.3:Doc/library/fcntl.rst:139-149`); process exit releases
+the lock even when its file remains. Dagu supplies dependency skipping,
+preconditions (`internal/runtime/runner.go:1267-1281,1633-1648`), retries
+(`:1502-1525`) and lifecycle handlers (`:1196-1206`) natively. No Python retry,
+handler or scheduler implementation is added, and this job enables no retry
+or alert handler policy. An independent alert path remains decision 2.
+
+The recovery worker calls native `Connection.backup(..., pages=-1)` in one read
+transaction, permitting concurrent WAL writers while avoiding incremental-copy
+restarts (`python/cpython@v3.12.3:Modules/_sqlite/connection.c:2013,2067-2102`).
+That API has no hard wall-time parameter; `subprocess.run(timeout=...)` bounds
+the isolated worker (`Doc/library/subprocess.rst:62-68`). The documented defaults are **120 seconds and 256 MiB per
+journal**, with explicit `--backup-timeout`/`--max-journal-bytes` parameters;
+failed/oversize/timed-out snapshots publish no inventory. Each per-journal
+snapshot is consistent; simultaneous commits need not all appear in that snapshot.
+
+Rotation now timestamps the invocation before snapshot/backup, bounds completion
+of the **whole seven-subset cycle** in UTC, and accepts 24 h + 60 s jitter and
+the 2026-11-01 fall-back. It refuses incomplete overdue cycles, clock reversal,
+over-seven-day idle gaps and old state until successful full checking. Backup
+and any later forget policy group by **host,tags**
+(`restic/restic@v0.19.1:doc/040_backup.rst:197-206; doc/060_forget.rst:225-233`),
+so disposable staging paths share parent/retention groups. No forget/prune ran.
+
+The seven research-runtime passthrough entries are restored as well as the four
+scheduled-job entries: Dagu's allowlist is at
+`dagucloud/dagu@v2.16.6:internal/cmn/config/loader.go:344-347; internal/cmn/config/env.go:77-95`.
+The research operator's simulation job must atomically publish `LEAN_EVENTS`
+after the session's actual close **by 16:25 New York**. Its mtime must be between
+close and check time. Missing/stale/future tokens visibly skip the native
+precondition chain. This availability check does not establish market-data
+freshness or point-in-time correctness inside the file.
+
+The hosting README again carries the verified pinned-download/checksum recipe,
+0600 private config/DAG, loopback exposure warning, auth transition note,
+historical 2.17.2 artifact boundary and operator-only systemctl lifecycle steps.
+It adds native `loginctl enable-linger` (`systemd/systemd@v255:man/loginctl.xml:186-195`)
+and the caveat that linger cannot extend Windows/WSL VM lifetime. Portable
+templates use plain `env TMPDIR=... nice -n 19 python3 ...`; the builder's actual
+commands used RTK's fallback, recorded separately from the portable recipe.
+Recovery uses Python **3.11+**, because `hashlib.file_digest` was added then
+(`python/cpython@v3.12.3:Doc/library/hashlib.rst:267-302`); execution used 3.13.15.
+
+The drill resolves its scratch root at creation, scrubs lexical and canonical
+forms and refuses any remaining absolute path before publishing `--output`.
+The restore control now alters SQLite header content while integrity, required
+counts and file bytes remain equal; external SHA-256 comparison still refuses it.
+Tests cover symlinked roots, both controls, native lock contention/stale files,
+slow/overdue rotation, real holiday/early-close calendars and native Dagu
+skip/success chains, all on scratch directories without a scheduler.
 
 ## Dagu 2.16.6 to 2.18.2 scheduler comparison
 
@@ -155,7 +244,48 @@ here; interrupted-precondition behavior remains outside the claimed acceptance.
 
 ## Evidence, corrections and completeness critic
 
-The [local integration receipt](../../evidence/receipts/trading-unattended-hosting-recovery-20261005.json)
+The **round 2** [local integration receipt](../../evidence/receipts/trading-unattended-hosting-recovery-r2-20261005.json)
+and [offline proof](../../blueprints/us-equities/hosting/evidence/offline-proof-r2.json)
+retain a fresh native backup/check/restore of **16,531,456 journal bytes** and
+independent committed-write observations within each single `pages=-1` native
+call. Snapshot refusal is native exit **3**, procedure exit **1**; restore
+mutation is native restore exit **0**, procedure exit **1**, with equal integrity,
+required counts and bytes. The throwaway password was deleted. **42 tests**
+passed, including six real-calendar cases, genuine DateOutOfBounds, freshness,
+both controls, native lock contention/stale state, whole-cycle jitter/fall-back,
+restart guards, symlinked scratch roots and Python 3.11-compatible syntax.
+
+The [native Dagu record](../../blueprints/us-equities/hosting/evidence/native-dagu-probes-r2.json)
+retains non-session and stale-input skips plus an executed success chain, all
+with native CLI exit **0**. Skips have node status **5**, successful steps **4**.
+These are manual short-lived runs, not scheduler or host restart acceptance.
+The verdict JSON has `nv_summary` without the referenced `nv[2]` recipe; the
+probe therefore uses the pinned upstream scalar-precondition/dependency pattern.
+Native `dagu validate` on the revised DAG also returned **0**.
+
+The pinned [cron Next probe record](../../blueprints/us-equities/hosting/evidence/cron-next-probe-r2.json)
+holds the tiny Go program and local v3.0.1 module prepared from tagged source.
+Execution with module networking disabled returned **127**: `go` was not found
+in PATH or the checked standard/ecosystem locations. No compiler was installed
+under the source-only network constraint. The supplied expected results,
+2026-11-02T21:30Z and 2027-03-15T20:30Z, are **not measured Next results**; this
+uses the user's explicit option to record why the probe cannot run.
+
+Round 2 completeness critic: the native skip probes showed that Dagu can report
+overall success while the research chain is skipped. The process-restart drill
+now requires **every required research step** succeeded before counting the due
+slot. Input mtime is only a producer availability contract, not proof of the
+market dates/content. A strict per-step interval hid daily jitter and DST; a
+whole-cycle UTC deadline plus completion check covers those cases. Sentinel
+lock files could survive crashes; native process-owned locks address that gap.
+During artifact publication the sanitizer first refused a relative `./` module
+path; its absolute-path test now admits relative paths and has a regression.
+The remaining modalities are actual operating-host lifecycle/independent alerts,
+an executable cron Next probe, real consumer journal selection and state,
+independent destination/key recovery, second-host restore and measured RTO.
+They remain limits for the next hosting/recovery sweep.
+
+The historical **round 1** [local integration receipt](../../evidence/receipts/trading-unattended-hosting-recovery-20261005.json)
 and [offline proof](../../blueprints/us-equities/hosting/evidence/offline-proof.json)
 retain actual native restic output on scratch directories. Two synthetic WAL
 journals were each written while their Online Backup was active, then restored
@@ -177,7 +307,7 @@ corrected as above. These source-location mistakes changed no pin or acceptance.
 Completeness critic: process liveness alone cannot attest a due slot, so the later
 drill checks original scheduler trigger and slot. Same-count mutation bypasses
 count/integrity-only checks; external hashes and a mutation test address that
-gap. Missed partition executions lose coverage; persistent cursor, 24-hour bound
+gap. Missed partition executions lose coverage; persistent cursor, seven-day whole-cycle bound
 and full reset address that gap. Remaining modalities are host reboot,
 downtime/catch-up and duplicate-slot behavior, independent alerts, destination
 and key loss, second-host consumer restore and measured recovery time. These

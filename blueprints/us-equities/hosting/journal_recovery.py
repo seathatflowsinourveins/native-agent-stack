@@ -14,6 +14,7 @@ from __future__ import annotations
 import argparse
 from contextlib import closing
 from datetime import datetime, timedelta, timezone
+import fcntl
 import hashlib
 import json
 import os
@@ -22,11 +23,15 @@ import re
 import sqlite3
 import stat
 import subprocess
+import sys
+import tempfile
 import time
 
 
 CHECK_PARTS = 7
-MAX_CHECK_GAP = timedelta(hours=24)
+MAX_ROTATION_AGE = timedelta(days=7)
+BACKUP_TIMEOUT = 120.0
+MAX_JOURNAL_BYTES = 256 * 1024 * 1024
 INVENTORY_FILE = "inventory.json"
 SAFE_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]*\Z")
 
@@ -70,12 +75,36 @@ def journal_state(path: Path, tables: list[str]) -> dict:
     return {"integrity_check": "ok", "required_tables": counts}
 
 
-def snapshot_journals(journals: dict, stage: Path, oracle: Path, *, progress=None) -> dict:
+def copy_journal(source: Path, target: Path, max_bytes: int) -> dict:
+    """Use upstream Online Backup unchanged, with a single WAL read transaction.
+
+    CPython@v3.12.3:Modules/_sqlite/connection.c:2013,2067-2102 passes pages=-1
+    straight to sqlite3_backup_step and releases the GIL during that native call.
+    The caller bounds this worker with subprocess.run(timeout=...).
+    """
+    with closing(sqlite3.connect(source.resolve().as_uri() + "?mode=ro", uri=True)) as src:
+        src.execute("BEGIN")
+        size = src.execute("PRAGMA page_count").fetchone()[0] * src.execute("PRAGMA page_size").fetchone()[0]
+        if size > max_bytes:
+            raise RecoveryError("journal exceeds --max-journal-bytes")
+        with closing(sqlite3.connect(target)) as dst:
+            started = time.monotonic_ns()
+            src.backup(dst, pages=-1)
+            finished = time.monotonic_ns()
+            dst.execute("PRAGMA journal_mode=DELETE")
+    return {"backup_started_ns": started, "backup_finished_ns": finished, "pages": -1}
+
+
+def snapshot_journals(journals: dict, stage: Path, oracle: Path, *, observation=None,
+                      backup_timeout=BACKUP_TIMEOUT, max_journal_bytes=MAX_JOURNAL_BYTES) -> dict:
     """One Online Backup per journal; no cross-journal atomicity is promised.
 
-    Optional progress observation is used by the offline concurrent-write fixture.
+    An isolated stdlib worker permits a hard wall timeout even within a native step.
+    Optional observation reports the native call interval to the offline fixture.
     Failed stages remain for diagnosis; they never receive an accepted inventory.
     """
+    if backup_timeout <= 0 or max_journal_bytes <= 0:
+        raise RecoveryError("positive backup timeout and journal size limits are required")
     if not journals or oracle.exists():
         raise RecoveryError("use nonempty journal selection and a new external inventory")
     if stage.resolve() in oracle.resolve().parents:
@@ -90,19 +119,15 @@ def snapshot_journals(journals: dict, stage: Path, oracle: Path, *, progress=Non
     records = []
     for name, (source, tables) in sorted(journals.items()):
         target = stage / "journals" / f"{name}.sqlite3"
-        deadline = time.monotonic() + 60
-
-        def observe(status, remaining, total):
-            if time.monotonic() > deadline:
-                raise RecoveryError("Online Backup exceeded its 60 second bound")
-            if progress:
-                progress(name, status, remaining, total)
-
-        # CPython's published src.backup(dst, pages=..., progress=...) pattern.
-        with closing(sqlite3.connect(source.resolve().as_uri() + "?mode=ro", uri=True)) as src:
-            with closing(sqlite3.connect(target)) as dst:
-                src.backup(dst, pages=16, progress=observe, sleep=0.05)
-                dst.execute("PRAGMA journal_mode=DELETE")
+        completed = subprocess.run(
+            [sys.executable, str(Path(__file__).resolve()), "_copy", "--source", str(source.resolve()),
+             "--target", str(target.resolve()), "--max-journal-bytes", str(max_journal_bytes)],
+            env={"PATH": "/usr/bin:/bin", "LC_ALL": "C", "TMPDIR": os.environ.get("TMPDIR", str(stage.parent))},
+            capture_output=True, text=True, timeout=backup_timeout, check=False)
+        if completed.returncode:
+            raise RecoveryError("Online Backup worker refused: " + json.loads(completed.stdout)["reason"])
+        if observation:
+            observation(name, json.loads(completed.stdout))
         state = journal_state(target, tables)
         target.chmod(0o400)
         records.append({"path": target.relative_to(stage).as_posix(),
@@ -187,47 +212,79 @@ class Restic:
 
 
 def check_rotation(restic, state_path: Path, *, parts=CHECK_PARTS, now=None,
-                   full_check=False) -> str:
+                   full_check=False, clock=None) -> str:
     """All n/t subsets in at most seven days; advance only after native success.
 
-    Run at least once every 24 hours, including weekends and holidays. A missed
-    interval requires a successful full --read-data check before starting again.
+    Run daily, including weekends/holidays; jitter and DST do not impose a per-step
+    24h deadline. An incomplete rotation exceeding seven days requires a full read.
     A separate state file belongs to this repository; concurrent checks fail closed.
     """
     if not 1 <= parts <= CHECK_PARTS:
         raise RecoveryError("rotation requires 1..7 parts (default 7)")
-    now = now or datetime.now(timezone.utc)
+    # Explicit 'now' is a deterministic test/drill clock. Real cycles also supply
+    # a completion clock, so a slow check cannot pass after the rotation deadline.
+    clock = clock or ((lambda: now) if now is not None else lambda: datetime.now(timezone.utc))
+    now = now or clock()
+    if now.utcoffset() is None:
+        raise RecoveryError("rotation needs an aware UTC clock")
+    now = now.astimezone(timezone.utc)
     lock = state_path.with_suffix(state_path.suffix + ".lock")
-    with lock.open("x"):
+    # Native process-owned flock replaces the crash-prone exclusive-create sentinel.
+    # CPython@v3.12.3:Doc/library/fcntl.rst:139-153. Keep the inode, even on exit.
+    with lock.open("a") as locked:
+        try:
+            fcntl.flock(locked, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except BlockingIOError as error:
+            raise RecoveryError("rotation lock is held by another process") from error
         try:
             key = hashlib.sha256(str(restic.repository).encode()).hexdigest()
             state = json.loads(state_path.read_text()) if state_path.exists() else {
-                "parts": parts, "next": 1, "repository_key": key}
+                "schema_version": 2, "parts": parts, "next": 1, "repository_key": key}
             if state.get("parts") != parts or state.get("repository_key") != key:
                 raise RecoveryError("rotation state belongs to another repository or partition count")
-            previous = datetime.fromisoformat(state["last_success"]) if "last_success" in state else None
-            if previous and (now < previous or now - previous > MAX_CHECK_GAP):
+            previous = datetime.fromisoformat(state["last_success"]).astimezone(timezone.utc) if "last_success" in state else None
+            part = state["next"]
+            if type(part) is not int or not 1 <= part <= parts:
+                raise RecoveryError("invalid rotation cursor")
+            origin = datetime.fromisoformat(state["cycle_started_at"]).astimezone(timezone.utc) if "cycle_started_at" in state else now
+            overdue = (state.get("schema_version") != 2 or (part != 1 and "cycle_started_at" not in state) or
+                       now < origin or (previous and (now < previous or now - previous > MAX_ROTATION_AGE)) or
+                       (part != 1 and now - origin > MAX_ROTATION_AGE))
+            if overdue:
                 if not full_check:
                     raise RecoveryError("rotation overdue or clock reversed; require --full-check")
             if full_check:
                 restic.run("check", "--read-data")
-                state["next"] = 1
-            part = state["next"]
-            if type(part) is not int or not 1 <= part <= parts:
-                raise RecoveryError("invalid rotation cursor")
+                part = 1
+            if part == 1:
+                origin = now  # The cycle-start instant, before this subset's native check.
             subset = f"{part}/{parts}"
             restic.run("check", f"--read-data-subset={subset}")
-            state.update(next=part % parts + 1, last_success=now.isoformat())
-            temporary = state_path.with_suffix(state_path.suffix + ".new")
-            write_new(temporary, json_bytes(state))
-            os.replace(temporary, state_path)
+            finished = clock().astimezone(timezone.utc)
+            if finished < now or finished - origin > MAX_ROTATION_AGE:
+                raise RecoveryError("rotation overdue or clock reversed after native check; require --full-check")
+            state.update(schema_version=2, next=part % parts + 1,
+                         cycle_started_at=origin.isoformat(), last_success=finished.isoformat())
+            # tempfile + replace is native atomic file publication, without stale .new refusal.
+            with tempfile.NamedTemporaryFile(dir=state_path.parent, delete=False) as stream:
+                temporary = Path(stream.name)
+                try:
+                    stream.write(json_bytes(state))
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                    temporary.chmod(0o400)
+                    os.replace(temporary, state_path)
+                finally:
+                    temporary.unlink(missing_ok=True)
             return subset
         finally:
-            lock.unlink()
+            fcntl.flock(locked, fcntl.LOCK_UN)
 
 
 def cycle(restic: Restic, journals: dict, state_path: Path, *, parts=CHECK_PARTS,
-          full_check=False, control=None, progress=None) -> dict:
+          full_check=False, control=None, observation=None,
+          backup_timeout=BACKUP_TIMEOUT, max_journal_bytes=MAX_JOURNAL_BYTES) -> dict:
+    cycle_started = datetime.now(timezone.utc)
     stage, oracle, restored = (restic.work / name for name in ("stage", "frozen-inventory.json", "restored"))
     if restored.exists() or not restic.repository.is_dir() or not restic.password_file.is_file():
         raise RecoveryError("use a fresh restore/work directory and an initialized local repository")
@@ -236,14 +293,15 @@ def cycle(restic: Restic, journals: dict, state_path: Path, *, parts=CHECK_PARTS
     version_output = restic.run("version")
     if not version_output.startswith("restic 0.19.1 "):
         raise RecoveryError("restic must stay pinned to 0.19.1")
-    inventory = snapshot_journals(journals, stage, oracle, progress=progress)
+    inventory = snapshot_journals(journals, stage, oracle, observation=observation,
+                                 backup_timeout=backup_timeout, max_journal_bytes=max_journal_bytes)
     verify(stage, oracle)  # Refuse a staging change before attempting backup.
     unreadable = stage / inventory["files"][0]["path"]
     if control == "snapshot":
         unreadable.chmod(0)  # Keep another readable file, so restic can create an incomplete snapshot.
     try:
         output = restic.run("backup", str(stage), "--host", "equity-research-recovery",
-                            "--tag", "journal-recovery", "--json")
+                            "--tag", "journal-recovery", "--group-by", "host,tags", "--json")
     finally:
         unreadable.chmod(0o400)
     if control == "snapshot":
@@ -254,12 +312,27 @@ def cycle(restic: Restic, journals: dict, state_path: Path, *, parts=CHECK_PARTS
     if len(summaries) != 1 or not re.fullmatch(r"[a-f0-9]{64}", summaries[0].get("snapshot_id", "")):
         raise RecoveryError("backup did not return exactly one complete snapshot ID")
     snapshot_id = summaries[0]["snapshot_id"]
-    subset = check_rotation(restic, state_path, parts=parts, full_check=full_check)
+    subset = check_rotation(restic, state_path, parts=parts, full_check=full_check,
+                            now=cycle_started, clock=lambda: datetime.now(timezone.utc))
     # Restore the selected snapshot's staging subtree to a new directory; never use latest.
     restic.run("restore", f"{snapshot_id}:{stage}", "--target", str(restored),
                "--verify", "--overwrite", "never", "--json")
     if control == "restore":
-        (restored / inventory["files"][0]["path"]).unlink()
+        altered = restored / inventory["files"][0]["path"]
+        tables = list(inventory["files"][0]["required_tables"])
+        before_state, before_identity = journal_state(altered, tables), file_identity(altered)
+        altered.chmod(0o600)
+        with closing(sqlite3.connect(altered)) as db:
+            current = db.execute("PRAGMA user_version").fetchone()[0]
+            db.execute(f"PRAGMA user_version={current ^ 1}")
+        unchanged = journal_state(altered, tables) == before_state
+        after_identity = file_identity(altered)
+        observation_control = {"mutation": "SQLite user_version header", "required_state_unchanged": unchanged,
+                               "bytes_unchanged": after_identity["bytes"] == before_identity["bytes"],
+                               "sha256_changed": after_identity["sha256"] != before_identity["sha256"]}
+        (restic.work / "restore-control.json").write_bytes(json_bytes(observation_control))
+        if not all(observation_control[key] for key in ("required_state_unchanged", "bytes_unchanged", "sha256_changed")):
+            raise RecoveryError("restore control did not preserve counts/integrity/bytes while altering content")
     compared = verify(restored, oracle)
     if control:
         raise RecoveryError("unknown or non-discriminating control")
@@ -291,6 +364,10 @@ def main(argv=None) -> int:
         p = commands.add_parser(name)
         p.add_argument("--journal", action="append", required=True)
         p.add_argument("--required-table", action="append", required=True)
+        p.add_argument("--backup-timeout", type=float, default=BACKUP_TIMEOUT,
+                       help="hard seconds per isolated Online Backup worker (default 120)")
+        p.add_argument("--max-journal-bytes", type=int, default=MAX_JOURNAL_BYTES,
+                       help="maximum logical bytes per journal (default 256 MiB)")
         if name == "snapshot":
             p.add_argument("--stage", type=Path, required=True)
             p.add_argument("--inventory", type=Path, required=True)
@@ -306,19 +383,27 @@ def main(argv=None) -> int:
     p = commands.add_parser("verify")
     p.add_argument("--restored", type=Path, required=True)
     p.add_argument("--inventory", type=Path, required=True)
+    p = commands.add_parser("_copy", help="internal bounded native Online Backup worker")
+    p.add_argument("--source", type=Path, required=True)
+    p.add_argument("--target", type=Path, required=True)
+    p.add_argument("--max-journal-bytes", type=int, required=True)
     args = parser.parse_args(argv)
     try:
-        if args.command == "verify":
+        if args.command == "_copy":
+            result = copy_journal(args.source, args.target, args.max_journal_bytes)
+        elif args.command == "verify":
             result = verify(args.restored, args.inventory)
         else:
             journals = selections(args.journal, args.required_table)
             if args.command == "snapshot":
-                result = snapshot_journals(journals, args.stage, args.inventory)
+                result = snapshot_journals(journals, args.stage, args.inventory,
+                                          backup_timeout=args.backup_timeout, max_journal_bytes=args.max_journal_bytes)
             else:
                 args.work.mkdir(mode=0o700)
                 runner = Restic(args.restic_bin, args.repository, args.password_file, args.work)
                 result = cycle(runner, journals, args.rotation_state, parts=args.check_parts,
-                               full_check=args.full_check, control=args.control)
+                               full_check=args.full_check, control=args.control,
+                               backup_timeout=args.backup_timeout, max_journal_bytes=args.max_journal_bytes)
         print(json.dumps({"result": "passed", **result}, sort_keys=True))
         return 0
     except (RecoveryError, OSError, sqlite3.Error, KeyError, TypeError,

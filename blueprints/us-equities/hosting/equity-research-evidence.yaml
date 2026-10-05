@@ -4,7 +4,8 @@ tags: [nyse-post-close-evidence]
 # Schedule contract name: nyse-post-close-evidence (the DAG name is its filename).
 # dagucloud/dagu@v2.16.6:internal/ir/schedule.go:281-305;
 # go.mod:65 pins robfig/cron@v3.0.1:parser.go:93-103 (CRON_TZ).
-# 16:30 ET also follows a 13:00 early close; holidays are skipped below.
+# 16:30 ET follows ordinary and early closes. The bracketed native calendar query
+# returns non_session on holidays (including New Year); uncovered dates fail.
 schedule: 'CRON_TZ=America/New_York 30 16 * * 1-5'
 # dagucloud/dagu@v2.16.6:internal/spec/dag.go:1663-1673.
 # Replace these placeholders in the private deployed DAG. env -i needs no inheritance.
@@ -23,7 +24,10 @@ artifacts:
 steps:
   # A normal command surfaces import/version/calendar failures instead of silently skipping.
   - id: calendar_check
-    run: '"${SDK_ENV}/bin/python" "${STACK_REPO}/blueprints/us-equities/hosting/session_day.py"'
+    # LEAN_EVENTS producer: research operator's simulation job publishes this
+    # session's input after its actual close and by 16:25 ET. Stale/missing input
+    # is a visible token and skips the native precondition/dependent chain.
+    run: '"${SDK_ENV}/bin/python" "${STACK_REPO}/blueprints/us-equities/hosting/session_day.py" --events "${LEAN_EVENTS}"'
     output: SESSION_DAY
   # dagucloud/dagu@v2.16.6:internal/runtime/runner.go:1633-1648, 1267-1281:
   # a false step precondition skips this step and its dependents, without failure.

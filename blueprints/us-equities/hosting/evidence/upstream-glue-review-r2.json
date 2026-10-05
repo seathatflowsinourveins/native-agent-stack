@@ -1,0 +1,252 @@
+{
+  "schema_version": 1,
+  "round": "t-pr4-r2",
+  "observed_at_utc": "2026-10-05T05:25:40.188600+00:00",
+  "scope": "Native functionality at locked pins; no new orchestrator, replication service, install, broker or pin selection.",
+  "cli_checks": [
+    {
+      "command": "restic backup --help",
+      "exit": 0,
+      "returned_output": "EXIT STATUS\nExit status is 0 if the command was successful.\nExit status is 1 if there was a fatal error (no snapshot created).\nExit status is 3 if some source data could not be read (incomplete snapshot created).\nExit status is 10 if the repository does not exist.\nExit status is 11 if the repository is already locked.\nExit status is 12 if the password is incorrect.\n  -g, --group-by group                         group snapshots by host, paths and/or tags, separated by comma (disable grouping with '') (default host,paths)\n      --parent snapshot                        use this parent snapshot (default: latest snapshot in the group determined by --group-by and not newer than the timestamp determined by --time)\n      --stdin-from-command                     interpret arguments as command to execute and store its stdout\n",
+      "representation": "selected help lines"
+    },
+    {
+      "command": "restic check --help",
+      "exit": 0,
+      "returned_output": "backed-up data, use the --read-data or --read-data-subset flags.\n      --read-data-subset subset   read a subset of data packs, specified as 'n/t' for specific part, or either 'x%' or 'x.y%' or a size in bytes with suffixes k/K, m/M, g/G, t/T for a random subset\n",
+      "representation": "selected help lines"
+    },
+    {
+      "command": "restic restore --help",
+      "exit": 0,
+      "returned_output": "      --delete                  delete files from target directory if they do not exist in snapshot. Use '--dry-run -vv' to check what would be deleted\n      --overwrite behavior      overwrite behavior, one of (always|if-changed|if-newer|never) (default always)\n  -t, --target string           directory to extract data to\n      --verify                  verify restored files content\n      --no-extra-verify                  skip additional verification of data before upload (see documentation)\n      --pack-size size                   set target pack size in MiB, created pack files may be larger (default: $RESTIC_PACK_SIZE)\n",
+      "representation": "selected help lines"
+    },
+    {
+      "command": "restic forget --help",
+      "exit": 0,
+      "returned_output": "first divided into groups according to \"--group-by\", and after that the policy\n  -g, --group-by group                    group snapshots by host, paths and/or tags, separated by comma (disable grouping with '') (default host,paths)\n  -n, --dry-run                           do not delete anything, just print what would be done\n",
+      "representation": "selected help lines"
+    },
+    {
+      "command": "dagu start-all --help",
+      "exit": 0,
+      "returned_output": "Simultaneously start the web UI server, scheduler, and optionally coordinator in a single command.\nThis convenience command combines the functionality of 'dagu server', 'dagu scheduler',\nand optionally 'dagu coordinator' into a single process. The web UI provides the management\ninterface, the scheduler handles automated DAG-run execution based on defined schedules,\nand the coordinator (when enabled) manages distributed task execution across workers.\nThe coordinator is enabled by default and can be disabled by setting coordinator.enabled=false\nin the config file or DAGU_COORDINATOR_ENABLED=false as an environment variable.\n  --coordinator.host string         Host address to bind the coordinator gRPC server to (default: 127.0.0.1)\n  --coordinator.advertise string    Address to advertise in service registry (default: auto-detected hostname)\n  --coordinator.port int            Port number for the coordinator gRPC server (default: 50055)\n  # Default mode (coordinator enabled)\n  # Disable coordinator\n  DAGU_COORDINATOR_ENABLED=false dagu start-all\n  # Distributed mode with coordinator on all interfaces\n  dagu start-all --coordinator.host=0.0.0.0 --coordinator.port=50055\n  # Production with both web and coordinator on all interfaces\n  dagu start-all --host=0.0.0.0 --port=8080 --coordinator.host=0.0.0.0\n  -A, --coordinator.advertise string   Address to advertise in service registry (default: auto-detected hostname)\n  -H, --coordinator.host string        Coordinator gRPC server host (default: 127.0.0.1) (default \"127.0.0.1\")\n  -P, --coordinator.port string        Coordinator gRPC server port (default: 50055) (default \"50055\")\n",
+      "representation": "selected help lines"
+    },
+    {
+      "command": "python3 -m sqlite3 --help",
+      "exit": 0,
+      "returned_output": "usage: python -m sqlite3 [-h] [-v] [filename] [sql]\n\nPython sqlite3 CLI\n\npositional arguments:\n  filename       SQLite database to open (defaults to ':memory:'). A new\n                 database is created if the file does not previously exist.\n  sql            An SQL query to execute. Any returned rows are printed to\n                 stdout.\n\noptions:\n  -h, --help     show this help message and exit\n  -v, --version  Print underlying SQLite library version\n",
+      "representation": "full returned output"
+    },
+    {
+      "command": "ecal --help",
+      "exit": 255,
+      "returned_output": "usage: <ecal-4.13.2> CALENDAR [[[DAY] MONTH] YEAR]\n",
+      "representation": "full returned output"
+    },
+    {
+      "command": "ecal XNYS 11 2026",
+      "exit": 0,
+      "returned_output": "       November 2026\n Su  Mo  Tu  We  Th  Fr  Sa\n\n[ 1]  2   3   4   5   6 [ 7]\n[ 8]  9  10  11  12  13 [14]\n[15] 16  17  18  19  20 [21]\n[22] 23  24  25 [26] 27 [28]\n[29] 30 \n\n",
+      "representation": "full returned output"
+    }
+  ],
+  "sqlite_library_executed": "3.53.1",
+  "sqlite_cli_lookup": {
+    "command": "lookup sqlite3 in PATH",
+    "present": false
+  },
+  "sources": [
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "internal/runtime/runner.go:1267-1281,1502-1525,1196-1206,1633-1648",
+      "sha256": "95ec2ba0e869bc1fc3d2d25feb5b1af0371602d0af7073d4852381faaf5d7948"
+    },
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "internal/cmn/config/env.go:77-95",
+      "sha256": "5d852a9e96a17c37101602a96217b369bcdf79e0463e880e2cba85b9ffed3f81"
+    },
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "internal/cmn/config/loader.go:344-347,1311-1319",
+      "sha256": "eb7203d02fbf88a213bdee63261dccfefca376c358612630779b181069cfdec3"
+    },
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "internal/cmd/startall.go:32-45",
+      "sha256": "1b535400a80904fcceec79b16fa862b917d265170c5a31ae48cc8c856e32763e"
+    },
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "internal/cmd/history.go:568-602",
+      "sha256": "a972e448952c527fd602465c5c4fa43c008422f2c13d22b9b08ee94fff0a760e"
+    },
+    {
+      "pin": "restic/restic@v0.19.1",
+      "locator": "doc/040_backup.rst:197-206,679-703,787-806",
+      "sha256": "e7281c20f0ef27bdbbb5f59d12f64aef63fae33048c5bd6b086ff1973edd218e"
+    },
+    {
+      "pin": "restic/restic@v0.19.1",
+      "locator": "doc/045_working_with_repos.rst:482-521",
+      "sha256": "56bfbe763b9cae005700f9472f73f69acaa28eea07d6fe258471af729ffffcd6"
+    },
+    {
+      "pin": "restic/restic@v0.19.1",
+      "locator": "doc/050_restore.rst:55-73",
+      "sha256": "00d39803cfcb17158c2ee1d835de6351c902e66067d2493438831580e9b04251"
+    },
+    {
+      "pin": "restic/restic@v0.19.1",
+      "locator": "doc/060_forget.rst:225-233",
+      "sha256": "444be0adec93ad92810a4c6b363d8a5a7b77d84c88879e38408b1a7ea2eff614"
+    },
+    {
+      "pin": "sqlite/sqlite@version-3.53.1",
+      "locator": "src/shell.c.in:3737,3759,9074-9099",
+      "sha256": "bcceddfe1ab18e60c32cb9bbac7020ec22c03dbd68bd8dffe3599246560a46e3"
+    },
+    {
+      "pin": "sqlite/sqlite@version-3.53.1",
+      "locator": "src/backup.c:321-392",
+      "sha256": "ee4cbfc7d8afb311d12cc106d645764a3e18266694f003438b410bfa33764ef7"
+    },
+    {
+      "pin": "sqlite/sqlite@version-3.53.1",
+      "locator": "tool/sqlite3_rsync.c:13-40",
+      "sha256": "b9e54de43b69da85771de1acacd1ade4ad29d001be09b2f187dfb954eda2f0c8"
+    },
+    {
+      "pin": "python/cpython@v3.12.3",
+      "locator": "Modules/_sqlite/connection.c:2011-2016,2067-2102",
+      "sha256": "c33db9525cbc9887293c1cbdc03e0d8a3a3201e7dae98392452a40196e850070"
+    },
+    {
+      "pin": "python/cpython@v3.12.3",
+      "locator": "Doc/library/sqlite3.rst:1107-1155",
+      "sha256": "f5be72345d2d37ffa53a82058b6054ed9052dda816a2e84639b96172fe3183b7"
+    },
+    {
+      "pin": "python/cpython@v3.12.3",
+      "locator": "Doc/library/subprocess.rst:62-68",
+      "sha256": "2cb61f06f2fc41a60cf52c13a1bdaf52ff2a7962c55be96ec650bb12eb3c6845"
+    },
+    {
+      "pin": "python/cpython@v3.12.3",
+      "locator": "Doc/library/hashlib.rst:267-302",
+      "sha256": "49df3195ff1acf0d114ed0288a15a43c924c9cd41564e0d956d40998ed6d6a82"
+    },
+    {
+      "pin": "python/cpython@v3.12.3",
+      "locator": "Doc/library/fcntl.rst:139-149",
+      "sha256": "2d828976d383a49e1bd394921100078afd5412a50c498b5302682bbf2be58a8d"
+    },
+    {
+      "pin": "gerrymanoim/exchange_calendars@4.13.2",
+      "locator": "pyproject.toml:67-68",
+      "sha256": "0624504db59140714e6d12dd5039009e6517e20e88017c2e8989cf961645a266"
+    },
+    {
+      "pin": "gerrymanoim/exchange_calendars@4.13.2",
+      "locator": "exchange_calendars/ecal.py:100-149",
+      "sha256": "1744b47c0a502f5a3ae9baebdf5affac6027da68ce3ab954289691e7f03f6c8f"
+    },
+    {
+      "pin": "gerrymanoim/exchange_calendars@4.13.2",
+      "locator": "exchange_calendars/exchange_calendar.py:1012-1016,1257-1279",
+      "sha256": "7b8087892b698299fe448afbc4b3fb9300a34ba1605804999436525391c08de6"
+    },
+    {
+      "pin": "systemd/systemd@v255",
+      "locator": "man/loginctl.xml:186-195",
+      "sha256": "b07e1b67f169a8d0b380f5738676390b2c5d6b4297bc6f1845aaf1e336d6a476"
+    },
+    {
+      "pin": "systemd/systemd@v255",
+      "locator": "man/systemd.service.xml:818-836",
+      "sha256": "439322b120014971f37e0a96adc6cb827367846ff6c16f193e9ec4b15931033b"
+    }
+  ],
+  "release_checks": [
+    {
+      "pin": "gerrymanoim/exchange_calendars@4.13.2",
+      "locator": "tagged GitHub release body",
+      "entry_point_verified": "ecal is declared at pyproject.toml:67-68",
+      "release_body_sha256": "42187892bcb2fb2981cc93f0b0ca49247e2cfb1a299e01970e332c1b55034d06",
+      "summary": "Tagged 4.13.2 notes cover New Year holiday-name formatting and non-XNYS calendar updates; packaging/native help separately confirm the ecal entry point."
+    },
+    {
+      "pin": "restic/restic@v0.19.1",
+      "locator": "CHANGELOG.md:3",
+      "result": "Read tagged changelog; native backup help and doc/040_backup.rst:679-703 verify stdin-from-command.",
+      "sha256": "fbf2ba611d2821e6b965129ce455ae3d086dab29fc7552eb34610aff289bbf21"
+    },
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "tagged GitHub release body",
+      "source_sha256": "333c6be589bdd718ad0b5e6a58ae5e8a47d76248169cdd69c6bdeff1095e5140",
+      "comparison_artifact": "blueprints/us-equities/hosting/evidence/dagu-scheduler-comparison.json"
+    }
+  ],
+  "native_choices": [
+    {
+      "glue": "session_day.py",
+      "decision": "kept",
+      "checked": "Native ecal CLI, native is_session/session_close and Dagu preconditions/retries/handlers.",
+      "gap_citation": "gerrymanoim/exchange_calendars@4.13.2:pyproject.toml:67-68; exchange_calendars/ecal.py:100-149; exchange_calendars/exchange_calendar.py:1012-1016,1257-1279",
+      "why": "ecal renders a calendar; compose native session/close queries into the job eligibility/input-mtime token and leave skipping to Dagu."
+    },
+    {
+      "glue": "journal_recovery.py",
+      "decision": "kept",
+      "checked": "restic stdin-from-command, SQLite CLI .backup/.dump, SQLite sqlite3_rsync, CPython Online Backup and subprocess timeout.",
+      "gap_citation": "restic/restic@v0.19.1:doc/040_backup.rst:679-703; doc/045_working_with_repos.rst:482-521; doc/050_restore.rst:55-73; sqlite/sqlite@version-3.53.1:src/shell.c.in:9074-9099; tool/sqlite3_rsync.c:13-40",
+      "why": "Native operations do the copying/backups/checks/restores; consumer glue freezes the external oracle and required tables, rotates checks with a deadline and refuses controls."
+    },
+    {
+      "glue": "journal_recovery.py rotation lock",
+      "decision": "replaced",
+      "checked": "CPython native fcntl.flock",
+      "gap_citation": "python/cpython@v3.12.3:Doc/library/fcntl.rst:139-149",
+      "why": "Replace exclusive-create sentinels with nonblocking process-owned flock; stale file survives safely and no custom stale-lock recovery runs."
+    },
+    {
+      "glue": "drill_process_restart.py",
+      "decision": "kept",
+      "checked": "systemd Restart=on-failure, Dagu native history/status and native handlers/retries.",
+      "gap_citation": "systemd/systemd@v255:man/systemd.service.xml:818-836; dagucloud/dagu@v2.16.6:internal/cmd/history.go:568-602; internal/ir/status.go:133-149",
+      "why": "Upstreams own supervision and run records; identity/time/holiday guards and exact due-slot correlation are our acceptance procedure."
+    },
+    {
+      "glue": "drill_local_recovery.py",
+      "decision": "kept",
+      "checked": "Native Online Backup, restic backup/check/restore and .backup/.dump/sqlite3_rsync alternatives.",
+      "gap_citation": "python/cpython@v3.12.3:Modules/_sqlite/connection.c:2067-2102; restic/restic@v0.19.1:doc/050_restore.rst:55-73",
+      "why": "Synthetic concurrent WAL writers, failures preserving integrity/counts and path-free integration evidence are consumer acceptance rather than replacement backup tools."
+    }
+  ],
+  "stdin_assessment": {
+    "backup": "restic stores command stdout; sqlite3 .backup writes a destination DB and emits no DB stdout, so this command would archive an empty stream.",
+    "dump": "Logical SQL dump would require replay and a different completeness oracle; this contract freezes staged binary DB inventory before restic.",
+    "maintained_tool": "SQLite upstream sqlite3_rsync performs live replication; it does not replace the encrypted restic repository/consumer-oracle contract."
+  },
+  "retained_decision": {
+    "locator": "coordinator decision-record-T-final.md:102",
+    "rule": "Keep restic and stdlib Online Backup; independent destination, key recovery and second-host consumer restore are decision 3.",
+    "litestream_context": "blueprints/us-equities/convergence-review/prompt.txt:F8 deferred Litestream in the prior hosting comparison. The final T row does not name Litestream; this repair does not reopen it."
+  },
+  "corrections": [
+    "Round 1 Jan-1 bounds falsely failed New Year holidays; real 4.13.2 tests reproduced three DateOutOfBounds errors and now pass bracketed queries.",
+    "SDK_ENV lock authority is adoption/sdk/requirements-linux-x86_64-py313.lock:241 at the repair base, not an unlanded runtime bundle.",
+    "exchange_calendars ships ecal; pyproject.toml:67-68 and installed CLI were checked, so no CLI-absence claim is made.",
+    "An initial source lookup under internal/cmn/env/env.go was wrong; rg located internal/cmn/config/env.go and lines 77-95 were read.",
+    "exchange_calendars CHANGELOG.md and etc/changes.rst returned HTTP 404 at 4.13.2; tagged GitHub release notes were read instead."
+  ],
+  "limitations": [
+    "Source gap judgments are scoped inferences from documented native interfaces, not exhaustive ecosystem absence claims.",
+    "No SQLite CLI or sqlite3_rsync installation/trial; pinned SQLite source and installed CPython Online Backup are the evidence."
+  ]
+}

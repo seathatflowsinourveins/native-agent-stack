@@ -3,10 +3,12 @@
 The templates run the named `nyse-post-close-evidence` research job with Dagu
 **2.16.6** and recover selected research SQLite journals with restic **0.19.1**.
 This serves US-equities research and historical simulation: the DAG summarizes
-an operator-supplied local LEAN simulation and validates its evidence. It neither
+an operator-supplied local LEAN simulation and validates its evidence. The research
+operator's simulation job owns refreshing `LEAN_EVENTS` after that session's
+actual close and **by 16:25 America/New_York**, before the 16:30 attempt. It neither
 acquires market data nor executes broker orders.
 
-The [decision](../../../../docs/decisions/2026-10-05-trading-unattended-hosting-recovery.md)
+The [decision](../../../docs/decisions/2026-10-05-trading-unattended-hosting-recovery.md)
 records the alternatives, scheduler comparison and remaining gates. These are
 portable examples. PR-4 installed no unit, started no scheduler and used no
 existing host service. Operating-host and alert selection is **user decision 2**.
@@ -25,14 +27,23 @@ that file; it otherwise defaults to enabled. Sources:
 Replace every `/path/to/...` in a **private copy** of the unit and DAG. Put the
 four job variables `STACK_REPO`, `SDK_ENV`, `LEAN_EVENTS` and `RESEARCH_OUTPUT`
 in the DAG's `env:` block. This keeps the job complete when invoked by either
-the scheduler or native CLI. `SDK_ENV` is the existing locked trading runtime.
+the scheduler or native CLI. `SDK_ENV` is the installed SDK built from
+[`adoption/sdk/requirements-linux-x86_64-py313.lock:241`](../../../adoption/sdk/requirements-linux-x86_64-py313.lock),
+which locks exchange-calendars 4.13.2. Use that maintained native environment;
+PR-4 adds no second runtime, lock or dependency installation.
 An `Environment=` line in the unit cannot supply them: `env -i` discards that
 inherited environment. Sources: `coreutils/coreutils@v9.4:src/env.c:824-838`
 ([implementation](https://github.com/coreutils/coreutils/blob/v9.4/src/env.c#L824)) and
 `dagucloud/dagu@v2.16.6:internal/spec/dag.go:1663-1673`
 ([DAG env](https://github.com/dagucloud/dagu/blob/v2.16.6/internal/spec/dag.go#L1663)).
-The four passthrough entries remain available for other native CLI definitions;
-this DAG obtains its values from its own block.
+`env_passthrough` is an **allowlist**. The four scheduled-job entries and all seven
+entries used by [research-runtime](../research-runtime/README.md) remain in the
+config: `LEAN_RESULTS`, `RESEARCH_WORKSPACE`, `NATIVE_CODEX_HOME`,
+`NATIVE_CODEX_BIN`, `NATIVE_CLAUDE_BIN`, `NATIVE_RUNTIME_PATH` and
+`SDK_OBSERVATION_DIR`. Those recipes must also supply their own environment to
+their native CLI calls; the scheduled DAG obtains its four values from its own
+block. Sources: `dagucloud/dagu@v2.16.6:internal/cmn/config/loader.go:344-347`
+and `internal/cmn/config/env.go:77-95`.
 
 Deploy only the private research DAG to the chosen Dagu DAG directory, with its
 local input and output paths adapted. Each run writes
@@ -53,6 +64,75 @@ and `internal/service/scheduler/dag_executor.go:280-321`
 Anonymous loopback observation requires a trusted local user; these permissions
 do not cover all administration APIs. DAG artifact storage stays off.
 
+## Native installation and operating-host service boundary
+
+These commands are **for the operator later**, after user decision 2 selects the
+operating host. Use a clean upstream release on a new Linux/WSL host, verified
+against its publisher's checksum; reuse a previously verified installation at the
+same pin. For Linux amd64 the historical verified archive SHA-256 is
+`06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717`
+([historical receipt](receipt.json)); still verify the downloaded archive against
+the tagged release's `checksums.txt`:
+
+```sh
+gh release download v2.16.6 --repo dagucloud/dagu \
+  --pattern dagu_2.16.6_linux_amd64.tar.gz --pattern checksums.txt
+awk '$2 == "dagu_2.16.6_linux_amd64.tar.gz"' checksums.txt | sha256sum --check --strict
+tar -xzf dagu_2.16.6_linux_amd64.tar.gz
+"$DAGU" version
+install -m 0600 config.yaml.example "$RESEARCH_HOME/config.yaml"
+```
+
+Set `DAGU`, `RESEARCH_HOME`, `STACK_REPO`, `SDK_ENV`, `LEAN_EVENTS` and
+`RESEARCH_OUTPUT` to private operator paths, adapt the private DAG and unit, and
+keep **config and private DAG mode 0600**. Download/extraction must target a
+private installation directory, with `DAGU` pointing to its extracted executable.
+The supported upstream release is
+[dagucloud/dagu@v2.16.6](https://github.com/dagucloud/dagu/releases/tag/v2.16.6);
+no rebuilt Dagu or restic binary belongs to this recipe.
+
+`auth.mode: none` permits anonymous reads and some administration on loopback;
+**do not expose it with a network listener or tunnel**. The historical Basic
+configuration returned 401 and repeatedly challenged the browser. When changing
+to `none`, remove the `auth.basic` subsection: the native config validator refuses
+a Basic block under that mode. The [dated auth observation](../../../evidence/artifacts/gap-wave2-20260923/us-equities__data-quality-orchestration/2-dashboard-auth-mode.json)
+retains that finding, distinct from this round's offline probes. Use upstream
+authentication in a separately reviewed network deployment. `run_dags: false`
+and `write_dags: false` do not form a global Viewer role. Artifact storage is
+enabled by default; this DAG disables it explicitly. Native scratch acceptance
+on **2.16.6 and 2.17.2** found that `base.yaml` does not propagate that key.
+**2.17.2 adds anonymous cross-run `GET /api/v1/artifacts` under `none`**; its
+historical boundary remains relevant to any later pin change. See the
+[2026-09-25 source/observation record](../../../docs/decisions/2026-09-25-workstation-sota-refresh.md).
+This round keeps 2.16.6 and runs neither version's server.
+
+After adapting and placing the private unit under the operating user's
+`~/.config/systemd/user/dagu-equities.service`, the operator's lifecycle commands
+are:
+
+```sh
+loginctl enable-linger
+systemctl --user daemon-reload
+systemctl --user enable --now dagu-equities.service
+systemctl --user restart dagu-equities.service
+systemctl --user status dagu-equities.service
+"$DAGU" history --context local --dagu-home "$RESEARCH_HOME" --format json
+# Later removal preserves the evidence directories:
+systemctl --user disable --now dagu-equities.service
+```
+
+`loginctl enable-linger` without a name selects the caller: it keeps the user
+manager alive after logout and permits boot activation
+(`systemd/systemd@v255:man/loginctl.xml:186-195`
+[source](https://github.com/systemd/systemd/blob/v255/man/loginctl.xml#L186)).
+It **cannot keep a WSL VM or Windows host running**. Windows/WSL shutdown, VM
+lifetime and host reboot interrupt this user unit; unattended availability still
+needs the later host receipt. `start-all` replaces the previous manual-history
+`server` example and owns the scheduler within the same supervised process.
+`Restart=on-failure` provides process restart, with no claim of resuming in-flight
+steps or catching up a missed schedule. The builder executed none of these
+service/linger commands.
+
 ## NYSE session schedule
 
 [equity-research-evidence.yaml](equity-research-evidence.yaml) names its schedule
@@ -68,18 +148,18 @@ expression and optional runtime profile. Sources:
 
 Cron cannot skip exchange holidays. The normal `calendar_check` step runs
 [session_day.py](session_day.py) in `SDK_ENV`, checks exchange-calendars **4.13.2**,
-and queries XNYS for today's New York date and actual close. A non-session prints
+and queries XNYS for today's New York date and actual close. It constructs bounds
+from **December 1 of the previous year through January 31 of the following year**,
+bracketing New Year's Day and observed January holidays before the first session.
+The native calendar's session boundaries determine coverage
+(`gerrymanoim/exchange_calendars@4.13.2:exchange_calendars/exchange_calendar.py:1257-1279`).
+A truly uncovered date remains a hard error. A covered non-session prints
 `non_session`; the `nyse_session` precondition skips that step and its dependents.
 Import, package-version or calendar failures fail the normal check step instead
 of being mistaken for a holiday. A manual run before close prints `before_close`
 and skips the research chain.
 
-The calendar is locked in
-`blueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml:11`
-(PR-1 revision `d00e4e6eeb92c7c99066ea5d0bd85f379c931c4f`). The brief's shorter
-`runtime-2604/pyproject.toml` path is absent at this PR's base; the nested bundled
-file was read directly, and `manifests/stack.json` independently carries 4.13.2.
-PR-4 adds no lock or dependency installation. Calendar sources:
+The SDK lock cited above is on this branch's base. Calendar sources:
 `gerrymanoim/exchange_calendars@4.13.2:exchange_calendars/exchange_calendar.py:1012-1016,1263-1279`
 and `exchange_calendars/exchange_calendar_xnys.py:157-165`
 ([session API](https://github.com/gerrymanoim/exchange_calendars/blob/4.13.2/exchange_calendars/exchange_calendar.py#L1263),
@@ -88,6 +168,17 @@ and `exchange_calendars/exchange_calendar_xnys.py:157-165`
 additional cron or run. Step skip and dependency propagation come from
 `dagucloud/dagu@v2.16.6:internal/runtime/runner.go:1633-1648,1267-1281`
 ([precondition result](https://github.com/dagucloud/dagu/blob/v2.16.6/internal/runtime/runner.go#L1633)).
+
+On a session after close, `--events "${LEAN_EVENTS}"` also requires the events
+file's mtime to be between that session's actual close and the check instant.
+`missing_input`, `stale_input` or `future_input` are visible normal-step output
+tokens; the **native Dagu precondition** skips the evidence chain, so stale input
+cannot produce a succeeded summarization. The native run itself can be succeeded
+with skipped steps; inspect its token and node statuses. Calendar/import/IO errors
+remain failures. The producer must complete and atomically publish that session's
+local LEAN simulation output by 16:25; mtime is an availability contract, not
+proof of the market dates or quality inside a file. No upstream acquisition job
+is introduced here.
 
 ## Journal snapshot and restic procedure
 
@@ -98,11 +189,22 @@ glue around CPython's published Online Backup example and native restic commands
 
 Select **every journal required by the research consumer**, with explicit required
 tables. The procedure opens each source read-only and uses
-`sqlite3.Connection.backup` to a new staging directory, then closes the destination
+`sqlite3.Connection.backup(..., pages=-1)` within a read transaction to a new staging directory, then closes the destination
 in DELETE journal mode. Never copy an active SQLite, WAL or SHM file directly.
 Sources: `python/cpython@v3.12.3:Doc/library/sqlite3.rst:1107-1155`
 ([concurrent backup and example](https://github.com/python/cpython/blob/v3.12.3/Doc/library/sqlite3.rst#L1107))
-and `Modules/_sqlite/connection.c:2067-2077`. Each journal is independently
+and `Modules/_sqlite/connection.c:2013,2067-2102`. One native step avoids restarting
+an incremental copy on each WAL commit. An isolated stdlib subprocess bounds each
+copy at **120 seconds**, including worker startup; timeout kills and waits for
+the worker and prevents inventory publication. The maximum logical journal size
+is **256 MiB** per source, checked in the read transaction. Operators can set
+`--backup-timeout` and `--max-journal-bytes` after measuring the required sizes and
+copy times; neither limit silently drops a journal. These are explicit integration
+policy limits, not upstream defaults. Source:
+`python/cpython@v3.12.3:Doc/library/subprocess.rst:62-68` (native timeout).
+The timeout bounds the spawned worker; the OS's initial process creation itself
+cannot always be interrupted, as the same source explains.
+Each journal is independently
 consistent; this does not create an atomic transaction across journals.
 Consumers needing one must quiesce their writers before taking the snapshots.
 
@@ -118,12 +220,18 @@ is insufficient for acceptance. Source:
 `restic/restic@v0.19.1:doc/040_backup.rst:787-806`
 ([exit codes](https://github.com/restic/restic/blob/v0.19.1/doc/040_backup.rst#L787)).
 
-Run the cycle at least once every **24 hours**, including weekends and holidays,
+Run the cycle **daily**, including weekends and holidays,
 using one private rotation-state file per repository. Default checks rotate
 `1/7` through `7/7`; all partitions are read within **seven days**. The cursor
-advances only after successful native checking. A gap over 24 hours or reversed
-clock refuses continuation until `--full-check` successfully reads all data and
-resets the rotation. This is an operator execution requirement; no backup timer
+advances only after successful native checking. The **whole 1..7 rotation**, from
+its cycle-start timestamp through subset 7's successful completion, has a seven-day
+deadline in UTC. There is no strict per-step 24-hour cutoff: daily execution with
+60 seconds of jitter and the 25-hour fall-back day fit the bound. An incomplete
+cycle older than seven days, a gap since the last success over seven days, reversed
+clock or pre-v2 state requires `--full-check`; only successful full reading can
+restart the cursor. Starting the next rotation resets its origin before subset 1;
+capture the invocation time before snapshot/backup, and check completion time
+again before publishing state. This is an operator execution requirement; no backup timer
 was enabled by PR-4. Every cycle also restores and compares its snapshot.
 Source: `restic/restic@v0.19.1:doc/045_working_with_repos.rst:482-521`
 ([deterministic partitions](https://github.com/restic/restic/blob/v0.19.1/doc/045_working_with_repos.rst#L482)).
@@ -140,11 +248,12 @@ For an already initialized **local** repository and its operator-owned password
 file, the template command is:
 
 ```sh
-rtk env TMPDIR="$PRIVATE_TMP" nice -n 19 python3 \
+env TMPDIR="$PRIVATE_TMP" nice -n 19 python3 \
   blueprints/us-equities/hosting/journal_recovery.py cycle \
   --restic-bin "$RESTIC_BIN" --repository "$LOCAL_REPOSITORY" \
   --password-file "$RESTIC_PASSWORD_FILE" --work "$NEW_PRIVATE_WORK" \
   --rotation-state "$PRIVATE_ROTATION_STATE" \
+  --backup-timeout 120 --max-journal-bytes 268435456 \
   --journal "research=$RESEARCH_JOURNAL" --required-table research=events \
   --journal "evidence=$EVIDENCE_JOURNAL" --required-table evidence=runs
 ```
@@ -152,9 +261,22 @@ rtk env TMPDIR="$PRIVATE_TMP" nice -n 19 python3 \
 Adapt names and tables to the consumer's contract; `events` and `runs` are the
 fixture tables. The work directory must be new. The password file must be outside
 staging; its contents are never read or printed by the Python script. Keep the
-repository, raw output, state and oracle private. If a crash leaves a `.lock` or
-`.new` rotation file, preserve the failed output and resolve that private state
-before retrying; do not reset the cursor to conceal a missed interval.
+repository, raw output, state and oracle private. Native `fcntl.flock` owns the
+rotation lock; the `.lock` inode remains but process exit releases the lock.
+A stale lock file is safe to reuse; a live holder causes visible refusal. Never
+unlink it to bypass a holder. Native temporary-file plus `os.replace` publication
+avoids stale `.new` collisions; preserve failed artifacts without resetting the
+cursor. Source: `python/cpython@v3.12.3:Doc/library/fcntl.rst:139-149`.
+
+Backup uses **`--group-by host,tags`**, with the stable host
+`equity-research-recovery` and tag `journal-recovery`, so new staging paths share
+a parent group. Any later `forget --keep-*` policy must use **the same grouping**,
+filtered to that host/tag; first inspect `forget --dry-run --group-by host,tags`
+with the chosen retention counts. Retention counts and deletion remain unaccepted;
+this procedure performs neither forget nor prune. Sources:
+`restic/restic@v0.19.1:doc/040_backup.rst:197-206` and
+`doc/060_forget.rst:225-233`.
+
 Remote repository URLs are outside this local procedure. A second-host consumer
 can run `verify --restored "$RESTORE" --inventory "$FROZEN_INVENTORY"` against
 its independently retained oracle after the separately approved destination
@@ -169,7 +291,8 @@ Python. Supply `--dagu-bin`, `--dagu-home`, `--config`, this one DAG's
 verifies an existing unit's MainPID and executable, kills `start-all` with
 SIGKILL, observes automatic restart and waits for the next successful due run.
 Native history plus original `status.jsonl` must attest the exact `scheduleTime`
-and scheduler trigger while the deployed UI has `run_dags: false`. A manual run
+and scheduler trigger, with every required research step succeeded, while the
+deployed UI has `run_dags: false`. A skipped evidence chain does not count. A manual run
 does not count. The script installs, enables and starts no unit. SIGKILL induces
 failure; under `Restart=on-failure`, clean SIGTERM need not trigger restart
 (`systemd/systemd@v255:man/systemd.service.xml:818-836`
@@ -183,7 +306,7 @@ receipts and the chosen alert path.
 Run the disposable local backup-check-restore drill with:
 
 ```sh
-rtk env TMPDIR="$PRIVATE_TMP" nice -n 19 python3 \
+env TMPDIR="$PRIVATE_TMP" nice -n 19 python3 \
   blueprints/us-equities/hosting/drill_local_recovery.py \
   --restic-bin "$RESTIC_BIN" --output "$NEW_SANITIZED_REPORT"
 ```
@@ -196,14 +319,63 @@ the default seven-part rotation. It also runs these controls:
 
 - `--control snapshot` makes one staged file unreadable: native backup must exit
   **3** and the procedure must exit nonzero before checking or restoring.
-- `--control restore` deletes a required file after native restore: comparison
-  must make the procedure exit nonzero.
+- `--control restore` alters the restored SQLite `user_version` header while
+  integrity, required table counts **and file bytes remain equal**. The SHA-256
+  comparison must make the procedure exit nonzero, proving that those secondary
+  checks alone would accept incomplete recovery of the original state.
 
-The [sanitized offline proof](evidence/offline-proof.json) and
-[local integration receipt](../../../../evidence/receipts/trading-unattended-hosting-recovery-20261005.json)
+The [round 2 sanitized offline proof](evidence/offline-proof-r2.json) and
+[local integration receipt](../../../evidence/receipts/trading-unattended-hosting-recovery-r2-20261005.json)
 retain actual native output and command exits with separate observations.
 The fixture is our integration check, using the unchanged restic 0.19.1 executable.
 Neither operator drill was run on an operating service.
+
+The scripts require **Python 3.11 or later**: `hashlib.file_digest` was added in
+3.11 (`python/cpython@v3.12.3:Doc/library/hashlib.rst:267-302`). The builder checked
+that API and executed on Python 3.13.15; it did not run a separate 3.11 interpreter.
+The receipt notes the builder's RTK fallback; portable recipes require only plain
+`env`, `nice`, the locked SDK where needed, and the upstream binaries. The retained
+[round 1 proof](evidence/offline-proof.json) remains historical evidence.
+The [native Dagu probes](evidence/native-dagu-probes-r2.json) observed both skip
+and success chains. The [pinned cron Next probe](evidence/cron-next-probe-r2.json)
+was prepared from v3.0.1 source but returned 127 because no Go compiler was found;
+its DST expectations are recorded, not measured. No compiler was installed.
+
+## Why this glue exists
+
+The [pinned native review](evidence/upstream-glue-review-r2.json) records installed
+help, tagged release notes/source and the alternatives checked before repair.
+Native `ecal` **does exist** in exchange_calendars 4.13.2. It renders calendars;
+it provides neither the post-close eligibility token nor this input-freshness
+contract. Native Dagu already owns preconditions, dependency skips, retries and
+handlers; none is reimplemented here. No retry/handler policy is enabled by this
+job, and independent alerts still need user decision 2.
+
+| Kept integration | One-line gap justification at the pin |
+| --- | --- |
+| `session_day.py` | `gerrymanoim/exchange_calendars@4.13.2:pyproject.toml:67-68; exchange_calendars/ecal.py:100-149` ships a calendar renderer; its `exchange_calendar.py:1012-1016,1257-1279` APIs supply session/close queries, leaving our eligibility/freshness token as job policy. |
+| `journal_recovery.py` | `restic/restic@v0.19.1:doc/040_backup.rst:679-703; doc/045_working_with_repos.rst:482-521; doc/050_restore.rst:55-73` supplies stream backup, partition checks and restore, leaving the external frozen oracle, required table contract, bounded rotation and failure controls to the consumer. |
+| `drill_process_restart.py` | `systemd/systemd@v255:man/systemd.service.xml:818-836` supplies restart and Dagu `@v2.16.6:internal/cmd/history.go:568-602` supplies history without slot/trigger fields, leaving identity guards and exact-slot evidence correlation as the acceptance drill. |
+| `drill_local_recovery.py` | `python/cpython@v3.12.3:Modules/_sqlite/connection.c:2067-2102` supplies Online Backup and restic `@v0.19.1:doc/050_restore.rst:55-73` supplies restore, leaving the concurrent-write fixture, two deliberately failing controls and path-free receipt as our local integration evidence. |
+
+Specifically checked: `restic backup --stdin-from-command -- sqlite3 "$DB"
+".backup ..."` captures **stdout**, while SQLite's `.backup` writes a destination
+file (`sqlite/sqlite@version-3.53.1:src/shell.c.in:9074-9099`); it would save an
+empty stream instead of that DB. `.dump` emits SQL (`src/shell.c.in:3759`), which
+could form a logical restore procedure but does not preserve the already-frozen
+binary file inventory. Keep the **native Online Backup API**, not a rebuilt SQLite
+backup implementation. CPython's single native step has no wall-time argument
+(`python/cpython@v3.12.3:Modules/_sqlite/connection.c:2011-2016,2075-2102`), so
+stdlib subprocess timeout bounds it. Native `fcntl.flock` replaces our previous
+exclusive-create lock/sentinel, including automatic release after a crash.
+
+The maintained upstream **sqlite3_rsync** utility also copies live databases
+(`sqlite/sqlite@version-3.53.1:tool/sqlite3_rsync.c:13-40`); it is a replication
+protocol rather than this encrypted restic repository plus consumer-oracle
+procedure. The final T **off-host-recovery row, line 102**, retains restic and the
+stdlib Online Backup API; the prior hosting comparison deferred Litestream. This
+repair keeps that decision and does not reopen it. The final row does not name
+Litestream; the earlier comparison is recorded separately in the pinned review.
 
 **The same-host drill cannot close the off-host-recovery gate.** Closure needs
 **user decision 3**: an independent destination, key recovery and a restore by a

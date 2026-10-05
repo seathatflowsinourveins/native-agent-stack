@@ -1,0 +1,361 @@
+{
+  "schema_version": 1,
+  "round": "t-pr4-r2",
+  "evidence_class": "local_integration",
+  "observed_at_utc": "2026-10-05T05:30:30.573203+00:00",
+  "recipe_provenance": "Review verdict contains nv_summary, without an nv[2] recipe. This minimal output/scalar-precondition/dependency probe follows dagucloud/dagu@v2.16.6:internal/runtime/runner.go:1267-1281,1633-1648.",
+  "dagu_pin": "2.16.6",
+  "probes": [
+    {
+      "token": "non_session",
+      "version_exit": 0,
+      "version_output": "2.16.6\n",
+      "command": "dagu start --context local --dagu-home <scratch> --config <scratch>/config.yaml <scratch>/native-chain.yaml",
+      "exit": 0,
+      "output": "Succeeded - 2026-10-05T01:30:29-04:00\n\ndag: native-chain (0s)\n\u251c\u2500log: <scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckDp9B9yc0zMwKFQk/dag-run_20261005.013029.340.034aTckD.log\n\u2502\n\u251c\u2500calendar_check (0s) [succeeded]\n\u2502 \u251c\u2500printf non_session\n\u2502 \u2502\n\u2502 \u2514\u2500stdout: <scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckDp9B9yc0zMwKFQk/run_20261005_053029Z_9aa2e0/calendar_check.20261005.013029.410.034aTckD.out\n\u2502     non_session\n\u2502 \n\u251c\u2500nyse_session [skipped]\n\u2502 \n\u2514\u2500evidence [skipped]\n\nResult: Succeeded\n\ntime=2026-10-05T01:30:29.241-04:00 level=INFO msg=\"Creating example DAGs for first-time users\" dir=<scratch>/dags\ntime=2026-10-05T01:30:29.302-04:00 level=INFO msg=\"Example DAGs created successfully. Check the web UI to explore them!\"\ntime=2026-10-05T01:30:29.330-04:00 level=INFO msg=\"Executing root dag-run\" dag=native-chain run-id=034aTckDp9B9yc0zMwKFQk params=\"\"\ntime=2026-10-05T01:30:29.401-04:00 level=INFO msg=\"DAG run started\" dag=native-chain run-id=034aTckDp9B9yc0zMwKFQk worker-id=local attempt-id=9aa2e0 params=[]\ntime=2026-10-05T01:30:29.407-04:00 level=INFO msg=\"Step started\" dag=native-chain run-id=034aTckDp9B9yc0zMwKFQk worker-id=local attempt-id=9aa2e0 step=calendar_check\ntime=2026-10-05T01:30:29.436-04:00 level=INFO msg=\"Step started\" dag=native-chain run-id=034aTckDp9B9yc0zMwKFQk worker-id=local attempt-id=9aa2e0 step=nyse_session\ntime=2026-10-05T01:30:29.450-04:00 level=INFO msg=\"Checking preconditions for \\\"nyse_session\\\"\" dag=native-chain run-id=034aTckDp9B9yc0zMwKFQk worker-id=local attempt-id=9aa2e0 step=nyse_session\ntime=2026-10-05T01:30:29.454-04:00 level=INFO msg=\"Preconditions failed for \\\"nyse_session\\\"\" dag=native-chain run-id=034aTckDp9B9yc0zMwKFQk worker-id=local attempt-id=9aa2e0 step=nyse_session\ntime=2026-10-05T01:30:29.486-04:00 level=INFO msg=\"DAG run finished\" dag=native-chain run-id=034aTckDp9B9yc0zMwKFQk worker-id=local attempt-id=9aa2e0 status=succeeded started-at=2026-10-05T01:30:29-04:00 finished-at=2026-10-05T01:30:29-04:00\n",
+      "native_status": {
+        "root": {
+          "name": "native-chain",
+          "id": "034aTckDp9B9yc0zMwKFQk"
+        },
+        "name": "native-chain",
+        "dagRunId": "034aTckDp9B9yc0zMwKFQk",
+        "attemptId": "9aa2e0",
+        "attemptKey": "f56fc74a6e15e6d7:9aa2e0",
+        "status": 4,
+        "triggerType": 2,
+        "workerId": "local",
+        "pid": 97,
+        "pidStartedAt": 1791178228390,
+        "nodes": [
+          {
+            "step": {
+              "id": "calendar_check",
+              "name": "calendar_check",
+              "commands": [
+                {
+                  "command": "printf",
+                  "args": [
+                    "non_session"
+                  ],
+                  "cmdWithArgs": "printf non_session"
+                }
+              ],
+              "output": "SESSION_DAY"
+            },
+            "stdout": "<scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckDp9B9yc0zMwKFQk/run_20261005_053029Z_9aa2e0/calendar_check.20261005.013029.410.034aTckD.out",
+            "stderr": "<scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckDp9B9yc0zMwKFQk/run_20261005_053029Z_9aa2e0/calendar_check.20261005.013029.410.034aTckD.err",
+            "workingDir": "<scratch>/data/dag-run-work/native-chain/2xjnjbgxpblf3krsa6c2f6ffsy/root",
+            "startedAt": "2026-10-05T01:30:29-04:00",
+            "finishedAt": "2026-10-05T01:30:29-04:00",
+            "status": 4,
+            "doneCount": 1,
+            "outputVariables": {
+              "SESSION_DAY": "SESSION_DAY=non_session"
+            },
+            "outputValue": "non_session"
+          },
+          {
+            "step": {
+              "id": "nyse_session",
+              "name": "nyse_session",
+              "commands": [
+                {
+                  "command": "true",
+                  "cmdWithArgs": "true"
+                }
+              ],
+              "depends": [
+                "calendar_check"
+              ],
+              "preconditions": [
+                {
+                  "condition": "${SESSION_DAY}",
+                  "expected": "session",
+                  "error": "condition was not met: expected \"session\", got \"non_session\""
+                }
+              ]
+            },
+            "stdout": "<scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckDp9B9yc0zMwKFQk/run_20261005_053029Z_9aa2e0/nyse_session.20261005.013029.442.034aTckD.out",
+            "stderr": "<scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckDp9B9yc0zMwKFQk/run_20261005_053029Z_9aa2e0/nyse_session.20261005.013029.442.034aTckD.err",
+            "workingDir": "<scratch>/data/dag-run-work/native-chain/2xjnjbgxpblf3krsa6c2f6ffsy/root",
+            "startedAt": "2026-10-05T01:30:29-04:00",
+            "finishedAt": "2026-10-05T01:30:29-04:00",
+            "status": 5
+          },
+          {
+            "step": {
+              "id": "evidence",
+              "name": "evidence",
+              "commands": [
+                {
+                  "command": "touch",
+                  "args": [
+                    "<scratch>/ran"
+                  ],
+                  "cmdWithArgs": "touch \"<scratch>/ran\""
+                }
+              ],
+              "depends": [
+                "nyse_session"
+              ]
+            },
+            "stdout": "",
+            "stderr": "",
+            "startedAt": "",
+            "finishedAt": "",
+            "status": 5,
+            "error": "upstream skipped"
+          }
+        ],
+        "createdAt": 1791178229486,
+        "startedAt": "2026-10-05T01:30:29-04:00",
+        "finishedAt": "2026-10-05T01:30:29-04:00",
+        "procGroup": "native-chain",
+        "definitionId": "native-chain",
+        "log": "<scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckDp9B9yc0zMwKFQk/dag-run_20261005.013029.340.034aTckD.log",
+        "workingDir": "<scratch>/data/dag-run-work/native-chain/2xjnjbgxpblf3krsa6c2f6ffsy/root",
+        "pendingStepRetries": null
+      },
+      "marker_created": false
+    },
+    {
+      "token": "session",
+      "version_exit": 0,
+      "version_output": "2.16.6\n",
+      "command": "dagu start --context local --dagu-home <scratch> --config <scratch>/config.yaml <scratch>/native-chain.yaml",
+      "exit": 0,
+      "output": "Succeeded - 2026-10-05T01:30:29-04:00\n\ndag: native-chain (0s)\n\u251c\u2500log: <scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckqEWNZwBAqHVQ26h/dag-run_20261005.013029.735.034aTckq.log\n\u2502\n\u251c\u2500calendar_check (0s) [succeeded]\n\u2502 \u251c\u2500printf session\n\u2502 \u2502\n\u2502 \u2514\u2500stdout: <scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckqEWNZwBAqHVQ26h/run_20261005_053029Z_bedb59/calendar_check.20261005.013029.808.034aTckq.out\n\u2502     session\n\u2502 \n\u251c\u2500nyse_session (0s) [succeeded]\n\u2502 \u2514\u2500true\n\u2502 \n\u2514\u2500evidence (0s) [succeeded]\n  \u2514\u2500touch \"<scratch>/ran\"\n\nResult: Succeeded\n\ntime=2026-10-05T01:30:29.637-04:00 level=INFO msg=\"Creating example DAGs for first-time users\" dir=<scratch>/dags\ntime=2026-10-05T01:30:29.698-04:00 level=INFO msg=\"Example DAGs created successfully. Check the web UI to explore them!\"\ntime=2026-10-05T01:30:29.723-04:00 level=INFO msg=\"Executing root dag-run\" dag=native-chain run-id=034aTckqEWNZwBAqHVQ26h params=\"\"\ntime=2026-10-05T01:30:29.795-04:00 level=INFO msg=\"DAG run started\" dag=native-chain run-id=034aTckqEWNZwBAqHVQ26h worker-id=local attempt-id=bedb59 params=[]\ntime=2026-10-05T01:30:29.802-04:00 level=INFO msg=\"Step started\" dag=native-chain run-id=034aTckqEWNZwBAqHVQ26h worker-id=local attempt-id=bedb59 step=calendar_check\ntime=2026-10-05T01:30:29.832-04:00 level=INFO msg=\"Step started\" dag=native-chain run-id=034aTckqEWNZwBAqHVQ26h worker-id=local attempt-id=bedb59 step=nyse_session\ntime=2026-10-05T01:30:29.852-04:00 level=INFO msg=\"Checking preconditions for \\\"nyse_session\\\"\" dag=native-chain run-id=034aTckqEWNZwBAqHVQ26h worker-id=local attempt-id=bedb59 step=nyse_session\ntime=2026-10-05T01:30:29.868-04:00 level=INFO msg=\"Step started\" dag=native-chain run-id=034aTckqEWNZwBAqHVQ26h worker-id=local attempt-id=bedb59 step=evidence\ntime=2026-10-05T01:30:29.941-04:00 level=INFO msg=\"DAG run finished\" dag=native-chain run-id=034aTckqEWNZwBAqHVQ26h worker-id=local attempt-id=bedb59 status=succeeded started-at=2026-10-05T01:30:29-04:00 finished-at=2026-10-05T01:30:29-04:00\n",
+      "native_status": {
+        "root": {
+          "name": "native-chain",
+          "id": "034aTckqEWNZwBAqHVQ26h"
+        },
+        "name": "native-chain",
+        "dagRunId": "034aTckqEWNZwBAqHVQ26h",
+        "attemptId": "bedb59",
+        "attemptKey": "4cb0f50e9b0e2ec7:bedb59",
+        "status": 4,
+        "triggerType": 2,
+        "workerId": "local",
+        "pid": 145,
+        "pidStartedAt": 1791178228780,
+        "nodes": [
+          {
+            "step": {
+              "id": "calendar_check",
+              "name": "calendar_check",
+              "commands": [
+                {
+                  "command": "printf",
+                  "args": [
+                    "session"
+                  ],
+                  "cmdWithArgs": "printf session"
+                }
+              ],
+              "output": "SESSION_DAY"
+            },
+            "stdout": "<scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckqEWNZwBAqHVQ26h/run_20261005_053029Z_bedb59/calendar_check.20261005.013029.808.034aTckq.out",
+            "stderr": "<scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckqEWNZwBAqHVQ26h/run_20261005_053029Z_bedb59/calendar_check.20261005.013029.808.034aTckq.err",
+            "workingDir": "<scratch>/data/dag-run-work/native-chain/dc5dgjdqqucvq7om65ydxbylbu/root",
+            "startedAt": "2026-10-05T01:30:29-04:00",
+            "finishedAt": "2026-10-05T01:30:29-04:00",
+            "status": 4,
+            "doneCount": 1,
+            "outputVariables": {
+              "SESSION_DAY": "SESSION_DAY=session"
+            },
+            "outputValue": "session"
+          },
+          {
+            "step": {
+              "id": "nyse_session",
+              "name": "nyse_session",
+              "commands": [
+                {
+                  "command": "true",
+                  "cmdWithArgs": "true"
+                }
+              ],
+              "depends": [
+                "calendar_check"
+              ],
+              "preconditions": [
+                {
+                  "condition": "${SESSION_DAY}",
+                  "expected": "session"
+                }
+              ]
+            },
+            "stdout": "<scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckqEWNZwBAqHVQ26h/run_20261005_053029Z_bedb59/nyse_session.20261005.013029.839.034aTckq.out",
+            "stderr": "<scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckqEWNZwBAqHVQ26h/run_20261005_053029Z_bedb59/nyse_session.20261005.013029.839.034aTckq.err",
+            "workingDir": "<scratch>/data/dag-run-work/native-chain/dc5dgjdqqucvq7om65ydxbylbu/root",
+            "startedAt": "2026-10-05T01:30:29-04:00",
+            "finishedAt": "2026-10-05T01:30:29-04:00",
+            "status": 4,
+            "doneCount": 1
+          },
+          {
+            "step": {
+              "id": "evidence",
+              "name": "evidence",
+              "commands": [
+                {
+                  "command": "touch",
+                  "args": [
+                    "<scratch>/ran"
+                  ],
+                  "cmdWithArgs": "touch \"<scratch>/ran\""
+                }
+              ],
+              "depends": [
+                "nyse_session"
+              ]
+            },
+            "stdout": "<scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckqEWNZwBAqHVQ26h/run_20261005_053029Z_bedb59/evidence.20261005.013029.873.034aTckq.out",
+            "stderr": "<scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckqEWNZwBAqHVQ26h/run_20261005_053029Z_bedb59/evidence.20261005.013029.873.034aTckq.err",
+            "workingDir": "<scratch>/data/dag-run-work/native-chain/dc5dgjdqqucvq7om65ydxbylbu/root",
+            "startedAt": "2026-10-05T01:30:29-04:00",
+            "finishedAt": "2026-10-05T01:30:29-04:00",
+            "status": 4,
+            "doneCount": 1
+          }
+        ],
+        "createdAt": 1791178229941,
+        "startedAt": "2026-10-05T01:30:29-04:00",
+        "finishedAt": "2026-10-05T01:30:29-04:00",
+        "procGroup": "native-chain",
+        "definitionId": "native-chain",
+        "log": "<scratch>/logs/native-chain/dag-run_20261005_053029Z_034aTckqEWNZwBAqHVQ26h/dag-run_20261005.013029.735.034aTckq.log",
+        "workingDir": "<scratch>/data/dag-run-work/native-chain/dc5dgjdqqucvq7om65ydxbylbu/root",
+        "pendingStepRetries": null
+      },
+      "marker_created": true
+    },
+    {
+      "token": "stale_input",
+      "version_exit": 0,
+      "version_output": "2.16.6\n",
+      "command": "dagu start --context local --dagu-home <scratch> --config <scratch>/config.yaml <scratch>/native-chain.yaml",
+      "exit": 0,
+      "output": "Succeeded - 2026-10-05T01:30:30-04:00\n\ndag: native-chain (0s)\n\u251c\u2500log: <scratch>/logs/native-chain/dag-run_20261005_053030Z_034aTclYmS8noRKPBBkoB7/dag-run_20261005.013030.191.034aTclY.log\n\u2502\n\u251c\u2500calendar_check (0s) [succeeded]\n\u2502 \u251c\u2500printf stale_input\n\u2502 \u2502\n\u2502 \u2514\u2500stdout: <scratch>/logs/native-chain/dag-run_20261005_053030Z_034aTclYmS8noRKPBBkoB7/run_20261005_053030Z_b370aa/calendar_check.20261005.013030.266.034aTclY.out\n\u2502     stale_input\n\u2502 \n\u251c\u2500nyse_session [skipped]\n\u2502 \n\u2514\u2500evidence [skipped]\n\nResult: Succeeded\n\ntime=2026-10-05T01:30:30.094-04:00 level=INFO msg=\"Creating example DAGs for first-time users\" dir=<scratch>/dags\ntime=2026-10-05T01:30:30.157-04:00 level=INFO msg=\"Example DAGs created successfully. Check the web UI to explore them!\"\ntime=2026-10-05T01:30:30.180-04:00 level=INFO msg=\"Executing root dag-run\" dag=native-chain run-id=034aTclYmS8noRKPBBkoB7 params=\"\"\ntime=2026-10-05T01:30:30.252-04:00 level=INFO msg=\"DAG run started\" dag=native-chain run-id=034aTclYmS8noRKPBBkoB7 worker-id=local attempt-id=b370aa params=[]\ntime=2026-10-05T01:30:30.259-04:00 level=INFO msg=\"Step started\" dag=native-chain run-id=034aTclYmS8noRKPBBkoB7 worker-id=local attempt-id=b370aa step=calendar_check\ntime=2026-10-05T01:30:30.286-04:00 level=INFO msg=\"Step started\" dag=native-chain run-id=034aTclYmS8noRKPBBkoB7 worker-id=local attempt-id=b370aa step=nyse_session\ntime=2026-10-05T01:30:30.305-04:00 level=INFO msg=\"Checking preconditions for \\\"nyse_session\\\"\" dag=native-chain run-id=034aTclYmS8noRKPBBkoB7 worker-id=local attempt-id=b370aa step=nyse_session\ntime=2026-10-05T01:30:30.311-04:00 level=INFO msg=\"Preconditions failed for \\\"nyse_session\\\"\" dag=native-chain run-id=034aTclYmS8noRKPBBkoB7 worker-id=local attempt-id=b370aa step=nyse_session\ntime=2026-10-05T01:30:30.369-04:00 level=INFO msg=\"DAG run finished\" dag=native-chain run-id=034aTclYmS8noRKPBBkoB7 worker-id=local attempt-id=b370aa status=succeeded started-at=2026-10-05T01:30:30-04:00 finished-at=2026-10-05T01:30:30-04:00\n",
+      "native_status": {
+        "root": {
+          "name": "native-chain",
+          "id": "034aTclYmS8noRKPBBkoB7"
+        },
+        "name": "native-chain",
+        "dagRunId": "034aTclYmS8noRKPBBkoB7",
+        "attemptId": "b370aa",
+        "attemptKey": "1e72afb7a9cc666f:b370aa",
+        "status": 4,
+        "triggerType": 2,
+        "workerId": "local",
+        "pid": 199,
+        "pidStartedAt": 1791178229240,
+        "nodes": [
+          {
+            "step": {
+              "id": "calendar_check",
+              "name": "calendar_check",
+              "commands": [
+                {
+                  "command": "printf",
+                  "args": [
+                    "stale_input"
+                  ],
+                  "cmdWithArgs": "printf stale_input"
+                }
+              ],
+              "output": "SESSION_DAY"
+            },
+            "stdout": "<scratch>/logs/native-chain/dag-run_20261005_053030Z_034aTclYmS8noRKPBBkoB7/run_20261005_053030Z_b370aa/calendar_check.20261005.013030.266.034aTclY.out",
+            "stderr": "<scratch>/logs/native-chain/dag-run_20261005_053030Z_034aTclYmS8noRKPBBkoB7/run_20261005_053030Z_b370aa/calendar_check.20261005.013030.266.034aTclY.err",
+            "workingDir": "<scratch>/data/dag-run-work/native-chain/gzynpjveef5psmljgqq6l623wq/root",
+            "startedAt": "2026-10-05T01:30:30-04:00",
+            "finishedAt": "2026-10-05T01:30:30-04:00",
+            "status": 4,
+            "doneCount": 1,
+            "outputVariables": {
+              "SESSION_DAY": "SESSION_DAY=stale_input"
+            },
+            "outputValue": "stale_input"
+          },
+          {
+            "step": {
+              "id": "nyse_session",
+              "name": "nyse_session",
+              "commands": [
+                {
+                  "command": "true",
+                  "cmdWithArgs": "true"
+                }
+              ],
+              "depends": [
+                "calendar_check"
+              ],
+              "preconditions": [
+                {
+                  "condition": "${SESSION_DAY}",
+                  "expected": "session",
+                  "error": "condition was not met: expected \"session\", got \"stale_input\""
+                }
+              ]
+            },
+            "stdout": "<scratch>/logs/native-chain/dag-run_20261005_053030Z_034aTclYmS8noRKPBBkoB7/run_20261005_053030Z_b370aa/nyse_session.20261005.013030.293.034aTclY.out",
+            "stderr": "<scratch>/logs/native-chain/dag-run_20261005_053030Z_034aTclYmS8noRKPBBkoB7/run_20261005_053030Z_b370aa/nyse_session.20261005.013030.293.034aTclY.err",
+            "workingDir": "<scratch>/data/dag-run-work/native-chain/gzynpjveef5psmljgqq6l623wq/root",
+            "startedAt": "2026-10-05T01:30:30-04:00",
+            "finishedAt": "2026-10-05T01:30:30-04:00",
+            "status": 5
+          },
+          {
+            "step": {
+              "id": "evidence",
+              "name": "evidence",
+              "commands": [
+                {
+                  "command": "touch",
+                  "args": [
+                    "<scratch>/ran"
+                  ],
+                  "cmdWithArgs": "touch \"<scratch>/ran\""
+                }
+              ],
+              "depends": [
+                "nyse_session"
+              ]
+            },
+            "stdout": "",
+            "stderr": "",
+            "startedAt": "",
+            "finishedAt": "",
+            "status": 5,
+            "error": "upstream skipped"
+          }
+        ],
+        "createdAt": 1791178230369,
+        "startedAt": "2026-10-05T01:30:30-04:00",
+        "finishedAt": "2026-10-05T01:30:30-04:00",
+        "procGroup": "native-chain",
+        "definitionId": "native-chain",
+        "log": "<scratch>/logs/native-chain/dag-run_20261005_053030Z_034aTclYmS8noRKPBBkoB7/dag-run_20261005.013030.191.034aTclY.log",
+        "workingDir": "<scratch>/data/dag-run-work/native-chain/gzynpjveef5psmljgqq6l623wq/root",
+        "pendingStepRetries": null
+      },
+      "marker_created": false
+    }
+  ],
+  "structural_validation": {
+    "command": "dagu validate --context local --dagu-home <scratch> --config <scratch>/config.yaml <checkout>/blueprints/us-equities/hosting/equity-research-evidence.yaml",
+    "exit": 0,
+    "returned_output": "time=2026-10-05T01:30:30.475-04:00 level=INFO msg=\"Creating example DAGs for first-time users\" dir=<scratch>/dags\ntime=2026-10-05T01:30:30.535-04:00 level=INFO msg=\"Example DAGs created successfully. Check the web UI to explore them!\"\n",
+    "dag_sha256": "267fe130b5e8d10676cc998e690617bc6b119c89a6ec5fbbe8fe8771e93107b9"
+  },
+  "limitations": [
+    "Native start executes short manual fixture DAGs; no start-all, scheduler, systemd, operating host or broker.",
+    "run_dags:false permits these manual CLI jobs; scheduler-triggered behavior still requires the later operating-host drill.",
+    "A native DAG can be succeeded with skipped dependents; the restart drill now requires all six research steps succeeded."
+  ]
+}

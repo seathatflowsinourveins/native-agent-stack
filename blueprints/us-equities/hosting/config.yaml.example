@@ -11,6 +11,15 @@ env_passthrough:
   - SDK_ENV
   - LEAN_EVENTS
   - RESEARCH_OUTPUT
+  # dagucloud/dagu@v2.16.6:internal/cmn/config/loader.go:344-347;
+  # internal/cmn/config/env.go:77-95: passthrough is an allowlist.
+  - LEAN_RESULTS
+  - RESEARCH_WORKSPACE
+  - NATIVE_CODEX_HOME
+  - NATIVE_CODEX_BIN
+  - NATIVE_CLAUDE_BIN
+  - NATIVE_RUNTIME_PATH
+  - SDK_OBSERVATION_DIR
 auth:
   mode: none
 permissions:

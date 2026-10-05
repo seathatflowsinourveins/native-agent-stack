@@ -19,30 +19,65 @@ import sqlite3
 import subprocess
 import sys
 import tempfile
+import threading
+import time
+import re
 
 import journal_recovery as recovery
 
 
+def scratch_directory(scratch_root: Path) -> tuple[Path, Path]:
+    """Keep both lexical and canonical names; operate only on the resolved root."""
+    lexical = Path(tempfile.mkdtemp(prefix="equity-recovery-", dir=scratch_root)).absolute()
+    return lexical.resolve(), lexical
+
+
+def assert_sanitized(value) -> None:
+    """Refuse publication if any Unix/Windows absolute path remains in a string."""
+    if isinstance(value, str):
+        if re.search(r'(?<![A-Za-z0-9_<>.])/(?!/)[^\s,\"\']+|(?<![A-Za-z0-9_])[A-Za-z]:[\\/]', value):
+            raise recovery.RecoveryError("sanitized output still contains an absolute path")
+    elif isinstance(value, list):
+        for item in value:
+            assert_sanitized(item)
+    elif isinstance(value, dict):
+        for key, item in value.items():
+            assert_sanitized(key)
+            assert_sanitized(item)
+
+
+def sanitize(value, *, root: Path, lexical_root: Path, binary: Path):
+    replacements = {str(root): "<scratch>", str(lexical_root): "<scratch>",
+                    str(binary.absolute()): "<restic-0.19.1>", str(binary.resolve()): "<restic-0.19.1>"}
+
+    def scrub(item):
+        if isinstance(item, str):
+            for path in sorted(replacements, key=len, reverse=True):
+                item = item.replace(path, replacements[path])
+            return item
+        if isinstance(item, list):
+            return [scrub(child) for child in item]
+        if isinstance(item, dict):
+            return {scrub(key): scrub(child) for key, child in item.items()}
+        return item
+
+    clean = scrub(value)
+    assert_sanitized(clean)
+    return clean
+
+
 def drill(binary: Path, scratch_root: Path) -> dict:
     os.umask(0o077)
-    root = Path(tempfile.mkdtemp(prefix="equity-recovery-", dir=scratch_root))
+    root, lexical_root = scratch_directory(scratch_root)
     password = root / "throwaway-password"
     password.write_text(secrets.token_urlsafe(48) + "\n")
     password.chmod(0o600)
     writers = {}
+    stops, threads, commits, writer_errors = {}, {}, {}, []
     journals = {}
     report = {"schema_version": 1, "evidence_class": "local_integration",
               "fixture_class": "synthetic SQLite WAL journals", "started_at_utc":
               datetime.now(timezone.utc).isoformat(), "restic_pin": "0.19.1"}
-
-    def sanitize(value):
-        if isinstance(value, str):
-            return value.replace(str(binary.resolve()), "<restic-0.19.1>").replace(str(root), "<scratch>")
-        if isinstance(value, list):
-            return [sanitize(item) for item in value]
-        if isinstance(value, dict):
-            return {key: sanitize(item) for key, item in value.items()}
-        return value
 
     try:
         for name, table in (("research", "events"), ("evidence", "runs")):
@@ -50,30 +85,54 @@ def drill(binary: Path, scratch_root: Path) -> dict:
             db = sqlite3.connect(path, isolation_level=None)
             db.execute("PRAGMA journal_mode=WAL")
             db.execute("PRAGMA synchronous=FULL")
+            db.execute("PRAGMA wal_autocheckpoint=0")
             db.execute(f"CREATE TABLE {table}(id INTEGER PRIMARY KEY, payload TEXT NOT NULL)")
-            db.executemany(f"INSERT INTO {table}(payload) VALUES (?)", [("fixture" * 300,)] * 96)
+            # About 8 MiB each: long enough to observe overlapping commits during
+            # a single native pages=-1 step, without delaying/reimplementing it.
+            db.executemany(f"INSERT INTO {table}(payload) VALUES (?)", [("fixture" * 12000,)] * 96)
             writers[name] = db
             journals[name] = (path, [table])
         observed = []
-        written = set()
 
-        def write_during_copy(name, status, remaining, total):
-            if name not in written and status == sqlite3.SQLITE_OK and remaining > 0:
-                writers[name].execute(f"INSERT INTO {journals[name][1][0]}(payload) VALUES (?)",
-                                      ("committed while Online Backup was active",))
-                written.add(name)
-                observed.append({"journal": name, "remaining_pages": remaining,
-                                 "total_pages": total, "committed_writes": 1})
+        def write_continuously(name):
+            # Independent WAL connection/thread; CPython releases the GIL during
+            # sqlite3_backup_step (@v3.12.3:Modules/_sqlite/connection.c:2075-2078).
+            db = sqlite3.connect(journals[name][0], isolation_level=None)
+            try:
+                db.execute("PRAGMA synchronous=FULL")
+                db.execute("PRAGMA wal_autocheckpoint=0")
+                while not stops[name].is_set():
+                    db.execute(f"INSERT INTO {journals[name][1][0]}(payload) VALUES (?)", ("concurrent WAL commit",))
+                    commits[name].append(time.monotonic_ns())
+                    stops[name].wait(0.001)
+            except Exception as error:
+                writer_errors.append(type(error).__name__)
+            finally:
+                db.close()
+
+        def observe_copy(name, native):
+            stops[name].set()
+            threads[name].join(timeout=10)
+            count = sum(native["backup_started_ns"] <= instant <= native["backup_finished_ns"]
+                        for instant in commits[name])
+            if threads[name].is_alive() or writer_errors or count < 1:
+                raise recovery.RecoveryError("each journal needs an observed commit during its native Online Backup call")
+            observed.append({"journal": name, "pages": native["pages"], "committed_writes_during_native_call": count,
+                             "native_copy_duration_s": (native["backup_finished_ns"] - native["backup_started_ns"]) / 1e9})
 
         work = root / "accepted"
         work.mkdir(mode=0o700)
         runner = recovery.Restic(binary, root / "repository", password, work)
         runner.run("init", "--json")
+        for name in journals:
+            stops[name], commits[name] = threading.Event(), []
+            threads[name] = threading.Thread(target=write_continuously, args=(name,))
+            threads[name].start()
         # One partition (1/1) deliberately reads every pack in this small proof.
         # The operator procedure defaults to seven partitions; unittest covers its rotation.
         result = recovery.cycle(runner, journals, root / "rotation-one.json", parts=1,
-                                progress=write_during_copy)
-        if written != set(journals):
+                                observation=observe_copy)
+        if {entry["journal"] for entry in observed} != set(journals):
             raise recovery.RecoveryError("both journals must be written during their Online Backup")
         inventory = json.loads((work / "frozen-inventory.json").read_text())
         independent = []
@@ -96,8 +155,8 @@ def drill(binary: Path, scratch_root: Path) -> dict:
                           for t in record["required_tables"]}
             finally:
                 db.close()
-            if counts != record["required_tables"] or list(counts.values()) != [97]:
-                raise recovery.RecoveryError("concurrent committed row missing from restore")
+            if counts != record["required_tables"] or min(counts.values()) < 96:
+                raise recovery.RecoveryError("independent snapshot row-count comparison failed")
             independent.append({"path": record["path"], "sha256": record["sha256"],
                                 "bytes": len(data), "integrity_check": "ok", "row_counts": counts})
         controls = {}
@@ -117,12 +176,14 @@ def drill(binary: Path, scratch_root: Path) -> dict:
             native = [json.loads(p.read_text()) for p in sorted(control_work.glob("restic-*.result.json"))]
             controls[control] = {"exit": completed.returncode, "returned": returned,
                                  "native_commands": native}
+            if control == "restore":
+                controls[control]["mutation_observation"] = json.loads((control_work / "restore-control.json").read_text())
             if completed.returncode == 0:
                 raise recovery.RecoveryError("a failing control incorrectly passed")
             if control == "snapshot" and not any(c["exit"] == 3 for c in native):
                 raise recovery.RecoveryError("snapshot control must observe native restic exit 3")
             if control == "restore" and (not any(c["args"][0] == "restore" and c["exit"] == 0 for c in native)
-                                         or "file inventory mismatch" not in returned.get("reason", "")):
+                                         or "sha256/bytes mismatch" not in returned.get("reason", "")):
                 raise recovery.RecoveryError("restore control must fail the comparison after native restore")
         report.update(result="passed", copy_observations=observed, frozen_inventory=inventory,
                       native_commands=runner.commands, comparison=result,
@@ -132,12 +193,16 @@ def drill(binary: Path, scratch_root: Path) -> dict:
                                    "Two per-journal snapshots; no atomic transaction spanning both journals.",
                                    "Subset 1/1 only; seven-part rotation is tested separately with stdlib fixtures."])
     finally:
+        for stop in stops.values():
+            stop.set()
+        for thread in threads.values():
+            thread.join(timeout=10)
         for db in writers.values():
             db.close()
         password.unlink(missing_ok=True)
     report["throwaway_password_deleted"] = not password.exists()
     report["completed_at_utc"] = datetime.now(timezone.utc).isoformat()
-    return sanitize(report)
+    return sanitize(report, root=root, lexical_root=lexical_root, binary=binary)
 
 
 def main(argv=None) -> int:
@@ -151,6 +216,7 @@ def main(argv=None) -> int:
     try:
         report = drill(args.restic_bin, args.scratch_root)
         if args.output:
+            assert_sanitized(report)
             recovery.write_new(args.output, recovery.json_bytes(report))
         print(json.dumps({"result": report["result"], "matched_journals": 2,
                           "checked_subset": report["comparison"]["checked_subset"],

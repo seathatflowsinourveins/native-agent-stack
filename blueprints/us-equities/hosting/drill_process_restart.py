@@ -42,6 +42,13 @@ def due_run(status: dict, due: datetime, run_ids: set[str]) -> bool:
             status.get("dagRunId") in run_ids and status.get("triggerType") == 1 and
             status.get("status") == 4):
         return False
+    # Dagu marks a run succeeded even when a precondition skips the chain.
+    # Accept the research job only when every required step actually succeeded.
+    required = {"calendar_check", "nyse_session", "prepare_output", "summarize",
+                "baseline_evidence", "catalog_evidence"}
+    nodes = {node["step"]["id"]: node.get("status") for node in status.get("nodes", [])}
+    if any(nodes.get(step) != 4 for step in required):
+        return False
     slot = status.get("scheduleTime")
     return bool(slot and datetime.fromisoformat(slot) == due)
 
@@ -59,6 +66,33 @@ def last_status(path: Path) -> dict:
     return last
 
 
+def validate_window(due: datetime, now: datetime, wait_seconds: int) -> None:
+    if due.utcoffset() is None or now.utcoffset() is None or not 1 <= wait_seconds <= 3600:
+        raise ValueError("use an aware due time and a wait bound of 1..3600 seconds")
+    market = due.astimezone(session_day.MARKET_ZONE)
+    if (market.hour, market.minute, market.second, market.microsecond) != (16, 30, 0, 0):
+        raise ValueError("--due-at must be the named schedule's 16:30 New York slot")
+    if not now + timedelta(seconds=15) < due < now + timedelta(seconds=wait_seconds - 180):
+        raise ValueError("run the drill shortly before the next due slot; reserve 180 seconds for completion")
+
+
+def require_session(due: datetime) -> None:
+    checked = subprocess.run([os.sys.executable, str(Path(session_day.__file__)), "--at", due.isoformat()],
+                             capture_output=True, text=True, timeout=60, check=False)
+    if checked.returncode or checked.stdout.strip() != "session":
+        raise ValueError(f"locked session check refused the due slot (exit {checked.returncode})")
+
+
+def validate_process(pid: int, binary: Path, proc_root: Path = Path("/proc")) -> None:
+    """Identity guard only; restart/supervision belong to upstream systemd."""
+    if pid <= 1:
+        raise ValueError("MainPID is not the chosen start-all executable")
+    process = proc_root / str(pid)
+    command = (process / "cmdline").read_bytes().split(b"\0")
+    if b"start-all" not in command or (process / "exe").resolve() != binary.resolve():
+        raise ValueError("MainPID is not the chosen start-all executable")
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--unit", default="dagu-equities.service")
@@ -73,18 +107,9 @@ def main(argv=None) -> int:
     try:
         due = datetime.fromisoformat(args.due_at)
         now = datetime.now(timezone.utc)
-        if due.utcoffset() is None or not 1 <= args.wait_seconds <= 3600:
-            raise ValueError("use an aware due time and a wait bound of 1..3600 seconds")
-        market = due.astimezone(session_day.MARKET_ZONE)
-        if (market.hour, market.minute, market.second, market.microsecond) != (16, 30, 0, 0):
-            raise ValueError("--due-at must be the named schedule's 16:30 New York slot")
-        if not now + timedelta(seconds=15) < due < now + timedelta(seconds=args.wait_seconds - 180):
-            raise ValueError("run the drill shortly before the next due slot; reserve 180 seconds for completion")
+        validate_window(due, now, args.wait_seconds)
         # Normal helper command validates the package pin; do not kill anything on a holiday.
-        checked = subprocess.run([os.sys.executable, str(Path(session_day.__file__)), "--at", due.isoformat()],
-                                 capture_output=True, text=True, timeout=60, check=False)
-        if checked.returncode or checked.stdout.strip() != "session":
-            raise ValueError(f"locked session check refused the due slot (exit {checked.returncode})")
+        require_session(due)
         config = args.config.read_text()
         if "run_dags: false" not in config or not args.dag_history.is_dir():
             raise ValueError("use the deployed read-only UI config and this DAG's history directory")
@@ -94,9 +119,7 @@ def main(argv=None) -> int:
             raise ValueError("the chosen existing unit must run start-all with this config and on-failure restart")
         pid = int(before["MainPID"])
         # Linux operating-host drill: verify identity before signalling this one process.
-        command = Path(f"/proc/{pid}/cmdline").read_bytes().split(b"\0")
-        if pid <= 1 or b"start-all" not in command or Path(f"/proc/{pid}/exe").resolve() != args.dagu_bin.resolve():
-            raise ValueError("MainPID is not the chosen start-all executable")
+        validate_process(pid, args.dagu_bin)
         deadline = time.monotonic() + args.wait_seconds
         os.kill(pid, signal.SIGKILL)  # SIGTERM is a clean exit and need not trigger on-failure.
         restart_deadline = min(deadline, time.monotonic() + 90)
@@ -104,6 +127,7 @@ def main(argv=None) -> int:
             after = unit_state(args.unit)
             if (after.get("ActiveState") == "active" and int(after.get("MainPID", "0")) not in (0, pid) and
                     int(after.get("NRestarts", "0")) > int(before["NRestarts"])):
+                validate_process(int(after["MainPID"]), args.dagu_bin)
                 break
             if time.monotonic() >= restart_deadline:
                 raise ValueError("start-all did not restart within 90 seconds")

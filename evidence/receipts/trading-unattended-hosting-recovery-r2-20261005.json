@@ -1,0 +1,454 @@
+{
+  "schema_version": 1,
+  "id": "trading-unattended-hosting-recovery-r2-20261005",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "dagu",
+    "restic"
+  ],
+  "evidence_class": "local_integration",
+  "source_git_commit": "b3a01ce273952260df0b552d5075997b737b71ad",
+  "observed_at_utc": "2026-10-05T05:34:37.145949+00:00",
+  "claim": "Round 2 native restic 0.19.1 backed up two synthetic WAL journals using CPython Online Backup pages=-1 during independently observed commits, checked subset 1/1, restored 16531456 identical journal bytes against the external inventory and required state, and refused native-exit-3 snapshot and same-count/same-integrity content-mutation restore controls. Dagu 2.16.6 validated the revised DAG and executed native manual skip/success/stale-input probes. 42 stdlib tests passed including real exchange_calendars 4.13.2 cases. Cron Next was not executable: no Go compiler found. Operating-host and off-host gates remain open.",
+  "limitations": [
+    "Scratch local integration and synthetic fixtures, not an unchanged upstream test suite, real market/broker state or operating-host acceptance.",
+    "Per-journal Online Backup is consistent independently; no transaction across journals. Commits during the native call need not appear in its read snapshot; comparison uses the frozen snapshot oracle.",
+    "Native check subset 1/1 reads every pack in this small proof. Whole seven-part/seven-day rotation, daily jitter, fall-back and deadlines are behavioural stdlib tests; operator execution is still required.",
+    "No scheduler or systemd unit installed, enabled or started; the operating-host restart/reboot/missed-run and independent-alert gates remain user decision 2.",
+    "Native Dagu probes use manual start, not scheduler dispatch. Scheduler run_dags:false behavior still needs the future host drill; a succeeded run with skipped research steps cannot count.",
+    "Off-host recovery requires user decision 3: independent destination, key recovery and second-host consumer restore under a chosen/measured recovery-time objective.",
+    "No retention deletion, broker, live credentials/mode, model calls, commit, push or manifest pin move.",
+    "Python 3.11 minimum is source-verified and syntax-checked. Execution used 3.13.15; no separate 3.11 interpreter was exercised.",
+    "robfig/cron v3.0.1 Next program/module were prepared from tagged source, but go run exited 127 because the compiler was not found; expected DST values are not measured results."
+  ],
+  "tool_versions": {
+    "dagu": "2.16.6",
+    "restic": "0.19.1",
+    "python_executed": "3.13.15",
+    "python_minimum": "3.11",
+    "exchange_calendars_executed": "4.13.2",
+    "sqlite_executed": "3.53.1",
+    "cpython_reference": "v3.12.3"
+  },
+  "upstream_sources": [
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "internal/runtime/runner.go:1267-1281,1502-1525,1196-1206,1633-1648",
+      "sha256": "95ec2ba0e869bc1fc3d2d25feb5b1af0371602d0af7073d4852381faaf5d7948"
+    },
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "internal/cmn/config/env.go:77-95",
+      "sha256": "5d852a9e96a17c37101602a96217b369bcdf79e0463e880e2cba85b9ffed3f81"
+    },
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "internal/cmn/config/loader.go:344-347,1311-1319",
+      "sha256": "eb7203d02fbf88a213bdee63261dccfefca376c358612630779b181069cfdec3"
+    },
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "internal/cmd/startall.go:32-45",
+      "sha256": "1b535400a80904fcceec79b16fa862b917d265170c5a31ae48cc8c856e32763e"
+    },
+    {
+      "pin": "dagucloud/dagu@v2.16.6",
+      "locator": "internal/cmd/history.go:568-602",
+      "sha256": "a972e448952c527fd602465c5c4fa43c008422f2c13d22b9b08ee94fff0a760e"
+    },
+    {
+      "pin": "restic/restic@v0.19.1",
+      "locator": "doc/040_backup.rst:197-206,679-703,787-806",
+      "sha256": "e7281c20f0ef27bdbbb5f59d12f64aef63fae33048c5bd6b086ff1973edd218e"
+    },
+    {
+      "pin": "restic/restic@v0.19.1",
+      "locator": "doc/045_working_with_repos.rst:482-521",
+      "sha256": "56bfbe763b9cae005700f9472f73f69acaa28eea07d6fe258471af729ffffcd6"
+    },
+    {
+      "pin": "restic/restic@v0.19.1",
+      "locator": "doc/050_restore.rst:55-73",
+      "sha256": "00d39803cfcb17158c2ee1d835de6351c902e66067d2493438831580e9b04251"
+    },
+    {
+      "pin": "restic/restic@v0.19.1",
+      "locator": "doc/060_forget.rst:225-233",
+      "sha256": "444be0adec93ad92810a4c6b363d8a5a7b77d84c88879e38408b1a7ea2eff614"
+    },
+    {
+      "pin": "sqlite/sqlite@version-3.53.1",
+      "locator": "src/shell.c.in:3737,3759,9074-9099",
+      "sha256": "bcceddfe1ab18e60c32cb9bbac7020ec22c03dbd68bd8dffe3599246560a46e3"
+    },
+    {
+      "pin": "sqlite/sqlite@version-3.53.1",
+      "locator": "src/backup.c:321-392",
+      "sha256": "ee4cbfc7d8afb311d12cc106d645764a3e18266694f003438b410bfa33764ef7"
+    },
+    {
+      "pin": "sqlite/sqlite@version-3.53.1",
+      "locator": "tool/sqlite3_rsync.c:13-40",
+      "sha256": "b9e54de43b69da85771de1acacd1ade4ad29d001be09b2f187dfb954eda2f0c8"
+    },
+    {
+      "pin": "python/cpython@v3.12.3",
+      "locator": "Modules/_sqlite/connection.c:2011-2016,2067-2102",
+      "sha256": "c33db9525cbc9887293c1cbdc03e0d8a3a3201e7dae98392452a40196e850070"
+    },
+    {
+      "pin": "python/cpython@v3.12.3",
+      "locator": "Doc/library/sqlite3.rst:1107-1155",
+      "sha256": "f5be72345d2d37ffa53a82058b6054ed9052dda816a2e84639b96172fe3183b7"
+    },
+    {
+      "pin": "python/cpython@v3.12.3",
+      "locator": "Doc/library/subprocess.rst:62-68",
+      "sha256": "2cb61f06f2fc41a60cf52c13a1bdaf52ff2a7962c55be96ec650bb12eb3c6845"
+    },
+    {
+      "pin": "python/cpython@v3.12.3",
+      "locator": "Doc/library/hashlib.rst:267-302",
+      "sha256": "49df3195ff1acf0d114ed0288a15a43c924c9cd41564e0d956d40998ed6d6a82"
+    },
+    {
+      "pin": "python/cpython@v3.12.3",
+      "locator": "Doc/library/fcntl.rst:139-149",
+      "sha256": "2d828976d383a49e1bd394921100078afd5412a50c498b5302682bbf2be58a8d"
+    },
+    {
+      "pin": "gerrymanoim/exchange_calendars@4.13.2",
+      "locator": "pyproject.toml:67-68",
+      "sha256": "0624504db59140714e6d12dd5039009e6517e20e88017c2e8989cf961645a266"
+    },
+    {
+      "pin": "gerrymanoim/exchange_calendars@4.13.2",
+      "locator": "exchange_calendars/ecal.py:100-149",
+      "sha256": "1744b47c0a502f5a3ae9baebdf5affac6027da68ce3ab954289691e7f03f6c8f"
+    },
+    {
+      "pin": "gerrymanoim/exchange_calendars@4.13.2",
+      "locator": "exchange_calendars/exchange_calendar.py:1012-1016,1257-1279",
+      "sha256": "7b8087892b698299fe448afbc4b3fb9300a34ba1605804999436525391c08de6"
+    },
+    {
+      "pin": "systemd/systemd@v255",
+      "locator": "man/loginctl.xml:186-195",
+      "sha256": "b07e1b67f169a8d0b380f5738676390b2c5d6b4297bc6f1845aaf1e336d6a476"
+    },
+    {
+      "pin": "systemd/systemd@v255",
+      "locator": "man/systemd.service.xml:818-836",
+      "sha256": "439322b120014971f37e0a96adc6cb827367846ff6c16f193e9ec4b15931033b"
+    }
+  ],
+  "upstream_glue_choices": [
+    {
+      "glue": "session_day.py",
+      "decision": "kept",
+      "checked": "Native ecal CLI, native is_session/session_close and Dagu preconditions/retries/handlers.",
+      "gap_citation": "gerrymanoim/exchange_calendars@4.13.2:pyproject.toml:67-68; exchange_calendars/ecal.py:100-149; exchange_calendars/exchange_calendar.py:1012-1016,1257-1279",
+      "why": "ecal renders a calendar; compose native session/close queries into the job eligibility/input-mtime token and leave skipping to Dagu."
+    },
+    {
+      "glue": "journal_recovery.py",
+      "decision": "kept",
+      "checked": "restic stdin-from-command, SQLite CLI .backup/.dump, SQLite sqlite3_rsync, CPython Online Backup and subprocess timeout.",
+      "gap_citation": "restic/restic@v0.19.1:doc/040_backup.rst:679-703; doc/045_working_with_repos.rst:482-521; doc/050_restore.rst:55-73; sqlite/sqlite@version-3.53.1:src/shell.c.in:9074-9099; tool/sqlite3_rsync.c:13-40",
+      "why": "Native operations do the copying/backups/checks/restores; consumer glue freezes the external oracle and required tables, rotates checks with a deadline and refuses controls."
+    },
+    {
+      "glue": "journal_recovery.py rotation lock",
+      "decision": "replaced",
+      "checked": "CPython native fcntl.flock",
+      "gap_citation": "python/cpython@v3.12.3:Doc/library/fcntl.rst:139-149",
+      "why": "Replace exclusive-create sentinels with nonblocking process-owned flock; stale file survives safely and no custom stale-lock recovery runs."
+    },
+    {
+      "glue": "drill_process_restart.py",
+      "decision": "kept",
+      "checked": "systemd Restart=on-failure, Dagu native history/status and native handlers/retries.",
+      "gap_citation": "systemd/systemd@v255:man/systemd.service.xml:818-836; dagucloud/dagu@v2.16.6:internal/cmd/history.go:568-602; internal/ir/status.go:133-149",
+      "why": "Upstreams own supervision and run records; identity/time/holiday guards and exact due-slot correlation are our acceptance procedure."
+    },
+    {
+      "glue": "drill_local_recovery.py",
+      "decision": "kept",
+      "checked": "Native Online Backup, restic backup/check/restore and .backup/.dump/sqlite3_rsync alternatives.",
+      "gap_citation": "python/cpython@v3.12.3:Modules/_sqlite/connection.c:2067-2102; restic/restic@v0.19.1:doc/050_restore.rst:55-73",
+      "why": "Synthetic concurrent WAL writers, failures preserving integrity/counts and path-free integration evidence are consumer acceptance rather than replacement backup tools."
+    }
+  ],
+  "artifacts": [
+    {
+      "path": "blueprints/us-equities/hosting/evidence/offline-proof-r2.json",
+      "sha256": "8738887500d41c47c15f0647f3cc6ad8d9af69e00aab894aad57c410549ab8a1",
+      "bytes": 9016
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/native-dagu-probes-r2.json",
+      "sha256": "86bf2cd9b2b6b698e4ea2de30d227b4e133a40d5de839e9fac92d821840b5f11",
+      "bytes": 21096
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/upstream-glue-review-r2.json",
+      "sha256": "49f02ebf9e5456b587af0aeef8b2800e4ddcab8313601f9fc682f37d3cbdad56",
+      "bytes": 15819
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/cron-next-probe-r2.json",
+      "sha256": "d397eb9d53692382de7e345783a8ac0585e3857f1fc6664b50fbf6d86ab5cc02",
+      "bytes": 2076
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/dagu-scheduler-comparison.json",
+      "sha256": "c15ac08f09f324a6c1106f167c21cb013bc6c58fefbb04a3092ec68cc8cf43c7",
+      "bytes": 12307
+    }
+  ],
+  "integration_source_sha256": {
+    "blueprints/us-equities/hosting/config.yaml.example": "a8bfd48d297f783c40338eeea473180144e9ddf5a8a6fe6011010dd9e732a24b",
+    "blueprints/us-equities/hosting/equity-research-evidence.yaml": "267fe130b5e8d10676cc998e690617bc6b119c89a6ec5fbbe8fe8771e93107b9",
+    "blueprints/us-equities/hosting/session_day.py": "eaab149b5825e37d31efdc35584ee112397e8a3b389bd9ee46a09e208a02762d",
+    "blueprints/us-equities/hosting/journal_recovery.py": "4a861e8db692017ba24b19894f276b6756aa25c9cfdbf56c882c8a3d58d608c7",
+    "blueprints/us-equities/hosting/drill_process_restart.py": "dc394c0b5a5cf61084a639bcab457f8cbb6c40a57bbfe12125b394da191e510b",
+    "blueprints/us-equities/hosting/drill_local_recovery.py": "405e1c8cc98876ba50b4ec47b46f9edf297a3bad8e7c429880190f20576ca6dd",
+    "tests/test_us_equities_hosting.py": "7e6367b3a0ab333278afa3ce796972d0aa2fcc1a9aca746662b610a1e9b01033"
+  },
+  "commands": [
+    {
+      "cmd": "env TMPDIR=<private-scratch-root> nice -n 19 python3 blueprints/us-equities/hosting/drill_local_recovery.py --restic-bin <restic-0.19.1> --scratch-root <private-scratch-root> --output <new-sanitized-report>",
+      "exit": 0,
+      "invocation_proxy": "Builder prefixed the command with rtk env, which ran env through RTK fallback. The portable recipe does not require RTK.",
+      "returned_output": "{\"checked_subset\": \"1/1\", \"matched_journals\": 2, \"restore_control_exit\": 1, \"result\": \"passed\", \"snapshot_control_exit\": 1, \"throwaway_password_deleted\": true}\n",
+      "started_at_utc": "2026-10-05T05:32:23.230897+00:00",
+      "completed_at_utc": "2026-10-05T05:32:33.774862+00:00"
+    },
+    {
+      "cmd": "python3 -m unittest tests.test_us_equities_hosting -v",
+      "exit": 0,
+      "returned_output": "test_output_refuses_unsanitized_report_before_write (tests.test_us_equities_hosting.DrillGuardTests.test_output_refuses_unsanitized_report_before_write) ... ok\ntest_restart_pid_command_and_executable_identity_guards (tests.test_us_equities_hosting.DrillGuardTests.test_restart_pid_command_and_executable_identity_guards) ... ok\ntest_restart_refuses_holiday_and_calendar_failure_before_signalling (tests.test_us_equities_hosting.DrillGuardTests.test_restart_refuses_holiday_and_calendar_failure_before_signalling) ... ok\ntest_restart_time_window_refuses_wrong_slot_past_close_and_short_reserve (tests.test_us_equities_hosting.DrillGuardTests.test_restart_time_window_refuses_wrong_slot_past_close_and_short_reserve) ... ok\ntest_symlinked_scratch_root_scrubs_both_forms_and_resolves_at_creation (tests.test_us_equities_hosting.DrillGuardTests.test_symlinked_scratch_root_scrubs_both_forms_and_resolves_at_creation) ... ok\ntest_actual_close_is_checked_and_early_close_waits_until_daily_slot (tests.test_us_equities_hosting.HostingContractTests.test_actual_close_is_checked_and_early_close_waits_until_daily_slot) ... ok\ntest_coordinator_disabled_in_configuration (tests.test_us_equities_hosting.HostingContractTests.test_coordinator_disabled_in_configuration) ... ok\ntest_due_run_requires_slot_scheduler_and_success (tests.test_us_equities_hosting.HostingContractTests.test_due_run_requires_slot_scheduler_and_success) ... ok\ntest_input_mtime_must_follow_actual_session_close (tests.test_us_equities_hosting.HostingContractTests.test_input_mtime_must_follow_actual_session_close) ... ok\ntest_schedule_name_timezone_and_skipping_dependency_chain (tests.test_us_equities_hosting.HostingContractTests.test_schedule_name_timezone_and_skipping_dependency_chain) ... ok\ntest_scripts_use_python_311_compatible_syntax_and_native_digest (tests.test_us_equities_hosting.HostingContractTests.test_scripts_use_python_311_compatible_syntax_and_native_digest) ... ok\ntest_session_check_uses_new_york_date_and_skips_a_non_session (tests.test_us_equities_hosting.HostingContractTests.test_session_check_uses_new_york_date_and_skips_a_non_session) ... ok\ntest_unit_start_all_restart_and_job_environment_delivery (tests.test_us_equities_hosting.HostingContractTests.test_unit_start_all_restart_and_job_environment_delivery) ... ok\ntest_wrong_calendar_version_fails_in_the_normal_step (tests.test_us_equities_hosting.HostingContractTests.test_wrong_calendar_version_fails_in_the_normal_step) ... ok\ntest_both_controls_make_the_procedure_exit_nonzero (tests.test_us_equities_hosting.JournalRecoveryTests.test_both_controls_make_the_procedure_exit_nonzero) ... ok\ntest_cycle_clock_is_captured_before_snapshot_and_checks_native_completion (tests.test_us_equities_hosting.JournalRecoveryTests.test_cycle_clock_is_captured_before_snapshot_and_checks_native_completion) ... ok\ntest_empty_selection_and_unreviewed_tables_refused (tests.test_us_equities_hosting.JournalRecoveryTests.test_empty_selection_and_unreviewed_tables_refused) ... ok\ntest_every_nonzero_native_exit_including_three_is_refused (tests.test_us_equities_hosting.JournalRecoveryTests.test_every_nonzero_native_exit_including_three_is_refused) ... ok\ntest_failed_check_does_not_advance_rotation (tests.test_us_equities_hosting.JournalRecoveryTests.test_failed_check_does_not_advance_rotation) ... ok\ntest_hash_rejects_changed_contents_even_when_integrity_and_counts_match (tests.test_us_equities_hosting.JournalRecoveryTests.test_hash_rejects_changed_contents_even_when_integrity_and_counts_match) ... ok\ntest_missed_rotation_interval_requires_successful_full_read (tests.test_us_equities_hosting.JournalRecoveryTests.test_missed_rotation_interval_requires_successful_full_read) ... ok\ntest_missing_and_extra_files_refused (tests.test_us_equities_hosting.JournalRecoveryTests.test_missing_and_extra_files_refused) ... ok\ntest_missing_required_table_prevents_freezing (tests.test_us_equities_hosting.JournalRecoveryTests.test_missing_required_table_prevents_freezing) ... ok\ntest_native_lock_contention_refuses_and_stale_lock_after_exit_is_safe (tests.test_us_equities_hosting.JournalRecoveryTests.test_native_lock_contention_refuses_and_stale_lock_after_exit_is_safe) ... ok\ntest_online_backup_includes_committed_wal_state_and_freezes_hashes (tests.test_us_equities_hosting.JournalRecoveryTests.test_online_backup_includes_committed_wal_state_and_freezes_hashes) ... ok\ntest_online_backup_size_and_hard_time_limits_refuse_before_freezing (tests.test_us_equities_hosting.JournalRecoveryTests.test_online_backup_size_and_hard_time_limits_refuse_before_freezing) ... ok\ntest_restore_cannot_substitute_its_own_inventory (tests.test_us_equities_hosting.JournalRecoveryTests.test_restore_cannot_substitute_its_own_inventory) ... ok\ntest_rotation_across_fall_back_uses_utc_seven_day_cycle (tests.test_us_equities_hosting.JournalRecoveryTests.test_rotation_across_fall_back_uses_utc_seven_day_cycle) ... ok\ntest_rotation_allows_daily_jitter_over_multiple_whole_cycles (tests.test_us_equities_hosting.JournalRecoveryTests.test_rotation_allows_daily_jitter_over_multiple_whole_cycles) ... ok\ntest_rotation_reads_every_default_subset_within_seven_days (tests.test_us_equities_hosting.JournalRecoveryTests.test_rotation_reads_every_default_subset_within_seven_days) ... ok\ntest_rotation_refuses_other_repository_and_invalid_part_counts (tests.test_us_equities_hosting.JournalRecoveryTests.test_rotation_refuses_other_repository_and_invalid_part_counts) ... ok\ntest_row_count_is_a_secondary_required_state_check (tests.test_us_equities_hosting.JournalRecoveryTests.test_row_count_is_a_secondary_required_state_check) ... ok\ntest_slow_native_check_cannot_publish_state_after_cycle_deadline (tests.test_us_equities_hosting.JournalRecoveryTests.test_slow_native_check_cannot_publish_state_after_cycle_deadline) ... ok\ntest_snapshot_calls_backup_api_and_does_not_copy_source_files (tests.test_us_equities_hosting.JournalRecoveryTests.test_snapshot_calls_backup_api_and_does_not_copy_source_files) ... ok\ntest_stale_atomic_publication_file_does_not_reset_or_block_cursor (tests.test_us_equities_hosting.JournalRecoveryTests.test_stale_atomic_publication_file_does_not_reset_or_block_cursor) ... ok\ntest_symlink_is_refused (tests.test_us_equities_hosting.JournalRecoveryTests.test_symlink_is_refused) ... ok\ntest_whole_rotation_deadline_refuses_even_without_large_individual_gaps (tests.test_us_equities_hosting.JournalRecoveryTests.test_whole_rotation_deadline_refuses_even_without_large_individual_gaps) ... ok\ntest_native_non_session_skips_dependents (tests.test_us_equities_hosting.NativeDaguTests.test_native_non_session_skips_dependents) ... ok\ntest_native_session_executes_success_chain (tests.test_us_equities_hosting.NativeDaguTests.test_native_session_executes_success_chain) ... ok\ntest_native_stale_input_is_visible_and_skips_dependents (tests.test_us_equities_hosting.NativeDaguTests.test_native_stale_input_is_visible_and_skips_dependents) ... ok\ntest_holidays_and_early_closes_with_real_locked_calendar (tests.test_us_equities_hosting.RealCalendarTests.test_holidays_and_early_closes_with_real_locked_calendar) ... ok\ntest_truly_uncovered_date_is_a_hard_failure (tests.test_us_equities_hosting.RealCalendarTests.test_truly_uncovered_date_is_a_hard_failure) ... ok\n\n----------------------------------------------------------------------\nRan 42 tests in 7.782s\n\nOK\n",
+      "started_at_utc": "2026-10-05T05:34:28.663845+00:00",
+      "completed_at_utc": "2026-10-05T05:34:37.146883+00:00",
+      "class": "stdlib behavioural/contract tests, real pinned calendars and native manual Dagu fixture runs"
+    },
+    {
+      "exit": 0,
+      "returned_output": "time=2026-10-05T01:30:30.475-04:00 level=INFO msg=\"Creating example DAGs for first-time users\" dir=<scratch>/dags\ntime=2026-10-05T01:30:30.535-04:00 level=INFO msg=\"Example DAGs created successfully. Check the web UI to explore them!\"\n",
+      "dag_sha256": "267fe130b5e8d10676cc998e690617bc6b119c89a6ec5fbbe8fe8771e93107b9",
+      "cmd": "dagu validate --context local --dagu-home <scratch> --config <scratch>/config.yaml <checkout>/blueprints/us-equities/hosting/equity-research-evidence.yaml"
+    },
+    {
+      "cmd": "dagu start --context local --dagu-home <scratch> --config <scratch>/config.yaml <scratch>/native-chain.yaml (token=non_session)",
+      "exit": 0,
+      "native_node_statuses": {
+        "calendar_check": 4,
+        "nyse_session": 5,
+        "evidence": 5
+      },
+      "marker_created": false,
+      "class": "native manual Dagu fixture, no scheduler"
+    },
+    {
+      "cmd": "dagu start --context local --dagu-home <scratch> --config <scratch>/config.yaml <scratch>/native-chain.yaml (token=session)",
+      "exit": 0,
+      "native_node_statuses": {
+        "calendar_check": 4,
+        "nyse_session": 4,
+        "evidence": 4
+      },
+      "marker_created": true,
+      "class": "native manual Dagu fixture, no scheduler"
+    },
+    {
+      "cmd": "dagu start --context local --dagu-home <scratch> --config <scratch>/config.yaml <scratch>/native-chain.yaml (token=stale_input)",
+      "exit": 0,
+      "native_node_statuses": {
+        "calendar_check": 4,
+        "nyse_session": 5,
+        "evidence": 5
+      },
+      "marker_created": false,
+      "class": "native manual Dagu fixture, no scheduler"
+    },
+    {
+      "cmd": "env GOPROXY=off GOSUMDB=off GOTOOLCHAIN=local go run main.go",
+      "exit": 127,
+      "returned_output": "nice: \u2018go\u2019: No such file or directory\n",
+      "class": "unavailable execution; permitted record-why alternative"
+    }
+  ],
+  "copy_observations": [
+    {
+      "committed_writes_during_native_call": 6,
+      "journal": "evidence",
+      "native_copy_duration_s": 0.049027458,
+      "pages": -1
+    },
+    {
+      "committed_writes_during_native_call": 9,
+      "journal": "research",
+      "native_copy_duration_s": 0.052331414,
+      "pages": -1
+    }
+  ],
+  "controls": {
+    "restore": {
+      "exit": 1,
+      "mutation_observation": {
+        "bytes_unchanged": true,
+        "mutation": "SQLite user_version header",
+        "required_state_unchanged": true,
+        "sha256_changed": true
+      },
+      "native_commands": [
+        {
+          "args": [
+            "version"
+          ],
+          "duration_s": 0.012312,
+          "exit": 0,
+          "output": "restic 0.19.1 compiled with go1.26.4 on linux/amd64\n"
+        },
+        {
+          "args": [
+            "backup",
+            "<scratch>/control-restore/stage",
+            "--host",
+            "equity-research-recovery",
+            "--tag",
+            "journal-recovery",
+            "--group-by",
+            "host,tags",
+            "--json"
+          ],
+          "duration_s": 0.83599,
+          "exit": 0,
+          "output": "{\"message_type\":\"summary\",\"files_new\":3,\"files_changed\":0,\"files_unmodified\":0,\"dirs_new\":3,\"dirs_changed\":5,\"dirs_unmodified\":0,\"data_blobs\":1,\"tree_blobs\":9,\"data_added\":440024,\"data_added_packed\":4408,\"total_files_processed\":3,\"total_bytes_processed\":16532001,\"total_duration\":0.800409374,\"backup_start\":\"2026-10-05T01:32:31.299715116-04:00\",\"backup_end\":\"2026-10-05T01:32:32.10012451-04:00\",\"snapshot_id\":\"0f8689841dd2a17de838454f93f004cd439c69f8e9f685a1b76f0ced3945f2b0\"}\n"
+        },
+        {
+          "args": [
+            "check",
+            "--read-data-subset=1/1"
+          ],
+          "duration_s": 0.780648,
+          "exit": 0,
+          "output": "using temporary cache in <scratch>/control-restore/cache/restic-check-cache-3829689771\ncreate exclusive lock for repository\nload indexes\ncheck all packs\ncheck snapshots, trees and blobs\n[0:00] 100.00%  3 / 3 snapshots\nread group #1 of 6 data packs (out of total 6 packs in 1 groups\n[0:00] 100.00%  6 / 6 packs\nno errors were found\n"
+        },
+        {
+          "args": [
+            "restore",
+            "0f8689841dd2a17de838454f93f004cd439c69f8e9f685a1b76f0ced3945f2b0:<scratch>/control-restore/stage",
+            "--target",
+            "<scratch>/control-restore/restored",
+            "--verify",
+            "--overwrite",
+            "never",
+            "--json"
+          ],
+          "duration_s": 0.766378,
+          "exit": 0,
+          "output": "{\"message_type\":\"summary\",\"total_files\":4,\"files_restored\":4,\"total_bytes\":16532001,\"bytes_restored\":16532001}\n"
+        }
+      ],
+      "returned": {
+        "reason": "file sha256/bytes mismatch",
+        "result": "refused"
+      }
+    },
+    "snapshot": {
+      "exit": 1,
+      "native_commands": [
+        {
+          "args": [
+            "version"
+          ],
+          "duration_s": 0.015723,
+          "exit": 0,
+          "output": "restic 0.19.1 compiled with go1.26.4 on linux/amd64\n"
+        },
+        {
+          "args": [
+            "backup",
+            "<scratch>/control-snapshot/stage",
+            "--host",
+            "equity-research-recovery",
+            "--tag",
+            "journal-recovery",
+            "--group-by",
+            "host,tags",
+            "--json"
+          ],
+          "duration_s": 0.786509,
+          "exit": 3,
+          "output": "{\"message_type\":\"summary\",\"files_new\":2,\"files_changed\":0,\"files_unmodified\":0,\"dirs_new\":3,\"dirs_changed\":5,\"dirs_unmodified\":0,\"data_blobs\":2,\"tree_blobs\":9,\"data_added\":439323,\"data_added_packed\":4764,\"total_files_processed\":2,\"total_bytes_processed\":8266273,\"total_duration\":0.759458587,\"backup_start\":\"2026-10-05T01:32:30.20588227-04:00\",\"backup_end\":\"2026-10-05T01:32:30.965340857-04:00\",\"snapshot_id\":\"32eac2d2e6d8e8a4b83723f540cf10a456cfc73011ef7ef7bf6882c65eb502fc\"}\n{\"message_type\":\"error\",\"error\":{\"message\":\"open <scratch>/control-snapshot/stage/journals/evidence.sqlite3: permission denied\"},\"during\":\"archival\",\"item\":\"<scratch>/control-snapshot/stage/journals/evidence.sqlite3\"}\n{\"message_type\":\"exit_error\",\"code\":3,\"message\":\"Warning: at least one source file could not be read\"}\n"
+        }
+      ],
+      "returned": {
+        "reason": "restic backup refused (exit 3)",
+        "result": "refused"
+      }
+    }
+  },
+  "independent_observation": [
+    {
+      "bytes": 8265728,
+      "integrity_check": "ok",
+      "path": "journals/evidence.sqlite3",
+      "row_counts": {
+        "runs": 103
+      },
+      "sha256": "2672f026b8cf69cbf716b07037e263be7d5787171e4ed8599e89f0759a935334"
+    },
+    {
+      "bytes": 8265728,
+      "integrity_check": "ok",
+      "path": "journals/research.sqlite3",
+      "row_counts": {
+        "events": 126
+      },
+      "sha256": "4809d2613be676b45b97bae9704f8e8c61b7a63b1450a009fcb6d623c3eb1f4f"
+    }
+  ],
+  "sanitization": "Canonical scratch root resolved at creation; lexical/canonical roots and executable paths scrubbed, then absolute-path assertions run before --output. New receipts contain no host path, login name or password; native fixture IDs/hashes and timestamps remain. Private raw output stays in scratch custody.",
+  "prior_attempts": [
+    {
+      "command": "real-calendar regression before fix",
+      "exit": 1,
+      "observation": "Three DateOutOfBounds failures: 2026-01-01, 2027-01-01, 2034-01-02. Same real-calendar cases passed after bracketing."
+    },
+    {
+      "command": "python3 -m unittest tests.test_us_equities_hosting -v (intermediate contract update)",
+      "exit": 1,
+      "observation": "Legacy tests expected a missing-file restore control, removed sentinel and strict 24h cutoff; updated to new mutation control, native flock and whole-cycle bounds."
+    },
+    {
+      "command": "python3 -m unittest tests.test_us_equities_hosting -v (before README repair)",
+      "exit": 1,
+      "observation": "One documentation contract failed because group-by host,tags had not yet been documented; final run passes."
+    },
+    {
+      "command": "native probe artifact recording",
+      "exit": 1,
+      "observation": "Native Dagu probes and validate exited 0; publication guard refused the Go module relative ./ path. The guard now admits relative ./ paths and tests that case; cron record remains not_run."
+    },
+    {
+      "command": "earlier round 2 local recovery drill",
+      "exit": 0,
+      "observation": "Passed before the relative-path sanitizer correction; final drill rerun with the final sanitizer and retained here."
+    }
+  ],
+  "operational_status": {
+    "unit_installed": false,
+    "scheduler_started": false,
+    "process_restart_drill_run": false,
+    "off_host_recovery_gate_closed": false,
+    "unattended_hosting_gate_closed": false,
+    "throwaway_password_deleted": true,
+    "pin_moved": false
+  },
+  "review": {
+    "kind": "self",
+    "scope": "Original pinned source/native capability review, real calendar regression, native manual Dagu runs, native restic controls and independent bytes/state observations. Coordinator review remains separate."
+  }
+}
