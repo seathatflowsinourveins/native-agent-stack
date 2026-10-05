@@ -16617,6 +16617,11 @@
       "bytes": 18701
     },
     {
+      "path": "docs/decisions/2026-10-05-github-ci-final-state.md",
+      "sha256": "713259ca5a636ec60f8468f15cc714853c47d37c68d1a2dd551ae357411a11cc",
+      "bytes": 18745
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -32915,6 +32920,101 @@
       "path": "evidence/artifacts/gh-upstream-qualification-20261002/qualification.json",
       "sha256": "d28841a9bba66869bb8aaea59ad852d3000ec7a7ca06e49a4e1d6619e19bdf8e",
       "bytes": 15832
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/README.md",
+      "sha256": "dffedd7660984427ca31375d783ef5d81a2a869e835dea8510bf7aac406fa74e",
+      "bytes": 3878
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/counts.json",
+      "sha256": "496dee64ccd4c0465257d4bd9834ca7697d3df317a08f48e2ecaf54bb32953b5",
+      "bytes": 12235
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/current-state.json",
+      "sha256": "170be66abdacacdf562427998260e06b45b65fd5234281d421b3d1728f8e31f2",
+      "bytes": 19732
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/durations.json",
+      "sha256": "abd20adc33e8a74c24da0a8226ebe382863d732bfaa83d5f4d19464d86211de9",
+      "bytes": 6797
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/failure-log-excerpts.json",
+      "sha256": "f8295106d1584eb0d281c8f79893e887c62ea2c81e465c4e8f6398a0dca5584f",
+      "bytes": 150013
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/macos-artifact-excerpts.json",
+      "sha256": "c1970960e8dd209ae10550f8df0df5c2fe131b32bf60c747e4cc062a96435aa8",
+      "bytes": 6987
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/main-jobs.json",
+      "sha256": "2117457f591fe82f30668470a14dd209b580c7a5739466ca9534fee4e38ef182",
+      "bytes": 41796
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/ownership-followup.json",
+      "sha256": "919d2625973e5e068cba85cb7375029c781ebe0c7e4eb7de0b9c3dfe03c9d797",
+      "bytes": 13608
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/pr-checks-recovered.json",
+      "sha256": "26144f0e4f3c4cef787023eadcc60c2a2b0e8c6d139d8941e538fe792d504a81",
+      "bytes": 9995
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/pr-checks.json",
+      "sha256": "f60ad6af1ca112049b635c3aedad8a1a459dae58fe261a0f8bfdeb5d3872ab61",
+      "bytes": 70669
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/pr-ownership.json",
+      "sha256": "5de15da5faeda24e85d9fae4de1bc98ec607fd69cd894d4044f7f587a502f385",
+      "bytes": 41233
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/runs-2026-09-28.json",
+      "sha256": "a9972623a0e37c37d4cfab96c623ff3cbef825cc6f3811b4095171a9fb56ea9a",
+      "bytes": 59372
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/runs-2026-09-29.json",
+      "sha256": "9c592e6e1a36c089672c8bce08d796fc78cc7639af14f3dced00696725b2a16e",
+      "bytes": 70849
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/runs-2026-09-30.json",
+      "sha256": "74e3c785e64ffff0ecd1995f9c1632c5a04d090b618d7c83e987184d540e6888",
+      "bytes": 71953
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/runs-2026-10-01.json",
+      "sha256": "ad8998b7a1b68a077c0e6e8ca872e3972417c3e20f9b22ccd861f4b6b7395724",
+      "bytes": 88307
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/runs-2026-10-02.json",
+      "sha256": "5459f50be00cb808014cbdef8c5acd5e046f47f306481602422d6ff04a472de4",
+      "bytes": 52210
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/runs-2026-10-03.json",
+      "sha256": "34cf0f2ff0531471712def859ad3d7de19f3ccc6348bbb64ddd2166df5439e76",
+      "bytes": 139474
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/runs-2026-10-04.json",
+      "sha256": "4ad2bd50291788a425ef7154880fa1bbefef5f189c821c7d38b6f85c3190325b",
+      "bytes": 112822
+    },
+    {
+      "path": "evidence/artifacts/github-ci-finalize-20261005/runs-2026-10-05.json",
+      "sha256": "ea7d142e4091f9c72ff6666384d312fdd8b2398944737ad5b9e819d3159a432c",
+      "bytes": 32235
     },
     {
       "path": "evidence/artifacts/github-ci-measurements-20261003/input.json",
@@ -51275,6 +51375,11 @@
       "path": "evidence/receipts/github-automation-newpc-20260922.json",
       "sha256": "acc1cbe95b2f3dfbd7b29a6136dbfb6d77d7c5a5e9fb4556522bba0dfd5ef776",
       "bytes": 5839
+    },
+    {
+      "path": "evidence/receipts/github-ci-finalize-20261005.json",
+      "sha256": "6bfbe9b6d1319a38dcfb2c5f62c7150e7d3ad8473563bd3bdb9d6a44023e52a1",
+      "bytes": 11125
     },
     {
       "path": "evidence/receipts/github-ci-measurements-20261003.json",
