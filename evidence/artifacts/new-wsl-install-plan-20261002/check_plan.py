@@ -192,7 +192,7 @@ def agent_messaging_contract(plan_dir, by_slot, bad):
     except (OSError, ValueError, KeyError, TypeError):
         bad("agent-messaging", "mapped native posture or rules are missing")
     acceptance = row.get("acceptance", {}).get("post_install", {}).get("command", "")
-    if "hcom status --json" not in acceptance or "hcom list --json" not in acceptance or "--check" not in acceptance:
+    if not all(token in acceptance for token in ("status --json", "list --json", "send @nobody -- hi", "listen --name", "events --last 10", "env -i", "--check")):
         bad("agent-messaging", "post-install must check upstream CLI smoke behavior and installed client posture")
 
 
@@ -260,7 +260,7 @@ def browser_contract(by_slot, install_funcs, bad):
     # The destination map is the sole registration writer (round-2 G2 handoff).
     # Like hcom's posture check, read the source map even for --plan-dir copies.
     source_root = pathlib.Path(__file__).resolve().parents[3]
-    args = ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics"]
+    args = ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"]
     try:
         additions = source_root / "adoption/new-wsl/templates"
         claude = json.loads((additions / "claude-user.mcp.additions.json").read_text())["mcpServers"]["chrome-devtools"]
@@ -281,14 +281,17 @@ def browser_contract(by_slot, install_funcs, bad):
         bad("playwright-cli", "privilege belongs to a declared prerequisite helper; no second browser/Claude plugin install")
     expected_integrity = "sha512-Klw6HWDqHC/XS1JwZldd2r49aUhbUJN9m9Mvcx4SEueIPXtzuQX+QelxAViobv8YUkDZ7HWDrmViR6LeYK0wAw=="
     if (row.get("checksum", {}).get("integrity") != expected_integrity
-            or not any("sha512sum --check --status" in command for command in commands)):
-        bad("playwright-cli", "the published npm SHA512 must be retained and checked against the downloaded archive")
+            or not any("npm view chrome-devtools-mcp@1.10.1 dist.integrity" in command for command in commands)):
+        bad("playwright-cli", "the published npm SHA512 must be retained and compared with the native npx registry pin; no unused archive implies runtime verification")
     steps = row.get("prerequisite_steps", [])
     helper = install_funcs.get("chrome_devtools_linux_chrome", "")
     if (row.get("needs", {}).get("sudo") is not True
             or not any(step.get("name") == "chrome_devtools_linux_chrome"
                        and step.get("needs", {}).get("sudo") is True for step in steps)
-            or "sudo dpkg -i" not in helper
+            or "sudo apt-get install" not in helper
+            or "apt_release_version google-chrome-stable 154.0.8037.97" not in helper
+            or "--with-colons --show-keys" not in helper
+            or "Signed-By: /etc/apt/keyrings/google-chrome.asc EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796" not in helper
             or "chrome_devtools_linux_chrome ||" not in install_funcs.get("playwright-cli", "")):
         bad("playwright-cli", "Linux-side Google Chrome requires a declared and invoked privileged prerequisite")
     post = row.get("acceptance", {}).get("post_install", {})
@@ -496,7 +499,19 @@ def main():
             bad("dispatch", f"{script}: the --only slot list is not the slots of install-plan.json, in order")
     for r in selected + measured:
         slot = r["slot"]
-        if not re.search(r"(run_slot|measured_slot) '?" + re.escape(slot) + r"'?(;|$)|^\s+" + re.escape(slot) + r"$", install_text, re.M):
+        dispatch = (r"^if (?:selected|named) '" + re.escape(slot)
+                    + r"'; then run_slot '" + re.escape(slot) + r"';(?: |$)"
+                    + r"|^measured_slot '?" + re.escape(slot) + r"'?(?:;|$)")
+        # Existing native bootstrap/dependency guards also name the exact slot
+        # they invoke. Keep these bounded forms; another slot's selector cannot
+        # satisfy them (the original hcom-under-srt failure).
+        dependency_dispatch = {
+            "container-engine": r"^if \$needs_docker \|\| selected container-engine; then\n  run_slot container-engine(?:\n|$)",
+            "docker-compose": r"^if \$needs_docker \|\| selected docker-compose; then run_slot docker-compose; fi$",
+            "mise": r"^if \$needs_runtime \|\| selected mise; then\n(?:  #[^\n]*\n)*  mise\n",
+        }.get(slot)
+        if not re.search(dispatch, install_text, re.M) and not (
+                dependency_dispatch and re.search(dependency_dispatch, install_text, re.M)):
             bad("dispatch", f"install.sh never runs row {slot}")
     for r in selected + measured + acceptance_only:
         slot = r["slot"]

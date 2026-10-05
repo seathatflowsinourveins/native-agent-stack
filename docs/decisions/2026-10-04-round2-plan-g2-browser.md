@@ -30,22 +30,27 @@ metadata or the source checkout.
 The [tagged client setup](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71)
 documents Claude Code at line 71 and Codex at line 109. Both clients use
 `npx -y chrome-devtools-mcp@1.10.1 --headless --isolated
---no-usage-statistics`; the native `--` separator forwards those options.
+--no-usage-statistics --no-performance-crux`; the native `--` separator forwards those options.
 Installed `claude mcp add --help` and `codex mcp add --help` confirm that syntax.
 [Concurrent sessions](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/advanced-usage.md#L22)
 require isolated temporary profiles. The MCP interface is adopted; the
 experimental CLI and Claude plugin are not registered.
 
-The [upstream WSL section](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/troubleshooting.md#L99)
-prescribes the Linux-side current stable amd64 `.deb`, `wget` and privileged
-`dpkg -i`. `needs.sudo` and the named prerequisite declare that privilege; no
-command string hides sudo. If dependencies are unmet, the helper applies
-[Ubuntu's documented apt-get --fix-broken repair](https://manpages.ubuntu.com/manpages/resolute/en/man8/apt-get.8.html).
-That repair is a separately cited OS integration step and remains unverified on
-NativeStack2604. The upstream Chrome route has no immutable version or published
-checksum. Acceptance records the installed version and separately labels a
-local archive SHA256 as an observation. Node 24.21.0 is already the plan runtime
-and satisfies the package's engines at `package.json:104-105`.
+The upstream WSL section requires Linux-side stable amd64 Chrome. Repair
+2026-10-05 uses [Google's signed apt repository](https://www.google.com/linuxrepositories/)
+instead of an unchecked current .deb. The helper checks the active primary
+fingerprint EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796, restricts Signed-By to
+that fingerprint and its legitimate signing subkeys, updates authenticated apt
+metadata, and installs exactly google-chrome-stable=154.0.8037.97-1.
+[Published package metadata](https://dl.google.com/linux/chrome/deb/dists/stable/main/binary-amd64/Packages)
+held that version on 2026-10-05. If it is no longer available, fail clearly;
+never fall back to the current package. Privilege remains in the declared helper.
+No package installation ran in this repair. Node 24.21.0 satisfies the MCP pin.
+The downloaded MCP artifact's SHA256 is
+012cbcf6e832d4f6709dad0c21d7bef17089e94adee9cf33179d15ea0a9adf2b;
+its SHA512 matches the frozen published SRI. The destination npx route checks
+registry dist.integrity; it no longer downloads an unused archive. That checks
+the direct pin, with no claim that transitive npm dependencies are locked.
 
 The stable component identifier `playwright-cli` is retained so historical
 receipt references do not become unknown components. Its repository, runtime
@@ -67,7 +72,7 @@ files: `tests/index.test.ts` and
 actual output in private per-run state and propagates failure. The subset selects installed Google Chrome stable through the documented
 `PUPPETEER_EXECUTABLE_PATH` (puppeteer/puppeteer@puppeteer-v25.11.0:
 packages/puppeteer/src/getConfiguration.ts:140-145 and the MCP tests/utils.ts:89-92).
-The CI Chrome for Testing download remains test preparation only. This is not
+The unused Chrome for Testing download is removed; these tests use the installed stable Chrome. This is not
 the whole OS/Node matrix,
 notices suite, publication process or memory-leak job.
 
@@ -96,8 +101,8 @@ destination, with the single registration and required flags active.
 
 [README.md:35-55](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/README.md#L35)
 documents usage-statistics and CrUX opt-outs separately. The required statistics
-opt-out is installed. `--no-performance-crux` is the operator's separate option
-for performance trace URL lookups; this local navigation/snapshot/console check
+opt-out is installed. `--no-performance-crux` is required in both client registrations to disable
+performance trace URL lookups; this local navigation/snapshot/console check
 does not invoke a trace lookup.
 
 ## Client map integration boundary
@@ -119,7 +124,7 @@ Add this single server to the Claude additions' existing `mcpServers` object:
 "chrome-devtools": {
   "type": "stdio",
   "command": "npx",
-  "args": ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics"]
+  "args": ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"]
 }
 ```
 
@@ -128,7 +133,7 @@ Append the equivalent Codex server, keeping authorization a distinct piece:
 ```toml
 [mcp_servers.chrome-devtools]
 command = "npx"
-args = ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics"]
+args = ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"]
 default_tools_approval_mode = "approve"
 ```
 
@@ -254,7 +259,7 @@ browser owner. Source: this PR:catalogs/foundation/new-wsl-architecture-20261001
 (the durable-memory and backtesting-engine rows).
 
 The map now renders the single chrome-devtools stdio server from both client
-additions, with --headless --isolated --no-usage-statistics. Its Codex approval
+additions, with --headless --isolated --no-usage-statistics --no-performance-crux. Its Codex approval
 piece remains scoped to the existing authorization-settings option. The two
 installer CLI registration commands were removed to keep one writer. Source:
 ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df:

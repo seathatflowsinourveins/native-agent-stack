@@ -150,7 +150,7 @@
         "slots": 104
       },
       "date_utc": "2026-10-01",
-      "decision_rule": "A foundation first-round default is definitive when it is in the Claude record and in enough blind GPT samples under the combination rule (evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md and its amendment 1); a contested one is resolved by a blind Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families name it and both critics return converged, and a split is settled by the measurement the critics name. A manifest row may be added or amended by a recorded direct consensus: one family's sourced proposal, the other family's independent primary-source review, and both acknowledgements on record. Such a row has row_kind consensus and is never definitive. Its label names the direct consensus of both families and says either that the row is neither a blind result nor a measurement or, for a row whose install waits for a gate or a comparison, that the gate or the measurement decides and that nothing is installed until it returns. Acceptance gates that an installed or resolved row still has to pass on the destination are listed as its open acceptance gates and do not hold its install. A direct consensus never replaces a blind definitive default or a measured result; where the families differ, or where the consensus itself names a comparison, the measurement decides. Amendment 3 (wave 2, 2026-10-03): a row whose decided default installs nothing may carry an interim install, recorded in the row's interim field beside the fields the rounds decided, which stay as they were. The interim names what it installs and at which pin, the measurement or comparison that replaces or removes it, the authority that installs it meanwhile, each family's recorded review and its hashed records. The authority is the owner's dated decision, as the record that relays it states it, or a direct consensus with both families' acknowledgements on record. On the owner's decision an interim may sit on a definitive row whose default installs nothing: the definitive verdict stays recorded beside it, and the named measurement reports to the owner instead of removing the interim by itself. An interim is never definitive and is neither a blind result nor a measurement; no other installed row may own its job; its label starts with 'interim install', names its authority and says what decides it. The install plan installs it as the row's owner, and the client configuration wires what it installs while the row carries it. Amendment 4 (wave 3, 2026-10-04): on the owner's dated decision, as the record that relays it states it, a batch may add rows of kind owner_decision and give a row whose decided default installs nothing an owner default. An owner row or an owner default names what it installs and at which pin, the job it owns and the comparison that would remove it; that comparison reports to the owner and removes nothing by itself. The fields an owner default replaces, and an interim it drops, stay recorded on the row under overturned. Neither is definitive, a blind result, a consensus or a measurement, and no other installed row may own its job; its label starts with 'owner decision' and names its authority. The relaying record is hashed in the batch, quotes the owner's words and names every slot the batch changes. The install plan installs it as the row's owner, and the client configuration wires what it installs. Amendment 4 (wave 3, 2026-10-04; applied again in wave 5): on the owner's dated decision, as the record that relays it states it, a batch may add rows of kind owner_decision and give a row whose decided default installs nothing an owner default. An owner row or an owner default names what it installs and at which pin, the job it owns and the comparison that would remove it; that comparison reports to the owner and removes nothing by itself. The fields an owner default replaces, and an interim it drops, stay recorded on the row under overturned. Neither is definitive, a blind result, a consensus or a measurement, and no other installed row may own its job; its label starts with 'owner decision' and names its authority. The relaying record is hashed in the batch, quotes the owner's words and names every slot the batch changes. The install plan installs it as the row's owner, and the client configuration wires what it installs.",
+      "decision_rule": "A foundation first-round default is definitive when it is in the Claude record and in enough blind GPT samples under the combination rule (evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md and its amendment 1); a contested one is resolved by a blind Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families name it and both critics return converged, and a split is settled by the measurement the critics name. A manifest row may be added or amended by a recorded direct consensus: one family's sourced proposal, the other family's independent primary-source review, and both acknowledgements on record. Such a row has row_kind consensus and is never definitive. Its label names the direct consensus of both families and says either that the row is neither a blind result nor a measurement or, for a row whose install waits for a gate or a comparison, that the gate or the measurement decides and that nothing is installed until it returns. Acceptance gates that an installed or resolved row still has to pass on the destination are listed as its open acceptance gates and do not hold its install. A direct consensus never replaces a blind definitive default or a measured result; where the families differ, or where the consensus itself names a comparison, the measurement decides. Amendment 3 (wave 2, 2026-10-03): a row whose decided default installs nothing may carry an interim install, recorded in the row's interim field beside the fields the rounds decided, which stay as they were. The interim names what it installs and at which pin, the measurement or comparison that replaces or removes it, the authority that installs it meanwhile, each family's recorded review and its hashed records. The authority is the owner's dated decision, as the record that relays it states it, or a direct consensus with both families' acknowledgements on record. On the owner's decision an interim may sit on a definitive row whose default installs nothing: the definitive verdict stays recorded beside it, and the named measurement reports to the owner instead of removing the interim by itself. An interim is never definitive and is neither a blind result nor a measurement; no other installed row may own its job; its label starts with 'interim install', names its authority and says what decides it. The install plan installs it as the row's owner, and the client configuration wires what it installs while the row carries it. Amendment 4 (wave 3, 2026-10-04): on the owner's dated decision, as the record that relays it states it, a batch may add rows of kind owner_decision and give a row whose decided default installs nothing an owner default. An owner row or an owner default names what it installs and at which pin, the job it owns and the comparison that would remove it; that comparison reports to the owner and removes nothing by itself. The fields an owner default replaces, and an interim it drops, stay recorded on the row under overturned. Neither is definitive, a blind result, a consensus or a measurement, and no other installed row may own its job; its label starts with 'owner decision' and names its authority. The relaying record is hashed in the batch, quotes the owner's words and names every slot the batch changes. The install plan installs it as the row's owner, and the client configuration wires what it installs.",
       "decision_rule_before_amendment_2": "a slot's default is definitive when both deciders of both families name it and both critics return converged; a split is settled by the measurement the critics name",
       "kind": "new-wsl-definitive-manifest",
       "meaning": "one default per slot for the clean install of the new WSL distribution; a definitive default is the slot's install decision, agreed by both model families, and is not a merit acceptance",
@@ -210,7 +210,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "8ab833903cd1b15c5c56cc057fd3ddc9a5f0e365a9d61d298bd179ad0b5690eb"
+          "sha256": "ae95d82c9d319aa492dcf33596e8f5579185d5e7d980be1284cf506bff0aba68"
         },
         "convergence": {
           "file": "convergence.json",
@@ -686,7 +686,7 @@
                 "skillspector scan <fixture skill> --no-llm --format json --fail-on-findings exits non-zero on a planted finding and zero on a clean skill"
               ],
               "outcome": "added_by_owner_decision",
-              "overturn": "the m1-m7 fixture comparison proposed in PR #692, or a paired Inspect comparison; remove SkillSpector if the current procedure matches its recall with no more false positives; it reports to the owner",
+              "overturn": "the frozen seven-case malicious-skill comparison stated in this record (manual source review plus skills.sh audit labels versus SkillSpector 2.12.0, high/critical recall, false positives, tokens, wall time and no external file access on m7), or a paired Inspect comparison; remove SkillSpector if the current procedure matches its recall with no more false positives; it reports to the owner and removes nothing by itself",
               "pin": "- Release: v2.12.0, published 2026-09-23T22:28:18Z; tag commit c7958a3268d9498644b22edb75d0f051bbc8cbfc.\n- GitHub release-asset sha256: wheel skillspector-2.12.0-py3-none-any.whl 62973f6254d30c871480246869f88a01e17dff6f12e9d43010962eb0d7e305f4; sdist skillspector-2.12.0.tar.gz 507c367b8f53b821adf0568bb32c7e08dd2da8f63900efa7ceccb53e9b401b53.\n- Not on PyPI, and the release has no signature or provenance attestation.\n- Transitive dependencies are resolved fresh at install time, because `uv tool install` does not use the repo's uv.lock.",
               "reason": "Decide round 2 applied the owner's repository-quality rule to the gap skill-vetting; its Opus verification named NVIDIA/SkillSpector CLI v2.12.0, limited to an on-demand scan of third-party skill artifacts by the coordinator before it pins a skill. The scan is an advisory signal beside the rule-3 skills.sh audits and manual source review, never an allow decision. No MCP server and no install hook. against live upstream. Upheld; adopt SkillSpector v2.12.0. Live reads at 2026-10-04T22:18Z.\n\n**Requirement gate.** Met under A(1), because skills belong to the two-client foundation and its supply chain. Also met under A(2): the round-1 critic recorded \"third-party skill artifacts warrant security scanning\" as holding. The repo itself records \"no local content scan precedes a pin\" as an open gap (origin/main, 2026-09-25 skills decision L318-335 and skills manifest L765-774). The threat is concrete: the coordinator pins third-party skills whose bundled scripts run on a host holding 0600 provider credentials. One on-d",
               "sources": [
@@ -891,8 +891,8 @@
               "outcome": "owner_default",
               "overturn": "the preregistered messaging measurement (prereg r3 of 2026-10-03, never started), or the verdict's paired Harbor comparison against a released agmsg; revert to configuring the native incumbents if both upstreams document a native cross-client ingress; each reports to the owner and removes nothing by itself",
               "pin": "aannoo/hcom tag v0.7.27 = commit 2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b, published 2026-10-01T02:11:55Z. hcom-installer.sh sha256 3bc057fcd763748c32fae0ae25e150abf2b1df0d4c9451432c28f4ddde176a98, which equals the release API asset digest. hcom-x86_64-unknown-linux-gnu.tar.gz sha256 8ae97ff6fef63c637d66ddf882651aadd035bd74ae26c0787743869c20a5391d; the installer embeds this value and checks it with verify_checksum (installer L313, L374-375). Installs to ~/.local/bin; receipt goes to ~/.config/hcom. The upstream alternative is uv tool install hcom==0.7.27 (PyPI manylinux x86_64 wheel; no provenance). Re-pin at the first release that closes issue 151.",
-              "posture": "the hcom posture both lanes converged on (2026-10-03; Codex root source-accept), from the owner's answer on the posture question, quoted: \"we need full sota convergneced llm native automation at highest quality\"",
-              "reason": "Decide round 2 applied the owner's repository-quality rule to the gap workers/agent-messaging; its Opus verification named hcom against live upstream. Uphold: the critic's revised verdict (hcom) survives refutation.\n\n(1) Requirement gate. Met under A(1), two-client Claude Code plus Codex work, and A(3): the 2026-10-02 amendment quotes the owner asking for \"claude-codex messaging\", and TASK-packets.md:9 records the user's 10-03 decision, \"hcom by SOTA convergence\".\n\n(2) hcom passes every candidate gate:\n- Maintained: not archived; main commit 2026-10-04; release 2026-10-01.\n- Linux x86_64 install: documented, with a checksum-verifying installer; the source has explicit WSL detection.\n- Self-hosted: local SQLite. The relay stays inactive until",
+              "posture": "the hcom posture both lanes converged on (2026-10-03; Codex root source-accept), from the owner's answer on the posture question, quoted: \"we need full sota convergneced llm native automation at highest quality\"; verbatim record: https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972022684",
+              "reason": "Decide round 2 applied the owner's repository-quality rule to the gap workers/agent-messaging; its Opus verification named hcom against live upstream. Uphold: the critic's revised verdict (hcom) survives refutation.\n\n(1) Requirement gate. Met under A(1), two-client Claude Code plus Codex work, and A(3): the 2026-10-02 amendment quotes the owner asking for \"claude-codex messaging\", and the user's Q11 answer is quoted verbatim in https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972022684: \"we need full sota convergneced llm native automation at highest quality\"; that answer names no tool.\n\n(2) hcom passes every candidate gate:\n- Maintained: not archived; main commit 2026-10-04; release 2026-10-01.\n- Linux x86_64 install: documented, with a checksum-verifying installer; the source has explicit WSL detection.\n- Self-hosted: local SQLite. The relay stays inactive until",
               "sources": [
                 "docs/decisions/2026-10-04-final-architecture-round2.md",
                 "docs/decisions/2026-10-04-repository-quality-rule.md",
@@ -2063,7 +2063,7 @@
               "outcome": "owner_default",
               "overturn": "the slot's named comparison, run through upstream Harbor: the adopted MCP interface against Playwright CLI 0.1.22 on the same 20 browser tasks; it reports to the owner and removes nothing by itself",
               "pin": "chrome-devtools-mcp@1.10.1 on npm. Tag chrome-devtools-mcp-v1.10.1 = commit e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df, published 2026-09-23T10:37:16Z; still the latest release when checked on 2026-10-04. npm gitHead matches the tag, with SLSA v1 provenance and 2 registry signatures; engines node ^20.19.0 || ^22.12.0 || >=23. The browser is google-chrome-stable amd64 and cannot be pinned through the upstream route: the README requires \"current stable version or newer\", so the host receipt should record the installed Chrome version.",
-              "reason": "Decide round 2 applied the owner's repository-quality rule to the gap web-research/playwright-cli; its Opus verification named Chrome DevTools MCP against live upstream. I upheld the converged verdict. The evidence supports Chrome DevTools MCP 1.10.1 through its MCP interface under criteria-quality.txt rule D(1).\n\n(1) Requirement gate: met three ways. A(1): agent browser automation serves the two-client coding and research scope. A(2): the round-1 critics agreed one browser tool is needed (definitive-manifest resolution: \"both critics agree on one browser tool, not two\"). A(3): the 20:45Z directive is recorded, though only as the coordinator's paraphrase in add_user_directives.py:24-26.\n\n(2) Candidate gates, re-checked live on 2026-10-04, all pass:\n- Unarchive",
+              "reason": "Decide round 2 applied the owner's repository-quality rule to the gap web-research/playwright-cli; its Opus verification named Chrome DevTools MCP against live upstream. I upheld the converged verdict. The evidence supports Chrome DevTools MCP 1.10.1 through its MCP interface under criteria-quality.txt rule D(1).\n\n(1) Requirement gate: met three ways. A(1): agent browser automation serves the two-client coding and research scope. A(2): the round-1 critics agreed one browser tool is needed (definitive-manifest resolution: \"both critics agree on one browser tool, not two\"). A(3): the repository-quality rule is quoted verbatim in docs/decisions/2026-10-04-repository-quality-rule.md; the earlier 20:45Z packet gloss is a coordinator summary, not the user's words.\n\n(2) Candidate gates, re-checked live on 2026-10-04, all pass:\n- Unarchive",
               "sources": [
                 "docs/decisions/2026-10-04-final-architecture-round2.md",
                 "docs/decisions/2026-10-04-repository-quality-rule.md",
@@ -2071,7 +2071,7 @@
               ],
               "usage_rules": [
                 "register the MCP server only, never its experimental CLI and never a second browser tool",
-                "run with --headless --isolated --no-usage-statistics; record the installed google-chrome-stable version in the host receipt",
+                "run with --headless --isolated --no-usage-statistics --no-performance-crux; record the installed google-chrome-stable version in the host receipt",
                 "browser diagnostics (performance traces, network requests, console messages) use the same server, with no second registration"
               ]
             },
@@ -2179,7 +2179,6 @@
       "title": "Web research",
       "tools": [
         "8854a22b77817147",
-        "ca21c6a70e1dc0c9",
         "263b2d469bfc5351"
       ],
       "uses": []
@@ -3178,7 +3177,7 @@
                 "scout scan with a grep scanner over one Claude Code session returns a result row"
               ],
               "outcome": "added_by_owner_decision",
-              "overturn": "Scout against Monocle trace assertions on one frozen, human-labelled set of this stack's sessions and Harbor ATIF trials; Monocle replaces Scout if it detects more labelled failures at the same false-positive rate, with an interval excluding zero; it reports to the owner",
+              "overturn": "Scout against Monocle trace assertions on one frozen, human-labelled set of this stack's sessions and Harbor ATIF trials; Monocle replaces Scout if it detects more labelled failures at the same false-positive rate, with an interval excluding zero; it reports to the owner and removes nothing by itself",
               "pin": "inspect-scout 0.5.3: GitHub release 2026-09-23T00:29:02Z; tag 0.5.3 is commit 0e8fc055a3cebba1a14c11bc35856767b6405173. PyPI wheel inspect_scout-0.5.3-py3-none-any.whl, uploaded 2026-09-23T00:30:00Z, carries a trusted-publishing provenance attestation (publisher meridianlabs-ai/inspect_scout, workflow publish.yaml, environment pypi). Companion: harbor==0.23.0, the stack's existing Harbor pin.",
               "reason": "Decide round 2 applied the owner's repository-quality rule to the gap trajectory-analysis; its Opus verification named Inspect Scout against live upstream. Refuted. The verdict rests on one procedural step: \"recovering A and B is the single next check.\" Both deciders ended with deadline_exceeded and 0 chars (runs/p02-observability/status.json, out-A.jsonl, out-B.jsonl), so there is nothing to recover. The facts the critic itself checked are enough to settle the split under rule D.\n\n(1) Requirement gate: met under A(1), observability and evaluation of the two-client coding work and the Harbor A/B lane. The stack has repeatedly built its own transcript scanning (origin/main 3b8f9c8a1):\n- an ad hoc subagent_scan, a pattern scan over 308 Claude Code ",
               "sources": [
@@ -4836,13 +4835,13 @@
             "resolution": {
               "batch": "wave5",
               "by": "the owner's repository-quality rule of 2026-10-04",
-              "install": "npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.12 list --requirements 2026-07-28, then npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.12 server --url http://<host>:<port>/mcp --requirements 2026-07-28 --expected-failures ./conformance-baseline.yml (and the matching client --command form). This is upstream's documented npx CLI (README@c37eec888e, lines 7-33 and 121-150) with an exact version, in the same pinned form python-sdk v2.3.0 CI uses (CONFORMANCE_PKG passed verbatim to npx --yes). It needs Node; upstream CI uses Node 24. Never use the bare documented `npx @modelcontextprotocol/conformance`: it resolves to npm latest 0.1.16, which is outside the 180-day window and has no --requirements option.",
+              "install": "npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.12 list --requirements 2026-07-28, then npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.12 server --url http://<host>:<port>/mcp --requirements 2026-07-28 --expected-failures ./conformance-baseline.yml (and the matching client --command form). This is upstream's documented npx CLI (README@c37eec888e, lines 7-33 and 121-150) with an exact version, in the same pinned form python-sdk v2.3.0 CI uses (CONFORMANCE_PKG passed verbatim to npx --yes). It needs Node; upstream CI uses Node 24. Never use the bare documented `npx @modelcontextprotocol/conformance`: it resolves to npm latest 0.1.16, which is outside the 180-day window and has no --requirements option. Installed only when named (install.sh --only mcp-protocol-conformance); the default run skips it.",
               "open_acceptance_gates": [
                 "npx --yes @modelcontextprotocol/conformance@<pin> list --requirements 2026-07-28 lists the scenarios",
                 "one local HTTP MCP server runs the server scenarios with a committed expected-failures baseline"
               ],
               "outcome": "added_by_owner_decision",
-              "overturn": "the MCP Inspector's documented automated checks against the suite on the same servers; the suite goes if the Inspector covers the same requirements; it reports to the owner",
+              "overturn": "the MCP Inspector's documented automated checks against the suite on the same servers; the suite goes if the Inspector covers the same requirements; it reports to the owner and removes nothing by itself",
               "pin": "Adopted version: @modelcontextprotocol/conformance@0.2.0-alpha.12 (npm dist-tag alpha). Published 2026-10-01T12:07:36.856Z by GitHub Actions from ci.yml run 34856531653, at gitHead f44482ba17df816d3176962a11cdf36aec9bda00 on branch paulc/bump-0.2.0-alpha.12; there is no git tag. Integrity sha512-eXtZFgmtZiU5SsvXty+RGXGnyIqEVm3GLU/HZmg1wMjtKOocPZZgD9HQKd30oJhio5UB0wFJmsc6r8u48Q+EYA==, with SLSA v1 provenance. It becomes eligible under the repo's 7-day non-security cooldown at 2026-10-08T12:07:36Z. The recorded 10-03 waiver covers only tagged non-prerelease releases, so the only earlier path is an explicit user waiver. For an install before that date, use 0.2.0-alpha.11: published 2026-08-07T14:01:03Z from refs/heads/main at c321dd32035556e6769d3724a8ee97d87c3faaac (an ancestor of main), test and publish succeeded, SLSA v1 provenance from run 31185306763. Its integrity is sha512-imPK9tx5gQ",
               "reason": "Decide round 2 applied the owner's repository-quality rule to the gap mcp-protocol-conformance; its Opus verification named modelcontextprotocol/conformance against live upstream. Upheld. (1) Requirement gate A passes. The round-1 critic agreed the need is real: \"the packet expressly assigns that job\", and keeping Inspector \"leaves formal qualification ... unresolved\". All three round-2 GPT judges also found A(1). The job is not a landscape proposal without a use: the stack's own 09-26 record names concrete targets, ai-memory's loopback HTTP MCP endpoint and the mcporter bridge client, and the Codex template configures ai-memory over HTTP. (2) Candidate gates for Conformance:\n- Not archived.\n- Main commit c37eec888e on 2026-10-01, 3 days old.\n- The release gate passes o",
               "sources": [
@@ -7382,7 +7381,7 @@
                 "one dspy.LM call through the OmniRoute endpoint returns, with the key supplied by the credential runner"
               ],
               "outcome": "added_by_owner_decision",
-              "overturn": "on one stack program, dspy.GEPA against standalone gepa with the same model, splits and budget, scored in Inspect; standalone GEPA replaces DSPy if it reproducibly wins on the held-out metric; it reports to the owner",
+              "overturn": "on one stack program, dspy.GEPA against standalone gepa with the same model, splits and budget, scored in Inspect; standalone GEPA replaces DSPy if it reproducibly wins on the held-out metric; it reports to the owner and removes nothing by itself",
               "pin": "dspy==3.4.0, published 2026-09-25 and still the latest on PyPI on 2026-10-04. Git tag 3.4.0 is commit 2413b67a4d08a476e4bc6f40b9f8f42f87711ee7. Wheel dspy-3.4.0-py3-none-any.whl sha256 36de329ecdaf18e31977e26c61b587caa470a34f574f2fe6cb7f4c82bcbf97cc; sdist sha256 4dea089c6bd1f8d314e1095e7f64b4b4ff64bb8a09549efee026c0a609f08c16. It pulls in the exact pin gepa==0.1.4 (gepa[dspy]==0.1.4): tag v0.1.4 is commit 8b0ce6cd99a234f6b74daf37558a2ac0ce18f975, wheel sha256 12b971039599625c156d2231f6d72a29c31a22e9c237689459b5f1a3c353f532. litellm is uncapped (>=1.65.8). It resolved to 1.104.0 on 2026-10-03, which ships a cp310-abi3 manylinux_2_28_x86_64 wheel, so Python 3.14 installs without a Rust build. Record the resolved lock in the install receipt.",
               "reason": "Decide round 2 applied the owner's repository-quality rule to the gap lm-program-optimization; its Opus verification named stanfordnlp/dspy 3.4.0. It owns GPT-lane LM program optimization through dspy.GEPA and the other DSPy optimizers. GEPA 0.1.4 comes in as DSPy's declared, pinned dependency, not as a second owner. Optimizing skill descriptions and triggers stays with skill-creator, the existing skill-authoring owner. against live upstream. I tried to refute the verdict and it holds.\n\n(1) Requirement gate: met under the frozen rule.\n- A(2) holds: round 1's critic rejected treating missing experiment inputs as a failed requirement and called \"no extra install\" a deferral, not a dismissal (prompt-C.md line 58). Round 1's Opus check objected that no program, metric or examples were named, but A(2) needs only one of the two.\n- A(1) holds through the GPT-lane workers and research scope.\n- The stack had already recorded a concrete use: optimizing its judge and shortlist prompts against sealed held-out judgments (origin/main 3b8f9c8a1, ",
               "sources": [
@@ -7795,15 +7794,15 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "7cd6084ec54a49c7417fa50b3a8089d4131093cb141ce620fa71d5e7e9e1c509"
+      "sha256": "e8ad7ec74d13697e54d5af18bcf097e92abf7f8b585e5a58acb4a3c0deb964d8"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "9ce444680380be9c27e46146d436c57908af5d4f20d6732b0f4c31783e7f9ab8"
+      "sha256": "e4655b7fbc3862cdd26f302030f58f0843570b6d3ff3a7ff5770343bec53c04b"
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "191184b8528eb6d31b141dd90a99e7917a05b98e466873ad6f81c23780ed99e0"
+      "sha256": "799a2809775197f2fbdd231602ecd5797d7d7c4a9e8044c8fd4a70460250b425"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -7915,7 +7914,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "8b64f012df266db23d53d7e980a17405080fe634fc0a106faaa27a2826d85ae2"
+      "sha256": "ee2ab95cf4ad78d1775aa7d4d7bb2936ae0883f2395cb2960de5b69040f88195"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -7939,7 +7938,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "8ab833903cd1b15c5c56cc057fd3ddc9a5f0e365a9d61d298bd179ad0b5690eb"
+      "sha256": "ae95d82c9d319aa492dcf33596e8f5579185d5e7d980be1284cf506bff0aba68"
     }
   ],
   "stage_order": [
@@ -9250,48 +9249,6 @@
       "stage": "native-extensions",
       "status": "picked",
       "tool_id": "8854a22b77817147",
-      "used_by": [
-        "web-research"
-      ]
-    },
-    {
-      "acceptance": null,
-      "aliases": [
-        "Playwright CLI"
-      ],
-      "blocking_gaps": [
-        "pin: release or immutable revision pending in W-PROF",
-        "checksum: real SHA-256 and its source pending in W-PROF",
-        "install: upstream-documented command and source pending in W-PROF",
-        "acceptance: upstream test or documented example and source pending in W-PROF",
-        "install order: stage and position pending in W-PROF"
-      ],
-      "checksum": null,
-      "documented_install": [
-        {
-          "command": "npm install -g @playwright/cli@latest && playwright-cli install --skills",
-          "source": "https://github.com/microsoft/playwright-cli#installation"
-        }
-      ],
-      "evidence_refs": [],
-      "install": null,
-      "name": "Playwright CLI",
-      "owner_layer_id": "web-research",
-      "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": null,
-      "position": null,
-      "provisioning_status": "pending",
-      "repository": "https://github.com/microsoft/playwright-cli",
-      "selection_sources": [
-        {
-          "layer_id": "web-research",
-          "name": "Playwright CLI",
-          "source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json"
-        }
-      ],
-      "stage": null,
-      "status": "picked",
-      "tool_id": "ca21c6a70e1dc0c9",
       "used_by": [
         "web-research"
       ]
@@ -11936,7 +11893,7 @@
         "evidence_class": "upstream_test_command_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "At the exact release source commit, git submodule update --init, PUPPETEER_SKIP_DOWNLOAD=true npm ci, npx puppeteer browsers install chrome, npm run bundle.",
+          "At the exact release source commit, git submodule update --init, PUPPETEER_SKIP_DOWNLOAD=true npm ci, npm run bundle.",
           "After native client sign-ins, the plan additionally requires both clients to navigate the local fixture and return its snapshot title and console marker.",
           "Puppeteer 25.11.0 getConfiguration.ts:140-145 supports the explicit Linux Chrome executable override; no CI AppArmor-disable step is applied to the host."
         ],
@@ -11947,14 +11904,13 @@
       "aliases": [
         "Chrome DevTools MCP"
       ],
-      "blocking_gaps": [
-        "checksum: real SHA-256 and its source pending in W-PROF"
-      ],
+      "blocking_gaps": [],
       "checksum": {
-        "algorithm": "sha512",
+        "algorithm": "sha256",
+        "integrity": "sha512-Klw6HWDqHC/XS1JwZldd2r49aUhbUJN9m9Mvcx4SEueIPXtzuQX+QelxAViobv8YUkDZ7HWDrmViR6LeYK0wAw==",
         "kind": "artifact",
         "source": "https://registry.npmjs.org/chrome-devtools-mcp/1.10.1",
-        "value": "2a5c3a1d60ea1c2fd74b527066575ddabe3d69485b50937d9bd32f731e1212e7883d7b73b905fe41e9710158a86eff185240d9ec7583ae656247a2de60ad3003"
+        "value": "012cbcf6e832d4f6709dad0c21d7bef17089e94adee9cf33179d15ea0a9adf2b"
       },
       "documented_install": [],
       "evidence_refs": [
@@ -11965,11 +11921,11 @@
         "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/tests/index.test.ts#L38"
       ],
       "install": {
-        "command": "claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics && codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics",
+        "command": "claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics --no-performance-crux && codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics --no-performance-crux",
         "execution_status": "UNRUN",
         "pinning_source": "https://registry.npmjs.org/chrome-devtools-mcp/1.10.1",
         "prerequisites": [
-          "NativeStack2604 amd64, Linux-side Google Chrome stable; declared sudo for the .deb and dependency fixup.",
+          "NativeStack2604 amd64, Linux-side Google Chrome 154.0.8037.97-1 through the signed apt repository and fingerprint-restricted keyring; privilege is declared by its helper.",
           "Plan Node 24.21.0; destination client templates must include the prepared chrome-devtools entries."
         ],
         "scope": "Release-pinned documented npx stdio route and Linux-side WSL Chrome prerequisites; single browser owner for both clients and diagnostics.",

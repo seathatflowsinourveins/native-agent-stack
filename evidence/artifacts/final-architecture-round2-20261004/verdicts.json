@@ -2526,5 +2526,17 @@
  "private_records_sha256": {
   "opus-verify-r2.json": "cd03e7394c7633b150f6b4e07168424bdfd34c131dc9dfb8e68aa2e94a8a79fb",
   "verify-items.json": "eb85f02b61e351b944271dff0724d163ee7dcaaa6492ef84fa874db75e26e7b4"
- }
+ },
+ "corrections": [
+  {
+   "claim": "The hcom requirement-gate packet gloss \"hcom by SOTA convergence\" is a verbatim user decision.",
+   "correction": "That is a coordinator gloss, not the user's words. Their Q11 record says \"we need full sota convergneced llm native automation at highest quality\" and names no tool. A(1) independently meets the requirement gate.",
+   "source": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972022684"
+  },
+  {
+   "claim": "TASK-packets.md and add_user_directives.py are committed authority for user quotations.",
+   "correction": "Those are private assembly inputs. The operative batch now cites the public Q11 record and the committed repository-quality rule; the sanitized verifier text above stays verbatim.",
+   "source": "this PR:docs/decisions/2026-10-04-repository-quality-rule.md"
+  }
+ ]
 }

@@ -130,5 +130,17 @@
  ],
  "private_records_sha256": {
   "opus-verify-landscape.json": "fd49d0cc4e509c974c5acbc9bce591164783db2ce5275afe97ac70d47f97c0c0"
- }
+ },
+ "corrections": [
+  {
+   "claim": "\"maintained tools over self-built; a local script is a stopgap with a named replacement\" is the user's verbatim directive.",
+   "correction": "This is a coordinator application note, not an established verbatim user quotation. The reviewer's proposed replacement must be checked in the user's own record before quoting; this extract does not establish that record. No adoption depends on this gloss.",
+   "source": "this PR:evidence/artifacts/final-architecture-round2-20261004/landscape-verdicts.json:24"
+  },
+  {
+   "claim": "\"sota foundation folder set\" is established as the user's verbatim request.",
+   "correction": "The original user record was not verified in this repair. Treat this phrase as a verifier gloss pending that source. A(1) independently establishes the folder-set requirement.",
+   "source": "this PR:evidence/artifacts/final-architecture-round2-20261004/landscape-verdicts.json:78"
+  }
+ ]
 }

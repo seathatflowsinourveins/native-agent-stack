@@ -240,6 +240,28 @@ class NewWslHandbookTests(unittest.TestCase):
         self.assertNotIn("package_id", unresolved)
         self.assertTrue(any("package identity" in gap for gap in unresolved["blocking_gaps"]))
 
+    def test_owner_browser_replacement_has_one_pick_and_a_complete_checksum(self):
+        self.real_tree()
+        data = handbook.build_data(self.root)
+        self.assertFalse(any(tool["name"] == "Playwright CLI" and tool["status"] == "picked"
+                             for tool in data["tools"]))
+        chrome, = [tool for tool in data["tools"] if tool["name"] == "Chrome DevTools MCP"]
+        self.assertEqual(chrome["status"], "picked")
+        self.assertEqual(chrome["checksum"]["algorithm"], "sha256")
+        self.assertRegex(chrome["checksum"]["value"], r"^[0-9a-f]{64}$")
+        self.assertTrue(chrome["checksum"]["integrity"].startswith("sha512-"))
+        self.assertFalse(any("checksum" in gap.lower() for gap in chrome["blocking_gaps"]))
+
+        # A profile without the explicit historical-name binding must still
+        # surface the unfulfilled old pick; this is not a global name filter.
+        profile = self.read(handbook.PROFILE)
+        entry, = [entry for entry in profile["entries"] if entry["name"] == "Chrome DevTools MCP"]
+        entry.pop("source_selection_name")
+        self.write(handbook.PROFILE, profile)
+        control = handbook.build_data(self.root)
+        self.assertTrue(any(tool["name"] == "Playwright CLI" and tool["status"] == "picked"
+                            and tool["blocking_gaps"] for tool in control["tools"]))
+
     def test_cli_same_package_checksum_conflicts_still_reject(self):
         variants = [
             (1, "https://registry.npmjs.org/%40openai%2Fcodex-sdk/0.159.3"),
@@ -411,7 +433,19 @@ class NewWslHandbookTests(unittest.TestCase):
                  for state in ("definitive", "resolved", "split", "measurement", "open")}
         self.assertEqual({state: count for state, count in shown.items() if count}, manifest["counts"]["by_state"])
         self.assertEqual(data["default_decisions"]["inventory"]["by_state"], manifest["counts"]["by_state"])
-        self.assertEqual(data["tools"], before["tools"])
+        # The published owner amendment replaces the historical browser pick.
+        # All other tools retain exactly their previous inventory and metadata.
+        old_tools = {tool["tool_id"]: tool for tool in before["tools"]}
+        new_tools = {tool["tool_id"]: tool for tool in data["tools"]}
+        removed, = old_tools.keys() - new_tools.keys()
+        self.assertEqual(old_tools[removed]["name"], "Playwright CLI")
+        self.assertFalse(new_tools.keys() - old_tools.keys())
+        for identity, tool in new_tools.items():
+            self.assertEqual(tool, old_tools[identity], identity)
+        chrome, = [tool for tool in data["tools"] if tool["name"] == "Chrome DevTools MCP"]
+        browser = next(slot for slot in manifest["slots"] if slot["slot_id"] == "playwright-cli")
+        self.assertIn(chrome["name"], browser["default"])
+        self.assertEqual(browser["resolution"]["outcome"], "owner_default")
         self.assertEqual([row["status"] for row in data["layers"]],
                          [row["status"] for row in before["layers"]])
         self.assertFalse(data["new_host_acceptance_claimed"])

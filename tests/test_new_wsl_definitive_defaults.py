@@ -468,12 +468,11 @@ class Manifest(unittest.TestCase):
         self.assertNotEqual(rule, self.foundation["decision_rule"])
         self.assertEqual(self.manifest.get("decision_rule_before_amendment_2"), self.foundation["decision_rule"])
         # The consensus record's rule is appended whole, after the rounds' rule, then amendment 3 of its wave-2 batch and
-        # amendment 4 of wave 3, then round 2's amended rule in wave 5.
+        # amendment 4 of wave 3, reused unchanged by wave 5 and appended only once.
         self.assertTrue(rule.endswith(" " + self.consensus["rule"] + " " + self.wave2["interim_rule"] + " "
-                                      + self.wave3["owner_rule"] + " " + self.wave5["owner_rule"]))
+                                      + self.wave3["owner_rule"]))
+        self.assertEqual(self.wave5["owner_rule"], self.wave3["owner_rule"])
         self.assertEqual(rule.count(self.wave3["owner_rule"]), 1)
-        self.assertEqual(rule.count(self.wave5["owner_rule"]), 1)
-        self.assertLess(rule.index(self.wave3["owner_rule"]), rule.index(self.wave5["owner_rule"]))
         self.assertLess(rule.index("decision-round"), rule.index(self.consensus["rule"]))
         self.assertTrue(self.wave2["interim_rule"].startswith("Amendment 3 "))
         self.assertTrue(self.wave3["owner_rule"].startswith("Amendment 4 "))
@@ -837,7 +836,7 @@ class Manifest(unittest.TestCase):
         self.assertEqual(counts["interim"], 2)
         self.assertEqual(counts["by_row_kind"]["consensus"], 6)
         self.assertEqual(counts["by_row_kind"]["owner_decision"], 14)
-        # 23, the ten owner rows, and context-supply, no longer definitive (ccusage and session-analytics stay resolved).
+        # 23, the ten wave-3 owner rows, context-supply, the four wave-5 owner rows and the two wave-5 owner defaults (agent-messaging, playwright-cli) = 40.
         self.assertEqual(counts["by_state"]["resolved"], 40)
         self.assertEqual(counts["by_state"]["definitive"], 30)
         self.assertEqual(counts["definitive"], 30)
@@ -1330,7 +1329,13 @@ class Manifest(unittest.TestCase):
                 # Copied as the batch gives it, with the manifest's row fields.
                 self.assertEqual(row, recorded)
                 self.assertEqual(tuple(row), assembler.ROW_FIELDS)
-                self.assertEqual((row["catalog"], row["layer_id"]), ("foundation", recorded["layer_id"]))
+                expected_layer = {
+                    "lm-program-optimization": "cross:gpt6-harnesses",
+                    "skill-vetting": "instructions-skills",
+                    "mcp-protocol-conformance": "mcp-surfaces",
+                    "trajectory-analysis": "quality-evaluation",
+                }.get(sid, "token-efficiency")
+                self.assertEqual((row["catalog"], row["layer_id"]), ("foundation", expected_layer))
                 # Installed now, resolved, never definitive, and labelled as what it is.
                 self.assertTrue(assembler.installs(row))
                 self.assertEqual((row["state"], row["definitive"], row["measurement"]), ("resolved", False, None))
@@ -1345,16 +1350,14 @@ class Manifest(unittest.TestCase):
                 for key in ("by", "reason", "pin", "install", "overturn"):
                     self.assertTrue(resolution[key].strip(), key)
                 self.assertTrue(resolution["open_acceptance_gates"])
+                self.assertIn("removes nothing by itself", resolution["overturn"])
                 if batch_number == 3:
                     self.assertTrue(resolution["usage_rules"])
-                    self.assertIn("removes nothing by itself", resolution["overturn"])
                 else:
-                    # Round 2 puts usage and qualification in install/open gates;
-                    # it does not define wave 3's separate usage_rules field.
-                    self.assertNotIn("usage_rules", resolution)
-                    self.assertEqual(resolution["install"], recorded["resolution"]["install"])
+                    # Wave-5 added rows carry usage/qualification in install and
+                    # open gates; its amended defaults also carry usage_rules.
                     self.assertTrue(resolution["install"])
-                    self.assertEqual(resolution["overturn"], recorded["resolution"]["overturn"])
+                    self.assertTrue(resolution["open_acceptance_gates"])
                 self.assertIn(self.consensus[f"wave{batch_number}"]["records"]["decision_record"]["path"],
                               resolution["sources"])
                 for family in ("claude", "gpt"):
@@ -1363,7 +1366,8 @@ class Manifest(unittest.TestCase):
                     else:
                         # Round 2 carries its deciders/critic and Opus verification,
                         # while still resolving on the owner's repository-quality rule.
-                        self.assertEqual(row[family], recorded[family])
+                        prefix = "Opus verification of decide round 2" if family == "claude" else "decide round 2"
+                        self.assertTrue(row[family].startswith(prefix), row[family])
         # After every other row of the layer, in the batch's order.
         for layer_id in {row["layer_id"] for row in self.owner_rows.values()}:
             in_layer = [row["slot_id"] for row in self.rows if row["layer_id"] == layer_id]
@@ -1616,6 +1620,13 @@ class InterimPlanChecks(unittest.TestCase):
             result = subprocess.run([sys.executable, "-B", str(PLAN / "check_plan.py"), "--plan-dir", str(plan_dir),
                                      "--manifest", str(manifest)], capture_output=True, text=True, timeout=180)
         return result.returncode, result.stdout + result.stderr
+
+    def test_messaging_cannot_hide_under_another_slots_selector(self):
+        code, out = self.run_check(change_install=lambda text: text.replace(
+            "if selected 'agent-messaging'; then run_slot 'agent-messaging'; fi",
+            "if selected 'sandbox-runtime-srt'; then run_slot 'agent-messaging'; fi"))
+        self.assertEqual(code, 1, out)
+        self.assertIn("install.sh never runs row agent-messaging", out)
 
     def test_the_unchanged_copy_passes(self):
         code, out = self.run_check()

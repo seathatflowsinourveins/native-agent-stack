@@ -57,12 +57,14 @@ inferred from successful `SKILL.md` reads, as the pinned guide states at line 24
 
 ## Research consumers: preserve the fix-wave binding
 
-The fix wave already configures DeerFlow's `langchain_openai:ChatOpenAI` model
-`cx/gpt-6.1-sol-max` at `http://127.0.0.1:21128/v1`, keyless DuckDuckGo and Jina
+The repair configures DeerFlow's `langchain_openai:ChatOpenAI` model
+`cx/gpt-6.1-sol` at `http://127.0.0.1:21128/v1`, with
+`supports_reasoning_effort: true` and `reasoning_effort: xhigh`, keyless DuckDuckGo and Jina
 tools, `DEER_FLOW_CONFIG_PATH`, and the embedded client. GPT Researcher already
 uses the same endpoint, `duckduckgo`, `CONTEXT_FILTER=keyword` and `env -i`,
-preventing inherited environment overrides. Leave both installs and those
-consumer settings unchanged. Add the installed runner's preflight and an
+preventing inherited environment overrides. Its smart and strategic models use
+the plain Sol route at xhigh; its fast model retains the high suffix. Keep both
+installs. Add the installed runner's preflight and an
 effective DeerFlow endpoint/model/tool read-back. The fresh native Codex caller
 uses its native Sol/max route.
 
@@ -74,10 +76,15 @@ and `:backend/packages/harness/deerflow/client.py:1229`;
 [this PR's installed GPT Researcher runner](https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files)
 (`this PR: tools/research/gpt_researcher.sh:27`).
 
-Keep the verdict's exact consumer model spellings, with no claim that the
-published gateway honors Sol/max. A live cited run from each gatherer, matched
-gateway status-200 rows and zero `/v1/embeddings` requests are still acceptance
-items. Effective-configuration read-back and those runs overturn the binding
+The conflicting research and topology verdicts are reconciled through #637's
+published 3.8.51 record. That gateway caps Sol at xhigh. Per-run session headers
+join both gatherers to native call logs; acceptance requires successful calls,
+zero `/v1/embeddings` requests, and the delivered provider request's model and
+reasoning effort, rather than the requested alias. DeerFlow's pinned
+`config/model_config.py:36` defaults `supports_reasoning_effort` to false, and
+`models/factory.py:283-285` drops the configured effort unless that flag is true;
+the read-back asserts the flag as well. These source-verified repairs supersede
+the earlier Sol/max consumer spelling. Effective-configuration read-back and those runs overturn the binding
 only if an endpoint/model/effort/retriever mismatch cannot be expressed by the
 consumers' documented settings and a gate-passing alternative fixes it without
 adding a service. The comparison belongs to this binding, not a gateway swap.
@@ -90,10 +97,10 @@ install compares the published SHA512 SRI before install; npm enforces package
 integrity. The registry publishes SLSA provenance, which was not verified by
 this job. Native upstream doctor, readiness and fresh-client checks remain
 acceptance, with no carried patch or historical canary receipt used as their
-gate. The stack's `omniroute.new_wsl_pin` and the architecture gateway winner
-retain their original values. Moving them to 3.8.51 is deferred until a
-saturation-audit row and qualification receipt satisfy
-`this PR:tests/test_stack_lifecycle.py:21-37`. Neither is produced by this job.
+gate. The stack already records the qualified 3.8.51 release selected in #637; it
+has no new_wsl_pin field and this repair does not change it. The destination
+architecture uses the same published release. The historical #704 canary is
+superseded by the round-2 topology, not carried as fresh acceptance.
 The adoption profile has no OmniRoute entry to re-pin.
 
 The new topology artifact and client-config map render the destination's
@@ -132,8 +139,11 @@ telemetry-contract qualification as an `after_sign_in` acceptance recipe.
 
 The recipe needs the user's maintained, commit-pinned task corpus and public
 Harbor JSON job config. It uses Harbor's own runner, documented agent kwargs,
-native verifiers and ATIF validator. Container producers are pinned to Codex
-0.160.0, OpenHands SDK 1.51.0 and DeerFlow v2.1.0; Codex uses native Sol/max.
+native verifiers and ATIF validator. Codex is pinned to 0.160.0 and DeerFlow to
+v2.1.0; Codex uses native Sol/max. The OpenHands adapter and returned trial
+version must match the producer's actually installed openhands-sdk metadata.
+The worker pin stays 1.50.1. A move to 1.51.0 needs its owner's qualification;
+an adapter mismatch exits 78 as needs_user before Harbor launches.
 Native verifiers must separately assert the SDK/app-server and OpenHands
 events, unique concurrent writer identity, MCP/skill, tool error/recovery,
 nested workers, cancellation and restart, using valid and seeded-violation
@@ -218,7 +228,7 @@ handed back to its configuration owner.
 Harbor's README inventory now names its unchanged upstream ATIF unit tests.
 Its worker telemetry contract, Promptfoo's paired skill configuration and the
 gatherers' published gateway bindings are integrated without changing their
-owners. The existing OpenHands worker row remains 1.50.1 while telemetry's
-producer requirement is 1.51.0; that dependency needs its owner to reconcile
-the pin. Native telemetry corpus, provider sign-ins and destination runs remain
+owners. The existing OpenHands worker row remains 1.50.1; telemetry now checks
+that installed version. Qualification of 1.51.0 is handed to its owner.
+Native telemetry corpus, provider sign-ins and destination runs remain
 external acceptance. Source: this PR:docs/decisions/2026-10-04-final-architecture-round2.md:37.

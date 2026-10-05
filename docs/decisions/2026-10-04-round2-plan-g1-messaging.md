@@ -50,9 +50,10 @@ mapper enumerates pieces already present in shared templates; it cannot create
 additional permission-list entries or a rules file. An adapter in this slot's
 `config/` directory reads the map extension and reuses the mapper's existing
 settings merge, managed instruction blocks and atomic writer, leaving shared
-templates under their original ownership. It resolves `crossSessionInbound`
-through the mapper's existing authorization entry and preserves a different
-existing user choice. This is repository integration glue, with native formats
+templates under their original ownership. It checks `crossSessionInbound`
+against the mapper's existing authorization entry but never writes it. Only
+`new_wsl_client_config.py --apply --with-authorization-settings` writes that key.
+An absent key, accept, or a different operator choice does not fail messaging acceptance. This is repository integration glue, with native formats
 from the cited upstreams, rather than a new permissions engine.
 Source: this PR, `tools/adoption/new_wsl_client_config.py:549,577,1623,2289`;
 this PR, `tools/adoption/apply_claude_settings.py:191`;
@@ -67,16 +68,17 @@ authority, including `bigboss`. Both clients receive that instruction. Claude
 gets the posture's hcom and uvx-hcom denies, including equals-joined `send --from`
 and its middle `claude-pty` wildcard. Codex gets four `forbidden` prefix rules,
 each with native `match`/`not_match` examples, in a separate `hcom-deny.rules`;
-upstream retains ownership of `hcom.rules`. The adapter checks the native rule
-source before writing and the installed file during acceptance with the
+upstream retains ownership of `hcom.rules`. The adapter checks the installed rule file during acceptance with the
 mandatory `codex execpolicy check --pretty --rules <file> -- hcom term inject luna hi`.
 [Upstream safe list:46-72](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/common.rs#L46),
 [Codex forbidden branch:394-406](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/core/src/exec_policy.rs#L394).
 
 The prefixes retain the accepted posture's limits: reordered or equals-joined
 global flags, Codex's single-token `--from=bigboss`, numbered Claude PTY launches,
-other executable wrappers (including RTK) and shell scripts the client does not
-split remain outside their coverage. Parsing failure and `--ignore-rules` remain
+agent-launched `hcom claude`, `hcom [N] claude|codex`, `hcom r`, `hcom f`,
+other executable wrappers and shell scripts the client does not split remain
+outside their coverage. The checked prefix set alone cannot establish that peer
+text cannot drive another terminal or configuration. Parsing failure and `--ignore-rules` remain
 separate limitations. Deny rules are not an OS security boundary, and the peer
 instruction does not promote them to one.
 [Router:264](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/router.rs#L264),
@@ -86,8 +88,11 @@ instruction does not promote them to one.
 ## Acceptance and correction
 
 Post-install acceptance parameterizes the upstream `status_json_in_fresh_dir`
-and `list_json_empty` assertions against the installed binary, using a disposable
-HCOM_DIR. It then checks mapped client files and native rule parsing/matching.
+and `list_json_empty` assertions, then `send_without_identity_errors_with_hint`
+and `start_send_events_roundtrip`, against the installed binary in a disposable
+HCOM_DIR and empty inherited identity environment. It requires one correctly
+attributed message, listen delivery, and unread cursor advancement to zero.
+It then checks mapped client files and native rule parsing/matching.
 The smoke is an upstream-test-derived CLI integration observation; it is not an
 execution of the unchanged Cargo suite or cross-client E2E.
 [CLI smoke tests:129-146](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/tests/cli_smoke.rs#L129).
@@ -184,3 +189,30 @@ classes are native ExternalMessage ingress and future released agmsg; revisit
 them in the messaging layer's next landscape sweep. Remaining modality gap is
 idle plain-Claude delivery without hcom launch hooks. No local runner, parser
 hook, model trial or OS-sandbox change is added to conceal it.
+
+
+## Repair 2026-10-05: transport trust and measured RTK interaction
+
+Launching `hcom codex` grants trust to its per-run hooks and their pre-trusted
+current_hash values. With auto_approve=true, hcom writes its upstream allow list
+to `rules/hcom.rules`, including term, relay, config and hooks. These are per-run
+hooks; the adapter itself installs no global client hooks. After the first
+hcom Codex launch, the new after_sign_in check requires both actual rule files
+and passes both to the native repeatable --rules option. Terminal injection and
+`hcom config` must still return forbidden; a missing upstream hcom.rules remains
+needs_user, and a parse failure remains a failure. This establishes combined
+policy evaluation, not rule reloading in an already-running client. Sources:
+[aannoo/hcom codex.rs:314,337,1538,1566](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L314),
+[its safe list](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/common.rs#L57),
+and [the native repeated-rule checker](https://developers.openai.com/codex/rules).
+
+Measured on 2026-10-05 at 03:45Z with rtk 0.51.0 and
+`rtk hook check --agent codex <command>`: hcom term inject luna hi, hcom kill
+luna, hcom send -b @luna -- hi, uvx hcom kill luna and uvx hcom config all
+returned No rewrite for the command. The controls git push and git status
+returned rtk git push and rtk git status. RTK rewrites none of the hcom or
+uvx-hcom commands this deny set forbids, so that Codex hook cannot bypass them.
+The measured input is rtk-hcom-interaction-20261005.md supplied with this repair.
+PR #705's trust-tool guard refinement is a separate owner handoff; this repair
+keeps hcom-deny.rules byte-identical. The launch verbs above remain documented
+limits of the existing posture; extending the forbidden set needs its owner.

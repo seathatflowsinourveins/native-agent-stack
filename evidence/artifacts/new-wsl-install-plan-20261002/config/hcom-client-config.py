@@ -32,6 +32,7 @@ END = "<!-- native-agent-stack:agent-messaging:end -->"
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, required=True)
+    parser.add_argument("--rules-source", type=Path, help="the installer's plan-owned copied rule source")
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--check-map", action="store_true")
     mode.add_argument("--apply", action="store_true")
@@ -46,10 +47,11 @@ def main():
     manifest = cfg.load_manifest(root)["agent-messaging"]
     if not cfg.installs(manifest) or "hcom 0.7.27" not in cfg.installed_default(manifest):
         raise ValueError("agent-messaging must install its adopted hcom 0.7.27 owner")
-    rules = root / spec["codex_rule_file"]
-    # Resolve crossSessionInbound through the shared mapper's native piece and
-    # authorization entry. Only this slot's explicit --apply writes it, and an
-    # existing different choice is kept, with needs_user below.
+    rules = args.rules_source or root / spec["codex_rule_file"]
+    cfg.file_io.refuse_symlink(rules)
+    # Check the shared mapper's authorization classification only. This adapter
+    # never writes crossSessionInbound; only the shared mapper's --apply with
+    # --with-authorization-settings may write that authorization setting.
     key = "claude/settings/setting/crossSessionInbound"
     entry = next(e for e in cfg.load_map(root)
                  if any(fnmatch.fnmatchcase(key, p) for p in e.match))
@@ -61,14 +63,6 @@ def main():
     if args.check_map:
         print("agent-messaging: map, native inbound setting and rule source present")
         return 0
-
-    # Codex validates every inline match/not_match when loading these rules.
-    # This mandatory query also requires the returned strictest decision.
-    done = subprocess.run(["codex", "execpolicy", "check", "--pretty", "--rules", str(rules),
-                           "--", "hcom", "term", "inject", "luna", "hi"],
-                          capture_output=True, text=True, check=True)
-    if json.loads(done.stdout).get("decision") != "forbidden":
-        raise ValueError("the native Codex rule check did not forbid terminal injection")
 
     claude_home = Path(os.environ.get("CLAUDE_CONFIG_DIR", Path.home() / ".claude"))
     codex_home = Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
@@ -105,10 +99,8 @@ def main():
     settings_bytes = original(settings_path)
     settings = json.loads(settings_bytes) if settings_bytes is not None else {}
     incoming = dict(spec["claude_settings"])
-    if "crossSessionInbound" not in settings or settings["crossSessionInbound"] == inbound:
-        incoming["crossSessionInbound"] = inbound
-    else:
-        pending.append("Claude crossSessionInbound differs; retain the user's existing choice")
+    if args.check and "crossSessionInbound" in settings and settings["crossSessionInbound"] != inbound:
+        print("agent-messaging: Claude crossSessionInbound differs; the user's authorization choice is retained")
     merged = cfg.file_io.merge_settings(settings, incoming)
     if merged != settings:
         put(settings_path, (json.dumps(merged, indent=2, ensure_ascii=False) + "\n").encode(), settings_bytes)

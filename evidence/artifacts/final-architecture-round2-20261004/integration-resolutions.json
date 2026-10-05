@@ -73,7 +73,7 @@
     {
       "file": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
       "builder": "G4",
-      "resolution": "Resolve research-harnesses conflict in favour of G4's installed runner path and native openai Sol/max caller. Retain #704's stdin redirection so the JSON command matches the shell acceptance exactly. Both gatherers retain their verdict-specified gateway bindings.",
+      "resolution": "Resolve research-harnesses conflict in favour of G4's installed runner path and native openai Sol/max caller. Retain #704's stdin redirection so the JSON command matches the shell acceptance exactly. Both gatherers retain their verdict-specified gateway bindings. Superseded by repair R2-05: gateway research uses Sol/xhigh and native Codex alone supplies Sol/max.",
       "source": "this PR:docs/decisions/2026-10-04-final-architecture-round2.md:38; this PR:docs/decisions/2026-10-04-round2-plan-g4-config.md:58"
     },
     {
@@ -115,7 +115,7 @@
     {
       "file": "evidence/artifacts/new-wsl-install-plan-20261002/config/harbor-worker-telemetry-contract.md",
       "builder": "G4",
-      "resolution": "Integrate Harbor's telemetry qualification unchanged. Record the unreconciled producer dependency: the existing worker recipe is 1.50.1, while the fixed telemetry verdict requires OpenHands SDK 1.51.0. Do not change the unowned worker pin.",
+      "resolution": "Integrate Harbor's telemetry qualification unchanged. Record the unreconciled producer dependency: the existing worker recipe is 1.50.1, while the fixed telemetry verdict requires OpenHands SDK 1.51.0. Do not change the unowned worker pin. Superseded by repair R2-04: telemetry checks the installed producer, leaving future 1.51.0 qualification to its owner.",
       "source": "this PR:docs/decisions/2026-10-04-final-architecture-round2.md:37; this PR:docs/decisions/2026-10-04-round2-plan-g4-config.md:221"
     }
   ],
@@ -129,7 +129,7 @@
     {
       "test": "tests.test_new_wsl_definitive_defaults.Manifest.test_decision_rule_states_the_current_rule",
       "old": "Rule ends with wave3; one owner-rule preamble",
-      "new": "Append wave5's distinct owner-rule preamble exactly once; keep the repeated exception deduplicated",
+      "new": "Keep amendment 4 byte-identical across waves 3 and 5; the manifest contains it once, and the repeated exception remains deduplicated.",
       "justification": "this PR:evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json:1311; this PR:evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json:1312"
     },
     {
@@ -183,7 +183,7 @@
     {
       "test": "tests.test_new_wsl_client_config.RenderTests.test_the_wired_servers_are_registered_and_serena_and_qmd_by_the_command_their_readmes_give",
       "old": "Eight Claude and nine Codex servers",
-      "new": "Nine Claude and ten Codex servers; exact Chrome stdio command, pin and all three required flags",
+      "new": "Nine Claude and ten Codex servers; exact Chrome stdio command, pin and all four required flags, including the CrUX opt-out.",
       "justification": "this PR:docs/decisions/2026-10-04-final-architecture-round2.md:24; this PR:docs/decisions/2026-10-04-final-architecture-round2.md:34; ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df:docs/client-configurations.md:71,109"
     },
     {
@@ -202,7 +202,7 @@
       "test": "tests.test_new_wsl_client_config.AuthorizationTests.test_the_default_render_has_none_of_the_authorization_keys_and_the_option_adds_those_and_nothing_else",
       "old": "Four main Codex server approvals and their exact leaf delta",
       "new": "Five, adding only Chrome; retain exact default absence, complete leaf deltas, unchanged shared values and deny lists",
-      "justification": "this PR:docs/decisions/2026-10-04-final-architecture-round2.md:24; this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:130"
+      "justification": "this PR:docs/decisions/2026-10-04-final-architecture-round2.md:24; this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:137"
     },
     {
       "test": "tests.test_new_wsl_handbook.NewWslHandbookTests.test_inventory_holds_all_104_manifest_rows_the_ten_added_the_six_consensus_and_the_fourteen_owner_ones",
@@ -232,7 +232,7 @@
       "test": "tests.test_new_wsl_client_config.AuthorizationTests shared expected fixtures",
       "old": "15 authorization pieces; no Chrome approval identity or label",
       "new": "16 pieces; add the exact fixed Chrome owner and label; preserve the same two absent-owner negative controls after index insertion",
-      "justification": "this PR:docs/decisions/2026-10-04-final-architecture-round2.md:24; this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:130"
+      "justification": "this PR:docs/decisions/2026-10-04-final-architecture-round2.md:24; this PR:docs/decisions/2026-10-04-round2-plan-g2-browser.md:137"
     }
   ],
   "checks": {
@@ -420,13 +420,17 @@
     }
   },
   "not_done": [
-    "adoption/templates/codex.omniroute.config.toml effort-comment handoff remains outside this job.",
-    "Host Chrome/Playwright and agent-browser changes, central Chrome landscape registration, and the requested OmniRoute new_wsl_pin change remain currency-PR work with saturation and qualification evidence.",
-    "The existing OpenHands worker 1.50.1 pin needs its owner to reconcile telemetry's fixed 1.51.0 producer requirement.",
+    "The unowned gateway effort-comment template remains a configuration-owner handoff.",
+    "Host Chrome/Playwright and agent-browser reconciliation and central Chrome landscape registration remain currency-owner work. Main #637 already qualified the unchanged stack pin 3.8.51; no new_wsl_pin move is owed here.",
+    "The agent-runtime-worker owner must independently qualify any future OpenHands 1.51.0 move. Telemetry now requires the adapter and returned runtime to match the producer actually installed.",
     "Evidence-registry reconciliation belongs to the coordinator.",
     "Destination installation, browser/upstream runtime tests, provider/GPU acceptance, research observation and Harbor telemetry qualification remain unrun; the telemetry corpus and native sign-ins remain destination prerequisites.",
     "hcom idle delivery into plain Claude remains unqualified under the no-wrapper posture; the documented start/listen route remains the implemented path.",
-    "The coordinator must stage the marker-free working-tree resolutions and commit; the two existing unmerged index entries are intentionally untouched."
+    "The coordinator owns staging and committing this repaired working tree. This repair writes neither the git index nor a commit.",
+    "Scholarly retrievers and OPENALEX_EMAIL are explicitly deferred to the research-harnesses owner to reconcile the conflicting scholarly/search verdicts and its env-i keyless-search contract; DuckDuckGo remains operative.",
+    "R2-19: The launch-verb limits and overbroad claim are corrected in G1. The deny-file header remains unchanged because this job explicitly forbids changing hcom-deny.rules; its posture owner must reconcile that header or extend the policy.",
+    "R2-20: Reviewed transitive locks, uv cooldown resolution, OmniRoute install-script sequencing/signature qualification and source-based conformance execution require their owners’ supported-route qualification. Changing these executable installation contracts without that evidence is not a safe local repair; top-level pins and current supported routes are preserved.",
+    "R2-27: Both landscape phrases are annotated as unverified coordinator/verifier glosses while preserving the original verifier text. The cited user memory record could not be read under the never-approval policy, and the second quotation has no verified original record. No review-supplied replacement is promoted to a user quotation; exact-word provenance closure remains owed."
   ],
   "completeness_critic": {
     "findings": [
@@ -481,5 +485,542 @@
       "correction": "The generator binds original source bytes. Re-ran the coordinator regeneration and refroze its receipt, then --check passed.",
       "verification": "this PR:scripts/build_new_wsl_handbook.py:186; python3 scripts/build_new_wsl_handbook.py --check: exit 0"
     }
-  ]
+  ],
+  "repair_round": {
+    "schema_version": 1,
+    "job": "r2-repair",
+    "date_utc": "2026-10-05",
+    "rounds": 1,
+    "model": "GPT Sol at max (user pin preserved)",
+    "trigger": "Independent four-lens Claude synthesis for PR #713, including the existing F9 owner-list repair.",
+    "north_star_action": "Provide reproducible NativeStack2604 configuration and acceptance for complex systems and the north-star R&D before the separately authorized broker paper lane.",
+    "inputs": [
+      {
+        "name": "wave5-claude-read-synthesis.json",
+        "sha256": "a43f847c56cc61384913585268b4d8a5f3b64d09c6f35a9672ff6945ec98d427"
+      },
+      {
+        "name": "rtk-hcom-interaction-20261005.md",
+        "sha256": "78ad196203968e3e3e0e8fdda4b4ec37beca8670ab9b8844dac3c7224e82f75e"
+      }
+    ],
+    "finding_count": 39,
+    "refuted_claims_acted_on": 0,
+    "fixed": [
+      {
+        "id": "R2-01",
+        "severity": "P1",
+        "change": "Dispatch hcom under its own selector and prerequisites; enforce matching dispatch with bounded native bootstrap exceptions and a negative control. Apply needs no Codex executable."
+      },
+      {
+        "id": "R2-02",
+        "severity": "P1",
+        "change": "Remove all crossSessionInbound writes from the hcom adapter; retain absent or differing authorization choices. Only the shared mapper authorization opt-in writes it."
+      },
+      {
+        "id": "R2-03",
+        "severity": "P1",
+        "change": "Run conformance working-tree/index cleanliness guards only after an index exists, allowing the initial --no-checkout clone."
+      },
+      {
+        "id": "R2-04",
+        "severity": "P2",
+        "change": "Check installed OpenHands producer metadata against the Harbor adapter and returned runtime version; fail a mismatch clearly. Keep 1.50.1 and hand 1.51.0 qualification to its owner."
+      },
+      {
+        "id": "R2-05",
+        "severity": "P2",
+        "change": "Use honest gateway Sol/xhigh research routes, enable DeerFlow supports_reasoning_effort, and assert delivered provider effort from per-run native call logs. Use the supported xhigh alias for OpenHands."
+      },
+      {
+        "id": "R2-06",
+        "severity": "P2",
+        "change": "Refuse auth-store upload variables before Harbor launches and require an externally injected OpenAI API key for the containerized Codex leg."
+      },
+      {
+        "id": "R2-07",
+        "severity": "P2",
+        "change": "Use the exact public Q11 user quotation in the operative hcom authority; preserve sanitized verifier text with an explicit gloss correction and rehash the extract."
+      },
+      {
+        "id": "R2-08",
+        "severity": "P2",
+        "change": "Restore removes-nothing-by-itself wording in all four new owner rows and the unconditional test invariant."
+      },
+      {
+        "id": "R2-09",
+        "severity": "P2",
+        "change": "Record the downloaded Chrome MCP tarball SHA256 alongside its SRI; bind the historical Playwright selection to its owner replacement so the handbook emits one browser pick."
+      },
+      {
+        "id": "R2-10",
+        "severity": "P2",
+        "change": "Explicitly defer conflicting scholarly retrievers and OPENALEX_EMAIL to the research-harnesses owner; retain the qualified DuckDuckGo contract."
+      },
+      {
+        "id": "R2-11",
+        "severity": "P2",
+        "change": "Replace the unchecked Chrome .deb install with signed apt metadata, the pinned Google primary key fingerprint, and exact package-version selection."
+      },
+      {
+        "id": "R2-12",
+        "severity": "P2",
+        "change": "Make Inspect AI the sole writer of the complete Inspect/Scout/Harbor/pytest environment and dispatch it before named trajectory analysis."
+      },
+      {
+        "id": "R2-13",
+        "severity": "P2",
+        "change": "Parameterize the upstream full hcom send/events/list/listen/cursor roundtrip and no-identity refusal in a clean environment."
+      },
+      {
+        "id": "R2-14",
+        "severity": "P2",
+        "change": "Close stdin for every codex exec and claude -p in accept.sh; pass the review diff by an explicit file path in the prompt."
+      },
+      {
+        "id": "R2-15",
+        "severity": "P2",
+        "change": "Add architecture cells for hcom, DSPy, SkillSpector, Scout and conformance using allowed winner fields, name identifiers and actual pin lines; keep destination acceptance none_recorded."
+      },
+      {
+        "id": "R2-16",
+        "severity": "P3",
+        "change": "Document that the cooldown waiver was considered but not exercised; retain alpha.11 under the named-only publication boundary without an alpha.12 fix claim."
+      },
+      {
+        "id": "R2-17",
+        "severity": "P3",
+        "change": "Treat prerequisite exit 78 as needs_user without marking the whole acceptance pass failed; use it for missing Harbor, Scout and Promptfoo inputs."
+      },
+      {
+        "id": "R2-18",
+        "severity": "P3",
+        "change": "Describe Chrome approval accurately as server-wide, still gated by the shared authorization opt-in, and regenerate the native decision tables."
+      },
+      {
+        "id": "R2-21",
+        "severity": "P3",
+        "change": "Record that this PR supersedes #704 with main #637’s already-qualified 3.8.51 pin; remove the nonexistent new_wsl_pin premise from current topology documentation."
+      },
+      {
+        "id": "R2-22",
+        "severity": "P3",
+        "change": "Restrict destination alert configuration to the selected ntfy webhook; keep the disarmed sink only as an unresolved bootstrap placeholder and preserve native delivery acceptance."
+      },
+      {
+        "id": "R2-23",
+        "severity": "P3",
+        "change": "Replace tautologies with independent source-layer/family-prefix assertions and the restored removal invariant."
+      },
+      {
+        "id": "R2-24",
+        "severity": "P3",
+        "change": "Reuse amendment 4 byte-for-byte in wave5 so the assembler deduplicates it once; remove the assertion requiring a duplicate rule."
+      },
+      {
+        "id": "R2-25",
+        "severity": "P3",
+        "change": "Correct the resolved-row count explanation to the actual 40-row derivation."
+      },
+      {
+        "id": "R2-26",
+        "severity": "P3",
+        "change": "Cite the public Q11 comment beside the exact user words and the consensus posture, then reseal the wave records."
+      },
+      {
+        "id": "R2-28",
+        "severity": "P3",
+        "change": "Define the seven-case frozen scanner removal comparison in this PR, including benign, external-access, recall, token and time conditions."
+      },
+      {
+        "id": "R2-29",
+        "severity": "P3",
+        "change": "State named-only conformance installation in the decision table, consensus install field and architecture role."
+      },
+      {
+        "id": "R2-30",
+        "severity": "P3",
+        "change": "Point both Chrome approval justifications to the actual G2 approval line."
+      },
+      {
+        "id": "R2-31",
+        "severity": "P3",
+        "change": "Remove unused Chrome/conformance tarball and Chrome-for-Testing downloads; make the copied hcom rule source the adapter’s consumed input."
+      },
+      {
+        "id": "R2-32",
+        "severity": "P3",
+        "change": "Assert Claude’s native Command and Args against the same exact Chrome registration checked for Codex."
+      },
+      {
+        "id": "R2-33",
+        "severity": "P3",
+        "change": "Require nonzero scanner exit and nonempty complete findings on the pinned upstream malicious-skill fixture."
+      },
+      {
+        "id": "R2-34",
+        "severity": "P3",
+        "change": "Run DSPy tests with Python safe-path and pytest importlib mode, and assert the imported module is inside the installed environment."
+      },
+      {
+        "id": "R2-35",
+        "severity": "P3",
+        "change": "Set sudo=false on the four new rows whose own install commands use no sudo."
+      },
+      {
+        "id": "R2-36",
+        "severity": "P3",
+        "change": "Refresh script headers and recipe counts to 84 rows, 63 installed, 183 commands and 112 acceptance entries."
+      },
+      {
+        "id": "R2-37",
+        "severity": "P3",
+        "change": "Disable CrUX with --no-performance-crux in both Chrome registrations and all corresponding checks and documentation."
+      },
+      {
+        "id": "R2-38",
+        "severity": "P3",
+        "change": "Document disabling DSPy’s disk cache for operator runs and keeping GEPA log_dir and wandb/mlflow integrations off."
+      },
+      {
+        "id": "R2-39",
+        "severity": "P3",
+        "change": "Document hcom Codex hook/hash/allow-list trust and require combined actual allow/deny policy checks after the first launch; record the measured RTK non-interaction."
+      }
+    ],
+    "left": [
+      {
+        "id": "R2-19",
+        "severity": "P3",
+        "reason": "The launch-verb limits and overbroad claim are corrected in G1. The deny-file header remains unchanged because this job explicitly forbids changing hcom-deny.rules; its posture owner must reconcile that header or extend the policy."
+      },
+      {
+        "id": "R2-20",
+        "severity": "P3",
+        "reason": "Reviewed transitive locks, uv cooldown resolution, OmniRoute install-script sequencing/signature qualification and source-based conformance execution require their owners’ supported-route qualification. Changing these executable installation contracts without that evidence is not a safe local repair; top-level pins and current supported routes are preserved."
+      },
+      {
+        "id": "R2-27",
+        "severity": "P3",
+        "reason": "Both landscape phrases are annotated as unverified coordinator/verifier glosses while preserving the original verifier text. The cited user memory record could not be read under the never-approval policy, and the second quotation has no verified original record. No review-supplied replacement is promoted to a user quotation; exact-word provenance closure remains owed."
+      }
+    ],
+    "disputed": [
+      {
+        "id": "R2-01",
+        "alternative": "Enforce the exact matching selected/named/measured dispatch, with three bounded exceptions for the existing mise, container-engine and docker-compose bootstrap/dependency guards. A blanket line-start quoted-selector regex rejects those valid prerequisite guards. The real checker’s negative control still rejects hcom hidden under srt; no Codex pre-dispatch was added.",
+        "source": "this PR:evidence/artifacts/new-wsl-install-plan-20261002/install.sh:1083,1161,1170; this PR:evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py:499; this PR:tests/test_new_wsl_definitive_defaults.py (hcom-under-srt negative control)"
+      }
+    ],
+    "sources": [
+      {
+        "source": "this PR",
+        "paths": [
+          "tools/adoption/new_wsl_client_config.py",
+          "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+          "scripts/build_ecosystem.py",
+          "scripts/build_new_wsl_handbook.py",
+          "docs/decisions/2026-10-03-omniroute-3851-pin.md"
+        ]
+      },
+      {
+        "repository": "aannoo/hcom",
+        "pin": "2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b",
+        "files": [
+          "tests/cli_smoke.rs:158,330",
+          "src/hooks/codex.rs:314,337,1538,1566"
+        ]
+      },
+      {
+        "repository": "openai/codex",
+        "installed_client": "0.159.3",
+        "plan_pin": "0.160.0",
+        "verification": "Installed execpolicy help and release changelog; native repeated --rules parsing. The destination run is still owed."
+      },
+      {
+        "repository": "diegosouzapw/OmniRoute",
+        "pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+        "release": "3.8.51",
+        "files": [
+          "open-sse/executors/codex/reasoningSuffix.ts",
+          "open-sse/executors/codex.ts",
+          "src/app/api/usage/call-logs/route.ts:233-277",
+          "src/lib/usage/callLogs.ts:472-520,1067-1074",
+          "open-sse/utils/providerRequestLogging.ts:269-284"
+        ]
+      },
+      {
+        "repository": "bytedance/deer-flow",
+        "pin": "v2.1.0",
+        "files": [
+          "backend/packages/harness/deerflow/config/model_config.py:36",
+          "backend/packages/harness/deerflow/models/factory.py:283-285"
+        ]
+      },
+      {
+        "repository": "ChromeDevTools/chrome-devtools-mcp",
+        "pin": "e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df",
+        "release": "1.10.1",
+        "files": [
+          "README.md (CrUX option)",
+          "docs/client-configurations.md:71,109"
+        ],
+        "npm_artifact_sha256": "012cbcf6e832d4f6709dad0c21d7bef17089e94adee9cf33179d15ea0a9adf2b"
+      },
+      {
+        "source": "https://www.google.com/linuxrepositories/",
+        "checked_at": "2026-10-05",
+        "active_primary_fingerprint": "EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796",
+        "apt_package": "google-chrome-stable=154.0.8037.97-1",
+        "apt_metadata": "https://dl.google.com/linux/chrome/deb/dists/stable/main/binary-amd64/Packages"
+      },
+      {
+        "repository": "harbor-framework/harbor",
+        "pin": "1e5c5c6db929a10a140d05e606882c671ae20729",
+        "files": [
+          "src/harbor/agents/installed/codex.py",
+          "tests/unit/test_trajectory_validator.py",
+          "docs-mintlify/core-concepts/jobs/configs.mdx"
+        ]
+      },
+      {
+        "repository": "stanfordnlp/dspy",
+        "pin": "3.4.0",
+        "files": [
+          "dspy configure_cache documentation/source"
+        ]
+      },
+      {
+        "source": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972022684",
+        "meaning": "Exact original Q11 words; names no tool."
+      }
+    ],
+    "handoffs": [
+      {
+        "id": "R2-04",
+        "owner": "agent-runtime-worker",
+        "action": "Qualify any OpenHands 1.51.0 pin move independently; no producer pin was changed."
+      },
+      {
+        "id": "R2-10",
+        "owner": "research-harnesses",
+        "action": "Resolve scholarly/search verdicts, verify bundled retriever names at GPT Researcher v3.7.0 and carry operator OPENALEX_EMAIL through env-i."
+      },
+      {
+        "owner": "hcom posture / PR #705",
+        "action": "Retain the measured RTK non-interaction; refine the separate trust-tool guard only on a real changed execpolicy decision."
+      },
+      {
+        "owner": "coordinator",
+        "action": "Regenerate the evidence registry, stage and commit the reviewable working tree using .bounded-r2-repair/msg-1.txt."
+      }
+    ],
+    "corrections": [
+      {
+        "assumption": "The reviewed adapter calls Codex only under --check.",
+        "correction": "Reading the original adapter in this PR showed an unconditional source-rule check before apply plus an installed-rule check under --check. Removed only the unconditional call; no Codex pre-dispatch was introduced.",
+        "verification": "Original this PR adapter source; Round2RepairIntegrationTests.test_hcom_apply_never_grants_inbound_authorization_or_requires_codex executes apply against scratch homes and asserts no subprocess launch."
+      },
+      {
+        "assumption": "A configured DeerFlow reasoning_effort survives its factory without another flag.",
+        "correction": "The v2.1.0 model config defaults supports_reasoning_effort to false; the factory removes the effort in that case. Set the supported flag true and assert it in effective configuration.",
+        "verification": "bytedance/deer-flow@v2.1.0:backend/packages/harness/deerflow/config/model_config.py:36; models/factory.py:283-285; this PR:config/deer-flow-config.yaml and accept.sh."
+      },
+      {
+        "assumption": "Any explanatory string can be used for architecture pin_is_latest.",
+        "correction": "The existing schema permits only yes, no or unknown. Conformance now uses no; its named-only/cooldown explanation stays in the role and decision record.",
+        "verification": "this PR:scripts/build_ecosystem.py:66,636-640; build_ecosystem.py --check returned exit 0 after the correction."
+      },
+      {
+        "assumption": "SourceFileLoader test imports leave config inventory untouched.",
+        "correction": "They generated config/__pycache__, which an existing file-only inventory test rightly rejected. The source-module test disables bytecode writes and the two generated cache files were removed.",
+        "verification": "Full-suite first attempt IsADirectoryError; source_module now patches sys.dont_write_bytecode; HostTemplateTests focused run passed."
+      },
+      {
+        "assumption": "Closing stdin can be appended after an intentional diff input without changing the review.",
+        "correction": "The review diff is now an explicit readable file path in the Claude prompt, and stdin is closed; duplicate null redirections were removed.",
+        "verification": "this PR:accept.sh cross-family-review stage and synchronized JSON commands."
+      },
+      {
+        "assumption": "The owners inventory should duplicate every install-plan command and acceptance field.",
+        "correction": "The native original owners.json is a metadata inventory. Its original bytes and source metadata were restored after verifying all 84 layer/slot/owner/repository/installed identities against the current plan.",
+        "verification": "Original this PR owners.json; this PR check_plan.py owner identity checks; no owner identity changed in this repair."
+      },
+      {
+        "assumption": "The cached reasoningSuffix basename implied a src/shared/utils source locator.",
+        "correction": "The actual pinned upstream path is open-sse/executors/codex/reasoningSuffix.ts. The decision link and ledger now cite that path.",
+        "verification": "Main #637 source locator; direct public raw file at c1e30b7676975feb298b49eff6ff58923c04b89e matches cached original bytes, SHA256 19fde125e10934338c885d30793e585b3f5403135e8a04f1675b50f8d950ef6e."
+      }
+    ],
+    "attempts": [
+      {
+        "name": "plan sync using native parser",
+        "exit": 1,
+        "condition": "The first invocation used rows rather than the schema’s owners field; it made no mutation. Corrected against the original plan and reran successfully.",
+        "usage": "unknown"
+      },
+      {
+        "name": "coordinator regeneration before corrected plan sync",
+        "exit": 1,
+        "condition": "The generated outputs refreshed, but the final plan check detected the unsynchronized script strings. Corrected sync and regeneration exited 0.",
+        "usage": "unknown"
+      },
+      {
+        "name": "first full eight-module unittest run",
+        "exit": 1,
+        "returned": "Ran 648 tests in 148.342s; FAILED (failures=5, errors=8, skipped=6)",
+        "condition": "Architecture enum, generated client table, expected handbook supersession, test-created bytecode and new hcom F9 after-sign-in owner were repaired.",
+        "usage": "unknown"
+      },
+      {
+        "name": "focused unittest selector",
+        "exit": 1,
+        "returned": "Ran 6 tests; FAILED (errors=1)",
+        "condition": "The selector DecisionRecordTests does not exist; the actual class is RecordTests. Correct RecordTests/architecture/HostTemplate focused run passed (10 tests).",
+        "usage": "unknown"
+      },
+      {
+        "name": "handbook and F9 focused controls",
+        "exit": 0,
+        "returned": "Ran 8 tests in 2.006s; OK",
+        "usage": "unknown"
+      },
+      {
+        "name": "RecordTests, architecture and HostTemplate focused controls",
+        "exit": 0,
+        "returned": "Ran 10 tests in 0.661s; OK",
+        "usage": "unknown"
+      }
+    ],
+    "checks": {
+      "check_plan": {
+        "cmd": "python3 evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+        "exit": 0,
+        "returned": "OK: 84 rows; 63 installed (60 default, 3 named-only); 2 measurement-only; 19 not installed; 183 commands; 112 acceptance entries; 0 problems"
+      },
+      "bash_n_install": {
+        "cmd": "bash -n evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+        "exit": 0
+      },
+      "bash_n_accept": {
+        "cmd": "bash -n evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+        "exit": 0
+      },
+      "client_config": {
+        "cmd": "python3 tools/adoption/new_wsl_client_config.py --check",
+        "exit": 0,
+        "returned": "check passed"
+      },
+      "regen": {
+        "cmd": "bash coordinator job-050-fix-wave-integrate/regen.sh \"$PWD\"",
+        "exit": 0
+      },
+      "handbook": {
+        "cmd": "python3 scripts/build_new_wsl_handbook.py --check",
+        "exit": 0,
+        "returned": "status: passed"
+      },
+      "build_ecosystem": {
+        "cmd": "python3 scripts/build_ecosystem.py --check",
+        "exit": 0,
+        "returned": "status: passed; 23 historical architecture pin drift entries remain distinct from validation errors"
+      },
+      "validate": {
+        "cmd": "python3 scripts/validate.py",
+        "exit": 1,
+        "registry_drift_only": true,
+        "drift": {
+          "sha256_mismatches": 33,
+          "byte_count_mismatches": 32,
+          "unlisted_evidence_files": 1
+        }
+      },
+      "git_diff_check": {
+        "cmd": "git diff --check",
+        "exit": 0
+      }
+    },
+    "tests": {
+      "cmd": "python3 -m unittest tests.test_new_wsl_definitive_defaults tests.test_new_wsl_client_config tests.test_new_wsl_handbook tests.test_new_wsl_profile tests.test_stack_lifecycle tests.test_ecosystem_manifest tests.test_upstream_surface_watch tests.test_wsl_new_distro_recipe",
+      "exit": 0,
+      "returned": "Ran 648 tests in 129.852s; OK (skipped=6)",
+      "evidence_class": "local integration unittest suite; no new upstream/provider acceptance"
+    },
+    "source_access": {
+      "skills": [
+        "search-first",
+        "diagnosing-bugs"
+      ],
+      "memory": "Scoped pin_first=true, limit=2 lookup was rejected by the never-approval policy; original committed and public source records were read. R2-27’s inaccessible history is not treated as authority.",
+      "primary_sources": "Exact pinned source files and public Google/npm metadata were read; official web open was unsupported, so direct public HTTP/gh reads were used.",
+      "child_research": "The existing read-only upstream source researcher’s results were treated as leads and checked against original cached primary source before editing."
+    },
+    "evidence_boundary": "Local unittest and recipe consistency checks are integration evidence. This job executes no install row, WSL/Windows command, provider/GPU acceptance, browser model run or Harbor telemetry corpus; historical receipts are not promoted into new acceptance.",
+    "completeness_critic": {
+      "finding_accounting": "All 39 verified findings have an explicit disposition; all P1/P2 are repaired, including source-backed R2-01 checker adaptation. The four refuted proposals were not adopted.",
+      "missed_modality_found": "Factory configuration can discard a requested effort before it reaches the gateway; DeerFlow capability read-back and actual delivered wire effort now cover this distinct path.",
+      "next_sweep": [
+        {
+          "layer": "agent messaging",
+          "lifecycle_task": "activation and recovery",
+          "follow_up": "Reconcile the protected deny header/launch-verb coverage and independently qualify idle plain-Claude delivery; PR #705 owns the RTK bypass predicate."
+        },
+        {
+          "layer": "installation integrity",
+          "lifecycle_task": "updates and source qualification",
+          "follow_up": "Review transitive locks, publication cooldowns and install-script execution for uv/npm/conformance before changing the executable routes (R2-20)."
+        },
+        {
+          "layer": "research harnesses",
+          "lifecycle_task": "configuration and acceptance",
+          "follow_up": "Reconcile scholarly retrievers/email with the empty-environment keyless runner and keep per-consumer factory plus actual provider-wire evidence."
+        },
+        {
+          "layer": "skills",
+          "lifecycle_task": "vetting and removal",
+          "follow_up": "Run the frozen malicious-skill/benign/external-access paired comparison through the existing upstream promptfoo owner; this repair defines it but claims no model result."
+        },
+        {
+          "layer": "decision provenance",
+          "lifecycle_task": "record correction",
+          "follow_up": "Close R2-27 only after reading the user’s exact original records; preserve verifier text and update every copied digest."
+        }
+      ]
+    },
+    "stop_instruction": "Deadline reached: no further fixes; finish this ledger and run the requested closing acceptance once.",
+    "protected_files": {
+      "manifests/stack.json": {
+        "unchanged": true
+      },
+      "manifests/evidence.json": {
+        "unchanged": true
+      },
+      "catalogs/landscape/upstream-snapshot.json": {
+        "unchanged": true
+      },
+      "evidence/artifacts/new-wsl-install-plan-20261002/config/hcom-deny.rules": {
+        "unchanged": true
+      }
+    },
+    "index_unchanged": true,
+    "closing_acceptance": {
+      "runs": 1,
+      "after_deadline": true,
+      "new_fixes": 0,
+      "command_exits": {
+        "check_plan": 0,
+        "bash_n_install": 0,
+        "bash_n_accept": 0,
+        "client_config": 0,
+        "regen": 0,
+        "handbook": 0,
+        "build_ecosystem": 0,
+        "tests": 0,
+        "validate": 1,
+        "git_diff_check": 0
+      },
+      "validate_registry_drift_only": true,
+      "retained_output": "Closing native command output is retained in the job’s external TMPDIR; the sanitized counts and exits are recorded here."
+    }
+  }
 }

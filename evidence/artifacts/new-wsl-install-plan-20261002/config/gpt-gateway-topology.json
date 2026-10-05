@@ -4,7 +4,7 @@
   "gateway": {
     "owner": "OmniRoute",
     "release": "3.8.51",
-    "adoption_status": "Proposed recipe; stack and architecture pins remain unchanged pending saturation audit and qualification receipt.",
+    "adoption_status": "Published 3.8.51 already qualified and selected in #637; destination recipe matches that pin and supersedes #704's canary. No gateway or model run in this repair.",
     "source_pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
     "endpoint": "http://127.0.0.1:21128/v1",
     "role": "account pool and fallback",

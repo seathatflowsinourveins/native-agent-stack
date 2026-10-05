@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Current integration: 98 primary acceptance stages and two additional checks, from the merged 80-row plan.
+# Current integration: 112 primary acceptance stages and two additional checks, from the merged 84-row plan.
 # Historical 64-row revision ran on 2026-10-02 in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution; the record of that run is private, and its public receipt comes with that distribution's acceptance.
 # Five rows were added after the throwaway run, from the layer consensus of 2026-10-02 (69 foundation rows). The checks of skill-discovery and skill-authoring have not run anywhere; research-skill and credential-custody install nothing and have nothing to check; the fix-wave adds native review checks.
 # On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable after their measurement; like their installation, their checks run only with --only, and as plan rows they have not run anywhere.
@@ -58,8 +58,13 @@ check() {
   local slot="$1" program="$3" rc=0
   # Kind/source remain in JSON and beside each command. Suppress stdout, which
   # diagnostics/model examples can fill with private config; retain stderr/status.
-  if prepare_path && bash -euo pipefail -c "$program" >/dev/null; then rc=0; else rc=$?; failed=1; fi
-  printf '%s | %s | %s\n' "$slot" "$stage" "$rc"
+  if prepare_path && bash -euo pipefail -c "$program" >/dev/null; then rc=0; else rc=$?; fi
+  if [[ "$rc" == 78 ]]; then
+    printf '%s | %s | needs_user (78)\n' "$slot" "$stage"
+  else
+    [[ "$rc" == 0 ]] || failed=1
+    printf '%s | %s | %s\n' "$slot" "$stage" "$rc"
+  fi
 }
 skipped() { printf '%s | %s | skipped\n' "$1" "$stage"; }
 
@@ -297,10 +302,40 @@ agent-messaging() {
       # Source: https://developers.openai.com/codex/rules
       check agent-messaging 'upstream smoke + native integration' 'smoke="$(mktemp -d)"
 trap '"'"'rm -rf -- "$smoke"'"'"' EXIT
-HCOM_DIR="$smoke" hcom status --json > "$smoke/status.json"
+mkdir -p -- "$smoke/home"
+hcom_binary="$(command -v hcom)"
+isolated=(env -i HOME="$smoke/home" PATH="$PATH" HCOM_DIR="$smoke")
+"${isolated[@]}" "$hcom_binary" status --json > "$smoke/status.json"
 jq -e --arg expected "$smoke" '"'"'.hcom_dir == $expected and .instances.total == 0'"'"' "$smoke/status.json" >/dev/null
-HCOM_DIR="$smoke" hcom list --json | jq -e '"'"'type == "array" and length == 0'"'"' >/dev/null
-python3 "$config_root/hcom-client-config.py" --repo-root "$repo_root" --check'
+"${isolated[@]}" "$hcom_binary" list --json | jq -e '"'"'type == "array" and length == 0'"'"' >/dev/null
+identity_rc=0
+"${isolated[@]}" "$hcom_binary" send @nobody -- hi > "$smoke/no-identity.out" 2> "$smoke/no-identity.err" || identity_rc=$?
+[[ "$identity_rc" -ne 0 ]]
+rg -Fq "identity not found" "$smoke/no-identity.err"
+"${isolated[@]}" "$hcom_binary" start > "$smoke/sender.txt"
+"${isolated[@]}" "$hcom_binary" start > "$smoke/recipient.txt"
+sender="$(sed -n '"'"'s/^\[hcom:\([^]]*\)\].*/\1/p'"'"' "$smoke/sender.txt")"
+recipient="$(sed -n '"'"'s/^\[hcom:\([^]]*\)\].*/\1/p'"'"' "$smoke/recipient.txt")"
+[[ -n "$sender" && -n "$recipient" && "$sender" != "$recipient" ]]
+"${isolated[@]}" "$hcom_binary" send "@$recipient" --name "$sender" -- "hello there"
+"${isolated[@]}" "$hcom_binary" events --last 10 > "$smoke/events.jsonl"
+jq -s -e --arg sender "$sender" '"'"'[.[] | select(.type == "message")] | length == 1 and .[0].instance == $sender and .[0].data.from == $sender and .[0].data.text == "hello there"'"'"' "$smoke/events.jsonl" >/dev/null
+"${isolated[@]}" "$hcom_binary" list --json | jq -e --arg sender "$sender" --arg recipient "$recipient" '"'"'any(.[]; .name == $recipient and .unread_count == 1) and any(.[]; .name == $sender and .unread_count == 0)'"'"' >/dev/null
+"${isolated[@]}" "$hcom_binary" listen --name "$recipient" --timeout 1 --json > "$smoke/delivered.jsonl"
+jq -s -e --arg sender "$sender" '"'"'length == 1 and .[0].from == $sender and .[0].text == "hello there" and .[0].reply_id == (.[0].event_id | tostring)'"'"' "$smoke/delivered.jsonl" >/dev/null
+"${isolated[@]}" "$hcom_binary" list --json | jq -e --arg recipient "$recipient" '"'"'any(.[]; .name == $recipient and .unread_count == 0)'"'"' >/dev/null
+python3 "$config_root/hcom-client-config.py" --repo-root "$repo_root" --rules-source "$config_root/hcom-deny.rules" --check'
+      ;;
+    after_sign_in)
+      # Kind: native integration; Source: https://developers.openai.com/codex/rules
+      # Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L1566
+      check agent-messaging 'native integration' 'codex_rules="${CODEX_HOME:-$HOME/.codex}/rules"
+if [[ ! -f "$codex_rules/hcom.rules" ]]; then
+  printf "needs_user: launch hcom codex once before checking its upstream allow rules together with the posture denies.\n" >&2
+  exit 78
+fi
+codex execpolicy check --pretty --rules "$codex_rules/hcom.rules" --rules "$codex_rules/hcom-deny.rules" -- hcom term inject luna hi | jq -e '"'"'.decision == "forbidden"'"'"' >/dev/null
+codex execpolicy check --pretty --rules "$codex_rules/hcom.rules" --rules "$codex_rules/hcom-deny.rules" -- hcom config | jq -e '"'"'.decision == "forbidden"'"'"' >/dev/null'
       ;;
     *) skipped agent-messaging ;;
   esac
@@ -339,7 +374,7 @@ mkdir -p -- "$native_receipts"
 native_probe="$(mktemp -d "$native_receipts/serena.XXXXXX")"
 cd "$repo_root"
 prompt='"'"'Use the configured Serena MCP server. Activate the current directory as the project and follow its session initialization if required. Call find_symbol with name_path_pattern register_file, relative_path scripts/host_receipts.py and include_body true. Then call find_referencing_symbols with name_path register_file and the same relative_path. Both calls must succeed and return the definition and real callers. Do not substitute shell or file-reading tools. Report a failure if either call fails.'"'"'
-claude -p "$prompt" --output-format stream-json --verbose --allowedTools mcp__serena__activate_project,mcp__serena__initial_instructions,mcp__serena__check_onboarding_performed,mcp__serena__find_symbol,mcp__serena__find_referencing_symbols > "$native_probe/claude.jsonl"
+claude -p "$prompt" --output-format stream-json --verbose --allowedTools mcp__serena__activate_project,mcp__serena__initial_instructions,mcp__serena__check_onboarding_performed,mcp__serena__find_symbol,mcp__serena__find_referencing_symbols > "$native_probe/claude.jsonl" </dev/null
 jq -s -e '"'"'def returned($tool):
   [ .[] | select(.type == "assistant") | .message.content[]? |
     select(.type == "tool_use" and .name == $tool) | .id ] as $ids |
@@ -469,7 +504,7 @@ mkdir -p -- "$native_receipts"
 native_probe="$(mktemp -d "$native_receipts/mineru-native.XXXXXX")"
 cd "$repo_root"
 prompt="Use the installed mineru skill to read the public fixture $tool_root/mineru/demo1.pdf locally. Run mineru parse on that absolute path with --tier standard --pages 1 --wait 600 --json in one tool call. Then use a returned doc locator (choose page 1) in a separate mineru read call with --json. Both tool results must contain the first-page text about afforestation. Do not use --remote, another parser, a pipeline, or a model-written summary as a substitute. Report failure if either command fails."
-claude -p "$prompt" --output-format stream-json --verbose --allowedTools Skill,Bash > "$native_probe/claude.jsonl"
+claude -p "$prompt" --output-format stream-json --verbose --allowedTools Skill,Bash > "$native_probe/claude.jsonl" </dev/null
 jq -s -e '"'"'def returned($operation):
   [ .[] | select(.type == "assistant") | .message.content[]? |
     select(.type == "tool_use" and .name == "Bash" and (.input.command | contains($operation))) | .id ] as $ids |
@@ -501,7 +536,9 @@ browser_receipts="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acc
 mkdir -p -- "$browser_receipts"
 google-chrome-stable --version > "$browser_receipts/google-chrome-stable.version.txt"
 test -s "$browser_receipts/google-chrome-stable.version.txt"
-sha256sum "$tool_root/chrome-devtools-mcp/google-chrome-stable_current_amd64.deb" > "$browser_receipts/google-chrome-stable.deb.sha256"
+test "$(dpkg-query -W -f='"'"'${Version}'"'"' google-chrome-stable)" = 154.0.8037.97-1
+apt-cache policy google-chrome-stable > "$browser_receipts/google-chrome-stable.apt-policy.txt"
+rg -Fq "Signed-By: /etc/apt/keyrings/google-chrome.asc EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796" /etc/apt/sources.list.d/google-chrome.sources
 cd "$tool_root/chrome-devtools-mcp-source"
 test "$(git rev-parse HEAD)" = e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df
 browser_run="$(mktemp -d "$browser_receipts/upstream.XXXXXX")"
@@ -517,10 +554,12 @@ native_probe="$(mktemp -d "$native_receipts/clients.XXXXXX")"
 fixture_url="file://$plan_dir/config/chrome-devtools-accept.html"
 cd "$repo_root"
 claude mcp get chrome-devtools > "$native_probe/claude-registration.txt"
+rg -q '"'"'^Command: npx$'"'"' "$native_probe/claude-registration.txt"
+rg -q '"'"'^Args: -y chrome-devtools-mcp@1\.10\.1 --headless --isolated --no-usage-statistics --no-performance-crux$'"'"' "$native_probe/claude-registration.txt"
 codex mcp get chrome-devtools --json > "$native_probe/codex-registration.json"
-jq -e '"'"'.transport.type == "stdio" and .transport.command == "npx" and .transport.args == ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics"]'"'"' "$native_probe/codex-registration.json" >/dev/null
+jq -e '"'"'.transport.type == "stdio" and .transport.command == "npx" and .transport.args == ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"]'"'"' "$native_probe/codex-registration.json" >/dev/null
 prompt="Use only the configured chrome-devtools MCP server for this browser acceptance. Call navigate_page to $fixture_url. Then call take_snapshot and list_console_messages for that page (use its pageId when returned). The title must be NativeStack Chrome MCP acceptance and the console must include native-stack-chrome-devtools-ready. Report failure if a required call fails. Do not substitute shell tools, file-reading tools, another browser server or another browser registration."
-claude -p "$prompt" --model opus --effort max --max-turns 8 --output-format stream-json --verbose --allowedTools mcp__chrome-devtools__navigate_page,mcp__chrome-devtools__take_snapshot,mcp__chrome-devtools__list_console_messages > "$native_probe/claude.jsonl"
+claude -p "$prompt" --model opus --effort max --max-turns 8 --output-format stream-json --verbose --allowedTools mcp__chrome-devtools__navigate_page,mcp__chrome-devtools__take_snapshot,mcp__chrome-devtools__list_console_messages > "$native_probe/claude.jsonl" </dev/null
 jq -s -e --arg url "$fixture_url" '"'"'def returned($tool; $needle):
   [ .[] | select(.type == "assistant") | .message.content[]? |
     select(.type == "tool_use" and .name == $tool) | .id ] as $ids |
@@ -531,7 +570,7 @@ any(.[]; .type == "result" and .subtype == "success" and .is_error == false) and
 returned("mcp__chrome-devtools__navigate_page"; $url) and
 returned("mcp__chrome-devtools__take_snapshot"; "NativeStack Chrome MCP acceptance") and
 returned("mcp__chrome-devtools__list_console_messages"; "native-stack-chrome-devtools-ready")'"'"' "$native_probe/claude.jsonl" >/dev/null
-codex exec --json -C "$repo_root" -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' "$prompt" > "$native_probe/codex.jsonl"
+codex exec --json -C "$repo_root" -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' "$prompt" > "$native_probe/codex.jsonl" </dev/null
 jq -s -e --arg url "$fixture_url" '"'"'def returned($tool; $needle):
   any(.[]; .type == "item.completed" and .item.type == "mcp_tool_call" and
     .item.server == "chrome-devtools" and .item.tool == $tool and .item.status == "completed" and
@@ -650,7 +689,7 @@ mkdir -p -- "$run"
 chmod 0700 "$run"
 printf -v claude_cmd '"'"'set -o pipefail; %q claude daily --since %q --timezone UTC --offline --no-cost --json | jq -c .totals'"'"' "$meter" "$day"
 printf -v codex_cmd '"'"'set -o pipefail; %q codex daily --since %q --timezone UTC --offline --no-cost --speed standard --json | jq -c .totals'"'"' "$meter" "$day"
-claude -p --effort max --max-turns 4 --tools Bash --allowedTools Bash --verbose --output-format stream-json "Run this exact read-only meter command once: $claude_cmd. Report only its numeric totals; read no authentication or credential files." > "$run/claude.jsonl" 2> "$run/claude.stderr"
+claude -p --effort max --max-turns 4 --tools Bash --allowedTools Bash --verbose --output-format stream-json "Run this exact read-only meter command once: $claude_cmd. Report only its numeric totals; read no authentication or credential files." > "$run/claude.jsonl" 2> "$run/claude.stderr" </dev/null
 codex exec --json -c '"'"'model_reasoning_effort="max"'"'"' --skip-git-repo-check "Run this exact read-only meter command once: $codex_cmd. Report only its numeric totals; read no authentication or credential files." </dev/null > "$run/codex.jsonl" 2> "$run/codex.stderr"
 jq -s -e --arg client claude --arg meter "$meter" -f "$config_root/ccusage-session.jq" "$run/claude.jsonl" >/dev/null
 jq -s -e --arg client codex --arg meter "$meter" -f "$config_root/ccusage-session.jq" "$run/codex.jsonl" >/dev/null
@@ -1078,7 +1117,7 @@ curl -fsS -H '\''Content-Type: application/json'\'' --data '\''{"from":"now-5m",
     after_sign_in)
       # Kind: smoke; Source: https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/data_source.md#L657
       check grafana 'smoke' 'export NS2604_OBSERVABILITY_DATA="${NS2604_OBSERVABILITY_DATA:-${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability}"
-claude -p --effort max "Reply exactly NS2604_GRAFANA_NATIVE_ACCEPTANCE" >/dev/null
+claude -p --effort max "Reply exactly NS2604_GRAFANA_NATIVE_ACCEPTANCE" >/dev/null </dev/null
 uv run --locked --script "$repo_root/examples/omniroute-codex-sdk/worker.py" --workspace "$repo_root" --sandbox read-only --prompt "Reply exactly NS2604_GRAFANA_SDK_ACCEPTANCE" | python3 -c '\''
 import json, os, pathlib, sys, uuid
 rows = [json.loads(line) for line in sys.stdin if line.strip()]
@@ -1310,7 +1349,7 @@ gateway="${PROMPTFOO_GATEWAY_CONFIG:-$config_root/promptfoo-gateway.yaml}"
 export GATEWAY_API_KEY="${GATEWAY_API_KEY:-keyless-loopback}"
 if rg -q '"'"'your-gpt-model-id|your-claude-model-id|your-model-id|gateway.example.com'"'"' "$gateway"; then
   printf '"'"'needs_user: select the two exact existing GPT/Claude gateway model IDs and its apiBaseUrl in %s.\n'"'"' "$gateway" >&2
-  exit 1
+  exit 78
 fi
 export PROMPTFOO_CONFIG_DIR="$config_root/promptfoo-state" PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1
 run="$config_root/promptfoo-acceptance/$(date -u +%Y%m%dT%H%M%SZ)-$$"
@@ -1355,7 +1394,7 @@ env -u OPENAI_API_KEY -u CODEX_API_KEY -u ANTHROPIC_API_KEY "$pf" eval --config 
 jq -e '"'"'.results.stats | .successes == 0 and .failures == 2 and .errors == 0'"'"' "$run/skills/fail.json" >/dev/null
 args="$(jq -cn --arg path "$gateway" '"'"'{configPath:$path,cache:false,write:false,share:false,maxConcurrency:1,resultLimit:20}'"'"')"
 prompt="Call the promptfoo MCP run_evaluation tool once with these exact arguments: $args. Report only the evaluation ID and pass/fail counts. Read no authentication or credential files; use the inherited gateway environment."
-claude -p --effort max --max-turns 4 --allowedTools mcp__promptfoo__run_evaluation --verbose --output-format stream-json "$prompt" > "$run/claude.jsonl" 2> "$run/claude.stderr"
+claude -p --effort max --max-turns 4 --allowedTools mcp__promptfoo__run_evaluation --verbose --output-format stream-json "$prompt" > "$run/claude.jsonl" 2> "$run/claude.stderr" </dev/null
 codex exec --json --sandbox workspace-write -C "$run" -c '"'"'mcp_servers.promptfoo.tools.run_evaluation.approval_mode="approve"'"'"' -c '"'"'model_reasoning_effort="max"'"'"' --skip-git-repo-check "$prompt" </dev/null > "$run/codex.jsonl" 2> "$run/codex.stderr"
 jq -s -e --arg client claude -f "$config_root/promptfoo-session.jq" "$run/claude.jsonl" >/dev/null
 jq -s -e --arg client codex -f "$config_root/promptfoo-session.jq" "$run/codex.jsonl" >/dev/null'
@@ -1518,8 +1557,8 @@ state_root="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptanc
 mkdir -p -- "$state_root"
 run_dir="$(mktemp -d "$state_root/run.XXXXXX")"
 printf -v task '"'"'Use your shell tool to run exactly: bash %q --only %q --stage post_install. This must execute the functional upstream examples and controls; a version report or a final answer without a tool call is insufficient. Report the command exit status. Modify only the disposable fixture this acceptance program owns.'"'"' "$plan_dir/accept.sh" worktrunk
-claude -p --model sonnet --effort max --max-turns 6 --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"' "$task" > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr"
-codex exec -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --ephemeral --json -o "$run_dir/codex-last.txt" "$task" < /dev/null > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr"
+claude -p --model sonnet --effort max --max-turns 6 --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"' "$task" > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr" </dev/null
+codex exec -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --ephemeral --json -o "$run_dir/codex-last.txt" "$task" > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr" </dev/null
 python3 - "$run_dir" worktrunk <<'"'"'PY'"'"'
 import json, pathlib, sys
 directory, slot = pathlib.Path(sys.argv[1]), sys.argv[2]
@@ -1569,8 +1608,8 @@ state_root="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptanc
 mkdir -p -- "$state_root"
 run_dir="$(mktemp -d "$state_root/run.XXXXXX")"
 printf -v task '"'"'Use your shell tool to run exactly: bash %q --only %q --stage post_install. This must execute the functional upstream examples and controls; a version report or a final answer without a tool call is insufficient. Report the command exit status. Modify only the disposable fixture this acceptance program owns.'"'"' "$plan_dir/accept.sh" difftastic
-claude -p --model sonnet --effort max --max-turns 6 --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"' "$task" > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr"
-codex exec -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --ephemeral --json -o "$run_dir/codex-last.txt" "$task" < /dev/null > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr"
+claude -p --model sonnet --effort max --max-turns 6 --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"' "$task" > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr" </dev/null
+codex exec -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --ephemeral --json -o "$run_dir/codex-last.txt" "$task" > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr" </dev/null
 python3 - "$run_dir" difftastic <<'"'"'PY'"'"'
 import json, pathlib, sys
 directory, slot = pathlib.Path(sys.argv[1]), sys.argv[2]
@@ -1608,10 +1647,10 @@ mkdir -p -- "$state_root"
 run_dir="$(mktemp -d "$state_root/run.XXXXXX")"
 git status --porcelain=v1 -z > "$run_dir/status-before"
 printf '"'"'%s\n'"'"' "$claude_base" "$claude_head" "$gpt_base" "$gpt_head" > "$run_dir/commits.txt"
-codex exec review --commit "$claude_head" -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' -c '"'"'sandbox_mode="read-only"'"'"' --ephemeral --json -o "$run_dir/gpt-review.txt" < /dev/null > "$run_dir/gpt-review.jsonl" 2> "$run_dir/gpt-review.stderr"
+codex exec review --commit "$claude_head" -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' -c '"'"'sandbox_mode="read-only"'"'"' --ephemeral --json -o "$run_dir/gpt-review.txt" > "$run_dir/gpt-review.jsonl" 2> "$run_dir/gpt-review.stderr" </dev/null
 git diff "$gpt_base" "$gpt_head" > "$run_dir/gpt-authored.diff"
 test -s "$run_dir/gpt-authored.diff"
-claude -p --model opus --effort max --permission-mode plan --max-turns 14 --output-format stream-json --verbose "Review this GPT-authored diff read-only; report file:line correctness findings. The immutable base is $gpt_base and head is $gpt_head. Read the original repository files for each finding. Do not edit or publish." < "$run_dir/gpt-authored.diff" > "$run_dir/claude-review.jsonl" 2> "$run_dir/claude-review.stderr"
+claude -p --model opus --effort max --permission-mode plan --max-turns 14 --output-format stream-json --verbose "Read the GPT-authored diff at $run_dir/gpt-authored.diff and review it read-only; report file:line correctness findings. The immutable base is $gpt_base and head is $gpt_head. Read the original repository files for each finding. Do not edit or publish." > "$run_dir/claude-review.jsonl" 2> "$run_dir/claude-review.stderr" </dev/null
 git status --porcelain=v1 -z > "$run_dir/status-after"
 cmp -- "$run_dir/status-before" "$run_dir/status-after"
 test -s "$run_dir/gpt-review.txt"
@@ -1739,9 +1778,9 @@ session="$(mktemp -d "$state/clients.XXXXXXXX")"
 for client in claude codex; do
   prompt="Use your native shell to assert the inherited MCP_AUTO_OPEN_ENABLED is exactly false. Run MCP_INSPECTOR_SECRET_STORE=memory npx -y @modelcontextprotocol/inspector@2.9.0 --cli qmd --index native-agent-stack-catalog mcp -- --method tools/list and save its actual JSON as $session/$client-tools.json. Then boot the published Inspector Web mode with the same QMD positional command: MCP_INSPECTOR_SECRET_STORE=memory HOST=127.0.0.1 CLIENT_PORT=26399 setsid npx -y @modelcontextprotocol/inspector@2.9.0 --web -- qmd --index native-agent-stack-catalog mcp. Poll http://127.0.0.1:26399/ with curl and save the served page to $session/$client-page.html. Stop its process group in a shell trap and wait for it before finishing. Keep its authentication enabled. Write $session/$client-env.txt with the inherited MCP_AUTO_OPEN_ENABLED after the assertion succeeds."
   if [[ "$client" == claude ]]; then
-    (cd "$session" && timeout 600 claude -p --model opus --effort max --max-turns 12 --permission-mode bypassPermissions --output-format stream-json --verbose "$prompt") >"$session/claude.jsonl"
+    (cd "$session" && timeout 600 claude -p --model opus --effort max --max-turns 12 --permission-mode bypassPermissions --output-format stream-json --verbose "$prompt") >"$session/claude.jsonl" </dev/null
   else
-    OMNIROUTE_API_KEY=local-loopback timeout 600 codex exec -p omniroute -m gpt-6.1-sol -c model_reasoning_effort=max \
+    OMNIROUTE_API_KEY=local-loopback timeout 600 codex exec -p omniroute -m gpt-6.1-sol -c model_reasoning_effort=max  </dev/null \
       --sandbox workspace-write -c sandbox_workspace_write.network_access=true \
       -c "shell_environment_policy.set.npm_config_cache=\"$session/npm-cache\"" \
       -c "sandbox_workspace_write.writable_roots=[\"$state\"]" \
@@ -1825,7 +1864,7 @@ policy["filesystem"]["allowWrite"] = [str(root)]
 policy["network"]["allowedDomains"] = ["127.0.0.1:21128"]
 (root / "hello-srt.json").write_text(json.dumps(policy))
 PY
-(cd "$run" && HOME="$run/home" OH_PERSISTENCE_DIR="$run/openhands-home" NO_PROXY= no_proxy= LLM_BASE_URL=http://127.0.0.1:21128/v1 LLM_MODEL=openai/cx/gpt-6.1-sol-max LLM_API_KEY=local-loopback \
+(cd "$run" && HOME="$run/home" OH_PERSISTENCE_DIR="$run/openhands-home" NO_PROXY= no_proxy= LLM_BASE_URL=http://127.0.0.1:21128/v1 LLM_MODEL=openai/cx/gpt-6.1-sol-xhigh LLM_API_KEY=local-loopback \
   srt --settings "$run/hello-srt.json" -- env NO_PROXY= no_proxy= "$tool_root/agent-runtime-worker/bin/python" "$tool_root/openhands-source/examples/01_standalone_sdk/01_hello_world.py")
 test -s "$run/FACTS.txt"
 # The closed-port negative preserves its journal and proves no model request occurred.
@@ -1845,9 +1884,9 @@ for client in claude codex; do
   id="$client-$stamp"
   prompt="Use the native-stack-worker skill to prepare job $id with its default Python sum(range(1,11)) task and default owned workspace. Dispatch it with systemctl --user start --wait openhands-job@$id.service, then inspect its run-report.json and result.txt. Complete the real job; a preflight is insufficient."
   if [[ "$client" == claude ]]; then
-    (cd "$run" && timeout 1800 claude -p --model opus --effort max --max-turns 12 --permission-mode bypassPermissions --output-format stream-json --verbose "$prompt") >"$run/claude.jsonl"
+    (cd "$run" && timeout 1800 claude -p --model opus --effort max --max-turns 12 --permission-mode bypassPermissions --output-format stream-json --verbose "$prompt") >"$run/claude.jsonl" </dev/null
   else
-    OMNIROUTE_API_KEY=local-loopback timeout 1800 codex exec -p omniroute -m gpt-6.1-sol -c model_reasoning_effort=max \
+    OMNIROUTE_API_KEY=local-loopback timeout 1800 codex exec -p omniroute -m gpt-6.1-sol -c model_reasoning_effort=max  </dev/null \
       --sandbox workspace-write -c sandbox_workspace_write.network_access=true \
       -c "sandbox_workspace_write.writable_roots=[\"$cfg\",\"$worker_state\"]" \
       --skip-git-repo-check -C "$run" --json "$prompt" </dev/null >"$run/codex.jsonl"
@@ -1909,7 +1948,9 @@ assert any(m["name"] == "gpt-runtime" for m in client.list_models()["models"])
 active = get_app_config().model_dump()
 model, = [m for m in active["models"] if m["name"] == "gpt-runtime"]
 assert model["use"] == "langchain_openai:ChatOpenAI"
-assert model["model"] == "cx/gpt-6.1-sol-max"
+assert model["model"] == "cx/gpt-6.1-sol"
+assert model["supports_reasoning_effort"] is True
+assert model["reasoning_effort"] == "xhigh"
 assert model["base_url"] == "http://127.0.0.1:21128/v1"
 search, = [tool for tool in active["tools"] if tool["name"] == "web_search"]
 assert search["use"] == "deerflow.community.ddg_search.tools:web_search_tool"
@@ -1925,7 +1966,11 @@ grep -q "^Report written to '"'"'outputs/" <<<"$out"
 run="$(sed -n '"'"'s/^run directory: //p'"'"' <<<"$out")"
 refs="$(awk '"'"'/^#+ *References/{f=1} f'"'"' "$run"/outputs/*.md | grep -oE '"'"'https?://[^) >]+'"'"' | sort -u | wc -l)"
 [[ "$refs" -ge 5 ]]
-bash "$config_root/deer-flow-research.sh" "Research Ubuntu 26.04 WSL news this month; return a short answer with primary source URLs."
+python3 "$config_root/gateway-effort-accept.py" "gptr-${run##*/}"
+deer_out="$(bash "$config_root/deer-flow-research.sh" "Research Ubuntu 26.04 WSL news this month; return a short answer with primary source URLs.")"
+deer_run="$(sed -n '"'"'s/^run directory: //p'"'"' <<<"$deer_out")"
+[[ -d "$deer_run" ]]
+python3 "$config_root/gateway-effort-accept.py" "deerflow-${deer_run##*/}"
 # Both gatherers are exercised by each fresh native session, with actual outputs observed outside it.
 state="${XDG_STATE_HOME:-$HOME/.local/state}"
 install -d -m 0700 -- "$state/native-agent-stack/research/client-checks"
@@ -1935,9 +1980,9 @@ for client in claude codex; do
   touch "$marker"
   prompt="Use native-stack-research to complete a short public research query about Ubuntu 26.04 WSL this month through BOTH installed gatherers: bash $config_root/gpt-researcher.sh and bash $config_root/deer-flow-research.sh. Include source URLs. Complete both real calls; preflight/import checks do not qualify. Inspect the two resulting reports and print their run directories."
   if [[ "$client" == claude ]]; then
-    (cd "$session" && timeout 3300 claude -p --model opus --effort max --max-turns 16 --permission-mode bypassPermissions --output-format stream-json --verbose "$prompt") >"$session/claude.jsonl"
+    (cd "$session" && timeout 3300 claude -p --model opus --effort max --max-turns 16 --permission-mode bypassPermissions --output-format stream-json --verbose "$prompt") >"$session/claude.jsonl" </dev/null
   else
-    timeout 3300 codex exec -m gpt-6.1-sol -c model_provider='"'"'"openai"'"'"' -c model_reasoning_effort=max \
+    timeout 3300 codex exec -m gpt-6.1-sol -c model_provider='"'"'"openai"'"'"' -c model_reasoning_effort=max  </dev/null \
       --sandbox workspace-write -c sandbox_workspace_write.network_access=true \
       -c "sandbox_workspace_write.writable_roots=[\"$state/new-wsl-native-stack/research\",\"$state/native-agent-stack/research\"]" \
       --skip-git-repo-check -C "$session" --json "$prompt" </dev/null >"$session/codex.jsonl"
@@ -2025,7 +2070,8 @@ assert version("gepa") == "0.1.4"
 assert callable(dspy.GEPA)
 PY
 cd "$tool_root/dspy-source-3.4.0"
-uv run --project "$tool_root/dspy-3.4.0" --frozen --no-sync python -m pytest -q tests/teleprompt/test_gepa.py tests/predict/test_predict.py'
+uv run --project "$tool_root/dspy-3.4.0" --frozen --no-sync python -P -c '"'"'import dspy, sys; from pathlib import Path; assert Path(dspy.__file__).resolve().is_relative_to(Path(sys.prefix).resolve())'"'"'
+uv run --project "$tool_root/dspy-3.4.0" --frozen --no-sync python -P -m pytest --import-mode=importlib -q tests/teleprompt/test_gepa.py tests/predict/test_predict.py'
       ;;
     after_sign_in)
       # Kind: smoke; Source: https://github.com/stanfordnlp/dspy/blob/3.4.0/docs/docs/learn/programming/language_models.md#L139
@@ -2066,6 +2112,10 @@ umask 077
 state="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/skill-vetting"
 install -d -m 0700 -- "$state"
 run="$(mktemp -d "$state/semantic.XXXXXXXX")"
+bad_rc=0
+SKILLSPECTOR_PROVIDER=codex_cli skillspector scan "$tool_root/skillspector-source-2.12.0/tests/fixtures/malicious_skill" --format json --output "$run/bad-report.json" --fail-on-findings --fail-on-incomplete || bad_rc=$?
+[[ "$bad_rc" -ne 0 ]]
+jq -e '"'"'.analysis_completeness.is_complete == true and .execution_successful == true and (.findings | length > 0)'"'"' "$run/bad-report.json" >/dev/null
 SKILLSPECTOR_PROVIDER=codex_cli skillspector scan "$tool_root/skillspector-source-2.12.0/tests/fixtures/safe_skill" --format json --output "$run/report.json" --fail-on-incomplete
 "$(uv tool dir)/skillspector/bin/python" - "$run/report.json" <<'"'"'PY'"'"'
 import json, sys
@@ -2100,8 +2150,10 @@ cd "$tool_root/inspect-scout-source-0.5.3"
       ;;
     after_sign_in)
       # Kind: smoke; Source: https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/src/inspect_scout/_cli/import_command.py#L317
-      check trajectory-analysis smoke ': "${SCOUT_CLAUDE_SESSION_FILE:?Select a current Claude session JSONL with a known Agent/Task call and consent to private local import}"
-: "${SCOUT_HARBOR_ATIF_FILE:?Select one existing Harbor trajectory.json and consent to private local import}"
+      check trajectory-analysis smoke 'if [[ -z "${SCOUT_CLAUDE_SESSION_FILE:-}" || -z "${SCOUT_HARBOR_ATIF_FILE:-}" ]]; then
+  printf "needs_user: select a current Claude session with an Agent/Task call and one Harbor ATIF trial, and consent to private local import.\n" >&2
+  exit 78
+fi
 [[ -f "$SCOUT_CLAUDE_SESSION_FILE" && -f "$SCOUT_HARBOR_ATIF_FILE" ]]
 umask 077
 state="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/trajectory-analysis"

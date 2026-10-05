@@ -996,7 +996,7 @@
       "pin": "1.10.1",
       "component_id": "playwright-cli",
       "source_selection_layer": "web-research",
-      "source_selection_name": "Chrome DevTools MCP",
+      "source_selection_name": "Playwright CLI",
       "status": "picked",
       "stage": "native-extensions",
       "position": 7,
@@ -1009,20 +1009,21 @@
         "url": "https://registry.npmjs.org/chrome-devtools-mcp/-/chrome-devtools-mcp-1.10.1.tgz"
       },
       "checksum": {
-        "algorithm": "sha512",
-        "value": "2a5c3a1d60ea1c2fd74b527066575ddabe3d69485b50937d9bd32f731e1212e7883d7b73b905fe41e9710158a86eff185240d9ec7583ae656247a2de60ad3003",
+        "algorithm": "sha256",
+        "value": "012cbcf6e832d4f6709dad0c21d7bef17089e94adee9cf33179d15ea0a9adf2b",
         "source": "https://registry.npmjs.org/chrome-devtools-mcp/1.10.1",
-        "kind": "artifact"
+        "kind": "artifact",
+        "integrity": "sha512-Klw6HWDqHC/XS1JwZldd2r49aUhbUJN9m9Mvcx4SEueIPXtzuQX+QelxAViobv8YUkDZ7HWDrmViR6LeYK0wAw=="
       },
-      "integrity_observation": "published_npm_dist_integrity_not_downloaded_on_destination",
+      "integrity_observation": "repair_builder_download_sha256_and_frozen_npm_sri_match_not_destination_acceptance",
       "install": {
-        "command": "claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics && codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics",
+        "command": "claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics --no-performance-crux && codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics --no-performance-crux",
         "source": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71",
         "pinning_source": "https://registry.npmjs.org/chrome-devtools-mcp/1.10.1",
         "scope": "Release-pinned documented npx stdio route and Linux-side WSL Chrome prerequisites; single browser owner for both clients and diagnostics.",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "NativeStack2604 amd64, Linux-side Google Chrome stable; declared sudo for the .deb and dependency fixup.",
+          "NativeStack2604 amd64, Linux-side Google Chrome 154.0.8037.97-1 through the signed apt repository and fingerprint-restricted keyring; privilege is declared by its helper.",
           "Plan Node 24.21.0; destination client templates must include the prepared chrome-devtools entries."
         ],
         "source_review_ref": "docs/decisions/2026-10-04-round2-plan-g2-browser.md"
@@ -1033,7 +1034,7 @@
         "evidence_class": "upstream_test_command_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "At the exact release source commit, git submodule update --init, PUPPETEER_SKIP_DOWNLOAD=true npm ci, npx puppeteer browsers install chrome, npm run bundle.",
+          "At the exact release source commit, git submodule update --init, PUPPETEER_SKIP_DOWNLOAD=true npm ci, npm run bundle.",
           "After native client sign-ins, the plan additionally requires both clients to navigate the local fixture and return its snapshot title and console marker.",
           "Puppeteer 25.11.0 getConfiguration.ts:140-145 supports the explicit Linux Chrome executable override; no CI AppArmor-disable step is applied to the host."
         ],

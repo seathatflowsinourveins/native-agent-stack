@@ -13,7 +13,7 @@
       "match": [
         "codex/config/mcp_servers.chrome-devtools.default_tools_approval_mode"
       ],
-      "wiring": "authorization:allow the selected browser MCP tools under the destination's never policy",
+      "wiring": "authorization:a tool approval mode of \"approve\" makes Codex run every tool of the chrome-devtools MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has",
       "slot": "playwright-cli",
       "owner": "Chrome DevTools MCP 1.10.1 (one stdio MCP server, chrome-devtools, in both clients; it also serves browser diagnostics)",
       "source": "openai/codex@rust-v0.160.0:codex-rs/core/src/mcp_tool_call.rs:1515-1530,1619-1624; codex-rs/codex-mcp/src/mcp/mod.rs:91-109; ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df:src/tools/pages.ts:159-161 and src/tools/snapshot.ts:17-20"

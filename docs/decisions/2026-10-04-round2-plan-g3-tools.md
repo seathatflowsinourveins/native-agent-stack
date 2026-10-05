@@ -87,7 +87,8 @@ The conformance row is selected (`installed: true`) but named-only and
 `on_demand: true`: a full plan skips it, while `--only mcp-protocol-conformance`
 prepares the pinned invocation and runs its upstream acceptance. It installs no
 global npm executable. Tool-specific commands use user scope; the existing
-wrapper's clean-host apt prerequisite is declared by `needs.sudo: true`.
+wrapper's shared clean-host apt prerequisite is separate from these four
+rows' own unprivileged commands; each row declares needs.sudo=false.
 
 The non-provider upstream tests are the post-install gates. Destination gates
 that depend on a provider sign-in, selected transcripts, privacy choice or HTTP
@@ -100,8 +101,10 @@ no credential file is read or copied.
 Standalone GEPA would introduce a second optimizer owner; the inherited held-out
 Inspect comparison can overturn DSPy. SkillSpector's MCP/install-hook modes
 would exceed its advisory CLI boundary. A separate Scout uv tool would create
-a second Inspect AI, contrary to the verdict. Pinning alpha.12 now would violate
-the seven-day cooldown. The final owner decision retains the Monocle and MCP
+a second Inspect AI, contrary to the verdict. The owner's 2026-10-03 cooldown waiver was considered but is not used here:
+alpha.12 was published from a non-main branch, this row runs only when named,
+and this recipe claims none of alpha.12's harness fixes. Waiting remains compatible
+with the permissive waiver. The final owner decision retains the Monocle and MCP
 Inspector comparisons as removal checks; this plan invents none.
 
 Completeness critic: checked runtime isolation, upstream test entry points,
@@ -161,3 +164,22 @@ external `/tmp` fallback. A write preflight returned `Read-only file system`;
 no temp path was placed inside either checkout. The coordinator must provide
 write access to the prescribed cache path to repeat the test under that exact
 filesystem condition.
+
+
+Repair 2026-10-05: Inspect AI is the only installer of its uv tool environment.
+It installs Scout 0.5.3, Harbor 0.23.0 and the upstream pytest dependencies
+together with its existing OpenAI SDK, and exports the scout executable. A named
+trajectory-analysis run dispatches that owner first; its own commands only
+prepare source, verify the scanner and record acceptance. Running inspect-ai
+last preserves the same complete requirement set.
+
+Operator DSPy runs must call `dspy.configure_cache(enable_disk_cache=False)`
+before using their LM; keep GEPA log_dir and wandb/mlflow integrations off.
+This prevents prompts and completions entering the default on-disk DSPy cache.
+The option is native at
+[stanfordnlp/dspy 3.4.0 dspy/clients/__init__.py:19](https://github.com/stanfordnlp/dspy/blob/2413b67a4d08a476e4bc6f40b9f8f42f87711ee7/dspy/clients/__init__.py#L19).
+Installed-wheel upstream tests now use Python -P with pytest importlib mode and
+require dspy.__file__ within the intended virtual environment. SkillSpector
+acceptance also scans the pinned upstream malicious_skill fixture, requiring
+nonempty findings and a nonzero fail-on-findings result alongside the safe
+control. These are still unrun destination recipes.

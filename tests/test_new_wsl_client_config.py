@@ -14,6 +14,7 @@ import contextlib
 import fnmatch
 import hashlib
 import io
+import importlib.util
 import json
 import os
 import random
@@ -46,6 +47,86 @@ from tests import test_wsl_new_distro_recipe as recipe_tests  # noqa: E402
 MAP = ROOT / cfg.MAP_REL
 MANIFEST = ROOT / cfg.MANIFEST_REL
 PLAN = ROOT / cfg.PLAN_REL
+
+
+class Round2RepairIntegrationTests(unittest.TestCase):
+    """Local synthetic controls; never producer, provider or destination acceptance."""
+
+    @staticmethod
+    def source_module(name):
+        spec = importlib.util.spec_from_file_location(name.replace("-", "_"), PLAN / "config" / name)
+        module = importlib.util.module_from_spec(spec)
+        with mock.patch.object(sys, "dont_write_bytecode", True):
+            spec.loader.exec_module(module)
+        return module
+
+    def test_hcom_apply_never_grants_inbound_authorization_or_requires_codex(self):
+        adapter = self.source_module("hcom-client-config.py")
+        for inbound in (None, "accept", "hold"):
+            with self.subTest(inbound=inbound), tempfile.TemporaryDirectory() as scratch:
+                root = Path(scratch)
+                claude = root / "claude"
+                claude.mkdir()
+                settings = {} if inbound is None else {"crossSessionInbound": inbound}
+                (claude / "settings.json").write_text(json.dumps(settings))
+                env = {"CLAUDE_CONFIG_DIR": str(claude), "CODEX_HOME": str(root / "codex"),
+                       "HCOM_DIR": str(root / "hcom")}
+                with mock.patch.dict(os.environ, env), mock.patch.object(sys, "argv", [
+                        "adapter", "--repo-root", str(ROOT), "--apply"]), \
+                        mock.patch.object(cfg, "running_codex_pids", return_value=[]), \
+                        mock.patch.object(adapter.subprocess, "run") as native, \
+                        contextlib.redirect_stdout(io.StringIO()):
+                    self.assertEqual(adapter.main(), 0)
+                native.assert_not_called()
+                after = json.loads((claude / "settings.json").read_text())
+                if inbound is None:
+                    self.assertNotIn("crossSessionInbound", after)
+                else:
+                    self.assertEqual(after["crossSessionInbound"], inbound)
+
+    def test_gateway_alias_label_cannot_replace_delivered_wire_effort(self):
+        gate = self.source_module("gateway-effort-accept.py")
+        rows = [{"id": "synthetic-call", "status": 200, "path": "/v1/responses",
+                 "requestedModel": "cx/gpt-6.1-sol"}]
+        wire = {"pipelinePayloads": {"providerRequest": {
+            "model": "gpt-6.1-sol", "reasoning": {"effort": "xhigh"}}}}
+        self.assertEqual(gate.delivered_efforts(rows, lambda _: wire), {"xhigh"})
+        for effort in ("max", "high", None):
+            with self.subTest(effort=effort):
+                wire["pipelinePayloads"]["providerRequest"]["reasoning"]["effort"] = effort
+                with self.assertRaisesRegex(ValueError, "delivered"):
+                    gate.delivered_efforts(rows, lambda _: wire)
+        with self.assertRaisesRegex(ValueError, "no call log"):
+            gate.delivered_efforts([], lambda _: wire)
+
+    def test_harbor_openhands_adapter_must_match_the_installed_producer(self):
+        text = (PLAN / "config/harbor-worker-telemetry-accept.sh").read_text()
+        start = text.index("<<'PY'", text.index('python3 - "$HARBOR_TELEMETRY_JOB_CONFIG"')) + len("<<'PY'\n")
+        script = text[start:text.index("\nPY", start)]
+        job = {"agents": [
+            {"name": "codex", "model_name": "gpt-6.1-sol", "kwargs": {"version": "0.160.0",
+             "config": {"model_provider": "openai", "model_reasoning_effort": "max"}}},
+            {"name": "openhands-sdk", "model_name": "synthetic-model", "kwargs": {"version": "1.50.1"}},
+            {"name": "deerflow", "model_name": "synthetic-model", "kwargs": {"repo_ref": "v2.1.0"}},
+        ]}
+        with tempfile.TemporaryDirectory() as scratch:
+            path = Path(scratch) / "public-job.json"
+            for adapter, wanted in (("1.50.1", 0), ("1.51.0", 78)):
+                job["agents"][1]["kwargs"]["version"] = adapter
+                path.write_text(json.dumps(job))
+                done = subprocess.run([sys.executable, "-c", script, str(path)],
+                                      env={"producer_version": "1.50.1"}, capture_output=True, text=True)
+                self.assertEqual(done.returncode, wanted, done.stderr)
+                if wanted:
+                    self.assertIn("needs_user", done.stderr)
+
+    def test_harbor_refuses_auth_store_upload_before_launch(self):
+        for name in ("CODEX_AUTH_JSON_PATH", "CODEX_FORCE_AUTH_JSON"):
+            with self.subTest(name=name):
+                done = subprocess.run(["bash", str(PLAN / "config/harbor-worker-telemetry-accept.sh")],
+                                      env={"PATH": os.environ["PATH"], name: ""}, capture_output=True, text=True)
+                self.assertEqual(done.returncode, 78, done.stderr)
+                self.assertIn("auth-store upload is forbidden", done.stderr)
 
 
 class ObservabilityMigrationRepairTests(unittest.TestCase):
@@ -908,7 +989,7 @@ class RenderTests(unittest.TestCase):
         self.assertEqual(list(config["mcp_servers"]), ["serena", "ai-memory", "socraticode", "headroom", "codebase-memory",
                                                       "qmd", "context-mode", "jcodemunch", "semble", "chrome-devtools"])
         # Round-2 browser verdict: one stdio server serves automation and diagnostics.
-        chrome_args = ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics"]
+        chrome_args = ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"]
         self.assertEqual(servers["chrome-devtools"], {"type": "stdio", "command": "npx", "args": chrome_args})
         self.assertEqual(config["mcp_servers"]["chrome-devtools"], {"command": "npx", "args": chrome_args})
         pinned_search = host["ECO_ROOT"] + "/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"

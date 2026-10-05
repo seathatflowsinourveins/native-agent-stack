@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Current integration: 80 foundation rows, 57 installed (55 default, two named-only), three measurement-only, 20 no persistent install.
+# Current integration: 84 foundation rows, 63 installed (60 default, three named-only), two measurement-only, 19 no persistent install.
 # Historical 64-row revision: the real-distribution observations below precede the fix-wave.
 # This revision ran once, on 2026-10-02, in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to
 # main (6652b78e), once on the destination distribution; the record of that run is private, and its public receipt comes with that
@@ -291,7 +291,7 @@ agent-messaging() {
   # Source: https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh
   run_command 'HCOM_INSTALL_DIR="$HOME/.local/bin" HCOM_NO_MODIFY_PATH=1 sh "$tool_root/hcom-0.7.27/hcom-installer.sh"' || return "$?"
   # Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972504465
-  run_command 'python3 "$config_root/hcom-client-config.py" --repo-root "$repo_root" --apply' || return "$?"
+  run_command 'python3 "$config_root/hcom-client-config.py" --repo-root "$repo_root" --rules-source "$config_root/hcom-deny.rules" --apply' || return "$?"
 }
 
 sandbox-runtime-srt() {
@@ -355,13 +355,33 @@ mineru() {
 }
 
 chrome_devtools_linux_chrome() {
-  # Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/troubleshooting.md#L105
-  # Privilege is declared in playwright-cli.needs and prerequisite_steps, outside command strings.
-  if ! sudo dpkg -i "$tool_root/chrome-devtools-mcp/google-chrome-stable_current_amd64.deb"; then
-    # Source: https://manpages.ubuntu.com/manpages/resolute/en/man8/apt-get.8.html (--fix-broken).
-    sudo apt-get -f install -y || return "$?"
+  # Source: https://www.google.com/linuxrepositories/ (active primary fingerprint).
+  # Source: https://manpages.debian.org/bookworm/apt/sources.list.5.en.html (Signed-By).
+  # Privilege belongs to this declared prerequisite; apt verifies repository signatures.
+  local key="$tool_root/chrome-devtools-mcp/google-chrome.asc" key_home version
+  curl --proto '=https' --tlsv1.2 -fL https://dl.google.com/linux/linux_signing_key.pub -o "$key" || return "$?"
+  key_home="$(mktemp -d)" || return "$?"
+  if ! gpg --batch --no-options --homedir "$key_home" --with-colons --show-keys "$key" | \
+    awk -F: '$1 == "pub" { primary=1; next } primary && $1 == "fpr" { if ($10 == "EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796") found=1; primary=0 } END { exit !found }'; then
+    rm -rf -- "$key_home"
+    printf 'Google Chrome signing key primary fingerprint mismatch.\n' >&2
+    return 1
   fi
-  # Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/README.md#L65 (installed Linux Chrome required).
+  rm -rf -- "$key_home"
+  sudo install -m 0755 -d /etc/apt/keyrings || return "$?"
+  sudo install -m 0644 -- "$key" /etc/apt/keyrings/google-chrome.asc || return "$?"
+  sudo tee /etc/apt/sources.list.d/google-chrome.sources >/dev/null <<'GOOGLE'
+Types: deb
+URIs: https://dl.google.com/linux/chrome/deb/
+Suites: stable
+Components: main
+Architectures: amd64
+Signed-By: /etc/apt/keyrings/google-chrome.asc EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796
+GOOGLE
+  sudo apt-get update || return "$?"
+  # Source: https://dl.google.com/linux/chrome/deb/dists/stable/main/binary-amd64/Packages
+  version="$(apt_release_version google-chrome-stable 154.0.8037.97)" || return "$?"
+  sudo apt-get install -y --no-install-recommends "google-chrome-stable=$version" || return "$?"
   google-chrome-stable --version >/dev/null || return "$?"
 }
 
@@ -370,15 +390,12 @@ playwright-cli() {
   # Planned. Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/troubleshooting.md#L99
   run_command 'test "$(dpkg --print-architecture)" = amd64 && mkdir -p -- "$tool_root/chrome-devtools-mcp"' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/troubleshooting.md#L104
-  run_command 'cd "$tool_root/chrome-devtools-mcp" && wget -O google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb' || return "$?"
   chrome_devtools_linux_chrome || return "$?"
   copy_config 'chrome-devtools-accept.html' || return "$?"
   # Planned. Source: https://registry.npmjs.org/chrome-devtools-mcp/1.10.1
-  run_command 'curl --proto "=https" --tlsv1.2 -fL https://registry.npmjs.org/chrome-devtools-mcp/-/chrome-devtools-mcp-1.10.1.tgz -o "$tool_root/chrome-devtools-mcp/chrome-devtools-mcp-1.10.1.tgz" && printf "%s  %s\n" 2a5c3a1d60ea1c2fd74b527066575ddabe3d69485b50937d9bd32f731e1212e7883d7b73b905fe41e9710158a86eff185240d9ec7583ae656247a2de60ad3003 "$tool_root/chrome-devtools-mcp/chrome-devtools-mcp-1.10.1.tgz" | sha512sum --check --status' || return "$?"
-  # Planned. Source: https://registry.npmjs.org/chrome-devtools-mcp/1.10.1
-  run_command 'test "$(npm view chrome-devtools-mcp@1.10.1 dist.integrity)" = sha512-Klw6HWDqHC/XS1JwZldd2r49aUhbUJN9m9Mvcx4SEueIPXtzuQX+QelxAViobv8YUkDZ7HWDrmViR6LeYK0wAw== && npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics --help' || return "$?"
+  run_command 'test "$(npm view chrome-devtools-mcp@1.10.1 dist.integrity)" = sha512-Klw6HWDqHC/XS1JwZldd2r49aUhbUJN9m9Mvcx4SEueIPXtzuQX+QelxAViobv8YUkDZ7HWDrmViR6LeYK0wAw== && npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics --no-performance-crux --help' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/.github/workflows/run-tests.yml#L30
-  run_command 'checkout_tag https://github.com/ChromeDevTools/chrome-devtools-mcp chrome-devtools-mcp-v1.10.1 "$tool_root/chrome-devtools-mcp-source" && test "$(git -C "$tool_root/chrome-devtools-mcp-source" rev-parse HEAD)" = e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df && cd "$tool_root/chrome-devtools-mcp-source" && git submodule update --init && PUPPETEER_SKIP_DOWNLOAD=true npm ci && npx puppeteer browsers install chrome && NODE_OPTIONS=--max_old_space_size=4096 npm run bundle' || return "$?"
+  run_command 'checkout_tag https://github.com/ChromeDevTools/chrome-devtools-mcp chrome-devtools-mcp-v1.10.1 "$tool_root/chrome-devtools-mcp-source" && test "$(git -C "$tool_root/chrome-devtools-mcp-source" rev-parse HEAD)" = e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df && cd "$tool_root/chrome-devtools-mcp-source" && git submodule update --init && PUPPETEER_SKIP_DOWNLOAD=true npm ci && NODE_OPTIONS=--max_old_space_size=4096 npm run bundle' || return "$?"
   # Planned. Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71
   # Planned. Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L109
 }
@@ -669,7 +686,12 @@ local-generation-model() {
 inspect-ai() {
   # G5 plan repair 2026-10-04; execution remains for the host coordinator.
   # Planned. Source: https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/docs/index.qmd#L38; https://docs.astral.sh/uv/guides/tools/; https://pypi.org/pypi/openai/3.24.0/json
-  run_command 'uv tool install --python 3.13 inspect-ai==0.3.273 --with openai==3.24.0' || return "$?"
+  # Source: https://pypi.org/pypi/inspect-scout/0.5.3/json
+  run_command 'fetch_verified https://files.pythonhosted.org/packages/68/0c/474e38758bdf796d2f8c90ffb026790003b112b57405958cfdbe21b86a66/inspect_scout-0.5.3-py3-none-any.whl 097c1f1174bb3372bb15d72a69f979d6bf63e80752eac71062d4d9217136bd30 "$tool_root/downloads/inspect_scout-0.5.3-py3-none-any.whl"' || return "$?"
+  # Source: https://pypi.org/pypi/harbor/0.23.0/json
+  run_command 'fetch_verified https://files.pythonhosted.org/packages/19/c7/607ff037dff1f40d1f941b9854742d66fd43630274fd4e7b8de8480dad34/harbor-0.23.0-py3-none-any.whl 8747400dbb2a5e2298e1338e17e88eba38433c0433fd700f34d1a9021bba5c37 "$tool_root/downloads/harbor-0.23.0-py3-none-any.whl"' || return "$?"
+  # Source: https://github.com/astral-sh/uv/blob/0.12.22/docs/guides/tools.md#L225
+  run_command 'uv tool install --python 3.13 inspect-ai==0.3.273 --with openai==3.24.0 --with "inspect-scout @ file://$tool_root/downloads/inspect_scout-0.5.3-py3-none-any.whl" --with "harbor @ file://$tool_root/downloads/harbor-0.23.0-py3-none-any.whl" --with-executables-from inspect-scout --with pytest --with pytest-asyncio --with pytest-xdist' || return "$?"
   # Planned. Source: https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/examples/theory_of_mind.py#L7
   run_command 'checkout_tag https://github.com/UKGovernmentBEIS/inspect_ai.git 0.3.273 "$tool_root/inspect-ai-0.3.273"; [[ "$(git -C "$tool_root/inspect-ai-0.3.273" rev-parse HEAD)" == 9e44f1b77ed7c912bf58baf30db8560937e7ce53 ]]' || return "$?"
 }
@@ -883,6 +905,7 @@ research-deer-flow() {
 }
 
 research-harnesses() {
+  copy_config 'gateway-effort-accept.py' || return "$?"
   # Planned. Keep both independent owners even when one installation fails.
   local status=0
   if research-gpt-researcher; then :; else status=1; fi
@@ -926,12 +949,6 @@ skill-vetting() {
 
 # Round2 wave5: trajectory-analysis; destination installation UNRUN.
 trajectory-analysis() {
-  # Source: https://pypi.org/pypi/inspect-scout/0.5.3/json
-  run_command 'fetch_verified https://files.pythonhosted.org/packages/68/0c/474e38758bdf796d2f8c90ffb026790003b112b57405958cfdbe21b86a66/inspect_scout-0.5.3-py3-none-any.whl 097c1f1174bb3372bb15d72a69f979d6bf63e80752eac71062d4d9217136bd30 "$tool_root/downloads/inspect_scout-0.5.3-py3-none-any.whl"' || return "$?"
-  # Source: https://pypi.org/pypi/harbor/0.23.0/json
-  run_command 'fetch_verified https://files.pythonhosted.org/packages/19/c7/607ff037dff1f40d1f941b9854742d66fd43630274fd4e7b8de8480dad34/harbor-0.23.0-py3-none-any.whl 8747400dbb2a5e2298e1338e17e88eba38433c0433fd700f34d1a9021bba5c37 "$tool_root/downloads/harbor-0.23.0-py3-none-any.whl"' || return "$?"
-  # Source: https://github.com/astral-sh/uv/blob/0.12.22/docs/guides/tools.md#L225
-  run_command 'uv tool install --python 3.13 inspect-ai==0.3.273 --with openai==3.24.0 --with "inspect-scout @ file://$tool_root/downloads/inspect_scout-0.5.3-py3-none-any.whl" --with "harbor @ file://$tool_root/downloads/harbor-0.23.0-py3-none-any.whl" --with-executables-from inspect-scout --with pytest --with pytest-asyncio --with pytest-xdist' || return "$?"
   # Source: https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/README.md#L1
   run_command 'checkout_tag https://github.com/meridianlabs-ai/inspect_scout.git 0.5.3 "$tool_root/inspect-scout-source-0.5.3"; [[ "$(git -C "$tool_root/inspect-scout-source-0.5.3" rev-parse HEAD)" == 0e8fc055a3cebba1a14c11bc35856767b6405173 ]]' || return "$?"
   # Source: https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/examples/scanner/grep_examples.py#L102
@@ -943,9 +960,9 @@ trajectory-analysis() {
 # Round2 wave5: mcp-protocol-conformance; destination installation UNRUN.
 mcp-protocol-conformance() {
   # Source: https://registry.npmjs.org/@modelcontextprotocol%2Fconformance/0.2.0-alpha.11
-  run_command 'mkdir -p -- "$tool_root/downloads"; curl --proto '"'"'=https'"'"' --tlsv1.2 -fL https://registry.npmjs.org/@modelcontextprotocol/conformance/-/conformance-0.2.0-alpha.11.tgz -o "$tool_root/downloads/conformance-0.2.0-alpha.11.tgz"; printf '"'"'%s  %s\n'"'"' 8a63caf6dc79810b0be99290ab832bb320d87d2688c294665fafa88236de017b3d2c6bf1901c56718eca712ed3bf068193f66255697a6ff9da178abcdd4c0344 "$tool_root/downloads/conformance-0.2.0-alpha.11.tgz" | sha512sum --check --status; [[ "$(npm view @modelcontextprotocol/conformance@0.2.0-alpha.11 dist.integrity)" == sha512-imPK9tx5gQsL6ZKQq4MrsyDYfSaIwpRmX6+ogjbeAXs9LGvxkBxWcY7KcS7TvwaBk/ZiVWl6b/naF4q83UwDRA== ]]; npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 list --requirements 2026-07-28' || return "$?"
+  run_command '[[ "$(npm view @modelcontextprotocol/conformance@0.2.0-alpha.11 dist.integrity)" == sha512-imPK9tx5gQsL6ZKQq4MrsyDYfSaIwpRmX6+ogjbeAXs9LGvxkBxWcY7KcS7TvwaBk/ZiVWl6b/naF4q83UwDRA== ]]; npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 list --requirements 2026-07-28' || return "$?"
   # Source: https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/.github/workflows/ci.yml#L26
-  run_command 'source_dir="$tool_root/mcp-conformance-source-0.2.0-alpha.11"; if [[ ! -d "$source_dir/.git" ]]; then git clone --filter=blob:none --no-checkout https://github.com/modelcontextprotocol/conformance.git "$source_dir"; fi; [[ "$(git -C "$source_dir" config --get remote.origin.url)" == https://github.com/modelcontextprotocol/conformance.git ]]; git -C "$source_dir" diff --quiet; git -C "$source_dir" diff --cached --quiet; git -C "$source_dir" fetch --depth 1 origin c321dd32035556e6769d3724a8ee97d87c3faaac; git -C "$source_dir" checkout --detach c321dd32035556e6769d3724a8ee97d87c3faaac; [[ "$(git -C "$source_dir" rev-parse HEAD)" == c321dd32035556e6769d3724a8ee97d87c3faaac ]]' || return "$?"
+  run_command 'source_dir="$tool_root/mcp-conformance-source-0.2.0-alpha.11"; if [[ ! -d "$source_dir/.git" ]]; then git clone --filter=blob:none --no-checkout https://github.com/modelcontextprotocol/conformance.git "$source_dir"; fi; [[ "$(git -C "$source_dir" config --get remote.origin.url)" == https://github.com/modelcontextprotocol/conformance.git ]]; if [[ -f "$source_dir/.git/index" ]]; then git -C "$source_dir" diff --quiet; git -C "$source_dir" diff --cached --quiet; fi; git -C "$source_dir" fetch --depth 1 origin c321dd32035556e6769d3724a8ee97d87c3faaac; git -C "$source_dir" checkout --detach c321dd32035556e6769d3724a8ee97d87c3faaac; [[ "$(git -C "$source_dir" rev-parse HEAD)" == c321dd32035556e6769d3724a8ee97d87c3faaac ]]' || return "$?"
 }
 
 if $list; then
@@ -1046,9 +1063,9 @@ esac
 needs_execution=false
 needs_runtime=false
 needs_docker=false
-for slot in 'claude-code' 'codex' 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'code-search' 'tobi-qmd' 'mineru' 'playwright-cli' 'memory-owner' 'context-supply' 'statusline' 'ccusage' 'command-output' 'output-compression' 'code-index' 'code-graph' 'repo-packing' 'structured-data' 'doc-conversion' 'api-docs' 'trace-viewer' 'session-analytics' 'otel-collector-contrib' 'prometheus' 'local-model-server' 'alerting' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'promptfoo' 'zizmor' 'syft' 'actionlint-kjanat' 'dagu' 'docker-compose' 'container-engine' 'betterleaks' 'git' 'gh-github-cli' 'worktrunk' 'difftastic' 'mise' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_execution=true; done
+for slot in 'claude-code' 'codex' 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'agent-messaging' 'sandbox-runtime-srt' 'serena' 'structural-search' 'code-search' 'tobi-qmd' 'mineru' 'playwright-cli' 'memory-owner' 'context-supply' 'statusline' 'ccusage' 'command-output' 'output-compression' 'code-index' 'code-graph' 'repo-packing' 'structured-data' 'doc-conversion' 'api-docs' 'trace-viewer' 'session-analytics' 'otel-collector-contrib' 'prometheus' 'local-model-server' 'alerting' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'promptfoo' 'zizmor' 'syft' 'actionlint-kjanat' 'dagu' 'docker-compose' 'container-engine' 'betterleaks' 'git' 'gh-github-cli' 'worktrunk' 'difftastic' 'mise' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_execution=true; done
 for slot in 'mcp-inspector' 'loki' 'grafana' 'local-generation-model' 'embedding-model'; do named "$slot" && needs_execution=true; done
-for slot in 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'code-search' 'tobi-qmd' 'mineru' 'playwright-cli' 'context-supply' 'statusline' 'ccusage' 'output-compression' 'code-index' 'repo-packing' 'structured-data' 'doc-conversion' 'api-docs' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'promptfoo' 'zizmor' 'syft' 'actionlint-kjanat' 'betterleaks' 'gh-github-cli' 'worktrunk' 'difftastic' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_runtime=true; done
+for slot in 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'agent-messaging' 'sandbox-runtime-srt' 'serena' 'structural-search' 'code-search' 'tobi-qmd' 'mineru' 'playwright-cli' 'context-supply' 'statusline' 'ccusage' 'output-compression' 'code-index' 'repo-packing' 'structured-data' 'doc-conversion' 'api-docs' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'promptfoo' 'zizmor' 'syft' 'actionlint-kjanat' 'betterleaks' 'gh-github-cli' 'worktrunk' 'difftastic' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_runtime=true; done
 for slot in 'mcp-inspector'; do named "$slot" && needs_runtime=true; done
 for slot in 'harbor-containerized-agent-e2e-runner' 'docker-compose'; do selected "$slot" && needs_docker=true; done
 
@@ -1058,7 +1075,7 @@ for slot in 'lm-program-optimization' 'skill-vetting' 'trajectory-analysis' 'mcp
 if $needs_execution; then
   # Planned. Repository bootstrap-linux.sh:206-216; selected owner prereqs extend its package list.
   packages=(ca-certificates curl git tar gzip xz-utils jq)
-  if selected playwright-cli; then packages+=(wget); fi
+  if selected playwright-cli; then packages+=(gnupg); fi
   if selected research-harnesses; then packages+=(make); fi
   if selected sandbox-runtime-srt; then packages+=(bubblewrap socat ripgrep gcc libseccomp-dev); fi
   if named loki; then packages+=(unzip); fi
@@ -1104,8 +1121,8 @@ if selected 'engineering-process-skills'; then run_slot 'engineering-process-ski
 if selected 'skill-discovery'; then run_slot 'skill-discovery'; fi
 if selected 'skill-authoring'; then run_slot 'skill-authoring'; fi
 if selected 'mcporter'; then run_slot 'mcporter'; fi
-if selected 'sandbox-runtime-srt'; then run_slot 'agent-messaging'
-run_slot 'sandbox-runtime-srt'; fi
+if selected 'agent-messaging'; then run_slot 'agent-messaging'; fi
+if selected 'sandbox-runtime-srt'; then run_slot 'sandbox-runtime-srt'; fi
 if selected 'serena'; then run_slot 'serena'; fi
 if selected 'structural-search'; then run_slot 'structural-search'; fi
 if selected 'tobi-qmd'; then run_slot 'tobi-qmd'; fi
@@ -1127,6 +1144,7 @@ if selected 'trace-viewer'; then run_slot 'trace-viewer'; fi
 if selected 'token-lane-carriers'; then run_slot 'token-lane-carriers'; fi
 if selected 'session-analytics'; then run_slot 'session-analytics'; fi
 if selected 'playwright-cli'; then run_slot 'playwright-cli'; fi
+if [[ "$only" == trajectory-analysis ]]; then run_slot 'inspect-ai'; fi
 if selected 'inspect-ai'; then run_slot 'inspect-ai'; fi
 if selected 'harbor-containerized-agent-e2e-runner'; then run_slot 'harbor-containerized-agent-e2e-runner'; fi
 if selected 'promptfoo'; then run_slot 'promptfoo'; fi

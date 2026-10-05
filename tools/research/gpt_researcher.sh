@@ -80,13 +80,16 @@ if config.retrievers != ["duckduckgo"]:
     problems.append(f"retrievers {config.retrievers!r}, not ['duckduckgo']")
 if getattr(config, "context_filter", None) != "keyword":
     problems.append(f"context filter {getattr(config, 'context_filter', None)!r}, not 'keyword'")
-wanted = {"fast": ("openai", "cx/gpt-6.1-sol-high"), "smart": ("openai", "cx/gpt-6.1-sol-max"),
-          "strategic": ("openai", "cx/gpt-6.1-sol-max")}
+wanted = {"fast": ("openai", "cx/gpt-6.1-sol-high"), "smart": ("openai", "cx/gpt-6.1-sol"),
+          "strategic": ("openai", "cx/gpt-6.1-sol")}
 for role, pair in wanted.items():
     found = (getattr(config, f"{role}_llm_provider", None), getattr(config, f"{role}_llm_model", None))
     if found != pair:
         problems.append(f"{role} model {found!r}, not {pair!r}")
-base_url = (getattr(config, "llm_kwargs", None) or {}).get("base_url")
+kwargs = getattr(config, "llm_kwargs", None) or {}
+if kwargs.get("reasoning_effort") != "xhigh":
+    problems.append("gateway research reasoning_effort must be xhigh on OmniRoute 3.8.51")
+base_url = kwargs.get("base_url")
 if not base_url == os.environ.get("OPENAI_BASE_URL") == gateway:
     problems.append(f"base_url {base_url!r} and OPENAI_BASE_URL {os.environ.get('OPENAI_BASE_URL')!r} are not {gateway!r}")
 if problems:
