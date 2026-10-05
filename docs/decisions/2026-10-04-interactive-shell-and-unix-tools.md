@@ -1,6 +1,6 @@
 # Decision: bash with no framework on the 26.04 hosts, a small opt-in interactive layer below Ubuntu's guard, and no new agent tools (2026-10-04)
 
-**Status:** accepted 2026-10-04 (cross-family consensus: Claude Opus synthesis, GPT-6.1 Sol review, Opus finalize)
+**Status:** proposed. Cross-family consensus was reached on 2026-10-04. The record becomes accepted when the command center ACKs this PR and it lands.
 
 **Decided by:** research unit B of the decide-quality round, which is session 5f's unit for the interactive shell and Unix tooling. It started from the GPT-6.1 Sol discovery lanes B1-B3 and applied the frozen round-2 criteria (the coordinator's quality criteria of 2026-10-04). The record then passed two more stages:
 - cross-family reader: GPT-6.1 Sol;
@@ -8,7 +8,9 @@
 
 The integration base is main `3b8f9c8a`. The repository files cited here are unchanged since `38ac9aca`, which remains history only.
 
-**Adoption status:** This PR records the decision and catalog selections only; it installs nothing. The interactive block is opt-in and person-run. Implementation and Ubuntu 26.04 qualification belong to the subsequent unit B PRs. Dotfile names below denote the person's shell startup files without publishing a home path.
+**Adoption status:** This PR records the decision and catalog selections only; it installs nothing. The interactive block is opt-in and person-run. Implementation belongs to the subsequent unit B PRs; every Ubuntu 26.04 runtime guarantee remains pending PR-3. Dotfile names below denote the person's shell startup files without publishing a home path.
+
+**Landing dependency:** Hold this PR's merge until unit A's planned record, `docs/decisions/2026-10-04-credential-guard-launcher-union.md` (PR-1), is on main. Once it exists, add that path to the isolation row's `source_paths` before final file registration. Unit A's PR-2 owns `CLAUDE_CODE_SHELL=/bin/bash` and agent-shell policy.
 
 **Scope:**
 - **In scope:** the login shell, framework, prompt, history, directory jump and environment loader, and the modern-Unix tool set, both agent-facing and human-facing.
@@ -110,11 +112,11 @@ On Oh My Zsh, since the user named it:
 **Image, archive and host state**
 
 - **26.04.1 WSL image manifest.** It lists bash 5.3-2ubuntu1, bash-completion 1:2.16.0-8build1, git 1:2.53.0-1ubuntu1, coreutils-from-uutils and rust-coreutils 0.8.0-0ubuntu3. It lists no zsh, fzf, ripgrep or jq.
-- **Coreutils upgrade.** Coordination records of 2026-10-04 show both 2604 hosts upgraded to rust-coreutils 0.10.0-1ubuntu2~26.04.1:
-  - NativeStack2604: coordination records of 2026-10-04, committed as a host receipt by unit A's PR-0 (08:04:47Z-08:05:03Z);
-  - StackMeasure2604: coordination records of 2026-10-04, committed as a host receipt by unit A's PR-0.
+- **Coreutils upgrade.** Coordination records of 2026-10-04 and unit A PR-0's read-only host baseline artifacts, captured 2026-10-05 01:02-01:03Z, record rust-coreutils 0.10.0-1ubuntu2~26.04.1 and sudo-rs on both 2604 hosts:
+  - NativeStack2604: held in private coordination state, not a repository record; unit A's PR-0 is to commit a sanitized host receipt (the 2026-10-04 upgrade record covers 08:04:47Z-08:05:03Z);
+  - StackMeasure2604: held in private coordination state, not a repository record; unit A's PR-0 is to commit a sanitized host receipt.
 
-  The B2 lead's 0.10.0 therefore matches the hosts' current state, not the image. The records become repository evidence when unit A's PR-0 commits them.
+  The B2 lead's 0.10.0 therefore matches the recorded host state, not the image. These artifacts and receipts are pending in unit A's PR-0; the records become repository evidence when that PR commits them. Every Ubuntu 26.04 runtime guarantee remains pending PR-3.
 - **Ubuntu skel `.bashrc`.** It holds the guard (L5-9), the history defaults (L13-20), the `.bash_aliases` hook (L100-105) and bash-completion (L112-115).
 - **git.** It ships `git-sh-prompt` and its bash-completion loader. The PS1 mode is at git-prompt.sh:13-17 and the PROMPT_COMMAND mode at :18-24, at v2.53.0 (the 26.04 image's git) and identically at v2.43.0 (24.04).
 
@@ -246,5 +248,5 @@ On Oh My Zsh, since the user named it:
   - docs/decisions/2026-09-28-terminal-experience.md:135
 - Coordination records, cited as leads only:
   - A coordinator record of 2026-10-04 quoting the user (requirement basis, lines 8, 10, 12).
-  - Coordination records of 2026-10-04, committed as a host receipt by unit A's PR-0 (NativeStack2604 coreutils upgrade).
-  - Coordination records of 2026-10-04, committed as a host receipt by unit A's PR-0 (StackMeasure2604 coreutils upgrade).
+  - Coordination records of 2026-10-04 and unit A PR-0's pending read-only host baseline artifacts, captured 2026-10-05 01:02-01:03Z (NativeStack2604 coreutils and sudo-rs); held in private coordination state, not a repository record; unit A's PR-0 is to commit a sanitized host receipt.
+  - Coordination records of 2026-10-04 and unit A PR-0's pending read-only host baseline artifacts, captured 2026-10-05 01:02-01:03Z (StackMeasure2604 coreutils and sudo-rs); held in private coordination state, not a repository record; unit A's PR-0 is to commit a sanitized host receipt.

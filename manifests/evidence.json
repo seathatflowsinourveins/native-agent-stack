@@ -15434,8 +15434,8 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "d5afd1a1853fe06a27d6f067df36ed137739cfa37f2ecd7c4b2eeccdfa29dada",
-      "bytes": 162252
+      "sha256": "c78940a9cf4aabe2e49ef26dada1458564fd3c863ca3d083ec5cda99508122bc",
+      "bytes": 164541
     },
     {
       "path": "catalogs/foundation/manifest.json",
@@ -16424,8 +16424,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-interactive-shell-and-unix-tools.md",
-      "sha256": "186ee547e7de784c06a12e82c5b3ff13f8360b8f0bc04a7e8a61e191df82a747",
-      "bytes": 23194
+      "sha256": "aa95f27b2f29238aa9c7ad0ec41f42c8bc5b601fd6d0db18a1af5d53923144c4",
+      "bytes": 24228
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",

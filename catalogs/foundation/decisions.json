@@ -13,16 +13,16 @@
       ],
       "selection": "candidate",
       "review_status": "source_review",
-      "activation": "Accepted research choice: retain Ubuntu 26.04's image-default bash 5.3 and the recipe's passwd shell, without chsh. This docs-only row installs nothing; candidate records pending adoption of this scoped capability. The interactive additions are a separate opt-in, person-run slot on NativeStack2604; StackMeasure2604 gets no block.",
+      "activation": "Status: proposed. Cross-family consensus was reached on 2026-10-04. The record becomes accepted when the command center ACKs this PR and it lands. Research choice: retain Ubuntu 26.04's image-default bash 5.3 and the recipe's passwd shell, without chsh. This docs-only row installs nothing; candidate records pending adoption of this scoped capability. The interactive additions are a separate opt-in, person-run slot on NativeStack2604; StackMeasure2604 gets no block. Every Ubuntu 26.04 runtime guarantee remains pending PR-3.",
       "component_ids": [],
       "candidate": {
         "id": "ubuntu-2604-bash-login-shell-policy",
         "repository": "https://git.launchpad.net/ubuntu/+source/bash"
       },
       "evidence_ids": [],
-      "evidence_scope": "Source-reviewed selection from unit B's accepted cross-family record, using Ubuntu's 26.04.1 image manifest and skel startup guard. Supports reproducible workstations for north-star R&D; this PR adds documentation only.",
+      "evidence_scope": "Source-reviewed selection from unit B's proposed cross-family record, using Ubuntu's 26.04.1 image manifest and skel startup guard. Supports reproducible workstations for north-star R&D; this PR adds documentation only.",
       "limitations": [
-        "The decision record's 26.04 host values come from coordination records owned by unit A's PR-0; this PR performs no host observation or installation.",
+        "The decision record's 26.04 host values come from coordination records of 2026-10-04 and unit A PR-0's read-only host baseline artifacts for NativeStack2604 and StackMeasure2604, captured 2026-10-05 01:02-01:03Z (rust-coreutils 0.10.0-1ubuntu2~26.04.1 and sudo-rs). These artifacts and receipts are pending in unit A's PR-0, held in private coordination state and not yet repository evidence; this PR performs no host observation or installation. Every Ubuntu 26.04 runtime guarantee remains pending PR-3.",
         "Claude snapshot observations are from Ubuntu 24.04 with Claude Code 2.1.289, and no Codex startup path was executed by unit B."
       ],
       "source_paths": [
@@ -48,14 +48,14 @@
       ],
       "selection": "candidate",
       "review_status": "source_review",
-      "activation": "Accepted research choice: use no shell framework. The candidate is a pending scoped policy, not a framework to install. The optional interactive block is written only by the person's own named-slot run; this docs-only PR installs nothing.",
+      "activation": "Status: proposed. Cross-family consensus was reached on 2026-10-04. The record becomes accepted when the command center ACKs this PR and it lands. Research choice: use no shell framework. The candidate is a pending scoped policy, not a framework to install. The optional interactive block is written only by the person's own named-slot run; this docs-only PR installs nothing. Every Ubuntu 26.04 runtime guarantee remains pending PR-3.",
       "component_ids": [],
       "candidate": {
         "id": "ubuntu-2604-no-shell-framework-policy",
         "repository": "https://github.com/seathatflowsinourveins/native-agent-stack"
       },
       "evidence_ids": [],
-      "evidence_scope": "Unit B's accepted cross-family source review compares Oh My Zsh, Oh My Bash, Bash-it, ble.sh, Prezto, Sheldon and the zsh-only managers against the frozen maintenance and isolation criteria.",
+      "evidence_scope": "Unit B's proposed cross-family source review compares Oh My Zsh, Oh My Bash, Bash-it, ble.sh, Prezto, Sheldon and the zsh-only managers against the frozen maintenance and isolation criteria.",
       "limitations": [
         "Oh My Zsh's missing release/tag fails the frozen gate despite its recorded rolling maintenance activity; this is a limitation of the criteria, not evidence of inactivity.",
         "The review does not establish native isolation for an alternative framework on Ubuntu 26.04."
@@ -83,14 +83,14 @@
       ],
       "selection": "candidate",
       "review_status": "source_review",
-      "activation": "Accepted research choice: keep Ubuntu's skel PS1 and add git's __git_ps1 helper with upstream defaults. The future opt-in, person-run interactive-shell slot sources /usr/lib/git-core/git-sh-prompt only if bash-completion has not already defined the helper. This PR installs nothing and edits no shell startup file.",
+      "activation": "Status: proposed. Cross-family consensus was reached on 2026-10-04. The record becomes accepted when the command center ACKs this PR and it lands. Research choice: keep Ubuntu's skel PS1 and add git's __git_ps1 helper with upstream defaults. The future opt-in, person-run interactive-shell slot sources /usr/lib/git-core/git-sh-prompt only if bash-completion has not already defined the helper. This PR installs nothing and edits no shell startup file. Every Ubuntu 26.04 runtime guarantee remains pending PR-3.",
       "component_ids": [],
       "candidate": {
         "id": "ubuntu-2604-git-prompt-integration",
         "repository": "https://github.com/git/git"
       },
       "evidence_ids": [],
-      "evidence_scope": "Source-reviewed git/git v2.53.0 contrib/completion/git-prompt.sh PS1 and PROMPT_COMMAND modes, as reconciled in unit B's accepted decision; no prompt timing was executed by this PR.",
+      "evidence_scope": "Source-reviewed git/git v2.53.0 contrib/completion/git-prompt.sh PS1 and PROMPT_COMMAND modes, as reconciled in unit B's proposed decision; no prompt timing was executed by this PR.",
       "limitations": [
         "The 50 ms median threshold is an overturn condition, not a measured result.",
         "Complete prompt performance with mise and zoxide hooks on the largest Ubuntu 26.04 worktree is pending."
@@ -118,14 +118,14 @@
       ],
       "selection": "candidate",
       "review_status": "source_review",
-      "activation": "Accepted research choice: retain Ubuntu's native bash history defaults and search them with fzf's bash Ctrl-R integration. fzf 0.74.4 is a planned global mise pin in the opt-in, person-run interactive-shell slot on NativeStack2604 only; this PR installs nothing and writes no block.",
+      "activation": "Status: proposed. Cross-family consensus was reached on 2026-10-04. The record becomes accepted when the command center ACKs this PR and it lands. Research choice: retain Ubuntu's native bash history defaults and search them with fzf's bash Ctrl-R integration. fzf 0.74.4 is a planned global mise pin in the opt-in, person-run interactive-shell slot on NativeStack2604 only; this PR installs nothing and writes no block. Every Ubuntu 26.04 runtime guarantee remains pending PR-3.",
       "component_ids": [],
       "candidate": {
         "id": "ubuntu-2604-native-history-fzf-integration",
         "repository": "https://github.com/junegunn/fzf"
       },
       "evidence_ids": [],
-      "evidence_scope": "Unit B's accepted source review covers Ubuntu skel history defaults, junegunn/fzf v0.74.4 bash integration and Atuin v18.23.0's bash-preexec, AI, sync and update requirements.",
+      "evidence_scope": "Unit B's proposed source review covers Ubuntu skel history defaults, junegunn/fzf v0.74.4 bash integration and Atuin v18.23.0's bash-preexec, AI, sync and update requirements.",
       "limitations": [
         "The future writer must check bash 4 or newer and the pinned fzf version before modifying the block; Readline binding acceptance is pending.",
         "fzf also binds Ctrl-T and Alt-C; the record documents the upstream variables that disable them. Concurrent-shell history retention has not been qualified by this PR."
@@ -153,14 +153,14 @@
       ],
       "selection": "candidate",
       "review_status": "source_review",
-      "activation": "Accepted research choice: zoxide 0.10.0 provides z and zi without changing cd. The planned opt-in, person-run NativeStack2604 slot pins it through mise and places its bash initialization last in the managed block. StackMeasure2604 gets no block; this PR installs nothing.",
+      "activation": "Status: proposed. Cross-family consensus was reached on 2026-10-04. The record becomes accepted when the command center ACKs this PR and it lands. Research choice: zoxide 0.10.0 provides z and zi without changing cd. The planned opt-in, person-run NativeStack2604 slot pins it through mise and places its bash initialization last in the managed block. StackMeasure2604 gets no block; this PR installs nothing. Every Ubuntu 26.04 runtime guarantee remains pending PR-3.",
       "component_ids": [],
       "candidate": {
         "id": "ubuntu-2604-zoxide-integration",
         "repository": "https://github.com/ajeetdsouza/zoxide"
       },
       "evidence_ids": [],
-      "evidence_scope": "Unit B's accepted source review of ajeetdsouza/zoxide v0.10.0 documents initialization order, fzf >=0.51 for zi and GitHub's release-asset SHA-256 digest; it does not record an installation by this PR.",
+      "evidence_scope": "Unit B's proposed source review of ajeetdsouza/zoxide v0.10.0 documents initialization order, fzf >=0.51 for zi and GitHub's release-asset SHA-256 digest; it does not record an installation by this PR.",
       "limitations": [
         "Integrity relies on GitHub's platform digest plus HTTPS, not a publisher signature or checksum file.",
         "zoxide's prompt-hook cost and Ubuntu 26.04 integration remain unmeasured here."
@@ -189,14 +189,14 @@
       ],
       "selection": "candidate",
       "review_status": "source_review",
-      "activation": "Accepted research choice: retain the existing mise owner at the install-plan pin v2026.10.0. Login-profile shims stay on PATH; interactive activation belongs to the opt-in, person-run block. Projects use mise.toml [env], and agent commands needing it use mise exec -- explicitly. This PR installs nothing, moves no pin and adds no CwdChanged hook.",
+      "activation": "Status: proposed. Cross-family consensus was reached on 2026-10-04. The record becomes accepted when the command center ACKs this PR and it lands. Research choice: retain the existing mise owner at the install-plan pin v2026.10.0. Login-profile shims stay on PATH; interactive activation belongs to the opt-in, person-run block. Projects use mise.toml [env], and agent commands needing it use mise exec -- explicitly. This PR installs nothing, moves no pin and adds no CwdChanged hook. Every Ubuntu 26.04 runtime guarantee remains pending PR-3.",
       "component_ids": [],
       "candidate": {
         "id": "ubuntu-2604-mise-environment-integration",
         "repository": "https://github.com/jdx/mise"
       },
       "evidence_ids": [],
-      "evidence_scope": "The accepted decision follows jdx/mise v2026.10.0 docs/dev-tools/shims.md and docs/direnv.md and main 3b8f9c8a's install-plan pin; the cited files are recorded as byte-identical at v2026.10.2. This row covers the proposed integration, not acceptance of an existing installation.",
+      "evidence_scope": "The proposed decision follows jdx/mise v2026.10.0 docs/dev-tools/shims.md and docs/direnv.md and main 3b8f9c8a's install-plan pin; the cited files are recorded as byte-identical at v2026.10.2. This row covers the proposed integration, not acceptance of an existing installation.",
       "limitations": [
         "Moving mise's pin requires a separate pin-move PR; this source-reviewed row carries no native environment-loading receipt.",
         "Persistent per-directory session state and initial-environment handling are not qualified here; a CwdChanged hook remains requirement-gated."
@@ -227,14 +227,14 @@
       ],
       "selection": "candidate",
       "review_status": "source_review",
-      "activation": "Accepted research choice: retain Claude's native bfs/ugrep and bundled rg route, Codex's rg/rg --files route, the plan's sandbox-runtime apt ripgrep requirement, jq's F4 owner and the existing RTK exclusions. This is a pending scoped tool policy, not a new install. The human interactive block is opt-in and person-run; this PR changes no host tools or hooks.",
+      "activation": "Status: proposed. Cross-family consensus was reached on 2026-10-04. The record becomes accepted when the command center ACKs this PR and it lands. Research choice: retain Claude's native bfs/ugrep and bundled rg route, Codex's rg/rg --files route, the plan's sandbox-runtime apt ripgrep requirement, jq's F4 owner and the existing RTK exclusions. This is a pending scoped tool policy, not a new install. The human interactive block is opt-in and person-run; this PR changes no host tools or hooks. Every Ubuntu 26.04 runtime guarantee remains pending PR-3.",
       "component_ids": [],
       "candidate": {
         "id": "ubuntu-2604-agent-unix-tool-policy",
         "repository": "https://github.com/seathatflowsinourveins/native-agent-stack"
       },
       "evidence_ids": [],
-      "evidence_scope": "The accepted record reviews Claude Code v2.1.289 native-search documentation, Codex rust-v0.160.0 base instructions, RTK v0.51.0 rewrite rules and the stack's install-plan requirements. No new agent-tool execution is claimed.",
+      "evidence_scope": "The proposed record reviews Claude Code v2.1.289 native-search documentation, Codex rust-v0.160.0 base instructions, RTK v0.51.0 rewrite rules and the stack's install-plan requirements. No new agent-tool execution is claimed.",
       "limitations": [
         "A prescribed ripgrep install is not an observed install; the subsequent unit B qualification must record the Ubuntu 26.04 state.",
         "RTK filters over uutils 0.10.0 remain untested. Static rewrite rules and RTK's TOML registry are separate inventories, and an explicit RTK prefix still needs exact-output exceptions."
@@ -263,14 +263,14 @@
       ],
       "selection": "candidate",
       "review_status": "source_review",
-      "activation": "Accepted research choice: fzf 0.74.4 and zoxide 0.10.0 become global mise pins only through the future named-only interactive-shell slot, run by the person on NativeStack2604. Default runs skip it, and StackMeasure2604 never selects it. The writer must check bash >=4, both exact tool versions, git-sh-prompt and mise before writing; this PR installs nothing.",
+      "activation": "Status: proposed. Cross-family consensus was reached on 2026-10-04. The record becomes accepted when the command center ACKs this PR and it lands. Research choice: fzf 0.74.4 and zoxide 0.10.0 become global mise pins only through the future named-only interactive-shell slot, run by the person on NativeStack2604. Default runs skip it, and StackMeasure2604 never selects it. The writer must check bash >=4, both exact tool versions, git-sh-prompt and mise before writing; this PR installs nothing. Every Ubuntu 26.04 runtime guarantee remains pending PR-3.",
       "component_ids": [],
       "candidate": {
         "id": "ubuntu-2604-person-run-unix-tools-profile",
         "repository": "https://github.com/seathatflowsinourveins/native-agent-stack"
       },
       "evidence_ids": [],
-      "evidence_scope": "Source-reviewed combination of junegunn/fzf v0.74.4, ajeetdsouza/zoxide v0.10.0 and the main 3b8f9c8a install plan's named-only selection pattern. The row records an accepted optional profile choice with pending implementation and adoption.",
+      "evidence_scope": "Source-reviewed combination of junegunn/fzf v0.74.4, ajeetdsouza/zoxide v0.10.0 and the main 3b8f9c8a install plan's named-only selection pattern. The row records a proposed optional profile choice with pending implementation and adoption.",
       "limitations": [
         "No person has run this slot as a result of this PR, and no tool or block is installed here.",
         "Other human-facing jobs keep their existing owners; no eza, fd, dust, btop, tealdeer, lazygit, bat, duf, delta, tmux or zellij adoption is implied."
@@ -300,16 +300,16 @@
       ],
       "selection": "candidate",
       "review_status": "source_review",
-      "activation": "Accepted research choice: put all optional interactive content in one person-run managed block below Ubuntu's guard and bash-completion; keep the login profile environment-only and BASH_ENV unset. Unit A owns CLAUDE_CODE_SHELL=/bin/bash. Codex retains shell_snapshot=false and inherit=none; allow_login_shell remains unit A's decision. StackMeasure2604 receives no block. This PR installs nothing and changes no client settings.",
+      "activation": "Status: proposed. Cross-family consensus was reached on 2026-10-04. The record becomes accepted when the command center ACKs this PR and it lands. Research choice: put all optional interactive content in one person-run managed block below Ubuntu's guard and bash-completion; keep the login profile environment-only and BASH_ENV unset. Unit A owns CLAUDE_CODE_SHELL=/bin/bash. Codex retains shell_snapshot=false and inherit=none; allow_login_shell remains unit A's decision. StackMeasure2604 receives no block. This PR installs nothing and changes no client settings. Every Ubuntu 26.04 runtime guarantee remains pending PR-3.",
       "component_ids": [],
       "candidate": {
         "id": "ubuntu-2604-interactive-startup-isolation-policy",
         "repository": "https://github.com/seathatflowsinourveins/native-agent-stack"
       },
       "evidence_ids": [],
-      "evidence_scope": "Unit B's accepted source review combines Ubuntu's skel guard, the stack's managed_block.py boundary and unit A's documented agent-shell setting. Historical Ubuntu 24.04 snapshot observations are retained as such; this row does not qualify Ubuntu 26.04 or authorize agent commands.",
+      "evidence_scope": "Unit B's proposed source review combines Ubuntu's skel guard, the stack's managed_block.py boundary and unit A's planned agent-shell policy. Historical Ubuntu 24.04 snapshot observations are retained as such; this row does not qualify Ubuntu 26.04 or authorize agent commands.",
       "limitations": [
-        "Land with or after unit A's decision record so the CLAUDE_CODE_SHELL policy reference resolves; unit A's PR-2 owns that setting.",
+        "Hold this PR's merge until unit A's planned record, docs/decisions/2026-10-04-credential-guard-launcher-union.md (PR-1), is on main. Once it exists, add that path to this row's source_paths before final file registration; unit A's PR-2 owns CLAUDE_CODE_SHELL=/bin/bash and agent-shell policy.",
         "Session-attributed Claude snapshots rely on observed undocumented behavior, and no Codex path was executed by unit B. The skel guard is not an authorization control.",
         "Codex login startup still runs unless unit A adopts allow_login_shell=false; inherit=none alone does not disable startup files."
       ],
