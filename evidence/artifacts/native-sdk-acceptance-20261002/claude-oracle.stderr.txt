@@ -1,0 +1,21 @@
+test_average_preserves_normal_result (test_utils.QuickstartContract.test_average_preserves_normal_result) ... ok
+test_empty_average_does_not_crash (test_utils.QuickstartContract.test_empty_average_does_not_crash) ... ok
+test_name_preserves_normal_result (test_utils.QuickstartContract.test_name_preserves_normal_result) ... ok
+test_null_user_does_not_crash (test_utils.QuickstartContract.test_null_user_does_not_crash) ... ERROR
+
+======================================================================
+ERROR: test_null_user_does_not_crash (test_utils.QuickstartContract.test_null_user_does_not_crash)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<owned-trial>/oracle/test_utils.py", line 29, in test_null_user_does_not_crash
+    UTILS.get_user_name(None)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^
+  File "<owned-trial>/candidate/utils.py", line 13, in get_user_name
+    return (user.get("name") or "").upper()
+            ^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get'
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.001s
+
+FAILED (errors=1)

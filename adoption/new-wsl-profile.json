@@ -631,7 +631,7 @@
       "repository": "https://github.com/openclaw/mcporter",
       "layer_id": "mcp-surfaces",
       "owner_layer_id": "mcp-surfaces",
-      "pin": "0.14.1",
+      "pin": "0.14.2",
       "component_id": "mcporter",
       "source_selection_layer": "mcp-surfaces",
       "source_selection_name": "mcporter",
@@ -643,25 +643,28 @@
       "default_install": false,
       "blocking_gaps": [],
       "artifact": {
-        "name": "mcporter-0.14.1.tgz",
-        "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.1.tgz"
+        "name": "mcporter-0.14.2.tgz",
+        "url": "https://registry.npmjs.org/mcporter/-/mcporter-0.14.2.tgz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "8e489864d7118863f516d0d22ca1d43b862b9d93228489c39617c2c130d810f2",
-        "source": "https://registry.npmjs.org/mcporter/0.14.1",
+        "value": "f5baa5a02be64d5d75722c5739975eee79d393eb2761496f70a53474688f8f6b",
+        "source": "https://registry.npmjs.org/mcporter/0.14.2",
         "kind": "artifact"
       },
       "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": "npm install -g mcporter@0.14.1",
-        "source": "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md",
+        "command": "npm install -g mcporter@0.14.2",
+        "source": "https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
+        "prerequisites": [
+          "Node 24 or newer; ps on the daemon launch PATH."
+        ]
       },
       "acceptance": {
         "command": "pnpm test",
-        "source": "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md",
+        "source": "https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md",
         "evidence_class": "upstream_test_command_not_executed"
       },
       "provisioning_status": "unprovisioned_source_review",
@@ -671,12 +674,14 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/mcp-surfaces.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md",
-        "https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md"
+        "https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md",
+        "https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md",
+        "https://github.com/openclaw/mcporter/releases/tag/v0.14.2",
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md"
       ],
       "release": {
-        "tag": "0.14.1",
-        "source": "https://registry.npmjs.org/mcporter/0.14.1",
+        "tag": "0.14.2",
+        "source": "https://registry.npmjs.org/mcporter/0.14.2",
         "kind": "native_package_release"
       },
       "source_pin_kind": "release_or_artifact_version"
@@ -741,7 +746,7 @@
       "repository": "https://github.com/anthropics/sandbox-runtime",
       "layer_id": "isolation",
       "owner_layer_id": "isolation",
-      "pin": "0.0.77",
+      "pin": "0.0.78",
       "component_id": "sandbox-runtime",
       "source_selection_layer": "isolation",
       "source_selection_name": "sandbox-runtime (srt)",
@@ -753,25 +758,25 @@
       "default_install": false,
       "blocking_gaps": [],
       "artifact": {
-        "name": "sandbox-runtime-0.0.77.tgz",
-        "url": "https://registry.npmjs.org/@anthropic-ai/sandbox-runtime/-/sandbox-runtime-0.0.77.tgz"
+        "name": "sandbox-runtime-0.0.78.tgz",
+        "url": "https://registry.npmjs.org/@anthropic-ai/sandbox-runtime/-/sandbox-runtime-0.0.78.tgz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "cfc25049ae6b154f945ec7116725200f4153a9564752ffad2b1739a5e396b5b9",
-        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.77",
+        "value": "a9cf9e35068a4c71d2d94de8b0abe8de51c7d44daef537cc92906848ccc67240",
+        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.78",
         "kind": "artifact"
       },
       "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": "npm install -g @anthropic-ai/sandbox-runtime@0.0.77",
-        "source": "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md",
+        "command": "npm install -g @anthropic-ai/sandbox-runtime@0.0.78",
+        "source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md#L14",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
         "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
       },
       "acceptance": {
         "command": "srt echo \"hello world\"",
-        "source": "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md",
+        "source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md#L168",
         "evidence_class": "documented_upstream_example_not_executed"
       },
       "provisioning_status": "unprovisioned_source_review",
@@ -781,12 +786,13 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/isolation.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md",
-        "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md"
+        "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md",
+        "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g8-base-gateway.md"
       ],
       "release": {
-        "tag": "0.0.77",
-        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.77",
+        "tag": "0.0.78",
+        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.78",
         "kind": "native_package_release"
       },
       "source_pin_kind": "release_or_artifact_version"
@@ -1063,11 +1069,8 @@
       "position": 8,
       "comparison_group": null,
       "default_precedence": null,
-      "default_install": false,
-      "blocking_gaps": [
-        "No complete pin-matching supported install command verified for this owned row.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
-      ],
+      "default_install": true,
+      "blocking_gaps": [],
       "artifact": {
         "name": "ccusage-20.0.26.tgz",
         "url": "https://registry.npmjs.org/ccusage/-/ccusage-20.0.26.tgz"
@@ -1080,27 +1083,602 @@
       },
       "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": null,
-        "source": "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/README.md"
+        "command": "npm install --global --prefix \"$STACK_HOME/tools/ccusage-20.0.26\" ccusage@20.0.26",
+        "source": "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/apps/ccusage/README.md#L62",
+        "execution_status": "UNRUN",
+        "scope": "The pinned npm package into its own prefix (docs/token-efficiency-stack.json, upstream_commands.install); the install plan installs the same version from the registry tarball checked against this sha256, into ${ECO_ROOT}/tools/<tool>-<version>, and links the command into ${ECO_ROOT}/bin. The tarball digest does not pin the dependencies npm resolves. The tarball carries the JavaScript launcher; npm resolves the @ccusage/ccusage-linux-x64 native build at install time, outside this digest.",
+        "prerequisites": [
+          "Node 24 and npm."
+        ]
       },
       "acceptance": {
-        "command": null,
-        "source": null,
-        "evidence_class": null
+        "command": "ccusage claude daily",
+        "source": "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/apps/ccusage/README.md#L66",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "scope": "Upstream's daily report of Claude Code's local usage logs (ccusage codex daily for Codex, line 67); a meter, never a saving: native finalized accounting stays authoritative, and reports stay token-only (--no-cost) unless every model is priced.",
+        "prerequisites": [
+          "The clients' local usage logs."
+        ]
       },
       "provisioning_status": "unprovisioned_source_review",
-      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "provisioning_reason": "Owner default of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): installed by default on the destination through the install plan's ccusage row, not by iterating over these entries. Source review only here: no tool, service, account, model, provider, GPU or destination WSL installation or acceptance was performed. Net provider savings stay unmeasured.",
       "evidence_refs": [
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/token-efficiency.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/README.md"
+        "https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/README.md",
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json"
       ],
       "release": {
         "tag": "20.0.26",
         "source": "https://registry.npmjs.org/ccusage/20.0.26",
         "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "context-mode",
+      "repository": "https://github.com/mksglu/context-mode",
+      "layer_id": "token-efficiency",
+      "owner_layer_id": "token-efficiency",
+      "pin": "1.0.169",
+      "component_id": "context-mode",
+      "source_selection_layer": "token-efficiency",
+      "source_selection_name": "context-mode",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 16,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "context-mode-1.0.169.tgz",
+        "url": "https://registry.npmjs.org/context-mode/-/context-mode-1.0.169.tgz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "09c41e4cf77b21566c76b8ea2fdbd7f3d823055fee2f02c2166fd5bb575daf2c",
+        "source": "https://registry.npmjs.org/context-mode/1.0.169",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "claude plugin marketplace add mksglu/context-mode --scope user && claude plugin install context-mode@context-mode --scope user && codex plugin marketplace add mksglu/context-mode --ref 6f0cc6841c687e754059f36714a11233fda1a02b --json && codex plugin add context-mode@context-mode --json",
+        "source": "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L72",
+        "execution_status": "UNRUN",
+        "scope": "Both clients' plugins at the reviewed commit 6f0cc6841c687e754059f36714a11233fda1a02b (Codex by --ref; Claude Code takes the marketplace's default branch, so the installed gitCommitSha is compared with the reviewed commit), and the Codex session server from the verified npm tarball under ${ECO_ROOT}/tools/context-mode-1.0.169 (the install plan's context-supply row). The npm digest covers the server package only, not either plugin.",
+        "prerequisites": [
+          "Claude Code and Codex installed and signed in.",
+          "The client configuration's hook trust entries for Codex."
+        ]
+      },
+      "acceptance": {
+        "command": "/context-mode:ctx-doctor",
+        "source": "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L81",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "scope": "Upstream's verify step inside a Claude Code session: every check shows [x] (runtimes, hooks, FTS5, plugin registration). Not a provider-savings measurement.",
+        "prerequisites": [
+          "A Claude Code session with the plugin enabled."
+        ]
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Owner default of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): installed by default on the destination through the install plan's context-supply row, not by iterating over these entries. Source review only here: no tool, service, account, model, provider, GPU or destination WSL installation or acceptance was performed. Net provider savings stay unmeasured.",
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L72"
+      ],
+      "release": {
+        "tag": "1.0.169",
+        "source": "https://registry.npmjs.org/context-mode/1.0.169",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "jcodemunch-mcp",
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "layer_id": "token-efficiency",
+      "owner_layer_id": "token-efficiency",
+      "pin": "1.108.319",
+      "component_id": "jcodemunch-mcp",
+      "source_selection_layer": "token-efficiency",
+      "source_selection_name": "jcodemunch-mcp",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 17,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [
+        "No artifact digest is recorded for this pin: the checksum is the source commit (manifests/stack.json), and uv's index hashes are the only artifact check."
+      ],
+      "artifact": {
+        "name": "jcodemunch-mcp==1.108.319",
+        "url": "https://pypi.org/project/jcodemunch-mcp/1.108.319/"
+      },
+      "checksum": {
+        "algorithm": "git-sha1",
+        "value": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+        "kind": "source"
+      },
+      "integrity_observation": "source_identity_only",
+      "install": {
+        "command": "uv tool install jcodemunch-mcp==1.108.319",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91",
+        "execution_status": "UNRUN",
+        "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. Registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md); jcodemunch-mcp init, which writes a prompt policy and hooks, is not run.",
+        "prerequisites": [
+          "uv with CPython 3.13."
+        ]
+      },
+      "acceptance": {
+        "command": "order({\"action\":\"get_session_stats\",\"args\":{}})",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L141",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "scope": "Upstream's confirmation after a search_symbols and get_symbol_source answer, in a project that registered the server; its counter is an upstream estimate in its own scope, not a provider saving.",
+        "prerequisites": [
+          "A project-scoped registration and an index of the selected code."
+        ]
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Owner default of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): installed by default on the destination through the install plan's code-index row, not by iterating over these entries. Source review only here: no tool, service, account, model, provider, GPU or destination WSL installation or acceptance was performed. Net provider savings stay unmeasured.",
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/jgravelle/jcodemunch-mcp/blob/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91"
+      ],
+      "release": {
+        "tag": "v1.108.319",
+        "source": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "codebase-memory-mcp",
+      "repository": "https://github.com/DeusData/codebase-memory-mcp",
+      "layer_id": "token-efficiency",
+      "owner_layer_id": "token-efficiency",
+      "pin": "0.11.0",
+      "component_id": "codebase-memory-mcp",
+      "source_selection_layer": "token-efficiency",
+      "source_selection_name": "codebase-memory-mcp",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 18,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "codebase-memory-mcp-linux-amd64.tar.gz",
+        "url": "https://github.com/DeusData/codebase-memory-mcp/releases/download/v0.11.0/codebase-memory-mcp-linux-amd64.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "032b33c1833919a2d1de67ff6367fa6ea46aee8689c86ef223c88fae3b6e4536",
+        "source": "https://api.github.com/repos/DeusData/codebase-memory-mcp/releases/tags/v0.11.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "gh release download v0.11.0 --repo DeusData/codebase-memory-mcp --pattern codebase-memory-mcp-linux-amd64.tar.gz --dir \"$DOWNLOAD_DIR\" && tar -xf \"$DOWNLOAD_DIR/codebase-memory-mcp-linux-amd64.tar.gz\" -C \"$PREFIX\"",
+        "source": "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L88",
+        "execution_status": "UNRUN",
+        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. Neither the archive's install.sh nor the binary's install subcommand runs: both configure the detected clients. Indexes only on an explicit index_repository call.",
+        "prerequisites": [
+          "tar."
+        ]
+      },
+      "acceptance": {
+        "command": "codebase-memory-mcp cli index_repository --repo-path \"$PROJECT_ROOT\" && codebase-memory-mcp cli list_projects",
+        "source": "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L648",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "scope": "Upstream's CLI form of the explicit index call and the project listing, on a selected checkout.",
+        "prerequisites": [
+          "A selected project checkout."
+        ]
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Owner default of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): installed by default on the destination through the install plan's code-graph row, not by iterating over these entries. Source review only here: no tool, service, account, model, provider, GPU or destination WSL installation or acceptance was performed. Net provider savings stay unmeasured.",
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/DeusData/codebase-memory-mcp/blob/v0.11.0/README.md#L88"
+      ],
+      "release": {
+        "tag": "v0.11.0",
+        "source": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0",
+        "published_at": "2026-09-15T23:40:39Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Repomix",
+      "repository": "https://github.com/yamadashy/repomix",
+      "layer_id": "token-efficiency",
+      "owner_layer_id": "token-efficiency",
+      "pin": "1.18.1",
+      "component_id": "repomix",
+      "source_selection_layer": "token-efficiency",
+      "source_selection_name": "Repomix",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 19,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "repomix-1.18.1.tgz",
+        "url": "https://registry.npmjs.org/repomix/-/repomix-1.18.1.tgz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "d4d278310b33f245d4abbc7f757cc3815ff362f6d69225692f837c7dcee83c8f",
+        "source": "https://registry.npmjs.org/repomix/1.18.1",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "npm install --global --prefix \"$STACK_HOME/tools/repomix-1.18.1\" repomix@1.18.1",
+        "source": "https://github.com/yamadashy/repomix/blob/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L109",
+        "execution_status": "UNRUN",
+        "scope": "The pinned npm package into its own prefix (docs/token-efficiency-stack.json, upstream_commands.install); the install plan installs the same version from the registry tarball checked against this sha256, into ${ECO_ROOT}/tools/<tool>-<version>, and links the command into ${ECO_ROOT}/bin. The tarball digest does not pin the dependencies npm resolves.",
+        "prerequisites": [
+          "Node 24 and npm."
+        ]
+      },
+      "acceptance": {
+        "command": "repomix --include \"src/**/*.ts,**/*.md\"",
+        "source": "https://github.com/yamadashy/repomix/blob/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L204",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "scope": "Upstream's selected-file pack; with --compress a Python definition whose signature spans lines can drop without notice, so a pack is checked against its file list.",
+        "prerequisites": [
+          "A selected checkout."
+        ]
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Owner default of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): installed by default on the destination through the install plan's repo-packing row, not by iterating over these entries. Source review only here: no tool, service, account, model, provider, GPU or destination WSL installation or acceptance was performed. Net provider savings stay unmeasured.",
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/yamadashy/repomix/blob/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L109"
+      ],
+      "release": {
+        "tag": "1.18.1",
+        "source": "https://registry.npmjs.org/repomix/1.18.1",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "TOON",
+      "repository": "https://github.com/toon-format/toon",
+      "layer_id": "token-efficiency",
+      "owner_layer_id": "token-efficiency",
+      "pin": "4.1.1",
+      "component_id": "toon",
+      "source_selection_layer": "token-efficiency",
+      "source_selection_name": "TOON",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 20,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "cli-4.1.1.tgz",
+        "url": "https://registry.npmjs.org/@toon-format/cli/-/cli-4.1.1.tgz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "93ec1d3f44a608332d6f1fa811adda4237983841baec9b165e40252f20d83ca6",
+        "source": "https://registry.npmjs.org/@toon-format/cli/4.1.1",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "npm install --global --prefix \"$STACK_HOME/tools/toon-4.1.1\" @toon-format/cli@4.1.1",
+        "source": "https://github.com/toon-format/toon/blob/v4.1.1/packages/cli/README.md#L11",
+        "execution_status": "UNRUN",
+        "scope": "The pinned npm package into its own prefix (docs/token-efficiency-stack.json, upstream_commands.install); the install plan installs the same version from the registry tarball checked against this sha256, into ${ECO_ROOT}/tools/<tool>-<version>, and links the command into ${ECO_ROOT}/bin. The tarball digest does not pin the dependencies npm resolves.",
+        "prerequisites": [
+          "Node 24 and npm."
+        ]
+      },
+      "acceptance": {
+        "command": "cat data.toon | toon --decode",
+        "source": "https://github.com/toon-format/toon/blob/v4.1.1/packages/cli/README.md#L53",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "scope": "Upstream's decode example. Use only for uniform arrays of flat records and keep the original JSON unless a strict decode is value-equal: 4.1.1 strips a leading U+FEFF (recipes/README.md).",
+        "prerequisites": [
+          "A TOON file."
+        ]
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Owner default of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): installed by default on the destination through the install plan's structured-data row, not by iterating over these entries. Source review only here: no tool, service, account, model, provider, GPU or destination WSL installation or acceptance was performed. Net provider savings stay unmeasured.",
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/toon-format/toon/blob/v4.1.1/packages/cli/README.md#L11"
+      ],
+      "release": {
+        "tag": "4.1.1",
+        "source": "https://registry.npmjs.org/@toon-format/cli/4.1.1",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "MarkItDown",
+      "repository": "https://github.com/microsoft/markitdown",
+      "layer_id": "token-efficiency",
+      "owner_layer_id": "token-efficiency",
+      "pin": "0.1.8",
+      "component_id": "markitdown",
+      "source_selection_layer": "token-efficiency",
+      "source_selection_name": "MarkItDown",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 21,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "markitdown-0.1.8.tar.gz",
+        "url": "https://files.pythonhosted.org/packages/11/60/2431842a40975524da12edd4d64dd7dc31ef56e209b4848ebf0b14ad1431/markitdown-0.1.8.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "17188ad827ea79fc264c7b1ca8cf5a242a16278d84cc32f2edc475dbe92812ed",
+        "source": "https://pypi.org/pypi/markitdown/0.1.8/json",
+        "kind": "artifact"
+      },
+      "integrity_observation": "published_digest_not_rehashed",
+      "install": {
+        "command": "uv tool install markitdown==0.1.8",
+        "source": "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md#L62",
+        "execution_status": "UNRUN",
+        "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. The base converter only, not the README's [all]; other extras are separate decisions.",
+        "prerequisites": [
+          "uv with CPython 3.13."
+        ]
+      },
+      "acceptance": {
+        "command": "markitdown fixtures/greeting.html -o \"$STACK_HOME/output/greeting.md\"",
+        "source": "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md#L81",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "scope": "Upstream's -o form on an HTML input, which the base converter handles (the README's PDF example needs the [pdf] extra, not installed); give the input type with -x html when it is read from stdin.",
+        "prerequisites": [
+          "This checkout's fixtures/greeting.html."
+        ]
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Owner default of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): installed by default on the destination through the install plan's doc-conversion row, not by iterating over these entries. Source review only here: no tool, service, account, model, provider, GPU or destination WSL installation or acceptance was performed. Net provider savings stay unmeasured.",
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/microsoft/markitdown/blob/v0.1.8/README.md#L62"
+      ],
+      "release": {
+        "tag": "0.1.8",
+        "source": "https://pypi.org/pypi/markitdown/0.1.8/json",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "Context Hub",
+      "repository": "https://github.com/andrewyng/context-hub",
+      "layer_id": "token-efficiency",
+      "owner_layer_id": "token-efficiency",
+      "pin": "0.1.4",
+      "component_id": "context-hub",
+      "source_selection_layer": "token-efficiency",
+      "source_selection_name": "Context Hub",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 22,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "chub-0.1.4.tgz",
+        "url": "https://registry.npmjs.org/@aisuite/chub/-/chub-0.1.4.tgz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "ca9fb94a21d3b5ae3025923ded305dd11f189626da5adab48a8b947bc523888f",
+        "source": "https://registry.npmjs.org/@aisuite/chub/0.1.4",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "npm install --global --prefix \"$STACK_HOME/tools/context-hub-0.1.4\" @aisuite/chub@0.1.4",
+        "source": "https://github.com/andrewyng/context-hub/blob/v0.1.4/README.md#L12",
+        "execution_status": "UNRUN",
+        "scope": "The pinned npm package into its own prefix (docs/token-efficiency-stack.json, upstream_commands.install); the install plan installs the same version from the registry tarball checked against this sha256, into ${ECO_ROOT}/tools/<tool>-<version>, and links the command into ${ECO_ROOT}/bin. The tarball digest does not pin the dependencies npm resolves. Telemetry and feedback off in ~/.chub/config.yaml (recipes/README.md, Context Hub opt-out).",
+        "prerequisites": [
+          "Node 24 and npm."
+        ]
+      },
+      "acceptance": {
+        "command": "chub search openai",
+        "source": "https://github.com/andrewyng/context-hub/blob/v0.1.4/README.md#L13",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "scope": "Upstream's search example with telemetry and feedback off; check a document's metadata.versions against the version a task targets.",
+        "prerequisites": [
+          "Network access to the Context Hub registry."
+        ]
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Owner default of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): installed by default on the destination through the install plan's api-docs row, not by iterating over these entries. Source review only here: no tool, service, account, model, provider, GPU or destination WSL installation or acceptance was performed. Net provider savings stay unmeasured.",
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/andrewyng/context-hub/blob/v0.1.4/README.md#L12"
+      ],
+      "release": {
+        "tag": "0.1.4",
+        "source": "https://registry.npmjs.org/@aisuite/chub/0.1.4",
+        "kind": "native_package_release"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "otel-tui",
+      "repository": "https://github.com/ymtdzzz/otel-tui",
+      "layer_id": "token-efficiency",
+      "owner_layer_id": "token-efficiency",
+      "pin": "0.7.5",
+      "component_id": "otel-tui",
+      "source_selection_layer": "token-efficiency",
+      "source_selection_name": "otel-tui",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 23,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "otel-tui_Linux_x86_64.tar.gz",
+        "url": "https://github.com/ymtdzzz/otel-tui/releases/download/v0.7.5/otel-tui_Linux_x86_64.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "dd10bfa12b6713a2d51d7a094644ff61a2467856fc93d3acecfe741a124ca896",
+        "source": "https://api.github.com/repos/ymtdzzz/otel-tui/releases/tags/v0.7.5",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "gh release download v0.7.5 --repo ymtdzzz/otel-tui -p otel-tui_Linux_x86_64.tar.gz -p otel-tui_0.7.5_checksums.txt --dir \"$STACK_HOME/downloads/otel-tui-0.7.5\"",
+        "source": "https://github.com/ymtdzzz/otel-tui/blob/3b25779a083469b732e3c628b4a412ee05cf9948/README.md#L131",
+        "execution_status": "UNRUN",
+        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. An on-demand viewer: no service and no port held.",
+        "prerequisites": [
+          "tar."
+        ]
+      },
+      "acceptance": {
+        "command": "otel-tui --host 127.0.0.1 --grpc 24317 --http 24318",
+        "source": "https://github.com/ymtdzzz/otel-tui/blob/3b25779a083469b732e3c628b4a412ee05cf9948/README.md#L43",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "scope": "Upstream's host and port flags on unused loopback ports, for a deliberate diagnostic session that is closed afterward; it changes no collector or client telemetry setting.",
+        "prerequisites": [
+          "A producer configured to send OTLP there."
+        ]
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Owner default of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): installed by default on the destination through the install plan's trace-viewer row, not by iterating over these entries. Source review only here: no tool, service, account, model, provider, GPU or destination WSL installation or acceptance was performed. Net provider savings stay unmeasured.",
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/ymtdzzz/otel-tui/blob/3b25779a083469b732e3c628b4a412ee05cf9948/README.md#L131"
+      ],
+      "release": {
+        "tag": "v0.7.5",
+        "source": "https://github.com/ymtdzzz/otel-tui/releases/tag/v0.7.5",
+        "published_at": "2026-09-12T10:28:45Z"
+      },
+      "source_pin_kind": "release_or_artifact_version"
+    },
+    {
+      "name": "agentsview",
+      "repository": "https://github.com/kenn-io/agentsview",
+      "layer_id": "observation-inference",
+      "owner_layer_id": "observation-inference",
+      "pin": "0.43.0",
+      "component_id": "agentsview",
+      "source_selection_layer": "observation-inference",
+      "source_selection_name": "agentsview",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 24,
+      "comparison_group": null,
+      "default_precedence": null,
+      "default_install": true,
+      "blocking_gaps": [],
+      "artifact": {
+        "name": "agentsview_0.43.0_linux_amd64.tar.gz",
+        "url": "https://github.com/kenn-io/agentsview/releases/download/v0.43.0/agentsview_0.43.0_linux_amd64.tar.gz"
+      },
+      "checksum": {
+        "algorithm": "sha256",
+        "value": "4520c6698772d2db7220212abf58d7d58c0966d7435f0a5ab134371f874df6d9",
+        "source": "https://api.github.com/repos/kenn-io/agentsview/releases/tags/v0.43.0",
+        "kind": "artifact"
+      },
+      "integrity_observation": "downloaded_and_rehashed",
+      "install": {
+        "command": "gh release download v0.43.0 --repo kenn-io/agentsview --pattern agentsview_0.43.0_linux_amd64.tar.gz --dir \"$STACK_HOME/downloads/agentsview-0.43.0\" && tar -xf \"$STACK_HOME/downloads/agentsview-0.43.0/agentsview_0.43.0_linux_amd64.tar.gz\" -C \"$PREFIX\"",
+        "source": "https://github.com/kenn-io/agentsview/blob/v0.43.0/README.md#L25",
+        "execution_status": "UNRUN",
+        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. The asset is the one gh release view v0.43.0 --json assets lists for Linux x86_64 (docs/token-efficiency-stack.json). A local archive only: telemetry and the update check off, no hosted or remote sync.",
+        "prerequisites": [
+          "tar."
+        ]
+      },
+      "acceptance": {
+        "command": "AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 agentsview session list",
+        "source": "https://github.com/kenn-io/agentsview/blob/v0.43.0/README.md#L48",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "scope": "Upstream's session listing from the local archive, with telemetry off (README line 695) and the update check off (docs/token-efficiency-stack.json); a blank archive is not evidence of zero usage.",
+        "prerequisites": [
+          "An owned AGENTSVIEW_DATA_DIR and a prior agentsview sync."
+        ]
+      },
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Owner default of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): installed by default on the destination through the install plan's session-analytics row, not by iterating over these entries. Source review only here: no tool, service, account, model, provider, GPU or destination WSL installation or acceptance was performed. Net provider savings stay unmeasured.",
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/kenn-io/agentsview/blob/v0.43.0/README.md#L25"
+      ],
+      "release": {
+        "tag": "v0.43.0",
+        "source": "https://github.com/kenn-io/agentsview/releases/tag/v0.43.0",
+        "published_at": "2026-09-14T13:22:53Z"
       },
       "source_pin_kind": "release_or_artifact_version"
     },
@@ -1236,7 +1814,7 @@
       "position": 11,
       "comparison_group": null,
       "default_precedence": null,
-      "default_install": false,
+      "default_install": true,
       "blocking_gaps": [],
       "artifact": {
         "name": "promptfoo-0.123.1.tgz",
@@ -1250,10 +1828,10 @@
       },
       "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": "npm install -g promptfoo@0.123.1",
-        "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/README.md",
+        "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only promptfoo",
+        "source": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
+        "scope": "Plan row: checksum-verified 0.123.1 tarball in an owned prefix, optional MCP SDK and both clients' native registration; run the install plan instead of an unverified global npm command.",
         "execution_status": "UNRUN",
         "prerequisites": [
           "Node/npm and an owned global install scope for promptfoo 0.123.1."
@@ -1748,7 +2326,7 @@
       },
       "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": null,
+        "command": "npm install --global --prefix \"$STACK_HOME/tools/socraticode-1.15.0\" --ignore-scripts --before=2026-09-24T12:00:00Z socraticode@1.15.0",
         "source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md"
       },
       "acceptance": {
@@ -1757,14 +2335,18 @@
         "evidence_class": "upstream_test_command_not_executed"
       },
       "provisioning_status": "unprovisioned_comparison_arm",
-      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "provisioning_reason": "A comparison arm of the split code-search slot: default_install stays false here, because a default install would decide the slot before its frozen confirmatory returns (validate_default_installs). The install plan's code-search interim installs this arm beside semble on the owner's decision of 2026-10-04 (amendment 4; docs/decisions/2026-10-04-token-full-stack-owner-default.md); its MCP server serves nothing until the client configuration names a Qdrant store and an embedding endpoint.",
       "evidence_refs": [
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/semantic-rag.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md",
-        "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md"
+        "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md",
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json"
       ],
       "release": {
         "tag": "1.15.0",
@@ -2640,62 +3222,68 @@
       "repository": "https://github.com/rtk-ai/rtk",
       "layer_id": "token-efficiency",
       "owner_layer_id": "token-efficiency",
-      "pin": "0.50.0",
+      "pin": "0.51.0",
       "component_id": "rtk",
       "source_selection_layer": "token-efficiency",
       "source_selection_name": "rtk-ai/rtk",
-      "status": "head-to-head-arm",
-      "stage": "compression-comparison",
-      "position": 1,
-      "comparison_group": "compression",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 14,
+      "comparison_group": null,
       "default_precedence": null,
-      "default_install": false,
+      "default_install": true,
       "blocking_gaps": [],
       "artifact": {
         "name": "rtk-x86_64-unknown-linux-musl.tar.gz",
-        "url": "https://github.com/rtk-ai/rtk/releases/download/v0.50.0/rtk-x86_64-unknown-linux-musl.tar.gz"
+        "url": "https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "bc2b8902b0d9c796c82ef45f16ae2307e17757afeca5ee156235a3dc7bda5f89",
-        "source": "https://api.github.com/repos/rtk-ai/rtk/releases/tags/v0.50.0",
+        "value": "5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5",
+        "source": "https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt",
         "kind": "artifact"
       },
-      "integrity_observation": "published_digest_not_rehashed",
+      "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": "cargo install --git https://github.com/rtk-ai/rtk --tag v0.50.0 --locked",
-        "source": "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/README.md#L106",
-        "pinning_source": "https://doc.rust-lang.org/cargo/commands/cargo-install.html",
+        "command": "gh release download v0.51.0 --repo rtk-ai/rtk --pattern rtk-x86_64-unknown-linux-musl.tar.gz --pattern checksums.txt --dir \"$STACK_HOME/downloads/rtk-0.51.0\" && (cd \"$STACK_HOME/downloads/rtk-0.51.0\" && sha256sum --check --ignore-missing checksums.txt && tar -xf rtk-x86_64-unknown-linux-musl.tar.gz -C \"$PREFIX\")",
+        "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/14048b840425c2569e0df60a6596e94e601da15b/recipes/README.md#L41",
         "execution_status": "UNRUN",
-        "scope": "Upstream Git install form with Cargo documented --tag and --locked. This builds the tagged source; the published binary archive checksum above does not identify the resulting local build.",
+        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. This replaces the UNRUN cargo build of the tagged source: the release binary is the asset the recorded sha256 identifies. The Claude Code hook and its exclude_commands are the client configuration's; rtk init --global --codex is never run at 0.51.0.",
         "prerequisites": [
-          "Supported Rust/Cargo toolchain and source build prerequisites."
-        ]
+          "tar and sha256sum."
+        ],
+        "pinning_source": "https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md#L113"
       },
       "acceptance": {
-        "command": "cargo test",
-        "source": "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/CONTRIBUTING.md#L258",
-        "evidence_class": "upstream_test_command_not_executed",
+        "command": "rtk git log -n 10",
+        "source": "https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md#L193",
+        "evidence_class": "documented_upstream_example_not_executed",
         "execution_status": "UNRUN",
+        "scope": "Upstream's one-line commit example in a checkout; rtk proxy git log -n 10 returns the raw output when a condensed result is unusable (README line 313).",
         "prerequisites": [
-          "Selected upstream source checkout and its Rust build/test dependencies."
-        ],
-        "scope": "Upstream unit/snapshot tests from the selected source checkout only. The separately documented ignored integration tests, installed CLI/hook behavior and new-host acceptance are not covered."
+          "A git checkout."
+        ]
       },
-      "provisioning_status": "unprovisioned_comparison_arm",
-      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Owner default of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): installed by default on the destination through the install plan's command-output row, not by iterating over these entries. Source review only here: no tool, service, account, model, provider, GPU or destination WSL installation or acceptance was performed. Net provider savings stay unmeasured.",
       "evidence_refs": [
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/token-efficiency.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json"
+        "evidence/artifacts/new-wsl-profile-20261001/upstream-gap-closure.json",
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json",
+        "https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md",
+        "https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt"
       ],
       "release": {
-        "tag": "v0.50.0",
-        "source": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
-        "published_at": "2026-09-24T10:02:31Z"
+        "tag": "v0.51.0",
+        "source": "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+        "published_at": "2026-10-02T13:33:54Z"
       },
       "source_pin_kind": "release_or_artifact_version"
     },
@@ -2762,12 +3350,12 @@
       "component_id": "headroom",
       "source_selection_layer": "token-efficiency",
       "source_selection_name": "Headroom",
-      "status": "head-to-head-arm",
-      "stage": "compression-comparison",
-      "position": 3,
-      "comparison_group": "compression",
+      "status": "picked",
+      "stage": "native-extensions",
+      "position": 15,
+      "comparison_group": null,
       "default_precedence": null,
-      "default_install": false,
+      "default_install": true,
       "blocking_gaps": [],
       "artifact": {
         "name": "headroom_ai-0.37.0-cp310-abi3-manylinux_2_28_x86_64.whl",
@@ -2781,23 +3369,32 @@
       },
       "integrity_observation": "published_digest_not_rehashed",
       "install": {
-        "command": "uv tool install --python 3.13 \"headroom-ai[all]==0.37.0\"",
-        "source": "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md"
+        "command": "uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'",
+        "source": "https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/README.md#L92",
+        "execution_status": "UNRUN",
+        "scope": "The pinned PyPI package as a uv tool (docs/token-efficiency-stack.json, upstream_commands.install); the install plan sets UV_TOOL_DIR and UV_TOOL_BIN_DIR to the ecosystem root the client templates run. uv checks the index's hashes. The [mcp] extra (adoption/pins-linux-x86_64.json), not the README's [all]; MCP server only, headroom mcp serve --proxy-url http://127.0.0.1:1 with its offline variables, and no proxy mode.",
+        "prerequisites": [
+          "uv with CPython 3.13."
+        ]
       },
       "acceptance": {
         "command": "uv sync --extra dev && uv run pytest",
         "source": "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md",
         "evidence_class": "upstream_test_command_not_executed"
       },
-      "provisioning_status": "unprovisioned_comparison_arm",
-      "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
+      "provisioning_status": "unprovisioned_source_review",
+      "provisioning_reason": "Owner default of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): installed by default on the destination through the install plan's output-compression row, not by iterating over these entries. Source review only here: no tool, service, account, model, provider, GPU or destination WSL installation or acceptance was performed. Net provider savings stay unmeasured.",
       "evidence_refs": [
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/token-efficiency.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md",
-        "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md"
+        "https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md",
+        "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
+        "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "docs/token-efficiency-stack.json"
       ],
       "release": {
         "tag": "0.37.0",
@@ -2872,28 +3469,28 @@
       "default_precedence": null,
       "default_install": false,
       "blocking_gaps": [
-        "No complete pin-matching supported install command verified for this owned row.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+        "G4 revised installation and native runtime acceptance are UNRUN on the destination."
       ],
       "artifact": {
-        "name": "otelcol-contrib_0.162.0_linux_amd64.deb",
-        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.deb"
+        "name": "otelcol-contrib_0.162.0_linux_amd64.tar.gz",
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.tar.gz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "0b2b37eeb83db8e19a5f9dfc60894d058c739384a226ac085e674561befaad44",
+        "value": "fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3",
         "source": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases/tags/v0.162.0",
         "kind": "artifact"
       },
-      "integrity_observation": "published_digest_not_rehashed",
+      "integrity_observation": "published_sha256_not_rehashed_in_this_job",
       "install": {
         "command": null,
-        "source": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/README.md"
+        "source": "https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/9f912d59a165ded5dec82d0e1a94c2aef54e5c57/content/en/docs/collector/install/binary/linux.md#L87"
       },
       "acceptance": {
         "command": null,
-        "source": null,
-        "evidence_class": null
+        "source": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector-contrib/v0.162.0/extension/healthcheckextension/README.md#L96",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job."
       },
       "provisioning_status": "unprovisioned_optional_service",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -2902,7 +3499,8 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/README.md"
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/README.md",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"
       ],
       "release": {
         "tag": "v0.162.0",
@@ -3026,7 +3624,7 @@
       "repository": "https://github.com/grafana/grafana",
       "layer_id": "observation-inference",
       "owner_layer_id": "observation-inference",
-      "pin": "13.2.2",
+      "pin": "13.2.3",
       "component_id": "grafana",
       "source_selection_layer": "observation-inference",
       "source_selection_name": "Grafana",
@@ -3037,30 +3635,30 @@
       "default_precedence": null,
       "default_install": false,
       "blocking_gaps": [
-        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
-        "No complete pin-matching supported install command verified for this owned row.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "The first Linux release asset was Enterprise, not the selected OSS native installation. Its digest is excluded; the correct OSS install artifact remains unverified."
+        "G4 revised installation and native runtime acceptance are UNRUN on the destination.",
+        "The canonical definitive selection remains split/measurement-only; explicit --only grafana is required pending coordinator reconciliation.",
+        "After sign-in, the native client/SDK workload and nine affected dashboard queries must pass."
       ],
       "artifact": {
-        "name": "git source at 3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
-        "url": "https://github.com/grafana/grafana/tree/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e"
+        "name": "grafana_13.2.3_36482603486_linux_amd64.tar.gz",
+        "url": "https://dl.grafana.com/grafana/release/13.2.3/grafana_13.2.3_36482603486_linux_amd64.tar.gz"
       },
       "checksum": {
-        "algorithm": "git-sha1",
-        "value": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
-        "source": "https://api.github.com/repos/grafana/grafana/commits/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
-        "kind": "source"
+        "algorithm": "sha256",
+        "value": "6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235",
+        "source": "https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux#L2819",
+        "kind": "artifact"
       },
-      "integrity_observation": "source_identity_only",
+      "integrity_observation": "published_sha256_not_rehashed_in_this_job",
       "install": {
         "command": null,
-        "source": "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md"
+        "source": "https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux#L2819"
       },
       "acceptance": {
         "command": null,
-        "source": null,
-        "evidence_class": null
+        "source": "https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/data_source.md#L657",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job."
       },
       "provisioning_status": "unprovisioned_optional_service",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -3069,12 +3667,13 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md"
+        "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"
       ],
       "release": {
-        "tag": "v13.2.2",
-        "source": "https://github.com/grafana/grafana/releases/tag/v13.2.2",
-        "published_at": "2026-09-15T12:21:32Z"
+        "tag": "v13.2.3",
+        "source": "https://github.com/grafana/grafana/releases/tag/v13.2.3",
+        "published_at": "2026-09-29T09:02:18Z"
       },
       "source_pin_kind": "release_or_artifact_version"
     },
@@ -3635,7 +4234,7 @@
       "repository": "https://github.com/anchore/syft",
       "layer_id": "ci-supply-chain",
       "owner_layer_id": "ci-supply-chain",
-      "pin": "1.52.0",
+      "pin": "1.54.0",
       "component_id": "syft",
       "source_selection_layer": "ci-supply-chain",
       "source_selection_name": "Syft",
@@ -3645,43 +4244,47 @@
       "comparison_group": null,
       "default_precedence": null,
       "default_install": false,
-      "blocking_gaps": [
-        "No complete pin-matching supported install command verified for this owned row.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
-      ],
+      "blocking_gaps": [],
       "artifact": {
-        "name": "syft_1.52.0_linux_amd64.deb",
-        "url": "https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_linux_amd64.deb"
+        "name": "syft_1.54.0_linux_amd64.tar.gz",
+        "url": "https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_linux_amd64.tar.gz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "c8e13cd04f78b5cf90a70b2e45d2a4b7ec9aa0aa129d3001cd5d488103351b7f",
-        "source": "https://api.github.com/repos/anchore/syft/releases/tags/v1.52.0",
+        "value": "54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860",
+        "source": "https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_checksums.txt",
         "kind": "artifact"
       },
-      "integrity_observation": "published_digest_not_rehashed",
+      "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": null,
-        "source": "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md"
+        "command": "mise use -g syft@1.54.0",
+        "source": "https://github.com/jdx/mise/blob/v2026.10.0/registry/syft.toml#L1",
+        "execution_status": "UNRUN",
+        "scope": "The reviewed user-owned mise registry recipe used by the install plan; no destination WSL run.",
+        "source_review_ref": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md"
       },
       "acceptance": {
-        "command": null,
-        "source": null,
-        "evidence_class": null
+        "command": "syft alpine:latest",
+        "source": "https://raw.githubusercontent.com/anchore/syft/cc326e45a6213360266dda4b30cc68095946d676/README.md#L48",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "scope": "Upstream public-image smoke; destination WSL acceptance is owed. The bounded Linux check is recorded separately in the fix-wave decision.",
+        "source_review_ref": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md"
       },
-      "provisioning_status": "unprovisioned_user_decision",
+      "provisioning_status": "unprovisioned_source_review",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
       "evidence_refs": [
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md"
+        "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md"
       ],
       "release": {
-        "tag": "v1.52.0",
-        "source": "https://github.com/anchore/syft/releases/tag/v1.52.0",
-        "published_at": "2026-09-17T14:38:17Z"
+        "tag": "v1.54.0",
+        "source": "https://github.com/anchore/syft/releases/tag/v1.54.0",
+        "published_at": "2026-10-01T20:54:29Z"
       },
       "source_pin_kind": "release_or_artifact_version"
     },
@@ -4042,7 +4645,7 @@
     "primary_client": "Codex",
     "accepted_codex_cli_pin": "0.160.0",
     "sdk_gate": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/626",
-    "default_profile": "Minimal native foundation only: existing bootstrap component_ids [codex, claude-code], implicit Node/uv/gh pins, and CPython 3.13.15 via uv; Git and OS utilities are prerequisites.",
+    "default_profile": "Minimal native foundation only: existing bootstrap component_ids [codex, claude-code], implicit Node/uv/gh pins, and CPython 3.13.15 via uv; Git and OS utilities are prerequisites. Owner defaults of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): the token-efficiency rows RTK, Headroom, ccusage, context-mode, jcodemunch-mcp, codebase-memory-mcp, Repomix, TOON, MarkItDown, Context Hub and otel-tui, and agentsview (observation-inference), have default_install true and install through the install plan's slot rows (evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json), not through the bootstrap's component_ids; SocratiCode installs there as an arm of the code-search interim. Wave 4 also gives Promptfoo default_install true under the repository-quality rule, through its checksum-verified owned-prefix plan row.",
     "install_dispatch": "Do not iterate over entries. The existing bootstrap installs only the named native profile and its implicit toolchain; every optional row and comparison arm is excluded. Examples are not an authorization to install.",
     "bootstrap": {
       "command": "bash adoption/bootstrap-linux.sh --profile new-wsl-clean-foundation --skip-system-packages",

@@ -22,11 +22,10 @@ max_concurrent_threads_per_session = 3
 # main-checkout-only binding this file used to carry. recipes/README.md ("Retained Context Mode") keeps
 # the project-scoped form for a project that needs a fixed directory.
 
-# jcodemunch stays project-scoped: its own MCP instructions ("Prefer it over Read/Grep/Glob/Bash for code
-# navigation") would load into every session at user scope, contradicting this catalog's own retrieval
-# routing, the same reasoning docs/decisions/2026-09-23-claude-user-profile.md's 2026-09-25 addendum
-# gives for Claude. A worktree that wants jcodemunch registers it per worktree, exactly as a project that
-# wants it opts in today (adoption/bootstrap.md "jCodeMunch, per project").
+# jcodemunch is registered at user scope too (adoption/templates/codex.config.template.toml, on the user's directive of
+# 2026-10-04, docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md, which overturns the project scope of 2026-09-25: its own MCP
+# instructions load into every session). This entry stays for a project whose Codex home does not carry the user-scope one, and
+# is the same entry: a project that wants it pinned registers it here (adoption/bootstrap.md "jCodeMunch, per project").
 [mcp_servers.jcodemunch]
 command = "${ECO_ROOT}/bin/jcodemunch-mcp"
 startup_timeout_sec = 60

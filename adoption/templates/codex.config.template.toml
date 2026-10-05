@@ -60,7 +60,8 @@ enabled = false
 # ai-memory's registration carries no project: its workspace/project scoping is a per-call argument.
 # headroom, codebase-memory and qmd mirror the Claude user-scope set: headroom's dead proxy URL means
 # it reroutes no model traffic, codebase-memory indexes only on an explicit index_repository call,
-# and qmd serves the named catalog index. jcodemunch stays project-scoped (#240). context-mode's plugin
+# and qmd serves the named catalog index. jcodemunch is registered below at user scope (the user's directive of 2026-10-04,
+# docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md). context-mode's plugin
 # supplies its hooks and skills, while its MCP server is registered below, bound to each session's own
 # directory; see project.codex.config.template.toml.
 [mcp_servers.serena]
@@ -154,6 +155,27 @@ RTK_TELEMETRY_DISABLED = "1"
 PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
 CONTEXT_MODE_PLATFORM = "codex"
 
+# jgravelle/jcodemunch-mcp 1.108.319, README.md at 8f7b34abe16fb459e0bf1c04747d584216dfe32e (L119-122: `claude mcp add -s user
+# jcodemunch jcodemunch-mcp`): the native MCP registration at user scope, on the user's directive of 2026-10-04 that every fresh
+# session starts with the tools ready (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md; it overturns the project scope
+# of 2026-09-25 for NativeStack and NativeStack2604). JCODEMUNCH_SHARE_SAVINGS=0 in the env block is the documented opt-out of its
+# anonymous savings counter (CONFIGURATION.md L231 and SECURITY.md L311 at the same revision). `jcodemunch-mcp init`, which writes a
+# prompt policy and hooks, is not run. The entry is the one project.codex.config.template.toml registers per project: the tools
+# carry no MCP annotations, so under approval_policy = "never" Codex refuses every unapproved call, and
+# default_tools_approval_mode = "approve" auto-approves even then (codex-rs/codex-mcp/src/mcp/mod.rs L89-L98 at rust-v0.157.1);
+# enabled_tools names the three verbs of its front door (counter.py FRONT_DOOR at 1.108.319). CODE_INDEX_PATH stays unset:
+# upstream's default is ~/.code-index (README.md L225).
+[mcp_servers.jcodemunch]
+command = "${ECO_ROOT}/bin/jcodemunch-mcp"
+startup_timeout_sec = 60
+enabled_tools = ["route", "menu", "order"]
+default_tools_approval_mode = "approve"
+
+[mcp_servers.jcodemunch.env]
+RTK_TELEMETRY_DISABLED = "1"
+PATH = "${ECO_ROOT}/bin:${HOST_PATH}"
+JCODEMUNCH_SHARE_SAVINGS = "0"
+
 # Trust lets Codex load a project's own .codex/config.toml, which is otherwise loaded but disabled; for a linked
 # worktree Codex looks the trust up under its main checkout (codex-rs/config/src/loader/mod.rs L131-133 and
 # L1041-1084; git-utils/src/trust.rs L9-16). Four dated validation directories this list used to trust were removed:
@@ -244,6 +266,11 @@ daemon_auto_start = false
 # README.md). Without it each command runs as `shell -lc`, the same login shell the snapshot would have captured
 # (core/src/tools/runtimes/mod.rs L268-276), at the cost of starting that shell per command.
 shell_snapshot = false
+# Experimental and off by default (`codex features list`): adds the seven-day five-hour and weekly allowance history to
+# /analytics through one ChatGPT-backend request, not a model call (codex-rs/features/src/lib.rs at rust-v0.160.0). On
+# both hosts on the user's directive of 2026-10-04 to enable the latest changelog features; the history stays empty
+# (the request returns nothing) on an account whose plan has none.
+analytics_plan_history = true
 
 # Notify only when Codex needs a decision: an approval (approval-requested), a plan-mode prompt or a `request_user_input` question (both
 # reported as plan-mode-prompt, tui/src/chatwidget/tool_requests.rs L449-458 at rust-v0.155.1 and rust-v0.157.1) or an asynchronous question

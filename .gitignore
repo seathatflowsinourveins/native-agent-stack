@@ -65,6 +65,8 @@ evidence/hosts/**/*.json.tmp-*
 # `claude --worktree` creates inside the repository.
 .claude/settings.local.json
 .claude/worktrees/
+# Serena's generated per-project index/config/logs can contain private host paths.
+.serena/
 
 # ai-memory's capture opt-in is each host's own decision, never committed; .worktreeinclude
 # copies it into new worktrees (recipes/README.md, "Worktrees and the capture marker").

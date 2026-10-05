@@ -1,0 +1,150 @@
+{
+ "schema_version": 1,
+ "kind": "repository-quality-round2-extract",
+ "date_utc": "2026-10-04",
+ "meaning": "the decide-round-2 verdicts on the gap skill-lifecycle-verification (paired skill verification in both clients) and the Opus check of them, which the wave4 owner default on the promptfoo row cites; an extract of private coordination records, with their digests; selection evidence only, no comparison has run",
+ "rule": "docs/decisions/2026-10-04-repository-quality-rule.md",
+ "owner_words": "with the repos quality itself resolute our architecture with the sota repos's own quality and finalize for the architecture for us to clean install",
+ "round2": {
+  "decider_A": {
+   "model": "GPT-6.1 Sol, blind",
+   "adopt": false,
+   "owner": "no extra install: promptfoo/promptfoo"
+  },
+  "decider_B": {
+   "model": "GPT-6.1 Sol, blind, reversed candidate order",
+   "adopt": false,
+   "owner": "no extra install: promptfoo, configured for paired native-client skill verification and result recording"
+  },
+  "critic": {
+   "model": "GPT Astra",
+   "verdict": "converged",
+   "adopt": true,
+   "owner": "promptfoo/promptfoo — configure the existing evaluator and native SDK providers for paired skill verification and records",
+   "why": "The default survives and agrees with the reconciled round-1 owner. A(1) and the supplied round-1 finding establish the two-client verification requirement. Release-pinned documentation covers the actual job, so reuse is supported by capability evidence rather than merely by installation status. A's successful release-CI claim checks out; B accurately described its incomplete lookup, but that uncertainty can now be closed. Anthropic's authoring benchmark is real, yet its inspected automation invokes Claude, and neither it nor agentskills has a qualifying tag. The main limitation remains Codex invocation inference: reading SKILL.md is evidence of access, not proof of a first-class invocation event. Native SDK dependency resolution, exact client binary selection and fixtures still need configuration; no installed skill is qualified merely by selecting this owner. adopt:true records this required responsibility while retaining the no-extra-install outcome.",
+   "overturn_check": "After a native skill-creator workflow passes every candidate gate and documents both clients, compare it with promptfoo on the same frozen skill regressions, recorded traces and oracle-labelled expected outcomes. Transfer verification ownership if it detects more true regressions without additional false flags and preserves complete reproducible records. Score verification correctness separately from the underlying agents' task success."
+  }
+ },
+ "round1_opus_contested_check": {
+  "what": "round 1's Opus check of its contested verdicts (2026-10-04): round 1's deciders had named skill-creator for this gap and round 1's critic switched to promptfoo; the check upheld the switch on capability fit (decide-overrides.json)",
+  "final_owner": "promptfoo (no extra install: Test Agent Skills evals through the existing Claude Agent SDK and Codex SDK providers)",
+  "final_adopt": true,
+  "reason": "Owner upheld. Adopt is corrected to true because the page renders adopt=false as 'not adopted' and drops the owner. The critic's switch to promptfoo is right on capability fit, which I checked today. Promptfoo 0.123.1 (latest release, published 2026-09-18) ships site/docs/guides/test-agent-skills.md, described as 'Compare Claude, Codex, and other skill versions'. It has anthropic:claude-agent-sdk and openai:codex-sdk sections, skill-used assertions, --repeat and exported results. The deciders' owner, skill-creator, does not cover the Codex half. Codex's embedded skill-creator at rust-v0.160.0 ships only init_skill.py, quick_validate.py and generate_openai_yaml.py, plus informal 'Validate and Iterate' guidance (SKILL.md:203), with no paired benchmark recording. Anthropic's run_eval.py drives 'claude -p'. The packet's own skills-sweep record (lines 29 and 34) names promptfoo as the only cross-host harness. The requirement is current: every skill layer's overturn condition needs a paired benchmark in both clients. There are no failed checks for this gap. Acceptance stays open: provider dependency resolution, client pins, and the fact that Codex's skill-used signal is inferred from SKILL.md reads.",
+  "upstream_sources": [
+   "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/guides/test-agent-skills.md (lines 4, 38-40, 202-249, 375; read today)",
+   "https://github.com/openai/codex/tree/rust-v0.160.0/codex-rs/skills/src/assets/samples/skill-creator (read today)",
+   "https://github.com/anthropics/skills/blob/main/skills/skill-creator/scripts/run_eval.py#L45-L71 (read today)"
+  ]
+ },
+ "premise_note": "Both deciders and the critic described promptfoo as the existing evaluator (no extra install). On the definitive manifest the promptfoo row's decided default installed nothing, so the owner default installs it.",
+ "private_records_sha256": {
+  "result-A.txt": "7c7680e884be1f7480e34b96dbd393100c991cfe4803d213be7f9889bd32e847",
+  "result-B.txt": "91db6b14ba64c0f58e0a256f1750b802ace09513b6f8b48812276af7c2cc1de1",
+  "result-C.txt": "2f710c1fa4c7bcb3bd79a5ce46a49d5d5ca483bb76a1d4a74d02208af008c003",
+  "decide-overrides.json": "3bb3b271137a4ee08e3bd9d6409376c33efca706390da1f66c3e3357f33b7495",
+  "opus-verify-r2.json": "cd03e7394c7633b150f6b4e07168424bdfd34c131dc9dfb8e68aa2e94a8a79fb"
+ },
+ "opus_verification": {
+  "what": "the round's Opus refute-by-default verification of every adopt-true verdict, against live upstream (2026-10-04)",
+  "uphold": false,
+  "final_adopt": true,
+  "final_owner": "promptfoo/promptfoo 0.123.1 (owner upheld; adds no component beyond the FINAL quality-evaluation/promptfoo owner). Configure its anthropic:claude-agent-sdk and openai:codex-sdk providers as the release-pinned Test Agent Skills guide describes, for paired skill-version verification and recorded results. Point them at the host's pinned clients with path_to_claude_code_executable and codex_path_override. Boundary: instructions-skills/skill-authoring (skill-creator) keeps authoring and authoring-time evaluation; quality-evaluation/harbor keeps containerized task-level agent A/B. promptfoo is not yet installed on 2604, so the install step goes in the plan.",
+  "pin": "0.123.1. Tag 0.123.1 is a lightweight tag on commit 34f74d34e140b5e17d23770dfb2340057b1936b8, published 2026-09-18T01:07:54Z. It was still the latest release on 2026-10-04 and matches manifests/stack.json:706-708.",
+  "install": "npm install -g promptfoo@0.123.1. This is the upstream README.md:31 form (\"npm install -g promptfoo\") with a version pin; it needs Node.js >=22.22.0 (README.md:27). Upstream documents Linux x86_64 through npm but does not name WSL2. A default install also resolves the optionalDependencies declared in the 0.123.1 package.json: @anthropic-ai/claude-agent-sdk 0.3.263 and @openai/codex-sdk ^0.153.2. Acceptance: promptfoo --version, then npm ls -g --all @anthropic-ai/claude-agent-sdk @openai/codex-sdk.",
+  "uphold_note": "uphold=false keeps the owner and adopt=true; it corrects the critic's record (its overturn comparator, native skill-creator, fails the gates)",
+  "corrected_overturn": "run promptfoo and Harbor v0.23.0 (--skill injection plus Rewardkit) on the same frozen skill regressions with oracle-labelled outcomes, in both clients; transfer ownership if Harbor detects strictly more true regressions, with no more false flags and complete reproducible records, scoring verification correctness separately from the agents' task success",
+  "premise_correction": "'existing evaluator' is wrong for NativeStack2604: the plan recorded promptfoo as not installed, so the install step goes in the plan",
+  "checks": [
+   {
+    "claim": "promptfoo/promptfoo is not archived; pushed_at 2026-10-04T21:56:43Z; default branch main",
+    "holds": true,
+    "source": "gh api repos/promptfoo/promptfoo (observed 2026-10-04)"
+   },
+   {
+    "claim": "Latest release is 0.123.1, published 2026-09-18T01:07:54Z; tag 0.123.1 is a lightweight tag on commit 34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "holds": true,
+    "source": "gh api repos/promptfoo/promptfoo/releases/latest; gh api repos/promptfoo/promptfoo/git/ref/tags/0.123.1"
+   },
+   {
+    "claim": "CI (main.yml) at the release commit succeeded (run 35294050711), and the release-please run at that commit succeeded",
+    "holds": true,
+    "source": "gh api repos/promptfoo/promptfoo/actions/runs/35294050711; actions/runs?head_sha=34f74d34e140b5e17d23770dfb2340057b1936b8"
+   },
+   {
+    "claim": "Default-branch CI is healthy: run 37189496583 at 5fde786d succeeded on 2026-10-04, and the last 10 main.yml runs are success or cancelled, with no failure",
+    "holds": true,
+    "source": "gh api repos/promptfoo/promptfoo/actions/workflows/main.yml/runs?branch=main&per_page=10"
+   },
+   {
+    "claim": "Publication uses OIDC (id-token: write) and npm publish --provenance",
+    "holds": true,
+    "source": "https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/.github/workflows/release-please.yml (publish-npm job)"
+   },
+   {
+    "claim": "SECURITY.md provides GitHub-advisory and email reporting with a 1-business-day acknowledgement target",
+    "holds": true,
+    "source": "https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/SECURITY.md lines 133, 134, 138, 175"
+   },
+   {
+    "claim": "The README documents npm install -g promptfoo and Node >=22.22.0; it does not name WSL2",
+    "holds": true,
+    "source": "https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/README.md lines 27, 31, 35"
+   },
+   {
+    "claim": "package.json at 0.123.1 declares @anthropic-ai/claude-agent-sdk 0.3.263 and @openai/codex-sdk ^0.153.2 as optionalDependencies",
+    "holds": true,
+    "source": "https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/package.json"
+   },
+   {
+    "claim": "The release-pinned Test Agent Skills guide documents paired skill-version comparisons for anthropic:claude-agent-sdk and openai:codex-sdk with skill-used assertions; Codex skill-used is inferred from SKILL.md reads",
+    "holds": true,
+    "source": "https://raw.githubusercontent.com/promptfoo/promptfoo/0.123.1/site/docs/guides/test-agent-skills.md lines 4, 40, 142, 204, 249"
+   },
+   {
+    "claim": "The providers can target host binaries (path_to_claude_code_executable, codex_path_override), and the Codex provider reuses an existing ChatGPT login",
+    "holds": true,
+    "source": "promptfoo 0.123.1 site/docs/providers/claude-agent-sdk.md:202,900; site/docs/providers/openai-codex-sdk.md:60-72 and options table"
+   },
+   {
+    "claim": "The Claude Agent SDK provider page documents use of the native Claude Code sign-in",
+    "holds": false,
+    "source": "promptfoo 0.123.1 site/docs/providers/claude-agent-sdk.md Setup section names only ANTHROPIC_API_KEY; grep found no OAuth/setup-token path"
+   },
+   {
+    "claim": "anthropics/skills fails the release/tag gate: 0 releases, 0 tags; last default-branch commit 2026-09-29 (8a1541c4a3ff)",
+    "holds": true,
+    "source": "gh api repos/anthropics/skills/releases, /tags, /commits?per_page=1"
+   },
+   {
+    "claim": "agentskills/agentskills fails the release/tag gate: 0 releases, 0 tags; last commit 2026-08-09 (69ef37e9424c)",
+    "holds": true,
+    "source": "gh api repos/agentskills/agentskills/releases, /tags, /commits?per_page=1"
+   },
+   {
+    "claim": "Anthropic skill-creator's evaluation automation drives claude -p only, and Codex rust-v0.160.0's embedded skill-creator ships only generate_openai_yaml.py, init_skill.py and quick_validate.py",
+    "holds": true,
+    "source": "https://raw.githubusercontent.com/anthropics/skills/main/skills/skill-creator/scripts/run_eval.py lines 46, 71; gh api repos/openai/codex/contents/codex-rs/skills/src/assets/samples/skill-creator/scripts?ref=rust-v0.160.0"
+   },
+   {
+    "claim": "No other existing owner covers the job (implicit in the verdict; skills sweep line 29 calls promptfoo the only cross-host harness)",
+    "holds": false,
+    "source": "https://raw.githubusercontent.com/harbor-framework/harbor/v0.23.0/docs-mintlify/core-concepts/jobs/skills.mdx (--skill into Codex $HOME/.agents/skills and Claude Code $CLAUDE_CONFIG_DIR/skills; SHA-256 digest and git commit in the job lock); harbor v0.23.0 skills/rewardkit/SKILL.md:96 trajectory_tool_used"
+   },
+   {
+    "claim": "Harbor (existing owner) is clearly stronger than promptfoo on checklist items 1-5 for this job",
+    "holds": false,
+    "source": "Harbor v0.23.0 commit 1e5c5c6d: Python Tests and Type Check succeeded (gh api actions/runs?head_sha=); no publish workflow in .github/workflows at v0.23.0; SECURITY.md 404; SkillsBench https://arxiv.org/html/2602.12670v1 section 2 'Built on the Harbor framework' (independent, favors Harbor on item 5 only)"
+   },
+   {
+    "claim": "The critic's overturn comparator (native skill-creator) can pass the candidate gates and be executed in both clients",
+    "holds": false,
+    "source": "gh api repos/anthropics/skills/releases and /tags (both empty); Codex rust-v0.160.0 skill-creator has no evaluation runner"
+   },
+   {
+    "claim": "promptfoo has more than one active maintainer, though concentration is high: of the first 100 commits since 2026-07-06, 46 are mldangelo-oai and 14 mldangelo (likely one person), 2 ianw-oai, and the rest other contributors and bots",
+    "holds": true,
+    "source": "gh api repos/promptfoo/promptfoo/commits?sha=main&since=2026-07-06T00:00:00Z&per_page=100"
+   }
+  ]
+ }
+}

@@ -30,6 +30,11 @@ The coordinator owns this directory, the dated decision and the assigned new `ex
 
 ## Completion and reopening
 
+The [dated SDK execution evidence](../../../evidence/artifacts/native-sdk-acceptance-20261002/README.md)
+records the failed Claude task, separately accepted Codex repair and scoped
+Claude/OpenHands source-suite passes. The [open requirement map](open-work.json)
+keeps the remaining roles, provider, lifecycle and architecture gates explicit.
+
 Close this resolution wave only when the selected task envelope has current source citations, explicit owner/disposition for each material finding, actual returned checks for changed behavior, independent review, a clean publication candidate and a recoverable handoff. The global catalogs' `close_only_when` rules still govern layer closure. Record residual gates without labeling them passed. Reopen for a changed requirement, incompatible upstream release, concrete maintained challenger, retained failure or contradictory primary evidence.
 
 ## SOTA sources
