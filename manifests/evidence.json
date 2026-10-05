@@ -4207,6 +4207,47 @@
         "Sanitized projections only; private original hashes, failed cases and corrections retained. The projection step ran no new provider/test/control execution and made no shared edits; registration in manifests/evidence.json is separate from that step."
       ],
       "path": "evidence/receipts/native-sdk-role-mcp-followup-20261002.json"
+    },
+    {
+      "id": "trading-unattended-hosting-recovery-20261005",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "dagu",
+        "restic"
+      ],
+      "claim": "Native restic 0.19.1 backed up two synthetic SQLite WAL journals copied by the stdlib Online Backup API during committed writes, read subset 1/1 (2/2 packs), restored 802816 identical journal bytes with matching external inventory and required state, and refused both snapshot and restore controls. Dagu 2.16.6 validated the scheduled research DAG offline; operating-host and off-host gates remain open.",
+      "limitations": [
+        "Scratch local integration with synthetic research journals; not an unchanged upstream test suite or a real market/broker journal.",
+        "Per-journal Online Backup is independently consistent; no atomic cross-journal transaction or research consumer application restart was accepted.",
+        "Historical one-part check 1/1 read 2/2 packs. Round 1 enforced strict daily gaps in its synthetic rotation test; round 2 replaces that policy with a whole seven-subset rotation within seven days.",
+        "Operating host and independent alert path are user decision 2. No systemd unit was installed, enabled or started; no process-restart drill or scheduler was run.",
+        "A process-restart drill is not reboot, missed-run or independent-alert acceptance. permissions.run_dags scheduler behavior is source-reviewed and awaits the later host drill.",
+        "Off-host recovery stays open until user decision 3 chooses an independent destination and key recovery and a consumer restores on a second host against the independent inventory and required state.",
+        "Recovery-time objective, independent alerting and retention deletion remain unaccepted. No broker, credentials, live mode, model calls, commit or push was used.",
+        "Historical round 1 cited an unlanded calendar bundle. Round 2 uses the on-base SDK_ENV lock adoption/sdk/requirements-linux-x86_64-py313.lock:241 and executes the already installed exchange-calendars 4.13.2 for real-calendar regressions; no new installation is claimed."
+      ],
+      "path": "evidence/receipts/trading-unattended-hosting-recovery-20261005.json"
+    },
+    {
+      "id": "trading-unattended-hosting-recovery-r2-20261005",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "dagu",
+        "restic"
+      ],
+      "claim": "Round 2 native restic 0.19.1 backed up two synthetic WAL journals using CPython Online Backup pages=-1 during independently observed commits, checked subset 1/1, restored 16531456 identical journal bytes against the external inventory and required state, and refused native-exit-3 snapshot and same-count/same-integrity content-mutation restore controls. Dagu 2.16.6 validated the revised DAG and executed native manual skip/success/stale-input probes. 42 stdlib tests passed including real exchange_calendars 4.13.2 cases. Cron Next was not executable: no Go compiler found. Operating-host and off-host gates remain open.",
+      "limitations": [
+        "Scratch local integration and synthetic fixtures, not an unchanged upstream test suite, real market/broker state or operating-host acceptance.",
+        "Per-journal Online Backup is consistent independently; no transaction across journals. Commits during the native call need not appear in its read snapshot; comparison uses the frozen snapshot oracle.",
+        "Native check subset 1/1 reads every pack in this small proof. Whole seven-part/seven-day rotation, daily jitter, fall-back and deadlines are behavioural stdlib tests; operator execution is still required.",
+        "No scheduler or systemd unit installed, enabled or started; the operating-host restart/reboot/missed-run and independent-alert gates remain user decision 2.",
+        "Native Dagu probes use manual start, not scheduler dispatch. Scheduler run_dags:false behavior still needs the future host drill; a succeeded run with skipped research steps cannot count.",
+        "Off-host recovery requires user decision 3: independent destination, key recovery and second-host consumer restore under a chosen/measured recovery-time objective.",
+        "No retention deletion, broker, live credentials/mode, model calls, commit, push or manifest pin move.",
+        "Python 3.11 minimum is source-verified and syntax-checked. Execution used 3.13.15; no separate 3.11 interpreter was exercised.",
+        "robfig/cron v3.0.1 Next program/module were prepared from tagged source, but go run exited 127 because the compiler was not found; expected DST values are not measured results."
+      ],
+      "path": "evidence/receipts/trading-unattended-hosting-recovery-r2-20261005.json"
     }
   ],
   "files": [
@@ -14503,8 +14544,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/README.md",
-      "sha256": "77e0264bdcd7cf1dc700d22236f9f3ba3407b5e5f7a76df1d8883aac64992270",
-      "bytes": 7585
+      "sha256": "c1300c39d810ec4b6dfba2a1a3c5e2ad55c9f7c8695616b88b74784a4f2f6bf2",
+      "bytes": 30811
     },
     {
       "path": "blueprints/us-equities/hosting/backup/README.md",
@@ -14533,23 +14574,93 @@
     },
     {
       "path": "blueprints/us-equities/hosting/config.yaml.example",
-      "sha256": "e411b4c53b531f4c1f44efd0d8c597b5229972bd163f3ba179a29daed4c14d9f",
-      "bytes": 369
+      "sha256": "a8bfd48d297f783c40338eeea473180144e9ddf5a8a6fe6011010dd9e732a24b",
+      "bytes": 691
     },
     {
       "path": "blueprints/us-equities/hosting/dagu-equities.service.example",
-      "sha256": "b7e1814daa569c7b8484f600c13d98956ac3efb6d955e87a768591a38fa7d855",
-      "bytes": 441
+      "sha256": "327f5500f6d02d96508c35a1e512d7adcb2018427067a286b51603bebdd6bd41",
+      "bytes": 863
+    },
+    {
+      "path": "blueprints/us-equities/hosting/drill_local_recovery.py",
+      "sha256": "2ea3cb7d176fbc561e23624d804df346e69df5a5c8ccd10b3485cd86b6a8e015",
+      "bytes": 12362
+    },
+    {
+      "path": "blueprints/us-equities/hosting/drill_process_restart.py",
+      "sha256": "e6f5815515c417a120c356356834c8536201cf584a03383a6580fa34f82e1b7a",
+      "bytes": 9894
     },
     {
       "path": "blueprints/us-equities/hosting/equity-research-evidence.yaml",
-      "sha256": "715f893dc329c40c6db6ffcbe23a308c5696e0ec791e49a4a38adfc627f0886d",
-      "bytes": 770
+      "sha256": "6107eebb77ae8904ff6422b7e86f4c551dde36d35aa5d6e87b8f5d72b0c9397f",
+      "bytes": 2688
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/cron-next-probe-r2.json",
+      "sha256": "d397eb9d53692382de7e345783a8ac0585e3857f1fc6664b50fbf6d86ab5cc02",
+      "bytes": 2076
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/dagu-scheduler-comparison.json",
+      "sha256": "c15ac08f09f324a6c1106f167c21cb013bc6c58fefbb04a3092ec68cc8cf43c7",
+      "bytes": 12307
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/dagu-validation.json",
+      "sha256": "ca499670b89b1dfc19745e1e8e5338196fc03e31a53f53c9dd7fa9bace7feccc",
+      "bytes": 444
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/native-dagu-probes-r2.json",
+      "sha256": "86bf2cd9b2b6b698e4ea2de30d227b4e133a40d5de839e9fac92d821840b5f11",
+      "bytes": 21096
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/native-dagu-probes-r3.json",
+      "sha256": "8119d2a1f7d281ed6309f2a46e552538cfc5250fd0af2d7cdd500a8711b8d43b",
+      "bytes": 3255
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/offline-proof-r2.json",
+      "sha256": "c80b455622e549c21e3a0df78ce300c0722182f529bcdae09ddf5ce5c25637b1",
+      "bytes": 10789
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/offline-proof-r3.json",
+      "sha256": "1fb0eebddd33c15c880af008606301364bb62044a123492b86da96af00e83684",
+      "bytes": 11577
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/offline-proof.json",
+      "sha256": "1d2aea2c11578aab27fb20d6d549241cd9b0c1b7b709c9f5081025ff612a7ce4",
+      "bytes": 10383
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/upstream-glue-review-r2.json",
+      "sha256": "2f8c7896b7277264801fc4b701375c612574619a2b96190202396fb52b00e2e7",
+      "bytes": 15859
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/upstream-glue-review-r3.json",
+      "sha256": "79237a01bbe3d7c6997409e910894664aa0a41e8d36240689259e92a9673b5d2",
+      "bytes": 2790
+    },
+    {
+      "path": "blueprints/us-equities/hosting/journal_recovery.py",
+      "sha256": "f90884e465634a7cbe741e53233294192fc64de5ded499b9337aeb187c1a112b",
+      "bytes": 23753
     },
     {
       "path": "blueprints/us-equities/hosting/receipt.json",
       "sha256": "a7311c35dfb25d6c8f5212435095c1bbc91cde407490a9d61bf895cd1fe9f6cc",
       "bytes": 4873
+    },
+    {
+      "path": "blueprints/us-equities/hosting/session_day.py",
+      "sha256": "73969582e6a675f894b681769eb8a99c1a142babb1dd81a5c2a4b377a9272e96",
+      "bytes": 3220
     },
     {
       "path": "blueprints/us-equities/identity-readiness/README.md",
@@ -16615,6 +16726,11 @@
       "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",
       "sha256": "1389de18bbaf5c41d8f22093a9642d982230a851f954183b7c8254e0b5890bce",
       "bytes": 18701
+    },
+    {
+      "path": "docs/decisions/2026-10-05-trading-unattended-hosting-recovery.md",
+      "sha256": "c70bfb7988b18a56bf6aa56f4384270dd7ac638f66492ef5e37dddf1596f5a3c",
+      "bytes": 27568
     },
     {
       "path": "docs/direct-results.md",
@@ -51797,6 +51913,21 @@
       "bytes": 6386
     },
     {
+      "path": "evidence/receipts/trading-unattended-hosting-recovery-20261005.json",
+      "sha256": "5162c8dfc2fa3ea8112589fe6f34ed9be7d403f0812a91c2334ee13b69f1a171",
+      "bytes": 9674
+    },
+    {
+      "path": "evidence/receipts/trading-unattended-hosting-recovery-r2-20261005.json",
+      "sha256": "46bcef63ef1ab2542f6c056da0bdd91c949f94e68e76881c690f0732196191c7",
+      "bytes": 30998
+    },
+    {
+      "path": "evidence/receipts/trading-unattended-hosting-recovery-r3-20261005.json",
+      "sha256": "4cb50ba3c449da96f241b5ed6b0c7aa51c71e98cce094ef73a319e15b45767c7",
+      "bytes": 16209
+    },
+    {
       "path": "evidence/receipts/ultracode-token-routing-20260921.json",
       "sha256": "fcb3b15c9f4657f00b92a6c493b33b851136d416e0dbc0f37a8b67360bdedbcf",
       "bytes": 3204
@@ -54035,6 +54166,11 @@
       "path": "tests/test_upstream_surface_watch.py",
       "sha256": "e60c417abd190f598a9ba1f248a1ea94ced9d1b2e13b265fd494266a9d427bca",
       "bytes": 121324
+    },
+    {
+      "path": "tests/test_us_equities_hosting.py",
+      "sha256": "39bc789787ae09e87dfa288b9fbda8ae9de4f309541708194fe3e98b4c90cac4",
+      "bytes": 48594
     },
     {
       "path": "tests/test_validate.py",
