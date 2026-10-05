@@ -4658,13 +4658,13 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "dff00cd461f6ad9f687c09e6ad8ed0f1f0d78f58d357c2a97906b10f74375f79",
-      "bytes": 255344
+      "sha256": "8be6b5bb2981843c3beca082169211fb0bd7071abf0e5abccdc9f31632152841",
+      "bytes": 254949
     },
     {
       "path": "adoption/new-wsl-profile.md",
-      "sha256": "c5a2e353ce280a20df4d37b6bc77acb6d482303e0094f79e688aea3f4bb5914e",
-      "bytes": 24326
+      "sha256": "97d9e6c805216dc15e0b7a0d315635f7e6f21855bc353a5bc0d9b3692359cb6b",
+      "bytes": 24089
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
@@ -4738,8 +4738,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "93b5b0ec3aba25ce978bc936c31d807cbc9824c99ba004c87f574770c1292517",
-      "bytes": 92809
+      "sha256": "c496b08e4b26cd1f29b2057109028b341dc72ab17229e15f6502f57e3aa1ec53",
+      "bytes": 91920
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -16609,8 +16609,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-codex-rtk-hook-qualified.md",
-      "sha256": "998b2fa725652d923d5a5715e0371093770ad8f1876ed94bdafb87abf2de5db4",
-      "bytes": 38315
+      "sha256": "0c37639806c5f419632b1ad30aba2de2e94602aea638f9006b5cfae3bb422373",
+      "bytes": 13573
     },
     {
       "path": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
@@ -16949,13 +16949,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "5d34aedc608ad0fa04a2fedb181fc620941a0ac53c6035cf4d9132eddaeef5ad",
-      "bytes": 652707
+      "sha256": "97360d359377f9eedbbc9c580e3080038b326eab09fba6a2e627d8401e97041e",
+      "bytes": 651950
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "08028f9ffa3d922c420b550d30d46f89c774ec75e175ee338c90b4bbbf91223f",
-      "bytes": 354511
+      "sha256": "b72ec0299a300da82d9f35bc7ed98658bd167c9ee156a5ef5a7466f59e277149",
+      "bytes": 354116
     },
     {
       "path": "docs/next-host-stages.md",
@@ -17049,8 +17049,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "172d1d75458d9af2c24f1a1f63615fbaa34dc6abaf9428c58d6cacee3ec58b95",
-      "bytes": 592422
+      "sha256": "0cf61d527319aa065dcf74da19b78214c527005cd2a5f4bf73b5b7c0dcfceda6",
+      "bytes": 591301
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -17069,8 +17069,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "f19bdc04bc36499e5577b9490dc2505ee565dea65cbb214ca8eb445123edf3e1",
-      "bytes": 97518
+      "sha256": "b575df47e58969314bee2bcaed100c46b14151953000ab1112a9b9324f75c415",
+      "bytes": 96219
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -38259,8 +38259,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "5b238422132df5b2f4921c59afc99a5527f282dad67a86940c6d679a90767fbb",
-      "bytes": 200284
+      "sha256": "9982349afc6b914a5fc5a6a085f3b343f49a9d3bb863bf5d949c1deb3b32752e",
+      "bytes": 199933
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -39009,7 +39009,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "d593fc292242207f6b8f6c50519936bc68727fdfac3136b09c1504698b697d19",
+      "sha256": "30669b9f6f5ef26003a1e9f32cfb6ebdf998c199a1db4bcf18557079e40a2551",
       "bytes": 5760
     },
     {
@@ -39019,8 +39019,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "f273e751f9b238661933cb8c6ce21a0820a8a1751ef6fe45abe218efc7bbe3b9",
-      "bytes": 64205
+      "sha256": "4dce18ca28abfbba66de7c34fbcf5555b859894bc4aae7a133cfedd91adf76cb",
+      "bytes": 64110
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
@@ -39034,8 +39034,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "afe48fafb16a6db5c65b0dc19589e5a8a715aab016e867d23e6ac08871388c63",
-      "bytes": 130117
+      "sha256": "719c3386ff4e4edda10dbe3d23e7599d097b0a27dee92c061d92ebc438a26d79",
+      "bytes": 127896
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
@@ -39299,13 +39299,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "ba11776ca4f73ea475ac1b04b1894953c3dc2be789a4ba6676f63ad5d4b9bdd0",
-      "bytes": 318166
+      "sha256": "44b2175638441c59b6fe3a46c6c5e5ce1d72fa5b8393dccd769cb82b2aad22a3",
+      "bytes": 313874
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "138aa5cd1e172abefd6bc5c1d46db75d85133caec73db42a184691ef780ac0e0",
-      "bytes": 103681
+      "sha256": "b1707542184300681cce017aa3f383552d4b9ae8d3d3c06e222f8a4d5784ec3c",
+      "bytes": 102158
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",
@@ -39369,8 +39369,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "f0faa52e4c9350ad3d01d63dabfddc7ccab0aadcae55796b27573fdafd32c13d",
-      "bytes": 110214
+      "sha256": "53b5dc9c43c6e40d5e9bb62c8cf9967ba61388ab1b9b2c13f77d3eaafe38b892",
+      "bytes": 109862
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/copy-notes.json",
@@ -49019,28 +49019,13 @@
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/README.md",
-      "sha256": "3a55c99b2c80a4f5f841aa9b2edc86c8e0d7be14c1a47445c89a8c687ab0a4a7",
-      "bytes": 17488
-    },
-    {
-      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/check_rtk_rewrite_heads.py",
-      "sha256": "1cf410d8f8f8a877803447e72b1364f2cdf8a4aed58e8c3ad3d22a238b15b643",
-      "bytes": 16865
+      "sha256": "7beb441d44383fb44b2c34937fcee17e92bc0000b845dbc77da3268fa9501e54",
+      "bytes": 11469
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/codex_hook_qual.py",
       "sha256": "fb2a2426a6564567a8276c74c2d6ada73e95643017d9536e8c3dd85a6f7fbe4f",
       "bytes": 11503
-    },
-    {
-      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/derive_rtk_rewrite_heads.py",
-      "sha256": "483fed3920d2dbdf1c3b9d5a68e075054b878c9ee6da323c37369a51d0bbbc12",
-      "bytes": 15530
-    },
-    {
-      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/fixtures/hcom-deny.rules",
-      "sha256": "ac6254ee9bb7ac20deca69bb03bead76dacbe4e53a41cbc563a8b3614fa6a6aa",
-      "bytes": 2939
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/fresh_session_e2e.sh",
@@ -49053,24 +49038,14 @@
       "bytes": 4148
     },
     {
-      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/plan-row-scratch-run.json",
-      "sha256": "af5ec5e1f284e3015303add555342e3d1ad8eb3f145343e09321c778a29ef0e7",
-      "bytes": 60746
-    },
-    {
-      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/plan_row_scratch_run.py",
-      "sha256": "3e6709b1761617877c43d4e0d7f1e485761df5e1047b19ac477a4965ff2e9245",
-      "bytes": 31302
-    },
-    {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/receipt.json",
       "sha256": "b59c4fbf9c320f00f41952c08fe796ff9349452e1eeb9b9f8a426d21d84d4571",
       "bytes": 10065
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-behaviour-probe.json",
-      "sha256": "2049db24c36958c77a93b89cc52625400daaa825ab4db5f20d37e659bd73fe9d",
-      "bytes": 24278
+      "sha256": "838b32e26270edfa137a8d825bc7430f3ed86e6054806c28deba33f3918b12dc",
+      "bytes": 11574
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-init-codex-probe.json",
@@ -49078,34 +49053,14 @@
       "bytes": 14351
     },
     {
-      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-rewrite-heads-check.json",
-      "sha256": "2be061a74036d26fb21e356e9a356de8ee1940441890bdb3ed24350cf41fd82b",
-      "bytes": 22361
-    },
-    {
-      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-rewrite-heads.json",
-      "sha256": "64e533671bc636c98d9381b4fb03e8b9f9781aa32cc8a02c1ec91e4ac053c894",
-      "bytes": 22141
-    },
-    {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk_behaviour_probe.py",
-      "sha256": "2c2b1081f59542559bfd9bca29462f13790a12d060b53138dc757888bc74e936",
-      "bytes": 10417
+      "sha256": "ee46570dfc9960ed0f05e90c7c2df1fcdbb6a8b1874f8dc7a417f135ce43a694",
+      "bytes": 8313
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk_init_codex_probe.py",
       "sha256": "e509397908e89bcc901335044890f296526694fcb678495fc71ae9b691e67b3b",
       "bytes": 6479
-    },
-    {
-      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rule-review-mutation-check.txt",
-      "sha256": "090c2f414cda25e75b9fc09457f63d448e70b65b1f2c64db39a984f479907624",
-      "bytes": 4447
-    },
-    {
-      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rule_review_mutation_check.py",
-      "sha256": "1a3d31ce27f5a77c9806bde26bc5019e350674447be571d2de4392412a949d2f",
-      "bytes": 14196
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/trust_readback_race.py",
@@ -53608,11 +53563,6 @@
       "bytes": 39933
     },
     {
-      "path": "tests/test_codex_hook_trust.py",
-      "sha256": "eacd147a8d0cdbabe997cf7b5e596606b289c530db4cb7bd5e56080e6480b096",
-      "bytes": 65954
-    },
-    {
       "path": "tests/test_codex_quota.py",
       "sha256": "c8b3f1a4841201eabc5f9f6b2fa4d75e0cd33373b2e9f96d5ea142d6bde5fbc4",
       "bytes": 17722
@@ -54399,8 +54349,8 @@
     },
     {
       "path": "tests/test_wsl_new_distro_recipe.py",
-      "sha256": "59eb7a60144a227c3fc1465ef825d7843b132008d1a2d3370dab85b32382cca5",
-      "bytes": 220759
+      "sha256": "ed9c76a2b20d967d6caa2a98549667287f9e4072826ad6fa3fdb4721899cbd96",
+      "bytes": 220600
     },
     {
       "path": "tests/test_wsl_restore.py",
@@ -54428,11 +54378,6 @@
       "bytes": 92072
     },
     {
-      "path": "tools/adoption/codex_hook_trust.py",
-      "sha256": "544d1bdd9cd31fa64da98e33ab83c969aba7d27bb636b3fbb8d4bed400a28577",
-      "bytes": 29504
-    },
-    {
       "path": "tools/adoption/codex_roles.py",
       "sha256": "d02975b4d5e7f4e43ab347f18d99a4973a9e262cdad816147e63410c0543feff",
       "bytes": 34229
@@ -54441,11 +54386,6 @@
       "path": "tools/adoption/embed_acceptance.py",
       "sha256": "b567a3ce64d66f0798bd5fc73cf78d8a12074d583177c204d5465050873258b1",
       "bytes": 8209
-    },
-    {
-      "path": "tools/adoption/exec_rules_reviewed.json",
-      "sha256": "7d7ad8ec2f9b52e2508b4e60fc26ff86ab9d5b37572926d35c5a6ae389a97ff9",
-      "bytes": 2706
     },
     {
       "path": "tools/adoption/host-baseline.md",
