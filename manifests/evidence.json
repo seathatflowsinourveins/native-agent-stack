@@ -4418,38 +4418,38 @@
     },
     {
       "path": "adoption/agents/codex/SHA256SUMS",
-      "sha256": "b07d7697f01ed1b1472b727af2d6e77b20a9b2846410b655cd6354a2adca856c",
+      "sha256": "deefd9275da75f242d878a16d8d6b8237e05a1a54a69a1337cdc1095e927ed73",
       "bytes": 174
     },
     {
       "path": "adoption/agents/codex/stack-researcher.toml",
-      "sha256": "48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77",
-      "bytes": 7223
+      "sha256": "22f13371e0e7848086206de8765884047f66de763744c16f17324f1f522a8ac0",
+      "bytes": 7227
     },
     {
       "path": "adoption/agents/codex/stack-verifier.toml",
-      "sha256": "18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b",
-      "bytes": 6685
+      "sha256": "1c56b9a49591432d08ca1e860f116ff5f17a8361a22b722af9e9a92f74d63d06",
+      "bytes": 6689
     },
     {
       "path": "adoption/agents/codex/workers/SHA256SUMS",
-      "sha256": "e5d75d7e7e6a68ac6460e4b447221c2fc254feb532f570661d7d95b1ba3064d2",
+      "sha256": "32e75fbd6d1ae9c9466a4acdb01416afdcc8fd212b21bfda0f5310fa6d02bca4",
       "bytes": 275
     },
     {
       "path": "adoption/agents/codex/workers/evidence-reviewer.toml",
-      "sha256": "91ed272d63ff5a7271be87550488ad1bff99bde09bd1a699332fdd3f41b06a6c",
-      "bytes": 6148
+      "sha256": "78407604e0c31b85a66725ea2c128819c2efe291a49e6b61d9194b510e7ad284",
+      "bytes": 6159
     },
     {
       "path": "adoption/agents/codex/workers/isolated-builder.toml",
-      "sha256": "7c46a4cd994764101f2864e590fe71c8dfa8e3b78242f1a793eaac1d5af091d9",
-      "bytes": 6656
+      "sha256": "b699cab2688fa0e9dd056415f21f618ed4f95372948a376b88ecc473cabdae83",
+      "bytes": 6667
     },
     {
       "path": "adoption/agents/codex/workers/semantic-evidence-reviewer.toml",
-      "sha256": "5a2a28e12b6fa1a894fd45afa572f54bd7546408c40b2446c417d493d622ebae",
-      "bytes": 6250
+      "sha256": "8c2a7483ce0b3c9836012f7ece55919402089dd9b8b3dfc81971a179bef34faa",
+      "bytes": 6261
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -4688,8 +4688,8 @@
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "bc2ba57618b771c63fae870fbc8906a1f247d421d7645960d7e0c1992b7df459",
-      "bytes": 8180
+      "sha256": "532e3d6374bd7a986c3c020fe95631413d89b10f2232d580b3d4e4d17f5cf454",
+      "bytes": 8191
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -16309,8 +16309,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "ac6d9270b9af2e01cfea6c323996eafaa2cf4f77c184e29cacb72a8806fd1a72",
-      "bytes": 128176
+      "sha256": "0d6b3a41548ba556e42ebec0c574781849cdb842f7cef948a36d8fb965a85d7b",
+      "bytes": 130132
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -16426,6 +16426,11 @@
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
       "sha256": "635fb536fb82377c4f1dd8d1acefe73d4fa6cc9298ce578164c372142ac36a8a",
       "bytes": 16799
+    },
+    {
+      "path": "docs/decisions/2026-10-04-rtk-051-f4-exceptions.md",
+      "sha256": "f48b4059d0ea9dc0baafad36a2b1a9830ace272653b2d644ca31772d27165598",
+      "bytes": 15918
     },
     {
       "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",
@@ -16564,8 +16569,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "5ea6aab2571aa0f7d4077666473271cd89e46440b60134606415214818803b7a",
-      "bytes": 184183
+      "sha256": "f73f9ce93962672b8c93ccf26041760ea8f5f2447826a05340fd4bcc1204fd45",
+      "bytes": 185944
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -44023,6 +44028,21 @@
       "bytes": 3721
     },
     {
+      "path": "evidence/artifacts/rtk-f4-remeasurement-20261004/hook-and-prefix-probe.json",
+      "sha256": "d5251099fa4a0d42b13e988e3b16aa66a45ab0d36a13521e1f9ee55834368789",
+      "bytes": 30800
+    },
+    {
+      "path": "evidence/artifacts/rtk-f4-remeasurement-20261004/rtk-behaviour-probe.json",
+      "sha256": "3d7b5a0e527113a7e3ef13413dd35d5e15b3913ba8e87c96dcca6ee7888713e4",
+      "bytes": 11041
+    },
+    {
+      "path": "evidence/artifacts/rtk-f4-remeasurement-20261004/scratch-supplement.json",
+      "sha256": "840cb31e2fe3e596e0f358a7cdd1e11de241e218f3cf0209b95a39f3ebfeae15",
+      "bytes": 182211
+    },
+    {
       "path": "evidence/artifacts/rtk-native-git256-20261002/receipt.json",
       "sha256": "3746287baeda32c343247eb8f87ecc3b79b6605dfe564f31c2a85ca1f714368a",
       "bytes": 29878
@@ -51364,33 +51384,33 @@
     },
     {
       "path": "examples/codex-native/README.md",
-      "sha256": "071881280df5d12a7826ec4e1c162529f8f037027c45b01cfc9ed37a847c2ee3",
-      "bytes": 24461
+      "sha256": "794b6526da93715bd2d51c8295c553a28aaa30c968f394d8179cb7362b12b0d6",
+      "bytes": 28107
     },
     {
       "path": "examples/codex-native/agents/evidence-reviewer.toml",
-      "sha256": "b1f528c65c6f6004b2371e4dd4caf92fb19c0d7d6dbef782ea38fd6003b6a122",
-      "bytes": 3127
+      "sha256": "6f03dccd40eeb33cca796c0597a61db6552ae063112f385a16967e6f1c8bb746",
+      "bytes": 3138
     },
     {
       "path": "examples/codex-native/agents/isolated-builder.toml",
-      "sha256": "548b1b6aed15f8947d9441259678ebae5ac0f34c0113a27ce76c146821c2dee4",
-      "bytes": 3183
+      "sha256": "698ab336c9e9f1f0205228b0d5c07c6c35e69c4488caf49cafab40b5bc8a7fd1",
+      "bytes": 3194
     },
     {
       "path": "examples/codex-native/agents/semantic-evidence-reviewer.toml",
-      "sha256": "74e43905022e58fb6a2c3ce65f5e43212573f2e2dcd5026bf0dea41d14b1b1b8",
-      "bytes": 4786
+      "sha256": "ab0b6c86f09c4310bcc4cd98c062b742c9267d198a52af9ef5e2054a13be6692",
+      "bytes": 4797
     },
     {
       "path": "examples/codex-native/agents/stack-researcher.toml",
-      "sha256": "48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77",
-      "bytes": 7223
+      "sha256": "22f13371e0e7848086206de8765884047f66de763744c16f17324f1f522a8ac0",
+      "bytes": 7227
     },
     {
       "path": "examples/codex-native/agents/stack-verifier.toml",
-      "sha256": "18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b",
-      "bytes": 6685
+      "sha256": "1c56b9a49591432d08ca1e860f116ff5f17a8361a22b722af9e9a92f74d63d06",
+      "bytes": 6689
     },
     {
       "path": "examples/codex-native/config.agents.toml.example",
@@ -51954,8 +51974,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "5ce6c88fac8855b5c8138f6fa553073580f990ea3dd853a17b760a41e60ca9fa",
-      "bytes": 128045
+      "sha256": "f742f6d05650e9a866a96924d266ebc2f7761636e3a91fbc502528d7d22bac70",
+      "bytes": 130262
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -52609,8 +52629,8 @@
     },
     {
       "path": "tests/test_codex_agents.py",
-      "sha256": "bbeb41fee103f03db2cc3f2f9ca22a182b53b4304997297b8ff1c16cb26b7d76",
-      "bytes": 39933
+      "sha256": "78c37a358631c63c8a2e0b842b438a74db9f5b519ee3c5b5666169adf2dbc1b4",
+      "bytes": 39915
     },
     {
       "path": "tests/test_codex_quota.py",
@@ -52619,13 +52639,13 @@
     },
     {
       "path": "tests/test_codex_roles.py",
-      "sha256": "0cbc0a490d3e42223cb4442d53196bc5c6e9447c1180143f3c581b1b0c20fb03",
-      "bytes": 33199
+      "sha256": "c322690e7d358aa77065b4d7f09400f0db71bdc20b80ee1b4797ad57bb17f4ff",
+      "bytes": 33204
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "9ebe2cb3ae7a1ae9c404790567b5ada507f5f968f7db8d17b5077fe5235cf241",
-      "bytes": 189921
+      "sha256": "1c908cc88a01e8f454d222d3b477566da575f99f7bba452c64090b0c4293b322",
+      "bytes": 190873
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -53399,8 +53419,8 @@
     },
     {
       "path": "tools/adoption/codex_roles.py",
-      "sha256": "d02975b4d5e7f4e43ab347f18d99a4973a9e262cdad816147e63410c0543feff",
-      "bytes": 34229
+      "sha256": "b32ff615c5a48b452a95fb370de6a79ae49698963419ad6608cf00459426d7c8",
+      "bytes": 34215
     },
     {
       "path": "tools/adoption/embed_acceptance.py",
