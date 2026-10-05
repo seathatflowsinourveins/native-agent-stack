@@ -15434,12 +15434,12 @@
     },
     {
       "path": "catalogs/foundation/decisions.json",
-      "sha256": "d5afd1a1853fe06a27d6f067df36ed137739cfa37f2ecd7c4b2eeccdfa29dada",
-      "bytes": 162252
+      "sha256": "89091ead1eecd0cf5f030f75ef721fe750b34023705f770539923180b7e87163",
+      "bytes": 140288
     },
     {
       "path": "catalogs/foundation/manifest.json",
-      "sha256": "73e50e3f06434610120baa20f92e6e7187cbb11fdbfb5d451b5e240f980da464",
+      "sha256": "5a72d2cd395bdef2dbc807e6172c9526256f2784aa0dcb7acbfcefeda4061f6f",
       "bytes": 29964
     },
     {
@@ -16421,11 +16421,6 @@
       "path": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
       "sha256": "d091a1021eff71b11bf409b7896577566713788ecbf33e8f8c629e4d45ad26e1",
       "bytes": 15230
-    },
-    {
-      "path": "docs/decisions/2026-10-04-interactive-shell-and-unix-tools.md",
-      "sha256": "186ee547e7de784c06a12e82c5b3ff13f8360b8f0bc04a7e8a61e191df82a747",
-      "bytes": 23194
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
