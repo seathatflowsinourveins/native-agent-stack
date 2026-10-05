@@ -16423,11 +16423,6 @@
       "bytes": 15230
     },
     {
-      "path": "docs/decisions/2026-10-04-host-baseline-recorder.md",
-      "sha256": "9ec0ed885882abeb88fd76834bcef849b6dc30d7f133db77f96517328d380407",
-      "bytes": 10762
-    },
-    {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
       "sha256": "635fb536fb82377c4f1dd8d1acefe73d4fa6cc9298ce578164c372142ac36a8a",
       "bytes": 16799
@@ -32796,31 +32791,6 @@
       "path": "evidence/artifacts/hf-memory-models-20260921/native-results.json",
       "sha256": "01263899ad06977b5fc855f9667f2c29bdffd13d2036705485b24bb7095c5e50",
       "bytes": 17286
-    },
-    {
-      "path": "evidence/artifacts/host-baseline-20261004/coreutils-2604-upgrade.json",
-      "sha256": "5869c88fa349ed59bea95887ca5596e0f6f482ba8b8c3cd4ff406342accd6130",
-      "bytes": 597
-    },
-    {
-      "path": "evidence/artifacts/host-baseline-20261004/host-baseline-probe-r0.txt",
-      "sha256": "21f3d8e96d1f4b9d24b7b30f280dba2f44af14135fdd0852468444c25d86bedf",
-      "bytes": 11784
-    },
-    {
-      "path": "evidence/artifacts/host-baseline-20261004/nativestack-2404.json",
-      "sha256": "f12c983de1cafdec4f9ee318fc4ae5ca62492ab23b371f457bbf785d70eb1e7c",
-      "bytes": 13783
-    },
-    {
-      "path": "evidence/artifacts/host-baseline-20261004/nativestack2604.json",
-      "sha256": "a9ef297bef7ad864cee212ca34c30e76e0da7770fd3d746ab344edf2bd2e1b46",
-      "bytes": 11954
-    },
-    {
-      "path": "evidence/artifacts/host-baseline-20261004/stackmeasure2604.json",
-      "sha256": "0d771af61bf75d07cbc6bf428b82652b0d5cd3a030ff3a4e83e28439b5ea66c6",
-      "bytes": 11952
     },
     {
       "path": "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json",
@@ -50663,26 +50633,6 @@
       "bytes": 3678
     },
     {
-      "path": "evidence/receipts/host-baseline-coreutils-2604-upgrade-20261004.json",
-      "sha256": "cf8ae48a69ca7f48b79b01a73dab8711480b64732c8a5936ca2b64e3f487dd06",
-      "bytes": 1537
-    },
-    {
-      "path": "evidence/receipts/host-baseline-nativestack-20261004.json",
-      "sha256": "01b2b216bbecded140bfeb760d10b8894fb0f77436a43fb637b4a5fea61c4384",
-      "bytes": 2282
-    },
-    {
-      "path": "evidence/receipts/host-baseline-nativestack2604-20261004.json",
-      "sha256": "8660a683706a3698b1a9c6ba7788f54c695e1a803d18960680a726ce74e0d5d7",
-      "bytes": 2691
-    },
-    {
-      "path": "evidence/receipts/host-baseline-stackmeasure2604-20261004.json",
-      "sha256": "de417e849f616fd8020fb70cf4823ba882561c16dbfac93be6feb9d9d568db1f",
-      "bytes": 2573
-    },
-    {
       "path": "evidence/receipts/ibkr-readonly-acceptance-20260923.json",
       "sha256": "0d32534357501c011298420c07161c59940929cabd00a9b71d5d7817126f88c9",
       "bytes": 17126
@@ -52848,11 +52798,6 @@
       "bytes": 5155
     },
     {
-      "path": "tests/test_host_baseline_probe.py",
-      "sha256": "69e62ca29d4cbeb2bf603c789020d93989e09c0a44d978b342d7fa87e6cd17ca",
-      "bytes": 13323
-    },
-    {
       "path": "tests/test_host_receipts.py",
       "sha256": "04f54683ee97d99f3383ac1f9989c0aad843562bdc31f890dece4177f114448f",
       "bytes": 144843
@@ -53461,16 +53406,6 @@
       "path": "tools/adoption/embed_acceptance.py",
       "sha256": "b567a3ce64d66f0798bd5fc73cf78d8a12074d583177c204d5465050873258b1",
       "bytes": 8209
-    },
-    {
-      "path": "tools/adoption/host-baseline.md",
-      "sha256": "80c8fafedc81cd1d684ed8d293169247a7aedbd74eb090564c019527055b0605",
-      "bytes": 8593
-    },
-    {
-      "path": "tools/adoption/host_baseline_probe.py",
-      "sha256": "33fb4dd8199cf251b09d92afd50cdef678bd5383411447ea52877d269cb31435",
-      "bytes": 12326
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
