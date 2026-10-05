@@ -4309,22 +4309,6 @@
         "No retention deletion, broker, credentials, live mode, model calls, commit, push or pin move."
       ],
       "path": "evidence/receipts/trading-unattended-hosting-recovery-r3-20261005.json"
-    },
-    {
-      "id": "codex-01592-host-finalization-20260930",
-      "kind": "native_cli_e2e",
-      "component_ids": [
-        "codex"
-      ],
-      "claim": "Current Linux/WSL Codex 0.159.2 package provenance and native scratch config/updater lifecycle qualified at rust-v0.159.2. The installed binary matches the verified native package; production clients were not restarted or killed.",
-      "limitations": [
-        "One Linux/WSL host; second-machine checks explicitly deferred by user.",
-        "Scratch native acceptance is separate from production global rollout and live provider acceptance.",
-        "No unchanged upstream cargo test suite ran; repository tests and scratch client probes are integration checks.",
-        "The invalid-effort fixture was corrected after tagged source and native behavior established forward-compatible ReasoningEffort::Custom support; failed attempts remain in the artifact.",
-        "Active client processes and differing owned profile are guarded; production rollout must use the qualified ownership migration and idle guard."
-      ],
-      "path": "evidence/receipts/codex-01592-host-finalization-20260930.json"
     }
   ],
   "files": [
@@ -16920,11 +16904,6 @@
       "bytes": 135389
     },
     {
-      "path": "docs/decisions/2026-10-05-main-checkout-backup-disposition.md",
-      "sha256": "22839061d0826b5272f5b840f1765e5b175845b25b8f0e3c9a8ce8ccc8dfedba",
-      "bytes": 129176
-    },
-    {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
       "sha256": "976b8e8c3ede42aa2ce26c01dbca5184cf45e329419a065e169bc0936f093051",
       "bytes": 14176
@@ -17076,8 +17055,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "5e1f757ad2cffca40319c32f8c256049bf44cc1c9cf53c4bb31b68a6b1a7e1c5",
-      "bytes": 218355
+      "sha256": "f618b5ffb61efaa89602fa629bffbf8be336fcada47adfeaac9c78bc6cebe3c0",
+      "bytes": 199277
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -18493,21 +18472,6 @@
       "path": "evidence/artifacts/codeql-quality-measure-20260927/triage_verdicts.json",
       "sha256": "1e74f31476c5f582b2708da4a2e829901852edc87c458382acd115302c783cde",
       "bytes": 11808
-    },
-    {
-      "path": "evidence/artifacts/codex-01592-qualification-20260930/profile-command-correction.json",
-      "sha256": "c9f7a5fd4c5bab7ccb7c665a926fc68da63a50aa5f8d9fb2bc5a5b87320b532e",
-      "bytes": 6327
-    },
-    {
-      "path": "evidence/artifacts/codex-01592-qualification-20260930/profile-migration.json",
-      "sha256": "6b53645368ed34655d6c799b661697a95f3d5cc9a5056c21797378388ee74bec",
-      "bytes": 12094
-    },
-    {
-      "path": "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
-      "sha256": "7d634ff5a9195a589923f9be2bf64070fe507bf50b2efc82629150e967ec896e",
-      "bytes": 14536
     },
     {
       "path": "evidence/artifacts/codex-shell-snapshot-cleanup-20260930/listing_diff.py.txt",
@@ -45720,11 +45684,6 @@
       "bytes": 7974
     },
     {
-      "path": "evidence/artifacts/sota-finalization-20260930/convergence.json",
-      "sha256": "e50c03d19cc5057c74a6b49aa5c00063231d8c0e52fbdbc4aa394986ffe4efa4",
-      "bytes": 69769
-    },
-    {
       "path": "evidence/artifacts/sota-finalization-20260930/idle-rollout.json",
       "sha256": "31e18f68af05c84110eda7ea94374285d7e8d7b5571230d7181fa32c9b982b17",
       "bytes": 5301
@@ -51740,11 +51699,6 @@
       "bytes": 21813
     },
     {
-      "path": "evidence/receipts/codex-01592-host-finalization-20260930.json",
-      "sha256": "e55772fb5c5ba894e90fcc26f332e96f3f275d227b033d71ccf81e8babec8f13",
-      "bytes": 1909
-    },
-    {
       "path": "evidence/receipts/codex-01592-qualification-20260930.json",
       "sha256": "fa75848f482708ee6aa64398ffe56cbfe6fdddab3120ccdf73b249e261a268ef",
       "bytes": 41981
@@ -55436,7 +55390,6 @@
     "blueprints/convergence-practice/omniroute-runtime-workers/experiment.json",
     "blueprints/convergence-practice/omniroute-runtime-workers/experiment-sdk-0160-20261003.json",
     "evidence/artifacts/native-runtime-role-resolution-20260930/experiment.json",
-    "evidence/artifacts/suite-parallelism-trial-20261003/experiment.json",
-    "evidence/artifacts/sota-finalization-20260930/convergence.json"
+    "evidence/artifacts/suite-parallelism-trial-20261003/experiment.json"
   ]
 }
