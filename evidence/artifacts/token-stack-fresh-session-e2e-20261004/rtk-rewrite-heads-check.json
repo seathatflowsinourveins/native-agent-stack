@@ -1,0 +1,942 @@
+{
+  "schema": "rtk-rewrite-heads-check/2",
+  "evidence_class": "local_integration: one run, one host, rtk upstream defaults in a scratch HOME",
+  "rtk": "rtk 0.51.0",
+  "fixture_rtk": "rtk 0.51.0",
+  "heads": 142,
+  "positive_controls": {
+    "patterns": 94,
+    "without_a_rewrite": [],
+    "rewritten_without_a_head": [],
+    "rows": [
+      {
+        "line": "src/discover/rules.rs:L61",
+        "tried": 40,
+        "rewritten": 40,
+        "example": "git status x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L76",
+        "tried": 12,
+        "rewritten": 12,
+        "example": "gh pr x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L85",
+        "tried": 12,
+        "rewritten": 12,
+        "example": "glab mr x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L94",
+        "tried": 12,
+        "rewritten": 12,
+        "example": "cargo build x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L104",
+        "tried": 8,
+        "rewritten": 8,
+        "example": "pnpm exec",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L112",
+        "tried": 12,
+        "rewritten": 12,
+        "example": "npm exec x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L120",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "npx x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L128",
+        "tried": 3,
+        "rewritten": 2,
+        "example": "cat x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L135",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "grep x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L144",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "rg x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L153",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "ast-grep x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L167",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "ls x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L176",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "find x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L185",
+        "tried": 26,
+        "rewritten": 26,
+        "example": "tsc x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L209",
+        "tried": 40,
+        "rewritten": 38,
+        "example": "biome x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L260",
+        "tried": 26,
+        "rewritten": 26,
+        "example": "prettier x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L285",
+        "tried": 26,
+        "rewritten": 26,
+        "example": "next build x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L310",
+        "tried": 40,
+        "rewritten": 40,
+        "example": "jest x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L349",
+        "tried": 40,
+        "rewritten": 40,
+        "example": "vitest x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L388",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "ctest x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L396",
+        "tried": 26,
+        "rewritten": 26,
+        "example": "playwright x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L420",
+        "tried": 26,
+        "rewritten": 26,
+        "example": "prisma x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L444",
+        "tried": 18,
+        "rewritten": 18,
+        "example": "docker ps x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L452",
+        "tried": 8,
+        "rewritten": 8,
+        "example": "kubectl get x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L460",
+        "tried": 12,
+        "rewritten": 12,
+        "example": "oc get x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L468",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "tree x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L477",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "diff x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L485",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "curl x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L493",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "wget x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L501",
+        "tried": 6,
+        "rewritten": 6,
+        "example": "mypy x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L510",
+        "tried": 4,
+        "rewritten": 4,
+        "example": "ruff check x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L520",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "sqlfluff lint x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L528",
+        "tried": 4,
+        "rewritten": 4,
+        "example": "pytest x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L537",
+        "tried": 24,
+        "rewritten": 24,
+        "example": "pip list x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L547",
+        "tried": 2,
+        "rewritten": 1,
+        "example": "uv run x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L555",
+        "tried": 6,
+        "rewritten": 6,
+        "example": "go test x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L565",
+        "tried": 4,
+        "rewritten": 4,
+        "example": "golangci-lint run x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L575",
+        "tried": 40,
+        "rewritten": 16,
+        "example": "sbt testOnly x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L584",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "bundle install",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L593",
+        "tried": 24,
+        "rewritten": 10,
+        "example": "rake test x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L609",
+        "tried": 4,
+        "rewritten": 4,
+        "example": "rspec x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L618",
+        "tried": 4,
+        "rewritten": 4,
+        "example": "rubocop x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L628",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "php artisan x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L636",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "php -l x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L643",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "php run-tests.php x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L651",
+        "tried": 24,
+        "rewritten": 24,
+        "example": "phpunit x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L664",
+        "tried": 12,
+        "rewritten": 12,
+        "example": "phpstan analyse",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L674",
+        "tried": 8,
+        "rewritten": 8,
+        "example": "pest x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L683",
+        "tried": 8,
+        "rewritten": 8,
+        "example": "paratest x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L692",
+        "tried": 8,
+        "rewritten": 8,
+        "example": "ecs x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L701",
+        "tried": 8,
+        "rewritten": 8,
+        "example": "pint x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L710",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "aws x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L734",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "psql x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L743",
+        "tried": 9,
+        "rewritten": 9,
+        "example": "bun install",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L762",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "bunx x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L770",
+        "tried": 7,
+        "rewritten": 7,
+        "example": "deno test",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L791",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "ansible-playbook",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L799",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "brew install",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L808",
+        "tried": 3,
+        "rewritten": 3,
+        "example": "composer install",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L817",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "df x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L825",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "dotnet build",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L834",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "du",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L842",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "fail2ban-client",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L849",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "gcloud",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L857",
+        "tried": 40,
+        "rewritten": 40,
+        "example": "./gradlew x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L866",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "hadolint",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L875",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "helm",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L884",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "iptables",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L892",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "make",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L900",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "markdownlint",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L909",
+        "tried": 4,
+        "rewritten": 4,
+        "example": "mix compile x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L918",
+        "tried": 40,
+        "rewritten": 40,
+        "example": "./mvnw compile",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L934",
+        "tried": 28,
+        "rewritten": 28,
+        "example": "mvnd.cmd compile",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L942",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "ping",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L949",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "pio run x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L958",
+        "tried": 3,
+        "rewritten": 3,
+        "example": "poetry install",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L967",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "pre-commit",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L976",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "ps x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L984",
+        "tried": 10,
+        "rewritten": 10,
+        "example": "pulumi preview x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L999",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "quarto render x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L1008",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "rsync",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L1016",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "shellcheck",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L1025",
+        "tried": 4,
+        "rewritten": 4,
+        "example": "shopify theme push x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L1034",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "sops",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L1041",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "swift build",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L1051",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "systemctl status",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L1060",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "terraform plan x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L1069",
+        "tried": 8,
+        "rewritten": 8,
+        "example": "tofu fmt x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L1078",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "trunk build x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L1087",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "uv sync",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L1095",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "yamllint",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L1104",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "wc x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L1112",
+        "tried": 1,
+        "rewritten": 1,
+        "example": "gt x",
+        "rewritten_without_head": []
+      },
+      {
+        "line": "src/discover/rules.rs:L1120",
+        "tried": 2,
+        "rewritten": 2,
+        "example": "liquibase x",
+        "rewritten_without_head": []
+      }
+    ]
+  },
+  "scan": {
+    "names": 1449,
+    "shapes": [
+      "",
+      "x",
+      "status",
+      "run",
+      "test",
+      "build",
+      "install",
+      "-C . push",
+      "--version"
+    ],
+    "commands": 13041,
+    "rewritten": 623,
+    "first_words_rewritten": [
+      "ansible-playbook",
+      "ast-grep",
+      "aws",
+      "biome",
+      "brew",
+      "bun",
+      "bundle",
+      "bunx",
+      "cargo",
+      "cat",
+      "composer",
+      "ctest",
+      "curl",
+      "deno",
+      "df",
+      "diff",
+      "docker",
+      "dotnet",
+      "du",
+      "ecs",
+      "eslint",
+      "fail2ban-client",
+      "find",
+      "gcc",
+      "gcc-13",
+      "gcc-ar",
+      "gcc-ar-13",
+      "gcc-nm",
+      "gcc-nm-13",
+      "gcc-ranlib",
+      "gcc-ranlib-13",
+      "gcloud",
+      "gh",
+      "git",
+      "go",
+      "golangci",
+      "golangci-lint",
+      "gradle",
+      "gradlew",
+      "grep",
+      "gt",
+      "hadolint",
+      "head",
+      "helm",
+      "iptables",
+      "jest",
+      "jq",
+      "liquibase",
+      "ls",
+      "make",
+      "markdownlint",
+      "mvn",
+      "mvnd",
+      "mvnw",
+      "mypy",
+      "next",
+      "npm",
+      "npx",
+      "paratest",
+      "pest",
+      "phpunit",
+      "ping",
+      "pint",
+      "pip",
+      "pip3",
+      "playwright",
+      "pnpm",
+      "poetry",
+      "pre-commit",
+      "prettier",
+      "prisma",
+      "ps",
+      "psql",
+      "pytest",
+      "rails",
+      "rake",
+      "rg",
+      "rspec",
+      "rsync",
+      "rubocop",
+      "sbt",
+      "shellcheck",
+      "sops",
+      "ssh",
+      "stat",
+      "swift",
+      "systemctl",
+      "tree",
+      "trunk",
+      "tsc",
+      "vitest",
+      "wc",
+      "wget",
+      "yamllint"
+    ],
+    "gaps": []
+  },
+  "variants": {
+    "heads": 101,
+    "forms": [
+      "EXE",
+      "abs",
+      "backslash",
+      "bare",
+      "bat",
+      "bin",
+      "capital",
+      "cmd",
+      "dash",
+      "dot",
+      "dotslash_win",
+      "dquote",
+      "exe",
+      "prefix",
+      "ps1",
+      "rel",
+      "slash",
+      "squote",
+      "underscore",
+      "upper",
+      "vendor",
+      "winpath"
+    ],
+    "shapes": [
+      "x",
+      "status",
+      "run x",
+      "-C . push"
+    ],
+    "commands": 8884,
+    "rewritten": 480,
+    "forms_rewritten": [
+      "EXE",
+      "abs",
+      "bare",
+      "bat",
+      "bin",
+      "cmd",
+      "dash",
+      "dot",
+      "dotslash_win",
+      "exe",
+      "ps1",
+      "rel",
+      "slash",
+      "vendor",
+      "winpath"
+    ],
+    "gaps": []
+  },
+  "wrappers": {
+    "prefixes": 67,
+    "rewritten": [
+      "/usr/bin/nice git status",
+      "/usr/bin/time git status",
+      "/usr/bin/timeout 5 git status",
+      "FOO=1 BAR=2 git status",
+      "FOO=1 git status",
+      "builtin git status",
+      "command git status",
+      "docker exec c git status",
+      "env git status",
+      "exec git status",
+      "mise exec -- git status",
+      "nice -n 5 git status",
+      "nice git status",
+      "nocorrect git status",
+      "noglob git status",
+      "nohup git status",
+      "npx git status",
+      "pnpm exec git status",
+      "ssh host git status",
+      "time -p git status",
+      "time git status",
+      "timeout -s KILL 5 git status",
+      "timeout 5 git status",
+      "uv run git status"
+    ],
+    "not_rewritten": [
+      "/usr/bin/env git status",
+      "\\time git status",
+      "asdf exec git status",
+      "bash -c git status",
+      "bundle exec git status",
+      "chroot /x git status",
+      "command -p git status",
+      "conda run git status",
+      "direnv exec . git status",
+      "doas git status",
+      "dotenv run git status",
+      "env -i git status",
+      "eval git status",
+      "gdb --args git status",
+      "hcom run git status",
+      "ionice -c3 git status",
+      "ionice git status",
+      "kubectl exec p -- git status",
+      "ltrace git status",
+      "nix-shell --run git status",
+      "node -e git status",
+      "parallel git status",
+      "pdm run git status",
+      "pipx run git status",
+      "pnpm dlx git status",
+      "poetry run git status",
+      "python -m git status",
+      "python3 -m git status",
+      "rye run git status",
+      "script -q git status",
+      "setsid git status",
+      "sh -c git status",
+      "stdbuf -oL git status",
+      "strace git status",
+      "sudo git status",
+      "unbuffer git status",
+      "uvx git status",
+      "uvx hcom git status",
+      "valgrind git status",
+      "watch git status",
+      "xargs git status",
+      "yarn git status",
+      "zsh -c git status"
+    ],
+    "gaps": []
+  },
+  "counterexamples": {
+    "git -C .": null,
+    "git -C . push origin main": "rtk git -C . push origin main",
+    "git -C /tmp status": "rtk git -C /tmp status",
+    "uv": null,
+    "uv run harmless.py": "rtk uv run harmless.py",
+    "npx": null,
+    "npx prisma migrate deploy": "rtk prisma migrate deploy",
+    "python3 -m pytest -q": "rtk pytest -q",
+    "cat f": "rtk read f",
+    "yadm status": "rtk git status",
+    "uv pip install x": "rtk uv pip install x"
+  },
+  "hcom_commands_rewritten": [],
+  "reviewed_entries": {
+    "entries": [
+      "hcom-deny.rules"
+    ],
+    "sha256": [
+      "ac6254ee9bb7ac20deca69bb03bead76dacbe4e53a41cbc563a8b3614fa6a6aa"
+    ],
+    "first_tokens": [
+      "hcom",
+      "uvx"
+    ],
+    "commands": 352,
+    "rewritten": []
+  },
+  "ok": true
+}

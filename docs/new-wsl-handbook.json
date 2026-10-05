@@ -199,7 +199,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "53b5dc9c43c6e40d5e9bb62c8cf9967ba61388ab1b9b2c13f77d3eaafe38b892"
+          "sha256": "f0faa52e4c9350ad3d01d63dabfddc7ccab0aadcae55796b27573fdafd32c13d"
         },
         "convergence": {
           "file": "convergence.json",
@@ -2352,12 +2352,13 @@
               "install": "the install plan's command-output function: the release archive through the plan's checksum-verified download, extracted into ${ECO_ROOT}/tools/rtk-0.51.0 and linked into ${ECO_ROOT}/bin",
               "open_acceptance_gates": [
                 "${ECO_ROOT}/bin/rtk reports 0.51.0, and rtk git log -3 and rtk proxy git log -3 both return in a checkout",
-                "a Claude Code Bash call to a supported command is rewritten by the hook, and rtk gain --format json reads back the session's counters"
+                "a Claude Code Bash call to a supported command is rewritten by the hook, and rtk gain --format json reads back the session's counters",
+                "a fresh codex exec, told to add no prefix, runs rtk git status with exit 0 (the after_sign_in check of the command-output row)"
               ],
               "outcome": "added_by_owner_decision",
               "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without RTK against the full stack and the lean base), or the fresh-session invocation census, reports that RTK adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
               "pin": "tag v0.51.0; release asset rtk-x86_64-unknown-linux-musl.tar.gz, sha256 5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5 (adoption/pins-linux-x86_64.json; the release's checksums.txt and the GitHub asset digest read 2026-10-04 state the same digest)",
-              "reason": "the owner's order installs the token-efficiency repositories by default; RTK is the first core row of docs/token-efficiency-stack.json (compact supported command outputs, keep failure and raw recovery). Claude Code's Bash hook rewrites supported commands; Codex calls rtk explicitly at this pin",
+              "reason": "the owner's order installs the token-efficiency repositories by default; RTK is the first core row of docs/token-efficiency-stack.json (compact supported command outputs, keep failure and raw recovery). Claude Code's Bash hook rewrites supported commands; Codex's PreToolUse hook rewrites them too from the decision of 2026-10-04 (it was explicit rtk commands at the 0.50.0 pin)",
               "sources": [
                 "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
                 "docs/token-efficiency-stack.json (rows[component_id=rtk].upstream_commands)",
@@ -2369,7 +2370,7 @@
               ],
               "usage_rules": [
                 "the pin follows main 14048b840 after PR #693: v0.51.0 requires --shell for executable positional scripts that need shell expansion; the plan uses direct git/proxy arguments and hook-check inspection strings",
-                "retain explicit rtk commands for Codex; this plan never runs rtk init --global --codex (docs/token-session-handbook.md:397)",
+                "Codex calls rtk through its PreToolUse hook: the plan's command-output row runs rtk init -g --codex and then codex_hook_trust.py --apply (the decision of 2026-10-04, docs/decisions/2026-10-04-codex-rtk-hook-qualified.md; rtk-ai/rtk v0.51.0 README.md L133)",
                 "RTK_TELEMETRY_DISABLED=1 in both clients; rtk proxy returns the raw output when a condensed result is unusable"
               ]
             },
@@ -7537,11 +7538,11 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "4a86d142e1a629f6c806a036cce46ac4298b595d48d57505b1bd3cd852cb41f2"
+      "sha256": "e6a511845790939ebf48d514e5414bcaf1c791975c6a49de9ddb3a40d4718a2f"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "c496b08e4b26cd1f29b2057109028b341dc72ab17229e15f6502f57e3aa1ec53"
+      "sha256": "93b5b0ec3aba25ce978bc936c31d807cbc9824c99ba004c87f574770c1292517"
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
@@ -7657,7 +7658,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "9982349afc6b914a5fc5a6a085f3b343f49a9d3bb863bf5d949c1deb3b32752e"
+      "sha256": "5b238422132df5b2f4921c59afc99a5527f282dad67a86940c6d679a90767fbb"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -7681,7 +7682,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "53b5dc9c43c6e40d5e9bb62c8cf9967ba61388ab1b9b2c13f77d3eaafe38b892"
+      "sha256": "f0faa52e4c9350ad3d01d63dabfddc7ccab0aadcae55796b27573fdafd32c13d"
     }
   ],
   "stage_order": [
@@ -9435,7 +9436,7 @@
         "prerequisites": [
           "tar and sha256sum."
         ],
-        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. This replaces the UNRUN cargo build of the tagged source: the release binary is the asset the recorded sha256 identifies. The Claude Code hook and its exclude_commands are the client configuration's; rtk init --global --codex is never run at 0.51.0.",
+        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. This replaces the UNRUN cargo build of the tagged source: the release binary is the asset the recorded sha256 identifies. The Claude Code hook and its exclude_commands are the client configuration's. The install plan's command-output row also runs rtk init -g --codex (the Codex PreToolUse hook, RTK.md and an inert @RTK.md pointer line in the Codex AGENTS.md; upstream: rtk-ai/rtk v0.51.0 README.md L133 (rtk init -g --codex)) and then tools/adoption/codex_hook_trust.py --command \"rtk hook codex\" --apply, which trusts that one hook at its current hash, on the decision of 2026-10-04 (docs/decisions/2026-10-04-codex-rtk-hook-qualified.md).",
         "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/14048b840425c2569e0df60a6596e94e601da15b/recipes/README.md#L41"
       },
       "name": "RTK",
