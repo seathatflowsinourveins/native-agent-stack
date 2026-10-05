@@ -16915,6 +16915,11 @@
       "bytes": 22253
     },
     {
+      "path": "docs/decisions/2026-10-05-codex-profile-drift-check.md",
+      "sha256": "7854ddafca2912b5d755a3aaadff9f7154537a633199eb3452214e24694e8218",
+      "bytes": 5882
+    },
+    {
       "path": "docs/decisions/2026-10-05-dagu-mise-pin-move.md",
       "sha256": "c1eaaffe72e840c7655e05a44e71116174dc1701675d2e08730ba54a8c9a6e87",
       "bytes": 135389
@@ -18513,6 +18518,11 @@
       "path": "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
       "sha256": "7d634ff5a9195a589923f9be2bf64070fe507bf50b2efc82629150e967ec896e",
       "bytes": 14536
+    },
+    {
+      "path": "evidence/artifacts/codex-profile-drift-check-20261005/receipt.json",
+      "sha256": "1bac7eb84eec5b3be8fc93e5761f588f71bc08ae3ea5b376cd1afca52d3a8f0f",
+      "bytes": 8686
     },
     {
       "path": "evidence/artifacts/codex-shell-snapshot-cleanup-20260930/listing_diff.py.txt",
@@ -54511,8 +54521,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "fc53272498f2f2222cc604cfcd485935ad20c4896fff4fc415774fb8bb78ed0f",
-      "bytes": 282444
+      "sha256": "90343ceae3671225da08525df23546a95798bfcad76e92ec12277d4c9ebbb015",
+      "bytes": 288202
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -54986,8 +54996,8 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "ae8f67fd2ed4028998bbf7524dc758491ba98c2b9c2b6ed82312c50b9faa4127",
-      "bytes": 153006
+      "sha256": "1c4ca8ec7ee0068b4713599f743bb884891fae0db939c47e8b44f9596de082bd",
+      "bytes": 156613
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
