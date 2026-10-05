@@ -486,11 +486,22 @@ metadata hashes and uses a new completion marker shared with acceptance.
 
 The original **25/25 summary is pre-relock evidence** at EdgarTools 5.58.0 and
 its original lock hash; every measured receipt field remains unchanged. The
-NativeStack2604 install/offline rerun on the final 5.60.0 lock is pending and
-gets a separate receipt. The supplied native SEC acceptance at 5.60.0 remains
-separate and valid; catalog selections and gate status do not change here.
+NativeStack2604 install/offline rerun on the final 5.60.0 lock is now recorded
+in [native-trading-runtime-2604-rerun-d02c0827-20261005](../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json):
+install PASS and 25/25 offline acceptance PASS at `d02c0827`, lock
+`4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2`,
+on **2026-10-05, 01:00:17Z–01:01:07Z**, through `mise exec uv@0.12.17`.
+This dated follow-up resolves the rerun and target-host mise verification
+pending in the earlier preparation sections. Independent review remains
+pending. The supplied native SEC acceptance at 5.60.0 remains separate and
+valid; catalog selections and gate status do not change here.
 Python 3.12.3 versus 3.13 ratification and the earlier independent-receipt-review
 qualification remain open.
+
+The rerun receipt scopes `native_proven` to the unchanged `nautilus_quickstart`
+row and `local_integration` to the other 24 destination-host rows. Its per-row
+status lines remain private on the host; a sanitized row artifact is requested
+from the operator. The outer summary is retained without inventing row data.
 
 Resume after storage interruption: the coordinator removed the earlier scratch
 state. The four completed proof results and output were already recorded, and

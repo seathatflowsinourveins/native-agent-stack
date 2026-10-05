@@ -166,6 +166,8 @@ The current `data-edgartools` entry selects
 records one GET answered 200 with zero retries, 371 index rows and five matching
 selected CIK/accession rows on NativeStack, CPython 3.12.3. Earlier 5.58.0
 receipts remain historical. The separate offline document/index fixture results
-qualify local parsing only. NativeStack2604 installation and offline acceptance
-at 5.60.0 are pending a host rerun; point-in-time data and strategy gates remain
-unchanged.
+qualify local parsing only. The separate
+[NativeStack2604 rerun receipt](../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json)
+records installation PASS and 25/25 offline acceptance at 5.60.0 on the final
+lock, at `d02c0827` on 2026-10-05, 01:00:17Z–01:01:07Z. Independent review
+remains pending; point-in-time data and strategy gates remain unchanged.

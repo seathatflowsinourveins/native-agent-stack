@@ -79,14 +79,12 @@
  "output": {
   "private_original": "<private>/sec-5600/native-network-5600.json",
   "private_original_mode": "0600",
-  "private_original_sha256": "ec8120ed887b4621449624d470787e709692fbe980a5308434e40cafa60c14dc",
-  "private_original_bytes": 2145,
   "private_content_check": "read in full before copying: no email address, host path or contact text; the only identity-derived field is identity_sha256",
   "withheld_fields": [
    "identity_sha256"
   ],
-  "committed_copy_sha256": "c8bca5515b2c7e7e8c966a7ec6aa2e26af89ab293c870c6e3acc74bb8346dcba",
-  "committed_copy_note": "native_output below is the private output with identity_sha256 removed, serialized as native_edgar.py writes it (indent 2, sorted keys); committed_copy_sha256 is over that serialization",
+  "committed_copy_sha256": "e87326142c10bbf17ffbbd7854706de338b42c11f53fcab0824e805ee434aa09",
+  "committed_copy_note": "native_output below is the private output with identity_sha256 removed, serialized as native_edgar.py writes it (catalyst.py json_bytes: indent 2, sorted keys, trailing newline); committed_copy_sha256 is over that serialization",
   "native_output": {
    "automatic_retries": 0,
    "cohort_count": 371,
@@ -151,6 +149,7 @@
    ],
    "started_at": "2026-10-04T22:29:40.417432Z",
    "status": "complete"
-  }
+  },
+  "private_original_note": "the private original's own sha256 and byte count are not published: with every other field committed, they would let a guessed contact be confirmed exactly as the withheld identity_sha256 would"
  }
 }

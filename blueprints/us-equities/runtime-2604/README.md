@@ -11,8 +11,10 @@ No paper or broker execution occurred.
 
 The current bundle selects **EdgarTools 5.60.0**, matching the catalog after
 [native SEC index acceptance on NativeStack](../catalyst-provenance/native-network-edgartools-5600-20261004.json).
-NativeStack2604's own installation and 25 offline checks at this pin are **pending
-the command center's rerun**, which must receive a separate receipt. The existing
+NativeStack2604's own installation and **25/25 offline checks passed** at this
+pin on **2026-10-05, 01:00:17Z–01:01:07Z**, at commit `d02c0827` on the final
+lock below. The [rerun receipt](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json)
+records this separate execution; independent review remains pending. The earlier
 receipt continues to describe its 5.58.0 execution.
 
 The current lock SHA256 is
@@ -29,9 +31,11 @@ fails as expected. The affected recipe tests and dependency check pass.
 
 The packaging worker has native uv 0.12.17 but no Linux mise executable. The
 requested mise relock route exits 127 here; resolution and `uv lock --check`
-succeed with that native binary and the identical settings below. Verification
-through mise remains pending. The target-host invocation still uses mise and
-the installer still enforces uv 0.12.17. No shim or host-guard bypass is used.
+succeed with that native binary and the identical settings below. The
+[destination-host rerun](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json)
+records successful installation and offline acceptance through
+`mise exec uv@0.12.17`. Independent review remains pending. The installer still
+enforces uv 0.12.17; no shim or host-guard bypass is used.
 
 This recipe serves the US-equities research and historical-simulation north star:
 [NautilusTrader 2.0.0rc5](../../../catalogs/us-equities/runtime-target.json), its
@@ -108,9 +112,11 @@ Python 3.12.3, prerelease `if-necessary`, the PyPI default index and
 
 [tests.test_trading_2604_lock](../../../tests/test_trading_2604_lock.py) checks the
 pyproject/manifest agreement, the backend version and exact archive hashes, and
-the single-sdist census. Planted fixtures reject a second source build, a
-different backend version, missing hashes and a differing manifest. The virtual
-project entry has no distribution archive and is excluded from that census.
+the census of packages without any wheel. Planted fixtures reject a second
+package without any wheel, a different backend version, missing hashes and a
+differing manifest. The virtual project entry has no distribution archive and
+is excluded from that census. This test does not check target-compatible wheel
+coverage under Linux markers.
 
 [sync-trading-2604.sh](sync-trading-2604.sh) defines the sole host/CI argument
 vector and its Python/uv/cutoff pins. The installer verifies its SHA256 before
@@ -130,7 +136,10 @@ controls remove the valid alternative archive hash; retaining that alternative
 can legitimately succeed. A fresh resolution exercises the backend download,
 while the locked-sync control preserves runtime archive hashes. These are local
 integration and structural checks. The earlier 25/25 summary is **pre-relock
-evidence**; NativeStack2604's rerun on this final lock requires its own receipt.
+evidence**; NativeStack2604's rerun on this final lock is recorded in its
+[separate receipt](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json),
+with installation and 25/25 offline checks passing. Independent review remains
+pending.
 The final completion marker also differs from the prior bundles.
 
 ## Pinned sources
@@ -253,8 +262,10 @@ characters. That local fixture evidence is distinct from
 the latter records one HTTP 200, zero retries, 371 index rows and five matching
 selected CIK/accession rows on NativeStack with CPython 3.12.3. Together with the
 directed move, it supersedes the 5.59.1 overturn item and moves `data-edgartools`
-to 5.60.0. It does not qualify broader data, strategy or broker gates, or replace
-the pending NativeStack2604 rerun.
+to 5.60.0. It does not qualify broader data, strategy or broker gates. The
+[separate NativeStack2604 rerun](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json)
+records installation and 25/25 offline acceptance at this pin on the final lock;
+independent review remains pending.
 
 ## Open qualification
 

@@ -1547,7 +1547,7 @@
         "https://github.com/dgunning/edgartools/releases/tag/v5.60.0",
         "https://pypi.org/pypi/edgartools/5.60.0/json"
       ],
-      "freshness": "Native SEC acceptance recorded 2026-10-04 at 5.60.0: one HTTP 200, zero retries, 371 index rows and five matching selected CIK/accessions, on NativeStack with CPython 3.12.3. The accepted 42-package freeze is requirements.lock; earlier 5.58.0 evidence remains historical. NativeStack2604 locked-runtime install/offline acceptance is pending."
+      "freshness": "Native SEC acceptance recorded 2026-10-04 at 5.60.0: one HTTP 200, zero retries, 371 index rows and five matching selected CIK/accessions, on NativeStack with CPython 3.12.3. The accepted 42-package blueprints/us-equities/catalyst-provenance/requirements.lock is a name==version freeze, not hash-locked; earlier 5.58.0 evidence remains historical. NativeStack2604 locked-runtime installation PASS and 25/25 offline acceptance are recorded in native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json), at d02c0827 on lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z, through mise exec uv@0.12.17; independent review pending."
     },
     {
       "id": "exchange-calendars",

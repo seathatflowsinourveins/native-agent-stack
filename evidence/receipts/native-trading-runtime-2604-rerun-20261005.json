@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "id": "native-trading-runtime-2604-rerun-d02c0827-20261005",
-  "kind": "host-run-receipt",
+  "kind": "native_cli_e2e",
   "claim": "On NativeStack2604, PR #703's own install-trading-2604.sh and accept-trading-2604.sh ran at head d02c0827 against its final lock: install PASS; acceptance 25/25 PASS, 0 FAIL, 0 BLOCKED.",
   "host": "NativeStack2604",
   "pr": 703,
@@ -28,10 +28,40 @@
       "quantconnect/lean image already present at its pinned digest"
     ]
   },
-  "evidence_class": "native_proven (actual execution on the destination host)",
+  "evidence_class": "local_integration",
   "limitations": [
     "Per-check logs stay private on the host; this receipt carries the outer status lines only.",
-    "One run; no unchanged upstream test suite was run."
+    "One run; no unchanged upstream test suite was run.",
+    "Per-row status lines remain private on the host. A sanitized artifact of the actual row statuses is requested from the operator; no row data is reconstructed in this receipt.",
+    "native_proven applies only to the unchanged nautilus_quickstart row; the other 24 rows are local_integration on the destination host. The aggregate 25/25 result does not promote those rows to upstream acceptance.",
+    "Independent review remains pending; the retained outer summary is not independent observation of the per-row results.",
+    "This recorded execution qualifies the offline runtime on NativeStack2604 only; it is not paper, broker, live-trading, SEC network or point-in-time data acceptance."
   ],
-  "operator": "Claude coordinator (wsl-architecture-design lane)"
+  "operator": "Claude coordinator (wsl-architecture-design lane)",
+  "component_ids": [
+    "alpaca-py",
+    "duckdb",
+    "edgartools",
+    "exchange-calendars",
+    "nautilus-trader",
+    "pandas",
+    "skfolio"
+  ],
+  "evidence_class_scope": {
+    "native_proven": {
+      "check_names": [
+        "nautilus_quickstart"
+      ],
+      "row_count": 1,
+      "scope": "Only the unchanged pinned NautilusTrader quickstart executed natively on NativeStack2604, using synthetic EUR/USD bars."
+    },
+    "local_integration": {
+      "row_count": 24,
+      "scope": "All other acceptance rows executed on the destination host by the local harness; not unchanged upstream tests or whole-component qualification."
+    }
+  },
+  "operator_followup": {
+    "status": "pending",
+    "request": "Supply a sanitized artifact containing the actual per-row status lines from this rerun for independent review."
+  }
 }

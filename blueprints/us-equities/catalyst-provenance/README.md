@@ -18,9 +18,11 @@ at 5,218 characters. This is local offline-fixture evidence.
 
 [Earlier access resolution](access-resolution.md), the daily-index compatibility
 fix and the initial failure receipts below retain their original dates, versions
-and scope. The NativeStack2604 runtime
-[install and offline acceptance](../runtime-2604/README.md) at 5.60.0 remain
-pending a separate host rerun and receipt.
+and scope. The separate
+[NativeStack2604 rerun receipt](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json)
+records installation PASS and 25/25 offline acceptance at 5.60.0 on the final
+lock, at `d02c0827` on 2026-10-05, 01:00:17Z–01:01:07Z. Independent review
+remains pending.
 
 ## Initial wave
 

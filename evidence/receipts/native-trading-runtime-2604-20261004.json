@@ -460,5 +460,6 @@
       "Native uv 0.12.17 was used because mise is unavailable to this worker, as explicitly authorized for round c. The host installation route remains mise.",
       "Completed build proof results were retained before the coordinator removed scratch state after a storage interruption. Unchanged proof inputs were verified on resume; no additional full cold-cache runtime sync was run. Fresh targeted tests pass; their small scratch environments were removed after recording."
     ]
-  }
+  },
+  "superseded_note_20261005": "2026-10-05: The EdgarTools 5.60.0 move, supported by native SEC acceptance native-sec-edgartools-5600-20261004, supersedes the historical sentence that the 5.59.1 overturn comparison remains open and delivered EdgarTools stays at catalog 5.58.0. NativeStack2604 installation PASS and 25/25 offline acceptance on the final 5.60.0 lock are recorded in native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json), at d02c0827 on lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z, through mise exec uv@0.12.17. This also supersedes the earlier bundle follow-up notes describing the rerun and destination-host mise verification as pending; independent review remains pending. The recorded 2026-10-04 measurements, limitations and 5.58.0 runtime remain historical."
 }

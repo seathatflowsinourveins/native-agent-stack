@@ -247,7 +247,7 @@
       "receipt_id": "native-sec-edgartools-5600-20261004",
       "evidence_ref": "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json",
       "historical_2604_run_edgartools": "5.58.0",
-      "native_stack_2604_rerun": "pending; install and offline acceptance at 5.60.0 require a separate receipt",
+      "native_stack_2604_rerun": "recorded: native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json); install PASS and 25/25 offline acceptance at d02c0827 on final lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z, through mise exec uv@0.12.17; independent review pending",
       "scope": "Bounded SEC index acceptance on NativeStack; no strategy, point-in-time data, paper or broker gate changes."
     }
   }
