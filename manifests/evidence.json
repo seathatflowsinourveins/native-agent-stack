@@ -4220,7 +4220,7 @@
         "All 23 tracked YAML DAGs were validated unchanged: 16 passed, including all four current DAGs; seven archived fixtures failed with entrypoint document must not define name. Verified Dagu 2.16.6 rejects the same seven, so these failures are retained pre-existing evidence.",
         "The start-all smoke uses an empty owned DAG directory and no scheduled/job/model execution. Its coordinator is enabled as the repository template and upstream default require; shutdown logged one not registered service-registry update error while the native process returned 0 and both owned listeners closed.",
         "Upstream make test and mise unit/E2E suites, installed-client route activation, real job retry/SIGKILL/reboot recovery and production data downgrade were not run.",
-        "No published advisory found applies to the selected versions; historical advisories exist, including one affecting old mise 2026.9.18. Dagu has no tag CHANGELOG. Release notes contain migration-relevant #2784, #2776 and #2858 storage changes; a 2604 existing-home rollback must restore a pre-upgrade DAGU_HOME plus the prior binary/unit/environment together. The trading stack stays held at 2.16.6.",
+        "No published advisory found applies to the selected versions; historical advisories exist, including one affecting old mise 2026.9.18. Dagu has no tag CHANGELOG. Release notes contain migration-relevant #2784, #2776 and #2858 storage changes; conditional rollback for a generic existing-home upgrade requires a pre-upgrade DAGU_HOME copy and restores that copy plus the prior binary/unit/environment together. NativeStack2604 is already on 2.18.2 with no pre-upgrade copy, so its rollback is re-provisioning. See [Command center correction and NativeStack2604 state](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9e6ab1c8948d9c94f7a034f4ae27c63bbab9a7f7/docs/decisions/2026-10-05-dagu-mise-pin-move.md#command-center-correction-and-nativestack2604-state-2026-10-05-r2b). The trading stack stays held at 2.16.6.",
         "Version output and checksum matching do not prove the full integration, deployed host, source-build reproducibility, dependency-tree security or model quality."
       ],
       "path": "evidence/receipts/dagu-mise-pin-qualification-20261005.json"
@@ -4675,8 +4675,8 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "d2fffba6a1b7afc8baa5050d9180c53170402d06eae72dbfe9dd1c45fe6eb4b4",
-      "bytes": 255712
+      "sha256": "4a86d142e1a629f6c806a036cce46ac4298b595d48d57505b1bd3cd852cb41f2",
+      "bytes": 255958
     },
     {
       "path": "adoption/new-wsl-profile.md",
@@ -10351,8 +10351,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "8fee91c76e58b3bbeff1ee2bd367cebab085cf6dfc08eb94de9693e5e54a9a54",
-      "bytes": 485256
+      "sha256": "1b1e73fb375bca9983d8e6227637b0d03070d2114a2d21e5832617bf9325f62f",
+      "bytes": 485120
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -16691,8 +16691,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-dagu-mise-pin-move.md",
-      "sha256": "c56910b3514bbd02d19ed6bc21915bc8a02de86823ac2ffc3752544bfa3246d8",
-      "bytes": 134478
+      "sha256": "ebdfe7f631960c6eebf403e79d5d8be94013713790dda1dc9380e1d3accac807",
+      "bytes": 134932
     },
     {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
@@ -16971,13 +16971,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "4ba9696007ff70dbbb3b5b77e3106f1faf70232cf28ceb40d96a9a4ea0d3feaa",
-      "bytes": 652539
+      "sha256": "3a900090ef89ff7f9c77610feedede73fc084f6442582119aaefb4fe0d16be27",
+      "bytes": 652785
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "84fa9a08d3bb401423bb25924082c3c6ea855fb98e0501760fd580f2c5e70700",
-      "bytes": 354563
+      "sha256": "b9d88fb6d21704da1d89d7fde3f07fcbbb278af18206103285ca369204912aad",
+      "bytes": 354809
     },
     {
       "path": "docs/next-host-stages.md",
@@ -39031,8 +39031,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "8df4285b2e7fa32c35d2039ca5aa000a8d0cf2f7ef1234ec8f6de19a5fedde65",
-      "bytes": 7750
+      "sha256": "aa6329ccd178facde3e2c34b5b6e6eacdfcfa74d1596cfbff2fda5759de7d9e7",
+      "bytes": 9625
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -39046,8 +39046,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "2ee1882765ce703487719ed61272678f77faee2c2c10b6e94df23f2fdeec0306",
-      "bytes": 143818
+      "sha256": "3bdea3300edade0d89cf4a3ca89170e81d4f494f5b15c3431860fbcb4d1476ba",
+      "bytes": 144115
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -39321,8 +39321,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "768521a96754e38d481fc11b6812383b048da2009186bda8372da748a018074a",
-      "bytes": 314344
+      "sha256": "2407724b609d15ef7272642468527ad91c9b817746f6e63b6c31e773f5d91bbc",
+      "bytes": 314658
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -51431,8 +51431,8 @@
     },
     {
       "path": "evidence/receipts/dagu-mise-pin-qualification-20261005.json",
-      "sha256": "85f6ffffce124c829507e88620444f50859be4680167871241669051cb30882b",
-      "bytes": 74959
+      "sha256": "27f02ff8261683b2889e72ac01fc24d5ea8d293fb35fc509038ddfd88dc50e49",
+      "bytes": 75391
     },
     {
       "path": "evidence/receipts/dashboard-gap-resolution-20260921.json",
@@ -52626,8 +52626,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "e8652d354ea09c1294b7da88091dc2e00bc440b15d13ca14dc39e7143a913b2f",
-      "bytes": 102371
+      "sha256": "71224507e37ecac0125c8b81a5a46044632fa4a0d0b7ca7fad248ce130fb5238",
+      "bytes": 102331
     },
     {
       "path": "observability/README.md",
