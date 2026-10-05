@@ -1466,6 +1466,36 @@ def external_triggers(baseline: dict | None, staleness: dict | None, freshness: 
                 for key, _ in layers:
                     triggers.setdefault(key, []).append(
                         {"trigger": trigger, "ref": f"receipt_staleness:{row.get('platform_id')}/{row.get('component_id')}"})
+        # Reuse existing reopen categories. An organic observation is not a sweep
+        # or acceptance receipt; this report only tells the next real sweep what
+        # needs rechecking, including the client-dependent comparison boundary.
+        organic_flags = {
+            "organic_tool_version_changed": "pin_moved",
+            "organic_client_version_changed": "comparison_changed",
+            "organic_landscape_reopened": "comparison_changed",
+            "organic_context_changed": "comparison_changed",
+            "organic_age_limit": "stale_receipt",
+        }
+        for row in staleness.get("organic_use") or []:
+            if row.get("saturation_trigger_active") is False:
+                continue
+            selected = {key for key, _ in mapping.get(row.get("component_id"), [])}
+            for flag in row.get("flags") or []:
+                trigger = organic_flags.get(flag)
+                if trigger is None:
+                    continue
+                for layer_ref in row.get("layer_ids") or []:
+                    key = tuple(layer_ref.split("/", 1))
+                    if key not in selected:
+                        notes.append(f"organic flag {flag} on {row.get('component_id')} is informational "
+                                     f"outside the baseline selection in {layer_ref}")
+                        continue
+                    triggers.setdefault(key, []).append({
+                        "trigger": trigger,
+                        "ref": f"organic_use:{row.get('block_ref', row.get('receipt_ref'))}:"
+                               f"{row.get('component_id')}/{(row.get('client') or {}).get('id')}/"
+                               f"{row.get('arm')}/{flag}",
+                    })
     if freshness is not None and baseline is not None:
         fresh = component_layers(freshness)
         for component_id, placements in fresh.items():

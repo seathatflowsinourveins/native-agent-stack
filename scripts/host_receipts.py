@@ -333,7 +333,17 @@ def schema_nodes(schema):
         yield from schema_nodes(items)
 
 
-def _schema_type_ok(instance, type_name: str) -> bool:
+def _schema_type_ok(instance, type_name: str | list[str]) -> bool:
+    # JSON Schema 2020-12 permits an array of distinct type names and the null type.
+    # https://json-schema.org/draft/2020-12/json-schema-validation#section-6.1.1
+    # Reuse the same shape checks for optional receipt projections.
+    if isinstance(type_name, list):
+        names = {"object", "array", "string", "integer", "number", "boolean", "null"}
+        return (bool(type_name) and all(isinstance(name, str) and name in names for name in type_name)
+                and len(set(type_name)) == len(type_name)
+                and any(_schema_type_ok(instance, name) for name in type_name))
+    if type_name == "null":
+        return instance is None
     if type_name == "object":
         return isinstance(instance, dict)
     if type_name == "array":
@@ -346,7 +356,7 @@ def _schema_type_ok(instance, type_name: str) -> bool:
         return isinstance(instance, (int, float)) and not isinstance(instance, bool)
     if type_name == "boolean":
         return isinstance(instance, bool)
-    return True  # pragma: no cover - every type used in the schema is listed above
+    return False
 
 
 def _json_equal(a, b) -> bool:

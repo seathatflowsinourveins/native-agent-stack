@@ -24,6 +24,13 @@ The [upstream-surface baseline](foundation/upstream-surface-baseline.json) and [
 
 Both catalogs reference shared component pins, upstream source reviews and scoped execution receipts. General engineering does not inherit broker prerequisites. Trading work reuses the foundation and adds data, strategy, risk and broker-specific acceptance.
 
+The proposed [organic-use record format](../docs/decisions/2026-10-05-organic-use-catalog-records.md)
+retains client/arm observations in registered receipts and the generated
+[component evidence matrix](landscape/component-evidence-matrix.json). Pending
+pilot metrics stay unknown. Freshness and saturation reports surface tool/client
+version changes, landscape reopens and an explicit age limit for later rechecks;
+these observations do not change readiness or upstream acceptance.
+
 Both follow the [upstream acceptance evidence policy](../docs/acceptance-evidence-policy.md): research and reuse supported upstream skills, examples, tests and automation; retain actual native results and independent observations. Our integration tests and synthetic fixtures remain explicitly scoped.
 
 The [GitHub automation handbook](../docs/github-automation.md) defines check and

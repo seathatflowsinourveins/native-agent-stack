@@ -53,8 +53,10 @@ from pathlib import Path
 
 try:
     from . import host_receipts
+    from . import organic_use
 except ImportError:  # running as a plain script, not a package
     import host_receipts
+    import organic_use
 
 
 DEFAULT_MAX_AGE_DAYS = 30
@@ -190,6 +192,97 @@ def unbound_reason(entry: dict, pins: list[str]) -> str:
     return "pin_moved"
 
 
+def assess_organic(root: Path, now: datetime, client_versions: dict | None = None,
+                   client_contexts: dict | None = None) -> list[dict]:
+    """Report registered organic observations separately from host acceptance.
+
+    Default client comparisons use declared catalog versions, not live host
+    discovery. An owner can supply a current version without changing host config.
+    A changed landscape hash alone is not a reopen: retain actual later ledger
+    reopen records for the observation's layers. This writes no sweep.
+    """
+    records = organic_use.load_records(root)
+    if not records:
+        return []
+    stack = json.loads((root / "manifests/stack.json").read_text())
+    versions = {item["id"]: item.get("version") for item in stack.get("components", [])}
+    ledger = json.loads((root / "catalogs/saturation/ledger.json").read_text())
+    overrides = client_versions or {}
+    contexts = client_contexts or {}
+    rows = []
+    for record in records:
+        client_id = record["client"]["id"]
+        client_version = overrides.get(client_id, versions.get(client_id))
+        sweeps = ledger.get("sweeps", [])
+        baseline_index = next((index for index, sweep in enumerate(sweeps)
+                               if sweep.get("sweep_id") == record["recheck"]["sweep_id"]), None)
+        reopens = [sweep["sweep_id"] for sweep in sweeps[baseline_index + 1:]
+                   if any(f"{layer.get('catalog')}/{layer.get('layer_id')}" in record["layer_ids"]
+                          and layer.get("reopen") for layer in sweep.get("layers", []))] if baseline_index is not None else []
+        context_keys = ("mode", "model", "effective_effort", "effective_tier", "route", "config_sha256")
+        # Arm, runtime mode and treatment identities can differ within a client.
+        # Supply current context for an exact observation block, never pool it.
+        current_context = contexts.get(record["block_ref"], {})
+        unknown_context = [f"client_{key}" for key in context_keys
+                           if current_context.get(key) is None or record["client"].get(key) is None]
+        flags = organic_use.recheck(record, versions.get(record["component_id"]),
+                                    client_version, now, landscape_reopened=bool(reopens))
+        if any(current_context.get(key) is not None and record["client"].get(key) is not None
+               and current_context[key] != record["client"][key] for key in context_keys):
+            flags.append("organic_context_changed")
+        not_checked = (["tool_pin"] if record["component_pin"] is None
+                       or versions.get(record["component_id"]) is None else []) \
+                      + (["client_version"] if client_version is None else []) \
+                      + (["landscape_sweep"] if baseline_index is None else []) + unknown_context
+        rows.append({
+            "component_id": record["component_id"], "platform_id": record["platform_id"],
+            "layer_ids": record["layer_ids"], "client": record["client"], "arm": record["arm"],
+            "receipt_ref": record["receipt_ref"], "observed_at_utc": record["observed_at_utc"],
+            "block_ref": record["block_ref"], "receipt_sha256": record["receipt_sha256"],
+            "state": record["state"], "verdict": record["verdict"],
+            "current_tool_pin": versions.get(record["component_id"]),
+            "current_tool_pin_source": "declared_catalog",
+            "current_client_version": client_version,
+            "client_version_source": "owner_supplied" if client_id in overrides else "declared_catalog",
+            "current_client_context": {key: current_context.get(key) for key in context_keys},
+            "current_client_context_source": "owner_supplied" if current_context else "not_supplied",
+            "max_age_days": record["recheck"]["max_age_days"], "landscape_reopen_sweeps": reopens,
+            "not_checked": not_checked, "flags": flags,
+            "binding_status": "requires_recheck" if flags else "unknown" if not_checked else "current",
+            "saturation_trigger_active": True,
+        })
+    by_ref = {record["block_ref"]: (record, row) for record, row in zip(records, rows)}
+    for old_ref, (old, old_row) in by_ref.items():
+        previous = old
+        visited = {old_ref}
+        while True:
+            successors = [record for record in records
+                          if (record.get("supersedes") or {}).get("ref") == previous["block_ref"]]
+            if len(successors) != 1:
+                break  # forks and incomplete successors do not discharge a current recheck
+            new = successors[0]
+            if new["block_ref"] in visited:
+                break
+            visited.add(new["block_ref"])
+            same_scope = all(previous[key] == new[key] for key in
+                             ("component_id", "platform_id", "arm", "task_scope", "layer_ids")) \
+                         and previous["client"]["id"] == new["client"]["id"] \
+                         and previous["client"].get("mode") == new["client"].get("mode")
+            reviewed = new["stage"] == "qualification" and new["state"] == "complete" \
+                       and new["verdict"] in ("READY", "NOT-READY", "EXCLUDED") \
+                       and new["qualification"]["status"] == "complete" \
+                       and new["review"]["status"] == "reviewed" \
+                       and new["adjudication"]["status"] == "adjudicated"
+            if not (same_scope and reviewed and new["supersedes"]["sha256"] == previous["receipt_sha256"]):
+                break
+            if by_ref[new["block_ref"]][1]["binding_status"] == "current":
+                old_row["saturation_trigger_active"] = False
+                old_row["discharged_by"] = new["block_ref"]
+                break
+            previous = new  # a unique reviewed chain can reach a later current leaf
+    return rows
+
+
 def render_text(report: dict) -> str:
     lines = [f"Receipt staleness at {report['generated_at_utc']} (window {report['max_age_days']} days): "
              f"{len(report['rows'])} component x platform bucket(s), {report['flagged']} flagged."]
@@ -209,6 +302,11 @@ def render_text(report: dict) -> str:
             lines.append(f"    re-record at the current pin: {', '.join(row['pin_moved_hosts'])}")
         for entry in row["unbound"]:
             lines.append(f"    unbound: {entry['path']} (version {entry['component_version']}, {entry['reason']})")
+    for row in report.get("organic_use", []):
+        flags = ", ".join(row["flags"]) or "no known recheck trigger"
+        lines.append(f"organic {row['component_id']} / {row['client']['id']} / {row['arm']}: "
+                     f"{row['state']}; {flags}; client comparison {row['client_version_source']}; "
+                     f"not checked: {', '.join(row['not_checked']) or 'none'}; {row['receipt_ref']}")
     return "\n".join(lines)
 
 
@@ -218,11 +316,19 @@ def main(argv=None) -> int:
     parser.add_argument("--max-age-days", type=int, default=DEFAULT_MAX_AGE_DAYS,
                         help=f"flag a latest bound receipt older than this (default {DEFAULT_MAX_AGE_DAYS})")
     parser.add_argument("--now", help="evaluate ages at this UTC time (YYYY-MM-DDTHH:MM:SSZ); default: the clock")
+    parser.add_argument("--client-version", action="append", default=[], metavar="ID=VERSION",
+                        help="owner-supplied current client version for organic rechecks; default: catalog version")
     parser.add_argument("--json", action="store_true", help="print JSON instead of text")
     parser.add_argument("--out", type=Path, help="also write the printed report to this file (outside the checkout)")
     args = parser.parse_args(argv)
     if args.max_age_days < 0:
         parser.error("--max-age-days must be zero or more")
+    client_versions = {}
+    for value in args.client_version:
+        identifier, separator, version = value.partition("=")
+        if not separator or not identifier or not version or identifier in client_versions:
+            parser.error("--client-version needs a unique nonempty ID=VERSION")
+        client_versions[identifier] = version
     root = args.root.resolve()
     out = args.out.resolve() if args.out is not None else None
     if out is not None and (out == root or root in out.parents):
@@ -233,11 +339,14 @@ def main(argv=None) -> int:
         parser.error(str(error))
     try:
         summary = host_receipts.build_summary(root)
+        organic_rows = assess_organic(root, now, client_versions)
     except (OSError, ValueError) as error:
         print(json.dumps({"status": "error", "error": str(error)}))
         return 2
     report = assess(summary, lambda component_id: current_pins(root, component_id), now, args.max_age_days,
                     host_receipts.winner_stack_aliases(root), host_receipts.grandfathered_alias_paths(root))
+    if organic_rows:
+        report["organic_use"] = organic_rows
     text = json.dumps(report, indent=1, sort_keys=True) if args.json else render_text(report)
     print(text)
     if out is not None:

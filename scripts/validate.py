@@ -17,7 +17,6 @@ import subprocess
 import zlib
 from pathlib import Path, PurePosixPath
 
-
 RECEIPT_KINDS = {
     "native_model_e2e", "native_cli_e2e", "artifact_measurement",
     "historical_inventory", "upstream_provenance", "compatibility_attempt",
@@ -459,6 +458,21 @@ class Validator:
                 for key in ("id", "kind", "component_ids", "claim", "limitations"):
                     if detail.get(key) != receipt.get(key):
                         self.error(f"{label}: payload {key} differs from manifest")
+                data = detail.get("data")
+                if isinstance(data, dict) and "organic_use" in data:
+                    # Privacy-only readers load this module by file path without
+                    # its package. Optional receipt validation needs the helper;
+                    # loading PRIVATE_CONTENT alone must keep its existing API.
+                    try:
+                        from . import organic_use
+                    except ImportError:
+                        import organic_use
+                    if kind != "historical_inventory":
+                        self.error(f"{label}: organic-use observations require historical_inventory")
+                    for error in organic_use.validate_payload(
+                            data["organic_use"], component_ids=set(components),
+                            receipt_component_ids=set(component_ids), schema=organic_use._schema(self.root)):
+                        self.error(f"{label}: {error}")
 
         model_ids = set()
         for model in self.sequence(stack.get("models", []), "models"):

@@ -409,5 +409,129 @@ class ReceiptReadingWorkflowsCheckOutFullHistory(unittest.TestCase):
             self.assertIn("fetch-depth: 0", path.read_text(encoding="utf-8"), path.name)
 
 
+class OrganicRecheckReportTests(unittest.TestCase):
+    def _record(self):
+        return {"component_id": "widget", "component_pin": "1.0", "layer_ids": ["foundation/code-navigation"],
+                "platform_id": "linux-wsl2-x86_64", "client": {"id": "codex", "version": "0.160.0"},
+                "arm": "native", "state": "pending", "verdict": None,
+                "stage": "pilot", "supersedes": None, "task_scope": "bounded code task",
+                "block_ref": "evidence/receipts/organic.json#/data/organic_use/records/0", "receipt_sha256": "a" * 64,
+                "receipt_ref": "evidence/receipts/organic.json", "observed_at_utc": "2026-10-01T00:00:00Z",
+                "recheck": {"tool_pin": "1.0", "client_version": "0.160.0", "max_age_days": 30,
+                            "sweep_id": "baseline", "sweep_date_utc": "2026-10-01T00:00:00Z"}}
+
+    def _root(self, root, sweeps):
+        (root / "manifests").mkdir()
+        (root / "catalogs/saturation").mkdir(parents=True)
+        (root / "manifests/stack.json").write_text(json.dumps({"components": [
+            {"id": "widget", "version": "1.0"}, {"id": "codex", "version": "0.160.0"}]}))
+        (root / "catalogs/saturation/ledger.json").write_text(json.dumps({"sweeps": sweeps}))
+
+    def test_same_day_later_scoped_reopen_is_reported_without_writing_ledger(self):
+        sweeps = [{"sweep_id": "baseline", "date": "2026-10-01", "layers": []},
+                  {"sweep_id": "later", "date": "2026-10-01", "layers": [{
+                      "catalog": "foundation", "layer_id": "code-navigation",
+                      "reopen": [{"trigger": "comparison_changed", "ref": "measured comparison"}]}]}]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self._root(root, sweeps)
+            before = (root / "catalogs/saturation/ledger.json").read_bytes()
+            with mock.patch.object(rs.organic_use, "load_records", return_value=[self._record()]):
+                [row] = rs.assess_organic(root, NOW_DT)
+            self.assertIn("organic_landscape_reopened", row["flags"])
+            self.assertEqual(row["landscape_reopen_sweeps"], ["later"])
+            self.assertEqual((root / "catalogs/saturation/ledger.json").read_bytes(), before)
+
+    def test_owner_supplied_client_change_and_observation_age_are_separate_signals(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self._root(root, [{"sweep_id": "baseline", "layers": []}])
+            later = datetime(2026, 11, 2, tzinfo=timezone.utc)
+            with mock.patch.object(rs.organic_use, "load_records", return_value=[self._record()]):
+                [row] = rs.assess_organic(root, later, {"codex": "0.161.0"})
+            self.assertEqual(row["client_version_source"], "owner_supplied")
+            self.assertCountEqual(row["flags"], ["organic_client_version_changed", "organic_age_limit"])
+
+    def test_missing_sweep_and_unverified_tool_pin_remain_not_checked(self):
+        record = self._record()
+        record["component_pin"] = record["recheck"]["tool_pin"] = None
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self._root(root, [{"sweep_id": "unrelated", "layers": []}])
+            with mock.patch.object(rs.organic_use, "load_records", return_value=[record]):
+                [row] = rs.assess_organic(root, NOW_DT)
+            self.assertTrue({"tool_pin", "landscape_sweep", "client_model", "client_config_sha256"}
+                            <= set(row["not_checked"]))
+            self.assertNotIn("organic_tool_version_changed", row["flags"])
+
+    def test_only_scoped_reviewed_current_successor_discharges_its_predecessor(self):
+        old = self._record()
+        old["client"].update({"mode": "headless", "model": "test-model", "effective_effort": "max",
+                              "effective_tier": "test-tier", "route": "test-route", "config_sha256": "c" * 64})
+        new = copy.deepcopy(old)
+        new.update({"stage": "qualification", "state": "complete", "observed_at_utc": "2026-11-02T00:00:00Z",
+                    "verdict": "READY",
+                    "block_ref": "evidence/receipts/new.json#/data/organic_use/records/0", "receipt_sha256": "b" * 64,
+                    "supersedes": {"ref": old["block_ref"], "sha256": old["receipt_sha256"]},
+                    "qualification": {"status": "complete"}, "review": {"status": "reviewed"},
+                    "adjudication": {"status": "adjudicated"}})
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self._root(root, [{"sweep_id": "baseline", "layers": []}])
+            now = datetime(2026, 11, 2, tzinfo=timezone.utc)
+            def assess(records):
+                with mock.patch.object(rs.organic_use, "load_records", return_value=records):
+                    return rs.assess_organic(root, now, client_contexts={
+                        record["block_ref"]: old["client"] for record in records})
+            [old_row, new_row] = assess([old, new])
+            self.assertIn("organic_age_limit", old_row["flags"])
+            self.assertFalse(old_row["saturation_trigger_active"])
+            self.assertEqual(old_row["discharged_by"], new["block_ref"])
+            self.assertEqual(new_row["binding_status"], "current")
+            middle = copy.deepcopy(new)
+            middle["observed_at_utc"] = "2026-10-02T00:00:00Z"
+            leaf = copy.deepcopy(new)
+            leaf["block_ref"] = "evidence/receipts/leaf.json#/data/organic_use/records/0"
+            leaf["supersedes"] = {"ref": middle["block_ref"], "sha256": middle["receipt_sha256"]}
+            chain = assess([old, middle, leaf])
+            self.assertFalse(chain[0]["saturation_trigger_active"])
+            self.assertFalse(chain[1]["saturation_trigger_active"])
+            self.assertEqual(chain[0]["discharged_by"], leaf["block_ref"])
+            pending = copy.deepcopy(new)
+            pending["review"]["status"] = "pending"
+            self.assertTrue(assess([old, pending])[0]["saturation_trigger_active"])
+            unknown_verdict = copy.deepcopy(new)
+            unknown_verdict["verdict"] = None
+            self.assertTrue(assess([old, unknown_verdict])[0]["saturation_trigger_active"])
+            fork = copy.deepcopy(new)
+            fork["block_ref"] = "evidence/receipts/fork.json#/data/organic_use/records/0"
+            self.assertTrue(assess([old, new, fork])[0]["saturation_trigger_active"])
+            unknown_context = copy.deepcopy(new)
+            unknown_context["client"]["config_sha256"] = None
+            self.assertTrue(assess([old, unknown_context])[0]["saturation_trigger_active"])
+            (root / "manifests/stack.json").write_text(json.dumps({"components": [
+                {"id": "codex", "version": "0.160.0"}]}))
+            [unknown_tool] = assess([new])
+            self.assertIn("tool_pin", unknown_tool["not_checked"])
+            self.assertEqual(unknown_tool["binding_status"], "unknown")
+
+    def test_current_context_does_not_leak_between_native_and_env_cells(self):
+        native = self._record()
+        native["client"].update({"mode": "headless", "model": "test-model", "effective_effort": "max",
+                                 "effective_tier": "test-tier", "route": "test-route", "config_sha256": "c" * 64})
+        env = copy.deepcopy(native)
+        env["arm"] = "env"
+        env["block_ref"] = "evidence/receipts/env.json#/data/organic_use/records/0"
+        env["client"]["config_sha256"] = "d" * 64
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            self._root(root, [{"sweep_id": "baseline", "layers": []}])
+            with mock.patch.object(rs.organic_use, "load_records", return_value=[native, env]):
+                rows = rs.assess_organic(root, NOW_DT, client_contexts={native["block_ref"]: native["client"]})
+            self.assertEqual(rows[0]["binding_status"], "current")
+            self.assertEqual(rows[1]["binding_status"], "unknown")
+            self.assertIn("client_config_sha256", rows[1]["not_checked"])
+
+
 if __name__ == "__main__":
     unittest.main()

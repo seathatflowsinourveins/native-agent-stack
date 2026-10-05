@@ -1834,5 +1834,29 @@ class V2PendingCliTests(FixtureCase):
                 self.assertEqual(converted["layers"][0]["refuted"], [])
 
 
+class OrganicExternalTriggerTests(unittest.TestCase):
+    def test_organic_signals_reuse_existing_categories_without_mutating_inputs(self):
+        observation = {"component_id": "widget", "client": {"id": "codex"}, "arm": "native",
+                       "receipt_ref": "evidence/receipts/organic.json", "layer_ids": ["foundation/code-navigation"],
+                       "flags": ["organic_tool_version_changed", "organic_client_version_changed",
+                                 "organic_landscape_reopened", "organic_age_limit"]}
+        report = {"organic_use": [observation]}
+        before = copy.deepcopy(report)
+        baseline = {"foundation": [{"layer": "code-navigation", "components": [{"id": "widget"}]}]}
+        triggers, notes = sl.external_triggers(baseline, report, None)
+        self.assertEqual(report, before)
+        self.assertEqual(notes, [])
+        self.assertCountEqual([item["trigger"] for item in triggers[("foundation", "code-navigation")]],
+                              ["pin_moved", "comparison_changed", "comparison_changed", "stale_receipt"])
+        self.assertTrue(all(item["ref"].startswith("organic_use:evidence/receipts/organic.json:")
+                            for item in triggers[("foundation", "code-navigation")]))
+        observation["saturation_trigger_active"] = False
+        self.assertEqual(sl.external_triggers(baseline, report, None), ({}, []))
+        observation["saturation_trigger_active"] = True
+        triggers, notes = sl.external_triggers(None, report, None)
+        self.assertEqual(triggers, {})
+        self.assertEqual(len(notes), 4)
+
+
 if __name__ == "__main__":
     unittest.main()

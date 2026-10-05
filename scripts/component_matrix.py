@@ -37,6 +37,7 @@ import re
 
 try:
     from . import host_receipts
+    from . import organic_use
     from . import platform_status as platform_evidence
     from . import saturation_ledger
     from .catalog_decisions import InvalidDecisionIndex, load, safe_file, unique_json
@@ -44,6 +45,7 @@ try:
     from .validate import PRIVATE_CONTENT
 except ImportError:  # running as a plain script, not a package
     import host_receipts
+    import organic_use
     import platform_status as platform_evidence
     import saturation_ledger
     from catalog_decisions import InvalidDecisionIndex, load, safe_file, unique_json
@@ -876,6 +878,7 @@ def build_document(root: Path):
 
     landscape_docs = {catalog: load_optional(root, relative) for catalog, relative in LANDSCAPE_FILES.items()}
     winner_aliases = alias_ids_by_winner(stack_doc, landscape_docs.values())
+    organic_records = organic_use.load_records(root)
     repo_layers = host_receipts.repository_layers({
         f"{catalog}/{layer['layer_id']}": layer for catalog, document in landscape_docs.items()
         for layer in (document or {}).get("layers", []) or []
@@ -899,6 +902,15 @@ def build_document(root: Path):
             flip_violations.extend(row_flip_violations)
 
     rows.sort(key=lambda row: (row["catalog"], row["layer_id"]))
+
+    # Registered observations stay informational: never alter lifecycle, platform
+    # acceptance, convergence scores or readiness. The explicit layer scope also
+    # retains alternatives and stack ids without rebinding them to a winner.
+    for row in rows:
+        observations = [record for record in organic_records
+                        if f"{row['catalog']}/{row['layer_id']}" in record["layer_ids"]]
+        if observations:
+            row["organic_use"] = observations
 
     # Whether each alias receipt is exempt from validate's alias rejection (GRANDFATHERED_ALIAS_RECEIPTS,
     # path and recorded-claim digest); informational like the rest of the alias listing.
@@ -1176,6 +1188,26 @@ def render_markdown(document: dict) -> str:
         for entry in needs_review:
             lines.append(f"- `{entry['catalog']}/{entry['layer_id']}`: {entry['independent_review']}")
     lines += ["", *render_convergence_markdown(document)]
+    organic_rows = []
+    for row in document["rows"]:
+        for record in row.get("organic_use", []):
+            organic_rows.append((row, record))
+    if organic_rows:
+        lines += ["", "## Organic-use observations", "",
+                  "These registered records retain the protocol's client and arm boundaries. "
+                  "They do not change platform acceptance, convergence scores or aggregate readiness. "
+                  "Pending metrics and verdicts remain null; an env arm is comparison evidence. "
+                  "Run `scripts/receipt_staleness.py` for current recheck signals; a real subsequent "
+                  "sweep records them in the saturation ledger.", "",
+                  "| Layer | Recorded component | Client / arm | State / verdict | Observation | Receipt |",
+                  "| --- | --- | --- | --- | --- | --- |"]
+        for row, record in organic_rows:
+            component = record["component_id"]
+            client = record["client"]
+            lines.append(f"| {row['catalog']}/{row['layer_id']} | `{component}` | "
+                         f"{client['id']} {client['version']} / {record['arm']} | "
+                         f"{record['state']} / {record.get('verdict') or 'pending'} | "
+                         f"{record['observed_at_utc']} | `{record['receipt_ref']}` |")
     lines += [
         "",
         "## How to update this page",

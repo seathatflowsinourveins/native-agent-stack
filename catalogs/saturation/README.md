@@ -1,5 +1,15 @@
 # Saturation ledger
 
+Registered [organic-use observations](../../docs/decisions/2026-10-05-organic-use-catalog-records.md)
+are a separate informational input to the existing freshness report. Its
+`organic_use[]` rows retain client and arm, receipt reference, binding source,
+unknown inputs and recheck flags. The saturation report maps tool-pin changes to
+`pin_moved`, client-version changes or a later scoped landscape reopen to
+`comparison_changed`, and an exceeded observational age limit to
+`stale_receipt`. A real subsequent sweep records those report references in
+`reopen[]`; an observation alone appends no sweep and closes no layer. See the
+decision for native/env, pilot and exclusion boundaries.
+
 `ledger.json` is an append-only record of landscape sweeps, one record per sweep, with per-layer
 results. It answers one question per layer: how many consecutive sweeps have found nothing that
 survives review? It does not close a layer. A **saturation candidate** is an input to closure.
