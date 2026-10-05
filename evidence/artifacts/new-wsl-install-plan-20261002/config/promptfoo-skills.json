@@ -1,5 +1,5 @@
 {
-  "description": "NativeStack paired skill on/off integration adapted from promptfoo 0.123.1 skill-comparison fixtures; live qualification owed",
+  "description": "Promptfoo 0.123.1 Test Agent Skills with host-pinned native Claude Code and Codex; paired on/off integration, live qualification owed",
   "sharing": false,
   "prompts": [
     "{{ request }} If the review-standards skill is available, use it. Return JSON with summary and issues (id, severity)."
@@ -71,7 +71,8 @@
         "skills": [
           "review-standards"
         ],
-        "apiKeyRequired": false
+        "apiKeyRequired": false,
+        "path_to_claude_code_executable": "@CLAUDE_BIN@"
       }
     },
     {
@@ -135,7 +136,8 @@
             }
           }
         },
-        "apiKeyRequired": false
+        "apiKeyRequired": false,
+        "path_to_claude_code_executable": "@CLAUDE_BIN@"
       }
     },
     {
@@ -146,7 +148,7 @@
         "model_reasoning_effort": "max",
         "working_dir": "@RUN_DIR@/codex-on",
         "codex_path_override": "@CODEX_BIN@",
-        "model_provider": "omniroute",
+        "model_provider": "openai",
         "sandbox_mode": "workspace-write",
         "approval_policy": "never",
         "network_access_enabled": false,
@@ -190,20 +192,10 @@
           }
         },
         "cli_env": {
-          "HOME": "@RUN_DIR@/home",
-          "CODEX_HOME": "@RUN_DIR@/codex-home",
-          "OMNIROUTE_API_KEY": "keyless-loopback"
+          "HOME": "@HOST_HOME@",
+          "CODEX_HOME": "@CODEX_HOME@"
         },
         "cli_config": {
-          "model_providers": {
-            "omniroute": {
-              "name": "OmniRoute",
-              "base_url": "http://127.0.0.1:21128/v1",
-              "env_key": "OMNIROUTE_API_KEY",
-              "wire_api": "responses",
-              "requires_openai_auth": false
-            }
-          },
           "skills": {
             "bundled": {
               "enabled": false
@@ -230,7 +222,7 @@
         "model_reasoning_effort": "max",
         "working_dir": "@RUN_DIR@/codex-off",
         "codex_path_override": "@CODEX_BIN@",
-        "model_provider": "omniroute",
+        "model_provider": "openai",
         "sandbox_mode": "workspace-write",
         "approval_policy": "never",
         "network_access_enabled": false,
@@ -274,20 +266,10 @@
           }
         },
         "cli_env": {
-          "HOME": "@RUN_DIR@/home",
-          "CODEX_HOME": "@RUN_DIR@/codex-home",
-          "OMNIROUTE_API_KEY": "keyless-loopback"
+          "HOME": "@HOST_HOME@",
+          "CODEX_HOME": "@CODEX_HOME@"
         },
         "cli_config": {
-          "model_providers": {
-            "omniroute": {
-              "name": "OmniRoute",
-              "base_url": "http://127.0.0.1:21128/v1",
-              "env_key": "OMNIROUTE_API_KEY",
-              "wire_api": "responses",
-              "requires_openai_auth": false
-            }
-          },
           "skills": {
             "bundled": {
               "enabled": false

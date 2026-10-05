@@ -354,12 +354,33 @@ mineru() {
   run_command 'fetch_verified https://raw.githubusercontent.com/opendatalab/MinerU/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/demo/pdfs/demo1.pdf f3b3be345bf2df8979f2491ca9466e078e4fd1d6a216611faa8566e4c44d474b "$tool_root/mineru/demo1.pdf"' || return "$?"
 }
 
+chrome_devtools_linux_chrome() {
+  # Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/troubleshooting.md#L105
+  # Privilege is declared in playwright-cli.needs and prerequisite_steps, outside command strings.
+  if ! sudo dpkg -i "$tool_root/chrome-devtools-mcp/google-chrome-stable_current_amd64.deb"; then
+    # Source: https://manpages.ubuntu.com/manpages/resolute/en/man8/apt-get.8.html (--fix-broken).
+    sudo apt-get -f install -y || return "$?"
+  fi
+  # Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/README.md#L65 (installed Linux Chrome required).
+  google-chrome-stable --version >/dev/null || return "$?"
+}
+
 playwright-cli() {
-  # Playwright CLI | npm-global | measurement-only
-  # Planned. Source: https://raw.githubusercontent.com/microsoft/playwright-cli/v0.1.22/README.md#L26
-  run_command 'npm install -g @playwright/cli@0.1.22' || return "$?"
-  # Planned. Source: https://raw.githubusercontent.com/microsoft/playwright/e8149b8257d32dcf8f72573ecc43e72439da7080/packages/playwright-core/src/tools/cli-client/program.ts#L346
-  run_command 'playwright-cli install-browser --with-deps chromium' || return "$?"
+  # Chrome DevTools MCP | npm-npx-stdio | owner default, one server for automation and diagnostics.
+  # Planned. Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/troubleshooting.md#L99
+  run_command 'test "$(dpkg --print-architecture)" = amd64 && mkdir -p -- "$tool_root/chrome-devtools-mcp"' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/troubleshooting.md#L104
+  run_command 'cd "$tool_root/chrome-devtools-mcp" && wget -O google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb' || return "$?"
+  chrome_devtools_linux_chrome || return "$?"
+  copy_config 'chrome-devtools-accept.html' || return "$?"
+  # Planned. Source: https://registry.npmjs.org/chrome-devtools-mcp/1.10.1
+  run_command 'curl --proto "=https" --tlsv1.2 -fL https://registry.npmjs.org/chrome-devtools-mcp/-/chrome-devtools-mcp-1.10.1.tgz -o "$tool_root/chrome-devtools-mcp/chrome-devtools-mcp-1.10.1.tgz" && printf "%s  %s\n" 2a5c3a1d60ea1c2fd74b527066575ddabe3d69485b50937d9bd32f731e1212e7883d7b73b905fe41e9710158a86eff185240d9ec7583ae656247a2de60ad3003 "$tool_root/chrome-devtools-mcp/chrome-devtools-mcp-1.10.1.tgz" | sha512sum --check --status' || return "$?"
+  # Planned. Source: https://registry.npmjs.org/chrome-devtools-mcp/1.10.1
+  run_command 'test "$(npm view chrome-devtools-mcp@1.10.1 dist.integrity)" = sha512-Klw6HWDqHC/XS1JwZldd2r49aUhbUJN9m9Mvcx4SEueIPXtzuQX+QelxAViobv8YUkDZ7HWDrmViR6LeYK0wAw== && npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics --help' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/.github/workflows/run-tests.yml#L30
+  run_command 'checkout_tag https://github.com/ChromeDevTools/chrome-devtools-mcp chrome-devtools-mcp-v1.10.1 "$tool_root/chrome-devtools-mcp-source" && test "$(git -C "$tool_root/chrome-devtools-mcp-source" rev-parse HEAD)" = e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df && cd "$tool_root/chrome-devtools-mcp-source" && git submodule update --init && PUPPETEER_SKIP_DOWNLOAD=true npm ci && npx puppeteer browsers install chrome && NODE_OPTIONS=--max_old_space_size=4096 npm run bundle' || return "$?"
+  # Planned. Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71
+  # Planned. Source: https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L109
 }
 
 memory-owner() {
@@ -654,10 +675,14 @@ inspect-ai() {
 }
 
 harbor-containerized-agent-e2e-runner() {
-  # G5 plan repair 2026-10-04; execution remains for the host coordinator.
-  # Planned. Source: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md#L22
-  run_command 'uv tool install --python 3.13 harbor==0.23.0' || return "$?"
-  # Planned. Source: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/tests/integration/test_hello_user_e2e.py#L25
+  # Harbor 0.23.0: published wheel hash, unchanged upstream tests and native recipe.
+  copy_config 'harbor-worker-telemetry-accept.sh' || return "$?"
+  copy_config 'harbor-worker-telemetry-contract.md' || return "$?"
+  # Source: https://pypi.org/pypi/harbor/0.23.0/json
+  run_command 'fetch_verified https://files.pythonhosted.org/packages/19/c7/607ff037dff1f40d1f941b9854742d66fd43630274fd4e7b8de8480dad34/harbor-0.23.0-py3-none-any.whl 8747400dbb2a5e2298e1338e17e88eba38433c0433fd700f34d1a9021bba5c37 "$tool_root/downloads/harbor-0.23.0-py3-none-any.whl"' || return "$?"
+  # Source: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md#L22
+  run_command 'uv tool install --python 3.13 "$tool_root/downloads/harbor-0.23.0-py3-none-any.whl"' || return "$?"
+  # Source: https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md#L32
   run_command 'checkout_tag https://github.com/harbor-framework/harbor.git v0.23.0 "$tool_root/harbor-v0.23.0"; [[ "$(git -C "$tool_root/harbor-v0.23.0" rev-parse HEAD)" == 1e5c5c6db929a10a140d05e606882c671ae20729 ]]' || return "$?"
 }
 
@@ -795,15 +820,17 @@ restic() {
 }
 
 gpt-gateway() {
-  # OmniRoute | source-build | planned; wave-2 canary composition, npm 3.8.51 rollback only.
-  copy_config 'omniroute-canary-install.sh' || return "$?"
+  # Published OmniRoute 3.8.51 pool/fallback; native Codex owns Sol/max.
+  copy_config 'gpt-gateway-topology.json' || return "$?"
   copy_config 'gpt-gateway-client-accept.sh' || return "$?"
-  copy_config 'omniroute-canary-evidence.json' || return "$?"
-  copy_config 'omniroute-canary-check.py' || return "$?"
   copy_config 'omniroute.service' || return "$?"
-  # Planned. Source: https://raw.githubusercontent.com/diegosouzapw/OmniRoute/23a11484862b3bb589a55e85b00e4ac53ffeb234/package.json#L119
-  run_command 'bash "$config_root/omniroute-canary-install.sh"' || return "$?"
   copy_config 'omniroute.env.example' || return "$?"
+  # Source: https://registry.npmjs.org/omniroute/3.8.51
+  run_command '[[ "$(npm view omniroute@3.8.51 dist.integrity)" == "sha512-VwwSt+bP9lJiPJXFJMz0nNGGuoewPZU3nFe1SLuO11ADgdSwTegGCxhg8Ov75+31m/cocPxHiO63zygn1XQ0MQ==" ]]' || return "$?"
+  # Source: https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/docs/guides/SETUP_GUIDE.md#L28
+  run_command 'npm install --global --include=optional --prefix "$tool_root/omniroute-3.8.51" omniroute@3.8.51; install -d -m 0700 -- "$HOME/.local/bin"; ln -sfn "$tool_root/omniroute-3.8.51/bin/omniroute" "$HOME/.local/bin/omniroute"' || return "$?"
+  # Source: https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html
+  run_command 'install -d -m 0700 -- "$HOME/.config/systemd/user" "$HOME/.local/share/omniroute"; unit="$HOME/.config/systemd/user/omniroute.service"; if [[ ! -e "$unit" ]]; then install -m 0600 -- "$config_root/omniroute.service" "$unit"; elif ! cmp -s -- "$config_root/omniroute.service" "$unit"; then printf "needs_user: existing OmniRoute unit differs; review the destination unit before replacement.\n" >&2; exit 1; fi; systemctl --user daemon-reload' || return "$?"
 }
 
 agent-runtime-worker() {
@@ -945,7 +972,7 @@ if $list; then
   printf '%s\n' 'tobi-qmd | tobi/qmd | npm-global | planned'
   printf '%s\n' 'mineru | MinerU | uv-tool | planned'
   printf '%s\n' 'trafilatura | Not installed: text extraction is a sub-step of retrieval that the two agents'\'' native web tools (or the one browser tool) already own; neither blind Sol-ultra order picked it | none | excluded'
-  printf '%s\n' 'playwright-cli | Playwright CLI | npm-global | measurement-only'
+  printf '%s\n' 'playwright-cli | Chrome DevTools MCP 1.10.1 (one stdio MCP server, chrome-devtools, in both clients; it also serves browser diagnostics) | npm-npx-stdio | planned'
   printf '%s\n' 'web-search-provider | Not installed: both research harnesses ship a keyless search provider as a declared dependency; SearXNG (picked by both blind GPT orders with two MCP bridges) is the named challenger, decided by a measurement on 30 frozen queries | none | excluded'
   printf '%s\n' 'memory-owner | ai-memory 2.5.2 | release-binary | planned'
   printf '%s\n' 'ccusage | ccusage 20.0.26 | none | planned'
@@ -997,7 +1024,7 @@ if $list; then
   printf '%s\n' 'restic | Restic | mise | planned'
   printf '%s\n' 'chezmoi | Not installed: mise and the repository-carried bootstrap already own the reproduction of configuration; no blind GPT sample picked it | none | excluded'
   printf '%s\n' 'base-distribution | Ubuntu 26.04.1 LTS (Canonical WSL image), primary | none | excluded'
-  printf '%s\n' 'gpt-gateway | OmniRoute | source-build | planned'
+  printf '%s\n' 'gpt-gateway | OmniRoute | npm-global | planned'
   printf '%s\n' 'agent-runtime-worker | OpenHands software-agent-sdk | none | planned'
   printf '%s\n' 'research-harnesses | GPT Researcher and DeerFlow, kept as two independent evidence gatherers | none | planned'
   printf '%s\n' 'credential-guard | Command and secret-path guard (K4) | repository-recipe | planned'
@@ -1019,10 +1046,10 @@ esac
 needs_execution=false
 needs_runtime=false
 needs_docker=false
-for slot in 'claude-code' 'codex' 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'code-search' 'tobi-qmd' 'mineru' 'memory-owner' 'context-supply' 'statusline' 'ccusage' 'command-output' 'output-compression' 'code-index' 'code-graph' 'repo-packing' 'structured-data' 'doc-conversion' 'api-docs' 'trace-viewer' 'session-analytics' 'otel-collector-contrib' 'prometheus' 'local-model-server' 'alerting' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'promptfoo' 'zizmor' 'syft' 'actionlint-kjanat' 'dagu' 'docker-compose' 'container-engine' 'betterleaks' 'git' 'gh-github-cli' 'worktrunk' 'difftastic' 'mise' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_execution=true; done
-for slot in 'mcp-inspector' 'playwright-cli' 'loki' 'grafana' 'local-generation-model' 'embedding-model'; do named "$slot" && needs_execution=true; done
-for slot in 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'code-search' 'tobi-qmd' 'mineru' 'context-supply' 'statusline' 'ccusage' 'output-compression' 'code-index' 'repo-packing' 'structured-data' 'doc-conversion' 'api-docs' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'promptfoo' 'zizmor' 'syft' 'actionlint-kjanat' 'betterleaks' 'gh-github-cli' 'worktrunk' 'difftastic' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_runtime=true; done
-for slot in 'mcp-inspector' 'playwright-cli'; do named "$slot" && needs_runtime=true; done
+for slot in 'claude-code' 'codex' 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'code-search' 'tobi-qmd' 'mineru' 'playwright-cli' 'memory-owner' 'context-supply' 'statusline' 'ccusage' 'command-output' 'output-compression' 'code-index' 'code-graph' 'repo-packing' 'structured-data' 'doc-conversion' 'api-docs' 'trace-viewer' 'session-analytics' 'otel-collector-contrib' 'prometheus' 'local-model-server' 'alerting' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'promptfoo' 'zizmor' 'syft' 'actionlint-kjanat' 'dagu' 'docker-compose' 'container-engine' 'betterleaks' 'git' 'gh-github-cli' 'worktrunk' 'difftastic' 'mise' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_execution=true; done
+for slot in 'mcp-inspector' 'loki' 'grafana' 'local-generation-model' 'embedding-model'; do named "$slot" && needs_execution=true; done
+for slot in 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'code-search' 'tobi-qmd' 'mineru' 'playwright-cli' 'context-supply' 'statusline' 'ccusage' 'output-compression' 'code-index' 'repo-packing' 'structured-data' 'doc-conversion' 'api-docs' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'promptfoo' 'zizmor' 'syft' 'actionlint-kjanat' 'betterleaks' 'gh-github-cli' 'worktrunk' 'difftastic' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_runtime=true; done
+for slot in 'mcp-inspector'; do named "$slot" && needs_runtime=true; done
 for slot in 'harbor-containerized-agent-e2e-runner' 'docker-compose'; do selected "$slot" && needs_docker=true; done
 
 for slot in 'lm-program-optimization' 'skill-vetting' 'trajectory-analysis' 'mcp-protocol-conformance'; do selected "$slot" && needs_execution=true; done
@@ -1031,6 +1058,7 @@ for slot in 'lm-program-optimization' 'skill-vetting' 'trajectory-analysis' 'mcp
 if $needs_execution; then
   # Planned. Repository bootstrap-linux.sh:206-216; selected owner prereqs extend its package list.
   packages=(ca-certificates curl git tar gzip xz-utils jq)
+  if selected playwright-cli; then packages+=(wget); fi
   if selected research-harnesses; then packages+=(make); fi
   if selected sandbox-runtime-srt; then packages+=(bubblewrap socat ripgrep gcc libseccomp-dev); fi
   if named loki; then packages+=(unzip); fi
@@ -1065,6 +1093,7 @@ if [[ "$only" == trail-of-bits-security-skills-trailofbits-skills || "$only" == 
   run_slot claude-code
   run_slot codex
 fi
+if [[ "$only" == playwright-cli ]]; then run_slot claude-code; run_slot codex; fi
 if [[ "$only" == codex-sdk-and-codex-exec-app-server ]]; then run_slot codex; fi
 if selected 'claude-code'; then run_slot 'claude-code'; fi
 if selected 'codex'; then run_slot 'codex'; fi
@@ -1097,7 +1126,7 @@ if selected 'api-docs'; then run_slot 'api-docs'; fi
 if selected 'trace-viewer'; then run_slot 'trace-viewer'; fi
 if selected 'token-lane-carriers'; then run_slot 'token-lane-carriers'; fi
 if selected 'session-analytics'; then run_slot 'session-analytics'; fi
-measured_slot 'playwright-cli'
+if selected 'playwright-cli'; then run_slot 'playwright-cli'; fi
 if selected 'inspect-ai'; then run_slot 'inspect-ai'; fi
 if selected 'harbor-containerized-agent-e2e-runner'; then run_slot 'harbor-containerized-agent-e2e-runner'; fi
 if selected 'promptfoo'; then run_slot 'promptfoo'; fi

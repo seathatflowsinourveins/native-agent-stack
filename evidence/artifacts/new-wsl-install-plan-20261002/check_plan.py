@@ -2,7 +2,8 @@
 """Consistency checker for the new-WSL install plan. Standard library only (Python 3.11 or newer, for tomllib).
 
 Reads install-plan.json, owners.json, install.sh, accept.sh, mise.toml, config/ and the merged definitive manifest, names every
-disagreement and exits 1; prints one summary line and exits 0 when they agree. It runs `bash install.sh --list` (read-only) and
+disagreement and exits 1; prints actual installed, measurement-only, excluded, command and acceptance counts
+and exits 0 when they agree. It runs `bash install.sh --list` (read-only) and
 installs nothing.
 
 usage: python3 -B check_plan.py [--plan-dir DIR] [--manifest PATH]
@@ -242,6 +243,65 @@ def code_docs_contract(plan_dir, by_slot, bad):
     if not {"service_health", "after_sign_in"}.issubset(mineru.get("acceptance", {})):
         bad("mineru", "local Standard parse/read and fresh native client use are required")
 
+def browser_contract(by_slot, install_funcs, bad):
+    """Wave-5 browser owner; existing slot ID, one upstream stdio server in each client.
+
+    ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df:
+    docs/client-configurations.md:71,109; docs/troubleshooting.md:103-105;
+    docs/advanced-usage.md:22-25; README.md:45,65; scripts/test.js:28-38.
+    This is structural consistency, never destination acceptance or a new trial.
+    """
+    row = by_slot.get("playwright-cli", {})
+    pin = "e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df"
+    if (not row.get("installed") or row.get("measurement_only")
+            or row.get("release") != "chrome-devtools-mcp-v1.10.1" or row.get("source_pin") != pin):
+        bad("playwright-cli", "the wave-5 Chrome DevTools MCP 1.10.1 owner must install by default at its release commit")
+    commands = row.get("commands", [])
+    # The destination map is the sole registration writer (round-2 G2 handoff).
+    # Like hcom's posture check, read the source map even for --plan-dir copies.
+    source_root = pathlib.Path(__file__).resolve().parents[3]
+    args = ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics"]
+    try:
+        additions = source_root / "adoption/new-wsl/templates"
+        claude = json.loads((additions / "claude-user.mcp.additions.json").read_text())["mcpServers"]["chrome-devtools"]
+        codex = tomllib.loads((additions / "codex.config.additions.toml").read_text())["mcp_servers"]["chrome-devtools"]
+        mapping = json.loads((source_root / "adoption/new-wsl/client-config-map.json").read_text())
+        for client, server in (("Claude Code", claude), ("Codex", codex)):
+            if server.get("command") != "npx" or server.get("args") != args or server.get("type", "stdio") != "stdio":
+                bad("playwright-cli", f"one mapped {client} stdio server with the required pin and flags is required")
+        for piece in ("claude/mcp/server/chrome-devtools", "codex/config/mcp_servers.chrome-devtools.*"):
+            entries = [e for e in mapping["entries"] if piece in e["match"]]
+            if len(entries) != 1 or entries[0]["wiring"] != "slot:playwright-cli" or entries[0].get("owner") != row["owner"]:
+                bad("playwright-cli", f"the destination map must wire {piece} through its wave-5 owner")
+    except (OSError, ValueError, KeyError, TypeError):
+        bad("playwright-cli", "mapped Chrome stdio server or client additions are missing")
+    if any("mcp add chrome-devtools" in command for command in commands):
+        bad("playwright-cli", "the client map owns registration; installer CLI registrations would add a second writer")
+    if any("sudo" in command or "@playwright/cli" in command or "claude plugin" in command for command in commands):
+        bad("playwright-cli", "privilege belongs to a declared prerequisite helper; no second browser/Claude plugin install")
+    expected_integrity = "sha512-Klw6HWDqHC/XS1JwZldd2r49aUhbUJN9m9Mvcx4SEueIPXtzuQX+QelxAViobv8YUkDZ7HWDrmViR6LeYK0wAw=="
+    if (row.get("checksum", {}).get("integrity") != expected_integrity
+            or not any("sha512sum --check --status" in command for command in commands)):
+        bad("playwright-cli", "the published npm SHA512 must be retained and checked against the downloaded archive")
+    steps = row.get("prerequisite_steps", [])
+    helper = install_funcs.get("chrome_devtools_linux_chrome", "")
+    if (row.get("needs", {}).get("sudo") is not True
+            or not any(step.get("name") == "chrome_devtools_linux_chrome"
+                       and step.get("needs", {}).get("sudo") is True for step in steps)
+            or "sudo dpkg -i" not in helper
+            or "chrome_devtools_linux_chrome ||" not in install_funcs.get("playwright-cli", "")):
+        bad("playwright-cli", "Linux-side Google Chrome requires a declared and invoked privileged prerequisite")
+    post = row.get("acceptance", {}).get("post_install", {})
+    if (post.get("kind") != "upstream tests" or "npm run test:no-build -- tests/index.test.ts" not in post.get("command", "")
+            or "google-chrome-stable --version >" not in post.get("command", "")):
+        bad("playwright-cli", "unchanged upstream browser tests and the installed Chrome version record are required")
+    native = row.get("acceptance", {}).get("after_sign_in", {})
+    if (not native.get("needs_user")
+            or not all(name in native.get("command", "") for name in
+                       ("navigate_page", "take_snapshot", "list_console_messages", "claude.jsonl", "codex.jsonl"))):
+        bad("playwright-cli", "fresh native-client navigation/snapshot/console checks must remain gated on native sign-in")
+
+
 def main():
     here = pathlib.Path(__file__).resolve().parent
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
@@ -279,6 +339,7 @@ def main():
     by_slot = {r["slot"]: r for r in rows}
     agent_messaging_contract(plan_dir, by_slot, bad)
     code_docs_contract(plan_dir, by_slot, bad)
+    browser_contract(by_slot, install_funcs, bad)
 
     # Node rows must receive the runtime bootstrap even when selected alone.
     for flag in ("needs_execution", "needs_runtime"):
@@ -541,7 +602,19 @@ def main():
         bad("base-distribution", "base-image acceptance must consume config/base-distribution-accept.sh")
     for name in sorted(copied - config):
         bad("config", f"install.sh copies config/{name}, which does not exist")
-    for name in sorted(config - copied):
+    # Round-2 gpt-gateway-topology excludes local carries from the clean default.
+    # Source: https://github.com/diegosouzapw/OmniRoute/pull/15167
+    # These retained historical artifacts still support the canary regression
+    # tests, but the published release row must neither install nor accept them.
+    historical_gateway_configs = set()
+    gateway = by_slot.get("gpt-gateway", {})
+    if gateway.get("release") == "3.8.51" and not gateway.get("source_build"):
+        historical_gateway_configs = {
+            "omniroute-canary-check.py", "omniroute-canary-evidence.json", "omniroute-canary-install.sh",
+        }
+        if historical_gateway_configs & copied:
+            bad("gpt-gateway", "published clean release must not install historical canary assets")
+    for name in sorted(config - copied - historical_gateway_configs):
         bad("config", f"config/{name} is copied by no install function")
     claims = collections.defaultdict(set)
     # G4 configs wire existing listeners. Scrape/datasource/exporter targets and synthetic

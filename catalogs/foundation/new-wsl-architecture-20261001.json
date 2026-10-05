@@ -635,9 +635,47 @@
           "repository": "https://github.com/vercel-labs/agent-browser",
           "pin": "0.38.1",
           "pin_source": "manifests/stack.json:38",
-          "install": {"command": "npm install --global --prefix \"$STACK_HOME/tools/agent-browser-0.38.1\" agent-browser@0.38.1; agent-browser install", "kind": "repo_recipe", "source_path": "recipes/README.md"},
-          "acceptance": {"command": "agent-browser --config examples/agent-browser.json --namespace native-stack --session selected-owned-session open \"file://${PROJECT_ROOT}/fixtures/greeting.html\"", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
-          "upstream_currency": {"latest_release": "v0.38.1 (2026-09-16)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/vercel-labs/agent-browser/releases"}
+          "install": {
+            "command": "npm install --global --prefix \"$STACK_HOME/tools/agent-browser-0.38.1\" agent-browser@0.38.1; agent-browser install",
+            "kind": "repo_recipe",
+            "source_path": "recipes/README.md"
+          },
+          "acceptance": {
+            "command": "agent-browser --config examples/agent-browser.json --namespace native-stack --session selected-owned-session open \"file://${PROJECT_ROOT}/fixtures/greeting.html\"",
+            "evidence_class": "none_recorded",
+            "source_path": "recipes/README.md"
+          },
+          "upstream_currency": {
+            "latest_release": "v0.38.1 (2026-09-16)",
+            "checked_at": "2026-10-01T07:41Z",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/vercel-labs/agent-browser/releases"
+          },
+          "role": "NativeStack host browser reference; superseded for the 2604 browser slot"
+        },
+        {
+          "repository": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+          "pin": "1.10.1",
+          "pin_source": "docs/decisions/2026-10-04-final-architecture-round2.md:24",
+          "install": {
+            "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only playwright-cli",
+            "kind": "repo_recipe",
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g2-browser.md"
+          },
+          "acceptance": {
+            "command": "npm run test:no-build -- tests/index.test.ts tests/tools/pages.test.ts tests/tools/snapshot.test.ts tests/tools/console.test.ts tests/tools/network.test.ts tests/tools/performance.test.ts",
+            "evidence_class": "none_recorded",
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g2-browser.md",
+            "scope": "Planned unchanged upstream subset and fresh native-client navigation/snapshot/console checks; no destination execution."
+          },
+          "upstream_currency": {
+            "latest_release": "chrome-devtools-mcp-v1.10.1 (2026-09-23)",
+            "checked_at": "2026-10-04",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/ChromeDevTools/chrome-devtools-mcp/releases/tag/chrome-devtools-mcp-v1.10.1"
+          },
+          "name": "Chrome DevTools MCP",
+          "role": "selected 2604 browser automation and diagnostics owner"
         },
         {
           "component_id": "openresearch",
@@ -682,7 +720,7 @@
         {"text": "Tavily calls need the user's own Tavily key in its 0600 provider file; the free native lanes need none.", "kind": "user_side", "source_path": "docs/secret-storage.md"}
       ],
       "owner_lane": "foundation",
-      "notes": "Tavily stays pinned for historical reproduction; new work prefers the free native lanes."
+      "notes": "Tavily stays pinned for historical reproduction; new work prefers the free native lanes. Wave 5 selects Chrome DevTools MCP 1.10.1 at e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df for the 2604 playwright-cli slot; it supersedes agent-browser and the measurement-only Playwright CLI for that slot. One chrome-devtools stdio server per native client uses --headless --isolated --no-usage-statistics; browser diagnostics share it. The Linux-side stable Chrome route records the installed version. The catalog retains the NativeStack agent-browser pin and historical receipts as a host reference, following the durable-memory host-reference role and the retained LEAN comparison-oracle cell; host stack changes require separate currency qualification."
     },
     {
       "layer_id": "token-efficiency",
@@ -2628,22 +2666,22 @@
         {
           "component_id": "omniroute",
           "repository": "https://github.com/diegosouzapw/OmniRoute",
-          "pin": "3.8.52-canary (23a11484 + PR13788 + PR15167)",
+          "pin": "3.8.51",
           "pin_source": "manifests/stack.json:1887",
           "install": {
             "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only gpt-gateway",
             "kind": "repo_recipe",
-            "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute-canary-install.sh"
+            "source_path": "docs/decisions/2026-10-04-round2-plan-g4-config.md"
           },
           "acceptance": {
             "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only gpt-gateway --stage post_install; repeat with --stage service_health and --stage after_sign_in",
             "evidence_class": "none_recorded",
-            "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute-canary-evidence.json"
+            "source_path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json"
           },
           "upstream_currency": {
             "latest_release": "v3.8.51 (2026-09-30)",
             "checked_at": "2026-10-01T07:42Z",
-            "pin_is_latest": "unknown",
+            "pin_is_latest": "yes",
             "url": "https://github.com/diegosouzapw/OmniRoute/releases"
           }
         }
@@ -2674,7 +2712,7 @@
         "Codex installs with the token-efficiency profile at 0.159.2; sign in with `codex login --device-auth`.",
         "Render the Codex lane: `python3 tools/adoption/apply_codex_lane.py` (dry run), review, then `--apply --expect-config-sha256 <sha> --expect-agents-sha256 <sha>`; the codex-lane step of --configure-full-profile runs the same tool.",
         "Prove it with `python3 tools/adoption/prove_codex_lane.py`; add --live only when worker runs are intended.",
-        "For the 2604 gateway lane, use the install-plan's release/v3.8.52 @23a11484 plus PR13788 and PR15167 canary recipe, with its upstream tests/build/pack gates and npm 3.8.51 as rollback. The separate user service uses DATA_DIR ~/.local/share/omniroute and loopback 21128/21129/21131, keyless by the wave-2 ruling. Reuse the bound historical host gates and fresh Codex turn; fresh accounts sign in natively only when absent. The workstation stable 3.8.50 registry receipt is a separate historical scope.",
+        "For the 2604 gateway lane, use the published omniroute@3.8.51 install and identity acceptance, as main PR #637 qualified and handed to the configuration owner (docs/decisions/2026-10-03-omniroute-3851-pin.md:108). Preserve the carried-prefix composition check with tool_root; it cannot substitute for the selected release identity. The separate user service uses DATA_DIR ~/.local/share/omniroute and loopback 21128/21129/21131. The pool/fallback profile uses Sol/xhigh; native Codex supplies Sol/max until a published release carries PR #15167. Destination doctor, readiness and fresh-client acceptance remain unrun.",
         "Qualify Codex 0.159.3 on the new distribution (npm tarball hash, provenance, CLI surface) before moving the pin."
       ],
       "gates": [

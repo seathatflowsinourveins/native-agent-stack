@@ -2179,7 +2179,8 @@
       "title": "Web research",
       "tools": [
         "8854a22b77817147",
-        "dd1462ee4e754917"
+        "ca21c6a70e1dc0c9",
+        "263b2d469bfc5351"
       ],
       "uses": []
     },
@@ -7794,7 +7795,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "4a86d142e1a629f6c806a036cce46ac4298b595d48d57505b1bd3cd852cb41f2"
+      "sha256": "7cd6084ec54a49c7417fa50b3a8089d4131093cb141ce620fa71d5e7e9e1c509"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -7802,7 +7803,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "8bac735580fade3d1ba750fd6f9e19763878dc72e78e881c7515b5c74dd6a6cc"
+      "sha256": "191184b8528eb6d31b141dd90a99e7917a05b98e466873ad6f81c23780ed99e0"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -9254,60 +9255,32 @@
       ]
     },
     {
-      "acceptance": {
-        "command": "npm ci && npm run test",
-        "evidence_class": "upstream_test_command_not_executed",
-        "execution_status": "UNRUN",
-        "prerequisites": [
-          "Run from the v0.1.21 source checkout; the workflow selects Node.js 20 and npm ci.",
-          "A working browser/runtime required by the upstream CLI tests must be available. The source integration fixture launches playwright-cli.js in a test output directory and opens a persistent data:text/html,hello page; npm test has not been run and no browser availability was checked."
-        ],
-        "scope": "Source CI test command including the upstream data-URL fixture; not acceptance of an installed browser, MCP surface or destination WSL.",
-        "source": "https://github.com/microsoft/playwright-cli/blob/v0.1.21/.github/workflows/ci.yml",
-        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
-      },
+      "acceptance": null,
       "aliases": [
         "Playwright CLI"
       ],
-      "blocking_gaps": [],
-      "checksum": {
-        "algorithm": "sha256",
-        "kind": "artifact",
-        "source": "https://registry.npmjs.org/%40playwright%2Fcli/0.1.21",
-        "value": "46d0b66061dd4a84c287e36965fd3f1a8c6a49cbcf3b3f90f842023833d5234c"
-      },
+      "blocking_gaps": [
+        "pin: release or immutable revision pending in W-PROF",
+        "checksum: real SHA-256 and its source pending in W-PROF",
+        "install: upstream-documented command and source pending in W-PROF",
+        "acceptance: upstream test or documented example and source pending in W-PROF",
+        "install order: stage and position pending in W-PROF"
+      ],
+      "checksum": null,
       "documented_install": [
         {
           "command": "npm install -g @playwright/cli@latest && playwright-cli install --skills",
           "source": "https://github.com/microsoft/playwright-cli#installation"
         }
       ],
-      "evidence_refs": [
-        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
-        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/web-research.json",
-        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
-      ],
-      "install": {
-        "command": "npm install -g @playwright/cli@0.1.21",
-        "execution_status": "UNRUN",
-        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "prerequisites": [
-          "Node/npm and the selected package installation target must be available."
-        ],
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
-        "source": "https://github.com/microsoft/playwright-cli/blob/v0.1.21/README.md",
-        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
-      },
+      "evidence_refs": [],
+      "install": null,
       "name": "Playwright CLI",
       "owner_layer_id": "web-research",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "package_id": "npm:@playwright/cli",
-      "pin": "0.1.21",
-      "position": 7,
-      "provisioning_status": "unprovisioned_source_review",
+      "pin": null,
+      "position": null,
+      "provisioning_status": "pending",
       "repository": "https://github.com/microsoft/playwright-cli",
       "selection_sources": [
         {
@@ -9316,9 +9289,9 @@
           "source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json"
         }
       ],
-      "stage": "native-extensions",
+      "stage": null,
       "status": "picked",
-      "tool_id": "dd1462ee4e754917",
+      "tool_id": "ca21c6a70e1dc0c9",
       "used_by": [
         "web-research"
       ]
@@ -10681,7 +10654,7 @@
       "acceptance": {
         "command": "make test",
         "evidence_class": "upstream_test_command_not_executed",
-        "source": "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md"
+        "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md"
       },
       "aliases": [
         "Dagu"
@@ -10690,8 +10663,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://github.com/dagucloud/dagu/releases/download/v2.18.2/checksums.txt",
-        "value": "5a84c093b9ba9d02b7a60e106bb91d46f9383fd01c62bd51560e41193f05792b"
+        "source": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.16.6",
+        "value": "06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717"
       },
       "documented_install": [
         {
@@ -10704,20 +10677,19 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/scheduling-supervision.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md",
-        "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md",
-        "evidence/receipts/dagu-mise-pin-qualification-20261005.json"
+        "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
+        "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md"
       ],
       "install": {
-        "command": "npm install -g --ignore-scripts=false @dagucloud/dagu@2.18.2",
+        "command": "npm install -g --ignore-scripts=false @dagucloud/dagu@2.16.6",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version. Independent new-WSL pin only; the workstation/trading stack remains held at 2.16.6. For a future upgrade of any existing owned Dagu installation, stop its owned unit and retain a complete pre-upgrade DAGU_HOME copy plus the prior binary, unit and environment. Conditional rollback restores that copy and the prior binary/unit/environment together. NativeStack2604 is already on 2.18.2 with no pre-upgrade copy, so its rollback is re-provisioning. See [Command center correction and NativeStack2604 state](../docs/decisions/2026-10-05-dagu-mise-pin-move.md#command-center-correction-and-nativestack2604-state-2026-10-05-r2b).",
-        "source": "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md"
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
+        "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md"
       },
       "name": "Dagu",
       "owner_layer_id": "scheduling-supervision",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "2.18.2",
+      "pin": "2.16.6",
       "position": 6,
       "provisioning_status": "unprovisioned_optional_service",
       "repository": "https://github.com/dagucloud/dagu",
@@ -11369,11 +11341,11 @@
         "evidence_class": "upstream_test_command_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Run from the v2026.10.1 source checkout after its documented development setup: suitable Rust, a working mise meeting min_version, git/host dependencies, mise install and mise run build.",
+          "Run from the v2026.9.18 source checkout after its documented development setup: suitable Rust, a working mise meeting min_version, git/host dependencies, mise install and mise run build.",
           "The E2E selector is the documented basename regex ^test_use$; it does not select the full suite."
         ],
         "scope": "Documented unit suite plus one selected upstream E2E case, both UNRUN. No host installation, lifecycle or new-host acceptance.",
-        "source": "https://github.com/jdx/mise/blob/v2026.10.1/docs/contributing.md",
+        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/contributing.md",
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "aliases": [
@@ -11383,8 +11355,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://github.com/jdx/mise/releases/download/v2026.10.1/SHASUMS256.txt",
-        "value": "9b92aa39b8fde54b28c8f974a68f2501925a1523d6c05a52719145df3acdd75a"
+        "source": "https://api.github.com/repos/jdx/mise/releases/tags/v2026.9.18",
+        "value": "4312f8fd72a8d6a869cd2aca7444929e2a0ef6f45d2c6f2866a1eacc5bdc2e84"
       },
       "documented_install": [
         {
@@ -11397,24 +11369,23 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/recovery-portability.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/jdx/mise/blob/v2026.10.1/docs/installing-mise.md",
-        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json",
-        "evidence/receipts/dagu-mise-pin-qualification-20261005.json"
+        "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "install": {
-        "command": "curl -fsSL https://mise.run | MISE_VERSION=v2026.10.1 sh",
+        "command": "curl -fsSL https://mise.run | MISE_VERSION=v2026.9.18 sh",
         "execution_status": "UNRUN",
         "prerequisites": [
           "curl, sh and a chosen owned installation target; no installer was executed.",
-          "The selected release asset install.sh resolves the pinned MISE_VERSION after removing one leading v; its API digest was verified during the pin review. The live mise.run endpoint is the guide's installer route, not the archive installation used for isolated qualification."
+          "The selected installer source's resolve_release function removes the leading v from MISE_VERSION at line 300. The live mise.run endpoint is the guide's installer route, not an independently frozen installer-byte artifact."
         ],
-        "source": "https://github.com/jdx/mise/blob/v2026.10.1/docs/installing-mise.md",
+        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "name": "mise",
       "owner_layer_id": "recovery-portability",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "2026.10.1",
+      "pin": "2026.9.18",
       "position": 1,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/jdx/mise",
@@ -11957,6 +11928,74 @@
       "tool_id": "78da7220cba3bdfe",
       "used_by": [
         "recovery-portability"
+      ]
+    },
+    {
+      "acceptance": {
+        "command": "PUPPETEER_EXECUTABLE_PATH=\"$(command -v google-chrome-stable)\" npm run test:no-build -- tests/index.test.ts tests/tools/pages.test.ts tests/tools/snapshot.test.ts tests/tools/console.test.ts tests/tools/network.test.ts tests/tools/performance.test.ts",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "At the exact release source commit, git submodule update --init, PUPPETEER_SKIP_DOWNLOAD=true npm ci, npx puppeteer browsers install chrome, npm run bundle.",
+          "After native client sign-ins, the plan additionally requires both clients to navigate the local fixture and return its snapshot title and console marker.",
+          "Puppeteer 25.11.0 getConfiguration.ts:140-145 supports the explicit Linux Chrome executable override; no CI AppArmor-disable step is applied to the host."
+        ],
+        "scope": "Six unchanged upstream files through the published test runner; separate synthetic native-client integration. Neither is a new host pass or a comparative trial.",
+        "source": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/.github/workflows/run-tests.yml#L72",
+        "source_review_ref": "docs/decisions/2026-10-04-round2-plan-g2-browser.md"
+      },
+      "aliases": [
+        "Chrome DevTools MCP"
+      ],
+      "blocking_gaps": [
+        "checksum: real SHA-256 and its source pending in W-PROF"
+      ],
+      "checksum": {
+        "algorithm": "sha512",
+        "kind": "artifact",
+        "source": "https://registry.npmjs.org/chrome-devtools-mcp/1.10.1",
+        "value": "2a5c3a1d60ea1c2fd74b527066575ddabe3d69485b50937d9bd32f731e1212e7883d7b73b905fe41e9710158a86eff185240d9ec7583ae656247a2de60ad3003"
+      },
+      "documented_install": [],
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-final-architecture-round2.md",
+        "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
+        "docs/decisions/2026-10-04-round2-plan-g2-browser.md",
+        "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71",
+        "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/tests/index.test.ts#L38"
+      ],
+      "install": {
+        "command": "claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics && codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics",
+        "execution_status": "UNRUN",
+        "pinning_source": "https://registry.npmjs.org/chrome-devtools-mcp/1.10.1",
+        "prerequisites": [
+          "NativeStack2604 amd64, Linux-side Google Chrome stable; declared sudo for the .deb and dependency fixup.",
+          "Plan Node 24.21.0; destination client templates must include the prepared chrome-devtools entries."
+        ],
+        "scope": "Release-pinned documented npx stdio route and Linux-side WSL Chrome prerequisites; single browser owner for both clients and diagnostics.",
+        "source": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71",
+        "source_review_ref": "docs/decisions/2026-10-04-round2-plan-g2-browser.md"
+      },
+      "name": "Chrome DevTools MCP",
+      "owner_layer_id": "web-research",
+      "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+      "package_id": "npm:chrome-devtools-mcp",
+      "pin": "1.10.1",
+      "position": 7,
+      "provisioning_status": "unprovisioned_source_review",
+      "repository": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+      "selection_sources": [
+        {
+          "layer_id": "web-research",
+          "name": "Chrome DevTools MCP",
+          "source": "adoption/new-wsl-profile.json"
+        }
+      ],
+      "stage": "native-extensions",
+      "status": "picked",
+      "tool_id": "263b2d469bfc5351",
+      "used_by": [
+        "web-research"
       ]
     },
     {

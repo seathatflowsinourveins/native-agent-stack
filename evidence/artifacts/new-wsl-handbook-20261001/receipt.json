@@ -4,15 +4,15 @@
   "source_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
   "evidence_class": "local_integration",
   "generator_sha256": "8a66e5eebe1429924d62545e2eee389f1fdd58e6c2f679d8280cec3e99027cf8",
-  "profile_sha256": "8be6b5bb2981843c3beca082169211fb0bd7071abf0e5abccdc9f31632152841",
+  "profile_sha256": "7cd6084ec54a49c7417fa50b3a8089d4131093cb141ce620fa71d5e7e9e1c509",
   "outputs": {
-    "docs/new-wsl-handbook.md": "3dcae777d67d0302d3a8a1e5bb4cddbd94229064e48edbb6aa8a4b98d45c449d",
-    "docs/new-wsl-handbook.json": "e5a3d25149a934924b627c4e3431ed246180b43d53347e4a1e59c091f678ee04"
+    "docs/new-wsl-handbook.md": "3a38235cda28a09b9e2581c7732d39b2c9882042888366c8c0216b6cf408beb9",
+    "docs/new-wsl-handbook.json": "3c118f63f945c2d3dd9a2d87a2e227703780bc89c94ec98aaae1c9fc2e4062e4"
   },
   "inventory": {
     "layers": 37,
     "profile_entries": 78,
-    "projected_tools": 82,
+    "projected_tools": 83,
     "canonical_package_ids": 25
   },
   "validation": [

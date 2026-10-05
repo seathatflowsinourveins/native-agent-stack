@@ -721,8 +721,8 @@ class ManifestRuleTests(unittest.TestCase):
         planned = {slot for slot, row in plan.items() if row["installed"]}
         self.assertEqual(installing - planned, {"mcp-inspector", "base-distribution"})
         self.assertEqual(planned - installing, set())
-        # The 56 wave-3 installs plus the wave-4 Promptfoo owner default (the repository-quality rule).
-        self.assertEqual(len(planned), 57)
+        # 57 after wave 4; round 2 adds four rows and installs both former split owners.
+        self.assertEqual(len(planned), 63)
 
     def test_a_split_slot_that_is_changed_to_installing_wires_its_piece_and_back(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -791,7 +791,7 @@ class ManifestRuleTests(unittest.TestCase):
                          {"serena", "tobi-qmd", "otel-collector-contrib", "gpt-gateway", "claude-code", "mise",
                           "mcp-inspector", "context-supply", "memory-owner", "code-search", "statusline",
                           "container-engine", "command-output", "output-compression", "code-index", "code-graph",
-                          "api-docs"})
+                          "api-docs", "playwright-cli"})
         self.assertEqual({s for s in slots if rows[s].get("interim")}, {"memory-owner", "code-search"})
 
 
@@ -890,7 +890,7 @@ class RenderTests(unittest.TestCase):
         servers = json.loads(self.files["mcp-servers.json"])["mcpServers"]
         # The owner-selected token stack joins Serena, QMD and the interim memory/search installs.
         self.assertEqual(list(servers), ["ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd",
-                                         "jcodemunch", "semble"])
+                                         "jcodemunch", "semble", "chrome-devtools"])
         self.assertEqual(servers["serena"]["command"], "serena")
         self.assertEqual(servers["serena"]["args"][:1] + servers["serena"]["args"][3:6],
                          ["start-mcp-server", "--project-from-cwd", "--context", "claude-code"])
@@ -906,7 +906,11 @@ class RenderTests(unittest.TestCase):
         config = tomllib.loads(self.files["codex.config.toml"])
         # semble comes from the new distribution's additions, merged after the shared template's servers.
         self.assertEqual(list(config["mcp_servers"]), ["serena", "ai-memory", "socraticode", "headroom", "codebase-memory",
-                                                      "qmd", "context-mode", "jcodemunch", "semble"])
+                                                      "qmd", "context-mode", "jcodemunch", "semble", "chrome-devtools"])
+        # Round-2 browser verdict: one stdio server serves automation and diagnostics.
+        chrome_args = ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics"]
+        self.assertEqual(servers["chrome-devtools"], {"type": "stdio", "command": "npx", "args": chrome_args})
+        self.assertEqual(config["mcp_servers"]["chrome-devtools"], {"command": "npx", "args": chrome_args})
         pinned_search = host["ECO_ROOT"] + "/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
         self.assertEqual(servers["socraticode"]["args"], [pinned_search.replace(host["ECO_ROOT"], "${ECO_ROOT}")])
         self.assertEqual(config["mcp_servers"]["socraticode"]["args"], [pinned_search])
@@ -997,8 +1001,21 @@ class RenderTests(unittest.TestCase):
 
     def test_no_text_names_a_tool_that_the_manifest_does_not_install(self):
         names = unwired_names_independently()
-        self.assertTrue({"codex-plugin-cc", "codex-rescue", "context-mode-cache-heal", "hcom", "openai-codex"} <= {
-            n.lower() for n in names}, names)
+        # Reproduced failure: hcom was still asserted unwired after wave 5 made
+        # it an installed owner. Keep the original name set and verify both
+        # partitions against that decision, rather than dropping its name.
+        referenced = {"codex-plugin-cc", "codex-rescue", "context-mode-cache-heal", "hcom", "openai-codex"}
+        consensus = json.loads((ROOT / "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json").read_text())
+        adopted = next(e["owner_default"] for e in consensus["wave5"]["amend_rows"]
+                       if e["slot_id"] == "agent-messaging")
+        messaging = foundation_rows()["agent-messaging"]
+        self.assertEqual(messaging["default"], adopted["default"])
+        self.assertFalse(messaging["installs_nothing_extra"])
+        self.assertTrue(cfg.installs(messaging))
+        installed_names = {adopted["default"].split()[0].lower()}
+        self.assertEqual(installed_names, {"hcom"})
+        self.assertEqual(referenced & {n.lower() for n in names}, referenced - installed_names)
+        self.assertEqual(installed_names & {n.lower() for n in names}, set())
         # The owner defaults and interim installs are wired, so their names are no longer scanned for.
         self.assertEqual({"ai-memory", "context-mode", "claude-hud", "semble", "rtk", "socraticode", "headroom",
                           "codebase-memory", "jcodemunch", "chub"} & {n.lower() for n in names}, set())
@@ -1690,7 +1707,7 @@ class ApplyTests(ApplyCase):
                              icp.expected_sha256(icp.HOOKS[name]))
         self.assertEqual(len(list((self.home / ".claude/agents").iterdir())), 11)
         self.assertEqual(sorted(json.loads((self.home / ".stub-claude-mcp.json").read_text())),
-                         ["ai-memory", "codebase-memory", "headroom", "jcodemunch", "qmd", "semble", "serena", "socraticode"])
+                         ["ai-memory", "chrome-devtools", "codebase-memory", "headroom", "jcodemunch", "qmd", "semble", "serena", "socraticode"])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         # The repository's hooks and the overlay's Notification, and the events ai-memory's hooks take (an interim install).
         self.assertEqual(sorted(settings["hooks"]), ["ConfigChange", "Notification", "PostToolUse", "PreCompact", "PreToolUse",
@@ -2021,11 +2038,12 @@ class AuthorizationTests(ApplyCase):
     # The coordinator's decision of 2026-10-04: the main checkout is trusted, and Codex looks a linked worktree's trust
     # up under it (codex-rs/git-utils/src/trust.rs at rust-v0.160.0); every other project still asks.
     TRUST = ('codex/config/projects."${PROJECT_ROOT}".trust_level',)
-    # The tool approval modes of six MCP servers, each tied to its installed owner's slot; wave 3 installs them all.
+    # Wave 5 adds Chrome's scoped approval piece to the existing owner approvals.
     APPROVAL = ("codex/config/mcp_servers.ai-memory.default_tools_approval_mode",
                 "codex/config/mcp_servers.semble.default_tools_approval_mode",
                 "codex/config/mcp_servers.context-mode.default_tools_approval_mode",
                 "codex/config/mcp_servers.jcodemunch.default_tools_approval_mode",
+                "codex/config/mcp_servers.chrome-devtools.default_tools_approval_mode",
                 "codex/stack-worker/mcp_servers.ai-memory.default_tools_approval_mode",
                 "codex/stack-worker/mcp_servers.socraticode.default_tools_approval_mode",
                 "codex/stack-worker/mcp_servers.headroom.default_tools_approval_mode")
@@ -2035,10 +2053,12 @@ class AuthorizationTests(ApplyCase):
     ALL = STANDALONE + TRUST + APPROVAL + ALLOW
     SLOT_OF = dict(zip(APPROVAL + ALLOW, (("memory-owner", "ai-memory"), ("code-search", "semble"),
                                           ("context-supply", "context-mode"), ("code-index", "jcodemunch"),
+                                          ("playwright-cli", "Chrome DevTools MCP 1.10.1 (one stdio MCP server, chrome-devtools, "
+                                           "in both clients; it also serves browser diagnostics)"),
                                           ("memory-owner", "ai-memory"),
                                           ("code-search", "SocratiCode"), ("output-compression", "headroom"),
                                           ("code-search", "semble"), ("code-search", "semble"))))
-    WAITING = APPROVAL[5:]                        # negative-control fixtures remove these two installed owners
+    WAITING = APPROVAL[6:]                        # the same two negative-control owners, after Chrome's insertion
     WRITTEN = STANDALONE + TRUST + APPROVAL + ALLOW     # what the option writes today
     OPTION = "--with-authorization-settings"
     DEFAULT_LINE = ("authorization settings: left to the clients' own defaults (Claude Code permissions.defaultMode, "
@@ -2123,7 +2143,8 @@ class AuthorizationTests(ApplyCase):
         self.assertEqual((codex_on["approval_policy"], codex_on["sandbox_mode"]), ("never", "danger-full-access"))
         self.assertEqual({name: server["default_tools_approval_mode"] for name, server in codex_on["mcp_servers"].items()
                           if "default_tools_approval_mode" in server},
-                         {"ai-memory": "approve", "semble": "approve", "context-mode": "approve", "jcodemunch": "approve"})
+                         {"ai-memory": "approve", "semble": "approve", "context-mode": "approve", "jcodemunch": "approve",
+                          "chrome-devtools": "approve"})
         # One trust grant, for the host's main checkout (PROJECT_ROOT) and nothing else: no parent directory, and not
         # the publication checkout the shared template also names.
         project_root = json.loads((ROOT / "adoption/hosts/example.json").read_text())["PROJECT_ROOT"]
@@ -2138,6 +2159,7 @@ class AuthorizationTests(ApplyCase):
                  ("mcp_servers", "semble", "default_tools_approval_mode"),
                  ("mcp_servers", "context-mode", "default_tools_approval_mode"),
                  ("mcp_servers", "jcodemunch", "default_tools_approval_mode"),
+                 ("mcp_servers", "chrome-devtools", "default_tools_approval_mode"),
                  ("projects", project_root, "trust_level")]))
             self.assertEqual(set(leaves(off)) - set(leaves(on)), set())
             self.assertEqual({k: v for k, v in leaves(on).items() if k in leaves(off)}, leaves(off))
@@ -2152,6 +2174,7 @@ class AuthorizationTests(ApplyCase):
                     "Codex mcp_servers.context-mode.default_tools_approval_mode, "
                     "Codex mcp_servers.jcodemunch.default_tools_approval_mode, "
                     "Codex mcp_servers.semble.default_tools_approval_mode, "
+                    "Codex mcp_servers.chrome-devtools.default_tools_approval_mode, "
                     'Codex projects."${PROJECT_ROOT}".trust_level')
     STACK_WORKER = ("Codex stack-worker profile mcp_servers.ai-memory.default_tools_approval_mode, "
                     "Codex stack-worker profile mcp_servers.socraticode.default_tools_approval_mode, "

@@ -11,6 +11,27 @@
   "entries": [
     {
       "match": [
+        "codex/config/mcp_servers.chrome-devtools.default_tools_approval_mode"
+      ],
+      "wiring": "authorization:allow the selected browser MCP tools under the destination's never policy",
+      "slot": "playwright-cli",
+      "owner": "Chrome DevTools MCP 1.10.1 (one stdio MCP server, chrome-devtools, in both clients; it also serves browser diagnostics)",
+      "source": "openai/codex@rust-v0.160.0:codex-rs/core/src/mcp_tool_call.rs:1515-1530,1619-1624; codex-rs/codex-mcp/src/mcp/mod.rs:91-109; ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df:src/tools/pages.ts:159-161 and src/tools/snapshot.ts:17-20"
+    },
+    {
+      "match": [
+        "claude/mcp/server/chrome-devtools",
+        "codex/config/mcp_servers.chrome-devtools.*"
+      ],
+      "wiring": "slot:playwright-cli",
+      "owner": "Chrome DevTools MCP 1.10.1 (one stdio MCP server, chrome-devtools, in both clients; it also serves browser diagnostics)",
+      "names": [
+        "chrome-devtools"
+      ],
+      "source": "ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df:docs/client-configurations.md:71,109; docs/advanced-usage.md:22; README.md:45"
+    },
+    {
+      "match": [
         "claude/settings/env/RTK_TELEMETRY_DISABLED",
         "codex/*/shell_environment_policy.set.RTK_TELEMETRY_DISABLED"
       ],
@@ -727,6 +748,56 @@
         "CHUB_TELEMETRY",
         "CHUB_FEEDBACK"
       ]
+    },
+    {
+      "match": [
+        "codex/omniroute/model"
+      ],
+      "wiring": "slot:gpt-gateway",
+      "owner": "OmniRoute",
+      "override": "cx/gpt-6.1-sol",
+      "source": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11; https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L331; docs/decisions/2026-10-04-round2-plan-g4-config.md",
+      "note": "Published 3.8.51 destination pool/fallback profile: Sol/xhigh. Native Codex/openai owns Sol/max; clean installation carries neither PR15167 nor the PR13788 standalone-search route."
+    },
+    {
+      "match": [
+        "codex/omniroute/model_reasoning_effort"
+      ],
+      "wiring": "slot:gpt-gateway",
+      "owner": "OmniRoute",
+      "override": "xhigh",
+      "source": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11; https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L331; docs/decisions/2026-10-04-round2-plan-g4-config.md",
+      "note": "Published 3.8.51 destination pool/fallback profile: Sol/xhigh. Native Codex/openai owns Sol/max; clean installation carries neither PR15167 nor the PR13788 standalone-search route."
+    },
+    {
+      "match": [
+        "codex/omniroute/web_search"
+      ],
+      "wiring": "slot:gpt-gateway",
+      "owner": "OmniRoute",
+      "override": "disabled",
+      "source": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11; https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L331; docs/decisions/2026-10-04-round2-plan-g4-config.md",
+      "note": "Published 3.8.51 destination pool/fallback profile: Sol/xhigh. Native Codex/openai owns Sol/max; clean installation carries neither PR15167 nor the PR13788 standalone-search route."
+    },
+    {
+      "match": [
+        "codex/omniroute/model_providers.omniroute.supports_standalone_web_search"
+      ],
+      "wiring": "slot:gpt-gateway",
+      "owner": "OmniRoute",
+      "override": false,
+      "source": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11; https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L331; docs/decisions/2026-10-04-round2-plan-g4-config.md",
+      "note": "Published 3.8.51 destination pool/fallback profile: Sol/xhigh. Native Codex/openai owns Sol/max; clean installation carries neither PR15167 nor the PR13788 standalone-search route."
+    },
+    {
+      "match": [
+        "codex/omniroute/features.standalone_web_search"
+      ],
+      "wiring": "slot:gpt-gateway",
+      "owner": "OmniRoute",
+      "override": false,
+      "source": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11; https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L331; docs/decisions/2026-10-04-round2-plan-g4-config.md",
+      "note": "Published 3.8.51 destination pool/fallback profile: Sol/xhigh. Native Codex/openai owns Sol/max; clean installation carries neither PR15167 nor the PR13788 standalone-search route."
     },
     {
       "match": [

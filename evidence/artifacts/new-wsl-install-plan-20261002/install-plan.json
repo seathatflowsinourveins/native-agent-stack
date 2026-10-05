@@ -1413,15 +1413,18 @@
     {
       "layer": "web-research",
       "slot": "playwright-cli",
-      "owner": "Playwright CLI",
-      "repository": "https://github.com/microsoft/playwright-cli",
-      "release": "v0.1.22",
-      "installed": false,
-      "measurement_only": true,
-      "route": "npm-global",
+      "owner": "Chrome DevTools MCP 1.10.1 (one stdio MCP server, chrome-devtools, in both clients; it also serves browser diagnostics)",
+      "repository": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+      "release": "chrome-devtools-mcp-v1.10.1",
+      "installed": true,
+      "measurement_only": false,
+      "route": "npm-npx-stdio",
       "commands": [
-        "npm install -g @playwright/cli@0.1.22",
-        "playwright-cli install-browser --with-deps chromium"
+        "test \"$(dpkg --print-architecture)\" = amd64 && mkdir -p -- \"$tool_root/chrome-devtools-mcp\"",
+        "cd \"$tool_root/chrome-devtools-mcp\" && wget -O google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb",
+        "curl --proto \"=https\" --tlsv1.2 -fL https://registry.npmjs.org/chrome-devtools-mcp/-/chrome-devtools-mcp-1.10.1.tgz -o \"$tool_root/chrome-devtools-mcp/chrome-devtools-mcp-1.10.1.tgz\" && printf \"%s  %s\\n\" 2a5c3a1d60ea1c2fd74b527066575ddabe3d69485b50937d9bd32f731e1212e7883d7b73b905fe41e9710158a86eff185240d9ec7583ae656247a2de60ad3003 \"$tool_root/chrome-devtools-mcp/chrome-devtools-mcp-1.10.1.tgz\" | sha512sum --check --status",
+        "test \"$(npm view chrome-devtools-mcp@1.10.1 dist.integrity)\" = sha512-Klw6HWDqHC/XS1JwZldd2r49aUhbUJN9m9Mvcx4SEueIPXtzuQX+QelxAViobv8YUkDZ7HWDrmViR6LeYK0wAw== && npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics --help",
+        "checkout_tag https://github.com/ChromeDevTools/chrome-devtools-mcp chrome-devtools-mcp-v1.10.1 \"$tool_root/chrome-devtools-mcp-source\" && test \"$(git -C \"$tool_root/chrome-devtools-mcp-source\" rev-parse HEAD)\" = e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df && cd \"$tool_root/chrome-devtools-mcp-source\" && git submodule update --init && PUPPETEER_SKIP_DOWNLOAD=true npm ci && npx puppeteer browsers install chrome && NODE_OPTIONS=--max_old_space_size=4096 npm run bundle"
       ],
       "needs": {
         "sudo": true,
@@ -1429,30 +1432,116 @@
         "docker": false,
         "gpu": false,
         "node": true,
-        "python": false
+        "python": true
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/microsoft/playwright-cli/v0.1.22/README.md#L26",
-        "line": 26
+        "url": "https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71",
+        "line": 71
       },
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "playwright-cli open https://playwright.dev --browser=chromium && playwright-cli close",
+          "command": "umask 077\nbrowser_receipts=\"${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/chrome-devtools\"\nmkdir -p -- \"$browser_receipts\"\ngoogle-chrome-stable --version > \"$browser_receipts/google-chrome-stable.version.txt\"\ntest -s \"$browser_receipts/google-chrome-stable.version.txt\"\nsha256sum \"$tool_root/chrome-devtools-mcp/google-chrome-stable_current_amd64.deb\" > \"$browser_receipts/google-chrome-stable.deb.sha256\"\ncd \"$tool_root/chrome-devtools-mcp-source\"\ntest \"$(git rev-parse HEAD)\" = e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df\nbrowser_run=\"$(mktemp -d \"$browser_receipts/upstream.XXXXXX\")\"\nPUPPETEER_EXECUTABLE_PATH=\"$(command -v google-chrome-stable)\" npm run test:no-build -- tests/index.test.ts tests/tools/pages.test.ts tests/tools/snapshot.test.ts tests/tools/console.test.ts tests/tools/network.test.ts tests/tools/performance.test.ts > \"$browser_run/tests.log\" 2>&1",
+          "kind": "upstream tests",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/.github/workflows/run-tests.yml#L72",
+            "line": 72
+          },
+          "evidence_class": "unchanged_upstream_test_subset",
+          "test_files": [
+            "tests/index.test.ts",
+            "tests/tools/pages.test.ts",
+            "tests/tools/snapshot.test.ts",
+            "tests/tools/console.test.ts",
+            "tests/tools/network.test.ts",
+            "tests/tools/performance.test.ts"
+          ],
+          "scope": "Six unchanged upstream files through the upstream test runner after release CI preparation. The documented PUPPETEER_EXECUTABLE_PATH environment selects installed Linux-side Google Chrome stable for these tests; the CI Chrome for Testing download remains test preparation only. Remaining upstream suites, matrix jobs, notices, memory-leak and publication checks are not rerun."
+        },
+        "after_sign_in": {
+          "command": "umask 077\nnative_receipts=\"${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/chrome-devtools\"\nmkdir -p -- \"$native_receipts\"\nnative_probe=\"$(mktemp -d \"$native_receipts/clients.XXXXXX\")\"\nfixture_url=\"file://$plan_dir/config/chrome-devtools-accept.html\"\ncd \"$repo_root\"\nclaude mcp get chrome-devtools > \"$native_probe/claude-registration.txt\"\ncodex mcp get chrome-devtools --json > \"$native_probe/codex-registration.json\"\njq -e '.transport.type == \"stdio\" and .transport.command == \"npx\" and .transport.args == [\"-y\", \"chrome-devtools-mcp@1.10.1\", \"--headless\", \"--isolated\", \"--no-usage-statistics\"]' \"$native_probe/codex-registration.json\" >/dev/null\nprompt=\"Use only the configured chrome-devtools MCP server for this browser acceptance. Call navigate_page to $fixture_url. Then call take_snapshot and list_console_messages for that page (use its pageId when returned). The title must be NativeStack Chrome MCP acceptance and the console must include native-stack-chrome-devtools-ready. Report failure if a required call fails. Do not substitute shell tools, file-reading tools, another browser server or another browser registration.\"\nclaude -p \"$prompt\" --model opus --effort max --max-turns 8 --output-format stream-json --verbose --allowedTools mcp__chrome-devtools__navigate_page,mcp__chrome-devtools__take_snapshot,mcp__chrome-devtools__list_console_messages > \"$native_probe/claude.jsonl\"\njq -s -e --arg url \"$fixture_url\" 'def returned($tool; $needle):\n  [ .[] | select(.type == \"assistant\") | .message.content[]? |\n    select(.type == \"tool_use\" and .name == $tool) | .id ] as $ids |\n  any(.[] | select(.type == \"user\") | .message.content[]?;\n    .type == \"tool_result\" and (.tool_use_id as $id | $ids | index($id) != null) and\n    (.is_error != true) and (.content | tostring | contains($needle)));\nany(.[]; .type == \"result\" and .subtype == \"success\" and .is_error == false) and\nreturned(\"mcp__chrome-devtools__navigate_page\"; $url) and\nreturned(\"mcp__chrome-devtools__take_snapshot\"; \"NativeStack Chrome MCP acceptance\") and\nreturned(\"mcp__chrome-devtools__list_console_messages\"; \"native-stack-chrome-devtools-ready\")' \"$native_probe/claude.jsonl\" >/dev/null\ncodex exec --json -C \"$repo_root\" -m gpt-6.1-sol -c 'model_reasoning_effort=\"max\"' \"$prompt\" > \"$native_probe/codex.jsonl\"\njq -s -e --arg url \"$fixture_url\" 'def returned($tool; $needle):\n  any(.[]; .type == \"item.completed\" and .item.type == \"mcp_tool_call\" and\n    .item.server == \"chrome-devtools\" and .item.tool == $tool and .item.status == \"completed\" and\n    .item.error == null and .item.result.isError != true and\n    (.item.result.content | tostring | contains($needle)));\nany(.[]; .type == \"turn.completed\") and\n(all(.[]; .type != \"turn.failed\" and .type != \"error\")) and\nreturned(\"navigate_page\"; $url) and\nreturned(\"take_snapshot\"; \"NativeStack Chrome MCP acceptance\") and\nreturned(\"list_console_messages\"; \"native-stack-chrome-devtools-ready\")' \"$native_probe/codex.jsonl\" >/dev/null",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/microsoft/playwright/e8149b8257d32dcf8f72573ecc43e72439da7080/packages/playwright-core/src/tools/mcp/config.ts#L285",
-            "line": 285
-          }
+            "url": "https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/tool-reference.md#L223",
+            "line": 223
+          },
+          "evidence_class": "project_integration_check_with_synthetic_local_fixture",
+          "needs_user": "Sign in to Claude Code and Codex natively on the destination, then run fresh sessions after client registration."
         }
       },
-      "config_paths": [],
-      "notes": "Measurement only: the manifest state is split, so the default run installs nothing and prints skipped; --only playwright-cli installs it for the deciding measurement (manifest: both critics agree on one browser tool, not two, and disagree on which: agent-browser's WSL2 launch issues are open upstream (critic 1) against one binary with no Node at run time (critic 2)). Planned. Upstream first global npm route; Node >=18. Browser/system dependencies required; acceptance requires network and a usable browser. Headless is default at README:69. Browser install adapts microsoft/playwright b630e71fcda7885885c459bcbb88e5bfa7c0a1ac docs/src/browsers.md:122 to CLI's package.json:25 dependency pin; close documented README:316. Ubuntu 26.04 native browser dependency support remains unrun. Round1 installed the correctly pinned bundled Chromium, while the unspecified browser selected system Chrome. Use the installed CLI's bundled browser installer and explicitly select chromium; retain the real open/close smoke.",
+      "config_paths": [
+        "config/chrome-devtools-accept.html"
+      ],
+      "notes": "Wave 5 owner default under the 2026-10-04 repository-quality rule. Replaces the measurement-only Playwright CLI row; preserves the slot ID. One stdio server named chrome-devtools in each client, with --headless --isolated --no-usage-statistics, serves browser automation and diagnostics. The experimental CLI and Claude plugin are not registered. Chrome stable uses the Linux-side upstream WSL .deb route, declares sudo, and records its actual version and locally observed archive hash (no published Chrome checksum or immutable Chrome version through this route). npm 1.10.1 artifact is checked against the published SHA512 SRI, and registry metadata is checked before the documented npx cache warmup. Native Ubuntu apt fix-broken repair follows a failed dpkg dependency install and is not a candidate-upstream test or verified 26.04 host result. Node 24.21.0 is already selected by the plan; satisfies the npm engines. Local source review and structural tests here are not a browser run. The destination client-config map owns the single stdio registration in each native client, rendered from its Claude and Codex additions; no install-row command registers a second server. Optional --no-performance-crux disables trace URL lookups; mandatory usage-statistics opt-out does not disable CrUX. Each client must return navigation, the fixture title and its console message before READY. Existing differing registrations require native reconciliation; no credential store is read or copied. The unstarted 20-task upstream Harbor comparison against Playwright CLI 0.1.22 remains an owner-reported removal check, never a local selection trial.",
       "supporting_sources": [
         {
-          "url": "https://raw.githubusercontent.com/microsoft/playwright/e8149b8257d32dcf8f72573ecc43e72439da7080/packages/playwright-core/src/tools/cli-client/program.ts#L346",
-          "line": 346
+          "url": "https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/troubleshooting.md#L99",
+          "line": 99
+        },
+        {
+          "url": "https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L109",
+          "line": 109
+        },
+        {
+          "url": "https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/advanced-usage.md#L22",
+          "line": 22
+        },
+        {
+          "url": "https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/README.md#L35",
+          "line": 35
+        },
+        {
+          "url": "https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/README.md#L45",
+          "line": 45
+        },
+        {
+          "url": "https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/configuration.md#L79",
+          "line": 79
+        },
+        {
+          "url": "https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/tests/index.test.ts#L38",
+          "line": 38
+        },
+        {
+          "url": "https://registry.npmjs.org/chrome-devtools-mcp/1.10.1"
+        },
+        {
+          "url": "https://github.com/puppeteer/puppeteer/blob/puppeteer-v25.11.0/packages/puppeteer/src/getConfiguration.ts#L140",
+          "line": 140
+        }
+      ],
+      "source_pin": "e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df",
+      "checksum": {
+        "algorithm": "sha512",
+        "value": "2a5c3a1d60ea1c2fd74b527066575ddabe3d69485b50937d9bd32f731e1212e7883d7b73b905fe41e9710158a86eff185240d9ec7583ae656247a2de60ad3003",
+        "integrity": "sha512-Klw6HWDqHC/XS1JwZldd2r49aUhbUJN9m9Mvcx4SEueIPXtzuQX+QelxAViobv8YUkDZ7HWDrmViR6LeYK0wAw==",
+        "source": "https://registry.npmjs.org/chrome-devtools-mcp/1.10.1",
+        "kind": "upstream_npm_dist_integrity"
+      },
+      "prerequisite_steps": [
+        {
+          "name": "chrome_devtools_linux_chrome",
+          "command": "dpkg -i \"$tool_root/chrome-devtools-mcp/google-chrome-stable_current_amd64.deb\"",
+          "needs": {
+            "sudo": true
+          },
+          "source": {
+            "url": "https://raw.githubusercontent.com/ChromeDevTools/chrome-devtools-mcp/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/troubleshooting.md#L105",
+            "line": 105
+          }
+        },
+        {
+          "name": "chrome_devtools_linux_chrome_dependency_fixup",
+          "command": "apt-get -f install -y",
+          "when": "dpkg reports unmet dependencies",
+          "needs": {
+            "sudo": true
+          },
+          "source": {
+            "url": "https://manpages.ubuntu.com/manpages/resolute/en/man8/apt-get.8.html"
+          },
+          "evidence_class": "documented_native_OS_repair_not_candidate_upstream_acceptance"
         }
       ]
     },
@@ -2762,7 +2851,8 @@
       "installed": true,
       "route": "uv-tool",
       "commands": [
-        "uv tool install --python 3.13 harbor==0.23.0",
+        "fetch_verified https://files.pythonhosted.org/packages/19/c7/607ff037dff1f40d1f941b9854742d66fd43630274fd4e7b8de8480dad34/harbor-0.23.0-py3-none-any.whl 8747400dbb2a5e2298e1338e17e88eba38433c0433fd700f34d1a9021bba5c37 \"$tool_root/downloads/harbor-0.23.0-py3-none-any.whl\"",
+        "uv tool install --python 3.13 \"$tool_root/downloads/harbor-0.23.0-py3-none-any.whl\"",
         "checkout_tag https://github.com/harbor-framework/harbor.git v0.23.0 \"$tool_root/harbor-v0.23.0\"; [[ \"$(git -C \"$tool_root/harbor-v0.23.0\" rev-parse HEAD)\" == 1e5c5c6db929a10a140d05e606882c671ae20729 ]]"
       ],
       "needs": {
@@ -2781,11 +2871,11 @@
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "export HARBOR_TELEMETRY=off\nharbor --version",
-          "kind": "version only",
+          "command": "export HARBOR_TELEMETRY=off\nharbor_env=\"$(uv tool dir)/harbor\"\n[[ \"$(readlink -f \"$(command -v harbor)\")\" == \"$(readlink -f \"$harbor_env/bin/harbor\")\" ]]\n\"$harbor_env/bin/python\" -c 'from importlib.metadata import version; assert version(\"harbor\") == \"0.23.0\"'\nharbor --version\ncd \"$tool_root/harbor-v0.23.0\"\nuv run --frozen --group dev python -m pytest -q tests/unit/test_trajectory_validator.py",
+          "kind": "upstream tests",
           "source": {
-            "url": "https://raw.githubusercontent.com/harbor-framework/harbor/v0.23.0/skills/create-adapter/SKILL.md#L30",
-            "line": 30
+            "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/tests/unit/test_trajectory_validator.py#L1",
+            "line": 1
           }
         },
         "service_health": {
@@ -2795,16 +2885,70 @@
             "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/tests/integration/test_hello_user_e2e.py#L25",
             "line": 25
           }
+        },
+        "after_sign_in": {
+          "command": "bash \"$config_root/harbor-worker-telemetry-accept.sh\"",
+          "kind": "native worker telemetry qualification",
+          "source": {
+            "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/docs-mintlify/core-concepts/agents/atif.mdx#L121",
+            "line": 121
+          }
         }
       },
-      "config_paths": [],
-      "notes": "G5 repair 2026-10-04, following the Opus adjudication: keep the pinned uv installation and clone v0.23.0 at 1e5c5c6db929a10a140d05e606882c671ae20729 because the wheel has no examples. Keep --version as post_install; service_health runs the unchanged hello-user task twice through Harbor, oracle and nop, on rootless Docker with DOCKER_HOST explicit. Apply the exact reward/exception assertions from tests/integration/test_hello_user_e2e.py:25-54 and independently check each verifier/reward.txt. The same positive reward gate must reject nop. Retain native job/trial results, verifier output and logs in fresh private directories. Oracle/nop E2E needs Docker and network for ubuntu:24.04 only; model-backed trials need a provider route. This CLI has no declared client wiring. A native codex agent trial through OmniRoute is a separate next step, not the READY gate; container access to the loopback-only gateway is untested. Claude OAuth token setup is outside this gate. No trial has run in this builder job.",
+      "config_paths": [
+        "$tool_root/downloads/harbor-0.23.0-py3-none-any.whl",
+        "$tool_root/harbor-v0.23.0",
+        "$config_root/harbor-worker-telemetry-accept.sh",
+        "$config_root/harbor-worker-telemetry-contract.md"
+      ],
+      "notes": "G5 repair 2026-10-04, following the Opus adjudication: keep the pinned uv installation and clone v0.23.0 at 1e5c5c6db929a10a140d05e606882c671ae20729 because the wheel has no examples. Keep --version as post_install; service_health runs the unchanged hello-user task twice through Harbor, oracle and nop, on rootless Docker with DOCKER_HOST explicit. Apply the exact reward/exception assertions from tests/integration/test_hello_user_e2e.py:25-54 and independently check each verifier/reward.txt. The same positive reward gate must reject nop. Retain native job/trial results, verifier output and logs in fresh private directories. Oracle/nop E2E needs Docker and network for ubuntu:24.04 only; model-backed trials need a provider route. This CLI has no declared client wiring. A native codex agent trial through OmniRoute is a separate next step, not the READY gate; container access to the loopback-only gateway is untested. Claude OAuth token setup is outside this gate. No trial has run in this builder job. Round-2 telemetry-contract acceptance recipe, UNRUN: install the published 0.23.0 wheel only after its PyPI SHA256 verifies, retaining the exact upstream source checkout. post_install now executes the unchanged upstream ATIF validator unit tests, including invalid-input rejection. Retain the existing oracle/nop Docker runner READY gate. after_sign_in dispatches only Harbor's own job runner with the user's maintained, commit-pinned task corpus and public native job config, requires the complete Codex/OpenHands/DeerFlow matrix and successful native verifiers, then applies the upstream trajectory validator to every adapter's ATIF. Pin container producers to Codex 0.160.0, OpenHands SDK 1.51.0 and DeerFlow v2.1.0 through documented adapter kwargs; independently require the observed Codex/OpenHands agent versions. Codex Sol/max uses native openai. Native verifier checks cover rollout, SDK JSONL, app-server and OpenHands events, with unique writer identity, errors/recovery, MCP/skill, nested workers, cancellation and restart, plus independent Collector observation and seeded violations. ATIF validity alone cannot qualify that contract. Harbor replaces no producer or collector and enables no telemetry exporter. The task corpus/config/provider and collector reachability inputs are needs_user; no new local trial is authored or run. Full recipe and evidence boundary: config/harbor-worker-telemetry-contract.md.",
       "source_checkout": {
         "tag": "v0.23.0",
         "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
         "path": "${tool_root}/harbor-v0.23.0",
         "purpose": "unchanged hello-user task and integration-test oracle"
-      }
+      },
+      "package_integrity": {
+        "algorithm": "sha256",
+        "value": "8747400dbb2a5e2298e1338e17e88eba38433c0433fd700f34d1a9021bba5c37",
+        "source": "https://pypi.org/pypi/harbor/0.23.0/json",
+        "scope": "Harbor wheel only; no PyPI attestation claim or transitive-dependency hash claim."
+      },
+      "needs_user": "Supply HARBOR_TELEMETRY_TASKS, its full HARBOR_TELEMETRY_TASKS_REV and a public HARBOR_TELEMETRY_JOB_CONFIG with native verifiers, container-reachable model/Collector endpoints and native sign-in if absent. No telemetry corpus is supplied by this builder.",
+      "supporting_sources": [
+        {
+          "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/docs-mintlify/core-concepts/jobs/configs.mdx#L6",
+          "line": 6
+        },
+        {
+          "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/base.py#L560",
+          "line": 560
+        },
+        {
+          "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/codex.py#L328",
+          "line": 328
+        },
+        {
+          "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/openhands_sdk.py#L150",
+          "line": 150
+        },
+        {
+          "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/deerflow.py#L181",
+          "line": 181
+        },
+        {
+          "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/docs-mintlify/core-concepts/tasks/verifier.mdx#L1",
+          "line": 1
+        },
+        {
+          "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/tests/integration/test_hello_user_e2e.py#L25",
+          "line": 25
+        },
+        {
+          "url": "https://docs.astral.sh/uv/reference/cli/#uv-tool-dir",
+          "line": 1
+        }
+      ]
     },
     {
       "layer": "quality-evaluation",
@@ -2828,7 +2972,7 @@
         "docker": false,
         "gpu": false,
         "node": true,
-        "python": false
+        "python": true
       },
       "version_pinned": true,
       "install_source": {
@@ -2838,7 +2982,7 @@
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "pf=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/promptfoo\"\nexport PROMPTFOO_CONFIG_DIR=\"$config_root/promptfoo-state\" PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1\n[[ \"$(\"$pf\" --version)\" == \"0.123.1\" ]]\n\"$pf\" mcp --help >/dev/null\nreceipt=\"$(mktemp -d \"${TMPDIR:-/tmp}/new-wsl-promptfoo.XXXXXX\")\"\ntrap 'rm -rf -- \"$receipt\"' EXIT\n\"$pf\" eval --config \"$config_root/promptfoo-0.123.1-basic.yaml\" --no-cache --no-share --no-write --no-table --no-progress-bar --output \"$receipt/pass.json\"\njq -e '.results.stats | .successes == 1 and .failures == 0 and .errors == 0' \"$receipt/pass.json\" >/dev/null\nrc=0\n\"$pf\" eval --config \"$config_root/promptfoo-0.123.1-failing.yaml\" --no-cache --no-share --no-write --no-table --no-progress-bar --output \"$receipt/fail.json\" || rc=$?\n[[ \"$rc\" == 100 ]]\njq -e '.results.stats | .successes == 0 and .failures == 1 and .errors == 0' \"$receipt/fail.json\" >/dev/null\nclaude mcp get promptfoo > \"$receipt/claude-wiring.txt\"\nrg -Fq \"Scope: User config\" \"$receipt/claude-wiring.txt\"\nrg -Fq \"Type: stdio\" \"$receipt/claude-wiring.txt\"\nrg -Fq -- \"$pf mcp --transport stdio\" \"$receipt/claude-wiring.txt\"\ncodex mcp get promptfoo --json | jq -e --arg pf \"$pf\" '.transport.command == $pf and .transport.args == [\"mcp\", \"--transport\", \"stdio\"] and (.transport.env_vars | index(\"GATEWAY_API_KEY\")) != null' >/dev/null",
+          "command": "pf=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/promptfoo\"\nexport PROMPTFOO_CONFIG_DIR=\"$config_root/promptfoo-state\" PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1\n[[ \"$(\"$pf\" --version)\" == \"0.123.1\" ]]\n\"$pf\" mcp --help >/dev/null\nnpm ls --global --prefix \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/promptfoo-0.123.1\" --all @anthropic-ai/claude-agent-sdk @openai/codex-sdk\nreceipt=\"$(mktemp -d \"${TMPDIR:-/tmp}/new-wsl-promptfoo.XXXXXX\")\"\ntrap 'rm -rf -- \"$receipt\"' EXIT\n\"$pf\" eval --config \"$config_root/promptfoo-0.123.1-basic.yaml\" --no-cache --no-share --no-write --no-table --no-progress-bar --output \"$receipt/pass.json\"\njq -e '.results.stats | .successes == 1 and .failures == 0 and .errors == 0' \"$receipt/pass.json\" >/dev/null\nrc=0\n\"$pf\" eval --config \"$config_root/promptfoo-0.123.1-failing.yaml\" --no-cache --no-share --no-write --no-table --no-progress-bar --output \"$receipt/fail.json\" || rc=$?\n[[ \"$rc\" == 100 ]]\njq -e '.results.stats | .successes == 0 and .failures == 1 and .errors == 0' \"$receipt/fail.json\" >/dev/null\nclaude mcp get promptfoo > \"$receipt/claude-wiring.txt\"\nrg -Fq \"Scope: User config\" \"$receipt/claude-wiring.txt\"\nrg -Fq \"Type: stdio\" \"$receipt/claude-wiring.txt\"\nrg -Fq -- \"$pf mcp --transport stdio\" \"$receipt/claude-wiring.txt\"\ncodex mcp get promptfoo --json | jq -e --arg pf \"$pf\" '.transport.command == $pf and .transport.args == [\"mcp\", \"--transport\", \"stdio\"] and (.transport.env_vars | index(\"GATEWAY_API_KEY\")) != null' >/dev/null",
           "kind": "smoke",
           "source": {
             "url": "https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/test/smoke/eval.test.ts#L65",
@@ -2846,12 +2990,30 @@
           }
         },
         "after_sign_in": {
-          "command": "pf=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/promptfoo\"\ngateway=\"${PROMPTFOO_GATEWAY_CONFIG:-$config_root/promptfoo-gateway.yaml}\"\nexport GATEWAY_API_KEY=\"${GATEWAY_API_KEY:-keyless-loopback}\"\nif rg -q 'your-gpt-model-id|your-claude-model-id|your-model-id|gateway.example.com' \"$gateway\"; then\n  printf 'needs_user: select the two exact existing GPT/Claude gateway model IDs and its apiBaseUrl in %s.\\n' \"$gateway\" >&2\n  exit 1\nfi\nexport PROMPTFOO_CONFIG_DIR=\"$config_root/promptfoo-state\" PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1\nrun=\"$config_root/promptfoo-acceptance/$(date -u +%Y%m%dT%H%M%SZ)-$$\"\nmkdir -p -- \"$run\"\nchmod 0700 \"$run\"\n\"$pf\" eval --config \"$gateway\" --no-cache --no-share --no-table --no-progress-bar --output \"$run/gateway.json\"\njq -e '.results.stats.successes == 2 and .results.stats.failures == 0 and .results.stats.errors == 0 and ([.results.results[].provider.id] | unique | length) == 2 and all(.results.results[]; .success == true and (.provider.id | startswith(\"openai:chat:\")))' \"$run/gateway.json\" >/dev/null\n# Supported Promptfoo SDK harness, with unchanged pinned fixtures in paired on/off workspaces.\npython3 - \"$config_root/promptfoo-skills.json\" \"$run/skills\" \"$tool_root/promptfoo-skill-fixtures\" <<'PY'\nimport json, shutil, sys\nfrom pathlib import Path\nroot, fixtures = Path(sys.argv[2]), Path(sys.argv[3])\nroot.mkdir(mode=0o700)\nfor name in (\"home\", \"codex-home\"):\n    (root / name).mkdir(mode=0o700)\nfor client, skill_dir in ((\"claude\", \".claude\"), (\"codex\", \".agents\")):\n    for arm in (\"on\", \"off\"):\n        work = root / f\"{client}-{arm}\"\n        (work / \"src\").mkdir(parents=True)\n        shutil.copyfile(fixtures / \"auth.ts\", work / \"src/auth.ts\")\n        if arm == \"on\":\n            skill = work / skill_dir / \"skills/review-standards\"\n            skill.mkdir(parents=True)\n            shutil.copyfile(fixtures / \"SKILL.md\", skill / \"SKILL.md\")\nconfig = Path(sys.argv[1]).read_text().replace(\"@RUN_DIR@\", str(root)).replace(\"@CODEX_BIN@\", shutil.which(\"codex\"))\npositive = json.loads(config)\n(root / \"config.json\").write_text(json.dumps(positive))\n# The failure control applies the disabled-skill assertion to both enabled arms.\nnegative = json.loads(config)\nnegative[\"tests\"] = [negative[\"tests\"][0]]\nnegative[\"tests\"][0][\"assert\"] = [{\"type\": \"not-skill-used\", \"value\": \"review-standards\"}]\n(root / \"negative.json\").write_text(json.dumps(negative))\nPY\n\"$pf\" eval --config \"$run/skills/config.json\" --max-concurrency 1 --no-cache --no-share --no-write --no-table --no-progress-bar --output \"$run/skills/pass.json\"\njq -e '.results.stats | .successes == 4 and .failures == 0 and .errors == 0' \"$run/skills/pass.json\" >/dev/null\nskill_rc=0\n\"$pf\" eval --config \"$run/skills/negative.json\" --max-concurrency 1 --no-cache --no-share --no-write --no-table --no-progress-bar --output \"$run/skills/fail.json\" || skill_rc=$?\n[[ \"$skill_rc\" == 100 ]]\njq -e '.results.stats | .successes == 0 and .failures == 2 and .errors == 0' \"$run/skills/fail.json\" >/dev/null\nargs=\"$(jq -cn --arg path \"$gateway\" '{configPath:$path,cache:false,write:false,share:false,maxConcurrency:1,resultLimit:20}')\"\nprompt=\"Call the promptfoo MCP run_evaluation tool once with these exact arguments: $args. Report only the evaluation ID and pass/fail counts. Read no authentication or credential files; use the inherited gateway environment.\"\nclaude -p --effort max --max-turns 4 --allowedTools mcp__promptfoo__run_evaluation --verbose --output-format stream-json \"$prompt\" > \"$run/claude.jsonl\" 2> \"$run/claude.stderr\"\ncodex exec --json --sandbox workspace-write -C \"$run\" -c 'mcp_servers.promptfoo.tools.run_evaluation.approval_mode=\"approve\"' -c 'model_reasoning_effort=\"max\"' --skip-git-repo-check \"$prompt\" </dev/null > \"$run/codex.jsonl\" 2> \"$run/codex.stderr\"\njq -s -e --arg client claude -f \"$config_root/promptfoo-session.jq\" \"$run/claude.jsonl\" >/dev/null\njq -s -e --arg client codex -f \"$config_root/promptfoo-session.jq\" \"$run/codex.jsonl\" >/dev/null",
+          "command": "pf=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/promptfoo\"\ngateway=\"${PROMPTFOO_GATEWAY_CONFIG:-$config_root/promptfoo-gateway.yaml}\"\nexport GATEWAY_API_KEY=\"${GATEWAY_API_KEY:-keyless-loopback}\"\nif rg -q 'your-gpt-model-id|your-claude-model-id|your-model-id|gateway.example.com' \"$gateway\"; then\n  printf 'needs_user: select the two exact existing GPT/Claude gateway model IDs and its apiBaseUrl in %s.\\n' \"$gateway\" >&2\n  exit 1\nfi\nexport PROMPTFOO_CONFIG_DIR=\"$config_root/promptfoo-state\" PROMPTFOO_DISABLE_TELEMETRY=1 PROMPTFOO_DISABLE_UPDATE=1\nrun=\"$config_root/promptfoo-acceptance/$(date -u +%Y%m%dT%H%M%SZ)-$$\"\nmkdir -p -- \"$run\"\nchmod 0700 \"$run\"\n\"$pf\" eval --config \"$gateway\" --no-cache --no-share --no-table --no-progress-bar --output \"$run/gateway.json\"\njq -e '.results.stats.successes == 2 and .results.stats.failures == 0 and .results.stats.errors == 0 and ([.results.results[].provider.id] | unique | length) == 2 and all(.results.results[]; .success == true and (.provider.id | startswith(\"openai:chat:\")))' \"$run/gateway.json\" >/dev/null\n# Supported Promptfoo SDK harness, with unchanged pinned fixtures in paired on/off workspaces.\npython3 - \"$config_root/promptfoo-skills.json\" \"$run/skills\" \"$tool_root/promptfoo-skill-fixtures\" <<'PY'\nimport json, os, shutil, sys\nfrom pathlib import Path\nroot, fixtures = Path(sys.argv[2]), Path(sys.argv[3])\nroot.mkdir(mode=0o700)\nfor client, skill_dir in ((\"claude\", \".claude\"), (\"codex\", \".agents\")):\n    for arm in (\"on\", \"off\"):\n        work = root / f\"{client}-{arm}\"\n        (work / \"src\").mkdir(parents=True)\n        shutil.copyfile(fixtures / \"auth.ts\", work / \"src/auth.ts\")\n        if arm == \"on\":\n            skill = work / skill_dir / \"skills/review-standards\"\n            skill.mkdir(parents=True)\n            shutil.copyfile(fixtures / \"SKILL.md\", skill / \"SKILL.md\")\nbinaries = {\"@CODEX_BIN@\": shutil.which(\"codex\"), \"@CLAUDE_BIN@\": shutil.which(\"claude\")}\nassert all(binaries.values()), \"Both pinned native clients must be installed before provider acceptance\"\nconfig = Path(sys.argv[1]).read_text().replace(\"@RUN_DIR@\", str(root))\nfor token, binary in binaries.items():\n    config = config.replace(token, binary)\nconfig = config.replace(\"@HOST_HOME@\", str(Path.home())).replace(\"@CODEX_HOME@\", os.environ.get(\"CODEX_HOME\", str(Path.home() / \".codex\")))\npositive = json.loads(config)\n(root / \"config.json\").write_text(json.dumps(positive))\n# The failure control applies the disabled-skill assertion to both enabled arms.\nnegative = json.loads(config)\nnegative[\"tests\"] = [negative[\"tests\"][0]]\nnegative[\"tests\"][0][\"assert\"] = [{\"type\": \"not-skill-used\", \"value\": \"review-standards\"}]\n(root / \"negative.json\").write_text(json.dumps(negative))\nPY\nenv -u OPENAI_API_KEY -u CODEX_API_KEY -u ANTHROPIC_API_KEY \"$pf\" eval --config \"$run/skills/config.json\" --max-concurrency 1 --no-cache --no-share --no-write --no-table --no-progress-bar --output \"$run/skills/pass.json\"\njq -e '.results.stats | .successes == 4 and .failures == 0 and .errors == 0' \"$run/skills/pass.json\" >/dev/null\nskill_rc=0\nenv -u OPENAI_API_KEY -u CODEX_API_KEY -u ANTHROPIC_API_KEY \"$pf\" eval --config \"$run/skills/negative.json\" --max-concurrency 1 --no-cache --no-share --no-write --no-table --no-progress-bar --output \"$run/skills/fail.json\" || skill_rc=$?\n[[ \"$skill_rc\" == 100 ]]\njq -e '.results.stats | .successes == 0 and .failures == 2 and .errors == 0' \"$run/skills/fail.json\" >/dev/null\nargs=\"$(jq -cn --arg path \"$gateway\" '{configPath:$path,cache:false,write:false,share:false,maxConcurrency:1,resultLimit:20}')\"\nprompt=\"Call the promptfoo MCP run_evaluation tool once with these exact arguments: $args. Report only the evaluation ID and pass/fail counts. Read no authentication or credential files; use the inherited gateway environment.\"\nclaude -p --effort max --max-turns 4 --allowedTools mcp__promptfoo__run_evaluation --verbose --output-format stream-json \"$prompt\" > \"$run/claude.jsonl\" 2> \"$run/claude.stderr\"\ncodex exec --json --sandbox workspace-write -C \"$run\" -c 'mcp_servers.promptfoo.tools.run_evaluation.approval_mode=\"approve\"' -c 'model_reasoning_effort=\"max\"' --skip-git-repo-check \"$prompt\" </dev/null > \"$run/codex.jsonl\" 2> \"$run/codex.stderr\"\njq -s -e --arg client claude -f \"$config_root/promptfoo-session.jq\" \"$run/claude.jsonl\" >/dev/null\njq -s -e --arg client codex -f \"$config_root/promptfoo-session.jq\" \"$run/codex.jsonl\" >/dev/null",
           "kind": "smoke",
           "source": {
             "url": "https://raw.githubusercontent.com/promptfoo/promptfoo/34f74d34e140b5e17d23770dfb2340057b1936b8/examples/openai-compatible-gateway/README.md#L22",
             "line": 22
-          }
+          },
+          "supporting_sources": [
+            {
+              "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/guides/test-agent-skills.md#L204",
+              "line": 204
+            },
+            {
+              "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/providers/claude-agent-sdk.md#L45",
+              "line": 45
+            },
+            {
+              "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/providers/claude-agent-sdk.md#L890",
+              "line": 890
+            },
+            {
+              "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/providers/openai-codex-sdk.md#L62",
+              "line": 62
+            }
+          ]
         }
       },
       "config_paths": [
@@ -2866,7 +3028,7 @@
         "$config_root/promptfoo-skills.json",
         "$tool_root/promptfoo-skill-fixtures"
       ],
-      "notes": "UNRUN on every distribution. The wave-4 owner default (the owner's repository-quality rule of 2026-10-04; decide round 2 named promptfoo for paired skill verification in both clients) replaces the historical no-install row; promptfoo also serves prompt/provider regression and the gateway A/B lane. Install the checksum-verified pinned npm package in an owned prefix including the optional MCP SDK, then register its upstream STDIO server in both native clients. The post-install positive and failing upstream echo fixtures prove evaluator plumbing only, with the failing control required to return 100; they do not qualify a model route. after_sign_in requires a real uncached two-provider gateway evaluation plus fresh Claude/Codex run_evaluation calls, inspected from native events and actual tool results. needs_user: select exact GPT/Claude model IDs in the retained gateway template and expose GATEWAY_API_KEY only when gateway authentication is enabled; retain native client sign-ins. Codex forwards that name through native env_vars without persisting its value. The plan and owners inventory follow the definitive manifest as written; no plan-local grant can override it. Paired skill verification uses the pinned upstream review-standards/auth.ts fixtures unchanged in equal-task on/off scratch workspaces with both Claude and Codex SDK providers. skill-used/not-skill-used assertions and the inverted enabled-arm exit-100 failure control are required. The Codex provider explicitly selects workspace-write, approval_policy=never, streaming and the installed CLI; a disposable HOME/CODEX_HOME and exact name/path enablement isolate the tested skill while a literal keyless gateway provider avoids copying native auth. This is a supported-harness integration adaptation, not unchanged upstream acceptance; its model/client execution remains owed.",
+      "notes": "Round-2 skill-lifecycle-verification config, UNRUN: retain Promptfoo 0.123.1, its checksum-verified npm install with optionalDependencies, its unchanged upstream passing/failing echo fixtures, native MCP registrations, gateway A/B and retained results. post_install also checks that both optional agent SDK providers are installed with npm ls in the owned prefix. The Test Agent Skills config sets anthropic:claude-agent-sdk path_to_claude_code_executable and openai:codex-sdk codex_path_override to the host's installed pinned native executables. Claude uses apiKeyRequired=false for its existing native sign-in. Codex uses the native openai provider at gpt-6.1-sol/max and its existing HOME/CODEX_HOME; no authentication file is copied or inspected. Provider API-key variables are removed for these paired runs. The on/off project workspaces, unchanged pinned fixtures, streaming skill-read evidence, deterministic task assertion and inverted exit-100 control remain supported-harness integration checks; the upstream echo smoke is upstream acceptance. Codex skill-used is inferred from successful SKILL.md reads, so verification correctness and task success remain separate. skill-creator owns authoring and authoring-time evaluation; Harbor owns containerized task-level agent A/B. needs_user: native Claude/Codex sign-in only if absent, and the existing gateway A/B template's two exact provider model IDs. No new local trial or model run occurs in this builder. The correction and Harbor comparison removal condition are recorded in docs/decisions/2026-10-04-round2-plan-g4-config.md.",
       "supporting_sources": [
         {
           "url": "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/mcp_tool_call.rs#L2485",
@@ -2887,8 +3049,21 @@
         {
           "url": "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/config/src/skills_config.rs#L20",
           "line": 20
+        },
+        {
+          "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/providers/claude-agent-sdk.md#L45",
+          "line": 45
+        },
+        {
+          "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/providers/claude-agent-sdk.md#L890",
+          "line": 890
+        },
+        {
+          "url": "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/providers/openai-codex-sdk.md#L62",
+          "line": 62
         }
-      ]
+      ],
+      "needs_user": "On a clean host, sign in natively to Claude Code and Codex if absent; select the two existing provider model IDs in promptfoo-gateway.yaml for the separate gateway A/B gate."
     },
     {
       "layer": "ci-supply-chain",
@@ -3794,11 +3969,13 @@
       "slot": "gpt-gateway",
       "owner": "OmniRoute",
       "repository": "https://github.com/diegosouzapw/OmniRoute",
-      "release": "3.8.52-canary (23a11484 + PR13788 + PR15167)",
+      "release": "3.8.51",
       "installed": true,
-      "route": "source-build",
+      "route": "npm-global",
       "commands": [
-        "bash \"$config_root/omniroute-canary-install.sh\""
+        "[[ \"$(npm view omniroute@3.8.51 dist.integrity)\" == \"sha512-VwwSt+bP9lJiPJXFJMz0nNGGuoewPZU3nFe1SLuO11ADgdSwTegGCxhg8Ov75+31m/cocPxHiO63zygn1XQ0MQ==\" ]]",
+        "npm install --global --include=optional --prefix \"$tool_root/omniroute-3.8.51\" omniroute@3.8.51; install -d -m 0700 -- \"$HOME/.local/bin\"; ln -sfn \"$tool_root/omniroute-3.8.51/bin/omniroute\" \"$HOME/.local/bin/omniroute\"",
+        "install -d -m 0700 -- \"$HOME/.config/systemd/user\" \"$HOME/.local/share/omniroute\"; unit=\"$HOME/.config/systemd/user/omniroute.service\"; if [[ ! -e \"$unit\" ]]; then install -m 0600 -- \"$config_root/omniroute.service\" \"$unit\"; elif ! cmp -s -- \"$config_root/omniroute.service\" \"$unit\"; then printf \"needs_user: existing OmniRoute unit differs; review the destination unit before replacement.\\n\" >&2; exit 1; fi; systemctl --user daemon-reload"
       ],
       "needs": {
         "sudo": false,
@@ -3810,8 +3987,8 @@
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/23a11484862b3bb589a55e85b00e4ac53ffeb234/package.json#L119",
-        "line": 119
+        "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/docs/guides/SETUP_GUIDE.md#L28",
+        "line": 28
       },
       "service": {
         "form": "destination systemd --user service adapted from adoption/templates/systemd/omniroute.service; config/omniroute.service is installed without replacing an existing different unit; startup is separate",
@@ -3820,73 +3997,70 @@
       },
       "acceptance": {
         "post_install": {
-          "command": "python3 \"$plan_dir/config/omniroute-canary-check.py\" \"$HOME/.local/bin/omniroute\" \"$plan_dir/config/omniroute-canary-evidence.json\" \"$tool_root\"\ntest -x \"$HOME/.local/bin/omniroute\"\nDATA_DIR=\"$HOME/.local/share/omniroute\" PORT=21128 OMNIROUTE_SERVER_HOST=127.0.0.1 \"$HOME/.local/bin/omniroute\" --output json doctor --no-liveness",
+          "command": "case \"$(readlink -f \"$HOME/.local/bin/omniroute\")\" in\n  \"$tool_root\"/omniroute-canary-*)\n    python3 \"$plan_dir/config/omniroute-canary-check.py\" \"$HOME/.local/bin/omniroute\" \"$plan_dir/config/omniroute-canary-evidence.json\" \"$tool_root\"\n    ;;\nesac\ntest -x \"$HOME/.local/bin/omniroute\"\n[[ \"$(readlink -f \"$HOME/.local/bin/omniroute\")\" == \"$(readlink -f \"$tool_root/omniroute-3.8.51/bin/omniroute\")\" ]]\nnode -e 'if (require(process.argv[1]).version !== \"3.8.51\") process.exit(1)' \"$tool_root/omniroute-3.8.51/lib/node_modules/omniroute/package.json\"\nDATA_DIR=\"$HOME/.local/share/omniroute\" PORT=21128 OMNIROUTE_SERVER_HOST=127.0.0.1 \"$HOME/.local/bin/omniroute\" --output json doctor --no-liveness",
           "kind": "smoke",
           "source": {
-            "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/23a11484862b3bb589a55e85b00e4ac53ffeb234/bin/cli/commands/doctor.mjs#L630",
-            "line": 630
+            "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/bin/cli/commands/doctor.mjs#L632",
+            "line": 632
           }
         },
         "service_health": {
-          "command": "python3 \"$plan_dir/config/omniroute-canary-check.py\" \"$HOME/.local/bin/omniroute\" \"$plan_dir/config/omniroute-canary-evidence.json\" \"$tool_root\"\ncurl -fsS http://127.0.0.1:21128/readyz\nDATA_DIR=\"$HOME/.local/share/omniroute\" PORT=21128 OMNIROUTE_SERVER_HOST=127.0.0.1 \"$HOME/.local/bin/omniroute\" --output json doctor --liveness-url http://127.0.0.1:21128/api/monitoring/health",
+          "command": "case \"$(readlink -f \"$HOME/.local/bin/omniroute\")\" in\n  \"$tool_root\"/omniroute-canary-*)\n    python3 \"$plan_dir/config/omniroute-canary-check.py\" \"$HOME/.local/bin/omniroute\" \"$plan_dir/config/omniroute-canary-evidence.json\" \"$tool_root\"\n    ;;\nesac\ntest -x \"$HOME/.local/bin/omniroute\"\n[[ \"$(readlink -f \"$HOME/.local/bin/omniroute\")\" == \"$(readlink -f \"$tool_root/omniroute-3.8.51/bin/omniroute\")\" ]]\nnode -e 'if (require(process.argv[1]).version !== \"3.8.51\") process.exit(1)' \"$tool_root/omniroute-3.8.51/lib/node_modules/omniroute/package.json\"\ncurl -fsS http://127.0.0.1:21128/readyz\nDATA_DIR=\"$HOME/.local/share/omniroute\" PORT=21128 OMNIROUTE_SERVER_HOST=127.0.0.1 \"$HOME/.local/bin/omniroute\" --output json doctor --liveness-url http://127.0.0.1:21128/api/monitoring/health",
           "kind": "health",
           "source": {
-            "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/23a11484862b3bb589a55e85b00e4ac53ffeb234/src/app/healthz/route.ts#L17",
-            "line": 17
+            "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/app/readyz/route.ts#L1",
+            "line": 1
           }
         },
         "after_sign_in": {
-          "command": "python3 \"$plan_dir/config/omniroute-canary-check.py\" \"$HOME/.local/bin/omniroute\" \"$plan_dir/config/omniroute-canary-evidence.json\" \"$tool_root\"\nbash \"$config_root/gpt-gateway-client-accept.sh\"",
+          "command": "case \"$(readlink -f \"$HOME/.local/bin/omniroute\")\" in\n  \"$tool_root\"/omniroute-canary-*)\n    python3 \"$plan_dir/config/omniroute-canary-check.py\" \"$HOME/.local/bin/omniroute\" \"$plan_dir/config/omniroute-canary-evidence.json\" \"$tool_root\"\n    ;;\nesac\ntest -x \"$HOME/.local/bin/omniroute\"\n[[ \"$(readlink -f \"$HOME/.local/bin/omniroute\")\" == \"$(readlink -f \"$tool_root/omniroute-3.8.51/bin/omniroute\")\" ]]\nnode -e 'if (require(process.argv[1]).version !== \"3.8.51\") process.exit(1)' \"$tool_root/omniroute-3.8.51/lib/node_modules/omniroute/package.json\"\nbash \"$config_root/gpt-gateway-client-accept.sh\"",
           "kind": "native client integration",
           "source": {
-            "url": "https://developers.openai.com/codex/noninteractive"
+            "url": "https://developers.openai.com/codex/noninteractive/"
           }
         }
       },
       "config_paths": [
+        "$tool_root/omniroute-3.8.51",
+        "$HOME/.local/bin/omniroute",
         "$config_root/omniroute.env.example",
-        "$config_root/omniroute-canary-install.sh",
+        "$config_root/omniroute.service",
         "$config_root/gpt-gateway-client-accept.sh",
-        "$config_root/omniroute-canary-evidence.json",
-        "$config_root/omniroute.service"
+        "$config_root/gpt-gateway-topology.json",
+        "$plan_dir/config/omniroute-canary-check.py",
+        "$plan_dir/config/omniroute-canary-evidence.json"
       ],
-      "notes": "Reconciles the wave-2 ruling with the recorded destination canary: upstream release/v3.8.52 @23a11484 plus the two PR13788 commits and PR15167@0585aba5. The clean-install helper runs npm ci, the five unchanged carried unit test files through upstream Node's runner, typecheck:core, build:release, OMNIROUTE_ALLOW_CANARY_BUILD=1 check:pack-artifact and npm pack, then installs that tarball in an owned prefix. Installation writes the destination user unit only when absent and reloads the manager; a differing existing unit is retained and refused. It neither starts/restarts the gateway nor reads provider state. After the clean install, start it with systemctl --user enable --now omniroute.service before service_health and native sign-in. The historical sanitized receipt binds the original B5a exits (test counts unknown), BUILD_SHA 720e881a4, package hash, independent canary read-back and the already successful clients-2 fresh Codex turn. These are reused host observations, not new builder execution. npm 3.8.51 is rollback only; manifests/stack.json retains the workstation's separately qualified stable registry pin and names the destination composition under new_wsl_pin. Both doctor legs call the explicit canary alias and use the service's DATA_DIR and port, avoiding the mise rollback and legacy ~/.omniroute. JSON is global --output json; doctor warnings alone do not establish service health, so /readyz must succeed first. The after_sign_in check uses the recorded keyless-loopback placeholder, requires native exit 0, turn.completed and the fixed response. Native wiring is the existing destination Codex omniroute profile on 21128 and the plan-carried user unit; the new-WSL client-config writer renders the profile, not the unit; Claude retains native sign-in and dispatches GPT lanes through that profile. Fresh-provider sign-in is needed only on a clean host that has none, never repeated for the recorded passing host. Standalone web.run open remains unsupported and provider priority-tier application remains unverified; neither is silently claimed. The live gateway was not touched. Every acceptance stage first checks the installed package/CLI version 3.8.52 and dist/BUILD_SHA 720e881a4 against the retained canary receipt; foreign and rollback builds fail before any health/model request. Fresh rebuilds verify the deterministic exact-composition source tree and use upstream OMNIROUTE_BUILD_SHA to stamp the historical composition marker consistently into Next/CLI sentinels. This does not assert that a new cherry-pick HEAD equals the historical source HEAD. An already matching owned canary is reused; existing active different builds and foreign aliases are retained and refused.",
+      "notes": "Round-2 corrected topology, UNRUN: the clean default is the published npm omniroute@3.8.51 package at c1e30b7676975feb298b49eff6ff58923c04b89e. Compare npm's published SHA512 SRI before its supported global install in an owned prefix. The clean install carries no local PR, patch or source build. Retain #704's composition checker, including its tool_root argument, when an installed alias resolves to a carried canary prefix; every stage subsequently requires the selected published 3.8.51 prefix and package identity, so a historical canary cannot qualify this destination. OmniRoute owns the account pool and fallback route; at this release gpt-6.1-sol is absent from both max/ultra alias sets and clampEffort caps it at xhigh before native passthrough. Native Codex/openai is the only Sol/max route. The destination client-config map renders the opt-in omniroute profile as cx/gpt-6.1-sol/xhigh on 21128 and disables the standalone search settings that required the previous PR13788 carry. The new topology artifact records the release/route boundary and re-pin trigger. Post-install runs upstream doctor, service_health requires /readyz plus doctor, and after_sign_in requires a fresh native Codex turn through the explicit pool/fallback profile at xhigh. Re-pin only when an upstream release contains PR15167's Sol alias correction and a gateway request independently shows wire reasoning.effort=max. Existing private DATA_DIR/native accounts remain host-owned; a differing destination service unit is retained and reported needs_user. Unit installation reloads the manager without starting or restarting it. Start the selected unit before service_health. Native Claude keeps its own route and can dispatch native Codex workers; no Claude provider setting is changed. The workstation's stable registry record and historical carried host receipts are separate scopes. No live gateway, provider store, credential file, new host install or model run is touched in this builder.",
       "supporting_sources": [
         {
-          "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/23a11484862b3bb589a55e85b00e4ac53ffeb234/bin/cli/data-dir.mjs#L51",
-          "line": 51
+          "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11",
+          "line": 11
         },
         {
-          "url": "https://raw.githubusercontent.com/diegosouzapw/OmniRoute/23a11484862b3bb589a55e85b00e4ac53ffeb234/scripts/build/validate-pack-artifact.ts#L215",
-          "line": 215
+          "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L331",
+          "line": 331
         },
         {
-          "url": "https://github.com/diegosouzapw/OmniRoute/pull/13788"
+          "url": "https://github.com/diegosouzapw/OmniRoute/pull/15167"
         },
         {
-          "url": "https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/tests/unit/codex-gpt6-sol-luna.test.ts#L65",
-          "line": 65
+          "url": "https://registry.npmjs.org/omniroute/3.8.51"
         },
         {
-          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/684",
-          "repository_locator": "this PR: adoption/templates/systemd/omniroute.service:65-97"
+          "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/docs/reference/ENVIRONMENT.md#L15",
+          "line": 15
         },
         {
-          "url": "https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/scripts/build/write-build-sha.mjs#L27",
-          "line": 27
+          "url": "https://developers.openai.com/codex/config-reference/"
         }
       ],
-      "source_build": {
-        "base": "23a11484862b3bb589a55e85b00e4ac53ffeb234",
-        "branch": "release/v3.8.52",
-        "cherry_picks": [
-          "24bbadbad15eec0d598c908416e4b01be4e37671",
-          "6c7990058c4ce9677de79452c8cefb10b4bf1b3d",
-          "0585aba5589d5a1f49243a13a8db249558e7c9e3"
-        ],
-        "rollback": "npm omniroute@3.8.51",
-        "historical_evidence": "config/omniroute-canary-evidence.json"
-      }
+      "source_pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "package_integrity": {
+        "sri": "sha512-VwwSt+bP9lJiPJXFJMz0nNGGuoewPZU3nFe1SLuO11ADgdSwTegGCxhg8Ov75+31m/cocPxHiO63zygn1XQ0MQ==",
+        "source": "https://registry.npmjs.org/omniroute/3.8.51",
+        "enforcement": "Compare the published SRI before npm install; native npm verifies downloaded package integrity. SLSA provenance is published, not verified here."
+      },
+      "needs_user": "Use native provider sign-in only if absent on a clean host; review an existing differing destination service unit before replacement."
     },
     {
       "layer": "cross:runtime-workers",
@@ -4024,7 +4198,7 @@
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "cd \"$tool_root/gpt-researcher\"\n.venv/bin/python -c 'import tomllib; from gpt_researcher import GPTResearcher; print(tomllib.load(open(\"pyproject.toml\", \"rb\"))[\"project\"][\"version\"])'\nbash \"$repo_root/tools/research/gpt_researcher.sh\" --preflight-only\n\"$tool_root/deer-flow/backend/.venv/bin/python\" -c 'from deerflow.client import DeerFlowClient'\ncd \"$tool_root/deer-flow/backend\"\nuv run --frozen --group dev python -m pytest -q tests/test_client.py\nDEER_FLOW_CONFIG_PATH=\"$config_root/deer-flow-config.yaml\" .venv/bin/python - <<'PY'\nimport os\nfrom deerflow.client import DeerFlowClient\nclient = DeerFlowClient(config_path=os.environ[\"DEER_FLOW_CONFIG_PATH\"], model_name=\"gpt-runtime\")\nassert any(m[\"name\"] == \"gpt-runtime\" for m in client.list_models()[\"models\"])\nPY\ntest -s \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/native-stack-research/SKILL.md\"\ntest -s \"$HOME/.agents/skills/native-stack-research/SKILL.md\"",
+          "command": "cd \"$tool_root/gpt-researcher\"\n.venv/bin/python -c 'import tomllib; from gpt_researcher import GPTResearcher; print(tomllib.load(open(\"pyproject.toml\", \"rb\"))[\"project\"][\"version\"])'\nbash \"$config_root/gpt-researcher.sh\" --preflight-only\n\"$tool_root/deer-flow/backend/.venv/bin/python\" -c 'from deerflow.client import DeerFlowClient'\ncd \"$tool_root/deer-flow/backend\"\nuv run --frozen --group dev python -m pytest -q tests/test_client.py\nenv -i HOME=\"$HOME\" PATH=\"$PATH\" JINA_API_KEY= DEER_FLOW_PROJECT_ROOT=\"$tool_root/deer-flow\" DEER_FLOW_CONFIG_PATH=\"$config_root/deer-flow-config.yaml\" .venv/bin/python - <<'PY'\nimport os\nfrom deerflow.client import DeerFlowClient\nfrom deerflow.config.app_config import get_app_config\nclient = DeerFlowClient(config_path=os.environ[\"DEER_FLOW_CONFIG_PATH\"], model_name=\"gpt-runtime\")\nassert any(m[\"name\"] == \"gpt-runtime\" for m in client.list_models()[\"models\"])\nactive = get_app_config().model_dump()\nmodel, = [m for m in active[\"models\"] if m[\"name\"] == \"gpt-runtime\"]\nassert model[\"use\"] == \"langchain_openai:ChatOpenAI\"\nassert model[\"model\"] == \"cx/gpt-6.1-sol-max\"\nassert model[\"base_url\"] == \"http://127.0.0.1:21128/v1\"\nsearch, = [tool for tool in active[\"tools\"] if tool[\"name\"] == \"web_search\"]\nassert search[\"use\"] == \"deerflow.community.ddg_search.tools:web_search_tool\"\nprint(\"DeerFlow effective loopback model and keyless search: passed\")\nPY\ntest -s \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/native-stack-research/SKILL.md\"\ntest -s \"$HOME/.agents/skills/native-stack-research/SKILL.md\"",
           "kind": "smoke",
           "source": {
             "url": "https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/tests/test_client.py",
@@ -4032,7 +4206,7 @@
           }
         },
         "after_sign_in": {
-          "command": "out=\"$(bash \"$repo_root/tools/research/gpt_researcher.sh\" \"Ubuntu 26.04 WSL news this month\")\"\ngrep -q \"^Report written to 'outputs/\" <<<\"$out\"\nrun=\"$(sed -n 's/^run directory: //p' <<<\"$out\")\"\nrefs=\"$(awk '/^#+ *References/{f=1} f' \"$run\"/outputs/*.md | grep -oE 'https?://[^) >]+' | sort -u | wc -l)\"\n[[ \"$refs\" -ge 5 ]]\nbash \"$config_root/deer-flow-research.sh\" \"Research Ubuntu 26.04 WSL news this month; return a short answer with primary source URLs.\"\n# Both gatherers are exercised by each fresh native session, with actual outputs observed outside it.\nstate=\"${XDG_STATE_HOME:-$HOME/.local/state}\"\ninstall -d -m 0700 -- \"$state/native-agent-stack/research/client-checks\"\nsession=\"$(mktemp -d \"$state/native-agent-stack/research/client-checks/run.XXXXXXXX\")\"\nfor client in claude codex; do\n  marker=\"$session/$client.started\"\n  touch \"$marker\"\n  prompt=\"Use native-stack-research to complete a short public research query about Ubuntu 26.04 WSL this month through BOTH installed gatherers: bash $config_root/gpt-researcher.sh and bash $config_root/deer-flow-research.sh. Include source URLs. Complete both real calls; preflight/import checks do not qualify. Inspect the two resulting reports and print their run directories.\"\n  if [[ \"$client\" == claude ]]; then\n    (cd \"$session\" && timeout 3300 claude -p --model opus --effort max --max-turns 16 --permission-mode bypassPermissions --output-format stream-json --verbose \"$prompt\") >\"$session/claude.jsonl\"\n  else\n    OMNIROUTE_API_KEY=local-loopback timeout 3300 codex exec -p omniroute -m gpt-6.1-sol -c model_reasoning_effort=max \\\n      --sandbox workspace-write -c sandbox_workspace_write.network_access=true \\\n      -c \"sandbox_workspace_write.writable_roots=[\\\"$state/new-wsl-native-stack/research\\\",\\\"$state/native-agent-stack/research\\\"]\" \\\n      --skip-git-repo-check -C \"$session\" --json \"$prompt\" </dev/null >\"$session/codex.jsonl\"\n  fi\n  python3 - \"$state\" \"$marker\" \"$session/$client.jsonl\" \"$client\" <<'PY'\nimport json, re, sys\nfrom pathlib import Path\n\ndef native_commands(path, client):\n    # Original native JSONL is retained. Match completed tool calls, not a model's verdict.\n    events = [json.loads(line) for line in path.read_text().splitlines() if line.startswith(\"{\")]\n    if client == \"codex\":\n        return [e[\"item\"][\"command\"] for e in events if e.get(\"type\") == \"item.completed\"\n                and e.get(\"item\", {}).get(\"type\") == \"command_execution\"\n                and e[\"item\"].get(\"exit_code\") == 0 and e[\"item\"].get(\"status\") == \"completed\"]\n    calls, done = {}, set()\n    for event in events:\n        content = event.get(\"message\", {}).get(\"content\", [])\n        if not isinstance(content, list):\n            continue\n        for block in content:\n            if block.get(\"type\") == \"tool_use\" and block.get(\"name\") == \"Bash\":\n                calls[block[\"id\"]] = block.get(\"input\", {}).get(\"command\", \"\")\n            elif block.get(\"type\") == \"tool_result\" and not block.get(\"is_error\", False):\n                done.add(block.get(\"tool_use_id\"))\n    return [command for key, command in calls.items() if key in done]\n\ncalls = native_commands(Path(sys.argv[3]), sys.argv[4])\nassert any(\"gpt-researcher.sh\" in cmd and \"--preflight-only\" not in cmd for cmd in calls), \"No completed native GPT Researcher call\"\nassert any(\"deer-flow-research.sh\" in cmd for cmd in calls), \"No completed native DeerFlow call\"\nstate, marker = map(Path, sys.argv[1:3])\nsince = marker.stat().st_mtime_ns\ngpt = [p for p in (state / \"new-wsl-native-stack/research/gptr\").glob(\"*/outputs/*.md\") if p.stat().st_mtime_ns > since]\ndeer = [p for p in (state / \"native-agent-stack/research/deer-flow\").glob(\"*/answer.md\") if p.stat().st_mtime_ns > since]\ndef has_references(path):\n    parts = re.split(r\"(?m)^#+ *References\", path.read_text())\n    return len(parts) > 1 and len(set(re.findall(r\"https?://[^\\s)>]+\", parts[-1]))) >= 5\nassert any(has_references(p) for p in gpt), \"No completed new GPT Researcher report\"\nassert any(p.read_text().strip() and re.search(r\"https?://\", p.read_text()) for p in deer), \"No completed new cited DeerFlow answer\"\nPY\ndone\n# Embedded acceptance starts no DeerFlow HTTP stack.\nif ss -H -ltn | awk '{print $4}' | grep -Eq ':(2026|8001|3000)$'; then\n  printf 'An embedded-only DeerFlow acceptance port is listening; inspect its owner\\n' >&2; exit 1\nfi",
+          "command": "out=\"$(bash \"$config_root/gpt-researcher.sh\" \"Ubuntu 26.04 WSL news this month\")\"\ngrep -q \"^Report written to 'outputs/\" <<<\"$out\"\nrun=\"$(sed -n 's/^run directory: //p' <<<\"$out\")\"\nrefs=\"$(awk '/^#+ *References/{f=1} f' \"$run\"/outputs/*.md | grep -oE 'https?://[^) >]+' | sort -u | wc -l)\"\n[[ \"$refs\" -ge 5 ]]\nbash \"$config_root/deer-flow-research.sh\" \"Research Ubuntu 26.04 WSL news this month; return a short answer with primary source URLs.\"\n# Both gatherers are exercised by each fresh native session, with actual outputs observed outside it.\nstate=\"${XDG_STATE_HOME:-$HOME/.local/state}\"\ninstall -d -m 0700 -- \"$state/native-agent-stack/research/client-checks\"\nsession=\"$(mktemp -d \"$state/native-agent-stack/research/client-checks/run.XXXXXXXX\")\"\nfor client in claude codex; do\n  marker=\"$session/$client.started\"\n  touch \"$marker\"\n  prompt=\"Use native-stack-research to complete a short public research query about Ubuntu 26.04 WSL this month through BOTH installed gatherers: bash $config_root/gpt-researcher.sh and bash $config_root/deer-flow-research.sh. Include source URLs. Complete both real calls; preflight/import checks do not qualify. Inspect the two resulting reports and print their run directories.\"\n  if [[ \"$client\" == claude ]]; then\n    (cd \"$session\" && timeout 3300 claude -p --model opus --effort max --max-turns 16 --permission-mode bypassPermissions --output-format stream-json --verbose \"$prompt\") >\"$session/claude.jsonl\"\n  else\n    timeout 3300 codex exec -m gpt-6.1-sol -c model_provider='\"openai\"' -c model_reasoning_effort=max \\\n      --sandbox workspace-write -c sandbox_workspace_write.network_access=true \\\n      -c \"sandbox_workspace_write.writable_roots=[\\\"$state/new-wsl-native-stack/research\\\",\\\"$state/native-agent-stack/research\\\"]\" \\\n      --skip-git-repo-check -C \"$session\" --json \"$prompt\" </dev/null >\"$session/codex.jsonl\"\n  fi\n  python3 - \"$state\" \"$marker\" \"$session/$client.jsonl\" \"$client\" <<'PY'\nimport json, re, sys\nfrom pathlib import Path\n\ndef native_commands(path, client):\n    # Original native JSONL is retained. Match completed tool calls, not a model's verdict.\n    events = [json.loads(line) for line in path.read_text().splitlines() if line.startswith(\"{\")]\n    if client == \"codex\":\n        return [e[\"item\"][\"command\"] for e in events if e.get(\"type\") == \"item.completed\"\n                and e.get(\"item\", {}).get(\"type\") == \"command_execution\"\n                and e[\"item\"].get(\"exit_code\") == 0 and e[\"item\"].get(\"status\") == \"completed\"]\n    calls, done = {}, set()\n    for event in events:\n        content = event.get(\"message\", {}).get(\"content\", [])\n        if not isinstance(content, list):\n            continue\n        for block in content:\n            if block.get(\"type\") == \"tool_use\" and block.get(\"name\") == \"Bash\":\n                calls[block[\"id\"]] = block.get(\"input\", {}).get(\"command\", \"\")\n            elif block.get(\"type\") == \"tool_result\" and not block.get(\"is_error\", False):\n                done.add(block.get(\"tool_use_id\"))\n    return [command for key, command in calls.items() if key in done]\n\ncalls = native_commands(Path(sys.argv[3]), sys.argv[4])\nassert any(\"gpt-researcher.sh\" in cmd and \"--preflight-only\" not in cmd for cmd in calls), \"No completed native GPT Researcher call\"\nassert any(\"deer-flow-research.sh\" in cmd for cmd in calls), \"No completed native DeerFlow call\"\nstate, marker = map(Path, sys.argv[1:3])\nsince = marker.stat().st_mtime_ns\ngpt = [p for p in (state / \"new-wsl-native-stack/research/gptr\").glob(\"*/outputs/*.md\") if p.stat().st_mtime_ns > since]\ndeer = [p for p in (state / \"native-agent-stack/research/deer-flow\").glob(\"*/answer.md\") if p.stat().st_mtime_ns > since]\ndef has_references(path):\n    parts = re.split(r\"(?m)^#+ *References\", path.read_text())\n    return len(parts) > 1 and len(set(re.findall(r\"https?://[^\\s)>]+\", parts[-1]))) >= 5\nassert any(has_references(p) for p in gpt), \"No completed new GPT Researcher report\"\nassert any(p.read_text().strip() and re.search(r\"https?://\", p.read_text()) for p in deer), \"No completed new cited DeerFlow answer\"\nPY\ndone\n# Embedded acceptance starts no DeerFlow HTTP stack.\nif ss -H -ltn | awk '{print $4}' | grep -Eq ':(2026|8001|3000)$'; then\n  printf 'An embedded-only DeerFlow acceptance port is listening; inspect its owner\\n' >&2; exit 1\nfi",
           "kind": "smoke",
           "source": {
             "url": "https://github.com/bytedance/deer-flow/blob/v2.1.0/README.md#L1658",
@@ -4051,7 +4225,7 @@
         "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/skills/native-stack-research/SKILL.md",
         "$HOME/.agents/skills/native-stack-research/SKILL.md"
       ],
-      "notes": "One row for the manifest's research-harnesses slot; the two independent evidence gatherers keep their own commands, in order: GPT Researcher (source checkout plus isolated venv) then DeerFlow (source checkout plus its backend's locked uv environment). install.sh attempts both and fails when either fails. Revised by the wave-2 research ruling (2026-10-03; Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2).): DeerFlow runs as the embedded DeerFlowClient, with no HTTP service, port, Compose, nginx, apt or sudo (changes 9 and 10; README.md:1639-1686, the backend's uv sync --locked is Makefile:96), so make docker-init, the 2026 service and its /health/ready check are gone and needs.docker is false; make config still generates config.yaml, which embedded runs read through DEER_FLOW_CONFIG_PATH (app_config.py:398-401 fails closed without it). The HTTP service comes back only if claude-to-deerflow passes the research-skill gate, and only in a loopback-only form. GPT Researcher: Classification gap: source checkout plus isolated Python venv has no permitted route label. Release v3.7.0 declares package 0.16.0; installing gpt-researcher==3.7.0 would invent a version. Install tagged requirements and import source from checkout. Runs go only through tools/research/gpt_researcher.sh (synthesis X18; research changes 2-5): a keyless configuration (tools/research/gpt-researcher.config.json, the measured session-80 values without the key: duckduckgo retriever, keyword context filter, fast cx/gpt-6.1-sol-high, smart and strategic cx/gpt-6.1-sol-max, LLM_KWARGS.max_tokens 12000), its base_url and a per-run x-omniroute-session header written into each run's copy, an env -i scrub with the placeholder key local-loopback inline (the runner cannot rename the gateway entry's OMNIROUTE_API_KEY, and OPENAI_API_KEY is on the inventory's must_not_be_set list), a fail-closed preflight in upstream's own Config with no network call, and --report_type research_report only (detailed_report reaches embeddings). No TAVILY_API_KEY: the duckduckgo retriever needs none (custody ruling, change 12). The post-install check imports both gatherers and runs the preflight; the check after sign-in is one short current-month research run through the destination gateway (127.0.0.1:21128): the success line and at least five distinct http(s) references in the report's reference list (research change 6); the gateway call log's status-200 rows and zero /v1/embeddings rows are read on the gateway's side. The installed config/deer-flow-config.yaml supplies the gpt-runtime model entry through the loopback gateway with its literal non-secret placeholder. No operator .env edit is needed; the wrapper masks upstream's example JINA_API_KEY with an empty environment value. A cited embedded run with no HTTP listener remains owed. 2026-10-04 G2 plan repair, UNRUN: copy_config preserves a dedicated active embedded configuration with the selected keyless gateway model and upstream DuckDuckGo/web-fetch tools. It no longer depends on an operator editing DeerFlow .env or activating a research skill. Install byte-identical copies of the existing GPT Researcher runner and public configuration together so both native clients can invoke them from any cwd. Install native-stack-research into both native skill directories. Post-install adds unchanged DeerFlow tests/test_client.py (including its mocked Gateway conformance tests) and checks the active model without printing settings. After-sign-in now executes DeerFlow chat alongside the GPT Researcher report, then both complete gatherers from each fresh headless client. Reference thresholds, fresh artifact observations and absence of HTTP listeners are local integration checks, not upstream acceptance suites. Gateway-side status-200 and zero-embeddings inspection remains an independent host observation. No new HTTP service, account secret or privacy choice is introduced. Native JSONL completion records are checked alongside the independently read artifacts, so a session summary or unrelated fresh output alone cannot pass.",
+      "notes": "One row for the manifest's research-harnesses slot; the two independent evidence gatherers keep their own commands, in order: GPT Researcher (source checkout plus isolated venv) then DeerFlow (source checkout plus its backend's locked uv environment). install.sh attempts both and fails when either fails. Revised by the wave-2 research ruling (2026-10-03; Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2).): DeerFlow runs as the embedded DeerFlowClient, with no HTTP service, port, Compose, nginx, apt or sudo (changes 9 and 10; README.md:1639-1686, the backend's uv sync --locked is Makefile:96), so make docker-init, the 2026 service and its /health/ready check are gone and needs.docker is false; make config still generates config.yaml, which embedded runs read through DEER_FLOW_CONFIG_PATH (app_config.py:398-401 fails closed without it). The HTTP service comes back only if claude-to-deerflow passes the research-skill gate, and only in a loopback-only form. GPT Researcher: Classification gap: source checkout plus isolated Python venv has no permitted route label. Release v3.7.0 declares package 0.16.0; installing gpt-researcher==3.7.0 would invent a version. Install tagged requirements and import source from checkout. Runs go only through tools/research/gpt_researcher.sh (synthesis X18; research changes 2-5): a keyless configuration (tools/research/gpt-researcher.config.json, the measured session-80 values without the key: duckduckgo retriever, keyword context filter, fast cx/gpt-6.1-sol-high, smart and strategic cx/gpt-6.1-sol-max, LLM_KWARGS.max_tokens 12000), its base_url and a per-run x-omniroute-session header written into each run's copy, an env -i scrub with the placeholder key local-loopback inline (the runner cannot rename the gateway entry's OMNIROUTE_API_KEY, and OPENAI_API_KEY is on the inventory's must_not_be_set list), a fail-closed preflight in upstream's own Config with no network call, and --report_type research_report only (detailed_report reaches embeddings). No TAVILY_API_KEY: the duckduckgo retriever needs none (custody ruling, change 12). The post-install check imports both gatherers and runs the preflight; the check after sign-in is one short current-month research run through the destination gateway (127.0.0.1:21128): the success line and at least five distinct http(s) references in the report's reference list (research change 6); the gateway call log's status-200 rows and zero /v1/embeddings rows are read on the gateway's side. The installed config/deer-flow-config.yaml supplies the gpt-runtime model entry through the loopback gateway with its literal non-secret placeholder. No operator .env edit is needed; the wrapper masks upstream's example JINA_API_KEY with an empty environment value. A cited embedded run with no HTTP listener remains owed. 2026-10-04 G2 plan repair, UNRUN: copy_config preserves a dedicated active embedded configuration with the selected keyless gateway model and upstream DuckDuckGo/web-fetch tools. It no longer depends on an operator editing DeerFlow .env or activating a research skill. Install byte-identical copies of the existing GPT Researcher runner and public configuration together so both native clients can invoke them from any cwd. Install native-stack-research into both native skill directories. Post-install adds unchanged DeerFlow tests/test_client.py (including its mocked Gateway conformance tests) and checks the active model without printing settings. After-sign-in now executes DeerFlow chat alongside the GPT Researcher report, then both complete gatherers from each fresh headless client. Reference thresholds, fresh artifact observations and absence of HTTP listeners are local integration checks, not upstream acceptance suites. Gateway-side status-200 and zero-embeddings inspection remains an independent host observation. No new HTTP service, account secret or privacy choice is introduced. Native JSONL completion records are checked alongside the independently read artifacts, so a session summary or unrelated fresh output alone cannot pass. Round 2 research-service-llm-route: the fix wave already supplied both /v1 model bindings, the keyless DuckDuckGo/Jina tools, the env -i GPT Researcher scrub and native research skill; leave those installs and consumer configs unchanged. Add only the installed-runner preflight and effective DeerFlow model/endpoint/tool read-back. The Codex caller of the gatherers uses native openai at Sol/max; consumers retain the verdict's exact cx/gpt-6.1-sol-max request spelling, with no claim that the clean 3.8.51 gateway honors max. A live cited run per gatherer and independent gateway status-200/zero-/v1/embeddings observation remain owed. The effective-settings removal condition tests each consumer's documented binding, not replacement of the gateway. No provider call is run in this builder.",
       "supporting_sources": [
         {
           "url": "https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/README.md#L1658",
@@ -4100,8 +4274,13 @@
         {
           "url": "https://code.claude.com/docs/en/cli-reference#streaming-json-output",
           "line": 1
+        },
+        {
+          "url": "https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/config/app_config.py#L681",
+          "line": 681
         }
-      ]
+      ],
+      "needs_user": "Native client/provider sign-in only if absent; retain the independent gateway call-log observation for each live cited run (status 200 and zero /v1/embeddings requests)."
     },
     {
       "layer": "cross:credential-practice",
