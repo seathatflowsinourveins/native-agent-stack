@@ -173,25 +173,36 @@ def main(argv=None) -> int:
             except Exception as error:  # noqa: BLE001
                 record["loki"] = {"error": type(error).__name__}
         elif client == "codex":
-            thread = codex_thread(stream)
-            if not thread and trial.get("cell") == "codex-app-server":
-                thread = None  # recorded from the app-server rollout below
-            record["thread_id"] = thread
-            files = rollouts_for(thread, start, end) if thread else []
-            if trial.get("cell") == "codex-app-server" and not files:
-                files = [p for p in rollouts_for(tid, start, end)]
-            dest = root / "rollouts" / tid
-            dest.mkdir(parents=True, exist_ok=True)
-            for path in files:
-                if not (dest / path.name).exists():
-                    shutil.copy2(path, dest / path.name)
-            record["rollouts"] = [p.name for p in files]
+            rows = None
             try:
                 rows = loki(f'{{service_name=~"codex.*"}} | env="{tid}" | event_name!="codex.sse_event"', start_ns, end_ns)
                 write_json(root / "loki" / f"{tid}.json", {"by_env": rows}, 0o600)
                 record["loki"] = {"by_env": len(rows)}
             except Exception as error:  # noqa: BLE001
                 record["loki"] = {"error": type(error).__name__}
+            thread = codex_thread(stream)
+            if not thread and rows:
+                # CL7b has no exec stream: the thread comes from Loki (env = trial_id), the conversation that started first.
+                starts = [r for r in rows if r.get("event_name") == "codex.conversation_starts" and r.get("conversation_id")]
+                thread = (starts[0] if starts else next((r for r in rows if r.get("conversation_id")), {})).get("conversation_id")
+                record["thread_from"] = "loki env"
+            record["thread_id"] = thread
+            files = rollouts_for(thread, start, end) if thread else []
+            dest = root / "rollouts" / tid
+            dest.mkdir(parents=True, exist_ok=True)
+            for path in files:
+                if not (dest / path.name).exists():
+                    shutil.copy2(path, dest / path.name)
+            record["rollouts"] = [p.name for p in files]
+            prepared = trial["phases"].get("prepared", {}) or trial["phases"].get("pre-launch", {})
+            fixture_dir = prepared.get("fixture_private")
+            if trial.get("cell") == "codex-app-server" and fixture_dir and Path(fixture_dir).exists():
+                # No launcher ran for CL7b, so stage 5 copies ./draft/ and hash-manifests the fixture (protocol CL7b).
+                from common import tree_manifest
+                if not (root / "draft" / tid).exists():
+                    shutil.copytree(Path(fixture_dir) / "draft", root / "draft" / tid, symlinks=True) \
+                        if (Path(fixture_dir) / "draft").exists() else (root / "draft" / tid).mkdir(parents=True)
+                write_json(root / "manifests" / f"{tid}.fixture.json", tree_manifest(Path(fixture_dir)), 0o600)
             if files:
                 ledger_path = root / "call-ledgers" / f"{tid}.jsonl"
                 if ledger_path.exists():

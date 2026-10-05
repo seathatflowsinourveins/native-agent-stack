@@ -801,6 +801,15 @@ def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> 
     events = parse_stream_text(stream_path.read_text(encoding="utf-8", errors="replace")) if stream_path.exists() else []
     stream = parse_codex_stream(events)
     rollouts = [parse_rollout(p) for p in sorted((root / "rollouts" / tid).glob("rollout-*.jsonl"))] if (root / "rollouts" / tid).exists() else []
+    stream_source = "exec stream"
+    if not stream["thread_id"] and rollouts:
+        # CL7b has no exec stream: the thread collect.py took from Loki, and that thread's rollout is the primary source.
+        collected = (load_json(root / "collect.json").get("trials") or {}).get(tid, {}) if (root / "collect.json").exists() else {}
+        thread = collected.get("thread_id") or (rollouts[0].get("meta") or {}).get("id")
+        main_rollout = next((r for r in rollouts if (r.get("meta") or {}).get("id") == thread), rollouts[0])
+        stream = {**stream, "thread_id": (main_rollout.get("meta") or {}).get("id"),
+                  "items": [dict(it) for it in main_rollout["items"].values()]}
+        stream_source = "rollout (no exec stream)"
     main = next((r for r in rollouts if (r.get("meta") or {}).get("id") == stream["thread_id"]), rollouts[0] if rollouts else None)
     clone = root / "clones" / tid
     catalog = skill_catalog("codex", clone)
@@ -809,7 +818,7 @@ def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> 
     # number of tool items completed before it plus 0.5. Child threads are offset by 10^6 per child.
     ordinal = 0
     for item in stream["items"]:
-        if item.get("type") in STREAM_TOOL_TYPES:
+        if item.get("type") in STREAM_TOOL_TYPES | ROLLOUT_TOOL_TYPES:
             ordinal += 1
         item["_ordinal"] = ordinal
         item["_actor"] = "main"
@@ -842,7 +851,7 @@ def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> 
     loki_mcp = {r.get("call_id"): r for r in rows if r.get("event_name") == "codex.tool_result" and r.get("mcp_server_name")}
     wrappers = [r for r in rows if r.get("event_name") == "codex.tool_result" and r.get("tool_name") == "exec"
                 and r.get("tool_namespace") == "functions"]
-    stream_mcp = [it for it in stream["items"] if it.get("type") == "mcp_tool_call"]
+    stream_mcp = [it for it in stream["items"] if it.get("type") in ("mcp_tool_call", "McpToolCall")]
     disagreements = []
     for call_id, item in rollout_mcp.items():
         row = loki_mcp.get(call_id)
@@ -877,7 +886,7 @@ def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> 
               "gateway_backend_models": sorted({c.get("backend_model") for c in calls if c.get("backend_model")}),
               "gateway_calls": len(calls), "gateway_build": ledger_rows.get("pre-launch", {}).get("gateway_build")}
     return {"stream": {"thread_id": stream["thread_id"], "items": len(stream["items"]), "errors": stream["errors"],
-                       "turn_failed": len(stream["turn_failed"]), "usage": stream["usage"]},
+                       "turn_failed": len(stream["turn_failed"]), "usage": stream["usage"], "source": stream_source},
             "uses": uses, "joins": joins, "agreement": agreement, "markers": markers, "effort": effort,
             "rollouts": [Path(r["path"]).name for r in rollouts], "model_provider": (main or {}).get("meta", {}).get("model_provider") if main else None,
             "hook_context_items": sum(1 for r in rollouts for m in r["messages"] if m.get("kinds") and "hooks.additional_context" in json.dumps(m["kinds"])),
