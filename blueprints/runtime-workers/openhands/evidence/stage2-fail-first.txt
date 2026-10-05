@@ -1,0 +1,657 @@
+Resolver stage 2: fail-first runs, local synthetic integration checks; not upstream or live acceptance.
+Each section is one returned test run before its implementing commit, in execution order.
+Only private filesystem prefixes are replaced: <worktree>, <scratch>, <tmp> and <private-home>.
+Environment of every run: TMPDIR=<tmp> PYTHONDONTWRITEBYTECODE=1, from <worktree>.
+
+=== slice1-harness: before 370e1da0: base read, repository check, branch rules, write journal ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.Stage2HarnessTests
+Exit code: 1
+
+EEEEE
+======================================================================
+ERROR: test_base_and_repository_reads_are_fixed_read_only_templates (tests.test_runtime_worker_openhands_resolver.Stage2HarnessTests.test_base_and_repository_reads_are_fixed_read_only_templates)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2383, in test_base_and_repository_reads_are_fixed_read_only_templates
+    self.assertEqual(h.op_base(), ["git", "ls-remote", ORIGIN, "refs/heads/main"])
+                     ^^^^^^^^^
+AttributeError: module 'openhands_resolver_gh_harness' has no attribute 'op_base'. Did you mean: 'op_issue'?
+
+======================================================================
+ERROR: test_base_parser_takes_exactly_one_main_line (tests.test_runtime_worker_openhands_resolver.Stage2HarnessTests.test_base_parser_takes_exactly_one_main_line)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2401, in test_base_parser_takes_exactly_one_main_line
+    self.assertEqual(self.h.parse_base(SHA_BASE_LINE.format(sha=sha)), sha)
+                     ^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_gh_harness' has no attribute 'parse_base'
+
+======================================================================
+ERROR: test_every_github_write_is_journaled_with_its_exit_status (tests.test_runtime_worker_openhands_resolver.Stage2HarnessTests.test_every_github_write_is_journaled_with_its_exit_status)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2467, in test_every_github_write_is_journaled_with_its_exit_status
+    self.assertEqual(harness.writes, [{"op": "push", "exit_code": 0}, {"op": "pr_create", "exit_code": 1},
+                     ^^^^^^^^^^^^^^
+AttributeError: 'GhHarness' object has no attribute 'writes'
+
+======================================================================
+ERROR: test_harness_reads_base_repository_and_branch_rules_through_its_runner (tests.test_runtime_worker_openhands_resolver.Stage2HarnessTests.test_harness_reads_base_repository_and_branch_rules_through_its_runner)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2439, in test_harness_reads_base_repository_and_branch_rules_through_its_runner
+    self.assertEqual(harness.base_sha(), sha)
+                     ^^^^^^^^^^^^^^^^
+AttributeError: 'GhHarness' object has no attribute 'base_sha'
+
+======================================================================
+ERROR: test_repository_check_names_this_repository_with_main_as_default (tests.test_runtime_worker_openhands_resolver.Stage2HarnessTests.test_repository_check_names_this_repository_with_main_as_default)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2410, in test_repository_check_names_this_repository_with_main_as_default
+    self.assertEqual(self.h.check_repository(json.dumps(REPOSITORY_JSON)),
+                     ^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_gh_harness' has no attribute 'check_repository'
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.022s
+
+FAILED (errors=5)
+
+=== slice2-worker: before 0426010a: worker resolver mode ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.ResolverWorkerTests
+Exit code: 1
+Note: Two assertions in this snapshot sat outside their subTest blocks; the next commit nests them.
+
+FEEEE
+======================================================================
+ERROR: test_resolver_agent_has_the_three_skills_agents_context_and_no_mcp (tests.test_runtime_worker_openhands_resolver.ResolverWorkerTests.test_resolver_agent_has_the_three_skills_agents_context_and_no_mcp)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2551, in test_resolver_agent_has_the_three_skills_agents_context_and_no_mcp
+    (agent, versions, skills), created, mcp = self.build(self.RESOLVER_SET, self.RESOLVER_SET)
+                                              ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2544, in build
+    mock.patch.object(self.worker, "RUN_INPUT", self.run_input), \
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1503, in __enter__
+    original, local = self.get_original()
+                      ~~~~~~~~~~~~~~~~~^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1473, in get_original
+    raise AttributeError(
+        "%s does not have the attribute %r" % (target, name)
+    )
+AttributeError: <module 'openhands_resolver_s2_worker' from '<worktree>/blueprints/runtime-workers/openhands/worker.py'> does not have the attribute 'RUN_INPUT'
+
+======================================================================
+ERROR: test_resolver_agent_refuses_any_other_skill_set (tests.test_runtime_worker_openhands_resolver.ResolverWorkerTests.test_resolver_agent_refuses_any_other_skill_set) (installed=('tdd', 'search-first', 'systematic-debugging'), listed=('tdd', 'search-first', 'systematic-debugging'))
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2588, in test_resolver_agent_refuses_any_other_skill_set
+    self.build(installed, listed)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2544, in build
+    mock.patch.object(self.worker, "RUN_INPUT", self.run_input), \
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1503, in __enter__
+    original, local = self.get_original()
+                      ~~~~~~~~~~~~~~~~~^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1473, in get_original
+    raise AttributeError(
+        "%s does not have the attribute %r" % (target, name)
+    )
+AttributeError: <module 'openhands_resolver_s2_worker' from '<worktree>/blueprints/runtime-workers/openhands/worker.py'> does not have the attribute 'RUN_INPUT'
+
+======================================================================
+ERROR: test_resolver_agent_refuses_any_other_skill_set (tests.test_runtime_worker_openhands_resolver.ResolverWorkerTests.test_resolver_agent_refuses_any_other_skill_set)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2589, in test_resolver_agent_refuses_any_other_skill_set
+    self.assertEqual(str(caught.exception), reason)
+                         ^^^^^^^^^^^^^^^^
+AttributeError: '_AssertRaisesContext' object has no attribute 'exception'
+
+======================================================================
+ERROR: test_resolver_request_has_no_hook_config_and_the_resolver_agent (tests.test_runtime_worker_openhands_resolver.ResolverWorkerTests.test_resolver_request_has_no_hook_config_and_the_resolver_agent)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2606, in test_resolver_request_has_no_hook_config_and_the_resolver_agent
+    body = self.worker.start_request("Resolve issue 12", "rw-openhands-res-12-20260928", "control",
+                                     resolver=True)
+TypeError: start_request() got an unexpected keyword argument 'resolver'
+
+======================================================================
+FAIL: test_request_entry_point_selects_the_mode_from_argv (tests.test_runtime_worker_openhands_resolver.ResolverWorkerTests.test_request_entry_point_selects_the_mode_from_argv)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2627, in test_request_entry_point_selects_the_mode_from_argv
+    start.assert_called_once_with("task text", "rw-openhands-res-12-20260928", "control", resolver=resolver)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 991, in assert_called_once_with
+    return self.assert_called_with(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 979, in assert_called_with
+    raise AssertionError(_error_message()) from cause
+AssertionError: expected call not found.
+Expected: start_request('task text', 'rw-openhands-res-12-20260928', 'control', resolver=False)
+  Actual: start_request('task text', 'rw-openhands-res-12-20260928', 'control')
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.018s
+
+FAILED (failures=1, errors=4)
+
+=== slice3-host: before 202fe266: host resolver mode ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.ResolverHostTests
+Exit code: 1
+
+EEEEEEEEEEEE
+======================================================================
+ERROR: test_gate_refusal_stops_resolver_mode_before_any_clone_or_container (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_gate_refusal_stops_resolver_mode_before_any_clone_or_container) (gate='verify_stage_gates')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2955, in test_gate_refusal_stops_resolver_mode_before_any_clone_or_container
+    code, mocks, result = self.run_resolver(attempt, **{gate: mock.Mock(side_effect=ValueError(reason))})
+                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2942, in run_resolver
+    mocks[name] = enter(mock.patch.object(self.host, name, replacement))
+                  ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/contextlib.py", line 530, in enter_context
+    result = _enter(cm)
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1503, in __enter__
+    original, local = self.get_original()
+                      ~~~~~~~~~~~~~~~~~^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1473, in get_original
+    raise AttributeError(
+        "%s does not have the attribute %r" % (target, name)
+    )
+AttributeError: <module 'openhands_resolver_s2_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not have the attribute 'resolver_clone'
+
+======================================================================
+ERROR: test_gate_refusal_stops_resolver_mode_before_any_clone_or_container (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_gate_refusal_stops_resolver_mode_before_any_clone_or_container) (gate='verify_gateway_providers')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2955, in test_gate_refusal_stops_resolver_mode_before_any_clone_or_container
+    code, mocks, result = self.run_resolver(attempt, **{gate: mock.Mock(side_effect=ValueError(reason))})
+                          ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2942, in run_resolver
+    mocks[name] = enter(mock.patch.object(self.host, name, replacement))
+                  ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/contextlib.py", line 530, in enter_context
+    result = _enter(cm)
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1503, in __enter__
+    original, local = self.get_original()
+                      ~~~~~~~~~~~~~~~~~^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1473, in get_original
+    raise AttributeError(
+        "%s does not have the attribute %r" % (target, name)
+    )
+AttributeError: <module 'openhands_resolver_s2_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not have the attribute 'resolver_clone'
+
+======================================================================
+ERROR: test_gate_refusal_stops_resolver_mode_before_any_clone_or_container (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_gate_refusal_stops_resolver_mode_before_any_clone_or_container)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2964, in test_gate_refusal_stops_resolver_mode_before_any_clone_or_container
+    stage_gates = mocks["verify_stage_gates"]
+                  ^^^^^
+UnboundLocalError: cannot access local variable 'mocks' where it is not associated with a value
+
+======================================================================
+ERROR: test_installed_resolver_skills_must_be_exactly_the_pinned_three (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_installed_resolver_skills_must_be_exactly_the_pinned_three)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2869, in test_installed_resolver_skills_must_be_exactly_the_pinned_three
+    self.assertEqual(self.host.resolver_workspace_skills(workspace, path),
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_s2_host' has no attribute 'resolver_workspace_skills'. Did you mean: 'install_workspace_skills'?
+
+======================================================================
+ERROR: test_resolver_attempt_prepares_without_mcp_qmd_or_runtime_mounts (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_resolver_attempt_prepares_without_mcp_qmd_or_runtime_mounts)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2970, in test_resolver_attempt_prepares_without_mcp_qmd_or_runtime_mounts
+    code, mocks, result = self.run_resolver(attempt)
+                          ~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2942, in run_resolver
+    mocks[name] = enter(mock.patch.object(self.host, name, replacement))
+                  ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/contextlib.py", line 530, in enter_context
+    result = _enter(cm)
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1503, in __enter__
+    original, local = self.get_original()
+                      ~~~~~~~~~~~~~~~~~^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1473, in get_original
+    raise AttributeError(
+        "%s does not have the attribute %r" % (target, name)
+    )
+AttributeError: <module 'openhands_resolver_s2_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not have the attribute 'resolver_clone'
+
+======================================================================
+ERROR: test_resolver_manifest_reuses_the_runtime_pins_and_passes_the_installer_schema (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_resolver_manifest_reuses_the_runtime_pins_and_passes_the_installer_schema)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2826, in test_resolver_manifest_reuses_the_runtime_pins_and_passes_the_installer_schema
+    manifest = self.host.resolver_skills_manifest(ROOT, pin)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_s2_host' has no attribute 'resolver_skills_manifest'
+
+======================================================================
+ERROR: test_resolver_preflight_skips_memory_embedding_and_qmd_checks (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_resolver_preflight_skips_memory_embedding_and_qmd_checks)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2698, in test_resolver_preflight_skips_memory_embedding_and_qmd_checks
+    pins, host_file, mcp = self.host.preflight(prefix, state, resolver=True)
+                           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: preflight() got an unexpected keyword argument 'resolver'
+
+======================================================================
+ERROR: test_resolver_request_is_rendered_with_the_resolver_flag_and_the_sink (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_resolver_request_is_rendered_with_the_resolver_flag_and_the_sink)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2741, in test_resolver_request_is_rendered_with_the_resolver_flag_and_the_sink
+    self.host.prepare_native_dispatch(self.tmp, RUN_ID, recipe.arm_config("control"), self.tmp / "prefix",
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                      self.pins, [], {"variables": {"HOST_PATH": "/usr/bin"}}, port=3740,
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                      resolver=True, session_sink=received.append)
+                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: prepare_native_dispatch() got an unexpected keyword argument 'resolver'
+
+======================================================================
+ERROR: test_resolver_skill_is_pinned_to_the_driver_checkouts_committed_bytes (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_resolver_skill_is_pinned_to_the_driver_checkouts_committed_bytes)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2810, in test_resolver_skill_is_pinned_to_the_driver_checkouts_committed_bytes
+    pin = self.host.resolver_skill_pin(repo)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_s2_host' has no attribute 'resolver_skill_pin'
+
+======================================================================
+ERROR: test_resolver_workspace_is_an_anonymous_clone_pinned_to_the_base_without_its_remote (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_resolver_workspace_is_an_anonymous_clone_pinned_to_the_base_without_its_remote)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2761, in test_resolver_workspace_is_an_anonymous_clone_pinned_to_the_base_without_its_remote
+    with mock.patch.object(self.host, "RESOLVER_ORIGIN", str(bare)), \
+         ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1503, in __enter__
+    original, local = self.get_original()
+                      ~~~~~~~~~~~~~~~~~^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1473, in get_original
+    raise AttributeError(
+        "%s does not have the attribute %r" % (target, name)
+    )
+AttributeError: <module 'openhands_resolver_s2_host' from '<worktree>/blueprints/runtime-workers/openhands/host.py'> does not have the attribute 'RESOLVER_ORIGIN'
+
+======================================================================
+ERROR: test_session_key_reaches_the_sink_in_memory_only (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_session_key_reaches_the_sink_in_memory_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2714, in test_session_key_reaches_the_sink_in_memory_only
+    paths = self.host.generate_session_files(self.tmp, RUN_ID, "control", sink=received.append)
+TypeError: generate_session_files() got an unexpected keyword argument 'sink'
+
+======================================================================
+ERROR: test_skill_installer_takes_the_resolver_manifest_through_the_same_path (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_skill_installer_takes_the_resolver_manifest_through_the_same_path)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2901, in test_skill_installer_takes_the_resolver_manifest_through_the_same_path
+    self.host.install_workspace_skills(ROOT, workspace, manifest=str(self.tmp / "resolver-skills.json"))
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: install_workspace_skills() got an unexpected keyword argument 'manifest'
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.116s
+
+FAILED (errors=12)
+
+=== slice4-result: before 08eb3d27: finish_result resolver branch and the receipt section ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.ResolverResultTests
+Exit code: 1
+
+EEFEE
+======================================================================
+ERROR: test_an_attempt_that_did_not_finish_hands_nothing_to_the_driver (tests.test_runtime_worker_openhands_resolver.ResolverResultTests.test_an_attempt_that_did_not_finish_hands_nothing_to_the_driver) (execution='stuck')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3096, in test_an_attempt_that_did_not_finish_hands_nothing_to_the_driver
+    self.assertEqual(receipt["resolver"]["status"], "agent_not_finished")
+                     ~~~~~~~^^^^^^^^^^^^
+KeyError: 'resolver'
+
+======================================================================
+ERROR: test_an_attempt_that_did_not_finish_hands_nothing_to_the_driver (tests.test_runtime_worker_openhands_resolver.ResolverResultTests.test_an_attempt_that_did_not_finish_hands_nothing_to_the_driver) (execution='error')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3096, in test_an_attempt_that_did_not_finish_hands_nothing_to_the_driver
+    self.assertEqual(receipt["resolver"]["status"], "agent_not_finished")
+                     ~~~~~~~^^^^^^^^^^^^
+KeyError: 'resolver'
+
+======================================================================
+ERROR: test_the_cli_result_without_the_driver_refuses_before_any_github_step (tests.test_runtime_worker_openhands_resolver.ResolverResultTests.test_the_cli_result_without_the_driver_refuses_before_any_github_step)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3086, in test_the_cli_result_without_the_driver_refuses_before_any_github_step
+    self.assertIsNone(receipt["resolver"]["status"])
+                      ~~~~~~~^^^^^^^^^^^^
+KeyError: 'resolver'
+
+======================================================================
+ERROR: test_the_drivers_stage_and_codes_reach_the_receipt_as_fixed_fields_only (tests.test_runtime_worker_openhands_resolver.ResolverResultTests.test_the_drivers_stage_and_codes_reach_the_receipt_as_fixed_fields_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3109, in test_the_drivers_stage_and_codes_reach_the_receipt_as_fixed_fields_only
+    section = receipt["resolver"]
+              ~~~~~~~^^^^^^^^^^^^
+KeyError: 'resolver'
+
+======================================================================
+FAIL: test_finished_attempt_exports_a_full_index_patch_and_hands_it_to_the_driver (tests.test_runtime_worker_openhands_resolver.ResolverResultTests.test_finished_attempt_exports_a_full_index_patch_and_hands_it_to_the_driver)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3058, in test_finished_attempt_exports_a_full_index_patch_and_hands_it_to_the_driver
+    self.assertEqual(len(driver.calls), 1)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 0 != 1
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.151s
+
+FAILED (failures=1, errors=4)
+
+=== slice5-driver: before 7d77f35d: ResolverAttempt and resolver.py run ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests tests.test_runtime_worker_openhands_resolver.ResolverRunTests tests.test_runtime_worker_openhands_resolver.CommandLineTests
+Exit code: 1
+
+EEEEEEEEE..F.
+======================================================================
+ERROR: test_a_failed_push_stops_before_the_pull_request (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_a_failed_push_stops_before_the_pull_request)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3294, in test_a_failed_push_stops_before_the_pull_request
+    outcome = self.attempt(github).finish(self.result_for("push"), patch_text=patch, final_message=FINAL_MESSAGE)
+              ~~~~~~~~~~~~^^^^^^^^
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3223, in attempt
+    attempt = self.r.ResolverAttempt(
+              ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_under_test' has no attribute 'ResolverAttempt'
+
+======================================================================
+ERROR: test_an_accepted_patch_becomes_one_ext_commit_with_hooks_off_then_a_draft_pr (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_an_accepted_patch_becomes_one_ext_commit_with_hooks_off_then_a_draft_pr)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3235, in test_an_accepted_patch_becomes_one_ext_commit_with_hooks_off_then_a_draft_pr
+    attempt = self.attempt(github)
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3223, in attempt
+    attempt = self.r.ResolverAttempt(
+              ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_under_test' has no attribute 'ResolverAttempt'
+
+======================================================================
+ERROR: test_exit_status_comes_from_host_observed_github_results_only (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_exit_status_comes_from_host_observed_github_results_only)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3300, in test_exit_status_comes_from_host_observed_github_results_only
+    exit_code = self.r.resolver_exit
+                ^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_under_test' has no attribute 'resolver_exit'
+
+======================================================================
+ERROR: test_model_text_that_fails_the_guard_is_refused_before_any_write (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_model_text_that_fails_the_guard_is_refused_before_any_write) (reason='session_key')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3271, in test_model_text_that_fails_the_guard_is_refused_before_any_write
+    outcome = self.attempt(github).finish(self.result_for(reason.replace("_", "-")), patch_text=patch,
+              ~~~~~~~~~~~~^^^^^^^^
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3223, in attempt
+    attempt = self.r.ResolverAttempt(
+              ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_under_test' has no attribute 'ResolverAttempt'
+
+======================================================================
+ERROR: test_model_text_that_fails_the_guard_is_refused_before_any_write (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_model_text_that_fails_the_guard_is_refused_before_any_write) (reason='no_sota_sources')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3271, in test_model_text_that_fails_the_guard_is_refused_before_any_write
+    outcome = self.attempt(github).finish(self.result_for(reason.replace("_", "-")), patch_text=patch,
+              ~~~~~~~~~~~~^^^^^^^^
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3223, in attempt
+    attempt = self.r.ResolverAttempt(
+              ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_under_test' has no attribute 'ResolverAttempt'
+
+======================================================================
+ERROR: test_model_text_that_fails_the_guard_is_refused_before_any_write (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_model_text_that_fails_the_guard_is_refused_before_any_write) (reason='closing_keyword')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3271, in test_model_text_that_fails_the_guard_is_refused_before_any_write
+    outcome = self.attempt(github).finish(self.result_for(reason.replace("_", "-")), patch_text=patch,
+              ~~~~~~~~~~~~^^^^^^^^
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3223, in attempt
+    attempt = self.r.ResolverAttempt(
+              ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_under_test' has no attribute 'ResolverAttempt'
+
+======================================================================
+ERROR: test_model_text_that_fails_the_guard_is_refused_before_any_write (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_model_text_that_fails_the_guard_is_refused_before_any_write) (reason='mention')
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3271, in test_model_text_that_fails_the_guard_is_refused_before_any_write
+    outcome = self.attempt(github).finish(self.result_for(reason.replace("_", "-")), patch_text=patch,
+              ~~~~~~~~~~~~^^^^^^^^
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3223, in attempt
+    attempt = self.r.ResolverAttempt(
+              ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_under_test' has no attribute 'ResolverAttempt'
+
+======================================================================
+ERROR: test_refused_and_empty_patches_write_nothing (tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_refused_and_empty_patches_write_nothing)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3280, in test_refused_and_empty_patches_write_nothing
+    refused = self.attempt(github).finish(self.result_for("refused"),
+              ~~~~~~~~~~~~^^^^^^^^
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3223, in attempt
+    attempt = self.r.ResolverAttempt(
+              ^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_under_test' has no attribute 'ResolverAttempt'
+
+======================================================================
+ERROR: setUpClass (tests.test_runtime_worker_openhands_resolver.ResolverRunTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3331, in setUpClass
+    cls.host, cls.dispatch, cls.receipts = (cls.r._recipe(name) for name in ("host", "dispatch", "receipt"))
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3331, in <genexpr>
+    cls.host, cls.dispatch, cls.receipts = (cls.r._recipe(name) for name in ("host", "dispatch", "receipt"))
+                                            ^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_under_test' has no attribute '_recipe'
+
+======================================================================
+FAIL: test_run_takes_the_stage_2_options_and_refuses_without_them (tests.test_runtime_worker_openhands_resolver.CommandLineTests.test_run_takes_the_stage_2_options_and_refuses_without_them)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2326, in test_run_takes_the_stage_2_options_and_refuses_without_them
+    self.assertEqual(script.returncode, 2)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: 1 != 2
+
+----------------------------------------------------------------------
+Ran 9 tests in 0.791s
+
+FAILED (failures=1, errors=9)
+
+=== slice6-rerun: before 050cf083: same-day rerun and a raising review loop ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_a_second_attempt_the_same_utc_day_refuses_and_leaves_the_first_receipt_alone tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_a_review_loop_that_raises_still_records_the_stop
+Exit code: 1
+
+FFE
+======================================================================
+ERROR: test_a_review_loop_that_raises_still_records_the_stop (tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_a_review_loop_that_raises_still_records_the_stop)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3576, in test_a_review_loop_that_raises_still_records_the_stop
+    code, printed, _ = self.run_cli(ResolverGitHub(base=self.base), edits={"docs/a.md": "a\nnew line\n"})
+                       ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3444, in run_cli
+    code = self.r.main(self.argv(*extra), runner=github, clock=clock.clock, sleep=clock.sleep)
+  File "<worktree>/blueprints/runtime-workers/openhands/resolver.py", line 1673, in main
+    return args.handler(args, **injected)
+           ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<worktree>/blueprints/runtime-workers/openhands/resolver.py", line 1580, in _cmd_run
+    review = review_summary(loop.run(), status="completed")
+                            ~~~~~~~~^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1169, in __call__
+    return self._mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1173, in _mock_call
+    return self._execute_mock_call(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/mock.py", line 1234, in _execute_mock_call
+    raise effect
+subprocess.TimeoutExpired: Command '['gh']' timed out after 600 seconds
+
+======================================================================
+FAIL: test_a_second_attempt_the_same_utc_day_refuses_and_leaves_the_first_receipt_alone (tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_a_second_attempt_the_same_utc_day_refuses_and_leaves_the_first_receipt_alone) (dry_run=True)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3560, in test_a_second_attempt_the_same_utc_day_refuses_and_leaves_the_first_receipt_alone
+    self.assertEqual(code, 3)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^
+AssertionError: 0 != 3
+
+======================================================================
+FAIL: test_a_second_attempt_the_same_utc_day_refuses_and_leaves_the_first_receipt_alone (tests.test_runtime_worker_openhands_resolver.ResolverRunTests.test_a_second_attempt_the_same_utc_day_refuses_and_leaves_the_first_receipt_alone) (dry_run=False)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3560, in test_a_second_attempt_the_same_utc_day_refuses_and_leaves_the_first_receipt_alone
+    self.assertEqual(code, 3)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^
+AssertionError: 5 != 3
+
+----------------------------------------------------------------------
+Ran 2 tests in 1.561s
+
+FAILED (failures=2, errors=1)
+
+=== slice7-vbc: before 2d1d074d: SWE-bench skill contract and the runtime manifest's exclusion ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_swebench_skill_contract_follows_the_runtime_manifest_exclusion
+Exit code: 1
+
+E
+======================================================================
+ERROR: test_swebench_skill_contract_follows_the_runtime_manifest_exclusion (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_swebench_skill_contract_follows_the_runtime_manifest_exclusion)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2918, in test_swebench_skill_contract_follows_the_runtime_manifest_exclusion
+    self.assertEqual(self.host.workspace_skills(stack, workspace)["names"], ["search-first", "tdd"])
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<worktree>/blueprints/runtime-workers/openhands/host.py", line 403, in workspace_skills
+    raise ValueError("runtime_skills_manifest_contract")
+ValueError: runtime_skills_manifest_contract
+
+----------------------------------------------------------------------
+Ran 1 test in 0.032s
+
+FAILED (errors=1)
+
+=== slice8-driver-edges: before 848fac7d: a head moving as the PR opens, and an interrupt in the driver ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_a_head_that_moves_as_the_pr_opens_keeps_the_pr_number_and_stops tests.test_runtime_worker_openhands_resolver.ResolverAttemptTests.test_an_interrupt_inside_the_driver_is_recorded_with_its_writes
+Exit code: 130
+Note: Exit 130: the KeyboardInterrupt that the second test plants was not caught by the driver, so it terminated the test runner before the summary. That termination is the red result for the interrupt case; the log is complete up to it.
+
+ETraceback (most recent call last):
+  File "<frozen runpy>", line 203, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/__main__.py", line 18, in <module>
+    main(module=None)
+    ~~~~^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/main.py", line 104, in __init__
+    self.runTests()
+    ~~~~~~~~~~~~~^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/main.py", line 270, in runTests
+    self.result = testRunner.run(self.test)
+                  ~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/runner.py", line 240, in run
+    test(result)
+    ~~~~^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/suite.py", line 84, in __call__
+    return self.run(*args, **kwds)
+           ~~~~~~~~^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/suite.py", line 122, in run
+    test(result)
+    ~~~~^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/suite.py", line 84, in __call__
+    return self.run(*args, **kwds)
+           ~~~~~~~~^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/suite.py", line 122, in run
+    test(result)
+    ~~~~^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/case.py", line 707, in __call__
+    return self.run(*args, **kwds)
+           ~~~~~~~~^^^^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/case.py", line 651, in run
+    self._callTestMethod(testMethod)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "<private-home>/.local/share/uv/python/cpython-3.13.15-linux-x86_64-gnu/lib/python3.13/unittest/case.py", line 606, in _callTestMethod
+    if method() is not None:
+       ~~~~~~^^
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3358, in test_an_interrupt_inside_the_driver_is_recorded_with_its_writes
+    outcome = self.attempt(runner).finish(self.result_for("interrupt"), patch_text=patch,
+                                          final_message=FINAL_MESSAGE)
+  File "<worktree>/blueprints/runtime-workers/openhands/resolver.py", line 1353, in finish
+    pushed = self.harness.push(str(clone), branch)
+  File "<worktree>/blueprints/runtime-workers/openhands/resolver/gh_harness.py", line 709, in push
+    return self.run(op_push(clone, branch, gh=self.gh))
+           ~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<worktree>/blueprints/runtime-workers/openhands/resolver/gh_harness.py", line 663, in run
+    result = self.runner([executable, *argv[1:]], cwd=self.workdir, env=dict(self.env),
+                         stdin=subprocess.DEVNULL, capture_output=True, encoding="utf-8", errors="replace",
+                         timeout=self.timeout, check=False)
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 3355, in runner
+    raise KeyboardInterrupt
+KeyboardInterrupt
+
+=== slice9-lock-skills: before b29ae17b: gitleaks' per-user lock, and the installer dry run in the plan ===
+Command: python3 -m unittest tests.test_runtime_worker_openhands_resolver.GitleaksLockTests tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_the_plan_checks_the_resolver_skills_with_the_installers_dry_run
+Exit code: 1
+
+EE
+======================================================================
+ERROR: test_a_busy_lock_is_retried_within_a_bound_and_never_read_as_clean (tests.test_runtime_worker_openhands_resolver.GitleaksLockTests.test_a_busy_lock_is_retried_within_a_bound_and_never_read_as_clean)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2534, in test_a_busy_lock_is_retried_within_a_bound_and_never_read_as_clean
+    self.assertEqual(self.g.GITLEAKS_LOCK_BUSY, 75)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_outgoing_guard' has no attribute 'GITLEAKS_LOCK_BUSY'
+
+======================================================================
+ERROR: test_the_plan_checks_the_resolver_skills_with_the_installers_dry_run (tests.test_runtime_worker_openhands_resolver.ResolverHostTests.test_the_plan_checks_the_resolver_skills_with_the_installers_dry_run)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<worktree>/tests/test_runtime_worker_openhands_resolver.py", line 2926, in test_the_plan_checks_the_resolver_skills_with_the_installers_dry_run
+    self.assertEqual(self.host.check_resolver_skills(ROOT, pin, workdir), summary["skills"])
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: module 'openhands_resolver_s2_host' has no attribute 'check_resolver_skills'. Did you mean: 'install_resolver_skills'?
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.048s
+
+FAILED (errors=2)
+
+=== negative controls on b29ae17b ===
+Command: python3 <scratch>/mutation_check.py
+Method: each mutation replaces one attribute of the module under test (unittest.mock) while the named test runs; 'detected' means that test failed. The script loads the test module and patches the modules each test class loads.
+Exit code: 0
+
+detected: commit identity changed -> test_an_accepted_patch_becomes_one_ext_commit_with_hooks_off_then_a_draft_pr
+detected: commit subject truncated to 5 -> test_an_accepted_patch_becomes_one_ext_commit_with_hooks_off_then_a_draft_pr
+detected: commit/patch byte comparison removed -> test_a_commit_that_differs_from_the_validated_patch_is_never_pushed
+detected: patch validator accepts everything -> test_end_to_end_refused_patch_makes_no_github_write
+detected: guard check disabled -> test_model_text_that_fails_the_guard_is_refused_before_any_write
+detected: a planted finished label reaches the driver -> test_an_attempt_that_did_not_finish_hands_nothing_to_the_driver
+detected: CLI result proceeds without the driver -> test_the_cli_result_without_the_driver_refuses_before_any_github_step
+detected: exit status trusts task_passed -> test_exit_status_comes_from_host_observed_github_results_only

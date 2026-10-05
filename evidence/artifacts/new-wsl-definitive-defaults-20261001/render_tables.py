@@ -23,8 +23,9 @@ def cell(row):
 
 
 def basis(row, combined):
-    # A row added by the direct consensus gives its own basis: its label says what kind of result it is and is not.
-    if row["row_kind"] == "consensus":
+    # A row added by the direct consensus or by the owner's decision (amendment 4), and a row the owner gave a default, give
+    # their own basis: the label says what kind of result it is and is not.
+    if row["row_kind"] in ("consensus", "owner_decision") or (row.get("overturned") or {}).get("fields"):
         return row["label"]
     resolution = row["resolution"] or {}
     outcome = resolution.get("outcome")
@@ -75,11 +76,16 @@ def render():
     combined = {layer["layer_id"]: layer for layer in json.loads((ROOT / man["sources"]["combined"]["path"]).read_text(encoding="utf-8"))["rows"]}
     counts = man["counts"]
     by_consensus = counts["by_row_kind"].get("consensus", 0)
+    by_owner = counts["by_row_kind"].get("owner_decision", 0)
+    owner_defaults = [row for row in man["slots"] if (row.get("overturned") or {}).get("fields")]
     lines = [BEGIN, "",
              f"{counts['layers']} layers, {counts['slots']} slots, {counts['definitive']} definitive, {counts['installed']} rows that install something. "
              "A default in bold is definitive under its recorded rule; a critic's install verdict is resolved, and a pending measurement installs nothing."
              + (f" {by_consensus} rows were added by a recorded direct consensus of the two model families; each says so in its basis, and none is definitive."
                 if by_consensus else "")
+             + (f" {by_owner} rows were added, and {len(owner_defaults)} rows given an owner default, by the owner's decision under amendment 4; "
+                "each says so in its basis, none is definitive, and the decisions they replace are listed after the decision round's table."
+                if by_owner or owner_defaults else "")
              + (f" {counts['interim']} rows carry an interim install under amendment 3, listed after the decision round's table; the tables print their decided default."
                 if counts.get("interim") else ""), "",
              "### Foundation and cross rows", ""]
@@ -99,7 +105,9 @@ def render():
                 if slot.get("split") and row["measurement"] and row["measurement"]["returned"]:
                     for pick in slot["split_between"]:
                         statuses[pick["family"]] += f" on {pick['name']} in the blind round"
-                blind_basis = row["resolution"].get("first_round_record", row)["label"]
+                # An owner default (amendment 4) replaced the row's decided fields; the blind round's basis is in the ones it kept.
+                decided = (row.get("overturned") or {}).get("fields") or row
+                blind_basis = decided["resolution"].get("first_round_record", decided)["label"]
                 lines.append(f"| {slot['slot_id']} | {row['default']} | {blind_basis} | {statuses['claude']} | {statuses['gpt']} | "
                              f"{'yes' if row['definitive'] else 'no'} | {row['job']} | {row.get('state') or 'open'} | {basis(row, combined)} |")
                 if slot.get("split_note") and not (row["measurement"] and row["measurement"]["returned"]):
@@ -120,6 +128,27 @@ def render():
                   "An amendment records a later decision on its row and replaces none of the row's fields in the tables above.", "",
                   "| Slot | Date | Decision |", "| --- | --- | --- |"]
         lines += [f"| {slot_id} | {amendment['date_utc']} | {amendment['decision']} |" for slot_id, amendment in amendments]
+    owner_rows = [row for row in man["slots"] if row["row_kind"] == "owner_decision"]
+    overturned = [row for row in man["slots"] if row.get("overturned")]
+    if owner_rows or overturned:
+        # Amendment 4: an owner row or an owner default prints its default in the tables above, and an interim the owner amended
+        # prints in the table of interim installs. What a decision replaced stays on its row under overturned and is listed here.
+        lines += ["", "### Owner decisions (amendment 4)", "",
+                  "A row the owner added, or gave a default, prints that default in the tables above, and an interim the owner "
+                  "amended prints in the table of interim installs. What each decision replaced stays recorded on its row under "
+                  "overturned; none of these rows is definitive.", "",
+                  "| Slot | Date | Decision | Replaced |", "| --- | --- | --- | --- |"]
+        lines += [f"| {row['slot_id']} | {man['consensus_' + row['resolution']['batch']]['date_utc']} | added: {row['default']} | "
+                  "nothing: a row the owner added |" for row in owner_rows]
+        for row in overturned:
+            kept, replaced = row["overturned"], []
+            if kept.get("fields"):
+                fields = kept["fields"]
+                default = ("**" + fields["default"] + "**") if fields["definitive"] else fields["default"]
+                replaced.append(f"{default} ({fields['state']}, {fields['resolution']['outcome']})")
+            if kept.get("interim"):
+                replaced.append(f"the interim {kept['interim']['default']}")
+            lines.append(f"| {row['slot_id']} | {kept['amendment']['date_utc']} | {kept['amendment']['decision']} | {'; '.join(replaced)} |")
     lines += ["", END]
     return "\n".join(lines)
 

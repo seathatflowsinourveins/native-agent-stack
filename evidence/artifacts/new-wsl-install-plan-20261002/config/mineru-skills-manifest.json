@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "kind": "skills_trial_manifest",
+  "checked_at": "2026-10-04",
+  "decision_record": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g3-code-docs.md",
+  "cli": {
+    "package": "skills",
+    "version": "1.7.0",
+    "source": "https://github.com/vercel-labs/skills/tree/v1.7.0",
+    "tarball": "https://registry.npmjs.org/skills/-/skills-1.7.0.tgz",
+    "integrity": "sha512-OfePnDft+Xt9/tCoHdCUe5fkM8i+Q3QOSQO53hm7mKtsXyvc+CKOAAliVWZ484HS3cWx+6r+ob0AArixs3jYXw==",
+    "sha256": "8d1466f792baaee945dae88e05ee403d6f9e78a3ae8dcbf61496035ca274418d",
+    "install": "npm install --global --prefix <tools-root>/skills-1.7.0 skills@1.7.0",
+    "env": {
+      "DISABLE_TELEMETRY": "1"
+    },
+    "lock_path": "$XDG_STATE_HOME/skills/.skill-lock.json when XDG_STATE_HOME is set, else ~/.agents/.skill-lock.json",
+    "notes": [
+      "`check` runs the same code path as `update` and can write; always pass -g for global scope.",
+      "The global lock's skillFolderHash is the upstream git tree SHA of the skill folder; a tree-URL install at a 40-hex ref stays at that ref on update.",
+      "DISABLE_TELEMETRY=1 (or DO_NOT_TRACK=1) disables both the telemetry event and the add-time audit call.",
+      "skills.sh's documented /api/v1 requires a Vercel OIDC token (https://skills.sh/docs/api, read 2026-09-26); discovery uses `skills find <query>` (the CLI's unauthenticated /api/search) and the site pages, and the raw audit risks behind the page labels come from https://add-skill.vercel.sh/audit?source=<owner/repo>&skills=<names>, the endpoint the CLI calls at add time when telemetry is on."
+    ]
+  },
+  "skills": [
+    {
+      "name": "mineru",
+      "source": "opendatalab/MinerU",
+      "url": "https://github.com/opendatalab/MinerU/tree/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/skills/mineru",
+      "ref": "c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93",
+      "path": "skills/mineru",
+      "tree_sha": "38d108595980854f65640d46ab27ecea002b549d",
+      "skill_md_sha256": "dec330a3549d232fed44db2b0c9bc0b64505a11d2526008ddf044b3f94681d96",
+      "status": "kept",
+      "claude_listing": "on",
+      "codex_enabled": true,
+      "gap": "Native document-reader skill for this installed MinerU row. Pinned manifest route replaces the unpinned npx add from upstream README:66. Local Standard quality is provisioned before native sessions; remote parsing is never selected."
+    }
+  ]
+}

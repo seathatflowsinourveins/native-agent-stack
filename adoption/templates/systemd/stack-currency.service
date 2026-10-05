@@ -8,8 +8,13 @@
 # revision moves, and never a build worktree, which a merge deletes. Substitute it before installing, as for the
 # other @REPOSITORY@ templates in this directory, and verify both units together (adoption/lifecycle.md):
 #   sed 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' adoption/templates/systemd/stack-currency.service > ~/.config/systemd/user/stack-currency.service
+#   sed 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' adoption/templates/systemd/upstream-surface-watch.service > ~/.config/systemd/user/upstream-surface-watch.service
 #   cp adoption/templates/systemd/stack-currency.timer ~/.config/systemd/user/
-#   systemd-analyze --user verify ~/.config/systemd/user/stack-currency.service ~/.config/systemd/user/stack-currency.timer
+#   systemd-analyze --user verify ~/.config/systemd/user/stack-currency.service ~/.config/systemd/user/upstream-surface-watch.service ~/.config/systemd/user/stack-currency.timer
+#
+# Wants= and After= run upstream-surface-watch.service (scripts/upstream_surface_watch.py --network) first, so that
+# currency_due.py counts its fresh report; Wants= is weak, so a failed or missing watch unit never blocks this one
+# (that unit's header quotes systemd.unit(5)). This unit itself stays offline: the network fetches belong to the watch.
 #
 # The run makes no network call and writes nothing into the checkout. scripts/currency_due.py runs
 # receipt_staleness.py, adoption_status.py --pinned-versions and saturation_ledger.py --report, then writes
@@ -30,6 +35,8 @@
 # directory's other oneshots.
 [Unit]
 Description=Write the stack currency due-file for the next session (read-only checks, no network)
+Wants=upstream-surface-watch.service
+After=upstream-surface-watch.service
 
 [Service]
 Type=oneshot

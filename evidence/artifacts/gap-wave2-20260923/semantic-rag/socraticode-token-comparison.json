@@ -96,7 +96,8 @@
     "The question was deliberately answerable via grep because its file location is named explicitly; this measures the token cost of SocratiCode's availability for a case where the model doesn't need retrieval, not the benefit case where the file location is unknown. A harder, location-unknown question is needed to test the benefit side and was not run here given the 90-minute/12-call budget for this unit.",
     "Model defaulted to the account's aliased Opus model rather than a pinned model id; --effort low was passed explicitly per the unit's constraint, but model choice itself was not controlled beyond that.",
     "ccusage's account-wide aggregation could not isolate these 6 calls from concurrent activity on the shared account, so per-call `usage` JSON (a different, session-scoped evidence source) was used instead; this is noted as a deviation from the suggested ccusage-based approach, with the reason recorded.",
-    "Did not test whether forcing tool use (e.g. via a system-prompt instruction to always use codebase_search) would change the picture; this receipt characterizes default model behavior only."
+    "Did not test whether forcing tool use (e.g. via a system-prompt instruction to always use codebase_search) would change the picture; this receipt characterizes default model behavior only.",
+    "Publication redaction 2026-10-04: the six runs/*.stdout copies replace only the username in encoded home paths with <user>; those six raw_artifacts sha256 values name the redacted publication bytes. Scope correction 2026-10-04: run_arm.sh retains its historical file-as-run sha256 and its separate published_sha256, verified against the published helper. Recorded results and usage are unchanged; no execution was repeated."
   ],
   "raw_artifacts": [
     {
@@ -127,27 +128,27 @@
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/with_1.stdout",
-      "sha256": "44dec266d0169e7018eed464e81093d6c906c5cc938066376cd16bebe2934332"
+      "sha256": "255a7f5a515727b2bcd85c663bac50c3e1cdfb9a91feac4bc58b6d9719183cf2"
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/with_2.stdout",
-      "sha256": "4e0d901180eeedea997f9e2fafb9e2e8555fa74cf5d873c28908a64ca89fb585"
+      "sha256": "17765899b255330155061db97c5e1cbce743a42e537898c152d44561cce183a3"
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/with_3.stdout",
-      "sha256": "d3d8c2c78e0887e89b7561c06622d8b7e2a178d103eae9e3fe8c2b7cfa23627c"
+      "sha256": "f4c157553b7e8df076c62a049f64266c34c6bdead3ce6ce05c8f3a6b59075b07"
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/without_1.stdout",
-      "sha256": "3e7670a9b5a3b2b95fe03bcb421ffcafacf50b43648f7cb027350c125f073f37"
+      "sha256": "0a39727c926ccdfc9673972c674f6a6d66e1669ff5fec104f19d07b35f114f2f"
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/without_2.stdout",
-      "sha256": "33353ac3d5547661a8c8faee2a16a350a60a687c50e3155402c4021a6319c812"
+      "sha256": "96b76e3499a970c06c3b9fdd126883f4cc29972b4a7d26d09544abbd30bf46cf"
     },
     {
       "path": "blueprints/gap-wave2-20260923/socraticode-token-comparison/runs/without_3.stdout",
-      "sha256": "bd40389d38d1d63a41b7c6d6563c4d3a38fd0ee1e73c756b023632de4492a604"
+      "sha256": "274cf43cec762da29d422a0c436a9422b12539fa2ba9dae7fe6f074446d4ce24"
     }
   ]
 }

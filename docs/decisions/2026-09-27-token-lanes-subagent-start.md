@@ -839,3 +839,24 @@ ec7c6b2a80c58e0156daab25b7cfd4eea6f2e3eac77137067051601045f9d2f8  token-lanes-bl
   upstream extracts identifiers or otherwise shapes search queries from tasks (a change
   at `counter.py` L616-630 or `_handle_route`), or a gate returns the target symbol using
   `route(execute=true)` in #433's fixture. Revisit wording if the carrier byte bound changes.
+
+## Addendum 2026-10-04: main-session carrier
+
+The user's order of 2026-10-04, as relayed to session wsl-architecture-design and session 99, verbatim:
+
+> WE NEED TO ENABLE FULL SOTA STACKS FOR THE TOKEN EFFICIENCY REPOS INSTALL CLEANLY MAKE SURETHEY LIVE SEAMLESSLY AS
+> OUR NATIVE WORKFLWO FOR FUTURE SESSION DEFAULT TO LAUNCH AND INVOKE ,CLENA RESOLUTE AND REPORT THE MAIN SESSION WHEN
+> READY with real new session launched e2e monitor invoke rate and upstream commands e2e with using of the sota
+> related full lifecycle skills, the token save is essential layer make sure we are monitored token use and sota token
+> save repos invoke rate with new session launched e2e m keep resolute untill the upstream are fully resoluted and
+> live within our native workflow including ultracode subagent,experimental agent team in our wsl with upstream
+> commands for showing the real saved and sota resoluted practices upstream clean installed
+
+The SubagentStart carrier reaches subagents only, and main sessions were reported reading whole files and choosing Bash
+over the lanes (reported to this unit, not re-run here). [`token-lanes-session-start.py`](../../adoption/hooks/claude/token-lanes-session-start.py)
+now returns [`token-lanes-block.main.md`](../../adoption/hooks/claude/token-lanes-block.main.md) (1,842 of 2,600 bytes)
+as SessionStart `additionalContext` for startup, resume, clear, compact and fork (a separate source since v2.1.214 that
+runs SessionStart hooks again); `blind-*` and silent roles get nothing, as in this carrier. The template gains one
+group, and `HOOKS` and `SHA256SUMS` list both files. The text is advisory, not enforcement
+([handbook](../token-session-handbook.md#token-lanes-carried-into-the-main-session)). Overturn: drop or rewrite it if
+session 99's E2E shows no rise in main-session lane calls against a run without it, or once a client enforces lanes.

@@ -7276,7 +7276,7 @@
       "purpose": "Optional pinned local gateway; isolated lifecycle verified, connected-account inference remains unaccepted in this wave.",
       "upstream_commands": {
         "install": [
-          "DATA_DIR=\"$OMNIROUTE_DATA\" npm install --global --prefix \"$OMNIROUTE_PREFIX\" omniroute@3.8.50 --include=optional",
+          "DATA_DIR=\"$OMNIROUTE_DATA\" npm install --global --prefix \"$OMNIROUTE_PREFIX\" omniroute@3.8.51 --include=optional",
           "DATA_DIR=\"$OMNIROUTE_DATA\" npm rebuild --global --prefix \"$OMNIROUTE_PREFIX\" --allow-scripts=omniroute,keytar,onnxruntime-node,tls-client-node,@parcel/watcher,@swc/core,protobufjs,koffi,esbuild --foreground-scripts"
         ],
         "use": [

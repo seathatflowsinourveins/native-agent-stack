@@ -1,0 +1,35 @@
+# Destination adaptation of adoption/templates/systemd/omniroute.service at
+# this PR: adoption/templates/systemd/omniroute.service:65-100. No daemon under systemd.
+# OmniRoute@23a11484:bin/cli/commands/serve.mjs and docs/reference/ENVIRONMENT.md.
+# The native client-config writer handles the Codex profile, not this unit.
+[Unit]
+Description=OmniRoute destination gateway (loopback only)
+Documentation=https://github.com/diegosouzapw/OmniRoute
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.local/share/omniroute
+EnvironmentFile=-%h/.local/share/omniroute/server.env
+Environment=PATH=%h/.local/share/mise/shims:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=DATA_DIR=%h/.local/share/omniroute
+Environment=OMNIROUTE_SERVER_HOST=127.0.0.1
+Environment=API_HOST=127.0.0.1
+Environment=PORT=21128
+Environment=LIVE_WS_HOST=127.0.0.1
+Environment=LIVE_WS_PORT=21129
+Environment=EMBED_WS_PROXY_PORT=21131
+Environment=OMNIROUTE_MEMORY_MB=16384
+Environment=STREAM_READINESS_TIMEOUT_MS=600000
+Environment=STREAM_READINESS_MAX_TIMEOUT_MS=600000
+Environment=STREAM_ACTIVE_TIMEOUT_MS=3600000
+Environment=CLI_ALLOW_CONFIG_WRITES=false
+ExecStart=%h/.local/bin/omniroute serve --port 21128 --no-open --no-tray
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

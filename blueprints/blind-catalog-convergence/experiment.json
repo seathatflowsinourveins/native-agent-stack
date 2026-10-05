@@ -55,11 +55,11 @@
       },
       {
         "path": "evidence/artifacts/blind-catalog-convergence-20260921/closure-provenance.json",
-        "sha256": "e12c91de527ee15caef4616d1fe7f1d7f58ef85888f4a08a650dfaa3f1743940"
+        "sha256": "640d4d2bfeda3d2410ec4e166665c6cafb43c368db7c31b63584201782660b8c"
       },
       {
         "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-coverage-review.json",
-        "sha256": "c1a6cad2d0b2dca4a1bb94a869e5b253b6d22c65905364e87af7e38ecd8383b2"
+        "sha256": "c9d859091f6ba166a73b45ec0dd5984721417c150a15f9ad4db31a43ae86b253"
       },
       {
         "path": "evidence/artifacts/blind-catalog-convergence-20260921/claude-screening-repair.json",
@@ -207,7 +207,7 @@
       "artifacts": [
         {
           "path": "evidence/artifacts/blind-catalog-convergence-20260921/closure-provenance.json",
-          "sha256": "e12c91de527ee15caef4616d1fe7f1d7f58ef85888f4a08a650dfaa3f1743940"
+          "sha256": "640d4d2bfeda3d2410ec4e166665c6cafb43c368db7c31b63584201782660b8c"
         },
         {
           "path": "evidence/artifacts/blind-catalog-convergence-20260921/screening-ledger.json",
@@ -236,7 +236,11 @@
     "WF3 critic's six-binding-star-caps claim was corrected by independent audit; all ten shortlists match the top twelve recorded stars in residual sets with no recorded rule exclusion. These are not certified passers.",
     "WF4 OctoBot no-backtesting rationale is rejected by its pinned upstream README; crypto versus US-equities suitability remains a separate question.",
     "WF2 retains two incomplete historical judge attempts. The peer's separate Codex Lane C review failed with only a partial result; supported source corrections were independently checked.",
-    "WF3's original false readiness verdict and missing159screening decisions are retained; WF4laterrepaired thosepairs. Fresh source audit rejects WF4OctoBotno-backtesting rationale. No candidate runtime or quality gate was executed by these research workflows."
+    "WF3's original false readiness verdict and missing159screening decisions are retained; WF4laterrepaired thosepairs. Fresh source audit rejects WF4OctoBotno-backtesting rationale. No candidate runtime or quality gate was executed by these research workflows.",
+    "Publication redaction 2026-10-04: encoded home usernames in the coverage report were replaced by <user>, following the landscape-sweep-20260926/returns.json precedent. The coverage-report and closure-provenance pins refer to the redacted public bytes. Historical findings, observations and usage are unchanged; no native workflow was repeated.",
+    "Publication repair 2026-10-04 (PR #697, base 0110c94c2e): the ten remaining standalone account tokens in docs/tasks/2026-09-22-github-automation-newpc.md, evidence/artifacts/gap-wave2-20260923/recovery-portability/restic-mtime-sparse-uid-extension.json, evidence/artifacts/gap-wave2-20260923/semantic-rag/qdrant-restart-reconnect.json, evidence/receipts/github-automation-newpc-20260922.json and the listed manifests/evidence.json claim were replaced by <user>. These are single-token replacements with JSON structure, line counts and trailing newlines preserved; native findings and usage are unchanged. Only the registry claim token was redacted; registry hash entries were re-pinned by the coordinator in this PR's registry commit. The review's ten occurrences use whole-token boundaries; public identifiers containing the same substring remain intact.",
+    "Publication rule repair 2026-10-04: extend the existing Python re rule to bare encoded homes and WSL-mounted profiles. Sources: scripts/validate.py at 0110c94c2e and CPython v3.13.15 Lib/re/__init__.py (https://github.com/python/cpython/blob/v3.13.15/Lib/re/__init__.py), verified with the installed Python 3.13.15 unittest runner. The supplied review candidate's example word-boundary exemption suppresses existing example-prefixed dotted names, so the repair exempts only the complete example placeholder. The expanded pattern suite fails 358 subcases on the base rule and passes on the repair.",
+    "Completeness check 2026-10-04: cover Linux, macOS, Windows-drive and WSL-mount slugs, bare-home terminators, dotted/dashed/digit/underscore names, placeholders and prefix boundaries; retain existing matches and non-matches. Lowercase users, dashless, non-ASCII and glued slugs remain outside this bounded repair. The host-supplied name canary and grader home-slug subtest are deferred by the brief. This unit serves sanitized foundation evidence publication for the US-equities research and historical-simulation north star."
   ],
   "decision_and_scope": {
     "decision": "retain",

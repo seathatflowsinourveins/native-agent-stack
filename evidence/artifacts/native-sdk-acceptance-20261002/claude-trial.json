@@ -1,0 +1,145 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration_with_actual_provider_task",
+  "projection": "Selected fields from the frozen private result; subsequent independent review included separately. Raw conversation and init/auth/session metadata are not published.",
+  "outcome": "useful_task_failed",
+  "sdk_version": "0.2.163",
+  "native_cli_version": "2.1.287",
+  "source_commit": "1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7",
+  "data": {
+    "process": {
+      "query_exit": 0,
+      "bridge_exit": 0,
+      "start_epoch": 1790977214.7341075,
+      "end_epoch": 1790977322.1084437
+    },
+    "sdk_terminal": {
+      "subtype": "success",
+      "is_error": false,
+      "num_turns": 6,
+      "terminal_reason": "completed",
+      "stop_reason": "end_turn",
+      "permission_denials": [],
+      "errors": null,
+      "api_error_status": null
+    },
+    "tool_evidence": {
+      "uses": {
+        "Glob": 2,
+        "Read": 1,
+        "Edit": 2
+      },
+      "returned_tool_result_blocks": 5,
+      "result_is_error_fields": [
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "note": "Successful edits must be supported by returned tool content and changed candidate bytes; null is_error alone is not success proof."
+    },
+    "oracle": {
+      "process_exit": 1,
+      "cases": 4,
+      "passed": 3,
+      "errors": 1,
+      "failed_case": "test_null_user_does_not_crash",
+      "exception": "AttributeError: 'NoneType' object has no attribute 'get'",
+      "boundary": "Codex0.160.0 read-only native sandbox, Python -B; exact command and actual child status in target-oracle-capture.stdout.jsonl"
+    },
+    "candidate": {
+      "path": "candidate-result.py",
+      "bytes": 258,
+      "sha256": "8bf05cd5709b44f860eae6f6f6acbb2042baaaa87e4e8fc6120092a44c8e2d61"
+    },
+    "native_usage": {
+      "input_tokens": 10,
+      "cache_creation_input_tokens": 11184,
+      "cache_read_input_tokens": 15412,
+      "output_tokens": 10626,
+      "output_tokens_details": {
+        "thinking_tokens": 9569
+      },
+      "reported_total_cost_usd": 0.30608840000000004,
+      "duration_ms": 105657,
+      "duration_api_ms": 106128,
+      "model_usage_keys": [
+        "claude-haiku-4-5-20251001",
+        "claude-opus-5-5"
+      ],
+      "scope": "Selected native ResultMessage fields only; complete returned usage and model_usage remain in query.stdout.jsonl. Do not sum top-level usage and model breakdowns or add cache/reasoning subset counters. Reported cost is not a verified billing charge."
+    },
+    "lifecycle_observation": {
+      "before_ps_exit": 0,
+      "after_query_ps_exit": 0,
+      "after_oracle_ps_exit": 0,
+      "matching_client_processes": [],
+      "scope": "ps pid/ppid/comm exact claude/codex matches before and after; not exhaustive proof of all renamed descendants or complete host lifecycle."
+    },
+    "oracle_sha256_after": "7f555898a5cef064bc72121a9d123f61d7161ad573c2117b342ece316eecb1d5"
+  },
+  "private_originals": [
+    {
+      "name": "trial-result.json",
+      "bytes": 3732,
+      "sha256": "384a233a668712d7ef389ca6c8a57e92bb5eab59214e88ad77553fbc04fc2f4e"
+    },
+    {
+      "name": "independent-review.json",
+      "bytes": 1236,
+      "sha256": "8dd79a803e474ab64c4f2927526be757398a5137a5e00ef6b5342c2f89da2589"
+    },
+    {
+      "name": "trial-plan.json",
+      "bytes": 2324,
+      "sha256": "66dabab403d77af89f57a6f4ad89c7df1d31525324c6e1184f3852ff0a33599b"
+    },
+    {
+      "name": "query.stdout.jsonl",
+      "bytes": 7154,
+      "sha256": "85efee67d1abcb370574db54967aacbde10890c05dd05caf2467d5af48080056"
+    },
+    {
+      "name": "query.stderr.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "oracle.stderr.txt",
+      "bytes": 1215,
+      "sha256": "70043b5ed8537498a5e546d9e68ad66bf15150f38a6c0c93bc74a4f10b771ac8"
+    },
+    {
+      "name": "oracle.stdout.txt",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "query_trial.py",
+      "bytes": 2432,
+      "sha256": "d129f7eb423ed5198b74c0a0207c11d82ae310ff75ea38922d8c0a38da0fe957"
+    }
+  ],
+  "target_capture_bindings": [
+    {
+      "path": "target-query-capture.stdout.jsonl",
+      "bytes": 1102,
+      "sha256": "b220b6ad9e1b9ee991bea33482493b62fff700d62440ca29c34e41861402809a"
+    },
+    {
+      "path": "target-oracle-capture.stdout.jsonl",
+      "bytes": 956,
+      "sha256": "6bbb279865d0c91d5cccc50815c13296f69ff38d601b6197b6a90593b7894da1"
+    }
+  ],
+  "independent_review": {
+    "role": "Sol/max independent source and artifact review",
+    "verdict": "runtime protocol demonstrated; useful-task acceptance rejected",
+    "observations": "All five tool calls have matching returned results; reconstructing two successful edits reproduces the retained candidate. One successful terminal SDK result after six turns. Unchanged oracle reports three passes and one error with process exit1. All six locally checkable artifact bindings, plan, driver and enforcement hashes match.",
+    "usage_scope": "result.usage overlaps the Opus model_usage row and its iteration counters; thinking9569 is a subset of output10626. Auxiliary Haiku909input/13output is separately returned. Reported total cost0.3060884 retained without recomputing overlapping totals.",
+    "limits": "Invocation, effective sandbox probe command/family and process observations are coordinator-observed. Exact comm-name before/after checks do not establish complete descendant or host lifecycle. after_verifier_process_exit0 is the ps command status, never oracle success.",
+    "review_correction": "An initial reconstruction added an extra EOF newline; corrected extraction matches frozen input and resulting candidate exactly. No target entry or rerun."
+  },
+  "provenance_limit": "The coordinator observed invocation, native exits and process samples. Independent review checked retained bytes/source/outcomes without a new execution. An oracle hash alone does not establish execution; passing output also occurs in the historical positive control."
+}

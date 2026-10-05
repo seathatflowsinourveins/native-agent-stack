@@ -212,6 +212,12 @@ PINNED_LINES: dict[str, list[tuple[str, str]]] = {
         (SCAN_ASSIGNMENT, "the split-scan test's copy of the assignment check"),
     ],
     THIS_MODULE: [("48df9b77f3b81b77dbab7d9dd55a4397fc1b056bd009e62988bc3475ef2d045e", "this module's ARTIFACT line")],
+    # PR #489's gate-reads set diff lists each path of two protected-set derivations; two entries are the frozen
+    # lock as a listed path (describes the derivation's output; installs, builds and serves nothing).
+    "blueprints/runtime-workers/openhands/evidence/gate-reads-set-diff-20261004.json": [
+        ("798ac0438b0cc820dd0f2e5c9ddc05f97f0091c08e2ffdf9f4178edb8cce3d7f", "a protected-set listing entry, base derivation"),
+        ("798ac0438b0cc820dd0f2e5c9ddc05f97f0091c08e2ffdf9f4178edb8cce3d7f", "a protected-set listing entry, head derivation"),
+    ],
 }
 
 # The excluded classes besides *.md: retained evidence, the hash registry and catalog data. A file in an excluded class

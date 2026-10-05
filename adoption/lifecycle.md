@@ -229,17 +229,24 @@ Added after `v2026.09.26.2`: a daily user timer keeps the next session's
 currency notice current without a check at startup.
 [`stack-currency.service`](templates/systemd/stack-currency.service) runs
 `python3 scripts/currency_due.py`, which runs the receipt, pin and saturation
-checks and writes `${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/currency-due.json`
+checks, counts the unreviewed Claude Code and Codex switches in the upstream-surface
+watch's latest report, and writes `${XDG_STATE_HOME:-~/.local/state}/native-agent-stack/currency-due.json`
 (mode 0600) only while something is due; a SessionStart hook prints its one
 line ([decision](../docs/decisions/2026-09-30-session-currency-notice.md)).
-Render the service from the live clone, verify both units, enable
+The service `Wants=` and runs `After=`
+[`upstream-surface-watch.service`](templates/systemd/upstream-surface-watch.service)
+(`scripts/upstream_surface_watch.py --network`, [guide](../docs/upstream-surface-watch.md#daily-run)),
+so render that unit with it: the dependency is weak, and a host that installs only the
+currency service never runs a surface check and records the check as not run.
+Render both services from the live clone, verify the three units, enable
 [the timer](templates/systemd/stack-currency.timer) and read the current report;
-the service file's header covers `PATH` on another host:
+the service files' headers cover `PATH` on another host:
 
 ```sh
+sed 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' adoption/templates/systemd/upstream-surface-watch.service > ~/.config/systemd/user/upstream-surface-watch.service
 sed 's#@REPOSITORY@#%h/code/native-agent-stack-live#g' adoption/templates/systemd/stack-currency.service > ~/.config/systemd/user/stack-currency.service
 cp adoption/templates/systemd/stack-currency.timer ~/.config/systemd/user/
-systemd-analyze --user verify ~/.config/systemd/user/stack-currency.service ~/.config/systemd/user/stack-currency.timer
+systemd-analyze --user verify ~/.config/systemd/user/upstream-surface-watch.service ~/.config/systemd/user/stack-currency.service ~/.config/systemd/user/stack-currency.timer
 systemctl --user daemon-reload
 systemctl --user enable --now stack-currency.timer
 python3 scripts/currency_due.py --dry-run
