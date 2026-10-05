@@ -16572,11 +16572,6 @@
       "bytes": 15230
     },
     {
-      "path": "docs/decisions/2026-10-04-host-baseline-recorder.md",
-      "sha256": "d9cd63e4c2a19c39dd49d947959780268d3e4385e53d0c908f728fc1ea1d7a9f",
-      "bytes": 22090
-    },
-    {
       "path": "docs/decisions/2026-10-04-new-wsl-changelog-parity.md",
       "sha256": "aa1e7b5ad354b6a86c9dac099053944aaadcfd951c08ec861430812a64552805",
       "bytes": 6304
@@ -32980,36 +32975,6 @@
       "path": "evidence/artifacts/hf-memory-models-20260921/native-results.json",
       "sha256": "01263899ad06977b5fc855f9667f2c29bdffd13d2036705485b24bb7095c5e50",
       "bytes": 17286
-    },
-    {
-      "path": "evidence/artifacts/host-baseline-20261004/coreutils-2604-upgrade.json",
-      "sha256": "5869c88fa349ed59bea95887ca5596e0f6f482ba8b8c3cd4ff406342accd6130",
-      "bytes": 597
-    },
-    {
-      "path": "evidence/artifacts/host-baseline-20261004/host-baseline-probe-r0.txt",
-      "sha256": "21f3d8e96d1f4b9d24b7b30f280dba2f44af14135fdd0852468444c25d86bedf",
-      "bytes": 11784
-    },
-    {
-      "path": "evidence/artifacts/host-baseline-20261004/host-baseline-probe-r1.txt",
-      "sha256": "33fb4dd8199cf251b09d92afd50cdef678bd5383411447ea52877d269cb31435",
-      "bytes": 12326
-    },
-    {
-      "path": "evidence/artifacts/host-baseline-20261004/nativestack-2404.json",
-      "sha256": "f12c983de1cafdec4f9ee318fc4ae5ca62492ab23b371f457bbf785d70eb1e7c",
-      "bytes": 13783
-    },
-    {
-      "path": "evidence/artifacts/host-baseline-20261004/nativestack2604.json",
-      "sha256": "a9ef297bef7ad864cee212ca34c30e76e0da7770fd3d746ab344edf2bd2e1b46",
-      "bytes": 11954
-    },
-    {
-      "path": "evidence/artifacts/host-baseline-20261004/stackmeasure2604.json",
-      "sha256": "0d771af61bf75d07cbc6bf428b82652b0d5cd3a030ff3a4e83e28439b5ea66c6",
-      "bytes": 11952
     },
     {
       "path": "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json",
@@ -51347,26 +51312,6 @@
       "bytes": 3678
     },
     {
-      "path": "evidence/receipts/host-baseline-coreutils-2604-upgrade-20261004.json",
-      "sha256": "834593fa86965850d7c94abb7ab1893e0388960140f383f6dad178cca4de2143",
-      "bytes": 2310
-    },
-    {
-      "path": "evidence/receipts/host-baseline-nativestack-20261004.json",
-      "sha256": "71be13bbfb7dfe9e698e92eb462ed64b2d62b60008fe2d1f39a14b6690766a50",
-      "bytes": 3443
-    },
-    {
-      "path": "evidence/receipts/host-baseline-nativestack2604-20261004.json",
-      "sha256": "ec3ab7856c602ab8c497ed1cb00a9a423c8d79a8e4c686ec4043ee9c52eaeea1",
-      "bytes": 3694
-    },
-    {
-      "path": "evidence/receipts/host-baseline-stackmeasure2604-20261004.json",
-      "sha256": "168fcd1842f19b85e90ca4d5ee0e967b582d5067e856d8d7e954ddd18b148d41",
-      "bytes": 3576
-    },
-    {
       "path": "evidence/receipts/ibkr-readonly-acceptance-20260923.json",
       "sha256": "0d32534357501c011298420c07161c59940929cabd00a9b71d5d7817126f88c9",
       "bytes": 17126
@@ -53557,11 +53502,6 @@
       "bytes": 5155
     },
     {
-      "path": "tests/test_host_baseline_probe.py",
-      "sha256": "93ac7b44f451c1dd17116671146cd44376bf5fa599b3b099fa891c1a44a49919",
-      "bytes": 27912
-    },
-    {
       "path": "tests/test_host_receipts.py",
       "sha256": "04f54683ee97d99f3383ac1f9989c0aad843562bdc31f890dece4177f114448f",
       "bytes": 144843
@@ -54185,16 +54125,6 @@
       "path": "tools/adoption/embed_acceptance.py",
       "sha256": "b567a3ce64d66f0798bd5fc73cf78d8a12074d583177c204d5465050873258b1",
       "bytes": 8209
-    },
-    {
-      "path": "tools/adoption/host-baseline.md",
-      "sha256": "f3da0f7fbcd54735239acbcff141012945f1673dcc45bd4fde2fed9cc4c39cb0",
-      "bytes": 15210
-    },
-    {
-      "path": "tools/adoption/host_baseline_probe.py",
-      "sha256": "a1e4833767389f6004c655683bc853e6ae94b879a0046a1df27073d399a471f2",
-      "bytes": 17228
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
