@@ -20,6 +20,7 @@
     "This publication does not execute upstream tests, host acceptance commands, provider requests, GPU checks or broker operations. Structural checks verify the documents and generators, not capability acceptance."
   ],
   "data": {
+    "publication_reconciliation": {"base":"9e955327702e6b7a8dd1909b2884196726a15ba5","released_by":"#713 merged1796303f and co-op J-GC direction2026-10-05T16:11:01Z","host_execution":false,"claim_scope":"Generated projection/source integration only; official30 unchanged, current/conditional null, reported32 provisional. Old host attempts do not qualify changed plan/profile pins."},
     "publication_date_utc": "2026-10-05",
     "publication_base_revision": "4c897418fe35a030a1188ae447eaf31c893f8eff",
     "host": "NativeStack2604",

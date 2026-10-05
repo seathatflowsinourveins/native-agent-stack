@@ -266,6 +266,42 @@
       "source": "catalogs/landscape/research-state.json"
     }
   ],
+  "host_requalification": {
+    "decision_record": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
+    "disputed_slot_ids": [
+      "token-efficiency/code-index",
+      "token-efficiency/command-output",
+      "token-efficiency/output-compression",
+      "token-efficiency/repo-packing"
+    ],
+    "host": "NativeStack2604",
+    "independent_review": {
+      "recorded_source_review": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "scope": "The Claude source review of this public projection recorded changes required; correction re-check remains pending. This review is not a new host replication or final qualification. Only the command center own dated final same-80-slot verified E2E, independently reviewed and adjudicated, can replace official readiness 30/80 or lift provisional.",
+      "status": "pending"
+    },
+    "publication_date_utc": "2026-10-05",
+    "qualification_scope": "Historical observations on one WSL distribution. Publication does not execute native acceptance or change upstream, broker or final qualification status. Official readiness 30/80 remains; separately reported proposals do not qualify a new aggregate.",
+    "readiness": {
+      "baseline": {
+        "denominator": 80,
+        "numerator": 30,
+        "percent": 37.5,
+        "status": "historical_adjudicated_2026-10-04"
+      },
+      "conditional": null,
+      "current": null,
+      "derivation_gap": "Final readiness awaits the command center own new dated same-80-slot qualification with independent review and adjudication. A complete public projection review alone never lifts provisional.",
+      "formula": "(READY + BY_DESIGN) / all 80 PR #700 foundation slots; PARTIAL, FAIL, INTERIM and UNJUDGED contribute zero; BY_DESIGN is an intentional disposition, not execution",
+      "official_source": "evidence/receipts/ns2604-e2e-20261004.json",
+      "provisional": true,
+      "rounding": "Exact percentages shown; baseline PR #700 rounded 37.5% half up to 38%."
+    },
+    "receipt_id": "ns2604-requalification-20261005",
+    "receipt_kind": "historical_inventory",
+    "source": "evidence/receipts/ns2604-requalification-20261005.json",
+    "source_class": "Historical native client outputs, local plan-integration checks and source review. Official readiness 30/80 is retained from receipt #700; current/conditional are null. New proposals are attributed in the decision record."
+  },
   "kind": "generated_new_wsl_handbook",
   "layers": [
     {
@@ -1293,10 +1329,10 @@
         "source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "text": "Use the judge's sealed set of 30-50 target-language questions with exact file:line answers, on WSL2 and once on macOS arm64. (a) Within Claude Code, Serena against the native LSP plugins; Codex uses Serena only. (b) For the structural slot, codebase-memory-mcp (installed with --skip-config and invoked explicitly) against CodeGraph and jCodeMunch, each scored against an rg+Read known-source baseline. Score reference precision and recall, correctness, tokens, tool calls, wall time, cold index build, incremental update after an edit and RSS. Confirm from each transcript that the arm's tools were invoked. Adopt a structural index only for the question class where it beats the baseline."
       },
-      "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+      "ownership_source": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
       "owns": [
-        "Serena (Codex sessions)",
-        "the official code-intelligence LSP plugins (Claude Code sessions)"
+        "Serena (symbol navigation and references for both clients)",
+        "ast-grep (syntax-pattern code search and rewrite)"
       ],
       "reference_edition": {
         "role": "reference only; no winners, pins or closure inherited",
@@ -7803,7 +7839,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "e4680b2fb032d26302bae8b1f64b8e675c7f5db84685abfdcef8ee1fef203537"
+      "sha256": "b57eeb220ae905ca23f0869bb5f211a01e6ecc05de5cb90986e56002255db215"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -7812,6 +7848,10 @@
     {
       "path": "catalogs/landscape/us-equities.json",
       "sha256": "cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618"
+    },
+    {
+      "path": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
+      "sha256": "639878602e15dd96673a8d2787af74c5491536addc5eca1ece5ea6ec272c8f4f"
     },
     {
       "path": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
@@ -7940,6 +7980,10 @@
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
       "sha256": "a34fb8c01429177cd2787a07a1edf0a0668d31898ff35fd798056964d5dab82e"
+    },
+    {
+      "path": "evidence/receipts/ns2604-requalification-20261005.json",
+      "sha256": "b2e703eb60ce1b55131961d9e9edbf72f8d1f29711b621a0415341052b47156c"
     }
   ],
   "stage_order": [

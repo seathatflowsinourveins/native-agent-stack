@@ -23,10 +23,10 @@ artifact, beside today's observations. It is not a new 2026-10-05 acceptance
 run. Official readiness stays **30/80** until the command center's own dated,
 final verified E2E of the same 80 slots, followed by independent review and
 adjudication. A review of this PR or its public projection does not lift
-provisional status. The separately prepared generated correction sets
-current/conditional values to null with this decision as its pointer; it remains
-held until #713 lands or its owner releases the paths. The coupled old generated
-projection is superseded context and supplies no current readiness authority.
+provisional status. The generated correction sets current/conditional values to
+null with this decision as its pointer. Its earlier #713 ownership hold ended
+when #713 landed as1796303f. The publication is reconciled with current main
+9e955327; older coupled projections supply no current readiness authority.
 
 ## Sources and reuse
 
@@ -375,3 +375,34 @@ All 80 historical baseline labels, original attempts and review chains remain
 unchanged. Official readiness remains 30/80; no aggregate is derived. Ruling 10
 also keeps shared-host plan application with the co-op's readiness-runner lane.
 This publication neither runs install.sh nor changes host configuration.
+
+## Publication reconciliation after #713 landed
+
+The 16:11Z co-op direction releases the previously recorded generated-path hold.
+This publication now follows main9e955327702e6b7a8dd1909b2884196726a15ba5,
+which contains #713 at1796303f, #705 at0ce95369 and #735 at095d4fad.
+Earlier hold/unpublished-candidate descriptions in this dated record describe
+the preceding preparation phase; they are not current publication gates.
+
+Preserve main's owner/profile binding, browser replacement controls, wave-5
+104-row catalog inventory and owner fields. The frozen readiness denominator
+remains 80; the larger recommendation catalog does not change it. Main's winner
+pins, destination-unaccepted qualifications and original generation history
+remain intact. Append scoped historical observations and regenerate through the
+existing builders. Restore main's evidence registry and re-register only this
+lane's two receipts and changed files; registry is the final commit.
+
+Main's plan/profile Dagu and Mise moves are #740 at
+cb339488e3e004b04e8a4e5b4fd246442a275e3c, separately from #735's calendar
+changes. The installed-host observations at4c897418 are historical and do not
+qualify a changed plan/profile pin by replay. In particular, the plan's Dagu
+v2.18.2 and Mise v2026.10.1 remain distinct from the deliberately held stack pin
+and earlier host attempts. No fresh installation or acceptance is claimed.
+
+Sources: native-agent-stack@9e955327702e6b7a8dd1909b2884196726a15ba5:scripts/build_new_wsl_handbook.py:811–831,
+tests/test_new_wsl_handbook.py:243–263, :1046, :1158, :1233;
+catalogs/foundation/new-wsl-architecture-20261001.json;
+evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json#/owners/57
+and #/owners/71; docs/lanes.md:94–128. The exact-head command-center Claude read
+remains pending and cannot replace the final verified E2E. Official30/80 and
+null current/conditional values remain; the reported32 proposal stays provisional.

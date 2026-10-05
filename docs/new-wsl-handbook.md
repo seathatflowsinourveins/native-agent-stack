@@ -12,6 +12,32 @@ One model family judged (Claude Opus 5.5). The GPT-6.1 Sol reviews of 2026-10-01
 
 The architecture edition supplies the row inventory and reference links only. Its source-host winners, pins and closure cells are not new-install decisions.
 
+## NativeStack2604 host re-qualification
+
+Published 2026-10-05; source: [evidence/receipts/ns2604-requalification-20261005.json](../evidence/receipts/ns2604-requalification-20261005.json).
+
+Official readiness remains the qualified 2026-10-04 baseline; current and conditional figures, when supplied, are provisional source projections without an independently verified 80-slot join.
+
+- Official readiness (qualified 2026-10-04): **30/80 (37.5%)**.
+
+No aggregate established for: current, conditional.
+
+Decision record: [docs/decisions/2026-10-05-ns2604-foundation-requalification.md](../docs/decisions/2026-10-05-ns2604-foundation-requalification.md).
+
+An updated official readiness figure requires the command center's new dated qualification of the same 80 slots, followed by independent review and adjudication. This receipt projection or its public review alone does not change the official figure.
+
+Formula: (READY + BY_DESIGN) / all 80 PR #700 foundation slots; PARTIAL, FAIL, INTERIM and UNJUDGED contribute zero; BY_DESIGN is an intentional disposition, not execution.
+
+Source class: Historical native client outputs, local plan-integration checks and source review. Official readiness 30/80 is retained from receipt #700; current/conditional are null. New proposals are attributed in the decision record.
+
+Qualification scope: Historical observations on one WSL distribution. Publication does not execute native acceptance or change upstream, broker or final qualification status. Official readiness 30/80 remains; separately reported proposals do not qualify a new aggregate.
+
+Recorded token-review disagreements: `token-efficiency/code-index`, `token-efficiency/command-output`, `token-efficiency/output-compression`, `token-efficiency/repo-packing`.
+
+Independent review: pending; The Claude source review of this public projection recorded changes required; correction re-check remains pending. This review is not a new host replication or final qualification. Only the command center own dated final same-80-slot verified E2E, independently reviewed and adjudicated, can replace official readiness 30/80 or lift provisional.
+
+This receipt projection supplies no new upstream acceptance, independently replicated host execution, recommendation status or finality gate.
+
 ## Stage 1 and stage 2
 
 ### Stage 1
@@ -413,21 +439,25 @@ Status: **picked**. Evidence today: source_review: model judges read upstream pu
 
 Requirement: Retrieve exact source and references for changes with a conceptual or structural index only when it answers the actual question. ([evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/code-navigation.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/code-navigation.json)).
 
-Owns: Serena (Codex sessions); the official code-intelligence LSP plugins (Claude Code sessions).
+Owns: Serena (symbol navigation and references for both clients); ast-grep (syntax-pattern code search and rewrite).
 
 Uses: none declared / pending.
 
-Ownership source: [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json).
+Ownership source: [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json).
 
 ### Slot default decisions
 
-Default ownership: ["Serena", "claude-plugins-official (code-intelligence LSP plugins)"]; uses: [].
+Default ownership: ["Serena (symbol navigation and references for both clients)", "ast-grep (syntax-pattern code search and rewrite)"]; uses: [].
 
 | Slot | State | Job | Default | Install | Repository | Outcome | Source basis | Family source status | Provenance |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | serena | definitive | symbol navigation and references for both clients | [Serena](https://github.com/oraios/serena) | installed | https://github.com/oraios/serena | final | both families: the Claude record and the blind GPT samples | claude: returned; gpt: returned: both blind Sol-ultra orders | foundation / code-navigation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 | claude-plugins-official-code-intelligence-lsp-pl | resolved | symbol navigation through language servers, Claude Code only | Not installed: the same job as Serena, for Claude Code only, with no measured gain; neither blind Sol-ultra order picked it | not installed: the same job as Serena, for Claude Code only, with no measured gain; neither blind Sol-ultra order picked it | none | not_installed | not installed: resolved by the rule or a blind critic | claude: returned; gpt: returned: 0 of 2 blind GPT samples | foundation / code-navigation / first_round; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
 | structural-search | resolved | syntax-pattern code search and rewrite | [ast-grep](https://github.com/ast-grep/ast-grep) | installed | https://github.com/ast-grep/ast-grep | installed_on_critic | kept or added on a blind critic's verdict | claude: not judged in the first round; gpt: returned: 2 of 2 blind GPT samples | foundation / code-navigation / added; [evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json](../evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json) |
+
+### Historical recommendation packet tools
+
+The following tools belong to the dated comparison packets; current defaults and exclusions are shown in the slot table above.
 
 | Tool / repository | Owner / status | Pin / checksum | Install | Acceptance | Stage / position |
 | --- | --- | --- | --- | --- | --- |
@@ -2130,9 +2160,10 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | [adoption/manifest.json](../adoption/manifest.json) | `159ad1f56a9a654951eb16a4a66645378d225d8b924eede282815f49342add55` (without source.release_tag, source.release_commit, updated_at) |
 | [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json) | `7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04` |
 | [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `4e505c4e7ca64d769bb0f9be4e506526dfaed79231e4a30a26bb811bcb967abe` |
-| [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `e4680b2fb032d26302bae8b1f64b8e675c7f5db84685abfdcef8ee1fef203537` |
+| [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `b57eeb220ae905ca23f0869bb5f211a01e6ecc05de5cb90986e56002255db215` |
 | [catalogs/landscape/research-state.json](../catalogs/landscape/research-state.json) | `fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a` |
 | [catalogs/landscape/us-equities.json](../catalogs/landscape/us-equities.json) | `cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618` |
+| [docs/decisions/2026-10-05-ns2604-foundation-requalification.md](../docs/decisions/2026-10-05-ns2604-foundation-requalification.md) | `639878602e15dd96673a8d2787af74c5491536addc5eca1ece5ea6ec272c8f4f` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json) | `ad86d1d4c2cddeeebc2bc327fddc897b161cec092706db24c779603321246bc7` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/agent-sdks.json) | `eff4adb3683062fb31acb63f494fb15c39d08bd50627a68ca32262c007adb519` |
 | [evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json](../evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json) | `dc62fdbbebd6ed1ab837663ee00407a78031f86c8f302f6fcc1139ab1744505c` |
@@ -2165,3 +2196,4 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | [evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md](../evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md) | `3a638294fd3f818f032fd226eddde760f40fcbc0f3313af64ff09e96130f65e6` |
 | [evidence/artifacts/new-wsl-final-architecture-20261002/convergence/combined.json](../evidence/artifacts/new-wsl-final-architecture-20261002/convergence/combined.json) | `8b8234eabf4f3f66b9acc6e1b74e0809bccd79b70ca381635c2eae5ae8527b25` |
 | [evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json](../evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json) | `a34fb8c01429177cd2787a07a1edf0a0668d31898ff35fd798056964d5dab82e` |
+| [evidence/receipts/ns2604-requalification-20261005.json](../evidence/receipts/ns2604-requalification-20261005.json) | `b2e703eb60ce1b55131961d9e9edbf72f8d1f29711b621a0415341052b47156c` |

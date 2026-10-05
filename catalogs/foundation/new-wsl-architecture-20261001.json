@@ -1205,7 +1205,7 @@
         }
       ],
       "owner_lane": "foundation: Gate A",
-      "notes": "Harbor's prerequisites (rootless Docker, the egress allowlist, the Node v22.23.3 pre-step and the native OAuth token) come from the Gate A harness lane; the subordinate-id observation is in the Harbor receipt of PR #570, and the rest is not yet in the repository, so the pilot's record should land it. Inspect AI is the fallback runner. Harbor is the runner because top rule (e) requires an upstream harness and it is the only one run end to end on this stack, not because it beat Inspect AI, which was never compared; Inspect AI stays an arm of any comparison. Wave-5 destination owner cells have no recorded destination acceptance; original host/reference winner evidence remains scoped to those winners."
+      "notes": "Harbor's prerequisites (rootless Docker, the egress allowlist, the Node v22.23.3 pre-step and the native OAuth token) come from the Gate A harness lane; the subordinate-id observation is in the Harbor receipt of PR #570, and the rest is not yet in the repository, so the pilot's record should land it. Inspect AI is the fallback runner. Harbor is the runner because top rule (e) requires an upstream harness and it is the only one run end to end on this stack, not because it beat Inspect AI, which was never compared; Inspect AI stays an arm of any comparison. Wave-5 destination owner cells have no recorded destination acceptance; original host/reference winner evidence remains scoped to those winners. Dated NativeStack2604 documentary re-qualification: official historical30/80 remains until the command center final verified same80-slot E2E; current/conditional values are null and the reported32/80 remains provisional. Sources: evidence/receipts/ns2604-requalification-20261005.json and docs/decisions/2026-10-05-ns2604-foundation-requalification.md. This source projection runs no native destination acceptance and preserves main owner/winner scopes."
     },
     {
       "layer_id": "ci-supply-chain",
@@ -1535,7 +1535,7 @@
         {"text": "The Gate A comparison of the two per-subagent routes runs on the Harbor pilot; until then neither route is the instrument of record.", "kind": "lane", "source_path": "examples/claude-native/workflows/README.md"}
       ],
       "owner_lane": "foundation: Gate A",
-      "notes": "Install the collector examples under observability/collector only if the OTel route is chosen for per-subagent evidence."
+      "notes": "Install the collector examples under observability/collector only if the OTel route is chosen for per-subagent evidence. Dated host source observations are in evidence/receipts/ns2604-roadmap-evidence-20261005.json: user Alerting attestation stands; initial skip, modified delivery/cache, fresh unmodified defect14 boundary and session idle-period/ccusage-control gaps remain separate historical records. Main plan repairs or pin changes do not qualify them by receipt replay."
     },
     {
       "layer_id": "agent-sdks",
