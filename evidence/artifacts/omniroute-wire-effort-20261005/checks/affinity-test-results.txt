@@ -4,63 +4,64 @@
 #   N = the v3.8.51 tag commit c1e30b767 plus the patch's test file only (negative control: the test must fail on the published code)
 #   B = N plus the patch's two source files (alternative B)
 #   C = B plus upstream PR 15167's commit 0585aba55 (the composition)
-# script: scripts/affinity-test.sh.txt (every step logs its own exit code; the lines below are its progress log)
+# The unit test ran on N, B and C; the wire probe ran on B and C only.
+# script: scripts/affinity-test.sh.txt. The block below is its progress log, byte for byte (every step logs its own exit code); the per-test lines are the ✔/✖/ℹ lines of each test log.
 
-15:30:33Z clone exit=0
-15:30:33Z fetch pr15167 exit=0
-15:30:37Z checkout tag exit=0 head=c1e30b767 tree=0f58d8df20c0c2ae4336b432b3f39837119b6eed
-15:31:54Z npm ci exit=0
-15:31:54Z working tree after npm ci: 0 changed or untracked paths: 
-15:31:54Z apply test file only exit=0
-15:31:54Z state N-tag-plus-test-file tree=ae6cc3567093899a5bcde884e23f92f35252b4d6
-15:31:57Z test N exit=1
-15:31:57Z apply patch source files exit=0
-15:31:57Z state B-tag-plus-patch tree=cdbac0178bb18f5043f9cdaf7f90d540595e9061
-15:32:00Z test B exit=0
-15:32:01Z wire probe B exit=0
-15:32:01Z apply pr15167 diff exit=0
-15:32:01Z state C-composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f
-15:32:04Z test C exit=0
-15:32:05Z wire probe C exit=0
-15:32:05Z probe B extract equals committed wire-probe-without-15167.txt: yes (7 lines)
-15:32:05Z probe C extract equals committed wire-probe-with-15167.txt: yes (7 lines)
-15:32:05Z DONE
+15:50:19Z clone exit=0
+15:50:19Z fetch pr15167 exit=0
+15:50:23Z checkout tag exit=0 head=c1e30b767 tree=0f58d8df20c0c2ae4336b432b3f39837119b6eed
+15:51:32Z npm ci exit=0
+15:51:32Z working tree after npm ci: 0 changed or untracked paths: 
+15:51:32Z apply test file only exit=0
+15:51:32Z state N-tag-plus-test-file tree=ae6cc3567093899a5bcde884e23f92f35252b4d6
+15:51:35Z test N exit=1 tests=7 pass=1 fail=6
+15:51:35Z apply patch source files exit=0
+15:51:35Z state B-tag-plus-patch tree=cdbac0178bb18f5043f9cdaf7f90d540595e9061
+15:51:37Z test B exit=0 tests=7 pass=7 fail=0
+15:51:38Z wire probe B exit=0
+15:51:38Z apply pr15167 diff exit=0
+15:51:38Z state C-composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f
+15:51:41Z test C exit=0 tests=7 pass=7 fail=0
+15:51:42Z wire probe C exit=0
+15:51:42Z probe B extract equals committed wire-probe-without-15167.txt: yes (7 lines)
+15:51:42Z probe C extract equals committed wire-probe-with-15167.txt: yes (7 lines)
+15:51:42Z DONE
 
 ## N: tag + test file only (negative control)
-✖ (a) a reused eligible pin is served even when an OAuth peer is less occupied (292.332411ms)
-✖ (b) a rate-limited pin is not reused: the session moves and occupancy still decides (218.283741ms)
-✖ (c) a fresh session on an occupied LRU pick: occupancy moves it and the pin names the account selected for dispatch (209.791794ms)
-✖ (d) the next turn of (c) is served on the same account with no occupancy move (208.157949ms)
-✖ (e) the combo availability check pins the less-occupied peer, and the dispatch turn serves that pin (209.463075ms)
-✔ (f) concurrent first selections on different selection locks leave the newer pin in place (209.813577ms)
-✖ (g) an expired pin on the LRU pick is not reused: occupancy decides the fresh pin (204.261358ms)
+✖ (a) a reused eligible pin is served even when an OAuth peer is less occupied (270.911312ms)
+✖ (b) a rate-limited pin is not reused: the session moves and occupancy still decides (212.66829ms)
+✖ (c) a fresh session on an occupied LRU pick: occupancy moves it and the pin names the account selected for dispatch (197.659328ms)
+✖ (d) the next turn of (c) is served on the same account with no occupancy move (201.564632ms)
+✖ (e) the combo availability check pins the less-occupied peer, and the dispatch turn serves that pin (200.758064ms)
+✔ (f) concurrent first selections on different selection locks leave the newer pin in place (213.929723ms)
+✖ (g) an expired pin on the LRU pick is not reused: occupancy decides the fresh pin (212.519014ms)
 ℹ tests 7
 ℹ pass 1
 ℹ fail 6
 
 ## B: tag + patch
-✔ (a) a reused eligible pin is served even when an OAuth peer is less occupied (276.638856ms)
-✔ (b) a rate-limited pin is not reused: the session moves and occupancy still decides (218.805995ms)
-✔ (c) a fresh session on an occupied LRU pick: occupancy moves it and the pin names the account selected for dispatch (207.998644ms)
-✔ (d) the next turn of (c) is served on the same account with no occupancy move (212.513857ms)
-✔ (e) the combo availability check pins the less-occupied peer, and the dispatch turn serves that pin (217.323346ms)
-✔ (f) concurrent first selections on different selection locks leave the newer pin in place (213.926782ms)
-✔ (g) an expired pin on the LRU pick is not reused: occupancy decides the fresh pin (240.476109ms)
+✔ (a) a reused eligible pin is served even when an OAuth peer is less occupied (255.669293ms)
+✔ (b) a rate-limited pin is not reused: the session moves and occupancy still decides (208.665873ms)
+✔ (c) a fresh session on an occupied LRU pick: occupancy moves it and the pin names the account selected for dispatch (202.813714ms)
+✔ (d) the next turn of (c) is served on the same account with no occupancy move (204.768901ms)
+✔ (e) the combo availability check pins the less-occupied peer, and the dispatch turn serves that pin (202.843405ms)
+✔ (f) concurrent first selections on different selection locks leave the newer pin in place (196.941764ms)
+✔ (g) an expired pin on the LRU pick is not reused: occupancy decides the fresh pin (208.320268ms)
 ℹ tests 7
 ℹ pass 7
 ℹ fail 0
 
 ## C: tag + patch + PR 15167
-✔ (a) a reused eligible pin is served even when an OAuth peer is less occupied (287.781782ms)
-✔ (b) a rate-limited pin is not reused: the session moves and occupancy still decides (218.479142ms)
-✔ (c) a fresh session on an occupied LRU pick: occupancy moves it and the pin names the account selected for dispatch (206.095319ms)
-✔ (d) the next turn of (c) is served on the same account with no occupancy move (210.28829ms)
-✔ (e) the combo availability check pins the less-occupied peer, and the dispatch turn serves that pin (210.091641ms)
-✔ (f) concurrent first selections on different selection locks leave the newer pin in place (210.116392ms)
-✔ (g) an expired pin on the LRU pick is not reused: occupancy decides the fresh pin (215.896115ms)
+✔ (a) a reused eligible pin is served even when an OAuth peer is less occupied (253.243285ms)
+✔ (b) a rate-limited pin is not reused: the session moves and occupancy still decides (194.835303ms)
+✔ (c) a fresh session on an occupied LRU pick: occupancy moves it and the pin names the account selected for dispatch (190.697722ms)
+✔ (d) the next turn of (c) is served on the same account with no occupancy move (190.901099ms)
+✔ (e) the combo availability check pins the less-occupied peer, and the dispatch turn serves that pin (195.33399ms)
+✔ (f) concurrent first selections on different selection locks leave the newer pin in place (189.091838ms)
+✔ (g) an expired pin on the LRU pick is not reused: occupancy decides the fresh pin (199.532072ms)
 ℹ tests 7
 ℹ pass 7
 ℹ fail 0
 
 ## wire probe
-The committed checks/wire-probe-*.txt files are the `WIRE `-prefixed lines of wire-probe.mts's output with the prefix removed (sed -n 's/^WIRE //p'); the probe above, run on B and on C, gives extracts equal to wire-probe-without-15167.txt and wire-probe-with-15167.txt (7 lines each, the progress lines say yes).
+The committed checks/wire-probe-*.txt files are the `WIRE `-prefixed lines of wire-probe.mts's output with the prefix removed (sed -n 's/^WIRE //p'); the probe, run on B and on C, gives extracts equal to wire-probe-without-15167.txt and wire-probe-with-15167.txt (7 lines each; the progress log says yes).

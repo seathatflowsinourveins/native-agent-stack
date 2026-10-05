@@ -32,7 +32,7 @@ log "working tree after npm ci: $(G status --porcelain | wc -l) changed or untra
 run_test() {
   local label=$1
   ( cd "$T" && DISABLE_SQLITE_AUTO_BACKUP=true nice -n 19 node --import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts --test tests/unit/affinity-outranks-occupancy-8940.test.ts > "$OUT/test-$label.log" 2>&1 ); local rc=$?
-  log "test $label exit=$rc tests=$(grep -E '^# tests ' "$OUT/test-$label.log" | awk '{print $3}') pass=$(grep -E '^# pass ' "$OUT/test-$label.log" | awk '{print $3}') fail=$(grep -E '^# fail ' "$OUT/test-$label.log" | awk '{print $3}')"
+  log "test $label exit=$rc tests=$(grep -aE '^ℹ tests ' "$OUT/test-$label.log" | awk '{print $3}') pass=$(grep -aE '^ℹ pass ' "$OUT/test-$label.log" | awk '{print $3}') fail=$(grep -aE '^ℹ fail ' "$OUT/test-$label.log" | awk '{print $3}')"   # node's spec reporter prints 'ℹ tests N', not TAP '# tests N'
 }
 commit_state() { G commit -q --allow-empty -m "state $1"; log "state $1 tree=$(G rev-parse 'HEAD^{tree}')"; }   # only what apply --index staged, so the tree is exactly the applied change
 

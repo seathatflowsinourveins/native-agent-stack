@@ -23,7 +23,7 @@ cancellation, with `tools/omniroute/gateway_record.py`). Host paths are masked (
 
 Rerun the probe: in an OmniRoute checkout at the tag with `npm ci` done, copy `scripts/wire-probe.mts.txt` to `wire-probe.mts` at the root and run
 `DISABLE_SQLITE_AUTO_BACKUP=true node --import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts wire-probe.mts` (upstream's unit-test flags; the data
-directory is isolated); the probe prints each case after a `WIRE ` prefix, and `sed -n 's/^WIRE //p'` gives the committed files. `scripts/affinity-test.sh.txt` runs the whole re-run (clone, `npm ci`, the unit test and the probe on three trees). The live columns are read with `scripts/effort_live.py.txt` (it opens the store with `mode=ro`).
+directory is isolated); the probe prints each case after a `WIRE ` prefix, and `sed -n 's/^WIRE //p'` gives the committed files. `scripts/affinity-test.sh.txt` runs the whole re-run (clone, `npm ci`, the unit test on three trees and the wire probe on two of them). The live columns are read with `scripts/effort_live.py.txt` (it opens the store with `mode=ro`).
 
 Limits: the upstream effort column is captured from the provider request, not from the backend's own report, so whether the backend applies `max` is not observable here; the cache effect of
 removing the affinity patch was not measured (no build without it was deployed); the probe applies PR 15167's head of 2026-10-05 (`0585aba55`) to the tag, while the running build carries the
