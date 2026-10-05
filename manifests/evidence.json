@@ -4285,8 +4285,8 @@
     },
     {
       "path": ".github/main-ruleset.json",
-      "sha256": "5b6a1543053c995222fb0b6de9e213fa9446aa86e20aaa6086e6289bf1e97013",
-      "bytes": 1763
+      "sha256": "ecabfdacefecadce56e879b32b84ff43db746cd1fdc24bb0ccaaf4e6d7cc82d2",
+      "bytes": 1697
     },
     {
       "path": ".github/osv-scanner-frozen-macos.toml",
@@ -4330,8 +4330,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "a5a61ef48d7be71aee55dbc9e1c79b2dc970a753e04cff1f671a09543b41164c",
-      "bytes": 58273
+      "sha256": "96f4e9e7843827fa3e8689839fdb37d0adb98e37198c187f68f286a0880a301d",
+      "bytes": 56981
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -4770,8 +4770,8 @@
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "d500961c71dc2aec4b944780480ee4216980ab6ef1d7529891b24f1d8ea7ac73",
-      "bytes": 65350
+      "sha256": "266da883e614f767929981e8e630c34cf3958020fb5a14f162d9f385bbb9427e",
+      "bytes": 65623
     },
     {
       "path": "adoption/pre-login-observation.json",
@@ -9736,8 +9736,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/RESOLVER.md",
-      "sha256": "71ca481abc78c689ecf6b3f4b0f597899b73b3f257cc1c8866824116b43b73ed",
-      "bytes": 74585
+      "sha256": "d7a0572da2bf5dc33d7314b0a581fef2a79ad9f49888bce08beb90376349e734",
+      "bytes": 74643
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -15661,8 +15661,8 @@
     },
     {
       "path": "catalogs/foundation/automation.json",
-      "sha256": "ccf259a9b7bca8cf81cfa0ddfbe5f54e7bc95a073defebc74a28877bfee5f084",
-      "bytes": 34986
+      "sha256": "4ec258549f82eeb8ea709f18b8a0bd482cdcebfc690bfab87c58449b16947472",
+      "bytes": 36223
     },
     {
       "path": "catalogs/foundation/community-practice-20260920.json",
@@ -16321,8 +16321,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "e7a04ffd9489c038674637c89e799d8bcc14265d3b6dbdf76148ef9327b305c4",
-      "bytes": 155413
+      "sha256": "329aa284c373b0889e28337cb45c0c8d235efbb3901d87fda15f1ef1f972e6e7",
+      "bytes": 155548
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -16581,8 +16581,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-macos-ci-scope.md",
-      "sha256": "5af6945bef16c92dcd730b4da9e8b3bf9db34a2207eb4b17c0c3c4ce5133c0be",
-      "bytes": 84655
+      "sha256": "fa966cdfdb55751e6673c137d2365627abd660edf0d20d31a840fa54c5aab5a0",
+      "bytes": 84790
     },
     {
       "path": "docs/decisions/2026-10-03-macos-full-suite-coverage.md",
@@ -16881,13 +16881,13 @@
     },
     {
       "path": "docs/github-automation.md",
-      "sha256": "506dab27e1618ac53a688b38eb21e3219f56acd65940f1315a77a588bcdae035",
-      "bytes": 98818
+      "sha256": "6e17a86f92414d877858c9cbd88a42703aaaefb36f04bad6a78219f869bae18a",
+      "bytes": 99371
     },
     {
       "path": "docs/grand-catalog-handbook.md",
-      "sha256": "0a6e88cc5c4776c433eb4af0414e30b970388204bb9e1d36ac73ce22f3db6eec",
-      "bytes": 426080
+      "sha256": "975c81017bfd910bf8c6d5eb50612c9eb5e7246dea707d7eee5294b6704bf51f",
+      "bytes": 426093
     },
     {
       "path": "docs/harness-defaults.md",
@@ -16936,7 +16936,7 @@
     },
     {
       "path": "docs/lanes.md",
-      "sha256": "c7bacc23aa75a860dc3a8a0957a4c74aac135d5a03bc1187e76a86cc630c0c84",
+      "sha256": "bc464ce7d95542b7a33229de29f50efe2bf52b341bf037772bf91e556468cb8f",
       "bytes": 13335
     },
     {
@@ -53456,8 +53456,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "9c62a6bbd07bf32a9af5627725f6e925bd2ba4eecd29066b20955b523251d021",
-      "bytes": 231032
+      "sha256": "c4ccf548196cd115103738f7c8de2637618e6bd038f7167973ef79d4f7701044",
+      "bytes": 230581
     },
     {
       "path": "tests/test_adoption_bootstrap_parity.py",
@@ -54226,8 +54226,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
-      "sha256": "dde7b78ffd818486f31af1e93da324e2bcd3fb40ddbce2d5ae97814c775e8562",
-      "bytes": 271316
+      "sha256": "bcb1218394b20467dcd5d76242bbe2023038807248f3eedbc2decb290233f052",
+      "bytes": 271414
     },
     {
       "path": "tests/test_runtime_worker_skills.py",
@@ -54266,8 +54266,8 @@
     },
     {
       "path": "tests/test_shell_parser_ci.py",
-      "sha256": "9a64956e57530dc7a42229a020471b8c63d059410be8b3e0662a1e45992badae",
-      "bytes": 43277
+      "sha256": "8cb8f02858dd261aaa24f961784385f39b06a4d311ff08742708cbf0f1fe743d",
+      "bytes": 43323
     },
     {
       "path": "tests/test_sim_capacity.py",
@@ -54406,13 +54406,13 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "77086c6f6d24060b36021e1667dce09ef272bc076e99c8dd14798722bb94f9e6",
-      "bytes": 151424
+      "sha256": "acbd0d2aaac0dcb2842ec63a609f2a83b48dfc06dfa168d7660e73ad8cb86727",
+      "bytes": 149433
     },
     {
       "path": "tests/test_workflow_policy.py",
-      "sha256": "646cec9f8e45b6f8666a7c6495744e6c7cb0d7dff3efc145370dad724accf418",
-      "bytes": 82767
+      "sha256": "1c518c3b82f265c9567bfeb9034e48329b9f3d8e83999776917647462cf3523e",
+      "bytes": 82779
     },
     {
       "path": "tests/test_workflow_security.py",
