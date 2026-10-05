@@ -1647,9 +1647,10 @@ class SotaManifestFreezeTests(GateFixture):
 
 class TrustPathDerivationTests(unittest.TestCase):
     """Review of #123, finding 4, and fourth review G3: TRUST_PATHS covers every repository module the
-    gate and the validators import (transitively) and every head-side rule input they read, derived
-    from the modules (an ast walk of the imports) and from what they actually open (a sys.addaudithook
-    recording every read while the gate judges a fixture and the validators check this checkout)."""
+    gate and the validators import (transitively), every head-side rule input they read and the
+    workflow wrappers. Derive them from the modules (an ast walk of the imports), actual reads
+    (a sys.addaudithook while the gate judges a fixture and the validators check this checkout)
+    and parsed workflow jobs and steps."""
 
     ROOT = Path(gate.__file__).resolve().parents[1]
     ENTRY_POINTS = ("scripts/verdict_review_gate.py", "scripts/landscape.py", "scripts/platform_status.py",
@@ -1690,6 +1691,20 @@ class TrustPathDerivationTests(unittest.TestCase):
             queue.extend(self.local_imports(relative) - seen)
         self.assertIn("scripts/validate.py", seen)  # scripts/host_receipts.py imports it
         self.assertEqual(sorted(seen - set(gate.TRUST_PATHS)), [])
+
+    def test_workflow_wrappers_match_the_workflow_trust_paths(self):
+        from tests.test_workflow_policy import load_workflow, workflow_files
+
+        wrappers = set()
+        for path in workflow_files(self.ROOT / ".github/workflows"):
+            jobs = load_workflow(path.read_text(encoding="utf-8"))["jobs"]
+            invokes_gate = any("scripts/verdict_review_gate.py" in step.get("run", "")
+                               for job in jobs.values() for step in job.get("steps", []))
+            if "verdict-review-gate" in jobs or invokes_gate:
+                wrappers.add(path.relative_to(self.ROOT).as_posix())
+        self.assertTrue(wrappers, "no workflow defines or invokes the verdict-review gate")
+        trusted = {path for path in gate.TRUST_PATHS if path.startswith(".github/workflows/")}
+        self.assertEqual(wrappers, trusted)
 
     # Runs in a subprocess: an audit hook cannot be removed once added. It records every file opened
     # for reading under the data root and every module imported from the repository.

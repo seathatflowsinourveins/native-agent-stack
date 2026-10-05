@@ -1475,7 +1475,8 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
     external reviewer can countersign a wave. Either makes the provenance checkable and would
     replace this residual with a verification step.
 - **Accepted residual: the PR's own workflow can disable the job (finding 2, 2026-09-23).** A
-  `pull_request` run takes the job definition from the PR's `validate.yml`. A PR that edits the
+  `pull_request` run takes the job definition from the PR's `pr-metadata.yml`
+  (`validate.yml` before PR #706). A PR that edits the
   `verdict-review-gate` job so that it no longer runs the base's gate is therefore not blocked by
   this check.
   - *Alternatives, all rejected.* A `pull_request_target` or `workflow_run` job would take its
