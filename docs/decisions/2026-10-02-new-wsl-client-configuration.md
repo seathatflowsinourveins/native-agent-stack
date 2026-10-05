@@ -945,22 +945,24 @@ snapshots above retain their original content. This is a documentation
 projection; it establishes no new WSL installation, client execution or
 qualification. The byte-pinned upstream awareness block stays at v0.50.0.
 
-`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (1 unit(s) left out; 57 of 58 lines stay):
+The current projection follows the [conditional F4 correction](2026-10-04-rtk-051-f4-exceptions.md):
+six exceptions, installed hook exclusions, explicit log-count/proxy guidance
+and the narrow bare-name find warning
+([src/discover/registry.rs:1704](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/discover/registry.rs#L1704), [src/hooks/decision.rs:143](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/decision.rs#L143),
+[src/cmds/git/git_cmd.rs:1842](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/git/git_cmd.rs#L1842), [src/cmds/system/find_cmd.rs:147](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/system/find_cmd.rs#L147), [src/cmds/system/find_cmd.rs:417](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/cmds/system/find_cmd.rs#L417)).
+Our [probe rerun](../../evidence/artifacts/rtk-f4-remeasurement-20261004/rtk-behaviour-probe.json) and
+[hook/prefix remeasurement](../../evidence/artifacts/rtk-f4-remeasurement-20261004/hook-and-prefix-probe.json) are recorded beside
+[PR #701 README](https://github.com/seathatflowsinourveins/native-agent-stack/blob/e3ed1fe36703c6f08044b5d81fdd8d1b5f93e9d6/evidence/artifacts/token-stack-fresh-session-e2e-20261004/README.md#L67), [peer probe](https://github.com/seathatflowsinourveins/native-agent-stack/blob/e3ed1fe36703c6f08044b5d81fdd8d1b5f93e9d6/evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk_behaviour_probe.py), [peer JSON](https://github.com/seathatflowsinourveins/native-agent-stack/blob/e3ed1fe36703c6f08044b5d81fdd8d1b5f93e9d6/evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-behaviour-probe.json), [exclusions fixture](https://github.com/seathatflowsinourveins/native-agent-stack/blob/e3ed1fe36703c6f08044b5d81fdd8d1b5f93e9d6/fixtures/rtk-hook-exclusions.toml). The merged distribution now retains the RTK guidance. This projection drops 0 units for Claude (58 of 58 lines retained) and 0 for Codex (65 of 65 lines retained), as regenerated with `--check --markdown`.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 58 of 58 lines stay):
 
 ```text
-line 17, bullet; names Promptfoo
-- A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.
-
 ```
 
-`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (1 unit(s) left out; 64 of 65 lines stay):
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 65 of 65 lines stay):
 
 ```text
-line 11, sentence; names Promptfoo
-A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.
-
 ```
-
 
 ## Addendum 2026-10-04: integrated Promptfoo owner default
 

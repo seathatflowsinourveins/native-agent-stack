@@ -27,8 +27,8 @@ sys.path.insert(0, str(ROOT / "tools" / "adoption"))
 SOURCE = ROOT / "adoption" / "agents" / "codex"
 NAMES = ("stack-researcher.toml", "stack-verifier.toml")
 GOOD_ROWS = {
-    "stack-researcher.toml": "48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77",
-    "stack-verifier.toml": "18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b",
+    "stack-researcher.toml": "a8e416feffb47afd36ba8f4afd2076f7168d766bfb5efd847cf1b600e6110c4f",
+    "stack-verifier.toml": "d35bcd8f77bcdfe58e879c3c752c152219a8725f55d2b17f5fc67a7832595561",
 }
 # The worker roles: their own folder and SHA256SUMS, so the carriers' folder keeps exactly the two files the frozen
 # E2E pinned (tests/test_codex_agents.py test_stack_role_files_rows_and_mirrors).
@@ -433,7 +433,7 @@ class RuleSourceCitationTests(unittest.TestCase):
         self.assertEqual(text.count(module.EXCEPTIONS_MARKER), 1)
         block = text.split(module.EXCEPTIONS_MARKER, 1)[1].split(module.END_MARKER, 1)[0]
         bullets = [line for line in block.splitlines() if line.startswith("- ")]
-        commands = ("`git show REV:path`", "`diff`", "`git branch`", "`git log`", "`jq`", "`find`")
+        commands = ("`git show REV:path`", "`diff`", "`git branch`", "`jq`", "`git log`", "`find NAME`")
         self.assertEqual(len(bullets), len(commands), bullets)
         for command, line in zip(commands, bullets):
             with self.subTest(command=command):

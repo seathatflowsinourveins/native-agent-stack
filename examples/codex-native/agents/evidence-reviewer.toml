@@ -37,13 +37,13 @@ tokens; behavior and exit code are unchanged.
 
 <!-- native-agent-stack:rtk-exceptions -->
 
-rtk 0.51.0 positional expansion needs `--shell`. An explicit `rtk` prefix bypasses rtk's own exclusion list, so "the prefix is always safe" does not hold for these commands: rtk changes their output or exit status. Run them natively, or as `rtk proxy <command>` to keep the call tracked:
-- `git show REV:path` in any form, including `git -C DIR show REV:path`: rtk keeps about 8 KiB of the blob.
-- `diff`: rtk 0.51.0 read errors exit 2 (bf23cff); 0.50.0: 1.
-- `git branch`: rtk can list a branch checked out in another worktree as remote-only.
-- `git log` when the complete history matters: rtk stops at 10 commits without a notice and drops merge commits.
-- `jq`: rtk keeps 40 lines of at most 120 characters.
-- `find` on a path that may not exist: rtk exits 0 with no output.
+With installed rtk exclusions config (`fixtures/rtk-hook-exclusions.toml`), rewrite/installed hooks keep the first four native; else rewrite them. Explicit `rtk` bypasses exclusions: use `rtk proxy <command>`, never prefix. rtk 0.51.0: `--shell` for positional expansion.
+- `git show REV:path`/`git -C DIR show REV:path`: rtk keeps ~8 KiB.
+- `diff`: rtk changes diagnostics; both exit 2 on missing files.
+- `git branch`: rtk can mislabel other worktrees' branches remote-only.
+- `jq`: rtk caps at 40 lines/120 chars.
+- `git log` via rtk: bare: max 10 commits, no notice; `--stat`: max 10, notice, keeps merges. Bare/`--oneline`/`--format=%s`/`--graph --oneline` drop merges. History/merges: `-n <count>` or `rtk proxy git log`.
+- `find NAME`: rtk uses patterns for missing bare names; no match exits 0. Use `./NAME` or `rtk proxy find` for status.
 
-Never put `rtk` in front of a shell builtin such as `cd`, `export` or `source`: rtk exits 127 and the rest of a `&&` chain does not run.
+`cd`, `export`, `source` stay in shell: `rtk` exits 127, halting `&&`.
 '''

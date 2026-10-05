@@ -471,8 +471,18 @@ class TemplateTests(unittest.TestCase):
     def test_exceptions_name_every_raw_sensitive_form(self):
         _, _, exceptions = template_segments()
         for needle in ("`git show REV:path`", "git -C DIR show REV:path", "`diff`", "`git branch`", "`git log`",
-                       "`jq`", "`find`", "`rtk proxy <command>`", "`cd`", "`export`", "`source`", "127"):
+                       "`jq`", "`rtk proxy <command>`", "`cd`", "`export`", "`source`", "127"):
             self.assertIn(needle, exceptions)
+        self.assertIn("With installed rtk exclusions config (`fixtures/rtk-hook-exclusions.toml`)", exceptions)
+        self.assertIn("rewrite/installed hooks keep the first four native; else rewrite them", exceptions)
+        self.assertIn("Explicit `rtk` bypasses exclusions: use `rtk proxy <command>`, never prefix", exceptions)
+        self.assertIn("`diff`: rtk changes diagnostics; both exit 2 on missing files", exceptions)
+        self.assertIn("bare: max 10 commits, no notice", exceptions)
+        self.assertIn("`--stat`: max 10, notice, keeps merges", exceptions)
+        self.assertIn("Bare/`--oneline`/`--format=%s`/`--graph --oneline` drop merges", exceptions)
+        self.assertIn("History/merges: `-n <count>` or `rtk proxy git log`", exceptions)
+        self.assertIn("`find NAME`: rtk uses patterns for missing bare names; no match exits 0", exceptions)
+        self.assertIn("Use `./NAME` or `rtk proxy find` for status", exceptions)
 
     def test_adoption_status_finds_the_rtk_text_inline(self):
         # scripts/adoption_status.py (#368) counts RTK as wired only when RTK.md's text is inline in what Codex

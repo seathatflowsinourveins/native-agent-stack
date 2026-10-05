@@ -57,8 +57,8 @@ README_HEADING = "## 2026-09-29: Stack role carriers"
 # section of 2026-09-29 repeats these rows verbatim, and Amendment 4 copies them; any later change to a
 # carrier needs a new dated amendment and new rows here.
 STACK_ROLE_ROWS = (
-    "| `stack-researcher.toml` | `48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77` |",
-    "| `stack-verifier.toml` | `18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b` |",
+    "| `stack-researcher.toml` | `a8e416feffb47afd36ba8f4afd2076f7168d766bfb5efd847cf1b600e6110c4f` |",
+    "| `stack-verifier.toml` | `d35bcd8f77bcdfe58e879c3c752c152219a8725f55d2b17f5fc67a7832595561` |",
 )
 
 # The spawn_agent tool text shows a role's description to every parent in every arm (role.rs:294-334), so each
@@ -85,13 +85,13 @@ CITE_SENTENCE = ("Cite the source (file:line, the recorded pin or the docs) for 
 # Each role's own exact-shape sentence. `jq` output is in both: the F4 exceptions list six commands, jq included.
 EXACT_SHAPES = {
     "stack-researcher": (
-        "For an exact blob from `git show REV:path`, a `diff` whose exit status matters, `git branch`, a complete "
-        "`git log`, `jq` output, or `find` on a directory that may not exist, use the native command or "
+        "For an exact blob from `git show REV:path`, raw `diff` diagnostics, `git branch`, a complete `git log`, "
+        "`jq` output, or `find NAME` on a bare name that may not exist, use the native command or "
         "`rtk proxy <command>` (the RTK exceptions below)."
     ),
     "stack-verifier": (
-        "Use the native command or `rtk proxy <command>` for an exact blob from `git show REV:path`, a `diff` whose "
-        "exit status matters, `git branch`, a complete `git log`, `jq` output, and `find` on a directory that may "
+        "Use the native command or `rtk proxy <command>` for an exact blob from `git show REV:path`, raw `diff` "
+        "diagnostics, `git branch`, a complete `git log`, `jq` output, and `find NAME` on a bare name that may "
         "not exist (the RTK exceptions below)."
     ),
 }
@@ -299,7 +299,7 @@ MUTANTS = [
     ("working-directory bullet removed", ("cwd_rule",), STACK_ROLES,
      lambda role, data: (role, _edit(data, WORKING_DIRECTORY_BULLET + "\n", ""))),
     ("jq removed from the exact-shape sentence", ("exact_shapes",), STACK_ROLES,
-     lambda role, data: (role, _edit(data, "`jq` output, ", ""))),
+     lambda role, data: (role, _edit(data, "`jq` output", ""))),
     ("F4 block removed", ("f4_block",), STACK_ROLES,
      lambda role, data: (role, _edit(data, f4_block(), ""))),
     ("F4 block duplicated", ("f4_block",), STACK_ROLES,
@@ -513,7 +513,7 @@ class CustomAgentInstructionsTests(unittest.TestCase):
         for role in STACK_ROLES:
             data = load_role(ADOPTION_AGENTS / f"{role}.toml")
             self.assertEqual(module.structural_problems(role, role, data), [], "the unmutated role has no problem")
-            self.assertEqual(data["developer_instructions"].count("`jq` output, "), 1)
+            self.assertEqual(data["developer_instructions"].count("`jq` output"), 1)
             for label, expected, roles, build in MUTANTS:
                 if role not in roles:
                     continue
