@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Deterministic host driver for the OpenHands PR resolver.
 
-2026-10-04: the public driver is disabled until the owned-path allowlist gate lands.
-The stages below describe dormant code, retained for the later enablement PR.
+2026-10-04: the public driver requires the owned-path gate's startup negative control.
+The handlers below proceed after that control and retain their existing stage gates.
 
 Stage 1 built the driver's core and a CLI that exercises it with fakes. Stage 2
 wires it into host.run and dispatch: `run` performs one attempt end to end
@@ -65,7 +65,10 @@ def _load(name):
 patch_policy = _load("patch_policy")
 gh_harness = _load("gh_harness")
 outgoing_guard = _load("outgoing_guard")
-push_gate = _load("push_gate")
+try:
+    push_gate = _load("push_gate")
+except BaseException:  # An unavailable gate reaches the public exit-3 refusal below.
+    push_gate = None
 
 
 # -- Unit 1: issue selection and the untrusted-input block (plan section 2, steps 1 and 4)
@@ -355,7 +358,26 @@ def resolver_instruction(selected, *, task, owned_paths, new_boundary=new_bounda
         "flags. If the fix needs such a change, including a new or changed test, change nothing: "
         "stop and report which file would need to change and why.\n"
         "- Static read inventories are monitoring only; they authorize no path and refuse no change. "
-        "The resolver entry point stays disabled until the owned-path allowlist gate lands.\n"
+        "The trusted push gate independently checks the owned paths on the exact commit and refuses "
+        "every unowned path, including either end of a rename; symlinks, gitlinks, mode/type changes, "
+        "unsafe path components (empty, . or .. components), absolute paths, .git or its HFS/NTFS aliases, "
+        ".gitmodules and its aliases; and a casefold or NFC/NFKC alias of a protected path or a collision "
+        "with another changed path.\n"
+        "- Even inside owned paths, compiled or bytecode artifacts (compiled_module_artifact) are refused "
+        "anywhere: every __pycache__ component and .pyc, .pyo, .so, .pyd, .dylib or .dll suffix. "
+        "Git semantic dot files (git_semantic_file) are refused at any depth: .git* names including "
+        ".gitattributes, .gitignore and .gitconfig, plus .mailmap; .git, .gitmodules and .github keep their "
+        "existing refusals. Instruction files (instruction_file) are also refused by basename at any depth "
+        "or by directory prefix: AGENTS.md, "
+        "AGENTS.override.md, AGENTS.template.md, codex.AGENTS.template.md, CLAUDE.md, CLAUDE.local.md, "
+        "GEMINI.md, SKILL.md, RTK.md, codex-user-instructions.md, claude-user-instructions.md, "
+        "token-lanes-block.md, token-lanes-block.builder.md, token-lanes-block.researcher.md, "
+        "token-lanes-block.reviewer.md, token-lanes-block.scout.md, token-lanes-block.verifier.md "
+        "and adoption/agents/. The prefix covers Claude definitions, Codex roles and their pin files. "
+        "Case/Unicode and NTFS trailing-dot, "
+        "space or stream forms are refused too; instruction and Git names also discard Git's HFS-ignorable "
+        "characters. If the fix needs such a change, change nothing: stop and report "
+        "which file would need to change and why.\n"
         "- There is no network: only the model endpoint is reachable. Do not fetch the issue, "
         "install packages, push or open a pull request; the host does that from your patch.\n\n"
         "Workflow:\n"
@@ -1279,7 +1301,7 @@ class ResolverAttempt:
         if not isinstance(base_sha, str) or not SHA.fullmatch(base_sha):
             raise ValueError("base_sha_required")
         self.number, self.title, self.base_sha, self.branch = number, title, base_sha, branch
-        self.owned_paths = patch_policy.normalize_owned(owned_paths)
+        self.owned_paths = tuple(patch_policy.normalize_owned(owned_paths))
         self.lane, self.instruction, self.run_id = lane, instruction, run_id
         self.gh, self.git, self.gitleaks, self.gitleaks_config = gh, git, gitleaks, gitleaks_config
         # The trusted pre-push gate: by default push_gate.PushGate from this checkout's resolver/
@@ -1293,7 +1315,7 @@ class ResolverAttempt:
         self.harness = self.guard = self.clone = self.pr = self.clone_home = None
 
     def identity(self):
-        return {"issue": self.number, "base_sha": self.base_sha, "owned_paths": self.owned_paths, "lane": self.lane,
+        return {"issue": self.number, "base_sha": self.base_sha, "owned_paths": list(self.owned_paths), "lane": self.lane,
                 "run_id": self.run_id,
                 "instruction_sha256": hashlib.sha256(self.instruction.encode("utf-8")).hexdigest(),
                 "reviewer_argv_sha256": self.reviewer_argv_sha256}
@@ -1315,7 +1337,7 @@ class ResolverAttempt:
         gate = self.gate if self.gate is not None else push_gate.PushGate(git=self.git, zizmor=self.zizmor)
         self.harness = gh_harness.GhHarness(self.gh, git=self.git, base_env=self.base_env,
                                             workdir=gh_harness.private_workdir(str(private)), runner=self.runner,
-                                            guard=self.guard, push_gate=gate)
+                                            guard=self.guard, push_gate=gate, owned_paths=self.owned_paths)
         return private
 
     def _commit_message(self):
@@ -1838,14 +1860,50 @@ def build_parser():
     return parser
 
 
-DISABLED_MESSAGE = ("resolver disabled until the owned-path allowlist gate lands "
+DISABLED_MESSAGE = ("resolver disabled: owned-path allowlist gate self-test failed "
                     "(docs/decisions/2026-09-28-openhands-resolver-isolation.md)")
 
 
+def _startup_gate_self_test():
+    """git's native hash-object/mktree/commit-tree fixture; no network or container.
+
+    A real unowned addition must be refused specifically as unowned_path, rather than
+    passing because a different check (trusted ancestry or unavailable zizmor) refused.
+    The fixture's allowlist is constant; no argument or environment chooses its scope.
+    """
+    if push_gate is None:
+        return False
+    try:
+        git = shutil.which("git", path="/usr/bin:/bin")
+        with tempfile.TemporaryDirectory(prefix="resolver-gate-self-test-") as directory:
+            def run(*args, input_bytes=None):
+                return subprocess.run([git, "-C", directory, "-c", "user.name=Resolver gate fixture",
+                                       "-c", "user.email=gate-fixture@example.invalid", *args],
+                                      input=input_bytes, check=True, capture_output=True, timeout=10,
+                                      env=dict(push_gate.GIT_ENV)).stdout.decode("ascii").strip()
+
+            run("init", "-q", "--template=", "-b", "main")
+            empty = run("mktree", input_bytes=b"")
+            base = run("commit-tree", empty, "-m", "base fixture")
+            blob = run("hash-object", "-w", "--stdin", input_bytes=b"negative control\n")
+            tree = run("mktree", input_bytes=f"100644 blob {blob}\tunowned.txt\n".encode("ascii"))
+            head = run("commit-tree", tree, "-p", base, "-m", "unowned fixture")
+            with contextlib.redirect_stderr(io.StringIO()):
+                record = push_gate.PushGate(git=git, zizmor=None).check(
+                    directory, base=base, head=head, owned_paths=("owned.txt",))
+            return (record.get("status") == "fail" and record.get("reasons") == ["unowned_path"]
+                    and record.get("commit") == head and record.get("base") == base
+                    and record.get("changed_path_count") == 1 and record.get("owned_path_count") == 1)
+    except BaseException:
+        return False
+
+
 def main(argv=None, *, session_key=None, **injected):
-    """Public entry point is disabled before parsing, network, push or model calls."""
-    print(DISABLED_MESSAGE, file=sys.stderr)
-    return 3
+    """A successful import and native unowned-commit negative control precede parsing."""
+    if not _startup_gate_self_test():
+        print(DISABLED_MESSAGE, file=sys.stderr)
+        return 3
+    return _dormant_main(argv, session_key=session_key, **injected)
 
 
 def _dormant_main(argv=None, *, session_key=None, **injected):

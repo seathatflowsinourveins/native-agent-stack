@@ -93,8 +93,8 @@
     {
       "id": "dagu",
       "upstream": "https://github.com/dagucloud/dagu",
-      "version": "2.18.2",
-      "status": "isolated native qualification; historical service receipt retained",
+      "version": "2.16.6",
+      "status": "installed_native_research_dag_and_local_history_service",
       "receipt": "hosting/receipt.json"
     }
   ],

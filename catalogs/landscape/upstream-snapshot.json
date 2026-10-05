@@ -36,7 +36,7 @@
       "poppler",
       "tavily-cli"
     ],
-    "api_commands": 281,
+    "api_commands": 284,
     "api_nonzero_results": 8,
     "corrected_invalid_archive_digest_ref_attempts": 2,
     "newer_stable_release_review_queue": [
@@ -52,8 +52,8 @@
         "canonical": "https://github.com/headroomlabs-ai/headroom"
       }
     ],
-    "recommendation": "Retain current qualified pins; review the four newer stable releases against actual capability gaps before upgrading. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
-    "selected_component_api_commands": 264,
+    "recommendation": "Retain current qualified pins; review the 4 newer stable releases against actual capability gaps before upgrading. Dagu 2.16.6 remains held by the trading lane; the separate new-WSL profile selects 2.18.2. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
+    "selected_component_api_commands": 267,
     "initial_star_delta_commands": 1,
     "complete_star_snapshot_commands": 7,
     "added_candidate_source_screen_commands": 9,
@@ -3030,8 +3030,8 @@
       "component_id": "dagu",
       "repository": "https://github.com/dagucloud/dagu",
       "selected_repository_url": "https://github.com/dagucloud/dagu",
-      "selected_version": "2.18.2",
-      "selected_source_pin": "v2.18.2",
+      "selected_version": "2.16.6",
+      "selected_source_pin": "v2.16.6",
       "checks": [
         {
           "endpoint": "repos/dagucloud/dagu",
@@ -3080,6 +3080,16 @@
           "ended_at": "2026-10-05T08:21:37.212245+00:00",
           "stdout_sha256": "4de427e0447bc20d43379c1df2869ef2876f1f4bbd4c2e22a7ab1ebd14daec90",
           "status": "ok"
+        },
+        {
+          "endpoint": "repos/dagucloud/dagu/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-05T09:58:54.132800+00:00",
+          "ended_at": "2026-10-05T09:58:54.343594+00:00",
+          "stdout_sha256": "9b18505341f2b54036fa4f18ee3b160b61fdc912a8ee68e1f8cc6142cb3556b1",
+          "status": "ok",
+          "native_client": "curl; unauthenticated public GET",
+          "hash_scope": "Raw HTTP response body saved directly to the task cache; stdout_sha256 is the snapshot response-digest field."
         }
       ],
       "canonical_repository": "https://github.com/dagucloud/dagu",
@@ -3097,10 +3107,10 @@
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "v2.18.2",
-        "sha": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
-        "html_url": "https://github.com/dagucloud/dagu/commit/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4",
-        "committed_at": "2026-10-04T03:12:18Z"
+        "ref": "v2.16.6",
+        "sha": "58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+        "html_url": "https://github.com/dagucloud/dagu/commit/58fed633d58c1dd1319091fdb2c2f6158ecfa053",
+        "committed_at": "2026-09-14T14:09:43Z"
       },
       "latest_release_source": {
         "ref": "v2.18.2",
@@ -3112,8 +3122,8 @@
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
       "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/dagucloud/dagu",
-      "release_relationship": "selected_stable_release_qualified_within_scope",
-      "pin_move_checked_at": "2026-10-05T08:26:23.663167+00:00"
+      "release_relationship": "newer_stable_release_review_pending",
+      "pin_move_checked_at": "2026-10-05T09:58:54.343594+00:00"
     },
     {
       "component_id": "lean",
@@ -3265,7 +3275,7 @@
       "repository": "https://github.com/alpacahq/alpaca-py",
       "selected_repository_url": "https://github.com/alpacahq/alpaca-py",
       "selected_version": "0.44.0",
-      "selected_source_pin": null,
+      "selected_source_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
       "checks": [
         {
           "endpoint": "repos/alpacahq/alpaca-py",
@@ -3314,7 +3324,7 @@
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",
-      "source_pin_kind": "version_only",
+      "source_pin_kind": "git_commit",
       "primary_repository": "https://github.com/alpacahq/alpaca-py",
       "release_relationship": "selected_version_matches_latest_stable"
     },

@@ -4214,16 +4214,37 @@
       "component_ids": [
         "dagu"
       ],
-      "claim": "The published checksum-verified Dagu 2.18.2 and mise 2026.10.1 Linux release archives were extracted only into an owned isolated root. Native dagu version, all 23 tracked DAG validations (16 pass / 7 baseline-invalid historical archives), coordinator-enabled start-all with HTTP 200 and coordinator connection plus clean native exit/closed listeners, and mise --version/doctor with shims on PATH were observed. The source/profile pins move; existing historical recovery/model receipts retain their bytes and scopes.",
+      "claim": "The published checksum-verified Dagu 2.18.2 and mise 2026.10.1 Linux release archives were extracted only into an owned isolated root. Native dagu version, all 23 tracked DAG validations (16 pass / 7 baseline-invalid historical archives), coordinator-enabled start-all with HTTP 200 and coordinator connection plus clean native exit/closed listeners, and mise --version/doctor with shims on PATH were observed. Only the independent new-WSL profile and install-plan pins move; the workstation/trading stack remains held at Dagu 2.16.6. Existing historical recovery/model receipts retain their bytes and scopes.",
       "limitations": [
         "Isolated Linux x86_64 binary qualification only; no live host service/timer/config, system mise, destination WSL, model/provider/GPU or broker operation was changed or qualified.",
         "All 23 tracked YAML DAGs were validated unchanged: 16 passed, including all four current DAGs; seven archived fixtures failed with entrypoint document must not define name. Verified Dagu 2.16.6 rejects the same seven, so these failures are retained pre-existing evidence.",
         "The start-all smoke uses an empty owned DAG directory and no scheduled/job/model execution. Its coordinator is enabled as the repository template and upstream default require; shutdown logged one not registered service-registry update error while the native process returned 0 and both owned listeners closed.",
         "Upstream make test and mise unit/E2E suites, installed-client route activation, real job retry/SIGKILL/reboot recovery and production data downgrade were not run.",
-        "No published advisory found applies to the selected versions; historical advisories exist, including one affecting the old mise 2026.9.18 pin. Dagu has no tag CHANGELOG; reviewed release bodies and unchanged SCHEMA_MIGRATION.md are the actual sources.",
+        "No published advisory found applies to the selected versions; historical advisories exist, including one affecting old mise 2026.9.18. Dagu has no tag CHANGELOG. Release notes contain migration-relevant #2784, #2776 and #2858 storage changes; a 2604 existing-home rollback must restore a pre-upgrade DAGU_HOME plus the prior binary/unit/environment together. The trading stack stays held at 2.16.6.",
         "Version output and checksum matching do not prove the full integration, deployed host, source-build reproducibility, dependency-tree security or model quality."
       ],
       "path": "evidence/receipts/dagu-mise-pin-qualification-20261005.json"
+    },
+    {
+      "id": "rtk-fold-harbor-20261004",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "rtk",
+        "codex"
+      ],
+      "claim": "The retained 2026-10-05 upstream Harbor 0.23.0 study executed 72 live Codex 0.160.0 trials on eight local synthetic grep tasks with three repetitions in A/B/C. Every arm had zero adjudicated wrong-path actions and reward 1.0 in all 24 trials; both confirmatory A-C Holm p-values were 1.0 and remedy_triggered was false. This publication preserves historical model-driven execution and makes no new live-run or saving claim.",
+      "limitations": [
+        "Eight related synthetic task clusters and three repetitions limit power and external validity; zero observed errors does not establish equivalence or universal safety.",
+        "One pinned Codex 0.160.0 client was measured through the local nginx+socat proxy to OmniRoute cx/gpt-6.1-sol-max, configured at max effort; model and effort are route configuration, not per-run provider attestation. D was dropped prospectively and contributes no Claude-client outcome.",
+        "A/B installed RTK at /usr/local/bin/rtk for container login PATH resolution; host PATH and other installation locations are outside this qualification.",
+        "Only the five registered GNU grep spellings, plain ASCII newline-separated paths and one topology were studied; other search and path modalities remain unqualified.",
+        "Blinding was imperfect; six primary model readers and the added 53-row blind negative audit do not establish positive-label sensitivity or eliminate shared systematic errors.",
+        "B hook_fired was 8/24 because the frozen predicate counts ten non-file-list follow-up rewrites, contrary to the marker-matched Amendment 1 intention. All 24 discovery greps skipped rewriting and returned exact unfolded lists; broader exclusion coverage remains unresolved. The retained B fold flag is 0/24.",
+        "The retained A fold flag is 23/24; original inspection found a successful discovery fold in fold-08-r3-A that the frozen nested-result decoder missed. This is an extraction limitation; no frozen result or adjudication label was changed.",
+        "Tokens are secondary exploratory native fields with uncontrolled cache and incomplete enclosing-workflow usage; no token, cost or time saving claim is made.",
+        "This is a sanitized historical native-model study on local fixtures, not an unchanged upstream test suite, a fresh provider run, host-install acceptance or independently attested billing telemetry."
+      ],
+      "path": "evidence/receipts/rtk-fold-harbor-20261004.json"
     }
   ],
   "files": [
@@ -4274,8 +4295,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "2be9f85160b9f3f6ac9f4fb11cc3ebb25c960aea20a72a6ffe6e32d7b3b30eef",
-      "bytes": 12367
+      "sha256": "167d60a2b8feb571602dbf78b4af15c5fa9aa0ebae6c75c1839928dba5879917",
+      "bytes": 12705
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -4309,8 +4330,8 @@
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
-      "sha256": "0153fc7595f7dd64d077366b2b0251cbe78f13a47f90798ab6d3d746624c2aec",
-      "bytes": 25235
+      "sha256": "064d309189054b6f2c6ec37855fd3e3e6c09eee42197865cc1cc86d9233dcc20",
+      "bytes": 26117
     },
     {
       "path": ".github/workflows/dependency-review.yml",
@@ -4654,13 +4675,13 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "5bad498f80b3b662db7f13889534620ae3bf60e4b2ac3169ae55877702eb6dfa",
-      "bytes": 255333
+      "sha256": "d2fffba6a1b7afc8baa5050d9180c53170402d06eae72dbfe9dd1c45fe6eb4b4",
+      "bytes": 255712
     },
     {
       "path": "adoption/new-wsl-profile.md",
-      "sha256": "5748a4926f667d344e7587a530a10ce2b1800a51f961106cd948ccdb2ec3bd9f",
-      "bytes": 24544
+      "sha256": "9c2e7898753a8bfc87970efa088a130898ca577deb51f4af196d9d69defc2eac",
+      "bytes": 24671
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
@@ -9710,8 +9731,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/RESOLVER.md",
-      "sha256": "ba245dcc6aec0c3b6ae532046551634a3eddb32f3b6e864957434f610d0a7b56",
-      "bytes": 65488
+      "sha256": "71ca481abc78c689ecf6b3f4b0f597899b73b3f257cc1c8866824116b43b73ed",
+      "bytes": 74585
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -9792,6 +9813,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/gate-reads-set-diff-20261004.json",
       "sha256": "ad92ad3c433ef92078c303d3a8b3f483fa1e7f420fddeef36b7e2bd5c3ea2253",
       "bytes": 52184
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/owned-path-gate-fail-first.txt",
+      "sha256": "a64a87c1b8dcf212b47f4c4c72c07c57295642e99ff7ffa666631801a5037b80",
+      "bytes": 57859
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/phase1-commands.json",
@@ -10230,8 +10256,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/receipt.py",
-      "sha256": "23d21cdfe59ab74dddc4c524c59a3862f23bfc160ecf98a4d70dd61e702590e8",
-      "bytes": 32529
+      "sha256": "37f30f25623f9e8f4f5347fd24a2e61b08dc5edc51a41ebc22520bc11aba6912",
+      "bytes": 33130
     },
     {
       "path": "blueprints/runtime-workers/openhands/recipe.py",
@@ -10250,18 +10276,18 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver.py",
-      "sha256": "0bea80f837432b84a30025616967de20bda9ddb3cf13f53581922d82b7525291",
-      "bytes": 99589
+      "sha256": "b72dc929e54da878eac6a6ee34cd1e076ac8016f0015153725aadd96861b1a15",
+      "bytes": 103642
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/gate_reads.py",
-      "sha256": "7e5aa4f95f42dd3ad2ef905d7644cd49698b22173b81b0ada73c431891476b89",
-      "bytes": 55520
+      "sha256": "6fe148d0e60d60c097db311e7106b7e6cc2bb9952d81c54dd11979a2ff94e4e8",
+      "bytes": 55526
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/gh_harness.py",
-      "sha256": "feac3c5cd42af57c59e2234265652a7d61bc6d8445f529fffed8b05c8ce36e59",
-      "bytes": 34953
+      "sha256": "917e8b32a2c8a9b91d8a93a1bb27c6e819d32b158680d4bf65cbb35978997fdd",
+      "bytes": 35857
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/outgoing_guard.py",
@@ -10275,8 +10301,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/push_gate.py",
-      "sha256": "268a3b33cfdf9082454f3e5eab9db8db1beb93f5f98d529b0061543eaf7c9ff8",
-      "bytes": 61610
+      "sha256": "e68cfc8053e44eeafca3625ffbbb12fc2bbbd47599f3ffaf2b2b9b626f838c53",
+      "bytes": 75141
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -10290,8 +10316,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/skills/resolver/SKILL.md",
-      "sha256": "bae5abecc3e179d00068129d1be79504a3c1f40a4a82ae0263ce47b9b11dbc86",
-      "bytes": 5868
+      "sha256": "c37d1f3a8a72124b5a1439dfd3fb71129a69770012a22ece75d5d5b29758ec2d",
+      "bytes": 7333
     },
     {
       "path": "blueprints/runtime-workers/openhands/worker.py",
@@ -10325,8 +10351,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "93d137376182b11e4d371dc87158a158c4ad387e9ba149f19e4859222adb08df",
-      "bytes": 484781
+      "sha256": "8fee91c76e58b3bbeff1ee2bd367cebab085cf6dfc08eb94de9693e5e54a9a54",
+      "bytes": 485256
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -14520,7 +14546,7 @@
     },
     {
       "path": "blueprints/us-equities/hosting/README.md",
-      "sha256": "075b3789ef634c068a1a426c89c25187d652a04c2278e566d9e3b8e096a71b1a",
+      "sha256": "77e0264bdcd7cf1dc700d22236f9f3ba3407b5e5f7a76df1d8883aac64992270",
       "bytes": 7585
     },
     {
@@ -14555,7 +14581,7 @@
     },
     {
       "path": "blueprints/us-equities/hosting/dagu-equities.service.example",
-      "sha256": "934ed629763802d5e1056d763bc37e20accb93e06f9d42eed9078bb0326b774e",
+      "sha256": "b7e1814daa569c7b8484f600c13d98956ac3efb6d955e87a768591a38fa7d855",
       "bytes": 441
     },
     {
@@ -14625,8 +14651,8 @@
     },
     {
       "path": "blueprints/us-equities/manifest.json",
-      "sha256": "f29b59eb9b1285cf3647040746352f027df67c161102cc31c4bbc3455f33da3e",
-      "bytes": 7993
+      "sha256": "3660237d92c99c90d09464315288b8cffd78c4a1c501ca41b8100ef1e74260b7",
+      "bytes": 7982
     },
     {
       "path": "blueprints/us-equities/memory-lifecycle/README.md",
@@ -14917,6 +14943,26 @@
       "path": "blueprints/us-equities/order-throughput/rate_limit_evidence.py",
       "sha256": "3967619143bdd20239d34783748589d4881c5ca915e114cfb0f19fb4c1e8bb1a",
       "bytes": 10588
+    },
+    {
+      "path": "blueprints/us-equities/overfitting-controls/README.md",
+      "sha256": "59ee9b0d6c761506962f3100ba60654c4cade71326fc1ef7efab76c95034eed6",
+      "bytes": 6941
+    },
+    {
+      "path": "blueprints/us-equities/overfitting-controls/requirements-riskl-parity.in",
+      "sha256": "bf09321accc61be05ccace59d7eb7c9fb2c1642da06c4c4b19287cc3e615d43e",
+      "bytes": 172
+    },
+    {
+      "path": "blueprints/us-equities/overfitting-controls/requirements-riskl-parity.lock",
+      "sha256": "d0e1dbf620c58d7763ee4a12929dc109b7739d5aa4759092b03b7dd8003b8e12",
+      "bytes": 30346
+    },
+    {
+      "path": "blueprints/us-equities/overfitting-controls/riskl-parity-receipt.json",
+      "sha256": "fa231acbc5fbb766c30cd33f3ab01faeb571bc08f6d4ff55ca2670d1785fa570",
+      "bytes": 21645
     },
     {
       "path": "blueprints/us-equities/overnight-volume/runs/20260929/README.md",
@@ -15595,8 +15641,8 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "7a3d334c6b37bbe7243169980a86578aff1e39b657f39ebd64d0651f8eb442a4",
-      "bytes": 308650
+      "sha256": "8bac735580fade3d1ba750fd6f9e19763878dc72e78e881c7515b5c74dd6a6cc",
+      "bytes": 308666
     },
     {
       "path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
@@ -15710,8 +15756,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "3451dcfacbb84e348634a0343b3ad7094089dc9843dfb5ffbd822378ab655ad6",
-      "bytes": 256398
+      "sha256": "0d35173c6f8a1432bc275bd051cc5736c40eb6ee4cfbd27bec2a91a89cafb728",
+      "bytes": 257058
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -15840,8 +15886,8 @@
     },
     {
       "path": "catalogs/us-equities/convergence-20260926.json",
-      "sha256": "d4e7d79f9b32c093632ae611bf5cdc13fb654907817137974e2987fd03202c73",
-      "bytes": 882688
+      "sha256": "acd7e784328701ef9b7123cc0f4f243437e3a353236f80e61ded6205faa65b40",
+      "bytes": 898431
     },
     {
       "path": "catalogs/us-equities/convergence-20260926.md",
@@ -15925,8 +15971,8 @@
     },
     {
       "path": "catalogs/us-equities/decision-index.json",
-      "sha256": "4b62678bee9f238e0df6179a44f88860ed5b3d4b96b3505fdcb82a539d6db004",
-      "bytes": 757289
+      "sha256": "15bcf02837853bad02026d7ff31395fa71e51a8be659e47cc4c6832620b81fe9",
+      "bytes": 758875
     },
     {
       "path": "catalogs/us-equities/engines-strategies.json",
@@ -16040,8 +16086,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "6cdc57719ada786b46fe8c27d6d36ce162ffe66304b4e21d9e4e5131f6fa153d",
-      "bytes": 22531
+      "sha256": "9e9491592ca1ef4a1a1ba152b45c3b0a38afa4fa18f869eca9d92d30fc88d680",
+      "bytes": 22812
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -16365,8 +16411,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
-      "sha256": "ef05f248771b554dae6426f67bc2531c0586a3b2a1812423203174b75b941392",
-      "bytes": 79140
+      "sha256": "66528f4383af140504dafc2529db2e778e0db7a575b19c1c5fa9a9244b7bcae0",
+      "bytes": 120216
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
@@ -16580,13 +16626,23 @@
     },
     {
       "path": "docs/decisions/2026-10-04-codex-rtk-hook-qualified.md",
-      "sha256": "fc93f4173ecd6e21c6b0b2c4fd58be79d24b506698b4441e65bb088c43f762b7",
-      "bytes": 13314
+      "sha256": "0c37639806c5f419632b1ad30aba2de2e94602aea638f9006b5cfae3bb422373",
+      "bytes": 13573
     },
     {
       "path": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
       "sha256": "d091a1021eff71b11bf409b7896577566713788ecbf33e8f8c629e4d45ad26e1",
       "bytes": 15230
+    },
+    {
+      "path": "docs/decisions/2026-10-04-host-baseline-recorder.md",
+      "sha256": "9ef55a32757e36e65f54fadf3360943c885f3bf51031130aa106ebd8760cf5c7",
+      "bytes": 25010
+    },
+    {
+      "path": "docs/decisions/2026-10-04-nautilus-prerelease-freshness.md",
+      "sha256": "d2970fdbec345d22375f1c42a20449ce6dae4073555464a6a5ff330005877616",
+      "bytes": 20018
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-changelog-parity.md",
@@ -16635,8 +16691,23 @@
     },
     {
       "path": "docs/decisions/2026-10-05-dagu-mise-pin-move.md",
-      "sha256": "941be047f1428823688e625031dddf55b0f31931c98d1ed2ac996ad0e4a3406c",
-      "bytes": 115203
+      "sha256": "9d1b3c0982bba355a75998b3d8d535ae5ec40ba0eff6e22373360373f86eac66",
+      "bytes": 132816
+    },
+    {
+      "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
+      "sha256": "976b8e8c3ede42aa2ce26c01dbca5184cf45e329419a065e169bc0936f093051",
+      "bytes": 14176
+    },
+    {
+      "path": "docs/decisions/2026-10-05-rtk-fold-harbor-phase2.md",
+      "sha256": "d7698470de9eb7ed30f0764f8b1b17acd8a926298b08630829e1b955ba177dfe",
+      "bytes": 23344
+    },
+    {
+      "path": "docs/decisions/2026-10-05-typesafe-sdk-transport.md",
+      "sha256": "d197ab297186fe55e6c83624c78a06ead264e00d66a7fe2d5e62cfc1b653dbd6",
+      "bytes": 9226
     },
     {
       "path": "docs/direct-results.md",
@@ -16770,8 +16841,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "227eca7519d62cb1b6a3cfe70b05935555857407f25fd5120b53124d7db91b70",
-      "bytes": 188707
+      "sha256": "6f6a7e54101c4b720c58a116b1c675ccccac3b10a06e455556c7da021a7bfe77",
+      "bytes": 196524
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -16900,13 +16971,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "c13616fd07abab5d8d08a77a299a92b01f3c6d6618e882e42fe5723504d6c269",
-      "bytes": 652160
+      "sha256": "4ba9696007ff70dbbb3b5b77e3106f1faf70232cf28ceb40d96a9a4ea0d3feaa",
+      "bytes": 652539
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "2696b2c5aec661336e241bddcf1a7d5ae96a8e40d5085abbe7ad327bfd4e1137",
-      "bytes": 354184
+      "sha256": "84fa9a08d3bb401423bb25924082c3c6ea855fb98e0501760fd580f2c5e70700",
+      "bytes": 354563
     },
     {
       "path": "docs/next-host-stages.md",
@@ -16945,7 +17016,7 @@
     },
     {
       "path": "docs/stack.md",
-      "sha256": "13747ec978f60b495aedb662a9b34ddf5de2069f8a6c450aef0e97b169fe38bb",
+      "sha256": "58728a1f807256257e7848da15401221eeef0f63d36d0630b4e7cfb195bd35de",
       "bytes": 7667
     },
     {
@@ -33004,6 +33075,36 @@
       "bytes": 17286
     },
     {
+      "path": "evidence/artifacts/host-baseline-20261004/coreutils-2604-upgrade.json",
+      "sha256": "5869c88fa349ed59bea95887ca5596e0f6f482ba8b8c3cd4ff406342accd6130",
+      "bytes": 597
+    },
+    {
+      "path": "evidence/artifacts/host-baseline-20261004/host-baseline-probe-r0.txt",
+      "sha256": "21f3d8e96d1f4b9d24b7b30f280dba2f44af14135fdd0852468444c25d86bedf",
+      "bytes": 11784
+    },
+    {
+      "path": "evidence/artifacts/host-baseline-20261004/host-baseline-probe-r1.txt",
+      "sha256": "33fb4dd8199cf251b09d92afd50cdef678bd5383411447ea52877d269cb31435",
+      "bytes": 12326
+    },
+    {
+      "path": "evidence/artifacts/host-baseline-20261004/nativestack-2404.json",
+      "sha256": "f12c983de1cafdec4f9ee318fc4ae5ca62492ab23b371f457bbf785d70eb1e7c",
+      "bytes": 13783
+    },
+    {
+      "path": "evidence/artifacts/host-baseline-20261004/nativestack2604.json",
+      "sha256": "a9ef297bef7ad864cee212ca34c30e76e0da7770fd3d746ab344edf2bd2e1b46",
+      "bytes": 11954
+    },
+    {
+      "path": "evidence/artifacts/host-baseline-20261004/stackmeasure2604.json",
+      "sha256": "0d771af61bf75d07cbc6bf428b82652b0d5cd3a030ff3a4e83e28439b5ea66c6",
+      "bytes": 11952
+    },
+    {
       "path": "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json",
       "sha256": "746b8bac3212d2a1df220db6c25b203de44208a37ea4741d352fa599d4ab884c",
       "bytes": 7401
@@ -38930,8 +39031,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "8a29680afc2d3c7472679f0649fd9ad11e6f51a6477b69bc26244e40148c2350",
-      "bytes": 6882
+      "sha256": "8df4285b2e7fa32c35d2039ca5aa000a8d0cf2f7ef1234ec8f6de19a5fedde65",
+      "bytes": 7750
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -38945,8 +39046,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "f3c7835ba2dd442de43a40e7c5da06c25f41943903a84085c7e9f0de8066b8a2",
-      "bytes": 142481
+      "sha256": "2ee1882765ce703487719ed61272678f77faee2c2c10b6e94df23f2fdeec0306",
+      "bytes": 143818
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -39220,8 +39321,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "ed030fed904e8e01f40708c1203adc8f4c910c95cf33c33cca51276bc27ac948",
-      "bytes": 313879
+      "sha256": "768521a96754e38d481fc11b6812383b048da2009186bda8372da748a018074a",
+      "bytes": 314344
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -44679,6 +44780,96 @@
       "bytes": 3721
     },
     {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/AMENDMENT-2026-10-04.md",
+      "sha256": "03472c19bd031e3854d8fb832343197a73872a556a3632af0bf515f7b09f00f0",
+      "bytes": 6461
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/FREEZE-v4.json",
+      "sha256": "96954eba01557a3e8e2aaeeffc9fc2d25d25a60010a6f16755a6aa636c7bcfde",
+      "bytes": 1675
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/FREEZE-v4.sha256",
+      "sha256": "1596e4176fca1f751f7751764acc88af88443b8034b62f668a0e41122dc80f18",
+      "bytes": 75981
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/FREEZE.json",
+      "sha256": "45c37b631bc66fe2c6cc193f698c61301a930f952bedf75bf2c6ed4625e1682f",
+      "bytes": 1812
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/FREEZE.sha256",
+      "sha256": "a079389d203677444bbac6ea48f0a853ef4e760f125b89808f15471d0be0722d",
+      "bytes": 76783
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/PREREGISTRATION.md",
+      "sha256": "2cc717d1ee3674a463acd30617f59c737a1ae00f5ff638750e840afa4863e6b6",
+      "bytes": 27038
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/PROTOCOL.frozen.md",
+      "sha256": "d8e141c4408fc1693eaacad10c5aa8abf488888dc9c32ffe69f518cd8e39068a",
+      "bytes": 4756
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/README.md",
+      "sha256": "2a8658fcf366021c8cb3d8593df13ecdc835001d7c3aa9364d256ddb9590a848",
+      "bytes": 8729
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/adjudication-summary.json",
+      "sha256": "2ed392122a50a8d279214a622122050707fd6c68b3bc6ee290d474b32d241eb7",
+      "bytes": 1747
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/audit-rows.json",
+      "sha256": "708bd553eac2130f6c6a0014108e41c0dc94b3650029ce45bb82a221704bb626",
+      "bytes": 3657
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/grep-audit.csv",
+      "sha256": "279310f7e1e1c35e044fd5cb87aea2065f9b40cc688fcffd25d1301365d49aa2",
+      "bytes": 4949
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/hook-coverage.md",
+      "sha256": "c7172cd06a09cebb94fa18f5b98960b4e1afe918935b447e07feb0d3a4ca8316",
+      "bytes": 10668
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/per-arm-summary.csv",
+      "sha256": "da7f332e8e1d2c5dc763f8f3883e8e908633ded9a0a8b665056b92498f2fafd6",
+      "bytes": 721
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/phase1-decision-draft.md",
+      "sha256": "8f6e5f1eea82caba80f64aa363d104a3e1821730b4290d9817bc587368576a71",
+      "bytes": 13075
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/phase2-analysis.json",
+      "sha256": "38f72d1cab659af25f055f5a7ed71a6d74bafb8a4b324c5a5ed6818cd6df6d50",
+      "bytes": 50865
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/phase2-measures.adjudications.csv",
+      "sha256": "184f0c26173cf955d2a2869e7c2b639c4e05a19b8814bc4d27c2d4364f1ce9d4",
+      "bytes": 22432
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/premeasurement-acceptance.json",
+      "sha256": "60b065c8ecf013e7bf87f9f822b3c7b4f619664786397092ece6c3a25721a2c6",
+      "bytes": 1918
+    },
+    {
+      "path": "evidence/artifacts/rtk-fold-harbor-20261004/source-hashes.json",
+      "sha256": "9a4c321e0b0e1a36004efab401b05ef3376123d8d36bb01c9f66848242022136",
+      "bytes": 27566
+    },
+    {
       "path": "evidence/artifacts/rtk-native-git256-20261002/receipt.json",
       "sha256": "3746287baeda32c343247eb8f87ecc3b79b6605dfe564f31c2a85ca1f714368a",
       "bytes": 29878
@@ -49389,6 +49580,16 @@
       "bytes": 30252
     },
     {
+      "path": "evidence/artifacts/typesafe-sdk-transport-20261005/checks.json",
+      "sha256": "0c2d0c3a40a5f4fdfbf707d30bc49a9d58cddbd01fdad8965fcb495248f312ac",
+      "bytes": 5642
+    },
+    {
+      "path": "evidence/artifacts/typesafe-sdk-transport-20261005/unittest-output.txt",
+      "sha256": "a2c5d1bde040183fcd96890e3ce1b5dce70197478942641dce45ca75976ddb15",
+      "bytes": 3275
+    },
+    {
       "path": "evidence/artifacts/u11-part1-source-repair-20261001/integration-main-20261002.json",
       "sha256": "6382ce9bc43e18e5797b0e0c7df0f2b76f2485ca6a908e3b7aba13ec1c1eb638",
       "bytes": 2740
@@ -51230,8 +51431,8 @@
     },
     {
       "path": "evidence/receipts/dagu-mise-pin-qualification-20261005.json",
-      "sha256": "0585def004fb8aee6cd7fd7766824513eeb1fb5aff5693f97d1c5945efc38527",
-      "bytes": 41083
+      "sha256": "85f6ffffce124c829507e88620444f50859be4680167871241669051cb30882b",
+      "bytes": 74959
     },
     {
       "path": "evidence/receipts/dashboard-gap-resolution-20260921.json",
@@ -51342,6 +51543,26 @@
       "path": "evidence/receipts/hf-memory-models-20260921.json",
       "sha256": "aed4f45ee65ac469ad7ecabf2ed7e1c2bcb028d0a6011f7f81dffdd4a00a17aa",
       "bytes": 3678
+    },
+    {
+      "path": "evidence/receipts/host-baseline-coreutils-2604-upgrade-20261004.json",
+      "sha256": "834593fa86965850d7c94abb7ab1893e0388960140f383f6dad178cca4de2143",
+      "bytes": 2310
+    },
+    {
+      "path": "evidence/receipts/host-baseline-nativestack-20261004.json",
+      "sha256": "71be13bbfb7dfe9e698e92eb462ed64b2d62b60008fe2d1f39a14b6690766a50",
+      "bytes": 3443
+    },
+    {
+      "path": "evidence/receipts/host-baseline-nativestack2604-20261004.json",
+      "sha256": "ec3ab7856c602ab8c497ed1cb00a9a423c8d79a8e4c686ec4043ee9c52eaeea1",
+      "bytes": 3694
+    },
+    {
+      "path": "evidence/receipts/host-baseline-stackmeasure2604-20261004.json",
+      "sha256": "168fcd1842f19b85e90ca4d5ee0e967b582d5067e856d8d7e954ddd18b148d41",
+      "bytes": 3576
     },
     {
       "path": "evidence/receipts/ibkr-readonly-acceptance-20260923.json",
@@ -51737,6 +51958,11 @@
       "path": "evidence/receipts/rtk-051-qualification-20261004.json",
       "sha256": "f35ef95e65d1a8c621c62102eba41f6c05bd39c8c79fc64e6550a04190912d6e",
       "bytes": 23051
+    },
+    {
+      "path": "evidence/receipts/rtk-fold-harbor-20261004.json",
+      "sha256": "add26129b24cbe994b3ba1032b13687102ee3a24bd8af6e7a6d187f894937779",
+      "bytes": 16146
     },
     {
       "path": "evidence/receipts/runtime-sdk-20261003.json",
@@ -52190,8 +52416,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/acceptance-plan.json",
-      "sha256": "1b0a88e60146c295bbed76ce6797e3dd9efa9ef090c69c6cf51e191592fbb1fc",
-      "bytes": 2615
+      "sha256": "4c037b03e5b89295834eb49d3a04eb65a72f8203017c630bfbd70729912576df",
+      "bytes": 3014
     },
     {
       "path": "examples/omniroute-codex-sdk/agents/runtime-judge.toml",
@@ -52205,8 +52431,8 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/enhancements.md",
-      "sha256": "6f924a5073bb6d1fd40dce1db35cf66fe99f2464aa10f1924416a70dc9bb16bf",
-      "bytes": 10245
+      "sha256": "034a8e301e0f14014e744b5bb46226db79b199079ba23ffc9ae1bdfd98fcd64b",
+      "bytes": 10255
     },
     {
       "path": "examples/omniroute-codex-sdk/rerun-plan.json",
@@ -52215,7 +52441,7 @@
     },
     {
       "path": "examples/omniroute-codex-sdk/runtime-worker.yaml",
-      "sha256": "49ad6e2dc255f493b859626a65c58ccd73f2fcee1ef6f3da2f74521d48297d46",
+      "sha256": "b664f94d9498075558a275cc01b5d5f78ec5e0aa0a72c2664c25c9ef5f530a1c",
       "bytes": 1411
     },
     {
@@ -52400,8 +52626,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "673fa85699ad719988cbdb9ebec002446466caca4508e018afafe7e2f460affb",
-      "bytes": 102424
+      "sha256": "e8652d354ea09c1294b7da88091dc2e00bc440b15d13ca14dc39e7143a913b2f",
+      "bytes": 102371
     },
     {
       "path": "observability/README.md",
@@ -52775,8 +53001,8 @@
     },
     {
       "path": "scripts/freshness_propose.py",
-      "sha256": "c96e99d80e922f257e6c95d8b28c9493e981e4aacd99cfbbe980b4053b55bcd1",
-      "bytes": 51393
+      "sha256": "b948678e659f6eb653395aedad38990b8db40a476cabaa855e608521a62acf2e",
+      "bytes": 52517
     },
     {
       "path": "scripts/git-hooks/pre-commit",
@@ -53294,9 +53520,24 @@
       "bytes": 9953
     },
     {
+      "path": "tests/test_catalog_freshness_pins.py",
+      "sha256": "9fa9d371f765e734ed748008e9106c6accf1f2a956248f8041cb6d23ad9a89ea",
+      "bytes": 6969
+    },
+    {
       "path": "tests/test_catalog_freshness_propose.py",
-      "sha256": "0f18570a5f35701f88770fc702bc9bba815e3a5e17104422264fc2570dbd8b50",
-      "bytes": 60148
+      "sha256": "e6779fe4339908a1173ff4351da75e6b816fd4b6cd94ec34c3a0acbba259b65a",
+      "bytes": 62213
+    },
+    {
+      "path": "tests/test_catalog_freshness_runtime.py",
+      "sha256": "1eff93310ff8c4ee6589a9864940e01c911e8aca2eceb342eeb727a381a0b0c0",
+      "bytes": 119415
+    },
+    {
+      "path": "tests/test_catalog_freshness_trading.py",
+      "sha256": "5de4a7a8de9d860c541e1649b005e55bccca18b76ba8bdffbcd61474c644d4ea",
+      "bytes": 35494
     },
     {
       "path": "tests/test_catalogs.py",
@@ -53479,6 +53720,11 @@
       "bytes": 13100
     },
     {
+      "path": "tests/test_gap_crosswalk_sdk.py",
+      "sha256": "5bdf42e3dbd407909c1d21a1e8314d2f9d5b19623f26d8ee1d86689bf3184dda",
+      "bytes": 7316
+    },
+    {
       "path": "tests/test_gap_resolution_ledger.py",
       "bytes": 5845,
       "sha256": "686fab880ea35dd0863d04a721d924158b76f0edde464af93f40fac1bd36b156"
@@ -53532,6 +53778,11 @@
       "path": "tests/test_historical_simulation.py",
       "sha256": "05359d5a861e3eeed3ebbcbf87a8f805332a1ba9cd10b213a4de0703604090fa",
       "bytes": 5155
+    },
+    {
+      "path": "tests/test_host_baseline_probe.py",
+      "sha256": "495b8d02036f5240f88edc5b1a2abfdbef010fbd73d82f7f4bee840e81e6f4a6",
+      "bytes": 31719
     },
     {
       "path": "tests/test_host_receipts.py",
@@ -53814,6 +54065,11 @@
       "bytes": 75839
     },
     {
+      "path": "tests/test_overfitting_riskl_parity.py",
+      "sha256": "ed2dbdc9108109a50da5ffca6561ef0a7695f36fef4784d754cc2420f40e9d94",
+      "bytes": 15821
+    },
+    {
       "path": "tests/test_path_safety.py",
       "sha256": "3ef5408df71c98eca31ddfd8e065594ee0bb09d61b37108df9d73c8e66c4acaf",
       "bytes": 7047
@@ -53905,13 +54161,13 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "378bc88ca039041e185343772aa25241bb6e6653027b33a2c11c28091fc8cd25",
-      "bytes": 112694
+      "sha256": "a10e6db7ec3bd175f64b12292fed1b57ce581e74a81209e2dacacfd6f40a994b",
+      "bytes": 155207
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
-      "sha256": "8a8c6aab4d4aaa97a6e10b0124adae4b1829023b69a3b57a2402b124b9267235",
-      "bytes": 264534
+      "sha256": "dde7b78ffd818486f31af1e93da324e2bcd3fb40ddbce2d5ae97814c775e8562",
+      "bytes": 271316
     },
     {
       "path": "tests/test_runtime_worker_skills.py",
@@ -53990,8 +54246,8 @@
     },
     {
       "path": "tests/test_sota_convergence.py",
-      "sha256": "cb197ddbe88b82bfc110bcf77da80ab59197f371407c93674643718b8469dcf1",
-      "bytes": 163940
+      "sha256": "e95a6683694382ff58ef71fe2c031aef877de19f46de06fd3360a8ca77f56a0a",
+      "bytes": 182187
     },
     {
       "path": "tests/test_sota_sources_gate.py",
@@ -54005,8 +54261,8 @@
     },
     {
       "path": "tests/test_stack_lifecycle.py",
-      "sha256": "82d85e465b877e04f3eb746aa2c71ae398f2e9659c2fb2a2f1d07e6f49494e43",
-      "bytes": 6421
+      "sha256": "4a72cab5b32f906813adb28e9ec340519432a929daafcdd9526cc075f66d9285",
+      "bytes": 7192
     },
     {
       "path": "tests/test_supply_chain_scan.py",
@@ -54157,6 +54413,16 @@
       "path": "tools/adoption/embed_acceptance.py",
       "sha256": "b567a3ce64d66f0798bd5fc73cf78d8a12074d583177c204d5465050873258b1",
       "bytes": 8209
+    },
+    {
+      "path": "tools/adoption/host-baseline.md",
+      "sha256": "7bed0cbee248b9700ec34f736d2fa1909497f2b63b7093b350f3bc6b512ee992",
+      "bytes": 16100
+    },
+    {
+      "path": "tools/adoption/host_baseline_probe.py",
+      "sha256": "a3dcf5d27e29587101818f71a99cd0acfeed75fcfad3d13aacbeb4778dfabb55",
+      "bytes": 17646
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
@@ -54340,8 +54606,8 @@
     },
     {
       "path": "tools/sota-convergence/README.md",
-      "sha256": "20c70c09d8b293c23caccb1086f5a379f2f9c823f37555d17bfb202038f9a4b2",
-      "bytes": 188578
+      "sha256": "d74fac1613c59d6b4abe629d87758d672b50f19efda520b7fe444c7a5932b10a",
+      "bytes": 189511
     },
     {
       "path": "tools/sota-convergence/adjudicate.py",
@@ -54360,8 +54626,8 @@
     },
     {
       "path": "tools/sota-convergence/build_manifest.py",
-      "sha256": "91af1beac78818d9b414a4de7f099c92133b1f84d7db1ce0715932195122f78c",
-      "bytes": 121534
+      "sha256": "4529b138b7ea110bafc6db472c43aa152a3e2ed50db812bf365730d3d063c957",
+      "bytes": 125546
     },
     {
       "path": "tools/sota-convergence/build_verdicts.py",
@@ -54375,8 +54641,8 @@
     },
     {
       "path": "tools/sota-convergence/gap_crosswalk.py",
-      "sha256": "7545a9aa0a709aaca636e69b6ca7a1d6d9e317a53027098df7133e952d4f705f",
-      "bytes": 30150
+      "sha256": "77f9c58561e656dfa6b42a346ed6063d7a3716089c2900c84808e0527594c22c",
+      "bytes": 30850
     },
     {
       "path": "tools/sota-convergence/gap_wave_ledger.py",
@@ -54385,8 +54651,8 @@
     },
     {
       "path": "tools/sota-convergence/github_freshness.py",
-      "sha256": "aa3964f31cedc9098354d9a4cdbd47170a1358662358b5e55e57d0ff600617b7",
-      "bytes": 27422
+      "sha256": "4bc8cf58a7c9dc5346b79b4dc6a2a6082e9c06cc11535cad75120d8e00c3aa44",
+      "bytes": 34972
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/README.md",

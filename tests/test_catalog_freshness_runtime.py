@@ -572,6 +572,65 @@ class ResolveRuntimePinsTests(unittest.TestCase):
 
 
 class GithubFreshnessReadsRuntimePinsTests(unittest.TestCase):
+    def test_tag_declared_prerelease_does_not_fetch_unused_list_or_suppress_shared_drift(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            (work / "foundation-layers.json").write_text(json.dumps({"layers": [{"components": [
+                {"id": "stable", "repository": TAGGED_REPOSITORY, "version": "1.0.0"}]}]}))
+            runtime = {"entries": [{"id": "tagged", "repository": TAGGED_REPOSITORY,
+                                    "pin": "1.0.0rc5", "kind": "pin_source",
+                                    "tags": {"prefix": "v", "pattern": r"^v(\d+\.\d+)$"}}]}
+            (work / "runtime-pins.json").write_text(json.dumps(runtime))
+            calls = []
+            base_api = _fake_gh_api(calls)
+
+            def api(path, timeout=60, *, paginate=False):
+                if path.endswith("/releases/latest"):
+                    calls.append((path, paginate))
+                    return {"tag_name": "v1.1.0", "published_at": "2026-10-02T00:00:00Z"}, None
+                if "/releases?" in path:
+                    calls.append((path, paginate))
+                    return None, "HTTP 503: Service Unavailable"
+                return base_api(path, timeout, paginate=paginate)
+
+            with mock.patch.object(github_freshness, "gh_api", side_effect=api), redirect_stdout(StringIO()):
+                self.assertEqual(github_freshness.main(["--work-dir", str(work), "--workers", "1"]), 0)
+            document = json.loads((work / "github-freshness.json").read_text())
+            repositories = document["repositories"]
+            upstream = build_manifest.compute_upstream(TAGGED_REPOSITORY, repositories, pin="1.0.0")
+            old = {"id": "stable", "repository": TAGGED_REPOSITORY, "pin": "1.0.0",
+                   "upstream": {"latest": "v1.0.0", "pushed_at": "2026-10-01"},
+                   "pin_behind_upstream": False}
+            new = {**old, "upstream": upstream, **build_manifest.pin_comparison_fields(
+                build_manifest.classify_pin("1.0.0", TAGGED_REPOSITORY, upstream["latest"]))}
+            drifted, unfetched, no_release = fp.compute_drift({"stable": old}, {"stable": new}, repositories)
+            self.assertEqual([row[0] for row in drifted], ["stable"])
+            self.assertEqual((unfetched, no_release), ([], []))
+            self.assertEqual(document["partial_errors"], 0)
+            self.assertFalse(any("/releases?" in path for path, _ in calls))
+            tagged = build_manifest.build_runtime_freshness(runtime, repositories, CHECKED_AT)["entries"][0]
+            self.assertIs(tagged["pin_behind_upstream"], True)
+
+    def test_another_stream_pin_for_a_tagged_slug_still_requires_the_release_list(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            work = Path(tmp)
+            tagged = {"repository": TAGGED_REPOSITORY, "pin": "1.0.0rc5", "tags": {"prefix": "v"}}
+            for filename, stream in (
+                ("foundation-layers.json", {"version": "1.0.0rc5"}),
+                ("trading-catalog.json", {"version_or_commit": "1.0.0rc5"}),
+                ("trading-pins.json", {"pin": "1.0.0rc5"}),
+                ("runtime-pins.json", {"pin": "1.0.0rc5"}),
+            ):
+                with self.subTest(filename=filename):
+                    (work / "runtime-pins.json").write_text(json.dumps({"entries": [tagged]}))
+                    entries = [{"repository": TAGGED_REPOSITORY, **stream}]
+                    document = {"layers": [{"components": entries}]} if filename == "foundation-layers.json" \
+                        else {"entries": ([tagged] if filename == "runtime-pins.json" else []) + entries}
+                    path = work / filename
+                    path.write_text(json.dumps(document))
+                    self.assertEqual(github_freshness.collect_prerelease_slugs(work), {TAGGED_SLUG})
+                    path.unlink()
+
     def test_runtime_repositories_are_collected_and_the_file_is_optional(self):
         with tempfile.TemporaryDirectory() as tmp:
             work = Path(tmp)
@@ -1064,6 +1123,56 @@ class RuntimeTagPatternRowTests(unittest.TestCase):
 
     def _row(self, entry, repositories):
         return build_manifest.build_runtime_freshness({"entries": [entry]}, repositories, CHECKED_AT)["entries"][0]
+
+    def test_tag_declared_prerelease_keeps_release_fallback_when_the_tag_list_is_missing(self):
+        record = _inspect_record(matching_tags={}, latest_release={
+            "tag": "v1.1.0", "published_at": "2026-10-01T00:00:00Z"})
+        row = self._row(_inspect_entry(pin="1.0.0rc5"), {INSPECT_REPOSITORY: record})
+        self.assertEqual(row["upstream"]["latest_source"], "tag_pattern_unfetched")
+        self.assertEqual(row["upstream"]["latest"], "v1.1.0")
+        self.assertNotIn("latest_flag", row["upstream"])
+        self.assertEqual((row["pin_comparison"], row["pin_behind_upstream"], row.get("pin_comparison_reason")),
+                         ("not_compared", None, "tag_pattern_unfetched"))
+
+    def test_prerelease_tag_misses_do_not_compare_another_packages_release(self):
+        cases = (
+            ("missing", {"matching_tags": {}}, "tag_pattern_unfetched"),
+            ("failed", {"matching_tags": {}, "matching_tags_errors": {"": "HTTP 503"}},
+             "tag_pattern_unfetched"),
+            ("empty", {"matching_tags": {"": []}}, "tag_pattern_unmatched"),
+            ("other package", {"matching_tags": {"": ["other-package-9.9.9"]}},
+             "tag_pattern_unmatched"),
+        )
+        for label, fields, reason in cases:
+            with self.subTest(case=label):
+                record = _inspect_record(**fields, latest_release={
+                    "tag": "v0.3.999", "published_at": "2026-10-01T00:00:00Z"})
+                row = self._row(_inspect_entry(pin="1.1.0rc5"), {INSPECT_REPOSITORY: record})
+                self.assertEqual((row["upstream"]["latest"], row["upstream"]["latest_source"]),
+                                 ("v0.3.999", reason))
+                self.assertEqual((row["pin_comparison"], row["pin_behind_upstream"],
+                                  row.get("pin_comparison_reason")), ("not_compared", None, reason))
+
+    def test_stable_tag_miss_keeps_the_release_fallback_comparison(self):
+        for matching_tags, reason in (({}, "tag_pattern_unfetched"), ({"": []}, "tag_pattern_unmatched")):
+            with self.subTest(source=reason):
+                record = _inspect_record(matching_tags=matching_tags, latest_release={
+                    "tag": "v0.3.999", "published_at": "2026-10-01T00:00:00Z"})
+                row = self._row(_inspect_entry(pin="0.3.273"), {INSPECT_REPOSITORY: record})
+                self.assertEqual((row["upstream"]["latest"], row["upstream"]["latest_source"]),
+                                 ("v0.3.999", reason))
+                self.assertEqual((row["pin_comparison"], row["pin_behind_upstream"],
+                                  row.get("pin_comparison_reason")), ("compared", True, None))
+
+    def test_prerelease_pin_keeps_numeric_comparison_for_a_prefixed_tag_declaration(self):
+        prefix = "inspect-tool-support-"
+        entry = _inspect_entry(pin="1.1.0rc5", tags={"prefix": prefix,
+                                                  "pattern": r"^inspect-tool-support-(\d+\.\d+\.\d+)$"})
+        record = _inspect_record(matching_tags={prefix: [prefix + "1.0.0", prefix + "1.2.0"]})
+        row = self._row(entry, {INSPECT_REPOSITORY: record})
+        self.assertEqual(row["upstream"]["latest"], prefix + "1.2.0")
+        self.assertEqual((row["pin_comparison"], row["pin_behind_upstream"], row.get("pin_comparison_reason")),
+                         ("compared", True, None))
 
     def test_the_inspect_row_is_compared_with_its_highest_version_tag(self):
         repositories = {INSPECT_REPOSITORY: _inspect_record()}

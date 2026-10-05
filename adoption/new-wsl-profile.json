@@ -3763,7 +3763,7 @@
         "command": "npm install -g --ignore-scripts=false @dagucloud/dagu@2.18.2",
         "source": "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version. Independent new-WSL pin only; the workstation/trading stack remains held at 2.16.6. For a 2604 upgrade of an existing owned Dagu installation, stop its owned unit and retain a pre-upgrade copy of the complete DAGU_HOME before running a newer binary. Rollback restores that copy and the prior binary, unit and environment together; deleting only the newer binary is insufficient."
       },
       "acceptance": {
         "command": "make test",

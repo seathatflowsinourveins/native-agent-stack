@@ -882,7 +882,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": null,
+      "source_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
@@ -2647,7 +2647,7 @@
     {
       "component_id": "dagu",
       "repository": "https://github.com/dagucloud/dagu",
-      "version": "2.18.2",
+      "version": "2.16.6",
       "profile": "supporting",
       "role": "Manual native research workflows and private local run history",
       "installation_assessment": "runtime present at retained native operation date",
@@ -2729,13 +2729,18 @@
             "id": "claude-repository-evidence-20260921",
             "path": "evidence/receipts/claude-repository-evidence-20260921.json",
             "kind": "native_cli_e2e"
+          },
+          {
+            "id": "dagu-mise-pin-qualification-20261005",
+            "path": "evidence/receipts/dagu-mise-pin-qualification-20261005.json",
+            "kind": "compatibility_attempt"
           }
         ],
         "retained_operation_ids": [
           "fresh-dagu-history",
           "fresh-dagu-isolated-native"
         ],
-        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance. Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed."
+        "scope": "Native fixture/SDK/transport operation with scope and checks in its operation receipts; not full-stack model acceptance. Additional independently reviewed native evidence qualifies one orderly disposable Ubuntu guest reboot: linger starts the timer without login, the same Dagu run resumes, checkpoint/claim bytes remain unchanged, one local effect completes before postboot SSH, and the owned guest/disks/key are removed. The 2026-10-05 compatibility_attempt qualifies only independent new-WSL Dagu 2.18.2 in a disposable root; this stack component and its observed installation remain 2.16.6."
       },
       "artifact_baselines": [],
       "exact_causal_lifetime_provider_tokens_saved": null,
@@ -2749,11 +2754,11 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "v2.18.2",
+      "source_pin": "v2.16.6",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
-          "scope": "Dated native runtime/library availability is recorded. This does not by itself establish clean-prefix reinstall, uninstall or dependency rollback.",
+          "scope": "Historical Dagu 2.16.6 host availability from the retained September receipts. The separate new-WSL 2.18.2 archive qualification does not establish installation or cutover of this held stack component.",
           "evidence_refs": [
             "blueprints/us-equities/research-runtime/receipt.json",
             "adoption/paired/receipt.json",

@@ -7537,7 +7537,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "5bad498f80b3b662db7f13889534620ae3bf60e4b2ac3169ae55877702eb6dfa"
+      "sha256": "d2fffba6a1b7afc8baa5050d9180c53170402d06eae72dbfe9dd1c45fe6eb4b4"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -7545,7 +7545,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "7a3d334c6b37bbe7243169980a86578aff1e39b657f39ebd64d0651f8eb442a4"
+      "sha256": "8bac735580fade3d1ba750fd6f9e19763878dc72e78e881c7515b5c74dd6a6cc"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -10454,7 +10454,7 @@
       "install": {
         "command": "npm install -g --ignore-scripts=false @dagucloud/dagu@2.18.2",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version. Independent new-WSL pin only; the workstation/trading stack remains held at 2.16.6. For a 2604 upgrade of an existing owned Dagu installation, stop its owned unit and retain a pre-upgrade copy of the complete DAGU_HOME before running a newer binary. Rollback restores that copy and the prior binary, unit and environment together; deleting only the newer binary is insufficient.",
         "source": "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md"
       },
       "name": "Dagu",

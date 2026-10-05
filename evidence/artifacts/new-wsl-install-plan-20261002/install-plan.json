@@ -3050,7 +3050,7 @@
         "$HOME/.config/systemd/user/dagu.service",
         "$HOME/.config/dagu/dagu.env"
       ],
-      "notes": "Planned. First user-level Linux installer beats mise. Use upstream version/no-prompt/user-service/host/port/browser flags (installer:109-121). No admin bootstrap secrets. Installer owns unit and starts service; may add PATH startup entries, but does not change default shell. Coordinator native default free50055, source loopback verified."
+      "notes": "Independent Ubuntu 26.04 new-WSL pin 2.18.2; the workstation/trading stack stays held at 2.16.6. Storage changes #2784 (suspend flags under data_dir), #2776 (partitioned/indexed artifacts), and #2858 (DAG definition index under data_dir) make an existing-home upgrade different from a clean install. Before any 2604 upgrade, stop the owned unit and retain a complete pre-upgrade DAGU_HOME copy plus the prior binary, unit and environment. Rollback stops the new unit, preserves its post-upgrade state separately, restores the complete pre-upgrade home and the old binary/unit/environment as a set, then verifies the native version and owned workflow. Do not open a shared home with mixed binary versions; 2.17.x removes legacy dags/.dag.index. No such host upgrade or rollback was executed in this round."
     },
     {
       "layer": "hosting-services",

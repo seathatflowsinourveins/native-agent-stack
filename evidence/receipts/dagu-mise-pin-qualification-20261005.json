@@ -6,13 +6,13 @@
   "component_ids": [
     "dagu"
   ],
-  "claim": "The published checksum-verified Dagu 2.18.2 and mise 2026.10.1 Linux release archives were extracted only into an owned isolated root. Native dagu version, all 23 tracked DAG validations (16 pass / 7 baseline-invalid historical archives), coordinator-enabled start-all with HTTP 200 and coordinator connection plus clean native exit/closed listeners, and mise --version/doctor with shims on PATH were observed. The source/profile pins move; existing historical recovery/model receipts retain their bytes and scopes.",
+  "claim": "The published checksum-verified Dagu 2.18.2 and mise 2026.10.1 Linux release archives were extracted only into an owned isolated root. Native dagu version, all 23 tracked DAG validations (16 pass / 7 baseline-invalid historical archives), coordinator-enabled start-all with HTTP 200 and coordinator connection plus clean native exit/closed listeners, and mise --version/doctor with shims on PATH were observed. Only the independent new-WSL profile and install-plan pins move; the workstation/trading stack remains held at Dagu 2.16.6. Existing historical recovery/model receipts retain their bytes and scopes.",
   "limitations": [
     "Isolated Linux x86_64 binary qualification only; no live host service/timer/config, system mise, destination WSL, model/provider/GPU or broker operation was changed or qualified.",
     "All 23 tracked YAML DAGs were validated unchanged: 16 passed, including all four current DAGs; seven archived fixtures failed with entrypoint document must not define name. Verified Dagu 2.16.6 rejects the same seven, so these failures are retained pre-existing evidence.",
     "The start-all smoke uses an empty owned DAG directory and no scheduled/job/model execution. Its coordinator is enabled as the repository template and upstream default require; shutdown logged one not registered service-registry update error while the native process returned 0 and both owned listeners closed.",
     "Upstream make test and mise unit/E2E suites, installed-client route activation, real job retry/SIGKILL/reboot recovery and production data downgrade were not run.",
-    "No published advisory found applies to the selected versions; historical advisories exist, including one affecting the old mise 2026.9.18 pin. Dagu has no tag CHANGELOG; reviewed release bodies and unchanged SCHEMA_MIGRATION.md are the actual sources.",
+    "No published advisory found applies to the selected versions; historical advisories exist, including one affecting old mise 2026.9.18. Dagu has no tag CHANGELOG. Release notes contain migration-relevant #2784, #2776 and #2858 storage changes; a 2604 existing-home rollback must restore a pre-upgrade DAGU_HOME plus the prior binary/unit/environment together. The trading stack stays held at 2.16.6.",
     "Version output and checksum matching do not prove the full integration, deployed host, source-build reproducibility, dependency-tree security or model quality."
   ],
   "base_commit": "4af7417b7d4db8936c0136235a86717f31d16f27",
@@ -103,139 +103,139 @@
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu blueprints/us-equities/hosting/equity-research-evidence.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:48.104-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\ntime=2026-10-05T04:06:48.106-04:00 level=INFO msg=\"Creating example DAGs for first-time users\" dir=$QUAL_ROOT/dagu/dags\ntime=2026-10-05T04:06:48.148-04:00 level=INFO msg=\"Example DAGs created successfully. Check the web UI to explore them!\"\n",
+      "output": "time=2026-10-05T04:06:48.104-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\ntime=2026-10-05T04:06:48.106-04:00 level=INFO msg=\"Creating example DAGs for first-time users\" dir=$QUAL_ROOT/dagu/dags\ntime=2026-10-05T04:06:48.148-04:00 level=INFO msg=\"Example DAGs created successfully. Check the web UI to explore them!\"\n",
       "path": "blueprints/us-equities/hosting/equity-research-evidence.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu blueprints/us-equities/research-runtime/prepare-evidence.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:48.217-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "output": "time=2026-10-05T04:06:48.217-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
       "path": "blueprints/us-equities/research-runtime/prepare-evidence.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu blueprints/us-equities/research-runtime/research-pair.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:48.263-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "output": "time=2026-10-05T04:06:48.263-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
       "path": "blueprints/us-equities/research-runtime/research-pair.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/0-prior-interrupted-attempt/real_workflow.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:48.308-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "output": "time=2026-10-05T04:06:48.308-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
       "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/0-prior-interrupted-attempt/real_workflow.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/1-provider-cancel/cancelprobe.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:48.354-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "output": "time=2026-10-05T04:06:48.354-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
       "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/1-provider-cancel/cancelprobe.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/11-reboot-analog-run/realboot.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:48.400-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "output": "time=2026-10-05T04:06:48.400-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
       "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/11-reboot-analog-run/realboot.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/2-real-scheduled-run/dags__realmaint.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:48.445-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "output": "time=2026-10-05T04:06:48.445-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
       "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/2-real-scheduled-run/dags__realmaint.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/4-6-three-engine-comparison/dagu__sigkill__dags__recovery.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:48.490-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "output": "time=2026-10-05T04:06:48.490-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
       "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/4-6-three-engine-comparison/dagu__sigkill__dags__recovery.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/4-6-three-engine-comparison/dagu__stop-retry__dags__recovery.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:48.535-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "output": "time=2026-10-05T04:06:48.535-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
       "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/4-6-three-engine-comparison/dagu__stop-retry__dags__recovery.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F1-dagu-sigkill-preregistered-150s/dagu__sigkill__dags__recovery.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:48.579-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "output": "time=2026-10-05T04:06:48.579-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
       "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F1-dagu-sigkill-preregistered-150s/dagu__sigkill__dags__recovery.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F1-dagu-sigkill-preregistered-150s/dagu__stop-retry__dags__recovery.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:48.630-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "output": "time=2026-10-05T04:06:48.630-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
       "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F1-dagu-sigkill-preregistered-150s/dagu__stop-retry__dags__recovery.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F2-dagu-sigkill-scheduler-variant/dagu__sigkill__dags__recovery.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:48.680-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "output": "time=2026-10-05T04:06:48.680-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
       "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F2-dagu-sigkill-scheduler-variant/dagu__sigkill__dags__recovery.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F2-dagu-sigkill-scheduler-variant/dagu__stop-retry__dags__recovery.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:48.729-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "output": "time=2026-10-05T04:06:48.729-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
       "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F2-dagu-sigkill-scheduler-variant/dagu__stop-retry__dags__recovery.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F3-gap2-real-scheduled-rerun/dags__realmaint.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:48.775-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "output": "time=2026-10-05T04:06:48.775-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
       "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F3-gap2-real-scheduled-rerun/dags__realmaint.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml",
       "exit": 1,
-      "output": "time=2026-10-05T04:06:48.821-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml\n- entrypoint document must not define name\n",
+      "output": "time=2026-10-05T04:06:48.821-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml\n- entrypoint document must not define name\n",
       "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml",
       "exit": 1,
-      "output": "time=2026-10-05T04:06:48.865-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml\n- entrypoint document must not define name\n",
+      "output": "time=2026-10-05T04:06:48.865-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml\n- entrypoint document must not define name\n",
       "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml",
       "exit": 1,
-      "output": "time=2026-10-05T04:06:48.909-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml\n- entrypoint document must not define name\n",
+      "output": "time=2026-10-05T04:06:48.909-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml\n- entrypoint document must not define name\n",
       "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml",
       "exit": 1,
-      "output": "time=2026-10-05T04:06:48.953-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
+      "output": "time=2026-10-05T04:06:48.953-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
       "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml",
       "exit": 1,
-      "output": "time=2026-10-05T04:06:48.996-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
+      "output": "time=2026-10-05T04:06:48.996-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
       "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml",
       "exit": 1,
-      "output": "time=2026-10-05T04:06:49.041-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
+      "output": "time=2026-10-05T04:06:49.041-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
       "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml",
       "exit": 1,
-      "output": "time=2026-10-05T04:06:49.085-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
+      "output": "time=2026-10-05T04:06:49.085-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
       "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/native-service-reboot-20260920/guest-reboot.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:49.132-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "output": "time=2026-10-05T04:06:49.132-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
       "path": "evidence/artifacts/native-service-reboot-20260920/guest-reboot.yaml"
     },
     {
       "command": "dagu validate --dagu-home $QUAL_ROOT/dagu examples/omniroute-codex-sdk/runtime-worker.yaml",
       "exit": 0,
-      "output": "time=2026-10-05T04:06:49.178-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "output": "time=2026-10-05T04:06:49.178-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
       "path": "examples/omniroute-codex-sdk/runtime-worker.yaml"
     }
   ],
@@ -275,50 +275,112 @@
     "version": "2.16.6",
     "upstream_sha256": "06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717",
     "checksum_source": "https://github.com/dagucloud/dagu/releases/download/v2.16.6/checksums.txt",
-    "checksum_check_exit": 0
+    "checksum_check_exit": 0,
+    "version_command": {
+      "command": "$QUAL_ROOT/tools/dagu-2.16.6/dagu version",
+      "executed_argv": [
+        "$QUAL_ROOT/tools/dagu-2.16.6/dagu",
+        "version"
+      ],
+      "exit": 0,
+      "output": "2.16.6\n"
+    },
+    "checksum_check_command": "sha256sum --check --strict baseline-selected.sha256",
+    "checksum_check_stdout": "dagu_2.16.6_linux_amd64.tar.gz: OK\n",
+    "extraction_command": "tar -xzf dagu_2.16.6_linux_amd64.tar.gz -C $QUAL_ROOT/tools/dagu-2.16.6",
+    "extraction_exit": 0
   },
   "baseline_archived_dag_validations": [
     {
-      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml",
-      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml",
+      "command": "$QUAL_ROOT/tools/dagu-2.16.6/dagu validate --dagu-home $QUAL_ROOT/baseline-dagu $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml",
+      "executed_argv": [
+        "$QUAL_ROOT/tools/dagu-2.16.6/dagu",
+        "validate",
+        "--dagu-home",
+        "$QUAL_ROOT/baseline-dagu",
+        "$REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml"
+      ],
       "exit": 1,
-      "output": "time=2026-10-05T04:13:00.035-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\ntime=2026-10-05T04:13:00.037-04:00 level=INFO msg=\"Creating example DAGs for first-time users\" dir=$QUAL_ROOT/baseline-dagu/dags\ntime=2026-10-05T04:13:00.080-04:00 level=INFO msg=\"Example DAGs created successfully. Check the web UI to explore them!\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml\n- entrypoint document must not define name\n"
+      "output": "time=2026-10-05T06:03:47.296-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\ntime=2026-10-05T06:03:47.298-04:00 level=INFO msg=\"Creating example DAGs for first-time users\" dir=$QUAL_ROOT/baseline-dagu/dags\ntime=2026-10-05T06:03:47.339-04:00 level=INFO msg=\"Example DAGs created successfully. Check the web UI to explore them!\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml\n- entrypoint document must not define name\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml"
     },
     {
-      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml",
-      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml",
+      "command": "$QUAL_ROOT/tools/dagu-2.16.6/dagu validate --dagu-home $QUAL_ROOT/baseline-dagu $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml",
+      "executed_argv": [
+        "$QUAL_ROOT/tools/dagu-2.16.6/dagu",
+        "validate",
+        "--dagu-home",
+        "$QUAL_ROOT/baseline-dagu",
+        "$REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml"
+      ],
       "exit": 1,
-      "output": "time=2026-10-05T04:13:00.142-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml\n- entrypoint document must not define name\n"
+      "output": "time=2026-10-05T06:03:47.416-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml\n- entrypoint document must not define name\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml"
     },
     {
-      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml",
-      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml",
+      "command": "$QUAL_ROOT/tools/dagu-2.16.6/dagu validate --dagu-home $QUAL_ROOT/baseline-dagu $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml",
+      "executed_argv": [
+        "$QUAL_ROOT/tools/dagu-2.16.6/dagu",
+        "validate",
+        "--dagu-home",
+        "$QUAL_ROOT/baseline-dagu",
+        "$REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml"
+      ],
       "exit": 1,
-      "output": "time=2026-10-05T04:13:00.183-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml\n- entrypoint document must not define name\n"
+      "output": "time=2026-10-05T06:03:47.472-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml\n- entrypoint document must not define name\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml"
     },
     {
-      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml",
-      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml",
+      "command": "$QUAL_ROOT/tools/dagu-2.16.6/dagu validate --dagu-home $QUAL_ROOT/baseline-dagu $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml",
+      "executed_argv": [
+        "$QUAL_ROOT/tools/dagu-2.16.6/dagu",
+        "validate",
+        "--dagu-home",
+        "$QUAL_ROOT/baseline-dagu",
+        "$REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml"
+      ],
       "exit": 1,
-      "output": "time=2026-10-05T04:13:00.222-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n"
+      "output": "time=2026-10-05T06:03:47.533-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml"
     },
     {
-      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml",
-      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml",
+      "command": "$QUAL_ROOT/tools/dagu-2.16.6/dagu validate --dagu-home $QUAL_ROOT/baseline-dagu $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml",
+      "executed_argv": [
+        "$QUAL_ROOT/tools/dagu-2.16.6/dagu",
+        "validate",
+        "--dagu-home",
+        "$QUAL_ROOT/baseline-dagu",
+        "$REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml"
+      ],
       "exit": 1,
-      "output": "time=2026-10-05T04:13:00.263-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n"
+      "output": "time=2026-10-05T06:03:47.587-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml"
     },
     {
-      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml",
-      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml",
+      "command": "$QUAL_ROOT/tools/dagu-2.16.6/dagu validate --dagu-home $QUAL_ROOT/baseline-dagu $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml",
+      "executed_argv": [
+        "$QUAL_ROOT/tools/dagu-2.16.6/dagu",
+        "validate",
+        "--dagu-home",
+        "$QUAL_ROOT/baseline-dagu",
+        "$REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml"
+      ],
       "exit": 1,
-      "output": "time=2026-10-05T04:13:00.304-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n"
+      "output": "time=2026-10-05T06:03:47.643-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml"
     },
     {
-      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml",
-      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml",
+      "command": "$QUAL_ROOT/tools/dagu-2.16.6/dagu validate --dagu-home $QUAL_ROOT/baseline-dagu $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml",
+      "executed_argv": [
+        "$QUAL_ROOT/tools/dagu-2.16.6/dagu",
+        "validate",
+        "--dagu-home",
+        "$QUAL_ROOT/baseline-dagu",
+        "$REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml"
+      ],
       "exit": 1,
-      "output": "time=2026-10-05T04:13:00.345-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n"
+      "output": "time=2026-10-05T06:03:47.697-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml"
     }
   ],
   "independent_observations": {
@@ -344,5 +406,398 @@
     "Absolute repository/cache/root paths replaced by $REPO/$QUAL_CACHE/$QUAL_ROOT.",
     "Ephemeral listener ports and native hostname replaced by labels; timestamp, exit, status, error and version evidence retained.",
     "Original native outputs stay in private task cache; no credentials or authentication stores were read."
-  ]
+  ],
+  "baseline_archived_dag_validations_r1_labels": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml",
+      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:13:00.035-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\ntime=2026-10-05T04:13:00.037-04:00 level=INFO msg=\"Creating example DAGs for first-time users\" dir=$QUAL_ROOT/baseline-dagu/dags\ntime=2026-10-05T04:13:00.080-04:00 level=INFO msg=\"Example DAGs created successfully. Check the web UI to explore them!\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml\n- entrypoint document must not define name\n"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml",
+      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:13:00.142-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml\n- entrypoint document must not define name\n"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml",
+      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:13:00.183-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml\n- entrypoint document must not define name\n"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml",
+      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:13:00.222-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml",
+      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:13:00.263-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml",
+      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:13:00.304-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml",
+      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:13:00.345-04:00 level=WARN msg=\"No auth.mode configured \u2014 defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n"
+    }
+  ],
+  "r2_baseline_correction": {
+    "round": "dagu-pin-r2",
+    "scope": "The prior baseline labels were not literal commands. This independently reverified archive extraction, the baseline executable own version, and all seven literal sanitized argv/outputs in a fresh isolated root.",
+    "environment": {
+      "HOME": "$QUAL_ROOT/home",
+      "PATH": "/usr/bin:/bin",
+      "TMPDIR": "$HOME/.cache/dagu-pin-r2",
+      "XDG_CONFIG_HOME": "$QUAL_ROOT/config",
+      "XDG_DATA_HOME": "$QUAL_ROOT/data",
+      "XDG_STATE_HOME": "$QUAL_ROOT/state",
+      "XDG_CACHE_HOME": "$QUAL_ROOT/cache",
+      "DAGU_HOME": "$QUAL_ROOT/baseline-dagu",
+      "LANG": "C.UTF-8"
+    },
+    "stack_selected_version": "2.16.6",
+    "new_wsl_profile_version": "2.18.2"
+  },
+  "r2_integration_acceptance": {
+    "evidence_class": "local_integration",
+    "scope": "Unchanged repository integration suites and generators against merged file contents; no new live host, source-build or model/provider acceptance. Initial lifecycle/registration-dependent failures are retained separately.",
+    "results": [
+      {
+        "command": "git diff --check",
+        "exit": 0,
+        "notes": "Passed with no output.",
+        "wall_seconds": 0.122
+      },
+      {
+        "command": "python3 scripts/build_ecosystem.py --check",
+        "exit": 0,
+        "notes": "{\"architecture_pin_drift\": 24, \"bytes\": 15281970, \"input_sha256\": \"bc541485869156964d8c79a762d49a2b0b84a93e9291cb862883eee1d855d5e3\", \"output_sha256\": \"7aa889c3c916da3f52f87a5f04582acb154bbe570cfb4946898e88bf327cd85c\", \"status\": \"passed\"}",
+        "wall_seconds": 5.402
+      },
+      {
+        "command": "python3 scripts/evidence_manifest.py --check",
+        "exit": 0,
+        "notes": "{\"files\": 10140, \"status\": \"passed\"}\n",
+        "wall_seconds": 0.05
+      },
+      {
+        "command": "python3 scripts/build_new_wsl_handbook.py --check",
+        "exit": 0,
+        "notes": "{\"outputs\": {\"docs/new-wsl-handbook.json\": \"4ba9696007ff70dbbb3b5b77e3106f1faf70232cf28ceb40d96a9a4ea0d3feaa\", \"docs/new-wsl-handbook.md\": \"84fa9a08d3bb401423bb25924082c3c6ea855fb98e0501760fd580f2c5e70700\"}, \"status\": \"passed\"}",
+        "wall_seconds": 0.745
+      },
+      {
+        "command": "python3 scripts/landscape.py --root .",
+        "exit": 0,
+        "notes": "{\"counts\": {\"applied_skills\": 3, \"comparison_candidates\": 366, \"comparison_repositories\": 161, \"current_public_stars\": 343, \"dispositions\": {\"conditional\": 163, \"measured_tradeoff\": 9, \"out_of_scope\": 9, \"overlap\": 14, \"selected\": 136, \"unqualified\": 35}, \"domain_layers\": 4, \"explained_components\": 69, \"foundation_decisions\": 54, \"foundation_layers\": 20, \"foundation_statuses\": {\"accepted_within_scope\": 44, \"partial_acceptance\": 2, \"source_review\": 8}, \"historical_candidate_cards\": 154, \"layers\": 32, \"quality_review_repositories\": 16, \"research_queue_layers\": 32, \"research_repositories\": 875, \"selected_components\": 69}, \"scope\": \"Coverage and reference integrity; no new runtime or ranking acceptance.\", \"status\": \"passed\"}",
+        "wall_seconds": 0.688
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_catalog_freshness_pins",
+        "exit": 0,
+        "notes": "Ran 7 tests in 0.009s\nOK",
+        "wall_seconds": 0.081
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_catalog_freshness_propose",
+        "exit": 1,
+        "notes": "FAIL: test_general_publication_validator_passes_after_the_run (tests.test_catalog_freshness_propose.RebuildExplorerSubprocessTests.test_general_publication_validator_passes_after_the_run)\nRan 86 tests in 64.487s\nFAILED (failures=1)\n.............................................................................F........\n======================================================================\nFAIL: test_general_publication_validator_passes_after_the_run (tests.test_catalog_freshness_propose.RebuildExplorerSubprocessTests.test_general_publication_validator_passes_after_the_run)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"$REPO/tests/test_catalog_freshness_propose.py\", line 793, in test_general_publication_validator_passes_after_the_run\n    self.assertEqual(checked.returncode, 0, checked.stdout + checked.stderr)\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: 1 != 0 : Publication validation failed:\nadoption/new-wsl-profile.json: SHA-256 mismatch\nadoption/new-wsl-profile.json: byte count mismatch\nadoption/new-wsl-profile.md: SHA-256 mismatch\nadoption/new-wsl-profile.md: byte count mismatch\nblueprints/token-native-focus/saturation-audit.json: SHA-256 mismatch\nblueprints/token-native-focus/saturation-audit.json: byte count mismatch\nblueprints/us-equities/hosting/README.md: SHA-256 mismatch\nblueprints/us-equities/hosting/dagu-equities.service.example: SHA-256 mismatch\nblueprints/us-equities/manifest.json: SHA-256 mismatch\nblueprints/us-equities/manifest.json: byte count mismatch\ncatalogs/foundation/new-wsl-architecture-20261001.json: SHA-256 mismatch\ncatalogs/foundation/new-wsl-architecture-20261001.json: byte count mismatch\ncatalogs/landscape/upstream-snapshot.json: SHA-256 mismatch\ncatalogs/landscape/upstream-snapshot.json: byte count mismatch\ndocs/decisions/2026-10-05-dagu-mise-pin-move.md: SHA-256 mismatch\ndocs/decisions/2026-10-05-dagu-mise-pin-move.md: byte count mismatch\ndocs/harness-defaults.md: SHA-256 mismatch\ndocs/harness-defaults.md: byte count mismatch\ndocs/new-wsl-handbook.json: SHA-256 mismatch\ndocs/new-wsl-handbook.json: byte count mismatch\ndocs/new-wsl-handbook.md: SHA-256 mismatch\ndocs/new-wsl-handbook.md: byte count mismatch\ndocs/stack.md: SHA-256 mismatch\nevidence/artifacts/new-wsl-handbook-20261001/receipt.json: SHA-256 mismatch\nevidence/artifacts/new-wsl-handbook-20261001/receipt.json: byte count mismatch\nevidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md: SHA-256 mismatch\nevidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md: byte count mismatch\nevidence/artifacts/new-wsl-install-plan-20261002/install-plan.json: SHA-256 mismatch\nevidence/artifacts/new-wsl-install-plan-20261002/install-plan.json: byte count mismatch\nevidence/receipts/dagu-mise-pin-qualification-20261005.json: SHA-256 mismatch\nevidence/receipts/dagu-mise-pin-qualification-20261005.json: byte count mismatch\nexamples/omniroute-codex-sdk/acceptance-plan.json: SHA-256 mismatch\nexamples/omniroute-codex-sdk/acceptance-plan.json: byte count mismatch\nexamples/omniroute-codex-sdk/enhancements.md: SHA-256 mismatch\nexamples/omniroute-codex-sdk/enhancements.md: byte count mismatch\nexamples/omniroute-codex-sdk/runtime-worker.yaml: SHA-256 mismatch\nmanifests/stack.json: SHA-256 mismatch\nmanifests/stack.json: byte count mismatch\n\n\n----------------------------------------------------------------------\nRan 86 tests in 64.487s\n\nFAILED (failures=1)\n",
+        "wall_seconds": 64.572
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_catalog_freshness_propose",
+        "exit": 0,
+        "notes": "Ran 86 tests in 64.805s\nOK",
+        "wall_seconds": 64.886
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_catalog_freshness_runtime",
+        "exit": 0,
+        "notes": "Ran 105 tests in 0.299s\nOK",
+        "wall_seconds": 0.438
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_catalog_freshness_trading",
+        "exit": 0,
+        "notes": "Ran 49 tests in 0.100s\nOK",
+        "wall_seconds": 0.23
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_component_matrix",
+        "exit": 0,
+        "notes": "Ran 63 tests in 0.727s\nOK",
+        "wall_seconds": 0.826
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_ecosystem_manifest",
+        "exit": 0,
+        "notes": "Ran 80 tests in 23.435s\nOK",
+        "wall_seconds": 23.514
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_foundation_stack_pins",
+        "exit": 0,
+        "notes": "Ran 2 tests in 0.001s\nOK",
+        "wall_seconds": 0.051
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_host_receipts",
+        "exit": 0,
+        "notes": "Ran 184 tests in 4.978s\nOK",
+        "wall_seconds": 5.083
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_landscape",
+        "exit": 0,
+        "notes": "Ran 95 tests in 1.165s\nOK",
+        "wall_seconds": 1.236
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_new_host_grand_list",
+        "exit": 0,
+        "notes": "Ran 36 tests in 0.109s\nOK",
+        "wall_seconds": 0.203
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_new_wsl_client_config",
+        "exit": 0,
+        "notes": "Ran 171 tests in 50.950s\nOK",
+        "wall_seconds": 51.177
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_new_wsl_definitive_defaults",
+        "exit": 0,
+        "notes": "Ran 84 tests in 4.473s\nOK",
+        "wall_seconds": 4.548
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_new_wsl_handbook",
+        "exit": 0,
+        "notes": "Ran 75 tests in 28.992s\nOK",
+        "wall_seconds": 29.087
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_new_wsl_profile",
+        "exit": 0,
+        "notes": "Ran 18 tests in 5.006s\nOK",
+        "wall_seconds": 5.063
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_sota_convergence",
+        "exit": 0,
+        "notes": "Ran 157 tests in 7.612s\nOK",
+        "wall_seconds": 7.734
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_stack_lifecycle",
+        "exit": 1,
+        "notes": "FAIL: test_every_selected_component_has_current_identity_and_receipts (tests.test_stack_lifecycle.StackLifecycleTests.test_every_selected_component_has_current_identity_and_receipts) (component='dagu')\nRan 6 tests in 0.056s\nFAILED (failures=1)\n...F..\n======================================================================\nFAIL: test_every_selected_component_has_current_identity_and_receipts (tests.test_stack_lifecycle.StackLifecycleTests.test_every_selected_component_has_current_identity_and_receipts) (component='dagu')\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"$REPO/tests/test_stack_lifecycle.py\", line 34, in test_every_selected_component_has_current_identity_and_receipts\n    self.assertEqual({r[\"id\"] for r in refs}, set(component[\"evidence_ids\"]))\n    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nAssertionError: Items in the first set but not the second:\n'dagu-mise-pin-qualification-20261005'\n\n----------------------------------------------------------------------\nRan 6 tests in 0.056s\n\nFAILED (failures=1)\n",
+        "wall_seconds": 0.115
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_stack_lifecycle",
+        "exit": 0,
+        "notes": "6 tests passed after the inline compatibility evidence-id correction."
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_validate",
+        "exit": 0,
+        "notes": "Ran 68 tests in 0.715s\nOK",
+        "wall_seconds": 0.793
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_wsl_new_distro_recipe",
+        "exit": 0,
+        "notes": "Ran 100 tests in 1.680s\nOK",
+        "wall_seconds": 1.776
+      },
+      {
+        "command": "python3 scripts/validate.py",
+        "exit": 0,
+        "notes": "{\"components\": 69, \"hashed_files\": 10140, \"profiles\": 4, \"receipts\": 204, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+        "wall_seconds": 26.758
+      }
+    ],
+    "check_plan": {
+      "command": "python3 -B evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "exit": 0,
+      "notes": "80 rows, 161 commands and 100 acceptance entries agree."
+    },
+    "merge": {
+      "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
+      "original_worktree_merge_exit": 128,
+      "original_worktree_staged": false,
+      "reason": "Linked Git metadata is read-only under the assigned filesystem permissions.",
+      "isolated_merge_exit": 1,
+      "isolated_conflicts_resolved": [
+        "docs/harness-defaults.md",
+        "manifests/evidence.json"
+      ],
+      "isolated_merge_staged": true,
+      "commit_or_push": false,
+      "previous_origin_main": "a11dc5ff33e6fe41cc3684eb8571b408c232c164",
+      "additional_main_paths": 17
+    },
+    "latest_main_test_results": [
+      {
+        "command": "python3 -B -m unittest tests.test_gap_crosswalk_sdk",
+        "exit": 0,
+        "notes": "Ran 9 tests in 0.005s\nOK (skipped=6)",
+        "wall_seconds": 0.084
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_runtime_worker_openhands_push_gate",
+        "exit": 0,
+        "notes": "Ran 122 tests in 48.803s\nOK (skipped=1)",
+        "wall_seconds": 49.482
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_runtime_worker_openhands_resolver",
+        "exit": 1,
+        "notes": "ERROR: test_installed_gitleaks_refuses_a_token_shape_even_with_an_allow_comment (tests.test_runtime_worker_openhands_resolver.OutgoingGuardTests.test_installed_gitleaks_refuses_a_token_shape_even_with_an_allow_comment)\nRan 138 tests in 14.238s\nFAILED (errors=1, skipped=2)\n...................................................ssE.....................................................................................\n======================================================================\nERROR: test_installed_gitleaks_refuses_a_token_shape_even_with_an_allow_comment (tests.test_runtime_worker_openhands_resolver.OutgoingGuardTests.test_installed_gitleaks_refuses_a_token_shape_even_with_an_allow_comment)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"$REPO/tests/test_runtime_worker_openhands_resolver.py\", line 1839, in test_installed_gitleaks_refuses_a_token_shape_even_with_an_allow_comment\n    self.assertEqual(scan(f\"the token {token} was found\"), [\"gitleaks\"])\n                     ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"$REPO/blueprints/runtime-workers/openhands/resolver/outgoing_guard.py\", line 265, in scan\n    raise RuntimeError(\"gitleaks_failed\")\nRuntimeError: gitleaks_failed\n\n----------------------------------------------------------------------\nRan 138 tests in 14.238s\n\nFAILED (errors=1, skipped=2)\n",
+        "wall_seconds": 14.383
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_sota_convergence",
+        "exit": 0,
+        "notes": "Ran 157 tests in 7.625s\nOK",
+        "wall_seconds": 7.74
+      }
+    ],
+    "final_current_test_results": [
+      {
+        "command": "python3 -B -m unittest tests.test_host_baseline_probe",
+        "exit": 0,
+        "notes": "Ran 24 tests in 21.338s\nOK",
+        "wall_seconds": 21.414,
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_new_wsl_client_config",
+        "exit": 0,
+        "notes": "Ran 171 tests in 49.479s\nOK",
+        "wall_seconds": 49.705,
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_new_wsl_definitive_defaults",
+        "exit": 0,
+        "notes": "Ran 84 tests in 4.259s\nOK",
+        "wall_seconds": 4.324,
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_new_wsl_handbook",
+        "exit": 0,
+        "notes": "Ran 75 tests in 28.653s\nOK",
+        "wall_seconds": 28.743,
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_new_wsl_profile",
+        "exit": 0,
+        "notes": "Ran 18 tests in 4.887s\nOK",
+        "wall_seconds": 4.938,
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_overfitting_riskl_parity",
+        "exit": 0,
+        "notes": "Ran 14 tests in 0.000s\nOK (skipped=14)",
+        "wall_seconds": 0.072,
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_stack_lifecycle",
+        "exit": 0,
+        "notes": "Ran 6 tests in 0.056s\nOK",
+        "wall_seconds": 0.106,
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_wsl_new_distro_recipe",
+        "exit": 0,
+        "notes": "Ran 100 tests in 1.652s\nOK",
+        "wall_seconds": 1.739,
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      },
+      {
+        "command": "python3 -B -m unittest tests.test_catalog_freshness_propose",
+        "exit": 0,
+        "notes": "Ran 86 tests in 63.912s; OK after registration for c148e049. The initial stale-registry exit 1 is retained separately.",
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      }
+    ],
+    "gitleaks_containment_probe": {
+      "command": "gitleaks stdin --config $REPO/.gitleaks.toml --no-banner --redact --ignore-gitleaks-allow --exit-code 99 --log-level error",
+      "exit": 1,
+      "notes": "$HOST_HOME/.local/share/codex-ecosystem/bin/gitleaks: line 22: /run/user/$UID/ecosystem-gitleaks.lock: Read-only file system",
+      "input": "Literal clean fixture, no credential; scan was not started if containment failed."
+    },
+    "open": [
+      "The original worktree merge cannot be staged because linked Git metadata is read-only; a resolved native merge against c148e049efee75f8ea8a9a009e7b96b1e97f5c28 is prepared in the isolated integration-current checkout.",
+      "The newly merged resolver suite returned 1: the installed Gitleaks launcher cannot create /run/user/$UID/ecosystem-gitleaks.lock under these read-only permissions. A clean stdin probe also returned 1 before scanning. No containment bypass or unrelated resolver fix was made."
+    ],
+    "final_current_gates": [
+      {
+        "command": "python3 -B evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+        "exit": 0,
+        "output": "OK: 80 rows: 57 installed (55 by the default run, 2 only when named), 3 measurement-only, 20 not installed; 161 commands and 100 acceptance entries agree with the scripts (2 additional checks included)\n",
+        "wall_seconds": 0.190454966,
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      },
+      {
+        "command": "python3 scripts/build_new_wsl_handbook.py --check",
+        "exit": 0,
+        "output": "{\"outputs\": {\"docs/new-wsl-handbook.json\": \"4ba9696007ff70dbbb3b5b77e3106f1faf70232cf28ceb40d96a9a4ea0d3feaa\", \"docs/new-wsl-handbook.md\": \"84fa9a08d3bb401423bb25924082c3c6ea855fb98e0501760fd580f2c5e70700\"}, \"status\": \"passed\"}\n",
+        "wall_seconds": 0.6943832,
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      },
+      {
+        "command": "python3 scripts/build_ecosystem.py --check",
+        "exit": 0,
+        "output": "{\"architecture_pin_drift\": [{\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"foundation/native-clients\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"worktrunk\", \"edition_pin\": \"0.80.0\", \"row\": \"foundation/workers\", \"stack_pin\": \"0.79.0\"}, {\"component_id\": \"worktrunk\", \"edition_pin\": \"0.80.0\", \"row\": \"foundation/isolation\", \"stack_pin\": \"0.79.0\"}, {\"component_id\": \"sandbox-runtime\", \"edition_pin\": \"0.0.78\", \"row\": \"foundation/isolation\", \"stack_pin\": \"0.0.77\"}, {\"component_id\": \"rtk\", \"edition_pin\": \"0.50.0\", \"row\": \"foundation/token-efficiency\", \"stack_pin\": \"0.51.0\"}, {\"component_id\": \"syft\", \"edition_pin\": \"1.54.0\", \"row\": \"foundation/ci-supply-chain\", \"stack_pin\": \"1.52.0\"}, {\"component_id\": \"nextjs\", \"edition_pin\": \"16.3.6\", \"row\": \"foundation/hosting-services\", \"stack_pin\": \"16.3.8\"}, {\"component_id\": \"opentelemetry-collector-contrib\", \"edition_pin\": \"0.162.0\", \"row\": \"foundation/observation-inference\", \"stack_pin\": \"0.161.0\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"foundation/agent-sdks\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"mcporter\", \"edition_pin\": \"0.14.1\", \"row\": \"foundation/mcp-surfaces\", \"stack_pin\": \"0.14.2\"}, {\"component_id\": \"worktrunk\", \"edition_pin\": \"0.80.0\", \"row\": \"foundation/git-github-automation\", \"stack_pin\": \"0.79.0\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"opentelemetry-collector-contrib\", \"edition_pin\": \"0.162.0\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"0.161.0\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.3\", \"row\": \"us-equities/data-quality-orchestration\", \"stack_pin\": \"13.2.2\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"opentelemetry-collector-contrib\", \"edition_pin\": \"0.162.0\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"0.161.0\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.3\", \"row\": \"us-equities/evaluation-experiments\", \"stack_pin\": \"13.2.2\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/agents-models-workers\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"rtk\", \"edition_pin\": \"0.50.0\", \"row\": \"us-equities/agents-models-workers\", \"stack_pin\": \"0.51.0\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"opentelemetry-collector-contrib\", \"edition_pin\": \"0.162.0\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"0.161.0\"}, {\"component_id\": \"grafana\", \"edition_pin\": \"13.2.3\", \"row\": \"us-equities/observability-hosting\", \"stack_pin\": \"13.2.2\"}, {\"component_id\": \"codex\", \"edition_pin\": \"0.159.2\", \"row\": \"cross/cross:gpt6-harnesses\", \"stack_pin\": \"0.160.0\"}, {\"component_id\": \"omniroute\", \"edition_pin\": \"3.8.52-canary (23a11484 + PR13788 + PR15167)\", \"row\": \"cross/cross:gpt6-harnesses\", \"stack_pin\": \"3.8.51\"}], \"bytes\": 15287178, \"input_sha256\": \"8398ec6fb9bef50b516d431b38760885db9ca21e2f61d73095cd82c433e30886\", \"output_sha256\": \"ce09a92962ba3ad6b36f7c2676aa407ddf0c331b43117835f089ca09b00768aa\", \"status\": \"passed\"}\n",
+        "wall_seconds": 5.320182663,
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      },
+      {
+        "command": "python3 scripts/landscape.py --root .",
+        "exit": 0,
+        "output": "{\"counts\": {\"applied_skills\": 3, \"comparison_candidates\": 366, \"comparison_repositories\": 161, \"current_public_stars\": 343, \"dispositions\": {\"conditional\": 163, \"measured_tradeoff\": 9, \"out_of_scope\": 9, \"overlap\": 14, \"selected\": 136, \"unqualified\": 35}, \"domain_layers\": 4, \"explained_components\": 69, \"foundation_decisions\": 54, \"foundation_layers\": 20, \"foundation_statuses\": {\"accepted_within_scope\": 44, \"partial_acceptance\": 2, \"source_review\": 8}, \"historical_candidate_cards\": 154, \"layers\": 32, \"quality_review_repositories\": 16, \"research_queue_layers\": 32, \"research_repositories\": 875, \"selected_components\": 69}, \"scope\": \"Coverage and reference integrity; no new runtime or ranking acceptance.\", \"status\": \"passed\"}\n",
+        "wall_seconds": 0.611560028,
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      },
+      {
+        "command": "python3 scripts/validate.py",
+        "exit": 0,
+        "output": "{\"components\": 69, \"hashed_files\": 10145, \"profiles\": 4, \"receipts\": 204, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.\n",
+        "wall_seconds": 27.373316463,
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      },
+      {
+        "command": "python3 scripts/evidence_manifest.py --check",
+        "exit": 0,
+        "output": "{\"files\": 10145, \"status\": \"passed\"}\n",
+        "wall_seconds": 1.039e-05,
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      },
+      {
+        "command": "git diff --check",
+        "exit": 0,
+        "output": "",
+        "wall_seconds": 0.070548741,
+        "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      }
+    ]
+  }
 }

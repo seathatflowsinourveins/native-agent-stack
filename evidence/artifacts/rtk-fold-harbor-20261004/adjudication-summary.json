@@ -1,0 +1,55 @@
+{
+  "rows": 264,
+  "audit_rows": 53,
+  "disagreements": 0,
+  "unknown": 0,
+  "negative_sample_agreement": "53/53",
+  "positive_agreement": "0/0",
+  "primary": {
+    "model": "Claude Opus 5.5",
+    "effort": "max",
+    "readers": 6,
+    "rows": 264,
+    "positives": 0,
+    "negatives": 264,
+    "unknown": 0,
+    "automatic_candidates_rejected": 80,
+    "all_rows_match_filled_csv": true
+  },
+  "audit": {
+    "model": "GPT-6.1 Sol",
+    "effort": "max",
+    "seed": 20261004,
+    "negative_rows": 53,
+    "agreements": 53,
+    "disagreements": 0,
+    "positive_rows": 0,
+    "unknown": 0,
+    "seeded_sample_reproduced": true,
+    "positive_agreement_note": "No primary positives existed; 0/0 supplies no evidence of positive-label sensitivity.",
+    "sampling_call": "random.Random(20261004).sample(sorted(negatives), math.ceil(0.2 * len(negatives)))",
+    "negative_key": "(trial, call_id)",
+    "sample_file": "audit-rows.json",
+    "sample_storage_order": "selected pairs sorted by (trial, call_id)",
+    "public_csv_key_columns": [
+      "job",
+      "trial",
+      "call_id"
+    ],
+    "public_sample_and_audit_notes_match": true
+  },
+  "protocol": {
+    "original_sha256": "a45f6b868ae65e1289de00021e6f9dd8a631ed1de50f5a08c982da07aa24f77b",
+    "recorded_utc": "2026-10-05T04:37:29Z",
+    "status": "Addition to preregistered single-reviewer procedure; added after execution and frozen before labels.",
+    "batch_row_counts": [
+      46,
+      46,
+      43,
+      43,
+      42,
+      44
+    ]
+  },
+  "publication": "Counts verified by joining (trial, call_id) across original actions, primary labels, filled CSV and audit labels. Public keyed negatives reproduce the exact selected pairs; original rationales and observations omitted."
+}

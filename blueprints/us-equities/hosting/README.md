@@ -31,10 +31,10 @@ Do not expose this local mode through a network listener or tunnel. The release 
 license and current workflow schema. No Docker or cloud account is required.
 
 ```sh
-gh release download v2.18.2 --repo dagucloud/dagu \
-  --pattern dagu_2.18.2_linux_amd64.tar.gz --pattern checksums.txt
-sha256sum dagu_2.18.2_linux_amd64.tar.gz
-awk '$2 == "dagu_2.18.2_linux_amd64.tar.gz"' checksums.txt | sha256sum --check --strict
+gh release download v2.16.6 --repo dagucloud/dagu \
+  --pattern dagu_2.16.6_linux_amd64.tar.gz --pattern checksums.txt
+sha256sum dagu_2.16.6_linux_amd64.tar.gz
+awk '$2 == "dagu_2.16.6_linux_amd64.tar.gz"' checksums.txt | sha256sum --check --strict
 "$DAGU" version
 mkdir -p "$RESEARCH_OUTPUT"
 env -i HOME="$HOME" PATH=/usr/bin:/bin \
