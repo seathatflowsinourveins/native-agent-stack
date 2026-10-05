@@ -142,9 +142,12 @@ The actual template cadence is **30s** for hostmetrics collection
 batch timeout ([collector.yaml:269–270](../../observability/collector/collector.yaml#L269)),
 and **15s** each for scrape and evaluation
 ([Prometheus template:2–3](../../observability/backends/templates/ecosystem-prometheus.yml.example#L2)).
-With an established falling trend, the configured worst-phase budget after
-crossing the low-space floor is approximately **30 + 1 + 15 + 15 + 15 = 76s**,
-including the new pending interval. This is a configuration budget, not a measured
+For a fill fast enough that the two-minute forecast is already negative when free
+space crosses the floor (faster than about 50 GiB per two minutes), the configured
+worst-phase budget after crossing the low-space floor is approximately
+**30 + 1 + 15 + 15 + 15 = 76s**, including the new pending interval. For slower fills
+the page arrives roughly (120 s − observation delay − 15 s) before the forecast
+reaches zero, whatever the fill speed (independent delta read, 2026-10-05). This is a configuration budget, not a measured
 latency guarantee; transport, scheduling and an unestablished regression can add
 delay. At least two float samples are required, and changing the slope can take
 time to dominate the two-minute history. Alertmanager's initial **5s group_wait**
@@ -389,3 +392,16 @@ after the coordinator verifies deployed warning/firing/resolved delivery and
 headroom recovery with the selected route. Revisit the guards if supported tests
 no longer copy the checkout; an internal destination cannot be allowed for native
 recursive copytree without a separately qualified exclusion strategy.
+
+## Coordinator acceptance at the committed head (2026-10-05T03:38:48Z)
+
+The builder's recorded runs predate the commit. The coordinator re-ran the acceptance on the committed content
+(6d1a37b8d on main 4c897418f, registry 4572df248), with TMPDIR outside the checkout:
+
+| Command | Exit | Result |
+| --- | --- | --- |
+| `python3 -m unittest tests.test_tmpdir_guard tests.test_observability_backends_alerts tests.test_catalog_freshness_propose tests.test_wsl_retrieval` | 0 | 175 tests OK, 3 skipped (optional PyYAML); the 9 `RootFilesystemRuleTests` ran pinned promtool 3.15.0 `test rules` |
+| `python3 -m unittest discover -s tests -p test_tmpdir_guard.py` | 0 | 9 tests OK |
+| `promtool check rules observability/backends/templates/ecosystem-prometheus-rules.yml.example` | 0 | SUCCESS: 26 rules found |
+| `python3 scripts/validate.py` | 0 | passed (10,094 hashed files, 202 receipts) |
+

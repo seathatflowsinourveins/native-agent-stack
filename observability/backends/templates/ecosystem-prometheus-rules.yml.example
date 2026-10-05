@@ -144,7 +144,7 @@ groups:
           scope: local-ecosystem
         annotations:
           summary: 'WSL root filesystem is predicted to exhaust within two minutes below 50 GiB available'
-          description: 'The two-minute free-space trend predicts exhaustion within two minutes and less than 50 GiB remains, sustained for 15 seconds. With an established falling trend, the configured collection/batch/scrape/evaluation/pending budget after crossing the floor is up to about 76 seconds, plus transport and scheduling; prediction requires at least two samples. Faster fills can outrun this alert: the test TMPDIR/copy guard prevents the known recursive cause, and the coordinator runs an independent two-minute headroom guard outside this repository. Stop the offending writer and recover headroom.'
+          description: 'The two-minute free-space trend predicts exhaustion within two minutes and less than 50 GiB remains, sustained for 15 seconds. The page arrives roughly 120 s minus the observation delay minus the 15 s pending interval before the trend reaches zero, whatever the fill speed; only fills faster than about 50 GiB per two minutes page within about 76 s of crossing the floor (configured collection/batch/scrape/evaluation/pending budget, plus transport and scheduling); prediction requires at least two samples. Faster fills can outrun this alert: the test TMPDIR/copy guard prevents the known recursive cause, and the coordinator runs an independent two-minute headroom guard outside this repository. Stop the offending writer and recover headroom.'
   - name: native-telemetry-integrity
     rules:
       - alert: EcosystemTokenCounterResets

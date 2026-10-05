@@ -418,6 +418,42 @@
     "head_unchanged": "43005a9f86ae6e5fcf0e4774ccf0cc3e7135e1d3",
     "working_tree_registry_unchanged": true,
     "untracked_status_source": "https://github.com/git/git/blob/v2.55.0/Documentation/git-status.adoc#L201-L204",
-    "installed_git_version": "2.43.0"
+    "installed_git_version": "2.43.0",
+    "head_unchanged_note": "builder-time field: the builder's worktree head before the coordinator committed and rebased the change."
+  },
+  "committed_note": "builder-time field: false when the builder wrote this receipt; the content was later committed by the coordinator (see publication).",
+  "publication": {
+    "content_commit": "6d1a37b8d",
+    "base": "4c897418f",
+    "registry_commit": "4572df248",
+    "pr": "#712"
+  },
+  "coordinator_acceptance": {
+    "at": "2026-10-05T03:38:48Z",
+    "commit": "6d1a37b8d (content) on 4c897418f; registry 4572df248",
+    "tmpdir": "outside the checkout",
+    "runs": [
+      {
+        "cmd": "python3 -m unittest tests.test_tmpdir_guard tests.test_observability_backends_alerts tests.test_catalog_freshness_propose tests.test_wsl_retrieval",
+        "exit": 0,
+        "result": "Ran 175 tests, OK (skipped=3: optional PyYAML); RootFilesystemRuleTests (9) ran pinned promtool test rules"
+      },
+      {
+        "cmd": "python3 -m unittest discover -s tests -p test_tmpdir_guard.py",
+        "exit": 0,
+        "result": "Ran 9 tests, OK"
+      },
+      {
+        "cmd": "promtool check rules observability/backends/templates/ecosystem-prometheus-rules.yml.example",
+        "exit": 0,
+        "result": "SUCCESS: 26 rules found"
+      },
+      {
+        "cmd": "python3 scripts/validate.py",
+        "exit": 0,
+        "result": "passed: 10,094 hashed files, 202 receipts"
+      }
+    ],
+    "note": "The builder's 91- and 175-test runs predate the final edits; this block binds the passes to the committed files."
   }
 }
