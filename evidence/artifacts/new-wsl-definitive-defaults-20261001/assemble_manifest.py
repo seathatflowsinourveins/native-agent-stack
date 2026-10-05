@@ -6,9 +6,12 @@ deterministic: running it again over unchanged inputs writes the same bytes.
 A settlement settles a split or measurement row of the compact documents before the convergence decisions, or a split row
 that those decisions add (an added slot) right after them; either way the row's resolution stays as the rounds recorded it.
 The last step reads the layer-consensus record (evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json): it adds that
-record's rows and records its amendments, and changes no field that the rounds decided. The record's wave-2 batch adds rows and
-amendments the same way, under its own records and acknowledgements, and records the interim installs of its amendment 3: an
-interim is written to the row's own `interim` field, beside the fields the rounds decided, which stay as they were.
+record's rows and records its amendments, and changes no field that the rounds decided. Each later batch of the record
+(wave2, wave3, ..., in their numeric order) is folded the same way, under its own records and acknowledgements. A batch of a
+direct consensus (wave 2) records the interim installs of its amendment 3: an interim is written to the row's own `interim`
+field, beside the fields the rounds decided, which stay as they were. A batch on the owner's decision (wave 3, amendment 4)
+adds rows of kind owner_decision and gives a row whose decided default installs nothing an owner default; the fields an owner
+default replaces, and an interim it drops or amends, are kept on the row under `overturned`.
 
 Usage: assemble_manifest.py [--check]
 """
@@ -374,6 +377,28 @@ RELAYED_BY = re.compile(r"(?P<name>[A-Za-z0-9._-]+\.json) owner_decisions\[(?P<i
 # The affirmative actions with which a relayed decision authorizes an interim: the entry's `authorizes` lists each slot and
 # repository pair its decision installs or puts to use, under the decision's own verb. Any other action authorizes nothing.
 AUTHORIZING_ACTIONS = ("install", "use")
+# The record's later batches are its keys wave2, wave3, ..., folded in their numeric order. A batch of a direct consensus has
+# BATCH_FIELDS; a batch on the owner's decision (amendment 4, wave 3) has OWNER_BATCH_FIELDS: its own rule text, the owner's
+# decision as the hashed record that relays it states it, and no acknowledgement owed, since no family consensus is its
+# authority.
+WAVE = re.compile(r"wave(?P<number>[2-9]|[1-9][0-9]+)")
+OWNER_BATCH_FIELDS = (("date_utc", str), ("meaning", str), ("owner_rule", str), ("no_install_rule_exception", str),
+                      ("authority", dict), ("records", dict), ("acknowledgements", list), ("acknowledgements_owed", list),
+                      ("add_rows", list), ("amend_rows", list))
+OWNER_AUTHORITY_FIELDS = ("kind", "date_utc", "decision", "verbatim", "relayed_by", "rule_basis")
+# Amendment 4: a row the owner adds has this kind and outcome; a row whose decided default installs nothing and which the
+# owner gives a default keeps its kind and takes OWNER_DEFAULT_OUTCOME. Neither is definitive: the state is resolved. The
+# fields an owner default replaces are OVERTURNED_FIELDS, kept on the row under overturned.fields.
+OWNER_ROW_KIND = "owner_decision"
+OWNER_ROW_OUTCOME = "added_by_owner_decision"
+OWNER_DEFAULT_OUTCOME = "owner_default"
+OWNER_LABEL = "owner decision"
+OWNER_DEFAULT_FIELDS = ("default", "repository", "label", "claude", "gpt", "replaces_interim", "resolution")
+OVERTURNED_FIELDS = ("default", "repository", "installs_nothing_extra", "definitive", "label", "state", "measurement", "claude",
+                     "gpt", "resolution")
+OWNER_RESOLUTION_TEXT = ("by", "batch", "reason", "pin", "overturn")
+# The interim fields an owner batch may amend, beside the ones the interim's own authority set.
+INTERIM_AMENDABLE = ("default", "repository", "pin", "label", "decided_by", "open_acceptance_gates")
 
 
 def relayed_decision(sid, interim, authority):
@@ -417,25 +442,197 @@ def acknowledged_families(acknowledgements):
     return {ack.get("family") for ack in acknowledgements if isinstance(ack, dict) and ack.get("url")}
 
 
-def check_batch(batch):
-    """The wave-2 batch's shape, records and acknowledgements. An acknowledgement is a pull-request comment of one family; a
-    family without one is named in acknowledgements_owed, so the record never claims an acknowledgement it does not hold."""
-    if not isinstance(batch, dict) or set(batch) != {key for key, _ in BATCH_FIELDS} or not all(
-            isinstance(batch[key], kind) for key, kind in BATCH_FIELDS):
-        raise ValueError("consensus wave2: the batch needs exactly " + ", ".join(key for key, _ in BATCH_FIELDS))
-    if not all(batch[key].strip() for key, kind in BATCH_FIELDS if kind is str):
-        raise ValueError("consensus wave2: the batch's date, meaning and rule texts are not blank")
+def wave_batches(data):
+    """[(name, batch)] of the record's later batches (wave2, wave3, ...) in their numeric order. A top-level key that starts
+    with 'wave' and is not one of them is refused, so a misspelt batch is never skipped."""
+    found = []
+    for key in data:
+        if key.startswith("wave"):
+            match = WAVE.fullmatch(key)
+            if not match:
+                raise ValueError(f"consensus {key}: a batch is named wave<n> with n at least 2")
+            found.append((int(match["number"]), key))
+    return [(key, data[key]) for _, key in sorted(found)]
+
+
+def is_owner_batch(batch):
+    """Whether a batch rests on the owner's decision (amendment 4) rather than on a direct consensus of the families."""
+    return isinstance(batch, dict) and "owner_rule" in batch
+
+
+def batch_rule(batch):
+    """The rule text a batch appends to the manifest's decision rule."""
+    return batch["owner_rule"] if is_owner_batch(batch) else batch["interim_rule"]
+
+
+def https_parts(value):
+    """The URLs of a repository field, which may name several repositories separated by '; ', or None if one is not https."""
+    parts = [part.strip() for part in str(value or "").split(";")]
+    return parts if parts and all(part.startswith("https://") and " " not in part for part in parts) else None
+
+
+def check_records_and_acknowledgements(name, batch):
     if not batch["records"]:
-        raise ValueError("consensus wave2: the batch names its hashed records")
-    for name in sorted(batch["records"]):
-        verify_evidence(batch["records"][name], f"wave2.records.{name}", "consensus")
+        raise ValueError(f"consensus {name}: the batch names its hashed records")
+    for record in sorted(batch["records"]):
+        verify_evidence(batch["records"][record], f"{name}.records.{record}", "consensus")
     for ack in batch["acknowledgements"]:
         if not (isinstance(ack, dict) and ack.get("family") in FAMILIES and str(ack.get("url", "")).startswith("https://github.com/")
                 and all(isinstance(ack.get(key), str) and ack[key].strip() for key in ("at", "covers"))):
-            raise ValueError("consensus wave2: an acknowledgement is one family's pull-request comment, with its time and what it covers")
+            raise ValueError(f"consensus {name}: an acknowledgement is one family's pull-request comment, with its time and what it covers")
+
+
+def check_batch(batch, name="wave2"):
+    """A consensus batch's shape, records and acknowledgements. An acknowledgement is a pull-request comment of one family; a
+    family without one is named in acknowledgements_owed, so the record never claims an acknowledgement it does not hold."""
+    if not isinstance(batch, dict) or set(batch) != {key for key, _ in BATCH_FIELDS} or not all(
+            isinstance(batch[key], kind) for key, kind in BATCH_FIELDS):
+        raise ValueError(f"consensus {name}: the batch needs exactly " + ", ".join(key for key, _ in BATCH_FIELDS))
+    if not all(batch[key].strip() for key, kind in BATCH_FIELDS if kind is str):
+        raise ValueError(f"consensus {name}: the batch's date, meaning and rule texts are not blank")
+    check_records_and_acknowledgements(name, batch)
     owed = sorted(set(FAMILIES) - acknowledged_families(batch["acknowledgements"]))
     if batch["acknowledgements_owed"] != owed:
-        raise ValueError(f"consensus wave2: acknowledgements_owed must name exactly the families without an acknowledgement: {owed}")
+        raise ValueError(f"consensus {name}: acknowledgements_owed must name exactly the families without an acknowledgement: {owed}")
+
+
+def changed_slots(batch):
+    """The slots an owner batch adds or amends, in the batch's order."""
+    return ([row.get("slot_id") for row in batch["add_rows"] if isinstance(row, dict)]
+            + [entry.get("slot_id") for entry in batch["amend_rows"] if isinstance(entry, dict)])
+
+
+def batch_repositories(batch):
+    """Every repository an owner batch's rows and amendments name."""
+    named = [row.get("repository") for row in batch["add_rows"] if isinstance(row, dict)]
+    for entry in batch["amend_rows"]:
+        if isinstance(entry, dict):
+            for key in ("owner_default", "interim"):
+                if isinstance(entry.get(key), dict) and "repository" in entry[key]:
+                    named.append(entry[key]["repository"])
+    return [part for value in named for part in (https_parts(value) or [str(value)])]
+
+
+def check_owner_batch(name, batch):
+    """An owner batch (amendment 4): its shape, records and acknowledgements, and the owner's decision it rests on. The decision
+    is the one the hashed record named by authority.relayed_by states: that record quotes the owner's words verbatim and names
+    every slot the batch adds or amends (as `slot`) and every repository they install, so the record, not the batch's own
+    text, says what the owner decided. No acknowledgement is owed, since no family consensus is the batch's authority."""
+    if not isinstance(batch, dict) or set(batch) != {key for key, _ in OWNER_BATCH_FIELDS} or not all(
+            isinstance(batch[key], kind) for key, kind in OWNER_BATCH_FIELDS):
+        raise ValueError(f"consensus {name}: an owner batch needs exactly " + ", ".join(key for key, _ in OWNER_BATCH_FIELDS))
+    if not all(batch[key].strip() for key, kind in OWNER_BATCH_FIELDS if kind is str):
+        raise ValueError(f"consensus {name}: the batch's date, meaning and rule texts are not blank")
+    check_records_and_acknowledgements(name, batch)
+    if batch["acknowledgements_owed"] != []:
+        raise ValueError(f"consensus {name}: an owner batch owes no acknowledgement; its authority is the owner's decision")
+    authority = batch["authority"]
+    if set(authority) != set(OWNER_AUTHORITY_FIELDS) or not all(
+            isinstance(authority[key], str) and authority[key].strip() for key in OWNER_AUTHORITY_FIELDS):
+        raise ValueError(f"consensus {name}: the owner's decision needs exactly " + ", ".join(OWNER_AUTHORITY_FIELDS))
+    if authority["kind"] != "owner_decision":
+        raise ValueError(f"consensus {name}: an owner batch's authority is an owner_decision, not {authority['kind']}")
+    if authority["date_utc"] != batch["date_utc"]:
+        raise ValueError(f"consensus {name}: the owner's decision is dated {authority['date_utc']}, and the batch {batch['date_utc']}")
+    refs = [ref for ref in batch["records"].values() if isinstance(ref, dict) and ref.get("path") == authority["relayed_by"]]
+    if not refs:
+        raise ValueError(f"consensus {name}: the owner's decision is relayed by {authority['relayed_by']}, which is not one of "
+                         "the batch's hashed records")
+    text = (ROOT / refs[0]["path"]).read_text(encoding="utf-8")
+    if authority["verbatim"] not in text:
+        raise ValueError(f"consensus {name}: {authority['relayed_by']} does not quote the owner's words verbatim")
+    for sid in changed_slots(batch):
+        if not isinstance(sid, str) or f"`{sid}`" not in text:
+            raise ValueError(f"consensus {name}: {authority['relayed_by']} does not name the slot {sid}")
+    for repository in batch_repositories(batch):
+        if repository not in text:
+            raise ValueError(f"consensus {name}: {authority['relayed_by']} does not name the repository {repository}")
+
+
+def owner_resolution(sid, resolution, outcome, name):
+    """The resolution an owner row or owner default carries: its outcome, the owner's decision, the batch, why, the pin, the
+    comparison that would remove it, and its sources."""
+    if not isinstance(resolution, dict) or resolution.get("outcome") != outcome:
+        raise ValueError(f"consensus {sid}: an owner {'row' if outcome == OWNER_ROW_OUTCOME else 'default'} has the outcome {outcome}")
+    blank = [key for key in OWNER_RESOLUTION_TEXT if not (isinstance(resolution.get(key), str) and resolution[key].strip())]
+    if blank:
+        raise ValueError(f"consensus {sid}: an owner decision's resolution needs a non-empty {', '.join(blank)}")
+    if resolution["batch"] != name:
+        raise ValueError(f"consensus {sid}: the resolution names the batch {resolution['batch']}, not {name}")
+    if not (isinstance(resolution.get("sources"), list) and resolution["sources"]):
+        raise ValueError(f"consensus {sid}: an owner decision names its sources")
+
+
+def apply_owner_amendments(rows, by_slot, name, batch):
+    """Amendment 4 on rows the rounds or an earlier batch decided: an owner default on a row whose decided default installs
+    nothing (it may drop the row's interim), or an amendment of a row's interim. The replaced values are kept on the row under
+    overturned, with the amendment that replaced them."""
+    for entry in batch["amend_rows"]:
+        entry = entry if isinstance(entry, dict) else {}
+        sid = entry.get("slot_id")
+        if not isinstance(sid, str) or sid not in by_slot:
+            raise ValueError(f"consensus {sid}: amendment for unknown slot")
+        changes = [key for key in ("owner_default", "interim") if key in entry]
+        if set(entry) - {"slot_id", "amendment", "owner_default", "interim"} or len(changes) != 1:
+            raise ValueError(f"consensus {sid}: an owner amendment is its slot_id, its amendment and one owner_default or interim")
+        amendment = entry.get("amendment")
+        if not isinstance(amendment, dict) or not all(
+                isinstance(amendment.get(key), str) and amendment[key].strip() for key in ("date_utc", "by", "decision")):
+            raise ValueError(f"consensus {sid}: an amendment needs date_utc, by and decision")
+        if amendment["date_utc"] != batch["date_utc"]:
+            raise ValueError(f"consensus {sid}: the amendment is dated {amendment['date_utc']}, and its batch {batch['date_utc']}")
+        replaced = sorted((set(amendment) & set(PROTECTED)) | ({"interim"} & set(amendment)))
+        if replaced:
+            raise ValueError(f"consensus {sid}: an amendment's own text cannot carry {', '.join(replaced)}")
+        row = by_slot[sid]
+        if "overturned" in row:
+            raise ValueError(f"consensus {sid}: the row already carries an owner amendment")
+        overturned = {"amendment": json.loads(json.dumps(amendment))}
+        if changes == ["owner_default"]:
+            default = entry["owner_default"]
+            if not isinstance(default, dict) or set(default) != set(OWNER_DEFAULT_FIELDS):
+                raise ValueError(f"consensus {sid}: an owner default carries exactly " + ", ".join(OWNER_DEFAULT_FIELDS))
+            if installs(row):
+                raise ValueError(f"consensus {sid}: an owner default replaces only a decided default that installs nothing")
+            if default["replaces_interim"] is not bool(row.get("interim")):
+                raise ValueError(f"consensus {sid}: replaces_interim must say whether the row carries an interim")
+            blank = [key for key in ("default", "label", "claude", "gpt")
+                     if not (isinstance(default[key], str) and default[key].strip())]
+            if blank:
+                raise ValueError(f"consensus {sid}: an owner default needs a non-empty {', '.join(blank)}")
+            if https_parts(default["repository"]) is None:
+                raise ValueError(f"consensus {sid}: an owner default names its repository by an https URL")
+            if not default["label"].startswith(OWNER_LABEL):
+                raise ValueError(f"consensus {sid}: an owner default's label starts with '{OWNER_LABEL}'")
+            owner_resolution(sid, default["resolution"], OWNER_DEFAULT_OUTCOME, name)
+            overturned["fields"] = {key: json.loads(json.dumps(row[key])) for key in OVERTURNED_FIELDS}
+            if row.get("interim"):
+                overturned["interim"] = row.pop("interim")
+            row.update({"default": default["default"], "repository": default["repository"], "installs_nothing_extra": False,
+                        "definitive": False, "label": default["label"], "state": "resolved", "measurement": None,
+                        "claude": default["claude"], "gpt": default["gpt"],
+                        "resolution": json.loads(json.dumps(default["resolution"]))})
+        else:
+            change = entry["interim"]
+            if not isinstance(row.get("interim"), dict):
+                raise ValueError(f"consensus {sid}: an interim amendment needs a row that carries an interim")
+            if not isinstance(change, dict) or not change or set(change) - set(INTERIM_AMENDABLE):
+                raise ValueError(f"consensus {sid}: an interim amendment changes only " + ", ".join(INTERIM_AMENDABLE))
+            for key, value in change.items():
+                ok = (isinstance(value, list) and value and all(isinstance(item, str) and item.strip() for item in value)
+                      if key == "open_acceptance_gates" else isinstance(value, str) and value.strip())
+                if not ok:
+                    raise ValueError(f"consensus {sid}: an interim amendment needs a non-empty {key}")
+            if "repository" in change and https_parts(change["repository"]) is None:
+                raise ValueError(f"consensus {sid}: an interim names its repository by an https URL")
+            if "label" in change and not change["label"].startswith("interim install"):
+                raise ValueError(f"consensus {sid}: an interim's label starts with 'interim install'")
+            overturned["interim"] = {key: json.loads(json.dumps(row["interim"].get(key))) for key in change}
+            row["interim"].update(json.loads(json.dumps(change)))
+        owners = [other["slot_id"] for other in rows if other is not row and other["job"] == row["job"] and installs_now(other)]
+        if owners:
+            raise ValueError(f"consensus {sid}: installed job also owned by {owners[0]}: {row['job']}")
+        row["overturned"] = overturned
 
 
 def apply_interims(rows, by_slot, entries):
@@ -493,8 +690,9 @@ def apply_consensus(rows, layers):
 
     An added row is copied as the record gives it and placed after the last row of its layer. An amendment becomes an
     item of its row's amendments list. The exchanged notes that the record names are hashed as verify_evidence does it;
-    the acknowledgements are links to pull-request comments and are checked for presence only. The wave-2 batch adds its
-    rows after the record's own, records its amendments after theirs, then its interim installs (apply_interims).
+    the acknowledgements are links to pull-request comments and are checked for presence only. Each later batch, in its
+    numeric order, adds its rows after the earlier ones; a consensus batch then records its amendments and its interim
+    installs (apply_interims), and an owner batch, last, its owner amendments (apply_owner_amendments).
     """
     data = json.loads(CONSENSUS.read_text(encoding="utf-8"))
     if not isinstance(data, dict) or not all(isinstance(data.get(key), kind) for key, kind in
@@ -507,9 +705,12 @@ def apply_consensus(rows, layers):
     acknowledgements = records.get("acknowledgements") if isinstance(records.get("acknowledgements"), list) else []
     if not notes or not set(FAMILIES) <= acknowledged_families(acknowledgements):
         raise ValueError("consensus records: the exchanged notes and an acknowledgement of each family are required")
-    wave2 = data.get("wave2")
-    if wave2 is not None:
-        check_batch(wave2)
+    batches = wave_batches(data)
+    for name, batch in batches:
+        if is_owner_batch(batch):
+            check_owner_batch(name, batch)
+        else:
+            check_batch(batch, name)
     by_slot = {row["slot_id"]: row for row in rows}
     by_layer = {(layer["catalog"], layer["layer_id"]): [] for layer in layers}
     for row in rows:
@@ -517,7 +718,9 @@ def apply_consensus(rows, layers):
     catalogs = sorted({layer["catalog"] for layer in layers})
     jobs = {row["job"]: row["slot_id"] for row in rows if installs(row)}
 
-    def add(entries):
+    def add(entries, owner_batch=None):
+        """Add a batch's rows: consensus rows, or, with owner_batch (the batch's name), the owner's rows of amendment 4."""
+        kind = "consensus" if owner_batch is None else OWNER_ROW_KIND
         for added in entries:
             added = added if isinstance(added, dict) else {}
             sid = added.get("slot_id")
@@ -526,10 +729,19 @@ def apply_consensus(rows, layers):
                 raise ValueError(f"consensus {sid}: an added row carries the manifest's row fields: missing {missing}; unknown {unknown}")
             if sid in by_slot:
                 raise ValueError(f"consensus {sid}: slot already exists")
-            if added["row_kind"] != "consensus":
-                raise ValueError(f"consensus {sid}: an added row must have row_kind consensus, not {added['row_kind']}")
+            if added["row_kind"] != kind:
+                raise ValueError(f"consensus {sid}: an added row must have row_kind {kind}, not {added['row_kind']}")
             if added["definitive"] is not False or added["state"] == "definitive":
-                raise ValueError(f"consensus {sid}: a consensus row is never definitive")
+                raise ValueError(f"consensus {sid}: a{'n owner' if owner_batch else ' consensus'} row is never definitive")
+            if owner_batch is not None:
+                # An owner row installs what it names, now: resolved, no pending measurement, a label that says what it is.
+                if added["state"] != "resolved" or added["measurement"] is not None or not installs(added):
+                    raise ValueError(f"consensus {sid}: an owner row is resolved, waits for no measurement and installs its default")
+                if https_parts(added["repository"]) is None:
+                    raise ValueError(f"consensus {sid}: an owner row names its repository by an https URL")
+                if not str(added["label"]).startswith(OWNER_LABEL):
+                    raise ValueError(f"consensus {sid}: an owner row's label starts with '{OWNER_LABEL}'")
+                owner_resolution(sid, added["resolution"], OWNER_ROW_OUTCOME, owner_batch)
             if added["state"] not in STATES:
                 raise ValueError(f"consensus {sid}: unknown state: {added['state']}")
             if added["catalog"] not in catalogs:
@@ -570,13 +782,18 @@ def apply_consensus(rows, layers):
             by_slot[sid].setdefault("amendments", []).append(json.loads(json.dumps(amendment)))
 
     add(data["add_rows"])
-    if wave2 is not None:
-        add(wave2["add_rows"])
+    for name, batch in batches:
+        add(batch["add_rows"], name if is_owner_batch(batch) else None)
     rows[:] = [row for layer in layers for row in by_layer[layer["catalog"], layer["layer_id"]]]
     amend(data["amend_rows"])
-    if wave2 is not None:
-        amend(wave2["amend_rows"])
-        apply_interims(rows, by_slot, wave2["interim_rows"])
+    for name, batch in batches:
+        if not is_owner_batch(batch):
+            amend(batch["amend_rows"])
+            apply_interims(rows, by_slot, batch["interim_rows"])
+    # Owner amendments come last: an owner default may drop an interim, and an interim amendment changes one.
+    for name, batch in batches:
+        if is_owner_batch(batch):
+            apply_owner_amendments(rows, by_slot, name, batch)
     return data
 
 
@@ -616,14 +833,17 @@ def build():
         by_kind[r["row_kind"]] = by_kind.get(r["row_kind"], 0) + 1
         state = r.get("state") or "open"
         by_state[state] = by_state.get(state, 0) + 1
-    wave2 = consensus.get("wave2")
-    # Amendment 3 is appended to the rule after the consensus record's rule, and its exception is stated beside the
-    # no-install rule; the batch's acknowledgements, and the families whose acknowledgement is owed, are carried as recorded.
-    amendment_3 = {} if wave2 is None else {
-        "no_install_rule_exception": wave2["no_install_rule_exception"],
-        "consensus_wave2": {"date_utc": wave2["date_utc"], "meaning": wave2["meaning"],
-                            "acknowledgements": wave2["acknowledgements"],
-                            "acknowledgements_owed": wave2["acknowledgements_owed"]}}
+    batches = wave_batches(consensus)
+    # Each batch's rule (amendment 3, amendment 4, ...) is appended to the rule after the consensus record's rule, in the
+    # batches' order, and their exceptions are stated, joined in the same order, beside the no-install rule; each batch's
+    # acknowledgements, and the families whose acknowledgement is owed, are carried as recorded, with an owner batch's authority.
+    amendments = {} if not batches else {
+        "no_install_rule_exception": " ".join(batch["no_install_rule_exception"] for _, batch in batches),
+        **{f"consensus_{name}": {"date_utc": batch["date_utc"], "meaning": batch["meaning"],
+                                 **({"authority": {key: batch["authority"][key] for key in ("kind", "date_utc", "relayed_by")}}
+                                    if is_owner_batch(batch) else {}),
+                                 "acknowledgements": batch["acknowledgements"],
+                                 "acknowledgements_owed": batch["acknowledgements_owed"]} for name, batch in batches}}
     doc = {
         "schema_version": 1, "kind": "new-wsl-definitive-manifest", "date_utc": "2026-10-01",
         "meaning": "one default per slot for the clean install of the new WSL distribution; a definitive default is the slot's install decision, "
@@ -632,10 +852,10 @@ def build():
                          f"under the combination rule ({convergence['rule']['path']} and its amendment 1); a contested one is resolved by a blind "
                          "Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families "
                          "name it and both critics return converged, and a split is settled by the measurement the critics name."
-                         + " " + consensus["rule"] + ("" if wave2 is None else " " + wave2["interim_rule"]),
+                         + " " + consensus["rule"] + "".join(" " + batch_rule(batch) for _, batch in batches),
         "decision_rule_before_amendment_2": foundation["decision_rule"],
         "no_install_rule": foundation["no_install_rule"],
-        **amendment_3,
+        **amendments,
         "not_claimed": foundation["not_claimed"],
         "sources": {"foundation": {"file": FOUNDATION.name, "sha256": sha(FOUNDATION)},
                     "us-equities": {"file": "trading/" + TRADING.name, "sha256": sha(TRADING), "owner": trading["owner"]},
@@ -645,7 +865,7 @@ def build():
                     "consensus": {"path": CONSENSUS.relative_to(ROOT).as_posix(), "sha256": sha(CONSENSUS)}},
         "counts": {"layers": len(layers), "slots": len(rows), "definitive": sum(1 for r in rows if r["definitive"]), "by_row_kind": by_kind,
                    "by_state": by_state, "installed": sum(1 for r in rows if installs(r)),
-                   **({} if wave2 is None else {"interim": sum(1 for r in rows if r.get("interim"))})},
+                   **({} if not batches else {"interim": sum(1 for r in rows if r.get("interim"))})},
         "pinned_requirements": {"us-equities": trading.get("pinned_requirements", [])},
         "no_blind_default_today": {"us-equities": trading.get("no_blind_default_today", [])},
         "layers": layers, "slots": rows,
@@ -673,4 +893,5 @@ if __name__ == "__main__":
         amended = [row for row in doc["slots"] if row.get("amendments")]
         print("layers", counts["layers"], "| slots", counts["slots"], by_catalog, "| definitive", counts["definitive"],
               "| installed", counts["installed"], "| interim", counts.get("interim", 0), "|", counts["by_row_kind"], "|",
-              counts["by_state"], "| amendments", sum(len(row["amendments"]) for row in amended), "on", len(amended), "rows")
+              counts["by_state"], "| amendments", sum(len(row["amendments"]) for row in amended), "on", len(amended), "rows",
+              "| overturned", sum(1 for row in doc["slots"] if row.get("overturned")))

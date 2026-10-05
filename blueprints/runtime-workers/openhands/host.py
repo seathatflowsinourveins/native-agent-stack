@@ -33,12 +33,20 @@ from recipe import (COMPRESSION_COMBOS, HERE, arm_config, digest, environment_se
                     render_mcp)
 from e2e import netprobe
 from e2e.task import load_task, worker_instruction
-from receipt import PROBE_MECHANISM, create_receipt, gateway_database, read_bounded, time_value
+from receipt import FAILURE_STAGES, PROBE_MECHANISM, create_receipt, gateway_database, read_bounded, time_value
 
 
 DOCKER = ["docker", "--context", "rootless"]
 # SWE-bench worker default; the resolver mode uses 3740 (README "Workflow dispatch").
 DEFAULT_PORT = 3730
+# Resolver mode (RESOLVER.md "Stage 2"): its repository, the runtime-worker manifest that pins
+# tdd and search-first, and this recipe's resolver skill, which together are its skill set.
+RESOLVER_PORT = 3740
+RESOLVER_REPOSITORY = "seathatflowsinourveins/native-agent-stack"
+RESOLVER_ORIGIN = f"https://github.com/{RESOLVER_REPOSITORY}.git"
+RUNTIME_SKILLS_MANIFEST = "blueprints/runtime-workers/skills/manifest.json"
+RESOLVER_SKILLS = ("resolver", "search-first", "tdd")
+RESOLVER_SKILL_PATH = "blueprints/runtime-workers/openhands/skills/resolver"
 # Agent limits whose partial patch is still graded: SDK@fcc102a
 # conversation/impl/local_conversation.py:753-755 (STUCK) and :2021-2043,
 # :2339-2360 (ERROR with ConversationErrorEvent code "MaxIterationsReached").
@@ -64,6 +72,12 @@ NETWORK_FORMAT = ('{"id":{{json .Id}},"name":{{json .Name}},"driver":{{json .Dri
 # Never a full container inspect: the server's Config.Env holds the session key.
 CONTAINER_FORMAT = ('{"id":{{json .Id}},"name":{{json .Name}},"running":{{json .State.Running}},'
                     '"labels":{{json .Config.Labels}},"networks":{{json .NetworkSettings.Networks}}}')
+# Plan acceptance A7 (review item D7): a names-only listing of the agent container's environment.
+# Each Config.Env entry is "NAME=value"; the template emits the part before the first "=" as a
+# JSON string and never a value. split, index and json are the Docker CLI's template functions
+# (docs.docker.com "Format command and log output"); rendered with the local CLI 29.8.1.
+ENV_NAMES_FORMAT = '[{{range $i, $e := .Config.Env}}{{if $i}},{{end}}{{json (index (split $e "=") 0)}}{{end}}]'
+ENV_NAME = re.compile(r"[A-Za-z_][A-Za-z0-9_]{0,127}")
 PROXY_TEMPLATE = HERE / "config/proxy-nginx.conf"
 PLACEHOLDER = re.compile(r"@[A-Z]+@")
 # Plan section 1 and E1: a P0-P2 receipt gates dispatch start for at most 900 s
@@ -319,7 +333,7 @@ def verify_gateway_providers(arm, allowlists):
         check_gateway_surface(gateway_surface(gateway_database(store)), allowlists[store])
 
 
-def preflight(prefix, state):
+def preflight(prefix, state, *, resolver=False):
     pins = read_json(HERE / "pins.json")
     if digest(HERE / "requirements.lock") != pins["requirements_sha256"]:
         raise ValueError("runtime_lock_hash_mismatch")
@@ -335,6 +349,15 @@ def preflight(prefix, state):
     host = read_host_file()
     gateway_allowlists(host)
     variables = host["variables"]
+    if resolver:
+        # Resolver mode mounts no MCP server or QMD collection and reaches no memory or
+        # embedding service (plan section 5, E4), so none of those entries is read. The
+        # request and server containers still take their PATH from HOST_PATH.
+        if not isinstance(variables, dict) or not isinstance(variables.get("HOST_PATH"), str) \
+                or not variables["HOST_PATH"]:
+            raise ValueError("host_path_required")
+        check_rootless()
+        return pins, host, {}
     # These endpoints belong to the disabled ai-memory and socraticode entries
     # (config/mcp-policy.json). Under O1 they are unreachable by design from
     # the internal run network; the values only keep the template renderable.
@@ -359,15 +382,18 @@ def preflight(prefix, state):
     return pins, host, mcp
 
 
-def install_workspace_skills(stack_root, workspace):
-    """Pending shared skills PR: no copy/symlink/global-install fallback."""
+def install_workspace_skills(stack_root, workspace, manifest=RUNTIME_SKILLS_MANIFEST):
+    """Pending shared skills PR: no copy/symlink/global-install fallback.
+
+    Resolver mode passes its own project-scope manifest (install_resolver_skills).
+    """
     # Vercel skills 1.7.0 add.ts:2130-2160 also creates a root local lock.
     # A task's existing paths must never become installer-owned or ignored.
     if any(os.path.lexists(workspace / name) for name in (".agents", "skills-lock.json")):
         raise ValueError("task_conflicts_with_skill_installer_paths")
     subprocess.run([
         sys.executable, str(stack_root / "tools/adoption/install_skills.py"),
-        "--manifest", "blueprints/runtime-workers/skills/manifest.json",
+        "--manifest", str(manifest),
         "--project-dir", str(workspace), "--agent", "universal",
     ], cwd=stack_root, check=True, timeout=600)
     with (workspace / ".git/info/exclude").open("a") as stream:
@@ -379,7 +405,11 @@ def workspace_skills(stack_root, workspace):
     entries = read_json(manifest)["skills"]
     installed = workspace / ".agents/skills"
     names = [entry["name"] for entry in entries]
-    if len(names) != len(set(names)) or not {"tdd", "verification-before-completion"} <= set(names):
+    # verification-before-completion is excluded: the runtime manifest lists it under
+    # "excluded" (#429, bdf25d28), and the resolver plan's 2026-09-28 update keeps it out
+    # of every container skill set. Requiring it stopped every live prepare here.
+    if (len(names) != len(set(names)) or "tdd" not in names
+            or "verification-before-completion" in names):
         raise ValueError("runtime_skills_manifest_contract")
     for entry in entries:
         path = installed / entry["name"] / "SKILL.md"
@@ -390,6 +420,185 @@ def workspace_skills(stack_root, workspace):
         if digest(path) != entry["skill_md_sha256"]:
             raise ValueError("installed_project_skill_pin_mismatch")
     return {"names": sorted(names), "manifest_sha256": digest(manifest)}
+
+
+SHA1 = re.compile(r"[0-9a-f]{40}")
+
+
+def resolver_git_env(home):
+    """Neutral, anonymous git for the resolver's clones (RESOLVER.md "Stage 2").
+
+    git(1): GIT_CONFIG_GLOBAL and GIT_CONFIG_NOSYSTEM drop the global and system files,
+    so no credential helper, hook path or filter can come from them, and
+    GIT_TERMINAL_PROMPT=0 fails instead of prompting. HOME is an empty private
+    directory, so no per-user file under it applies: no ~/.netrc, and not the XDG git
+    ignore and attributes files that tests/__init__.py names. Nothing is inherited.
+    """
+    return {"PATH": "/usr/bin:/bin", "LANG": "C.UTF-8", "HOME": str(home), "GIT_CONFIG_GLOBAL": os.devnull,
+            "GIT_CONFIG_NOSYSTEM": "1", "GIT_TERMINAL_PROMPT": "0", "GIT_NO_REPLACE_OBJECTS": "1"}
+
+
+def resolver_clone(result, base):
+    """Plan section 2 step 2: an anonymous clone of main, pinned to the base, remote removed.
+
+    EXT (OpenHands/extensions@bea7a20 skills/github-issue-to-pr/scripts/main.py:558-592)
+    clones one branch over plain HTTPS. History is isolated as run()'s SWE-bench path
+    does it: the remote removed, the reflog expired and unreachable objects pruned, so
+    the workspace holds main's history up to the base and nothing later. No tag is
+    fetched, the credential helper list is empty, and git-clone(1) --template with an
+    empty value copies no hook (on git 2.43.0 no .git/hooks is created).
+    """
+    if not isinstance(base, str) or not SHA1.fullmatch(base):
+        raise ValueError("resolver_base_sha_required")
+    result = Path(result)
+    home = result / "git-home"
+    private_directory(home)
+    env = resolver_git_env(home)
+    workspace = result / "workspace"
+    git = ["git", "-c", "credential.helper=", "-c", "core.hooksPath=/dev/null"]
+    steps = (("clone", git + ["clone", "--template=", "--no-checkout", "--single-branch", "--branch", "main",
+                              "--no-tags", "--", RESOLVER_ORIGIN, str(workspace)]),
+             ("checkout", git + ["-C", str(workspace), "reset", "--hard", base]),
+             ("remove-remote", git + ["-C", str(workspace), "remote", "remove", "origin"]),
+             ("reflog", git + ["-C", str(workspace), "reflog", "expire", "--expire=now", "--all"]),
+             ("gc", git + ["-C", str(workspace), "gc", "--prune=now"]))
+    for step, argv in steps:
+        if logged_command(argv, result / f"resolver-{step}.log", cwd=result, timeout=900, env=env):
+            raise RuntimeError("resolver_" + step.replace("-", "_") + "_failed")
+    refs = subprocess.check_output(["git", "-C", str(workspace), "for-each-ref", "--format=%(objectname) %(refname)"],
+                                   text=True, timeout=30, env=env).splitlines()
+    head = subprocess.check_output(["git", "-C", str(workspace), "rev-parse", "HEAD"], text=True, timeout=30,
+                                   env=env).strip()
+    if refs != [f"{base} refs/heads/main"] or head != base:
+        raise ValueError("unexpected_resolver_reference")
+    return workspace
+
+
+def write_agents_md(workspace, base, target):
+    """`git show <base>:AGENTS.md` into the read-only input mount (plan section 2 step 4).
+
+    The worker loads it as the always-on "agents" skill. Neutral git, as the clone.
+    """
+    if not isinstance(base, str) or not SHA1.fullmatch(base):
+        raise ValueError("resolver_base_sha_required")
+    env = resolver_git_env(Path(workspace).parent / "git-home")
+    try:
+        text = subprocess.check_output(["git", "-C", str(workspace), "--no-pager", "show", f"{base}:AGENTS.md"],
+                                       stderr=subprocess.DEVNULL, timeout=30, env=env)
+    except (OSError, subprocess.SubprocessError):
+        raise ValueError("agents_md_unreadable") from None
+    if len(text) > 1024 * 1024:
+        raise ValueError("agents_md_too_large")
+    Path(target).write_bytes(text)
+
+
+def resolver_skill_pin(stack_root):
+    """The resolver skill at the driver checkout's commit, pinned as install_skills.py pins every skill.
+
+    The skill states the driver's bounds, so it comes from the commit the driver runs
+    from. Its tree and SKILL.md bytes are read from local git at HEAD, never from the
+    working tree; install_skills.py then checks the tree against GitHub's Trees API
+    before any add, so that commit must be on GitHub (a pushed branch or main).
+    """
+    env = {"PATH": "/usr/bin:/bin", "LC_ALL": "C", "GIT_CONFIG_GLOBAL": os.devnull, "GIT_CONFIG_NOSYSTEM": "1"}
+
+    def git(*args):
+        return subprocess.run(["git", "-C", str(stack_root), *args], capture_output=True, env=env, timeout=30,
+                              check=True).stdout
+
+    try:
+        ref = git("rev-parse", "--verify", "--end-of-options", "HEAD^{commit}").decode("ascii").strip()
+        tree = git("rev-parse", "--verify", "--end-of-options", f"{ref}:{RESOLVER_SKILL_PATH}").decode("ascii").strip()
+        data = git("cat-file", "blob", f"{ref}:{RESOLVER_SKILL_PATH}/SKILL.md")
+    except (OSError, subprocess.SubprocessError, UnicodeDecodeError):
+        raise ValueError("resolver_skill_pin_unavailable") from None
+    if not SHA1.fullmatch(ref) or not SHA1.fullmatch(tree):
+        raise ValueError("resolver_skill_pin_unavailable")
+    return {"ref": ref, "tree_sha": tree, "skill_md_sha256": hashlib.sha256(data).hexdigest()}
+
+
+def resolver_skills_manifest(stack_root, pin):
+    """The resolver's project-scope manifest for install_skills.py.
+
+    tdd and search-first are the runtime-worker manifest's entries, unchanged, so the
+    installer resolves their reuse_ref against the adoption pins. The resolver entry
+    uses the installer's url form (tools/adoption/install_skills.py main's schema check).
+    """
+    runtime = read_json(Path(stack_root) / RUNTIME_SKILLS_MANIFEST)
+    entries = {entry.get("name"): entry for entry in runtime.get("skills", []) if isinstance(entry, dict)}
+    if any(name not in entries for name in ("tdd", "search-first")):
+        raise ValueError("resolver_skills_missing_from_runtime_manifest")
+    resolver = {"name": "resolver", "source": RESOLVER_REPOSITORY,
+                "url": f"https://github.com/{RESOLVER_REPOSITORY}/tree/{pin['ref']}/{RESOLVER_SKILL_PATH}",
+                "ref": pin["ref"], "path": RESOLVER_SKILL_PATH, "tree_sha": pin["tree_sha"],
+                "skill_md_sha256": pin["skill_md_sha256"], "status": "trial"}
+    return {"schema_version": runtime["schema_version"], "kind": runtime["kind"], "scope": "project",
+            "cli": runtime["cli"], "skills": [entries["tdd"], entries["search-first"], resolver]}
+
+
+def resolver_workspace_skills(workspace, manifest_path):
+    """Exactly the resolver set installed, each SKILL.md at its manifest hash (workspace_skills' checks)."""
+    manifest_path = Path(manifest_path)
+    entries = read_json(manifest_path)["skills"]
+    names = sorted(entry["name"] for entry in entries)
+    if tuple(names) != RESOLVER_SKILLS:
+        raise ValueError("resolver_skill_set_mismatch")
+    installed = Path(workspace) / ".agents/skills"
+    if sorted(path.name for path in installed.iterdir()) != names:
+        raise ValueError("resolver_installed_skills_mismatch")
+    for entry in entries:
+        path = installed / entry["name"] / "SKILL.md"
+        if not path.resolve().is_relative_to(installed.resolve()):
+            raise ValueError("skills_must_be_project_local")
+        if digest(path) != entry["skill_md_sha256"]:
+            raise ValueError("installed_project_skill_pin_mismatch")
+    return {"names": names, "manifest_sha256": digest(manifest_path)}
+
+
+def check_resolver_skills(stack_root, pin, workdir):
+    """install_skills.py --dry-run with the resolver manifest against an empty project directory.
+
+    tools/adoption/install_skills.py main: --dry-run still checks the pinned skills
+    binary (verify_skills_bin) and looks up every selected source tree through
+    `gh api` before any add, and it adds nothing. resolver.plan_run calls this before
+    the attempt exists, so a missing binary or an unpublished pin refuses before the
+    run id is spent. Returns the installer's per-skill statuses.
+    """
+    workdir = Path(workdir)
+    manifest, project = workdir / "resolver-skills.json", workdir / "project"
+    project.mkdir(mode=0o700)
+    write_json(manifest, resolver_skills_manifest(stack_root, pin))
+    checked = subprocess.run([sys.executable, str(Path(stack_root) / "tools/adoption/install_skills.py"),
+                              "--manifest", str(manifest), "--project-dir", str(project), "--agent", "universal",
+                              "--dry-run", "--json"], cwd=stack_root, capture_output=True, text=True, timeout=600,
+                             check=False)
+    try:
+        summary = json.loads(checked.stdout.strip().splitlines()[-1])
+    except (ValueError, IndexError):
+        summary = {}
+    if (checked.returncode != 0 or not isinstance(summary, dict) or summary.get("ok") is not True
+            or summary.get("dry_run") is not True or not isinstance(summary.get("skills"), dict)):
+        raise ValueError("resolver_skills_unverified")
+    return summary["skills"]
+
+
+def install_resolver_skills(stack_root, workspace, result):
+    """tdd, search-first and the resolver skill through install_skills.py in project mode.
+
+    The same path as the SWE-bench mode's set (install_workspace_skills), with the
+    manifest written beside the attempt, outside every model mount.
+    """
+    manifest = Path(result) / "resolver-skills.json"
+    write_json(manifest, resolver_skills_manifest(stack_root, resolver_skill_pin(stack_root)))
+    install_workspace_skills(stack_root, workspace, manifest=str(manifest))
+    return resolver_workspace_skills(workspace, manifest)
+
+
+def optional_digest(path):
+    try:
+        return digest(path)
+    except OSError:
+        return None
 
 
 def attempt_stem(run_id, arm):
@@ -742,7 +951,7 @@ def session_files(state, run_id, arm):
     return directory / (stem + ".server.env"), directory / (stem + ".headers")
 
 
-def generate_session_files(state, run_id, arm):
+def generate_session_files(state, run_id, arm, *, sink=None):
     """Generate this attempt's agent-server key; return the two paths, never the value.
 
     One value from Python's secrets module goes into <stem>.server.env in
@@ -750,6 +959,8 @@ def generate_session_files(state, run_id, arm):
     --env-file) and into <stem>.headers for curl -H @file. Each file is created
     with O_CREAT|O_EXCL|O_NOFOLLOW at 0600, so an existing file or a planted
     symlink is refused. teardown_attempt deletes both after confirmed removal.
+    Resolver mode passes `sink`, which receives the value in memory once both
+    files exist: the outgoing-text guard's session key (RESOLVER.md "Stage 2").
     """
     paths = session_files(state, run_id, arm)
     private_directory(paths[0].parent)
@@ -759,6 +970,8 @@ def generate_session_files(state, run_id, arm):
         with os.fdopen(descriptor, "w") as stream:
             os.fchmod(stream.fileno(), 0o600)
             stream.write(line)
+    if sink is not None:
+        sink(value)
     return paths
 
 
@@ -844,12 +1057,33 @@ def cleanup_network(name, record):
     return cleanup["confirmed_removed"]
 
 
+def record_env_names(name, record):
+    """Write the names in container `name`'s environment to `record`, never a value (plan A7).
+
+    One `docker inspect --format ENV_NAMES_FORMAT` read. Output that is not a JSON array of
+    environment names reads as unreadable, so no value can reach the file. Never raises for
+    Docker's answer: teardown continues whatever it finds.
+    """
+    listing = {"status": "unreadable", "names": None}
+    try:
+        answer = subprocess.run(DOCKER + ["inspect", "--format", ENV_NAMES_FORMAT, name], capture_output=True,
+                                text=True, check=False, timeout=30)
+        names = json.loads(answer.stdout) if answer.returncode == 0 else None
+        if isinstance(names, list) and all(isinstance(item, str) and ENV_NAME.fullmatch(item) for item in names):
+            listing = {"status": "observed", "names": sorted(set(names))}
+    except (OSError, subprocess.TimeoutExpired, ValueError, TypeError):
+        pass
+    write_json(record, listing)
+
+
 def teardown_attempt(state, run_id, arm):
     """Remove the attempt's proxy, server and networks by exact name; never prune.
 
     Container logs go to private files first (the proxy access log is the
-    denied-path evidence). The key files are deleted only after both
-    containers are confirmed removed. True only if all four are confirmed.
+    denied-path evidence), and the server's environment names are listed while
+    it still exists (record_env_names, plan acceptance A7). The key files are
+    deleted only after both containers are confirmed removed. True only if all
+    four are confirmed.
     """
     stem = attempt_stem(run_id, arm)
     result = Path(state) / "runs" / run_id / arm
@@ -857,6 +1091,8 @@ def teardown_attempt(state, run_id, arm):
     for role in ("proxy", "server"):
         name, logfile = f"{stem}-{role}", result / f"{role}.log"
         try:
+            if role == "server":
+                record_env_names(name, result / "server-env-names.json")
             logged_command(DOCKER + ["logs", name], logfile, cwd=result, timeout=30)
         finally:
             cleanup_container(name, logfile)
@@ -1118,6 +1354,45 @@ def recorded(entry, now, **fields):
         return False
 
 
+def read_stage_gates(state):
+    """<state>/stage-gates.json: an owner-only regular file with the recorded schema."""
+    path = Path(state) / STAGE_GATES
+    if not path.exists():
+        raise ValueError("stage_gates_not_recorded")
+    gates = json.loads(read_bounded(private_file(path), limit=1024 * 1024))
+    if not isinstance(gates, dict) or gates.get("schema") != STAGE_GATES_SCHEMA:
+        raise ValueError("stage_gates_schema")
+    return gates
+
+
+def reviewer_argv_sha256(argv):
+    """SHA-256 of an argv in the /proc/<pid>/cmdline form: each element followed by a NUL byte
+    (proc(5)), so ["a b"] and ["a", "b"] differ."""
+    if (not isinstance(argv, (list, tuple)) or not argv
+            or not all(isinstance(arg, str) and "\0" not in arg for arg in argv)):
+        raise ValueError("reviewer_argv_invalid")
+    return hashlib.sha256(b"".join(arg.encode("utf-8") + b"\0" for arg in argv)).hexdigest()
+
+
+def verify_reviewer_gate(state, argv, *, now):
+    """Plan gate G4 for the resolver's reviewer command (review item F3).
+
+    The reviewer is the one host-side model that reads the agent's diff, so G4 qualifies
+    its exact argv (resolver plan section 2 step 10 and gate G4: no project or user hook,
+    MCP server, skill or tool). <state>/stage-gates.json must hold a passed "g4" record,
+    recorded no later than now, whose reviewer_argv_sha256 equals reviewer_argv_sha256 of
+    `argv`. Resolver mode only: SWE-bench mode runs no reviewer, so verify_stage_gates does
+    not require it. Returns the digest for the receipt.
+    """
+    entry = read_stage_gates(state).get("g4")
+    if not recorded(entry, now) or not re.fullmatch(r"[0-9a-f]{64}", str(entry.get("reviewer_argv_sha256"))):
+        raise ValueError("stage_gate_g4_not_recorded")
+    qualified = reviewer_argv_sha256(argv)
+    if entry["reviewer_argv_sha256"] != qualified:
+        raise ValueError("reviewer_argv_not_qualified")
+    return qualified
+
+
 def verify_stage_gates(state, arm, *, now):
     """The coordinator's live records that code cannot observe (repair R6).
 
@@ -1130,12 +1405,7 @@ def verify_stage_gates(state, arm, *, now):
     until the gates are observed, so dispatch start refuses until then.
     """
     arm_config(arm)
-    path = Path(state) / STAGE_GATES
-    if not path.exists():
-        raise ValueError("stage_gates_not_recorded")
-    gates = json.loads(read_bounded(private_file(path), limit=1024 * 1024))
-    if not isinstance(gates, dict) or gates.get("schema") != STAGE_GATES_SCHEMA:
-        raise ValueError("stage_gates_schema")
+    gates = read_stage_gates(state)
     pins = read_json(HERE / "pins.json")
     scans = gates.get("g2") if isinstance(gates.get("g2"), dict) else {}
     if not all(recorded(scans.get(ref), now) for ref in (pins["image"]["ref"], pins["gateway_proxy"]["ref"])):
@@ -1330,7 +1600,7 @@ def result_exit(receipt):
     return 2
 
 
-def begin_attempt(state, run_id, arm):
+def begin_attempt(state, run_id, arm, *, mcp=True):
     if not re.fullmatch(r"rw-openhands-[a-z0-9-]{1,64}", run_id):
         raise ValueError("owned_run_id_required")
     arm_config(arm)
@@ -1338,7 +1608,8 @@ def begin_attempt(state, run_id, arm):
     if result.exists():
         raise ValueError("run_id_arm_already_exists")
     private_directory(result)
-    for directory in (result / "input", result / "worker", result / "mcp"):
+    # Resolver mode has no MCP server, so no MCP state directory (mcp=False).
+    for directory in (result / "input", result / "worker", *([result / "mcp"] if mcp else [])):
         private_directory(directory)
     write_json(result / "status.json", {"run_id": run_id, "arm": arm, "status": "starting",
                                         "receipt": str(result / "receipt.json")})
@@ -1364,14 +1635,16 @@ def model_visible(root, *, writable):
             raise ValueError("special_file_in_model_mount")
 
 
-def prepare_native_dispatch(state, run_id, selection, prefix, pins, base, host, port=DEFAULT_PORT):
+def prepare_native_dispatch(state, run_id, selection, prefix, pins, base, host, port=DEFAULT_PORT, *, resolver=False,
+                            session_sink=None):
     """Serialize the request offline, then build the O1 topology around the server.
 
     Order: request render with no network; the two attempt networks; the
     per-attempt key; the agent-server on <stem>-int with no published port;
     the rendered proxy config; proxy create/connect/start; the native health
     and OpenAPI gate through the proxy's loopback ingress. The caller tears
-    everything down on any failure (teardown_attempt).
+    everything down on any failure (teardown_attempt). Resolver mode renders
+    with `worker.py --request --resolver` and hands the key to `session_sink`.
     """
     from dispatch import check_server, server_command
     stem = attempt_stem(run_id, selection["arm"])
@@ -1385,6 +1658,7 @@ def prepare_native_dispatch(state, run_id, selection, prefix, pins, base, host, 
                    "--env", f"PATH={prefix}/venv/bin:" + host["variables"]["HOST_PATH"]]
     render = docker_args(pins, stem + "-request") + base + mount(result / "worker", "/run-output", False)
     render += environment + ["--entrypoint", str(prefix / "venv/bin/python"), pins["image"]["ref"], "/recipe/worker.py", "--request"]
+    render += ["--resolver"] if resolver else []
     if execute_container(render, stem + "-request", result / "request.log", 120):
         raise RuntimeError("native_request_serialization_failed")
     # Host copy made before a model can run; later worker edits cannot change it.
@@ -1393,7 +1667,7 @@ def prepare_native_dispatch(state, run_id, selection, prefix, pins, base, host, 
     private_directory(result / "server")
     model_visible(result / "server", writable=True)
     networks = create_topology(result, stem)
-    env_file, _ = generate_session_files(state, run_id, selection["arm"])
+    env_file, _ = generate_session_files(state, run_id, selection["arm"], sink=session_sink)
     check_server_env(env_file)
     mounts = base + environment + mount(result / "server", "/state/server", False) + mount(result / "worker", "/run-output", False)
     name = stem + "-server"
@@ -1410,16 +1684,51 @@ def prepare_native_dispatch(state, run_id, selection, prefix, pins, base, host, 
                                         "receipt": str(result / "receipt.json")})
 
 
-def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAULT_PORT):
+FAILURE_TYPE = re.compile(r"[A-Za-z_][A-Za-z0-9_]{0,63}")
+
+
+def resolver_failure_receipt(result, failed):
+    """Review item D5: a resolver attempt's receipt after dispatch.execute failed.
+
+    That failure path (a start POST, the 1200 s deadline, a wait or result GET, the final
+    response contract) writes only {arm, failure_stage, failure_type, ...}. This rebuilds the
+    receipt with create_receipt from the window dispatch last wrote, keeping dispatch's stage
+    and exception type name, so that its resolver section names the issue, base, lane,
+    instruction hash and gate hashes like every other receipt of the attempt.
+    """
+    window = json.loads(read_bounded(result / "window.json"))
+    stage, failure_type = failed.get("failure_stage"), failed.get("failure_type")
+    window["failure_stage"] = stage if stage in FAILURE_STAGES else "start"
+    window["failure_type"] = failure_type if isinstance(failure_type, str) and FAILURE_TYPE.fullmatch(failure_type) \
+        else None
+    window["finished_at"] = window.get("finished_at") or utc_now()
+    write_json(result / "window.json", window)
+    write_json(result / "check.json", {"upstream_resolved": None, "grader_exit_code": None})
+    receipt = create_receipt(result)
+    receipt["failure_type"] = window["failure_type"]
+    write_json(result / "receipt.json", receipt)
+    return receipt
+
+
+def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAULT_PORT, resolver=None):
+    """One attempt: SWE-bench mode, or resolver mode when `resolver` is a resolver.ResolverAttempt.
+
+    Resolver mode (RESOLVER.md "Stage 2") keeps the O1 topology, the P0-P2 probe and
+    every dispatch gate. It also checks the stage gates and G5 before any clone or
+    container, and it replaces the task clone, MCP, QMD and SWE-bench skills with an
+    anonymous pinned clone of main, AGENTS.md and the resolver skill set.
+    """
     run_id = run_id or os.environ.get("OPENHANDS_RUN_ID", "rw-openhands-e2e-" + uuid.uuid4().hex[:12])
     arm = arm or os.environ.get("OPENHANDS_ARM", "control")
     try:
-        result = begin_attempt(state, run_id, arm)
+        result = begin_attempt(state, run_id, arm, mcp=resolver is None)
     except (OSError, ValueError):
         print(json.dumps({"run_id": run_id, "arm": arm, "receipt": None, "failure_stage": "preflight",
                           "task_passed": False, "evidence_complete": False}))
         return 3
     window = {"started_at": utc_now(), "finished_at": None, "worker_exit_code": None, "arm": arm, "run_id": run_id}
+    if resolver is not None:
+        window["mode"] = "resolver"
     checked = {"upstream_resolved": None, "grader_exit_code": None}
     stem = run_id + "-" + arm
     stage = "preflight"
@@ -1427,7 +1736,18 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAUL
     native_receipt = None
     try:
         port = owned_port(port)
-        pins, host, mcp = preflight(prefix, state)
+        if resolver is not None:
+            # First, so that every receipt of the attempt names its issue and base.
+            write_json(result / "resolver-identity.json", resolver.identity())
+        pins, host, mcp = preflight(prefix, state, resolver=resolver is not None)
+        if resolver is not None:
+            # The dispatch gate's stage-gate and G5 checks, before any clone or container.
+            # verify_isolation repeats both at dispatch start, so this is stricter, never a bypass.
+            stage = "gates"
+            verify_stage_gates(state, arm, now=datetime.now(timezone.utc))
+            verify_gateway_providers(arm, gateway_allowlists(host))
+            window["stage_gates_sha256"] = optional_digest(Path(state) / STAGE_GATES)
+            stage = "preflight"
         installed = read_json(state / "installation.json")
         if installed.get("exit_code") != 0 or installed.get("requirements_sha256") != pins["requirements_sha256"]:
             raise ValueError("matching_successful_installation_required")
@@ -1442,78 +1762,98 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAUL
         window.update({k: v for k, v in selection.items() if k != "headers"})
         window["header_names"] = sorted([*selection["headers"], "x-omniroute-session", "X-Correlation-Id", "Idempotency-Key"])
         stage = "prepare"
-        original = Path(os.environ["OPENHANDS_TASK_FILE"]).resolve()
-        task_sha = os.environ["OPENHANDS_TASK_SHA256"]
-        task = load_task(original, task_sha)
-        window.update(instance_id=task["instance_id"])
-        # Frozen oracle bytes are outside every worker mount.
-        dataset = result / ("dataset" + original.suffix)
-        shutil.copyfile(original, dataset)
-        load_task(dataset, task_sha)
-        write_json(result / "task-identity.json", {
-            "instance_id": task["instance_id"], "repo": task["repo"],
-            "base_commit": task["base_commit"], "dataset_sha256": task_sha,
-        })
-        workspace = result / "workspace"
-        code = logged_command(clone_command(prefix, task, workspace), result / "clone.log", cwd=result, timeout=300)
-        if code:
-            raise RuntimeError("task_clone_failed")
-        code = logged_command(["git", "-C", str(workspace), "reset", "--hard", task["base_commit"]],
-                              result / "checkout.log", cwd=result, timeout=120)
-        if code:
-            raise RuntimeError("task_checkout_failed")
-        # SWE-bench 4.1.0 test_spec/python.py:274-292 removes future refs and
-        # reflogs before exposing the checkout. This bare-checkout adaptation
-        # drops every tag (not only newer tags) and checks surviving refs below.
-        code = logged_command(["git", "-C", str(workspace), "remote", "remove", "origin"],
-                              result / "remove-remote.log", cwd=result, timeout=30)
-        if code:
-            raise RuntimeError("task_history_isolation_failed")
-        tags = subprocess.check_output(["git", "-C", str(workspace), "tag", "--list"], text=True, timeout=30).splitlines()
-        for tag in tags:
-            subprocess.run(["git", "-C", str(workspace), "update-ref", "-d", "refs/tags/" + tag],
-                           check=True, timeout=30, stdin=subprocess.DEVNULL)
-        for phase, argv in (("reflog", ["reflog", "expire", "--expire=now", "--all"]),
-                            ("gc", ["gc", "--prune=now"])):
-            if logged_command(["git", "-C", str(workspace), *argv], result / (phase + ".log"),
-                              cwd=result, timeout=300):
+        if resolver is None:
+            original = Path(os.environ["OPENHANDS_TASK_FILE"]).resolve()
+            task_sha = os.environ["OPENHANDS_TASK_SHA256"]
+            task = load_task(original, task_sha)
+            window.update(instance_id=task["instance_id"])
+            # Frozen oracle bytes are outside every worker mount.
+            dataset = result / ("dataset" + original.suffix)
+            shutil.copyfile(original, dataset)
+            load_task(dataset, task_sha)
+            write_json(result / "task-identity.json", {
+                "instance_id": task["instance_id"], "repo": task["repo"],
+                "base_commit": task["base_commit"], "dataset_sha256": task_sha,
+            })
+            workspace = result / "workspace"
+            code = logged_command(clone_command(prefix, task, workspace), result / "clone.log", cwd=result, timeout=300)
+            if code:
+                raise RuntimeError("task_clone_failed")
+            code = logged_command(["git", "-C", str(workspace), "reset", "--hard", task["base_commit"]],
+                                  result / "checkout.log", cwd=result, timeout=120)
+            if code:
+                raise RuntimeError("task_checkout_failed")
+            # SWE-bench 4.1.0 test_spec/python.py:274-292 removes future refs and
+            # reflogs before exposing the checkout. This bare-checkout adaptation
+            # drops every tag (not only newer tags) and checks surviving refs below.
+            code = logged_command(["git", "-C", str(workspace), "remote", "remove", "origin"],
+                                  result / "remove-remote.log", cwd=result, timeout=30)
+            if code:
                 raise RuntimeError("task_history_isolation_failed")
-        refs = subprocess.check_output(["git", "-C", str(workspace), "for-each-ref", "--format=%(objectname)"],
-                                       text=True, timeout=30).splitlines()
-        if not refs or any(ref != task["base_commit"] for ref in refs):
-            raise ValueError("unexpected_task_reference")
+            tags = subprocess.check_output(["git", "-C", str(workspace), "tag", "--list"], text=True, timeout=30).splitlines()
+            for tag in tags:
+                subprocess.run(["git", "-C", str(workspace), "update-ref", "-d", "refs/tags/" + tag],
+                               check=True, timeout=30, stdin=subprocess.DEVNULL)
+            for phase, argv in (("reflog", ["reflog", "expire", "--expire=now", "--all"]),
+                                ("gc", ["gc", "--prune=now"])):
+                if logged_command(["git", "-C", str(workspace), *argv], result / (phase + ".log"),
+                                  cwd=result, timeout=300):
+                    raise RuntimeError("task_history_isolation_failed")
+            refs = subprocess.check_output(["git", "-C", str(workspace), "for-each-ref", "--format=%(objectname)"],
+                                           text=True, timeout=30).splitlines()
+            if not refs or any(ref != task["base_commit"] for ref in refs):
+                raise ValueError("unexpected_task_reference")
+        else:
+            workspace = resolver_clone(result, resolver.base_sha)
+            write_agents_md(workspace, resolver.base_sha, result / "input/agents.md")
         stage = "skills"
         stack_root = Path(os.environ.get("OPENHANDS_STACK_ROOT", str(HERE.parents[2]))).resolve()
         if not (stack_root / "blueprints/runtime-workers/skills/manifest.json").is_file():
             raise ValueError("skills_program_pending_pr")
-        install_workspace_skills(stack_root, workspace)
-        skills = workspace_skills(stack_root, workspace)
-        write_json(result / "input/skills.json", skills)
-        write_json(result / "input/mcp.json", mcp)
-        (result / "input/task.txt").write_text(worker_instruction(task))
-        for name in mcp:
-            for child in ("cache", "config", "data", "state"):
-                private_directory(result / "mcp" / name / child)
-        serena_home = result / "mcp/serena/home"
-        private_directory(serena_home)
-        shutil.copyfile(HERE / "config/serena_config.yml", serena_home / "serena_config.yml")
-        for directory in (workspace, result / "mcp", result / "worker"):
-            model_visible(directory, writable=True)
-        model_visible(result / "input", writable=False)
-        # Only the worker venv, not the grader checkout/environment, is mounted.
-        base = mount(prefix / "venv", prefix / "venv") + mount(HERE, "/recipe")
-        base += mount(result / "input", "/run-input") + mount(result / "mcp", "/state/mcp", False)
-        base += mount(workspace, "/workspace", False) + mount(workspace / ".git", "/workspace/.git")
-        base += mount(workspace / ".agents", "/workspace/.agents") + runtime_mounts(host)
-        if (workspace / "skills-lock.json").is_file():
-            base += mount(workspace / "skills-lock.json", "/workspace/skills-lock.json")
-        stage = "qmd_setup"
-        args = docker_args(pins, stem + "-qmd") + base
-        args += ["--entrypoint", str(prefix / "venv/bin/python"), pins["image"]["ref"], "/recipe/qmd-setup.py"]
-        if execute_container(args, stem + "-qmd", result / "qmd-setup.log", 900):
-            raise RuntimeError("qmd_setup_failed")
+        if resolver is None:
+            install_workspace_skills(stack_root, workspace)
+            skills = workspace_skills(stack_root, workspace)
+            write_json(result / "input/skills.json", skills)
+            write_json(result / "input/mcp.json", mcp)
+            (result / "input/task.txt").write_text(worker_instruction(task))
+            for name in mcp:
+                for child in ("cache", "config", "data", "state"):
+                    private_directory(result / "mcp" / name / child)
+            serena_home = result / "mcp/serena/home"
+            private_directory(serena_home)
+            shutil.copyfile(HERE / "config/serena_config.yml", serena_home / "serena_config.yml")
+            for directory in (workspace, result / "mcp", result / "worker"):
+                model_visible(directory, writable=True)
+            model_visible(result / "input", writable=False)
+            # Only the worker venv, not the grader checkout/environment, is mounted.
+            base = mount(prefix / "venv", prefix / "venv") + mount(HERE, "/recipe")
+            base += mount(result / "input", "/run-input") + mount(result / "mcp", "/state/mcp", False)
+            base += mount(workspace, "/workspace", False) + mount(workspace / ".git", "/workspace/.git")
+            base += mount(workspace / ".agents", "/workspace/.agents") + runtime_mounts(host)
+            if (workspace / "skills-lock.json").is_file():
+                base += mount(workspace / "skills-lock.json", "/workspace/skills-lock.json")
+            stage = "qmd_setup"
+            args = docker_args(pins, stem + "-qmd") + base
+            args += ["--entrypoint", str(prefix / "venv/bin/python"), pins["image"]["ref"], "/recipe/qmd-setup.py"]
+            if execute_container(args, stem + "-qmd", result / "qmd-setup.log", 900):
+                raise RuntimeError("qmd_setup_failed")
+        else:
+            write_json(result / "input/skills.json", install_resolver_skills(stack_root, workspace, result))
+            (result / "input/task.txt").write_text(resolver.instruction)
+            for directory in (workspace, result / "worker"):
+                model_visible(directory, writable=True)
+            model_visible(result / "input", writable=False)
+            # The SWE-bench mounts without /state/mcp, the MCP tool roots and the QMD
+            # collections, and no QMD setup: resolver mode has no MCP server.
+            base = mount(prefix / "venv", prefix / "venv") + mount(HERE, "/recipe")
+            base += mount(result / "input", "/run-input")
+            base += mount(workspace, "/workspace", False) + mount(workspace / ".git", "/workspace/.git")
+            base += mount(workspace / ".agents", "/workspace/.agents")
+            if (workspace / "skills-lock.json").is_file():
+                base += mount(workspace / "skills-lock.json", "/workspace/skills-lock.json")
         stage = "start"
-        prepare_native_dispatch(state, run_id, selection, prefix, pins, base, host, port=port)
+        prepare_native_dispatch(state, run_id, selection, prefix, pins, base, host, port=port,
+                                resolver=resolver is not None, session_sink=getattr(resolver, "session_sink", None))
         # Plan E1/G7: P0-P2 before any conversation; dispatch start re-checks the receipt.
         stage = "probe"
         if not run_probe(state, run_id, arm, prefix, pins):
@@ -1525,9 +1865,11 @@ def run(prefix, state, *, run_id=None, arm=None, prepare_only=False, port=DEFAUL
             from dispatch import execute
             with contextlib.redirect_stdout(io.StringIO()):
                 for action in ("start", "wait", "result"):
-                    if execute(action, state, run_id, arm):
+                    if execute(action, state, run_id, arm, resolver=resolver):
                         break
             native_receipt = read_json(result / "receipt.json")
+            if resolver is not None and not isinstance(native_receipt.get("resolver"), dict):
+                native_receipt = resolver_failure_receipt(result, native_receipt)
     except (Exception, KeyboardInterrupt) as exc:
         window["failure_stage"] = stage
         window["failure_type"] = type(exc).__name__

@@ -71,7 +71,7 @@
       },
       {
         "path": "scripts/native_token_ci.py",
-        "enforced_by": "scripts/native_token_ci.py:1740-1742 stops a run with 'Manifest pin changed' when PINS differs from manifests/stack.json.",
+        "enforced_by": "scripts/native_token_ci.py:1749-1751 stops a run with 'Manifest pin changed' when PINS differs from manifests/stack.json.",
         "locations": [
           {"line_at_record": 64, "kind": "checked_mirror", "match": "\"agentsview\": \"0.43.0\""},
           {"line_at_record": 635, "kind": "version_specific_guidance", "match": "(internal/telemetry/telemetry.go at v0.43.0)", "change": "Re-verify the telemetry opt-out at the new tag and update the citation."}
@@ -115,6 +115,7 @@
       }
     ],
     "not_repin_targets": [
+      {"path": "adoption/new-wsl-profile.json", "class": "dated_record", "basis": "2026-10-04", "reason": "The new distribution's profile, edited for the owner's decision of 2026-10-04 (wave 3, amendment 4 of the definitive manifest), names the agentsview pin selected for NativeStack2604. The profile is built from the definitive manifest and the install plan and does not read manifests/stack.json, so a re-pin of the stack does not edit it; the distribution's pin changes by a new dated amendment and a regenerated profile."},
       {"path": "catalogs/foundation/new-wsl-architecture-20261001.json", "class": "dated_record", "basis": "20261001", "reason": "The dated 2026-10-01 architecture edition names AgentsView 0.43.0 as an alternative of the observation layer, citing the landscape record; a dated edition is not rewritten by a re-pin."},
       {"path": "catalogs/landscape/foundation.json", "class": "dated_record", "basis": "\"checked_at\": \"2026-09-22\"", "reason": "The AgentsView why_not_default belongs to the grandfathered 2026-09-22 verdict wave (scripts/landscape.py:56-75); tools/sota-convergence/build_verdicts.py --check, run by .github/workflows/validate.yml:115, compares it with layer-verdicts-20260922.json."},
       {"path": "catalogs/sota-convergence/README.md", "class": "dated_record", "basis": "\"now\" is the GitHub latest release on 2026-09-22", "reason": "Dated 2026-09-22 convergence summary."},
@@ -129,6 +130,8 @@
       {"path": "docs/grand-catalog-handbook.md", "class": "dated_record", "basis": "frozen on **September 22, 2026**", "reason": "Handbook of the frozen 2026-09-22 catalog; it repeats the verdict-wave text."},
       {"path": "docs/landscape-freshness-notes.md", "class": "dated_record", "basis": "The observation ended at **2026-09-21 22:40:29 UTC**.", "reason": "Dated 2026-09-21 freshness observation."},
       {"path": "docs/native-dashboard-operations-resolution.md", "class": "dated_record", "basis": "Observed on 2026-09-21.", "reason": "Dated operational recovery record."},
+      {"path": "docs/new-wsl-handbook.json", "class": "dated_record", "basis": "2026-10-04", "reason": "Generated from adoption/new-wsl-profile.json and the definitive manifest by scripts/build_new_wsl_handbook.py, whose --check keeps it current; it repeats the profile's wave-3 pin and changes only when that profile does."},
+      {"path": "docs/new-wsl-handbook.md", "class": "dated_record", "basis": "2026-10-04", "reason": "Generated from adoption/new-wsl-profile.json and the definitive manifest by scripts/build_new_wsl_handbook.py, whose --check keeps it current; it repeats the profile's wave-3 pin and changes only when that profile does."},
       {"path": "docs/stack.md", "class": "dated_record", "basis": "Snapshot: September 19, 2026.", "reason": "Dated inventory snapshot. Measured 2026-09-28: its last change is 2026-09-19, no earlier re-pin changed it, and 14 of its 47 rows differ from manifests/stack.json by version (15 when the repository URL is compared)."},
       {"path": "evidence/receipts/component-history.json", "class": "dated_record", "basis": "\"kind\": \"historical_inventory\"", "reason": "Historical inventory recorded 2026-09-19."},
       {"path": "evidence/receipts/current-session-observation-20260920.json", "class": "dated_record", "basis": "20260920", "reason": "Dated receipt."},

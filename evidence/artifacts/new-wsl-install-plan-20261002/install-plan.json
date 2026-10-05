@@ -1,9 +1,9 @@
 {
   "schema_version": 2,
   "generated_at_utc": "2026-10-02T02:41:24Z",
-  "revised_at_utc": "2026-10-03T18:26:54Z",
+  "revised_at_utc": "2026-10-04T14:22:30Z",
   "base": "Ubuntu 26.04.1 WSL 2",
-  "status": "revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision. As generated, the revised commands were unrun; on 2026-10-02 (12:54Z to 13:17Z) they ran once in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution, the one meant to stay; the record of that run is private, and its public receipt comes with that distribution's acceptance. Five rows were added after the clean run, from the layer consensus of 2026-10-02, which makes 69 foundation rows: skill-discovery and skill-authoring install, and their install and acceptance commands have not run anywhere, neither in a throwaway distribution nor on the destination; research-skill, credential-custody and cross-family-review install nothing. On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable, after their measurement settled them in the manifest: they are created through the running model server, which the plan does not start, so the default run skips them and --only installs each; as plan rows their install and acceptance commands have not run anywhere (the measurement created and ran the same models in a throwaway distribution). Wave 2 (2026-10-03), 70 foundation rows: four rows install for the first time, from the wave-2 records of the layer consensus (memory-owner, code-search and context-supply as interim installs under amendment 3 of the manifest's decision rule, and the added statusline row), and research-harnesses, tobi-qmd and gpt-gateway are revised; the three skills rows run tools/adoption/install_skills.py; each interim install's function first calls interim_acknowledged, which refuses while the wave-2 batch owes an acknowledgement; none of these commands or checks has run anywhere, neither in a throwaway distribution nor on the destination.",
+  "status": "revised to the merged definitive manifest (64 foundation rows) and after the real-distribution run of the previous revision. As generated, the revised commands were unrun; on 2026-10-02 (12:54Z to 13:17Z) they ran once in a throwaway distribution (real-distribution-validation.json), and later that day, as merged to main (6652b78e), once on the destination distribution, the one meant to stay; the record of that run is private, and its public receipt comes with that distribution's acceptance. Five rows were added after the clean run, from the layer consensus of 2026-10-02, which makes 69 foundation rows: skill-discovery and skill-authoring install, and their install and acceptance commands have not run anywhere, neither in a throwaway distribution nor on the destination; research-skill, credential-custody and cross-family-review install nothing. On 2026-10-03 the two local-model rows (local-generation-model, embedding-model) became installable, after their measurement settled them in the manifest: they are created through the running model server, which the plan does not start, so the default run skips them and --only installs each; as plan rows their install and acceptance commands have not run anywhere (the measurement created and ran the same models in a throwaway distribution). Wave 2 (2026-10-03), 70 foundation rows: four rows install for the first time, from the wave-2 records of the layer consensus (memory-owner, code-search and context-supply as interim installs under amendment 3 of the manifest's decision rule, and the added statusline row), and research-harnesses, tobi-qmd and gpt-gateway are revised; the three skills rows run tools/adoption/install_skills.py; each interim install's function first calls interim_acknowledged, which refuses while the wave-2 batch owes an acknowledgement; none of these commands or checks has run anywhere, neither in a throwaway distribution nor on the destination. Wave 3 (2026-10-04), 80 foundation rows: on the owner's decision of that day (amendment 4 of the manifest's decision rule), ten owner rows are added in token-efficiency (command-output, output-compression, code-index, code-graph, repo-packing, structured-data, doc-conversion, api-docs, trace-viewer, token-lane-carriers), ccusage and session-analytics install their owner defaults, context-supply installs as an owner default without the interim gate, and code-search installs both arms of its confirmatory; none of these commands has run anywhere.",
   "owners": [
     {
       "layer": "native-clients",
@@ -796,21 +796,23 @@
     {
       "layer": "semantic-rag",
       "slot": "code-search",
-      "owner": "semble 0.6.1",
-      "repository": "https://github.com/MinishLab/semble",
+      "owner": "semble 0.6.1 + SocratiCode 1.15.0",
+      "repository": "https://github.com/MinishLab/semble; https://github.com/giancarloerra/SocratiCode",
       "release": "v0.6.1",
       "installed": true,
       "route": "uv-tool",
       "commands": [
         "uv tool install -p 3.13 'semble[mcp]==0.6.1'",
-        "\"$(uv tool dir)/semble/bin/python\" -c \"from huggingface_hub import snapshot_download; print(snapshot_download('minishlab/potion-code-16M-v2', revision='e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b', local_dir='$HOME/.local/share/semble/potion-code-16M-v2-e9d2a44c'))\""
+        "\"$(uv tool dir)/semble/bin/python\" -c \"from huggingface_hub import snapshot_download; print(snapshot_download('minishlab/potion-code-16M-v2', revision='e9d2a44ca6a05ac6685f3b23709ea57eb7352d5b', local_dir='$HOME/.local/share/semble/potion-code-16M-v2-e9d2a44c'))\"",
+        "fetch_verified https://registry.npmjs.org/socraticode/-/socraticode-1.15.0.tgz f1ec039e58013863c6e736d1c17876386b9fec1daf9abf72960fcc51c3e364d1 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/socraticode-1.15.0/socraticode-1.15.0.tgz\"",
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; npm install --global --prefix \"$e/tools/socraticode-1.15.0\" --ignore-scripts --before=2026-09-24T12:00:00Z \"$e/downloads/socraticode-1.15.0/socraticode-1.15.0.tgz\""
       ],
       "needs": {
         "sudo": false,
         "systemd_user_unit": false,
         "docker": false,
         "gpu": false,
-        "node": false,
+        "node": true,
         "python": true
       },
       "version_pinned": true,
@@ -821,7 +823,7 @@
       "service": null,
       "acceptance": {
         "post_install": {
-          "command": "semble --version\nprobe=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$probe\"' EXIT\nprintf '%s\\n' 'def parse_invoice_total(lines):' '    return sum(float(line.split(\",\")[2]) for line in lines)' > \"$probe/invoice_probe.py\"\nSEMBLE_MODEL_NAME=\"$HOME/.local/share/semble/potion-code-16M-v2-e9d2a44c\" SEMBLE_CACHE_LOCATION=\"$probe/cache\" semble search \"sum the invoice totals\" \"$probe\" --format text | grep -q invoice_probe.py",
+          "command": "semble --version\nprobe=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$probe\"' EXIT\nprintf '%s\\n' 'def parse_invoice_total(lines):' '    return sum(float(line.split(\",\")[2]) for line in lines)' > \"$probe/invoice_probe.py\"\nSEMBLE_MODEL_NAME=\"$HOME/.local/share/semble/potion-code-16M-v2-e9d2a44c\" SEMBLE_CACHE_LOCATION=\"$probe/cache\" semble search \"sum the invoice totals\" \"$probe\" --format text | grep -q invoice_probe.py\n[[ \"$(jq -r .version \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/socraticode-1.15.0/lib/node_modules/socraticode/package.json\")\" == 1.15.0 ]]",
           "kind": "smoke",
           "source": {
             "url": "https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/src/semble/cli.py#L269",
@@ -832,9 +834,10 @@
       "config_paths": [
         "$HOME/.local/share/semble/potion-code-16M-v2-e9d2a44c",
         "$HOME/.cache/semble-claude",
-        "$HOME/.cache/semble-codex"
+        "$HOME/.cache/semble-codex",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/socraticode-1.15.0"
       ],
-      "notes": "UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan. Interim install under amendment 3 of the manifest's decision rule, on the owner's decision of 2026-10-03 (decision 2 lifts the code-search hold); the frozen code-search confirmatory decides and replaces or removes it. Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2). The uv tool with the mcp extra at the exact version (README.md:41; docs/installation.md:44 pins semble[mcp]==X.Y.Z; requires-python >=3.10, classifiers up to 3.13, pyproject.toml:12-25). semble loads its model by Hub name with no revision and keys cache validity on that name, so the second command pins minishlab/potion-code-16M-v2 at e9d2a44c into a local snapshot, which SEMBLE_MODEL_NAME names (README.md:285; code-search ruling, change 4); record the resolved dependencies after the install with uv pip freeze --python \"$(uv tool dir)/semble/bin/python\". Each client gets its own absolute SEMBLE_CACHE_LOCATION (code-search ruling, change 5), and the client configuration renders both MCP entries, Codex's enabled_tools and its approval mode, and Claude Code's two exact-name allow rules (the last two only with --with-authorization-settings); never run semble install or mcp add for those entries (synthesis X11). Stdio MCP, CPU only, no port. The acceptance's first line is upstream's documented check (cli.py:269, README.md:114); the probe search after it, on a temporary file with the pinned local model and a scratch cache, is this project's integration check, not upstream acceptance (code-search ruling, change 6). Rollback, with literal targets: the ruling's change 9."
+      "notes": "UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan. Interim install under amendment 3 of the manifest's decision rule, on the owner's decision of 2026-10-03 (decision 2 lifts the code-search hold); the frozen code-search confirmatory decides and replaces or removes it. Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2). The uv tool with the mcp extra at the exact version (README.md:41; docs/installation.md:44 pins semble[mcp]==X.Y.Z; requires-python >=3.10, classifiers up to 3.13, pyproject.toml:12-25). semble loads its model by Hub name with no revision and keys cache validity on that name, so the second command pins minishlab/potion-code-16M-v2 at e9d2a44c into a local snapshot, which SEMBLE_MODEL_NAME names (README.md:285; code-search ruling, change 4); record the resolved dependencies after the install with uv pip freeze --python \"$(uv tool dir)/semble/bin/python\". Each client gets its own absolute SEMBLE_CACHE_LOCATION (code-search ruling, change 5), and the client configuration renders both MCP entries, Codex's enabled_tools and its approval mode, and Claude Code's two exact-name allow rules (the last two only with --with-authorization-settings); never run semble install or mcp add for those entries (synthesis X11). Stdio MCP, CPU only, no port. The acceptance's first line is upstream's documented check (cli.py:269, README.md:114); the probe search after it, on a temporary file with the pinned local model and a scratch cache, is this project's integration check, not upstream acceptance (code-search ruling, change 6). Rollback, with literal targets: the ruling's change 9. Wave 3 (2026-10-04, amendment 4, the owner's decision of that day): the interim installs both arms of the slot's frozen confirmatory, semble 0.6.1 and SocratiCode 1.15.0, which still decides and removes the arm it does not select; the install gate (the acknowledgements) stays. SocratiCode installs from its verified npm tarball into its own prefix with --ignore-scripts and --before=2026-09-24T12:00:00Z (recipes/README.md), the prefix the client templates run; it is never run with --version, which starts its MCP server, so its version is read from its package.json. Its server needs a Qdrant store and an embedding endpoint that no row of the new distribution installs yet; until the client configuration names both, the installed package serves nothing."
     },
     {
       "layer": "semantic-rag",
@@ -1152,26 +1155,44 @@
     {
       "layer": "token-efficiency",
       "slot": "ccusage",
-      "owner": "Not installed: the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it",
-      "repository": "",
-      "release": null,
-      "installed": false,
+      "owner": "ccusage 20.0.26",
+      "repository": "https://github.com/ccusage/ccusage",
+      "release": "v20.0.26",
+      "installed": true,
       "route": "none",
-      "commands": [],
+      "commands": [
+        "fetch_verified https://registry.npmjs.org/ccusage/-/ccusage-20.0.26.tgz b8d59c191f357d5e847c109f306cf522e60496fc9219be2ab72d201fd59eb1f2 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/ccusage-20.0.26/ccusage-20.0.26.tgz\"",
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; npm install --global --prefix \"$e/tools/ccusage-20.0.26\" \"$e/downloads/ccusage-20.0.26/ccusage-20.0.26.tgz\"; mkdir -p \"$e/bin\"; ln -sfn \"$e/tools/ccusage-20.0.26/bin/ccusage\" \"$e/bin/ccusage\""
+      ],
       "needs": {
         "sudo": false,
         "systemd_user_unit": false,
         "docker": false,
         "gpu": false,
-        "node": false,
+        "node": true,
         "python": false
       },
-      "version_pinned": false,
-      "install_source": null,
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/ccusage/ccusage/d9821088b98aa536c7a385aa1a4579d6fa02269b/apps/ccusage/README.md#L62",
+        "line": 62
+      },
       "service": null,
-      "acceptance": {},
-      "config_paths": [],
-      "notes": "the two agents' own usage commands and their OpenTelemetry token data own usage metering; neither blind Sol-ultra order picked it"
+      "acceptance": {
+        "post_install": {
+          "command": "[[ \"$(\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/ccusage\" --version)\" == \"ccusage 20.0.26\" ]]",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/adoption/pins-linux-x86_64.json#L309",
+            "line": 309
+          }
+        }
+      },
+      "config_paths": [
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/ccusage-20.0.26",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/ccusage"
+      ],
+      "notes": "UNRUN on every distribution: changed by the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner default under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md), replacing the rounds' not-installed resolution, which stays recorded on the manifest row under overturned. A read-only usage meter, never a saving: native finalized accounting stays authoritative, and reports stay token-only (--no-cost) unless every model is priced (recipes/README.md). Classification gap: no npm-local route in the permitted enum; the package installs into its own prefix under the ecosystem root. The tarball carries only the JavaScript launcher; npm resolves the @ccusage/ccusage-linux-x64 native build at install time, outside the recorded digest (adoption/pins-linux-x86_64.json)."
     },
     {
       "layer": "token-efficiency",
@@ -1217,7 +1238,7 @@
         "${CODEX_HOME:-$HOME/.codex}/config.toml",
         "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/context-mode-1.0.169"
       ],
-      "notes": "UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan. Interim install under amendment 3 of the manifest's decision rule, on the owner's pin (the wave-2 brief quotes the owner: 'context mode'), beside the slot's definitive no-install default; a preregistered end-to-end comparison decides and reports to the owner, and the pin is never removed automatically. Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2). Classification gap: the permitted enum has no plugin-marketplace or local-npm route. Claude Code: the plugin from its marketplace (README.md:72-73); a marketplace source takes no commit, so this installs the default branch head and the acceptance gates it: the installed gitCommitSha is the reviewed 6f0cc684, or a descendant whose compare lists only stats.json (context ruling, change 17; recipes/README.md 'Native context mode and hooks'). The compare uses GitHub's public API without a sign-in. The route stays the default-branch head behind that gate, not the context ruling's preferred sha-pinned hand-authored marketplace (change 17; recipes/README.md:143): the client configuration renders this marketplace by its GitHub source (the extraKnownMarketplaces.context-mode piece of claude.settings.template.json that the map wires), so a hand-authored local marketplace would be a second registration of context-mode that it does not render (synthesis X11, one writer); that registration has not been run anywhere, and the change keeps the gate until it is run and its gitCommitSha read back. Between installs nothing moves the plugin: Claude Code updates plugins only from a marketplace with auto-update on, which for a third-party marketplace is off unless autoUpdate is set on its extraKnownMarketplaces entry or its known_marketplaces.json entry (https://code.claude.com/docs/en/plugins/loading, 'Which marketplaces and plugins auto-update', read 2026-10-03); the acceptance's last lines check that neither sets it (this project's integration check). Codex: the plugin's hooks and skills at --ref 6f0cc684 (README.md:593; codex-rs/cli/src/marketplace_cmd.rs:70-72 and plugin_cmd.rs:61 at a956835d), with the plugin's own MCP server off, and one session-bound MCP server from the verified npm tarball (sha256 09c41e4c..., the repository's pin in adoption/pins-linux-x86_64.json) installed under ${ECO_ROOT}/tools/context-mode-1.0.169, the path the Codex template's entry runs (context ruling, change 7, option a; ECO_ROOT is the host template's). start.mjs can re-execute under Bun, run npm installs of its own dependencies and write the Claude configuration (context ruling, changes 6 and 8): record command -v bun and npm ls for each install surface after the first session. The six Codex hook trust entries, the server entry and the plugin settings are the client configuration's; never pass --dangerously-bypass-hook-trust. Live proof: the interim's open acceptance gates in the definitive manifest."
+      "notes": "UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan. Owner default under amendment 4 of the manifest's decision rule since wave 3 (2026-10-04, the owner's decision of that day; docs/decisions/2026-10-04-token-full-stack-owner-default.md), replacing the slot's definitive no-install default and the wave-2 interim (amendment 3, the owner's pin: the wave-2 brief quotes the owner: 'context mode'), both kept on the manifest row under overturned; its install no longer waits for the wave-2 acknowledgements; a preregistered end-to-end comparison decides and reports to the owner, and the pin is never removed automatically. Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2). Classification gap: the permitted enum has no plugin-marketplace or local-npm route. Claude Code: the plugin from its marketplace (README.md:72-73); a marketplace source takes no commit, so this installs the default branch head and the acceptance gates it: the installed gitCommitSha is the reviewed 6f0cc684, or a descendant whose compare lists only stats.json (context ruling, change 17; recipes/README.md 'Native context mode and hooks'). The compare uses GitHub's public API without a sign-in. The route stays the default-branch head behind that gate, not the context ruling's preferred sha-pinned hand-authored marketplace (change 17; recipes/README.md:143): the client configuration renders this marketplace by its GitHub source (the extraKnownMarketplaces.context-mode piece of claude.settings.template.json that the map wires), so a hand-authored local marketplace would be a second registration of context-mode that it does not render (synthesis X11, one writer); that registration has not been run anywhere, and the change keeps the gate until it is run and its gitCommitSha read back. Between installs nothing moves the plugin: Claude Code updates plugins only from a marketplace with auto-update on, which for a third-party marketplace is off unless autoUpdate is set on its extraKnownMarketplaces entry or its known_marketplaces.json entry (https://code.claude.com/docs/en/plugins/loading, 'Which marketplaces and plugins auto-update', read 2026-10-03); the acceptance's last lines check that neither sets it (this project's integration check). Codex: the plugin's hooks and skills at --ref 6f0cc684 (README.md:593; codex-rs/cli/src/marketplace_cmd.rs:70-72 and plugin_cmd.rs:61 at a956835d), with the plugin's own MCP server off, and one session-bound MCP server from the verified npm tarball (sha256 09c41e4c..., the repository's pin in adoption/pins-linux-x86_64.json) installed under ${ECO_ROOT}/tools/context-mode-1.0.169, the path the Codex template's entry runs (context ruling, change 7, option a; ECO_ROOT is the host template's). start.mjs can re-execute under Bun, run npm installs of its own dependencies and write the Claude configuration (context ruling, changes 6 and 8): record command -v bun and npm ls for each install surface after the first session. The six Codex hook trust entries, the server entry and the plugin settings are the client configuration's; never pass --dangerously-bypass-hook-trust. Live proof: the interim's open acceptance gates in the definitive manifest."
     },
     {
       "layer": "token-efficiency",
@@ -1262,6 +1283,426 @@
         "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/plugins/claude-hud"
       ],
       "notes": "UNRUN on every distribution: added from the wave-2 records of 2026-10-03, after every recorded run of this plan. Added by the wave-2 batch of the layer consensus (2026-10-03; both pull-request acknowledgements owed). Wave-2 records: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json (docs/decisions/2026-10-02-new-wsl-layer-consensus.md, section Wave 2). Classification gap: the permitted enum has no plugin-marketplace route. The marketplace at the v0.10.0 tag (commit 75683c6d) and the plugin at user scope (README.md:29-30; usage ruling, change 2). The launcher runs the highest claude-hud version in any marketplace cache (scripts/statusline.mjs:29-39), so the pin also needs marketplace auto-update off, the documented default for a third-party marketplace, and no other cached version, which the acceptance checks. Then upstream's helper runs without prompts (usage ruling, change 3): scripts/setup.mjs inspect, then install, with --shell posix, under the runtime commands/setup.md:24 finds (mise's Node here). install copies the launcher to <config dir>/plugins/claude-hud/statusline.mjs and writes statusLine as the quoted runtime, then that launcher (scripts/setup.mjs:19-32 and 69-101), before the client configuration's apply, which keeps a statusLine the file has (keep_existing). setup.mjs keeps earlier statusLine keys only when they were claude-hud's (L94), so refreshInterval 5 is added when absent (change 4). Run the helper again after every mise Node move (change 5). The acceptance runs the configured command through bash with upstream's sample input (commands/setup.md:10 and 69-77), and checks that refreshInterval is a positive integer and that the copied launcher is 0.10.0's; it no longer runs the cached launcher directly, which passed while the configured command's launcher was missing (review of 2026-10-03). The interval check takes any integer of at least 1, the settings schema's type and minimum (SchemaStore claude-code-settings.json at de76181a, L2454), not only 5: install keeps an earlier claude-hud value (L94), and the check had rejected such an installed configuration (review of 2026-10-03 at 99a2e3c6). Kept off: showCost, showDailyCost, showWeeklyCost, showAuth and showAuthUser; CLAUDE_HUD_ALLOW_EXTRA_CMD is never set. Codex needs no install: its footer's six items are a key of its configuration, which the client configuration renders."
+    },
+    {
+      "layer": "token-efficiency",
+      "slot": "command-output",
+      "owner": "RTK 0.51.0",
+      "repository": "https://github.com/rtk-ai/rtk",
+      "release": "v0.51.0",
+      "installed": true,
+      "route": "release-binary",
+      "commands": [
+        "fetch_verified https://github.com/rtk-ai/rtk/releases/download/v0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz 5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/rtk-0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz\"",
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; mkdir -p \"$e/tools/rtk-0.51.0\" \"$e/bin\"; tar -xf \"$e/downloads/rtk-0.51.0/rtk-x86_64-unknown-linux-musl.tar.gz\" -C \"$e/tools/rtk-0.51.0\"; [[ -x \"$e/tools/rtk-0.51.0/rtk\" ]]; ln -sfn \"$e/tools/rtk-0.51.0/rtk\" \"$e/bin/rtk\"",
+        "rtk_config_dir=\"$HOME/.config/rtk\"; if [[ \"${XDG_CONFIG_HOME:-}\" == /* ]]; then rtk_config_dir=\"$XDG_CONFIG_HOME/rtk\"; fi; mkdir -p -- \"$rtk_config_dir\"; if [[ ! -e \"$rtk_config_dir/config.toml\" ]]; then install -m 0600 -- \"$plan_dir/config/rtk-config.toml\" \"$rtk_config_dir/config.toml\"; elif ! cmp -s -- \"$plan_dir/config/rtk-config.toml\" \"$rtk_config_dir/config.toml\"; then printf \"Existing RTK config.toml differs; retained. Review hook exclusions before client configuration.\\n\" >&2; fi",
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; for command in \"git show HEAD:README.md | tail -20\" \"diff a b\" \"jq . x.json\" \"git branch -a\"; do rc=0; decision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"$command\" 2>&1) || rc=$?; [[ \"$rc\" -eq 1 && \"$decision\" == \"No rewrite for: $command\" ]]; done; decision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"git status\" 2>&1); [[ \"$decision\" == \"rtk git status\" ]]"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L113",
+        "line": 113
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\n[[ \"$(\"$e/bin/rtk\" --version)\" == \"rtk 0.51.0\" ]]\ncd \"$repo_root\"\nRTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" git log -n 3\nRTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" proxy git log -n 3\ne=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\nfor command in \"git show HEAD:README.md | tail -20\" \"diff a b\" \"jq . x.json\" \"git branch -a\"; do\n  rc=0\n  decision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"$command\" 2>&1) || rc=$?\n  [[ \"$rc\" -eq 1 && \"$decision\" == \"No rewrite for: $command\" ]]\ndone\ndecision=$(RTK_TELEMETRY_DISABLED=1 \"$e/bin/rtk\" hook check \"git status\" 2>&1)\n[[ \"$decision\" == \"rtk git status\" ]]",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L121",
+            "line": 121
+          }
+        }
+      },
+      "config_paths": [
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/rtk-0.51.0",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/rtk",
+        "$XDG_CONFIG_HOME/rtk/config.toml (absolute XDG_CONFIG_HOME only; otherwise $HOME/.config/rtk/config.toml)"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). The release archive goes through the plan's checksum-verified download (fetch_verified) instead of gh release download, so the plan needs no GitHub sign-in; the digest is the one adoption/pins-linux-x86_64.json records (the release's checksums.txt line and the GitHub asset digest), and the archive holds only the rtk executable (listed 2026-10-04). The pin follows main 14048b840 after PR #693: v0.51.0 requires --shell for executable positional scripts that need shell expansion; the plan uses direct arguments and hook-check inspection strings. The Linux archive was fetched again and rehashed against the v0.51.0 publisher checksums.txt on 2026-10-04. The command-output slot installs the binary and the recipe's exact five-entry [hooks] exclude_commands table at RTK's Linux config path ($XDG_CONFIG_HOME/rtk/config.toml only when XDG_CONFIG_HOME is absolute; otherwise $HOME/.config/rtk/config.toml), mode 0600, preserving existing files and warning on a difference. Native hook checks verify the four exclusions and a git status positive control before client configuration can wire the hook. The Claude Code hook and RTK_TELEMETRY_DISABLED=1 remain the client configuration's; rtk init --global --codex is never run by this plan (Codex calls rtk explicitly)."
+    },
+    {
+      "layer": "token-efficiency",
+      "slot": "output-compression",
+      "owner": "Headroom 0.37.0 (headroom-ai[mcp], MCP server only)",
+      "repository": "https://github.com/headroomlabs-ai/headroom",
+      "release": "v0.37.0",
+      "installed": true,
+      "route": "uv-tool",
+      "commands": [
+        "UV_TOOL_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools\" UV_TOOL_BIN_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin\" uv tool install --python 3.13 'headroom-ai[mcp]==0.37.0'"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": true
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/headroomlabs-ai/headroom/v0.37.0/README.md#L92",
+        "line": 92
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "HEADROOM_OFFLINE=1 HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 DO_NOT_TRACK=1 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/headroom\" --version | grep -F 0.37.0 >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/headroomlabs-ai/headroom/v0.37.0/README.md#L437",
+            "line": 437
+          }
+        }
+      },
+      "config_paths": [
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools/headroom-ai",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/headroom"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). The [mcp] extra, not the README's [all] (adoption/pins-linux-x86_64.json, the headroom pin), into the ecosystem root the client templates name (${ECO_ROOT}/bin/headroom). MCP server only: the client configuration runs headroom mcp serve --proxy-url http://127.0.0.1:1, a dead proxy URL that reroutes no model traffic, with HEADROOM_OFFLINE, HF_HUB_OFFLINE, TRANSFORMERS_OFFLINE and DO_NOT_TRACK set (docs/decisions/2026-09-25-codex-mcp-scope.md; adoption/templates/codex.config.template.toml); no proxy mode. uv checks the index's hashes; the wheel digest the pin records is not re-checked by this command."
+    },
+    {
+      "layer": "token-efficiency",
+      "slot": "code-index",
+      "owner": "jcodemunch-mcp 1.108.319",
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "release": "v1.108.319",
+      "installed": true,
+      "route": "uv-tool",
+      "commands": [
+        "UV_TOOL_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools\" UV_TOOL_BIN_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin\" uv tool install --python 3.13 jcodemunch-mcp==1.108.319"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": true
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91",
+        "line": 91
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "[[ \"$(\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp\" --version)\" == \"jcodemunch-mcp 1.108.319\" ]]",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L113",
+            "line": 113
+          }
+        }
+      },
+      "config_paths": [
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools/jcodemunch-mcp",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/jcodemunch-mcp"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). The pin is manifests/stack.json's at f77a35eb (source 8f7b34abe16fb459e0bf1c04747d584216dfe32e), installed where the project template runs ${ECO_ROOT}/bin/jcodemunch-mcp (recipes/README.md, Focused jCodeMunch retrieval); no artifact digest is recorded for it, so uv's index hashes are the only artifact check. It is registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md, which overturns the per-project rule of 2026-09-25 for this distribution), as the pinned README documents (claude mcp add -s user jcodemunch jcodemunch-mcp), with JCODEMUNCH_SHARE_SAVINGS=0 in the server's env block; jcodemunch-mcp init, which writes a prompt policy and hooks, is not run."
+    },
+    {
+      "layer": "token-efficiency",
+      "slot": "code-graph",
+      "owner": "codebase-memory-mcp 0.11.0",
+      "repository": "https://github.com/DeusData/codebase-memory-mcp",
+      "release": "v0.11.0",
+      "installed": true,
+      "route": "release-binary",
+      "commands": [
+        "fetch_verified https://github.com/DeusData/codebase-memory-mcp/releases/download/v0.11.0/codebase-memory-mcp-linux-amd64.tar.gz 032b33c1833919a2d1de67ff6367fa6ea46aee8689c86ef223c88fae3b6e4536 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/codebase-memory-mcp-0.11.0/codebase-memory-mcp-linux-amd64.tar.gz\"",
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; mkdir -p \"$e/tools/codebase-memory-mcp-0.11.0\" \"$e/bin\"; tar -xf \"$e/downloads/codebase-memory-mcp-0.11.0/codebase-memory-mcp-linux-amd64.tar.gz\" -C \"$e/tools/codebase-memory-mcp-0.11.0\"; [[ -x \"$e/tools/codebase-memory-mcp-0.11.0/codebase-memory-mcp\" ]]; ln -sfn \"$e/tools/codebase-memory-mcp-0.11.0/codebase-memory-mcp\" \"$e/bin/codebase-memory-mcp\""
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/v0.11.0/README.md#L88",
+        "line": 88
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "[[ \"$(\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/codebase-memory-mcp\" --version)\" == \"codebase-memory-mcp 0.11.0\" ]]",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/v0.11.0/src/main.c#L1236",
+            "line": 1236
+          }
+        }
+      },
+      "config_paths": [
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/codebase-memory-mcp-0.11.0",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/codebase-memory-mcp"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). The release archive goes through the plan's checksum-verified download; recipes/README.md records its sha256, and the archive holds the codebase-memory-mcp executable, LICENSE, THIRD_PARTY_NOTICES.md and an install.sh (listed 2026-10-04), all kept in the versioned prefix. Neither the archive's install.sh nor the binary's install subcommand is run: both configure the detected clients. It indexes only on an explicit index_repository call, with auto_index=false and ui_enabled=false set by the client configuration (docs/decisions/2026-09-25-codex-mcp-scope.md)."
+    },
+    {
+      "layer": "token-efficiency",
+      "slot": "repo-packing",
+      "owner": "Repomix 1.18.1",
+      "repository": "https://github.com/yamadashy/repomix",
+      "release": "v1.18.1",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "fetch_verified https://registry.npmjs.org/repomix/-/repomix-1.18.1.tgz d4d278310b33f245d4abbc7f757cc3815ff362f6d69225692f837c7dcee83c8f \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/repomix-1.18.1/repomix-1.18.1.tgz\"",
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; npm install --global --prefix \"$e/tools/repomix-1.18.1\" \"$e/downloads/repomix-1.18.1/repomix-1.18.1.tgz\"; mkdir -p \"$e/bin\"; ln -sfn \"$e/tools/repomix-1.18.1/bin/repomix\" \"$e/bin/repomix\""
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/yamadashy/repomix/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L109",
+        "line": 109
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\n[[ \"$(\"$e/bin/repomix\" --version)\" == 1.18.1 ]]\nprobe=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$probe\"' EXIT\nprintf '%s\\n' 'print(1)' > \"$probe/a.py\"\nprintf '%s\\n' 'print(2)' > \"$probe/b.py\"\n\"$e/bin/repomix\" \"$probe\" --include \"a.py,b.py\" --style xml --output \"$probe/pack.xml\"\ngrep -F a.py \"$probe/pack.xml\" >/dev/null\ngrep -F b.py \"$probe/pack.xml\" >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/yamadashy/repomix/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L609",
+            "line": 609
+          }
+        }
+      },
+      "config_paths": [
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/repomix-1.18.1",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/repomix"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). Classification gap: no npm-local route in the permitted enum; the package installs into its own prefix under the ecosystem root. The registry tarball goes through the plan's checksum-verified download against the digest adoption/pins-linux-x86_64.json records (the bootstrap's own npm route); the tarball digest does not pin its dependencies. --compress keeps a Python definition only when the first line of its signature matches, so a pack is checked against its file list and the originals are read before an edit."
+    },
+    {
+      "layer": "token-efficiency",
+      "slot": "structured-data",
+      "owner": "TOON 4.1.1 (@toon-format/cli)",
+      "repository": "https://github.com/toon-format/toon",
+      "release": "v4.1.1",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "fetch_verified https://registry.npmjs.org/@toon-format/cli/-/cli-4.1.1.tgz 93ec1d3f44a608332d6f1fa811adda4237983841baec9b165e40252f20d83ca6 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/toon-4.1.1/cli-4.1.1.tgz\"",
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; npm install --global --prefix \"$e/tools/toon-4.1.1\" \"$e/downloads/toon-4.1.1/cli-4.1.1.tgz\"; mkdir -p \"$e/bin\"; ln -sfn \"$e/tools/toon-4.1.1/bin/toon\" \"$e/bin/toon\""
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/toon-format/toon/v4.1.1/packages/cli/README.md#L11",
+        "line": 11
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\n[[ \"$(\"$e/bin/toon\" --version)\" == 4.1.1 ]]\nprobe=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$probe\"' EXIT\nprintf '%s\\n' '[{\"id\":1,\"name\":\"a\"},{\"id\":2,\"name\":\"b\"}]' > \"$probe/records.json\"\n\"$e/bin/toon\" \"$probe/records.json\" -o \"$probe/records.toon\"\n\"$e/bin/toon\" \"$probe/records.toon\" --decode --strict -o \"$probe/recovered.json\"\njq -e --slurpfile a \"$probe/records.json\" --slurpfile b \"$probe/recovered.json\" -n '$a == $b' >/dev/null",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/adoption/pins-linux-x86_64.json#L294",
+            "line": 294
+          }
+        }
+      },
+      "config_paths": [
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/toon-4.1.1",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/toon"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). Classification gap: no npm-local route in the permitted enum; the package installs into its own prefix under the ecosystem root. The registry tarball goes through the plan's checksum-verified download against the digest adoption/pins-linux-x86_64.json records. Only for uniform arrays of flat records, compact JSON otherwise, and the original JSON is kept unless the strict decode is value-equal: pull request #627 (an open draft) reports that its three BOM string round trips fail, and 4.1.1 strips a leading U+FEFF on decode (recipes/README.md)."
+    },
+    {
+      "layer": "token-efficiency",
+      "slot": "doc-conversion",
+      "owner": "MarkItDown 0.1.8",
+      "repository": "https://github.com/microsoft/markitdown",
+      "release": "v0.1.8",
+      "installed": true,
+      "route": "uv-tool",
+      "commands": [
+        "UV_TOOL_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools\" UV_TOOL_BIN_DIR=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin\" uv tool install --python 3.13 markitdown==0.1.8"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": true
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/microsoft/markitdown/v0.1.8/README.md#L62",
+        "line": 62
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\n\"$e/bin/markitdown\" --version | grep -F 0.1.8 >/dev/null\nprobe=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$probe\"' EXIT\nprintf '%s\\n' '<html><body><h1>Probe heading</h1><p>probe text</p></body></html>' > \"$probe/probe.html\"\n\"$e/bin/markitdown\" \"$probe/probe.html\" -x html -o \"$probe/probe.md\"\ngrep -F \"Probe heading\" \"$probe/probe.md\" >/dev/null\n! grep -F \"<h1>\" \"$probe/probe.md\"",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/microsoft/markitdown/v0.1.8/packages/markitdown/src/markitdown/__main__.py#L53",
+            "line": 53
+          }
+        }
+      },
+      "config_paths": [
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/python-tools/markitdown",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/markitdown"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). The base converter only (markitdown==0.1.8, as adoption/pins-linux-x86_64.json pins it), not the README's [all]; other extras are separate decisions. Give the input type (-x html or -m text/html) and check that the output keeps the required facts (recipes/README.md, the markitdown row). uv checks the index's hashes."
+    },
+    {
+      "layer": "token-efficiency",
+      "slot": "api-docs",
+      "owner": "Context Hub 0.1.4 (context-hub, the chub CLI)",
+      "repository": "https://github.com/andrewyng/context-hub",
+      "release": "v0.1.4",
+      "installed": true,
+      "route": "none",
+      "commands": [
+        "fetch_verified https://registry.npmjs.org/@aisuite/chub/-/chub-0.1.4.tgz ca9fb94a21d3b5ae3025923ded305dd11f189626da5adab48a8b947bc523888f \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/context-hub-0.1.4/chub-0.1.4.tgz\"",
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; npm install --global --prefix \"$e/tools/context-hub-0.1.4\" \"$e/downloads/context-hub-0.1.4/chub-0.1.4.tgz\"; mkdir -p \"$e/bin\"; ln -sfn \"$e/tools/context-hub-0.1.4/bin/chub\" \"$e/bin/chub\"",
+        "chub_config_dir=\"${CHUB_DIR:-$HOME/.chub}\"; mkdir -p -- \"$chub_config_dir\"; if [[ ! -e \"$chub_config_dir/config.yaml\" ]]; then install -m 0600 -- \"$plan_dir/config/chub-config.yaml\" \"$chub_config_dir/config.yaml\"; elif ! cmp -s -- \"$plan_dir/config/chub-config.yaml\" \"$chub_config_dir/config.yaml\"; then printf \"Existing Context Hub config.yaml differs; retained. Review telemetry and feedback opt-outs before ordinary sessions.\\n\" >&2; fi"
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/andrewyng/context-hub/v0.1.4/README.md#L12",
+        "line": 12
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "[[ \"$(CHUB_TELEMETRY=0 CHUB_FEEDBACK=0 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/chub\" --cli-version)\" == 0.1.4 ]]\ne=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"\nchub_source_config=\"${CHUB_DIR:-$HOME/.chub}/config.yaml\"\nchub_check_dir=$(mktemp -d \"${TMPDIR:-/tmp}/new-wsl-chub-check.XXXXXX\")\ntrap 'rm -rf -- \"$chub_check_dir\"' EXIT\ninstall -m 0600 -- \"$chub_source_config\" \"$chub_check_dir/config.yaml\"\nenv -u CHUB_TELEMETRY -u CHUB_FEEDBACK CHUB_DIR=\"$chub_check_dir\" node --input-type=module -e 'const { pathToFileURL } = await import(\"node:url\"); const { isTelemetryEnabled, isFeedbackEnabled } = await import(pathToFileURL(process.argv[1]).href); const telemetry = isTelemetryEnabled(); const feedback = isFeedbackEnabled(); console.log(\"telemetry=\" + telemetry + \" feedback=\" + feedback); if (telemetry !== false || feedback !== false) process.exit(1);' \"$e/tools/context-hub-0.1.4/lib/node_modules/@aisuite/chub/src/lib/telemetry.js\"",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/andrewyng/context-hub/v0.1.4/cli/src/index.js#L53",
+            "line": 53
+          }
+        }
+      },
+      "config_paths": [
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/context-hub-0.1.4",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/chub",
+        "${CHUB_DIR:-$HOME/.chub}/config.yaml"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). Classification gap: no npm-local route in the permitted enum; the package installs into its own prefix under the ecosystem root. The registry tarball goes through the plan's checksum-verified download against the digest adoption/pins-linux-x86_64.json records. The api-docs slot persists telemetry: false and feedback: false in ${CHUB_DIR:-$HOME/.chub}/config.yaml, mode 0600, preserving existing files and warning on a difference. Post-install acceptance copies that configuration into a scratch CHUB_DIR and requires both upstream runtime functions to return false with CHUB_TELEMETRY and CHUB_FEEDBACK unset; the pinned CLI version probe is retained. The stack-worker profile keeps CHUB_TELEMETRY=0 CHUB_FEEDBACK=0 for workers using another HOME or CHUB_DIR (recipes/README.md, Context Hub opt-out). The CLI's version flag is --cli-version (cli/src/index.js:53 at v0.1.4); the --version row of its docs/cli-reference.md does not match the code."
+    },
+    {
+      "layer": "token-efficiency",
+      "slot": "trace-viewer",
+      "owner": "otel-tui 0.7.5",
+      "repository": "https://github.com/ymtdzzz/otel-tui",
+      "release": "v0.7.5",
+      "installed": true,
+      "route": "release-binary",
+      "commands": [
+        "fetch_verified https://github.com/ymtdzzz/otel-tui/releases/download/v0.7.5/otel-tui_Linux_x86_64.tar.gz dd10bfa12b6713a2d51d7a094644ff61a2467856fc93d3acecfe741a124ca896 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/otel-tui-0.7.5/otel-tui_Linux_x86_64.tar.gz\"",
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; mkdir -p \"$e/tools/otel-tui-0.7.5\" \"$e/bin\"; tar -xf \"$e/downloads/otel-tui-0.7.5/otel-tui_Linux_x86_64.tar.gz\" -C \"$e/tools/otel-tui-0.7.5\"; [[ -x \"$e/tools/otel-tui-0.7.5/otel-tui\" ]]; ln -sfn \"$e/tools/otel-tui-0.7.5/otel-tui\" \"$e/bin/otel-tui\""
+      ],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/ymtdzzz/otel-tui/3b25779a083469b732e3c628b4a412ee05cf9948/README.md#L131",
+        "line": 131
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": "[[ \"$(\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/otel-tui\" --version)\" == \"otel-tui version 0.7.5\" ]]",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/ymtdzzz/otel-tui/3b25779a083469b732e3c628b4a412ee05cf9948/README.md#L46",
+            "line": 46
+          }
+        }
+      },
+      "config_paths": [
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/otel-tui-0.7.5",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/otel-tui"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). The release archive goes through the plan's checksum-verified download; recipes/README.md records the tested sha256, and the archive holds the otel-tui executable, LICENSE and README.md (listed 2026-10-04). It is an on-demand viewer, run on unused loopback ports and closed afterward: no service, no port held, and no change to the collector or the clients' telemetry settings."
+    },
+    {
+      "layer": "token-efficiency",
+      "slot": "token-lane-carriers",
+      "owner": "token-lanes carriers: the SubagentStart block and a SessionStart main-session block (Claude Code hooks)",
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "release": "checkout of the repository (adoption/hooks/claude/SHA256SUMS)",
+      "installed": true,
+      "route": "repository-recipe",
+      "commands": [],
+      "needs": {
+        "sudo": false,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/docs/token-session-handbook.md#L197",
+        "line": 197
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "command": null,
+          "kind": "unavailable",
+          "source": {
+            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/docs/token-session-handbook.md#L197",
+            "line": 197
+          },
+          "reason": "The client configuration writes the carriers after this plan runs (tools/adoption/new_wsl_client_config.py, then its --check); this plan installs nothing for them and has nothing to check."
+        }
+      },
+      "config_paths": [
+        "adoption/hooks/claude",
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks"
+      ],
+      "notes": "UNRUN on every distribution: added from the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner row (row kind owner_decision) under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md; evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave3). Written by the client configuration (tools/adoption/new_wsl_client_config.py and tools/adoption/install_claude_profile.py), not by this plan: the SubagentStart block (adoption/hooks/claude/token-lanes-subagent-start.py and its role blocks, byte-pinned in adoption/hooks/claude/SHA256SUMS) and the SessionStart main-session block, a separate unit that is not on main at f77a35eb. A carrier names only tools the distribution installs and wires."
     },
     {
       "layer": "observation-inference",
@@ -1723,12 +2164,15 @@
     {
       "layer": "observation-inference",
       "slot": "session-analytics",
-      "owner": "Not installed: both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set",
-      "repository": "",
-      "release": null,
-      "installed": false,
-      "route": "none",
-      "commands": [],
+      "owner": "agentsview 0.43.0 (local archive only)",
+      "repository": "https://github.com/kenn-io/agentsview",
+      "release": "v0.43.0",
+      "installed": true,
+      "route": "release-binary",
+      "commands": [
+        "fetch_verified https://github.com/kenn-io/agentsview/releases/download/v0.43.0/agentsview_0.43.0_linux_amd64.tar.gz 4520c6698772d2db7220212abf58d7d58c0966d7435f0a5ab134371f874df6d9 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/downloads/agentsview-0.43.0/agentsview_0.43.0_linux_amd64.tar.gz\"",
+        "e=\"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}\"; mkdir -p \"$e/tools/agentsview-0.43.0\" \"$e/bin\"; tar -xf \"$e/downloads/agentsview-0.43.0/agentsview_0.43.0_linux_amd64.tar.gz\" -C \"$e/tools/agentsview-0.43.0\"; [[ -x \"$e/tools/agentsview-0.43.0/agentsview\" ]]; ln -sfn \"$e/tools/agentsview-0.43.0/agentsview\" \"$e/bin/agentsview\""
+      ],
       "needs": {
         "sudo": false,
         "systemd_user_unit": false,
@@ -1737,12 +2181,27 @@
         "node": false,
         "python": false
       },
-      "version_pinned": false,
-      "install_source": null,
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/kenn-io/agentsview/v0.43.0/README.md#L25",
+        "line": 25
+      },
       "service": null,
-      "acceptance": {},
-      "config_paths": [],
-      "notes": "both agents write full local transcripts, have session pickers and usage commands and export per-session telemetry; agentsview (picked by both blind GPT orders) is the named challenger, decided by a measurement on a fixed question set"
+      "acceptance": {
+        "post_install": {
+          "command": "v=\"$(AGENTSVIEW_TELEMETRY_ENABLED=0 AGENTSVIEW_DISABLE_UPDATE_CHECK=1 \"${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/agentsview\" --version)\"\n[[ \"$v\" == \"agentsview v0.43.0 \"* ]]",
+          "kind": "smoke",
+          "source": {
+            "url": "https://raw.githubusercontent.com/kenn-io/agentsview/v0.43.0/README.md#L695",
+            "line": 695
+          }
+        }
+      },
+      "config_paths": [
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/tools/agentsview-0.43.0",
+        "${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}/bin/agentsview"
+      ],
+      "notes": "UNRUN on every distribution: changed by the wave-3 batch of 2026-10-04, after every recorded run of this plan. Owner default under amendment 4 of the manifest's decision rule, on the owner's decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md), replacing the rounds' not-installed resolution, which stays recorded on the manifest row under overturned. The release archive goes through the plan's checksum-verified download; the digest is the GitHub asset digest of v0.43.0 (read 2026-10-04), and the archive holds only the agentsview executable (listed 2026-10-04). A local archive only: an owned AGENTSVIEW_DATA_DIR, AGENTSVIEW_TELEMETRY_ENABLED=0 and AGENTSVIEW_DISABLE_UPDATE_CHECK=1 on every call (docs/token-efficiency-stack.json, the agentsview use commands); no hosted or remote sync, which needs a credential and the owner's yes. A blank archive is not evidence of zero usage."
     },
     {
       "layer": "quality-evaluation",
@@ -2855,8 +3314,8 @@
       },
       "version_pinned": true,
       "install_source": {
-        "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/bootstrap.md#L400",
-        "line": 400
+        "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/adoption/bootstrap.md#L412",
+        "line": 412
       },
       "service": null,
       "acceptance": {
@@ -2864,8 +3323,8 @@
           "command": null,
           "kind": "unavailable",
           "source": {
-            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/bootstrap.md#L400",
-            "line": 400
+            "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/14048b840425c2569e0df60a6596e94e601da15b/adoption/bootstrap.md#L412",
+            "line": 412
           },
           "reason": "Repository adoption practice; no standalone host self-test or version command was found in the cited recipe."
         }
