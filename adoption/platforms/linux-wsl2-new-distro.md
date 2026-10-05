@@ -1065,8 +1065,7 @@ sets), so each client keeps its own defaults and a value a person set is never t
 
 After the `--apply` line, run `codex login`, then `claude`, by hand (leave it once it is signed in). Then run the plan's
 after-sign-in checks one owner at a time, `bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only <slot>
---stage after_sign_in`, for `codex`, `claude-agent-sdk`, `codex-sdk-and-codex-exec-app-server`, `tobi-qmd`,
-`local-model-server`, `agent-runtime-worker` and `research-harnesses`, the owners whose plan row has that stage. No trust
+--stage after_sign_in`, for `codex`, `claude-agent-sdk`, `codex-sdk-and-codex-exec-app-server`, `sandbox-runtime-srt`, `serena`, `tobi-qmd`, `mineru`, `ccusage`, `local-model-server`, `alerting`, `session-analytics`, `inspect-ai`, `promptfoo`, `worktrunk`, `difftastic`, `gpt-gateway`, `agent-runtime-worker`, `research-harnesses`, `cross-family-review`, `mcp-inspector` and `grafana`, the owners whose plan row has that stage. This includes acceptance-only cross-family-review and named-only mcp-inspector and grafana. Run `install.sh --only mcp-inspector` first for its declared Chromium host prerequisites. No trust
 grant or hook approval of another host is carried over, so a project's own `.codex/config.toml` stays disabled until
 Codex trusts its directory; the only Codex hooks wired here are the context-mode plugin's six, whose approvals the tool
 writes once their hashes were read back and compared on this host.

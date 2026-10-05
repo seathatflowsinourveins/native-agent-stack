@@ -63,13 +63,13 @@
         "split": 5
       },
       "definitive": 30,
-      "installed": 72,
+      "installed": 73,
       "interim": 2,
       "layers": 37,
       "measurements_pending": 8,
       "measurements_returned": 3,
-      "not_installed": 28,
-      "owner_amendments": 4,
+      "not_installed": 27,
+      "owner_amendments": 5,
       "slots": 100
     },
     "metadata": {
@@ -103,6 +103,17 @@
         "date_utc": "2026-10-04",
         "meaning": "the wave-3 batch of 2026-10-04: the owner's decision that the full token-efficiency stack installs by default on the new distribution, recorded under amendment 4: ten rows added, owner defaults on three rows whose decided default installs nothing, and the code-search interim widened to both arms of its confirmatory; selection records only: no comparison named here has run, net provider savings stay unmeasured, and this record changes nothing on any host"
       },
+      "consensus_wave4": {
+        "acknowledgements": [],
+        "acknowledgements_owed": [],
+        "authority": {
+          "date_utc": "2026-10-04",
+          "kind": "owner_decision",
+          "relayed_by": "docs/decisions/2026-10-04-2604-e2e-fix-wave.md"
+        },
+        "date_utc": "2026-10-04",
+        "meaning": "the 2026-10-04 owner default on promptfoo under the owner's repository-quality rule: decide round 2 named promptfoo the owner of paired skill verification in both clients, and the fix wave's G6 recipe installs it; selection record only: no comparison named here has run"
+      },
       "counts": {
         "by_row_kind": {
           "added": 10,
@@ -122,7 +133,7 @@
           "split": 5
         },
         "definitive": 30,
-        "installed": 72,
+        "installed": 73,
         "interim": 2,
         "layers": 37,
         "slots": 100
@@ -188,7 +199,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "62b83a096aa044c9fdbb3daf769ae1672395dcefe17d1e8b746220f6fad2e0f6"
+          "sha256": "53b5dc9c43c6e40d5e9bb62c8cf9967ba61388ab1b9b2c13f77d3eaafe38b892"
         },
         "convergence": {
           "file": "convergence.json",
@@ -2928,41 +2939,75 @@
           "state": "definitive"
         },
         {
-          "installed": false,
-          "not_installed_reason": "prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it",
+          "installed": true,
+          "not_installed_reason": null,
           "record": {
             "catalog": "foundation",
-            "claude": "returned",
+            "claude": "Opus checks of both decide rounds (2026-10-04): round 1's contested check upheld its critic's switch from skill-creator to promptfoo on capability fit; round 2's verification upheld the owner and adopt true against live upstream, read at promptfoo 0.123.1 (site/docs/guides/test-agent-skills.md), and corrected the overturn comparator and the existing-evaluator premise; not a new blind judgment of this row",
             "coincides_with_lane_record": null,
-            "default": "Not installed: prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it",
+            "default": "Promptfoo 0.123.1",
             "definitive": false,
-            "gpt": "returned: 0 of 2 blind GPT samples",
-            "installs_nothing_extra": true,
+            "gpt": "decide round 2 (2026-10-04): both blind GPT-6.1 Sol deciders and the GPT Astra critic named promptfoo for paired skill verification (the deciders took it for the existing evaluator); not a new blind judgment of this row",
+            "installs_nothing_extra": false,
             "job": "prompt and provider regression tests",
-            "label": "not installed: resolved by the rule or a blind critic",
+            "label": "owner decision of 2026-10-04 (wave 4, amendment 4): the owner's repository-quality rule; installed because decide round 2 named promptfoo the owner of paired skill verification in both clients; the blind no-install decision stays under overturned; live acceptance unrun; not a blind result, consensus or measurement",
             "layer_id": "quality-evaluation",
             "measurement": null,
-            "repository": "",
-            "resolution": {
-              "by": "one blind Claude critic",
-              "covered_by": [
-                "inspect-ai"
-              ],
-              "evidence": {
-                "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
-                "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+            "overturned": {
+              "amendment": {
+                "by": "the owner's repository-quality rule of 2026-10-04 (wave 4, amendment 4)",
+                "date_utc": "2026-10-04",
+                "decision": "Promptfoo 0.123.1 installs as the owner of the row's prompt and provider regression tests and of the paired skill-version regression verification in both clients that decide round 2 gave it; skill-authoring (skill-creator) keeps authoring and authoring-time evaluation; the blind no-install decision stays under overturned."
               },
-              "first_round_record": {
+              "fields": {
                 "claude": "returned",
-                "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
-                "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
-              },
-              "former_default": {
-                "name": "Promptfoo",
-                "repository": "https://github.com/promptfoo/promptfoo"
-              },
-              "outcome": "not_installed",
-              "reason": "prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it"
+                "default": "Not installed: prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it",
+                "definitive": false,
+                "gpt": "returned: 0 of 2 blind GPT samples",
+                "installs_nothing_extra": true,
+                "label": "not installed: resolved by the rule or a blind critic",
+                "measurement": null,
+                "repository": "",
+                "resolution": {
+                  "by": "one blind Claude critic",
+                  "covered_by": [
+                    "inspect-ai"
+                  ],
+                  "evidence": {
+                    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+                    "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+                  },
+                  "first_round_record": {
+                    "claude": "returned",
+                    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+                    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+                  },
+                  "former_default": {
+                    "name": "Promptfoo",
+                    "repository": "https://github.com/promptfoo/promptfoo"
+                  },
+                  "outcome": "not_installed",
+                  "reason": "prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it"
+                },
+                "state": "resolved"
+              }
+            },
+            "repository": "https://github.com/promptfoo/promptfoo",
+            "resolution": {
+              "batch": "wave4",
+              "by": "the owner's repository-quality rule of 2026-10-04",
+              "outcome": "owner_default",
+              "overturn": "the verified overturn check: run promptfoo and Harbor v0.23.0 (--skill injection plus Rewardkit) on the same frozen skill regressions with oracle-labelled outcomes, in both clients; transfer ownership if Harbor detects strictly more true regressions, with no more false flags and complete reproducible records, scoring verification correctness separately from the agents' task success; or failed upstream fixture/control or uncached two-route gateway/fresh-client MCP acceptance; each reports to the owner and removes nothing by itself.",
+              "pin": "Promptfoo 0.123.1; source 34f74d34e140b5e17d23770dfb2340057b1936b8",
+              "reason": "Decide round 2, under the owner's repository-quality rule, named promptfoo the owner of paired skill verification in both clients (its Test Agent Skills guide drives the claude-agent-sdk and codex-sdk providers), and the Opus check upheld it. The row's decided default installed nothing, so the owner default installs Promptfoo 0.123.1 with G6's pinned recipe; Inspect AI keeps model and task evaluation.",
+              "sources": [
+                "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
+                "docs/decisions/2026-10-04-repository-quality-rule.md",
+                "evidence/artifacts/new-wsl-fix-wave-20261004/repository-quality-promptfoo.json",
+                "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md",
+                "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/guides/test-agent-skills.md",
+                "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/examples/openai-compatible-gateway/promptfooconfig.yaml"
+              ]
             },
             "row_kind": "first_round",
             "slot_id": "promptfoo",
@@ -7487,15 +7532,15 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "48a1db80f4cbbeecc975d275d4ed92e71d8f1cc06a5e918259c9aab3e52c1ab2"
+      "sha256": "8be6b5bb2981843c3beca082169211fb0bd7071abf0e5abccdc9f31632152841"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "ff94e93390875a4c6d2baa352fa7075e66acc7a966b33f1ef62338fb9988b7f3"
+      "sha256": "c496b08e4b26cd1f29b2057109028b341dc72ab17229e15f6502f57e3aa1ec53"
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "35306c969c85d2cd3234d0dae17fcdc31673e729f1c7d2cfe625d5fcd7fd4813"
+      "sha256": "0cd26fdab18ab685ea2fb0f5d996416befbade4e3bcefb0fcb0c5b2f904cc2bc"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -7607,7 +7652,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "daff08da80c204c9fbd7e0aa790676b55836d828461e0cfd9adfc11c590f672b"
+      "sha256": "9982349afc6b914a5fc5a6a085f3b343f49a9d3bb863bf5d949c1deb3b32752e"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -7631,7 +7676,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "62b83a096aa044c9fdbb3daf769ae1672395dcefe17d1e8b746220f6fad2e0f6"
+      "sha256": "53b5dc9c43c6e40d5e9bb62c8cf9967ba61388ab1b9b2c13f77d3eaafe38b892"
     }
   ],
   "stage_order": [
@@ -8276,7 +8321,7 @@
       "acceptance": {
         "command": "srt echo \"hello world\"",
         "evidence_class": "documented_upstream_example_not_executed",
-        "source": "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md"
+        "source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md#L168"
       },
       "aliases": [
         "sandbox-runtime (srt)",
@@ -8286,8 +8331,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.77",
-        "value": "cfc25049ae6b154f945ec7116725200f4153a9564752ffad2b1739a5e396b5b9"
+        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.78",
+        "value": "a9cf9e35068a4c71d2d94de8b0abe8de51c7d44daef537cc92906848ccc67240"
       },
       "documented_install": [
         {
@@ -8300,20 +8345,21 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/isolation.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md",
-        "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md"
+        "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md",
+        "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g8-base-gateway.md"
       ],
       "install": {
-        "command": "npm install -g @anthropic-ai/sandbox-runtime@0.0.77",
+        "command": "npm install -g @anthropic-ai/sandbox-runtime@0.0.78",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
         "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
-        "source": "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md"
+        "source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md#L14"
       },
       "name": "sandbox-runtime",
       "owner_layer_id": "isolation",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
       "package_id": "npm:@anthropic-ai/sandbox-runtime",
-      "pin": "0.0.77",
+      "pin": "0.0.78",
       "position": 3,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/anthropics/sandbox-runtime",
@@ -9416,15 +9462,15 @@
     {
       "acceptance": {
         "command": null,
-        "evidence_class": null,
-        "source": null
+        "evidence_class": "documented_upstream_example_not_executed",
+        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job.",
+        "source": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector-contrib/v0.162.0/extension/healthcheckextension/README.md#L96"
       },
       "aliases": [
         "OTel Collector Contrib"
       ],
       "blocking_gaps": [
-        "No complete pin-matching supported install command verified for this owned row.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
+        "G4 revised installation and native runtime acceptance are UNRUN on the destination.",
         "install: upstream-documented command and source pending in W-PROF",
         "acceptance: upstream test or documented example and source pending in W-PROF"
       ],
@@ -9432,7 +9478,7 @@
         "algorithm": "sha256",
         "kind": "artifact",
         "source": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases/tags/v0.162.0",
-        "value": "0b2b37eeb83db8e19a5f9dfc60894d058c739384a226ac085e674561befaad44"
+        "value": "fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3"
       },
       "documented_install": [
         {
@@ -9445,11 +9491,12 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/README.md"
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/README.md",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"
       ],
       "install": {
         "command": null,
-        "source": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/README.md"
+        "source": "https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/9f912d59a165ded5dec82d0e1a94c2aef54e5c57/content/en/docs/collector/install/binary/linux.md#L87"
       },
       "name": "OTel Collector Contrib",
       "owner_layer_id": "observation-inference",
@@ -9593,27 +9640,25 @@
     {
       "acceptance": {
         "command": null,
-        "evidence_class": null,
-        "source": null
+        "evidence_class": "documented_upstream_example_not_executed",
+        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job.",
+        "source": "https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/data_source.md#L657"
       },
       "aliases": [
         "Grafana"
       ],
       "blocking_gaps": [
-        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
-        "No complete pin-matching supported install command verified for this owned row.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "The first Linux release asset was Enterprise, not the selected OSS native installation. Its digest is excluded; the correct OSS install artifact remains unverified.",
-        "checksum: real SHA-256 and its source pending in W-PROF",
-        "checksum: source identity does not verify an install artifact or lockfile",
+        "G4 revised installation and native runtime acceptance are UNRUN on the destination.",
+        "The canonical definitive selection remains split/measurement-only; explicit --only grafana is required pending coordinator reconciliation.",
+        "After sign-in, the native client/SDK workload and nine affected dashboard queries must pass.",
         "install: upstream-documented command and source pending in W-PROF",
         "acceptance: upstream test or documented example and source pending in W-PROF"
       ],
       "checksum": {
-        "algorithm": "git-sha1",
-        "kind": "source",
-        "source": "https://api.github.com/repos/grafana/grafana/commits/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
-        "value": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e"
+        "algorithm": "sha256",
+        "kind": "artifact",
+        "source": "https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux#L2819",
+        "value": "6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235"
       },
       "documented_install": [
         {
@@ -9626,16 +9671,17 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md"
+        "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"
       ],
       "install": {
         "command": null,
-        "source": "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md"
+        "source": "https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux#L2819"
       },
       "name": "Grafana",
       "owner_layer_id": "observation-inference",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "13.2.2",
+      "pin": "13.2.3",
       "position": 4,
       "provisioning_status": "unprovisioned_optional_service",
       "repository": "https://github.com/grafana/grafana",
@@ -9955,14 +10001,14 @@
         "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       ],
       "install": {
-        "command": "npm install -g promptfoo@0.123.1",
+        "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only promptfoo",
         "execution_status": "UNRUN",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
         "prerequisites": [
           "Node/npm and an owned global install scope for promptfoo 0.123.1."
         ],
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
-        "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/README.md",
+        "scope": "Plan row: checksum-verified 0.123.1 tarball in an owned prefix, optional MCP SDK and both clients' native registration; run the install plan instead of an unverified global npm command.",
+        "source": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "name": "promptfoo",
@@ -10115,24 +10161,22 @@
     },
     {
       "acceptance": {
-        "command": null,
-        "evidence_class": null,
-        "source": null
+        "command": "syft alpine:latest",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "scope": "Upstream public-image smoke; destination WSL acceptance is owed. The bounded Linux check is recorded separately in the fix-wave decision.",
+        "source": "https://raw.githubusercontent.com/anchore/syft/cc326e45a6213360266dda4b30cc68095946d676/README.md#L48",
+        "source_review_ref": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md"
       },
       "aliases": [
         "Syft"
       ],
-      "blocking_gaps": [
-        "No complete pin-matching supported install command verified for this owned row.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "install: upstream-documented command and source pending in W-PROF",
-        "acceptance: upstream test or documented example and source pending in W-PROF"
-      ],
+      "blocking_gaps": [],
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://api.github.com/repos/anchore/syft/releases/tags/v1.52.0",
-        "value": "c8e13cd04f78b5cf90a70b2e45d2a4b7ec9aa0aa129d3001cd5d488103351b7f"
+        "source": "https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_checksums.txt",
+        "value": "54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860"
       },
       "documented_install": [
         {
@@ -10145,18 +10189,22 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md"
+        "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md"
       ],
       "install": {
-        "command": null,
-        "source": "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md"
+        "command": "mise use -g syft@1.54.0",
+        "execution_status": "UNRUN",
+        "scope": "The reviewed user-owned mise registry recipe used by the install plan; no destination WSL run.",
+        "source": "https://github.com/jdx/mise/blob/v2026.10.0/registry/syft.toml#L1",
+        "source_review_ref": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md"
       },
       "name": "Syft",
       "owner_layer_id": "ci-supply-chain",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "1.52.0",
+      "pin": "1.54.0",
       "position": 5,
-      "provisioning_status": "unprovisioned_user_decision",
+      "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/anchore/syft",
       "selection_sources": [
         {

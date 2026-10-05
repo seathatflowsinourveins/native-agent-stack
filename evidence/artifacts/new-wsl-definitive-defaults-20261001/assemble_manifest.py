@@ -838,7 +838,7 @@ def build():
     # batches' order, and their exceptions are stated, joined in the same order, beside the no-install rule; each batch's
     # acknowledgements, and the families whose acknowledgement is owed, are carried as recorded, with an owner batch's authority.
     amendments = {} if not batches else {
-        "no_install_rule_exception": " ".join(batch["no_install_rule_exception"] for _, batch in batches),
+        "no_install_rule_exception": " ".join(dict.fromkeys(batch["no_install_rule_exception"] for _, batch in batches)),
         **{f"consensus_{name}": {"date_utc": batch["date_utc"], "meaning": batch["meaning"],
                                  **({"authority": {key: batch["authority"][key] for key in ("kind", "date_utc", "relayed_by")}}
                                     if is_owner_batch(batch) else {}),
@@ -852,7 +852,7 @@ def build():
                          f"under the combination rule ({convergence['rule']['path']} and its amendment 1); a contested one is resolved by a blind "
                          "Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families "
                          "name it and both critics return converged, and a split is settled by the measurement the critics name."
-                         + " " + consensus["rule"] + "".join(" " + batch_rule(batch) for _, batch in batches),
+                         + " " + consensus["rule"] + "".join(" " + rule for rule in dict.fromkeys(batch_rule(batch) for _, batch in batches)),
         "decision_rule_before_amendment_2": foundation["decision_rule"],
         "no_install_rule": foundation["no_install_rule"],
         **amendments,

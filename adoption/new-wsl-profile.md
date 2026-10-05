@@ -85,6 +85,17 @@ iterating over entries. Optional services, hosted workflows, paid services and
 task-specific choices remain unprovisioned with reasons. Trading's twelve
 layers await their owner's report after October 3.
 
+The 2026-10-04 G4 observability plan repair synchronizes the Collector's **0.162.0**
+pin and Grafana OSS **13.2.3**, including the plan's published tar-archive SHA256s.
+Their entries now name the staged install and native acceptance commands in the
+[install plan](../evidence/artifacts/new-wsl-install-plan-20261002/README.md).
+The [G4 decision](../docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md)
+records the native data-directory environment, Grafana provisioning and the alert
+receiver's pending user choice. The changed recipes are **UNRUN** on a distribution.
+Historical source-review gaps remain in their original receipts. Grafana's
+canonical selection remains split; explicit `--only grafana` installs the display
+for finalization, pending the coordinator's selection reconciliation.
+
 The generator owner can import `load_profile(root)` from
 [scripts/new_wsl_profile.py](../scripts/new_wsl_profile.py), or consume its public
 JSON CLI. It returns the original contract and preserves explicit null fields
@@ -202,7 +213,7 @@ have no default-install precedence.
 | Claude Code | 2.1.284 | [reviewed install source](https://code.claude.com/docs/en/setup#install-a-specific-version) |
 | mcporter | 0.14.2 | [reviewed install source](https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md) |
 | MCP Inspector | 2.9.0 | [reviewed install source](https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/README.md) |
-| sandbox-runtime | 0.0.77 | [reviewed install source](https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md) |
+| sandbox-runtime | 0.0.78 | [reviewed install source](https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md) |
 | Worktrunk | 0.80.0 | [exact release installer and shell setup](https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0) |
 | Serena | c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | [local install from the exact source checkout](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/CONTRIBUTING.md#L70) |
 | trafilatura | 2.2.0 | [tagged installation guide](https://github.com/adbar/trafilatura/blob/v2.2.0/docs/installation.rst#L73) |
@@ -244,3 +255,38 @@ after integrating the parallel patches remain with their owner.
 The wave-1 profile adapter and prerequisite-status commands returned exit 0,
 and the existing eight `NewWslProfileCliTests` passed. These are local contract
 checks; the upstream install and source-test examples remain unrun.
+
+## G2 runtime-worker plan pin (2026-10-04)
+
+The clean-host install plan keeps its isolated OpenHands SDK/tools/dispatcher at
+v1.50.1 (`1e1390acc8788346ba4804c34323284009bf3f5e`), the definitive manifest's
+selection and comparison baseline, using constraints exported from the upstream frozen lock; the move to
+v1.51.0 is a currency follow-up with its own declared amendment. [The release](https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.50.1)
+and [the dated G2 decision](../docs/decisions/2026-10-04-2604-e2e-fix-wave-g2-mcp-workers.md)
+record the source and acceptance boundary. The architecture's
+`cross:runtime-workers` winner now records this SDK plan pin; the separate frozen
+1.49.6 container/SWE-bench recipe retains its original pin in the blueprint. This profile has no OpenHands
+component entry, so the repair adds no inventory row or shared count.
+
+Inspector already has a 2.9.0 on-demand entry here. Its pinned Web launch,
+published-package acceptance and fresh-session checks now live in the install
+plan's own row. GPT Researcher v3.7.0 and embedded DeerFlow v2.1.0 retain their
+plan pins and now have an active second-gatherer configuration and functional
+checks through both native clients. These are unexecuted plan commands; the
+coordinator's destination-host E2E must qualify them.
+
+
+## Syft clean-install pin correction (2026-10-04)
+
+The bounded [verified-E2E fix-wave decision](../docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md)
+moves this profile's Syft row from historical 1.52.0 to the install plan's
+**1.54.0**, source `cc326e45a6213360266dda4b30cc68095946d676`. The owned install
+is `mise use -g syft@1.54.0`, supported by
+[jdx/mise@v2026.10.0:registry/syft.toml:1](https://github.com/jdx/mise/blob/v2026.10.0/registry/syft.toml#L1).
+The upstream acceptance is `syft alpine:latest`, from
+[anchore/syft@cc326e45a6213360266dda4b30cc68095946d676:README.md:48](https://github.com/anchore/syft/blob/cc326e45a6213360266dda4b30cc68095946d676/README.md#L48).
+The Linux archive and its published SHA256 were rehashed in this bounded Linux
+job; that observation is separate from the still-UNRUN destination profile.
+The historical source-review references and trading receipts are retained.
+The row's two source-review command gaps are now filled. Shared aggregate counts
+and registry receipts are the coordinator's integration work.

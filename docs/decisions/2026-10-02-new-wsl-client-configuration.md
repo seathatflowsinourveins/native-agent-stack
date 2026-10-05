@@ -960,3 +960,18 @@ line 11, sentence; names Promptfoo
 A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired benchmark for skills, Harbor or Inspect for containerized agent tasks; never a self-written runner.
 
 ```
+
+
+## Addendum 2026-10-04: integrated Promptfoo owner default
+
+The [fix-wave integration](2026-10-04-2604-e2e-fix-wave.md) canonicalizes the wave-4 owner-default Promptfoo recipe (the owner's repository-quality rule) with the supported owner-batch format. The generated native instruction carriers now retain the upstream harness sentence. This projection establishes no new destination runtime acceptance. The current dropped-unit projection follows.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 58 of 58 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 65 of 65 lines stay):
+
+```text
+```

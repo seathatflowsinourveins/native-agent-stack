@@ -746,7 +746,7 @@
       "repository": "https://github.com/anthropics/sandbox-runtime",
       "layer_id": "isolation",
       "owner_layer_id": "isolation",
-      "pin": "0.0.77",
+      "pin": "0.0.78",
       "component_id": "sandbox-runtime",
       "source_selection_layer": "isolation",
       "source_selection_name": "sandbox-runtime (srt)",
@@ -758,25 +758,25 @@
       "default_install": false,
       "blocking_gaps": [],
       "artifact": {
-        "name": "sandbox-runtime-0.0.77.tgz",
-        "url": "https://registry.npmjs.org/@anthropic-ai/sandbox-runtime/-/sandbox-runtime-0.0.77.tgz"
+        "name": "sandbox-runtime-0.0.78.tgz",
+        "url": "https://registry.npmjs.org/@anthropic-ai/sandbox-runtime/-/sandbox-runtime-0.0.78.tgz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "cfc25049ae6b154f945ec7116725200f4153a9564752ffad2b1739a5e396b5b9",
-        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.77",
+        "value": "a9cf9e35068a4c71d2d94de8b0abe8de51c7d44daef537cc92906848ccc67240",
+        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.78",
         "kind": "artifact"
       },
       "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": "npm install -g @anthropic-ai/sandbox-runtime@0.0.77",
-        "source": "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md",
+        "command": "npm install -g @anthropic-ai/sandbox-runtime@0.0.78",
+        "source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md#L14",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
         "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version."
       },
       "acceptance": {
         "command": "srt echo \"hello world\"",
-        "source": "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md",
+        "source": "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md#L168",
         "evidence_class": "documented_upstream_example_not_executed"
       },
       "provisioning_status": "unprovisioned_source_review",
@@ -786,12 +786,13 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/isolation.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md",
-        "https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md"
+        "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md",
+        "https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g8-base-gateway.md"
       ],
       "release": {
-        "tag": "0.0.77",
-        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.77",
+        "tag": "0.0.78",
+        "source": "https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.78",
         "kind": "native_package_release"
       },
       "source_pin_kind": "release_or_artifact_version"
@@ -1813,7 +1814,7 @@
       "position": 11,
       "comparison_group": null,
       "default_precedence": null,
-      "default_install": false,
+      "default_install": true,
       "blocking_gaps": [],
       "artifact": {
         "name": "promptfoo-0.123.1.tgz",
@@ -1827,10 +1828,10 @@
       },
       "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": "npm install -g promptfoo@0.123.1",
-        "source": "https://github.com/promptfoo/promptfoo/blob/0.123.1/README.md",
+        "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only promptfoo",
+        "source": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
+        "scope": "Plan row: checksum-verified 0.123.1 tarball in an owned prefix, optional MCP SDK and both clients' native registration; run the install plan instead of an unverified global npm command.",
         "execution_status": "UNRUN",
         "prerequisites": [
           "Node/npm and an owned global install scope for promptfoo 0.123.1."
@@ -3468,28 +3469,28 @@
       "default_precedence": null,
       "default_install": false,
       "blocking_gaps": [
-        "No complete pin-matching supported install command verified for this owned row.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
+        "G4 revised installation and native runtime acceptance are UNRUN on the destination."
       ],
       "artifact": {
-        "name": "otelcol-contrib_0.162.0_linux_amd64.deb",
-        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.deb"
+        "name": "otelcol-contrib_0.162.0_linux_amd64.tar.gz",
+        "url": "https://github.com/open-telemetry/opentelemetry-collector-releases/releases/download/v0.162.0/otelcol-contrib_0.162.0_linux_amd64.tar.gz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "0b2b37eeb83db8e19a5f9dfc60894d058c739384a226ac085e674561befaad44",
+        "value": "fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3",
         "source": "https://api.github.com/repos/open-telemetry/opentelemetry-collector-releases/releases/tags/v0.162.0",
         "kind": "artifact"
       },
-      "integrity_observation": "published_digest_not_rehashed",
+      "integrity_observation": "published_sha256_not_rehashed_in_this_job",
       "install": {
         "command": null,
-        "source": "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/README.md"
+        "source": "https://raw.githubusercontent.com/open-telemetry/opentelemetry.io/9f912d59a165ded5dec82d0e1a94c2aef54e5c57/content/en/docs/collector/install/binary/linux.md#L87"
       },
       "acceptance": {
         "command": null,
-        "source": null,
-        "evidence_class": null
+        "source": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector-contrib/v0.162.0/extension/healthcheckextension/README.md#L96",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job."
       },
       "provisioning_status": "unprovisioned_optional_service",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -3498,7 +3499,8 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/README.md"
+        "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/README.md",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"
       ],
       "release": {
         "tag": "v0.162.0",
@@ -3622,7 +3624,7 @@
       "repository": "https://github.com/grafana/grafana",
       "layer_id": "observation-inference",
       "owner_layer_id": "observation-inference",
-      "pin": "13.2.2",
+      "pin": "13.2.3",
       "component_id": "grafana",
       "source_selection_layer": "observation-inference",
       "source_selection_name": "Grafana",
@@ -3633,30 +3635,30 @@
       "default_precedence": null,
       "default_install": false,
       "blocking_gaps": [
-        "No install artifact or native lock checksum verified; only the immutable Git source identity was checked.",
-        "No complete pin-matching supported install command verified for this owned row.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute.",
-        "The first Linux release asset was Enterprise, not the selected OSS native installation. Its digest is excluded; the correct OSS install artifact remains unverified."
+        "G4 revised installation and native runtime acceptance are UNRUN on the destination.",
+        "The canonical definitive selection remains split/measurement-only; explicit --only grafana is required pending coordinator reconciliation.",
+        "After sign-in, the native client/SDK workload and nine affected dashboard queries must pass."
       ],
       "artifact": {
-        "name": "git source at 3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
-        "url": "https://github.com/grafana/grafana/tree/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e"
+        "name": "grafana_13.2.3_36482603486_linux_amd64.tar.gz",
+        "url": "https://dl.grafana.com/grafana/release/13.2.3/grafana_13.2.3_36482603486_linux_amd64.tar.gz"
       },
       "checksum": {
-        "algorithm": "git-sha1",
-        "value": "3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
-        "source": "https://api.github.com/repos/grafana/grafana/commits/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e",
-        "kind": "source"
+        "algorithm": "sha256",
+        "value": "6107ad27016296aac38e0d7ffa8753ab540b5541ad27e94790f771289d733235",
+        "source": "https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux#L2819",
+        "kind": "artifact"
       },
-      "integrity_observation": "source_identity_only",
+      "integrity_observation": "published_sha256_not_rehashed_in_this_job",
       "install": {
         "command": null,
-        "source": "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md"
+        "source": "https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux#L2819"
       },
       "acceptance": {
         "command": null,
-        "source": null,
-        "evidence_class": null
+        "source": "https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/data_source.md#L657",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job."
       },
       "provisioning_status": "unprovisioned_optional_service",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
@@ -3665,12 +3667,13 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md"
+        "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"
       ],
       "release": {
-        "tag": "v13.2.2",
-        "source": "https://github.com/grafana/grafana/releases/tag/v13.2.2",
-        "published_at": "2026-09-15T12:21:32Z"
+        "tag": "v13.2.3",
+        "source": "https://github.com/grafana/grafana/releases/tag/v13.2.3",
+        "published_at": "2026-09-29T09:02:18Z"
       },
       "source_pin_kind": "release_or_artifact_version"
     },
@@ -4231,7 +4234,7 @@
       "repository": "https://github.com/anchore/syft",
       "layer_id": "ci-supply-chain",
       "owner_layer_id": "ci-supply-chain",
-      "pin": "1.52.0",
+      "pin": "1.54.0",
       "component_id": "syft",
       "source_selection_layer": "ci-supply-chain",
       "source_selection_name": "Syft",
@@ -4241,43 +4244,47 @@
       "comparison_group": null,
       "default_precedence": null,
       "default_install": false,
-      "blocking_gaps": [
-        "No complete pin-matching supported install command verified for this owned row.",
-        "No upstream test or documented functional acceptance command verified in this bounded source review. Version/help checks do not substitute."
-      ],
+      "blocking_gaps": [],
       "artifact": {
-        "name": "syft_1.52.0_linux_amd64.deb",
-        "url": "https://github.com/anchore/syft/releases/download/v1.52.0/syft_1.52.0_linux_amd64.deb"
+        "name": "syft_1.54.0_linux_amd64.tar.gz",
+        "url": "https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_linux_amd64.tar.gz"
       },
       "checksum": {
         "algorithm": "sha256",
-        "value": "c8e13cd04f78b5cf90a70b2e45d2a4b7ec9aa0aa129d3001cd5d488103351b7f",
-        "source": "https://api.github.com/repos/anchore/syft/releases/tags/v1.52.0",
+        "value": "54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860",
+        "source": "https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_checksums.txt",
         "kind": "artifact"
       },
-      "integrity_observation": "published_digest_not_rehashed",
+      "integrity_observation": "downloaded_and_rehashed",
       "install": {
-        "command": null,
-        "source": "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md"
+        "command": "mise use -g syft@1.54.0",
+        "source": "https://github.com/jdx/mise/blob/v2026.10.0/registry/syft.toml#L1",
+        "execution_status": "UNRUN",
+        "scope": "The reviewed user-owned mise registry recipe used by the install plan; no destination WSL run.",
+        "source_review_ref": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md"
       },
       "acceptance": {
-        "command": null,
-        "source": null,
-        "evidence_class": null
+        "command": "syft alpine:latest",
+        "source": "https://raw.githubusercontent.com/anchore/syft/cc326e45a6213360266dda4b30cc68095946d676/README.md#L48",
+        "evidence_class": "documented_upstream_example_not_executed",
+        "execution_status": "UNRUN",
+        "scope": "Upstream public-image smoke; destination WSL acceptance is owed. The bounded Linux check is recorded separately in the fix-wave decision.",
+        "source_review_ref": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md"
       },
-      "provisioning_status": "unprovisioned_user_decision",
+      "provisioning_status": "unprovisioned_source_review",
       "provisioning_reason": "Source recommendation only. No tool, service, account, model, provider, GPU or destination WSL installation/acceptance was performed.",
       "evidence_refs": [
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/ci-supply-chain.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md"
+        "https://github.com/anchore/syft/blob/02ba369d13b4248395b20a504eca94b0cab564d8/README.md",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md"
       ],
       "release": {
-        "tag": "v1.52.0",
-        "source": "https://github.com/anchore/syft/releases/tag/v1.52.0",
-        "published_at": "2026-09-17T14:38:17Z"
+        "tag": "v1.54.0",
+        "source": "https://github.com/anchore/syft/releases/tag/v1.54.0",
+        "published_at": "2026-10-01T20:54:29Z"
       },
       "source_pin_kind": "release_or_artifact_version"
     },
@@ -4638,7 +4645,7 @@
     "primary_client": "Codex",
     "accepted_codex_cli_pin": "0.160.0",
     "sdk_gate": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/626",
-    "default_profile": "Minimal native foundation only: existing bootstrap component_ids [codex, claude-code], implicit Node/uv/gh pins, and CPython 3.13.15 via uv; Git and OS utilities are prerequisites. Owner defaults of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): the token-efficiency rows RTK, Headroom, ccusage, context-mode, jcodemunch-mcp, codebase-memory-mcp, Repomix, TOON, MarkItDown, Context Hub and otel-tui, and agentsview (observation-inference), have default_install true and install through the install plan's slot rows (evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json), not through the bootstrap's component_ids; SocratiCode installs there as an arm of the code-search interim.",
+    "default_profile": "Minimal native foundation only: existing bootstrap component_ids [codex, claude-code], implicit Node/uv/gh pins, and CPython 3.13.15 via uv; Git and OS utilities are prerequisites. Owner defaults of 2026-10-04 (amendment 4 of the manifest's decision rule; docs/decisions/2026-10-04-token-full-stack-owner-default.md): the token-efficiency rows RTK, Headroom, ccusage, context-mode, jcodemunch-mcp, codebase-memory-mcp, Repomix, TOON, MarkItDown, Context Hub and otel-tui, and agentsview (observation-inference), have default_install true and install through the install plan's slot rows (evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json), not through the bootstrap's component_ids; SocratiCode installs there as an arm of the code-search interim. Wave 4 also gives Promptfoo default_install true under the repository-quality rule, through its checksum-verified owned-prefix plan row.",
     "install_dispatch": "Do not iterate over entries. The existing bootstrap installs only the named native profile and its implicit toolchain; every optional row and comparison arm is excluded. Examples are not an authorization to install.",
     "bootstrap": {
       "command": "bash adoption/bootstrap-linux.sh --profile new-wsl-clean-foundation --skip-system-packages",

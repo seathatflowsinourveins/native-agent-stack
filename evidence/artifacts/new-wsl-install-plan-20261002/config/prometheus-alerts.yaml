@@ -1,0 +1,21 @@
+# Native rule format: prometheus/prometheus@v3.15.0:docs/configuration/alerting_rules.md:15.
+# Adapted from this PR: observability/backends/templates/ecosystem-prometheus-rules.yml.example:1.
+groups:
+  - name: nativestack2604-services
+    rules:
+      - alert: EcosystemServiceUnavailable
+        expr: up{job!="acceptance-fixture"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'Local service {{ $labels.job }} is unavailable'
+      - alert: EcosystemAcceptanceTargetDown
+        expr: up{job="acceptance-fixture"} == 0
+        for: 10s
+        labels:
+          severity: test
+          scope: synthetic-acceptance
+        annotations:
+          summary: 'Controlled local acceptance target is unavailable'
