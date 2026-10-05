@@ -16691,8 +16691,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-dagu-mise-pin-move.md",
-      "sha256": "9d1b3c0982bba355a75998b3d8d535ae5ec40ba0eff6e22373360373f86eac66",
-      "bytes": 132816
+      "sha256": "c56910b3514bbd02d19ed6bc21915bc8a02de86823ac2ffc3752544bfa3246d8",
+      "bytes": 134478
     },
     {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
