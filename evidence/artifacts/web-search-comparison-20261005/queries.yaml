@@ -1,0 +1,242 @@
+[
+  {
+    "description": "q01",
+    "vars": {
+      "query": "promptfoo Python provider call_api output error",
+      "query_id": "q01",
+      "primary_patterns": "[\"^https?://www\\\\.promptfoo\\\\.dev/docs/providers/python(?:/|$)\",\"^https?://promptfoo\\\\.dev/docs/providers/python(?:/|$)\",\"^https?://github\\\\.com/promptfoo/promptfoo/blob/[^/]+/site/docs/providers/python\\\\.md(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/promptfoo/promptfoo/[^/]+/site/docs/providers/python\\\\.md(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q02",
+    "vars": {
+      "query": "promptfoo HTTP provider GET queryParams transformResponse",
+      "query_id": "q02",
+      "primary_patterns": "[\"^https?://www\\\\.promptfoo\\\\.dev/docs/providers/http(?:/|$)\",\"^https?://promptfoo\\\\.dev/docs/providers/http(?:/|$)\",\"^https?://github\\\\.com/promptfoo/promptfoo/blob/[^/]+/site/docs/providers/http\\\\.md(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/promptfoo/promptfoo/[^/]+/site/docs/providers/http\\\\.md(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q03",
+    "vars": {
+      "query": "promptfoo eval repeat no-cache max-concurrency",
+      "query_id": "q03",
+      "primary_patterns": "[\"^https?://www\\\\.promptfoo\\\\.dev/docs/configuration/reference(?:/|$)\",\"^https?://promptfoo\\\\.dev/docs/configuration/reference(?:/|$)\",\"^https?://github\\\\.com/promptfoo/promptfoo/blob/[^/]+/site/docs/configuration/reference\\\\.md(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/promptfoo/promptfoo/[^/]+/site/docs/configuration/reference\\\\.md(?:/|$)\",\"^https?://github\\\\.com/promptfoo/promptfoo/blob/[^/]+/src/commands/eval\\\\.ts(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/promptfoo/promptfoo/[^/]+/src/commands/eval\\\\.ts(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q04",
+    "vars": {
+      "query": "promptfoo Python assertions get_assert score pass",
+      "query_id": "q04",
+      "primary_patterns": "[\"^https?://www\\\\.promptfoo\\\\.dev/docs/configuration/expected-outputs/python(?:/|$)\",\"^https?://promptfoo\\\\.dev/docs/configuration/expected-outputs/python(?:/|$)\",\"^https?://github\\\\.com/promptfoo/promptfoo/blob/[^/]+/site/docs/configuration/expected-outputs/python\\\\.md(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/promptfoo/promptfoo/[^/]+/site/docs/configuration/expected-outputs/python\\\\.md(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q05",
+    "vars": {
+      "query": "promptfoo named metrics derivedMetrics",
+      "query_id": "q05",
+      "primary_patterns": "[\"^https?://www\\\\.promptfoo\\\\.dev/docs/configuration/expected-outputs(?:/|$)\",\"^https?://promptfoo\\\\.dev/docs/configuration/expected-outputs(?:/|$)\",\"^https?://github\\\\.com/promptfoo/promptfoo/blob/[^/]+/site/docs/configuration/expected-outputs/index\\\\.md(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/promptfoo/promptfoo/[^/]+/site/docs/configuration/expected-outputs/index\\\\.md(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q06",
+    "vars": {
+      "query": "DeerFlow v2.1.0 DuckDuckGo DDGS backend auto",
+      "query_id": "q06",
+      "primary_patterns": "[\"^https?://github\\\\.com/bytedance/deer-flow/blob/[^/]+/config\\\\.example\\\\.yaml(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/bytedance/deer-flow/[^/]+/config\\\\.example\\\\.yaml(?:/|$)\",\"^https?://github\\\\.com/bytedance/deer-flow/blob/[^/]+/backend/packages/harness/deerflow/community/ddg_search/tools\\\\.py(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/bytedance/deer-flow/[^/]+/backend/packages/harness/deerflow/community/ddg_search/tools\\\\.py(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q07",
+    "vars": {
+      "query": "DeerFlow v2.1.0 SearXNG web_search base_url",
+      "query_id": "q07",
+      "primary_patterns": "[\"^https?://github\\\\.com/bytedance/deer-flow/blob/[^/]+/config\\\\.example\\\\.yaml(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/bytedance/deer-flow/[^/]+/config\\\\.example\\\\.yaml(?:/|$)\",\"^https?://github\\\\.com/bytedance/deer-flow/blob/[^/]+/backend/packages/harness/deerflow/community/searxng/tools\\\\.py(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/bytedance/deer-flow/[^/]+/backend/packages/harness/deerflow/community/searxng/tools\\\\.py(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q08",
+    "vars": {
+      "query": "DeerFlow v2.1.0 Tavily web_search tool",
+      "query_id": "q08",
+      "primary_patterns": "[\"^https?://github\\\\.com/bytedance/deer-flow/blob/[^/]+/config\\\\.example\\\\.yaml(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/bytedance/deer-flow/[^/]+/config\\\\.example\\\\.yaml(?:/|$)\",\"^https?://github\\\\.com/bytedance/deer-flow/blob/[^/]+/backend/packages/harness/deerflow/community/tavily/tools\\\\.py(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/bytedance/deer-flow/[^/]+/backend/packages/harness/deerflow/community/tavily/tools\\\\.py(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q09",
+    "vars": {
+      "query": "DeerFlow v2.1.0 embedded DeerFlowClient",
+      "query_id": "q09",
+      "primary_patterns": "[\"^https?://github\\\\.com/bytedance/deer-flow/blob/[^/]+/README\\\\.md(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/bytedance/deer-flow/[^/]+/README\\\\.md(?:/|$)\",\"^https?://github\\\\.com/bytedance/deer-flow/blob/[^/]+/backend/packages/harness/deerflow/client\\\\.py(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/bytedance/deer-flow/[^/]+/backend/packages/harness/deerflow/client\\\\.py(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q10",
+    "vars": {
+      "query": "GPT Researcher v3.7.0 CLI research_report sources",
+      "query_id": "q10",
+      "primary_patterns": "[\"^https?://github\\\\.com/assafelovic/gpt-researcher/blob/[^/]+/cli\\\\.py(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/assafelovic/gpt-researcher/[^/]+/cli\\\\.py(?:/|$)\",\"^https?://github\\\\.com/assafelovic/gpt-researcher/blob/[^/]+/README\\\\.md(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/assafelovic/gpt-researcher/[^/]+/README\\\\.md(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q11",
+    "vars": {
+      "query": "SearXNG official Docker manual container deployment",
+      "query_id": "q11",
+      "primary_patterns": "[\"^https?://docs\\\\.searxng\\\\.org/admin/installation-docker\\\\.html(?:/|$)\",\"^https?://github\\\\.com/searxng/searxng/blob/[^/]+/docs/admin/installation-docker\\\\.rst(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/searxng/searxng/[^/]+/docs/admin/installation-docker\\\\.rst(?:/|$)\",\"^https?://github\\\\.com/searxng/searxng/blob/[^/]+/container/docker-compose\\\\.yml(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/searxng/searxng/[^/]+/container/docker-compose\\\\.yml(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q12",
+    "vars": {
+      "query": "SearXNG search API format json",
+      "query_id": "q12",
+      "primary_patterns": "[\"^https?://docs\\\\.searxng\\\\.org/dev/search_api\\\\.html(?:/|$)\",\"^https?://github\\\\.com/searxng/searxng/blob/[^/]+/docs/dev/search_api\\\\.rst(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/searxng/searxng/[^/]+/docs/dev/search_api\\\\.rst(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q13",
+    "vars": {
+      "query": "SearXNG search settings formats",
+      "query_id": "q13",
+      "primary_patterns": "[\"^https?://docs\\\\.searxng\\\\.org/admin/settings/settings_search\\\\.html(?:/|$)\",\"^https?://github\\\\.com/searxng/searxng/blob/[^/]+/searx/settings\\\\.yml(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/searxng/searxng/[^/]+/searx/settings\\\\.yml(?:/|$)\",\"^https?://github\\\\.com/searxng/searxng/blob/[^/]+/docs/admin/settings/settings_search\\\\.rst(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/searxng/searxng/[^/]+/docs/admin/settings/settings_search\\\\.rst(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q14",
+    "vars": {
+      "query": "SearXNG official container image version commit tag",
+      "query_id": "q14",
+      "primary_patterns": "[\"^https?://docs\\\\.searxng\\\\.org/admin/installation-docker\\\\.html(?:/|$)\",\"^https?://hub\\\\.docker\\\\.com/r/searxng/searxng(?:/|$)\",\"^https?://github\\\\.com/searxng/searxng/blob/[^/]+/container/\\\\.env\\\\.example(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/searxng/searxng/[^/]+/container/\\\\.env\\\\.example(?:/|$)\",\"^https?://github\\\\.com/searxng/searxng/blob/[^/]+/\\\\.github/workflows/container\\\\.yml(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/searxng/searxng/[^/]+/\\\\.github/workflows/container\\\\.yml(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q15",
+    "vars": {
+      "query": "SearXNG search engine request timeout settings",
+      "query_id": "q15",
+      "primary_patterns": "[\"^https?://docs\\\\.searxng\\\\.org/admin/settings/settings_outgoing\\\\.html(?:/|$)\",\"^https?://docs\\\\.searxng\\\\.org/admin/settings/settings_engines\\\\.html(?:/|$)\",\"^https?://github\\\\.com/searxng/searxng/blob/[^/]+/searx/settings\\\\.yml(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/searxng/searxng/[^/]+/searx/settings\\\\.yml(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q16",
+    "vars": {
+      "query": "promptfoo 0.123.1 release notes September 2026",
+      "query_id": "q16",
+      "primary_patterns": "[\"^https?://github\\\\.com/promptfoo/promptfoo/releases/tag/0\\\\.123\\\\.1(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q17",
+    "vars": {
+      "query": "DeerFlow v2.1.0 release notes",
+      "query_id": "q17",
+      "primary_patterns": "[\"^https?://github\\\\.com/bytedance/deer-flow/releases/tag/v2\\\\.1\\\\.0(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q18",
+    "vars": {
+      "query": "GPT Researcher v3.7.0 release notes",
+      "query_id": "q18",
+      "primary_patterns": "[\"^https?://github\\\\.com/assafelovic/gpt-researcher/releases/tag/v3\\\\.7\\\\.0(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q19",
+    "vars": {
+      "query": "OpenHands SDK v1.52.0 release October 2026",
+      "query_id": "q19",
+      "primary_patterns": "[\"^https?://github\\\\.com/OpenHands/software-agent-sdk/releases/tag/v1\\\\.52\\\\.0(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q20",
+    "vars": {
+      "query": "Harbor 0.23.0 evaluation framework release",
+      "query_id": "q20",
+      "primary_patterns": "[\"^https?://github\\\\.com/harbor-framework/harbor/releases/tag/v0\\\\.23\\\\.0(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q21",
+    "vars": {
+      "query": "Inspect AI evaluation logs metrics retries",
+      "query_id": "q21",
+      "primary_patterns": "[\"^https?://inspect\\\\.aisi\\\\.org\\\\.uk/(?:eval-logs|metrics|handling-errors|setting-limits)\\\\.html(?:\\\\.md)?(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q22",
+    "vars": {
+      "query": "Harbor AI agent evaluation sandbox benchmark",
+      "query_id": "q22",
+      "primary_patterns": "[\"^https?://docs\\\\.harborframework\\\\.com/(?:agents/pre-integrated-agents|sandboxes)(?:/|$)\",\"^https?://docs\\\\.harborframework\\\\.com/$\",\"^https?://harborframework\\\\.com/docs(?:/|$)\",\"^https?://github\\\\.com/harbor-framework/harbor/blob/[^/]+/README\\\\.md(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/harbor-framework/harbor/[^/]+/README\\\\.md(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q23",
+    "vars": {
+      "query": "LangChain open_deep_research configurable search providers",
+      "query_id": "q23",
+      "primary_patterns": "[\"^https?://github\\\\.com/langchain-ai/open_deep_research/blob/[^/]+/README\\\\.md(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/langchain-ai/open_deep_research/[^/]+/README\\\\.md(?:/|$)\",\"^https?://github\\\\.com/langchain-ai/open_deep_research/blob/[^/]+/src/open_deep_research/configuration\\\\.py(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/langchain-ai/open_deep_research/[^/]+/src/open_deep_research/configuration\\\\.py(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q24",
+    "vars": {
+      "query": "Stanford STORM research citations",
+      "query_id": "q24",
+      "primary_patterns": "[\"^https?://github\\\\.com/stanford-oval/storm/blob/[^/]+/README\\\\.md(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/stanford-oval/storm/[^/]+/README\\\\.md(?:/|$)\",\"^https?://arxiv\\\\.org/(?:abs|html)/2402\\\\.14207(?:v[0-9]+)?(?:/|$)\",\"^https?://storm-project\\\\.stanford\\\\.edu/$\"]"
+    }
+  },
+  {
+    "description": "q25",
+    "vars": {
+      "query": "DDGS Python text search backend documentation",
+      "query_id": "q25",
+      "primary_patterns": "[\"^https?://github\\\\.com/deedy5/ddgs/blob/[^/]+/README\\\\.md(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/deedy5/ddgs/[^/]+/README\\\\.md(?:/|$)\",\"^https?://pypi\\\\.org/project/ddgs(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q26",
+    "vars": {
+      "query": "GitHub Actions reusable workflow permissions",
+      "query_id": "q26",
+      "primary_patterns": "[\"^https?://docs\\\\.github\\\\.com/en/actions/how-tos/reuse-automations/reuse-workflows(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q27",
+    "vars": {
+      "query": "GitHub Actions cache-mode none",
+      "query_id": "q27",
+      "primary_patterns": "[\"^https?://docs\\\\.github\\\\.com/en/actions/reference/workflows-and-actions/workflow-syntax(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q28",
+    "vars": {
+      "query": "Docker publish container port 127.0.0.1",
+      "query_id": "q28",
+      "primary_patterns": "[\"^https?://docs\\\\.docker\\\\.com/engine/network/port-publishing(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q29",
+    "vars": {
+      "query": "uv tool install version pin",
+      "query_id": "q29",
+      "primary_patterns": "[\"^https?://docs\\\\.astral\\\\.sh/uv/guides/tools(?:/|$)\",\"^https?://github\\\\.com/astral-sh/uv/blob/[^/]+/docs/guides/tools\\\\.md(?:/|$)\",\"^https?://raw\\\\.githubusercontent\\\\.com/astral-sh/uv/[^/]+/docs/guides/tools\\\\.md(?:/|$)\"]"
+    }
+  },
+  {
+    "description": "q30",
+    "vars": {
+      "query": "OpenTelemetry Collector configuration receivers exporters",
+      "query_id": "q30",
+      "primary_patterns": "[\"^https?://opentelemetry\\\\.io/docs/collector/configuration(?:/|$)\"]"
+    }
+  }
+]

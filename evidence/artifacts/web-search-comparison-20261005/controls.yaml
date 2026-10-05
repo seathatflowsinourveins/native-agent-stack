@@ -1,0 +1,53 @@
+# promptfoo@34f74d34:site/docs/configuration/reference.md:65.
+# providerOutput bypasses provider calls; these are synthetic controls.
+description: Offline native promptfoo scoring controls
+prompts: ['{{query}}']
+providers: [echo]
+tests:
+  - description: correct native SearXNG list
+    vars: {query: fixture, primary_patterns: '["^https://docs\\.example\\.org/native/"]'}
+    providerOutput: '[{"title":"primary","url":"https://docs.example.org/native/example","snippet":"source"}]'
+  - description: correct native DDGS object
+    vars: {query: fixture, primary_patterns: '["^https://docs\\.example\\.org/native/"]'}
+    providerOutput: '{"query":"fixture","results":[{"title":"primary","url":"https://docs.example.org/native/example","content":"source"}]}'
+  - description: empty list
+    vars: {query: fixture, primary_patterns: '["^https://docs\\.example\\.org/native/"]'}
+    providerOutput: '[]'
+  - description: native error
+    vars: {query: fixture, primary_patterns: '["^https://docs\\.example\\.org/native/"]'}
+    providerOutput: '{"error":"No results found","query":"fixture"}'
+  - description: malformed JSON
+    vars: {query: fixture, primary_patterns: '["^https://docs\\.example\\.org/native/"]'}
+    providerOutput: '{'
+  - description: HTML challenge
+    vars: {query: fixture, primary_patterns: '["^https://docs\\.example\\.org/native/"]'}
+    providerOutput: '<html>CAPTCHA</html>'
+  - description: invalid URL protocol
+    vars: {query: fixture, primary_patterns: '["^https://docs\\.example\\.org/native/"]'}
+    providerOutput: '[{"title":"invalid","url":"file:///private","snippet":"fixture"}]'
+  - description: valid unrelated result
+    vars: {query: fixture, primary_patterns: '["^https://docs\\.example\\.org/native/"]'}
+    providerOutput: '[{"title":"unrelated","url":"https://unrelated.example.org/native/example","snippet":"source"}]'
+  - description: host-prefix impostor
+    vars: {query: fixture, primary_patterns: '["^https://docs\\.example\\.org/native/"]'}
+    providerOutput: '[{"title":"impostor","url":"https://docs.example.org.evil.invalid/native/example","snippet":"source"}]'
+  - description: duplicate primary hit counted once
+    vars: {query: fixture, primary_patterns: '["^https://docs\\.example\\.org/native/"]'}
+    providerOutput: '[{"title":"primary","url":"https://docs.example.org/native/example","snippet":"source"},{"title":"duplicate","url":"https://docs.example.org/native/example","snippet":"source"}]'
+  - description: primary outside five violates contract
+    vars: {query: fixture, primary_patterns: '["^https://docs\\.example\\.org/native/"]'}
+    providerOutput: '[{"title":"a","url":"https://other.example.org/a","snippet":"a"},{"title":"b","url":"https://other.example.org/b","snippet":"b"},{"title":"c","url":"https://other.example.org/c","snippet":"c"},{"title":"d","url":"https://other.example.org/d","snippet":"d"},{"title":"e","url":"https://other.example.org/e","snippet":"e"},{"title":"primary","url":"https://docs.example.org/native/example","snippet":"source"}]'
+  - description: primary at rank five
+    vars: {query: fixture, primary_patterns: '["^https://docs\\.example\\.org/native/"]'}
+    providerOutput: '[{"title":"a","url":"https://other.example.org/a","snippet":"a"},{"title":"b","url":"https://other.example.org/b","snippet":"b"},{"title":"c","url":"https://other.example.org/c","snippet":"c"},{"title":"d","url":"https://other.example.org/d","snippet":"d"},{"title":"primary","url":"https://docs.example.org/native/example","snippet":"source"}]'
+  - description: blank title and snippet
+    vars: {query: fixture, primary_patterns: '["^https://docs\\.example\\.org/native/"]'}
+    providerOutput: '[{"title":"","url":"https://docs.example.org/native/example","snippet":""}]'
+defaultTest:
+  assert:
+    - {type: javascript, value: 'file://assertions.cjs:contract', metric: contract}
+    - {type: javascript, value: 'file://assertions.cjs:usable', metric: usable}
+    - {type: javascript, value: 'file://assertions.cjs:primaryHit', metric: primary_hit_at_5}
+    - {type: javascript, value: 'file://assertions.cjs:primaryMrr', metric: primary_mrr_at_5}
+    - {type: javascript, value: 'file://assertions.cjs:unique', metric: unique_fraction}
+evaluateOptions: {maxConcurrency: 1, cache: false}

@@ -1,0 +1,12 @@
+description: Synthetic native provider-error denominator control; no web calls
+prompts: [fixture]
+providers:
+  - id: file://provider.py
+    config: {arm: offline-error, workers: 1, timeout: 60000}
+tests:
+  - vars: {query: fixture, primary_patterns: '["^https://docs\\.example\\.org/native/"]'}
+defaultTest:
+  assert:
+    - {type: javascript, value: 'file://assertions.cjs:usable', metric: usable}
+    - {type: javascript, value: 'file://assertions.cjs:primaryHit', metric: primary_hit_at_5}
+evaluateOptions: {maxConcurrency: 1, cache: false}

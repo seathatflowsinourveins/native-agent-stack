@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-05",
+  "status": "preregistered_before_live_search",
+  "original_query_pack_sha256": "54b3d7adf6e55366b80da27cb7d7b0f80ac2cbeb19fd2f4aaf1a2f443259746d",
+  "preserved": "All 30 query texts and their order; old keyed arms and plan-row gate superseded by ruling12.",
+  "slots": [
+    "cross:runtime-workers/research-harnesses",
+    "web-research/web-search-provider"
+  ],
+  "arms": [
+    "ddgs-auto",
+    "searxng"
+  ],
+  "excluded": [
+    "brave-keyed",
+    "tavily-keyed"
+  ],
+  "repeats": 3,
+  "native_batch_filters": ["^q(0[1-9]|10)$", "^q(1[1-9]|20)$", "^q(2[1-9]|30)$"],
+  "batch_rule": "Three native promptfoo batches of ten queries per repeat round; every query still receives three calls per arm. Preserve query order and alternate provider order per round. Start a batch only with at least 22 minutes before the paper window; native per-provider timeout is 60 seconds. No added retries. Failed or aborted batches cannot support adoption.",
+  "top_k": 5,
+  "provider_order": [
+    [
+      "ddgs-auto",
+      "searxng"
+    ],
+    [
+      "searxng",
+      "ddgs-auto"
+    ],
+    [
+      "ddgs-auto",
+      "searxng"
+    ]
+  ],
+  "harness": "promptfoo/promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8 (0.123.1)",
+  "deerflow_source": "bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e",
+  "ddgs_version": "9.14.1",
+  "searxng_source": "searxng/searxng@d48c4b555421e824342c51d68482dd0898e54d0f",
+  "image": "searxng/searxng:2026.10.4-d48c4b555@sha256:76b0bf285aca014c7191fc4d9234c4bfb358624ac33d8883833d496c059ec072",
+  "amd64_manifest_digest": "sha256:b0497f6e93b5e98b1a15c66b333afed176266af34f479a46ed87514f4a441eda",
+  "container_rule": "Temporary upstream rootless container, loopback, isolated config/data, default engines, JSON enabled; remove afterward. No shared install.sh or plan row.",
+  "metrics": [
+    "contract",
+    "usable",
+    "primary_hit_at_5",
+    "primary_mrr_at_5",
+    "unique_fraction",
+    "native_latency_ms"
+  ],
+  "statistics": {
+    "unit": "30 paired query means over three repeats; every error and timeout remains zero-credit in denominator",
+    "minimum_primary_hit_gain": 0.1,
+    "exact_one_sided_sign_p_below": 0.05,
+    "maximum_usable_rate_loss": 0.02,
+    "p95_ms_at_most": 30000,
+    "p95_baseline_multiplier_at_most": 2,
+    "p95_method": "nearest rank ceil(0.95*n), includes failures with native latency; missing latency prevents pass",
+    "secondary": "MRR and duplicate fraction cannot override primary gates",
+    "unknown_provider_usage": null,
+    "unknown_internal_retries": null
+  },
+  "limitations": [
+    "Software/foundation documentation corpus; source-family discovery, not answer correctness or full research quality.",
+    "q27 preserves an ambiguous cache-mode phrase: its broad official workflow reference target cannot establish that capability.",
+    "Release queries require exact tag URL; source-topic queries allow official current branch aliases, and do not prove retrieved version matches.",
+    "No candidate win does not establish equivalence; owner changes/host installation stay separate.",
+    "DDGS auto may internally use keyless engines including Brave; no separate keyed provider arm is called."
+  ],
+  "next_sweep": [
+    "official financial/regulatory sources",
+    "primary papers/PDFs",
+    "freshness-sensitive queries",
+    "ambiguous queries"
+  ],
+  "primary_target_verification": "Independent read-only review of official pinned docs and exact release API endpoints; root rechecks frozen patterns before execution."
+}

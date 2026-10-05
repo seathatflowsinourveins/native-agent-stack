@@ -1,0 +1,13 @@
+{
+  "deerflow_revision": "345f08be00c8a9495079b732a39b46aa9af1584e",
+  "deerflow_uv_lock_sha256": "3cc643cd34374384c62de7fd8cef49cc4608df01ea11eff85daeea51f5cf0d5f",
+  "python": "3.12.3",
+  "installed_libraries": {"ddgs": "9.14.1", "httpx": "0.28.1", "langchain": "1.3.14", "langchain-core": "1.4.9", "pydantic": "2.13.3"},
+  "promptfoo": "0.123.1",
+  "promptfoo_revision": "34f74d34e140b5e17d23770dfb2340057b1936b8",
+  "docker": "29.8.2",
+  "docker_security_options": ["name=seccomp,profile=builtin", "name=rootless", "name=cgroupns"],
+  "measurement_scope": "Installed unchanged DeerFlow tool calls and native promptfoo evaluation. No whole research runtime, skill, MCP or HTTP research acceptance claim.",
+  "native_control_outcomes": {"cases": 13, "expected_passing_cases": 4, "observed_passing_cases": 4, "graded_cli_exit": 100, "provider_error_cases": 1, "provider_error_named_scores": {}, "provider_error_quality_credit": 0},
+  "corrections_before_live_calls": ["Array oracle vars expand into cases; freeze all patterns as one JSON-string var.", "Native named metric scores are weighted: weight zero erased MRR/duplicate metrics, so final assertions keep positive weights. Decision gates use individual named metrics.", "Require nonblank title and native snippet/content for usable-result credit; blank control fails.", "Every error/timeout stays in full arm denominator with zero quality credit, including absent namedScores."]
+}

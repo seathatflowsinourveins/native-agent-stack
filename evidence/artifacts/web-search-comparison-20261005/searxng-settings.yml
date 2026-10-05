@@ -1,0 +1,5 @@
+# SearXNG@d48c4b55:searx/settings.yml:83-86; settings_loader.py:130-136.
+use_default_settings: true
+search:
+  formats:
+    - json
