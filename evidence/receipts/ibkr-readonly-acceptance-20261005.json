@@ -6,13 +6,13 @@
   "gate_status_after": "not_established",
   "claim": "The 2026-10-05 frozen scheduled IBKR paper read-only run passed through the official ibapi 10.45.1 client and NautilusTrader 2.0.0rc5 HistoricalInteractiveBrokersClient. The official receipt reports one DU-prefix paper account, zero positions/open orders, REALTIME SPY contract/quote data and zero noninformational errors; the native adapter resolved SPY.ARCA and returned five daily bars and 390 five-minute bars. Native process exit 0 and terminal strong_native_postcheck exit 0 corroborate clean completion of this bounded read-only sequence.",
   "north_star_action": "Qualify the selected NautilusTrader 2.0.0rc5/IBKR destination's paper read-only data access before separate order, recovery and reconciliation acceptance.",
-  "first_clean_run_scope": "First clean paired run under the 2026-10-03 frozen Monday schedule and paper Gateway container configuration; the 2026-09-23 paired read-only receipt is earlier separate evidence.",
+  "first_clean_run_scope": "First clean paired run under the independently accepted 2026-10-03 installed Monday schedule and paper Gateway container configuration; REVIEW.md binds the accepted service, timer and source manifest hashes below. The 2026-09-23 paired read-only receipt is earlier separate evidence.",
   "observed_utc": "2026-10-05T13:35:05.192621+00:00",
   "terminal_checked_at_utc": "2026-10-05T13:35:10.954043+00:00",
   "plan_path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/plan.json",
   "plan_sha256": "edd7fba5a0e5167499eb3f4d2874125f4d50427bed939f01e4375b7e0726b57c",
   "preregistered": false,
-  "plan_history": "The original step-1 plan predates the first September run but was not independently reviewed before it. The supplied October FREEZE.md and CHECKS.json record preparation on 2026-10-03; this publication does not promote them to independently reviewed preregistration.",
+  "plan_history": "The original step-1 plan predates the first September run but was not independently reviewed before it. October FREEZE.md and CHECKS.json record preparation on 2026-10-03. The retained pre-run REVIEW.md records independent Astra/max ACCEPT of the actual installed service and timer after one blocking source-manifest digest-binding finding was corrected. That review accepts scheduling, source integrity and conditional read-only readiness for the October run; it does not retroactively supply independent preregistration review for the original step-1 plan.",
   "deviations_from_plan": [
     "The maintained official ibapi and selected Nautilus probes replace the original plan's hand-rolled protocol client; no hand-rolled client was used in this run.",
     "Official client id 73 and native client id 76 replace the planned client id 71.",
@@ -125,6 +125,29 @@
         "passed": true,
         "failures": []
       },
+      "official-process.json": {
+        "kind": "local_readonly_sequencing_check",
+        "stage": "process",
+        "checked_at_utc": "2026-10-05T13:35:09.493603+00:00",
+        "broker_qualification": false,
+        "actual_wire_requests": null,
+        "provider_usage": null,
+        "phase": "official",
+        "process_exit_code": 0,
+        "passed": true,
+        "failures": []
+      },
+      "official-admission.json": {
+        "kind": "local_readonly_sequencing_check",
+        "stage": "official",
+        "checked_at_utc": "2026-10-05T13:35:09.524653+00:00",
+        "broker_qualification": false,
+        "actual_wire_requests": null,
+        "provider_usage": null,
+        "original_receipt_sha256": "0199aefb1b311b82cf3c4925644856cfe1b0ed43f1c26a03a17312a24bcca469",
+        "passed": true,
+        "failures": []
+      },
       "native-process.json": {
         "kind": "local_readonly_sequencing_check",
         "stage": "process",
@@ -165,10 +188,130 @@
     "native_admission_binds_original_nautilus_receipt": true,
     "ibapi_receipt_age_at_nautilus_generation_s": 4.435734,
     "max_ibapi_receipt_age_s": 300,
-    "wrapper_source_inference": "The frozen locked wrapper reaches strong_native_postcheck only after both six-file hash checks, date/window admission, official process exit 0, stronger official receipt admission and native process exit 0. Terminal exit 0 plus the separately retained native admission/process records corroborate completion; these are local sequencing checks, not broker qualification.",
     "broker_qualification": false,
     "actual_wire_requests": null,
-    "provider_usage": null
+    "provider_usage": null,
+    "status_record_artifacts": [
+      {
+        "name": "date-admission.json",
+        "sha256": "c35d12ee2ae5609ca5cc054e480fdabe0fd601e0cac19fac1206ed2e70f9a8cf",
+        "bytes": 250,
+        "retained_privately": true
+      },
+      {
+        "name": "official-process.json",
+        "sha256": "3013cc8a55b12a367ea1d9601ee84274623f9284c2676507c6119550fa4a7004",
+        "bytes": 302,
+        "retained_privately": true
+      },
+      {
+        "name": "official-admission.json",
+        "sha256": "b8c6b0089c337d23ebffc09650eff23b27c4a6123ad0a7c2dd8145fa707d31c9",
+        "bytes": 351,
+        "retained_privately": true
+      },
+      {
+        "name": "native-process.json",
+        "sha256": "ed88be821e718fba2f7acf7fcac10045e96c0b4942e7520913fa2d5775309954",
+        "bytes": 300,
+        "retained_privately": true
+      },
+      {
+        "name": "native-admission.json",
+        "sha256": "99502d65f3da2e0b29b19314999f6c68431863372d128a857ca971de5716fe91",
+        "bytes": 349,
+        "retained_privately": true
+      },
+      {
+        "name": "terminal-status.json",
+        "sha256": "aba863a33f5502f2262e4f2e1c22dd36d9a2a2e646830006aed455963629e7ac",
+        "bytes": 318,
+        "retained_privately": true
+      }
+    ],
+    "official_admission_binds_original_ibapi_receipt": true,
+    "retained_output_artifacts": [
+      {
+        "name": "official.stdout",
+        "sha256": "36813eb61ca3471580eb1b597fd8b88d81a8304478f58dfee71c91a0b91d2f70",
+        "bytes": 80,
+        "retained_privately": true,
+        "summary": {
+          "phase": "official",
+          "status": "passed",
+          "exit_code": 0,
+          "evidence_class": "native_paper_readonly",
+          "process_record": "official-process.json",
+          "matches_recorded_process_exit": true
+        }
+      },
+      {
+        "name": "native.stdout",
+        "sha256": "36813eb61ca3471580eb1b597fd8b88d81a8304478f58dfee71c91a0b91d2f70",
+        "bytes": 80,
+        "retained_privately": true,
+        "summary": {
+          "phase": "native",
+          "status": "passed",
+          "exit_code": 0,
+          "evidence_class": "native_paper_readonly",
+          "process_record": "native-process.json",
+          "matches_recorded_process_exit": true
+        }
+      },
+      {
+        "name": "official.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "retained_privately": true,
+        "summary": {
+          "empty": true
+        }
+      },
+      {
+        "name": "native.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "retained_privately": true,
+        "summary": {
+          "empty": true
+        }
+      },
+      {
+        "name": "service.stdout",
+        "sha256": "cb2a274573fb21d6038f5f6c672a85ea80aefbd77957484686dabc2134e62645",
+        "bytes": 1488,
+        "retained_privately": true,
+        "summary": {
+          "sha256sum_check_count": 2,
+          "matched_files_per_check": [
+            6,
+            6
+          ],
+          "all_12_reported_results": "OK",
+          "source_manifest_sha256": "0421ca438acf15b9e7094493d97b909d260d8f0bf89c0a7a9145fb8a8730a21b",
+          "original_source_locators_match_manifest": true,
+          "required_leaves": [
+            "ibapi_probe.py",
+            "nautilus_probe.py",
+            "plan.json",
+            "compose.yaml",
+            "run-readonly.sh",
+            "check-readonly.py"
+          ]
+        }
+      },
+      {
+        "name": "service.stderr",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0,
+        "retained_privately": true,
+        "summary": {
+          "empty": true
+        }
+      }
+    ],
+    "recorded_sequence": "All six retained date/process/admission/terminal records report passed with no failures. The official and native process records each report exit 0, both stronger admission records bind their respective original receipt hashes, and the terminal record reports strong_native_postcheck with exit 0. Separate client stdout summaries report passed/exit 0, client/service stderr files are empty, and retained service stdout records two complete six-file checksum passes with all 12 results OK. These recorded local sequencing facts corroborate the bounded read-only run; they are not broker qualification."
   },
   "frozen_source_verification": {
     "prepared_date_utc": "2026-10-03",
@@ -205,7 +348,7 @@
       }
     ],
     "native_command": "sha256sum --check SOURCE.SHA256SUMS",
-    "runtime_check_basis": "The frozen wrapper checks all six source/compose/helper hashes before each client phase and stops on mismatch; the recorded terminal phase and exit establish that this sequence reached its final postcheck.",
+    "runtime_check_basis": "Retained service.stdout directly records two complete six-file sha256sum checks with all 12 results OK, and its original leaf locators match the digest-bound SOURCE.SHA256SUMS manifest. All six retained local sequencing records report passed, with official/native process and terminal exit codes 0. The recorded pre-run review binds the manifest digest in the accepted installed service.",
     "publication_recheck": {
       "matched_files": 6,
       "probe_and_plan_bytes_match_public_repository": true
@@ -224,6 +367,28 @@
       {
         "name": "SOURCE.SHA256SUMS",
         "sha256": "0421ca438acf15b9e7094493d97b909d260d8f0bf89c0a7a9145fb8a8730a21b",
+        "retained_privately": true
+      },
+      {
+        "name": "REVIEW.md",
+        "sha256": "80e8806c79f90f52ea8636ee228d2359d3c92e63fdfaa361d9bb053b8985a3ef",
+        "bytes": 2398,
+        "retained_privately": true,
+        "role": "independent_pre_run_review",
+        "retained_file_date_utc": "2026-10-03"
+      },
+      {
+        "name": "ibkr-paper-readonly-20261005.service",
+        "sha256": "f615de5b1872b6c1cab5ed21d7d3f85d89cbc1cfb3103ca66a655e2fa28dc654",
+        "role": "reviewed_installed_service",
+        "binding_source": "REVIEW.md records the accepted installed service; this is distinct from the unchanged rejected staged service.",
+        "retained_privately": true
+      },
+      {
+        "name": "ibkr-paper-readonly-20261005.timer",
+        "sha256": "c9fd5cd1c590aca45bc2849ab123367e157b0c53d5a2673ea2c99705ab965294",
+        "role": "reviewed_installed_timer",
+        "binding_source": "REVIEW.md records the accepted installed timer; retained staged timer bytes independently match this hash.",
         "retained_privately": true
       }
     ]
@@ -291,6 +456,23 @@
       "exit_code": 1,
       "failure": "PackageNotFoundError",
       "correction": "A separate installed module query returned ibapi 10.45.1; the failed named distribution lookup does not establish client absence."
+    },
+    {
+      "date_utc": "2026-10-03",
+      "phase": "initial_actual_unit_source_binding_review",
+      "evidence_class": "source_review",
+      "status": "blocking_source_binding_finding",
+      "finding": "The original staged service trusted SOURCE.SHA256SUMS without binding its reviewed digest, allowing a shortened manifest to omit required source leaves.",
+      "original_staged_service_sha256": "66828bade860d4edaedded8cf9062bb7ceae549bc71498157462f1e7b8fa81ef",
+      "correction": "A native pre-start condition in the actual installed service now binds the exact reviewed SOURCE.SHA256SUMS digest before the scheduled sequence.",
+      "required_manifest_sha256": "0421ca438acf15b9e7094493d97b909d260d8f0bf89c0a7a9145fb8a8730a21b",
+      "accepted_installed_service_sha256": "f615de5b1872b6c1cab5ed21d7d3f85d89cbc1cfb3103ca66a655e2fa28dc654",
+      "subsequent_review_verdict": "ACCEPT",
+      "reviewer": "Astra",
+      "reasoning_effort": "max",
+      "review_source_artifact": "REVIEW.md",
+      "review_source_sha256": "80e8806c79f90f52ea8636ee228d2359d3c92e63fdfaa361d9bb053b8985a3ef",
+      "retention": "Original staged artifacts and the failed review remain private and unchanged, as recorded by REVIEW.md."
     }
   ],
   "blockers": [
@@ -360,15 +542,18 @@
     "Account identifiers are represented only by a count and DU-prefix boolean; no account-id hash or account balance is published.",
     "Private filesystem paths, host user names and session text are omitted. Loopback endpoint and numeric client ids are retained to match the probe contract.",
     "IB informational callback text and account type are omitted from the public ibapi projection; numeric notice codes remain.",
-    "Whole-artifact SHA256 values preserve private original provenance. Native paper_check binding remains to the private original official receipt; public projections have their own separately recorded hashes."
+    "Whole-artifact SHA256 values preserve private original provenance. Native paper_check binding remains to the private original official receipt; public projections have their own separately recorded hashes.",
+    "Client/service stdout and stderr are retained privately and published only as whole-artifact hashes, byte counts and allowlisted status/checksum summaries. Pre-run review and installed-unit bindings are summarized without raw review text, unit content or private source locators."
   ],
   "completeness_review": {
     "kind": "self",
     "checked": [
       "Both pinned client observations and raw verdicts",
-      "Native process and final sequencing status",
-      "Six frozen source bindings",
-      "Retained failed attempts and synthetic refusal controls",
+      "All six retained date/process/admission/terminal records and their artifact hashes",
+      "Client/service stdout and stderr hashes, empty stderr and two complete six-file checksum passes",
+      "Six frozen source bindings and the review-bound source manifest digest",
+      "Independent pre-run Astra/max ACCEPT and accepted installed service/timer hashes",
+      "Initial blocking source-binding review, its correction, earlier failed attempts and synthetic refusal controls",
       "Public/private hash distinction and redaction"
     ],
     "remaining_modalities": "Order behavior, recovery/reconciliation, exact account identity, full callback/log error visibility and container runtime image inspection are outside this receipt."
@@ -382,5 +567,23 @@
     "The Gateway image digest and read-only mode are bound compose configuration; the supplied run artifacts do not include an independent runtime container-image inspection or an API write-refusal trial.",
     "This is one bounded session. Actual wire-request count and provider usage remain unknown; no continuous operation, later-session, live-trading or profitability claim is made.",
     "Private frozen wrapper/checker bytes and raw outputs are retained by their hashes; public projections and repository validation are structural publication evidence, not a new broker or model run."
-  ]
+  ],
+  "preregistered_reason": "False refers to the original step-1 plan, which lacked independent review before its first use. The October 3 independent operational staging review is recorded separately and was not an independent preregistration approval of that original plan.",
+  "pre_run_review": {
+    "kind": "independent_pre_run_staging_review",
+    "date_utc": "2026-10-03",
+    "date_basis": "Retained REVIEW.md file date, before the October 5 run.",
+    "reviewer": "Astra",
+    "reasoning_effort": "max",
+    "verdict": "ACCEPT",
+    "source_artifact": "REVIEW.md",
+    "source_sha256": "80e8806c79f90f52ea8636ee228d2359d3c92e63fdfaa361d9bb053b8985a3ef",
+    "scope": "Actual installed service/timer scheduling, source integrity and conditional native read-only readiness after the source-binding correction; no broker request or broker qualification was established by this review.",
+    "source_manifest_sha256": "0421ca438acf15b9e7094493d97b909d260d8f0bf89c0a7a9145fb8a8730a21b",
+    "accepted_installed_service_sha256": "f615de5b1872b6c1cab5ed21d7d3f85d89cbc1cfb3103ca66a655e2fa28dc654",
+    "accepted_installed_timer_sha256": "c9fd5cd1c590aca45bc2849ab123367e157b0c53d5a2673ea2c99705ab965294",
+    "recorded_actual_unit_verify_exit_code": 0,
+    "blocking_finding_corrected_before_accept": true,
+    "broker_qualification": false
+  }
 }
