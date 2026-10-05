@@ -81,7 +81,7 @@ selecting retry or fresh recovery.
 
 ## Automate with Dagu
 
-[runtime-worker.yaml](runtime-worker.yaml) uses maintained Dagu 2.16.6 to run
+[runtime-worker.yaml](runtime-worker.yaml) uses maintained Dagu 2.18.2 to run
 readiness before one bounded SDK task. Export `STACK_ROOT`, `WORKER_PROJECT`,
 `WORKER_CODEX_HOME`, `WORKER_TASK_FILE`, `WORKER_BASE_URL` (normally
 `http://127.0.0.1:20128/v1`) and a new private `WORKER_RESULT` path.
@@ -157,8 +157,8 @@ hook support and optional scheduler/tool recipes keep their own execution gates.
 - [Serena selected source](https://github.com/oraios/serena/tree/c6fbd1c5932df2494ffa0020af5a9fbe80b82143),
   native `start-mcp-server` integration from the same adoption template; selected
   read tools and worker-scoped state do not qualify all language servers.
-- [Dagu 2.16.6 native graph example](https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/examples/embedded/local/workflow.yaml)
-  and [native root environment import](https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/spec/dag.go#L694-L710).
+- [Dagu 2.18.2 native graph example](https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/examples/embedded/local/workflow.yaml)
+  and [native root environment import](https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/internal/spec/dag.go).
   The repository's pinned native job-recovery recipe qualifies a separate recovery scope.
 - [Claude native workflows](https://code.claude.com/docs/en/workflows); the
   repository's vendored scripts retain their reviewed agent-lab pins and bytes.

@@ -1,4 +1,4 @@
-# Dagu 2.16.6 / 58fed633d58c1dd1319091fdb2c2f6158ecfa053.
+# Dagu 2.18.2 / 5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4.
 # Native graph/run/depends/timeout format from examples/embedded/local/workflow.yaml
 # and the existing blueprints/convergence-practice/job-recovery/run.py recipe.
 # Export only the task-specific path bindings described in enhancements.md.

@@ -1,0 +1,348 @@
+{
+  "schema_version": 1,
+  "id": "dagu-mise-pin-qualification-20261005",
+  "kind": "compatibility_attempt",
+  "recorded_at_utc": "2026-10-05T08:41:18.429262+00:00",
+  "component_ids": [
+    "dagu"
+  ],
+  "claim": "The published checksum-verified Dagu 2.18.2 and mise 2026.10.1 Linux release archives were extracted only into an owned isolated root. Native dagu version, all 23 tracked DAG validations (16 pass / 7 baseline-invalid historical archives), coordinator-enabled start-all with HTTP 200 and coordinator connection plus clean native exit/closed listeners, and mise --version/doctor with shims on PATH were observed. The source/profile pins move; existing historical recovery/model receipts retain their bytes and scopes.",
+  "limitations": [
+    "Isolated Linux x86_64 binary qualification only; no live host service/timer/config, system mise, destination WSL, model/provider/GPU or broker operation was changed or qualified.",
+    "All 23 tracked YAML DAGs were validated unchanged: 16 passed, including all four current DAGs; seven archived fixtures failed with entrypoint document must not define name. Verified Dagu 2.16.6 rejects the same seven, so these failures are retained pre-existing evidence.",
+    "The start-all smoke uses an empty owned DAG directory and no scheduled/job/model execution. Its coordinator is enabled as the repository template and upstream default require; shutdown logged one not registered service-registry update error while the native process returned 0 and both owned listeners closed.",
+    "Upstream make test and mise unit/E2E suites, installed-client route activation, real job retry/SIGKILL/reboot recovery and production data downgrade were not run.",
+    "No published advisory found applies to the selected versions; historical advisories exist, including one affecting the old mise 2026.9.18 pin. Dagu has no tag CHANGELOG; reviewed release bodies and unchanged SCHEMA_MIGRATION.md are the actual sources.",
+    "Version output and checksum matching do not prove the full integration, deployed host, source-build reproducibility, dependency-tree security or model quality."
+  ],
+  "base_commit": "4af7417b7d4db8936c0136235a86717f31d16f27",
+  "evidence_class": "upstream_example_or_native_operation",
+  "tool_versions": {
+    "dagu": "2.18.2",
+    "mise": "2026.10.1"
+  },
+  "pins": {
+    "dagu": {
+      "tag": "v2.18.2",
+      "commit": "5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4"
+    },
+    "mise": {
+      "tag": "v2026.10.1",
+      "annotated_tag": "b752bdc18b1b5961e4f9ba01a63bc3c11a0a1f79",
+      "commit": "050ce5a20287a0aafd872b1191699a5fdafff5ac"
+    }
+  },
+  "assets": [
+    {
+      "tool": "dagu",
+      "tag": "v2.18.2",
+      "published_at": "2026-10-04T03:54:02Z",
+      "archive": "dagu_2.18.2_linux_amd64.tar.gz",
+      "archive_url": "https://github.com/dagucloud/dagu/releases/download/v2.18.2/dagu_2.18.2_linux_amd64.tar.gz",
+      "upstream_sha256": "5a84c093b9ba9d02b7a60e106bb91d46f9383fd01c62bd51560e41193f05792b",
+      "checksum_source": "https://github.com/dagucloud/dagu/releases/download/v2.18.2/checksums.txt",
+      "api_asset_digest": "sha256:5a84c093b9ba9d02b7a60e106bb91d46f9383fd01c62bd51560e41193f05792b",
+      "checksum_check_command": "sha256sum --check --strict dagu-selected.sha256",
+      "checksum_check_exit": 0,
+      "checksum_check_stdout": "dagu_2.18.2_linux_amd64.tar.gz: OK\n",
+      "archive_bytes": 54238739
+    },
+    {
+      "tool": "mise",
+      "tag": "v2026.10.1",
+      "published_at": "2026-10-03T14:12:48Z",
+      "archive": "mise-v2026.10.1-linux-x64.tar.gz",
+      "archive_url": "https://github.com/jdx/mise/releases/download/v2026.10.1/mise-v2026.10.1-linux-x64.tar.gz",
+      "upstream_sha256": "9b92aa39b8fde54b28c8f974a68f2501925a1523d6c05a52719145df3acdd75a",
+      "checksum_source": "https://github.com/jdx/mise/releases/download/v2026.10.1/SHASUMS256.txt",
+      "api_asset_digest": "sha256:9b92aa39b8fde54b28c8f974a68f2501925a1523d6c05a52719145df3acdd75a",
+      "checksum_check_command": "sha256sum --check --strict mise-selected.sha256",
+      "checksum_check_exit": 0,
+      "checksum_check_stdout": "mise-v2026.10.1-linux-x64.tar.gz: OK\n",
+      "archive_bytes": 51221451
+    }
+  ],
+  "recipe_sources": [
+    "blueprints/us-equities/hosting/README.md",
+    "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/scripts/installer.sh#L1520",
+    "https://github.com/jdx/mise/blob/050ce5a20287a0aafd872b1191699a5fdafff5ac/docs/installing-mise.md#L396"
+  ],
+  "installation": [
+    {
+      "command": "tar -xzf dagu_2.18.2_linux_amd64.tar.gz -C $QUAL_ROOT/tools/dagu-2.18.2",
+      "exit": 0
+    },
+    {
+      "command": "tar -xzf mise-v2026.10.1-linux-x64.tar.gz -C $QUAL_ROOT/tools/mise-2026.10.1",
+      "exit": 0
+    }
+  ],
+  "native_commands": [
+    {
+      "command": "dagu version",
+      "exit": 0,
+      "output": "2.18.2\n"
+    },
+    {
+      "command": "dagu start-all --help",
+      "exit": 0,
+      "output": "Simultaneously start the web UI server, scheduler, and optionally coordinator in a single command.\n\nThis convenience command combines the functionality of 'dagu server', 'dagu scheduler',\nand optionally 'dagu coordinator' into a single process. The web UI provides the management\ninterface, the scheduler handles automated DAG-run execution based on defined schedules,\nand the coordinator (when enabled) manages distributed task execution across workers.\n\nThe coordinator is enabled by default and can be disabled by setting coordinator.enabled=false\nin the config file or DAGU_COORDINATOR_ENABLED=false as an environment variable.\n\nFlags:\n  --host string                     Host address to bind the web server to (default: 127.0.0.1)\n  --port int                        Port number for the web server to listen on (default: 8080)\n  --dags string                     Path to the directory containing DAG definition files\n  --coordinator.host string         Host address to bind the coordinator gRPC server to (default: 127.0.0.1)\n  --coordinator.advertise string    Address to advertise in service registry (default: auto-detected hostname)\n  --coordinator.port int            Port number for the coordinator gRPC server (default: 50055)\n  --peer.cert-file string           Path to TLS certificate file for peer connections\n  --peer.key-file string            Path to TLS key file for peer connections\n  --peer.client-ca-file string      Path to CA certificate file for client verification (mTLS)\n  --peer.insecure                   Use insecure connection (h2c) instead of TLS\n  --peer.skip-tls-verify            Skip TLS certificate verification (insecure)\n\nExample:\n  # Default mode (coordinator enabled)\n  dagu start-all\n\n  # Disable coordinator\n  DAGU_COORDINATOR_ENABLED=false dagu start-all\n\n  # Distributed mode with coordinator on all interfaces\n  dagu start-all --coordinator.host=0.0.0.0 --coordinator.port=50055\n\n  # Production with both web and coordinator on all interfaces\n  dagu start-all --host=0.0.0.0 --port=8080 --coordinator.host=0.0.0.0\n\nThis process runs continuously in the foreground until terminated.\n\nUsage:\n  dagu start-all [flags]\n\nFlags:\n  -c, --config string                  Path to the configuration file (default: $HOME/.config/dagu/config.yaml)\n  -A, --coordinator.advertise string   Address to advertise in service registry (default: auto-detected hostname)\n  -H, --coordinator.host string        Coordinator gRPC server host (default: 127.0.0.1) (default \"127.0.0.1\")\n  -P, --coordinator.port string        Coordinator gRPC server port (default: 50055) (default \"50055\")\n      --cpu-profile                    Enable CPU profiling (saves to cpu.pprof)\n  -d, --dags string                    Directory containing DAG files (default: $HOME/.config/dagu/dags)\n      --dagu-home string               Override DAGU_HOME for this command\n  -h, --help                           help for start-all\n  -s, --host string                    Server hostname or IP address (default: localhost) (default \"localhost\")\n      --peer.cert-file string          Path to TLS certificate file for mutual TLS\n      --peer.client-ca-file string     Path to CA certificate file for server verification\n      --peer.insecure                  Use insecure connection (h2c) instead of TLS\n      --peer.key-file string           Path to TLS key file for mutual TLS\n      --peer.skip-tls-verify           Skip TLS certificate verification (insecure)\n  -p, --port string                    Server port number (default: 8080) (default \"8080\")\n  -q, --quiet                          Suppress output during dag-run\n\nGlobal Flags:\n      --context string   Context name to use for command execution (default: current context or local)\n"
+    },
+    {
+      "command": "dagu validate --help",
+      "exit": 0,
+      "output": "Validate a DAG YAML file without executing it.\n\nPrints a human-readable result instead of structured logs.\nChecks structural correctness and references (e.g., step dependencies)\nsimilar to the server-side spec validation.\n\nReferences whose value only exists during a run, such as ${context.paths.*}\nor an environment variable supplied by the operator, are not reported by\ndefault. Pass --show-unresolved to list them as well.\n\nUsage:\n  dagu validate [flags] <DAG definition>\n\nFlags:\n  -c, --config string      Path to the configuration file (default: $HOME/.config/dagu/config.yaml)\n      --cpu-profile        Enable CPU profiling (saves to cpu.pprof)\n      --dagu-home string   Override DAGU_HOME for this command\n  -h, --help               help for validate\n  -q, --quiet              Suppress output during dag-run\n      --show-unresolved    Also report references whose value only exists during a run\n\nGlobal Flags:\n      --context string   Context name to use for command execution (default: current context or local)\n"
+    },
+    {
+      "command": "mise --version",
+      "exit": 0,
+      "output": "2026.10.1 linux-x64 (2026-10-03)\n"
+    }
+  ],
+  "dag_validations": [
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu blueprints/us-equities/hosting/equity-research-evidence.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:48.104-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\ntime=2026-10-05T04:06:48.106-04:00 level=INFO msg=\"Creating example DAGs for first-time users\" dir=$QUAL_ROOT/dagu/dags\ntime=2026-10-05T04:06:48.148-04:00 level=INFO msg=\"Example DAGs created successfully. Check the web UI to explore them!\"\n",
+      "path": "blueprints/us-equities/hosting/equity-research-evidence.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu blueprints/us-equities/research-runtime/prepare-evidence.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:48.217-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "path": "blueprints/us-equities/research-runtime/prepare-evidence.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu blueprints/us-equities/research-runtime/research-pair.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:48.263-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "path": "blueprints/us-equities/research-runtime/research-pair.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/0-prior-interrupted-attempt/real_workflow.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:48.308-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/0-prior-interrupted-attempt/real_workflow.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/1-provider-cancel/cancelprobe.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:48.354-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/1-provider-cancel/cancelprobe.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/11-reboot-analog-run/realboot.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:48.400-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/11-reboot-analog-run/realboot.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/2-real-scheduled-run/dags__realmaint.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:48.445-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/2-real-scheduled-run/dags__realmaint.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/4-6-three-engine-comparison/dagu__sigkill__dags__recovery.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:48.490-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/4-6-three-engine-comparison/dagu__sigkill__dags__recovery.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/4-6-three-engine-comparison/dagu__stop-retry__dags__recovery.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:48.535-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/4-6-three-engine-comparison/dagu__stop-retry__dags__recovery.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F1-dagu-sigkill-preregistered-150s/dagu__sigkill__dags__recovery.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:48.579-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F1-dagu-sigkill-preregistered-150s/dagu__sigkill__dags__recovery.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F1-dagu-sigkill-preregistered-150s/dagu__stop-retry__dags__recovery.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:48.630-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F1-dagu-sigkill-preregistered-150s/dagu__stop-retry__dags__recovery.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F2-dagu-sigkill-scheduler-variant/dagu__sigkill__dags__recovery.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:48.680-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F2-dagu-sigkill-scheduler-variant/dagu__sigkill__dags__recovery.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F2-dagu-sigkill-scheduler-variant/dagu__stop-retry__dags__recovery.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:48.729-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F2-dagu-sigkill-scheduler-variant/dagu__stop-retry__dags__recovery.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F3-gap2-real-scheduled-rerun/dags__realmaint.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:48.775-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/foundation__scheduling-supervision/raw/fix1-F3-gap2-real-scheduled-rerun/dags__realmaint.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:06:48.821-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml\n- entrypoint document must not define name\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:06:48.865-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml\n- entrypoint document must not define name\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:06:48.909-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml\n- entrypoint document must not define name\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:06:48.953-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:06:48.996-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:06:49.041-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:06:49.085-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n",
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu evidence/artifacts/native-service-reboot-20260920/guest-reboot.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:49.132-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "path": "evidence/artifacts/native-service-reboot-20260920/guest-reboot.yaml"
+    },
+    {
+      "command": "dagu validate --dagu-home $QUAL_ROOT/dagu examples/omniroute-codex-sdk/runtime-worker.yaml",
+      "exit": 0,
+      "output": "time=2026-10-05T04:06:49.178-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\n",
+      "path": "examples/omniroute-codex-sdk/runtime-worker.yaml"
+    }
+  ],
+  "start_all": {
+    "command": "dagu start-all --dagu-home $QUAL_ROOT/start-all --config $QUAL_ROOT/start-all/config.yaml --dags $QUAL_ROOT/start-all/dags --host 127.0.0.1 --port <isolated-http-port> --coordinator.host 127.0.0.1 --coordinator.port <isolated-grpc-port> --coordinator.advertise 127.0.0.1",
+    "exit": 0,
+    "health": {
+      "status": 200,
+      "body": "{\"status\":\"healthy\",\"timestamp\":\"2026-10-05T04:11:54-04:00\",\"uptime\":0,\"version\":\"2.18.2\"}\n"
+    },
+    "coordinator_socket_connected": true,
+    "coordinator_enabled": true,
+    "ports_released": [
+      true,
+      true
+    ],
+    "output": "time=2026-10-05T04:11:54.721-04:00 level=INFO msg=\"Coordinator initialization\" bind-address=127.0.0.1 advertise-address=127.0.0.1 port=<isolated-port> instance-id=<qualification-host>@<isolated-port>\ntime=2026-10-05T04:11:54.755-04:00 level=INFO msg=\"Resource monitoring service started\"\ntime=2026-10-05T04:11:54.755-04:00 level=INFO msg=\"Scheduler initialization\" dir=$QUAL_ROOT/start-all/dags\ntime=2026-10-05T04:11:54.755-04:00 level=INFO msg=\"Started zombie detector\" interval=45s\ntime=2026-10-05T04:11:54.755-04:00 level=INFO msg=\"Starting service registry\" service=scheduler service-id=<qualification-host>-10-1791187914 host=<qualification-host> port=8090 status=inactive\ntime=2026-10-05T04:11:54.765-04:00 level=INFO msg=\"Registered with service registry as inactive\" service-id=<qualification-host>-10-1791187914 host=<qualification-host> port=8090\ntime=2026-10-05T04:11:54.765-04:00 level=INFO msg=\"Waiting to acquire scheduler lock\"\ntime=2026-10-05T04:11:54.766-04:00 level=INFO msg=\"Starting service registry\" service=coordinator service-id=<qualification-host>@<isolated-port> host=127.0.0.1 port=<isolated-port> status=active\ntime=2026-10-05T04:11:54.767-04:00 level=INFO msg=\"Acquired scheduler lock\"\ntime=2026-10-05T04:11:54.774-04:00 level=INFO msg=\"Registered with service registry\" service-id=<qualification-host>@<isolated-port> configured-host=127.0.0.1 port=<isolated-port> addr=127.0.0.1:<isolated-port>\ntime=2026-10-05T04:11:54.774-04:00 level=INFO msg=\"Starting to serve on coordinator service\" addr=127.0.0.1:<isolated-port>\ntime=2026-10-05T04:11:54.781-04:00 level=INFO msg=\"Updated scheduler status to active\"\ntime=2026-10-05T04:11:54.782-04:00 level=INFO msg=\"Loading DAGs\" dir=$QUAL_ROOT/start-all/dags\ntime=2026-10-05T04:11:54.782-04:00 level=INFO msg=\"Loaded scheduler watermark\" lastTick=0001-01-01T00:00:00.000Z dagCount=0\ntime=2026-10-05T04:11:54.782-04:00 level=INFO msg=\"Scheduler started\"\ntime=2026-10-05T04:11:54.782-04:00 level=INFO msg=\"Started retry scanner\" interval=30s retry_failure_window=24h0m0s\n2026/10/05 04:11:54 INFO DAG run notification monitor started\n2026/10/05 04:11:54 INFO DAG run notification monitor started\ntime=2026-10-05T04:11:54.782-04:00 level=INFO msg=\"Started zombie detector\" interval=45s\n2026/10/05 04:11:54 INFO Acquired notification lock; DAG run notifications are active lock_dir=$QUAL_ROOT/start-all/data/notifications/monitor-state.json.lock\n2026/10/05 04:11:54 INFO Acquired notification lock; DAG run notifications are active lock_dir=$QUAL_ROOT/start-all/data/incidents/monitor-state.json.lock\ntime=2026-10-05T04:11:54.855-04:00 level=INFO msg=\"Server initialization\" host=127.0.0.1 port=<isolated-port>\ntime=2026-10-05T04:11:54.929-04:00 level=INFO msg=\"SSE invalidation stream configured for multiplexed topics\"\ntime=2026-10-05T04:11:54.929-04:00 level=INFO msg=\"SSE routes configured\" basePath=/api/v1\ntime=2026-10-05T04:11:54.930-04:00 level=INFO msg=\"MCP route configured\" path=/mcp\ntime=2026-10-05T04:11:54.930-04:00 level=INFO msg=\"Server is starting\" addr=127.0.0.1:<isolated-port>\n2026/10/05 04:11:54 INFO DAG run notification monitor started\n2026/10/05 04:11:54 INFO DAG run notification monitor started\n2026/10/05 04:11:54 INFO Notification lock is held by another process; DAG run notifications are on standby lock_dir=$QUAL_ROOT/start-all/data/notifications/monitor-state.json.lock\n2026/10/05 04:11:54 INFO Notification lock is held by another process; DAG run notifications are on standby lock_dir=$QUAL_ROOT/start-all/data/incidents/monitor-state.json.lock\ntime=2026-10-05T04:11:54.965-04:00 level=INFO msg=\"Received shutdown signal\" signal=terminated\ntime=2026-10-05T04:11:54.965-04:00 level=INFO msg=\"Received shutdown signal\" signal=\"context canceled\"\n2026/10/05 04:11:54 INFO DAG run notification monitor stopped\ntime=2026-10-05T04:11:54.965-04:00 level=INFO msg=\"Stopping all services\"\ntime=2026-10-05T04:11:54.965-04:00 level=INFO msg=\"Stopping service registry\" service=coordinator service-id=<qualification-host>@<isolated-port> host=127.0.0.1 port=<isolated-port>\n2026/10/05 04:11:54 INFO DAG run notification monitor stopped\ntime=2026-10-05T04:11:54.965-04:00 level=ERROR msg=\"Failed to update status to inactive\" err=\"not registered\"\ntime=2026-10-05T04:11:54.965-04:00 level=INFO msg=\"Scheduler stopped\"\ntime=2026-10-05T04:11:54.965-04:00 level=INFO msg=\"Stopping service registry\" service=scheduler service-id=<qualification-host>-10-1791187914 host=<qualification-host> port=8090\n2026/10/05 04:11:54 INFO DAG run notification monitor stopped\n2026/10/05 04:11:54 INFO DAG run notification monitor stopped\ntime=2026-10-05T04:11:54.965-04:00 level=INFO msg=\"Unregistered from service registry\" service-id=<qualification-host>@<isolated-port>\ntime=2026-10-05T04:11:54.978-04:00 level=INFO msg=\"Stopping zombie detector\"\ntime=2026-10-05T04:11:54.978-04:00 level=INFO msg=\"Resource monitoring service stopped\"\ntime=2026-10-05T04:11:55.042-04:00 level=INFO msg=\"App SSE stream shut down\"\ntime=2026-10-05T04:11:55.042-04:00 level=INFO msg=\"SSE multiplexer shut down\"\ntime=2026-10-05T04:11:55.042-04:00 level=INFO msg=\"Server is shutting down\" addr=127.0.0.1:<isolated-port>\ntime=2026-10-05T04:11:55.042-04:00 level=INFO msg=\"All services stopped gracefully\"\n"
+  },
+  "mise_doctor": {
+    "command": "mise doctor",
+    "exit": 0,
+    "output": "version: 2026.10.1 linux-x64 (2026-10-03)\nactivated: no\nshims_on_path: yes\nself_update_available: yes\n\nbuild_info:\n  Target: x86_64-unknown-linux-gnu\n  Features: openssl, rustls-native-roots, self_update\n  Built: Sat, 3 Oct 2026 13:17:16 +0000\n  Rust Version: rustc 1.94.0 (4a4ef493e 2026-03-02)\n  Profile: release\n\nshell:\n  bash\n  GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)\n  Copyright (C) 2022 Free Software Foundation, Inc.\n  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n\n  This is free software; you are free to change and redistribute it.\n  There is NO WARRANTY, to the extent permitted by law.\n\naqua:\n  baked in registry: aquaproj/aqua-registry@5ab394cf06c77ff09b8e621196bb97a34018dca4\n  baked in registry tools: 2323\n\ndirs:\n  cache: ~/cache/mise\n  config: ~/config/mise\n  data: ~/mise\n  shims: ~/mise/shims\n  system_shims: /usr/local/share/mise/shims\n  state: ~/state/mise\n\nconfig_files:\n\nenv_files:\n  (none)\n\nignored_config_files: (none)\n\nbackends:\n  aqua\n  asdf\n  cargo\n  conda\n  core\n  dotnet\n  forgejo\n  gem\n  github\n  gitlab\n  go\n  npm\n  packslip\n  pypi\n  spm\n  http\n  s3\n  ubi\n  vfox\n\nplugins:\n\ntoolset:\n\npath:\n  ~/bin\n  ~/mise/shims\n  /usr/bin\n  /bin\n\nenv_vars:\n  MISE_DATA_DIR=~/mise\n  MISE_CONFIG_DIR=~/config/mise\n  MISE_CACHE_DIR=~/cache/mise\n  MISE_STATE_DIR=~/state/mise\n  MISE_OFFLINE=true\n\nsettings:\n\nNo problems found\n"
+  },
+  "negative_controls": [
+    {
+      "command": "mise doctor (control: shims absent)",
+      "exit": 1,
+      "output": "version: 2026.10.1 linux-x64 (2026-10-03)\nactivated: no\nshims_on_path: no\nself_update_available: yes\n\nbuild_info:\n  Target: x86_64-unknown-linux-gnu\n  Features: openssl, rustls-native-roots, self_update\n  Built: Sat, 3 Oct 2026 13:17:16 +0000\n  Rust Version: rustc 1.94.0 (4a4ef493e 2026-03-02)\n  Profile: release\n\nshell:\n  bash\n  GNU bash, version 5.2.21(1)-release (x86_64-pc-linux-gnu)\n  Copyright (C) 2022 Free Software Foundation, Inc.\n  License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html>\n\n  This is free software; you are free to change and redistribute it.\n  There is NO WARRANTY, to the extent permitted by law.\n\naqua:\n  baked in registry: aquaproj/aqua-registry@5ab394cf06c77ff09b8e621196bb97a34018dca4\n  baked in registry tools: 2323\n\ndirs:\n  cache: ~/cache/mise\n  config: ~/config/mise\n  data: ~/mise\n  shims: ~/mise/shims\n  system_shims: /usr/local/share/mise/shims\n  state: ~/state/mise\n\nconfig_files:\n\nenv_files:\n  (none)\n\nignored_config_files: (none)\n\nbackends:\n  aqua\n  asdf\n  cargo\n  conda\n  core\n  dotnet\n  forgejo\n  gem\n  github\n  gitlab\n  go\n  npm\n  packslip\n  pypi\n  spm\n  http\n  s3\n  ubi\n  vfox\n\nplugins:\n\ntoolset:\n\npath:\n  ~/bin\n  /usr/bin\n  /bin\n\nenv_vars:\n  MISE_DATA_DIR=~/mise\n  MISE_CONFIG_DIR=~/config/mise\n  MISE_CACHE_DIR=~/cache/mise\n  MISE_STATE_DIR=~/state/mise\n  MISE_OFFLINE=true\n\nsettings:\n\n1 problem found:\n\n1. mise is not activated, run mise help activate or\n   read documentation at https://mise.jdx.dev for activation instructions.\n   Alternatively, add the shims directory ~/mise/shims to PATH.\n   Using the shims directory is preferred for non-interactive setups.\n\n"
+    },
+    {
+      "command": "sha256sum --check --strict control-mismatch.sha256 (control: incorrect expected checksum)",
+      "exit": 1,
+      "output": "dagu_2.18.2_linux_amd64.tar.gz: FAILED\n/usr/bin/sha256sum: WARNING: 1 computed checksum did NOT match\n"
+    }
+  ],
+  "baseline_archive": {
+    "version": "2.16.6",
+    "upstream_sha256": "06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717",
+    "checksum_source": "https://github.com/dagucloud/dagu/releases/download/v2.16.6/checksums.txt",
+    "checksum_check_exit": 0
+  },
+  "baseline_archived_dag_validations": [
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml",
+      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:13:00.035-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\ntime=2026-10-05T04:13:00.037-04:00 level=INFO msg=\"Creating example DAGs for first-time users\" dir=$QUAL_ROOT/baseline-dagu/dags\ntime=2026-10-05T04:13:00.080-04:00 level=INFO msg=\"Example DAGs created successfully. Check the web UI to explore them!\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round1/obsgap.yaml\n- entrypoint document must not define name\n"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml",
+      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:13:00.142-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round2/obsgap.yaml\n- entrypoint document must not define name\n"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml",
+      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:13:00.183-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/dagu-arm-round4/obsgap.yaml\n- entrypoint document must not define name\n"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml",
+      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:13:00.222-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round5/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml",
+      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:13:00.263-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round6/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml",
+      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:13:00.304-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round7/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n"
+    },
+    {
+      "path": "evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml",
+      "command": "dagu 2.16.6 validate evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml",
+      "exit": 1,
+      "output": "time=2026-10-05T04:13:00.345-04:00 level=WARN msg=\"No auth.mode configured — defaulting to 'builtin'. Set auth.mode to 'none' to disable authentication, or complete /setup to create an admin account.\"\nError: Validation failed for $REPO/evidence/artifacts/gap-wave2-20260923/us-equities__observability-hosting/raw/paper-arm-round8/dagu/dags/obsgap-paper.yaml\n- entrypoint document must not define name\n"
+    }
+  ],
+  "independent_observations": {
+    "http_health": {
+      "status": 200,
+      "body": "{\"status\":\"healthy\",\"timestamp\":\"2026-10-05T04:11:54-04:00\",\"uptime\":0,\"version\":\"2.18.2\"}\n"
+    },
+    "coordinator_socket_connected": true,
+    "owned_ports_released": [
+      true,
+      true
+    ],
+    "baseline_and_selected_archive_failures_match": true
+  },
+  "environment": {
+    "owned_root": "task-owned cache root/root",
+    "tmpdir": "task-owned cache root (outside worktree and /tmp)",
+    "priority": "nice 19",
+    "client_environment": "isolated child HOME/XDG/DAGU_HOME/MISE directories; no credential or native authentication input inherited",
+    "mise_doctor": "MISE_OFFLINE=true; only isolated shims added to PATH"
+  },
+  "sanitization": [
+    "Absolute repository/cache/root paths replaced by $REPO/$QUAL_CACHE/$QUAL_ROOT.",
+    "Ephemeral listener ports and native hostname replaced by labels; timestamp, exit, status, error and version evidence retained.",
+    "Original native outputs stay in private task cache; no credentials or authentication stores were read."
+  ]
+}

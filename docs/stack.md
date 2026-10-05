@@ -48,7 +48,7 @@ Snapshot: September 19, 2026. The 47 entries below are adopted tools, integratio
 | [ntfy](https://github.com/binwiederhier/ntfy) | 2.28.0 | Local retained notification inbox | observability |
 | [duckdb](https://github.com/duckdb/duckdb) | 1.5.5 | Deterministic local SQL/Parquet research data and exact decimal storage | supporting |
 | [restic](https://github.com/restic/restic) | 0.19.1 | Encrypted same-host backup and verified restore of explicitly selected public files | supporting |
-| [dagu](https://github.com/dagucloud/dagu) | 2.16.6 | Manual native research workflows and private local run history | supporting |
+| [dagu](https://github.com/dagucloud/dagu) | 2.18.2 | Manual native research workflows and private local run history | supporting |
 | [lean](https://github.com/QuantConnect/Lean) | 985ef30 with documented dependency remediation | Deterministic native historical research backtest engine; no broker initialized | supporting |
 | [syft](https://github.com/anchore/syft) | 1.52.0 | Scoped native SDK dependency inventory; no vulnerability verdict | supporting |
 

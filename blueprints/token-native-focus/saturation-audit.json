@@ -2647,7 +2647,7 @@
     {
       "component_id": "dagu",
       "repository": "https://github.com/dagucloud/dagu",
-      "version": "2.16.6",
+      "version": "2.18.2",
       "profile": "supporting",
       "role": "Manual native research workflows and private local run history",
       "installation_assessment": "runtime present at retained native operation date",
@@ -2749,7 +2749,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "v2.16.6",
+      "source_pin": "v2.18.2",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
