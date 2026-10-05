@@ -1169,3 +1169,17 @@ carry full commit SHAs, where stars are discovery metadata and not evidence, and
 [primary sources](../../../docs/decisions/2026-09-28-community-sweep.md#primary-sources)
 carry read dates. Its keep-but-compare rows name the comparison that would change a
 rule here, such as the effort arms for the child roles.
+
+## Native workflow mechanics relocated (2026-10-05)
+
+- With agent teams on, a named spawn becomes a teammate at the lead's session effort in the lead's working directory, without its definition's `skills` or `isolation`: name spawns only for teammates, never for a role that relies on `skills`, `omitClaudeMd` or `isolation`, and start a run that needs them with `claude --settings '{"env":{"CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS":"0"}}'`.
+
+- In Ultracode, pass an explicit task-matched `model` and `effort: 'max'` on each `agent()` call; project agents declare `effort: max`. A stage that names no model takes its definition's, else `CLAUDE_CODE_SUBAGENT_MODEL`, else the lead's, so set `CLAUDE_CODE_SUBAGENT_MODEL=opus`. On Claude Code 2.1.284 Ultracode stays on at any effort and the `ultracode` setting sets none: a terminal session started through the ecosystem `claude` launcher runs at `max` (`claude --effort xhigh` opts out; the default rests on the user's requirement, not on a measured gain), and a launch that skips it (IDE, desktop, web) uses the saved per-model xhigh (`modelSettings`, or `effortLevel` in a project file; `max` cannot be saved). Headless `-p` runs pass `--effort` per call site, and `CLAUDE_CODE_EFFORT_LEVEL` stays unset at every scope because it overrides every worker's effort.
+- Size each workflow to its task under the `unrestricted` size guideline and within the runtime limits (4,096 items per `parallel()`/`pipeline()` call, 1,000 agents per run). Avoid unintended model inheritance, unbounded fan-out and repeated word-count calls.
+- Cap concurrency per host with `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS`, starting at 8 under the client's default of min(16, available CPUs − 2) per workflow (the bundled `/workflow-authoring` reference); the setting accepts 1–256 from 2.1.269.
+- Children do not fan out a second layer (`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH=1`). Teammates report through the shared task list and idle notifications rather than a summarized return value, so the lead collects their results and has any claim verified on Opus before acting on it.
+
+- Message another Claude Code session with SendMessage, and a Codex session with `codex queue --thread <its CODEX_THREAD_ID> --message "$(cat <<'MSG'` followed by the text, a blank line, `reply: SendMessage to <your session name>`, `MSG` and `)"`, each on its own line: a quoted heredoc, never the text inline.
+- Codex receives queued messages between turns, never mid-turn; expect up to about 20 s delay when it is idle.
+- When you return through StructuredOutput, put the schema fields at the top level of the call arguments; never wrap them in an input, output or result key.
+- When a worker returns null or incomplete output, check its transcript for a safety refusal before retrying, since session limits and other errors also produce null results; after a refusal, edit the brief and retry on the current model, and never accept an older model's answer in its place.

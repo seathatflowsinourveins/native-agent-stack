@@ -1,0 +1,16 @@
+## Trading north star
+
+The north star is US-equities research and historical simulation with the selected
+NautilusTrader 2.0.0rc5/IBKR destination and a separate Alpaca adapter path, followed
+by independently qualified paper operation for each broker. Current selections
+are in `catalogs/us-equities/runtime-target.json`; dated LEAN/Alpaca receipts remain
+comparison evidence rather than overriding that destination.
+Read `catalogs/us-equities/README.md` for selection and `blueprints/us-equities/north-star.md`
+for boundaries. The native worker policy applies to workers launched by its example,
+not automatically to unrelated SDKs or projects. Keep models in research and
+deterministic code in numeric/risk/order state.
+The user has explicitly authorized broker-specific paper-trading E2E after the
+current foundation work. Follow `docs/paper-lane-policy.md`: proceed through native
+paper readiness and measured acceptance without repeated human approval. Missing
+live credentials or live configuration do not gate paper; live trading and paid
+hosting remain separate scopes.

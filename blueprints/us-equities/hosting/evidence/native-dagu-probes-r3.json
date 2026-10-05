@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "round": "t-pr4-r3",
+  "evidence_class": "local_integration",
+  "dagu_pin": "2.16.6",
+  "calendar_pin": "4.13.2",
+  "clock_fixture": "2026-11-27T21:30:00Z",
+  "events_mtime_fixture": "2026-11-27T19:00:00Z",
+  "scope": "Manual native run of all six deployed steps; synthetic historical LEAN input and post-close clock; no scheduler.",
+  "dag_template_sha256": "6107eebb77ae8904ff6422b7e86f4c551dde36d35aa5d6e87b8f5d72b0c9397f",
+  "private_copy_sha256": "e71ebf99aa29a86bf0eb18ab61a054ec24bdfcb67fed5538f2be22c4662884f9",
+  "commands": [
+    {
+      "verb": "validate",
+      "exit": 0,
+      "duration_s": 0.210249,
+      "raw_output_sha256": "e542d658b185d65bc180fbfffc22127516c034643fd63cc45c4045a6f29bdf2c"
+    },
+    {
+      "verb": "start",
+      "exit": 0,
+      "duration_s": 37.141351,
+      "raw_output_sha256": "63b019e05930b07cc64d36140722c96bca5fab3bf913f6506fd768523cc3908d"
+    }
+  ],
+  "native_run_status": 4,
+  "native_node_statuses": {
+    "calendar_check": 4,
+    "nyse_session": 4,
+    "prepare_output": 4,
+    "summarize": 4,
+    "baseline_evidence": 4,
+    "catalog_evidence": 4
+  },
+  "trigger_type": 2,
+  "timeout_sec": 180,
+  "history": {
+    "exit": 0,
+    "context": "local",
+    "from_utc": "2026-10-05T00:00:00Z",
+    "status_filter": "succeeded",
+    "limit": 1000,
+    "matched_run": true,
+    "row_count": 1
+  },
+  "parquet_count": 1,
+  "parquet_sha256": [
+    "bcb285fabdedd0129b0d54dd7097688369695f5ed806fd3a89b26db9d33c65a8"
+  ],
+  "guard_output": "session",
+  "unavailable_input_probes": [
+    {
+      "token": "missing_input",
+      "exit": 1,
+      "run_status": 2,
+      "node_statuses": {
+        "calendar_check": 2,
+        "nyse_session": 3,
+        "evidence": 3
+      },
+      "marker_created": false,
+      "output_token_observed": true,
+      "raw_sanitized_output_sha256": "0b6641cc99565df6e909406e9fc0c1c7aa9000cdb7caed04e00c610efbbc4efb"
+    },
+    {
+      "token": "stale_input",
+      "exit": 1,
+      "run_status": 2,
+      "node_statuses": {
+        "calendar_check": 2,
+        "nyse_session": 3,
+        "evidence": 3
+      },
+      "marker_created": false,
+      "output_token_observed": true,
+      "raw_sanitized_output_sha256": "7fdf89042f9cfc5c0aea90cc9ac85b22f1c4c4d1909b72c2da3d5cb482ca8969"
+    },
+    {
+      "token": "future_input",
+      "exit": 1,
+      "run_status": 2,
+      "node_statuses": {
+        "calendar_check": 2,
+        "nyse_session": 3,
+        "evidence": 3
+      },
+      "marker_created": false,
+      "output_token_observed": true,
+      "raw_sanitized_output_sha256": "452353a4995a5eabdd19bb7a6ec57cbab08ff3b0695a5f36a47d490647ba09a2"
+    }
+  ],
+  "completed_at_utc": "2026-10-05T07:50:43.143067+00:00",
+  "summarizer_returned_json": {
+    "scope": "LEAN bundled historical simulation, not broker fills",
+    "events": 1,
+    "distinct_orders": 1,
+    "statuses": {
+      "Filled": 1
+    },
+    "calendar": "XNYS",
+    "sample_session": "2013-10-07",
+    "session_open_utc": "2013-10-07T13:30:00+00:00",
+    "session_close_utc": "2013-10-07T20:00:00+00:00",
+    "source_sha256": "5d39b6390bf54295d3552923a5bc0ca7848271d300740702182a4c9aa53cad41",
+    "parquet_sha256": "bcb285fabdedd0129b0d54dd7097688369695f5ed806fd3a89b26db9d33c65a8"
+  }
+}

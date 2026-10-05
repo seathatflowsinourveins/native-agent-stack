@@ -160,3 +160,29 @@ grep -a -c '!.\{1,4\}\.CLAUDE_CODE_DISABLE_REFUSAL_FALLBACK&&' "$(readlink -f ~/
 A count of 0 means the variable is no longer read in that form. Re-check the client code before relying on the guard.
 
 The StructuredOutput sentence is adopted.
+
+## Addendum (2026-10-05): PR #726 restores the user-level schema carrier
+
+Job 075 moved the StructuredOutput sentence into the workflow README. That
+departure from this accepted record had no same-version A/B or client-fix evidence.
+The PR #726 repair restores it verbatim in `examples/claude-native/CLAUDE.md`,
+which generates the user-level instruction block that workflow children load:
+
+> When you return through StructuredOutput, put the schema fields at the top level of the call arguments; never wrap them in an input, output or result key.
+
+The existing G4 comparison (5/30 control schema errors versus 0/30 treatment) and
+the sequential user-level-only check (0/30) remain the evidence for carrying it.
+Their limits remain Sonnet 5 on Claude Code 2.1.282. No new provider run is implied.
+The complete relocated workflow group remains in its dated reference section for
+byte preservation; the portable pointer covers messaging and incomplete returns,
+while a child can read the schema guard directly at startup.
+
+The common discovery conditional on the client and repository surfaces is:
+when no skill fits, use installed `find-skills` or Skills CLI `find` and `skill-creator` for verification or A/B; check client exposure and the skills lifecycle. Its reference is `adoption/skills/lifecycle.md`.
+This exposure check handles missing installed Claude copies without changing any
+model-fallback setting, agent's omitClaudeMd contract, or this record's removal
+conditions. [Claude memory](https://code.claude.com/docs/en/memory) documents the
+user instruction/import scope; [the context-budget record](2026-10-05-harness-context-budget.md)
+records the restoration bytes and separate child carrier. The same-version G4 A/B
+or an evidenced client wrapping fix remains the comparison that can remove the
+guard; reference-file presence alone cannot.

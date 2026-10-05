@@ -4247,6 +4247,70 @@
       "path": "evidence/receipts/rtk-fold-harbor-20261004.json"
     },
     {
+      "id": "trading-unattended-hosting-recovery-20261005",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "dagu",
+        "restic"
+      ],
+      "claim": "Native restic 0.19.1 backed up two synthetic SQLite WAL journals copied by the stdlib Online Backup API during committed writes, read subset 1/1 (2/2 packs), restored 802816 identical journal bytes with matching external inventory and required state, and refused both snapshot and restore controls. Dagu 2.16.6 validated the scheduled research DAG offline; operating-host and off-host gates remain open.",
+      "limitations": [
+        "Scratch local integration with synthetic research journals; not an unchanged upstream test suite or a real market/broker journal.",
+        "Per-journal Online Backup is independently consistent; no atomic cross-journal transaction or research consumer application restart was accepted.",
+        "Historical one-part check 1/1 read 2/2 packs. Round 1 enforced strict daily gaps in its synthetic rotation test; round 2 replaces that policy with a whole seven-subset rotation within seven days.",
+        "Operating host and independent alert path are user decision 2. No systemd unit was installed, enabled or started; no process-restart drill or scheduler was run.",
+        "A process-restart drill is not reboot, missed-run or independent-alert acceptance. permissions.run_dags scheduler behavior is source-reviewed and awaits the later host drill.",
+        "Off-host recovery stays open until user decision 3 chooses an independent destination and key recovery and a consumer restores on a second host against the independent inventory and required state.",
+        "Recovery-time objective, independent alerting and retention deletion remain unaccepted. No broker, credentials, live mode, model calls, commit or push was used.",
+        "Historical round 1 cited an unlanded calendar bundle. Round 2 uses the on-base SDK_ENV lock adoption/sdk/requirements-linux-x86_64-py313.lock:241 and executes the already installed exchange-calendars 4.13.2 for real-calendar regressions; no new installation is claimed."
+      ],
+      "path": "evidence/receipts/trading-unattended-hosting-recovery-20261005.json"
+    },
+    {
+      "id": "trading-unattended-hosting-recovery-r2-20261005",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "dagu",
+        "restic"
+      ],
+      "claim": "Round 2 native restic 0.19.1 backed up two synthetic WAL journals using CPython Online Backup pages=-1 during independently observed commits, checked subset 1/1, restored 16531456 identical journal bytes against the external inventory and required state, and refused native-exit-3 snapshot and same-count/same-integrity content-mutation restore controls. Dagu 2.16.6 validated the revised DAG and executed native manual skip/success/stale-input probes. 42 stdlib tests passed including real exchange_calendars 4.13.2 cases. Cron Next was not executable: no Go compiler found. Operating-host and off-host gates remain open.",
+      "limitations": [
+        "Scratch local integration and synthetic fixtures, not an unchanged upstream test suite, real market/broker state or operating-host acceptance.",
+        "Per-journal Online Backup is consistent independently; no transaction across journals. Commits during the native call need not appear in its read snapshot; comparison uses the frozen snapshot oracle.",
+        "Native check subset 1/1 reads every pack in this small proof. Whole seven-part/seven-day rotation, daily jitter, fall-back and deadlines are behavioural stdlib tests; operator execution is still required.",
+        "No scheduler or systemd unit installed, enabled or started; the operating-host restart/reboot/missed-run and independent-alert gates remain user decision 2.",
+        "Native Dagu probes use manual start, not scheduler dispatch. Scheduler run_dags:false behavior still needs the future host drill; a succeeded run with skipped research steps cannot count.",
+        "Off-host recovery requires user decision 3: independent destination, key recovery and second-host consumer restore under a chosen/measured recovery-time objective.",
+        "No retention deletion, broker, live credentials/mode, model calls, commit, push or manifest pin move.",
+        "Python 3.11 minimum is source-verified and syntax-checked. Execution used 3.13.15; no separate 3.11 interpreter was exercised.",
+        "robfig/cron v3.0.1 Next program/module were prepared from tagged source, but go run exited 127 because the compiler was not found; expected DST values are not measured results."
+      ],
+      "path": "evidence/receipts/trading-unattended-hosting-recovery-r2-20261005.json"
+    },
+    {
+      "id": "trading-unattended-hosting-recovery-r3-20261005",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "dagu",
+        "restic"
+      ],
+      "claim": "All seven new p2 repairs have red/green regressions; native Dagu executes the six deployed steps and fails unavailable-input runs; native restic verifies WAL recovery and isolated failing controls.",
+      "limitations": [
+        "Local integration and synthetic fixtures, not an unchanged upstream test suite or operating-host acceptance.",
+        "The deployed DAG copy uses a fixed post-close guard clock and a synthetic historical LEAN event; the native trigger remains manual.",
+        "Restart identity/window guards are tested with mocks. No systemctl manager operation, fault or service deployment ran.",
+        "Scheduler dispatch with run_dags:false, reboot, missed slots and independent alerts remain user decision 2.",
+        "Off-host recovery remains user decision 3: independent destination, key recovery and second-host consumer restore.",
+        "The independent final T row at line 102 was reread; it retains restic/Online Backup and does not name Litestream.",
+        "No Go compiler was found in PATH; the historical cron Next probe exit 127 remains unmeasured across DST.",
+        "No separate Python 3.11 interpreter was found in PATH; execution used 3.13.15.",
+        "Per-journal snapshots are consistent separately; there is no cross-journal transaction.",
+        "Native recovery reads subset 1/1; whole seven-part rotation remains behavioral fixture evidence.",
+        "No retention deletion, broker, credentials, live mode, model calls, commit, push or pin move."
+      ],
+      "path": "evidence/receipts/trading-unattended-hosting-recovery-r3-20261005.json"
+    },
+    {
       "id": "native-trading-runtime-2604-20261004",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -4557,8 +4621,8 @@
     },
     {
       "path": "AGENTS.md",
-      "sha256": "40595dfcde0dea50175380e773d78ff5aca00be901a290ea634fef8b84fe64a1",
-      "bytes": 13787
+      "sha256": "611caaf180166eaa6104ec3fc76781a5bf7db6349135b1837fbb17dd0afa9663",
+      "bytes": 10959
     },
     {
       "path": "CLAUDE.md",
@@ -4627,37 +4691,37 @@
     },
     {
       "path": "adoption/agents/codex/SHA256SUMS",
-      "sha256": "b07d7697f01ed1b1472b727af2d6e77b20a9b2846410b655cd6354a2adca856c",
+      "sha256": "30893d76587b34d96bf4e942ec649272a37deccf011fc4f14bc6125e91dc1071",
       "bytes": 174
     },
     {
       "path": "adoption/agents/codex/stack-researcher.toml",
-      "sha256": "48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77",
+      "sha256": "52620afd5a6ded09adeffcfa652007c04f413c18d200ff0c2ae268b5f310fe52",
       "bytes": 7223
     },
     {
       "path": "adoption/agents/codex/stack-verifier.toml",
-      "sha256": "18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b",
+      "sha256": "aab3b1f7980344adac583bb74ceb5f7d3b1cb98f75b552d993cb4b77626bfc34",
       "bytes": 6685
     },
     {
       "path": "adoption/agents/codex/workers/SHA256SUMS",
-      "sha256": "e5d75d7e7e6a68ac6460e4b447221c2fc254feb532f570661d7d95b1ba3064d2",
+      "sha256": "5491850603b330940d571cb0b36937693005d341f36535f0a33c65f47f9f03c7",
       "bytes": 275
     },
     {
       "path": "adoption/agents/codex/workers/evidence-reviewer.toml",
-      "sha256": "91ed272d63ff5a7271be87550488ad1bff99bde09bd1a699332fdd3f41b06a6c",
+      "sha256": "209b739b38a0f412993af4fdce59e0c7e2954fccd89b2f8bf9f0e10a25a269fb",
       "bytes": 6148
     },
     {
       "path": "adoption/agents/codex/workers/isolated-builder.toml",
-      "sha256": "7c46a4cd994764101f2864e590fe71c8dfa8e3b78242f1a793eaac1d5af091d9",
+      "sha256": "1f8d2a024e2f2f84310f5838cb0fa34276ce6137ce2b4f273bf3c326ea475cc0",
       "bytes": 6656
     },
     {
       "path": "adoption/agents/codex/workers/semantic-evidence-reviewer.toml",
-      "sha256": "5a2a28e12b6fa1a894fd45afa572f54bd7546408c40b2446c417d493d622ebae",
+      "sha256": "ea53a3453ce0512f383472cdbb8c085b6aa39d4c3c06b62cd0915023115cd7ef",
       "bytes": 6250
     },
     {
@@ -4797,18 +4861,18 @@
     },
     {
       "path": "adoption/new-wsl/claude-user-instructions.md",
-      "sha256": "e35358c4eb22a9ed155061e0ec2dd577ab5488f82c9436c8daa82da976bee3db",
-      "bytes": 13577
+      "sha256": "9bc0f41208ce30ec46a1f08fa7d0b6680f14b8e56266a414389d7e69d2ea36c2",
+      "bytes": 11575
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "f07d72f48366325df5a0d70711da45a6083c12bb4a0ce70f781c53677ccfdb0a",
-      "bytes": 56510
+      "sha256": "57bbddca2429266953c09f770a2caff524a19ec32ed3affc9cea00a83cca8651",
+      "bytes": 57558
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
-      "sha256": "899ca1d57eea56424fa626bc2014abc9c623ed9e8672d74a703611e6327d8481",
-      "bytes": 8187
+      "sha256": "f8874e406be3e7cc5a43bf9747eed5e6923ab5a997ac2f384694b6cc9f6bf539",
+      "bytes": 8373
     },
     {
       "path": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
@@ -4917,13 +4981,13 @@
     },
     {
       "path": "adoption/skills/lifecycle.md",
-      "sha256": "699618216179c94f2142c3cdf5c3075e4db4578715c5ba506b5d5e5f7f19ca77",
-      "bytes": 19590
+      "sha256": "164f4a30bbf0838c65b229885455693539a96f1e7b32ce6c9f563fdbbddb59e6",
+      "bytes": 20171
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "2d5426225cd7da8c8abc9b3542bfe2efbc477fb638b47c8748255afbfa4032d0",
-      "bytes": 56595
+      "sha256": "731b79c977c430e0dd37e7ffa85b8a70df22c1ff1e53998b7cb0dc4923292259",
+      "bytes": 56885
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
@@ -4932,13 +4996,13 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "adef8d297b818434428411cb24fb237405afb4f0ddce931e69b75806630ed95e",
+      "sha256": "304dc11b5fca6e4001382a8cb884712e10d28bdfa8551fcac6dbfc2b4d36cf70",
       "bytes": 12744
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "899ca1d57eea56424fa626bc2014abc9c623ed9e8672d74a703611e6327d8481",
-      "bytes": 8187
+      "sha256": "453173835cb0aec0d4e7396dc21fcc8e1e4bf7c0429078b3d2766b74dceb290f",
+      "bytes": 7307
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -11838,8 +11902,8 @@
     },
     {
       "path": "blueprints/us-equities/AGENTS.md",
-      "sha256": "6771f177d28f29a120d464e56797fef71e96e2be99c5117e47c445db5cce018a",
-      "bytes": 2814
+      "sha256": "b62e98ce878ce279c9d817d01538be5d0247807456db9d626c76709e4a984b11",
+      "bytes": 4608
     },
     {
       "path": "blueprints/us-equities/CLAUDE.md",
@@ -13813,8 +13877,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/README.md",
-      "sha256": "414ad723089dd85745286799888f6f75a9f38ec94528c08a1e5b6bb9914df1dc",
-      "bytes": 7268
+      "sha256": "45534566fd22e51bfdc0c92f209c870b841de0a3604e73cc528a714affffc9ac",
+      "bytes": 8682
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/attempts/20260923T131151Z-handrolled-protocol-probe.json",
@@ -13922,9 +13986,19 @@
       "bytes": 2060
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/ibapi-readonly-20261005.json",
+      "sha256": "daaf666a04ba0ab00920c6ae79dce94c885e0ce762159e898633c420b8b63f3e",
+      "bytes": 2278
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/nautilus-readonly-20260923.json",
       "sha256": "cc9c87daf3cfe58f8a4882b71a19cdc8dc0b5b6c44a36d125c6f3d617720c780",
       "bytes": 1642
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/nautilus-readonly-20261005.json",
+      "sha256": "b6ff1c664fdf8d21891072e30f7091aa08eeed05158602b3ad997e621e21ff81",
+      "bytes": 2163
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/ibapi_probe.py",
@@ -14713,8 +14787,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/README.md",
-      "sha256": "77e0264bdcd7cf1dc700d22236f9f3ba3407b5e5f7a76df1d8883aac64992270",
-      "bytes": 7585
+      "sha256": "b8957339e8e99f9711212bed7e41a509b2349703b595cfbeebe09ac8d5c02904",
+      "bytes": 32889
     },
     {
       "path": "blueprints/us-equities/hosting/backup/README.md",
@@ -14743,23 +14817,93 @@
     },
     {
       "path": "blueprints/us-equities/hosting/config.yaml.example",
-      "sha256": "e411b4c53b531f4c1f44efd0d8c597b5229972bd163f3ba179a29daed4c14d9f",
-      "bytes": 369
+      "sha256": "a8bfd48d297f783c40338eeea473180144e9ddf5a8a6fe6011010dd9e732a24b",
+      "bytes": 691
     },
     {
       "path": "blueprints/us-equities/hosting/dagu-equities.service.example",
-      "sha256": "b7e1814daa569c7b8484f600c13d98956ac3efb6d955e87a768591a38fa7d855",
-      "bytes": 441
+      "sha256": "327f5500f6d02d96508c35a1e512d7adcb2018427067a286b51603bebdd6bd41",
+      "bytes": 863
+    },
+    {
+      "path": "blueprints/us-equities/hosting/drill_local_recovery.py",
+      "sha256": "2ea3cb7d176fbc561e23624d804df346e69df5a5c8ccd10b3485cd86b6a8e015",
+      "bytes": 12362
+    },
+    {
+      "path": "blueprints/us-equities/hosting/drill_process_restart.py",
+      "sha256": "5888fda35b878fc957340de5f2a8152e3f16eaa13e7b8513234e97c09465f001",
+      "bytes": 10995
     },
     {
       "path": "blueprints/us-equities/hosting/equity-research-evidence.yaml",
-      "sha256": "715f893dc329c40c6db6ffcbe23a308c5696e0ec791e49a4a38adfc627f0886d",
-      "bytes": 770
+      "sha256": "6107eebb77ae8904ff6422b7e86f4c551dde36d35aa5d6e87b8f5d72b0c9397f",
+      "bytes": 2688
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/cron-next-probe-r2.json",
+      "sha256": "d397eb9d53692382de7e345783a8ac0585e3857f1fc6664b50fbf6d86ab5cc02",
+      "bytes": 2076
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/dagu-scheduler-comparison.json",
+      "sha256": "c15ac08f09f324a6c1106f167c21cb013bc6c58fefbb04a3092ec68cc8cf43c7",
+      "bytes": 12307
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/dagu-validation.json",
+      "sha256": "ca499670b89b1dfc19745e1e8e5338196fc03e31a53f53c9dd7fa9bace7feccc",
+      "bytes": 444
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/native-dagu-probes-r2.json",
+      "sha256": "86bf2cd9b2b6b698e4ea2de30d227b4e133a40d5de839e9fac92d821840b5f11",
+      "bytes": 21096
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/native-dagu-probes-r3.json",
+      "sha256": "8119d2a1f7d281ed6309f2a46e552538cfc5250fd0af2d7cdd500a8711b8d43b",
+      "bytes": 3255
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/offline-proof-r2.json",
+      "sha256": "c80b455622e549c21e3a0df78ce300c0722182f529bcdae09ddf5ce5c25637b1",
+      "bytes": 10789
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/offline-proof-r3.json",
+      "sha256": "1fb0eebddd33c15c880af008606301364bb62044a123492b86da96af00e83684",
+      "bytes": 11577
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/offline-proof.json",
+      "sha256": "1d2aea2c11578aab27fb20d6d549241cd9b0c1b7b709c9f5081025ff612a7ce4",
+      "bytes": 10383
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/upstream-glue-review-r2.json",
+      "sha256": "2f8c7896b7277264801fc4b701375c612574619a2b96190202396fb52b00e2e7",
+      "bytes": 15859
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/upstream-glue-review-r3.json",
+      "sha256": "79237a01bbe3d7c6997409e910894664aa0a41e8d36240689259e92a9673b5d2",
+      "bytes": 2790
+    },
+    {
+      "path": "blueprints/us-equities/hosting/journal_recovery.py",
+      "sha256": "ac9f179361b951eda229e8a9beb58c15ff03e4691aa0574263e5e9b5cabb2a7d",
+      "bytes": 24043
     },
     {
       "path": "blueprints/us-equities/hosting/receipt.json",
       "sha256": "a7311c35dfb25d6c8f5212435095c1bbc91cde407490a9d61bf895cd1fe9f6cc",
       "bytes": 4873
+    },
+    {
+      "path": "blueprints/us-equities/hosting/session_day.py",
+      "sha256": "624de575e3e829c6086e696a0274dd7c2fc6d802b9343dac8ff8dda5943b4ffc",
+      "bytes": 3540
     },
     {
       "path": "blueprints/us-equities/identity-readiness/README.md",
@@ -15868,8 +16012,8 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "3b9a12bd2102cbf12a077278713c8ee92ad4fd3c5375700ce0abbcc7f2d2b679",
-      "bytes": 153291
+      "sha256": "7a11c341ad0c194ae42e4bcd8fc0fc61c3765bb871e97fec31bef03f3c933594",
+      "bytes": 155287
     },
     {
       "path": "catalogs/landscape/README.md",
@@ -16508,8 +16652,8 @@
     },
     {
       "path": "docs/decisions/2026-09-25-skills-trial-and-usage.md",
-      "sha256": "cfba8d21f04294f26c0d888c14c28d41a931d5d0037580207bebd19f7910618d",
-      "bytes": 145781
+      "sha256": "3eb5161caa86df7fc1edb86c84a208700ae9243240501df468acfddbd237cdb6",
+      "bytes": 146232
     },
     {
       "path": "docs/decisions/2026-09-25-workstation-sota-refresh.md",
@@ -16523,8 +16667,8 @@
     },
     {
       "path": "docs/decisions/2026-09-26-harness-rules-cleanup.md",
-      "sha256": "28068c23be98ef10bb31c9404ad928826ffa52329353e5b5ba96594dac066f2d",
-      "bytes": 24429
+      "sha256": "42dea622e815a233987ddf1e80157ac21392b925db70d7399aba3ccd203f6b67",
+      "bytes": 26706
     },
     {
       "path": "docs/decisions/2026-09-26-stack-agents-role-dispatch.md",
@@ -16708,8 +16852,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "f8f58ec71c6a6ddc59cca95d04a1e8c67fe8ad7dfba4958b890bbbc21a7cf8df",
-      "bytes": 112045
+      "sha256": "549a70f992717568f6fe8811b3f4d7ffbe3299015458686643fffe54a6f86d7b",
+      "bytes": 134812
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -16828,8 +16972,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-codex-rtk-hook-qualified.md",
-      "sha256": "998b2fa725652d923d5a5715e0371093770ad8f1876ed94bdafb87abf2de5db4",
-      "bytes": 38315
+      "sha256": "5cf4c39ec5c38dafedf48a651738e46b0a718cfbd224dcc0c5dc468d45139233",
+      "bytes": 39899
     },
     {
       "path": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
@@ -16838,8 +16982,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-host-baseline-recorder.md",
-      "sha256": "9ef55a32757e36e65f54fadf3360943c885f3bf51031130aa106ebd8760cf5c7",
-      "bytes": 25010
+      "sha256": "1d5f1b5628f5ea707a361418069e36a516bedacec63c65add96c9a7395a7b12f",
+      "bytes": 29171
     },
     {
       "path": "docs/decisions/2026-10-04-nautilus-prerelease-freshness.md",
@@ -16915,6 +17059,11 @@
       "path": "docs/decisions/2026-10-05-rtk-fold-harbor-phase2.md",
       "sha256": "d7698470de9eb7ed30f0764f8b1b17acd8a926298b08630829e1b955ba177dfe",
       "bytes": 23344
+    },
+    {
+      "path": "docs/decisions/2026-10-05-trading-unattended-hosting-recovery.md",
+      "sha256": "604998e8ff2290f91273ebe55c52165f7101cb956a00c56620c85e44fdf03a1d",
+      "bytes": 29820
     },
     {
       "path": "docs/decisions/2026-10-05-typesafe-sdk-transport.md",
@@ -17053,8 +17202,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "017440ae4a397a8c1d06f6e84c958cc55b6afbf287fab629d2a233b90f998ddb",
-      "bytes": 201055
+      "sha256": "9b636a0afe934c68e58e2cb148f6dc95fc044758d3d84381ad8850ab705d35fe",
+      "bytes": 203808
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -17183,12 +17332,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "c49d7d2457692e6d3895cd0896ed601d81d55a90b2f3dd9ff27cec6116da7a16",
+      "sha256": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e",
       "bytes": 685881
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "e8b739408bf4bd24c19ab2c88440bd18084582350c8aa108c575c0362f42c15d",
+      "sha256": "b1dd8bdb72f32d3ab449aa90014b9621f779a5a7b3db590e4253120ba6c0bdfe",
       "bytes": 362513
     },
     {
@@ -17298,13 +17447,13 @@
     },
     {
       "path": "docs/token-practice.md",
-      "sha256": "7b4e30e942e4d3c49680b8443a3d58603224316b2b44dbe4006deecdd5cf2ed0",
-      "bytes": 39853
+      "sha256": "9ce6b2d1710076871e97012ca084e29ec0ea919e1755a45733c7c6361638af49",
+      "bytes": 40805
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "f19bdc04bc36499e5577b9490dc2505ee565dea65cbb214ca8eb445123edf3e1",
-      "bytes": 97518
+      "sha256": "e54b87c1e0ad36ed6f0533e70e80d05935c42fcd72058d1b1ed6174a4e9ecb6a",
+      "bytes": 98350
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -17318,8 +17467,8 @@
     },
     {
       "path": "docs/upstream-surface-watch.md",
-      "sha256": "1638b5cb7f7d05404a9ea897b5efff66d8187f782b02cf44412d44de6f2aec68",
-      "bytes": 18921
+      "sha256": "b2f5d71f0a7d931166dd53b00ec91bb2728a2829df1e335c25363035464da7a5",
+      "bytes": 20291
     },
     {
       "path": "evidence/artifacts/actionlint-successor-parity-20260927/README.md",
@@ -39308,8 +39457,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "ff4b1a3e0cc6a915a09cdb28f8b2a281511d02b95dbb927bea21fb48e2f54bb9",
-      "bytes": 11498
+      "sha256": "36385bc3af6e6cfdaac4dc6fbdfad33eb8f149a80ec726dcc8a130c8689b8749",
+      "bytes": 12145
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -51992,6 +52141,11 @@
       "bytes": 17126
     },
     {
+      "path": "evidence/receipts/ibkr-readonly-acceptance-20261005.json",
+      "sha256": "99580ecf2786f53585823b7695546f67d690fa5c2a6e30e4732854fe3f107787",
+      "bytes": 27783
+    },
+    {
       "path": "evidence/receipts/local-inference-c2-serving-switch-20260926.json",
       "sha256": "84153b7486e2cd9b970d0cb017bcb73b12930158efb2e793e323a6347f09d3e3",
       "bytes": 14360
@@ -52487,6 +52641,21 @@
       "bytes": 6386
     },
     {
+      "path": "evidence/receipts/trading-unattended-hosting-recovery-20261005.json",
+      "sha256": "5162c8dfc2fa3ea8112589fe6f34ed9be7d403f0812a91c2334ee13b69f1a171",
+      "bytes": 9674
+    },
+    {
+      "path": "evidence/receipts/trading-unattended-hosting-recovery-r2-20261005.json",
+      "sha256": "46bcef63ef1ab2542f6c056da0bdd91c949f94e68e76881c690f0732196191c7",
+      "bytes": 30998
+    },
+    {
+      "path": "evidence/receipts/trading-unattended-hosting-recovery-r3-20261005.json",
+      "sha256": "4cb50ba3c449da96f241b5ed6b0c7aa51c71e98cce094ef73a319e15b45767c7",
+      "bytes": 16209
+    },
+    {
       "path": "evidence/receipts/ultracode-token-routing-20260921.json",
       "sha256": "fcb3b15c9f4657f00b92a6c493b33b851136d416e0dbc0f37a8b67360bdedbcf",
       "bytes": 3204
@@ -52588,8 +52757,8 @@
     },
     {
       "path": "examples/claude-native/CLAUDE.md",
-      "sha256": "e35358c4eb22a9ed155061e0ec2dd577ab5488f82c9436c8daa82da976bee3db",
-      "bytes": 13577
+      "sha256": "9bc0f41208ce30ec46a1f08fa7d0b6680f14b8e56266a414389d7e69d2ea36c2",
+      "bytes": 11575
     },
     {
       "path": "examples/claude-native/agents/blind-adjudicator.md",
@@ -52643,8 +52812,8 @@
     },
     {
       "path": "examples/claude-native/workflows/README.md",
-      "sha256": "b25e7d3f2639a54a8a6114c2ca316e8a4121fd85e583793481321765b35f425e",
-      "bytes": 107700
+      "sha256": "466817eba6c4c99d3bc7620cf0b241e14f7d031abfa825dc84de6f028c91901f",
+      "bytes": 110684
     },
     {
       "path": "examples/claude-native/workflows/SHA256SUMS",
@@ -52748,32 +52917,32 @@
     },
     {
       "path": "examples/codex-native/README.md",
-      "sha256": "071881280df5d12a7826ec4e1c162529f8f037027c45b01cfc9ed37a847c2ee3",
-      "bytes": 24461
+      "sha256": "a1dce6b110d38c662be7ca7323a8de567a7b27ce31231a58c55adb37753c5e7e",
+      "bytes": 26282
     },
     {
       "path": "examples/codex-native/agents/evidence-reviewer.toml",
-      "sha256": "b1f528c65c6f6004b2371e4dd4caf92fb19c0d7d6dbef782ea38fd6003b6a122",
+      "sha256": "d2f5effbc4d48a92dbd05ce5f0f81ff188f9fd8eb4a6dcbebb22d41acb81f71e",
       "bytes": 3127
     },
     {
       "path": "examples/codex-native/agents/isolated-builder.toml",
-      "sha256": "548b1b6aed15f8947d9441259678ebae5ac0f34c0113a27ce76c146821c2dee4",
+      "sha256": "c14210ecd15119fe1e4cac6cf207e29642c5594264776ffb2ee12fee2cb47858",
       "bytes": 3183
     },
     {
       "path": "examples/codex-native/agents/semantic-evidence-reviewer.toml",
-      "sha256": "74e43905022e58fb6a2c3ce65f5e43212573f2e2dcd5026bf0dea41d14b1b1b8",
+      "sha256": "3d8d294a9abed2e7635ca3c53fae94f71d7d52b58dd0d3c0f68bbbfe1eab3c42",
       "bytes": 4786
     },
     {
       "path": "examples/codex-native/agents/stack-researcher.toml",
-      "sha256": "48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77",
+      "sha256": "52620afd5a6ded09adeffcfa652007c04f413c18d200ff0c2ae268b5f310fe52",
       "bytes": 7223
     },
     {
       "path": "examples/codex-native/agents/stack-verifier.toml",
-      "sha256": "18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b",
+      "sha256": "aab3b1f7980344adac583bb74ceb5f7d3b1cb98f75b552d993cb4b77626bfc34",
       "bytes": 6685
     },
     {
@@ -53203,8 +53372,8 @@
     },
     {
       "path": "observability/grand-dashboard/README.md",
-      "sha256": "e549c74b036a987965a0cd11078dfbb3c0df4f212593ea4d4b5ffd9284d38e41",
-      "bytes": 7635
+      "sha256": "22662cb7c468977a874f87fa1d2395e00dfd09991a0933e57e357b08b44cadd7",
+      "bytes": 8128
     },
     {
       "path": "observability/grand-dashboard/acceptance.py",
@@ -53523,8 +53692,8 @@
     },
     {
       "path": "scripts/upstream_surface_watch.py",
-      "sha256": "96c124949cfb3368ae11628772531bff65da13732d5634469040fb247902812c",
-      "bytes": 105411
+      "sha256": "ae147f00a36ef462198c8e8976bbbada632a6aff89fdf2edea9ebbb47817640d",
+      "bytes": 107699
     },
     {
       "path": "scripts/validate.py",
@@ -54028,8 +54197,8 @@
     },
     {
       "path": "tests/test_codex_agents.py",
-      "sha256": "bbeb41fee103f03db2cc3f2f9ca22a182b53b4304997297b8ff1c16cb26b7d76",
-      "bytes": 39933
+      "sha256": "37ecbc4109e5efec33e470af2ae521f5a57de87a0840df9e7c91e485c0670cea",
+      "bytes": 39927
     },
     {
       "path": "tests/test_codex_hook_trust.py",
@@ -54043,13 +54212,13 @@
     },
     {
       "path": "tests/test_codex_roles.py",
-      "sha256": "0cbc0a490d3e42223cb4442d53196bc5c6e9447c1180143f3c581b1b0c20fb03",
+      "sha256": "d4b45ef03d09a5934a574f97c7ef844c58df4dcdcc4640a3254e96254dcdb78b",
       "bytes": 33199
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "b6135344dac4e93f46a8ea6e6d30384960daec228b7cc20c059f606a4b0a7db2",
-      "bytes": 190722
+      "sha256": "d35f474cbdfda1e7666ee84479047de04f3666913d15110f7736f8c074bd8d41",
+      "bytes": 191406
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -54233,8 +54402,8 @@
     },
     {
       "path": "tests/test_host_baseline_probe.py",
-      "sha256": "495b8d02036f5240f88edc5b1a2abfdbef010fbd73d82f7f4bee840e81e6f4a6",
-      "bytes": 31719
+      "sha256": "e23d9075900b81ec17bd626ab983674faa4f323cd45602824e499285c673a5be",
+      "bytes": 36179
     },
     {
       "path": "tests/test_host_receipts.py",
@@ -54263,8 +54432,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "f84cfa8343dc88820aec8b0051daf7170b3a5db7872d2aa95d75aafff29064f2",
-      "bytes": 118993
+      "sha256": "66225f2f62892b5600883e15ac362c0a62ef0d858e856ed00b86f418620699bc",
+      "bytes": 131331
     },
     {
       "path": "tests/test_install_skills.py",
@@ -54303,8 +54472,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "67134665e936bb3b9f7ffe89e9108a96911cafe7f173412b91c1e5989fe4a260",
-      "bytes": 377423
+      "sha256": "472f0c0fbae4fc006345df7b1ba7150d2d72643a6838a48076ca2f482d9113e3",
+      "bytes": 377687
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -54333,8 +54502,8 @@
     },
     {
       "path": "tests/test_managed_block.py",
-      "sha256": "103c30facbb744404abcef68734b9d46b78b7fe04593484a899293b4407dd25e",
-      "bytes": 33095
+      "sha256": "78d17b9ead5412bd6ce2dd8372947a3be1672a0b33c0512515fceab884d868df",
+      "bytes": 33994
     },
     {
       "path": "tests/test_memory_lifecycle.py",
@@ -54438,8 +54607,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "4960c28316cce5086d5966929d74799a62d1e37fd3c127cb3e760f6121a7905f",
-      "bytes": 276856
+      "sha256": "fc53272498f2f2222cc604cfcd485935ad20c4896fff4fc415774fb8bb78ed0f",
+      "bytes": 282444
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -54618,8 +54787,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "a10e6db7ec3bd175f64b12292fed1b57ce581e74a81209e2dacacfd6f40a994b",
-      "bytes": 155207
+      "sha256": "aef98d31834907cb8489e0e36415e54653919626ae5649d4602ee0c5449e0868",
+      "bytes": 157423
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",
@@ -54693,8 +54862,8 @@
     },
     {
       "path": "tests/test_skills_manifest.py",
-      "sha256": "ece8667185c2932d47bed55fab86874e44fcee5b29428ed56ca0026c3c9c669f",
-      "bytes": 19754
+      "sha256": "9020a7c87958c36df3c81e42e94869c5c49accde595e619c012e2f46d66d266e",
+      "bytes": 19524
     },
     {
       "path": "tests/test_skills_status.py",
@@ -54783,8 +54952,13 @@
     },
     {
       "path": "tests/test_upstream_surface_watch.py",
-      "sha256": "e60c417abd190f598a9ba1f248a1ea94ced9d1b2e13b265fd494266a9d427bca",
-      "bytes": 121324
+      "sha256": "e2b67d99b2921273c683fad75b89c78c3b1643f64bddec8887a818d50cf97d56",
+      "bytes": 125461
+    },
+    {
+      "path": "tests/test_us_equities_hosting.py",
+      "sha256": "bd947c5a67c6265c3cae717dc0396ebe7fd1aa0919cdc5e89c8872b0c211f459",
+      "bytes": 55117
     },
     {
       "path": "tests/test_validate.py",
@@ -54863,8 +55037,8 @@
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
-      "sha256": "ed9bd6544f9c18ae318c224b8c8541d49f7dcd399fbbe371bacc4a458982b2d7",
-      "bytes": 92072
+      "sha256": "b5ce278be6c39076d4dd42cc2b8bf0a76c63adf2bfd5cfd4e016bfa5fbddb858",
+      "bytes": 92234
     },
     {
       "path": "tools/adoption/codex_hook_trust.py",
@@ -54873,8 +55047,8 @@
     },
     {
       "path": "tools/adoption/codex_roles.py",
-      "sha256": "d02975b4d5e7f4e43ab347f18d99a4973a9e262cdad816147e63410c0543feff",
-      "bytes": 34229
+      "sha256": "620cca61a86d1272745f9a04b1b3e987005c67faf22f3d8621878af779710291",
+      "bytes": 34367
     },
     {
       "path": "tools/adoption/embed_acceptance.py",
@@ -54888,13 +55062,13 @@
     },
     {
       "path": "tools/adoption/host-baseline.md",
-      "sha256": "7bed0cbee248b9700ec34f736d2fa1909497f2b63b7093b350f3bc6b512ee992",
-      "bytes": 16100
+      "sha256": "478e7f061e964606cf4f7209155f596b76bf04bc5bd6a67fdaba7a5a0cbc4c4c",
+      "bytes": 16770
     },
     {
       "path": "tools/adoption/host_baseline_probe.py",
-      "sha256": "a3dcf5d27e29587101818f71a99cd0acfeed75fcfad3d13aacbeb4778dfabb55",
-      "bytes": 17646
+      "sha256": "f99aaa0e8e3b6ef057dc47fb5b0f9fbf281bf07686cc5f2d57d287753c554c78",
+      "bytes": 17992
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
@@ -54908,17 +55082,17 @@
     },
     {
       "path": "tools/adoption/managed_block.py",
-      "sha256": "4a5d7c2001be450209aa903af691e653b39989af654bf0e61d70b2199012bba8",
-      "bytes": 23567
+      "sha256": "0a60f63d6540d1999df93168fc560884e29f1cb5de3a09caa1b19eeb3c5fabc5",
+      "bytes": 24430
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "ff5ae788cfa9196f83e35fcedfe985e43a2767ac429936c2eac639961d368784",
-      "bytes": 151287
+      "sha256": "ae8f67fd2ed4028998bbf7524dc758491ba98c2b9c2b6ed82312c50b9faa4127",
+      "bytes": 153006
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
-      "sha256": "bf14abefe41c2886526fa7a3229e5fb2e58318f959a09c3aea1004648c91ea75",
+      "sha256": "cbc08bc9fb357307b48e97536bdfdbd07c41f304c13c0938b67e1a1a8d38e957",
       "bytes": 35166
     },
     {
@@ -55133,13 +55307,13 @@
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_args.py",
-      "sha256": "434544166ed070b7050671d9b669962d5f13a6afbd1e8714572c7ffef8720192",
+      "sha256": "ca6c59cb1b666601bb25c4a1f20ae6da22050072b6d98fbc0dcad77dcf096790",
       "bytes": 51608
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/build_inputs.py",
-      "sha256": "9a26ac63c854ddcaa107f2a892707cc5fccf2cf35f99cf3d3249a0d8c8fe097f",
-      "bytes": 62428
+      "sha256": "ec0bf5f398349e2b5313fff34d228ac89d86f1059ff04bfec1dc48be45d9625d",
+      "bytes": 62451
     },
     {
       "path": "tools/sota-convergence/landscape-sweep/codex_call.sh",

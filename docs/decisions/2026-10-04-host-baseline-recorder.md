@@ -381,3 +381,68 @@ The t3 intermediate counts above remain historical reported results; the t4
 regressions reproduce the new findings against the committed t3 code. Historical
 captures, source archives, upgrade evidence and receipt amendments stay unchanged.
 Registration follows the completed recorder, tests, guide and decision changes.
+
+## Post-merge privacy repair r5 (2026-10-05)
+
+The t4 cross-family verdict accepted PR #710 with three p2 residuals. Against
+main `ec0b8fd821a7b2004c331d2185b33d9e5ed47896`, the new Claude regression exited
+1 with three failing subtests: prerelease and build suffixes containing the login
+were erased with the leading label. The exemption now retains the entire suffix
+for the existing login checks. This keeps the observed numeric/product label
+controls and a benign build suffix passing, without assuming a stricter upstream
+version grammar. The same regression then exited 0.
+
+The home-path regression exited 1 with 14 failing subtests against the unchanged
+t4 normalization: sibling escapes and interior `..` traversal, each in output,
+stderr, command text and a key, plus two lexical-normalization controls. Absolute
+values with a `..` component now fail closed before tilde conversion. Remaining
+absolute paths use Python's maintained stdlib `posixpath.normpath` before the
+complete-home membership check; symlinks are not resolved. The implementation
+was checked in the installed CPython 3.13.15 stdlib
+([python/cpython v3.13.15, Lib/posixpath.py](https://github.com/python/cpython/blob/v3.13.15/Lib/posixpath.py)).
+The two dotted/repeated-separator controls return `~/bin/env`, and all traversal
+fixtures return exit 3 with empty stdout and stderr. The regression then exited 0.
+
+The existing sibling-home subtests now use the case index instead of the shared
+executable basename. A stdlib `TestResult` ID check first exited 1 with eight
+duplicates among 18 subtests, then exited 0 with all 18 IDs distinct.
+
+Targeted acceptance passed all 26 module tests with exit 0, including the
+unchanged 15-pair committed-capture matrix. The local stdin dry run exited 0 with
+one JSON object, empty stderr and zero login, home-prefix and actual-home matches.
+Its output stays in scratch under TMPDIR `~/.cache/baseline-privacy-r5`; commands
+use nice 19. The six historical capture/source/upgrade artifacts retain their
+original SHA256s, and receipts remain unchanged. Registration follows the
+completed recorder, tests, guide and decision changes.
+
+## Privacy repair r6 (2026-10-05)
+
+The r5 cross-family read accepted the change with three p2 findings. The fidelity
+regression against `26d6bdd7bd9ae5a0ce1c50fce499b8479dc95c6e` exited 1 with 12
+failing subtests: normalizing a whole output value collapsed URL separators and
+removed a trailing slash from error text. Normalization now uses the existing
+stdlib `posixpath.normpath` only for single-line, whitespace-free absolute values.
+For other values, a leading complete home prefix is replaced while its remainder
+stays verbatim. This chooses the review's bounded alternative without adding a
+path-token parser. The same control passed with exit 0.
+
+The traversal regression adds newline- and carriage-return-terminated `..` in
+output, stderr, command text and keys. These eight new subtests failed against
+the committed r5 probe (exit 1). Checking `/`-delimited components on each line
+now refuses them with exit 3 and empty stdout/stderr; the regression exited 0.
+The existing sibling, interior-traversal and lexical-normalization controls stay
+passing. The guide also narrows its whole-document claim to homes under the
+Linux home prefix: an embedded reference to a home elsewhere can survive unless
+a profile pattern or login check matches. This corrects the claim without
+changing the gate's scope.
+
+A committed unittest now asserts that the sibling-home subtest IDs are unique.
+The IDs were already distinct at r5, so this control passes on that baseline
+(exit 0). Reintroducing the former shared `env` label in memory makes it fail
+(exit 1); the unchanged case-index labels pass (exit 0). These outcomes preserve
+the distinction between a new behaviour repair and coverage of an existing fix.
+
+The targeted module passed all 28 tests with exit 0. The six historical artifacts
+and four receipts remain unchanged. Commands use nice 19 with scratch under
+TMPDIR `~/.cache/baseline-privacy-r6`, outside the worktree and `/tmp`.
+Registration follows the completed recorder, tests, guide and decision changes.

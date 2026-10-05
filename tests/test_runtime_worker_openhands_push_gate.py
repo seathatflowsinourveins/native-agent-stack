@@ -138,9 +138,9 @@ class GateFixture:
         self.trusted = self.clone("trusted")
         self.count = 0
 
-    def clone(self, name):
+    def clone(self, name, *, git_config=()):
         path = self.root / name
-        subprocess.run(["git", "clone", "-q", str(self.bare), str(path)], check=True, capture_output=True,
+        subprocess.run(["git", *git_config, "clone", "-q", str(self.bare), str(path)], check=True, capture_output=True,
                        env=hermetic_git_environment())
         return path
 
@@ -164,6 +164,30 @@ class GateFixture:
                 else:
                     write_file(clone, rel, data if number == 0 else f"{data}{number}\n")
             head = commit_all(clone, f"agent {number}")
+        return clone, head
+
+    def agent_index_commit(self, edits):
+        """An agent commit with exact index paths, independent of worktree filename folding."""
+        # git/git v2.43.0 t/t2107-update-index-basic.sh:59-69 builds index-only
+        # entries with hash-object --stdin and update-index --cacheinfo.
+        # Documentation/git-{write,commit}-tree.txt describes committing that index
+        # without restaging the worktree. Disable macOS argv normalization and case
+        # folding for every Git call so even aliases of existing files stay distinct.
+        config = ("-c", "core.precomposeunicode=false", "-c", "core.ignorecase=false")
+        self.count += 1
+        clone = self.clone(f"agent-{self.count}", git_config=config)
+        parent = run_git(clone, *config, "rev-parse", "HEAD").stdout.decode().strip()
+        for rel, data in edits.items():
+            if data is None:
+                run_git(clone, *config, "update-index", "--force-remove", "--", rel)
+            else:
+                raw = data if isinstance(data, bytes) else data.encode("utf-8")
+                oid = run_git(clone, *config, "hash-object", "-w", "--stdin", input=raw).stdout.decode().strip()
+                run_git(clone, *config, "update-index", "--add", "--cacheinfo", f"100644,{oid},{rel}")
+        tree = run_git(clone, *config, "write-tree").stdout.decode().strip()
+        head = run_git(clone, *config, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.invalid",
+                       "commit-tree", tree, "-p", parent, "-m", "agent 0").stdout.decode().strip()
+        run_git(clone, *config, "update-ref", "HEAD", head, parent)
         return clone, head
 
 
@@ -1541,7 +1565,11 @@ class OwnedPathGateTests(unittest.TestCase):
                                ("unicode_nfc_collision", ("docs/caf\u00e9", "docs/cafe\u0301")),
                                ("unicode_nfkc_collision", ("docs/A", "docs/\uff21"))):
             with self.subTest(control=control):
-                clone, head = self.fixture.agent_commit(dict.fromkeys(paths, "fixture\n"))
+                clone, head = self.fixture.agent_index_commit(dict.fromkeys(paths, "fixture\n"))
+                names = run_git(clone, "-c", "core.precomposeunicode=false", "-c", "core.ignorecase=false",
+                                "ls-tree", "-r", "--name-only", "-z", head).stdout.split(b"\0")[:-1]
+                for path in paths:
+                    self.assertIn(path.encode("utf-8"), names, f"{control}: fixture tree lost {path!r}")
                 self.refuse(control, clone, head, "changed_path_collision")
 
     def test_unicode_protected_alias_even_when_owned(self):
@@ -1557,7 +1585,8 @@ class OwnedPathGateTests(unittest.TestCase):
         gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
         for alias in ("policy/CAF\u00c9.toml", "policy/cafe\u0301.toml", "policy/\uff43af\u00e9.toml"):
             with self.subTest(alias=alias):
-                clone, head = fixture.agent_commit({alias: "strict = false\n"})
+                # Preserve the unchanged policy file alongside its alias on APFS.
+                clone, head = fixture.agent_index_commit({alias: "strict = false\n"})
                 with contextlib.redirect_stderr(io.StringIO()):
                     record = gate.check(str(clone), base=fixture.base, head=head, owned_paths=("policy",))
                 self.observe("unchanged_protected_alias", record)
@@ -1573,7 +1602,8 @@ class OwnedPathGateTests(unittest.TestCase):
         self.assertEqual(record["status"], "pass")
         for alias in ("docs/A.md", "docs/\uff41.md"):
             with self.subTest(alias=alias):
-                clone, head = self.fixture.agent_commit({alias: "fixture\n"})
+                # docs/a.md must remain unchanged while the alias is added.
+                clone, head = self.fixture.agent_index_commit({alias: "fixture\n"})
                 record = self.check(clone, head)
                 self.observe("unchanged_unprotected_alias_residual", record)
                 self.assertEqual(record["status"], "pass")
