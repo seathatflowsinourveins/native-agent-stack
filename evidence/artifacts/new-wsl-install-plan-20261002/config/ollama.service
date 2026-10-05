@@ -1,5 +1,10 @@
 # Ollama 0.35.0 on NativeStack2604 (wave-2 localmodel step 4 with ruling changes 5 and 6). One GPU owner at a time:
 # it is enabled only at the GPU handover; inside a GPU window it is started explicitly.
+# 2026-10-05 (the user's decision, about 15:08Z): models load on demand and unload after 30 min idle (Ollama's native
+# keep-alive; upstream default 5m per `ollama serve --help` at 0.35.0). Measured: 0 workflow calls in the first 70 min,
+# about 19 GiB of VRAM pinned, Windows down to about 0.45 GiB free; cold load about 11 s for the 27B model, a few s for the embedder.
+# The boot preload is removed because its keep_alive:-1 requests pinned both models forever. Overturn condition: an organic-use
+# measurement showing calls frequent enough that reload latency costs more than the freed VRAM.
 [Unit]
 Description=Ollama 0.35.0 local model server (NativeStack2604; one GPU owner at a time)
 After=network-online.target
@@ -7,9 +12,8 @@ After=network-online.target
 [Service]
 ExecCondition=/bin/sh -c 'out=$$(/usr/bin/ss -ltnH "( sport = :18231 or sport = :18232 or sport = :21434 )") || exit 255; test -z "$$out"'
 ExecStart=%h/.local/share/mise/installs/ollama/0.35.0/bin/ollama serve
-ExecStartPost=-%h/.local/share/new-wsl-native-stack/bin/ollama-warmup.sh
 Environment=OLLAMA_HOST=127.0.0.1:21434
-Environment=OLLAMA_KEEP_ALIVE=-1
+Environment=OLLAMA_KEEP_ALIVE=30m
 Environment=OLLAMA_NUM_PARALLEL=1
 Environment=OLLAMA_NO_CLOUD=1
 TimeoutStartSec=600

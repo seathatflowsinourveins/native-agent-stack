@@ -40,12 +40,14 @@
     "unit": {
       "artifact_alias": "config/ollama.service",
       "bytes": 845,
-      "sha256": "94e03d7b35b57327086b74a1ea7b189bf362c970e756703dc8a1f42340618c50"
+      "sha256": "94e03d7b35b57327086b74a1ea7b189bf362c970e756703dc8a1f42340618c50",
+      "historical_source_revision": "64f11b1069455e7c3a6483974524896c62cb4281"
     },
     "warmup": {
       "artifact_alias": "config/ollama-warmup.sh",
       "bytes": 860,
-      "sha256": "2236dc865fde718d7cd44a9182b17fb55dcd36a0bbd601e9f4bd81d1c35892e5"
+      "sha256": "2236dc865fde718d7cd44a9182b17fb55dcd36a0bbd601e9f4bd81d1c35892e5",
+      "historical_source_revision": "64f11b1069455e7c3a6483974524896c62cb4281"
     },
     "asset_provenance": "user-designated existing owner files; exact supplied hashes, host originals read without editing",
     "ruling": "D-ollama2026-10-05; task-ns2604-coop-20261005T142343Z point1; supersedes historical local-model decision254\u2013257",
@@ -63,7 +65,8 @@
       "bytes": 40,
       "sha256": "8880af82831af79db393b69c5412969d09237dee6a4612a80d4dc953a816dace"
     },
-    "not_proved": "model warmup success, residency, GPU inference or future reboot"
+    "not_proved": "model warmup success, residency, GPU inference or future reboot",
+    "superseded_scope": "D-ollama-2 changes current unit/removes row warmup; these unchanged outcomes/hashes refer to earlier bytes at historical_source_revision."
   },
   "checks": [
     {
@@ -146,12 +149,14 @@
     {
       "artifact_alias": "config/ollama.service",
       "bytes": 845,
-      "sha256": "94e03d7b35b57327086b74a1ea7b189bf362c970e756703dc8a1f42340618c50"
+      "sha256": "94e03d7b35b57327086b74a1ea7b189bf362c970e756703dc8a1f42340618c50",
+      "historical_source_revision": "64f11b1069455e7c3a6483974524896c62cb4281"
     },
     {
       "artifact_alias": "config/ollama-warmup.sh",
       "bytes": 860,
-      "sha256": "2236dc865fde718d7cd44a9182b17fb55dcd36a0bbd601e9f4bd81d1c35892e5"
+      "sha256": "2236dc865fde718d7cd44a9182b17fb55dcd36a0bbd601e9f4bd81d1c35892e5",
+      "historical_source_revision": "64f11b1069455e7c3a6483974524896c62cb4281"
     }
   ],
   "recipe_identities": [

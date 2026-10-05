@@ -2568,7 +2568,7 @@
       "route": "mise",
       "commands": [
         "mise use -g ollama@0.35.0",
-        "ollama_unit_path=\"$HOME/.config/systemd/user/ollama.service\"; ollama_warmup_path=\"$HOME/.local/share/new-wsl-native-stack/bin/ollama-warmup.sh\"; if [[ -L \"$ollama_unit_path\" || -L \"$ollama_warmup_path\" ]] || { [[ -e \"$ollama_unit_path\" ]] && ! cmp -s -- \"$config_root/ollama.service\" \"$ollama_unit_path\"; } || { [[ -e \"$ollama_warmup_path\" ]] && ! cmp -s -- \"$config_root/ollama-warmup.sh\" \"$ollama_warmup_path\"; }; then   printf 'needs_owner: retained differing Ollama unit or warmup script.\\n' >&2;   exit 3; fi; install -d -m 0700 -- \"$HOME/.config/systemd/user\" \"$HOME/.local/share/new-wsl-native-stack/bin\" && install -m 0600 -- \"$config_root/ollama.service\" \"$ollama_unit_path\" && install -m 0755 -- \"$config_root/ollama-warmup.sh\" \"$ollama_warmup_path\"",
+        "ollama_unit_path=\"$HOME/.config/systemd/user/ollama.service\"; if [[ -L \"$ollama_unit_path\" ]] || { [[ -e \"$ollama_unit_path\" ]] && ! cmp -s -- \"$config_root/ollama.service\" \"$ollama_unit_path\"; }; then   printf 'needs_owner: retained differing Ollama unit.\\n' >&2;   exit 3; fi; install -d -m 0700 -- \"$HOME/.config/systemd/user\" && install -m 0600 -- \"$config_root/ollama.service\" \"$ollama_unit_path\"",
         "systemctl --user daemon-reload && systemctl --user enable --now ollama.service"
       ],
       "needs": {
@@ -2600,11 +2600,11 @@
           }
         },
         "service_health": {
-          "command": "systemctl --user is-enabled ollama.service\nsystemctl --user is-active ollama.service\nOLLAMA_HOST=127.0.0.1:21434 ollama ls",
+          "command": "systemctl --user is-enabled ollama.service\nsystemctl --user is-active ollama.service\ncurl -fsS --connect-timeout 5 --max-time 120 http://127.0.0.1:21434/api/embed -d '{\"model\":\"qwen3-embedding-8k\",\"input\":\"Hello world\"}' | jq -e '.model == \"qwen3-embedding-8k\" and (.embeddings | type == \"array\" and length == 1) and (.embeddings[0] | type == \"array\" and length > 0 and all(.[]; type == \"number\"))' >/dev/null\ncurl -fsS --connect-timeout 5 --max-time 30 http://127.0.0.1:21434/api/ps | jq -e '.models | select(type == \"array\") | map(select(.name == \"qwen3-embedding-8k:latest\" and .model == \"qwen3-embedding-8k:latest\")) | length == 1 and (.[0] | (.size | type == \"number\" and . > 0) and (.size_vram | type == \"number\") and .size_vram == .size)' >/dev/null",
           "kind": "health",
           "source": {
-            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/cli.mdx#L97",
-            "line": 97
+            "url": "https://raw.githubusercontent.com/ollama/ollama/cc4069396f3ad2c370c53eed2e4a42ac13adab84/docs/api.md#L1736",
+            "line": 1736
           }
         },
         "after_sign_in": {
@@ -2618,10 +2618,9 @@
       },
       "config_paths": [
         "$config_root/ollama.env.example",
-        "$config_root/ollama.service",
-        "$config_root/ollama-warmup.sh"
+        "$config_root/ollama.service"
       ],
-      "notes": "Ollama0.35.0 uses the registered user-level mise route. D-ollama (2026-10-05), command-center item task-ns2604-coop-20261005T142343Z point1, carries the user's2026-10-03 lasting NativeStack2604 GPU-owner ruling. It supersedes the undecided ownership/startup limitation in docs/decisions/2026-10-03-new-wsl-local-models.md:254–257. Upstream docs/linux.mdx:57–89 supplies the system-unit form; this plan adopts the already owned user-unit adaptation and warmup bytes exactly, SHA25694e03d7b35b57327086b74a1ea7b189bf362c970e756703dc8a1f42340618c50 and2236dc865fde718d7cd44a9182b17fb55dcd36a0bbd601e9f4bd81d1c35892e5. Place both through copy_config, retain a differing or symlinked destination with nonzero needs_owner, then native daemon-reload/enable --now. Warmup preloads only the two settled model names; ExecStartPost failure is nonfatal. service_health requires native enabled state and lists the server. The after_sign_in /api/embed check remains unchanged; it is skipped until the embedding-model manifest exists. Ruling10: the co-op/readiness-runner is the only shared-host plan-apply writer. The co-op reports enabling at2026-10-05T14:28:53Z with its private ollama-enable.log; that report is separate from this lane's source/local tests and any independently rerun enabled-state health check.",
+      "notes": "Ollama0.35.0 retains the user-approved lasting NativeStack2604 GPU-owner ruling (D-ollama, 2026-10-05, command-center item task-ns2604-coop-20261005T142343Z point1; local-model decision254\u2013257). D-ollama-2 describes the user's about15:05Z decision: no organic workflow calls since13:58Z, about19GiB pinned VRAM with Windows about0.45GiB free, cold-load about11s for27B/3.2s for the embedder. Use on-demand loading and native30m idle expiry; organic calls/reload-cost measurement can overturn it. Installed ollama serve --help at0.35.0 reports built-in5m; envconfig/config.go:126\u2013143 documents env override and infinite negative values. Adopt exact new user-unit bytes SHA2565e8e8bc42306f2d1ebc6da912e34daa28c6ce73eccf793d3155851733dccc6db, with no ExecStartPost or warmup row asset. Upstream docs/linux.mdx:57\u201389 supplies the adapted unit form. Retain differing/symlinked unit custody with nonzero needs_owner, then native daemon-reload/enable --now by the sole co-op plan writer. service_health requires enabled/active, one on-demand /api/embed, then exactly one canonical embedder /api/ps entry with positive numeric size_vram==size; no preloaded-state requirement, no keep_alive:-1 request. after_sign_in remains the unchanged embed smoke and model-store prerequisite. All figures are reported decision inputs, not remeasured here; unit header's about15:08Z timestamp remains exact. Sources: ollama/ollama@cc4069396f3ad2c370c53eed2e4a42ac13adab84:docs/api.md:1659\u20131704,1736\u20131771; server/routes.go:2422\u20132440; types/model/name.go:230\u2013247. No host config apply by this lane.",
       "mise_tool": "ollama",
       "supporting_sources": [
         {

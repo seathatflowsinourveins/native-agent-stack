@@ -582,7 +582,7 @@ def main():
             bad("mise", f"row {r['slot']} has route mise but names no mise_tool")
 
     # D-ollama: owner-approved native user-unit adaptation; no host apply here.
-    # Source: Ollama v0.35.0 docs/linux.mdx:53-85; local-model decision:254-257 superseded by 2026-10-05 ruling.
+    # Source: Ollama v0.35.0 docs/linux.mdx:57-89; D-ollama-2 on-demand/30m owner ruling.
     ollama = by_slot.get("local-model-server", {})
     if not ollama.get("needs", {}).get("systemd_user_unit"):
         bad("local-model-server", "lasting GPU owner requires its user-unit prerequisite")
@@ -592,9 +592,17 @@ def main():
     health = (ollama.get("acceptance", {}).get("service_health") or {}).get("command") or ""
     if "systemctl --user is-enabled ollama.service" not in health.splitlines():
         bad("local-model-server", "service_health must require boot-enabled ollama.service")
+    if (health.splitlines()[:2] != ["systemctl --user is-enabled ollama.service",
+                                    "systemctl --user is-active ollama.service"]
+            or health.count("/api/embed") != 1 or health.count("/api/ps") != 1
+            or health.index("/api/embed") > health.index("/api/ps")
+            or '.size_vram == .size' not in health
+            or 'qwen3-embedding-8k:latest' not in health):
+        bad("local-model-server", "service_health must load the embedder on demand before its positive GPU-residency gate")
+    if any("ollama-warmup.sh" in value for value in ollama.get("commands", []) + ollama.get("config_paths", [])):
+        bad("local-model-server", "D-ollama-2 removes the warmup asset and all installer references")
     assets = {
-        "ollama.service": "94e03d7b35b57327086b74a1ea7b189bf362c970e756703dc8a1f42340618c50",
-        "ollama-warmup.sh": "2236dc865fde718d7cd44a9182b17fb55dcd36a0bbd601e9f4bd81d1c35892e5",
+        "ollama.service": "5e8e8bc42306f2d1ebc6da912e34daa28c6ce73eccf793d3155851733dccc6db",
     }
     for name, expected in assets.items():
         path = plan_dir / "config" / name
