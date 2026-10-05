@@ -1114,7 +1114,7 @@ class NewWslHandbookTests(unittest.TestCase):
                 self.assertIn(f"{row['catalog']} / {row['layer_id']} / owner_decision", cells[9])
         overturned = [row for row in manifest["slots"] if row.get("overturned")]
         self.assertEqual(sorted(row["slot_id"] for row in overturned),
-                         ["ccusage", "code-search", "context-supply", "session-analytics"])
+                         ["ccusage", "code-search", "context-supply", "promptfoo", "session-analytics"])
         for row in overturned:
             item = row["overturned"]["amendment"]
             with self.subTest(owner_amendment=row["slot_id"]):
@@ -1250,7 +1250,15 @@ class NewWslHandbookTests(unittest.TestCase):
         commands = page_commands()
         self.assertIn("readlink /proc/self/ns/cgroup", commands)
         generator = self.committed("scripts/build_new_wsl_handbook.py")
-        profile = "\n".join(all_strings(json.loads(self.committed(handbook.PROFILE))))
+        profile_data = json.loads(self.committed(handbook.PROFILE))
+        promptfoo = next(row for row in profile_data["entries"] if row["name"] == "promptfoo")
+        # A tool recipe may point at its canonical plan row; it does not duplicate F9's stage block.
+        plan_path = "evidence/artifacts/new-wsl-install-plan-20261002"
+        self.assertTrue(promptfoo["default_install"])
+        self.assertEqual(promptfoo["install"]["command"], f"bash {plan_path}/install.sh --only promptfoo")
+        self.assertEqual(promptfoo["install"]["source"], f"{plan_path}/install-plan.json")
+        promptfoo["install"]["command"] = ""
+        profile = "\n".join(all_strings(profile_data))
         profile += "\n" + self.committed("adoption/new-wsl-profile.md")
         for command in sorted(commands):
             with self.subTest(command=command):

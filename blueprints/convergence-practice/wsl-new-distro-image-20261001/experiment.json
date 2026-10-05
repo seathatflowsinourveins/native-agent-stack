@@ -81,7 +81,7 @@
     ],
     "sources": [
       {
-        "path": "adoption/platforms/linux-wsl2-new-distro.md",
+        "path": "evidence/artifacts/new-wsl-fix-wave-20261004/frozen-inputs/linux-wsl2-new-distro.md.txt",
         "sha256": "ff94e93390875a4c6d2baa352fa7075e66acc7a966b33f1ef62338fb9988b7f3"
       },
       {
@@ -109,7 +109,7 @@
         "sha256": "7c0811c460fe8732f413b954cd7ddadb5cc41a5300f8686b5b83aefcd80a971a"
       },
       {
-        "path": "tests/test_wsl_new_distro_recipe.py",
+        "path": "evidence/artifacts/new-wsl-fix-wave-20261004/frozen-inputs/test_wsl_new_distro_recipe.py.txt",
         "sha256": "a05c758abd049d8d5f50459b39b223ad0d96bd5960b2dccc50bfc1ab7d09e8f3"
       }
     ]

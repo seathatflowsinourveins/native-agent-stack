@@ -1,0 +1,34 @@
+# Native harness: prometheus/prometheus@v3.15.0:docs/configuration/unit_testing_rules.md:6.
+# Synthetic rule inputs; they are not a real notification receipt.
+rule_files: [prometheus-alerts.yaml]
+evaluation_interval: 5s
+tests:
+  - interval: 5s
+    input_series:
+      - series: 'up{job="prometheus",instance="127.0.0.1:21090"}'
+        values: '0+0x25 1+0x4'
+      - series: 'up{job="acceptance-fixture",instance="127.0.0.1:21997"}'
+        values: '0+0x3 1+0x26'
+    alert_rule_test:
+      - eval_time: 115s
+        alertname: EcosystemServiceUnavailable
+        exp_alerts: []
+      - eval_time: 120s
+        alertname: EcosystemServiceUnavailable
+        exp_alerts:
+          - exp_labels: {job: prometheus, instance: '127.0.0.1:21090', severity: warning, scope: local-ecosystem}
+            exp_annotations: {summary: 'Local service prometheus is unavailable'}
+      - eval_time: 130s
+        alertname: EcosystemServiceUnavailable
+        exp_alerts: []
+      - eval_time: 5s
+        alertname: EcosystemAcceptanceTargetDown
+        exp_alerts: []
+      - eval_time: 10s
+        alertname: EcosystemAcceptanceTargetDown
+        exp_alerts:
+          - exp_labels: {job: acceptance-fixture, instance: '127.0.0.1:21997', severity: test, scope: synthetic-acceptance}
+            exp_annotations: {summary: 'Controlled local acceptance target is unavailable'}
+      - eval_time: 20s
+        alertname: EcosystemAcceptanceTargetDown
+        exp_alerts: []

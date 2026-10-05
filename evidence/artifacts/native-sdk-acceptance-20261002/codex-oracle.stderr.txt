@@ -1,0 +1,9 @@
+test_average_preserves_normal_result (test_utils.QuickstartContract.test_average_preserves_normal_result) ... ok
+test_empty_average_does_not_crash (test_utils.QuickstartContract.test_empty_average_does_not_crash) ... ok
+test_name_preserves_normal_result (test_utils.QuickstartContract.test_name_preserves_normal_result) ... ok
+test_null_user_does_not_crash (test_utils.QuickstartContract.test_null_user_does_not_crash) ... ok
+
+----------------------------------------------------------------------
+Ran 4 tests in 0.000s
+
+OK

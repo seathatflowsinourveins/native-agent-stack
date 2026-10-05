@@ -1239,5 +1239,70 @@
     }
    }
   ]
+ },
+ "wave4": {
+  "date_utc": "2026-10-04",
+  "meaning": "the 2026-10-04 owner default on promptfoo under the owner's repository-quality rule: decide round 2 named promptfoo the owner of paired skill verification in both clients, and the fix wave's G6 recipe installs it; selection record only: no comparison named here has run",
+  "owner_rule": "Amendment 4 (wave 3, 2026-10-04): on the owner's dated decision, as the record that relays it states it, a batch may add rows of kind owner_decision and give a row whose decided default installs nothing an owner default. An owner row or an owner default names what it installs and at which pin, the job it owns and the comparison that would remove it; that comparison reports to the owner and removes nothing by itself. The fields an owner default replaces, and an interim it drops, stay recorded on the row under overturned. Neither is definitive, a blind result, a consensus or a measurement, and no other installed row may own its job; its label starts with 'owner decision' and names its authority. The relaying record is hashed in the batch, quotes the owner's words and names every slot the batch changes. The install plan installs it as the row's owner, and the client configuration wires what it installs.",
+  "no_install_rule_exception": "Amendment 4 makes a second exception to the no-install rule: an owner row or an owner default installs on the owner's decision before measured evidence shows a gain; net provider savings stay unmeasured, and the decision it replaces stays recorded beside it.",
+  "authority": {
+   "kind": "owner_decision",
+   "date_utc": "2026-10-04",
+   "decision": "fill documented gaps by the candidate repository's own quality evidence, without a new local trial, and finalize the architecture for the clean install (the repository-quality rule, applied by decide round 2)",
+   "verbatim": "with the repos quality itself resolute our architecture with the sota repos's own quality and finalize for the architecture for us to clean install",
+   "relayed_by": "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
+   "rule_basis": "docs/decisions/2026-10-04-repository-quality-rule.md (decide round 2); amendment 4's owner default (wave3.owner_rule)"
+  },
+  "records": {
+   "decision_record": {
+    "path": "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
+    "sha256": "e60ca8cf00843aafeee60871ee638252c2a942688653c79669b6a96bccaadb4a"
+   },
+   "quality_rule": {
+    "path": "docs/decisions/2026-10-04-repository-quality-rule.md",
+    "sha256": "b11fac1ba8dfa8b64a1a1c53c24fe5bea69228e74c7142aa38ec169890326e91"
+   },
+   "round2_extract": {
+    "path": "evidence/artifacts/new-wsl-fix-wave-20261004/repository-quality-promptfoo.json",
+    "sha256": "92b70fde74999cb3ae8f00462b01ce92a3a0a649dbc1380bc00619d7b1d7c6bc"
+   }
+  },
+  "acknowledgements": [],
+  "acknowledgements_owed": [],
+  "add_rows": [],
+  "amend_rows": [
+   {
+    "slot_id": "promptfoo",
+    "amendment": {
+     "date_utc": "2026-10-04",
+     "by": "the owner's repository-quality rule of 2026-10-04 (wave 4, amendment 4)",
+     "decision": "Promptfoo 0.123.1 installs as the owner of the row's prompt and provider regression tests and of the paired skill-version regression verification in both clients that decide round 2 gave it; skill-authoring (skill-creator) keeps authoring and authoring-time evaluation; the blind no-install decision stays under overturned."
+    },
+    "owner_default": {
+     "default": "Promptfoo 0.123.1",
+     "repository": "https://github.com/promptfoo/promptfoo",
+     "label": "owner decision of 2026-10-04 (wave 4, amendment 4): the owner's repository-quality rule; installed because decide round 2 named promptfoo the owner of paired skill verification in both clients; the blind no-install decision stays under overturned; live acceptance unrun; not a blind result, consensus or measurement",
+     "claude": "Opus checks of both decide rounds (2026-10-04): round 1's contested check upheld its critic's switch from skill-creator to promptfoo on capability fit; round 2's verification upheld the owner and adopt true against live upstream, read at promptfoo 0.123.1 (site/docs/guides/test-agent-skills.md), and corrected the overturn comparator and the existing-evaluator premise; not a new blind judgment of this row",
+     "gpt": "decide round 2 (2026-10-04): both blind GPT-6.1 Sol deciders and the GPT Astra critic named promptfoo for paired skill verification (the deciders took it for the existing evaluator); not a new blind judgment of this row",
+     "replaces_interim": false,
+     "resolution": {
+      "outcome": "owner_default",
+      "by": "the owner's repository-quality rule of 2026-10-04",
+      "batch": "wave4",
+      "reason": "Decide round 2, under the owner's repository-quality rule, named promptfoo the owner of paired skill verification in both clients (its Test Agent Skills guide drives the claude-agent-sdk and codex-sdk providers), and the Opus check upheld it. The row's decided default installed nothing, so the owner default installs Promptfoo 0.123.1 with G6's pinned recipe; Inspect AI keeps model and task evaluation.",
+      "pin": "Promptfoo 0.123.1; source 34f74d34e140b5e17d23770dfb2340057b1936b8",
+      "overturn": "the verified overturn check: run promptfoo and Harbor v0.23.0 (--skill injection plus Rewardkit) on the same frozen skill regressions with oracle-labelled outcomes, in both clients; transfer ownership if Harbor detects strictly more true regressions, with no more false flags and complete reproducible records, scoring verification correctness separately from the agents' task success; or failed upstream fixture/control or uncached two-route gateway/fresh-client MCP acceptance; each reports to the owner and removes nothing by itself.",
+      "sources": [
+       "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
+       "docs/decisions/2026-10-04-repository-quality-rule.md",
+       "evidence/artifacts/new-wsl-fix-wave-20261004/repository-quality-promptfoo.json",
+       "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md",
+       "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/guides/test-agent-skills.md",
+       "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/examples/openai-compatible-gateway/promptfooconfig.yaml"
+      ]
+     }
+    }
+   }
+  ]
  }
 }

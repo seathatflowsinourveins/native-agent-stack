@@ -1374,7 +1374,7 @@ web_search = "live"
 [mcp_servers.context-mode]
 disabled_tools = ["ctx_upgrade", "ctx_purge"]
 """
-TOKEN_MCP_SERVERS = ("serena", "ai-memory", "socraticode", "headroom", "codebase-memory", "qmd", "context-mode")
+TOKEN_MCP_SERVERS = ("serena", "ai-memory", "socraticode", "headroom", "codebase-memory", "qmd", "context-mode", "jcodemunch")
 
 
 class OmniRouteFallbackBuildTests(unittest.TestCase):

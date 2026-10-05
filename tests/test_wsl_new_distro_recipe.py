@@ -449,7 +449,9 @@ def plan_rows() -> list[dict]:
 
 def plan_after_sign_in_slots() -> list[str]:
     """The slots of the installed rows whose acceptance has an ``after_sign_in`` stage, in the plan's order."""
-    return [row["slot"] for row in plan_rows() if row.get("installed") and "after_sign_in" in (row.get("acceptance") or {})]
+    return [row["slot"] for row in plan_rows() if (row.get("installed") or row.get("measurement_only") or row.get("acceptance_only")
+                                                or row["slot"] == "mcp-inspector")
+            and "after_sign_in" in (row.get("acceptance") or {})]
 
 
 def plan_collector_ports() -> tuple[int, int]:
@@ -1417,8 +1419,7 @@ class StageTwoTests(unittest.TestCase):
     def test_the_after_sign_in_owners_are_read_from_the_plan_and_accept_sh_takes_the_stage_and_the_slot(self):
         owners = plan_after_sign_in_slots()
         # tobi-qmd's after-provisioning check joined with the wave-2 records (2026-10-03; wave-2 qmd ruling, change 16).
-        self.assertEqual(owners, ["codex", "claude-agent-sdk", "codex-sdk-and-codex-exec-app-server", "tobi-qmd",
-                                  "local-model-server", "agent-runtime-worker", "research-harnesses"])
+        self.assertEqual(owners, ['codex', 'claude-agent-sdk', 'codex-sdk-and-codex-exec-app-server', 'mcp-inspector', 'sandbox-runtime-srt', 'serena', 'tobi-qmd', 'mineru', 'ccusage', 'grafana', 'local-model-server', 'alerting', 'session-analytics', 'inspect-ai', 'promptfoo', 'worktrunk', 'difftastic', 'cross-family-review', 'gpt-gateway', 'agent-runtime-worker', 'research-harnesses'])
         script = read(PLAN_DIR / "accept.sh")
         for part in ("--only)", "--stage)", "post_install|service_health|after_sign_in) ;;"):
             self.assertIn(part, script)
@@ -1448,7 +1449,7 @@ class StageTwoTests(unittest.TestCase):
             "no after-sign-in checks": recipe.replace("--stage after_sign_in", "--stage post_install"),
             "the checks before the sign-in": recipe.replace(
                 sign_in_and_checks.group(0), sign_in_and_checks.group(2) + " " + sign_in_and_checks.group(1)),
-            "an owner lost": recipe.replace("`agent-runtime-worker` and ", ""),
+            "an owner lost": recipe.replace("`agent-runtime-worker`, ", ""),
             "an owner without that stage": recipe.replace("`research-harnesses`", "`research-harnesses` and `claude-code`"),
             "an id placeholder": recipe.replace("`--dry-run` shows", "`--dry-run` '<id>' shows"),
             "a second block": recipe.replace("Proof: `accept.sh` exits 0", "```sh\necho again\n```\n\nProof: `accept.sh` exits 0"),

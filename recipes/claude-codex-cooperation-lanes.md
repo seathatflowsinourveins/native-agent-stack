@@ -55,9 +55,11 @@ codex exec -s read-only -m gpt-6-astra -c model_reasoning_effort="max" -c web_se
 - Only `-c web_search="live"` was observed to send `external_web_access: true`, and
   on a local stand-in provider (same log). If this lane moves behind the OmniRoute
   gateway, re-verify from the sent request that live search still reaches the model:
-  web search through a custom provider is unverified, and OmniRoute 3.8.50 caps the
-  effort of a model its table does not know, `gpt-6-astra` included, at `xhigh`
-  ([foundation stack](../docs/foundation-stack.md)).
+  web search through a custom provider is unverified in that recorded check.
+  The selected OmniRoute 3.8.51 source preserves `max` for `gpt-6-astra`,
+  `gpt-6-sol` and `gpt-6-luna`, and sends `ultra` as upstream wire `max`.
+  The clean tag still caps `gpt-6.1-sol` at `xhigh`; its deployed `max` support
+  belongs to the #15167 carry ([foundation stack](../docs/foundation-stack.md)).
 
 ## Lane B: live-session coordination
 

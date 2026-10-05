@@ -1,0 +1,348 @@
+{
+  "description": "NativeStack paired skill on/off integration adapted from promptfoo 0.123.1 skill-comparison fixtures; live qualification owed",
+  "sharing": false,
+  "prompts": [
+    "{{ request }} If the review-standards skill is available, use it. Return JSON with summary and issues (id, severity)."
+  ],
+  "providers": [
+    {
+      "id": "anthropic:claude-agent-sdk",
+      "label": "claude-on",
+      "config": {
+        "model": "opus",
+        "effort": "max",
+        "working_dir": "@RUN_DIR@/claude-on",
+        "setting_sources": [
+          "project"
+        ],
+        "custom_allowed_tools": [
+          "Read",
+          "Grep",
+          "Glob",
+          "Skill"
+        ],
+        "max_turns": 8,
+        "sandbox": {
+          "enabled": true,
+          "autoAllowBashIfSandboxed": true,
+          "allowUnsandboxedCommands": false,
+          "failIfUnavailable": true
+        },
+        "output_format": {
+          "type": "json_schema",
+          "schema": {
+            "type": "object",
+            "required": [
+              "summary",
+              "issues"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "summary": {
+                "type": "string"
+              },
+              "issues": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "severity"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "high",
+                        "medium",
+                        "low"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "skills": [
+          "review-standards"
+        ],
+        "apiKeyRequired": false
+      }
+    },
+    {
+      "id": "anthropic:claude-agent-sdk",
+      "label": "claude-off",
+      "config": {
+        "model": "opus",
+        "effort": "max",
+        "working_dir": "@RUN_DIR@/claude-off",
+        "setting_sources": [],
+        "custom_allowed_tools": [
+          "Read",
+          "Grep",
+          "Glob",
+          "Skill"
+        ],
+        "max_turns": 8,
+        "sandbox": {
+          "enabled": true,
+          "autoAllowBashIfSandboxed": true,
+          "allowUnsandboxedCommands": false,
+          "failIfUnavailable": true
+        },
+        "output_format": {
+          "type": "json_schema",
+          "schema": {
+            "type": "object",
+            "required": [
+              "summary",
+              "issues"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "summary": {
+                "type": "string"
+              },
+              "issues": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": [
+                    "id",
+                    "severity"
+                  ],
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "severity": {
+                      "type": "string",
+                      "enum": [
+                        "high",
+                        "medium",
+                        "low"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "apiKeyRequired": false
+      }
+    },
+    {
+      "id": "openai:codex-sdk",
+      "label": "codex-on",
+      "config": {
+        "model": "gpt-6.1-sol",
+        "model_reasoning_effort": "max",
+        "working_dir": "@RUN_DIR@/codex-on",
+        "codex_path_override": "@CODEX_BIN@",
+        "model_provider": "omniroute",
+        "sandbox_mode": "workspace-write",
+        "approval_policy": "never",
+        "network_access_enabled": false,
+        "skip_git_repo_check": true,
+        "enable_streaming": true,
+        "output_schema": {
+          "type": "object",
+          "required": [
+            "summary",
+            "issues"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "summary": {
+              "type": "string"
+            },
+            "issues": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "severity"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "high",
+                      "medium",
+                      "low"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "cli_env": {
+          "HOME": "@RUN_DIR@/home",
+          "CODEX_HOME": "@RUN_DIR@/codex-home",
+          "OMNIROUTE_API_KEY": "keyless-loopback"
+        },
+        "cli_config": {
+          "model_providers": {
+            "omniroute": {
+              "name": "OmniRoute",
+              "base_url": "http://127.0.0.1:21128/v1",
+              "env_key": "OMNIROUTE_API_KEY",
+              "wire_api": "responses",
+              "requires_openai_auth": false
+            }
+          },
+          "skills": {
+            "bundled": {
+              "enabled": false
+            },
+            "config": [
+              {
+                "name": "review-standards",
+                "enabled": false
+              },
+              {
+                "path": "@RUN_DIR@/codex-on/.agents/skills/review-standards/SKILL.md",
+                "enabled": true
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "id": "openai:codex-sdk",
+      "label": "codex-off",
+      "config": {
+        "model": "gpt-6.1-sol",
+        "model_reasoning_effort": "max",
+        "working_dir": "@RUN_DIR@/codex-off",
+        "codex_path_override": "@CODEX_BIN@",
+        "model_provider": "omniroute",
+        "sandbox_mode": "workspace-write",
+        "approval_policy": "never",
+        "network_access_enabled": false,
+        "skip_git_repo_check": true,
+        "enable_streaming": true,
+        "output_schema": {
+          "type": "object",
+          "required": [
+            "summary",
+            "issues"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "summary": {
+              "type": "string"
+            },
+            "issues": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "severity"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "severity": {
+                    "type": "string",
+                    "enum": [
+                      "high",
+                      "medium",
+                      "low"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "cli_env": {
+          "HOME": "@RUN_DIR@/home",
+          "CODEX_HOME": "@RUN_DIR@/codex-home",
+          "OMNIROUTE_API_KEY": "keyless-loopback"
+        },
+        "cli_config": {
+          "model_providers": {
+            "omniroute": {
+              "name": "OmniRoute",
+              "base_url": "http://127.0.0.1:21128/v1",
+              "env_key": "OMNIROUTE_API_KEY",
+              "wire_api": "responses",
+              "requires_openai_auth": false
+            }
+          },
+          "skills": {
+            "bundled": {
+              "enabled": false
+            },
+            "config": [
+              {
+                "name": "review-standards",
+                "enabled": false
+              }
+            ]
+          }
+        }
+      }
+    }
+  ],
+  "defaultTest": {
+    "assert": [
+      {
+        "type": "javascript",
+        "value": "const result = typeof output === \"string\" ? JSON.parse(output) : output; return Array.isArray(result.issues) && [\"weak-password-hash\", \"timing-unsafe-compare\"].every(id => result.issues.some(issue => issue.id === id));"
+      }
+    ]
+  },
+  "tests": [
+    {
+      "description": "skill enabled",
+      "providers": [
+        "claude-on",
+        "codex-on"
+      ],
+      "vars": {
+        "request": "Review src/auth.ts for password handling and token comparison issues. Use issue ids weak-password-hash and timing-unsafe-compare."
+      },
+      "assert": [
+        {
+          "type": "skill-used",
+          "value": "review-standards"
+        }
+      ]
+    },
+    {
+      "description": "same task, skill disabled control",
+      "providers": [
+        "claude-off",
+        "codex-off"
+      ],
+      "vars": {
+        "request": "Review src/auth.ts for password handling and token comparison issues. Use issue ids weak-password-hash and timing-unsafe-compare."
+      },
+      "assert": [
+        {
+          "type": "not-skill-used",
+          "value": "review-standards"
+        }
+      ]
+    }
+  ]
+}

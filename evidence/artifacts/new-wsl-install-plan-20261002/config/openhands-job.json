@@ -1,0 +1,25 @@
+{
+  "llm": {
+    "model": "openai/cx/gpt-6.1-sol-max",
+    "base_url": "http://127.0.0.1:21128/v1",
+    "reasoning_effort": "max",
+    "api_mode": "responses",
+    "capability_overrides": {
+      "supports_reasoning_effort": true,
+      "supports_responses_api": true,
+      "supports_sampling_params": false
+    },
+    "usage_id": "agent",
+    "timeout": 900
+  },
+  "max_iterations": 50,
+  "proxy_loopback": true,
+  "extensions": {
+    "terminal_type": "subprocess",
+    "subagents": true,
+    "user_skills": true,
+    "project_skills": true,
+    "hooks": true
+  },
+  "task": "Use Python to compute sum(range(1, 11)); write the numeric answer followed by a newline into result.txt."
+}
