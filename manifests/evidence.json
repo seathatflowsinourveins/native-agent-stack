@@ -4220,7 +4220,7 @@
         "All 23 tracked YAML DAGs were validated unchanged: 16 passed, including all four current DAGs; seven archived fixtures failed with entrypoint document must not define name. Verified Dagu 2.16.6 rejects the same seven, so these failures are retained pre-existing evidence.",
         "The start-all smoke uses an empty owned DAG directory and no scheduled/job/model execution. Its coordinator is enabled as the repository template and upstream default require; shutdown logged one not registered service-registry update error while the native process returned 0 and both owned listeners closed.",
         "Upstream make test and mise unit/E2E suites, installed-client route activation, real job retry/SIGKILL/reboot recovery and production data downgrade were not run.",
-        "No published advisory found applies to the selected versions; historical advisories exist, including one affecting old mise 2026.9.18. Dagu has no tag CHANGELOG. Release notes contain migration-relevant #2784, #2776 and #2858 storage changes; conditional rollback for a generic existing-home upgrade requires a pre-upgrade DAGU_HOME copy and restores that copy plus the prior binary/unit/environment together. NativeStack2604 is already on 2.18.2 with no pre-upgrade copy, so its rollback is re-provisioning. See [Command center correction and NativeStack2604 state](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9e6ab1c8948d9c94f7a034f4ae27c63bbab9a7f7/docs/decisions/2026-10-05-dagu-mise-pin-move.md#command-center-correction-and-nativestack2604-state-2026-10-05-r2b). The trading stack stays held at 2.16.6.",
+        "No published advisory found applies to the selected versions; historical advisories exist, including one affecting old mise 2026.9.18. Dagu has no tag CHANGELOG. Release notes contain migration-relevant #2784, #2776 and #2858 storage changes; conditional rollback for a generic existing-home upgrade requires a pre-upgrade DAGU_HOME copy and restores that copy plus the prior binary/unit/environment together. NativeStack2604 is already on 2.18.2 with no pre-upgrade copy, so its rollback is re-provisioning. See [Command center correction and NativeStack2604 state](docs/decisions/2026-10-05-dagu-mise-pin-move.md#command-center-correction-and-nativestack2604-state-2026-10-05-r2b). The trading stack stays held at 2.16.6.",
         "Version output and checksum matching do not prove the full integration, deployed host, source-build reproducibility, dependency-tree security or model quality."
       ],
       "path": "evidence/receipts/dagu-mise-pin-qualification-20261005.json"
@@ -16691,8 +16691,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-dagu-mise-pin-move.md",
-      "sha256": "ebdfe7f631960c6eebf403e79d5d8be94013713790dda1dc9380e1d3accac807",
-      "bytes": 134932
+      "sha256": "c1eaaffe72e840c7655e05a44e71116174dc1701675d2e08730ba54a8c9a6e87",
+      "bytes": 135389
     },
     {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
@@ -51431,8 +51431,8 @@
     },
     {
       "path": "evidence/receipts/dagu-mise-pin-qualification-20261005.json",
-      "sha256": "27f02ff8261683b2889e72ac01fc24d5ea8d293fb35fc509038ddfd88dc50e49",
-      "bytes": 75391
+      "sha256": "f6de5af7e9defdc32c3f121ba83aa523e4f8e513981f63b3437d063453171452",
+      "bytes": 76528
     },
     {
       "path": "evidence/receipts/dashboard-gap-resolution-20260921.json",

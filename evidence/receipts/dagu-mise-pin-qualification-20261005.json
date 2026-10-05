@@ -12,7 +12,7 @@
     "All 23 tracked YAML DAGs were validated unchanged: 16 passed, including all four current DAGs; seven archived fixtures failed with entrypoint document must not define name. Verified Dagu 2.16.6 rejects the same seven, so these failures are retained pre-existing evidence.",
     "The start-all smoke uses an empty owned DAG directory and no scheduled/job/model execution. Its coordinator is enabled as the repository template and upstream default require; shutdown logged one not registered service-registry update error while the native process returned 0 and both owned listeners closed.",
     "Upstream make test and mise unit/E2E suites, installed-client route activation, real job retry/SIGKILL/reboot recovery and production data downgrade were not run.",
-    "No published advisory found applies to the selected versions; historical advisories exist, including one affecting old mise 2026.9.18. Dagu has no tag CHANGELOG. Release notes contain migration-relevant #2784, #2776 and #2858 storage changes; conditional rollback for a generic existing-home upgrade requires a pre-upgrade DAGU_HOME copy and restores that copy plus the prior binary/unit/environment together. NativeStack2604 is already on 2.18.2 with no pre-upgrade copy, so its rollback is re-provisioning. See [Command center correction and NativeStack2604 state](https://github.com/seathatflowsinourveins/native-agent-stack/blob/9e6ab1c8948d9c94f7a034f4ae27c63bbab9a7f7/docs/decisions/2026-10-05-dagu-mise-pin-move.md#command-center-correction-and-nativestack2604-state-2026-10-05-r2b). The trading stack stays held at 2.16.6.",
+    "No published advisory found applies to the selected versions; historical advisories exist, including one affecting old mise 2026.9.18. Dagu has no tag CHANGELOG. Release notes contain migration-relevant #2784, #2776 and #2858 storage changes; conditional rollback for a generic existing-home upgrade requires a pre-upgrade DAGU_HOME copy and restores that copy plus the prior binary/unit/environment together. NativeStack2604 is already on 2.18.2 with no pre-upgrade copy, so its rollback is re-provisioning. See [Command center correction and NativeStack2604 state](docs/decisions/2026-10-05-dagu-mise-pin-move.md#command-center-correction-and-nativestack2604-state-2026-10-05-r2b). The trading stack stays held at 2.16.6.",
     "Version output and checksum matching do not prove the full integration, deployed host, source-build reproducibility, dependency-tree security or model quality."
   ],
   "base_commit": "4af7417b7d4db8936c0136235a86717f31d16f27",
@@ -799,5 +799,35 @@
         "origin_main": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
       }
     ]
+  },
+  "r3_integration_acceptance": {
+    "date": "2026-10-05",
+    "round": "dagu-pin-r3",
+    "reported_by": "coordinator",
+    "evidence_class": "local_integration",
+    "supersedes": "r2_integration_acceptance.open",
+    "scope": "Coordinator-reported closure of the r2 merge handoff and installed-Gitleaks containment control; the dated r2 observations remain unchanged. This builder did not rerun the coordinator control.",
+    "merge": {
+      "commit": "6410e5d3a941ae3e67d8bdfe637758d2375a9c32",
+      "committed_by": "coordinator",
+      "parents": [
+        "f5239420207128802bca0ad68c008f0f4da945b8",
+        "c148e049efee75f8ea8a9a009e7b96b1e97f5c28"
+      ],
+      "status": "committed"
+    },
+    "installed_gitleaks_containment_control": {
+      "command": "TMPDIR=<coordinator cache outside /tmp and the checkout> nice -n 19 python3 -m unittest tests.test_runtime_worker_openhands_resolver",
+      "execution_context": "Coordinator shell, where the gitleaks runtime lock is writable.",
+      "head": "9e6ab1c89",
+      "working_tree": "r3 working tree",
+      "resolver_files_changed": false,
+      "exit": 0,
+      "returned_lines": [
+        "Ran 138 tests in 15.762s",
+        "OK (skipped=2)"
+      ]
+    },
+    "open": []
   }
 }
