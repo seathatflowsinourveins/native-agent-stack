@@ -13,9 +13,9 @@
   "plan_prerequisites": [
     "mise"
   ],
-  "claim": "Five canonical stack owners and one plan prerequisite have destination installation and selected native use qualification on NativeStack2604. Scope and evidence classes are per owner; no whole-stack or full-lifecycle recertification.",
+  "claim": "Dated NativeStack2604 installation and selected native use observations for five canonical stack owners and one plan prerequisite, offered to the existing W1/W1b owners. Scope and evidence classes are per owner; no current plan-of-record advancement, whole-stack or full-lifecycle recertification.",
   "base_public_commit": "4c897418fe35a030a1188ae447eaf31c893f8eff",
-  "recipe_provenance": "Native receipt catalog_revision identifies the base checkout, not its uncommitted recipe edits. input-files.json binds the final reviewed recipe/source bytes; earlier failing recipe revisions are preserved by this branch diff and native failure receipts.",
+  "recipe_provenance": "Native receipt catalog_revision identifies the base checkout, not its uncommitted recipe edits. input-files.json binds the original reviewed recipe/source bytes at immutable commit 652d98041a7248d961731e90696f499da55dd8d8. The Worktrunk acceptance implementation was subsequently reverted for fixwave-defects item 1 ownership; observed passes and failures remain historical and do not accept the reverted command. Earlier failing revisions remain in the native failure receipts and repository history.",
   "inputs_ref": "evidence/artifacts/ns2604-currency-20261005/input-files.json",
   "integrity_ref": "evidence/artifacts/ns2604-currency-20261005/artifact-integrity.json",
   "upstream_harness_original_output": "evidence/artifacts/ns2604-currency-20261005/jcodemunch-upstream-harness-output.md",
@@ -443,7 +443,9 @@
     "No permission/client account/model/effort settings, OS restart, trading operation or main checkout change was performed.",
     "No causal provider-token, savings, cost or convergence superiority claim. Open holds are documented in the currency decision.",
     "The native collector recorded mise with --allow-unbound-version, but its host validator rejects IDs absent from canonical component catalogs. The four original mise receipt bytes are retained unchanged as prerequisite artifacts outside the component census; they are not valid catalog host-enrollment receipts.",
-    "Second independent mise drift to2026.10.0 at05:05Z; final authorized reapply/doctor/version/digest pass at05:07:28Z is an immediate observation only. Durable shared-host state remains a coordinator serialization question."
+    "Second independent mise drift to2026.10.0 at05:05Z; final reapply/doctor/version/digest pass at05:07:28Z is an immediate observation only. The coordinator subsequently fixed main's 4c897418f install plan as the shared-host plan of record until the release re-pin; no further currency installs or reinstalls are allowed on that host.",
+    "Coordinator observation: its 04:58-05:06Z agent-runtime-worker, promptfoo and Worktrunk applies, plus fixwave-defects reruns, use main's plan and mise2026.10.0. Plan-revision contention is the likely mise flip-flop cause; exact process attribution remains unproved. Future pin qualification uses an isolated tool root or throwaway StackMeasure2604, never the shared host.",
+    "Worktrunk and Difftastic prompt-boundary repair belongs to fixwave-defects item1. Currency's Worktrunk acceptance edit was dropped; this receipt preserves the original dated results, not acceptance of the later reverted implementation."
   ],
   "sources": [
     "docs/decisions/2026-10-05-ns2604-currency-wave.md",

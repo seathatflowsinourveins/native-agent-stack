@@ -1427,8 +1427,8 @@ state_root="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptanc
 mkdir -p -- "$state_root"
 run_dir="$(mktemp -d "$state_root/run.XXXXXX")"
 printf -v task '"'"'Use your shell tool to run exactly: bash %q --only %q --stage post_install. This must execute the functional upstream examples and controls; a version report or a final answer without a tool call is insufficient. Report the command exit status. Modify only the disposable fixture this acceptance program owns.'"'"' "$plan_dir/accept.sh" worktrunk
-claude -p --model sonnet --effort max --max-turns 12 --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"' -- "$task" > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr"
-(cd "$run_dir" && codex exec --skip-git-repo-check --add-dir "${TMPDIR:-$run_dir}" -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --ephemeral --json -o "$run_dir/codex-last.txt" "$task" < /dev/null > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr")
+claude -p --model sonnet --effort max --max-turns 6 --output-format stream-json --verbose --allowedTools '"'"'Bash(bash *),Bash(rtk bash *)'"'"' "$task" > "$run_dir/claude.jsonl" 2> "$run_dir/claude.stderr"
+codex exec -m gpt-6.1-sol -c '"'"'model_reasoning_effort="max"'"'"' --sandbox workspace-write --ephemeral --json -o "$run_dir/codex-last.txt" "$task" < /dev/null > "$run_dir/codex.jsonl" 2> "$run_dir/codex.stderr"
 python3 - "$run_dir" worktrunk <<'"'"'PY'"'"'
 import json, pathlib, sys
 directory, slot = pathlib.Path(sys.argv[1]), sys.argv[2]

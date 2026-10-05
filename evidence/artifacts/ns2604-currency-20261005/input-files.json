@@ -2,7 +2,9 @@
   "schema_version": 1,
   "kind": "qualification_input_bytes",
   "observed_date_utc": "2026-10-05",
-  "scope": "Final reviewed source and recipe bytes for this branch. The final PR commit binds these bytes; native collector base catalog_revision alone did not capture uncommitted changes. This manifest is provenance, not execution acceptance.",
+  "scope": "Original reviewed qualification source and recipe bytes at the immutable repository commit below. Later owner-handoff edits revert the Worktrunk acceptance implementation; these historical hashes are deliberately not replaced with the reverted bytes. Native collector base catalog_revision alone did not capture uncommitted changes. This manifest is provenance, not execution acceptance or current plan-of-record deployment.",
+  "repository_commit": "652d98041a7248d961731e90696f499da55dd8d8",
+  "repository_url": "https://github.com/seathatflowsinourveins/native-agent-stack",
   "files": [
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",

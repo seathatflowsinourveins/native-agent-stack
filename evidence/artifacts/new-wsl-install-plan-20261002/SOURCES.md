@@ -737,13 +737,16 @@ download-result lines. Integrity and source review are separate from native inst
   The native Alpine example produced a nonempty package inventory; the exact predicate rejected an empty synthetic SBOM.
   `alpine:latest` is upstream's example, not an immutable image pin; no vulnerability verdict or whole-host inventory is claimed.
 
-Installed `claude --help` defines `--allowedTools <tools...>` as variadic. The Worktrunk acceptance now terminates it with
-`--` before the positional task; [official CLI reference](https://code.claude.com/docs/en/cli-reference) supports the bounded
-`--max-turns` option. Its six-turn failure is retained, and the twelve-turn retry passed. The SRT wrapper similarly uses
+Installed `claude --help` defines `--allowedTools <tools...>` as variadic. The dated Worktrunk qualification at
+`652d98041a7248d961731e90696f499da55dd8d8` terminated it with `--` before the positional task;
+[official CLI reference](https://code.claude.com/docs/en/cli-reference) supports the bounded
+`--max-turns` option. Its six-turn failure is retained, and the twelve-turn retry passed. That acceptance implementation
+was subsequently restored to the maintained base command because fixwave-defects item 1 owns both Worktrunk and
+Difftastic prompt-boundary repairs. This observation does not accept the restored command. The SRT wrapper similarly uses
 a twelve-turn bound and retains failed streams. Installed Codex 0.160.0 `exec --help`, its
 [release notes](https://github.com/openai/codex/releases/tag/rust-v0.160.0), and
 [openai/codex@rust-v0.160.0:codex-rs/exec/src/cli.rs:33](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/exec/src/cli.rs#L33)
-support `--skip-git-repo-check`; the native turn runs from the owned non-Git receipt directory with its owned TMPDIR added.
+support `--skip-git-repo-check`; the dated qualification turn ran from the owned non-Git receipt directory with its owned TMPDIR added.
 No permission, account, model or effort configuration was changed.
 
 The [dated currency decision](../../../docs/decisions/2026-10-05-ns2604-currency-wave.md) records release-age, regression and

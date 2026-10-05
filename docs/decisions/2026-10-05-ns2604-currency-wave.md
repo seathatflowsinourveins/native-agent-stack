@@ -1,17 +1,22 @@
 # NativeStack2604 currency wave (2026-10-05)
 
-Status: six scoped destination installs and defined acceptance stages passed;
-repository validation passed; ready for command-center review.
+Status: six dated scoped destination observations and retained failures handed
+to the existing W1/W1b owners. No independent currency landing; the Worktrunk
+acceptance edit is dropped for fixwave-defects item 1 ownership.
 
 North-star action: keep the native research harness current and qualified for
 US-equities research and historical simulation before broker paper acceptance.
 This work starts from `4c897418fe35a030a1188ae447eaf31c893f8eff` and serves only
-the foundation lane. The command center reviews and lands the PR.
+the foundation lane. The command center integrates evidence through W1/W1b;
+this lane never lands or merges it independently.
 
 ## Scope and source contract
 
 The user's 2026-10-05 currency brief authorizes scoped installation and every
-defined acceptance stage on NativeStack2604. Releases must be at least 24 hours
+defined acceptance stage on NativeStack2604. The later coordinator correction
+stops further installs/reinstalls on the shared host, retains main's
+`4c897418f` plan until the release re-pin, and requires isolated tool roots or
+the throwaway StackMeasure2604 for future pin qualification. Releases must be at least 24 hours
 old and have no unresolved release regression. Historical receipts do not
 certify this host. An existing qualification hold remains a hold until its
 required evidence exists.
@@ -63,7 +68,7 @@ Worktrunk and SRT use native model event assertions and synthetic fixtures;
 their upstream Rust/Bun suites were not run. Syft is a native example with a
 synthetic negative control; mise is native doctor plus binary read-back.
 
-The Worktrunk argument repair follows installed `claude --help` and the
+The Worktrunk argument repair used for the dated observations follows installed `claude --help` and the
 [official CLI reference](https://code.claude.com/docs/en/cli-reference).
 Its first prompt was consumed by variadic `--allowedTools`; the next native
 run reached a six-turn limit. The twelve-turn retry passed. Codex executes
@@ -77,7 +82,8 @@ configuration was changed.
 Independent read-back observed mise drift from 2026.10.1 to 2026.10.0; after
 reapplication, native doctor and the exact binary digest passed. The cause is
 unconfirmed. Host observations are dated, not a guarantee against other writers.
-Final recipe hashes bind the qualification to this branch's bytes; the native
+Original reviewed recipe hashes bind the qualification to immutable commit
+`652d98041a7248d961731e90696f499da55dd8d8`, not subsequent handoff edits; the native
 collector's base revision alone does not identify uncommitted edits.
 
 A second independent read-back at 05:05Z again found the official 2026.10.0
@@ -139,4 +145,44 @@ parsed successfully before validation. The current defaults were then regenerate
 from their source rather than maintained as hand-edited output. The earlier
 SocratiCode freeze claim was corrected against the October 1 decision and current
 target-host gates. Final source/receipt critic found no remaining material blocker
-after the explicit projection note; shared-host mise serialization remains open.
+after the explicit projection note. The coordinator's later serialization
+decision and Worktrunk ownership correction are recorded below.
+
+## Owner handoff and shared-host correction
+
+The later binding direction requires building on
+[W1 #642](https://github.com/seathatflowsinourveins/native-agent-stack/pull/642)
+and [W1b #645](https://github.com/seathatflowsinourveins/native-agent-stack/pull/645).
+The existing currency review branch is a recoverable handoff, not authority for
+a parallel pin wave. The original native receipt bytes, failures and integrity
+observations remain intact. `input-files.json` names their immutable qualified
+recipe commit. Five proposed canonical pin identities still have matching
+saturation-audit rows and receipt references, as required by
+`tests/test_stack_lifecycle.py:21-37`; they are review material, not landed pins.
+Nothing touching stack, adoption, installers or host receipts lands before the
+v2026.10.05 re-pin.
+
+The coordinator identifies its own 04:58-05:06Z applies of
+agent-runtime-worker, promptfoo and Worktrunk, plus fixwave-defects reruns,
+as users of main's mise2026.10.0 plan. That is observed plan-revision contention
+and the likely cause of the flip-flop, without exact process attribution.
+The initial shared-host qualification instruction caused the contention;
+the corrected rule is no further installs or reinstalls here, and future pin
+qualification in an isolated tool root or throwaway StackMeasure2604.
+
+Fixwave-defects item 1 owns both Difftastic and Worktrunk's variadic
+`--allowedTools` prompt boundary. Currency's Worktrunk `after_sign_in`
+implementation is restored exactly from the maintained
+`f946c6d4ca988a17b6fa4392ecb488909f147883` source and shell mirror. Its
+successful twelve-turn/non-Git observation and earlier failures remain evidence
+for that owner; they do not certify the restored command. No acceptance command
+was re-executed during the handoff. The current duplicate-fix alternative is
+rejected by the one-owner direction. A later explicit owner handoff and
+upstream-source review would permit integrating the owned fix.
+
+The official-upstream rule also applies: use supported published installers,
+do not rebuild/fork shipped products, and do not replace native upstream tests
+with local integration checks. Only jCodeMunch ran the full unchanged upstream
+harness here; the other scopes and unrun suites remain explicit above. This
+handoff preserves the evidence needed for the north-star foundation work and
+leaves contested Collector/Grafana advancement to the existing owners.
