@@ -13801,8 +13801,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md",
-      "sha256": "1a0d91d7f5db609f654dc8b8329f186a90e0d88cb48cdf7df98a2dcd9f9df178",
-      "bytes": 21648
+      "sha256": "5d480100d6ec46396d539224d989007a812a42b7ae28242e44d0bc2b358dd3dc",
+      "bytes": 23568
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/frozen-c23525e6.SHA256SUMS",
@@ -13823,6 +13823,11 @@
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/harness/plan.json.9f2942c49bbd",
       "sha256": "9f2942c49bbd0d783802dd47a9bb2f38b81e54b2a4f4422be1d203fe649105bd",
       "bytes": 8876
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/harness/run.py.1b697f237275",
+      "sha256": "1b697f237275a725a0dcc39ee886c4f07aa27bfba1c2b442982b3c76b02e1012",
+      "bytes": 92700
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/harness/run.py.676a375a472a",
@@ -13848,6 +13853,11 @@
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-refused-read-only-api.json",
       "sha256": "cb6ece766ca5eb26f1022e9bc7e2fb566277a2e10f1a3ae101de2d2ac5d1fb5f",
       "bytes": 5770
+    },
+    {
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20261005-passed.json",
+      "sha256": "494bdfd892481f5ff8b9e8d873e4400dd043d867ad56a9f04b41e9ba9148a783",
+      "bytes": 14590
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/plan-post.json",
