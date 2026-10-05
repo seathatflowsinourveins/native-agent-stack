@@ -95,12 +95,15 @@ def completed(command, code, out="", err=""):
 
 
 class FakeRtk:
-    """The two commands the rule review runs of rtk: `rtk --version` and `rtk config` (a `Config: <path>` line, then the configuration as TOML, as
-    src/core/config.rs show_config prints it in v0.51.0). The review asks rtk only for a file on the reviewed list, and only these two things."""
+    """The three commands the rule review runs of rtk: `rtk --version`, `rtk config` (a `Config: <path>` line, then the configuration as TOML, as
+    src/core/config.rs show_config prints it in v0.51.0) and `rtk trust --list` (`No trusted filters.` for an empty store, src/hooks/trust.rs run_trust). The
+    review asks rtk only for a file on the reviewed list, and only these things."""
 
-    def __init__(self, config_dir, version="rtk 0.51.0", prefixes=(), version_exit=0, config_exit=0, config_body=None):
+    def __init__(self, config_dir, version="rtk 0.51.0", prefixes=(), version_exit=0, config_exit=0, config_body=None,
+                 trust_body="No trusted filters.\n", trust_exit=0):
         self.config_dir, self.version, self.prefixes = Path(config_dir), version, list(prefixes)
         self.version_exit, self.config_exit, self.config_body = version_exit, config_exit, config_body
+        self.trust_body, self.trust_exit = trust_body, trust_exit
         self.calls = []
 
     def run(self, command, **kwargs):
@@ -113,6 +116,8 @@ class FakeRtk:
                 f"Config: {self.config_dir / 'config.toml'}\n\n[hooks]\nexclude_commands = []\ntransparent_prefixes = [{prefixes}]\n"
                 f"suppress_hook_warning = false\n")
             return completed(command, self.config_exit, body, "boom\n" if self.config_exit else "")
+        if command[1:] == ["trust", "--list"]:
+            return completed(command, self.trust_exit, self.trust_body, "boom\n" if self.trust_exit else "")
         raise AssertionError(command)
 
 
@@ -125,6 +130,10 @@ class Case(unittest.TestCase):
         self.home.mkdir()
         self.config = self.home / "config.toml"
         self.config.write_text('model = "x"\n', encoding="utf-8")
+        patcher = mock.patch.dict(os.environ)  # the review looks at RTK_TRUST_PROJECT_FILTERS: start every test without it
+        patcher.start()
+        self.addCleanup(patcher.stop)
+        os.environ.pop("RTK_TRUST_PROJECT_FILTERS", None)
         self.codex = self.dir / "codex"
         self.codex.write_text("#!/bin/sh\nexit 9\n", encoding="utf-8")
         self.codex.chmod(0o700)
@@ -529,7 +538,7 @@ class RuleReviewTests(Case):
         self.assertEqual(len(server.writes()), 1)
         self.assertIn("hcom-deny.rules; 1 on the reviewed list, 0 Codex allow-only, 0 not accepted", out)
         self.assertIn("every rule file is accepted", out)
-        self.assertEqual(self.tools.calls, [["/opt/rtk/bin/rtk", "--version"], ["/opt/rtk/bin/rtk", "config"]])
+        self.assertEqual(self.tools.calls, [["/opt/rtk/bin/rtk", "--version"], ["/opt/rtk/bin/rtk", "config"], ["/opt/rtk/bin/rtk", "trust", "--list"]])
 
     def test_a_file_is_reviewed_by_its_bytes_not_by_its_name(self):
         self.rules("renamed.rules", HCOM_DENY_RULES)
@@ -699,6 +708,33 @@ class RuleReviewTests(Case):
                 self.assert_refused_before_anything_was_written(code, server)
                 self.assertIn("cannot check: cannot read the configuration `rtk config` reports", out)
 
+    def test_trusted_toml_filters_end_the_review(self):
+        """Measured with rtk 0.51.0 (plan-row-scratch-run.json): a trusted project filter makes the hook rewrite `hcom kill luna`; the trust store is global, so
+        `rtk trust --list` shows it from any directory."""
+        self.rules("hcom-deny.rules", HCOM_DENY_RULES)
+        trusted = "Trusted filters:\n" + "=" * 60 + "\n  /work/proj/.rtk/filters.toml (trusted 2026-10-05)\n    sha256:" + "a" * 64 + "\n"
+        for label, body, exit_code in (("a trusted project filter", trusted, 0), ("the phrase followed by more output", "No trusted filters.\n" + trusted, 0),
+                                       ("a failing command that prints the phrase", "No trusted filters.\n", 1), ("empty output", "", 0),
+                                       ("another phrase", "No filters trusted.\n", 0)):
+            with self.subTest(label):
+                server = FakeServer([hook(KEY, RTK)])
+                code, out, err = self.run_tool(server, "--apply", tools=FakeRtk(self.dir / "rtk-config", trust_body=body, trust_exit=exit_code))
+                self.assert_refused_before_anything_was_written(code, server)
+                self.assertIn("rtk trusts TOML filter files", out)
+
+    def test_the_trust_override_variable_ends_the_review_whatever_its_value(self):
+        """With a CI variable, RTK_TRUST_PROJECT_FILTERS=1 makes rtk trust any project filters file without a store entry, and `rtk trust --list` does not show it
+        (measured, plan-row-scratch-run.json); the check is for the variable being present."""
+        self.rules("hcom-deny.rules", HCOM_DENY_RULES)
+        for value in ("1", "0", ""):
+            with self.subTest(value), mock.patch.dict(os.environ, {"RTK_TRUST_PROJECT_FILTERS": value}):
+                server = FakeServer([hook(KEY, RTK)])
+                code, out, err = self.run_tool(server, "--apply")
+                self.assert_refused_before_anything_was_written(code, server)
+                self.assertIn("RTK_TRUST_PROJECT_FILTERS is set", out)
+        code, out, err = self.run_tool(FakeServer([hook(KEY, RTK, "trusted")]), "--check")
+        self.assertEqual(code, 0, err)
+
     def test_a_configured_transparent_prefix_ends_the_review(self):
         self.rules("hcom-deny.rules", HCOM_DENY_RULES)
         server = FakeServer([hook(KEY, RTK)])
@@ -783,7 +819,7 @@ class RuleReviewTests(Case):
             seen.append(kwargs)
             return FakeRtk(self.dir / "rtk-config").run(command)
         trust.review_rules(self.home, "/opt/rtk/bin/rtk", runner)
-        self.assertEqual(len(seen), 2)
+        self.assertEqual(len(seen), 3)
         for kwargs in seen:
             self.assertEqual(kwargs["env"]["RTK_TELEMETRY_DISABLED"], "1")
             self.assertEqual(kwargs["stdin"], subprocess.DEVNULL)

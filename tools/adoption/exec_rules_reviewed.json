@@ -10,10 +10,10 @@
       "reviewed_for": {
         "rtk_version_output": "rtk 0.51.0",
         "rtk_commit": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
-        "rtk_configuration": "the default hook configuration: [hooks].transparent_prefixes empty and no user TOML filters"
+        "rtk_configuration": "the default hook configuration: [hooks].transparent_prefixes empty, no trusted TOML filter (rtk trust --list says No trusted filters.), RTK_TRUST_PROJECT_FILTERS unset and no user TOML filters"
       },
       "reviewed": "2026-10-05",
-      "why": "Every rule is a prefix rule on `hcom ...` or `uvx hcom ...`. rtk 0.51.0 rewrites a command only when its first word, after peeling env prefixes, global options, absolute paths and wrappers, is one of the heads derived from its source (evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-rewrite-heads.json); neither `hcom` nor `uvx` is one, so no command that a rule of the file matches is rewritten; a command behind a wrapper (`time hcom ...`) is outside a prefix rule's reach with or without the rewrite.",
+      "why": "Every rule is a prefix rule on `hcom ...` or `uvx hcom ...`. rtk 0.51.0 rewrites a command only when its first word, after peeling env prefixes, global options, absolute paths and wrappers, is one of the heads derived from its source (evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-rewrite-heads.json) or matches a TOML filter that rtk has been told to trust (the host conditions rule that out, and the configured prefixes); neither `hcom` nor `uvx` is one, so no command that a rule of the file matches is rewritten; a command behind a wrapper (`time hcom ...`) is outside a prefix rule's reach with or without the rewrite.",
       "evidence": [
         "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-rewrite-heads.json",
         "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-rewrite-heads-check.json",

@@ -29,8 +29,10 @@ each rule file in <codex home>/rules:
     file (today #713's hcom-deny.rules: every rule is a prefix rule on `hcom ...` or `uvx ...`, which rtk 0.51.0 cannot route, from its source
     and against the real binary: evidence/artifacts/token-stack-fresh-session-e2e-20261004/), for one rtk version and its default hook
     configuration, so for such a file `rtk --version` must report the entry's version, `rtk config` must show `transparent_prefixes = []`,
-    and the user-global TOML filters file beside rtk's config must hold no filter (a pin move of rtk re-reviews the list: a test compares
-    the entries with the pin);
+    `rtk trust --list` must say `No trusted filters.` (a trusted project or global TOML filter can make rtk rewrite any command: measured with
+    rtk 0.51.0, a trusted project filter makes the hook rewrite `hcom kill luna`), RTK_TRUST_PROJECT_FILTERS must be unset (with a CI variable it
+    trusts every project filters file without a store entry) and the user-global TOML filters file beside rtk's config must hold no filter (a pin
+    move of rtk re-reviews the list: a test compares the entries with the pin);
   - a file is accepted when it holds nothing but allow rules in Codex's own format, byte for byte: lines `prefix_rule(pattern=["a", "b"],
     decision="allow")` whose tokens are printable ASCII without a quote or a backslash (codex-rs/execpolicy/src/amend.rs, which writes
     default.rules), comment lines of printable ASCII without a backslash and empty lines (hcom's own hcom.rules begins with one comment line,
@@ -46,8 +48,8 @@ each rule file in <codex home>/rules:
     it may report a missing directory (no rules), every other error, also on an entry, is a failure; the type of every entry is asked
     before its extension, from its own lstat, which fails for an entry that vanished (Python's DirEntry.is_file would say False; Codex's
     file_type() propagates the error); a symlink or another non-file is not loaded. Any step that cannot be done is an exposure as well.
-With no rule file nothing runs; rtk is run (`rtk --version`, `rtk config`) only for a file on the reviewed list. Not seen: rules in a
-project's .codex/rules or a managed layer, and rtk TOML filters that a project trusts with `rtk trust`.
+With no rule file nothing runs; rtk is run (`rtk --version`, `rtk config`, `rtk trust --list`) only for a file on the reviewed list. Not seen: rules
+in a project's .codex/rules or a managed layer, and the environment Codex itself runs the hook in (RTK_TRUST_PROJECT_FILTERS is checked in this tool's own).
 
 A dry run makes no trust or config edit and no backup. It is not read-only: starting the app-server creates its own state files in
 the Codex home (SQLite databases, an installation id, the bundled skills; measured on a scratch home, 2026-10-04).
@@ -93,6 +95,8 @@ ALLOW_LINE = re.compile(rf'prefix_rule\(pattern=\[{TOKEN}(?:, {TOKEN})*\], decis
 COMMENT_LINE = re.compile(r"#[ -\[\]-~]*")  # printable ASCII except a backslash: a comment that no parser can continue onto the next line
 REWRITE_WORD = '"rtk"'  # the word rtk's hook inserts; a token holds no quote, so this is exactly one token equal to `rtk`
 SCHEMA_LINE = re.compile(r"schema_version\s*=\s*\d+")
+NO_TRUSTED_FILTERS = "No trusted filters."  # what `rtk trust --list` prints for an empty trust store (src/hooks/trust.rs run_trust, rtk 0.51.0)
+TRUST_ENV = "RTK_TRUST_PROJECT_FILTERS"  # with a CI variable, rtk trusts every project .rtk/filters.toml without a store entry (src/hooks/trust.rs L106-L116)
 SHOWN = 8
 
 
@@ -224,8 +228,10 @@ def invoke(command: list[str], runner) -> subprocess.CompletedProcess:
 def rtk_conditions(rtk: str | None, entries: list[dict], runner) -> list[str]:
     """Why the reviewed files do not apply on this host, empty when they do. A review covers one rtk version and its default hook configuration:
     `rtk --version` must report that version, `rtk config` must show `transparent_prefixes = []` (a configured prefix makes rtk rewrite the command after
-    it), and the user-global TOML filters file beside rtk's config (src/core/toml_filter.rs) must hold nothing but comments and a schema_version line, since
-    a filter's match_command can make rtk rewrite any command. Lines are compared whole, not parsed."""
+    it), `rtk trust --list` must print exactly `No trusted filters.` (rtk applies a project or global TOML filter only while it is trusted, and the store is
+    global, so a filter trusted in any project shows there; a filter's match_command can make rtk rewrite any command), RTK_TRUST_PROJECT_FILTERS must not be
+    set in this environment (with a CI variable rtk trusts project filters without a store entry, which the list does not show), and the user-global TOML
+    filters file beside rtk's config (src/core/toml_filter.rs) must hold nothing but comments and a schema_version line. Output is compared whole, not parsed."""
     rtk = rtk or shutil.which("rtk")
     if not rtk:
         raise ReviewError("no rtk executable on PATH (or --rtk): a reviewed rule file applies to one rtk version")
@@ -242,6 +248,12 @@ def rtk_conditions(rtk: str | None, entries: list[dict], runner) -> list[str]:
         raise ReviewError(f"cannot read the configuration `rtk config` reports: {brief(done.stderr or done.stdout)}")
     if not re.search(r"^transparent_prefixes = \[\]$", body, re.M):
         reasons.append("rtk's [hooks].transparent_prefixes is not empty, or `rtk config` does not say it is: rtk rewrites the command after a configured prefix")
+    done = invoke([rtk, "trust", "--list"], runner)
+    if done.returncode != 0 or (done.stdout or "").strip() != NO_TRUSTED_FILTERS:
+        reasons.append("rtk trusts TOML filter files (`rtk trust --list` does not say `No trusted filters.`, or failed): a trusted project or global filter can make "
+                       "rtk rewrite any command, `hcom ...` included")
+    if TRUST_ENV in os.environ:
+        reasons.append(f"{TRUST_ENV} is set: with a CI variable rtk trusts every project filters file without a store entry")
     filters = Path(first[len("Config: "):].strip()).parent / "filters.toml"
     if filters.exists():
         try:

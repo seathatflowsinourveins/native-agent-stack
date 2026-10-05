@@ -12,7 +12,7 @@ not run), and the execution-rule review of the trust tool in more scratch homes,
 accepted by its sha256 on tools/adoption/exec_rules_reviewed.json (and the conditions of its rtk) or when it is Codex's own allow-only format byte for byte.
 Scenarios: #713's hcom-deny.rules by its exact bytes (the trust proceeds; a `git push` rule added after the grant makes `--check` exit 6 and the trust
 refuse) and the same bytes plus one comment line (refused); the allow-only files Codex and hcom write (the trust proceeds); a configured rtk
-transparent prefix, an allow rule that names rtk (the evaluator allows `rtk git push origin main` under it and gives no decision for `git push origin main`) and a user TOML filter (705f's `^reviewalpha\\b|^hcom\\b`), each of which ends the review of the reviewed file (refused); a `git push` forbid rule (refused before anything is
+transparent prefix, a trusted project filter and the CI override variable (each of which makes the real rtk rewrite `hcom kill luna`), an allow rule that names rtk (the evaluator allows `rtk git push origin main` under it and gives no decision for `git push origin main`) and a user TOML filter (705f's `^reviewalpha\\b|^hcom\\b`), each of which ends the review of the reviewed file (refused); a `git push` forbid rule (refused before anything is
 written; --allow-exec-rules accepts it, after which `--check` exits 6) and the same rule with its `rtk git push` twin (still refused); the counterexamples of the
 three GPT reads (705e: `git -C .` is not rewritten by rtk but `git -C . push origin main` is, and the native evaluator forbids the original and not the
 rewrite, broad `uv` and `npx` rules, a `host_executable(name = prefix_rule(...) or "git", ...)` file that the real codex evaluator accepts and that registers a
@@ -154,6 +154,7 @@ def main() -> int:
         rtk_hook_check: list[dict] = []
         nested_check: list[dict] = []
         allow_rtk_check: list[dict] = []
+        project_filter_check: list[dict] = []
         if busy:
             trust_cmd = trust_cmd + " --codex-process-name no-such-process-name"
             deviation = (f"{len(busy)} codex process(es) were running on the host, so the trust command carries "
@@ -246,6 +247,37 @@ def main() -> int:
         (rtk_config_dir(filtered) / "filters.toml").write_text(USER_FILTER, encoding="utf-8")
         run("rules-hcom-filter (the reviewed file, a user TOML filter beside rtk's config): refused", trust_cmd, 2, filtered)
 
+        # A trusted project filter (`rtk trust`) or the CI override variable makes the hook rewrite `hcom ...` although the first word of the filter's pattern
+        # is something else: measured with the real rtk, from the project's own directory. The trust store is global, so `rtk trust --list` shows a trusted
+        # filter from anywhere; the override variable is not in the store, so the tool also looks at its own environment.
+        def project_step(settings: dict, project: Path, step: str, command: list[str], extra: dict | None = None) -> subprocess.CompletedProcess:
+            done = subprocess.run(command, cwd=project, env={**settings, **(extra or {})}, capture_output=True, text=True, timeout=60, check=False,
+                                  stdin=subprocess.DEVNULL)
+            shown = [line.replace(scratch, "<scratch>")[:200] for line in done.stdout.splitlines() if line.strip()][:3]
+            project_filter_check.append({"step": step, "exit": done.returncode, "stdout": shown, "stderr_first": (done.stderr.strip().splitlines() or [""])[0][:100]})
+            return done
+
+        hook_check = ["rtk", "hook", "check", "--agent", "codex", "hcom kill luna"]
+        trusted_filter = home_with_hook("rules-hcom-trusted-filter", {"hcom-deny.rules": HCOM_RULES})
+        project = Path(trusted_filter["HOME"]) / "project"
+        (project / ".rtk").mkdir(parents=True)
+        (project / ".rtk" / "filters.toml").write_text(USER_FILTER, encoding="utf-8")
+        project_step(trusted_filter, project, "project filter present, untrusted: hook check hcom kill luna", hook_check)
+        project_step(trusted_filter, project, "rtk trust --yes in the project", ["rtk", "trust", "--yes"])
+        project_step(trusted_filter, project, "project filter trusted: hook check hcom kill luna", hook_check)
+        project_step(trusted_filter, Path(trusted_filter["HOME"]), "rtk trust --list from another directory", ["rtk", "trust", "--list"])
+        run("rules-hcom-trusted-filter (the reviewed file, a trusted project filter that makes rtk rewrite hcom): refused", trust_cmd, 2, trusted_filter)
+
+        override = home_with_hook("rules-hcom-trust-override", {"hcom-deny.rules": HCOM_RULES})
+        project_env = Path(override["HOME"]) / "project"
+        (project_env / ".rtk").mkdir(parents=True)
+        (project_env / ".rtk" / "filters.toml").write_text(USER_FILTER, encoding="utf-8")
+        trust_override = {"RTK_TRUST_PROJECT_FILTERS": "1", "CI": "1"}
+        project_step(override, project_env, "no store entry, no override: hook check hcom kill luna", hook_check)
+        project_step(override, project_env, "RTK_TRUST_PROJECT_FILTERS=1 and CI=1, no store entry: hook check hcom kill luna", hook_check, trust_override)
+        project_step(override, project_env, "RTK_TRUST_PROJECT_FILTERS=1 and CI=1: rtk trust --list", ["rtk", "trust", "--list"], trust_override)
+        run("rules-hcom-trust-override (the reviewed file, RTK_TRUST_PROJECT_FILTERS in the tool's environment): refused", trust_cmd, 2, {**override, **trust_override})
+
         exposed = home_with_hook("rules-exposed", {"default.rules": GIT_PUSH})
         run("rules-exposed (a git push forbid rule, no rtk twin): the trust command is refused before anything is written", trust_cmd, 2, exposed)
         run("rules-exposed: --check says the hook is not trusted (nothing was written)", check_cmd, 5, exposed)
@@ -292,11 +324,14 @@ def main() -> int:
               "rtk": subprocess.run(["rtk", "--version"], capture_output=True, text=True, check=False).stdout.strip(),
               "codex": subprocess.run(["codex", "--version"], capture_output=True, text=True, check=False).stdout.strip(),
               "deviation": deviation, "steps": steps, "execpolicy_check": execpolicy,
-              "rtk_hook_check": rtk_hook_check, "nested_host_executable_check": nested_check, "allow_rtk_check": allow_rtk_check,
+              "rtk_hook_check": rtk_hook_check, "nested_host_executable_check": nested_check, "allow_rtk_check": allow_rtk_check, "project_filter_check": project_filter_check,
               "all_as_expected": all(step["exit"] == step["expected_exit"] for step in steps) and all(e["valid"] for e in execpolicy) and
               [e["decision"] for e in execpolicy] == ["forbidden", None, "prompt", None, None, None] and
               all(e["valid"] for e in nested_check) and [e["decision"] for e in nested_check] == ["forbidden", None] and
               all(e["valid"] for e in allow_rtk_check) and [e["decision"] for e in allow_rtk_check] == ["allow", None] and
+              [(e["exit"], e["stdout"][:1]) for e in project_filter_check] ==
+              [(1, []), (0, ["Risk summary:"]), (0, ["rtk hcom kill luna"]), (0, ["Trusted filters:"]), (1, []), (0, ["rtk hcom kill luna"]),
+               (0, ["No trusted filters."])] and
               [(e["command"], e["exit"], bool(e["rewritten_to"])) for e in rtk_hook_check] ==
               [("git -C .", 1, False), ("git -C . push origin main", 0, True), ("uv", 1, False), ("uv run harmless.py", 0, True), ("npx", 1, False),
                ("npx prisma migrate deploy", 0, True), ("uvx hcom kill luna", 1, False), ("phpunit.exe tests/", 0, True), ("g++\u0301 --version", 0, True),

@@ -73,6 +73,12 @@ MUTANTS = {
     "an unreadable rtk config is accepted (no Config line)": ('if done.returncode != 0 or not first.startswith("Config: "):', "if done.returncode != 0:"),
     "configured transparent prefixes are ignored": ('if not re.search(r"^transparent_prefixes = \\[\\]$", body, re.M):', "if False:"),
     "the transparent_prefixes line is matched only at the start of the output": ('r"^transparent_prefixes = \\[\\]$", body, re.M)', 'r"^transparent_prefixes = \\[\\]$", body)'),
+    "trusted TOML filters are ignored": ('    if done.returncode != 0 or (done.stdout or "").strip() != NO_TRUSTED_FILTERS:', "    if False:"),
+    "the trust list's exit status is ignored": ('    if done.returncode != 0 or (done.stdout or "").strip() != NO_TRUSTED_FILTERS:', '    if (done.stdout or "").strip() != NO_TRUSTED_FILTERS:'),
+    "the trust list is matched loosely (the phrase anywhere in the output)": (
+        '    if done.returncode != 0 or (done.stdout or "").strip() != NO_TRUSTED_FILTERS:', '    if done.returncode != 0 or NO_TRUSTED_FILTERS not in (done.stdout or ""):'),
+    "the trust override variable is ignored": ("    if TRUST_ENV in os.environ:", "    if False:"),
+    "only the value 1 of the trust override variable counts": ("    if TRUST_ENV in os.environ:", '    if os.environ.get(TRUST_ENV) == "1":'),
     "user-global TOML filters are ignored": ("    if filters.exists():", "    if False:"),
     "the schema line is a filter": ("if line and not SCHEMA_LINE.fullmatch(line)]", "if line]"),
     "comments are filters": ('(re.sub(r"#.*$", "", row).strip() for row in text.splitlines())', "(row.strip() for row in text.splitlines())"),

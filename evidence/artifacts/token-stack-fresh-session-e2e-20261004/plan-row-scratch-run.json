@@ -60,7 +60,7 @@
       "stdout_tail": [
         "hooks named in <scratch>/fake-home/.codex:",
         "  <scratch>/fake-home/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/fake-home/.codex/config.toml.bak.20261005T065930Z",
+        "backup: <scratch>/fake-home/.codex/config.toml.bak.20261005T070425Z",
         "trusted 1 hook(s) in <scratch>/fake-home/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -71,13 +71,13 @@
       "expected_exit": 0,
       "stdout_tail": [
         "    Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>",
-        "commit c771da9eb67798bc2af5092f1626dc770b5279bb",
+        "commit 3a2bb97ba4b37de964dfea49b01ee9efc47225cd",
         "Author: Scout <scout@local>",
-        "Date:   Mon Oct 5 01:25:01 2026 -0400",
-        "    registry: register the files of the static rule review round in manifests/evidence.json",
-        "    Hot-file protocol (docs/lanes.md): evidence.json restored from the base 4c897418f, the changed files and the 8 new ones (the scratch run and its output, the hcom",
-        "    fixture, the mutation check and its output, the heads derivation and check scripts and the binary check's output) re-registered, component_matrix.py and",
-        "    new_host_grand_list.py regenerated; validate.py and validate_convergence.py --all-recorded exit 0, build_new_wsl_handbook.py --check passes.",
+        "Date:   Mon Oct 5 02:51:31 2026 -0400",
+        "    registry: register the files of the hash-list rule review round in manifests/evidence.json",
+        "    The hot-file step (docs/lanes.md): evidence.json restored from the base 4c897418f, the changed files re-registered with host_receipts.register_file,",
+        "    the heads file registered under its new path, component_matrix and new_host_grand_list rewritten; validate.py and validate_convergence.py",
+        "    --all-recorded pass.",
         "    Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>",
         "hooks named in <scratch>/fake-home/.codex:",
         "  <scratch>/fake-home/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is trusted",
@@ -189,7 +189,7 @@
         "  every rule file is accepted",
         "hooks named in <scratch>/rules-hcom/.codex:",
         "  <scratch>/rules-hcom/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/rules-hcom/.codex/config.toml.bak.20261005T065932Z",
+        "backup: <scratch>/rules-hcom/.codex/config.toml.bak.20261005T070427Z",
         "trusted 1 hook(s) in <scratch>/rules-hcom/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -308,7 +308,7 @@
         "  every rule file is accepted",
         "hooks named in <scratch>/rules-allow-only/.codex:",
         "  <scratch>/rules-allow-only/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/rules-allow-only/.codex/config.toml.bak.20261005T065933Z",
+        "backup: <scratch>/rules-allow-only/.codex/config.toml.bak.20261005T070428Z",
         "trusted 1 hook(s) in <scratch>/rules-allow-only/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -405,6 +405,84 @@
       ]
     },
     {
+      "step": "rules-hcom-trusted-filter: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom-trusted-filter: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-hcom-trusted-filter/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-hcom-trusted-filter/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-hcom-trusted-filter/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom-trusted-filter (the reviewed file, a trusted project filter that makes rtk rewrite hcom): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-hcom-trusted-filter/.codex/rules: hcom-deny.rules; 1 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: hcom-deny.rules: rtk trusts TOML filter files (`rtk trust --list` does not say `No trusted filters.`, or failed): a trusted project or global filter can make rtk rewrite any command, `hcom ...` included"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-hcom-trust-override: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom-trust-override: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-hcom-trust-override/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-hcom-trust-override/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-hcom-trust-override/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom-trust-override (the reviewed file, RTK_TRUST_PROJECT_FILTERS in the tool's environment): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-hcom-trust-override/.codex/rules: hcom-deny.rules; 1 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: hcom-deny.rules: RTK_TRUST_PROJECT_FILTERS is set: with a CI variable rtk trusts every project filters file without a store entry"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
       "step": "rules-exposed: plan command 3 (the exclusions config)",
       "exit": 0,
       "expected_exit": 0,
@@ -466,7 +544,7 @@
         "  exposed: default.rules (sha256 f481703c6aec) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r",
         "hooks named in <scratch>/rules-exposed/.codex:",
         "  <scratch>/rules-exposed/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/rules-exposed/.codex/config.toml.bak.20261005T065935Z",
+        "backup: <scratch>/rules-exposed/.codex/config.toml.bak.20261005T070431Z",
         "trusted 1 hook(s) in <scratch>/rules-exposed/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -546,7 +624,7 @@
         "  exposed: default.rules (sha256 84a079dfaa1a) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r",
         "hooks named in <scratch>/rules-twin/.codex:",
         "  <scratch>/rules-twin/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/rules-twin/.codex/config.toml.bak.20261005T065936Z",
+        "backup: <scratch>/rules-twin/.codex/config.toml.bak.20261005T070432Z",
         "trusted 1 hook(s) in <scratch>/rules-twin/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -1034,6 +1112,64 @@
       "exit": 0,
       "valid": true,
       "decision": null
+    }
+  ],
+  "project_filter_check": [
+    {
+      "step": "project filter present, untrusted: hook check hcom kill luna",
+      "exit": 1,
+      "stdout": [],
+      "stderr_first": "No rewrite for: hcom kill luna"
+    },
+    {
+      "step": "rtk trust --yes in the project",
+      "exit": 0,
+      "stdout": [
+        "Risk summary:",
+        "  Filters: 1",
+        "  No high-risk patterns detected."
+      ],
+      "stderr_first": "\u001b[33mDetected 1 custom project scoped toml filter(s) in .rtk/filters.toml \u2014 they rewrite matching co"
+    },
+    {
+      "step": "project filter trusted: hook check hcom kill luna",
+      "exit": 0,
+      "stdout": [
+        "rtk hcom kill luna"
+      ],
+      "stderr_first": ""
+    },
+    {
+      "step": "rtk trust --list from another directory",
+      "exit": 0,
+      "stdout": [
+        "Trusted filters:",
+        "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550",
+        "  <scratch>/rules-hcom-trusted-filter/project/.rtk/filters.toml (trusted 2026-10-05)"
+      ],
+      "stderr_first": ""
+    },
+    {
+      "step": "no store entry, no override: hook check hcom kill luna",
+      "exit": 1,
+      "stdout": [],
+      "stderr_first": "No rewrite for: hcom kill luna"
+    },
+    {
+      "step": "RTK_TRUST_PROJECT_FILTERS=1 and CI=1, no store entry: hook check hcom kill luna",
+      "exit": 0,
+      "stdout": [
+        "rtk hcom kill luna"
+      ],
+      "stderr_first": ""
+    },
+    {
+      "step": "RTK_TRUST_PROJECT_FILTERS=1 and CI=1: rtk trust --list",
+      "exit": 0,
+      "stdout": [
+        "No trusted filters."
+      ],
+      "stderr_first": ""
     }
   ],
   "all_as_expected": true

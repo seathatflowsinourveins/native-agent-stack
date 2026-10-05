@@ -201,9 +201,12 @@ recommended after 705f and the command center accepted: the tool no longer decid
     rtk's 94 `RULES` patterns and 62 builtin TOML filters, the wrappers and the env prefix, with line provenance) and on `check_rtk_rewrite_heads.py`, whose section 6
     ran the entry's first tokens in 22 spellings and 8 shapes, alone and behind each wrapper (352 commands) against the real binary: none is rewritten. Both are review
     evidence, not a gate: the tool reads neither. The conditions of an entry are the ones the review was made under: `rtk --version` must report the entry's version,
-    `rtk config` must show `transparent_prefixes = []` (a configured prefix makes rtk rewrite the command after it), and the user-global TOML filters file beside rtk's
-    config must hold nothing but comments and `schema_version` (a filter's `match_command` can make rtk rewrite any command). One changed byte of the file, another rtk,
-    a prefix or a filter ends the review. **A pin move of rtk re-reviews the list**: `tests/test_codex_hook_trust.py` compares each entry with the rtk entry of
+    `rtk config` must show `transparent_prefixes = []` (a configured prefix makes rtk rewrite the command after it), `rtk trust --list` must print exactly
+    `No trusted filters.` (rtk applies a project or global TOML filter only while it is trusted, and the store is global; measured with rtk 0.51.0: a trusted project
+    filter makes the hook rewrite `hcom kill luna` from that project's directory, and `rtk trust --list` shows it from any directory), `RTK_TRUST_PROJECT_FILTERS`
+    must be unset in the tool's environment (with a CI variable rtk trusts every project filters file without a store entry, which the list does not show: measured
+    too), and the user-global TOML filters file beside rtk's config must hold nothing but comments and `schema_version` (a filter's `match_command` can make rtk
+    rewrite any command). One changed byte of the file, another rtk, a prefix, a trusted filter or the override variable ends the review. **A pin move of rtk re-reviews the list**: `tests/test_codex_hook_trust.py` compares each entry with the rtk entry of
     `adoption/pins-linux-x86_64.json` (version and commit), so the PR that moves the pin carries the new review (re-derive the heads with
     `derive_rtk_rewrite_heads.py`, run `check_rtk_rewrite_heads.py` and the scratch run, update the entry), and the RTK row of `docs/token-efficiency-stack.json` names
     the step in the currency process. A file that ships with an install plan row must be on the list or allow-only, which a test checks.
@@ -213,9 +216,10 @@ recommended after 705f and the command center accepted: the tool no longer decid
     never opened. The cost is false refusals: any hand-written restricting rule that is not on the list, and a `default.rules` that Codex wrote with an escape (an
     approved command with a quote or a backslash), is an exposure until it is reviewed into the list or accepted with `--allow-exec-rules`.
 
-Evidence (`local_integration` unless noted): `plan-row-scratch-run.json`, 70 steps with the real rtk 0.51.0 and codex-cli 0.159.3 in scratch homes, the plan's own
+Evidence (`local_integration` unless noted): `plan-row-scratch-run.json`, 76 steps with the real rtk 0.51.0 and codex-cli 0.159.3 in scratch homes, the plan's own
 command strings: #713's `hcom-deny.rules` by its exact bytes lets the trust proceed (and a `git push` forbid rule added after the grant makes `--check` exit 6 and the
-trust refuse); the same bytes plus one comment line, a configured transparent prefix and a user TOML filter beside the reviewed file are each refused; Codex's and
+trust refuse); the same bytes plus one comment line, a configured transparent prefix, a user TOML filter beside the reviewed file, a trusted project filter (under which the real rtk
+rewrites `hcom kill luna` from the project's directory) and `RTK_TRUST_PROJECT_FILTERS` with a CI variable (the same rewrite, with no store entry) are each refused; Codex's and
 hcom's allow-only files let the trust proceed, and an allow rule that names `rtk` is refused; a `git push` forbid rule is refused before anything is written (accepted with `--allow-exec-rules`, after which
 `--check` exits 6), and so is the same rule with its `rtk git push` twin; the counterexamples of 705e (`git -C .`, broad `uv` and `npx` rules, the nested
 `host_executable` file, under which the real evaluator forbids `git push origin main`) and of 705f (raw CR, `bash -lc` script, `phpunit.exe`, `g++` plus a combining
@@ -225,14 +229,13 @@ are rewritten; `git -C .`, `uv`, `npx`, `uvx hcom kill luna` and `hcom kill luna
 that the binary rewrites, 13,041 scanned commands (1,449 names, 9 shapes) gave 623 rewrites and none outside the heads, 67 wrapper prefixes in front of `git status`
 gave 24 rewrites, all led by a head, 8,884 spellings of the 101 literal heads gave 480 rewrites and none outside the heads, and the 352 commands of the reviewed
 entry gave none (the derivation's gaps were 101, then 63, then 0, and 28, then 40, then 0 in the spelling scan: the `r#"..."#` sbt rule, the TOML filters as a
-second rewrite source, `^gcc\b` accepting `gcc-13`, a trailing slash, PHP `.exe`/`.bat` words, backslash readings). 79 unit tests (`synthetic`: `FakeRtk` stands in for
-`rtk --version` and `rtk config`; the evidence tests read the retained records) were written after the code and checked by mutation: 58 mutants each fail at
+second rewrite source, `^gcc\b` accepting `gcc-13`, a trailing slash, PHP `.exe`/`.bat` words, backslash readings). 81 unit tests (`synthetic`: `FakeRtk` stands in for
+`rtk --version` and `rtk config`; the evidence tests read the retained records) were written after the code and checked by mutation: 63 mutants each fail at
 least one test (`rule_review_mutation_check.py`, `rule-review-mutation-check.txt`; the ASCII decode of the grammar is the one equivalent mutant and is not listed).
 The operating rule for rule authors stays: write the `rtk` form beside the plain one and check both with `codex execpolicy check`, then accept with `--allow-exec-rules`.
 
-Limits and residuals: rules in a project's `.codex/rules` or a managed layer are not visible to the tool; rtk TOML filters that a project trusts with `rtk trust`
-(`.rtk/filters.toml`, per directory) can add heads and are not read, so the review of the hcom entry stands only while no such filter makes rtk rewrite `hcom` or
-`uvx`; the reviewed list covers rtk's default hook configuration of the one version it names; the review covers the user layer's rule files as bytes and does not
+Limits and residuals: rules in a project's `.codex/rules` or a managed layer are not visible to the tool; the override variable is checked in the tool's own
+environment, not in the environment Codex runs the hook in; the reviewed list covers rtk's default hook configuration of the one version it names; the review covers the user layer's rule files as bytes and does not
 say whether a restricting rule is good; no live Codex session was run with a forbidding rule and the hook active (untested boundary: the session behaviour is
 derived from the dispatch order above and the evaluator that `codex execpolicy check` runs); `--allow-exec-rules` is an explicit acceptance of an exposure.
 What would overturn the design: a Codex that matches execution rules before the PreToolUse rewrite or against both forms, an rtk that reads Codex's rules or has a
