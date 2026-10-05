@@ -160,8 +160,9 @@ def _dec_config(value):
 class LeverageInputs:
     """Per-tick, caller-observed inputs the policy layer's `ceiling()`
     consults. `session` is a `sessions.SessionKind` value (or None when the
-    current wall-clock time is outside the frozen session calendar --
-    unclassifiable, so `ceiling()`/`envelope()` fail closed to 0).
+    queried timestamp or XNYS range/construction raises ValueError --
+    unclassifiable, so `ceiling()`/`envelope()` fail closed to 0). XNYS
+    bounds come from the queried date's year; other provider errors propagate.
 
     `pending_buy_notional_usd` (LEV-RI-A, 2026-09-22 leverage fix round 1):
     the ledger's own `AccountState.pending_buy_notional_usd` -- the notional

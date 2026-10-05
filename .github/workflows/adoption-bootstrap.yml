@@ -35,6 +35,7 @@ on:
       - 'manifests/evidence.json'
       - 'blueprints/convergence-practice/wsl-native-tools/pins.json'
       - '.github/workflows/adoption-bootstrap.yml'
+      - '.github/requirements-calendar.txt'
   # No `paths:` filter here: a required check must report on every pull_request. validate-macos reports a
   # full result, a changed-tests result or SKIPPED, as the `changes` job decides
   # (docs/decisions/2026-10-03-macos-ci-scope.md). A path-filtered workflow would leave the required check
@@ -142,6 +143,7 @@ jobs:
             'manifests/evidence.json'
             'blueprints/convergence-practice/wsl-native-tools/pins.json'
             '.github/workflows/adoption-bootstrap.yml'
+            '.github/requirements-calendar.txt'
           )
           # The macOS-relevant list of docs/decisions/2026-10-03-macos-ci-scope.md, section 6.2, in its
           # order: C1 this workflow; C2 the macOS install and launcher surface; C3 code the Mac runs from
@@ -151,6 +153,7 @@ jobs:
           # criteria; tests/test_workflow_hardening.py (MacosPatternsTests) pins the list.
           MACOS_PATTERNS=(
             '.github/workflows/adoption-bootstrap.yml'
+            '.github/requirements-calendar.txt'
             'adoption/bootstrap-macos.sh'
             'adoption/pins-macos-arm64.json'
             'adoption/manifest.json'
@@ -864,6 +867,9 @@ jobs:
         with:
           python-version: '3.13'
           check-latest: false
+      - name: Install the hash-locked session calendar
+        run: |
+          python3 -m pip install --require-hashes --only-binary=:all: -r .github/requirements-calendar.txt
       # Every step from here through "Run the full test suite (gating on macOS)" runs in full mode only
       # (docs/decisions/2026-10-03-macos-ci-scope.md); changed-tests mode runs its own step further below.
       - name: Validate manifests and evidence integrity

@@ -3746,6 +3746,7 @@ class CIWorkflowTriggerPathsTests(unittest.TestCase):
 
     def test_every_macos_job_input_is_a_push_trigger_path(self):
         for expected in (
+            ".github/requirements-calendar.txt",
             "evidence/artifacts/macos-embed-reference-20260923/**",
             "scripts/host_receipts.py",
             "scripts/component_matrix.py",
