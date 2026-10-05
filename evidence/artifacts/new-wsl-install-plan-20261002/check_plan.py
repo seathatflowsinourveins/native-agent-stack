@@ -10,6 +10,7 @@ usage: python3 -B check_plan.py [--plan-dir DIR] [--manifest PATH]
 """
 import argparse
 import collections
+import hashlib
 import json
 import pathlib
 import re
@@ -579,6 +580,28 @@ def main():
     for r in selected + measured:
         if r["route"] == "mise" and not r.get("mise_tool"):
             bad("mise", f"row {r['slot']} has route mise but names no mise_tool")
+
+    # D-ollama: owner-approved native user-unit adaptation; no host apply here.
+    # Source: Ollama v0.35.0 docs/linux.mdx:53-85; local-model decision:254-257 superseded by 2026-10-05 ruling.
+    ollama = by_slot.get("local-model-server", {})
+    if not ollama.get("needs", {}).get("systemd_user_unit"):
+        bad("local-model-server", "lasting GPU owner requires its user-unit prerequisite")
+    native_enable = "systemctl --user daemon-reload && systemctl --user enable --now ollama.service"
+    if native_enable not in ollama.get("commands", []):
+        bad("local-model-server", "missing native daemon-reload and boot enable/start command")
+    health = (ollama.get("acceptance", {}).get("service_health") or {}).get("command") or ""
+    if "systemctl --user is-enabled ollama.service" not in health.splitlines():
+        bad("local-model-server", "service_health must require boot-enabled ollama.service")
+    assets = {
+        "ollama.service": "94e03d7b35b57327086b74a1ea7b189bf362c970e756703dc8a1f42340618c50",
+        "ollama-warmup.sh": "2236dc865fde718d7cd44a9182b17fb55dcd36a0bbd601e9f4bd81d1c35892e5",
+    }
+    for name, expected in assets.items():
+        path = plan_dir / "config" / name
+        if not path.is_file() or hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+            bad("local-model-server", f"{name} differs from its designated owner-approved bytes")
+        if f"copy_config '{name}'" not in install_funcs.get("local-model-server", ""):
+            bad("local-model-server", f"install function must place {name} through copy_config")
 
     # G4: these are plan contracts, not a claim that a host or a notification receiver passed.
     # Source: OTel v0.162.0 otelcol/command_validate.go:15; Grafana v13.2.3 query-editor/_index.md:47;

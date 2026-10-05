@@ -23,9 +23,16 @@ test -f "$SRT_ACCEPT_POLICY"
 test -f "$SRT_ACCEPT_DENY_READ"
 test -f "$SRT_ACCEPT_DENY_WRITE"
 test -d "$SRT_ACCEPT_ALLOWED_DIR"
-export SRT_ACCEPT_POLICY SRT_ACCEPT_DENY_READ SRT_ACCEPT_DENY_WRITE SRT_ACCEPT_ALLOWED_DIR SRT_ACCEPT_DENIED_URL
-srt_session_probe="$(mktemp -d)"
-trap 'rm -rf -- "$srt_session_probe"' EXIT
+umask 077
+srt_state_root="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/sandbox-runtime-srt"
+mkdir -p -- "$srt_state_root"
+srt_session_probe="$(mktemp -d "$srt_state_root/run.XXXXXX")"
+# Codex inherit=none drops exported fixtures; shell-quote only these synthetic
+# values into the supplied command instead of changing the client's policy.
+# Source: https://developers.openai.com/codex/config-reference/#shell_environment_policyinherit
+# TMPDIR stays in the validated allowed fixture; Node v24.21.0 doc/api/os.md:418-420.
+printf -v srt_fixture_bindings 'SRT_ACCEPT_POLICY=%q\nSRT_ACCEPT_DENY_READ=%q\nSRT_ACCEPT_DENY_WRITE=%q\nSRT_ACCEPT_ALLOWED_DIR=%q\nSRT_ACCEPT_DENIED_URL=%q\nTMPDIR=%q\nexport TMPDIR\n' \
+  "$SRT_ACCEPT_POLICY" "$SRT_ACCEPT_DENY_READ" "$SRT_ACCEPT_DENY_WRITE" "$SRT_ACCEPT_ALLOWED_DIR" "$SRT_ACCEPT_DENIED_URL" "$SRT_ACCEPT_ALLOWED_DIR"
 srt_native_recipe="$(cat <<'SRT'
 set -euo pipefail
 srt echo "hello world"
@@ -57,15 +64,18 @@ printf 'SRT_DENY_NETWORK_EXIT=%s\n' "$srt_deny_network_rc"
 printf 'SRT_NATIVE_USE_OK\n'
 SRT
 )"
-srt_prompt="Use your native shell tool to execute the following Bash recipe as one command, exactly as supplied. The SRT_ACCEPT_* variables name existing synthetic fixtures. Do not create or replace a policy. Report the command exit code. A version check cannot satisfy this task.
+srt_native_recipe="$srt_fixture_bindings$srt_native_recipe"
+srt_prompt="Use your native shell tool first to execute the following Bash recipe as one command, exactly as supplied. The recipe binds its existing synthetic fixture paths. Do not create or replace a policy. Report the command exit code. A version check cannot satisfy this task.
 
 $srt_native_recipe"
 case "${SRT_ACCEPT_CLIENT:-claude}" in
   claude)
-    claude -p --effort max --output-format stream-json --verbose --allowedTools Bash --max-turns 4 "$srt_prompt" > "$srt_session_probe/events.jsonl"
+    (cd -- "$srt_fixture_root" && env CLAUDE_CODE_DISABLE_BACKGROUND_TASKS=1 flock -w 3600 "${NATIVE_STACK_CLAUDE_SESSION_LOCK:-$HOME/.local/state/native-agent-stack/coordination/ns2604-coop/claude-session.lock}" claude -p "$srt_prompt" --max-turns 48 --append-system-prompt-file "$(dirname -- "${BASH_SOURCE[0]}")/acceptance-execution-instructions.txt" --effort max --tools Bash --output-format stream-json --verbose --allowedTools Bash) \
+      </dev/null > "$srt_session_probe/events.jsonl" 2> "$srt_session_probe/stderr"
     ;;
   codex)
-    codex exec --json --ephemeral "$srt_prompt" </dev/null > "$srt_session_probe/events.jsonl"
+    codex exec --json --ephemeral --skip-git-repo-check -C "$srt_fixture_root" "$srt_prompt" \
+      </dev/null > "$srt_session_probe/events.jsonl" 2> "$srt_session_probe/stderr"
     ;;
   *) printf 'SRT_ACCEPT_CLIENT must be claude or codex.\n' >&2; exit 2 ;;
 esac
@@ -74,6 +84,30 @@ python3 - "$srt_session_probe/events.jsonl" "${SRT_ACCEPT_CLIENT:-claude}" <<'PY
 import json
 import sys
 from pathlib import Path
+
+def completed_foreground_shell_calls(events):
+    # Claude 2.1.289 native tool IDs and background semantics; integration proof.
+    calls, complete = {}, set()
+    partial = ("_(timed out after ", "_(process backgrounded after ",
+               "Command did not complete within its ", "Command was manually backgrounded by user with ID:", "Command was moved to the background (ID:", "Command running in background with ID:", "Exit code:")
+    for event in events:
+        content = (event.get("message") or {}).get("content", [])
+        if not isinstance(content, list):
+            continue
+        for block in content:
+            if block.get("type") == "tool_use":
+                name, args = block.get("name", ""), block.get("input", {})
+                if name == "Bash":
+                    calls[block["id"]] = not args.get("run_in_background", False)
+                elif name.endswith("__ctx_execute") and args.get("language") == "shell":
+                    calls[block["id"]] = not args.get("background", False)
+            elif block.get("type") == "tool_result" and calls.get(block.get("tool_use_id")) and not block.get("is_error", False):
+                value = block.get("content", "")
+                text = value if isinstance(value, str) else "\n".join(
+                    b.get("text", "") for b in value if isinstance(b, dict) and b.get("type") == "text")
+                if not any(line.startswith(partial) for line in text.splitlines()):
+                    complete.add(block["tool_use_id"])
+    return complete
 
 events = [json.loads(line) for line in Path(sys.argv[1]).read_text().splitlines() if line.strip()]
 required = ('srt echo "hello world"', 'srt --settings', 'SRT_DENY_READ_EXIT=',
@@ -93,7 +127,7 @@ if sys.argv[2] == 'claude':
                 if 'SRT_NATIVE_USE_OK' in text and 'hello world' in text:
                     successful.add(block.get('tool_use_id'))
     complete = any(e.get('type') == 'result' and e.get('subtype') == 'success' and not e.get('is_error', False) for e in events)
-    passed = complete and bool(set(calls) & successful)
+    passed = complete and bool(set(calls) & successful & completed_foreground_shell_calls(events))
 else:
     complete = any(e.get('type') == 'turn.completed' for e in events)
     passed = complete and any(

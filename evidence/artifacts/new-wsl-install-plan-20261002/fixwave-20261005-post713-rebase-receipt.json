@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "kind": "ns2604-fixwave-post713-source-reconciliation",
+  "recorded_at_utc": "2026-10-05T16:33:00Z",
+  "north_star_action": "Preserve repaired native acceptance when reconciling the current engineering foundation plan.",
+  "source_inputs": {
+    "main_revision": "bea3d7f24f091ca19fcf264f5bce32a8e476c936",
+    "pr713_merge": "1796303f957c522e78b92667e553c06840fae3a2",
+    "merged_at_utc": "2026-10-05T15:58:11Z",
+    "preserved_pre_rebase_revision": "4e902bbb7da13c8404b6a5a90413905738d67941",
+    "folded_source_revision": "eb72548366585ba0068f57105f2fcf1edd44b07b"
+  },
+  "inventory": {
+    "rows": 84,
+    "installed": 63,
+    "default_installed": 60,
+    "named_installed": 3,
+    "measurement_only": 2,
+    "not_installed": 19,
+    "install_commands": 189,
+    "acceptance_entries": 113,
+    "additional_checks": 2,
+    "config_assets": 63
+  },
+  "reconciliation": {
+    "source_history_preserved": true,
+    "dropped_commits": "Verified registry-only changes; main registry re-registered last.",
+    "production_worker_policy_changed": false,
+    "forced_subprocess_upstream_selection_retained": true,
+    "claude_review_frozen_prompt_fixture_schema_48turns_1200seconds_retained": true,
+    "claude_native_read_only_surface_retained": true,
+    "codex_native_gatherer_polling_retained": true,
+    "deerflow": "Keyless DDGS retained; plain Sol/xhigh consumer and maintained per-run header copy precede native CLI.",
+    "metadata_observer": "Main direct observer retained; source-expected effort is not delivered wire effort. Window/model fallback cannot prove attribution/whole-run zero embeddings.",
+    "new_chrome_caller": "Same exact arguments now under binding native shared flock.",
+    "ollama_assets_byte_identical": true,
+    "prometheus_unit": "Render-only candidate and native effective-flags gate retained; owner activation separate."
+  },
+  "checks": {
+    "first_post_rebase_touched": {
+      "exit_code": 1,
+      "tests": 304,
+      "failures": 22,
+      "errors": 1,
+      "skipped": 3,
+      "seconds": 79.364,
+      "attribution": "21synthetic DeerFlow environments lacked maintained renderer Python; old lock count; obsolete plan-mode stdin-line fixture.",
+      "log": {
+        "bytes": 23671,
+        "sha256": "784ba200d356d7b4af1e84f24fed3d9712b33a5cc2e1c4dc8a45ad412a3bfd94"
+      }
+    },
+    "fixture_controls": {
+      "exit_code": 0,
+      "tests": 3,
+      "log": {
+        "bytes": 101,
+        "sha256": "f9d640da13935ffe5b39acd3497dedd337eeb71cdbf6ced7330295c9ec68afc4"
+      }
+    },
+    "final_post_rebase_touched": {
+      "exit_code": 0,
+      "tests": 304,
+      "skipped": 3,
+      "seconds": 80.736,
+      "log": {
+        "bytes": 417,
+        "sha256": "e221be73b8a4ab328883fc6da5c55630cb45ccbb77fc7cd9fd8101c6eb766db7"
+      }
+    },
+    "plan_consistency_exit_code": 0,
+    "evidence_class": "Repository integration and synthetic checks, not upstream or provider acceptance."
+  },
+  "selected_asset_identities": {
+    "inspector_client_probe": {
+      "sha256": "2f82b600dcebf957cfbec84bd85ba64b5abbafde20283392b03ff5dfa150f811",
+      "git_blob": "a478d7557b40e68a0774b1cad8fabdc6a9236eca"
+    },
+    "ollama_unit": {
+      "sha256": "94e03d7b35b57327086b74a1ea7b189bf362c970e756703dc8a1f42340618c50"
+    },
+    "ollama_warmup": {
+      "sha256": "2236dc865fde718d7cd44a9182b17fb55dcd36a0bbd601e9f4bd81d1c35892e5"
+    }
+  },
+  "native_acceptance": {
+    "new_model_run": false,
+    "host_apply": false,
+    "repaired_stage_reruns": "Pending; prior failed attempts remain separate.",
+    "destination_ready": false
+  },
+  "source_identities": {
+    "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json": {
+      "bytes": 441640,
+      "sha256": "c2098cf7c7fefdffad5d86a20a8f73d84a4d50cb81e86f91a945914c7eb9a78e"
+    },
+    "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh": {
+      "bytes": 187923,
+      "sha256": "2d000187d09c79579ed4586fe95d9361eb9d989cc2d06655f43b8f29cc5f1644"
+    },
+    "evidence/artifacts/new-wsl-install-plan-20261002/install.sh": {
+      "bytes": 122730,
+      "sha256": "7b473887b6ab35002009ca1177a755a117dab79e7800f5de2e8f24a7b1b11d42"
+    },
+    "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py": {
+      "bytes": 48077,
+      "sha256": "c3e2847c3b2856fe0ce75e3755cef7a9531526a39fcdd09e93ae0469b226b65a"
+    },
+    "evidence/artifacts/new-wsl-install-plan-20261002/README.md": {
+      "bytes": 85085,
+      "sha256": "b74d7eb40c49bd7209c2903d600b3902e888ff871f3180d966494284ee9b40dd"
+    },
+    "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md": {
+      "bytes": 195966,
+      "sha256": "bf303a09c2c014ae3e6d70f13a3329d942f5002eb3b362c353a868b926e88cb0"
+    },
+    "evidence/artifacts/new-wsl-install-plan-20261002/config/deer-flow-research.sh": {
+      "bytes": 7842,
+      "sha256": "8bc0054c3a2c71b70600ea89547686e71f60a680dc8eb952128cd2537f1e5860"
+    },
+    "evidence/artifacts/new-wsl-install-plan-20261002/config/deer-flow-config.yaml": {
+      "bytes": 801,
+      "sha256": "35a2b86a4553d22452b6921f733c35a49c4999a9d4d3c1b20c34cb6ec562934b"
+    },
+    "tests/test_new_wsl_definitive_defaults.py": {
+      "bytes": 247449,
+      "sha256": "d8a484cabaa26895add716527b20761690b68dea0cad75a01e80e5f69fa49ae6"
+    },
+    "tests/test_new_wsl_client_config.py": {
+      "bytes": 292986,
+      "sha256": "1f6c948d979ee50a8a52a9f5f21f66e95fb80aed3bed8852dc8522a0d2e60065"
+    }
+  },
+  "upstream_sources": [
+    "https://git-scm.com/docs/git-rebase#_interactive_mode",
+    "util-linux@v2.41.3:sys-utils/flock.1.adoc",
+    "bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e:backend/packages/harness/deerflow/config/model_config.py:26",
+    "bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e:backend/packages/harness/deerflow/models/factory.py:209-227,343",
+    "native-agent-stack@bea3d7f24f091ca19fcf264f5bce32a8e476c936:evidence/artifacts/new-wsl-install-plan-20261002/config/deer-flow-research.sh:14-24",
+    "native-agent-stack@bea3d7f24f091ca19fcf264f5bce32a8e476c936:evidence/artifacts/new-wsl-install-plan-20261002/config/gateway-effort-accept.py:92-108"
+  ],
+  "privacy": "No credentials, private paths, native session IDs, conversations or active client configuration published. Private logs retained; hashes and bounded observations only."
+}

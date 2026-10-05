@@ -1,5 +1,5 @@
-# bytedance/deer-flow@v2.1.0 config.example.yaml:23,250-278,802-807,1060-1065,1436-1437.
-# Public research through the selected keyless loopback gateway; no provider secret.
+# bytedance/deer-flow@v2.1.0 config.example.yaml:23,250-278,801-806,1060-1065,1436-1437.
+# Keyless DDGS search and the loopback model route preserve the owner/custody ruling.
 config_version: 45
 models:
   - name: gpt-runtime

@@ -416,8 +416,13 @@
       "override": {
         "args": [
           "${ECO_ROOT}/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
-        ]
+        ],
+        "env": {
+          "QDRANT_URL": "http://${QDRANT_URL}",
+          "LMSTUDIO_URL": "http://${EMBED_URL}/v1"
+        }
       },
+      "source": "https://github.com/giancarloerra/SocratiCode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/README.md#configuration documents QDRANT_URL and LMSTUDIO_URL (including /v1). https://code.claude.com/docs/en/mcp documents the native server env object. Fill both endpoint variables from the selected host, as adoption/templates/codex.config.template.toml does, and retain the template's other env settings.",
       "note": "The code-search slot is split between semble and SocratiCode and waits for the measurement; the owner's full-stack decision of 2026-10-04 makes both its interim install."
     },
     {

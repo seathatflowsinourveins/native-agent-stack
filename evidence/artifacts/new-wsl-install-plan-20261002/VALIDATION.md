@@ -416,3 +416,76 @@ one of its 30 declared records passes the validator's supported positional
 record mode, exit 0. Re-run the discovery mode after the coordinator refreshes
 the registry. The known RTK grep file-list exactness control is still a separate
 repair; `scripts/native_token_ci.py` was not edited.
+
+## NativeStack2604 acceptance defects (2026-10-05)
+
+The [repair decision](../../../docs/decisions/2026-10-05-ns2604-acceptance-defect-repairs.md)
+and [sanitized receipt](fixwave-20261005-receipt.json) supersede the unrun status for this repaired
+subset. The touched suites passed: 268 tests, three existing skips, exit 0. Plan consistency,
+client-config --check, five shell syntax checks and repository integrity validation passed.
+The final native after_sign_in runs passed for difftastic, Worktrunk, SRT in both clients,
+Inspector in both clients, Inspect AI and cross-family review. Inspector post_install and
+AgentsView install/post_install passed; carriers remained a skipped holdout. Failed retries
+remain recorded, including the invalidated wrappers and the established-socket collision.
+
+These are scoped native executions and local/synthetic integration evidence. The existing
+Inspector stage suppresses upstream stdout, so no complete upstream test output or count is
+claimed. The actual host already used the owned AgentsView launcher; its predecessor migration
+is fixture evidence. One Inspect sample does not qualify model accuracy; cross-family execution
+does not qualify findings/dispositions or physical provider binding. No other row, new host,
+broker operation or platform status is promoted. The supported registrar refreshes the evidence
+registry in this lane, with its commit last; historical drift statements above retain their date.
+
+### Official-upstream follow-up
+
+The duplicate fresh-Claude launcher and installer/config entries are removed. Five callers use
+native Claude CLI invocations with the same prompts, flags and controls. The touched suites passed
+again: 268 tests, three existing skips, exit 0, 65.725 seconds. The earlier retry failed ten fixtures
+because its supplied lane-cache TMPDIR was absent; that failed invocation remains recorded.
+Plan, client-config and three changed shell syntax checks passed.
+
+Direct native reruns returned 0 for Difftastic, Worktrunk, SRT Claude and Codex, Inspector and
+cross-family review. Claude's new cross-family completion reports 39 turns; GPT completed and the
+status/working/index snapshots match. Inspector's frozen hash, JSON/HTML/false-setting artifacts and
+closed listener were independently checked. The receipt preserves all prior attempts and detailed
+artifacts, with distinct symbolic locators for new runs. Unchanged Inspect, AgentsView, carrier and
+Inspector post-install inputs reuse their earlier execution evidence; they are not new model runs.
+
+Repository validation passed with 69 components, 10096 hashed files, four profiles and 202 receipts.
+Its preceding failure came from Git's cached publication listing still containing the unstaged
+helper deletion, not a stale registry entry. Staging the owned deletion corrected that condition;
+both validator attempts remain in the receipt as structural evidence.
+
+### NS2604 foreground/keyless and worker follow-up, 2026-10-05
+
+The follow-up receipt records serial native stage exits: Difftastic0, Worktrunk0,
+SRT-Claude0, SRT-Codex0 and Inspector0 with independent functional controls. The
+worker's earlier final native stage0 retains both successful units, outputs55,
+requests_to_model=3 each and the closed-port zero-request negative. Its later stricter
+oracle inspection is local integration, not another model invocation.
+
+Unchanged upstream SDK forced-subprocess terminal tests passed under isolated SRT77
+and78 with the worker policy; both default-tmux controls failed under the same Unix
+socket restrictions. The plan already selected78. No version regression, sandbox
+broadening, worker rewrite or installed pin change follows. Thirty-six unchanged
+DeerFlow search/time-range tests passed with mocked responses; they do not establish
+provider availability.
+
+Direct keyless DeerFlow CLI0 returned one terminal end, eight successful searches,
+two empty outcomes and two linked final citations. Its native usage131844 is counted
+once. The GPT Researcher direct report contains eight distinct reference URLs. The
+research whole stage1 hit Claude's native session limit before Codex ran. Cross whole
+stage outer124 also retained a Claude session-limit error and completed GPT branch.
+Those two whole-stage gates remain unqualified.
+
+The touched suites first passed272tests/3skips, then the cross-specific completion
+edit's first273-test run failed two generated plan/script synchronization checks.
+The new completion fixtures passed; accept.sh was synchronized before the retry.
+All failed native/structural/local attempts remain separate in the follow-up receipt.
+No answer accuracy, review findings/dispositions, physical provider binding,
+whole-plan/new-host qualification, provider owner or paper status is claimed.
+
+The synchronized retry passed273tests, three existing skips, exit0 in66.154seconds.
+Plan consistency, client-config parity and separate changed-shell syntax checks
+passed0. Final registry validation is structural evidence, recorded in the follow-up
+receipt; native client gates and the #713 rebase remain pending.
