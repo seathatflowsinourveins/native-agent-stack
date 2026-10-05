@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Operator-only drill: kill an existing start-all, observe restart and next due run.
 
-Run later on the chosen operating host (user decision 2), with its locked trading
-Python. This script never installs, enables or starts a unit. The operator must
+Run later on the chosen operating host (user decision 2), with an isolated uv
+PyYAML 6.0.3 overlay over its locked trading Python; see README. SDK_ENV stays
+unchanged. This script never installs, enables or starts a unit. The operator must
 have deployed the private templates and have supplied fresh local research input.
 
 Sources: systemd/systemd@v255:man/systemd.service.xml:830-836;
@@ -119,7 +120,7 @@ def main(argv=None) -> int:
         try:
             import yaml
         except ImportError as error:
-            raise ValueError("install upstream PyYAML 6.0.3 for the restart config check; see README") from error
+            raise ValueError("run the restart drill with the isolated uv PyYAML 6.0.3 overlay; see README") from error
         try:
             config = yaml.safe_load(args.config.read_text())
         except yaml.YAMLError as error:

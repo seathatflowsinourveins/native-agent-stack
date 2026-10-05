@@ -29,8 +29,9 @@ four job variables `STACK_REPO`, `SDK_ENV`, `LEAN_EVENTS` and `RESEARCH_OUTPUT`
 in the DAG's `env:` block. This keeps the job complete when invoked by either
 the scheduler or native CLI. `SDK_ENV` is the installed SDK built from
 [`adoption/sdk/requirements-linux-x86_64-py313.lock:241`](../../../adoption/sdk/requirements-linux-x86_64-py313.lock),
-which locks exchange-calendars 4.13.2. Use that maintained native environment;
-PR-4 adds no second runtime, lock or dependency installation.
+which locks exchange-calendars 4.13.2. Use that maintained native environment.
+The scheduled job adds no second runtime or lock; the restart drill alone uses
+the isolated pinned PyYAML overlay described below.
 An `Environment=` line in the unit cannot supply them: `env -i` discards that
 inherited environment. Sources: `coreutils/coreutils@v9.4:src/env.c:824-838`
 ([implementation](https://github.com/coreutils/coreutils/blob/v9.4/src/env.c#L824)) and
@@ -201,10 +202,13 @@ In another terminal, cancel that exact active run and inspect its native history
   --status succeeded,failed,aborted --limit 1000 --format json equity-research-evidence
 ```
 
-An aborted or failed run needs inspection and corrected input before replay.
-Replay with another fresh run ID using the start command **on the same New York
-date, after that session's close**, with input mtime after the close and no later
-than both the check time and that date's **16:25 New York** cutoff.
+Inspect an aborted or failed run before deciding whether recovery is possible.
+A missing, stale or late input failure **cannot be replayed for that session**:
+correcting the input after the scheduled run would miss the **16:25 New York**
+publication cutoff. After a later-step failure, replay with another fresh run ID
+using the start command **on the same New York date, after that session's close**,
+with the **unchanged, on-time input**. Its mtime must remain after the close and
+no later than both the check time and that date's 16:25 cutoff.
 `DAG_RUN_ID` keeps earlier output intact. A later replay
 evaluates its current New York date: before close or on a non-session day it
 records a succeeded run with skipped research steps; after another session's
@@ -274,18 +278,19 @@ is insufficient for acceptance. Source:
 
 Run the cycle **daily**, including weekends and holidays,
 using one private rotation-state file per repository. Default checks rotate
-`1/7` through `7/7`; all partitions are read within **seven days**. The cursor
+`1/7` through `7/7` in seven daily invocations. The cursor
 advances only after successful native checking. The **whole 1..7 rotation**, from
-its cycle-start timestamp through subset 7's successful completion, has a seven-day
-deadline in UTC. There is no strict per-step 24-hour cutoff: daily execution with
-60 seconds of jitter and the 25-hour fall-back day fit the whole-cycle bound. A
-cycle origin older than seven days, even when subset 7 completed and the cursor
-has returned to 1, a gap since the last success over seven days, reversed
+its cycle-start timestamp through successful completion and the next rollover,
+has an **eight-day elapsed-time bound in UTC**. The one-day slack covers the
+25-hour fall-back day plus 60 seconds of daily start drift: the rollover is
+seven days and one hour later across fall-back, or seven days and seven minutes
+later with that drift. There is no strict per-step 24-hour cutoff. A
+cycle origin older than eight days, even when subset 7 completed and the cursor
+has returned to 1, a gap since the last success over eight days, reversed
 clock or pre-v2 state requires `--full-check`; only successful full reading can
-restart the cursor. Check the previous origin before resetting it for subset 1;
-daily jitter can therefore require a full read at rollover after seven days.
-capture the invocation time before snapshot/backup, and check completion time
-again before publishing state. This is an operator execution requirement; no backup timer
+restart the cursor. Check the previous origin before resetting it for subset 1.
+The script captures the invocation time before snapshot/backup and checks completion
+time again before publishing state. This is an operator execution requirement; no backup timer
 was enabled by PR-4. Every cycle also restores and compares its snapshot.
 Source: `restic/restic@v0.19.1:doc/045_working_with_repos.rst:482-521`
 ([deterministic partitions](https://github.com/restic/restic/blob/v0.19.1/doc/045_working_with_repos.rst#L482)).
@@ -344,11 +349,28 @@ restore. Key recovery belongs to user decision 3.
 ## Same-host operator drills and proof
 
 Run [drill_process_restart.py](drill_process_restart.py) **later on the operating
-host**, shortly before the next eligible 16:30 slot, using its locked trading
-Python. This drill additionally uses upstream **PyYAML 6.0.3** to parse the
+host**, shortly before the next eligible 16:30 slot, using an isolated uv overlay
+over its locked trading Python. This drill uses upstream **PyYAML 6.0.3** to parse the
 deployed configuration, rather than treating a comment as an active permission.
-On that host, install it with `uv pip install --python "$SDK_ENV/bin/python" 'PyYAML==6.0.3'`
-before the drill. The parser is `yaml/pyyaml@6.0.3:lib/yaml/__init__.py:117-125`
+Run only the drill in that overlay, leaving the hash-locked `SDK_ENV` unchanged.
+Set the following private paths and the next due slot on the operating host:
+
+```sh
+env TMPDIR="$PRIVATE_TMPDIR" nice -n 19 \
+  uv run --no-project --python "$SDK_ENV/bin/python" --with PyYAML==6.0.3 \
+  python "$STACK_REPO/blueprints/us-equities/hosting/drill_process_restart.py" \
+  --dagu-bin "$DAGU_BIN" --dagu-home "$PRIVATE_DAGU_HOME" \
+  --config "$PRIVATE_CONFIG" --dag-history "$PRIVATE_DAG_HISTORY" \
+  --due-at "$NEXT_DUE_SLOT"
+```
+
+`--no-project` avoids project synchronization; uv layers the parser separately
+while retaining the locked calendar's site packages. Sources:
+`astral-sh/uv@0.12.17:crates/uv/src/commands/project/run.rs:903-920,1040-1105`
+([overlay implementation](https://github.com/astral-sh/uv/blob/0.12.17/crates/uv/src/commands/project/run.rs#L1040));
+the isolated pinned dependency precedent is
+`tools/runtime-worker-evidence/checks.json:40-43`.
+The parser is `yaml/pyyaml@6.0.3:lib/yaml/__init__.py:117-125`
 ([safe_load](https://github.com/yaml/pyyaml/blob/6.0.3/lib/yaml/__init__.py#L117));
 Dagu's mapping/default and legacy override are in
 `dagucloud/dagu@v2.16.6:internal/cmn/config/loader.go:586-611`.

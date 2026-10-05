@@ -808,7 +808,7 @@ class JournalRecoveryTests(unittest.TestCase):
         state = self.root / "rotation.json"
         now = datetime.now(timezone.utc)
         RECOVERY.check_rotation(runner, state, now=now)
-        later = now + timedelta(days=7, seconds=1)
+        later = now + timedelta(days=8, seconds=1)
         with self.assertRaisesRegex(RECOVERY.RecoveryError, "overdue"):
             RECOVERY.check_rotation(runner, state, now=later)
         self.assertEqual(RECOVERY.check_rotation(runner, state, now=later, full_check=True), "1/7")
@@ -816,7 +816,7 @@ class JournalRecoveryTests(unittest.TestCase):
 
     def test_completed_rotation_keeps_the_previous_deadline_at_rollover(self):
         first = datetime(2026, 10, 5, tzinfo=timezone.utc)
-        for gap in (timedelta(days=7, seconds=1), timedelta(days=12)):
+        for gap in (timedelta(days=8, seconds=1), timedelta(days=12)):
             with self.subTest(gap=gap):
                 runner = self.runner()
                 state = self.root / f"rollover-{gap.total_seconds()}.json"
@@ -831,39 +831,38 @@ class JournalRecoveryTests(unittest.TestCase):
                 self.assertEqual(RECOVERY.check_rotation(runner, state, now=later, full_check=True), "1/7")
                 self.assertIn(("check", "--read-data"), runner.commands)
 
-    def test_rotation_allows_daily_jitter_and_full_read_at_late_rollover(self):
+    def test_rotation_allows_daily_jitter_through_rollover(self):
         runner = self.runner()
         state = self.root / "jitter.json"
         first = datetime(2026, 10, 26, 20, 30, tzinfo=timezone.utc)
         times = [first + i * timedelta(hours=24, seconds=60) for i in range(14)]
-        observed = [RECOVERY.check_rotation(runner, state, now=instant) for instant in times[:7]]
-        with self.assertRaisesRegex(RECOVERY.RecoveryError, "overdue"):
-            RECOVERY.check_rotation(runner, state, now=times[7])
-        observed.append(RECOVERY.check_rotation(runner, state, now=times[7], full_check=True))
-        observed.extend(RECOVERY.check_rotation(runner, state, now=instant) for instant in times[8:])
+        observed = [RECOVERY.check_rotation(runner, state, now=instant) for instant in times]
         self.assertEqual(observed, [f"{i}/7" for i in range(1, 8)] * 2)
-        self.assertIn(("check", "--read-data"), runner.commands)
+        self.assertNotIn(("check", "--read-data"), runner.commands)
         self.assertEqual(json.loads(state.read_text())["cycle_started_at"], times[7].isoformat())
 
-    def test_rotation_across_fall_back_uses_utc_seven_day_cycle(self):
+    def test_daily_new_york_rotation_survives_fall_back_rollover(self):
         runner = self.runner()
         state = self.root / "dst.json"
         times = [datetime(2026, 10, 29, 16, 30, tzinfo=ZoneInfo("America/New_York")) + timedelta(days=i)
-                 for i in range(7)]
+                 for i in range(8)]
         self.assertEqual(times[3].astimezone(timezone.utc) - times[2].astimezone(timezone.utc), timedelta(hours=25))
+        self.assertEqual(times[7].astimezone(timezone.utc) - times[0].astimezone(timezone.utc),
+                         timedelta(days=7, hours=1))
         observed = [RECOVERY.check_rotation(runner, state, now=instant) for instant in times]
-        self.assertEqual(observed, [f"{i}/7" for i in range(1, 8)])
-        self.assertEqual(json.loads(state.read_text())["cycle_started_at"], times[0].astimezone(timezone.utc).isoformat())
+        self.assertEqual(observed, [f"{i}/7" for i in range(1, 8)] + ["1/7"])
+        self.assertNotIn(("check", "--read-data"), runner.commands)
+        self.assertEqual(json.loads(state.read_text())["cycle_started_at"], times[7].astimezone(timezone.utc).isoformat())
 
     def test_whole_rotation_deadline_refuses_even_without_large_individual_gaps(self):
         runner = self.runner()
         state = self.root / "slow.json"
         first = datetime(2026, 10, 5, tzinfo=timezone.utc)
         for i in range(6):
-            RECOVERY.check_rotation(runner, state, now=first + i * timedelta(hours=29))
+            RECOVERY.check_rotation(runner, state, now=first + i * timedelta(hours=33))
         before = state.read_bytes()
         with self.assertRaisesRegex(RECOVERY.RecoveryError, "overdue"):
-            RECOVERY.check_rotation(runner, state, now=first + 6 * timedelta(hours=29))
+            RECOVERY.check_rotation(runner, state, now=first + 6 * timedelta(hours=33))
         self.assertEqual(state.read_bytes(), before)
 
     def test_cycle_clock_is_captured_before_snapshot_and_checks_native_completion(self):
@@ -883,7 +882,7 @@ class JournalRecoveryTests(unittest.TestCase):
         before = state.read_bytes()
         with self.assertRaisesRegex(RECOVERY.RecoveryError, "after native check"):
             RECOVERY.check_rotation(runner, state, now=first + timedelta(days=6),
-                                    clock=lambda: first + timedelta(days=7, seconds=1))
+                                    clock=lambda: first + timedelta(days=8, seconds=1))
         self.assertEqual(state.read_bytes(), before)
 
     def test_native_lock_contention_refuses_and_stale_lock_after_exit_is_safe(self):

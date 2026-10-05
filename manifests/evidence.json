@@ -14610,8 +14610,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/README.md",
-      "sha256": "b7e52d1b790ea86dceb5a462a4eaaf30840a62504117fb825ac95672933c01f1",
-      "bytes": 31669
+      "sha256": "b8957339e8e99f9711212bed7e41a509b2349703b595cfbeebe09ac8d5c02904",
+      "bytes": 32889
     },
     {
       "path": "blueprints/us-equities/hosting/backup/README.md",
@@ -14655,8 +14655,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/drill_process_restart.py",
-      "sha256": "861416c4fc190c12b3cd915f43cbd753f4227380edc0b3cafc72e659ad92d9b5",
-      "bytes": 10912
+      "sha256": "5888fda35b878fc957340de5f2a8152e3f16eaa13e7b8513234e97c09465f001",
+      "bytes": 10995
     },
     {
       "path": "blueprints/us-equities/hosting/equity-research-evidence.yaml",
@@ -14715,8 +14715,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/journal_recovery.py",
-      "sha256": "c6ac8ab9d5bc17e1d0be69fc1b023083239787b93d07b8baa8f6cf2f8a177242",
-      "bytes": 23987
+      "sha256": "ac9f179361b951eda229e8a9beb58c15ff03e4691aa0574263e5e9b5cabb2a7d",
+      "bytes": 24043
     },
     {
       "path": "blueprints/us-equities/hosting/receipt.json",
@@ -16840,8 +16840,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-trading-unattended-hosting-recovery.md",
-      "sha256": "b42007c03d9733ccb66a0e5849244d1f6e955a1dc29598b608e966ee31d8f297",
-      "bytes": 28915
+      "sha256": "604998e8ff2290f91273ebe55c52165f7101cb956a00c56620c85e44fdf03a1d",
+      "bytes": 29820
     },
     {
       "path": "docs/decisions/2026-10-05-typesafe-sdk-transport.md",
@@ -54480,8 +54480,8 @@
     },
     {
       "path": "tests/test_us_equities_hosting.py",
-      "sha256": "9b8d49c402fc8c025580b74bfb25ddfb1c3f353dbdb1a40b783f4b5312bf8034",
-      "bytes": 55238
+      "sha256": "bd947c5a67c6265c3cae717dc0396ebe7fd1aa0919cdc5e89c8872b0c211f459",
+      "bytes": 55117
     },
     {
       "path": "tests/test_validate.py",

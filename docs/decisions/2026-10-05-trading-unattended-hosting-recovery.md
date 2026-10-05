@@ -91,7 +91,7 @@ operator commands and source-linked rule table. The verified original sources ar
   [Exit codes](https://github.com/restic/restic/blob/v0.19.1/doc/040_backup.rst#L787).
 - `restic/restic@v0.19.1:doc/045_working_with_repos.rst:482-521` defines
   deterministic `n/t` partition checks. Our policy rotates all seven subsets
-  within seven days **per whole rotation**, persisting only successful checks;
+  with an eight-day bound **per whole rotation**, persisting only successful checks;
   an overdue rotation needs a successful full `--read-data` check before reset.
   [Partitions](https://github.com/restic/restic/blob/v0.19.1/doc/045_working_with_repos.rst#L482).
 - `restic/restic@v0.19.1:doc/050_restore.rst:55-73` restores an exact snapshot's
@@ -123,7 +123,7 @@ Snapshot/restore glue and both drills belong in `hosting/`, which owns this
 research job's recovery without adapter coupling. Each journal gets its own
 Online Backup, an independently frozen file inventory and explicit required
 tables. This does not provide atomic cross-journal transactions. No new timer
-was enabled; the operator must run daily and complete every rotation within seven days.
+was enabled; the operator must run daily and keep every rotation within eight elapsed days.
 
 ## Round 2 native reuse and repairs
 
@@ -182,7 +182,7 @@ snapshot is consistent; simultaneous commits need not all appear in that snapsho
 Rotation now timestamps the invocation before snapshot/backup, bounds completion
 of the **whole seven-subset cycle** in UTC, and accepts 24 h + 60 s jitter and
 the 2026-11-01 fall-back. It refuses incomplete overdue cycles, clock reversal,
-over-seven-day idle gaps and old state until successful full checking. Backup
+over-eight-day idle gaps and old state until successful full checking. Backup
 and any later forget policy group by **host,tags**
 (`restic/restic@v0.19.1:doc/040_backup.rst:197-206; doc/060_forget.rst:225-233`),
 so disposable staging paths share parent/retention groups. No forget/prune ran.
@@ -249,8 +249,11 @@ the deployed DAG uses synthetic post-close time/input, not a live market run.
 Round 4 restores the round-2 review's exact `f417d2257` bytes and its original
 receipt hash/15859-byte pin. Round-3 additions have a separate review linked by
 the round-3 receipt; its parent link retains the earlier native observations.
-The operator replay window is the same New York date after that session's close,
-with input mtime after close; later runs skip or process another session.
+After a later-step failure, the operator replay window is the same New York date
+after that session's close, using unchanged input with mtime after close and no
+later than the check time or 16:25 New York. Missing, stale or late input failures
+cannot be replayed for that session: correction after the run misses the cutoff.
+Later runs skip or process another session.
 Native `dagu status --run-id` must show every research node succeeded before
 replay counts as recovery (`dagucloud/dagu@v2.16.6:internal/cmd/status.go:18-47`).
 The restart drill refuses unit globs before fault delivery, because literals
@@ -361,7 +364,7 @@ corrected as above. These source-location mistakes changed no pin or acceptance.
 Completeness critic: process liveness alone cannot attest a due slot, so the later
 drill checks original scheduler trigger and slot. Same-count mutation bypasses
 count/integrity-only checks; external hashes and a mutation test address that
-gap. Missed partition executions lose coverage; persistent cursor, seven-day whole-cycle bound
+gap. Missed partition executions lose coverage; persistent cursor, eight-day whole-cycle bound
 and full reset address that gap. Remaining modalities are host reboot,
 downtime/catch-up and duplicate-slot behavior, independent alerts, destination
 and key loss, second-host consumer restore and measured recovery time. These
@@ -374,12 +377,21 @@ cutoff. Oracle publication applies mode 0400 before file fsync and syncs the
 parent directory (`python/cpython@v3.12.3:Doc/library/os.rst:996-1005,1077-1087`).
 Rotation checks the previous cycle origin even when its cursor has returned to
 1; an overdue rollover requires a successful native full read before reset.
-Daily jitter still fits each whole rotation, but can require that full read at
-rollover. The restart drill parses its active file permission with upstream
+The previous seven-day bound rejected normal fall-back and daily drift at rollover.
+Round 7 gives the daily seven-part cadence an eight-day UTC age bound, including
+rollover: one day of slack covers the 25-hour fall-back day and 60 seconds of
+daily drift. An origin or idle gap older than eight days still requires a full read.
+The fall-back rollover and two-cycle jitter regressions failed against round 6
+before the bound changed, then passed; overdue cycles still refuse.
+The restart drill parses its active file permission with upstream
 PyYAML 6.0.3 (`yaml/pyyaml@6.0.3:lib/yaml/__init__.py:117-125`), including Dagu's
 default and legacy override (`dagucloud/dagu@v2.16.6:internal/cmn/config/loader.go:586-611`).
-Its operator Python therefore additionally needs the documented PyYAML install;
-no YAML parser is rebuilt here. It parses and hashes the same captured native
+Round 7 runs only this drill with the supported isolated `uv run --no-project
+--python "$SDK_ENV/bin/python" --with PyYAML==6.0.3` overlay; the hash-locked
+SDK_ENV stays unchanged and supplies the locked calendar. Source:
+`astral-sh/uv@0.12.17:crates/uv/src/commands/project/run.rs:903-920,1040-1105`;
+repository precedent: `tools/runtime-worker-evidence/checks.json:40-43`.
+No YAML parser is rebuilt here. It parses and hashes the same captured native
 status bytes, tolerating a replaced directory entry while polling. The round-3
 receipt is now discoverable in the receipt catalog with its original claim and
 limitations. Focused regressions cover each correction; earlier receipts remain

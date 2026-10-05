@@ -29,7 +29,7 @@ import time
 
 
 CHECK_PARTS = 7
-MAX_ROTATION_AGE = timedelta(days=7)
+MAX_ROTATION_AGE = timedelta(days=8)
 BACKUP_TIMEOUT = 120.0
 MAX_JOURNAL_BYTES = 256 * 1024 * 1024
 INVENTORY_FILE = "inventory.json"
@@ -224,10 +224,11 @@ class Restic:
 
 def check_rotation(restic, state_path: Path, *, parts=CHECK_PARTS, now=None,
                    full_check=False, clock=None) -> str:
-    """All n/t subsets in at most seven days; advance only after native success.
+    """Daily n/t subsets with an eight-day maximum age; advance after native success.
 
     Run daily, including weekends/holidays; jitter and DST do not impose a per-step
-    24h deadline. A rotation exceeding seven days, including at rollover, requires a full read.
+    24h deadline. The eight-day bound gives daily runs DST/jitter slack; a rotation
+    exceeding it, including at rollover, requires a full read.
     A separate state file belongs to this repository; concurrent checks fail closed.
     """
     if not 1 <= parts <= CHECK_PARTS:
