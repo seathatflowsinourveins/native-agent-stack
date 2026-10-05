@@ -15,11 +15,11 @@ def groups(where, args):
 
 out = {"schema": "omniroute-live-effort/1", "store": "omniroute (20128)", "read": "mode=ro; columns reasoning_effort_requested, reasoning_effort_upstream, reasoning_source, model, timestamp only",
        "meaning": "reasoning_effort_upstream is the effort in the provider request the attempt captured; filled only for rows whose response carried encrypted reasoning (reasoning_source='encrypted'); '-' means NULL, not 'none sent'",
-       "fresh_probe_rows_2026-10-05T14:07Z_to_14:12Z": groups("timestamp >= ? and timestamp <= ?", ("2026-10-05T14:07:00.000Z", "2026-10-05T14:12:00.000Z")),
+       "window_rows_2026-10-05T14:07Z_to_14:12Z": groups("timestamp >= ? and timestamp <= ?", ("2026-10-05T14:07:00.000Z", "2026-10-05T14:12:00.000Z")),
        "last_7_days_gpt_6_1_sol": groups("timestamp >= ? and model like 'gpt-6.1-sol%'", (since7,)), "window_start": since7}
 (O / "live-effort.json").write_text(json.dumps(out, indent=1) + "\n")
-for g in out["fresh_probe_rows_2026-10-05T14:07Z_to_14:12Z"]:
-    print("fresh", g["model"], g["requested"], "->", g["upstream"], g["reasoning_source"], g["rows"])
+for g in out["window_rows_2026-10-05T14:07Z_to_14:12Z"]:
+    print("window", g["model"], g["requested"], "->", g["upstream"], g["reasoning_source"], g["rows"])
 for g in out["last_7_days_gpt_6_1_sol"]:
     if g["upstream"] != "-":
         print("7d", g["model"], g["requested"], "->", g["upstream"], g["rows"], g["first"][:19], g["last"][:19])

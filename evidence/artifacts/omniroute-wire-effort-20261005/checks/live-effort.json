@@ -3,7 +3,7 @@
  "store": "omniroute (20128)",
  "read": "mode=ro; columns reasoning_effort_requested, reasoning_effort_upstream, reasoning_source, model, timestamp only",
  "meaning": "reasoning_effort_upstream is the effort in the provider request the attempt captured; filled only for rows whose response carried encrypted reasoning (reasoning_source='encrypted'); '-' means NULL, not 'none sent'",
- "fresh_probe_rows_2026-10-05T14:07Z_to_14:12Z": [
+ "window_rows_2026-10-05T14:07Z_to_14:12Z": [
   {
    "model": "gpt-6.1-sol-max",
    "requested": "-",

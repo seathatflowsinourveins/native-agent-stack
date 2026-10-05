@@ -1,6 +1,6 @@
 {
  "schema": "omniroute-live-requests/1",
- "note": "calls of the baseline probe sessions through the live 20128 gateway (SDK worker, default cx/gpt-6.1-sol-max route); connection ids and accounts are not recorded; /v1/responses correlation ids are gateway-generated, so the join to the worker's turns is by time window",
+ "note": "calls observed through the live 20128 gateway in the 5-minute window of the baseline probes (no session filter, so attribution to the probe sessions is by time only: 15 Sol and 4 Astra calls; the probes used the SDK worker, default cx/gpt-6.1-sol-max route); connection ids and accounts are not recorded; /v1/responses correlation ids are gateway-generated, so the join to the worker's turns is by time window",
  "calls": [
   {
    "time_utc": "2026-10-05T14:07:34.865Z",

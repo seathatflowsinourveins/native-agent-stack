@@ -58,7 +58,7 @@ for ts, model, status, tin, cache, tout, treason, conn, rel in rows:
     out.append({"time_utc": ts, "model": model, "status": status, "tokens_in": tin, "tokens_cache_read": cache, "tokens_out": tout, "tokens_reasoning": treason,
                 "connection_index": idx.setdefault(conn, len(idx)), "client_request_model": req.get("model"), "client_request_reasoning": req.get("reasoning"),
                 "service_tier": req.get("service_tier")})
-(O / "live-requests.json").write_text(json.dumps({"schema": "omniroute-live-requests/1", "note": "calls of the baseline probe sessions through the live 20128 gateway (SDK worker, default cx/gpt-6.1-sol-max route); connection ids and accounts are not recorded; /v1/responses correlation ids are gateway-generated, so the join to the worker's turns is by time window",
+(O / "live-requests.json").write_text(json.dumps({"schema": "omniroute-live-requests/1", "note": "calls observed through the live 20128 gateway in the 5-minute window of the baseline probes (no session filter, so attribution to the probe sessions is by time only: 15 Sol and 4 Astra calls; the probes used the SDK worker, default cx/gpt-6.1-sol-max route); connection ids and accounts are not recorded; /v1/responses correlation ids are gateway-generated, so the join to the worker's turns is by time window",
                                                       "calls": out}, indent=1) + "\n")
 print(json.dumps({k: identity[k] for k in ("base", "bundle_files_containing_gpt_6_1_sol", "bundle_files_containing_pickMoreAvailableOAuthPeer")}, indent=1)[:1500])
 print({f: r["deployed_equals_probe_with_15167"] for f, r in identity["file_sha256"].items()})

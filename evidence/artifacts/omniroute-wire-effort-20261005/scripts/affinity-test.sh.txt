@@ -1,0 +1,62 @@
+#!/bin/bash
+# Re-run the affinity patch's unit test with upstream's single-file runner flags (the form of package.json "test:fixes") on trees built from public refs and the published patch file only:
+#   N  the v3.8.51 tag commit plus the patch's test file alone (negative control: the test is expected to fail on the published code)
+#   B  the tag commit plus the whole patch (alternative B)
+#   C  B plus upstream PR 15167's commit (the composition)
+# and the wire probe on B and C, compared with the committed probe files. A scratch clone shares the mirror's objects; nothing is written to the mirror.
+# Every step logs its own exit code to $OUT/progress.txt. Run niced.
+set -u
+M=$HOME/.cache/omniroute-upstream-mirror-20261005.git
+T=$HOME/.cache/omniroute-test-744
+OUT=$HOME/.cache/omniroute-test-744-out
+EV=$HOME/code/.worktrees/native-agent-stack/99/omniroute-gw/evidence/artifacts/omniroute-wire-effort-20261005
+TAG=c1e30b7676975feb298b49eff6ff58923c04b89e
+PR=0585aba5589d5a1f49243a13a8db249558e7c9e3
+export PATH="$HOME/.local/share/codex-ecosystem/tools/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin"
+rm -rf "$OUT"; mkdir -p "$OUT"
+log() { echo "$(date -u +%H:%M:%SZ) $*" | tee -a "$OUT/progress.txt"; }
+G() { git -c user.name=Scout -c user.email=scout@local -c core.hooksPath=/dev/null -C "$T" "$@"; }  # no hooks: the repo's husky pre-commit runs prettier and would rewrite staged files
+
+rm -rf "$T"   # a fresh scratch clone every run
+if [ ! -d "$T/.git" ]; then
+  git clone -q --shared --no-checkout "$M" "$T"; rc=$?; log "clone exit=$rc"; [ $rc -eq 0 ] || exit 1
+fi
+G fetch -q "$M" "+refs/pull/15167/head:refs/pull/15167/head"; rc=$?; log "fetch pr15167 exit=$rc"
+G checkout -q --detach $TAG; rc=$?; log "checkout tag exit=$rc head=$(G rev-parse --short HEAD) tree=$(G rev-parse 'HEAD^{tree}')"
+[ $rc -eq 0 ] || exit 1
+if [ ! -d "$T/node_modules" ]; then
+  ( cd "$T" && nice -n 19 npm ci --no-audit --no-fund > "$OUT/npm-ci.log" 2>&1 ); rc=$?; log "npm ci exit=$rc"; [ $rc -eq 0 ] || exit 1
+fi
+log "working tree after npm ci: $(G status --porcelain | wc -l) changed or untracked paths: $(G status --porcelain | head -5 | tr '\n' ';')"
+
+run_test() {
+  local label=$1
+  ( cd "$T" && DISABLE_SQLITE_AUTO_BACKUP=true nice -n 19 node --import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts --test tests/unit/affinity-outranks-occupancy-8940.test.ts > "$OUT/test-$label.log" 2>&1 ); local rc=$?
+  log "test $label exit=$rc tests=$(grep -E '^# tests ' "$OUT/test-$label.log" | awk '{print $3}') pass=$(grep -E '^# pass ' "$OUT/test-$label.log" | awk '{print $3}') fail=$(grep -E '^# fail ' "$OUT/test-$label.log" | awk '{print $3}')"
+}
+commit_state() { G commit -q --allow-empty -m "state $1"; log "state $1 tree=$(G rev-parse 'HEAD^{tree}')"; }   # only what apply --index staged, so the tree is exactly the applied change
+
+# N: the tag plus the test file alone
+G apply --index --include='tests/*' "$EV/patches/045aa81f3.patch"; rc=$?; log "apply test file only exit=$rc"
+commit_state N-tag-plus-test-file
+run_test N
+# B: the rest of the patch
+G apply --index --include='src/*' "$EV/patches/045aa81f3.patch"; rc=$?; log "apply patch source files exit=$rc"
+commit_state B-tag-plus-patch
+run_test B
+cp "$EV/scripts/wire-probe.mts.txt" "$T/wire-probe.mts"
+( cd "$T" && DISABLE_SQLITE_AUTO_BACKUP=true nice -n 19 node --import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts wire-probe.mts > "$OUT/probe-B.raw" 2> "$OUT/probe-B.err" ); rc=$?; log "wire probe B exit=$rc"
+rm -f "$T/wire-probe.mts"
+# C: PR 15167's commit on top
+git --git-dir="$M" diff $PR^ $PR | G apply --index; rc=$?; log "apply pr15167 diff exit=$rc"
+commit_state C-composition
+run_test C
+cp "$EV/scripts/wire-probe.mts.txt" "$T/wire-probe.mts"
+( cd "$T" && DISABLE_SQLITE_AUTO_BACKUP=true nice -n 19 node --import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts wire-probe.mts > "$OUT/probe-C.raw" 2> "$OUT/probe-C.err" ); rc=$?; log "wire probe C exit=$rc"
+rm -f "$T/wire-probe.mts"
+for v in B C; do
+  sed -n 's/^WIRE //p' "$OUT/probe-$v.raw" > "$OUT/probe-$v.txt"
+  if [ $v = B ]; then ref="$EV/checks/wire-probe-without-15167.txt"; else ref="$EV/checks/wire-probe-with-15167.txt"; fi
+  if diff -q "$OUT/probe-$v.txt" "$ref" > /dev/null; then log "probe $v extract equals committed $(basename "$ref"): yes ($(wc -l < "$OUT/probe-$v.txt") lines)"; else log "probe $v extract equals committed $(basename "$ref"): NO"; diff "$OUT/probe-$v.txt" "$ref" | head -10 | tee -a "$OUT/progress.txt"; fi
+done
+log "DONE"
