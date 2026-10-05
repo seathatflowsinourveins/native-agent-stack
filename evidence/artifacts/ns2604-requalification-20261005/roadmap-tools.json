@@ -1,6 +1,7 @@
 {
   "schema_version": 1,
   "kind": "roadmap_tools_source_review",
+  "dated_criterion_2_reading": {"record":"evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json","evidence_class":"source_review","scope":"Retained pinned upstream examples/native operations may satisfy criterion2. Passing plan footers alone do not. Ccusage, Serena and MinerU condition-absent control requirements remain open; no reported_yes field is promoted into execution proof."},
   "as_of": "2026-10-05",
   "source_revision": "03e4833c",
   "source_workflow": {

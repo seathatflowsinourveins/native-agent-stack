@@ -158,7 +158,7 @@
       ],
       "open_items": [
         "Condition-absent controls are reported at 07:28:59Z and 07:29:05Z only in analyst transcript T; retain their original outputs and process provenance beside the passing runs.",
-        "Pending criterion-(2) ruling must establish whether the unrun just test suite at v20.0.26 is required."
+        "The 2026-10-05 dated criterion-2 ruling removes a blanket suite-only objection; retained pinned native operations can qualify this criterion. Condition-absent controls remain required and unretained beside these passing runs. See dated-readiness-rulings.json."
       ],
       "roadmap_source_pointer": "/records/0/final/slots/0"
     },

@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "kind": "dated_readiness_method_and_disposition_review",
+  "recorded_at_utc": "2026-10-05T13:02:00Z",
+  "evidence_class": "source_review",
+  "provisional": true,
+  "new_execution": false,
+  "aggregate_derivation_performed": false,
+  "claim_boundary": "Apply the adopted criterion-2 reading to all17 affected slots in one documentary pass. Eligibility of an upstream example/native operation is separate from retaining and independently joining its actual pinned output, controls, wiring and fresh-client use. No historical label or qualified whole-slot status changes under this reading alone. Custody/base dispositions are dated source review pending the coordinator's final verified same80-slot E2E. Official readiness remains30/80; no new aggregate is derived.",
+  "sources": {
+    "rulings": {"locator":"coord:readiness-20261005/coordinator-rulings-20261005.md","sha256":"acd2a2726af273dbb80fbfed44a2f257c5b5a614faa1de9db3dd4a2cffd97c7f","lines":[12,17,21,25]},
+    "dispatch": {"locator":"coordination-root:command-center/ITEM-ns2604-coop-20261005T115716Z.md","sha256":"683db9b84b2776037cf82211c98b57dd5dccd2919e5b9b8cb76adcbe2845fcf9"},
+    "roadmap": {"locator":"coord:readiness-20261005/readiness-roadmap-20261005.json","sha256":"d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078","scope":"Original blind model analyses and adjudication are source review; status_now labels are reported proposals."},
+    "method": "seathatflowsinourveins/native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:evidence/artifacts/ns2604-e2e-20261004/method.md:60–64",
+    "policy": "seathatflowsinourveins/native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:docs/acceptance-evidence-policy.md:28–53",
+    "readiness_authority": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-04-ns2604-verified-e2e.md:114–121"
+  },
+  "criterion_2": {
+    "reading": "An unchanged pinned upstream test, or a supported pinned upstream example/native operation with retained returned output, can satisfy criterion2. A plan check qualifies only when its body executes that operation. Require a particular unchanged suite when the frozen slot names it; do not impose a suite on every slot. A version-only option-list probe or passing wrapper footer alone is insufficient. Discriminating controls remain governed by policy42–53.",
+    "slots_in_scope": 17,
+    "scope_groups": {"original_twelve":"slots0–11","additional_five":"slots12–16"},
+    "whole_slot_status_changes": [],
+    "whole_slot_status_change_boundary": "No READY slot reverts merely because a suite was unrun. No slot gains READY from interpreting criterion2 alone. The reported roadmap labels below remain original source-review proposals, with later CC objections separately retained.",
+    "slots": [
+      {
+        "slot":"token-efficiency/ccusage", "roadmap_pointer":"/records/0/final/slots/0", "reported_status_before":"READY", "reported_status_after_reading":"READY", "whole_slot_status_changed":false,
+        "criterion_2_effect":"Remove blanket unrun-suite objection. Pinned verification/daily native operations are eligible; CC's not-counted-ready objection remains because controls are not retained beside passing runs.",
+        "operation_source":"ccusage/ccusage@d9821088b98aa536c7a385aa1a4579d6fa02269b:docs/guide/installation.md:133–148",
+        "witnesses":["coord:fixwave-4c897418f/ccusage.json#/stages","roadmap:/records/0/final/slots/0/evidence/2","roadmap:/records/0/final/slots/0/evidence/3","roadmap:/records/0/final/slots/0/evidence/4","roadmap:/records/0/final/slots/0/evidence/5"],
+        "witness_class":"Recipe wrapper stages are local_integration; roadmap claims are source_review. Underlying native-output/control join remains required.",
+        "remaining_gates":["Retain no-meter-call and empty-home condition-absent runs reported at07:28:59Z/07:29:05Z beside the passing operation; do not infer retained proof from transcriptT."]
+      },
+      {
+        "slot":"document-retrieval/mineru", "roadmap_pointer":"/records/8/final/slots/1", "reported_status_before":"READY", "reported_status_after_reading":"READY", "whole_slot_status_changed":false,
+        "criterion_2_effect":"The upstream-labelled --help installation verification is eligible under the adopted reading; an unchanged suite is not a blanket prerequisite.",
+        "operation_source":"opendatalab/MinerU@c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93:README.md:360–366",
+        "witnesses":["coord:fixwave-4c897418f/mineru.json#/stages","roadmap:/records/8/final/slots/1/evidence/1","roadmap:/records/8/final/slots/1/evidence/2","roadmap:/records/8/final/slots/1/evidence/3","roadmap:/records/8/final/slots/1/evidence/4"],
+        "witness_class":"Stage wrappers are local_integration; the operation/source join and condition-absent control scope need independent inspection.",
+        "remaining_gates":["Retain earlier service rc1 beside later rc0, and identify which condition the same failing predicate removes. A retry failure alone is not proof of every required control."]
+      },
+      {
+        "slot":"git-github-automation/gh-github-cli", "roadmap_pointer":"/records/4/final/slots/1", "reported_status_before":"READY", "reported_status_after_reading":"READY", "whole_slot_status_changed":false,
+        "criterion_2_effect":"No suite-only reversal. Native API operations may qualify; the registry/version installation check alone does not.",
+        "operation_source":"cli/cli@v2.102.0:README.md:1",
+        "witnesses":["roadmap:/records/4/final/slots/1/evidence/1","roadmap:/records/4/final/slots/1/evidence/2","roadmap:/records/4/final/slots/1/evidence/3","roadmap:/records/4/final/slots/1/evidence/4","scratch:fixwave/sweep.post_install.out:52"],
+        "witness_class":"Sweep footer is local_integration, not original native API output. Retain each actual pinned native operation in its own scope.",
+        "remaining_gates":["Independently join original native API output and the applicable pinned command; preserve the historical READY label."]
+      },
+      {
+        "slot":"quality-evaluation/inspect-ai", "roadmap_pointer":"/records/9/final/slots/0", "reported_status_before":"READY", "reported_status_after_reading":"READY", "whole_slot_status_changed":false,
+        "criterion_2_effect":"The unchanged scored upstream example is eligible; remove the blanket suite-only objection.",
+        "operation_source":"UKGovernmentBEIS/inspect_ai@9e44f1b77ed7c912bf58baf30db8560937e7ce53:examples/theory_of_mind.py:7",
+        "witnesses":["roadmap:/records/9/final/slots/0/evidence/2","roadmap:/records/9/final/slots/0/evidence/3","roadmap:/records/9/final/slots/0/evidence/4","roadmap:/records/9/final/slots/0/evidence/5","repo:evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json"],
+        "witness_class":"Original example operation and its local positive/negative predicates retain separate classes; reported run is source_review until joined to originals.",
+        "remaining_gates":["Keep main's absolute-path rc1 and the repaired draft recipe distinct; repair has not yet become the plan of record."]
+      },
+      {
+        "slot":"quality-evaluation/harbor-containerized-agent-e2e-runner", "roadmap_pointer":"/records/9/final/slots/1", "reported_status_before":"READY", "reported_status_after_reading":"READY", "whole_slot_status_changed":false,
+        "criterion_2_effect":"Documented oracle/nop native trials are eligible; do not label them an unchanged pytest suite. Native-worker telemetry is separate.",
+        "operation_source":"harbor-framework/harbor@1e5c5c6db929a10a140d05e606882c671ae20729:tests/integration/test_hello_user_e2e.py:25–54",
+        "witnesses":["roadmap:/records/9/final/slots/1/evidence/1","roadmap:/records/9/final/slots/1/evidence/2","roadmap:/records/9/final/slots/1/evidence/3","roadmap:/records/9/final/slots/1/evidence/4","coord:fixwave-4c897418f/harbor-containerized-agent-e2e-runner.json#/stages/service_health"],
+        "witness_class":"Native trial is distinct from wrapper predicates and source review; no native-worker producer qualification is inferred.",
+        "remaining_gates":["Preserve oracle/nop inputs, outcome and control scope; keep native-worker telemetry outside Harbor's gate."]
+      },
+      {
+        "slot":"agent-sdks/claude-agent-sdk", "roadmap_pointer":"/records/10/final/slots/3", "reported_status_before":"READY", "reported_status_after_reading":"READY", "whole_slot_status_changed":false,
+        "criterion_2_effect":"The pinned README quickstart is eligible; absence of this host's full suite does not itself reverse READY.",
+        "operation_source":"anthropics/claude-agent-sdk-python@1ef6d8c71bb0e44a6b33fe61497864f21e17fdb7:README.md:22",
+        "witnesses":["roadmap:/records/10/final/slots/3/evidence/1","roadmap:/records/10/final/slots/3/evidence/2","roadmap:/records/10/final/slots/3/evidence/3","roadmap:/records/10/final/slots/3/evidence/4","coord:accept-after_sign_in-3e343ba6.json"],
+        "witness_class":"Original native SDK operation must be joined to its selected row; other-host upstream tests retain their other-host scope.",
+        "remaining_gates":["Do not describe the other-host1587-test suite as execution on NativeStack2604."]
+      },
+      {
+        "slot":"agent-sdks/codex-sdk-and-codex-exec-app-server", "roadmap_pointer":"/records/10/final/slots/4", "reported_status_before":"READY", "reported_status_after_reading":"READY", "whole_slot_status_changed":false,
+        "criterion_2_effect":"Pinned SDK quickstart and native app-server operations are eligible; remove a blanket suite-only objection.",
+        "operation_source":"openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:sdk/typescript/README.md:1",
+        "witnesses":["roadmap:/records/10/final/slots/4/evidence/1","roadmap:/records/10/final/slots/4/evidence/2","roadmap:/records/10/final/slots/4/evidence/3","roadmap:/records/10/final/slots/4/evidence/4","roadmap:/records/10/final/slots/4/evidence/5","coord:fixwave-4c897418f/codex-sdk-and-codex-exec-app-server.json#/stages/after_sign_in"],
+        "witness_class":"Exec, SDK and app-server operations retain separate witnesses and scopes; wrapper stage0 is local_integration.",
+        "remaining_gates":["Join each original exec/SDK/app-server operation separately; an exec-only result does not prove all SDK legs."]
+      },
+      {
+        "slot":"instructions-skills/trail-of-bits-security-skills-trailofbits-skills", "roadmap_pointer":"/records/6/final/slots/0", "reported_status_before":"PARTIAL", "reported_status_after_reading":"PARTIAL", "whole_slot_status_changed":false,
+        "criterion_2_effect":"Supported native Skills CLI listing is eligible; remove the suite-only interpretive blocker while preserving missing fresh use.",
+        "operation_source":"vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73:README.md:164",
+        "bundle_pin":"trailofbits/skills@82fe8226252622fa807643bdca1710901198553a",
+        "witnesses":["roadmap:/records/6/final/slots/0/evidence/0","roadmap:/records/6/final/slots/0/evidence/1","roadmap:/records/6/final/slots/0/evidence/2","roadmap:/records/6/final/slots/0/evidence/3","roadmap:/records/6/final/slots/0/evidence/4"],
+        "witness_class":"Native listing is separate from locally authored skill validation and source review.",
+        "remaining_gates":["Fresh headless skill use after the repair remains open."]
+      },
+      {
+        "slot":"instructions-skills/engineering-process-skills", "roadmap_pointer":"/records/6/final/slots/1", "reported_status_before":"PARTIAL", "reported_status_after_reading":"PARTIAL", "whole_slot_status_changed":false,
+        "criterion_2_effect":"The supported native-listing route is eligible; remove suite-only ambiguity without filling the missing fresh Claude activation.",
+        "operation_source":"vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73:README.md:164",
+        "pin_scope":"The individual skill pins retained by the frozen slot remain authoritative; a bundle version is insufficient.",
+        "witnesses":["roadmap:/records/6/final/slots/1/evidence/0","roadmap:/records/6/final/slots/1/evidence/1","roadmap:/records/6/final/slots/1/evidence/2","roadmap:/records/6/final/slots/1/evidence/6","roadmap:/records/6/final/slots/1/evidence/7","roadmap:/records/6/final/slots/1/evidence/8","coord:fixwave-4c897418f/engineering-process-skills.json#/stages/post_install"],
+        "witness_class":"Native listing, local validators and source review remain distinct.",
+        "remaining_gates":["Record upstream-suite unavailability and missing post-cleanup fresh Claude activation."]
+      },
+      {
+        "slot":"git-github-automation/worktrunk", "roadmap_pointer":"/records/4/final/slots/2", "reported_status_before":"PARTIAL", "reported_status_after_reading":"PARTIAL", "whole_slot_status_changed":false,
+        "criterion_2_effect":"Documented switch/remove examples qualify the example route; remove the upstream-example-standing blocker.",
+        "operation_source":"max-sixty/worktrunk@v0.80.0:docs/src/content/docs/switch.md:20; docs/src/content/docs/remove.md:11",
+        "witnesses":["roadmap:/records/4/final/slots/2/evidence/2","roadmap:/records/4/final/slots/2/evidence/3","roadmap:/records/4/final/slots/2/evidence/4","roadmap:/records/4/final/slots/2/evidence/5","coord:fixwave-4c897418f/worktrunk.json#/stages/post_install"],
+        "witness_class":"Documented lifecycle operation is separate from its local dirty-removal refusal predicate and stage wrapper.",
+        "remaining_gates":["Pin reconciliation and plan-of-record fresh-client repair remain separate open conditions."]
+      },
+      {
+        "slot":"instructions-skills/skill-discovery", "roadmap_pointer":"/records/6/final/slots/2", "reported_status_before":"FAIL", "reported_status_after_reading":"FAIL", "whole_slot_status_changed":false,
+        "criterion_2_effect":"Native listing is an eligible operation; remove a blanket suite-only blocker but preserve the actual failed invocation.",
+        "operation_source":"vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73:src/list.ts:113–127; src/cli.ts:419",
+        "witnesses":["roadmap:/records/6/final/slots/2/evidence/0","roadmap:/records/6/final/slots/2/evidence/1","roadmap:/records/6/final/slots/2/evidence/2","roadmap:/records/6/final/slots/2/evidence/3","roadmap:/records/6/final/slots/2/evidence/4"],
+        "witness_class":"Retained listing failure is a native result, not superseded by the earlier local sweep's zero footer.",
+        "remaining_gates":["Keep the08:05:08Z rc5 truncated-listing failure visible; no passing repair is inferred."]
+      },
+      {
+        "slot":"git-github-automation/git", "roadmap_pointer":"/records/4/final/slots/0", "reported_status_before":"PARTIAL", "reported_status_after_reading":"PARTIAL", "whole_slot_status_changed":false,
+        "criterion_2_effect":"Remove ambiguity, but the retained version-only OPTIONS-line probe does not establish criterion2.",
+        "operation_source":"git/git@v2.56.0:Documentation/git.adoc:44",
+        "witnesses":["roadmap:/records/4/final/slots/0/evidence/1","roadmap:/records/4/final/slots/0/evidence/2","roadmap:/records/4/final/slots/0/evidence/3","roadmap:/records/4/final/slots/0/evidence/4","roadmap:/records/4/final/slots/0/evidence/7"],
+        "witness_class":"Version presence and local identity/control shells are separate from upstream functional acceptance; recorded installed UbuntuGit2.53.0 does not match the cited2.56.0 pin.",
+        "remaining_gates":["Functional pinned native operation and required fresh-client identity/use evidence remain open."]
+      },
+      {
+        "slot":"token-efficiency/api-docs", "roadmap_pointer":"/records/1/final/slots/3", "reported_status_before":"PARTIAL", "reported_status_after_reading":"PARTIAL", "whole_slot_status_changed":false,
+        "criterion_2_effect":"Retained chub search/get operations are eligible; absence of an npm suite alone is not decisive. The plan version probe alone is insufficient.",
+        "operation_source":"andrewyng/context-hub@04c149cd82d23d037e157d5920b80b0ca10d84b5",
+        "witnesses":["roadmap:/records/1/final/slots/3/evidence/1","roadmap:/records/1/final/slots/3/evidence/5"],
+        "witness_class":"Functional native-operation lead remains separate from local predicates and the Codex-only model verdict.",
+        "remaining_gates":["D04 wiring and missing discriminating controls remain open."]
+      },
+      {
+        "slot":"token-efficiency/doc-conversion", "roadmap_pointer":"/records/1/final/slots/2", "reported_status_before":"PARTIAL", "reported_status_after_reading":"PARTIAL", "whole_slot_status_changed":false,
+        "criterion_2_effect":"Native HTML conversion is eligible; remove the blanket hatch-suite objection without promoting local assertions.",
+        "operation_source":"microsoft/markitdown@b8f79c57ebc0044be41323d89b2a45d3fda8460e:README.md:81; packages/markitdown/src/markitdown/__main__.py:66",
+        "witnesses":["roadmap:/records/1/final/slots/2/evidence/1","roadmap:/records/1/final/slots/2/evidence/4","scratch:e2e/doc-conversion/probe-claude.md","scratch:e2e/doc-conversion/probe-codex.md"],
+        "artifact_sha256":"7a787ba134e904a16df819c528f240d9c0ca9cd1c5b7086da1ff8b9d47d287ea",
+        "witness_class":"Output documents support the scoped conversion operation; heading/paragraph predicates remain local_integration.",
+        "remaining_gates":["Retain the missing condition-absent control; no READY promotion follows from real output alone."]
+      },
+      {
+        "slot":"token-efficiency/repo-packing", "roadmap_pointer":"/records/1/final/slots/0", "reported_status_before":"PARTIAL", "reported_status_after_reading":"PARTIAL", "whole_slot_status_changed":false,
+        "criterion_2_effect":"Native packing is eligible; remove a blanket upstream-suite requirement while retaining the nondiscriminating predicate defect.",
+        "operation_source":"yamadashy/repomix@80b4280a9196feace092fc672dfe2b5fac62ef08:README.md:204,628",
+        "witnesses":["roadmap:/records/1/final/slots/0/evidence/1","roadmap:/records/1/final/slots/0/evidence/2","roadmap:/records/1/final/slots/0/evidence/5","scratch:e2e/repo-packing/pack-claude.xml","scratch:e2e/repo-packing/pack-codex.xml"],
+        "artifact_sha256":"fd7f9a402dd67dacb324d6e84d81315392d0e197a41dd1c90a0525d614a6b5db",
+        "witness_class":"Both retained outputs contain actual a.py/b.py file-path entries; the bare-name grep predicate remains local_integration and fails to discriminate.",
+        "remaining_gates":["Bare-grep predicate/control defect remains open despite actual native output."]
+      },
+      {
+        "slot":"token-efficiency/structured-data", "roadmap_pointer":"/records/1/final/slots/1", "reported_status_before":"PARTIAL", "reported_status_after_reading":"PARTIAL", "whole_slot_status_changed":false,
+        "criterion_2_effect":"Native encode/strict decode is eligible; remove a blanket pnpm-suite objection without promoting the local equality predicate.",
+        "operation_source":"toon-format/toon@v4.1.1:packages/cli/README.md:63–65",
+        "witnesses":["roadmap:/records/1/final/slots/1/evidence/1","roadmap:/records/1/final/slots/1/evidence/4","scratch:e2e/structured-data/recovered-claude.json","scratch:e2e/structured-data/recovered-codex.json"],
+        "artifact_sha256":"6dcd1f3bcbd9ace57a52aae22b981fb2916b7abf0f0b7bda73b1f9e8fda6ba6d",
+        "witness_class":"Both retained recovered JSONs match; round-trip equality is a local_integration assertion, not an unchanged upstream suite.",
+        "remaining_gates":["Condition-absent control remains missing."]
+      },
+      {
+        "slot":"token-efficiency/trace-viewer", "roadmap_pointer":"/records/1/final/slots/4", "reported_status_before":"PARTIAL", "reported_status_after_reading":"PARTIAL", "whole_slot_status_changed":false,
+        "criterion_2_effect":"A blanket suite demand is unnecessary, but this frozen slot explicitly names upstream make test. Its result remains missing; the --version-only option-list probe does not establish criterion2 or supersede that frozen named requirement.",
+        "frozen_named_suite":{"command":"make test","frozen_source":"seathatflowsinourveins/native-agent-stack@76647ef0bfd5a52dce97234a93a0b8bc802fd92b:evidence/artifacts/ns2604-e2e-20261004/slots.json:687","source_pointer":"/slots/token-efficiency~1trace-viewer/reason","upstream_source":"ymtdzzz/otel-tui@3b25779a083469b732e3c628b4a412ee05cf9948:Makefile:10–12","returned_result_retained":false,"status":"open"},
+        "operation_source":"ymtdzzz/otel-tui@3b25779a083469b732e3c628b4a412ee05cf9948:README.md:46",
+        "witnesses":["roadmap:/records/1/final/slots/4/evidence/1","roadmap:/records/1/final/slots/4/evidence/4"],
+        "witness_class":"Version presence remains presence evidence; no functional TUI acceptance is inferred.",
+        "remaining_gates":["Retain the frozen named make-test result or an explicit superseding adjudication. Native functional TUI evidence is absent from selected records; required controls and full-client scope remain open."]
+      }
+    ]
+  },
+  "controls": [
+    {"slot":"token-efficiency/ccusage","status":"open","source":"roadmap:/records/0/final/slots/0/evidence/5","scope":"No-meter-call and empty-home failures are reported only in transcriptT; retain original returned failure/provenance beside the passing runs."},
+    {"slot":"code-navigation/serena","status":"open","source":"roadmap:/records/7/final/slots/0/evidence/6","scope":"Eight rejection controls are synthetic fixtures, not contemporaneous native condition-absent results beside the4c pass.","fixture_source":"seathatflowsinourveins/native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:docs/decisions/2026-10-04-2604-e2e-fix-wave-g3-code-docs.md:166–171"},
+    {"slot":"document-retrieval/mineru","status":"open","sources":["roadmap:/records/8/final/slots/1/evidence/1","roadmap:/records/8/final/slots/1/evidence/2","roadmap:/records/8/final/slots/1/evidence/3","roadmap:/records/8/final/slots/1/evidence/4"],"scope":"An earlier service failure and later success remain retained; specify the removed acceptance condition and the same predicate's failing return before treating that failure as a discriminating control."}
+  ],
+  "dated_disposition_changes": [
+    {
+      "slot":"secrets-credentials/credential-custody", "reported_status_before":"INTERIM", "dated_status":"BY_DESIGN", "ruling_line":17, "evidence_class":"source_review", "provisional":true,
+      "drafted_disposition":"The documented alternative retains one private0600 file per provider outside worktrees, pointer variables, value-free status checks, the id-based runner and scoped client guards. Native sign-ins stay in their supported stores. No dedicated custody product is added. This is a policy disposition, not credential inspection or acceptance.",
+      "draft_source":"roadmap:/records/10/final/slots/2/jobs/4",
+      "practice_source":"seathatflowsinourveins/native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:docs/secret-storage.md:3–10",
+      "superseded_changes":{"ids":[1,2,3],"status":"superseded","scope":"Eligibility-gate criteria and systemd-creds sentences; no storage-hardening comparison or acknowledgement-completion dependency remains.","historical_source":"seathatflowsinourveins/native-agent-stack@1d74a851e83227e8d72e877171cabf9696b2c6b7:evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json:474–476"},
+      "superseded_roadmap_jobs":[0,1,2,3],
+      "superseded_jobs_source":"roadmap:/records/10/final/slots/2/jobs",
+      "new_custody_execution":false,
+      "remaining_comparison_gate":null
+    },
+    {
+      "slot":"cross:wsl-distro/base-distribution", "reported_status_before":"PARTIAL", "rejected_alternative":"INTERIM", "dated_status":"PARTIAL", "ruling_line":25, "evidence_class":"source_review", "provisional":true,
+      "status_effect":"The existing roadmap/base status staysPARTIAL; reject INTERIM and BY_DESIGN alternatives. The deployed distribution waits on G8's external condition, not an agreed hold.",
+      "canonical_upstream_test":{"source":"ubuntu/wsl-setup@73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8:test/systemd-assertions.sh:6–8","url":"https://github.com/ubuntu/wsl-setup/blob/73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8/test/systemd-assertions.sh#L6","process_exit_code":1,"evidence_class":"upstream_test","claim_scope":"Historical unchanged systemd assertion on this recorded host attempt; no new execution."},
+      "retained_attempt":{"started_at_utc":"2026-10-05T03:13:43Z","ended_at_utc":"2026-10-05T03:13:44Z","stderr":{"locator":"scratch:fixwave/base-distribution.accept.post_install.err:1–4","sha256":"427d1342ff207e007b816ef4121a9000cffbc6e8d11cfc1279197c2dac1b3f5b"},"stdout":{"locator":"scratch:fixwave/base-distribution.accept.post_install.out","sha256":"0ca9ddfd234ca53ea5e4824a137b3d57826b8612eac90abbfd90f20b2cf0542a"},"wrapper_exit_code":0,"wrapper_evidence_class":"local_integration"},
+      "f1_scope":"Exactly the sole systemd-binfmt failed unit and its identifier-selected read-only-flush diagnostic; the local exception does not change Canonical's upstream exit1.",
+      "correction":{"previous_comment":"F1 was described as an intentionally stopped-distribution exception.","verified_comment":"F1 is the narrowly scoped binfmt/read-only-flush exception.","verification_source":"seathatflowsinourveins/native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:docs/decisions/2026-10-04-2604-e2e-fix-wave-g8-base-gateway.md:28–35"},
+      "external_gate":"A supported microsoft/WSL or ubuntu/wsl-setup release passes Canonical's unchanged assertion with default protection and without the F1 exception; then retain independent target qualification.",
+      "protection_source":"https://github.com/microsoft/WSL/pull/40621",
+      "host_config_changed":false,
+      "protect_binfmt_override":false
+    }
+  ],
+  "preservation":{"historical_slots":80,"baseline_labels_changed":false,"original_declared_acceptance_changed":false,"original_attempt_fields_changed":false,"original_model_reviews_changed":false,"current_comment_correction":"Initial-capture open-item wording is corrected/superseded only by this separately dated source review."},
+  "ownership":{"generator_outputs_architecture_original_receipt":"Held for#713 merge or explicit owner release; A7 resolvesQ7 as option1.","full_rebased_candidate":"Prepared and checked separately; not published.","plan_apply_writer":"Co-op readiness-runner only. This lane runs no install.sh, pin qualification or shared-host plan application."},
+  "publication_review":"Command-center exact-head Claude re-check pending. Same-family documentary checks do not qualify readiness.",
+  "locator_roots":{"coord":"Private co-op coordination tree","coordination-root":"Private common coordination root","roadmap":"sources.roadmap.locator plus the following exact JSON pointer","scratch":"Selected retained original/archive tree declared in sources.json","repo":"Repository-relative source"},
+  "sanitization":"No credential values/files, raw conversations, host paths, account/session identities or active client configuration copied. Private originals remain private; hashes prove byte identity only."
+}

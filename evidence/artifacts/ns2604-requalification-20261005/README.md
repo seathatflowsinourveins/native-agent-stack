@@ -14,7 +14,7 @@ This map preserves all 80 PR #700 identifiers and historical labels, and attache
 
 slots.json contains every baseline slot, original 3e343ba6 census row, selected 4c897418f sweep/individual attempts, relevant reviews and open items. sources.json hashes original files with repository, coordination and scratch aliases. Private originals are not distributed here.
 
-The earlier **40/80** and conditional **44/80** scenarios are superseded. The cited roadmap proposes **37/80**; the command center reports **32/80, provisional, pending the coordinator's final verified E2E**. These are separate source-review proposals, not an aggregate derived by this map. Official readiness stays at the historical **30/80**. Generated current/conditional figures remain null with a pointer to the decision record. A public PR review does not lift provisional status. The earlier token judgments remain historical: Opus called code-index, command-output, output-compression and repo-packing READY; GPT called them PARTIAL. Neither verdict is upstream acceptance, and the old current-plus-four projection is not carried forward.
+The earlier **40/80** and conditional **44/80** scenarios are superseded. The cited roadmap proposes **37/80**; the command center reports **32/80, provisional, pending the coordinator's final verified E2E**. These are separate source-review proposals, not an aggregate derived by this map. Official readiness stays at the historical **30/80**. The separately prepared generated correction sets current/conditional figures to null with a decision pointer and stays held for #713 or owner release. The coupled old projection is superseded context, not current readiness authority. A public PR review does not lift provisional status. The earlier token judgments remain historical: Opus called code-index, command-output, output-compression and repo-packing READY; GPT called them PARTIAL. Neither verdict is upstream acceptance, and the old current-plus-four projection is not carried forward.
 
 The historical method counts READY plus BY_DESIGN: 18 + 12 = 30/80 = 37.5% (38% rounded half up). BY_DESIGN is a policy disposition, not execution. READY requires presence at the applicable version, upstream acceptance, native wiring and fresh-session use for client-facing tools. These historical labels are copied unchanged, not asserted to be today's independently re-qualified state.
 
@@ -79,3 +79,15 @@ historical; there is no remaining user-authorship question. The initial skip,
 modified-network delivery and cached unmodified pass remain distinct. Defect
 14 still blocks fresh unmodified delivery, and the plan check's printed result
 line is unconfirmed. D04/profile qualification has no owner closing evidence.
+
+The [dated criterion-2/custody/base record](dated-readiness-rulings.json) applies
+the command center's reading once to all 17 affected slots and lists every
+changed blocker or disposition. Pinned upstream examples/native operations with
+retained output may satisfy criterion 2; wrapper footers and version-only checks
+do not suffice. A specifically named frozen upstream suite remains required.
+Ccusage, Serena and MinerU controls remain explicit. Custody's drafted BY_DESIGN
+0600-file practice supersedes its INTERIM hold and changes 1–3/systemd-creds
+comparison. Base distribution remains PARTIAL, with Canonical's upstream
+systemd-assertions exit 1 and G8's external gate visible. Historical baseline
+labels and attempts are unchanged; these dated source-review dispositions do
+not produce a newly qualified status or aggregate.

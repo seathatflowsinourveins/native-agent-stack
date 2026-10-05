@@ -14,7 +14,7 @@
     "Only the command center's own dated final verified E2E of the same80slots, followed by independent review and adjudication, can change official readiness. A PR or publication review cannot lift provisional status.",
     "Retained native operations, unchanged upstream tests, local wrappers, synthetic fixtures, source review and structural checks retain separate classes and host/attempt scopes.",
     "Old failures and skips remain historical observations. Later success is tied to its own source, time and inputs; it does not rewrite an earlier process result.",
-    "The historical host capture remains distinct. Generated publication reports official30 with current/conditional null and a decision-record pointer; neither reported37 nor32 is promoted into those fields.",
+    "The historical host capture remains distinct. The separately prepared generated correction reports official30 with current/conditional null and a decision pointer; publication stays held for#713/owner release. The coupled old projection is superseded context, not current readiness authority. Neither reported37 nor32 is promoted.",
     "Job4 awaits each owner's stages2–5, independent review and adjudication. The PR #723 receipt will be cited only after merge by merged commit and JSON path. Job5 awaits PR #713.",
     "This corrected candidate awaits the command center's exact-head re-check. The ec7 publication review is preserved as an earlier review, not acceptance of these corrections. Local validation remains source consistency only.",
     "Ccusage condition-absent controls remain transcript-only; session-analytics requires a complete owner-native idle-period rerun with argv, stdout/stderr, rc, times, pin and hashes. Retained rerun2/service.8yU0G1 gaps are not inferred away.",
@@ -35,6 +35,7 @@
     ],
     "superseded_reported_scenarios": [40, 44],
     "aggregate_derivation_performed": false,
+    "dated_rulings": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
     "independent_publication_review": "changes_requested_recheck_pending",
     "independent_publication_review_scope": "The retained Claude review covers the earlier ec7 head. The command center's exact-head recheck of this corrected candidate remains pending; neither review qualifies new readiness.",
     "recorded_publication_review": {
@@ -52,7 +53,8 @@
       "evidence/artifacts/ns2604-requalification-20261005/roadmap-tools.json",
       "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
       "evidence/artifacts/ns2604-requalification-20261005/roadmap-memory-skills.json",
-      "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json"
+      "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
+      "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json"
     ],
     "decision_record": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
     "method_source": "seathatflowsinourveins/native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:evidence/artifacts/ns2604-e2e-20261004/method.md:56-72",

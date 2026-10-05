@@ -23,8 +23,10 @@ artifact, beside today's observations. It is not a new 2026-10-05 acceptance
 run. Official readiness stays **30/80** until the command center's own dated,
 final verified E2E of the same 80 slots, followed by independent review and
 adjudication. A review of this PR or its public projection does not lift
-provisional status. Generated current/conditional values remain null and point
-to this decision; they are not filled from either reported proposal.
+provisional status. The separately prepared generated correction sets
+current/conditional values to null with this decision as its pointer; it remains
+held until #713 lands or its owner releases the paths. The coupled old generated
+projection is superseded context and supplies no current readiness authority.
 
 ## Sources and reuse
 
@@ -244,7 +246,8 @@ refreshes retained per-slot proof for review. It preserves the original receipt
 as an initial-capture record and leaves its generated projection intact while
 PR #713 owns the overlapping catalog/generated paths. This is source evidence,
 not a new qualification. Every roadmap status remains provisional pending the
-independent read of this public projection.
+command center's final verified E2E; an independent public-projection read alone
+cannot qualify a new status or readiness figure.
 
 The only authority for a new readiness number is the command center's final,
 dated qualification of the same 80 slots with independent review and
@@ -270,8 +273,9 @@ current-plus-four calculation is superseded rather than carried forward.
 
 Ccusage remains open: its condition-absent controls at 07:28:59Z and 07:29:05Z
 are reported only in analyst transcript T, not retained beside the passing runs
-in this receipt. The pending criterion-(2) ruling must also establish whether
-the unrun pinned upstream suite is required. See
+in this receipt. The dated criterion-(2) reading accepts retained pinned native
+operations and upstream examples; the unrun suite is not an additional blanket
+requirement. The missing condition-absent controls remain open. See
 native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/acceptance-evidence-policy.md:42–53.
 
 Session-analytics remains open despite retained successful metadata. Rerun2 has
@@ -314,3 +318,60 @@ The source patch and its local integration checks remain isolated until the
 generated paths are released. Job4 waits for each slot's stages2–5, independent
 review and adjudication; cite the #723 receipt only by its merged commit and
 JSON path when available. Job5 waits for #713 to land.
+
+## Dated reading of criterion 2 and custody/base rulings
+
+The command center's 2026-10-05 reading of the frozen criterion 2 accepts an
+unchanged pinned upstream test or a supported pinned upstream example/native
+operation with its actual output retained. A plan check supplies that evidence
+only when its body runs the applicable upstream operation. A version string or
+wrapper's passing footer alone does not establish this condition. Require a
+particular suite when the frozen slot explicitly names it. Preserve controls,
+failed attempts, wiring and fresh-session use as separate requirements.
+
+The [dated ruling record](../../evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json)
+applies this interpretation to all 17 affected slots together, names each
+changed blocker and status, and keeps the original source-review labels beside
+the reading. No previously READY slot is demoted solely because an upstream
+suite was not run; removing a suite-only objection does not prove the other
+three READY conditions. Worktrunk, skill-discovery and Git lose the interpretive
+blocker. Git's retained version-only OPTIONS-line check still fails criterion 2.
+Trace-viewer is the named-suite exception in this 17-slot pass: the frozen PR
+#700 record names upstream `make test`, whose returned result is missing. Its
+version-only plan smoke supplies no result or superseding adjudication. Source:
+native-agent-stack@76647ef0bfd5a52dce97234a93a0b8bc802fd92b:evidence/artifacts/ns2604-e2e-20261004/slots.json:687,
+and ymtdzzz/otel-tui@3b25779a083469b732e3c628b4a412ee05cf9948:Makefile:10–12.
+Ccusage, Serena and MinerU need their retained condition-absent controls beside
+the applicable passing operations. Their gaps remain open rather than being
+filled by this documentary reading.
+
+Credential custody's dated disposition is **BY_DESIGN**, replacing its prior
+INTERIM policy hold. The drafted alternative retains one private 0600 file per
+provider outside worktrees, pointer variables, value-free status checks, the
+id-based runner and scoped client guards. It adds no dedicated custody product.
+Native sign-ins remain in the clients' supported stores.
+This is a documented scope choice, not inspection or acceptance of any credential
+file. The systemd-creds comparison and custody changes 1–3 are superseded;
+they no longer constitute planned work or a gate. The source for the existing
+practice is native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:docs/secret-storage.md:3–10,
+with the adopted ruling recorded at `coord:readiness-20261005/coordinator-rulings-20261005.md:17`.
+
+Base distribution is **PARTIAL**, with the proposed INTERIM disposition rejected.
+It is deployed and waits on G8's external upstream condition. Canonical's
+unchanged systemd-assertions returned **exit 1**; an exception-bearing local plan
+check that returned zero does not erase that upstream failure. Retain both
+results. No protectBinfmt setting is changed or proposed by this publication.
+Correction: the initial slot commentary called F1 an exception for an
+intentionally stopped distribution. G8 instead permits exactly one binfmt failed
+unit and its identifier-selected read-only flush diagnostic. Verification:
+the G8 lines below and ubuntu/wsl-setup@73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8:test/systemd-assertions.sh:6–8.
+The unchanged upstream script returns exit 1 when `systemctl is-system-running`
+reports any state other than the literal `running`, including a degraded state.
+The gate's source is native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:docs/decisions/2026-10-04-2604-e2e-fix-wave-g8-base-gateway.md:28–35,
+and the adopted ruling is `coord:readiness-20261005/coordinator-rulings-20261005.md:25`.
+
+These are source-review dispositions pending the final verified qualification.
+All 80 historical baseline labels, original attempts and review chains remain
+unchanged. Official readiness remains 30/80; no aggregate is derived. Ruling 10
+also keeps shared-host plan application with the co-op's readiness-runner lane.
+This publication neither runs install.sh nor changes host configuration.
