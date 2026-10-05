@@ -449,7 +449,7 @@ systemctl show getty@tty1.service -p Result -p NRestarts
   Pro for WSL writes it), that line lists its top-level keys: record them, and stop if `users:` or `write_files:` is among
   them. cloud-init 26.1 merges `agent.yaml` over the user-data one top-level key at a time, and an agent key replaces the
   user-data key entirely (`DataSourceWSL.py:317-336`, called at `:490`). Either key would replace the user or the
-  `[user] default` of W3.
+  `[time]` and `[user] default` of W3.
 - The `.wslconfig` line only reads: it prints the file's section headers and its `instanceIdleTimeout` and
   `vmIdleTimeout` lines, or nothing when the file or the keys are absent. Record both values in the receipt's
   `idle_keys`; a missing key has its default. `instanceIdleTimeout` (under `[general]`, default 15000 ms, `-1` turns it
@@ -620,7 +620,10 @@ Proof (path A, cloud-init provisioned the instance):
   schema exits 1 (`:1493-1498`). The `schema` subcommand never reads the marker (`cloudinit/cmd/main.py:1240-1241`,
   `:1286-1293`). The 26.04.1 rehearsal returned `Valid schema user-data` after the marker on both host releases;
   each run must repeat that observation. Record the output (`schema_system`).
-- `/etc/wsl.conf` holds `[boot]`, `systemd=true`, `[user]` and `default=<WSL_USER>`, each once.
+- `/etc/wsl.conf` holds `[boot]`, `systemd=true`, `[time]`, `useWindowsTimezone=true`, `[user]` and
+  `default=<WSL_USER>`, each once. The explicit `[time]` key keeps the distribution on the time zone set in Windows
+  ([Microsoft wsl-config, "Time settings"](https://learn.microsoft.com/en-us/windows/wsl/wsl-config#time-settings):
+  `useWindowsTimezone`, default `true`); W6 writes the same key on path B.
 - The marker file exists, and `sudo -l` lists `(ALL) NOPASSWD: ALL`.
 - The starred line of `--list --verbose` is still W1's (`default_distribution_after`).
 
@@ -778,6 +781,7 @@ printf '%s ALL=(ALL) NOPASSWD:ALL\n' '<WSL_USER>' > /etc/sudoers.d/90-wsl-defaul
 chmod 0440 /etc/sudoers.d/90-wsl-default-user
 visudo -cf /etc/sudoers.d/90-wsl-default-user
 grep -q '^\[user\]' /etc/wsl.conf || printf '\n[user]\ndefault=%s\n' '<WSL_USER>' >> /etc/wsl.conf
+grep -q '^\[time\]' /etc/wsl.conf || printf '\n[time]\nuseWindowsTimezone=true\n' >> /etc/wsl.conf
 touch /etc/cloud/cloud-init.disabled
 ```
 

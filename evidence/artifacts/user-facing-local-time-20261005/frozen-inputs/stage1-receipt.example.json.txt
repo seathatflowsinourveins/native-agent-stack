@@ -1062,12 +1062,6 @@
     },
     {
       "step": "W6",
-      "cmd": "grep -q '^\\[time\\]' /etc/wsl.conf || printf '\\n[time]\\nuseWindowsTimezone=true\\n' >> /etc/wsl.conf",
-      "exit": "<path B only: exit code; null on path A>",
-      "output_excerpt": "<path B only: sanitized output; null on path A>"
-    },
-    {
-      "step": "W6",
       "cmd": "touch /etc/cloud/cloud-init.disabled",
       "exit": "<path B only: exit code; null on path A>",
       "output_excerpt": "<path B only: sanitized output; null on path A>"

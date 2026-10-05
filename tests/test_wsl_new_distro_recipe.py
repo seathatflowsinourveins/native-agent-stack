@@ -7,7 +7,8 @@ docs/decisions/2026-10-01-new-wsl-distro-recipe.md. Each test names the drift it
   ``${WSL_USER}`` placeholder, so the recipe's PowerShell ``.Replace`` writes the same bytes; the
   render starts with the ``#cloud-config`` header (no byte order mark, LF line ends) and creates the
   user the recipe describes: uid 1000, the groups the image's wsl-setup gives an interactive user,
-  passwordless sudo, a locked password and ``[user] default`` appended to /etc/wsl.conf;
+  passwordless sudo, a locked password and ``[user] default`` appended to /etc/wsl.conf, with
+  ``[time] useWindowsTimezone=true`` before it so the zone follows Windows (2026-10-05);
 - the host value template renders to JSON with exactly adoption/hosts/example.json's keys, every
   service on 127.0.0.1 at a port outside the workstation distribution's ports (WSL 2 distributions
   share one network namespace), and the recipe's ``ss`` probe checks exactly those ports;
@@ -430,7 +431,8 @@ def user_data_errors(template: str, user: str = "example") -> list[str]:
     required = (r"^users:$", rf"^- name: {re.escape(user)}$", r"^  uid: 1000$",
                 r"^  groups: \[adm, cdrom, sudo, dip, plugdev\]$", r'^  sudo: "ALL=\(ALL\) NOPASSWD:ALL"$',
                 r"^  shell: /bin/bash$", r"^  lock_passwd: true$", r"^write_files:$", r"^- path: /etc/wsl\.conf$",
-                r"^  append: true$", r"^  content: \|$", r"^    \[user\]$", rf"^    default={re.escape(user)}$")
+                r"^  append: true$", r"^  content: \|$", r"^    \[time\]$", r"^    useWindowsTimezone=true$",
+                r"^    \[user\]$", rf"^    default={re.escape(user)}$")
     errors += [f"the render lacks a line matching {pattern}" for pattern in required
                if not re.search(pattern, rendered, re.M)]
     if template.count(GETTY_BOOTCMD) != 1:
@@ -1289,6 +1291,8 @@ class UserDataTemplateTests(unittest.TestCase):
             "sudo with a password": good.replace("NOPASSWD:ALL", "ALL"),
             "no default user": good.replace("default=", "default_user="),
             "header": good.replace("#cloud-config", "# cloud-config", 1),
+            "no time section": good.replace("    [time]\n", ""),
+            "zone not from Windows": good.replace("useWindowsTimezone=true", "useWindowsTimezone=false"),
         }
         for name, mutant in mutants.items():
             with self.subTest(mutant=name):

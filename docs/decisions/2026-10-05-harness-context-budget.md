@@ -800,3 +800,18 @@ follow its ordinary merge contract. This is local
 integration and fixture acceptance, with no full CI suite, host rollout or
 provider/model trial claimed. The coordinator commits, refreshes the registry
 last and owns the pending host read-back and subsequent ceiling tightening.
+
+## Addendum (2026-10-05): user-facing local time
+
+[The local-time record](2026-10-05-user-facing-local-time.md) adds one 227-byte
+sentence to the portable Claude block (+230 bytes with its bullet marker and
+newline) and to the Codex `session-lanes` block (+228). `startup_files` measures
+Claude 23,566 → 23,796 and Codex 19,332 → 19,560 startup bytes, under the
+unchanged 24,458/20,103 constants (662/543 bytes of headroom); the compact Codex
+source is 7,535 bytes. For these inputs the post-gate projection above becomes
+23,116/18,880-byte scopes and 24,272/19,824-byte ceilings. The gate's reviewed
+diff still lowers the constants to the measured post-gate scopes plus 5%. No
+constant changes here. The top-rule/lanes pin named above moves from
+`568ee365aeef3455fc901e648eb72d28cc3b49c39f1bfba7f5e39beed20479a8` to
+`82e23b68466ed8b96566a229582f0c99fa1456a393e635f18cc5e65f601f4d09`: the pinned
+segment runs to the RTK marker, so it includes the `session-lanes` lines.

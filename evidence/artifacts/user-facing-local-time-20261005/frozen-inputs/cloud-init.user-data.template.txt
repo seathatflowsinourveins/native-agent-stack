@@ -8,8 +8,6 @@
 # Keys follow Canonical's "Automatic setup of Ubuntu on WSL with cloud-init" example and the cloud-init WSL datasource
 # "Default user" example. The groups are the ones the image's wsl-setup gives a user it creates interactively. uid 1000
 # matches defaultUid in the image's /etc/wsl-distribution.conf. The password stays locked; sudo needs none.
-# [time] useWindowsTimezone=true makes WSL use and sync to the time zone set in Windows (Microsoft wsl-config, "Time
-# settings"; default true). It is written explicitly so W5 reads it back: docs/decisions/2026-10-05-user-facing-local-time.md.
 # P2 checks the workstation schema; W5 must validate the selected image's own schema. Full new-host acceptance is owed.
 users:
 - name: ${WSL_USER}
@@ -23,9 +21,6 @@ write_files:
 - path: /etc/wsl.conf
   append: true
   content: |
-    [time]
-    useWindowsTimezone=true
-
     [user]
     default=${WSL_USER}
 
