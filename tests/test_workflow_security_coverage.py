@@ -117,7 +117,10 @@ class NewWorkflowSecurityCoverageTests(unittest.TestCase):
 
 
 FRESHNESS_WORKFLOW = WORKFLOWS_DIR / "runtime-worker-skills-freshness.yml"
-READ_ONLY_PERMISSIONS = "permissions:\n  contents: read\n\n"
+# Since 2026-10-04 the workflow grants no scope and its one job grants `contents: read`
+# (docs/decisions/2026-10-04-ci-least-privilege.md).
+NO_SCOPE_DEFAULT = "\npermissions: {}\n"
+READ_ONLY_PERMISSIONS = "    permissions:\n      contents: read\n"
 CHECKOUT_WITHOUT_CREDENTIALS = "        with:\n          persist-credentials: false\n"
 USES_LINE = r"(?m)^[ \t]+(?:- )?uses:"
 PINNED_ACTION = re.compile(USES_LINE + r" ([\w.-]+/[\w./-]+)@([0-9a-f]{40})(?=\s)")
@@ -163,19 +166,28 @@ class RuntimeWorkerSkillsFreshnessWorkflowTests(unittest.TestCase):
                 result, idents = self.analyze_copy(text.replace(f"{action}@{sha}", f"{action}@v1"))
                 self.assertNotEqual(result.returncode, 0, result.stderr[:2000])
                 self.assertIn("unpinned-uses", idents)
-        for label, block, ident in (("persist-credentials", CHECKOUT_WITHOUT_CREDENTIALS, "artipacked"),
-                                    ("permissions", READ_ONLY_PERMISSIONS, "excessive-permissions")):
+        # Dropping both permissions entries leaves the repository default token, which the regular persona
+        # reports; dropping either alone is not a regular-persona finding (measured with zizmor 1.30.1 on
+        # 2026-10-04: without the top-level `{}` only the pedantic persona reports excessive-permissions, and
+        # without the job's block the job inherits `{}`), so tests/test_workflow_policy.py holds each one.
+        for label, blocks, ident in (("persist-credentials", (CHECKOUT_WITHOUT_CREDENTIALS,), "artipacked"),
+                                     ("permissions", (NO_SCOPE_DEFAULT, READ_ONLY_PERMISSIONS), "excessive-permissions")):
             with self.subTest(dropped=label):
-                self.assertEqual(text.count(block), 1, f"the workflow's {label} block moved")
-                result, idents = self.analyze_copy(text.replace(block, ""))
+                copy = text
+                for block in blocks:
+                    self.assertEqual(text.count(block), 1, f"the workflow's {label} entry moved")
+                    copy = copy.replace(block, "\n" if block.startswith("\n") else "")
+                result, idents = self.analyze_copy(copy)
                 self.assertNotEqual(result.returncode, 0, result.stderr[:2000])
                 self.assertIn(ident, idents)
 
     def test_its_only_token_grant_is_contents_read(self):
         # zizmor's regular persona reports nothing for a workflow-level `contents: write` or
-        # `write-all` (measured with zizmor 1.30.1 on 2026-09-28), so the grant is asserted on the text.
+        # `write-all` (measured with zizmor 1.30.1 on 2026-09-28), nor for a job-level `contents: write`
+        # (2026-10-04), so the grant is asserted on the text.
         text = FRESHNESS_WORKFLOW.read_text(encoding="utf-8")
-        self.assertEqual(re.findall(r"(?m)^[ \t]*permissions:.*$", text), ["permissions:"])
+        self.assertEqual(re.findall(r"(?m)^[ \t]*permissions:.*$", text), ["permissions: {}", "    permissions:"])
+        self.assertEqual(text.count(NO_SCOPE_DEFAULT), 1)
         self.assertEqual(text.count(READ_ONLY_PERMISSIONS), 1)
         self.assertNotRegex(text, r"(?m)^[ \t]*[\w-]+:[ \t]*write(?:-all)?[ \t]*(?:#.*)?$")
 

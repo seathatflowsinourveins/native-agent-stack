@@ -1,0 +1,23 @@
+F
+======================================================================
+FAIL: test_rtk_exactness_checks_reject_passthrough_and_broken_recovery (tests.test_native_token_ci.NativeTokenCIContracts.test_rtk_exactness_checks_reject_passthrough_and_broken_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/tests/test_native_token_ci.py", line 1141, in test_rtk_exactness_checks_reject_passthrough_and_broken_recovery
+    self.assertEqual(ci.rtk_exactness_checks(cases, blob), dict.fromkeys(labels, True))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'rtk[473 chars]ness-proxy-restores-native-output-and-exit': True} != {'rtk[473 chars]ness-grep-non-plain-path-list-stays-verbatim':[62 chars]True}
+  {'rtk-exactness-branch-list-misreports-a-worktree-branch-as-remote-only': True,
+   'rtk-exactness-controls-diff-unchanged-and-grep-fold-lossless': True,
+   'rtk-exactness-diff-missing-file-preserves-native-exit-code': True,
+   'rtk-exactness-find-on-a-missing-directory-masks-the-exit-code': True,
+   'rtk-exactness-git-show-blob-window-changes-its-tail': True,
++  'rtk-exactness-grep-non-plain-path-list-stays-verbatim': True,
+   'rtk-exactness-jq-truncates-rows-and-width': True,
+   'rtk-exactness-log-caps-at-ten-commits-and-drops-the-merge': True,
+   'rtk-exactness-proxy-restores-native-output-and-exit': True}
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

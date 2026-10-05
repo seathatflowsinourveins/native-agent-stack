@@ -242,8 +242,8 @@
     },
     {
       "id": "claude-hud",
-      "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0",
-      "version": "0.8.0",
+      "repository": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
+      "version": "0.10.0",
       "license": "MIT",
       "profile": "optional",
       "role": "Claude statusline rendering",
@@ -259,12 +259,13 @@
         "token-practice-gap-followup-20260920",
         "native-claude-hud-interactive-20260920",
         "current-session-observation-20260920",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "claude-hud-0100-qualification-20261004"
       ],
       "upstream_sources": [
-        "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.8.0"
+        "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0"
       ],
-      "source_pin": null,
+      "source_pin": "75683c6de1ac07f6bbef00d739001679dba0740c",
       "freshness": "Installed tested pin; latest release identity is separately recorded in manifests/landscape.json.",
       "optional_reason": "Useful specialist/reference component; not a required condition for the demonstrated native core.",
       "command_scope": "Metadata/help/setup reference only; historical functional evidence retained separately. See native recipe for selected live workflow."
@@ -294,7 +295,7 @@
     {
       "id": "codex",
       "repository": "https://github.com/openai/codex",
-      "version": "0.159.3",
+      "version": "0.160.0",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Native subscription coding client",
@@ -338,16 +339,17 @@
         "codex-01571-qualification-20260926",
         "codex-01592-qualification-20260930",
         "codex-01593-native-queue-20261001",
-        "codex-01593-hindsight-native-memory-20261001"
+        "codex-01593-hindsight-native-memory-20261001",
+        "runtime-sdk-20261003"
       ],
       "upstream_sources": [
         "https://github.com/openai/codex",
-        "https://github.com/openai/codex/releases/tag/rust-v0.159.3",
-        "https://github.com/openai/codex/blob/rust-v0.159.3/scripts/install/install.sh",
-        "https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/app-server-daemon/README.md"
+        "https://github.com/openai/codex/releases/tag/rust-v0.160.0",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/scripts/install/install.sh",
+        "https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/app-server-daemon/README.md"
       ],
-      "source_pin": "01fc69f4026735edfdf6789820549727a4867b11",
-      "freshness": "Linux 0.159.3 is selected after the official rust-v0.159.3 installer staged the complete native package and the 2026-10-01 receipts qualified native queue delivery while idle and busy, receiver reconnect, and synthetic Hindsight hook capture and native recollection through both headless and shared-daemon sessions. These are scoped native client operations with independent observations, not upstream test-suite execution or a whole-memory-backend readiness claim. On the qualified host, daemon_auto_start is enabled, the native daemon is pinned to 0.159.3 and its automatic updater is disabled; the shared portable template still sets daemon_auto_start false, so daemon adoption on other hosts remains opt-in. The Linux npm wrapper download matches its registry integrity, but its signature and attestation were not verified in this promotion. tools/adoption/apply_codex_lane.py tracks the Linux version pin. Historical receipts and rollback installations remain available; the independent landscape selection is unchanged, and macOS remains pinned to 0.155.1 pending its own qualification."
+      "source_pin": "a956835d020762cb2b570053af06f643a11c0ecc",
+      "freshness": "Linux 0.160.0 is selected from the current stable rust-v0.160.0 release, commit a956835d020762cb2b570053af06f643a11c0ecc. The 2026-10-03 coordinator compatibility record retains the matching Python SDK and bundled CLI, strict-hash installation with CPython 3.13.15 and uv 0.12.17, matching npm-platform and bundled binary SHA256, and completed native-account SDK, gateway SDK and gateway CLI marker canaries (evidence/artifacts/runtime-sdk-20261003/receipt.json). The official install.sh and app-server-daemon README are unchanged upstream from rust-v0.159.3. The dated 0.159.3 queue and Hindsight receipts retain their original scope and do not qualify those operations at 0.160.0. The shared host launcher, daemon and production prefix still run 0.159.3 until a coordinated switch; the repository pin does not switch them. The shared portable template keeps daemon_auto_start false, so daemon adoption on another host remains opt-in. The npm wrapper bytes match registry dist.integrity and SHA256; signature and attestation verification were not recorded. Gateway backend model and effort were not read from the call log. Sanitized returned results, hashes and positive/negative marker controls are retained; original SDK outer argv/cwd, attested native heredoc and process start/end times remain incomplete, so runtime-sdk-20261003 is compatibility_attempt. This is same-host compatibility evidence, not native_cli_e2e, new-host, model-quality or whole-memory-backend acceptance. The move is inside the seven-day cooldown recorded in docs/decisions/2026-09-25-workstation-sota-refresh.md, as the earlier 0.159.2 and 0.159.3 moves were (docs/decisions/2026-09-27-model-currency.md). tools/adoption/apply_codex_lane.py follows the Linux pin; historical receipts and rollback installations remain available, and macOS stays at 0.155.1 pending its own qualification. The Linux codex pin row carries one dated hold, 0.159.3 until 2026-11-04 (X18, the #626 landing exception), with that version's install data; scripts/adoption_status.py --pinned-versions reports a host not yet switched as held, not drift, until that date. The hold installs and qualifies nothing (docs/decisions/2026-10-04-codex-dated-holds.md)."
     },
     {
       "id": "codex-for-claude",
@@ -625,8 +627,8 @@
     },
     {
       "id": "mcporter",
-      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.1",
-      "version": "0.14.1",
+      "repository": "https://github.com/openclaw/mcporter/tree/v0.14.2",
+      "version": "0.14.2",
       "license": "MIT",
       "profile": "core",
       "role": "Native CLI bridge with persistent MCP daemon connection",
@@ -640,13 +642,14 @@
         "current-session-observation-20260920",
         "claude-upstream-checks-20260921",
         "claude-repository-evidence-20260921",
-        "mcporter-0141-qualification-20260925"
+        "mcporter-0141-qualification-20260925",
+        "mcporter-0142-qualification-20261004"
       ],
       "upstream_sources": [
-        "https://github.com/openclaw/mcporter/tree/v0.14.1"
+        "https://github.com/openclaw/mcporter/tree/v0.14.2"
       ],
-      "source_pin": null,
-      "freshness": "0.14.1 serves bin/mcporter on the NativeStack WSL2 host since 2026-09-25 after a matched 37-step comparison against 0.13.13 (independent review). 0.14.x runs ps from PATH, so whatever launches the daemon needs ps on its PATH. 0.13.13 is kept for rollback. The Mac pin stays 0.13.13, and the landscape winner pin stays 0.13.13 until a new verdict wave."
+      "source_pin": "aa0f55f9bffcde9d2070c86145f37d4dd3525f6c",
+      "freshness": "0.14.2 serves bin/mcporter on the NativeStack WSL2 host since 2026-10-04; the qualification receipt retains failed configured-daemon calls and successful ad-hoc stdio calls, with no daemon recovery attempted. 0.14.x runs ps from PATH, so whatever launches the daemon needs ps on its PATH. 0.14.1 is kept for rollback. The Mac pin stays 0.13.13 until a Mac qualifies 0.14.2, and the landscape winner pin stays 0.13.13 until a new verdict wave."
     },
     {
       "id": "openresearch",
@@ -822,8 +825,8 @@
     },
     {
       "id": "rtk",
-      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0",
-      "version": "0.50.0",
+      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+      "version": "0.51.0",
       "license": "Apache-2.0",
       "profile": "core",
       "role": "Compact supported command outputs, retain failure/raw recovery",
@@ -847,13 +850,14 @@
         "full-stack-convergence-20260921",
         "claude-upstream-checks-20260921",
         "claude-repository-evidence-20260921",
-        "rtk-050-qualification-20260925"
+        "rtk-050-qualification-20260925",
+        "rtk-051-qualification-20261004"
       ],
       "upstream_sources": [
-        "https://github.com/rtk-ai/rtk/releases/tag/v0.50.0"
+        "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0"
       ],
-      "source_pin": null,
-      "freshness": "0.50.0 runs the Claude Code hook on the NativeStack WSL2 host since 2026-09-25 after qualification against 0.49.0 (hash-pinned hook acceptance, independent review); that host excludes `git show <rev>:<path>` and `diff` from rewriting through ~/.config/rtk/config.toml, which the bootstrap does not render. 0.49.0 is kept for rollback. The landscape winner pin stays 0.49.0 until a new verdict wave."
+      "source_pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "freshness": "0.51.0 runs the Claude Code hook on the NativeStack WSL2 host since 2026-10-04; its qualification receipt retains the native verify, hook and deny-rule comparisons. That host keeps the explicit exclusions, including `git show <rev>:<path>` and `diff`, through ~/.config/rtk/config.toml, which the bootstrap does not render. 0.50.0 is kept for rollback. The landscape winner pin stays 0.49.0 until a new verdict wave."
     },
     {
       "id": "sandbox-runtime",
@@ -1443,7 +1447,7 @@
         "https://github.com/alpacahq/alpaca-py/tree/v0.44.0",
         "https://pypi.org/project/alpaca-py/0.44.0/"
       ],
-      "source_pin": null,
+      "source_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
       "freshness": "Installed0.44.0 from accepted SDK lock; native read-only historical acquisition on2026-09-20. Exact scope and missing currency/PIT limits in receipt; no broker execution."
     },
     {
@@ -1880,12 +1884,12 @@
     {
       "id": "omniroute",
       "repository": "https://github.com/diegosouzapw/OmniRoute",
-      "version": "3.8.50",
+      "version": "3.8.51",
       "license": "MIT",
       "profile": "optional",
       "role": "Optional authenticated model gateway with scoped compression previews and persisted usage/cache observations",
       "commands": [
-        "npm install --global --prefix \"${OMNIROUTE_PREFIX}\" --include=optional omniroute@3.8.50",
+        "npm install --global --prefix \"${OMNIROUTE_PREFIX}\" --include=optional omniroute@3.8.51",
         "omniroute serve --port \"${OMNIROUTE_PORT}\" --no-open --no-tray --daemon",
         "omniroute status",
         "omniroute api compression post-api-compression-preview --body @preview.json"
@@ -1894,21 +1898,26 @@
         "foundation-native-20260920",
         "native-returned-results-20260921",
         "full-stack-convergence-20260921",
-        "claude-repository-evidence-20260921"
+        "claude-repository-evidence-20260921",
+        "omniroute-3851-npm-qualification-20260930"
       ],
       "upstream_sources": [
-        "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50",
-        "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/docs/guides/SETUP_GUIDE.md",
-        "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.50/src/app/api/compression/preview/route.ts",
-        "https://registry.npmjs.org/omniroute/3.8.50",
+        "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51",
+        "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.51/docs/guides/SETUP_GUIDE.md",
+        "https://github.com/diegosouzapw/OmniRoute/blob/v3.8.51/src/app/api/compression/preview/route.ts",
+        "https://registry.npmjs.org/omniroute/3.8.51",
         "https://github.com/diegosouzapw/OmniRoute/commit/2f42a9ac19d1a247ec9ce5473b790843724b3061",
         "https://github.com/diegosouzapw/OmniRoute/pull/14886",
         "https://github.com/diegosouzapw/OmniRoute/pull/14812",
         "https://github.com/diegosouzapw/OmniRoute/pull/13788",
-        "https://github.com/diegosouzapw/OmniRoute/pull/15167"
+        "https://github.com/diegosouzapw/OmniRoute/pull/15167",
+        "https://github.com/diegosouzapw/OmniRoute/commit/c1e30b7676975feb298b49eff6ff58923c04b89e",
+        "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L1-L31",
+        "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L315-L340",
+        "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L1401-L1442"
       ],
-      "source_pin": "5458026c216f77a3da68ea49152dc33470cfe2cb",
-      "freshness": "Official GitHub and npm release 3.8.50 checked September 20, 2026. The published tag commit, npm integrity and runtime build identity remain separate. Isolated Linux install/start/restart/state continuity/plaintext restore/owned stop passed; encrypted native restore is unsupported. Gateway native/provider attempts retained model-prefix and quota failures, not a successful gateway task. Running builds, 2026-09-30: the workstation runs two source builds, not this pin. Both are based on release/v3.8.51 at 2f42a9ac19d1a247ec9ce5473b790843724b3061 (upstream tagged v3.8.51 afterwards, at 2026-09-30T01:41Z, with the same tree as this commit, and published omniroute@3.8.51 to npm at 02:54Z, so the running builds are the released 3.8.51 tree plus the carries), which contains upstream's merged #14886, the fix that the 2026-09-27 build's #14904 cherry-pick stood in for, and #14812, the serve port-preflight fix that makes the lsof shim redundant. The open upstream PR #13788 is cherry-picked onto both (its two commits' stable patch-ids d6cb98ecd2c4aed3 and cbb7d8fb78ed0dcf equal the upstream commits'), and 20128 also carries a local affinity patch (045aa81f3, patch-id 132ad5e91380a1d2) and, since 2026-09-30T06:32:50Z, the open upstream PR #15167 (head f5d8e150b, stable patch-id 14ec6648f50fc499 equal to the cherry-pick's; gpt-6.1-sol at max effort). The BUILD_SHA is cf6748d04 on 20128 (ae5539a56 before) and 87c4c488d on 20129. Upstream's check:pack-artifact and check:pack-boot pass on all three tarballs (the earlier 20128 build, the 20129 build and the 20128 build with #15167; check:pack-boot on the 20129 tarball on its third attempt, the first two failed with causes not established). This manifest has no field for cherry-picks or local patches. A version/source_pin pair must also match the landscape freshness snapshot. npm latest became 3.8.51 on 2026-09-30 (published 02:54Z, after the rebuild), so the condition for moving the pin is met, but the pin stays the previously qualified 3.8.50 until the published 3.8.51 package has its own isolated install and boot check (a separate change to this row); upstream has not carried #13788. The 2026-09-27 build, service, probes and recorded keyless loopback posture: docs/decisions/2026-09-27-omniroute-account-pool.md and evidence/artifacts/omniroute-gateway-20260927/. The rebuild, its non-upstream deltas, the settings and the rollback: docs/decisions/2026-09-30-omniroute-rebuild.md and evidence/artifacts/omniroute-rebuild-20260930/.",
+      "source_pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+      "freshness": "3.8.51 is selected from the current stable upstream release v3.8.51 (published 2026-09-30T01:41:50Z), whose annotated tag 770faa7144f58ada625afc6efe572c8335484ec4 peels to commit c1e30b7676975feb298b49eff6ff58923c04b89e, tree 0f58d8df20c0c2ae4336b432b3f39837119b6eed. The published npm package was qualified on this workstation on 2026-09-30: evidence/receipts/omniroute-3851-npm-qualification-20260930.json records the isolated install and allowlisted rebuild, version/BUILD_SHA readback, two local boot/stop cycles with database continuity, tarball digest and npm signature/provenance checks, with their distinct scopes and retained failures. At 3.8.51, `serve --daemon`, `omniroute status` and the compression-preview command were not run as written (receipt limitations[3]-[4]); the smoke test started serve in the foreground and read `/api/health`. That compatibility_attempt is historical qualification, not a new install, inference run, upstream test-suite execution or other-host acceptance. The user's 2026-10-03 directive, \"the 7day waiting period can end sooner as needed with clean upstream releases\", ends the cooldown hold for this clean qualified release (docs/decisions/2026-10-03-omniroute-3851-pin.md). The running source builds remain deployment deltas: 20128 omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 (BUILD_SHA cf6748d04) carries upstream PR #13788, the local affinity patch and upstream PR #15167; 20129 omniroute-3.8.51-2f42a9ac-pr13788 (BUILD_SHA 87c4c488d) carries #13788. Their upstream base 2f42a9ac19d1a247ec9ce5473b790843724b3061 has the tag commit's tree. The published package contains neither deployment carry; this repository pin move does not replace either build or modify either service. The deployment record remains docs/decisions/2026-09-30-omniroute-rebuild.md. PR #15167 is still open upstream at head 0585aba5589d5a1f49243a13a8db249558e7c9e3 in the 2026-10-03 API read; that current head is not a claim about the deployed cherry-pick. At the selected tag commit, open-sse/executors/codex/reasoningSuffix.ts L1-L31 gives gpt-6-astra and gpt-6-sol an ultra cap and gpt-6-luna a max cap. open-sse/executors/codex.ts L315-L340 uses that alias cap before the xhigh fallback, and L1401-L1442 preserves requested max and sends ultra as max on the upstream wire. gpt-6.1-sol is absent from those tag alias sets and still receives the xhigh fallback; its deployed max support belongs to the #15167 delta, not this pin. These are source-verified effort transformations, not provider execution or quality measurements. The snapshot retains dated metadata attempts and appends the scoped current release/tag checks; other components were not refreshed.",
       "command_scope": "Use docs/foundation-stack.md for fresh-prefix guards, explicit DATA_DIR/loopback binding, private management authentication and exact provider scope. The workstation's source builds run as two units from values-free templates. adoption/templates/systemd/omniroute.service runs 20128, the shared gateway: build cf6748d04, with the local affinity patch and upstream PR #15167, so no OAuth routing combo may be created on 20128 while the affinity patch runs. adoption/templates/systemd/omniroute-fw.service runs 20129, the framework instance: build 87c4c488d, with its own data directory, forwarding to 20128 through a provider node. Both units announce CODEX_CLIENT_VERSION 0.159.1 while the installed Codex is 0.157.1, so the gateway's live catalog lists gpt-6.1-sol. 20129 runs ten of the twelve shipped compression engines at upstream's per-engine settings with the master switch on (upstream ships the master off and every engine disabled; headroom is off in the engines map but still runs where a stored combo names it, omniglyph is off; headerless plan session-dedup, ccr, lite; lossy engines only on a header or combo opt-in; the header allow-lossy selects a peer-owned stored combo); 20128 keeps its master switch off with codex/* excluded. Serve's port preflight counts client sockets on the port; 20128's prefix carries lsof shim v2, which leaves the bind probe as the guard, so a client's dead connection no longer blocks its restart, while 20129 and the previous 20128 prefix still have v1 (restart hindsight-live and any other client holding a connection first). The gateway is adopted for pooled GPT-6 access by gateway-routed Codex lanes. By the user's decision 20128 runs keyless and passwordless on loopback only (docs/decisions/2026-09-27-omniroute-account-pool.md, decision 5); 20129 also binds loopback only. A multi-user or non-loopback host keeps this recipe's API key and dashboard login. Native Codex stays the max-quality default, and the agent-sdks layer default waits on the preregistered three-arm comparison. Existing native accounts, models, hooks and default routing remain unchanged. Local preview success does not establish semantic fidelity or provider-token savings."
     },
     {

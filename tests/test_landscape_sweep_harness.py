@@ -2,8 +2,9 @@
 
 A fake `codex` (and a fake `gh`) early on PATH stands in for the real CLI, and a stubbed Hugging Face Hub fetch
 for source_reviews.py; sweep.js runs under node with stubbed agent(), parallel() and pipeline() (skipped without
-node); convert.py's evidence is appended to a synthetic saturation ledger checkout with scripts/saturation_ledger.py
-itself. Optional: BASH32_BINARY (a real bash 3.2, as on macOS) and shellcheck.
+node); the native changed-key recovery test requires node and fails clearly without it. convert.py's evidence is
+appended to a synthetic saturation ledger checkout with scripts/saturation_ledger.py itself. Optional:
+BASH32_BINARY (a real bash 3.2, as on macOS) and shellcheck.
 """
 
 from __future__ import annotations
@@ -54,9 +55,12 @@ BASH32 = os.environ.get("BASH32_BINARY") if os.environ.get("BASH32_BINARY") and 
 # Later on 2026-09-30, after unit F3 (#553) pinned skill-creator, which the skills templates name for its paired
 # with-skill/without-skill benchmark, the common Skills paragraph names it too (build_args.TEMPLATE_SKILLS), as a
 # Claude-Code-only skill to read and never run. Previous value: 9c34fa7211bc…f14b.
-PROMPTS_SHA256_CURRENT = "b61956f351f5b71b6478f713a5f5f10a0c13e09198e528e6b10c9e1daa3c726d"
+# 2026-10-03: the Skills paragraph of common and common_v2 drops semgrep (retired) and agent-browser (held) with the
+# wave-2 skills ruling, changes 1 and 3 (build_args.TEMPLATE_SKILLS). Previous value: b61956f351f5…726d.
+PROMPTS_SHA256_CURRENT = "a57b659ddc5738728ae25848979561ce84dd24139dd6ff05858ccaffa38cf5e2"
 # Future U11 A/B source contract, filled with the same fixture values. This is not an activated runner's receipt.
-PROMPTS_SHA256_V2_CURRENT = "67e3adfa24fd4110f9784283ad3884fd18ae67cabad53977f6cb98839b94e525"
+# 2026-10-03: the same Skills paragraph change in common_v2. Previous value: 67e3adfa24fd…e525.
+PROMPTS_SHA256_V2_CURRENT = "fab3672aac7490dd223fcadee194510055a64864fbe745fd05f9240cb8fc9191"
 # The same change detector for a skills run (filled with the same 2026-09-26 values and modality "skills"): discover
 # and critic are discover_skills and critic_skills, and facts and fit end in modality_skills. The skills templates name
 # the layer input's known_skills (installed and excluded skills as the manifest states them); the first value,
@@ -65,8 +69,9 @@ PROMPTS_SHA256_V2_CURRENT = "67e3adfa24fd4110f9784283ad3884fd18ae67cabad53977f6c
 # only as a plain false, a source the catalog marks maintenance stale labels its skills not_adopted, and writing
 # CLAUDE.md or AGENTS.md conflicts only when unasked (skills-agent-docs maintains them). Previous value: 5d9ae85a17be…48db.
 # Later on 2026-09-30: common's Skills paragraph names skill-creator (see PROMPTS_SHA256_CURRENT). Previous value:
-# 2c2efbaed4d9…63d3.
-PROMPTS_SHA256_SKILLS_CURRENT = "a76ee858fe65b998dc974f8fe9cdac9562bdf14abe6f73dcd7d1778c9f95b460"
+# 2c2efbaed4d9…63d3. 2026-10-03: common's Skills paragraph drops semgrep and agent-browser (see PROMPTS_SHA256_CURRENT).
+# Previous value: a76ee858fe65…b460.
+PROMPTS_SHA256_SKILLS_CURRENT = "dabae268b07a8bc8c9b3dd1e7770a7f8dc181b40f77c06a3775591f56f280291"
 # The 2026-09-26 run's own value, kept in that run's record (evidence/artifacts/landscape-sweep-20260926/README.md);
 # fixtures below use it as a historical run's recorded prompts_sha256.
 PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4"
@@ -264,6 +269,24 @@ SYNTHETIC_LABELS = [f"{role}:{layer}" for layer in ("alpha", "beta") for role in
                     ("discover", "gpt6-discover", "refute-facts", "refute-fit", "gpt6-refute-fit")] + [
     f"{role}:beta:followup" for role in ("discover", "gpt6-discover", "refute-facts", "refute-fit", "gpt6-refute-fit")
 ] + ["critic"]
+
+
+def paused_child_usage(label):
+    """Synthetic child-usage stdout in journal order: a killed attempt, then its changed-key re-run.
+
+    child-usage.mjs summarizeRun preserves started-row order in children, but only links equal call keys.
+    Its effortMismatches reports the killed attempt's empty effort list too.
+    """
+    raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS, status="incomplete"))
+    for i, child in enumerate(raw["children"]):
+        child["agent_id"] = f"b{i}"
+    retry = next(c for c in raw["children"] if c["label"] == label)
+    killed = dict(retry, agent_id="killed", efforts=[], complete=False, requests=0, usage_by_model={},
+                  issues=["no result entry in journal", "no assistant usage in transcript"])
+    raw["children"].insert(0, killed)
+    raw["reason"] = "1 child(ren) incomplete"
+    raw["effort_mismatches"] = [{"child": label, "efforts": []}]
+    return raw
 
 
 # --------------------------------------------------------------------------- templates and skills
@@ -1321,6 +1344,9 @@ if "last_text" in config:
     with open(sys.argv[sys.argv.index("-o") + 1], "w") as out:
         out.write(config["last_text"])
 sys.stderr.write(config.get("stderr", ""))
+if config.get("limit_marker"):
+    with open(config["limit_marker"], "w") as out:
+        out.write("operator hold\\n")
 if config.get("record"):
     with open(config["record"], "w") as out:
         json.dump(record, out)
@@ -1348,7 +1374,58 @@ web_search = "live"
 [mcp_servers.context-mode]
 disabled_tools = ["ctx_upgrade", "ctx_purge"]
 """
-TOKEN_MCP_SERVERS = ("serena", "ai-memory", "socraticode", "headroom", "codebase-memory", "qmd", "context-mode")
+TOKEN_MCP_SERVERS = ("serena", "ai-memory", "socraticode", "headroom", "codebase-memory", "qmd", "context-mode", "jcodemunch")
+
+
+class OmniRouteFallbackBuildTests(unittest.TestCase):
+    def test_fallback_is_opt_in_and_restaging_keeps_frozen_prompts(self):
+        work = stage_work(self)
+        first = build(work)
+        self.assertEqual(first.returncode, 0, first.stderr)
+        self.assertNotIn("fallback", json.loads((work / "staged.json").read_text())["codex"])
+        frozen = {name: (work / name).read_bytes() for name in
+                  ("prompts_sha256.txt", "templates.json", "args.json", "sweep.embedded.js")}
+        (work / "gpt6" / "earlier-job").mkdir()
+        fallback = build(work, "--force", "--gpt6-fallback", "omniroute", "--fallback-codex-host", "127.0.0.1:20128")
+        self.assertEqual(fallback.returncode, 0, fallback.stderr)
+        settings = codex_job.settings(work)
+        self.assertEqual(settings["fallback"], {"provider": "omniroute", "base_url": "http://127.0.0.1:20128/v1"})
+        self.assertEqual((settings["provider"], settings["model"], settings["effort"]), ("native", "gpt-6-astra", "max"))
+        self.assertFalse((work / "codex-home").exists())
+        for name, original in frozen.items():
+            self.assertEqual((work / name).read_bytes(), original, name)
+        profile = temp_dir(self) / "stack-worker.config.toml"
+        profile.write_text(STACK_WORKER_FIXTURE, encoding="utf-8")
+        gateway = build(work, "--force", "--gpt6-provider", "omniroute", "--codex-host", "example",
+                        "--stack-worker-profile", profile)
+        self.assertEqual(gateway.returncode, 0, gateway.stderr)
+        self.assertNotIn("fallback", json.loads((work / "staged.json").read_text())["codex"])
+        for name, original in frozen.items():
+            self.assertEqual((work / name).read_bytes(), original, name)
+
+    def test_invalid_fallback_stages_nothing(self):
+        for extra in (("--fallback-codex-host", "127.0.0.1:20128"),
+                      ("--gpt6-fallback", "omniroute", "--fallback-codex-host", "example.org:20128"),
+                      ("--gpt6-fallback", "omniroute", "--fallback-codex-host", "127.0.0.1:0"),
+                      ("--gpt6-fallback", "omniroute", "--fallback-codex-host", "127.0.0.1:65536"),
+                      ("--gpt6-fallback", "omniroute", "--gpt6-provider", "omniroute"),
+                      ("--gpt6-fallback", "omniroute", "--gpt6-model", "cx/gpt-6-astra")):
+            with self.subTest(extra=extra):
+                work = stage_work(self)
+                done = build(work, *extra)
+                self.assertEqual(done.returncode, 2, done.stderr)
+                self.assertFalse((work / "staged.json").exists())
+                self.assertFalse((work / "codex-home").exists())
+
+    def test_fallback_without_a_gateway_max_alias_stages_nothing(self):
+        for model in ("gpt-daybreak-blue-latest", "codex-auto-review", "gpt-5.5", "gpt-6.1-sol-custom"):
+            with self.subTest(model=model):
+                work = stage_work(self)
+                done = build(work, "--gpt6-fallback", "omniroute", "--gpt6-model", model)
+                self.assertEqual(done.returncode, 2, done.stdout + done.stderr)
+                self.assertIn("reasoning alias", done.stderr)
+                self.assertFalse((work / "staged.json").exists())
+                self.assertFalse((work / "gpt6").exists())
 
 
 class OmniRouteLaneBuildTests(unittest.TestCase):
@@ -1876,6 +1953,33 @@ class OmniRouteLaneRunnerTests(RunnerCase):
     """A gateway lane runs Codex with CODEX_HOME set to the staged lane-local home, -p stack-worker and no
     --ignore-user-config, and never starts without its key variable."""
 
+    def test_primary_gateway_429_stops_with_the_pool_reason(self):
+        self.lane()
+        staged = json.loads((self.work / "staged.json").read_text())
+        self.settings({**staged["codex"], "api_key_placeholder": "local-loopback"})
+        self.env.pop("OMNIROUTE_API_KEY", None)
+        result = self.job("gpt6-primary-429", exit=1, events=[{"type": "error", "message": RETRY_429_TEXT}])
+        self.assertEqual((result["exit"], result["limit"], result["limit_marker"]), (3, True, True))
+        self.assertTrue((self.work / "LIMIT").read_text().startswith("gateway pool 429;"))
+        self.assertFalse((self.work / "LIMIT-native").exists())
+
+    def test_primary_gateway_stderr_429_is_a_fault_without_an_error_event(self):
+        self.lane()
+        staged = json.loads((self.work / "staged.json").read_text())
+        self.settings({**staged["codex"], "api_key_placeholder": "local-loopback"})
+        self.env.pop("OMNIROUTE_API_KEY", None)
+        result = self.job("gpt6-primary-stderr", exit=1, stderr="ERROR: " + RETRY_429_TEXT + "\n")
+        self.assertEqual((result["exit"], result["limit"], result["limit_marker"]), (1, False, False))
+
+    def test_primary_gateway_stderr_usage_quote_is_a_fault(self):
+        self.lane()
+        staged = json.loads((self.work / "staged.json").read_text())
+        self.settings({**staged["codex"], "api_key_placeholder": "local-loopback"})
+        self.env.pop("OMNIROUTE_API_KEY", None)
+        result = self.job("gpt6-primary-usage-quote", exit=7, stderr="ERROR: diagnostic quoted " + LIMIT_TEXT + "\n")
+        self.assertEqual((result["exit"], result["limit"], result["limit_marker"]), (7, False, False))
+        self.assertFalse((self.work / "LIMIT").exists())
+
     def lane(self):
         home = self.work / "codex-home"
         home.mkdir(exist_ok=True)
@@ -2017,6 +2121,406 @@ class OmniRouteLaneRunnerTests(RunnerCase):
                 codex_job.settings(self.work)
             self.settings(base)
             self.assertEqual(codex_job.settings(self.work)["http_headers"], {})
+
+
+class OmniRouteFallbackRunnerTests(RunnerCase):
+    """Synthetic native errors and no-model app-server probes through fake codex on PATH."""
+
+    def setUp(self):
+        super().setUp()
+        self.settings({"model": "gpt-6.1-sol", "timeout_s": 400, "fallback": {
+            "provider": "omniroute", "base_url": "http://127.0.0.1:20128/v1"}})
+        self.env.pop("OMNIROUTE_API_KEY", None)
+        self.native_home = self.bin / "native-home"
+        self.native_home.mkdir()
+        self.env["CODEX_HOME"] = str(self.native_home)
+
+    def native_marker(self):
+        codex_job.mark_limit(self.work, json.dumps({"reason": LIMIT_TEXT, "reset_time": "reported reset"}),
+                             marker="LIMIT-native")
+
+    def bound_job(self, name):
+        directory = self.work / "gpt6" / name
+        directory.mkdir(parents=True)
+        prompt, schema = self.prompt.read_bytes(), self.schema.read_bytes()
+        (directory / "prompt.txt").write_bytes(prompt)
+        (directory / "schema.json").write_bytes(schema)
+        config = codex_job.settings(self.work)
+        write_json(directory / "inputs.json", codex_job.job_inputs(prompt, schema, config["model"],
+                   effort=config["effort"]))
+        return directory
+
+    def test_fallback_preserves_non_max_request_effort(self):
+        for effort, wire in (("high", "high"), ("ultra", "xhigh")):
+            with self.subTest(effort=effort):
+                (self.work / "LIMIT-native").unlink(missing_ok=True)
+                staged = json.loads((self.work / "staged.json").read_text())["codex"]
+                self.settings({**staged, "effort": effort, "idle_timeout_s": 4200, "timeout_s": 14400})
+                result = self.job(f"gpt6-effort-{effort}", attempts=[
+                    {"exit": 1, "events": [{"type": "error", "message": LIMIT_TEXT}]},
+                    {"exit": 0, "events": [COMPLETED], "last": LAST}])
+                self.assertEqual(result["exit"], 0)
+                self.assertEqual(result["route"]["gateway_model"], f"cx/gpt-6.1-sol-{wire}")
+                self.assertEqual(result["route"]["gateway_effort"], wire)
+                self.assertEqual((result["effort"], result["request_effort"]), (effort, wire))
+                self.assertIn(f'model_reasoning_effort="{effort}"', self.record()["argv"])
+                directory = self.work / "gpt6" / f"gpt6-effort-{effort}"
+                self.assertEqual((directory / "inputs.json").read_bytes(),
+                                 (directory / "attempts" / "1" / "inputs.json").read_bytes())
+                (self.work / "LIMIT-native").unlink()
+
+    def test_fallback_refuses_a_model_without_the_requested_gateway_alias(self):
+        staged = json.loads((self.work / "staged.json").read_text())["codex"]
+        for model in ("gpt-daybreak-blue-latest", "codex-auto-review", "gpt-6.1-sol-custom"):
+            with self.subTest(model=model):
+                self.settings({**staged, "model": model})
+                with self.assertRaisesRegex(codex_job.UsageError, "reasoning alias"):
+                    codex_job.settings(self.work)
+
+    def test_fallback_gateway_stderr_usage_quote_is_a_fault(self):
+        result = self.job("gpt6-fallback-usage-quote", attempts=[
+            {"exit": 1, "events": [{"type": "error", "message": LIMIT_TEXT}]},
+            {"exit": 7, "events": [], "stderr": "ERROR: diagnostic quoted " + LIMIT_TEXT + "\n"}])
+        self.assertEqual((result["exit"], result["limit"], result["limit_marker"]), (7, False, False))
+        self.assertFalse((self.work / "LIMIT").exists())
+        self.assertTrue((self.work / "LIMIT-native").exists())
+
+    def test_operator_limit_beside_native_marker_prevents_any_gateway_launch(self):
+        self.native_marker()
+        (self.work / "LIMIT").write_text("operator hold\n")
+        self.fake(last=LAST, events=[COMPLETED])
+        started = self.call("start", "gpt6-held", self.prompt, self.schema)
+        self.assertEqual(started.returncode, 3)
+        self.assertFalse((self.bin / "record.json").exists())
+        result = json.loads(self.call("result", "gpt6-held").stdout)
+        self.assertIsNone(result["route"])
+        self.assertEqual((self.work / "LIMIT").read_text(), "operator hold\n")
+        self.assertTrue((self.work / "LIMIT-native").exists())
+
+    def test_operator_limit_during_native_attempt_prevents_gateway_launch(self):
+        gateway_record = self.bin / "unlaunched.json"
+        result = self.job("gpt6-held-during-native", attempts=[
+            {"exit": 1, "events": [{"type": "error", "message": LIMIT_TEXT}],
+             "limit_marker": str(self.work / "LIMIT")},
+            {"exit": 0, "events": [COMPLETED], "last": LAST, "record": str(gateway_record)}])
+        self.assertEqual(result["exit"], 3)
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "1")
+        self.assertFalse(gateway_record.exists())
+        self.assertIsNone(result["route"])
+        self.assertEqual(result["attempts"][0]["failure"]["kind"], "usage")
+        self.assertEqual((self.work / "LIMIT").read_text(), "operator hold\n")
+
+    def test_native_item_content_quoting_usage_limit_does_not_fail_over(self):
+        quote = {"type": "item.completed", "item": {"type": "agent_message", "text": LIMIT_TEXT}}
+        for code, events in ((0, [quote, COMPLETED]), (7, [quote])):
+            with self.subTest(code=code):
+                result = self.job(f"gpt6-native-quote-{code}", attempts=[
+                    {"exit": code, "events": events, "last": LAST},
+                    {"exit": 0, "events": [COMPLETED], "last": LAST}])
+                self.assertEqual((result["exit"], result["limit"], result["limit_marker"]), (code, False, False))
+                self.assertEqual((self.bin / "attempt-counter").read_text(), "1")
+                self.assertIsNone(result["route"])
+                self.assertFalse((self.work / "LIMIT-native").exists())
+
+    def test_changed_or_disabled_fallback_does_not_reuse_gateway_success(self):
+        def rerun(**fixture):
+            self.fake(last=LAST, events=[COMPLETED], **fixture)
+            started = self.call("start", "gpt6-restage-route", self.prompt, self.schema)
+            self.assertEqual(started.returncode, 0, started.stdout + started.stderr)
+            self.assertIn("started gpt6-restage-route", started.stdout)
+            self.assertNotIn("already done", started.stdout)
+            self.call("wait", "gpt6-restage-route", "20")
+            return json.loads(self.call("result", "gpt6-restage-route").stdout)
+
+        result = self.job("gpt6-restage-route", attempts=[
+            {"exit": 1, "events": [{"type": "error", "message": LIMIT_TEXT}]},
+            {"exit": 0, "events": [COMPLETED], "last": LAST}])
+        original_route = result["route"]
+        staged = json.loads((self.work / "staged.json").read_text())["codex"]
+        self.settings({**staged, "fallback": {"provider": "omniroute", "base_url": "http://127.0.0.1:20129/v1"}})
+        result = rerun(quota={"result": {**quota_answer(99), "ordinaryUsageAllowed": False}})
+        self.assertEqual(result["route"]["base_url"], "http://127.0.0.1:20129/v1")
+        self.assertEqual(result["attempts"][-1]["route"], original_route)
+        self.settings({**staged, "fallback": None})
+        result = rerun()
+        self.assertEqual(result["exit"], 0)
+        self.assertEqual(result["model"], "gpt-6.1-sol")
+        self.assertIsNone(result["route"])
+        self.assertEqual(result["attempts"][-1]["route"]["base_url"], "http://127.0.0.1:20129/v1")
+
+    def test_recovery_probe_helper_and_parent_share_the_remaining_deadline(self):
+        self.native_marker()
+        staged = json.loads((self.work / "staged.json").read_text())["codex"]
+        self.settings({**staged, "timeout_s": 1, "quota_timeout_s": 600})
+        directory = self.bound_job("gpt6-probe-deadline")
+        clock = [0.0]
+
+        def probe(argv, **kwargs):
+            helper_timeout = float(argv[argv.index("--timeout") + 1])
+            self.assertEqual((helper_timeout, kwargs["timeout"]), (1.0, 1.0))
+            clock[0] = 1.0
+            raise subprocess.TimeoutExpired(argv, kwargs["timeout"])
+
+        with mock.patch.dict(os.environ, self.env), \
+                mock.patch.object(codex_job, "codex_version", return_value="fixture"), \
+                mock.patch.object(codex_job.time, "monotonic", side_effect=lambda: clock[0]), \
+                mock.patch.object(codex_job.subprocess, "run", side_effect=probe), \
+                mock.patch.object(codex_job.subprocess, "Popen") as launch:
+            self.assertEqual(codex_job.run(self.work, "gpt6-probe-deadline"), 124)
+        launch.assert_not_called()
+        quota = json.loads((directory / "quota.json").read_text())
+        self.assertEqual(quota["status"], "probe_failed")
+        self.assertIn("1 s", quota["error"])
+        self.assertIsNone(codex_job.result(self.work, "gpt6-probe-deadline")["route"])
+
+    def test_recovery_probe_does_not_launch_after_the_deadline(self):
+        self.native_marker()
+        directory = self.bound_job("gpt6-expired-probe")
+        config = codex_job.settings(self.work)
+        with mock.patch.object(codex_job.time, "monotonic", return_value=10), \
+                mock.patch.object(codex_job.subprocess, "run") as probe:
+            codex_job.refresh_native_limit(self.work, directory, config, deadline=10)
+        probe.assert_not_called()
+        quota = json.loads((directory / "quota.json").read_text())
+        self.assertEqual(quota["status"], "probe_failed")
+        self.assertIn("deadline", quota["error"])
+        self.assertTrue((self.work / "LIMIT-native").exists())
+
+    def test_quota_failover_requires_the_retry_reserve(self):
+        staged = json.loads((self.work / "staged.json").read_text())["codex"]
+        self.settings({**staged, "timeout_s": 30, "quota_stop_percent": 95})
+        result = self.job("gpt6-quota-reserve", last=LAST, events=[COMPLETED], quota={"result": quota_answer(99)})
+        self.assertEqual((result["exit"], result["failure"]["kind"], result["attempts"]), (3, "quota", []))
+        self.assertFalse((self.bin / "record.json").exists())
+        self.assertIsNone(result["route"])
+        self.assertTrue((self.work / "LIMIT-native").exists())
+
+    def test_limit_after_a_capacity_retry_remains_terminal_without_the_reserve(self):
+        staged = json.loads((self.work / "staged.json").read_text())["codex"]
+        self.settings({**staged, "timeout_s": 600, "capacity_backoff_s": 0.01, "capacity_backoff_max_s": 0.01})
+        self.fake(attempts=[
+            {"exit": 1, "events": [{"type": "error", "message": "Selected model is at capacity."}]},
+            {"exit": 1, "events": [{"type": "error", "message": LIMIT_TEXT}]},
+            {"exit": 0, "events": [COMPLETED], "last": LAST}])
+        self.bound_job("gpt6-capacity-then-limit")
+        clock = [0.0]
+        attempts = [0]
+
+        def wait_attempt(process, directory, config, deadline):
+            code = process.wait(timeout=5)
+            attempts[0] += 1
+            clock[0] = 100 if attempts[0] == 1 else 500
+            return code, None
+
+        def sleep(seconds):
+            clock[0] += seconds
+
+        with mock.patch.dict(os.environ, self.env), \
+                mock.patch.object(codex_job.time, "monotonic", side_effect=lambda: clock[0]), \
+                mock.patch.object(codex_job.time, "sleep", side_effect=sleep), \
+                mock.patch.object(codex_job, "wait_process", side_effect=wait_attempt):
+            self.assertEqual(codex_job.run(self.work, "gpt6-capacity-then-limit"), 3)
+        result = codex_job.result(self.work, "gpt6-capacity-then-limit")
+        self.assertEqual(result["failure"]["kind"], "usage")
+        self.assertTrue(result["limit"])
+        self.assertEqual([attempt["failure"]["kind"] for attempt in result["attempts"]], ["capacity"])
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "2")
+        self.assertIsNone(result["route"])
+
+    def test_failed_gateway_launch_has_no_route_receipt(self):
+        self.fake(attempts=[{"exit": 1, "events": [{"type": "error", "message": LIMIT_TEXT}]}])
+        self.bound_job("gpt6-launch-failed")
+        real_launch = subprocess.Popen
+
+        def launch(argv, **kwargs):
+            if 'model_provider="omniroute"' in argv:
+                raise OSError("fixture launch refused")
+            return real_launch(argv, **kwargs)
+
+        with mock.patch.dict(os.environ, self.env), mock.patch.object(codex_job.subprocess, "Popen", side_effect=launch):
+            self.assertEqual(codex_job.run(self.work, "gpt6-launch-failed"), 2)
+        result = codex_job.result(self.work, "gpt6-launch-failed")
+        self.assertIsNone(result["route"])
+        self.assertIsNone(result["started"])
+        self.assertEqual(result["model"], "gpt-6.1-sol")
+        self.assertEqual(result["attempts"][0]["failure"]["kind"], "usage")
+
+    def test_native_limit_falls_back_in_the_held_slot_and_keeps_native_inputs(self):
+        native_record, gateway_record = self.bin / "native.json", self.bin / "gateway.json"
+        native_events = [{"type": "error", "message": LIMIT_TEXT},
+                         {"type": "turn.failed", "error": {"message": LIMIT_TEXT}}]
+        result = self.job("gpt6-fallback", attempts=[
+            {"exit": 1, "events": native_events, "record": str(native_record), "stderr": "ERROR: " + LIMIT_TEXT + "\n"},
+            {"exit": 0, "events": [COMPLETED], "last": LAST, "record": str(gateway_record), "stderr": ""}])
+        directory = self.work / "gpt6" / "gpt6-fallback"
+        kept = directory / "attempts" / "1"
+        self.assertEqual((result["exit"], result["limit"], result["limit_marker"]), (0, False, False))
+        self.assertEqual(result["inputs"]["model"], "gpt-6.1-sol")
+        self.assertEqual(result["model"], "cx/gpt-6.1-sol-max")
+        self.assertEqual(result["route"], {"provider": "omniroute", "fallback_from": "native", "reason": LIMIT_TEXT,
+                         "native_model": "gpt-6.1-sol", "gateway_model": "cx/gpt-6.1-sol-max", "native_attempt": 1,
+                         "base_url": "http://127.0.0.1:20128/v1", "gateway_effort": "max",
+                         "search_backend": "omniroute:/alpha/search"})
+        self.assertEqual(result["attempts"][0]["exit"], 3)
+        self.assertIsNone(result["attempts"][0]["route"])
+        self.assertEqual((kept / "events.jsonl").read_text(), "".join(json.dumps(e) + "\n" for e in native_events))
+        self.assertEqual((kept / "stderr.txt").read_text(), "ERROR: " + LIMIT_TEXT + "\n")
+        self.assertEqual((kept / "model").read_text(), "gpt-6.1-sol\n")
+        self.assertFalse((kept / "done").exists(), "the held job must not advertise completion between routes")
+        for name in ("prompt.txt", "schema.json", "inputs.json", "slot"):
+            self.assertEqual((kept / name).read_bytes(), (directory / name).read_bytes(), name)
+        marker = json.loads((self.work / "LIMIT-native").read_text())
+        self.assertEqual(marker["reason"], LIMIT_TEXT)
+        self.assertIn("Sep 30th, 2026 11:50 PM", marker["reset_time"])
+        native = json.loads(native_record.read_text())
+        gateway = json.loads(gateway_record.read_text())
+        for record in (native, gateway):
+            self.assertEqual(record["cwd"], str(self.work / "empty"))
+            self.assertEqual(record["codex_home"], str(self.native_home))
+            self.assertTrue(record["stdin_devnull"])
+            self.assertEqual(record["argv"][-1], self.prompt.read_text().rstrip("\n"))
+            self.assertIn("--ignore-user-config", record["argv"])
+            self.assertNotIn("-p", record["argv"])
+            self.assertIn('model_reasoning_effort="max"', record["argv"])
+        self.assertFalse(native["api_key_present"])
+        self.assertTrue(gateway["api_key_present"])
+        configs = [gateway["argv"][i + 1] for i, arg in enumerate(gateway["argv"]) if arg == "-c"]
+        for config in ('model_provider="omniroute"', "features.standalone_web_search=true",
+                       "features.shell_snapshot=false", 'shell_environment_policy.filters.OMNIROUTE_API_KEY="exclude"'):
+            self.assertIn(config, configs)
+        block = next(c for c in configs if c.startswith("model_providers.omniroute="))
+        for value in ('base_url = "http://127.0.0.1:20128/v1"', 'env_key = "OMNIROUTE_API_KEY"',
+                      'wire_api = "responses"', "requires_openai_auth = false", "supports_standalone_web_search = true"):
+            self.assertIn(value, block)
+        again = self.call("start", "gpt6-fallback", self.prompt, self.schema)
+        self.assertEqual((again.returncode, again.stdout.strip()), (0, "already done: gpt6-fallback"))
+
+    def test_native_limit_then_gateway_429_stops_the_lane(self):
+        result = self.job("gpt6-exhausted", attempts=[
+            {"exit": 1, "events": [{"type": "error", "message": LIMIT_TEXT}]},
+            {"exit": 1, "events": [{"type": "turn.failed", "error": {"message": RETRY_429_TEXT}}]}])
+        self.assertEqual((result["exit"], result["limit"], result["limit_marker"]), (3, True, True))
+        self.assertEqual(result["failure"]["kind"], "http_429")
+        self.assertTrue((self.work / "LIMIT-native").exists())
+        self.assertTrue((self.work / "LIMIT").read_text().startswith("gateway pool 429;"))
+        self.assertEqual(len(result["attempts"]), 1)
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "2")
+        stopped = self.call("start", "gpt6-next", self.prompt, self.schema)
+        self.assertEqual(stopped.returncode, 3)
+        self.assertIn("gateway pool 429", stopped.stdout)
+
+    def test_gateway_retry_preserves_route_and_both_failed_attempts(self):
+        staged = json.loads((self.work / "staged.json").read_text())
+        self.settings({**staged["codex"], "timeout_s": 400, "capacity_backoff_s": 0.01,
+                       "capacity_backoff_max_s": 0.01})
+        result = self.job("gpt6-gateway-retry", attempts=[
+            {"exit": 1, "events": [{"type": "error", "message": LIMIT_TEXT}]},
+            {"exit": 1, "events": [{"type": "error", "message": "Selected model is at capacity."}]},
+            {"exit": 0, "events": [COMPLETED], "last": LAST}])
+        self.assertEqual(result["exit"], 0)
+        self.assertEqual([a["failure"]["kind"] for a in result["attempts"]], ["usage", "capacity"])
+        self.assertEqual(result["attempts"][1]["route"], result["route"])
+        self.assertEqual(result["route"]["native_attempt"], 1)
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "3")
+        directory = self.work / "gpt6" / "gpt6-gateway-retry"
+        for number in (1, 2):
+            self.assertEqual((directory / "attempts" / str(number) / "inputs.json").read_bytes(),
+                             (directory / "inputs.json").read_bytes())
+
+    def test_native_attempt_consumes_the_shared_deadline_before_gateway_launch(self):
+        staged = json.loads((self.work / "staged.json").read_text())
+        self.settings({**staged["codex"], "timeout_s": 10})
+        self.fake(attempts=[{"exit": 1, "events": [{"type": "error", "message": LIMIT_TEXT}]}])
+        directory = self.work / "gpt6" / "gpt6-budget"
+        directory.mkdir(parents=True)
+        prompt, schema = self.prompt.read_bytes(), self.schema.read_bytes()
+        (directory / "prompt.txt").write_bytes(prompt)
+        (directory / "schema.json").write_bytes(schema)
+        write_json(directory / "inputs.json", codex_job.job_inputs(prompt, schema, "gpt-6.1-sol"))
+        clock = [0.0]
+
+        def wait_native(process, directory, config, deadline):
+            code = process.wait(timeout=5)  # the real subprocess is fake codex on PATH
+            self.assertEqual(deadline, 10)
+            clock[0] = 11.0
+            return code, None
+
+        with mock.patch.dict(os.environ, self.env), \
+                mock.patch.object(codex_job.time, "monotonic", side_effect=lambda: clock[0]), \
+                mock.patch.object(codex_job, "wait_process", side_effect=wait_native):
+            code = codex_job.run(self.work, "gpt6-budget")
+        result = codex_job.result(self.work, "gpt6-budget")
+        self.assertEqual((code, result["exit"], result["failure"]["kind"]), (3, 3, "usage"))
+        self.assertEqual(result["attempts"], [])
+        self.assertEqual((self.bin / "attempt-counter").read_text(), "1")
+        self.assertEqual(result["model"], "gpt-6.1-sol")
+        self.assertIsNone(result["route"], "no gateway route may be reported without a gateway launch")
+
+    def test_gateway_idle_retry_preserves_the_route(self):
+        staged = json.loads((self.work / "staged.json").read_text())
+        self.settings({**staged["codex"], "timeout_s": 400, "idle_timeout_s": 0.2, "kill_grace_s": 0.1})
+        result = self.job("gpt6-gateway-idle", attempts=[
+            {"exit": 1, "events": [{"type": "error", "message": LIMIT_TEXT}]},
+            {"exit": 0, "events": [], "sleep": 2},
+            {"exit": 0, "events": [COMPLETED], "last": LAST, "sleep": 0}])
+        self.assertEqual(result["exit"], 0)
+        self.assertEqual([a["failure"]["kind"] for a in result["attempts"]], ["usage", "idle"])
+        self.assertEqual(result["attempts"][1]["route"], result["route"])
+        self.assertEqual(result["route"]["native_attempt"], 1)
+
+    def test_limit_native_sends_new_jobs_directly_to_gateway_when_probe_is_not_allowed(self):
+        self.native_marker()
+        answer = quota_answer(99)
+        answer["ordinaryUsageAllowed"] = False
+        probes = self.bin / "probes.log"
+        result = self.job("gpt6-direct", last=LAST, events=[COMPLETED], quota={"log": str(probes), "result": answer})
+        self.assertEqual((result["exit"], result["model"], result["attempts"]), (0, "cx/gpt-6.1-sol-max", []))
+        self.assertIsNone(result["route"]["native_attempt"])
+        self.assertEqual(probes.read_text(), "probe\n")
+        self.assertTrue((self.work / "LIMIT-native").exists())
+        self.assertFalse((self.work / "LIMIT").exists())
+        self.assertIn('model_provider="omniroute"', self.record()["argv"])
+
+    def test_native_recovery_probe_clears_limit_native_and_returns_to_native(self):
+        self.native_marker()
+        probes = self.bin / "probes.log"
+        result = self.job("gpt6-recovered", last=LAST, events=[COMPLETED],
+                          quota={"log": str(probes), "result": quota_answer(4)})
+        self.assertEqual((result["exit"], result["model"], result["route"]), (0, "gpt-6.1-sol", None))
+        self.assertEqual(probes.read_text(), "probe\n")
+        self.assertFalse((self.work / "LIMIT-native").exists())
+        self.assertNotIn('model_provider="omniroute"', self.record()["argv"])
+        self.assertFalse(self.record()["api_key_present"])
+
+    def test_unknown_or_failed_recovery_probe_keeps_the_gateway_route(self):
+        for name, quota in (("unknown", {"result": {**quota_answer(0), "ordinaryUsageAllowed": None}}),
+                            ("failed", {"error": {"code": -32600, "message": "fixture error"}})):
+            with self.subTest(name=name):
+                self.native_marker()
+                result = self.job(f"gpt6-{name}", last=LAST, events=[COMPLETED], quota=quota)
+                self.assertEqual((result["exit"], result["model"]), (0, "cx/gpt-6.1-sol-max"))
+                self.assertTrue((self.work / "LIMIT-native").exists())
+                self.assertEqual(result["route"]["fallback_from"], "native")
+
+    def test_native_quota_gate_can_fail_over_without_a_native_model_call(self):
+        staged = json.loads((self.work / "staged.json").read_text())
+        self.settings({**staged["codex"], "quota_stop_percent": 95})
+        result = self.job("gpt6-gated", last=LAST, events=[COMPLETED], quota={"result": quota_answer(96)})
+        self.assertEqual((result["exit"], result["model"], result["limit_marker"]), (0, "cx/gpt-6.1-sol-max", False))
+        self.assertEqual(result["attempts"][0]["failure"]["kind"], "quota")
+        self.assertEqual(result["attempts"][0]["quota"]["status"], "gate")
+        self.assertEqual(json.loads((self.work / "LIMIT-native").read_text())["reset_time"], "2026-10-03T01:28Z")
+
+    def test_gateway_429_content_and_stderr_quotes_are_not_limits(self):
+        self.native_marker()
+        cited = {"type": "item.completed", "item": {"type": "agent_message", "text": RETRY_429_TEXT}}
+        answer = {**quota_answer(99), "ordinaryUsageAllowed": False}
+        result = self.job("gpt6-cited", last=LAST, events=[cited, COMPLETED],
+                          stderr="ERROR: " + RETRY_429_TEXT + "\n", quota={"result": answer})
+        self.assertEqual((result["exit"], result["limit"], result["limit_marker"]), (0, False, False))
+        result = self.job("gpt6-stderr-429", exit=1, events=[], stderr="ERROR: " + RETRY_429_TEXT + "\n",
+                          quota={"result": answer})
+        self.assertEqual((result["exit"], result["limit"], result["limit_marker"]), (1, False, False))
 
 
 class RunnerTests(RunnerCase):
@@ -2598,7 +3102,7 @@ class RecoveryRunnerTests(RunnerCase):
             clock[0] += version_delay_s
             return "codex-cli fixture"
 
-        def probe(base, directory, config):
+        def probe(base, directory, config, deadline=None):
             if len(starts) == 1:
                 clock[0] += retry_probe_delay_s
             return quota_probe(base, directory, config) if quota_probe else None
@@ -2990,6 +3494,33 @@ class ShellTests(RunnerCase):
 
 
 class ConvertTests(unittest.TestCase):
+    def test_route_provenance_survives_the_wrappers_fixed_field_copy(self):
+        work = temp_dir(self)
+        res = healthy_result()
+        route = {"provider": "omniroute", "fallback_from": "native", "reason": "native usage limit",
+                 "native_model": "gpt-6-astra", "gateway_model": "cx/gpt-6-astra-max", "native_attempt": 1,
+                 "base_url": "http://127.0.0.1:20129/v1", "gateway_effort": "max",
+                 "search_backend": "omniroute:/alpha/search"}
+        # The workflow does not copy result.route; conversion must read the runner's original sibling receipt.
+        res["first"][0]["fit_gpt6"]["model"] = "cx/gpt-6-astra-max"
+        self.assertNotIn("route", res["first"][0]["fit_gpt6"])
+        write_codex_files(work, res)
+        write_json(work / "gpt6/gpt6-fit-alpha/route.json", route)
+        out = self.convert(res, work=work)
+        self.assertEqual(out["returns"]["raw"]["alpha"]["first"]["gpt6_routes"], {"fit": route})
+        self.assertEqual(out["returns"]["votes"]["alpha"][0]["fit"]["gpt6"]["route"], route)
+        self.assertIn("cx/gpt-6-astra-max", out["lanes"]["lanes"][0]["result"]["limits"][0])
+        self.assertTrue(any("/alpha/search" in text for text in out["lanes"]["lanes"][0]["result"]["limits"]))
+
+    def test_without_a_launched_route_conversion_does_not_claim_a_gateway(self):
+        work = temp_dir(self)
+        res = healthy_result()
+        write_codex_files(work, res)
+        out = self.convert(res, work=work)
+        self.assertNotIn("gpt6_routes", out["returns"]["raw"]["alpha"]["first"])
+        self.assertNotIn("route", out["returns"]["votes"]["alpha"][0]["fit"]["gpt6"])
+        self.assertFalse(any("/alpha/search" in text for text in out["lanes"]["lanes"][0]["result"]["limits"]))
+
     def convert(self, res=None, models=None, work=None):
         return convert.convert(res or synthetic_result(), scope_for(), "landscape-sweep-20261026",
                                models or convert.resolved_models(None), work)
@@ -3313,6 +3844,46 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(out["layers"][0]["reopen"], [{"trigger": "retained_failure",
                                                        "ref": "@RETURNS@#/failures/alpha"}])
 
+    def test_superseded_empty_effort_attempt_with_max_retry_is_retained_separately(self):
+        # The upstream tool already supersedes same-key attempts; their empty effort is not an uncovered deviation.
+        raw = paused_child_usage("critic")
+        killed = raw["children"].pop(0)
+        retry = next(c for c in raw["children"] if c["label"] == "critic")
+        raw["superseded_attempts"] = [dict(killed, superseded_by=retry["agent_id"])]
+        raw["effort_mismatches"][0]["superseded_by"] = retry["agent_id"]
+        raw["status"] = "complete"
+        document = usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT)
+        out = convert.convert(healthy_two_layers(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["effort_deviations"], [])
+        self.assertEqual(out["summary"]["retained_failures"], {})
+        self.assertEqual(out["summary"]["reopened_layers"], [])
+        for layer in ("alpha", "beta"):
+            retained = out["returns"]["superseded_retained"][layer]
+            self.assertEqual([(r["round"], r["child"], r["superseded_by"]) for r in retained],
+                             [("critic", "critic", retry["agent_id"])])
+            self.assertTrue(retained[0]["reason"])
+
+    def test_superseded_attempt_needs_a_matching_complete_max_retry(self):
+        for condition in ("missing", "another label", "incomplete", "xhigh"):
+            with self.subTest(condition=condition):
+                raw = paused_child_usage("critic")
+                killed = raw["children"].pop(0)
+                retry = next(c for c in raw["children"] if c["label"] == "critic")
+                raw["superseded_attempts"] = [dict(killed, superseded_by=retry["agent_id"])]
+                if condition == "missing":
+                    raw["children"].remove(retry)
+                elif condition == "another label":
+                    retry["label"] = "discover:alpha"
+                elif condition == "incomplete":
+                    retry["complete"] = False
+                else:
+                    retry["efforts"] = ["xhigh"]
+                document = {"child_usage": raw}
+                out = convert.convert(healthy_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+                failures = out["returns"]["failures"]["alpha"]
+                self.assertTrue(any(f.get("superseded_by") == raw["superseded_attempts"][0]["superseded_by"]
+                                    and f["cause"] == "effort_deviation" for f in failures))
+
     def test_a_worker_with_a_capped_web_search_is_a_retained_failure_of_its_layer(self):
         # The session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION): child-usage.mjs counts capped calls.
         raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS + ["refute-fit:zeta"]))
@@ -3340,8 +3911,8 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(out["layers"][0]["reopen"], [{"trigger": "retained_failure",
                                                        "ref": "@RETURNS@#/failures/alpha"}])
 
-    def cli(self, work, res, *extra, codex_files=True):
-        run_file = write_json(work / "run.json", {"runId": "wf_fixture-1", "status": "completed", "result": res})
+    def cli(self, work, res, *extra, codex_files=True, run_id="wf_fixture-1"):
+        run_file = write_json(work / "run.json", {"runId": run_id, "status": "completed", "result": res})
         write_json(work / "scope.json", scope_for())
         if codex_files:
             write_codex_files(work, res)
@@ -3359,12 +3930,718 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(returns["workflow_run"], "wf_fixture-1")
         lanes = json.loads((work / "out/lanes.json").read_text())
         self.assertEqual(lanes["lanes"][0]["result"]["limits"][-1], "run note")
+        previous = {path.name: path.read_bytes() for path in (work / "out").iterdir()}
         identifier = "-".join(["0123abcd", "4567", "89ab", "cdef", "0123456789ab"])
         res["first"][0]["claude_discover"]["notes"] = f"session {identifier}"
         done = self.cli(work, res)
         self.assertEqual(done.returncode, 3)
         self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes: local session identifier", done.stderr)
         self.assertNotIn(identifier, done.stderr + done.stdout)
+        self.assertEqual(done.stdout, "")
+        self.assertEqual({path.name: path.read_bytes() for path in (work / "out").iterdir()}, previous)
+
+    def test_cli_redacts_dash_encoded_project_directory_in_notes(self):
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/"):
+            with self.subTest(prefix=prefix):
+                work = temp_dir(self)
+                res = healthy_result()
+                res["first"][0]["claude_discover"]["notes"] = prefix + encoded + "/session-fixture/notes"
+                done = self.cli(work, res)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 prefix + "<project-dir>/session-fixture/notes")
+
+    def test_cli_redacts_dash_encoded_project_directory_deeper_in_strings(self):
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/"):
+            with self.subTest(prefix=prefix):
+                work = temp_dir(self)
+                res = healthy_result()
+                notes = 'trace: (file="' + prefix + encoded + '/session-fixture/notes"); continued'
+                res["first"][0]["claude_discover"]["notes"] = {"details": [{"note": notes}]}
+                done = self.cli(work, res, "--limit", notes)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                expected = 'trace: (file="' + prefix + '<project-dir>/session-fixture/notes"); continued'
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {"details": [{"note": expected}]})
+                lanes = json.loads((work / "out/lanes.json").read_text())
+                self.assertEqual(lanes["lanes"][0]["result"]["limits"][-1], expected)
+                for name in ("returns", "lanes", "layers", "survivors"):
+                    self.assertNotIn(encoded, (work / f"out/{name}.json").read_text())
+
+    def test_cli_redacts_bare_and_suffixed_local_encoded_home(self):
+        # Mock the native home lookup, never the real HOME environment or a real user name.
+        for home in (Path("/") / "home" / "fixture.user", Path("/") / "Users" / "fixture.user"):
+            with self.subTest(home=home):
+                encoded = "-".join(("", home.parts[1], "fixture", "user"))
+                work = temp_dir(self)
+                res = healthy_result()
+                notes = {"bare": encoded, "path": encoded + "/session-fixture/notes",
+                         "project": encoded + "-code-project", "sentence": "read " + encoded + ". Next."}
+                res["first"][0]["claude_discover"]["notes"] = notes
+                run_file = write_json(work / "run.json", {"runId": encoded, "status": "completed", "result": res})
+                scope = write_json(work / "scope.json", scope_for())
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with mock.patch.object(convert.Path, "home", return_value=home), \
+                        contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                    code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                         "--out", str(work / "out")])
+                self.assertEqual(code, 0, stderr.getvalue())
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {"bare": "<project-dir>", "path": "<project-dir>/session-fixture/notes",
+                                  "project": "<project-dir>", "sentence": "read <project-dir>. Next."})
+                self.assertNotIn(encoded, stdout.getvalue())
+
+    def test_cli_redacts_bare_encoded_home_after_native_directory_anchors(self):
+        encoded = "-".join(("", "home", "fixtureuser"))
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/"):
+            with self.subTest(prefix=prefix):
+                work = temp_dir(self)
+                res = healthy_result()
+                res["first"][0]["claude_discover"]["notes"] = prefix + encoded + "/session-fixture"
+                done = self.cli(work, res)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 prefix + "<project-dir>/session-fixture")
+
+    def test_cli_redacts_encoded_profile_slugs_in_prose(self):
+        notes = "see the " + "-".join(("", "home", "assistant", "core")) + " repo and /docs/" + \
+            "-".join(("", "home", "page", "setup"))
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = notes
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         "see the <project-dir> repo and /docs/<project-dir>")
+
+    def test_cli_encoded_home_redaction_preserves_sentence_ending(self):
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = "read projects/" + encoded + ". Next sentence."
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         "read projects/<project-dir>. Next sentence.")
+
+    def test_cli_redacts_encoded_dict_key_and_printed_summary(self):
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        path = "projects/" + encoded
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {"details": [{path: "retained note"}]}
+        # runId reaches the printed summary; notes alone would make the stdout assertion vacuous.
+        done = self.cli(work, res, run_id=path)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {"details": [{"projects/<project-dir>": "retained note"}]})
+        self.assertNotIn(encoded, done.stdout)
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], "projects/<project-dir>")
+
+    def assert_anchored_profile_redaction(self, encoded_home):
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/"):
+            for suffix in ("", "-code-project"):
+                with self.subTest(prefix=prefix, suffix=suffix):
+                    work = temp_dir(self)
+                    encoded = encoded_home + suffix
+                    path = prefix + encoded
+                    res = healthy_result()
+                    res["first"][0]["claude_discover"]["notes"] = {
+                        "string": "read " + path + ". Next.", path: "retained note"}
+                    done = self.cli(work, res, run_id=path)
+                    self.assertEqual(done.returncode, 0, done.stderr)
+                    returns = json.loads((work / "out/returns.json").read_text())
+                    expected = prefix + "<project-dir>"
+                    self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                     {"string": "read " + expected + ". Next.", expected: "retained note"})
+                    for name in ("returns", "lanes", "layers", "survivors"):
+                        self.assertNotIn(encoded_home, (work / f"out/{name}.json").read_text())
+                    self.assertNotIn(encoded_home, done.stdout)
+                    self.assertEqual(json.loads(done.stdout)["run"]["runId"], expected)
+
+    def test_cli_redacts_anchored_linux_profile_in_strings_keys_and_summary(self):
+        self.assert_anchored_profile_redaction("-".join(("", "home", "fixtureuser")))
+
+    def test_cli_redacts_anchored_macos_profile_in_strings_keys_and_summary(self):
+        self.assert_anchored_profile_redaction("-".join(("", "Users", "fixtureuser")))
+
+    def assert_profile_context_redaction(self, encoded_home, prefix=""):
+        work = temp_dir(self)
+        encoded = prefix + encoded_home
+        contexts = ("{}", "read {}", "https://example.test/{}/notes", "https://example.test/?project={}",
+                    "https://example.test/list#{}", "cache=/data/{}/", "/srv/{}/notes.md#L4")
+        strings = [context.format(encoded) for context in contexts]
+        expected = [context.format(prefix + "<project-dir>") for context in contexts]
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = [{"value": text, text: "retained note"} for text in strings]
+        done = self.cli(work, res, run_id=" | ".join(strings))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         [{"value": text, text: "retained note"} for text in expected])
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(expected))
+        for name in ("returns", "lanes", "layers", "survivors"):
+            self.assertNotIn(encoded_home, (work / f"out/{name}.json").read_text())
+        self.assertNotIn(encoded_home, done.stdout)
+
+    def test_cli_redacts_bare_macos_case_variants_in_all_contexts(self):
+        for users in ("users", "USERS", "uSeRs"):
+            for suffix in ("", "-code-project"):
+                with self.subTest(users=users, suffix=suffix):
+                    self.assert_profile_context_redaction("-".join(("", users, "fixtureuser")) + suffix)
+
+    def test_cli_redacts_anchored_macos_case_variants_in_all_contexts(self):
+        for users in ("users", "USERS", "uSeRs"):
+            for prefix in ("projects/", "claude-1000/"):
+                for suffix in ("", "-code-project"):
+                    with self.subTest(users=users, prefix=prefix, suffix=suffix):
+                        self.assert_profile_context_redaction("-".join(("", users, "fixtureuser")) + suffix, prefix)
+
+    def test_cli_redacts_dots_only_profile_names(self):
+        roots = (("", "home"), ("", "Users"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
+        for parts in roots:
+            for name in (".", "..", "..."):
+                with self.subTest(parts=parts, name=name):
+                    self.assert_profile_context_redaction("-".join((*parts, name)))
+
+    def test_cli_preserves_example_profiles_before_non_tail_punctuation(self):
+        roots = (("", "home"), ("", "uSeRs"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
+        controls = [prefix + "-".join((*parts, "example")) + tail
+                    for parts in roots for prefix in ("", "projects/", "claude-1000/")
+                    for tail in (",", ";", ":", ">", "}", "&", "?", "#", "=", "|", "*", "!", "\u2026", "\u2019", "\x1b")]
+        work = temp_dir(self)
+        res = healthy_result()
+        notes = [{"value": text, text: "retained control"} for text in controls]
+        res["first"][0]["claude_discover"]["notes"] = notes
+        done = self.cli(work, res, run_id=" | ".join(controls))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(controls))
+
+    def test_cli_redacts_non_name_tails_in_all_contexts(self):
+        roots = (("", "home"), ("", "uSeRs"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
+        contexts = ("{}", "projects/{}", "claude-1000/{}", "https://example.test/?project={}&tab=1")
+        tails = (",", ":", ";", "*", "&", "#", "?", "=", ">", "}", "|", "!")
+        strings, expected = [], []
+        for parts in roots:
+            encoded = "-".join((*parts, "fixtureuser"))
+            for tail in tails:
+                for context in contexts:
+                    strings.append(context.format(encoded + tail))
+                    expected.append(context.format("<project-dir>" + tail))
+            strings.extend(("?project=" + encoded + "&tab=1", encoded + ", " + encoded + ";"))
+            expected.extend(("?project=<project-dir>&tab=1", "<project-dir>, <project-dir>;"))
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = [{"value": text, text: "retained note"} for text in strings]
+        done = self.cli(work, res, run_id=" | ".join(strings))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         [{"value": text, text: "retained note"} for text in expected])
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(expected))
+
+    def test_cli_redacts_serialized_profile_tails_and_preserves_unicode_summary(self):
+        pattern = dict(sweep_common.private_content(ROOT))["encoded home path"]
+        roots = (("", "home"), ("", "Users"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
+        tails = ("\u2026", "\u2019", "\x1b")
+        strings = ["see " + "-".join((*parts, "fixtureuser")) + tail for parts in roots for tail in tails]
+        expected = ["see <project-dir>" + tail for _ in roots for tail in tails]
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = [{"value": text, text: "retained note"} for text in strings]
+        done = self.cli(work, res, run_id=" | ".join(strings))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        emitted_returns = (work / "out/returns.json").read_bytes().decode("utf-8")
+        self.assertIsNone(pattern.search(emitted_returns))
+        self.assertIsNone(pattern.search(done.stdout))
+        self.assertEqual(json.loads(emitted_returns)["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         [{"value": text, text: "retained note"} for text in expected])
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(expected))
+        for tail in tails[:2]:
+            self.assertIn(tail, done.stdout)
+        self.assertNotIn("\\u2026", done.stdout)
+        self.assertNotIn("\\u2019", done.stdout)
+        self.assertIn("\\u001b", done.stdout)
+
+    def test_cli_refuses_serialized_profile_residue_before_publishing(self):
+        # Inject a redaction failure to exercise the independent emitted-text backstop with the real rule.
+        pattern = dict(sweep_common.private_content(ROOT))["encoded home path"]
+        encoded = "-".join(("", "home", "fixtureuser"))
+        strings = ["see " + encoded + tail for tail in ("\u2026", "\u2019", "\x1b")]
+        self.assertTrue(all(pattern.search(text) is None for text in strings))
+        candidate = temp_dir(self) / "candidate-returns.json"
+        sweep_common.write_json(candidate, {"notes": strings})
+        self.assertIsNotNone(pattern.search(candidate.read_bytes().decode("utf-8")))
+        for location in ("returns.json", "printed summary"):
+            with self.subTest(location=location):
+                work = temp_dir(self)
+                res = healthy_result()
+                if location == "returns.json":
+                    res["first"][0]["claude_discover"]["notes"] = [
+                        {"value": text, text: "retained note"} for text in strings]
+                run_id = " | ".join(strings) if location == "printed summary" else "wf_fixture-1"
+                run_file = write_json(work / "run.json", {"runId": run_id, "status": "completed", "result": res})
+                scope = write_json(work / "scope.json", scope_for())
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with mock.patch.object(convert, "redact_project_dirs", side_effect=lambda value, *args: value), \
+                        contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                    code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                         "--out", str(work / "out")])
+                self.assertEqual(code, 3, stderr.getvalue())
+                self.assertIn(location + "#/<serialized>: encoded home path", stderr.getvalue())
+                self.assertEqual(stdout.getvalue(), "")
+                self.assertNotIn(encoded, stderr.getvalue())
+                self.assertFalse((work / "out").exists())
+
+    def test_cli_redacts_complete_local_name_fragments(self):
+        work = temp_dir(self)
+        home = Path("/") / "home" / "fixturelocal"
+        encoded = "-".join(("", "home", "fixturelocal"))
+        contexts = ("{}/", "projects/{}/", "https://example.test/?project={}", "cache=/data/{}/")
+        suffixes = (".smith", "_smith", "9smith", ".smith-code", ".smith\u00e9", "_smith\u00e9", ".smith_\u65e5\u672c")
+        strings = [context.format(encoded + suffix) for suffix in suffixes
+                   for context in contexts]
+        expected = [context.format("<project-dir>") for _ in suffixes for context in contexts]
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = [{"value": text, text: "retained note"} for text in strings]
+        run_file = write_json(work / "run.json", {"runId": " | ".join(strings), "status": "completed", "result": res})
+        scope = write_json(work / "scope.json", scope_for())
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with mock.patch.object(convert.Path, "home", return_value=home), \
+                contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                 "--out", str(work / "out")])
+        self.assertEqual(code, 0, stderr.getvalue())
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         [{"value": text, text: "retained note"} for text in expected])
+        self.assertEqual(json.loads(stdout.getvalue())["run"]["runId"], " | ".join(expected))
+        self.assertNotIn("smith", stdout.getvalue() + (work / "out/returns.json").read_text())
+
+    def test_redactor_output_passes_actual_encoded_home_publication_rule(self):
+        patterns = [(kind, pattern) for kind, pattern in sweep_common.private_content(ROOT)
+                    if kind == "encoded home path"]
+        self.assertEqual(len(patterns), 1,
+                         "#697 at 0d2a38b2 must be on the base: scripts/validate.py has no unique encoded home path rule")
+        roots = ["-".join(("", "home"))]
+        roots.extend("-".join(("", users)) for users in ("Users", "users", "USERS", "uSeRs"))
+        roots.extend("-".join(("", "mnt", drive, users)) for drive, users in
+                     (("c", "Users"), ("C", "users"), ("D", "USERS"), ("d", "uSeRs")))
+        roots.extend("-".join((drive, "", users)) for drive, users in
+                     (("D", "Users"), ("d", "users"), ("C", "USERS"), ("c", "uSeRs")))
+        roots.extend(drive + "---" + users for drive, users in (("E", "Users"), ("e", "uSeRs")))
+        names = ("fixtureuser", "fixture.user", "fixture_user", "fixture9", "fixture-user",
+                 "fixture.user-code-project", "fixture_user-code-project", "fixturelocal", "fixturelocal.smith",
+                 "fixturelocal_smith", ".", "..", "...", "example", "ExAmPlE", "example.person", "exampleuser", "<user>")
+        tails = ("", "/", "\\", '"', "'", " ", "\t", "\n", "`", ")", "]", ",", ";", ":", ".",
+                 ">", "}", "&", "?", "#", "=", "*", "|", "!", "\u2026", "\u2019", "\x1b")
+        contexts = ("{}", "read {} continued", "projects/{}", "claude-1000/{}", "~/.claude/projects/{}",
+                    "/tmp/claude-1000/{}", "https://example.test/{}", "https://example.test/?project={}",
+                    "https://example.test/list#{}", "//example.test/{}", "cache=/data/{}", "/srv/{}/notes.md#L4",
+                    "docs/readme.md#{}", "docs/search?q=dir/{}", "?project={}", "assignment={}", ".{}",
+                    "word{}", "-{}", "{}. Next.")
+        strings = [context.format(root + "-" + name + tail) for root in roots for name in names
+                   for tail in tails for context in contexts]
+        self.assertGreater(sum(bool(patterns[0][1].search(text)) for text in strings), 0)
+        document = [{"value": text, text: "retained note"} for text in strings]
+        home = Path("/") / "home" / "fixturelocal"
+        with mock.patch.object(convert.Path, "home", return_value=home):
+            redacted = convert.redact_project_dirs(document, work=None, repo_root=None)
+        findings = sweep_common.private_findings(redacted, patterns)
+        self.assertFalse(findings, f"{len(findings)} encoded-home residues; first safe locator: {findings[:1]}")
+        emitted = json.dumps(redacted, indent=1, ensure_ascii=False) + "\n"
+        self.assertIsNone(patterns[0][1].search(emitted), "serialized fixture matrix retains an encoded home")
+
+    def test_cli_redacts_anchored_wsl_profile_in_strings_keys_and_summary(self):
+        for drive, users in (("c", "Users"), ("D", "uSeRs")):
+            with self.subTest(drive=drive, users=users):
+                self.assert_anchored_profile_redaction("-".join(("", "mnt", drive, users, "fixtureuser")))
+
+    def test_cli_redacts_anchored_windows_profile_in_strings_keys_and_summary(self):
+        # The converter covers encodings with multiple separators after the drive colon.
+        for drive, users, separators in (("D", "Users", 1), ("c", "uSeRs", 1), ("E", "Users", 2)):
+            with self.subTest(drive=drive, users=users, separators=separators):
+                self.assert_anchored_profile_redaction(drive + "-" * (separators + 1) + users + "-fixtureuser")
+
+    def test_cli_preserves_anchored_example_profiles(self):
+        # Only lowercase example followed by the publication rule's tail is exempt.
+        homes = (("", "home", "example"), ("", "Users", "example"),
+                 ("", "mnt", "c", "Users", "example"), ("D", "", "Users", "example"))
+        for parts in homes:
+            for prefix in ("projects/", "claude-1000/"):
+                with self.subTest(parts=parts, prefix=prefix):
+                    work = temp_dir(self)
+                    path = prefix + "-".join(parts) + "-code-project"
+                    res = healthy_result()
+                    notes = {"string": "read " + path + ". Next.", path: "retained note"}
+                    res["first"][0]["claude_discover"]["notes"] = notes
+                    done = self.cli(work, res, run_id=path)
+                    self.assertEqual(done.returncode, 0, done.stderr)
+                    returns = json.loads((work / "out/returns.json").read_text())
+                    self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
+                    self.assertEqual(json.loads(done.stdout)["run"]["runId"], path)
+        # The exemption must not include a distinct username that starts with 'example'.
+        self.assert_anchored_profile_redaction("-".join(("", "home", "exampleuser")))
+
+    def test_cli_redacts_unanchored_project_slugs(self):
+        homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
+                 ("", "mnt", "c", "Users", "fixtureuser"), ("D", "", "Users", "fixtureuser"))
+        notes = "home-assistant and " + ", ".join("-".join(parts) + "-code-project" for parts in homes)
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = notes
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         "home-assistant and " + ", ".join("<project-dir>" for _ in homes))
+
+    def assert_bare_profile_conversion(self, encoded_home, expected_home="<project-dir>"):
+        for suffix in ("/session-fixture", "\\session-fixture", '" quoted', "' quoted", " continued",
+                       "\tcontinued", "\ncontinued", "` quoted", ")", "]", ""):
+            with self.subTest(suffix=suffix):
+                work = temp_dir(self)
+                path = encoded_home + suffix
+                expected = expected_home + suffix
+                res = healthy_result()
+                res["first"][0]["claude_discover"]["notes"] = {"details": [{"string": "read " + path,
+                                                                           path: "retained note"}]}
+                done = self.cli(work, res, run_id=path)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {"details": [{"string": "read " + expected, expected: "retained note"}]})
+                self.assertEqual(json.loads(done.stdout)["run"]["runId"], expected)
+                if expected_home != encoded_home:
+                    for name in ("returns", "lanes", "layers", "survivors"):
+                        self.assertNotIn(encoded_home, (work / f"out/{name}.json").read_text())
+                    self.assertNotIn(encoded_home, done.stdout)
+
+    def test_cli_redacts_generic_bare_linux_home_for_each_terminator(self):
+        self.assert_bare_profile_conversion("-".join(("", "home", "fixtureuser")))
+
+    def test_cli_redacts_generic_bare_macos_home_for_each_terminator(self):
+        self.assert_bare_profile_conversion("-".join(("", "Users", "fixtureuser")))
+
+    def test_cli_redacts_generic_bare_wsl_home_for_each_terminator(self):
+        for drive, users in (("c", "Users"), ("D", "uSeRs")):
+            with self.subTest(drive=drive, users=users):
+                self.assert_bare_profile_conversion("-".join(("", "mnt", drive, users, "fixtureuser")))
+
+    def test_cli_redacts_generic_bare_windows_home_for_each_terminator(self):
+        for drive, users in (("D", "Users"), ("c", "uSeRs")):
+            with self.subTest(drive=drive, users=users):
+                self.assert_bare_profile_conversion("-".join((drive, "", users, "fixtureuser")))
+
+    def test_cli_preserves_generic_bare_home_prose_and_boundaries(self):
+        homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
+                 ("", "mnt", "c", "Users", "fixtureuser"), ("D", "", "Users", "fixtureuser"))
+        controls = ["home-assistant", "my-home-page", "-".join(("", "home", ""))]
+        for parts in homes:
+            slug = "-".join(parts)
+            controls.extend(("word" + slug, "-" + slug))
+        work = temp_dir(self)
+        res = healthy_result()
+        notes = {"strings": controls, "keys": {control: "retained control" for control in controls}}
+        res["first"][0]["claude_discover"]["notes"] = notes
+        run_id = " | ".join(controls)
+        done = self.cli(work, res, run_id=run_id)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], run_id)
+
+    def test_cli_preserves_generic_bare_example_homes_for_each_terminator(self):
+        homes = (("", "home", "example"), ("", "Users", "example"),
+                 ("", "mnt", "c", "Users", "example"), ("D", "", "Users", "example"))
+        for parts in homes:
+            with self.subTest(parts=parts):
+                slug = "-".join(parts)
+                self.assert_bare_profile_conversion(slug, expected_home=slug)
+        self.assert_bare_profile_conversion("-".join(("", "home", "exampleuser")))
+
+    def test_cli_redacts_unanchored_profile_slugs_in_urls(self):
+        homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
+                 ("", "mnt", "c", "Users", "fixtureuser"), ("D", "", "Users", "fixtureuser"))
+        for parts in homes:
+            with self.subTest(parts=parts):
+                encoded = "-".join(parts)
+                controls = ["https://example.test/list#" + encoded,
+                            "https://example.test/search?q=" + encoded,
+                            "https://example.test/" + encoded,
+                            "https://example.test/dir/" + encoded + "/docs",
+                            "https://example.test/?q=dir/" + encoded,
+                            "//example.test/" + encoded,
+                            "docs/readme.md#" + encoded,
+                            "docs/search?q=dir/" + encoded,
+                            "search=dir/" + encoded,
+                            "?project=" + encoded + "-code-project",
+                            "/srv/" + encoded + "/notes.md#L4",
+                            "cache=/data/" + encoded + "/",
+                            "?next=" + encoded, "#" + encoded, "=" + encoded]
+                work = temp_dir(self)
+                res = healthy_result()
+                notes = {"strings": controls, "keys": {control: "retained control" for control in controls}}
+                res["first"][0]["claude_discover"]["notes"] = notes
+                run_id = " | ".join(controls)
+                done = self.cli(work, res, run_id=run_id)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                expected = [control.replace(encoded + "-code-project", "<project-dir>")
+                            .replace(encoded, "<project-dir>") for control in controls]
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {"strings": expected, "keys": {text: "retained control" for text in expected}})
+                self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(expected))
+                self.assertNotIn(encoded, done.stdout + (work / "out/returns.json").read_text())
+
+    def test_cli_redacts_local_encoded_home_in_urls(self):
+        work = temp_dir(self)
+        home = Path("/") / "home" / "fixtureuser"
+        encoded = "-".join(("", "home", "fixtureuser"))
+        controls = ["https://example.test/" + encoded,
+                    "https://example.test/dir/" + encoded + "-code-project",
+                    "docs/search?q=dir/" + encoded,
+                    "?project=" + encoded + "-code-project",
+                    "/srv/" + encoded + "/notes.md#L4",
+                    "cache=/data/" + encoded + "/"]
+        res = healthy_result()
+        notes = {"strings": controls, "keys": {control: "retained control" for control in controls}}
+        res["first"][0]["claude_discover"]["notes"] = notes
+        run_id = " | ".join(controls)
+        run_file = write_json(work / "run.json", {"runId": run_id, "status": "completed", "result": res})
+        scope = write_json(work / "scope.json", scope_for())
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with mock.patch.object(convert.Path, "home", return_value=home), \
+                contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                 "--out", str(work / "out")])
+        self.assertEqual(code, 0, stderr.getvalue())
+        returns = json.loads((work / "out/returns.json").read_text())
+        expected = [control.replace(encoded + "-code-project", "<project-dir>")
+                    .replace(encoded, "<project-dir>") for control in controls]
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {"strings": expected, "keys": {text: "retained control" for text in expected}})
+        self.assertEqual(json.loads(stdout.getvalue())["run"]["runId"], " | ".join(expected))
+        self.assertNotIn(encoded, stdout.getvalue() + (work / "out/returns.json").read_text())
+
+    def test_cli_redacts_local_checkout_and_work_encodings_inside_urls(self):
+        work = temp_dir(self)
+        linux_home = Path("/") / "home" / "fixturelinux"
+        wsl_root = Path("/") / "mnt" / "c" / "Users" / "fixtureuser" / "code" / "project"
+        for root, private_path in ((ROOT, work), (wsl_root, wsl_root)):
+            with self.subTest(root=root, private_path=private_path):
+                encoded = re.sub(r"[^a-zA-Z0-9]", "-", str(private_path.resolve()))
+                path = "https://example.test/?project=" + encoded + "-nested"
+                expected = "https://example.test/?project=<project-dir>"
+                res = healthy_result()
+                res["first"][0]["claude_discover"]["notes"] = {"string": path, path: "retained note"}
+                run_file = write_json(work / "run.json", {"runId": path, "status": "completed", "result": res})
+                scope = write_json(work / "scope.json", scope_for())
+                write_codex_files(work, res)
+                patterns = sweep_common.private_content(ROOT)
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with mock.patch.object(convert.Path, "home", return_value=linux_home), \
+                        mock.patch.object(convert, "private_content", return_value=patterns), \
+                        contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                    code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                         "--work-dir", str(work), "--repo-root", str(root),
+                                         "--out", str(work / "out")])
+                self.assertEqual(code, 0, stderr.getvalue())
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {"string": expected, expected: "retained note"})
+                self.assertEqual(json.loads(stdout.getvalue())["run"]["runId"], expected)
+                self.assertNotIn(encoded, stdout.getvalue() + (work / "out/returns.json").read_text())
+
+    def test_cli_redacts_publication_rule_name_and_boundary_cases(self):
+        homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
+                 ("", "mnt", "c", "Users", "fixtureuser"), ("D", "", "Users", "fixtureuser"))
+        for parts in homes:
+            for suffix in ("_", ".person", ".", "-code-project"):
+                with self.subTest(parts=parts, suffix=suffix):
+                    encoded = "-".join(parts)
+                    path = "." + encoded + suffix
+                    expected = ".<project-dir>" + ("." if suffix == "." else "")
+                    work = temp_dir(self)
+                    res = healthy_result()
+                    res["first"][0]["claude_discover"]["notes"] = {"string": path, path: "retained note"}
+                    done = self.cli(work, res, run_id=path)
+                    self.assertEqual(done.returncode, 0, done.stderr)
+                    returns = json.loads((work / "out/returns.json").read_text())
+                    self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                     {"string": expected, expected: "retained note"})
+                    self.assertEqual(json.loads(done.stdout)["run"]["runId"], expected)
+                    self.assertNotIn(encoded, done.stdout)
+
+    def test_cli_redacts_publication_rule_example_case_and_suffix_variants(self):
+        homes = (("", "home"), ("", "Users"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
+        for parts in homes:
+            for name in ("ExAmPlE", "example.person", "exampleuser"):
+                with self.subTest(parts=parts, name=name):
+                    self.assert_anchored_profile_redaction("-".join((*parts, name)))
+                    self.assert_bare_profile_conversion("-".join((*parts, name)))
+
+    def test_cli_redacts_anchored_profile_slugs_inside_urls(self):
+        homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
+                 ("", "mnt", "c", "Users", "fixtureuser"), ("D", "", "Users", "fixtureuser"))
+        for parts in homes:
+            for prefix in ("projects/", "claude-1000/"):
+                with self.subTest(parts=parts, prefix=prefix):
+                    encoded = "-".join(parts) + "-code-project"
+                    path = "https://example.test/" + prefix + encoded + "/notes"
+                    expected = "https://example.test/" + prefix + "<project-dir>/notes"
+                    work = temp_dir(self)
+                    res = healthy_result()
+                    res["first"][0]["claude_discover"]["notes"] = {"string": path, path: "retained note"}
+                    done = self.cli(work, res, run_id=path)
+                    self.assertEqual(done.returncode, 0, done.stderr)
+                    returns = json.loads((work / "out/returns.json").read_text())
+                    self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                     {"string": expected, expected: "retained note"})
+                    self.assertEqual(json.loads(done.stdout)["run"]["runId"], expected)
+                    self.assertNotIn(encoded, done.stdout)
+
+    def assert_cli_key_collision(self, work, res, locator_pattern, private_keys):
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 3, done.stderr)
+        self.assertRegex(done.stderr, r"returns\.json#" + locator_pattern + r": redaction key collision")
+        self.assertEqual(done.stdout, "")
+        self.assertFalse((work / "out").exists(), "collision must be detected before writing artifacts")
+        for key in private_keys:
+            self.assertNotIn(key, done.stderr)
+
+    def test_cli_fails_closed_on_encoded_key_collision(self):
+        work = temp_dir(self)
+        encoded = ["-".join(("", root, "fixtureuser")) for root in ("home", "Users")]
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {
+            "details": [{encoded[0]: "first note", encoded[1]: "second note"}]}
+        self.assert_cli_key_collision(work, res, r"/(?:<key-\d+>/){6}0", encoded)
+
+    def test_cli_fails_closed_on_host_sanitize_key_collision(self):
+        work = temp_dir(self)
+        private_key = str(work) + "/one"
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {
+            "details": [{private_key: "first note", "<work-dir>/one": "second note"}]}
+        self.assert_cli_key_collision(work, res, r"/(?:<key-\d+>/){6}0", [private_key])
+
+    def test_cli_key_collision_reports_only_indices(self):
+        work = temp_dir(self)
+        parent = "-".join(("0123abcd", "4567", "89ab", "cdef", "0123456789ab"))
+        encoded = ["-".join(("", root, "fixtureuser")) for root in ("home", "Users")]
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {parent: {encoded[0]: "first", encoded[1]: "second"}}
+        self.assert_cli_key_collision(work, res, r"(?:/<key-\d+>){6}", [parent, *encoded])
+
+    def test_cli_refuses_private_residue_before_publishing(self):
+        work = temp_dir(self)
+        identifier = "-".join(("0123abcd", "4567", "89ab", "cdef", "0123456789ab"))
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = identifier
+        done = self.cli(work, res, run_id=identifier)
+        self.assertEqual(done.returncode, 3, done.stderr)
+        self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes: local session identifier", done.stderr)
+        self.assertIn("printed summary#/run/runId: local session identifier", done.stderr)
+        self.assertNotIn(identifier, done.stderr)
+        self.assertEqual(done.stdout, "")
+        self.assertFalse((work / "out").exists())
+
+    def test_cli_refuses_private_keys_without_printing_text(self):
+        work = temp_dir(self)
+        identifier = "-".join(("0123abcd", "4567", "89ab", "cdef", "0123456789ab"))
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {"details": [{identifier: {"value": identifier}}]}
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 3, done.stderr)
+        self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes/details/0/<key-0>: "
+                      "local session identifier (in a key)", done.stderr)
+        self.assertNotIn(identifier, done.stderr)
+        self.assertEqual(done.stdout, "")
+        self.assertFalse((work / "out").exists())
+
+    def test_cli_wires_selected_validator_patterns_to_publication_check(self):
+        work = temp_dir(self)
+        selected = work / "selected-checkout"
+        (selected / "scripts").mkdir(parents=True)
+        validator = (ROOT / "scripts/validate.py").read_text()
+        validator += '\nPRIVATE_CONTENT += (("selected checkout fixture", re.compile("selected-validator-only")),)\n'
+        (selected / "scripts/validate.py").write_text(validator, encoding="utf-8")
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = "selected-validator-only"
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        previous = {path.name: path.read_bytes() for path in (work / "out").iterdir()}
+        done = self.cli(work, res, "--repo-root", selected)
+        self.assertEqual(done.returncode, 3, done.stderr)
+        self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes: selected checkout fixture", done.stderr)
+        self.assertEqual(done.stdout, "")
+        self.assertEqual({path.name: path.read_bytes() for path in (work / "out").iterdir()}, previous)
+
+    def test_cli_redacts_unanchored_wsl_checkout_with_linux_home(self):
+        work = temp_dir(self)
+        linux_home = Path("/") / "home" / "fixturelinux"
+        wsl_root = Path("/") / "mnt" / "c" / "Users" / "fixtureuser" / "code" / "project"
+        encoded = "-".join(("", "mnt", "c", "Users", "fixtureuser", "code", "project"))
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {
+            "bare": encoded, "string": "read " + encoded + "-nested. Next.", encoded: "retained note"}
+        run_file = write_json(work / "run.json", {"runId": encoded, "status": "completed", "result": res})
+        scope = write_json(work / "scope.json", scope_for())
+        # Use the actual validator's patterns while the checkout root is a synthetic WSL profile.
+        patterns = sweep_common.private_content(ROOT)
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with mock.patch.object(convert.Path, "home", return_value=linux_home), \
+                mock.patch.object(convert, "REPO_ROOT", wsl_root), \
+                mock.patch.object(convert, "private_content", return_value=patterns), \
+                contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                 "--out", str(work / "out")])
+        self.assertEqual(code, 0, stderr.getvalue())
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {"bare": "<project-dir>", "string": "read <project-dir>. Next.",
+                          "<project-dir>": "retained note"})
+        for name in ("returns", "lanes", "layers", "survivors"):
+            self.assertNotIn(encoded, (work / f"out/{name}.json").read_text())
+        self.assertNotIn(encoded, stdout.getvalue())
+        self.assertEqual(json.loads(stdout.getvalue())["run"]["runId"], "<project-dir>")
+
+    def test_cli_redacts_unanchored_encoded_work_directory(self):
+        work = temp_dir(self)
+        encoded = re.sub(r"[^a-zA-Z0-9]", "-", str(work.resolve()))
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {
+            "string": "read " + encoded + "-nested. Next.", encoded: "retained note"}
+        done = self.cli(work, res, run_id=encoded)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {"string": "read <project-dir>. Next.", "<project-dir>": "retained note"})
+        self.assertNotIn(encoded, done.stdout)
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], "<project-dir>")
+
+    def test_cli_preserves_home_substrings_inside_ordinary_words(self):
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        notes = "word" + encoded + " and component-home-widget; unchanged"
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = notes
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
 
     def test_cli_compares_each_gpt6_output_with_the_file_codex_wrote(self):
         work = temp_dir(self)
@@ -3410,6 +4687,220 @@ class ConvertTests(unittest.TestCase):
 
 
 class UsageRecordTests(unittest.TestCase):
+    def measure_paused(self, raw):
+        work = temp_dir(self)
+        stdout = json.dumps(raw).encode("utf-8")
+        (work / "raw.json").write_bytes(stdout)
+        done = run([sys.executable, HARNESS / "usage_record.py", "--raw-output", work / "raw.json", "--exit-code", "1",
+                    "--out", work / "usage.json"])
+        document = json.loads((work / "usage.json").read_text())
+        self.assertEqual(document["measurement"]["exit_code"], 1)
+        self.assertEqual(document["measurement"]["raw_output_sha256"], hashlib.sha256(stdout).hexdigest())
+        return done, document
+
+    def test_killed_critic_rerun_under_changed_call_key_is_superseded(self):
+        raw = paused_child_usage("critic")
+        # Aggregate usage is already over all attempts; moving a child must never add it a second time.
+        raw["by_resolved_model"] = {"claude-opus-5-5": {"children": 2, "output_tokens": 17}}
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        usage = document["child_usage"]
+        retry = next(c for c in usage["children"] if c["label"] == "critic")
+        self.assertEqual(usage["status"], "complete")
+        self.assertEqual([(c["agent_id"], c["superseded_by"], c["reason"]) for c in usage["superseded_attempts"]],
+                         [("killed", retry["agent_id"], "no result entry; a later complete attempt with the same label "
+                           "returned; call keys not compared")])
+        self.assertEqual(usage["by_resolved_model"], {"claude-opus-5-5": {"children": 2, "output_tokens": 17}})
+        self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 1)
+        self.assertIn("1", usage["reason"])
+        out = convert.convert(healthy_two_layers(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["retained_failures"], {})
+        for layer in ("alpha", "beta"):
+            self.assertEqual(out["returns"]["superseded_retained"][layer][0]["child"], "critic")
+        self.assertEqual(make_result.check_usage(document, "fixture", out["returns"], ("alpha", "beta")), usage)
+
+    def test_killed_followup_refuter_rerun_is_superseded(self):
+        label = "refute-facts:beta:followup"
+        done, document = self.measure_paused(paused_child_usage(label))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        usage = document["child_usage"]
+        self.assertEqual(usage["status"], "complete")
+        self.assertEqual([c["label"] for c in usage["superseded_attempts"]], [label])
+        out = convert.convert(synthetic_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["effort_deviations"], [])
+        self.assertEqual(set(out["returns"]["superseded_retained"]), {"beta"})
+        retained = out["returns"]["superseded_retained"]["beta"]
+        self.assertEqual([(r["round"], r["child"]) for r in retained], [("followup", label)])
+        self.assertEqual(make_result.check_usage(document, "fixture", out["returns"], ("alpha", "beta")), usage)
+
+    def test_incomplete_child_without_later_same_label_stays_incomplete(self):
+        raw = paused_child_usage("critic")
+        next(c for c in raw["children"] if c["label"] == "critic" and c["complete"])["label"] = "critic:other"
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1)
+        usage = document["child_usage"]
+        self.assertEqual(usage["status"], "incomplete")
+        self.assertEqual([c["agent_id"] for c in usage["children"] if not c["complete"]], ["killed"])
+        self.assertEqual(usage.get("superseded_attempts", []), [])
+
+    def test_later_same_label_incomplete_attempt_links_nothing(self):
+        raw = paused_child_usage("critic")
+        next(c for c in raw["children"] if c["label"] == "critic" and c["complete"])["complete"] = False
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1)
+        usage = document["child_usage"]
+        self.assertEqual(usage["status"], "incomplete")
+        self.assertEqual(len([c for c in usage["children"] if not c["complete"]]), 2)
+        self.assertEqual(usage.get("superseded_attempts", []), [])
+
+    def test_result_bearing_or_unclassified_incomplete_child_is_not_linked(self):
+        for issue in ("null result", "empty result", "wait-notice result", "missing meta.json", None):
+            with self.subTest(issue=issue):
+                raw = paused_child_usage("critic")
+                if issue is None:
+                    raw["children"][0].pop("issues")
+                else:
+                    raw["children"][0]["issues"] = [issue]
+                done, document = self.measure_paused(raw)
+                self.assertEqual(done.returncode, 1)
+                self.assertEqual(document["child_usage"]["status"], "incomplete")
+                self.assertEqual(document["child_usage"].get("superseded_attempts", []), [])
+                self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 0)
+
+    def test_multiple_complete_children_with_the_same_label_prevent_linking(self):
+        for earlier in (False, True):
+            with self.subTest(earlier=earlier):
+                raw = paused_child_usage("critic")
+                retry = next(c for c in raw["children"] if c["label"] == "critic" and c["complete"])
+                other = dict(retry, agent_id="other-complete")
+                raw["children"].insert(0 if earlier else len(raw["children"]), other)
+                done, document = self.measure_paused(raw)
+                self.assertEqual(done.returncode, 1)
+                self.assertEqual(document["child_usage"]["status"], "incomplete")
+                self.assertEqual(document["child_usage"].get("superseded_attempts", []), [])
+
+    def test_partial_link_keeps_the_other_child_incomplete(self):
+        raw = paused_child_usage("critic")
+        orphan = dict(raw["children"][0], label="refute-facts:missing", agent_id="lost")
+        raw["children"].insert(1, orphan)
+        raw["effort_mismatches"].append({"child": orphan["label"], "efforts": []})
+        done, document = self.measure_paused(raw)
+        usage = document["child_usage"]
+        self.assertEqual(done.returncode, 1)
+        self.assertEqual(usage["status"], "incomplete")
+        self.assertEqual([c["agent_id"] for c in usage["children"] if not c["complete"]], ["lost"])
+        self.assertEqual([c["agent_id"] for c in usage["superseded_attempts"]], ["killed"])
+        self.assertEqual(usage["effort_mismatches"], [{"child": orphan["label"], "efforts": []}])
+        self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 1)
+
+    def test_post_processing_retains_source_reason_and_covered_attempt_provenance(self):
+        raw = paused_child_usage("critic")
+        retry = next(c for c in raw["children"] if c["label"] == "critic" and c["complete"])
+        same_key_target = next(c for c in raw["children"] if c["label"] == "discover:alpha")
+        raw["superseded_attempts"] = [dict(same_key_target, agent_id="same-key-killed", complete=False,
+                                           efforts=[], superseded_by=same_key_target["agent_id"])]
+        raw["effort_mismatches"].append({"child": "discover:alpha", "efforts": [],
+                                         "superseded_by": same_key_target["agent_id"]})
+        raw["reason"] += "; 1 earlier attempt re-run under the same call key"
+        raw["children"][0]["resolved_models"] = [*raw["children"][0]["resolved_models"], "other-model"]
+        raw["multi_model_children"] = ["critic"]
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        processing = document["measurement"]["post_processing"]
+        self.assertEqual(processing["source_status"], raw["status"])
+        self.assertEqual(processing["source_reason"], raw["reason"])
+        self.assertEqual(processing["linked_agent_ids"], ["killed"])
+        self.assertEqual(processing["covered_agent_ids"], ["same-key-killed", "killed"])
+        self.assertEqual(processing["covered_effort_mismatches"],
+                         [{"child": "critic", "efforts": [], "superseded_by": retry["agent_id"]},
+                          {"child": "discover:alpha", "efforts": [], "superseded_by": same_key_target["agent_id"]}])
+        self.assertEqual(processing["effort_mismatches_covered"], 2)
+        self.assertEqual(document["child_usage"]["multi_model_children"], [])
+
+    def test_summary_distinguishes_raw_and_wrapper_exit_codes(self):
+        for orphan in (False, True):
+            with self.subTest(orphan=orphan):
+                raw = paused_child_usage("critic")
+                if orphan:
+                    raw["children"].insert(1, dict(raw["children"][0], label="orphan", agent_id="lost"))
+                done, document = self.measure_paused(raw)
+                summary = json.loads(done.stdout)
+                self.assertEqual(summary["raw_exit_code"], document["measurement"]["exit_code"])
+                self.assertEqual(summary["exit_code"], done.returncode)
+                self.assertEqual(done.returncode, 1 if orphan else 0)
+
+    def test_unsuperseded_nonmax_attempt_stays_an_effort_deviation(self):
+        raw = paused_child_usage("critic")
+        raw["children"].pop(0)
+        next(c for c in raw["children"] if c["label"] == "critic")["efforts"] = ["xhigh"]
+        raw["status"] = "complete"
+        raw["effort_mismatches"] = [{"child": "critic", "efforts": ["xhigh"]}]
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1)
+        self.assertEqual(document["child_usage"].get("superseded_attempts", []), [])
+        out = convert.convert(healthy_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["effort_deviations"], ["critic"])
+        self.assertEqual(out["summary"]["retained_failures"], {"alpha": ["critic:effort_deviation"]})
+        self.assertEqual(make_result.check_usage(document, "fixture", out["returns"], ("alpha",))["status"], "complete")
+        with self.assertRaisesRegex(ValueError, "no effort_deviation retained failure"):
+            make_result.check_usage(document, "fixture", {"failures": {}}, ("alpha",))
+
+    def test_an_earlier_complete_attempt_cannot_supersede_a_child(self):
+        raw = paused_child_usage("critic")
+        raw["children"].append(raw["children"].pop(0))
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1)
+        self.assertEqual(document["child_usage"]["status"], "incomplete")
+        self.assertEqual(document["child_usage"].get("superseded_attempts", []), [])
+
+    def test_superseded_usage_issues_keep_the_record_incomplete(self):
+        raw = paused_child_usage("critic")
+        raw["children"][0]["usage_issues"] = ["1 assistant message(s) without provider usage"]
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1)
+        usage = document["child_usage"]
+        self.assertEqual(usage["status"], "incomplete")
+        self.assertEqual(usage["superseded_attempts"][0]["usage_issues"], raw["children"][0]["usage_issues"])
+
+    def test_native_changed_keys_link_two_critics_and_a_followup_and_count_usage_once(self):
+        self.assertTrue(NODE, "node is required for the native child-usage.mjs changed-key recovery fixture")
+        transcripts = temp_dir(self) / "subagents" / "workflows" / "wf_changed-keys"
+        transcripts.mkdir(parents=True)
+        followup = "refute-facts:scheduling-supervision:followup"
+        attempts = [("c0", "critic", "old-critic"), ("f0", followup, "old-facts"),
+                    ("c1", "critic", "changed-critic"), ("c2", "critic", "final-critic"),
+                    ("f1", followup, "changed-facts")]
+        journal = []
+        zero = {"input_tokens": 0, "output_tokens": 0, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}
+        for agent, label, key in attempts:
+            journal.append({"type": "started", "agentId": agent, "label": label, "key": key})
+            if agent in ("c2", "f1"):
+                journal.append({"type": "result", "agentId": agent, "result": {"ok": True}})
+            rows = []
+            if agent in ("c0", "c2", "f1"):
+                rows = [{"type": "assistant", "effort": "max", "message": {
+                    "id": f"m-{agent}", "model": "claude-opus-5-5", "usage": dict(zero, output_tokens=7 if agent == "c0" else 5)}}]
+            write_json(transcripts / f"agent-{agent}.meta.json", {"model": "opus"})
+            (transcripts / f"agent-{agent}.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+        (transcripts / "journal.jsonl").write_text("".join(json.dumps(e) + "\n" for e in journal), encoding="utf-8")
+        out = temp_dir(self) / "usage.json"
+        done = run([sys.executable, HARNESS / "usage_record.py", "--transcript-dir", transcripts, "--out", out])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        document = json.loads(out.read_text())
+        usage = document["child_usage"]
+        self.assertEqual(document["measurement"]["exit_code"], 1)
+        self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 3)
+        self.assertEqual(usage["status"], "complete")
+        self.assertEqual([(c["agent_id"], c["superseded_by"]) for c in usage["superseded_attempts"]],
+                         [("c0", "c2"), ("f0", "f1"), ("c1", "c2")])
+        self.assertEqual([c["agent_id"] for c in usage["children"]], ["c2", "f1"])
+        self.assertEqual(usage["by_resolved_model"]["claude-opus-5-5"]["output_tokens"], 17)
+
+    def test_native_changed_keys_reports_missing_node_as_a_failure(self):
+        with mock.patch(__name__ + ".NODE", None):
+            with self.assertRaisesRegex(AssertionError, "node is required for the native child-usage.mjs"):
+                self.test_native_changed_keys_link_two_critics_and_a_followup_and_count_usage_once()
+
     def test_record_sanitizes_the_transcript_dir_and_hashes_the_raw_output(self):
         work = temp_dir(self)
         raw = child_usage_raw("wf_fixture-1", ["discover:alpha"])
@@ -3660,6 +5151,61 @@ class LedgerIntegrationTests(unittest.TestCase):
         returns["failures"] = {}
         with self.assertRaisesRegex(ValueError, "no effort_deviation retained failure"):
             self.result(out, reviews, returns=returns)
+
+    def test_make_result_accepts_superseded_effort_mismatch_covered_by_max_retry(self):
+        raw = paused_child_usage("critic")
+        killed = raw["children"].pop(0)
+        retry = next(c for c in raw["children"] if c["label"] == "critic")
+        raw["superseded_attempts"] = [dict(killed, superseded_by=retry["agent_id"])]
+        raw["effort_mismatches"][0]["superseded_by"] = retry["agent_id"]
+        raw["status"] = "complete"
+        usage = usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT)
+        self.assertEqual(make_result.check_usage(usage, "fixture", {"failures": {}}, ("alpha", "beta"))["status"],
+                         "complete")
+
+    def assert_make_result_rejects_uncovered_retry(self, condition):
+        for listed in (False, True):
+            with self.subTest(listed=listed):
+                raw = paused_child_usage("critic")
+                killed = raw["children"].pop(0)
+                retry = next(c for c in raw["children"] if c["label"] == "critic")
+                raw["superseded_attempts"] = [dict(killed, superseded_by=retry["agent_id"])]
+                if condition == "missing":
+                    raw["children"].remove(retry)
+                elif condition == "another label":
+                    retry["label"] = "discover:alpha"
+                elif condition == "incomplete":
+                    retry["complete"] = False
+                else:
+                    retry["efforts"] = ["xhigh"]
+                raw["effort_mismatches"] = ([{"child": "critic", "efforts": [],
+                                             "superseded_by": retry["agent_id"]}] if listed else [])
+                # Isolate coverage from the status gate, including a stale 'complete' input.
+                raw["status"] = "complete"
+                usage = {"measurement": {"exit_code": 1}, "child_usage": raw}
+                with self.assertRaisesRegex(ValueError, "no effort_deviation retained failure"):
+                    make_result.check_usage(usage, "fixture", {"failures": {}}, ("alpha", "beta"))
+
+    def test_make_result_rejects_superseded_attempt_with_missing_retry(self):
+        self.assert_make_result_rejects_uncovered_retry("missing")
+
+    def test_make_result_rejects_superseded_attempt_with_another_label_retry(self):
+        self.assert_make_result_rejects_uncovered_retry("another label")
+
+    def test_make_result_rejects_superseded_attempt_with_incomplete_retry(self):
+        self.assert_make_result_rejects_uncovered_retry("incomplete")
+
+    def test_make_result_rejects_superseded_attempt_with_xhigh_retry(self):
+        self.assert_make_result_rejects_uncovered_retry("xhigh")
+
+    def test_superseded_critic_rerun_keeps_completed_layers_clean(self):
+        usage = usage_record.record(json.dumps(paused_child_usage("critic")).encode("utf-8"), 1, "cmd", ROOT)
+        out, reviews = self.evidence(healthy_two_layers(), usage=usage)
+        result = self.result(out, reviews)
+        self.assertTrue(all(layer["reopen"] == [] for layer in result["layers"]))
+        ledger = sl.append(self.root, json.loads((self.root / sl.LEDGER).read_text()), result)
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        self.assertEqual({key[1]: value["count"] for key, value in sl.derive(ledger).items()}, {"alpha": 1, "beta": 1})
 
     def test_a_capped_web_search_reopens_every_layer_through_the_critic(self):
         raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))

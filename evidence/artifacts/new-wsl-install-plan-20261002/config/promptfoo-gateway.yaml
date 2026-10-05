@@ -1,0 +1,27 @@
+# Parameterized from promptfoo@0.123.1:examples/openai-compatible-gateway/promptfooconfig.yaml:1-24.
+# The owner supplies the two exact IDs served by the existing gateway's /v1/models.
+# Keyless loopback uses the literal placeholder; set GATEWAY_API_KEY only for operator-enabled auth.
+description: NativeStack gateway GPT and Claude route acceptance
+sharing: false
+
+prompts:
+  - 'Answer in one short sentence: {{question}}'
+
+providers:
+  - id: openai:chat:your-gpt-model-id
+    config:
+      apiBaseUrl: http://127.0.0.1:21128/v1
+      apiKeyEnvar: GATEWAY_API_KEY
+      temperature: 0.2
+  - id: openai:chat:your-claude-model-id
+    config:
+      apiBaseUrl: http://127.0.0.1:21128/v1
+      apiKeyEnvar: GATEWAY_API_KEY
+      temperature: 0.2
+
+tests:
+  - vars:
+      question: What is the capital of France?
+    assert:
+      - type: contains
+        value: Paris

@@ -1,0 +1,1510 @@
+{
+  "schema": "suite-parallelism-oracle/1",
+  "trimming": {
+    "original": {
+      "file": "result.json in the compare artifact of run 37109532421",
+      "artifact_digest": "sha256:bc0136254601b3ece5ecfec7c2a0525bcbc60c0f606de1b03c05ff7c729d6f2c",
+      "sha256": "f26cb0c1c460029ffd481a844bc524ae5e83c84b73fda52cc3efe3496475eb9a",
+      "bytes": 815073
+    },
+    "kept_unchanged": [
+      "schema",
+      "decision_rule",
+      "inputs",
+      "id_mapping",
+      "controls",
+      "verdicts"
+    ],
+    "runs": "Every field of every run is kept except three lists: notes (52 log-parser notes per serial run, kept only as notes_total), missing_ids (replaced by missing_id_set, which names one of the two lists below; the build asserts equality) and mismatches (only the records whose id is not a missing id are kept, as mismatches_not_missing; every missing id's record has an empty arm side, and its S side, the id's outcome in the reference S run, is kept as counts in missing_id_sets, s_outcome_totals and s_outcome_by_class per level: the same in every run of a level and equal to the id's outcome in each of the three S logs)."
+  },
+  "decision_rule": {
+    "eligibility": "every run of the arm is eligible under both oracle parts (part 1: zero mismatches against S outside flaky ids, the exact preregistered command, run_attempt 1 recorded in runtime.json; part 2: an existing, empty git-status.txt), at least 3 runs, and its controls and crash control passed on that OS (their run directories under the same two parts)",
+    "speed": "take the fastest eligible arm by median step_seconds; adopt it only if its median <= 0.6 x S median and its max <= 0.75 x S fastest, compared as exact ratios (rounded for display only); otherwise reject (no fall-through to a slower arm)",
+    "unpooled_preference": "if the adopted arm is P3 (L4), take P3F (L4F) when it is eligible, meets the speed rule and its median is <= 1.1 x the pooled median (exact ratio)",
+    "id_mapping": "the inventories differ only by the prefix 'tests.test_native_maintenance.' on exactly the 29 base ids of the six B1 classes, as a bijection; otherwise every OS gets no verdict",
+    "every_os": "every OS of the preregistration is listed in verdicts; one without any run directory gets no verdict (reason: no run directory)"
+  },
+  "inputs": {
+    "inventory_base": {
+      "count": 9823,
+      "sha256": "59ffb6b2ec53eeafb040da310f1eb01a5dbe228dd1f4dc402a85f019de6fa062"
+    },
+    "inventory_trial": {
+      "count": 9823,
+      "sha256": "4ef8626973e3d971ba64de20464d3abeed21f18df7e3c25c48dc16280b8f420c"
+    },
+    "control_expectations_sha256": "24ad74995d07e13dfd27217af9465390bd1cc3a3a9e510da8661b199eb18308a",
+    "frozen_checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+    "checkout_shas_seen": [
+      "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de"
+    ],
+    "ignored_entries": []
+  },
+  "id_mapping": {
+    "base_count": 9823,
+    "trial_count": 9823,
+    "base_only": 29,
+    "trial_only": 29,
+    "expected_prefix": "tests.test_native_maintenance.",
+    "expected_ids": 29,
+    "base_ids_of_the_classes": 29,
+    "mapped": 29,
+    "prefixes": {
+      "application_portability_tests": [
+        "tests.test_native_maintenance"
+      ],
+      "memory_patch_evidence_tests": [
+        "tests.test_native_maintenance"
+      ],
+      "wsl_transport_evidence_tests": [
+        "tests.test_native_maintenance"
+      ]
+    },
+    "classes": [
+      "application_portability_tests.MakeBoundaryTests",
+      "application_portability_tests.RecipeHistoryTests",
+      "application_portability_tests.RestartPortTests",
+      "memory_patch_evidence_tests.EvidenceTests",
+      "memory_patch_evidence_tests.FunctionalFactsTests",
+      "wsl_transport_evidence_tests.TransportEvidenceTests"
+    ],
+    "problems": [],
+    "ok": true
+  },
+  "controls": [
+    {
+      "name": "ubuntu-24.04-L4-controls",
+      "os": "ubuntu-24.04",
+      "arm": "L4",
+      "kind": "controls",
+      "passed": true,
+      "problems": [],
+      "exit_code": 5,
+      "ran": 8,
+      "status_word": "FAILED",
+      "run_attempt": 1,
+      "checkout_clean": true
+    },
+    {
+      "name": "ubuntu-24.04-L4-crash",
+      "os": "ubuntu-24.04",
+      "arm": "L4",
+      "kind": "crash",
+      "passed": true,
+      "problems": [],
+      "exit_code": 124,
+      "ran": null,
+      "status_word": null,
+      "run_attempt": 1,
+      "checkout_clean": true
+    },
+    {
+      "name": "ubuntu-24.04-L4C-controls",
+      "os": "ubuntu-24.04",
+      "arm": "L4C",
+      "kind": "controls",
+      "passed": true,
+      "problems": [],
+      "exit_code": 5,
+      "ran": 8,
+      "status_word": "FAILED",
+      "run_attempt": 1,
+      "checkout_clean": true
+    },
+    {
+      "name": "ubuntu-24.04-L4C-crash",
+      "os": "ubuntu-24.04",
+      "arm": "L4C",
+      "kind": "crash",
+      "passed": true,
+      "problems": [],
+      "exit_code": 124,
+      "ran": null,
+      "status_word": null,
+      "run_attempt": 1,
+      "checkout_clean": true
+    },
+    {
+      "name": "ubuntu-24.04-L4F-controls",
+      "os": "ubuntu-24.04",
+      "arm": "L4F",
+      "kind": "controls",
+      "passed": true,
+      "problems": [],
+      "exit_code": 5,
+      "ran": 8,
+      "status_word": "FAILED",
+      "run_attempt": 1,
+      "checkout_clean": true
+    },
+    {
+      "name": "ubuntu-24.04-L4F-crash",
+      "os": "ubuntu-24.04",
+      "arm": "L4F",
+      "kind": "crash",
+      "passed": true,
+      "problems": [],
+      "exit_code": 124,
+      "ran": null,
+      "status_word": null,
+      "run_attempt": 1,
+      "checkout_clean": true
+    },
+    {
+      "name": "ubuntu-24.04-S-controls",
+      "os": "ubuntu-24.04",
+      "arm": "S",
+      "kind": "controls",
+      "passed": true,
+      "problems": [],
+      "exit_code": 1,
+      "ran": 8,
+      "status_word": "FAILED",
+      "run_attempt": 1,
+      "checkout_clean": true
+    },
+    {
+      "name": "ubuntu-24.04-S-crash",
+      "os": "ubuntu-24.04",
+      "arm": "S",
+      "kind": "crash",
+      "passed": true,
+      "problems": [],
+      "exit_code": 3,
+      "ran": null,
+      "status_word": null,
+      "run_attempt": 1,
+      "checkout_clean": true
+    }
+  ],
+  "verdicts": {
+    "macos-15": {
+      "arms": {
+        "S": {
+          "runs": 0,
+          "eligible_runs": 0,
+          "timing": null,
+          "controls_passed": null,
+          "crash_passed": null,
+          "eligible": false,
+          "reasons": [
+            "0 runs, the preregistration needs 3",
+            "no controls run",
+            "no crash run"
+          ]
+        },
+        "P3": {
+          "runs": 0,
+          "eligible_runs": 0,
+          "timing": null,
+          "controls_passed": null,
+          "crash_passed": null,
+          "eligible": false,
+          "reasons": [
+            "0 runs, the preregistration needs 3",
+            "no controls run",
+            "no crash run"
+          ]
+        },
+        "P3F": {
+          "runs": 0,
+          "eligible_runs": 0,
+          "timing": null,
+          "controls_passed": null,
+          "crash_passed": null,
+          "eligible": false,
+          "reasons": [
+            "0 runs, the preregistration needs 3",
+            "no controls run",
+            "no crash run"
+          ]
+        },
+        "P3C": {
+          "runs": 0,
+          "eligible_runs": 0,
+          "timing": null,
+          "controls_passed": null,
+          "crash_passed": null,
+          "eligible": false,
+          "reasons": [
+            "0 runs, the preregistration needs 3",
+            "no controls run",
+            "no crash run"
+          ]
+        },
+        "P4": {
+          "runs": 0,
+          "eligible_runs": 0,
+          "timing": null,
+          "controls_passed": null,
+          "crash_passed": null,
+          "eligible": false,
+          "reasons": [
+            "0 runs, the preregistration needs 3",
+            "no controls run",
+            "no crash run"
+          ]
+        }
+      },
+      "s_timing": null,
+      "selected_arm": null,
+      "reasons": [
+        "no run directory"
+      ],
+      "outcome": "no verdict",
+      "baseline": {
+        "s_runs": 0,
+        "s_eligible": 0,
+        "flaky_ids": [],
+        "flaky_total": 0
+      }
+    },
+    "ubuntu-24.04": {
+      "arms": {
+        "S": {
+          "runs": 3,
+          "eligible_runs": 3,
+          "timing": {
+            "median": 1659.0,
+            "min": 1186.0,
+            "max": 1688.0,
+            "n": 3
+          },
+          "controls_passed": true,
+          "crash_passed": true,
+          "eligible": true,
+          "reasons": []
+        },
+        "L4": {
+          "runs": 3,
+          "eligible_runs": 0,
+          "timing": {
+            "median": 459.0,
+            "min": 438.0,
+            "max": 649.0,
+            "n": 3
+          },
+          "controls_passed": true,
+          "crash_passed": true,
+          "median_vs_s_median": 0.2767,
+          "max_vs_s_fastest": 0.5472,
+          "median_vs_s_median_exact": "153/553",
+          "max_vs_s_fastest_exact": "649/1186",
+          "meets_speed_rule": true,
+          "eligible": false,
+          "reasons": [
+            "3 ineligible runs"
+          ]
+        },
+        "L4F": {
+          "runs": 3,
+          "eligible_runs": 0,
+          "timing": {
+            "median": 692.0,
+            "min": 539.0,
+            "max": 710.0,
+            "n": 3
+          },
+          "controls_passed": true,
+          "crash_passed": true,
+          "median_vs_s_median": 0.4171,
+          "max_vs_s_fastest": 0.5987,
+          "median_vs_s_median_exact": "692/1659",
+          "max_vs_s_fastest_exact": "355/593",
+          "meets_speed_rule": true,
+          "eligible": false,
+          "reasons": [
+            "3 ineligible runs"
+          ]
+        },
+        "L4C": {
+          "runs": 3,
+          "eligible_runs": 0,
+          "timing": {
+            "median": 667.0,
+            "min": 659.0,
+            "max": 704.0,
+            "n": 3
+          },
+          "controls_passed": true,
+          "crash_passed": true,
+          "median_vs_s_median": 0.402,
+          "max_vs_s_fastest": 0.5936,
+          "median_vs_s_median_exact": "667/1659",
+          "max_vs_s_fastest_exact": "352/593",
+          "meets_speed_rule": true,
+          "eligible": false,
+          "reasons": [
+            "3 ineligible runs"
+          ]
+        }
+      },
+      "s_timing": {
+        "median": 1659.0,
+        "min": 1186.0,
+        "max": 1688.0,
+        "n": 3
+      },
+      "selected_arm": null,
+      "reasons": [
+        "no parallel arm is eligible"
+      ],
+      "outcome": "reject",
+      "baseline": {
+        "s_runs": 3,
+        "s_eligible": 3,
+        "flaky_ids": [],
+        "flaky_total": 0,
+        "python_version": [
+          "3.12.3"
+        ],
+        "runner_images": [
+          "20260927.320.1"
+        ]
+      }
+    }
+  },
+  "missing_id_sets": {
+    "module_level": {
+      "arms": [
+        "L4",
+        "L4F"
+      ],
+      "count": 199,
+      "ids": [
+        "tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_adaptive_lineage_reuses_the_checkpoint_window_for_reads_and_transport",
+        "tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_an_unexplained_gap_still_refuses_the_next_trial",
+        "tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_failed_next_trial_pagination_charges_every_sent_read",
+        "tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_fees_posted_since_the_baseline_are_recorded_before_the_next_trial_check",
+        "tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_first_adaptive_checkpoint_refusals_leave_the_trial_unentered",
+        "tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_first_adaptive_trial_books_checkpoint_fees_before_fixing_baseline",
+        "tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_full_next_trial_budget_prevents_the_http_read",
+        "tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_next_trial_cash_tolerance_is_exactly_one_cent_with_and_without_fees",
+        "tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_the_adaptive_recover_transport_reads_fees_from_started_at",
+        "tests.test_adaptive_paper_fees.FeeCheckpoint.test_checkpoint_refuses_a_changed_normalized_row",
+        "tests.test_adaptive_paper_fees.FeeCheckpoint.test_checkpoint_refuses_a_fee_posted_between_its_reads",
+        "tests.test_adaptive_paper_fees.FeeCheckpoint.test_checkpoint_returns_f2_and_normalized_cash_on_one_read_only_client",
+        "tests.test_adaptive_paper_fees.FeeHTTPBoundary.test_every_other_path_parameter_or_method_is_refused_before_the_budget",
+        "tests.test_adaptive_paper_fees.FeeHTTPBoundary.test_the_fee_read_is_allowed_only_after_one_utc_instant_and_is_a_budgeted_read",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_a_changed_fee_activity_is_refused_and_the_whole_batch_rolls_back",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_a_fee_credit_raises_realized_and_the_peak_but_never_lowers_the_loss",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_a_new_ledger_is_schema_3_with_the_fees_table",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_any_cap_trip_during_recovery_is_sticky_and_the_sell_still_completes",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_any_other_schema_version_is_refused_before_any_change",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_credit_then_debit_batch_preserves_the_intermediate_peak_and_halt",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_debit_then_credit_batch_preserves_the_intermediate_halt",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_fees_count_against_the_gross_loss_budget",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_malformed_fee_rows_are_refused_before_any_write",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_measured_recovery_fees_preserve_recovery_only_and_allow_the_sell",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_migrated_schema_is_outside_the_previous_accept_list",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_re_recording_known_fees_changes_nothing",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_record_fees_books_cash_realized_and_loss_once_with_one_event_each",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_recovery_fee_crossing_the_loss_cap_cannot_be_cleared_by_the_next_trial",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_rederived_accounting_keeps_recorded_fees_next_to_symbol_money",
+        "tests.test_adaptive_paper_fees.FeeLedger.test_schema_2_1_and_unversioned_ledgers_migrate_to_3",
+        "tests.test_adaptive_paper_fees.FeeNormalization.test_a_credit_and_trailing_zeros",
+        "tests.test_adaptive_paper_fees.FeeNormalization.test_anything_else_fails_closed_without_provider_text",
+        "tests.test_adaptive_paper_fees.FeeNormalization.test_currency_and_status_may_be_absent",
+        "tests.test_adaptive_paper_fees.FeeNormalization.test_description_is_never_accessed",
+        "tests.test_adaptive_paper_fees.FeeNormalization.test_documented_fee_row_keeps_four_fields_and_never_the_description",
+        "tests.test_adaptive_paper_fees.FeeNormalization.test_every_documented_fee_sub_type_and_an_absent_or_null_one",
+        "tests.test_adaptive_paper_fees.FeeReconciliation.test_a_snapshot_without_the_fees_key_behaves_as_before",
+        "tests.test_adaptive_paper_fees.FeeReconciliation.test_an_unbooked_fee_absorbed_into_an_arbitrary_baseline_counts_twice",
+        "tests.test_adaptive_paper_fees.FeeReconciliation.test_cash_tolerance_is_exactly_one_cent_with_and_without_fees",
+        "tests.test_adaptive_paper_fees.FeeReconciliation.test_mover_reconcile_records_fees_through_runner_reconcile",
+        "tests.test_adaptive_paper_fees.FeeReconciliation.test_other_account_activity_still_fails_closed",
+        "tests.test_adaptive_paper_fees.FeeReconciliation.test_the_measured_gap_fails_without_fees_and_reconciles_with_the_three_rows",
+        "tests.test_adaptive_paper_fees.FeeSnapshot.test_a_failed_or_malformed_fee_read_freezes_instead_of_listing_no_fees",
+        "tests.test_adaptive_paper_fees.FeeSnapshot.test_a_full_page_at_the_bound_is_incomplete_not_an_empty_list",
+        "tests.test_adaptive_paper_fees.FeeSnapshot.test_a_naive_fee_history_start_is_refused",
+        "tests.test_adaptive_paper_fees.FeeSnapshot.test_fee_activities_reads_through_a_fresh_allow_listed_session",
+        "tests.test_adaptive_paper_fees.FeeSnapshot.test_fee_pages_continue_from_the_last_activity_id",
+        "tests.test_adaptive_paper_fees.FeeSnapshot.test_snapshot_lists_the_fees_created_after_the_fee_window_oldest_first",
+        "tests.test_adaptive_paper_fees.FeeSnapshot.test_the_fee_window_defaults_to_the_history_start",
+        "tests.test_adaptive_paper_fees.MoverFeeHelpers.test_checkpoint_window_is_preferred_and_invalid_values_are_refused",
+        "tests.test_adaptive_paper_fees.MoverFeeHelpers.test_fee_receipt_counts_totals_and_sub_types_without_ids",
+        "tests.test_adaptive_paper_fees.MoverFeeHelpers.test_the_mover_fee_window_is_the_trials_own_baseline_time",
+        "tests.test_adaptive_paper_fees.MoverLaneFees.test_checkpoint_instability_refuses_start_and_the_next_start_retries",
+        "tests.test_adaptive_paper_fees.MoverLaneFees.test_each_mover_trial_and_recover_reuses_the_lineage_checkpoint_window",
+        "tests.test_adaptive_paper_fees.MoverLaneFees.test_fee_posted_after_checkpoint_before_trial_start_remains_in_the_window",
+        "tests.test_adaptive_paper_fees.MoverLaneFees.test_fees_posted_during_a_trial_are_recorded_and_the_receipt_stays_consistent",
+        "tests.test_adaptive_paper_fees.MoverLaneFees.test_full_mover_budget_refuses_checkpoint_before_any_http_call",
+        "tests.test_adaptive_paper_fees.MoverLaneFees.test_mover_checkpoint_books_preflight_to_start_fees_before_the_baseline",
+        "tests.test_adaptive_paper_fees.MoverLaneFees.test_mover_same_second_fee_before_account_read_is_booked_once",
+        "tests.test_adaptive_paper_fees.MoverLaneFees.test_recover_records_fees_posted_after_the_trial_and_reports_them",
+        "tests.test_adaptive_paper_fees.MoverLaneFees.test_second_mover_start_reuses_the_first_checkpoint_window",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_403_rejection_requires_absence_lookup_and_never_retries",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_422_duplicate_resolves_existing_order_or_stays_ambiguous",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_a_named_cancel_keeps_the_waiting_budget_path",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_a_named_cancel_uses_the_default_owner_deadline_and_freeze",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_ambiguous_post_resolves_by_id_without_retry_and_stays_frozen",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_ambiguous_post_then_404_does_not_resubmit",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_an_exit_without_its_own_fresh_quote_is_refused_before_the_wire_as_not_sent",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_an_iex_quote_ack_needs_no_halt_channels",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_b2_fallback_never_rolls_back_or_freezes_either_arrival_order",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_cancel_404_with_terminal_final_is_data",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_cancel_ack_is_not_terminal_and_every_attempt_counted",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_cancel_again_sends_delete_and_takes_422_as_data",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_cancel_refusal_for_still_working_order_freezes",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_cancel_server_error_stays_unresolved",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_crossed_streamed_quote_is_dropped_and_counted_not_fatal",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_delayed_budget_rechecks_quote_before_wire",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_disconnect_requires_explicit_reconciliation",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_documented_sub_penny_422_is_definitive_once_absent",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_dropped_quote_keeps_the_last_valid_quote_and_its_age",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_fill_activities_page_through_the_guarded_session_and_tile_one_order",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_fill_activities_that_do_not_describe_one_complete_order_are_refused",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_halted_or_unsubscribed_invalid_quote_fails_closed",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_invalid_envelope_never_reaches_the_fake_broker",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_known_partial_then_invisible_order_still_cancels_known_id",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_late_event_cannot_undo_cumulative_fill",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_luld_bands_are_kept_for_receipts_and_never_freeze",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_malformed_streamed_quote_still_fails_the_transport",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_metadata_journaled_not_sent_and_replay_has_one_post",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_minimum_price_variance_matches_the_ledger",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_missing_order_update_freezes",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_native_stream_threads_start_and_join",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_other_422_stays_ambiguous",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_owned_exit_with_a_fresh_quote_reaches_the_wire_under_an_admission_freeze",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_proven_not_sent_intent_does_not_break_flat_snapshot",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_queue_overflow_cannot_be_silently_thawed",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_queued_quotes_do_not_block_reconciliation_but_order_events_do",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_queued_statuses_and_lulds_do_not_block_reconciliation",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_quiet_unrequired_symbol_does_not_halt_benchmark_readiness",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_quote_subscription_ack_requires_statuses_and_lulds_for_every_symbol_on_sip",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_replayed_id_cannot_change_intent",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_required_benchmark_stale_blocks_entry",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_reviewed_native_dispatch_observes_control_ack",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_routine_acknowledgement_keeps_pending_order_update_timers",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_sleeping_submit_budget_cannot_starve_owned_cancel",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_snapshot_bound_is_failure_not_partial_success",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_snapshot_paginates_and_rejects_nonadvancing_page",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_start_on_iex_subscribes_quotes_only",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_start_subscribes_statuses_and_lulds_on_the_sip_quote_connection",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_start_waits_on_the_required_basket_only",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_startup_staggered_quotes_do_not_freeze_before_first_ready",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_stream_execution_is_forwarded_after_a_rest_read_advanced_past_it",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_stream_fill_time_reaches_ledger_losslessly",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_sub_penny_422_with_visible_order_is_not_a_refusal",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_subscription_ack_not_running_flag_controls_ready",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_task_cancellation_preserves_worker_cancel_identity",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_trading_status_messages_reach_the_status_sink_and_are_counted",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_valid_submit_posts_exactly_its_envelope",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_websocket_redirect_rejected_before_sdk_authentication",
+        "tests.test_adaptive_paper_transport.AsyncTransport.test_wire_future_quote_tolerance_matches_risk_layer",
+        "tests.test_adaptive_paper_transport.ConfiguredQuoteFeed.test_default_transport_feed_remains_the_frozen_iex_lane",
+        "tests.test_adaptive_paper_transport.ConfiguredQuoteFeed.test_iex_feed_keeps_the_frozen_quote_stream",
+        "tests.test_adaptive_paper_transport.ConfiguredQuoteFeed.test_sdk_enum_member_is_refused_by_the_transport_and_by_preflight",
+        "tests.test_adaptive_paper_transport.ConfiguredQuoteFeed.test_sip_feed_selects_the_sip_quote_stream",
+        "tests.test_adaptive_paper_transport.ConfiguredQuoteFeed.test_unqualified_feed_refused_before_any_stream_is_constructed",
+        "tests.test_adaptive_paper_transport.DataFeedSelection.test_a_str_subclass_naming_a_feed_is_still_refused",
+        "tests.test_adaptive_paper_transport.DataFeedSelection.test_configured_feed_selects_the_matching_quote_stream",
+        "tests.test_adaptive_paper_transport.DataFeedSelection.test_quote_stream_connect_guard_follows_the_configured_feed",
+        "tests.test_adaptive_paper_transport.DataFeedSelection.test_sdk_enum_members_are_refused_rather_than_formatted_into_the_url",
+        "tests.test_adaptive_paper_transport.DataFeedSelection.test_unqualified_feed_is_refused_before_any_endpoint_is_derived",
+        "tests.test_adaptive_paper_transport.HTTPBoundary.test_cancel_budget_names_only_the_announced_order",
+        "tests.test_adaptive_paper_transport.HTTPBoundary.test_closed_preflight_preserves_clock_with_invalid_and_missing_quotes",
+        "tests.test_adaptive_paper_transport.HTTPBoundary.test_every_attempt_budgeted_timeouts_and_headers_sanitized",
+        "tests.test_adaptive_paper_transport.HTTPBoundary.test_fill_activities_read_is_allowed_only_filtered_by_one_order",
+        "tests.test_adaptive_paper_transport.HTTPBoundary.test_positive_submission_delay_is_deferred_without_sending",
+        "tests.test_adaptive_paper_transport.HTTPBoundary.test_preflight_is_read_only_and_hashes_identity",
+        "tests.test_adaptive_paper_transport.HTTPBoundary.test_preflight_refuses_an_unqualified_feed_before_any_request",
+        "tests.test_adaptive_paper_transport.HTTPBoundary.test_preflight_sends_the_configured_feed_on_the_quote_request",
+        "tests.test_adaptive_paper_transport.HTTPBoundary.test_restricts_origin_method_path_and_redirects",
+        "tests.test_adaptive_paper_transport.HTTPBoundary.test_sdk_serialization_of_an_envelope_passes_the_wire_gate",
+        "tests.test_adaptive_paper_transport.HTTPBoundary.test_sdk_zero_retry_applied_after_constructor",
+        "tests.test_adaptive_paper_transport.HTTPBoundary.test_unvalidated_order_body_is_refused_before_budget_and_http",
+        "tests.test_adaptive_paper_transport.HaltFeedSeed.test_a_dripping_loopback_server_is_cut_off_at_the_deadline_by_the_real_http_stack",
+        "tests.test_adaptive_paper_transport.HaltFeedSeed.test_a_dripping_server_cannot_hold_the_read_past_its_deadline",
+        "tests.test_adaptive_paper_transport.HaltFeedSeed.test_active_halts_are_the_latest_unresumed_halt_of_each_wanted_symbol",
+        "tests.test_adaptive_paper_transport.HaltFeedSeed.test_eastern_times_convert_across_daylight_saving",
+        "tests.test_adaptive_paper_transport.HaltFeedSeed.test_one_bounded_get_of_the_one_url_without_redirects",
+        "tests.test_adaptive_paper_transport.HaltFeedSeed.test_the_feed_is_requested_uncompressed_and_an_encoded_body_is_refused",
+        "tests.test_adaptive_paper_transport.HaltFeedSeed.test_the_feed_parses_to_rows_of_the_documented_fields",
+        "tests.test_adaptive_paper_transport.HaltFeedSeed.test_the_seed_records_its_source_digest_and_active_halts",
+        "tests.test_adaptive_paper_transport.LeverageNormalizeAccountTests.test_current_alpaca_schema_normalizes_without_legacy_fields",
+        "tests.test_adaptive_paper_transport.LeverageNormalizeAccountTests.test_default_returns_exact_pre_change_key_set",
+        "tests.test_adaptive_paper_transport.LeverageNormalizeAccountTests.test_include_margin_true_adds_margin_keys",
+        "tests.test_adaptive_paper_transport.LeverageNormalizeAccountTests.test_include_margin_true_missing_fields_omitted_not_erroring",
+        "tests.test_adaptive_paper_transport.Normalization.test_crossed_and_one_sided_quotes_are_untradable_not_corrupt",
+        "tests.test_adaptive_paper_transport.Normalization.test_cumulative_fill_cannot_exceed_order",
+        "tests.test_adaptive_paper_transport.Normalization.test_fractional_exit_is_preserved_but_entry_rejected",
+        "tests.test_adaptive_paper_transport.Normalization.test_nonfinite_and_advanced_orders_rejected",
+        "tests.test_adaptive_paper_transport.Normalization.test_timestamp_accepts_lowercase_z",
+        "tests.test_adaptive_paper_transport.Normalization.test_timestamp_preserves_nanoseconds",
+        "tests.test_adaptive_paper_transport.Normalization.test_timestamp_rfc3339_offsets_and_zero_to_nine_fraction_digits",
+        "tests.test_adaptive_paper_transport.Normalization.test_timestamp_truncates_subnanosecond_fraction",
+        "tests.test_adaptive_paper_transport.Normalization.test_wire_decimals_are_exact_fixed_point_for_risk_parser",
+        "tests.test_adaptive_paper_transport.OrderContractBoundary.test_boundary_status_is_active_and_fails_closed",
+        "tests.test_adaptive_paper_transport.OrderContractBoundary.test_contract_refusals_are_local_not_broker_refusals",
+        "tests.test_adaptive_paper_transport.OrderContractBoundary.test_engine_semantics_kept_fractional_sell_and_allowed_extended_hours",
+        "tests.test_adaptive_paper_transport.OrderContractBoundary.test_envelope_validates_the_sdk_bound_projection_only",
+        "tests.test_adaptive_paper_transport.OrderContractBoundary.test_float_that_loses_the_exact_decimal_is_refused",
+        "tests.test_adaptive_paper_transport.OrderContractBoundary.test_wire_gate_requires_the_exact_validated_body",
+        "tests.test_adaptive_paper_transport.TradingStatusParsing.test_an_unrecognized_tape_reads_both_tables_so_a_documented_resume_still_resumes",
+        "tests.test_adaptive_paper_transport.TradingStatusParsing.test_cta_halt_with_reason_m_is_a_luld_pause_and_e_or_f_never_changes_the_state",
+        "tests.test_adaptive_paper_transport.TradingStatusParsing.test_cta_price_indication_halts_and_trading_range_indication_does_not",
+        "tests.test_adaptive_paper_transport.TradingStatusParsing.test_documented_luld_band_parses_and_malformed_bands_raise",
+        "tests.test_adaptive_paper_transport.TradingStatusParsing.test_every_documented_status_code_maps_to_one_effect",
+        "tests.test_adaptive_paper_transport.TradingStatusParsing.test_halt_statuses_ride_only_the_sip_feed",
+        "tests.test_adaptive_paper_transport.TradingStatusParsing.test_market_wide_circuit_breakers_halt_and_mwcq_resumes",
+        "tests.test_adaptive_paper_transport.TradingStatusParsing.test_unknown_or_cross_tape_codes_fail_closed_and_malformed_messages_raise",
+        "tests.test_adoption_version_probes.DeclaredProbeTests.test_every_pin_declares_a_supported_probe",
+        "tests.test_adoption_version_probes.DeclaredProbeTests.test_floor_pins_compare_as_minimum",
+        "tests.test_adoption_version_probes.DeclaredProbeTests.test_servers_without_a_version_flag_are_never_executed",
+        "tests.test_adoption_version_probes.LinuxReportUnderbash32Tests.test_all_verified_exits_zero_and_writes_the_report",
+        "tests.test_adoption_version_probes.LinuxReportUnderbash32Tests.test_an_interrupt_during_a_probe_stops_it_and_frees_the_lock",
+        "tests.test_adoption_version_probes.LinuxReportUnderbash32Tests.test_every_probe_is_bounded_classified_and_nothing_else_runs",
+        "tests.test_adoption_version_probes.LinuxReportUnderbash32Tests.test_fast_probes_leave_no_watchdog_timer_behind",
+        "tests.test_adoption_version_probes.LinuxReportUnderbashTests.test_all_verified_exits_zero_and_writes_the_report",
+        "tests.test_adoption_version_probes.LinuxReportUnderbashTests.test_an_interrupt_during_a_probe_stops_it_and_frees_the_lock",
+        "tests.test_adoption_version_probes.LinuxReportUnderbashTests.test_every_probe_is_bounded_classified_and_nothing_else_runs",
+        "tests.test_adoption_version_probes.LinuxReportUnderbashTests.test_fast_probes_leave_no_watchdog_timer_behind",
+        "tests.test_adoption_version_probes.MacosReportUnderbash32Tests.test_all_verified_exits_zero_and_writes_the_report",
+        "tests.test_adoption_version_probes.MacosReportUnderbash32Tests.test_an_interrupt_during_a_probe_stops_it_and_frees_the_lock",
+        "tests.test_adoption_version_probes.MacosReportUnderbash32Tests.test_every_probe_is_bounded_classified_and_nothing_else_runs",
+        "tests.test_adoption_version_probes.MacosReportUnderbash32Tests.test_fast_probes_leave_no_watchdog_timer_behind",
+        "tests.test_adoption_version_probes.MacosReportUnderbashTests.test_all_verified_exits_zero_and_writes_the_report",
+        "tests.test_adoption_version_probes.MacosReportUnderbashTests.test_an_interrupt_during_a_probe_stops_it_and_frees_the_lock",
+        "tests.test_adoption_version_probes.MacosReportUnderbashTests.test_every_probe_is_bounded_classified_and_nothing_else_runs",
+        "tests.test_adoption_version_probes.MacosReportUnderbashTests.test_fast_probes_leave_no_watchdog_timer_behind",
+        "tests.test_adoption_version_probes.ReportStructureTests.test_cleanup_stops_an_interrupted_probe_in_both_scripts",
+        "tests.test_adoption_version_probes.ReportStructureTests.test_no_script_runs_a_flag_against_every_bin_dir_entry",
+        "tests.test_adoption_version_probes.ReportStructureTests.test_the_report_step_is_identical_in_both_scripts"
+      ],
+      "s_outcome_totals": {
+        "ok": 90,
+        "skipped": 109
+      },
+      "s_outcome_by_class": {
+        "tests.test_adaptive_paper_fees.AdaptiveLaneFees": {
+          "ok": 7,
+          "skipped": 2
+        },
+        "tests.test_adaptive_paper_fees.FeeCheckpoint": {
+          "ok": 0,
+          "skipped": 3
+        },
+        "tests.test_adaptive_paper_fees.FeeHTTPBoundary": {
+          "ok": 0,
+          "skipped": 2
+        },
+        "tests.test_adaptive_paper_fees.FeeLedger": {
+          "ok": 16,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_fees.FeeNormalization": {
+          "ok": 6,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_fees.FeeReconciliation": {
+          "ok": 6,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_fees.FeeSnapshot": {
+          "ok": 0,
+          "skipped": 7
+        },
+        "tests.test_adaptive_paper_fees.MoverFeeHelpers": {
+          "ok": 3,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_fees.MoverLaneFees": {
+          "ok": 0,
+          "skipped": 9
+        },
+        "tests.test_adaptive_paper_transport.AsyncTransport": {
+          "ok": 0,
+          "skipped": 59
+        },
+        "tests.test_adaptive_paper_transport.ConfiguredQuoteFeed": {
+          "ok": 0,
+          "skipped": 5
+        },
+        "tests.test_adaptive_paper_transport.DataFeedSelection": {
+          "ok": 3,
+          "skipped": 2
+        },
+        "tests.test_adaptive_paper_transport.HTTPBoundary": {
+          "ok": 0,
+          "skipped": 12
+        },
+        "tests.test_adaptive_paper_transport.HaltFeedSeed": {
+          "ok": 8,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_transport.LeverageNormalizeAccountTests": {
+          "ok": 4,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_transport.Normalization": {
+          "ok": 9,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_transport.OrderContractBoundary": {
+          "ok": 6,
+          "skipped": 0
+        },
+        "tests.test_adaptive_paper_transport.TradingStatusParsing": {
+          "ok": 8,
+          "skipped": 0
+        },
+        "tests.test_adoption_version_probes.DeclaredProbeTests": {
+          "ok": 3,
+          "skipped": 0
+        },
+        "tests.test_adoption_version_probes.LinuxReportUnderbash32Tests": {
+          "ok": 0,
+          "skipped": 4
+        },
+        "tests.test_adoption_version_probes.LinuxReportUnderbashTests": {
+          "ok": 4,
+          "skipped": 0
+        },
+        "tests.test_adoption_version_probes.MacosReportUnderbash32Tests": {
+          "ok": 0,
+          "skipped": 4
+        },
+        "tests.test_adoption_version_probes.MacosReportUnderbashTests": {
+          "ok": 4,
+          "skipped": 0
+        },
+        "tests.test_adoption_version_probes.ReportStructureTests": {
+          "ok": 3,
+          "skipped": 0
+        }
+      }
+    },
+    "class_level": {
+      "arms": [
+        "L4C"
+      ],
+      "count": 82,
+      "classes": [
+        "tests.test_adaptive_paper_fees.FeeSnapshot",
+        "tests.test_adaptive_paper_transport.AsyncTransport",
+        "tests.test_adoption_version_probes.LinuxReportUnderbash32Tests",
+        "tests.test_adoption_version_probes.LinuxReportUnderbashTests",
+        "tests.test_adoption_version_probes.MacosReportUnderbash32Tests",
+        "tests.test_adoption_version_probes.MacosReportUnderbashTests"
+      ],
+      "rule": "every module_level id whose module and class prefix is one of these classes",
+      "s_outcome_totals": {
+        "ok": 8,
+        "skipped": 74
+      },
+      "s_outcome_by_class": {
+        "tests.test_adaptive_paper_fees.FeeSnapshot": {
+          "ok": 0,
+          "skipped": 7
+        },
+        "tests.test_adaptive_paper_transport.AsyncTransport": {
+          "ok": 0,
+          "skipped": 59
+        },
+        "tests.test_adoption_version_probes.LinuxReportUnderbash32Tests": {
+          "ok": 0,
+          "skipped": 4
+        },
+        "tests.test_adoption_version_probes.LinuxReportUnderbashTests": {
+          "ok": 4,
+          "skipped": 0
+        },
+        "tests.test_adoption_version_probes.MacosReportUnderbash32Tests": {
+          "ok": 0,
+          "skipped": 4
+        },
+        "tests.test_adoption_version_probes.MacosReportUnderbashTests": {
+          "ok": 4,
+          "skipped": 0
+        }
+      }
+    }
+  },
+  "runs": [
+    {
+      "name": "ubuntu-24.04-L4-r1",
+      "os": "ubuntu-24.04",
+      "arm": "L4",
+      "kind": "arm",
+      "repeat": 1,
+      "eligible": false,
+      "reasons": [
+        "no 'Ran N tests' line: the log is truncated or the run never finished",
+        "199 inventory ids never ran: [tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_adaptive_lineage_reuses_the_checkpoint_window_for_reads_and_transport, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_an_unexplained_gap_still_refuses_the_next_trial, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_failed_next_trial_pagination_charges_every_sent_read, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_fees_posted_since_the_baseline_are_recorded_before_the_next_trial_check, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_first_adaptive_checkpoint_refusals_leave_the_trial_unentered, ...] (199)",
+        "199 ids differ from the S baseline: [tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_adaptive_lineage_reuses_the_checkpoint_window_for_reads_and_transport, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_an_unexplained_gap_still_refuses_the_next_trial, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_failed_next_trial_pagination_charges_every_sent_read, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_fees_posted_since_the_baseline_are_recorded_before_the_next_trial_check, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_first_adaptive_checkpoint_refusals_leave_the_trial_unentered, ...] (199)",
+        "Ran None, S ran [9823]"
+      ],
+      "exit_code": 1,
+      "step_seconds": 649.0,
+      "run_attempt": 1,
+      "checkout_clean": true,
+      "python_version": "3.12.3",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "runner_image": "20260927.320.1",
+      "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+      "command": "python3 -m unittest_parallel -j 4 --level module -v",
+      "mode": "parallel",
+      "header": {
+        "suites": 233,
+        "total_tests": 9823,
+        "workers": 4,
+        "line": 1
+      },
+      "ran": null,
+      "status_word": null,
+      "status_counts": {},
+      "outcome_counts": {
+        "ok": 8766,
+        "FAIL": 0,
+        "ERROR": 0,
+        "skipped": 858,
+        "expected failure": 0,
+        "unexpected success": 0
+      },
+      "notes_total": 3,
+      "durations_section": false,
+      "count_deltas_vs_s": {
+        "failures": 0,
+        "errors": 0,
+        "skipped": -967,
+        "expected failures": 0,
+        "unexpected successes": 0,
+        "ran": -9823
+      },
+      "mismatch_total": 199,
+      "missing_total": 199,
+      "extra_ids": [],
+      "extra_total": 0,
+      "missing_id_set": "module_level",
+      "mismatches_not_missing": []
+    },
+    {
+      "name": "ubuntu-24.04-L4-r2",
+      "os": "ubuntu-24.04",
+      "arm": "L4",
+      "kind": "arm",
+      "repeat": 2,
+      "eligible": false,
+      "reasons": [
+        "no 'Ran N tests' line: the log is truncated or the run never finished",
+        "199 inventory ids never ran: [tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_adaptive_lineage_reuses_the_checkpoint_window_for_reads_and_transport, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_an_unexplained_gap_still_refuses_the_next_trial, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_failed_next_trial_pagination_charges_every_sent_read, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_fees_posted_since_the_baseline_are_recorded_before_the_next_trial_check, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_first_adaptive_checkpoint_refusals_leave_the_trial_unentered, ...] (199)",
+        "199 ids differ from the S baseline: [tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_adaptive_lineage_reuses_the_checkpoint_window_for_reads_and_transport, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_an_unexplained_gap_still_refuses_the_next_trial, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_failed_next_trial_pagination_charges_every_sent_read, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_fees_posted_since_the_baseline_are_recorded_before_the_next_trial_check, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_first_adaptive_checkpoint_refusals_leave_the_trial_unentered, ...] (199)",
+        "Ran None, S ran [9823]"
+      ],
+      "exit_code": 1,
+      "step_seconds": 438.0,
+      "run_attempt": 1,
+      "checkout_clean": true,
+      "python_version": "3.12.3",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "runner_image": "20260927.320.1",
+      "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+      "command": "python3 -m unittest_parallel -j 4 --level module -v",
+      "mode": "parallel",
+      "header": {
+        "suites": 233,
+        "total_tests": 9823,
+        "workers": 4,
+        "line": 1
+      },
+      "ran": null,
+      "status_word": null,
+      "status_counts": {},
+      "outcome_counts": {
+        "ok": 8766,
+        "FAIL": 0,
+        "ERROR": 0,
+        "skipped": 858,
+        "expected failure": 0,
+        "unexpected success": 0
+      },
+      "notes_total": 3,
+      "durations_section": false,
+      "count_deltas_vs_s": {
+        "failures": 0,
+        "errors": 0,
+        "skipped": -967,
+        "expected failures": 0,
+        "unexpected successes": 0,
+        "ran": -9823
+      },
+      "mismatch_total": 199,
+      "missing_total": 199,
+      "extra_ids": [],
+      "extra_total": 0,
+      "missing_id_set": "module_level",
+      "mismatches_not_missing": []
+    },
+    {
+      "name": "ubuntu-24.04-L4-r3",
+      "os": "ubuntu-24.04",
+      "arm": "L4",
+      "kind": "arm",
+      "repeat": 3,
+      "eligible": false,
+      "reasons": [
+        "no 'Ran N tests' line: the log is truncated or the run never finished",
+        "199 inventory ids never ran: [tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_adaptive_lineage_reuses_the_checkpoint_window_for_reads_and_transport, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_an_unexplained_gap_still_refuses_the_next_trial, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_failed_next_trial_pagination_charges_every_sent_read, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_fees_posted_since_the_baseline_are_recorded_before_the_next_trial_check, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_first_adaptive_checkpoint_refusals_leave_the_trial_unentered, ...] (199)",
+        "199 ids differ from the S baseline: [tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_adaptive_lineage_reuses_the_checkpoint_window_for_reads_and_transport, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_an_unexplained_gap_still_refuses_the_next_trial, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_failed_next_trial_pagination_charges_every_sent_read, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_fees_posted_since_the_baseline_are_recorded_before_the_next_trial_check, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_first_adaptive_checkpoint_refusals_leave_the_trial_unentered, ...] (199)",
+        "Ran None, S ran [9823]"
+      ],
+      "exit_code": 1,
+      "step_seconds": 459.0,
+      "run_attempt": 1,
+      "checkout_clean": true,
+      "python_version": "3.12.3",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "runner_image": "20260927.320.1",
+      "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+      "command": "python3 -m unittest_parallel -j 4 --level module -v",
+      "mode": "parallel",
+      "header": {
+        "suites": 233,
+        "total_tests": 9823,
+        "workers": 4,
+        "line": 1
+      },
+      "ran": null,
+      "status_word": null,
+      "status_counts": {},
+      "outcome_counts": {
+        "ok": 8766,
+        "FAIL": 0,
+        "ERROR": 0,
+        "skipped": 858,
+        "expected failure": 0,
+        "unexpected success": 0
+      },
+      "notes_total": 4,
+      "durations_section": false,
+      "count_deltas_vs_s": {
+        "failures": 0,
+        "errors": 0,
+        "skipped": -967,
+        "expected failures": 0,
+        "unexpected successes": 0,
+        "ran": -9823
+      },
+      "mismatch_total": 199,
+      "missing_total": 199,
+      "extra_ids": [],
+      "extra_total": 0,
+      "missing_id_set": "module_level",
+      "mismatches_not_missing": []
+    },
+    {
+      "name": "ubuntu-24.04-L4C-r1",
+      "os": "ubuntu-24.04",
+      "arm": "L4C",
+      "kind": "arm",
+      "repeat": 1,
+      "eligible": false,
+      "reasons": [
+        "no 'Ran N tests' line: the log is truncated or the run never finished",
+        "82 inventory ids never ran: [tests.test_adaptive_paper_fees.FeeSnapshot.test_a_failed_or_malformed_fee_read_freezes_instead_of_listing_no_fees, tests.test_adaptive_paper_fees.FeeSnapshot.test_a_full_page_at_the_bound_is_incomplete_not_an_empty_list, tests.test_adaptive_paper_fees.FeeSnapshot.test_a_naive_fee_history_start_is_refused, tests.test_adaptive_paper_fees.FeeSnapshot.test_fee_activities_reads_through_a_fresh_allow_listed_session, tests.test_adaptive_paper_fees.FeeSnapshot.test_fee_pages_continue_from_the_last_activity_id, ...] (82)",
+        "83 ids differ from the S baseline: [tests.test_adaptive_paper_fees.FeeSnapshot.test_a_failed_or_malformed_fee_read_freezes_instead_of_listing_no_fees, tests.test_adaptive_paper_fees.FeeSnapshot.test_a_full_page_at_the_bound_is_incomplete_not_an_empty_list, tests.test_adaptive_paper_fees.FeeSnapshot.test_a_naive_fee_history_start_is_refused, tests.test_adaptive_paper_fees.FeeSnapshot.test_fee_activities_reads_through_a_fresh_allow_listed_session, tests.test_adaptive_paper_fees.FeeSnapshot.test_fee_pages_continue_from_the_last_activity_id, ...] (83)",
+        "Ran None, S ran [9823]"
+      ],
+      "exit_code": 1,
+      "step_seconds": 667.0,
+      "run_attempt": 1,
+      "checkout_clean": true,
+      "python_version": "3.12.3",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "runner_image": "20260927.320.1",
+      "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+      "command": "python3 -m unittest_parallel -j 4 --level class -v",
+      "mode": "parallel",
+      "header": {
+        "suites": 1475,
+        "total_tests": 9823,
+        "workers": 4,
+        "line": 1
+      },
+      "ran": null,
+      "status_word": null,
+      "status_counts": {},
+      "outcome_counts": {
+        "ok": 8847,
+        "FAIL": 1,
+        "ERROR": 0,
+        "skipped": 893,
+        "expected failure": 0,
+        "unexpected success": 0
+      },
+      "notes_total": 4,
+      "durations_section": false,
+      "count_deltas_vs_s": {
+        "failures": 0,
+        "errors": 0,
+        "skipped": -967,
+        "expected failures": 0,
+        "unexpected successes": 0,
+        "ran": -9823
+      },
+      "mismatch_total": 83,
+      "missing_total": 82,
+      "extra_ids": [],
+      "extra_total": 0,
+      "missing_id_set": "class_level",
+      "mismatches_not_missing": [
+        {
+          "id": "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+          "S": [
+            [
+              "test",
+              "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+              "ok"
+            ]
+          ],
+          "arm": [
+            [
+              "derived",
+              "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+              "FAIL"
+            ],
+            [
+              "subtest",
+              "tests.test_secret_path_guard.K4GuardTests.test_k4_timing (helper='k4_needs_walk')",
+              "FAIL"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ubuntu-24.04-L4C-r2",
+      "os": "ubuntu-24.04",
+      "arm": "L4C",
+      "kind": "arm",
+      "repeat": 2,
+      "eligible": false,
+      "reasons": [
+        "no 'Ran N tests' line: the log is truncated or the run never finished",
+        "82 inventory ids never ran: [tests.test_adaptive_paper_fees.FeeSnapshot.test_a_failed_or_malformed_fee_read_freezes_instead_of_listing_no_fees, tests.test_adaptive_paper_fees.FeeSnapshot.test_a_full_page_at_the_bound_is_incomplete_not_an_empty_list, tests.test_adaptive_paper_fees.FeeSnapshot.test_a_naive_fee_history_start_is_refused, tests.test_adaptive_paper_fees.FeeSnapshot.test_fee_activities_reads_through_a_fresh_allow_listed_session, tests.test_adaptive_paper_fees.FeeSnapshot.test_fee_pages_continue_from_the_last_activity_id, ...] (82)",
+        "83 ids differ from the S baseline: [tests.test_adaptive_paper_fees.FeeSnapshot.test_a_failed_or_malformed_fee_read_freezes_instead_of_listing_no_fees, tests.test_adaptive_paper_fees.FeeSnapshot.test_a_full_page_at_the_bound_is_incomplete_not_an_empty_list, tests.test_adaptive_paper_fees.FeeSnapshot.test_a_naive_fee_history_start_is_refused, tests.test_adaptive_paper_fees.FeeSnapshot.test_fee_activities_reads_through_a_fresh_allow_listed_session, tests.test_adaptive_paper_fees.FeeSnapshot.test_fee_pages_continue_from_the_last_activity_id, ...] (83)",
+        "Ran None, S ran [9823]"
+      ],
+      "exit_code": 1,
+      "step_seconds": 659.0,
+      "run_attempt": 1,
+      "checkout_clean": true,
+      "python_version": "3.12.3",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "runner_image": "20260927.320.1",
+      "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+      "command": "python3 -m unittest_parallel -j 4 --level class -v",
+      "mode": "parallel",
+      "header": {
+        "suites": 1475,
+        "total_tests": 9823,
+        "workers": 4,
+        "line": 1
+      },
+      "ran": null,
+      "status_word": null,
+      "status_counts": {},
+      "outcome_counts": {
+        "ok": 8847,
+        "FAIL": 1,
+        "ERROR": 0,
+        "skipped": 893,
+        "expected failure": 0,
+        "unexpected success": 0
+      },
+      "notes_total": 6,
+      "durations_section": false,
+      "count_deltas_vs_s": {
+        "failures": 0,
+        "errors": 0,
+        "skipped": -967,
+        "expected failures": 0,
+        "unexpected successes": 0,
+        "ran": -9823
+      },
+      "mismatch_total": 83,
+      "missing_total": 82,
+      "extra_ids": [],
+      "extra_total": 0,
+      "missing_id_set": "class_level",
+      "mismatches_not_missing": [
+        {
+          "id": "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+          "S": [
+            [
+              "test",
+              "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+              "ok"
+            ]
+          ],
+          "arm": [
+            [
+              "derived",
+              "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+              "FAIL"
+            ],
+            [
+              "subtest",
+              "tests.test_secret_path_guard.K4GuardTests.test_k4_timing (row='T-STORE-STAGES')",
+              "FAIL"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ubuntu-24.04-L4C-r3",
+      "os": "ubuntu-24.04",
+      "arm": "L4C",
+      "kind": "arm",
+      "repeat": 3,
+      "eligible": false,
+      "reasons": [
+        "no 'Ran N tests' line: the log is truncated or the run never finished",
+        "82 inventory ids never ran: [tests.test_adaptive_paper_fees.FeeSnapshot.test_a_failed_or_malformed_fee_read_freezes_instead_of_listing_no_fees, tests.test_adaptive_paper_fees.FeeSnapshot.test_a_full_page_at_the_bound_is_incomplete_not_an_empty_list, tests.test_adaptive_paper_fees.FeeSnapshot.test_a_naive_fee_history_start_is_refused, tests.test_adaptive_paper_fees.FeeSnapshot.test_fee_activities_reads_through_a_fresh_allow_listed_session, tests.test_adaptive_paper_fees.FeeSnapshot.test_fee_pages_continue_from_the_last_activity_id, ...] (82)",
+        "83 ids differ from the S baseline: [tests.test_adaptive_paper_fees.FeeSnapshot.test_a_failed_or_malformed_fee_read_freezes_instead_of_listing_no_fees, tests.test_adaptive_paper_fees.FeeSnapshot.test_a_full_page_at_the_bound_is_incomplete_not_an_empty_list, tests.test_adaptive_paper_fees.FeeSnapshot.test_a_naive_fee_history_start_is_refused, tests.test_adaptive_paper_fees.FeeSnapshot.test_fee_activities_reads_through_a_fresh_allow_listed_session, tests.test_adaptive_paper_fees.FeeSnapshot.test_fee_pages_continue_from_the_last_activity_id, ...] (83)",
+        "Ran None, S ran [9823]"
+      ],
+      "exit_code": 1,
+      "step_seconds": 704.0,
+      "run_attempt": 1,
+      "checkout_clean": true,
+      "python_version": "3.12.3",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "runner_image": "20260927.320.1",
+      "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+      "command": "python3 -m unittest_parallel -j 4 --level class -v",
+      "mode": "parallel",
+      "header": {
+        "suites": 1475,
+        "total_tests": 9823,
+        "workers": 4,
+        "line": 1
+      },
+      "ran": null,
+      "status_word": null,
+      "status_counts": {},
+      "outcome_counts": {
+        "ok": 8847,
+        "FAIL": 3,
+        "ERROR": 0,
+        "skipped": 893,
+        "expected failure": 0,
+        "unexpected success": 0
+      },
+      "notes_total": 9,
+      "durations_section": false,
+      "count_deltas_vs_s": {
+        "failures": 0,
+        "errors": 0,
+        "skipped": -967,
+        "expected failures": 0,
+        "unexpected successes": 0,
+        "ran": -9823
+      },
+      "mismatch_total": 83,
+      "missing_total": 82,
+      "extra_ids": [],
+      "extra_total": 0,
+      "missing_id_set": "class_level",
+      "mismatches_not_missing": [
+        {
+          "id": "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+          "S": [
+            [
+              "test",
+              "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+              "ok"
+            ]
+          ],
+          "arm": [
+            [
+              "derived",
+              "tests.test_secret_path_guard.K4GuardTests.test_k4_timing",
+              "FAIL"
+            ],
+            [
+              "subtest",
+              "tests.test_secret_path_guard.K4GuardTests.test_k4_timing (helper='k4_runner_environment')",
+              "FAIL"
+            ],
+            [
+              "subtest",
+              "tests.test_secret_path_guard.K4GuardTests.test_k4_timing (helper='k4_runner_start')",
+              "FAIL"
+            ],
+            [
+              "subtest",
+              "tests.test_secret_path_guard.K4GuardTests.test_k4_timing (row='T-STORE-STAGES')",
+              "FAIL"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ubuntu-24.04-L4F-r1",
+      "os": "ubuntu-24.04",
+      "arm": "L4F",
+      "kind": "arm",
+      "repeat": 1,
+      "eligible": false,
+      "reasons": [
+        "no 'Ran N tests' line: the log is truncated or the run never finished",
+        "199 inventory ids never ran: [tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_adaptive_lineage_reuses_the_checkpoint_window_for_reads_and_transport, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_an_unexplained_gap_still_refuses_the_next_trial, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_failed_next_trial_pagination_charges_every_sent_read, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_fees_posted_since_the_baseline_are_recorded_before_the_next_trial_check, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_first_adaptive_checkpoint_refusals_leave_the_trial_unentered, ...] (199)",
+        "200 ids differ from the S baseline: [tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_adaptive_lineage_reuses_the_checkpoint_window_for_reads_and_transport, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_an_unexplained_gap_still_refuses_the_next_trial, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_failed_next_trial_pagination_charges_every_sent_read, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_fees_posted_since_the_baseline_are_recorded_before_the_next_trial_check, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_first_adaptive_checkpoint_refusals_leave_the_trial_unentered, ...] (200)",
+        "Ran None, S ran [9823]"
+      ],
+      "exit_code": 1,
+      "step_seconds": 539.0,
+      "run_attempt": 1,
+      "checkout_clean": true,
+      "python_version": "3.12.3",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "runner_image": "20260927.320.1",
+      "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+      "command": "python3 -m unittest_parallel -j 4 --level module --disable-process-pooling -v",
+      "mode": "parallel",
+      "header": {
+        "suites": 233,
+        "total_tests": 9823,
+        "workers": 4,
+        "line": 1
+      },
+      "ran": null,
+      "status_word": null,
+      "status_counts": {},
+      "outcome_counts": {
+        "ok": 8765,
+        "FAIL": 0,
+        "ERROR": 1,
+        "skipped": 858,
+        "expected failure": 0,
+        "unexpected success": 0
+      },
+      "notes_total": 2,
+      "durations_section": false,
+      "count_deltas_vs_s": {
+        "failures": 0,
+        "errors": 0,
+        "skipped": -967,
+        "expected failures": 0,
+        "unexpected successes": 0,
+        "ran": -9823
+      },
+      "mismatch_total": 200,
+      "missing_total": 199,
+      "extra_ids": [],
+      "extra_total": 0,
+      "missing_id_set": "module_level",
+      "mismatches_not_missing": [
+        {
+          "id": "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+          "S": [
+            [
+              "test",
+              "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+              "ok"
+            ]
+          ],
+          "arm": [
+            [
+              "test",
+              "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+              "ERROR"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ubuntu-24.04-L4F-r2",
+      "os": "ubuntu-24.04",
+      "arm": "L4F",
+      "kind": "arm",
+      "repeat": 2,
+      "eligible": false,
+      "reasons": [
+        "no 'Ran N tests' line: the log is truncated or the run never finished",
+        "199 inventory ids never ran: [tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_adaptive_lineage_reuses_the_checkpoint_window_for_reads_and_transport, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_an_unexplained_gap_still_refuses_the_next_trial, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_failed_next_trial_pagination_charges_every_sent_read, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_fees_posted_since_the_baseline_are_recorded_before_the_next_trial_check, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_first_adaptive_checkpoint_refusals_leave_the_trial_unentered, ...] (199)",
+        "200 ids differ from the S baseline: [tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_adaptive_lineage_reuses_the_checkpoint_window_for_reads_and_transport, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_an_unexplained_gap_still_refuses_the_next_trial, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_failed_next_trial_pagination_charges_every_sent_read, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_fees_posted_since_the_baseline_are_recorded_before_the_next_trial_check, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_first_adaptive_checkpoint_refusals_leave_the_trial_unentered, ...] (200)",
+        "Ran None, S ran [9823]"
+      ],
+      "exit_code": 1,
+      "step_seconds": 692.0,
+      "run_attempt": 1,
+      "checkout_clean": true,
+      "python_version": "3.12.3",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "runner_image": "20260927.320.1",
+      "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+      "command": "python3 -m unittest_parallel -j 4 --level module --disable-process-pooling -v",
+      "mode": "parallel",
+      "header": {
+        "suites": 233,
+        "total_tests": 9823,
+        "workers": 4,
+        "line": 1
+      },
+      "ran": null,
+      "status_word": null,
+      "status_counts": {},
+      "outcome_counts": {
+        "ok": 8765,
+        "FAIL": 0,
+        "ERROR": 1,
+        "skipped": 858,
+        "expected failure": 0,
+        "unexpected success": 0
+      },
+      "notes_total": 1,
+      "durations_section": false,
+      "count_deltas_vs_s": {
+        "failures": 0,
+        "errors": 0,
+        "skipped": -967,
+        "expected failures": 0,
+        "unexpected successes": 0,
+        "ran": -9823
+      },
+      "mismatch_total": 200,
+      "missing_total": 199,
+      "extra_ids": [],
+      "extra_total": 0,
+      "missing_id_set": "module_level",
+      "mismatches_not_missing": [
+        {
+          "id": "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+          "S": [
+            [
+              "test",
+              "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+              "ok"
+            ]
+          ],
+          "arm": [
+            [
+              "test",
+              "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+              "ERROR"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ubuntu-24.04-L4F-r3",
+      "os": "ubuntu-24.04",
+      "arm": "L4F",
+      "kind": "arm",
+      "repeat": 3,
+      "eligible": false,
+      "reasons": [
+        "no 'Ran N tests' line: the log is truncated or the run never finished",
+        "199 inventory ids never ran: [tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_adaptive_lineage_reuses_the_checkpoint_window_for_reads_and_transport, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_an_unexplained_gap_still_refuses_the_next_trial, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_failed_next_trial_pagination_charges_every_sent_read, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_fees_posted_since_the_baseline_are_recorded_before_the_next_trial_check, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_first_adaptive_checkpoint_refusals_leave_the_trial_unentered, ...] (199)",
+        "200 ids differ from the S baseline: [tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_adaptive_lineage_reuses_the_checkpoint_window_for_reads_and_transport, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_an_unexplained_gap_still_refuses_the_next_trial, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_failed_next_trial_pagination_charges_every_sent_read, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_fees_posted_since_the_baseline_are_recorded_before_the_next_trial_check, tests.test_adaptive_paper_fees.AdaptiveLaneFees.test_first_adaptive_checkpoint_refusals_leave_the_trial_unentered, ...] (200)",
+        "Ran None, S ran [9823]"
+      ],
+      "exit_code": 1,
+      "step_seconds": 710.0,
+      "run_attempt": 1,
+      "checkout_clean": true,
+      "python_version": "3.12.3",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "runner_image": "20260927.320.1",
+      "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+      "command": "python3 -m unittest_parallel -j 4 --level module --disable-process-pooling -v",
+      "mode": "parallel",
+      "header": {
+        "suites": 233,
+        "total_tests": 9823,
+        "workers": 4,
+        "line": 1
+      },
+      "ran": null,
+      "status_word": null,
+      "status_counts": {},
+      "outcome_counts": {
+        "ok": 8765,
+        "FAIL": 0,
+        "ERROR": 1,
+        "skipped": 858,
+        "expected failure": 0,
+        "unexpected success": 0
+      },
+      "notes_total": 1,
+      "durations_section": false,
+      "count_deltas_vs_s": {
+        "failures": 0,
+        "errors": 0,
+        "skipped": -967,
+        "expected failures": 0,
+        "unexpected successes": 0,
+        "ran": -9823
+      },
+      "mismatch_total": 200,
+      "missing_total": 199,
+      "extra_ids": [],
+      "extra_total": 0,
+      "missing_id_set": "module_level",
+      "mismatches_not_missing": [
+        {
+          "id": "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+          "S": [
+            [
+              "test",
+              "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+              "ok"
+            ]
+          ],
+          "arm": [
+            [
+              "test",
+              "tests.test_order_throughput.CapacityRunTests.test_cli_refuses_live_base_url_from_env_file_without_network",
+              "ERROR"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ubuntu-24.04-S-r1",
+      "os": "ubuntu-24.04",
+      "arm": "S",
+      "kind": "arm",
+      "repeat": 1,
+      "eligible": true,
+      "reasons": [],
+      "exit_code": 0,
+      "step_seconds": 1688.0,
+      "run_attempt": 1,
+      "checkout_clean": true,
+      "python_version": "3.12.3",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "runner_image": "20260927.320.1",
+      "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+      "command": "python3 -m unittest -v --durations 25",
+      "mode": "serial",
+      "header": null,
+      "ran": 9823,
+      "status_word": "OK",
+      "status_counts": {
+        "failures": 0,
+        "errors": 0,
+        "skipped": 967,
+        "expected failures": 0,
+        "unexpected successes": 0
+      },
+      "outcome_counts": {
+        "ok": 8856,
+        "FAIL": 0,
+        "ERROR": 0,
+        "skipped": 967,
+        "expected failure": 0,
+        "unexpected success": 0
+      },
+      "notes_total": 52,
+      "durations_section": true,
+      "count_deltas_vs_s": {},
+      "mismatch_total": 0,
+      "missing_total": 0,
+      "extra_ids": [],
+      "extra_total": 0,
+      "missing_id_set": null,
+      "mismatches_not_missing": []
+    },
+    {
+      "name": "ubuntu-24.04-S-r2",
+      "os": "ubuntu-24.04",
+      "arm": "S",
+      "kind": "arm",
+      "repeat": 2,
+      "eligible": true,
+      "reasons": [],
+      "exit_code": 0,
+      "step_seconds": 1659.0,
+      "run_attempt": 1,
+      "checkout_clean": true,
+      "python_version": "3.12.3",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "runner_image": "20260927.320.1",
+      "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+      "command": "python3 -m unittest -v --durations 25",
+      "mode": "serial",
+      "header": null,
+      "ran": 9823,
+      "status_word": "OK",
+      "status_counts": {
+        "failures": 0,
+        "errors": 0,
+        "skipped": 967,
+        "expected failures": 0,
+        "unexpected successes": 0
+      },
+      "outcome_counts": {
+        "ok": 8856,
+        "FAIL": 0,
+        "ERROR": 0,
+        "skipped": 967,
+        "expected failure": 0,
+        "unexpected success": 0
+      },
+      "notes_total": 52,
+      "durations_section": true,
+      "count_deltas_vs_s": {},
+      "mismatch_total": 0,
+      "missing_total": 0,
+      "extra_ids": [],
+      "extra_total": 0,
+      "missing_id_set": null,
+      "mismatches_not_missing": []
+    },
+    {
+      "name": "ubuntu-24.04-S-r3",
+      "os": "ubuntu-24.04",
+      "arm": "S",
+      "kind": "arm",
+      "repeat": 3,
+      "eligible": true,
+      "reasons": [],
+      "exit_code": 0,
+      "step_seconds": 1186.0,
+      "run_attempt": 1,
+      "checkout_clean": true,
+      "python_version": "3.12.3",
+      "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+      "runner_image": "20260927.320.1",
+      "checkout_sha": "1e4bb5ab7c79faa83e4cd8d04cf8dc6d33c7b0de",
+      "command": "python3 -m unittest -v --durations 25",
+      "mode": "serial",
+      "header": null,
+      "ran": 9823,
+      "status_word": "OK",
+      "status_counts": {
+        "failures": 0,
+        "errors": 0,
+        "skipped": 967,
+        "expected failures": 0,
+        "unexpected successes": 0
+      },
+      "outcome_counts": {
+        "ok": 8856,
+        "FAIL": 0,
+        "ERROR": 0,
+        "skipped": 967,
+        "expected failure": 0,
+        "unexpected success": 0
+      },
+      "notes_total": 52,
+      "durations_section": true,
+      "count_deltas_vs_s": {},
+      "mismatch_total": 0,
+      "missing_total": 0,
+      "extra_ids": [],
+      "extra_total": 0,
+      "missing_id_set": null,
+      "mismatches_not_missing": []
+    }
+  ]
+}

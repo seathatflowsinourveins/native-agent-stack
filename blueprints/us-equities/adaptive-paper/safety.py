@@ -1371,8 +1371,11 @@ class Ledger:
                     raise SafetyError("submit_identity_already_attempted_or_invalid")
             total = self.db.execute("SELECT at,kind FROM requests WHERE at>? ORDER BY at,id", (now - 60,)).fetchall()
             delays = [ZERO]
-            if len(total) >= self.limits.max_rest_per_minute:
-                delays.append(D(str(total[-self.limits.max_rest_per_minute]["at"] + 60 - now)))
+            # Every submit leaves twenty unused total slots, even when earlier
+            # reads/cancels have consumed requests in this rolling window.
+            total_cap = self.limits.max_rest_per_minute - (20 if kind == "submit" else 0)
+            if len(total) >= total_cap:
+                delays.append(D(str(total[-total_cap]["at"] + 60 - now)))
             submits = [r["at"] for r in total if r["kind"] == "submit"]
             if kind == "submit" and len(submits) >= self.limits.max_submits_per_minute:
                 delays.append(D(str(submits[-self.limits.max_submits_per_minute] + 60 - now)))

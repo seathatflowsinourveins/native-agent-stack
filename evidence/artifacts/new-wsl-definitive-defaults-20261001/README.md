@@ -13,6 +13,7 @@ function gates on one workstation, recorded in the first and confirmatory receip
 | `foundation-definitive.compact.json` | The foundation's 21 layers and 4 cross rows: per slot the default, its label, alternatives, the Claude deciders' deciding facts, both critics' findings and corrections, the overturn checks and each family's status |
 | `trading/trading-definitive.compact.json` | The 12 us-equities layers, in the same shape. The trading lane's work, with its builder, its one-owner map and both rounds' preregistrations |
 | `settlements.json` | The model-server settlement's default, basis, scope, receipt paths and hashes, verbatim limits and overturn condition; read by `assemble_manifest.py` |
+| `../new-wsl-layer-consensus-20261002/consensus.json` | The layer-consensus record of 2026-10-02, in its own folder: five rows to add and six amendments by a direct consensus of the two model families, and its wave-2 batch of 2026-10-03 (amendment 3: interim installs; one added row; two amendments). `assemble_manifest.py` reads it in its last step, hashes the records it names and changes no field that the rounds decided |
 | `criteria.txt` | The seven criteria of the first round, unchanged |
 | `decide-prompt.txt`, `decide-critic-prompt.txt` | The decision round's prompts, with the rules frozen before the round |
 | `decide-workflow.js` | The Claude family's workflow script (run `wf_c0e29ea4-90f`), with both output schemas inline |
@@ -20,7 +21,7 @@ function gates on one workstation, recorded in the first and confirmatory receip
 | `preregistration.json` | Hashes of the criteria, prompts, packets and first-round returns, written before launch |
 | `save_claude_returns.py`, `assemble_foundation_definitive.py` | Saves the Claude returns from the workflow journal; assembles the foundation documents from both families' returns |
 | `render_tables.py` | Writes the decision record's tables from the manifest; `--check` fails when they are stale |
-| `controls.py` | Negative controls that mutate inputs, regenerate the manifest and tables, require their named unittest failure and restore changed files |
+| `controls.py` | Negative controls that mutate inputs, regenerate the manifest and tables, require their named unittest failure and restore changed files. One control per refusal of the consensus step mutates the layer-consensus record |
 | `claude-decision-round-run.json` | Counts and times of the Claude family's decision round, read from its private journal |
 | `gpt-memory-first-round-units.json` | Counts, exit codes and usage of the GPT family's two first-round units for the memory layer (the first ran without shell network), read from their private event logs |
 
@@ -32,8 +33,20 @@ function gates on one workstation, recorded in the first and confirmatory receip
 - `pinned`: a requirement the user selected. It is carried, not judged.
 - `project_practice`: the project's own code or practice, settled by its closure record.
 - `no_blind_default_today`: a slot that cannot be decided blind today, with the reason.
+- `consensus`: a row added by the layer-consensus record of 2026-10-02, a recorded direct consensus of the two model
+  families. It is not a blind result and not a measurement, and it is never definitive.
 
 A row is `definitive` only when both deciders of both families named the default and both critics returned converged.
+
+An `amendments` list on a row holds later decisions by direct consensus. It stands beside the row's fields and changes
+none of them.
+
+An `interim` object on a row is an interim install under amendment 3 of the decision rule (the layer-consensus record's
+wave-2 batch, 2026-10-03): what the destination installs in the row's place until the named measurement decides, with
+its pin, its authority (the owner's dated decision or a direct consensus with both acknowledgements), both families'
+reviews and its hashed records. The assembler writes it only on a row whose decided default installs nothing and leaves
+every field the rounds decided as it was; the manifest states the exception beside the no-install rule
+(`no_install_rule_exception`) and counts the interims (`counts.interim`).
 
 ## A known leak in one packet
 
@@ -54,7 +67,7 @@ decision directory's host path appears in the documents as `<definitive-defaults
 
 ```
 python3 assemble_foundation_definitive.py <repository> <decision-directory> <output-directory>   # needs the private returns
-python3 assemble_manifest.py            # from the two committed compact documents and settlements.json
+python3 assemble_manifest.py            # from the two committed compact documents, settlements.json, convergence.json and the layer-consensus record
 python3 render_tables.py --write ../../../docs/decisions/2026-10-01-new-wsl-definitive-defaults.md
-python3 -B controls.py ../../..         # regenerate and require each named unittest failure
+python3 -B controls.py ../../..         # regenerate and require each named unittest failure; without an argument it uses this checkout
 ```

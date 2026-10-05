@@ -14,6 +14,11 @@ startup rule, item 4 of [`docs/token-practice.md`](../token-practice.md).
 both are frozen Gate A units. This record gives F2 the file contract and the acceptance gate below. No unit was
 installed and no host file was written: the timer and the service are drafted templates.
 
+**Correction (2026-10-02):** the implemented notice uses `MAX_AGE = timedelta(days=8)`, not the 48-hour
+proposal recorded below, and emits the summary through SessionStart `additionalContext`. The catalog-freshness
+workflow is now configured for a daily report; this supersedes this record's weekly references for that workflow
+only. See the [current behavior and bounded schedule decision](2026-10-02-daily-catalog-currency.md).
+
 ## Context
 
 - The currency checks already exist and are read-only. `scripts/adoption_status.py --pinned-versions` compares the
@@ -64,7 +69,8 @@ installed and no host file was written: the timer and the service are drafted te
   stopped does need one, and `Persistent=` applies only to `OnCalendar=` timers.
 - **Removing the earlier due-file when a run fails.** Rejected, because it would hide due items exactly when the
   checks break. A failed run leaves the state directory as it was, the unit shows in
-  `systemctl --user --failed`, and the hook's 48-hour age limit below keeps an old line from lingering.
+  `systemctl --user --failed`, and the proposed age limit below was intended to keep an old line from lingering.
+  The implemented limit is eight days, as corrected above.
 - **Counting an incomplete skill check as nothing due.** Rejected. The first draft did, and a `--network` run whose
   `gh api` calls failed, or whose skill pin did not verify, could delete the notice an earlier run had written (found by
   the cross-family review of that draft and reproduced by the failing-first tests below). The check's own report says
@@ -145,7 +151,9 @@ installed and no host file was written: the timer and the service are drafted te
 3. **The startup rule.** Item 4 of `docs/token-practice.md` now allows exactly one read-only SessionStart line from
    that file, printed fail-open; the checks never run at startup. `AGENTS.md:28` still reads "Do not rerun the full
    audit or model trials at startup", which this design keeps. Any change to that wording is unit F1's.
-4. **The contract for the hook in unit F2, which this change does not contain:**
+4. **The historical proposed contract for the hook in unit F2, which this change does not contain:**
+   The correction above identifies the implemented age limit and output format; this list preserves the original
+   proposal and its unmeasured acceptance gate.
    - Read only that file and print its `summary_line` as plain stdout. Exit 0 in every case.
    - Print nothing when the file is missing, unreadable or not a JSON object, when `summary_line` is not one line
      of at most 160 characters, or when `generated_at` is more than 48 hours old, because a failing timer leaves
@@ -204,6 +212,28 @@ installed and no host file was written: the timer and the service are drafted te
 - The catalog-freshness result becomes a file on the host that is refreshed at least weekly: add its
   `pin_behind_upstream` rows to `pins_behind`.
 - A check's JSON shape changes: update `aggregate()` in the script. Its tests quote the shapes it reads.
+
+## Addendum 2026-10-03: host alerts
+
+The wave-2 lifecycle ruling (change 7; its records are in
+`evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json`, layer lifecycle) makes this notice the
+channel through which a failed backup or a stopped service on the new WSL distribution reaches a session: Alertmanager
+there has only a `sink` receiver, Dagu mail needs SMTP, and a job that Dagu schedules cannot report Dagu's outage. A
+fifth count, `host_alerts`, adds:
+
+- from the state directory's `backup-status.json` and `restore-check-status.json`, whose shape the same ruling's change
+  8 sets (`last_success {snapshot_id, time}` kept apart from `last_attempt {result, exit_code, time}`): a last attempt
+  that failed or was partial (a result other than `ok`, or a nonzero exit code; restic exits 3 for a partial snapshot),
+  a last success older than 48 h (backup) or 8 days (restore check) or never recorded, and a record that cannot be read;
+- from `systemctl --user show`, each stage-2 unit of the wave-2 install order (`ecosystem-otelcol`,
+  `ecosystem-prometheus`, `ecosystem-alertmanager`, `omniroute`, `ai-memory`, `ollama`) and `dagu.service` that is
+  enabled and `failed` (a start-limit-hit included) or `inactive`.
+
+A record or a unit that a host does not have is no alert there, so the workstation's notice is unchanged unless such a
+unit of its own has stopped; a host whose user manager cannot be asked says so in the coverage entry. The SessionStart
+line reaches the new distribution's sessions only once its plan installs the stack-currency timer and the client
+configuration wires the notice hook (adoption/new-wsl/client-config-map.json keeps it unwired until then). Overturn:
+the backup or restore-check DAG writes another record shape, or the destination's unit names change.
 
 ## Sources
 

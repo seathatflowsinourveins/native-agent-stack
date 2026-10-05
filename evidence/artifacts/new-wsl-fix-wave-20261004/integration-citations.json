@@ -1,0 +1,1480 @@
+{
+  "fixes": [
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g1-clients.md",
+      "old": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/df5316c93f87fa143897d4c025d44c58ce44f99d/tools/adoption/apply_claude_settings.py#L191",
+      "new": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files",
+      "target": "tools/adoption/apply_claude_settings.py#L191"
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g1-clients.md",
+      "kind": "branch-local prose references",
+      "count": 2
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g3-code-docs.md",
+      "old": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/df5316c93f87fa143897d4c025d44c58ce44f99d/tools/adoption/install_skills.py#L623",
+      "new": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files",
+      "target": "tools/adoption/install_skills.py#L623"
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g3-code-docs.md",
+      "kind": "branch-local prose references",
+      "count": 1
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g5-analytics-eval.md",
+      "kind": "branch-local prose references",
+      "count": 2
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "old": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/df5316c93f87fa143897d4c025d44c58ce44f99d/tools/adoption/apply_claude_settings.py#L191",
+      "new": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files",
+      "target": "tools/adoption/apply_claude_settings.py#L191"
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "old": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/df5316c93f87fa143897d4c025d44c58ce44f99d/adoption/new-wsl/client-config-map.json#L371",
+      "new": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files",
+      "target": "adoption/new-wsl/client-config-map.json#L371"
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "old": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/df5316c93f87fa143897d4c025d44c58ce44f99d/adoption/new-wsl/client-config-map.json#L555",
+      "new": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files",
+      "target": "adoption/new-wsl/client-config-map.json#L555"
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "old": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/df5316c93f87fa143897d4c025d44c58ce44f99d/tools/adoption/install_skills.py#L623",
+      "new": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files",
+      "target": "tools/adoption/install_skills.py#L623"
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "old": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/df5316c93f87fa143897d4c025d44c58ce44f99d/tools/adoption/install_skills.py#L502",
+      "new": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files",
+      "target": "tools/adoption/install_skills.py#L502"
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "kind": "branch-local prose references",
+      "count": 2
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "old": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/df5316c93f87fa143897d4c025d44c58ce44f99d/tools/adoption/apply_claude_settings.py#L191",
+      "new": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files",
+      "target": "tools/adoption/apply_claude_settings.py#L191"
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "old": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/df5316c93f87fa143897d4c025d44c58ce44f99d/tools/adoption/apply_claude_settings.py#L191",
+      "new": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files",
+      "target": "tools/adoption/apply_claude_settings.py#L191"
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "old": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/df5316c93f87fa143897d4c025d44c58ce44f99d/tools/adoption/apply_claude_settings.py#L191",
+      "new": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files",
+      "target": "tools/adoption/apply_claude_settings.py#L191"
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "old": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/df5316c93f87fa143897d4c025d44c58ce44f99d/tools/adoption/install_skills.py#L623",
+      "new": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files",
+      "target": "tools/adoption/install_skills.py#L623"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:192",
+      "new": "manifests/stack.json:190",
+      "target": "claude-code"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:298",
+      "new": "manifests/stack.json:296",
+      "target": "codex"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:10",
+      "new": "manifests/stack.json:8",
+      "target": "affaan-m/ECC"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1620",
+      "new": "manifests/stack.json:1621",
+      "target": "skills-ref"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:192",
+      "new": "manifests/stack.json:190",
+      "target": "claude-code"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1059",
+      "new": "manifests/stack.json:1066",
+      "target": "worktrunk"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1059",
+      "new": "manifests/stack.json:1066",
+      "target": "worktrunk"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:sandbox-runtime",
+      "new": "manifests/stack.json:863",
+      "target": "sandbox-runtime"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:888",
+      "new": "manifests/stack.json:887",
+      "target": "serena"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:140",
+      "new": "manifests/stack.json:138",
+      "target": "ast-grep"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:276",
+      "new": "manifests/stack.json:274",
+      "target": "codebase-memory-mcp"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1685",
+      "new": "manifests/stack.json:1686",
+      "target": "jcodemunch-mcp"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:765",
+      "new": "manifests/stack.json:763",
+      "target": "qmd"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:581",
+      "new": "manifests/stack.json:579",
+      "target": "markitdown"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1818",
+      "new": "manifests/stack.json:1819",
+      "target": "poppler"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:387",
+      "new": "manifests/stack.json:385",
+      "target": "context-hub"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:970",
+      "new": "manifests/stack.json:969",
+      "target": "socraticode"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:734",
+      "new": "manifests/stack.json:732",
+      "target": "qdrant"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1037",
+      "new": "manifests/stack.json:1036",
+      "target": "vllm"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:557",
+      "new": "manifests/stack.json:555",
+      "target": "huggingface-hub-native"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:96",
+      "new": "manifests/stack.json:94",
+      "target": "ai-memory"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1921",
+      "new": "manifests/stack.json:1934",
+      "target": "tavily-cli"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:38",
+      "new": "manifests/stack.json:36",
+      "target": "agent-browser"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:657",
+      "new": "manifests/stack.json:655",
+      "target": "openresearch"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:829",
+      "new": "manifests/stack.json:827",
+      "target": "rtk"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:409",
+      "new": "manifests/stack.json:407",
+      "target": "context-mode"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:521",
+      "new": "manifests/stack.json:519",
+      "target": "headroom"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:800",
+      "new": "manifests/stack.json:798",
+      "target": "repomix"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1007",
+      "new": "manifests/stack.json:1006",
+      "target": "toon"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:164",
+      "new": "manifests/stack.json:162",
+      "target": "ccusage"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:708",
+      "new": "manifests/stack.json:706",
+      "target": "promptfoo"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1866",
+      "new": "manifests/stack.json:1867",
+      "target": "playwright-test"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1573",
+      "new": "manifests/stack.json:1574",
+      "target": "zizmor"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1396",
+      "new": "manifests/stack.json:1405",
+      "target": "syft"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1343",
+      "new": "manifests/stack.json:1344",
+      "target": "dagu"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1456",
+      "new": "manifests/stack.json:1457",
+      "target": "systemd"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1769",
+      "new": "manifests/stack.json:1770",
+      "target": "fastapi"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1723",
+      "new": "manifests/stack.json:1724",
+      "target": "nextjs"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1791",
+      "new": "manifests/stack.json:1792",
+      "target": "postgresql"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1315",
+      "new": "manifests/stack.json:1316",
+      "target": "restic"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1087",
+      "new": "manifests/stack.json:1094",
+      "target": "opentelemetry-collector-contrib"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:298",
+      "new": "manifests/stack.json:296",
+      "target": "codex"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:631",
+      "new": "manifests/stack.json:629",
+      "target": "mcporter"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:606",
+      "new": "manifests/stack.json:604",
+      "target": "mcp-inspector"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:497",
+      "new": "manifests/stack.json:495",
+      "target": "gitleaks"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1059",
+      "new": "manifests/stack.json:1066",
+      "target": "worktrunk"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:474",
+      "new": "manifests/stack.json:472",
+      "target": "difftastic"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1524",
+      "new": "manifests/stack.json:1525",
+      "target": "edgartools"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1552",
+      "new": "manifests/stack.json:1553",
+      "target": "exchange-calendars"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1283",
+      "new": "manifests/stack.json:1284",
+      "target": "duckdb"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1524",
+      "new": "manifests/stack.json:1525",
+      "target": "edgartools"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1283",
+      "new": "manifests/stack.json:1284",
+      "target": "duckdb"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1552",
+      "new": "manifests/stack.json:1553",
+      "target": "exchange-calendars"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1283",
+      "new": "manifests/stack.json:1284",
+      "target": "duckdb"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1524",
+      "new": "manifests/stack.json:1525",
+      "target": "edgartools"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1552",
+      "new": "manifests/stack.json:1553",
+      "target": "exchange-calendars"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1343",
+      "new": "manifests/stack.json:1344",
+      "target": "dagu"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:298",
+      "new": "manifests/stack.json:296",
+      "target": "codex"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:192",
+      "new": "manifests/stack.json:190",
+      "target": "claude-code"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1456",
+      "new": "manifests/stack.json:1457",
+      "target": "systemd"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1087",
+      "new": "manifests/stack.json:1094",
+      "target": "opentelemetry-collector-contrib"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1193",
+      "new": "manifests/stack.json:1201",
+      "target": "grafana"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1315",
+      "new": "manifests/stack.json:1316",
+      "target": "restic"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1524",
+      "new": "manifests/stack.json:1525",
+      "target": "edgartools"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1501",
+      "new": "manifests/stack.json:1502",
+      "target": "skfolio"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1376",
+      "new": "manifests/stack.json:1377",
+      "target": "lean"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1376",
+      "new": "manifests/stack.json:1377",
+      "target": "lean"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1376",
+      "new": "manifests/stack.json:1377",
+      "target": "lean"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1501",
+      "new": "manifests/stack.json:1502",
+      "target": "skfolio"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:298",
+      "new": "manifests/stack.json:296",
+      "target": "codex"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:192",
+      "new": "manifests/stack.json:190",
+      "target": "claude-code"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1343",
+      "new": "manifests/stack.json:1344",
+      "target": "dagu"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1456",
+      "new": "manifests/stack.json:1457",
+      "target": "systemd"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1087",
+      "new": "manifests/stack.json:1094",
+      "target": "opentelemetry-collector-contrib"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1193",
+      "new": "manifests/stack.json:1201",
+      "target": "grafana"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1315",
+      "new": "manifests/stack.json:1316",
+      "target": "restic"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:298",
+      "new": "manifests/stack.json:296",
+      "target": "codex"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:96",
+      "new": "manifests/stack.json:94",
+      "target": "ai-memory"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:970",
+      "new": "manifests/stack.json:969",
+      "target": "socraticode"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:765",
+      "new": "manifests/stack.json:763",
+      "target": "qmd"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:888",
+      "new": "manifests/stack.json:887",
+      "target": "serena"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:734",
+      "new": "manifests/stack.json:732",
+      "target": "qdrant"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:409",
+      "new": "manifests/stack.json:407",
+      "target": "context-mode"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:829",
+      "new": "manifests/stack.json:827",
+      "target": "rtk"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:298",
+      "new": "manifests/stack.json:296",
+      "target": "codex"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:192",
+      "new": "manifests/stack.json:190",
+      "target": "claude-code"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1343",
+      "new": "manifests/stack.json:1344",
+      "target": "dagu"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1087",
+      "new": "manifests/stack.json:1094",
+      "target": "opentelemetry-collector-contrib"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1193",
+      "new": "manifests/stack.json:1201",
+      "target": "grafana"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1315",
+      "new": "manifests/stack.json:1316",
+      "target": "restic"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:1404",
+      "new": "manifests/stack.json:1405",
+      "target": "syft"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:497",
+      "new": "manifests/stack.json:495",
+      "target": "gitleaks"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:298",
+      "new": "manifests/stack.json:296",
+      "target": "codex"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "manifests/stack.json:omniroute.new_wsl_pin",
+      "new": "manifests/stack.json:1920",
+      "target": "omniroute"
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "old": "adoption/platforms/linux-wsl2-new-distro.md:250",
+      "new": "adoption/platforms/linux-wsl2-new-distro.md:295"
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "old": "adoption/platforms/linux-wsl2-new-distro.md:791-828",
+      "new": "adoption/platforms/linux-wsl2-new-distro.md:836-873"
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "old": "adoption/templates/systemd/omniroute.service:65-100",
+      "new": "adoption/templates/systemd/omniroute.service:65-97"
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute-canary-install.sh",
+      "old": "adoption/templates/systemd/omniroute.service:65-100",
+      "new": "adoption/templates/systemd/omniroute.service:65-97"
+    }
+  ],
+  "checked_local_references": [
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "adoption/skills/manifest.json:69",
+      "mapped": [
+        69
+      ],
+      "source": [
+        "      \"ref\": \"49f948faa9258a0c61caceaf225e179651397431\","
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "adoption/skills/manifest.json:44",
+      "mapped": [
+        44
+      ],
+      "source": [
+        "      \"ref\": \"65a39f393687675ce170e6094757de20370365b9\","
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "blueprints/runtime-workers/openhands/pins.json:62",
+      "mapped": [
+        62
+      ],
+      "source": [
+        "      \"tag\": \"v0.23.0\","
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/foundation/automation.json:147-149",
+      "mapped": [
+        147,
+        149
+      ],
+      "source": [
+        "      \"repository\": \"actions/attest\",",
+        "      \"revision\": \"1e69f48acb82d1966a394da916b4c1698aa569d6\","
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "adoption/pins-linux-x86_64.json:24",
+      "mapped": [
+        24
+      ],
+      "source": [
+        "      \"version\": \"0.12.17\","
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "adoption/sdk/accepted-constraints.txt:19-20",
+      "mapped": [
+        19,
+        20
+      ],
+      "source": [
+        "msgpack==1.2.2",
+        "numpy==2.5.3"
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "adoption/pins-linux-x86_64.json:39",
+      "mapped": [
+        39
+      ],
+      "source": [
+        "      \"version\": \"2.101.0\","
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/us-equities/runtime-target.json:99",
+      "mapped": [
+        99
+      ],
+      "source": [
+        "        }"
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/us-equities/runtime-target.json:99",
+      "mapped": [
+        99
+      ],
+      "source": [
+        "        }"
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/landscape/us-equities.json:628-632",
+      "mapped": [
+        628,
+        632
+      ],
+      "source": [
+        "          \"component_id\": \"data-dvc\",",
+        "          \"why_selected\": \"Select c2 provisionally for this layer's reproducibility and data-versioning scope. Source review of the exact pinned [DVC README](https://raw.githubuser"
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/us-equities/runtime-target.json:99",
+      "mapped": [
+        99
+      ],
+      "source": [
+        "        }"
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/landscape/us-equities.json:1443-1447",
+      "mapped": [
+        1443,
+        1447
+      ],
+      "source": [
+        "          \"component_id\": \"data-pandera\",",
+        "          \"why_selected\": \"This is my own source review of the retained files. I ran nothing and did not use any TypeSafe inference results. Two candidates win: c3 (Dagu) for orche"
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/us-equities/runtime-target.json:26",
+      "mapped": [
+        26
+      ],
+      "source": [
+        "    \"requested_version\": \"2.0.0rc5\","
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/us-equities/runtime-target.json:99",
+      "mapped": [
+        99
+      ],
+      "source": [
+        "        }"
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/us-equities/runtime-target.json:26",
+      "mapped": [
+        26
+      ],
+      "source": [
+        "    \"requested_version\": \"2.0.0rc5\","
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/us-equities/runtime-target.json:99",
+      "mapped": [
+        99
+      ],
+      "source": [
+        "        }"
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/us-equities/runtime-target.json:26",
+      "mapped": [
+        26
+      ],
+      "source": [
+        "    \"requested_version\": \"2.0.0rc5\","
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/us-equities/runtime-target.json:99",
+      "mapped": [
+        99
+      ],
+      "source": [
+        "        }"
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/landscape/us-equities.json:2840",
+      "mapped": [
+        2840
+      ],
+      "source": [
+        "          \"component_id\": \"skfolio\","
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/landscape/us-equities.json:3209-3213",
+      "mapped": [
+        3209,
+        3213
+      ],
+      "source": [
+        "          \"component_id\": \"foundation-agent-retrieval-bench\",",
+        "          \"why_selected\": \"I judged fit against the layer title, \\\"Evaluation and experiments\\\", and its scope terms (evaluation, agent-evaluation, experiment-tracking, progressive"
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/landscape/us-equities.json:3228-3232",
+      "mapped": [
+        3228,
+        3232
+      ],
+      "source": [
+        "          \"component_id\": \"inspect-ai\",",
+        "          \"why_selected\": \"I judged fit against the layer title, \\\"Evaluation and experiments\\\", and its scope terms (evaluation, agent-evaluation, experiment-tracking, progressive"
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/landscape/us-equities.json:3247-3251",
+      "mapped": [
+        3247,
+        3251
+      ],
+      "source": [
+        "          \"component_id\": \"data-mlflow\",",
+        "          \"why_selected\": \"I judged fit against the layer title, \\\"Evaluation and experiments\\\", and its scope terms (evaluation, agent-evaluation, experiment-tracking, progressive"
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/foundation/automation.json:173-176",
+      "mapped": [
+        173,
+        176
+      ],
+      "source": [
+        "      \"repository\": \"anchore/grype\",",
+        "      \"source\": \"https://github.com/anchore/grype/releases/download/v0.119.0/grype_0.119.0_checksums.txt\","
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "adoption/platforms/linux-wsl2-new-distro.md:250",
+      "mapped": [
+        295
+      ],
+      "source": [
+        "an empty temporary directory, which is also `gpgv`'s home, so no GnuPG home of the user is read or written."
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "evidence/receipts/guard-k4-verification-20261001.json:27",
+      "mapped": [
+        27
+      ],
+      "source": [
+        "    \"guard_sha256\": \"33a11fc01ee35dc4b157b04eee4a8524460bb3fe74375ee32485bc3b2530782f\","
+      ]
+    },
+    {
+      "file": "catalogs/foundation/new-wsl-architecture-20261001.json",
+      "citation": "catalogs/foundation/new-wsl-architecture-20261001.json:6",
+      "mapped": [
+        6
+      ],
+      "source": [
+        "    \"base_commit\": \"5597f9fae2c6148037a74b4e73d2c55fc11c9ff6\","
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g1-clients.md",
+      "citation": "tools/adoption/apply_claude_settings.py:191",
+      "mapped": [
+        191
+      ],
+      "source": [
+        "def merge_settings(base: dict, template: dict) -> dict:"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g2-mcp-workers.md",
+      "citation": "adoption/new-wsl/client-config-map.json:27",
+      "mapped": [
+        27
+      ],
+      "source": [
+        "      \"match\": ["
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g2-mcp-workers.md",
+      "citation": "tools/research/gpt_researcher.sh:27",
+      "mapped": [
+        27
+      ],
+      "source": [
+        "here=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\" && pwd)\""
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g3-code-docs.md",
+      "citation": "tools/adoption/new_wsl_client_config.py:710,852,863",
+      "mapped": [
+        710,
+        852,
+        863
+      ],
+      "source": [
+        "def block_text(root: Path, piece_key: str) -> str:",
+        "def generate_blocks(root: Path, names: list) -> dict:",
+        "def block_errors(root: Path, names: list) -> list:"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g3-code-docs.md",
+      "citation": "adoption/templates/codex.AGENTS.template.md:54",
+      "mapped": [
+        54
+      ],
+      "source": [
+        "<!-- native-agent-stack:rtk-exceptions -->"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g3-code-docs.md",
+      "citation": "adoption/new-wsl/codex-user-instructions.md:54",
+      "mapped": [
+        54
+      ],
+      "source": [
+        "<!-- native-agent-stack:rtk-exceptions -->"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+      "citation": "observability/backends/configure.py:76",
+      "mapped": [
+        76
+      ],
+      "source": [
+        "    source=a.port_overrides or (saved if saved.exists() else None)"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+      "citation": "observability/collector/collector.yaml:1",
+      "mapped": [
+        1
+      ],
+      "source": [
+        "# Native OTLP only. Prompt/tool content and account identifiers are dropped; selected correlation IDs stay private."
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+      "citation": "observability/backends/templates/ecosystem-dashboard.json.example:1",
+      "mapped": [
+        1
+      ],
+      "source": [
+        "{"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+      "citation": "observability/backends/templates/ecosystem-prometheus-rules.yml.example:1",
+      "mapped": [
+        1
+      ],
+      "source": [
+        "groups:"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+      "citation": "observability/backends/README.md:214",
+      "mapped": [
+        214
+      ],
+      "source": [
+        "Prometheus alerts when a normal scrape remains down for two minutes. Four"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+      "citation": "examples/omniroute-codex-sdk/worker.py:165,189,395,596",
+      "mapped": [
+        165,
+        189,
+        395,
+        596
+      ],
+      "source": [
+        "",
+        "def initial_record(args: argparse.Namespace) -> dict:",
+        "    args: argparse.Namespace, prompt: str, *, sdk_factory=AsyncCodex, on_event=emit",
+        "                \"usage_status\": \"unknown\","
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+      "citation": "adoption/new-wsl/client-config-map.json:36",
+      "mapped": [
+        36
+      ],
+      "source": [
+        "      \"source\": \"modelcontextprotocol/inspector 2.9.0 clients/web/server/web-server-config.ts L530-542: MCP_AUTO_OPEN_ENABLED=false never opens the browser. The manifest installs t"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+      "citation": "docs/secret-storage.md:39,83",
+      "mapped": [
+        39,
+        83
+      ],
+      "source": [
+        "`PAPERCLIP_`, `OPENROUTER_API_KEY`). The checker lists any that are set, by",
+        "and `\\u003E` (the tag flag of PHP's `json_encode`); and hex. A variable that"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+      "citation": "observability/backends/configure.py:101-108",
+      "mapped": [
+        101,
+        108
+      ],
+      "source": [
+        "      'loki': f'{tool(\"loki\")}/loki-linux-amd64 -config.file={cfg}/ecosystem-loki.yml',",
+        "        if name=='grafana': text+=f'EnvironmentFile={env.resolve()}\\n'"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+      "citation": "tests/test_new_wsl_handbook.py:1249",
+      "mapped": [
+        1249
+      ],
+      "source": [
+        "    def test_no_recipe_command_is_typed_into_the_generator_or_the_profile(self):"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+      "citation": "scripts/new_wsl_profile.py:31,172-174",
+      "mapped": [
+        31,
+        172,
+        174
+      ],
+      "source": [
+        "ACCEPTANCE_CLASSES = {\"documented_upstream_example_not_executed\", \"upstream_test_command_not_executed\"}",
+        "        require(\"evidence_class\" in acceptance, \"acceptance evidence class is missing\")",
+        "                \"acceptance must remain a documented, unexecuted example or test\")"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md",
+      "citation": "tools/adoption/new_wsl_client_config.py:1623,1735,2343",
+      "mapped": [
+        1623,
+        1735,
+        2343
+      ],
+      "source": [
+        "def plan_merge(existing: dict, rendered: dict) -> MergePlan:",
+        "def merge_toml_text(text: str, plan: MergePlan) -> str:",
+        "                lane.atomic_write(config, new_text.encode(\"utf-8\"), mode, lane.sha256_bytes(original))"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md",
+      "citation": "tools/adoption/apply_codex_lane.py:271",
+      "mapped": [
+        271
+      ],
+      "source": [
+        "def atomic_write(path: Path, data: bytes, mode: int, expect_sha: str | None, create_only: bool = False) -> None:"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md",
+      "citation": "scripts/landscape.py:1365,1373-1378",
+      "mapped": [
+        1365,
+        1373,
+        1378
+      ],
+      "source": [
+        "    freshness = read(sources[\"freshness_snapshot\"])",
+        "    for row in checked:",
+        "                \"freshness selected source pin differs from current manifest\")"
+      ]
+    },
+    {
+      "file": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g7-git.md",
+      "citation": "scripts/landscape.py:1375-1379",
+      "mapped": [
+        1375,
+        1379
+      ],
+      "source": [
+        "        require(row.get(\"selected_version\") == selected.get(\"version\"),",
+        "        require(canonical(identity(row.get(\"selected_repository_url\")), aliases)"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "citation": "tools/adoption/apply_claude_settings.py:191",
+      "mapped": [
+        191
+      ],
+      "source": [
+        "def merge_settings(base: dict, template: dict) -> dict:"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "citation": "adoption/new-wsl/client-config-map.json:27",
+      "mapped": [
+        27
+      ],
+      "source": [
+        "      \"match\": ["
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "citation": "tools/research/gpt_researcher.sh:27",
+      "mapped": [
+        27
+      ],
+      "source": [
+        "here=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\" && pwd)\""
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "citation": "observability/collector/collector.yaml:1",
+      "mapped": [
+        1
+      ],
+      "source": [
+        "# Native OTLP only. Prompt/tool content and account identifiers are dropped; selected correlation IDs stay private."
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "citation": "observability/backends/templates/ecosystem-dashboard.json.example:1",
+      "mapped": [
+        1
+      ],
+      "source": [
+        "{"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "citation": "examples/omniroute-codex-sdk/worker.py:395,596",
+      "mapped": [
+        395,
+        596
+      ],
+      "source": [
+        "    args: argparse.Namespace, prompt: str, *, sdk_factory=AsyncCodex, on_event=emit",
+        "                \"usage_status\": \"unknown\","
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "citation": "docs/secret-storage.md:39,83",
+      "mapped": [
+        39,
+        83
+      ],
+      "source": [
+        "`PAPERCLIP_`, `OPENROUTER_API_KEY`). The checker lists any that are set, by",
+        "and `\\u003E` (the tag flag of PHP's `json_encode`); and hex. A variable that"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "citation": "observability/backends/templates/ecosystem-prometheus-rules.yml.example:1",
+      "mapped": [
+        1
+      ],
+      "source": [
+        "groups:"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "citation": "observability/backends/README.md:214-249",
+      "mapped": [
+        214,
+        249
+      ],
+      "source": [
+        "Prometheus alerts when a normal scrape remains down for two minutes. Four",
+        "```"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "citation": "observability/backends/configure.py:76-96",
+      "mapped": [
+        76,
+        96
+      ],
+      "source": [
+        "    source=a.port_overrides or (saved if saved.exists() else None)",
+        "    def tool(name): return str(a.tools_root.resolve()/f'ecosystem-{name}-{versions[name]}')"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "citation": "tools/adoption/new_wsl_client_config.py:1623,1735",
+      "mapped": [
+        1623,
+        1735
+      ],
+      "source": [
+        "def plan_merge(existing: dict, rendered: dict) -> MergePlan:",
+        "def merge_toml_text(text: str, plan: MergePlan) -> str:"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "citation": "tools/adoption/apply_codex_lane.py:271",
+      "mapped": [
+        271
+      ],
+      "source": [
+        "def atomic_write(path: Path, data: bytes, mode: int, expect_sha: str | None, create_only: bool = False) -> None:"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "citation": "adoption/platforms/linux-wsl2-new-distro.md:791-828",
+      "mapped": [
+        836,
+        873
+      ],
+      "source": [
+        "### F1. systemd",
+        "is benign and won't affect registration of user defined binfmt settings.\")."
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
+      "citation": "adoption/templates/systemd/omniroute.service:65-97",
+      "mapped": [
+        65,
+        97
+      ],
+      "source": [
+        "[Unit]",
+        "WantedBy=default.target"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/config/betterleaks-accept.sh",
+      "citation": "docs/decisions/2026-10-02-github-automation-practice.md:40-57",
+      "mapped": [
+        40,
+        57
+      ],
+      "source": [
+        "- **P1, the secret-scan gate.** It runs once the definitive round has picked the secrets slot, as the acceptance",
+        "  - Arms: sem 0.25.0 against difftastic 0.71.0 (the selection of record) and plain `git diff`."
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute-canary-install.sh",
+      "citation": "adoption/templates/systemd/omniroute.service:65-97",
+      "mapped": [
+        65,
+        97
+      ],
+      "source": [
+        "[Unit]",
+        "WantedBy=default.target"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/config/prometheus-alerts.yaml",
+      "citation": "observability/backends/templates/ecosystem-prometheus-rules.yml.example:1",
+      "mapped": [
+        1
+      ],
+      "source": [
+        "groups:"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/config/promptfoo-codex-env.py",
+      "citation": "tools/adoption/new_wsl_client_config.py:1623,1735",
+      "mapped": [
+        1623,
+        1735
+      ],
+      "source": [
+        "def plan_merge(existing: dict, rendered: dict) -> MergePlan:",
+        "def merge_toml_text(text: str, plan: MergePlan) -> str:"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/config/promptfoo-codex-env.py",
+      "citation": "tools/adoption/apply_codex_lane.py:271",
+      "mapped": [
+        271
+      ],
+      "source": [
+        "def atomic_write(path: Path, data: bytes, mode: int, expect_sha: str | None, create_only: bool = False) -> None:"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "citation": "recipes/README.md:143",
+      "mapped": [
+        143
+      ],
+      "source": [
+        "**Recommended Claude pin (CM H5 / B6).** In a scratch `CLAUDE_CONFIG_DIR`, use a hand-authored `.claude-plugin/marketplace.json` whose context-mode entry has `source: {\"source\":\"gi"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "citation": "observability/backends/configure.py:76",
+      "mapped": [
+        76
+      ],
+      "source": [
+        "    source=a.port_overrides or (saved if saved.exists() else None)"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "citation": "observability/backends/configure.py:76",
+      "mapped": [
+        76
+      ],
+      "source": [
+        "    source=a.port_overrides or (saved if saved.exists() else None)"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "citation": "observability/backends/configure.py:76",
+      "mapped": [
+        76
+      ],
+      "source": [
+        "    source=a.port_overrides or (saved if saved.exists() else None)"
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "citation": "tools/research/gpt_researcher.sh:27",
+      "mapped": [
+        27
+      ],
+      "source": [
+        "here=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\" && pwd)\""
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "citation": "tools/research/gpt_researcher.sh:27",
+      "mapped": [
+        27
+      ],
+      "source": [
+        "here=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\" && pwd)\""
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "citation": "tools/research/gpt_researcher.sh:27",
+      "mapped": [
+        27
+      ],
+      "source": [
+        "here=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\" && pwd)\""
+      ]
+    },
+    {
+      "file": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+      "citation": "tools/research/gpt_researcher.sh:27",
+      "mapped": [
+        27
+      ],
+      "source": [
+        "here=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\" && pwd)\""
+      ]
+    }
+  ]
+}

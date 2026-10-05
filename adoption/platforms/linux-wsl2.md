@@ -106,7 +106,7 @@ itself evidence the WSL UVA gap closed.
    The script and its rtk and markitdown pins changed after `v2026.09.25.2` (#291): at that tag rtk was pinned at 0.49.0 and the script printed no such reminder at all; after that tag the pin became 0.50.0 and, after installing rtk, the script started printing a reminder unless `~/.config/rtk/config.toml` already has the Claude-hook `exclude_commands` key. It changed after `v2026.09.26`, which already pins rtk 0.50.0 but still checks only for the original two-entry key and does not detect a duplicate `exclude_commands` line; here the reminder fires unless the key appears exactly once with all five entries from [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks) are present, exactly once, and, since #314, unless the installed `rtk hook check` also leaves the recipe's probes unrewritten (rtk can ignore a TOML-valid file, for example one with a `[tracking]` table that lacks `history_days`). The script never writes that file. Its pins file's rtk `install_note` also changed after `v2026.09.26` (`pins-linux-x86_64.json`, text only).
    The script's socraticode and headroom installs changed after `v2026.09.26` too (as did headroom's `install_note`): it now passes `--ignore-scripts` for socraticode's `ignore_scripts: true` pin, a field the tag's script ignores, so there npm runs every install script in socraticode's dependency tree, and it now downloads headroom's pinned wheel, verifies its `sha256` and installs that file, where the tag's script resolves `headroom-ai[mcp]==0.37.0` from the index without reading the wheel or its hash (step 2 of [`adoption/bootstrap.md`](../bootstrap.md)).
    Its pins file also changed after `v2026.09.25.2` in a second way:
-   `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.155.1 to 0.157.1 on 2026-09-26, then to 0.159.2 on 2026-09-30; a host at that tag installs 0.155.1, and 0.157.1 needs the Codex template's `daemon_auto_start = false` before its first interactive launch, which the template keeps for 0.159.2, where the feature is still listed as stable and on) and in its `claude-code` entry (2.1.281 to 2.1.284, described earlier in this step).
+   `pins-linux-x86_64.json` changed after `v2026.09.26.2` in its `codex` entry (0.155.1 to 0.157.1 on 2026-09-26, then to 0.159.2 on 2026-09-30, 0.159.3 on 2026-10-01 and the repository 0.160.0 pair on 2026-10-03; a host at that tag installs 0.155.1, and 0.157.1 needs the Codex template's `daemon_auto_start = false` before its first interactive launch, which the template keeps for 0.159.2, where the feature is still listed as stable and on) and in its `claude-code` entry (2.1.281 to 2.1.284, described earlier in this step). The [October 3 receipt](../../evidence/artifacts/runtime-sdk-20261003/receipt.json) retains completed 0.160.0 native-account and gateway markers on the existing host as a compatibility attempt; original invocation/timing evidence is incomplete; the shared launcher and daemon still run 0.159.3 until a coordinated switch.
    `pins-linux-x86_64.json` now pins `repomix`, `toon`,
    `headroom`, `ccusage`, `serena` and `socraticode` too, completing the
    `token-efficiency` profile's Linux coverage (step 2 of
@@ -139,13 +139,40 @@ itself evidence the WSL UVA gap closed.
 Lessons from work on the WSL workstation in September 2026; the links give the
 upstream behavior behind each.
 
-- Do not pipe a script to `powershell.exe -Command -`. PowerShell reads
+**Prerequisite: PowerShell 7 installed on the Windows host.** A stock Windows installation does not include it.
+This guidance uses [PowerShell v7.6.6](https://github.com/PowerShell/PowerShell/releases/tag/v7.6.6)
+(2026-09-08; current stable release checked 2026-10-04). Run
+`winget install --id Microsoft.PowerShell --source winget --installer-type wix --version 7.6.6` in a Windows command shell
+([Microsoft's install instructions](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.6#install-powershell-using-winget),
+[WinGet install reference: `--version` selects an exact version](https://learn.microsoft.com/en-us/windows/package-manager/winget/install#options)).
+WinGet defaults to MSIX since 7.6; `--installer-type wix` selects the MSI installation, whose default directory is
+`C:\Program Files\PowerShell\7`
+([installation options](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.6#install-the-msi-package-with-command-line-options)).
+If `/mnt/c/Program Files/PowerShell/7/pwsh.exe` is absent, stop the Windows-side steps and install it first. When WinGet
+is unavailable, download the **7.6.6 MSI** from the [reviewed release](https://github.com/PowerShell/PowerShell/releases/tag/v7.6.6)
+and follow [Microsoft's MSI installation steps](https://learn.microsoft.com/en-us/powershell/scripting/install/install-powershell-on-windows?view=powershell-7.6#install-the-msi-package):
+double-click it and follow the prompts, retaining the default directory; run the version gate before resuming
+([Microsoft's installer steps, lines 84–92](https://github.com/MicrosoftDocs/PowerShell-Docs/blob/a3de8f22552170e70852470d46cd52cd9ca471ec/reference/docs-conceptual/install/install-powershell-on-windows.md#L84-L92)).
+Before any Windows-side block, run the [PowerShell version gate from bash in the workstation distribution](linux-wsl2-new-distro.md#powershell-version-gate-before-w1).
+It prints and records `$PSVersionTable.PSVersion` from this exact executable and permits only 7.6.6 or a later stable
+7.6 patch. An older version takes
+`winget upgrade --id Microsoft.PowerShell --source winget --installer-type wix --version 7.6.6` in a Windows command
+shell ([WinGet upgrade reference](https://learn.microsoft.com/en-us/windows/package-manager/winget/upgrade#options)),
+or the 7.6.6 MSI fallback when WinGet is unavailable; rerun the gate and retain its new version log before continuing.
+Do not fall back to Windows PowerShell 5.1. NativeStack disables `appendWindowsPath`, so invoke the quoted absolute
+path below even when Windows has the executable on its PATH.
+
+- Do not pipe a script to `pwsh.exe -Command -`. PowerShell reads
   standard input one statement at a time, as if typed at the prompt, and does
   not run a statement that fails to parse
-  ([about_PowerShell_exe](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_powershell_exe?view=powershell-5.1)),
+  ([about_pwsh, -Command](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh?view=powershell-7.6#-command---c)),
   so a multi-line block can be dropped without an error. Write a `.ps1` file
   and run it with
-  `powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w file.ps1)"`.
+  `'/mnt/c/Program Files/PowerShell/7/pwsh.exe' -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$(wslpath -w step.ps1)"`.
+  `-File` takes the script path and must follow the other launcher options;
+  `-NonInteractive` makes prompts fail instead of hanging
+  ([about_pwsh, -File](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh?view=powershell-7.6#-file---f),
+  [about_pwsh, -NonInteractive](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_pwsh?view=powershell-7.6#-noninteractive---noni)).
 - Strip `\r` and `\0` from Windows-side output before comparing or parsing it,
   for example with `tr -d '\r\0'`. Windows programs end lines with CRLF, and
   `wsl.exe` writes UTF-16 unless `WSL_UTF8=1` is set
@@ -218,7 +245,7 @@ with bubblewrap, Claude Code creates such an empty `~/.bash_profile` and leaves 
 
 Measured on one workstation (Windows Terminal 1.24, Claude Code 2.1.284, Codex 0.157.1, before the Linux pin moved to 0.159.2). A new host collects its own evidence.
 
-The example also carries two resume profiles, `WSL - Codex - resume` and `WSL - Claude - resume`, each right after the profile of its client. They run `exec codex resume` and `exec claude --resume`, which open the client's own session picker, and nothing resumes until you choose a row. Each picker starts with the sessions of the profile's `--cd` directory (Codex: the launch directory; Claude Code: the current worktree) and can be widened from inside it ([Codex `resume_picker.rs` at `rust-v0.159.3`](https://github.com/openai/codex/blob/rust-v0.159.3/codex-rs/tui/src/resume_picker.rs#L674-L687); [Claude Code sessions](https://code.claude.com/docs/en/sessions)), and the default profiles are unchanged and still start a new session.
+The example also carries two resume profiles, `WSL - Codex - resume` and `WSL - Claude - resume`, each right after the profile of its client. They run `exec codex resume` and `exec claude --resume`, which open the client's own session picker, and nothing resumes until you choose a row. Each picker starts with the sessions of the profile's `--cd` directory (Codex: the launch directory; Claude Code: the current worktree) and can be widened from inside it ([Codex `resume_picker.rs` at `rust-v0.160.0`](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/tui/src/resume_picker.rs#L676-L689); [Claude Code sessions](https://code.claude.com/docs/en/sessions)), and the default profiles are unchanged and still start a new session.
 
 Windows Terminal re-saves `settings.json` in its own layout, written from its settings model with four-space indentation, and writes a single `bellSound` string back as a one-element array (`microsoft/terminal` `v1.24.11911.0`: `CascadiaSettingsSerialization.cpp` L1602 writes the file, and `JsonUtils.h` L359-L389 reads a lone string as a list of one while L549-L551 always writes an array), so a check that reads that file must accept both forms.
 

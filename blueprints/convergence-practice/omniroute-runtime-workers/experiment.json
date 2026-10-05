@@ -1,0 +1,776 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Provide Claude's foundation coordinator with high-quality native OmniRoute runtime workers and task-relevant skills. Qualify the retained Codex SDK lifecycle; hold the Claude Devin bridge after one source-backed repair still fails.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/openai/codex/tree/ff6aec96948b70d94983af2641a6b67c94faeff5/sdk/python",
+      "revision": "ff6aec96948b70d94983af2641a6b67c94faeff5"
+    },
+    {
+      "url": "https://github.com/anthropics/claude-agent-sdk-python/tree/f2204bb956bab02907aaf3cb88eb9dead28eaa35",
+      "revision": "f2204bb956bab02907aaf3cb88eb9dead28eaa35"
+    },
+    {
+      "url": "https://github.com/diegosouzapw/OmniRoute/tree/c1e30b7676975feb298b49eff6ff58923c04b89e/tests/fixtures/devin-bridge/e2e-workspace",
+      "revision": "c1e30b7676975feb298b49eff6ff58923c04b89e"
+    },
+    {
+      "url": "https://github.com/diegosouzapw/OmniRoute/tree/2f42a9ac19d1a247ec9ce5473b790843724b3061/open-sse/executors/devin-agentic",
+      "revision": "2f42a9ac19d1a247ec9ce5473b790843724b3061"
+    },
+    {
+      "url": "https://github.com/vercel-labs/skills/tree/7407f3893ad4dceab546ac002c3ef806e4000c73",
+      "revision": "7407f3893ad4dceab546ac002c3ef806e4000c73"
+    },
+    {
+      "url": "https://github.com/mitmproxy/mitmproxy/tree/6c09d56e4c29a92f5ad01b03199977584b8ea14f",
+      "revision": "6c09d56e4c29a92f5ad01b03199977584b8ea14f"
+    }
+  ],
+  "discovery_provenance": [
+    "Installed client/SDK command and version inspection, official tagged source and release records, maintained skill discovery and native Vercel installer.",
+    "Native Claude ListAgents/SendMessage owner contacts and independently checked public PR535/524 leads.",
+    "Astra/Max original-source review for consequential translated bridge architecture and failure unresolved after one bounded Sol repair.",
+    "2026-10-03 publication note: frozen references to changed example files now name byte-identical #551 historical copies, including checks.json. Original base, tasks, roles, tools, commands, observations, usage and qualification IDs remain September 30 history. All 0.160.0 observations belong only to sibling omniroute-runtime-workers/experiment-sdk-0160-20261003.json."
+  ],
+  "license_and_compatibility": "Use maintained Codex Apache-2.0 SDK/native runtime and licensed native Claude SDK/client. OmniRoute fixture is reused from its pinned published source. Loopback worker configuration is child-only; no global route, auth store, compression engine or interactive model changes.",
+  "baseline_and_candidate": {
+    "baseline": "Retained Codex SDK incumbent and native Claude interactive coordination; separate three-arm SDK comparison unresolved.",
+    "candidate": "Bounded Sol-Max Codex SDK coding worker on the selected OmniRoute Responses lane, plus native Claude on-demand dispatch skill; Claude SDK translated bridge retained as failed trial."
+  },
+  "frozen_inputs": {
+    "base_revision": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+    "tasks": [
+      "skill-install",
+      "skill-check",
+      "code-fix",
+      "resume",
+      "invalid-resume",
+      "interrupt",
+      "fresh-recovery",
+      "claude-bridge",
+      "owner-cooperation",
+      "analytical-review",
+      "bare-auth",
+      "fixture-negative",
+      "fixture-positive",
+      "claude-callsite",
+      "claude-sdk-child"
+    ],
+    "roles": [
+      "installer",
+      "sol-worker",
+      "claude-worker",
+      "claude-peer",
+      "astra-judge",
+      "oracle"
+    ],
+    "sources": [
+      {
+        "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-worker.py.txt",
+        "sha256": "8dfa1799dc2ce034548eb2581befe61bef480728cc541a451e960bb48decc651"
+      },
+      {
+        "path": "evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/worker.py.lock.source.txt",
+        "sha256": "15e5e7cfeec11ac86d8f081742c726c0d70326b480894a81e5cc76a7d9225c44"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+        "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+      },
+      {
+        "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-dispatcher.md",
+        "sha256": "857a00f0c3f4088a20662f32f422b30c4697d0c267c0db1f9dbb95dfcbe39ce5"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+        "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+      },
+      {
+        "path": "evidence/artifacts/omniroute-runtime-workers-20260930/pre-enhancement-test_worker.py.txt",
+        "sha256": "ea30d5bd0568f1e179e6460647ef61f2ca1ca025bda574f5f35a315eeee2ae2a"
+      },
+      {
+        "path": "evidence/receipts/omniroute-claude-callsite-20260930.json",
+        "sha256": "a1dd584094ebb8aa1c58da0ac34d1d7b7ddb9fcf5e78b67732c7d3b3a0ba6ce3"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Before provider trials require task skill read, only intended fixture edit, unchanged oracle pass, native resume, interruption and fresh recovery. This functional record is not a preregistered comparative SDK winner trial. Exact live source commits and AST-equivalent final formatting are retained.",
+    "usage_rule": "Preserve native cumulative thread snapshots; count latest snapshot once or difference comparable snapshots. Observation sol-resume uses the incremental difference from sol-fix, rather than adding cumulative totals. Cache/read and reasoning are subsets; failures and incomplete provider coverage remain unknown."
+  },
+  "runtime_and_platform": {
+    "platform": "Linux x86_64; Python 3.14.7 for worker invocation; unchanged Claude SDK suite separately Python 3.13.15.",
+    "tools": [
+      {
+        "name": "Codex Python SDK and native CLI",
+        "version": "0.159.2"
+      },
+      {
+        "name": "Claude Agent SDK",
+        "version": "0.2.162 / bundled CLI2.1.285"
+      },
+      {
+        "name": "OmniRoute",
+        "version": "3.8.51, running-base revision plus owned patches"
+      },
+      {
+        "name": "Vercel skills",
+        "version": "1.7.0"
+      },
+      {
+        "name": "mitmproxy",
+        "version": "12.2.3"
+      }
+    ],
+    "isolation": "Separate writing worktrees and bounded ownership, owned project and private worker home, separate per-invocation SDK child, dedicated loopback observer. Native interactive sessions and other owners' services/state preserved."
+  },
+  "commands": [
+    "rtk python3 tools/adoption/install_skills.py --manifest blueprints/runtime-workers/skills/manifest.json --project-dir <owned-project> --agent claude-code --skills-bin <pinned-skills> --json",
+    "Same supported skill installer with --check-only",
+    "rtk uv run --locked --script examples/omniroute-codex-sdk/worker.py --workspace <owned-project> --codex-home <private-home> --base-url <owned-loopback-observer>/v1 --prompt - --no-provider-retries --native-result <new-private-result>",
+    "Same native worker with --resume <retained-thread> --sandbox read-only and new private result",
+    "Same native worker with invalid retained thread, --sandbox read-only",
+    "Same native worker with --timeout 3 --sandbox read-only",
+    "Same native worker with new thread --sandbox read-only",
+    "rtk uv run --locked --script examples/claude-runtime-sdk/worker.py --cwd <owned-project> --gateway <owned-loopback-observer> --model dva/claude-opus-5-max --skill bridge-proof --setting-source project --permission-mode dontAsk --allow-tool Read --max-turns 6 --timeout 90 --result-output <new-private-result>",
+    "Same Claude SDK trial after source-backed child authentication repair",
+    "Native Claude background Opus 5.5/Max ListAgents/SendMessage cooperation; stop only owned session after no final packet",
+    "rtk proxy timeout --signal=TERM --kill-after=5s 240s claude -p --model claude-opus-5-5 --effort max --tools '' --strict-mcp-config --no-session-persistence --output-format json < <private-packet>",
+    "Native bare-mode analytical review negative control; no native authentication loading",
+    "rtk npm test (independent unchanged upstream fixture before and after the worker)",
+    "rtk proxy timeout --signal=TERM --kill-after=5s 180s claude -p --model claude-opus-5-5 --effort max --tools 'Bash,Read,Skill' --allowedTools 'Bash Read Skill' --strict-mcp-config --max-turns 4 --no-session-persistence --verbose --output-format stream-json < <private-callsite-prompt>",
+    "Native Claude Bash calls rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py --workspace <owned-project> --codex-home <private-home> --sandbox read-only --no-provider-retries --timeout 60 --request-id <own-request> --native-result <new-private-result> --prompt <single-oracle-task>"
+  ],
+  "observations": [
+    {
+      "id": "skills-install",
+      "task": "skill-install",
+      "role": "installer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Install selected 136 skills into owned project",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+          "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "skills-check",
+      "task": "skill-check",
+      "role": "installer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "Check selected 136 skills in owned project",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+          "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "sol-preflight",
+      "task": "code-fix",
+      "role": "sol-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "native_cli_execution",
+      "scope": "Native Sol-Max SDK coding worker on the selected OmniRoute Responses lane",
+      "status": "failed",
+      "exit_code": 2,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+          "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "sol-fix",
+      "task": "code-fix",
+      "role": "sol-worker",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 2,
+      "evidence_class": "model_task_execution",
+      "scope": "Native Sol-Max SDK coding worker on the selected OmniRoute Responses lane",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+          "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+        }
+      ],
+      "usage": {
+        "uncached_input": 44645,
+        "cache_creation": 0,
+        "cache_read": 91904,
+        "output": 2818,
+        "reasoning_in_output": 1480,
+        "total": 139367,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "sol-resume",
+      "task": "resume",
+      "role": "sol-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 3,
+      "evidence_class": "model_task_execution",
+      "scope": "Native Sol-Max SDK coding worker on the selected OmniRoute Responses lane",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+          "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+        }
+      ],
+      "usage": {
+        "uncached_input": 8129,
+        "cache_creation": 0,
+        "cache_read": 49792,
+        "output": 529,
+        "reasoning_in_output": 165,
+        "total": 58450,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "sol-invalid-resume",
+      "task": "invalid-resume",
+      "role": "sol-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 4,
+      "evidence_class": "recovery_execution",
+      "scope": "Native Sol-Max SDK coding worker on the selected OmniRoute Responses lane",
+      "status": "failed",
+      "exit_code": 2,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+          "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "sol-deadline",
+      "task": "interrupt",
+      "role": "sol-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 5,
+      "evidence_class": "recovery_execution",
+      "scope": "Native Sol-Max SDK coding worker on the selected OmniRoute Responses lane",
+      "status": "failed",
+      "exit_code": 2,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+          "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "sol-recovery",
+      "task": "fresh-recovery",
+      "role": "sol-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 6,
+      "evidence_class": "recovery_execution",
+      "scope": "Native Sol-Max SDK coding worker on the selected OmniRoute Responses lane",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+          "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+        }
+      ],
+      "usage": {
+        "uncached_input": 596,
+        "cache_creation": 0,
+        "cache_read": 30208,
+        "output": 123,
+        "reasoning_in_output": 42,
+        "total": 30927,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "claude-prototype",
+      "task": "claude-bridge",
+      "role": "claude-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 7,
+      "evidence_class": "model_task_execution",
+      "scope": "Claude SDK Devin bridge native tool acceptance",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+          "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-auth-repair",
+      "task": "claude-bridge",
+      "role": "claude-worker",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 8,
+      "evidence_class": "model_task_execution",
+      "scope": "Claude SDK Devin bridge native tool acceptance",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+          "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-cooperation",
+      "task": "owner-cooperation",
+      "role": "claude-peer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 9,
+      "evidence_class": "model_task_execution",
+      "scope": "Native peer final cooperation packet",
+      "status": "failed",
+      "exit_code": null,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+          "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-review-timeout",
+      "task": "analytical-review",
+      "role": "claude-peer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 10,
+      "evidence_class": "model_task_execution",
+      "scope": "Bounded native analytical review approval",
+      "status": "failed",
+      "exit_code": 124,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+          "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "claude-bare-auth",
+      "task": "bare-auth",
+      "role": "claude-peer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 11,
+      "evidence_class": "native_cli_execution",
+      "scope": "Bare-mode authentication negative control",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+          "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "independent-negative",
+      "task": "fixture-negative",
+      "role": "oracle",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 12,
+      "evidence_class": "native_cli_execution",
+      "scope": "Unchanged upstream arithmetic fixture",
+      "status": "failed",
+      "exit_code": 1,
+      "quality": {
+        "semantic": false,
+        "contract": false
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+          "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "independent-positive",
+      "task": "fixture-positive",
+      "role": "oracle",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 12,
+      "evidence_class": "native_cli_execution",
+      "scope": "Unchanged upstream arithmetic fixture",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+          "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+        }
+      ],
+      "usage": {
+        "uncached_input": 0,
+        "cache_creation": 0,
+        "cache_read": 0,
+        "output": 0,
+        "reasoning_in_output": 0,
+        "total": 0,
+        "native_retries": 0
+      }
+    },
+    {
+      "id": "claude-native-callsite",
+      "task": "claude-callsite",
+      "role": "claude-peer",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 13,
+      "evidence_class": "model_task_execution",
+      "scope": "Native Claude coordinator dispatch to the primary SDK worker",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-claude-callsite-20260930.json",
+          "sha256": "a1dd584094ebb8aa1c58da0ac34d1d7b7ddb9fcf5e78b67732c7d3b3a0ba6ce3"
+        }
+      ],
+      "usage": {
+        "uncached_input": 6,
+        "cache_creation": 49127,
+        "cache_read": 92451,
+        "output": 2706,
+        "reasoning_in_output": 1805,
+        "total": 144290,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "sol-claude-dispatch",
+      "task": "claude-sdk-child",
+      "role": "sol-worker",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 14,
+      "evidence_class": "model_task_execution",
+      "scope": "Native Sol-Max SDK coding worker on the selected OmniRoute Responses lane",
+      "status": "passed",
+      "exit_code": 0,
+      "quality": {
+        "semantic": true,
+        "contract": true
+      },
+      "artifacts": [
+        {
+          "path": "evidence/receipts/omniroute-claude-callsite-20260930.json",
+          "sha256": "a1dd584094ebb8aa1c58da0ac34d1d7b7ddb9fcf5e78b67732c7d3b3a0ba6ce3"
+        }
+      ],
+      "usage": {
+        "uncached_input": 658,
+        "cache_creation": 0,
+        "cache_read": 30208,
+        "output": 139,
+        "reasoning_in_output": 27,
+        "total": 31005,
+        "native_retries": 0
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "sol-preflight",
+      "reason": "Private Codex home did not exist. Native setup failed before inference; created owned 0700 directory, no global state change."
+    },
+    {
+      "run_id": "sol-invalid-resume",
+      "reason": "Expected discriminating InvalidRequestError before inference; cleanup closed; unknown usage retained."
+    },
+    {
+      "run_id": "sol-deadline",
+      "reason": "Expected three-second deadline during turn; interrupt requested and cleanup closed. Native usage unknown; not proof of provider termination."
+    },
+    {
+      "run_id": "claude-prototype",
+      "reason": "90-second native deadline with zero tool calls; prototype did not carry documented keyless gateway auth sentinel. Overall provider usage unknown."
+    },
+    {
+      "run_id": "claude-auth-repair",
+      "reason": "Source-backed child auth repair still returned gateway HTTP500 and 90-second deadline; zero tool calls, no successful provider usage. No third retry."
+    },
+    {
+      "run_id": "claude-cooperation",
+      "reason": "Native owner contacts made, but no final packet received. Stopped only owned session; partial/cooperation usage unknown."
+    },
+    {
+      "run_id": "claude-review-timeout",
+      "reason": "240-second analytical native review timed out with empty final result; no approval; usage unknown."
+    },
+    {
+      "run_id": "claude-bare-auth",
+      "reason": "Bare-mode review returned authentication_failed; bare skips native authentication loading, so no account-absence claim."
+    },
+    {
+      "run_id": "independent-negative",
+      "reason": "Deliberate before-fix negative control: upstream add incorrectly subtracts. Original test exit1; retained without changing oracle."
+    }
+  ],
+  "limitations": [
+    "Draft reproduction text used incorrect Claude wrapper flag names. Both installed runner --help commands were checked before publication; the text now uses --cwd/--gateway/--skill/--setting-source, with Max effort configured natively by the runner. Actual attempted calls and results did not change.",
+    "The first authored record validation failed because administrative task and role IDs were omitted from frozen_inputs. Those metadata declarations were corrected; no provider run or result changed.",
+    "One arithmetic fixture and lifecycle acceptance; no universal SDK or model quality ranking.",
+    "The original provider trials invoked the SDK directly. A subsequent native Claude 2.1.285 Opus 5.5/Max call discovered/read the project skill and invoked the Sol-Max SDK through Bash. This bounded read-only acceptance does not qualify other parent tools or optional MCP services.",
+    "Native Codex SDK remains the incumbent. The separate frozen three-arm SDK gate remains unresolved.",
+    "Native gateway requested/returned model labels are not backend attestation.",
+    "All 136 skills are available in the owned project, with two bodies exercised; full role coverage and optional service acceptance remain incomplete.",
+    "Native Codex repeated in-process fixtures emit stdout/stderr ResourceWarnings; standalone per-invocation child exit is qualified separately.",
+    "Complete provider usage, spending, remote cancellation and token savings remain unknown.",
+    "Public record is sanitized selected actual return fields and independent observations; original private returned artifacts remain outside the checkout.",
+    "Source/evaluation artifacts pin the final formatting-equivalent implementation; exact pre-format live worker bytes are retained in native commits named in the receipt.",
+    "The 136-skill native installation and check are separate from per-task quality. Upstream source suites, authored local fixtures and actual provider execution remain separate.",
+    "The new native Claude parent reports list-price cost and its own usage scope, separate from the external SDK child. The new child contributes 31,005 tokens once; distinct successful SDK threads now total 259,749. Parent usage is not added to that SDK total. Original independent transport reconciliation covers only the earlier 228,744 direct-trial tokens.",
+    "The first callsite record check rejected receipt kind native_model_e2e as an observation evidence_class. The published observation class was corrected to the validator-supported model_task_execution, matching retained provider trials; no run or receipt outcome changed. Independent review also corrected allowed Bash/Read/Skill versus actually invoked Read/Bash.",
+    "Pre-enhancement source, test and dispatcher bytes from public commit ef90678c199a53bb43344fedec2fbcd5b6bf5c58 are archived under evidence/artifacts/omniroute-runtime-workers-20260930. Frozen-input paths now point to those unchanged bytes, preserving historical hashes after the separately recorded enhancement work."
+  ],
+  "decision_and_scope": {
+    "decision": "adopt_within_scope",
+    "scope": "Native Sol-Max SDK coding worker on the selected OmniRoute Responses lane",
+    "qualification_run_ids": [
+      "sol-fix",
+      "sol-resume",
+      "sol-recovery",
+      "sol-claude-dispatch"
+    ]
+  },
+  "rollback": "Stop the owned invocation/observer and use the retained native coordinator/runtime path. Keep recoverable private thread state for resume; no shared gateway or account rollback is needed because none was changed.",
+  "next_decision_changing_test": "A repaired Claude bridge must pass native skill/tool/edit/oracle/resume/cancel/recovery and truthful usage acceptance before promotion. Extend task-specific role and optional-service coverage without indiscriminate loading. Preserve the existing frozen three-arm SDK gate for any SDK-winner change.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [
+      "skills-install",
+      "skills-check",
+      "sol-preflight",
+      "sol-fix",
+      "sol-resume",
+      "sol-invalid-resume",
+      "sol-deadline",
+      "sol-recovery",
+      "claude-prototype",
+      "claude-auth-repair",
+      "claude-cooperation",
+      "claude-review-timeout",
+      "claude-bare-auth",
+      "independent-negative",
+      "independent-positive",
+      "claude-native-callsite",
+      "sol-claude-dispatch"
+    ],
+    "coverage_artifact": {
+      "path": "evidence/receipts/omniroute-runtime-workers-20260930.json",
+      "sha256": "575af430f95651c425140acbb68cf403692c4d6699d8d89670de0f0728ee291e"
+    }
+  }
+}

@@ -1,4 +1,4 @@
-"""Unit tests for tools/adoption/install_claude_profile.py's guard/agents
+"""Unit tests for tools/adoption/install_claude_profile.py's guard/agents/workflows
 steps (sha256-checked, idempotent) and the MCP registration matcher used to
 decide whether an existing `claude mcp get` entry already matches the
 template (so registration is skipped rather than repeated). The `claude`
@@ -29,24 +29,23 @@ import install_claude_profile as icp  # noqa: E402
 # The user-scope MCP template is checked against the SubagentStart carrier, the Codex user template and this
 # repository's default host endpoints (docs/decisions/2026-09-26-stack-agents-role-dispatch.md, addendum 2026-09-30).
 CARRIER = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-block.md"
-# Every SubagentStart carrier block: the general block above and the five role blocks the hook picks by agent type
-# (adoption/hooks/claude/token-lanes-subagent-start.py). The user-scope template is checked against all of them.
-CARRIER_BLOCK_NAMES = ("token-lanes-block.builder.md", "token-lanes-block.md", "token-lanes-block.researcher.md",
-                       "token-lanes-block.reviewer.md", "token-lanes-block.scout.md", "token-lanes-block.verifier.md")
+# Every carrier block: the general block above and the five role blocks the SubagentStart hook picks by agent type
+# (adoption/hooks/claude/token-lanes-subagent-start.py), and the main-session block of the SessionStart hook
+# (adoption/hooks/claude/token-lanes-session-start.py). The user-scope template is checked against all of them.
+CARRIER_BLOCK_NAMES = ("token-lanes-block.builder.md", "token-lanes-block.main.md", "token-lanes-block.md",
+                       "token-lanes-block.researcher.md", "token-lanes-block.reviewer.md", "token-lanes-block.scout.md",
+                       "token-lanes-block.verifier.md")
 CODEX_TEMPLATE = ROOT / "adoption" / "templates" / "codex.config.template.toml"
 HOST_EXAMPLE = ROOT / "adoption" / "hosts" / "example.json"
-USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd"}
+USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd", "jcodemunch"}
 # A server the carrier names that the user-scope template leaves out, with each file and the phrase in it that keeps
-# it out: jCodeMunch registers per project (2026-09-25 addendum of docs/decisions/2026-09-23-claude-user-profile.md;
-# its user-scope drift is an owner decision pending in docs/decisions/2026-09-28-community-sweep.md), as on Codex. The
-# accepted routing record on main says the same for Claude Code: "registered per project, not at user scope"
-# (docs/decisions/2026-09-30-task-model-routing.md, the jcodemunch-mcp wiring paragraph). The first phrase is Claude
-# Code's per-project registration command, so the exception holds only while a project can still register the server
-# the carrier names; the second is the Codex user template's statement of the same scope.
-CARRIER_EXCEPTIONS = {
-    "jcodemunch": (("adoption/bootstrap.md", "claude mcp add --scope local jcodemunch"),
-                   ("adoption/templates/codex.config.template.toml", "jcodemunch stays project-scoped (#240)")),
-}
+# it out. None now: jCodeMunch was the one (registered per project since the 2026-09-25 addendum of
+# docs/decisions/2026-09-23-claude-user-profile.md) until the user's directive of 2026-10-04 put it back at user scope
+# in both user templates (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md).
+CARRIER_EXCEPTIONS: dict = {}
+# A sourced exception as the mechanism takes it, for the controls below: a server the template leaves out, and a file
+# that holds the phrase that says why.
+SAMPLE_EXCEPTION = {"qmd": (("adoption/bootstrap.md", "jCodeMunch recipe"),)}
 # Codex-side variables a Claude registration does not carry: the installer renders no ${HOST_PATH}, and serena's
 # entry has carried neither since 2026-09-23.
 CODEX_ONLY_ENV = {"PATH", "RTK_TELEMETRY_DISABLED"}
@@ -132,9 +131,9 @@ def codex_parity_errors(claude: dict, codex: dict, values: dict) -> list[str]:
             errors.append(f"{name}: env values differ")
     return errors
 
-# The jcodemunch entry adoption/mcp/claude-user.json carried until 2026-09-25, when jCodeMunch moved
-# to a per-project opt-in (adoption/bootstrap.md step 4a). It stays here, inline, as the fixture for
-# a stdio server with ${HOME} in an env value and env names to match: no template entry has either now.
+# The jcodemunch entry adoption/mcp/claude-user.json carried until 2026-09-25 (with CODE_INDEX_PATH; the template's
+# entry since 2026-10-04 carries only JCODEMUNCH_SHARE_SAVINGS). It stays here, inline, as the fixture for
+# a stdio server with ${HOME} in an env value and env names to match: no template entry has one now.
 JCODEMUNCH_SPEC = {
     "type": "stdio",
     "command": "${ECO_ROOT}/bin/jcodemunch-mcp",
@@ -150,13 +149,16 @@ def template_server_names() -> list[str]:
 class GuardInstallTests(unittest.TestCase):
     def test_token_lanes_assets_cli_dry_run_and_temp_home_install(self):
         script = "token-lanes-subagent-start.py"
+        session_script = "token-lanes-session-start.py"
         names = ("token-lanes-block.md", "token-lanes-block.builder.md", "token-lanes-block.researcher.md",
                  "token-lanes-block.reviewer.md", "token-lanes-block.scout.md", "token-lanes-block.verifier.md",
-                 script)
+                 script, "token-lanes-block.main.md", session_script)
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
+            # The carriers are held out of the default (docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md):
+            # they install only when --hook names them.
             command = [sys.executable, str(ROOT / "tools/adoption/install_claude_profile.py"),
-                       "--only", "guard"]
+                       "--only", "guard", *(arg for name in names for arg in ("--hook", name))]
             env = {**os.environ, "HOME": tmp}
             planned = subprocess.run(command + ["--dry-run"], env=env, cwd=ROOT,
                                      capture_output=True, text=True, timeout=30)
@@ -181,6 +183,35 @@ class GuardInstallTests(unittest.TestCase):
                     self.assertEqual(injected.returncode, 0, injected.stderr)
                     self.assertEqual(json.loads(injected.stdout)["hookSpecificOutput"]["additionalContext"],
                                      (home / ".claude/hooks" / block).read_text(encoding="utf-8"))
+            # The installed SessionStart script resolves the installed main-session block the same way.
+            with self.subTest(event="SessionStart"):
+                injected = subprocess.run([sys.executable, str(home / ".claude/hooks" / session_script)],
+                                          input=json.dumps({"hook_event_name": "SessionStart", "source": "startup"}),
+                                          env=env, cwd=home, capture_output=True, text=True, timeout=30)
+                self.assertEqual(injected.returncode, 0, injected.stderr)
+                self.assertEqual(json.loads(injected.stdout)["hookSpecificOutput"],
+                                 {"hookEventName": "SessionStart", "additionalContext":
+                                  (home / ".claude/hooks/token-lanes-block.main.md").read_text(encoding="utf-8")})
+
+    def test_the_default_guard_step_installs_no_held_out_carrier_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            env = {**os.environ, "HOME": tmp}
+            command = [sys.executable, str(ROOT / "tools/adoption/install_claude_profile.py"), "--only", "guard"]
+            planned = subprocess.run(command + ["--dry-run"], env=env, cwd=ROOT, capture_output=True, text=True,
+                                     timeout=30)
+            self.assertEqual(planned.returncode, 0, planned.stderr)
+            self.assertNotIn("token-lanes", planned.stdout)
+            for name in icp.HOOKS:
+                self.assertIn(f"would install {Path(tmp) / '.claude/hooks' / name}", planned.stdout)
+            installed = subprocess.run(command, env=env, cwd=ROOT, capture_output=True, text=True, timeout=30)
+            self.assertEqual(installed.returncode, 0, installed.stderr)
+            self.assertEqual(sorted(path.name for path in (Path(tmp) / ".claude/hooks").iterdir()), sorted(icp.HOOKS))
+
+    def test_a_name_outside_both_hook_maps_is_refused(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaises(icp.InstallError):
+                icp.install_guards(Path(tmp), dry_run=False, names=["token-lanes-block.nonexistent.md"])
+            self.assertFalse((Path(tmp) / ".claude").exists())
 
     def test_installs_when_absent(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -206,6 +237,286 @@ class GuardInstallTests(unittest.TestCase):
             self.assertFalse((home / ".claude" / "hooks" / "effort-default-guard.py").exists())
 
 
+class WorkflowInstallTests(unittest.TestCase):
+    """Local integration checks for native saved-script files, without model calls."""
+
+    NAMES = ("readiness-audit.js", "review-changes.js", "layer-verdict-lane.js")
+
+    def cli(self, home, *args):
+        return subprocess.run(
+            [sys.executable, str(ROOT / "tools/adoption/install_claude_profile.py"),
+             "--home", str(home), *args],
+            cwd=ROOT, capture_output=True, text=True, timeout=30,
+        )
+
+    def install(self, home):
+        with mock.patch("sys.stdout", new_callable=io.StringIO):
+            return icp.install_workflows(home, dry_run=False)
+
+    def test_cli_clean_install_readback_and_idempotence(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            planned = self.cli(home, "--only", "workflows", "--dry-run")
+            self.assertEqual(planned.returncode, 0, planned.stderr)
+            self.assertFalse((home / ".claude").exists())
+            for name in self.NAMES:
+                self.assertIn(f"would install {home / '.claude/workflows' / name}", planned.stdout)
+            installed = self.cli(home, "--only", "workflows")
+            self.assertEqual(installed.returncode, 0, installed.stderr)
+            dest_dir = home / ".claude/workflows"
+            self.assertEqual({p.name for p in dest_dir.iterdir()}, set(self.NAMES))
+            before = {}
+            for name in self.NAMES:
+                dest = dest_dir / name
+                self.assertEqual(dest.read_bytes(), (icp.WORKFLOWS_SRC_DIR / name).read_bytes())
+                before[name] = (dest.stat().st_ino, dest.stat().st_mtime_ns)
+            repeated = self.cli(home, "--only", "workflows")
+            self.assertEqual(repeated.returncode, 0, repeated.stderr)
+            self.assertEqual(repeated.stdout.count("already matches; skipped"), 3)
+            for name in self.NAMES:
+                dest = dest_dir / name
+                self.assertEqual((dest.stat().st_ino, dest.stat().st_mtime_ns), before[name])
+
+    def test_explicit_profile_selection_installs_saved_workflows(self):
+        with tempfile.TemporaryDirectory() as tmp, \
+             mock.patch.object(icp, "install_guards") as guards, \
+             mock.patch.object(icp, "install_agents") as agents, \
+             mock.patch.object(icp, "install_mcp_servers") as mcp, \
+             mock.patch("sys.stdout", new_callable=io.StringIO):
+            home = Path(tmp)
+            self.assertEqual(icp.main(["--home", tmp, "--only", "workflows"]), 0)
+            self.assertEqual({p.name for p in (home / ".claude/workflows").iterdir()}, set(self.NAMES))
+            guards.assert_not_called()
+            agents.assert_not_called()
+            mcp.assert_not_called()
+
+    def test_default_profile_never_reads_or_creates_workflows(self):
+        with tempfile.TemporaryDirectory() as tmp, \
+             mock.patch.object(icp, "install_guards") as guards, \
+             mock.patch.object(icp, "install_agents") as agents, \
+             mock.patch.object(icp, "install_mcp_servers") as mcp:
+            home = Path(tmp)
+            dest_dir = home / ".claude/workflows"
+
+            def forbid_workflow_access(method):
+                def checked(path, *args, **kwargs):
+                    if path.is_relative_to(dest_dir) or path.is_relative_to(icp.WORKFLOWS_SRC_DIR):
+                        raise AssertionError(f"default run accessed workflows: {path}")
+                    return method(path, *args, **kwargs)
+                return checked
+
+            with mock.patch.object(Path, "open", forbid_workflow_access(Path.open)), \
+                 mock.patch.object(Path, "stat", forbid_workflow_access(Path.stat)), \
+                 mock.patch.object(Path, "iterdir", forbid_workflow_access(Path.iterdir)), \
+                 mock.patch.object(Path, "mkdir", forbid_workflow_access(Path.mkdir)):
+                self.assertEqual(icp.main(["--home", tmp]), 0)
+            self.assertFalse(dest_dir.exists())
+            guards.assert_called_once_with(home, False, None)
+            agents.assert_called_once_with(home, False, None)
+            mcp.assert_called_once()
+
+    def test_source_corruption_or_missing_manifest_entry_refuses_before_writes(self):
+        for failure in ("corruption", "missing-entry"):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as tmp:
+                scratch = Path(tmp)
+                sources = scratch / "sources"
+                sources.mkdir()
+                for name in self.NAMES:
+                    shutil.copy2(icp.WORKFLOWS_SRC_DIR / name, sources / name)
+                sums = sources / "SHA256SUMS"
+                sums.write_bytes(icp.WORKFLOWS_SHA256SUMS.read_bytes())
+                if failure == "corruption":
+                    with (sources / self.NAMES[-1]).open("ab") as stream:
+                        stream.write(b"\n// unreviewed mutation\n")
+                else:
+                    sums.write_text("\n".join(line for line in sums.read_text().splitlines()
+                                              if not line.endswith(self.NAMES[-1])) + "\n")
+                home = scratch / "home"
+                home.mkdir()
+                with mock.patch.object(icp, "WORKFLOWS_SRC_DIR", sources), \
+                     mock.patch.object(icp, "WORKFLOWS_SHA256SUMS", sums):
+                    with self.assertRaises(icp.InstallError):
+                        self.install(home)
+                self.assertFalse((home / ".claude").exists())
+
+    def test_conflicting_last_target_refuses_every_write_including_dry_run(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dest_dir = home / ".claude/workflows"
+            dest_dir.mkdir(parents=True)
+            conflict = dest_dir / self.NAMES[-1]
+            conflict.write_bytes(b"personalized workflow\n")
+            custom = dest_dir / "custom.js"
+            custom.write_bytes(b"custom workflow\n")
+            for extra in ((), ("--dry-run",)):
+                result = self.cli(home, "--only", "workflows", *extra)
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn("differs; left unchanged", result.stderr)
+                self.assertEqual(conflict.read_bytes(), b"personalized workflow\n")
+                self.assertEqual(custom.read_bytes(), b"custom workflow\n")
+                self.assertEqual({p.name for p in dest_dir.iterdir()}, {conflict.name, custom.name})
+
+    def test_matching_or_dangling_target_symlink_is_refused(self):
+        for target_exists in (True, False):
+            with self.subTest(target_exists=target_exists), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp)
+                dest_dir = home / ".claude/workflows"
+                dest_dir.mkdir(parents=True)
+                target = home / "outside.js"
+                if target_exists:
+                    target.write_bytes((icp.WORKFLOWS_SRC_DIR / self.NAMES[-1]).read_bytes())
+                dest = dest_dir / self.NAMES[-1]
+                dest.symlink_to(target)
+                result = self.cli(home, "--only", "workflows")
+                self.assertEqual(result.returncode, 1, result.stdout)
+                self.assertIn("refusing target symlink", result.stderr)
+                self.assertTrue(dest.is_symlink())
+                self.assertEqual({p.name for p in dest_dir.iterdir()}, {dest.name})
+                self.assertEqual(target.exists(), target_exists)
+                if target_exists:
+                    self.assertEqual(target.read_bytes(), (icp.WORKFLOWS_SRC_DIR / dest.name).read_bytes())
+
+    def test_nonfile_target_is_preserved(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dest = home / ".claude/workflows" / self.NAMES[-1]
+            dest.mkdir(parents=True)
+            result = self.cli(home, "--only", "workflows")
+            self.assertEqual(result.returncode, 1, result.stdout)
+            self.assertTrue(dest.is_dir())
+            self.assertEqual({p.name for p in dest.parent.iterdir()}, {dest.name})
+
+    def test_personal_dotfiles_directory_symlink_is_supported(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dotfiles = home / "dotfiles-claude"
+            dotfiles.mkdir()
+            (home / ".claude").symlink_to(dotfiles, target_is_directory=True)
+            result = self.cli(home, "--only", "workflows")
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertTrue((home / ".claude").is_symlink())
+            for name in self.NAMES:
+                self.assertEqual((dotfiles / "workflows" / name).read_bytes(),
+                                 (icp.WORKFLOWS_SRC_DIR / name).read_bytes())
+
+    def test_write_failure_cleans_new_files_and_empty_directories_then_recovers(self):
+        original_open = Path.open
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+
+            def fail_open(path, mode="r", *args, **kwargs):
+                if path.name == self.NAMES[-1] and mode == "xb":
+                    raise OSError("injected write failure")
+                return original_open(path, mode, *args, **kwargs)
+
+            with mock.patch.object(Path, "open", fail_open):
+                with self.assertRaisesRegex(icp.InstallError, "new files rolled back"):
+                    self.install(home)
+            self.assertFalse((home / ".claude").exists())
+            self.assertEqual(self.install(home), dict.fromkeys(self.NAMES, "installed"))
+
+    def test_readback_failure_rolls_back_new_files_and_preserves_reused_and_custom(self):
+        original_read = Path.read_bytes
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dest_dir = home / ".claude/workflows"
+            dest_dir.mkdir(parents=True)
+            reused = dest_dir / self.NAMES[0]
+            reused.write_bytes((icp.WORKFLOWS_SRC_DIR / reused.name).read_bytes())
+            reused_identity = (reused.stat().st_ino, reused.stat().st_mtime_ns)
+            custom = dest_dir / "custom.js"
+            custom.write_bytes(b"custom workflow\n")
+
+            def fail_readback(path):
+                if path.parent == dest_dir and path.name == self.NAMES[-1]:
+                    return b"injected readback mismatch"
+                return original_read(path)
+
+            with mock.patch.object(Path, "read_bytes", fail_readback):
+                with self.assertRaisesRegex(icp.InstallError, "installed readback differs"):
+                    self.install(home)
+            self.assertEqual({p.name for p in dest_dir.iterdir()}, {reused.name, custom.name})
+            self.assertEqual((reused.stat().st_ino, reused.stat().st_mtime_ns), reused_identity)
+            self.assertEqual(custom.read_bytes(), b"custom workflow\n")
+            result = self.install(home)
+            self.assertEqual(result, {self.NAMES[0]: "skipped", self.NAMES[1]: "installed", self.NAMES[2]: "installed"})
+
+    def test_target_created_after_preflight_is_preserved_and_earlier_write_rolled_back(self):
+        original_open = Path.open
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            dest_dir = home / ".claude/workflows"
+
+            def competing_open(path, mode="r", *args, **kwargs):
+                if path.parent == dest_dir and path.name == self.NAMES[1] and mode == "xb":
+                    with original_open(path, "wb") as stream:
+                        stream.write(b"another writer's workflow\n")
+                return original_open(path, mode, *args, **kwargs)
+
+            with mock.patch.object(Path, "open", competing_open):
+                with self.assertRaises(icp.InstallError):
+                    self.install(home)
+            self.assertEqual({p.name for p in dest_dir.iterdir()}, {self.NAMES[1]})
+            self.assertEqual((dest_dir / self.NAMES[1]).read_bytes(), b"another writer's workflow\n")
+
+    def test_scoped_remove_dry_run_then_preserves_edited_and_custom_entries(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            self.install(home)
+            dest_dir = home / ".claude/workflows"
+            custom = dest_dir / "custom.js"
+            custom.write_bytes(b"custom workflow\n")
+            planned = self.cli(home, "--only", "workflows", "--remove-workflows", "--dry-run")
+            self.assertEqual(planned.returncode, 0, planned.stderr)
+            self.assertEqual(planned.stdout.count("would remove"), 3)
+            self.assertEqual({p.name for p in dest_dir.iterdir()}, {*self.NAMES, custom.name})
+            edited = dest_dir / self.NAMES[-1]
+            edited.write_bytes(b"personalized workflow\n")
+            removed = self.cli(home, "--only", "workflows", "--remove-workflows")
+            self.assertEqual(removed.returncode, 1, removed.stdout)
+            self.assertIn("differs; left unchanged", removed.stderr)
+            self.assertEqual({p.name for p in dest_dir.iterdir()}, {edited.name, custom.name})
+            self.assertEqual(edited.read_bytes(), b"personalized workflow\n")
+            self.assertEqual(custom.read_bytes(), b"custom workflow\n")
+
+    def test_scoped_remove_preserves_target_symlinks(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            self.install(home)
+            dest_dir = home / ".claude/workflows"
+            target = home / "outside.js"
+            dest = dest_dir / self.NAMES[-1]
+            dest.rename(target)
+            dest.symlink_to(target)
+            removed = self.cli(home, "--only", "workflows", "--remove-workflows")
+            self.assertEqual(removed.returncode, 1, removed.stdout)
+            self.assertIn("is a symlink; left unchanged", removed.stderr)
+            self.assertTrue(dest.is_symlink())
+            self.assertEqual(target.read_bytes(), (icp.WORKFLOWS_SRC_DIR / dest.name).read_bytes())
+
+    def test_complete_scoped_remove_is_idempotent_and_reinstall_recovers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            self.install(home)
+            for attempt in range(2):
+                removed = self.cli(home, "--only", "workflows", "--remove-workflows")
+                self.assertEqual(removed.returncode, 0, removed.stderr)
+                self.assertEqual(list((home / ".claude/workflows").iterdir()), [])
+                self.assertEqual(removed.stdout.count("removed" if attempt == 0 else "already absent"), 3)
+            self.assertEqual(self.install(home), dict.fromkeys(self.NAMES, "installed"))
+
+    def test_remove_rejects_mixed_mutation_options_before_writes(self):
+        for options in (("--remove-workflows",),
+                        ("--only", "workflows", "--only", "guard", "--remove-workflows"),
+                        ("--only", "workflows", "--replace-mcp", "--remove-workflows")):
+            with self.subTest(options=options), tempfile.TemporaryDirectory() as tmp:
+                home = Path(tmp)
+                result = self.cli(home, *options)
+                self.assertEqual(result.returncode, 2, result.stdout)
+                self.assertIn("requires exactly --only workflows", result.stderr)
+                self.assertFalse((home / ".claude").exists())
+
+
 class SecretGuardProfileTests(unittest.TestCase):
     """The secret-path guard and its deny rules ship in the user profile for every new host."""
 
@@ -221,12 +532,24 @@ class SecretGuardProfileTests(unittest.TestCase):
             self.assertEqual(icp.install_guards(home, dry_run=False),
                              {name: "skipped" for name in icp.HOOKS})
 
-    def test_token_lanes_template_merges_once_alongside_existing_ai_memory(self):
-        import apply_claude_settings as acs
+    def test_a_held_out_carrier_file_installs_only_when_named(self):
+        self.assertFalse(set(icp.HOOKS) & set(icp.HELD_OUT_HOOKS))
+        self.assertEqual(len(icp.HELD_OUT_HOOKS), 9)
         with tempfile.TemporaryDirectory() as tmp:
-            template = json.loads(string.Template(self.TEMPLATE.read_text()).safe_substitute(HOME=tmp))
+            home = Path(tmp)
+            self.assertEqual(icp.install_guards(home, dry_run=False, names=list(icp.HELD_OUT_HOOKS)),
+                             {name: "installed" for name in icp.HELD_OUT_HOOKS})
+            for name, source in icp.HELD_OUT_HOOKS.items():
+                self.assertEqual((home / ".claude" / "hooks" / name).read_bytes(), source.read_bytes())
+
+    def test_the_held_out_entries_merge_once_alongside_existing_ai_memory(self):
+        import apply_claude_settings as acs
+        entries_file = ROOT / "adoption" / "hooks" / "claude" / "held-out-hook-entries.json"
+        with tempfile.TemporaryDirectory() as tmp:
+            template = json.loads(string.Template(entries_file.read_text()).safe_substitute(HOME=tmp))
+            default = json.loads(string.Template(self.TEMPLATE.read_text()).safe_substitute(HOME=tmp))
             incoming = template["hooks"]["SubagentStart"]
-            memory = next(hook for group in incoming for hook in group["hooks"]
+            memory = next(hook for group in default["hooks"]["SubagentStart"] for hook in group["hooks"]
                           if "--event subagent-start" in hook["command"])
             # The current live shape already carries ai-memory under the empty matcher.
             base = {"hooks": {"SubagentStart": [{"matcher": "", "hooks": [memory]}]}}
@@ -246,13 +569,13 @@ class SecretGuardProfileTests(unittest.TestCase):
                             for group in merged["hooks"]["SubagentStart"] for hook in group["hooks"]]
                     with self.subTest(existing=bool(initial), application=application):
                         self.assertEqual(keys.count(acs.command_key(wanted)), 1)
-                        self.assertEqual(keys.count(acs.command_key(memory["command"])), 1)
+                        self.assertEqual(keys.count(acs.command_key(memory["command"])), 1 if initial else 0)
                         if application == 2:
                             self.assertEqual(merged, previous)
 
     def test_sha256sums_verifies_like_sha256sum_c(self):
         entries = icp.sha256sums_entries()
-        self.assertEqual(set(entries), {src.resolve() for src in icp.HOOKS.values()})
+        self.assertEqual(set(entries), {src.resolve() for src in icp.ALL_HOOKS.values()})
         for source, digest in entries.items():
             with self.subTest(source=source.name):
                 self.assertEqual(icp.sha256_of(source), digest)
@@ -313,9 +636,10 @@ class SecretGuardProfileTests(unittest.TestCase):
         merged = acs.merge_settings(base, template)
         self.assertEqual(merged["permissions"]["deny"][0], "Bash(rm -rf /)")
         self.assertIn("Read(~/.config/native-agent-stack/**)", merged["permissions"]["deny"])
-        commands = [h["command"] for h in merged["hooks"]["PreToolUse"][0]["hooks"]]
+        commands = [h["command"] for group in merged["hooks"]["PreToolUse"]
+                    if group.get("matcher") == "Bash" for h in group["hooks"]]
         self.assertEqual(commands.count("rtk hook claude"), 1)
-        self.assertTrue(any("secret_path_guard.py" in c for c in commands))
+        self.assertEqual(sum("secret_path_guard.py" in c for c in commands), 1)
 
 
 class ProfileTemplateSettingsTests(unittest.TestCase):
@@ -511,16 +835,16 @@ class ProfileTemplateSettingsTests(unittest.TestCase):
         self.assertNotIn("BASH_DEFAULT_TIMEOUT_MS", settings["env"])
         self.assertEqual(settings["statusLine"]["refreshInterval"], 5)
 
-    def test_the_advisor_is_fable_and_accepted_for_the_main_model(self):
-        # docs/decisions/2026-09-27-model-currency.md. https://code.claude.com/docs/en/settings-reference#advisormodel
+    def test_the_advisor_is_opus_and_accepted_for_the_main_model(self):
+        # docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md. https://code.claude.com/docs/en/settings-reference#advisormodel
         # (fetched 2026-09-27): scope "Any file"; "fable", "opus", "sonnet" or a full model ID; unset turns the advisor
         # off. https://code.claude.com/docs/en/advisor, "Choose an advisor model": an Opus 5.5 main model accepts "Fable,
         # and Opus 5 or later". The advisor needs feature-flag fetching, which DISABLE_GROWTHBOOK, DISABLE_TELEMETRY,
         # DO_NOT_TRACK and CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC turn off (env-vars, "Features that need feature-flag
         # fetching"), and CLAUDE_CODE_DISABLE_ADVISOR_TOOL=1 makes Claude Code ignore advisorModel.
         settings = self.settings()
-        self.assertEqual(settings.get("advisorModel"), "fable")
-        self.assertIn(settings["model"], ("opus", "opus[1m]"), "the pairing table accepts Fable for an Opus main model")
+        self.assertEqual(settings.get("advisorModel"), "opus")
+        self.assertIn(settings["model"], ("opus", "opus[1m]"), "the pairing table accepts Opus for an Opus main model")
         for name in ("DISABLE_GROWTHBOOK", "DISABLE_TELEMETRY", "DO_NOT_TRACK", "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC",
                      "CLAUDE_CODE_DISABLE_ADVISOR_TOOL"):
             with self.subTest(env=name):
@@ -1076,8 +1400,8 @@ class McpMatchTests(unittest.TestCase):
 
 class McpTemplateShapeTests(unittest.TestCase):
     def test_template_names_the_expected_servers(self):
-        # jcodemunch left the user-scope template on 2026-09-25 for a per-project opt-in; socraticode, headroom,
-        # codebase-memory and qmd joined on 2026-09-30, the Codex user template's set.
+        # jcodemunch left the user-scope template on 2026-09-25 for a per-project opt-in and came back on 2026-10-04;
+        # socraticode, headroom, codebase-memory and qmd joined on 2026-09-30, the Codex user template's set.
         data = json.loads(icp.MCP_TEMPLATE.read_text())
         self.assertEqual(set(data["mcpServers"].keys()), USER_SCOPE_SERVERS)
         self.assertEqual(data["mcpServers"]["ai-memory"]["type"], "http")
@@ -1085,11 +1409,15 @@ class McpTemplateShapeTests(unittest.TestCase):
             self.assertEqual(data["mcpServers"][name]["type"], "stdio")
         self.assertIn("--project-from-cwd", data["mcpServers"]["serena"]["args"])
 
-    def test_the_jcodemunch_opt_in_snippets_keep_savings_sharing_off(self):
-        # The template no longer carries JCODEMUNCH_SHARE_SAVINGS=0, so the two documented opt-in
-        # forms in adoption/bootstrap.md step 4a are where it ships: the local command and the
-        # checked-in .mcp.json entry must both keep it.
+    def test_every_jcodemunch_registration_keeps_savings_sharing_off(self):
+        # The user-scope entry of the template carries JCODEMUNCH_SHARE_SAVINGS=0, the documented opt-out of upstream's
+        # anonymous savings counter (CONFIGURATION.md and SECURITY.md of jcodemunch-mcp 1.108.319), and so do the two
+        # per-project forms in adoption/bootstrap.md step 4a: the local command and the checked-in .mcp.json entry.
+        self.assertEqual(json.loads(icp.MCP_TEMPLATE.read_text())["mcpServers"]["jcodemunch"]["env"],
+                         {"JCODEMUNCH_SHARE_SAVINGS": "0"})
         text = (ROOT / "adoption" / "bootstrap.md").read_text()
+        user = text[text.index("**jCodeMunch, user scope.**"):text.index("**jCodeMunch, per project.**")]
+        self.assertEqual(user.count("JCODEMUNCH_SHARE_SAVINGS"), 1)       # the prose names the template's opt-out once
         start = text.index("**jCodeMunch, per project.**")
         paragraph = text[start:text.index("Then apply the settings template itself", start)]
         self.assertIn("-e JCODEMUNCH_SHARE_SAVINGS=0", paragraph)
@@ -1098,8 +1426,8 @@ class McpTemplateShapeTests(unittest.TestCase):
 
 
 class McpCarrierCoverageTests(unittest.TestCase):
-    """The user-scope template registers exactly the servers the SubagentStart carrier blocks name (every
-    token-lanes-block*.md, the general block and the five role blocks), less the exceptions whose reason is still
+    """The user-scope template registers exactly the servers the carrier blocks name (every token-lanes-block*.md:
+    the general block, the five role blocks and the main-session block), less the exceptions whose reason is still
     written in the file each cites. Structural validation of repository files; no client runs."""
 
     BLOCKS = ROOT / "adoption" / "hooks" / "claude"
@@ -1111,7 +1439,8 @@ class McpCarrierCoverageTests(unittest.TestCase):
 
     def test_the_carrier_names_the_lane_servers(self):
         # Control for the parser: the carrier blocks' own ids, context-mode's plugin server left out. The role blocks
-        # name a subset of the general block's servers today, so the union is the general block's set.
+        # name a subset of the general block's servers today and the main-session block names servers by plain name
+        # only (no mcp__ ids), so the union is the general block's set.
         self.assertEqual(sorted(path.name for path in self.BLOCKS.glob("token-lanes-block*.md")),
                          sorted(CARRIER_BLOCK_NAMES))
         lanes = {"serena", "jcodemunch", "socraticode", "qmd", "ai-memory", "codebase-memory", "headroom"}
@@ -1148,18 +1477,16 @@ class McpCarrierCoverageTests(unittest.TestCase):
         cases = {
             "a lane server left unregistered": (carrier, registered - {"qmd"}, CARRIER_EXCEPTIONS, self.read),
             "a new lane server": (carrier + "\nmcp__newserver__tool", registered, CARRIER_EXCEPTIONS, self.read),
-            "the exception's reason removed": (carrier, registered, CARRIER_EXCEPTIONS,
-                                               lambda path: (self.read(path) or "").replace(
-                                                   "jcodemunch stays project-scoped (#240)", "")),
-            "the per-project registration removed": (carrier, registered, CARRIER_EXCEPTIONS,
-                                                     lambda path: (self.read(path) or "").replace(
-                                                         "claude mcp add --scope local jcodemunch", "")),
-            "an exception for a registered server": (carrier, registered | {"jcodemunch"}, CARRIER_EXCEPTIONS,
-                                                     self.read),
+            "the exception's reason removed": (carrier, registered - {"qmd"}, SAMPLE_EXCEPTION,
+                                               lambda path: (self.read(path) or "").replace("jCodeMunch recipe", "")),
+            "the exception's file missing": (carrier, registered - {"qmd"}, SAMPLE_EXCEPTION, lambda path: None),
+            "an exception for a registered server": (carrier, registered, SAMPLE_EXCEPTION, self.read),
         }
         for label, args in cases.items():
             with self.subTest(mutant=label):
                 self.assertEqual(len(carrier_coverage_errors(*args)), 1)
+        # Control: a sourced exception whose reason is written in its file excuses the server it names.
+        self.assertEqual(carrier_coverage_errors(carrier, registered - {"qmd"}, SAMPLE_EXCEPTION, self.read), [])
 
 
 class McpCodexParityTests(unittest.TestCase):
@@ -1254,7 +1581,7 @@ class McpRenderAndCommandTests(unittest.TestCase):
         self.assertEqual(calls, [])
 
     def test_registers_only_the_servers_the_template_names(self):
-        # A jcodemunch registration left by an earlier template is neither re-added nor removed.
+        # The installer visits exactly the template's servers (jcodemunch among them since 2026-10-04) and removes none.
         asked, ran = [], []
 
         def fake_get(claude_bin, name):
@@ -1272,7 +1599,11 @@ class McpRenderAndCommandTests(unittest.TestCase):
         self.assertEqual(asked, names)
         self.assertEqual(results, ["installed"] * len(names))
         self.assertEqual(ran, [icp.mcp_add_command("claude", name, rendered[name]) for name in names])
-        self.assertNotIn("jcodemunch", json.dumps(ran))
+        self.assertFalse([cmd for cmd in ran if "remove" in cmd])
+        add = next(cmd for cmd in ran if "jcodemunch" in cmd)
+        self.assertEqual(add[:6], ["claude", "mcp", "add", "--scope", "user", "jcodemunch"])
+        self.assertIn("JCODEMUNCH_SHARE_SAVINGS=0", add)
+        self.assertEqual(add[-2:], ["--", "/e/bin/jcodemunch-mcp"])
 
 
 class McpGetOutputTests(unittest.TestCase):
@@ -1454,12 +1785,16 @@ class PortableTopRuleTests(unittest.TestCase):
     operator's user-level file, so it took the rules only that file held, six standing clauses, the Sol-primary Codex
     routing and skill matching, then the coordinator scoping and pinned-launch rule of the Gate A owner's review
     (docs/decisions/2026-09-30-rule-text-every-layer.md); the 5% rule applies from that baseline.
+    Re-baselined on 2026-10-03 to 1,962 words (1,808 before): phase 0.3 of the wave-2 synthesis asks for instruction lines
+    in both client blocks, which no existing text held (context-mode's working directory, semble's lane, the GPT
+    Researcher entry and Claude Code to Codex messaging; the 2026-10-03 addendum of
+    docs/decisions/2026-10-02-new-wsl-client-configuration.md); the 5% rule applies from that baseline.
     docs/harness-defaults.md#upstream-verification-and-compounding-learning holds the long form. User-level instructions apply to all projects (Claude Code memory docs,
     `~/.claude/CLAUDE.md`), so the top rule names no file of this repository: each project declares
     its own anti-pattern log."""
 
     TEMPLATE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
-    BASELINE_WORDS = 1750  # Python str.split() count after the Gate A owner's review of PR #557 (1,703 before it; 1,696 before the conditional skill-discovery wording; 1,372 on 2026-09-29; 1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
+    BASELINE_WORDS = 1962  # Python str.split() count after the wave-2 instruction lines of 2026-10-03 (1,808 before them; 1,750 after the Gate A owner's review of PR #557, 1,703 before it; 1,696 before the conditional skill-discovery wording; 1,372 on 2026-09-29; 1,205 on 2026-09-27; 881 at dde28cc2, before the procedure)
     # Upstream as the source of truth and reuse, the check order and the absence wording, worker
     # answers as leads, the token practice in every lane, and recording a proven mistake.
     PROCEDURE_PHRASES = (

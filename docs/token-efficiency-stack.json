@@ -224,8 +224,8 @@
       "purpose": "Compact supported command outputs, retain failure/raw recovery",
       "upstream_commands": {
         "install": [
-          "gh release download v0.50.0 --repo rtk-ai/rtk --pattern rtk-x86_64-unknown-linux-musl.tar.gz --pattern checksums.txt --dir \"$STACK_HOME/downloads/rtk-0.50.0\"",
-          "(cd \"$STACK_HOME/downloads/rtk-0.50.0\" && sha256sum --check --ignore-missing checksums.txt && tar -xf rtk-x86_64-unknown-linux-musl.tar.gz -C \"$PREFIX\")"
+          "gh release download v0.51.0 --repo rtk-ai/rtk --pattern rtk-x86_64-unknown-linux-musl.tar.gz --pattern checksums.txt --dir \"$STACK_HOME/downloads/rtk-0.51.0\"",
+          "(cd \"$STACK_HOME/downloads/rtk-0.51.0\" && sha256sum --check --ignore-missing checksums.txt && tar -xf rtk-x86_64-unknown-linux-musl.tar.gz -C \"$PREFIX\")"
         ],
         "use": [
           "rtk git log -3",
@@ -236,8 +236,12 @@
           "rtk gain --project --format json"
         ],
         "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
-        "install_note": "Official [rtk-ai/rtk v0.50.0](https://github.com/rtk-ai/rtk/releases/tag/v0.50.0), asset `rtk-x86_64-unknown-linux-musl.tar.gz`, `checksums.txt`; exact archive procedure above; for the Claude hook, also the `exclude_commands` config in recipes/README.md. The guarded subshell checks and extracts inside the owned download directory; PREFIX must be the absolute owned installation prefix.",
-        "statistics_note": "Upstream savings estimate; keep its own scope."
+        "install_note": "Official [rtk-ai/rtk v0.51.0](https://github.com/rtk-ai/rtk/releases/tag/v0.51.0), asset `rtk-x86_64-unknown-linux-musl.tar.gz`, `checksums.txt`; exact archive procedure above; for the Claude hook, also the `exclude_commands` config in recipes/README.md. The guarded subshell checks and extracts inside the owned download directory; PREFIX must be the absolute owned installation prefix. 2026-10-04 host qualification: evidence/receipts/rtk-051-qualification-20261004.json; documentation commands are portable recipes, not a new execution claim. BREAKING in v0.51.0: executable positional scripts requiring implicit shell expansion now need --shell, e.g. rtk test --shell sh 'cargo test && cargo clippy'. Current git/proxy/gain calls use direct argv; the guarded install subshell expands its variables externally. Tool-reported gain is not provider usage.",
+        "statistics_note": "Upstream savings estimate; keep its own scope.",
+        "verify": [
+          "rtk --version",
+          "rtk verify"
+        ]
       },
       "returned_result_summary": "2026-09-20 14:55:57 UTC upstream refresh returned 1,722 estimated saved tokens across 55 retained commands; the selected project's 234 across 18 commands are included. Earlier same-day Desktop acceptance: native rtk git log -3 returned successfully; meter moved from 54 commands / 1,708 saved to 55 commands / 1,722 saved. An independent SQLite row matched 118 input, 104 output, 14 saved and 9 ms. These are estimates over retained history, not measured provider savings.",
       "session_statistics": {
@@ -337,7 +341,8 @@
         "evidence/receipts/token-practice-native-counters-20260920.json",
         "evidence/receipts/token-practice-confirmation-20260920.json",
         "evidence/receipts/native-token-stack-final-20260920.json",
-        "evidence/receipts/foundation-native-20260920.json"
+        "evidence/receipts/foundation-native-20260920.json",
+        "evidence/receipts/rtk-051-qualification-20261004.json"
       ],
       "foundation_counter_confirmation": {
         "observed_at": "2026-09-20T15:50:45.673231+00:00",
@@ -717,7 +722,14 @@
           ],
           "source": "evidence/artifacts/token-stack-cards-20260927/gpt6-reviews.json"
         }
-      }
+      },
+      "latest_release": {
+        "tag": "v0.51.0",
+        "published_at": "2026-10-02T13:33:54Z",
+        "url": "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0",
+        "checked_at": "2026-10-04T13:59:37.303596+00:00"
+      },
+      "notes": "2026-10-04 host qualification: evidence/receipts/rtk-051-qualification-20261004.json; documentation commands are portable recipes, not a new execution claim. BREAKING in v0.51.0: executable positional scripts requiring implicit shell expansion now need --shell, e.g. rtk test --shell sh 'cargo test && cargo clippy'. Current git/proxy/gain calls use direct argv; the guarded install subshell expands its variables externally. Tool-reported gain is not provider usage. Existing cards are dated editions and remain at their recorded pins."
     },
     {
       "component_id": "context-mode",
@@ -5751,15 +5763,18 @@
       "purpose": "Native CLI bridge with persistent MCP daemon connection",
       "upstream_commands": {
         "install": [
-          "npm install --global --prefix \"$STACK_HOME/tools/mcporter-0.14.1\" mcporter@0.14.1"
+          "npm install --global --prefix \"$STACK_HOME/tools/mcporter-0.14.2\" mcporter@0.14.2"
         ],
         "use": [
           "mcporter --config \"$MCPORTER_CONFIG\" list socraticode --brief --no-oauth",
           "mcporter call --stdio jcodemunch-mcp --env \"CODE_INDEX_PATH=$HOME/.code-index\" --env JCODEMUNCH_SHARE_SAVINGS=0 --name jcodemunch --tool order --args '{\"action\":\"get_session_stats\",\"args\":{}}' --output json --no-oauth"
         ],
         "statistics": [],
-        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/mcporter-0.14.1\" mcporter@0.14.1`; `ps` must be on the PATH of whatever launches the daemon.",
-        "command_kind": "Upstream documented commands; only the retained receipt establishes execution."
+        "install_note": "`npm install --global --prefix \"$STACK_HOME/tools/mcporter-0.14.2\" mcporter@0.14.2`; `ps` must be on the PATH of whatever launches the daemon. 2026-10-04 host qualification: evidence/receipts/mcporter-0142-qualification-20261004.json; documentation commands are portable recipes, not a new execution claim. Configured-daemon calls failed on a stale rendezvous; the two ad-hoc --stdio calls succeeded. The daemon was not recovered.",
+        "command_kind": "Upstream documented commands; only the retained receipt establishes execution.",
+        "verify": [
+          "mcporter --version"
+        ]
       },
       "returned_result_summary": "2026-09-20 native CLI bridge returned jCodeMunch's 29, 820 estimated retained total and Context Mode's actual project-file hash/length. This is a transport bridge, not an additional savings source; do not credit the same payload reduction again.",
       "session_statistics": {
@@ -5783,7 +5798,8 @@
         "evidence/receipts/component-history.json",
         "observability/restart-receipt.json",
         "evidence/receipts/token-practice-coverage-20260920.json",
-        "evidence/receipts/current-session-observation-20260920.json"
+        "evidence/receipts/current-session-observation-20260920.json",
+        "evidence/receipts/mcporter-0142-qualification-20261004.json"
       ],
       "observation_role": "selected_cli_or_client_display",
       "card": {
@@ -6027,7 +6043,14 @@
           ],
           "source": "evidence/artifacts/token-stack-cards-20260927/gpt6-reviews.json"
         }
-      }
+      },
+      "latest_release": {
+        "tag": "v0.14.2",
+        "published_at": "2026-10-01T18:24:07Z",
+        "url": "https://github.com/openclaw/mcporter/releases/tag/v0.14.2",
+        "checked_at": "2026-10-04T13:59:38.331553+00:00"
+      },
+      "notes": "2026-10-04 host qualification: evidence/receipts/mcporter-0142-qualification-20261004.json; documentation commands are portable recipes, not a new execution claim. Configured-daemon calls failed on a stale rendezvous; the two ad-hoc --stdio calls succeeded. The daemon was not recovered. Existing cards are dated editions and remain at their recorded pins."
     },
     {
       "component_id": "ccusage",
@@ -6657,15 +6680,19 @@
       "purpose": "Claude statusline rendering",
       "upstream_commands": {
         "install": [
-          "claude plugin marketplace add jarrodwatts/claude-hud@v0.8.0 --scope user",
+          "claude plugin marketplace add jarrodwatts/claude-hud@v0.10.0 --scope user",
           "claude plugin install claude-hud@claude-hud --scope user --json"
         ],
         "use": [
           "/claude-hud:setup"
         ],
         "statistics": [],
-        "install_note": "`claude plugin marketplace add jarrodwatts/claude-hud@v0.8.0 --scope user`; `claude plugin install claude-hud@claude-hud --scope user --json`",
-        "command_kind": "Upstream documented commands; only the retained receipt establishes execution."
+        "install_note": "`claude plugin marketplace add jarrodwatts/claude-hud@v0.10.0 --scope user`; `claude plugin install claude-hud@claude-hud --scope user --json` 2026-10-04 host qualification: evidence/receipts/claude-hud-0100-qualification-20261004.json; documentation commands are portable recipes, not a new execution claim. Initial marketplace add failed due to the old source entry; native marketplace remove/add and plugin install succeeded. Configured and direct statusline sample renders returned 0; no new interactive session was run.",
+        "command_kind": "Upstream documented commands; only the retained receipt establishes execution.",
+        "verify": [
+          "claude plugin list --json",
+          "claude plugin details claude-hud@claude-hud"
+        ]
       },
       "returned_result_summary": "Installed 0.8.0 renderer returned the synthetic fixture label and 25% context bar. Actual interactive attempt reached onboarding before live HUD appeared. Native Claude-only display, not a Codex Desktop observer or cumulative saved-token counter.",
       "session_statistics": {
@@ -6690,13 +6717,21 @@
         "evidence/receipts/token-practice-coverage-20260920.json",
         "evidence/receipts/token-practice-gap-followup-20260920.json",
         "evidence/receipts/native-claude-hud-interactive-20260920.json",
-        "evidence/receipts/current-session-observation-20260920.json"
+        "evidence/receipts/current-session-observation-20260920.json",
+        "evidence/receipts/claude-hud-0100-qualification-20261004.json"
       ],
       "observation_role": "selected_cli_or_client_display",
       "card": {
         "status": "no card in this edition",
         "edition": "2026-09-27"
-      }
+      },
+      "latest_release": {
+        "tag": "v0.10.0",
+        "published_at": "2026-10-01T19:11:24Z",
+        "url": "https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0",
+        "checked_at": "2026-10-04T13:59:40.251395+00:00"
+      },
+      "notes": "2026-10-04 host qualification: evidence/receipts/claude-hud-0100-qualification-20261004.json; documentation commands are portable recipes, not a new execution claim. Initial marketplace add failed due to the old source entry; native marketplace remove/add and plugin install succeeded. Configured and direct statusline sample renders returned 0; no new interactive session was run. Existing cards are dated editions and remain at their recorded pins."
     },
     {
       "component_id": "otel-tui",
@@ -7241,7 +7276,7 @@
       "purpose": "Optional pinned local gateway; isolated lifecycle verified, connected-account inference remains unaccepted in this wave.",
       "upstream_commands": {
         "install": [
-          "DATA_DIR=\"$OMNIROUTE_DATA\" npm install --global --prefix \"$OMNIROUTE_PREFIX\" omniroute@3.8.50 --include=optional",
+          "DATA_DIR=\"$OMNIROUTE_DATA\" npm install --global --prefix \"$OMNIROUTE_PREFIX\" omniroute@3.8.51 --include=optional",
           "DATA_DIR=\"$OMNIROUTE_DATA\" npm rebuild --global --prefix \"$OMNIROUTE_PREFIX\" --allow-scripts=omniroute,keytar,onnxruntime-node,tls-client-node,@parcel/watcher,@swc/core,protobufjs,koffi,esbuild --foreground-scripts"
         ],
         "use": [

@@ -952,12 +952,140 @@ class BlindPathAndPrecisionTests(CodexLaneFixture):
             "/bin/bash -lc \"python3 -c \\\"import urllib.request as u; u.urlopen('FILE://localhost/etc/passwd')\\\"\"":
                 "path outside the repository and packets: //localhost/etc/passwd",
             "/bin/bash -lc 'unzip -p jar:file:///etc/x.jar'": "path outside the repository and packets: ///etc/x.jar",
+            "/bin/bash -lc \"python3 -c \\\"print('http+unix://%2Frun%2Fuser%2F1000%2Fx.sock/v1')\\\"\"":
+                "path outside the repository and packets: //%2Frun%2Fuser%2F1000%2Fx.sock/v1",
+            "/bin/bash -lc \"python3 -c \\\"print('local://etc/passwd')\\\"\"":
+                "path outside the repository and packets: //etc/passwd",
+            "/bin/bash -lc 'cat LOCAL://etc/passwd'": "path outside the repository and packets: //etc/passwd",
+            "/bin/bash -lc 'cat HTTP+UNIX://socket/v1'": "path outside the repository and packets: //socket/v1",
             "/bin/bash -lc '/bin/sh -c file:///usr/local/bin/qmd; /usr/local/bin/qmd x'":
                 "runs qmd by path: /usr/local/bin/qmd",
         }
         for command, reason in expected.items():
             with self.subTest(command=command):
                 self.assertIn(reason, self.reasons(command))
+
+    def test_separator_and_anchor_exemptions_do_not_hide_constructed_reads(self):
+        # PR #216's broad exemptions hide these command-text paths at both audit call sites.
+        expected = {
+            "/bin/bash -lc \"python3 -c \\\"print(open('://'[1:]+'etc/passwd').read())\\\"\"": "//",
+            "/bin/bash -lc \"python3 -c \\\"import os; print(os.listdir('://'[1:]))\\\"\"": "//",
+            "/bin/bash -lc \"python3 -c \\\"print(open('/etc/passwd$)'[:-2]).read())\\\"\"": "/etc/passwd$",
+            "/bin/bash -lc \"python3 -c \\\"print(open('/etc/passwd$|'.rstrip('$|')).read())\\\"\"": "/etc/passwd$",
+            "/bin/bash -lc \"rg x $(python3 -c \\\"print('|/etc/passwd$|'[1:-2])\\\")\"": "/etc/passwd$",
+            "/bin/bash -lc \"cat /etc/passwd$''\"": "/etc/passwd$",
+            "/bin/bash -lc \"rg -n '/runner.py$' x\"": "/runner.py$",
+            "/bin/bash -lc 'cat ://x'": "//x",
+            "/bin/bash -lc 'ls //'": "//",
+            "/bin/bash -lc 'rg -n \"://|file\" docs'": "//",
+            "/bin/bash -lc \"python3 -c \\\"print(':'+'//etc')\\\"\"": "//etc",
+        }
+        for command, path in expected.items():
+            with self.subTest(command=command):
+                self.assertIn(f"path outside the repository and packets: {path}", self.reasons(command))
+        # Local authorities must also reach the CLI-by-path comprehension, not just outside_paths.
+        for scheme in ("local", "http+unix"):
+            command = f"/bin/bash -lc '{scheme}://qmd search x'"
+            with self.subTest(scheme=scheme):
+                self.assertIn("runs qmd by path: //qmd", self.reasons(command))
+
+    def test_wave_20260924_separator_and_regex_residuals(self):
+        # Exact historical shapes from 3f456ec286: both remain flagged when the unsafe exemptions are dropped.
+        expected = {
+            "/bin/bash -lc \"python3 - <<'PY'\nfor ref in refs:\n print(ref, 'EXTERNAL' if '://' in ref else ref)\nPY\"": "//",
+            "/bin/bash -lc \"rg --files tests | rg '(test_adaptive_paper_(recovery|safety)\\\\.py$|/runner.py$)'\"": "/runner.py$",
+        }
+        for command, path in expected.items():
+            with self.subTest(command=command):
+                self.assertIn(f"path outside the repository and packets: {path}", self.reasons(command))
+
+    def test_env_shell_shims_are_measured_under_the_blind_path(self):
+        bin_dir = self.work_dir / "env-shims"
+        bin_dir.mkdir()
+        empty_path = self.work_dir / "empty-path"
+        empty_path.mkdir()
+        for name, text in (
+                ("asdf-codex", '#!/usr/bin/env bash\nexec asdf exec codex "$@"\n'),
+                ("s-codex", '#!/usr/bin/env -S bash -e\nexec no-such-codex-launch-tool-216 "$@"\n')):
+            launcher = bin_dir / name
+            launcher.write_text(text, encoding="utf-8")
+            launcher.chmod(0o755)
+            with self.subTest(launcher=name), mock.patch.object(codex_lane, "BLIND_CHILD_PATH", str(empty_path)):
+                issue = codex_lane.codex_launch_issue(str(launcher))
+                self.assertIsNotNone(issue)
+                self.assertIn(str(launcher), issue)
+                self.assertIn("exited 127", issue)
+                self.assertIn("not found", issue)
+        # A command that exists but cannot execute is a measured exit 126.
+        target = bin_dir / "not-executable"
+        target.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
+        launcher = bin_dir / "permission-codex"
+        launcher.write_text(f'#!/usr/bin/env bash\nexec "{target}" "$@"\n', encoding="utf-8")
+        launcher.chmod(0o755)
+        issue = codex_lane.codex_launch_issue(str(launcher))
+        self.assertIsNotNone(issue)
+        self.assertIn("exited 126", issue)
+
+    def test_identity_launcher_is_accepted_and_runs_in_the_blind_environment(self):
+        # Use the original recipe unchanged, with a /bin/sh target for Linux/macOS determinism.
+        target = self.work_dir / "absolute-codex"
+        target.write_text(
+            '#!/bin/sh\n[ "$1" = --version ] || exit 2\n'
+            '[ -d "$HOME" ] && [ -d "$CODEX_HOME" ] || exit 3\n'
+            '[ ! -e "$CODEX_HOME/auth.json" ] || exit 4\n'
+            'printf "fixture codex version\\n"\n', encoding="utf-8")
+        target.chmod(0o755)
+        launcher = self.work_dir / "identity-codex"
+        template = (ROOT / "observability/collector/codex-identity-launcher.sh.example").read_text(encoding="utf-8")
+        launcher.write_text(template.replace("@CODEX_BIN@", str(target)), encoding="utf-8")
+        launcher.chmod(0o755)
+        self.assertIsNone(codex_lane.codex_launch_issue(str(launcher)))
+        home = self.work_dir / "identity-probe-home"
+        home.mkdir()
+        env = codex_lane.child_env(home)
+        Path(env["HOME"]).mkdir()
+        Path(env["TMPDIR"]).mkdir()
+        completed = subprocess.run(codex_lane.blind_child_argv([str(launcher), "--version"]), env=env,
+                                   stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=5, check=False)
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertEqual(completed.stdout, "fixture codex version\n")
+
+    def test_launcher_probe_uses_empty_scratch_homes_and_reports_other_failures(self):
+        launcher = self.work_dir / "probe-codex"
+        launcher.write_text("#!/usr/bin/env -S bash -e\n", encoding="utf-8")
+        launcher.chmod(0o755)
+        observed_homes = []
+
+        def probe(argv, **kwargs):
+            self.assertEqual(argv, [shutil.which("bash"), "-e", str(launcher), "--version"])
+            self.assertEqual(kwargs["stdin"], subprocess.DEVNULL)
+            self.assertEqual(kwargs["timeout"], 5)
+            env = kwargs["env"]
+            self.assertEqual(env["PATH"], codex_lane.BLIND_CHILD_PATH)
+            self.assertEqual(list(Path(env["HOME"]).iterdir()), [])
+            self.assertFalse((Path(env["CODEX_HOME"]) / "auth.json").exists())
+            self.assertNotEqual(env["CODEX_HOME"], str(self.native_codex))
+            observed_homes.append(Path(env["CODEX_HOME"]))
+            return subprocess.CompletedProcess(argv, 2, "", "first line\nlast line\n")
+
+        err = io.StringIO()
+        with mock.patch.object(codex_lane.subprocess, "run", side_effect=probe), contextlib.redirect_stderr(err):
+            self.assertIsNone(codex_lane.codex_launch_issue(str(launcher)))
+        self.assertIn("exited 2", err.getvalue())
+        self.assertIn("last line", err.getvalue())
+        self.assertNotIn("first line", err.getvalue())
+        self.assertTrue(observed_homes)
+        self.assertTrue(all(not path.exists() for path in observed_homes))
+        err = io.StringIO()
+        with mock.patch.object(codex_lane.subprocess, "run", side_effect=subprocess.TimeoutExpired("probe", 5)), \
+                contextlib.redirect_stderr(err):
+            self.assertIsNone(codex_lane.codex_launch_issue(str(launcher)))
+        self.assertIn("timed out", err.getvalue())
+        err = io.StringIO()
+        with mock.patch.object(codex_lane.subprocess, "run", side_effect=OSError("fixture launch error")), \
+                contextlib.redirect_stderr(err):
+            self.assertIsNone(codex_lane.codex_launch_issue(str(launcher)))
+        self.assertIn("fixture launch error", err.getvalue())
 
     def test_the_measured_path_covers_a_shell_without_path_and_ignores_profile_output(self):
         # C3: subprocess.run(..., shell=True, env={}) starts /bin/sh with its compiled default PATH (/usr/local/bin);

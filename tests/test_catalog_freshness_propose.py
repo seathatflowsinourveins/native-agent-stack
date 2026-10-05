@@ -39,6 +39,11 @@ from pathlib import Path
 from scripts import freshness_propose as fp
 from scripts.validate import validate
 
+if __package__:
+    from .repository_copy import guarded_copytree
+else:
+    from repository_copy import guarded_copytree
+
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github/workflows/catalog-freshness.yml"
@@ -49,7 +54,8 @@ EXPECTED_PROPOSE_IF = (
     "github.ref == 'refs/heads/main' && needs.freshness.outputs.drift == 'true' && "
     "(inputs.max_repos || 0) == 0 && needs.freshness.outputs.upstream_errors == '0' && "
     "needs.freshness.outputs.partial_errors == '0' && "
-    "(inputs.open_pr == true || (github.event_name == 'schedule' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))"
+    "(inputs.open_pr == true || (github.event_name == 'schedule' && "
+    "github.event.schedule == '17 6 * * 1' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))"
 )
 EXPECTED_PROPOSE_CONCURRENCY_GROUP = (
     "${{ github.workflow }}-propose-${{ inputs.open_pr == true && 'manual' || 'scheduled' }}"
@@ -380,6 +386,38 @@ class BuildDriftReportTests(unittest.TestCase):
         self.assertEqual((self.work_dir / "drift-status.txt").read_text().strip(), "false")
         self.assertIn(fp.md_cell("tavily-cli"), (self.work_dir / "drift.md").read_text())
 
+    def _assert_prerelease_unknown_report(self, reason):
+        for old_latest in ("v1.231.0", None):
+            for reason_field in ("latest_flag", "pin_comparison_reason"):
+                with self.subTest(old_latest=old_latest, reason_field=reason_field):
+                    self._write_manifest(self.published_dir / "manifest-20260922.json",
+                                         [("nautilustrader", "2.0.0rc5", old_latest,
+                                           False if old_latest else None)])
+                    rebuilt_path = self.work_dir / "manifest-20260923.json"
+                    self._write_manifest(rebuilt_path, [("nautilustrader", "2.0.0rc5", None, None)])
+                    rebuilt = json.loads(rebuilt_path.read_text())
+                    row = rebuilt["foundation"][0]["components"][0]
+                    if reason_field == "latest_flag":
+                        row["upstream"]["latest_flag"] = {"tag": None, "reason": reason}
+                    else:
+                        row["pin_comparison_reason"] = reason
+                    rebuilt_path.write_text(json.dumps(rebuilt))
+                    result = fp.build_drift_report(self.work_dir)
+                    self.assertEqual(result["drifted"], [])
+                    self.assertEqual(result["unfetched"], ["nautilustrader"])
+                    self.assertEqual(result["no_release"], [])
+                    markdown = (self.work_dir / "drift.md").read_text()
+                    self.assertIn("unknown", markdown.lower())
+                    self.assertIn(reason, markdown)
+                    self.assertNotIn("no GitHub release or tag at all", markdown)
+                    self.assertEqual((self.work_dir / "drift-status.txt").read_text().strip(), "false")
+
+    def test_truncated_prerelease_list_is_unknown_in_drift_report(self):
+        self._assert_prerelease_unknown_report("unknown beyond cap")
+
+    def test_no_release_in_pinned_major_is_unknown_in_drift_report(self):
+        self._assert_prerelease_unknown_report("no published release in pinned major")
+
     def test_upstream_error_count_reads_the_freshness_document(self):
         self._write_freshness_document({"errors": 3, "partial_errors": 0, "repositories": {}})
         self._write_manifest(self.published_dir / "manifest-20260922.json", [])
@@ -488,6 +526,13 @@ class BuildReceiptTests(unittest.TestCase):
                                     "https://example.invalid/run/1", "2026-09-23T00:00:00Z")
         self.assertEqual(receipt["schema_version"], 1)
         self.assertEqual(receipt["kind"], fp.RECEIPT_KIND)
+        self.assertTrue(
+            receipt["claim"].startswith(
+                "Catalog-freshness run (https://example.invalid/run/1) "
+                "rebuilt the SOTA-convergence manifest and "
+            )
+        )
+        self.assertNotIn("Scheduled", receipt["claim"])
         self.assertIn("report-only", receipt["claim"])
         self.assertIn("was selected, evaluated, or changed", receipt["claim"])
         self.assertIn("pin bump requires its own separately qualified receipt", receipt["claim"])
@@ -718,7 +763,7 @@ class RebuildExplorerSubprocessTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.scratch = Path(tempfile.mkdtemp(prefix="freshness-default-scratch-"))
-        shutil.copytree(
+        guarded_copytree(
             ROOT, cls.scratch, dirs_exist_ok=True,
             ignore=shutil.ignore_patterns(".git", "__pycache__", "*.pyc", ".pytest_cache"),
         )
@@ -762,7 +807,7 @@ class TrackedExplorerSubprocessTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.scratch = Path(tempfile.mkdtemp(prefix="freshness-tracked-scratch-"))
-        shutil.copytree(
+        guarded_copytree(
             ROOT, cls.scratch, dirs_exist_ok=True,
             ignore=shutil.ignore_patterns(".git", "__pycache__", "*.pyc", ".pytest_cache"),
         )
@@ -817,6 +862,12 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         match = re.search(rf"(?m)^  {re.escape(job_id)}:\n(.*?)(?=^  \w[\w-]*:|\Z)", self.text, re.DOTALL)
         self.assertIsNotNone(match, f"{job_id} job not found")
         return match.group(1)
+
+    def test_daily_report_schedules_partition_all_seven_days_at_0617_utc(self):
+        top_level = self.text.split("\njobs:\n", 1)[0]
+        schedules = re.findall(r"(?m)^    - cron: '([^']+)'$", top_level)
+        # Disjoint day sets cover Sunday (0) through Saturday (6) exactly once.
+        self.assertCountEqual(schedules, ["17 6 * * 1", "17 6 * * 0,2-6"])
 
     def test_open_pr_dispatch_input_is_a_boolean_defaulting_false(self):
         match = re.search(
@@ -892,8 +943,10 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         self.assertNotIn("actions: write", body)
 
     def test_top_level_permissions_stay_read_only(self):
+        # The workflow grants no scope (docs/decisions/2026-10-04-ci-least-privilege.md); freshness reads only.
         top_level = self.text.split("\njobs:\n", 1)[0]
-        self.assertIn("permissions:\n  contents: read", top_level)
+        self.assertRegex(top_level, r"(?m)^permissions: \{\}$")
+        self.assertIn("\n    permissions:\n      contents: read\n    outputs:\n", self._job_body("freshness"))
 
     def test_propose_job_never_references_forbidden_catalog_paths_for_writing(self):
         body = self._job_body("propose")
@@ -939,6 +992,74 @@ class CatalogFreshnessWorkflowTextTests(unittest.TestCase):
         self.assertIn('if [ -z "$existing" ] && ! gh pr create', body)
         self.assertIn('existing="$(find_open_pr)"', body)
         self.assertIn('gh pr edit "$existing" --title "$title" --body-file "$body_file"', body)
+
+    def _run_pr_metadata(self, lanes="", existing=True, race=False):
+        """Execute the actual metadata shell with a synthetic gh; no network calls."""
+        job = self._job_body("propose")
+        step = job[job.index("- name: Open or update the evidence PR"):job.index("- name: Note that this PR")]
+        script = step.split("        run: |\n", 1)[1]
+        script = "\n".join(line[10:] for line in script.splitlines())
+        stub = r'''
+gh() {
+  printf '%s\n' "$*" >> "$TEST_CALLS"
+  case "$1 $2" in
+    "pr list")
+      if [ "$TEST_EXISTING" = 1 ] || [ -f "$TEST_CREATED" ]; then printf '527\n'; fi ;;
+    "pr view")
+      case "$*" in
+        *"--json labels"*) printf '%s\n' "$TEST_LANES" ;;
+        *) printf 'https://example.invalid/pull/527\n' ;;
+      esac ;;
+    "pr create")
+      if [ "$TEST_RACE" = 1 ]; then : > "$TEST_CREATED"; return 1; fi ;;
+    "pr edit") ;;
+    *) return 99 ;;
+  esac
+}
+'''
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "freshness").mkdir()
+            env = {**os.environ, "RUNNER_TEMP": directory, "GITHUB_OUTPUT": str(root / "output"),
+                   "TEST_CALLS": str(root / "calls"), "TEST_CREATED": str(root / "created"),
+                   "TEST_LANES": lanes, "TEST_EXISTING": str(int(existing)), "TEST_RACE": str(int(race))}
+            result = subprocess.run(["bash", "-c", stub + script], env=env, capture_output=True,
+                                    text=True, timeout=30, check=False)
+            body_path = root / "freshness/pr-body.md"
+            return result, (root / "calls").read_text(), body_path.read_text() if body_path.exists() else ""
+
+    def test_pr_metadata_creates_a_shared_report_with_a_valid_source_section(self):
+        from tests.test_sota_sources_gate import NODE, GATE, body, inline_script, run_check, sota_job
+        if not NODE:
+            self.skipTest("node unavailable; CI supplies it for the native source gate")
+        result, calls, rendered = self._run_pr_metadata(existing=False)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertRegex(calls, r"pr create .*--label lane:shared")
+        self.assertIn("Lane: `lane:shared`", rendered)
+        outcome = run_check(inline_script(sota_job(GATE)), [body(rendered)])[0]
+        self.assertIsNone(outcome["failed"], outcome)
+
+    def test_pr_metadata_preserves_one_lane_and_rejects_ambiguous_lanes(self):
+        for supplied, expected in (("", "lane:shared"), ("lane:foundation", "lane:foundation"),
+                                   ("lane:trading", "lane:trading"), ("lane:shared", "lane:shared")):
+            with self.subTest(lanes=supplied):
+                result, calls, rendered = self._run_pr_metadata(supplied)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertRegex(calls, rf"pr edit 527 .*--add-label {expected}")
+                self.assertIn(f"Lane: `{expected}`", rendered)
+        for lanes in ("lane:foundation\nlane:shared", "lane:unknown"):
+            with self.subTest(lanes=lanes):
+                result, calls, _ = self._run_pr_metadata(lanes)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertNotIn("pr edit", calls)
+                self.assertNotIn("pr create", calls)
+
+    def test_pr_metadata_rechecks_the_lane_after_a_create_race(self):
+        result, calls, rendered = self._run_pr_metadata("lane:trading", existing=False, race=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertRegex(calls, r"pr create .*--label lane:shared")
+        self.assertRegex(calls, r"pr edit 527 .*--add-label lane:trading")
+        self.assertIn("Lane: `lane:trading`", rendered)
 
     def test_unfetched_wording_says_pin_changes_are_still_drift(self):
         report = fp.render_drift_markdown(

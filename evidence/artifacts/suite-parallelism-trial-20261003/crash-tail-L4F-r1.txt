@@ -1,0 +1,30 @@
+P0 bridge: sibling names absent at this base: ['validateIdentityTable']
+test_the_bridge_reports_the_kernel_names_it_finds (tests.test_token_e2e_grader.P0_SiblingPreflight.test_the_bridge_reports_the_kernel_names_it_finds)
+Stage 2 consumes the kernel only through node_bridge.mjs: at this base only the present names exist. ... ok
+test_the_real_run_mode_output_has_the_shape_the_grader_reads (tests.test_token_e2e_grader.P0_SiblingPreflight.test_the_real_run_mode_output_has_the_shape_the_grader_reads)
+U2's run-mode children are consumed as {agent_id, label, lanes.measurement.hook_context}; summarizeRun at this ...
+test_the_real_run_mode_output_has_the_shape_the_grader_reads (tests.test_token_e2e_grader.P0_SiblingPreflight.test_the_real_run_mode_output_has_the_shape_the_grader_reads)
+U2's run-mode children are consumed as {agent_id, label, lanes.measurement.hook_context}; summarizeRun at this ... ok
+test_toon_cli_version (tests.test_token_e2e_grader.P0_SiblingPreflight.test_toon_cli_version) ...
+test_toon_cli_version (tests.test_token_e2e_grader.P0_SiblingPreflight.test_toon_cli_version) ... skipped 'needs the TOON CLI 4.1.1 on PATH'
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "<runner-home>/.local/lib/python3.12/site-packages/unittest_parallel/__main__.py", line 12, in <module>
+    main()
+  File "<runner-home>/.local/lib/python3.12/site-packages/unittest_parallel/main.py", line 160, in main
+    results = pool.map(test_fn, test_suites, chunksize=1)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/pool.py", line 367, in map
+    return self._map_async(func, iterable, mapstar, chunksize).get()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/pool.py", line 774, in get
+    raise self._value
+  File "/usr/lib/python3.12/multiprocessing/pool.py", line 540, in _handle_tasks
+    put(task)
+  File "/usr/lib/python3.12/multiprocessing/connection.py", line 206, in send
+    self._send_bytes(_ForkingPickler.dumps(obj))
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/multiprocessing/reduction.py", line 51, in dumps
+    cls(buf, protocol).dump(obj)
+TypeError: cannot pickle '_contextvars.Context' object

@@ -198,3 +198,22 @@ patch has its own rollback: restore build `dd6e9607e`.
   effective-effort preservation across both hops is unproven (harm:4). OAuth refresh concurrency needs review before
   pinned traffic concentrates (missing:1). HTTP 200 is not completion without the terminal SSE event (missing:2). The
   all-200 counts in part1-final-recheck and limiter-lift-20129 are HTTP status only.
+
+## Addendum (2026-10-03)
+
+No R02 scored run is on record. 20128 left the frozen build `dd6e9607e` no later than 2026-09-29 00:42Z, when it was
+running `5fc47d970` at `81c9b6da`; that ended **in fact** the freeze under "Decisions". The 2026-09-30 rebuild
+restarted 20128 with `045aa81f3` in build `ae5539a56`, so the "after R02" order under "Next test and rollback" was
+broken **in fact** no later than 2026-09-30. The rebuild record describes `045aa81f3` as part (i) only; part (ii) is
+not recorded as applied and stays open. It names neither R02 nor #445. PR #425's records, on main since
+2026-09-28T22:57:18Z, already label `045aa81f3` as 20128's build. That label comes from a source read, not an observed
+version read, and read as the running build it conflicts with the rebuild record's account. The sources do not settle
+whether either break came earlier, and this addendum neither asserts nor rules out an earlier date. No explicit
+release by the user is on record; this addendum neither claims nor supplies one and releases nothing.
+#445 is retired by the
+[dated R02 retirement record](../../../docs/decisions/2026-10-03-retire-gateway-ab-r02.md), which preserves the
+design, history and evidence limits. Sources: the original `decisions.json:29-41,65-74`,
+`docs/decisions/2026-09-30-omniroute-rebuild.md:3-8,30-32,43-55,125,135-136`,
+`blueprints/runtime-workers/openhands/evidence/repair-round-commands.json:2,17,254` and
+`docs/decisions/2026-09-28-openhands-resolver-isolation.md:281`; class `source_review`. The historical
+instructions above and every pinned artifact remain unchanged.

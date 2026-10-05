@@ -2,7 +2,10 @@ name: Catalog freshness (report-only)
 
 on:
   schedule:
+    # Daily at 06:17 UTC; github.event.schedule identifies Monday proposals.
+    # https://github.com/github/docs/blob/2bd66de8cea336061c9ea060c9b37385136e6ab3/data/reusables/repositories/actions-scheduled-workflow-example.md#L34-L51
     - cron: '17 6 * * 1'
+    - cron: '17 6 * * 0,2-6'
   workflow_dispatch:
     inputs:
       max_repos:
@@ -14,13 +17,18 @@ on:
         type: boolean
         default: false
 
-permissions:
-  contents: read
+# No token scope by default; each job grants its own (docs/decisions/2026-10-04-ci-least-privilege.md).
+permissions: {}
 
 jobs:
   freshness:
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    # Raised from 30 to 60 on 2026-10-04: the job took 1687 of its 1800 s in run 37104350733 (its test suite step
+    # 1502 s) and 1623 s in run 37116574776, and the suite grows with most merged changes. The limit stays a hang guard;
+    # the suite step below aborts five minutes before it.
+    timeout-minutes: 60
+    permissions:
+      contents: read
     outputs:
       drift: ${{ steps.diff.outputs.drift }}
       upstream_errors: ${{ steps.diff.outputs.upstream_errors }}
@@ -72,11 +80,14 @@ jobs:
           # table in drift.md: every pinned trading component (selected us-equities
           # cards plus extract_layers.py's TRADING_PIN_SOURCES) vs upstream, with a
           # dormancy signal relative to --checked-at. The manifest itself is unchanged.
+          # --runtime-freshness-out does the same for the GPT runtime table: the runtime workers,
+          # SDKs and agents in extract_layers.py's RUNTIME_PIN_SOURCES and RUNTIME_WATCH_SOURCES.
           printf '{"lanes": [], "critic": null, "lost": []}\n' > "$RUNNER_TEMP/freshness/lanes.json"
           python3 tools/sota-convergence/build_manifest.py \
             --work-dir "$RUNNER_TEMP/freshness" --lanes "$RUNNER_TEMP/freshness/lanes.json" \
             --out "$RUNNER_TEMP/freshness/manifest-$(date -u +%Y%m%d).json" \
             --trading-freshness-out "$RUNNER_TEMP/freshness/trading-freshness.json" \
+            --runtime-freshness-out "$RUNNER_TEMP/freshness/runtime-freshness.json" \
             --checked-at "$(date -u +%Y-%m-%d)" --id "catalog-freshness-$(date -u +%Y%m%d)"
       - name: Diff the rebuilt manifest against the published pins/upstream
         id: diff
@@ -97,7 +108,9 @@ jobs:
           print((work_dir / "drift.md").read_text())
           print(f"drifted={len(result['drifted'])} unfetched={len(result['unfetched'])} "
                 f"no_release={len(result['no_release'])} trading={len(result['trading'])} "
-                f"dormant={len(result['dormant'])} archived={len(result['archived'])}")
+                f"dormant={len(result['dormant'])} archived={len(result['archived'])} "
+                f"runtime={len(result['runtime'])} runtime_behind={len(result['runtime_behind'])} "
+                f"runtime_unresolved={len(result['runtime_unresolved'])}")
           PYEOF
           {
             echo "drift=$(cat "$RUNNER_TEMP/freshness/drift-status.txt")"
@@ -121,7 +134,24 @@ jobs:
               "grype|anchore/grype|0.119.0" \
               "nautilus_trader|nautechsystems/nautilus_trader|2.0.0rc5"; do
               IFS='|' read -r name repo pinned <<<"$spec"
-              latest=$(gh api "repos/$repo/releases/latest" --jq '.tag_name' 2>/dev/null || echo "unavailable")
+              # Stable pins retain releases/latest; prerelease pins also read at most
+              # three 100-release pages (unknown beyond cap on a full third page).
+              # https://docs.github.com/en/rest/releases/releases#list-releases
+              # https://docs.github.com/en/rest/releases/releases#get-the-latest-release
+              latest=$(python3 - "$repo" "$pinned" <<'PYEOF'
+          import sys
+          sys.path.insert(0, "tools/sota-convergence")
+          from github_freshness import gh_api, fetch_release_list, is_prerelease_pin, select_release_for_pin
+
+          slug, pin = sys.argv[1:]
+          release, error = gh_api(f"repos/{slug}/releases/latest")
+          if is_prerelease_pin(pin):
+              selected, reason = select_release_for_pin(pin, {"release_list": fetch_release_list(slug)})
+              print(reason or selected["tag"])
+          else:
+              print((release or {}).get("tag_name") or "unavailable")
+          PYEOF
+              )
               echo "| $name | $pinned | $latest |"
             done
             echo ""
@@ -140,9 +170,17 @@ jobs:
           python3 scripts/validate_convergence.py
           --all-recorded --root . --json
       - name: Run project test suite
+        # --durations 50 lists the 50 slowest tests at the end of the run (Python 3.12+; this job sets up 3.13). GNU
+        # timeout sends SIGABRT at 55 minutes, five under the job's limit, and SIGKILL 60 s later; with
+        # PYTHONFAULTHANDLER faulthandler first prints every thread's Python traceback, so a hang names the test it
+        # stopped in. A timeout fails the step with status 124. The steps before this one took 127 to 178 s in the eight
+        # completed runs 35934519434 to 37116574776.
+        env:
+          PYTHONFAULTHANDLER: '1'
         run: |
           set -o pipefail
-          python3 -m unittest 2>&1 | tee "$RUNNER_TEMP/freshness/unittest.log"
+          timeout --signal=ABRT --kill-after=60s 55m \
+            python3 -m unittest --durations 50 2>&1 | tee "$RUNNER_TEMP/freshness/unittest.log"
       - name: Report the test suite's skipped-test count
         if: ${{ !cancelled() }}
         run: |
@@ -168,6 +206,7 @@ jobs:
             ${{ runner.temp }}/freshness/manifest-*.json
             ${{ runner.temp }}/freshness/github-freshness.json
             ${{ runner.temp }}/freshness/trading-freshness.json
+            ${{ runner.temp }}/freshness/runtime-freshness.json
             ${{ runner.temp }}/freshness/drift.md
           if-no-files-found: error
           include-hidden-files: false
@@ -180,7 +219,7 @@ jobs:
   # registration -- it never selects, evaluates, or writes catalogs/sota-convergence/*,
   # catalogs/landscape/*.json, manifests/stack.json, or layer-verdicts* (owned by the
   # separate SOTA-convergence lane review). Off by default: it only runs from an explicit
-  # manual `open_pr: true` dispatch, or from a schedule when the repository variable
+  # manual `open_pr: true` dispatch, or from Monday's schedule when the repository variable
   # CATALOG_FRESHNESS_PROPOSE is set to 'true' -- and, either way, only when this run's own
   # freshness fetch was unbounded and free of both full fetch errors and partial errors (a
   # releases/tags/commit sub-fetch that failed and fell back, e.g. a 503 on releases papered
@@ -192,7 +231,8 @@ jobs:
       github.ref == 'refs/heads/main' && needs.freshness.outputs.drift == 'true' &&
       (inputs.max_repos || 0) == 0 && needs.freshness.outputs.upstream_errors == '0' &&
       needs.freshness.outputs.partial_errors == '0' &&
-      (inputs.open_pr == true || (github.event_name == 'schedule' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))
+      (inputs.open_pr == true || (github.event_name == 'schedule' &&
+      github.event.schedule == '17 6 * * 1' && vars.CATALOG_FRESHNESS_PROPOSE == 'true'))
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     concurrency:
@@ -317,6 +357,21 @@ jobs:
           # branch head carries instead of embedding this run's report. A manual and a
           # scheduled propose can overlap (separate concurrency groups), and a
           # run-specific body could then describe an older commit than the branch holds.
+          find_open_pr() {
+            gh pr list --head automation/catalog-freshness --base main --state open --json number --jq '.[0].number // empty'
+          }
+          resolve_lane() {
+            lane=lane:shared
+            if [ -n "$existing" ]; then
+              current_lane="$(gh pr view "$existing" --json labels --jq '[.labels[].name | select(startswith("lane:"))] | join("\n")')"
+              case "$current_lane" in
+                "") ;;
+                lane:foundation|lane:trading|lane:shared) lane="$current_lane" ;;
+                *) echo "Expected at most one supported lane label; resolve the PR labels before retrying." >&2; return 1 ;;
+              esac
+            fi
+          }
+          write_pr_body() {
           body_file="$RUNNER_TEMP/freshness/pr-body.md"
           {
             echo "## Catalog freshness: report-only drift evidence"
@@ -324,21 +379,32 @@ jobs:
             echo "The evidence is the current head of \`automation/catalog-freshness\`: the drift report under \`evidence/artifacts/catalog-freshness-<date>/drift.md\` and the receipt under \`evidence/receipts/catalog-freshness-<date>.json\` in this PR's diff. The workflow run that produced the head commit is linked from that receipt."
             echo ""
             echo "This PR is report-only; no selection or pin changed; pin bumps require a qualified receipt under evidence/artifacts/*/."
+            echo ""
+            echo "Lane: \`$lane\`. This report covers foundation and trading source observations; an existing explicit lane label is preserved for owner review."
+            echo ""
+            echo "### SOTA sources"
+            echo ""
+            echo "The current PR's drift manifest and receipt retain the upstream repository identities, selected pins and fetched release/source observations. They are source-review evidence, not new runtime acceptance."
+            echo ""
+            echo "PR metadata source reviewed at cli/cli v2.102.0: [GitHub CLI create](https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/pkg/cmd/pr/create/create.go) and [edit](https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/pkg/cmd/pr/edit/edit.go). The hosted executable version is supplied by the runner image."
           } > "$body_file"
-          title="Catalog freshness: report-only drift evidence ($(date -u +%Y-%m-%d))"
-          find_open_pr() {
-            gh pr list --head automation/catalog-freshness --base main --state open --json number --jq '.[0].number // empty'
           }
+          title="Catalog freshness: report-only drift evidence ($(date -u +%Y-%m-%d))"
           existing="$(find_open_pr)"
+          resolve_lane
+          write_pr_body
           if [ -z "$existing" ] && ! gh pr create --base main --head automation/catalog-freshness \
-              --title "$title" --body-file "$body_file" >/dev/null; then
+              --title "$title" --body-file "$body_file" --label "$lane" >/dev/null; then
             # An overlapping run may have created the PR between the list and the create
             # (gh refuses a second PR for the same head); fall through to updating it.
             existing="$(find_open_pr)"
             [ -n "$existing" ] || { echo "gh pr create failed and no open PR exists" >&2; exit 1; }
           fi
           if [ -n "$existing" ]; then
-            gh pr edit "$existing" --title "$title" --body-file "$body_file"
+            # Re-read after a create race and retain a human's existing lane choice.
+            resolve_lane
+            write_pr_body
+            gh pr edit "$existing" --title "$title" --body-file "$body_file" --add-label "$lane"
           fi
           pr_url="$(gh pr view automation/catalog-freshness --json url --jq '.url')"
           echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
@@ -371,4 +437,9 @@ jobs:
             echo "use the approval banner in the PR's merge box and select \"Approve workflows to run\""
             echo "(GITHUB_TOKEN docs). A run left awaiting approval for"
             echo "more than 30 days is automatically deleted. See docs/github-automation.md."
+            echo ""
+            echo "For an existing PR whose old body lacked SOTA sources, the preceding push may"
+            echo "have captured that old body. If the approved source gate fails, make a genuine"
+            echo "human-authenticated body edit retaining the source section; rerunning the old"
+            echo "event keeps its old payload. GITHUB_TOKEN body edits do not trigger new runs."
           } >> "$GITHUB_STEP_SUMMARY"

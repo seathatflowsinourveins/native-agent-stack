@@ -77,6 +77,74 @@ groups:
         annotations:
           summary: 'WSL root filesystem observations are missing'
           description: 'Missing data is unknown, not proof of available space.'
+      # Port of prometheus/node_exporter v1.12.1 node-mixin filesystem alerts:
+      # commit 6044da783597cc3b57aef7580ddcdcff58a4ee99, docs/node-mixin/alerts/alerts.libsonnet:7-80
+      # and docs/node-mixin/config.libsonnet:67-91 (annotated tag object fc12f2c0ca65).
+      # OTel contrib v0.161.0 filesystemscraper/metadata.yaml declares free/used/reserved.
+      # Available is free alone; sum without(state) is size, preserving filesystem/owner labels.
+      # group_left retains state="free" so the percentage and prediction vectors match.
+      # mode!="ro" carries the mixin's read-only exclusion using the OTel mount mode.
+      - alert: EcosystemRootFilesystemSpaceFillingUp
+        expr: |
+          (ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}
+            / ignoring(state) group_left sum without(state) (ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state=~"free|used|reserved"}) * 100 < 40)
+          and predict_linear(ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}[6h], 24*60*60) < 0
+        for: 1h
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem is predicted to run out of space within 24 hours'
+          description: 'Less than 40% of total filesystem bytes are available to ordinary writers, and the six-hour free-space trend predicts exhaustion within 24 hours, sustained for one hour. Reserved bytes count toward size, not available space.'
+      - alert: EcosystemRootFilesystemSpaceFillingUp
+        expr: |
+          (ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}
+            / ignoring(state) group_left sum without(state) (ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state=~"free|used|reserved"}) * 100 < 20)
+          and predict_linear(ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}[6h], 4*60*60) < 0
+        for: 1h
+        labels:
+          severity: critical
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem is predicted to run out of space within four hours'
+          description: 'Less than 20% of total filesystem bytes are available to ordinary writers, and the six-hour free-space trend predicts exhaustion within four hours, sustained for one hour. Inspect active scratch writers and stop recursive checkout copies.'
+      - alert: EcosystemRootFilesystemAlmostOutOfSpace
+        expr: |
+          ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}
+            / ignoring(state) group_left sum without(state) (ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state=~"free|used|reserved"}) * 100 < 5
+        for: 30m
+        labels:
+          severity: warning
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem has less than 5% available space'
+          description: 'Available bytes have stayed below 5% of total filesystem bytes for 30 minutes. Available is the free state; size includes free, used and reserved states.'
+      - alert: EcosystemRootFilesystemAlmostOutOfSpace
+        expr: |
+          ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}
+            / ignoring(state) group_left sum without(state) (ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state=~"free|used|reserved"}) * 100 < 3
+        for: 30m
+        labels:
+          severity: critical
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem has less than 3% available space'
+          description: 'Available bytes have stayed below 3% of total filesystem bytes for 30 minutes. Recover headroom before the Collector and Prometheus fail to persist data.'
+      # Incident-specific short-window companion, not an upstream node-mixin default.
+      # 50 GiB is approximately the mixin's 5% low-space band on this ~1 TiB root.
+      # Forecast semantics: prometheus/prometheus v3.15.0 docs/querying/functions.md:769-781.
+      # Host cadence: collector.yaml (30s collection, 1s batch); Prometheus template (15s scrape/evaluation).
+      - alert: EcosystemRootFilesystemBurstFill
+        expr: |
+          predict_linear(ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"}[2m], 120) < 0
+          and ecosystem_system_filesystem_usage_bytes{mountpoint="/",mode!="ro",state="free"} < 53687091200
+        for: 15s
+        labels:
+          severity: critical
+          scope: local-ecosystem
+        annotations:
+          summary: 'WSL root filesystem is predicted to exhaust within two minutes below 50 GiB available'
+          description: 'The two-minute free-space trend predicts exhaustion within two minutes and less than 50 GiB remains, sustained for 15 seconds. For a linear fill at r GiB/s the page leads exhaustion by about min(50/r, 120) s minus the observation delay minus the 15 s pending interval: fills slower than about 50 GiB per two minutes get roughly 120 s minus those delays, while faster fills page within about 76 s of crossing the floor (configured collection/batch/scrape/evaluation/pending budget, plus transport and scheduling) and can exhaust the disk first; prediction requires at least two samples. Faster fills can outrun this alert: the test TMPDIR/copy guard prevents the known recursive cause, and the coordinator runs an independent two-minute headroom guard outside this repository. Stop the offending writer and recover headroom.'
   - name: native-telemetry-integrity
     rules:
       - alert: EcosystemTokenCounterResets
@@ -106,6 +174,52 @@ groups:
         annotations:
           summary: 'Token counters of {{ $labels.job }} have no per-process writer identity'
           description: 'These series are labelled instance="unscoped": a Claude process without session.id (a session that started before OTEL_METRICS_INCLUDE_SESSION_ID=true, or one that disables it) or a Codex process started without the identity launcher. Concurrent unscoped writers share one series, so the dashboards exclude them; restart the session or reinstall the launcher (observability/collector/README.md). The rule keeps 15 minutes of samples, longer than its 5-minute delay: a short Codex run''s series leaves the Collector''s exporter five minutes after its last export (metric_expiration), so it fires for such a run too and resolves 15 minutes after the last unscoped sample.'
+  - name: ecosystem-lanes
+    rules:
+      - alert: CodexLaneGoalBlocked
+        expr: 'sum by (ecosystem_lane) (increase(ecosystem_codex_goal_blocked_total[15m])) > 0'
+        for: 0m
+        keep_firing_for: 30m
+        labels:
+          severity: warning
+          scope: codex-lanes
+        annotations:
+          summary: 'A Codex goal is blocked (ecosystem_lane="{{ $labels.ecosystem_lane }}")'
+          description: 'A Codex goal reported codex.goal.blocked in the last 15 minutes. Event counters reach Prometheus as delta points that delta_to_cumulative converts, and their series leave the Collector''s exporter five minutes after the last export, so the rule fires at once (for: 0m) and keeps firing for 30 minutes after the event leaves the window (keep_firing_for). Check the lane''s goal state and the requests waiting on it on the lane board. ecosystem_lane comes from the launch-time OTEL_RESOURCE_ATTRIBUTES=ecosystem.lane=<lane>; an empty value is a Codex process started without it.'
+      - alert: CodexLaneToolErrorBurst
+        expr: |
+          (sum by (ecosystem_lane) (increase(ecosystem_codex_tool_call_total{success="false"}[1h]))
+            / sum by (ecosystem_lane) (increase(ecosystem_codex_tool_call_total[1h])) > 0.10)
+          and sum by (ecosystem_lane) (increase(ecosystem_codex_tool_call_total[1h])) >= 30
+        for: 15m
+        labels:
+          severity: warning
+          scope: codex-lanes
+        annotations:
+          summary: 'Codex tool calls are failing (ecosystem_lane="{{ $labels.ecosystem_lane }}")'
+          description: 'More than 10% of at least 30 Codex tool calls (codex.tool.call, success="false") failed in the last hour, for 15 minutes. 10% is twice the root lane''s 2026-10-03 daily failure rate of 4.9%, a starting value to re-tune after 7 days of data. The value is the failed share.'
+      - alert: CodexLaneMcpErrorRatio
+        expr: |
+          (sum by (ecosystem_lane) (increase(ecosystem_codex_mcp_call_error_total[1h]))
+            / sum by (ecosystem_lane) (increase(ecosystem_codex_mcp_call_total[1h])) > 0.10)
+          and sum by (ecosystem_lane) (increase(ecosystem_codex_mcp_call_total[1h])) >= 20
+        for: 15m
+        labels:
+          severity: warning
+          scope: codex-lanes
+        annotations:
+          summary: 'Codex MCP calls are failing (ecosystem_lane="{{ $labels.ecosystem_lane }}")'
+          description: 'More than 10% of at least 20 Codex MCP calls returned an error in the last hour (codex.mcp.call.error over codex.mcp.call), for 15 minutes. The tool label on these series names the failing MCP tool. A starting value to re-tune after 7 days of data. The value is the error share.'
+      - alert: CodexLaneUsageLimited
+        expr: 'sum by (ecosystem_lane) (increase(ecosystem_codex_goal_usage_limited_total[15m])) > 0'
+        for: 0m
+        keep_firing_for: 30m
+        labels:
+          severity: critical
+          scope: codex-lanes
+        annotations:
+          summary: 'A Codex goal hit a usage limit (ecosystem_lane="{{ $labels.ecosystem_lane }}")'
+          description: 'A Codex goal reported codex.goal.usage_limited in the last 15 minutes; any such event is critical. Resume the lane after the limit resets. It has the same delta-event mechanics as CodexLaneGoalBlocked (for: 0m, keep_firing_for: 30m). The 80% and 95% rate-limit readings come from the rollouts and are shown on the lane board, not here.'
   - name: equities-broker-path
     rules:
       - alert: EquitiesOrderStateDivergence

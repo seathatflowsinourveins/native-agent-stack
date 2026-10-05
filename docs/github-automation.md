@@ -348,19 +348,30 @@ change) and `adoption-bootstrap.yml`'s `bootstrap-linux`, `bootstrap-macos` and
 `adoption/**` or `blueprints/convergence-practice/wsl-native-tools/pins.json`
 change, or on a pull request that touches the same paths -- described in full
 further below). None of these appear in `main-ruleset.json`'s required status
-checks; a required check must run on every PR, and a scheduled or path-gated
-lane does not. Update 2026-09-22: `sbom-vuln` is no longer report-only; it
+checks; a required check must report on every PR, and a scheduled lane or a
+workflow skipped by a `paths:` filter does not (GitHub leaves its check
+pending). Update 2026-09-22: `sbom-vuln` is no longer report-only; it
 fails its own job on a High or Critical grype match (see "Secret and
 supply-chain scanning"), but it is still not a required check.
 `adoption-bootstrap.yml`'s fifth job, `validate-macos`, is the exception
-(2026-09-25): its workflow's `pull_request` trigger carries no `paths:` filter
-at all, so `validate-macos` itself reports a status on every pull request and
-is a required check (see "validate-macos required (2026-09-25)" in
+(2026-09-25, scoped 2026-10-03): its workflow's `pull_request` trigger carries
+no `paths:` filter, so `validate-macos` reports on every pull request and is a
+required check (see "validate-macos required (2026-09-25)" in
 [docs/decisions/2026-09-22-github-automation-closure.md](decisions/2026-09-22-github-automation-closure.md)).
-A `changes` job, added in the same workflow, diffs the pull request's base and
-head with plain `git` (no new third-party action) to keep the other three jobs
-path-gated on `pull_request` the same way GitHub's own `paths:` filter already
-path-gates them on `push`.
+Since 2026-10-03 it reports one of three results, as a `changes` job in the
+same workflow decides from the pull request's diff
+([docs/decisions/2026-10-03-macos-ci-scope.md](decisions/2026-10-03-macos-ci-scope.md)):
+a full run when the pull request changes a listed macOS-relevant path; a
+changed-tests run of only the top-level test modules it changed, which is a
+scoped result and not a macOS full-suite pass; or `skipped` when it changes
+neither. A job skipped by its own job-level `if:` reports `skipped`, which
+GitHub accepts for a required check; this repository records it as untested,
+not passed. Push, schedule and dispatch runs always run in full. The same
+`changes` job diffs the base and head with plain `git` (no third-party action)
+to keep the other three jobs path-gated on `pull_request` the same way GitHub's
+own `paths:` filter path-gates them on `push`, and `bootstrap-macos` and
+`bootstrap-macos-brew` run on a pull request only when `validate-macos` runs in
+full.
 
 `catalog-freshness.yml` reuses `tools/sota-convergence/extract_layers.py` and
 `github_freshness.py` unchanged, then rebuilds a manifest with
@@ -390,6 +401,19 @@ rust-ibapi). Each row shows pin vs upstream latest, the last release and
 default-branch commit dates, a dormancy flag (no release or commit in 180+
 days) and the archived flag. Dormant or archived rows never set
 `drift-status.txt` and are never read into the `propose` job's component ids.
+A third report-only table, built from `build_manifest.py --runtime-freshness-out`
+(`runtime-freshness.json`, also retained in the artifact), tracks the GPT runtime
+workers, SDKs and agents with the same columns: the pins in `extract_layers.py`'s
+`RUNTIME_PIN_SOURCES` (the new-WSL install plan rows, the runtime-worker recipe
+pin record and the native SDK constraints) and the watch-only upstreams in
+`RUNTIME_WATCH_SOURCES`, such as pi. It lists the pinned rows behind upstream and
+any source that did not resolve, and like the trading table it never sets
+`drift-status.txt`. A fetch failure on a repository that only `runtime-pins.json`
+names (no foundation, trading, trading-pin or star-candidate working file does)
+counts in `github-freshness.json`'s `runtime_only_errors` or
+`runtime_only_partial_errors`, not in the `upstream_errors` and `partial_errors`
+that hold the `propose` job below, and the table names that row in one line; a
+repository another working file also names counts in the gate as it did before.
 
 `catalog-freshness.yml`'s `python3 -m unittest` step runs on this job's
 `setup-python 3.13` interpreter, which has no `requests` package installed
@@ -495,7 +519,7 @@ commands for the immutable tag releases. [`.github/pull_request_template.md`](..
 requires scope with a Lane line (exactly one `lane:*` label), base commit, a `### SOTA sources` section
 (enforced by the required `sota-sources` check), a per-claim evidence-class table, exact local
 commands run, a decision-record path and a checklist covering SHA pins,
-`contents: read`, no secrets, no paid hosting and preserved peer-owned
+top-level `permissions: {}`, no secrets, no paid hosting and preserved peer-owned
 untracked files.
 
 ## Ruleset upgrade, 2026-09-22
@@ -838,8 +862,8 @@ to the full commit SHA of `v2.4.4`
 annotated tag with `gh api repos/ossf/scorecard-action/git/tags/<sha>`) on a
 weekly schedule, `workflow_dispatch`, and push to `main`. `publish_results`
 is `false` -- results are never published to the public `api.scorecard.dev`
-dataset or badge. The workflow's top-level permission is `contents: read`;
-since 2026-09-22 the `analysis` job alone also holds `security-events: write`,
+dataset or badge. The workflow's top-level permissions are `{}` (since 2026-10-04)
+and the `analysis` job holds `contents: read`; since 2026-09-22 it alone also holds `security-events: write`,
 which it uses only to upload the SARIF report to code scanning with
 `github/codeql-action/upload-sarif` v4.38.1 (free for this public repository,
 no GitHub Advanced Security purchase). The SARIF report is also retained as a
@@ -1054,12 +1078,25 @@ close together -- `--force-with-lease` above is what keeps that safe, not
 this concurrency group.
 `gh pr create` opens `automation/catalog-freshness` against `main` (or
 `gh pr edit` updates the existing one, keyed on `gh pr list --head
-automation/catalog-freshness`), with a body that includes the run's
-`drift.md` table (each cell rendered as escaped inline code by
-`scripts/freshness_propose.py`'s `md_cell()`, so an upstream release tag
-fetched from an external API can never break the Markdown table or smuggle
-formatting) and states plainly: "no selection or pin changed; pin bumps
-require a qualified receipt under evidence/artifacts/*/".
+automation/catalog-freshness`), with a description pointing to the branch's
+current report and receipt. The description contains no run-specific table,
+so overlapping proposals cannot leave an older run's report in the body. It
+includes the required `### SOTA sources` section and states plainly:
+"no selection or pin changed; pin bumps require a qualified receipt under
+evidence/artifacts/*/". Reports cover foundation and trading source observations,
+so a new or unlabeled PR defaults to `lane:shared`. An existing single supported
+lane label is preserved and reflected in the body; multiple or unknown lane
+labels stop the metadata step for owner resolution. Shared reports retain the
+other lane's acknowledgement requirement in [the lane policy](lanes.md).
+See the [metadata decision](decisions/2026-10-02-catalog-freshness-pr-metadata.md).
+
+For an existing PR whose old body lacks source metadata, the preceding push can
+capture that old body in its `synchronize` payload. The later bot body edit does
+not trigger another run. After approval, if the source gate fails for that reason,
+make a genuine human-authenticated body edit that retains the source section;
+rerunning the old event retains the old payload. Future synchronizations carry
+the corrected body. This one-time migration preserves the workflow's push order
+and token permissions. [GitHub documents the event behavior](https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/trigger-a-workflow).
 
 **No workflow is dispatched from this job, and that is deliberate.** An
 earlier version of this design called `gh workflow run validate.yml
@@ -1111,7 +1148,7 @@ reviewer's act. See "Live test, 2026-09-23" in the decision record.
 
 `propose` is the one job in this workflow with write permissions
 (`contents: write`, `pull-requests: write`, scoped to the job, not the
-workflow -- the top-level `permissions:` block stays `contents: read`),
+workflow -- the top-level `permissions:` block is `{}` and `freshness` holds `contents: read`),
 because it is the one job that opens a PR; it needs no `actions: write`
 since it no longer dispatches other workflows. It is still never a required
 check and it never merges anything by itself.

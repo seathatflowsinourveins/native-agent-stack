@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "kind": "native_runtime_task_repair_plan",
+  "status": "frozen_before_repair_provider_execution",
+  "frozen_at": "2026-09-30T23:48:00Z",
+  "lane": "foundation",
+  "original_plan": "examples/deepagents-omniroute/task-trial-plan.json",
+  "original_attempt": {
+    "status": "failed",
+    "exit_code": 1,
+    "error": "GraphRecursionError at frozen 24-step trial limit",
+    "oracle_exit_code": 2,
+    "failed_conditions": [
+      "No completed checkpoint_after event",
+      "Exact SQLite quote was 262 characters, exceeding unchanged 240-character maximum"
+    ],
+    "preservation": "Original worker revision, prompt, raw events, stderr, source inputs, SQLite state and usage remain retained."
+  },
+  "repair": {
+    "worker_sha256": "66ae2bba78773b52abdd4a312965579d7c2a1b888f54c3e7f1e9776a957ff0ec",
+    "prompt_sha256": "c93289aad4fa35720c586c4d61486bc2b8043ea1f48e9eaadf40c2c530245934",
+    "recursion_limit": 32,
+    "native_source": "https://github.com/langchain-ai/deepagents/blob/4394bcd00b8eb46e7c423939643a0dfcfb5d8773/libs/deepagents/deepagents/graph.py#L976",
+    "source_meaning": "Upstream configures native recursion_limit 9999; 32 is this bounded trial cap, not an upstream default.",
+    "context": "Same owned SQLite checkpoint and thread; native graph.stream adds one repair user turn to saved conversation.",
+    "task": "Correct only the short exact SQLite quote; no new task delegation or marker read; finish current parent turn.",
+    "deadline_seconds": 600,
+    "request_timeout_seconds": 120,
+    "max_retries": 0,
+    "model": "cx/gpt-6.1-sol-max",
+    "reasoning_effort": "max",
+    "endpoint": "http://127.0.0.1:25371/v1"
+  },
+  "unchanged": [
+    "Source and skill bytes",
+    "Initial input and resume prompt",
+    "Acceptance oracle and 240-character quote bound",
+    "Exactly one total native source-reviewer task across original plus repair",
+    "Native model, endpoint, tool limits, filesystem backend and SQLite checkpointer"
+  ],
+  "acceptance": "Concatenate exact original and repair JSONL bytes, without authored events. Run unchanged initial oracle over combined actual events. Then fresh-process continuation and negative controls under original task plan.",
+  "failure_policy": "One bounded Sol repair; escalate unresolved failure to Astra/Max with original evidence.",
+  "accounting": "Failed and repaired usage retained separately; no baseline savings comparison with changed cap/prompt. Native graph-update AI message IDs deduplicated; replay snapshots are excluded."
+}

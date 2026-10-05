@@ -1,0 +1,45 @@
+......FFFF...
+======================================================================
+FAIL: test_the_name_is_matched_in_any_letter_case (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_name_is_matched_in_any_letter_case) (text='MACOS-APPLICATION-20260924')
+A differently cased path names the same directory on a case-insensitive file system; pins stay exact.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 449, in test_the_name_is_matched_in_any_letter_case
+    self.assertTrue(names_artifact(text.encode()))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_name_is_matched_in_any_letter_case (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_name_is_matched_in_any_letter_case) (text='Macos-Application-20260924')
+A differently cased path names the same directory on a case-insensitive file system; pins stay exact.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 449, in test_the_name_is_matched_in_any_letter_case
+    self.assertTrue(names_artifact(text.encode()))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_name_is_matched_in_any_letter_case (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_name_is_matched_in_any_letter_case) (text='EVIDENCE/ARTIFACTS/MACOS-APPLICATION-20260924/variant')
+A differently cased path names the same directory on a case-insensitive file system; pins stay exact.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 449, in test_the_name_is_matched_in_any_letter_case
+    self.assertTrue(names_artifact(text.encode()))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+======================================================================
+FAIL: test_the_name_is_matched_in_any_letter_case (tests.test_frozen_macos_variant_no_use.ArtifactReferenceTripwireTests.test_the_name_is_matched_in_any_letter_case) (text="Path('MACOS-APPLICATION-20260924')")
+A differently cased path names the same directory on a case-insensitive file system; pins stay exact.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<clone>/tests/test_frozen_macos_variant_no_use.py", line 449, in test_the_name_is_matched_in_any_letter_case
+    self.assertTrue(names_artifact(text.encode()))
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: False is not true
+
+----------------------------------------------------------------------
+Ran 10 tests in 0.331s
+
+FAILED (failures=4)

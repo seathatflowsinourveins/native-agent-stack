@@ -3,7 +3,7 @@
   "kind": "convergence_experiment",
   "status": "observed",
   "lane": "retrieval",
-  "task_and_failure": "Audit the incomplete historical September 20 WSL fixture reference offline. Missing per-command argv/cwd, unavailable raw-log locations and unsupported blanket lifecycle-script suppression prevent native E2E or adoption acceptance.",
+  "task_and_failure": "Retire supported source/QMD replay and installation entry points for the incomplete historical September 20 WSL fixture while preserving offline audit and original evidence. Missing per-command argv/cwd, unavailable raw-log locations and unsupported blanket lifecycle-script suppression still prevent native E2E or adoption acceptance.",
   "primary_sources_and_pins": [
     {
       "url": "https://github.com/BurntSushi/ripgrep/releases/tag/15.2.0",
@@ -20,18 +20,35 @@
     {
       "url": "https://github.com/giancarloerra/SocratiCode/releases/tag/v1.14.0",
       "revision": "2218f25153d0f3f4a76ee240a5643dbc873e80be"
+    },
+    {
+      "url": "https://github.com/npm/cli/blob/v11.19.0/docs/lib/content/configuring-npm/package-json.md#L1117",
+      "revision": "bfacd33ccbcd908480610703b60455d2da5b57a9"
+    },
+    {
+      "url": "https://github.com/npm/cli/blob/v11.19.0/lib/base-cmd.js#L201",
+      "revision": "bfacd33ccbcd908480610703b60455d2da5b57a9"
+    },
+    {
+      "url": "https://github.com/npm/cli/blob/v11.19.0/workspaces/arborist/lib/arborist/load-virtual.js#L50",
+      "revision": "bfacd33ccbcd908480610703b60455d2da5b57a9"
+    },
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/56473e4b840f0e6940c031801d866e7e9bf29baf/blueprints/convergence-practice/wsl-retrieval/audit.py",
+      "revision": "56473e4b840f0e6940c031801d866e7e9bf29baf"
     }
   ],
   "discovery_provenance": [
-    "Existing selected ripgrep, ast-grep and QMD components; bounded official-source preflight dated September 20. No discovery-list installation or fresh currency claim during offline completion."
+    "Existing selected ripgrep, ast-grep and QMD components; bounded official-source preflight dated September 20. No discovery-list installation or fresh currency claim during offline completion.",
+    "The accepted bounded retirement design reuses the main564 archival audit and npm/cli v11.19.0 devEngines/runtime and standalone-lock source review. No retrieval, npm installation, provider run or scanner exception is established by this offline assessment."
   ],
   "license_and_compatibility": "Dated pins and tagged license identities are preserved: ripgrep MIT OR Unlicense; ast-grep and QMD MIT. The retained Linux x86_64 fixture reports Node 24.21.0, QMD 2.8.3, better-sqlite3 13.0.3 and sqlite-vec 0.1.9. Historical npm --ignore-scripts installation is not a supported fresh-host recipe; native dependency setup is not qualified.",
   "baseline_and_candidate": {
     "baseline": "Frozen Python string/AST oracles and explicit source bodies; no performance or model baseline run.",
-    "candidate": "Offline consistency audit of selected facts from incomplete historical receipts; no independently verified native invocation."
+    "candidate": "Offline consistency audit of selected facts from incomplete historical receipts, with current supported replay/install entry points retired; no independently verified historical native invocation."
   },
   "frozen_inputs": {
-    "base_revision": "6f74bc503ccecaaf6ccebd53677b23aedab50921",
+    "base_revision": "56473e4b840f0e6940c031801d866e7e9bf29baf",
     "tasks": [
       "historical-reference-audit"
     ],
@@ -48,6 +65,10 @@
         "sha256": "4cbcceac02158629ca78262aaa826c995c21bbe45fa83481f7c139f16a6c52d2"
       },
       {
+        "path": "blueprints/convergence-practice/wsl-retrieval/run-recording-aid.py.txt",
+        "sha256": "be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12"
+      },
+      {
         "path": "blueprints/convergence-practice/wsl-retrieval/seed/planner.py",
         "sha256": "3a33c48346221e2a103d4fb89d5675d2edaa97e651b7f08cf3a79b7ce0b8d7ef"
       }
@@ -58,11 +79,11 @@
         "sha256": "19572d05638badc6a79abf392924261836e08b19bd01231372e2f764502d393d"
       },
       {
-        "path": "blueprints/convergence-practice/wsl-retrieval/package.json",
+        "path": "blueprints/convergence-practice/wsl-retrieval/package-original.json.txt",
         "sha256": "7bbf63c5eafd347ae5ae56c684be06ef2589d38f2aab580ca7986ca4122bc6a8"
       },
       {
-        "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json",
+        "path": "blueprints/convergence-practice/wsl-retrieval/package-lock.json.frozen",
         "sha256": "5c51ee65cc477f2c1488a38ff5cad1c0a737f81a5b61bbd70d5edc4d15bfc3bb"
       },
       {
@@ -101,20 +122,28 @@
       },
       {
         "path": "blueprints/convergence-practice/wsl-retrieval/audit.py",
-        "sha256": "46cbcaecafe6d4bba3b09a26aa9770667eefbc26d7bbb806d4f0ab98078e86fd"
+        "sha256": "05fae80832470371bde09b145d7aeeb125cd4c44accee82052aa499ad5f79207"
       },
       {
         "path": "tests/test_wsl_retrieval.py",
-        "sha256": "83353f3ccaa8bc01518f529846bf92167f7e21023e430ef8523af3e129afd903"
+        "sha256": "72a79a26ffccc2582c536af34f25f7c18c0bdedc99040f671d86476df0d9fe91"
       },
       {
         "path": "blueprints/convergence-practice/wsl-retrieval/run.py",
-        "sha256": "be852ce99501f5bc4567b846b90fb0e91d91de77b0eafbd3b72bb4484a2f7d12"
+        "sha256": "0df1c6873b8514cb08af2efebe479dfe46c35ad1e6b05d73796bee0d7cca702e"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/package.json",
+        "sha256": "69ed6c37f8517e712ce64e1550c363926bdf25e42d8bfb30efa02b71197f3485"
+      },
+      {
+        "path": "blueprints/convergence-practice/wsl-retrieval/retirement-assessment.json",
+        "sha256": "88f1919546dcf8b9fda7b425c7d3ea2ea114b975ccdc6356e0775a3f4e81a9f0"
       }
     ]
   },
   "predeclared_metrics": {
-    "quality_rule": "Retrospective offline audit requires exact frozen-input and check-name sets, byte identities, source spans, QMD bodies, URI scope and retained failure. Consistency cannot establish the missing argv/cwd or independently certify historical execution. Native acceptance remains incomplete.",
+    "quality_rule": "Retrospective offline audit requires exact frozen-input and check-name sets, archived original manifest/runner identities, source spans, QMD bodies, URI scope and retained failure. A separate current retirement assessment checks the new archives, retained lock and dependency-free guard/diagnostic bindings. Consistency cannot establish missing argv/cwd, historical execution, native npm guard acceptance or scanner eligibility. Native historical acceptance remains incomplete.",
     "usage_rule": "The offline audit invokes no model. Historical per-fixture zero-usage declarations are retained as reported, not independently verified; whole-task parent/child/retry/cache accounting is unknown. No savings claim."
   },
   "runtime_and_platform": {
@@ -208,20 +237,22 @@
   "limitations": [
     "Incomplete historical fixture reference only; no native E2E or adoption acceptance. Receipt-declared source success (22 checks/six commands), QMD attempt-2 success (70 checks/17 commands), and failed QMD attempt 1 (five commands) are preserved without inventing missing invocation details.",
     "Exact frozen-input/check-name sets and selected result bytes can be audited offline. Historical argv/cwd are absent; original raw-log locations cannot be verified, so output digests do not prove which native command produced them.",
-    "Original install-receipt.json still records npm --ignore-scripts --omit=optional. This historical action is not a recommended installation recipe; future setup follows recipes/README.md and docs/native-token-ci.md with NODE_LLAMA_CPP_SKIP_DOWNLOAD=true and required dependency lifecycle scripts enabled.",
-    "Both historical runner versions remain byte-identical. The new run.py records sanitized argv/cwd and is a future recording aid, not evidence of a new execution or a repair of historical receipts.",
+    "Original install-receipt.json still records npm --ignore-scripts --omit=optional. This historical action is not a recommended installation recipe. This directory is retired; the separate current QMD recipe/status in recipes/README.md and docs/native-token-ci.md governs current setup.",
+    "Both historical runner versions remain byte-identical. The later recording aid and original package manifest are now byte-exact text archives. Historical manifest/runner resolution leaves every original receipt key/check set and mapping intact. The current run.py rejects both old modes before subprocess/output work.",
     "The first QMD attempt failed its bare-URI comparison while returning the expected body. The second runner corrected named-index URI parsing. Both receipts and all reported command counts remain preserved.",
     "Local synthetic fixtures do not qualify upstream suites, semantic RAG, production corpora, native clients, services, inference, OS confinement or resource performance.",
     "Historical verification.json records the earlier 18-test offline completion and its then-current assessment; it is not refreshed acceptance. Review changes supersede its acceptance wording without altering historical bytes.",
-    "Whole-task provider usage remains unknown. No savings claim, model/global change or automatic history capture."
+    "Whole-task provider usage remains unknown. No savings claim, model/global change or automatic history capture.",
+    "The current dependency-free package.json uses npm 11.19.0's devEngines runtime-name failure for supported install/ci entry points. Removing a manifest alone is insufficient because Arborist can load root metadata from a standalone lock. This guard is not an installation sandbox and does not cover explicit --force, other package managers or restored historical files. Native npm controls and scanner eligibility remain separate evidence.",
+    "Active QMD's GHSA-vfj7-8cjw-p6xm advisory remains unresolved. Retiring this historical lock does not patch a dependency, change the active QMD setup or establish a dedicated scanner exception."
   ],
   "decision_and_scope": {
     "decision": "defer",
-    "scope": "Incomplete historical fixture reference; native acceptance unavailable",
+    "scope": "Retired incomplete historical fixture reference; native acceptance unavailable",
     "qualification_run_ids": []
   },
-  "rollback": "No production or global deployment. Retain required evidence, then retire only the owned private fixture/index/package prefix if no longer needed; never remove or stop unrelated state or processes.",
-  "next_decision_changing_test": "Recover and verify the original raw logs and actual invocation provenance, or authorize a separate reachable-host native trial using the supported QMD installation recipe and complete command capture. Neither is performed by this offline repair.",
+  "rollback": "No production or global deployment. Original evidence and source bytes remain preserved; source retirement is recoverable through version control. No host state, services, accounts or unrelated processes are changed.",
+  "next_decision_changing_test": "Recovered verifiable historical invocation evidence could reopen historical acceptance. A current native QMD trial belongs to the separate maintained recipe/status. Independent native npm controls and exact-lock scanner review govern archival disposition; this offline experiment establishes neither.",
   "usage_assessment": {
     "claim": "none",
     "coverage": "partial",
