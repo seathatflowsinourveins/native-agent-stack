@@ -61,13 +61,29 @@ probe reads `~/.codex/config.toml` and `~/.claude/settings.json`; it does not
 resolve profile overlays, managed settings, project settings or environment
 overrides. Parse failures omit exception text to avoid disclosing values.
 Home paths are normalized to `~`. Remaining home paths anywhere in the document
-make the output fail closed. Login checks inspect observation output and stderr
-values, matching whole tokens or path components case-insensitively. Fixed schema
-keys, command descriptions and selected OS identifiers are not account identities;
-an executable's declared basename and leading version-banner tool name are also
-excluded, while its parent path is checked. Thus logins such as `ubuntu`, `codex`
-and `user` do not collide with the OS label, client key or `--unshare-user`.
-A real disclosure returns exit 3 with empty stdout and stderr, including with
+make the output fail closed. The personal-home and Windows-user-path patterns
+copied from `scripts/validate.py` also cover macOS user directories and Windows
+profiles, including WSL paths such as `/mnt/c/Users/<login>.HOST/AppData/...`.
+They apply to the whole document and do not depend on the current login. Their
+reserved `example` placeholder exception is retained; the existing Linux home
+prefix check remains stricter and has no placeholder exception.
+
+Login checks inspect observation output and stderr values, matching whole tokens
+or path components case-insensitively, and rejecting the attached `-u<login>`
+form. Outside the recognized profile prefixes, compound tokens and components
+such as `<login>-data` and `<login>.HOST` are accepted by design; they do not
+identify an account unambiguously. There is no blanket component-prefix rule.
+This permits the marker diagnostic ending in `90-wsl-default-user` for login
+`user`. A standalone login or `USER=<login>` remains a disclosure.
+
+Fixed schema keys, command descriptions and selected OS identifiers are not
+account identities. An executable's declared basename is excluded while its
+parent path is checked. In its own `--version` banner, the declared tool name
+is exempt wherever it appears as a word, and the OS-release ID is exempt as
+the opening distribution-vendor tag `(<ID> ...)`. Path segments remain checked.
+Thus login `claude` accepts `2.1.289 (Claude Code)`, and login `ubuntu` accepts
+`GNU gdb (Ubuntu ...)`; names outside those scoped banner forms remain checked.
+A detected disclosure returns exit 3 with empty stdout and stderr, including with
 `python3 -O`. Every exception in `main()`
 is caught and returns the same silent exit 3, including unexpected identity,
 filesystem and decoding errors.
@@ -109,7 +125,8 @@ nice -n 19 python3 - < "$probe_input" > "$capture_dir/nativestack-2404.json"
 
 On this host `wsl.exe` is not on PATH. Invoking the executable directly with
 `-- python3 -` also omits the user's login-shell PATH, causing installed clients
-to appear absent. The coordinator's r1 command was
+to appear absent. The coordinator's command for the two r0 26.04 captures
+(repair round r1) was
 `nice -n 19 /mnt/c/Windows/System32/wsl.exe -d <name> -- bash -lc 'nice -n 19 python3 -' < tools/adoption/host_baseline_probe.py`.
 For future captures, use the same login shell agents use with the frozen input
 above and measure its hash on the coordinator side before sending it:
@@ -132,7 +149,12 @@ remain unobserved on both 26.04 hosts. Retain their original bytes and hashes.
 
 The three host receipts and the historical coreutils sidecar are
 `evidence/receipts/host-baseline-*-20261004.json`. Their `recorded_at_utc` stamps
-date receipt assembly; observation and upgrade times stay in the bound artifacts.
+date initial receipt assembly; observation and upgrade times stay in the bound
+artifacts. Later metadata corrections are dated separately by
+`amendments[].amended_at_utc`, obtained from `date -u`. Each amendment names its
+review reference and changed fields, retaining prior values for rewritten fields.
+The t2 entries retrospectively document the t1 corrections; their stamps date
+the amendment entries, not the earlier t1 edits or a new host observation.
 The coreutils sidecar names NativeStack2604 and the three historical coordination
 source files, and states that no upgrade was re-executed. Its evidence class is
 the policy's `Independent observation` for inspection of native histories,
@@ -155,6 +177,10 @@ The evidence manifest does not register its own bytes.
   (component host-receipt classes), `scripts/validate.py` (`RECEIPT_KINDS`
   applies to indexed component receipts), and the plain observation-class
   precedent `evidence/receipts/github-ci-measurements-20261003.json`.
+- Delta repair reference `d06098ffb070dacfcbc9a424874de989cb55c8db`:
+  `scripts/validate.py:29-30` supplies the unchanged personal-home and
+  Windows-user-path patterns; the three committed host artifacts supply the
+  Claude version-banner fixtures. No host is recaptured to test those banners.
 - Installed `dpkg-query --help` and `dpkg-query(1)` at
   `/usr/share/man/man1/dpkg-query.1.gz`: `-W` reports package information,
   `-f` selects fields, and `db:Status-Status` supplies the package status word.

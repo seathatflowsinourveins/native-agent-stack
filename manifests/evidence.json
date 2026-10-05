@@ -16573,8 +16573,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-host-baseline-recorder.md",
-      "sha256": "071643012f0f55d3b04386712df7cdcd7608ef5f0fcdcb8dcd60a99a2d00136a",
-      "bytes": 15271
+      "sha256": "69670e513be9c898430eb98d29690d4c36a3ab88d6c9a7d617c6b647c84770c4",
+      "bytes": 18632
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-changelog-parity.md",
@@ -51348,23 +51348,23 @@
     },
     {
       "path": "evidence/receipts/host-baseline-coreutils-2604-upgrade-20261004.json",
-      "sha256": "61f6f4fdd94753b71900e5b55927a28023a3f9a9b6f09778f054dadd561331b8",
-      "bytes": 1832
+      "sha256": "834593fa86965850d7c94abb7ab1893e0388960140f383f6dad178cca4de2143",
+      "bytes": 2310
     },
     {
       "path": "evidence/receipts/host-baseline-nativestack-20261004.json",
-      "sha256": "72ff30c5d63b42495c3641710a456919cb1ad2811d4bcf58f1566d90118afdf9",
-      "bytes": 2886
+      "sha256": "71be13bbfb7dfe9e698e92eb462ed64b2d62b60008fe2d1f39a14b6690766a50",
+      "bytes": 3443
     },
     {
       "path": "evidence/receipts/host-baseline-nativestack2604-20261004.json",
-      "sha256": "8e1d4ff6d9414f6f6988edbe8849fc6d91f52f5a6635a3bb988e4cd3a0bdfb18",
-      "bytes": 3264
+      "sha256": "ec3ab7856c602ab8c497ed1cb00a9a423c8d79a8e4c686ec4043ee9c52eaeea1",
+      "bytes": 3694
     },
     {
       "path": "evidence/receipts/host-baseline-stackmeasure2604-20261004.json",
-      "sha256": "8455799b15973d545b54e24fc916f5b9bda90298f0ff847b36f5cfe0df661eaf",
-      "bytes": 3146
+      "sha256": "168fcd1842f19b85e90ca4d5ee0e967b582d5067e856d8d7e954ddd18b148d41",
+      "bytes": 3576
     },
     {
       "path": "evidence/receipts/ibkr-readonly-acceptance-20260923.json",
@@ -53558,8 +53558,8 @@
     },
     {
       "path": "tests/test_host_baseline_probe.py",
-      "sha256": "d822883d54ae1b393de6b1c57be6cca951fe616795547692e6c9603912203fce",
-      "bytes": 19954
+      "sha256": "1b48f90b77a3988be96500d933bdedfccd57c94172e5154e1db9144498e7c1cb",
+      "bytes": 25317
     },
     {
       "path": "tests/test_host_receipts.py",
@@ -54188,13 +54188,13 @@
     },
     {
       "path": "tools/adoption/host-baseline.md",
-      "sha256": "d22c8d5a038c1c79392998d895e62931dd1a0f59fbe2e3224443d56602fb0aad",
-      "bytes": 11958
+      "sha256": "059ea7f8a196adc453397bf5fe3390ade03090f840e73f7cd2da1cb98376c12f",
+      "bytes": 13736
     },
     {
       "path": "tools/adoption/host_baseline_probe.py",
-      "sha256": "28cef45996619a6c42ccc8deca6020124f415ff08cb4aaa82a2c71a96ad6bb32",
-      "bytes": 14591
+      "sha256": "c97630fe46ccdf86434027da841b6e744940e7f65c28e913f6c893550a931935",
+      "bytes": 15624
     },
     {
       "path": "tools/adoption/install_claude_profile.py",

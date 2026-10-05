@@ -49,5 +49,21 @@
     "executed_input_sha256": null,
     "executed_input_verified": false
   },
-  "package_query_status": "unrecorded"
+  "package_query_status": "unrecorded",
+  "amendments": [
+    {
+      "amended_at_utc": "2026-10-05T05:02:52Z",
+      "ref": "PR #710 t1 (7ec3f2a5f) and t2",
+      "changed_fields": [
+        "limitations",
+        "probe_identity",
+        "package_query_status",
+        "artifacts[probe_source].path"
+      ],
+      "prior_values": {
+        "artifacts[probe_source].path": "tools/adoption/host_baseline_probe.py"
+      },
+      "note": "Retrospective record of t1 metadata corrections, dated when this entry was added in t2; original receipt and artifact timestamps are unchanged."
+    }
+  ]
 }

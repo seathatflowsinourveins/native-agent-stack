@@ -215,21 +215,85 @@ class HostBaselineProbeTests(unittest.TestCase):
 
     def test_identity_tokens_and_path_components_still_fail_closed(self):
         cases = (
-            ("ubuntu", "installed by UBUNTU"),
+            ("ubuntu", "/srv/UBUNTU/bin/env"),
             ("codex", "/srv/CODEX/bin/codex"),
             ("user", "warning: USER"),
             ("fixture-login", "/srv/FIXTURE-LOGIN/bin/env"),
+            ("alice", "-ualice"),
         )
         for login, value in cases:
             with self.subTest(login=login, value=value):
                 document = {"env": {"command": "env --version", "exit": 0, "output": value}}
                 self.assertEqual(self.mocked_main(login, document), (3, "", ""))
         document = {"env": {"command": "env --version", "exit": 0,
-                            "output": "fixture-login-helper /srv/fixture-login-data/bin/env"}}
+                            "output": "fixture-login-helper (fixture native) 1.2.3"}}
         code, out, err = self.mocked_main("fixture-login", document)
         self.assertEqual(code, 0)
         self.assertEqual(json.loads(out), document)
         self.assertEqual(err, "")
+
+    def test_committed_claude_banners_are_tool_identity(self):
+        banners = {"nativestack-2404": "2.1.289 (Claude Code)",
+                   "nativestack2604": "2.1.289 (Claude Code)",
+                   "stackmeasure2604": "2.1.288 (Claude Code)"}
+        for name, banner in banners.items():
+            with self.subTest(artifact=name):
+                document = json.loads((ROOT / f"evidence/artifacts/host-baseline-20261004/{name}.json").read_text())
+                self.assertEqual(document["clients"]["claude"]["version"]["output"], banner)
+                code, out, err = self.mocked_main("claude", document)
+                self.assertEqual(code, 0)
+                self.assertEqual(json.loads(out), document)
+                self.assertEqual(err, "")
+
+    def test_version_vendor_tag_exemption_is_scoped(self):
+        document = {
+            "os_release": {"command": "read /etc/os-release", "exit": 0,
+                           "output": {"ID": "ubuntu", "VERSION_ID": "24.04"}},
+            "gdb": {"command": "gdb --version", "exit": 0,
+                    "output": "GNU gdb (Ubuntu 15.1-1ubuntu2) 15.1"},
+        }
+        code, out, err = self.mocked_main("ubuntu", document)
+        self.assertEqual(code, 0)
+        self.assertEqual(json.loads(out), document)
+        self.assertEqual(err, "")
+        for login, command, value in (
+                ("ubuntu", "gdb --version", "GNU gdb USER=UBUNTU"),
+                ("claude", "claude --version", "/srv/CLAUDE/bin/launcher")):
+            with self.subTest(login=login):
+                document["gdb"] = {"command": command, "exit": 0, "output": value}
+                self.assertEqual(self.mocked_main(login, document), (3, "", ""))
+
+    def test_profile_paths_fail_closed_anywhere_regardless_of_login(self):
+        profiles = (
+            "/mnt/c/" + "Users/alice.HOST/AppData/fixture",
+            "/mnt/c/" + "uSeRs/someone-else/AppData/fixture",
+            "C:" + chr(92) + "Users" + chr(92) + "alice.HOST" + chr(92) + "AppData",
+            "/" + "Users/someone-else/fixture",
+            "/" + "home/someone-else/fixture",
+        )
+        for profile in profiles:
+            for location in ("output", "stderr", "command", "key"):
+                with self.subTest(profile=profile, location=location):
+                    record = {"command": "env --version", "exit": 0, "output": ""}
+                    if location == "key":
+                        record[profile] = False
+                    else:
+                        record[location] = profile
+                    self.assertEqual(self.mocked_main("alice", {"env": record}), (3, "", ""))
+
+    def test_compounds_outside_profile_prefixes_are_accepted_by_design(self):
+        cases = (
+            ("alice", "/srv/alice-data/bin/env alice.HOST"),
+            ("fixture-login", "fixture-login-helper /srv/fixture-login-data/bin/env"),
+            ("user", "stat: cannot statx '/etc/sudoers.d/90-wsl-default-user': No such file or directory"),
+        )
+        for login, value in cases:
+            with self.subTest(login=login):
+                document = {"marker": {"command": "stat marker", "exit": 1, "output": value}}
+                code, out, err = self.mocked_main(login, document)
+                self.assertEqual(code, 0)
+                self.assertEqual(json.loads(out), document)
+                self.assertEqual(err, "")
 
     def test_dpkg_known_uninstalled_state_retains_zero_exit(self):
         (self.bin / "dpkg-known-uninstalled").touch()
@@ -352,6 +416,33 @@ class HostBaselineProbeTests(unittest.TestCase):
                 counts = Counter(record["exit"] for record in records)
                 dates_ok = sum(record["date_utc"]["exit"] == 0 for record in records)
                 self.assertIn(f"| `{name}.json` | {len(records)} | {counts[0]} | {counts[1]} | {counts[127]} | {dates_ok} |", decision)
+
+    def test_receipt_amendments_date_changes_and_preserve_prior_values(self):
+        for name in ("nativestack", "nativestack2604", "stackmeasure2604", "coreutils-2604-upgrade"):
+            with self.subTest(receipt=name):
+                receipt = json.loads((ROOT / f"evidence/receipts/host-baseline-{name}-20261004.json").read_text())
+                self.assertEqual(receipt["recorded_at_utc"], "2026-10-05T01:47:45Z")
+                amendment = next(a for a in receipt["amendments"] if a["ref"] == "PR #710 t1 (7ec3f2a5f) and t2")
+                self.assertRegex(amendment["amended_at_utc"], r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$")
+                self.assertGreater(amendment["amended_at_utc"], receipt["recorded_at_utc"])
+                fields = set(amendment["changed_fields"])
+                self.assertIn("limitations", fields)
+                if name == "coreutils-2604-upgrade":
+                    self.assertTrue({"evidence_class", "evidence_policy"} <= fields)
+                    self.assertEqual(amendment["prior_values"], {"evidence_class": "local_integration"})
+                else:
+                    self.assertTrue({"probe_identity", "package_query_status"} <= fields)
+                    if name == "nativestack":
+                        self.assertIn("artifacts[probe_source].path", fields)
+                        self.assertEqual(amendment["prior_values"], {"artifacts[probe_source].path": "tools/adoption/host_baseline_probe.py"})
+                    else:
+                        self.assertEqual(amendment["prior_values"], {})
+
+    def test_guide_distinguishes_source_round_and_amendment_stamp(self):
+        guide = " ".join((ROOT / "tools/adoption/host-baseline.md").read_text().split())
+        self.assertIn("coordinator's command for the two r0 26.04 captures (repair round r1)", guide)
+        self.assertIn("amendments[].amended_at_utc", guide)
+        self.assertIn("initial receipt assembly", guide)
 
 
 if __name__ == "__main__":

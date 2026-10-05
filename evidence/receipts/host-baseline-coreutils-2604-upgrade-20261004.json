@@ -37,5 +37,20 @@
       "sha256": "5869c88fa349ed59bea95887ca5596e0f6f482ba8b8c3cd4ff406342accd6130"
     }
   ],
-  "evidence_policy": "docs/acceptance-evidence-policy.md#identify-what-each-check-proves"
+  "evidence_policy": "docs/acceptance-evidence-policy.md#identify-what-each-check-proves",
+  "amendments": [
+    {
+      "amended_at_utc": "2026-10-05T05:02:52Z",
+      "ref": "PR #710 t1 (7ec3f2a5f) and t2",
+      "changed_fields": [
+        "limitations",
+        "evidence_class",
+        "evidence_policy"
+      ],
+      "prior_values": {
+        "evidence_class": "local_integration"
+      },
+      "note": "Retrospective record of t1 metadata corrections, dated when this entry was added in t2; original receipt and artifact timestamps are unchanged."
+    }
+  ]
 }

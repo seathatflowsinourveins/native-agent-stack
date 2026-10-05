@@ -33,6 +33,11 @@ LAUNCHERS = (
 )
 VERSION_COMMANDS = ("env", "timeout", "readlink", "find", "xargs", "claude", "codex", "gdb") + LAUNCHERS
 HOME_PREFIX = "/" + "home" + "/"
+# Standalone copies of scripts/validate.py's personal/Windows home-path patterns.
+PRIVATE_PROFILE_PATHS = (
+    re.compile(r"/(?:home|Users)/(?!example(?:/|\b))[A-Za-z0-9_.-]+(?:/|\b)"),
+    re.compile(r"(?:[A-Za-z]:[/\\]+|/mnt/[A-Za-z]/)Users[/\\]+(?!example(?:[/\\]|\b))[A-Za-z0-9_.-]+", re.I),
+)
 LANDLOCK_CODE = (
     "import ctypes, json, sys; "
     "libc = ctypes.CDLL(None, use_errno=True); libc.syscall.restype = ctypes.c_long; "
@@ -202,10 +207,15 @@ def normalize_home(value, home):
 def assert_private_output_absent(document, login):
     # Static schema keys and command descriptions do not disclose an identity.
     # Home paths are forbidden everywhere, including in keys and descriptions.
-    clean = HOME_PREFIX.casefold() not in json.dumps(document, ensure_ascii=False).casefold()
+    text = json.dumps(document, ensure_ascii=False)
+    clean = HOME_PREFIX.casefold() not in text.casefold() and not any(pattern.search(text) for pattern in PRIVATE_PROFILE_PATHS)
     if not clean:  # Remains effective under python3 -O.
         raise PrivacyFailure()
     token = re.compile(r"(?<![\w.-])" + re.escape(login.casefold()) + r"(?![\w.-])")
+    user_option = re.compile(r"(?<![\w.-])-u" + re.escape(login.casefold()) + r"(?![\w.-])")
+    release = document.get("os_release", {}).get("output", {})
+    vendor_id = release.get("ID") if isinstance(release, dict) else None
+    vendor_tag = re.compile(r"(?<=\()" + re.escape(vendor_id) + r"(?=[\s)])", re.I) if isinstance(vendor_id, str) else None
 
     def check_output(value, command=""):
         if isinstance(value, str):
@@ -217,9 +227,12 @@ def assert_private_output_absent(document, login):
                     value = value.rsplit("/", 1)[0]
             elif len(argv) == 2 and argv[1] == "--version":
                 name = Path(argv[0]).name
-                if value == name or value.startswith(name + " "):
-                    value = value[len(name):]
-            if token.search(value.casefold()):
+                # Tool-name words anywhere in their banner are not identities.
+                # Keep path segments intact even when they share the tool name.
+                value = re.sub(r"(?<![\w./\\-])" + re.escape(name) + r"(?![\w./\\-])", "", value, flags=re.I)
+                if vendor_tag is not None:
+                    value = vendor_tag.sub("", value)
+            if token.search(value.casefold()) or user_option.search(value.casefold()):
                 raise PrivacyFailure()
         elif isinstance(value, dict):
             for item in value.values():

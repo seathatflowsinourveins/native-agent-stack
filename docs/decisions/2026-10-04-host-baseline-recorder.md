@@ -237,3 +237,53 @@ JSON object, empty stderr, zero case-insensitive login matches and zero home-pat
 matches. Its output stays in scratch. All five pre-existing files in the artifact
 directory, including the three host captures, retain their original SHA256s.
 Registration follows the completed source, receipt, documentation and test changes.
+
+## Delta-review repair t2
+
+The Opus delta read accepted t1 without p1 findings and identified four p2 gaps
+at `d06098ffb070dacfcbc9a424874de989cb55c8db`. Its banner finding is confirmed
+against all three retained artifacts: the NativeStack captures report
+`2.1.289 (Claude Code)` and StackMeasure2604 reports `2.1.288 (Claude Code)`.
+In each banner the tool name is not leading. The gate now exempts declared tool-name words
+anywhere in that tool's own version banner and exempts the OS-release ID only
+as the opening distribution-vendor tag. Path segments and identity forms such
+as `USER=<login>` remain checked. Fixtures replay the retained Claude banners
+without querying a host and cover an Ubuntu gdb banner and real identity paths.
+
+The whole-document gate copies the personal-home and Windows-user-path patterns
+unchanged from `scripts/validate.py:29-30`. Windows/WSL profile names with suffixes
+are rejected regardless of the current login, including when a path appears in
+a key or command description. The existing Linux home-prefix check remains.
+Outside those recognized profile prefixes, compound names such as
+`<login>-data` and `<login>.HOST` are accepted by design, as the guide now states.
+A narrow attached-user-option check rejects `-u<login>`. There is no blanket
+component-prefix rule, so login `user` still accepts the marker's fixed filename
+in a stat diagnostic. The old mixed partial-token/path fixture is split into
+explicit token and documented compound-name controls.
+
+All four receipts now contain a dated amendment entry referring to
+`PR #710 t1 (7ec3f2a5f) and t2`. The stamp comes from `date -u` and dates this
+retrospective entry. It does not backdate the t1 edits or change initial
+`recorded_at_utc` stamps. Changed fields are listed; NativeStack's previous
+mutable source path and the upgrade sidecar's previous integration class are
+retained as prior values, checked against their original receipt blobs at
+`68ed2b16045e66599f8a1fa2933adb5f1d6f5a0f`. The guide distinguishes initial
+assembly and later amendments, and names the coordinator command as the command
+for the two r0 26.04 captures collected in repair round r1.
+
+The discriminating targeted run before these fixes exited 1: 18 tests, 22 failed
+assertions/subtests and four missing-amendment errors. It covers the banner,
+profile-path, attached-option, amendment and command-wording gaps. The first
+post-fix module run exited 1 because its fixture incorrectly required 2.1.289
+on StackMeasure2604 too. Direct inspection of the committed
+`stackmeasure2604.json` client-version field verified 2.1.288; the fixture was
+corrected without changing that artifact. Replaying the corrected banner test
+against the unchanged HEAD probe failed all three subtests with exit 1; the
+final targeted module passed all 18 tests with exit 0. The local stdin dry run
+exited 0 with zero login, home-prefix and profile-path matches and empty stderr.
+Both copied regexes match the validator's patterns and flags exactly, and all
+six retained artifact files have unchanged SHA256s. TMPDIR is
+`~/.cache/t710t2`, outside the checkout, and runs use nice 19. The only native
+probe invocation is the authorized local stdin dry run to scratch; historical
+captures and archived sources retain their bytes. Registration follows the
+completed source, receipt, guide, decision and test changes.
