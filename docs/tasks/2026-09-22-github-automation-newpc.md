@@ -56,11 +56,11 @@ and in this unit's structured handoff. Summary:
   validators against the changed manifest/decisions/evidence files
   (`native_proven`: actually executed on this host; structural validation
   only, not execution of the catalog's other capabilities).
-- `tools/adoption/render_config.py --host wsl-seath --check
+- `tools/adoption/render_config.py --host wsl-<user> --check
   --live-codex-project <agent-lab checkout>/.codex/config.toml` — a real
   local run against this host's actual live `~/.claude/settings.json`,
   `~/.codex/config.toml` and `agent-lab/.codex/config.toml`
-  (`native_proven`). `adoption/hosts/wsl-seath.json` holds this host's actual
+  (`native_proven`). `adoption/hosts/wsl-<user>.json` holds this host's actual
   values and is gitignored; it is never published.
 - `python3 -m unittest tests.test_render_config tests.test_adoption_contract`
   and the full `python3 -m unittest` run (`native_proven`, local integration

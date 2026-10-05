@@ -1,0 +1,23 @@
+{
+  "network": {
+    "allowedDomains": ["127.0.0.1:21128"],
+    "deniedDomains": [],
+    "allowLocalBinding": false
+  },
+  "filesystem": {
+    "denyRead": [
+      "~/.ssh",
+      "~/.config/new-wsl-native-stack",
+      "~/.config/gh",
+      "~/.codex",
+      "~/.claude",
+      "~/.claude.json",
+      "~/.docker/config.json",
+      "~/.local/share/omniroute",
+      "~/.local/share/omniroute-builds"
+    ],
+    "allowRead": [],
+    "allowWrite": [],
+    "denyWrite": []
+  }
+}

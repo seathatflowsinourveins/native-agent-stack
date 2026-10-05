@@ -26,7 +26,7 @@
       "cmd": "ps aux | grep qdrant  # confirm the live agent-lab qdrant (pid 402, qdrant-agent-lab.yaml) was never touched",
       "exit": 0,
       "duration_s": 1,
-      "output_excerpt": "seath 402 ... qdrant --config-path .../qdrant-agent-lab.yaml --disable-telemetry (untouched, same pid throughout); seath 2047251 ... qdrant-disposable.yaml (the new disposable pid after restart)",
+      "output_excerpt": "<user> 402 ... qdrant --config-path .../qdrant-agent-lab.yaml --disable-telemetry (untouched, same pid throughout); <user> 2047251 ... qdrant-disposable.yaml (the new disposable pid after restart)",
       "output_sha256": "n/a-inline"
     }
   ],

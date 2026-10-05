@@ -1,0 +1,501 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-e2e-20261004",
+  "kind": "native_model_e2e",
+  "recorded_at_utc": "2026-10-04T20:26:16Z",
+  "component_ids": [
+    "claude-code",
+    "codex",
+    "omniroute"
+  ],
+  "claim": "The historical 2026-10-04 foundation E2E covered 15 units and 80 slots through native executor observations, independent model review and 22 adjudications. Final labels are READY 18, PARTIAL 31, FAIL 2, BY_DESIGN 12 and INTERIM 17, with zero unjudged slots. Readiness is (18 + 12) / 80 = 37.5%, rounded half up to 38%; all 22 executor/reviewer disagreements were adjudicated, with 14 keeping the reviewer's status and 8 taking the executor's. This publication independently checks and sanitizes the retained status chains; it does not repeat host or provider execution. The adjudication prompt as run, claude-opus-5-5 at max effort with evidence-reviewer run records and timestamps, and the separate 33-slot fix list are retained.",
+  "limitations": [
+    "Host state is as of 2026-10-04 19:10–20:10Z only; later adjudication and source merge timestamp 2026-10-04T20:26:16Z do not extend that observation window. Publication and repair perform artifact inspection and structural checks in the owned sandbox; they do not repeat native host probes.",
+    "Fixes are pending. The 33 PARTIAL/FAIL slots after adjudication are not accepted as ready: 25 repository-plan and 8 host fixes (evidence/artifacts/ns2604-e2e-20261004/fixes.json). Four INTERIM token slots (context-supply, command-output, output-compression, code-index) are held for PR #684, which has not merged. The two open token slots have separate fixes: ccusage (FAIL, plan) and statusline (PARTIAL, host).",
+    "This is not an upstream benchmark. Native executor observations, independent model judgments and adjudication are separate from upstream tests, structural checks, independent host replication and measured quality or token improvement.",
+    "The 17 INTERIM slots are held by design. They remain in the denominator and contribute zero to the readiness numerator; the 12 BY_DESIGN slots are intentional dispositions rather than proof that their tools executed.",
+    "Adjudication: claude-opus-5-5 at effort max (evidence-reviewer), prompt template as run in evidence/artifacts/ns2604-e2e-20261004/adjudication-prompt.md. Run wf_8bf450a9-d1e (17 agents) started 2026-10-04T20:06:45Z and completed 2026-10-04T20:20:30Z; run wf_cdbf70a0-02c (5 agents) started 2026-10-04T20:08:29Z and completed 2026-10-04T20:19:31Z.",
+    "Historical source command excerpts and raw conversations remain private. Public reasons are bounded to 60 words, fixes preserve the merge's 900-character bound before sanitization, and citations are limited to four per slot. Hashes establish byte identity, not success or adequacy of every native acceptance claim.",
+    "Reviewer records report the requested gateway model cx/gpt-6.1-sol-max and max effort; no resolved backend model identity is inferred. Independent model review is review of retained evidence, not independent execution on the host.",
+    "The coordinator registers all eight published files in manifests/evidence.json in the PR's final registry-only commit, and full repository validation passes at that head. Per-file scans and local receipt tests are structural evidence only."
+  ],
+  "data": {
+    "publication_date_utc": "2026-10-04",
+    "publication_base_revision": "5358bb564fc42edb54a1edf7b848bf07d7f0997a",
+    "host_scope": "Historical Linux WSL2 foundation observation on NativeStack2604; machine label retained, local user identities withheld",
+    "observed_window_utc": {
+      "start": "2026-10-04T19:10:00Z",
+      "end": "2026-10-04T20:10:00Z"
+    },
+    "source_scope": "ns2604-e2e-20261004; private directory <host path>",
+    "counts": {
+      "READY": 18,
+      "PARTIAL": 31,
+      "FAIL": 2,
+      "BY_DESIGN": 12,
+      "INTERIM": 17,
+      "UNJUDGED": 0
+    },
+    "slots_total": 80,
+    "units_total": 15,
+    "percent": 38,
+    "formula": "(READY + BY_DESIGN) / all slots in scope; UNJUDGED counts as not ready",
+    "readiness_numerator": 30,
+    "unrounded_percent": 37.5,
+    "rounding": "nearest integer, half up",
+    "disagreement_count": 22,
+    "disagreements_open": 0,
+    "adjudications": 22,
+    "evidence_classes": [
+      {
+        "class": "native_host_observation",
+        "actor": "Claude Sonnet executors",
+        "scope": "Historical native commands, exit codes and excerpts retained in each unit evidence file; no publication-time host execution"
+      },
+      {
+        "class": "independent_model_review",
+        "actor": "GPT Sol reviewers",
+        "scope": "80 independent slot reviews in 15 completed worker result records; evidence review, not native host replication"
+      },
+      {
+        "class": "model_adjudication",
+        "actor": "Claude Opus 5.5 evidence-reviewer agents",
+        "scope": "22 retained judgments override final status and fix fields: 14 kept the reviewer status and 8 took the executor status. Resolved model and timestamps are retained in workflow runs wf_8bf450a9-d1e and wf_cdbf70a0-02c; the workflow script requests max effort."
+      },
+      {
+        "class": "structural_validation",
+        "actor": "bounded publisher",
+        "scope": "Independent original-record join, count and layer recomputation, sanitization and repository receipt checks; no new capability acceptance"
+      }
+    ],
+    "model_records": {
+      "executor": {
+        "model_id": "claude-sonnet-5-5",
+        "source": "observe-eval-1.json:executor.model; context-3.json:executor"
+      },
+      "reviewer": {
+        "requested_model": "cx/gpt-6.1-sol-max",
+        "requested_effort": "max",
+        "source": "review/<unit>/out.jsonl result records",
+        "completed_units": 15,
+        "resolved_backend_model_id": null
+      },
+      "adjudicator": {
+        "reported_family": "Claude Opus",
+        "reported_family_source": "workflow runs wf_8bf450a9-d1e and wf_cdbf70a0-02c",
+        "model_id": "claude-opus-5-5",
+        "requested_alias": "opus",
+        "effort": "max",
+        "agent_type": "evidence-reviewer",
+        "source": "workflow runs wf_8bf450a9-d1e and wf_cdbf70a0-02c; ns2604-e2e-adjudicate workflow script",
+        "exact_model_record_retained": true,
+        "runs": [
+          {
+            "run_id": "wf_8bf450a9-d1e",
+            "agents": 17,
+            "started_at_utc": "2026-10-04T20:06:45Z",
+            "completed_at_utc": "2026-10-04T20:20:30Z"
+          },
+          {
+            "run_id": "wf_cdbf70a0-02c",
+            "agents": 5,
+            "started_at_utc": "2026-10-04T20:08:29Z",
+            "completed_at_utc": "2026-10-04T20:19:31Z"
+          }
+        ]
+      }
+    },
+    "fix_plan": {
+      "source": "evidence/artifacts/ns2604-e2e-20261004/fixes.json; private fixes.json and e2e-merged.json after adjudication",
+      "plan_followups": 25,
+      "host_followups": 8,
+      "open_partial_fail_slots": 33,
+      "merged_fix_kinds_all_slots": {
+        "none": 42,
+        "plan": 30,
+        "host": 8
+      },
+      "merged_fix_kinds_partial_fail": {
+        "plan": 25,
+        "host": 8
+      },
+      "token_interim_slots_under_pr_684": [
+        "token-efficiency/context-supply",
+        "token-efficiency/command-output",
+        "token-efficiency/output-compression",
+        "token-efficiency/code-index"
+      ],
+      "pr_684_merged": false,
+      "open_token_slots": [
+        {
+          "slot_id": "token-efficiency/ccusage",
+          "status": "FAIL",
+          "fix_kind": "plan"
+        },
+        {
+          "slot_id": "token-efficiency/statusline",
+          "status": "PARTIAL",
+          "fix_kind": "host"
+        }
+      ],
+      "reviewer_stage_before_adjudication": {
+        "open_partial_fail_slots": 41,
+        "plan_followups": 30,
+        "host_followups": 11
+      }
+    },
+    "sanitization": "Concrete home and user-profile paths, including ~/ paths, become <host path>; local user identities <user>; emails <email>. The machine label NativeStack2604 is retained consistently, without masking. Technical paths, loopback URLs, API routes and portable shell-variable forms are preserved. Private scratch-file citations use source-relative filenames rather than host locations. No raw transcripts or session streams are copied. Reviewer streams are used only for selected model-request metadata and source hashes.",
+    "method_source": {
+      "file": "e2e_merge.py",
+      "class": "provided historical local integration procedure",
+      "execution_by_publisher": false
+    },
+    "source_gaps": [],
+    "private_source_hashes": [
+      {
+        "file": "units.json",
+        "sha256": "9175b36f0e1589a56a33522045852333adca0496432bacc2fd8df57e8138c6a0"
+      },
+      {
+        "file": "executor-status.json",
+        "sha256": "e83044d00a954436a9c51b05ff7f3bc3a0825a25e5152f6131bee0b4e0da20c8"
+      },
+      {
+        "file": "e2e-merged.json",
+        "sha256": "838365089640113b5f495a8eb214fff5798775cbadf3e0f1605c4af05a14d182"
+      },
+      {
+        "file": "adjudication.json",
+        "sha256": "a045daad25f9199c2a473336cc8898575c18f6ad773cd695e235747913e51e69"
+      },
+      {
+        "file": "review-prompt.txt",
+        "sha256": "74ae11e9ad15adc66d6f380e1fd3ff7583a85b4138ccc77ea533c5f572cabd41"
+      },
+      {
+        "file": "e2e_merge.py",
+        "sha256": "9876a892da0a8c816fb497adddc03abcef724d9c533fa2332842c63f8d9f94dc"
+      },
+      {
+        "file": "review-driver.py",
+        "sha256": "6c8610e978b31f8d6a3d11ab89825ea6aa082211f601e19239a8e50e3af798a4"
+      },
+      {
+        "file": "review-driver-v2.py",
+        "sha256": "e62d8450e0d14a739759af3800d0eff1dc901b3dd38b42c88cfd0cfa33e386fd"
+      },
+      {
+        "file": "clients-1.json",
+        "sha256": "d9b71aba94539f6fee5d2f3a3e82cc924846c1709d3846b33de8f7adf2fe6174"
+      },
+      {
+        "file": "clients-2.json",
+        "sha256": "b1e2eb9c394a036a573a80e7c053830814f38d16d79da84ce66f2ab1ffb5bf43"
+      },
+      {
+        "file": "gpt-runtime-1.json",
+        "sha256": "4c4bc65f0dfdd9cbf977b8cf908d6281e940fc2ea5bcf379438b313a32526dc9"
+      },
+      {
+        "file": "context-1.json",
+        "sha256": "ddfbcd1ac1b7cec3b6f43596f7e2734f3962fa7b7cf700dd47cc531558aa3235"
+      },
+      {
+        "file": "context-2.json",
+        "sha256": "c72ea3becbb9b5ff966d1e13dcf2153438767b3d50656f9ce27b13b9a20c1563"
+      },
+      {
+        "file": "context-3.json",
+        "sha256": "bddebb9bd7071a1e1bb26ab7af96f4275605fa3d24a4a6becc636a7a2ed48c31"
+      },
+      {
+        "file": "context-4.json",
+        "sha256": "c8a7662d0927ed848bf8313cbe9a1f5eb855925420bcb319520ad6f90e95d594"
+      },
+      {
+        "file": "context-5.json",
+        "sha256": "7c52ef793a15f202596c567b97b61cc59ebb6f0b904ef718397d04ca2b747ac3"
+      },
+      {
+        "file": "observe-eval-1.json",
+        "sha256": "1ad92df4da0e80b3f87bbc99b008a940bccd234ae5103b930ce4cccaa21135ae"
+      },
+      {
+        "file": "observe-eval-2.json",
+        "sha256": "9a897e83ecff1dd57c9e8ab031252fc8f90dc86c5e37d18065837e55d2230d63"
+      },
+      {
+        "file": "delivery-1.json",
+        "sha256": "5b1846963f3bad1a11bf914493604a6349be7b3a53cd148da8f8f50631531e03"
+      },
+      {
+        "file": "delivery-2.json",
+        "sha256": "ea7fa2759970cada6c056d78eeabf6b7c4998ffa799a716b7d8cda0af3aee217"
+      },
+      {
+        "file": "delivery-3.json",
+        "sha256": "aab30a99f632053d51e9e6e0563f4601acedfd048fb89d7917ac1374fe7ac41e"
+      },
+      {
+        "file": "host-1.json",
+        "sha256": "5ceffb36c772a3e0d4963509f68a1742403cdfd083c65532db939cbc9ddd94fb"
+      },
+      {
+        "file": "host-2.json",
+        "sha256": "24f6ecbc30004b5cf80f57a38f2746ba00395c0e481362698f12cb35a868085e"
+      },
+      {
+        "file": "review-clients-1.json",
+        "sha256": "b1754fe6c17247a260e4641ff0eb6d92191fb55c9ea37be3f6e6d5f8afa27171"
+      },
+      {
+        "file": "review-clients-2.json",
+        "sha256": "a542eacab8a54860f0e421165b8aeb44a6993ef03e83f60ef3dab11d7c4902eb"
+      },
+      {
+        "file": "review-gpt-runtime-1.json",
+        "sha256": "e4b7044c42ee75730ab343a74e3804927b23c77a2fb8df6f7226260046c83b89"
+      },
+      {
+        "file": "review-context-1.json",
+        "sha256": "7e4ebfdb2b58847b92700c0a71b7d0bcf1479c242bfebe118179d2694df8b671"
+      },
+      {
+        "file": "review-context-2.json",
+        "sha256": "28371b817d9cc56775cd73ee9fb190bf72aec977e1b470f16db971dd5fea5e6b"
+      },
+      {
+        "file": "review-context-3.json",
+        "sha256": "8fd514c69e2b85df424a5bab7a0b0bb4216aafcaa1bcb588cb22e156320e21d6"
+      },
+      {
+        "file": "review-context-4.json",
+        "sha256": "ca2ce3a87d4fd0c906957c7cb0fa8ece23e62ef338a90cc8754d8b716b2e04a2"
+      },
+      {
+        "file": "review-context-5.json",
+        "sha256": "65b6d5e1e70b938a2c36fd9328a481fb131e1a80f10c423b840aa0c7b034927c"
+      },
+      {
+        "file": "review-observe-eval-1.json",
+        "sha256": "2fdf24f5b1c379ac6ea4f8c72895249f34d6f052f4c149d376f58cdec35a7bcd"
+      },
+      {
+        "file": "review-observe-eval-2.json",
+        "sha256": "c24988a44196261f3aaa5ccf69273f6eaa52707d1c9294c341cbae5f429f99ee"
+      },
+      {
+        "file": "review-delivery-1.json",
+        "sha256": "7d6643d4bdbf12e958b0d658f7aea26ffd0e36a20601ffc88027b8fdc9c722c0"
+      },
+      {
+        "file": "review-delivery-2.json",
+        "sha256": "960d55b6d77fa52866cb208a4b30db476fb60669d4e59d15f90fdba6734efa8b"
+      },
+      {
+        "file": "review-delivery-3.json",
+        "sha256": "a29a9c5cd37ae53a58c20f2d80df6d9bdef3d1075e77b96d42dfdb6809c74895"
+      },
+      {
+        "file": "review-host-1.json",
+        "sha256": "85270025ebf6e22a5ba212d7f1d8dff85adec2c25102aa6dc0dca5784c4996ab"
+      },
+      {
+        "file": "review-host-2.json",
+        "sha256": "c9166a63c581ab34b3fa5486fcb0e87a9c50190ea6c7a883c283876a930dfeff"
+      },
+      {
+        "file": "review/clients-1/out.jsonl",
+        "sha256": "cb31d3a09e3f72a6bba482c231850b7238404ba0ea2ac2bc340c1382c81f71a0"
+      },
+      {
+        "file": "review/clients-2/out.jsonl",
+        "sha256": "d4cca262f39325aedf0e66cb6d3bf5901d411bc9924bd94655070113cb84155f"
+      },
+      {
+        "file": "review/gpt-runtime-1/out.jsonl",
+        "sha256": "52223f3932542a6215f6129a5a9b5f720b4523461d4f5e25c7ef81be271dc4a4"
+      },
+      {
+        "file": "review/context-1/out.jsonl",
+        "sha256": "789665a12940a742de4c00d3bb1e069f131853cc38a9020c798d9410ebafb9e9"
+      },
+      {
+        "file": "review/context-2/out.jsonl",
+        "sha256": "e9208d76c86d8161d7151d2a5ee380d60d71794dece714b91e5f8fdd40acea2f"
+      },
+      {
+        "file": "review/context-3/out.jsonl",
+        "sha256": "b2fce2ec0233fa86ac99024a4537c889cf2c2c3194483776e99d2b362c8d4389"
+      },
+      {
+        "file": "review/context-4/out.jsonl",
+        "sha256": "e3c3e6198f1a171e6f220c8483ccc52f8ed27a9774e4baeff28a837bfea37d71"
+      },
+      {
+        "file": "review/context-5/out.jsonl",
+        "sha256": "bf61dddcddd7bd5b51bacbc664f2f38d225f9dbb9308795f73cbd6706826b910"
+      },
+      {
+        "file": "review/observe-eval-1/out.jsonl",
+        "sha256": "6c9698b6a6b19f946b2f00fa46a55c1d87ddfd866328c297c05fbeba3aedc5ab"
+      },
+      {
+        "file": "review/observe-eval-2/out.jsonl",
+        "sha256": "8c93f88d2b9c21d5e1eb62d149f6b0bc54aaa9d59f8f1dd97adfec86ab54b1a0"
+      },
+      {
+        "file": "review/delivery-1/out.jsonl",
+        "sha256": "c4bd6bdfb970d82cc03fb285f1b63a22486fde2445bb5e271fc1735ddfd92483"
+      },
+      {
+        "file": "review/delivery-2/out.jsonl",
+        "sha256": "e702181dcc6d0ace3f07f69b112dae45372540393409db0180dcdb4cfba740f3"
+      },
+      {
+        "file": "review/delivery-3/out.jsonl",
+        "sha256": "35b7cf53e03767e6e8f3ea3a3388cb6f9a6259ab0718ba679f23c46dcbf8be0b"
+      },
+      {
+        "file": "review/host-1/out.jsonl",
+        "sha256": "b6f701a502ad98506387e7e4e0e1c0ac63f16782b4206d408841b845f2386d1f"
+      },
+      {
+        "file": "review/host-2/out.jsonl",
+        "sha256": "7aef93ee1d1bca19542416a3df4417af9fb73d3e46ff32da6b61b8b337bc92f9"
+      },
+      {
+        "file": "fixes.json",
+        "sha256": "c26d69e491a6784eab5586eb5beef71f86d27d742db7eab57a032946b24682e3"
+      },
+      {
+        "file": "wf_8bf450a9-d1e",
+        "sha256": "afe41254e4311bf8cc067907f860291d374fed1b359bf1a490d5cd26a299e7f0"
+      },
+      {
+        "file": "wf_cdbf70a0-02c",
+        "sha256": "fb2211c01eb58218da6020d13ce61dcaea5a2a5c9d524a65263d17081de8d4c0"
+      },
+      {
+        "file": "context-2.probe-H.txt",
+        "sha256": "1d84241b30066b684f643c6aa7a1581546a9f33cd6bf1666f599b5257331d4f9"
+      },
+      {
+        "file": "context-2.claude-stream.jsonl",
+        "sha256": "bb0e4c7d3349d6944266276c3b584167f14fa09237dcab4336956edbf1731d40"
+      }
+    ],
+    "public_artifacts": [
+      {
+        "path": "evidence/artifacts/ns2604-e2e-20261004/slots.json",
+        "sha256": "24c0d3504b367ae1b2897a27a983e5891adc4ad8f33c8d50b4c9abd274408735",
+        "bytes": 123276
+      },
+      {
+        "path": "evidence/artifacts/ns2604-e2e-20261004/method.md",
+        "sha256": "c166003013dcd1dd7f786977da74013e4987896958c2bba2344b5abbea049f5f",
+        "bytes": 9421
+      },
+      {
+        "path": "evidence/artifacts/ns2604-e2e-20261004/summary.json",
+        "sha256": "e8347f73a917c7efb9b2a72050ca6c4f104e8f7a2fb9c89d53ee58b49d0aeffd",
+        "bytes": 4589
+      },
+      {
+        "path": "evidence/artifacts/ns2604-e2e-20261004/review-prompt.txt",
+        "sha256": "3d09e4ad82274f0dd1be60be2231bdd95f9d395832e4641dfdffa4fbab40876a",
+        "bytes": 2067
+      },
+      {
+        "path": "evidence/artifacts/ns2604-e2e-20261004/adjudication-prompt.md",
+        "sha256": "2905791626d06cc9ba44215cecd1a346482ba2c718dcbc0b00e567bba7101843",
+        "bytes": 2111
+      },
+      {
+        "path": "docs/decisions/2026-10-04-ns2604-verified-e2e.md",
+        "sha256": "5c4f4c17c4e101a13f3167fc82973c1de4b2a3ab7b7d68741f9504dfecad8a93",
+        "bytes": 6659
+      },
+      {
+        "path": "evidence/artifacts/ns2604-e2e-20261004/fixes.json",
+        "sha256": "9c27909616706d6a5dfc1fd2abb1c7f921e9b7b675d2ea4beea5d73bc894e861",
+        "bytes": 31505
+      }
+    ],
+    "publication_checks": {
+      "original_status_chains_compared": 80,
+      "private_content_hits": 0,
+      "receipt_tests": {
+        "cmd": "python3 -m unittest tests.test_validate tests.test_evidence_manifest tests.test_host_receipts tests.test_receipt_staleness tests.test_token_e2e_receipt_checks",
+        "exit": 0,
+        "counts": "291 tests passed, 0 skipped"
+      },
+      "private_content_scan": {
+        "cmd": "python3 scripts/validate.py --scan-file <each deliverable>",
+        "scanned_files": 8,
+        "exit": 0,
+        "hits": 0
+      },
+      "repository_validation": {
+        "cmd": "python3 scripts/validate.py",
+        "revision": "the PR head carrying the final registry-only commit",
+        "exit": 0,
+        "errors": 0,
+        "scope": "All eight published files registered, with hashes and mirrored fields synchronized in the final registry-only commit."
+      },
+      "git_diff_check": {
+        "cmd": "git diff --check",
+        "exit": 0
+      },
+      "untracked_whitespace_checks": {
+        "cmd": "git diff --no-index --check <empty file> <each deliverable>",
+        "files": 8,
+        "native_difference_exits": 8,
+        "whitespace_diagnostics": 0,
+        "correction": "The initial wrapper misclassified exit 1 as failure. Official Git documentation says no-index enables difference exit codes; zero diagnostic output is retained separately.",
+        "verification_source": "https://git-scm.com/docs/git-diff"
+      },
+      "original_source_hashes_rechecked": 58,
+      "repair_round": {
+        "receipt_tests": {
+          "cmd": "TMPDIR=.bounded-job-044/tmp rtk python3 -m unittest tests.test_validate tests.test_evidence_manifest tests.test_host_receipts tests.test_receipt_staleness",
+          "exit": 0,
+          "counts": "277 tests passed, 0 skipped"
+        },
+        "private_content_scan": {
+          "cmd": "python3 scripts/validate.py --scan-file <each of the eight published files>",
+          "scanned_files": 8,
+          "exit": 0,
+          "hits": 0
+        },
+        "login_scan": {
+          "sources": [
+            "USER",
+            "LOGNAME",
+            "getpass.getuser()"
+          ],
+          "case_insensitive": true,
+          "whole_word": true,
+          "scanned_files": 8,
+          "hits": 0
+        },
+        "repository_validation": {
+          "cmd": "python3 scripts/validate.py",
+          "exit": 1,
+          "errors": 16,
+          "scope": "The repair round's working tree before the coordinator's registry synchronization: only changed artifact hashes/byte counts and mirrored claim/limitations differed. The final registry-only commit synchronizes them, and validate.py passes there."
+        },
+        "git_diff_check": {
+          "cmd": "git diff --check",
+          "exit": 0
+        }
+      }
+    },
+    "completeness_critic": "Covered all 15 units, 80 status chains, independent reviews, 22 adjudications, the 14 reviewer / 8 executor split, all layers, failures, exclusions and holds. The prompt as run, exact adjudicator model and run timestamps, and separate 33-slot fix list are retained. Four INTERIM token slots are held for unmerged PR #684; ccusage and statusline have separate open fixes. Technical strings remain intact while concrete home/profile paths and local user identities are sanitized; the machine label is consistently retained. Missing modalities are fresh native replication and upstream benchmark acceptance.",
+    "north_star_action": "Preserve recoverable native foundation status and follow-ups supporting complex engineering, US-equities research and historical simulation.",
+    "adjudication_split": {
+      "reviewer": 14,
+      "executor": 8
+    }
+  }
+}

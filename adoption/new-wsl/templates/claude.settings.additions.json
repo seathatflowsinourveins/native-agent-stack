@@ -1,9 +1,29 @@
 {
-  "_comment": "The new WSL distribution's additions to adoption/templates/claude.settings.template.json. Only tools/adoption/new_wsl_client_config.py reads this file (the `_comment` key is not a setting and is never rendered): it merges the keys below into the shared template (a key both files define is refused) and wires each through adoption/new-wsl/client-config-map.json, so the shared template stays what the bootstrap applies on every other host. The two allow rules name semble's tools exactly, so Claude Code calls them without asking outside bypass mode and an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3); an allow rule grants a permission, so the map classes them authorization: written only with --with-authorization-settings and only while the code-search slot installs semble.",
+  "_comment": "The new WSL distribution's additions to adoption/templates/claude.settings.template.json. Only tools/adoption/new_wsl_client_config.py reads this file (the `_comment` key is not a setting and is never rendered): it merges the keys below into the shared template (a key both files define is refused) and wires each through adoption/new-wsl/client-config-map.json, so the shared template stays what the bootstrap applies on every other host. The two allow rules name semble's tools exactly, so Claude Code calls them without asking outside bypass mode and an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3); an allow rule grants a permission, so the map classes them authorization: written only with --with-authorization-settings and only while the code-search slot installs semble. The env variable turns Claude Code's agent teams on (https://code.claude.com/docs/en/agent-teams), which the owner's directive of 2026-10-04 names (docs/decisions/2026-10-04-new-wsl-token-layer-default.md); a run that needs plain named subagents passes the variable as 0. The enabledPlugins entry turns on the built-in mod cc-plugin-you-should-know (a side agent that shows notes above the prompt, added in Claude Code 2.1.287; https://code.claude.com/docs/en/plugins/mods/overview, read 2026-10-04) under the owner's order of 2026-10-04 to enable the latest changelog features on both hosts; the ConfigChange hook is the logging-only audit hook of https://code.claude.com/docs/en/hooks-guide ('Audit configuration changes') with the same literal command NativeStack runs.",
+  "crossSessionInbound": "accept",
   "permissions": {
     "allow": [
       "mcp__semble__search",
       "mcp__semble__find_related"
+    ]
+  },
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "enabledPlugins": {
+    "cc-plugin-you-should-know@builtin": true
+  },
+  "hooks": {
+    "ConfigChange": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -c '{timestamp: now | todate, source: .source, file: .file_path}' >> ~/claude-config-audit.log || true"
+          }
+        ]
+      }
     ]
   }
 }

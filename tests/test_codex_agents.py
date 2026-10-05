@@ -57,8 +57,8 @@ README_HEADING = "## 2026-09-29: Stack role carriers"
 # section of 2026-09-29 repeats these rows verbatim, and Amendment 4 copies them; any later change to a
 # carrier needs a new dated amendment and new rows here.
 STACK_ROLE_ROWS = (
-    "| `stack-researcher.toml` | `22f13371e0e7848086206de8765884047f66de763744c16f17324f1f522a8ac0` |",
-    "| `stack-verifier.toml` | `1c56b9a49591432d08ca1e860f116ff5f17a8361a22b722af9e9a92f74d63d06` |",
+    "| `stack-researcher.toml` | `a8e416feffb47afd36ba8f4afd2076f7168d766bfb5efd847cf1b600e6110c4f` |",
+    "| `stack-verifier.toml` | `d35bcd8f77bcdfe58e879c3c752c152219a8725f55d2b17f5fc67a7832595561` |",
 )
 
 # The spawn_agent tool text shows a role's description to every parent in every arm (role.rs:294-334), so each

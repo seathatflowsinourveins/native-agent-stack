@@ -261,25 +261,44 @@ compares id-to-normalized-row maps and refuses a start if they differ. Every GET
 is admitted synchronously through the ledger's durable read budget before sending.
 The mover uses the saved `fee_window_start` of a continuing lineage (legacy:
 `started_at`); a new lineage takes L immediately before the checkpoint. It books
-F2 before `begin_next_trial` and before taking the accounting snapshot, then
-computes `baseline_cash = checkpoint account cash - ledger cash_delta`. The
-between-trial cash observation also uses checkpoint cash. `trial.json` saves L
-as epoch seconds; every paper/recover snapshot uses its same formatted `after`
+F2 before `begin_next_trial` and before taking the accounting snapshot. Only the
+first trial computes `baseline_cash = checkpoint account cash - ledger cash_delta`;
+every next trial keeps the `baseline_cash` stored in `trial.json`. That is the first
+trial's value for lineages started on this engine, and the last saved value for a
+lineage migrated from an engine that recomputed it each trial. The mover compares
+checkpoint cash with that stored baseline plus ledger `cash_delta` after booking fees.
+An unexplained difference above 0.01 USD refuses with `next_trial_cash_mismatch` (`not_started`),
+before consuming a new trial identity or building a port. An admitted trial's receipt
+sets `inter_trial_cash_changed` to `false` for every admitted next trial and `null`
+for a lineage's first trial. `--allow-shared-account`
+only bypasses the adaptive-directory guard: another lane's cash activity between
+mover trials that leaves such a difference permanently blocks the retained mover
+lineage, whose baseline stays fixed. `trial.json` saves L as epoch seconds;
+every paper/recover snapshot uses its same formatted `after`
 string. The adaptive lane does this at its first trial, keeps that baseline, and
 uses L for snapshots and its synchronously admitted next-trial fee read (legacy:
 `started_at`). The old preflight account read precedes `started_at`.
 
+Mover `recover` must receive `--config` with the trial's exact frozen config bytes.
+The SHA-256 covers the whole file; a changed config refuses with
+`recovery_config_differs_from_frozen_trial`, including when recovering a finished
+trial to book later fees. See README-mover.md, "Frozen recovery config", for the
+comparison of whole-file binding with binding only risk-relevant config fields,
+its reopen condition and the dated recovery-only copy.
+
 Assumption: a FEE activity is visible in the activity list exactly when its
 amount is in account cash. Under that assumption, every fee in F2 is in both
-checkpoint cash and ledger `cash_delta` before computing the baseline. Later
-fees after the fixed cutoff are listed and booked once by id. Fees before the
-cutoff are in cash and never listed, so the per-trial baseline neither double
+checkpoint cash and ledger `cash_delta` before computing the initial baseline or
+checking the retained baseline. Later fees after the fixed cutoff are listed and
+booked once by id. Fees before the
+cutoff are in cash and never listed, so the lineage baseline neither double
 counts nor misses a fee. Alpaca's documented `after` has whole-second precision:
 formatting fractional L can include a fee from earlier within that second, which
 is also booked before baseline and deduplicated thereafter. Fees earlier engines
-absorbed into a baseline are booked at the next checkpoint; recomputing baseline
-after booking preserves cash reconciliation. Fee losses still consume the risk
-budget during recovery. More generally, any risk cap that trips during a recovery
+absorbed into a baseline are booked at the next checkpoint; the retained baseline
+is never recomputed, so inconsistent legacy accounting refuses admission. Fee
+losses still consume the risk budget during recovery. More generally, any risk
+cap that trips during a recovery
 (a fee, a fill, or a mark that lifts the residual above the gross-exposure cap)
 now replaces `recovery_only` with that halt reason, exactly as it would halt a
 trial. The halt is permanent for the ledger (`next_trial_cannot_clear_risk_halt`),

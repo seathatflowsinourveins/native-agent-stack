@@ -1,0 +1,26 @@
+F
+======================================================================
+FAIL: test_a_faithful_judge_settles_the_claude_answers_and_grade_consumes_the_judgments (tests.test_token_e2e_grader.F15_JudgeContract.test_a_faithful_judge_settles_the_claude_answers_and_grade_consumes_the_judgments)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/tests/test_token_e2e_grader.py", line 6922, in test_a_faithful_judge_settles_the_claude_answers_and_grade_consumes_the_judgments
+    world, index = self.ready()
+                   ~~~~~~~~~~^^
+  File "<CHECKOUT>/tests/test_token_e2e_grader.py", line 6899, in ready
+    world = world or JudgeWorld(self).build()
+                     ~~~~~~~~~~^^^^^^
+  File "<CHECKOUT>/tests/test_token_e2e_grader.py", line 6269, in __init__
+    self.run = MiniRun(case, files=files)
+               ~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "<CHECKOUT>/tests/test_token_e2e_grader.py", line 4685, in __init__
+    self.ok(["spec", "--repo", self.repo, "--preregistration-commit", self.commit, "--out", self.spec])
+    ~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<CHECKOUT>/tests/test_token_e2e_grader.py", line 4701, in ok
+    assert proc.returncode == 0, f"{args[0]} failed: {sanitize(proc.first_line())}"
+           ^^^^^^^^^^^^^^^^^^^^
+AssertionError: spec failed: E_PATH reason=work_tree
+
+----------------------------------------------------------------------
+Ran 1 test in 0.145s
+
+FAILED (failures=1)

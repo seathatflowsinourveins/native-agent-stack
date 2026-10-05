@@ -69,7 +69,7 @@ With installed rtk exclusions config (`fixtures/rtk-hook-exclusions.toml`), rewr
 - `diff`: rtk changes diagnostics; both exit 2 on missing files.
 - `git branch`: rtk can mislabel other worktrees' branches remote-only.
 - `jq`: rtk caps at 40 lines/120 chars.
-- `git log` via rtk: bare: max 10 commits, no notice; `--stat`: max 10, notice, keeps merges. Bare/`--oneline`/`--format=%s`/`--graph --oneline` drop merges. For history/merges use `-n <count>` or `rtk proxy git log`.
+- `git log` via rtk: bare: max 10 commits, no notice; `--stat`: max 10, notice, keeps merges. Bare/`--oneline`/`--format=%s`/`--graph --oneline` drop merges. History/merges: `-n <count>` or `rtk proxy git log`.
 - `find NAME`: rtk uses patterns for missing bare names; no match exits 0. Use `./NAME` or `rtk proxy find` for status.
 
 `cd`, `export`, `source` stay in shell: `rtk` exits 127, halting `&&`.

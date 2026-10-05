@@ -108,11 +108,12 @@ receipts stay at their recorded versions; macOS execution was not run here.
 
 The template is 8,191 UTF-8 bytes against 8,192.
 `tests/test_codex_worker_lane.py:438` enforces the stricter local <8192 bound.
-The current carrier hashes are 22f13371e0e7848086206de8765884047f66de763744c16f17324f1f522a8ac0
-(researcher) and 1c56b9a49591432d08ca1e860f116ff5f17a8361a22b722af9e9a92f74d63d06
-(verifier). WSL --write-blocks exits 0; RTK is unwired in this distribution's
-map, so the generated Codex file finishes byte-identical to main. The current
-record projection is regenerated with --check --markdown, exit 0.
+The current carrier hashes are a8e416feffb47afd36ba8f4afd2076f7168d766bfb5efd847cf1b600e6110c4f
+(researcher) and d35bcd8f77bcdfe58e879c3c752c152219a8725f55d2b17f5fc67a7832595561
+(verifier). On the merged tree, WSL --write-blocks and --check --markdown exit 0. The
+updated generator retains RTK guidance in the distribution's Codex instructions;
+the Codex file changes while the Claude file is kept. Both current decision
+projections are regenerated from the native --check --markdown output.
 
 The earlier focused run exited 1 with three stale-anchor/projection failures;
 the repaired run exited 0 (382 tests, 12 skips). The coordinator subsequently
