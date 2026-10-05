@@ -185,9 +185,11 @@ recommended after 705f and the command center accepted: the tool no longer decid
     printable ASCII without a quote or a backslash, as `codex-rs/execpolicy/src/amend.rs` writes `default.rules`; comment lines of printable ASCII without a
     backslash, which hcom's own `hcom.rules` begins with (`aannoo/hcom` 7151660a3, `src/hooks/codex.rs` `build_codex_rules`); empty lines; hcom's file as its installer builds it, from `SAFE_HCOM_COMMANDS` and `HCOM_TOOL_NAMES`, has no character outside the grammar): it is accepted,
     because an allow rule that a rewrite stops matching only loses its approval and restricts nothing, and a language this small reads the same in every
-    parser; one with a token `rtk` is refused, because the hook's rewrite inserts that word, so the rule matches the rewritten command and not the original
-    and widens an approval (codex-cli 0.159.3 `execpolicy check`: under `["rtk"]` allow, `rtk git push origin main` is `allow` and `git push origin main` has
-    no decision; `plan-row-scratch-run.json`, `allow_rtk_check`);
+    parser (705g checked all 93 admitted token characters against Codex's Starlark); one that contains the letters `rtk` anywhere is refused, because the hook's
+    rewrite inserts that word, so the rule matches the rewritten command and not the original and widens an approval (codex-cli 0.159.3 `execpolicy check`: under
+    `["rtk"]` allow, `rtk git push origin main` is `allow` and `git push origin main` has no decision, `allow_rtk_check`; and 705g P1-1: Codex cannot split an
+    assignment-prefixed script, evaluates it as one token of the shell argv, and the hook inserts rtk inside that token, so `["/bin/bash", "-lc", "FOO=1 rtk git
+    push origin main"]` allows the rewritten script and not the original, `allow_rtk_script_check`; the whole-token version of the check missed it);
     (3) otherwise it is an exposure. `--apply` refuses with exit 2 before the app-server starts, so before any write, even for an already trusted hook;
     `--check` exits 6 for a trusted hook beside an exposure (5 stays for an untrusted one), and the post_install acceptance runs it, so a rule file added or
     edited after the grant is caught on the next acceptance run; `--allow-exec-rules` accepts the exposure, after the `rtk` form of each restricting rule is written
@@ -216,11 +218,11 @@ recommended after 705f and the command center accepted: the tool no longer decid
     never opened. The cost is false refusals: any hand-written restricting rule that is not on the list, and a `default.rules` that Codex wrote with an escape (an
     approved command with a quote or a backslash), is an exposure until it is reviewed into the list or accepted with `--allow-exec-rules`.
 
-Evidence (`local_integration` unless noted): `plan-row-scratch-run.json`, 76 steps with the real rtk 0.51.0 and codex-cli 0.159.3 in scratch homes, the plan's own
+Evidence (`local_integration` unless noted): `plan-row-scratch-run.json`, 79 steps with the real rtk 0.51.0 and codex-cli 0.159.3 in scratch homes, the plan's own
 command strings: #713's `hcom-deny.rules` by its exact bytes lets the trust proceed (and a `git push` forbid rule added after the grant makes `--check` exit 6 and the
 trust refuse); the same bytes plus one comment line, a configured transparent prefix, a user TOML filter beside the reviewed file, a trusted project filter (under which the real rtk
 rewrites `hcom kill luna` from the project's directory) and `RTK_TRUST_PROJECT_FILTERS` with a CI variable (the same rewrite, with no store entry) are each refused; Codex's and
-hcom's allow-only files let the trust proceed, and an allow rule that names `rtk` is refused; a `git push` forbid rule is refused before anything is written (accepted with `--allow-exec-rules`, after which
+hcom's allow-only files let the trust proceed, and an allow rule that holds `rtk` (as a token, or inside a shell-script token) is refused; a `git push` forbid rule is refused before anything is written (accepted with `--allow-exec-rules`, after which
 `--check` exits 6), and so is the same rule with its `rtk git push` twin; the counterexamples of 705e (`git -C .`, broad `uv` and `npx` rules, the nested
 `host_executable` file, under which the real evaluator forbids `git push origin main`) and of 705f (raw CR, `bash -lc` script, `phpunit.exe`, `g++` plus a combining
 mark) and an unreadable rules directory are refused; each `execpolicy_check` answer needs exit 0 and a valid response, and `rtk_hook_check` records which of the
@@ -235,7 +237,9 @@ least one test (`rule_review_mutation_check.py`, `rule-review-mutation-check.txt
 The operating rule for rule authors stays: write the `rtk` form beside the plain one and check both with `codex execpolicy check`, then accept with `--allow-exec-rules`.
 
 Limits and residuals: rules in a project's `.codex/rules` or a managed layer are not visible to the tool; the override variable is checked in the tool's own
-environment, not in the environment Codex runs the hook in; the reviewed list covers rtk's default hook configuration of the one version it names; the review covers the user layer's rule files as bytes and does not
+environment, not in the environment Codex runs the hook in, and a filter trusted after the review shows only at the next `--check` (705g P1-2: a point-in-time
+check cannot establish what a global hook does in every working directory; the review classifies the filter state it can see, so a trusted filter or the override
+needs `--allow-exec-rules`, and the exclusions of alternative (j) are the enforced hardening); the reviewed list covers rtk's default hook configuration of the one version it names; the review covers the user layer's rule files as bytes and does not
 say whether a restricting rule is good; no live Codex session was run with a forbidding rule and the hook active (untested boundary: the session behaviour is
 derived from the dispatch order above and the evaluator that `codex execpolicy check` runs); `--allow-exec-rules` is an explicit acceptance of an exposure.
 What would overturn the design: a Codex that matches execution rules before the PreToolUse rewrite or against both forms, an rtk that reads Codex's rules or has a
@@ -246,8 +250,12 @@ raised (`Path.glob` swallows the error); P2 the refusal came after the app-serve
 Job-071 (through the command center): P2 the same listing hole; P2 rules were reported only for a hook still to be trusted; P3 the claim that approvals-off
 hosts consult no rules. The second version (e6321c0b8) fixed those and was read by 705e: the three P1s above. The third version (c771da9eb) fixed them with the head
 set and the `ast` reader and was read by 705f: five P1s and a P2 (above). The fourth version replaces the analysis with the hash list on 5f's recommendation and
-keeps the mechanical repairs (the listing, fail closed). Bounded review loop: one more read of this version, and the residuals above recorded. The exclusions
-default that job-071 recommended is alternative (a).
+keeps the mechanical repairs (the listing, fail closed). 705g (Sol, through 5f, at 3a2bb97ba) found two P1s and no P2 in it: an allow rule for a shell script that holds
+`rtk` inside the script token (the check had refused only a whole token `rtk`), and project filters, which rtk loads from the hook's working directory before the
+global and built-in ones and which `rtk trust --yes` or `RTK_TRUST_PROJECT_FILTERS=1` with a CI variable activate, so that the reviewed hash still passed while the real
+hook rewrote `hcom kill luna` out of the forbid rule. The repair round refuses `rtk` anywhere in an allow rule and adds the trust list and the override variable to the
+entry's host conditions (the reviewer's second option: classify the project-filter exposure so that it needs `--allow-exec-rules`). Bounded review loop: one more read
+of this version, and the residuals above recorded. The exclusions default that job-071 recommended is alternative (a).
 
 **Alternatives.** (a) *Limit the hook to a read-only rewrite set with `exclude_commands`* (job-071 recommended exclusions for state-changing families as a
 default beside the guard): rtk's option is exclusion-only (`src/core/config.rs` L119-L123; `src/discover/registry.rs` L1548-L1582: a pattern starting with `^` is
@@ -263,4 +271,4 @@ refuses only what is not reviewed or allow-only. (f) *Compare decisions on probe
 (g) *A wrapper hook that evaluates the rules before delegating to `rtk hook codex`*: it would be complete for the user layer, but it replaces upstream's hook command
 with a self-built component, against the directive to install with upstream commands; not done. (h) *Derive rtk's heads and read the rules with a parser* (the third
 version): abandoned, the 705f counterexamples; the derivation and the real-binary check remain as the review evidence for a list entry. (i) *Accept any rule file
-whose first tokens are not heads, by a parser written for the purpose*: the same analysis with the same failure surface; the list reviews exact bytes instead.
+whose first tokens are not heads, by a parser written for the purpose*: the same analysis with the same failure surface; the list reviews exact bytes instead. (j) *Enforce `exclude_commands` entries for `hcom` and `uvx hcom` as the reviewed entry's host condition* (705g's first option for P1-2): rtk applies exclusions before the TOML-filter rewrite (`src/discover/registry.rs` L1743-L1763), and measured with the real binary in a scratch HOME (`project_filter_check`), `['^hcom(\s|$)', '^uvx\s+hcom(\s|$)']` keeps `hcom kill luna` and `uvx hcom kill luna` unrewritten while a trusted project filter that matches both is active, and under the CI override, and leaves `git status` rewritten. It is the better hardening and is not enforced by the tool: the entries would join the recipe's shared five-entry table that Claude's hook reads too (its text, fixture and tests count five, and other lanes own them), and an exclusion matches rtk's raw command text, so it cannot cover every shell spelling that Codex reads as `hcom` (quotes, escapes) against an unanchored trusted filter, where the observed-state conditions leave rtk with no filter at all. A host that opens untrusted repositories with Codex can add the two entries to rtk's config now; whether the plan's default table should carry them is a decision for the recipe's owners.

@@ -36,10 +36,12 @@ each rule file in <codex home>/rules:
   - a file is accepted when it holds nothing but allow rules in Codex's own format, byte for byte: lines `prefix_rule(pattern=["a", "b"],
     decision="allow")` whose tokens are printable ASCII without a quote or a backslash (codex-rs/execpolicy/src/amend.rs, which writes
     default.rules), comment lines of printable ASCII without a backslash and empty lines (hcom's own hcom.rules begins with one comment line,
-    src/hooks/codex.rs build_codex_rules); an allow rule that a rewrite stops matching only loses its approval, but one with a token `rtk` is not
-    accepted: the hook's rewrite inserts that word, so the rule matches the rewritten command and not the original (codex-cli 0.159.3
-    `execpolicy check`: `["rtk"]` allows `rtk git push origin main` and gives no decision for `git push origin main`), which widens an approval;
-    a language this small reads the same in every parser;
+    src/hooks/codex.rs build_codex_rules); an allow rule that a rewrite stops matching only loses its approval, but one that contains the letters
+    `rtk` anywhere is not accepted: the hook's rewrite inserts that word, so such a rule matches the rewritten command and not the original, which
+    widens an approval (codex-cli 0.159.3 `execpolicy check`: `["rtk"]` allows `rtk git push origin main` and gives no decision for `git push origin
+    main`; and 705g: Codex cannot split an assignment-prefixed script, evaluates it as ONE token of the shell argv, and the hook inserts rtk inside it,
+    so `["/bin/bash", "-lc", "FOO=1 rtk git push origin main"]` allows the rewritten script and not the original); a language this small reads the
+    same in every parser (705g checked all 93 admitted token characters against Codex's Starlark);
   - any other file (a restriction nobody reviewed against rtk's rewrite, a CR, a non-ASCII byte, a backslash outside a token) is an exposure: --apply
     refuses with exit 2 before the app-server starts, so before any write, even for an already trusted hook; --check exits 6 for a trusted
     hook beside one (the install plan's acceptance runs it, so a rule file added or edited after the grant is caught); --allow-exec-rules
@@ -93,7 +95,7 @@ REVIEWED_FILE = Path(__file__).with_name("exec_rules_reviewed.json")
 TOKEN = r'"[ !#-\[\]-~]+"'
 ALLOW_LINE = re.compile(rf'prefix_rule\(pattern=\[{TOKEN}(?:, {TOKEN})*\], decision="allow"\)')
 COMMENT_LINE = re.compile(r"#[ -\[\]-~]*")  # printable ASCII except a backslash: a comment that no parser can continue onto the next line
-REWRITE_WORD = '"rtk"'  # the word rtk's hook inserts; a token holds no quote, so this is exactly one token equal to `rtk`
+REWRITE_WORD = "rtk"  # the word rtk's hook inserts, as a token or inside a shell-script token (705g); every rewritten command contains it
 SCHEMA_LINE = re.compile(r"schema_version\s*=\s*\d+")
 NO_TRUSTED_FILTERS = "No trusted filters."  # what `rtk trust --list` prints for an empty trust store (src/hooks/trust.rs run_trust, rtk 0.51.0)
 TRUST_ENV = "RTK_TRUST_PROJECT_FILTERS"  # with a CI variable, rtk trusts every project .rtk/filters.toml without a store entry (src/hooks/trust.rs L106-L116)
@@ -189,9 +191,9 @@ def rule_files(home: Path) -> list[Path]:
 
 def is_allow_only(data: bytes) -> bool:
     """Whether the whole file holds nothing but allow rules in Codex's own format (amend.rs): every line is `prefix_rule(pattern=["a", "b"],
-    decision="allow")` with tokens of printable ASCII without a quote or a backslash and none equal to `rtk` (an allow rule that names the word the hook's rewrite
-    inserts matches the rewritten command and not the original), a comment of printable ASCII without a backslash, or empty; lines are ended by a newline; no
-    CR, no tab, no non-ASCII byte. An empty file holds no rule."""
+    decision="allow")` with tokens of printable ASCII without a quote or a backslash and without the letters `rtk` anywhere (an allow rule that holds the word the
+    hook's rewrite inserts, as a token or inside a shell-script token, matches the rewritten command and not the original), a comment of printable ASCII without a
+    backslash, or empty; lines are ended by a newline; no CR, no tab, no non-ASCII byte. An empty file holds no rule."""
     try:
         text = data.decode("ascii")
     except UnicodeDecodeError:

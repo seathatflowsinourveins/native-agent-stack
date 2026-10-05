@@ -446,6 +446,12 @@ NOT_ALLOW_ONLY = (
     ("an allow rule that names rtk, which matches the rewritten command and not the original", b'prefix_rule(pattern=["rtk"], decision="allow")\n'),
     ("an allow rule that names rtk after a wrapper", b'prefix_rule(pattern=["time", "rtk", "git"], decision="allow")\n'),
     ("an allow rule that names rtk beside a fine one", CODEX_ALLOW + b'prefix_rule(pattern=["rtk", "git", "status"], decision="allow")\n'),
+    ("an allow rule for a shell script that holds rtk: Codex evaluates an assignment-prefixed script as one token and the rewrite inserts rtk inside it (705g)",
+     b'prefix_rule(pattern=["/bin/bash", "-lc", "FOO=1 rtk git push origin main"], decision="allow")\n'),
+    ("rtk at the start of a token", b'prefix_rule(pattern=["rtkx"], decision="allow")\n'),
+    ("rtk at the end of a token", b'prefix_rule(pattern=["xrtk", "a"], decision="allow")\n'),
+    ("rtk inside a token", b'prefix_rule(pattern=["a", "rtk-x"], decision="allow")\n'),
+    ("rtk after a space inside a token", b'prefix_rule(pattern=["a", "x rtk"], decision="allow")\n'),
     ("a prompt rule beside an allow rule", CODEX_ALLOW + b'prefix_rule(pattern=["git"], decision="prompt")\n'),
     ("a forbidden rule in Codex's own spelling", b'prefix_rule(pattern=["git", "push"], decision="forbidden")\n'),
     ("spaces around =", b'prefix_rule(pattern = ["ls"], decision = "allow")\n'),
@@ -601,10 +607,10 @@ class RuleReviewTests(Case):
                 self.assertEqual(self.tools.calls, [])
 
     def test_the_allow_only_grammar_is_byte_for_byte(self):
+        # the check is for the lowercase letters the hook inserts, in an allow rule only: a comment may say rtk, and the rewrite never inserts RTK or splits it
         for body in (CODEX_ALLOW, HCOM_OWN, b"", b"\n", b"# a comment\n", b"# rtk is only a word here\n",
-                     b'prefix_rule(pattern=["rtkx"], decision="allow")\n', b'prefix_rule(pattern=["xrtk", "a"], decision="allow")\n',
-                     b'prefix_rule(pattern=["RTK"], decision="allow")\n', b'prefix_rule(pattern=["a", "rtk-x"], decision="allow")\n',
-                     b'prefix_rule(pattern=["a", "x rtk"], decision="allow")\n'):
+                     b'prefix_rule(pattern=["RTK"], decision="allow")\n', b'prefix_rule(pattern=["Rtk", "x"], decision="allow")\n',
+                     b'prefix_rule(pattern=["rt", "k"], decision="allow")\n', b'prefix_rule(pattern=["r t k"], decision="allow")\n'):
             self.assertTrue(trust.is_allow_only(body), body)
         for label, body in NOT_ALLOW_ONLY:
             with self.subTest(label):

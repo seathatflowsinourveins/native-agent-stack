@@ -43,7 +43,7 @@ MUTANTS = {
     "an empty line is not allowed": (GRAMMAR, GRAMMAR.replace('line == "" or ', "")),
     "an allow rule that names rtk is allow-only (it matches the rewritten command and not the original)": (GRAMMAR, GRAMMAR.replace(" and REWRITE_WORD not in line", "")),
     "only an allow rule that starts with rtk is refused": (GRAMMAR, GRAMMAR.replace("REWRITE_WORD not in line", """not line.startswith('prefix_rule(pattern=["rtk"')""")),
-    "any token that contains the letters rtk is refused": ("""REWRITE_WORD = '"rtk"'""", """REWRITE_WORD = 'rtk'"""),
+    "only a complete token rtk is refused, not rtk inside a shell-script token (705g P1-1)": ("""REWRITE_WORD = "rtk\"""", """REWRITE_WORD = '"rtk"'"""),
     "any line is a comment": (GRAMMAR, GRAMMAR.replace("COMMENT_LINE.fullmatch(line)", "True")),
     "a space-separated token list is not required": (
         'ALLOW_LINE = re.compile(rf\'prefix_rule\\(pattern=\\[{TOKEN}(?:, {TOKEN})*\\], decision="allow"\\)\')',

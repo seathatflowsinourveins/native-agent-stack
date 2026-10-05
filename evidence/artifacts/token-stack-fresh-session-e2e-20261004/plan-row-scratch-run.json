@@ -3,7 +3,7 @@
   "evidence_class": "local_integration: one run, one host, scratch HOMEs, the real rtk and codex (the stream is synthetic)",
   "rtk": "rtk 0.51.0",
   "codex": "codex-cli 0.159.3",
-  "deviation": "4 codex process(es) were running on the host, so the trust command carries --codex-process-name no-such-process-name (the tool would otherwise refuse, exit 2)",
+  "deviation": "8 codex process(es) were running on the host, so the trust command carries --codex-process-name no-such-process-name (the tool would otherwise refuse, exit 2)",
   "steps": [
     {
       "step": "--check before any rtk hook exists",
@@ -60,7 +60,7 @@
       "stdout_tail": [
         "hooks named in <scratch>/fake-home/.codex:",
         "  <scratch>/fake-home/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/fake-home/.codex/config.toml.bak.20261005T070425Z",
+        "backup: <scratch>/fake-home/.codex/config.toml.bak.20261005T074320Z",
         "trusted 1 hook(s) in <scratch>/fake-home/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -70,14 +70,14 @@
       "exit": 0,
       "expected_exit": 0,
       "stdout_tail": [
+        "    or a user filter. This closes the residual \"project-trusted filters are not read\". Not covered, and recorded: the environment Codex itself runs the",
+        "    hook in. The scratch run gains two homes (a trusted project filter, the override variable) with the real rtk's rewrite recorded before and after;",
+        "    81 unit tests (FakeRtk answers `trust --list`; every test starts without the variable), 63 mutants all killed, 76 scratch-run steps as expected.",
         "    Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>",
-        "commit 3a2bb97ba4b37de964dfea49b01ee9efc47225cd",
+        "commit 5ff53d65233992acd8d3f404095c4856d755d013",
         "Author: Scout <scout@local>",
-        "Date:   Mon Oct 5 02:51:31 2026 -0400",
-        "    registry: register the files of the hash-list rule review round in manifests/evidence.json",
-        "    The hot-file step (docs/lanes.md): evidence.json restored from the base 4c897418f, the changed files re-registered with host_receipts.register_file,",
-        "    the heads file registered under its new path, component_matrix and new_host_grand_list rewritten; validate.py and validate_convergence.py",
-        "    --all-recorded pass.",
+        "Date:   Mon Oct 5 03:00:31 2026 -0400",
+        "    registry: register the files changed by the reviewed-list update for #713 repair round 2",
         "    Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>",
         "hooks named in <scratch>/fake-home/.codex:",
         "  <scratch>/fake-home/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is trusted",
@@ -189,7 +189,7 @@
         "  every rule file is accepted",
         "hooks named in <scratch>/rules-hcom/.codex:",
         "  <scratch>/rules-hcom/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/rules-hcom/.codex/config.toml.bak.20261005T070427Z",
+        "backup: <scratch>/rules-hcom/.codex/config.toml.bak.20261005T074322Z",
         "trusted 1 hook(s) in <scratch>/rules-hcom/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -308,7 +308,7 @@
         "  every rule file is accepted",
         "hooks named in <scratch>/rules-allow-only/.codex:",
         "  <scratch>/rules-allow-only/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/rules-allow-only/.codex/config.toml.bak.20261005T070428Z",
+        "backup: <scratch>/rules-allow-only/.codex/config.toml.bak.20261005T074324Z",
         "trusted 1 hook(s) in <scratch>/rules-allow-only/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -544,7 +544,7 @@
         "  exposed: default.rules (sha256 f481703c6aec) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r",
         "hooks named in <scratch>/rules-exposed/.codex:",
         "  <scratch>/rules-exposed/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/rules-exposed/.codex/config.toml.bak.20261005T070431Z",
+        "backup: <scratch>/rules-exposed/.codex/config.toml.bak.20261005T074326Z",
         "trusted 1 hook(s) in <scratch>/rules-exposed/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -624,7 +624,7 @@
         "  exposed: default.rules (sha256 84a079dfaa1a) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r",
         "hooks named in <scratch>/rules-twin/.codex:",
         "  <scratch>/rules-twin/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
-        "backup: <scratch>/rules-twin/.codex/config.toml.bak.20261005T070432Z",
+        "backup: <scratch>/rules-twin/.codex/config.toml.bak.20261005T074328Z",
         "trusted 1 hook(s) in <scratch>/rules-twin/.codex/config.toml; read back from hooks/list by key and hash"
       ],
       "stderr_tail": []
@@ -903,6 +903,45 @@
       ]
     },
     {
+      "step": "rules-705g-allow-rtk-script: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705g-allow-rtk-script: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-705g-allow-rtk-script/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-705g-allow-rtk-script/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-705g-allow-rtk-script/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705g-allow-rtk-script (an allow rule for a shell script that holds rtk: the rewritten script matches it and the original does not): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-705g-allow-rtk-script/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 29ae2df09944) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
       "step": "rules-705f-unicode: plan command 3 (the exclusions config)",
       "exit": 0,
       "expected_exit": 0,
@@ -1081,6 +1120,11 @@
       "rewritten_to": "rtk g++\u0301 --version"
     },
     {
+      "command": "FOO=1 git push origin main",
+      "exit": 0,
+      "rewritten_to": "FOO=1 rtk git push origin main"
+    },
+    {
       "command": "hcom kill luna",
       "exit": 1,
       "rewritten_to": null
@@ -1112,6 +1156,28 @@
       "exit": 0,
       "valid": true,
       "decision": null
+    }
+  ],
+  "allow_rtk_script_check": [
+    {
+      "argv": [
+        "/bin/bash",
+        "-lc",
+        "FOO=1 git push origin main"
+      ],
+      "exit": 0,
+      "valid": true,
+      "decision": null
+    },
+    {
+      "argv": [
+        "/bin/bash",
+        "-lc",
+        "FOO=1 rtk git push origin main"
+      ],
+      "exit": 0,
+      "valid": true,
+      "decision": "allow"
     }
   ],
   "project_filter_check": [
@@ -1150,6 +1216,26 @@
       "stderr_first": ""
     },
     {
+      "step": "exclusions for hcom and uvx hcom in rtk's config, the project filter still trusted: hook check hcom kill luna",
+      "exit": 1,
+      "stdout": [],
+      "stderr_first": "No rewrite for: hcom kill luna"
+    },
+    {
+      "step": "exclusions for hcom and uvx hcom in rtk's config, the project filter still trusted: hook check uvx hcom kill luna",
+      "exit": 1,
+      "stdout": [],
+      "stderr_first": "No rewrite for: uvx hcom kill luna"
+    },
+    {
+      "step": "exclusions for hcom and uvx hcom in rtk's config, the project filter still trusted: hook check git status",
+      "exit": 0,
+      "stdout": [
+        "rtk git status"
+      ],
+      "stderr_first": ""
+    },
+    {
       "step": "no store entry, no override: hook check hcom kill luna",
       "exit": 1,
       "stdout": [],
@@ -1170,6 +1256,12 @@
         "No trusted filters."
       ],
       "stderr_first": ""
+    },
+    {
+      "step": "exclusions for hcom and uvx hcom, RTK_TRUST_PROJECT_FILTERS=1 and CI=1: hook check hcom kill luna",
+      "exit": 1,
+      "stdout": [],
+      "stderr_first": "No rewrite for: hcom kill luna"
     }
   ],
   "all_as_expected": true

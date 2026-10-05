@@ -116,11 +116,11 @@ reviews the user layer's rule files first and parses nothing (three reads each f
 A sample of commands cannot do this (the 705e read: `git -C .` is not rewritten but `git -C . push origin main` is, and the native evaluator forbids the original
 and not the rewrite) and neither can an `rtk` twin (rtk's rewrites also change words after `rtk`: `cat f` becomes `rtk read f`, `python3 -m pytest` becomes
 `rtk pytest`). `--check` exits 6 for a trusted hook beside such a file, so the post_install acceptance catches a rule file added or edited later;
-`--allow-exec-rules` accepts. The scratch run (76 steps, rtk 0.51.0 and codex-cli 0.159.3): #713's `hcom-deny.rules` by its exact bytes lets the trust proceed,
+`--allow-exec-rules` accepts. The scratch run (79 steps, rtk 0.51.0 and codex-cli 0.159.3): #713's `hcom-deny.rules` by its exact bytes lets the trust proceed,
 and the same bytes with one added comment line, a configured rtk transparent prefix, a user TOML filter beside the reviewed file, a trusted project filter
 (the real rtk then rewrites `hcom kill luna` from that project's directory) or `RTK_TRUST_PROJECT_FILTERS` with a CI variable are refused; the allow-only files
-of Codex and hcom let it proceed and an allow rule that names `rtk` (the real evaluator allows `rtk git push origin main` under it and not `git push origin main`) is
-refused; a `git push` forbid rule (with or without its twin), `git -C .`, broad `uv` and `npx` rules, a
+of Codex and hcom let it proceed and an allow rule that holds `rtk` (the real evaluator allows `rtk git push origin main` under `["rtk"]` and not `git push origin main`; and, 705g, allows the
+rewritten shell-script token `FOO=1 rtk git push origin main` and not the original) is refused; a `git push` forbid rule (with or without its twin), `git -C .`, broad `uv` and `npx` rules, a
 `host_executable(name = prefix_rule(...) or "git", ...)` file that the real codex evaluator accepts and that forbids `git push origin main`, a raw CR in a token,
 a `bash -lc` script rule, `phpunit.exe`, `g++` plus a combining mark and an unreadable rules directory are refused; a rule added after the grant makes `--check`
 exit 6. The decision record's 2026-10-05 addenda on #705 carry the sources, the alternatives, the correction that approvals off do not switch execution rules

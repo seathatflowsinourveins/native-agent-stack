@@ -12,7 +12,7 @@ not run), and the execution-rule review of the trust tool in more scratch homes,
 accepted by its sha256 on tools/adoption/exec_rules_reviewed.json (and the conditions of its rtk) or when it is Codex's own allow-only format byte for byte.
 Scenarios: #713's hcom-deny.rules by its exact bytes (the trust proceeds; a `git push` rule added after the grant makes `--check` exit 6 and the trust
 refuse) and the same bytes plus one comment line (refused); the allow-only files Codex and hcom write (the trust proceeds); a configured rtk
-transparent prefix, a trusted project filter and the CI override variable (each of which makes the real rtk rewrite `hcom kill luna`), an allow rule that names rtk (the evaluator allows `rtk git push origin main` under it and gives no decision for `git push origin main`) and a user TOML filter (705f's `^reviewalpha\\b|^hcom\\b`), each of which ends the review of the reviewed file (refused); a `git push` forbid rule (refused before anything is
+transparent prefix, a trusted project filter and the CI override variable (each of which makes the real rtk rewrite `hcom kill luna`), an allow rule that names rtk (the evaluator allows `rtk git push origin main` under it and gives no decision for `git push origin main`; 705g P1-1: the same for the shell-script token `FOO=1 rtk git push origin main`, which the real hook produces from `FOO=1 git push origin main`) and a user TOML filter (705f's `^reviewalpha\\b|^hcom\\b`), each of which ends the review of the reviewed file (refused); a `git push` forbid rule (refused before anything is
 written; --allow-exec-rules accepts it, after which `--check` exits 6) and the same rule with its `rtk git push` twin (still refused); the counterexamples of the
 three GPT reads (705e: `git -C .` is not rewritten by rtk but `git -C . push origin main` is, and the native evaluator forbids the original and not the
 rewrite, broad `uv` and `npx` rules, a `host_executable(name = prefix_rule(...) or "git", ...)` file that the real codex evaluator accepts and that registers a
@@ -66,7 +66,12 @@ def hcom_own_rules(prefix: tuple[str, ...]) -> bytes:
 HCOM_OWN = hcom_own_rules(("hcom",))
 # An allow rule that names rtk: with the hook active it matches the rewritten command and not the original (the evaluator's own answer is recorded below)
 ALLOW_RTK = b'prefix_rule(pattern=["rtk"], decision="allow")\n'
+# 705g P1-1: Codex cannot split an assignment-prefixed script and evaluates the whole shell argv, where the script is one token; the hook inserts rtk inside it
+ALLOW_RTK_SCRIPT = b'prefix_rule(pattern=["/bin/bash", "-lc", "FOO=1 rtk git push origin main"], decision="allow")\n'
 # 705f: a filter that rtk (after `rtk trust`) lets rewrite `hcom ...` although the first word of its pattern is `reviewalpha`
+# The upstream exclusion that would keep rtk off `hcom ...` and `uvx hcom ...` whatever filters are trusted (rtk applies exclude_commands before the TOML-filter rewrite,
+# src/discover/registry.rs L1743-L1763). Measured below for the plain spellings; the tool does not read it (alternative (j) of the decision record).
+HCOM_EXCLUSIONS = "[hooks]\nexclude_commands = [\n  '^hcom(\\s|$)',\n  '^uvx\\s+hcom(\\s|$)',\n]\n"
 USER_FILTER = 'schema_version = 1\n\n[filters.reviewalpha]\nmatch_command = "^reviewalpha\\\\b|^hcom\\\\b"\nstrip_lines_matching = ["^#"]\n'
 # 705f: rtk's Rust regex word boundary rewrites `g++` followed by a combining mark; Python's `\\w` does not include it
 UNICODE_GXX = 'prefix_rule(pattern = ["g++\u0301"], decision = "forbidden")\n'.encode("utf-8")
@@ -154,6 +159,7 @@ def main() -> int:
         rtk_hook_check: list[dict] = []
         nested_check: list[dict] = []
         allow_rtk_check: list[dict] = []
+        allow_rtk_script_check: list[dict] = []
         project_filter_check: list[dict] = []
         if busy:
             trust_cmd = trust_cmd + " --codex-process-name no-such-process-name"
@@ -194,7 +200,7 @@ def main() -> int:
                                "matched_prefixes": [m.get("prefixRuleMatch", {}).get("matchedPrefix") for m in verdict.get("matchedRules", [])]})
 
         for command in ("git -C .", "git -C . push origin main", "uv", "uv run harmless.py", "npx", "npx prisma migrate deploy", "uvx hcom kill luna",
-                        "phpunit.exe tests/", "g++\u0301 --version", "hcom kill luna"):
+                        "phpunit.exe tests/", "g++\u0301 --version", "FOO=1 git push origin main", "hcom kill luna"):
             done = subprocess.run(["rtk", "hook", "check", "--agent", "codex", command], env=env, capture_output=True, text=True, timeout=60, check=False,
                                   stdin=subprocess.DEVNULL)
             rtk_hook_check.append({"command": command, "exit": done.returncode, "rewritten_to": done.stdout.strip() or None})
@@ -213,6 +219,14 @@ def main() -> int:
                                   text=True, timeout=120, check=False, stdin=subprocess.DEVNULL)
             valid, verdict = evaluator_answer(done)
             allow_rtk_check.append({"command": command, "exit": done.returncode, "valid": valid, "decision": verdict.get("decision")})
+
+        allow_script_file = Path(scratch) / "allow-rtk-script.rules"
+        allow_script_file.write_bytes(ALLOW_RTK_SCRIPT)
+        for argv in (["/bin/bash", "-lc", "FOO=1 git push origin main"], ["/bin/bash", "-lc", "FOO=1 rtk git push origin main"]):
+            done = subprocess.run(["codex", "execpolicy", "check", "--rules", str(allow_script_file), "--", *argv], env=env, capture_output=True,
+                                  text=True, timeout=120, check=False, stdin=subprocess.DEVNULL)
+            valid, verdict = evaluator_answer(done)
+            allow_rtk_script_check.append({"argv": argv, "exit": done.returncode, "valid": valid, "decision": verdict.get("decision")})
 
         def home_with_hook(name: str, rules: dict[str, bytes]) -> dict:
             settings = make_home(name, rules)
@@ -267,6 +281,10 @@ def main() -> int:
         project_step(trusted_filter, project, "project filter trusted: hook check hcom kill luna", hook_check)
         project_step(trusted_filter, Path(trusted_filter["HOME"]), "rtk trust --list from another directory", ["rtk", "trust", "--list"])
         run("rules-hcom-trusted-filter (the reviewed file, a trusted project filter that makes rtk rewrite hcom): refused", trust_cmd, 2, trusted_filter)
+        (rtk_config_dir(trusted_filter) / "config.toml").write_text(HCOM_EXCLUSIONS, encoding="utf-8")
+        for command in ("hcom kill luna", "uvx hcom kill luna", "git status"):
+            project_step(trusted_filter, project, f"exclusions for hcom and uvx hcom in rtk's config, the project filter still trusted: hook check {command}",
+                         ["rtk", "hook", "check", "--agent", "codex", command])
 
         override = home_with_hook("rules-hcom-trust-override", {"hcom-deny.rules": HCOM_RULES})
         project_env = Path(override["HOME"]) / "project"
@@ -277,6 +295,9 @@ def main() -> int:
         project_step(override, project_env, "RTK_TRUST_PROJECT_FILTERS=1 and CI=1, no store entry: hook check hcom kill luna", hook_check, trust_override)
         project_step(override, project_env, "RTK_TRUST_PROJECT_FILTERS=1 and CI=1: rtk trust --list", ["rtk", "trust", "--list"], trust_override)
         run("rules-hcom-trust-override (the reviewed file, RTK_TRUST_PROJECT_FILTERS in the tool's environment): refused", trust_cmd, 2, {**override, **trust_override})
+        (rtk_config_dir(override) / "config.toml").write_text(HCOM_EXCLUSIONS, encoding="utf-8")
+        project_step(override, project_env, "exclusions for hcom and uvx hcom, RTK_TRUST_PROJECT_FILTERS=1 and CI=1: hook check hcom kill luna",
+                     ["rtk", "hook", "check", "--agent", "codex", "hcom kill luna"], trust_override)
 
         exposed = home_with_hook("rules-exposed", {"default.rules": GIT_PUSH})
         run("rules-exposed (a git push forbid rule, no rtk twin): the trust command is refused before anything is written", trust_cmd, 2, exposed)
@@ -306,6 +327,10 @@ def main() -> int:
         allow_rtk = home_with_hook("rules-allow-rtk", {"default.rules": ALLOW_RTK})
         run("rules-allow-rtk (an allow rule that names rtk: it matches the rewritten command and not the original, a widened approval): refused", trust_cmd, 2, allow_rtk)
 
+        allow_script = home_with_hook("rules-705g-allow-rtk-script", {"default.rules": ALLOW_RTK_SCRIPT})
+        run("rules-705g-allow-rtk-script (an allow rule for a shell script that holds rtk: the rewritten script matches it and the original does not): refused",
+            trust_cmd, 2, allow_script)
+
         unicode_gxx = home_with_hook("rules-705f-unicode", {"default.rules": UNICODE_GXX})
         run("rules-705f-unicode (`g++` plus a combining mark, which rtk's Rust regex rewrites): refused", trust_cmd, 2, unicode_gxx)
 
@@ -324,18 +349,19 @@ def main() -> int:
               "rtk": subprocess.run(["rtk", "--version"], capture_output=True, text=True, check=False).stdout.strip(),
               "codex": subprocess.run(["codex", "--version"], capture_output=True, text=True, check=False).stdout.strip(),
               "deviation": deviation, "steps": steps, "execpolicy_check": execpolicy,
-              "rtk_hook_check": rtk_hook_check, "nested_host_executable_check": nested_check, "allow_rtk_check": allow_rtk_check, "project_filter_check": project_filter_check,
+              "rtk_hook_check": rtk_hook_check, "nested_host_executable_check": nested_check, "allow_rtk_check": allow_rtk_check, "allow_rtk_script_check": allow_rtk_script_check, "project_filter_check": project_filter_check,
               "all_as_expected": all(step["exit"] == step["expected_exit"] for step in steps) and all(e["valid"] for e in execpolicy) and
               [e["decision"] for e in execpolicy] == ["forbidden", None, "prompt", None, None, None] and
               all(e["valid"] for e in nested_check) and [e["decision"] for e in nested_check] == ["forbidden", None] and
               all(e["valid"] for e in allow_rtk_check) and [e["decision"] for e in allow_rtk_check] == ["allow", None] and
+              all(e["valid"] for e in allow_rtk_script_check) and [e["decision"] for e in allow_rtk_script_check] == [None, "allow"] and
               [(e["exit"], e["stdout"][:1]) for e in project_filter_check] ==
-              [(1, []), (0, ["Risk summary:"]), (0, ["rtk hcom kill luna"]), (0, ["Trusted filters:"]), (1, []), (0, ["rtk hcom kill luna"]),
-               (0, ["No trusted filters."])] and
+              [(1, []), (0, ["Risk summary:"]), (0, ["rtk hcom kill luna"]), (0, ["Trusted filters:"]), (1, []), (1, []), (0, ["rtk git status"]),
+               (1, []), (0, ["rtk hcom kill luna"]), (0, ["No trusted filters."]), (1, [])] and
               [(e["command"], e["exit"], bool(e["rewritten_to"])) for e in rtk_hook_check] ==
               [("git -C .", 1, False), ("git -C . push origin main", 0, True), ("uv", 1, False), ("uv run harmless.py", 0, True), ("npx", 1, False),
                ("npx prisma migrate deploy", 0, True), ("uvx hcom kill luna", 1, False), ("phpunit.exe tests/", 0, True), ("g++\u0301 --version", 0, True),
-               ("hcom kill luna", 1, False)]}
+               ("FOO=1 git push origin main", 0, True), ("hcom kill luna", 1, False)]}
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
     print(f"wrote {target}: {len(steps)} steps, all as expected: {record['all_as_expected']}")
