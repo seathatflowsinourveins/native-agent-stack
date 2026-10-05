@@ -3,59 +3,60 @@
 # test runner: upstream's flags (tsx loader, setupPolyfill, isolateDataDir) with --test --test-force-exit --test-concurrency=4; the stream set is every tests/unit/*stream*, *sse* file, the Codex tool-handoff and empty-stream files, and every unit test file that mentions streamHandler (239 files)
 # script: scripts/drain-prototype.sh.txt. The block below is its progress log, byte for byte except that the home directory is written $HOME.
 
-21:39:00Z clone exit=0
-21:39:00Z fetch pr15167 exit=0
-21:39:04Z checkout tag exit=0
-21:40:04Z npm ci exit=0
-21:40:04Z apply affinity patch exit=0
-21:40:04Z apply pr15167 diff exit=0
-21:40:04Z commit composition exit=0
-21:40:04Z composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f equals the expected tree
-21:40:04Z stream-related test files: 239
-21:41:12Z A-baseline exit=1 tests=1746 pass=1745 fail=1
-21:41:14Z N-new-test-unpatched exit=1 tests=6 pass=3 fail=3
-21:41:14Z apply the first version's streamHandler.ts hunk exit=0
-21:41:15Z N2-new-test-first-version exit=1 tests=6 pass=4 fail=2
-21:41:15Z restore streamHandler.ts exit=0
-21:41:15Z apply patch under test exit=0
-21:41:15Z commit patch under test exit=0
-21:41:15Z patched tree=b7c6869001ce8bdd23e2e2352f48ce3058bc13d2 equals the expected tree
-21:41:17Z P-new-test-patched exit=0 tests=6 pass=6 fail=0
-21:42:19Z A2-stream-tests-patched exit=1 tests=1752 pass=1751 fail=1
-21:42:51Z B2-calllog-usage-chat-pipeline exit=0 tests=126 pass=126 fail=0
-21:42:51Z DONE; the scratch tree and the logs stay in $HOME/.cache/omniroute-drain-validate-qqe58g (remove it with rm -rf after reading)
+22:02:54Z clone exit=0
+22:02:54Z fetch pr15167 exit=0
+22:02:58Z checkout tag exit=0
+22:04:09Z npm ci exit=0
+22:04:09Z apply affinity patch exit=0
+22:04:09Z apply pr15167 diff exit=0
+22:04:09Z commit composition exit=0
+22:04:09Z composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f equals the expected tree
+22:04:10Z stream-related test files: 239
+22:05:21Z A-baseline exit=1 tests=1746 pass=1745 fail=1
+22:05:21Z copy the new test file exit=0
+22:05:23Z N-new-test-unpatched exit=1 tests=6 pass=3 fail=3
+22:05:23Z apply the first version's streamHandler.ts hunk exit=0
+22:05:24Z N2-new-test-first-version exit=1 tests=6 pass=4 fail=2
+22:05:24Z restore streamHandler.ts exit=0
+22:05:24Z apply patch under test exit=0
+22:05:24Z commit patch under test exit=0
+22:05:24Z patched tree=b7c6869001ce8bdd23e2e2352f48ce3058bc13d2 equals the expected tree
+22:05:26Z P-new-test-patched exit=0 tests=6 pass=6 fail=0
+22:06:30Z A2-stream-tests-patched exit=1 tests=1752 pass=1751 fail=1
+22:07:02Z B2-calllog-usage-chat-pipeline exit=0 tests=126 pass=126 fail=0
+22:07:02Z DONE; the scratch tree and the logs stay in $HOME/.cache/omniroute-drain-validate-89TzHw (remove it with rm -rf after reading)
 
 ## A: baseline, the 239 stream-related test files on the unpatched composition
 1 of 1,746 fails, and it fails identically after the patch (A2 below); it does not concern streams:
-✖ repository provider asset manifest covers the audited 141-file snapshot (98.939283ms)
+✖ repository provider asset manifest covers the audited 141-file snapshot (103.006594ms)
 
 ## N: the new test file (6 tests) on the unpatched composition (negative control: 3 fail)
-✖ a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run (95.07254ms)
-✔ with the disconnect grace period disabled the old behaviour stays: the upstream is cancelled and onComplete does not run (32.271352ms)
-✖ the drain is bounded: an upstream that never ends is cancelled when the grace period expires, and the pending request is cleared (123.909947ms)
-✔ a disconnect before the terminal event is unchanged: the upstream is cancelled right away (28.341732ms)
-✔ a completed tool handoff whose terminal event was already delivered is drained too: completion and usage bookkeeping run (73.982328ms)
-✖ a completed tool handoff whose terminal event was already delivered has a bounded drain, and the pending request is cleared (123.824765ms)
+✖ a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run (96.767424ms)
+✔ with the disconnect grace period disabled the old behaviour stays: the upstream is cancelled and onComplete does not run (43.43667ms)
+✖ the drain is bounded: an upstream that never ends is cancelled when the grace period expires, and the pending request is cleared (123.577876ms)
+✔ a disconnect before the terminal event is unchanged: the upstream is cancelled right away (26.766993ms)
+✔ a completed tool handoff whose terminal event was already delivered is drained too: completion and usage bookkeeping run (74.53763ms)
+✖ a completed tool handoff whose terminal event was already delivered has a bounded drain, and the pending request is cleared (124.266384ms)
 assertion messages of the failures: flush() never runs, so the drain must clear the pending request | the completed response must be drained, not aborted | the grace period must end the drain
 
 ## N2: the new test file with only the streamHandler.ts hunk of the first version of the patch (negative control for the two defects the cross-family read found: 2 fail)
-✔ a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run (92.063697ms)
-✔ with the disconnect grace period disabled the old behaviour stays: the upstream is cancelled and onComplete does not run (32.961013ms)
-✖ the drain is bounded: an upstream that never ends is cancelled when the grace period expires, and the pending request is cleared (124.756021ms)
-✔ a disconnect before the terminal event is unchanged: the upstream is cancelled right away (27.878953ms)
-✔ a completed tool handoff whose terminal event was already delivered is drained too: completion and usage bookkeeping run (74.063151ms)
-✖ a completed tool handoff whose terminal event was already delivered has a bounded drain, and the pending request is cleared (123.127994ms)
+✔ a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run (93.180924ms)
+✔ with the disconnect grace period disabled the old behaviour stays: the upstream is cancelled and onComplete does not run (32.047569ms)
+✖ the drain is bounded: an upstream that never ends is cancelled when the grace period expires, and the pending request is cleared (124.154765ms)
+✔ a disconnect before the terminal event is unchanged: the upstream is cancelled right away (26.613879ms)
+✔ a completed tool handoff whose terminal event was already delivered is drained too: completion and usage bookkeeping run (73.754793ms)
+✖ a completed tool handoff whose terminal event was already delivered has a bounded drain, and the pending request is cleared (123.045657ms)
 assertion messages of the failures: flush() never runs, so the drain must clear the pending request | the grace period must end the drain
 
 ## P: the new test file on the patched tree (6 of 6 pass)
-✔ a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run (92.888799ms)
-✔ with the disconnect grace period disabled the old behaviour stays: the upstream is cancelled and onComplete does not run (32.344681ms)
-✔ the drain is bounded: an upstream that never ends is cancelled when the grace period expires, and the pending request is cleared (123.343781ms)
-✔ a disconnect before the terminal event is unchanged: the upstream is cancelled right away (28.988184ms)
-✔ a completed tool handoff whose terminal event was already delivered is drained too: completion and usage bookkeeping run (73.940267ms)
-✔ a completed tool handoff whose terminal event was already delivered has a bounded drain, and the pending request is cleared (122.374624ms)
+✔ a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run (93.807873ms)
+✔ with the disconnect grace period disabled the old behaviour stays: the upstream is cancelled and onComplete does not run (32.219335ms)
+✔ the drain is bounded: an upstream that never ends is cancelled when the grace period expires, and the pending request is cleared (123.45587ms)
+✔ a disconnect before the terminal event is unchanged: the upstream is cancelled right away (26.670343ms)
+✔ a completed tool handoff whose terminal event was already delivered is drained too: completion and usage bookkeeping run (73.552885ms)
+✔ a completed tool handoff whose terminal event was already delivered has a bounded drain, and the pending request is cleared (123.481441ms)
 
 ## A2: the same 239 files plus the new test file on the patched tree: the same single, unrelated failure
-✖ repository provider asset manifest covers the audited 141-file snapshot (93.479394ms)
+✖ repository provider asset manifest covers the audited 141-file snapshot (96.4234ms)
 
 ## B2: call-log, artifact-worker, usage-history and chat-pipeline integration tests on the patched tree: 126 of 126 pass (no failing line)
