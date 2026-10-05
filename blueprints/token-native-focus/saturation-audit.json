@@ -3661,11 +3661,11 @@
       },
       "artifact_baselines": [],
       "exact_causal_lifetime_provider_tokens_saved": null,
-      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation. Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.",
       "integration_mode": "Configured persistent native service; explicit task consumes the selected endpoint.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability.",
+        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability. Historical lifecycle observations remain bound to 13.2.2. Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
@@ -5593,7 +5593,7 @@
       "version": "0.162.0",
       "profile": "observability",
       "role": "Single native core/contrib Collector process; content filtering, metric conversion, upstream exporters and SDK file receiver",
-      "installation_assessment": "runtime present at retained native operation date",
+      "installation_assessment": "Historical 0.161.0 runtime was present at its retained native operation date. Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117).",
       "current_host_recertified_by_this_audit": false,
       "native_integration": {
         "recipe_source": "adoption/manifest.json#/recipe_map/opentelemetry-collector-contrib",
@@ -5680,19 +5680,19 @@
         "retained_operation_ids": [
           "fresh-otel-config-unit-env"
         ],
-        "scope": "Native collector validates existing configuration with its required nonsecret unit environment; no service reload."
+        "scope": "Historical 0.161.0 configuration validation uses its required nonsecret unit environment; no service reload. Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117)."
       },
       "artifact_baselines": [],
       "exact_causal_lifetime_provider_tokens_saved": null,
-      "next_action": "Reuse applicable dated acceptance; rerun only after changed inputs or a concrete failed operation.",
+      "next_action": "Retain selection; resolve the NativeStack2604 release hold and collect host acceptance for 0.162.0 before claiming deployment qualification.",
       "integration_mode": "Configured persistent native service; explicit task consumes the selected endpoint.",
       "lifecycle_evidence": {
         "assessment": "bounded_role_evidence",
-        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability. Historical lifecycle observations remain bound to 0.161.0. W1 0.162.0 qualification is limited to the new receipt; no host switch or full lifecycle recertification occurred.",
+        "scope": "Dated role evidence is separated into install, use, persistence, restart, cleanup and recovery below. An unestablished stage is not inferred from runtime availability. Historical lifecycle observations remain bound to 0.161.0. W1 0.162.0 qualification is limited to the new receipt; no host switch or full lifecycle recertification occurred. Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117).",
         "all_optional_features_exercised": false
       },
       "remaining_install_gap": null,
-      "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
+      "remaining_install_gap_reason": "The historical 0.161.0 role evidence does not establish the selected release on a host. Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117).",
       "source_pin": null,
       "lifecycle_stages": {
         "install": {

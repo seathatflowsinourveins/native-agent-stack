@@ -688,3 +688,11 @@ GPT-runtime executor/review records plus an Opus check the coordinator relayed f
 The earlier job-030 patch/report was inspected; its changed slots do not include these four, so no unrelated hunk was ported.
 Scoped ai-memory retrieval with pin priority and limit two was unavailable because the MCP call required approval under
 this job's never-approval policy. Context Mode tools were not exposed in this session's enabled tool list; bounded native reads and RTK handled output.
+
+## Currency qualification source scope (2026-10-05)
+
+Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117).
+
+Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.
+
+The W1b receipt was read from local Git commit `748f701e1`; it is not a tracked file at this PR head. Source and qualification records were read without network access; no historical commands were replayed.

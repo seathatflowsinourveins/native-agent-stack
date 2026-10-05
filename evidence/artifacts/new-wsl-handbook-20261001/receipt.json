@@ -4,10 +4,10 @@
   "source_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
   "evidence_class": "local_integration",
   "generator_sha256": "8a66e5eebe1429924d62545e2eee389f1fdd58e6c2f679d8280cec3e99027cf8",
-  "profile_sha256": "1e191e6cf9f96399bde37894f287fb296ebd08d1d6291914ca9362d7ffc207e9",
+  "profile_sha256": "9abbb77704c9208d049518368f97786d1ef09060d420c5aebf183ee4575e7632",
   "outputs": {
-    "docs/new-wsl-handbook.md": "216c20f07d8283ccbfc47bfe2219a102b53a32caea744d83834ee4f8d0b589a2",
-    "docs/new-wsl-handbook.json": "de1f2ab30c51683e4b693244d636350e5cbece234e0c3452ecd2f9ca88bebb62"
+    "docs/new-wsl-handbook.md": "a1ff3d1711b9877896757c12fdbf93690539df42de1e8126ccca670eb05c3d41",
+    "docs/new-wsl-handbook.json": "e3ee015895db12c686808dede9de52de5c8b77e21d1387d0120c6af0688cb91f"
   },
   "inventory": {
     "layers": 37,
@@ -77,6 +77,18 @@
       "returned_outputs": {
         "docs/new-wsl-handbook.json": "de1f2ab30c51683e4b693244d636350e5cbece234e0c3452ecd2f9ca88bebb62",
         "docs/new-wsl-handbook.md": "216c20f07d8283ccbfc47bfe2219a102b53a32caea744d83834ee4f8d0b589a2"
+      }
+    },
+    {
+      "date_utc": "2026-10-05",
+      "recorded_at_utc": "2026-10-05T05:54:24Z",
+      "scope": "PR #642 fix round 2: local generated-byte verification after projecting the selected Collector/Grafana scratch/synthetic qualification limits and NativeStack2604 release holds. No host or upstream acceptance is claimed.",
+      "command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "native_exit_code": 0,
+      "returned_status": "passed",
+      "returned_outputs": {
+        "docs/new-wsl-handbook.json": "e3ee015895db12c686808dede9de52de5c8b77e21d1387d0120c6af0688cb91f",
+        "docs/new-wsl-handbook.md": "a1ff3d1711b9877896757c12fdbf93690539df42de1e8126ccca670eb05c3d41"
       }
     }
   ],
@@ -154,7 +166,9 @@
     "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
     "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
     "adoption/new-wsl-profile.json",
-    "docs/decisions/2026-10-01-new-wsl-handbook-generator.md"
+    "docs/decisions/2026-10-01-new-wsl-handbook-generator.md",
+    "docs/decisions/2026-10-03-currency-wave-w1.md",
+    "docs/decisions/2026-10-04-2604-e2e-fix-wave.md"
   ],
-  "repair_round": "this PR: bounded job 058, 2026-10-04; hashes regenerated in place, destination acceptance remains owed"
+  "repair_round": "this PR: bounded job 058, 2026-10-04; hashes regenerated in place, destination acceptance remains owed; PR #642 fix round 2, 2026-10-05: regenerated qualification limits and release holds, hashes refreshed, destination acceptance pending"
 }

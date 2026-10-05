@@ -6790,7 +6790,7 @@
         "statistics": [],
         "command_kind": "Read-only upstream validation, health and query commands from the retained exact-session evidence. No installer or service mutation is run by this row."
       },
-      "returned_result_summary": "2026-09-20 14:17 UTC: Collector health returned HTTP 200 and status 'Server available'; the native user service was active in the follow-up. Existing configuration routes native client telemetry to local backends. Health and configured routing alone do not prove exact task attribution. Later foundation evidence: native Codex returned 219,725 total tokens, matched by 9 Loki responses and Prometheus. The original seven-tool Claude returned 254,111, matched by 6 Loki responses, while Prometheus lacks 77,317; strict final JSON failed although required content passed. A separate Claude run waited for writer readiness and returned 35,537, with all four usage categories matched in Loki/Prometheus, zero tools and zero agents. These are separate native processes, not this Desktop task or measured savings.",
+      "returned_result_summary": "2026-09-20 14:17 UTC: Collector health returned HTTP 200 and status 'Server available'; the native user service was active in the follow-up. Existing configuration routes native client telemetry to local backends. Health and configured routing alone do not prove exact task attribution. Later foundation evidence: native Codex returned 219,725 total tokens, matched by 9 Loki responses and Prometheus. The original seven-tool Claude returned 254,111, matched by 6 Loki responses, while Prometheus lacks 77,317; strict final JSON failed although required content passed. A separate Claude run waited for writer readiness and returned 35,537, with all four usage categories matched in Loki/Prometheus, zero tools and zero agents. These are separate native processes, not this Desktop task or measured savings. Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117).",
       "session_statistics": {
         "availability": "none",
         "value": null,
@@ -6809,7 +6809,7 @@
         "codex": "Foundation native run 15:46:10\u201315:46:43 UTC: seven requested MCP calls and exact source passed; returned 219,725 usage matches9 Loki responses and Prometheus. Separate from retained Desktop evidence; no resume or causal savings claim.",
         "claude": "Foundation seven-tool run 15:49:15\u201315:49:29 UTC: required source/content passed but strict final JSON failed; 254,111 returned tokens match6 Loki responses while Prometheus misses 77,317. Separate readiness run 16:01:38 UTC: 35,537 matches native/Loki/Prometheus in all four categories, with 0 tools / 0 agents. Original gap remains; no live Desktop acceptance."
       },
-      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration. Foundation observation reused the configured route without reinstall, restart or collector configuration change; the separate readiness run explicitly waited for its new writer before sending a user request.",
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration. Foundation observation reused the configured route without reinstall, restart or collector configuration change; the separate readiness run explicitly waited for its new writer before sending a user request. Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117).",
       "source_paths": [
         "evidence/receipts/current-session-observation-20260920.json",
         "docs/current-session-observation.md",
@@ -6817,7 +6817,9 @@
         "observability/backends/README.md",
         "adoption/lifecycle.md",
         "blueprints/token-native-focus/saturation-audit.json",
-        "evidence/receipts/foundation-native-20260920.json"
+        "evidence/receipts/foundation-native-20260920.json",
+        "docs/decisions/2026-10-03-currency-wave-w1.md",
+        "evidence/receipts/otelcol-contrib-0162-qualification-20261003.json"
       ],
       "retained_observations": [
         {
@@ -7228,7 +7230,7 @@
         "statistics": [],
         "command_kind": "Read-only upstream validation, health and query commands from the retained exact-session evidence. No installer or service mutation is run by this row."
       },
-      "returned_result_summary": "2026-09-20 14:17 UTC: /api/health returned HTTP 200 with database 'ok', version '13.2.2', and the retained commit identity. The native user service was active in the follow-up. This current health check does not constitute a new visual dashboard acceptance or a token-savings measurement.",
+      "returned_result_summary": "2026-09-20 14:17 UTC: /api/health returned HTTP 200 with database 'ok', version '13.2.2', and the retained commit identity. The native user service was active in the follow-up. This current health check does not constitute a new visual dashboard acceptance or a token-savings measurement. Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.",
       "session_statistics": {
         "availability": "none",
         "value": null,
@@ -7247,14 +7249,15 @@
         "codex": "The current receipt concerns the Desktop parent task; historical SDK/native CLI receipts retain their own labels and scope.",
         "claude": "A configured export route is distinct from an independently attributed native Claude task; current metrics omit session/account identifiers."
       },
-      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration.",
+      "lifecycle_summary": "install: observed_installed; use: accepted_within_scope; persistence: not_established; restart: not_established; cleanup: not_established; recovery: not_established. Existing services were observed, not reinstalled or restarted by the current read-only probes. Preserve retained data and approved native configuration. Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.",
       "source_paths": [
         "evidence/receipts/current-session-observation-20260920.json",
         "docs/current-session-observation.md",
         "observability/README.md",
         "observability/backends/README.md",
         "adoption/lifecycle.md",
-        "blueprints/token-native-focus/saturation-audit.json"
+        "blueprints/token-native-focus/saturation-audit.json",
+        "docs/decisions/2026-10-03-currency-wave-w1.md"
       ],
       "retained_observations": [
         {

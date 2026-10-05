@@ -5,6 +5,8 @@ Pinned distribution: `otelcol-contrib` **0.162.0**, Linux amd64, from the offici
 Archive SHA256: `fcc063749f730f8c21fe29f2d340ff174f5f1c5885bd3156fb6c985a3036fcc3`.
 The downloaded publisher `.sha256` file matched before extraction. The [2026-10-03 scratch qualification](../../evidence/receipts/otelcol-contrib-0162-qualification-20261003.json) ran `--version` and `validate`. The [R642 native checks](../../evidence/artifacts/currency-wave-w1-20261003/review-repair-checks.json) also exercise the current logs, metrics and SDK fixtures on 0.162.0 with zero native skips; earlier dated runtime observations retain their 0.161.0 scope. No host service was switched.
 
+Selected 0.162.0; qualified on scratch/synthetic validation only ([receipt:11-15](../../evidence/receipts/otelcol-contrib-0162-qualification-20261003.json#L11-L15)); host acceptance pending. The R642 log/metric/SDK fixtures are synthetic integration checks. NativeStack2604 retains a release hold for the failed release-tag build-and-test ([record](../../docs/decisions/2026-10-04-2604-e2e-fix-wave.md#L117)); scratch validation does not close that hold.
+
 These are upstream installation commands for a new explicit installation path.
 Do not overwrite an existing installation or customized configuration.
 
@@ -34,7 +36,7 @@ export ECOSYSTEM_OBSERVABILITY_DATA="$STACK_DATA_ROOT"
 For persistent hosting, install the [user-service example](ecosystem-otelcol.service.example)
 with explicit absolute paths substituted for `@COLLECTOR_INSTALL_DIR@`,
 `@CONFIG_ROOT@`, and `@DATA_ROOT@`, then use native `systemctl --user enable --now`.
-The active acceptance service uses this layout and `UMask=0077`.
+The historical 0.161.0 acceptance service used this layout and `UMask=0077`; the selected 0.162.0 host acceptance remains pending.
 
 Ports: OTLP HTTP14318, OTLP gRPC14317, readiness14333, native metrics18889,
 Collector self-metrics18888. Every listener is loopback. Logs go to native Loki

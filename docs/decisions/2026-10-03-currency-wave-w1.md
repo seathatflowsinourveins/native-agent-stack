@@ -4,8 +4,9 @@
 
 Amended 2026-10-04: after merging main 14048b84 this PR integrates seven W1 moves; claude-hud, RTK and mcporter follow main's #693; see [Merge with main 14048b84, 2026-10-04](#merge-with-main-14048b84-2026-10-04).
 
-Integrate eight qualified foundation release pins from the W1 build contract;
-hold mcporter at 0.14.1 after R642b review.
+Dated W1 decision (2026-10-03): integrate eight foundation release pins within
+their recorded qualification scopes; mcporter was held at 0.14.1 after R642b review.
+The amendments below record the current seven W1 moves and main's selections.
 This maintains the native tooling used to build complex projects and conduct the
 north-star US-equities research and historical simulation. It changes repository
 selections and supported installation recipes; host installation, service
@@ -30,7 +31,7 @@ identities; they do not expand the scope of the recorded functional evidence.
 | openresearch | 0.2.7 | [v0.2.15](https://github.com/alphaXiv/OpenResearch/releases/tag/v0.2.15), commit `ee36ef0333ca3c533eace915f1bec322a1efde1c` | [Archive integrity and isolated version](../../evidence/receipts/openresearch-0215-qualification-20261003.json) |
 | mcp-inspector | 2.8.0 | [2.9.0](https://github.com/modelcontextprotocol/inspector/releases/tag/2.9.0), commit `ae865a19178ddf6f375780a02e9c77c4cf4da184` | [Version, help and new functional stdio runs](../../evidence/receipts/mcp-inspector-290-qualification-20261003.json) |
 | claude-hud | 0.8.0 | [v0.10.0](https://github.com/jarrodwatts/claude-hud/releases/tag/v0.10.0), commit `75683c6de1ac07f6bbef00d739001679dba0740c` | [Manifest versions and two synthetic stdin renders](../../evidence/receipts/claude-hud-0100-qualification-20261003.json) |
-| opentelemetry-collector-contrib | 0.161.0 | [v0.162.0](https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0), commit `ae8c507510f48f433ab47dd1c6b01a59d6c388b5`; [distribution release](https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.162.0) | [Archive, version and configuration validation](../../evidence/receipts/otelcol-contrib-0162-qualification-20261003.json) |
+| opentelemetry-collector-contrib | 0.161.0 | [v0.162.0](https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0), commit `ae8c507510f48f433ab47dd1c6b01a59d6c388b5`; [distribution release](https://github.com/open-telemetry/opentelemetry-collector-releases/releases/tag/v0.162.0) | [Archive, version and scratch configuration validation](../../evidence/receipts/otelcol-contrib-0162-qualification-20261003.json#L11-L15); selected; qualified on scratch/synthetic validation only; host acceptance pending; NativeStack2604 release hold below |
 | worktrunk | 0.79.0 | [v0.80.0](https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0), commit `b49ca7eea9b03145791a5b94eccaf9c59412ed37` | [Version and synthetic repository list](../../evidence/receipts/worktrunk-0800-qualification-20261003.json) |
 | syft | 1.52.0 | [v1.54.0](https://github.com/anchore/syft/releases/tag/v1.54.0), commit `cc326e45a6213360266dda4b30cc68095946d676` | [Version and recorded SDK inventory](../../evidence/receipts/syft-1540-qualification-20261003.json) |
 
@@ -121,9 +122,9 @@ observed fixture render.
 The user ended the seven-day cooldown for clean releases on 2026-10-03.
 This removes an age-only delay; it does not waive qualification, known
 regressions, functional gates or recipe compatibility. Alternatives were to
-retain the previous pins for the remaining cooldown, adopt eight qualified
-releases within their measured scopes while holding mcporter, or adopt all nine
-despite the mcporter dependency and daemon gaps. Adopt the eight qualified moves;
+retain the previous pins for the remaining cooldown, adopt eight
+releases within their measured qualification scopes while holding mcporter, or adopt all nine
+despite the mcporter dependency and daemon gaps. The October 3 decision adopted the eight moves within those scopes;
 retain each previous pin as the rollback reference.
 
 R642b holds mcporter at the accepted Linux 0.14.1 pin. Its
@@ -227,20 +228,21 @@ results from local structural checks.
 >   it carries Inspector 2.9.0, Worktrunk 0.80.0 and Collector 0.162.0, while
 >   playwright-cli 0.1.21 and Syft 1.52.0 remain older than the W1 selections.
 >   Its mcporter 0.14.1 agrees with R642b's hold. This file is outside the repair's edit scope.
+> - The trading owner must update the canonical
+>   `blueprints/us-equities/supply-chain/README.md` recipe for Syft 1.54.0,
+>   including its 1.52.0 archive/hash instructions, using the W1 receipt's
+>   publisher checksum URL and `54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860`.
+>   The trading owner also owns the Collector version comment in
+>   `observability/paper-trading-live/collector-paper-trading.yaml`.
+> - The coordinator supplies the required CI buckets, macOS result, hosted
+>   secret scans, PR labels/body and any required trading acknowledgement for
+>   the committed repair head. No commit or push is part of this repair;
+>   R642b authorizes correcting the PR's component count to eight.
 
 **Configuration-owner handoff after merges 2 and 3 (2026-10-05):**
 
-- Only the profile's playwright-cli 0.1.21 remains older than the stack's 0.1.22 selection. Syft 1.54.0 and mcporter 0.14.2 now match through main #684/#704. This PR sets the jcodemunch-mcp entry to 1.108.327. The other owner handoffs below retain their separate scopes.
-- The trading owner must update the canonical
-  `blueprints/us-equities/supply-chain/README.md` recipe for Syft 1.54.0,
-  including its 1.52.0 archive/hash instructions, using the W1 receipt's
-  publisher checksum URL and `54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860`.
-  The trading owner also owns the Collector version comment in
-  `observability/paper-trading-live/collector-paper-trading.yaml`.
-- The coordinator supplies the required CI buckets, macOS result, hosted
-  secret scans, PR labels/body and any required trading acknowledgement for
-  the committed repair head. No commit or push is part of this repair;
-  R642b authorizes correcting the PR's component count to eight.
+- Only the profile's playwright-cli 0.1.21 remains older than the stack's 0.1.22 selection. Syft 1.54.0 and mcporter 0.14.2 now match through main #684/#704. This PR sets the jcodemunch-mcp entry to 1.108.327.
+- The coordinator committed the October 5 repairs as `5dbc24c37` and pushed them with the hot-file pair `f37b1ac43`/`87184985a` to `origin/foundation/currency-w1-20261003`. The current PR integrates seven W1 moves; the original eight-move instruction belongs to the dated October 3 history above.
 
 ## Supplemental test environment correction
 
@@ -578,10 +580,12 @@ acknowledgement remain with that owner and the coordinator.
 This PR now edits these configuration-owner files, superseding the earlier
 scope statement retained above as dated history:
 
-- `adoption/new-wsl-profile.json`: the jcodemunch-mcp entry.
+- `adoption/new-wsl-profile.json`: the jcodemunch-mcp entry and the Collector/Grafana qualification limits recorded in fix round 2 below.
 - `evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json`: the wave3 code-index owner row; main's wave4 Promptfoo owner is preserved.
 - `evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json`: regenerated from the merged consensus.
 - `docs/decisions/2026-10-01-new-wsl-definitive-defaults.md`: the tables rendered from that manifest.
+- `docs/new-wsl-handbook.json` and `docs/new-wsl-handbook.md`: regenerated from the merged profile and definitive manifest.
+- `evidence/artifacts/new-wsl-handbook-20261001/receipt.json`: refreshed generator/profile/output hashes and retained validation[6]-[8]; fix round 2 records its new regeneration and check separately.
 - `evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json`, `owners.json`, `install.sh` and `accept.sh`: the code-index owner, install/list/version commands and source citations.
 - `evidence/artifacts/new-wsl-install-plan-20261002/README.md` and `SOURCES.md`: the current code-index pin, wave-3 refresh and verified source locations.
 
@@ -620,3 +624,42 @@ pins and source anchors, main's repair slots and Promptfoo owner, reconciled
 command counts, actual receipt dates and returned generator statuses. Rebuild
 the manifest, tables and handbook with their own generators, run the named
 local acceptance checks, and re-register changed files after all mutations.
+
+## Fix round 2: history, custody and release qualification (2026-10-05)
+
+The complete October 3 trading-owner and coordinator handoffs are retained
+inside the dated history block above. The October 5 handoff records seven W1
+moves and the coordinator's committed and pushed repair; it does not carry the
+older instruction to change the component count to eight. The configuration-owner
+file list includes the regenerated handbook pair and their receipt.
+
+Collector Contrib **0.162.0** remains selected; qualified on scratch/synthetic
+validation only ([receipt:11-15](../../evidence/receipts/otelcol-contrib-0162-qualification-20261003.json#L11-L15));
+host acceptance pending. The receipt covers Linux scratch-prefix version and
+configuration validation, with no live-traffic pipeline, running host service
+or service replacement, and no verified Sigstore bundle. The NativeStack2604
+release hold is the failed release-tag build-and-test, recorded in the
+[release-gate handoff](2026-10-04-2604-e2e-fix-wave.md#L117).
+
+Grafana **13.2.3** remains selected in the WSL profile/install plan; qualified
+on scratch/synthetic validation only ([W1b receipt:11-14](https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14));
+host acceptance pending. The namespace smoke does not establish browser
+rendering, real Prometheus/Loki data, production cardinality, Grafana-managed
+alerting, restart onto the real host database or unchanged upstream test
+acceptance. The NativeStack2604 release hold names regression reports
+`grafana/grafana#133835` and `#133856`, in the same
+[release-gate handoff](2026-10-04-2604-e2e-fix-wave.md#L117).
+
+At this head, `git ls-files` has no Grafana 13.2.3 qualification receipt:
+W1b retains it in local commit `748f701e1`, read here through `git show` without
+network access and cited at that immutable commit. `manifests/stack.json` and
+its freshness snapshot still select Grafana **13.2.2**; the WSL profile and plan
+select **13.2.3**. This repair changes qualification wording and preserves every
+pin. Neither scratch receipt closes the named release hold or pending host
+acceptance; the coordinator and release-gate owners retain that reconciliation.
+
+Current stack freshness, snapshot limits, profile blocking gaps, saturation
+and token evidence notes, foundation and observability guides, and install-plan
+notes carry these qualification scopes. Historical receipts and raw dated
+qualification/review outputs retain their original bytes. Selection and metadata
+enums remain unchanged; the scope is recorded in their supported prose fields.

@@ -7534,7 +7534,7 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "1e191e6cf9f96399bde37894f287fb296ebd08d1d6291914ca9362d7ffc207e9"
+      "sha256": "9abbb77704c9208d049518368f97786d1ef09060d420c5aebf183ee4575e7632"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
@@ -9465,7 +9465,7 @@
       "acceptance": {
         "command": null,
         "evidence_class": "documented_upstream_example_not_executed",
-        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job.",
+        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job. Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117).",
         "source": "https://raw.githubusercontent.com/open-telemetry/opentelemetry-collector-contrib/v0.162.0/extension/healthcheckextension/README.md#L96"
       },
       "aliases": [
@@ -9473,6 +9473,7 @@
       ],
       "blocking_gaps": [
         "G4 revised installation and native runtime acceptance are UNRUN on the destination.",
+        "Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117).",
         "install: upstream-documented command and source pending in W-PROF",
         "acceptance: upstream test or documented example and source pending in W-PROF"
       ],
@@ -9494,7 +9495,9 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/ae8c507510f48f433ab47dd1c6b01a59d6c388b5/README.md",
-        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+        "evidence/receipts/otelcol-contrib-0162-qualification-20261003.json",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave.md"
       ],
       "install": {
         "command": null,
@@ -9643,7 +9646,7 @@
       "acceptance": {
         "command": null,
         "evidence_class": "documented_upstream_example_not_executed",
-        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job.",
+        "integration_note": "Executable commands remain in the slot-owned install plan instead of being duplicated into this source-review profile. The staged plan wraps documented native upstream operations with repository assertions; native runtime operations remain UNRUN in this builder job. Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.",
         "source": "https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/data_source.md#L657"
       },
       "aliases": [
@@ -9653,6 +9656,7 @@
         "G4 revised installation and native runtime acceptance are UNRUN on the destination.",
         "The canonical definitive selection remains split/measurement-only; explicit --only grafana is required pending coordinator reconciliation.",
         "After sign-in, the native client/SDK workload and nine affected dashboard queries must pass.",
+        "Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head.",
         "install: upstream-documented command and source pending in W-PROF",
         "acceptance: upstream test or documented example and source pending in W-PROF"
       ],
@@ -9674,7 +9678,9 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/observation-inference.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
         "https://github.com/grafana/grafana/blob/3db12332b66497c31f8ad2a5fb0eb0fe0ca05a7e/README.md",
-        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md",
+        "https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14",
+        "docs/decisions/2026-10-04-2604-e2e-fix-wave.md"
       ],
       "install": {
         "command": null,

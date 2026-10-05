@@ -1125,7 +1125,7 @@
         "https://github.com/open-telemetry/opentelemetry-collector-contrib",
         "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases/tag/v0.162.0"
       ],
-      "freshness": "2026-10-03 W1 scratch qualification: The recorded version command printed \"otelcol-contrib version 0.162.0\" (exit 0). The recorded validate command returned empty output with exit 0. Current upstream metadata is in catalogs/landscape/upstream-snapshot.json. This integration changes repository pins; it does not switch a host installation. Prior 0.161.0 receipts retain their original scope."
+      "freshness": "Selected 0.162.0; qualified on scratch/synthetic validation only (evidence/receipts/otelcol-contrib-0162-qualification-20261003.json:11-15); host acceptance pending. NativeStack2604 release hold: the release-tag build-and-test failed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The recorded scratch version and validate commands exited 0; no host service was switched. Prior 0.161.0 receipts retain their original scope. The dated upstream metadata is in catalogs/landscape/upstream-snapshot.json."
     },
     {
       "id": "prometheus",
@@ -1233,7 +1233,7 @@
       "upstream_sources": [
         "https://github.com/grafana/grafana"
       ],
-      "freshness": "Pinned official release verified on2026-09-19; not an automatic latest-update policy."
+      "freshness": "Pinned official release verified on2026-09-19; not an automatic latest-update policy. Selected 13.2.3 in the WSL profile/install plan; qualified on scratch/synthetic validation only (W1b receipt:11-14, https://github.com/seathatflowsinourveins/native-agent-stack/blob/748f701e1ac871dca378f9ef41bfd81e457cb3f7/evidence/receipts/grafana-1323-qualification-20261003.json#L11-L14); host acceptance pending. NativeStack2604 release hold: open regression reports grafana/grafana#133835 and #133856 (docs/decisions/2026-10-04-2604-e2e-fix-wave.md:117). The host stack remains 13.2.2 at this head."
     },
     {
       "id": "alertmanager",
