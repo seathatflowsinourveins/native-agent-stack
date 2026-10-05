@@ -243,7 +243,9 @@ environment, not in the environment Codex runs the hook in, and a filter trusted
 check cannot establish what a global hook does in every working directory; the review classifies the filter state it can see, so a trusted filter or the override
 needs `--allow-exec-rules`, and the exclusions of alternative (j) are the enforced hardening); the reviewed list covers rtk's default hook configuration of the one version it names; the review covers the user layer's rule files as bytes and does not
 say whether a restricting rule is good; no live Codex session was run with a forbidding rule and the hook active (untested boundary: the session behaviour is
-derived from the dispatch order above and the evaluator that `codex execpolicy check` runs); `--allow-exec-rules` is an explicit acceptance of an exposure.
+derived from the dispatch order above and the evaluator that `codex execpolicy check` runs); `--allow-exec-rules` is an explicit acceptance of an exposure; there is no atomic snapshot across listing, loading and the grant of the trust, and no enforcement after a later
+change of the rules, the filters, the HOME or XDG paths or the hook's environment (705h's boundary: another `--check` is needed after such a change); the probes ran codex-cli
+0.159.3 and rtk 0.51.0, and rust-v0.160.0 was read from source, with no fresh model session.
 What would overturn the design: a Codex that matches execution rules before the PreToolUse rewrite or against both forms, an rtk that reads Codex's rules or has a
 Codex-aware rewrite exclusion, or a maintained upstream gate that supplies the review (the live landscape is re-read at each pin move).
 
@@ -257,7 +259,11 @@ keeps the mechanical repairs (the listing, fail closed). 705g (Sol, through 5f, 
 global and built-in ones and which `rtk trust --yes` or `RTK_TRUST_PROJECT_FILTERS=1` with a CI variable activate, so that the reviewed hash still passed while the real
 hook rewrote `hcom kill luna` out of the forbid rule. The repair round refuses `rtk` anywhere in an allow rule and adds the trust list and the override variable to the
 entry's host conditions (the reviewer's second option: classify the project-filter exposure so that it needs `--allow-exec-rules`). Bounded review loop: one more read
-of this version, and the residuals above recorded. The exclusions default that job-071 recommended is alternative (a).
+of this version, and the residuals above recorded. 705h (Sol, through 5f, at 14a8b119f) accepted it: no P1 and no P2, both 705g P1s verified fixed against the real binaries (the
+whole-token mutant dies with 36 test failures; both project-filter activation routes give `--apply` exit 2 and `--check` exit 6, with the default and the XDG layouts; `rtk trust
+--list` detects the filter from any directory), no additional bypass in the pinned rewrite paths and inputs, and two boundaries not verified (the residuals above). The branch was then refreshed by hand onto main `cb339488e` (the head that landed is `118f579ff`): 28 of its 31 owned
+files are patch-id-equal (`git diff -U0`) to the accepted head, the other three are the regenerated new-WSL handbook outputs and their receipt, and 5f re-queued it after its own
+micro-read of that regeneration. The exclusions default that job-071 recommended is alternative (a).
 
 **Alternatives.** (a) *Limit the hook to a read-only rewrite set with `exclude_commands`* (job-071 recommended exclusions for state-changing families as a
 default beside the guard): rtk's option is exclusion-only (`src/core/config.rs` L119-L123; `src/discover/registry.rs` L1548-L1582: a pattern starting with `^` is
