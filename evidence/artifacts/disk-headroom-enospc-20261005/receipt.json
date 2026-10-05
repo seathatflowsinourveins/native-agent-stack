@@ -489,5 +489,12 @@
       }
     ],
     "supersedes": "coordinator_acceptance (bound to 6d1a37b8d, before the description edits; GPT delta read 712d P2-1)"
-  }
+  },
+  "residuals": [
+    {
+      "at": "2026-10-05",
+      "item": "tests/test_wsl_retrieval.py restored to main: frozen evaluation input of blueprints/convergence-practice/wsl-retrieval/experiment.json; its six subtree copytree calls stay unguarded (subtree only; package-mode guard in tests/__init__.py)",
+      "source": "validate_convergence --all-recorded (run 37261666424: record.frozen_inputs.evaluation[2] SHA-256 mismatch)"
+    }
+  ]
 }

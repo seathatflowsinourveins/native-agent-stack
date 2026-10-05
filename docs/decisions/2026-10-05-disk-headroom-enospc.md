@@ -196,10 +196,18 @@ The shared [repository_copy.py](../../tests/repository_copy.py) therefore checks
 `shutil.copytree` runs. It rejects the source itself, descendants, `..` aliases and
 an external symlink into the source, with an instruction to use external scratch.
 Both full-checkout copies in [test_catalog_freshness_propose.py](../../tests/test_catalog_freshness_propose.py)
-now use it. The variant search also protected all six direct `ROOT` copies in
-[test_wsl_retrieval.py](../../tests/test_wsl_retrieval.py), whose root is the WSL
-retrieval fixture subtree. The tests inventory had no other full-checkout
-`copytree` calls. This keeps the native copying options for safe sibling copies.
+now use it. The tests inventory had no other full-checkout `copytree` calls. This
+keeps the native copying options for safe sibling copies.
+
+**Residual (2026-10-05):** the six direct `ROOT` copies in
+[test_wsl_retrieval.py](../../tests/test_wsl_retrieval.py) copy only the WSL retrieval
+fixture subtree, and stay unguarded. That file is a frozen evaluation input of the
+convergence record `blueprints/convergence-practice/wsl-retrieval/experiment.json`
+(`frozen_inputs.evaluation[2]`), and a frozen experiment input does not move for a
+guard; `validate_convergence --all-recorded` enforces this. These copies join the other
+subtree copies the independent delta read listed. They recurse only if TMPDIR sits
+inside that subtree during a `discover -s tests` run. Package-mode runs are caught
+by the guard in `tests/__init__.py`.
 
 The regression imports the real catalog test module as a top-level module,
 asserts `tests/__init__.py` never ran, and checks both real `setUpClass` copy sites
