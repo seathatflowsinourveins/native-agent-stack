@@ -10825,8 +10825,12 @@
         }
       ],
       "ibkr_blockers_correction": {
-        "affected_pointer": "/trading/4",
-        "correction": "The recorded claim that #4983 denies every rc5 stock order is superseded by the October 1 owner's verdict. #4983 reports v1.227.0; at rc5 the engine checks handles_order_venue and the IB client returns true. The blockers of record are #5007, #5057 and #5060 on recovery/reconciliation. The pinned rc5 IBKR path remains unqualified until native paper acceptance.",
+        "affected_pointers": [
+          "/trading/4/claude_summary",
+          "/trading/4/candidates/0/demonstrated_gap",
+          "/trading/4/gpt6_corrections/0/claim"
+        ],
+        "correction": "The September 26 in-record correction /trading/4/gpt6_corrections/0 and refuting vote /trading/4/candidates/0/adversarial_verification/votes/1 first refuted the claim that #4983 denies every rc5 stock order. #4983 reports v1.227.0; at rc5 the engine checks handles_order_venue and the IB client returns true. The October 1 owner's verdict adds blockers #5007, #5057 and #5060 on recovery/reconciliation. The pinned rc5 IBKR path remains unqualified until native paper acceptance.",
         "blockers": [5007, 5057, 5060],
         "issue_states_checked_at": "2026-10-01",
         "decision_record": "docs/decisions/2026-10-01-trading-layer-verdicts.md#decisions-on-the-synthesiss-risks",
@@ -10863,13 +10867,14 @@
           "disposition": "research_only",
           "review_level": "source_review",
           "evidence_level": "selected_primary_files",
-          "reason": "The adjudication rejects replacing the deterministic paper runner with an agent-facing order server. Separately scoped read-only data toolsets fit research agents. This release uses FastMCP/httpx, not alpaca-py.",
+          "reason": "The adjudication rejects replacing the deterministic paper runner with an agent-facing order server. Separately scoped read-only data toolsets fit research agents only after the credential-isolation condition below is qualified. This release uses FastMCP/httpx, not alpaca-py.",
           "toolset_scope": {
             "mechanism": "ALPACA_TOOLSETS",
             "research_configuration": "stock-data,options-data,corporate-actions,news,assets",
             "other_read_only_data_toolsets": ["crypto-data", "fixed-income-data"],
             "excluded_toolsets": ["account", "trading", "watchlists", "locates"],
-            "source_behavior": "server.py parses the nonempty allowlist, toolsets.py selects operation IDs, and order overrides register only when trading is active. Empty/unset enables all toolsets. account includes patchAccountConfig, so it is excluded from the read-only research scope."
+            "source_behavior": "server.py parses the nonempty allowlist, toolsets.py selects operation IDs, and order overrides register only when trading is active. Empty/unset enables all toolsets. account includes patchAccountConfig, so it is excluded from the read-only research scope. Five read-only documentation tools register unconditionally at server.py:212 and proxy to https://docs.alpaca.markets/mcp?project=us via readme_docs.py, independently of ALPACA_TOOLSETS.",
+            "qualification_condition": "Before research use, independently verify that broker keys reside only in a separately identified MCP host process and never in the research process or its environment. ALPACA_TOOLSETS limits exposed tools, not the key's broker authorization; the assets toolset sends the same credentials to the Trading API host. Alpaca's authentication documentation does not establish a data-only or read-only Trading API key for this pinned server, so this scope requires host credential isolation rather than assuming restricted key permissions."
           },
           "decision_records": [
             "ns2604-coop-reports/trading-upstream-first-audit-20261005.md#re-judge-alpacas-llm-native-surface-under-the-2026-10-05-quality-norm",
@@ -10881,10 +10886,12 @@
             "https://github.com/alpacahq/alpaca-mcp-server/releases/tag/v2.3.2",
             "https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/README.md#toolset-filtering",
             "https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/src/alpaca_mcp_server/toolsets.py",
-            "https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/src/alpaca_mcp_server/server.py#L128-L210",
-            "https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/pyproject.toml"
+            "https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/src/alpaca_mcp_server/server.py#L101-L214",
+            "https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/src/alpaca_mcp_server/readme_docs.py",
+            "https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/pyproject.toml",
+            "https://docs.alpaca.markets/docs/authentication"
           ],
-          "comparison_that_would_overturn": "Reopen research scope if pinned toolsets expose a mutating operation or fail the same research-data contract. Any future execution proposal must preserve the deterministic order-state boundary; the server's own paper tests do not qualify this lane.",
+          "comparison_that_would_overturn": "Reopen research scope if broker credentials reach the research process, MCP host credential isolation fails, pinned toolsets expose a mutating operation, or the same research-data contract fails. Any future execution proposal must preserve the deterministic order-state boundary; the server's own paper tests do not qualify this lane.",
           "runtime_acceptance": false
         },
         {
@@ -10897,10 +10904,9 @@
           "disposition": "research_only",
           "review_level": "source_review",
           "evidence_level": "selected_primary_files",
-          "reason": "Read-only market-data guidance and historical-research guidance may inform research agents. Paper-order, broker-order, funding and account-mutating skills are outside this scope. The backtest skill's custom simulator and optional paper adapter are not adopted: the selected upstream engine and deterministic writer retain those responsibilities.",
+          "reason": "research_only means documentary reference only, not installation or activation. The adoption/skills/manifest.json exclusion stands, including broker-api market-data and backtest; its overturn condition has not been met. Their market-data and historical-research guidance may inform reviewed research. Paper-order, broker-order, funding and account-mutating skills remain outside scope. The backtest skill's custom simulator and optional paper adapter are not adopted: the selected upstream engine and deterministic writer retain those responsibilities.",
           "decision_records": [
             "ns2604-coop-reports/trading-upstream-first-audit-20261005.md#re-judge-alpacas-llm-native-surface-under-the-2026-10-05-quality-norm",
-            "bounded-jobs-20261004/job-073-rebuild-inventory/adjudication-claude-opus-20261005.md#rejects",
             "adoption/skills/manifest.json#/excluded",
             "blueprints/us-equities/north-star.md#research-harness-contract"
           ],
@@ -10943,8 +10949,10 @@
       ],
       "alpaca_scope_correction": {
         "target": "catalogs/us-equities/runtime-target.json#/broker_boundaries/1/selected_path",
-        "basis": "The adjudication's Trading findings retain alpaca-py for the deterministic paper lifecycle. paper_runner.py:219-307 uses TradingClient(paper=True) to submit, look up and cancel orders; adaptive-paper/transport.py uses TradingClient for requests/reconciliation and TradingStream for trade updates. Market-data reads are a separate bounded scope.",
+        "basis": "Clarification of both existing roles: alpaca-py provides bounded market-data ingestion through StockHistoricalDataClient, CorporateActionsClient and NewsClient, as well as the deterministic paper lifecycle retained by the adjudication. paper_runner.py:219-307 uses TradingClient(paper=True) for order operations and StockHistoricalDataClient for latest quotes; adaptive-paper/transport.py uses TradingClient for requests/reconciliation, TradingStream for trade updates and StockDataStream for quote reads. The earlier wording clarification omitted the ingestion role; local_data_acceptance continues to bound the recorded data acceptance.",
         "sources": [
+          "blueprints/us-equities/alpaca-historical/collect.py",
+          "blueprints/us-equities/adaptive-paper/market_research.py",
           "blueprints/us-equities/alpaca-paper/paper_runner.py",
           "blueprints/us-equities/adaptive-paper/transport.py",
           "docs/decisions/2026-10-01-trading-layer-verdicts.md#rows",
@@ -10953,7 +10961,7 @@
       },
       "completeness_critic": {
         "reviewed": "Vendor SDK publication, MCP toolset source and order-override registration, CLI release/source and retained refutation, and individually selected skill files.",
-        "findings": "account is not a read-only MCP toolset because it includes a config writer. The backtest skill proposes custom simulation and an optional paper adapter, which are not accepted under never-rebuild. An unversioned skill pack needs an exact commit. No documentary disposition establishes installation, broker access or new paper acceptance.",
+        "findings": "account is not a read-only MCP toolset because it includes a config writer. Tool filtering does not restrict broker-key authorization, so research use requires separately qualified host credential isolation; five docs tools and their docs.alpaca.markets/mcp egress remain always on. The backtest skill proposes custom simulation and an optional paper adapter, which are not accepted under never-rebuild; the skill-pack exclusion stands and research_only is documentary reference only. An unversioned skill pack needs an exact commit. No documentary disposition establishes installation, broker access or new paper acceptance.",
         "next_sweep": "For each future research-skill lifecycle adoption, verify its exact files, dependencies and mutating surfaces against the deterministic order-state boundary; reconsider CLI only when the retained comparison gains new evidence."
       }
     }

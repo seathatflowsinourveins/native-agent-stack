@@ -10308,8 +10308,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "a0229ad6acc3b1d81857d606bbac02db43a25a8f774540fe826a5f132a2380f7",
-      "bytes": 484781
+      "sha256": "469a3121f6b68cfcadad8d130f01c62412b09a8cd7e4f0509f83f0e089b5242c",
+      "bytes": 484819
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -15693,8 +15693,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "107c6176702bdc95c586762cf9521c1d91b79bbd4ce6ad9e92c3c08afe063f84",
-      "bytes": 255589
+      "sha256": "5db67d6ba8c7e0f14863661e25db8f8eebd8a2dbe32f6f62b173bc5fecff3a7c",
+      "bytes": 255625
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -15823,8 +15823,8 @@
     },
     {
       "path": "catalogs/us-equities/convergence-20260926.json",
-      "sha256": "d313bbc81c39b7b9ed020f60435e8ecee291deee991bc3ad6d7c243308423de1",
-      "bytes": 896235
+      "sha256": "acd7e784328701ef9b7123cc0f4f243437e3a353236f80e61ded6205faa65b40",
+      "bytes": 898431
     },
     {
       "path": "catalogs/us-equities/convergence-20260926.md",
@@ -16023,8 +16023,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "0e1c46f3f3788f4de7d0ba12ba7ef86f0219dcd7e8b2501b59d88af2757c477b",
-      "bytes": 22673
+      "sha256": "9e9491592ca1ef4a1a1ba152b45c3b0a38afa4fa18f869eca9d92d30fc88d680",
+      "bytes": 22812
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -53973,8 +53973,8 @@
     },
     {
       "path": "tests/test_stack_lifecycle.py",
-      "sha256": "82d85e465b877e04f3eb746aa2c71ae398f2e9659c2fb2a2f1d07e6f49494e43",
-      "bytes": 6421
+      "sha256": "4a72cab5b32f906813adb28e9ec340519432a929daafcdd9526cc075f66d9285",
+      "bytes": 7192
     },
     {
       "path": "tests/test_supply_chain_scan.py",
