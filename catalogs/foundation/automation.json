@@ -456,5 +456,33 @@
       "the 2026-09-23 ruleset snapshot in docs/github-automation.md"
     ],
     "decision_record": "docs/decisions/2026-10-02-github-automation-practice.md"
+  },
+  "current_practice_20261005": {
+    "observed_at": "2026-10-05",
+    "source": "Read-only gh api GET of ruleset 23739774; required contexts, strict policy and merge methods match .github/main-ruleset.json",
+    "required_checks": [
+      "validate",
+      "token-report",
+      "secret-scan",
+      "dependency-review",
+      "osv-scanner",
+      "verdict-review-gate",
+      "sota-sources"
+    ],
+    "strict_required_status_checks": false,
+    "allowed_merge_methods": [
+      "squash"
+    ],
+    "macos_ci": "Advisory only; validate-macos, bootstrap-macos and bootstrap-macos-brew skip every pull_request",
+    "macos_events": [
+      "push to main matching adoption-bootstrap.yml paths",
+      "nightly schedule at 06:47 UTC",
+      "workflow_dispatch"
+    ],
+    "merge_guard": "docs/lanes.md#labels-and-prs",
+    "supersedes": [
+      "current_practice_20261002.required_checks (8 contexts, including validate-macos)"
+    ],
+    "decision_record": "docs/decisions/2026-10-05-macos-ci-advisory.md"
   }
 }

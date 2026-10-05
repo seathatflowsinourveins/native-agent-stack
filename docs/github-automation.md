@@ -17,15 +17,19 @@ The [PR #26 qualification record](https://github.com/seathatflowsinourveins/nati
 links the final hosted revision, integration and publication outcomes; local
 implementation records below remain dated observations.
 
-## Current practice (2026-10-02)
+## Current practice (2026-10-05)
 
 This section is the current practice. The dated sections below are history; where they differ, this section and the
-live settings win. Live state read with `gh api` GETs on 2026-10-02: ruleset 23739774 (updated
-2026-09-27T17:00:13-04:00) matches [`.github/main-ruleset.json`](../.github/main-ruleset.json).
+live settings win. The coordinator removed `validate-macos` from ruleset 23739774 on 2026-10-05;
+a read-only `gh api` GET confirmed the seven contexts below (updated 2026-10-05T01:42:03.690Z).
+The committed target [`.github/main-ruleset.json`](../.github/main-ruleset.json) carries the same contexts.
 
 - **Required checks** (job IDs from GitHub Actions, app ID 15368; strict up-to-date checks off): `validate`,
-  `token-report`, `secret-scan`, `dependency-review`, `osv-scanner`, `verdict-review-gate`, `validate-macos` and
+  `token-report`, `secret-scan`, `dependency-review`, `osv-scanner`, `verdict-review-gate` and
   `sota-sources`. Renaming one of these jobs, or giving it a job-level `name:`, orphans its required check.
+- **macOS is advisory.** `validate-macos`, `bootstrap-macos` and `bootstrap-macos-brew` skip every pull request.
+  Nightly runs at 06:47 UTC and main pushes selected by the workflow's paths filter retain portability coverage;
+  a failure is fixed in a follow-up PR ([decision](decisions/2026-10-05-macos-ci-advisory.md)).
 - **Merging.** Squash merges only; merge commits and rebase merges are off. The ruleset adds linear history, deletion
   and non-fast-forward rules, resolved review threads, no human approval count and a CodeQL code-scanning rule.
   Auto-merge is allowed by the repository settings but is not used for bot PRs: Dependabot PRs and the
@@ -73,7 +77,7 @@ not automatically run them; opening the PR supplies the review check.
 
 | Event | Ordinary validation and token-report checks | Native tool/engine checks | Recovery trials |
 | --- | --- | --- | --- |
-| Open or update a PR | Run; cancel an older run of the same workflow for that PR | Run only for existing matching paths; allow completion | No automatic run |
+| Open or update a PR | Run; cancel an older run of the same workflow for that PR | Run only for existing matching paths; macOS adoption jobs skip PRs | No automatic run |
 | Push to `main` | Run on the integrated revision | Run only for existing matching paths | No automatic run |
 | Manual dispatch | Run independently | Run independently | Run only the selected trial |
 
@@ -218,7 +222,7 @@ do not transfer a native client's credential store.
 
 ## Publication and practical acceptance
 
-**Superseded 2026-10-02** by "Current practice (2026-10-02)" above: the live ruleset now requires 8
+**Superseded 2026-10-05** by "Current practice (2026-10-05)" above: the live ruleset requires seven
 checks and allows squash merges only. This section is kept as history.
 
 As of a dated 2026-09-23 GET (see below), the active [main ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774)
@@ -236,7 +240,7 @@ Merge queues are not available for this personal repository (see "Automation
 closure, 2026-09-22"). A separate [tag ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23829417)
 (id 23829417, created 2026-09-22T11:08:53-04:00) is also active.
 
-The committed [main-ruleset.json](../.github/main-ruleset.json) is the reviewed
+The then-committed [main-ruleset.json](../.github/main-ruleset.json) was the reviewed
 *target*, not this applied state: it adds `dependency-review`, `osv-scanner`
 and (2026-09-25) `validate-macos` to the required checks, keeps the strict
 up-to-date policy off, and adds a CodeQL `code_scanning` rule and squash-only
@@ -338,40 +342,34 @@ maintainer), concurrency limits on stateful or manually dispatched workflows, an
 informational naming notes. Static checks execute no job; a pull request's own runs
 remain the execution evidence.
 
-## Scheduled report-only lanes, 2026-09-22
+## Scheduled portability and report-only lanes, 2026-10-05
 
 Three lanes run on a schedule and are not required checks: `catalog-freshness.yml`
 (Mondays 06:17 UTC, plus manual dispatch with a `max_repos` bound), the
 `sbom-vuln` job in `supply-chain.yml` (weekly, plus push/PR when its own paths
 change) and `adoption-bootstrap.yml`'s `bootstrap-linux`, `bootstrap-macos` and
-`bootstrap-macos-brew` jobs (weekly Monday 06:47 UTC, plus push when
-`adoption/**` or `blueprints/convergence-practice/wsl-native-tools/pins.json`
-change, or on a pull request that touches the same paths -- described in full
-further below). None of these appear in `main-ruleset.json`'s required status
-checks; a required check must report on every PR, and a scheduled lane or a
-workflow skipped by a `paths:` filter does not (GitHub leaves its check
-pending). Update 2026-09-22: `sbom-vuln` is no longer report-only; it
+`bootstrap-macos-brew` jobs (nightly 06:47 UTC, plus pushes to `main` matching
+the workflow's existing paths filter, and manual dispatch). `bootstrap-linux`
+also runs on pull requests whose diff matches that filter, through the `changes`
+job. None of these appear in `main-ruleset.json`'s required status checks.
+Update 2026-09-22: `sbom-vuln` is no longer report-only; it
 fails its own job on a High or Critical grype match (see "Secret and
 supply-chain scanning"), but it is still not a required check.
-`adoption-bootstrap.yml`'s fifth job, `validate-macos`, is the exception
-(2026-09-25, scoped 2026-10-03): its workflow's `pull_request` trigger carries
-no `paths:` filter, so `validate-macos` reports on every pull request and is a
-required check (see "validate-macos required (2026-09-25)" in
-[docs/decisions/2026-09-22-github-automation-closure.md](decisions/2026-09-22-github-automation-closure.md)).
-Since 2026-10-03 it reports one of three results, as a `changes` job in the
-same workflow decides from the pull request's diff
-([docs/decisions/2026-10-03-macos-ci-scope.md](decisions/2026-10-03-macos-ci-scope.md)):
-a full run when the pull request changes a listed macOS-relevant path; a
-changed-tests run of only the top-level test modules it changed, which is a
-scoped result and not a macOS full-suite pass; or `skipped` when it changes
-neither. A job skipped by its own job-level `if:` reports `skipped`, which
-GitHub accepts for a required check; this repository records it as untested,
-not passed. Push, schedule and dispatch runs always run in full. The same
-`changes` job diffs the base and head with plain `git` (no third-party action)
-to keep the other three jobs path-gated on `pull_request` the same way GitHub's
-own `paths:` filter path-gates them on `push`, and `bootstrap-macos` and
-`bootstrap-macos-brew` run on a pull request only when `validate-macos` runs in
-full.
+`validate-macos`, `bootstrap-macos` and `bootstrap-macos-brew` are advisory
+since [the 2026-10-05 decision](decisions/2026-10-05-macos-ci-advisory.md).
+Their job-level `if:` excludes every `pull_request`, regardless of changed paths
+or a failed `changes` job. They run in full on matching main pushes, the nightly
+schedule and manual dispatch; `!cancelled()` keeps them reachable when their
+`changes` dependency is skipped. The workflow retains its unfiltered PR trigger
+and plain-git detector for Linux. The old macOS classifier remains for its
+historical measurements and controls and no longer enables a PR job.
+
+GitHub documents the job condition in [workflow syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idif).
+Its [schedule event](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)
+runs the latest default-branch commit and can be delayed or dropped under load;
+06:47 UTC avoids the start of the hour. The former weekly bootstrap schedule is
+daily, so Linux's pinned-download smoke runs nightly too. A failing nightly or
+main-push macOS run is fixed in a follow-up PR; no PR waits for macOS.
 
 `catalog-freshness.yml` reuses `tools/sota-convergence/extract_layers.py` and
 `github_freshness.py` unchanged, then rebuilds a manifest with
@@ -450,7 +448,7 @@ catalog is malformed, including a decision record that does not exist.
 ## Secret and supply-chain scanning, 2026-09-22
 
 For the current state, which adds the report-only betterleaks trial and GitHub push protection, see
-"Current practice (2026-10-02)" above.
+"Current practice (2026-10-05)" above.
 
 `validate.yml`'s `secret-scan` job runs gitleaks 8.30.1 (SHA-256 verified
 against `blueprints/convergence-practice/wsl-native-tools/pins.json`,
@@ -529,14 +527,15 @@ untracked files.
 predates several fields the target file has gained since. The current
 committed target is [`.github/main-ruleset.json`](../.github/main-ruleset.json)
 (required checks also add `dependency-review`, `osv-scanner`,
-`verdict-review-gate`, `validate-macos` and `sota-sources`, the last not yet
+`verdict-review-gate` and `sota-sources`, the last not yet
 live on 2026-09-25; `allowed_merge_methods:
 ["squash"]` only), compared field by field against the live ruleset in
 [`docs/decisions/2026-09-22-github-automation-closure.md`](decisions/2026-09-22-github-automation-closure.md),
 section 10 ("Rulesets"). This section is kept as history and is not
 corrected in place; the `gh api` commands below still apply (a `PUT` is
 idempotent), just against the current target file. **Update 2026-10-02:** `sota-sources` is live, and the live
-ruleset matches the target file (see "Current practice (2026-10-02)").
+ruleset matched the target file then. **Update 2026-10-05:** `validate-macos`
+is advisory and absent from the current target (see "Current practice (2026-10-05)").
 
 [`.github/main-ruleset.json`](../.github/main-ruleset.json) gained
 `deletion`, `non_fast_forward`, `required_linear_history`, a `pull_request`
