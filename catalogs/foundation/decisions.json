@@ -1,8 +1,334 @@
 {
   "schema_version": 1,
-  "checked_at": "2026-09-21",
+  "checked_at": "2026-10-04",
   "scope": "Capability-specific general FOUNDATION selection; original pins, full receipt claims and per-component lifecycle stages remain canonical. Shared research and financial examples are not blanket adoption.",
   "decisions": [
+    {
+      "id": "interactive-shell-login-shell-2604",
+      "capability": "Interactive shell slot: login shell (bash 5.3, Ubuntu image default)",
+      "capability_key": "interactive-shell-login-shell-2604",
+      "checked_at": "2026-10-04",
+      "layer_ids": [
+        "native-clients"
+      ],
+      "selection": "candidate",
+      "review_status": "source_review",
+      "activation": "Accepted research choice: retain Ubuntu 26.04's image-default bash 5.3 and the recipe's passwd shell, without chsh. This docs-only row installs nothing; candidate records pending adoption of this scoped capability. The interactive additions are a separate opt-in, person-run slot on NativeStack2604; StackMeasure2604 gets no block.",
+      "component_ids": [],
+      "candidate": {
+        "id": "ubuntu-2604-bash-login-shell-policy",
+        "repository": "https://git.launchpad.net/ubuntu/+source/bash"
+      },
+      "evidence_ids": [],
+      "evidence_scope": "Source-reviewed selection from unit B's accepted cross-family record, using Ubuntu's 26.04.1 image manifest and skel startup guard. Supports reproducible workstations for north-star R&D; this PR adds documentation only.",
+      "limitations": [
+        "The decision record's 26.04 host values come from coordination records owned by unit A's PR-0; this PR performs no host observation or installation.",
+        "Claude snapshot observations are from Ubuntu 24.04 with Claude Code 2.1.289, and no Codex startup path was executed by unit B."
+      ],
+      "source_paths": [
+        "docs/decisions/2026-10-04-interactive-shell-and-unix-tools.md",
+        "adoption/platforms/linux-wsl2-new-distro.md"
+      ],
+      "next_gap": "Retain bash unless a user-named need requires another shell and a NativeStack2604 zsh run with CLAUDE_CODE_SHELL=/bin/bash passes session-attributed snapshot, Codex alias and adoption_status.py login-shell/launcher-resolution checks, as specified in the decision record.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "No lifecycle stage is claimed for this new, source-reviewed slot decision; existing component acceptance is not imported.",
+        "unknown": "Implementation and Ubuntu 26.04 qualification remain with the subsequent unit B PRs; no install, use, persistence, restart, cleanup or recovery is established by this PR.",
+        "stage_refs": []
+      },
+      "supersedes": []
+    },
+    {
+      "id": "interactive-shell-framework-2604",
+      "capability": "Interactive shell slot: framework (none)",
+      "capability_key": "interactive-shell-framework-2604",
+      "checked_at": "2026-10-04",
+      "layer_ids": [
+        "native-clients"
+      ],
+      "selection": "candidate",
+      "review_status": "source_review",
+      "activation": "Accepted research choice: use no shell framework. The candidate is a pending scoped policy, not a framework to install. The optional interactive block is written only by the person's own named-slot run; this docs-only PR installs nothing.",
+      "component_ids": [],
+      "candidate": {
+        "id": "ubuntu-2604-no-shell-framework-policy",
+        "repository": "https://github.com/seathatflowsinourveins/native-agent-stack"
+      },
+      "evidence_ids": [],
+      "evidence_scope": "Unit B's accepted cross-family source review compares Oh My Zsh, Oh My Bash, Bash-it, ble.sh, Prezto, Sheldon and the zsh-only managers against the frozen maintenance and isolation criteria.",
+      "limitations": [
+        "Oh My Zsh's missing release/tag fails the frozen gate despite its recorded rolling maintenance activity; this is a limitation of the criteria, not evidence of inactivity.",
+        "The review does not establish native isolation for an alternative framework on Ubuntu 26.04."
+      ],
+      "source_paths": [
+        "docs/decisions/2026-10-04-interactive-shell-and-unix-tools.md",
+        "tools/adoption/managed_block.py"
+      ],
+      "next_gap": "Reopen only for a gate-passing framework serving a job no standalone tool covers and adding zero aliases or functions to the session-attributed Claude snapshot and to Codex commands.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "This is a source-reviewed policy decision with no new software component and no claimed lifecycle stage.",
+        "unknown": "The future interactive-block implementation and Ubuntu 26.04 isolation checks remain pending; this PR establishes no host lifecycle acceptance.",
+        "stage_refs": []
+      },
+      "supersedes": []
+    },
+    {
+      "id": "interactive-shell-prompt-2604",
+      "capability": "Interactive shell slot: prompt (Ubuntu skel PS1 plus git __git_ps1 in PS1 mode)",
+      "capability_key": "interactive-shell-prompt-2604",
+      "checked_at": "2026-10-04",
+      "layer_ids": [
+        "native-clients"
+      ],
+      "selection": "candidate",
+      "review_status": "source_review",
+      "activation": "Accepted research choice: keep Ubuntu's skel PS1 and add git's __git_ps1 helper with upstream defaults. The future opt-in, person-run interactive-shell slot sources /usr/lib/git-core/git-sh-prompt only if bash-completion has not already defined the helper. This PR installs nothing and edits no shell startup file.",
+      "component_ids": [],
+      "candidate": {
+        "id": "ubuntu-2604-git-prompt-integration",
+        "repository": "https://github.com/git/git"
+      },
+      "evidence_ids": [],
+      "evidence_scope": "Source-reviewed git/git v2.53.0 contrib/completion/git-prompt.sh PS1 and PROMPT_COMMAND modes, as reconciled in unit B's accepted decision; no prompt timing was executed by this PR.",
+      "limitations": [
+        "The 50 ms median threshold is an overturn condition, not a measured result.",
+        "Complete prompt performance with mise and zoxide hooks on the largest Ubuntu 26.04 worktree is pending."
+      ],
+      "source_paths": [
+        "docs/decisions/2026-10-04-interactive-shell-and-unix-tools.md",
+        "tools/adoption/managed_block.py"
+      ],
+      "next_gap": "Measure 30 warm complete prompts with mise and zoxide active. Above a 50 ms median, first try composed PROMPT_COMMAND mode with zoxide last; adopt Starship v1.26.0 only if that still exceeds 50 ms and Starship takes under half the time, or a user-named field is missing from git-prompt.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Pending prompt integration only; no existing git acceptance is promoted into acceptance of this slot.",
+        "unknown": "The opt-in block, prompt timings and Ubuntu 26.04 qualification belong to the subsequent unit B PRs; no lifecycle stage is claimed here.",
+        "stage_refs": []
+      },
+      "supersedes": []
+    },
+    {
+      "id": "interactive-shell-history-2604",
+      "capability": "Interactive shell slot: history (native bash history with fzf Ctrl-R)",
+      "capability_key": "interactive-shell-history-2604",
+      "checked_at": "2026-10-04",
+      "layer_ids": [
+        "native-clients"
+      ],
+      "selection": "candidate",
+      "review_status": "source_review",
+      "activation": "Accepted research choice: retain Ubuntu's native bash history defaults and search them with fzf's bash Ctrl-R integration. fzf 0.74.4 is a planned global mise pin in the opt-in, person-run interactive-shell slot on NativeStack2604 only; this PR installs nothing and writes no block.",
+      "component_ids": [],
+      "candidate": {
+        "id": "ubuntu-2604-native-history-fzf-integration",
+        "repository": "https://github.com/junegunn/fzf"
+      },
+      "evidence_ids": [],
+      "evidence_scope": "Unit B's accepted source review covers Ubuntu skel history defaults, junegunn/fzf v0.74.4 bash integration and Atuin v18.23.0's bash-preexec, AI, sync and update requirements.",
+      "limitations": [
+        "The future writer must check bash 4 or newer and the pinned fzf version before modifying the block; Readline binding acceptance is pending.",
+        "fzf also binds Ctrl-T and Alt-C; the record documents the upstream variables that disable them. Concurrent-shell history retention has not been qualified by this PR."
+      ],
+      "source_paths": [
+        "docs/decisions/2026-10-04-interactive-shell-and-unix-tools.md",
+        "tools/adoption/managed_block.py"
+      ],
+      "next_gap": "Qualify the Ctrl-R Readline binding in the later unit B host checks. A recorded concurrent-shell history loss or user-named need for command context reopens the choice for Atuin v18.23.0 with the record's explicit disabled AI/sync/update settings and bash-preexec 0.7.0.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "No install or history-integration lifecycle stage is claimed for this source-reviewed candidate.",
+        "unknown": "The named-slot installation, Readline behavior, persistence, restart, cleanup and recovery remain unqualified here.",
+        "stage_refs": []
+      },
+      "supersedes": []
+    },
+    {
+      "id": "interactive-shell-directory-jump-2604",
+      "capability": "Interactive shell slot: directory jump (zoxide 0.10.0)",
+      "capability_key": "interactive-shell-directory-jump-2604",
+      "checked_at": "2026-10-04",
+      "layer_ids": [
+        "native-clients"
+      ],
+      "selection": "candidate",
+      "review_status": "source_review",
+      "activation": "Accepted research choice: zoxide 0.10.0 provides z and zi without changing cd. The planned opt-in, person-run NativeStack2604 slot pins it through mise and places its bash initialization last in the managed block. StackMeasure2604 gets no block; this PR installs nothing.",
+      "component_ids": [],
+      "candidate": {
+        "id": "ubuntu-2604-zoxide-integration",
+        "repository": "https://github.com/ajeetdsouza/zoxide"
+      },
+      "evidence_ids": [],
+      "evidence_scope": "Unit B's accepted source review of ajeetdsouza/zoxide v0.10.0 documents initialization order, fzf >=0.51 for zi and GitHub's release-asset SHA-256 digest; it does not record an installation by this PR.",
+      "limitations": [
+        "Integrity relies on GitHub's platform digest plus HTTPS, not a publisher signature or checksum file.",
+        "zoxide's prompt-hook cost and Ubuntu 26.04 integration remain unmeasured here."
+      ],
+      "source_paths": [
+        "docs/decisions/2026-10-04-interactive-shell-and-unix-tools.md",
+        "tools/adoption/managed_block.py"
+      ],
+      "next_gap": "Verify the fetched release asset against GitHub's published digest in the future profile. If zoxide adds over 10 ms to the median prompt or leaves a maintenance gate, move to z.lua or none; if the digest disappears without a checksum file, record the computed hash as unverified until the next release.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "No lifecycle stage is claimed for the pending zoxide integration.",
+        "unknown": "Person-run installation, command behavior, prompt cost, persistence, restart, cleanup and recovery remain with later unit B qualification.",
+        "stage_refs": []
+      },
+      "supersedes": []
+    },
+    {
+      "id": "interactive-shell-env-loader-2604",
+      "capability": "Interactive shell slot: environment loader (existing mise v2026.10.0; mise exec -- for agents)",
+      "capability_key": "interactive-shell-env-loader-2604",
+      "checked_at": "2026-10-04",
+      "layer_ids": [
+        "native-clients",
+        "isolation"
+      ],
+      "selection": "candidate",
+      "review_status": "source_review",
+      "activation": "Accepted research choice: retain the existing mise owner at the install-plan pin v2026.10.0. Login-profile shims stay on PATH; interactive activation belongs to the opt-in, person-run block. Projects use mise.toml [env], and agent commands needing it use mise exec -- explicitly. This PR installs nothing, moves no pin and adds no CwdChanged hook.",
+      "component_ids": [],
+      "candidate": {
+        "id": "ubuntu-2604-mise-environment-integration",
+        "repository": "https://github.com/jdx/mise"
+      },
+      "evidence_ids": [],
+      "evidence_scope": "The accepted decision follows jdx/mise v2026.10.0 docs/dev-tools/shims.md and docs/direnv.md and main 3b8f9c8a's install-plan pin; the cited files are recorded as byte-identical at v2026.10.2. This row covers the proposed integration, not acceptance of an existing installation.",
+      "limitations": [
+        "Moving mise's pin requires a separate pin-move PR; this source-reviewed row carries no native environment-loading receipt.",
+        "Persistent per-directory session state and initial-environment handling are not qualified here; a CwdChanged hook remains requirement-gated."
+      ],
+      "source_paths": [
+        "docs/decisions/2026-10-04-interactive-shell-and-unix-tools.md",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+        "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml"
+      ],
+      "next_gap": "Use mise exec -- first. Reopen for direnv only when a project needs logic mise cannot express and direnv passes the gates; add a CwdChanged hook, including initial project environment, only when a recorded agent workflow needs persistent state that mise exec -- cannot serve.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Source-reviewed Ubuntu 26.04 integration only; no existing mise lifecycle acceptance is imported into this candidate.",
+        "unknown": "The interactive block and both clients' project-environment behavior remain with later unit B qualification; this PR claims no lifecycle stage.",
+        "stage_refs": []
+      },
+      "supersedes": []
+    },
+    {
+      "id": "interactive-shell-agent-tools-2604",
+      "capability": "Unix tools slot: agent-facing tools (no new install)",
+      "capability_key": "interactive-shell-agent-tools-2604",
+      "checked_at": "2026-10-04",
+      "layer_ids": [
+        "native-clients",
+        "code-navigation",
+        "token-efficiency"
+      ],
+      "selection": "candidate",
+      "review_status": "source_review",
+      "activation": "Accepted research choice: retain Claude's native bfs/ugrep and bundled rg route, Codex's rg/rg --files route, the plan's sandbox-runtime apt ripgrep requirement, jq's F4 owner and the existing RTK exclusions. This is a pending scoped tool policy, not a new install. The human interactive block is opt-in and person-run; this PR changes no host tools or hooks.",
+      "component_ids": [],
+      "candidate": {
+        "id": "ubuntu-2604-agent-unix-tool-policy",
+        "repository": "https://github.com/seathatflowsinourveins/native-agent-stack"
+      },
+      "evidence_ids": [],
+      "evidence_scope": "The accepted record reviews Claude Code v2.1.289 native-search documentation, Codex rust-v0.160.0 base instructions, RTK v0.51.0 rewrite rules and the stack's install-plan requirements. No new agent-tool execution is claimed.",
+      "limitations": [
+        "A prescribed ripgrep install is not an observed install; the subsequent unit B qualification must record the Ubuntu 26.04 state.",
+        "RTK filters over uutils 0.10.0 remain untested. Static rewrite rules and RTK's TOML registry are separate inventories, and an explicit RTK prefix still needs exact-output exceptions."
+      ],
+      "source_paths": [
+        "docs/decisions/2026-10-04-interactive-shell-and-unix-tools.md",
+        "adoption/bootstrap-linux.sh",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install.sh"
+      ],
+      "next_gap": "Add a gate-passing tool only for a recorded agent-task failure caused by its absence. Qualify RTK filters against uutils 0.10.0 and coreutils-from-gnu using unit A PR-0's versions; a demonstrated parsing failure reopens the coreutils provider.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "No existing client or RTK receipt is promoted into acceptance of this new Ubuntu 26.04 tool-policy row.",
+        "unknown": "Target-host tool availability and RTK/uutils compatibility remain pending; this PR establishes no new lifecycle stage.",
+        "stage_refs": []
+      },
+      "supersedes": []
+    },
+    {
+      "id": "interactive-shell-human-tools-2604",
+      "capability": "Unix tools slot: human-facing tools (fzf 0.74.4 and zoxide 0.10.0, opt-in)",
+      "capability_key": "interactive-shell-human-tools-2604",
+      "checked_at": "2026-10-04",
+      "layer_ids": [
+        "native-clients"
+      ],
+      "selection": "candidate",
+      "review_status": "source_review",
+      "activation": "Accepted research choice: fzf 0.74.4 and zoxide 0.10.0 become global mise pins only through the future named-only interactive-shell slot, run by the person on NativeStack2604. Default runs skip it, and StackMeasure2604 never selects it. The writer must check bash >=4, both exact tool versions, git-sh-prompt and mise before writing; this PR installs nothing.",
+      "component_ids": [],
+      "candidate": {
+        "id": "ubuntu-2604-person-run-unix-tools-profile",
+        "repository": "https://github.com/seathatflowsinourveins/native-agent-stack"
+      },
+      "evidence_ids": [],
+      "evidence_scope": "Source-reviewed combination of junegunn/fzf v0.74.4, ajeetdsouza/zoxide v0.10.0 and the main 3b8f9c8a install plan's named-only selection pattern. The row records an accepted optional profile choice with pending implementation and adoption.",
+      "limitations": [
+        "No person has run this slot as a result of this PR, and no tool or block is installed here.",
+        "Other human-facing jobs keep their existing owners; no eza, fd, dust, btop, tealdeer, lazygit, bat, duf, delta, tmux or zellij adoption is implied."
+      ],
+      "source_paths": [
+        "docs/decisions/2026-10-04-interactive-shell-and-unix-tools.md",
+        "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
+        "tools/adoption/managed_block.py"
+      ],
+      "next_gap": "Implement the named-only slot in unit B's profile PR, then retain exact-version, integrity, Readline and isolation results in its qualification PR. Catalog inclusion must never cause a default or agent-run installation of the interactive block.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "This is a source-reviewed profile candidate with no install, activation or lifecycle receipt.",
+        "unknown": "Person-run installation and the subsequent host checks, including persistence, restart, cleanup and recovery, remain pending.",
+        "stage_refs": []
+      },
+      "supersedes": []
+    },
+    {
+      "id": "interactive-shell-isolation-2604",
+      "capability": "Interactive shell slot: isolation (Ubuntu skel guard and one person-run managed block)",
+      "capability_key": "interactive-shell-isolation-2604",
+      "checked_at": "2026-10-04",
+      "layer_ids": [
+        "native-clients",
+        "isolation"
+      ],
+      "selection": "candidate",
+      "review_status": "source_review",
+      "activation": "Accepted research choice: put all optional interactive content in one person-run managed block below Ubuntu's guard and bash-completion; keep the login profile environment-only and BASH_ENV unset. Unit A owns CLAUDE_CODE_SHELL=/bin/bash. Codex retains shell_snapshot=false and inherit=none; allow_login_shell remains unit A's decision. StackMeasure2604 receives no block. This PR installs nothing and changes no client settings.",
+      "component_ids": [],
+      "candidate": {
+        "id": "ubuntu-2604-interactive-startup-isolation-policy",
+        "repository": "https://github.com/seathatflowsinourveins/native-agent-stack"
+      },
+      "evidence_ids": [],
+      "evidence_scope": "Unit B's accepted source review combines Ubuntu's skel guard, the stack's managed_block.py boundary and unit A's documented agent-shell setting. Historical Ubuntu 24.04 snapshot observations are retained as such; this row does not qualify Ubuntu 26.04 or authorize agent commands.",
+      "limitations": [
+        "Land with or after unit A's decision record so the CLAUDE_CODE_SHELL policy reference resolves; unit A's PR-2 owns that setting.",
+        "Session-attributed Claude snapshots rely on observed undocumented behavior, and no Codex path was executed by unit B. The skel guard is not an authorization control.",
+        "Codex login startup still runs unless unit A adopts allow_login_shell=false; inherit=none alone does not disable startup files."
+      ],
+      "source_paths": [
+        "docs/decisions/2026-10-04-interactive-shell-and-unix-tools.md",
+        "tools/adoption/managed_block.py",
+        "adoption/templates/claude.settings.template.json",
+        "adoption/templates/codex.config.template.toml",
+        "adoption/new-wsl/templates/codex.config.additions.toml"
+      ],
+      "next_gap": "Qualify a fresh session-attributed Claude snapshot and Codex command on Ubuntu 26.04 in unit B PR-3. If aliases or __zoxide/_mise_hook/__fzf_/__git_ps1 leak, or Codex finds z, add the recorded CLAUDECODE/CODEX_THREAD_ID early return; adopt a native rc-capture switch if upstream documents one.",
+      "lifecycle": {
+        "source_path": "blueprints/token-native-focus/saturation-audit.json",
+        "scope": "Pending interactive-startup integration only; unit A's command-authorization guard and existing client lifecycle evidence keep their own scope.",
+        "unknown": "Ubuntu 26.04 isolation, session attribution and lifecycle acceptance remain pending; no stage is claimed by this docs-only PR.",
+        "stage_refs": []
+      },
+      "supersedes": []
+    },
     {
       "id": "native-memory-learning-maintenance",
       "capability": "Maintain useful scoped memory across native Codex and Claude",
