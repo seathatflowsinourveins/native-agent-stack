@@ -332,17 +332,22 @@ or wide quote leaves the run incomplete instead of paying up.
 
 ## Run, 2026-10-05 (the merged, hardened bytes; the paper Gateway hosted on NativeStack2604)
 
-This is the first run of the merged `run.py` (sha256 `1b697f23…`, archived as `evidence/harness/run.py.1b697f237275`)
-with the same `plan.json` (`9f2942c4…`) as the 2026-09-23 runs.
+This is the first retained receipt of the merged `run.py` (sha256 `1b697f23…`, archived as
+`evidence/harness/run.py.1b697f237275`). It uses the same `plan.json` (`9f2942c4…`) as the 2026-09-23 runs, which
+used the earlier bytes.
 
-- **Setup.**
-  - NautilusTrader 1.231.0 and nautilus-ibapi 10.45.1 were installed by this README's uv recipe; the `ib` extra
-    also installed protobuf 5.29.6.
-  - The harness ran on NativeStack against the paper IB Gateway (gnzsnz/ib-gateway 10.51.1b, paper mode) that
-    NativeStack2604 hosts. It connected at 127.0.0.1:4002, over the WSL loopback both distributions share.
-  - The user unticked Read-Only API in the running Gateway beforehand, at about 14:09Z; the coordinator lane attested
-    this. No IB 321 was observed.
-- **Pre-check.** `run.py check` passed: 1 paper account, 0 positions, 0 open orders.
+- **Setup.** These facts are recorded by the coordinator (session 5f) and are not in the receipt, which records
+  only the versions (NautilusTrader 1.231.0, ibapi 10.45.1) and port 4002.
+  - The environment came from this README's uv recipe. The `ib` extra also installed protobuf 5.29.6 (`uv pip list`
+    in that environment).
+  - The harness ran on NativeStack against the paper IB Gateway that NativeStack2604 hosts (gnzsnz/ib-gateway
+    10.51.1b, paper mode). It connected at 127.0.0.1:4002, over the WSL loopback both distributions share.
+  - The user unticked Read-Only API in the running Gateway beforehand, at about 14:09Z, as the coordinator lane
+    attested. The receipt records no IB 321, and its orders were accepted and filled.
+- **Pre-check.** The standalone `run.py check`, run at 14:23:41Z, printed exactly
+  `{"status": "passed", "exit_code": 0, "account_count": 1, "positions": 0, "open_orders": 0}`. That line is retained
+  as `evidence/check-20261005-passed.json`. The run's own in-process pre-check, recorded in the receipt, passed with the
+  same counts.
 - **Result.** 10:26 ET, `evidence/receipt-20261005-passed.json`: **passed** (exit 0, 11.5 s):
 
   | Case | Nautilus events | Result |
