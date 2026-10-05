@@ -91,22 +91,27 @@ class NewWslHandbookTests(unittest.TestCase):
 
     def host_requalification_fixture(self):
         """Synthetic receipt facts for the projection contract, not host evidence."""
+        decision = "docs/decisions/2026-10-05-fixture-requalification.md"
+        path = self.root / decision
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("# Synthetic qualification decision\n\nNo host acceptance is claimed.\n")
         return {"schema_version": 1, "id": "ns2604-requalification-20261005", "kind": "historical_inventory",
                 "data": {
                     "host": "NativeStack2604", "publication_date_utc": "2026-10-05",
+                    "decision_record": decision,
                     "readiness": {
                         "provisional": True,
                         "formula": "(READY + BY_DESIGN) / all 80 slots in scope",
                         "baseline": {"numerator": 30, "denominator": 80, "percent": 37.5},
-                        "current": {"numerator": 40, "denominator": 80, "percent": 50.0,
+                        "current": {"numerator": 27, "denominator": 80, "percent": 33.75,
                                     "status": "provisional_pending_independent_review"},
-                        "conditional": {"numerator": 44, "denominator": 80, "percent": 55.0,
+                        "conditional": {"numerator": 29, "denominator": 80, "percent": 36.25,
                                         "status": "conditional_pending_four_slot_adjudication"}},
                     "disputed_slot_ids": [f"token-efficiency/{slot}" for slot in
                                           ("repo-packing", "command-output", "output-compression", "code-index")],
-                    "independent_review": {"status": "pending", "scope": "Review the retained native evidence and projections."},
-                    "source_class": "supplied co-op/user projection, not independently derived verified labels",
-                    "qualification_scope": "The fresh 80-slot join and ten promoted slots behind 40/80 are not retained."}}
+                    "independent_review": {"status": "pending", "scope": "New dated command-center qualification, independent review and adjudication are required."},
+                    "source_class": "synthetic projection contract, not host or upstream acceptance",
+                    "qualification_scope": "Synthetic lower counts exercise consistency; no independently verified labels are claimed."}}
 
     def test_host_requalification_absence_keeps_it_out_of_the_book(self):
         data = handbook.build_data(self.root)
@@ -131,18 +136,73 @@ class NewWslHandbookTests(unittest.TestCase):
         source = next(source for source in data["sources"] if source["path"] == handbook.HOST_REQUALIFICATION)
         self.assertEqual(source["sha256"], handbook.digest((self.root / handbook.HOST_REQUALIFICATION).read_bytes()))
         page = (self.root / handbook.OUTPUTS[0]).read_text()
-        for text in ("Last fully reviewed baseline (2026-10-04): **30/80 (37.5%)**",
-                     "Supplied current projection (provisional): **40/80 (50%)**",
-                     "Conditional projection (four-slot adjudication pending): **44/80 (55%)**",
+        for text in ("Official readiness (qualified 2026-10-04): **30/80 (37.5%)**",
+                     "Supplied current projection (provisional): **27/80 (33.75%)**",
+                     "Conditional projection (provisional): **29/80 (36.25%)**",
                      receipt["data"]["source_class"], receipt["data"]["qualification_scope"],
                      "without an independently verified 80-slot join", "Independent review: pending",
-                     "historical 2026-10-04 baseline is fully adjudicated"):
+                     "Official readiness remains the qualified 2026-10-04 baseline", receipt["data"]["decision_record"],
+                     "command center's new dated qualification", "followed by independent review and adjudication"):
             self.assertIn(text, page)
+        decision = next(source for source in data["sources"] if source["path"] == receipt["data"]["decision_record"])
+        self.assertEqual(decision["sha256"], handbook.digest((self.root / decision["path"]).read_bytes()))
+        self.assertNotIn("four-slot adjudication pending", page)
         for slot in receipt["data"]["disputed_slot_ids"]:
             self.assertIn(slot, page)
         self.assertLess(page.index("## NativeStack2604 host re-qualification"), page.index("## Stage 1 and stage 2"))
         checked = self.public_cli("--check")
         self.assertEqual(checked.returncode, 0, checked.stderr)
+
+    def test_host_requalification_null_scenarios_keep_only_available_figures_and_decision_pointer(self):
+        before = handbook.build_data(self.root)
+        for unavailable in (("current",), ("conditional",), ("current", "conditional")):
+            with self.subTest(unavailable=unavailable):
+                receipt = self.host_requalification_fixture()
+                for key in unavailable:
+                    receipt["data"]["readiness"][key] = None
+                self.write(handbook.HOST_REQUALIFICATION, receipt)
+                result = self.public_cli()
+                self.assertEqual(result.returncode, 0, result.stderr)
+                data = self.read(handbook.OUTPUTS[1])
+                host = data["host_requalification"]
+                for key in unavailable:
+                    self.assertIsNone(host["readiness"][key])
+                page = (self.root / handbook.OUTPUTS[0]).read_text()
+                section = page.split("## NativeStack2604 host re-qualification", 1)[1].split("## Stage 1 and stage 2", 1)[0]
+                expected = [str(receipt["data"]["readiness"][key]["numerator"])
+                            for key in ("baseline", "current", "conditional") if key not in unavailable]
+                self.assertEqual(re.findall(r"\*\*(\d+)/80", section), expected)
+                if unavailable == ("current", "conditional"):
+                    self.assertIn("Official readiness (qualified 2026-10-04): **30/80 (37.5%)**", section)
+                    self.assertEqual(re.findall(r"\*\*(\d+)/80", section), ["30"])
+                    self.assertNotIn("37/80", section)
+                    self.assertNotIn("32/80", section)
+                self.assertIn("No aggregate established for: " + ", ".join(unavailable), section)
+                self.assertIn(receipt["data"]["decision_record"], section)
+                self.assertIn("command center's new dated qualification", section)
+                self.assertIn("public review alone does not change the official figure", section)
+                self.assertNotIn("four-slot adjudication pending", section)
+                self.assertFalse(data["new_host_acceptance_claimed"])
+                self.assertEqual({key: value for key, value in data.items() if key not in {"host_requalification", "sources"}},
+                                 {key: value for key, value in before.items() if key != "sources"})
+
+    def test_host_requalification_requires_explicit_scenarios_and_reviewed_baseline(self):
+        for missing in ("baseline", "current", "conditional"):
+            with self.subTest(missing=missing):
+                receipt = self.host_requalification_fixture()
+                del receipt["data"]["readiness"][missing]
+                self.write(handbook.HOST_REQUALIFICATION, receipt)
+                with self.assertRaisesRegex(ValueError, "explicitly declared " + missing):
+                    handbook.read_host_requalification(handbook.Inputs(self.root))
+
+    def test_host_requalification_requires_a_present_public_decision_record(self):
+        for value in (None, "", 42, "../outside.md", "/outside.md", "docs/README.md", "docs/decisions/missing.md"):
+            with self.subTest(decision=value):
+                receipt = self.host_requalification_fixture()
+                receipt["data"]["decision_record"] = value
+                self.write(handbook.HOST_REQUALIFICATION, receipt)
+                with self.assertRaisesRegex(ValueError, "host requalification|public repository path"):
+                    handbook.read_host_requalification(handbook.Inputs(self.root))
 
     def test_host_requalification_rejects_inconsistent_or_promoted_receipt_facts(self):
         changes = [
@@ -152,9 +212,13 @@ class NewWslHandbookTests(unittest.TestCase):
             ("data.readiness.current.denominator", 81), ("data.readiness.current.numerator", True),
             ("data.readiness.current.numerator", -1), ("data.readiness.current.percent", 55.0),
             ("data.readiness.current.percent", True), ("data.readiness.current.status", "accepted"),
+            ("data.readiness.baseline", None),
             ("data.readiness.baseline", {"numerator": 31, "denominator": 80, "percent": 38.75}),
-            ("data.readiness.conditional", {"numerator": 45, "denominator": 80, "percent": 56.25,
+            ("data.readiness.conditional", {"numerator": 45, "denominator": 80, "percent": 55.0,
                                           "status": "conditional_pending_four_slot_adjudication"}),
+            ("data.readiness.conditional", []),
+            ("data.readiness.conditional", {"numerator": 29, "denominator": 80, "percent": 36.25,
+                                          "status": "accepted"}),
             ("data.disputed_slot_ids", ["token-efficiency/context-supply"] * 4),
             ("data.disputed_slot_ids", [f"token-efficiency/{slot}" for slot in
                                        ("context-supply", "command-output", "output-compression", "code-index")]),
@@ -179,6 +243,16 @@ class NewWslHandbookTests(unittest.TestCase):
         self.assertEqual(self.public_cli().returncode, 0)
         receipt["data"]["qualification_scope"] += " A further source gap remains open."
         self.write(handbook.HOST_REQUALIFICATION, receipt)
+        stale = self.public_cli("--check")
+        self.assertEqual(stale.returncode, 1)
+        self.assertIn("stale generated output", stale.stderr)
+
+    def test_host_requalification_decision_change_invalidates_a_previously_generated_book(self):
+        receipt = self.host_requalification_fixture()
+        self.write(handbook.HOST_REQUALIFICATION, receipt)
+        self.assertEqual(self.public_cli().returncode, 0)
+        decision = self.root / receipt["data"]["decision_record"]
+        decision.write_text(decision.read_text() + "\nA further adjudication remains required.\n")
         stale = self.public_cli("--check")
         self.assertEqual(stale.returncode, 1)
         self.assertIn("stale generated output", stale.stderr)
@@ -556,6 +630,24 @@ class NewWslHandbookTests(unittest.TestCase):
         memory = next(slot for slot in manifest["slots"] if slot["slot_id"] == "memory-owner")
         self.assertIn(memory["default"], markdown)
         self.assertIn(memory["label"], markdown)
+
+    def test_code_navigation_current_defaults_replace_the_historical_client_split(self):
+        data = handbook.build_data(ROOT)
+        layer = next(row for row in data["layers"] if row["layer_id"] == "code-navigation")
+        self.assertIn("Serena (symbol navigation and references for both clients)", layer["owns"])
+        self.assertFalse(any("LSP" in owner or "Codex sessions" in owner for owner in layer["owns"]))
+        self.assertEqual(layer["ownership_source"], handbook.DEFAULTS_MANIFEST)
+        slots = {slot["record"]["slot_id"]: slot for slot in layer["default_slots"]}
+        self.assertTrue(slots["serena"]["installed"])
+        self.assertFalse(slots["claude-plugins-official-code-intelligence-lsp-pl"]["installed"])
+        markdown = handbook.render_markdown(data).decode()
+        navigation = markdown.split("## code-navigation:", 1)[1].split("\n## ", 1)[0]
+        self.assertNotIn("Serena (Codex sessions)", navigation)
+        lsp = next(line for line in navigation.splitlines()
+                   if "| claude-plugins-official-code-intelligence-lsp-pl |" in line)
+        self.assertIn("not installed:", lsp)
+        self.assertIn("Historical recommendation packet tools", navigation)
+        self.assertFalse(data["new_host_acceptance_claimed"])
 
     def test_defaults_manifest_rejects_invalid_states_layers_and_ownership(self):
         def changed_slot(data, field, value):

@@ -1,0 +1,270 @@
+{
+  "schema_version": 1,
+  "kind": "sanitized source corrections for PR #715 review and command-center ruling",
+  "recorded_at_utc": "2026-10-05T12:07:21Z",
+  "evidence_class": "source_review",
+  "reviewed_pr": 715,
+  "reviewed_head": "ec7dbc2d0ce4782a5157e5f9d14c7e5ce39863e8",
+  "new_execution": false,
+  "aggregate_derivation_performed": false,
+  "source_hash_boundary": "Hashes identify original bytes at the selected read. Owner status files are mutable snapshots, not immutable archives or continuous host-state proof; append later owner evidence rather than declaring closure from this review.",
+  "locator_roots": {
+    "coordination-root:bounded-jobs-20261004/": "Selected bounded-job originals under the common private coordination root, outside ns2604-coop; personal base path omitted.",
+    "coordination-root:command-center/": "Selected original command-center ruling under the same common coordination root, outside ns2604-coop; personal base path omitted.",
+    "coord:readiness-20261005/": "Existing ns2604-coop readiness source alias, as used by sources.json.",
+    "coord:lanes/": "Selected ns2604-coop owner status files; status is a dated coordination observation, not acceptance."
+  },
+  "sources": {
+    "claude_verdict": {
+      "locator": "coordination-root:bounded-jobs-20261004/read-715/verdict-claude-715.md",
+      "sha256": "cf54816c12d77a705b1d278f332d18166bfc8e926e65c3ecaac7eb2921bde5c8",
+      "lines": [
+        9,
+        58
+      ],
+      "evidence_class": "source_review"
+    },
+    "command_center_ruling": {
+      "locator": "coordination-root:command-center/ITEM-ns2604-coop-20261005T114416Z.md",
+      "sha256": "a4b778fcc133cb3b4b479688815b6dc34a287dccbfe05a5c00c057ae0af2e375",
+      "lines": [
+        15,
+        26
+      ],
+      "evidence_class": "source_review"
+    },
+    "roadmap": {
+      "locator": "coord:readiness-20261005/readiness-roadmap-20261005.json",
+      "sha256": "d97e6fb5f6ac725bb0dfe093e569df648992f86c38c0e849f7d7c439c9a0d078",
+      "json_pointer": "/synthesis/readiness_now",
+      "evidence_class": "source_review"
+    },
+    "fixwave_owner": {
+      "locator": "coord:lanes/fixwave-defects.status.md",
+      "sha256": "ad497c282381c50c658cd54bc6d652d826791d093ddb30e7e585f597225fbec7",
+      "as_of_utc": "2026-10-05T09:45:00Z",
+      "line": 3,
+      "evidence_class": "source_review",
+      "scope": "No closing fresh defect-14 acceptance supplied by this selected status."
+    },
+    "currency_owner": {
+      "locator": "coord:lanes/currency.status.md",
+      "sha256": "2c8095313ae6bddae03f03a0ccc29f90ff6180c2d84fe3832b9f5c2ab61e38d6",
+      "as_of_utc": "2026-10-05T11:37:20Z",
+      "line": 5,
+      "evidence_class": "source_review",
+      "scope": "Codex profile work waits for #713 and prerequisite Job2; no D04 owner acceptance is supplied."
+    }
+  },
+  "readiness_reporting": {
+    "official": {
+      "numerator": 30,
+      "denominator": 80,
+      "source": "PR #700 historical adjudicated receipt",
+      "new_qualification": false
+    },
+    "superseded_reported_scenarios": [
+      {
+        "numerator": 40,
+        "denominator": 80,
+        "status": "superseded",
+        "basis": "CC ruling line16; later roadmap proposal is different."
+      },
+      {
+        "numerator": 44,
+        "denominator": 80,
+        "status": "superseded_conditional_scenario",
+        "basis": "Underlying 40 scenario is superseded and roadmap already counts command-output READY; no current-plus-four derivation remains."
+      }
+    ],
+    "roadmap_proposal": {
+      "reported_numerator": 37,
+      "reported_denominator": 80,
+      "evidence_class": "source_review",
+      "status": "provisional_roadmap_proposal",
+      "source": "roadmap",
+      "confirmed_as_reported_by": "command_center_ruling:16"
+    },
+    "command_center_proposal": {
+      "reported_numerator": 32,
+      "reported_denominator": 80,
+      "evidence_class": "source_review",
+      "status": "provisional_pending_coordinator_final_verified_e2e",
+      "source": "command_center_ruling:16-18"
+    },
+    "generated_values": {
+      "current": null,
+      "conditional": null,
+      "pointer": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md"
+    },
+    "lift_condition": "Only the command center's own new dated final verified E2E of the same 80 slots, followed by independent review and adjudication; an independent PR/publication review does not lift provisional.",
+    "method_source": "native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/decisions/2026-10-04-ns2604-verified-e2e.md:114-121"
+  },
+  "roadmap_partial_reported_passes": [
+    {
+      "slot": "cross:wsl-distro/base-distribution",
+      "reported_status": "PARTIAL",
+      "source_pointer": "/records/11/final/slots/5"
+    },
+    {
+      "slot": "ci-supply-chain/syft",
+      "reported_status": "PARTIAL",
+      "source_pointer": "/records/5/final/slots/2"
+    },
+    {
+      "slot": "secrets-credentials/betterleaks",
+      "reported_status": "PARTIAL",
+      "source_pointer": "/records/10/final/slots/0"
+    },
+    {
+      "slot": "observation-inference/otel-collector-contrib",
+      "reported_status": "PARTIAL",
+      "source_pointer": "/records/2/final/slots/0"
+    }
+  ],
+  "roadmap_baseline_ready_demotions": [
+    {
+      "slot": "native-clients/claude-code",
+      "reported_status": "PARTIAL",
+      "source_pointer": "/records/12/final/slots/0",
+      "reported_cause": "Incomplete wiring."
+    },
+    {
+      "slot": "instructions-skills/skill-discovery",
+      "reported_status": "FAIL",
+      "source_pointer": "/records/6/final/slots/2",
+      "reported_cause": "rc5 at 08:05:08Z."
+    },
+    {
+      "slot": "scheduling-supervision/dagu",
+      "reported_status": "PARTIAL",
+      "source_pointer": "/records/12/final/slots/2",
+      "reported_cause": "Version mismatch."
+    },
+    {
+      "slot": "recovery-portability/mise",
+      "reported_status": "PARTIAL",
+      "source_pointer": "/records/12/final/slots/3",
+      "reported_cause": "Version mismatch."
+    }
+  ],
+  "command_center_ready_objections": [
+    {
+      "slot": "token-efficiency/ccusage",
+      "disposition": "not_counted_ready",
+      "source_lines": [
+        16,
+        22
+      ],
+      "open_items": [
+        "Condition-absent controls are reported at 07:28:59Z and 07:29:05Z only in analyst transcript T; retain their original outputs and process provenance beside the passing runs.",
+        "Pending criterion-(2) ruling must establish whether the unrun just test suite at v20.0.26 is required."
+      ],
+      "roadmap_source_pointer": "/records/0/final/slots/0"
+    },
+    {
+      "slot": "token-efficiency/command-output",
+      "disposition": "not_counted_ready",
+      "source_lines": [
+        16
+      ],
+      "open_items": [
+        "Keep roadmap-reported READY and historical Opus READY/GPT PARTIAL distinct; no new whole-slot READY adjudication."
+      ],
+      "roadmap_source_pointer": "/records/0/final/slots/3"
+    },
+    {
+      "slot": "native-clients/codex",
+      "disposition": "not_counted_ready",
+      "source_lines": [
+        16
+      ],
+      "open_items": [
+        "D04/stack-worker profile qualification remains open; latest selected currency owner status defers profile work until #713 and prerequisites."
+      ],
+      "roadmap_source_pointer": "/records/12/final/slots/1"
+    },
+    {
+      "slot": "observation-inference/session-analytics",
+      "disposition": "not_counted_ready",
+      "source_lines": [
+        16,
+        22
+      ],
+      "open_items": [
+        "Rerun2 stdout reports0 without rc/start/end siblings; retained service.8yU0G1 has no process rc or argv and its07:27 times come from the roadmap.",
+        "An owner-native idle-period rerun is required with argv, stdout/stderr, process rc, start/end times, exact pin and original-output hashes.",
+        "Dated daemon-state reconciliation does not qualify durable lifecycle or erase the idle-exit sweep failure."
+      ],
+      "roadmap_source_pointer": "/records/3/final/slots/3"
+    },
+    {
+      "slot": "observation-inference/alerting",
+      "disposition": "not_counted_ready",
+      "source_lines": [
+        16,
+        17
+      ],
+      "open_items": [
+        "Fresh unmodified delivery is blocked by defect14; the printed plan result line is unconfirmed.",
+        "Keep the initial exit0skip, modified-network delivery and cached unmodified pass distinct."
+      ],
+      "roadmap_source_pointer": "/records/2/final/slots/4"
+    }
+  ],
+  "alerting_attestation": {
+    "status": "user_authorship_confirmed_by_command_center",
+    "source": "command_center_ruling:17",
+    "historical_provenance_field": "not_verified",
+    "historical_field_preserved": true,
+    "authenticity_open_item": false,
+    "remaining_gap": "Fresh unmodified plan acceptance blocked by defect14 and printed result line unconfirmed."
+  },
+  "session_idle_rerun": {
+    "status": "pending_owner_native_execution",
+    "required_record_fields": [
+      "argv",
+      "stdout_source",
+      "stderr_source",
+      "process_exit_code",
+      "started_at_utc",
+      "ended_at_utc",
+      "upstream_pin",
+      "original_source_hashes",
+      "idle_period_scope"
+    ],
+    "preserve_failed_attempts": true,
+    "existing_rerun2": {
+      "reported_stdout_result": 0,
+      "process_exit_code": null,
+      "started_at_utc": null,
+      "ended_at_utc": null,
+      "argv": null
+    },
+    "existing_service_8yU0G1": {
+      "reported_time": "2026-10-05T07:27:02Z",
+      "timestamp_source": "roadmap only",
+      "process_exit_code": null,
+      "argv": null
+    },
+    "new_run_performed": false
+  },
+  "preservation": {
+    "historical_baseline_labels": "unchanged",
+    "stage_attempts": "unchanged",
+    "old_model_reviews": "unchanged",
+    "historical_attestation_provenance": "unchanged",
+    "missing_values": "remain null; no inferred rc/argv/timestamp"
+  },
+  "publication_review": {
+    "status": "pending_for_final_candidate",
+    "scope": "The reviewed ec7 head predates these corrections; this document preserves that review without claiming review of the corrected candidate."
+  },
+  "sanitization": {
+    "personal_paths": false,
+    "credential_values": false,
+    "credential_files": false,
+    "raw_conversations": false,
+    "active_configuration": false
+  }
+}

@@ -7,21 +7,24 @@ with the last fully adjudicated baseline and the new provisional scenarios
 shown separately. This serves complex engineering, US-equities research and
 historical simulation before independently qualified paper operation.
 
-The co-op's reported scenario is **40/80 (50%), provisional**. The conditional scenario
-is **44/80 (55%), provisional**, only if four disputed token slots adjudicate
-READY. These are the co-op projections supplied in this lane's brief. The
-initial capture did not identify a complete 80-slot status chain or
-the ten promotions deriving 40. The co-op subsequently named those ten host-plan
-passes; the supplement below records that observation without qualifying a new
-aggregate. Consequently this publication does not assert
-that 40 independently qualified slots have been demonstrated.
+The earlier co-op **40/80** and conditional **44/80** scenarios are superseded.
+The cited roadmap proposes **37/80**; the command center reports **32/80,
+provisional, pending the coordinator's final verified E2E**. Both figures are
+recorded source-review proposals, not an aggregate derived or qualified by
+this publication. The command center's correction excludes ccusage,
+command-output, native-clients/codex, session-analytics and alerting from READY.
+Its source and the exact review objections are retained in
+`evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json`.
 
 The last fully adjudicated aggregate remains the historical **30/80 (37.5%)**
 from 2026-10-04, reported as 38% after half-up rounding in PR #700. That record
 has 18 READY and 12 BY_DESIGN slots. Its labels stay intact in the new slot
 artifact, beside today's observations. It is not a new 2026-10-05 acceptance
-run. The gap in the current projection must be closed before it becomes the
-verified aggregate.
+run. Official readiness stays **30/80** until the command center's own dated,
+final verified E2E of the same 80 slots, followed by independent review and
+adjudication. A review of this PR or its public projection does not lift
+provisional status. Generated current/conditional values remain null and point
+to this decision; they are not filled from either reported proposal.
 
 ## Sources and reuse
 
@@ -83,7 +86,8 @@ raw conversations or host paths.
 | Retained native client command outputs | `native_proven` | The client command, host, revision and result actually retained; not whole-slot acceptance |
 | Plan-wrapper census/stage checks and locally authored probes | `local_integration` | Our integration only; not unchanged upstream tests |
 | Opus/GPT judgments and drift review | `source_review` | Review of retained evidence; not independent execution |
-| 40/80 and 44/80 projections | supplied provisional scenarios | No complete fresh derivation or independent aggregate review retained |
+| Earlier 40/80 and 44/80 projections | superseded reported scenarios | Historical proposals retained; not current readiness |
+| Roadmap 37/80 and CC 32/80 proposals | `source_review`, provisional | Reported figures only; coordinator's final verified E2E remains pending |
 | Early invocation snapshot | `historical_inventory` | Install exposure window and native counter scope only |
 | Skipped stages or missing raw proof | `none_recorded` | No successful operation inferred |
 | Generators, hashes, tests and validator | `structural_validation` | Publication consistency; not host or provider acceptance |
@@ -152,12 +156,13 @@ observations. Promoting zero-exit census rows or selected model READY labels
 would overstate the evidence. Publishing the provisional scenarios alongside
 the unchanged baseline preserves useful progress and its actual limitations.
 
-Replace the provisional scenario with a verified aggregate only after an
-independent reviewer retains the full 80-slot status chain, identifies every
-baseline-to-current promotion and checks each slot against the frozen method.
-Raise 40 to 44 only if the four disputed slots have source-backed native
-acceptance and recorded adjudications under that same contract. New failures,
-pin changes or client-leg limitations may instead lower the numerator.
+Only the command center's own new dated, final verified E2E of the same 80
+slots, followed by independent review and adjudication, can replace the
+official historical result. A PR/source-projection review alone cannot lift
+provisional. The earlier 40/44 scenarios and current-plus-four calculation are
+superseded; the reported roadmap37 and CC32 proposals are not derived here.
+New failures, pin changes or client-leg limitations may lower a later qualified
+result, so publication validation must not require monotonic readiness.
 
 ## Publication, rollback and remaining work
 
@@ -248,13 +253,50 @@ The wf_cfa1d860-ebd roadmap's blind Claude/GPT analyses and Opus adjudication
 are recorded as `source_review`. They do not establish upstream acceptance or
 authorize adoption of the roadmap's projected readiness figures.
 
-The co-op's ten reported host-plan passes were base-distribution,
-codex-sdk-and-codex-exec-app-server, structural-search, syft, betterleaks,
-serena, harbor-containerized-agent-e2e-runner, ccusage, otel-collector-contrib
-and session-analytics. Their reported completion of plan stages and fresh
-sessions supports the co-op scenario's provenance. It does not form a frozen
-80-slot status chain. The four token disputes remain separately recorded;
-their Opus READY and GPT PARTIAL reviews have no READY adjudication here.
+The earlier list of ten reported host-plan passes did not substantiate the
+40/80 scenario. The same cited roadmap holds base-distribution, syft,
+betterleaks and otel-collector-contrib at PARTIAL. It also demotes four
+baseline-READY slots: claude-code to PARTIAL for incomplete wiring,
+skill-discovery to FAIL after rc 5 at 08:05:08Z, and dagu and mise to PARTIAL
+for version mismatches. These are roadmap source-review labels, not replacements
+for the unchanged historical baseline or evidence of new upstream acceptance.
+
+The command center's subsequent objections cover ccusage, command-output,
+native-clients/codex, session-analytics and alerting. Its ruling says these do
+not count READY; it does not assign new PARTIAL labels to all five. The earlier
+token disputes and client-leg reviews stay intact, including the roadmap's
+reported command-output READY and the earlier GPT PARTIAL. The old conditional
+current-plus-four calculation is superseded rather than carried forward.
+
+Ccusage remains open: its condition-absent controls at 07:28:59Z and 07:29:05Z
+are reported only in analyst transcript T, not retained beside the passing runs
+in this receipt. The pending criterion-(2) ruling must also establish whether
+the unrun pinned upstream suite is required. See
+native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff:docs/acceptance-evidence-policy.md:42–53.
+
+Session-analytics remains open despite retained successful metadata. Rerun2 has
+stdout reporting 0 without process rc or start/end siblings. The 07:27
+service.8yU0G1 timestamps come from the roadmap; its argv and process rc are not
+retained. The idle-exit event and subsequent failed sweep remain. Required
+follow-up is an owner-native idle-period rerun retaining argv, stdout/stderr,
+process rc, start/end times, exact pin and original-output hashes. Reconciliation
+of dated daemon states does not close that lifecycle qualification gate.
+
+Alerting retains its initial exit-zero skip, later modified-network delivery,
+and later cached unmodified pass as distinct attempts. The command center
+confirms that the attestation is the user's own; the original receipt's
+not_verified field remains historical. User authorship is no longer an open
+authenticity question. Fresh unmodified delivery remains blocked by defect 14,
+and the plan check's printed result line remains unconfirmed. The currency
+owner's status still defers Codex profile work pending #713; it supplies no
+owner acceptance closing D04. Neither defect is declared fixed here.
+
+These corrections follow the original Claude review of #715 head ec7dbc2d0,
+SHA-256 cf54816c12d77a705b1d278f332d18166bfc8e926e65c3ecaac7eb2921bde5c8,
+and the command-center ruling at coordination-root:command-center/ITEM-ns2604-coop-20261005T114416Z.md:15–26,
+SHA-256 a4b778fcc133cb3b4b479688815b6dc34a287dccbfe05a5c00c057ae0af2e375.
+The correction artifact records their portable locators and original hashes;
+no new aggregate, native run or review-lift trigger is created.
 
 Job1's observation and tool records retain native operations, wrapper results,
 fixtures and model judgments separately. Job2 carries documented BY_DESIGN

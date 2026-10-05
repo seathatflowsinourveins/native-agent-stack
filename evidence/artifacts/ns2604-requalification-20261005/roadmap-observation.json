@@ -54,6 +54,22 @@
     "end": "2026-10-05T10:19:00Z"
   },
   "no_aggregate_readiness_derivation": true,
+  "review_correction": {
+    "evidence_class": "source_review",
+    "artifact": "review-715-corrections.json",
+    "source": "coordination-root:command-center/ITEM-ns2604-coop-20261005T114416Z.md",
+    "source_sha256": "a4b778fcc133cb3b4b479688815b6dc34a287dccbfe05a5c00c057ae0af2e375",
+    "source_lines": [15, 22],
+    "provisional": true,
+    "new_execution": false,
+    "slot_objections": {
+      "alerting": "not_counted_ready; fresh unmodified delivery blocked by defect14; user attestation authorship confirmed, printed plan result line unconfirmed",
+      "session-analytics": "not_counted_ready; complete idle-period acceptance with stdout, rc, times, argv, pin and hashes remains pending"
+    },
+    "qualification_gate": "pending_coordinator_final_verified_e2e",
+    "historical_roadmap_verdicts_preserved": true,
+    "publication_review_of_corrected_candidate": "pending"
+  },
   "slots": [
     {
       "slot_id": "prometheus",
@@ -504,10 +520,16 @@
           "confirmed_at": "2026-10-05T06:58:29Z",
           "firing_received": true,
           "resolved_received": true,
-          "provenance": "not_verified",
+            "provenance": "not_verified",
+            "provenance_scope": "Historical receipt field preserved; command center subsequently confirms user authorship.",
+            "authorship_confirmation": {
+              "status": "user_authorship_confirmed_by_command_center",
+              "source": "coordination-root:command-center/ITEM-ns2604-coop-20261005T114416Z.md:17",
+              "source_sha256": "a4b778fcc133cb3b4b479688815b6dc34a287dccbfe05a5c00c057ae0af2e375"
+            },
           "acceptance_id_join": true,
           "cache_age_seconds": 714,
-          "boundary": "User attribution is a field in the retained confirmation, not an independently authenticated assertion. The 1800-second cache is expired at this inspection."
+            "boundary": "The original receipt's unverified field is historical; CC confirms user authorship. The 1800-second cache was expired at inspection. Printed plan result line and fresh unmodified delivery remain unconfirmed."
         },
         {
           "id": "later-counters-and-current-config-hash",
@@ -600,7 +622,7 @@
         "Defect 14 still prevents an unmodified fresh acceptance under the recorded network condition; preserve modified-run/cache distinctions.",
         "Roadmap reports a #713 receiver-policy conflict and undeclared destination files. Owner/current-lane status must be checked before claiming these fixed; this writer neither inventories credentials nor reads settings.",
         "Retain original A/B counters and later config-hash recomputation outputs if needed for stronger provenance.",
-        "Authenticate/review the attestation provenance independently; do not equate it with a native Telegram receipt.",
+        "User authorship is confirmed by the command center; preserve the receipt's original not_verified field as historical. The plan check's printed result line remains unconfirmed, and the attestation does not establish fresh unmodified delivery.",
         "Independent review/adjudication before catalog promotion."
       ]
     },
@@ -633,7 +655,7 @@
           "boundary": "Original daemon output contains v0.43.0. The roadmap reports --version commit 9be7745a; that standalone output was not located. No binary was executed here."
         },
         "upstream_acceptance": {
-          "status": "retained_native_outputs_support_plan_predicates; wrapper_acceptance_is_local_integration",
+          "status": "partial_retained_metadata; idle_period_acceptance_pending",
           "evidence_class": "local_integration",
           "sources": [
             {
@@ -645,7 +667,26 @@
               "sha256": "6e7577d182bd5a7e7597273e8734d854fcff16b8e95b5beb24519d2858610dd7"
             }
           ],
-          "boundary": "Original plan runs native daemon/sync/session/usage operations, but its predicates and fresh-session controls are locally authored. No unchanged upstream suite claim."
+          "process_provenance": {
+            "rerun2": {
+              "stdout_reports": 0,
+              "process_exit_code": null,
+              "started_at_utc": null,
+              "ended_at_utc": null,
+              "argv": null
+            },
+            "service_8yU0G1": {
+              "timestamp_source": "roadmap only, 07:27Z",
+              "process_exit_code": null,
+              "argv": null
+            },
+            "idle_period_rerun": {
+              "status": "pending_owner_native_execution",
+              "required_record_fields": ["argv", "stdout_source", "stderr_source", "process_exit_code", "started_at_utc", "ended_at_utc", "upstream_pin", "original_source_hashes", "idle_period_scope"],
+              "new_run_performed": false
+            }
+          },
+          "boundary": "Retained native metadata and stdout footers do not establish complete process acceptance. Rerun2 lacks rc/start/end/argv; service.8yU0G1 lacks rc/argv and its timestamps come from the roadmap. The idle-period rerun remains open. Wrapper predicates remain local integration; no unchanged upstream suite claim."
         },
         "wired": {
           "status": "retained_owned-archive_daemon_sync_and_usage_outputs; launcher/link_state_reported",
@@ -922,6 +963,8 @@
       "scope": "Dated archive/daemon/session evidence and a bounded record-conflict correction; no current daemon or model acceptance.",
       "open_items": [
         "Owner-native durable lifecycle decision for the detached daemon's idle timeout; upstream documents supervised/foreground versus background behavior.",
+        "Retain an owner-native idle-period rerun with argv, stdout/stderr, process rc, start/end times, exact pin and original-output hashes; no complete record currently qualifies this gate.",
+        "Existing rerun2 stdout reports0 without rc/start/end siblings or argv; service.8yU0G1 has no rc/argv and its07:27 timestamps are roadmap-reported only.",
         "Retain exact standalone installed version and launcher/link outputs if required to bind revision and wiring beyond the dated metadata.",
         "Independent whole-slot readiness review/adjudication at the final qualification head; preserve the prior GPT partial-leg scope.",
         "Do not claim #723 fixed the daemon lifecycle: the roadmap reports alias migration only and no idle-timeout change."
