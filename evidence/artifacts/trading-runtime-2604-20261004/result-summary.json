@@ -1,0 +1,39 @@
+{
+ "host": "NativeStack2604",
+ "date_utc": "2026-10-04T21:17:20Z/21:23:33Z",
+ "runner": "mise exec uv@0.12.17 -- bash {install,accept}-trading-2604.sh",
+ "install": "PASS",
+ "acceptance": {
+  "offline_isolation": "PASS",
+  "python": "PASS",
+  "import_nautilus-trader": "PASS",
+  "import_numpy": "PASS",
+  "import_pandas": "PASS",
+  "import_alpaca-py": "PASS",
+  "import_edgartools": "PASS",
+  "import_exchange-calendars": "PASS",
+  "import_dvc": "PASS",
+  "import_duckdb": "PASS",
+  "import_pandera": "PASS",
+  "import_skfolio": "PASS",
+  "import_fincore": "PASS",
+  "import_mlflow": "PASS",
+  "import_arch": "PASS",
+  "import_purgedcv": "PASS",
+  "ibkr_adapter": "PASS",
+  "alpaca_adapter_source": "PASS",
+  "alpaca_adapter_import": "PASS",
+  "nautilus_quickstart_sha256": "PASS",
+  "nautilus_quickstart": "PASS",
+  "duckdb_query": "PASS",
+  "pandera_example": "PASS",
+  "skfolio_example": "PASS",
+  "arch_example": "PASS"
+ },
+ "pass": 25,
+ "total": 25,
+ "fixes_before_pass": [
+  "uv 0.12.17 pin satisfied via mise exec (host default uv is 0.12.22)",
+  "removed --managed-python from `uv python find` (conflicts with UV_PYTHON_PREFERENCE=only-managed)"
+ ]
+}

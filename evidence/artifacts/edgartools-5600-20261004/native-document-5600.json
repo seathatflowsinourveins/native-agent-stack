@@ -1,0 +1,50 @@
+{
+  "edgartools": "5.60.0",
+  "eligible_after_first_observation": false,
+  "eligible_before_first_observation": false,
+  "historical_point_in_time": false,
+  "limitations": [
+    "Fixture lineage is pinned upstream test data, not a fresh SEC response.",
+    "No SGML acceptance header exists; all trading cutoffs remain quarantined.",
+    "Text conversion and byte counts do not measure model token savings or strategy quality."
+  ],
+  "mode": "real_upstream_fixture_offline",
+  "native_api": "edgar.documents.HTMLParser().parse(raw).to_markdown()",
+  "native_markdown_bytes": 5308,
+  "native_markdown_sha256": "84b950871931d894596224602d5aa7fe4fcd73f765c5cff2f80dbffcc9767143",
+  "schema_version": 1,
+  "sec_network_requests": 0,
+  "source": {
+    "accepted_at": null,
+    "accession_from_upstream_path": "0000887919-21-000012",
+    "availability_status": "quarantined_missing_acceptance",
+    "bytes": 32434,
+    "commit": "abe44344c56cf4bfb5443e0debca7e39342f6e7a",
+    "first_local_observed_at": "2026-09-19T22:57:47.589804+00:00",
+    "form_from_upstream_path": "8-K",
+    "license_url": "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/LICENSE.txt",
+    "path": "tests/fixtures/parity_gate/8-K/0000887919-21-000012.html",
+    "provenance": "Pinned upstream test fixture containing historical filing HTML; not direct SEC acquisition and not a complete SGML filing.",
+    "repository": "dgunning/edgartools",
+    "sha256": "6f40108c938a9edc73da7477d92d5c6c705e965210e8e62faf60de81f0af4ab2",
+    "url": "https://raw.githubusercontent.com/dgunning/edgartools/abe44344c56cf4bfb5443e0debca7e39342f6e7a/tests/fixtures/parity_gate/8-K/0000887919-21-000012.html",
+    "vendored_file": {
+      "bytes": 32435,
+      "normalization": "One final newline appended by text writer. Original bytes recovered by removing one byte and verified against upstream SHA256.",
+      "sha256": "a1e7ca4772bca52911631c6ba2626878cb8c5ebdf17c662033e89d04ef4a0b17"
+    }
+  },
+  "status": "complete",
+  "temporal_gate": {
+    "acceptance_raw": null,
+    "accepted_at": null,
+    "accession": "0000887919-21-000012",
+    "available_at": null,
+    "cik": null,
+    "exclusion_reason": "missing_or_duplicate_header_field",
+    "filed_date": null,
+    "first_observed_at": "2026-09-19T22:57:47.589804+00:00",
+    "form": "8-K",
+    "status": "quarantined"
+  }
+}

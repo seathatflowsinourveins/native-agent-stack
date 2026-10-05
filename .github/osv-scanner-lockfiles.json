@@ -55,6 +55,9 @@
       "path": "blueprints/memory-stack/native-qualification/uv.lock"
     },
     {
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/requirements.txt"
     },
     {
@@ -235,6 +238,10 @@
     {
       "path": "blueprints/memory-stack/native-qualification/pyproject.toml",
       "lockfile": "blueprints/memory-stack/native-qualification/uv.lock"
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml",
+      "lockfile": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
     },
     {
       "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.in",

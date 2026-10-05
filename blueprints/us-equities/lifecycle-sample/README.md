@@ -47,7 +47,12 @@ keeps its unknown origin; the Roundhill document does not resolve it.
 
 ## Native operations and the project bridge
 
-`sample.py` is a small project adapter, not an upstream CLI. EdgarTools 5.58.0
+`sample.py` is a small project adapter, not an upstream CLI. Its current pin is
+EdgarTools 5.60.0, following the October 4
+[SEC index acceptance](../catalyst-provenance/native-network-edgartools-5600-20261004.json).
+The recorded lifecycle execution used 5.58.0; its receipt and parser fingerprints
+remain unchanged. New qualification uses new outputs and external hashes, while
+reproducing that historical native parse requires its original parser. The SDK
 executes `FilingSGML.from_text`, `get_document_by_sequence("1")` and
 `HTMLParser().parse(...).to_markdown()` locally. It never constructs an entity or
 filing downloader. The four installed source files are fingerprinted before

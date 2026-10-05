@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "kind": "runtime_lock_pin_move",
+  "old_sha256": "c6b5f25cd3198c1b847c1cb602fe5441dce7e038aa16976c46ecf5f0beb7b086",
+  "new_sha256": "6b4e6a4d4fc61cbda56c36d1ee0c65c263a5e938d968ce2806cc32330a8335f1",
+  "project_sha256": "f71b08811eb580cf5c3772da7327ec5554154b81839b80c6259d69eae6bd1338",
+  "diff": [
+    {
+      "name": "edgartools",
+      "old": "5.58.0",
+      "new": "5.60.0",
+      "why": "Directed upgrade to the verified 5.60.0 root; all locked dependencies already satisfy it."
+    },
+    {
+      "name": "us-equities-runtime",
+      "old": "0.1.0",
+      "new": "0.1.0",
+      "why": "Only project requires-dist metadata changes the direct EdgarTools pin; project version stays 0.1.0."
+    }
+  ],
+  "packages_added": [],
+  "packages_removed": [],
+  "entries": 242,
+  "unchanged_entries": 240,
+  "python_request": "3.12.3",
+  "prerelease": "if-necessary",
+  "exclude_newer": "2026-10-06T04:00:00Z",
+  "exclude_newer_changed": false,
+  "exclude_newer_reason": "The existing cutoff already includes the October 2 release and PyPI uploads.",
+  "requested_route": "mise exec uv@0.12.17 -- uv",
+  "requested_route_exit": 127,
+  "actual_route": "installed native uv 0.12.17 executable, verified by uv --version",
+  "resolution_command": "uv --no-config lock --project blueprints/us-equities/runtime-2604/trading-2604-runtime --python 3.12.3 --no-python-downloads --prerelease if-necessary --default-index https://pypi.org/simple --exclude-newer 2026-10-06T04:00:00Z --upgrade-package edgartools",
+  "resolution_exit": 0,
+  "check_command": "uv --no-config lock --check --project blueprints/us-equities/runtime-2604/trading-2604-runtime --python 3.12.3 --no-python-downloads --prerelease if-necessary --default-index https://pypi.org/simple --exclude-newer 2026-10-06T04:00:00Z",
+  "check_exit": 0,
+  "limitation": "No Linux mise executable was found on this worker. The prescribed wrapper could not run; native uv 0.12.17 performed the resolution and check without a shim. Validation through mise is pending."
+}
