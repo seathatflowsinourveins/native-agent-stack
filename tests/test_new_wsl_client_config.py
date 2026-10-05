@@ -197,8 +197,12 @@ class Round2RepairIntegrationTests(unittest.TestCase):
             (sources / "native-stack-google-chrome.sources").write_text(
                 "Signed-By: /etc/apt/keyrings/google-chrome.asc EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796\n")
             prefix = prefix.replace("/etc/apt/sources.list.d/", str(sources) + "/")
+            # CI 37320629278, full-suite-macos.log:12587-12617: macOS has no dpkg.
+            # Stub the WSL-only comparator and require its exact production arguments (accept.sh:541 at main 2d849ba1f).
             stubs = ('google-chrome-stable() { printf "Chrome %s\\n" "$build"; }\n'
                      'dpkg-query() { printf "%s" "$build"; }\n'
+                     'dpkg() { [[ "$1" == --compare-versions && "$2" == "$build" && "$3" == ge && '
+                     '"$4" == 154.0.8037.97-1 ]] && return "$version_status"; }\n'
                      'apt-cache() { printf "google-chrome-stable | %s | %s stable/main amd64 Packages\\n" "$build" "$origin"; }\n')
             for build, origin, expected in (("154.0.8037.97-1", "https://dl.google.com/linux/chrome/deb/", 0),
                                             ("155.0.9000.1-1", "https://dl.google.com/linux/chrome/deb/", 0),
@@ -207,7 +211,9 @@ class Round2RepairIntegrationTests(unittest.TestCase):
                 with self.subTest(build=build, origin=origin):
                     done = subprocess.run(["bash", "-euo", "pipefail", "-c", stubs + prefix],
                                           env={"PATH": os.environ["PATH"], "XDG_STATE_HOME": scratch,
-                                               "build": build, "origin": origin}, capture_output=True, text=True)
+                                                "build": build, "origin": origin,
+                                                "version_status": "1" if build.startswith("153.") else "0"},
+                                          capture_output=True, text=True)
                     self.assertEqual(done.returncode, expected, done.stderr)
 
     def test_harbor_openhands_adapter_must_match_the_installed_producer(self):
@@ -1192,9 +1198,9 @@ class RenderTests(unittest.TestCase):
         config = tomllib.loads(self.files["codex.config.toml"])
         self.assertIs(config["features"]["daemon_auto_start"], False)
         # The changelog parity of 2026-10-04: the experimental allowance-history feature (the shared template's, on both hosts)
-        # and the fast service tier (this distribution's additions; NativeStack runs both).
+        # and the standard tier chosen in its 2026-10-05 amendment (this distribution's additions).
         self.assertIs(config["features"]["analytics_plan_history"], True)
-        self.assertEqual(config["service_tier"], "fast")
+        self.assertEqual(config["service_tier"], "default")
         eco = json.loads((ROOT / "adoption/hosts/example.json").read_text())["ECO_ROOT"]
         self.assertEqual(config["shell_environment_policy"]["set"]["PATH"].split(":")[0], eco + "/bin")
         self.assertNotIn("projects", config)

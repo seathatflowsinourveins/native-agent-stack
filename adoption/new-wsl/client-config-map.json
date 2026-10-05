@@ -725,7 +725,7 @@
         "codex/config/shell_environment_policy.set.PATH"
       ],
       "wiring": "practice",
-      "source": "Keys of the config schema at openai/codex rust-v0.159.2 and rust-v0.160.0 (codex-rs/core/config.schema.json). tools/adoption/codex_home.py needs features.daemon_auto_start = false and a PATH that starts with the ecosystem's bin directory. service_tier = \"fast\" is the user's choice of 2026-10-03 for every route that honours it, which NativeStack runs (measured 2026-10-03: 61 against 33 output tokens per second through the gateway); the 0.160.0 schema calls `fast` the legacy spelling of the `priority` tier and says it still works. features.analytics_plan_history comes from the shared template."
+      "source": "Keys of the config schema at openai/codex rust-v0.159.2 and rust-v0.160.0 (codex-rs/core/config.schema.json). tools/adoption/codex_home.py needs features.daemon_auto_start = false and a PATH that starts with the ecosystem's bin directory. service_tier = \"default\" follows the user's 2026-10-05T13:22:24Z choice, Normal, fast on demand (Recommended), and forces standard; unset uses the TUI catalog default_service_tier, priority for gpt-6-sol and gpt-6-luna (openai/codex rust-v0.160.0, codex-rs/models-manager/models.json:512,680; codex-rs/tui/src/service_tier_resolution.rs:35-42). /fast persists fast on and default off (codex-rs/tui/src/config_update.rs:105-121 at that tag); per run use -c service_tier=fast. See docs/decisions/2026-10-04-new-wsl-changelog-parity.md, amendment 2026-10-05. features.analytics_plan_history comes from the shared template."
     },
     {
       "match": [

@@ -50,7 +50,7 @@ NativeStack lags the shared template on four items that a re-apply fixes: `skill
    delivers a message from another session without the approval hold that applies to a sender that is not in bypass mode.
    It is written only with `--with-authorization-settings` and never over a value the file already has. This overturns the
    wave-2 messaging ruling, which left the key unset because a message between two bypass-mode sessions delivers anyway,
-   on the user's directive above and his yes on the Claude-Codex messaging posture of 2026-10-02.
+   on the user's directive above and their yes on the Claude-Codex messaging posture of 2026-10-02.
 3. **Codex `service_tier = "fast"` is on 2604.** The user chose the fast tier for every route that honours it on
    2026-10-03, and NativeStack runs it (measured through the gateway the same day: 61 against 33 output tokens per second).
    The 0.160.0 config schema calls `fast` the legacy spelling of the `priority` tier and says it still works. The tier
@@ -75,3 +75,20 @@ NativeStack lags the shared template on four items that a re-apply fixes: `skill
 - Decision 2: a measured case of an unwanted message delivered without a hold, or the user asking for `hold`.
 - Decision 3: the user asks for the standard tier as the default, or the gateway stops honouring `fast`.
 - Decision 4: `plan_limit_history` returns nothing for our plans, or Codex removes the flag.
+
+## Amendment 2026-10-05: normal by default, fast on demand
+
+At **2026-10-05T13:22:24Z**, the user selected **"Normal, fast on demand (Recommended)"**.
+This supersedes Decision 3's interactive fast default: the new-WSL additions now set
+`service_tier = "default"`, which explicitly forces the standard tier. For one run, use
+`-c service_tier=fast`; `/fast` in the TUI toggles fast and persists the choice to `config.toml`,
+writing `"fast"` on and `"default"` off.
+
+Leaving the key unset does not select standard for every model: the TUI falls back to the
+catalog's `default_service_tier`, which is `priority` for `gpt-6-sol` and `gpt-6-luna`.
+Sources at `openai/codex` **rust-v0.160.0**, fetched read-only:
+[TUI resolution, :35-42](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/tui/src/service_tier_resolution.rs#L35-L42),
+[model catalog, :512 and :680](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/models-manager/models.json#L512),
+[fast toggle, :47-56](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/tui/src/chatwidget/service_tiers.rs#L47-L56),
+and [config persistence, :105-121](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/tui/src/config_update.rs#L105-L121).
+The client-config map and render assertion follow this choice. A later user choice would overturn it.
