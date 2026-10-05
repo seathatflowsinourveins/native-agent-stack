@@ -4257,8 +4257,8 @@
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "b18810796a06473b851897555c7319cc1891fadff1d8ea51847d38684a44c71c",
-      "bytes": 13089
+      "sha256": "fb817c3389d60aa2cac7dd97f352db74f7debf30441eb5f3066abac29eca1b32",
+      "bytes": 13198
     },
     {
       "path": ".github/osv-scanner.toml",

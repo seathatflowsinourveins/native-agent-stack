@@ -282,7 +282,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/receipts/xnys-primary-20261005/engine-baseline.lock",
-      "reason": "Captured evidence fixture of the XNYS-primary session-clock qualification (2026-10-05): the pre-change engine resolution, frozen as a receipt artifact to show the 20 baseline distributions stayed unchanged. It is not an install input; the active engine lock blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock is scanned."
+      "reason": "Captured evidence fixture of the XNYS-primary session-clock qualification (2026-10-05): the pre-change engine resolution, frozen as a receipt artifact to show the 20 baseline distributions stayed unchanged. It is not an install input; the active engine lock blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock is scanned.",
+      "evidence": "blueprints/us-equities/adaptive-paper/receipts/xnys-primary-20261005/qualification.json"
     }
   ]
 }
