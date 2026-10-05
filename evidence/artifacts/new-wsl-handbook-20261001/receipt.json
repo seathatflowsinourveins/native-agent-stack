@@ -6,8 +6,8 @@
   "generator_sha256": "8a66e5eebe1429924d62545e2eee389f1fdd58e6c2f679d8280cec3e99027cf8",
   "profile_sha256": "7cd6084ec54a49c7417fa50b3a8089d4131093cb141ce620fa71d5e7e9e1c509",
   "outputs": {
-    "docs/new-wsl-handbook.md": "3a38235cda28a09b9e2581c7732d39b2c9882042888366c8c0216b6cf408beb9",
-    "docs/new-wsl-handbook.json": "3c118f63f945c2d3dd9a2d87a2e227703780bc89c94ec98aaae1c9fc2e4062e4"
+    "docs/new-wsl-handbook.md": "390ecbce022d7476ee1c9477d351421aafc6119ec4d32fc481398644271ca4f7",
+    "docs/new-wsl-handbook.json": "1d493baabcaec31ae35e98a522c7c2d07016508e2a64a21e647f6ecdf3470f2e"
   },
   "inventory": {
     "layers": 37,

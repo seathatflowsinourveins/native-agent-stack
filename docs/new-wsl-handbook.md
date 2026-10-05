@@ -2137,7 +2137,7 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 | --- | --- |
 | [adoption/manifest.json](../adoption/manifest.json) | `7bb179e8440be17b75484c21495e66385ea8eb959a491d43d2488056ddede09a` |
 | [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json) | `7cd6084ec54a49c7417fa50b3a8089d4131093cb141ce620fa71d5e7e9e1c509` |
-| [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `c496b08e4b26cd1f29b2057109028b341dc72ab17229e15f6502f57e3aa1ec53` |
+| [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `9ce444680380be9c27e46146d436c57908af5d4f20d6732b0f4c31783e7f9ab8` |
 | [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `191184b8528eb6d31b141dd90a99e7917a05b98e466873ad6f81c23780ed99e0` |
 | [catalogs/landscape/research-state.json](../catalogs/landscape/research-state.json) | `fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a` |
 | [catalogs/landscape/us-equities.json](../catalogs/landscape/us-equities.json) | `cf441d393b1a1ee49c57d62592e2c7477de2003ca40aa9e1933a6c9b28d4a618` |
