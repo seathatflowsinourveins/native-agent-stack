@@ -2,8 +2,10 @@
 
 A stand-in checkout replaces the upstream source: its gpt_researcher.config.Config reads the JSON file and the environment
 the way upstream's does at 0957c301 (config.py: load_config, _set_attributes, parse_llm), and its cli.py records its
-arguments and environment instead of researching. Nothing is installed and no network is used. These are this project's
-checks of its own wrapper, not upstream acceptance: the wave-2 research ruling (changes 2-5) and the synthesis X18.
+arguments and environment instead of researching, then writes one report under outputs/ headed by frontmatter with a
+sources_count, as upstream's does (cli.py L209-245 and L332-336). Nothing is installed and no network is used. These are
+this project's checks of its own wrapper, not upstream acceptance: the wave-2 research ruling (changes 2-5), the synthesis
+X18 and the source guard added after run 20261005T222529Z-1387309 wrote a report from no sources and exited 0.
 """
 import hashlib
 import json
@@ -54,18 +56,31 @@ STAND_IN_CONFIG = textwrap.dedent('''
                 setattr(self, role + "_llm_provider", provider)
                 setattr(self, role + "_llm_model", model)
 ''')
-STAND_IN_CLI = textwrap.dedent('''
-    import json
-    import os
-    import sys
+FRONTMATTER = ('---\ntask_id: "stand-in"\ntitle: "Report"\nquery: "q"\nreport_type: "research_report"\nreport_source: "web"\n'
+               'tone: "objective"\ncreated_at: "2026-10-05T18:26:23"\nsources_count: {sources}\ntotal_cost_usd: 0.0\n---\n')
+REPORT = FRONTMATTER.format(sources=6) + "# Report\n\n## References\n" + "".join(f"- https://example.org/{n}\n" for n in range(6))
 
-    os.makedirs("outputs", exist_ok=True)
-    with open("cli-call.json", "w", encoding="utf-8") as handle:
-        json.dump({"argv": sys.argv[1:], "env": dict(os.environ), "cwd": os.getcwd()}, handle)
-    with open("outputs/report.md", "w", encoding="utf-8") as handle:
-        handle.write("# Report\\n\\n## References\\n" + "".join(f"- https://example.org/{n}\\n" for n in range(6)))
-    print("Report written to 'outputs/report.md'")
-''')
+
+def stand_in_cli(reports=(("report.md", REPORT),), status=0):
+    """A cli.py that records its call, writes `reports` (name, text) under outputs/ and exits with `status`. The run's
+    environment is scrubbed, so each case writes its own stand-in rather than passing a variable through."""
+    return textwrap.dedent(f'''
+        import json
+        import os
+        import sys
+
+        os.makedirs("outputs", exist_ok=True)
+        with open("cli-call.json", "w", encoding="utf-8") as handle:
+            json.dump({{"argv": sys.argv[1:], "env": dict(os.environ), "cwd": os.getcwd()}}, handle)
+        for name, text in {list(reports)!r}:
+            with open(os.path.join("outputs", name), "w", encoding="utf-8") as handle:
+                handle.write(text)
+            print(f"Report written to 'outputs/{{name}}'")
+        sys.exit({status!r})
+    ''')
+
+
+STAND_IN_CLI = stand_in_cli()
 
 
 class ResearchEntry(unittest.TestCase):
@@ -179,6 +194,7 @@ class ResearchEntry(unittest.TestCase):
                           "Ubuntu 26.04 WSL news this month", "--report_type", "research_report", "--tone", "objective",
                           "--no-pdf", "--no-docx"])
         self.assertIn("Report written to 'outputs/report.md'", result.stdout)
+        self.assertEqual(result.stdout.splitlines()[-2:], [f"run directory: {self.run_dir(result)}", "sources_count: 6"])
         call = json.loads((self.run_dir(result) / "cli-call.json").read_text())
         self.assertEqual(call["argv"], ["Ubuntu 26.04 WSL news this month", "--report_type", "research_report", "--tone",
                                         "objective", "--no-pdf", "--no-docx"])
@@ -190,6 +206,56 @@ class ResearchEntry(unittest.TestCase):
         self.assertEqual(env["HOME"], str(self.run_dir(result) / "home"))
         self.assertEqual(env["CONFIG_PATH"], str(self.run_dir(result) / "config.json"))
         self.assertEqual(Path(call["cwd"]), self.run_dir(result))
+
+    def test_a_report_from_no_sources_fails_closed(self):
+        """Run 20261005T222529Z-1387309: the CLI exited 0 with a report whose frontmatter said sources_count: 0. The wrapper
+        now exits 3, says why on stderr, and still prints the run directory, where the report stays for inspection."""
+        self.provide_timer()
+        empty = FRONTMATTER.format(sources=0) + "I could not gather any source material.\n"
+        (self.checkout / "cli.py").write_text(stand_in_cli(reports=[("WSL_3_Config_Tuning.md", empty)]))
+        result = self.run_script("WSL 3.0 .wslconfig settings October 2026")
+        self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+        self.assertIn("source guard failed: GPT Researcher retrieved 0 sources (sources_count: 0 in ", result.stderr)
+        self.assertIn("not research evidence", result.stderr)
+        self.assertNotIn("sources_count: 0", result.stdout)
+        self.assertEqual((self.run_dir(result) / "outputs/WSL_3_Config_Tuning.md").read_text(), empty)
+
+    def test_a_report_whose_sources_cannot_be_counted_fails_closed(self):
+        self.provide_timer()
+        body = "# Report\n\n## References\n- https://example.org/0\n"
+        uncounted = "has no single sources_count line in a closed frontmatter"
+        cases = {
+            "no report": ([], "0 reports in "),
+            "two reports": ([("a.md", REPORT), ("b.md", REPORT)], "2 reports in "),
+            "no frontmatter": ([("report.md", body)], uncounted),
+            "no sources_count": ([("report.md", REPORT.replace("sources_count: 6\n", ""))], uncounted),
+            "a count that is not a number": ([("report.md", REPORT.replace("sources_count: 6", "sources_count: many"))],
+                                             uncounted),
+            "two counts": ([("report.md", REPORT.replace("sources_count: 6\n", "sources_count: 6\nsources_count: 0\n"))],
+                           uncounted),
+            "a count below the frontmatter": ([("report.md", FRONTMATTER.replace("sources_count: {sources}\n", "")
+                                                + "sources_count: 6\n" + body)], uncounted),
+            "a frontmatter that never closes": ([("report.md", "---\nsources_count: 6\n" + body)], uncounted),
+        }
+        for case, (reports, message) in cases.items():
+            with self.subTest(case=case):
+                (self.checkout / "cli.py").write_text(stand_in_cli(reports=reports))
+                result = self.run_script("a query")
+                self.assertEqual(result.returncode, 3, result.stdout + result.stderr)
+                self.assertIn("source guard failed: ", result.stderr)
+                self.assertIn(message, result.stderr)
+                self.assertTrue(self.run_dir(result).is_dir())
+
+    def test_the_cli_status_passes_through_before_the_guard(self):
+        """A failed or stopped CLI (124 from the watchdog) keeps its own status; the guard reads only a run that exited 0."""
+        self.provide_timer()
+        for status in (1, 124):
+            with self.subTest(status=status):
+                (self.checkout / "cli.py").write_text(stand_in_cli(reports=[], status=status))
+                result = self.run_script("a query")
+                self.assertEqual(result.returncode, status, result.stdout + result.stderr)
+                self.assertNotIn("source guard", result.stderr)
+                self.assertTrue(self.run_dir(result).is_dir())
 
     def test_the_run_fails_closed_without_a_supported_timer(self):
         """Negative control: with neither timeout nor gtimeout on the caller's PATH, as on macOS without Homebrew's coreutils,

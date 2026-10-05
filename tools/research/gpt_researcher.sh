@@ -24,7 +24,24 @@
 #   by absolute path, since the scrubbed PATH (/usr/bin:/bin) has no timeout on macOS: GNU coreutils' timeout, else
 #   gtimeout, the name Homebrew's coreutils gives it there. With neither, the research run fails closed (exit 1) before it
 #   starts; --preflight-only does not need one.
-# No credential is read or printed. It prints the upstream CLI's output, then "run directory: <path>".
+# - A source guard fails closed after the CLI exits 0. Upstream's CLI writes one report under outputs/ in its working
+#   directory (the run directory), headed by YAML frontmatter whose sources_count is len(researcher.visited_urls)
+#   (cli.py L209-245, L225, L241 and L332-336 at 0957c301; skills/researcher.py L813-834 adds a URL to that set when it is
+#   selected for scraping). Without exactly one report, a sources_count line or with sources_count 0, the run exits 3: a
+#   report written from no sources reads as a success but is not research evidence (run 20261005T222529Z-1387309).
+# - The retriever stays duckduckgo (diagnosis of that run, 2026-10-05). At 0957c301, which is also main, it calls ddgs
+#   text() with region 'wt-wt' and ddgs's default backend 'auto', and exposes neither to configuration
+#   (gpt_researcher/retrievers/duckduckgo/duckduckgo.py L30-52); ddgs 9.16.0, the newest release, reads only DDGS_PROXY
+#   (ddgs/ddgs.py L53). Its keyless engines throttle a busy host, and an HTTP 429, 202 or 403 yields no results and no
+#   error (ddgs/base.py L65-70), so a failed search reports wikipedia's DNS error for wt.wikipedia.org instead
+#   (engines/wikipedia.py L35-39; 'wt-wt' is no ddgs region, deedy5/ddgs#417). Probed here that day: brave 429,
+#   duckduckgo 202, google and mojeek 403, yahoo alone with results; arxiv, openalex and semantic_scholar gave five
+#   off-topic results, none and a 429, so adding them would hide a dead web search behind scholarly hits. The durable
+#   keyless route owed is SearXNG through the searx retriever, after its service and the 30-query measurement
+#   (docs/decisions/2026-10-01-new-wsl-definitive-defaults.md L80).
+# No credential is read or printed. It prints the upstream CLI's output, then "run directory: <path>", then the report's
+# "sources_count: <n>". Exit status: 0 with at least one source; 2 for usage; 1 when GPT Researcher, the preflight or the
+# timer is missing or fails; 3 when the source guard fails; otherwise the CLI's own status (124 from the watchdog).
 # GPTR_CONFIG_SOURCE names another configuration to copy (the tests use it); the preflight holds any copy to the same rule.
 set -euo pipefail
 here="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
@@ -110,4 +127,29 @@ status=0
 "${scrub[@]}" "$timer" 1500 "$python" "$checkout/cli.py" "$query" --report_type research_report --tone objective --no-pdf --no-docx \
   || status=$?
 printf 'run directory: %s\n' "$run"
-exit "$status"
+if (( status != 0 )); then
+  exit "$status"
+fi
+# The source guard (see above), in the same scrubbed environment; any failure of it, its own included, exits 3.
+"${scrub[@]}" "$python" - "$run/outputs" <<'PY' || exit 3
+import re
+import sys
+from pathlib import Path
+
+outputs = Path(sys.argv[1])
+reports = sorted(outputs.glob("*.md")) if outputs.is_dir() else []
+if len(reports) != 1:
+    sys.exit(f"source guard failed: {len(reports)} reports in {outputs}, not one, so the run's sources cannot be counted")
+lines = reports[0].read_text(encoding="utf-8", errors="replace").splitlines()
+end = lines.index("---", 1) if lines[:1] == ["---"] and "---" in lines[1:] else 0
+counts = [int(found.group(1)) for line in lines[1:end] if (found := re.fullmatch(r"sources_count: (\d+)", line.strip()))]
+if len(counts) != 1:
+    sys.exit(f"source guard failed: {reports[0]} has no single sources_count line in a closed frontmatter, so its sources "
+             "cannot be counted")
+count = counts[0]
+if count == 0:
+    sys.exit(f"source guard failed: GPT Researcher retrieved 0 sources (sources_count: 0 in {reports[0]}). A report written "
+             "from no sources is not research evidence. The keyless search engines behind the duckduckgo retriever were "
+             "probably throttling this host; retry later.")
+print(f"sources_count: {count}")
+PY
