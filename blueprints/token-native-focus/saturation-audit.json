@@ -7579,7 +7579,7 @@
     {
       "component_id": "sandbox-runtime",
       "repository": "https://github.com/anthropics/sandbox-runtime",
-      "version": "0.0.77",
+      "version": "0.0.78",
       "profile": "supporting",
       "role": "On-demand OS isolation for selected native commands",
       "installation_assessment": "runtime present at retained native operation date",
@@ -7640,7 +7640,7 @@
       },
       "remaining_install_gap": null,
       "remaining_install_gap_reason": "No additional useful installation gap identified for the selected role in this bounded evidence review; full lifecycle/optional-feature limits remain explicit.",
-      "source_pin": "6fa731368807419ee157f9a3fac955fefe1019c6",
+      "source_pin": "6f0ce155ccb136bda33a8a72201fe7f54fe47d9b",
       "lifecycle_stages": {
         "install": {
           "status": "observed_installed",
