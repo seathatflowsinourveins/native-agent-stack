@@ -16678,6 +16678,11 @@
       "bytes": 14176
     },
     {
+      "path": "docs/decisions/2026-10-05-readiness-currency-upkeep.md",
+      "sha256": "9d48f3d31f57f24e89125d910082ab5e07c171b49f3fa478f4b4f0ee1e80da2f",
+      "bytes": 14670
+    },
+    {
       "path": "docs/decisions/2026-10-05-rtk-fold-harbor-phase2.md",
       "sha256": "d7698470de9eb7ed30f0764f8b1b17acd8a926298b08630829e1b955ba177dfe",
       "bytes": 23344
@@ -40021,6 +40026,11 @@
       "path": "evidence/artifacts/ns2604-e2e-20261004/summary.json",
       "sha256": "e8347f73a917c7efb9b2a72050ca6c4f104e8f7a2fb9c89d53ee58b49d0aeffd",
       "bytes": 4589
+    },
+    {
+      "path": "evidence/artifacts/ns2604-readiness-currency-20261005/source-review.json",
+      "sha256": "9ad01ea70c066b784cbd07264d497e008f8de7fab340e60ae82e9543b0417c5a",
+      "bytes": 12273
     },
     {
       "path": "evidence/artifacts/observability-dashboard.png",
