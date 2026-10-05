@@ -1,5 +1,24 @@
 # SOTA repository convergence — 2026-09-22
 
+## Seeded web-research follow-up — 2026-10-05
+
+[The dated manifest](manifest-20261005-webresearch-ns2604.json) publishes the
+`web-research` lane of `landscape-sweep-webresearch-20261005-ns2604`, workflow
+`wf_5d8a2a30-9b5`: 16 formal proposals across the first and follow-up rounds,
+five surviving dispositions and eleven fit refutations. Four survivors remain
+`targeted_candidate` (Exa MCP, Trafilatura, LettuceDetect and CDX Toolkit);
+IPI-proxy's surviving `not_adopted` disposition preserves its rejection.
+Stars supplied discovery seeds and establish no quality or adoption claim.
+
+Each candidate still needs its recorded measured comparison and native organic-use
+qualification. No selection, installation, platform acceptance or readiness changes.
+Browser-use and Playwright MCP were retained as discovery-stage dropped proposals,
+not included among the eleven formal refutations. The
+[decision and publication review](../../docs/decisions/2026-10-05-seeded-web-research-landscape.md)
+links all source reviews, retained votes, usage and the next-sweep gaps. The sections
+below retain the September 22 audit; unrelated layers in the new snapshot were not
+individually reviewed by this one-layer follow-up.
+
 One dated, per-layer list of the repositories this stack actually selects, confirmed
 against current upstream metadata, with every newcomer from the 342 starred
 repositories, the 35 awesome lists and a bounded 2026 web sweep examined and given a

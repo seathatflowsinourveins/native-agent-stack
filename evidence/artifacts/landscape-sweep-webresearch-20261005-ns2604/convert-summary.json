@@ -1,0 +1,75 @@
+{
+ "lane": "landscape-sweep-webresearch-20261005-ns2604",
+ "layers": 1,
+ "proposals": 16,
+ "survivors": 5,
+ "lost": [],
+ "excluded_layers": [],
+ "degraded_discovery": [],
+ "critic_lost": false,
+ "effort_deviations": [],
+ "effort_deviations_unmapped": [],
+ "superseded_retained": {},
+ "superseded_retained_unmapped": [],
+ "web_search": {
+  "calls": 22,
+  "capped": 0,
+  "capped_children": []
+ },
+ "web_search_capped": [],
+ "web_search_capped_unmapped": [],
+ "refuted_by_absence": {},
+ "retained_failures": {},
+ "reopened_layers": [],
+ "calls": {
+  "web_search": 10,
+  "web_fetch": 11,
+  "gh_api": 50,
+  "gpt6_web_search": 24,
+  "gpt6_web_fetch": 16,
+  "gpt6_gh_api": 80
+ },
+ "skills_usage": {
+  "discover_claude": {
+   "search-first": 2,
+   "iterative-retrieval": 2,
+   "supply-chain-risk-auditor": 1,
+   "fp-check": 1
+  },
+  "discover_gpt6": {
+   "search-first": 2,
+   "iterative-retrieval": 2,
+   "supply-chain-risk-auditor": 2,
+   "fp-check": 2,
+   "openai-docs": 1
+  },
+  "facts": {
+   "fp-check": 2,
+   "supply-chain-risk-auditor": 2
+  },
+  "fit_claude": {
+   "fp-check": 2,
+   "supply-chain-risk-auditor": 2
+  },
+  "fit_gpt6": {
+   "search-first": 2,
+   "iterative-retrieval": 2,
+   "supply-chain-risk-auditor": 2,
+   "fp-check": 2
+  }
+ },
+ "gpt6_jobs": 4,
+ "gpt6_by_status": {
+  "ok": 4
+ },
+ "gpt6_copy_check": {
+  "match": 4
+ },
+ "run": {
+  "runId": "wf_5d8a2a30-9b5",
+  "status": "completed",
+  "durationMs": 5978701,
+  "agentCount": 11,
+  "totalTokens": 1824013
+ }
+}

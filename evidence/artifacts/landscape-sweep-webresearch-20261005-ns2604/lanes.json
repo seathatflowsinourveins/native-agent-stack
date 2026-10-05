@@ -1,0 +1,789 @@
+{
+ "lanes": [
+  {
+   "lane": "landscape-sweep-webresearch-20261005-ns2604",
+   "result": {
+    "layers": [
+     {
+      "layer_id": "web-research",
+      "selected": [],
+      "alternatives_keep_but_compare": [],
+      "new_candidates": [
+       {
+        "repository": "https://github.com/chromedevtools/chrome-devtools-mcp",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: Seeded as the PR #713 plan row. README, docs/cli.md, docs/tool-reference.md (at cf2eab96), the releases and the GitHub Advisory Database were read via GitHub GraphQL; the 90-day rule used REST commits.",
+        "demonstrated_gap": "Seeded owner candidate. Open PR #713 (2026-10-05) adds a plan row for Chrome DevTools MCP 1.10.1 'for browser automation and diagnostics (web-research/playwright-cli)'. That row is a plan, not evidence of fit. The project is the Chrome DevTools team's first-party driver (v1.10.1, 2026-09-23; default-branch commit 2026-10-05). It now ships an experimental `chrome-devtools` CLI that talks to a background daemon and keeps browser state between commands, so it could serve as a bounded native command. Its documented differentiators, however, are diagnostics, not retrieval: the tool reference is dominated by performance traces and insights, lighthouse_audit, heap-snapshot analysis, and extension and PWA tools. For retrieval it offers take_snapshot, evaluate_script and get_network_request, which can save request and response bodies to files. It documents no reconnect or recovery behaviour, so nothing in it targets open gap 2 (session recovery and compatibility with arbitrary sites). agent-browser already covers this ground: full request/response detail, HAR with embedded bodies, session persistence, profile reuse, auto-connect and CDP mode. No requirement gap is shown. Any trial must switch off defaults that conflict with the privacy filter: (1) Google collects usage statistics by default (--no-usage-statistics or CHROME_DEVTOOLS_MCP_NO_USAGE_STATISTICS); (2) performance tools send trace URLs to the CrUX API (--no-performance-crux); (3) the server checks npm for updates (CHROME_DEVTOOLS_MCP_NO_UPDATE_CHECKS); (4) the CLI enables unrestricted filesystem access by default, which --workspace limits. Two moderate advisories (GHSA-8qf9-62x2-82pp, GHSA-3pvj-jv98-qhjq) were fixed in 1.1.0.",
+        "proposed_label": "keep_but_compare",
+        "comparison_that_would_overturn": "Use the frozen site set for open gaps 0 and 2: the loopback fixture plus selected public primary-source pages. Run the `chrome-devtools` CLI 1.10.1 with usage statistics, CrUX and update checks off and --workspace set. Compare it against agent-browser 0.38.2, not 0.38.1, so that the #2003 Chrome launch-freeze fix does not bias recovery. Score per-page task success, recovery after the browser is killed mid-session, snapshot bytes and tokens per page, and wall time, on both linux-wsl2 and macos-arm64. If it beats agent-browser on success or recovery at equal or lower token cost, promote it to targeted_candidate for the second browser slot. Otherwise it stays a diagnostics tool outside this layer's requirement.",
+        "evidence": [
+         "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/cf2eab96d96cad3d47ce769b9638815d1775500f/README.md: 'A CLI is also provided for use without MCP'; usage statistics 'enabled by default' (opt out with --no-usage-statistics); trace URLs sent to CrUX (--no-performance-crux); npm update checks (CHROME_DEVTOOLS_MCP_NO_UPDATE_CHECKS); officially supports Google Chrome and Chrome for Testing only",
+         "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/cf2eab96d96cad3d47ce769b9638815d1775500f/docs/cli.md: the CLI is 'experimental'; it is a client of a background daemon that preserves browser state; it 'enables unrestricted filesystem access by default. Use --workspace'; headless and isolated by default",
+         "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/cf2eab96d96cad3d47ce769b9638815d1775500f/docs/tool-reference.md: tools are mostly performance, lighthouse_audit, heap-snapshot, extension and PWA tools; get_network_request saves bodies via requestFilePath and responseFilePath; no reconnect or recovery tool is documented",
+         "https://github.com/ChromeDevTools/chrome-devtools-mcp/releases/tag/chrome-devtools-mcp-v1.10.1: latest release, 2026-09-23",
+         "https://github.com/advisories/GHSA-8qf9-62x2-82pp and https://github.com/advisories/GHSA-3pvj-jv98-qhjq: moderate; affect versions up to 1.0.1; fixed in 1.1.0",
+         "https://github.com/seathatflowsinourveins/native-agent-stack/pull/713: OPEN; plan row 'Chrome DevTools MCP 1.10.1 for browser automation and diagnostics (web-research/playwright-cli)'",
+         "https://github.com/vercel-labs/agent-browser/blob/526157cfd4ec64f45939f9ba0f10d5936aa7ac33/README.md: the Network section offers `network request` for full request/response detail and `network har start`, which embeds response bodies; the README also has Sessions, Session Persistence, Chrome Profile Reuse, Auto-Connect and CDP Mode sections",
+         "https://api.github.com/repos/ChromeDevTools/chrome-devtools-mcp/commits?since=2026-07-07T00:00:00Z&per_page=1: default-branch commit cf2eab96d96c on 2026-10-05"
+        ],
+        "upstream_now": {
+         "latest_release": "chrome-devtools-mcp-v1.10.1",
+         "released_at": "2026-09-23",
+         "stars": 52991,
+         "pushed_at": "2026-10-05",
+         "archived": false,
+         "license": "Apache-2.0"
+        }
+       },
+       {
+        "repository": "https://github.com/unclecode/crawl4ai",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: Seeded ('re-judge on current release'). Release, CHANGELOG and GitHub Advisory Database via GitHub GraphQL; fp-check applied to advisory reachability; REST commits. Prior refutation reasons (from evidence/artifacts/landscape-sweep-20260926-gpt6-fit-revote-20261003/props/web-research.json) were read as leads only.",
+        "demonstrated_gap": "Re-judged on v0.9.4 (2026-09-23). The decisive reason is requirement fit. The layer defines no crawl or ingestion task, so its overturn_when ('a defined source-coverage or ingestion task exceeds the current commands') is unmet. Page extraction is already covered by agent-browser plus the trafilatura survivor (v2.3.0, 2026-10-02). What is new in 0.9.x is speed, not attributable coverage: content pruning is about 10x faster with the lxml-native PruningContentFilterLXML, now the default. The supply-chain facts are secondary:\n- the GitHub Advisory Database lists 13 reviewed crawl4ai advisories;\n- 10 of their summaries name the Docker server or API, and GHSA-r253-r9jw-qg44's description scopes it to the Docker API's request-supplied extra_args;\n- GHSA-2jq4-q6vv-4cp3 (critical, path traversal in crawler downloads) also reached SDK users who crawled an attacker-controlled page before 0.9.0;\n- GHSA-445m-27cf-gr3x affects 0.4.247 and earlier;\n- none version-matches 0.9.4.\nThe 0.9.4 CHANGELOG separately names three more fixed advisories, described in Docker-server terms, which the database query did not return: GHSA-f77g-77vp-r96v, GHSA-wh5w-hmj3-vgg7 and GHSA-5w5p-vcv6-mm3f. Maintenance is active (default-branch commit 2026-10-05).",
+        "proposed_label": "not_adopted",
+        "comparison_that_would_overturn": "A frozen ingestion task, for example crawling a broker or exchange documentation tree to Markdown with source URLs. crawl4ai 0.9.4, used as a library with no Docker server, would have to beat agent-browser plus trafilatura on attributable-page completeness, extraction accuracy against gold text, and runtime.",
+        "evidence": [
+         "https://github.com/unclecode/crawl4ai/releases/tag/v0.9.4: 2026-09-23",
+         "https://github.com/unclecode/crawl4ai/blob/8afd0a68064ff7049303c9f9d037ab6228aac43c/CHANGELOG.md: '0.9.4 is a security release'; names GHSA-f77g-77vp-r96v, GHSA-wh5w-hmj3-vgg7 and GHSA-5w5p-vcv6-mm3f; PruningContentFilterLXML is about 10x faster and is now the default",
+         "https://github.com/advisories/GHSA-2jq4-q6vv-4cp3: the download sinks are 'reachable for SDK users simply by crawling an attacker-control[led page]'; affects 0.8.9 and earlier; fixed in 0.9.0",
+         "https://github.com/advisories/GHSA-r253-r9jw-qg44: 'The Docker API server accepted a request-supplied browser_config.extra_args'; fixed in 0.9.0",
+         "https://github.com/advisories?query=crawl4ai: 13 reviewed pip advisories (2025-04-18 to 2026-06-21); 10 summaries name the Docker server or API",
+         "https://api.github.com/repos/unclecode/crawl4ai/commits?since=2026-07-07T00:00:00Z&per_page=1: default-branch commit 8afd0a68064f on 2026-10-05"
+        ],
+        "upstream_now": {
+         "latest_release": "v0.9.4",
+         "released_at": "2026-09-23",
+         "stars": 84779,
+         "pushed_at": "2026-10-05",
+         "archived": false,
+         "license": "Apache-2.0"
+        }
+       },
+       {
+        "repository": "https://github.com/exa-labs/exa-mcp-server",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: A web search for measured search-API comparisons found the openbenchmarks live board and its open harness. exa-labs/exa-mcp-server was then verified via GitHub GraphQL (README at f3d71fb6) and REST commits. The 2026-10-03 revote and this morning's discovery draft also proposed it; those were treated as leads only and re-verified here.",
+        "demonstrated_gap": "Search slot (winner tavily-cli 0.1.8). The layer records two Tavily gaps: it missed the intended Nautilus adapter guide in one of three retained searches (open gap 3), and no completeness or accuracy benchmark exists (open gap 4). A third-party benchmark scores attributable retrieval: each gold token must carry a `# source:` URL that appeared in that run's search or fetch results (model fixed at gpt-5.6-sol; 100 held-out tickets; 3 runs). On its live board (last updated 26 Sept 2026), search+fetch puts Exa deep at 83.0 ± 1.0 and Exa auto at 81.7 ± 1.1, against Tavily advanced at 60.0 ± 2.0 and Tavily basic at 59.0 ± 1.7. On search-only, Tavily basic scores 51.0 ± 5.3. Exa's official MCP server is a hosted endpoint (https://mcp.exa.ai/mcp) that 'works anonymously with rate limits' and exposes web_search_exa and web_fetch_exa, so a trial needs no new credential on either host. Caveats: (1) The benchmark measured keyed `POST /search type=deep|auto` plus `POST /contents`; which search type the anonymous web_search_exa tool uses, and whether deep is offered anonymously, is unverified. (2) The scored task set is private. (3) Queries leave the host, as Tavily's do. The repository publishes no GitHub releases, so pin a commit (f3d71fb6b0ff, 2026-09-23).",
+        "proposed_label": "targeted_candidate",
+        "comparison_that_would_overturn": "Configure Exa as a plain MCP server only, with `codex mcp add exa --url https://mcp.exa.ai/mcp` or an equivalent streamable-HTTP mcpServers entry. Do not use the plugin install: it also loads Exa's skills/, which would add third-party instructions and confound a comparison of tools against `tvly`. Stay anonymous and decline the OAuth sign-in prompt. Run web_search_exa and web_fetch_exa against tavily-cli 0.1.8 (`tvly search` and `tvly extract` with --json) on one frozen source set with the same agent model and budgets. The set must include the Nautilus adapter-guide query that Tavily missed (evidence/receipts/native-tavily-session-20260920.json lines 11 and 83, per the layer input). Score target-URL hit rate, the share of claims whose source URL appeared in that run's retrieved results (the benchmark's grounding rule), wall time, tokens per task and rate-limit failures. Record which Exa search type web_search_exa used. Exa replaces or complements Tavily only if it raises target hits and attributable share without a runtime or rate-limit regression. It is refuted if the anonymous tier erases the benchmark's 21-24 point lead.",
+        "evidence": [
+         "https://github.com/exa-labs/exa-mcp-server/blob/f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97/README.md: hosted endpoint https://mcp.exa.ai/mcp; 'The hosted MCP server works anonymously with rate limits'; MCP-only install `codex mcp add exa --url https://mcp.exa.ai/mcp`; plugin installs load skills/; Exa Agent (agent_run) requires OAuth or an API key",
+         "https://openbenchmarks.com/web-search-for-coding-agents: live board, 'last updated 26 Sept 2026'. Search+fetch: Exa deep 83.0 ± 1.0, Exa auto 81.7 ± 1.1, Firecrawl 76.0 ± 1.0, Tavily advanced 60.0 ± 2.0, Tavily basic 59.0 ± 1.7. Search-only: Tavily basic 51.0 ± 5.3. Changelog: on 2026-09-11, Tavily Basic replaced Tavily Fast",
+         "https://github.com/openbenchmarks-labs/web-search-for-coding-agents/blob/a4fc6411013b504385d035fa74f57fab9fd83940/README.md: a ticket passes only if the file compiles, every gold token is present, and each token carries a `# source:` URL that appeared in that run's search or fetch results. Model gpt-5.6-sol; 32 turns, 5 searches and 5 fetches per ticket; 100-ticket scored set is private; 30-ticket public set is format-only",
+         "https://openbenchmarks.com/llms.txt: Disclosures section, self-declared: 'No paid placements' and 'No equity or referral relationships' with listed providers",
+         "https://api.github.com/repos/exa-labs/exa-mcp-server/commits?since=2026-07-07T00:00:00Z&per_page=1: default-branch commit f3d71fb6b0ff on 2026-09-23 (maintained under the 90-day rule)"
+        ],
+        "upstream_now": {
+         "latest_release": null,
+         "released_at": null,
+         "stars": 5078,
+         "pushed_at": "2026-10-02",
+         "archived": false,
+         "license": "MIT"
+        }
+       },
+       {
+        "repository": "https://github.com/adbar/trafilatura",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: Previous sweep survivor and seeded extraction control; reconsidered against the new October release.",
+        "demonstrated_gap": "The supplied incumbent evidence does not measure preservation of quotations, tables or citation metadata. The October 2 release specifically improves extraction, canonical URLs, metadata and Markdown correctness, making this a concrete candidate for attributable extraction of static primary sources. Superiority over Tavily extraction remains unmeasured.",
+        "proposed_label": "targeted_candidate",
+        "comparison_that_would_overturn": "Compare v2.3.0 with Tavily extraction and the existing browser route on 30 frozen primary-source HTML documents, including broker documentation and investor-relations pages. Score quotation fidelity, table-cell accuracy, URL/title/date accuracy, extraction recall, runtime and output tokens. Retain only if it improves recall by at least 10 percentage points or reduces runtime/tokens by at least 20% without attribution regressions. Verify native installation on WSL2 and both Mac profiles.",
+        "evidence": [
+         "[v2.3.0 release](https://github.com/adbar/trafilatura/releases/tag/v2.3.0) — October 2 extraction, metadata, canonical-URL, Markdown and download improvements.",
+         "[Repository documentation](https://github.com/adbar/trafilatura) — CLI, offline HTML processing, structured metadata and multiple output formats; links extraction evaluations, but establishes no comparison with these incumbents.",
+         "[Repository API](https://api.github.com/repos/adbar/trafilatura) — creation date, stars, pushed_at, archived status and license.",
+         "[Default-branch maintenance check](https://api.github.com/repos/adbar/trafilatura/commits?since=2026-07-07T00%3A00%3A00Z&per_page=1) — returned commit 6c1977a00b4e82ebb7e6fad1192467adaf24d430 dated October 2."
+        ],
+        "upstream_now": {
+         "latest_release": "v2.3.0",
+         "released_at": "2026-10-02T16:53:41Z",
+         "stars": 6913,
+         "pushed_at": "2026-10-02T16:53:41Z",
+         "archived": false,
+         "license": "Apache-2.0"
+        }
+       },
+       {
+        "repository": "https://github.com/1broseidon/ketch",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: Unseeded discovery through the broad current-month search for local research CLIs.",
+        "demonstrated_gap": "The retained Tavily search missed an intended adapter guide. Ketch provides a concrete alternative retrieval path: a standalone CLI with provider selection, federated search, source URLs and structured output, without requiring a research-agent service. Its release assets cover Linux x86_64 and macOS arm64. Better target recall is plausible, not demonstrated.",
+        "proposed_label": "targeted_candidate",
+        "comparison_that_would_overturn": "Freeze commit 3722f58c1ff5c6b14b687ca3f925587996033536, which follows v0.18.1 and advertises rejection of non-HTTP scrape/crawl targets. On 20 gold-labelled primary-source queries, compare an explicitly selected keyless backend and federation against Tavily; prohibit silent provider changes. Require at least 10 percentage points better recall@5 with no attribution loss, or equal recall at materially lower total cost. Record latency, failure disclosure and native host receipts; validate the post-release URL restriction.",
+        "evidence": [
+         "[Repository documentation](https://github.com/1broseidon/ketch) — standalone CLI, JSON output, explicit backend selection, rank fusion, extraction and browser fallback.",
+         "[v0.18.1 release](https://github.com/1broseidon/ketch/releases/tag/v0.18.1) — September 23 cache-sharing fixes; checksums and binaries for both required architectures.",
+         "[Repository API](https://api.github.com/repos/1broseidon/ketch) — created March 25, 2026; metadata and license.",
+         "[Default-branch maintenance check](https://api.github.com/repos/1broseidon/ketch/commits?since=2026-07-07T00%3A00%3A00Z&per_page=1) — September 29 commit 3722f58c1ff5c6b14b687ca3f925587996033536, titled rejection of non-HTTP targets."
+        ],
+        "upstream_now": {
+         "latest_release": "v0.18.1",
+         "released_at": "2026-09-23T03:27:59Z",
+         "stars": 691,
+         "pushed_at": "2026-09-29T05:12:07Z",
+         "archived": false,
+         "license": "MIT"
+        }
+       },
+       {
+        "repository": "https://github.com/knockoutez/wigolo",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: User seed; investigated specifically for attributable, bounded retrieval.",
+        "demonstrated_gap": "The incumbent evidence lacks a citation-accuracy benchmark. Wigolo documents citation IDs, verbatim excerpts with source offsets, engine-failure reporting and CLI access to keyless search/fetch. These directly address attribution and retrieval observability. Its published comparison is only one author-run query, so it does not establish general superiority.",
+        "proposed_label": "targeted_candidate",
+        "comparison_that_would_overturn": "Compare search and plain-page CLI operations with Tavily and Ketch on the same 20 queries and 100 gold quotation spans. Require every reported span to resolve correctly, explicit stale/failed-source reporting, and improved primary-source recall or lower total cost without accuracy loss. Freeze the tested version and verify its response contract: current-main documentation must not be assumed present in v0.2.1. Exclude autonomous research, stealth and challenge-bypass paths. Measure setup, cold start and memory on WSL2 and both Macs.",
+        "evidence": [
+         "[Repository documentation](https://github.com/KnockOutEZ/wigolo) — citation/span response example, CLI surface, local models/cache, platform requirements and the limited single-query comparison.",
+         "[v0.2.1 release](https://github.com/KnockOutEZ/wigolo/releases/tag/v0.2.1) — bounded SPA settling, completeness signalling and installation fixes; also records exclusions of external-API and ARM64-embedding checks from required failures.",
+         "[Repository API](https://api.github.com/repos/KnockOutEZ/wigolo) — created April 12, 2026; license reported as NOASSERTION, recorded without a ranking penalty.",
+         "[Default-branch maintenance check](https://api.github.com/repos/KnockOutEZ/wigolo/commits?since=2026-07-07T00%3A00%3A00Z&per_page=1) — September 27 commit da59eee72ee5e6c6a79a290e9c0f6d3720588711; the July release does not imply staleness."
+        ],
+        "upstream_now": {
+         "latest_release": "v0.2.1",
+         "released_at": "2026-07-19T11:31:19Z",
+         "stars": 5442,
+         "pushed_at": "2026-10-05T12:14:36Z",
+         "archived": false,
+         "license": "NOASSERTION"
+        }
+       },
+       {
+        "repository": "https://github.com/browserbase/stagehand",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: Seeded ('judge'). The browse CLI was found through the stagehand releases list (browse@0.9.6) and its packages tree via GitHub GraphQL; the npm registry gave the current version.",
+        "demonstrated_gap": "The candidate is the `browse` package in packages/cli (npm latest 0.11.1, MIT), not the Stagehand SDK. The SDK needs an LLM key for act and extract (its README example passes OPENAI_API_KEY), which would duplicate the native client's agent loop. `browse` belongs to agent-browser's class:\n- a per-session daemon that keeps cookies, tabs and snapshot refs (@0-12) between invocations;\n- 30+ DOM commands, network and console telemetry, --json output and `browse doctor`;\n- a managed local browser by default (BROWSERBASE_API_KEY only selects remote), plus --auto-connect and --cdp.\nNo measured comparison with agent-browser exists, and agent-browser already covers this surface, so no requirement gap is demonstrated today. Its browse.sh site-skills catalog ('browse skills add apartments.com') is community-authored, which makes it an untrusted-instruction surface. Whether the CLI sends its own usage telemetry is unverified; only the README was read. Maintenance: 23 commits under packages/cli since 2026-07-07, including release commit 8008208122 ('Release browse@0.11.1 (#3041)', 2026-09-30). The newest browse GitHub release is browse@0.9.6 (2026-08-03); the repository's latest GitHub release is @browserbasehq/stagehand@3.7.3 (2026-08-28).",
+        "proposed_label": "keep_but_compare",
+        "comparison_that_would_overturn": "Use the same frozen site set and metrics as the agent-browser comparison: task success, recovery after a browser kill, snapshot tokens and wall time. Run `browse --local` 0.11.1 against agent-browser 0.38.2 on both hosts with no community site skills installed. A clear win on recovery or token cost at equal success would make it a targeted candidate for the second browser slot.",
+        "evidence": [
+         "https://github.com/browserbase/stagehand/blob/0336409092b85beeba38ea3cd4953f45eb96ed6b/packages/cli/README.md: 'The single CLI your AI agents need to access the internet reliably'; per-session daemon; snapshot refs; browser-targets table (the default is a managed local browser, remote only with BROWSERBASE_API_KEY; --auto-connect; --cdp); browse.sh community skills catalog",
+         "https://registry.npmjs.org/browse/latest: version 0.11.1; its bugs URL points to github.com/browserbase/stagehand",
+         "https://github.com/browserbase/stagehand/commit/8008208122924cd25de821bd37efa6e34bf3f679: 'Release browse@0.11.1 (#3041)', 2026-09-30. GraphQL path history shows 23 commits touching packages/cli since 2026-07-07",
+         "https://github.com/browserbase/stagehand/blob/0336409092b85beeba38ea3cd4953f45eb96ed6b/README.md: 'Stagehand is the SDK for browser agents'; its example needs a model API key",
+         "https://github.com/browserbase/stagehand/releases: latest GitHub release @browserbasehq/stagehand@3.7.3 (2026-08-28); latest browse GitHub release browse@0.9.6 (2026-08-03)",
+         "https://api.github.com/repos/browserbase/stagehand/commits?since=2026-07-07T00:00:00Z&per_page=1: default-branch commit 0336409092b8 on 2026-10-05"
+        ],
+        "upstream_now": {
+         "latest_release": "@browserbasehq/stagehand@3.7.3",
+         "released_at": "2026-08-28",
+         "stars": 25533,
+         "pushed_at": "2026-10-05",
+         "archived": false,
+         "license": "MIT"
+        }
+       },
+       {
+        "repository": "https://github.com/d4vinci/scrapling",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: Explicit Scrapling re-judgment seed and previous sweep alternative.",
+        "demonstrated_gap": "The latest release adds reusable browser tabs, session-oriented MCP tools and bounded Markdown-corpus extraction containing URL/title fields. These address session continuity and structured extraction, but do not yet demonstrate a quality advantage on the required primary sources. Its anti-detection features are outside this assessment.",
+        "proposed_label": "keep_but_compare",
+        "comparison_that_would_overturn": "Use ordinary HTTP/browser operations against agent-browser and Crawl4AI on the same ten interaction tasks and 30-page corpus. Require exact URL/title/quotation preservation, reliable session recovery and a measurable completion or runtime improvement. Confirm the advertised per-request settings isolation and page cap. No stealth, challenge solving or exposed HTTP service; qualify native operation on both architectures before promotion.",
+        "evidence": [
+         "[v0.4.15 release](https://github.com/D4Vinci/Scrapling/releases/tag/v0.4.15) — reusable tabs, Response.markdown, URL/title/Markdown corpus output, max_pages, breaking MCP changes and authenticated loopback HTTP defaults.",
+         "[Repository API](https://api.github.com/repos/D4Vinci/Scrapling) — canonical capitalization, creation date, metadata and BSD-3-Clause license.",
+         "[Default-branch maintenance check](https://api.github.com/repos/D4Vinci/Scrapling/commits?since=2026-07-07T00%3A00%3A00Z&per_page=1) — October 3 commit 54e95104160d4d0f5b25ec6d4bcea767757126d5; the August release is not a staleness finding."
+        ],
+        "upstream_now": {
+         "latest_release": "v0.4.15",
+         "released_at": "2026-08-23T19:43:24Z",
+         "stars": 85792,
+         "pushed_at": "2026-10-04T19:47:53Z",
+         "archived": false,
+         "license": "BSD-3-Clause"
+        }
+       },
+       {
+        "repository": "https://github.com/krlabsorg/lettucedetect",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: Seeded in the follow-up brief (citation-check direction). Verified with gh api: GraphQL repository fields, the REST commits?since window and the README at head 2096ed28.",
+        "demonstrated_gap": "next_action asks for citation checks, and gap 4 notes the Tavily results do not establish that their sources support the claims. No component in this layer checks whether a fetched source supports the claim it is cited for. LettuceDetect is a local span-level grounding verifier. Given source text and an answer, it marks unsupported or contradicted spans. Its v2 models are lettucedect-v2-qwen-2b (generative) and lettucedect-v2-mmbert-base (encoder). It runs locally without an API, while the adopted promptfoo context-faithfulness assertion is LLM-graded and costs per check. Limits that the trial must respect: the published scores are modest (span-F1 0.689 Qwen-2B and 0.642 mmBERT on the unified v2 test set; 0.574 and 0.528 on the RAGTruth slice); the v1 encoders have 4K (ModernBERT) and 8K (EuroBERT) context windows, so fetched pages need chunking; and the EuroBERT variants load remote code that needs transformers<5, so the trial should use the ModernBERT, mmBERT or Qwen-2B variants. Superiority over the LLM-graded check is not shown.",
+        "proposed_label": "targeted_candidate",
+        "comparison_that_would_overturn": "Freeze at least 100 claim/source pairs from this layer's receipts and decision records, storing the fetched source text with each pair. Two independent judges label them, and disagreements are adjudicated. Add a held-out RAGTruth test slice as a second set; note that it is in-distribution for LettuceDetect. Run lettucedect-v2-mmbert-base and lettucedect-v2-qwen-2b against promptfoo context-faithfulness, which is already adopted, with Vectara HHEM-2.1-open as an optional third arm. Measure recall and precision on unsupported claims, the false-accept rate on unsupported citations, wall time on WSL and on the M5 Pro, and cost. Adopt only if LettuceDetect matches or beats the LLM-graded check on recall of unsupported claims at lower cost or runtime. Otherwise keep the LLM-graded check.",
+        "evidence": [
+         "https://github.com/KRLabsOrg/LettuceDetect/blob/2096ed28f3b662a62b4406795da3d6fbc5490063/README.md#L9 — 'open span-level grounding verifier for AI outputs. Given source evidence, it localizes unsupported, contradictory, or fabricated parts of RAG answers'",
+         "https://github.com/KRLabsOrg/LettuceDetect/blob/2096ed28f3b662a62b4406795da3d6fbc5490063/README.md#L175-L177 — span-F1 0.689 (Qwen-2B) and 0.642 (mmBERT-base) on the unified 10,698-example v2 test set; 0.574 and 0.528 on its RAGTruth slice",
+         "https://github.com/KRLabsOrg/LettuceDetect/blob/2096ed28f3b662a62b4406795da3d6fbc5490063/README.md#L63 — 4K (ModernBERT) and 8K (EuroBERT) context windows",
+         "https://github.com/KRLabsOrg/LettuceDetect/blob/2096ed28f3b662a62b4406795da3d6fbc5490063/README.md#L92-L96 — EuroBERT models load remote code that needs transformers<5; the v2 qwen-2b and mmbert-base model links",
+         "https://api.github.com/repos/KRLabsOrg/LettuceDetect/commits?since=2026-07-07T16:43:41Z&per_page=1 — newest default-branch commit 2096ed28f3b6 at 2026-09-07T11:59:30Z, inside the 90-day window",
+         "https://github.com/KRLabsOrg/LettuceDetect/releases/tag/v0.2.3 — latest release v0.2.3, published 2026-08-13 (GitHub GraphQL latestRelease)",
+         "evidence/artifacts/gap-wave2-20260923/foundation__web-research/4-tavily-gold-labelled-benchmark.json — gap 4 deferred; no accuracy or support check exists"
+        ],
+        "upstream_now": {
+         "latest_release": "v0.2.3",
+         "released_at": "2026-08-13",
+         "stars": 613,
+         "pushed_at": "2026-09-07T11:59:31Z",
+         "archived": false,
+         "license": "MIT"
+        }
+       },
+       {
+        "repository": "https://github.com/commoncrawl/cdx_toolkit",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: Seeded in the follow-up brief (as-of-date direction). Verified with gh api (GraphQL, commits?since, the README at head e87b1204) and by reading the trading lane's archive script locally.",
+        "demonstrated_gap": "The historical-simulation north star needs evidence as of a past date. Live search lanes (Tavily, WebSearch, codex --search) return today's pages, and the catalog has no tool that lists or retrieves past captures. The trading lane did this by hand: blueprints/gap-wave2-20260923/us-equities__market-data-reference/make_receipts.py:103-105 records raw curl calls to the Wayback CDX API to find snapshots, and to web.archive.org/web/<TS>id_/ URLs to download them. One CDX query hit 'Internet Archive: Temporarily Offline' and had to be retried by hand. archive_calendar_check.py then parses the saved snapshots, and license_clauses.py:23-25 pins SEC pages by Wayback id_ URLs. cdx_toolkit, maintained by the Common Crawl organisation, wraps exactly this. It queries the Internet Archive Wayback CDX index and the Common Crawl indexes with time bounds (`cdxt --ia --from 2008 --to 200906302359 iter`) and filters, and it extracts captures into WARC files with their timestamps, so a capture can be corroborated from two independent archives. Caveat: IA queries default to one year and 1,000 records unless --from, --to and --limit are set.",
+        "proposed_label": "targeted_candidate",
+        "comparison_that_would_overturn": "Rerun the receipt's own targets: nyse.com/markets/hours-calendars over the 2016-2025 windows, and the ICE press-release prefix query. Compare three paths: (a) `cdxt --ia` and `cdxt --cc` iter and warc; (b) the maintained Python Wayback client edgi-govdata-archiving/wayback v0.5.1 (head 2454bca6, 2026-10-01); (c) the hand curl path recorded in make_receipts.py:103-105. Measure four things. (1) Recall of the 10 NYSE and 3 ICE capture timestamps the receipt lists. (2) Payload equality with the saved raw files under evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/raw/. The repository stores these files LF-normalised (make_receipts.py:110-111), so compare after the same eol_normalize.py step or against the CDX digest. (3) Unchanged archive_calendar_check.py output. (4) Manual steps, retries and wall time. Adopt the tool that reproduces the receipt with fewer manual steps, and choose between the two tools on these numbers. If neither reproduces the payloads, keep the hand path.",
+        "evidence": [
+         "https://github.com/commoncrawl/cdx_toolkit/blob/e87b1204993b77a4c41c03239baefa1c8462a6e1/README.md#L15-L16 — 'allows extracting archived pages from CC and IA into WARC files'",
+         "https://github.com/commoncrawl/cdx_toolkit/blob/e87b1204993b77a4c41c03239baefa1c8462a6e1/README.md#L42-L43 — `cdxt --ia --limit 10 iter` and `cdxt --ia --limit 10 warc`",
+         "https://github.com/commoncrawl/cdx_toolkit/blob/e87b1204993b77a4c41c03239baefa1c8462a6e1/README.md#L88-L99 — IA queries default to one year and 1,000 entries unless --from/--to/--limit are given; example `--from 2008 --to 200906302359`",
+         "https://api.github.com/repos/commoncrawl/cdx_toolkit/commits?since=2026-07-07T16:43:41Z&per_page=1 — newest default-branch commit e87b1204993b at 2026-09-07T03:37:00Z, inside the window",
+         "https://github.com/commoncrawl/cdx_toolkit/releases/tag/0.9.39 — latest release 0.9.39, published 2026-06-01 (GitHub GraphQL latestRelease)",
+         "https://api.github.com/repos/edgi-govdata-archiving/wayback/commits?since=2026-07-07T16:43:41Z&per_page=1 — comparison arm maintained: commit 2454bca6d112 at 2026-10-01T21:23:16Z; release v0.5.1 2026-06-19 (GraphQL)",
+         "blueprints/gap-wave2-20260923/us-equities__market-data-reference/make_receipts.py:103-105 — hand curl to https://web.archive.org/cdx/search/cdx and web.archive.org/web/<TS>id_/ for the NYSE and ICE snapshots, including a manual retry after 'Temporarily Offline'",
+         "blueprints/gap-wave2-20260923/us-equities__market-data-reference/archive_calendar_check.py:11-12,190-191 — parses archived nyse.com hours-calendars snapshots; the snapshot file names carry the Wayback timestamp"
+        ],
+        "upstream_now": {
+         "latest_release": "0.9.39",
+         "released_at": "2026-06-01",
+         "stars": 216,
+         "pushed_at": "2026-09-07T04:38:17Z",
+         "archived": false,
+         "license": "Apache-2.0"
+        }
+       },
+       {
+        "repository": "https://github.com/meridianlabs-ai/inspect_swe",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: Seeded in the follow-up brief (frozen-task-set direction). Verified by reading inspect_swe at tag 0.2.71, inspect_ai's bridge on main and inspect_evals at v0.23.0 through gh api.",
+        "demonstrated_gap": "overturn_when needs a measured comparison on a frozen source set, and gaps 3 and 4 lack a gold-labelled benchmark. inspect_swe 0.2.71 exports claude_code() and codex_cli() agents that run the real clients inside an Inspect sandbox. They could be pointed at gold-labelled, scored tasks in UKGovernmentBEIS/inspect_evals v0.23.0: browse_comp, simpleqa, assistant_bench, gaia, mind2web and mind2web_sc. The source shows why such a run would not measure the installed lanes, though. claude_code() sends the model calls through Inspect's sandbox_agent_bridge, using ANTHROPIC_AUTH_TOKEN or a 'dummy-key-for-bridge' supplied through an apiKeyHelper. The bridge maps Claude Code's WebSearch onto Inspect's web_search(providers), and Anthropic's server-side web_fetch has no mapping of its own. A run therefore measures the client's agent loop with a search backend that Inspect configures and an API key pays for. It does not measure the subscription WebSearch lane as installed. Whether the client-side WebFetch works through the bridge was not verified. inspect_evals' browse_comp itself defaults to OpenAI's built-in web search, or else Tavily or Google. All of these are billed by API, which is the same 'no paid API' blocker that deferred gaps 3 and 4. A harness exists; the trial waits on authorization for paid usage. By contrast, Harbor v0.24.0's claude-code agent keeps WebSearch and WebFetch unless disable_web_search is set. It can also run on the subscription through CLAUDE_FORCE_OAUTH with a setup-token, so it is the upstream harness that would measure the installed lanes. Harbor is already in the catalog (catalogs/sota-convergence/manifest-20260926.json:16785-16787), with its trial gated on a container-scoped credential.",
+        "proposed_label": "keep_but_compare",
+        "comparison_that_would_overturn": "This becomes a targeted trial once an API-key arm is authorized under docs/secret-storage.md. Run one fixed, seeded subset (for example 100 simpleqa and 50 assistant_bench samples, a fixed --sample-shuffle seed, one epoch) with the same scorer model in every arm. (A) Inspect web_search with the tavily provider measures the current winner on gold labels, which is gap 4. (B) Anthropic's internal search provider. (C) inspect_swe claude_code() with WebSearch allowed. (D) codex_cli() with web search enabled. Measure accuracy, the share of answers whose cited URL resolves and supports the answer (checked by the citation-check row), wall time and API cost. A lane that beats Tavily on accuracy and on attributable citations at equal or lower cost overturns the winner. Otherwise Tavily keeps the role, now with measured numbers. To measure the installed subscription lanes rather than an API-billed backend, run arms C and D through Harbor's claude-code and codex agents on the same questions, under a user-authorized container-scoped subscription token.",
+        "evidence": [
+         "https://github.com/meridianlabs-ai/inspect_swe/blob/0.2.71/src/inspect_swe/_claude_code/claude_code.py#L342-L357 — sandbox_agent_bridge(model=models.bridge_model, ..., web_search=not web_search_tool_disallowed(disallowed_tools, 'WebSearch'))",
+         "https://github.com/meridianlabs-ai/inspect_swe/blob/0.2.71/src/inspect_swe/_claude_code/claude_code.py#L439-L445 — the client auth goes through an apiKeyHelper with ANTHROPIC_AUTH_TOKEN or 'dummy-key-for-bridge'; the comment notes that OAuth 'silently fails'",
+         "https://github.com/meridianlabs-ai/inspect_swe/blob/0.2.71/src/inspect_swe/_claude_code/claude_code.py#L179-L180 — 'disallowing \"WebSearch\" also disables web search for the agent'",
+         "https://github.com/UKGovernmentBEIS/inspect_ai/blob/7390f041b89cb162a504715b1c0a8de71d68ed90/src/inspect_ai/agent/_bridge/anthropic_api_impl.py#L356-L376 — WebSearch maps to Inspect web_search(resolve_web_search_providers(...)); 'Inspect has no standalone fetch tool' (main, read 2026-10-05)",
+         "https://github.com/UKGovernmentBEIS/inspect_evals/blob/v0.23.0/src/inspect_evals/browse_comp/README.md#L37-L41 — browse_comp uses web_search/web_browser and defaults to OpenAI built-in search, else Tavily or Google",
+         "https://api.github.com/repos/UKGovernmentBEIS/inspect_evals/contents/src/inspect_evals?ref=v0.23.0 — the v0.23.0 task list includes agentdojo, assistant_bench, browse_comp, gaia, mind2web, mind2web_sc and simpleqa",
+         "https://api.github.com/repos/meridianlabs-ai/inspect_swe/commits?since=2026-07-07T16:43:41Z&per_page=1 — newest commit ef3d9e56c1dd at 2026-10-05T12:51:59Z; release 0.2.71 2026-09-17; created 2025-08-29 (GraphQL)",
+         "evidence/artifacts/gap-wave2-20260923/foundation__web-research/3-tavily-target-hit-rate.json — deferred_reason: 'requires paid Tavily API usage' (no-paid-API rule), not a missing harness",
+         "https://github.com/harbor-framework/harbor/blob/v0.24.0/src/harbor/agents/installed/claude_code.py#L80-L89 — disable_web_search 'Disallow the WebSearch and WebFetch tools' (default False); L1782-1806 — CLAUDE_FORCE_OAUTH 'drops the API key so the CLI uses the subscription token' (setup-token)"
+        ],
+        "upstream_now": {
+         "latest_release": "0.2.71",
+         "released_at": "2026-09-17",
+         "stars": 34,
+         "pushed_at": "2026-10-05T13:20:04Z",
+         "archived": false,
+         "license": "MIT"
+        }
+       },
+       {
+        "repository": "https://github.com/promptfoo/promptfoo",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: Seeded in the follow-up brief (injection direction). Found the indirect-web-pwn strategy by web search. Read both docs pages and checked the installed 0.123.1 dist for remote-only plugins.",
+        "demonstrated_gap": "No layer tests the fetch and browse lanes for indirect prompt injection. promptfoo is already adopted in quality-evaluation, so it needs no new install. Its indirect-web-pwn strategy is the only maintained upstream path found that generates realistic pages with hidden payloads, has the agent fetch them through its real web-fetch tool, and tracks exfiltration deterministically on the server (data-exfil). Because the pages are publicly hosted, it could also reach server-side fetch lanes (tavily extract, codex --search) that a local proxy cannot intercept. Two findings block it as a local-first trial. First, the strategy requires 'Promptfoo Cloud: Server-side page generation and exfil tracking', a new SaaS credential whose pricing was not checked. Second, in the installed promptfoo 0.123.1, indirect-prompt-injection, data-exfil and hijacking are all in REMOTE_ONLY_PLUGIN_IDS, and the plain plugin only injects payloads into a prompt template variable (indirectInjectionVar). So the plugin tests how the model handles pasted content, not the fetch path.",
+        "proposed_label": "keep_but_compare",
+        "comparison_that_would_overturn": "If the user authorizes a Promptfoo Cloud account, run data-exfil plus indirect-web-pwn with a fixed number of generated pages and fixed seeds against each lane: Claude Code WebFetch, ctx_fetch_and_index, tavily extract, agent-browser 0.38.2 and codex --search. Record per lane the exfil requests (deterministic) and the rate at which the agent follows injected instructions (LLM-graded). It becomes targeted if it runs with no credential beyond the Cloud sign-in and yields a rate for every lane. A measured exfil rate above zero on any lane makes a guard a demonstrated gap.",
+        "evidence": [
+         "https://www.promptfoo.dev/docs/red-team/strategies/indirect-web-pwn/ — Requirements: 'Promptfoo Cloud: Server-side page generation and exfil tracking'; Architecture: the CLI requests a page from the Promptfoo server, and the 'Agent fetches the page via web fetch tool call'; data-exfil detection is 'Deterministic'",
+         "https://www.promptfoo.dev/docs/red-team/plugins/indirect-prompt-injection/ — How it works: 'Specify which template variable contains untrusted data'; 'Promptfoo injects adversarial payloads into that variable' (config indirectInjectionVar)",
+         "installed promptfoo 0.123.1, dist/src/tables-DJONIU43.js — REMOTE_ONLY_PLUGIN_IDS includes 'indirect-prompt-injection', 'data-exfil', 'hijacking', 'rag-poisoning' and 'ssrf'",
+         "https://api.github.com/repos/promptfoo/promptfoo — not archived, MIT; release 0.123.1 2026-09-18; default-branch head 2026-10-05T16:37:24Z (GraphQL)",
+         "https://api.github.com/repos/promptfoo/promptfoo/commits?since=2026-07-07T16:43:41Z&per_page=1 — newest default-branch commit fa605a9119fd at 2026-10-05T16:37:24Z, inside the window"
+        ],
+        "upstream_now": {
+         "latest_release": "0.123.1",
+         "released_at": "2026-09-18",
+         "stars": 25722,
+         "pushed_at": "2026-10-05T16:40:18Z",
+         "archived": false,
+         "license": "MIT"
+        }
+       },
+       {
+        "repository": "https://github.com/ukgovernmentbeis/inspect_evals",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: Follow-up critic's frozen-task-set direction; inspected the current release and its BrowseComp documentation rather than assuming benchmark names establish native-client coverage.",
+        "demonstrated_gap": "Deferred gaps 3–4 need repeatable, scored retrieval tasks. Inspect Evals supplies maintained browsing and factual-answer evaluations with configurable solvers and scoring. BrowseComp measures answer correctness and confidence, however, so primary-source attribution and historical cutoffs still need explicit gold labels. Its default tools are Inspect tools, not automatically the installed clients' native lanes.",
+        "proposed_label": "targeted_candidate",
+        "comparison_that_would_overturn": "Freeze 40 domain tasks covering Nautilus/IBKR documentation, the separate Alpaca adapter, SEC sources, dated exchange calendars and selected interactive pages; retain a small BrowseComp subset as a harness check. Pin task/data revisions, source bytes, client versions and solver configuration. Run three paired repetitions per host. A retrieval replacement must improve target hit rate by at least 10 percentage points at equal budgets without reducing gold citation precision. Reject the harness integration if missing tools, empty grading or changed source content can silently produce comparable-looking scores.",
+        "evidence": [
+         "[Repository API](https://api.github.com/repos/UKGovernmentBEIS/inspect_evals): metadata and creation date establish an existing, unarchived project.",
+         "[Default-branch commits since 2026-07-07](https://api.github.com/repos/UKGovernmentBEIS/inspect_evals/commits?since=2026-07-07T00:00:00Z&per_page=1): returned commit 9080b5e9f1647ed14e45de8cb01e3d43411c0163 dated 2026-10-05.",
+         "[Release v0.23.0](https://github.com/UKGovernmentBEIS/inspect_evals/releases/tag/v0.23.0): released October 2; includes evaluation and scorer-registration fixes.",
+         "[BrowseComp at v0.23.0](https://github.com/UKGovernmentBEIS/inspect_evals/blob/v0.23.0/src/inspect_evals/browse_comp/README.md): documents configurable solver/sandbox, answer and confidence scoring, API-backed search defaults, and with_browsing=False by default.",
+         "[Task registry](https://github.com/UKGovernmentBEIS/inspect_evals/blob/main/src/inspect_evals/_registry.py): registers BrowseComp, AssistantBench and Mind2Web task families."
+        ],
+        "upstream_now": {
+         "latest_release": "v0.23.0",
+         "released_at": "2026-10-02T06:20:01Z",
+         "stars": 692,
+         "pushed_at": "2026-10-05T07:07:49Z",
+         "archived": false,
+         "license": "MIT"
+        }
+       },
+       {
+        "repository": "https://github.com/answerdotai/llms-txt",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: Follow-up critic's agent-facing-format direction; checked the September release, tagged specification, default-branch activity and a live publisher index.",
+        "demonstrated_gap": "The missed adapter guide warrants an index-guided discovery arm before another extractor. The upstream format supports path-scoped indexes and direct Markdown links. This is a trial of publisher-provided navigation using existing native fetch commands first; a new parser dependency has not been justified. Both Nautilus URLs failed in this lane's fetcher, so the reported successful lookup was not independently reproduced.",
+        "proposed_label": "targeted_candidate",
+        "comparison_that_would_overturn": "Hide target URLs for 20 documentation questions, including Nautilus/IBKR, the separate Alpaca adapter, version mismatches and US-versus-India distractors. Compare Tavily discovery, native llms.txt-to-Markdown lookup, and the pinned parser only if needed. Require at least a 10-point target-hit improvement at equal request budgets, zero wrong-region/version selections, and no citation-support regression. If ordinary native fetching performs equally, adopt the lookup practice without adding the package.",
+        "evidence": [
+         "[Repository API](https://api.github.com/repos/AnswerDotAI/llms-txt): current metadata and creation date.",
+         "[Default-branch commits since 2026-07-07](https://api.github.com/repos/AnswerDotAI/llms-txt/commits?since=2026-07-07T00:00:00Z&per_page=1): returned commit 3700a0a624a4a004c6a246789b37f389940b1b58 dated 2026-09-24.",
+         "[Release 0.0.7](https://github.com/AnswerDotAI/llms-txt/releases/tag/0.0.7): fixes CLI flag hyphenation and removes a stray print.",
+         "[README at 0.0.7](https://github.com/AnswerDotAI/llms-txt/blob/0.0.7/README.md): describes scoped indexes, choosing the most specific applicable index, Markdown alternatives and following selected links.",
+         "[Alpaca index](https://docs.alpaca.markets/llms.txt): begins with India/GIFT City documentation, demonstrating why successful retrieval alone does not establish US-market scope."
+        ],
+        "upstream_now": {
+         "latest_release": "0.0.7",
+         "released_at": "2026-09-24T18:20:15Z",
+         "stars": 2648,
+         "pushed_at": "2026-09-24T18:21:11Z",
+         "archived": false,
+         "license": "Apache-2.0"
+        }
+       },
+       {
+        "repository": "https://github.com/anthropics/claude-code",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: Seeded in the follow-up brief (client-native browser lanes). Checked the installed client's help and read the official Chrome docs page.",
+        "demonstrated_gap": "This row is for the Claude in Chrome lane, on macOS only. The installed client's own browser lane is not in the catalog, and on the Macs every winner is still 'untested'. Claude Code 2.1.289 ships --chrome and --no-chrome (installed `claude --help`). It drives a visible Chrome or Edge window that 'shares your browser's login state', so it can act on signed-in pages. agent-browser's own profile and session handling was not compared here. It does not fit this layer as a default. It 'isn't supported in Windows Subsystem for Linux (WSL)', so it cannot run on the workstation. It needs a direct Anthropic plan and /login, and API-key or setup-token sessions keep it off. It is GUI-bound rather than a bounded headless command. It also raises the injection stakes: site permissions are inherited from the extension, and in auto mode a classifier approval skips the extension's per-site check unless permission rules deny a site.",
+        "proposed_label": "keep_but_compare",
+        "comparison_that_would_overturn": "Run this on an M5 Pro Mac, and only after the injection suite in the promptfoo row exists. Run the same fixed task set with agent-browser 0.38.2 and with `claude --chrome` (default permission mode and an explicit site allow-list in the extension): for example 10 read and interaction tasks on public documentation pages and 5 on a logged-in test account. Record success rate, wall time, human interventions for logins and CAPTCHAs, and the injection-suite exfil and follow rates. Adopt it only for logged-in reads where it matches agent-browser on success and shows zero exfil.",
+        "evidence": [
+         "https://code.claude.com/docs/en/chrome — 'Chrome integration isn't supported in Windows Subsystem for Linux (WSL)'; it requires 'A direct Anthropic plan (Pro, Max, Team, or Enterprise)' and /login, and API-key or setup-token sessions keep it off",
+         "https://code.claude.com/docs/en/chrome — 'shares your browser's login state, so it can access any site you're already signed into'; 'Browser actions run in a visible Chrome window'",
+         "https://code.claude.com/docs/en/chrome — 'Site-level permissions are inherited from the Chrome extension'; in auto mode, a classifier approval means 'the extension skips its own per-site check for that call'",
+         "installed Claude Code 2.1.289 `claude --help` — '--chrome Enable Claude in Chrome integration' and '--no-chrome'",
+         "https://github.com/anthropics/claude-code/releases/tag/v2.1.289 — latest release v2.1.289, 2026-10-03 (GraphQL)",
+         "https://api.github.com/repos/anthropics/claude-code/commits?since=2026-07-07T16:43:41Z&per_page=1 — newest default-branch commit 2bfb629dfaff at 2026-10-03T23:06:56Z, inside the window; GitHub detects no SPDX license (license null)"
+        ],
+        "upstream_now": {
+         "latest_release": "v2.1.289",
+         "released_at": "2026-10-03",
+         "stars": 149484,
+         "pushed_at": "2026-10-05T01:04:13Z",
+         "archived": false,
+         "license": null
+        }
+       },
+       {
+        "repository": "https://github.com/vulcanlab/ipi-proxy",
+        "source": "landscape-sweep-webresearch-20261005-ns2604: Seeded in the follow-up brief (injection direction) with the repository unverified. Found the code link in the arXiv Comments field and verified it with gh api.",
+        "demonstrated_gap": "Decisive reason: the repository is stale under the maintenance rule. It is not too new to assess, having been created on 2026-05-05, 153 days ago. The default branch has exactly one commit (272a61a7, 2026-05-05T07:08:27Z) and none since 2026-07-07. It has no releases or tags, and GitHub detects no license (information only). The design in arXiv 2605.11868 fits the missing injection test for client-side lanes: an intercepting proxy rewrites real responses from allow-listed domains in flight, using 820 payloads drawn from six benchmarks, a YAML harness and an exfiltration tracker. It remains a reference design only.",
+        "proposed_label": "not_adopted",
+        "comparison_that_would_overturn": "Maintenance resumes with a new default-branch commit, and a run shows its proxy reaching the client-side fetch lanes (Claude Code WebFetch, ctx_fetch_and_index, agent-browser) on allow-listed domains with exfil callbacks logged. It would also need lower setup cost and credential needs than promptfoo indirect-web-pwn. Rewriting HTTPS in flight implies trusting the proxy's CA. That is inferred, not read from its source, and would be judged as a security cost.",
+        "evidence": [
+         "https://arxiv.org/abs/2605.11868 — the Comments field gives 'code: https://github.com/VulcanLab/IPI-Proxy/'; the abstract describes the intercepting proxy, the 820 deduplicated attack strings from six benchmarks, the YAML harness and the exfiltration tracker",
+         "https://api.github.com/repos/VulcanLab/IPI-Proxy — created_at 2026-05-05T02:49:31Z, pushed_at 2026-05-05T07:08:37Z, license null, 15 stars, not archived",
+         "https://api.github.com/repos/VulcanLab/IPI-Proxy/commits?since=2026-07-07T16:43:41Z&per_page=1 — empty: no default-branch commit in the 90-day window",
+         "https://api.github.com/graphql — default-branch history totalCount 1, latestRelease null, 0 tags (queried 2026-10-05)"
+        ],
+        "upstream_now": {
+         "latest_release": null,
+         "released_at": null,
+         "stars": 15,
+         "pushed_at": "2026-05-05T07:08:37Z",
+         "archived": false,
+         "license": null
+        }
+       }
+      ]
+     }
+    ],
+    "calls": {
+     "web_search": 10,
+     "web_fetch": 11,
+     "gh_api": 50,
+     "gpt6_web_search": 24,
+     "gpt6_web_fetch": 16,
+     "gpt6_gh_api": 80
+    },
+    "limits": [
+     "Discovery per layer: a Claude researcher (claude-opus-5-5, effort max) and a GPT-6 researcher (gpt-6-astra through the Codex CLI, effort max, web search, read-only sandbox, user config ignored), each proposing at most 6 repositories within 12 web searches, 8 page fetches and 40 GitHub API calls; the two returns are merged by canonical repository and capped at 8 per layer (two-family proposals first; dropped proposals are logged and kept under raw).",
+     "Adversarial verification per layer: a facts/identity refuter (claude-opus-5-5, effort max) and two fit/standing refuters (claude-opus-5-5 and gpt-6-astra, effort max), each defaulting to refuted, within 8 web searches, 10 page fetches and 30 GitHub API calls; a candidate survives only when no refuter refutes it, and a missing vote counts as refuted.",
+     "One completeness critic (claude-opus-5-5, effort max) and one bounded follow-up round over at most 8 critic-flagged layers, with the same roles.",
+     "Source review and GitHub metadata only: no candidate was installed, run, benchmarked or compared with a winner; survival means the proposal withstood fact and fit checks, not that it beats a winner.",
+     "seeded web-research follow-up (the user's stars plus research convergence), 2026-10-05 15:59-17:39Z, native GPT-6; sweep-id landscape-sweep-webresearch-20261005-ns2604"
+    ]
+   },
+   "proposals": [
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/chromedevtools/chrome-devtools-mcp",
+     "kind": "new_candidate",
+     "survives": false,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.6,
+       "reasoning": "facts (claude-opus-5-5): Verified: not archived, Apache-2.0, 52,992 stars, latest chrome-devtools-mcp-v1.10.1 2026-09-23T10:37Z, REST since=2026-07-07 default-branch head cf2eab96 2026-10-05T13:04Z. README@cf2eab96: CLI without MCP; usage statistics enabled by default (--no-usage-statistics or CHROME_DEVTOOLS_MCP_NO_USAGE_STATISTICS); trace URLs to CrUX (--no-performance-crux); npm update checks (CHROME_DEVTOOLS_MCP_NO_UPDATE_CHECKS); Chrome and Chrome for Testing only. cli.md: experimental; client of a background daemon that keeps browser state; unrestricted filesystem by default, limited by --workspace; headless and isolated by default. get_network_request takes requestFilePath and responseFilePath. Both GHSAs are moderate, cover versions up to 1.0.1 and are fixed in 1.1.0; they are the package's only two. agent-browser README sections and the v0.38.2 #2003 Chrome-freeze fix are confirmed. Advisory facts came from the GitHub Advisory API, not the supply-chain-risk-auditor collector. Corrections, each immaterial to keep_but_compare: (1) PR #713 is now MERGED (2026-10-05T15:58:11Z, 1796303f). It was likely still OPEN when written, since the sweep inputs date from 15:01Z. The plan-row text is confirmed. (2) 'Mostly diagnostics' is false as a share: 27 of 59 tools (perf 3, lighthouse 1, heap 14, extensions 5, PWA 4), and with extensions and PWA off by default, 18 of 46. The tools agent-browser lacks are still the diagnostic ones. (3) 'Documents no reconnect or recovery' is overstated: cli.md auto-starts the server and browser 'if they aren't already running' (isolated profile by default). No state-preserving recovery is documented in README, cli.md, tool-reference.md or troubleshooting.md. The proposal's own kill-mid-session test measures this."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.75,
+       "reasoning": "fit (claude-opus-5-5): Refuted as understated, not as unfit: on the new host this tool is the merged slot owner, pending the named Harbor comparison. The premise, the comparison opponent and the label are all wrong. (1) PR #713 is not open: GitHub GraphQL on 2026-10-05 returns state MERGED, mergedAt 2026-10-05T15:58:11Z. (2) The merged decision already gives this tool the browser slot of this layer on the new host. docs/decisions/2026-10-04-round2-plan-g2-browser.md:3 says 'The web-research/playwright-cli slot installs Chrome DevTools MCP 1.10.1', and line 72 says agent-browser 'is superseded for this slot'. The slot's named comparison is Chrome DevTools MCP 'against Playwright CLI 0.1.22 on the same 20 browser tasks', run through upstream Harbor (final-architecture-round2.md:24). The proposal's opponent, agent-browser 0.38.2, is not that comparison. (3) 'No requirement gap is shown' is wrong, because verified evidence gives a plausible advantage over agent-browser in maintenance and WSL2 fit. agent-browser has no security policy (isSecurityPolicyEnabled=false). Its CI suite failed at the v0.38.2 tag commit 39a74c70 (the GitHub Actions 'CI' check suite concluded FAILURE). Its issue #1791, 'Auto-launch fails on WSL2 ... refuses all CDP connects', is OPEN, which bears on open gap 2. chrome-devtools-mcp publishes a security policy and has 345 default-branch commits since 2026-07-07 (head cf2eab96d96c, 2026-10-05). Its CHANGELOG 1.6.0 fixes 'keep page ids unique across browser reconnects (#2345)', so 'no reconnect or recovery behaviour' is overstated. (4) 'Otherwise it stays a diagnostics tool outside this layer's requirement' contradicts the merged slot assignment. The defensible standing is owner default of web-research/playwright-cli on NativeStack2604, pending the named Harbor comparison, roughly targeted_candidate; keep_but_compare understates it. Incumbency note: that owner default rests on source review. The plan record says 'the owner's repository-quality rule excludes a new local selection trial' (round2-plan-g2-browser.md:13), so it is not yet a measured win. Privacy-filter gap in the adopted configuration: adoption/new-wsl-profile.json:1020 passes --no-usage-statistics and --no-performance-crux, but no CHROME_DEVTOOLS_MCP_NO_UPDATE_CHECKS, and the README 'Update checks' section says the server 'periodically checks the npm registry for updates' by default. The two advisories, GHSA-8qf9-62x2-82pp and GHSA-3pvj-jv98-qhjq, cover versions up to 1.0.1, were patched in 1.1.0 and do not match 1.10.1. Not archived. License information only. Default-branch activity was read through GitHub GraphQL defaultBranchRef.history(since: 2026-07-07). That is the same fact as the REST commits?since query cited below, not pushed_at."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.96,
+       "reasoning": "fit (gpt-6-astra): The proposal establishes overlapping browser commands and additional diagnostics, but no concrete retrieval advantage supporting keep_but_compare. Correction: its CLI documentation does describe stopping the daemon when connection fails and automatic startup on subsequent commands; the categorical absence-of-recovery claim is overstated. Neither documentation establishes superior recovery. The retained agent-browser comparison also remains inconclusive, so incumbency does not establish that it is best."
+      }
+     ]
+    },
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/unclecode/crawl4ai",
+     "kind": "new_candidate",
+     "survives": false,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.82,
+       "reasoning": "facts (claude-opus-5-5): Verified: not archived, Apache-2.0, 84,780 stars, latest v0.9.4 2026-09-23T12:14Z, REST since=2026-07-07 head 8afd0a68 2026-10-05T05:44Z. CHANGELOG@8afd0a68 line 10: '0.9.4 is a security release'. Its 0.9.4 section names GHSA-f77g-77vp-r96v, GHSA-wh5w-hmj3-vgg7 and GHSA-5w5p-vcv6-mm3f in Docker-server terms, and calls PruningContentFilterLXML about 10x faster and 'now the default'. REST /advisories?affects=crawl4ai&ecosystem=pip returns 13 reviewed advisories, 2025-04-18 to 2026-06-21. Ten summaries name the Docker server or API (8qrg, wm69, 6qhc, 7cx2, f989, 4qqr, 365w, qxjp, 5882, vx9w); r253, 2jq4 and 445m do not. GHSA-2jq4 is critical, affects <=0.8.9, fixed in 0.9.0. GHSA-r253's description scopes it to the Docker API's request extra_args, and in-process SDK callers are unaffected. GHSA-445m affects <=0.4.247. None matches 0.9.4, and the three 0.9.4 GHSAs are not in the database. trafilatura v2.3.0 2026-10-02 is confirmed. The label rests on the layer's unmet overturn_when, as stated. Advisory facts came from the GitHub Advisory API, not the skill collector. Corrections, not material: (1) GHSA-2jq4 says 'attacker-controlled URL', not '[page]'. (2) The detailed Added entry scopes 'now the default' to the Docker server's fit filter and the CLI pruning filter, and library callers get a DeprecationWarning and must switch. This matters for the proposal's library-use test. (3) 0.9.1 and 0.9.2 have no CHANGELOG entries, so 'what is new in 0.9.x is speed' rests on 0.9.0, 0.9.3 and 0.9.4 only. (4) trafilatura survived a sweep but is not an adopted winner, so 'covered by' overstates its status. (5) The five 0.9.3 GHSAs are also absent from the database."
+      },
+      {
+       "refuted": false,
+       "confidence": 0.75,
+       "reasoning": "fit (claude-opus-5-5): Not refuted. The decisive rejection reason holds. The layer admits a crawler only when 'current native retrieval demonstrably misses the requirement' (next_action), and it changes only when 'a defined source-coverage or ingestion task exceeds the current commands' (overturn_when). No such task is defined. The 2026-09-29 sweep's two fit refuters rejected crawl4ai's keep_but_compare on the same ground, Claude at 0.7 and GPT-6 at 0.96 (landscape-sweep-20260929 returns.json, path votes/web-research/1/fit). The supply-chain facts check out. GitHub GraphQL securityVulnerabilities for pip crawl4ai returns 13 reviewed advisories, none of which version-matches 0.9.4. GHSA-2jq4-q6vv-4cp3 and GHSA-r253-r9jw-qg44 cover <= 0.8.9 and were patched in 0.9.0, and GHSA-445m-27cf-gr3x covers <= 0.4.247. GHSA-f77g-77vp-r96v, GHSA-wh5w-hmj3-vgg7 and GHSA-5w5p-vcv6-mm3f are absent from the reviewed database, as the proposal says. Maintenance holds: 149 default-branch commits since 2026-07-07 (head 8afd0a68064f, 2026-10-05), and v0.9.4 was published 2026-09-23. One supporting claim is wrong but not decisive: 'page extraction is already covered by agent-browser plus the trafilatura survivor'. Trafilatura is a surviving candidate, not adopted. Tavily Extract is paused under the recorded 2026-09-26 direction 'Run no new Tavily calls' (wave2-records.json:273; verdicts.json:1177 calls it an untrusted memory note). On the new host agent-browser 'is superseded for this slot' (round2-plan-g2-browser.md:72). Extraction coverage is therefore thinner than stated. That gap is single-page extraction, which the trafilatura candidate addresses with a lighter footprint, not crawling. The not_adopted label stands on the ingestion-task reason alone. License information only. Default-branch activity was read through GitHub GraphQL defaultBranchRef.history(since: 2026-07-07). That is the same fact as the REST commits?since query cited below, not pushed_at."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.86,
+       "reasoning": "fit (gpt-6-astra): The not_adopted rationale incorrectly restricts the candidate to bulk crawling. Its native crwl command supports single-page extraction without a standing research agent. Correction: v0.9.4 includes table-span and row-header correctness fixes and a macOS arm64 Chrome launch fix, not merely faster pruning. These provide an in-scope extraction-quality comparison case under the stated plausible-advantage standard. Requiring a new ingestion task before considering that case gives the incumbent extraction routes an unsupported advantage."
+      }
+     ]
+    },
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/exa-labs/exa-mcp-server",
+     "kind": "new_candidate",
+     "survives": true,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.85,
+       "reasoning": "facts (claude-opus-5-5): Verified: MIT, not archived, 5,078 stars, pushed 2026-10-02, no GitHub releases. REST since=2026-07-07 head f3d71fb6 2026-09-23 (maintained). README@f3d71fb6: hosted https://mcp.exa.ai/mcp; 'works anonymously with rate limits'; default tools web_search_exa and web_fetch_exa; `codex mcp add exa --url https://mcp.exa.ai/mcp`; skills/ load with plugin installs; Exa Agent needs OAuth or an API key. Live board ('last updated 26 Sept 2026'), search+fetch: Exa deep 83.0±1.0 and Exa auto 81.7±1.1 (POST /search type=deep|auto plus POST /contents), Firecrawl 76.0±1.0, Tavily advanced 60.0±2.0, Tavily basic 59.0±1.7. Search-only: Tavily basic 51.0±5.3. Changelog: on 2026-09-11 Tavily Basic replaced Tavily Fast on the search-only board. The lead is 21.7 to 24.0 points. Benchmark README@a4fc6411: gpt-5.6-sol; 32 turns, 5 searches and 5 fetches; 3 runs; 100-ticket private scored set; 30-ticket public set, format only. llms.txt disclosures are confirmed as self-declared. Receipt lines 11 and 83 match locally. Nuance: the README's grounding rule accepts 'that URL, or the token itself' appearing in results. The live page states the stricter URL rule the proposal uses. Context: the benchmark repo was created 2026-08-24 and has 4 stars. Incumbency: tavily-cli's search standing rests on local_integration receipts, and gaps 3 and 4 are deferred."
+      },
+      {
+       "refuted": false,
+       "confidence": 0.65,
+       "reasoning": "fit (claude-opus-5-5): Not refuted. A measured advantage transfers to the anonymous MCP surface, and the trial is feasible and bounded. (1) Board, fetched 2026-10-05: 'last updated 26 Sept 2026'. On the search-and-fetch board, Exa auto (POST /search type=auto plus POST /contents) scores 81.7 ± 1.1 and Exa deep 83.0 ± 1.0. Tavily advanced scores 60.0 ± 2.0 (openbenchmarks.com/web-search/exa-vs-tavily, fetched in this lane). On the search-only board, Exa fast scores 66.3 ± 1.5 and Exa instant 61.3 ± 2.9, against Tavily basic at 51.0 ± 5.3. A ticket passes only when each gold token is grounded in a '# source:' URL that appeared in that run's results, and the model-only baseline is 0. The task is 'hard enterprise SaaS documentation', which resembles the layer's missed Nautilus adapter guide. (2) Transfer to the anonymous tool. web_search_exa sends 'type: config?.defaultSearchType || \"auto\"' (src/tools/webSearch.ts:76 at f3d71fb6). A URL ?defaultSearchType or a server DEFAULT_SEARCH_TYPE can override it, and only auto, fast and instant are allowed (api/mcp.ts:514-540). So the measured auto type is the default. A trial can pin it with ?defaultSearchType=auto, because that URL parameter is parsed in the request-URL block whatever the auth method, the anonymous free_tier included (api/mcp.ts:437, 514-519). The deep figure does not transfer. The auto lead of about 21.7 points is the relevant number. web_fetch_exa calls /contents (webFetch.ts:90). The README says 'The hosted MCP server works anonymously with rate limits' (README.md:128). (3) Feasibility limits. Anonymous calls are IP-rate-limited, with code defaults of 2 QPS and 50 tool calls per day (api/mcp.ts:45-58, 155-156). The hosted values are not visible, and both hosts probably share one public IP, so the trial must be sized to the quota or spread over days. The repository commit does not pin the hosted endpoint; the same is true of Tavily's API. (4) Benchmark weight is moderate. The scored set is private. openbenchmarks-labs/web-search-for-coding-agents was created 2026-08-24 and has 4 stars. The disclosures ('No paid placements', 'No equity or referral relationships') are self-declared. Parallel (77.0) and Firecrawl (76.0) also beat Tavily, so Exa's edge for this layer is the credential-free hosted tier, not uniqueness. (5) Incumbency note: tavily-cli's standing rests on 3 small searches and 2 extractions (open gaps 3 and 4). It is also paused by the recorded 'Run no new Tavily calls' direction (wave2-records.json:273, an untrusted memory note) and marked optional on the new host. That standing is incumbency, not measured quality. Information only: the same page records that Nebius acquired Tavily on 19 February 2026. Trial-design defect, not a refutation: the named comparison needs fresh tvly runs. Score against the retained Tavily receipts and the board's Tavily rows, or against another free arm, unless the user lifts the pause. Maintained: 27 default-branch commits since 2026-07-07 (head f3d71fb6b0ff, 2026-09-23). It has no releases, so pin the commit. No reviewed npm advisories. License information only. Default-branch activity was read through GitHub GraphQL defaultBranchRef.history(since: 2026-07-07). That is the same fact as the REST commits?since query cited below, not pushed_at."
+      },
+      {
+       "refuted": false,
+       "confidence": 0.78,
+       "reasoning": "fit (gpt-6-astra): The measured documentation-task completion advantage and officially supported anonymous search/fetch endpoint justify a bounded targeted trial against Tavily. Correction: the published judge accepts an observed URL OR a retrieved gold token, and URL matching permits prefixes; the scores therefore do not establish the claimed strict citation accuracy. Anonymous MCP equivalence remains unverified, and a repository commit cannot freeze the hosted service. The trial must measure actual claim/source support and record service date, search configuration and rate limits. These limitations prevent promotion, while leaving a plausible candidate."
+      }
+     ]
+    },
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/adbar/trafilatura",
+     "kind": "new_candidate",
+     "survives": true,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.88,
+       "reasoning": "facts (claude-opus-5-5): Verified: not archived, Apache-2.0, 6,914 stars, created 2019. Latest v2.3.0 published 2026-10-02T16:53:41Z, equal to pushed_at. REST since=2026-07-07 on default branch master: 6c1977a0 2026-10-02 'maintenance: prepare version 2.3.0 (#950)'. The v2.3.0 notes cover a downloads overhaul, better text extraction, Markdown output, metadata including canonical URLs, and more robust downloads, as claimed. README@6c1977a0: Python package and command-line tool, online and offline input, metadata (title, author, date, site name), TXT, Markdown, CSV, JSON, HTML, XML and XML-TEI output, and an evaluation section citing external benchmarks. It makes no comparison with Tavily or agent-browser. The incumbent-evidence claim matches open gaps 3 and 4. Superiority is correctly labelled unmeasured."
+      },
+      {
+       "refuted": false,
+       "confidence": 0.65,
+       "reasoning": "fit (claude-opus-5-5): Not refuted, but the gap needs the anchor the proposal omits. As written, the gap is only that the incumbents never measured quotation, table or metadata preservation, which is weak. Measured anchor: upstream's evaluation page, 'Results (2026-10-02)', covers 990 documents, and trafilatura 2.3.0 (standard) scores F-score 0.926 and accuracy 0.924. That is the highest among the listed extractors, for example magic-html at 0.889, justext at 0.862 and readability-lxml at 0.853. The page also cites an external evaluation, Bevendorff et al. 2023, which ranks it 'best single tool by ROUGE-LSum Mean F1'. These comparisons are against open-source extractors, not Tavily Extract. Fit anchor: trafilatura is keyless and local and returns metadata (title, author, date, URL). The layer's only extraction command, Tavily Extract, is keyed and paused by the recorded 2026-09-26 direction (wave2-records.json:273, an untrusted memory note). On the new host agent-browser is superseded (round2-plan-g2-browser.md:72), and the slot owner's take_snapshot is a page snapshot tool, not a main-text-plus-metadata extractor. That is a plausible fit advantage under the local-first, privacy-filtered principle. The previous sweep's facts refuter and both fit refuters let this same targeted_candidate survive (landscape-sweep-20260929 adbar-trafilatura.json). v2.3.0 (published 2026-10-02T16:53:41Z) and its 2026-10-02 results are new since then. Maintained: 43 default-branch commits since 2026-07-07 (head 6c1977a00b4e, 2026-10-02). No reviewed pip advisories. A pure-Python CLI suits both host profiles; this is unverified by any run. Trial-design defect: the Tavily-extraction arm needs fresh Tavily calls. Use gold text, retained receipts and the browser arm instead, unless the user lifts the pause. License information only. Default-branch activity was read through GitHub GraphQL defaultBranchRef.history(since: 2026-07-07). That is the same fact as the REST commits?since query cited below, not pushed_at."
+      },
+      {
+       "refuted": false,
+       "confidence": 0.9,
+       "reasoning": "fit (gpt-6-astra): The October 2 release supplies new evidence since the previous sweep: extraction, canonical-URL, metadata and Markdown corrections directly concern attributable primary-source retrieval. A frozen HTML comparison through its documented Python CLI is feasible; upstream documents Linux and macOS testing. Exact ARM64 host qualification and superiority remain trial outcomes. The proposed label appropriately stops at targeted_candidate. Completeness limitation: this HTML trial cannot establish PDF or browser-rendered-page coverage, and citation checks should retain the fetched source alongside canonical metadata."
+      }
+     ]
+    },
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/1broseidon/ketch",
+     "kind": "new_candidate",
+     "survives": false,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.88,
+       "reasoning": "facts (claude-opus-5-5): Verified: created 2026-03-25 (more than 90 days old), MIT, 691 stars, not archived, pushed 2026-09-29T05:12:07Z. Latest v0.18.1 2026-09-23T03:27:59Z. Its notes cover MCP server and CLI cache sharing and cache sweeping. Assets include checksums.txt and linux_x86_64 and darwin_arm64 tarballs. REST since=2026-07-07 head 3722f58c 2026-09-29 'fix: reject non-HTTP scrape and crawl targets (#72)', after v0.18.1. README@3722f58c: stateless single-binary CLI with no daemon; --json everywhere; explicit backend config; --multi federation with Reciprocal Rank Fusion; keyless default 'auto' fallback; extract pipeline; headless-Chrome JS-rendering fallback. Better recall is correctly labelled plausible, not demonstrated."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.6,
+       "reasoning": "fit (claude-opus-5-5): Refuted as overstated (at most keep_but_compare). There is no evidence-backed gap for ketch itself: its keyless search reuses other providers. The README at 3722f58c says `auto` 'falls back through the keyless providers (`parallel` → `exa` → `keenable` → `youcom` → `firecrawl` → `ddg`)' (README line 246) and 'returns the first that answers' (lines 95-98). ketch therefore runs no retrieval engine of its own. Its keyless results come from anonymous tiers of hosted APIs, including Exa, which is evaluated directly as a separate candidate in this sweep, plus a DuckDuckGo fallback. That fallback is the class of deedy5/ddgs, which landscape-sweep-20260929 refuted for this layer. With an explicitly selected backend, as the proposal's trial requires, the trial measures the underlying provider, not ketch. ketch's distinct addition is `--multi` Reciprocal Rank Fusion (lines 107-108), and the proposal itself concedes that better recall is 'plausible, not demonstrated'. No benchmark exists. Fusion also sends each query to several third-party services, which widens exposure under the privacy-filtered principle. The fit points are real but not enough: it is a stateless single binary with no daemon (line 7), and it ships linux and darwin amd64/arm64 builds (lines 29, 41). Maintenance is fine and is not a refutation reason. The repository was created 2026-03-25, so it is old enough to assess, and it has 145 default-branch commits since 2026-07-07 (head 3722f58c1ff5, 2026-09-29, 'fix: reject non-HTTP scrape and crawl targets (#72)'). v0.18.1 was published 2026-09-23. The strongest counterpoint is real. The leading keyless providers in the chain (Parallel, Exa, Firecrawl) are the ones that beat Tavily on the openbenchmarks board. That evidence belongs to the providers, and the Exa candidate tests it directly. ketch's own routing and fusion are unmeasured, and `auto` can switch providers between calls, which weakens reproducible attribution unless the backend is pinned. At most keep_but_compare, as an optional federation arm after the Exa trial settles whether the anonymous providers beat Tavily. The comparison against Tavily also needs fresh Tavily calls, which conflicts with the recorded pause. License (MIT) information only. Default-branch activity was read through GitHub GraphQL defaultBranchRef.history(since: 2026-07-07). That is the same fact as the REST commits?since query cited below, not pushed_at."
+      },
+      {
+       "refuted": false,
+       "confidence": 0.82,
+       "reasoning": "fit (gpt-6-astra): Explicit provider selection and multi-provider rank fusion offer a concrete mechanism for investigating Tavily's target misses through a stateless native CLI. Upstream documents the required architectures, structured output and keyless backends, making the proposed trial feasible. Better recall remains unmeasured. The comparison must freeze the provider list because auto can change providers, and keyless queries still leave the host. The pinned HTTP(S)-scheme restriction is verified in documentation, but explicitly does not block private-network HTTP targets."
+      }
+     ]
+    },
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/knockoutez/wigolo",
+     "kind": "new_candidate",
+     "survives": false,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.85,
+       "reasoning": "facts (claude-opus-5-5): Verified: created 2026-04-12 (more than 90 days old), license NOASSERTION (information only), 5,442 stars, not archived, pushed 2026-10-05T12:14:36Z. Latest release v0.2.1 2026-07-19T11:31:19Z: #189 bounded SPA settle plus content_completeness, #196 fresh-install fixes, #201 keeps external-API and arm64-embedding checks out of required failures. A later prerelease, binary-v0.2.1-sd507.1 (2026-09-08), exists. REST since=2026-07-07 head da59eee7 2026-09-27 (merge of #638). README@da59eee7: citation_id; verbatim excerpt with byte-exact source_span; failed engines reported and stale cache labelled; CLI `wigolo search --json`; keyless search and fetch; Node>=20 and about 1.5 GB disk; on-device models and cache; a single-query comparison. Note: fetch escalates to a headless browser on anti-bot challenges, and the proposal's exclusion of challenge paths is consistent with that."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.6,
+       "reasoning": "fit (claude-opus-5-5): Refuted. The attribution feature is documented, but there is no measured advantage, and the package strains the layer's 'without another standing research-agent stack' requirement. (1) Evidence. The README's result shape at da59eee7 shows citation_id, a byte-exact source_span and an evidence_score (lines 82-95). That is a plausible fit feature for attributable retrieval, but span correctness is unmeasured. The README's only comparison is 'One cold query ... judged by the agent', and it concludes 'All four converged on the same answer and the same top source, so the parity is demonstrated' (line 141): parity, not superiority. (2) Class. The keyless search is '18 engines → rank fusion → ML rerank' (lines 284, 372), a keyless metasearch. That is the class of deedy5/ddgs and searxng/searxng, which landscape-sweep-20260929 refuted for this layer. No new measured evidence distinguishes it. (3) Footprint. It needs Node >= 20 and about 1.5 GB. `init` 'downloads the browser engine and on-device models' (line 53) and installs 'an 11-pack skill catalog' into the coding agent (line 251), which is a third-party instruction surface. It runs as one MCP process with research and agent tools (lines 71, 272). The core fetch ladder 'auto-escalates ... on anti-bot challenges' and 'waits out interstitial challenges and reuses clearances per domain' (lines 106, 302-303), so excluding challenge paths, as the trial proposes, means reconfiguring the default fetch path. The README also says it respects robots.txt and labels blocked_by_challenge failures. (4) Version gap. The latest release is v0.2.1 (2026-07-19), against 561 default-branch commits since 2026-07-07. The documented contract may not exist in any release, so a trial must pin a commit. Maintenance is active and is not a refutation reason: head da59eee72ee5 (2026-09-27), and the repository was created 2026-04-12, so it is old enough to assess. An unverified ARM64 status is not unsupported. The README declares AGPL-3.0 with commercial licensing, while the GitHub API reports NOASSERTION; information only. The comparison also requires fresh Tavily calls, which conflicts with the recorded pause. Default-branch activity was read through GitHub GraphQL defaultBranchRef.history(since: 2026-07-07). That is the same fact as the REST commits?since query cited below, not pushed_at."
+      },
+      {
+       "refuted": false,
+       "confidence": 0.79,
+       "reasoning": "fit (gpt-6-astra): The documented citation/span contract and explicit degraded-source reporting provide a specific attribution and observability comparison case. One-shot CLI operations avoid requiring its autonomous research loop. A bounded ordinary-page trial is feasible: documentation exposes HTTP-only fetching and controls to disable TLS impersonation and browser stealth. Span correctness, release parity and ARM64 operation remain acceptance checks, not established results. The single author-run query cannot establish general superiority. Local cache and models also do not make outbound search queries private."
+      }
+     ]
+    },
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/browserbase/stagehand",
+     "kind": "new_candidate",
+     "survives": false,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.78,
+       "reasoning": "facts (claude-opus-5-5): Verified: MIT, 25,533 stars, not archived. Latest GitHub release @browserbasehq/stagehand@3.7.3 (2026-08-28); newest browse release browse@0.9.6 (2026-08-03). npm browse/latest: 0.11.1, MIT, bugs URL to stagehand, directory packages/cli. Commit 80082081 'Release browse@0.11.1 (#3041)' 2026-09-30. 23 commits under packages/cli since 2026-07-07. REST since=2026-07-07 head 0336409 2026-10-05. packages/cli README@0336409 confirms the tagline; a per-session daemon keeping cookies, tabs and refs; @0-12 refs; 30+ DOM commands; network and console telemetry; --json; browse doctor; and a targets table (default managed local, remote when BROWSERBASE_API_KEY is set, --local, --auto-connect, --cdp). Main README: 'Stagehand is the SDK for browser agents', and its example passes a model apiKey from env. Corrections: (1) 'community-authored' is unverified. The README says 'largest open web catalog' and browse.sh says 'open catalog'. A sampled skill page shows no author field and steers to Browserbase --verified --proxies sessions. It is an untrusted-instruction surface either way. (2) Omitted: browse auto-loads .env from the cwd (deprecated; BROWSE_LOAD_DOTENV=0 opts out). With the 'remote when BROWSERBASE_API_KEY is set' default, a stray key can flip the default target to remote. The comparison's explicit --local avoids that."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.75,
+       "reasoning": "fit (claude-opus-5-5): Refuted. The proposal concedes 'no requirement gap is demonstrated today' and gives no measured comparison. The 2026-09-29 voters refuted crawl4ai's and Scrapling's keep_but_compare under the same rule (returns.json votes/web-research/1/fit and /6/fit). The baseline is also stale. On the new host, the merged #713 decision gives the web-research/playwright-cli browser slot to Chrome DevTools MCP 1.10.1, and agent-browser 'is superseded for this slot' (round2-plan-g2-browser.md:3,72). The slot's named comparison is Chrome DevTools MCP against Playwright CLI 0.1.22 on 20 tasks (final-architecture-round2.md:24), so a browse-versus-agent-browser trial does not address the decided slot. Verified README facts at 03364090 (packages/cli/README.md): the default is a 'Managed local browser, or remote when BROWSERBASE_API_KEY is set' (line 54). The browse.sh community skills catalog ('browse skills add ...', lines 26 and 197-206) is a third-party instruction surface. 'telemetry' appears only as page network and console telemetry (line 27), so the CLI's own usage telemetry remains unverified. Repository not archived; latest GitHub release @browserbasehq/stagehand@3.7.3 (2026-08-28). The browse@0.11.1 release commit and npm version were not re-verified in this lane. No reviewed npm advisories for 'browse'. License information only."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.95,
+       "reasoning": "fit (gpt-6-astra): The proposal correctly identifies the local browse CLI rather than assuming the SDK's LLM-key requirement applies. However, its daemon, snapshot references, DOM commands, CDP attachment and network capture substantially overlap agent-browser, with no evidence of improved retrieval, recovery or token cost. A feasible comparison alone does not supply the missing gap for keep_but_compare. Its README also documents default .env loading; a credential-isolated trial would need BROWSE_LOAD_DOTENV=0 as well as --local."
+      }
+     ]
+    },
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/d4vinci/scrapling",
+     "kind": "new_candidate",
+     "survives": false,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.88,
+       "reasoning": "facts (claude-opus-5-5): Verified: canonical D4Vinci/Scrapling, created 2024-10-13, BSD-3-Clause, 85,798 stars, not archived, pushed 2026-10-04T19:47:53Z. Latest v0.4.15 2026-08-23T19:43:24Z. REST since=2026-07-07 head 54e95104 2026-10-03 'docs: remove a sponsor'. The v0.4.15 notes match: browser tabs reused across requests, with each request re-applying its own settings so nothing leaks between requests; Response.markdown(); SiteToMarkdownSpider yielding url, title and markdown with a max_pages cap; a reworked, breaking MCP server with session_fetch and open_session; and an HTTP transport that requires auth and binds to localhost by default. Note: the same release advertises an improved Cloudflare solver (anti-detection), which the proposal correctly excludes."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.85,
+       "reasoning": "fit (claude-opus-5-5): Refuted. It repeats an already-known alternative without new evidence. The 'latest release' it cites, v0.4.15 (2026-08-23), is still the newest: GitHub GraphQL lists the releases as v0.4.15, v0.4.14 and v0.4.13. The 2026-09-29 fit refuters already judged v0.4.15 and refuted keep_but_compare: Claude at 0.75 ('v0.4.15 was released 2026-08-23') and GPT-6 at 0.95 (returns.json votes/web-research/6/fit). An earlier sweep refuted it on 2026-09-26. Since 2026-09-29 the default branch has only three commits, all sponsor documentation edits: 54e95104 'docs: remove a sponsor' (2026-10-03), 971d5edb 'docs: update a sponsor' and b11da909 'docs: removing a sponsor'. The proposal concedes no demonstrated quality advantage on the required primary sources. Its comparison uses Crawl4AI as a baseline, which is not a winner and is itself proposed not_adopted. Its distinguishing features are anti-bot evasion: the 2026-09-29 Claude refuter's README reading names StealthyFetcher solve_cloudflare and TLS impersonation, and this lane did not re-read them. The seeded scope places such features out of scope by security posture; this point is not decisive. Maintained (not a refutation reason). No reviewed pip advisories. License (BSD-3-Clause) information only. Default-branch activity since 2026-09-29 was read through GitHub GraphQL defaultBranchRef.history, the same fact as the REST commits?since query cited below."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.89,
+       "reasoning": "fit (gpt-6-astra): Reusable tabs, failed-tab replacement and URL/title/Markdown output establish capabilities, but the proposal provides no concrete advantage over the existing browser and extraction routes. Failed-tab replacement does not establish recovery after browser or daemon death. The cited August 23 release also predates the September rejection; no subsequent relevant improvement or comparative result is supplied. Accordingly, the known alternative has not earned keep_but_compare on new fit evidence. This rejection does not depend on its license, maintenance or optional stealth features."
+      }
+     ]
+    },
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/krlabsorg/lettucedetect",
+     "kind": "new_candidate",
+     "survives": true,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.88,
+       "reasoning": "facts (claude-opus-5-5): Verified. The repository was not renamed or archived. It is MIT, was created 2025-02-05, has 613 stars and pushed_at 2026-09-07T11:59:31Z. Its latest release is v0.2.3 (published 2026-08-13T12:53:57Z). REST commits since 2026-07-07 gives newest commit 2096ed28f3b6 at 2026-09-07T11:59:30Z, so it is maintained. README@2096ed28 checks: L9 quote (abridged; it continues 'coding-agent responses, and tool-grounded outputs'), L63 4K ModernBERT / 8K EuroBERT, L92 EuroBERT remote code needs transformers>=4.48.3,<5, L95-96 the v2 qwen-2b and mmbert-base links, L175-176 span-F1 0.689/0.642 (unified 10,698) and 0.574/0.528 (RAGTruth slice). The gap-4 receipt is deferred ('requires paid Tavily API usage'). promptfoo 0.123.1 is a quality-evaluation winner, and its installed context-faithfulness assertion makes LLM calls (tokensUsed), which is consistent with 'LLM-graded'. Wording correction: open_gaps[4] says the results 'do not establish that their sources' claims are correct', a different property from 'sources support the claims'. The gap still stands on next_action ('citation checks'). The proposal itself discloses that superiority is not shown."
+      },
+      {
+       "refuted": false,
+       "confidence": 0.6,
+       "reasoning": "fit (claude-opus-5-5): The proposal and its targeted_candidate label hold. Gap: the layer's next_action names citation checks, and no component in this layer checks whether a fetched source supports a claim. One correction to the proposal: it calls promptfoo context-faithfulness 'already adopted', but a repo-wide search finds zero configured uses. The assertion exists in the installed promptfoo 0.123.1, but nothing configures it, so there is no citation-check incumbent at all, which makes the gap stronger. Facts checked at 2096ed28: README L9 (the verifier claim), L63 (4K/8K windows), L92-96 (EuroBERT needs transformers<5; v2 qwen-2b and mmbert-base) and L175-177 (span-F1 0.689/0.642 unified, 0.574/0.528 RAGTruth slice) all match. Maintenance: a REST since-check gave 2096ed28f3b6 at 2026-09-07, inside the window; release v0.2.3 is from 2026-08-13; not archived. The GitHub Advisory Database GraphQL query (PIP lettucedetect) returned 0 advisories; the supply-chain collector was not run because no local manifest exists and cloning is not allowed. The trial needs no credentials and no paid SaaS; it runs locally as a library or web API (README L298-312). A 2B generative model and a base encoder fit both the RTX 4090 and the M5 Pro. The trial is bounded, with an explicit decision rule. Limits that keep confidence moderate: (1) the published evidence is span-level on its own v2 set, and v2 was trained on a code+tool+docs benchmark (README L95-96), not on claim-level citation support; (2) web pages must be chunked; (3) superiority over an LLM grader is unshown. The trial is what settles those points. The best-known claim-level alternative, MiniCheck, has a default-branch head of 2025-08-27 (GraphQL; the REST since-check was not run), so it does not displace this candidate on maintenance. Incumbency: no winner has any evidence of checking whether sources support claims. Tavily's standing rests on three small searches and two extractions, and gaps 3 and 4 were deferred."
+      },
+      {
+       "refuted": false,
+       "confidence": 0.88,
+       "reasoning": "fit (gpt-6-astra): The targeted-candidate label holds: local grounding checks address the explicit citation-support gap without adding a research-agent stack. Upstream provides CPU/CUDA inference and small models, making a bounded comparison plausible on these hosts; Mac performance remains unmeasured. The published scores establish capability, not superiority. Freeze precision and false-accept thresholds alongside recall: recall alone permits an over-rejecting detector to win. Also test chunking explicitly—the encoder aggregates unsupported-token probabilities across chunks using max(), which can affect supported claims."
+      }
+     ]
+    },
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/commoncrawl/cdx_toolkit",
+     "kind": "new_candidate",
+     "survives": true,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.85,
+       "reasoning": "facts (claude-opus-5-5): Verified. The repository is not archived and is Apache-2.0, with 216 stars and pushed_at 2026-09-07T04:38:17Z. Its latest release is 0.9.39 (published 2026-06-01T11:49:15Z). The newest default-branch commit is e87b1204993b at 2026-09-07T03:37:00Z (REST, since 2026-07-07). README@e87b1204 checks: L15-16 WARC extraction from CC and IA, L42-43 cdxt --ia iter/warc, L89-90 one-year and 1000-entry IA default, L99 --from 2008 --to 200906302359. Comparison arm edgi-govdata-archiving/wayback: head 2454bca6d112 at 2026-10-01T21:23:16Z, release v0.5.1 2026-06-19, BSD-3-Clause. Local checks: make_receipts.py:103-105 records hand curl calls to CDX and id_ ('Temporarily Offline' retried; 'by hand' is the proposer's word), L105 lists 10 NYSE and 3 ICE timestamps, L110-111 records LF normalisation; archive_calendar_check.py:11-12 and 190-191 and license_clauses.py:23-25 match. Correction to overturn step (2): the published NYSE raw files are also UUID-redacted (make_receipts.py:106, original hashes in REDACTIONS.json), the ICE pages are published as tag-stripped text (L107), and raw/ holds only 6 of the 10 NYSE snapshots. Comparing after eol_normalize alone would therefore show false mismatches; use the REDACTIONS.json hashes or the CDX digest, which the row also offers."
+      },
+      {
+       "refuted": false,
+       "confidence": 0.62,
+       "reasoning": "fit (claude-opus-5-5): The proposal and its targeted_candidate label hold. The strongest counter: the hand curl path succeeded after one manual retry (make_receipts.py:103), and next_action admits additions only where native retrieval 'demonstrably misses'. That counter is answered three ways. (1) cdx_toolkit is a bounded CLI and library, not a crawler or a standing research service. (2) The layer's overturn_when admits improvements in 'total runtime/cost on the same frozen source set', and the proposed trial measures exactly that on the receipt's own targets: recall of capture timestamps, payload equality after the same EOL normalization (make_receipts.py:110-111), unchanged archive_calendar_check output, manual steps, retries and wall time. (3) The verified retry loop answers the manual retry. At e87b1204, myrequests.py L126-137 retries 429 and 5xx responses with exponential backoff, capped at 60 s (L74), and L145-148 retry connection errors and timeouts. Whether IA's 'Temporarily Offline' page came back as a 503 was not recorded in the receipt, so automatic recovery of that exact event is inferred. Capability gap against the winners: no winner (Tavily, agent-browser, OpenResearch) lists or retrieves past captures. The previous sweep's archive tools (archivebox, scoop, py-wacz, single-file-cli) make captures and do not query archive indexes, so this is not a duplicate. Querying both the IA and Common Crawl indexes gives a second independent archive for corroboration (README L15-16, L42-43); the time-bound caveat is at README L88-99. Maintenance: a REST since-check gave e87b1204993b at 2026-09-07; the last release, 0.9.39 on 2026-06-01, is older, which is a lower-activity fact and not grounds for exclusion. Not archived. The GitHub Advisory Database GraphQL query returned 0 advisories (collector not run). Needs no credentials or paid service, and pure Python suits both hosts. The comparison names a maintained alternative arm (edgi wayback, GraphQL head 2454bca6d112 at 2026-10-01, v0.5.1) and allows a keep-the-hand-path outcome."
+      },
+      {
+       "refuted": false,
+       "confidence": 0.91,
+       "reasoning": "fit (gpt-6-astra): The historical-source use case is concrete: the retained receipt records manual archive discovery, retrieval and a retry. Bounded IA/Common Crawl queries and WARC extraction justify the proposed comparison without another research stack. This is a potential workflow improvement; curl already retrieves the captures. Correction: retained files underwent UUID/path redaction and ICE HTML-to-text conversion as well as newline normalization. Equality checks therefore need original digests or all publication transformations. Archive outages, missing captures and historically inappropriate timestamps must remain explicit failures."
+      }
+     ]
+    },
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/meridianlabs-ai/inspect_swe",
+     "kind": "new_candidate",
+     "survives": false,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.88,
+       "reasoning": "facts (claude-opus-5-5): Verified. The repository is not archived and is MIT, with 34 stars. It was created 2025-08-29, so it is assessable, and pushed_at is 2026-10-05T13:20:04Z. Release 0.2.71 was published 2026-09-17T20:49:46Z, and the newest commit is ef3d9e56c1dd at 2026-10-05T12:51:59Z. At tag 0.2.71, __init__ exports claude_code and codex_cli. In claude_code.py, L179-180 has the WebSearch disallow note; L342-357 calls sandbox_agent_bridge(model=models.bridge_model, ..., web_search=not web_search_tool_disallowed(...)); L439-445 has the apiKeyHelper with ANTHROPIC_AUTH_TOKEN or 'dummy-key-for-bridge' and says the OAuth flow 'silently fails'. inspect_ai@7390f041 (identical to main per compare) maps WebSearch to web_search(resolve_web_search_providers) at L356-366, and L367-375 says 'Inspect has no standalone fetch tool'. inspect_evals v0.23.0: the browse_comp README L37-41 gives OpenAI built-in search as default, else Tavily or Google, and the v0.23.0 tree contains all seven named tasks. Harbor v0.24.0 (released 2026-10-05) claude_code.py: L80-89 sets disable_web_search default False, which disallows WebSearch and WebFetch; L1782-1806 says CLAUDE_FORCE_OAUTH drops the API key in favour of a setup-token. The gap-3 receipt was deferred for 'requires paid Tavily API usage'. manifest-20260926.json:16783-16787 holds Harbor keep_but_compare, gated on a container-scoped credential. Nuance: the search default applies only when browsing is enabled, and with_browsing defaults False. The proposal itself marks WebFetch through the bridge as unverified. Tavily's winner standing has no gold-labelled accuracy evidence (gaps 3 and 4 deferred), so it rests on incumbency and local integration."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.75,
+       "reasoning": "fit (claude-opus-5-5): Refuted: in this layer it duplicates a harness that is already selected and adds no new evidence. inspect_swe is an evaluation instrument, not a web-research component. It competes with no winner, and the stack already knows it. The quality-evaluation selection is Inspect AI, Harbor and Promptfoo. That layer's deciding comparison already names 'Inspect AI with inspect_swe's claude_code and codex_cli agents' (docs/new-wsl-handbook.md:804), and inspect_swe 0.2.71 is already cited in a decision record. The proposal's own source claims verify at 0.2.71, and they argue against it here. The client authenticates through an apiKeyHelper with ANTHROPIC_AUTH_TOKEN or 'dummy-key-for-bridge' (L439-445). WebSearch maps to Inspect web_search providers (L342-357). The bridge has no standalone fetch tool (inspect_ai anthropic_api_impl.py L356-375). So the harness cannot measure the installed subscription lanes. The proposal itself identifies Harbor as the right harness. Harbor is already selected, and at v0.24.0 it keeps WebSearch and WebFetch unless disable_web_search is set (L80-89) and supports subscription OAuth (L1773-1794). Gaps 3 and 4 were deferred over authorization for paid Tavily usage (receipts 3 and 4), not over a missing harness. A keep_but_compare row here would therefore park a duplicate measurement tool under the wrong layer. Maintenance is fine: a REST since-check gave ef3d9e56c1dd at 2026-10-05, the repo was created 2025-08-29, and the latest release is 0.2.71. Incumbency: Tavily's standing rests on three small searches and two extractions with no gold labels. The fix is to run gaps 3 and 4 through Harbor, already selected, once paid usage is authorized, not to add this row."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.87,
+       "reasoning": "fit (gpt-6-astra): No additional gap requiring this harness is established for the installed native retrieval lanes. The verified bridge substitutes Inspect-configured search, so its scores cannot directly qualify subscription WebSearch. The retained benchmark receipt identifies paid-usage authorization—not a missing harness—as its blocker. Existing Promptfoo supports command-based providers and scoring retained outputs. The proposal supplies no comparative evidence that another runner improves this requirement enough to justify the backend substitution and additional credential-dependent evaluation path. Maintenance passes; the objection is fit."
+      }
+     ]
+    },
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/promptfoo/promptfoo",
+     "kind": "new_candidate",
+     "survives": false,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.85,
+       "reasoning": "facts (claude-opus-5-5): Verified. The repository is not archived and is MIT, with 25,722 stars and pushed_at 2026-10-05T16:40:18Z. Release 0.123.1 was published 2026-09-18T01:07:54Z, and the newest commit is fa605a9119fd at 2026-10-05T16:37:24Z. The indirect-web-pwn docs state these points verbatim: Requirements 'Promptfoo Cloud: Server-side page generation and exfil tracking'; Architecture 'Promptfoo CLI requests a web page from the Promptfoo server' and 'Agent fetches the page via web fetch tool call'; data-exfil 'Deterministic'. The indirect-prompt-injection docs say 'Specify which template variable contains untrusted data' and 'Promptfoo injects adversarial payloads into that variable' (indirectInjectionVar). In installed 0.123.1, dist/src/tables-DJONIU43.js:487 lists indirect-prompt-injection, data-exfil, hijacking, rag-poisoning and ssrf in REMOTE_ONLY_PLUGIN_IDS. promptfoo 0.123.1 is a quality-evaluation winner. Absence claim, scoped: the pattern prompt[- ]?injection|IPI|agentdojo|garak|pyrit|injecagent|exfil over catalogs/ and all 32 sweep inputs/*.json finds no fetch- or browse-lane injection test. The hits are a rejected tool's warning, claude-code-action CI warnings, a false 'exFil' match and the PIGuard rows. Correction: catalogs/us-equities/local-model-workloads-20260924.json already lists PIGuard (single_lane_lead) and Llama Prompt Guard 2 (runner-up) as flag-only tool-output screens with no native execution, so a guard candidate exists. 'Publicly hosted' is inferred from 'Generated page is hosted', and Cloud pricing is self-disclosed as unchecked."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.7,
+       "reasoning": "fit (claude-opus-5-5): Refuted: the only path that exercises the real fetch lanes needs a new SaaS credential, and no demonstrated gap justifies it. The indirect-web-pwn docs list 'Promptfoo Cloud: Server-side page generation and exfil tracking' as a requirement. In that design the Promptfoo server generates and hosts the pages, and grading runs through 'server-side tracking'. That means a new Cloud sign-in and test traffic sent to a Promptfoo-operated service, which conflicts with the local-first and privacy-filtered principle. The pricing page lists a free Community tier with 10k red-team probes a month. It does not say whether indirect-web-pwn hosting is included, so cost is unverified, but the credential and privacy issues stand either way. The gap is a hypothesis, not a demonstration: the proposal itself says only a measured exfil rate above zero would make a guard a demonstrated gap. Verified locally: the installed 0.123.1 lists indirect-prompt-injection, data-exfil, hijacking, rag-poisoning and ssrf among its 26 REMOTE_ONLY_PLUGIN_IDS. The plain plugin only injects payloads into a prompt variable, so no local-only path tests the fetch lanes. promptfoo is already the selected CI regression gate in quality-evaluation, so this is not a new alternative to any web-research winner. Under current authorization the keep_but_compare row cannot be run and has no role in this layer. The pinned winner agent-browser already ships safeguards (--allowed-domains, --content-boundaries; v0.38.1 README L221), untested. A local injection fixture against those safeguards is the credential-free next step, not this row. Maintenance is fine: a REST since-check gave fa605a9119fd at 2026-10-05; the latest release is 0.123.1; the GitHub Advisory Database GraphQL query (npm promptfoo) returned 0 advisories (collector not run)."
+      },
+      {
+       "refuted": false,
+       "confidence": 0.82,
+       "reasoning": "fit (gpt-6-astra): The conditional keep-but-compare label holds. Upstream documents an actual fetched-page attack path and server-observed callbacks, providing a concrete privacy-qualification comparison beyond injecting text into a prompt variable. Promptfoo Cloud is explicitly required, so this is not a ready local-first trial or authorization to obtain credentials. The documentation does not prove exclusivity, reachability through every proposed retrieval service, or credential sufficiency. A later trial must establish those facts and distinguish a callback request from actual canary-data exfiltration before reporting a vulnerability."
+      }
+     ]
+    },
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/ukgovernmentbeis/inspect_evals",
+     "kind": "new_candidate",
+     "survives": false,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.9,
+       "reasoning": "facts (claude-opus-5-5): Verified. The repository is not archived and is MIT, created 2024-10-02, with 692 stars and pushed_at 2026-10-05T07:07:49Z. Release v0.23.0 was published 2026-10-02T06:20:01Z. Its notes include the HLE scorer-registration fix ('Register the inspect_evals/hle/regex_judge and ... json_judge scorers') and other eval fixes. REST since 2026-07-07 gives newest commit 9080b5e9f164 at 2026-10-05T07:03:23Z. The BrowseComp README at v0.23.0 shows solver (L68) and sandbox (L69) options, with_browsing default False (L65; browse_comp.py L63), LLM-scored answers with confidence (L97, L141), and API-backed search defaults (L39-41). main _registry.py imports browse_comp, assistant_bench (five variants), mind2web and mind2web_sc. The claim that default tools are Inspect tools rather than the native client lanes matches README L37."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.8,
+       "reasoning": "fit (claude-opus-5-5): Refuted: the targeted_candidate label is wrong, and the component is already known. inspect_evals is a suite of evaluation datasets that accompanies the selected Inspect AI evaluator. It is not a web-research component and cannot replace or extend any winner. The stack has already run it: Inspect AI 0.3.273 with inspect-evals 0.23.0, task inspect_evals/bfcl (docs/decisions/2026-10-03-new-wsl-local-models.md:98). The measured set in the proposed trial is 40 self-authored domain tasks, so inspect_evals would supply only a BrowseComp subset as a harness check. At v0.23.0, BrowseComp's web_search defaults to OpenAI's built-in search, else Tavily or Google (README L37-41). Those are API-billed, the same paid-usage blocker that deferred gaps 3 and 4 (receipt 4). Browsing is off by default (L65), and scoring is done by an LLM (L97). So no bounded trial is feasible under current authorization, and once authorized, Inspect AI and Harbor (already selected) are the instruments. Maintenance is fine: a REST since-check gave 9080b5e9f164 at 2026-10-05; v0.23.0 is from 2026-10-02; the GitHub Advisory Database GraphQL query (PIP inspect-evals) returned 0 advisories (collector not run). Incumbency: Tavily's standing is unmeasured (three small searches and two extractions; gaps 3 and 4 deferred). That is an authorization gap for existing harnesses, not grounds for this row."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.88,
+       "reasoning": "fit (gpt-6-astra): The targeted-candidate label exceeds the demonstrated integration. BrowseComp defaults to browsing disabled and scores answer correctness/confidence, not primary-source citation support or historical cutoffs. The proposed domain gold labels and native-client solver remain unspecified integration work; configurable solvers alone do not establish that the installed lanes will be measured. The recorded blocker remains paid usage, while existing Promptfoo can score retained outputs. Retain these datasets as comparison references. Completeness follow-up: freeze domain labels, PDF/table and JavaScript-page coverage, timestamp cutoffs and citation checks before selecting another harness."
+      }
+     ]
+    },
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/answerdotai/llms-txt",
+     "kind": "new_candidate",
+     "survives": false,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.85,
+       "reasoning": "facts (claude-opus-5-5): Verified. The repository is not archived and is Apache-2.0, created 2024-09-01, with 2,648 stars and pushed_at 2026-09-24T18:21:11Z. Release 0.0.7 was published 2026-09-24T18:20:15Z with the notes 'remove stray print' and 'Update CLI flags for fastcore.script hyphenation'. The newest commit is 3700a0a624a4 at 2026-09-24T18:20:20Z. Citation correction: README.md at 0.0.7 is a symlink (mode 120000) to nbs/index.qmd, and the claims appear there: L22 a file at any path covers the pages under it, L48 'agents should use the most specific one', L26-28 .md alternatives and rel=alternate, L36 'follow the relevant links'. docs.alpaca.markets/llms.txt begins '# Alpaca India - GIFT City Documentation'. The lane's self-reported Nautilus fetch failure did not recur in this lane. nautilustrader.io/llms.txt (fetched 2026-10-05) links https://nautilustrader.io/docs/llms.txt, which lists integrations/interactive_brokers.md as raw markdown. That supports the gap's premise for the missed IBKR adapter guide."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.85,
+       "reasoning": "fit (claude-opus-5-5): Refuted: it duplicates a capability of the pinned winner, and the label is wrong. agent-browser 0.38.1 already does index-guided llms.txt discovery natively. Per its README (L219-221), `read` walks ancestor paths toward / to find the nearest llms.txt. `--llms index` prints the nearest-ancestor llms.txt link list, `--llms full` reads llms-full.txt, and `--filter` narrows the llms links (example at L213). The proposal's own decision rule is to adopt the practice without the package if native fetching performs equally, and says a parser dependency 'has not been justified'. The repository's code is therefore not what any trial would adopt, which makes targeted_candidate the wrong label. Its key evidence, the Nautilus lookup, was not reproduced. The trafilatura comparison that survived the previous sweep already includes 'agent-browser read (markdown/llms.txt path plus fallback)' on a frozen set that contains the Nautilus adapter guide Tavily missed (catalog manifest-20260926.json:4982-4985). A check of the Alpaca region and version would belong in that existing comparison. Maintenance is fine: a REST since-check gave 3700a0a624a4 at 2026-09-24; release 0.0.7 is from 2026-09-24; the GitHub Advisory Database GraphQL query (PIP llms-txt) returned 0 advisories (collector not run)."
+      },
+      {
+       "refuted": false,
+       "confidence": 0.84,
+       "reasoning": "fit (gpt-6-astra): The proposal survives as a publisher-index navigation trial using existing commands. Scoped indexes and selected Markdown links plausibly address the missed-document discovery problem without another service, credentials or platform-specific runtime. The bounded comparison includes relevant version and region controls. Neither Nautilus index URL was successfully retrieved here; that leaves coverage unresolved rather than proving the files absent. No parser-package adoption or measured retrieval advantage is established, consistent with the proposal's practice-first scope."
+      }
+     ]
+    },
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/anthropics/claude-code",
+     "kind": "new_candidate",
+     "survives": false,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.88,
+       "reasoning": "facts (claude-opus-5-5): Verified. The repository is not archived, and GitHub reports license null. It has 149,487 stars (149,484 claimed, which is ordinary drift) and pushed_at 2026-10-05T01:04:13Z. Release v2.1.289 was published 2026-10-03T23:07:17Z, and the newest default-branch commit is 2bfb629dfaff at 2026-10-03T23:06:56Z. Installed client: `claude --version` returns 2.1.289, and `claude --help` lists '--chrome Enable Claude in Chrome integration' and '--no-chrome'. code.claude.com/docs/en/chrome states each of the following verbatim: 'Chrome integration isn't supported in Windows Subsystem for Linux (WSL)'; it works with Chrome and Edge; 'A direct Anthropic plan (Pro, Max, Team, or Enterprise)'; it requires /login, and an API key or setup-token keeps it off even with --chrome; it 'shares your browser's login state'; 'Browser actions run in a visible Chrome window'; 'Site-level permissions are inherited from the Chrome extension'; in auto mode a classifier approval makes the extension skip its per-site check unless permission rules deny a site. A local grep finds no 'Claude in Chrome' or --chrome entry in catalogs/, docs/ or adoption/. The layer file shows every winner as untested on macos-arm64. The overturn condition depends on the promptfoo row's injection suite, which does not exist yet."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.75,
+       "reasoning": "fit (claude-opus-5-5): Refuted on platform fit and on duplicating the winner. (1) Platform trigger: the docs say 'Chrome integration isn't supported in Windows Subsystem for Linux (WSL)'. The layer profiles both hosts, and the WSL workstation is the primary one, so this lane cannot serve the layer's browser role there. (2) Duplication: the only advantage claimed is acting on signed-in pages. The pinned winner, agent-browser 0.38.1, already offers 'Chrome profile reuse' of existing Chrome login state (`--profile <name>`) and import of auth from an already-logged-in Chrome (`--auto-connect` + `state save`) (README L661-664, L789), headless and on both hosts. The proposal concedes it did not compare these. (3) Fit: per the docs, it runs in a visible Chrome window and pauses for manual login and CAPTCHA handling, so it is not a bounded headless command. In auto mode a classifier approval skips the extension's per-site check, which raises the security stakes. (4) The proposed comparison waits on the injection suite from the promptfoo row, which needs a Promptfoo Cloud sign-in, so it cannot run under current authorization. Other docs facts verified: a direct Anthropic plan and /login are required, and API-key or setup-token sessions keep the integration off. Maintenance is fine: a REST since-check gave 2bfb629dfaff at 2026-10-03; v2.1.289; license null (information only). The --chrome flag in the installed 2.1.289 was not re-verified by running the client."
+      },
+      {
+       "refuted": true,
+       "confidence": 0.95,
+       "reasoning": "fit (gpt-6-astra): The claimed logged-in browsing gap is not demonstrated: agent-browser already documents Chrome-profile reuse, persistent profiles and authentication-state import. Untested Mac performance does not establish that these capabilities fail. Claude's visible-browser lane also requires direct-plan login and explicitly excludes WSL. No concrete task or measured advantage justifies this overlapping Mac-only addition yet. Standing note: this rejection does not establish agent-browser superiority—the retained comparison used a Playwright library instead of its CLI, mismatched timing boundaries and no token measurements."
+      }
+     ]
+    },
+    {
+     "layer": "web-research",
+     "repository": "https://github.com/vulcanlab/ipi-proxy",
+     "kind": "new_candidate",
+     "survives": true,
+     "votes": [
+      {
+       "refuted": false,
+       "confidence": 0.92,
+       "reasoning": "facts (claude-opus-5-5): Verified. The repository was created 2026-05-05T02:49:31Z, 153 days before 2026-10-05, so it is not too new to assess. Further facts: pushed_at 2026-05-05T07:08:37Z, not archived, no rename, license null, 15 stars, latestRelease null, 0 tags. Default-branch history totalCount is 1 (272a61a7ee33 at 2026-05-05T07:08:27Z). REST commits?since=2026-07-07 returned an empty list, so the repository is stale under the 90-day rule and the not_adopted label is consistent. arXiv 2605.11868 has Comments 'code: https://github.com/VulcanLab/IPI-Proxy/'. Its abstract describes an intercepting proxy that rewrites real HTTP responses from whitelisted domains in flight, 820 deduplicated attack strings drawn from six published benchmarks, a YAML-driven harness and a companion exfiltration tracker. The proposal labels the CA-trust point as inference."
+      },
+      {
+       "refuted": false,
+       "confidence": 0.92,
+       "reasoning": "fit (claude-opus-5-5): The not_adopted label holds, and its rejection reason is verified. Under the maintenance rule the repository is stale: the REST since-check (2026-07-07) returned no default-branch commit. GraphQL shows exactly one commit (272a61a7ee33, 2026-05-05T07:08:27Z), 0 tags, no release, license null (information only), not archived. It was created on 2026-05-05, 153 days before 2026-10-05, so it is old enough to assess and the staleness exclusion applies. Its stated overturn condition (maintenance resumes and a run reaches the client-side fetch lanes) is a fair way back. The arXiv description of the design was not re-read here and does not affect the verdict."
+      },
+      {
+       "refuted": false,
+       "confidence": 0.99,
+       "reasoning": "fit (gpt-6-astra): The not_adopted proposal holds. The public REST commit query returned an empty array for the required 90-day window, and repository metadata gives a creation date of 2026-05-05, so the repository is not too new to assess. Its rejection follows the stated zero-activity rule. The proxy's potential functional fit does not overturn that maintenance exclusion."
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "critic": {
+  "followup_layers": [
+   {
+    "layer_id": "web-research",
+    "reason": "All 8 proposals in this sweep are browser, crawl or search frameworks (chrome-devtools-mcp, crawl4ai, exa-mcp-server, trafilatura, ketch, wigolo, stagehand, Scrapling). The 2026-09-29 sweep proposed and refuted capture and archiving tools. Neither sweep proposed a candidate for what actually blocks this layer. overturn_when needs a measured comparison on a frozen source set. Gaps 3 and 4 (Tavily target hit rate and a gold-labelled benchmark) are still deferred. next_action asks for citation checks. The installed clients' own browser lanes are not in the catalog. No layer owns injection testing of the fetch and browse lanes. Nothing covers as-of-date evidence, which the historical-simulation north star needs. Releases from the last 4 weeks that serve these needs were not considered: inspect_evals v0.23.0 (2026-10-02), inspect_swe 0.2.71 (2026-09-17) and llms-txt 0.0.7 (2026-09-24). The GPT discovery lane's own critic note (gpt6/gpt6-discover-web-research/last.json) asks the next sweep to prioritize the unqualified modalities 'rather than more general browser frameworks'.",
+    "search_directions": [
+     "Client-native browser lanes that are already installed; on the Macs every winner is still 'untested'. (1) Claude Code 2.1.289 has `--chrome` (Claude in Chrome). Per https://code.claude.com/docs/en/chrome (read 2026-10-05) it 'isn't supported in Windows Subsystem for Linux (WSL)' and needs a direct Anthropic plan. It drives a visible Chrome window that shares the user's logged-in state, and its site permissions come from the extension. (2) The Codex desktop app has Browser Use, an in-app browser and computer use. In openai/codex@rust-v0.160.0 codex-rs/features/src/lib.rs these are requirements-only gates, stable and on by default, for 'desktop apps'. Per-origin access/downloads/uploads/full_cdp_access keys are listed in catalogs/foundation/upstream-surface-baseline.json:800-829. Check whether codex exec or the TUI exposes these at all. Both lanes are GUI-bound, which matters for 'bounded native commands'. A logged-in browser reading untrusted pages also raises the injection stakes, so judge both lanes under direction 3's threat model and against agent-browser on macOS arm64. Neither lane is in the layer's winners or alternatives, or in upstream-surface-dispositions.json.",
+     "Frozen-task-set measurement plus citation checks, using upstream harnesses (what overturn_when, gaps 3-4 and next_action need). meridianlabs-ai/inspect_swe (0.2.71, 2026-09-17; commit 2026-10-05) exports claude_code() and codex_cli() agents (src/inspect_swe/__init__.py). These could run the real clients on UKGovernmentBEIS/inspect_evals tasks: v0.23.0 (2026-10-02) ships browse_comp (touched 2026-09-18), simpleqa, assistant_bench, gaia and mind2web. Unverified: whether the clients' own WebSearch and web_search tools work inside its sandbox, and under which sign-in or billing. Harbor is the other harness AGENTS.md names. Inspect's web_search() matrix compares only search backends (https://inspect.aisi.org.uk/tools-standard.html). Its internal anthropic and openai providers need no separate search key but are billed through the model APIs, not the client subscriptions. They cannot exercise Claude Code WebSearch, ctx_fetch_and_index or codex --search. For the citation-check half: KRLabsOrg/LettuceDetect ('Span-level grounding verification...'; v0.2.3, 2026-08-13; commit 2026-09-07), Vectara's hallucination_evaluation_model on Hugging Face (lastModified 2025-10-20), and promptfoo's adopted context-faithfulness, factuality and search-rubric assertions (site/docs/configuration/expected-outputs/model-graded/). The frozen corpus option is the HF dataset Tevatron/browsecomp-plus-corpus; its repository texttron/BrowseComp-Plus is stale (last push 2026-05-28).",
+     "Injection red-teaming and guards for every fetch and browse lane; no layer owns this testing today. promptfoo, already adopted in quality-evaluation, has an indirect-prompt-injection red-team plugin (https://www.promptfoo.dev/docs/red-team/plugins/indirect-prompt-injection/) that has not been pointed at these lanes. IPI-proxy (arXiv 2605.11868, May 2026; abstract read) is an open-source intercepting proxy that rewrites real responses from allow-listed domains in flight. Its repository and maintenance are unverified. meta-llama/PurpleLlama contains LlamaFirewall (path touched 2026-08-18) and Llama-Prompt-Guard-2; that Hugging Face model is gated, so using it needs a new token. Playwright MCP's README (lines 410-412) says its --allowed-origins and --blocked-origins options do 'not serve as a security boundary' and do not affect redirects, so origin allow-lists alone do not bound a lane. protectai/llm-guard is archived.",
+     "As-of-date (point-in-time) web retrieval for historical simulation. This is separate from the capture tools the 2026-09-29 sweep refuted. The trading lane already hand-parsed Wayback snapshots of nyse.com holiday calendars (blueprints/gap-wave2-20260923/us-equities__market-data-reference/archive_calendar_check.py), and no tool for this is in the catalog. commoncrawl/cdx_toolkit (formerly cocrawler/cdx_toolkit; 0.9.39; commit 2026-09-07) queries the Common Crawl and Internet Archive Wayback CDX indexes and extracts WARC records (README: cdxt --ia / --cc). Look-ahead leakage benchmarks to open: Look-Ahead-Bench (arXiv 2601.13770) and HindsightBench (arXiv 2607.18867); both are search-result leads that have not been opened. akamhy/waybackpy is stale (last push 2024). webrecorder/browsertrix-crawler has had no verdict since 2026-09-29 because a vote was missing.",
+     "Agent-facing formats that sites publish themselves, to test before adopting any extractor (trafilatura, crawl4ai, defuddle). https://nautilustrader.io/docs/llms.txt (200, 180 links on 2026-10-05) lists per-adapter markdown pages. One is https://nautilustrader.io/docs/md/latest/integrations/interactive_brokers.md, which returned 200 text/markdown. Test whether a lookup in this index finds the Nautilus adapter guide that Tavily missed (gap 3). Scope has to be checked per entry, not by status code: docs.alpaca.markets/llms.txt returns 200, but it is a multi-region index whose first section is 'Alpaca India - GIFT City Documentation'. AnswerDotAI/llms-txt released 0.0.7 on 2026-09-24. Cloudflare Markdown for Agents returns text/markdown when a request sends Accept: text/markdown (https://developers.cloudflare.com/fundamentals/reference/markdown-for-agents/; reproduced here); check which of our fetch lanes send that header. The WebMCP site-tool spec (webmachinelearning/webmcp) last had a commit on 2026-10-02."
+    ]
+   }
+  ],
+  "general": [
+   "Three winners hold their place by incumbency, not evidence. (1) tavily-cli is still a winner under the sealed 2026-09-22 verdict, although docs/harness-defaults.md:42 (user decision, 2026-09-26) puts free native lanes first and makes keyed search historical reference. Its upstream has no releases (latest null, pin_comparison not_compared). (2) agent-browser's lead over playwright-cli has no like-for-like measurement. The gap-0 receipt (evidence/artifacts/gap-wave2-20260923/foundation__web-research/0-agent-browser-vs-playwright-cli.json) is only 'advanced': loopback fixture only, tokens not measured, the Playwright library rather than the CLI was driven, and the timings are not comparable. (3) OpenResearch (pinned 0.2.7; upstream v0.2.15) has no measured comparison with any scholarly alternative. One is Future-House/paper-qa, maintained (v2026.08.12), described upstream as 'High accuracy RAG for answering questions from scientific documents with citations'.",
+   "Bias toward hosted services. exa-mcp-server's hosted MCP works anonymously with rate limits; OAuth or an API key unlocks higher limits and Exa Agent (README line 128). Every query still goes to a third-party service, so under the local-first, privacy-filtered and no-new-credentials rules it first needs a measured gap over the keyless native lanes on the same task set.",
+   "Gap in the native surface catalog. catalogs/foundation/upstream-surface-dispositions.json (baseline claude_code 2.1.289 / codex rust-v0.160.0) has rows for the web_search keys. It has none for the Codex features browser_use, browser_use_external, browser_use_full_cdp_access, in_app_browser or computer_use (all listed in upstream-surface-baseline.json), and none for Claude Code's --chrome flag.",
+   "Seeds without a verdict from both lanes. Only the GPT lane set aside browser-use/browser-use (0.13.10, 2026-09-04), firecrawl/firecrawl-mcp-server and microsoft/playwright-mcp (v0.0.83, 2026-09-28), as 'outside the six slots' or not_adopted, with no refuter votes. Lightpanda 1.0.0 (2026-10-02) was already known to this morning's facts vote, which noted that agent-browser v0.38.2 documents --engine lightpanda. What remains for Lightpanda is a measured engine comparison inside the incumbent, not a new owner.",
+   "Stale or archived under the 90-day default-branch rule (gh api commits?since=2026-07-07); do not spend sweep slots on them. Stale: texttron/BrowseComp-Plus, Liyan06/MiniCheck, allenai/ai2-scholarqa-lib, stanford-oval/storm, Alibaba-NLP/DeepResearch, MiroMindAI/MiroThinker (last push 2026-07-06), jina-ai/reader, akamhy/waybackpy, AkariAsai/OpenScholar. Archived: langchain-ai/open_deep_research, langchain-ai/mcpdoc, protectai/llm-guard, amazon-science/RefChecker.",
+   "Cross-layer routing. UKGovernmentBEIS/inspect_evals and meridianlabs-ai/inspect_swe are in no layer's known_repositories. That matters because inspect-ai is the evaluation-experiments winner and that layer's gap says no inspect-ai fixture exists. upstash/context7 (ctx7@0.5.13, 2026-10-05) is in no layer; it belongs with document-retrieval's docs lane (arabold/docs-mcp-server, andrewyng/context-hub). Injection testing of fetch and browse lanes needs an owner; the security-supply-chain winners are grype, syft and gitleaks.",
+   "Platform fit. The Chrome integration docs say it is not supported in WSL, so the WSL2 host keeps agent-browser or Playwright and only the Macs can test the native Chrome lane. Community WSLg workarounds (anthropics/claude-code issue #79655) are unverified leads. No proposal used the RTX 4090. Whether the grounding and guard models named above fit and run well on the 4090 or on the 24 GB Mac is still unverified (the LettuceDetect model card returned HTTP 401)."
+  ]
+ },
+ "lost": []
+}

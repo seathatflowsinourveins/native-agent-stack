@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-exa-labs-exa-mcp-server",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/exa-labs/exa-mcp-server",
+ "reviewed_commit": "f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "web-research"
+ ],
+ "claim": "Source and documentation review of exa-labs/exa-mcp-server at commit f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97 (license MIT), read from README.md at that commit. Repository description: \"Exa MCP for web search and web crawling!\". Survived the landscape-sweep-webresearch-20261005-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 5078,
+  "pushed_at": "2026-10-02T03:27:09Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97",
+   "text": "This repository is an [Agent Plugin](https://agent-plugins.org). Install it with any [compatible client](https://agent-plugins.org/compatible-clients)."
+  },
+  {
+   "source": "README.md@f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97",
+   "text": "Install from the [Claude Plugin Marketplace](https://claude.com/plugins/exa), or run:"
+  },
+  {
+   "source": "README.md@f3d71fb6b0ff4b4683f108f05bc2bae61a9f7e97",
+   "text": "```bash claude plugin install exa@claude-plugins-official ```"
+  }
+ ]
+}
