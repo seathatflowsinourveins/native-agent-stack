@@ -212,19 +212,25 @@ path. Its next dispatch/tag result must be retained as that path's first
 execution. This repair neither dispatches those workflows nor infers their
 results from local structural checks.
 
-Off-limit configuration-owner files, including `adoption/new-wsl-profile.json`,
-all `blueprints/us-equities/` files, historical receipts, prior decisions,
-dated catalogs and sweep manifests retain their bytes. The trading-owned
-`observability/paper-trading-live/collector-paper-trading.yaml` comment is
-restored to its base 0.161.0 text in R642. Reports may display the intentional
-difference between current stack pins and older sealed landscape winners.
+**Dated history (2026-10-03 W1 repair scope and handoff).** The following text is retained as written; its current-tense configuration-owner statements are superseded by the October 5 merge record below.
 
-Owner handoffs for the next unit:
+> Off-limit configuration-owner files, including `adoption/new-wsl-profile.json`,
+> all `blueprints/us-equities/` files, historical receipts, prior decisions,
+> dated catalogs and sweep manifests retain their bytes. The trading-owned
+> `observability/paper-trading-live/collector-paper-trading.yaml` comment is
+> restored to its base 0.161.0 text in R642. Reports may display the intentional
+> difference between current stack pins and older sealed landscape winners.
+>
+> Owner handoffs for the next unit:
+>
+> - The configuration owner must reconcile `adoption/new-wsl-profile.json`:
+>   it carries Inspector 2.9.0, Worktrunk 0.80.0 and Collector 0.162.0, while
+>   playwright-cli 0.1.21 and Syft 1.52.0 remain older than the W1 selections.
+>   Its mcporter 0.14.1 agrees with R642b's hold. This file is outside the repair's edit scope.
 
-- The configuration owner must reconcile `adoption/new-wsl-profile.json`:
-  it carries Inspector 2.9.0, Worktrunk 0.80.0 and Collector 0.162.0, while
-  playwright-cli 0.1.21 and Syft 1.52.0 remain older than the W1 selections.
-  Its mcporter 0.14.1 agrees with R642b's hold. This file is outside the repair's edit scope.
+**Configuration-owner handoff after merges 2 and 3 (2026-10-05):**
+
+- Only the profile's playwright-cli 0.1.21 remains older than the stack's 0.1.22 selection. Syft 1.54.0 and mcporter 0.14.2 now match through main #684/#704. This PR sets the jcodemunch-mcp entry to 1.108.327. The other owner handoffs below retain their separate scopes.
 - The trading owner must update the canonical
   `blueprints/us-equities/supply-chain/README.md` recipe for Syft 1.54.0,
   including its 1.52.0 archive/hash instructions, using the W1 receipt's
@@ -495,11 +501,13 @@ Main did not change those rows. Retain those exact W1 rows and add their
 three checks to main's counters, producing 277 and 260. No new API calls
 were made for this repair.
 
-The retained arrays contain 261 check entries, compared with main's 258.
-The base already contained 255 check entries against a selected-component
-summary counter of 254. This repair carries that dated one-entry discrepancy
-forward while adding the measured W1 delta; it does not relabel the historical
-summary as a newly reconciled count of every array entry.
+At the October 4 review repair, the retained arrays contained 261 check
+entries, compared with 258 at main `14048b84`. Main's [#637 recount](https://github.com/seathatflowsinourveins/native-agent-stack/pull/637)
+subsequently reconciled the earlier one-entry discrepancy. At main
+`4c897418f`, selected-component commands are 264 and all recorded API commands
+are 281. Retaining W1's three checks gives 264 + 3 = 267 and 281 + 3 = 284.
+The current selected-component array contains 267 checks and matches its
+summary; the earlier discrepancy is historical, not carried forward.
 
 Completeness critic: inspect the 55 pre-repair paths, plus
 `docs/harness-defaults.md` added by this repair, for the same
@@ -545,3 +553,70 @@ seven W1 moves and main's component selections, regenerate stale projections
 from merged sources, and run the named acceptance checks with skipped tests
 reported by name and reason. Historical host observations and the unverified
 W1 update path retain their original qualification limits.
+
+## Merge with main e871259ea and 4c897418f (2026-10-05)
+
+Merge 2 incorporated main `e871259ea` and was committed as `66c94a37f`;
+merge 3 incorporated main `4c897418f` and was committed as `f640b5309`.
+PR head `64c410699` has the same tree as the merge-3 commit. These merges
+retain the seven W1 currency moves while following main for its newer
+selections and the NativeStack2604 fix wave. This record serves the same
+native foundation for the north-star research action named above.
+
+The code-index owner rows now follow jcodemunch-mcp **1.108.327**, source
+`6d5ae86c130f96624e2ca2d797fa3b853c210b9d`, selected by W1. Merge 2's
+`test_owner_pins_are_the_repository_pins` failure forced the alignment:
+[tests/test_new_wsl_definitive_defaults.py:1336](../../tests/test_new_wsl_definitive_defaults.py#L1336)
+requires owner rows to name the pin in `manifests/stack.json`. Main already
+uses this precedent for RTK: the dated owner record's row at
+[docs/decisions/2026-10-04-token-full-stack-owner-default.md:108](2026-10-04-token-full-stack-owner-default.md#L108)
+names 0.50.0, while its "Refresh onto main after PR #693" section and main's
+owner row follow 0.51.0. The older decision stays historical. The configuration
+owner's decision record is unchanged by this repair; its wording and any
+acknowledgement remain with that owner and the coordinator.
+
+This PR now edits these configuration-owner files, superseding the earlier
+scope statement retained above as dated history:
+
+- `adoption/new-wsl-profile.json`: the jcodemunch-mcp entry.
+- `evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json`: the wave3 code-index owner row; main's wave4 Promptfoo owner is preserved.
+- `evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json`: regenerated from the merged consensus.
+- `docs/decisions/2026-10-01-new-wsl-definitive-defaults.md`: the tables rendered from that manifest.
+- `evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json`, `owners.json`, `install.sh` and `accept.sh`: the code-index owner, install/list/version commands and source citations.
+- `evidence/artifacts/new-wsl-install-plan-20261002/README.md` and `SOURCES.md`: the current code-index pin, wave-3 refresh and verified source locations.
+
+Main's 25 fix-wave slot repairs and wave4 Promptfoo 0.123.1 owner survive.
+The current configuration-owner handoff is only playwright-cli **0.1.21** in
+the profile against **0.1.22** in the stack. Syft **1.54.0** and mcporter
+**0.14.2** now match through main #684/#704; this PR sets the jcodemunch-mcp
+entry to **1.108.327**. These are selection and scope statements, not new
+host acceptance.
+
+Main's [#637 recount](https://github.com/seathatflowsinourveins/native-agent-stack/pull/637)
+reconciled the old summary discrepancy. Main supplies 264 selected-component
+commands and 281 total API commands; W1 retains three additional checks.
+The merged counters are **264 + 3 = 267** and **281 + 3 = 284**, and the
+selected-component array has exactly 267 checks. No API refresh ran here.
+
+The handbook receipt's two merge entries are retained: validation[6] records
+merge 2's `--write` at `2026-10-05T01:51:22.461149+00:00`, and validation[7]
+records merge 3's `--write` at `2026-10-05T03:39:08.219114+00:00`. Both
+recorded exit 0 and status `written`; those historical codes are unchanged.
+Each `date_utc` now follows its own UTC timestamp, **2026-10-05**. Their
+scopes describe regeneration, rather than claiming a check from `--write`.
+A separate validation[8] records today's actual `--check`, with its returned
+status, exit code and output hashes; the date is taken from `date -u`.
+
+The jcodemunch README read on 2026-10-05 at 6d5ae86c and prior pin 8f7b34ab
+confirms identical install, version and session-stats lines 91, 113 and 141;
+these anchors did not move. The plan now cites the ecosystem root and
+`--python 3.13` at `recipes/README.md:554-559`, plus `--version` at line 560,
+at the immutable merge-3 commit. The profile and executable source anchors
+remain unchanged because the read verified them.
+
+Completeness critic: distinguish historical scope from the files the PR now
+edits; preserve the configuration owner's reserved record; verify current
+pins and source anchors, main's repair slots and Promptfoo owner, reconciled
+command counts, actual receipt dates and returned generator statuses. Rebuild
+the manifest, tables and handbook with their own generators, run the named
+local acceptance checks, and re-register changed files after all mutations.

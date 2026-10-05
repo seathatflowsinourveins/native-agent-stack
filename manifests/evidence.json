@@ -16607,8 +16607,8 @@
     },
     {
       "path": "docs/decisions/2026-10-03-currency-wave-w1.md",
-      "sha256": "57e9b58c006d2d678b58e528088f3bd2e6c5a961cf642581de8ed155c9f43916",
-      "bytes": 39135
+      "sha256": "23564630816b2b2d2f5154ce51bc101615134901721e9d13c85a6e062f68a6ed",
+      "bytes": 44444
     },
     {
       "path": "docs/decisions/2026-10-03-foundation-catalog-drift.md",
@@ -16852,8 +16852,8 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "61d605859cce48fafae82a642f387befa854a5e230d4aa6ddc1eece0f7718ed9",
-      "bytes": 41786
+      "sha256": "15a129620db4569832c8b8ba9c5a0005cc9eb8d868548d12aad3d2eb02903af6",
+      "bytes": 41808
     },
     {
       "path": "docs/full-stack-convergence.md",
@@ -39092,8 +39092,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "db541a233daedf533543e9902c1e430c1091a7af40fcee9e56bae87e433952e1",
-      "bytes": 5620
+      "sha256": "50b4fc60487595d935499ff4f4dc6fd7345d1c0c3db14ebb496f6c3c61783a10",
+      "bytes": 6297
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -39102,13 +39102,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md",
-      "sha256": "30e73180781e42ee236962af77dcce78a777b6815731959b65f9b21059f44b01",
-      "bytes": 64229
+      "sha256": "6ae1ac928e0c934f97e24411c60b963dd6cbe206a6c7d8b7078eec6d1dc48882",
+      "bytes": 64583
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "3617bb263354d0e963f3325457aea747ac38a22b0664df8927b657b7adc2bcf4",
-      "bytes": 140790
+      "sha256": "3d479addd11d1537b556b67dc01519b4f9e6e81220492d91774ea384695e1bc5",
+      "bytes": 141789
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -39387,8 +39387,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "b82cbd7f314100820a8326fc1e29ab97277fe43564329bcfa40e800b82e8e160",
-      "bytes": 102206
+      "sha256": "60092712e9483273469315ad6649d047e850b9488df1561f1947a0385bf01134",
+      "bytes": 102445
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",

@@ -52,9 +52,9 @@
       "native_exit_code": 0
     },
     {
-      "date_utc": "2026-10-04",
+      "date_utc": "2026-10-05",
       "recorded_at_utc": "2026-10-05T01:51:22.461149+00:00",
-      "scope": "Local regeneration for PR #642 merge with main e871259e; generated-byte verification, with no destination installation or upstream execution claimed.",
+      "scope": "Local regeneration for PR #642 merge with main e871259e; --write execution, with no destination installation or upstream execution claimed.",
       "command": "python3 scripts/build_new_wsl_handbook.py --write",
       "native_exit_code": 0,
       "returned_status": "written"
@@ -62,10 +62,22 @@
     {
       "date_utc": "2026-10-05",
       "recorded_at_utc": "2026-10-05T03:39:08.219114+00:00",
-      "scope": "Local regeneration for PR #642 merge round 3 with main 4c897418f; generated-byte verification only, with no destination installation or upstream execution claimed.",
+      "scope": "Local regeneration for PR #642 merge round 3 with main 4c897418f; --write execution only, with no destination installation or upstream execution claimed.",
       "command": "python3 scripts/build_new_wsl_handbook.py --write",
       "native_exit_code": 0,
       "returned_status": "written"
+    },
+    {
+      "date_utc": "2026-10-05",
+      "recorded_at_utc": "2026-10-05T04:17:05Z",
+      "scope": "Local generated-byte verification of the merge-3 handbook outputs at PR #642 HEAD 64c410699, before this dated documentation repair. This --check run is separate from the two historical --write executions.",
+      "command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "native_exit_code": 0,
+      "returned_status": "passed",
+      "returned_outputs": {
+        "docs/new-wsl-handbook.json": "de1f2ab30c51683e4b693244d636350e5cbece234e0c3452ecd2f9ca88bebb62",
+        "docs/new-wsl-handbook.md": "216c20f07d8283ccbfc47bfe2219a102b53a32caea744d83834ee4f8d0b589a2"
+      }
     }
   ],
   "failed_conditions_retained": [
