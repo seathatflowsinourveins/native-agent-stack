@@ -26,22 +26,31 @@
 #   starts; --preflight-only does not need one.
 # - A source guard fails closed after the CLI exits 0. Upstream's CLI writes one report under outputs/ in its working
 #   directory (the run directory), headed by YAML frontmatter whose sources_count is len(researcher.visited_urls)
-#   (cli.py L209-245, L225, L241 and L332-336 at 0957c301; skills/researcher.py L813-834 adds a URL to that set when it is
-#   selected for scraping). Without exactly one report, a sources_count line or with sources_count 0, the run exits 3: a
-#   report written from no sources reads as a success but is not research evidence (run 20261005T222529Z-1387309).
+#   (cli.py L209-245, L225, L241 and L332-336 at 0957c301). That set holds the URLs a run tried to read, not the pages it
+#   read: skills/researcher.py adds a URL when it is picked for scraping (L813-834) or after a scrape whatever its outcome
+#   (L1088-1098), and each prefetched result (L911-913, L922-924), so a count above 0 is necessary, not sufficient, for
+#   usable sources. Without exactly one report, a single sources_count line in a closed frontmatter, or with
+#   sources_count 0, the run exits 3: a report written from no sources reads as a success but is not research evidence
+#   (run 20261005T222529Z-1387309). The guard reads lines split at "\n" only, as upstream joins them (cli.py L245), and a
+#   query with a line break is refused (exit 2): cli.py's _yaml_quote (L220-222) escapes only backslashes and double
+#   quotes, so such a query could forge that line.
 # - The retriever stays duckduckgo (diagnosis of that run, 2026-10-05). At 0957c301, which is also main, it calls ddgs
 #   text() with region 'wt-wt' and ddgs's default backend 'auto', and exposes neither to configuration
 #   (gpt_researcher/retrievers/duckduckgo/duckduckgo.py L30-52); ddgs 9.16.0, the newest release, reads only DDGS_PROXY
-#   (ddgs/ddgs.py L53). Its keyless engines throttle a busy host, and an HTTP 429, 202 or 403 yields no results and no
-#   error (ddgs/base.py L65-70), so a failed search reports wikipedia's DNS error for wt.wikipedia.org instead
-#   (engines/wikipedia.py L35-39; 'wt-wt' is no ddgs region, deedy5/ddgs#417). Probed here that day: brave 429,
-#   duckduckgo 202, google and mojeek 403, yahoo alone with results; arxiv, openalex and semantic_scholar gave five
-#   off-topic results, none and a 429, so adding them would hide a dead web search behind scholarly hits. The durable
-#   keyless route owed is SearXNG through the searx retriever, after its service and the 30-query measurement
+#   (ddgs/ddgs.py L53). An engine returns nothing and raises nothing both on an HTTP status other than 200 (ddgs/base.py
+#   L65-70, L120-121) and on a 200 without hits (engines/wikipedia.py L47-48), so a failed search reports wikipedia's
+#   DNS error for wt.wikipedia.org instead (engines/wikipedia.py L35-39; 'wt-wt' is no ddgs region, deedy5/ddgs#417).
+#   The probable cause of that run is throttling of this busy host: an unretained probe 6-10 minutes later saw brave
+#   429, duckduckgo 202, google and mojeek 403 and yahoo alone with results; arxiv, openalex and semantic_scholar gave
+#   five off-topic results, none and a 429, so adding them would hide a dead web search behind scholarly hits. The
+#   durable keyless route owed is SearXNG through the searx retriever, after its service and the 30-query measurement
 #   (docs/decisions/2026-10-01-new-wsl-definitive-defaults.md L80).
 # No credential is read or printed. It prints the upstream CLI's output, then "run directory: <path>", then the report's
-# "sources_count: <n>". Exit status: 0 with at least one source; 2 for usage; 1 when GPT Researcher, the preflight or the
-# timer is missing or fails; 3 when the source guard fails; otherwise the CLI's own status (124 from the watchdog).
+# "sources_count: <n>". Exit status: 0 with a count above 0; 2 when the wrapper refuses its arguments (not exactly one
+# non-empty, one-line query); 1 when GPT Researcher is not installed, the preflight fails or no timer is found; 3 when
+# the source guard fails. Any other status passes through unchanged from the timed CLI run, so it can repeat one of
+# these: the CLI's own (argparse's usage error is also 2), 124 when the watchdog stops it, and 125-127 when the timer or
+# env cannot run (timeout --help, "Exit status").
 # GPTR_CONFIG_SOURCE names another configuration to copy (the tests use it); the preflight holds any copy to the same rule.
 set -euo pipefail
 here="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
@@ -55,6 +64,10 @@ if (( $# != 1 )) || [[ -z "$1" ]]; then
   exit 2
 fi
 query="$1"
+if [[ "$query" == *[$'\n\r']* ]]; then
+  printf 'The query must be one line: GPT Researcher writes it unescaped into its report frontmatter (cli.py L220-222), where a line break could forge the sources_count line the source guard reads.\n' >&2
+  exit 2
+fi
 if [[ ! -x "$python" || ! -f "$checkout/cli.py" ]]; then
   printf 'GPT Researcher is not installed under %s (install plan row research-harnesses).\n' "$checkout" >&2
   exit 1
@@ -140,7 +153,7 @@ outputs = Path(sys.argv[1])
 reports = sorted(outputs.glob("*.md")) if outputs.is_dir() else []
 if len(reports) != 1:
     sys.exit(f"source guard failed: {len(reports)} reports in {outputs}, not one, so the run's sources cannot be counted")
-lines = reports[0].read_text(encoding="utf-8", errors="replace").splitlines()
+lines = reports[0].read_text(encoding="utf-8", errors="replace").split("\n")
 end = lines.index("---", 1) if lines[:1] == ["---"] and "---" in lines[1:] else 0
 counts = [int(found.group(1)) for line in lines[1:end] if (found := re.fullmatch(r"sources_count: (\d+)", line.strip()))]
 if len(counts) != 1:
