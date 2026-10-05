@@ -1633,15 +1633,11 @@ async def run_native(controller, policy_config, assets, trial_id, config, baseli
     # Tracks the NYSE session kind as of the previous tick so a boundary
     # receipt (D6) is only written on an actual PRE/RTH/POST/CLOSED crossing,
     # never on every ~30s reconciliation tick.
-    # S3: this used to run unconditionally, on every paper run, before the
-    # try block below -- so the DEFAULT policy (extended_hours False,
-    # overnight_holds False) depended on session_at's frozen calendar table
-    # and would raise session_calendar_out_of_range for any run whose
-    # wall-clock year falls outside it (exchange_calendars is not installed
-    # in this deployment, so there is no fallback). last_session_kind is
-    # only ever consulted below inside the `if session_policy["overnight_holds"]`
-    # boundary-receipt block, so the default policy must never call the
-    # session calendar to compute it at all.
+    # S3: the default policy needs no initial session-boundary tracking.
+    # Extended/overnight policies query the required XNYS calendar with
+    # bounds derived from this timestamp's year. DateOutOfBounds and
+    # calendar-construction errors remain visible; no table-year fallback
+    # is available. Only initialize the value when that tracking is used.
     last_session_kind = (session_at(datetime.fromtimestamp(time.time(), timezone.utc)).kind
                         if (session_policy["overnight_holds"] or session_policy["extended_hours"]) else None)
     # G-e receipt tracking (only meaningful/consulted when leverage_policy is

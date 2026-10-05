@@ -900,6 +900,26 @@ class WholeSuiteJobsCheckOutFullHistory(unittest.TestCase):
         self.assertEqual(unittest_invocations(wrapped), [["-v", "--durations", "50"]])
 
 
+class SessionCalendarTestPrerequisites(unittest.TestCase):
+    """Both additional suite interpreters install the pinned calendar before testing."""
+
+    def test_calendar_install_precedes_tests_in_every_mode(self):
+        install_name = "Install the hash-locked session calendar"
+        install_command = ("python3 -m pip install --require-hashes --only-binary=:all: "
+                           "-r .github/requirements-calendar.txt")
+        for workflow, job_id, test_steps in (
+                ("adoption-bootstrap.yml", "validate-macos",
+                 ("Run the full test suite (gating on macOS)", CHANGED_TESTS_STEP)),
+                ("catalog-freshness.yml", "freshness", ("Run project test suite",))):
+            with self.subTest(workflow=workflow):
+                job = jobs((WORKFLOWS / workflow).read_text(encoding="utf-8"))[job_id]
+                step = step_block(job, install_name)
+                self.assertEqual(uncommented(run_block(step)).strip(), install_command)
+                self.assertIsNone(block_if(step), "the dependency is required in every test mode")
+                for test_step in test_steps:
+                    self.assertLess(job.index(step), job.index(step_block(job, test_step)))
+
+
 class WholeSuiteHeadroomAndDiagnostics(unittest.TestCase):
     """The step that runs the whole suite in each job lists the 50 slowest tests and runs with faulthandler on. On the
     Linux jobs GNU timeout sends SIGABRT five minutes before the job's limit, so a hang prints every thread's Python
@@ -1988,7 +2008,7 @@ class PushNetTests(unittest.TestCase):
 
 class ValidateMacosModeTests(unittest.TestCase):
     """How validate-macos runs each mode (docs/decisions/2026-10-03-macos-ci-scope.md, sections 6.1 and 6.3): every
-    step after setup-python runs in full mode only, except the changed-tests step and the always() upload; the
+    step after setup-python runs in full mode only, except the calendar install, changed-tests step and always() upload; the
     changed-tests step reads its modules only through env and refuses a selection that runs no test; and the
     changes script admits only well-formed top-level test modules that still exist."""
 
@@ -2003,13 +2023,14 @@ class ValidateMacosModeTests(unittest.TestCase):
     def step_name(step):
         return re.search(r"(?m)^      - name: (.+)$", step).group(1).strip("'\"")
 
-    def test_every_step_after_setup_python_runs_in_full_mode_only_except_two(self):
+    def test_every_step_after_setup_python_runs_in_full_mode_only_except_three(self):
         steps = [(self.step_name(step), block_if(step)) for step in self.steps()]
         names = [name for name, _ in steps]
         setup = names.index("Set up the manifest-supported Python line")
         self.assertEqual([condition for _, condition in steps[:setup + 1]], [None] * (setup + 1),
                          "harden-runner, checkout and setup-python run in every mode")
-        exceptions = {CHANGED_TESTS_STEP: CHANGED_TESTS_IF, "Upload the full test suite result": "always()"}
+        exceptions = {"Install the hash-locked session calendar": None,
+                      CHANGED_TESTS_STEP: CHANGED_TESTS_IF, "Upload the full test suite result": "always()"}
         for name, condition in steps[setup + 1:]:
             with self.subTest(name):
                 self.assertEqual(condition, exceptions.get(name, FULL_MODE_IF))
@@ -2135,6 +2156,11 @@ class ChangesModeComputationTests(unittest.TestCase):
                                              "tests/test_unlisted_a.py": "# a, changed\n"})
         self.assert_mode(outputs, "full", bootstrap="true")
         self.assertIn("- `adoption/bootstrap-macos.sh`", summary)
+
+    def test_a_calendar_relock_selects_full_mode(self):
+        outputs, summary = self.run_changes({".github/requirements-calendar.txt": "# calendar relock\n"})
+        self.assert_mode(outputs, "full", bootstrap="true")
+        self.assertIn("- `.github/requirements-calendar.txt`", summary)
 
     def test_a_listed_test_module_selects_full_mode(self):
         outputs, _ = self.run_changes({"tests/test_workflow_hardening.py": "# changed\n"})

@@ -113,7 +113,7 @@ def main(argv=None):
     if args.sessions < 1:
         parser.error("--sessions must be a positive integer")
     from runner import credentials
-    from sessions import _is_trading_day, previous_trading_day
+    from sessions import is_trading_day, previous_trading_day
 
     key, secret = credentials(args.env_file)
     config = json.loads(args.config.read_text())
@@ -125,7 +125,7 @@ def main(argv=None):
     end = now - timedelta(minutes=20)
     bars = fetch(key, secret, symbols, feed, end - timedelta(days=args.sessions * 2 + 10), end)
     completed = completed_bars(bars, now)
-    expected_latest = expected_latest_session(now, _is_trading_day, previous_trading_day)
+    expected_latest = expected_latest_session(now, is_trading_day, previous_trading_day)
     problems = coverage_problems(completed, args.sessions, expected_latest)
     rows = rows_from_bars(completed, args.sessions, now.strftime("%Y-%m-%dT%H:%M:%SZ"))
     args.out.parent.mkdir(parents=True, exist_ok=True)
