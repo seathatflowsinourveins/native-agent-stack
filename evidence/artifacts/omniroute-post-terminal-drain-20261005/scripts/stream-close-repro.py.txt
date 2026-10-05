@@ -1,0 +1,66 @@
+#!/usr/bin/env python3
+"""Does a client that closes the socket right after the terminal SSE event keep the gateway from logging the request?
+
+Streams one tiny /v1/responses request to NativeStack's 20128 (documented loopback placeholder key) for each mode and then reads only metadata columns of the gateway store (mode=ro):
+  eof          read the stream until the server ends it (a normal client)
+  early:<sec>  close the socket <sec> seconds after the line that carries response.completed (what `codex exec` does when it exits)
+usage: omniroute-stream-close-repro-20261005.py eof early:0 early:0.3 ...
+"""
+import datetime as dt
+import http.client
+import json
+import os
+import sqlite3
+import sys
+import time
+
+DB = os.path.expanduser("~/.local/share/omniroute/storage.sqlite")
+MODEL = "cx/gpt-6-astra"
+
+
+def utc():
+    return dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+
+
+def rows(since):
+    con = sqlite3.connect(f"file:{DB}?mode=ro", uri=True)
+    calls = con.execute("select timestamp, path, status, model, tokens_in, tokens_out from call_logs where timestamp >= ? order by timestamp", (since,)).fetchall()
+    usage = con.execute("select timestamp, model, status, tokens_input, tokens_output from usage_history where timestamp >= ? order by timestamp", (since,)).fetchall()
+    return calls, usage
+
+
+def one(mode):
+    since = utc()
+    conn = http.client.HTTPConnection("127.0.0.1", 20128, timeout=180)
+    body = json.dumps({"model": MODEL, "input": "Reply with: ok", "stream": True, "reasoning": {"effort": "max"}})
+    conn.request("POST", "/v1/responses", body, {"Content-Type": "application/json", "Authorization": "Bearer local-loopback", "Accept": "text/event-stream"})
+    resp = conn.getresponse()
+    status = resp.status
+    seen = False
+    closed_early = False
+    t0 = time.time()
+    while True:
+        line = resp.fp.readline()
+        if not line:
+            break
+        if b"response.completed" in line and not seen:
+            seen = True
+            if mode.startswith("early"):
+                time.sleep(float(mode.split(":")[1]) if ":" in mode else 0.0)
+                conn.close()
+                closed_early = True
+                break
+    if not closed_early:
+        conn.close()
+    elapsed = time.time() - t0
+    time.sleep(8)
+    calls, usage = rows(since)
+    print(f"mode={mode} http={status} saw_completed={seen} closed_early={closed_early} stream_s={elapsed:.1f} -> call_logs rows={len(calls)} usage_history rows={len(usage)}")
+    for r in calls:
+        print("   call_logs:", r)
+    for r in usage:
+        print("   usage_history:", r)
+
+
+for mode in sys.argv[1:]:
+    one(mode)

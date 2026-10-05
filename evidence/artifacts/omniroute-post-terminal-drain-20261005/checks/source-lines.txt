@@ -1,0 +1,91 @@
+# Upstream OmniRoute at 0585aba5589d5a1f49243a13a8db249558e7c9e3 (the composition's tree): the lines that cause and bound the dropped call_logs and usage_history rows (verbatim, line-numbered; read from a bare mirror of diegosouzapw/OmniRoute)
+
+## open-sse/utils/streamHandler.ts L842-852: cancel() of the disconnect-aware stream, the code the patch changes
+842:       async cancel(reason) {
+843:         const deferCompletedToolHandoff =
+844:           streamController.shouldDeferCompletedToolHandoff?.() === true;
+845:         if (clientTerminalSeen) {
+846:           streamController.handleComplete();
+847:         } else {
+848:           streamController.handleDisconnect(reason || "cancelled");
+849:         }
+850:         if (deferCompletedToolHandoff) return;
+851:         await Promise.allSettled([reader.cancel(reason), writer.abort(reason)]);
+852:       },
+
+## open-sse/utils/streamHandler.ts L660-690: drainCompletedToolHandoff, the reference implementation the patch reuses
+660:   let terminalTail = "";
+661:   let clientTerminalSeen = false;
+662:   let bytesWereForwarded = false;
+663:   let completedToolHandoffDrainStarted = false;
+664: 
+665:   const drainCompletedToolHandoff = () => {
+666:     if (completedToolHandoffDrainStarted) return;
+667:     completedToolHandoffDrainStarted = true;
+668:     const gracePeriodMs = Math.max(0, Number(streamController.clientDisconnectGracePeriodMs) || 0);
+669:     const timeoutReason = "completed_tool_handoff_grace_expired";
+670:     const timeout = setTimeout(() => {
+671:       streamController.abort();
+672:       void Promise.allSettled([reader.cancel(timeoutReason), writer.abort(timeoutReason)]);
+673:     }, gracePeriodMs);
+674: 
+675:     void (async () => {
+676:       try {
+677:         while (true) {
+678:           const { done } = await reader.read();
+679:           if (done) break;
+680:         }
+681:         streamController.handleComplete();
+682:       } catch (error) {
+683:         streamController.handleError(error);
+684:       } finally {
+685:         clearTimeout(timeout);
+686:       }
+687:     })();
+688:   };
+689:   streamController.registerCompletedToolHandoffDrain?.(drainCompletedToolHandoff);
+690: 
+
+## open-sse/utils/streamHandler.ts L704-717: where the terminal marker is noted after the chunk is enqueued to the client
+704: 
+705:     terminalTail += terminalDecoder.decode(chunk, { stream: true });
+706:     // Scan before bounding retained state: a compaction terminal frame can
+707:     // exceed the tail budget because encrypted_content is carried inline.
+708:     clientTerminalSeen = hasClientTerminalSseMarker(
+709:       terminalTail,
+710:       streamController.clientResponseFormat
+711:     );
+712:     if (terminalTail.length > 4096) {
+713:       terminalTail = terminalTail.slice(-4096);
+714:     }
+715:     if (clientTerminalSeen) {
+716:       streamController.markClientTerminalSeen?.();
+717:     }
+
+## open-sse/utils/stream.ts: onComplete is called only inside the transform's flush() (L2510 flush start; call sites below); cancel() at L3214 only clears the idle timer
+2510:       async flush(controller) {
+2511:         // Clean up idle watchdog timer
+2512:         if (idleTimer) {
+2806:             if (onComplete) {
+2807:               try {
+2872:                 onComplete({
+2873:                   status: 200,
+3100:           if (onComplete) {
+3101:             try {
+3160:               onComplete({
+3161:                 status: 200,
+3214:       cancel(reason) {
+3215:         clearIdleTimer();
+3216:       },
+
+## open-sse/handlers/chatCore.ts: onStreamComplete (L6025) is the only route to the call log and the usage row; the grace period is passed at L3113-3114
+6025:   const onStreamComplete = ({
+6026:     status: streamStatus,
+6112:     recordStreamingUsageStats(streamUsage, {
+3113:     allowCompletedToolHandoffGrace: isCodexResponsesEcho,
+3114:     clientDisconnectGracePeriodMs: STREAM_DISCONNECT_GRACE_PERIOD_MS,
+
+## release/v3.8.52 head 23a114848 (fetched 2026-10-05): the same files
+open-sse/utils/streamHandler.ts tarball-tree cef58650b1a5 release/v3.8.52 cef58650b1a5
+open-sse/utils/stream.ts tarball-tree d563cf7e6990 release/v3.8.52 76a4b2772c31
+(stream.ts differs only by timing registration: createStreamTiming/registerStreamTiming, 5 lines; flush and cancel are unchanged)

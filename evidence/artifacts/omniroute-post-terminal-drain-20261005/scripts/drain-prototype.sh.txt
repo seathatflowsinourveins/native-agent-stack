@@ -1,0 +1,72 @@
+#!/bin/bash
+# Prototype of the post-terminal client-disconnect drain (scratch tree only; nothing is deployed).
+# Reference implementation: drainCompletedToolHandoff in open-sse/utils/streamHandler.ts at upstream 0585aba5589d5a1f49243a13a8db249558e7c9e3 (the same file, L660-690), reused from cancel() for the clientTerminalSeen case.
+# Steps (each logs its exit code to $OUT/progress.txt):
+#   composition C (v3.8.51 tag + affinity patch + PR 15167), npm ci, then
+#   A  baseline: the stream, SSE, disconnect and tool-handoff test files, unchanged, on the unpatched tree
+#   N  the new test on the unpatched tree (negative control: the first test must fail)
+#   P  the one-function change in streamHandler.ts, committed together with the new test file
+#   A' the same stream test files on the patched tree, plus the new test; B' the call-log, usage-history and chat-pipeline tests
+# usage: EV=<path to evidence/artifacts/omniroute-wire-effort-20261005> omniroute-drain-prototype-20261005.sh
+set -u
+M=$HOME/.cache/omniroute-upstream-mirror-20261005.git
+T=$HOME/.cache/omniroute-drain-proto
+OUT=$HOME/.cache/omniroute-drain-proto-out
+D=${DRAIN_DIR:?the directory holding stream-terminal-seen-client-disconnect.test.ts (it is also inside patches/drain-after-terminal.patch)}
+TAG=c1e30b7676975feb298b49eff6ff58923c04b89e
+PR=0585aba5589d5a1f49243a13a8db249558e7c9e3
+EV=${EV:?set EV to the evidence folder of the gateway-composition record}
+export PATH="$HOME/.local/share/codex-ecosystem/tools/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin"
+rm -rf "$OUT" "$T"; mkdir -p "$OUT"
+log() { echo "$(date -u +%H:%M:%SZ) $*" | tee -a "$OUT/progress.txt"; }
+G() { git -c user.name=Scout -c user.email=scout@local -c core.hooksPath=/dev/null -C "$T" "$@"; }
+git clone -q --shared --no-checkout "$M" "$T"; log "clone exit=$?"
+G fetch -q "$M" "+refs/pull/15167/head:refs/pull/15167/head"; log "fetch pr15167 exit=$?"
+G checkout -q --detach $TAG; log "checkout tag exit=$?"
+( cd "$T" && nice -n 19 npm ci --no-audit --no-fund > "$OUT/npm-ci.log" 2>&1 ); rc=$?; log "npm ci exit=$rc"; [ $rc -eq 0 ] || exit 1
+G apply --index "$EV/patches/045aa81f3.patch"; log "apply affinity patch exit=$?"
+git --git-dir="$M" diff $PR^ $PR | G apply --index; log "apply pr15167 diff exit=$?"
+G commit -q -m "composition"; log "composition tree=$(G rev-parse 'HEAD^{tree}') (expected f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f)"
+FLAGS="--import tsx/esm --import ./open-sse/utils/setupPolyfill.ts --import ./tests/_setup/isolateDataDir.ts"
+run() {
+  local label=$1; shift
+  ( cd "$T" && DISABLE_SQLITE_AUTO_BACKUP=true nice -n 19 node $FLAGS --test --test-force-exit --test-concurrency=4 "$@" > "$OUT/test-$label.log" 2>&1 ); local rc=$?
+  log "$label exit=$rc tests=$(grep -aE '^ℹ tests ' "$OUT/test-$label.log" | awk '{print $3}') pass=$(grep -aE '^ℹ pass ' "$OUT/test-$label.log" | awk '{print $3}') fail=$(grep -aE '^ℹ fail ' "$OUT/test-$label.log" | awk '{print $3}')"
+}
+cd "$T" || exit 2
+STREAM_TESTS=$(ls tests/unit/*stream*.test.ts tests/unit/*sse*.test.ts tests/unit/codex-tool-handoff-disconnect-499.test.ts tests/unit/empty-stream-no-content-8649.test.ts 2>/dev/null | sort -u | tr '\n' ' ')
+log "stream-related test files: $(echo $STREAM_TESTS | wc -w)"
+CALLUSE_TESTS="tests/unit/call-log-artifact-worker.test.ts tests/unit/call-log-save-drain.test.ts tests/unit/call-log-startup.test.ts tests/unit/call-log-in-memory-usage.test.ts tests/unit/call-log-cap.test.ts tests/unit/call-log-oom-unbounded-5618.test.ts tests/unit/call-log-size-limit-error.test.ts tests/unit/call-log-artifact-bodies-first.test.ts tests/unit/call-log-detailed-tokens.test.ts tests/unit/call-log-rotate-corrupt.test.ts tests/unit/usage-history-db.test.ts tests/unit/usage/usageHistoryDedup.test.ts tests/unit/usage-history-reset.test.ts tests/unit/usagehistory-helpers-split.test.ts tests/integration/chat-pipeline.test.ts"
+run A-baseline $STREAM_TESTS
+cp "$D/stream-terminal-seen-client-disconnect.test.ts" tests/unit/stream-terminal-seen-client-disconnect.test.ts
+run N-new-test-unpatched tests/unit/stream-terminal-seen-client-disconnect.test.ts
+python3 - <<'EOF'
+import os
+p=os.path.expanduser("~/.cache/omniroute-drain-proto/open-sse/utils/streamHandler.ts")
+t=open(p).read()
+old="        if (deferCompletedToolHandoff) return;\n        await Promise.allSettled([reader.cancel(reason), writer.abort(reason)]);\n"
+assert t.count(old)==1, t.count(old)
+new=("        if (deferCompletedToolHandoff) return;\n"
+"        // The client already has the terminal marker, so its response is complete. Cancelling the reader and aborting the writer here stops the\n"
+"        // transform before its flush() runs onComplete, the only path to the call log and the usage row (a client such as `codex exec` closes the\n"
+"        // socket right after response.completed). Drain the tail the way a completed tool handoff does (drainCompletedToolHandoff above),\n"
+"        // bounded by the same disconnect grace period.\n"
+"        if (clientTerminalSeen && Number(streamController.clientDisconnectGracePeriodMs) > 0) {\n"
+"          drainCompletedToolHandoff();\n"
+"          return;\n"
+"        }\n"
+"        await Promise.allSettled([reader.cancel(reason), writer.abort(reason)]);\n")
+open(p,"w").write(t.replace(old,new))
+print("patched streamHandler.ts")
+EOF
+log "patch applied exit=$?"
+G add open-sse/utils/streamHandler.ts tests/unit/stream-terminal-seen-client-disconnect.test.ts; G commit -q -m "fix(sse): drain the upstream after the client has the terminal event so call log and usage rows are written
+
+A client that closes the connection right after response.completed (codex exec does when it exits) made cancel() cancel the reader and abort the writer, so the SSE
+transform's flush() never ran onComplete and the request got no call_logs and no usage_history row. Drain the tail as drainCompletedToolHandoff does, bounded by
+STREAM_DISCONNECT_GRACE_PERIOD_MS."; log "commit exit=$? tree=$(G rev-parse 'HEAD^{tree}')"
+run P-new-test-patched tests/unit/stream-terminal-seen-client-disconnect.test.ts
+run A2-stream-tests-patched $STREAM_TESTS tests/unit/stream-terminal-seen-client-disconnect.test.ts
+run B2-calllog-usage-chat-pipeline $CALLUSE_TESTS
+G format-patch -1 --stdout > "$OUT/drain-after-terminal.patch"; log "format-patch exit=$? sha256=$(sha256sum "$OUT/drain-after-terminal.patch" | cut -d' ' -f1) bytes=$(wc -c < "$OUT/drain-after-terminal.patch")"
+log "DONE"

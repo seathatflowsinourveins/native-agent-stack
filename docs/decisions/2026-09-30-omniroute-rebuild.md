@@ -259,6 +259,14 @@ bare id answer 200 with the right effort, astra stays `max`, a 0.157.1 client re
 **Also recorded.** The sharedgw connection expiry of 05:50Z to 05:55Z (claim C9): my baseline probe sent `sharedgw/gpt-6.1-sol-max` before the carry; 20128 answered 401 and 20129 parked the node's
 only connection as expired for all callers until the dashboard's Test connection restored it. Upstream has no fix; the probe script now sends a lane request only after the bare id answered 200.
 
+## Update 2026-10-05, 20:12Z: the serve supervisor drops the server child's console output unless `--log` or `OMNIROUTE_SHOW_LOG=1` is set
+
+`bin/cli/runtime/processSupervisor.mjs` (blob-identical in release/v3.8.52 `23a114848`) starts the server with `stdio: showLog ? "inherit" : ["ignore", "pipe", "pipe"]`, where `showLog` is `OMNIROUTE_SHOW_LOG === "1"` (the `--log` option of `omniroute serve`).
+Without it the child's output is drained into an in-memory ring of the last 50 lines, printed only when the child exits, and the server has no console capture into its application log, so a `console.error` such as `[callLogs] Failed to save call log` reaches
+neither journald nor `app.log`. Both units (`omniroute.service` for 20128, `omniroute-fw.service` for 20129) now carry a drop-in `Environment=OMNIROUTE_SHOW_LOG=1` (`~/.config/systemd/user/<unit>.d/show-log.conf`), applied by restarting 20129 at 20:12:04Z and
+20128 at 20:12:12Z (both healthy at once, 5f's GPT lane told beforehand, a live streaming request logged afterwards). Rollback: remove the two drop-ins, `systemctl --user daemon-reload`, restart 20129 then 20128. Found while diagnosing the missing call-log
+rows on 2604; their cause is in `2026-10-05-omniroute-gateway-composition.md` (update of the evening).
+
 ## Comparison that would overturn it
 
 - The tip's `check:pack-boot` or a later unit run shows a defect the carries cause; then rebuild without the carry.

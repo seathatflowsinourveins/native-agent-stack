@@ -1,0 +1,198 @@
+From 75f728781775b3ae3b2417f478454212c43da993 Mon Sep 17 00:00:00 2001
+From: Scout <scout@local>
+Date: Mon, 5 Oct 2026 16:18:57 -0400
+Subject: [PATCH] fix(sse): drain the upstream after the client has the
+ terminal event so call log and usage rows are written
+
+A client that closes the connection right after response.completed (codex exec does when it exits) made cancel() cancel the reader and abort the writer, so the SSE
+transform's flush() never ran onComplete and the request got no call_logs and no usage_history row. Drain the tail as drainCompletedToolHandoff does, bounded by
+STREAM_DISCONNECT_GRACE_PERIOD_MS.
+---
+ open-sse/utils/streamHandler.ts               |   8 +
+ ...am-terminal-seen-client-disconnect.test.ts | 155 ++++++++++++++++++
+ 2 files changed, 163 insertions(+)
+ create mode 100644 tests/unit/stream-terminal-seen-client-disconnect.test.ts
+
+diff --git a/open-sse/utils/streamHandler.ts b/open-sse/utils/streamHandler.ts
+index cef58650b..fd87eeca8 100644
+--- a/open-sse/utils/streamHandler.ts
++++ b/open-sse/utils/streamHandler.ts
+@@ -848,6 +848,14 @@ export function createDisconnectAwareStream(
+           streamController.handleDisconnect(reason || "cancelled");
+         }
+         if (deferCompletedToolHandoff) return;
++        // The client already has the terminal marker, so its response is complete. Cancelling the reader and aborting the writer here stops the
++        // transform before its flush() runs onComplete, the only path to the call log and the usage row (a client such as `codex exec` closes the
++        // socket right after response.completed). Drain the tail the way a completed tool handoff does (drainCompletedToolHandoff above),
++        // bounded by the same disconnect grace period.
++        if (clientTerminalSeen && Number(streamController.clientDisconnectGracePeriodMs) > 0) {
++          drainCompletedToolHandoff();
++          return;
++        }
+         await Promise.allSettled([reader.cancel(reason), writer.abort(reason)]);
+       },
+     },
+diff --git a/tests/unit/stream-terminal-seen-client-disconnect.test.ts b/tests/unit/stream-terminal-seen-client-disconnect.test.ts
+new file mode 100644
+index 000000000..25891fc2d
+--- /dev/null
++++ b/tests/unit/stream-terminal-seen-client-disconnect.test.ts
+@@ -0,0 +1,155 @@
++/**
++ * A client that closes the connection right after it received the terminal Responses event (response.completed) must not stop the
++ * upstream transform before its flush() runs: flush() is the only caller of onComplete, which records the call log and the usage row.
++ * `codex exec` does exactly this when it exits, so before this change the session-final request of such a client, and every
++ * single-request session, left no call_logs and no usage_history row (cancel() cancelled the reader and aborted the writer).
++ *
++ * The drain is the one OmniRoute already uses for a completed tool handoff (drainCompletedToolHandoff in streamHandler.ts), bounded by
++ * the same STREAM_DISCONNECT_GRACE_PERIOD_MS, and it is not limited to Codex-originated clients (allowCompletedToolHandoffGrace stays false here).
++ */
++import test from "node:test";
++import assert from "node:assert/strict";
++
++import { FORMATS } from "../../open-sse/translator/formats.ts";
++import { createPassthroughStreamWithLogger } from "../../open-sse/utils/stream.ts";
++import {
++  createDisconnectAwareStream,
++  createNoopAbortWritable,
++  createStreamController,
++} from "../../open-sse/utils/streamHandler.ts";
++
++const encoder = new TextEncoder();
++const decoder = new TextDecoder();
++
++function sse(event: string, data: Record<string, unknown>): string {
++  return `event: ${event}\ndata: ${JSON.stringify({ type: event, ...data })}\n\n`;
++}
++
++function wait(ms: number): Promise<void> {
++  return new Promise((resolve) => setTimeout(resolve, ms));
++}
++
++const COMPLETED = sse("response.completed", {
++  response: {
++    id: "resp_1",
++    status: "completed",
++    output: [
++      {
++        id: "msg_1",
++        type: "message",
++        role: "assistant",
++        status: "completed",
++        content: [{ type: "output_text", text: "ok" }],
++      },
++    ],
++    usage: { input_tokens: 10, output_tokens: 2, total_tokens: 12 },
++  },
++});
++
++type Harness = {
++  reader: ReadableStreamDefaultReader<Uint8Array>;
++  upstream: () => ReadableStreamDefaultController<Uint8Array> | null;
++  state: { upstreamCancelled: boolean; completionRecorded: boolean; completionStatus: number | null };
++  streamController: ReturnType<typeof createStreamController>;
++};
++
++function build(gracePeriodMs: number, firstChunk: string): Harness {
++  let upstreamController: ReadableStreamDefaultController<Uint8Array> | null = null;
++  const state = { upstreamCancelled: false, completionRecorded: false, completionStatus: null as number | null };
++  const providerStream = new ReadableStream<Uint8Array>({
++    start(controller) {
++      upstreamController = controller;
++      controller.enqueue(encoder.encode(firstChunk));
++    },
++    cancel() {
++      state.upstreamCancelled = true;
++    },
++  });
++  const streamController = createStreamController({
++    clientResponseFormat: FORMATS.OPENAI_RESPONSES,
++    clientDisconnectGracePeriodMs: gracePeriodMs,
++  });
++  const transformStream = createPassthroughStreamWithLogger(
++    "codex",
++    null,
++    null,
++    "gpt-5.6-sol",
++    "connection-1",
++    { model: "gpt-5.6-sol", stream: true },
++    (payload) => {
++      state.completionRecorded = true;
++      state.completionStatus = payload.status;
++    },
++    null,
++    null,
++    FORMATS.OPENAI_RESPONSES
++  );
++  const clientStream = createDisconnectAwareStream(
++    { readable: providerStream.pipeThrough(transformStream), writable: createNoopAbortWritable() },
++    streamController
++  );
++  return { reader: clientStream.getReader(), upstream: () => upstreamController, state, streamController };
++}
++
++async function readUntil(reader: ReadableStreamDefaultReader<Uint8Array>, marker: string): Promise<string> {
++  let received = "";
++  while (!received.includes(marker)) {
++    const chunk = await reader.read();
++    assert.equal(chunk.done, false, `the stream ended before ${marker}`);
++    received += decoder.decode(chunk.value, { stream: true });
++  }
++  return received;
++}
++
++test("a client that closes right after response.completed still lets the stream finish: completion and usage bookkeeping run", async () => {
++  const h = build(50, COMPLETED);
++  await readUntil(h.reader, "response.completed");
++
++  const cancelPromise = h.reader.cancel("request_signal_aborted"); // the client is gone before the upstream stream ends
++  setTimeout(() => {
++    try {
++      h.upstream()?.close(); // the upstream ends a few milliseconds after its terminal event
++    } catch {
++      // the unchanged implementation has already cancelled the upstream
++    }
++  }, 0);
++  await cancelPromise;
++  await wait(70);
++
++  assert.equal(h.state.upstreamCancelled, false, "the completed response must be drained, not aborted");
++  assert.equal(h.state.completionRecorded, true, "onComplete (call log and usage) must run");
++  assert.equal(h.state.completionStatus, 200);
++});
++
++test("with the disconnect grace period disabled the old behaviour stays: the upstream is cancelled and onComplete does not run", async () => {
++  const h = build(0, COMPLETED);
++  await readUntil(h.reader, "response.completed");
++
++  await h.reader.cancel("request_signal_aborted");
++  await wait(30);
++
++  assert.equal(h.state.upstreamCancelled, true);
++  assert.equal(h.state.completionRecorded, false);
++});
++
++test("the drain is bounded: an upstream that never ends is cancelled when the grace period expires", async () => {
++  const h = build(30, COMPLETED);
++  await readUntil(h.reader, "response.completed");
++
++  await h.reader.cancel("request_signal_aborted");
++  await wait(120); // the upstream stays open and silent after its terminal event
++
++  assert.equal(h.state.upstreamCancelled, true, "the grace period must end the drain");
++  assert.equal(h.state.completionRecorded, false);
++});
++
++test("a disconnect before the terminal event is unchanged: the upstream is cancelled right away", async () => {
++  const h = build(50, sse("response.output_text.delta", { delta: "o", output_index: 0, content_index: 0, item_id: "msg_1" }));
++  await readUntil(h.reader, "response.output_text.delta");
++
++  await h.reader.cancel("request_signal_aborted");
++  await wait(20);
++
++  assert.equal(h.state.upstreamCancelled, true);
++  assert.equal(h.state.completionRecorded, false);
++});
+-- 
+2.43.0
+
