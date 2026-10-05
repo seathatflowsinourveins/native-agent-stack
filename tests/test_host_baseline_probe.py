@@ -1,7 +1,9 @@
 """Local integration controls for the read-only, stdin-portable PR-0 probe."""
 
 import ast
+from collections import Counter
 import hashlib
+import io
 import json
 import os
 from pathlib import Path
@@ -10,7 +12,9 @@ import re
 import subprocess
 import sys
 import tempfile
+from types import SimpleNamespace
 import unittest
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,7 +33,11 @@ elif name == "dpkg-query":
     if package in {"rust-coreutils", "rust-findutils", "sudo-rs"}:
         print("dpkg-query: no packages found matching " + package, file=sys.stderr)
         sys.exit(1)
-    print(package + " 1.2.3")
+    with_status = any("${db:Status-Status}" in arg for arg in sys.argv)
+    if package == "gdb" and (Path(sys.argv[0]).parent / "dpkg-known-uninstalled").exists():
+        print(package + ("\t\tnot-installed" if with_status else " "))
+    else:
+        print(package + ("\t1.2.3\tinstalled" if with_status else " 1.2.3"))
 elif name == "stat":
     print("440 fixture-owner 42")
 elif name == "getent":
@@ -66,6 +74,13 @@ def observations(value):
                 yield from observations(item)
 
 
+def probe_namespace():
+    source = ast.literal_eval(ast.parse(PROBE.read_text()).body[0].value)
+    namespace = {"__name__": "probe_test", "__file__": str(PROBE), "SOURCE": source}
+    exec(compile(source, "<probe-test>", "exec"), namespace)
+    return namespace
+
+
 class HostBaselineProbeTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
@@ -96,10 +111,10 @@ class HostBaselineProbeTests(unittest.TestCase):
         }))
         (self.home / "code/native-agent-stack").mkdir(parents=True)
 
-    def run_probe(self, *, stdin=False, optimized=False):
+    def run_probe(self, *, stdin=False, optimized=False, source=None):
         argv = [sys.executable] + (["-O"] if optimized else []) + (["-"] if stdin else [str(PROBE)])
         return subprocess.run(
-            argv, input=PROBE.read_bytes() if stdin else None,
+            argv, input=(PROBE.read_bytes() if source is None else source) if stdin else None,
             capture_output=True, env=self.env, timeout=30, check=False,
         )
 
@@ -153,13 +168,78 @@ class HostBaselineProbeTests(unittest.TestCase):
         self.assertEqual(data["rendered_config"]["claude"]["output"], {"CLAUDE_CODE_SHELL": True})
         self.assertFalse((self.bin / "privilege-launcher-invoked").exists())
 
-    def test_stdin_and_file_checksum_are_actual_probe_bytes(self):
+    def test_canonical_checksum_is_self_reported_not_stdin_attestation(self):
         expected = hashlib.sha256(PROBE.read_bytes()).hexdigest()
-        for stdin in (False, True):
-            with self.subTest(stdin=stdin):
-                result = self.run_probe(stdin=stdin)
+        wrapped = b"# harmless extra outer-wrapper bytes\n" + PROBE.read_bytes()
+        self.assertNotEqual(hashlib.sha256(wrapped).hexdigest(), expected)
+        for stdin, source in ((False, None), (True, None), (True, wrapped)):
+            with self.subTest(stdin=stdin, wrapped=source is not None):
+                result = self.run_probe(stdin=stdin, source=source)
                 self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertEqual(json.loads(result.stdout)["probe"]["output"], expected)
+                identity = json.loads(result.stdout)["probe"]["output"]
+                self.assertIsInstance(identity, dict)
+                self.assertEqual(identity["canonical_source_sha256"], expected)
+                self.assertEqual(identity["basis"], "self_reported_canonical_source")
+                self.assertIsNone(identity["executed_input_sha256"])
+                self.assertFalse(identity["executed_input_verified"])
+
+    def mocked_main(self, login, document):
+        namespace = probe_namespace()
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with patch.object(namespace["pwd"], "getpwuid", return_value=SimpleNamespace(pw_name=login)), \
+                patch.object(namespace["Path"], "home", return_value=self.home), \
+                patch.dict(namespace, {"collect": lambda home: document}), \
+                patch("sys.stdout", stdout), patch("sys.stderr", stderr):
+            code = namespace["main"]()
+        return code, stdout.getvalue(), stderr.getvalue()
+
+    def test_common_logins_do_not_reject_fixed_labels_or_command_names(self):
+        document = {
+            "os_release": {"command": "read /etc/os-release", "exit": 0,
+                           "output": {"ID": "ubuntu", "VERSION_ID": "24.04"}},
+            "clients": {"codex": {
+                "path": {"command": "command -v codex", "exit": 0, "output": "/usr/bin/codex"},
+                "version": {"command": "codex --version", "exit": 0, "output": "codex-cli 0.159.3"},
+            }},
+            "kernel": {"bwrap": {"command": "bwrap --unshare-user --unshare-pid true",
+                                 "exit": 0, "output": ""}},
+            "versions": {"env": {"command": "env --version", "exit": 0,
+                                 "output": "fixture-userland (fixture native) 1.2.3"}},
+        }
+        for login in ("ubuntu", "codex", "user"):
+            with self.subTest(login=login):
+                code, out, err = self.mocked_main(login, document)
+                self.assertEqual(code, 0)
+                self.assertEqual(json.loads(out), document)
+                self.assertEqual(err, "")
+
+    def test_identity_tokens_and_path_components_still_fail_closed(self):
+        cases = (
+            ("ubuntu", "installed by UBUNTU"),
+            ("codex", "/srv/CODEX/bin/codex"),
+            ("user", "warning: USER"),
+            ("fixture-login", "/srv/FIXTURE-LOGIN/bin/env"),
+        )
+        for login, value in cases:
+            with self.subTest(login=login, value=value):
+                document = {"env": {"command": "env --version", "exit": 0, "output": value}}
+                self.assertEqual(self.mocked_main(login, document), (3, "", ""))
+        document = {"env": {"command": "env --version", "exit": 0,
+                            "output": "fixture-login-helper /srv/fixture-login-data/bin/env"}}
+        code, out, err = self.mocked_main("fixture-login", document)
+        self.assertEqual(code, 0)
+        self.assertEqual(json.loads(out), document)
+        self.assertEqual(err, "")
+
+    def test_dpkg_known_uninstalled_state_retains_zero_exit(self):
+        (self.bin / "dpkg-known-uninstalled").touch()
+        result = self.run_probe(stdin=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        packages = json.loads(result.stdout)["launcher_packages"]
+        self.assertEqual(packages["gdb"]["exit"], 0)
+        self.assertIn("${db:Status-Status}", packages["gdb"]["command"])
+        self.assertEqual(packages["gdb"]["output"].split("\t"), ["gdb", "", "not-installed"])
+        self.assertEqual(packages["util-linux"]["output"].split("\t"), ["util-linux", "1.2.3", "installed"])
 
     def test_private_output_exits_three_without_any_output(self):
         planted = ["/" + "home" + "/planted-private-path", pwd.getpwuid(os.getuid()).pw_name.upper()]
@@ -222,17 +302,22 @@ class HostBaselineProbeTests(unittest.TestCase):
                 receipt = json.loads((ROOT / f"evidence/receipts/host-baseline-{name}-20261004.json").read_text())
                 self.assertTrue(required <= set(receipt))
                 self.assertEqual(receipt["kind"], "host_baseline")
-                self.assertEqual(receipt["evidence_class"], "local_integration")
+                self.assertEqual(receipt["evidence_class"],
+                                 "Independent observation" if name == "coreutils-2604-upgrade" else "local_integration")
                 self.assertTrue({"component_id", "component_ids", "stage", "result"}.isdisjoint(receipt))
                 for artifact in receipt["artifacts"]:
                     self.assertEqual(artifact["sha256"], hashlib.sha256((ROOT / artifact["path"]).read_bytes()).hexdigest())
                 if name == "coreutils-2604-upgrade":
+                    self.assertIn("| Independent observation |", (ROOT / "docs/acceptance-evidence-policy.md").read_text())
+                    self.assertEqual(receipt["evidence_policy"], "docs/acceptance-evidence-policy.md#identify-what-each-check-proves")
                     self.assertEqual(receipt["host"]["distribution"], "NativeStack2604")
                     self.assertFalse(receipt["source"]["reexecuted"])
                     self.assertEqual(receipt["source"]["files"], ["run.log", "versions-before.txt", "versions-after.txt"])
                 else:
                     self.assertEqual(receipt["reachability"]["passwordless_sudo"], "unknown")
                     source = next(a for a in receipt["artifacts"] if a["role"] == "probe_source")
+                    self.assertEqual(source["path"], "evidence/artifacts/host-baseline-20261004/host-baseline-probe-"
+                                     + ("r1" if name == "nativestack" else "r0") + ".txt")
                     observation = next(a for a in receipt["artifacts"] if a["role"] == "observation")
                     data = json.loads((ROOT / observation["path"]).read_text())
                     self.assertEqual(data["probe"]["output"], source["sha256"])
@@ -246,6 +331,27 @@ class HostBaselineProbeTests(unittest.TestCase):
                         }
                         self.assertEqual(observation["sha256"], expected[name])
         self.assertFalse((ROOT / "evidence/hosts/nativestack-2404-20261004").exists())
+
+    def test_historical_receipts_do_not_attest_transport_or_package_state(self):
+        for name in ("nativestack", "nativestack2604", "stackmeasure2604"):
+            with self.subTest(receipt=name):
+                receipt = json.loads((ROOT / f"evidence/receipts/host-baseline-{name}-20261004.json").read_text())
+                identity = receipt["probe_identity"]
+                self.assertEqual(identity["basis"], "self_reported_canonical_source")
+                self.assertIsNone(identity["executed_input_sha256"])
+                self.assertFalse(identity["executed_input_verified"])
+                self.assertEqual(receipt["package_query_status"], "unrecorded")
+                self.assertTrue(any("db:Status-Status" in limitation for limitation in receipt["limitations"]))
+
+    def test_decision_counts_match_retained_artifacts(self):
+        decision = (ROOT / "docs/decisions/2026-10-04-host-baseline-recorder.md").read_text()
+        for name in ("nativestack-2404", "nativestack2604", "stackmeasure2604"):
+            with self.subTest(artifact=name):
+                data = json.loads((ROOT / f"evidence/artifacts/host-baseline-20261004/{name}.json").read_text())
+                records = list(observations(data))
+                counts = Counter(record["exit"] for record in records)
+                dates_ok = sum(record["date_utc"]["exit"] == 0 for record in records)
+                self.assertIn(f"| `{name}.json` | {len(records)} | {counts[0]} | {counts[1]} | {counts[127]} | {dates_ok} |", decision)
 
 
 if __name__ == "__main__":

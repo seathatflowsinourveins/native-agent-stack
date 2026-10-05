@@ -8,7 +8,9 @@
     "Passwordless sudo is unknown. The generic recipe link in the probe is a criterion, not per-host acceptance. Root reachability requires separate evidence and remains status-unknown.",
     "Only selected user configuration files are observed; managed and project settings, profiles and environment overrides are not resolved.",
     "The 24.04 observation ran inside the builder client sandbox. Client path resolution and namespace results describe that context, not an independently repeated native login-shell run.",
-    "Codex startup attempts PATH-alias creation under its client home; the read-only sandbox blocks that attempt. The warning is preserved as stderr separately from the version stdout."
+    "Codex startup attempts PATH-alias creation under its client home; the read-only sandbox blocks that attempt. The warning is preserved as stderr separately from the version stdout.",
+    "probe.output is a self-reported canonical-source hash matching the independently hashed archived source. It does not attest the bytes delivered to Python on stdin; no coordinator-side input hash was recorded for this run.",
+    "The retained dpkg-query rows lack db:Status-Status. Their recorded values remain unchanged; exit 0 and an empty version do not establish installation."
   ],
   "recorded_at_utc": "2026-10-05T01:47:45Z",
   "host": {
@@ -38,8 +40,14 @@
     },
     {
       "role": "probe_source",
-      "path": "tools/adoption/host_baseline_probe.py",
+      "path": "evidence/artifacts/host-baseline-20261004/host-baseline-probe-r1.txt",
       "sha256": "33fb4dd8199cf251b09d92afd50cdef678bd5383411447ea52877d269cb31435"
     }
-  ]
+  ],
+  "probe_identity": {
+    "basis": "self_reported_canonical_source",
+    "executed_input_sha256": null,
+    "executed_input_verified": false
+  },
+  "package_query_status": "unrecorded"
 }

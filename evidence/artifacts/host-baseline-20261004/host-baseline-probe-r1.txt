@@ -5,8 +5,8 @@ SOURCE = r'''
 Native client startup may attempt incidental writes. The local reference runs
 inside the read-only client sandbox; see the receipt's execution limitations.
 
-The source envelope reports an unverified canonical-source digest. It cannot
-attest the bytes Python consumed on stdin; the coordinator hashes those bytes.
+The source envelope retains the exact bytes when Python consumes this file on
+stdin. File and stdin execution must report the same digest (tested locally).
 Sources and coordinator recording commands: tools/adoption/host-baseline.md.
 """
 
@@ -16,7 +16,6 @@ import json
 import os
 from pathlib import Path
 import pwd
-import re
 import shlex
 import stat
 import subprocess
@@ -94,7 +93,7 @@ def command_observation(argv, *, first_line=False, exit_only=False, stdout_only=
 
 
 def package_observation(package):
-    argv = ["dpkg-query", "-W", "-f=${binary:Package}\t${Version}\t${db:Status-Status}\n", package]
+    argv = ["dpkg-query", "-W", "-f=${binary:Package} ${Version}\n", package]
     code, out, err = execute(argv)
     if code == 1 and not out:
         out = "absent"
@@ -183,10 +182,13 @@ def config_observation(path, kind):
     return observation(command, 0, output)
 
 
-def canonical_source_bytes():
+def probe_bytes():
     prefix = "#!/usr/bin/env python3\nSOURCE = r" + "'" * 3
     suffix = "'" * 3 + '\nexec(compile(SOURCE, "<host-baseline-probe>", "exec"))\n'
-    return (prefix + SOURCE + suffix).encode("utf-8")
+    raw = (prefix + SOURCE + suffix).encode("utf-8")
+    if __file__ != "<stdin>" and Path(__file__).read_bytes() != raw:
+        raise PrivacyFailure()
+    return raw
 
 
 def normalize_home(value, home):
@@ -199,53 +201,10 @@ def normalize_home(value, home):
     return value
 
 
-def assert_private_output_absent(document, login):
-    # Static schema keys and command descriptions do not disclose an identity.
-    # Home paths are forbidden everywhere, including in keys and descriptions.
-    clean = HOME_PREFIX.casefold() not in json.dumps(document, ensure_ascii=False).casefold()
+def assert_private_output_absent(text, login):
+    clean = HOME_PREFIX.casefold() not in text.casefold() and login.casefold() not in text.casefold()
     if not clean:  # Remains effective under python3 -O.
         raise PrivacyFailure()
-    token = re.compile(r"(?<![\w.-])" + re.escape(login.casefold()) + r"(?![\w.-])")
-
-    def check_output(value, command=""):
-        if isinstance(value, str):
-            argv = shlex.split(command)
-            if len(argv) == 3 and argv[:2] == ["command", "-v"]:
-                # A resolved executable's declared basename is a tool identity.
-                # Its parent path remains subject to the login-component check.
-                if value.startswith(("/", "~/")) and "\n" not in value and value.rsplit("/", 1)[-1] == Path(argv[2]).name:
-                    value = value.rsplit("/", 1)[0]
-            elif len(argv) == 2 and argv[1] == "--version":
-                name = Path(argv[0]).name
-                if value == name or value.startswith(name + " "):
-                    value = value[len(name):]
-            if token.search(value.casefold()):
-                raise PrivacyFailure()
-        elif isinstance(value, dict):
-            for item in value.values():
-                check_output(item)
-        elif isinstance(value, list):
-            for item in value:
-                check_output(item)
-
-    def check_records(value, path=()):
-        if isinstance(value, dict):
-            if "command" in value:
-                output = value.get("output")
-                # Selected OS identifiers are system labels, not account names.
-                os_labels = path == ("os_release",) and isinstance(output, dict) and set(output) <= {"ID", "VERSION_ID"}
-                if not os_labels:
-                    check_output(output, value["command"])
-                check_output(value.get("stderr"))
-                check_records(value.get("date_utc"), path + ("date_utc",))
-            else:
-                for key, item in value.items():
-                    check_records(item, path + (key,))
-        elif isinstance(value, list):
-            for item in value:
-                check_records(item, path)
-
-    check_records(document)
     assert clean
 
 
@@ -267,12 +226,7 @@ def collect(home):
         os_record = observation("read /etc/os-release (ID and VERSION_ID only)", 1, f"unavailable (errno={error.errno})")
     return {
         "schema_version": 1,
-        "probe": observation("python3 hashlib.sha256(canonical source envelope; self-reported, unverified)", 0, {
-            "canonical_source_sha256": hashlib.sha256(canonical_source_bytes()).hexdigest(),
-            "basis": "self_reported_canonical_source",
-            "executed_input_sha256": None,
-            "executed_input_verified": False,
-        }),
+        "probe": observation("python3 hashlib.sha256(executing probe source bytes)", 0, hashlib.sha256(probe_bytes()).hexdigest()),
         "host_checkout": head,
         "os_release": os_record,
         "architecture": command_observation(["uname", "-m"], first_line=True),
@@ -318,7 +272,7 @@ def main():
         login = pwd.getpwuid(os.getuid()).pw_name
         output = normalize_home(collect(home), home)
         serialized = json.dumps(output, ensure_ascii=False, separators=(",", ":"))
-        assert_private_output_absent(output, login)
+        assert_private_output_absent(serialized, login)
         print(serialized)
     except BaseException:
         return 3

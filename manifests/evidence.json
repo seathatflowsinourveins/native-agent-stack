@@ -16573,8 +16573,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-host-baseline-recorder.md",
-      "sha256": "9ec0ed885882abeb88fd76834bcef849b6dc30d7f133db77f96517328d380407",
-      "bytes": 10762
+      "sha256": "071643012f0f55d3b04386712df7cdcd7608ef5f0fcdcb8dcd60a99a2d00136a",
+      "bytes": 15271
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-changelog-parity.md",
@@ -32990,6 +32990,11 @@
       "path": "evidence/artifacts/host-baseline-20261004/host-baseline-probe-r0.txt",
       "sha256": "21f3d8e96d1f4b9d24b7b30f280dba2f44af14135fdd0852468444c25d86bedf",
       "bytes": 11784
+    },
+    {
+      "path": "evidence/artifacts/host-baseline-20261004/host-baseline-probe-r1.txt",
+      "sha256": "33fb4dd8199cf251b09d92afd50cdef678bd5383411447ea52877d269cb31435",
+      "bytes": 12326
     },
     {
       "path": "evidence/artifacts/host-baseline-20261004/nativestack-2404.json",
@@ -51343,23 +51348,23 @@
     },
     {
       "path": "evidence/receipts/host-baseline-coreutils-2604-upgrade-20261004.json",
-      "sha256": "cf8ae48a69ca7f48b79b01a73dab8711480b64732c8a5936ca2b64e3f487dd06",
-      "bytes": 1537
+      "sha256": "61f6f4fdd94753b71900e5b55927a28023a3f9a9b6f09778f054dadd561331b8",
+      "bytes": 1832
     },
     {
       "path": "evidence/receipts/host-baseline-nativestack-20261004.json",
-      "sha256": "01b2b216bbecded140bfeb760d10b8894fb0f77436a43fb637b4a5fea61c4384",
-      "bytes": 2282
+      "sha256": "72ff30c5d63b42495c3641710a456919cb1ad2811d4bcf58f1566d90118afdf9",
+      "bytes": 2886
     },
     {
       "path": "evidence/receipts/host-baseline-nativestack2604-20261004.json",
-      "sha256": "8660a683706a3698b1a9c6ba7788f54c695e1a803d18960680a726ce74e0d5d7",
-      "bytes": 2691
+      "sha256": "8e1d4ff6d9414f6f6988edbe8849fc6d91f52f5a6635a3bb988e4cd3a0bdfb18",
+      "bytes": 3264
     },
     {
       "path": "evidence/receipts/host-baseline-stackmeasure2604-20261004.json",
-      "sha256": "de417e849f616fd8020fb70cf4823ba882561c16dbfac93be6feb9d9d568db1f",
-      "bytes": 2573
+      "sha256": "8455799b15973d545b54e24fc916f5b9bda90298f0ff847b36f5cfe0df661eaf",
+      "bytes": 3146
     },
     {
       "path": "evidence/receipts/ibkr-readonly-acceptance-20260923.json",
@@ -53553,8 +53558,8 @@
     },
     {
       "path": "tests/test_host_baseline_probe.py",
-      "sha256": "69e62ca29d4cbeb2bf603c789020d93989e09c0a44d978b342d7fa87e6cd17ca",
-      "bytes": 13323
+      "sha256": "d822883d54ae1b393de6b1c57be6cca951fe616795547692e6c9603912203fce",
+      "bytes": 19954
     },
     {
       "path": "tests/test_host_receipts.py",
@@ -54183,13 +54188,13 @@
     },
     {
       "path": "tools/adoption/host-baseline.md",
-      "sha256": "80c8fafedc81cd1d684ed8d293169247a7aedbd74eb090564c019527055b0605",
-      "bytes": 8593
+      "sha256": "d22c8d5a038c1c79392998d895e62931dd1a0f59fbe2e3224443d56602fb0aad",
+      "bytes": 11958
     },
     {
       "path": "tools/adoption/host_baseline_probe.py",
-      "sha256": "33fb4dd8199cf251b09d92afd50cdef678bd5383411447ea52877d269cb31435",
-      "bytes": 12326
+      "sha256": "28cef45996619a6c42ccc8deca6020124f415ff08cb4aaa82a2c71a96ad6bb32",
+      "bytes": 14591
     },
     {
       "path": "tools/adoption/install_claude_profile.py",

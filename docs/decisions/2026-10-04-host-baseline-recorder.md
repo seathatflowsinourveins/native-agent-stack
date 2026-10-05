@@ -8,8 +8,11 @@ subsequent research and historical simulation can use evidenced client settings.
 ## Decision and sources
 
 Use a checkout-independent Python stdlib probe and plain `kind: host_baseline`
-receipts under `evidence/receipts/`. Each `local_integration` receipt binds the
-complete observation artifact and actual source file with independent SHA256s.
+receipts under `evidence/receipts/`. Each host `local_integration` receipt binds the
+complete observation artifact and immutable archived source with independent SHA256s.
+The historical upgrade sidecar uses the policy's `Independent observation` class
+for native histories. Source-file hashes establish archived byte identity, not
+which bytes a past Python stdin invocation executed.
 It carries no component install stage or pass result. Observation success does
 not mean every optional binary or kernel
 feature is present. Record all field exits and failures without substituting
@@ -33,9 +36,10 @@ canonical source was read directly instead.
 
 Alternatives were a shell probe and a new JSON import path in the receipt CLI.
 The probe requires Python 3.11+ with stdlib `tomllib` and `ctypes`; exact Python
-versions are not inferred from the Ubuntu release. Its source envelope permits
-the actual file SHA256 to survive stdin transport; tests independently compare
-it in both invocation forms. The receipt CLI currently supports
+versions are not inferred from the Ubuntu release. Its source envelope reports
+an unverified canonical-source hash; it cannot attest the executed stdin bytes.
+Future captures use a frozen input archive hashed externally by the coordinator.
+The receipt CLI currently supports
 local command execution only; adding import support would expand this bounded
 change. An upstream stdin-capable recorder that preserves the exact fields,
 silent privacy failure and full sanitized artifact could overturn this choice
@@ -69,11 +73,12 @@ both streams empty, including under optimized Python. Shape, failure retention,
 configuration-value omission and file/stdin checksum controls passed on that
 first attempt.
 
-The corrected module ran four tests and exited 0. The actual stdin probe then
-ran on NativeStack and exited 0, with Ubuntu `24.04` and `x86_64` observed.
-Its 56 fields retain ten exit-1 observations: the three absent 26.04 coreutils
-package names, rust-findutils, sudo-rs, the absent sudoers marker, and the four
-optional binaries. Every other field and all 56 date queries exited 0. Landlock
+The original corrected module ran four tests and exited 0; that result is
+historical. The retained r1 stdin artifact from NativeStack exited 0, with Ubuntu
+`24.04` and `x86_64` observed. Its 64 observations retain eleven exit-1 results:
+the three coreutils package lookups, rust-findutils, sudo-rs, the unavailable
+sudoers marker, four optional-binary lookups and the gdb path lookup. The gdb
+version call exits 127; the other 52 observations and all 64 date queries exit 0. Landlock
 reported ABI 7; bwrap exited 0; ptrace_scope reported 1. The captured user config
 has no explicit Codex inherit or allow_login_shell key and no Claude
 CLAUDE_CODE_SHELL key. These are recorded gaps for later qualification, not
@@ -117,17 +122,19 @@ The accepted Opus verdict has no p1 findings. Per the coordinator's receipt
 decision, the component `claude-code/install/pass` receipt and its duplicate
 host directory are removed. The 24.04 plain receipt uses the existing public
 NativeStack identity. Three host receipts and the historical NativeStack2604
-coreutils sidecar carry `kind: host_baseline`, `local_integration`, execution
-context, limitations and hashes of complete artifacts. No version is typed into
+coreutils sidecar carry `kind: host_baseline`, execution context or historical
+source metadata, limitations and hashes of complete artifacts. The host captures
+use `local_integration`; the sidecar's classification is corrected below. No version is typed into
 an acceptance result, and the component acceptance index remains unchanged.
 
 The coordinator supplied the unchanged 26.04 captures made with the absolute
-WSL executable and `bash -lc`: NativeStack2604 at 01:02Z after F9 apply and
-StackMeasure2604 around 01:03Z. Their exact timestamps remain in each field.
+WSL executable and `bash -lc`: NativeStack2604 at 2026-10-05T01:02:27Z after F9
+apply and StackMeasure2604 at 01:02:53Z-01:02:54Z on that UTC date. Their exact timestamps remain in each field.
 The guide records why bare `wsl.exe` and direct `-- python3 -` were inadequate.
 The builder reruns only the local 24.04 probe. The archived r0 source's actual
-SHA256 matches both supplied artifacts; it is retained as evidence rather than
-presented as the repaired probe. The r1 24.04 capture uses the changed source.
+SHA256 matches both supplied self-reported canonical hashes; it is retained as
+evidence rather than presented as the repaired probe. That match does not attest
+the executed stdin bytes. The r1 24.04 capture is bound to its archived r1 source.
 
 The repaired Codex version value is its first stdout line; stderr stays separate.
 The 24.04 execution is inside the read-only client sandbox. Codex's startup
@@ -169,3 +176,64 @@ mode instead checks an exact export of the proposed publication files, including
 untracked additions and excluding the deleted receipt. The real Git index is
 unchanged; the coordinator must stage the deletion for the normal worktree
 command to pass. No validator code or scope is weakened.
+
+## Review-thread repair t1
+
+All six connector premises were checked against code and committed artifacts at
+`68ed2b16045e66599f8a1fa2933adb5f1d6f5a0f`. No capture is replaced or re-executed.
+The only host invocation in this round is the authorized 24.04 stdin dry run,
+whose output stays in scratch outside the checkout. TMPDIR is `~/.cache/t710t`,
+and commands run at nice 19. No other distribution is invoked.
+
+The login gate now inspects observation outputs and stderr as whole tokens or
+path components. It omits fixed schema keys, command text and selected OS labels;
+it also distinguishes declared executable basenames and leading banner names
+from account identities. Parent paths and unexpected returned text remain
+checked. The home-path assertion still covers the entire document. Fixtures
+cover `ubuntu`, `codex` and `user`, partial-token collisions, genuine uppercase
+identity disclosures and login components outside a home directory. Existing
+ordinary/optimized-Python silent-failure controls remain in place.
+
+The exact r1 source is archived as `host-baseline-probe-r1.txt` alongside r0.
+The three retained host receipts bind immutable archives, so the supported
+entrypoint can evolve without changing historical evidence. Their recorded
+`probe.output` strings are self-reported canonical-source hashes. Receipt
+metadata now states that executed input hashes were not independently recorded
+and remain unknown. The updated probe explicitly labels its own canonical hash
+unverified, including when additional outer-wrapper bytes are supplied on stdin.
+The guide freezes and externally hashes future input bytes with `sha256sum`
+before using the same archive as stdin and recording the coordinator's digest.
+
+For future captures, dpkg-query records `${db:Status-Status}` alongside the name
+and version, separated by tabs. A query can return exit 0 with an empty version
+and status `not-installed`. The retained r0/r1 rows lack the status field;
+receipts mark it unrecorded without editing any row or inferring installation.
+The historical upgrade sidecar uses exactly `Independent observation` from
+`docs/acceptance-evidence-policy.md` for native histories. The three enum classes
+in `docs/contributing-evidence.md` and the host-receipt schema apply to component
+host receipts; this plain receipt is outside that schema. In `scripts/validate.py`,
+`historical_inventory` is a receipt kind, not an evidence class. No enum or
+validator is extended.
+
+Python traversed each committed artifact's observations, native exits and nested
+date-query exits. These are the retained totals, checked by the targeted test;
+they exclude fixture invocations and the scratch dry run:
+
+| Artifact | Observations | Exit 0 | Exit 1 | Exit 127 | Date exit 0 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `nativestack-2404.json` | 64 | 52 | 11 | 1 | 64 |
+| `nativestack2604.json` | 56 | 50 | 6 | 0 | 56 |
+| `stackmeasure2604.json` | 56 | 50 | 6 | 0 | 56 |
+
+Before the fixes, the updated targeted module ran 12 tests and exited 1 with
+13 failed subtests/assertions and three missing-metadata errors. The failures
+cover common-login rejection, partial-token rejection, mutable r1 source binding,
+the unqualified canonical hash claim under modified stdin, missing package status,
+stale decision counts and the historical sidecar's integration label. The tests
+retain those discriminating controls; this is repository integration and evidence
+consistency testing, not upstream or model acceptance. After the fixes, the same
+12-test module exited 0. The authorized local stdin dry run exited 0 with one
+JSON object, empty stderr, zero case-insensitive login matches and zero home-path
+matches. Its output stays in scratch. All five pre-existing files in the artifact
+directory, including the three host captures, retain their original SHA256s.
+Registration follows the completed source, receipt, documentation and test changes.

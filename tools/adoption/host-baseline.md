@@ -6,8 +6,14 @@ stdlib `tomllib` and `ctypes`; no distribution shipping version is inferred. The
 coordinator's retained 26.04 artifacts show the original probe completed there,
 but do not record the Python or bwrap versions. Its output is
 one JSON object. Each observation has `command`, the actual `exit`, sanitized
-`output`, and `date_utc` with the command, exit and output of `date -u`. Package
-and executable absence retain their nonzero native exits. The bwrap check records
+`output`, and `date_utc` with the command, exit and output of `date -u`. Every
+package-query and executable-lookup exit is retained. `dpkg-query -W` can exit 0
+for a known but uninstalled package, so its exit is not an installation predicate.
+Future package rows contain tab-separated `${binary:Package}`, `${Version}` and
+`${db:Status-Status}`; an empty version remains an empty column. The retained
+r0 and r1 rows lack the status field, as their receipt metadata states. The
+24.04 gdb row has exit 0 and an empty version, while its path lookup exits 1
+and its version call exits 127. The bwrap check records
 only its exit and discards both streams. Sudo and sudo-rs are never executed.
 The other launchers run only `--version`; bwrap runs `true` in new user and PID
 namespaces. The updated probe also records gdb identity, bwrap's version and
@@ -22,14 +28,23 @@ the Codex version value is the first stdout line only. The coordinator's native
 prove that client startup made no writes. This repair changes no host installation
 or settings; the captures do not guarantee side-effect-free upstream executables.
 
-The `probe.output` SHA256 identifies the recorder bytes, while
-`host_checkout.output` identifies `~/code/native-agent-stack` independently.
-The Python source envelope keeps the probe bytes available even after `python3 -`
-consumes stdin. File execution checks the envelope against the actual file; tests
-compare both execution forms with the file's independently calculated SHA256.
-Receipts also bind the independently hashed source file. The unchanged r0 source
+`host_checkout.output` identifies `~/code/native-agent-stack` independently of
+the recorder. The updated `probe.output` object labels its canonical-source hash
+`self_reported_canonical_source`, with `executed_input_sha256: null` and
+`executed_input_verified: false`. Reconstructing the source envelope cannot
+attest bytes consumed by `python3 -`: extra executable wrapper bytes can change
+the program without changing that hash. The coordinator must hash the exact
+frozen input outside the probe and record it in the receipt.
+
+The retained captures' string-valued `probe.output` hashes are also self-reported,
+unverified canonical-source evidence. No external input hash was recorded for
+those runs, and receipt amendments do not invent one. The unchanged r0 source
 is archived as `evidence/artifacts/host-baseline-20261004/host-baseline-probe-r0.txt`
-for the two original 26.04 captures; it is evidence, not the supported entrypoint.
+for both original 26.04 captures. The r1 24.04 source is archived alongside it as
+`host-baseline-probe-r1.txt`. Receipts bind those immutable archives, whose
+independently computed file hashes match the historical self-reports. They do
+not bind the mutable supported entrypoint, and that match is not a transport
+attestation.
 
 The passwd record retains field 7 only, and the sudoers marker retains existence,
 mode and size only. Its owner column is discarded. Passwordless sudo remains
@@ -45,9 +60,15 @@ are inferred. Claude records only whether `env` has `CLAUDE_CODE_SHELL`. The
 probe reads `~/.codex/config.toml` and `~/.claude/settings.json`; it does not
 resolve profile overlays, managed settings, project settings or environment
 overrides. Parse failures omit exception text to avoid disclosing values.
-Home paths are normalized to `~`. Remaining home paths or the account's login
-name, case-insensitively, make the complete output fail closed with exit 3 and
-empty stdout and stderr, including with `python3 -O`. Every exception in `main()`
+Home paths are normalized to `~`. Remaining home paths anywhere in the document
+make the output fail closed. Login checks inspect observation output and stderr
+values, matching whole tokens or path components case-insensitively. Fixed schema
+keys, command descriptions and selected OS identifiers are not account identities;
+an executable's declared basename and leading version-banner tool name are also
+excluded, while its parent path is checked. Thus logins such as `ubuntu`, `codex`
+and `user` do not collide with the OS label, client key or `--unshare-user`.
+A real disclosure returns exit 3 with empty stdout and stderr, including with
+`python3 -O`. Every exception in `main()`
 is caught and returns the same silent exit 3, including unexpected identity,
 filesystem and decoding errors.
 
@@ -56,29 +77,46 @@ filesystem and decoding errors.
 Preserve the complete JSON artifact and write a plain `kind: host_baseline`
 receipt under `evidence/receipts/`, with `id`, `claim`, `limitations`,
 `recorded_at_utc`, `host`, `evidence_class: local_integration`, and `artifacts`
-containing relative paths and independently computed SHA256s. Bind both the
-observation and actual source bytes, then compare the source hash with
-`probe.output`. No client version is typed into an acceptance receipt. These
+containing relative paths and independently computed SHA256s. Bind the
+observation and an immutable archive of the input source. For future captures,
+record the coordinator's external input measurement as
+`probe_identity.executed_input_sha256`, with basis `coordinator_input_bytes`;
+the probe's self-report remains unverified. No client version is typed into an
+acceptance receipt. These
 component-free receipts are hash-listed evidence files, outside the component
 acceptance index. Their host observation exits remain in the full artifacts.
 
 Use the existing NativeStack identity `nativestack-5975wx-20260925` for the 24.04
 reference. The same distribution must not be presented as another physical host.
-The local collection command is:
+For a future capture, freeze the source before hashing or running it. Use a new
+capture directory and receipt instead of replacing a retained historical capture.
+The following local recipe hashes the exact archived bytes it sends on stdin;
+`sha256sum` runs on the coordinator side and prints a digest with `-`, without a
+private source path. Put that digest in the new receipt as the input measurement:
 
 ```bash
-mkdir -p "$HOME/.cache/t-pr0-baseline-r1"
-export TMPDIR="$HOME/.cache/t-pr0-baseline-r1"
-nice -n 19 python3 - < tools/adoption/host_baseline_probe.py > evidence/artifacts/host-baseline-20261004/nativestack-2404.json
+set -e
+nice -n 19 mkdir -p "$HOME/.cache/t710t"
+export TMPDIR="$HOME/.cache/t710t"
+capture_dir="evidence/artifacts/host-baseline-<capture-id>"
+nice -n 19 mkdir "$capture_dir"
+probe_input="$capture_dir/probe-source.txt"
+nice -n 19 cp tools/adoption/host_baseline_probe.py "$probe_input"
+nice -n 19 chmod 0444 "$probe_input"
+nice -n 19 sha256sum < "$probe_input"
+nice -n 19 python3 - < "$probe_input" > "$capture_dir/nativestack-2404.json"
 ```
 
 On this host `wsl.exe` is not on PATH. Invoking the executable directly with
 `-- python3 -` also omits the user's login-shell PATH, causing installed clients
-to appear absent. The coordinator's documented and used command runs the probe
-in the login shell agents use:
+to appear absent. The coordinator's r1 command was
+`nice -n 19 /mnt/c/Windows/System32/wsl.exe -d <name> -- bash -lc 'nice -n 19 python3 -' < tools/adoption/host_baseline_probe.py`.
+For future captures, use the same login shell agents use with the frozen input
+above and measure its hash on the coordinator side before sending it:
 
 ```bash
-nice -n 19 /mnt/c/Windows/System32/wsl.exe -d <name> -- bash -lc 'nice -n 19 python3 -' < tools/adoption/host_baseline_probe.py
+nice -n 19 sha256sum < "$probe_input"
+nice -n 19 /mnt/c/Windows/System32/wsl.exe -d <name> -- bash -lc 'nice -n 19 python3 -' < "$probe_input" > "$capture_dir/<host-id>.json"
 ```
 
 This sends the same probe bytes on stdin and needs no target checkout. The target
@@ -86,7 +124,8 @@ host's checkout HEAD, including an older checkout, remains a separate field.
 The coordinator schedules StackMeasure2604 within its owner's measurement window
 and captures stdout to the corresponding artifact. The builder does not invoke
 another distribution. The supplied NativeStack2604 capture is after F9 apply at
-01:02Z; StackMeasure2604 was captured around 01:03Z. The artifacts retain the
+2026-10-05T01:02:27Z; StackMeasure2604 was captured at 01:02:53Z-01:02:54Z
+on the same UTC date. The artifacts retain the
 exact per-field UTC times. They use the archived r0 source and lack the repair's
 additional gdb, launcher-package and bwrap-version observations; those fields
 remain unobserved on both 26.04 hosts. Retain their original bytes and hashes.
@@ -95,7 +134,10 @@ The three host receipts and the historical coreutils sidecar are
 `evidence/receipts/host-baseline-*-20261004.json`. Their `recorded_at_utc` stamps
 date receipt assembly; observation and upgrade times stay in the bound artifacts.
 The coreutils sidecar names NativeStack2604 and the three historical coordination
-source files, and states that no upgrade was re-executed. StackMeasure2604's
+source files, and states that no upgrade was re-executed. Its evidence class is
+the policy's `Independent observation` for inspection of native histories,
+rather than `local_integration`. This plain receipt is outside the component
+host-receipt schema's three-class enum. StackMeasure2604's
 current coreutils version is supported by its own retained probe artifact.
 Register the artifact and all other changed evidence files after finishing them with
 `scripts/host_receipts.py`'s `register_file(Path("."), relative_path)` function.
@@ -107,6 +149,15 @@ The evidence manifest does not register its own bytes.
   `scripts/host_receipts.py` (`register_file`), `docs/contributing-evidence.md`,
   `docs/acceptance-evidence-policy.md`, and the plain receipt style in
   `blueprints/us-equities/catalyst-provenance/new-host-native-network-20260924.json`.
+- Repair reference `68ed2b16045e66599f8a1fa2933adb5f1d6f5a0f`:
+  `docs/acceptance-evidence-policy.md` (Independent observation),
+  `docs/contributing-evidence.md` and `adoption/host-receipt.schema.json`
+  (component host-receipt classes), `scripts/validate.py` (`RECEIPT_KINDS`
+  applies to indexed component receipts), and the plain observation-class
+  precedent `evidence/receipts/github-ci-measurements-20261003.json`.
+- Installed `dpkg-query --help` and `dpkg-query(1)` at
+  `/usr/share/man/man1/dpkg-query.1.gz`: `-W` reports package information,
+  `-f` selects fields, and `db:Status-Status` supplies the package status word.
 - [Python 3.12 tomllib](https://docs.python.org/3.12/library/tomllib.html) and
   [subprocess](https://docs.python.org/3.12/library/subprocess.html): unchanged
   stdlib parsers and native exit capture. The probe is local glue using these
@@ -128,5 +179,5 @@ The evidence manifest does not register its own bytes.
   unit A's 24.04 version observation and the documented namespace, bind and proc options; the probe's
   command runs `true` and records its exit only.
 
-The source envelope, final privacy gate and fixture tests are repository
+The canonical-source self-report, final privacy gate and fixture tests are repository
 integration code using the cited stdlib and native interfaces.

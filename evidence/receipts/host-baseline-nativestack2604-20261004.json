@@ -10,7 +10,9 @@
     "The coordinator captured this artifact using the r0 probe source now archived and independently hashed. The capture was supplied to this repair; the remote distribution was not invoked again.",
     "The r0 capture lacks gdb, launcher-family package versions and bwrap version. Those added fields remain unobserved here and are not filled with 24.04 data.",
     "Native client startup may have incidental writes; absence of a stderr warning does not establish side-effect-free startup.",
-    "This is the post-F9 NativeStack2604 state, not a pre-apply comparison."
+    "This is the post-F9 NativeStack2604 state, not a pre-apply comparison.",
+    "probe.output is a self-reported canonical-source hash matching the independently hashed archived source. It does not attest the bytes delivered to Python on stdin; no coordinator-side input hash was recorded for this run.",
+    "The retained dpkg-query rows lack db:Status-Status. Their recorded values remain unchanged; exit 0 and an empty version do not establish installation."
   ],
   "recorded_at_utc": "2026-10-05T01:47:45Z",
   "host": {
@@ -46,5 +48,11 @@
       "path": "evidence/artifacts/host-baseline-20261004/host-baseline-probe-r0.txt",
       "sha256": "21f3d8e96d1f4b9d24b7b30f280dba2f44af14135fdd0852468444c25d86bedf"
     }
-  ]
+  ],
+  "probe_identity": {
+    "basis": "self_reported_canonical_source",
+    "executed_input_sha256": null,
+    "executed_input_verified": false
+  },
+  "package_query_status": "unrecorded"
 }
