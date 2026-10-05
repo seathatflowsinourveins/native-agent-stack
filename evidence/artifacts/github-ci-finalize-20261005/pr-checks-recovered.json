@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "changed_condition": "Resolved installed gh 2.102.0 executable used directly after its version check succeeded; executable path redacted as <installed-gh-2.102.0>. Failed reads retained in pr-checks.json.",
+  "captures": [
+    {
+      "pr": 703,
+      "head_sha": "d00e4e6eeb92c7c99066ea5d0bd85f379c931c4f",
+      "replaces_failed_capture_started_utc": "2026-10-05T04:19:59.250Z",
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/commits/d00e4e6eeb92c7c99066ea5d0bd85f379c931c4f/check-runs?filter=latest&per_page=100",
+        "--jq",
+        "{total_count,check_runs:[.check_runs[]|{id,name,status,conclusion,started_at,completed_at,details_url,head_sha,app_id:.app.id}]} | tojson"
+      ],
+      "started_utc": "2026-10-05T04:21:43.585Z",
+      "ended_utc": "2026-10-05T04:21:44.019Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "ee48690925065205a3621a29302a1e80e585716f048ff7c5f16dae56807192b1",
+      "stdout_bytes": 3113,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA83UT0/bMBgG8Ps+RfWeNikhjv8ktm9o1x022GnTVDnOSxNI48x2igriu08UBIcCLSKrevPBevX650fPLdgG7dXcj30A/fsWzDDM2xp0LgpW0gSsWw4dRqznJoIGSmiR5iQl4idhmgnN5S+4v9Xbbgyt60FDj2P0poMEaoym7cJ89B1oaGIcgs6y4OwVxpMaV5BAg6aeh8aAhpoQ5FggVora0ipFigKNqElVS3HBSmUVyy2/gAQ2G+Z5QQTNJWMqgd4sETScb2bPztGOvo1rPfs+dt3sDP+OGOLstEMfAyQQovGvvYlrsnlTiCaOAfQzAdwlz0CiLKXa5cM1U1s+YbQWQ3jVZ9HGZqxOrFtmAU1sTLzo3HVoezf6FbZ9yHoT2xWmZoF9TEM09iq7/8BsQ8KVLFkuP277OOjJ9qur8ce3nXqs3ENvv3hxTcp38z3HK6tNaCpnfJ05v8gwLRmurq/ZTRYqt8yKiiiiUKaK0yrleSlTJSRJuRS0tswSIewEilIKLvgbCfXuEm2cneHgfNwdTrEXLyvkbl1eHCacxsbW9eEhpKykQilO8rzILl31GFpZkqLgU3BvBj1xn/amW9/g7PPjDl92A7OpgIUm9KiAKZ0ImNJt4EuzMsH6dohpXA/4cDwsN2fHxC1UPg23UPk297COjesP6cu1eH8b/09fwSbyFWzb149hn/RO1saFpuSodPlEbSz4C21sQ2P8cNh2oEdVxoJMVMaCvFDGC/cR2z8JRBdNN7du7CNodffpH8vYIVMpDAAA",
+      "derived": null
+    },
+    {
+      "pr": 696,
+      "head_sha": "afc806b3f8ed3db1dcae4ee24e529d7a85ed4bec",
+      "replaces_failed_capture_started_utc": "2026-10-05T04:19:59.420Z",
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/commits/afc806b3f8ed3db1dcae4ee24e529d7a85ed4bec/check-runs?filter=latest&per_page=100",
+        "--jq",
+        "{total_count,check_runs:[.check_runs[]|{id,name,status,conclusion,started_at,completed_at,details_url,head_sha,app_id:.app.id}]} | tojson"
+      ],
+      "started_utc": "2026-10-05T04:21:44.210Z",
+      "ended_utc": "2026-10-05T04:21:44.792Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "c78472a13c992e41f99d9859444f6f824bff1c39f845de669076140d6b371806",
+      "stdout_bytes": 10441,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA93aTW/jNhAG4Ht/RcBTC1grflPSbdFrD+1uTy0Kg6YmthKFVEnKabLY/15Yzjre2IWchLGC3gzDeCE/GAw5Y39BZgXmeu57G1D15xeku27e1Kgigslihoy76VqIUM91RJXt23bznjVtHxpnv71TQ9RNG+a9b1GFVjF2ocrzZRNX/eKDcTd5AB1XOl627jY01vV+DY0NudWxWUOml2BjFqI217k2sXE25JsHypmikpRSUS7yK7fICSGSkAIziRWaoRXoeh5WGlVIX5oCywW7LKBm9YLURgMHoBwELWulCwE1X4BBMzR8u72gGbL6BlCF1rptah0BzVCI2n/70ohiKjOCMyx+x7zCZUX5H9vPxD6gCjV23nm39BAC+jobITxMY3KTto+KQm/MJm0CWc5YGlnO2E42uKiz4HpvIDxXd8f3Eluh3pUtJYlsKXmsWvB1Y2LmYd3AbbY8qYBFImLCK1a8J2JWJCpfVuyVLxgPMQtG2zPSFpUg74mWykTVSyU5RpstIEbwLejrE5rEi5mnOcOILAR99MSFLBgvX+/5EHRwhmU32rgRRsIqUaY7yUQlxGT1esyX8kS+lO98F87FEL3usrax/T8jdcorXqbrtHi6dnCMN8UV7CHoCO8p9UsrnIyXVpi+J14qEnUHKsr/4s0WHm5HjPFpxkKpohzrELziZyrhwfaBgNOywCksh6Cd5c+uht9+GW0ALFWFbrKO6F03XQf1GSq05OV+hZKiLJI0gCFop+rCOgvaN5dZ37VO1+O+NJ0vn25aeNoBlKKCJLhvPQTtfM1K2+XoEMYrkrJsp2ysZblftkqWBUlxLdgGvWTA3dzs37RkjbYG2vY8TeFAFycp2iHoFSNu2gLmhxuaSZFVmaLzboNeOYmlrWbB3hs0TQVNn7tmTClbVvSwB08qK8sijawsixfsaRI34Snn3pJ8d2+QjEuRhHYTtKON7hps5qFzPo7bqpNsJVN0HJcc9oQx3ODMNcQPNaxTQAiByWONfR6yLz6D6X0T76qLX/u2vfgEf/cQ4sXHFnw8oWeSdMVH8LsZCpQgKslSaxu0M79v7m+cf95c8P8lpirJ6T8EPSV2tm3sCSdTQtxjQ+35mucTXCxlilXBNuj7odZoa8GP0yacZyemZfu0vBRJ9gXboB1tDR3YGqy5e5gOUgGfeDgd6QwnH055rcNq4bSvc+eXOWSKwfr2lt3nYeFuclWDrhWITOKCZXwBKlsoUmZKX2KOOaWU1ElAOd4bAw7PN++uwMSLT6ed/TjZvUpUeMJ7FVNM7dcvlbJM0hqGoB33R6vbu3u4+NH3If40ritT6cqXXKzeUlclWcsMQYe63V1cOXtOX/GS3vCWvjzJYmYIOvRduhNsU/0yjuWU/5k5ZsuSDLND0KGtCSvtu3PW7rSb8CO+aTbhQ9Ch78MznBd4wr92HAEWOMmeawg6BL7Sax2Mb7qYxbsOti9f0y/+mqHoom7nxvU2oorhrz/8C8mkOKHJKAAA",
+      "derived": null
+    },
+    {
+      "pr": 633,
+      "head_sha": "241ef6b5398847304939f5d22c6e628c7b7dd7f8",
+      "replaces_failed_capture_started_utc": "2026-10-05T04:20:05.109Z",
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/commits/241ef6b5398847304939f5d22c6e628c7b7dd7f8/check-runs?filter=latest&per_page=100",
+        "--jq",
+        "{total_count,check_runs:[.check_runs[]|{id,name,status,conclusion,started_at,completed_at,details_url,head_sha,app_id:.app.id}]} | tojson"
+      ],
+      "started_utc": "2026-10-05T04:21:44.957Z",
+      "ended_utc": "2026-10-05T04:21:45.445Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "cae140d8eef0a6e40b06fb80dfbd3f4cd5983b43e33294f5cdb9b29e07af835d",
+      "stdout_bytes": 8722,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA93Zz4/iNhQH8Hv/CuRTK5FN/CtOfFv12kO729NWFXKcB2QJcWo7TGdW+79XAQTsZHZgKjdBvXFAT+HD8/fZzhek16A3C9s1Dsk/viDVtouqRJILkeVzpM22rcFDuVAeSUQSkkY4iRL6O84lTiVLP6H+W42uO1eZBknkOq3BOTRHJXhV1W7R2RpJtPa+dTKOV5Vfd8U7bbaxA+XXyi9r8+CqxnR2B1Xj4kb5ageRWkHjI+eV3sT988UYYyJohhPMBZqjNahy4daqfy6GYZkWnOZZxgRNWE7zJS8J0SmkJNOiEGUplhmao/7HXRaao0ZtAUn0synht1/QHDmv7Cu/mH46fMd3DskzEPo6P+thTtPsNT1CJM8kycbRU9pXpnEHRSowE0RwxtL4symOqiLLeUoDqB4KnVQLY7zzVrXRVmnjosLCwyvGvUsqGQ9kTMnx/7ofYxLKmHzP+HVemkhMQvD2y0FIxu6Kl4RqYfJSC9dV0/19NSFoHoo3lRQPeTdV20I5Ai/HySWvEJnIQ/DuC514jdtFTtlqGXVtbVR53Rff5JtSQa73b/L2/nVGb8C/K2EXAoMIxtMTxsd97dlH0J2t/KOc/drV9ewD/NWB87P3NVj/2vo+AOHbRtQtQOkxLP4lUFwqty6MsmVs7CqGSFDYPTzQp9gVZhsXpSizIsWREkJELGcsypYlj1KdMq3SDHKehDDGnF0M+qGxNZ9B+9kHaI31V3mTgOs7eWEHMNX6xolgOAh3X+jE/VQ9bY192xI/sPwfiTkNEqH7Qs+JTVNXDYyKe5h1U43/LL/ETXJOQpwLDoVOuN5soInsbdmAk/929o9m+6xxk5xhHsaWYf7t7NeqacCOR8uY5G8fagHblj5rW5IHoiX5mXan6qpU/nochHElWNJU8uR+TgNJTligOCBMDFyvn7WwTJjkQa4LcC4JlnjSsB10LQ2yN9sXOuk60Bb8PhNGzVoyZdYOaQkLREvYmdZ4FTnTWQ03HCFuO2Pd0Lb03sI21BwjF3Psom2jArwHW4PajMjcX0xOmr3PmTEJss/dFzpnL9iy0j6ysKvgIVqNN96OOzJ+T+MtCXNfuy90ItZr1azGDIg+fCe9Buf4GSsLxcrOrCW00JTQ6Mdj847Yt0ISMR0wpfm3fcu5SIMA94VOwO8bVT8+wezH9tGvTfPTiLc4QrL78g1zabYvNPT9rHbKaVu1PvKPLRw+Xuc+vCcIwT3ta7MXuMPc6OwLDbm1WyvbjtnO6aQbtpd8s1C+2dD3+Azj5gWe8LTxAnCgrVpfaAi8MuPaJhO+7x3aUhbmtNEXGtrazt0Qvd/X/XOOvPGqXmjTNR5Jwr/+8A+9ETsREiIAAA==",
+      "derived": null
+    },
+    {
+      "pr": 629,
+      "head_sha": "90cb37fc0c4aa9a17ce50ed677998e09534e4a13",
+      "replaces_failed_capture_started_utc": "2026-10-05T04:20:05.280Z",
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/commits/90cb37fc0c4aa9a17ce50ed677998e09534e4a13/check-runs?filter=latest&per_page=100",
+        "--jq",
+        "{total_count,check_runs:[.check_runs[]|{id,name,status,conclusion,started_at,completed_at,details_url,head_sha,app_id:.app.id}]} | tojson"
+      ],
+      "started_utc": "2026-10-05T04:21:45.600Z",
+      "ended_utc": "2026-10-05T04:21:46.149Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "22f04f2df4840ab06a29c234a98600c09172b76fd28a442e08c6d39e60c34170",
+      "stdout_bytes": 8722,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA93ZzW/bNhQA8Pv+CoOnDbAqflPkrdh1h63dqcNg0NSzrUQWNZJylhT93wfbmdPEXuy2nG305oPwIP3w/D7Ij8gtwN1OwtBFZP74iGzfT5oaGaFUpcfI+WXfQoJ6YhMyiGIqC4ILzH7HzHBuKPuA1k91rh1i4ztkUBycgxjRGNWQbNPGyRBaZNAipT6aspw3aTFM3zi/LCPYtLBp1vq72HR+CCtoulh2NjUrKOwculTEZN1tuX6/khBCKJaKE6zRGC3A1pO4sMggjd2UqZnDjlurLVEOBIZaKqV1BVgLxoFbwtAYrT/u80Bj1NklIIN+9jX89gsao5hseOWLyYftM2mIyDwBoU/jJz0imKyO62G9r3fb9D3UefWsS43v4laRKaw5kQpXurzx039VuaSE51DdBNqp+rgqog3NrBj61tv6qC/BWXy5IZXh/DzZechXalU988UVpVl814F2vlPvU0zB9sXSOh+LaYC714y5IdJgmcuYGy6uyhjLTMZY/pfxEV5qhMpVIsTj3+FaeJVmeXiVZgd426Yb/s5VISRT9Jgv+5oSEb27hfSmhlUGC6EEU2Rn8X4Te/Qe3BCadG9Gvw5tO3oHfw0Q0+htCyG9mn/bb6I5geg3AJW1jYupt6EufZiXUCgGq7s79lDGqV+WbCZnUzfVhVDWFtxaW1iMcQFUTbXi1kkBOYyl0q8aB38DLo3eQe9DOs6bp0NtYjF1NROAEJWmJAf3JtCO+6F5WPrwJUMAM6z6XolpVeUhplX1kth3bdPBcdxs7engBDuzTTsEuACukjgP7jrQ8wnW2a6DcJRWnFZ5v3o5OFfnV5jS57RC5CkN60A72uRvoSvCaWWX6Xw1QRyoCeebquSLtOU8x+K1DbSzjT7ZIvohODg+MeSzlYZXV2VLc0ys20BPtuACpE1VOBctN4QZdqbTllNpcS5avKNd2bapbTrexTJNYesDHUPI1SxZQihWqTyurFJ7rsdX2E3zEdkGMP542nAtWcuqTMWWVU/FdgWhblwqAqwauCvmpyTw99LPFMYvZgWmRCZiJXbENfTQ1dC5+0flMwJrwy5aIV7mMNWZgKkWh5paMYWUILRgb084bci2DnODLzo7vCzElOU4TNwG2jG7he3mJ4xkPM8Z7Yb1ktkrNJfPWGUuVvk569vOtvcPMPrx8R1+Omve0gvuavvAROZpcetA+8BhiOm4br4THH7RjeKALs1x+bgNtK879yfYZtzWyAWvbw7Y4jzb2jrQvq2LCxv681YGfsGVbd8Xq0yVAasDleHGrmx0oelTke572P48ZzoLQ778tuL/4xZa5rjx3Qba5+7v08J33+L75xgln2w7cX7oEjJUfPrhH3w4dh0SIgAA",
+      "derived": null
+    },
+    {
+      "replaces_failed_capture_started_utc": "2026-10-05T04:20:18.533Z",
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/pulls/696/files?per_page=100",
+        "--jq",
+        "[.[]|{filename,status}] | tojson"
+      ],
+      "started_utc": "2026-10-05T04:21:46.297Z",
+      "ended_utc": "2026-10-05T04:21:46.698Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "80edf9cd8084d1e91e2fc484bbf20c3f7e7944bedb28ebeb8605c9d2102f8714",
+      "stdout_bytes": 572,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA63QsQrCMBAG4N3HyNw2u5tgRxdXkXAk1xpN7kovrYj47pIWBAfBIcstd//Hz52eqvMBCSKqrYpAvkNJonH2DslicxUmVSlJkCbJJ+x859GpV/UVTUssTxOAnFgY0MgdcTAXGAlFmuHxF8QcRAsnqC3TjGOfe+gPWi+oPra7/aFtoitorrtUtmiEG5oRZQqF4fW5lmNkKitPAn3ubHl0P+Xz5g2/XljtPAIAAA==",
+      "derived": null
+    }
+  ]
+}

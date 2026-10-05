@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "sanitization": "Archive and log bytes withheld; hashes retained. Native artifact ZIP GET read in memory without extraction. Numbered failure/summary trace excerpts retained with home paths redacted; no OS state changed.",
+  "captures": [
+    {
+      "artifact": 11145704326,
+      "run": 36825377925,
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/actions/artifacts/11145704326/zip"
+      ],
+      "started_utc": "2026-10-05T04:26:19.634656+00:00",
+      "ended_utc": "2026-10-05T04:26:20.301754+00:00",
+      "exit_code": 0,
+      "stderr": "",
+      "archive_bytes": 268756,
+      "archive_sha256": "d6794a1eb1d93e34ce23415e43b9d892f6c61d6a5d93b92ae2f0bc79180da166",
+      "excerpt_sha256": "631eb95cee806a2e24d3eac0df327802723e2d6a89692c52ccb573ba2f870abf",
+      "excerpt_gzip_base64": "H4sIAOwmw2oC/7WTXW/TMBSG/8rBN2ulrIrj5quiSJPY2CQkJlau1lE5zklnzU2C7UDRVH47SSfSxhoTF+Nc+jznPZ++fSQl3yCZkaJR6tQ00uLphovKTFS1Jh7Jflo0ZEajNI2nsUfMPQ/CqOVpWnCWcBYJn6cMozASCQuiNBAhjfOwKJIsplnGfJ7koc8LljNfYBSgHwah4KLVxq1AXdtW/vaRKFm2ZVA/oKlHLG5tm2P+KkZ23pF84PfyF2dXH2fQ9mdXuJV2JaocV7zMV0auS65Wta5qvuYWYdRBZrJHhcYcSytbQDfl5FpXAo1ZHICXtcYwenqan9xcfbj8cn0ydgqkfYGnr2KOfNDLLzQXmHHxAKNNZSxoFG1jILhSoLix45kTyvpQgAupEJbk7eWnm8Xq+mxx+W5JPOhYoJQmHsjyX0brZJgeZQAwqIoJNwa1Pf/WcDVqB16invzg0o6s3GDV2Dnzxx50+u4cw4HWL8e+vmyOVtRrne3LkVV5rnWlZ0DhzRwSB4973HEk/3e3h6/zmZeQUj/d78B0y6ARm05iFpthDPP/Uiujg49y/h5GBZeq0Wjm1APzIOsa83m769SZPDucWF619xAAdrMy4EPN9f7n/HlwAg8H9uh4jg9jSTJViQdZrpdkBi45XPuy9XzHjru98xwycsia16ifR2MHNXLzBDpccsTtXJF00IOomtKaZzqY+s8nczE6wDqwXTXPlDT3mHcB1AkIBgE7x8teKH06HP/T9vpJ3e3ufgNpkodBSAYAAA=="
+    },
+    {
+      "artifact": 11169463076,
+      "run": 36867111096,
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/actions/artifacts/11169463076/zip"
+      ],
+      "started_utc": "2026-10-05T04:26:20.451855+00:00",
+      "ended_utc": "2026-10-05T04:26:20.975326+00:00",
+      "exit_code": 0,
+      "stderr": "",
+      "archive_bytes": 278378,
+      "archive_sha256": "e7f48544e52ef8fce316ab0d6b3d2e1261e8015a0f7bdc2d736443c66359804e",
+      "excerpt_sha256": "8635be9b9b3e17239628b16afbf75fb1dab8f5abffff671f6eb78eea6bc0c05f",
+      "excerpt_gzip_base64": "H4sIAOwmw2oC/7VUW2vbMBT+K5qeUnCD7PjOMiispYNBS5e3OBOyfdKYKJIryb1Qst8+uWVOLNq37DzJOt/3nau8fMWC7QDneN1xfq67xsD5jlVST7m8xx4uXwxonPtJlESR72G9YUEUW3ychBFJ0pJBVsM6ioMsqWfhuo4hSevQT8tZ6keEERZGLCU1S8M6qBM/i0hNqqQiVhueK1CtsfLLV8wbYdPwSZTEHjbwbGyM+UkM771j+WSQv7r48TNHtj5DBZhWyRKoAlZrqmRnr6kGYT+kANrVLX3oQL1QJmqqOqGp2QBtpW5M8wi0ksIoydGkV9PTN02LMs0O6JNUW1BUtiA2lq2nN/Z03Z9u+5CLA+NEWZw5FadDxecnMUc+G+QXilVQsmqLJjupDVJQgTCoYpwjzrQ5y8fUlAxUhK4aDqjAX69vfi3o7cXi+luBPdRjkZ8EgYcacdJZOan4R6kgpIGvp0xrUObyoWN8om12wiwLzIR+AgV1gVceumJcg9PuNBgp/XHs9+fm6MwGnYu3RBopLpWSKkcL1QH6Mn8P77DCgeU4ov+6Benh1d4xgbKQRG/T0v3YAhKk09hPtMNJPss1Hb3Ry+9osmYN7xToue8hvW3aFuq5Pwtit/mHZaztLqAAQd8yjQhqmW0h4/TfxZiYHVbx1fEcb0aBSy6rbSPuC5wjFzmefGE9j9DjlivPQc4cZMtaUB9DQweqm9070MFFR7i9KxKPaqik/TXpjypIPg7mwtIRrAfaUbOSN3rTv4wc+Q4hGxH2I29MyOepx2Tc/vfpDZ1a7Vd/ATwfvL/DBgAA"
+    },
+    {
+      "artifact": 11290689833,
+      "run": 37151325855,
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/actions/artifacts/11290689833/zip"
+      ],
+      "started_utc": "2026-10-05T04:26:21.127468+00:00",
+      "ended_utc": "2026-10-05T04:26:21.640157+00:00",
+      "exit_code": 0,
+      "stderr": "",
+      "archive_bytes": 295229,
+      "archive_sha256": "5d904f078c3f5c053587bdb966376c9c13d518b73aec5076868963904c249cbc",
+      "excerpt_sha256": "0778428f8aa649aaf78dc617b56424cc12ded21eacf917ce25d05b8ad5d7a7ba",
+      "excerpt_gzip_base64": "H4sIAO0mw2oC/71W227bOBD9FUIvVgpZ1s1X1AWKbrINULRF4u1LnAqUNIq5oUiVpJoYQfLtS0mJZbFxUexmywfaJM8czhxyhrq4sxguwFpYeUXpUFZEwbDAKZcu5VeWYyVbBdJa+LOp58/njiU3OBhPNH4cQR4l4xAmUy/CExzhOZ6EM38yhbEXBRB53mye5LMsSAII03TmjZM8G2e5N52muZ9qbrhNQZRK01/cWZQw7YbvB77nWApuld5j+SLNunf26f0d/fHZ2aezBdIBqhjHklwxTGO1gTjlRYFZFm90R0HGGdcd4yqWCgvVQBiPbzBRsagoxDyv7TeVyvgNQ3ZNKN2GNhWQAVNEE4uKue84k1UBYtUhXm7jIyPQYBfo8EWaQR/u6FcCp5Dg9BrZBZcKCUh1zCjFlCKKpTpaGKbRzhShE0IBra3X7z+dr+LPb1fv36wtB9VY5E8j30GEvfQJGd6M97xB2nmpHBSjJdIHxkC49VYVIylWYCtSAK/UcuKZYk96JF17+KF93WsGyfRHXUYfSCKw2I5OhM7TGy6u5ejzVm04c/OnmdEXEJLoqzUKXT8cUZKMygbSDGWVlIKnIKVbbjttgyBotN0Lz/Bm1gtJaukqrYz+BSG0PBJo7sb76hBW1ghgWa2Tgx7VMqWaH5DqkGJfD7U+b+D9PvX0pRk36sUH5Qv8vnytWhtIr+NHXeydUFyQq6dZx1DaUC8IerQPD78u10/FC3/n1ZvMH8Xbl8NwKOpnJSYS0KpFHt+WRNdV27Do57Hruq+DZkP5Rv83sM+na6v4MhkM3L85YXY7jiV8O0IkR90QAdXufOQMzOPpUngv+L7fC/SurV5ocDH4FyInhD2JPHDQYK9y1kOFvxO6rf8Nh3X/3zcYnjZ9qvu1RYqSC4XaUqzv6Fa2eb5es3bObX/sx9H56Z9/nZ/pMk5xkWQYvYoXrW7aoBSEKXsgAGe1wzmt5Ga5ElWz+Ghf4kqCXU/Uu7iSApS2544byFa6bbK4N0J/uNiDbwP0Ck29utWAtXU5aLzLkAYhnCsQaOLpZEw5y6RxdF29Mxbm/+tDGnZ16wwzNJ/P/ObBk3WK+PqzyZ3MQ8PX0D/ga9iVh5O3px+O/0C2vrJcyKU+AnlNyhKypR8GM+Pehl3+Z7wucKg1Qx4q9YNaf7/sJgqs0g1humLhK9lN6+eyljrmjG4PzJpUhg9dyt8ZK/upvbYSytNr7cDaWiAT2U/stV75DjXu4tIxkFMDWeISxPPQmQGVpGiBBm7/Zbs3SCKvF0PKtTDymQgi//nNTFhgVLC1pe8MTiiRG8hqA98wCHsG98Zq9DPX+/K3p7dT6vL+8h88i9RwRgwAAA=="
+    },
+    {
+      "artifact": 11293846309,
+      "run": 37174409325,
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/actions/artifacts/11293846309/zip"
+      ],
+      "started_utc": "2026-10-05T04:26:21.994834+00:00",
+      "ended_utc": "2026-10-05T04:26:22.600016+00:00",
+      "exit_code": 0,
+      "stderr": "",
+      "archive_bytes": 301945,
+      "archive_sha256": "f723be23bfb06568bd151f3869713ded0bfa15c44f58aabb06e8ed767aa0c664",
+      "excerpt_sha256": "86a41015005d63d6a76858ab6aeebf805696fc7f5f5f8e5eae6cdc05898f0f43",
+      "excerpt_gzip_base64": "H4sIAO4mw2oC/7VUy27bMBD8FVYnGZUNUW8ZdYsATZACAVqkvsWpQFErhzD1CCnlgcD99lJ2IFmEnZPLm7izw93ZHd29GSUpwJgbecv5VLasgWlBaCVnvFoblpG+NiCNOY6x47qhZcgH4viBwod2nOHc8R3ixeD6rkK4XppnOQQBjknqx7HnYOoGxPOjmAa5T7zUo37g5zZJQ6q44YWCqBtFf/dmcFaqMjD2AtcyGnhp1BuLsxxjax3Sez391cWPmzlS/TVJ81wl8hmglgkrJcsgIUnByraBpCAbSKoSEiFlIuCx7fCkzHZ3kK2JSOgr5YDMjknOdnyspFA27EmlVyVrKjG7bcubqqpn53puorXl921Nz3I0+qCnXwpCISV0g8yikg0S0LWKKOEccSKbyVxLDftUhK6YEmplfLn++XuZ/LpYXn9dGRbqsAiHEbYQK882EK2M6KAMhCTwfEakBNFcPraEm6agqhAozf2rk4mFTNtCzkQXOh7x/NXOn9NnzBPaPc/FrgxWlZdCVGKOlm3NQaKM5Tmoz64MPEGfFu8FaTy459ECzrDoTKhB7flYuUbAoehmhrVRhYP1sBYZXONoEf/U+8PKTN970ADDYnzrpES6QtEp5mEEn49qEtkfM0enNIucUwH3v9orGuS9JSXCtmMHOx/IzhA4wPYsDmOpJZ1SPgpGv7jL78jMCeOtALlQFpMbVteQLbAbBrpww0gy5SbkIOhWUiIb1UStKOFJf1GQhj6obUoaspbDtWjVf6/oDMpfT9zqVFoNw9jftMih9VZGyiu6UQWsjDnSkLE9MulKRZ6gw93dWxoSa8ia1CCOQx0NKlmxB2o49wC31Um8UQ+0UsLIYx34xx/TYcEI1gHV1pCUM/kAWZegGTkORwlbLRp9VPpY/v30eqXut/f/AAZvwwNNCAAA"
+    }
+  ]
+}

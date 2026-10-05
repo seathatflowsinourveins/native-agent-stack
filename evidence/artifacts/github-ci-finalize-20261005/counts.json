@@ -1,0 +1,590 @@
+{
+  "rows": 8022,
+  "unique": 8022,
+  "partitions": [
+    [
+      "2026-09-28T00:00:00Z",
+      "2026-09-28T23:59:59Z",
+      782
+    ],
+    [
+      "2026-09-29T00:00:00Z",
+      "2026-09-29T23:59:59Z",
+      935
+    ],
+    [
+      "2026-09-30T00:00:00Z",
+      "2026-09-30T23:59:59Z",
+      948
+    ],
+    [
+      "2026-10-01T00:00:00Z",
+      "2026-10-01T11:59:59Z",
+      703
+    ],
+    [
+      "2026-10-01T12:00:00Z",
+      "2026-10-01T23:59:59Z",
+      398
+    ],
+    [
+      "2026-10-02T00:00:00Z",
+      "2026-10-02T23:59:59Z",
+      679
+    ],
+    [
+      "2026-10-03T00:00:00Z",
+      "2026-10-03T11:59:59Z",
+      761
+    ],
+    [
+      "2026-10-03T12:00:00Z",
+      "2026-10-03T23:59:59Z",
+      992
+    ],
+    [
+      "2026-10-04T00:00:00Z",
+      "2026-10-04T11:59:59Z",
+      653
+    ],
+    [
+      "2026-10-04T12:00:00Z",
+      "2026-10-04T23:59:59Z",
+      764
+    ],
+    [
+      "2026-10-05T00:00:00Z",
+      "2026-10-05T03:59:59Z",
+      407
+    ]
+  ],
+  "main": 1430,
+  "events": {
+    "dynamic": 1306,
+    "pull_request": 5519,
+    "push": 1174,
+    "schedule": 10,
+    "workflow_dispatch": 13
+  },
+  "workflow_counts": [
+    {
+      "id": 364069539,
+      "name": "Adoption bootstrap smoke",
+      "all": {
+        "cancelled": 371,
+        "success": 787,
+        "failure": 79,
+        "action_required": 1,
+        "unfinished:in_progress": 4
+      },
+      "main": {
+        "success": 218,
+        "failure": 9
+      },
+      "path": ".github/workflows/adoption-bootstrap.yml"
+    },
+    {
+      "id": 364342256,
+      "name": "Catalog freshness (report-only)",
+      "all": {
+        "success": 6
+      },
+      "main": {
+        "success": 6
+      },
+      "path": ".github/workflows/catalog-freshness.yml"
+    },
+    {
+      "id": 364839026,
+      "name": "Dependency and workflow security scan",
+      "all": {
+        "success": 1102,
+        "failure": 98,
+        "action_required": 1,
+        "cancelled": 44
+      },
+      "main": {
+        "success": 228,
+        "failure": 5
+      },
+      "path": ".github/workflows/security-scan.yml"
+    },
+    {
+      "id": 364681055,
+      "name": "Dependency review",
+      "all": {
+        "success": 963,
+        "action_required": 1,
+        "cancelled": 45,
+        "failure": 3
+      },
+      "main": {},
+      "path": ".github/workflows/dependency-review.yml"
+    },
+    {
+      "id": 362916157,
+      "name": "Dependabot Updates",
+      "all": {
+        "success": 3
+      },
+      "main": {
+        "success": 3
+      },
+      "first_run_name": "github_actions in /. - Update #1594894581",
+      "path": "dynamic/dependabot/dependabot-updates"
+    },
+    {
+      "id": 364682882,
+      "name": "Dependency Graph",
+      "all": {
+        "success": 4
+      },
+      "main": {
+        "success": 4
+      },
+      "first_run_name": "Graph Update: pip in /blueprints/us-equities/workers #1602452669",
+      "path": "dynamic/dependabot/update-graph"
+    },
+    {
+      "id": 364745176,
+      "name": "Hardware profile smoke",
+      "all": {
+        "success": 3
+      },
+      "main": {},
+      "path": ".github/workflows/hardware-profile-smoke.yml"
+    },
+    {
+      "id": 362833350,
+      "name": "Native foundation offline engine E2E",
+      "all": {
+        "success": 21
+      },
+      "main": {
+        "success": 3
+      },
+      "path": ".github/workflows/native-foundation-e2e.yml"
+    },
+    {
+      "id": 362802882,
+      "name": "Native token tools E2E",
+      "all": {
+        "success": 96,
+        "cancelled": 5,
+        "failure": 7
+      },
+      "main": {
+        "success": 14,
+        "failure": 1
+      },
+      "path": ".github/workflows/native-token-e2e.yml"
+    },
+    {
+      "id": 364691671,
+      "name": "OpenSSF Scorecard (report-only)",
+      "all": {
+        "success": 229,
+        "cancelled": 4
+      },
+      "main": {
+        "success": 229,
+        "cancelled": 4
+      },
+      "path": ".github/workflows/scorecard.yml"
+    },
+    {
+      "id": 364790388,
+      "name": "CodeQL",
+      "all": {
+        "success": 1299
+      },
+      "main": {
+        "success": 233
+      },
+      "first_run_name": "PR #471",
+      "path": "dynamic/github-code-scanning/codeql"
+    },
+    {
+      "id": 375039533,
+      "name": "PR metadata gates",
+      "all": {
+        "success": 2
+      },
+      "main": {},
+      "path": ".github/workflows/pr-metadata.yml"
+    },
+    {
+      "id": 368994564,
+      "name": "Practice references freshness (report-only)",
+      "all": {
+        "success": 2
+      },
+      "main": {
+        "success": 2
+      },
+      "path": ".github/workflows/practice-references-freshness.yml"
+    },
+    {
+      "id": 362925478,
+      "name": "Qualify selected Action toolchains",
+      "all": {
+        "success": 4
+      },
+      "main": {
+        "success": 1
+      },
+      "path": ".github/workflows/action-compatibility.yml"
+    },
+    {
+      "id": 365390579,
+      "name": "Receipt staleness report",
+      "all": {
+        "success": 5
+      },
+      "main": {
+        "success": 2
+      },
+      "path": ".github/workflows/receipt-staleness.yml"
+    },
+    {
+      "id": 369468986,
+      "name": "Runtime-worker skills freshness (report-only)",
+      "all": {
+        "success": 1
+      },
+      "main": {
+        "success": 1
+      },
+      "path": ".github/workflows/runtime-worker-skills-freshness.yml"
+    },
+    {
+      "id": 365859342,
+      "name": "Saturation tracking",
+      "all": {
+        "success": 1
+      },
+      "main": {
+        "success": 1
+      },
+      "path": ".github/workflows/saturation-tracking.yml"
+    },
+    {
+      "id": 373779510,
+      "name": "Suite parallelism trial (draft pull request only)",
+      "all": {
+        "cancelled": 1
+      },
+      "main": {},
+      "path": ".github/workflows/macos-suite-parallel-trial.yml"
+    },
+    {
+      "id": 364069538,
+      "name": "Supply-chain SBOM and vulnerability scan",
+      "all": {
+        "success": 11
+      },
+      "main": {
+        "success": 2
+      },
+      "path": ".github/workflows/supply-chain.yml"
+    },
+    {
+      "id": 362484419,
+      "name": "Validate portable token report",
+      "all": {
+        "success": 1200,
+        "action_required": 1,
+        "cancelled": 43
+      },
+      "main": {
+        "success": 232
+      },
+      "path": ".github/workflows/token-report.yml"
+    },
+    {
+      "id": 361874833,
+      "name": "Validate published evidence",
+      "all": {
+        "success": 951,
+        "cancelled": 517,
+        "failure": 104,
+        "action_required": 1,
+        "unfinished:in_progress": 2
+      },
+      "main": {
+        "success": 225,
+        "failure": 6,
+        "cancelled": 1
+      },
+      "path": ".github/workflows/validate.yml"
+    }
+  ],
+  "main_unhealthy": [
+    [
+      36647290868,
+      364839026,
+      "Dependency and workflow security scan",
+      "push",
+      "failure",
+      "e45328d3951417c5ae69676f2ac2cc8896948f81",
+      1
+    ],
+    [
+      36646406088,
+      364839026,
+      "Dependency and workflow security scan",
+      "push",
+      "failure",
+      "a02ff13f79422744ee7aca6519b4495edb01c80f",
+      1
+    ],
+    [
+      36645830933,
+      364839026,
+      "Dependency and workflow security scan",
+      "push",
+      "failure",
+      "5cf0354d6cb3dc5c02da55113d8440561c7093b9",
+      1
+    ],
+    [
+      36523555202,
+      361874833,
+      "Validate published evidence",
+      "push",
+      "failure",
+      "0617f516d39f1b87335a956be9ea2bc0fdec3f1a",
+      1
+    ],
+    [
+      36784221993,
+      364839026,
+      "Dependency and workflow security scan",
+      "push",
+      "failure",
+      "29458b4342422c979ad3b9bc62532ea6f05073c1",
+      1
+    ],
+    [
+      36783972732,
+      364839026,
+      "Dependency and workflow security scan",
+      "push",
+      "failure",
+      "af23619ff733b48207ce43b9a5c90382e3c9cde1",
+      1
+    ],
+    [
+      36825377925,
+      364069539,
+      "Adoption bootstrap smoke",
+      "push",
+      "failure",
+      "5597f9fae2c6148037a74b4e73d2c55fc11c9ff6",
+      1
+    ],
+    [
+      36802271844,
+      361874833,
+      "Validate published evidence",
+      "push",
+      "cancelled",
+      "dca821cca85dce3647fa7b488d5a23fbe5b85d4a",
+      1
+    ],
+    [
+      36867111096,
+      364069539,
+      "Adoption bootstrap smoke",
+      "push",
+      "failure",
+      "b8dd81ddc04e723da3f9fb9d97d850d11820e491",
+      1
+    ],
+    [
+      37067723514,
+      361874833,
+      "Validate published evidence",
+      "push",
+      "failure",
+      "0eb47187925bf8134660b7a305aa32b0d44b9e17",
+      1
+    ],
+    [
+      37067723566,
+      364069539,
+      "Adoption bootstrap smoke",
+      "push",
+      "failure",
+      "0eb47187925bf8134660b7a305aa32b0d44b9e17",
+      1
+    ],
+    [
+      37100416149,
+      364069539,
+      "Adoption bootstrap smoke",
+      "push",
+      "failure",
+      "dcae68bd08a191f37ba564eceda9fc4a9d6d4a6e",
+      1
+    ],
+    [
+      37157767436,
+      364069539,
+      "Adoption bootstrap smoke",
+      "push",
+      "failure",
+      "ed60d4384c8cc495007b888342cc523a9b62758f",
+      1
+    ],
+    [
+      37151325855,
+      364069539,
+      "Adoption bootstrap smoke",
+      "push",
+      "failure",
+      "6112d14d40f741855f0b961124d98939daaad00e",
+      1
+    ],
+    [
+      37149426843,
+      364691671,
+      "OpenSSF Scorecard (report-only)",
+      "push",
+      "cancelled",
+      "cb7dabd7d3f1485387af5b6b73f82e1f3f87e1f3",
+      1
+    ],
+    [
+      37149418947,
+      364691671,
+      "OpenSSF Scorecard (report-only)",
+      "push",
+      "cancelled",
+      "d0dae1c00fba8cf1f264af232bf2710307cba113",
+      1
+    ],
+    [
+      37149396638,
+      364691671,
+      "OpenSSF Scorecard (report-only)",
+      "push",
+      "cancelled",
+      "22265f200b5e77e5c7c46e9a25c39b99e8735a72",
+      1
+    ],
+    [
+      37147299685,
+      361874833,
+      "Validate published evidence",
+      "push",
+      "failure",
+      "1f5a791b02a230aced670c88bab3d3d0ebcf401a",
+      1
+    ],
+    [
+      37135948579,
+      364069539,
+      "Adoption bootstrap smoke",
+      "push",
+      "failure",
+      "ecea28654a835fff2cc3651bab77ca0e46b9bec5",
+      1
+    ],
+    [
+      37135948481,
+      361874833,
+      "Validate published evidence",
+      "push",
+      "failure",
+      "ecea28654a835fff2cc3651bab77ca0e46b9bec5",
+      1
+    ],
+    [
+      37174409325,
+      364069539,
+      "Adoption bootstrap smoke",
+      "push",
+      "failure",
+      "3a5886394307fe45d3fe5748ab126481ccddc666",
+      1
+    ],
+    [
+      37168905683,
+      361874833,
+      "Validate published evidence",
+      "push",
+      "failure",
+      "1924981035e2bc86aafc5055c14aa4f8b066a3e0",
+      1
+    ],
+    [
+      37238141977,
+      364069539,
+      "Adoption bootstrap smoke",
+      "push",
+      "failure",
+      "08335d89bc71e2af5e5166300319c1f9c8392c54",
+      1
+    ],
+    [
+      37229129131,
+      362802882,
+      "Native token tools E2E",
+      "push",
+      "failure",
+      "14048b840425c2569e0df60a6596e94e601da15b",
+      1
+    ],
+    [
+      37249462697,
+      361874833,
+      "Validate published evidence",
+      "push",
+      "failure",
+      "3e343ba6c7fc391a54f8780c87df65231f24c276",
+      1
+    ],
+    [
+      37247963368,
+      364691671,
+      "OpenSSF Scorecard (report-only)",
+      "push",
+      "cancelled",
+      "dd6972824bca625394ba01ef421023f935ed222c",
+      1
+    ]
+  ],
+  "no_runs_in_window": [
+    {
+      "id": 362914368,
+      "name": "Native synthetic off-host application-state recovery",
+      "path": ".github/workflows/native-offhost-app-state.yml",
+      "state": "active"
+    },
+    {
+      "id": 362878204,
+      "name": "Native synthetic independent-host restore",
+      "path": ".github/workflows/native-offhost-restore.yml",
+      "state": "active"
+    },
+    {
+      "id": 362887350,
+      "name": "Native owned guest service reboot",
+      "path": ".github/workflows/native-service-reboot.yml",
+      "state": "active"
+    },
+    {
+      "id": 362916104,
+      "name": "Publish attested catalog archive",
+      "path": ".github/workflows/publish-catalog.yml",
+      "state": "active"
+    },
+    {
+      "id": 371619777,
+      "name": "SOTA sources gate",
+      "path": ".github/workflows/sota-sources-gate.yml",
+      "state": "active"
+    }
+  ]
+}

@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "id": "github-ci-finalize-20261005",
+  "kind": "artifact_measurement",
+  "evidence_class": "independent observation: read-only native GitHub platform records; source_review for diagnosis and maintained-command selection; structural validation for hashes and recounts",
+  "kind_basis": "Follows the existing github-ci-measurements-20261003 artifact_measurement receipt, with retained projected returned stdout instead of summary-only counts.",
+  "claim": "A resumable CI state observation at base/main 4c897418: 8022 distinct workflow runs in 11 bounded partitions, 1430 main-cohort runs, 21 historical main failures, five main cancellations, seven effective required contexts, and explicit open ownership.",
+  "scope": "Public repository GitHub CI measurement and handoff only; no settings mutation, workflow rerun, merge, installation or new test runner.",
+  "observed_date_utc": "2026-10-05",
+  "repository": "seathatflowsinourveins/native-agent-stack",
+  "base_commit": "4c897418fe35a030a1188ae447eaf31c893f8eff",
+  "api": {
+    "client": "gh 2.102.0",
+    "method": "GET",
+    "version": "2022-11-28 documented default; no version header passed",
+    "page_size": 50,
+    "partition_limit_exclusive": 1000
+  },
+  "required_contexts": [
+    "validate",
+    "token-report",
+    "secret-scan",
+    "dependency-review",
+    "osv-scanner",
+    "verdict-review-gate",
+    "sota-sources"
+  ],
+  "required_integration_id": 15368,
+  "strict_required_status_checks_policy": false,
+  "data": {
+    "counts": "evidence/artifacts/github-ci-finalize-20261005/counts.json",
+    "durations": "evidence/artifacts/github-ci-finalize-20261005/durations.json",
+    "current_state": "evidence/artifacts/github-ci-finalize-20261005/current-state.json",
+    "main_jobs": "evidence/artifacts/github-ci-finalize-20261005/main-jobs.json",
+    "pr_checks": "evidence/artifacts/github-ci-finalize-20261005/pr-checks.json",
+    "recovered_reads": "evidence/artifacts/github-ci-finalize-20261005/pr-checks-recovered.json",
+    "ownership": "evidence/artifacts/github-ci-finalize-20261005/pr-ownership.json",
+    "ownership_followup": "evidence/artifacts/github-ci-finalize-20261005/ownership-followup.json",
+    "logs": "evidence/artifacts/github-ci-finalize-20261005/failure-log-excerpts.json",
+    "macos_traces": "evidence/artifacts/github-ci-finalize-20261005/macos-artifact-excerpts.json"
+  },
+  "registration": "Registered as hashed files[] evidence, matching the prior CI measurement convention; not bound to a component adoption or convergence experiment.",
+  "decision_record": "docs/decisions/2026-10-05-github-ci-final-state.md",
+  "sources": [
+    {
+      "url": "https://github.com/cli/cli/releases/tag/v2.102.0",
+      "pin": "cli/cli@fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+      "purpose": "Installed gh release verified through native --version and release GET."
+    },
+    {
+      "url": "https://github.com/cli/cli/blob/v2.102.0/pkg/cmd/api/api.go#L103",
+      "purpose": "Explicit GET and supported field/projection/pagination flags; lines 260–267 reject --slurp with --jq."
+    },
+    {
+      "url": "https://github.com/cli/cli/blob/v2.102.0/pkg/cmd/run/shared/shared.go#L114",
+      "purpose": "Completed-run elapsed timestamp interval definition."
+    },
+    {
+      "url": "https://docs.github.com/en/rest/actions/workflow-runs?apiVersion=2022-11-28#list-workflow-runs-for-a-repository",
+      "purpose": "Created partitions below filtered 1000-result cap; per-page totals counted once."
+    },
+    {
+      "url": "https://docs.github.com/en/rest/repos/rules?apiVersion=2022-11-28#get-rules-for-a-branch",
+      "purpose": "Effective active required rules including inherited rules."
+    },
+    {
+      "url": "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/troubleshooting-required-status-checks",
+      "purpose": "Required context freshness, missing versus skipped checks, and PR head/test-merge distinction."
+    },
+    {
+      "url": "https://docs.github.com/en/actions/how-tos/write-workflows/choose-when-workflows-run/control-workflow-concurrency",
+      "purpose": "Default pending replacement distinguished from executing-job cancellation."
+    },
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/4c897418fe35a030a1188ae447eaf31c893f8eff/evidence/receipts/github-ci-measurements-20261003.json",
+      "purpose": "Repository artifact_measurement receipt convention and prior durability limitations."
+    },
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/4c897418fe35a030a1188ae447eaf31c893f8eff/scripts/host_receipts.py#L710",
+      "purpose": "Sorted path/hash/byte evidence registration convention."
+    }
+  ],
+  "limitations": [
+    "Pre-publication native GETs record #714 merged at 04:32:03Z and main at f946c6d4ca988a17b6fa4392ecb488909f147883: 16 successful, two skipped and five in-progress checks. Earlier passing main observations apply to 4c897418fe35a030a1188ae447eaf31c893f8eff. Follow-up reads do not alter the census creation window.",
+    "Decoded publication review uses scripts/validate.py PRIVATE_CONTENT patterns. UUID matches are public Socket SBOM details_url identifiers and StepSecurity job-correlation IDs from public check/log records, not host session identifiers; no other decoded private-content patterns matched.",
+    "Creation window is 2026-09-28T00:00:00Z through 2026-10-05T03:59:59Z inclusive (seven days plus four hours); conclusions were read over 04:09–04:26Z, not at one atomic instant.",
+    "Run-level latest outcomes only: 28 runs have run_attempt > 1; earlier attempts were not reconstructed. No flake rate or first-attempt success rate is inferred.",
+    "main cohort means head_branch == main; it includes dynamic/scheduled runs. All 21 failed and 5 cancelled main-cohort runs are push events. PR and other event cohorts remain distinct.",
+    "Elapsed workflow timestamps include scheduling/dependency intervals and are not billable or CPU minutes. Successful, failed and cancelled duration populations are separate; unfinished runs are excluded.",
+    "Projected native stdout is retained gzip-base64 with decoded stdout hashes, exact argument vectors, times and exits. Actors, authors/messages and associated PR metadata are omitted. Installed executable path is redacted as <installed-gh-2.102.0> after a transient PATH lookup failure.",
+    "Full logs and archives are withheld; numbered sanitized trace excerpts and original-byte hashes are retained. Excerpts are selective and can be truncated; they cannot reconstruct the entire raw log or archive.",
+    "Current PR check snapshots are observations of the captured head SHAs, not atomic repository readiness or merge authorization; duplicate contexts are retained. Failed read recoveries occurred later.",
+    "Latest main workflow success does not prove that all PR-only required checks passed on main or that unresolved intermittent failures are repaired.",
+    "MacOS advisory reconciliation (#711), strict up-to-date proposal (#708), PR metadata split (#706), and dependency bump (#690) remain owned open work. No branch protection/settings, workflows or owner paths changed in this lane.",
+    "Collection and review provider usage is unknown; no model execution, upstream test acceptance, efficiency gain, or live provider/GPU qualification is claimed."
+  ],
+  "collection_corrections": [
+    {
+      "condition": "Final critic found a literal per-workflow table placeholder and nonterminal #535 pagination",
+      "result": "Aggregate counts remained correct; the written table and ownership-file completeness were incomplete.",
+      "recovery": "Insert the verified counts table; native GET page 5 returns 34 files, completing #535 at 434 files. All 337 payloads decode and match hashes after pagination, then 340 after the three pre-publication state reads. REST pull-request files documentation defines pagination and its 3000-file cap."
+    },
+    {
+      "condition": "Independent recount assumed runs and branch keys rather than the original projection",
+      "result": "Read-only analysis raised KeyError before reporting results; stored data unchanged.",
+      "recovery": "Decode the first retained native page: workflow_runs and head_branch are the exact fields. Repeat the integrity analysis using those verified keys."
+    },
+    {
+      "condition": "--paginate --slurp --jq combination",
+      "result": "gh exit 1: --slurp is not supported with --jq or --template",
+      "verification": "cli/cli@v2.102.0 pkg/cmd/api/api.go:260–267",
+      "recovery": "Use independently captured projected pages; unsuccessful attempt excluded.",
+      "time": "Not retained before durable collector; no fabricated timing/usage."
+    },
+    {
+      "condition": "Large initial capture was indexed instead of transferred",
+      "result": "Not accepted as retained measurement input.",
+      "recovery": "Native projected page captures transferred as gzip-base64; all accepted pages retained."
+    },
+    {
+      "condition": "Transient gh lookup failed during Oct4 and five PR reads",
+      "result": "rtk exit 1: gh no such file or directory. Failed PR captures retained; partial Oct4 acquisition discarded.",
+      "recovery": "Oct4 recaptured after successful native version recheck; five PR calls replaced once using verified installed executable.",
+      "uncertainty": "Underlying PATH/transient condition not proved."
+    },
+    {
+      "condition": "Empty stdout of failed read decoded as JSON",
+      "result": "Analysis SyntaxError; no CI conclusion inferred.",
+      "recovery": "Check native exit code and parseability before reading failed-call output."
+    },
+    {
+      "condition": "Artifact template replaced BEGIN/END marker names",
+      "result": "Transfer parser failure after first successful artifact GET.",
+      "recovery": "Corrected marker interpolation; final four archive reads retained. No workflow rerun."
+    },
+    {
+      "condition": "Integrity analysis mixed aggregate partitions with page-capture objects",
+      "result": "Analysis TypeError; no stored data changed.",
+      "recovery": "Discriminate captures by pages schema; all 336 retained outputs decode and match hashes."
+    },
+    {
+      "condition": "Worker reported only one #690 hash mismatch and an earlier green #706 state",
+      "result": "Parent native logs show scorecard.yml and security-scan.yml mismatches; later #706 validate is in progress.",
+      "recovery": "Use parent retained source reads and time-bounded states; no worker claim treated as authority."
+    },
+    {
+      "condition": "Completeness critic found five action_required completed runs omitted from duration coverage",
+      "result": "Initial 53 groups covered 8011 records; five zero-second intervals omitted.",
+      "recovery": "All completed conclusion groups retained: 58 groups / 8016 records. Existing duration statistics unchanged. Native source cli/cli@v2.102.0 shared.go:121–130 supports zero intervals."
+    }
+  ]
+}

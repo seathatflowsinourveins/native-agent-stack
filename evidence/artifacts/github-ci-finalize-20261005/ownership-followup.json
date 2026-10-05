@@ -1,0 +1,228 @@
+{
+  "schema_version": 1,
+  "scope": "Remainder pages for selected large PR file lists; historical fix PR state verified from GitHub.",
+  "captures": [
+    {
+      "pr": 535,
+      "page": 5,
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/pulls/535/files?per_page=100&page=5",
+        "--jq",
+        "[.[]|{filename,status}] | tojson"
+      ],
+      "started_utc": "2026-10-05T04:35:37.824Z",
+      "ended_utc": "2026-10-05T04:35:38.268Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "da43aa2be4f9d42703801a9dc53ed4ffc248362d6046785b3c528b0641c8e776",
+      "stdout_bytes": 3133,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA72WwW7bMAyG73sMn6vIbbcB7W3Aetxl12EwaIl2uMiiJ9JOi2HvPiiZky7FtjSNe/FF0P+RPymaX34UDQWM0GFxW9RhwD5RVLFpiEodmjWnFSaxsqIQxCYUhOSWi84XF4Uo6CDFbdGxp4bQFz8v/hB0oBC4FdvwED0ocbQdRGpQdPFNOB4j4tmJ9ehIiKPYq/LqvSlvzHVppiAdxxFTi9GhaTgEXg/9QYTg/SnK2/SNY06e4iaBswp/HyBQQ+5oZRzJ5zwtJKUGnIplGY047ve5mwwsb65LG0gxhG6DawKvTUK3RLd6Yv45YBHENDWY6Zqh6PF+d77Qe50L2Q0KUeVVWEMkVRR9FdgIgTwozgxTGtFIH0gPqrcQ9Tzo7NSEI+F6prZ8xJmKl/PClGbPa6rfjD4mdEj903l6Dm3hITnMU4Ojo0DbOTUHaTehaoqeYmuyaPRDdzJtGrWJRTHtSZ/vPnz8dGc8YsrAE6fuv9XPLOoSrMNbILPtrbNbMnkxl37b5xe+XR0wzUUJ7FZGHEQD0ZsYdLXttheDhINJPGhuy0y7LMsr60GWNUPyxpFJ2AOleUDPet/TdiV2why9Z3EtmEaoKZA+2DZlE3dJ2nz9eC3dhJC/FfcYlxC9VJfvykX/8N8UHt+VscpVzaeV4xETtHigcUQIv+2ttktXNb2mZwZzoLKbHy9SaXut9i/jZVo7p491iDmIFVZ4vEHbOlD01WZNzH+sv2l9ffMLzaSNzD0MAAA=",
+      "derived": {
+        "returned_count": 34
+      }
+    },
+    {
+      "pr": 633,
+      "page": 2,
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/pulls/633/files?per_page=100&page=2",
+        "--jq",
+        "[.[]|{filename,status}] | tojson"
+      ],
+      "started_utc": "2026-10-05T04:25:03.989Z",
+      "ended_utc": "2026-10-05T04:25:04.379Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "32c80bd6714e823b667398eabad211816419cce47a32e77aa1afe6954b6fcfef",
+      "stdout_bytes": 806,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA8WSPU4DQQxGe44xdcwuQaLIVRCFM+MBL7P2yvYEIcTd0SokQqKhIND6R+/5k+/fUuVGgjOlXaIDF5JMA1pwxRw+WJfgmWDSvYNrt0zAEvhMsB23dzfjeDuYapx6Rligamv60pfryVXSJnlgdE+7hKVQSe+bX6F+nVmxLOQOWSVMm/+LxCN72CssphPlYBWoyK0bXVTC8xOV3shAMPhA5wwuSz2Wz3l7xvXc5gSLOn+KmB2D+AuV9Ql+xplRuJKHDyfit71ZC1deVx+uPgAYLnHOJgMAAA==",
+      "derived": null
+    },
+    {
+      "pr": 535,
+      "page": 2,
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/pulls/535/files?per_page=100&page=2",
+        "--jq",
+        "[.[]|{filename,status}] | tojson"
+      ],
+      "started_utc": "2026-10-05T04:25:04.694Z",
+      "ended_utc": "2026-10-05T04:25:05.223Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "a7380ceefc99e64b27dcc70d1af76f93c6d2e21b7c20aec2764dd6745561f71a",
+      "stdout_bytes": 11581,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA81aTY8bNwy992f4HNkLBwjQ3Ao0x156LYoFLXE8jDWSQlH+QND/Xmh2xhtv7GwbazR78sd4Ht+QFPlE+a+vi4YsOuhw8XGxsQkDk5O44uSEOlQHzzvkuDKI3Fh/GC+sGA1FFQVYlrFdvFtEAUlx8XEBxqBZ/PPup6GjGPKlQcV7q4K3pE/Lz9G7ouBPFx4H+HC6B3wbRDFGBNYt8urPT7/9/senZWcKYm4SWaMYvyRi7NBJXNJdDnkd33q9K2hBW3rk5BxyWW9r7xraLgW7YEHw7kx5AW8oBhDdliV9Rr1vybxAxTWudIt6V5Zsht0ymNKRy7i+aSw5VIxmKUeZCH2PTA1pEPKudIJkO4waKUh597BPzqwn8s4APrlzkivvGIG4K052TwadxpWzslOMoFvYkCW5v/28sLQFwQMUbjutjzJZGSQXBawtW68G0MeYQvBcePl0OpQSD98jPwb2x8LxC+Riaao9zQllwxX8wrJhOu7Tsn56W1YE9gX7/aQFm5NTuMay6zyDphCFETolGCXeie8Duhacide1ducNNfSTiE96Mmd2vvP+FfmMfENK3sU290KHEthvsCju2Aupgy0qYcov64f1h4df3z8UdMrZkCVBazvFmNfi2ZTaQMRexPm4VzoxoxM1iP4oBpnvlUblyPgkc5HBLsjpbfjlJZXKXul3si3EVp1FS213aHCGDMjbSNrX2NSNzyWbedP2x1xq+yVIYjSKXEhSsu+8btp3Xf5lTZt4BC1qBABnVPSJNap8n5AQxvr58B9J1U2MxusU0ahtAjajfKrtmYYxtmqPbl/f9vj9uclEQ1GU8QdnPZj6ERm/fy4fb4/RoUW0MzLqgJwAOTTq80GUBmuRo4JGkPskVnm8P8Nyuk5sBh4orTdj2V+GU33bY3YMVW4WDhd7w8R2KHBzUOn31ae6ph0I7fGbdat9F8hi/Sr7HRPnBy2kGGdn5Z2wt7N7J1BQ/QnL1UI2L6XZGDBqCqj6a3MH6GLMNFdkPCRpLW0UWIL4hnrfdWL1eYRT74UvCex5kjlXsMZb550YRA35aDz3oJjHutVDEs1ONXTMWmSGIAzbrD3Y3HtyNmyw8YyKnMFjfW8kp1twWzTXtEltNlNsy7MK7vu602SfB7sKtCSwl9lQ/kFvWb8yu6tnfMopyA9sBphK/d826qJw3gbVjK3BgC7/5DQ8NcUCx1f/g8DTCAOPwqD7EsMY2JvUf6joiG9GKfWMDssJeZRpLqYu9/56FG5svOsROO8leomqWrRhNuv1DVOX/2Mxg7+fNyjVTaf9WVDVs31DZFckkE95aDzIqFhhLw3XfeCLw5sbz/z3L/8CGuJ67D0tAAA=",
+      "derived": null
+    },
+    {
+      "pr": 535,
+      "page": 3,
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/pulls/535/files?per_page=100&page=3",
+        "--jq",
+        "[.[]|{filename,status}] | tojson"
+      ],
+      "started_utc": "2026-10-05T04:25:05.525Z",
+      "ended_utc": "2026-10-05T04:25:05.997Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "d81e96e012f89e24a4a456fabb14fca2deaed8f695d2e2efa565fd354e39cbc6",
+      "stdout_bytes": 12487,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA8Way3bjNgyG930MrwfOxZ5cZjerdt9lTxc0CVlIaFIBIVmenr57DyXf0tg5MwtCu0SW9f2CQdzIv/6ZVeQxmA3Ovs1WvsWGKUi64TYIbRC2kV+R001sMNQmuHSDHTkMFm82hgIw2hgseYT72/uH2+fFLcTUAW4a2YGNoaL1XHqZfZklMdKm2beZcQ7d7N8vhdAdcqIYFKlNu/KUanRgWKgyViDFli1C/qKQ7CYVk+YvKQYlPONbS4wbDJLmpPkrMHaEW3Qw3LDycaUJ33+1NqkGCkmM94r4hB6toAOHDYZ8b158m8YwJdWlIGa9RnewADTRk1X0/hKe3lBIcDdfPs8fijx+97IVYPTRvp7saKy0xkNyr1BRLy1jKmDFy+yVSegp4BBNbcuMQQ6hXM0An4mYxBDvMto0ZiicVK8ocHcZKRw9tE0SRrMBwSQgMXpFr2zJu9Lx9TLamuDIGUEIRqhDaHaDAWr0zQQiplyWn6qYxhTTLMxPNOibYcp1aYd/bSuxqsDWaF/10HGzyfcp/uoxJGGTH6L2lpdLOrVXxj73M9Z4jwwmOBhvy2Cy4NCLUTPFqGW4pguuGFMNHYZOERl/YAAKTVumg7uM3edWdEPib4OtTcgVPeOaMeXG+lANqFniJOks4l0QprckT4oOj9gPHYBCh0Eil+h5LmvJnZAYCuggfzwuVD1T7Cui8yoxRynyqC2BNk1kxbh8qAWpGdMemEqQp0jB/1eiDmZKkpsUxoaja62Umb99LmI3uv8hQkzkhRJ7cEwdsm66OMNzG3RbkzN2ueHrZXQ0rdSeVmA8maQe/XLtn6wJARlsbPSiftlB9xXmNicZR+p1/gjODx2n29bkADMYXk3DMcYNJfBxxv5+zk+KU7rx6miU4c/7+d3Xeb6+gBAHobv5ttYr064Imovh+fqHsoxDSMrJWLktH682u4aUkYweTdLLePtG0FESwF7YWNFmj6vPxW3w0bhp6NO8upg1xNULKoIZm5goNzfQGZ+rrByFV1hFRqAguGajWvmV32u8wtXZ7LsMz1tCU/n9GVvb68/QQ5ehL+BDplebyezR42bqUIAMg0ChFfkyhwsu68gFfqwqsmS8erbJ8JxUh956bxI1+GncdBq1505rgtnTUYCl0SaMQxxMJIrV51HF8eTBUPjliKipQr0JKrHo22bNxiHcfb09HSDaW7IwbtxULe1CH4iFGSX3hc45ZzUPVMSpRDK6xkv57EtpQ54DcytV2jkOk9xpsM1C5Vc8Dk3jEDI1kKqsswmNBu/d3ndpT9nWiL7Y9OsjqdyexgVWsUamZe9ptZjokNtVuuso5Wb29z/+/A5Pz09P8Gy3C+j7x8fJZKzrpYWHql/CW/1QYmb1czK6/u0RHpZ9D91yvVWU8f7YHxU81vOLCiYyQenDTb8uQtEQP3vi7+/f/gMxrNYOxzAAAA==",
+      "derived": null
+    },
+    {
+      "pr": 535,
+      "page": 4,
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/pulls/535/files?per_page=100&page=4",
+        "--jq",
+        "[.[]|{filename,status}] | tojson"
+      ],
+      "started_utc": "2026-10-05T04:25:06.279Z",
+      "ended_utc": "2026-10-05T04:25:06.778Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "ccbf6769b873f6296da002be037528e0d684849272e5025d7cbcc255404a194c",
+      "stdout_bytes": 11964,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA81aTXPbRgy992fonJU/1DhNbp1pjrn02ulkoF1QhLXc3QBLynKn/72zJCW7/kg8MQX6Zu9QeI8QgAdg9dc/i4o8Bmhw8Wmx9i0mppDljNuQqUGzi7xFlrOYMNQQnJxhRw6DxbOWvaf1yjD6aLfm8vzy6vzj6txYCI4cZDRROmPJ2Bgq2iyvJYbFu4VkyK0sPi3AOXSLf98pUsg3eR4GLTOGPNIwjGIhzOiQJ+nM5RxsUt7PHiT/Y6Hoitg05UnVF49BMkMxo/imDhOG8kjxcpOASaJqDuAN2GwseI9sJLZs0TB2hDtFLwwk+jOHPoMidEUBvIm7gM4U4ya1a08WMsVgSgUwUGVk0ybJjNAUrk3yxUkObHnqLZHV5MIotekwdKqg8RaDoZDarFodNpQ9wlbKH6ZGnxRf+ojdIYtuwNVRcok1IN8ymtXVh9WHi9Xq6uOFIgkKkkt9cgcHGAodhhx5r8iiAQqGMQGxSfz+1ytl7AxU0v56d6jWmjIVIFOH95qDIlbkcQYKMWSOfj4C1KTIqj3CCJwoGVuj3c4AzSSZQhG9xNG12roXoc21p7UBTyAzxH/phV3cBR/BKcMyegTRDPSCOnaCykpXkPVFbuinHFWVen79uO90aD0wOpMg1zJL1/k2+s1jDRpDs0OmauSiSWNfFPjy4r1J+0TqwOA6ksh7E6uKLIGfkYFodv6M12hLLxoiN9Drf0NZlUCKQqXpNB340gWVJBiStOSmEQiU6VY7IL/H600MrU8TXGMVGQ2FjBt+Gz67P12LjUlTcxm/tcTYYFk/kaovxo/WIPVh1FKEH6u5bXOsKpOiJ6s51UmGDbq7EXvM517mZs2ah8QGDuj62OWsuft4TKWUYl13HCtZCVPUbP2PyOK2MzTjd/BDoswwhTykgDeZwWpq70MG/Rg6B4/xvO+FD/9cLn9bluZoZUIMaCDsl7tas4Q+z2qZgZeb2xm49BO78ZSRwRvZIWrOkYfzvo5LXfR8CJzyuUxZU2GOXHTHhXvn2hVrPM+wMXFdpGIecE3U7rCP1N6YtHMsiNoZtjSnaHh2NaJXvXx+DvGUV89PY572HuFpzOMadwQ2FbGcojq8DH6ZTqEDL8RWA5ZuGGr0wrlADuO9Hubp5+encYe+QrFWZBS9KjHha5Wb5GXa3zfWREcV/aS9cVPR3weWm1FeSj218SlNNjZ93bTAbkonJAqPQ+9VFhktUpr0m2K0lHBai/eSvQTshJYFgW29bNx0Nttg8BKnDCZB7pC/ZoYg/TZoQucOJ6+3KFvyXs7+/Pz7H18+v96fo7n+V0cBRe4q4kRS8yzAVJYbCFShPF7d/bw3Esfy/OvlZ7THOPyq6+H9vyOxsUPem4Cb/ui1CvRSwFPh9DI6Tf/5XYgTGX/uC//7l/8AylQy+bwuAAA=",
+      "derived": null
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/pulls/525",
+        "--jq",
+        "{number,state,merged,merged_at,merge_commit_sha,head_sha:.head.sha,html_url} | tojson"
+      ],
+      "started_utc": "2026-10-05T04:25:07.108Z",
+      "ended_utc": "2026-10-05T04:25:07.718Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "8b8da9fca3948d24d1708571f11db65411d92e01cad7aab540bbc106e83891bb",
+      "stdout_bytes": 280,
+      "native_output_gzip_base64": "H4sIAAAAAAAAAzXOsXKFIBBA0T6fsbVGBAHhO1KlcRZc1AnoG1leikz+PU1eeYszc39gJ1yXuiN4mEjr2WoVR7euVgkxKROTlMqg03pKI7nZRQzQwc4lL+3O4GFnflQ/DNvBewvv8SpDJeQdOeXrux7n1e4nHWcdTuTjST1udHJfGePX8Gg5D1pq6KDQvdESr1IO/h9K1ppRBmNScBJtQIykxuQkueRCVMkmnYJwL72C57vRqxZk8CCFNL1wvRIfYvJCeDF/QgdnK4Fu8FrqDiojE3iI+aq0wu/bHxMtl5AYAQAA",
+      "derived": null
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/pulls/546",
+        "--jq",
+        "{number,state,merged,merged_at,merge_commit_sha,head_sha:.head.sha,html_url} | tojson"
+      ],
+      "started_utc": "2026-10-05T04:25:07.876Z",
+      "ended_utc": "2026-10-05T04:25:08.489Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "8c51a53628a1e6f2d6721d04d5bd7ff32362f53507844bca6f33587f4546ca5c",
+      "stdout_bytes": 280,
+      "native_output_gzip_base64": "H4sIAAAAAAAAAzXOMW7EIBBA0T7HmNoOYBsWOEeqNNYAw2IF2yszbIood0+TLX/xpP8DhTCtrSB4WFC66KLOinROQWut0xKdMsaYrCaS1sUsXYYBCu917VcFD4X50bwQ941LD+/x3EUj5IKc6/ndtuPs15O2o4kDeXvSiHc6eGyM8Us8eq1CLwYG2Om60xrPfd/4f8jmaI1SjjDmpAO5YFHNjhQlZW7J6ttipVPhpRN4vjq9akUGD5OczCjdOMsPZf3svHKfMMDR90AXeL2YARojE3iI9WyU4PftD44pfzEYAQAA",
+      "derived": null
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/pulls/562",
+        "--jq",
+        "{number,state,merged,merged_at,merge_commit_sha,head_sha:.head.sha,html_url} | tojson"
+      ],
+      "started_utc": "2026-10-05T04:25:08.641Z",
+      "ended_utc": "2026-10-05T04:25:09.214Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "0d2b68a8a5550a8d1f7357d3268e54ca72e102ff089f4105ad582017f6acf68f",
+      "stdout_bytes": 280,
+      "native_output_gzip_base64": "H4sIAAAAAAAAAzXOPW6EMBBA4T7HmBriP2zA50iVBo3tMUbBsMLDpohy9zTZ8hWf9H6gEKalFQQPWYc8GjPoOKVk0Bqj7BhG5UymaDBKPQ8zqQk6KFz35b528FCYH80LsW5c7vAezyoaIRfkvJ/fbTvO+3rSdjRxIG9P6nGlg/vGGL/E4953YZ2GDipdKy3xrHXj/6FxiNEObnKzwoRyduOQjbYUgo4phZRpwOSm+NIJPF83vWpBBg9aatcr2Uv1IaXX2svpEzo47hroAm+d7qAxMoGHuJ+NEvy+/QGWjgBnGAEAAA==",
+      "derived": null
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/pulls/665",
+        "--jq",
+        "{number,state,merged,merged_at,merge_commit_sha,head_sha:.head.sha,html_url} | tojson"
+      ],
+      "started_utc": "2026-10-05T04:25:09.383Z",
+      "ended_utc": "2026-10-05T04:25:09.916Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "cff5af0c4182f6995d64fdd068ae036f3a09d8416b8a0cd04a562c772d3da4f5",
+      "stdout_bytes": 280,
+      "native_output_gzip_base64": "H4sIAAAAAAAAAzXOO27FIBBA0T7LmNoOmJ8N60iVxhpgbKz482SGlyLK3tPklbc40v2BQpjnWhACZOejR0xOZROzjD6SMtGPxia0fkrepiTHyUAHhY99bvcOAQrzowYh1o1Li+/pOkQl5IK87Nd33c6r3U/azipO5O1JPa50cl8Z05d4tH0Xzlno4KB7pTldx7Hx/xCNSfmRlLXJT1qP0Zpl0dkOZvBDtnlYUDttzUtnCHw3etWMDAGUVK4fZC/Nh9TBTEHJT+jgbEekG4JztoPKyAQB0n5VyvD79ge6dzmcGAEAAA==",
+      "derived": null
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/pulls/698",
+        "--jq",
+        "{number,state,merged,merged_at,merge_commit_sha,head_sha:.head.sha,html_url} | tojson"
+      ],
+      "started_utc": "2026-10-05T04:25:10.072Z",
+      "ended_utc": "2026-10-05T04:25:10.598Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "60f9d4e7bdfb650989d9b90bd2728d1307e2fe52069c80fcbcd1d96671f504c2",
+      "stdout_bytes": 280,
+      "native_output_gzip_base64": "H4sIAAAAAAAAAzXOMW6EMBBA0T7HmBriMWBj+xxbpUFjM15QMKzwsCmi3D0V5S+e9H9hYZqnuhAEMHm0mf3QJ69H73XW6KKJOXpkq2nWXRqRkKGBRco2XecGARaRVw1KPVdZrviZjqIqkywkeTt+6rof1/nmda9qJ1nf3NKTd2mrUPpWr2vblPUOGih8PnlKRymr3ENsjefoeqszpRwZB5twGEdKGl021s3z2Lvh1jMEOS++ayKBAB12ttXYonmgDtgHM3xBA/tVIp8QrHcNVCFhCJC2o/IMfx//xkxtmhgBAAA=",
+      "derived": null
+    }
+  ]
+}

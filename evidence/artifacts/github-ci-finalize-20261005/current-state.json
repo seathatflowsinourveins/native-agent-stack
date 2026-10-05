@@ -1,0 +1,255 @@
+{
+  "schema_version": 1,
+  "api_version": "2022-11-28 (GitHub documented default; no version header passed)",
+  "captures": [
+    {
+      "scope": "pre-publication follow-up",
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/branches/main",
+        "--jq",
+        "{name,protected,sha:.commit.sha}|tojson"
+      ],
+      "started_utc": "2026-10-05T04:37:49.397Z",
+      "ended_utc": "2026-10-05T04:37:49.770Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "3be1f5e5407b2d67b21b5268f593bcac5c2bb8fe43a7e6773a9c44f6a6a35f67",
+      "stdout_bytes": 82,
+      "native_output_gzip_base64": "H4sIAAAAAAAAAwXBOxKAIAwFwN5jvJpCJYMJtwkQRgs/g1g53t3dF4fuhohdtwMOVzu75W4FsbfHHO5VEVGFQg6FsgqzTksKVcnLbDkRs4xSJ1qYPb7hB9DtgjFSAAAA",
+      "derived": null
+    },
+    {
+      "scope": "pre-publication follow-up",
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/commits/f946c6d4ca988a17b6fa4392ecb488909f147883/check-runs?per_page=100",
+        "--jq",
+        "{total_count,check_runs:[.check_runs[]|{id,name,status,conclusion,started_at,completed_at,html_url,details_url,app_id:.app.id}]}|tojson"
+      ],
+      "started_utc": "2026-10-05T04:37:50.039Z",
+      "ended_utc": "2026-10-05T04:37:50.576Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "4a219ddf6cb8e92399a962eeb5db49e6b04fc7c1c99a440ba1440123274835d3",
+      "stdout_bytes": 9403,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA82azY7iOBSF9/MUJa9mJNLxf4h38wat7ln1aISM44IUwY5sB6aq1e8+AnoKTEBANUnYIQtx4H45596b8B2ouVaLiWuMB+Lv70DW9aQsgECM8PEIKLusKx10MZEBCIAh5gmCCWR/QSoIEXD8DWzeZVTV+NIaIIBvlNLegxEodJBl5SeNq4AA8xBqL9J0VoZ5M/2k7DL1Woa5DM+VXfvS2MatdGl8amQoVzqRM21C4oNUi1SqUFrj0833TEmGOckpYhSlL3aaIoQ44tmYEzgGIzAPy6pvzW3JDo5GwMilBgJYv0q8dOVz0tSVlQUYAR+kO1dRLEj2bfee0Hgg9gDAj9GNdLBgD0SHQ5qRnun8r3lAZ3v0TuetfFtadyMgdBUgTjJ8mRCCNxPyVi10+FToVVpIP59a6YrUulmqk4zo1XpN3lI/tctUcsw0LHAyVQQnVFOYyGeoknz6PEVjmDNJ6R2BbEHsqsxzPM5ZVPjd0Xvhv25/xNNXrRpXhlfx9NnZF63C0xddWxcuQtjlzj1cQgRkA7oEZ+zgiuXjjIyzrl1yRvMA1vboHdafRlavb/rpd9f48MdlNvm92DCB6EOxyVD/bLaaMZsMtdkoP5euvkwH3dE5+Pb06rJS7J5xdotmTIfRNp2ZvUwG4zt2/sfyDeX9k9lqxmQob5P5+WlXxNrdjEMFxA+FBw8Qa7gda/hErL3IlfTKlXVIwmutdy+vSDn4UVimqaoYze6kdyqI9T8I7DQjKoidGATq1zC35mbPlGZSOztzm+v8A6EGeds1i7KuddHHOgPjWvEc5Z2vM6c1D/lsjt75qLk0M+0vY+H36zTDQqFZXKAx6dw0ZzQjKGOyN423QSbeNk71SoYIlA+5/R9fujiDvdtlpxmRwRl8JzO1NvjgZJ1UpWn+7XACGKqptCsyQGjhdmjhg9DaU1hKZS9ZhAlKP95THoYDYv27YacZcUBs74aVrMpCBn0VBioguWdrJ2TArOIEHVWKdD4Qn9GM6ZD9QBzsQpvE9X13DAs65I7f6rUId++b05oxGXzgG+2KUoXE6VWp18lMBt0jICbooG3+uFiQ9w9opxkBgnwPyGvldEi8kqZX5wz79OVoteOQdf/05bRmDIbtn77IzTrpyyum4jvahQx5t7/VkyHtfl85rRlTodm5eSyZOr2+QIgI/OG9ZbCRrJUiuPvR+LRmjALnrZGs0/ssjwKA5f0D+Kl5CGBzdKp1JFMdgnaVloubA+tXh+NBI4vGgyrjsAdMJzUjTBzm8Z8slDRGu147PM4eCQzJO99azmhGYEiOjv9fYU1Vml+Ziv8ZgWCDrCbKNiYAgcmP3/4D8iQ1jrskAAA=",
+      "derived": null
+    },
+    {
+      "scope": "pre-publication follow-up",
+      "argv": [
+        "rtk",
+        "proxy",
+        "<installed-gh-2.102.0>",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/pulls/714",
+        "--jq",
+        "{number,state,merged,merged_at,merge_commit_sha,head_sha:.head.sha,base_sha:.base.sha,html_url}|tojson"
+      ],
+      "started_utc": "2026-10-05T04:37:50.771Z",
+      "ended_utc": "2026-10-05T04:37:51.337Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "860b93598e6085e4f6841255843808628edcb7ef3cc92b1d9fecabf8066028d0",
+      "stdout_bytes": 334,
+      "native_output_gzip_base64": "H4sIAAAAAAAAAzXOu26EMBBA0T6fMTUEPwY89nekSoPGZryg8Fhhsymi/HsUabe8xZHuD0QuMpaZIQAm8g41ZbE9K6tYayIWRCecrU7kbSbJGRqYhaenUnEyGa14SlMkcsaSQz+oIdroesJJmdzblP5V3dbxOlcIMNd6L6Hrbkudr/iejq0rwnXmmtfjuyz7cZ0PWfbS7VyXh7R8k722pXL66u7XunZOIzSwyXmTMR3bttTnUPY4pGHCxJ6ItYtDZrTeSIpI5JXPGh2RfekJQj0vedXIFQIYZYZWq1b1HwqDNUHZT2hgv7YoJwSnsYFSuQoESOtRZILftz9vklP2TgEAAA==",
+      "derived": null
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "gh",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/branches/main",
+        "--jq",
+        "{name,protected,sha:.commit.sha} | tojson"
+      ],
+      "started_utc": "2026-10-05T04:16:20.887Z",
+      "ended_utc": "2026-10-05T04:16:21.224Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "573fd6f1c0b0d96597a050d93a0bbce8fb2911bd68c5ffff24043e74d840441f",
+      "stdout_bytes": 82,
+      "native_output_gzip_base64": "H4sIAAAAAAAAAwXBMQ6AIAwF0N1j/JkBUgyF2zTYRgfQIE7Gu/veiy5NUdDk6HC4xjm1Tt1Q5njU4d4FBbFyTjGwKa3iyUsIzKIxJhWjUDmTsZrhW35ZVHtvUgAAAA==",
+      "derived": null
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "gh",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/rules/branches/main"
+      ],
+      "started_utc": "2026-10-05T04:16:21.380Z",
+      "ended_utc": "2026-10-05T04:16:21.742Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "31102a4da802e1320615f56a56cb762f0196667774b64c4d89a23560e84884e1",
+      "stdout_bytes": 1793,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA81UTW/bMAz9Lzzb2Ee2ZfN11122a1EQmsTYQhXRJSmnQdD/PsjxgrZpgZza3izzPb0HinxXB7D9SNCB0G2JQgHVnBVFP5C/UWhgdOK2ZCQK3QHUJHrD59E4cop+D93GJaUGAmNmQ8obFk/IGb2QMzoBXhDtrg7gORvdGXQwuRRDZTUQs1EvziJnjAG6T19X377fNw/RxjeUW6GRxS5jKHkha9W7fBkh0Eg5UPb7VmiKtLuMxjrNIpnkMsJEEqK3RaTtL+6BsrlWuYgnfZFxfd+AlERKhkcsLqPwh0bWaCx7eAqZ2+VscLZJvNOYuchEMeuH7CxO1LqesrVqzt88IFfVz6v16sd6/aVaXYQCJaquzmRe3UnmjBunhhuWnZPw9o5Oq5FiJic4RH1W9dWNjSWlef9J7SweTq7dOApPMfd4nF70XLJB97GBEHUbVevOJ1rKWsNhLDpAZ1IeJsOxPl9/dX36j54DIe8yyYJ4mimY6nPWKxcvLp3HzuLNBiFXT8qpzAP52AXSnYk73VOHBEt2ZhL/FqOAfnC5J/1PcynxjgJuSXrCLdnAofoHvS1OB3gHqzf3b06jmPuzZ3xURWNOx1CuX9DBTw70+xc0NTqLRNujSySmcyN14BSggyH2A3Id3H6YE+8ZDImwKLxdFl3/A4NnLK8BBwAA",
+      "derived": null
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "gh",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/branches/main/protection"
+      ],
+      "started_utc": "2026-10-05T04:16:21.949Z",
+      "ended_utc": "2026-10-05T04:16:22.283Z",
+      "exit_code": 1,
+      "stderr": "gh: Branch not protected (HTTP 404)\n",
+      "stdout_sha256": "d6020ee3b0852c3deb66c66d159cc80caabeaa66ee301778307a2a18d486450d",
+      "stdout_bytes": 149,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA2XMMQrDMBBE0auYSWtbKVypzEWCLC2SINYa7agKuXsguEv3+cV74xCzkAUejx5aLFNTTmdXSqQkzEgaxyGNgVXbc/QXPAp5mncuabQ1V5axr1EP18Xo9p8jdsVyYVXbLQuXv4sZxsBh8NjuGz5fBgVFKpUAAAA=",
+      "derived": null
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "gh",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/rulesets/23739774",
+        "--jq",
+        "{id,name,enforcement,target,conditions,rules,updated_at} | tojson"
+      ],
+      "started_utc": "2026-10-05T04:16:22.547Z",
+      "ended_utc": "2026-10-05T04:16:22.924Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "75f255ef8e7bb948512f0834c6966994a5a1895971af44858e1a90a197308da2",
+      "stdout_bytes": 1310,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA41TwW7bMAy97ysKnu3VTbp29XXXYcCA3YpAUCXGFiqLLkUlDYr8+0DHbZOtBXKzzPf4nsinF3CUfJBAKUP7Aoxrk+yA+o3PLhaP0N6vKgjp9aCYfNmj9flysCHBar+vANOa2OGASaAF6yRsECoIHtrF8nZ5d3t7XcGhM/yyWr1YU0neqvQF41MJjP7C9egeM1TAJWKG9v4FRst2QEGeDHoyicTMcoaScYxWENq1jRkreG1lslgp2cwdtZOjJPis/jY2Bq8svZhgx5MNo26vvi1vvu+rY7TQI6aacSSW8xgZHaPU2dl0HsHjiMljcruacRNwex6N8mYSScjnETbIPjiZReru7BlkEltnKuwwf8pYVZCFgxPz8RbMSDG43byrfQWyGzUQn+xMHcwIjxFV7PhfomTWNotZE28t++PaW8cYElo2fchCvJsgp4GyMdIWvRmQOzQDSk9e4wL5qdjcw6oCH/IQclZ3Ec1hdFmjN5bcQytc3nNnHHk0tE3IM/LfZBp8FrbGjiPTxkZ1b0qyIhweiqA3rrep0/CfNo56VVV8o/6f+UMlpG7WNo6KPsjmCDNXpGe0esoUyzTaU71X4DSm+9X7ssYS47RfzPLBPKf7T5lUG0IUD4/PRmTJk2zuKXpoAZmJNU0ZXeEgO/MBqA9db0g32PVTyrUltPCDPP7+CfsjZyfSoGkUyx1qfB/YJtdDBWXUd++N1b+LZnFTXzV1c/1ncdVeL9pm+fXmTs9t08D+y19PE/YXHgUAAA==",
+      "derived": null
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "gh",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/actions/workflows?per_page=100",
+        "--jq",
+        "{total_count,workflows:[.workflows[]|{id,name,path,state}]} | tojson"
+      ],
+      "started_utc": "2026-10-05T04:16:23.198Z",
+      "ended_utc": "2026-10-05T04:16:23.553Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "9afe12aad79ae10f438073ae513ab74eef0a46fb3fe81f6435e9809ec3a88aab",
+      "stdout_bytes": 3226,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA51WzW/bNhS/768gdOqAsLG+pdyyrtsO25LGWy/DMDxTTzYRmmRJyoFR9H8vKMmSk2ai0ZNl4PfFx8dHfo6cciD+Y6qTLrpJiqvoSZnHVqgnG9388zniTXSTFkmd5FlZXUUS9hjdRB86ELw9EosCmcOG3DLHlSROKcF2wKWNriINbhfdRG+33O26zfWkew09mDK11+D4hgvujm+PexFdRdaB8wYecsDoy9UpQbYq6jytpwS3jdK95UYpZ50BTexePeKi78ihEyfommZJkheT6ztwINSWtAbtTqK15I1BrYyjSorjj0vmbKDSiRr0Lqp4leeT98+oUTYo2ZEYPHB8WnJrJjAdwEG3Msvjcl7pb2CaJzBItFEtFxiu7m5k0JFBe0bAt0zLss7j1eS77rhDosGAECi43RNnOAjypjHQOqI7IYjBTx1aR4I13wNTllovSU+StNcLlSOp0jTN51h/ggeQVnWygb7vVNsKLpGg3Pqf98n7pSSy59OZTzEJ1aZI6jhLi+plCHuUboeOM5+B7pR1BLQWnA3CvRwxyNQBzfGCUKptvQgFrQdyuDhllayy/8/F5an/3JDPoHXKLLbPizAjIxylKl/ZJ/UksSHbvkssmgNnviL+2F8QYSTQgRBOsEqqKnmZwKlHHOahvbA3esYFbVHmq7TO03RyvH8ge3TQgAOyBYeLs1cbegKHVlbVdZYX8zbfGw/pK9miQcnQfs8g1KMMnWUuH4pJHRfxWevddxvB7Y6Ac2j9RTSOWQKG7Tx1KcjApSMlZJ2n9Sov5xvoARly7Yh1ILAvwVCBJUszcOjECZnWWVHV1TyWHzrp+B6pl0RD7CMX4rt2wTwTooPQ5fuQV3mdZnPXr8F1ZhiMzgB75HK75G4nOD3Bw9dhHRdlPDneaZTr9S9kzZRBBqa5fO32RAl6Vmm9SorXrmCQDTkpEousM9wdiWUgF51HIPXA0DmPi7guy3Ku8d1ft8SqzviD5w/6opNyQEcw3V4w1IcHVnV2EWstjrR/zZH1T3d/9Es+dEKigeHNFl7umUbwZGdVlsXz8foIgjf+JvN7ChtxGqnhQzYM0gEXco2rMqvOZunsOgwHbAgeuN/yxWofRtpF4ysvXzQUbJQjf+vm+exujhL2nI1POY85+6TdBF96QD67mc6691cDerdoNejT7QhceDfWq7Sa2+adavDD799KDyWjTDXYN7/kcnvt/316rWD/fvnhKzLDcj+aDAAA",
+      "derived": null
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "gh",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/commits/4c897418fe35a030a1188ae447eaf31c893f8eff/check-runs?per_page=100",
+        "--jq",
+        "{total_count,check_runs:[.check_runs[]|{id,name,status,conclusion,started_at,completed_at,details_url,head_sha,app_id:.app.id}]} | tojson"
+      ],
+      "started_utc": "2026-10-05T04:16:23.765Z",
+      "ended_utc": "2026-10-05T04:16:24.306Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "58f07e84a91fda81114417e0c198bdc4557650befa59535d36de25221b3b34c8",
+      "stdout_bytes": 8106,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA93ZzW7jNhAH8HufIuCpBcwVP0WKt77BYrenLQpjTNG2YlkUSMppsth3L5SkTmxn42TL2sbefBAG8g+DP4ejr8gunV1Nw9BFZP78iqDvp02NDJW81BNk/bpvXXL1FBIyiBFWYkowkX8QbggxUnxB41OdbYfY+A4ZFAdrXYxogmqXoGnjdAgtMmiZUh9NUSyatBxmH6xfF9FBWkKat/4mNp0fwsY1XSw6SM3GYVi4LuGYwK4KsKnxXSzG9yy4YlLJilPOi2s/KyilstKECiYJmqClg3oal4AMElZXSlA9d1wC4QQo1RqcEMrBnFOrKz7Xbj5HE3T/p58VmqAO1g4ZdNfcrX3AEUIzx0PfeqjRBMUE4fssrPry8EwaIjJPiujb5N3EQl8KsapUVdEMxI+FtsQ+bt7pS97kW3LFjgMT+m7g6O3KpQ+12xQ1xOXMQ6gLHxaFw4q7zc0NvyvizK8LXipLhJpjBpZj4eaAKw0OS1JKxUohKgs5PAlRnG89P9+/3tVnZ4fQpFtz9TH4a2fT1SfX+5Be42VGVkaWWdr3Wa1d3VXT964+RftS8qx9daUolRm4HwptuaNPgKMfgnXxVLbciMpIctZo0Du2pSJlFtux0NZ2A21TQ3J4Dda/qssN/fc8yhG89Edy4X/ULYXIo1sKsdWdeZ9iCtDjtumGv483r/5ZguGAl6hMvERtee0SusUpM4Hox9HjUrpWap6HVWr+QtfehwKeBXdzZGSQhucaySgxQl2UscyUu1KW3zM+wqsNz9bCytAz8jLOxS6v0FUeXqGrLe/vHbS3d+7q1/42LX332/GIyHijkPKifHONDeLZ2LD1DUNMb9DNc6493NfOeCU+1OUqU/dy9UL3Pr7DKYGZES8MDmcELmkm4JIeAtu4hNCfMh6ooeyifEWmwYwLdei78KfsXWrERdkyyvLYMsoOba9hA9GGpk843fbu4edps5jxcw5qe8uHkqhM3EQ9cW9cqBubcHCbxt3gBSR3QmJ+5g3wHrGsMt03xkJP+x1ng0s4WuiO06pMtJwZdtbN7wGtynPQjYUO1juncx1T4YwhzKmge640zwE3Ftq6Jr9yHQ5vXPdmi4PSkLPa7ves1nmWZmOhl+IAz1xKLrQOVm/Y8uQ82M67geC7zErn2aqPhfa/u/mubbpX8+HhIw7/SRa/RLNdXKny3I/HQltcGIe02Jy2aenlfMkcOaTO5Cr17pdMC13nwn840v6aoOQTtFPrhy4hw/i3X/4BO679eqofAAA=",
+      "derived": null
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "gh",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/commits/4c897418fe35a030a1188ae447eaf31c893f8eff/status",
+        "--jq",
+        "{sha,state,statuses:[.statuses[]|{id,context,state,target_url,created_at,updated_at}]} | tojson"
+      ],
+      "started_utc": "2026-10-05T04:16:24.551Z",
+      "ended_utc": "2026-10-05T04:16:24.905Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "b49d12eee838ed6e1ec0e0d5d29e655dc77d97ea90ef5bd248f4ddc70424912c",
+      "stdout_bytes": 83,
+      "native_output_gzip_base64": "H4sIAAAAAAAAAy3IMQ6AMAgAwN1nMDuUgCntV4wDqaAujQk6Gf/u4o33QOwKFbhJyYziRpMmSoooosacTZ2wSSEXc4cR4tLLoMJpfT369s8dFlDn5R0+ziZEA1MAAAA=",
+      "derived": null
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "gh",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/pulls?state=open&per_page=100",
+        "--jq",
+        "[.[]|{number,title,html_url,draft,updated_at,head_sha:.head.sha,head_ref:.head.ref,base_sha:.base.sha}] | tojson"
+      ],
+      "started_utc": "2026-10-05T04:16:25.328Z",
+      "ended_utc": "2026-10-05T04:16:25.820Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "059448446a639c318703d8226041a470c874d481a993d5e0c130b1779e037020",
+      "stdout_bytes": 12841,
+      "native_output_gzip_base64": "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",
+      "derived": null
+    },
+    {
+      "argv": [
+        "rtk",
+        "proxy",
+        "gh",
+        "api",
+        "--method",
+        "GET",
+        "repos/seathatflowsinourveins/native-agent-stack/actions/permissions/artifact-and-log-retention"
+      ],
+      "started_utc": "2026-10-05T04:16:26.073Z",
+      "ended_utc": "2026-10-05T04:16:26.421Z",
+      "exit_code": 0,
+      "stderr": "",
+      "stdout_sha256": "c442a43edd5cf6d7110c96e43860888e18bafa4586118fe0267b75780cbdb463",
+      "stdout_bytes": 37,
+      "native_output_gzip_base64": "H4sIAAAAAAAAA6tWSkmsLFaysjTQUcpNrMjMLc2NT8zJyS9PTYmHydQCAE8Q604lAAAA",
+      "derived": null
+    }
+  ]
+}
