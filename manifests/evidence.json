@@ -4152,6 +4152,26 @@
       "path": "evidence/receipts/claude-hud-0100-qualification-20261004.json"
     },
     {
+      "id": "native-sdk-acceptance-20261002",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "codex",
+        "claude-code"
+      ],
+      "claim": "Actual Claude SDK task failed its independent oracle despite successful protocol completion; a separate informed Codex SDK repair passed all four unchanged cases. Unchanged Claude and OpenHands default source suites passed within recorded skip, warning and environment limits.",
+      "limitations": [
+        "Two different model tasks and source-test suites have different evidence scopes; this is not a model-quality or token-efficiency comparison, global SOTA winner claim or full foundation closure.",
+        "Claude original useful-task acceptance remains FAILED. Codex passes only the four-case informed repair; its requested model/effort are bound, but resolved model/provider identity and billing cost were not returned.",
+        "Coordinator observed invocation, native exits and process samples. Independent reviewers checked retained source/artifact/outcome bindings without rerunning; hash equality alone is not execution provenance.",
+        "Public attachments are declared projections, exact resulting candidates and selected native output. Complete permitted streams remain private; raw conversations, auth/session metadata and personal paths are not published.",
+        "Claude default source suite has six skips, with five collection identities inferred from source/dependencies. OpenHands retains seven optional ToolShield skips, 12 xfails, 83 warnings, default stress/ACP-live exclusions and a preserved failed environment attempt; exact fetched model-map bytes were not retained.",
+        "OpenHands is supplemental source-test evidence, not a new adopted stack component. Its FACTS provider task remains unrun in this lane; Codex default source-suite execution remains with its separate owner.",
+        "Researcher/reviewer roles, resume/recovery, selected MCP, generation permission-negative tests, complete target lifecycle and target token routing remain open. Exact before/after process-name samples do not prove complete descendant cleanup.",
+        "Historical Claude task binding is CLI2.1.287. Current release2.1.288 reconciliation remains with the configuration owner and cannot retroactively change these captures."
+      ],
+      "path": "evidence/receipts/native-sdk-acceptance-20261002.json"
+    },
+    {
       "id": "ns2604-e2e-20261004",
       "kind": "native_model_e2e",
       "component_ids": [
@@ -5208,6 +5228,16 @@
       "path": "blueprints/convergence-practice/ci-security/receipt.json",
       "sha256": "218dca2e923462c85c08cd7ff07edeb20f1e784cd409988f2e201ad2351c8b31",
       "bytes": 787
+    },
+    {
+      "path": "blueprints/convergence-practice/clean-resolution-20261002/README.md",
+      "sha256": "b965c5034ff964b6082526301957ecb2349ec675ba02689e061f679b018af1e1",
+      "bytes": 6634
+    },
+    {
+      "path": "blueprints/convergence-practice/clean-resolution-20261002/open-work.json",
+      "sha256": "e157abd153bed629b0e1525223ff29299d909a0d702be0e7df4d5097fe3c20df",
+      "bytes": 8741
     },
     {
       "path": "blueprints/convergence-practice/container-storage/README.md",
@@ -16506,6 +16536,11 @@
       "bytes": 7862
     },
     {
+      "path": "docs/decisions/2026-10-04-codex-rtk-hook-qualified.md",
+      "sha256": "fc93f4173ecd6e21c6b0b2c4fd58be79d24b506698b4441e65bb088c43f762b7",
+      "bytes": 13314
+    },
+    {
       "path": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
       "sha256": "d091a1021eff71b11bf409b7896577566713788ecbf33e8f8c629e4d45ad26e1",
       "bytes": 15230
@@ -16687,8 +16722,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "c49dc1046c214ffd0367d1fedbb2fc08807d4f3602e9bfab6de46da5ecfcb2bc",
-      "bytes": 184906
+      "sha256": "ca1091c14b65605c72d7aa6fdeb429f80a49c26774c6899dc1d757d1c67f19f7",
+      "bytes": 187468
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -37041,6 +37076,51 @@
       "bytes": 2164
     },
     {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/README.md",
+      "sha256": "a2cf68ee5ef60fe6d485cf99abd21f22bf41d81e49eb674c3d440fb48814d6e6",
+      "bytes": 6106
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/claude-candidate.py",
+      "sha256": "8bf05cd5709b44f860eae6f6f6acbb2042baaaa87e4e8fc6120092a44c8e2d61",
+      "bytes": 258
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/claude-oracle.stderr.txt",
+      "sha256": "f3866ae926de929f605535cbf32c8633c17a339a14d0640e33438b21c0291d87",
+      "bytes": 1157
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/claude-trial.json",
+      "sha256": "faf4d0eb9e12648b19e35855b7ae7217b982cce80664eba9ce21663e2bc4e649",
+      "bytes": 6147
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/codex-candidate.py",
+      "sha256": "f2f46a4d90ef352c69b3f5b3c6d21bbfd7bf730758881fb53c33ac9f69642c1f",
+      "bytes": 297
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/codex-oracle.stderr.txt",
+      "sha256": "d4f0b690c988bba7842b69922a6a2464aa4ce8d33f164b6fa1ac151752dc9c22",
+      "bytes": 524
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/codex-trial.json",
+      "sha256": "1dcfd1d5cbc209c366bcaf21b2cd5ae1e3a8759e0ffa43746e57e283b22a0f08",
+      "bytes": 6622
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/native-suite-excerpts.json",
+      "sha256": "c20feff5127854af84a3fda57cfb4252129630676efc3f5ebb5e302a1a953092",
+      "bytes": 1716
+    },
+    {
+      "path": "evidence/artifacts/native-sdk-acceptance-20261002/source-suites.json",
+      "sha256": "bf629e08d9b19a9919a212efb07d6d90b307f6ae7b687896485a588e1fcca439",
+      "bytes": 16601
+    },
+    {
       "path": "evidence/artifacts/native-service-reboot-20260920/cleanup.json",
       "sha256": "6aadee9cb7005d261df5f0337cc289190378cb5f3d2f49a264428452acd17b75",
       "bytes": 111
@@ -48476,6 +48556,56 @@
       "bytes": 7562
     },
     {
+      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/README.md",
+      "sha256": "7beb441d44383fb44b2c34937fcee17e92bc0000b845dbc77da3268fa9501e54",
+      "bytes": 11469
+    },
+    {
+      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/codex_hook_qual.py",
+      "sha256": "fb2a2426a6564567a8276c74c2d6ada73e95643017d9536e8c3dd85a6f7fbe4f",
+      "bytes": 11503
+    },
+    {
+      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/fresh_session_e2e.sh",
+      "sha256": "86d9c5d0447fdfaa1b7c91497b9ca87ba1978db5771b167bdd14aff912219bd0",
+      "bytes": 6964
+    },
+    {
+      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/nativestack-before-snapshot.summary.md",
+      "sha256": "304e49102446295fb9de9c58602b56b8799baa4042b9871283c3f91161a66bcc",
+      "bytes": 4148
+    },
+    {
+      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/receipt.json",
+      "sha256": "b59c4fbf9c320f00f41952c08fe796ff9349452e1eeb9b9f8a426d21d84d4571",
+      "bytes": 10065
+    },
+    {
+      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-behaviour-probe.json",
+      "sha256": "838b32e26270edfa137a8d825bc7430f3ed86e6054806c28deba33f3918b12dc",
+      "bytes": 11574
+    },
+    {
+      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-init-codex-probe.json",
+      "sha256": "2865151f7e015d23e1afba1750bbab445b22b33c000ff1acc082cfd8f4ae49a9",
+      "bytes": 14351
+    },
+    {
+      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk_behaviour_probe.py",
+      "sha256": "ee46570dfc9960ed0f05e90c7c2df1fcdbb6a8b1874f8dc7a417f135ce43a694",
+      "bytes": 8313
+    },
+    {
+      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk_init_codex_probe.py",
+      "sha256": "e509397908e89bcc901335044890f296526694fcb678495fc71ae9b691e67b3b",
+      "bytes": 6479
+    },
+    {
+      "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/trust_readback_race.py",
+      "sha256": "e803d89311703c22c22b15bd14db3b6fcc2c77346ada3cf75085eba51c8138a6",
+      "bytes": 3895
+    },
+    {
       "path": "evidence/artifacts/token-tool-currency-20260927/METHOD.md",
       "sha256": "16d8b2e78deffeabc6e2900cb00514087a0a1746ee083924f6d0af659e1e89b1",
       "bytes": 10339
@@ -51111,6 +51241,11 @@
       "bytes": 2504
     },
     {
+      "path": "evidence/receipts/native-sdk-acceptance-20261002.json",
+      "sha256": "d50dc8b83d1bd7be2a96eb0d98c13a561fa4d173ae20d796021f59d27f31e5ce",
+      "bytes": 7562
+    },
+    {
       "path": "evidence/receipts/native-service-reboot-20260920.json",
       "sha256": "7f13f5bfe6072465d09aa725d766fb880eb865f6c0452902a41cf7f5b446a0d0",
       "bytes": 5495
@@ -51729,6 +51864,11 @@
       "path": "examples/mcporter.json.example",
       "sha256": "cdb2e40a8b2feab0db591f5421b1ece60548bc572ddb384cd4d073d88c1cc0b4",
       "bytes": 1589
+    },
+    {
+      "path": "examples/native-sdk-acceptance/README.md",
+      "sha256": "d68e0ef071fce0d4f2b0a2285c2f246c6c95bdd8215e0a679232ac9b503ab6bd",
+      "bytes": 11239
     },
     {
       "path": "examples/native-stack-embeddings.service.example",
