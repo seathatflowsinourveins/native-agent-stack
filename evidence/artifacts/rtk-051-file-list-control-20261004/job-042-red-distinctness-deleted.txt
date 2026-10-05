@@ -1,0 +1,15 @@
+F.
+======================================================================
+FAIL: test_rtk_exactness_grep_fold_rejects_duplicate_native_paths (tests.test_native_token_ci.NativeTokenCIContracts.test_rtk_exactness_grep_fold_rejects_duplicate_native_paths)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/tests/test_native_token_ci.py", line 1251, in test_rtk_exactness_grep_fold_rejects_duplicate_native_paths
+    self.assertEqual({label for label, passed in checks.items() if not passed}, {failing})
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: Items in the second set but not the first:
+'rtk-exactness-controls-diff-unchanged-and-grep-fold-lossless'
+
+----------------------------------------------------------------------
+Ran 2 tests in 0.002s
+
+FAILED (failures=1)

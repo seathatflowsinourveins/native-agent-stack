@@ -1,0 +1,295 @@
+{
+  "schema_version": 1,
+  "kind": "unchanged_upstream_test_execution",
+  "status": "source_tests_build_and_local_smoke_passed_independent_review_accepted",
+  "scope": "Historical qualification of unchanged GitHub CLI v2.102.0 source on the recorded host. This sanitized artifact is evidence only; it does not register a component, select a default or authorize adoption.",
+  "projection": {
+    "timestamp_observed_at_utc": "2026-10-03T02:45:38Z",
+    "time_scope": "Projection timestamp sampled during preparation only; not an execution or review timestamp.",
+    "execution_record": {
+      "logical_artifact": "qualification.json",
+      "bytes": 11409,
+      "sha256": "95d360a4962e69a023ce24165f76a219cff51930424cb2cc6dea1a98c30985ad"
+    },
+    "acceptance_handoff": {
+      "logical_artifact": "CODEX-GH-QUALIFICATION-HANDOFF-20261002.md",
+      "bytes": 4354,
+      "sha256": "f85483bdd39b534cb09268208391679fbb68a175706eea0fd566bc7795f149c8"
+    },
+    "schema_basis": "Frozen qualification schema_version 1 and evidence/artifacts/sota-finalization-20260930/upstream-tests.json; no new runner or acceptance framework.",
+    "sanitization": [
+      "Personal paths, session identifiers, owner identifiers and observer task identifiers omitted.",
+      "Raw stdout/stderr, conversations and active client configuration omitted; retained stream names are safe logical locators for private originals.",
+      "Historical review-pending status superseded only by the accepted handoff; frozen private inputs remain unchanged."
+    ]
+  },
+  "source": {
+    "repository": "https://github.com/cli/cli",
+    "tag": "v2.102.0",
+    "commit": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+    "source_clean_before_tests": true,
+    "test_reference": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/.github/workflows/go.yml#L32",
+    "command": "go test -race -tags=integration ./...",
+    "build_references": [
+      "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/.github/CONTRIBUTING.md#L24-L35",
+      "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/Makefile#L8-L23",
+      "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/script/build.go#L48-L64",
+      "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/script/build.go#L125-L144"
+    ],
+    "test_scope_reference": "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/docs/testing.md#L103",
+    "notes": "Upstream AGENTS.md, CONTRIBUTING and docs/testing.md informed the original qualification. Source and tests were unchanged. The recorded make invocation built the binary; no literal make test invocation is claimed."
+  },
+  "toolchain": {
+    "version_output": "go version go1.27.1 linux/amd64",
+    "compiler_output": "cc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+    "publisher_metadata": "https://go.dev/dl/?mode=json&include=all",
+    "retained_publisher_metadata": "downloads/publisher-go-metadata.json",
+    "retained_publisher_metadata_bytes": 2211180,
+    "retained_publisher_metadata_sha256": "1ed915f72633d0a72eaa2f462740153db4fe347cb56f7d1e25ec44868568f13e",
+    "publisher_metadata_observed_at_utc": "2026-10-02T19:14:35Z",
+    "archive": "go1.27.1.linux-amd64.tar.gz",
+    "archive_bytes": 70553950,
+    "archive_sha256": "63d339f0da5ab53635a56f2490a7984dfe12dfcff22ad749f63edaf590168445",
+    "publisher_match": true,
+    "installation": "Complete official archive extracted into an empty owned versioned prefix for the private qualification; GOROOT resolved there. No persistent PATH, profile or configuration change."
+  },
+  "process_scope": {
+    "GH_CONFIG_DIR": "owned empty qualification directory",
+    "GOCACHE": "owned qualification cache",
+    "GOPATH": "owned qualification module directory",
+    "GIT_CONFIG_GLOBAL": "/dev/null",
+    "GIT_CONFIG_SYSTEM": "/dev/null",
+    "GOTOOLCHAIN": "local",
+    "GOENV": "off",
+    "GOAUTH": "off",
+    "GOPROXY": "https://proxy.golang.org,direct",
+    "GOSUMDB": "sum.golang.org",
+    "GOMAXPROCS": 4,
+    "removed_environment_keys": [
+      "GH_TOKEN",
+      "GITHUB_TOKEN",
+      "GH_ENTERPRISE_TOKEN",
+      "GITHUB_ENTERPRISE_TOKEN",
+      "GH_ACCEPTANCE_TOKEN",
+      "GH_ACCEPTANCE_HOST",
+      "GH_ACCEPTANCE_ORG"
+    ],
+    "native_signins": "untouched",
+    "controls_scope": "GH_PAGER, NO_COLOR and TERM were cleared only for the demonstrated native test qualification; no blanket session reset was introduced."
+  },
+  "observations": [
+    {
+      "command": "go mod download",
+      "launch_observed_at_utc": "2026-10-02T18:38:35Z",
+      "exit_code": 0,
+      "stdout": "go-mod-download.stdout.txt",
+      "stderr": "go-mod-download.stderr.txt",
+      "both_streams_bytes": 0,
+      "both_streams_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "go test -race -tags=integration ./...",
+      "launch_observed_at_utc": "2026-10-02T18:40:28Z",
+      "exit_code": 1,
+      "stdout": "go-test.stdout.txt",
+      "stdout_bytes": 89412,
+      "stdout_sha256": "444bf1241c9f86ed630b75495039b57a4b921c802f71ced1a9efdf869248f5fa",
+      "stderr": "go-test.stderr.txt",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "completed_observed_at_utc": "2026-10-02T18:53:20Z",
+      "package_results": {
+        "pass": 247,
+        "fail": 3,
+        "no_test_files": 60
+      },
+      "observed_failure": "Pager expectations, accessible-mode prompt timeouts and ANSI editor snapshots. Original failed run retained."
+    },
+    {
+      "command": "go test -race -tags=integration ./internal/ghcmd -run ^Test_newIOStreams_pager$",
+      "change_from_full_command_environment": "none",
+      "exit_code": 1,
+      "stdout": "pager-baseline.stdout.txt",
+      "stdout_bytes": 1469,
+      "stdout_sha256": "f2db3cff6ac14893b83c4dda7caf6334e9a48c0dde511d39ee2d6c8eccdfec94",
+      "stderr": "pager-baseline.stderr.txt",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "go test -race -tags=integration ./internal/ghcmd -run ^Test_newIOStreams_pager$",
+      "change_from_baseline_environment": "env -u GH_PAGER only",
+      "exit_code": 0,
+      "stdout": "pager-clean.stdout.txt",
+      "stdout_bytes": 49,
+      "stdout_sha256": "4ab8084134d5577a62a3717b7bda83068a4188bb54a7d817b9c79a5fbf056190",
+      "stderr": "pager-clean.stderr.txt",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "go test -race -tags=integration ./pkg/surveyext -run ^Test_GhEditor_Prompt",
+      "change_from_full_command_environment": "none",
+      "exit_code": 1,
+      "stdout": "editor-baseline.stdout.txt",
+      "stdout_bytes": 3189,
+      "stdout_sha256": "cff5dd34636d792e2510e4f3aeb14edb613e0058e3787cc4bbda1bbbdbda372b",
+      "stderr": "editor-baseline.stderr.txt",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "go test -race -tags=integration ./pkg/surveyext -run ^Test_GhEditor_Prompt",
+      "change_from_baseline_environment": "env -u NO_COLOR only",
+      "exit_code": 0,
+      "stdout": "editor-clean.stdout.txt",
+      "stdout_bytes": 48,
+      "stdout_sha256": "9829d5a5a106a23b78a64264ab16d9a95a025eb1272a0700bb5e9aa2e4ba51b7",
+      "stderr": "editor-clean.stderr.txt",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "go test -race -tags=integration ./internal/prompter -run ^TestHuhPrompterInput$/^basic_input$ -count=1 -timeout=20s",
+      "change_from_original_full_run_environment": "env -u TERM only; the original full run supplies the retained failing case and timeout stacks",
+      "exit_code": 0,
+      "stdout": "prompter-clean.stdout.txt",
+      "stdout_bytes": 52,
+      "stdout_sha256": "053af5d4a95a3158ffffb18e0ea63e7f094bfd1d3ea0b75c0c9597ee686d7227",
+      "stderr": "prompter-clean.stderr.txt",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "go test -race -tags=integration ./...",
+      "change_from_original_full_run_environment": "env -u GH_PAGER -u NO_COLOR -u TERM; no source or test changes",
+      "exit_code": 0,
+      "stdout": "go-test-clean.stdout.txt",
+      "stdout_bytes": 17975,
+      "stdout_sha256": "d989372079844b018c541e252596488f59175f32287ca11a3a3cb49d42946414",
+      "stderr": "go-test-clean.stderr.txt",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "package_results": {
+        "pass": 250,
+        "fail": 0,
+        "no_test_files": 60,
+        "cached_pass": 245,
+        "fresh_pass": 5
+      },
+      "source_clean_after_tests": true,
+      "cache_scope": "245 passing package results reused the native Go test cache; five were freshly executed. This is not 250 new executions."
+    },
+    {
+      "command": "GH_VERSION=v2.102.0 make",
+      "process_environment": "Same isolated corrected test environment; staged Go1.27.1 bin prepended to PATH for this process only",
+      "reference": ".github/CONTRIBUTING.md:24-35; Makefile:8-23; script/build.go:48-64,125-144",
+      "exit_code": 0,
+      "stdout": "make.stdout.txt",
+      "stdout_bytes": 247,
+      "stdout_sha256": "2444209b24143f3ee08272d97d90b3f5b9357703c24726dd5d33303dda93b63a",
+      "stderr": "make.stderr.txt",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "observation": "Native output showed build-helper compilation and go build -trimpath of ./cmd/gh. Embedded date is the build date 2026-10-02."
+    },
+    {
+      "command": "bin/gh --version",
+      "exit_code": 0,
+      "stdout": "built-version.stdout.txt",
+      "stdout_bytes": 81,
+      "stdout_sha256": "983b456a5aa3cb9634899974b853503bf7d880375c18047c8b6f5614880eee86",
+      "stderr": "built-version.stderr.txt",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "observed_version": "gh version 2.102.0 (2026-10-02)"
+    },
+    {
+      "command": "bin/gh --help",
+      "exit_code": 0,
+      "stdout": "built-help.stdout.txt",
+      "stdout_bytes": 2716,
+      "stdout_sha256": "5665cc62dabe5ed7be4d26714e79e4ebc645c1ca6bf56bd81499bf68bd94b474",
+      "stderr": "built-help.stderr.txt",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "go version -m bin/gh",
+      "exit_code": 0,
+      "stdout": "built-info.stdout.txt",
+      "stdout_bytes": 15838,
+      "stdout_sha256": "350026d4b6f3e2939d795b9b48d0b4b442e1c88e4efb8e89a778c6b021317cf9",
+      "stderr": "built-info.stderr.txt",
+      "stderr_bytes": 0,
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "observed_build": {
+        "go": "go1.27.1",
+        "module_version": "v2.102.0",
+        "GOOS": "linux",
+        "GOARCH": "amd64",
+        "vcs.revision": "fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd",
+        "vcs.modified": false
+      }
+    }
+  ],
+  "built_binary": {
+    "path": "source/bin/gh",
+    "bytes": 58587762,
+    "sha256": "77c0f65452e524b8cb7c01dbee032322e538264f52d25789a9d8bb3a35181bf4",
+    "source_clean_after_build": true,
+    "adoption": "Private source-built binary, distinct from the publisher release binary. No shared tool link, persistent PATH, pin, target distribution or account change."
+  },
+  "corrections": [
+    {
+      "condition": "Inherited GH_PAGER=cat changed the pager expectations.",
+      "verification": "Unchanged focused test failed with the inherited environment and passed after only GH_PAGER was removed.",
+      "sources": [
+        "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/internal/ghcmd/cmd.go#L387-L395",
+        "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/internal/ghcmd/cmd_test.go#L175-L232"
+      ]
+    },
+    {
+      "condition": "Inherited nonempty NO_COLOR disabled ANSI output expected by the editor tests; CLICOLOR=0 was independently absent.",
+      "verification": "Unchanged focused editor test failed with the inherited environment and passed after only NO_COLOR was removed.",
+      "sources": [
+        "https://github.com/AlecAivazis/survey/blob/v2.3.7/core/template.go#L27-L29"
+      ]
+    },
+    {
+      "condition": "Inherited TERM=dumb selected Huh v2.0.3 accessible mode. Its Scanner waited for newline/EOF while the unchanged CLI helper sent carriage return. The password path also blocked: Input.RunAccessible lacked an Fd reader, Form.runAccessible discarded its error, and the helper blocked writing before its timeout.",
+      "verification": "Original full-run failure stacks retained the accessible path. The unchanged basic_input test passed after only TERM was removed. Source diagnosis was supplied by a read-only worker; the coordinator executed the discriminator.",
+      "sources": [
+        "https://github.com/charmbracelet/huh/blob/3c0116c6fd1f578ef50a25d868d2db19bd985222/form.go#L129-L132",
+        "https://github.com/charmbracelet/huh/blob/3c0116c6fd1f578ef50a25d868d2db19bd985222/field_input.go#L452-L460",
+        "https://github.com/charmbracelet/huh/blob/3c0116c6fd1f578ef50a25d868d2db19bd985222/form.go#L727-L733",
+        "https://github.com/cli/cli/blob/fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd/internal/prompter/huh_prompter_test.go#L156-L171"
+      ]
+    }
+  ],
+  "independent_review": {
+    "status": "accepted",
+    "subject": "Hash-bound original qualification",
+    "basis": "Final acceptance in the hash-bound handoff supersedes the frozen record's historical review-pending field.",
+    "independently_observed": [
+      "Source HEAD, tag and clean status; native output counts and retained stream bindings.",
+      "Source-built binary hash and Go/VCS metadata.",
+      "Retained official Go publisher metadata and archive comparison."
+    ],
+    "method_scope": "Read-only artifact/source review reused the prior execution evidence; no suite, build or provider call was performed for that review."
+  },
+  "outer_exit_observer": "Commands, flags, process exit codes and environment-only changes are coordinator-observed launch evidence. Independent artifact inspection corroborates outputs and byte identity; hashes do not independently establish invocation provenance.",
+  "raw_outputs": "Complete native stdout/stderr remain private and unchanged. The logical names, byte counts and SHA-256 bindings above identify those originals; raw streams are not included in this public artifact.",
+  "timestamps": "Only execution timestamps recorded in the frozen input are reproduced. Other execution start/end times and the review time are unknown. The projection timestamp is separately labelled.",
+  "limitations": [
+    "Native race/integration source-suite evidence is separate from live-server acceptance and attestation integration.",
+    "This projection performs no target installation, native sign-in, credential access, configuration change or default selection.",
+    "No new test or build was run to create this projection; historical results are not a new host's passed status.",
+    "Retained byte bindings establish identity, not test adequacy or launch provenance."
+  ],
+  "usage": {
+    "model_provider_evaluation": "No model/provider evaluation was run in this qualification.",
+    "token_efficiency_claim": "none",
+    "native_compute_totals": "unknown"
+  }
+}

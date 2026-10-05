@@ -164,8 +164,16 @@ trust_level = "trusted"
 [projects."${HOME}/code/native-agent-stack-publication"]
 trust_level = "trusted"
 
+# Codex's startup notice for a newly available model, seeded as already shown its maximum number of times so a host set
+# up from this template does not show it. At openai/codex rust-v0.160.0 (a956835d020762cb2b570053af06f643a11c0ecc) the
+# table is a map of model slug to a u32 show count (codex-rs/config/src/types.rs L789-795, the [tui] field at L940-942);
+# the TUI shows a model's notice only while its count is below MODEL_AVAILABILITY_NUX_MAX_SHOW_COUNT = 4
+# (tui/src/app/startup_prompts.rs L242 and L250-266) and writes the count back one higher per showing (L281-305). At
+# that tag the bundled catalog's one notice is gpt-6.1-sol's (models-manager/models.json L178 and L245-247). The slug
+# has a dot, so its key is quoted.
 [tui.model_availability_nux]
 gpt-6-astra = 4
+"gpt-6.1-sol" = 4
 
 [hooks.state]
 
@@ -236,6 +244,11 @@ daemon_auto_start = false
 # README.md). Without it each command runs as `shell -lc`, the same login shell the snapshot would have captured
 # (core/src/tools/runtimes/mod.rs L268-276), at the cost of starting that shell per command.
 shell_snapshot = false
+# Experimental and off by default (`codex features list`): adds the seven-day five-hour and weekly allowance history to
+# /analytics through one ChatGPT-backend request, not a model call (codex-rs/features/src/lib.rs at rust-v0.160.0). On
+# both hosts on the user's directive of 2026-10-04 to enable the latest changelog features; the history stays empty
+# (the request returns nothing) on an account whose plan has none.
+analytics_plan_history = true
 
 # Notify only when Codex needs a decision: an approval (approval-requested), a plan-mode prompt or a `request_user_input` question (both
 # reported as plan-mode-prompt, tui/src/chatwidget/tool_requests.rs L449-458 at rust-v0.155.1 and rust-v0.157.1) or an asynchronous question

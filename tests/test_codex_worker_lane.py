@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import concurrent.futures
 import contextlib
+from datetime import date
 import hashlib
 import importlib.util
 import io
@@ -814,6 +815,51 @@ class ApplyFlowTests(unittest.TestCase):
         code, out = self.host.apply()
         self.assertEqual(code, 2, out)
         self.assertIn("codex processes", out)
+
+    def test_a_held_codex_is_refused_and_the_refusal_names_the_hold_and_its_until_date(self):
+        # docs/decisions/2026-10-04-codex-dated-holds.md: a dated hold changes what adoption_status.py reports, not
+        # what the lane accepts; --apply still needs CODEX_VERSION. A synthetic pins file keeps this independent of
+        # the live hold, which is deleted once the held hosts retire or switch.
+        fake = self.host.codex.read_text()
+        self.host.codex.write_text(fake.replace('print("codex-cli 0.160.0")', 'print("codex-cli 0.159.3")'))
+        pins = self.host.tmp / "pins-linux-x86_64.json"
+        pins.write_text(json.dumps({"tools": [{"id": "codex", "version": lane.CODEX_VERSION, "holds": [
+            {"version": "0.159.3", "until": "2026-11-04", "reason": "X18: synthetic reason",
+             "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.159.3.tgz", "sha256": "0" * 64}]}]}))
+        refusal = ("  [fail] codex version: codex-cli 0.159.3 (pin 0.160.0); dated hold in adoption/pins-linux-x86_64.json: "
+                   "0.159.3 {state} 2026-11-04 (X18: synthetic reason){tail}; the lane still needs the pin\n")
+        with mock.patch.object(lane, "PINS_FILE", pins), \
+                mock.patch.object(lane.adoption_status, "utc_today", return_value=date(2026, 11, 3)):
+            code, out = self.host.run()
+            self.assertEqual(code, 2, out)
+            self.assertIn(refusal.format(state="held until", tail=""), out)
+            self.assertIn("result: apply would refuse", out)
+            code, out = self.host.apply()
+            self.assertEqual(code, 2, out)
+            self.assertIn(refusal.format(state="held until", tail=""), out)
+            self.assertIn("refused: nothing written", out)
+        self.assertFalse(self.host.state.exists())
+        self.assertFalse((self.host.codex_home / "stack-worker.config.toml").exists())
+        with mock.patch.object(lane, "PINS_FILE", pins), \
+                mock.patch.object(lane.adoption_status, "utc_today", return_value=date(2026, 11, 4)):
+            code, out = self.host.run()  # from its until date the hold is stated as expired; still refused
+        self.assertEqual(code, 2, out)
+        self.assertIn(refusal.format(state="hold expired", tail="; reported as drift"), out)
+        # A version without a hold keeps the plain refusal.
+        self.host.codex.write_text(fake.replace('print("codex-cli 0.160.0")', 'print("codex-cli 0.159.2")'))
+        with mock.patch.object(lane, "PINS_FILE", pins):
+            code, out = self.host.run()
+        self.assertEqual(code, 2, out)
+        self.assertIn("  [fail] codex version: codex-cli 0.159.2 (pin 0.160.0)\n", out)
+
+    def test_every_live_codex_hold_reaches_the_refusal(self):
+        # The live pins file's codex holds, if any, are the ones the refusal names (vacuous once none remains).
+        entry = adoption_status.read_pins(lane.PINS_FILE)["codex"]
+        for hold in adoption_status.pin_holds(entry):
+            with self.subTest(version=hold["version"]):
+                self.assertEqual(lane.codex_hold(hold["version"])["hold_until"], hold["until"])
+        self.assertIsNone(lane.codex_hold(None))  # codex --version printed no version
+        self.assertIsNone(lane.codex_hold("0.0.0-not-held"))
 
     def test_apply_is_read_back_and_idempotent_and_rollback_restores(self):
         original_config = self.host.read_config()

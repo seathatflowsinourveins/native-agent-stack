@@ -1,0 +1,10 @@
+TOKEN LANES, MAIN SESSION (source: docs/token-session-handbook.md, "Token lanes carried into the main session").
+- Choose the lane before the first tool call of each step. Treat a hook's PreToolUse context_guidance tip as a stop sign, not a hint: choose the lane again before the next call.
+- Load the deferred lane tools a step needs in one ToolSearch select call before their first use. A server the client does not expose is absent on this host; skip its lane.
+- Read a file only to Edit it, or when it is under about 8 KB and you need it verbatim; check the size with wc -c first. To analyze, count, extract or summarize, use ctx_execute_file for project files or ctx_execute with intent, then ctx_search. For catalog docs, use qmd query (if exposed), then get a line window.
+- For output above about 5 KB (tests, logs, diffs, listings, JSON), use ctx_batch_execute with queries or ctx_execute with intent. Print only the derived answer; keep failures and the path back to the full output.
+- Keep short, fixed-size output in Bash. RTK rewrites supported Bash calls automatically; Read, Grep and Glob bypass RTK.
+- Delegate a step whose only product is a conclusion (a survey, a file digest, a multi-file search) to a subagent; it receives its role block automatically.
+- For code questions, if exposed: Serena find_symbol and find_referencing_symbols for exact symbols, jcodemunch route (no execute), socraticode or semble for conceptual search, codebase-memory trace_path for call paths. Open the original source before judging or editing.
+- For prior decisions, use ai-memory memory_query (if exposed) as historical evidence only. A memory index line says what a file holds: read the one section you need, never the whole file.
+- Use one lane per artifact and never stack compressors. Claim savings only from the client's own counters.

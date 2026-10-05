@@ -40,6 +40,12 @@ SDK_VERSION = "0.160.0"
 PROVIDER = "omniroute_runtime"
 DEFAULT_MODEL = "cx/gpt-6.1-sol-max"
 DEFAULT_BASE_URL = "http://127.0.0.1:20128/v1"
+# OmniRoute 0585aba5589d5a1f49243a13a8db249558e7c9e3:
+# open-sse/executors/codex/reasoningSuffix.ts: suffix tokens for a lexical
+# fail-closed guard, independent of gateway alias sets.
+GATEWAY_EFFORT_SUFFIXES = (
+    "-none", "-low", "-medium", "-high", "-xhigh", "-max", "-ultra", "(max)", "(ultra)"
+)
 CLEANUP_TIMEOUT = 5.0
 _CLEANUP_TASKS: set[asyncio.Task] = set()
 
@@ -122,7 +128,7 @@ def runtime_config(args: argparse.Namespace) -> CodexConfig:
     overrides = (
         "model_provider=" + quoted(PROVIDER),
         "model=" + quoted(args.model),
-        'model_reasoning_effort="max"',
+        "model_reasoning_effort=" + quoted(args.effort),
         # Native curated-plugin startup sync is unused by this worker.
         # a956835d core-plugins/src/manager.rs:748-763; core/config.schema.json:7038.
         "features.plugins=false",
@@ -190,7 +196,7 @@ def initial_record(args: argparse.Namespace) -> dict:
     return {
         "request_id": args.request_id,
         "requested_model": args.model,
-        "requested_effort": "max",
+        "requested_effort": args.effort,
         "provider": PROVIDER,
         "model_inference_submitted": False,
         "usage_status": "unknown",
@@ -434,7 +440,7 @@ async def run_worker(
             # Codex owns tools, MCP discovery, skills, caching and compaction.
             # There is no extra skill carrier or Responses prompt rewrite here.
             record["model_inference_submitted"] = True
-            turn = await thread.turn(prompt, model=args.model, effort=ReasoningEffort.max)
+            turn = await thread.turn(prompt, model=args.model, effort=ReasoningEffort(args.effort))
             phase = "turn_run"
             result = await turn.run()
             record.update(result_record(result))
@@ -526,6 +532,15 @@ def parse_args(argv=None) -> argparse.Namespace:
         default=DEFAULT_MODEL,
         help="explicit native/gateway model id; default Sol/max route",
     )
+    parser.add_argument(
+        "--effort",
+        choices=[ReasoningEffort.max.value, ReasoningEffort.ultra.value],
+        default=ReasoningEffort.max.value,
+        help=(
+            "requested native reasoning effort; default max; "
+            "ultra requires a suffixless --model (e.g. cx/gpt-6.1-sol)"
+        ),
+    )
     parser.add_argument("--base-url", type=gateway_url, default=DEFAULT_BASE_URL)
     parser.add_argument("--request-id", type=request_id, default=uuid.uuid4().hex)
     parser.add_argument("--timeout", type=positive_seconds, default=300.0)
@@ -568,6 +583,12 @@ def parse_args(argv=None) -> argparse.Namespace:
         parser.error("codex-home must be an existing private state directory")
     if not args.model.strip():
         parser.error("model must be nonempty")
+    if args.effort == ReasoningEffort.ultra.value and args.model.endswith(GATEWAY_EFFORT_SUFFIXES):
+        parser.error(
+            "--effort ultra requires a suffixless --model (e.g. cx/gpt-6.1-sol); "
+            "lexical fail-closed check also refuses IDs whose own name ends "
+            "in a listed token, regardless of gateway alias recognition"
+        )
     if (args.require_mcp or args.require_skill) and not args.preflight:
         parser.error("require-mcp and require-skill require --preflight")
     if args.catalog_details and not args.preflight:

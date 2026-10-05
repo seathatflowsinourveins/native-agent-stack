@@ -248,7 +248,7 @@ machine-readable copy with each `checksum_source` and `checksum_ref` is
 | `llama-cpp` | b11057 | `llama-b11057-bin-macos-arm64.tar.gz` | `443eadead90d44c3925b7163012430b2df4934df881cf72a4d94fc71d1380da1` | `github_release_asset_digest_plus_local_rehash` |
 | `qdrant` | 1.19.1 | `qdrant-aarch64-apple-darwin.tar.gz` | `e060209dfefc9d977ddcec48521349f505f8fd1ce21f2a3db444140870522fe4` | `github_release_asset_digest_plus_local_rehash` |
 | `socraticode` | 1.14.0 | `socraticode-1.14.0.tgz` | `3dbb106c876be4214048289cef31094eb0e48e97007fb90180270edc4eed7c46` | `npm_registry_integrity_crosscheck` |
-| `rtk` | 0.50.0 | `rtk-aarch64-apple-darwin.tar.gz` | `fe54761a9950266e3a78ddb66a8af5e067251169da306a288e0751de63d836fe` | `publisher_checksum_file` |
+| `rtk` | 0.51.0 | `rtk-aarch64-apple-darwin.tar.gz` | `8817d8b71afc02ac8bf06eb24bcc41c306592ab735b68e8fee9db1ba0de7cb59` | `publisher_checksum_file` |
 | `qmd` | 2.8.3 | `qmd-2.8.3.tgz` | `2e60829913a0c646234a905cefd61043167a1392fdcfd19bc54f890af89ca0f0` | `npm_registry_integrity_crosscheck` |
 | `repomix` | 1.18.1 | `repomix-1.18.1.tgz` | `d4d278310b33f245d4abbc7f757cc3815ff362f6d69225692f837c7dcee83c8f` | `npm_registry_integrity_crosscheck` |
 | `toon` | 4.1.1 | `cli-4.1.1.tgz` (`@toon-format/cli`) | `93ec1d3f44a608332d6f1fa811adda4237983841baec9b165e40252f20d83ca6` | `npm_registry_integrity_crosscheck` |
@@ -321,9 +321,9 @@ checks these variables before configuration; the
 records the profile loading check and its limits. This amendment adds no Mac
 execution receipt.
 
-A Mac that runs the Claude RTK hook at the rtk 0.50.0 pin needs the exclusions from
+A Mac that runs the Claude RTK hook at the rtk 0.51.0 pin needs the exclusions from
 [the RTK hook recipe](../../recipes/README.md#native-context-mode-and-hooks) in
-`~/Library/Application Support/rtk/config.toml`, the only config file rtk 0.50.0 reads on
+`~/Library/Application Support/rtk/config.toml`, the config file rtk 0.51.0 reads on
 macOS. It reads `dirs::config_dir()/rtk/config.toml`, which on macOS is under
 `$HOME/Library/Application Support` whatever `XDG_CONFIG_HOME` says, and it reads no
 config-path variable of its own, so a file at the Linux location under `~/.config` is never
@@ -915,3 +915,5 @@ qualification on this platform, not a port:
   (the existing WSL kernel, Windows-mount `PATH` segments, and the WSL vLLM
   0.25.0 GPU pin documented in [the Linux/WSL2 page](linux-wsl2.md)).
 - Every native sign-in, service start, and acceptance test named above.
+
+The 2026-10-04 Darwin RTK 0.51.0 archive is artifact-checked only; no Mac executed it in the retained host records. MCPorter stays at 0.13.13 until a Mac qualifies 0.14.2; the Linux host upgrade does not qualify the Mac. Claude HUD 0.10.0 remains a native plugin from tag v0.10.0. The [RTK](../../evidence/receipts/rtk-051-qualification-20261004.json), [MCPorter](../../evidence/receipts/mcporter-0142-qualification-20261004.json) and [Claude HUD](../../evidence/receipts/claude-hud-0100-qualification-20261004.json) receipts retain the host failures and evidence limits.

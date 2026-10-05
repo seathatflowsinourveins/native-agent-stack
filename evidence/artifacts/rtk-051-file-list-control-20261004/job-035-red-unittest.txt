@@ -1,0 +1,15 @@
+F
+======================================================================
+FAIL: test_rtk_exactness_checks_reject_passthrough_and_broken_recovery (tests.test_native_token_ci.NativeTokenCIContracts.test_rtk_exactness_checks_reject_passthrough_and_broken_recovery)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "<CHECKOUT>/tests/test_native_token_ci.py", line 1135, in test_rtk_exactness_checks_reject_passthrough_and_broken_recovery
+    self.assertEqual(ci.rtk_exactness_checks(cases, blob), dict.fromkeys(labels, True))
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: {'rtk[438 chars]ed': False, 'rtk-exactness-proxy-restores-nati[21 chars]True} != {'rtk[438 chars]ed': True, 'rtk-exactness-proxy-restores-nativ[20 chars]True}
+Diff is 715 characters long. Set self.maxDiff to None to see it.
+
+----------------------------------------------------------------------
+Ran 1 test in 0.001s
+
+FAILED (failures=1)

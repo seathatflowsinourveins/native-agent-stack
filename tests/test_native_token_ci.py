@@ -1080,7 +1080,10 @@ class NativeTokenCIContracts(unittest.TestCase):
 
     @staticmethod
     def _rtk_exactness_cases():
-        # Synthetic native/0.50.0/proxy arms from rtk_exactness_fixture and its frozen predicates;
+        # Synthetic native/0.51.0/proxy arms; diff status follows upstream bf23cff.
+        # File-list fold/guard: v0.51.0 src/cmds/system/search.rs:612-674,1337-1342;
+        # upstream feac25d and 3223a80, including a carriage return in a filename.
+        # Remaining outcomes come from the 0.50.0 rtk_exactness_fixture predicates;
         # the committed port cites full-save/rtk/exactness.sh (2026-09-26 scratch, not committed).
         blob = "".join(f"line {number:05d} abcdefghijklmnopqrstuvwxyz0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZ\n"
                        for number in range(1, 401))
@@ -1095,13 +1098,19 @@ class NativeTokenCIContracts(unittest.TestCase):
             "... (20 lines truncated)", "[full output: rtk recall abc123]"]) + "\n"
         diff = "2c2\n< beta\n---\n> gamma\n"
         grep = "src/deep/pkg/f1.txt\nsrc/deep/pkg/f2.txt\nsrc/deep/pkg/f3.txt\n"
+        folded_grep = "src/deep/pkg/ (3 files)\nf1.txt\nf2.txt\nf3.txt\n"
+        non_plain_grep = ("grep-non-plain/deep/pkg/f1.txt\r\n"
+                          "grep-non-plain/deep/pkg/f2.txt\n"
+                          "grep-non-plain/deep/pkg/f3.txt\n")
+        plain_grep = non_plain_grep.replace("\r", "")
+        folded_plain_grep = "grep-non-plain/deep/pkg/ (3 files)\nf1.txt\nf2.txt\nf3.txt\n"
         cases = {}
         for case, native_exit, native_stdout, rtk_exit, rtk_stdout in (
                 ("t1-git-show-blob", 0, blob, 0, "".join(blob.splitlines(keepends=True)[:100]) +
                  "... (+300 lines) [see remaining: rtk proxy git show HEAD:big.txt]\n"),
                 ("t1b-git-c-show-blob", 0, blob, 0, "".join(blob.splitlines(keepends=True)[:100]) +
                  "... (+300 lines) [see remaining: rtk proxy git -C . show HEAD:big.txt]\n"),
-                ("t2-diff-missing-file", 2, "", 1, ""),
+                ("t2-diff-missing-file", 2, "", 2, ""),
                 ("t2b-diff-two-files", 1, diff, 1, diff),
                 ("t3-git-branch-all", 0, "+ feature\n* main\n  remotes/origin/feature\n  remotes/origin/main\n",
                  0, "  remote-only (1):\n    feature\n"),
@@ -1109,51 +1118,163 @@ class NativeTokenCIContracts(unittest.TestCase):
                 ("t4b-git-log-subjects", 0, "\n".join(subjects) + "\n", 0,
                  "\n".join(subject for subject in subjects if subject != "merge feature") + "\n"),
                 ("t5-find-missing-dir", 1, "", 0, ""),
-                ("t6-grep-file-list", 0, grep, 0, grep),
+                ("t6-grep-file-list", 0, grep, 0, folded_grep),
+                ("t6b-grep-non-plain-file-list", 0, non_plain_grep, 0, non_plain_grep),
+                ("t6c-grep-plain-file-list", 0, plain_grep, 0, folded_plain_grep),
                 ("t7-jq-rows", 0, "\n".join(rows) + "\n", 0, jq)):
             native = {"exit": native_exit, "stdout": native_stdout}
             cases[case] = {"native": native, "rtk": {"exit": rtk_exit, "stdout": rtk_stdout}, "proxy": dict(native)}
         return cases, blob
 
     def test_rtk_exactness_checks_reject_passthrough_and_broken_recovery(self):
-        # Mock-free check of the eight frozen outcomes in rtk_exactness_checks (rtk 0.50.0).
+        # Mock-free check of ten outcomes, including the matched plain -l sibling.
         labels = (
             "rtk-exactness-git-show-blob-window-changes-its-tail",
-            "rtk-exactness-diff-missing-file-exit-code-changes",
+            "rtk-exactness-diff-missing-file-preserves-native-exit-code",
             "rtk-exactness-branch-list-misreports-a-worktree-branch-as-remote-only",
             "rtk-exactness-log-caps-at-ten-commits-and-drops-the-merge",
             "rtk-exactness-find-on-a-missing-directory-masks-the-exit-code",
             "rtk-exactness-jq-truncates-rows-and-width",
-            "rtk-exactness-controls-diff-and-grep-unchanged",
+            "rtk-exactness-controls-diff-unchanged-and-grep-fold-lossless",
+            "rtk-exactness-grep-non-plain-path-list-stays-verbatim",
+            "rtk-exactness-grep-explicit-plain-path-list-folds-losslessly",
             "rtk-exactness-proxy-restores-native-output-and-exit",
         )
         cases, blob = self._rtk_exactness_cases()
-        self.assertEqual(len(cases), 10)
+        self.assertEqual(len(cases), 12)
         self.assertEqual(ci.rtk_exactness_checks(cases, blob), dict.fromkeys(labels, True))
         variants = []
         for case, failing in (
                 ("t1-git-show-blob", labels[0]), ("t1b-git-c-show-blob", labels[0]),
-                ("t2-diff-missing-file", labels[1]), ("t3-git-branch-all", labels[2]),
+                ("t3-git-branch-all", labels[2]),
                 ("t4-git-log", labels[3]), ("t4b-git-log-subjects", labels[3]),
                 ("t5-find-missing-dir", labels[4]), ("t7-jq-rows", labels[5])):
             variants.append((case, "rtk", dict(cases[case]["native"]), failing))
+        # Upstream v0.51.0 tests/diff_byte_accuracy_test.rs: missing_operand_exits_two_and_names_the_failed_path.
+        # Reject the former exit=1 result and a broken native control.
+        variants.append(("t2-diff-missing-file", "rtk", {"exit": 1, "stdout": ""}, labels[1]))
+        variants.append(("t2-diff-missing-file", "native", {"exit": 1, "stdout": ""}, labels[1]))
         for case in ("t1-git-show-blob", "t1b-git-c-show-blob"):
             variants.append((case, "rtk", {"exit": 0, "stdout": ""}, labels[0]))
         for case in ("t2b-diff-two-files", "t6-grep-file-list"):
             for field, wrong in (("stdout", "lost output\n"), ("exit", 42)):
                 variants.append((case, "rtk", {**cases[case]["rtk"], field: wrong}, labels[6]))
+        # Reject an absent fold, a malformed header, and missing/duplicated/changed paths.
+        for wrong in (
+                cases["t6-grep-file-list"]["native"]["stdout"],
+                "src/deep/pkg/ (2 files)\nf1.txt\nf2.txt\nf3.txt\n",
+                "src/deep/pkg (3 files)\nf1.txt\nf2.txt\nf3.txt\n",
+                "src/deep/pkg/ (3 files)\nf1.txt\nf2.txt\n",
+                "src/deep/pkg/ (3 files)\nf1.txt\nf2.txt\nf2.txt\n",
+                "src/deep/pkg/ (4 files)\nf1.txt\nf2.txt\nf3.txt\nf4.txt\n",
+                "src/wrong/pkg/ (3 files)\nf1.txt\nf2.txt\nf3.txt\n",
+                "src/deep/pkg/ (3 files)\nf1.txt\nf2.txt\nf3.tx\n",
+                "src/deep/pkg/ (3 files)\nf1.txt\r\nf2.txt\nf3.txt\n",
+                "src/deep/pkg/ (3 files)\nsrc/deep/pkg/f1.txt\nf2.txt\nf3.txt\n"):
+            variants.append(("t6-grep-file-list", "rtk", {"exit": 0, "stdout": wrong}, labels[6]))
+        variants.append(("t6-grep-file-list", "native", {"exit": 0, "stdout": ""}, labels[6]))
+        variants.append(("t6-grep-file-list", "native", {**cases["t6-grep-file-list"]["native"], "exit": 42}, labels[6]))
+        guard_case = "t6b-grep-non-plain-file-list"
+        for wrong in (
+                {"exit": 0, "stdout": cases[guard_case]["native"]["stdout"].replace("\r", "")},
+                {"exit": 0, "stdout": "grep-non-plain/deep/pkg/ (3 files)\nf1.txt\nf2.txt\nf3.txt\n"},
+                {"exit": 42, "stdout": cases[guard_case]["native"]["stdout"]}):
+            variants.append((guard_case, "rtk", wrong, labels[7]))
+        # A guard fixture without the CR signal or any output must not pass vacuously.
+        for wrong in ({"exit": 0, "stdout": ""},
+                      {"exit": 0, "stdout": cases[guard_case]["native"]["stdout"].replace("\r", "")},
+                      {"exit": 42, "stdout": cases[guard_case]["native"]["stdout"]}):
+            with self.subTest(guard_control=wrong):
+                changed = deepcopy(cases)
+                changed[guard_case] = {arm: dict(wrong) for arm in ("native", "rtk", "proxy")}
+                self.assertFalse(ci.rtk_exactness_checks(changed, blob)[labels[7]])
+        # The CR-free explicit-operand sibling must actually fold and preserve order.
+        plain_case = "t6c-grep-plain-file-list"
+        for wrong in (
+                {"exit": 0, "stdout": cases[plain_case]["native"]["stdout"]},
+                {"exit": 0, "stdout": "grep-non-plain/deep/pkg/ (2 files)\nf1.txt\nf2.txt\nf3.txt\n"},
+                {"exit": 0, "stdout": "grep-non-plain/deep/pkg/ (3 files)\nf1.txt\nf2.txt\n"},
+                {"exit": 0, "stdout": "grep-non-plain/deep/pkg/ (3 files)\nf3.txt\nf1.txt\nf2.txt\n"},
+                {"exit": 42, "stdout": cases[plain_case]["rtk"]["stdout"]}):
+            variants.append((plain_case, "rtk", wrong, labels[8]))
+        variants.append((plain_case, "native", {**cases[plain_case]["native"], "exit": 42}, labels[8]))
+        with self.subTest(plain_control="CR signal"):
+            changed = deepcopy(cases)
+            for arm in ("native", "rtk", "proxy"):
+                changed[plain_case][arm]["stdout"] = changed[plain_case][arm]["stdout"].replace("f1.txt\n", "f1.txt\r\n")
+            checks = ci.rtk_exactness_checks(changed, blob)
+            self.assertEqual(checks, {label: label != labels[8] for label in labels})
         for case in cases:
             for field, wrong in (("stdout", "lost output\n"), ("exit", 42)):
-                variants.append((case, "proxy", {**cases[case]["proxy"], field: wrong}, labels[7]))
+                variants.append((case, "proxy", {**cases[case]["proxy"], field: wrong}, labels[9]))
         for case, arm, wrong, failing in variants:
             with self.subTest(case=case, arm=arm, response=wrong):
                 changed = deepcopy(cases)
                 changed[case][arm] = wrong
+                if arm == "native":
+                    changed[case]["proxy"] = dict(wrong)
                 checks = ci.rtk_exactness_checks(changed, blob)
                 self.assertEqual(checks, {label: label != failing for label in labels})
                 # The fixture feeds these exact booleans and labels to Run.check -> require.
                 with self.assertRaisesRegex(AssertionError, f"^{failing}$"):
                     ci.require(checks[failing], failing)
+
+    def test_rtk_exactness_grep_fold_compares_complete_native_paths_in_engine_order(self):
+        for name, native, folded in (
+                # search.rs:613,670-674 preserves engine order, including non-lexical order.
+                ("relative engine order",
+                 "src/deep/pkg/f3.txt\nsrc/deep/pkg/f1.txt\nsrc/deep/pkg/f2.txt\n",
+                 "src/deep/pkg/ (3 files)\nf3.txt\nf1.txt\nf2.txt\n"),
+                # Unchanged upstream search.rs:1345-1354 lossless unit example.
+                ("absolute nested tails", "/p/q/a.rs\n/p/q/r/b.rs\n/p/q/c.rs\n",
+                 "/p/q/ (3 files)\na.rs\nr/b.rs\nc.rs\n"),
+                # Literal prefix/tails: the header suffix must be parsed from its end.
+                ("spaces and header-like directory",
+                 "src (2 files)/deep/a file.rs\nsrc (2 files)/deep/r/b.rs\nsrc (2 files)/deep/c.rs\n",
+                 "src (2 files)/deep/ (3 files)\na file.rs\nr/b.rs\nc.rs\n")):
+            with self.subTest(paths=name):
+                cases, blob = self._rtk_exactness_cases()
+                cases["t6-grep-file-list"]["native"]["stdout"] = native
+                cases["t6-grep-file-list"]["proxy"]["stdout"] = native
+                cases["t6-grep-file-list"]["rtk"]["stdout"] = folded
+                self.assertTrue(all(ci.rtk_exactness_checks(cases, blob).values()))
+
+    def test_rtk_exactness_grep_fold_rejects_duplicate_native_paths(self):
+        # Three records and a matching inverse still fail native distinctness alone.
+        cases, blob = self._rtk_exactness_cases()
+        native = "src/deep/pkg/f1.txt\nsrc/deep/pkg/f2.txt\nsrc/deep/pkg/f2.txt\n"
+        cases["t6-grep-file-list"]["native"]["stdout"] = native
+        cases["t6-grep-file-list"]["proxy"]["stdout"] = native
+        cases["t6-grep-file-list"]["rtk"]["stdout"] = "src/deep/pkg/ (3 files)\nf1.txt\nf2.txt\nf2.txt\n"
+        failing = "rtk-exactness-controls-diff-unchanged-and-grep-fold-lossless"
+        checks = ci.rtk_exactness_checks(cases, blob)
+        self.assertEqual({label for label, passed in checks.items() if not passed}, {failing})
+        with self.assertRaisesRegex(AssertionError, f"^{failing}$"):
+            ci.require(checks[failing], failing)
+
+    def test_rtk_exactness_grep_guard_rejects_wrong_lf_record_count(self):
+        # All arms agree and retain the CR signal, isolating the LF record-count term.
+        for stdout in ("grep-non-plain/deep/pkg/f1.txt\r\ngrep-non-plain/deep/pkg/f2.txt\n",
+                       "grep-non-plain/deep/pkg/f1.txt\r\ngrep-non-plain/deep/pkg/f2.txt\n"
+                       "grep-non-plain/deep/pkg/f3.txt\ngrep-non-plain/deep/pkg/f4.txt\n"):
+            with self.subTest(records=stdout.count("\n")):
+                cases, blob = self._rtk_exactness_cases()
+                cases["t6b-grep-non-plain-file-list"] = {
+                    arm: {"exit": 0, "stdout": stdout} for arm in ("native", "rtk", "proxy")}
+                failing = "rtk-exactness-grep-non-plain-path-list-stays-verbatim"
+                checks = ci.rtk_exactness_checks(cases, blob)
+                self.assertEqual({label for label, passed in checks.items() if not passed}, {failing})
+                with self.assertRaisesRegex(AssertionError, f"^{failing}$"):
+                    ci.require(checks[failing], failing)
+
+    def test_rtk_exactness_grep_fold_rejects_reordered_paths(self):
+        cases, blob = self._rtk_exactness_cases()
+        cases["t6-grep-file-list"]["rtk"]["stdout"] = "src/deep/pkg/ (3 files)\nf3.txt\nf1.txt\nf2.txt\n"
+        failing = "rtk-exactness-controls-diff-unchanged-and-grep-fold-lossless"
+        checks = ci.rtk_exactness_checks(cases, blob)
+        self.assertEqual({label for label, passed in checks.items() if not passed}, {failing})
+        with self.assertRaisesRegex(AssertionError, f"^{failing}$"):
+            ci.require(checks[failing], failing)
 
     def test_rtk_exact_rows_exercises_the_jq_line_and_width_limits(self):
         # rtk_exact_rows and rtk 0.50.0 src/filters/jq.toml: max_lines=40, width=120.
@@ -1210,6 +1331,11 @@ class NativeTokenCIContracts(unittest.TestCase):
                     prefix = {"native": [], "rtk": ["/stub/rtk"], "proxy": ["/stub/rtk", "proxy"]}[arm]
                     self.assertEqual(argv[:len(prefix)], prefix)
                     self.assertIn(argv[len(prefix)], ("git", "diff", "find", "grep", "jq"))
+                    if case in ("t6b-grep-non-plain-file-list", "t6c-grep-plain-file-list"):
+                        suffix = "\r" if case == "t6b-grep-non-plain-file-list" else ""
+                        self.assertEqual(argv[len(prefix):], ["grep", "-l", "needle",
+                            "grep-non-plain/deep/pkg/f1.txt" + suffix, "grep-non-plain/deep/pkg/f2.txt",
+                            "grep-non-plain/deep/pkg/f3.txt"])
                     arms.append((case, arm))
                     result = cases[case][arm]
                     run.report["commands"].append({"label": label, "exit_code": result["exit"],
