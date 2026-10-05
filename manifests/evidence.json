@@ -4325,6 +4325,23 @@
         "Active client processes and differing owned profile are guarded; production rollout must use the qualified ownership migration and idle guard."
       ],
       "path": "evidence/receipts/codex-01592-host-finalization-20260930.json"
+    },
+    {
+      "id": "ns2604-organic-use-pilot-20261005",
+      "kind": "historical_inventory",
+      "component_ids": [
+        "jcodemunch-mcp",
+        "serena"
+      ],
+      "claim": "Sanitized source inventory for organic-e2e-v1-20261005 plus U1: four pending client/arm cells and eight terminal process records; no metrics, verdict or readiness change.",
+      "limitations": [
+        "Historical inventory only, not a live organic qualification, upstream acceptance or a new host execution.",
+        "Process rc/times do not establish exposure, selection, successful use, native telemetry joins or an organic verdict.",
+        "Protocol and run originals are private owner-held proof; the public digest retains logical locators and hashes without prompts, conversations or active host configuration.",
+        "Pilot metrics and verdicts remain null; independent verification, convergence-practice format review and command-center adjudication are pending.",
+        "The 30-day observational recheck limit reuses the existing freshness default and is not a protocol qualification threshold."
+      ],
+      "path": "evidence/receipts/ns2604-organic-use-pilot-20261005.json"
     }
   ],
   "files": [
@@ -15736,8 +15753,8 @@
     },
     {
       "path": "catalogs/README.md",
-      "sha256": "b849394c1855754c7dbcc1106e5b21c196a4dd2113d1f3862c9a07107c1b9715",
-      "bytes": 3355
+      "sha256": "9024607e5f684c1ea06bc8816dc60d66f10d1980f7113951fb894e64b351df75",
+      "bytes": 3839
     },
     {
       "path": "catalogs/convergence-practice/architecture-wave/README.md",
@@ -15911,8 +15928,8 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "a3d4df9eb0f9cea278deb99a6370eb7f17e46c87e63b2092a649e9831d147519",
-      "bytes": 314853
+      "sha256": "6fb56903ebfffb5939de5bde5b4f0ba3256c8cfc9e56d94877fe70baf1b42643",
+      "bytes": 336586
     },
     {
       "path": "catalogs/landscape/foundation.json",
@@ -15970,6 +15987,11 @@
       "bytes": 287704
     },
     {
+      "path": "catalogs/landscape/organic-use.schema.json",
+      "sha256": "318a0b72fefc89275adcb3b78307117636e4a1be6be459e66c579e3dc52df617",
+      "bytes": 17982
+    },
+    {
       "path": "catalogs/landscape/research-state.json",
       "sha256": "fe142c1b8b8ec8b92d69ec5971d68028225899c101ffc43cea618883b119332a",
       "bytes": 21449
@@ -15986,8 +16008,8 @@
     },
     {
       "path": "catalogs/saturation/README.md",
-      "sha256": "65b35374209ae8abf0d37154e4664cdcac98d5415f02b4583a9c479b4bf4436e",
-      "bytes": 12036
+      "sha256": "ef675914ceb8917d0164175fb57b44ad6df850a13f6b984f49b8ef3febc3c77d",
+      "bytes": 12723
     },
     {
       "path": "catalogs/saturation/ledger.json",
@@ -16446,8 +16468,8 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "f09a0e803184d4e31e48c534ae6d717774516bc2f42d1f7195fa4bee434eb0cb",
-      "bytes": 32903
+      "sha256": "63e9fde8632e545be2d5df0616d6fb44d95421dc502174df35941fdc302af3c9",
+      "bytes": 34130
     },
     {
       "path": "docs/contributing-evidence.md",
@@ -16928,6 +16950,11 @@
       "path": "docs/decisions/2026-10-05-omniroute-gateway-composition.md",
       "sha256": "2859b9a07848be5666856121e1bd350e0c08389826718e96334354dd0ac9ecc7",
       "bytes": 22114
+    },
+    {
+      "path": "docs/decisions/2026-10-05-organic-use-catalog-records.md",
+      "sha256": "60038ef6ff8a502fc1b679dd03def1c4bcd777acfffc56ff79c5e0f6db79655e",
+      "bytes": 13008
     },
     {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
@@ -52370,6 +52397,11 @@
       "bytes": 22000
     },
     {
+      "path": "evidence/receipts/ns2604-organic-use-pilot-20261005.json",
+      "sha256": "aacec9253bc6a2fb6c71fe07acb7f6232408da01af8e4abf827c25af8204ae39",
+      "bytes": 18024
+    },
+    {
       "path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json",
       "sha256": "0f6a0c171872cde9689d9d5f2ff60b881ae2328b96769dc78613f625cf9d1017",
       "bytes": 16128
@@ -53496,8 +53528,8 @@
     },
     {
       "path": "scripts/component_matrix.py",
-      "sha256": "ab4cbdd0521d2a42108395509589b12a82e83afef76e6377574177ff54c5d899",
-      "bytes": 72137
+      "sha256": "e34baa87370bf62bc0ee9ec032cf6e7662d51e6bfbc477121aed5295be3312ef",
+      "bytes": 74063
     },
     {
       "path": "scripts/credential_status.py",
@@ -53541,8 +53573,8 @@
     },
     {
       "path": "scripts/host_receipts.py",
-      "sha256": "c3dc47cdab33e2ed2f1473700774a006a34c6218d6cd7ceb36f33d7f71f0fd6f",
-      "bytes": 111077
+      "sha256": "5b2cef2ae1b944001a6b800f1fcba6770edd7f86ead7be10ac2a53578868a4dc",
+      "bytes": 111679
     },
     {
       "path": "scripts/kernel_keyring.py",
@@ -53565,6 +53597,11 @@
       "bytes": 14217
     },
     {
+      "path": "scripts/organic_use.py",
+      "sha256": "cf4b6228a5ddfc1de2d2a232b811db1a04f856b351b9f6c1826d0157f19ef43c",
+      "bytes": 21220
+    },
+    {
       "path": "scripts/path_safety.py",
       "sha256": "228edf3968176c04c557078c59502b2d90141e000e1acf2917e87cc67316e703",
       "bytes": 3308
@@ -53576,8 +53613,8 @@
     },
     {
       "path": "scripts/receipt_staleness.py",
-      "sha256": "2360fcd200cf9a98914367408aca1ec7df44fdadf32c97c2f13df27a2b18a997",
-      "bytes": 13408
+      "sha256": "7a2ab6dc85adb574467e08f9f1433a4a1100886acbed87ab650fdb931708eb44",
+      "bytes": 20489
     },
     {
       "path": "scripts/recount-tokens.cjs",
@@ -53591,8 +53628,8 @@
     },
     {
       "path": "scripts/saturation_ledger.py",
-      "sha256": "611b5640c92b3985675f3405770405cdc2a9552a8b5e6bc3b3f7a868168f6b76",
-      "bytes": 110935
+      "sha256": "04c898a42a43da11d87b74f338612bb00c0593f6ac87388f5ee142ec4f9afb28",
+      "bytes": 112669
     },
     {
       "path": "scripts/skills_status.py",
@@ -53611,8 +53648,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "2deb008f40032fd860c1386e11518bc8d8f5b21df40b5ff70f13ef4151ca69ab",
-      "bytes": 26751
+      "sha256": "51047c25412dc5e696bc792b473a1dfb2f5e4ab205b3333ed9e1aba969c07144",
+      "bytes": 27727
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -54141,8 +54178,8 @@
     },
     {
       "path": "tests/test_component_matrix.py",
-      "sha256": "a98574895dd7e4dda8c45d6d993af8ec335a5a4a02644efaee64e1688d162de4",
-      "bytes": 83131
+      "sha256": "ae8cce129a77ce5f621e04c0a315fe212dd30db2151b61ab679483fdece0d38a",
+      "bytes": 85366
     },
     {
       "path": "tests/test_context_mode_practice_docs.py",
@@ -54311,8 +54348,8 @@
     },
     {
       "path": "tests/test_host_receipts.py",
-      "sha256": "04f54683ee97d99f3383ac1f9989c0aad843562bdc31f890dece4177f114448f",
-      "bytes": 144843
+      "sha256": "9bedd016368d474b95df96f56b46c22bf8d288c8be93e507bb7132af6db659ff",
+      "bytes": 146443
     },
     {
       "path": "tests/test_ibkr_acceptance.py",
@@ -54590,6 +54627,11 @@
       "bytes": 73784
     },
     {
+      "path": "tests/test_organic_use.py",
+      "sha256": "d5bb4aa341b57c42918c08eea890cf050de95b038b4a390faba4fc53f442b0c4",
+      "bytes": 24082
+    },
+    {
       "path": "tests/test_osv_lockfile_coverage.py",
       "sha256": "cb4d002908f17185127d1d98caaec8ef47b4fd23adefe9c28ee4b3050e53d3a3",
       "bytes": 75839
@@ -54651,8 +54693,8 @@
     },
     {
       "path": "tests/test_receipt_staleness.py",
-      "sha256": "3bf62e631f72fc93740f4ebf361fd76d0da5c9b1743e7ba65542bea640e37fae",
-      "bytes": 24084
+      "sha256": "c99e4ee256b35af82ee5abe04d0bfd2e576c8c4951e94e8809ab60a2d529573c",
+      "bytes": 32273
     },
     {
       "path": "tests/test_release_pin_contents.py",
@@ -54706,8 +54748,8 @@
     },
     {
       "path": "tests/test_saturation_ledger.py",
-      "sha256": "c0311178a40acd4f233bbce29540f6f591f3878e855242f85f71b8dc49a3cbb3",
-      "bytes": 112415
+      "sha256": "1fd9355d47cab5940bc12298727e0b08a6ddeec33c22fe40165bfb763549a381",
+      "bytes": 114021
     },
     {
       "path": "tests/test_sdk_usage_scope.py",
