@@ -2,8 +2,9 @@
 
 A fake `codex` (and a fake `gh`) early on PATH stands in for the real CLI, and a stubbed Hugging Face Hub fetch
 for source_reviews.py; sweep.js runs under node with stubbed agent(), parallel() and pipeline() (skipped without
-node); convert.py's evidence is appended to a synthetic saturation ledger checkout with scripts/saturation_ledger.py
-itself. Optional: BASH32_BINARY (a real bash 3.2, as on macOS) and shellcheck.
+node); the native changed-key recovery test requires node and fails clearly without it. convert.py's evidence is
+appended to a synthetic saturation ledger checkout with scripts/saturation_ledger.py itself. Optional:
+BASH32_BINARY (a real bash 3.2, as on macOS) and shellcheck.
 """
 
 from __future__ import annotations
@@ -268,6 +269,24 @@ SYNTHETIC_LABELS = [f"{role}:{layer}" for layer in ("alpha", "beta") for role in
                     ("discover", "gpt6-discover", "refute-facts", "refute-fit", "gpt6-refute-fit")] + [
     f"{role}:beta:followup" for role in ("discover", "gpt6-discover", "refute-facts", "refute-fit", "gpt6-refute-fit")
 ] + ["critic"]
+
+
+def paused_child_usage(label):
+    """Synthetic child-usage stdout in journal order: a killed attempt, then its changed-key re-run.
+
+    child-usage.mjs summarizeRun preserves started-row order in children, but only links equal call keys.
+    Its effortMismatches reports the killed attempt's empty effort list too.
+    """
+    raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS, status="incomplete"))
+    for i, child in enumerate(raw["children"]):
+        child["agent_id"] = f"b{i}"
+    retry = next(c for c in raw["children"] if c["label"] == label)
+    killed = dict(retry, agent_id="killed", efforts=[], complete=False, requests=0, usage_by_model={},
+                  issues=["no result entry in journal", "no assistant usage in transcript"])
+    raw["children"].insert(0, killed)
+    raw["reason"] = "1 child(ren) incomplete"
+    raw["effort_mismatches"] = [{"child": label, "efforts": []}]
+    return raw
 
 
 # --------------------------------------------------------------------------- templates and skills
@@ -3825,6 +3844,46 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(out["layers"][0]["reopen"], [{"trigger": "retained_failure",
                                                        "ref": "@RETURNS@#/failures/alpha"}])
 
+    def test_superseded_empty_effort_attempt_with_max_retry_is_retained_separately(self):
+        # The upstream tool already supersedes same-key attempts; their empty effort is not an uncovered deviation.
+        raw = paused_child_usage("critic")
+        killed = raw["children"].pop(0)
+        retry = next(c for c in raw["children"] if c["label"] == "critic")
+        raw["superseded_attempts"] = [dict(killed, superseded_by=retry["agent_id"])]
+        raw["effort_mismatches"][0]["superseded_by"] = retry["agent_id"]
+        raw["status"] = "complete"
+        document = usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT)
+        out = convert.convert(healthy_two_layers(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["effort_deviations"], [])
+        self.assertEqual(out["summary"]["retained_failures"], {})
+        self.assertEqual(out["summary"]["reopened_layers"], [])
+        for layer in ("alpha", "beta"):
+            retained = out["returns"]["superseded_retained"][layer]
+            self.assertEqual([(r["round"], r["child"], r["superseded_by"]) for r in retained],
+                             [("critic", "critic", retry["agent_id"])])
+            self.assertTrue(retained[0]["reason"])
+
+    def test_superseded_attempt_needs_a_matching_complete_max_retry(self):
+        for condition in ("missing", "another label", "incomplete", "xhigh"):
+            with self.subTest(condition=condition):
+                raw = paused_child_usage("critic")
+                killed = raw["children"].pop(0)
+                retry = next(c for c in raw["children"] if c["label"] == "critic")
+                raw["superseded_attempts"] = [dict(killed, superseded_by=retry["agent_id"])]
+                if condition == "missing":
+                    raw["children"].remove(retry)
+                elif condition == "another label":
+                    retry["label"] = "discover:alpha"
+                elif condition == "incomplete":
+                    retry["complete"] = False
+                else:
+                    retry["efforts"] = ["xhigh"]
+                document = {"child_usage": raw}
+                out = convert.convert(healthy_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+                failures = out["returns"]["failures"]["alpha"]
+                self.assertTrue(any(f.get("superseded_by") == raw["superseded_attempts"][0]["superseded_by"]
+                                    and f["cause"] == "effort_deviation" for f in failures))
+
     def test_a_worker_with_a_capped_web_search_is_a_retained_failure_of_its_layer(self):
         # The session's WebSearch cap (CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION): child-usage.mjs counts capped calls.
         raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS + ["refute-fit:zeta"]))
@@ -3852,8 +3911,8 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(out["layers"][0]["reopen"], [{"trigger": "retained_failure",
                                                        "ref": "@RETURNS@#/failures/alpha"}])
 
-    def cli(self, work, res, *extra, codex_files=True):
-        run_file = write_json(work / "run.json", {"runId": "wf_fixture-1", "status": "completed", "result": res})
+    def cli(self, work, res, *extra, codex_files=True, run_id="wf_fixture-1"):
+        run_file = write_json(work / "run.json", {"runId": run_id, "status": "completed", "result": res})
         write_json(work / "scope.json", scope_for())
         if codex_files:
             write_codex_files(work, res)
@@ -3871,12 +3930,718 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(returns["workflow_run"], "wf_fixture-1")
         lanes = json.loads((work / "out/lanes.json").read_text())
         self.assertEqual(lanes["lanes"][0]["result"]["limits"][-1], "run note")
+        previous = {path.name: path.read_bytes() for path in (work / "out").iterdir()}
         identifier = "-".join(["0123abcd", "4567", "89ab", "cdef", "0123456789ab"])
         res["first"][0]["claude_discover"]["notes"] = f"session {identifier}"
         done = self.cli(work, res)
         self.assertEqual(done.returncode, 3)
         self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes: local session identifier", done.stderr)
         self.assertNotIn(identifier, done.stderr + done.stdout)
+        self.assertEqual(done.stdout, "")
+        self.assertEqual({path.name: path.read_bytes() for path in (work / "out").iterdir()}, previous)
+
+    def test_cli_redacts_dash_encoded_project_directory_in_notes(self):
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/"):
+            with self.subTest(prefix=prefix):
+                work = temp_dir(self)
+                res = healthy_result()
+                res["first"][0]["claude_discover"]["notes"] = prefix + encoded + "/session-fixture/notes"
+                done = self.cli(work, res)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 prefix + "<project-dir>/session-fixture/notes")
+
+    def test_cli_redacts_dash_encoded_project_directory_deeper_in_strings(self):
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/"):
+            with self.subTest(prefix=prefix):
+                work = temp_dir(self)
+                res = healthy_result()
+                notes = 'trace: (file="' + prefix + encoded + '/session-fixture/notes"); continued'
+                res["first"][0]["claude_discover"]["notes"] = {"details": [{"note": notes}]}
+                done = self.cli(work, res, "--limit", notes)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                expected = 'trace: (file="' + prefix + '<project-dir>/session-fixture/notes"); continued'
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {"details": [{"note": expected}]})
+                lanes = json.loads((work / "out/lanes.json").read_text())
+                self.assertEqual(lanes["lanes"][0]["result"]["limits"][-1], expected)
+                for name in ("returns", "lanes", "layers", "survivors"):
+                    self.assertNotIn(encoded, (work / f"out/{name}.json").read_text())
+
+    def test_cli_redacts_bare_and_suffixed_local_encoded_home(self):
+        # Mock the native home lookup, never the real HOME environment or a real user name.
+        for home in (Path("/") / "home" / "fixture.user", Path("/") / "Users" / "fixture.user"):
+            with self.subTest(home=home):
+                encoded = "-".join(("", home.parts[1], "fixture", "user"))
+                work = temp_dir(self)
+                res = healthy_result()
+                notes = {"bare": encoded, "path": encoded + "/session-fixture/notes",
+                         "project": encoded + "-code-project", "sentence": "read " + encoded + ". Next."}
+                res["first"][0]["claude_discover"]["notes"] = notes
+                run_file = write_json(work / "run.json", {"runId": encoded, "status": "completed", "result": res})
+                scope = write_json(work / "scope.json", scope_for())
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with mock.patch.object(convert.Path, "home", return_value=home), \
+                        contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                    code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                         "--out", str(work / "out")])
+                self.assertEqual(code, 0, stderr.getvalue())
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {"bare": "<project-dir>", "path": "<project-dir>/session-fixture/notes",
+                                  "project": "<project-dir>", "sentence": "read <project-dir>. Next."})
+                self.assertNotIn(encoded, stdout.getvalue())
+
+    def test_cli_redacts_bare_encoded_home_after_native_directory_anchors(self):
+        encoded = "-".join(("", "home", "fixtureuser"))
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/"):
+            with self.subTest(prefix=prefix):
+                work = temp_dir(self)
+                res = healthy_result()
+                res["first"][0]["claude_discover"]["notes"] = prefix + encoded + "/session-fixture"
+                done = self.cli(work, res)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 prefix + "<project-dir>/session-fixture")
+
+    def test_cli_redacts_encoded_profile_slugs_in_prose(self):
+        notes = "see the " + "-".join(("", "home", "assistant", "core")) + " repo and /docs/" + \
+            "-".join(("", "home", "page", "setup"))
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = notes
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         "see the <project-dir> repo and /docs/<project-dir>")
+
+    def test_cli_encoded_home_redaction_preserves_sentence_ending(self):
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = "read projects/" + encoded + ". Next sentence."
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         "read projects/<project-dir>. Next sentence.")
+
+    def test_cli_redacts_encoded_dict_key_and_printed_summary(self):
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        path = "projects/" + encoded
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {"details": [{path: "retained note"}]}
+        # runId reaches the printed summary; notes alone would make the stdout assertion vacuous.
+        done = self.cli(work, res, run_id=path)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {"details": [{"projects/<project-dir>": "retained note"}]})
+        self.assertNotIn(encoded, done.stdout)
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], "projects/<project-dir>")
+
+    def assert_anchored_profile_redaction(self, encoded_home):
+        for prefix in ("~/.claude/projects/", "/tmp/claude-1000/"):
+            for suffix in ("", "-code-project"):
+                with self.subTest(prefix=prefix, suffix=suffix):
+                    work = temp_dir(self)
+                    encoded = encoded_home + suffix
+                    path = prefix + encoded
+                    res = healthy_result()
+                    res["first"][0]["claude_discover"]["notes"] = {
+                        "string": "read " + path + ". Next.", path: "retained note"}
+                    done = self.cli(work, res, run_id=path)
+                    self.assertEqual(done.returncode, 0, done.stderr)
+                    returns = json.loads((work / "out/returns.json").read_text())
+                    expected = prefix + "<project-dir>"
+                    self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                     {"string": "read " + expected + ". Next.", expected: "retained note"})
+                    for name in ("returns", "lanes", "layers", "survivors"):
+                        self.assertNotIn(encoded_home, (work / f"out/{name}.json").read_text())
+                    self.assertNotIn(encoded_home, done.stdout)
+                    self.assertEqual(json.loads(done.stdout)["run"]["runId"], expected)
+
+    def test_cli_redacts_anchored_linux_profile_in_strings_keys_and_summary(self):
+        self.assert_anchored_profile_redaction("-".join(("", "home", "fixtureuser")))
+
+    def test_cli_redacts_anchored_macos_profile_in_strings_keys_and_summary(self):
+        self.assert_anchored_profile_redaction("-".join(("", "Users", "fixtureuser")))
+
+    def assert_profile_context_redaction(self, encoded_home, prefix=""):
+        work = temp_dir(self)
+        encoded = prefix + encoded_home
+        contexts = ("{}", "read {}", "https://example.test/{}/notes", "https://example.test/?project={}",
+                    "https://example.test/list#{}", "cache=/data/{}/", "/srv/{}/notes.md#L4")
+        strings = [context.format(encoded) for context in contexts]
+        expected = [context.format(prefix + "<project-dir>") for context in contexts]
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = [{"value": text, text: "retained note"} for text in strings]
+        done = self.cli(work, res, run_id=" | ".join(strings))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         [{"value": text, text: "retained note"} for text in expected])
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(expected))
+        for name in ("returns", "lanes", "layers", "survivors"):
+            self.assertNotIn(encoded_home, (work / f"out/{name}.json").read_text())
+        self.assertNotIn(encoded_home, done.stdout)
+
+    def test_cli_redacts_bare_macos_case_variants_in_all_contexts(self):
+        for users in ("users", "USERS", "uSeRs"):
+            for suffix in ("", "-code-project"):
+                with self.subTest(users=users, suffix=suffix):
+                    self.assert_profile_context_redaction("-".join(("", users, "fixtureuser")) + suffix)
+
+    def test_cli_redacts_anchored_macos_case_variants_in_all_contexts(self):
+        for users in ("users", "USERS", "uSeRs"):
+            for prefix in ("projects/", "claude-1000/"):
+                for suffix in ("", "-code-project"):
+                    with self.subTest(users=users, prefix=prefix, suffix=suffix):
+                        self.assert_profile_context_redaction("-".join(("", users, "fixtureuser")) + suffix, prefix)
+
+    def test_cli_redacts_dots_only_profile_names(self):
+        roots = (("", "home"), ("", "Users"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
+        for parts in roots:
+            for name in (".", "..", "..."):
+                with self.subTest(parts=parts, name=name):
+                    self.assert_profile_context_redaction("-".join((*parts, name)))
+
+    def test_cli_preserves_example_profiles_before_non_tail_punctuation(self):
+        roots = (("", "home"), ("", "uSeRs"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
+        controls = [prefix + "-".join((*parts, "example")) + tail
+                    for parts in roots for prefix in ("", "projects/", "claude-1000/")
+                    for tail in (",", ";", ":", ">", "}", "&", "?", "#", "=", "|", "*", "!", "\u2026", "\u2019", "\x1b")]
+        work = temp_dir(self)
+        res = healthy_result()
+        notes = [{"value": text, text: "retained control"} for text in controls]
+        res["first"][0]["claude_discover"]["notes"] = notes
+        done = self.cli(work, res, run_id=" | ".join(controls))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(controls))
+
+    def test_cli_redacts_non_name_tails_in_all_contexts(self):
+        roots = (("", "home"), ("", "uSeRs"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
+        contexts = ("{}", "projects/{}", "claude-1000/{}", "https://example.test/?project={}&tab=1")
+        tails = (",", ":", ";", "*", "&", "#", "?", "=", ">", "}", "|", "!")
+        strings, expected = [], []
+        for parts in roots:
+            encoded = "-".join((*parts, "fixtureuser"))
+            for tail in tails:
+                for context in contexts:
+                    strings.append(context.format(encoded + tail))
+                    expected.append(context.format("<project-dir>" + tail))
+            strings.extend(("?project=" + encoded + "&tab=1", encoded + ", " + encoded + ";"))
+            expected.extend(("?project=<project-dir>&tab=1", "<project-dir>, <project-dir>;"))
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = [{"value": text, text: "retained note"} for text in strings]
+        done = self.cli(work, res, run_id=" | ".join(strings))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         [{"value": text, text: "retained note"} for text in expected])
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(expected))
+
+    def test_cli_redacts_serialized_profile_tails_and_preserves_unicode_summary(self):
+        pattern = dict(sweep_common.private_content(ROOT))["encoded home path"]
+        roots = (("", "home"), ("", "Users"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
+        tails = ("\u2026", "\u2019", "\x1b")
+        strings = ["see " + "-".join((*parts, "fixtureuser")) + tail for parts in roots for tail in tails]
+        expected = ["see <project-dir>" + tail for _ in roots for tail in tails]
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = [{"value": text, text: "retained note"} for text in strings]
+        done = self.cli(work, res, run_id=" | ".join(strings))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        emitted_returns = (work / "out/returns.json").read_bytes().decode("utf-8")
+        self.assertIsNone(pattern.search(emitted_returns))
+        self.assertIsNone(pattern.search(done.stdout))
+        self.assertEqual(json.loads(emitted_returns)["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         [{"value": text, text: "retained note"} for text in expected])
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(expected))
+        for tail in tails[:2]:
+            self.assertIn(tail, done.stdout)
+        self.assertNotIn("\\u2026", done.stdout)
+        self.assertNotIn("\\u2019", done.stdout)
+        self.assertIn("\\u001b", done.stdout)
+
+    def test_cli_refuses_serialized_profile_residue_before_publishing(self):
+        # Inject a redaction failure to exercise the independent emitted-text backstop with the real rule.
+        pattern = dict(sweep_common.private_content(ROOT))["encoded home path"]
+        encoded = "-".join(("", "home", "fixtureuser"))
+        strings = ["see " + encoded + tail for tail in ("\u2026", "\u2019", "\x1b")]
+        self.assertTrue(all(pattern.search(text) is None for text in strings))
+        candidate = temp_dir(self) / "candidate-returns.json"
+        sweep_common.write_json(candidate, {"notes": strings})
+        self.assertIsNotNone(pattern.search(candidate.read_bytes().decode("utf-8")))
+        for location in ("returns.json", "printed summary"):
+            with self.subTest(location=location):
+                work = temp_dir(self)
+                res = healthy_result()
+                if location == "returns.json":
+                    res["first"][0]["claude_discover"]["notes"] = [
+                        {"value": text, text: "retained note"} for text in strings]
+                run_id = " | ".join(strings) if location == "printed summary" else "wf_fixture-1"
+                run_file = write_json(work / "run.json", {"runId": run_id, "status": "completed", "result": res})
+                scope = write_json(work / "scope.json", scope_for())
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with mock.patch.object(convert, "redact_project_dirs", side_effect=lambda value, *args: value), \
+                        contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                    code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                         "--out", str(work / "out")])
+                self.assertEqual(code, 3, stderr.getvalue())
+                self.assertIn(location + "#/<serialized>: encoded home path", stderr.getvalue())
+                self.assertEqual(stdout.getvalue(), "")
+                self.assertNotIn(encoded, stderr.getvalue())
+                self.assertFalse((work / "out").exists())
+
+    def test_cli_redacts_complete_local_name_fragments(self):
+        work = temp_dir(self)
+        home = Path("/") / "home" / "fixturelocal"
+        encoded = "-".join(("", "home", "fixturelocal"))
+        contexts = ("{}/", "projects/{}/", "https://example.test/?project={}", "cache=/data/{}/")
+        suffixes = (".smith", "_smith", "9smith", ".smith-code", ".smith\u00e9", "_smith\u00e9", ".smith_\u65e5\u672c")
+        strings = [context.format(encoded + suffix) for suffix in suffixes
+                   for context in contexts]
+        expected = [context.format("<project-dir>") for _ in suffixes for context in contexts]
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = [{"value": text, text: "retained note"} for text in strings]
+        run_file = write_json(work / "run.json", {"runId": " | ".join(strings), "status": "completed", "result": res})
+        scope = write_json(work / "scope.json", scope_for())
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with mock.patch.object(convert.Path, "home", return_value=home), \
+                contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                 "--out", str(work / "out")])
+        self.assertEqual(code, 0, stderr.getvalue())
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         [{"value": text, text: "retained note"} for text in expected])
+        self.assertEqual(json.loads(stdout.getvalue())["run"]["runId"], " | ".join(expected))
+        self.assertNotIn("smith", stdout.getvalue() + (work / "out/returns.json").read_text())
+
+    def test_redactor_output_passes_actual_encoded_home_publication_rule(self):
+        patterns = [(kind, pattern) for kind, pattern in sweep_common.private_content(ROOT)
+                    if kind == "encoded home path"]
+        self.assertEqual(len(patterns), 1,
+                         "#697 at 0d2a38b2 must be on the base: scripts/validate.py has no unique encoded home path rule")
+        roots = ["-".join(("", "home"))]
+        roots.extend("-".join(("", users)) for users in ("Users", "users", "USERS", "uSeRs"))
+        roots.extend("-".join(("", "mnt", drive, users)) for drive, users in
+                     (("c", "Users"), ("C", "users"), ("D", "USERS"), ("d", "uSeRs")))
+        roots.extend("-".join((drive, "", users)) for drive, users in
+                     (("D", "Users"), ("d", "users"), ("C", "USERS"), ("c", "uSeRs")))
+        roots.extend(drive + "---" + users for drive, users in (("E", "Users"), ("e", "uSeRs")))
+        names = ("fixtureuser", "fixture.user", "fixture_user", "fixture9", "fixture-user",
+                 "fixture.user-code-project", "fixture_user-code-project", "fixturelocal", "fixturelocal.smith",
+                 "fixturelocal_smith", ".", "..", "...", "example", "ExAmPlE", "example.person", "exampleuser", "<user>")
+        tails = ("", "/", "\\", '"', "'", " ", "\t", "\n", "`", ")", "]", ",", ";", ":", ".",
+                 ">", "}", "&", "?", "#", "=", "*", "|", "!", "\u2026", "\u2019", "\x1b")
+        contexts = ("{}", "read {} continued", "projects/{}", "claude-1000/{}", "~/.claude/projects/{}",
+                    "/tmp/claude-1000/{}", "https://example.test/{}", "https://example.test/?project={}",
+                    "https://example.test/list#{}", "//example.test/{}", "cache=/data/{}", "/srv/{}/notes.md#L4",
+                    "docs/readme.md#{}", "docs/search?q=dir/{}", "?project={}", "assignment={}", ".{}",
+                    "word{}", "-{}", "{}. Next.")
+        strings = [context.format(root + "-" + name + tail) for root in roots for name in names
+                   for tail in tails for context in contexts]
+        self.assertGreater(sum(bool(patterns[0][1].search(text)) for text in strings), 0)
+        document = [{"value": text, text: "retained note"} for text in strings]
+        home = Path("/") / "home" / "fixturelocal"
+        with mock.patch.object(convert.Path, "home", return_value=home):
+            redacted = convert.redact_project_dirs(document, work=None, repo_root=None)
+        findings = sweep_common.private_findings(redacted, patterns)
+        self.assertFalse(findings, f"{len(findings)} encoded-home residues; first safe locator: {findings[:1]}")
+        emitted = json.dumps(redacted, indent=1, ensure_ascii=False) + "\n"
+        self.assertIsNone(patterns[0][1].search(emitted), "serialized fixture matrix retains an encoded home")
+
+    def test_cli_redacts_anchored_wsl_profile_in_strings_keys_and_summary(self):
+        for drive, users in (("c", "Users"), ("D", "uSeRs")):
+            with self.subTest(drive=drive, users=users):
+                self.assert_anchored_profile_redaction("-".join(("", "mnt", drive, users, "fixtureuser")))
+
+    def test_cli_redacts_anchored_windows_profile_in_strings_keys_and_summary(self):
+        # The converter covers encodings with multiple separators after the drive colon.
+        for drive, users, separators in (("D", "Users", 1), ("c", "uSeRs", 1), ("E", "Users", 2)):
+            with self.subTest(drive=drive, users=users, separators=separators):
+                self.assert_anchored_profile_redaction(drive + "-" * (separators + 1) + users + "-fixtureuser")
+
+    def test_cli_preserves_anchored_example_profiles(self):
+        # Only lowercase example followed by the publication rule's tail is exempt.
+        homes = (("", "home", "example"), ("", "Users", "example"),
+                 ("", "mnt", "c", "Users", "example"), ("D", "", "Users", "example"))
+        for parts in homes:
+            for prefix in ("projects/", "claude-1000/"):
+                with self.subTest(parts=parts, prefix=prefix):
+                    work = temp_dir(self)
+                    path = prefix + "-".join(parts) + "-code-project"
+                    res = healthy_result()
+                    notes = {"string": "read " + path + ". Next.", path: "retained note"}
+                    res["first"][0]["claude_discover"]["notes"] = notes
+                    done = self.cli(work, res, run_id=path)
+                    self.assertEqual(done.returncode, 0, done.stderr)
+                    returns = json.loads((work / "out/returns.json").read_text())
+                    self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
+                    self.assertEqual(json.loads(done.stdout)["run"]["runId"], path)
+        # The exemption must not include a distinct username that starts with 'example'.
+        self.assert_anchored_profile_redaction("-".join(("", "home", "exampleuser")))
+
+    def test_cli_redacts_unanchored_project_slugs(self):
+        homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
+                 ("", "mnt", "c", "Users", "fixtureuser"), ("D", "", "Users", "fixtureuser"))
+        notes = "home-assistant and " + ", ".join("-".join(parts) + "-code-project" for parts in homes)
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = notes
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         "home-assistant and " + ", ".join("<project-dir>" for _ in homes))
+
+    def assert_bare_profile_conversion(self, encoded_home, expected_home="<project-dir>"):
+        for suffix in ("/session-fixture", "\\session-fixture", '" quoted', "' quoted", " continued",
+                       "\tcontinued", "\ncontinued", "` quoted", ")", "]", ""):
+            with self.subTest(suffix=suffix):
+                work = temp_dir(self)
+                path = encoded_home + suffix
+                expected = expected_home + suffix
+                res = healthy_result()
+                res["first"][0]["claude_discover"]["notes"] = {"details": [{"string": "read " + path,
+                                                                           path: "retained note"}]}
+                done = self.cli(work, res, run_id=path)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {"details": [{"string": "read " + expected, expected: "retained note"}]})
+                self.assertEqual(json.loads(done.stdout)["run"]["runId"], expected)
+                if expected_home != encoded_home:
+                    for name in ("returns", "lanes", "layers", "survivors"):
+                        self.assertNotIn(encoded_home, (work / f"out/{name}.json").read_text())
+                    self.assertNotIn(encoded_home, done.stdout)
+
+    def test_cli_redacts_generic_bare_linux_home_for_each_terminator(self):
+        self.assert_bare_profile_conversion("-".join(("", "home", "fixtureuser")))
+
+    def test_cli_redacts_generic_bare_macos_home_for_each_terminator(self):
+        self.assert_bare_profile_conversion("-".join(("", "Users", "fixtureuser")))
+
+    def test_cli_redacts_generic_bare_wsl_home_for_each_terminator(self):
+        for drive, users in (("c", "Users"), ("D", "uSeRs")):
+            with self.subTest(drive=drive, users=users):
+                self.assert_bare_profile_conversion("-".join(("", "mnt", drive, users, "fixtureuser")))
+
+    def test_cli_redacts_generic_bare_windows_home_for_each_terminator(self):
+        for drive, users in (("D", "Users"), ("c", "uSeRs")):
+            with self.subTest(drive=drive, users=users):
+                self.assert_bare_profile_conversion("-".join((drive, "", users, "fixtureuser")))
+
+    def test_cli_preserves_generic_bare_home_prose_and_boundaries(self):
+        homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
+                 ("", "mnt", "c", "Users", "fixtureuser"), ("D", "", "Users", "fixtureuser"))
+        controls = ["home-assistant", "my-home-page", "-".join(("", "home", ""))]
+        for parts in homes:
+            slug = "-".join(parts)
+            controls.extend(("word" + slug, "-" + slug))
+        work = temp_dir(self)
+        res = healthy_result()
+        notes = {"strings": controls, "keys": {control: "retained control" for control in controls}}
+        res["first"][0]["claude_discover"]["notes"] = notes
+        run_id = " | ".join(controls)
+        done = self.cli(work, res, run_id=run_id)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], run_id)
+
+    def test_cli_preserves_generic_bare_example_homes_for_each_terminator(self):
+        homes = (("", "home", "example"), ("", "Users", "example"),
+                 ("", "mnt", "c", "Users", "example"), ("D", "", "Users", "example"))
+        for parts in homes:
+            with self.subTest(parts=parts):
+                slug = "-".join(parts)
+                self.assert_bare_profile_conversion(slug, expected_home=slug)
+        self.assert_bare_profile_conversion("-".join(("", "home", "exampleuser")))
+
+    def test_cli_redacts_unanchored_profile_slugs_in_urls(self):
+        homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
+                 ("", "mnt", "c", "Users", "fixtureuser"), ("D", "", "Users", "fixtureuser"))
+        for parts in homes:
+            with self.subTest(parts=parts):
+                encoded = "-".join(parts)
+                controls = ["https://example.test/list#" + encoded,
+                            "https://example.test/search?q=" + encoded,
+                            "https://example.test/" + encoded,
+                            "https://example.test/dir/" + encoded + "/docs",
+                            "https://example.test/?q=dir/" + encoded,
+                            "//example.test/" + encoded,
+                            "docs/readme.md#" + encoded,
+                            "docs/search?q=dir/" + encoded,
+                            "search=dir/" + encoded,
+                            "?project=" + encoded + "-code-project",
+                            "/srv/" + encoded + "/notes.md#L4",
+                            "cache=/data/" + encoded + "/",
+                            "?next=" + encoded, "#" + encoded, "=" + encoded]
+                work = temp_dir(self)
+                res = healthy_result()
+                notes = {"strings": controls, "keys": {control: "retained control" for control in controls}}
+                res["first"][0]["claude_discover"]["notes"] = notes
+                run_id = " | ".join(controls)
+                done = self.cli(work, res, run_id=run_id)
+                self.assertEqual(done.returncode, 0, done.stderr)
+                returns = json.loads((work / "out/returns.json").read_text())
+                expected = [control.replace(encoded + "-code-project", "<project-dir>")
+                            .replace(encoded, "<project-dir>") for control in controls]
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {"strings": expected, "keys": {text: "retained control" for text in expected}})
+                self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(expected))
+                self.assertNotIn(encoded, done.stdout + (work / "out/returns.json").read_text())
+
+    def test_cli_redacts_local_encoded_home_in_urls(self):
+        work = temp_dir(self)
+        home = Path("/") / "home" / "fixtureuser"
+        encoded = "-".join(("", "home", "fixtureuser"))
+        controls = ["https://example.test/" + encoded,
+                    "https://example.test/dir/" + encoded + "-code-project",
+                    "docs/search?q=dir/" + encoded,
+                    "?project=" + encoded + "-code-project",
+                    "/srv/" + encoded + "/notes.md#L4",
+                    "cache=/data/" + encoded + "/"]
+        res = healthy_result()
+        notes = {"strings": controls, "keys": {control: "retained control" for control in controls}}
+        res["first"][0]["claude_discover"]["notes"] = notes
+        run_id = " | ".join(controls)
+        run_file = write_json(work / "run.json", {"runId": run_id, "status": "completed", "result": res})
+        scope = write_json(work / "scope.json", scope_for())
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with mock.patch.object(convert.Path, "home", return_value=home), \
+                contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                 "--out", str(work / "out")])
+        self.assertEqual(code, 0, stderr.getvalue())
+        returns = json.loads((work / "out/returns.json").read_text())
+        expected = [control.replace(encoded + "-code-project", "<project-dir>")
+                    .replace(encoded, "<project-dir>") for control in controls]
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {"strings": expected, "keys": {text: "retained control" for text in expected}})
+        self.assertEqual(json.loads(stdout.getvalue())["run"]["runId"], " | ".join(expected))
+        self.assertNotIn(encoded, stdout.getvalue() + (work / "out/returns.json").read_text())
+
+    def test_cli_redacts_local_checkout_and_work_encodings_inside_urls(self):
+        work = temp_dir(self)
+        linux_home = Path("/") / "home" / "fixturelinux"
+        wsl_root = Path("/") / "mnt" / "c" / "Users" / "fixtureuser" / "code" / "project"
+        for root, private_path in ((ROOT, work), (wsl_root, wsl_root)):
+            with self.subTest(root=root, private_path=private_path):
+                encoded = re.sub(r"[^a-zA-Z0-9]", "-", str(private_path.resolve()))
+                path = "https://example.test/?project=" + encoded + "-nested"
+                expected = "https://example.test/?project=<project-dir>"
+                res = healthy_result()
+                res["first"][0]["claude_discover"]["notes"] = {"string": path, path: "retained note"}
+                run_file = write_json(work / "run.json", {"runId": path, "status": "completed", "result": res})
+                scope = write_json(work / "scope.json", scope_for())
+                write_codex_files(work, res)
+                patterns = sweep_common.private_content(ROOT)
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with mock.patch.object(convert.Path, "home", return_value=linux_home), \
+                        mock.patch.object(convert, "private_content", return_value=patterns), \
+                        contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                    code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                         "--work-dir", str(work), "--repo-root", str(root),
+                                         "--out", str(work / "out")])
+                self.assertEqual(code, 0, stderr.getvalue())
+                returns = json.loads((work / "out/returns.json").read_text())
+                self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                 {"string": expected, expected: "retained note"})
+                self.assertEqual(json.loads(stdout.getvalue())["run"]["runId"], expected)
+                self.assertNotIn(encoded, stdout.getvalue() + (work / "out/returns.json").read_text())
+
+    def test_cli_redacts_publication_rule_name_and_boundary_cases(self):
+        homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
+                 ("", "mnt", "c", "Users", "fixtureuser"), ("D", "", "Users", "fixtureuser"))
+        for parts in homes:
+            for suffix in ("_", ".person", ".", "-code-project"):
+                with self.subTest(parts=parts, suffix=suffix):
+                    encoded = "-".join(parts)
+                    path = "." + encoded + suffix
+                    expected = ".<project-dir>" + ("." if suffix == "." else "")
+                    work = temp_dir(self)
+                    res = healthy_result()
+                    res["first"][0]["claude_discover"]["notes"] = {"string": path, path: "retained note"}
+                    done = self.cli(work, res, run_id=path)
+                    self.assertEqual(done.returncode, 0, done.stderr)
+                    returns = json.loads((work / "out/returns.json").read_text())
+                    self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                     {"string": expected, expected: "retained note"})
+                    self.assertEqual(json.loads(done.stdout)["run"]["runId"], expected)
+                    self.assertNotIn(encoded, done.stdout)
+
+    def test_cli_redacts_publication_rule_example_case_and_suffix_variants(self):
+        homes = (("", "home"), ("", "Users"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
+        for parts in homes:
+            for name in ("ExAmPlE", "example.person", "exampleuser"):
+                with self.subTest(parts=parts, name=name):
+                    self.assert_anchored_profile_redaction("-".join((*parts, name)))
+                    self.assert_bare_profile_conversion("-".join((*parts, name)))
+
+    def test_cli_redacts_anchored_profile_slugs_inside_urls(self):
+        homes = (("", "home", "fixtureuser"), ("", "Users", "fixtureuser"),
+                 ("", "mnt", "c", "Users", "fixtureuser"), ("D", "", "Users", "fixtureuser"))
+        for parts in homes:
+            for prefix in ("projects/", "claude-1000/"):
+                with self.subTest(parts=parts, prefix=prefix):
+                    encoded = "-".join(parts) + "-code-project"
+                    path = "https://example.test/" + prefix + encoded + "/notes"
+                    expected = "https://example.test/" + prefix + "<project-dir>/notes"
+                    work = temp_dir(self)
+                    res = healthy_result()
+                    res["first"][0]["claude_discover"]["notes"] = {"string": path, path: "retained note"}
+                    done = self.cli(work, res, run_id=path)
+                    self.assertEqual(done.returncode, 0, done.stderr)
+                    returns = json.loads((work / "out/returns.json").read_text())
+                    self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                                     {"string": expected, expected: "retained note"})
+                    self.assertEqual(json.loads(done.stdout)["run"]["runId"], expected)
+                    self.assertNotIn(encoded, done.stdout)
+
+    def assert_cli_key_collision(self, work, res, locator_pattern, private_keys):
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 3, done.stderr)
+        self.assertRegex(done.stderr, r"returns\.json#" + locator_pattern + r": redaction key collision")
+        self.assertEqual(done.stdout, "")
+        self.assertFalse((work / "out").exists(), "collision must be detected before writing artifacts")
+        for key in private_keys:
+            self.assertNotIn(key, done.stderr)
+
+    def test_cli_fails_closed_on_encoded_key_collision(self):
+        work = temp_dir(self)
+        encoded = ["-".join(("", root, "fixtureuser")) for root in ("home", "Users")]
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {
+            "details": [{encoded[0]: "first note", encoded[1]: "second note"}]}
+        self.assert_cli_key_collision(work, res, r"/(?:<key-\d+>/){6}0", encoded)
+
+    def test_cli_fails_closed_on_host_sanitize_key_collision(self):
+        work = temp_dir(self)
+        private_key = str(work) + "/one"
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {
+            "details": [{private_key: "first note", "<work-dir>/one": "second note"}]}
+        self.assert_cli_key_collision(work, res, r"/(?:<key-\d+>/){6}0", [private_key])
+
+    def test_cli_key_collision_reports_only_indices(self):
+        work = temp_dir(self)
+        parent = "-".join(("0123abcd", "4567", "89ab", "cdef", "0123456789ab"))
+        encoded = ["-".join(("", root, "fixtureuser")) for root in ("home", "Users")]
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {parent: {encoded[0]: "first", encoded[1]: "second"}}
+        self.assert_cli_key_collision(work, res, r"(?:/<key-\d+>){6}", [parent, *encoded])
+
+    def test_cli_refuses_private_residue_before_publishing(self):
+        work = temp_dir(self)
+        identifier = "-".join(("0123abcd", "4567", "89ab", "cdef", "0123456789ab"))
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = identifier
+        done = self.cli(work, res, run_id=identifier)
+        self.assertEqual(done.returncode, 3, done.stderr)
+        self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes: local session identifier", done.stderr)
+        self.assertIn("printed summary#/run/runId: local session identifier", done.stderr)
+        self.assertNotIn(identifier, done.stderr)
+        self.assertEqual(done.stdout, "")
+        self.assertFalse((work / "out").exists())
+
+    def test_cli_refuses_private_keys_without_printing_text(self):
+        work = temp_dir(self)
+        identifier = "-".join(("0123abcd", "4567", "89ab", "cdef", "0123456789ab"))
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {"details": [{identifier: {"value": identifier}}]}
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 3, done.stderr)
+        self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes/details/0/<key-0>: "
+                      "local session identifier (in a key)", done.stderr)
+        self.assertNotIn(identifier, done.stderr)
+        self.assertEqual(done.stdout, "")
+        self.assertFalse((work / "out").exists())
+
+    def test_cli_wires_selected_validator_patterns_to_publication_check(self):
+        work = temp_dir(self)
+        selected = work / "selected-checkout"
+        (selected / "scripts").mkdir(parents=True)
+        validator = (ROOT / "scripts/validate.py").read_text()
+        validator += '\nPRIVATE_CONTENT += (("selected checkout fixture", re.compile("selected-validator-only")),)\n'
+        (selected / "scripts/validate.py").write_text(validator, encoding="utf-8")
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = "selected-validator-only"
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        previous = {path.name: path.read_bytes() for path in (work / "out").iterdir()}
+        done = self.cli(work, res, "--repo-root", selected)
+        self.assertEqual(done.returncode, 3, done.stderr)
+        self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes: selected checkout fixture", done.stderr)
+        self.assertEqual(done.stdout, "")
+        self.assertEqual({path.name: path.read_bytes() for path in (work / "out").iterdir()}, previous)
+
+    def test_cli_redacts_unanchored_wsl_checkout_with_linux_home(self):
+        work = temp_dir(self)
+        linux_home = Path("/") / "home" / "fixturelinux"
+        wsl_root = Path("/") / "mnt" / "c" / "Users" / "fixtureuser" / "code" / "project"
+        encoded = "-".join(("", "mnt", "c", "Users", "fixtureuser", "code", "project"))
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {
+            "bare": encoded, "string": "read " + encoded + "-nested. Next.", encoded: "retained note"}
+        run_file = write_json(work / "run.json", {"runId": encoded, "status": "completed", "result": res})
+        scope = write_json(work / "scope.json", scope_for())
+        # Use the actual validator's patterns while the checkout root is a synthetic WSL profile.
+        patterns = sweep_common.private_content(ROOT)
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with mock.patch.object(convert.Path, "home", return_value=linux_home), \
+                mock.patch.object(convert, "REPO_ROOT", wsl_root), \
+                mock.patch.object(convert, "private_content", return_value=patterns), \
+                contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                 "--out", str(work / "out")])
+        self.assertEqual(code, 0, stderr.getvalue())
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {"bare": "<project-dir>", "string": "read <project-dir>. Next.",
+                          "<project-dir>": "retained note"})
+        for name in ("returns", "lanes", "layers", "survivors"):
+            self.assertNotIn(encoded, (work / f"out/{name}.json").read_text())
+        self.assertNotIn(encoded, stdout.getvalue())
+        self.assertEqual(json.loads(stdout.getvalue())["run"]["runId"], "<project-dir>")
+
+    def test_cli_redacts_unanchored_encoded_work_directory(self):
+        work = temp_dir(self)
+        encoded = re.sub(r"[^a-zA-Z0-9]", "-", str(work.resolve()))
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = {
+            "string": "read " + encoded + "-nested. Next.", encoded: "retained note"}
+        done = self.cli(work, res, run_id=encoded)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         {"string": "read <project-dir>. Next.", "<project-dir>": "retained note"})
+        self.assertNotIn(encoded, done.stdout)
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], "<project-dir>")
+
+    def test_cli_preserves_home_substrings_inside_ordinary_words(self):
+        encoded = "-".join(("", "home", "fixtureuser", "code", "project"))
+        notes = "word" + encoded + " and component-home-widget; unchanged"
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = notes
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
 
     def test_cli_compares_each_gpt6_output_with_the_file_codex_wrote(self):
         work = temp_dir(self)
@@ -3922,6 +4687,220 @@ class ConvertTests(unittest.TestCase):
 
 
 class UsageRecordTests(unittest.TestCase):
+    def measure_paused(self, raw):
+        work = temp_dir(self)
+        stdout = json.dumps(raw).encode("utf-8")
+        (work / "raw.json").write_bytes(stdout)
+        done = run([sys.executable, HARNESS / "usage_record.py", "--raw-output", work / "raw.json", "--exit-code", "1",
+                    "--out", work / "usage.json"])
+        document = json.loads((work / "usage.json").read_text())
+        self.assertEqual(document["measurement"]["exit_code"], 1)
+        self.assertEqual(document["measurement"]["raw_output_sha256"], hashlib.sha256(stdout).hexdigest())
+        return done, document
+
+    def test_killed_critic_rerun_under_changed_call_key_is_superseded(self):
+        raw = paused_child_usage("critic")
+        # Aggregate usage is already over all attempts; moving a child must never add it a second time.
+        raw["by_resolved_model"] = {"claude-opus-5-5": {"children": 2, "output_tokens": 17}}
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        usage = document["child_usage"]
+        retry = next(c for c in usage["children"] if c["label"] == "critic")
+        self.assertEqual(usage["status"], "complete")
+        self.assertEqual([(c["agent_id"], c["superseded_by"], c["reason"]) for c in usage["superseded_attempts"]],
+                         [("killed", retry["agent_id"], "no result entry; a later complete attempt with the same label "
+                           "returned; call keys not compared")])
+        self.assertEqual(usage["by_resolved_model"], {"claude-opus-5-5": {"children": 2, "output_tokens": 17}})
+        self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 1)
+        self.assertIn("1", usage["reason"])
+        out = convert.convert(healthy_two_layers(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["retained_failures"], {})
+        for layer in ("alpha", "beta"):
+            self.assertEqual(out["returns"]["superseded_retained"][layer][0]["child"], "critic")
+        self.assertEqual(make_result.check_usage(document, "fixture", out["returns"], ("alpha", "beta")), usage)
+
+    def test_killed_followup_refuter_rerun_is_superseded(self):
+        label = "refute-facts:beta:followup"
+        done, document = self.measure_paused(paused_child_usage(label))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        usage = document["child_usage"]
+        self.assertEqual(usage["status"], "complete")
+        self.assertEqual([c["label"] for c in usage["superseded_attempts"]], [label])
+        out = convert.convert(synthetic_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["effort_deviations"], [])
+        self.assertEqual(set(out["returns"]["superseded_retained"]), {"beta"})
+        retained = out["returns"]["superseded_retained"]["beta"]
+        self.assertEqual([(r["round"], r["child"]) for r in retained], [("followup", label)])
+        self.assertEqual(make_result.check_usage(document, "fixture", out["returns"], ("alpha", "beta")), usage)
+
+    def test_incomplete_child_without_later_same_label_stays_incomplete(self):
+        raw = paused_child_usage("critic")
+        next(c for c in raw["children"] if c["label"] == "critic" and c["complete"])["label"] = "critic:other"
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1)
+        usage = document["child_usage"]
+        self.assertEqual(usage["status"], "incomplete")
+        self.assertEqual([c["agent_id"] for c in usage["children"] if not c["complete"]], ["killed"])
+        self.assertEqual(usage.get("superseded_attempts", []), [])
+
+    def test_later_same_label_incomplete_attempt_links_nothing(self):
+        raw = paused_child_usage("critic")
+        next(c for c in raw["children"] if c["label"] == "critic" and c["complete"])["complete"] = False
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1)
+        usage = document["child_usage"]
+        self.assertEqual(usage["status"], "incomplete")
+        self.assertEqual(len([c for c in usage["children"] if not c["complete"]]), 2)
+        self.assertEqual(usage.get("superseded_attempts", []), [])
+
+    def test_result_bearing_or_unclassified_incomplete_child_is_not_linked(self):
+        for issue in ("null result", "empty result", "wait-notice result", "missing meta.json", None):
+            with self.subTest(issue=issue):
+                raw = paused_child_usage("critic")
+                if issue is None:
+                    raw["children"][0].pop("issues")
+                else:
+                    raw["children"][0]["issues"] = [issue]
+                done, document = self.measure_paused(raw)
+                self.assertEqual(done.returncode, 1)
+                self.assertEqual(document["child_usage"]["status"], "incomplete")
+                self.assertEqual(document["child_usage"].get("superseded_attempts", []), [])
+                self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 0)
+
+    def test_multiple_complete_children_with_the_same_label_prevent_linking(self):
+        for earlier in (False, True):
+            with self.subTest(earlier=earlier):
+                raw = paused_child_usage("critic")
+                retry = next(c for c in raw["children"] if c["label"] == "critic" and c["complete"])
+                other = dict(retry, agent_id="other-complete")
+                raw["children"].insert(0 if earlier else len(raw["children"]), other)
+                done, document = self.measure_paused(raw)
+                self.assertEqual(done.returncode, 1)
+                self.assertEqual(document["child_usage"]["status"], "incomplete")
+                self.assertEqual(document["child_usage"].get("superseded_attempts", []), [])
+
+    def test_partial_link_keeps_the_other_child_incomplete(self):
+        raw = paused_child_usage("critic")
+        orphan = dict(raw["children"][0], label="refute-facts:missing", agent_id="lost")
+        raw["children"].insert(1, orphan)
+        raw["effort_mismatches"].append({"child": orphan["label"], "efforts": []})
+        done, document = self.measure_paused(raw)
+        usage = document["child_usage"]
+        self.assertEqual(done.returncode, 1)
+        self.assertEqual(usage["status"], "incomplete")
+        self.assertEqual([c["agent_id"] for c in usage["children"] if not c["complete"]], ["lost"])
+        self.assertEqual([c["agent_id"] for c in usage["superseded_attempts"]], ["killed"])
+        self.assertEqual(usage["effort_mismatches"], [{"child": orphan["label"], "efforts": []}])
+        self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 1)
+
+    def test_post_processing_retains_source_reason_and_covered_attempt_provenance(self):
+        raw = paused_child_usage("critic")
+        retry = next(c for c in raw["children"] if c["label"] == "critic" and c["complete"])
+        same_key_target = next(c for c in raw["children"] if c["label"] == "discover:alpha")
+        raw["superseded_attempts"] = [dict(same_key_target, agent_id="same-key-killed", complete=False,
+                                           efforts=[], superseded_by=same_key_target["agent_id"])]
+        raw["effort_mismatches"].append({"child": "discover:alpha", "efforts": [],
+                                         "superseded_by": same_key_target["agent_id"]})
+        raw["reason"] += "; 1 earlier attempt re-run under the same call key"
+        raw["children"][0]["resolved_models"] = [*raw["children"][0]["resolved_models"], "other-model"]
+        raw["multi_model_children"] = ["critic"]
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        processing = document["measurement"]["post_processing"]
+        self.assertEqual(processing["source_status"], raw["status"])
+        self.assertEqual(processing["source_reason"], raw["reason"])
+        self.assertEqual(processing["linked_agent_ids"], ["killed"])
+        self.assertEqual(processing["covered_agent_ids"], ["same-key-killed", "killed"])
+        self.assertEqual(processing["covered_effort_mismatches"],
+                         [{"child": "critic", "efforts": [], "superseded_by": retry["agent_id"]},
+                          {"child": "discover:alpha", "efforts": [], "superseded_by": same_key_target["agent_id"]}])
+        self.assertEqual(processing["effort_mismatches_covered"], 2)
+        self.assertEqual(document["child_usage"]["multi_model_children"], [])
+
+    def test_summary_distinguishes_raw_and_wrapper_exit_codes(self):
+        for orphan in (False, True):
+            with self.subTest(orphan=orphan):
+                raw = paused_child_usage("critic")
+                if orphan:
+                    raw["children"].insert(1, dict(raw["children"][0], label="orphan", agent_id="lost"))
+                done, document = self.measure_paused(raw)
+                summary = json.loads(done.stdout)
+                self.assertEqual(summary["raw_exit_code"], document["measurement"]["exit_code"])
+                self.assertEqual(summary["exit_code"], done.returncode)
+                self.assertEqual(done.returncode, 1 if orphan else 0)
+
+    def test_unsuperseded_nonmax_attempt_stays_an_effort_deviation(self):
+        raw = paused_child_usage("critic")
+        raw["children"].pop(0)
+        next(c for c in raw["children"] if c["label"] == "critic")["efforts"] = ["xhigh"]
+        raw["status"] = "complete"
+        raw["effort_mismatches"] = [{"child": "critic", "efforts": ["xhigh"]}]
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1)
+        self.assertEqual(document["child_usage"].get("superseded_attempts", []), [])
+        out = convert.convert(healthy_result(), scope_for(), LANE, convert.resolved_models(document), usage=document)
+        self.assertEqual(out["summary"]["effort_deviations"], ["critic"])
+        self.assertEqual(out["summary"]["retained_failures"], {"alpha": ["critic:effort_deviation"]})
+        self.assertEqual(make_result.check_usage(document, "fixture", out["returns"], ("alpha",))["status"], "complete")
+        with self.assertRaisesRegex(ValueError, "no effort_deviation retained failure"):
+            make_result.check_usage(document, "fixture", {"failures": {}}, ("alpha",))
+
+    def test_an_earlier_complete_attempt_cannot_supersede_a_child(self):
+        raw = paused_child_usage("critic")
+        raw["children"].append(raw["children"].pop(0))
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1)
+        self.assertEqual(document["child_usage"]["status"], "incomplete")
+        self.assertEqual(document["child_usage"].get("superseded_attempts", []), [])
+
+    def test_superseded_usage_issues_keep_the_record_incomplete(self):
+        raw = paused_child_usage("critic")
+        raw["children"][0]["usage_issues"] = ["1 assistant message(s) without provider usage"]
+        done, document = self.measure_paused(raw)
+        self.assertEqual(done.returncode, 1)
+        usage = document["child_usage"]
+        self.assertEqual(usage["status"], "incomplete")
+        self.assertEqual(usage["superseded_attempts"][0]["usage_issues"], raw["children"][0]["usage_issues"])
+
+    def test_native_changed_keys_link_two_critics_and_a_followup_and_count_usage_once(self):
+        self.assertTrue(NODE, "node is required for the native child-usage.mjs changed-key recovery fixture")
+        transcripts = temp_dir(self) / "subagents" / "workflows" / "wf_changed-keys"
+        transcripts.mkdir(parents=True)
+        followup = "refute-facts:scheduling-supervision:followup"
+        attempts = [("c0", "critic", "old-critic"), ("f0", followup, "old-facts"),
+                    ("c1", "critic", "changed-critic"), ("c2", "critic", "final-critic"),
+                    ("f1", followup, "changed-facts")]
+        journal = []
+        zero = {"input_tokens": 0, "output_tokens": 0, "cache_read_input_tokens": 0, "cache_creation_input_tokens": 0}
+        for agent, label, key in attempts:
+            journal.append({"type": "started", "agentId": agent, "label": label, "key": key})
+            if agent in ("c2", "f1"):
+                journal.append({"type": "result", "agentId": agent, "result": {"ok": True}})
+            rows = []
+            if agent in ("c0", "c2", "f1"):
+                rows = [{"type": "assistant", "effort": "max", "message": {
+                    "id": f"m-{agent}", "model": "claude-opus-5-5", "usage": dict(zero, output_tokens=7 if agent == "c0" else 5)}}]
+            write_json(transcripts / f"agent-{agent}.meta.json", {"model": "opus"})
+            (transcripts / f"agent-{agent}.jsonl").write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+        (transcripts / "journal.jsonl").write_text("".join(json.dumps(e) + "\n" for e in journal), encoding="utf-8")
+        out = temp_dir(self) / "usage.json"
+        done = run([sys.executable, HARNESS / "usage_record.py", "--transcript-dir", transcripts, "--out", out])
+        self.assertEqual(done.returncode, 0, done.stderr)
+        document = json.loads(out.read_text())
+        usage = document["child_usage"]
+        self.assertEqual(document["measurement"]["exit_code"], 1)
+        self.assertEqual(document["measurement"]["post_processing"]["linked_attempts"], 3)
+        self.assertEqual(usage["status"], "complete")
+        self.assertEqual([(c["agent_id"], c["superseded_by"]) for c in usage["superseded_attempts"]],
+                         [("c0", "c2"), ("f0", "f1"), ("c1", "c2")])
+        self.assertEqual([c["agent_id"] for c in usage["children"]], ["c2", "f1"])
+        self.assertEqual(usage["by_resolved_model"]["claude-opus-5-5"]["output_tokens"], 17)
+
+    def test_native_changed_keys_reports_missing_node_as_a_failure(self):
+        with mock.patch(__name__ + ".NODE", None):
+            with self.assertRaisesRegex(AssertionError, "node is required for the native child-usage.mjs"):
+                self.test_native_changed_keys_link_two_critics_and_a_followup_and_count_usage_once()
+
     def test_record_sanitizes_the_transcript_dir_and_hashes_the_raw_output(self):
         work = temp_dir(self)
         raw = child_usage_raw("wf_fixture-1", ["discover:alpha"])
@@ -4172,6 +5151,61 @@ class LedgerIntegrationTests(unittest.TestCase):
         returns["failures"] = {}
         with self.assertRaisesRegex(ValueError, "no effort_deviation retained failure"):
             self.result(out, reviews, returns=returns)
+
+    def test_make_result_accepts_superseded_effort_mismatch_covered_by_max_retry(self):
+        raw = paused_child_usage("critic")
+        killed = raw["children"].pop(0)
+        retry = next(c for c in raw["children"] if c["label"] == "critic")
+        raw["superseded_attempts"] = [dict(killed, superseded_by=retry["agent_id"])]
+        raw["effort_mismatches"][0]["superseded_by"] = retry["agent_id"]
+        raw["status"] = "complete"
+        usage = usage_record.record(json.dumps(raw).encode("utf-8"), 1, "cmd", ROOT)
+        self.assertEqual(make_result.check_usage(usage, "fixture", {"failures": {}}, ("alpha", "beta"))["status"],
+                         "complete")
+
+    def assert_make_result_rejects_uncovered_retry(self, condition):
+        for listed in (False, True):
+            with self.subTest(listed=listed):
+                raw = paused_child_usage("critic")
+                killed = raw["children"].pop(0)
+                retry = next(c for c in raw["children"] if c["label"] == "critic")
+                raw["superseded_attempts"] = [dict(killed, superseded_by=retry["agent_id"])]
+                if condition == "missing":
+                    raw["children"].remove(retry)
+                elif condition == "another label":
+                    retry["label"] = "discover:alpha"
+                elif condition == "incomplete":
+                    retry["complete"] = False
+                else:
+                    retry["efforts"] = ["xhigh"]
+                raw["effort_mismatches"] = ([{"child": "critic", "efforts": [],
+                                             "superseded_by": retry["agent_id"]}] if listed else [])
+                # Isolate coverage from the status gate, including a stale 'complete' input.
+                raw["status"] = "complete"
+                usage = {"measurement": {"exit_code": 1}, "child_usage": raw}
+                with self.assertRaisesRegex(ValueError, "no effort_deviation retained failure"):
+                    make_result.check_usage(usage, "fixture", {"failures": {}}, ("alpha", "beta"))
+
+    def test_make_result_rejects_superseded_attempt_with_missing_retry(self):
+        self.assert_make_result_rejects_uncovered_retry("missing")
+
+    def test_make_result_rejects_superseded_attempt_with_another_label_retry(self):
+        self.assert_make_result_rejects_uncovered_retry("another label")
+
+    def test_make_result_rejects_superseded_attempt_with_incomplete_retry(self):
+        self.assert_make_result_rejects_uncovered_retry("incomplete")
+
+    def test_make_result_rejects_superseded_attempt_with_xhigh_retry(self):
+        self.assert_make_result_rejects_uncovered_retry("xhigh")
+
+    def test_superseded_critic_rerun_keeps_completed_layers_clean(self):
+        usage = usage_record.record(json.dumps(paused_child_usage("critic")).encode("utf-8"), 1, "cmd", ROOT)
+        out, reviews = self.evidence(healthy_two_layers(), usage=usage)
+        result = self.result(out, reviews)
+        self.assertTrue(all(layer["reopen"] == [] for layer in result["layers"]))
+        ledger = sl.append(self.root, json.loads((self.root / sl.LEDGER).read_text()), result)
+        self.assertEqual(sl.check_ledger(self.root, ledger), [])
+        self.assertEqual({key[1]: value["count"] for key, value in sl.derive(ledger).items()}, {"alpha": 1, "beta": 1})
 
     def test_a_capped_web_search_reopens_every_layer_through_the_critic(self):
         raw = json.loads(child_usage_raw("wf_fixture-1", SYNTHETIC_LABELS))

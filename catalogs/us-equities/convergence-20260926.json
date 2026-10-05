@@ -10804,5 +10804,166 @@
     "omitted_candidates": 64,
     "votes_kept": 716,
     "votes_not_addressed": 159
-  }
+  },
+  "forward_notes": [
+    {
+      "checked_at": "2026-10-05",
+      "scope": "Catalog corrections under the user's 2026-10-05 upstream-first, never-rebuild rule. The September 26 proposals, votes, corrections and counts retain their recorded text; these later dispositions do not install or qualify a runtime.",
+      "north_star_action": "Keep research agents on vendor-owned read-only data surfaces and keep numeric risk, durable order state and broker writes in deterministic code for independently qualified IBKR and Alpaca paper operation.",
+      "coordination_sources": [
+        {
+          "ref": "ns2604-coop-reports/trading-upstream-first-audit-20261005.md",
+          "sections": "Registry hygiene (lines 32-35) and Re-judge Alpaca's LLM-native surface (lines 37-48)",
+          "sha256": "47f436f5c72ebe50bff45dee7e1cbc11b266c27ddad566144f2229ef5a1a32cd",
+          "scope": "Private coordinator report, cited by coordination-relative locator and digest."
+        },
+        {
+          "ref": "bounded-jobs-20261004/job-073-rebuild-inventory/adjudication-claude-opus-20261005.md",
+          "sections": "Inventory claim 9, Trading findings (lines 52-62), and Rejects (line 97)",
+          "sha256": "4c52ebc1449eede026bde7f6abad1b98bc3530fd7b5f7ce40980e200ea05daf8",
+          "scope": "Claude Opus 5.5 source adjudication; documentary review, not new execution or a CLI-specific adoption verdict."
+        }
+      ],
+      "ibkr_blockers_correction": {
+        "affected_pointers": [
+          "/trading/4/claude_summary",
+          "/trading/4/candidates/0/demonstrated_gap",
+          "/trading/4/gpt6_corrections/0/claim"
+        ],
+        "correction": "The September 26 in-record correction /trading/4/gpt6_corrections/0 and refuting vote /trading/4/candidates/0/adversarial_verification/votes/1 first refuted the claim that #4983 denies every rc5 stock order. #4983 reports v1.227.0; at rc5 the engine checks handles_order_venue and the IB client returns true. The October 1 owner's verdict adds blockers #5007, #5057 and #5060 on recovery/reconciliation. The pinned rc5 IBKR path remains unqualified until native paper acceptance.",
+        "blockers": [5007, 5057, 5060],
+        "issue_states_checked_at": "2026-10-01",
+        "decision_record": "docs/decisions/2026-10-01-trading-layer-verdicts.md#decisions-on-the-synthesiss-risks",
+        "runtime_record": "catalogs/us-equities/runtime-target.json#/broker_boundaries/0",
+        "sources": [
+          "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/execution/src/engine/mod.rs#L2220-L2231",
+          "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/adapters/interactive_brokers/src/execution/core.rs#L491-L496"
+        ],
+        "verification": "Pinned source re-read on October 5; issue states are the October 1 record, not a new live-state check. No broker run."
+      },
+      "alpaca_py_source_verification": {
+        "version": "0.44.0",
+        "tag": "v0.44.0",
+        "source_pin": "cc4cb3b7ba50ae250e621983c2779047fb16bb28",
+        "method": "GitHub's tag ref resolves directly to this commit. Publish python package run 31481138868 is a successful push of head_branch v0.44.0 at the identical head_sha; its build-and-publish job 93746106958 and Build and publish to pypi step both succeeded. At this commit the publish workflow checks out the tag and uses poetry-dynamic-versioning, and pyproject.toml declares alpaca-py with that tag-derived build backend. This verifies the selected PyPI version's tag-to-publication provenance without rebuilding the package.",
+        "sources": [
+          "https://api.github.com/repos/alpacahq/alpaca-py/git/ref/tags/v0.44.0",
+          "https://github.com/alpacahq/alpaca-py/releases/tag/v0.44.0",
+          "https://api.github.com/repos/alpacahq/alpaca-py/actions/runs/31481138868",
+          "https://api.github.com/repos/alpacahq/alpaca-py/actions/runs/31481138868/jobs",
+          "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/.github/workflows/publish-pypi.yaml",
+          "https://github.com/alpacahq/alpaca-py/blob/cc4cb3b7ba50ae250e621983c2779047fb16bb28/pyproject.toml"
+        ],
+        "limitations": "Publication metadata and pinned source review, not a new install or byte comparison of a downloaded PyPI wheel/sdist. Historical job-log retrieval returned HTTP 410; run and step metadata remain available."
+      },
+      "repository_decisions": [
+        {
+          "id": "alpaca-mcp-server-research-boundary-20261005",
+          "repository": "https://github.com/alpacahq/alpaca-mcp-server",
+          "version": "2.3.2",
+          "tag": "v2.3.2",
+          "source_pin": "9b0c72beda5579de088413ce9c3720456cde8f5f",
+          "decision": "accept_read_only_research_toolsets_reject_paper_order_path",
+          "disposition": "research_only",
+          "review_level": "source_review",
+          "evidence_level": "selected_primary_files",
+          "reason": "The adjudication rejects replacing the deterministic paper runner with an agent-facing order server. Separately scoped read-only data toolsets fit research agents only after the credential-isolation condition below is qualified. This release uses FastMCP/httpx, not alpaca-py.",
+          "toolset_scope": {
+            "mechanism": "ALPACA_TOOLSETS",
+            "research_configuration": "stock-data,options-data,corporate-actions,news,assets",
+            "other_read_only_data_toolsets": ["crypto-data", "fixed-income-data"],
+            "excluded_toolsets": ["account", "trading", "watchlists", "locates"],
+            "source_behavior": "server.py parses the nonempty allowlist, toolsets.py selects operation IDs, and order overrides register only when trading is active. Empty/unset enables all toolsets. account includes patchAccountConfig, so it is excluded from the read-only research scope. Five read-only documentation tools register unconditionally at server.py:212 and proxy to https://docs.alpaca.markets/mcp?project=us via readme_docs.py, independently of ALPACA_TOOLSETS.",
+            "qualification_condition": "Before research use, independently verify that broker keys reside only in a separately identified MCP host process and never in the research process or its environment. ALPACA_TOOLSETS limits exposed tools, not the key's broker authorization; the assets toolset sends the same credentials to the Trading API host. Alpaca's authentication documentation does not establish a data-only or read-only Trading API key for this pinned server, so this scope requires host credential isolation rather than assuming restricted key permissions."
+          },
+          "decision_records": [
+            "ns2604-coop-reports/trading-upstream-first-audit-20261005.md#re-judge-alpacas-llm-native-surface-under-the-2026-10-05-quality-norm",
+            "bounded-jobs-20261004/job-073-rebuild-inventory/adjudication-claude-opus-20261005.md#trading-findings",
+            "catalogs/us-equities/convergence-20260926.json#/trading/4/candidates/7",
+            "blueprints/us-equities/north-star.md#research-harness-contract"
+          ],
+          "sources": [
+            "https://github.com/alpacahq/alpaca-mcp-server/releases/tag/v2.3.2",
+            "https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/README.md#toolset-filtering",
+            "https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/src/alpaca_mcp_server/toolsets.py",
+            "https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/src/alpaca_mcp_server/server.py#L101-L214",
+            "https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/src/alpaca_mcp_server/readme_docs.py",
+            "https://github.com/alpacahq/alpaca-mcp-server/blob/9b0c72beda5579de088413ce9c3720456cde8f5f/pyproject.toml",
+            "https://docs.alpaca.markets/docs/authentication"
+          ],
+          "comparison_that_would_overturn": "Reopen research scope if broker credentials reach the research process, MCP host credential isolation fails, pinned toolsets expose a mutating operation, or the same research-data contract fails. Any future execution proposal must preserve the deterministic order-state boundary; the server's own paper tests do not qualify this lane.",
+          "runtime_acceptance": false
+        },
+        {
+          "id": "alpaca-skills-research-boundary-20261005",
+          "repository": "https://github.com/alpacahq/alpaca-skills",
+          "version": null,
+          "source_pin": "39111abee6b60af7c11d40b5fc892dfc4fd791a4",
+          "version_verification": "Vendor repository exists and is unarchived. main resolves to this commit; GitHub tags and releases returned empty arrays on October 5, so the source version is the commit rather than an invented release.",
+          "decision": "research_only",
+          "disposition": "research_only",
+          "review_level": "source_review",
+          "evidence_level": "selected_primary_files",
+          "reason": "research_only means documentary reference only, not installation or activation. The adoption/skills/manifest.json exclusion stands, including broker-api market-data and backtest; its overturn condition has not been met. Their market-data and historical-research guidance may inform reviewed research. Paper-order, broker-order, funding and account-mutating skills remain outside scope. The backtest skill's custom simulator and optional paper adapter are not adopted: the selected upstream engine and deterministic writer retain those responsibilities.",
+          "decision_records": [
+            "ns2604-coop-reports/trading-upstream-first-audit-20261005.md#re-judge-alpacas-llm-native-surface-under-the-2026-10-05-quality-norm",
+            "adoption/skills/manifest.json#/excluded",
+            "blueprints/us-equities/north-star.md#research-harness-contract"
+          ],
+          "sources": [
+            "https://github.com/alpacahq/alpaca-skills/tree/39111abee6b60af7c11d40b5fc892dfc4fd791a4",
+            "https://github.com/alpacahq/alpaca-skills/blob/39111abee6b60af7c11d40b5fc892dfc4fd791a4/README.md",
+            "https://github.com/alpacahq/alpaca-skills/blob/39111abee6b60af7c11d40b5fc892dfc4fd791a4/skills/broker-api/market-data/SKILL.md",
+            "https://github.com/alpacahq/alpaca-skills/blob/39111abee6b60af7c11d40b5fc892dfc4fd791a4/skills/trading-api/backtest/SKILL.md"
+          ],
+          "comparison_that_would_overturn": "Reopen a selected research skill if its pinned instructions require broker writes or rebuilding an upstream capability. Qualify any later adoption per skill; review of this pack does not accept its order skills or its CLI dependency.",
+          "runtime_acceptance": false
+        },
+        {
+          "id": "alpaca-cli-reconciliation-disposition-20261005",
+          "repository": "https://github.com/alpacahq/cli",
+          "version": "0.0.14",
+          "tag": "v0.0.14",
+          "source_pin": "53606273aa230a40c64b783425dcb3f4423ede30",
+          "decision": "retain_refuted_reconciliation_collector",
+          "disposition": "not_adopted",
+          "review_level": "source_review",
+          "evidence_level": "selected_primary_files",
+          "reason": "The co-op audit permits reconsideration only on new evidence and cites the September 26 refutation of the reconciliation-collector proposal. The existing alpaca-py path already collects fills with bounded pagination and reconciliation checks. v0.0.14 has account activity/portfolio commands but retains its alpha stability warning; pin verification supplies no new comparative result. The adjudication retains the existing deterministic alpaca-py lifecycle and evidence glue, and makes no separate CLI adoption decision.",
+          "decision_records": [
+            "ns2604-coop-reports/trading-upstream-first-audit-20261005.md#re-judge-alpacas-llm-native-surface-under-the-2026-10-05-quality-norm",
+            "bounded-jobs-20261004/job-073-rebuild-inventory/adjudication-claude-opus-20261005.md#trading-findings",
+            "catalogs/sota-convergence/manifest-20260926.json#/trading/6/candidates/9",
+            "docs/decisions/2026-09-27-prompt-audit-resolution.md#alternatives-considered"
+          ],
+          "sources": [
+            "https://github.com/alpacahq/cli/releases/tag/v0.0.14",
+            "https://api.github.com/repos/alpacahq/cli/git/tags/880c09f34d937fbd4a20d431076de0fcde4968a7",
+            "https://github.com/alpacahq/cli/blob/53606273aa230a40c64b783425dcb3f4423ede30/README.md",
+            "https://github.com/alpacahq/cli/blob/53606273aa230a40c64b783425dcb3f4423ede30/cmd/generate/commands.go#L123-L142",
+            "blueprints/us-equities/adaptive-paper/transport.py"
+          ],
+          "comparison_that_would_overturn": "New evidence of an unmet read-only collection requirement and a pinned comparison against alpaca-py on identical account/time boundaries, complete pagination, activity-ID deduplication, exact decimals and matching fills/dividends/fees/cash adjustments; paper order state remains deterministic.",
+          "runtime_acceptance": false
+        }
+      ],
+      "alpaca_scope_correction": {
+        "target": "catalogs/us-equities/runtime-target.json#/broker_boundaries/1/selected_path",
+        "basis": "Clarification of both existing roles: alpaca-py provides bounded market-data ingestion through StockHistoricalDataClient, CorporateActionsClient and NewsClient, as well as the deterministic paper lifecycle retained by the adjudication. paper_runner.py:219-307 uses TradingClient(paper=True) for order operations and StockHistoricalDataClient for latest quotes; adaptive-paper/transport.py uses TradingClient for requests/reconciliation, TradingStream for trade updates and StockDataStream for quote reads. The earlier wording clarification omitted the ingestion role; local_data_acceptance continues to bound the recorded data acceptance.",
+        "sources": [
+          "blueprints/us-equities/alpaca-historical/collect.py",
+          "blueprints/us-equities/adaptive-paper/market_research.py",
+          "blueprints/us-equities/alpaca-paper/paper_runner.py",
+          "blueprints/us-equities/adaptive-paper/transport.py",
+          "docs/decisions/2026-10-01-trading-layer-verdicts.md#rows",
+          "bounded-jobs-20261004/job-073-rebuild-inventory/adjudication-claude-opus-20261005.md#trading-findings"
+        ]
+      },
+      "completeness_critic": {
+        "reviewed": "Vendor SDK publication, MCP toolset source and order-override registration, CLI release/source and retained refutation, and individually selected skill files.",
+        "findings": "account is not a read-only MCP toolset because it includes a config writer. Tool filtering does not restrict broker-key authorization, so research use requires separately qualified host credential isolation; five docs tools and their docs.alpaca.markets/mcp egress remain always on. The backtest skill proposes custom simulation and an optional paper adapter, which are not accepted under never-rebuild; the skill-pack exclusion stands and research_only is documentary reference only. An unversioned skill pack needs an exact commit. No documentary disposition establishes installation, broker access or new paper acceptance.",
+        "next_sweep": "For each future research-skill lifecycle adoption, verify its exact files, dependencies and mutating surfaces against the deterministic order-state boundary; reconsider CLI only when the retained comparison gains new evidence."
+      }
+    }
+  ]
 }

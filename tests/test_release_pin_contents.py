@@ -45,7 +45,7 @@ class ReleasePinContentsTests(unittest.TestCase):
     def test_pinned_release_is_self_consistent(self):
         paths = rd.commit_paths(self.commit)
         self.assertIn("adoption/bootstrap.md", paths)
-        missing = sorted(p for p in paths if not rd.ignored(p) and not rd.at_commit(self.commit, p))
+        missing = sorted(p for p in paths if not rd.ignored(p) and not rd.held(self.commit, p))
         self.assertEqual(missing, [], f"{self.tag}'s own new-machine documents reference paths it does not contain")
 
     def test_release_due_report_runs_and_is_not_strict_by_default(self):
@@ -60,6 +60,22 @@ class ReleasePinContentsTests(unittest.TestCase):
 
 
 class ReleaseDueUnitTests(unittest.TestCase):
+    def test_a_scaffold_output_path_is_held_by_its_scaffold_source(self):
+        # adoption/bootstrap.md names the files scaffold_repo.py writes into another repository; their sources live under
+        # adoption/scaffold/, as the file or as its .template. A path that is neither tracked nor scaffolded stays missing.
+        head = rd.git("rev-parse", "HEAD").stdout.strip()
+        self.assertEqual(rd.git("cat-file", "-e", f"{head}:.github/workflows/sota-sources.yml").returncode != 0, True)
+        self.assertTrue(rd.held(head, ".github/workflows/sota-sources.yml"))
+        self.assertFalse(rd.at_commit(head, ".github/workflows/sota-sources.yml"))  # due() stays literal
+        self.assertTrue(rd.held(head, "adoption/bootstrap.md"))
+        self.assertFalse(rd.held(head, ".github/workflows/no-such-scaffold-output.yml"))
+
+    def test_git_metadata_is_never_a_repository_file(self):
+        # In an ordinary clone .git/info/exclude is a real file; a document that names it must not make it a release
+        # input (GPT read of #714, P2).
+        for rel in (".git", ".git/info/exclude", ".git/config"):
+            self.assertIsNone(rd.repo_file(rel), rel)
+
     def test_path_pattern_covers_templates_workflows_and_tests(self):
         text = ("run adoption/launchd/agent.plist.template and .github/workflows/validate.yml, "
                 "tests/test_x.py, tools/adoption/render_launchd.py, docs/notes.txt")
@@ -144,6 +160,20 @@ class ReleaseDueContentDriftTests(unittest.TestCase):
         proc = subprocess.run([sys.executable, str(self.repo / "scripts/release_due.py"), *args],
                               capture_output=True, text=True, encoding="utf-8", env=env)
         return proc.returncode, json.loads(proc.stdout)
+
+    def test_a_real_file_a_release_lacks_is_due_even_when_a_scaffold_source_shares_its_path(self):
+        # GPT read of #714, P2: the scaffold reading must not hide a file of this repository that the release lacks.
+        self.git("checkout", "-q", "--detach", self.release)
+        self.write("adoption/scaffold/.github/pull_request_template.md", "scaffold template\n")
+        self.commit("release with only the scaffold source")
+        self.release = self.git("rev-parse", "HEAD").stdout.strip()
+        self.git("checkout", "-q", "-B", "main")
+        self.write("adoption/bootstrap.md", "Fill in .github/pull_request_template.md first.\n")
+        self.write(".github/pull_request_template.md", "this repository's own template\n")
+        self.repin()
+        code, report = self.report("--strict")
+        self.assertEqual(code, 1)
+        self.assertIn(".github/pull_request_template.md", report["due"])
 
     def test_a_re_pin_alone_is_current(self):
         # The pin fields, updated_at and manifests/evidence.json always change on a re-pin.

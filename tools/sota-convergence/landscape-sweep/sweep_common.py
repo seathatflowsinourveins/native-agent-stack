@@ -53,8 +53,13 @@ def load_json(path: Path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
+def json_text(value, indent=1) -> str:
+    """The JSON text emitted by write_json, including its final newline."""
+    return json.dumps(value, indent=indent, ensure_ascii=False) + "\n"
+
+
 def write_json(path: Path, value, indent=1) -> None:
-    Path(path).write_text(json.dumps(value, indent=indent, ensure_ascii=False) + "\n", encoding="utf-8")
+    Path(path).write_text(json_text(value, indent), encoding="utf-8")
 
 
 def inside_repository(path: Path) -> Path | None:
@@ -130,17 +135,18 @@ def deviation_rounds(deviations: list, layer_ids) -> tuple[dict, list]:
 
 
 def private_findings(value, patterns, pointer: str = "") -> list[tuple[str, str]]:
-    """(JSON pointer, kind) for every string, dict keys included, that matches a private-content pattern. The
-    matched text is never returned, so a report cannot leak it."""
+    """(Locator, kind) for private strings and keys. Matching keys and their descendants use the key's
+    document-order index instead of its text, so a report cannot expose that text through a pointer."""
     found = []
     if isinstance(value, str):
         found.extend((pointer or "/", description) for description, pattern in patterns if pattern.search(value))
     elif isinstance(value, dict):
-        for key, item in value.items():
-            child = f"{pointer}/{pointer_token(key)}"
-            if isinstance(key, str):
-                found.extend((child, f"{description} (in a key)") for description, pattern in patterns
-                             if pattern.search(key))
+        for index, (key, item) in enumerate(value.items()):
+            kinds = [description for description, pattern in patterns if pattern.search(key)] \
+                if isinstance(key, str) else []
+            token = f"<key-{index}>" if kinds else pointer_token(key)
+            child = f"{pointer}/{token}"
+            found.extend((child, f"{description} (in a key)") for description in kinds)
             found.extend(private_findings(item, patterns, child))
     elif isinstance(value, list):
         for index, item in enumerate(value):
@@ -160,18 +166,36 @@ def host_replacements(work: Path | None = None, repo_root: Path | None = REPO_RO
     return sorted(dict(pairs).items(), key=lambda pair: -len(pair[0]))
 
 
+class RedactionKeyCollision(ValueError):
+    """Distinct keys would merge; path contains only dictionary-key and list indices, never key text."""
+
+    def __init__(self, path):
+        self.path = path
+        super().__init__("redaction key collision")
+
+
+def rewrite_strings(value, fix, path=()):
+    """Rewrite strings and dict keys, refusing collisions instead of discarding a value."""
+    if isinstance(value, str):
+        return fix(value)
+    if isinstance(value, list):
+        return [rewrite_strings(item, fix, (*path, index)) for index, item in enumerate(value)]
+    if isinstance(value, dict):
+        result = {}
+        for index, (key, item) in enumerate(value.items()):
+            rewritten_key = fix(key) if isinstance(key, str) else key
+            if rewritten_key in result:
+                raise RedactionKeyCollision(path)
+            result[rewritten_key] = rewrite_strings(item, fix, (*path, f"<key-{index}>"))
+        return result
+    return value
+
+
 def sanitize(value, replacements):
-    """value with every string (dict keys included) rewritten by the (prefix, token) replacements."""
+    """Rewrite strings and keys with (prefix, token) replacements; fail on a key collision."""
     def fix(text: str) -> str:
         for prefix, token in replacements:
             text = text.replace(prefix, token)
         return text
 
-    if isinstance(value, str):
-        return fix(value)
-    if isinstance(value, list):
-        return [sanitize(item, replacements) for item in value]
-    if isinstance(value, dict):
-        return {(fix(key) if isinstance(key, str) else key): sanitize(item, replacements)
-                for key, item in value.items()}
-    return value
+    return rewrite_strings(value, fix)
