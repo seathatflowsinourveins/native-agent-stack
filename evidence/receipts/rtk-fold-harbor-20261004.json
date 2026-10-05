@@ -1,0 +1,328 @@
+{
+  "schema_version": 1,
+  "id": "rtk-fold-harbor-20261004",
+  "kind": "native_model_e2e",
+  "component_ids": [
+    "rtk",
+    "codex"
+  ],
+  "claim": "The retained 2026-10-05 upstream Harbor 0.23.0 study executed 72 live Codex 0.160.0 trials on eight local synthetic grep tasks with three repetitions in A/B/C. Every arm had zero adjudicated wrong-path actions and reward 1.0 in all 24 trials; both confirmatory A-C Holm p-values were 1.0 and remedy_triggered was false. This publication preserves historical model-driven execution and makes no new live-run or saving claim.",
+  "limitations": [
+    "Eight related synthetic task clusters and three repetitions limit power and external validity; zero observed errors does not establish equivalence or universal safety.",
+    "One pinned Codex 0.160.0 client was measured through the local nginx+socat proxy to OmniRoute cx/gpt-6.1-sol-max, configured at max effort; model and effort are route configuration, not per-run provider attestation. D was dropped prospectively and contributes no Claude-client outcome.",
+    "A/B installed RTK at /usr/local/bin/rtk for container login PATH resolution; host PATH and other installation locations are outside this qualification.",
+    "Only the five registered GNU grep spellings, plain ASCII newline-separated paths and one topology were studied; other search and path modalities remain unqualified.",
+    "Blinding was imperfect; six primary model readers and the added 53-row blind negative audit do not establish positive-label sensitivity or eliminate shared systematic errors.",
+    "B hook_fired was 8/24 because the frozen predicate counts ten non-file-list follow-up rewrites, contrary to the marker-matched Amendment 1 intention. All 24 discovery greps skipped rewriting and returned exact unfolded lists; broader exclusion coverage remains unresolved. The retained B fold flag is 0/24.",
+    "The retained A fold flag is 23/24; original inspection found a successful discovery fold in fold-08-r3-A that the frozen nested-result decoder missed. This is an extraction limitation; no frozen result or adjudication label was changed.",
+    "Tokens are secondary exploratory native fields with uncontrolled cache and incomplete enclosing-workflow usage; no token, cost or time saving claim is made.",
+    "This is a sanitized historical native-model study on local fixtures, not an unchanged upstream test suite, a fresh provider run, host-install acceptance or independently attested billing telemetry."
+  ],
+  "recorded_at_utc": "2026-10-05T05:40:24.138944Z",
+  "lane": "foundation",
+  "decision": "docs/decisions/2026-10-05-rtk-fold-harbor-phase2.md",
+  "artifact_directory": "evidence/artifacts/rtk-fold-harbor-20261004",
+  "execution": {
+    "status": "historical_live_provider_execution",
+    "first_started_at_utc": "2026-10-05T01:13:29.537098Z",
+    "last_finished_at_utc": "2026-10-05T04:31:56.164729Z",
+    "harness": {
+      "repository": "harbor-framework/harbor",
+      "version": "0.23.0",
+      "commit": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "native_command": [
+        "harbor",
+        "run",
+        "-c",
+        "<state>/cfg/<measured-job>.json",
+        "-y",
+        "-q"
+      ]
+    },
+    "client": {
+      "repository": "openai/codex",
+      "version": "0.160.0",
+      "tag": "rust-v0.160.0",
+      "native_session_versions_matched": 72
+    },
+    "model_route": "cx/gpt-6.1-sol-max",
+    "effort": "max",
+    "rtk": {
+      "repository": "rtk-ai/rtk",
+      "version": "0.51.0",
+      "commit": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "release_archive_sha256": "5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5"
+    },
+    "working_directory": "<state>",
+    "trials": 72,
+    "task_clusters": 8,
+    "repetitions": 3,
+    "seed": 20261004,
+    "arms": [
+      "A",
+      "B",
+      "C"
+    ],
+    "dropped_arms": [
+      "D"
+    ],
+    "driver_exit": 0,
+    "harbor_exits": {
+      "0": 72
+    },
+    "token_scan_exits": {
+      "0": 72
+    },
+    "raw_logs_and_trajectories": "retained privately; not published"
+  },
+  "evidence_classification": {
+    "receipt_kind_reason": "On the public NativeStack rootless-Docker host, a real Codex client made live provider requests through the local nginx+socat proxy to OmniRoute route cx/gpt-6.1-sol-max, configured at max effort, used tools and produced verifier-backed task results under upstream Harbor. Model/effort are route configuration, without per-run provider attestation. Historical republication keeps this execution class without claiming a new run.",
+    "native_execution": "Upstream example or native operation: fresh Harbor containers on NativeStack, using locally authored synthetic tasks and the local proxy to OmniRoute cx/gpt-6.1-sol-max",
+    "installation_bridge_and_analysis": "Local integration check: installation bridge, frozen offline exposure extraction, adjudication and analysis",
+    "task_corpus": "Synthetic fixture",
+    "publication_observation": "Independent inspection of original results/logs, grep audits and returns, label joins, exact public audit sample, readiness timing and source hashes",
+    "publication_acceptance": "Structural validation and explicit per-file private-pattern scans; no live provider or model execution"
+  },
+  "results": {
+    "per_arm": [
+      {
+        "arm": "A",
+        "trials": 24,
+        "tasks": 8,
+        "repetitions": 3,
+        "wrong_path_actions": 0,
+        "reward_mean": 1.0,
+        "reward_median": 1.0,
+        "fold_observed_trials": 23,
+        "hook_fired_trials": 24,
+        "grep_hook_invoked_trials": 24,
+        "automatic_candidate_rows": 31,
+        "identical_command_retries_after_path_failure": 0,
+        "exploratory_input_tokens_mean": 54688.166666666664,
+        "exploratory_input_tokens_median": 58168.5,
+        "exploratory_output_tokens_mean": 3469.5833333333335,
+        "exploratory_output_tokens_median": 3484.0,
+        "exploratory_cache_tokens_mean": 44218.666666666664,
+        "exploratory_cache_tokens_median": 45632.0
+      },
+      {
+        "arm": "B",
+        "trials": 24,
+        "tasks": 8,
+        "repetitions": 3,
+        "wrong_path_actions": 0,
+        "reward_mean": 1.0,
+        "reward_median": 1.0,
+        "fold_observed_trials": 0,
+        "hook_fired_trials": 8,
+        "grep_hook_invoked_trials": 24,
+        "automatic_candidate_rows": 29,
+        "identical_command_retries_after_path_failure": 0,
+        "exploratory_input_tokens_mean": 57812.833333333336,
+        "exploratory_input_tokens_median": 58868.0,
+        "exploratory_output_tokens_mean": 3427.2916666666665,
+        "exploratory_output_tokens_median": 3279.0,
+        "exploratory_cache_tokens_mean": 47402.666666666664,
+        "exploratory_cache_tokens_median": 47680.0
+      },
+      {
+        "arm": "C",
+        "trials": 24,
+        "tasks": 8,
+        "repetitions": 3,
+        "wrong_path_actions": 0,
+        "reward_mean": 1.0,
+        "reward_median": 1.0,
+        "fold_observed_trials": 0,
+        "hook_fired_trials": 0,
+        "grep_hook_invoked_trials": 0,
+        "automatic_candidate_rows": 20,
+        "identical_command_retries_after_path_failure": 0,
+        "exploratory_input_tokens_mean": 54346.625,
+        "exploratory_input_tokens_median": 46718.5,
+        "exploratory_output_tokens_mean": 3298.1666666666665,
+        "exploratory_output_tokens_median": 2959.5,
+        "exploratory_cache_tokens_mean": 42874.666666666664,
+        "exploratory_cache_tokens_median": 38208.0
+      }
+    ],
+    "confirmatory_A_C": {
+      "wrong_path_actions": {
+        "arm_mean": 0.0,
+        "base_mean": 0.0,
+        "difference": 0.0,
+        "p_one_sided": 1.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "paired_tasks": 8,
+        "p_holm": 1.0,
+        "significant_holm_0_05": false
+      },
+      "reward": {
+        "arm_mean": 1.0,
+        "base_mean": 1.0,
+        "difference": 0.0,
+        "p_one_sided": 1.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "paired_tasks": 8,
+        "p_holm": 1.0,
+        "significant_holm_0_05": false
+      }
+    },
+    "exploratory_A_B": {
+      "wrong_path_actions": {
+        "arm_mean": 0.0,
+        "base_mean": 0.0,
+        "difference": 0.0,
+        "p_one_sided": 1.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "paired_tasks": 8
+      },
+      "reward": {
+        "arm_mean": 1.0,
+        "base_mean": 1.0,
+        "difference": 0.0,
+        "p_one_sided": 1.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "paired_tasks": 8
+      }
+    },
+    "exploratory_B_C": {
+      "wrong_path_actions": {
+        "arm_mean": 0.0,
+        "base_mean": 0.0,
+        "difference": 0.0,
+        "p_one_sided": 1.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "paired_tasks": 8
+      },
+      "reward": {
+        "arm_mean": 1.0,
+        "base_mean": 1.0,
+        "difference": 0.0,
+        "p_one_sided": 1.0,
+        "ci95": [
+          0.0,
+          0.0
+        ],
+        "paired_tasks": 8
+      }
+    },
+    "remedy_triggered": false,
+    "default_decision": "retain A for studied grep scope",
+    "primary_rows": 264,
+    "primary_positive": 0,
+    "primary_unknown": 0,
+    "automatic_candidates_rejected": 80,
+    "audit_rows": 53,
+    "audit_agreements": 53,
+    "audit_disagreements": 0,
+    "identical_command_retries_after_path_failure": 0,
+    "scipy_version": "1.18.1",
+    "statsmodels_version": "0.15.0",
+    "token_status": "secondary exploratory only; cache is a subset of input; no saving claim"
+  },
+  "phase1": {
+    "calibration_oracle_tasks": 8,
+    "calibration_oracle_rewards": {
+      "1.0": 8
+    },
+    "calibration_nop_tasks": 8,
+    "calibration_nop_rewards": {
+      "0.0": 8
+    },
+    "required_smokes": [
+      "smoke2-A",
+      "smoke2-B",
+      "smoke-C"
+    ],
+    "readiness_exit": 0,
+    "original_A_login_path_exit": 127,
+    "amendment2_A_initial_wrapper_exit": 97,
+    "reporting_recovery_without_model_rerun": true,
+    "failures_retained_in_private_state": true,
+    "decision_draft": "evidence/artifacts/rtk-fold-harbor-20261004/phase1-decision-draft.md"
+  },
+  "provenance": {
+    "source_hashes": "evidence/artifacts/rtk-fold-harbor-20261004/source-hashes.json",
+    "analysis_projection": "evidence/artifacts/rtk-fold-harbor-20261004/phase2-analysis.json",
+    "adjudication_protocol": "evidence/artifacts/rtk-fold-harbor-20261004/PROTOCOL.frozen.md",
+    "adjudication_summary": "evidence/artifacts/rtk-fold-harbor-20261004/adjudication-summary.json",
+    "adjudication_csv": "evidence/artifacts/rtk-fold-harbor-20261004/phase2-measures.adjudications.csv",
+    "per_arm_summary": "evidence/artifacts/rtk-fold-harbor-20261004/per-arm-summary.csv",
+    "requested_v4_manifest_sha256": "6522f2289afb28360aae14b5d51f5b37e29cd9c6ee63c11e01d545e6ea5961f8",
+    "effective_measured_freeze_version": 5,
+    "effective_manifest_sha256": "819f87338f079bded755071bba299244fa2d63dda2884d258e9eb8a64c4bed3f",
+    "original_analysis_sha256": "9af49853d0204bc32d9f977d144b17f9bab075b2e74066b8ae892880e5b1fae0",
+    "grep_spelling_table": "evidence/artifacts/rtk-fold-harbor-20261004/grep-audit.csv",
+    "hook_coverage": "evidence/artifacts/rtk-fold-harbor-20261004/hook-coverage.md",
+    "audit_sample": "evidence/artifacts/rtk-fold-harbor-20261004/audit-rows.json",
+    "premeasurement_acceptance": "evidence/artifacts/rtk-fold-harbor-20261004/premeasurement-acceptance.json"
+  },
+  "sanitization": [
+    "Private paths replaced by <state>; session identifier omitted from protocol and session identifiers in freeze-manifest locators replaced by <session-id>.",
+    "Analysis trials retain only selected identifiers, counters, flags and token categories; raw tool arguments, outputs, fold text and hook logs omitted.",
+    "CSV retains job/trial/call keys and labels with short review-status notes; the sample list contains trial/call pairs only. Original reviewer rationales and observations are omitted.",
+    "Original hashes describe private bytes; manifests/evidence.json records sanitized public bytes.",
+    "No raw trajectories, auth material, login names or host-specific paths are published."
+  ],
+  "publication": {
+    "new_trials": 0,
+    "new_model_calls": 0,
+    "source_state_read_only": true,
+    "network_scope": "Read-only pinned upstream source files only; publication uses existing repository validators and register_file API at f946c6d4ca988a17b6fa4392ecb488909f147883",
+    "registered_receipt_core": {
+      "id": "rtk-fold-harbor-20261004",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "rtk",
+        "codex"
+      ],
+      "claim": "The retained 2026-10-05 upstream Harbor 0.23.0 study executed 72 live Codex 0.160.0 trials on eight local synthetic grep tasks with three repetitions in A/B/C. Every arm had zero adjudicated wrong-path actions and reward 1.0 in all 24 trials; both confirmatory A-C Holm p-values were 1.0 and remedy_triggered was false. This publication preserves historical model-driven execution and makes no new live-run or saving claim.",
+      "limitations": [
+        "Eight related synthetic task clusters and three repetitions limit power and external validity; zero observed errors does not establish equivalence or universal safety.",
+        "One pinned Codex 0.160.0 client was measured through the local nginx+socat proxy to OmniRoute cx/gpt-6.1-sol-max, configured at max effort; model and effort are route configuration, not per-run provider attestation. D was dropped prospectively and contributes no Claude-client outcome.",
+        "A/B installed RTK at /usr/local/bin/rtk for container login PATH resolution; host PATH and other installation locations are outside this qualification.",
+        "Only the five registered GNU grep spellings, plain ASCII newline-separated paths and one topology were studied; other search and path modalities remain unqualified.",
+        "Blinding was imperfect; six primary model readers and the added 53-row blind negative audit do not establish positive-label sensitivity or eliminate shared systematic errors.",
+        "B hook_fired was 8/24 because the frozen predicate counts ten non-file-list follow-up rewrites, contrary to the marker-matched Amendment 1 intention. All 24 discovery greps skipped rewriting and returned exact unfolded lists; broader exclusion coverage remains unresolved. The retained B fold flag is 0/24.",
+        "The retained A fold flag is 23/24; original inspection found a successful discovery fold in fold-08-r3-A that the frozen nested-result decoder missed. This is an extraction limitation; no frozen result or adjudication label was changed.",
+        "Tokens are secondary exploratory native fields with uncontrolled cache and incomplete enclosing-workflow usage; no token, cost or time saving claim is made.",
+        "This is a sanitized historical native-model study on local fixtures, not an unchanged upstream test suite, a fresh provider run, host-install acceptance or independently attested billing telemetry."
+      ]
+    },
+    "sanitization_correction": {
+      "initial_full_validation_exit": 1,
+      "initial_manifest_scan_exits": {
+        "FREEZE-v4.sha256": 1,
+        "FREEZE.sha256": 1
+      },
+      "cause": "UUID session identifiers in copied freeze-manifest locators survived the initial path-only sanitization.",
+      "fix": "Use the existing scripts/validate.py PRIVATE_CONTENT local-session-identifier pattern to replace locator matches with <session-id>; keep all original input digests.",
+      "redacted_locator_identifier_occurrences": {
+        "FREEZE-v4.sha256": 4,
+        "FREEZE.sha256": 4
+      },
+      "verification_path": "Explicit validate.py --scan-file checks on both manifests and full validate.py, followed by re-registration. Failed outputs retained outside the checkout."
+    }
+  },
+  "host_scope": {
+    "host": "NativeStack",
+    "platform": "Linux task containers on the NativeStack rootless-Docker workstation",
+    "identity": "One public workstation; fresh Harbor task containers running pinned Codex 0.160.0"
+  }
+}
