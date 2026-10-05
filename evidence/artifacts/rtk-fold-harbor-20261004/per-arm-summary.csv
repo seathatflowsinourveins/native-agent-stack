@@ -1,0 +1,4 @@
+arm,trials,tasks,repetitions,wrong_path_actions,reward_mean,reward_median,fold_observed_trials,hook_fired_trials,grep_hook_invoked_trials,automatic_candidate_rows,identical_command_retries_after_path_failure,exploratory_input_tokens_mean,exploratory_input_tokens_median,exploratory_output_tokens_mean,exploratory_output_tokens_median,exploratory_cache_tokens_mean,exploratory_cache_tokens_median
+A,24,8,3,0,1.0,1.0,23,24,24,31,0,54688.166666666664,58168.5,3469.5833333333335,3484.0,44218.666666666664,45632.0
+B,24,8,3,0,1.0,1.0,0,8,24,29,0,57812.833333333336,58868.0,3427.2916666666665,3279.0,47402.666666666664,47680.0
+C,24,8,3,0,1.0,1.0,0,0,0,20,0,54346.625,46718.5,3298.1666666666665,2959.5,42874.666666666664,38208.0

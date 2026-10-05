@@ -5,6 +5,7 @@ the way upstream's does at 0957c301 (config.py: load_config, _set_attributes, pa
 arguments and environment instead of researching. Nothing is installed and no network is used. These are this project's
 checks of its own wrapper, not upstream acceptance: the wave-2 research ruling (changes 2-5) and the synthesis X18.
 """
+import hashlib
 import json
 import os
 import shutil
@@ -18,6 +19,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPT = ROOT / "tools/research/gpt_researcher.sh"
 CONFIG = ROOT / "tools/research/gpt-researcher.config.json"
+MEASURED_RECORD = ROOT / "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json"
+AMENDMENT_RECORD = ROOT / "evidence/artifacts/final-architecture-round2-20261004/integration-resolutions.json"
 GATEWAY = "http://127.0.0.1:21128/v1"
 # The host timer, found as the wrapper finds its own: GNU coreutils' timeout on PATH, else gtimeout, Homebrew coreutils'
 # name for it on macOS. macOS has no timeout in /usr/bin or /bin (run 37141171758: exit 127, "env: timeout: No such file or
@@ -106,14 +109,37 @@ class ResearchEntry(unittest.TestCase):
         self.env["PATH"] = f"{timer_bin}{os.pathsep}{self.env['PATH']}"
         return timer_bin / "timeout", record
 
-    def test_the_committed_configuration_is_the_measured_one_without_a_key(self):
+    def test_the_committed_configuration_matches_the_measured_profile_and_dated_amendment_without_a_key(self):
+        # The retained ruling binds the baseline to session 80. The 2026-10-05
+        # amendment binds these exact config bytes to #637's source compatibility
+        # corrections; it makes no new model-run or delivered-effort claim.
+        amendment = json.loads(AMENDMENT_RECORD.read_text())["repair_round_4"]["research_configuration_amendment"]
+        self.assertEqual(amendment["date_utc"], "2026-10-05")
+        self.assertFalse(amendment["measurement_performed"])
+        self.assertEqual(amendment["configuration_sha256"], hashlib.sha256(CONFIG.read_bytes()).hexdigest())
+        self.assertEqual(amendment["measured_record"]["path"], str(MEASURED_RECORD.relative_to(ROOT)))
+        self.assertEqual(amendment["measured_record"]["sha256"], hashlib.sha256(MEASURED_RECORD.read_bytes()).hexdigest())
+        ruling = json.loads(MEASURED_RECORD.read_text())["layers"]["gpt-runtimes"]["ruling"]
+        self.assertIn("session 80's config.json", ruling["changes"]["2"])
+        self.assertIn("cx/gpt-6.1-sol-high and cx/gpt-6.1-sol-max", ruling["decided_default"])
         config = json.loads(CONFIG.read_text())
+        for field, value in amendment["preserved_measured_values"].items():
+            found = config
+            for part in field.split("."):
+                found = found[part]
+            self.assertEqual(found, value, field)
+        for field, change in amendment["compatibility_amendments"].items():
+            found = config
+            for part in field.split("."):
+                found = found[part]
+            self.assertEqual(found, change["value"], field)
         self.assertNotIn("api_key", config["LLM_KWARGS"])
         self.assertEqual(config["LLM_KWARGS"]["base_url"], GATEWAY)
         self.assertEqual(config["LLM_KWARGS"]["max_tokens"], 12000)
         self.assertEqual((config["RETRIEVER"], config["CONTEXT_FILTER"]), ("duckduckgo", "keyword"))
         self.assertEqual((config["FAST_LLM"], config["SMART_LLM"], config["STRATEGIC_LLM"]),
-                         ("openai:cx/gpt-6.1-sol-high", "openai:cx/gpt-6.1-sol-max", "openai:cx/gpt-6.1-sol-max"))
+                         ("openai:cx/gpt-6.1-sol-high", "openai:cx/gpt-6.1-sol", "openai:cx/gpt-6.1-sol"))
+        self.assertEqual(config["LLM_KWARGS"]["reasoning_effort"], "xhigh")
         self.assertEqual((config["MAX_SCRAPER_WORKERS"], config["SCRAPER_RATE_LIMIT_DELAY"], config["BROWSE_CHUNK_MAX_LENGTH"],
                           config["TOTAL_WORDS"]), (4, 0.5, 4096, 1500))
 
@@ -124,7 +150,8 @@ class ResearchEntry(unittest.TestCase):
         copy = json.loads((self.run_dir(result) / "config.json").read_text())
         self.assertEqual(copy["LLM_KWARGS"]["base_url"], GATEWAY)
         self.assertNotIn("api_key", copy["LLM_KWARGS"])
-        self.assertEqual(copy["LLM_KWARGS"]["default_headers"]["x-omniroute-session"], "gptr-" + self.run_dir(result).name)
+        self.assertEqual(copy["LLM_KWARGS"]["default_headers"]["x-omniroute-session-id"], "gptr-" + self.run_dir(result).name)
+        self.assertNotIn("x-omniroute-session", copy["LLM_KWARGS"]["default_headers"])
         self.assertFalse((self.run_dir(result) / "cli-call.json").exists())
 
     def test_the_preflight_fails_closed_and_the_research_never_starts(self):

@@ -71,9 +71,9 @@ TOOL_PATH = ROOT / "adoption/tools/codex-broker-reaper"
 
 # This suite needs /proc (cmdline, comm, cwd, stat, uptime) and
 # prctl(PR_SET_NAME); both are Linux-only, like the tool under test. Without
-# this guard the *required* validate-macos CI check (.github/workflows/
-# adoption-bootstrap.yml, gated by .github/main-ruleset.json) would run this
-# whole module's `python3 -m unittest -v` on macos-15 and fail every class.
+# this guard the advisory validate-macos CI job (.github/workflows/
+# adoption-bootstrap.yml, on matching main pushes, nightly schedules and
+# dispatches) would run this whole module on macos-15 and fail every class.
 LINUX_ONLY = unittest.skipUnless(
     sys.platform.startswith("linux"),
     "codex-broker-reaper and this suite read /proc directly and are Linux-only",

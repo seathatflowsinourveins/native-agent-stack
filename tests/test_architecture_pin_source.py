@@ -15,6 +15,7 @@ from scripts.build_ecosystem import architecture_pin_source
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = "catalogs/foundation/new-wsl-architecture-20261001.json"
+ROUND2_DECISION = "docs/decisions/2026-10-04-final-architecture-round2.md"
 
 
 def record_fields(lines, identity_key, identity_value):
@@ -51,6 +52,17 @@ def expected_ranges(root, path, winner):
     repository = winner["repository"]
     source_repo = repository.removeprefix("https://github.com/")
     pin = winner["pin"]
+    if path == ROUND2_DECISION:
+        ranges = set()
+        for index, line in enumerate(lines):
+            cells = [cell.strip() for cell in line.split("|")]
+            if len(cells) != 8 or cells[0] or cells[-1] or cells[4] != repository:
+                continue
+            owner = cells[3]
+            if (re.match(re.escape(winner["name"]) + r"(?=\s|$)", owner)
+                    and re.search(r"(?<![\w.+-])" + re.escape(pin) + r"(?![\w.+-])", owner)):
+                ranges.add((index + 1, index + 1))
+        return ranges
     if path == "manifests/stack.json":
         stack = json.loads("\n".join(lines))
         component = winner.get("component_id")
@@ -138,6 +150,30 @@ def expected_ranges(root, path, winner):
 
 
 class ArchitecturePinSourceTests(unittest.TestCase):
+    def test_decision_table_requires_owner_repository_and_exact_pin(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / ROUND2_DECISION).parent.mkdir(parents=True)
+            repository = "https://github.com/example/tool"
+            winner = {"name": "Example Tool", "repository": repository, "pin": "1.2.3"}
+            for owner, source, accepted in (
+                    ("Example Tool 1.2.3 (selected)", repository, True),
+                    ("Example Tool (CLI; 1.2.3 until 1.2.4 clears cooldown)", repository, True),
+                    ("Other Tool 1.2.3", repository, False),
+                    ("Example Tools 1.2.3", repository, False),
+                    ("Example Tool 1.2.3", "https://github.com/example/other", False),
+                    ("Example Tool 1.2.4", repository, False),
+                    ("Example Tool 1.2.30", repository, False),
+                    ("Example Tool 1.2.3-rc1", repository, False)):
+                with self.subTest(owner=owner, repository=source):
+                    text = ("# Decision\n\n"
+                            f"| `slot` | new row | {owner} | {source} | verified | "
+                            "Compare Example Tool 1.2.3 |\n")
+                    (root / ROUND2_DECISION).write_text(text, encoding="utf-8")
+                    self.assertEqual(expected_ranges(root, ROUND2_DECISION, winner),
+                                     {(3, 3)} if accepted else set())
+                    self.assertNotIn((2, 2), expected_ranges(root, ROUND2_DECISION, winner))
+
     def test_all_line_citations_identify_the_winners_pin_fields(self):
         catalog = json.loads((ROOT / CATALOG).read_text(encoding="utf-8"))
         cells = [winner for row in catalog["rows"] for winner in row["winners"]]

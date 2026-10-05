@@ -73,6 +73,15 @@ class SourceHashesManifestIsHonest(unittest.TestCase):
         bad = sorted(key for key in self.manifest if not _KEY_RE.match(key))
         self.assertEqual(bad, [], f"keys that are not adaptive-paper/tests .py/.json repo paths: {bad}")
 
+    def test_engine_lock_is_registered_without_extending_the_privacy_allowlist(self):
+        # The general evidence registry can attest a .lock file; this narrow
+        # manifest must continue to match the dedicated gitleaks allowlist.
+        lock = "blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock"
+        self.assertNotIn(lock, self.manifest)
+        evidence = json.loads((REPO_ROOT / "manifests/evidence.json").read_text(encoding="utf-8"))
+        record = next(row for row in evidence["files"] if row["path"] == lock)
+        self.assertEqual(record["sha256"], hashlib.sha256((REPO_ROOT / lock).read_bytes()).hexdigest())
+
     def test_every_value_is_exactly_64_lowercase_hex(self):
         bad = {key: value for key, value in self.manifest.items() if not _HEX_RE.match(value)}
         self.assertEqual(bad, {}, f"values that are not exactly 64 lowercase hex characters: {bad}")

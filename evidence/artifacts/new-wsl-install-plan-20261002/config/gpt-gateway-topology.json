@@ -1,0 +1,38 @@
+{
+  "schema": "native-agent-stack/gpt-gateway-topology/v1",
+  "decision": "docs/decisions/2026-10-04-round2-plan-g4-config.md",
+  "gateway": {
+    "owner": "OmniRoute",
+    "release": "3.8.51",
+    "adoption_status": "Published 3.8.51 already qualified and selected in #637; destination recipe matches that pin and supersedes #704's canary. No gateway or model run in this repair.",
+    "source_pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+    "endpoint": "http://127.0.0.1:21128/v1",
+    "role": "account pool and fallback",
+    "sol_effort_cap": "xhigh",
+    "local_carries": []
+  },
+  "sol_max": {
+    "client": "native Codex",
+    "model_provider": "openai",
+    "model": "gpt-6.1-sol",
+    "model_reasoning_effort": "max",
+    "command": "codex exec -m gpt-6.1-sol -c model_provider=\"openai\" -c model_reasoning_effort=\"max\""
+  },
+  "pool_fallback": {
+    "profile": "omniroute",
+    "model_provider": "omniroute",
+    "model": "cx/gpt-6.1-sol",
+    "model_reasoning_effort": "xhigh"
+  },
+  "re_pin": {
+    "source": "https://github.com/diegosouzapw/OmniRoute/pull/15167",
+    "condition": "An upstream release includes gpt-6.1-sol in both CODEX_MAX_ALIAS_MODELS and CODEX_ULTRA_ALIAS_MODELS. Re-pin only to that published release and require one gateway request with wire reasoning.effort=max.",
+    "status": "open and unmerged on 2026-10-04; gateway Sol/max remains unqualified"
+  },
+  "sources": [
+    "diegosouzapw/OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e:docs/guides/SETUP_GUIDE.md:28",
+    "diegosouzapw/OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e:open-sse/executors/codex/reasoningSuffix.ts:11",
+    "diegosouzapw/OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e:open-sse/executors/codex.ts:331",
+    "https://developers.openai.com/codex/config-reference/"
+  ]
+}

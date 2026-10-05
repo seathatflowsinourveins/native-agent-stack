@@ -1,5 +1,7 @@
 # Decision: scope the required macOS check to macOS-relevant changes and changed tests (2026-10-03)
 
+> Superseded 2026-10-05: macOS CI is advisory; see [docs/decisions/2026-10-05-macos-ci-advisory.md](2026-10-05-macos-ci-advisory.md).
+
 **Status:** implemented in the pull request that adds this record (branch `c5/macos-ci-scope`, cut from the
 verification base below), as the coordinator's brief directed, from the draft with sha256
 `3a5eba0772ed82cf86e0688809788241f676e79072333a0416b75f3371e2b83f`. That pull request makes the workflow, test and docs

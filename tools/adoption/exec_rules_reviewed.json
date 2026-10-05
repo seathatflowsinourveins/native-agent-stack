@@ -1,0 +1,25 @@
+{
+  "schema": "exec-rules-reviewed/1",
+  "rule": "A Codex execution-rule file in the user layer is accepted by tools/adoption/codex_hook_trust.py without --allow-exec-rules only if its sha256 is on this list (and the conditions of its entry hold on this host) or it is Codex's own allow-only format. An entry is a review of one exact file: rtk's rewrite cannot take a command that a restricting rule of the file matches out of the rule's reach. Any edit to the file changes its hash and ends the review.",
+  "entries": [
+    {
+      "name": "hcom-deny.rules",
+      "sha256": "ac6254ee9bb7ac20deca69bb03bead76dacbe4e53a41cbc563a8b3614fa6a6aa",
+      "source": "native-agent-stack #713, evidence/artifacts/new-wsl-install-plan-20261002/config/hcom-deny.rules at head 7fbe586f3 (repair round 2 narrowed the comments and the justification strings of 5f295f254's file, sha256 845f06b0ca31d03956df813ea7ab426e42ab784de7f39010c4a70cc91e3bc0e1; every other line, the patterns, decisions, match and not_match lists, is identical, checked by comparing the two files without their comment and justification lines); the copy kept for this review is evidence/artifacts/token-stack-fresh-session-e2e-20261004/fixtures/hcom-deny.rules",
+      "first_tokens": ["hcom", "uvx"],
+      "reviewed_for": {
+        "rtk_version_output": "rtk 0.51.0",
+        "rtk_commit": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+        "rtk_configuration": "the default hook configuration: [hooks].transparent_prefixes empty, no trusted TOML filter (rtk trust --list says No trusted filters.), RTK_TRUST_PROJECT_FILTERS unset and no user TOML filters"
+      },
+      "reviewed": "2026-10-05",
+      "why": "Every rule is a prefix rule on `hcom ...` or `uvx hcom ...`. rtk 0.51.0 rewrites a command only when its first word, after peeling env prefixes, global options, absolute paths and wrappers, is one of the heads derived from its source (evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-rewrite-heads.json) or matches a TOML filter that rtk has been told to trust (the host conditions rule that out, and the configured prefixes); neither `hcom` nor `uvx` is one, so no command that a rule of the file matches is rewritten; a command behind a wrapper (`time hcom ...`) is outside a prefix rule's reach with or without the rewrite.",
+      "evidence": [
+        "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-rewrite-heads.json",
+        "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-rewrite-heads-check.json",
+        "evidence/artifacts/token-stack-fresh-session-e2e-20261004/plan-row-scratch-run.json",
+        "docs/decisions/2026-10-04-codex-rtk-hook-qualified.md"
+      ]
+    }
+  ]
+}

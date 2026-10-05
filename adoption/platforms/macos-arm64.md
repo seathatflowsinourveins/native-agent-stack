@@ -497,6 +497,13 @@ to its historical `denylist` default
 
 ## What a hosted run proves
 
+Since the [2026-10-05 advisory decision](../../docs/decisions/2026-10-05-macos-ci-advisory.md),
+the Mac is portable or remote-control only. `validate-macos`, `bootstrap-macos`
+and `bootstrap-macos-brew` skip every pull request and are not required checks.
+They run nightly at 06:47 UTC, on main pushes selected by the workflow's paths
+filter, and on manual dispatch. A failing nightly or main-push run is fixed in
+a follow-up PR.
+
 The `platform_profiles` row for `macos-arm64` names a hosted smoke job
 (`.github/workflows/adoption-bootstrap.yml`, jobs `bootstrap-macos`,
 `bootstrap-macos-brew` and `validate-macos`) whose status is
@@ -874,18 +881,15 @@ there; what a Mac's crash reporter keeps of a crashed command's environment
 has not been checked. Key acceptance on a Mac is
 the runner, guard and status test suites on the macOS CI job, then a new Mac
 host receipt that separates the steps run from those not run. WSL receipts
-do not certify the Mac. Added after `v2026.09.26.2`: on a pull request that
-macOS CI job (`adoption-bootstrap.yml`'s `validate-macos`) runs in full when the pull
-request changes a listed macOS-relevant path, runs only the changed top-level
-test modules when nothing else relevant changed (a scoped result, not a
-full-suite pass), and is skipped otherwise (untested, not passed); push,
-schedule and dispatch runs are always full
-([docs/decisions/2026-10-03-macos-ci-scope.md](../../docs/decisions/2026-10-03-macos-ci-scope.md)).
+do not certify the Mac. Since 2026-10-05, that macOS CI job
+(`adoption-bootstrap.yml`'s `validate-macos`) skips every pull request and runs
+the full suite on matching main pushes, nightly schedules and manual dispatch
+([advisory decision](../../docs/decisions/2026-10-05-macos-ci-advisory.md)).
 The runner, guard and status suites (`tests/test_credential_run.py`,
 `tests/test_secret_path_guard.py`, `tests/test_effort_default_guard.py`,
 `tests/test_adoption_status.py` and `tests/test_credential_status.py`) are on
-that list, as is the code they test, so a change to them always runs the job in
-full.
+the retained Mac-relevant input list, as is the code they test. Portability
+checks happen after merge or on the nightly schedule; a failure gets a follow-up PR.
 
 ## Qdrant collections
 

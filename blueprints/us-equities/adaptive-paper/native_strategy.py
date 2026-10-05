@@ -515,12 +515,11 @@ class AdaptiveStrategy(Strategy):
         it fires for any currently-held symbol at the crossing, not only
         positions individually proven to have been opened before the prior
         close, because this engine does not track a per-position entry
-        session boundary. A date outside the frozen session calendar (D7)
-        -- including previous_trading_day walking into a year outside
-        sessions.CALENDAR_YEARS at the very first trading day of the
-        calendar (round 5) -- degrades to "validation-unknown, do not arm,
-        record it" (the "stale_prior_close_ignored" event below), not a
-        raised exception.
+        session boundary. XNYS bounds come from the queried date's year.
+        A DateOutOfBounds or calendar-construction ValueError in the
+        current-session query prevents arming; one in previous_trading_day
+        leaves the prior date unknown and records "stale_prior_close_ignored".
+        Other provider errors propagate; there is no fallback calendar.
 
         D2/D3/D4 (round 4): arming is decoupled from the single crossing
         tick. `_gap_arm_pending` is seeded with every held symbol at the
