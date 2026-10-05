@@ -27,14 +27,17 @@ boundary also checks advisory-followed files: unparseable workflows/scripts and
 RecursionError at GateReads construction fail closed. RecursionError in reads()/executed()
 is advisory. Tree-read GateError, OSError, subprocess.SubprocessError and KeyError propagate
 to the existing fail-closed handling, including during imported-constant evaluation.
-The resolver entry point is disabled until a later owned-path allowlist gate lands. It
+The gate independently default-denies paths outside the coordinator's owned paths, passed
+in host memory through GhHarness, on the exact commit's raw diff against its trusted base.
+It refuses symlinks, gitlinks, mode/type changes, unsafe components and filesystem aliases.
+The plan reaches the gate only through the harness's captured host memory. The gate
 also refuses a `run:` or `script:` text that interpolates untrusted event text
 (`pr_text_interpolated`), and it runs the zizmor version CI pins on the commit's workflows
 and actions with this module's own flags (no configuration file, no ignore comments); an
 excessive-permissions, dangerous-triggers, cache-poisoning, artipacked or
 template-injection finding refuses (`zizmor_finding`), and an unavailable zizmor fails closed.
 
-Immutable to the agent: this module, its siblings patch_policy.py and gate_reads.py and the
+Immutable to the agent: this module, patch_policy.py, gate_reads.py, gh_harness.py, resolver.py and the
 rules above run from the checkout this file sits in (TRUSTED_ROOT, from __file__ only, never
 from an argument or the environment). check() refuses when that checkout or a tool lies inside an
 agent tree, when an enforcing file differs from the trusted commit's blob, when the trusted
@@ -67,6 +70,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import unicodedata
 
 GATE_FILE = Path(__file__).resolve()
 RESOLVER_DIR = "blueprints/runtime-workers/openhands/resolver"
@@ -74,10 +78,11 @@ DRIVER = "blueprints/runtime-workers/openhands/resolver.py"
 GATE_RELATIVE = f"{RESOLVER_DIR}/push_gate.py"
 # The checkout this file sits in. Never taken from an argument, the environment or cwd.
 TRUSTED_ROOT = GATE_FILE.parents[4]
-# The files that decide what is refused: this module, the derivation it reuses and the
-# harness that calls it. Each must equal the trusted commit's blob and the base's.
+# The files that decide what is refused, including the driver's owned-path
+# freezing/transport and startup control. Each must equal the trusted commit's
+# blob and the base's. Receipt projection does not authorize a push.
 ENFORCING_FILES = (GATE_RELATIVE, f"{RESOLVER_DIR}/patch_policy.py", f"{RESOLVER_DIR}/gate_reads.py",
-                   f"{RESOLVER_DIR}/gh_harness.py")
+                   f"{RESOLVER_DIR}/gh_harness.py", DRIVER)
 
 
 def _sibling(name):
@@ -577,11 +582,12 @@ def _without_pattern_lists(code):
 # GateReads inventories use it separately; Protected never receives those collectors.
 RULE_PRECEDENCE = ("ci_local_action", "ci_discovered", "ci_named", "ci_import", "ci_read")
 
-# Every rule a refused path can carry, with the phrase the agent's instructions use for it
-# (cross-family review P2 of 2026-10-04). skills/resolver/SKILL.md and
-# resolver.resolver_instruction state each phrase and STOP_AND_REPORT, and a test keeps them, this
-# map and the receipt's rule set in step, so no rule reaches the gate without reaching the
-# instructions. unresolved_read now names an unparseable gate script, not a computed read.
+# Instruction phrases for every path rule, named or unnamed in receipts. The skill
+# and generated instruction state these phrases and STOP_AND_REPORT. Rules in
+# UNNAMED_PATH_RULES retain only codes/counts in the receipt because their paths can
+# contain untrusted or unsafe names. A test derives rules from their emitting code,
+# checks both phrase maps against the instructions, and checks the receipt partition.
+# unresolved_read names an unparseable gate script, not a computed read.
 AGENT_RULE_PHRASES = {
     "github": ".github/",
     "codeowners": "CODEOWNERS",
@@ -596,6 +602,23 @@ AGENT_RULE_PHRASES = {
     "zizmor_finding": "workflow or action",
 }
 GATE_ONLY_RULES = frozenset({"unresolved_read"})
+UNNAMED_RULE_PHRASES = {
+    "unowned_path": ("unowned path",),
+    "symlink": ("symlink",),
+    "gitlink": ("gitlink",),
+    "mode_change": ("mode/type change",),
+    "type_change": ("mode/type change",),
+    "invalid_path_component": ("unsafe path component", "empty, . or .. components"),
+    "absolute_path": ("absolute path",),
+    "git_component": (".git", "HFS/NTFS aliases"),
+    "gitmodules": (".gitmodules",),
+    "changed_path_collision": ("casefold", "NFC/NFKC", "protected path", "another changed path"),
+    "compiled_module_artifact": ("compiled or bytecode artifacts", "compiled_module_artifact", "__pycache__"),
+    "git_semantic_file": ("Git semantic dot files", "git_semantic_file", ".git*", ".gitattributes", ".gitignore",
+                          ".mailmap", ".gitconfig"),
+    "instruction_file": ("instruction files", "instruction_file"),
+}
+UNNAMED_PATH_RULES = frozenset(UNNAMED_RULE_PHRASES)
 STOP_AND_REPORT = ("including a new or changed test, change nothing: stop and report which file would need to "
                    "change and why")
 
@@ -1023,6 +1046,152 @@ class Protected:
 
 # -- The gate
 
+# Git v2.43.0 (the installed git): read-cache.c verify_path_internal/verify_dotfile;
+# utf8.c next_hfs_char/is_hfs_dotgit; path.c is_ntfs_dotgit/is_ntfs_dot_generic;
+# fsck.c fsck_tree/check_gitmodules. Unlike Git's content checks, this task forbids
+# .gitmodules altogether. CPython v3.13.15 unicodedata.normalize supplies NFC/NFKC.
+# The owned-list grammar below independently implements patch_policy's documented
+# coordinator contract; neither its normalizer nor its matcher is reused here.
+HFS_IGNORED = frozenset([*range(0x200c, 0x2010), *range(0x202a, 0x202f), *range(0x206a, 0x2070), 0xfeff])
+# CI's CPython v3.12.3 Lib/importlib/_bootstrap_external.py:1724-1732
+# searches extensions before source; :1095-1126 accepts PEP 552 unchecked
+# caches. PEP 3147 cache names are documented in Doc/library/importlib.rst:1265-1308.
+# Deny these artifacts everywhere, independently of the source-module closure.
+MODULE_ARTIFACT_SUFFIXES = (".pyc", ".pyo", ".so", ".pyd", ".dylib", ".dll")
+# Independent instruction-name policy: RESOLVER.md's validator contract;
+# recipes/README.md:184, :212, :218-220; docs/harness-defaults.md:208;
+# adoption/platforms/linux-wsl2-new-distro.md:1082-1083 (at 56fced827).
+# The actual Codex template is named by tools/adoption/apply_codex_lane.py:111;
+# the default and role carrier blocks are selected by
+# adoption/hooks/claude/token-lanes-subagent-start.py:16-23,33-38 (at 656f263dc).
+# Include these concrete basenames and Gemini's instruction file independently
+# of patch_policy.INSTRUCTION_FILES. AGENTS.template.md remains reserved too.
+INSTRUCTION_FILE_NAMES = frozenset({"agents.md", "agents.override.md", "agents.template.md", "claude.md",
+                                    "claude.local.md", "gemini.md", "skill.md", "rtk.md",
+                                    "codex-user-instructions.md", "claude-user-instructions.md",
+                                    "codex.agents.template.md", "token-lanes-block.md",
+                                    "token-lanes-block.builder.md", "token-lanes-block.researcher.md",
+                                    "token-lanes-block.reviewer.md", "token-lanes-block.scout.md",
+                                    "token-lanes-block.verifier.md"})
+# At 0e2610d66, tools/adoption/install_claude_profile.py:152-170 refreshes
+# every Claude definition; tools/adoption/apply_codex_lane.py:595-604,1234-1236
+# installs Codex roles pinned by SHA256SUMS in this same tree. Reserve the
+# component-bounded prefix, including future definitions and pin files.
+INSTRUCTION_PATH_PREFIXES = frozenset({"adoption/agents"})
+RAW_CHANGE = re.compile(rb":(000000|100644|100755|120000|160000) "
+                        rb"(000000|100644|100755|120000|160000) "
+                        rb"([0-9a-f]{40}) ([0-9a-f]{40}) ([AMDT])")
+
+
+def normalize_owned_paths(paths):
+    """Sorted unique relative POSIX entries; each covers itself and its descendants."""
+    if isinstance(paths, (str, bytes)) or not paths:
+        raise GateError("owned_paths_required")
+    entries = set()
+    for entry in paths:
+        if (not isinstance(entry, str) or not entry or entry != entry.strip() or entry.startswith("/")
+                or any(char in entry for char in "\\\0\n\r")):
+            raise GateError("invalid_owned_path")
+        entry = entry.rstrip("/")
+        if not entry or any(component in ("", ".", "..") for component in entry.split("/")):
+            raise GateError("invalid_owned_path")
+        entries.add(entry)
+    return tuple(sorted(entries))
+
+
+def path_is_owned(path, owned):
+    """Exact entry or component-bounded descendant, without patch_policy's matcher."""
+    for entry in owned:
+        if path == entry or path.startswith(entry + "/"):
+            return True
+    return False
+
+
+def path_aliases(path):
+    """Casefold, canonical and compatibility forms, including their combinations."""
+    aliases = {path, path.casefold()}
+    for form in ("NFC", "NFKC"):
+        normalized = unicodedata.normalize(form, path)
+        aliases.update((normalized, unicodedata.normalize(form, path.casefold()),
+                        unicodedata.normalize(form, normalized.casefold())))
+    return aliases
+
+
+def _git_component(component):
+    hfs = "".join(char for char in component if ord(char) not in HFS_IGNORED).lower()
+    ntfs = component.lower().split(":", 1)[0].rstrip(" .")
+    return hfs == ".git" or ntfs in (".git", "git~1")
+
+
+def _gitmodules_component(component):
+    hfs = "".join(char for char in component if ord(char) not in HFS_IGNORED).lower()
+    if hfs == ".gitmodules":
+        return True
+
+    def only_spaces_and_periods(index):
+        return all(char in " ." for char in component[index:].split(":", 1)[0])
+
+    # git/git v2.43.0 path.c:1489-1510, is_ntfs_dot_generic's fallback loop,
+    # with the gitmodules/gi7eba arguments at :1524-1527. Keep its
+    # index zero: the prefix can be empty (~1000000), followed by a nonzero
+    # first digit and enough decimal digits to fill eight characters.
+    if component[:11].lower() == ".gitmodules":
+        return only_spaces_and_periods(11)
+    if component[:7].lower() == "gitmod~" and component[7:8] in ("1", "2", "3", "4"):
+        return only_spaces_and_periods(8)
+    index, saw_tilde = 0, False
+    while index < 8:
+        if index >= len(component):
+            return False
+        char = component[index]
+        if saw_tilde:
+            if not "0" <= char <= "9":
+                return False
+        elif char == "~":
+            index += 1
+            if index >= len(component) or not "1" <= component[index] <= "9":
+                return False
+            saw_tilde = True
+        elif index >= 6 or ord(char) >= 128 or char.lower() != "gi7eba"[index]:
+            return False
+        index += 1
+    return only_spaces_and_periods(index)
+
+
+def path_refusals(path):
+    reasons = set()
+    for alias in path_aliases(path):
+        if alias.startswith(("/", "\\")) or re.match(r"^[A-Za-z]:", alias):
+            reasons.add("absolute_path")
+        components = alias.replace("\\", "/").split("/")
+        if any(component in ("", ".", "..") for component in components):
+            reasons.add("invalid_path_component")
+        if "\\" in alias or any(char in alias for char in "\0\n\r"):
+            reasons.add("invalid_path_component")
+        if any(_git_component(component) for component in components):
+            reasons.add("git_component")
+        if any(_gitmodules_component(component) for component in components):
+            reasons.add("gitmodules")
+        # Include case/Unicode forms above and NTFS trailing-dot/space/ADS
+        # forms, so an equivalent name cannot bypass the artifact refusal.
+        module_names = [component.split(":", 1)[0].rstrip(" .").casefold() for component in components]
+        if "__pycache__" in module_names or module_names[-1].endswith(MODULE_ARTIFACT_SUFFIXES):
+            reasons.add("compiled_module_artifact")
+        # git/git v2.43.0 Documentation/gitattributes.txt:69-82, :110-118,
+        # :391-409: per-directory attributes can alter even unchanged files
+        # on checkout. gitignore.txt:29-34 and gitmailmap.txt:16-20 describe
+        # the other semantic inputs. Conservatively reserve all .git* names;
+        # .git, .gitmodules and .github keep their existing refusal categories.
+        semantic_names = ["".join(char for char in name if ord(char) not in HFS_IGNORED).rstrip(" .")
+                          for name in module_names]
+        if any(name == ".mailmap" or name.startswith(".git")
+               and name not in (".git", ".gitmodules", ".github") for name in semantic_names):
+            reasons.add("git_semantic_file")
+        if (semantic_names[-1] in INSTRUCTION_FILE_NAMES
+                or path_is_owned("/".join(semantic_names), INSTRUCTION_PATH_PREFIXES)):
+            reasons.add("instruction_file")
+    return sorted(reasons)
+
 def _git(git, repo, *args, check=True, binary=False):
     completed = subprocess.run([git, "-C", str(repo), *args], capture_output=True, env=dict(GIT_ENV), timeout=120,
                                check=False, stdin=subprocess.DEVNULL)
@@ -1044,8 +1213,8 @@ class PushGate:
     def __init__(self, *, git, zizmor, timeout=600):
         self.git, self.zizmor, self.timeout = git, zizmor, timeout
 
-    def trusted_identity(self, agent_trees=()):
-        """Where the gate runs from: the checks that need no clone. Returns the trusted commit."""
+    def _check_locations(self, agent_trees):
+        """Check locations before even a diff can invoke an executable."""
         trees = [os.path.realpath(tree) for tree in agent_trees]
         locations = [str(GATE_FILE), str(TRUSTED_ROOT), *(str(TRUSTED_ROOT / rel) for rel in ENFORCING_FILES)]
         if any(_within(location, tree) for location in locations for tree in trees):
@@ -1057,6 +1226,10 @@ class PushGate:
             raise GateError("git_unavailable")
         if GATE_FILE != TRUSTED_ROOT / GATE_RELATIVE:
             raise GateError("gate_not_at_its_path")
+
+    def trusted_identity(self, agent_trees=()):
+        """Where the gate runs from: the checks that need no clone. Returns the trusted commit."""
+        self._check_locations(agent_trees)
         try:
             top = _git(self.git, TRUSTED_ROOT, "rev-parse", "--show-toplevel")
             commit = _git(self.git, TRUSTED_ROOT, "rev-parse", "--verify", "HEAD^{commit}")
@@ -1072,9 +1245,20 @@ class PushGate:
                 raise GateError("gate_file_modified")
         return commit
 
-    def check(self, clone, *, base, head, agent_trees=()):
+    def check(self, clone, *, base, head, owned_paths=None, agent_trees=()):
         """One record for the exact commit `head` of `clone` against `base`. Never raises."""
+        try:
+            return self._check(clone, base=base, head=head, owned_paths=owned_paths, agent_trees=agent_trees)
+        except BaseException as error:  # Includes record construction/output and interrupted checks.
+            return {"commit": head, "base": base, "status": "fail",
+                    "reasons": ["gate_error_" + re.sub(r"[^a-z0-9_]", "", type(error).__name__.lower())[:40]],
+                    "paths": [], "changed_path_count": None, "owned_path_count": None,
+                    "trusted_commit": None, "protected": None,
+                    "zizmor": {"version": None, "findings": None, "failing": []}}
+
+    def _check(self, clone, *, base, head, owned_paths, agent_trees):
         record = {"commit": head, "base": base, "status": "fail", "reasons": [], "paths": [],
+                  "changed_path_count": None, "owned_path_count": None,
                   "trusted_commit": None, "protected": None,
                   "advisory_gate_reads": advisory_gate_reads([]),
                   "zizmor": {"version": None, "findings": None, "failing": []}}
@@ -1083,12 +1267,23 @@ class PushGate:
             if not (isinstance(clone, str) and os.path.isabs(clone) and all(isinstance(sha, str) and SHA.fullmatch(sha)
                                                                              for sha in (base, head))):
                 raise GateError("invalid_arguments")
+            self._check_locations([clone, *agent_trees])
+            owned = normalize_owned_paths(owned_paths)
+            record["owned_path_count"] = len(owned)
+            changed = self._changed(clone, base, head)
+            record["changed_path_count"] = len(changed)
+            self._check_paths(changed, owned, reasons, paths)
+            # Refuse immediately on an independently proven path violation. This also
+            # lets the startup negative control exercise this gate in a tiny repository
+            # without copying the trusted stack or needing zizmor. An owned change still
+            # runs every existing trusted-checkout, protected-path and zizmor check.
+            if reasons:
+                raise GateError(reasons[0])
             record["trusted_commit"] = trusted = self.trusted_identity([clone, *agent_trees])
             self._check_commit(clone, base, head, trusted, reasons)
             trusted_tree = patch_policy.GitTree(TRUSTED_ROOT, trusted, git=self.git)
             base_tree = patch_policy.GitTree(clone, base, git=self.git)
             head_tree = patch_policy.GitTree(clone, head, git=self.git)
-            changed = self._changed(clone, base, head)
             try:
                 derived = [derive_ci_protected(tree) for tree in (trusted_tree, base_tree, head_tree)]
                 record["advisory_gate_reads"] = advisory_gate_reads(derived)
@@ -1098,8 +1293,14 @@ class PushGate:
                 record["protected"] = {"workflows": len(set().union(*(item.workflows for item in derived))),
                                        "files": len(protected.files), "prefixes": len(protected.prefixes),
                                        "globs": len(protected.globs)}
-                for path in changed:
+                for change in changed:
+                    path = change["path"]
                     rule = protected.rule(path)
+                    if not rule:
+                        rule = next((protected.rule(alias) for alias in sorted(path_aliases(path))
+                                     if protected.rule(alias)), None)
+                        if rule:
+                            reasons.append("protected_path_alias")
                     if rule:
                         paths.setdefault(path, rule)
                 if any(rule for rule in paths.values()):
@@ -1129,7 +1330,7 @@ class PushGate:
         except GateError as error:
             reasons.append(error.reason)
             known = set()
-        except Exception as error:  # noqa: BLE001 - any other failure refuses: the gate fails closed
+        except BaseException as error:  # Any other failure refuses: the gate fails closed.
             reasons.append("gate_error_" + re.sub(r"[^a-z0-9_]", "", type(error).__name__.lower())[:40])
             known = set()
         ordered = sorted(paths.items())
@@ -1160,11 +1361,58 @@ class PushGate:
 
     def _changed(self, clone, base, head):
         """git-diff-tree(1): every path the commit adds, deletes, modifies or retypes; renames off."""
-        out = _git(self.git, clone, "diff-tree", "-r", "-z", "--name-only", "--no-renames", "--no-commit-id",
-                   base, head, binary=True)
+        out = _git(self.git, clone, "diff-tree", "-r", "-z", "--no-renames", "--raw", "--no-abbrev",
+                   base, head, check=False, binary=True)
         if out.returncode != 0:
             raise GateError("diff_failed")
-        return sorted({name.decode("utf-8", "surrogateescape") for name in out.stdout.split(b"\0") if name})
+        if not isinstance(out.stdout, bytes) or (out.stdout and not out.stdout.endswith(b"\0")):
+            raise GateError("diff_output_invalid")
+        fields = out.stdout.split(b"\0")[:-1]
+        if len(fields) % 2:
+            raise GateError("diff_output_invalid")
+        changed, seen = [], set()
+        for index in range(0, len(fields), 2):
+            meta = RAW_CHANGE.fullmatch(fields[index])
+            if not meta:
+                raise GateError("diff_output_invalid")
+            old, new, old_oid, new_oid, status = (value.decode("ascii") for value in meta.groups())
+            if (status == "A" and (old != "000000" or new == "000000")
+                    or status == "D" and (new != "000000" or old == "000000")
+                    or status in ("M", "T") and "000000" in (old, new)
+                    or (old == "000000") != (old_oid == "0" * 40)
+                    or (new == "000000") != (new_oid == "0" * 40)):
+                raise GateError("diff_output_invalid")
+            path = fields[index + 1].decode("utf-8", "surrogateescape")
+            if path in seen:
+                raise GateError("diff_output_invalid")
+            seen.add(path)
+            changed.append({"path": path, "old_mode": old, "new_mode": new, "status": status})
+        return sorted(changed, key=lambda change: change["path"])
+
+    def _check_paths(self, changed, owned, reasons, paths):
+        seen = {}
+        for change in changed:
+            path = change["path"]
+            refused = path_refusals(path)
+            if not path_is_owned(path, owned):
+                refused.append("unowned_path")
+            modes = (change["old_mode"], change["new_mode"])
+            if "120000" in modes:
+                refused.append("symlink")
+            if "160000" in modes:
+                refused.append("gitlink")
+            if "000000" not in modes and modes[0] != modes[1]:
+                refused.append("mode_change")
+            if change["status"] == "T":
+                refused.append("type_change")
+            for alias in sorted(path_aliases(path)):
+                if alias in seen and seen[alias] != path:
+                    refused.append("changed_path_collision")
+                    paths.setdefault(seen[alias], "changed_path_collision")
+                seen[alias] = path
+            if refused:
+                paths.setdefault(path, refused[0])
+                reasons.extend(refused)
 
     def _zizmor(self, trusted_tree, head_tree, record, reasons, paths):
         """The pinned zizmor on the commit's workflows and actions; every failure is a refusal."""

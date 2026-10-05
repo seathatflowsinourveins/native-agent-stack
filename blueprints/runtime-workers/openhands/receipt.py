@@ -240,7 +240,10 @@ def _matching(value, pattern):
 
 
 # The trusted pre-push gate's records (resolver/push_gate.py, journaled by GhHarness.gates).
-# The rules a path can break, and zizmor's audit names (docs.zizmor.sh/audits).
+# Named protected-path categories, and zizmor's audit names (docs.zizmor.sh/audits).
+# Ownership/mode/path-safety/compiled-artifact classes in push_gate.UNNAMED_PATH_RULES
+# stay unnamed even if marked known: keep their codes and counts, never their paths.
+# The gate's source-derived protocol test checks the named/unnamed partition.
 PUSH_GATE_RULES = frozenset({"github", "codeowners", "gate_code", "workflow_policy_test", "ci_named", "ci_import",
                              "ci_read", "ci_discovered", "ci_local_action", "pr_text_interpolation", "zizmor_finding",
                              "unresolved_read"})
@@ -298,6 +301,10 @@ def push_gate_summary(records):
             "trusted_commit": _matching(record.get("trusted_commit"), HEX40),
             "reasons": sorted({reason for reason in record.get("reasons") or [] if _matching(reason, REASON_CODE)})
             if isinstance(record.get("reasons"), list) else [],
+            "changed_path_count": record.get("changed_path_count")
+            if type(record.get("changed_path_count")) is int and record["changed_path_count"] >= 0 else None,
+            "owned_path_count": record.get("owned_path_count")
+            if type(record.get("owned_path_count")) is int and record["owned_path_count"] >= 0 else None,
             "paths": named,
             "advisory_gate_reads": advisory_gate_reads_summary(record.get("advisory_gate_reads")),
             "unnamed_paths": len(entries) - len(named) + (omitted if type(omitted) is int and omitted > 0 else 0),
