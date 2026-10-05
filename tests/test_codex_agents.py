@@ -1,7 +1,8 @@
 """Structural validation of custom-agent instruction payloads.
 
 Sources: openai/codex rust-v0.157.1 (commit 36650394), codex-rs/agent-roles/src/agent_role_config.rs
-and codex-rs/core/src/agent/role.rs; rtk-ai/rtk v0.50.0, hooks/rtk-awareness-full.md. These are local
+and codex-rs/core/src/agent/role.rs; rtk-ai/rtk v0.51.0, hooks/rtk-awareness-full.md (qualified
+excerpt, docs/decisions/2026-10-05-harness-context-budget.md). These are local
 checks, not spawned-agent acceptance.
 
 The two stack role carriers (`stack-researcher` and `stack-verifier`, 2026-09-29) are checked as bytes
@@ -36,10 +37,10 @@ ADOPTION_AGENTS = ROOT / "adoption" / "agents" / "codex"
 README = ROOT / "examples" / "codex-native" / "README.md"
 PREREGISTRATION = ROOT / "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json"
 SEALED_TEST = ROOT / "tests" / "test_token_e2e_preregistration.py"
-UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
+UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 EXCEPTIONS_MARKER = "<!-- native-agent-stack:rtk-exceptions -->\n"
 END_MARKER = "<!-- native-agent-stack:codex-user-instructions:end -->"
-# Byte identity of upstream hooks/rtk-awareness-full.md, also checked by the worker-lane tests.
+# Byte identity of the unchanged upstream v0.51.0 awareness file (e001f773).
 RTK_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 
 STACK_ROLES = ("stack-researcher", "stack-verifier")
@@ -57,8 +58,8 @@ README_HEADING = "## 2026-09-29: Stack role carriers"
 # section of 2026-09-29 repeats these rows verbatim, and Amendment 4 copies them; any later change to a
 # carrier needs a new dated amendment and new rows here.
 STACK_ROLE_ROWS = (
-    "| `stack-researcher.toml` | `48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77` |",
-    "| `stack-verifier.toml` | `18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b` |",
+    "| `stack-researcher.toml` | `52620afd5a6ded09adeffcfa652007c04f413c18d200ff0c2ae268b5f310fe52` |",
+    "| `stack-verifier.toml` | `aab3b1f7980344adac583bb74ceb5f7d3b1cb98f75b552d993cb4b77626bfc34` |",
 )
 
 # The spawn_agent tool text shows a role's description to every parent in every arm (role.rs:294-334), so each
@@ -175,8 +176,10 @@ def frozen_denylist():
 
 @functools.lru_cache(maxsize=None)
 def f4_block():
-    """The F4 block: from the rtk-upstream marker through the shell-builtin line of the Codex AGENTS template."""
+    """The rendered F4 block, including the unchanged pinned awareness file."""
     template = (ROOT / "adoption/templates/codex.AGENTS.template.md").read_text(encoding="utf-8")
+    template = template.replace("<!-- native-agent-stack:include-rtk-awareness-full -->\n",
+                                (ROOT / "adoption/templates/rtk-awareness-full.md").read_text(encoding="utf-8"))
     return UPSTREAM_MARKER + template.split(UPSTREAM_MARKER, 1)[1].split(END_MARKER, 1)[0]
 
 
@@ -322,9 +325,7 @@ def sealed_module():
 
 class CustomAgentInstructionsTests(unittest.TestCase):
     def test_every_custom_agent_carries_verbatim_f4_in_developer_instructions(self):
-        template = (ROOT / "adoption/templates/codex.AGENTS.template.md").read_text(encoding="utf-8")
-        expected = UPSTREAM_MARKER + template.split(UPSTREAM_MARKER, 1)[1].split(
-            "<!-- native-agent-stack:codex-user-instructions:end -->", 1)[0]
+        expected = f4_block()
         paths = sorted(AGENTS.glob("*.toml"))
         self.assertEqual({path.stem for path in paths}, STACK_STEMS)
         for path in paths:

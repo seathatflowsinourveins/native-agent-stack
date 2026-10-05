@@ -49,6 +49,13 @@ def cached_artifact(test: unittest.TestCase, source: str) -> bytes:
         test.skipTest(f"cached upstream input unavailable: {source}; set UPSTREAM_SURFACE_TEST_CACHE")
     return path.read_bytes()
 
+# Small synthetic document bodies; never used as observed upstream evidence.
+DOCUMENTS = {
+    "https://code.claude.com/docs/en/memory": b"# Memory\nSynthetic instruction imports.\n",
+    "https://code.claude.com/docs/en/skills": b"# Skills\nSynthetic listing defaults.\n",
+    "https://developers.openai.com/codex/guides/agents-md": b"# AGENTS.md\nSynthetic project instructions.\n",
+}
+
 # ----------------------------------------------------------------------------------------------- fixture builders
 
 FILLER_SETTINGS = [f"fillerSetting{index:02d}" for index in range(60)]
@@ -322,6 +329,7 @@ class Upstream:
         self.release_list: dict | None = None
         self.broken: set[str] = set()
         self.calls: list[tuple] = []
+        self.documents = dict(DOCUMENTS)
 
     def schema_bytes(self) -> bytes:
         if self.schema_override is not None:
@@ -359,11 +367,12 @@ class Upstream:
             usw.CHANGELOG_URL: (self.changelog_override if self.changelog_override is not None
                                 else changelog(self.changelog)).encode("utf-8"),
         }
+        bodies.update(self.documents)
         for sdk, _ in self.sdk_pairs:
             bodies[usw.UNPKG_URL.format(package=usw.SDK_PACKAGE, version=sdk, path="sdk.d.ts")] = dts
         return bodies
 
-    def http_get(self, url: str, timeout: int = 60) -> bytes:
+    def http_get(self, url: str, timeout: int = 60, *, accept=None) -> bytes:
         self.calls.append(("http", url))
         bodies = self.bodies()
         if url in self.broken or url not in bodies:
@@ -418,6 +427,11 @@ class Watch:
         self.dispositions = self.root / usw.DISPOSITIONS_PATH
         self.dispositions.parent.mkdir(parents=True)
         shutil.copyfile(ROOT / usw.DISPOSITIONS_PATH, self.dispositions)
+        catalog = json.loads(self.dispositions.read_text())
+        for entry in catalog["rows"]:
+            if ":doc:" in entry["key"] and entry["disposition"] == "enabled":
+                entry["value"]["sha256"] = sha256(DOCUMENTS[entry["source"]])
+        self.dispositions.write_text(json.dumps(catalog), encoding="utf-8")
         self.baseline = self.root / usw.BASELINE_PATH
         self.latest = self.state / usw.LATEST_FILE
 
@@ -459,6 +473,62 @@ def row(key: str, disposition: str = "declined", **changes) -> dict:
 
 
 # ----------------------------------------------------------------------------------------------- parser tests
+
+
+
+class InstructionDocumentWatchTests(unittest.TestCase):
+    def test_each_changed_document_reopens_its_existing_disposition_and_audit(self):
+        for url in DOCUMENTS:
+            with self.subTest(url=url):
+                upstream, watch = Upstream(), Watch(self)
+                watch.seed(self, upstream)
+                upstream.documents[url] += b"A changed upstream rule.\n"
+                result = watch.document("--network", upstream=upstream)
+                changed = [r for r in result["documents"] if r["changed"]]
+                self.assertEqual([r["source"] for r in changed], [url])
+                self.assertEqual(result["unreviewed"], [changed[0]["key"]])
+                self.assertEqual(changed[0]["carrier"], "docs/decisions/2026-10-05-harness-context-budget.md")
+                self.assertEqual(result["new"], [])
+                self.assertIn("instruction doc change", result["summary_line"])
+                # --write-baseline cannot silently accept a document change either.
+                result = watch.document("--network", "--write-baseline", "--force", upstream=upstream)
+                self.assertEqual(result["unreviewed"], [changed[0]["key"]])
+                # An explicitly reviewed digest clears exactly that reopened audit.
+                catalog = json.loads(watch.dispositions.read_text())
+                entry = next(r for r in catalog["rows"] if r["key"] == changed[0]["key"])
+                entry["value"]["sha256"] = changed[0]["observed_sha256"]
+                watch.dispositions.write_text(json.dumps(catalog))
+                self.assertEqual(watch.document("--network", upstream=upstream)["unreviewed"], [])
+
+    def test_offline_replay_preserves_document_changes_without_a_network_call(self):
+        upstream, watch = Upstream(), Watch(self)
+        watch.seed(self, upstream)
+        upstream.documents[next(iter(DOCUMENTS))] += b"Changed.\n"
+        current = watch.document("--network", upstream=upstream)
+        with mock.patch.object(socket, "socket", side_effect=AssertionError("offline network call")):
+            replayed = watch.document("--dry-run")
+        self.assertEqual(replayed["documents"], current["documents"])
+        self.assertEqual(replayed["unreviewed"], current["unreviewed"])
+
+    def test_missing_document_source_cannot_report_a_completed_watch(self):
+        upstream, watch = Upstream(), Watch(self)
+        url = next(iter(DOCUMENTS))
+        upstream.broken.add(url)
+        code, _, err = watch.run("--network", "--write-baseline", upstream=upstream)
+        self.assertEqual(code, 4, err)
+        self.assertIn("claude-doc-memory", err)
+        self.assertFalse(watch.latest.exists())
+
+    def test_enabled_document_rows_require_a_reviewed_digest_and_https_source(self):
+        catalog = json.loads((ROOT / usw.DISPOSITIONS_PATH).read_text())
+        entry = next(r for r in catalog["rows"] if ":doc:" in r["key"])
+        for digest in (None, "", "f" * 63, "F" * 64, 42):
+            with self.subTest(digest=digest):
+                entry["value"]["sha256"] = digest
+                self.assertTrue(usw.validate_dispositions(catalog))
+        entry["value"]["sha256"] = "f" * 64
+        entry["source"] = "AGENTS.md:1"
+        self.assertTrue(usw.validate_dispositions(catalog))
 
 
 class ParserTests(unittest.TestCase):
@@ -1028,7 +1098,7 @@ class FreshnessTests(unittest.TestCase):
         watch.seed(self, upstream)
         lifecycle = json.dumps({"codex_cli_version": "codex-cli 0.160.0", "cli_features": []}).encode()
         original = upstream.http_get
-        upstream.http_get = lambda url, timeout=60: (lifecycle if url == usw.CHENRUI_LIFECYCLE_URL
+        upstream.http_get = lambda url, timeout=60, accept=None: (lifecycle if url == usw.CHENRUI_LIFECYCLE_URL
                                                      else original(url, timeout))
         code, _, stderr = watch.run("--network", "--cross-check", upstream=upstream)  # caches the tracker at NOW
         self.assertEqual(code, 0, stderr)
@@ -1232,7 +1302,7 @@ class WriteTests(unittest.TestCase):
         self.assertEqual(leftovers, [])
         document = json.loads(watch.latest.read_text(encoding="utf-8"))
         self.assertEqual(list(document), ["schema_version", "generated_at", "run_at", "versions", "new", "removed",
-                                          "stage_changed", "changelog", "unreviewed", "coverage", "cross_check",
+                                          "stage_changed", "changelog", "unreviewed", "documents", "coverage", "cross_check",
                                           "summary_line"])
 
     def test_a_write_that_fails_before_the_rename_keeps_the_earlier_file(self):
@@ -1623,7 +1693,7 @@ class CrossCheckTests(unittest.TestCase):
             {"name": "environment.catalog.json", "browser_download_url": "https://github.com/amitray007/claude-code-schema/releases/download/v2.1.288/environment.catalog.json", "digest": "sha256:" + sha256(environment)}]}
         original_get, original_gh = upstream.http_get, upstream.gh_api
 
-        def http_get(url, timeout=60):
+        def http_get(url, timeout=60, *, accept=None):
             extra = {release["assets"][0]["browser_download_url"]: settings,
                      release["assets"][1]["browser_download_url"]: environment,
                      usw.CHENRUI_LIFECYCLE_URL: lifecycle.encode()}

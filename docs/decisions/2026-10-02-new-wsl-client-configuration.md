@@ -955,3 +955,137 @@ authorization). Source: this PR:docs/decisions/2026-10-04-final-architecture-rou
 ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df:
 docs/client-configurations.md:71,109. No destination runtime acceptance is
 claimed by this projection.
+
+## Addendum 2026-10-05: official upstream rule projection
+
+The [official-upstream rule decision](2026-10-05-official-upstream-never-rebuild.md) adds the requested standing sentence to both client sources and compresses only the Codex source's session-lane wording to keep its byte budget. The generated instruction carriers retain every unit. The current projection below is the output of `new_wsl_client_config.py --check --markdown`; earlier dated projections retain their original counts. This is instruction projection evidence, not a new host installation or runtime qualification.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 58 of 58 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 66 of 66 lines stay):
+
+```text
+```
+
+
+## Addendum 2026-10-05: fixed startup context and native RTK layout
+
+The [context-budget decision](2026-10-05-harness-context-budget.md) moves specialized rules behind pointers, removes the skill-listing fraction override (superseded by repair round 3 below: NativeStack2604 keeps `skillListingBudgetFraction: 0.05`), and wires the native RTK global initializer to create RTK.md and its import. The current instruction projection follows; earlier dated projections keep their original counts. This is repository rendering evidence, with RTK init separately exercised in an isolated temporary home, and establishes no destination client or provider acceptance.
+
+Today: 393 pieces, 354 wired (206 practice, 148 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 15 authorization pieces.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 52 of 52 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 66 of 66 lines stay):
+
+```text
+```
+
+## Addendum 2026-10-05: PR #726 required startup restorations
+
+The [context-budget repair](2026-10-05-harness-context-budget.md) restores the
+user-level StructuredOutput guard and common cross-family sentence, carries the
+uniform discovery and pinned-glue wording, and makes the existing settings apply
+retire the owned listing fraction with absence read-back (superseded by repair round 3 below: the fraction is kept, not retired). Root routing remains
+until both hosts pass the post-landing render gate. This current projection is
+the generator's dropped-unit output; earlier projections remain historical.
+These are repository integration changes, not a new destination installation.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 56 of 56 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 67 of 67 lines stay):
+
+```text
+```
+
+## Addendum 2026-10-05: PR #726 repair round 2 contract literals
+
+The [round 2 budget addendum](2026-10-05-harness-context-budget.md#addendum-2026-10-05-pr-726-repair-round-2)
+restores the portable effort and unrestricted-size clauses that the checksum-locked
+workflow contract reads. The carrier retains both clauses. Existing projections
+remain historical; the current generator output follows. This is local repository
+projection and workflow-contract evidence, not a new destination host acceptance.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 58 of 58 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 67 of 67 lines stay):
+
+```text
+```
+
+
+## 2026-10-05 repair round 3: full skill listing and native RTK awareness
+
+The user's [September 30 LLM-native invocation directive](2026-09-30-skills-llm-native-listing.md) governs skill visibility independently of startup file bytes. All nine audit listings return to `on`, and NativeStack2604 keeps `skillListingBudgetFraction: 0.05`. Main's ordinary settings merge preserves unmentioned host keys and applies the configured fraction. Codex carriers now inline the complete pinned RTK 0.51.0 awareness source; the compact template holds only its include marker. See the [round 3 budget comparison](2026-10-05-harness-context-budget.md#2026-10-05-repair-round-3-user-directed-listing-and-verbatim-rtk) for sources and byte ceilings.
+
+After the refresh onto main 9e9553277, which carries wave 5's four browser-registration pieces: Today: 398 pieces, 358 wired (207 practice, 151 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 16 authorization pieces. The check prints `authorization: 16`, and 24 pieces are not wired. Earlier dated tables and counts remain historical.
+
+| Piece | Wiring | Why it is not wired |
+| --- | --- | --- |
+| `claude/settings/permission/deny/Agent(codex:codex-rescue)` | `not_wired` | the manifest has no slot whose repository is openai/codex-plugin-cc (the nearest rows, codex and codex-sdk-and-codex-exec-app-server, are openai/codex), so no installed owner supplies the plugin |
+| `claude/settings/hook/SessionStart/matcher=-/"${HOME}/.claude/hooks/context-mode-cache-heal.mjs"` | `not_wired` | context-mode writes this SessionStart hook into settings.json itself and deploys the file it runs, ~/.claude/hooks/context-mode-cache-heal.mjs (start.mjs L166-183 at mksglu/context-mode@6f0cc684; evidence/artifacts/context-mode-codex-binding-20260926/README.md L207-217), and its self-heal runs on every start from either client and on npm postinstall (start.mjs L227-427 and L237-239, scripts/heal-installed-plugins.mjs L202-205); the repository does not copy that file, and a second writer of the entry would compete with the plugin's own (wave-2 synthesis X11; context ruling, change 8) |
+| `claude/settings/plugin/codex@openai-codex` | `not_wired` | the manifest has no slot whose repository is openai/codex-plugin-cc (the nearest rows, codex and codex-sdk-and-codex-exec-app-server, are openai/codex), so no installed owner supplies the plugin |
+| `claude/settings/marketplace/openai-codex` | `not_wired` | the manifest has no slot whose repository is openai/codex-plugin-cc (the nearest rows, codex and codex-sdk-and-codex-exec-app-server, are openai/codex), so no installed owner supplies the plugin |
+| `codex/config/check_for_update_on_startup` | `not_wired` | the template sets it false because the client is pinned and updated by the stack, and the install plan installs Codex with its self-updating native installer, so Codex keeps its own update check |
+| `codex/config/projects."${HOME}/code/native-agent-stack-publication".trust_level` | `not_wired` | trust grants belong to one host; adoption/bootstrap.md step 4 and tools/adoption/codex_home.py leave them out, and Codex asks on this host |
+| `codex/config/tui.model_availability_nux.gpt-6-astra` | `not_wired` | a counter of how often Codex showed a model notice on the source host, which is client state and not configuration |
+| `codex/config/tui.model_availability_nux."gpt-6.1-sol"` | `not_wired` | a counter of how often Codex showed a model notice on the source host, which is client state and not configuration |
+| `codex/config/hooks.state."${PROJECT_ROOT}/.codex/hooks.json:pre_tool_use:0:0".trusted_hash` | `not_wired` | each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then |
+| `codex/config/hooks.state."${HOME}/.codex/hooks.json:pre_tool_use:0:0".trusted_hash` | `not_wired` | each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then |
+| `codex/config/hooks.state."${HOME}/.codex/hooks.json:post_tool_use:0:0".trusted_hash` | `not_wired` | each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then |
+| `codex/config/hooks.state."${HOME}/.codex/hooks.json:pre_compact:0:0".trusted_hash` | `not_wired` | each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then |
+| `codex/config/hooks.state."${HOME}/.codex/hooks.json:session_start:0:0".trusted_hash` | `not_wired` | each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then |
+| `codex/config/hooks.state."${HOME}/.codex/hooks.json:session_end:0:0".trusted_hash` | `not_wired` | each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then |
+| `codex/config/hooks.state."${HOME}/.codex/hooks.json:user_prompt_submit:0:0".trusted_hash` | `not_wired` | each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then |
+| `codex/config/hooks.state."${HOME}/.codex/hooks.json:stop:0:0".trusted_hash` | `not_wired` | each remaining entry approves the hash of a hook file this tool does not write: the project's own .codex/hooks.json, which the repository does not track, and ai-memory's seven Codex hooks in ~/.codex/hooks.json, which ai-memory 2.5.2's own `install-hooks --agent codex --apply` writes once (the install plan's memory-owner row, the exception synthesis X11 allows) and whose template hashes were taken from ai-memory 2.4.x on another host; their 2.5.2 hashes are read back through `codex app-server` hooks/list on the destination, the reviewed values are recorded in the template, and these entries are then wired so the apply renders them, the one trust route of synthesis X10 (context ruling, change 9); the /hooks review is the fallback until then |
+| `codex/hooks/setting/description` | `not_wired` | ~/.codex/hooks.json is written by ai-memory 2.5.2's own install-hooks (the hooks.state entry below), so this tool would be a second writer of that file, and the template's handler has no reviewed trust hash; the Claude Code notice is wired |
+| `codex/hooks/hook/SessionStart/matcher=startup/python3 "$HOME/.claude/hooks/currency-due-notice.py" 2>/dev/null \|\| true` | `not_wired` | ~/.codex/hooks.json is written by ai-memory 2.5.2's own install-hooks (the hooks.state entry below), so this tool would be a second writer of that file, and the template's handler has no reviewed trust hash; the Claude Code notice is wired |
+| `codex/role/stack-researcher.toml` | `not_wired` | the carriers are byte-pinned in adoption/agents/codex/SHA256SUMS and ruled by tools/adoption/codex_roles.py (cwd_rule, exact_shapes, f4_block); stack-researcher.toml names jCodeMunch, which this distribution does not install, so a copy without that sentence keeps the three rules but not its pinned hash; stack-verifier.toml names no tool that is not wired, and the 2026-10-04 token-layer record leaves both roles to its follow-up, the carriers filtered to the installed lanes |
+| `codex/role/stack-verifier.toml` | `not_wired` | the carriers are byte-pinned in adoption/agents/codex/SHA256SUMS and ruled by tools/adoption/codex_roles.py (cwd_rule, exact_shapes, f4_block); stack-researcher.toml names jCodeMunch, which this distribution does not install, so a copy without that sentence keeps the three rules but not its pinned hash; stack-verifier.toml names no tool that is not wired, and the 2026-10-04 token-layer record leaves both roles to its follow-up, the carriers filtered to the installed lanes |
+| `codex/worker-role/evidence-reviewer.toml` | `not_wired` | installed only by apply_codex_lane.py --worker-roles, which adds every role's description to every parent's spawn text and which the lane keeps off while the token-adoption E2E's Gate A window is open |
+| `codex/worker-role/isolated-builder.toml` | `not_wired` | installed only by apply_codex_lane.py --worker-roles, which adds every role's description to every parent's spawn text and which the lane keeps off while the token-adoption E2E's Gate A window is open |
+| `codex/worker-role/semantic-evidence-reviewer.toml` | `not_wired` | installed only by apply_codex_lane.py --worker-roles, which adds every role's description to every parent's spawn text and which the lane keeps off while the token-adoption E2E's Gate A window is open |
+| `step/skills` | `not_wired` | the install plan installs the six mattpocock skills and adds the Trail of Bits marketplace; this tool runs no skills installer |
+
+| Authorization setting | Value --with-authorization-settings writes | Written by default | Why it needs the option | Also needs |
+| --- | --- | --- | --- | --- |
+| `claude/settings/setting/permissions.defaultMode` | `"bypassPermissions"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
+| `claude/settings/permission/allow/mcp__semble__search` | `"mcp__semble__search"` | no | an allow rule lets Claude Code call the tool without asking outside bypass mode; the rules name each tool exactly, so an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3) | slot `code-search` installing `semble` |
+| `claude/settings/permission/allow/mcp__semble__find_related` | `"mcp__semble__find_related"` | no | an allow rule lets Claude Code call the tool without asking outside bypass mode; the rules name each tool exactly, so an upstream upgrade cannot add an allowed tool silently (wave-2 code-search ruling, change 3) | slot `code-search` installing `semble` |
+| `claude/settings/setting/skipDangerousModePermissionPrompt` | `true` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
+| `claude/settings/setting/crossSessionInbound` | `"accept"` | no | "accept" delivers messages from the user's other sessions to Claude without the approval hold that otherwise applies to a sender that is not in bypass mode, so it is written only with --with-authorization-settings and never over a value the file already has | - |
+| `codex/config/approval_policy` | `"never"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
+| `codex/config/sandbox_mode` | `"danger-full-access"` | no | they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has | - |
+| `codex/config/mcp_servers.ai-memory.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `memory-owner` installing `ai-memory` |
+| `codex/config/mcp_servers.context-mode.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `context-supply` installing `context-mode` |
+| `codex/config/mcp_servers.jcodemunch.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `code-index` installing `jcodemunch` |
+| `codex/config/mcp_servers.semble.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `code-search` installing `semble` |
+| `codex/config/projects."${PROJECT_ROOT}".trust_level` | `"trusted"` | no | a trusted project's own .codex/config.toml layers load and Codex asks nothing about the folder, so the grant is written only with --with-authorization-settings and never over a value the file already has | - |
+| `codex/stack-worker/mcp_servers.ai-memory.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `memory-owner` installing `ai-memory` |
+| `codex/stack-worker/mcp_servers.socraticode.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `code-search` installing `SocratiCode` |
+| `codex/stack-worker/mcp_servers.headroom.default_tools_approval_mode` | `"approve"` | no | a tool approval mode of "approve" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has | slot `output-compression` installing `headroom` |
+
+| Project agent | MCP servers of its tools that are not wired | Skills the plan does not install |
+| --- | --- | --- |
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 58 of 58 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 69 of 69 lines stay):
+
+```text
+```

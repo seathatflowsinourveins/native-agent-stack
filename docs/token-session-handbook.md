@@ -492,3 +492,11 @@ For observation, a healthy service or rendered chart is only readiness. Retain t
 OmniRoute stays optional: use [its scoped native lifecycle and launch guide](foundation-stack.md) only when selecting that route. The retained RTK/lite semantic preview failures, exact-dedup limited acceptance and gateway provider quota failures do not establish a default full-stack compression route. Preserve native caching/compaction and choose useful tools without chaining every compressor.
 
 For another PC, retain the reviewed source revision and public hashes, then collect that PC's own install/use/persistence/restart/cleanup/recovery results. Transfer only selected application data through the [recovery guide](../adoption/lifecycle.md#stateful-persistence-and-recovery), with isolated restore and logical comparison. Historical receipts and saved counters support continuity; they are not new-host acceptance or proof of universal superiority.
+
+## Catalog lookup
+
+- For catalog lookup on a host that adopted the named QMD index, refresh changed files with `qmd --index native-agent-stack-catalog update`, followed by `qmd --index native-agent-stack-catalog embed` where that index carries embeddings, then use scoped `query`, `search` and `get` from `us-equities-catalog`, `us-equities-foundation`, `foundation-adoption` or `foundation-docs`; `catalogs/us-equities/native-workflows.md` documents explicit setup for other checkouts. Do not index unrelated folders.
+
+## Offline ecosystem guide
+
+- The offline consolidated layer/setup guide `docs/ecosystem/index.html` is generated, not committed: build it with `python3 scripts/build_ecosystem.py --write`, or download it from a `publish-catalog.yml` workflow artifact (7-day retention, `workflow_dispatch`/`v*`-tag runs only).

@@ -63,6 +63,8 @@ import adoption_status  # noqa: E402  (native Rust whitespace for the override g
 
 CLAUDE_EXAMPLE = ROOT / "examples" / "claude-native" / "CLAUDE.md"
 CODEX_TEMPLATE = ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"
+RTK_AWARENESS_REL = "adoption/templates/rtk-awareness-full.md"
+RTK_INCLUDE = "<!-- native-agent-stack:include-rtk-awareness-full -->\n"
 DECISION_TEMPLATE = ROOT / "adoption" / "templates" / "decision-routing.md"
 CODEX_BEGIN = "<!-- native-agent-stack:codex-user-instructions:begin"
 CODEX_END = "<!-- native-agent-stack:codex-user-instructions:end -->"
@@ -164,7 +166,23 @@ def merged_claude_md(current: str, example: str) -> str:
     return with_block(current, block, CLAUDE_BEGIN, CLAUDE_END)
 
 
+def codex_block(template: str, *, root: Path = ROOT) -> str:
+    """Inline the pinned RTK awareness bytes; Codex does not expand @ imports.
+
+    rtk-ai/rtk v0.51.0 (e001f773), src/hooks/init/codex.rs writes RTK.md
+    plus a reference. This existing writer fills only the Codex import gap.
+    Already-rendered carriers have no include marker and pass through unchanged.
+    """
+    if RTK_INCLUDE not in template:
+        return template
+    if template.count(RTK_INCLUDE) != 1:
+        raise Refused("the Codex template must include RTK awareness exactly once")
+    awareness = (root / RTK_AWARENESS_REL).read_bytes().decode("utf-8")
+    return template.replace(RTK_INCLUDE, awareness)
+
+
 def merged_codex_md(current: str, template: str) -> str:
+    template = codex_block(template)
     refuse_generated_output(current)
     refuse_narrow_block_in_full_pack(current)
     if block_span(template, CODEX_BEGIN, CODEX_END) != (0, len(template)):

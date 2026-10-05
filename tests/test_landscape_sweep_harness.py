@@ -1771,12 +1771,16 @@ class OmniRouteLaneBuildTests(unittest.TestCase):
         # RTK's instructions from ~/.codex/AGENTS.md, so the gateway lane's home must carry the same managed block.
         work, _, done = self.stage_lane()
         self.assertEqual(done.returncode, 0, done.stderr)
-        template = (ROOT / "adoption" / "templates" / "codex.AGENTS.template.md").read_bytes()
+        rendered = build_args.codex_user_instructions(ROOT).encode("utf-8")
         staged = (work / "codex-home" / "AGENTS.md").read_bytes()
-        self.assertEqual(staged, template)
-        self.assertIn(b"rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim", staged)
+        self.assertEqual(staged, rendered)
+        # rtk-ai/rtk v0.51.0 tag = e001f773f80b22b7dc4c7a79521b30e35aaef026;
+        # hooks/rtk-awareness-full.md is unchanged and carried in full.
+        self.assertIn(b"rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim", staged)
+        native = (ROOT / "tests/fixtures/codex-worker-lane/rtk-awareness-full.md").read_bytes()
+        self.assertIn(native, staged)
         lane = json.loads((work / "staged.json").read_text())["codex"]["lane_home"]
-        self.assertEqual(lane["agents_sha256"], hashlib.sha256(template).hexdigest())
+        self.assertEqual(lane["agents_sha256"], hashlib.sha256(rendered).hexdigest())
 
     def test_reading_the_instructions_leaves_the_import_path_unchanged(self):
         # apply_codex_lane.py prepends the repository root on import (its line 69); the whole path must come back,
