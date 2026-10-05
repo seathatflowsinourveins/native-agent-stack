@@ -1,0 +1,824 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "observed",
+  "lane": "research-application",
+  "task_and_failure": "Qualify keyless primary-source search for foundation research supporting complex systems and US-equities R&D. Current DDGS(auto) may fail or return weak source discovery; compare unchanged DeerFlow search tools on 30 frozen queries.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/bytedance/deer-flow",
+      "revision": "345f08be00c8a9495079b732a39b46aa9af1584e"
+    },
+    {
+      "url": "https://github.com/promptfoo/promptfoo",
+      "revision": "34f74d34e140b5e17d23770dfb2340057b1936b8"
+    },
+    {
+      "url": "https://github.com/searxng/searxng",
+      "revision": "d48c4b555421e824342c51d68482dd0898e54d0f"
+    }
+  ],
+  "discovery_provenance": [
+    "Ruling12 confines measurement to keyless DDGS(auto) and isolated published-rootless SearXNG; supersedes the old install-row gate without transferring plan paths.",
+    "Independent bounded primary-source review verified pinned native tool/provider/container contracts and official URL families; leads were reread at primary sources.",
+    "Native preflight: promptfoo0.123.1; installed DeerFlow commit345f08be and DDGS9.14.1; rootless Docker29.8.2; published image runtime revision matches source. No measured search yet.",
+    "All180 actual search cells retained across nine native promptfoo CLI batches (exit100 each); source05481fc frozen inputs independently checked unchanged. Container/native scope and local controls remain separate."
+  ],
+  "license_and_compatibility": "DeerFlow and promptfoo MIT, SearXNG AGPL-3.0; unchanged published runtime used as a private temporary measurement service, no vendoring, fork, distribution or supported-host installation. Existing Python3.12.3 environment supplies locked upstream dependencies.",
+  "baseline_and_candidate": {
+    "baseline": "Current unchanged DeerFlowv2.1.0 DDGS9.14.1 backendauto max_results5; this is multi-engine keyless search, not DuckDuckGo-only.",
+    "candidate": "Unchanged DeerFlowv2.1.0 SearXNG tool max_results5 against source d48c4b555421e824342c51d68482dd0898e54d0f published container at immutable index digest76b0bf285aca014c7191fc4d9234c4bfb358624ac33d8883833d496c059ec072; upstream engine defaults, JSON enabled."
+  },
+  "frozen_inputs": {
+    "base_revision": "cb55ae1c69674b43d5e4a52b31044566c5d906bf",
+    "tasks": [
+      "q01",
+      "q02",
+      "q03",
+      "q04",
+      "q05",
+      "q06",
+      "q07",
+      "q08",
+      "q09",
+      "q10",
+      "q11",
+      "q12",
+      "q13",
+      "q14",
+      "q15",
+      "q16",
+      "q17",
+      "q18",
+      "q19",
+      "q20",
+      "q21",
+      "q22",
+      "q23",
+      "q24",
+      "q25",
+      "q26",
+      "q27",
+      "q28",
+      "q29",
+      "q30"
+    ],
+    "roles": [
+      "search-provider"
+    ],
+    "sources": [
+      {
+        "path": "evidence/artifacts/web-search-comparison-20261005/provider.py",
+        "sha256": "ad348205528be3db2dccae615c9d045021897b87c43f7bab555c9bacaf69c945"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "evidence/artifacts/web-search-comparison-20261005/queries.yaml",
+        "sha256": "734a24c13c31fb90f9a0b96446d4094aadd819a3afff1fac54393fd53a3e310e"
+      },
+      {
+        "path": "evidence/artifacts/web-search-comparison-20261005/searxng-settings.yml",
+        "sha256": "fb89a2a266f20f3a2be92cd0f32a6c73ac609424a45cd4ae8639f775a3c687c3"
+      },
+      {
+        "path": "evidence/artifacts/web-search-comparison-20261005/runtime-facts.json",
+        "sha256": "86690d75078bbf47e0a888b1296f3b9db5391a5033902dc2255a32575ba8915a"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "evidence/artifacts/web-search-comparison-20261005/preregistration.json",
+        "sha256": "65fe37de8cbcd3fa6ede48c72c896e93374741a2c347421662509a87e647794a"
+      },
+      {
+        "path": "evidence/artifacts/web-search-comparison-20261005/assertions.cjs",
+        "sha256": "3d156e86ff63e74b138e3f47f4fb17facf2077681fbb0f556eabb3dd599ba136"
+      },
+      {
+        "path": "evidence/artifacts/web-search-comparison-20261005/search.yaml",
+        "sha256": "bc2c36d1ce7fe70ec8d2604e5d539269006ebc9fb884500106e01d48ded65964"
+      },
+      {
+        "path": "evidence/artifacts/web-search-comparison-20261005/search-reversed.yaml",
+        "sha256": "e4ac4135fbba6ea7bc02553cc090617f9021abd435922f3f0f48040a3c6382e0"
+      },
+      {
+        "path": "evidence/artifacts/web-search-comparison-20261005/controls.yaml",
+        "sha256": "32f77ff833e1f960124573bd5ef4750ed122a03d9d0729b57a6d4783710e4150"
+      },
+      {
+        "path": "evidence/artifacts/web-search-comparison-20261005/error-control.yaml",
+        "sha256": "dfa0e7b2e32a4d70b0906190e04b77a5fbe88225b34a94d4f7568d7efafc682f"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "All180 attempts retained. Candidate requires complete90-call arm denominators, primary-hit@5 mean gain>=0.10, one-sided exact sign-test p<0.05 over30 paired-query means with ties excluded (all ties p=1), usable rate>=baseline-0.02, p95<=30s and<=2*baseline p95. Native latency includes failures; absent latency prevents gate pass. MRR and uniqueness secondary only. Missing named scores on provider errors become zeros, never omissions. p95 nearest rank ceil(.95*n). No win retains incumbent within this corpus, not equivalence.",
+    "usage_rule": "No token-savings claim. Provider tokens and hidden engine retries remain unknown; preserve native returned usage and distinguish any native zero counter from whole-task usage."
+  },
+  "runtime_and_platform": {
+    "platform": "Linux x86_64 WSL, existing rootless Docker; one heavy step at a time outside strict paper windows.",
+    "tools": [
+      {
+        "name": "DeerFlow",
+        "version": "2.1.0"
+      },
+      {
+        "name": "DDGS",
+        "version": "9.14.1"
+      },
+      {
+        "name": "promptfoo",
+        "version": "0.123.1"
+      },
+      {
+        "name": "Python",
+        "version": "3.12.3"
+      },
+      {
+        "name": "SearXNG",
+        "version": "2026.10.4+d48c4b555"
+      },
+      {
+        "name": "Docker",
+        "version": "29.8.2"
+      }
+    ],
+    "isolation": "Lane-owned scratch/state, existing unchanged DeerFlow interpreter, scoped AppConfig, native promptfoo one-worker/cache-off CLI, loopback ephemeral upstream rootless container. No credential contents/configuration read, no shared install.sh/plan edit, no image/source build; remove container after measurement."
+  },
+  "commands": [
+    "promptfoo eval --config evidence/artifacts/web-search-comparison-20261005/search.yaml --repeat 1 --filter-pattern '^q(0[1-9]|10)$' --max-concurrency 1 --delay 1000 --no-cache --no-share --no-write --no-table --no-progress-bar --output <lane-owned-output>/round1-batch1.json",
+    "promptfoo eval --config evidence/artifacts/web-search-comparison-20261005/search.yaml --repeat 1 --filter-pattern '^q(1[1-9]|20)$' --max-concurrency 1 --delay 1000 --no-cache --no-share --no-write --no-table --no-progress-bar --output <lane-owned-output>/round1-batch2.json",
+    "promptfoo eval --config evidence/artifacts/web-search-comparison-20261005/search.yaml --repeat 1 --filter-pattern '^q(2[1-9]|30)$' --max-concurrency 1 --delay 1000 --no-cache --no-share --no-write --no-table --no-progress-bar --output <lane-owned-output>/round1-batch3.json",
+    "promptfoo eval --config evidence/artifacts/web-search-comparison-20261005/search-reversed.yaml --repeat 1 --filter-pattern '^q(0[1-9]|10)$' --max-concurrency 1 --delay 1000 --no-cache --no-share --no-write --no-table --no-progress-bar --output <lane-owned-output>/round2-batch1.json",
+    "promptfoo eval --config evidence/artifacts/web-search-comparison-20261005/search-reversed.yaml --repeat 1 --filter-pattern '^q(1[1-9]|20)$' --max-concurrency 1 --delay 1000 --no-cache --no-share --no-write --no-table --no-progress-bar --output <lane-owned-output>/round2-batch2.json",
+    "promptfoo eval --config evidence/artifacts/web-search-comparison-20261005/search-reversed.yaml --repeat 1 --filter-pattern '^q(2[1-9]|30)$' --max-concurrency 1 --delay 1000 --no-cache --no-share --no-write --no-table --no-progress-bar --output <lane-owned-output>/round2-batch3.json",
+    "promptfoo eval --config evidence/artifacts/web-search-comparison-20261005/search.yaml --repeat 1 --filter-pattern '^q(0[1-9]|10)$' --max-concurrency 1 --delay 1000 --no-cache --no-share --no-write --no-table --no-progress-bar --output <lane-owned-output>/round3-batch1.json",
+    "promptfoo eval --config evidence/artifacts/web-search-comparison-20261005/search.yaml --repeat 1 --filter-pattern '^q(1[1-9]|20)$' --max-concurrency 1 --delay 1000 --no-cache --no-share --no-write --no-table --no-progress-bar --output <lane-owned-output>/round3-batch2.json",
+    "promptfoo eval --config evidence/artifacts/web-search-comparison-20261005/search.yaml --repeat 1 --filter-pattern '^q(2[1-9]|30)$' --max-concurrency 1 --delay 1000 --no-cache --no-share --no-write --no-table --no-progress-bar --output <lane-owned-output>/round3-batch3.json"
+  ],
+  "observations": [
+    {
+      "id": "web-r1-b1-baseline",
+      "task": "q01",
+      "role": "search-provider",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm baseline view of shared CLI round1-batch1, query IDs q01,q02,q03,q04,q05,q06,q07,q08,q09,q10. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round1-batch1.receipt.json",
+          "sha256": "8fecbc25a00e065149c8a6bc39dda1302b8af109e6d5d0d9f0c384d6283e233c"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r1-b1-candidate",
+      "task": "q01",
+      "role": "search-provider",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 0,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm candidate view of shared CLI round1-batch1, query IDs q01,q02,q03,q04,q05,q06,q07,q08,q09,q10. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round1-batch1.receipt.json",
+          "sha256": "8fecbc25a00e065149c8a6bc39dda1302b8af109e6d5d0d9f0c384d6283e233c"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r1-b2-baseline",
+      "task": "q11",
+      "role": "search-provider",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm baseline view of shared CLI round1-batch2, query IDs q11,q12,q13,q14,q15,q16,q17,q18,q19,q20. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round1-batch2.receipt.json",
+          "sha256": "29f37cd54f14c8906bd31bc18a2b71534920947d5060e31ea3fc5531d39a96c9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r1-b2-candidate",
+      "task": "q11",
+      "role": "search-provider",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 1,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm candidate view of shared CLI round1-batch2, query IDs q11,q12,q13,q14,q15,q16,q17,q18,q19,q20. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round1-batch2.receipt.json",
+          "sha256": "29f37cd54f14c8906bd31bc18a2b71534920947d5060e31ea3fc5531d39a96c9"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r1-b3-baseline",
+      "task": "q21",
+      "role": "search-provider",
+      "condition": "baseline",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm baseline view of shared CLI round1-batch3, query IDs q21,q22,q23,q24,q25,q26,q27,q28,q29,q30. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round1-batch3.receipt.json",
+          "sha256": "13b98a5c3ba8513a9c7f068cbfac19cf60347c4e6e9960d5ea0c3a17ef6b3edd"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r1-b3-candidate",
+      "task": "q21",
+      "role": "search-provider",
+      "condition": "candidate",
+      "attempt": 1,
+      "command_index": 2,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm candidate view of shared CLI round1-batch3, query IDs q21,q22,q23,q24,q25,q26,q27,q28,q29,q30. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round1-batch3.receipt.json",
+          "sha256": "13b98a5c3ba8513a9c7f068cbfac19cf60347c4e6e9960d5ea0c3a17ef6b3edd"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r2-b1-baseline",
+      "task": "q01",
+      "role": "search-provider",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm baseline view of shared CLI round2-batch1, query IDs q01,q02,q03,q04,q05,q06,q07,q08,q09,q10. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round2-batch1.receipt.json",
+          "sha256": "d5ce7ee4e3039567a33cabd5f7665645cb4a2277bfcdde2ee2f37a40cffbfd40"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r2-b1-candidate",
+      "task": "q01",
+      "role": "search-provider",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 3,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm candidate view of shared CLI round2-batch1, query IDs q01,q02,q03,q04,q05,q06,q07,q08,q09,q10. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round2-batch1.receipt.json",
+          "sha256": "d5ce7ee4e3039567a33cabd5f7665645cb4a2277bfcdde2ee2f37a40cffbfd40"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r2-b2-baseline",
+      "task": "q11",
+      "role": "search-provider",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 4,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm baseline view of shared CLI round2-batch2, query IDs q11,q12,q13,q14,q15,q16,q17,q18,q19,q20. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round2-batch2.receipt.json",
+          "sha256": "6680aecd2b0fea57a7307c56a52e3ab76f4351f52f5d77dac7e26b581108d04c"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r2-b2-candidate",
+      "task": "q11",
+      "role": "search-provider",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 4,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm candidate view of shared CLI round2-batch2, query IDs q11,q12,q13,q14,q15,q16,q17,q18,q19,q20. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round2-batch2.receipt.json",
+          "sha256": "6680aecd2b0fea57a7307c56a52e3ab76f4351f52f5d77dac7e26b581108d04c"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r2-b3-baseline",
+      "task": "q21",
+      "role": "search-provider",
+      "condition": "baseline",
+      "attempt": 2,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm baseline view of shared CLI round2-batch3, query IDs q21,q22,q23,q24,q25,q26,q27,q28,q29,q30. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round2-batch3.receipt.json",
+          "sha256": "5cd055b7401ec486f2171bfb27224fe5a39f24bceb880d552db48dd209424c90"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r2-b3-candidate",
+      "task": "q21",
+      "role": "search-provider",
+      "condition": "candidate",
+      "attempt": 2,
+      "command_index": 5,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm candidate view of shared CLI round2-batch3, query IDs q21,q22,q23,q24,q25,q26,q27,q28,q29,q30. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round2-batch3.receipt.json",
+          "sha256": "5cd055b7401ec486f2171bfb27224fe5a39f24bceb880d552db48dd209424c90"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r3-b1-baseline",
+      "task": "q01",
+      "role": "search-provider",
+      "condition": "baseline",
+      "attempt": 3,
+      "command_index": 6,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm baseline view of shared CLI round3-batch1, query IDs q01,q02,q03,q04,q05,q06,q07,q08,q09,q10. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round3-batch1.receipt.json",
+          "sha256": "c4701a399d5779189aad4c07de3121500789a7e8f7dff6dcb82fd6d1809d1656"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r3-b1-candidate",
+      "task": "q01",
+      "role": "search-provider",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 6,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm candidate view of shared CLI round3-batch1, query IDs q01,q02,q03,q04,q05,q06,q07,q08,q09,q10. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round3-batch1.receipt.json",
+          "sha256": "c4701a399d5779189aad4c07de3121500789a7e8f7dff6dcb82fd6d1809d1656"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r3-b2-baseline",
+      "task": "q11",
+      "role": "search-provider",
+      "condition": "baseline",
+      "attempt": 3,
+      "command_index": 7,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm baseline view of shared CLI round3-batch2, query IDs q11,q12,q13,q14,q15,q16,q17,q18,q19,q20. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round3-batch2.receipt.json",
+          "sha256": "feab2fa77d9507f0da4dee02f41d7876d5bb48c73ab4c99691371e3b6acae24f"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r3-b2-candidate",
+      "task": "q11",
+      "role": "search-provider",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 7,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm candidate view of shared CLI round3-batch2, query IDs q11,q12,q13,q14,q15,q16,q17,q18,q19,q20. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round3-batch2.receipt.json",
+          "sha256": "feab2fa77d9507f0da4dee02f41d7876d5bb48c73ab4c99691371e3b6acae24f"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r3-b3-baseline",
+      "task": "q21",
+      "role": "search-provider",
+      "condition": "baseline",
+      "attempt": 3,
+      "command_index": 8,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm baseline view of shared CLI round3-batch3, query IDs q21,q22,q23,q24,q25,q26,q27,q28,q29,q30. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round3-batch3.receipt.json",
+          "sha256": "2878d7ee1c931565998d65938d306713786ddcc24131f5f2c48c697e488bf184"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    },
+    {
+      "id": "web-r3-b3-candidate",
+      "task": "q21",
+      "role": "search-provider",
+      "condition": "candidate",
+      "attempt": 3,
+      "command_index": 8,
+      "evidence_class": "native_cli_execution",
+      "scope": "Arm candidate view of shared CLI round3-batch3, query IDs q21,q22,q23,q24,q25,q26,q27,q28,q29,q30. Task field is a schema anchor, not a single-query run; same process/exit is shared by two views. Individual native scores are in the receipt.",
+      "status": "failed",
+      "exit_code": 100,
+      "quality": {
+        "semantic": null,
+        "contract": null
+      },
+      "artifacts": [
+        {
+          "path": "evidence/artifacts/web-search-comparison-20261005/round3-batch3.receipt.json",
+          "sha256": "2878d7ee1c931565998d65938d306713786ddcc24131f5f2c48c697e488bf184"
+        }
+      ],
+      "usage": {
+        "uncached_input": null,
+        "cache_creation": null,
+        "cache_read": null,
+        "output": null,
+        "reasoning_in_output": null,
+        "total": null,
+        "native_retries": null
+      }
+    }
+  ],
+  "failures_and_skips": [
+    {
+      "run_id": "web-r1-b1-baseline",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r1-b1-candidate",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r1-b2-baseline",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r1-b2-candidate",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r1-b3-baseline",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r1-b3-candidate",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r2-b1-baseline",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r2-b1-candidate",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r2-b2-baseline",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r2-b2-candidate",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r2-b3-baseline",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r2-b3-candidate",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r3-b1-baseline",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r3-b1-candidate",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r3-b2-baseline",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r3-b2-candidate",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r3-b3-baseline",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    },
+    {
+      "run_id": "web-r3-b3-candidate",
+      "reason": "Enclosing native promptfoo CLI returned graded exit100. This is a shared batch-process outcome, not a search-provider failure; per-cell contract/usable/source-hit results and failures remain in the compact native projection. No qualification or usage claim is inferred."
+    }
+  ],
+  "limitations": [
+    "Source-family retrieval proxy on software documentation corpus; does not qualify answer/citation truth, whole research quality, skill/MCP/HTTP gates or host readiness.",
+    "q27 is ambiguous and has a broad official-doc target; source-topic branch aliases do not prove version accuracy.",
+    "DeerFlow's normalized SearXNG results omit per-engine diagnostics; unavailable counters stay unknown. Keyed arms excluded.",
+    "Failures/empty output can make baseline latency low; the preregistered relative p95 gate still applies.",
+    "Eighteen schema arm views refer to nine shared CLI processes, counted once by command_index. All process grading exits100 are preserved and aggregate quality remains null; this does not turn the180 native tool calls into18 independent experiments or assign provider subprocess exits.",
+    "Native response cachefalse does not establish engine/index independence. Seventy-two SearXNG calls return valid empty lists; no provider-error objects/missing native named metrics occur in this trial.",
+    "Source-family URL discovery is not answer/citation truth or version-specific content validation.",
+    "Thirty query pairs are the statistical units; repeats share engines/indexes/caches, and nominal p is scoped to this fixed corpus.",
+    "DDGS9.14.1 backendauto is the unchanged current multi-engine baseline; no pure-DDG or keyed-provider claim.",
+    "Upstream default persistent SearXNG engines/settings were frozen; normalized tool results omit per-query engine diagnostics/retries.",
+    "Exact-string distinctness is not canonical duplicate suppression.",
+    "q27 is ambiguous and broad official workflow-doc matches do not prove its cache-mode phrase.",
+    "Strict paper-window hold separated round3-batch1 from the final two batches; native batch timestamps are retained, no per-call timestamp invented.",
+    "Any owner-row or provider adoption remains with the command center; measurement changes no host plan."
+  ],
+  "decision_and_scope": {
+    "decision": "retain",
+    "scope": "Retain current DDGS(auto) BY_DESIGN only for the frozen30 software/source-discovery query corpus on this source-pinned host configuration. No SearXNG READY proposal or shared plan/provider adoption; command center remains owner.",
+    "qualification_run_ids": []
+  },
+  "rollback": "Stop/remove only the named isolated measurement container; retain outputs/failures and unchanged shared-host configuration. No active install/owner row changes.",
+  "next_decision_changing_test": "A new preregistered source-pinned matched trial on domain-balanced financial/regulatory, primary PDF/table and freshness/ambiguous-capability queries, with time-blocked confirmation, validated engine health and an owner-qualified current DDGS baseline, satisfying the primary/usable/latency gates. Retain this failed candidate result; do not tune and rescore the frozen run.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}
