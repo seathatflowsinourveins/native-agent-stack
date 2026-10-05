@@ -437,7 +437,12 @@ class HeldOutHookTests(unittest.TestCase):
         self.assertTrue(acs.runs_held_out_hook({"command": other}, "/Users/example"))
 
     def test_a_settings_file_names_its_own_home(self):
-        self.assertEqual(acs.host_home(Path("/home/example/.claude/settings.json")), "/home/example")
+        # The home is the settings file's resolved path, so a fixture under a path that the platform resolves differently names the
+        # resolved home (macOS resolves /home to /System/Volumes/Data/home, which failed the literal comparison on macos-15): compare
+        # with resolve(), not with the text.
+        settings = Path("/home/example/.claude/settings.json")
+        self.assertEqual(acs.host_home(settings), str(settings.resolve().parent.parent))
+        self.assertTrue(str(settings.resolve()).endswith("/home/example/.claude/settings.json"))
         self.assertIsNone(acs.host_home(Path("/home/example/settings.json")))
         self.assertIsNone(acs.host_home(Path("/tmp/x/.claude/other.json")))
         self.assertIsNone(acs.host_home(Path("/tmp/x/settings.json")))
