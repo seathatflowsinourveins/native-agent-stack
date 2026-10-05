@@ -4903,8 +4903,8 @@
     },
     {
       "path": "adoption/update.md",
-      "sha256": "fa66de9fa5f37eb440fe0a8f4b9d611ba584e0da59594b02a0b2889db5262aef",
-      "bytes": 32102
+      "sha256": "f3ba559d4374e5657eb5759437ef347dfc2014d21a6cab6c706f9781bc842482",
+      "bytes": 33181
     },
     {
       "path": "blueprints/blind-catalog-convergence/README.md",
@@ -16671,6 +16671,11 @@
       "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",
       "sha256": "1389de18bbaf5c41d8f22093a9642d982230a851f954183b7c8254e0b5890bce",
       "bytes": 18701
+    },
+    {
+      "path": "docs/decisions/2026-10-05-ci-release-repin-verification.md",
+      "sha256": "d9b2528d47e82a868d255d04ee9e74834170a60d7d3a77db5c67ce49e1bfa541",
+      "bytes": 6008
     },
     {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
@@ -32996,6 +33001,11 @@
       "path": "evidence/artifacts/github-ci-measurements-20261003/later-reads-20261003.json",
       "sha256": "b100809511623c4cc13ef62939f7cf52e3113b40eae63952146657ed47f56ab3",
       "bytes": 56770
+    },
+    {
+      "path": "evidence/artifacts/github-ci-r1-20261005.json",
+      "sha256": "eab27c1d49b964b3364a5ff0e3d63b11d406f16159cc995f49655529f07cc5fd",
+      "bytes": 10053
     },
     {
       "path": "evidence/artifacts/gitleaks-macos-memory-bound-20260924/measure.py",
@@ -53044,8 +53054,8 @@
     },
     {
       "path": "scripts/release_due.py",
-      "sha256": "c6de7480f2fe7f68a6ebe389f1d73990ba4ac2880d5ed5c829e4d9b244f5c31d",
-      "bytes": 14662
+      "sha256": "43ce0b26852d97d5bdb3a29d48f4615e8dddc42ed1298a9f975411456e530c21",
+      "bytes": 16086
     },
     {
       "path": "scripts/saturation_ledger.py",
@@ -54099,8 +54109,8 @@
     },
     {
       "path": "tests/test_release_pin_contents.py",
-      "sha256": "cc79f9bf73b53f5304fe0b14059bcd8c089040d93960df8bba4ed51aa8157d8f",
-      "bytes": 15007
+      "sha256": "486e834d84d7d52f514a9af89c106ba82b488e1c4b28f701b49626f185e9631a",
+      "bytes": 22718
     },
     {
       "path": "tests/test_render_config.py",
