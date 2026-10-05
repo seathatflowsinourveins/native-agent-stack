@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reviewed_at": "2026-10-02",
+  "reviewed_at": "2026-10-04",
   "purpose": "Selected GitHub automation with source-backed suitability and bounded observed results; not a count of repositories or an instruction to activate optional tools.",
   "handbook": "docs/github-automation.md",
   "resolution_record": "docs/tasks/2026-09-20-automation-resolution.md",
@@ -367,7 +367,7 @@
     {
       "repository": "GitHub merge queue",
       "source": "https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/configuring-pull-request-merges/managing-a-merge-queue",
-      "decision": "Unavailable: merge queues need an organization-owned public repository (or Enterprise Cloud private); this is a personal repository. Without a queue, strict up-to-date checks stay off (docs/decisions/2026-09-22-github-automation-closure.md section 10); every required check still runs on each PR and on push to main. Overturn: a main failure traced to two PRs merging close together."
+      "decision": "Target after owner decision U1: GitHub merge queues need an organization-owned public repository (or Enterprise Cloud private), and this repository is User-owned. The 2026-09-22 merge-skew overturn was met by ecea2865 on 2026-10-03, when two PRs merged 13 seconds apart and the merged evidence registry became unsorted. G-11 sets strict up-to-date checks on as the interim control, whatever U1 decides; every lander updates a BEHIND branch and waits for required checks or hands it to the landing queue, which refreshes mechanically before the coordinator applies the ruleset. U1 recommends qualifying a serial native queue on a disposable organization fixture before transfer; ownership remains the owner's pending decision. G-10 acceptance decides the strict flag at cutover. The queue owner records daily queued and landed counts; more queued than landed on each of 7 consecutive days with strict on triggers slot 2's overturn and the owner's choice between U1 and loose mode with the landing check. Source: docs/decisions/2026-10-04-github-convergence-workflow.md, slots 1 and 2 and Overturn."
     },
     {
       "repository": "GitHub secret scanning non-provider patterns and validity checks",
@@ -456,5 +456,44 @@
       "the 2026-09-23 ruleset snapshot in docs/github-automation.md"
     ],
     "decision_record": "docs/decisions/2026-10-02-github-automation-practice.md"
+  },
+  "current_practice_20261004": {
+    "observed_at": "2026-10-04",
+    "source_revision": "3b8f9c8a1b938358d65bf422f61592dc3b89407d",
+    "source": "Read-only gh api GETs of ruleset 23739774, repository settings and #611; strict_required_status_checks describes the accepted in-repository G-11 target, while live_strict_required_status_checks records the observed setting.",
+    "required_checks": [
+      "validate",
+      "token-report",
+      "secret-scan",
+      "dependency-review",
+      "osv-scanner",
+      "verdict-review-gate",
+      "validate-macos",
+      "sota-sources"
+    ],
+    "strict_required_status_checks": true,
+    "live_strict_required_status_checks": false,
+    "ruleset_application": "Coordinator applies after this change lands and the landing queue handles BEHIND through mechanical refresh, then records the read-back.",
+    "allowed_merge_methods": [
+      "squash"
+    ],
+    "allow_auto_merge": false,
+    "auto_merge_used_for_bot_prs": false,
+    "observed_squash_defaults": {
+      "squash_merge_commit_title": "COMMIT_OR_PR_TITLE",
+      "squash_merge_commit_message": "COMMIT_MESSAGES"
+    },
+    "target_squash_defaults": {
+      "squash_merge_commit_title": "PR_TITLE",
+      "squash_merge_commit_message": "PR_BODY"
+    },
+    "squash_defaults_application": "Coordinator applies through G-3.",
+    "description_edits_after_G1": "pr-metadata.yml owns edited, sota-sources and verdict-review-gate, with queue: max and no cancel-in-progress; the gates read current metadata and fail closed on retrieval errors or base drift. validate.yml drops edited. Queue order does not guarantee freshness and runs beyond 100 pending are cancelled.",
+    "merge_guard": "docs/lanes.md#labels-and-prs",
+    "supersedes": [
+      "current_practice_20261002",
+      "active_baseline.target_ruleset_status"
+    ],
+    "decision_record": "docs/decisions/2026-10-04-github-convergence-workflow.md"
   }
 }

@@ -826,6 +826,14 @@ locally with `GH_TOKEN` set and no `--offline`, using
 
 ## 10. Rulesets
 
+The strict-off choice below is historical. Its merge-skew overturn was met by
+`ecea2865` on 2026-10-03; the
+[2026-10-04 convergence record, slot 2](2026-10-04-github-convergence-workflow.md#decision)
+supersedes it with strict on through G-11. The coordinator applies the target
+after merge and the landing queue's mechanical `BEHIND` refresh change; G-10
+decides the flag at merge-queue cutover. The queue owner records daily queued
+and landed counts for the new [slot 2 overturn](2026-10-04-github-convergence-workflow.md#overturn).
+
 - `.github/tag-ruleset.json` equals live 23829417 (`deletion`,
   `non_fast_forward`, `update`; no bypass). `.github/tag-creation-ruleset.json`
   equals live 23859358 (`creation`; bypass `RepositoryRole` 5 `always`). Both

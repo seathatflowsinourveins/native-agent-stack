@@ -153,7 +153,7 @@ on the PR, before merge. Branch names do not encode lanes; the label does. The
 Merge with the checked and reviewed head pinned:
 
 ```sh
-gh pr view <N> --json headRefOid --jq .headRefOid
+gh pr view <N> --json headRefOid,mergeStateStatus
 gh pr checks <N> --required --json name,bucket --jq '"\(length) required checks, buckets: \(map(.bucket) | unique | join(","))"'
 gh pr merge <N> --squash --match-head-commit <SHA>
 ```
@@ -171,9 +171,12 @@ gh pr merge <N> --squash --match-head-commit <SHA>
   ([`checks.go` L248-252](https://github.com/cli/cli/blob/v2.101.0/pkg/cmd/pr/checks/checks.go#L248-L252)
   and [`aggregate.go` L72-88](https://github.com/cli/cli/blob/v2.101.0/pkg/cmd/pr/checks/aggregate.go#L72-L88)
   at gh v2.101.0: `CANCELLED` is bucket `cancel`, counted as neither failed nor
-  pending), and with `--json` it exits 0 whatever the state. A description edit
-  starts a new `validate.yml` run on the same head (its `pull_request` types
-  include `edited`), so run it after the last edit. `gh` sends `<SHA>` as
+  pending), and with `--json` it exits 0 whatever the state. Run it after the
+  last description edit: until G-1, `edited` starts a new `validate.yml` run on
+  the same head; after G-1 it runs the `sota-sources` and `verdict-review-gate`
+  jobs in `pr-metadata.yml`, whose current-metadata reads determine freshness
+  ([convergence record, slot 3](decisions/2026-10-04-github-convergence-workflow.md#decision)).
+  `gh` sends `<SHA>` as
   GitHub's `expectedHeadOid` ([gh pr merge](https://cli.github.com/manual/gh_pr_merge):
   "Commit SHA that the pull request head must match to allow merge"), and GitHub
   refuses the merge if the head has moved since; the mechanics are in the
@@ -189,16 +192,24 @@ gh pr merge <N> --squash --match-head-commit <SHA>
   reports; otherwise review the new head. This is analogous to GitHub's
   stale-approval rule, which dismisses an approval when the approved diff changes
   ([available rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#require-a-pull-request-before-merging)).
-- The flag guards the head, not the base. The ruleset keeps strict up-to-date
-  checks off, because concurrent sessions share `main`, and this User-owned
-  repository cannot use a merge queue
-  ([decision record](decisions/2026-09-22-github-automation-closure.md)). Two
-  pull requests that each passed against an older `main` can therefore still
-  break it together: "Status checks may fail after you merge your branch if
-  there are incompatible changes with the base branch"
-  ([loose required status checks](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#require-status-checks-to-pass-before-merging)).
-  Merging `main` right before the merge narrows that window without closing
-  it, and `validate.yml` runs again on every push to `main`.
+- The flag guards the head, not the base. G-11 sets strict up-to-date checks on
+  in [the target ruleset](../.github/main-ruleset.json), whatever the owner's U1
+  decision, because `ecea2865` met the prior merge-skew overturn
+  ([convergence record, slot 2](decisions/2026-10-04-github-convergence-workflow.md#decision)).
+  Every lander reads `mergeStateStatus`: update a `BEHIND` branch with current
+  `main` through the hot-file protocol and wait for the required checks on the
+  new head, or hand the PR to the coordinator's landing queue. Strict mode
+  requires the branch to be up to date with its base before merging
+  ([required status checks](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#require-status-checks-to-pass-before-merging)).
+- Before the coordinator applies G-11 after merge, the landing queue must send
+  `BEHIND` PRs to its mechanical refresh step, with one refresh in flight. If
+  another lander overtakes a refreshed PR, refresh it again; hand it back only
+  at the existing cap, naming the cause. The merge-queue cutover (G-10) decides
+  the strict flag after its acceptance passes. The queue owner keeps daily PRs
+  queued and landed counts from the landing-queue logs. More queued than landed
+  on each of 7 consecutive days with strict on triggers slot 2's overturn: the
+  owner chooses between U1 and loose mode with the landing check
+  ([overturn](decisions/2026-10-04-github-convergence-workflow.md#overturn)).
 
 ## Coordination
 

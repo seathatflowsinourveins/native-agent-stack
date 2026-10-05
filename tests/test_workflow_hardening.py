@@ -488,16 +488,16 @@ class PublishReleaseTests(unittest.TestCase):
 
 
 class TargetRulesetTests(unittest.TestCase):
-    """The committed target main ruleset (docs/decisions/2026-09-22-github-automation-closure.md, section 10)."""
+    """The committed target main ruleset (docs/decisions/2026-10-04-github-convergence-workflow.md, slot 2)."""
 
     ruleset = __import__("json").loads((ROOT / ".github/main-ruleset.json").read_text(encoding="utf-8"))
 
     def rule(self, kind):
         return [rule for rule in self.ruleset["rules"] if rule["type"] == kind]
 
-    def test_strict_up_to_date_checks_stay_off_and_required_signatures_stays_out(self):
+    def test_strict_up_to_date_checks_are_on_and_required_signatures_stays_out(self):
         (checks,) = self.rule("required_status_checks")
-        self.assertIs(checks["parameters"]["strict_required_status_checks_policy"], False)
+        self.assertIs(checks["parameters"]["strict_required_status_checks_policy"], True)
         self.assertEqual(self.rule("required_signatures"), [])
 
     def test_target_requires_the_security_gates_from_github_actions(self):

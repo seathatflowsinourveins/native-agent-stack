@@ -15,7 +15,7 @@ DOC = ROOT / "docs/github-automation.md"
 MANIFEST = ROOT / "catalogs/foundation/automation.json"
 RULESET = ROOT / ".github/main-ruleset.json"
 RECORD = ROOT / "docs/decisions/2026-10-02-github-automation-practice.md"
-HEADING = "## Current practice (2026-10-02)"
+HEADING = "## Current practice (2026-10-04)"
 
 
 def ruleset_rule(kind: str) -> dict:
@@ -42,8 +42,8 @@ class CurrentPracticeSectionTests(unittest.TestCase):
     def test_the_section_states_the_merge_method_and_strict_setting_of_the_ruleset(self):
         self.assertEqual(ruleset_rule("pull_request")["allowed_merge_methods"], ["squash"])
         self.assertIn("Squash merges only", section())
-        self.assertFalse(ruleset_rule("required_status_checks")["strict_required_status_checks_policy"])
-        self.assertIn("strict up-to-date checks off", section())
+        self.assertTrue(ruleset_rule("required_status_checks")["strict_required_status_checks_policy"])
+        self.assertIn("strict up-to-date checks on", section())
 
     def test_the_section_links_the_merge_guard_and_does_not_restate_it(self):
         self.assertIn("lanes.md#labels-and-prs", section())
@@ -59,7 +59,7 @@ class CurrentPracticeSectionTests(unittest.TestCase):
 
 class ManifestBlockTests(unittest.TestCase):
     def setUp(self):
-        self.block = json.loads(MANIFEST.read_text(encoding="utf-8"))["current_practice_20261002"]
+        self.block = json.loads(MANIFEST.read_text(encoding="utf-8"))["current_practice_20261004"]
 
     def test_the_block_matches_the_ruleset(self):
         checks = [check["context"] for check in ruleset_rule("required_status_checks")["required_status_checks"]]

@@ -1,17 +1,17 @@
 {
   "schema_version": 1,
-  "recorded_date_utc": "2026-10-02",
+  "recorded_date_utc": "2026-10-04",
   "goal_status": "active",
   "base_revision": "18eea2c1de992b46c266d79ef0cc40f93c9fb943",
-  "status_assessed_at_revision": "73ca1e8b53383f5bd5e1a59a06eade50a0086370",
+  "status_assessed_at_revision": "3b8f9c8a1b938358d65bf422f61592dc3b89407d",
   "scope": "Full user-requested foundation resolution serving the north star; the SDK oracle is one assigned unit, not a replacement objective.",
   "requirements": [
     {
       "id": "github-practice",
       "state": "partially_verified_followups_open",
-      "evidence": "Read-only remote audit found eight app-bound required checks, full-SHA action policy, restricted publishers and no ruleset bypass at the observed main. Isolated legacy-host qualification of gh 2.102.0 passed the unchanged upstream race/integration command (250 packages: 245 native cached results and five fresh executions; 60 packages without tests), native build and local binary smoke. Original failed conditions and source/output bindings were retained and independently reviewed. Catalog metadata source review is accepted; hosted behavior and current-head publication gates remain separate.",
-      "remaining": ["Integrate the gh 2.102.0 source qualification through the installation owner without inferring host adoption", "Require complete current-head coverage before landing the catalog metadata fix", "Observe the next authorized hosted catalog proposal and its source/lane metadata"],
-      "sources": ["https://github.com/cli/cli/releases/tag/v2.102.0", "docs/decisions/2026-10-02-github-automation-practice.md", "https://github.com/seathatflowsinourveins/native-agent-stack/pull/607#issuecomment-5959705875", "https://github.com/seathatflowsinourveins/native-agent-stack/pull/611#issuecomment-5959596846"]
+      "evidence": "Read-only remote audit found eight app-bound required checks, full-SHA action policy, restricted publishers and no ruleset bypass at the observed main. Isolated legacy-host qualification of gh 2.102.0 passed the unchanged upstream race/integration command (250 packages: 245 native cached results and five fresh executions; 60 packages without tests), native build and local binary smoke. Original failed conditions and source/output bindings were retained and independently reviewed. Catalog metadata source review is accepted; hosted behavior and current-head publication gates remain separate. The current-head coverage item is satisfied: #611 merged as 5803017 at 2026-10-02T20:15:13Z; at head 05a2c67f, 22 check contexts passed and 3 were skipped (read-only GETs rechecked 2026-10-04).",
+      "remaining": ["Integrate the gh 2.102.0 source qualification through the installation owner without inferring host adoption", "Observe the next authorized hosted catalog proposal and its source/lane metadata"],
+      "sources": ["https://github.com/cli/cli/releases/tag/v2.102.0", "docs/decisions/2026-10-02-github-automation-practice.md", "https://github.com/seathatflowsinourveins/native-agent-stack/pull/607#issuecomment-5959705875", "https://github.com/seathatflowsinourveins/native-agent-stack/pull/611#issuecomment-5959596846", "https://github.com/seathatflowsinourveins/native-agent-stack/pull/611", "docs/decisions/2026-10-04-github-convergence-workflow.md"]
     },
     {
       "id": "maintained-layer-selections",

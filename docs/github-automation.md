@@ -17,21 +17,42 @@ The [PR #26 qualification record](https://github.com/seathatflowsinourveins/nati
 links the final hosted revision, integration and publication outcomes; local
 implementation records below remain dated observations.
 
-## Current practice (2026-10-02)
+## Current practice (2026-10-04)
 
 This section is the current practice. The dated sections below are history; where they differ, this section and the
-live settings win. Live state read with `gh api` GETs on 2026-10-02: ruleset 23739774 (updated
-2026-09-27T17:00:13-04:00) matches [`.github/main-ruleset.json`](../.github/main-ruleset.json).
+live settings win. Read-only repository and ruleset GETs on 2026-10-04 confirmed auto-merge off, squash-only
+merges and eight required checks with strict off. The accepted
+[convergence record](decisions/2026-10-04-github-convergence-workflow.md) sets strict on through G-11 in
+[`.github/main-ruleset.json`](../.github/main-ruleset.json). After this change lands and the landing queue's
+`BEHIND` refresh change is ready, the coordinator applies the ruleset and records the read-back.
 
-- **Required checks** (job IDs from GitHub Actions, app ID 15368; strict up-to-date checks off): `validate`,
+- **Required checks** (job IDs from GitHub Actions, app ID 15368; strict up-to-date checks on in the G-11 target): `validate`,
   `token-report`, `secret-scan`, `dependency-review`, `osv-scanner`, `verdict-review-gate`, `validate-macos` and
   `sota-sources`. Renaming one of these jobs, or giving it a job-level `name:`, orphans its required check.
 - **Merging.** Squash merges only; merge commits and rebase merges are off. The ruleset adds linear history, deletion
   and non-fast-forward rules, resolved review threads, no human approval count and a CodeQL code-scanning rule.
-  Auto-merge is allowed by the repository settings but is not used for bot PRs: Dependabot PRs and the
-  catalog-freshness `propose` PR stay reviewable. Branches are deleted on merge. Land a PR with the merge guard in
+  Auto-merge is off (live setting read on 2026-10-04), correcting the previous claim that it was allowed;
+  when it changed is unknown. Dependabot PRs and the catalog-freshness `propose` PR stay reviewable.
+  The squash-default target is the PR title and description (`squash_merge_commit_title: PR_TITLE`,
+  `squash_merge_commit_message: PR_BODY`); the observed defaults remain `COMMIT_OR_PR_TITLE` and
+  `COMMIT_MESSAGES` until the coordinator applies G-3. Branches are deleted on merge. Land a PR with the merge guard in
   [`docs/lanes.md`, "Labels and PRs"](lanes.md#labels-and-prs): read the head SHA, confirm that every required check
   is in bucket `pass`, then squash-merge with that SHA pinned.
+- **Merge skew and queue.** `ecea2865` met the 2026-09-22 strict-mode overturn when two PRs merged 13 seconds
+  apart and left the evidence registry unsorted. Strict up-to-date checks are the interim control through G-11:
+  every lander updates a `BEHIND` branch and waits for the required checks or hands the PR to the landing queue,
+  which refreshes it mechanically. GitHub's native merge queue is the target after the owner's U1 decision;
+  this User-owned repository needs an organization before cutover. G-10 acceptance decides the strict flag.
+  The queue owner records daily queued and landed counts; more queued than landed on each of 7 consecutive
+  days with strict on triggers slot 2's overturn, for the owner's choice between U1 and loose mode with the
+  landing check ([record](decisions/2026-10-04-github-convergence-workflow.md#overturn)).
+- **Description edits after G-1.** `validate.yml` drops `edited`; `sota-sources` and `verdict-review-gate` keep
+  their job IDs in `pr-metadata.yml`, on `edited`, pushes to `main` and manual dispatch. Its per-PR concurrency
+  group uses `queue: max` without `cancel-in-progress`. This avoids single-pending replacement below 100 pending
+  runs; ordering is not a freshness guarantee, and additional runs are cancelled when that queue is full.
+  `sota-sources` reads the current PR body through the REST API with the pinned `actions/github-script` and fails
+  on retrieval errors. `verdict-review-gate` keeps its merge-parent and head checks and fails closed if the current
+  base differs from the event's base ([record, slot 3](decisions/2026-10-04-github-convergence-workflow.md#decision)).
 - **Labels and the PR template.** Every PR carries exactly one of `lane:foundation`, `lane:trading` or `lane:shared`,
   and a `lane:shared` PR needs the other lane's acknowledgement as a comment or review.
   [`.github/pull_request_template.md`](../.github/pull_request_template.md) carries the Lane line and a
@@ -218,7 +239,7 @@ do not transfer a native client's credential store.
 
 ## Publication and practical acceptance
 
-**Superseded 2026-10-02** by "Current practice (2026-10-02)" above: the live ruleset now requires 8
+**Superseded 2026-10-02** by "Current practice" above: the live ruleset now requires 8
 checks and allows squash merges only. This section is kept as history.
 
 As of a dated 2026-09-23 GET (see below), the active [main ruleset](https://github.com/seathatflowsinourveins/native-agent-stack/rules/23739774)
@@ -450,7 +471,7 @@ catalog is malformed, including a decision record that does not exist.
 ## Secret and supply-chain scanning, 2026-09-22
 
 For the current state, which adds the report-only betterleaks trial and GitHub push protection, see
-"Current practice (2026-10-02)" above.
+"Current practice" above.
 
 `validate.yml`'s `secret-scan` job runs gitleaks 8.30.1 (SHA-256 verified
 against `blueprints/convergence-practice/wsl-native-tools/pins.json`,
@@ -536,7 +557,7 @@ live on 2026-09-25; `allowed_merge_methods:
 section 10 ("Rulesets"). This section is kept as history and is not
 corrected in place; the `gh api` commands below still apply (a `PUT` is
 idempotent), just against the current target file. **Update 2026-10-02:** `sota-sources` is live, and the live
-ruleset matches the target file (see "Current practice (2026-10-02)").
+ruleset matches the target file (see "Current practice").
 
 [`.github/main-ruleset.json`](../.github/main-ruleset.json) gained
 `deletion`, `non_fast_forward`, `required_linear_history`, a `pull_request`
@@ -1393,6 +1414,11 @@ merges. The decision record is "verdict-review-gate (2026-09-23)" in
 The closure record
 [`docs/decisions/2026-09-22-github-automation-closure.md`](decisions/2026-09-22-github-automation-closure.md)
 holds the evidence, alternatives and overturn comparison for each item.
+
+Its strict-off choice is superseded by the
+[2026-10-04 convergence record, slot 2](decisions/2026-10-04-github-convergence-workflow.md#decision):
+`ecea2865` met the merge-skew overturn. G-11 sets strict on in the target ruleset; the coordinator applies it
+after merge and the landing queue's mechanical `BEHIND` refresh change. The observations below retain their dates.
 
 - **Repository settings (applied by the coordinator, before/after GETs in the
   record).** CodeQL default setup configured (a fresh
