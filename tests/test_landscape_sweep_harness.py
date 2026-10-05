@@ -4117,7 +4117,7 @@ class ConvertTests(unittest.TestCase):
         roots = (("", "home"), ("", "uSeRs"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
         controls = [prefix + "-".join((*parts, "example")) + tail
                     for parts in roots for prefix in ("", "projects/", "claude-1000/")
-                    for tail in (",", ";", ":", ">", "}", "&", "?", "#", "=", "|")]
+                    for tail in (",", ";", ":", ">", "}", "&", "?", "#", "=", "|", "*", "!", "\u2026", "\u2019", "\x1b")]
         work = temp_dir(self)
         res = healthy_result()
         notes = [{"value": text, text: "retained control"} for text in controls]
@@ -4128,14 +4128,91 @@ class ConvertTests(unittest.TestCase):
         self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"], notes)
         self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(controls))
 
+    def test_cli_redacts_non_name_tails_in_all_contexts(self):
+        roots = (("", "home"), ("", "uSeRs"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
+        contexts = ("{}", "projects/{}", "claude-1000/{}", "https://example.test/?project={}&tab=1")
+        tails = (",", ":", ";", "*", "&", "#", "?", "=", ">", "}", "|", "!")
+        strings, expected = [], []
+        for parts in roots:
+            encoded = "-".join((*parts, "fixtureuser"))
+            for tail in tails:
+                for context in contexts:
+                    strings.append(context.format(encoded + tail))
+                    expected.append(context.format("<project-dir>" + tail))
+            strings.extend(("?project=" + encoded + "&tab=1", encoded + ", " + encoded + ";"))
+            expected.extend(("?project=<project-dir>&tab=1", "<project-dir>, <project-dir>;"))
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = [{"value": text, text: "retained note"} for text in strings]
+        done = self.cli(work, res, run_id=" | ".join(strings))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        returns = json.loads((work / "out/returns.json").read_text())
+        self.assertEqual(returns["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         [{"value": text, text: "retained note"} for text in expected])
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(expected))
+
+    def test_cli_redacts_serialized_profile_tails_and_preserves_unicode_summary(self):
+        pattern = dict(sweep_common.private_content(ROOT))["encoded home path"]
+        roots = (("", "home"), ("", "Users"), ("", "mnt", "c", "Users"), ("D", "", "Users"))
+        tails = ("\u2026", "\u2019", "\x1b")
+        strings = ["see " + "-".join((*parts, "fixtureuser")) + tail for parts in roots for tail in tails]
+        expected = ["see <project-dir>" + tail for _ in roots for tail in tails]
+        work = temp_dir(self)
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = [{"value": text, text: "retained note"} for text in strings]
+        done = self.cli(work, res, run_id=" | ".join(strings))
+        self.assertEqual(done.returncode, 0, done.stderr)
+        emitted_returns = (work / "out/returns.json").read_bytes().decode("utf-8")
+        self.assertIsNone(pattern.search(emitted_returns))
+        self.assertIsNone(pattern.search(done.stdout))
+        self.assertEqual(json.loads(emitted_returns)["raw"]["alpha"]["first"]["claude_discover"]["notes"],
+                         [{"value": text, text: "retained note"} for text in expected])
+        self.assertEqual(json.loads(done.stdout)["run"]["runId"], " | ".join(expected))
+        for tail in tails[:2]:
+            self.assertIn(tail, done.stdout)
+        self.assertNotIn("\\u2026", done.stdout)
+        self.assertNotIn("\\u2019", done.stdout)
+        self.assertIn("\\u001b", done.stdout)
+
+    def test_cli_refuses_serialized_profile_residue_before_publishing(self):
+        # Inject a redaction failure to exercise the independent emitted-text backstop with the real rule.
+        pattern = dict(sweep_common.private_content(ROOT))["encoded home path"]
+        encoded = "-".join(("", "home", "fixtureuser"))
+        strings = ["see " + encoded + tail for tail in ("\u2026", "\u2019", "\x1b")]
+        self.assertTrue(all(pattern.search(text) is None for text in strings))
+        candidate = temp_dir(self) / "candidate-returns.json"
+        sweep_common.write_json(candidate, {"notes": strings})
+        self.assertIsNotNone(pattern.search(candidate.read_bytes().decode("utf-8")))
+        for location in ("returns.json", "printed summary"):
+            with self.subTest(location=location):
+                work = temp_dir(self)
+                res = healthy_result()
+                if location == "returns.json":
+                    res["first"][0]["claude_discover"]["notes"] = [
+                        {"value": text, text: "retained note"} for text in strings]
+                run_id = " | ".join(strings) if location == "printed summary" else "wf_fixture-1"
+                run_file = write_json(work / "run.json", {"runId": run_id, "status": "completed", "result": res})
+                scope = write_json(work / "scope.json", scope_for())
+                stdout, stderr = io.StringIO(), io.StringIO()
+                with mock.patch.object(convert, "redact_project_dirs", side_effect=lambda value, *args: value), \
+                        contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                    code = convert.main(["--workflow-output", str(run_file), "--scope", str(scope),
+                                         "--out", str(work / "out")])
+                self.assertEqual(code, 3, stderr.getvalue())
+                self.assertIn(location + "#/<serialized>: encoded home path", stderr.getvalue())
+                self.assertEqual(stdout.getvalue(), "")
+                self.assertNotIn(encoded, stderr.getvalue())
+                self.assertFalse((work / "out").exists())
+
     def test_cli_redacts_complete_local_name_fragments(self):
         work = temp_dir(self)
         home = Path("/") / "home" / "fixturelocal"
         encoded = "-".join(("", "home", "fixturelocal"))
         contexts = ("{}/", "projects/{}/", "https://example.test/?project={}", "cache=/data/{}/")
-        strings = [context.format(encoded + suffix) for suffix in (".smith", "_smith", "9smith", ".smith-code")
+        suffixes = (".smith", "_smith", "9smith", ".smith-code", ".smith\u00e9", "_smith\u00e9", ".smith_\u65e5\u672c")
+        strings = [context.format(encoded + suffix) for suffix in suffixes
                    for context in contexts]
-        expected = [context.format("<project-dir>") for _ in range(4) for context in contexts]
+        expected = [context.format("<project-dir>") for _ in suffixes for context in contexts]
         res = healthy_result()
         res["first"][0]["claude_discover"]["notes"] = [{"value": text, text: "retained note"} for text in strings]
         run_file = write_json(work / "run.json", {"runId": " | ".join(strings), "status": "completed", "result": res})
@@ -4168,7 +4245,7 @@ class ConvertTests(unittest.TestCase):
                  "fixture.user-code-project", "fixture_user-code-project", "fixturelocal", "fixturelocal.smith",
                  "fixturelocal_smith", ".", "..", "...", "example", "ExAmPlE", "example.person", "exampleuser", "<user>")
         tails = ("", "/", "\\", '"', "'", " ", "\t", "\n", "`", ")", "]", ",", ";", ":", ".",
-                 ">", "}", "&", "?", "#", "=")
+                 ">", "}", "&", "?", "#", "=", "*", "|", "!", "\u2026", "\u2019", "\x1b")
         contexts = ("{}", "read {} continued", "projects/{}", "claude-1000/{}", "~/.claude/projects/{}",
                     "/tmp/claude-1000/{}", "https://example.test/{}", "https://example.test/?project={}",
                     "https://example.test/list#{}", "//example.test/{}", "cache=/data/{}", "/srv/{}/notes.md#L4",
@@ -4183,6 +4260,8 @@ class ConvertTests(unittest.TestCase):
             redacted = convert.redact_project_dirs(document, work=None, repo_root=None)
         findings = sweep_common.private_findings(redacted, patterns)
         self.assertFalse(findings, f"{len(findings)} encoded-home residues; first safe locator: {findings[:1]}")
+        emitted = json.dumps(redacted, indent=1, ensure_ascii=False) + "\n"
+        self.assertIsNone(patterns[0][1].search(emitted), "serialized fixture matrix retains an encoded home")
 
     def test_cli_redacts_anchored_wsl_profile_in_strings_keys_and_summary(self):
         for drive, users in (("c", "Users"), ("D", "uSeRs")):
@@ -4491,6 +4570,24 @@ class ConvertTests(unittest.TestCase):
         self.assertNotIn(identifier, done.stderr)
         self.assertEqual(done.stdout, "")
         self.assertFalse((work / "out").exists())
+
+    def test_cli_wires_selected_validator_patterns_to_publication_check(self):
+        work = temp_dir(self)
+        selected = work / "selected-checkout"
+        (selected / "scripts").mkdir(parents=True)
+        validator = (ROOT / "scripts/validate.py").read_text()
+        validator += '\nPRIVATE_CONTENT += (("selected checkout fixture", re.compile("selected-validator-only")),)\n'
+        (selected / "scripts/validate.py").write_text(validator, encoding="utf-8")
+        res = healthy_result()
+        res["first"][0]["claude_discover"]["notes"] = "selected-validator-only"
+        done = self.cli(work, res)
+        self.assertEqual(done.returncode, 0, done.stderr)
+        previous = {path.name: path.read_bytes() for path in (work / "out").iterdir()}
+        done = self.cli(work, res, "--repo-root", selected)
+        self.assertEqual(done.returncode, 3, done.stderr)
+        self.assertIn("returns.json#/raw/alpha/first/claude_discover/notes: selected checkout fixture", done.stderr)
+        self.assertEqual(done.stdout, "")
+        self.assertEqual({path.name: path.read_bytes() for path in (work / "out").iterdir()}, previous)
 
     def test_cli_redacts_unanchored_wsl_checkout_with_linux_home(self):
         work = temp_dir(self)

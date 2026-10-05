@@ -694,22 +694,27 @@ realpaths, replacing every character outside ASCII letters and digits with `-`, 
 [sweep_common.host_replacements](sweep_common.py). It replaces each whole segment, bare or with a
 project-directory suffix, with `<project-dir>` even without a directory prefix. Local and generic rules run
 over the whole text, including URLs, queries, fragments and assignments. Privacy takes priority over retaining
-an encoded user-profile slug in a source URL. Both this converter and
-[#697](https://github.com/seathatflowsinourveins/native-agent-stack/pull/697) at `0d2a38b2`,
-`scripts/validate.py`'s `encoded home path` rule, cover `-home-` case-sensitively and `-Users-`,
-`-mnt-<drive>-Users-` and `<drive>--Users-` case-insensitively. Coverage includes bare text, `projects/` and
-`claude-<uid>/` anchors, URL paths, queries and fragments, assignments, and JSON keys and values.
-The generic redactor uses that revision's `(?<![\w-])` boundary, a username from
-`[A-Za-z0-9_.]+`, and a dash or `/`, backslash, double or single quote, whitespace, backtick, `)`, `]` or end
-terminator. A dash starts a longer project suffix, which is included in the replacement without an anchor.
-Only lowercase `example` followed by that tail is exempt; `ExAmPlE`, `example.person` and `exampleuser` redact.
-Dots-only names are removed too. The converter is deliberately stricter for Windows encodings with more
-than two separators after the drive letter, and for known local home, checkout and work-directory encodings
-outside the generic roots or exemption. Local name continuations with letters, digits, `_` and `.` are
-consumed as part of the same segment, so a `.smith` fragment cannot survive a replaced local prefix.
+an encoded user-profile slug in a source URL. The generic roots and boundary derive from
+[#697](https://github.com/seathatflowsinourveins/native-agent-stack/pull/697) at `0d2a38b2`, now landed in
+`scripts/validate.py` as `encoded home path`: `-home-` is case-sensitive, while `-Users-`,
+`-mnt-<drive>-Users-` and `<drive>--Users-` ignore case, with the `(?<![\w-])` left boundary.
+The converter deliberately covers more tails than the publication rule. A name must start with
+`[A-Za-z0-9_.]`; redaction needs no restricted terminator, so punctuation such as commas, colons, asterisks
+and `&`, and Unicode or control tails, receive redaction in bare text, `projects/` and `claude-<uid>/`
+anchors, URL paths, queries and fragments, assignments, and JSON keys and values. For example, a query's
+`&tab=1` can follow the replaced name directly. The replacement consumes Unicode word characters, dots,
+dashes and project suffixes. In comparison, #697 requires a dash or `/`, backslash, quote, whitespace,
+backtick, `)`, `]` or end after its ASCII username.
+Lowercase `example` followed by a dash, end or a character outside `[A-Za-z0-9_.]` is exempt, including
+`example,`; `ExAmPlE`, `example.person` and `exampleuser` redact. Dots-only names are removed too.
+The converter also covers Windows encodings with more than two separators after the drive letter and
+known local home, checkout and work-directory encodings outside the generic roots or exemption.
+Local continuations consume Unicode-aware `\w`, dots and dashes as part of the same segment, including
+`.smith` followed by non-ASCII word characters, so those name fragments cannot survive a replaced local prefix.
 WSL checkouts under a Windows profile are covered even when the native home is a Linux path; encoded Windows
-segments can begin with the drive letter. Native `projects/` and `claude-<uid>/` anchors still receive
-redaction too. Redaction covers deeper strings and nested JSON fields and keys and preserves sentence-ending
+segments can begin with the drive letter. Native `projects/` and `claude-<uid>/` anchors use the same generic
+rule as other contexts, including punctuation tails; an anchor is not required. Redaction covers deeper
+strings and nested JSON fields and keys and preserves sentence-ending
 periods. Ordinary words such as `home-assistant` and `my-home-page` remain unchanged; encoded profile forms
 in prose receive the same privacy treatment as paths.
 The implementation follows the recursive string/key traversal of
@@ -723,14 +728,19 @@ Fixtures cover notes, nested strings,
 bare local and anchored homes, all four profile forms, WSL checkouts, work directories, dict keys, the printed
 summary, publication-rule username and boundary cases, bare-home terminators, case-sensitive example-user
 exemptions, prose, sentence endings, URL redaction, path line fragments, assignments, all macOS root case
-variants, dots-only names, non-tail punctuation, complete local names and key collisions.
-The converter's private-content check uses the selected checkout's own `PRIVATE_CONTENT` patterns, returning
-exit 3 for any retained match (including UUIDs), before creating or updating `--out` or printing the summary.
-The policy regression loads the actual `encoded home path` rule from `scripts/validate.py` by name and checks
-redacted values and keys over the fixture matrix. It fails when that rule is absent, without a skip or a
-synthetic marker. #697 lands before this change; before that landing the original checkout's publication
-scan has no encoded-home pattern, and pre-landing verification uses a throwaway copy with #697 at `0d2a38b2`
-overlaid as its validator. This repair does not edit the original checkout's validator.
+variants, dots-only names, punctuation tails, complete Unicode local names and key collisions.
+The converter's private-content check uses the selected checkout's own `PRIVATE_CONTENT` patterns on both
+decoded documents and the exact JSON text prepared for emission, returning exit 3 for any retained match
+(including UUIDs) before creating or updating `--out` or printing the summary. Artifacts use the serialization
+shared with [sweep_common.write_json](sweep_common.py): indentation 1, `ensure_ascii=False`, and a final newline,
+written as UTF-8. The summary uses that same text format and keeps Unicode characters unescaped.
+Scanning the serialized text also covers backslashes introduced by JSON's control-character escaping;
+serialized-only findings use a fixed locator and never echo matching text.
+The policy regression loads the actual landed `encoded home path` rule from `scripts/validate.py` by name
+and checks decoded and serialized redactor output. CLI fixtures check written artifact bytes and stdout
+with Unicode and control tails, inject a redaction failure to verify exit 3 without publication, and verify
+`--repo-root` selects the validator without mocking. These are local integration fixtures, not provider runs.
+This repair does not edit `scripts/validate.py`.
 
 Read these fields of `convert.py`'s summary before appending:
 

@@ -43,19 +43,20 @@ Privacy: work-dir, checkout and home paths become <work-dir>, <repo> and ~. Thei
 (every character outside ASCII letters and digits becomes '-') and project-directory suffixes become
 <project-dir>, including bare home segments. Local and generic rules run over the whole text, including URLs,
 queries, fragments and assignments: privacy takes priority over preserving an encoded slug in a source URL.
-Generic roots follow #697 at 0d2a38b2: -home- is case-sensitive; -Users-, -mnt-<drive>-Users- and
-<drive>--Users- ignore case. Both rules cover bare text, native directory anchors, URLs, assignments, keys and
-values, with the (?<![\\w-]) boundary, ASCII username class
-[A-Za-z0-9_.]+, and dash or slash/backslash, quote, whitespace, backtick, ')', ']' or end terminator. A dash
-starts a project suffix, which is redacted too. Only lowercase example followed by that tail is exempt;
-Dots-only names are removed; ordinary names keep sentence-ending periods. The converter is deliberately
-stricter for multiple Windows separators and known local encodings, including local name continuations with
-letters, digits, '_' and '.'. Ordinary words such as home-assistant and my-home-page stay unchanged.
-Both key collisions and any residue matching the selected checkout's PRIVATE_CONTENT refuse with exit 3
+Generic roots and the (?<![\\w-]) boundary derive from #697 at 0d2a38b2: -home- is case-sensitive; -Users-,
+-mnt-<drive>-Users- and <drive>--Users- ignore case. The converter is deliberately stricter about tails:
+a name starts with [A-Za-z0-9_.] and needs no restricted terminator, so punctuation and Unicode tails redact
+in bare text, native directory anchors, URLs, assignments, keys and values. Word characters, dots, dashes
+and project suffixes are consumed. Lowercase example followed by a dash, end or a character outside
+[A-Za-z0-9_.] is exempt. Dots-only names are removed; ordinary names keep sentence-ending periods.
+Extra Windows separators and known local encodings also receive stricter coverage; local continuations use
+Unicode-aware word characters, dots and dashes. Ordinary home-assistant and my-home-page prose survives.
+Both key collisions and any residue matching the selected checkout's PRIVATE_CONTENT refuse with exit 3,
+checking decoded documents and their exact emitted JSON text, including the summary (ensure_ascii=False),
 before --out is created or updated and before any summary is printed. Findings name the kind and a locator;
 matching keys use document-order indices, and collision locators use only indices, never key text.
-The required regression loads scripts/validate.py's actual encoded home path rule by name and fails if #697
-is absent; before its landing, the current publication scan has no dash-encoded coverage of its own.
+The required regression loads scripts/validate.py's landed encoded home path rule by name, checking decoded
+and serialized output; another CLI fixture checks --repo-root selection without mocking the validator.
 Integrity: with --work-dir, every GPT-6 output is compared with the file Codex wrote (gpt6/<job>/last.json). Exit 4
 when the workflow used an output that differs from that file (mismatch), that Codex never wrote (no_file) or that
 Codex wrote as non-JSON (file_unparseable), or when a job that finished with exit 0 wrote an output that never
@@ -79,9 +80,9 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from sweep_common import (REPO_ROOT, RedactionKeyCollision, canon, deviation_rounds, host_replacements,  # noqa: E402
+from sweep_common import (REPO_ROOT, RedactionKeyCollision, canon, deviation_rounds, host_replacements, json_text,  # noqa: E402
                           ledger_module, load_json, pointer_token, private_content, private_findings,
-                          rewrite_strings, sanitize, slug, write_json)
+                          rewrite_strings, sanitize, slug)
 from usage_record import superseded_at_required_effort  # noqa: E402
 
 # The Claude judgment roles all run on Opus (sweep.js WORKER, adoption/agents/claude/landscape-sweep-worker.md): the
@@ -99,17 +100,16 @@ COPY_FAILURES = ("mismatch", "no_file", "file_unparseable", "file_only")
 VOTE_ROLES = (("facts", "facts"), ("fit_claude", "Claude fit"), ("fit_gpt6", "GPT-6 fit"))
 SKILLS_CATALOG = "skills"  # build_inputs.SKILLS: the catalog of a skills-* layer, whose proposals are skill refs
 # Follow #697 at 0d2a38b2: /home is case-sensitive, every Users branch ignores case, example is case-sensitive.
-# Retain the converter's additional multiple Windows separators and consume the whole project suffix.
+# Deliberately cover any name delimiter, additional Windows separators and the whole project suffix.
 # Local paths are derived at the redaction call site; no rule excludes URL contexts.
 ENCODED_PROFILE_ROOT = (
     r"(?:-home-|(?i:-Users-|-mnt-[a-z]-Users-|[a-z]-{2,}Users-))")
-ENCODED_HOME_END = r"[/\\\"'\s`)\]]"
-ENCODED_PROFILE_START = ENCODED_PROFILE_ROOT + r"(?!example(?:-|" + ENCODED_HOME_END + r"|$))"
-# Use the publication rule's name/tail guard in every context, including native directory anchors. Preserve
+ENCODED_PROFILE_START = ENCODED_PROFILE_ROOT + r"(?!example(?:-|(?![A-Za-z0-9_.])))"
+# No restricted tail: punctuation or Unicode after a real name is private in every context. Preserve
 # sentence periods after ordinary names; a dots-only name is consumed entirely rather than left as a residue.
 ENCODED_USER_PROFILE = re.compile(
     r"(?<![\w-])" + ENCODED_PROFILE_START
-    + r"(?=[A-Za-z0-9_.]+(?:-|(?=" + ENCODED_HOME_END + r"|$)))(?:[\w.-]*[\w-]|\.+)")
+    + r"(?=[A-Za-z0-9_.])(?:[\w.-]*[\w-]|\.+)")
 
 
 def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"], skills: bool = False) -> list[str]:
@@ -708,18 +708,19 @@ def redact_project_dirs(value, work: Path | None = None, repo_root: Path | None 
     """Redact local and generic encoded user profiles throughout strings and keys, including URLs.
 
     Use host_replacements' home, checkout, optional work directory and realpath forms; a bare encoded home is
-    also private. Generic roots follow #697 at 0d2a38b2: home is case-sensitive and every Users branch ignores
-    case, with its ASCII username class, boundary, tail and case-sensitive example exemption. Project suffixes
-    and dots-only names are removed. Local encodings and extra Windows separators receive stricter coverage;
-    local name continuations include letters, digits, '_' and '.'. Plain home-assistant and my-home-page prose survives;
+    also private. Generic roots and boundary derive from #697 at 0d2a38b2: home is case-sensitive and every
+    Users branch ignores case. A name starts with [A-Za-z0-9_.] and needs no restricted terminator. Lowercase
+    example before a dash, end or any character outside that ASCII class is exempt. Project suffixes and
+    dots-only names are removed. Local encodings and extra Windows separators receive stricter coverage;
+    local continuations consume Unicode word characters, dots and dashes. Plain home-assistant and my-home-page prose survives;
     URL, query, fragment and assignment contexts receive no exemption. Colliding keys raise RedactionKeyCollision.
-    The CLI scans with the selected checkout's actual PRIVATE_CONTENT patterns before writing or printing.
-    Regression fixtures require that checkout's encoded home path rule, rather than a synthetic marker.
+    The CLI scans decoded documents and exact emitted JSON with the selected checkout's PRIVATE_CONTENT
+    before writing or printing. Regression fixtures use its actual encoded home path rule, not a synthetic marker.
     """
     encoded_paths = sorted({re.sub(r"[^a-zA-Z0-9]", "-", prefix)
                             for prefix, _ in host_replacements(work, repo_root)}, key=lambda form: -len(form))
     local = (re.compile(r"(?<![\w.-])(?:" + "|".join(re.escape(form) for form in encoded_paths)
-                        + r")(?:[A-Za-z0-9_.-]*[A-Za-z0-9_-])?(?![\w-])") if encoded_paths else None)
+                        + r")(?:[\w.-]*[\w-])?(?![\w-])") if encoded_paths else None)
 
     def fix(text):
         if local:
@@ -770,20 +771,26 @@ def main(argv=None) -> int:
         location = "printed summary" if name == "summary" else f"{name}.json"
         print(f"convert.py: {location}#{pointer}: redaction key collision (no artifacts written)", file=sys.stderr)
         return EXIT_PRIVATE
+    emitted = {name: json_text(document) for name, document in documents.items()}
     findings = []
     for name, document in documents.items():
         location = "printed summary" if name == "summary" else f"{name}.json"
-        findings.extend((f"{location}#{pointer}", kind) for pointer, kind in private_findings(document, patterns))
+        decoded = private_findings(document, patterns)
+        findings.extend((f"{location}#{pointer}", kind) for pointer, kind in decoded)
+        for kind, pattern in patterns:
+            if pattern.search(emitted[name]) and not any(description in (kind, f"{kind} (in a key)")
+                                                        for _, description in decoded):
+                findings.append((f"{location}#/<serialized>", kind))
     if findings:
         print("refusing to publish: possible private content (no artifacts written; text not shown):", file=sys.stderr)
         for pointer, kind in findings:
             print(f"  {pointer}: {kind}", file=sys.stderr)
         return EXIT_PRIVATE
     args.out.mkdir(parents=True, exist_ok=True)
-    for name, document in documents.items():
+    for name, text in emitted.items():
         if name != "summary":
-            write_json(args.out / f"{name}.json", document)
-    print(json.dumps(documents["summary"], indent=1))
+            (args.out / f"{name}.json").write_bytes(text.encode("utf-8"))
+    sys.stdout.write(emitted["summary"])
     copy_problems = {kind: count for kind, count in out["summary"]["gpt6_copy_check"].items() if kind in COPY_FAILURES}
     if copy_problems:
         print(f"GPT-6 copy check failed {json.dumps(copy_problems, sort_keys=True)}; see raw/<layer>/<round>/"

@@ -53,8 +53,13 @@ def load_json(path: Path):
     return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
+def json_text(value, indent=1) -> str:
+    """The JSON text emitted by write_json, including its final newline."""
+    return json.dumps(value, indent=indent, ensure_ascii=False) + "\n"
+
+
 def write_json(path: Path, value, indent=1) -> None:
-    Path(path).write_text(json.dumps(value, indent=indent, ensure_ascii=False) + "\n", encoding="utf-8")
+    Path(path).write_text(json_text(value, indent), encoding="utf-8")
 
 
 def inside_repository(path: Path) -> Path | None:
