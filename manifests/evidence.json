@@ -16563,8 +16563,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-codex-rtk-hook-qualified.md",
-      "sha256": "8929c8d8a44507812a748c8e6fb7ee0eae35779b34203082c3f04b8ac7724493",
-      "bytes": 35322
+      "sha256": "736bd781cf91664ab9f793116b12521ba34a3961bb6e1680d164458d64065616",
+      "bytes": 38056
     },
     {
       "path": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
@@ -48823,8 +48823,8 @@
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/README.md",
-      "sha256": "05fbff90b9ea7692c4b0f1c53fb27cd0b46ec870c77989e668470d32400a4a5d",
-      "bytes": 17375
+      "sha256": "3a55c99b2c80a4f5f841aa9b2edc86c8e0d7be14c1a47445c89a8c687ab0a4a7",
+      "bytes": 17488
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/check_rtk_rewrite_heads.py",
@@ -48858,13 +48858,13 @@
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/plan-row-scratch-run.json",
-      "sha256": "5a2eceda99fc21a9f8caa882174a491c312404c9135344e44270924151488b8c",
-      "bytes": 56893
+      "sha256": "af5ec5e1f284e3015303add555342e3d1ad8eb3f145343e09321c778a29ef0e7",
+      "bytes": 60746
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/plan_row_scratch_run.py",
-      "sha256": "ad2ae45b8b1b56ff46af207878d9013f1cc93a5d3e36a2533b6da1e9d1189fb0",
-      "bytes": 28343
+      "sha256": "3e6709b1761617877c43d4e0d7f1e485761df5e1047b19ac477a4965ff2e9245",
+      "bytes": 31302
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/receipt.json",
@@ -48903,13 +48903,13 @@
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rule-review-mutation-check.txt",
-      "sha256": "f2a58851f6a86d82f0e46ed614079c9accf121235e5230b89e9d634c5acba2e9",
-      "bytes": 4411
+      "sha256": "090c2f414cda25e75b9fc09457f63d448e70b65b1f2c64db39a984f479907624",
+      "bytes": 4447
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rule_review_mutation_check.py",
-      "sha256": "a2b82145fb2ff4fb78285c0f38b60e456ef7448edddb92f9d83854c9f0f169d5",
-      "bytes": 14160
+      "sha256": "1a3d31ce27f5a77c9806bde26bc5019e350674447be571d2de4392412a949d2f",
+      "bytes": 14196
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/trust_readback_race.py",
