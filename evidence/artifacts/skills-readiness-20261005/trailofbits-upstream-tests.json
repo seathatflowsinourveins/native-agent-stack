@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "trailofbits-native-validation-20261005",
+  "slot": "instructions-skills/trail-of-bits-security-skills-trailofbits-skills",
+  "evidence_class": "upstream_test",
+  "repository": "https://github.com/trailofbits/skills",
+  "reviewed_commit": "82fe8226252622fa807643bdca1710901198553a",
+  "source_worktree_clean_after_execution": true,
+  "source_checkout": {"clone_argv": ["git", "clone", "https://github.com/trailofbits/skills.git", "<scratch>/trailofbits-skills"], "clone_exit_code": 0, "checkout_argv": ["git", "checkout", "82fe8226252622fa807643bdca1710901198553a"], "checkout_exit_code": 0, "clone_returned_output": "logs/trailofbits-clone.log"},
+  "result": "failed_partial",
+  "observation_interval_utc": ["2026-10-05 10:00:50", "2026-10-05 10:08:08"],
+  "per_command_start_end_utc": null,
+  "timing_limit": "The tool call records preserve commands, elapsed durations and return codes; exact per-step UTC start/end was not separately captured. The coordination clock bounds the execution interval above. No per-step timestamps are reconstructed from file mtimes.",
+  "runtime": {"python": "3.13.16", "node": "24.21.0", "npm": "11.19.0", "claude_latest_at_execution": "2.1.289", "codex_ci": "0.146.0", "codex_host_additional_check": "0.160.0"},
+  "path_legend": {"<scratch>": "Owned lane cache readiness-20261005, outside Git and /tmp", "cwd": "<scratch>/trailofbits-skills"},
+  "environment": {"TMPDIR": "<scratch>/tmp", "CLAUDE_CONFIG_DIR": "<scratch>/client-homes/claude", "CODEX_HOME": "<scratch>/client-homes/codex", "helper_isolation": "Upstream loadability helpers additionally create isolated temporary HOME and native client homes beneath TMPDIR. No live client marketplace/configuration is modified."},
+  "checks": [
+    {"argv": ["python3", ".github/scripts/validate_plugin_metadata.py", "--self-test"], "exit_code": 0, "result": "113 assertions passed", "stdout": "logs/trailofbits-metadata-self-test.stdout", "stderr": "logs/trailofbits-metadata-self-test.stderr", "source": ".github/workflows/validate.yml:31"},
+    {"argv": ["bash", "<scratch>/trailofbits-step-1.sh"], "exit_code": 0, "result": "85 skills checked", "stdout": "logs/trailofbits-frontmatter.stdout", "stderr": "logs/trailofbits-frontmatter.stderr", "source": ".github/workflows/validate.yml:35", "selection": "Exact unchanged YAML run value for frontmatter validation, frozen outside the clone", "run_value_sha256": "bf34b098a566ccef878951cd6b0b878a2df87d56437ebc69238b6153de8af2d9"},
+    {"argv": ["bash", "<scratch>/trailofbits-step-2.sh"], "exit_code": 0, "result": "Personal email check passed", "stdout": "logs/trailofbits-emails.stdout", "stderr": "logs/trailofbits-emails.stderr", "source": ".github/workflows/validate.yml:90", "selection": "Exact unchanged YAML run value for email validation, frozen outside the clone", "run_value_sha256": "f6b961aa698c327b3c36e6284ab91cbb7de776de9c3806156f7d9b2e46d5efac"},
+    {"argv": ["python3", ".github/scripts/validate_plugin_metadata.py"], "exit_code": 0, "result": "44 plugins; 413 references, 1106 hardcoded-path files, 752 legacy-invocation files, 132 README components; seven non-failing length warnings retained", "stdout": "logs/trailofbits-metadata.stdout", "stderr": "logs/trailofbits-metadata.stderr", "source": ".github/workflows/validate.yml:103", "selection": "Push-like frozen-revision path; BASE_REF not set, so PR-diff-only validation is not claimed"},
+    {"argv": ["python3", ".github/scripts/check_claude_loadability.py", "--claude-bin", "<scratch>/claude-cli/bin/claude"], "exit_code": 1, "result": "Strict marketplace validation rejected the reserved plugin name claude-in-chrome-troubleshooting", "stdout": "logs/trailofbits-claude-loadability.stdout", "stderr": "logs/trailofbits-claude-loadability.stderr", "source": ".github/workflows/validate.yml:149", "boundary": "The native helper stopped at check_claude_loadability.py:130 before marketplace add/install at line 136. No installed-loadability pass follows."},
+    {"argv": ["python3", ".github/scripts/check_codex_loadability.py", "--codex-bin", "<scratch>/codex-ci/bin/codex"], "exit_code": 0, "result": "44 plugins, 83 skills, 1 MCP server; all checks passed", "stdout": "logs/trailofbits-codex-ci-loadability.stdout", "stderr": "logs/trailofbits-codex-ci-loadability.stderr", "source": ".github/workflows/validate.yml:161"},
+    {"argv": ["python3", ".github/scripts/check_codex_loadability.py", "--codex-bin", "/home/<user>/.local/bin/codex"], "exit_code": 0, "result": "44 plugins, 83 skills, 1 MCP server; all checks passed", "stdout": "logs/trailofbits-codex-host-loadability.stdout", "stderr": "logs/trailofbits-codex-host-loadability.stderr", "source": ".github/scripts/check_codex_loadability.py", "selection": "Additional unchanged-helper host compatibility check on 0.160.0; distinct from CI's 0.146.0 leg"}
+  ],
+  "native_install_prerequisites": [
+    {"argv": ["npm", "install", "--global", "--prefix", "<scratch>/claude-cli", "@anthropic-ai/claude-code@latest"], "exit_code": 0, "evidence_class": "upstream_native_operation", "stdout": "logs/trailofbits-claude-install.stdout", "stderr": "logs/trailofbits-claude-install.stderr", "source": ".github/workflows/validate.yml:141", "limit": "Upstream CI selects latest, not a pinned Claude CLI version; actual observed CLI was 2.1.289"},
+    {"argv": ["npm", "install", "--global", "--prefix", "<scratch>/codex-ci", "@openai/codex@0.146.0"], "exit_code": 0, "evidence_class": "upstream_native_operation", "stdout": "logs/trailofbits-codex-install.stdout", "stderr": "logs/trailofbits-codex-install.stderr", "source": ".github/workflows/validate.yml:153"}
+  ],
+  "source_sha256": {".github/workflows/validate.yml": "ee09af9a518923436a37551380f3a75b87ebdabfa10b9469757e976e9ce0776b", ".github/scripts/validate_plugin_metadata.py": "b3ed088b7df58f796b376f743070475a8f9839b50bb6a3755490170b30d41eab", ".github/scripts/check_claude_loadability.py": "f79981b33d97c59cecaf3b856ac85a656ad6822a63ab531408bcdeebdc47a52a", ".github/scripts/check_codex_loadability.py": "2407f34c92352aa4bd55d7ed071b59fdb900f6d869569b8d28e85d1bdcb26b85"},
+  "controls": "The unchanged upstream self-test exercised 113 assertions. No custom runner, source patch, downgrade, bypass or easier replacement demo was used.",
+  "omissions": ["GitHub Actions orchestration/setup itself was not executed on this host", "PR-diff BASE_REF-specific validation was not selected", "Claude add/install and post-install loading did not execute after the native strict-validation failure", "No provider/model behavior or installed-skill invocation was measured"],
+  "skips": "No test skip was reported by these native commands; omissions and the stopped Claude leg are explicit above.",
+  "disposition": "Retain the upstream incompatibility and passing subsets without READY promotion. An upstream-supported corrected revision and fresh unchanged native loadability run would resolve this failure; do not patch or rename the upstream plugin locally.",
+  "returned_output_index": "returned-output-index.json",
+  "command_wrapper": "Native argument vectors shown above were executed through rtk proxy, with stdout/stderr redirected to private owned-cache logs. YAML run-value Bash bodies were copied unchanged; no local runner orchestrated the checks.",
+  "sources": ["trailofbits/skills@82fe8226252622fa807643bdca1710901198553a:.github/workflows/validate.yml:31", "trailofbits/skills@82fe8226252622fa807643bdca1710901198553a:.github/scripts/check_claude_loadability.py:130", "native-agent-stack@ec0b8fd821a7b2004c331d2185b33d9e5ed47896:docs/acceptance-evidence-policy.md:37"]
+}

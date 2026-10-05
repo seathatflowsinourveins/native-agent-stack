@@ -1,0 +1,24 @@
+Validating marketplace manifest: <scratch>/trailofbits-skills/.claude-plugin/marketplace.json
+
+✘ Found 1 error:
+
+  ❯ plugins[3].name: Plugin name "claude-in-chrome-troubleshooting" is reserved: it passes as one of Anthropic's own. A third party's plugin name cannot start with "claude-", "anthropic-", "anthropics-", or "cc-plugin-", be "claude", "anthropic", "anthropics", "claude-code", or "claude-mods", or put "official" beside "claude" or "anthropic". Name it for what it does.
+
+✘ Validation failed
+Traceback (most recent call last):
+  File "<scratch>/trailofbits-skills/.github/scripts/check_claude_loadability.py", line 199, in <module>
+    raise SystemExit(main())
+                     ~~~~^^
+  File "<scratch>/trailofbits-skills/.github/scripts/check_claude_loadability.py", line 130, in main
+    run_claude(
+    ~~~~~~~~~~^
+        claude_bin,
+        ^^^^^^^^^^^
+    ...<2 lines>...
+        ["plugin", "validate", "--strict", str(repo / MARKETPLACE)],
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "<scratch>/trailofbits-skills/.github/scripts/check_claude_loadability.py", line 37, in run_claude
+    raise RuntimeError(f"claude {' '.join(args)} failed with {result.returncode}")
+RuntimeError: claude plugin validate --strict <scratch>/trailofbits-skills/.claude-plugin/marketplace.json failed with 1

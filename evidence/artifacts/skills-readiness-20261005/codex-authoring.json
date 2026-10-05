@@ -1,0 +1,199 @@
+{
+  "schema_version": 1,
+  "id": "fresh-codex-skill-authoring-20261005",
+  "evidence_classes": [
+    "native_proven",
+    "synthetic",
+    "structural_validation"
+  ],
+  "result": "native_creation_and_structural_controls_passed",
+  "source": "openai/codex@rust-v0.160.0:codex-rs/skills/src/assets/samples/skill-creator/SKILL.md",
+  "source_locators": ["openai/codex@rust-v0.160.0:codex-rs/skills/src/assets/samples/skill-creator/SKILL.md:175", "openai/codex@rust-v0.160.0:codex-rs/skills/src/assets/samples/skill-creator/SKILL.md:208", "openai/codex@rust-v0.160.0:codex-rs/skills/src/assets/samples/skill-creator/SKILL.md:211"],
+  "source_skill_md_sha256": "6656e54755638e8efcf275a472b9672eaa8a9a1b9e59dc210e275b03b59e1e66",
+  "official_source_byte_match": true,
+  "client_version": "0.160.0",
+  "requested_route_model": "cx/gpt-6.1-sol-max",
+  "requested_effort": "max",
+  "provider_reported_model_or_effort": null,
+  "scope": "Fresh native creation/validation in non-git owned-cache scratch through the existing OmniRoute profile. No paired Codex A/B, installation, candidate qualification or production acceptance.",
+  "start_utc": "2026-10-05 11:00:42 UTC",
+  "end_observed_utc": "2026-10-05 11:06:07 UTC",
+  "exit_code": 0,
+  "input_sha256": {
+    "plan.md": "5283917719bef34ae6886a93c9f98c29d3996b0e504a6e95c1b11b481fa2bf37",
+    "claude/task.md": "421f8cbfee712199e0ae12f3a45fb87141a721bcf7b108917e6d3ed620e0c7e1",
+    "codex/task.md": "e37b78575f553dfcd5bb3f381f0acd0919785f89bb49e425ec80de3ee21cb3bf"
+  },
+  "first_attempt": {
+    "exit_code": 1,
+    "end_observed_utc": "2026-10-05 10:57:37 UTC",
+    "result": "Profile env_key missing before creation",
+    "stream": "authoring-codex.jsonl",
+    "repair": "Repository-documented inert local-loopback placeholder and cx/<native model>-<requested effort> qualifier. Frozen fixture/task inputs unchanged; no credential read or configuration write.",
+    "sources": [
+      "native-agent-stack@ec0b8fd821a7b2004c331d2185b33d9e5ed47896:docs/secret-storage.md:21",
+      "native-agent-stack@ec0b8fd821a7b2004c331d2185b33d9e5ed47896:tools/sota-convergence/landscape-sweep/codex_job.py:56"
+    ],
+    "presence_check": {
+      "command": "python3 scripts/credential_status.py --json",
+      "exit_code": 0,
+      "values_read": false,
+      "omniroute_optional_entry": "missing",
+      "native_client_entries": "present"
+    },
+    "native_route_observation": {
+      "command": "curl --fail --silent --show-error http://127.0.0.1:20128/v1/models",
+      "exit_code": 0,
+      "relevant_id_present": "cx/gpt-6.1-sol-max",
+      "claim_boundary": "Live model listing, not a provider acceptance run"
+    }
+  },
+  "native_argv": [
+    "env",
+    "OMNIROUTE_API_KEY=local-loopback",
+    "TMPDIR=<scratch>/tmp",
+    "PYTHONDONTWRITEBYTECODE=1",
+    "codex",
+    "-p",
+    "omniroute",
+    "exec",
+    "--json",
+    "--skip-git-repo-check",
+    "--dangerously-bypass-approvals-and-sandbox",
+    "-m",
+    "cx/gpt-6.1-sol-max",
+    "-c",
+    "model_reasoning_effort=\"max\"",
+    "-"
+  ],
+  "cwd": "<scratch>/skill-authoring/codex",
+  "stdin": "task.md",
+  "non_git_verified": true,
+  "native_commands": [
+    {
+      "command": "/bin/bash -lc 'rtk cat /home/<user>/.codex/skills/.system/skill-creator/SKILL.md'",
+      "exit_code": 0,
+      "returned_output": null
+    },
+    {
+      "command": "/bin/bash -lc 'rtk proxy env PYTHONDONTWRITEBYTECODE=1 python3 /home/<user>/.codex/skills/.system/skill-creator/scripts/init_skill.py --help'",
+      "exit_code": 0,
+      "returned_output": null
+    },
+    {
+      "command": "/bin/bash -lc \"rtk proxy env PYTHONDONTWRITEBYTECODE=1 python3 /home/<user>/.codex/skills/.system/skill-creator/scripts/init_skill.py cedar-note-codex --path <scratch>/skill-authoring/codex --interface 'display_name=Cedar Note Codex' --interface 'short_description=Convert fictional Cedar maintenance notes to JSON'\"",
+      "exit_code": 0,
+      "returned_output": "Initializing skill: cedar-note-codex\n   Location: <scratch>/skill-authoring/codex\n   Resources: none (create as needed)\n\n[OK] Created skill directory: <scratch>/skill-authoring/codex/cedar-note-codex\n[OK] Created SKILL.md\n[OK] Created agents/openai.yaml\n\n[OK] Skill 'cedar-note-codex' initialized successfully at <scratch>/skill-authoring/codex/cedar-note-codex\n\nNext steps:\n1. Edit SKILL.md to complete the TODO items and update the description\n2. Create resource directories only if needed (scripts/, references/, assets/)\n3. Update agents/openai.yaml if the UI metadata should differ\n4. Run the validator when ready to check the skill structure\n5. Consider independent forward-testing only when complexity or risk warrants it\n"
+    },
+    {
+      "command": "/bin/bash -lc 'rtk proxy env PYTHONDONTWRITEBYTECODE=1 python3 /home/<user>/.codex/skills/.system/skill-creator/scripts/quick_validate.py <scratch>/skill-authoring/codex/cedar-note-codex'",
+      "exit_code": 0,
+      "returned_output": "Skill is valid!\n"
+    },
+    {
+      "command": "/bin/bash -lc 'rtk proxy env PYTHONDONTWRITEBYTECODE=1 python3 /home/<user>/.codex/skills/.system/skill-creator/scripts/quick_validate.py <scratch>/skill-authoring/codex/negative-control/invalid-skill'",
+      "exit_code": 1,
+      "returned_output": "Name 'invalid_skill' should be hyphen-case (lowercase letters, digits, and hyphens only)\n"
+    },
+    {
+      "command": "/bin/bash -lc 'rtk sha256sum /home/<user>/.codex/skills/.system/skill-creator/SKILL.md /home/<user>/.codex/skills/.system/skill-creator/references/openai_yaml.md /home/<user>/.codex/skills/.system/skill-creator/scripts/init_skill.py /home/<user>/.codex/skills/.system/skill-creator/scripts/generate_openai_yaml.py /home/<user>/.codex/skills/.system/skill-creator/scripts/quick_validate.py'",
+      "exit_code": 0,
+      "returned_output": "6656e54755638e8efcf275a472b9672eaa8a9a1b9e59dc210e275b03b59e1e66  /home/<user>/.codex/skills/.system/skill-creator/SKILL.md\nffac39318e408108141d40f820968e59f70434a891694f9bf1d25be8237b150c  /home/<user>/.codex/skills/.system/skill-creator/references/openai_yaml.md\nbf0656a5f9d8d8cdecf0245eaf27e1df8e0e9b6d40ccdda814eb8e3d5f6992c8  /home/<user>/.codex/skills/.system/skill-creator/scripts/init_skill.py\n816df12072d74faf924d802a6599a139997e1441e90bfe4869ec304f2e5e2851  /home/<user>/.codex/skills/.system/skill-creator/scripts/generate_openai_yaml.py\nee6dba90f44d37171c5a6edb8095979c54919ff6822c1a907afca2e78c48738c  /home/<user>/.codex/skills/.system/skill-creator/scripts/quick_validate.py\n"
+    }
+  ],
+  "checks": {
+    "skill_creator_body_read": {
+      "exit_code": 0,
+      "returned_bytes": 15311,
+      "actual_command_record_retained": true
+    },
+    "initializer": {
+      "exit_code": 0,
+      "skill_and_agents_metadata_created": true
+    },
+    "valid_native_quick_validate": {
+      "exit_code": 0,
+      "returned_output": "Skill is valid!"
+    },
+    "invalid_name_control": {
+      "exit_code": 1,
+      "returned_output": "Name 'invalid_skill' should be hyphen-case (lowercase letters, digits, and hyphens only)",
+      "expected_failure": true
+    }
+  },
+  "native_cli_turn_usage": [
+    {
+      "input_tokens": 573515,
+      "cached_input_tokens": 522880,
+      "cache_write_input_tokens": 0,
+      "output_tokens": 12955,
+      "reasoning_output_tokens": 7070
+    }
+  ],
+  "usage_scope": "One final native CLI turn counter. Cached input and reasoning output remain native subset fields; not added to totals. No provider billing observation or sum of intermediate cumulative snapshots.",
+  "files": {
+    "cedar-note-codex/SKILL.md": {
+      "raw_sha256": "87048d1b77bfda857d356c62b0b2d5e4a93423bbe64e97674a76143459c857f5",
+      "raw_bytes": 875,
+      "sanitized_text": "---\nname: cedar-note-codex\ndescription: Convert fictional Cedar maintenance notes into the frozen four-field JSON contract when a user requests a Cedar card summary.\n---\n\n# Cedar Note Codex\n\nReturn one JSON object with exactly `asset`, `status`, `owner`, and `next_action`, with no surrounding prose.\n\n- `asset`: Copy the explicitly named asset exactly.\n- `status`: Apply these rules in order:\n  1. `\"blocked\"` when an unresolved unsafe condition is reported, even if another sentence reports completion.\n  2. `\"needs-information\"` when an unresolved question remains.\n  3. `\"complete\"` when completion is explicit.\n  4. `\"needs-information\"` otherwise.\n- `owner`: Copy the named responsible person, or use JSON `null` when absent.\n- `next_action`: Copy an explicit requested next action verbatim, or use JSON `null` when absent.\n\nUse only stated facts; do not invent facts.\n"
+    },
+    "cedar-note-codex/agents/openai.yaml": {
+      "raw_sha256": "2db2b0fd4dd56fd91acec744f4355644aa1da75057fc0e1f9872f9d5aae8b83b",
+      "raw_bytes": 119,
+      "sanitized_text": "interface:\n  display_name: \"Cedar Note Codex\"\n  short_description: \"Convert fictional Cedar maintenance notes to JSON\"\n"
+    },
+    "negative-control/invalid-skill/SKILL.md": {
+      "raw_sha256": "90a97451c524499fa402c224e52f3a8ae64818292a034b29de0b081696e79d19",
+      "raw_bytes": 238,
+      "sanitized_text": "---\nname: invalid_skill\ndescription: Structural negative control for the fictional Cedar authoring fixture.\n---\n\n# Invalid Skill Control\n\nThis fixture deliberately uses an underscore in its skill name to exercise the native naming check.\n"
+    },
+    "validator-results.txt": {
+      "raw_sha256": "f36e1a0cfdd06fe91c0503643f7ff0f6eb3800e1dd4f989cb226c4a35115e0c3",
+      "raw_bytes": 2130,
+      "sanitized_text": "Native structural validation results\nSource: openai/codex@rust-v0.160.0, codex-rs/skills/src/assets/samples/skill-creator/scripts/quick_validate.py\nInstalled script: /home/<user>/.codex/skills/.system/skill-creator/scripts/quick_validate.py\nWorking directory: <scratch>/skill-authoring/codex\nThe same unchanged native validator was invoked directly for both controls.\nCommands used rtk proxy to preserve native output and return codes. PYTHONDONTWRITEBYTECODE=1 prevented bytecode writes beside the installed scripts.\n\nValid Cedar fixture\nPath: <scratch>/skill-authoring/codex/cedar-note-codex\nCommand: rtk proxy env PYTHONDONTWRITEBYTECODE=1 python3 /home/<user>/.codex/skills/.system/skill-creator/scripts/quick_validate.py <scratch>/skill-authoring/codex/cedar-note-codex\nStart UTC: 2026-10-05T11:03:19Z\nEnd UTC: 2026-10-05T11:03:20Z\nActual exit code: 0\n\nCaptured native output:\nSkill is valid!\n\nDeliberately invalid naming control\nPath: <scratch>/skill-authoring/codex/negative-control/invalid-skill\nCommand: rtk proxy env PYTHONDONTWRITEBYTECODE=1 python3 /home/<user>/.codex/skills/.system/skill-creator/scripts/quick_validate.py <scratch>/skill-authoring/codex/negative-control/invalid-skill\nStart UTC: 2026-10-05T11:03:20Z\nEnd UTC: 2026-10-05T11:03:21Z\nActual exit code: 1\n\nCaptured native output:\nName 'invalid_skill' should be hyphen-case (lowercase letters, digits, and hyphens only)\n\nBoundary of this evidence:\nThe valid fixture passed native structural validation with exit code 0.\nThe invalid_skill control failed the native name check with exit code 1; this failure is expected and is retained above.\nStructural validation does not establish behavioral acceptance, correct model decisions, a skill quality advantage, production readiness, or human acceptance.\nNo paired model evaluations or behavioral executor/grader runs were performed in this Codex leg.\n\n"
+    },
+    "initialization-results.txt": {
+      "raw_sha256": "1ba48a441189c4823b05380b723a74069e133e27b23a56fcd866641a7ccbf63a",
+      "raw_bytes": 1674,
+      "sanitized_text": "Native initialization\nSource: openai/codex@rust-v0.160.0, codex-rs/skills/src/assets/samples/skill-creator/scripts/init_skill.py\nInstalled script: /home/<user>/.codex/skills/.system/skill-creator/scripts/init_skill.py\nWorking directory: <scratch>/skill-authoring/codex\nCommand: rtk proxy env PYTHONDONTWRITEBYTECODE=1 python3 /home/<user>/.codex/skills/.system/skill-creator/scripts/init_skill.py cedar-note-codex --path <scratch>/skill-authoring/codex --interface 'display_name=Cedar Note Codex' --interface 'short_description=Convert fictional Cedar maintenance notes to JSON'\nStart UTC: 2026-10-05T11:02:06Z\nEnd UTC: 2026-10-05T11:02:07Z\nActual exit code: 0\n\nCaptured native output:\nInitializing skill: cedar-note-codex\n   Location: <scratch>/skill-authoring/codex\n   Resources: none (create as needed)\n\n[OK] Created skill directory: <scratch>/skill-authoring/codex/cedar-note-codex\n[OK] Created SKILL.md\n[OK] Created agents/openai.yaml\n\n[OK] Skill 'cedar-note-codex' initialized successfully at <scratch>/skill-authoring/codex/cedar-note-codex\n\nNext steps:\n1. Edit SKILL.md to complete the TODO items and update the description\n2. Create resource directories only if needed (scripts/, references/, assets/)\n3. Update agents/openai.yaml if the UI metadata should differ\n4. Run the validator when ready to check the skill structure\n5. Consider independent forward-testing only when complexity or risk warrants it\n\n"
+    }
+  },
+  "private_streams": {
+    "authoring-claude.jsonl": {
+      "sha256": "f68f00aaae9381793ffc871574a561b41fc557ca2e6e0ebca4725ef388465602",
+      "bytes": 26612,
+      "raw_retained_private": true
+    },
+    "authoring-claude.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "raw_retained_private": true
+    },
+    "authoring-codex.jsonl": {
+      "sha256": "e3ef9607b00819033185984dabee80f09e4e3c7c132202e47cd23f75c1070db2",
+      "bytes": 1091,
+      "raw_retained_private": true
+    },
+    "authoring-codex.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "raw_retained_private": true
+    },
+    "authoring-codex-retry.jsonl": {
+      "sha256": "ca941a678eb3d859cec436e17cb6a5342d3d7595e227d2a959a495ade2c39cdf",
+      "bytes": 124267,
+      "raw_retained_private": true
+    },
+    "authoring-codex-retry.stderr": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0,
+      "raw_retained_private": true
+    }
+  },
+  "sanitization": "Retained raw native conversation streams stay private. Selected native commands, returned validation/init output and synthetic artifacts replace the owned scratch prefix and personal home prefix with placeholders; hashes always identify original raw files.",
+  "independent_observation": "Root inspected the actual created SKILL.md, agents metadata and invalid control, and matched the native command completions/return codes in the fresh JSONL, rather than trusting the final model summary.",
+  "remaining_gates": [
+    "Claude paired creation/evaluation workflow awaits native account reset",
+    "Landscape candidate qualification, PR review, lifecycle installation and worker discovery are separate future gates"
+  ]
+}

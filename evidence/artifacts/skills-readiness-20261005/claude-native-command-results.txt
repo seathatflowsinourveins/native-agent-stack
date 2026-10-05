@@ -1,0 +1,42 @@
+# Native skill-creator command results (pinned anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4; scripts unchanged)
+
+## 1. aggregate_benchmark
+cwd: <installed-creator>
+command: python3 -B -m scripts.aggregate_benchmark <scratch>/skill-authoring/claude/cedar-note-workspace/iteration-1 --skill-name cedar-note --skill-path <scratch>/skill-authoring/claude/cedar-note
+aggregate_benchmark.py sha256: 123ef128ea5ccc01a4b1ac212ef5567f21e9c13d3d240609780beeb3200c49aa
+started_utc: 2026-10-05T11:55:36.554Z
+ended_utc: 2026-10-05T11:55:36.600Z
+exit_code: 0
+output (stdout+stderr):
+Generated: <scratch>/skill-authoring/claude/cedar-note-workspace/iteration-1/benchmark.json
+Generated: <scratch>/skill-authoring/claude/cedar-note-workspace/iteration-1/benchmark.md
+
+Summary:
+  With Skill: 86.7% pass rate
+  Without Skill: 80.0% pass rate
+  Delta:         +0.07
+benchmark.json sha256 at generation: 7a5941a4cdedb54e497bc4d6404fe34d3f04fdf777588be284eaf90b660ec4ce
+benchmark.md sha256 at generation: 86556c945c7243c097ac0c4c142af41ce7aea440af35c14a46d9874950651391
+
+## 2. generate_review.py (static)
+cwd: <scratch>/skill-authoring/claude
+command: python3 -B <installed-creator>/eval-viewer/generate_review.py <scratch>/skill-authoring/claude/cedar-note-workspace/iteration-1 --skill-name cedar-note --benchmark <scratch>/skill-authoring/claude/cedar-note-workspace/iteration-1/benchmark.json --static <scratch>/skill-authoring/claude/review.html
+generate_review.py sha256: fc9d1b9243fe5ab6012ebd579bd76d0035de1b79fd3b969de114defab26478fb; viewer.html sha256: a53213426ee1100441d701a3a0d49cda7a842f992d2c36463f4d3cc0258575fa
+started_utc: 2026-10-05T11:55:36.619Z
+ended_utc: 2026-10-05T11:55:36.690Z
+exit_code: 0
+output (stdout+stderr):
+
+  Static viewer written to: <scratch>/skill-authoring/claude/review.html
+review.html sha256 at generation: e29e1dffeab6e13c7f284add6cf6a8d391eb8f8132954eefcff8c21bc67aebe4; bytes: 111630
+
+## 3. Files under the installed skill-creator modified since 2026-10-05T11:55:36.547Z (expect none)
+  (end of list)
+
+## 3 (correction). The check above did not run: 'find' here is bfs, which rejected the millisecond timestamp (Invalid timestamp), so its empty list proves nothing. Re-run with a supported format:
+command: find <installed-creator> -newermt 2026-10-05T11:55:36Z -print   (run at 2026-10-05T11:55:45Z)
+exit_code: 0
+files modified since 11:55:36Z: none
+command: find <installed-creator> -newermt 2026-10-05T11:31:00Z -print   (since this session started)
+exit_code: 0
+files modified since 11:31:00Z: none

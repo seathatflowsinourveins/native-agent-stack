@@ -1,0 +1,463 @@
+{
+  "schema_version": 1,
+  "id": "skills-readiness-native-returned-outputs-20261005",
+  "scope": "Jobs 1 and 2: exact private native returned stdout/stderr, with declared public path redactions and one appended final LF. Raw files remain outside Git; no raw conversations or credential material are published.",
+  "private_locator": "Owned lane cache readiness-20261005/logs/<name>; machine-specific absolute path deliberately omitted.",
+  "sanitization": {
+    "owned_scratch_prefix": "<scratch>",
+    "remaining_personal_home_prefix": "/home/<user>",
+    "temporary_path": "<upstream-temporary-path>",
+    "public_encoding": "UTF-8 path-sanitized native text normalized to one final LF; an empty stream is represented by one LF. Three trailing-space sites are trimmed in vercel-build.stdout. All actual public hashes and per-file transformations are recorded; sanitized_output_sha256 identifies the path-only transform before formatting normalizations."
+  },
+  "files": [
+    {
+      "name": "trailofbits-claude-install.stderr",
+      "raw_sha256": "a9a14bf5d2540e6ab98b7b71aef54f5932cca1d7f61b2be78cda972bff20d5c8",
+      "raw_bytes": 465,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "a9a14bf5d2540e6ab98b7b71aef54f5932cca1d7f61b2be78cda972bff20d5c8",
+      "artifact_bytes": 465,
+      "sanitized_output_sha256": "a9a14bf5d2540e6ab98b7b71aef54f5932cca1d7f61b2be78cda972bff20d5c8"
+    },
+    {
+      "name": "trailofbits-claude-install.stdout",
+      "raw_sha256": "bf14b7a2bc076990244fa3239536925868dfe5ad05089c7d459b5fa482abfc72",
+      "raw_bytes": 24,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "bf14b7a2bc076990244fa3239536925868dfe5ad05089c7d459b5fa482abfc72",
+      "artifact_bytes": 24,
+      "sanitized_output_sha256": "bf14b7a2bc076990244fa3239536925868dfe5ad05089c7d459b5fa482abfc72"
+    },
+    {
+      "name": "trailofbits-claude-loadability.stderr",
+      "raw_sha256": "4c04c324ed5a534f85df659ee024acb408be9a51009bd1744d6c9ad2d8d479ba",
+      "raw_bytes": 1620,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 5,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "fd07cb4e859fffe4b3022278d65aed3a084ad9a72b65496d1c7423e187445d77",
+      "artifact_bytes": 1360,
+      "sanitized_output_sha256": "fd07cb4e859fffe4b3022278d65aed3a084ad9a72b65496d1c7423e187445d77"
+    },
+    {
+      "name": "trailofbits-claude-loadability.stdout",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "artifact_bytes": 1,
+      "sanitized_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "trailofbits-clone.log",
+      "raw_sha256": "43abc510dd77d5e4af9e03f009ea48a64f0b2e7023d1513ee3f005f8234a5c8a",
+      "raw_bytes": 99,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 1,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "c56822b40e0d1ad7850dff07ad920aa023774f75da2fc96034bae061bcbcd4d6",
+      "artifact_bytes": 47,
+      "sanitized_output_sha256": "c56822b40e0d1ad7850dff07ad920aa023774f75da2fc96034bae061bcbcd4d6"
+    },
+    {
+      "name": "trailofbits-codex-ci-loadability.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "artifact_bytes": 1,
+      "sanitized_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "trailofbits-codex-ci-loadability.stdout",
+      "raw_sha256": "32d00a26fb48ceb00e9ec42f3a22cfdb2dd0cf48ea6d6da6464bc7bfa80415cf",
+      "raw_bytes": 113,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "32d00a26fb48ceb00e9ec42f3a22cfdb2dd0cf48ea6d6da6464bc7bfa80415cf",
+      "artifact_bytes": 113,
+      "sanitized_output_sha256": "32d00a26fb48ceb00e9ec42f3a22cfdb2dd0cf48ea6d6da6464bc7bfa80415cf"
+    },
+    {
+      "name": "trailofbits-codex-host-loadability.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "artifact_bytes": 1,
+      "sanitized_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "trailofbits-codex-host-loadability.stdout",
+      "raw_sha256": "32d00a26fb48ceb00e9ec42f3a22cfdb2dd0cf48ea6d6da6464bc7bfa80415cf",
+      "raw_bytes": 113,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "32d00a26fb48ceb00e9ec42f3a22cfdb2dd0cf48ea6d6da6464bc7bfa80415cf",
+      "artifact_bytes": 113,
+      "sanitized_output_sha256": "32d00a26fb48ceb00e9ec42f3a22cfdb2dd0cf48ea6d6da6464bc7bfa80415cf"
+    },
+    {
+      "name": "trailofbits-codex-install.stderr",
+      "raw_sha256": "c8d3634b4eedadeb6fe94129864315d296b329f9ab4b12383c606fe5ef8ba1f3",
+      "raw_bytes": 27,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "c8d3634b4eedadeb6fe94129864315d296b329f9ab4b12383c606fe5ef8ba1f3",
+      "artifact_bytes": 27,
+      "sanitized_output_sha256": "c8d3634b4eedadeb6fe94129864315d296b329f9ab4b12383c606fe5ef8ba1f3"
+    },
+    {
+      "name": "trailofbits-codex-install.stdout",
+      "raw_sha256": "0084a2467ddcb7209a9d3143448e657c43875f2b05b5c0c5e89ed25ab6b9a3dd",
+      "raw_bytes": 24,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "0084a2467ddcb7209a9d3143448e657c43875f2b05b5c0c5e89ed25ab6b9a3dd",
+      "artifact_bytes": 24,
+      "sanitized_output_sha256": "0084a2467ddcb7209a9d3143448e657c43875f2b05b5c0c5e89ed25ab6b9a3dd"
+    },
+    {
+      "name": "trailofbits-emails.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "artifact_bytes": 1,
+      "sanitized_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "trailofbits-emails.stdout",
+      "raw_sha256": "1af7cd40cd7ea9a58a9de001719d2bd2b95c1a051c3fb216476d19ba7edf1323",
+      "raw_bytes": 57,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "1af7cd40cd7ea9a58a9de001719d2bd2b95c1a051c3fb216476d19ba7edf1323",
+      "artifact_bytes": 57,
+      "sanitized_output_sha256": "1af7cd40cd7ea9a58a9de001719d2bd2b95c1a051c3fb216476d19ba7edf1323"
+    },
+    {
+      "name": "trailofbits-frontmatter.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "artifact_bytes": 1,
+      "sanitized_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "trailofbits-frontmatter.stdout",
+      "raw_sha256": "5895bbd3a491bbe88309c79d82a3f76cf8f2c01608c69ec394809fb2ac757c46",
+      "raw_bytes": 78,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "5895bbd3a491bbe88309c79d82a3f76cf8f2c01608c69ec394809fb2ac757c46",
+      "artifact_bytes": 78,
+      "sanitized_output_sha256": "5895bbd3a491bbe88309c79d82a3f76cf8f2c01608c69ec394809fb2ac757c46"
+    },
+    {
+      "name": "trailofbits-metadata-self-test.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "artifact_bytes": 1,
+      "sanitized_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "trailofbits-metadata-self-test.stdout",
+      "raw_sha256": "a103f57f399678c294905cd838439cbb8c7e9c330fe5bd57c77a331a1dcd23d2",
+      "raw_bytes": 48,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "a103f57f399678c294905cd838439cbb8c7e9c330fe5bd57c77a331a1dcd23d2",
+      "artifact_bytes": 48,
+      "sanitized_output_sha256": "a103f57f399678c294905cd838439cbb8c7e9c330fe5bd57c77a331a1dcd23d2"
+    },
+    {
+      "name": "trailofbits-metadata.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "artifact_bytes": 1,
+      "sanitized_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "trailofbits-metadata.stdout",
+      "raw_sha256": "1caf3f26d0225c30c51855973b01d02c3070c3c8bcb93ac229a01d393789d9d9",
+      "raw_bytes": 860,
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "tmp_path_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "1caf3f26d0225c30c51855973b01d02c3070c3c8bcb93ac229a01d393789d9d9",
+      "artifact_bytes": 860,
+      "sanitized_output_sha256": "1caf3f26d0225c30c51855973b01d02c3070c3c8bcb93ac229a01d393789d9d9"
+    },
+    {
+      "name": "vercel-build.stderr",
+      "raw_sha256": "afe8ea800f5a5da7920305f151693547da25e9e63a14df96dca3ea87017990a6",
+      "raw_bytes": 1652,
+      "sanitized_output_sha256": "afe8ea800f5a5da7920305f151693547da25e9e63a14df96dca3ea87017990a6",
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "bde1a57f9c00ae1c4e38da82e1066140cde83a320a2c640d9fb411fe81f0a608",
+      "artifact_bytes": 1651
+    },
+    {
+      "name": "vercel-build.stdout",
+      "raw_sha256": "de3adc36fbced15d23dd111e6544ce54a77b884603c0479b0a48e456bc86a6b4",
+      "raw_bytes": 724,
+      "sanitized_output_sha256": "c505c1e2effeff1cf7062673eeb80fa1fade6885a45d764fda2182ec8fe443e6",
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 3,
+        "remaining_home_replacements": 0,
+        "trailing_space_lines_trimmed": 3,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "12d1802ff32b47774120f6ae9ec4cd7b0fe7284209b5f3c6a973b7cd180f938e",
+      "artifact_bytes": 565
+    },
+    {
+      "name": "vercel-clone.stderr",
+      "raw_sha256": "4019931d2ebf374af793374217a5d15192ba4c4fed8e7349e4936155aedb2168",
+      "raw_bytes": 94,
+      "sanitized_output_sha256": "0c2fa29f136d4d0d9076b3bd1ad425b1a36d372114b3ff67f1a47a7e7b229f25",
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 1,
+        "remaining_home_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "0c2fa29f136d4d0d9076b3bd1ad425b1a36d372114b3ff67f1a47a7e7b229f25",
+      "artifact_bytes": 42
+    },
+    {
+      "name": "vercel-clone.stdout",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sanitized_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "artifact_bytes": 1
+    },
+    {
+      "name": "vercel-format.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sanitized_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "artifact_bytes": 1
+    },
+    {
+      "name": "vercel-format.stdout",
+      "raw_sha256": "121e3ea14e53c408cb2e9fe79b3673933329b8f4e3c7a4dc6f8ee25a11c550d9",
+      "raw_bytes": 223,
+      "sanitized_output_sha256": "7e3db2339f152eafb4b6b8948348a06266b56ddce05b9367cb8b73c44fb60702",
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 1,
+        "remaining_home_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "7e3db2339f152eafb4b6b8948348a06266b56ddce05b9367cb8b73c44fb60702",
+      "artifact_bytes": 171
+    },
+    {
+      "name": "vercel-install.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sanitized_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "artifact_bytes": 1
+    },
+    {
+      "name": "vercel-install.stdout",
+      "raw_sha256": "4e809d8c16843ededbf2452fd74161a6ac03bb5229b0b6543c1797ee7dece31c",
+      "raw_bytes": 785,
+      "sanitized_output_sha256": "243dc98598ce8c022c2ad46c8a1bf9aad384f3ca6f42a19352cdc67d26a0788d",
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 1,
+        "remaining_home_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "243dc98598ce8c022c2ad46c8a1bf9aad384f3ca6f42a19352cdc67d26a0788d",
+      "artifact_bytes": 733
+    },
+    {
+      "name": "vercel-tests-retry.stderr",
+      "raw_sha256": "4044235528ab49fb59313c61ec902663ba26ab63bcfc8b8d353d191af4bc13d8",
+      "raw_bytes": 1096,
+      "sanitized_output_sha256": "4044235528ab49fb59313c61ec902663ba26ab63bcfc8b8d353d191af4bc13d8",
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "41b553107f4eeb7c83a637636f11102d3fd60e04778d62cb73b2f55e3777fdab",
+      "artifact_bytes": 1095
+    },
+    {
+      "name": "vercel-tests-retry.stdout",
+      "raw_sha256": "54a5b171ef18493a8706879d4aa78360852b6c766e45659bb7e518f2872972a2",
+      "raw_bytes": 2888,
+      "sanitized_output_sha256": "fd9b311d9461599cb18b9399e1dd3190777c37aa15403671e9ecb671aee2cb6f",
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 2,
+        "remaining_home_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "fd9b311d9461599cb18b9399e1dd3190777c37aa15403671e9ecb671aee2cb6f",
+      "artifact_bytes": 2784
+    },
+    {
+      "name": "vercel-tests.stderr",
+      "raw_sha256": "a0903844c484f3705c55f8a2decad0bd963b144078ef2def61b58c48b6e1d62f",
+      "raw_bytes": 1614,
+      "sanitized_output_sha256": "a0903844c484f3705c55f8a2decad0bd963b144078ef2def61b58c48b6e1d62f",
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "64bbe990561a2459793dba873f3259b33a77c151f84053beb268268143d98e9c",
+      "artifact_bytes": 1613
+    },
+    {
+      "name": "vercel-tests.stdout",
+      "raw_sha256": "b726352d9378c9e9ea84bc450aa3481f4d9a701c5b82db9dc3dd07155f5f13bb",
+      "raw_bytes": 2978,
+      "sanitized_output_sha256": "3900cc5b8c82553635e0b4402a8e10ce4ac06f2c2b7d812494f22546e3e30422",
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 2,
+        "remaining_home_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "3900cc5b8c82553635e0b4402a8e10ce4ac06f2c2b7d812494f22546e3e30422",
+      "artifact_bytes": 2874
+    },
+    {
+      "name": "vercel-typecheck.stderr",
+      "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "raw_bytes": 0,
+      "sanitized_output_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 0,
+        "remaining_home_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "artifact_bytes": 1
+    },
+    {
+      "name": "vercel-typecheck.stdout",
+      "raw_sha256": "aca9d4252688ab72e7f2cd203f4b918814d2b3c15d670fcec4a3054e70d3768b",
+      "raw_bytes": 119,
+      "sanitized_output_sha256": "5cc54aacffea38a99d89e99a47e1a083d9f1e29cb8e10ebe43e9ce17d4309450",
+      "sanitization": {
+        "owned_scratch_prefix_replacements": 1,
+        "remaining_home_replacements": 0,
+        "final_newline": "Normalized to one final LF; native raw bytes retained separately"
+      },
+      "artifact_sha256": "1a72b2908bfb7a23dd4a6fc44a37be9f17d55b807f9a1df3cbbec250c3a57859",
+      "artifact_bytes": 66
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "id": "fresh-codex-authoring-read-only-critic-20261005",
+  "evidence_class": "independent_observation",
+  "reviewer_role": "Separate read-only GPT lane worker, source/artifact/native-stream inspection; no writes, network, installs, suites or fan-out",
+  "scope": ["codex-authoring.json", "authoring-fixture.json", "Private fresh Codex JSONL and created artifacts"],
+  "observed": {"full_creator_read_stream_line": 7, "initializer_exit_0_stream_line": 31, "valid_native_validator_exit_0_stream_line": 45, "invalid_native_validator_exit_1_stream_line": 51, "single_final_turn_usage_stream_line": 75, "frozen_input_hashes_matched": 3, "artifact_hashes_matched": 5, "creator_returned_body_sha256": "6656e54755638e8efcf275a472b9672eaa8a9a1b9e59dc210e275b03b59e1e66", "native_stream_sha256": "ca941a678eb3d859cec436e17cb6a5342d3d7595e227d2a959a495ade2c39cdf", "creation_controls_passed": true, "behavioral_execution_performed": false, "usage_subsets_preserved": true, "provider_identity_unknown_preserved": true, "first_failure_retained": true, "edits_in_owned_scratch": true},
+  "finding": "Add exact native initialization/validation locators at upstream SKILL.md:175 and :208; root verified those source lines and added them. No material acceptance overstatement found.",
+  "sources": ["openai/codex@rust-v0.160.0:codex-rs/skills/src/assets/samples/skill-creator/SKILL.md:175", "openai/codex@rust-v0.160.0:codex-rs/skills/src/assets/samples/skill-creator/SKILL.md:208", "openai/codex@rust-v0.160.0:codex-rs/skills/src/assets/samples/skill-creator/SKILL.md:211"],
+  "limitations": "This gate is fresh creation and structural validation. No behavioral A/B, automatic activation, production skill acceptance, lifecycle install or worker discovery is claimed. Claude quota failure is not model acceptance."
+}

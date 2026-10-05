@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "id": "skills-readiness-local-checks-20261005",
+  "evidence_class": "local_integration",
+  "base_commit": "c148e049efee75f8ea8a9a009e7b96b1e97f5c28",
+  "checked_source_sha256": {
+    "blueprints/runtime-workers/openhands/host.py": "f0136bad4074f93172c6db175ed1e9eeee2cd7f327ea72f29a9fa8b887a33121",
+    "tests/test_install_skills.py": "b5dc2dc30e16c9c435789d343ce35c725801340d259b7f1c6e1531635fb80970",
+    "tests/test_runtime_worker_openhands.py": "0b99ea8856c4ef855492fd4cd2196f726869b11195e66bcc90477182c7db52d8",
+    "tests/test_runtime_worker_openhands_resolver.py": "20894ff19d6122812d42e00f6bfec564f49e4d05081037e36b1e3245a818f7da",
+    "tools/adoption/install_skills.py": "15630fa1c5990f047ce85adfb53c2a570bd29f515480c2d6df21a450a9fde50c",
+    "scripts/validate.py": "2deb008f40032fd860c1386e11518bc8d8f5b21df40b5ff70f13ef4151ca69ab"
+  },
+  "commands": [
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_install_skills",
+        "tests.test_skills_manifest",
+        "tests.test_runtime_worker_skills",
+        "tests.test_runtime_worker_openhands",
+        "tests.test_runtime_worker_openhands_resolver",
+        "tests.test_skills_status"
+      ],
+      "exit_code": 0,
+      "tests": 457,
+      "skips": 3,
+      "scope": "Fresh after rebase; no later implementation changes",
+      "raw_outputs": [
+        {
+          "path": "<scratch>/logs/repo-skills-tests.stdout",
+          "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "raw_bytes": 0
+        },
+        {
+          "path": "<scratch>/logs/repo-skills-tests.stderr",
+          "raw_sha256": "306f45b54107f2812a25ca2650db584896d327299959d8f2c47855a48c897257",
+          "raw_bytes": 736
+        }
+      ]
+    },
+    {
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "tests.test_adoption_docs_consistency",
+        "tests.test_release_pin_contents"
+      ],
+      "exit_code": 0,
+      "tests": 61,
+      "skips": 1,
+      "scope": "Fresh on completed readiness documentation at 2026-10-05 13:00Z",
+      "raw_outputs": [
+        {
+          "path": "<scratch>/logs/repo-docs-final.stdout",
+          "raw_sha256": "cc651d7bf75c763aef63f40ea72936fc7e03c186d6a7b31f8cb692d61715ece4",
+          "raw_bytes": 781
+        },
+        {
+          "path": "<scratch>/logs/repo-docs-final.stderr",
+          "raw_sha256": "1428bd08eb2c2000b63e76b9a943d77c088bd8e4c21213900c5e14e36ad7aae2",
+          "raw_bytes": 368
+        }
+      ]
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "exit_code": 0,
+      "scope": "Completed publication immediately before registering this receipt; final canonical validation runs again after registration",
+      "declared_summary": {
+        "components": 69,
+        "hashed_files": 10261,
+        "profiles": 4,
+        "receipts": 203,
+        "status": "passed"
+      },
+      "raw_outputs": [
+        {
+          "path": "<scratch>/logs/repo-validate-publication.stdout",
+          "raw_sha256": "bc0a878c01747269ee76e458522e797c91de522282f9d9940896e6ea53c14c3e",
+          "raw_bytes": 162
+        },
+        {
+          "path": "<scratch>/logs/repo-validate-publication.stderr",
+          "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "raw_bytes": 0
+        }
+      ]
+    }
+  ],
+  "retained_failed_checks": [
+    {
+      "argv": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "exit_code": 1,
+      "cause": "Coordinator started validation before the registry writer finished; validator read an incomplete list",
+      "raw_outputs": [
+        {
+          "path": "<scratch>/logs/repo-validate-final.stdout",
+          "raw_sha256": "0fc94c05a81fe742a4a0c21b409216688a80dc3d76a7ab991d01cd7d0bfaa2a4",
+          "raw_bytes": 9880
+        },
+        {
+          "path": "<scratch>/logs/repo-validate-final.stderr",
+          "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "raw_bytes": 0
+        }
+      ]
+    },
+    {
+      "argv": [
+        "python3",
+        "scripts/validate.py"
+      ],
+      "exit_code": 1,
+      "cause": "Publication gate found private session identifier and encoded home path in native completion report; redacted before publication",
+      "raw_outputs": [
+        {
+          "path": "<scratch>/logs/repo-validate-final-retry.stdout",
+          "raw_sha256": "8d6bde38bb49dd92e49b6e2a7948a4be12974ef8bdd76065640bfa7f1dd2e500",
+          "raw_bytes": 260
+        },
+        {
+          "path": "<scratch>/logs/repo-validate-final-retry.stderr",
+          "raw_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "raw_bytes": 0
+        }
+      ]
+    }
+  ],
+  "release_warning": "15 new-machine files differ from v2026.10.05.1; pinned host recipes run released copies, so later release/re-pin remains a command-center dependency",
+  "acceptance_boundary": "Our integration, fixture and publication checks only; not upstream native skill acceptance, live model/worker discovery, provider/GPU acceptance or a readiness promotion",
+  "raw_output_retention": "Exact actual stdout/stderr retained in owned private scratch; hashes and command outcomes above are observations, not a reconstructed run",
+  "one_heavy_step_and_paper_windows": "Runs serialized and outside strict paper windows"
+}

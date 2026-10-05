@@ -1,0 +1,103 @@
+
+> skills@1.7.0 test <scratch>/vercel-skills
+> vitest
+
+
+ RUN  v4.1.10 <scratch>/vercel-skills
+
+ ❯ tests/dist.test.ts (1 test | 1 failed) 8ms
+     × builds and runs without errors 7ms
+│
+●   codex  Agent detected — removing non-interactively
+[?25l│
+[?25l│
+◇  Found 1 Notion pack in workspace Acme HQ
+[?25h│
+◇  Selected 1 Notion pack ─╮
+│                          │
+│  Company-wide            │
+│                          │
+├──────────────────────────╯
+◇  Found 1 unique installed skill(s)
+[?25h[?25l│
+[?25l│
+◇  Removal process complete
+[?25h│
+●  Restoring 1 skill from skills-lock.json into .agents/skills/
+│
+■  Cannot restore skill-a: skills-lock.json is missing sourceUrl for this generic Git source
+│
+●  Restoring 1 skill from skills-lock.json into .agents/skills/
+│
+◆  Successfully removed 1 skill(s)
+│
+└  Done!
+
+◇  Prepared 1 Notion pack with 1 skill
+[?25h
+[38;5;102mChecking skills from source: owner/repo[0m[K
+
+[K
+[38;5;102mChecking skills from source: owner/repo[0m[K
+
+[K
+[38;5;102mChecking skills from source: owner/repo[0m[K
+
+[K
+[38;5;102mChecking skills from source: owner/repo[0m[K
+
+[38;5;102mChecking skills from source: owner/repo[0m[K
+
+[K
+[38;5;102mChecking skills from source: owner/private-repo[0m[K
+
+[K
+[38;5;102mChecking skills from source: owner/private-repo[0m[K
+
+[K
+[38;5;102mChecking skills from source: git@gitea.example.com:owner/repo.git[0m[K
+
+[K
+[38;5;102mChecking skills from source: ssh://git@github.com/owner/repo[0m[K
+
+[K
+[38;5;102mChecking skills from source: acme/skills[0m[K
+
+[K│
+●   codex  Agent detected — removing non-interactively
+[?25l│
+
+[38;5;102mChecking skills from source: owner/repo[0m[K
+
+[K
+[38;5;102mChecking skills from source: https://github.example.com/acme/skills.git[0m[K
+
+[K
+[38;5;102mChecking skills from source: owner/repo[0m[K
+
+[K[?25l│
+◇  Downloaded skill from Notion in workspace Acme HQ
+[?25h[?25l│
+◇  Failed to prepare Notion skill
+[?25h[?25l│
+◇  Downloaded skill from Notion
+[?25h◇  Found 1 unique installed skill(s)
+[?25h[?25l│
+◇  Removal process complete
+[?25h│
+◆  Successfully removed 1 skill(s)
+│
+└  Done!
+
+stdout | tests/private-repo-add-security.test.ts > private repository installs > falls back to normal Git authentication without reading stored gh credentials
+
+
+ ❯ tests/private-repo-add-security.test.ts (4 tests | 1 failed) 126ms
+     × falls back to normal Git authentication without reading stored gh credentials 53ms
+
+ Test Files  2 failed | 60 passed (62)
+      Tests  2 failed | 873 passed (875)
+   Start at  06:13:02
+   Duration  9.76s (transform 30.12s, setup 0ms, import 38.19s, tests 38.21s, environment 8ms)
+
+ ELIFECYCLE  Test failed. See above for more details.

@@ -1,0 +1,39 @@
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/dist.test.ts > dist build > builds and runs without errors
+Error: Command failed: pnpm build
+/bin/sh: 1: pnpm: not found
+
+ ❯ tests/dist.test.ts:10:5
+      8|   it('builds and runs without errors', { timeout: 30000 }, () => {
+      9|     // Build the project
+     10|     execSync('pnpm build', { cwd: rootDir, stdio: 'pipe' });
+       |     ^
+     11|
+     12|     // Run the CLI - should exit cleanly with help output
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/private-repo-add-security.test.ts > private repository installs > falls back to normal Git authentication without reading stored gh credentials
+Error: [vitest] No "GitCloneError" export is defined on the "../src/git.ts" mock. Did you forget to return it from "vi.mock"?
+If you need to partially mock a module, you can use "importOriginal" helper inside:
+
+vi.mock(import("../src/git.ts"), async (importOriginal) => {
+  const actual = await importOriginal()
+  return {
+    ...actual,
+    // your mocked methods
+  }
+})
+
+ ❯ Module.runAdd src/add.ts:2317:26
+    2315|     await promptForFindSkills(options, targetAgents);
+    2316|   } catch (error) {
+    2317|     if (error instanceof GitCloneError) {
+       |                          ^
+    2318|       p.log.error(pc.red('Failed to clone repository'));
+    2319|       // Print each line of the error message separately for better fo…
+ ❯ tests/private-repo-add-security.test.ts:110:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯

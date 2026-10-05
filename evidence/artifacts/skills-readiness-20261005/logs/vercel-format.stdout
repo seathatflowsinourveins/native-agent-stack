@@ -1,0 +1,6 @@
+
+> skills@1.7.0 format:check <scratch>/vercel-skills
+> prettier --check "src/**/*.ts" "scripts/**/*.ts"
+
+Checking formatting...
+All matched files use Prettier code style!

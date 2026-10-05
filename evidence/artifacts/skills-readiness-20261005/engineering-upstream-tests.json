@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "engineering-process-upstream-test-availability-20261005",
+  "checked_at": "2026-10-05",
+  "slot": "instructions-skills/engineering-process-skills",
+  "evidence_class": "source_review",
+  "repository": "https://github.com/mattpocock/skills",
+  "reviewed_commit": "d81f3a183412e71a5b1e84ca21bc1a35eea03a60",
+  "package_version": "1.2.3",
+  "observed": {
+    "workflow_files": [".github/workflows/release.yml"],
+    "workflow_test_steps": 0,
+    "package_scripts": {
+      "changeset": "changeset",
+      "version": "changeset version && node scripts/sync-plugin-version.mjs",
+      "check-plugin-version": "node scripts/sync-plugin-version.mjs --check"
+    },
+    "package_test_script": false,
+    "runnable_behavioral_suite_found_in_checked_sources": false,
+    "test_guidance": "skills/engineering/tdd/tests.md",
+    "metadata_checker_available": true,
+    "source_worktree_clean": true,
+    "install_documentation": "README.md:52 (npx skills@latest add mattpocock/skills); line 55 describes selection/setup",
+    "installation_performed": false,
+    "tests_executed": false
+  },
+  "disposition": "Upstream behavioral-test unavailability recorded in the checked pinned workflow, package scripts and tracked source tree. Metadata version validation and the documented native installation operation remain distinct evidence classes. No easier local demo substitutes for an unavailable upstream suite; no READY or fresh-session-use claim follows from this source review.",
+  "scope": "The absence finding is limited to these exact checked sources; it is not a universal claim about all unpublished or external upstream testing.",
+  "sources": [
+    "mattpocock/skills@d81f3a183412e71a5b1e84ca21bc1a35eea03a60:.github/workflows/release.yml:24",
+    "mattpocock/skills@d81f3a183412e71a5b1e84ca21bc1a35eea03a60:package.json:11",
+    "mattpocock/skills@d81f3a183412e71a5b1e84ca21bc1a35eea03a60:README.md:52",
+    "vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73:README.md",
+    "native-agent-stack@ec0b8fd821a7b2004c331d2185b33d9e5ed47896:docs/acceptance-evidence-policy.md:37"
+  ],
+  "related_historical_native_operation": "Existing lifecycle readiness and co-op fixwave receipts retain Skills CLI 1.7.0 listings/check-only observations. They are native operations, not a newly executed upstream behavioral suite. Shared post-repair fresh headless engineering-skill probes are owned by the co-op."
+}
