@@ -226,7 +226,9 @@ def insert_mcp_gh_config_dir(config_text: str, gh_dir: str) -> tuple[str, list[s
     with their own env table and HOME, so a server that runs commands (context-mode's ctx_execute, ctx_batch_execute)
     would otherwise reach the host gh login. A server with an [mcp_servers.<name>.env] table gets the line in that
     table; a server without env gets a new [mcp_servers.<name>.env] table at the end; an inline env is refused (the
-    clone gate then fails and the trial is censored, never guessed)."""
+    clone gate then fails and the trial is censored, never guessed). A server's env adds to Codex's default variables
+    (HOME, PATH, ...) rather than replacing them (openai/codex@rust-v0.160.0 codex-rs/rmcp-client/src/utils.rs:16-39,
+    DEFAULT_ENV_VARS at :163-166), so a new env table leaves a server's start unchanged apart from GH_CONFIG_DIR."""
     import tomllib
     parsed = tomllib.loads(config_text)
     servers = stdio_mcp_servers(parsed)

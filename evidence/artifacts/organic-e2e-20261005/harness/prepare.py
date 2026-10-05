@@ -153,7 +153,7 @@ def promptfoo_config(work: Path, code: str, tests: list[dict]) -> str:
 
 
 def app_server_config(code: str, trial_id: str, test: dict, fixture_dir: Path, clone: Path, gh_dir: Path,
-                      path_value: str) -> str:
+                      path_value: str, t_seconds: int = T_SECONDS) -> str:
     """CL7b: promptfoo's own openai:codex-app-server provider, one provider entry (and config) per trial."""
     otel = f"ecosystem.task.id={trial_id},ecosystem.lane={test['lane']},service.instance.id={trial_id}"
     cfg = [f"description: {yaml_quote(code)}",
@@ -163,7 +163,7 @@ def app_server_config(code: str, trial_id: str, test: dict, fixture_dir: Path, c
            f"      working_dir: {yaml_quote(str(fixture_dir))}", "      skip_git_repo_check: true", "      ephemeral: false",
            "      reuse_server: false", "      approval_policy: never", f"      sandbox_mode: {yaml_quote(test['sandbox'])}",
            "      network_access_enabled: false", "      model: gpt-6.1-sol", "      model_reasoning_effort: max",
-           f"      turn_timeout_ms: {T_SECONDS * 1000}", "      cli_config:", "        profile: omniroute",
+           f"      turn_timeout_ms: {t_seconds * 1000}", "      cli_config:", "        profile: omniroute",
            "        service_tier: default", "        otel:", f"          environment: {yaml_quote(trial_id)}",
            "      cli_env:", f"        CODEX_HOME: {yaml_quote(str(clone))}", "        OMNIROUTE_API_KEY: local-loopback",
            f"        GH_CONFIG_DIR: {yaml_quote(str(gh_dir))}",
@@ -235,7 +235,8 @@ def main(argv=None) -> int:
     parser.add_argument("--claude-completion", choices=("censor-at-T", "complete-at-result"), default=None,
                         help="what a Claude result event before T means; needs --amendment-ref (finding 3)")
     parser.add_argument("--claude-grace-s", type=int, default=POST_RESULT_GRACE_S)
-    parser.add_argument("--claude-t-seconds", type=int, default=T_SECONDS)
+    parser.add_argument("--claude-t-seconds", type=int, default=T_SECONDS,
+                        help="the run's T for every cell, CL7b's turn timeout included (another value needs --amendment-ref)")
     parser.add_argument("--amendment-ref", default=None, help="the CC amendment the completion policy or T rests on")
     parser.add_argument("--registry-review", default=None, help="JSON {reviewed: [paths], reviewer, at}: the hint "
                         "reader's reviewed routing-file registry; organic trials refuse while it is provisional")
@@ -475,7 +476,7 @@ def main(argv=None) -> int:
                 fixture_dir = fixture.extract_fixture(Path(fx["tar"]["path"]), fx["tar"]["sha256"])
                 clone = work / "clones" / trial_id
                 clone_record = arms.build_clone(clone, spec["arm"], GH_EMPTY, rules_text)
-                text = app_server_config(code, trial_id, test, fixture_dir, clone, GH_EMPTY, path_value)
+                text = app_server_config(code, trial_id, test, fixture_dir, clone, GH_EMPTY, path_value, args.claude_t_seconds)
                 neutral = work / "p" / f"{code}-t{index}.yaml"
                 neutral.write_text(text, encoding="utf-8")
                 record["trials"].append({"trial_id": trial_id, "ref": test["ref"], "test_key": test["test_key"],
