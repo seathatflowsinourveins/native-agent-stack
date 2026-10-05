@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "gate_id": "ibkr-local-acceptance",
+  "step": "acceptance-plan 5.1 read-only",
+  "client": "ibapi (official IB API client)",
+  "host": "127.0.0.1",
+  "port": 4002,
+  "client_id": 73,
+  "deadline_seconds": 90.0,
+  "generated_at": "2026-10-05T13:35:05.192621+00:00",
+  "ibapi_version": "10.45.1",
+  "status": "passed",
+  "evidence_class": "native_paper_readonly",
+  "existing_state": {
+    "positions": 0,
+    "open_orders": 0
+  },
+  "requests_completed": {
+    "accounts": true,
+    "time": true,
+    "positions": true,
+    "orders": true,
+    "summary": true,
+    "contract": true,
+    "mktdata": true,
+    "history": true
+  },
+  "exit_code": 0,
+  "observed": {
+    "account_count": 1,
+    "paper_accounts": true,
+    "server_time_epoch": 1791207305,
+    "positions": 0,
+    "open_orders": 0,
+    "summary_tags": [
+      "AccountType",
+      "BuyingPower",
+      "NetLiquidation",
+      "TotalCashValue"
+    ],
+    "spy_contract": {
+      "conId": 756733,
+      "secType": "STK",
+      "currency": "USD",
+      "exchange": "SMART",
+      "primaryExchange": "ARCA",
+      "longName": "SS SPDR S&P 500 ETF TRUST-US",
+      "tradingHoursSample": "20261005:0400-20261005:2000;20261006:040"
+    },
+    "market_data_type": "REALTIME",
+    "spy_quote": {
+      "last_trade_epoch": 1791207306,
+      "last": 770.8,
+      "first_tick_local_epoch": 1791207306.8028593,
+      "bid": 770.79,
+      "ask": 770.8
+    },
+    "history": {
+      "bars": 80,
+      "first": "1790947800",
+      "last": "1791207300"
+    },
+    "errors": [],
+    "server_minus_local_s": -1.008,
+    "quote_age_s": -0.19,
+    "max_quote_age_s": 900.0,
+    "info": [
+      {
+        "reqId": -1,
+        "code": 2104
+      },
+      {
+        "reqId": -1,
+        "code": 2107
+      },
+      {
+        "reqId": -1,
+        "code": 2158
+      },
+      {
+        "reqId": -1,
+        "code": 2106
+      }
+    ]
+  },
+  "publication": {
+    "source_artifact": "ibapi-receipt.json",
+    "source_sha256": "0199aefb1b311b82cf3c4925644856cfe1b0ed43f1c26a03a17312a24bcca469",
+    "sanitization": "Allowlist projection; informational callback text and account type omitted. Account identifiers and balances are not published; the account is represented only by count and the DU-prefix boolean."
+  }
+}

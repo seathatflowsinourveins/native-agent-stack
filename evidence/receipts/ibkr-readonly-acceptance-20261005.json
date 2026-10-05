@@ -1,0 +1,386 @@
+{
+  "id": "ibkr-readonly-acceptance-20261005",
+  "kind": "broker_readonly_acceptance",
+  "evidence_class": "native_paper_readonly",
+  "gate_id": "ibkr-local-acceptance",
+  "gate_status_after": "not_established",
+  "claim": "The 2026-10-05 frozen scheduled IBKR paper read-only run passed through the official ibapi 10.45.1 client and NautilusTrader 2.0.0rc5 HistoricalInteractiveBrokersClient. The official receipt reports one DU-prefix paper account, zero positions/open orders, REALTIME SPY contract/quote data and zero noninformational errors; the native adapter resolved SPY.ARCA and returned five daily bars and 390 five-minute bars. Native process exit 0 and terminal strong_native_postcheck exit 0 corroborate clean completion of this bounded read-only sequence.",
+  "north_star_action": "Qualify the selected NautilusTrader 2.0.0rc5/IBKR destination's paper read-only data access before separate order, recovery and reconciliation acceptance.",
+  "first_clean_run_scope": "First clean paired run under the 2026-10-03 frozen Monday schedule and paper Gateway container configuration; the 2026-09-23 paired read-only receipt is earlier separate evidence.",
+  "observed_utc": "2026-10-05T13:35:05.192621+00:00",
+  "terminal_checked_at_utc": "2026-10-05T13:35:10.954043+00:00",
+  "plan_path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/plan.json",
+  "plan_sha256": "edd7fba5a0e5167499eb3f4d2874125f4d50427bed939f01e4375b7e0726b57c",
+  "preregistered": false,
+  "plan_history": "The original step-1 plan predates the first September run but was not independently reviewed before it. The supplied October FREEZE.md and CHECKS.json record preparation on 2026-10-03; this publication does not promote them to independently reviewed preregistration.",
+  "deviations_from_plan": [
+    "The maintained official ibapi and selected Nautilus probes replace the original plan's hand-rolled protocol client; no hand-rolled client was used in this run.",
+    "Official client id 73 and native client id 76 replace the planned client id 71.",
+    "The official probe returned 80 bars for 2 D of 5-minute TRADES; the native probe returned both 1-DAY-LAST and 5-MINUTE-LAST over 5 D, ending 2026-10-04T20:00:00+00:00.",
+    "The actual granted market-data type was REALTIME; the original plan names DELAYED.",
+    "Raw outputs remain private; sanitized projections are published under evidence/ rather than the gate's flip receipt."
+  ],
+  "tool_versions": {
+    "ibapi": "10.45.1",
+    "nautilus_trader": "2.0.0rc5"
+  },
+  "paper_gateway": {
+    "repository": "https://github.com/gnzsnz/ib-gateway-docker",
+    "image": "ghcr.io/gnzsnz/ib-gateway:10.51.1b@sha256:69db6310cd75d5d0aca3a70c05dc5ad77b2be29ad75360a3f1e393454f2efa59",
+    "version": "10.51.1b",
+    "digest": "sha256:69db6310cd75d5d0aca3a70c05dc5ad77b2be29ad75360a3f1e393454f2efa59",
+    "trading_mode": "paper",
+    "read_only_api": true,
+    "read_only_api_config_value": "yes",
+    "provenance": "Frozen compose.yaml configuration, verified by its six-file source binding; no new runtime image inspection is claimed."
+  },
+  "probes": [
+    {
+      "client": "ibapi",
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/ibapi-readonly-20261005.json",
+      "sha256": "daaf666a04ba0ab00920c6ae79dce94c885e0ce762159e898633c420b8b63f3e",
+      "source_sha256": "0199aefb1b311b82cf3c4925644856cfe1b0ed43f1c26a03a17312a24bcca469"
+    },
+    {
+      "client": "nautilus",
+      "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/nautilus-readonly-20261005.json",
+      "sha256": "b6ff1c664fdf8d21891072e30f7091aa08eeed05158602b3ad997e621e21ff81",
+      "source_sha256": "edb7318e785429b64dea84b76705052adfcd07d6ec915cc196927bdc18e6facf"
+    }
+  ],
+  "observed_summary": {
+    "paper_account_check": true,
+    "account_description": "single paper account (DU prefix)",
+    "account_count": 1,
+    "positions": 0,
+    "open_orders": 0,
+    "completed_callback_count": 8,
+    "spy_contract": {
+      "conId": 756733,
+      "secType": "STK",
+      "currency": "USD",
+      "exchange": "SMART",
+      "primaryExchange": "ARCA",
+      "longName": "SS SPDR S&P 500 ETF TRUST-US",
+      "tradingHoursSample": "20261005:0400-20261005:2000;20261006:040"
+    },
+    "market_data_type": "REALTIME",
+    "spy_quote": {
+      "last_trade_epoch": 1791207306,
+      "last": 770.8,
+      "first_tick_local_epoch": 1791207306.8028593,
+      "bid": 770.79,
+      "ask": 770.8
+    },
+    "quote_age_s": -0.19,
+    "max_quote_age_s": 900.0,
+    "server_minus_local_s": -1.008,
+    "history_bars_ibapi": 80,
+    "ibapi_error_count": 0,
+    "ibapi_errors": [],
+    "ibapi_informational_codes": [
+      2104,
+      2107,
+      2158,
+      2106
+    ],
+    "nautilus_instrument": {
+      "id": "SPY.ARCA",
+      "class": "Equity",
+      "price_increment": "0.01",
+      "conId": 756733,
+      "primaryExchange": "ARCA",
+      "currency": "USD",
+      "elapsed_s": 0.008
+    },
+    "nautilus_bars": [
+      {
+        "spec": "1-DAY-LAST",
+        "end": "2026-10-04T20:00:00+00:00",
+        "duration": "5 D",
+        "count": 5,
+        "elapsed_s": 0.126
+      },
+      {
+        "spec": "5-MINUTE-LAST",
+        "end": "2026-10-04T20:00:00+00:00",
+        "duration": "5 D",
+        "count": 390,
+        "elapsed_s": 0.317
+      }
+    ],
+    "nautilus_reported_instrument_or_bar_error": false
+  },
+  "sequencing": {
+    "evidence_class": "local_integration",
+    "kind": "local_readonly_sequencing_check",
+    "raw_status_records": {
+      "date-admission.json": {
+        "kind": "local_readonly_sequencing_check",
+        "stage": "date",
+        "checked_at_utc": "2026-10-05T13:35:05.157059+00:00",
+        "broker_qualification": false,
+        "actual_wire_requests": null,
+        "provider_usage": null,
+        "passed": true,
+        "failures": []
+      },
+      "native-process.json": {
+        "kind": "local_readonly_sequencing_check",
+        "stage": "process",
+        "checked_at_utc": "2026-10-05T13:35:10.894680+00:00",
+        "broker_qualification": false,
+        "actual_wire_requests": null,
+        "provider_usage": null,
+        "phase": "native",
+        "process_exit_code": 0,
+        "passed": true,
+        "failures": []
+      },
+      "native-admission.json": {
+        "kind": "local_readonly_sequencing_check",
+        "stage": "native",
+        "checked_at_utc": "2026-10-05T13:35:10.923934+00:00",
+        "broker_qualification": false,
+        "actual_wire_requests": null,
+        "provider_usage": null,
+        "original_receipt_sha256": "edb7318e785429b64dea84b76705052adfcd07d6ec915cc196927bdc18e6facf",
+        "passed": true,
+        "failures": []
+      },
+      "terminal-status.json": {
+        "kind": "local_readonly_sequencing_check",
+        "stage": "terminal",
+        "checked_at_utc": "2026-10-05T13:35:10.954043+00:00",
+        "broker_qualification": false,
+        "actual_wire_requests": null,
+        "provider_usage": null,
+        "phase": "strong_native_postcheck",
+        "process_exit_code": 0,
+        "passed": true,
+        "failures": []
+      }
+    },
+    "native_used_original_ibapi_receipt": true,
+    "native_admission_binds_original_nautilus_receipt": true,
+    "ibapi_receipt_age_at_nautilus_generation_s": 4.435734,
+    "max_ibapi_receipt_age_s": 300,
+    "wrapper_source_inference": "The frozen locked wrapper reaches strong_native_postcheck only after both six-file hash checks, date/window admission, official process exit 0, stronger official receipt admission and native process exit 0. Terminal exit 0 plus the separately retained native admission/process records corroborate completion; these are local sequencing checks, not broker qualification.",
+    "broker_qualification": false,
+    "actual_wire_requests": null,
+    "provider_usage": null
+  },
+  "frozen_source_verification": {
+    "prepared_date_utc": "2026-10-03",
+    "files": [
+      {
+        "name": "ibapi_probe.py",
+        "sha256": "01af076abb97adeece6041770141b59cd21453148475cf486c4ee12a1047f5ca",
+        "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/ibapi_probe.py"
+      },
+      {
+        "name": "nautilus_probe.py",
+        "sha256": "06fff32db6e55b471da4408661e428d471e756264d734e4116fe9526c34d1305",
+        "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/nautilus_probe.py"
+      },
+      {
+        "name": "plan.json",
+        "sha256": "edd7fba5a0e5167499eb3f4d2874125f4d50427bed939f01e4375b7e0726b57c",
+        "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/plan.json"
+      },
+      {
+        "name": "compose.yaml",
+        "sha256": "bd84faa90af9851deee5268185f46ad3a70446c85c580f8d566aa798f5e1998d",
+        "retained_privately": true
+      },
+      {
+        "name": "run-readonly.sh",
+        "sha256": "f542747452060efa7673b07b4db41e312d388ae9e8480a86b476896a2392b9b4",
+        "retained_privately": true
+      },
+      {
+        "name": "check-readonly.py",
+        "sha256": "2e3e2ad1aafaeba3c06cdba8bdf76a3fcbda2a423e1fcf1b1eee9e9c56cdafec",
+        "retained_privately": true
+      }
+    ],
+    "native_command": "sha256sum --check SOURCE.SHA256SUMS",
+    "runtime_check_basis": "The frozen wrapper checks all six source/compose/helper hashes before each client phase and stops on mismatch; the recorded terminal phase and exit establish that this sequence reached its final postcheck.",
+    "publication_recheck": {
+      "matched_files": 6,
+      "probe_and_plan_bytes_match_public_repository": true
+    },
+    "staging_metadata": [
+      {
+        "name": "FREEZE.md",
+        "sha256": "ff6fe1b105cffc105655a5b7544300b658b001eb210e2355fb39c11c85ae0325",
+        "retained_privately": true
+      },
+      {
+        "name": "CHECKS.json",
+        "sha256": "a872f0769b908c6d2328df7948e3ded38f2e18a95cf7b98d0d8eb58960f4fa95",
+        "retained_privately": true
+      },
+      {
+        "name": "SOURCE.SHA256SUMS",
+        "sha256": "0421ca438acf15b9e7094493d97b909d260d8f0bf89c0a7a9145fb8a8730a21b",
+        "retained_privately": true
+      }
+    ]
+  },
+  "preparation_controls": {
+    "evidence_class": "synthetic",
+    "source": "CHECKS.json retained privately; recorded 2026-10-03, not rerun for publication",
+    "exit_code": 0,
+    "passed": 15,
+    "controls": [
+      "launch_lower_bound_accept",
+      "launch_upper_bound_accept",
+      "early_launch_refuse",
+      "late_launch_refuse",
+      "wrong_day_refuse",
+      "synthetic_official_stronger_gate_accept",
+      "raw_passed_with_error_refuse",
+      "multiple_paper_accounts_refuse",
+      "missing_callback_refuse",
+      "missing_quote_timestamp_refuse",
+      "stale_official_receipt_refuse",
+      "synthetic_two_series_accept",
+      "only_one_nonempty_series_refuse",
+      "reported_bar_error_refuse",
+      "wrong_official_binding_refuse"
+    ],
+    "broker_requests": 0,
+    "claim_boundary": "Locally authored fixed-clock scalar/dictionary fixtures test receipt and launch-window predicates, including refusal controls. They are separate from the native paper run and unchanged upstream tests."
+  },
+  "retained_failures": [
+    {
+      "date_utc": "2026-10-03",
+      "phase": "official_readonly_before_competing_session_closed",
+      "status": "incomplete",
+      "exit_code": 1,
+      "completed_callback_count": 7,
+      "history_bars": 0,
+      "noninformational_error_codes": [
+        10197,
+        162
+      ],
+      "quote_age_s": null
+    },
+    {
+      "date_utc": "2026-10-03",
+      "phase": "official_readonly_after_competing_session_closed",
+      "status": "incomplete",
+      "exit_code": 1,
+      "completed_callback_count": 8,
+      "history_bars": 156,
+      "noninformational_error_codes": [],
+      "quote_age_s": null,
+      "selected_native_started": false
+    },
+    {
+      "date_utc": "2026-10-03",
+      "phase": "preparation_orchestration",
+      "failure": "SyntaxError",
+      "commands_executed": 0,
+      "correction": "Orchestration delimiters corrected before preparation commands ran."
+    },
+    {
+      "date_utc": "2026-10-03",
+      "phase": "named_ibapi_distribution_metadata_lookup",
+      "exit_code": 1,
+      "failure": "PackageNotFoundError",
+      "correction": "A separate installed module query returned ibapi 10.45.1; the failed named distribution lookup does not establish client absence."
+    }
+  ],
+  "blockers": [
+    {
+      "id": "nautilus-5007",
+      "source": "https://github.com/nautechsystems/nautilus_trader/issues/5007",
+      "state": "open",
+      "verified_date_utc": "2026-10-05",
+      "scope": "Fill-report account filtering during recovery/reconciliation."
+    },
+    {
+      "id": "nautilus-5057",
+      "source": "https://github.com/nautechsystems/nautilus_trader/issues/5057",
+      "state": "open",
+      "verified_date_utc": "2026-10-05",
+      "scope": "Management of working orders from a previous session after restart."
+    },
+    {
+      "id": "nautilus-5060",
+      "source": "https://github.com/nautechsystems/nautilus_trader/issues/5060",
+      "state": "open",
+      "verified_date_utc": "2026-10-05",
+      "scope": "External-fill and position reconciliation behavior."
+    }
+  ],
+  "source_basis": [
+    {
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "revision": "cb339488e3e004b04e8a4e5b4fd246442a275e3c",
+      "paths": [
+        "blueprints/us-equities/engine-nautilus/ibkr-acceptance/README.md",
+        "blueprints/us-equities/engine-nautilus/ibkr-acceptance/ibapi_probe.py",
+        "blueprints/us-equities/engine-nautilus/ibkr-acceptance/nautilus_probe.py",
+        "blueprints/us-equities/engine-nautilus/ibkr-acceptance/plan.json",
+        "evidence/receipts/ibkr-readonly-acceptance-20260923.json",
+        "scripts/host_receipts.py",
+        "scripts/validate.py",
+        "docs/acceptance-evidence-policy.md"
+      ],
+      "applicability": "Existing read-only probes, dated receipt format, registration and publication policy."
+    },
+    {
+      "repository": "https://github.com/nautechsystems/nautilus_trader",
+      "tag": "v2.0.0rc5",
+      "revision": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+      "release": "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc5",
+      "paths": [
+        "python/nautilus_trader/adapters/interactive_brokers/__init__.py",
+        "crates/adapters/interactive_brokers/src/python/historical.rs",
+        "examples/live/interactive_brokers/historical_download.py"
+      ],
+      "applicability": "Pinned historical IB adapter's Python export, native request surface and official example."
+    },
+    {
+      "source": "https://pypi.org/pypi/nautilus-ibapi/10.45.1/json",
+      "version": "10.45.1",
+      "official_reference": "https://interactivebrokers.github.io/tws-api",
+      "applicability": "Published distribution identifies IB's official API source; the run's installed module version is recorded separately."
+    },
+    {
+      "source": "https://github.com/gnzsnz/ib-gateway-docker/blob/a7f587641dad6ca3deef704e4c9e3371da3f628b/README.md",
+      "revision": "a7f587641dad6ca3deef704e4c9e3371da3f628b",
+      "applicability": "Supported READ_ONLY_API=yes configuration; the exact image is the frozen compose digest above."
+    }
+  ],
+  "sanitization": [
+    "Account identifiers are represented only by a count and DU-prefix boolean; no account-id hash or account balance is published.",
+    "Private filesystem paths, host user names and session text are omitted. Loopback endpoint and numeric client ids are retained to match the probe contract.",
+    "IB informational callback text and account type are omitted from the public ibapi projection; numeric notice codes remain.",
+    "Whole-artifact SHA256 values preserve private original provenance. Native paper_check binding remains to the private original official receipt; public projections have their own separately recorded hashes."
+  ],
+  "completeness_review": {
+    "kind": "self",
+    "checked": [
+      "Both pinned client observations and raw verdicts",
+      "Native process and final sequencing status",
+      "Six frozen source bindings",
+      "Retained failed attempts and synthetic refusal controls",
+      "Public/private hash distinction and redaction"
+    ],
+    "remaining_modalities": "Order behavior, recovery/reconciliation, exact account identity, full callback/log error visibility and container runtime image inspection are outside this receipt."
+  },
+  "limitations": [
+    "Read-only step 1 only. No order submission, cancellation, fill, flatten, kill-switch or execution-adapter qualification is established; the ibkr-local-acceptance gate remains not_established.",
+    "No NautilusTrader 2.0.0rc5 recovery or reconnect/restart reconciliation was exercised; #5007, #5057 and #5060 remain separate open upstream issues as checked 2026-10-05.",
+    "Paper scope is the official managed-account DU-prefix check for one account on the same loopback endpoint; no exact account-identity proof is published. The Nautilus historical client relies on the fresh official receipt and does not independently query account scope.",
+    "Zero errors means the official receipt's empty noninformational error array and no reported native instrument/bar/error fields; this does not establish visibility into every native callback or log error.",
+    "Quote age -0.190 s is retained unchanged. The probe uses IB server/last-trade times at one-second resolution and permits a -2 s lower bound; server-minus-local delta is -1.008 s.",
+    "The Gateway image digest and read-only mode are bound compose configuration; the supplied run artifacts do not include an independent runtime container-image inspection or an API write-refusal trial.",
+    "This is one bounded session. Actual wire-request count and provider usage remain unknown; no continuous operation, later-session, live-trading or profitability claim is made.",
+    "Private frozen wrapper/checker bytes and raw outputs are retained by their hashes; public projections and repository validation are structural publication evidence, not a new broker or model run."
+  ]
+}

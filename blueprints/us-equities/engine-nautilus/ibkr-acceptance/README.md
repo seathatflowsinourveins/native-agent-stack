@@ -6,7 +6,22 @@ Step 1 of `blueprints/us-equities/engine-nautilus/acceptance-plan.md` section 5
 This is partial evidence: step 1 passed on both clients on 2026-09-23
 (`evidence/`, receipt `evidence/receipts/ibkr-readonly-acceptance-20260923.json`),
 but the gate stays `not_established` because steps 2-4 need NautilusTrader
-native paper stock orders, which are blocked upstream (see "Blockers").
+native paper order, recovery and reconciliation acceptance (see "Blockers").
+
+The 2026-10-05 frozen scheduled run also passed through both clients:
+[consolidated receipt](../../../../evidence/receipts/ibkr-readonly-acceptance-20261005.json),
+[official ibapi receipt](evidence/ibapi-readonly-20261005.json) and
+[Nautilus receipt](evidence/nautilus-readonly-20261005.json). It used ibapi 10.45.1
+and NautilusTrader 2.0.0rc5 against the digest-pinned gnzsnz/ib-gateway 10.51.1b
+paper configuration with `READ_ONLY_API=yes`. One DU-prefix paper account was
+flat with no open orders; REALTIME SPY contract/quote data, zero official
+noninformational errors, five native daily bars and 390 native five-minute bars
+were recorded. The native process and terminal `strong_native_postcheck` both
+returned exit 0; the receipt preserves the separate local sequencing checks,
+six frozen source hashes and earlier incomplete attempts. The native receipt's
+official-receipt binding identifies the private original, while the public
+projections have separate hashes. This run establishes no order path or rc5
+recovery/reconciliation (#5007, #5057, #5060), and does not change the gate.
 
 ## Probes
 
