@@ -1922,5 +1922,174 @@
         "historical configuration custody"
       ]
     }
+  },
+  "a30_grafana_legacy_custody_followup": {
+    "recorded_at_utc": "2026-10-05T18:26:33Z",
+    "scope": "Co-op A30 exact-path custody guard in existing publisher/checker plus caller coverage. A29 frozen review/rebase/serial checks were already consumed; no new cross/research attempt in this unit.",
+    "evidence_class": "local_integration_with_native_stage_results_and_reported_custody_separated",
+    "parent_revision": "86268eb193700714fe4b6df5eb956f485b91bbe6",
+    "native_source_scope": "Native runs used this uncommitted candidate tree with functional files/commands hashed below; no source/index edits during tests or native readers. Documentation followed the runs. Parent alone is not the executed source identity.",
+    "co_op_custody_report": {
+      "observed_at_utc": "2026-10-05T15:03:41Z",
+      "verification_scope": "User-queued co-op A30 report; backup bytes were not read or independently rehashed by this lane.",
+      "live_legacy_paths_at_co_op_observation": "All three absent. Native current-source preflight also passed in all three Grafana stages.",
+      "backup_locator": "private-co-op-readiness-job4-backup-20261005T1007Z",
+      "preserved_artifacts": [
+        {
+          "relative_path": "grafana-provisioning/datasources/ns2604.yaml",
+          "bytes": 625,
+          "sha256": "49525d7b18e19a17c2c6d4a12a73a8fe66b1c0f6ba35b2986304be6ffc15edee"
+        },
+        {
+          "relative_path": "grafana-provisioning/dashboards/token-layer.yaml",
+          "bytes": 322,
+          "sha256": "e277f35919d8ff40f9b00d039c5d95647f77f951ac9a3a639ecaa492f295be59"
+        },
+        {
+          "relative_path": "grafana-dashboards/token-layer/token-layer.json",
+          "bytes": 54805,
+          "sha256": "ae0962b245805681ab192bb58a4d21028e8e2c5c7656cac42d33d0f18c4622dc"
+        }
+      ],
+      "ruling": "Every exact legacy path, including dangling symlinks, needs_owner even when its digest matches. Provenance is not permission. Co-op keeps backup until command-center takeover soak, then any retirement is a co-op host step confirmed by observability owner."
+    },
+    "source_files": [
+      {
+        "locator": "evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py",
+        "bytes": 16112,
+        "sha256": "51382783c1c608b30ff715bb63ecbe5b7a737b147fb0c092bf6179c09989fd47"
+      },
+      {
+        "locator": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+        "bytes": 188748,
+        "sha256": "ede4a5f802f2e0f09e72069754f7dcb07fb7cb6c9def827836fc96d50a4ac05b"
+      },
+      {
+        "locator": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "bytes": 445434,
+        "sha256": "19ac5a99904fb84d7a9dc1aa48accfb6866cda83f18d68e827310d9fb9dd9d1c"
+      }
+    ],
+    "stage_recipe_identities": [
+      {
+        "stage": "post_install",
+        "command_bytes": 108,
+        "command_sha256": "b088ec65ad4b8673889f8bae553594a8d7e7ebdbc1579fca9ce271537a839d37",
+        "native_suffix_byte_identical": true
+      },
+      {
+        "stage": "service_health",
+        "command_bytes": 789,
+        "command_sha256": "da78ecf4c6971c60de429fe08e1c730ecff34fd1ea80e79edf9d60ddc765b34b",
+        "native_suffix_byte_identical": true
+      },
+      {
+        "stage": "after_sign_in",
+        "command_bytes": 2886,
+        "command_sha256": "682de1d2cc9306dda07de41b21f9fef3be56f60332ec590b4d16843e156bcd2a",
+        "native_suffix_byte_identical": true
+      }
+    ],
+    "local_fixture_checks": {
+      "focused_tests": 9,
+      "focused_exit_code": 0,
+      "focused_seconds": 4.911,
+      "touched_tests": 320,
+      "touched_exit_code": 0,
+      "touched_seconds": 95.959,
+      "existing_skips": 3,
+      "presence_controls": 42,
+      "additional_controls": [
+        "Absent exact paths and unrelated-name positive",
+        "Metadata PermissionError fails closed before output",
+        "Three stage commands reject before stale installed helper/native work"
+      ],
+      "preservation": "Files, empty files, ledger-owned files, directories, live/dangling/loop symlinks preserve bytes, mode, inode, mtime, symlink targets, active outputs and ledger; no data directory created.",
+      "evidence_class": "synthetic_fixture_and_local_integration"
+    },
+    "native_stage_results": [
+      {
+        "row": "grafana",
+        "stage": "post_install",
+        "exit_code": 0,
+        "retained_output": {
+          "locator": "private-lane-cache/a30-grafana-native-post.log",
+          "bytes": 27,
+          "sha256": "e7aeee6f55b288e21501906000cffccc1b12764b7852e3cd4f2cde057a652486"
+        }
+      },
+      {
+        "row": "grafana",
+        "stage": "service_health",
+        "exit_code": 0,
+        "retained_output": {
+          "locator": "private-lane-cache/a30-grafana-native-health.log",
+          "bytes": 29,
+          "sha256": "d6142ed5aa81d22208918ac272f0f4ff061613691528d1a8177cf17fbb2f7b1a"
+        }
+      },
+      {
+        "row": "grafana",
+        "stage": "after_sign_in",
+        "exit_code": 0,
+        "retained_output": {
+          "locator": "private-lane-cache/a30-grafana-native-after.log",
+          "bytes": 57,
+          "sha256": "7b9fd0b47eb43444d84ff0baa8aa318dbedd563c5564ee6c1b9739428e59f6c8"
+        }
+      }
+    ],
+    "native_sdk_receipt": {
+      "retained_artifact": {
+        "locator": "private-native-grafana-sdk-receipt/grafana-acceptance-e01d47a9f3374f41b19093dd3867296a.json",
+        "bytes": 222,
+        "sha256": "05788a5d59902a6497895d736e97691bd0c35695c74451907d436bf4f63576dd"
+      },
+      "status": "completed",
+      "configured_model": "cx/gpt-6.1-sol-max",
+      "usage_status": "reported",
+      "usage_scope": "native_thread_cumulative",
+      "numeric_usage": "Unobserved in retained sanitized receipt; unknown remains unknown.",
+      "completion_scope": "Original native SDK gate asserted completed/closed before writing sanitized receipt; raw SDK stdout and Claude marker stdout are discarded by existing check. No complete native stream, token-count or exact marker-text claim is made.",
+      "query_scope": "All original six Claude and three SDK queries required observed values; native stage exit0 is retained. No replayed historical receipt substituted."
+    },
+    "fresh_claude_scope": "One unchanged native marker prompt under canonical shared util-linux flock. No cross/research retry; all native stages serial.",
+    "retained_local_check_outputs": [
+      {
+        "locator": "private-lane-cache/a30-grafana-focused-tests.log",
+        "bytes": 106,
+        "sha256": "e2e81eee76b7b01a1e38cd2bbcdc0c36600d679101f017a9995ccb4795cf9cb7"
+      },
+      {
+        "locator": "private-lane-cache/a30-grafana-focused-tests-with-callers.log",
+        "bytes": 107,
+        "sha256": "3a15ab9afe2ace202b7cf49fd8245d78d26babccc40cb0dad74194d9f0cd73df"
+      },
+      {
+        "locator": "private-lane-cache/a30-grafana-touched-tests.log",
+        "bytes": 433,
+        "sha256": "6cd006246eaf4b20f9964a97ef26daefda82249ffd6183217357b3b3440d5b11"
+      },
+      {
+        "locator": "private-lane-cache/a30-grafana-check-plan.log",
+        "bytes": 202,
+        "sha256": "b4476e66639cf206b17334f78b1bf7355fe17ac7f7629476658c3d5c1ad0476d"
+      },
+      {
+        "locator": "private-lane-cache/a30-grafana-client-check.log",
+        "bytes": 52675,
+        "sha256": "5ad7e5c031fc86d0ae2ecce708c307e6a2d995c2d7630aa7573f82801fa4337b"
+      }
+    ],
+    "completeness_critic": "Read-only exact source/caller/metadata-failure/symlink/preservation review found no material gap. Installed pathlib source at3.13.16 matched official tag; source/fixture review remains separate from the returned native stage results.",
+    "preservation_boundary": "Publisher/checker perform no writes before legacy preflight. Installer transports its helper before publisher entry; no blanket no-write claim for install.sh. This lane did not run install.sh or change live Grafana configuration or preserved backups.",
+    "remaining_gates": "Prior reported Grafana legacy-name custody uncertainty is answered by A30 and the bounded guard. Cross/research retry/apply, canonical route/provider acceptance, independent binding/dispositions, receiver confirmation, Prometheus effective flags, imported gateway qualification and command-center draft read remain pending.",
+    "primary_sources": [
+      "grafana/grafana@6193dc03311b631b9727b560d24369e683dc396e:docs/sources/administration/provisioning/index.md:90,339,371",
+      "grafana/grafana@6193dc03311b631b9727b560d24369e683dc396e:pkg/services/provisioning/datasources/config_reader.go:27-34",
+      "grafana/grafana@6193dc03311b631b9727b560d24369e683dc396e:pkg/services/provisioning/dashboards/file_reader.go:181",
+      "python/cpython@v3.13.16:Lib/pathlib/_abc.py:432-437",
+      "seathatflowsinourveins/native-agent-stack@86268eb193700714fe4b6df5eb956f485b91bbe6:evidence/artifacts/new-wsl-install-plan-20261002/config/observability_config.py:98,115-141,227-247"
+    ]
   }
 }

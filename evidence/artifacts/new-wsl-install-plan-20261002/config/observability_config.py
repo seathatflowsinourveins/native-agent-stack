@@ -35,6 +35,16 @@ HISTORICAL_PLAN_RENDER_DIGESTS = {
 }
 
 
+# Co-op A30 (2026-10-05): exact retired provisioning paths remain custodian-owned.
+# Their historical digests are provenance, never permission to publish/migrate.
+# Grafana@6193dc03:docs/sources/administration/provisioning/index.md:90,339,371.
+LEGACY_GRAFANA_PATHS = (
+    "grafana-provisioning/datasources/ns2604.yaml",
+    "grafana-provisioning/dashboards/token-layer.yaml",
+    "grafana-dashboards/token-layer/token-layer.json",
+)
+
+
 def digest(text):
     return hashlib.sha256(text.encode()).hexdigest()
 
@@ -97,6 +107,17 @@ def main():
     args = parser.parse_args()
     root = args.config_root
     source = args.source_root or root
+    if args.action in ("grafana", "grafana-check"):
+        # CPython@v3.13.16:Lib/pathlib/_abc.py:432-437, unlike exists(),
+        # lstat sees a dangling symlink. Check before any ledger read or write.
+        for name in LEGACY_GRAFANA_PATHS:
+            try:
+                (root / name).lstat()
+            except FileNotFoundError:
+                continue
+            except OSError as error:
+                raise ValueError(f"needs_owner: cannot verify legacy Grafana path {name}") from error
+            raise ValueError(f"needs_owner: retained legacy Grafana path {name}; co-op custody required")
     data = Path(os.environ.get("NS2604_OBSERVABILITY_DATA", str(
         Path(os.environ.get("XDG_DATA_HOME", str(Path.home() / ".local/share"))) / "new-wsl-native-stack/observability")))
     if not data.is_absolute():
