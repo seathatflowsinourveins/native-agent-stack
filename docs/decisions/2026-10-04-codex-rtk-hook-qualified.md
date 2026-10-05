@@ -11,7 +11,9 @@ the flip the same evening, to be written on main after the install plan's rows (
 **Status:** this record lands with the trust tool, its tests and the evidence (the first of two pull requests, which touch no file
 that PR 684 owns). The install plan's RTK row, the handbook and card text follow in a second pull request once PR 684 lands on
 main, because the plan rows are its; until then no host installs or trusts the hook, and the awareness block of the Codex
-`AGENTS.md` is reconciled with rtk 0.51.0 separately, by session native-agent-stack-5f, which owns the Codex roles that carry it.
+`AGENTS.md` is reconciled with rtk 0.51.0 separately, by session native-agent-stack-5f, which owns the Codex roles that carry it. (This paragraph is the status of 2026-10-04.
+Update of 2026-10-05: PR 684 landed as `ba1f6876c`, the first pull request as #701 (`287514581`) and the second as #705 (`0ce953696`), so the install plan's RTK row, the handbook and the card text are on
+main and the plan's `command-output` row installs and trusts the hook; the residuals and the review history below state what that does and does not cover.)
 
 **Scope:**
 
