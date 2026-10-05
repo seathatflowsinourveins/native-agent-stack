@@ -1,0 +1,69 @@
+# Final architecture, decide round 2: owner rows on the repository-quality rule (2026-10-04)
+
+**Status:** accepted on the owner's rule; selection records only. Nothing named here has run on a host; every row's acceptance gates are open until the install plan runs them.
+
+## Authority
+
+The owner's decision of 2026-10-04 (about 20:50Z), quoted verbatim:
+
+> with the repos quality itself resolute our architecture with the sota repos's own quality and finalize for the architecture for us to clean install
+
+It set the rule in `docs/decisions/2026-10-04-repository-quality-rule.md`: documented gaps are filled by the candidate repository's own quality evidence, with no new local trial. **The owner decided the rule; the tools below were named by decide round 2 and its Opus verification.** The owner named no tool here, except that the hcom row follows the posture the lanes converged on from the owner's 2026-10-03 answer, quoted: "we need full sota convergneced llm native automation at highest quality".
+
+## Method
+
+- Two blind GPT-6.1 Sol deciders per packet, with the candidate order reversed; one GPT Astra critic.
+- An Opus refute-by-default verification of every adopt-true verdict and every split, against live upstream (25 gaps; 15 adopt, 10 not adopted).
+- The sanitized verdicts, with the digests of the private records they come from, are in `evidence/artifacts/final-architecture-round2-20261004/verdicts.json`.
+
+## Rows this record changes (consensus batch `wave5`)
+
+| Slot | Change | Owner | Repository | Named by | Removal check |
+| --- | --- | --- | --- | --- | --- |
+| `agent-messaging` | owner default on a split row | hcom 0.7.27 (the Claude Code <-> Codex message transport only; Claude <-> Claude stays on native cross-session messaging) | https://github.com/aannoo/hcom | deciders A hcom and B agmsg; the critic hcom; the Opus verification upheld hcom | the preregistered messaging measurement (prereg r3 of 2026-10-03, never started), or the verdict's paired Harbor comparison against a released agmsg; revert to configuring the native incumbents if both upstreams document a native cross-client ingress; each reports to the owner and removes nothing by itself |
+| `playwright-cli` | owner default on a split row | Chrome DevTools MCP 1.10.1 (one stdio MCP server, chrome-devtools, in both clients; it also serves browser diagnostics) | https://github.com/ChromeDevTools/chrome-devtools-mcp | both deciders and the critic: Chrome DevTools MCP; the Opus verification upheld it | the slot's named comparison, run through upstream Harbor: the adopted MCP interface against Playwright CLI 0.1.22 on the same 20 browser tasks; it reports to the owner and removes nothing by itself |
+| `lm-program-optimization` | new row (cross:gpt6-harnesses) | DSPy 3.4.0 (dspy.GEPA and the other DSPy optimizers; GEPA 0.1.4 comes in as its pinned dependency) | https://github.com/stanfordnlp/dspy | both deciders and the critic: DSPy; the Opus verification upheld it | on one stack program, dspy.GEPA against standalone gepa with the same model, splits and budget, scored in Inspect; standalone GEPA replaces DSPy if it reproducibly wins on the held-out metric; it reports to the owner |
+| `skill-vetting` | new row (instructions-skills) | SkillSpector 2.12.0 CLI (on demand; advisory, never an allow decision; no MCP server and no install hook) | https://github.com/NVIDIA/skillspector | both deciders and the critic: SkillSpector; the Opus verification upheld it | the m1-m7 fixture comparison proposed in PR #692, or a paired Inspect comparison; remove SkillSpector if the current procedure matches its recall with no more false positives; it reports to the owner |
+| `mcp-protocol-conformance` | new row (mcp-surfaces) | MCP conformance suite (npm @modelcontextprotocol/conformance, on demand through npx; 0.2.0-alpha.11 until 0.2.0-alpha.12 clears the cooldown on 2026-10-08) | https://github.com/modelcontextprotocol/conformance | both deciders: no extra install (configure the MCP Inspector); the critic: the conformance suite; the Opus verification upheld the critic | the MCP Inspector's documented automated checks against the suite on the same servers; the suite goes if the Inspector covers the same requirements; it reports to the owner |
+| `trajectory-analysis` | new row (quality-evaluation) | Inspect Scout 0.5.3 (in the Inspect AI owner's environment, with harbor 0.23.0 for ATIF import) | https://github.com/meridianlabs-ai/inspect_scout | both deciders returned nothing (deadline exceeded); the critic left the gap split; the Opus verification settled it under rule D | Scout against Monocle trace assertions on one frozen, human-labelled set of this stack's sessions and Harbor ATIF trials; Monocle replaces Scout if it detects more labelled failures at the same false-positive rate, with an interval excluding zero; it reports to the owner |
+
+Both split rows named a deciding measurement that never started (no receipts): the playwright-cli row's Harbor comparison and the agent-messaging row's preregistered measurement (r3, frozen 2026-10-03). The repository-quality rule kept out only the slots whose measurements were running (memory owner, code search), so both rows take the rule, and each named measurement becomes the row's removal check.
+
+## Adopted as configuration of existing owners (no row change)
+
+- `browser-debugging`: ChromeDevTools/chrome-devtools-mcp 1.10.1, MCP server `chrome-devtools`, for browser diagnostics (performance traces with insights, network requests, console messages). The install plan carries only one registration. If item 1 (i02-browser, web-research/playwright-cli) is upheld, this job goes to that same server with no additional install. If item 1 falls, this item stands alone and uses the same commands.
+- `skill-lifecycle-verification`: promptfoo/promptfoo 0.123.1 (owner upheld; adds no component beyond the FINAL quality-evaluation/promptfoo owner). Configure its anthropic:claude-agent-sdk and openai:codex-sdk providers as the release-pinned Test Agent Skills guide describes, for paired skill-version verification and recorded results. Point them at the host's pinned clients with path_to_claude_code_executable and codex_path_override.
+- `gpt-gateway-topology`: no extra install: OmniRoute (pool and fallback gateway). On the clean v3.8.51 pin, OmniRoute caps gpt-6.1-sol at xhigh, so the topology records native Codex as the only Sol/max route until an upstream OmniRoute release contains PR #15167.
+- `gpt-worker-telemetry-contract`: no extra install: Harbor v0.23.0 (existing owner quality-evaluation/harbor-containerized-agent-e2e-runner) owns qualification of the worker telemetry contract. Codex rust-v0.160.0 and OpenHands software-agent-sdk v1.51.0 remain the event producers, and OTel Collector Contrib v0.162.0 remains the collection/routing owner, each under its own existing slot.
+- `research-service-llm-route`: no extra install: GPT Researcher v3.7.0 and DeerFlow v2.1.0 (the existing research-harnesses owner) each set their own upstream-documented model, endpoint and keyless-search settings to point at OmniRoute's /v1 endpoint (the existing gpt-gateway owner).
+- `gpt-worker-dispatch`: No extra install. The owner is the recorded coordinator policy: decisions 1, 4 and 6 of docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md, merged in d323b5343. It runs on the existing FINAL owners. The Claude Code coordinator session dispatches GPT builders through the packaged Codex SDK worker (openai-codex 0.160.0, cx/gpt-6.1-sol-max).
+- `codex-skill-successors`: no extra install: keep the existing per-skill pins, installed through skills@1.7.0 (not the upstream plugin marketplaces or Codex $skill-installer): openai/skills@49f948faa9258a0c61caceaf225e179651397431 gh-fix-ci (kept), security-best-practices (kept), security-threat-model (trial), gh-address-comments (trial); trailofbits/skills@0cc1c73a5e96749ab32d7ea5e14892fafa6972ae codeql, supply-chain-risk-auditor, agentic-act (…)
+- `application-delivery-runtime`: No extra install. The job already has an owner: the repository's local-typed-application capability (catalogs/foundation/decisions.json:1636-1650), run by blueprints/convergence-practice/application-delivery. In that blueprint, Next.js 16.3.8 with React/React DOM 19.3.0 provides the UI, FastAPI 0.141.1 the API and PostgreSQL 18.6 the state. All four are locked per project; none is a host-level runtime.
+
+## Not adopted
+
+- `computer-use-worker`: No extra install for this slot. Web actions belong to the browser-automation slot web-research/playwright-cli, which this round already gave to Chrome DevTools MCP 1.10.1 (MCP interface) in item 1 (i02-browser, converged).
+- `agent-user-ui`: No extra install and no agent-user-ui owner. Agent event streams stay with the existing agent SDK owners: Codex SDK and codex exec/app-server, and the Claude Agent SDK.
+- `runtime-behavior-monitor`: no adoption
+- `codex-ci`: No extra install. The existing FINAL decision for 'coding agent in CI' already covers this job.
+- `alert-notification-delivery`: Alertmanager v0.34.1, the existing FINAL owner of alert routing and delivery. No extra install: replace its `sink` receiver with the native webhook receiver pointed at the user-approved ntfy.sh topic (?template=alertmanager). No local ntfy server.
+- `client-trace-export`: No extra install. The existing owners stay: the native Claude Code and Codex OTel exporters, feeding OTel Collector Contrib, which writes to Loki and Grafana (the design the user decided on 2026-09-26, with traces off), plus agentsview over both clients' local transcripts.
+- `agent-control-plane`: no extra install: keep the existing owners configured. OpenHands software-agent-sdk's Agent Server API covers OpenHands conversations. Codex SDK and codex exec/app-server covers Codex threads.
+- `gpt-worker-homes`: No extra install. The single owner is the existing "Codex SDK and codex exec/app-server" slot, configured through the packaged worker examples/omniroute-codex-sdk/worker.py (private CODEX_HOME per job, worker-owned cleanup and result receipts).
+- `benchmark-currency`: No extra install: Convergence practice and its validators (existing owner, seathatflowsinourveins/native-agent-stack v2026.09.26.2) own benchmark qualification and currency records. Harbor v0.23.0 (existing owner) stays the executor and the source of per-run identity, and Inspect AI keeps model and task evaluation.
+- `scholarly-source-resolution`: No extra install. Configure the scholarly retrievers of the existing research-harness owner (cross:runtime-workers/research-harnesses, GPT Researcher): RETRIEVER=<bundled keyless web provider>,openalex,semantic_scholar,arxiv,pubmed_central, plus OPENALEX_EMAIL. Hyperresearch is not adopted.
+
+## Outside this record
+
+- `ci-secret-scan-gate`: a repository CI change, not a destination row: the swap of the required secret-scan gate from gitleaks to betterleaks v1.9.0 lands as its own PR after the P1 parity prerequisites the verdict lists (re-triage at v1.9.0, the unprefixed 40-hex token class the verdict names, dropping --exit-code 0).
+- The memory owner and code search keep their running measurements (D3r4; the sealed code-search confirmatory).
+- The landscape round (harness rules, TypeSafe, terminal profiles, folders, scaffolding, code foundation, agent frameworks; 10 jobs) adopted no new install: its Opus verification upheld nine configure-the-existing-owner verdicts and refuted the one adoption (EveryInc/compound-engineering-plugin for engineering workflows), and it checked the oh-my-* frameworks the owner named (ohmyzsh, oh-my-openagent, oh-my-claudecode, oh-my-pi, oh-my-codex) against each job: none owns one. Its completeness critic reopened six items for a follow-up round: the 21:05Z directive on rule content (q01), hook invoke-rate monitoring on the existing telemetry owners, the Jev P1 inference runtime, a git-hook front end (jdx/hk), spec-kit and OpenSpec as missing engineering-workflow candidates, and the Claude-to-Codex cooperation plugin (openai/codex-plugin-cc).
+
+## Overturn
+
+Each row's removal check reports to the owner and removes nothing by itself. A gate failure at install time (install, acceptance or native wiring) replaces the adoption, as the rule's own overturn says.
+
+## Alternatives
+
+- Keep the split rows waiting for their measurements: leaves browser automation and cross-client messaging uninstalled on the clean install, against the owner's rule.
+- Record the configuration-only adoptions as rows: they install nothing, and an owner row must install its default.
