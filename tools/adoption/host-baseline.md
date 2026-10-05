@@ -60,14 +60,19 @@ are inferred. Claude records only whether `env` has `CLAUDE_CODE_SHELL`. The
 probe reads `~/.codex/config.toml` and `~/.claude/settings.json`; it does not
 resolve profile overlays, managed settings, project settings or environment
 overrides. Parse failures omit exception text to avoid disclosing values.
-Absolute path values use stdlib `posixpath.normpath` before checking membership
-in the current home, without resolving symlinks. An absolute value containing a
-`..` component fails closed, including traversal that ends inside the home.
+Single-line, whitespace-free absolute values use stdlib `posixpath.normpath`
+before checking membership in the current home, without resolving symlinks.
+An absolute value containing a `/`-delimited `..` component on any line fails
+closed, including traversal that ends inside the home or ends at a line break.
 Only a normalized path equal to the current home, or beginning with that complete
 home component followed by `/`, is converted to `~`. Prefix-sharing sibling paths
-and embedded home references remain unchanged and make the output fail closed.
-The same normalization applies recursively to keys and values. Remaining home
-paths anywhere in the document make the output fail closed. The personal-home
+and embedded home references remain unchanged. For values with whitespace or line
+breaks, only a leading complete home prefix is replaced with `~`; the remainder
+stays verbatim. The same normalization applies recursively to keys and values.
+For homes under `/home/`, remaining home paths anywhere in the document make
+the output fail closed. The gate does not compare against the actual home:
+embedded references to homes elsewhere can survive unless a profile pattern or
+login check matches. The personal-home
 and Windows-user-path patterns
 copied from `scripts/validate.py` also cover macOS user directories and Windows
 profiles, including WSL paths such as `/mnt/c/Users/<login>.HOST/AppData/...`.

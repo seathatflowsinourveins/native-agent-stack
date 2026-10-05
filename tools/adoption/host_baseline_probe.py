@@ -199,9 +199,9 @@ def normalize_home(value, home):
     if isinstance(value, str):
         home_text = posixpath.normpath(str(home))
         if value.startswith("/"):
-            if ".." in value.split("/"):
+            if any(".." in line.split("/") for line in value.splitlines()):
                 raise PrivacyFailure()
-            path_text = posixpath.normpath(value)
+            path_text = value if any(char.isspace() for char in value) else posixpath.normpath(value)
             if home_text != "/" and (path_text == home_text or path_text.startswith(home_text + "/")):
                 return "~" + path_text[len(home_text):]
         return value
@@ -214,7 +214,7 @@ def normalize_home(value, home):
 
 def assert_private_output_absent(document, login):
     # Static schema keys and command descriptions do not disclose an identity.
-    # Home paths are forbidden everywhere, including in keys and descriptions.
+    # Linux home/profile path patterns apply everywhere, including in keys and descriptions.
     text = json.dumps(document, ensure_ascii=False)
     clean = HOME_PREFIX.casefold() not in text.casefold() and not any(pattern.search(text) for pattern in PRIVATE_PROFILE_PATHS)
     if not clean:  # Remains effective under python3 -O.

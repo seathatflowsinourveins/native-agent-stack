@@ -220,12 +220,28 @@ class HostBaselineProbeTests(unittest.TestCase):
                 self.assertEqual(json.loads(out)["env"]["output"], "~" + suffix)
                 self.assertEqual(err, "")
 
+    def test_sibling_home_subtest_ids_are_unique(self):
+        ids = []
+
+        class SubtestResult(unittest.TestResult):
+            def addSubTest(self, test, subtest, err):
+                ids.append(subtest.id())
+                super().addSubTest(test, subtest, err)
+
+        result = SubtestResult()
+        type(self)("test_prefix_sharing_home_paths_fail_closed_before_normalization").run(result)
+        self.assertTrue(result.wasSuccessful(), result.failures + result.errors)
+        self.assertTrue(ids)
+        self.assertEqual(len(ids), len(set(ids)))
+
     def test_home_traversal_fails_closed_before_tilde_normalization(self):
         home = Path("/") / "home" / "alice"
         cases = (
             ("sibling escape", str(home) + "/../bob/bin/env"),
             ("prefix-sharing sibling escape", str(home) + "/../alicebob/bin/env"),
             ("interior traversal", str(home) + "/bin/../env"),
+            ("newline traversal", str(home) + "/..\nfoo"),
+            ("carriage-return traversal", str(home) + "/..\r"),
         )
         for path_kind, path in cases:
             for location in ("output", "stderr", "command", "key"):
@@ -247,6 +263,31 @@ class HostBaselineProbeTests(unittest.TestCase):
                 self.assertEqual(code, 0)
                 self.assertEqual(json.loads(out)["env"]["output"], "~/bin/env")
                 self.assertEqual(err, "")
+
+    def test_home_prefix_replacement_preserves_trailing_text(self):
+        home = Path("/") / "home" / "alice"
+        suffixes = (
+            ("error line", "/bin/tool: see https://example.com/x/"),
+            ("combined stdout and stderr", "/bin/tool\nwarning: see https://example.com/x/"),
+            ("whitespace", "/bin/tool\tsee https://example.com/x/"),
+        )
+        for text_kind, suffix in suffixes:
+            for location in ("output", "stderr", "command", "key"):
+                with self.subTest(text_kind=text_kind, location=location):
+                    record = {"command": "command -v env", "exit": 0, "output": ""}
+                    if location == "key":
+                        record[str(home) + suffix] = False
+                    else:
+                        record[location] = str(home) + suffix
+                    code, out, err = self.mocked_main("alice", {"env": record}, home=home)
+                    self.assertEqual(code, 0)
+                    expected = {"command": "command -v env", "exit": 0, "output": ""}
+                    if location == "key":
+                        expected["~" + suffix] = False
+                    else:
+                        expected[location] = "~" + suffix
+                    self.assertEqual(json.loads(out), {"env": expected})
+                    self.assertEqual(err, "")
 
     def test_common_logins_do_not_reject_fixed_labels_or_command_names(self):
         document = {
