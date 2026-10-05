@@ -51,7 +51,7 @@ holds admission in the runner. Official client 92 requests timestamped
 The installed official ibapi 10.45.1 callback signatures were inspected. A
 positive, uncrossed quote must be at most ten seconds old against the broker
 clock; notices 10089/10167, delayed tick types and delayed data modes refuse.
-One times the ask plus USD 10 headroom must fit the USD 1000 cap. The receipt
+Admission requires `ask × qty × 1.05 + USD 10 headroom ≤ USD 1000 cap`. The receipt
 records bid, ask, age, timestamps, headroom and derived offset. The child checks
 the age again and recomputes the cap and offset before constructing the node.
 
@@ -92,10 +92,11 @@ connectivity failures and delayed-data codes refuse quote admission; unrelated
 farm notices remain information. The original trial's exact timeout cause is
 unproven, so the next coordinator run can distinguish the remaining callbacks.
 
-Admission also checks `(ask - bid) * quantity + 2 * commission_allowance_per_order_usd`
+Admission also checks `(ask - bid) × qty + 2 × (commission_allowance_per_order_usd + USD 0.02)`
 against the existing `max_roundtrip_loss_usd`. A bid of 770 and ask of 990
 therefore refuses with `refused_quote_loss_bound`: the spread loss is 220 USD
-and the plan's expected round-trip commissions add 2 USD to the 5 USD bound.
+and the plan's USD 1.00 per-order allowance plus the USD 0.02 margin adds
+USD 2.04 for round-trip commissions against the USD 5 loss bound.
 The quote receipt retains that stage and all the compared numbers. No node starts
 after this refusal. The plan numbers are unchanged.
 
@@ -315,6 +316,15 @@ opening 15 minutes use single-width bands, correcting the earlier opening-window
 claim. Trades cannot execute outside active bands and a persistent limit state
 triggers a pause. See the [LULD Plan overview](https://www.luldplan.com/) and
 its [2021 Annual Report](https://cdn.luldplan.com/reports/LULD-2021-Annual-Report.pdf).
+Before any broker request, the runner refuses if the planned order window
+reaches 15:35:00 ET, when the Tier 1 closing-period band doubles to 10%.
+The window extends from the parent start through `node_stop_at` plus the close
+horizon: 300 seconds plus 45 seconds of cleanup and 15 seconds of stop allowance,
+or 360 seconds total. A start at 15:28:59 ET ends at 15:34:59 and fits this guard;
+a start at 15:29:00 ET or later refuses with `refused_luld_closing_period`.
+The receipt records the refusal stage, reason, window end and 10% closing-band
+constant. This earlier admission cutoff preserves all plan numbers and prevents
+the order/close window from reaching double-width bands.
 The admission stress is not a guaranteed submission-time cap over 300 seconds;
 rc6 qualification moves that bound to the engine. The independent client-92
 flat proof still runs at the end.
@@ -329,8 +339,13 @@ atomically written before starting the node and refreshed as observations arrive
 A killed child leaves that provisional state for the parent and reviewer.
 Pre-node child refusals write a `refused_child_*` reason before exiting; the
 parent retains that cause after successful independent flat proof.
-The parent marks the child launch before `Popen` and adopts child evidence into
-its existing receipt object. A later storage failure cannot revert to
+The parent generates an account-independent UUID nonce, passes it through the
+stdin payload, and requires that nonce on the child's receipt before adopting
+evidence into its existing object. A different run's receipt at the same path
+leaves this run's provisional evidence intact and yields `incomplete` with
+`child_receipt_nonce_mismatch`; independent flat proof still runs. The nonce is
+public correlation evidence, not an account identifier or a secret.
+The parent marks the child launch before `Popen`. A later storage failure cannot revert to
 `not_started`: unavailable flat proof leaves `cleanup_required`, while successful
 flat proof plus a final write error yields `incomplete`. An already observed
 bound or case failure remains `failed`.

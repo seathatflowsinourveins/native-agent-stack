@@ -48,7 +48,7 @@ def admitted_quote():
 def node_payload(receipt):
     admission = admitted_quote()
     return {"account_id": FAKE_ACCOUNT, "receipt": receipt, "node_stop_at": time.monotonic() + 30,
-            "quote_admission": admission, "tob_offset_ticks": admission["tob_offset_ticks"]}
+            "run_nonce": receipt.get("run_nonce"), "quote_admission": admission, "tob_offset_ticks": admission["tob_offset_ticks"]}
 
 
 def event(kind, order="O1", typ="LIMIT", side="BUY", when=1_000_000_000, **changes):
@@ -96,6 +96,17 @@ def cache_order(client_id, events, *, strategy="EXEC_TESTER-001", status="FILLED
 
 
 class RunOrderOwnership(unittest.TestCase):
+    def test_started_second_is_required_even_when_skew_and_init_time_fit(self):
+        scope = RUN.RunOrderScope(2_100_000_000)
+        order = cache_order("O-19700101-000001-001-001-1", [
+            event("OrderInitialized", typ="MARKET", when=2_500_000_000)], status="INITIALIZED")
+        native = order.events()[0]
+        self.assertGreaterEqual(native.ts_init, scope.started_ns)
+        # Removing the started-second guard leaves every other condition true.
+        self.assertEqual(native.ts_init // 1_000_000_000 - 1, 1)
+        self.assertFalse(scope.generated_here(native))
+        self.assertEqual(scope.partition([order])[0], [])
+
     def test_generated_identity_excludes_old_or_mismatched_intents(self):
         scope = RUN.RunOrderScope(2_100_000_000)
         cases = [
@@ -1026,6 +1037,32 @@ class AdmissionRefusals(unittest.TestCase):
     def args(self, path, *extra):
         return RUN.parser().parse_args(["--receipt", str(path), *extra])
 
+    def test_luld_closing_overlap_refuses_before_any_broker_request(self):
+        for minute in (29, 35, 43):
+            with self.subTest(minute=minute), tempfile.TemporaryDirectory() as directory:
+                now = NOW.astimezone(NY).replace(hour=15, minute=minute, second=0)
+                # These times satisfy the old whole-run RTH rule.
+                self.assertTrue(RUN.frozen().rth_check(now, PLAN)[0])
+                with mock.patch.object(RUN, "official_admission") as admission, mock.patch.object(RUN, "official_check") as proof, mock.patch.object(RUN, "build_node") as node, mock.patch.object(RUN.subprocess, "Popen") as process, mock.patch.object(RUN.safety(), "AccountLease") as lease:
+                    receipt = RUN.run_trial(self.args(Path(directory) / "receipt.json"), now=now, versions=PINNED)
+                self.assertEqual((receipt["status"], receipt["exit_code"]), ("refused_luld_closing_period", 3))
+                self.assertEqual(receipt["quote_admission"]["stage"], "luld_tier1_closing_period_band")
+                self.assertEqual(receipt["quote_admission"]["reason"], "planned_order_window_overlaps_15_35_et")
+                self.assertEqual(receipt["quote_admission"]["order_horizon_seconds"], 360)
+                self.assertEqual(receipt["quote_admission"]["closing_band_fraction"], "0.10")
+                self.assertIsNone(receipt["pre_check"])
+                for operation in (admission, proof, node, process, lease):
+                    operation.assert_not_called()
+
+    def test_luld_order_window_boundary_in_new_york_and_utc(self):
+        start = NOW.astimezone(NY).replace(hour=15, minute=28, second=59)
+        admitted = RUN.closing_period_admission(PLAN, start.astimezone(timezone.utc))
+        self.assertEqual(admitted["status"], "passed")
+        self.assertTrue(admitted["planned_order_window_end"].startswith("2026-10-05T15:34:59"))
+        refused = RUN.closing_period_admission(PLAN, start.replace(minute=29, second=0))
+        self.assertEqual(refused["status"], "refused_luld_closing_period")
+        self.assertTrue(refused["planned_order_window_end"].startswith("2026-10-05T15:35:00"))
+
     def test_pins_window_ports_and_ids_refuse_without_connecting(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "receipt.json"
@@ -1089,7 +1126,7 @@ class ChildRefusals(unittest.TestCase):
     def test_pre_node_refusals_are_written_and_preserved_by_parent_mapping(self):
         for condition, expected in (("plan", "refused_child_plan"), ("runtime", "refused_child_runtime"),
                                      ("window", "refused_child_window"), ("quote", "refused_child_quote_admission"),
-                                     ("payload", "refused_child_payload")):
+                                     ("payload", "refused_child_payload"), ("nonce", "refused_child_receipt_nonce")):
             with self.subTest(condition=condition), tempfile.TemporaryDirectory() as directory:
                 path = Path(directory) / "receipt.json"
                 receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
@@ -1102,6 +1139,8 @@ class ChildRefusals(unittest.TestCase):
                     payload["quote_admission"]["admitted_monotonic"] -= 11
                 if condition == "payload":
                     del payload["node_stop_at"]
+                if condition == "nonce":
+                    payload["run_nonce"] = "0" * 32
                 versions = {} if condition == "runtime" else PINNED
                 args = RUN.parser().parse_args(["--_node-phase", "--port", "4002", "--receipt", str(path)])
                 with mock.patch.object(RUN.sys, "stdin", io.StringIO(json.dumps(payload))), mock.patch.object(RUN, "load_plan", return_value=plan), mock.patch.object(RUN, "runtime_versions", return_value=versions), mock.patch.object(RUN.frozen(), "rth_check", return_value=(condition != "window", "synthetic")), mock.patch.object(RUN, "build_node") as node:
@@ -1128,7 +1167,7 @@ class ChildRefusals(unittest.TestCase):
 
 class SyntheticOrchestration(unittest.TestCase):
     """Official checks, quote admission and node execution are synthetic."""
-    def drive(self, proof=None, proof_account=FAKE_ACCOUNT, pre_status="passed", events=None, quote=None, proof_hook=None, pre_account=FAKE_ACCOUNT, fail_final_write=False):
+    def drive(self, proof=None, proof_account=FAKE_ACCOUNT, pre_status="passed", events=None, quote=None, proof_hook=None, pre_account=FAKE_ACCOUNT, fail_final_write=False, foreign_receipt=False):
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
         path = Path(directory.name) / "receipt.json"
@@ -1137,6 +1176,7 @@ class SyntheticOrchestration(unittest.TestCase):
         pre.update(status=pre_status, liquid_hours="20261005:0930-20261005:1600", time_zone_id="US/Eastern")
         proof = copy.deepcopy(FLAT if proof is None else proof)
         test = self
+        own_nonce = []
 
         class FixedDateTime(datetime):
             @classmethod
@@ -1148,9 +1188,17 @@ class SyntheticOrchestration(unittest.TestCase):
                 payload = json.loads(pipe.getvalue())
                 test.assertEqual(payload["account_id"], FAKE_ACCOUNT)
                 receipt = payload["receipt"]
+                if not foreign_receipt:
+                    test.assertEqual(payload["run_nonce"], receipt["run_nonce"])
+                    test.assertRegex(payload["run_nonce"], r"^[0-9a-f]{32}$")
+                own_nonce.append(receipt.get("run_nonce"))
                 receipt["node"].update(started=True, stop_ns=STOP_NS)
                 test.assertTrue(RUN.validate_child_admission(PLAN, payload))
                 RUN.update_observations(receipt, sequence() if events is None else events, PLAN)
+                if foreign_receipt:
+                    # Another account's independently initialized parent uses
+                    # the same receipt path and writes otherwise passing evidence.
+                    receipt["run_nonce"] = "0" * 32
                 RUN.write_receipt(path, receipt, (FAKE_ACCOUNT,))
                 super().close()
 
@@ -1195,6 +1243,8 @@ class SyntheticOrchestration(unittest.TestCase):
         if fail_final_write:
             self.assertEqual(injected, [True])
         self.assertNotIn(FAKE_ACCOUNT, path.read_text())
+        if foreign_receipt:
+            self.assertEqual(receipt.get("run_nonce"), own_nonce[0])
         self.assertEqual(receipt["account_lease"], {"acquired": True})
         lock_name = RUN.safety().account_lock_name(FAKE_ACCOUNT)
         for raw in (json.dumps(receipt), path.read_text()):
@@ -1207,6 +1257,19 @@ class SyntheticOrchestration(unittest.TestCase):
         self.assertEqual(checker.call_count, 1)
         self.assertFalse(checker.call_args_list[0].kwargs["with_session"])
         self.assertEqual(receipt["status"], "passed")
+
+    def test_foreign_run_receipt_is_not_adopted_and_flat_proof_still_runs(self):
+        receipt, checker = self.drive(foreign_receipt=True)
+        self.assertEqual((receipt["status"], receipt["exit_code"]), ("incomplete", 1))
+        self.assertFalse(receipt["node"]["started"])
+        self.assertTrue(receipt["node"]["child_launched"])
+        self.assertEqual(receipt["events"], [])
+        self.assertEqual(receipt["fills"], [])
+        self.assertIsNone(receipt["roundtrip"])
+        self.assertEqual([case["outcome"] for case in receipt["cases"].values()], ["not_run"] * 4)
+        self.assertTrue(any(f["reason"] == "child_receipt_nonce_mismatch" for f in receipt["failures"]))
+        self.assertEqual(receipt["flat_proof"]["status"], "passed")
+        self.assertEqual(checker.call_count, 1)
 
     def test_final_write_failure_retains_child_evidence_and_never_not_started(self):
         receipt, checker = self.drive(fail_final_write=True)

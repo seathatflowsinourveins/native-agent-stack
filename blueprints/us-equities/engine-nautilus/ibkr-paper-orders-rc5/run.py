@@ -23,7 +23,7 @@ import tempfile
 import threading
 import time
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 from functools import lru_cache
 from pathlib import Path
@@ -41,6 +41,10 @@ TERMINAL_FAILURES = {"OrderDenied", "OrderRejected", "OrderExpired", "OrderCance
 # NMS Limit Up-Limit Down Plan, Tier 1 core-session price band. This is a
 # single-band admission stress, not a submission-time engine notional cap.
 LULD_TIER1_CORE_BAND = Decimal("0.05")
+# NMS LULD Plan, Tier 1 last-25-minutes band: do not let the planned
+# order/close horizon enter this double-width period with a 5% admission stress.
+LULD_TIER1_CLOSING_PERIOD_BAND = Decimal("0.10")
+LULD_TIER1_CLOSING_PERIOD_START_ET = (15, 35)
 # The frozen USD 1/order allowance needs USD 0.02 for run 3's USD 1.02 sell fee.
 COMMISSION_MARGIN_PER_ORDER_USD = Decimal("0.02")
 TESTER_SETTINGS = {
@@ -238,6 +242,30 @@ def resting_offset_ticks(bid, plan):
     """Frozen half-bid placement through upstream ExecTester's supported offset."""
     tick = decimal(plan["instrument"]["expected_price_increment"])
     return int((decimal(bid) * Decimal("0.5") / tick).to_integral_value(rounding=ROUND_FLOOR))
+
+
+def closing_period_admission(plan, start):
+    """Refuse closing-band overlap before any official-client request.
+
+    node_stop_at reserves proof, cleanup and stop allowance from the overall
+    deadline; adding the close horizon restores cleanup and stop allowance.
+    Source: the NMS LULD Plan's Tier 1 last-25-minutes double-width band.
+    """
+    times = plan["timeouts"]
+    node_stop_seconds = (times["overall_deadline_seconds"] - times["post_check_reserve_seconds"]
+                         - times["cleanup_seconds"] - times["node_stop_allowance_seconds"])
+    close_horizon = times["cleanup_seconds"] + times["node_stop_allowance_seconds"]
+    horizon = node_stop_seconds + close_horizon
+    start_et = start.astimezone(frozen().ZoneInfo("America/New_York"))
+    end_et = start_et + timedelta(seconds=horizon)
+    closing_start = start_et.replace(hour=LULD_TIER1_CLOSING_PERIOD_START_ET[0],
+                                    minute=LULD_TIER1_CLOSING_PERIOD_START_ET[1], second=0, microsecond=0)
+    result = {"status": "passed", "stage": "luld_tier1_closing_period_band",
+              "order_horizon_seconds": horizon, "closing_band_fraction": str(LULD_TIER1_CLOSING_PERIOD_BAND),
+              "planned_order_window_end": end_et.isoformat()}
+    if end_et >= closing_start:
+        result.update(status="refused_luld_closing_period", reason="planned_order_window_overlaps_15_35_et")
+    return result
 
 
 def admit_quote(plan, quote, server_time_epoch, *, elapsed_seconds=0, delayed=False, errors=()):
@@ -674,6 +702,7 @@ def new_receipt(plan, plan_path, versions):
     except OSError:
         plan_hash = None
     return {"schema_version": 1, "kind": KIND, "evidence_class": "native_paper",
+            "run_nonce": uuid.uuid4().hex,
             "started_at": datetime.now(timezone.utc).isoformat(), "versions": versions,
             "plan_sha256": plan_hash, "harness_sha256": sha256(__file__),
             "source_hashes": {"frozen_checker_sha256": sha256(FROZEN_RUN), "safety_sha256": sha256(HERE / "safety.py")},
@@ -1175,6 +1204,11 @@ def run_trial(args, *, now=None, versions=None):
         receipt["window"] = window
         if not inside:
             status = "refused_outside_window"
+    if status is None:
+        closing_admission = closing_period_admission(plan, now)
+        if closing_admission["status"] != "passed":
+            receipt["quote_admission"] = closing_admission
+            status = closing_admission["status"]
     if status:
         finish(receipt, status, reason="; ".join(errors) if errors else status)
         if args.receipt:
@@ -1261,6 +1295,7 @@ def run_admitted_trial(args, plan, receipt, deadline, expected_account, lease, j
     # Atomic provisional cleanup_required receipt BEFORE creating the child/node.
     write_receipt(args.receipt, receipt, (account_id,))
     child = None
+    run_nonce = receipt["run_nonce"]
     interrupted = []
     old_handlers = {}
 
@@ -1284,6 +1319,7 @@ def run_admitted_trial(args, plan, receipt, deadline, expected_account, lease, j
                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=child_env, pass_fds=(lease.fd,))
         # Anonymous pipe only: no account in argv, environment, file or receipt.
         child.stdin.write(json.dumps({"account_id": account_id, "receipt": receipt, "node_stop_at": stop_at,
+                                     "run_nonce": run_nonce,
                                      "quote_admission": admitted, "tob_offset_ticks": admitted["tob_offset_ticks"],
                                      "journal_path": str(journal.path), "run_id": journal.run_id}))
         child.stdin.close()
@@ -1312,12 +1348,18 @@ def run_admitted_trial(args, plan, receipt, deadline, expected_account, lease, j
         launched = receipt["node"].get("child_launched", False)
         try:
             latest = json.loads(Path(args.receipt).read_text())
-            latest["failures"].extend(saved_failures)
-            latest["node"]["child_launched"] = launched
-            # Keep the caller's object current even if flat proof or a later
-            # receipt write raises. Never revert to pre-node evidence.
-            receipt.clear()
-            receipt.update(latest)
+            if latest.get("run_nonce") != run_nonce:
+                # Other accounts can hold separate leases but share this path.
+                # Preserve our provisional evidence and still perform flat proof.
+                receipt["failures"].append({"acceptance_step": 3, "cases_blocked": list(CASE_IDS),
+                                            "reason": "child_receipt_nonce_mismatch"})
+            else:
+                latest["failures"].extend(saved_failures)
+                latest["node"]["child_launched"] = launched
+                # Keep the caller's object current even if flat proof or a later
+                # receipt write raises. Never revert to pre-node evidence.
+                receipt.clear()
+                receipt.update(latest)
         except (OSError, ValueError):
             pass  # Preserve provisional state; a corrupt receipt can never pass.
         proof, proof_account = official_check(plan, port, with_session=False, deadline=deadline)
@@ -1392,6 +1434,12 @@ def run_child(args):
         reason = "refused_child_plan"
     if reason is None and runtime_refusal(runtime_versions()):
         reason = "refused_child_runtime"
+    if reason is None:
+        nonce = payload.get("run_nonce")
+        child_receipt = payload.get("receipt")
+        if (not isinstance(nonce, str) or len(nonce) != 32 or any(c not in "0123456789abcdef" for c in nonce)
+                or not isinstance(child_receipt, dict) or child_receipt.get("run_nonce") != nonce):
+            reason = "refused_child_receipt_nonce"
     if reason is None:
         try:
             inside = frozen().rth_check(datetime.now(timezone.utc), plan,
