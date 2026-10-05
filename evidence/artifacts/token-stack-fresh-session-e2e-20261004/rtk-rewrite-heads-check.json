@@ -1,5 +1,5 @@
 {
-  "schema": "rtk-rewrite-heads-check/1",
+  "schema": "rtk-rewrite-heads-check/2",
   "evidence_class": "local_integration: one run, one host, rtk upstream defaults in a scratch HOME",
   "rtk": "rtk 0.51.0",
   "fixture_rtk": "rtk 0.51.0",
@@ -782,9 +782,65 @@
     ],
     "gaps": []
   },
+  "variants": {
+    "heads": 101,
+    "forms": [
+      "EXE",
+      "abs",
+      "backslash",
+      "bare",
+      "bat",
+      "bin",
+      "capital",
+      "cmd",
+      "dash",
+      "dot",
+      "dotslash_win",
+      "dquote",
+      "exe",
+      "prefix",
+      "ps1",
+      "rel",
+      "slash",
+      "squote",
+      "underscore",
+      "upper",
+      "vendor",
+      "winpath"
+    ],
+    "shapes": [
+      "x",
+      "status",
+      "run x",
+      "-C . push"
+    ],
+    "commands": 8884,
+    "rewritten": 480,
+    "forms_rewritten": [
+      "EXE",
+      "abs",
+      "bare",
+      "bat",
+      "bin",
+      "cmd",
+      "dash",
+      "dot",
+      "dotslash_win",
+      "exe",
+      "ps1",
+      "rel",
+      "slash",
+      "vendor",
+      "winpath"
+    ],
+    "gaps": []
+  },
   "wrappers": {
-    "prefixes": 61,
+    "prefixes": 67,
     "rewritten": [
+      "/usr/bin/nice git status",
+      "/usr/bin/time git status",
+      "/usr/bin/timeout 5 git status",
       "FOO=1 BAR=2 git status",
       "FOO=1 git status",
       "builtin git status",
@@ -808,10 +864,13 @@
       "uv run git status"
     ],
     "not_rewritten": [
+      "/usr/bin/env git status",
+      "\\time git status",
       "asdf exec git status",
       "bash -c git status",
       "bundle exec git status",
       "chroot /x git status",
+      "command -p git status",
       "conda run git status",
       "direnv exec . git status",
       "doas git status",
@@ -865,5 +924,19 @@
     "uv pip install x": "rtk uv pip install x"
   },
   "hcom_commands_rewritten": [],
+  "reviewed_entries": {
+    "entries": [
+      "hcom-deny.rules"
+    ],
+    "sha256": [
+      "845f06b0ca31d03956df813ea7ab426e42ab784de7f39010c4a70cc91e3bc0e1"
+    ],
+    "first_tokens": [
+      "hcom",
+      "uvx"
+    ],
+    "commands": 352,
+    "rewritten": []
+  },
   "ok": true
 }

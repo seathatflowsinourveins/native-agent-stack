@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
-"""Derive, from rtk's own source at a pinned tag, the set of command heads rtk's hook can rewrite (tools/adoption/rtk_rewrite_heads.json).
+"""Derive, from rtk's own source at a pinned tag, the set of command heads rtk's hook can rewrite (rtk-rewrite-heads.json beside this file).
 
-    python3 derive_rtk_rewrite_heads.py --source <rtk clone> [--tag v0.51.0] --write ../../../tools/adoption/rtk_rewrite_heads.json
-    python3 derive_rtk_rewrite_heads.py --source <rtk clone> --check ../../../tools/adoption/rtk_rewrite_heads.json
+This is review evidence, not a gate: tools/adoption/codex_hook_trust.py parses no rule file and reads no heads (three reads found a bypass in every analysing
+version). The file supports the entry of tools/adoption/exec_rules_reviewed.json, the review of #713's hcom-deny.rules (neither `hcom` nor `uvx` is a head),
+and a pin move of rtk must re-derive it and re-review that entry.
+
+    python3 derive_rtk_rewrite_heads.py --source <rtk clone> [--tag v0.51.0] --write rtk-rewrite-heads.json
+    python3 derive_rtk_rewrite_heads.py --source <rtk clone> --check rtk-rewrite-heads.json
 
 Why: `rtk hook codex` replaces a Bash call with its rewrite before Codex matches execution rules on the command words, so a rule whose
 prefix can be rewritten out of it is no longer matched (docs/decisions/2026-10-04-codex-rtk-hook-qualified.md). rtk's rewrite is decided by
@@ -13,11 +17,11 @@ keeps in front of `rtk`). A rule whose first token is not one of the heads below
 
 The heads are: the leading token(s) of every RULES pattern and of every builtin TOML filter's match_command (for a pattern that starts with an optional
 wrapper group, both the wrapper's tokens and the tool's, found by walking the parsed regex, not by reading it), the names in PROCESS_WRAPPERS, SHELL_KEYWORD_PREFIXES and ROUTABLE_WRAPPER_PREFIXES,
-`env` and a NAME=value token (ENV_PREFIX). A head that the pattern ends with `\\b` also accepts a continuation that starts with a non-word character
-(`^gcc\\b` matches the word `gcc-13`). A path-qualified head is reduced to its basename (rtk strips absolute paths, and ./ and vendor/bin/
+`env` and a NAME=value token (ENV_PREFIX). A head that the pattern ends with `\\b` also accepts any continuation (`^gcc\\b` matches the word `gcc-13`, and the shell's reading of the raw
+`gcc\\x`). A path-qualified head is reduced to its basename (rtk strips absolute paths, and ./ and vendor/bin/
 forms, before matching). rtk's user-configured `[hooks].transparent_prefixes` are not in the file: the review reads them from `rtk config`.
-The file is valid for the one rtk version it names; a pin move must re-derive it (tests/test_codex_hook_trust.py compares it with
-adoption/pins-linux-x86_64.json).
+The file is valid for the one rtk version it names; a pin move must re-derive it and re-review the reviewed list
+(tests/test_codex_hook_trust.py compares the entries of tools/adoption/exec_rules_reviewed.json with adoption/pins-linux-x86_64.json).
 """
 
 from __future__ import annotations
@@ -169,8 +173,9 @@ def leading_tokens(pattern: str) -> set[str]:
             token += text
         token = token.rsplit("/", 1)[-1]
         if token and word_boundary:
-            # `\b` ends the head at a word boundary, not at whitespace: `^gcc\b` also matches the word `gcc-13` or `gcc.x`.
-            token += r"(?:\W\S*)?" if re.search(r"(?:[A-Za-z0-9_]|\\w)$", token) else r"(?:\w\S*)?"
+            # `\b` ends the head at a word boundary, not at whitespace: `^gcc\b` also matches the word `gcc-13` or `gcc.x`, and a shell reads a backslash
+            # inside a word away (rtk sees the raw `ty\pe`, a rule sees `type`), so any continuation counts.
+            token += r"\S*"
         if token:
             tokens.add(token)
     return tokens
@@ -222,6 +227,9 @@ def derive(repo: Path, tag: str) -> dict:
         for offset, text in enumerate(block):
             for word in re.findall(r'"([^"]+)"', text):
                 add(re.escape(word.split()[0]), f"src/discover/registry.rs:L{line + offset} {name}")
+    php = re.search(r"const PHP_TOOL_NAMES: \[&str; \d+\] = \[(.*?)\];", registry_rs)
+    php_line = registry_rs[:php.start()].count("\n") + 1
+    php_names = re.findall(r'"([^"]+)"', php.group(1))
     env_line = next(i for i, text in enumerate(registry_rs.splitlines(), 1) if "static ENV_PREFIX" in text)
     add("env", f"src/discover/registry.rs:L{env_line} ENV_PREFIX")
     add(r"[A-Z_][A-Z0-9_]*=.*", f"src/discover/registry.rs:L{env_line} ENV_PREFIX")
@@ -238,6 +246,10 @@ def derive(repo: Path, tag: str) -> dict:
                                                                          text=True, check=True).stdout.encode()).hexdigest()},
         "rule": "A rule's first pattern token (every alternative, reduced to its basename) that fullmatches a head can be rewritten out of the rule's reach.",
         "not_in_file": "[hooks].transparent_prefixes of the host's rtk config: the review reads them from `rtk config`.",
+        "php_tool_names": {"names": php_names, "from": f"src/discover/registry.rs:L{php_line} PHP_TOOL_NAMES",
+                           "rule": "rtk normalizes a PHP tool word before it matches (normalize_php_tool_path, L364-L430: backslashes become slashes, a leading ./ goes, a "
+                                   ".bat, .cmd, .exe or .ps1 extension goes), and a shell removes the backslashes of the raw word, so a rule token that ends with one of "
+                                   "these names (after the same extension strip) is a head too."},
         "heads": sorted(heads.values(), key=lambda entry: (entry["regex"], entry["head"])),
     }
 

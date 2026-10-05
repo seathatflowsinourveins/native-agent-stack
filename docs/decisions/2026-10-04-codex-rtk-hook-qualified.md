@@ -163,76 +163,87 @@ and rust-v0.160.0 `a956835d0207`, identical lines) and rtk v0.51.0 (`e001f773f80
    `<codex home>/rules` on 2026-10-05: no such directory; NativeStack has none either), so no user-layer rule exists for the rewrite to bypass. That is a
    statement about the user layer; the tool does not see a project's `.codex/rules` or a managed layer.
 
-**Decision.** Keep the upstream install, and review the user layer's rules before the hook is activated (`tools/adoption/codex_hook_trust.py`, third version of
-2026-10-05). The first version refused whenever a rules file existed (head 4739ea829). 705d and job-071 read it; the command center then asked for a refusal
-only where a rule could really be bypassed, so that #713's `hcom-deny.rules` (rtk rewrites none of its commands) would not block the row, and the second version
-(e6321c0b8) compared the decisions that `codex execpolicy check` gives on the commands the rules name, and on a sample of rtk-rewritten commands, with and
-without the rewrite of `rtk hook check --agent codex`. The 705e read showed that this cannot be completed: P1 an entry-level `FileNotFoundError` still failed
-open (the handler wrapped the iteration, and Codex asks every entry's file type before its extension); P1 a `prefix_rule` nested in an argument of
-`host_executable` is accepted by the real codex-cli 0.159.3 evaluator and was never counted; P1 a prefix that rtk leaves alone has extensions that it rewrites
-(`["git", "-C", "."]` forbidden: `rtk hook check` exits 1 for `git -C .` and rewrites `git -C . push origin main` to `rtk git -C . push origin main`, and the
-evaluator forbids the original and not the rewrite; broad `["uv"]` and `["npx"]` forbids passed, `uv run harmless.py` and `npx prisma migrate deploy` being
-rewritten). The rewrite space is not finite. rtk's classifier is one anchored regex per tool over the whole command, after it has peeled off env prefixes, git and
-other global options, absolute paths, the process and shell wrappers and the configured `transparent_prefixes` (`src/discover/registry.rs` L64, L194-L215, L438,
-L568, L1386-L1498), and the rewrite also changes words after `rtk` (`cat f` becomes `rtk read f`, `python3 -m pytest` becomes `rtk pytest`, `uv pip install`
-becomes `rtk pip install`, `yadm status` becomes `rtk git status`), so neither a finite probe set nor an `rtk` twin can show that a rule is preserved. The third
-version adopts the fail-closed rule that the 705e read proposed and the command center accepted:
-  - **The rule.** A `forbidden` or `prompt` rule is exposed unless its first pattern token (every alternative; a path is reduced to its basename) is a word
-    that rtk 0.51.0 cannot route at all. `tools/adoption/rtk_rewrite_heads.json` lists the heads that it can: the leading tokens of each of the 94 `RULES`
-    patterns in `src/discover/rules.rs` and of each of the 62 builtin TOML filters in `src/filters/*.toml` (which `registry.rs` L1743-L1760 consults, so the hook
-    filters `gcc`, `jq`, `ssh`, `stat`, `mise` and others too), found by walking the parsed regexes (an optional wrapper group gives both the wrapper and the
-    tool: `python3 -m pytest`, `bundle exec rake`, `pnpm dlx tsc`; a `\b`-terminated pattern also accepts a continuation: `^gcc\b` matches `gcc-13`), the four
-    `PROCESS_WRAPPERS`, the shell keywords and `uv run`, `env` and a `NAME=value` token (`ENV_PREFIX`), each with its line in the pinned source. The review adds
-    the first word of every `[hooks].transparent_prefixes` entry that `rtk config` reports and the word each user-global TOML filter starts with, and fails
-    closed on a filter whose pattern is not a plain anchored word. An `rtk` twin does not change the verdict. A rule on `hcom ...` or `uvx hcom ...` is not exposed
-    (neither word is a head), so #713's file passes; a rule on `rtk ...` alone is not exposed either. An `allow` rule on a head is only noted (its rewrite may
-    need an approval), and the default decision is `allow`.
-  - **Why the rule is sound.** Every pattern is `^`-anchored, so a rewrite only replaces the program at the start of a segment, after prefixes that the rewrite
-    keeps in front of `rtk` (`strip_process_wrapper_prefix`, `ENV_PREFIX`); a rule whose first token is not a head can therefore not have a command it matches
-    rewritten out of its reach, whatever follows it. The file is a derivation from source, checked against the binary, not a proof: the check can falsify it.
-  - **The version gate.** The heads are valid for the one rtk version they name. `rtk --version` must report it (another version refuses the review, so a newer
-    rtk cannot silently widen the rewrite set), and `tests/test_codex_hook_trust.py` compares the file with the rtk entry of `adoption/pins-linux-x86_64.json`
-    (version and commit). **A pin move of rtk must re-derive the file** (`derive_rtk_rewrite_heads.py --source <clone> --write tools/adoption/rtk_rewrite_heads.json`,
-    then `check_rtk_rewrite_heads.py` and the scratch run): the PR that moves the pin carries it, because that test fails otherwise, and the RTK row of
-    `docs/token-efficiency-stack.json` names the step in the currency process (the command center's request of 2026-10-05).
-  - **The rest of the review, fail closed.** The rules directory is listed as Codex's `collect_policy_files` does (`exec_policy.rs` L1121-L1170: only opening it may
-    report a missing directory; an error on the open, the iteration or an entry's file type fails, and every entry's type is asked before its extension; a symlink or
-    another non-file is not loaded). The files are read with Python's `ast` (Starlark's keyword calls of `prefix_rule` and `host_executable` are Python literals):
-    every argument of both builtins must be a literal, because Codex evaluates argument expressions and a nested call can register a rule; a statement that is
-    not such a call, a positional or `**` argument, an argument that is not known, a value that is not a literal, a bad decision or a syntax error is refused,
-    not guessed. Any failure is an exposure. `--apply` refuses (exit 2) before the app-server starts, so before any write, even for an already trusted hook;
-    `--check` exits 6 for a trusted hook beside an exposure (5 stays for an untrusted one), and the post_install acceptance runs it, so a rule added after the
-    grant is caught on the next acceptance run; `--allow-exec-rules` accepts an exposure, after the `rtk` forms of the rules are written and checked with
-    `codex execpolicy check`. With no rule file nothing runs; `rtk --version` and `rtk config` run only for a `forbidden` or `prompt` rule. The plan's trust and
-    check commands pass `--rtk "$e/bin/rtk"`. A Codex rules file that does not parse makes Codex load no file rules at all (`exec_policy.rs` L645-L660,
-    `load_exec_policy_with_warning`), while a listing or read error fails the policy load; the review reports both.
+**Decision.** Keep the upstream install, and gate the activation of the hook on the user layer's rule files with a review that parses nothing
+(`tools/adoption/codex_hook_trust.py`, fourth version of 2026-10-05). The history is three analysing versions and three sets of bypasses. The first version
+refused whenever a rules file existed (head 4739ea829); 705d and job-071 read it. The command center then asked for a refusal only where a rule could really be
+bypassed, so that #713's `hcom-deny.rules` (rtk rewrites none of its commands) would not block the row. The second version (e6321c0b8) compared the decisions that
+`codex execpolicy check` gives on the commands the rules name and on a sample of rtk-rewritten commands; 705e found that it cannot be completed: P1 an entry-level
+`FileNotFoundError` failed open, P1 a `prefix_rule` nested in an argument of `host_executable` is accepted by the real codex-cli 0.159.3 evaluator and was never
+counted, P1 a prefix that rtk leaves alone has extensions that it rewrites (`["git", "-C", "."]`: `rtk hook check` exits 1 for `git -C .` and rewrites
+`git -C . push origin main`; broad `["uv"]` and `["npx"]` forbids passed). The third version (a9a07d815, c771da9eb) derived the command heads that rtk can rewrite
+from its source and checked each rule's first token against them, reading the rules with Python's `ast`; 705f found five P1s and a P2 in it: a raw CR inside a
+triple-quoted token, which Codex's Starlark lexer drops (the pattern is `git push`) and Python's reader turns into a newline; a rule on the whole shell argv
+(`["bash", "-lc", "FOO=1 git push origin main"]`), which Codex evaluates when it cannot split an assignment-prefixed script, and rtk rewrites the script; the PHP
+tool spellings that rtk normalizes (`phpunit.exe`); a user-global TOML filter whose pattern has a second branch (`^reviewalpha\b|^hcom\b`) that rtk rewrites after
+`rtk trust`; rtk's Unicode word boundary (`g++` plus a combining mark); and P2 `DirEntry.is_file()` suppresses a missing-entry error that Codex's `file_type()`
+propagates. Every analysing version modelled two things that must agree with the real ones, Codex's Starlark evaluator on one side and rtk's rewrite on the other,
+and every read found a place where they differ; each repair widened the analysed surface (heads, parser, matcher). The fourth version is the design that 5f
+recommended after 705f and the command center accepted: the tool no longer decides what a rule means.
+  - **The rule.** For each regular file with the extension `.rules` in `<codex home>/rules`, read as bytes:
+    (1) its sha256 is on the reviewed list, `tools/adoption/exec_rules_reviewed.json`, and the host conditions of the entry hold: it is accepted;
+    (2) it holds nothing but allow rules in Codex's own format, byte for byte (lines `prefix_rule(pattern=["a", "b"], decision="allow")` whose tokens are
+    printable ASCII without a quote or a backslash, as `codex-rs/execpolicy/src/amend.rs` writes `default.rules`; comment lines of printable ASCII without a
+    backslash, which hcom's own `hcom.rules` begins with (`aannoo/hcom` 7151660a3, `src/hooks/codex.rs` `build_codex_rules`); empty lines; hcom's file as its installer builds it, from `SAFE_HCOM_COMMANDS` and `HCOM_TOOL_NAMES`, has no character outside the grammar): it is accepted,
+    because an allow rule that a rewrite stops matching only loses its approval and restricts nothing, and a language this small reads the same in every
+    parser; one with a token `rtk` is refused, because the hook's rewrite inserts that word, so the rule matches the rewritten command and not the original
+    and widens an approval (codex-cli 0.159.3 `execpolicy check`: under `["rtk"]` allow, `rtk git push origin main` is `allow` and `git push origin main` has
+    no decision; `plan-row-scratch-run.json`, `allow_rtk_check`);
+    (3) otherwise it is an exposure. `--apply` refuses with exit 2 before the app-server starts, so before any write, even for an already trusted hook;
+    `--check` exits 6 for a trusted hook beside an exposure (5 stays for an untrusted one), and the post_install acceptance runs it, so a rule file added or
+    edited after the grant is caught on the next acceptance run; `--allow-exec-rules` accepts the exposure, after the `rtk` form of each restricting rule is written
+    beside the plain one and both are checked with `codex execpolicy check`. Any step that cannot be done (a listing or read error, a broken list, an rtk that does not
+    answer) is an exposure as well. With no rule file nothing is read and rtk is not run.
+  - **The reviewed list.** An entry is the review of one exact file for one rtk version: the sha256, the first tokens of its rules, the rtk version and commit it was
+    reviewed for, and its evidence. Today it has one entry, #713's `config/hcom-deny.rules` at head 5f295f254 (a copy is kept as
+    `fixtures/hcom-deny.rules`): every rule is a prefix rule on `hcom ...` or `uvx hcom ...`, neither word is a command rtk 0.51.0 can route, so no
+    command that a rule matches is rewritten, and a command behind a wrapper (`time hcom ...`) is outside a prefix rule's reach with or without the rewrite. The review rests on `rtk-rewrite-heads.json` (the heads derived from
+    rtk's 94 `RULES` patterns and 62 builtin TOML filters, the wrappers and the env prefix, with line provenance) and on `check_rtk_rewrite_heads.py`, whose section 6
+    ran the entry's first tokens in 22 spellings and 8 shapes, alone and behind each wrapper (352 commands) against the real binary: none is rewritten. Both are review
+    evidence, not a gate: the tool reads neither. The conditions of an entry are the ones the review was made under: `rtk --version` must report the entry's version,
+    `rtk config` must show `transparent_prefixes = []` (a configured prefix makes rtk rewrite the command after it), and the user-global TOML filters file beside rtk's
+    config must hold nothing but comments and `schema_version` (a filter's `match_command` can make rtk rewrite any command). One changed byte of the file, another rtk,
+    a prefix or a filter ends the review. **A pin move of rtk re-reviews the list**: `tests/test_codex_hook_trust.py` compares each entry with the rtk entry of
+    `adoption/pins-linux-x86_64.json` (version and commit), so the PR that moves the pin carries the new review (re-derive the heads with
+    `derive_rtk_rewrite_heads.py`, run `check_rtk_rewrite_heads.py` and the scratch run, update the entry), and the RTK row of `docs/token-efficiency-stack.json` names
+    the step in the currency process. A file that ships with an install plan row must be on the list or allow-only, which a test checks.
+  - **The listing, fail closed.** The rules directory is listed as Codex's `collect_policy_files` does (`exec_policy.rs` L1121-L1170): only opening it may report a
+    missing directory, every other error (the open, the iteration, an entry) is a failure, and the type of every entry is asked before its extension, from its own
+    `lstat` (`os.scandir` entry `stat(follow_symlinks=False)`, which raises for an entry that vanished), so a symlink, a directory or a named pipe is not loaded and
+    never opened. The cost is false refusals: any hand-written restricting rule that is not on the list, and a `default.rules` that Codex wrote with an escape (an
+    approved command with a quote or a backslash), is an exposure until it is reviewed into the list or accepted with `--allow-exec-rules`.
 
-Evidence (`local_integration` unless noted): `plan-row-scratch-run.json`, 42 steps with the real rtk 0.51.0 and codex-cli 0.159.3 in scratch homes: #713's four
-hcom rules (`fixtures/hcom-deny.rules`) let the trust proceed; a `git push` forbid rule is refused before anything is written (accepted with `--allow-exec-rules`,
-after which `--check` exits 6), and so is the same rule with its twin; `git -C .`, broad `uv` and `npx` rules, the nested `host_executable` file (the real
-evaluator forbids `git push origin main` under it) and an unreadable rules directory are refused; a `git push` rule added after a grant makes `--check` exit 6 and
-the trust refuse; each `execpolicy_check` answer needs exit 0 and a valid response. `rtk-rewrite-heads-check.json`: 94 of 94 RULES patterns have a command that
-the binary rewrites, 13,041 scanned commands (1,449 names, 9 shapes) gave 623 rewrites and none outside the heads, 61 wrapper prefixes in front of `git status` gave
-21 rewrites, all led by a head, and none of 17 hcom commands is rewritten. A first derivation from the `RULES` table alone had 101 gaps in that scan, and the scan
-found each cause: the sbt rule is written as an `r#"..."#` raw string, the builtin TOML filters are a second rewrite source (`jq`, `ssh`, `stat`, `mise`, `gcc`),
-and `^gcc\b` accepts `gcc-13` (gaps 101, then 63, then 0). 71 unit tests (`synthetic`: `FakeRtk` stands in for `rtk --version` and `rtk config`; the fixture tests
-read the retained records) were written after the code and checked by mutation: 21 mutants each fail at least one test (`rule_review_mutation_check.py`,
-`rule-review-mutation-check.txt`). The operating rule for rule authors stays: write the `rtk` form beside the plain one and check both with `codex execpolicy
-check`, then accept with `--allow-exec-rules`.
+Evidence (`local_integration` unless noted): `plan-row-scratch-run.json`, 70 steps with the real rtk 0.51.0 and codex-cli 0.159.3 in scratch homes, the plan's own
+command strings: #713's `hcom-deny.rules` by its exact bytes lets the trust proceed (and a `git push` forbid rule added after the grant makes `--check` exit 6 and the
+trust refuse); the same bytes plus one comment line, a configured transparent prefix and a user TOML filter beside the reviewed file are each refused; Codex's and
+hcom's allow-only files let the trust proceed, and an allow rule that names `rtk` is refused; a `git push` forbid rule is refused before anything is written (accepted with `--allow-exec-rules`, after which
+`--check` exits 6), and so is the same rule with its `rtk git push` twin; the counterexamples of 705e (`git -C .`, broad `uv` and `npx` rules, the nested
+`host_executable` file, under which the real evaluator forbids `git push origin main`) and of 705f (raw CR, `bash -lc` script, `phpunit.exe`, `g++` plus a combining
+mark) and an unreadable rules directory are refused; each `execpolicy_check` answer needs exit 0 and a valid response, and `rtk_hook_check` records which of the
+commands the real hook rewrites (`git -C . push origin main`, `uv run harmless.py`, `npx prisma migrate deploy`, `phpunit.exe tests/` and the combining-mark `g++`
+are rewritten; `git -C .`, `uv`, `npx`, `uvx hcom kill luna` and `hcom kill luna` are not). `rtk-rewrite-heads-check.json`: 94 of 94 RULES patterns have a command
+that the binary rewrites, 13,041 scanned commands (1,449 names, 9 shapes) gave 623 rewrites and none outside the heads, 67 wrapper prefixes in front of `git status`
+gave 24 rewrites, all led by a head, 8,884 spellings of the 101 literal heads gave 480 rewrites and none outside the heads, and the 352 commands of the reviewed
+entry gave none (the derivation's gaps were 101, then 63, then 0, and 28, then 40, then 0 in the spelling scan: the `r#"..."#` sbt rule, the TOML filters as a
+second rewrite source, `^gcc\b` accepting `gcc-13`, a trailing slash, PHP `.exe`/`.bat` words, backslash readings). 79 unit tests (`synthetic`: `FakeRtk` stands in for
+`rtk --version` and `rtk config`; the evidence tests read the retained records) were written after the code and checked by mutation: 58 mutants each fail at
+least one test (`rule_review_mutation_check.py`, `rule-review-mutation-check.txt`; the ASCII decode of the grammar is the one equivalent mutant and is not listed).
+The operating rule for rule authors stays: write the `rtk` form beside the plain one and check both with `codex execpolicy check`, then accept with `--allow-exec-rules`.
 
 Limits and residuals: rules in a project's `.codex/rules` or a managed layer are not visible to the tool; rtk TOML filters that a project trusts with `rtk trust`
-(`.rtk/filters.toml`, per directory) can add heads and are not read; Starlark is approximated by Python's parser and anything else is refused; a path head is
-checked by its basename (Codex's `--resolve-host-executables` semantics are not modelled); the head set is derived from the source at the pin and gated on
-`rtk --version`, so a different rtk refuses until the file is re-derived; the binary scan covers the command names of one host and nine argument shapes, so it
-falsifies the derivation and does not prove it; no live Codex session was run with a forbidding rule and the hook active (untested boundary: the session
-behaviour is derived from the dispatch order above and the evaluator that `codex execpolicy check` runs).
+(`.rtk/filters.toml`, per directory) can add heads and are not read, so the review of the hcom entry stands only while no such filter makes rtk rewrite `hcom` or
+`uvx`; the reviewed list covers rtk's default hook configuration of the one version it names; the review covers the user layer's rule files as bytes and does not
+say whether a restricting rule is good; no live Codex session was run with a forbidding rule and the hook active (untested boundary: the session behaviour is
+derived from the dispatch order above and the evaluator that `codex execpolicy check` runs); `--allow-exec-rules` is an explicit acceptance of an exposure.
+What would overturn the design: a Codex that matches execution rules before the PreToolUse rewrite or against both forms, an rtk that reads Codex's rules or has a
+Codex-aware rewrite exclusion, or a maintained upstream gate that supplies the review (the live landscape is re-read at each pin move).
 
 **Review rounds (2026-10-05).** The first version of the guard (4739ea829) was read twice. 705d (Sol, through 5f): P1 `rule_files` failed open when the listing
 raised (`Path.glob` swallows the error); P2 the refusal came after the app-server started; P2 the scratch run accepted a failed evaluator as "no decision".
 Job-071 (through the command center): P2 the same listing hole; P2 rules were reported only for a hook still to be trusted; P3 the claim that approvals-off
-hosts consult no rules. The second version (e6321c0b8) fixed those and was read by 705e (Sol, through 5f): the three P1s above. The third version replaces the
-probing with the rule above and fixes the two mechanical P1s (the listing handler wraps only `os.scandir(directory)`, and every argument of both builtins must be a
-literal). The exclusions default that job-071 recommended is alternative (a).
+hosts consult no rules. The second version (e6321c0b8) fixed those and was read by 705e: the three P1s above. The third version (c771da9eb) fixed them with the head
+set and the `ast` reader and was read by 705f: five P1s and a P2 (above). The fourth version replaces the analysis with the hash list on 5f's recommendation and
+keeps the mechanical repairs (the listing, fail closed). Bounded review loop: one more read of this version, and the residuals above recorded. The exclusions
+default that job-071 recommended is alternative (a).
 
 **Alternatives.** (a) *Limit the hook to a read-only rewrite set with `exclude_commands`* (job-071 recommended exclusions for state-changing families as a
 default beside the guard): rtk's option is exclusion-only (`src/core/config.rs` L119-L123; `src/discover/registry.rs` L1548-L1582: a pattern starting with `^` is
@@ -243,7 +254,9 @@ compression only on short mutating-command output. That read's own probe shows t
 the first thing to add if a bypass is ever observed. (b) *Prove rtk never rewrites mutating commands*: false (item 4). (c) *Hold the Codex hook out again*:
 against the user's directive of 2026-10-04. (d) *Ship `rtk ...` rules with the plan*: under `approval_policy = "never"` a `prompt` rule is rejected by policy and
 becomes `forbidden` (`exec_policy.rs` L216-L236 and the match at L407-L415), which would block the authorization-settings hosts, and a twin cannot be shown to
-cover every rewrite. (e) *Refuse whenever a rules file exists* (the first version): it blocks the row for nothing once #713 installs `hcom-deny.rules`; replaced by
-the rule above, which refuses only the rules that start with a head. (f) *Compare decisions on probed and sampled commands* (the second version): abandoned,
-the 705e counterexamples above. (g) *A wrapper hook that evaluates the rules before delegating to `rtk hook codex`*: it would be complete for the user layer, but
-it replaces upstream's hook command with a self-built component, against the directive to install with upstream commands; not done.
+cover every rewrite. (e) *Refuse whenever a rules file exists* (the first version): it blocks the row for nothing once #713 installs `hcom-deny.rules`; the hash list
+refuses only what is not reviewed or allow-only. (f) *Compare decisions on probed and sampled commands* (the second version): abandoned, the 705e counterexamples.
+(g) *A wrapper hook that evaluates the rules before delegating to `rtk hook codex`*: it would be complete for the user layer, but it replaces upstream's hook command
+with a self-built component, against the directive to install with upstream commands; not done. (h) *Derive rtk's heads and read the rules with a parser* (the third
+version): abandoned, the 705f counterexamples; the derivation and the real-binary check remain as the review evidence for a list entry. (i) *Accept any rule file
+whose first tokens are not heads, by a parser written for the purpose*: the same analysis with the same failure surface; the list reviews exact bytes instead.

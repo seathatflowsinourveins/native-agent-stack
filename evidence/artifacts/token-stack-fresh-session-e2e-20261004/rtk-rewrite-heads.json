@@ -15,6 +15,18 @@
   },
   "rule": "A rule's first pattern token (every alternative, reduced to its basename) that fullmatches a head can be rewritten out of the rule's reach.",
   "not_in_file": "[hooks].transparent_prefixes of the host's rtk config: the review reads them from `rtk config`.",
+  "php_tool_names": {
+    "names": [
+      "phpunit",
+      "phpstan",
+      "ecs",
+      "pest",
+      "paratest",
+      "pint"
+    ],
+    "from": "src/discover/registry.rs:L15 PHP_TOOL_NAMES",
+    "rule": "rtk normalizes a PHP tool word before it matches (normalize_php_tool_path, L364-L430: backslashes become slashes, a leading ./ goes, a .bat, .cmd, .exe or .ps1 extension goes), and a shell removes the backslashes of the raw word, so a rule token that ends with one of these names (after the same extension strip) is a head too."
+  },
   "heads": [
     {
       "head": "ast-grep",
@@ -787,7 +799,7 @@
       ]
     },
     {
-      "head": "ansible\\-playbook(?:\\W\\S*)?",
+      "head": "ansible\\-playbook\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L791",
@@ -795,21 +807,21 @@
       ]
     },
     {
-      "head": "basedpyright(?:\\W\\S*)?",
+      "head": "basedpyright\\S*",
       "regex": true,
       "from": [
         "src/filters/basedpyright.toml:L3"
       ]
     },
     {
-      "head": "biome(?:\\W\\S*)?",
+      "head": "biome\\S*",
       "regex": true,
       "from": [
         "src/filters/biome.toml:L3"
       ]
     },
     {
-      "head": "du(?:\\W\\S*)?",
+      "head": "du\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L834",
@@ -817,7 +829,7 @@
       ]
     },
     {
-      "head": "fail2ban\\-client(?:\\W\\S*)?",
+      "head": "fail2ban\\-client\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L842",
@@ -825,21 +837,21 @@
       ]
     },
     {
-      "head": "g\\+\\+(?:\\w\\S*)?",
+      "head": "g\\+\\+\\S*",
       "regex": true,
       "from": [
         "src/filters/gcc.toml:L3"
       ]
     },
     {
-      "head": "gcc(?:\\W\\S*)?",
+      "head": "gcc\\S*",
       "regex": true,
       "from": [
         "src/filters/gcc.toml:L3"
       ]
     },
     {
-      "head": "gcloud(?:\\W\\S*)?",
+      "head": "gcloud\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L849",
@@ -847,7 +859,7 @@
       ]
     },
     {
-      "head": "hadolint(?:\\W\\S*)?",
+      "head": "hadolint\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L866",
@@ -855,7 +867,7 @@
       ]
     },
     {
-      "head": "helm(?:\\W\\S*)?",
+      "head": "helm\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L875",
@@ -863,7 +875,7 @@
       ]
     },
     {
-      "head": "iptables(?:\\W\\S*)?",
+      "head": "iptables\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L884",
@@ -871,35 +883,35 @@
       ]
     },
     {
-      "head": "jira(?:\\W\\S*)?",
+      "head": "jira\\S*",
       "regex": true,
       "from": [
         "src/filters/jira.toml:L3"
       ]
     },
     {
-      "head": "jj(?:\\W\\S*)?",
+      "head": "jj\\S*",
       "regex": true,
       "from": [
         "src/filters/jj.toml:L3"
       ]
     },
     {
-      "head": "jq(?:\\W\\S*)?",
+      "head": "jq\\S*",
       "regex": true,
       "from": [
         "src/filters/jq.toml:L3"
       ]
     },
     {
-      "head": "just(?:\\W\\S*)?",
+      "head": "just\\S*",
       "regex": true,
       "from": [
         "src/filters/just.toml:L3"
       ]
     },
     {
-      "head": "make(?:\\W\\S*)?",
+      "head": "make\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L892",
@@ -907,7 +919,7 @@
       ]
     },
     {
-      "head": "markdownlint(?:\\W\\S*)?",
+      "head": "markdownlint\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L900",
@@ -915,35 +927,35 @@
       ]
     },
     {
-      "head": "mvn(?:\\W\\S*)?",
+      "head": "mvn\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L918"
       ]
     },
     {
-      "head": "mvnd(?:\\W\\S*)?",
+      "head": "mvnd\\.cmd\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L934"
       ]
     },
     {
-      "head": "mvnd\\.cmd(?:\\W\\S*)?",
+      "head": "mvnd\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L934"
       ]
     },
     {
-      "head": "mvnw(?:\\W\\S*)?",
+      "head": "mvnw\\.cmd\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L918"
       ]
     },
     {
-      "head": "mvnw\\.cmd(?:\\W\\S*)?",
+      "head": "mvnw\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L918"
@@ -964,21 +976,21 @@
       ]
     },
     {
-      "head": "nx(?:\\W\\S*)?",
+      "head": "nx\\S*",
       "regex": true,
       "from": [
         "src/filters/nx.toml:L3"
       ]
     },
     {
-      "head": "oxlint(?:\\W\\S*)?",
+      "head": "oxlint\\S*",
       "regex": true,
       "from": [
         "src/filters/oxlint.toml:L3"
       ]
     },
     {
-      "head": "ping(?:\\W\\S*)?",
+      "head": "ping\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L942",
@@ -1000,7 +1012,7 @@
       ]
     },
     {
-      "head": "pre\\-commit(?:\\W\\S*)?",
+      "head": "pre\\-commit\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L967",
@@ -1015,7 +1027,7 @@
       ]
     },
     {
-      "head": "rsync(?:\\W\\S*)?",
+      "head": "rsync\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L1008",
@@ -1023,7 +1035,7 @@
       ]
     },
     {
-      "head": "shellcheck(?:\\W\\S*)?",
+      "head": "shellcheck\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L1016",
@@ -1031,14 +1043,14 @@
       ]
     },
     {
-      "head": "skopeo(?:\\W\\S*)?",
+      "head": "skopeo\\S*",
       "regex": true,
       "from": [
         "src/filters/skopeo.toml:L3"
       ]
     },
     {
-      "head": "sops(?:\\W\\S*)?",
+      "head": "sops\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L1034",
@@ -1046,49 +1058,49 @@
       ]
     },
     {
-      "head": "stat(?:\\W\\S*)?",
+      "head": "stat\\S*",
       "regex": true,
       "from": [
         "src/filters/stat.toml:L3"
       ]
     },
     {
-      "head": "task(?:\\W\\S*)?",
+      "head": "task\\S*",
       "regex": true,
       "from": [
         "src/filters/task.toml:L3"
       ]
     },
     {
-      "head": "turbo(?:\\W\\S*)?",
+      "head": "turbo\\S*",
       "regex": true,
       "from": [
         "src/filters/turbo.toml:L3"
       ]
     },
     {
-      "head": "ty(?:\\W\\S*)?",
+      "head": "ty\\S*",
       "regex": true,
       "from": [
         "src/filters/ty.toml:L3"
       ]
     },
     {
-      "head": "xcodebuild(?:\\W\\S*)?",
+      "head": "xcodebuild\\S*",
       "regex": true,
       "from": [
         "src/filters/xcodebuild.toml:L3"
       ]
     },
     {
-      "head": "yadm(?:\\W\\S*)?",
+      "head": "yadm\\S*",
       "regex": true,
       "from": [
         "src/filters/yadm.toml:L3"
       ]
     },
     {
-      "head": "yamllint(?:\\W\\S*)?",
+      "head": "yamllint\\S*",
       "regex": true,
       "from": [
         "src/discover/rules.rs:L1095",
