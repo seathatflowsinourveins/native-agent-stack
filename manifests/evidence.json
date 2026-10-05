@@ -4172,6 +4172,27 @@
       "path": "evidence/receipts/native-sdk-acceptance-20261002.json"
     },
     {
+      "id": "ns2604-e2e-20261004",
+      "kind": "native_model_e2e",
+      "component_ids": [
+        "claude-code",
+        "codex",
+        "omniroute"
+      ],
+      "claim": "The historical 2026-10-04 foundation E2E covered 15 units and 80 slots through native executor observations, independent model review and 22 adjudications. Final labels are READY 18, PARTIAL 31, FAIL 2, BY_DESIGN 12 and INTERIM 17, with zero unjudged slots. Readiness is (18 + 12) / 80 = 37.5%, rounded half up to 38%; all 22 executor/reviewer disagreements were adjudicated, with 14 keeping the reviewer's status and 8 taking the executor's. This publication independently checks and sanitizes the retained status chains; it does not repeat host or provider execution. The adjudication prompt as run, claude-opus-5-5 at max effort with evidence-reviewer run records and timestamps, and the separate 33-slot fix list are retained.",
+      "limitations": [
+        "Host state is as of 2026-10-04 19:10\u201320:10Z only; later adjudication and source merge timestamp 2026-10-04T20:26:16Z do not extend that observation window. Publication and repair perform artifact inspection and structural checks in the owned sandbox; they do not repeat native host probes.",
+        "Fixes are pending. The 33 PARTIAL/FAIL slots after adjudication are not accepted as ready: 25 repository-plan and 8 host fixes (evidence/artifacts/ns2604-e2e-20261004/fixes.json). Four INTERIM token slots (context-supply, command-output, output-compression, code-index) are held for PR #684, which has not merged. The two open token slots have separate fixes: ccusage (FAIL, plan) and statusline (PARTIAL, host).",
+        "This is not an upstream benchmark. Native executor observations, independent model judgments and adjudication are separate from upstream tests, structural checks, independent host replication and measured quality or token improvement.",
+        "The 17 INTERIM slots are held by design. They remain in the denominator and contribute zero to the readiness numerator; the 12 BY_DESIGN slots are intentional dispositions rather than proof that their tools executed.",
+        "Adjudication: claude-opus-5-5 at effort max (evidence-reviewer), prompt template as run in evidence/artifacts/ns2604-e2e-20261004/adjudication-prompt.md. Run wf_8bf450a9-d1e (17 agents) started 2026-10-04T20:06:45Z and completed 2026-10-04T20:20:30Z; run wf_cdbf70a0-02c (5 agents) started 2026-10-04T20:08:29Z and completed 2026-10-04T20:19:31Z.",
+        "Historical source command excerpts and raw conversations remain private. Public reasons are bounded to 60 words, fixes preserve the merge's 900-character bound before sanitization, and citations are limited to four per slot. Hashes establish byte identity, not success or adequacy of every native acceptance claim.",
+        "Reviewer records report the requested gateway model cx/gpt-6.1-sol-max and max effort; no resolved backend model identity is inferred. Independent model review is review of retained evidence, not independent execution on the host.",
+        "The coordinator registers all eight published files in manifests/evidence.json in the PR's final registry-only commit, and full repository validation passes at that head. Per-file scans and local receipt tests are structural evidence only."
+      ],
+      "path": "evidence/receipts/ns2604-e2e-20261004.json"
+    },
+    {
       "id": "native-sdk-role-mcp-followup-20261002",
       "kind": "native_cli_e2e",
       "component_ids": [
@@ -4501,8 +4522,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "99e39090a4fb2aa129b0c0abb598102872fbf1050b69add447edfbeda4383ad7",
-      "bytes": 65436
+      "sha256": "9ea67939f6e5443576cdc2aad3ff997cc554aca3292e877afbe0c000d7d9e6ae",
+      "bytes": 65967
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -4631,18 +4652,18 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "de9503b9662c5e60710499e905cf4ac9b6fb041973bd3ac72a3f3b4a4fccdf7c",
-      "bytes": 48327
+      "sha256": "4a0c77c9412326fc1c9bcb9b9744824cd85071fba745b44c8f0cd3afeb7bd197",
+      "bytes": 46809
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
-      "sha256": "d6e9d8067fdf492a2f2f97ccfe93af3a12e01b360c6d73ed84eef4df081a4ec5",
-      "bytes": 7977
+      "sha256": "f63073d862dbfdb808b3ac61969d0fdab5f61692548b8d4b6723aa458b6831bc",
+      "bytes": 7984
     },
     {
       "path": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
-      "sha256": "e49bdf7ceed1e63344485d38f2a421f4371aed9fedebd00eb413361076de38e5",
-      "bytes": 1331
+      "sha256": "e18deb08003d0ad6f74fa658eac2c4c45998f1b65f00254c6ba671cead7e9e4b",
+      "bytes": 1149
     },
     {
       "path": "adoption/new-wsl/templates/claude.settings.additions.json",
@@ -4651,8 +4672,8 @@
     },
     {
       "path": "adoption/new-wsl/templates/codex.config.additions.toml",
-      "sha256": "bbcb0e73b42b218a37808d1b31e7f39c4c309300297fb56117acb5b0ce566deb",
-      "bytes": 5643
+      "sha256": "1231c49a499efbfb452e979c9494152b229d7162d881dfa26a1c6bb0ac52f0be",
+      "bytes": 4117
     },
     {
       "path": "adoption/paired/README.md",
@@ -4761,18 +4782,18 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "8b3945c1a146b1a56bccd55ac19aba7fb9a8ce40af0175bc2790474c0a570a12",
-      "bytes": 13294
+      "sha256": "adef8d297b818434428411cb24fb237405afb4f0ddce931e69b75806630ed95e",
+      "bytes": 12744
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "bc2ba57618b771c63fae870fbc8906a1f247d421d7645960d7e0c1992b7df459",
-      "bytes": 8180
+      "sha256": "899ca1d57eea56424fa626bc2014abc9c623ed9e8672d74a703611e6327d8481",
+      "bytes": 8187
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "6ff9288499a0039af4a77a9c48b2273b54ffe6569130ac11ed621407af7b934f",
-      "bytes": 17530
+      "sha256": "f87509d1bc52e728bff767cf37e1fe24cace4e140f749e72319713ff5563a61b",
+      "bytes": 19129
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -4791,8 +4812,8 @@
     },
     {
       "path": "adoption/templates/project.codex.config.template.toml",
-      "sha256": "a6822a173f78b007478480f9e681c012ef60e75f17f36091ad1d1470fd6258af",
-      "bytes": 2941
+      "sha256": "c449bf7f17f650d06e4e5a1e00a438c06331c32269dd1326f6c683627303c1ff",
+      "bytes": 2953
     },
     {
       "path": "adoption/templates/systemd/omniroute-fw.service",
@@ -10287,8 +10308,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "9eece716982d44ddc5ff844003680c9b04f45fbe7b21d35f18188ee6a70de15c",
-      "bytes": 484284
+      "sha256": "a0229ad6acc3b1d81857d606bbac02db43a25a8f774540fe826a5f132a2380f7",
+      "bytes": 484781
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -15582,7 +15603,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "634a03f56f39b1bc634c1a857991531daf6436441c8ff9a8005b088d9c26ae73",
+      "sha256": "2b8d918eadc27d957330ea0a7616b8a255cdf4ef1998b9e75a1c5d0379ab236e",
       "bytes": 153291
     },
     {
@@ -15672,8 +15693,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "975b5a515271c24b1a158594568a76f1b6d65db6eb920f561db77e056e20b8b1",
-      "bytes": 253392
+      "sha256": "107c6176702bdc95c586762cf9521c1d91b79bbd4ce6ad9e92c3c08afe063f84",
+      "bytes": 255589
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -16422,8 +16443,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "2a8b5945e4ac0cfc88f51b8676ea404bc0504b3d1862eebc27aaf6a1ae0c3e45",
-      "bytes": 116432
+      "sha256": "c38a61163d28ac3ca25a82623ec91cb53f0e0f434706871ba20208b857fece4c",
+      "bytes": 111900
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -16459,6 +16480,11 @@
       "path": "docs/decisions/2026-10-03-macos-full-suite-coverage.md",
       "sha256": "6c1099993e992b8bdfaf1d9d582fb9f2dace0d8b48846072ac44548bb8b928a8",
       "bytes": 23777
+    },
+    {
+      "path": "docs/decisions/2026-10-03-omniroute-3851-pin.md",
+      "sha256": "dc22610e9a76a64c67a2ce4a13126d2efa74b974d666d7f6036662ac282f187a",
+      "bytes": 23724
     },
     {
       "path": "docs/decisions/2026-10-03-omniroute-sdk-worker-0160.md",
@@ -16526,6 +16552,11 @@
       "bytes": 37516
     },
     {
+      "path": "docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md",
+      "sha256": "e56e1fdcfeb37a3256c494e23d067c647986dd6e2a27f2d93c445cb7f865f336",
+      "bytes": 18256
+    },
+    {
       "path": "docs/decisions/2026-10-04-codex-dated-holds.md",
       "sha256": "77cd924e5e347929fe38f7f19d4ff25d179da65981c17fca03743d6f14208e68",
       "bytes": 7862
@@ -16547,18 +16578,23 @@
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-clean-default-holdouts.md",
-      "sha256": "d8e18a2206728eec59b99868c4302154e46a277fa99968caff37b10e15eca730",
-      "bytes": 4510
+      "sha256": "924c9464c703f5f14babb29cee45be5acbd0052df84bcecd0d6b15cea28b84d7",
+      "bytes": 5174
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md",
-      "sha256": "c213f14dcee47a9e1755fe58601929058e0f54d5d6bacba400f81c21ebe280c7",
-      "bytes": 6203
+      "sha256": "f94c6638f3912fdef6d03383ca0d11fefcc43dbf141de27c00c424ac39382769",
+      "bytes": 6758
     },
     {
       "path": "docs/decisions/2026-10-04-new-wsl-token-layer-default.md",
       "sha256": "51bb422d713c5df21d6228f7e83440dafa48a576e424a02db5e867dfd8d7b2c5",
       "bytes": 10057
+    },
+    {
+      "path": "docs/decisions/2026-10-04-ns2604-verified-e2e.md",
+      "sha256": "5c4f4c17c4e101a13f3167fc82973c1de4b2a3ab7b7d68741f9504dfecad8a93",
+      "bytes": 6659
     },
     {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
@@ -16662,8 +16698,8 @@
     },
     {
       "path": "docs/foundation-stack.md",
-      "sha256": "d86649c5c4f7fe5686d588586588ad20f6b84f95b0b109cca510f82c5d0b40c4",
-      "bytes": 39778
+      "sha256": "c5211cd4fdf9824db1638fba1290dfb012a448a7f0fb06289d36ddd24239eec9",
+      "bytes": 41611
     },
     {
       "path": "docs/full-stack-convergence.md",
@@ -16782,8 +16818,8 @@
     },
     {
       "path": "docs/native-dashboards.md",
-      "sha256": "3e1a49e3a6e7d90fd6985d85c4e56c32c5d232e4d6d073f471338b7e753592bc",
-      "bytes": 17709
+      "sha256": "7873026e9de4f06c651de7edc5c4fdc05cc61b7eb34267160d263864e8c98ae9",
+      "bytes": 17782
     },
     {
       "path": "docs/native-foundation-resolution-20260921.md",
@@ -16942,7 +16978,7 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "c701409aa29644941e107e1102c1f0cc765509553f93c93872f27bf661cdde94",
+      "sha256": "0cf61d527319aa065dcf74da19b78214c527005cd2a5f4bf73b5b7c0dcfceda6",
       "bytes": 591301
     },
     {
@@ -16962,8 +16998,8 @@
     },
     {
       "path": "docs/token-session-handbook.md",
-      "sha256": "dfe5fab38071bc90ceb5599d05696147774b0c858e2600cf2d84410b25903740",
-      "bytes": 95587
+      "sha256": "b575df47e58969314bee2bcaed100c46b14151953000ab1112a9b9324f75c415",
+      "bytes": 96219
     },
     {
       "path": "docs/ultracode-token-routing-20260921.md",
@@ -39616,6 +39652,36 @@
       "bytes": 23333
     },
     {
+      "path": "evidence/artifacts/ns2604-e2e-20261004/adjudication-prompt.md",
+      "sha256": "2905791626d06cc9ba44215cecd1a346482ba2c718dcbc0b00e567bba7101843",
+      "bytes": 2111
+    },
+    {
+      "path": "evidence/artifacts/ns2604-e2e-20261004/fixes.json",
+      "sha256": "9c27909616706d6a5dfc1fd2abb1c7f921e9b7b675d2ea4beea5d73bc894e861",
+      "bytes": 31505
+    },
+    {
+      "path": "evidence/artifacts/ns2604-e2e-20261004/method.md",
+      "sha256": "c166003013dcd1dd7f786977da74013e4987896958c2bba2344b5abbea049f5f",
+      "bytes": 9421
+    },
+    {
+      "path": "evidence/artifacts/ns2604-e2e-20261004/review-prompt.txt",
+      "sha256": "3d09e4ad82274f0dd1be60be2231bdd95f9d395832e4641dfdffa4fbab40876a",
+      "bytes": 2067
+    },
+    {
+      "path": "evidence/artifacts/ns2604-e2e-20261004/slots.json",
+      "sha256": "24c0d3504b367ae1b2897a27a983e5891adc4ad8f33c8d50b4c9abd274408735",
+      "bytes": 123276
+    },
+    {
+      "path": "evidence/artifacts/ns2604-e2e-20261004/summary.json",
+      "sha256": "e8347f73a917c7efb9b2a72050ca6c4f104e8f7a2fb9c89d53ee58b49d0aeffd",
+      "bytes": 4589
+    },
+    {
       "path": "evidence/artifacts/observability-dashboard.png",
       "sha256": "3fd996f22320f31bd54decff339374be80f7d20fed07d83a66fa7eabaee59cd2",
       "bytes": 80748
@@ -51311,6 +51377,11 @@
       "bytes": 24695
     },
     {
+      "path": "evidence/receipts/ns2604-e2e-20261004.json",
+      "sha256": "4f88b17d529372fd140bb723e58539effc2a9970204a1faf5ab632c113909705",
+      "bytes": 22000
+    },
+    {
       "path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json",
       "sha256": "0f6a0c171872cde9689d9d5f2ff60b881ae2328b96769dc78613f625cf9d1017",
       "bytes": 16128
@@ -52062,8 +52133,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "bcbc611c905081a00ca6762d8fad0e478841b0e101a9adc4ce4d09450710c943",
-      "bytes": 101523
+      "sha256": "07a9ba1f192497808897040543ae605a1da686c7743b23df58503e927f453520",
+      "bytes": 102293
     },
     {
       "path": "observability/README.md",
@@ -52347,13 +52418,13 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "5ce6c88fac8855b5c8138f6fa553073580f990ea3dd853a17b760a41e60ca9fa",
-      "bytes": 128045
+      "sha256": "ad750498ace3022cdaab34bc6cafb42300379d9a9e0f9e76f00414916c9d8a96",
+      "bytes": 128978
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
-      "sha256": "beabed12521161b15c8e44ce8dccff02a78e863b844c706d99391fe38a847201",
-      "bytes": 8125
+      "sha256": "5165e75affc97436910612b9056ef464dc3ca1d2f0585c17625f0ce3f371f83c",
+      "bytes": 8294
     },
     {
       "path": "recipes/claude-codex-foreground-review.md",
@@ -52907,8 +52978,8 @@
     },
     {
       "path": "tests/test_apply_claude_settings.py",
-      "sha256": "1bd3e90b095c326edf6327202bcbeeab7ed6ccc6c5789dc794062024baf6d64f",
-      "bytes": 18302
+      "sha256": "4c40b74a699fa29a307935c1b309edc7869e7b50e390c5b5d8613ae74ea6a5d3",
+      "bytes": 47548
     },
     {
       "path": "tests/test_blind_layer_decisions.py",
@@ -53022,8 +53093,8 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "9ebe2cb3ae7a1ae9c404790567b5ada507f5f968f7db8d17b5077fe5235cf241",
-      "bytes": 189921
+      "sha256": "b6135344dac4e93f46a8ea6e6d30384960daec228b7cc20c059f606a4b0a7db2",
+      "bytes": 190722
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -53217,8 +53288,8 @@
     },
     {
       "path": "tests/test_install_claude_profile.py",
-      "sha256": "0f6d9599bc58d46ec8ebe01c0c4a42f391f93e85a8dcea3d917d825c06bcb552",
-      "bytes": 116102
+      "sha256": "f84cfa8343dc88820aec8b0051daf7170b3a5db7872d2aa95d75aafff29064f2",
+      "bytes": 118993
     },
     {
       "path": "tests/test_install_skills.py",
@@ -53257,8 +53328,8 @@
     },
     {
       "path": "tests/test_landscape_sweep_harness.py",
-      "sha256": "8884d6f2791a4d7a4492e1de997302dd17f5f56e1ed6bbb50ca5990ebc3c07ec",
-      "bytes": 309812
+      "sha256": "d1ff35c05eeca0d86ef7a557ad269225425557e3fdc88af8d70c808e7a429bf7",
+      "bytes": 309826
     },
     {
       "path": "tests/test_lane_packets.py",
@@ -53392,8 +53463,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "78cb1d7b07b88dd7c26b7a0394c44e975cfeaa8f7b3c1b7a3987f7282c4f0d1e",
-      "bytes": 246096
+      "sha256": "f3f046001f7c88f565aa0abe7d5caade8e96b3527ce8ecf7c7a495f71ed281b0",
+      "bytes": 246113
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -53697,8 +53768,8 @@
     },
     {
       "path": "tests/test_token_lanes_session_start.py",
-      "sha256": "2439a883ef232a8e672e2de78ccb22ef0baff3dead8bc782e244abd145dc8154",
-      "bytes": 12494
+      "sha256": "e4a8690fe48d0786f15be12d2183096f2d9eac031932402d09865c39400dfeb7",
+      "bytes": 13350
     },
     {
       "path": "tests/test_token_lanes_subagent_start.py",
@@ -53802,8 +53873,8 @@
     },
     {
       "path": "tools/adoption/apply_claude_settings.py",
-      "sha256": "9f9597c3aca440437e64b87ca67c82d9eab14655165d8d57cdcc05a19741ff75",
-      "bytes": 13231
+      "sha256": "c3b01736e08a247ee52f6be53a881fb03768acad15c4520401c9023a4350e9de",
+      "bytes": 22818
     },
     {
       "path": "tools/adoption/apply_codex_lane.py",
@@ -53822,8 +53893,8 @@
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
-      "sha256": "3bb8ce0b260625892517c2b4e2d59a69bc76ceb9f6e717cab475791885e85b40",
-      "bytes": 24328
+      "sha256": "ba00dc062d4f38e24911f0ff9e4f8793e3b26083d66d5c3966a78b077f2d86c1",
+      "bytes": 25010
     },
     {
       "path": "tools/adoption/install_skills.py",
@@ -54347,7 +54418,7 @@
     },
     {
       "path": "tools/token-report/README.md",
-      "sha256": "17e56072c6b5568af421dd67b7dfb4db51906d11511e950448f611d58ba73808",
+      "sha256": "20c8f4f0b757860b0d9960809dcee36e0c4425489550df31b7c0a940798615b2",
       "bytes": 25833
     },
     {

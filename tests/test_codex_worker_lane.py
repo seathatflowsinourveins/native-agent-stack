@@ -51,9 +51,11 @@ FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
 # wave-2 records of 2026-10-03 added semble to the token lanes and the session-lanes lines: context-mode's working
 # directory, semble, GPT Researcher and Claude Code messaging, and 800 before the long-command line that runs the
 # research script and the messaging courier with yield_time_ms and write_stdin polling, wave-2 messaging ruling,
-# change 1) and rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec),
+# change 1; the word count is unchanged by the 2026-10-04 user-scope jCodeMunch registration, which gave jcodemunch
+# serena's lane and shortened "where it is connected" to "if connected" to stay under the 8192-byte budget) and
+# rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec),
 # both byte for byte.
-TOP_RULE_SHA256 = "3201144dccd9d134110a2459a1e795d55e8cb747a9592e779e4c4778d8b8bc1c"
+TOP_RULE_SHA256 = "147d7a08029039a335f1938888b406feffc53d680eae2a8cf04d524316e13aad"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 
@@ -567,10 +569,14 @@ class TemplateTests(unittest.TestCase):
         server = project["mcp_servers"]["jcodemunch"]
         self.assertEqual(server.get("default_tools_approval_mode"), "approve")
         self.assertEqual(set(server.get("enabled_tools", [])), {"route", "menu", "order"})
-        for name in ("codex.config.template.toml", "codex.stack-worker.config.toml"):
-            with self.subTest(template=name):
-                config = tomllib.loads((TEMPLATES / name).read_text(encoding="utf-8"))
-                self.assertNotIn("jcodemunch", config["mcp_servers"])
+        # Since the user's directive of 2026-10-04 the user template registers the same entry at user scope
+        # (docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md); the stack-worker profile still has none.
+        user = tomllib.loads((TEMPLATES / "codex.config.template.toml").read_text(encoding="utf-8"))["mcp_servers"]["jcodemunch"]
+        # The same entry but for CODE_INDEX_PATH: the project pins it, the user entry leaves upstream's default (~/.code-index).
+        self.assertEqual({k: v for k, v in user.items() if k != "env"}, {k: v for k, v in server.items() if k != "env"})
+        self.assertEqual(user["env"], {k: v for k, v in server["env"].items() if k != "CODE_INDEX_PATH"})
+        worker = tomllib.loads((TEMPLATES / "codex.stack-worker.config.toml").read_text(encoding="utf-8"))
+        self.assertNotIn("jcodemunch", worker["mcp_servers"])
 
     def test_owned_edits_stay_on_the_lanes_keys(self):
         live = {"mcp_servers": {"headroom": {"command": "/x/headroom", "env": {"HEADROOM_OFFLINE": "1"}}}}

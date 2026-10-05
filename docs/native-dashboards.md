@@ -127,7 +127,8 @@ UI/server compatibility matrix; this pairing is accepted within these checks.
 
 ## On-demand dashboards and hosted accounts
 
-OmniRoute 3.8.50 is an optional, separately started Windows gateway profile. Its
+The portable stack selects OmniRoute 3.8.51. The recorded Windows dashboard
+acceptance used an optional, separately started OmniRoute 3.8.50 profile. Its
 existing selective launcher starts native `omniroute serve --port 20128
 --no-open --no-tray --no-recovery` with the saved data directory and
 `OMNIROUTE_SERVER_HOST=127.0.0.1`. It is not a replacement for native Codex/Claude
