@@ -183,15 +183,42 @@ class HostBaselineProbeTests(unittest.TestCase):
                 self.assertIsNone(identity["executed_input_sha256"])
                 self.assertFalse(identity["executed_input_verified"])
 
-    def mocked_main(self, login, document):
+    def mocked_main(self, login, document, *, home=None):
         namespace = probe_namespace()
         stdout, stderr = io.StringIO(), io.StringIO()
         with patch.object(namespace["pwd"], "getpwuid", return_value=SimpleNamespace(pw_name=login)), \
-                patch.object(namespace["Path"], "home", return_value=self.home), \
+                patch.object(namespace["Path"], "home", return_value=self.home if home is None else home), \
                 patch.dict(namespace, {"collect": lambda home: document}), \
                 patch("sys.stdout", stdout), patch("sys.stderr", stderr):
             code = namespace["main"]()
         return code, stdout.getvalue(), stderr.getvalue()
+
+    def test_prefix_sharing_home_paths_fail_closed_before_normalization(self):
+        homes = Path("/") / "home"
+        cases = (
+            ("alice", homes / "alicebob" / ".local/bin/env"),
+            ("alice", homes / "alice-old" / "bin/env"),
+            ("al", homes / "alice" / ".local/bin/env"),
+            ("alice", Path("/backup") / "home/alice/bin/env"),
+        )
+        for login, path in cases:
+            for location in ("output", "stderr", "command", "key"):
+                with self.subTest(login=login, location=location, path_kind=path.name):
+                    record = {"command": "command -v env", "exit": 0, "output": ""}
+                    if location == "key":
+                        record[str(path)] = False
+                    else:
+                        record[location] = str(path)
+                    self.assertEqual(self.mocked_main(login, {"env": record}, home=homes / login), (3, "", ""))
+        for suffix in ("", "/bin/env"):
+            with self.subTest(control="current home", suffix=suffix):
+                home = homes / "alice"
+                document = {"env": {"command": "command -v env", "exit": 0,
+                                    "output": str(home) + suffix}}
+                code, out, err = self.mocked_main("alice", document, home=home)
+                self.assertEqual(code, 0)
+                self.assertEqual(json.loads(out)["env"]["output"], "~" + suffix)
+                self.assertEqual(err, "")
 
     def test_common_logins_do_not_reject_fixed_labels_or_command_names(self):
         document = {
@@ -273,6 +300,46 @@ class HostBaselineProbeTests(unittest.TestCase):
                                              "output": value}}
                     self.assertEqual(self.mocked_main(login, document), (3, "", ""))
 
+    def test_account_annotations_after_leading_version_labels_fail_closed(self):
+        banners = {
+            "claude": "2.1.289 (Claude Code)", "codex": "codex-cli 0.159.3",
+            "gdb": "GNU gdb (GDB) 15.1", "env": "env (GNU coreutils) 9.4",
+            "time": "time (GNU Time) UNKNOWN", "script": "script from util-linux 2.39.3",
+            "watch": "watch from procps-ng 4.0.4", "find": "find (GNU findutils) 4.9.0",
+        }
+        for login, banner in banners.items():
+            forms = (
+                f"gid=1000({login})", f"groups=1000({login})",
+                f"groups=1000({login}),27(sudo)", f"euid=1000({login})", f"egid=1000({login})",
+                f"--user {login}", f"--group {login}", f"--owner {login}",
+                f"-g {login}", f"-G {login}", f"user: {login}",
+                f"user = {login}", f"USER= {login}", f"login {login}",
+                f"logged in as {login}", f"Built by {login}",
+            )
+            for form in forms:
+                with self.subTest(login=login, form=form):
+                    document = {"version": {"command": f"{login} --version", "exit": 0,
+                                             "output": f"{banner} {form}"}}
+                    self.assertEqual(self.mocked_main(login, document), (3, "", ""))
+            with self.subTest(login=login, control="unmodified banner"):
+                document = {"version": {"command": f"{login} --version", "exit": 0,
+                                         "output": banner}}
+                code, out, err = self.mocked_main(login, document)
+                self.assertEqual(code, 0)
+                self.assertEqual(json.loads(out), document)
+                self.assertEqual(err, "")
+
+    def test_vendor_labels_cannot_erase_account_syntax_or_stderr(self):
+        for value in ("gid=1000(ubuntu)", "groups=1000(ubuntu),27(sudo)",
+                      "euid=1000(ubuntu)", "GNU gdb 15.1\nwarning (ubuntu) cannot read"):
+            with self.subTest(value=value):
+                document = {
+                    "os_release": {"command": "read /etc/os-release", "exit": 0,
+                                   "output": {"ID": "ubuntu", "VERSION_ID": "24.04"}},
+                    "gdb": {"command": "gdb --version", "exit": 0, "output": value},
+                }
+                self.assertEqual(self.mocked_main("ubuntu", document), (3, "", ""))
+
     def test_vendor_exemption_is_limited_to_first_banner_group(self):
         for value in ("GNU gdb (Ubuntu 15.1) uid=1000(ubuntu)",
                       "GNU gdb (GDB) (Ubuntu 15.1)"):
@@ -327,19 +394,15 @@ class HostBaselineProbeTests(unittest.TestCase):
         self.assertEqual(json.loads(out), document)
         self.assertEqual(err, "")
 
-    def test_committed_launcher_paths_and_package_versions_are_system_labels(self):
-        cases = (
-            ("codex", "nativestack-2404"), ("codex", "nativestack2604"),
-            ("codex", "stackmeasure2604"), ("ubuntu", "nativestack2604"),
-            ("ubuntu", "stackmeasure2604"),
-        )
-        for login, name in cases:
-            with self.subTest(login=login, artifact=name):
-                document = json.loads((ROOT / f"evidence/artifacts/host-baseline-20261004/{name}.json").read_text())
-                code, out, err = self.mocked_main(login, document)
-                self.assertEqual(code, 0)
-                self.assertEqual(json.loads(out), document)
-                self.assertEqual(err, "")
+    def test_all_committed_captures_accept_common_logins(self):
+        for login in ("claude", "codex", "ubuntu", "user", "alice"):
+            for name in ("nativestack-2404", "nativestack2604", "stackmeasure2604"):
+                with self.subTest(login=login, artifact=name):
+                    document = json.loads((ROOT / f"evidence/artifacts/host-baseline-20261004/{name}.json").read_text())
+                    code, out, err = self.mocked_main(login, document)
+                    self.assertEqual(code, 0)
+                    self.assertEqual(json.loads(out), document)
+                    self.assertEqual(err, "")
 
     def test_dpkg_known_uninstalled_state_retains_zero_exit(self):
         (self.bin / "dpkg-known-uninstalled").touch()

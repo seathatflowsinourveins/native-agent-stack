@@ -196,7 +196,8 @@ def canonical_source_bytes():
 
 def normalize_home(value, home):
     if isinstance(value, str):
-        return value.replace(str(home), "~") if str(home) != "/" else value
+        home_text = str(home)
+        return "~" + value[len(home_text):] if home_text != "/" and (value == home_text or value.startswith(home_text + "/")) else value
     if isinstance(value, dict):
         return {normalize_home(key, home): normalize_home(item, home) for key, item in value.items()}
     if isinstance(value, list):
@@ -221,7 +222,6 @@ def assert_private_output_absent(document, login):
     )
     release = document.get("os_release", {}).get("output", {})
     vendor_id = release.get("ID") if isinstance(release, dict) else None
-    vendor_tag = re.compile(r"\A([^()]*)\(" + re.escape(vendor_id) + r"(?=[\s)])", re.I) if isinstance(vendor_id, str) else None
     marker_path = re.compile(r"(?<![\w./\\-])/etc/sudoers\.d/90-wsl-default-user(?![\w./\\-])")
 
     def check_output(value, command=""):
@@ -242,12 +242,17 @@ def assert_private_output_absent(document, login):
                         value = ""
             elif len(argv) == 2 and argv[1] == "--version":
                 name = Path(argv[0]).name
-                # Exempt standalone tool/brand labels, never account syntax.
                 names = (name, "codex-cli") if name == "codex" else (name,)
-                value = re.sub(r"(?<![^\s(])(?:" + "|".join(map(re.escape, names)) + r")(?=[\s)]|$)", "", value, flags=re.I)
-                if vendor_tag is not None:
-                    # A vendor label must begin the first parenthesized group.
-                    value = vendor_tag.sub(r"\1(", value, count=1)
+                label = r"(?:" + "|".join(map(re.escape, names)) + r")"
+                if isinstance(vendor_id, str):
+                    # A vendor group must immediately follow the leading label.
+                    vendor_tag = r"\A((?:GNU[ \t]+)?" + label + r"[ \t]+\()" + re.escape(vendor_id) + r"(?=[ \t)])"
+                    value = re.sub(vendor_tag, r"\1(", value, count=1, flags=re.I)
+                # Exempt only the leading product label; keep all later text.
+                prefix = r"\A(?:GNU[ \t]+)?" + label + r"(?=[ \t(]|$)(?:[ \t]+\((?:GNU[ \t]+)?" + re.escape(name) + r"\))?"
+                value = re.sub(prefix, "", value, count=1, flags=re.I)
+                if name == "claude":
+                    value = re.sub(r"\A[0-9]+(?:\.[0-9]+)+(?:[-+][a-z0-9.-]+)?[ \t]+\(Claude[ \t]+Code\)", "", value, count=1, flags=re.I)
             elif len(argv) == 4 and argv[:2] == ["dpkg-query", "-W"] and argv[2].startswith("-f="):
                 fields = value.split()
                 if isinstance(vendor_id, str) and len(fields) in (2, 3) and fields[0] == argv[3] and re.fullmatch(r"[0-9][A-Za-z0-9.+:~\-]*", fields[1]):

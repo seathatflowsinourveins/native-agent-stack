@@ -295,12 +295,14 @@ gaps at `22ec2b15419cb5f508976bac586aece72c3a7a3b`. Both are confirmed through
 the existing `main()` fixture boundary. Before the first fix, all 42 new banner
 subtests failed with exit 1: standalone tool-name logins, account assignments,
 user options, login-at-host and tilde forms, UID and passwd forms, punctuation
-identities, and a vendor label in a later parenthesized group. The gate now
-checks unstripped values for `USER=`, `LOGNAME=`, `--user=`, `-u <login>`,
+identities, and a vendor label in a later parenthesized group. The t3 gate
+checked unstripped values for `USER=`, `LOGNAME=`, `--user=`, `-u <login>`,
 `<login>@`, `~<login>`, `uid=N(<login>)`, `<login>:x:` and standalone-login values
-before any exemption. Tool-name exemptions require start, whitespace or `(`
-on the left and whitespace, `)` or end on the right. A vendor ID must open the
-first parenthesized group. The 20-test module then passed with exit 0.
+before any exemption. Tool-name exemptions required start, whitespace or `(`
+on the left and whitespace, `)` or end on the right. A vendor ID had to open the
+first parenthesized group. These enumerated checks missed the additional account
+annotations and merged-stderr case confirmed by the t4 review below. The
+20-test module then passed with exit 0.
 
 The next discriminating run exited 1 with 19 failed compound subtests/assertions
 before the compound fix. Casefolded login matching now uses ASCII alphanumeric
@@ -338,3 +340,44 @@ TMPDIR is `~/.cache/t710t3`, outside the checkout, and commands use nice 19.
 The three captures, both source archives and upgrade artifact retain their
 original SHA256s. The receipts retain their dated amendments. No host is
 recaptured; registration follows the completed source, tests, guide and decision.
+
+## Delta-review repair t4 (2026-10-05)
+
+The cross-family verdict at `ce2c11ba0382e9d227f241669f20094a4490edaa` accepted
+t3 without p1 findings and identified two p2 privacy gaps. The first is confirmed
+with 128 account-annotation fixtures across eight tool-name logins and four
+vendor/stderr fixtures. Against the unchanged t3 gate, the three selected test
+methods exited 1 with 132 failures; the complete three-capture, five-login matrix
+already passed. The account fixtures include numeric ID/group records, spaced
+user/group/owner options and assignments, login phrases and build attribution.
+
+The repair chooses the verdict's structural alternative: exempt only a leading
+product label instead of extending the identity-form list. An optional GNU
+prefix and immediate eponymous group belong to that label; Claude's numeric
+version and `(Claude Code)` form its observed leading label. Later text is never
+stripped for mentioning the tool name. The vendor tag must immediately follow
+the leading tool label on the same line. It cannot erase an ID/group record or
+cross the newline between stdout and merged stderr. The three selected methods
+then exited 0, including all 15 immutable-capture controls with identical returned
+documents and empty stderr. The guide now distinguishes the enumerated raw
+checks from the checks on text outside the bounded product label.
+
+The second finding concerns the normalization inherited from r0/r1. Raw substring
+replacement changed a prefix-sharing sibling home into a misleading tilde value
+before the whole-document gate ran. A new `main()` regression exited 1 with
+16 failing subtests: three prefix-sharing paths and an embedded backup path,
+each in output, stderr, command text and a key. Normalization now handles only
+a value equal to the current home or beginning with its complete component and
+`/`. Siblings and embedded references retain their original home path and fail
+closed with exit 3 and empty stdout/stderr. Exact current-home and child-path
+controls remain valid. The same selected test then exited 0. This changes the
+live recorder, preserving both historical source archives and captured values.
+
+The verdict's local stdin dry-run command was run with the updated probe and
+TMPDIR `~/.cache/t710t4`, using nice 19. It exited 0 with one JSON object, empty
+stderr and zero login, home-prefix, actual-home and profile-path matches. Its
+output stays in scratch. The module's tests now retain the full 15-pair matrix.
+The t3 intermediate counts above remain historical reported results; the t4
+regressions reproduce the new findings against the committed t3 code. Historical
+captures, source archives, upgrade evidence and receipt amendments stay unchanged.
+Registration follows the completed recorder, tests, guide and decision changes.

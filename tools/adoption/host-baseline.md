@@ -60,8 +60,12 @@ are inferred. Claude records only whether `env` has `CLAUDE_CODE_SHELL`. The
 probe reads `~/.codex/config.toml` and `~/.claude/settings.json`; it does not
 resolve profile overlays, managed settings, project settings or environment
 overrides. Parse failures omit exception text to avoid disclosing values.
-Home paths are normalized to `~`. Remaining home paths anywhere in the document
-make the output fail closed. The personal-home and Windows-user-path patterns
+Only a value equal to the current home, or beginning with that complete home
+component followed by `/`, is normalized to `~`. Prefix-sharing sibling paths
+and embedded home references remain unchanged and make the output fail closed.
+The same normalization applies recursively to keys and values. Remaining home
+paths anywhere in the document make the output fail closed. The personal-home
+and Windows-user-path patterns
 copied from `scripts/validate.py` also cover macOS user directories and Windows
 profiles, including WSL paths such as `/mnt/c/Users/<login>.HOST/AppData/...`.
 They apply to the whole document and do not depend on the current login. Their
@@ -77,7 +81,7 @@ are rejected. The complete fixed marker path
 `/etc/sudoers.d/90-wsl-default-user` is exempt; a longer lookalike path is checked.
 There is no blanket component-prefix exemption.
 
-Before any label exemption, unstripped values are checked for `USER=<login>`,
+Before any label exemption, the enumerated raw checks cover `USER=<login>`,
 `LOGNAME=<login>`, `--user=<login>`, `-u <login>`, `<login>@`, `~<login>`,
 `uid=N(<login>)` and `<login>:x:`. A value consisting only of the login also fails
 closed, even when it is a tool name.
@@ -87,12 +91,16 @@ account identities. An executable's declared basename is excluded while its
 parent path is checked. The exact default launcher parent
 `~/.local/share/codex-ecosystem/bin` is also a system label in a matching
 `command -v` result; arbitrary parent paths remain checked. In its own
-`--version` output, the declared tool name is exempt only between start,
-whitespace or `(` and whitespace, `)` or end. The same bounds apply to the
-`codex-cli` brand in Codex's banner. The OS-release ID is exempt only when it
-opens the first parenthesized group, as `(<ID> ...)`. Thus login `claude` accepts
-`2.1.289 (Claude Code)`, and login `ubuntu` accepts `GNU gdb (Ubuntu ...)`, while
-explicit account forms are rejected before either exemption.
+`--version` output, the tool-name exemption covers only the leading product
+label: an optional `GNU` prefix, the declared tool name or Codex's `codex-cli`
+brand, and an immediate parenthesized repetition such as `(GNU Time)` or `(GDB)`.
+Claude's numeric version followed by `(Claude Code)` is its leading label.
+Later tool-name words remain checked, including account annotations such as
+`gid=N(<login>)`, `--owner <login>` and `Built by <login>`. The OS-release ID is
+exempt only in a vendor group immediately following the leading tool label on
+the same line. Thus login `claude` accepts `2.1.289 (Claude Code)`, and login
+`ubuntu` accepts `GNU gdb (Ubuntu ...)`. Neither exemption erases later account
+annotations or crosses from stdout into merged stderr.
 
 In a returned dpkg row matching the queried package, a distribution tag followed
 by digits inside a numeric version is also a label: for example, `~ubuntu25` in
@@ -204,6 +212,10 @@ The evidence manifest does not register its own bytes.
   `scripts/adoption_status.py:1124-1134` defines the default launcher root; the
   committed 26.04 package rows retain `coreutils-from-uutils 0.0.0~ubuntu25`.
   Replaying those captures supplies the scoped system-label controls.
+- Structural privacy repair reference `ce2c11ba0382e9d227f241669f20094a4490edaa`:
+  the probe's normalization and version-label checks supply the before-fix code;
+  the committed 24.04 artifact supplies the time, script, watch, find and env
+  banners. Tests cover all three captures with all five common-login controls.
 - Installed `dpkg-query --help` and `dpkg-query(1)` at
   `/usr/share/man/man1/dpkg-query.1.gz`: `-W` reports package information,
   `-f` selects fields, and `db:Status-Status` supplies the package status word.
