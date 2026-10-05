@@ -151,4 +151,8 @@ two file names. The applier's default target is `~/.claude/settings.json` and do
 outside a `.claude` directory, or inside a `.claude` that is a symlink to a differently named directory, resolves to a path
 with no `.claude` parent and has no home this tool can name, so its carrier entry stays until its owner removes it. A
 differently cased spelling of a home names the same directory on a case-insensitive filesystem and is kept, because
-`realpath` does not fold case; that was not exercised.
+`realpath` does not fold case; that was not exercised. The closing read (job-059) found two edge cases of the realpath rule, recorded and not coded: (1) a spelling that cannot reach the
+carrier, such as `H/ordinary-file/..` (ENOTDIR) or `H/missing/..` (ENOENT), realpaths to the home, so a command carrying it is retired
+although it never ran the carrier (CPython 3.12's `realpath(strict=True)` also cancels `file/..`); the effect is benign, because a command
+that could not run is removed. (2) `isprintable()` rejects a home alias that contains a Unicode space such as U+00A0, so a working carrier
+rendered under such an alias is kept; that is exotic, and it errs toward keeping the hook.
