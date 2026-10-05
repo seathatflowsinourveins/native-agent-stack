@@ -16617,6 +16617,11 @@
       "bytes": 18701
     },
     {
+      "path": "docs/decisions/2026-10-05-typesafe-sdk-transport.md",
+      "sha256": "71fbf27f7ff1920ef4d20f698c37addb5e0a668fdd4682938335708e8ce0d66f",
+      "bytes": 6867
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -49367,6 +49372,16 @@
       "bytes": 30252
     },
     {
+      "path": "evidence/artifacts/typesafe-sdk-transport-20261005/checks.json",
+      "sha256": "0c2d0c3a40a5f4fdfbf707d30bc49a9d58cddbd01fdad8965fcb495248f312ac",
+      "bytes": 5642
+    },
+    {
+      "path": "evidence/artifacts/typesafe-sdk-transport-20261005/unittest-output.txt",
+      "sha256": "a2c5d1bde040183fcd96890e3ce1b5dce70197478942641dce45ca75976ddb15",
+      "bytes": 3275
+    },
+    {
       "path": "evidence/artifacts/u11-part1-source-repair-20261001/integration-main-20261002.json",
       "sha256": "6382ce9bc43e18e5797b0e0c7df0f2b76f2485ca6a908e3b7aba13ec1c1eb638",
       "bytes": 2740
@@ -53452,6 +53467,11 @@
       "bytes": 13100
     },
     {
+      "path": "tests/test_gap_crosswalk_sdk.py",
+      "sha256": "5bdf42e3dbd407909c1d21a1e8314d2f9d5b19623f26d8ee1d86689bf3184dda",
+      "bytes": 7316
+    },
+    {
       "path": "tests/test_gap_resolution_ledger.py",
       "bytes": 5845,
       "sha256": "686fab880ea35dd0863d04a721d924158b76f0edde464af93f40fac1bd36b156"
@@ -54348,8 +54368,8 @@
     },
     {
       "path": "tools/sota-convergence/gap_crosswalk.py",
-      "sha256": "7545a9aa0a709aaca636e69b6ca7a1d6d9e317a53027098df7133e952d4f705f",
-      "bytes": 30150
+      "sha256": "77f9c58561e656dfa6b42a346ed6063d7a3716089c2900c84808e0527594c22c",
+      "bytes": 30850
     },
     {
       "path": "tools/sota-convergence/gap_wave_ledger.py",
