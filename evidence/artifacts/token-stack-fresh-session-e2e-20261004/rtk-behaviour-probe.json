@@ -33,13 +33,13 @@
         "stdout_lines": 10
       },
       "shell": {
-        "commit_lines": 16,
+        "commit_lines": 66,
         "exit": 0,
         "mentions_usr_bin_ls": false,
         "merge_lines": 1,
         "stderr_first_lines": [],
         "stdout_ends_with_newline": true,
-        "stdout_lines": 96
+        "stdout_lines": 396
       }
     },
     {
@@ -56,13 +56,13 @@
         "stdout_lines": 87
       },
       "shell": {
-        "commit_lines": 16,
+        "commit_lines": 66,
         "exit": 0,
         "mentions_usr_bin_ls": false,
         "merge_lines": 1,
         "stderr_first_lines": [],
         "stdout_ends_with_newline": true,
-        "stdout_lines": 142
+        "stdout_lines": 592
       }
     },
     {
@@ -74,7 +74,7 @@
         "merge_lines": 0,
         "stderr_first_lines": [],
         "stdout_ends_with_newline": true,
-        "stdout_lines": 15
+        "stdout_lines": 50
       },
       "shell": {
         "commit_lines": 0,
@@ -83,28 +83,28 @@
         "merge_lines": 1,
         "stderr_first_lines": [],
         "stdout_ends_with_newline": true,
-        "stdout_lines": 16
+        "stdout_lines": 66
       }
     },
     {
       "command": "git log --format=%s",
       "rtk": {
-        "commit_lines": 14,
+        "commit_lines": 49,
         "exit": 0,
         "mentions_usr_bin_ls": false,
         "merge_lines": 0,
         "stderr_first_lines": [],
         "stdout_ends_with_newline": true,
-        "stdout_lines": 15
+        "stdout_lines": 50
       },
       "shell": {
-        "commit_lines": 14,
+        "commit_lines": 64,
         "exit": 0,
         "mentions_usr_bin_ls": false,
         "merge_lines": 1,
         "stderr_first_lines": [],
         "stdout_ends_with_newline": true,
-        "stdout_lines": 16
+        "stdout_lines": 66
       }
     },
     {
@@ -116,7 +116,7 @@
         "merge_lines": 0,
         "stderr_first_lines": [],
         "stdout_ends_with_newline": true,
-        "stdout_lines": 15
+        "stdout_lines": 50
       },
       "shell": {
         "commit_lines": 0,
@@ -125,7 +125,7 @@
         "merge_lines": 1,
         "stderr_first_lines": [],
         "stdout_ends_with_newline": true,
-        "stdout_lines": 18
+        "stdout_lines": 68
       }
     },
     {
@@ -150,6 +150,27 @@
       }
     },
     {
+      "command": "git log --oneline -n 66",
+      "rtk": {
+        "commit_lines": 0,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 1,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 66
+      },
+      "shell": {
+        "commit_lines": 0,
+        "exit": 0,
+        "mentions_usr_bin_ls": false,
+        "merge_lines": 1,
+        "stderr_first_lines": [],
+        "stdout_ends_with_newline": true,
+        "stdout_lines": 66
+      }
+    },
+    {
       "command": "git log --stat -n 16",
       "rtk": {
         "commit_lines": 16,
@@ -158,7 +179,7 @@
         "merge_lines": 1,
         "stderr_first_lines": [],
         "stdout_ends_with_newline": true,
-        "stdout_lines": 142
+        "stdout_lines": 141
       },
       "shell": {
         "commit_lines": 16,
@@ -167,7 +188,7 @@
         "merge_lines": 1,
         "stderr_first_lines": [],
         "stdout_ends_with_newline": true,
-        "stdout_lines": 142
+        "stdout_lines": 141
       }
     },
     {
@@ -245,7 +266,7 @@
   "evidence_class": "local_integration: one run, one host, a scratch repository",
   "exclusions_fixture_sha256": "0e788d025386c9a97c0adcda270e3c0ce39c679a22b90462599a31805bd81edd",
   "fixture": {
-    "commits": 16,
+    "commits": 66,
     "merge_commits": 1
   },
   "rewrite": {

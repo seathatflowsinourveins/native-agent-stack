@@ -41,6 +41,11 @@ documents the hook as the Codex integration (rtk-ai/rtk v0.51.0, commit e001f773
    while a codex process runs and reads every named hook back through `hooks/list` by key and hash (a hook that vanished, moved or
    changed during the write, or a discovery error that was not there before it, is exit 3: `expectedVersion` guards `config.toml`, not the
    hooks file). This grant is the trust decision for the hook that sees every Bash command; the user's "yes frictionless" above is its authority.
+   The upstream command is not hook-only: it also creates `RTK.md` and appends a pointer line `@<Codex home>/RTK.md` to `AGENTS.md`
+   (`rtk-init-codex-probe.json`; `--hook-only`, `--no-patch` and `--auto-patch` are refused with `--codex`). Codex expands no `@` reference,
+   so the pointer is inert text, and NativeStack's `AGENTS.md` already carries it; but it is an edit of the instruction file, which the
+   user's reply about authorization settings does not name, so the second pull request lists it among the points for the user to confirm.
+   `rtk init -g --codex --uninstall` removes the hook, `RTK.md` and the pointer together.
 2. The row's acceptance is `rtk init --show --codex` with every line `[ok]`, `codex_hook_trust.py --command "rtk hook codex"` reporting the
    hook trusted, a fresh `codex exec --json --ephemeral` probe whose executed command carries the `rtk` prefix from each real launcher (the
    hook is the bare command `rtk hook codex` and fails open and silent when `rtk` is not on the launcher's PATH), the fresh-session E2E
@@ -50,8 +55,9 @@ documents the hook as the Codex integration (rtk-ai/rtk v0.51.0, commit e001f773
    exceptions are reconciled with rtk 0.51.0 as measured (`rtk_behaviour_probe.py`): the hook leaves `git show REV:path`, `diff`, `jq` and
    `git branch` alone only under the five `exclude_commands` of `fixtures/rtk-hook-exclusions.toml`, which the bootstrap installs for the
    Claude hook and the Codex hook reads from the same rtk config (with upstream defaults rtk rewrites all four); `find` on a missing path
-   exits 1 like find; bare `git log` caps at 10 commits without a notice and drops merge commits, and `git log --stat` caps at 10 with the
-   notice.
+   exits 1 like find; bare `git log` caps at 10 commits without a notice and drops merge commits, `git log --stat` caps at 10 with the
+   notice, and `--oneline` or `--format` without a count default to 50 commits, again without merges or a notice
+   (`git_cmd.rs` L1819-L1825 at e001f773; measured on a 66-commit fixture).
 4. The hold-out in the handbook and in the token-efficiency card becomes this decision and its evidence.
 
 ## Evidence (`evidence/artifacts/token-stack-fresh-session-e2e-20261004/`)
@@ -64,6 +70,7 @@ documents the hook as the Codex integration (rtk-ai/rtk v0.51.0, commit e001f773
 | The trust edit works through `codex_hook_trust.py` on the real binary: dry run, apply with backup, idempotent second run, exit 4 when no hook has the command | `local_integration`: a scratch home | the arms above ran with it; its fake-server tests are `synthetic` (22 tests) |
 | The trust tool's read-back, when the hook's definition changes right after the write, on the real binary: the tool at `c8613fe16` reported success (exit 0), the fixed tool exits 3 and names the hook | `local_integration`: real `codex app-server` 0.159.3, a scratch home, one run each | `trust_readback_race.py`; `receipt.json`, `trust_readback_race` |
 | rtk 0.51.0's rewrite table with upstream defaults and with the five `exclude_commands`, and its compact forms against the shell's (the log cap and its notice, dropped merges, the trailing newline, `/usr/bin/ls`, `find` exit 1) | `local_integration`: one run, one host, a scratch repository and scratch homes | `rtk_behaviour_probe.py`; `rtk-behaviour-probe.json` |
+| `rtk init -g --codex` also creates `RTK.md`, appends the `@<Codex home>/RTK.md` pointer to `AGENTS.md` (creating it when missing) and rtk's history database, honours `CODEX_HOME`, is idempotent, is undone whole by `--uninstall`, and refuses `--hook-only`, `--no-patch` and `--auto-patch` | `local_integration`: one run, one host, scratch homes | `rtk_init_codex_probe.py`; `rtk-init-codex-probe.json` |
 | `rtk-ai/rtk` v0.51.0 and `openai/codex` rust-v0.159.3 behave as the citations above say | `source_review` | the pinned README and source lines |
 | A fresh Claude and Codex session on NativeStack picks the token stack up with nothing per project, and rtk rewrites show in the hook events | `local_integration` | `nativestack-before-snapshot.summary.md` |
 
@@ -93,12 +100,13 @@ documents the hook as the Codex integration (rtk-ai/rtk v0.51.0, commit e001f773
 
 ## Residuals
 
-One run per arm, one host, the loopback gateway route and not the host's ChatGPT sign-in; no claim about tokens saved. Native probes ran on
+The install edits the Codex instruction file (the inert pointer line) and creates `RTK.md`; whether the user accepts that edit with the rest of the
+install is open. One run per arm, one host, the loopback gateway route and not the host's ChatGPT sign-in; no claim about tokens saved. Native probes ran on
 codex-cli 0.159.3 only: no 0.160.0 binary was run, so 0.160.0 is checked from source only. The hook is skipped
 again whenever its definition or its group index changes (the key carries the index), so the acceptance probe is the check, not the grant. The
 2604 after snapshot, the PATH of each real launcher and the grant on a real host are later steps that this decision schedules and does not
 run. Cosmetic differences remain (a dropped trailing newline in `rtk git status --short`, `/usr/bin/ls` in an `rtk ls` error), and so do
-content differences in rtk's compact `git log` (merge commits dropped, a 10-commit cap), which the awareness reconcile carries. A dry run of
+content differences in rtk's compact `git log` (merge commits dropped, a 10-commit cap, a 50-commit default for `--oneline` and `--format`), which the awareness reconcile carries. A dry run of
 the trust tool makes no trust or config edit but is not read-only: starting the app-server creates its own state files in the Codex home.
 The NativeStack counter delta of the snapshot (+33 commands, +297 saved tokens) spans other sessions' commands; the project-scoped block of
 its summary is the E2E's own.

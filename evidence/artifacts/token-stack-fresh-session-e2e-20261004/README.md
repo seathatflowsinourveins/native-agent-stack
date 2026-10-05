@@ -9,6 +9,7 @@ out at the 0.50.0 pin because it was not qualified, be installed with `rtk init 
 | --- | --- | --- |
 | Fresh-session E2E | `fresh_session_e2e.sh <label>` | `rtk --version`, `rtk init --show`, `rtk gain -f json` before and after, `claude mcp list`, `codex mcp list`, two fresh `claude -p --output-format stream-json --verbose --include-hook-events` sessions (git status, grep -rl), one fresh `codex exec --json --ephemeral` session, all in a new empty project directory, summarised with jq |
 | Codex hook qualification | `codex_hook_qual.py [outdir [arm ...]]` | `rtk init -g --codex`, `rtk init --show --codex`, Codex's own `hooks/list`, `tools/adoption/codex_hook_trust.py`, `codex exec --json --ephemeral` through the loopback OmniRoute gateway (no credential needed or copied), `rtk gain` |
+| rtk init probe | `rtk_init_codex_probe.py [outfile]` | what `rtk init -g --codex` writes, shows and undoes in scratch homes (no host file): `rtk-init-codex-probe.json` |
 | rtk behaviour probe | `rtk_behaviour_probe.py [outfile]` | `rtk rewrite` and rtk's compact forms against the shell, in a scratch repository and scratch homes (no host configuration, no host counter): `rtk-behaviour-probe.json` |
 | Read-back race | `trust_readback_race.py [tool file]` | `tools/adoption/codex_hook_trust.py` against the real `codex app-server` when the hook's definition changes right after the write |
 
@@ -16,8 +17,8 @@ Run the first inside a distribution (about 30 s, about 8 cents of Haiku for two 
 second from the repository (about 5 min for seven arms of one or two sessions each): it builds scratch Codex homes and a fixture
 repository under `~/.cache/native-agent-stack-e2e`, never writes the live `~/.codex` (it hashes the live hooks.json before and
 after), and deletes its work directory. Files here: `receipt.json` (the sanitized results below),
-`nativestack-before-snapshot.summary.md` (the E2E's own summary, home paths replaced) and `rtk-behaviour-probe.json` (the
-probe's output).
+`nativestack-before-snapshot.summary.md` (the E2E's own summary, home paths replaced), `rtk-behaviour-probe.json` and
+`rtk-init-codex-probe.json` (the probes' output).
 
 ## NativeStack before snapshot (2026-10-04 21:44Z, before the NativeStack host steps of docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md)
 
@@ -41,6 +42,18 @@ group, `{"matcher":"Bash","hooks":[{"type":"command","command":"rtk hook codex"}
 other byte, so the existing hooks keep their keys (`hooks.json:pre_tool_use:0:0`: a key carries the group index) and their
 trust; a second run is "already present"; `--uninstall` removes the entry (the JSON equals the original after normalising; rtk
 reserialises the file and leaves a `.bak`); Codex's own `hooks/list` loads it with no error or warning.
+
+The same command is not hook-only (`rtk-init-codex-probe.json`: scratch homes, rtk 0.51.0). It also creates `RTK.md` in the Codex
+home, appends the line `@<absolute Codex home>/RTK.md` to its `AGENTS.md` (creating the file when it is missing) and creates rtk's
+history database under its data directory; it prints the optional `writable_roots` grant for that database and applies none ("No
+Codex permission settings have been changed"), and it honours `CODEX_HOME`. A second run reports "already present".
+`--uninstall` removes the hook entry, `RTK.md` and the pointer line and leaves an emptied `AGENTS.md`. `--hook-only`, `--no-patch` and
+`--auto-patch` are refused with `--codex` (exit 1, "rtk: --codex cannot be combined with ..."), so there is no hook-only Codex
+install. `rtk init --show --codex` reports the Global lines (RTK.md, hook, AGENTS.md pointer) `[ok]` after the install and `[--]`
+after the uninstall; its Local lines concern the current directory's `.codex/`, so an acceptance reads the Global lines only. Codex
+expands no `@` reference in `AGENTS.md` (`docs/token-efficiency-stack.md`, citing `codex-rs/codex-home/src/instructions/mod.rs` at
+rust-v0.157.1), so the pointer is inert text; NativeStack's `~/.codex/AGENTS.md` already carries it from an earlier `rtk init`, and
+the stack's AGENTS block keeps it. Installing the hook is therefore also an edit of the Codex instruction file.
 
 Dynamic, seven arms over six commands (and five more in arm B2), a probe hook at group 0 standing for ai-memory. The arms ran with
 the host's HOME, so rtk read the host's own configuration, a `[hooks] exclude_commands` of the five entries of
@@ -72,7 +85,7 @@ codex-rs/utils/cli/src/shared_options.rs L61-L64 and codex-rs/exec/src/cli.rs L1
 it is not the hash-bound grant this tool writes. (An earlier draft of this README said the flag was absent: it had filtered the help
 text through `head -8`; see the anti-pattern log in docs/harness-defaults.md.)
 
-What rtk does is in `rtk-behaviour-probe.json` (rtk 0.51.0, git 2.43.0; a scratch repository of 16 commits with one merge and
+What rtk does is in `rtk-behaviour-probe.json` (rtk 0.51.0, git 2.43.0; a scratch repository of 66 commits with one merge and
 scratch homes, so no host configuration applies). `rtk rewrite "<cmd>"` with upstream defaults rewrites `git status`, `git log`,
 `git diff`, `ls`, `cat` (to `rtk read`), `grep`, `find`, `git show REV:path`, `diff`, `jq`, `git branch` and the first segment of a
 pipe or `&&` chain, and leaves `echo` and `bash -c ...` alone (exit 1, no output); with the five `exclude_commands` of
@@ -81,8 +94,11 @@ The compact forms differ from the shell's: `rtk git status --short` drops the tr
 `/usr/bin/ls` in its error. Exit codes are the shell's, `find` on a missing path included (1: the awareness text's "exits 0" does
 not hold at 0.51.0). Bare `rtk git log` prints at most 10 commits, one `<hash> <subject> (<age>) <author>` line each, drops the
 merge commit and prints no notice; `rtk git log --stat` caps at 10 commits, keeps the merge and prints `[rtk] capped at 10 commits;
-pass -n <count> for more` on stderr; with `--oneline`, `--format=%s` or `--graph --oneline` it prints every non-merge commit (15 of
-16) and no cap; `-n 16` keeps all 16.
+pass -n <count> for more` on stderr; with `--oneline`, `--format=%s` or `--graph --oneline` and no count it defaults to 50 commits,
+without merges, and prints no notice (50 lines against git's 66, 66 and 68; `src/cmds/git/git_cmd.rs` L1819-L1825 at e001f773:
+`--oneline`, `--format` and `--pretty` without a count add `-50`); an explicit count is respected and keeps merges (`-n 16`: 16
+lines; `--oneline -n 66`: 66). A fixture shorter than 50 commits cannot show that default, and an earlier draft of this README, run
+on 16 commits, called those forms uncapped.
 
 ## What this does not show
 

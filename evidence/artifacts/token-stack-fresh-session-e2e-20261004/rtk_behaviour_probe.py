@@ -39,7 +39,7 @@ REWRITE_CASES = (
 # the hook's exclusions do not apply to a command typed with the prefix).
 COMPARE_CASES = (
     "git status --short", "git log", "git log --stat", "git log --oneline", "git log --format=%s", "git log --graph --oneline",
-    "git log -n 16", "git log --stat -n 16", "ls /nonexistent", "find /nonexistent -name x", "grep -rl needle .",
+    "git log -n 16", "git log --oneline -n 66", "git log --stat -n 16", "ls /nonexistent", "find /nonexistent -name x", "grep -rl needle .",
 )
 
 
@@ -64,14 +64,15 @@ def git(repo: Path, home: Path, *args: str) -> None:
 
 
 def fixture(repo: Path, home: Path) -> None:
-    """Fourteen linear commits, one feature commit merged with --no-ff (sixteen commits, one merge), a modified and an untracked file."""
+    """Sixty-four linear commits, one feature commit merged with --no-ff (sixty-six commits, one merge: past rtk's default of 50 for
+    compact log forms), a modified and an untracked file."""
     git(repo, home, "init", "-q", "-b", "main")
     (repo / "a" / "x").mkdir(parents=True)
     (repo / "a" / "x" / "util.py").write_text("needle\n", encoding="utf-8")
     (repo / "data.json").write_text("{}\n", encoding="utf-8")
     git(repo, home, "add", ".")
     git(repo, home, "commit", "-q", "-m", "commit 1")
-    for number in range(2, 15):
+    for number in range(2, 65):
         (repo / "a" / "x" / "util.py").write_text(f"needle {number}\n", encoding="utf-8")
         git(repo, home, "commit", "-q", "-am", f"commit {number}")
     git(repo, home, "checkout", "-q", "-b", "feature")
