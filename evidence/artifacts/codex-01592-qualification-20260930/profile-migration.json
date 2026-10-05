@@ -1,0 +1,246 @@
+{
+  "schema_version": 1,
+  "id": "codex-01592-owned-profile-migration-20260930",
+  "recorded_on": "2026-09-30",
+  "status": "qualified-in-isolated-scratch",
+  "scope": "Existing native Codex updater migration of exact previously owned stack-worker profiles, with expected digest, backup, mode preservation, native readback and rollback. No global application or model execution.",
+  "base_catalog_commit": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+  "client": {
+    "version": "codex-cli 0.159.2",
+    "upstream_tag": "rust-v0.159.2",
+    "upstream_commit": "ff6aec96948b70d94983af2641a6b67c94faeff5",
+    "installation_qualification": "qualification.json"
+  },
+  "sources": [
+    {
+      "url": "https://github.com/openai/codex/releases/tag/rust-v0.159.2",
+      "role": "Installed-version release verification; release contains the Windows console fix, not a profile writer change.",
+      "command_exit_code": 0
+    },
+    {
+      "url": "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/cli/src/main.rs",
+      "symbol": "profile_v2_for_subcommand",
+      "role": "profile_v2 runtime command restriction; app-server is refused."
+    },
+    {
+      "url": "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/app-server/src/config_manager_service.rs",
+      "role": "Native config batch writes accept only the user config path; expectedVersion and typed validation remain native."
+    },
+    {
+      "url": "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/config/src/loader/mod.rs",
+      "role": "Native loading of CODEX_HOME/<profile>.config.toml above the user config."
+    },
+    {
+      "url": "https://github.com/openai/codex/blob/ff6aec96948b70d94983af2641a6b67c94faeff5/codex-rs/core/src/config/edit.rs",
+      "role": "Native supported configuration format and existing source-qualified writer contract."
+    },
+    {
+      "path": "docs/decisions/2026-09-26-codex-worker-lane.md",
+      "sha256": "15092d762e018a24df27f04019d5d14542ddf739f054380f142224d1837e7f5a",
+      "role": "Existing repository decision: native app-server cannot write the profile_v2 file; plain atomic profile-file creation and native readback."
+    },
+    {
+      "path": "docs/decisions/2026-09-30-sol-primary-quality-defaults.md",
+      "sha256": "762e669686582bc5c71c5f5cb2052be0364be4fce2d0e564bbccc15b9850a7f4",
+      "role": "User-authorized Sol worker defaults; ownership provenance for the exact one-model substitution."
+    },
+    {
+      "path": "evidence/receipts/foundation-quality-defaults-20260930.json",
+      "sha256": "b777966f07d349826aa0afaa2082e854476d4f48be7e1b2812d9b81520de4c6c",
+      "role": "Configuration/default decision receipt; not installation or provider-backend attestation."
+    }
+  ],
+  "ownership": {
+    "literal_prior_template": {
+      "commit": "5cfa2400e3ebb4aefb8419135345c1fa92b05409",
+      "path": "adoption/templates/codex.stack-worker.config.toml",
+      "sha256": "a8b2198116337a9530abd0ae39df4a10c5767c1277816f17fd52e66bb7c4428a"
+    },
+    "exact_authorized_transform": {
+      "find": "model = \"gpt-6-astra\"",
+      "replace": "model = \"gpt-6.1-sol\"",
+      "occurrence_count": 1,
+      "resulting_sha256": "658246460ef25fd56a1c7d8adcd22ca5018390ad4594b448abc27d686dc32557",
+      "matches_root_supplied_installed_value_free_digest": true,
+      "verification": "Hash the committed prior template; replace the single model assignment; hash the result; compare with the root-supplied installed profile digest. The worker did not inspect live client configuration."
+    },
+    "recognized_previous_digests": [
+      "a8b2198116337a9530abd0ae39df4a10c5767c1277816f17fd52e66bb7c4428a",
+      "658246460ef25fd56a1c7d8adcd22ca5018390ad4594b448abc27d686dc32557"
+    ],
+    "correction": {
+      "initial_observation": "The installed digest did not match the literal committed template history or newline/BOM variants. No arbitrary custom-profile replacement was authorized.",
+      "new_evidence": "The parent reported the existing Sol model assignment and its prior user authorization. Exactly one model substitution in the proven prior template yields the installed digest.",
+      "verification_result": "Exact digest match; only that transform and the unchanged prior template are recognized.",
+      "arbitrary_custom_profiles": "Refused even when their current digest is supplied."
+    }
+  },
+  "frozen_current_main_template_sha256": {
+    "adoption/templates/codex.config.template.toml": "20f2e03684a9c4731b0690fbd745f82011fd6c9bafb8e9cdf016d2cbb26f8dcb",
+    "adoption/templates/codex.stack-worker.config.toml": "7cc85870cfd7557b6e5fb776391c4baaf12da13da4c3d66328e02b146de310b9",
+    "adoption/templates/codex.AGENTS.template.md": "947641bf204afa9707ad76ef89ab145e3e71722a9ac65243326c84713e213b6d"
+  },
+  "native_capability_observations": [
+    {
+      "command_template": "rtk codex -p stack-worker app-server --listen stdio://",
+      "environment": "Isolated synthetic CODEX_HOME and HOME.",
+      "exit_code": 1,
+      "returned_output_excerpt": "--profile only applies to runtime commands and `codex mcp`",
+      "verdict": "Expected restriction, source-matched."
+    },
+    {
+      "operation": "config/batchWrite with filePath set to the isolated stack-worker.config.toml",
+      "probe_exit_code": 0,
+      "returned_error": {
+        "code": -32600,
+        "data": {
+          "config_write_error_code": "configLayerReadonly"
+        },
+        "message": "Only writes to the user config are allowed"
+      },
+      "verdict": "Expected restriction; no existing native profile batch-writer path."
+    }
+  ],
+  "implementation": {
+    "path": "tools/adoption/apply_codex_lane.py",
+    "native_acceptance_source_sha256": "beb4ceff142a9facb9dfeb27a140b3dee80ba4670a1c27e6e1b6a34af72250aa",
+    "final_source_sha256": "d239f454563b44a77abd00de1f06cda05e6d40ca90c95dc000119cbe4e73e2c8",
+    "final_delta_after_native_acceptance": "Add the required --expect-profile-sha256 to the printed dry-run apply command; targeted migration test passed on the final source.",
+    "contract": [
+      "Existing atomic_write implementation is reused; same-directory temporary file, fsync, expected current digest, atomic replacement.",
+      "Migration requires an exact recognized source digest and the caller's matching --expect-profile-sha256.",
+      "The prior profile is backed up before mutation; original mode and source ownership are journaled.",
+      "The replacing intent is journaled before replacement, so rollback can recover an interruption before completion journaling.",
+      "Rollback restores only when current bytes match the applied target and backup bytes match the recorded prior digest; later writers and modified backups cause a conflict.",
+      "Exact client-version guard, default idle guard, native config expectedVersion, daemon_auto_start=false and unknown-custom-profile refusal remain intact."
+    ]
+  },
+  "native_integration_acceptance": {
+    "evidence_class": "Local integration acceptance against the installed native executable; not unchanged upstream tests.",
+    "invocation_template": "rtk python3 tools/adoption/apply_codex_lane.py [--apply | --rollback <run>] --codex <installed-client> --codex-home <synthetic-home> --eco-root <installed-prefix> --host-path /usr/bin:/bin --state-dir <isolated-state> --codex-process-name codex-q1592",
+    "process_guard_note": "The scratch process-name selector isolates this fixture from live clients. The global updater's default codex active-process guard was not changed or bypassed.",
+    "original_profile_sha256": "658246460ef25fd56a1c7d8adcd22ca5018390ad4594b448abc27d686dc32557",
+    "target_profile_sha256": "7cc85870cfd7557b6e5fb776391c4baaf12da13da4c3d66328e02b146de310b9",
+    "profile_original_mode": "0640",
+    "steps": [
+      {
+        "operation": "dry-run",
+        "exit_code": 0,
+        "observations": [
+          "Migration identified.",
+          "All original bytes unchanged."
+        ]
+      },
+      {
+        "operation": "apply without expected profile digest",
+        "exit_code": 2,
+        "observations": [
+          "Refused before writing.",
+          "All original bytes unchanged."
+        ]
+      },
+      {
+        "operation": "apply with incorrect expected profile digest",
+        "exit_code": 2,
+        "observations": [
+          "Refused before writing.",
+          "All original bytes unchanged."
+        ]
+      },
+      {
+        "operation": "apply with matching config, AGENTS and owned profile digests",
+        "exit_code": 0,
+        "returned_output_excerpt": "stack-worker.config.toml: in place",
+        "observations": [
+          "Native config and profile readback passed.",
+          "Profile bytes match the frozen current-main target.",
+          "0640 mode preserved.",
+          "Backup matches the exact original profile.",
+          "Source transform journaled."
+        ]
+      },
+      {
+        "operation": "idempotent apply",
+        "exit_code": 0,
+        "returned_output_excerpt": "already in place: nothing to do"
+      },
+      {
+        "operation": "rollback",
+        "exit_code": 0,
+        "returned_output_excerpt": "profile: restored from the backup",
+        "observations": [
+          "Config, AGENTS and preexisting profile restored byte-for-byte.",
+          "Profile mode restored.",
+          "Preexisting profile retained."
+        ]
+      },
+      {
+        "operation": "reapply for later-writer fixture",
+        "exit_code": 0
+      },
+      {
+        "operation": "rollback after a synthetic later profile edit",
+        "exit_code": 3,
+        "returned_output_excerpt": "or its backup changed since the run; left in place",
+        "observations": [
+          "Later writer's profile preserved.",
+          "Other owned files rolled back."
+        ]
+      },
+      {
+        "operation": "apply with exact digest of an unknown custom profile",
+        "exit_code": 2,
+        "observations": [
+          "Unknown profile refused.",
+          "All snapshot bytes unchanged."
+        ]
+      }
+    ],
+    "all_declared_independent_checks": true,
+    "private_raw_report_sha256": "cbf8d47544d7c174f3f00451402056ee2a0962abe6e22d2523a9cb30b0623f52"
+  },
+  "tests": [
+    {
+      "command": "rtk python3 -m unittest discover -s tests -p test_codex_worker_lane.py -v",
+      "exit_code": 0,
+      "returned_output_excerpt": "Ran 64 tests in 29.032s; OK (skipped=9)",
+      "classification": "Repository integration and synthetic fixtures; native opt-in tests skipped in this command."
+    },
+    {
+      "command": "rtk python3 -m unittest tests.test_codex_worker_lane.ApplyFlowTests.test_owned_profile_migration_journals_and_restores_bytes_and_mode -v",
+      "exit_code": 0,
+      "returned_output_excerpt": "Ran 1 test in 0.971s; OK",
+      "classification": "Final-source bounded verification of the generated migration command and journal/rollback behavior."
+    },
+    {
+      "command": "rtk git diff --check",
+      "exit_code": 0
+    },
+    {
+      "command": "rtk git apply --check <migration-only.patch>",
+      "exit_code": 0,
+      "classification": "Read-only applicability check against the concurrent main checkout."
+    }
+  ],
+  "patch": {
+    "scope": [
+      "tools/adoption/apply_codex_lane.py",
+      "tests/test_codex_worker_lane.py (new bounded test block only)"
+    ],
+    "bytes": 14011,
+    "sha256": "1ff99cbc9edb95d04559a715c04695782de9f9c70b5815d8445a63a019c11e1a",
+    "preserves_root_owned_template_and_model_default_changes": true
+  },
+  "boundaries": {
+    "global_apply_performed": false,
+    "live_authentication_inspected": false,
+    "model_calls": 0,
+    "provider_usage": null,
+    "provider_backend_attested": false,
+    "active_clients_terminated_or_restarted": false,
+    "upstream_test_suite_run": false
+  },
+  "unresolved_failure": false,
+  "astra_adjudication_trigger": null,
+  "remaining_gate": "Global rollout must wait for the existing default idle guard. Root owns manifest/hash registration and final integration."
+}
