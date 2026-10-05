@@ -4895,8 +4895,18 @@
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "731b79c977c430e0dd37e7ffa85b8a70df22c1ff1e53998b7cb0dc4923292259",
-      "bytes": 56885
+      "sha256": "ac8f6a28b25dbafd7c4e5663231052915737a3beaf4c1b4e9ec67ce2d9408b66",
+      "bytes": 59660
+    },
+    {
+      "path": "adoption/skills/native-stack-research/LICENSE",
+      "sha256": "cdaba0c8e8dec15da68c3b182eefabc9d9bbc36cab255545e25853f8fd3fc49d",
+      "bytes": 1088
+    },
+    {
+      "path": "adoption/skills/native-stack-research/SKILL.md",
+      "sha256": "313f41cbbb7ba5cbe9733d7b9c4caf85bd4fabf4c7a4cb5b40731f5449b941eb",
+      "bytes": 1602
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
@@ -4905,8 +4915,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "304dc11b5fca6e4001382a8cb884712e10d28bdfa8551fcac6dbfc2b4d36cf70",
-      "bytes": 12744
+      "sha256": "0677e5e0dcf19d01e8999566767eaeaec936f68c5d63efcccaf5a20979d7e6ca",
+      "bytes": 12779
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -4915,8 +4925,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "f87509d1bc52e728bff767cf37e1fe24cace4e140f749e72319713ff5563a61b",
-      "bytes": 19129
+      "sha256": "4aa9657b3112e4e352df5d10fb06ea46347d67f5b34903f4ed1e833a634f4e1c",
+      "bytes": 19168
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -10421,8 +10431,8 @@
     },
     {
       "path": "blueprints/runtime-workers/skills/manifest.json",
-      "sha256": "1a2db8d0ba28a0cf9ea330d31ade083d6e111ac5b58525157a415978f54b4499",
-      "bytes": 186836
+      "sha256": "963b3a35fffc8aeba8bbccc64a248031f1b79b66fd800fa57d4eb178ce3dc238",
+      "bytes": 188427
     },
     {
       "path": "blueprints/runtime-workers/skills/research.md",
@@ -16938,6 +16948,11 @@
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
       "sha256": "976b8e8c3ede42aa2ce26c01dbca5184cf45e329419a065e169bc0936f093051",
       "bytes": 14176
+    },
+    {
+      "path": "docs/decisions/2026-10-05-research-skill-round2.md",
+      "sha256": "bb4a704be2d83a094ea1f3d5a68e404ab3f08e71b098ea18feda0d73aa7d6bb4",
+      "bytes": 13251
     },
     {
       "path": "docs/decisions/2026-10-05-rtk-fold-harbor-phase2.md",
@@ -45080,6 +45095,76 @@
       "bytes": 3039
     },
     {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/README.md",
+      "sha256": "f43dc504a08de13f2d598b905b0b78e22afb34ae78962ea485f98362b0c372a4",
+      "bytes": 2093
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/astra.json",
+      "sha256": "91451759df757666be2f6edc3716d1eb1ab3b75f69ada18634eb4ff16480ac7b",
+      "bytes": 12728
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/checks.json",
+      "sha256": "ee82c89a02f67269c0ab94f018c7fd39f9767e8b5f1a533968e6f57745d88eba",
+      "bytes": 7549
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/completeness.json",
+      "sha256": "25739a7e5fe5e6a55242283a1fea719e690f2808c427daba3466468914808fe8",
+      "bytes": 9634
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/completeness.schema.json",
+      "sha256": "569d747dc3547504cb70e176f48a45d2493d0d088e84b7e2fa367d5d4bda09cb",
+      "bytes": 1704
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/critic.schema.json",
+      "sha256": "0e48bb2feedc4a449950054c65e4b48e9de6bbbfa11701b9e80e436b60c96023",
+      "bytes": 2337
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/decider-a.json",
+      "sha256": "0af96d5944c09879b7def09060cbbb5f49a14ab76a92ccd6ab56b341812c8e30",
+      "bytes": 7749
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/decider-b.json",
+      "sha256": "bb6f7126f22575baafb5a7b424761e63ebdb3e1d81b35f410c75e92297634f9e",
+      "bytes": 8031
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/decision.schema.json",
+      "sha256": "0b169205d0f1edfdf84e136623c2612a022cb59a32be67c7c3da4d3153e2aa71",
+      "bytes": 2569
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/execution.json",
+      "sha256": "09b6afe13466a1999f34a7c74b353a78c673468f24b77d41116d9dc0251f69c2",
+      "bytes": 12084
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/package-origin.json",
+      "sha256": "a0d6b65d88bd3ec2338ed5125e64377157c77d44f1e21cd3389eb3cd0b8315bf",
+      "bytes": 3288
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/packet.json",
+      "sha256": "3fc67e5d65e67709ac91ee64c9daa5e7920986e1ad6cf21e8935f089804fcbab",
+      "bytes": 7383
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/plan.json",
+      "sha256": "fc1ef2021450ac4680adc5a175d9c5546345f2cfee32e4f5fa7e63c335732ec3",
+      "bytes": 3186
+    },
+    {
+      "path": "evidence/artifacts/research-skill-round2-decision-20261005/source-review.json",
+      "sha256": "33dde2689ee45d7116b1617809dfc240db27975949c887aea626ab0f19e2b22f",
+      "bytes": 4887
+    },
+    {
       "path": "evidence/artifacts/retrieved-code.txt",
       "sha256": "228c4bc674c606fc6cfbbb57fba4164fe30066de34bba396fe68a335799f035f",
       "bytes": 2166
@@ -55296,8 +55381,8 @@
     },
     {
       "path": "tests/test_runtime_worker_skills.py",
-      "sha256": "7580739e21895c57be3fef8e7c9209e751c9ef90f975f3293cdb7f0efcde4b26",
-      "bytes": 24392
+      "sha256": "deb0c4a3bb8a860ee367e4d6019dd6814c5eb9b5a15441bb7c40ffbc5c0e369d",
+      "bytes": 24319
     },
     {
       "path": "tests/test_saturation_ledger.py",
@@ -55366,8 +55451,8 @@
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "7c7ffee80a370d9a6c0d7510c16cd96abc0d7314e93579816400b317ab169fb5",
-      "bytes": 67576
+      "sha256": "0e52d6b1d1c5dcccc5cce6902f74c4245f1122e301b9a9e4bdab5965996c570c",
+      "bytes": 67590
     },
     {
       "path": "tests/test_sota_convergence.py",
