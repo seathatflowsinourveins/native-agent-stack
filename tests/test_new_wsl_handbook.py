@@ -89,6 +89,106 @@ class NewWslHandbookTests(unittest.TestCase):
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(value))
 
+    def host_requalification_fixture(self):
+        """Synthetic receipt facts for the projection contract, not host evidence."""
+        return {"schema_version": 1, "id": "ns2604-requalification-20261005", "kind": "historical_inventory",
+                "data": {
+                    "host": "NativeStack2604", "publication_date_utc": "2026-10-05",
+                    "readiness": {
+                        "provisional": True,
+                        "formula": "(READY + BY_DESIGN) / all 80 slots in scope",
+                        "baseline": {"numerator": 30, "denominator": 80, "percent": 37.5},
+                        "current": {"numerator": 40, "denominator": 80, "percent": 50.0,
+                                    "status": "provisional_pending_independent_review"},
+                        "conditional": {"numerator": 44, "denominator": 80, "percent": 55.0,
+                                        "status": "conditional_pending_four_slot_adjudication"}},
+                    "disputed_slot_ids": [f"token-efficiency/{slot}" for slot in
+                                          ("context-supply", "command-output", "output-compression", "code-index")],
+                    "independent_review": {"status": "pending", "scope": "Review the retained native evidence and projections."},
+                    "source_class": "supplied co-op/user projection, not independently derived verified labels",
+                    "qualification_scope": "The fresh 80-slot join and ten promoted slots behind 40/80 are not retained."}}
+
+    def test_host_requalification_absence_keeps_it_out_of_the_book(self):
+        data = handbook.build_data(self.root)
+        self.assertNotIn("host_requalification", data)
+        self.assertNotIn(handbook.HOST_REQUALIFICATION, {source["path"] for source in data["sources"]})
+        self.assertNotIn("host re-qualification", handbook.render_markdown(data).decode())
+
+    def test_host_requalification_projects_scope_and_figures_without_promoting_acceptance(self):
+        before = handbook.build_data(self.root)
+        receipt = self.host_requalification_fixture()
+        self.write(handbook.HOST_REQUALIFICATION, receipt)
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        data = self.read(handbook.OUTPUTS[1])
+        host = data["host_requalification"]
+        self.assertEqual({key: host[key] for key in receipt["data"]}, receipt["data"])
+        self.assertEqual(host["source"], handbook.HOST_REQUALIFICATION)
+        self.assertEqual(host["receipt_kind"], "historical_inventory")
+        self.assertEqual({key: value for key, value in data.items() if key not in {"host_requalification", "sources"}},
+                         {key: value for key, value in before.items() if key != "sources"})
+        self.assertFalse(data["new_host_acceptance_claimed"])
+        source = next(source for source in data["sources"] if source["path"] == handbook.HOST_REQUALIFICATION)
+        self.assertEqual(source["sha256"], handbook.digest((self.root / handbook.HOST_REQUALIFICATION).read_bytes()))
+        page = (self.root / handbook.OUTPUTS[0]).read_text()
+        for text in ("Last fully reviewed baseline: **30/80 (37.5%)**",
+                     "Supplied current projection (provisional): **40/80 (50%)**",
+                     "Conditional projection (four-slot adjudication pending): **44/80 (55%)**",
+                     receipt["data"]["source_class"], receipt["data"]["qualification_scope"],
+                     "without an independently verified 80-slot join", "Independent review: pending"):
+            self.assertIn(text, page)
+        for slot in receipt["data"]["disputed_slot_ids"]:
+            self.assertIn(slot, page)
+        self.assertLess(page.index("## NativeStack2604 host re-qualification"), page.index("## Stage 1 and stage 2"))
+        checked = self.public_cli("--check")
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+
+    def test_host_requalification_rejects_inconsistent_or_promoted_receipt_facts(self):
+        changes = [
+            ("schema_version", True), ("kind", "native_model_e2e"), ("id", "another-receipt"),
+            ("data.host", "another-host"), ("data.publication_date_utc", "2026-10-06"),
+            ("data.readiness.provisional", False), ("data.readiness.formula", ""),
+            ("data.readiness.current.denominator", 81), ("data.readiness.current.numerator", True),
+            ("data.readiness.current.numerator", -1), ("data.readiness.current.percent", 55.0),
+            ("data.readiness.current.percent", True), ("data.readiness.current.status", "accepted"),
+            ("data.readiness.baseline", {"numerator": 31, "denominator": 80, "percent": 38.75}),
+            ("data.readiness.conditional", {"numerator": 45, "denominator": 80, "percent": 56.25,
+                                          "status": "conditional_pending_four_slot_adjudication"}),
+            ("data.disputed_slot_ids", ["token-efficiency/context-supply"] * 4),
+            ("data.independent_review.status", "agreed"), ("data.independent_review.scope", ""),
+            ("data.qualification_scope", ""), ("data.source_class", ""),
+        ]
+        for path, value in changes:
+            with self.subTest(path=path, value=value):
+                receipt = self.host_requalification_fixture()
+                target = receipt
+                keys = path.split(".")
+                for key in keys[:-1]:
+                    target = target[key]
+                target[keys[-1]] = value
+                self.write(handbook.HOST_REQUALIFICATION, receipt)
+                with self.assertRaisesRegex(ValueError, "host requalification"):
+                    handbook.read_host_requalification(handbook.Inputs(self.root))
+
+    def test_host_requalification_change_invalidates_a_previously_generated_book(self):
+        receipt = self.host_requalification_fixture()
+        self.write(handbook.HOST_REQUALIFICATION, receipt)
+        self.assertEqual(self.public_cli().returncode, 0)
+        receipt["data"]["qualification_scope"] += " A further source gap remains open."
+        self.write(handbook.HOST_REQUALIFICATION, receipt)
+        stale = self.public_cli("--check")
+        self.assertEqual(stale.returncode, 1)
+        self.assertIn("stale generated output", stale.stderr)
+
+    def test_host_requalification_rejects_private_omitted_metadata_before_publication(self):
+        receipt = self.host_requalification_fixture()
+        receipt["private_omitted_metadata"] = "/home/private-user/coordination/source.json"
+        self.write(handbook.HOST_REQUALIFICATION, receipt)
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("host path", result.stderr)
+        self.assertTrue(all(not (self.root / output).exists() for output in handbook.OUTPUTS))
+
     def profile(self, **changes):
         entry = {
             "name": "Claude Code", "layer_id": "native-clients",

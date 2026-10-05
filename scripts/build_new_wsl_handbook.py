@@ -42,6 +42,7 @@ ADOPTION = "adoption/manifest.json"
 ADOPTION_POINTER_FIELDS = ("source.release_tag", "source.release_commit", "updated_at")
 PROFILE = "adoption/new-wsl-profile.json"
 DEFAULTS_MANIFEST = "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json"
+HOST_REQUALIFICATION = "evidence/receipts/ns2604-requalification-20261005.json"
 OUTPUTS = ("docs/new-wsl-handbook.md", "docs/new-wsl-handbook.json")
 SOURCES = (OWNERSHIP, SELECTION, EDITION, RESEARCH, TRADING, DISTRO,
            ADOPTION, PREREGISTRATION)
@@ -198,6 +199,64 @@ class Inputs:
         if override is not None:
             validate_payload(value)
         return value
+
+
+def read_host_requalification(inputs):
+    """Project the dated receipt without qualifying a host or changing a selection.
+
+    The frozen denominator and reviewed baseline follow PR #700's method.md at
+    native-agent-stack@4c897418fe35a030a1188ae447eaf31c893f8eff. Consistency
+    checks here do not establish the supplied current projection's truth.
+    """
+    if not safe_file(inputs.root, HOST_REQUALIFICATION).exists():
+        return None
+    receipt = inputs.read(HOST_REQUALIFICATION)
+    validate_payload(receipt)
+    require(isinstance(receipt, dict) and type(receipt.get("schema_version")) is int
+            and receipt["schema_version"] == 1
+            and receipt.get("kind") == "historical_inventory"
+            and receipt.get("id") == "ns2604-requalification-20261005",
+            "host requalification needs its schema-1 historical receipt")
+    data = receipt.get("data")
+    require(isinstance(data, dict) and data.get("host") == "NativeStack2604"
+            and data.get("publication_date_utc") == "2026-10-05",
+            "host requalification needs its dated host scope")
+    for key in ("qualification_scope", "source_class"):
+        require(isinstance(data.get(key), str) and bool(data[key].strip()),
+                f"host requalification needs {key}")
+    readiness = data.get("readiness")
+    require(isinstance(readiness, dict) and readiness.get("provisional") is True
+            and isinstance(readiness.get("formula"), str) and bool(readiness["formula"].strip()),
+            "host requalification readiness must remain provisional and name its formula")
+    for key in ("baseline", "current", "conditional"):
+        value = readiness.get(key)
+        require(isinstance(value, dict) and type(value.get("numerator")) is int
+                and type(value.get("denominator")) is int and value["denominator"] == 80
+                and 0 <= value["numerator"] <= value["denominator"]
+                and type(value.get("percent")) in (int, float)
+                and value["percent"] == 100 * value["numerator"] / value["denominator"],
+                f"host requalification {key} readiness is inconsistent with its 80-slot scope")
+    require(readiness["baseline"]["numerator"] == 30,
+            "host requalification baseline must retain the reviewed 30/80")
+    require(readiness["current"].get("status") == "provisional_pending_independent_review"
+            and readiness["conditional"].get("status") == "conditional_pending_four_slot_adjudication",
+            "host requalification projections must retain their pending review statuses")
+    disputed = data.get("disputed_slot_ids")
+    require(isinstance(disputed, list) and len(disputed) == 4
+            and all(isinstance(slot, str) for slot in disputed)
+            and set(disputed) == {f"token-efficiency/{slot}" for slot in
+                                 ("context-supply", "command-output", "output-compression", "code-index")},
+            "host requalification needs the four disputed token slots")
+    require(readiness["current"]["numerator"] >= readiness["baseline"]["numerator"]
+            and readiness["conditional"]["numerator"] == readiness["current"]["numerator"] + len(disputed),
+            "host requalification conditional readiness must add only the four disputed slots")
+    review = data.get("independent_review")
+    require(isinstance(review, dict) and review.get("status") == "pending"
+            and isinstance(review.get("scope"), str) and bool(review["scope"].strip()),
+            "host requalification needs its pending independent review scope")
+    return {"source": HOST_REQUALIFICATION, "receipt_id": receipt["id"], "receipt_kind": receipt["kind"],
+            **{key: data[key] for key in ("host", "publication_date_utc", "readiness", "disputed_slot_ids",
+                                         "independent_review", "qualification_scope", "source_class")}}
 
 
 def profile_fields(entry):
@@ -697,6 +756,7 @@ def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=Non
     owners = index_rows(ownership["layers"], OWNERSHIP)
     reference = index_rows(edition["rows"], EDITION)
     default_decisions = read_default_decisions(inputs, reference, defaults_manifest)
+    host_requalification = read_host_requalification(inputs)
     declarations = {}
     for layer_id, row in owners.items():
         for declaration in row["owns"]:
@@ -982,6 +1042,8 @@ def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=Non
         "blocking_gaps": gaps,
         "sources": sorted(inputs.sources.values(), key=lambda source: source["path"]),
     }
+    if host_requalification is not None:
+        result["host_requalification"] = host_requalification
     if default_decisions is not None:
         require_slot_inventory([slot["record"]["slot_id"] for layer in layers for slot in layer["default_slots"]],
                                [slot["record"]["slot_id"] for slots in default_decisions["slots"].values()
@@ -1062,8 +1124,29 @@ def render_markdown(data):
              f"As of {data['as_of']}. {data['evidence_class']}.", "",
              "`picked` means a repository recommendation, `head-to-head-arm` means a comparison input, and `final` requires all five gates and both packet-bound family verdicts. `pending` identifies unpublished inputs.", "",
              data["meaning"], "", data["cross_family_boundary"], "",
-             "The architecture edition supplies the row inventory and reference links only. Its source-host winners, pins and closure cells are not new-install decisions.", "",
-             "## Stage 1 and stage 2", ""]
+             "The architecture edition supplies the row inventory and reference links only. Its source-host winners, pins and closure cells are not new-install decisions.", ""]
+    if data.get("host_requalification"):
+        host = data["host_requalification"]
+        readiness = host["readiness"]
+        lines += ["## NativeStack2604 host re-qualification", "",
+                  f"Published {host['publication_date_utc']}; source: {link(host['source'])}.", "",
+                  "All figures in this re-qualification remain provisional pending independent review. "
+                  "The reviewed baseline is the last fully reviewed qualification; the current and conditional "
+                  "figures are supplied projections, without an independently verified 80-slot join.", ""]
+        for key, label in (("baseline", "Last fully reviewed baseline"),
+                           ("current", "Supplied current projection (provisional)"),
+                           ("conditional", "Conditional projection (four-slot adjudication pending)")):
+            value = readiness[key]
+            lines += [f"- {label}: **{value['numerator']}/{value['denominator']} ({value['percent']:g}%)**."]
+        lines += ["", f"Formula: {cell(readiness['formula'])}.", "",
+                  f"Source class: {cell(host['source_class'])}.", "",
+                  f"Qualification scope: {cell(host['qualification_scope'])}.", "",
+                  "Disputed slots: " + ", ".join(f"`{slot}`" for slot in host["disputed_slot_ids"]) + ".", "",
+                  f"Independent review: {cell(host['independent_review']['status'])}; "
+                  f"{cell(host['independent_review']['scope'])}.", "",
+                  "This receipt projection supplies no new upstream acceptance, independently replicated host "
+                  "execution, recommendation status or finality gate.", ""]
+    lines += ["## Stage 1 and stage 2", ""]
     for stage in data["stage_order"]:
         lines += [f"### Stage {stage['stage']}", "", stage["boundary"], "", f"Source: {link(stage['source'])}.", ""]
         lines += [f"{i}. {step}" for i, step in enumerate(stage["steps"], 1)] + [""]
