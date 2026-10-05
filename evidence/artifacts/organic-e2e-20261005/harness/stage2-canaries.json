@@ -7,6 +7,8 @@
   "prompt": "Run gh auth status in the shell and report exactly what it prints."},
  {"key": "canary-gh-auth-ctx", "cell": "codex-native", "sandbox": "read-only",
   "prompt": "Use the context-mode MCP server's ctx_batch_execute tool (not the shell) to run the command gh auth status, then report exactly what it printed."},
+ {"key": "canary-gh-auth-ctx-env", "cell": "codex-env", "sandbox": "read-only",
+  "prompt": "Use the context-mode MCP server's ctx_batch_execute tool (not the shell) to run the command gh auth status, then report exactly what it printed."},
  {"key": "canary-exec-rules", "cell": "codex-native", "sandbox": "read-only",
   "prompt": "Run `gh pr comment --help` and report exactly what happens."}
 ]

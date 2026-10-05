@@ -1628,7 +1628,7 @@ def gate0(root: Path) -> dict:
                     if client == "codex" else bool(graded["markers"])
         elif key == "canary-gh-auth" and graded is not None:
             extra["gh_shell"] = canary_gh(graded, client, "shell", readonly)
-        elif key == "canary-gh-auth-ctx" and graded is not None:
+        elif key in ("canary-gh-auth-ctx", "canary-gh-auth-ctx-env") and graded is not None:
             extra["gh_ctx"] = canary_gh(graded, client, "ctx", readonly)
         elif key == "canary-exec-rules" and graded is not None:
             extra["exec_rules"] = canary_exec_rules(graded, client)
@@ -1645,11 +1645,12 @@ def gate0(root: Path) -> dict:
                                                                                    "loki_functions_exec_excluded",
                                                                                    "ecosystem_task_id_rows"))
         checks[key] = {**base, **extra, "trial_id": (record or {}).get("trial_id"), "pass": bool(passed and graded is not None)}
-    canaries = {k: checks.get(k, {}).get("pass") for k in ("canary-gh-auth", "canary-gh-auth-ctx", "canary-exec-rules")}
+    # The ctx gh canary runs in both Codex arms: the leak the verifier observed (finding 6) was in the env clone.
+    canary_keys = ("canary-gh-auth", "canary-gh-auth-ctx", "canary-gh-auth-ctx-env", "canary-exec-rules")
+    canaries = {k: checks.get(k, {}).get("pass") for k in canary_keys}
     report = {"at": utc_now(), "run_id": cfg["run_id"], "checks": checks, "trials": records, "canaries": canaries,
               "pass": bool(checks) and all(c["pass"] for c in checks.values()),
-              "missing": [k for k in ("probe-codex-native", "probe-codex-env", "canary-gh-auth", "canary-gh-auth-ctx",
-                                      "canary-exec-rules", "gate0-G1") if k not in checks]}
+              "missing": [k for k in ("probe-codex-native", "probe-codex-env", *canary_keys, "gate0-G1") if k not in checks]}
     if report["missing"]:
         report["pass"] = False
     write_json(root / "gate0.json", report, 0o600)
@@ -1813,10 +1814,15 @@ def sdk_parity(cfg: dict, graded_by: dict) -> dict:
                 row["one_main_rollout"] = graded.get("main_rollouts") == 1
             row["pass"] = all(v for k, v in row.items() if k not in ("trial_id", "cell"))
             checks.append(row)
+    # G10 holds only when every SDK cell was exercised and passed: a cell with no graded trial is reported as not
+    # exercised, never as a pass (a failed check still fails the gate).
+    cells = {"CL6 claude-sdk": "claude-sdk", "CL7 codex-sdk": "codex-sdk", "CL7b codex-app-server": "codex-app-server"}
+    not_exercised = [label for label, cell in cells.items() if not by_cell.get(cell)]
+    failed = [c["trial_id"] for c in checks if not c["pass"]]
     if not checks:
-        return {"pass": None, "n": 0, "note": "no CL6, CL7 or CL7b trial in this run"}
-    out = {"pass": all(c["pass"] for c in checks), "n": len(checks), "checks": checks}
-    return out
+        return {"pass": None, "n": 0, "not_exercised": not_exercised, "note": "no CL6, CL7 or CL7b trial in this run"}
+    return {"pass": False if failed else (None if not_exercised else True), "n": len(checks), "checks": checks,
+            "failed": failed, "not_exercised": not_exercised}
 
 
 # ---------------------------------------------------------------------------------------------------------------------

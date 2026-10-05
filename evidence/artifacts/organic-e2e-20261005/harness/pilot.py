@@ -15,8 +15,8 @@ or experiment word while sessions run.
 1  prepare.py: every pilot cell, the stage-2 probes and canaries (stage2-canaries.json) plus any --prompted runs. If a
    host harness file moved since the protocol's hashes, one Claude probe is added and the give-way rule drops
    G1|claude-sdk, so the Claude total stays 14. Stage 1 refuses a Claude schedule above 14.
-2  Gate 0: the Codex probes and canaries (gh auth through the shell and through ctx_batch_execute, the exec-rules
-   canary), the gate-0 CL3 native trial on G1, then the Claude probe if one is required; collect.py on those trials and
+2  Gate 0: the Codex probes and canaries (gh auth through the shell, and through ctx_batch_execute in both Codex arms;
+   the exec-rules canary), the gate-0 CL3 native trial on G1, then the Claude probe if one is required; collect.py on those trials and
    grade.py gate0. Stage 4 never starts unless gate0.json passes.
 4  Codex blocks C1-C5 in order and, in parallel, the Claude schedule (G1 first, then the seeded order), one eval per
    test at -j 1 under the shared lock. Needs gate0.json passing and a reviewed routing-file registry (or a recorded
