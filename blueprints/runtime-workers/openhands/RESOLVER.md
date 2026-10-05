@@ -1,24 +1,53 @@
 # OpenHands PR resolver: deterministic host driver
 
-## Monitoring-only decision and disabled driver (2026-10-04)
+<a id="monitoring-only-decision-and-disabled-driver-2026-10-04"></a>
+
+## Monitoring-only derivation and owned-path gate (2026-10-04)
 
 PR #489 ends with the static read derivation as **monitoring only**. Its files,
 directory prefixes, globs, computed-execution and unresolved diagnostics, followed
 execution/import paths, and unclassified entries are advisory. They protect no path,
 refuse no commit, and make no claim of completeness. No further derivation repair round
-follows. A separate, later PR will implement the real gate: a default-deny owned-path
-allowlist, permitting a resolver commit to touch only its task's declared paths.
+follows. The independent default-deny owned-path gate permits a resolver commit to
+touch only the coordinator's declared paths. It uses the exact pushed commit's raw
+diff against the trusted plan's base, with renames disabled so both ends are checked.
 
-The public `resolver.py` entry point exits with status 3 before argument parsing, any
-network request, git push or model call. Its stderr message is:
+Before argument parsing, the public `resolver.py` entry point imports the trusted gate
+and creates a tiny temporary Git repository. Its negative control adds an unowned file:
+the gate must refuse specifically with `unowned_path`, with one changed path and one
+owned entry. Import failure, an allowed control, or any fixture failure exits 3 with:
 
 ```
-resolver disabled until the owned-path allowlist gate lands (docs/decisions/2026-09-28-openhands-resolver-isolation.md)
+resolver disabled: owned-path allowlist gate self-test failed (docs/decisions/2026-09-28-openhands-resolver-isolation.md)
 ```
 
-The existing command handlers remain dormant and are exercised only by local fixture
-tests. The historical live runbook below does not enable the driver. Enablement requires
-the owned-path allowlist gate in the later PR, including its independent acceptance.
+After a successful self-test the existing handlers proceed. The self-test runs local
+Git only. Live operation still requires the gate on reviewed main, its independently
+accepted negative controls on that main, and the recorded stage gates in the runbook.
+The gate and enablement are separate hunks: `resolver.py`'s frozen owned-path plumbing
+belongs to the gate; its import guard, startup fixture, public `main` and instruction
+wording belong to enablement. The coordinator commits the gate first, enablement last.
+
+`--owned-path` values come only from the coordinator's argv. `plan_run` normalizes them
+and constructs `ResolverAttempt` in host memory; the attempt freezes them as a tuple,
+and `GhHarness` freezes its own copy before calling `PushGate.check`. The host-written
+`resolver-identity.json` beside the attempt is outside every mount and is never reread
+to obtain the allowlist. Issue text, agent exports, container-writable files and
+environment values supply no allowlist input. The [adoption trace and pinned
+sources](../../../docs/decisions/2026-09-28-openhands-resolver-isolation.md#owned-path-allowlist-adoption-2026-10-04)
+name each writer and source hop.
+
+The gate independently implements patch_policy's owned-path contract: sorted unique
+relative POSIX entries, trailing slashes dropped, matching an exact entry or a descendant
+under `entry + "/"`. Every A, M, D and T path must match. Even when owned, symlinks,
+gitlinks, mode/type changes, empty/dot/dotdot components, absolute paths, `.git` and its
+Git HFS/NTFS equivalents, and `.gitmodules` (including fsck aliases) refuse. So do casefold
+and NFC/NFKC aliases of protected paths and collisions between changed paths. Exceptions
+or malformed raw Git output refuse. Gate records and their receipt projection retain
+`changed_path_count`, `owned_path_count` and refusal codes, with unknown counts as `null`
+and no file contents. [Fail-first evidence](evidence/owned-path-gate-fail-first.txt) records
+the old and new decisions; the old gate already refused exceptions, so that retained
+control is honestly recorded as green on both versions.
 
 `PushGate.check` prints `advisory_gate_reads` on stderr on every run and records it under
 the same clearly named field in the receipt. It includes `mode: "monitoring_only"`, sorted
@@ -123,7 +152,8 @@ and this round's local results: the two-module run exited 1 with the installed-g
 All design, enforcement and live-run claims below are retained historical notes. The
 monitoring-only decision above supersedes the earlier derived-read protections,
 computed-read/execution refusals, and classify-every-residual enablement precondition.
-The driver remains disabled until the later owned-path allowlist gate lands.
+The owned-path adoption above supersedes the old blanket exit-3 disablement. The read
+derivation remains monitoring only; plan-time pre-refusal based on it is not adopted.
 
 The resolver turns one owner-authored issue into a draft pull request. A contained
 OpenHands agent writes a patch; this driver does everything that touches GitHub.
@@ -154,7 +184,7 @@ local composition of cited mechanisms.
 | `resolver.py` | Issue selection, the delimited instruction, branch naming, SOTA sources, PR body, review loop, the stage-2 driver (`ResolverAttempt`, `run`) and CLI |
 | `resolver/patch_policy.py` | Fail-closed patch parser and validator; derives the host-executed set at the base commit; extracts what a patch adds |
 | `resolver/gh_harness.py` | Allowlisted gh and git operations, the child environment, preflight, the base and repository reads, the gated push of an exact commit, and the journals of GitHub writes and gate records |
-| `resolver/push_gate.py` | The trusted pre-push gate: protected paths derived from the workflows, untrusted-text interpolation, the pinned zizmor, and the trusted-copy checks ([decision](#the-decision-record-amendment-is-decided)) |
+| `resolver/push_gate.py` | The trusted pre-push gate: independent exact-commit owned-path allowlist, unsafe-path/mode/alias refusals, retained protected categories, untrusted-text interpolation, pinned zizmor and trusted-copy checks |
 | `resolver/gate_reads.py` | The gate's reader of the data CI-run gate scripts read: each expression evaluated to the repository paths it spells, then files, directory prefixes, globs, legacy unresolved reads and the visible unclassified list |
 | `resolver/outgoing_guard.py` | Checks every text before it reaches GitHub, including what the pushed patch adds; approves body files by hash |
 | `host.py` | Resolver mode of `run`: resolver preflight, early gates, the pinned clone, `AGENTS.md`, the resolver skill set |
@@ -391,7 +421,10 @@ the patch.
 ## Stage 2: one attempt end to end
 
 `resolver.py run --issue N --owned-path P... --task T --lane L --arm control|engines-on`
-performs one attempt. The run id is `rw-openhands-res-<N>-<UTC yyyymmdd>`, so there is
+first runs the local negative control, then performs one attempt. Owned paths travel
+from this coordinator invocation through frozen host memory to the exact-commit gate;
+the identity receipt and the worker's export never supply them.
+The run id is `rw-openhands-res-<N>-<UTC yyyymmdd>`, so there is
 one attempt per issue, arm and UTC day. Failed attempts are kept, so a retry on the
 same day is refused before any read (`run_id_arm_already_exists`).
 
@@ -436,6 +469,8 @@ Nothing in this step starts a container or writes to GitHub.
   as SWE-bench mode. The P0-P2 probe runs inside `host.run` before dispatch start.
   Before anything else, `host.run` writes `resolver-identity.json` (issue, base,
   owned paths, lane, instruction hash) beside the attempt, outside every mount.
+  This artifact records the plan; enforcement uses the attempt's frozen owned paths
+  directly, then the harness's frozen copy, rather than rereading the artifact.
 - **Workspace.** `host.resolver_clone` makes an anonymous clone of `main`: neutral
   git (`GIT_CONFIG_GLOBAL=/dev/null`, `GIT_CONFIG_NOSYSTEM=1`, an empty private
   `HOME`), an empty credential helper list, `--no-tags`, and no template hooks
@@ -846,7 +881,8 @@ free branch name.
 ### Live runbook (first attempt)
 
 These are the coordinator's commands, in order. Run them from a clean checkout of
-main that contains the merged pre-push gate, with `RECIPE` set to its
+main that contains the merged owned-path pre-push gate and its accepted independent
+negative controls, with `RECIPE` set to its
 `blueprints/runtime-workers/openhands` directory. The gate refuses to run from a
 checkout off main's history, from one whose gate files differ from main's at the
 attempt's base, and from inside an attempt's result directory. Every variable holds a
@@ -854,15 +890,12 @@ path or a name, never a credential.
 
 ```sh
 # Precondition (decision record amendment, decided 2026-10-04: option 1 with trusted pre-push enforcement,
-# docs/decisions/2026-09-28-openhands-resolver-isolation.md). Stop here until all four hold:
-#   (a) the trusted pre-push gate (resolver/push_gate.py) has landed on main and this checkout is that main;
-#   (b) its negative controls pass on that main: tests.test_runtime_worker_openhands_push_gate, with the
+# docs/decisions/2026-09-28-openhands-resolver-isolation.md). Stop here until all three hold:
+#   (a) the owned-path allowlist gate has landed on main, then enablement; this checkout is that main;
+#   (b) its independent negative controls pass on that main: tests.test_runtime_worker_openhands_push_gate, with the
 #       pinned zizmor on PATH so its real-zizmor test runs rather than skips;
 #   (c) the stage gates are recorded (steps 2-6 below: G2, P3, G5 and G4 in stage-gates.json).
-#   (d) every unclassified gate read is classified, including evidence/unclassified-gate-reads-20261004.json
-#       and later reports: anchor on CWD, __file__ or a repo-root constant; a provably external base is a host
-#       read; the rest is unresolved. The refreshed 321-location baseline is a blocking precondition, not a waiver.
-#       The 2026-10-04 literal-container micro-fix resolves tests/test_new_host_grand_list.py:115.
+# Static read inventories are monitoring only. They supply no plan-time pre-refusal or enablement condition.
 # Option 2 (an owner fork) is only the overturn target; it would need its own reviewed harness change (Residuals).
 export PATH="$HOME/.local/share/codex-ecosystem/tools/docker-rootless-29.8.1/bin:$HOME/.local/share/codex-ecosystem/tools/skills-1.7.0/bin:$HOME/.local/share/codex-ecosystem/tools/node-24.21.0/bin:$HOME/.local/share/codex-ecosystem/bin:$PATH"
 RECIPE="$PWD/blueprints/runtime-workers/openhands"

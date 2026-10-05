@@ -2375,22 +2375,62 @@ class CommandLineTests(unittest.TestCase):
         import io
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
-            code = self.r._dormant_main(list(argv), **kwargs)
+            code = self.r.main(list(argv), **kwargs)
         return code, out.getvalue()
 
-    def test_public_driver_refuses_before_parsing_or_any_external_call(self):
+    def test_public_driver_refuses_when_gate_import_is_unavailable(self):
         import contextlib
         import io
-        expected = ('resolver disabled until the owned-path allowlist gate lands '
-                    '(docs/decisions/2026-09-28-openhands-resolver-isolation.md)')
         output = io.StringIO()
-        with mock.patch.object(self.r, "build_parser", side_effect=AssertionError("parser reached")), \
+        with mock.patch.object(self.r, "push_gate", None), \
+                mock.patch.object(self.r, "build_parser", side_effect=AssertionError("parser reached")), \
                 mock.patch("subprocess.run", side_effect=AssertionError("subprocess reached")), \
                 mock.patch("socket.create_connection", side_effect=AssertionError("network reached")), \
                 contextlib.redirect_stderr(output):
             code = self.r.main(["run"])
         self.assertEqual(code, 3)
-        self.assertEqual(output.getvalue().strip(), expected)
+        self.assertEqual(output.getvalue().strip(), self.r.DISABLED_MESSAGE)
+
+    def test_public_driver_refuses_when_negative_control_is_allowed(self):
+        output = io.StringIO()
+        with mock.patch.object(self.r.push_gate.PushGate, "check", return_value={"status": "pass"}), \
+                mock.patch.object(self.r, "build_parser", side_effect=AssertionError("parser reached")), \
+                mock.patch("socket.create_connection", side_effect=AssertionError("network reached")), \
+                contextlib.redirect_stderr(output):
+            self.assertEqual(self.r.main(["run"]), 3)
+        self.assertEqual(output.getvalue().strip(), self.r.DISABLED_MESSAGE)
+
+    def test_startup_negative_control_runs_the_native_git_fixture(self):
+        self.assertTrue(self.r._startup_gate_self_test())
+
+    def test_public_driver_proceeds_after_self_test(self):
+        with mock.patch.object(self.r, "_dormant_main", return_value=7) as dispatch:
+            self.assertEqual(self.r.main(["plan"], session_key=None), 7)
+        dispatch.assert_called_once_with(["plan"], session_key=None)
+
+    def test_gate_import_exception_keeps_the_public_stderr_and_exit_3(self):
+        original = importlib.util.spec_from_file_location
+
+        class BrokenLoader:
+            def create_module(self, _):
+                return None
+
+            def exec_module(self, _):
+                raise ImportError("fixture gate import failed")
+
+        def spec(name, path, **kwargs):
+            selected = original(name, path, **kwargs)
+            if str(path).endswith("resolver/push_gate.py"):
+                selected.loader = BrokenLoader()
+            return selected
+
+        output = io.StringIO()
+        with mock.patch.object(importlib.util, "spec_from_file_location", side_effect=spec):
+            resolver = load_resolver()
+        with mock.patch("subprocess.run", side_effect=AssertionError("subprocess reached")), \
+                contextlib.redirect_stderr(output):
+            self.assertEqual(resolver.main(["--help"]), 3)
+        self.assertEqual(output.getvalue().strip(), resolver.DISABLED_MESSAGE)
 
     def test_dormant_run_parser_keeps_stage_2_options_without_gate_or_run_id(self):
         parser = self.r.build_parser()
@@ -2506,15 +2546,16 @@ class CommandLineTests(unittest.TestCase):
         self.assertNotIn(key, printed)
         self.assertEqual((self.tmp / "leaky.jsonl").read_text(encoding="utf-8"), "")
 
-    def test_public_cli_is_disabled_even_for_help_or_incomplete_arguments(self):
-        for argv in (("run", "--issue", "12"), ("--help",), ("run", "--help")):
+    def test_public_cli_checks_the_gate_then_parses_help_or_incomplete_arguments(self):
+        for argv, expected in ((("run", "--issue", "12"), 2), (("--help",), 0), (("run", "--help"), 0)):
             with self.subTest(argv=argv):
                 run = subprocess.run([sys.executable, str(RECIPE / "resolver.py"), *argv],
                                      capture_output=True, text=True, timeout=60,
                                      env=hermetic_git_environment())
-                self.assertEqual(run.returncode, 3)
-                self.assertEqual(run.stderr.strip(), self.r.DISABLED_MESSAGE)
-                self.assertEqual(run.stdout, "")
+                self.assertEqual(run.returncode, expected, run.stderr)
+                self.assertNotIn(self.r.DISABLED_MESSAGE, run.stderr)
+                if expected == 0:
+                    self.assertIn("usage:", run.stdout)
 
 
 class ResolverSkillTests(unittest.TestCase):
@@ -3979,7 +4020,7 @@ class ResolverRunTests(unittest.TestCase):
                 mocks["time"] = enter(mock.patch.object(dispatch, "time", dispatch_time))
             enter(contextlib.redirect_stdout(out))
             extra = ["--dry-run"] if dry_run else ["--reviewer-command", self.reviewer]
-            code = self.r._dormant_main(self.argv(*extra), runner=github, clock=clock.clock, sleep=clock.sleep, gate=self.gate)
+            code = self.r.main(self.argv(*extra), runner=github, clock=clock.clock, sleep=clock.sleep, gate=self.gate)
         return code, json.loads(out.getvalue()), mocks
 
     def receipt(self, printed):
