@@ -528,19 +528,8 @@ def rtk_instructions_inline(codex_dir: Path) -> bool | None:
     instructions, rtk = codex_instructions(codex_dir), read_client_file(codex_dir / "RTK.md", "text")
     if instructions is None or rtk is None:
         return None
-    # The pinned 0.51.0 full-awareness text still has two blanket assurances that
-    # contradict qualified output/exit-status behavior. Our excerpt omits only
-    # these exact sentences (2026-10-05-harness-context-budget.md). Compare every
-    # remaining upstream byte by content; this does not accept a bare import.
-    def qualified(text: str) -> str:
-        body = instruction_text(text)
-        for rejected in (" Commands RTK has no filter for run as-is, so the prefix is always safe.",
-                         "; behavior and exit code are unchanged"):
-            body = body.replace(rejected, "")
-        return body
-
-    body = qualified(rtk)
-    return bool(body) and body in qualified(instructions)
+    body = instruction_text(rtk)
+    return bool(body) and body in instruction_text(instructions)
 
 
 def shared_regex_subset(pattern: str) -> bool:

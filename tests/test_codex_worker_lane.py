@@ -48,10 +48,10 @@ TEMPLATES = ROOT / "adoption" / "templates"
 FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
 # The canonical routing move is recorded in 2026-10-05-harness-context-budget.md.
 # RTK's unchanged 0.51.0 awareness fixture is pinned to e001f773 and checked
-# separately from the qualified excerpt, which omits only its two false assurances.
+# byte for byte in the rendered block, with local exceptions kept separately.
 TOP_RULE_SHA256 = "568ee365aeef3455fc901e648eb72d28cc3b49c39f1bfba7f5e39beed20479a8"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
-UPSTREAM_MARKER = '<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, qualified excerpt -->\n'
+UPSTREAM_MARKER = '<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim -->\n'
 
 # A minimal TOML writer for the fake (tables, arrays of tables, strings, numbers, booleans, string arrays): enough for
 # these fixtures, including the user template's [[skills.config]].
@@ -412,8 +412,8 @@ def write_fixture_mcp_server(directory: Path) -> Path:
 
 
 def template_segments() -> tuple[str, str, str]:
-    """(top-rule block, upstream awareness text, exceptions block) of the AGENTS template."""
-    text = (TEMPLATES / "codex.AGENTS.template.md").read_text(encoding="utf-8")
+    """(top-rule block, upstream awareness text, exceptions block) of the rendered instructions."""
+    text = lane.agents_block()
     body = text.split("\n", 1)[1]  # after the begin marker line
     top, rest = body.split("\n" + UPSTREAM_MARKER, 1)
     upstream, exceptions = rest.split("\n<!-- native-agent-stack:rtk-exceptions -->\n", 1)
@@ -428,20 +428,22 @@ class TemplateTests(unittest.TestCase):
         self.assertEqual(text.count(lane.BLOCK_BEGIN), 1)
         self.assertEqual(text.count(lane.TOP_RULE_MARKER), 1)
         self.assertEqual(text.count(lane.EXCEPTIONS_MARKER), 1)
-        self.assertEqual(lane.agents_block(), text)
+        rendered = lane.agents_block()
+        self.assertEqual(rendered, lane.managed_block.codex_block(text))
+        self.assertIn(lane.managed_block.RTK_INCLUDE, text)
+        self.assertNotIn(lane.managed_block.RTK_INCLUDE, rendered)
         # Codex expands no @ reference (codex-rs/core/src/agents_md.rs at rust-v0.157.1): the text is inline.
-        self.assertFalse([line for line in text.splitlines() if line.startswith("@")])
+        self.assertFalse([line for line in rendered.splitlines() if line.startswith("@")])
         self.assertLess(len(text.encode("utf-8")), 8192)  # local size budget; the project-doc limit does not cap global instructions
 
-    def test_top_rule_is_pinned_and_rtk_excerpt_qualifies_the_pinned_source(self):
+    def test_top_rule_is_pinned_and_rendered_rtk_is_the_unchanged_pinned_source(self):
         top, upstream, _ = template_segments()
         self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
         native = (FIXTURES / "rtk-awareness-full.md").read_text(encoding="utf-8")
         self.assertEqual(hashlib.sha256(native.encode("utf-8")).hexdigest(), RTK_AWARENESS_SHA256)
-        expected = native.replace(" Commands RTK has no filter for\nrun as-is, so the prefix is always safe.", "")
-        expected = expected.replace("; behavior and exit code are unchanged", "")
-        self.assertEqual(upstream, expected)
-        self.assertNotIn("the prefix is always safe", upstream)
+        fragment = (ROOT / lane.managed_block.RTK_AWARENESS_REL).read_bytes()
+        self.assertEqual(fragment, native.encode("utf-8"))
+        self.assertEqual(upstream.encode("utf-8"), fragment)
 
     # The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md, as the Codex block states them,
     # with the Sol-primary routing of docs/decisions/2026-09-30-sol-primary-quality-defaults.md and skill matching.
@@ -472,19 +474,22 @@ class TemplateTests(unittest.TestCase):
                        "`jq`", "`find`", "`rtk proxy <command>`", "`cd`", "`export`", "`source`", "127"):
             self.assertIn(needle, exceptions)
 
-    def test_adoption_status_accepts_the_qualified_excerpt_of_native_rtk_text(self):
+    def test_adoption_status_requires_the_entire_native_rtk_text(self):
         native = (FIXTURES / "rtk-awareness-full.md").read_text(encoding="utf-8")
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             (home / "RTK.md").write_text(native, encoding="utf-8")
             (home / "AGENTS.md").write_text(lane.agents_block(), encoding="utf-8")
             self.assertTrue(adoption_status.rtk_instructions_inline(home))
-            (home / "AGENTS.md").write_text(lane.agents_block().replace("- `rtk discover`", "- `different tool`"))
-            self.assertFalse(adoption_status.rtk_instructions_inline(home))
+            for omitted in ("- `rtk discover`", " Commands RTK has no filter for\nrun as-is, so the prefix is always safe.",
+                            "; behavior and exit code are unchanged"):
+                with self.subTest(omitted=omitted):
+                    (home / "AGENTS.md").write_text(lane.agents_block().replace(omitted, ""))
+                    self.assertFalse(adoption_status.rtk_instructions_inline(home))
 
     def test_adoption_status_finds_the_rtk_text_inline(self):
         # scripts/adoption_status.py (#368) counts RTK as wired only when RTK.md's text is inline in what Codex
-        # reads; the template carries it verbatim, and a bare pointer stays false.
+        # reads; the rendered block carries it verbatim, and a bare pointer stays false.
         _, upstream, _ = template_segments()
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)

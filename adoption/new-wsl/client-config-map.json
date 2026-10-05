@@ -880,11 +880,12 @@
     },
     {
       "match": [
-        "claude/settings/setting/skillOverrides"
+        "claude/settings/setting/skillOverrides",
+        "claude/settings/setting/skillListingBudgetFraction"
       ],
       "wiring": "practice",
-      "source": "https://code.claude.com/docs/en/skills (read 2026-10-05): name-only keeps skills invocable while omitting descriptions; leave skillListingBudgetFraction unset for the upstream 1% default.",
-      "note": "Specialized audit skills from adoption/skills/manifest.json use name-only; selection and fixed context budgets: docs/decisions/2026-10-05-harness-context-budget.md."
+      "source": "https://code.claude.com/docs/en/skills and docs/decisions/2026-09-30-skills-llm-native-listing.md: eligible skills stay on; skillListingBudgetFraction 0.05 keeps the listing from being truncated.",
+      "note": "The user's 2026-09-30 directive governs LLM-native skill invocation independently of startup instruction bytes. Repair round 3 overturns audit item 8's name-only recommendation; do not retire the listing fraction."
     },
     {
       "match": [

@@ -1239,7 +1239,7 @@ class ShippedAgentCopiesAndDispatchTests(unittest.TestCase):
                     if ":" in skill:
                         self.assertRegex(skill, r"^[^:\s]+:[^:\s]+$")
                     else:
-                        self.assertIn(listing.get(skill), {"on", "name-only"},
+                        self.assertEqual(listing.get(skill), "on",
                                       f"{path.name} preloads {skill} with Listing={listing.get(skill)!r}")
         for agent, expected in {
             "isolated-builder": ["context-mode:context-mode"],
@@ -2047,7 +2047,8 @@ class PortableTopRuleTests(unittest.TestCase):
         Count raw UTF-8 bytes including markers; Claude's @AGENTS.md import loads the
         repository AGENTS once, alongside CLAUDE.md and unconditional rules. Codex
         prefers a root override and does not expand imports. Plugin blocks, native
-        RTK and the named SubagentStart child carrier are separate measured scopes.
+        Claude RTK imports and the named SubagentStart child carrier are separate
+        measured scopes; Codex's inline native RTK awareness is counted here.
         """
         root = ROOT.resolve()
         files = {}

@@ -82,21 +82,24 @@ was 86 bytes including its leading space; its exact removal leaves the
 
 ## Native defaults and corrected claims
 
-Remove the `skillListingBudgetFraction: 0.05` override and its map matcher. Upstream
-defaults to 1% of context. Use native `name-only` visibility for nine specialized
-audit/triage skills selected from the audit's listing concern,
-`adoption/skills/manifest.json`, and the user's 2026-10-05T05:58:36Z directive
-(quoted verbatim in the repair addendum): `security-best-practices`, `security-threat-model`,
-`codeql`, `supply-chain-risk-auditor`, `agentic-actions-auditor`, `sarif-parsing`,
-`fp-check`, `variant-analysis` and `security-audit`. Their names stay listed and
-invocable; all skill entries, pins, statuses and Codex enablement stay in place.
-The manifest's listed-description sum changes from 9,484 to 5,357 Unicode code
-points, a manifest calculation rather than a live skill-listing byte measurement.
-No new skill-usage report was run. Native `/skill-doctor` is the follow-up for
-per-host costs and invocation frequency. Plugin skills ignore `skillOverrides`,
-so that native setting is limited to skills exposed through the supported local
-skill paths. [Claude skills documentation](https://code.claude.com/docs/en/skills)
-defines the default, visibility states, plugin limitation and usage report.
+**Amended by repair round 3 (2026-10-05):** the initial audit item 8
+recommendation to remove the fraction override and make nine audit skills
+`name-only` is overturned by the user's September 30 LLM-native invocation
+directive. Keep `skillListingBudgetFraction: 0.05` and every eligible local skill
+`on`, including `security-best-practices`, `security-threat-model`, `codeql`,
+`supply-chain-risk-auditor`, `agentic-actions-auditor`, `sarif-parsing`, `fp-check`,
+`variant-analysis` and `security-audit`. The initial name-only rationale cited
+2026-10-05T05:58:36Z (quoted below); that workflow-quality directive does not revoke
+the more specific standing skill-invocation directive. All entries, pins, statuses
+and Codex eligibility remain in place. The listed-description sum returns from
+5,357 to 9,484 Unicode code points; this is a manifest calculation, not a live
+skill-listing byte measurement. Skill listing is governed independently of the
+startup instruction-file budget. Native `/skill-doctor` remains the host check;
+plugin skills ignore `skillOverrides`.
+[Claude skills documentation](https://code.claude.com/docs/en/skills) and the
+[accepted September 30 record](2026-09-30-skills-llm-native-listing.md) provide the
+native settings and evidence. The dated round 3 addendum below records the
+restoration and alternatives.
 
 **Amended by [Required startup behavior and accepted-record amendments](#required-startup-behavior-and-accepted-record-amendments):**
 the following paragraph describes the initial job 075 wording. The common repair
@@ -134,18 +137,18 @@ is native installation evidence, not a provider or model run.
 [RTK 0.51.0 installer source](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/claude.rs#L305)
 and [README](https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md) document the layout.
 
-The Codex inline RTK excerpt removes the two blanket assurances that every prefix
-is safe and that behavior/exit status never changes. Its existing command-form
-exceptions remain explicit, directing callers to native execution or `rtk proxy`.
-The excerpt marker says it is qualified, and the unchanged upstream full-awareness
-source is retained in `tests/fixtures/codex-worker-lane/rtk-awareness-full.md`
-(SHA-256 `278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc`).
-The status checker compares all remaining awareness content while allowing only
-those two exact omissions; a bare import or missing command guidance still fails.
-Existing Codex role projections, their checksums and the scaffold top block follow
-the canonical correction. Their role and delegation text stays unchanged.
-[RTK awareness source](https://github.com/rtk-ai/rtk/blob/v0.51.0/hooks/rtk-awareness-full.md)
-is the cited original; the dated anti-pattern log records the corrected claim.
+**Amended by repair round 3 (2026-10-05):** Codex carries the entire native
+RTK 0.51.0 awareness file verbatim. The earlier qualified excerpt and the status
+checker's two-omission tolerance are superseded. The separately marked local
+exceptions qualify the upstream blanket assurances without rewriting its text.
+The compact template includes `adoption/templates/rtk-awareness-full.md`; the
+existing managed-block writer expands that include into the carrier and native
+lane instructions. All five Codex role projections and their mirrors carry the
+same complete F4 block with current checksums. The full 1,121-byte source has
+SHA-256 `278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc`, identical
+to the existing worker-lane fixture and
+[the pinned native source](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/hooks/rtk-awareness-full.md).
+The round 3 addendum records the template fallback and measured rendered bytes.
 
 ## Fixed byte budget and review procedure
 
@@ -207,9 +210,10 @@ behavior while bounding the owned surface. Overturn this choice when:
   adopt it and remove the redundant local gate.
 - A document watch or client update changes file discovery, imports, skill listing
   or native RTK initialization; verify the new source and remeasure before adoption.
-- A native usage report or task comparison shows a selected audit skill loses
-  required matching; restore that skill's description through a dated listing
-  decision, keeping the upstream fraction default unless evidence overturns it.
+- The user revises the standing LLM-native invocation directive or an upstream
+  change supplies better native discovery while preserving proactive invocation;
+  compare host listings and invocation evidence in a dated listing decision.
+  Startup file savings alone do not justify hiding a skill's description.
 - Real task evidence shows a relocated rule is not reached through its pointer;
   sharpen the trigger or restore only the required common instruction, with a
   dated byte comparison and quality evidence.
@@ -283,10 +287,12 @@ and supplies the following user directives verbatim:
 
 > safty is never our main focus, no security over enginnering is needed,focuing on the real tasksm the quality of workflow etc is the main
 
-The latter directive is cited beside the nine name-only selections above. Their
-Skills-CLI/local installation route is recorded in the skills manifest; plugin
-skills ignore this setting, so actual installation and `/skill-doctor` read-back
-on 2604 remain coordinator observations. No skill is deleted or disabled here.
+The latter directive was cited for the initial nine name-only selections. Repair
+round 3 restores their full descriptions under the more specific September 30
+standing directive quoted below. The Skills-CLI/local installation route remains
+in the manifest; plugin skills ignore this setting. Actual installation and
+`/skill-doctor` read-back on 2604 remain coordinator observations. No selected
+skill is deleted or newly disabled here.
 
 ### Required startup behavior and accepted-record amendments
 
@@ -339,25 +345,25 @@ fixtures. Root's trading trigger now includes paper/broker operation and naming 
 coordinator unit's north-star action. `build_inputs.py` now cites
 `blueprints/us-equities/AGENTS.md#trading-north-star`. Standing delegation is untouched.
 
-### Propagating the native listing default
+### Preserving the accepted listing fraction (amended 2026-10-05, round 3)
 
 Removing a template key alone leaves a host's old value because the existing
 [deep_merge_dict](../../tools/adoption/apply_claude_settings.py) keeps unmentioned
-base keys. Retain that generic host-preservation contract. The same writer now
-accepts explicit `--retire-key skillListingBudgetFraction`, only when the incoming
-template does not set it. It removes only that owned key, uses the existing backup
-and atomic write, and rejects other or explicitly configured retirements.
+base keys. The first repair added the explicit `--retire-key` mechanism using the
+existing backup, atomic write and read-back; it still refuses retirement of an
+incoming configured key. Keep that generic explicit mechanism, but supersede the
+first repair's automatic `skillListingBudgetFraction` retirement, its absence
+assertion and the name-only exceptions.
 
-[step_claude_settings](../../tools/adoption/new_wsl_client_config.py) predicts and
-passes the retirement through that writer, includes removal in the dry-run report,
-and reads the resulting JSON back to require absence. The manifest and lifecycle
-notes now describe this opt-in retirement exception. The regression seeds 0.05 and
-an unrelated host key, proves the dry run changes nothing, proves retirement with
-backup and host-key preservation, and proves the second apply is identical. This
-is the selected narrow integration fix: [upstream skills](https://code.claude.com/docs/en/skills)
-defines unset as the 1% default, while our existing merge requires an explicit
-owned-key removal to reach an already configured host. No general deletion API or
-second settings writer is introduced. Actual 2604 read-back remains a host gate.
+[step_claude_settings](../../tools/adoption/new_wsl_client_config.py) now follows
+the accepted September 30 practice: merge `skillListingBudgetFraction: 0.05` and
+full eligible `skillOverrides: on`, while retaining unrelated host keys. It never
+implicitly passes `--retire-key`. The regression seeds 0.05 and an unrelated host
+key, proves dry-run preservation, checks the fraction and unrelated key after
+apply, and checks the backup and identical second apply. Actual 2604 read-back of
+0.05 and the native Skills row remain a coordinator host gate. The native 1%
+default documented by [Claude](https://code.claude.com/docs/en/skills) does not
+supersede the user's invocation directive.
 
 ### Expanded byte scope and fixed amended ceilings
 
@@ -442,7 +448,7 @@ hosts through `tools/adoption/new_wsl_client_config.py`; read back `gpt-6.1-sol`
 "spawn call names neither" and "starts a cross-family lane" in each actual
 Codex-home AGENTS.md (including the bounded SDK jobs' codex-home-full). Read back
 the StructuredOutput and cross-family sentences in each actual Claude user block,
-and the absence of `skillListingBudgetFraction` in 2604 settings, followed by the
+and `skillListingBudgetFraction: 0.05` in 2604 settings, followed by the
 native `/context` Skills row. Until both host reads pass, keep root routing inline.
 No host files, credentials or sign-ins are changed by this repository repair.
 
@@ -588,3 +594,125 @@ no full-repository Python acceptance is claimed. The unchanged workflow config a
 checksum lock were read back through git diff. Full returned outputs, including
 the failed reproductions, remain in the authorized repair TMPDIR. The coordinator
 commits and refreshes the registry last; both protected manifests remain unchanged.
+
+## 2026-10-05 repair round 3: user-directed listing and verbatim RTK
+
+CI run 37283231657, job 111676262001 at `ee37894af`, reported three failures
+among 11,047 tests. The same three failures were reproduced locally before this
+repair. They identify a conflict with an accepted user directive and a native
+source-preservation regression, rather than a new upstream recommendation.
+
+The coordinator supplies the user's September 30 standing directive verbatim:
+
+> make sure all the skills can invoke seamlessly with llm native end, rather than user end
+
+The [accepted listing record](2026-09-30-skills-llm-native-listing.md) records that
+`name-only` depresses proactive invocation. All nine changed skills therefore
+return to `claude_listing: on` and template `skillOverrides: on`; existing Codex
+eligibility is preserved, including its native `skill-creator` copy exception.
+The map restores `skillListingBudgetFraction: 0.05`, also kept on NativeStack2604.
+The generic explicit retirement mechanism remains available, but no apply step
+retires this key. Related tests again require full eligible descriptions and
+preservation of the fraction. Audit item 8's name-only/default-fraction proposal
+is overturned by this directive. The October 5 workflow-quality quote above does
+not revoke it. The rejected alternative is hiding descriptions to save startup
+context; the skill catalog is governed by the user directive and measured as a
+separate client surface, independently of the instruction-file byte gate.
+
+At base `77d7516d8`, the upstream awareness body lived inline in both the Codex
+template and new-WSL carrier (8,187 bytes each), under a v0.50.0 verbatim marker.
+At `ee37894af`, both were 8,186 bytes with a v0.51.0 qualified excerpt. Read-only
+`manifests/stack.json` inspection pins RTK 0.51.0 to
+`e001f773f80b22b7dc4c7a79521b30e35aaef026`; `gh api
+repos/rtk-ai/rtk/git/ref/tags/v0.51.0` confirms that tag resolves to the same commit.
+Its [hooks/rtk-awareness-full.md](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/hooks/rtk-awareness-full.md)
+exists and is byte-identical to the existing fixture: 1,121 bytes and SHA-256
+`278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc`.
+
+Restoring that complete body inside the template would make it 8,286 bytes before
+any local qualification, exceeding the strict 8,192-byte ceiling. Use the
+coordinator's carrier fallback: vendor those unchanged upstream bytes at
+`adoption/templates/rtk-awareness-full.md`, with a single include marker in the
+compact template. The existing managed-block writer expands it for the new-WSL
+carrier, its CLI and the native/gateway worker lanes. No Codex `@` import is used.
+The demonstrated gap is that RTK's
+[native Codex installer](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/hooks/init/codex.rs)
+writes RTK.md and a reference, while Codex's
+[pinned instruction loader](https://github.com/openai/codex/blob/rust-v0.157.1/codex-rs/core/src/agents_md.rs)
+does not expand that reference. This is assembly in the existing writer, not a
+replacement of either upstream's installer. The native text is unchanged; local
+exceptions follow it in a separate block and explicitly qualify its blanket
+prefix and output/exit-status assurances. All role projections carry the same
+verbatim awareness body; their source/mirror checksums and independent literal
+checks are updated. The lane test now checks v0.51.0 and the complete native body.
+The status checker again requires the entire native text; it rejects the earlier
+two omissions.
+
+| File/scope | Round 2 / ee37894af bytes | Round 3 bytes |
+| --- | ---: | ---: |
+| Root AGENTS.md | 10,959 | 10,959 |
+| Repo CLAUDE.md | 766 | 766 |
+| Portable Claude source and carrier | 11,575 | 11,575 |
+| Claude rendered user block | 11,841 | 11,841 |
+| Codex compact template | 8,186 | 7,307 |
+| Codex vendored native awareness | — | 1,121 |
+| Codex new-WSL rendered carrier | 8,186 | 8,373 |
+| Codex native/gateway lane rendered block | 8,186 | 8,377 |
+| Claude startup scope | 23,566 | 23,566 |
+| Codex startup scope (new-WSL carrier plus root) | 19,145 | 19,332 |
+
+The filter normalizes four separator bytes in the new-WSL carrier; its awareness
+body remains byte-identical. The template limit applies to its compact source;
+the startup gate counts the full rendered carrier, including all native RTK
+bytes. The standalone native/gateway lane block is four bytes larger and also
+fits the current Codex ceiling with the root instructions.
+
+This is the dated measurement and alternative comparison required by the change
+procedure above. The accepted fixed ceilings stay 24,458 Claude and 20,103 Codex,
+with 892/771 bytes of headroom in the measured new-WSL scopes. No automatic
+re-baseline or ceiling increase is made. The first ceiling raise remains caused
+by S1–S3, as corrected in round 2; this source restoration fits the existing
+ceilings. The rejected RTK alternatives are rewriting its text again, keeping a
+bare Codex reference, or exceeding the template limit. Replace the assembly only
+when upstream Codex expands the native reference or RTK provides equivalent
+native inline installation, then verify the exact pinned content and remeasure.
+
+**The coordinator's host gate remains pending.** Re-render both hosts and read
+back the existing routing/schema sentences, the complete pinned RTK body in
+Codex and NativeStack2604's 0.05 fraction and native Skills row. After that gate,
+the 868-byte root routing paragraph becomes the 188-byte pointer, removing
+680 bytes from both startup scopes. In the same reviewed diff, remeasure and
+lower the fixed ceilings to those actual scopes plus 5%, rounded upward. For
+these new-WSL inputs, that means 22,886/18,652-byte scopes and 24,031/19,585-byte
+ceilings, superseding round 2's projected Codex 19,389 ceiling. If a host instead
+uses the standalone native block, its measured Codex scope is 18,656 and its
+plus-5% ceiling is 19,589; the coordinator must record which carrier is actually
+rendered. Freed routing bytes cannot become permanent growth headroom. No host
+user file or protected stack/evidence manifest is changed by this repair.
+
+### Round 3 local acceptance
+
+| Command | Exit | Result |
+| --- | ---: | --- |
+| `python3 -m unittest tests.test_landscape_sweep_harness tests.test_landscape_sweep_skills tests.test_runtime_worker_skills` | 0 | 421 tests, 7 skipped |
+| `python3 -m unittest tests.test_install_claude_profile tests.test_codex_worker_lane tests.test_scaffold_repo tests.test_new_wsl_client_config tests.test_new_wsl_handbook tests.test_managed_block tests.test_upstream_surface_watch` | 0 | 655 tests, 22 skipped |
+| `python3 -m unittest tests.test_codex_agents tests.test_codex_roles tests.test_skills_manifest` | 0 | 90 checks of the updated projections, checksums and listing policy |
+| `node test-envelope.mjs` from `examples/claude-native/workflows` | 0 | `SUMMARY passed=254 failed=0 total=254` |
+| `node test-contract-mutations.mjs` from the same directory | 0 | `SUMMARY passed=74 failed=0 total=74` |
+| `python3 tools/adoption/new_wsl_client_config.py --write-blocks` | 0 | carriers regenerated with no source units dropped |
+| `python3 tools/adoption/new_wsl_client_config.py --check` | 0 | current carriers and wiring |
+| `python3 scripts/build_new_wsl_handbook.py --check` | 0 | generated handbook is current; no regeneration needed |
+| `python3 scripts/validate.py` | 1 | registry SHA-256 and byte-count drift only; coordinator refreshes registry last |
+| `wc -c adoption/templates/codex.AGENTS.template.md` | 0 | 7,307 bytes, strictly below 8,192 |
+| `git diff --check` | 0 | clean |
+
+The first seven-module pass found one incorrect generated-record count (0 rather
+than 24 pieces not wired by their own entry). Correcting the dated counts and
+rerunning the record checks and the full seven-module group gave the passing
+result above. The initial writer run also refused a `directive` field on a
+practice entry; that field is for slot-owner selection. The practice's user
+source belongs in its `source` and `note` fields, where it now stays; the rerun
+passed. These are local integration and synthetic-fixture checks. No full CI
+suite, macOS run, provider/model trial or host rollout is claimed here. The
+protected manifests are unchanged; rebase, host rollout and registry refresh
+remain the coordinator's work.

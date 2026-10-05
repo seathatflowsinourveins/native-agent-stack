@@ -21,7 +21,7 @@ linear scan (a backtracking expression was flagged as a denial-of-service risk h
 
 Sources: openai/codex rust-v0.157.1 (36650394) codex-rs/agent-roles/src/{agent_role_config,loader,discovery}.rs,
 codex-rs/core/src/agent/role.rs, codex-rs/cli/src/doctor.rs; rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md
-(qualified excerpt, docs/decisions/2026-10-05-harness-context-budget.md).
+(verbatim, e001f773; docs/decisions/2026-10-05-harness-context-budget.md).
 """
 
 from __future__ import annotations
@@ -33,6 +33,8 @@ import os
 import stat
 import tomllib
 from pathlib import Path
+
+import managed_block
 
 ROOT = Path(__file__).resolve().parents[2]
 ROLE_FILES = ("stack-researcher.toml", "stack-verifier.toml")
@@ -68,12 +70,11 @@ ROLE_EFFORT = "max"
 # role's own model would replace both, since the role applies after the spawn's model and the default_subagent_model
 # (openai/codex rust-v0.159.2 core/src/agent/child_config.rs:62-73,204-206; core/src/agent/role.rs:184-186).
 INHERITED_MODEL_ROLES = frozenset({"isolated-builder"})
-UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, qualified excerpt -->\n"
+UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 EXCEPTIONS_MARKER = "<!-- native-agent-stack:rtk-exceptions -->\n"
 END_MARKER = "<!-- native-agent-stack:codex-user-instructions:end -->"
-# Qualified excerpt of rtk-ai/rtk v0.51.0 (e001f773), checked against the unchanged upstream fixture
-# by tests/test_codex_worker_lane.py; the October 5 context-budget record names the two omissions.
-RTK_SHA256 = "e14f6845e503d3df94ed23017a6bb3f26480ded04a11c4a4dd7b71bbbef7915f"
+# Unchanged hooks/rtk-awareness-full.md from rtk-ai/rtk v0.51.0 (e001f773).
+RTK_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 ONE_AGENT_SENTENCE = "You do not spawn, message or follow up with other agents."
 WORKING_DIRECTORY_BULLET = (
     "- **Working directory.** A working-directory instruction in the task wins. Context-mode is already bound to "
@@ -284,8 +285,8 @@ def frozen_denylist() -> tuple:
 
 @functools.lru_cache(maxsize=None)
 def f4_block() -> str:
-    """The F4 block: from the rtk-upstream marker through the shell-builtin line of the Codex AGENTS template."""
-    template = AGENTS_TEMPLATE.read_text(encoding="utf-8")
+    """The rendered F4 block: pinned native awareness plus the separate local exceptions."""
+    template = managed_block.codex_block(AGENTS_TEMPLATE.read_text(encoding="utf-8"))
     return UPSTREAM_MARKER + template.split(UPSTREAM_MARKER, 1)[1].split(END_MARKER, 1)[0]
 
 
@@ -417,7 +418,7 @@ RULES = (
      _rule_effort_pin),
     ("f4_block", ALL_ROLES,
      "docs/decisions/2026-09-26-token-practice-f1-f9.md#f4-codex-rtk-guidance-2026-09-26; rtk-ai/rtk v0.51.0 "
-     "hooks/rtk-awareness-full.md (qualified excerpt, RTK_SHA256); adoption/templates/codex.AGENTS.template.md; "
+     "hooks/rtk-awareness-full.md (verbatim, RTK_SHA256); adoption/templates/codex.AGENTS.template.md; "
      "docs/decisions/2026-10-05-harness-context-budget.md",
      _rule_f4_block),
     ("claude_only_name", ALL_ROLES,

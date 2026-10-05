@@ -708,7 +708,8 @@ def scan_names(text: str, names: list) -> list:
 
 
 def block_text(root: Path, piece_key: str) -> str:
-    return (root / BLOCK_TEXT_REL[piece_key]).read_text(encoding="utf-8")
+    text = (root / BLOCK_TEXT_REL[piece_key]).read_text(encoding="utf-8")
+    return managed_block.codex_block(text, root=root) if piece_key == CODEX_MD_PIECE else text
 
 
 @dataclasses.dataclass(frozen=True)
@@ -2161,11 +2162,9 @@ class Apply:
                 drop_path(wanted, tuple(path))
             else:
                 found[verdict.piece.key] = "added"
-        # This map owns the removed override. Generic settings merge preserves
-        # unknown host keys; use its explicit retirement path for this key only.
-        # https://code.claude.com/docs/en/skills: unset means the native 1% budget.
-        retired = () if "skillListingBudgetFraction" in wanted else ("skillListingBudgetFraction",)
-        merged = file_io.merge_settings(current, wanted, retire_keys=retired)
+        # Keep the configured listing fraction under the 2026-09-30 directive.
+        # An omitted host key stays; retirement requires an explicit writer call.
+        merged = file_io.merge_settings(current, wanted)
         if target.is_file() and merged == current:
             self.record("claude-settings", "current", f"{target} already holds the wired settings")
         elif self.dry:
@@ -2175,12 +2174,7 @@ class Apply:
             (self.stage / "settings.merged.json").write_text(json.dumps(wanted, indent=2) + "\n", encoding="utf-8")
             argv = [str(ROOT / "tools/adoption/apply_claude_settings.py"), "--template",
                     str(self.stage / "settings.merged.json"), "--target", str(target)]
-            for key in retired:
-                argv += ["--retire-key", key]
             ok = self.tool("claude-settings", argv)
-            if ok and any(key in json.loads(target.read_text(encoding="utf-8")) for key in retired):
-                self.say("claude-settings", "  read-back failed: retired skill listing override remains")
-                ok = False
             self.done("claude-settings", ok)
         if self.outcomes[-1][1] != "failed":
             self.authorization.update({key: status for key, status in found.items() if is_authorization_piece(key)})

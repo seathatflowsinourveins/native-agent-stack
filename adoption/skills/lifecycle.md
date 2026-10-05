@@ -244,14 +244,17 @@ for current qualification limits.
 - **Claude** fits the listing to `skillListingBudgetFraction` of the model's
   context window (default 0.01, with an 8,000-character fallback) and cuts each
   entry at 1,536 characters. On overflow it drops descriptions, starting with the
-  least-invoked skills, and writes a warning to the debug log. The template leaves
-  the fraction unset for the native 1% default; never also set
+  least-invoked skills, and writes a warning to the debug log. The template sets
+  the fraction to 0.05 under the user's
+  [September 30 directive](../../docs/decisions/2026-09-30-skills-llm-native-listing.md)
+  so eligible skills remain visible with descriptions; never also set
   `SLASH_COMMAND_TOOL_CHAR_BUDGET`, which pins a fixed count.
   Check a host with `claude --debug -p ok` on a 200k and a 1M-context model, the
   `/doctor` estimate and the `/context` Skills row, then follow the
   [October 5 budget decision](../../docs/decisions/2026-10-05-harness-context-budget.md).
-  The new-WSL apply step explicitly retires the owned fraction override and reads
-  back its absence; generic settings merge continues to preserve other host keys.
+  Skill listing is governed by that directive independently of the startup file
+  budget. The new-WSL apply step keeps this fraction, including on NativeStack2604;
+  the generic explicit `--retire-key` mechanism is retained but is not used here.
 - **Codex** fits its catalog to `[skills] max_context_tokens`, capped at 10,000
   tokens when set; unset, the budget is 2% of the context window, and 8,000
   characters when the window is unknown. Each description is cut at 1,024

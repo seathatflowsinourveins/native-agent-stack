@@ -250,13 +250,10 @@ class LlmNativeListingTests(unittest.TestCase):
         cls.manifest = load_json(MANIFEST_PATH)
         cls.skills = cls.manifest["skills"]
 
-    def test_every_model_invocable_skill_stays_listed_with_the_dated_audit_overrides(self):
+    def test_every_model_invocable_skill_stays_listed_with_its_description(self):
         for skill in self.skills:
             with self.subTest(skill=skill["name"]):
-                audits = {"security-best-practices", "security-threat-model", "codeql", "supply-chain-risk-auditor",
-                          "agentic-actions-auditor", "sarif-parsing", "fp-check", "variant-analysis", "security-audit"}
-                expected = ("user-invocable-only" if skill["upstream_disable_model_invocation"]
-                            else "name-only" if skill["name"] in audits else "on")
+                expected = "user-invocable-only" if skill["upstream_disable_model_invocation"] else "on"
                 self.assertEqual(skill["claude_listing"], expected)
 
     def test_codex_disables_only_the_skill_codex_ships_natively(self):
@@ -281,10 +278,10 @@ class LlmNativeListingTests(unittest.TestCase):
 class ListingBudgetTemplateTests(unittest.TestCase):
     """The listing budgets the two client templates set (2026-09-30 record)."""
 
-    def test_claude_template_uses_the_upstream_listing_budget_default(self):
-        # https://code.claude.com/docs/en/skills: 1% default, explicit audit skills name-only.
+    def test_claude_template_keeps_the_directive_backed_listing_fraction(self):
+        # 2026-09-30-skills-llm-native-listing.md: descriptions must remain visible.
         template = load_json(SETTINGS_TEMPLATE_PATH)
-        self.assertNotIn("skillListingBudgetFraction", template)
+        self.assertEqual(template["skillListingBudgetFraction"], 0.05)
         self.assertNotIn("SLASH_COMMAND_TOOL_CHAR_BUDGET", template.get("env", {}))
 
     def test_codex_template_sets_the_catalog_token_budget_and_no_per_skill_tables(self):

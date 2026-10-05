@@ -27,7 +27,7 @@
     "window_days": 30,
     "review_after": "2026-10-25",
     "on_description_char_cap": 10500,
-    "prune_rule": "A trial skill installed for at least window_days with zero invocations in the last window_days is a prune candidate: the review keeps it or removes it through a dated decision record. Zero use no longer demotes a listing: under the user's 2026-09-30 directive every model-invocable skill stays listed so the model can invoke it. Kept verdict winners change status only through a verdict re-record, and their listing only through a dated decision record. The 2026-10-05 harness-context-budget decision lists specialized audit skills name-only, keeping them model-invocable.",
+    "prune_rule": "A trial skill installed for at least window_days with zero invocations in the last window_days is a prune candidate: the review keeps it or removes it through a dated decision record. Zero use no longer demotes a listing: under the user's 2026-09-30 directive every model-invocable skill stays listed so the model can invoke it. Kept verdict winners change status only through a verdict re-record, and their listing only through a dated decision record.",
     "confound": "name-only and user-invocable-only listings depress proactive invocation; compare only within a listing state.",
     "measurement": {
       "claude": "native /skill-doctor (claude -p \"/skill-doctor\"), run by hand per host",
@@ -35,7 +35,7 @@
     },
     "verdict_boundary": "Trial skills are not verdict winners; catalogs/landscape/foundation.json instructions-skills is unchanged until a sealed re-record."
   },
-  "settings_propagation": "adoption/templates/claude.settings.template.json skillOverrides, applied by tools/adoption/apply_claude_settings.py (deep merge; an omitted host key stays unless explicitly retired, so demotion writes an explicit state). The new-WSL apply step retires the owned skillListingBudgetFraction override with --retire-key and reads back its absence; no other host-only setting is removed (2026-10-05 harness-context-budget repair).",
+  "settings_propagation": "adoption/templates/claude.settings.template.json skillOverrides and skillListingBudgetFraction, applied by tools/adoption/apply_claude_settings.py (deep merge; an omitted host key stays unless explicitly retired). The new-WSL apply step keeps the 0.05 listing fraction under the user's 2026-09-30 directive; it does not retire this key (2026-10-05 harness-context-budget repair round 3).",
   "skills": [
     {
       "name": "typesafe-ai",
@@ -109,7 +109,7 @@
       },
       "status": "kept",
       "gap": "Verdict winner: language-specific secure-coding review for scripts/ and tools/.",
-      "claude_listing": "name-only",
+      "claude_listing": "on",
       "codex_enabled": true
     },
     {
@@ -259,7 +259,7 @@
       },
       "status": "trial",
       "gap": "Paper-lane broker adapters, credential stores and host-request lanes have no written threat model.",
-      "claude_listing": "name-only",
+      "claude_listing": "on",
       "codex_enabled": true
     },
     {
@@ -309,7 +309,7 @@
       },
       "status": "trial",
       "gap": "CodeQL default setup gates main via the code_scanning rule, but alert triage and custom queries have no procedure.",
-      "claude_listing": "name-only",
+      "claude_listing": "on",
       "codex_enabled": true
     },
     {
@@ -334,7 +334,7 @@
       },
       "status": "trial",
       "gap": "Catalog winners and pinned tools (adoption/pins-*.json) are adopted without a dependency risk checklist.",
-      "claude_listing": "name-only",
+      "claude_listing": "on",
       "codex_enabled": true
     },
     {
@@ -359,7 +359,7 @@
       },
       "status": "trial",
       "gap": "Workflows run agent-adjacent automation (catalog-freshness propose, verdict-review-gate); no audit procedure for agentic Actions risk.",
-      "claude_listing": "name-only",
+      "claude_listing": "on",
       "codex_enabled": true
     },
     {
@@ -434,7 +434,7 @@
       },
       "status": "trial",
       "gap": "zizmor, OSV-Scanner, Scorecard and CodeQL all upload SARIF; reading and diffing those results is manual.",
-      "claude_listing": "name-only",
+      "claude_listing": "on",
       "codex_enabled": true
     },
     {
@@ -459,7 +459,7 @@
       },
       "status": "trial",
       "gap": "Open Scorecard/zizmor/CodeQL alerts need false-positive triage with retained reasoning.",
-      "claude_listing": "name-only",
+      "claude_listing": "on",
       "codex_enabled": true
     },
     {
@@ -585,7 +585,7 @@
       },
       "status": "trial",
       "gap": "Post-merge review keeps finding siblings of defects already fixed: #314 (2026-09-26) widened #291's rtk blob exclusion and closed a blind-packet leak through sentences the #269 filter did not match. fp-check verifies one finding and says it is not for hunting; no installed procedure searches a fixed bug's variants before merge.",
-      "claude_listing": "name-only",
+      "claude_listing": "on",
       "codex_enabled": true,
       "added": "2026-09-26"
     },
@@ -637,7 +637,7 @@
       },
       "status": "trial",
       "gap": "No installed procedure audits the whole repository with a coverage ledger and a confirmed/needs_validation/rejected verdict contract. Native /security-review reviews the diff between the branch and origin's default branch; /code-review reviews a diff, PR, branch or path for correctness bugs (Claude Code commands reference, read 2026-09-27); security-best-practices is framework guidance and 'not a full security audit' (catalogs/landscape/native-practice.json). Listed on and enabled for Codex from 2026-09-30 under the user's LLM-native directive (docs/decisions/2026-09-30-skills-llm-native-listing.md): its 359-character description, which says 'Use for security questions', now reaches both clients' listings, so the model may load it on an ordinary security question; loading it is guidance only unless a prompt asks for the full audit (SKILL.md L12 at the pin). The M5c bake-off against /security-review decides promotion.",
-      "claude_listing": "name-only",
+      "claude_listing": "on",
       "codex_enabled": true,
       "added": "2026-09-27"
     },
@@ -673,14 +673,14 @@
     }
   ],
   "budget": {
-    "claude_on_description_chars": 5357,
+    "claude_on_description_chars": 9484,
     "claude_on_cap": 10500,
     "codex_enabled_description_chars": 9165,
     "codex_catalog_description_chars": 9165,
     "codex_configured_budget_tokens": 6000,
     "codex_fallback_budget_chars": 8000,
     "description_chars_method": "Unicode code points of the SKILL.md frontmatter description parsed with PyYAML, surrounding whitespace stripped (2026-09-26; semgrep, codeql and sarif-parsing corrected from 709, 753 and 375).",
-    "client_budgets": "Claude Code fits the listing to skillListingBudgetFraction of the model's context window (default 0.01, settings reference), with an 8,000-character fallback (env-vars reference, SLASH_COMMAND_TOOL_CHAR_BUDGET row), and cuts each entry at 1,536 characters; the settings template leaves the fraction unset for the upstream 1% default (2026-10-05-harness-context-budget). Codex fits its catalog to [skills] max_context_tokens, capped at 10,000 tokens when set; unset, the budget is 2% of the model's context window, and 8,000 characters only when the window is unknown (codex-rs/ext/skills/src/render.rs L19-22 and L126-152 at rust-v0.159.2, the same rule as L17-20 and L123-149 at rust-v0.157.1). codex_configured_budget_tokens is the Codex template's [skills] max_context_tokens (tests/test_skills_manifest.py keeps them equal), and codex_fallback_budget_chars keeps that 8,000-character fallback as metadata, not a cap. claude_on_cap is this manifest's own ceiling on the on-listed sum, not a client budget. codex_catalog_description_chars counts the 24 skills Codex shows the model: a skill whose agents/openai.yaml sets allow_implicit_invocation: false (upstream_allow_implicit_invocation) stays out of its catalog (codex-rs/ext/skills/src/provider/host.rs L147-148); since the retirements of 2026-10-03 no selected skill sets it, so it equals codex_enabled_description_chars. The sums include the held agent-browser, a ceiling for a host where it is still installed. scripts/skills_status.py estimates that catalog in tokens as render.rs charges it, each line '- name: description (file: <path>/SKILL.md)' plus its newline at ceil(bytes / 4) (L154-160, L25 and L258-267), and compares the estimate with codex_configured_budget_tokens. Recorded 2026-09-30 in docs/decisions/2026-09-30-skills-llm-native-listing.md."
+    "client_budgets": "Claude Code fits the listing to skillListingBudgetFraction of the model's context window (default 0.01, settings reference), with an 8,000-character fallback (env-vars reference, SLASH_COMMAND_TOOL_CHAR_BUDGET row), and cuts each entry at 1,536 characters; the settings template sets 0.05 so eligible skills keep their descriptions under the user's 2026-09-30 LLM-native invocation directive (2026-09-30-skills-llm-native-listing). Codex fits its catalog to [skills] max_context_tokens, capped at 10,000 tokens when set; unset, the budget is 2% of the model's context window, and 8,000 characters only when the window is unknown (codex-rs/ext/skills/src/render.rs L19-22 and L126-152 at rust-v0.159.2, the same rule as L17-20 and L123-149 at rust-v0.157.1). codex_configured_budget_tokens is the Codex template's [skills] max_context_tokens (tests/test_skills_manifest.py keeps them equal), and codex_fallback_budget_chars keeps that 8,000-character fallback as metadata, not a cap. claude_on_cap is this manifest's own ceiling on the on-listed sum, not a client budget. codex_catalog_description_chars counts the 24 skills Codex shows the model: a skill whose agents/openai.yaml sets allow_implicit_invocation: false (upstream_allow_implicit_invocation) stays out of its catalog (codex-rs/ext/skills/src/provider/host.rs L147-148); since the retirements of 2026-10-03 no selected skill sets it, so it equals codex_enabled_description_chars. The sums include the held agent-browser, a ceiling for a host where it is still installed. scripts/skills_status.py estimates that catalog in tokens as render.rs charges it, each line '- name: description (file: <path>/SKILL.md)' plus its newline at ceil(bytes / 4) (L154-160, L25 and L258-267), and compares the estimate with codex_configured_budget_tokens. Recorded 2026-09-30 in docs/decisions/2026-09-30-skills-llm-native-listing.md."
   },
   "excluded": [
     {

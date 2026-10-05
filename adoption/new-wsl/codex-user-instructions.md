@@ -27,12 +27,13 @@ Web research: if the stack installs GPT Researcher, run `bash ~/code/native-agen
 Message Claude Code in one long command: set `msg` via a quoted heredoc (`msg=$(cat <<'MSG'`, text, `MSG`, `)` each on its own line), then `printf '%s\n\nreply: codex queue --thread %s\n' "$msg" "$CODEX_THREAD_ID" | claude -p -n "codex-$(printf '%.8s' "$CODEX_THREAD_ID")" --permission-mode bypassPermissions --max-turns 3 --output-format stream-json --verbose "Send the text on stdin, complete and verbatim, to the session named <name> with exactly one SendMessage call, then stop."`.
 Codex receives queued messages only between turns; idle delay is up to ~20 s.
 
-<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, qualified excerpt -->
+<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, verbatim -->
 # RTK
 
 Prefix every shell command with `rtk`: `rtk git status`, `rtk cargo test`,
 `rtk npm run build`, `rtk ls src/`. Keep the prefix inside chains:
-`rtk git add . && rtk git commit -m "msg"`.
+`rtk git add . && rtk git commit -m "msg"`. Commands RTK has no filter for
+run as-is, so the prefix is always safe.
 
 # Command output
 
@@ -46,7 +47,7 @@ output was clearly expected, contradicting its exit code, or garbled.
 ## About RTK
 
 RTK (Rust Token Killer) is a CLI proxy that filters command output to save
-tokens.
+tokens; behavior and exit code are unchanged.
 
 - `rtk gain` / `rtk gain --history` — token savings, overall and per command.
 - `rtk proxy <cmd>` — run a command unfiltered, still tracked.
@@ -55,6 +56,7 @@ tokens.
 
 <!-- native-agent-stack:rtk-exceptions -->
 
+The exceptions below override RTK's blanket prefix and output/exit-status assurances.
 rtk 0.51.0 positional expansion needs `--shell`. An explicit `rtk` prefix bypasses its exclusion list. Preserve output and exit status for the forms below with native commands or `rtk proxy <command>`:
 - `git show REV:path` in any form, including `git -C DIR show REV:path`: rtk keeps about 8 KiB of the blob.
 - `diff`: rtk 0.51.0 read errors exit 2 (bf23cff); 0.50.0: 1.

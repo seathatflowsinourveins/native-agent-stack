@@ -622,7 +622,7 @@ def make_catalog(tmp: Path) -> Path:
     files = [cfg.MAP_REL, cfg.MANIFEST_REL, cfg.BOOTSTRAP_REL, cfg.HOST_TEMPLATE_REL, *cfg.TEMPLATES.values(),
              *cfg.TEMPLATE_ADDITIONS.values(), *cfg.BLOCK_TEXT_REL.values(), *cfg.GENERATED_BLOCKS.values(), f"{cfg.PLAN_REL}/install-plan.json",
              f"{cfg.PLAN_REL}/config/otel.yaml", f"{cfg.PLAN_REL}/config/omniroute.env.example",
-             cfg.SKILLS_MANIFEST_REL]
+             cfg.SKILLS_MANIFEST_REL, cfg.managed_block.RTK_AWARENESS_REL]
     # The dated records that the map's `directive` fields name: --check requires each to be a file of the checkout.
     files += sorted({entry["directive"] for entry in json.loads((ROOT / cfg.MAP_REL).read_text(encoding="utf-8"))["entries"]
                      if "directive" in entry})
@@ -1398,7 +1398,7 @@ SENTENCE_STOP = r"[.!?][\"')\]`*_]*"
 
 
 def source_lines(piece: str) -> list:
-    return (ROOT / cfg.BLOCK_TEXT_REL[piece]).read_text(encoding="utf-8").split("\n")
+    return cfg.block_text(ROOT, piece).split("\n")
 
 
 def generated_text(piece: str) -> str:
@@ -1934,7 +1934,7 @@ class ApplyCase(unittest.TestCase):
 
 
 class ApplyTests(ApplyCase):
-    def test_apply_retires_the_owned_skill_listing_fraction_and_preserves_host_only_settings(self):
+    def test_apply_keeps_the_owned_skill_listing_fraction_and_host_only_settings(self):
         self.installed_state()
         target = self.home / ".claude/settings.json"
         target.parent.mkdir()
@@ -1947,7 +1947,7 @@ class ApplyTests(ApplyCase):
         code, out, _ = self.apply()
         self.assertEqual(code, 0, out[-800:])
         settings = json.loads(target.read_text())
-        self.assertNotIn("skillListingBudgetFraction", settings)
+        self.assertEqual(settings["skillListingBudgetFraction"], 0.05)
         self.assertEqual(settings["hostOnly"], {"keep": 1})
         backups = list(target.parent.glob("settings.json.bak.*"))
         self.assertEqual([p.read_bytes() for p in backups], [before])
