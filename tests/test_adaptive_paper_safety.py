@@ -10,6 +10,7 @@ import sys
 import tempfile
 import threading
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 FILE = ROOT / "blueprints/us-equities/adaptive-paper/safety.py"
@@ -192,6 +193,33 @@ class SafetyTests(unittest.TestCase):
         with self.assertRaisesRegex(s.SafetyError, "aggregate_exposure"):
             self.reserve("buy-2", price="100.02")
         self.assertGreaterEqual(self.ledger.accounting().gross_exposure_usd, D(100))
+
+    def tight_overnight_ledger(self):
+        limits = replace(s.RiskLimits(), max_gross_exposure_usd=D("200"),
+                         max_order_notional_usd=D("200"), overnight_gross_multiple=D("0.5"))
+        self.ledger.close()
+        self.db = self.root / "tight-overnight.sqlite3"
+        self.ledger = s.Ledger(self.db, limits)
+        self.ledger.start_trial(self.now)
+
+    def test_calendar_value_error_keeps_the_stricter_cap_at_entry(self):
+        self.tight_overnight_ledger()
+        with patch.object(s, "_session_at", side_effect=ValueError("calendar query failed")):
+            self.reserve(price="100", quote=self.quote(bid="99.99", ask="100"))
+            with self.assertRaisesRegex(s.SafetyError, "aggregate_exposure_cap_exceeded"):
+                self.reserve("buy-2", price="100", quote=self.quote(bid="99.99", ask="100"))
+        self.assertEqual(self.ledger.accounting().pending_buy_notional_usd, D("100"))
+
+    def test_calendar_value_error_halts_exposure_above_the_stricter_cap(self):
+        self.tight_overnight_ledger()
+        with patch.object(s, "_session_at", side_effect=ValueError("calendar query failed")):
+            self.reserve(price="100", quote=self.quote(bid="99.99", ask="100"))
+            self.fill(timestamp=self.now)
+            self.assertIsNone(self.ledger.accounting().halted_reason)
+            state = self.ledger.mark_to_market([self.quote(bid="149.99", ask="150")], self.now)
+        self.assertEqual(state.gross_exposure_usd, D("150"))
+        self.assertEqual(state.halted_reason, "gross_exposure_cap_exceeded")
+        self.assertEqual(self.ledger.accounting().halted_reason, "gross_exposure_cap_exceeded")
 
     def test_outstanding_sell_reservation_prevents_oversell(self):
         self.reserve()

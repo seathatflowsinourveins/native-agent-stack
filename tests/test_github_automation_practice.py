@@ -15,7 +15,7 @@ DOC = ROOT / "docs/github-automation.md"
 MANIFEST = ROOT / "catalogs/foundation/automation.json"
 RULESET = ROOT / ".github/main-ruleset.json"
 RECORD = ROOT / "docs/decisions/2026-10-02-github-automation-practice.md"
-HEADING = "## Current practice (2026-10-02)"
+HEADING = "## Current practice (2026-10-05)"
 
 
 def ruleset_rule(kind: str) -> dict:
@@ -59,7 +59,7 @@ class CurrentPracticeSectionTests(unittest.TestCase):
 
 class ManifestBlockTests(unittest.TestCase):
     def setUp(self):
-        self.block = json.loads(MANIFEST.read_text(encoding="utf-8"))["current_practice_20261002"]
+        self.block = json.loads(MANIFEST.read_text(encoding="utf-8"))["current_practice_20261005"]
 
     def test_the_block_matches_the_ruleset(self):
         checks = [check["context"] for check in ruleset_rule("required_status_checks")["required_status_checks"]]

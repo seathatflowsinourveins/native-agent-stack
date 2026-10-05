@@ -6,7 +6,27 @@ Step 1 of `blueprints/us-equities/engine-nautilus/acceptance-plan.md` section 5
 This is partial evidence: step 1 passed on both clients on 2026-09-23
 (`evidence/`, receipt `evidence/receipts/ibkr-readonly-acceptance-20260923.json`),
 but the gate stays `not_established` because steps 2-4 need NautilusTrader
-native paper stock orders, which are blocked upstream (see "Blockers").
+native paper order, recovery and reconciliation acceptance (see "Blockers").
+
+The 2026-10-05 frozen scheduled run also passed through both clients:
+[consolidated receipt](../../../../evidence/receipts/ibkr-readonly-acceptance-20261005.json),
+[official ibapi receipt](evidence/ibapi-readonly-20261005.json) and
+[Nautilus receipt](evidence/nautilus-readonly-20261005.json). It used ibapi 10.45.1
+and NautilusTrader 2.0.0rc5 against the digest-pinned gnzsnz/ib-gateway 10.51.1b
+paper configuration with `READ_ONLY_API=yes`. One DU-prefix paper account was
+flat with no open orders; REALTIME SPY contract/quote data, zero official
+noninformational errors, five native daily bars and 390 native five-minute bars
+were recorded. The official and native processes and terminal
+`strong_native_postcheck` each returned exit 0. The receipt publishes all six
+parsed local sequencing records, hashes and summaries of client/service output,
+and both recorded six-file checksum passes. It also records the independent
+2026-10-03 Astra/max staging ACCEPT, binds the reviewed installed service and
+timer hashes, and preserves the initial blocking source-binding finding and its
+pre-start manifest-digest fix. Earlier incomplete attempts remain recorded.
+The native receipt's
+official-receipt binding identifies the private original, while the public
+projections have separate hashes. This run establishes no order path or rc5
+recovery/reconciliation (#5007, #5057, #5060), and does not change the gate.
 
 ## Probes
 
@@ -54,15 +74,26 @@ Two isolated environments, created with the same uv recipe as
 
 ```
 uv venv --python /usr/bin/python3.12 "$IBAPI_ENV"
-uv pip install --python "$IBAPI_ENV/bin/python" --index-url https://pypi.org/simple nautilus-ibapi==10.45.1
+uv pip install --python "$IBAPI_ENV/bin/python" --index-url https://pypi.org/simple nautilus-ibapi==10.45.1 protobuf==5.29.6
 uv venv --python /usr/bin/python3.12 "$NAUTILUS_ENV"
 uv pip install --python "$NAUTILUS_ENV/bin/python" --index-url https://pypi.org/simple --pre nautilus_trader==2.0.0rc5
 ```
 
 `nautilus-ibapi` is the PyPI distribution of IB's official TWS API Python
 client used by NautilusTrader (import name `ibapi`; its project URLs point to
-IB's tws-api; version 10.45.1 in the published run). With a signed-in
-paper IB Gateway on this host, run the two probes back to back:
+IB's tws-api; version 10.45.1 in the published run).
+
+The `protobuf` pin is needed (added 2026-10-05):
+
+- The 10.45.1 wheel declares no dependencies; its PyPI metadata has no `Requires-Dist`.
+- Its generated `ibapi/protobuf/*_pb2.py` modules were built for protobuf 5.29.5. They call
+  `ValidateProtobufRuntimeVersion(5, 29, 5, …)` at import. The installed runtime's check (protobuf
+  `runtime_version.py`) rejects any runtime older than that, so at least 5.29.5 is required.
+- Without `protobuf`, `import ibapi.client` fails with `ModuleNotFoundError: No module named 'google'`.
+- `protobuf==5.29.6` is the pin that NautilusTrader 1.231.0's own `ib` extra declares for the same nautilus-ibapi
+  10.45.1 (`https://pypi.org/pypi/nautilus_trader/1.231.0/json`).
+
+With a signed-in paper IB Gateway on this host, run the two probes back to back:
 
 ```
 "$IBAPI_ENV/bin/python" ibapi_probe.py --receipt ibapi.json

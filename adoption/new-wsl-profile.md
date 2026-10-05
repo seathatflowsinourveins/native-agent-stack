@@ -219,7 +219,7 @@ have no default-install precedence.
 | Worktrunk | 0.80.0 | [exact release installer and shell setup](https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0) |
 | Serena | c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | [local install from the exact source checkout](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/CONTRIBUTING.md#L70) |
 | trafilatura | 2.2.0 | [tagged installation guide](https://github.com/adbar/trafilatura/blob/v2.2.0/docs/installation.rst#L73) |
-| Playwright CLI | 0.1.21 | [reviewed install source](https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md) |
+| Chrome DevTools MCP | 1.10.1 | [reviewed install source](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71); one `chrome-devtools` stdio server in both clients, also for diagnostics |
 | Inspect AI | 0321960a92aa52390413ce011d67ffb5962a2b11 | [reviewed install source](https://github.com/UKGovernmentBEIS/inspect_ai/blob/0321960a92aa52390413ce011d67ffb5962a2b11/README.md) |
 | Harbor | 0.23.0 | [reviewed install source](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md) |
 | promptfoo | 0.123.1 | [reviewed install source](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/README.md) |
@@ -234,7 +234,7 @@ have no default-install precedence.
 | ai-memory | 2.5.2 | [upstream mise example](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L1622), [GitHub backend version syntax](https://mise.jdx.dev/dev-tools/backends/github.html) |
 | Hindsight | 0.10.2 | [reviewed install source](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/README.md) |
 | agentmemory | 0.9.29 | [reviewed install source](https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md) |
-| RTK | 0.51.0 | [release asset](https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md#L113) through the [archive procedure](../recipes/README.md#official-release-archives) (0.50.0 until the #693 refresh of 2026-10-04) |
+| RTK | 0.51.0 | [release asset](https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md#L113) through the [archive procedure](../recipes/README.md#official-release-archives) (0.50.0 until the #693 refresh of 2026-10-04); the plan's `command-output` row also runs `rtk init -g --codex` and the Codex hook trust step ([upstream](https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md#L133), [decision](../docs/decisions/2026-10-04-codex-rtk-hook-qualified.md)) |
 | sqz | 1.9.0 | [reviewed install source](https://github.com/ojuschugh1/sqz/blob/726e77bd7e9d6ae7529e2750da69d86e622ca699/README.md) |
 | Headroom | 0.37.0 | [reviewed install source](https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md); since 2026-10-04 the [uv tool form](https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/README.md#L92) with the `[mcp]` extra, not `[all]` |
 | Phoenix | 20.18.0 | [reviewed install source](https://github.com/Arize-ai/phoenix/blob/d2ad1d916fa8afa21ea218ef7918ef7e4df6ab60/README.md) |

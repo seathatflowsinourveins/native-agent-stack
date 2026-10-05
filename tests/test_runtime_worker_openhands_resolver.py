@@ -1870,7 +1870,8 @@ def completed(args, stdout="", code=0, stderr=""):
     return subprocess.CompletedProcess(list(args), code, stdout, stderr)
 
 
-# The required contexts of main's rules, read with a GET on 2026-09-28 (review item D3).
+# Dated observation of 2026-09-28: eight required contexts of main's rules (GET, review item D3).
+# This fixture preserves that observed list, rather than describing the current ruleset.
 REQUIRED_CONTEXTS = ("validate", "token-report", "secret-scan", "dependency-review", "osv-scanner",
                      "verdict-review-gate", "validate-macos", "sota-sources")
 

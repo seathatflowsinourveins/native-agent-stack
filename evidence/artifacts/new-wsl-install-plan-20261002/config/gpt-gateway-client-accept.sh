@@ -8,7 +8,7 @@ set -euo pipefail
 gateway_session_probe="$(mktemp -d)"
 trap 'rm -rf -- "$gateway_session_probe"' EXIT
 gateway_session_rc=0
-OMNIROUTE_API_KEY=keyless-loopback codex exec -p omniroute --json --ephemeral \
+OMNIROUTE_API_KEY=keyless-loopback codex exec -p omniroute -m cx/gpt-6.1-sol -c model_reasoning_effort=xhigh --json --ephemeral \
   'Reply with exactly GATEWAY_OK. Do not use tools.' </dev/null > "$gateway_session_probe/events.jsonl" || gateway_session_rc=$?
 printf 'gpt-gateway | native-codex-exit=%s\n' "$gateway_session_rc" >&2
 (( gateway_session_rc == 0 )) || exit "$gateway_session_rc"

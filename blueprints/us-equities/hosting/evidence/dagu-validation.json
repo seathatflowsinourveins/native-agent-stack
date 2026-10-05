@@ -1,0 +1,5 @@
+{
+  "command": "dagu validate --context local --dagu-home <scratch> --config <scratch>/config.yaml <checkout>/blueprints/us-equities/hosting/equity-research-evidence.yaml",
+  "exit": 0,
+  "output": "time=2026-10-04T23:56:06.918-04:00 level=INFO msg=\"Creating example DAGs for first-time users\" dir=<scratch>/dags\ntime=2026-10-04T23:56:07.022-04:00 level=INFO msg=\"Example DAGs created successfully. Check the web UI to explore them!\"\n"
+}

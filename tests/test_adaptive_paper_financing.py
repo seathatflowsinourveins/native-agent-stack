@@ -1,6 +1,6 @@
 """Pure-module tests for the modeled margin-interest / financing lane
-(financing.py). Stdlib only -- these run on plain system Python (no
-jsonschema/PyYAML/numpy, no pinned runtime). See test_adaptive_paper_runner.py
+(financing.py). Install .github/requirements-calendar.txt in the test
+interpreter, or use the pinned engine venv. See test_adaptive_paper_runner.py
 for the runner.py integration test (overnight_holds False adds no outcome
 key).
 
@@ -10,7 +10,7 @@ next_trading_day (see the module docstring's cited dates): 2026-09-15
 nearby; 2026-09-10 (Thursday) settles Friday 2026-09-11 with an ordinary,
 holiday-free weekend behind it; 2026-09-03 (Thursday) settles Friday
 2026-09-04, whose weekend is immediately followed by the Labor Day holiday
-(2026-09-07, in sessions.HOLIDAYS_2026), so the next trading day is Tuesday
+(2026-09-07, a pinned XNYS closure), so the next trading day is Tuesday
 2026-09-08.
 """
 from datetime import date
@@ -102,7 +102,7 @@ class SettlementOffsetTests(unittest.TestCase):
 
 class WeekendAndHolidaySettleWindowTests(unittest.TestCase):
     """A one-night hold whose buy settlement lands the Friday before Labor
-    Day (2026-09-07, sessions.HOLIDAYS_2026): the settle-to-settle window
+    Day (2026-09-07, a pinned XNYS closure): the settle-to-settle window
     spans Friday, Saturday, Sunday and the Monday holiday."""
 
     def test_charge_days_span_weekend_and_labor_day_holiday(self):

@@ -1476,5 +1476,6 @@
         "here=\"$(cd -- \"$(dirname -- \"${BASH_SOURCE[0]}\")\" && pwd)\""
       ]
     }
-  ]
+  ],
+  "superseded_stack_rows": "Every manifests/stack.json line number in fixes[] was computed against the integration branch's own stack.json. The coordinator withdrew that branch's host pin moves before #704 landed (docs/decisions/2026-10-04-2604-e2e-fix-wave.md, \"Host stack pins withdrawn from this PR\"), so those numbers are historical and the architecture catalog's pin_source values are authoritative. fixes[108] (omniroute, manifests/stack.json:1920) is one such row (GPT delta read job-065, P3)."
 }

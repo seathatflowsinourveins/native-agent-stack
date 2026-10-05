@@ -429,7 +429,7 @@ Known limits:
 - **main's rules:** `gh api --paginate repos/<owner>/<repo>/rules/branches/main` is the
   only read of main's rules, for the checks wait. GitHub's "Get rules for a branch"
   (docs.github.com/en/rest/repos/rules) returns every active rule, 30 to a page by
-  default, so the read takes every page. Read-only GETs on 2026-09-28 found eight
+  default, so the read takes every page. Dated observation of 2026-09-28: read-only GETs found eight
   required contexts in main's rules, and a 404 "Branch not protected" for classic
   branch protection. So the harness allows no protection read, and it refuses rules,
   ruleset and protection writes.
@@ -653,7 +653,7 @@ executes nothing the model wrote.
 **The push runs the model's code in CI.** The claim above holds for the host only.
 The driver pushes the agent's commit to a branch of this repository and opens a PR.
 main's `pull_request` workflows then run repository code from the PR's merge commit
-on GitHub-hosted runners. At origin/main b0fb65b4, 11 of the 20 workflows run on
+on GitHub-hosted runners. In the dated observation of 2026-09-28 at origin/main b0fb65b4, 11 of the 20 workflows run on
 `pull_request`: action-compatibility, adoption-bootstrap (including the required
 validate-macos), dependency-review, hardware-profile-smoke, native-foundation-e2e,
 native-token-e2e, receipt-staleness, security-scan, supply-chain, token-report and

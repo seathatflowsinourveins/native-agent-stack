@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-05",
+  "evidence_class": "source_review_and_transcribed_coordinator_measurement_not_destination_acceptance",
+  "coordinator_brief": {
+    "source": "REPAIR-713.md supplied by the coordinator for PR #713, 2026-10-05",
+    "field": "Model",
+    "verbatim": "GPT, Sol at max.",
+    "attribution": "Coordinator launch pin; not an original user-record quotation."
+  },
+  "rtk_hcom": {
+    "source": "Coordinator-supplied rtk-hcom-interaction-20261005.md",
+    "measured_at": "2026-10-05T03:45:00Z",
+    "version": "0.51.0",
+    "method": "rtk hook check --agent codex <command>",
+    "observations": [
+      {
+        "command": "hcom term inject luna hi",
+        "result": "No rewrite for: hcom term inject luna hi"
+      },
+      {
+        "command": "hcom kill luna",
+        "result": "No rewrite for: hcom kill luna"
+      },
+      {
+        "command": "hcom send -b @luna -- hi",
+        "result": "No rewrite for: hcom send -b @luna -- hi"
+      },
+      {
+        "command": "uvx hcom kill luna",
+        "result": "No rewrite for: uvx hcom kill luna"
+      },
+      {
+        "command": "uvx hcom config",
+        "result": "No rewrite for: uvx hcom config"
+      },
+      {
+        "command": "git push",
+        "result": "rtk git push"
+      },
+      {
+        "command": "git status",
+        "result": "rtk git status"
+      }
+    ],
+    "interpretation": "The sampled forbidden hcom and uvx-hcom commands are not rewritten, so the RTK Codex hook cannot bypass their deny decisions. PR #705 owns refinement of its separate trust-tool guard.",
+    "execution": "Historical coordinator measurement transcribed verbatim; this repair did not re-run these probes."
+  },
+  "google_chrome": {
+    "index_url": "https://dl.google.com/linux/chrome/deb/dists/stable/main/binary-amd64/Packages",
+    "stable_build_count": 1,
+    "version": "154.0.8037.97-1",
+    "package_url": "https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_154.0.8037.97-1_amd64.deb",
+    "published_sha256": "a4edbe95e9b01db6c9b97d7a1323121eda18362b5620df06abac1b59bee80053",
+    "download_sha256": "a4edbe95e9b01db6c9b97d7a1323121eda18362b5620df06abac1b59bee80053",
+    "postinst_sha256": "0c845d0870abe07ccb8fefc68c0fc576abf9c88c47c3164222658ab274dcaa20",
+    "postinst_locators": {
+      "source_filename": "postinst:336-340",
+      "signing_key_file": "postinst:329,344-353",
+      "repository_content": "postinst:389-400",
+      "repo_add_once_condition": "postinst:429-466",
+      "entry_points": "postinst:501-503"
+    },
+    "postinst_behavior": "Creates google-chrome.sources (URI chrome-stable/deb, Signed-By /usr/share/keyrings/google-chrome.gpg); removes or comments its legacy google-chrome.list. With repo_add_once=false and neither package-managed source filename present, it adds no source. An existing google-chrome.sources forces recreation even with repo_add_once=false.",
+    "repair": "The helper owns native-stack-google-chrome.sources, checks the primary fingerprint, uses restricted Signed-By, disables repo_add_once before apt installation, preserves other defaults and refuses pre-existing package-managed source files. It installs current stable and records the installed version; acceptance checks minimum 154.0.8037.97-1 plus Google repository origin, without an exact build pin.",
+    "execution": "Downloaded, digest-verified and extracted control files only; package and postinst were never installed or executed."
+  },
+  "omniroute": {
+    "repository": "diegosouzapw/OmniRoute",
+    "version": "3.8.51",
+    "tag_commit": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+    "sources": [
+      {
+        "path": "open-sse/handlers/chatCore.ts",
+        "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/handlers/chatCore.ts",
+        "sha256": "15e4eae668dc790a5dad1995f6f9e3c9e87bd7ace7cc76cfe5acc89b0c4343ac"
+      },
+      {
+        "path": "open-sse/handlers/chatCore/attemptLogging.ts",
+        "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/handlers/chatCore/attemptLogging.ts",
+        "sha256": "92d9c6c8eb432562f84bc0e6ce5acbb0dc9d5d94143550b6b8fb2b0d8436bdbf"
+      },
+      {
+        "path": "open-sse/services/conversationTracker.ts",
+        "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/services/conversationTracker.ts",
+        "sha256": "7e7ea0c57f34abd7bc59c8060345ea4228456a8b23b2299108a642df9263300a"
+      },
+      {
+        "path": "src/lib/usage/callLogs.ts",
+        "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/usage/callLogs.ts",
+        "sha256": "f031baadb70a9730e9b391b7a63c948cb759110ff8672b05d301dd299e589b56"
+      },
+      {
+        "path": "src/app/api/usage/call-logs/route.ts",
+        "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/app/api/usage/call-logs/route.ts",
+        "sha256": "3c8bc89378d2a55baebc13b539d77af50c4cb947d0b11cf5370d10771ae2843e"
+      },
+      {
+        "path": "src/lib/db/migrations/014_unified_log_artifacts.sql",
+        "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/db/migrations/014_unified_log_artifacts.sql",
+        "sha256": "33cbceffa47c4e5e3ba671c3f27ac7c018097835c13a10d486736290d326c74d"
+      },
+      {
+        "path": "src/shared/utils/apiAuth.ts",
+        "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/shared/utils/apiAuth.ts",
+        "sha256": "5bda72684d19a7460b87be3ab11f4cc660a08bea9fd87d915bf5126f0d406a6f"
+      },
+      {
+        "path": "src/lib/api/requireManagementAuth.ts",
+        "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/lib/api/requireManagementAuth.ts",
+        "sha256": "f4c258daf30caeef2bd6f3d50531200248dd0656a3c4d5e86b368d1ca9c0f3e8"
+      },
+      {
+        "path": "open-sse/executors/codex/reasoningSuffix.ts",
+        "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts",
+        "sha256": "19fde125e10934338c885d30793e585b3f5403135e8a04f1675b50f8d950ef6e"
+      },
+      {
+        "path": "open-sse/executors/codex.ts",
+        "url": "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts",
+        "sha256": "1cfeb46527e23c6a830a066b4a14aca9184aa6583b446c283384616a517867cd"
+      }
+    ],
+    "findings": [
+      "chatCore.ts:1087-1090,1133 records conversationId or x-omniroute-session-id on chat/completions attempts; conversationTracker.ts:462-468 gives the explicit session header precedence.",
+      "migration 014:7-10 defaults call_log_pipeline_enabled to false; enabling it persists prompt/completion payloads and is not part of this repair.",
+      "callLogs.ts:650-668 defines conditional encrypted-reasoning effort metadata, but mapSummaryRow:472-520 exposes no effort field through the list or hydrated summary API. Default delivery effort cannot be universally asserted through that API.",
+      "callLogs.ts:1036 pages persisted rows newest first. The API route:218-225 prepends active/completed in-memory rows, so the old-row cutoff applies only to persisted rows.",
+      "apiAuth.ts:469-475,516 allows fresh password-free loopback bootstrap before setup completion. An operator-enabled management-auth requirement remains needs_user; no credential store is read."
+    ],
+    "assertion_boundary": "Observe fresh successful logged Sol routes via per-run session headers, with an explicitly weaker time-window-plus-model fallback. Source-derived expected high/xhigh effort is labelled separately; delivered wire effort and whole-run attribution in fallback mode are not asserted."
+  }
+}

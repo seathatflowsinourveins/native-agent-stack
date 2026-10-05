@@ -3622,8 +3622,8 @@
   {
    "key": "codex:config:tui.status_line",
    "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository decision at docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:82 names it",
-   "source": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:82",
+   "reason": "off on both hosts (read 2026-10-04)); the repository decision at docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:84 names it",
+   "source": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md:84",
    "carrier": null,
    "value": null,
    "scope": null,
