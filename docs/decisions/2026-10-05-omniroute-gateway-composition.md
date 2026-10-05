@@ -56,7 +56,7 @@ At 2026-10-05T13:22:24Z the user picked the option "Published 3.8.51 (Recommende
 `xhigh` limit as its cost. The running build is `release/v3.8.51`-based and also carries the affinity patch; this session read the facts below and asked for a choice among A (published only),
 B (published plus the affinity patch) and C (keep). The user picked "Published + affinity patch (Recommended)" and then, in the command center's verbatim relay: "we need highest quality resolution
 and interms ofthe never rebuilt rule, never build with sota reference and evidances, in this case we have them so our actions is not gated and the sota resolution is needed for seamless workflow".
-Read with its context, the never-rebuild rule (`docs/harness-defaults.md:75`: write local code only for a recorded gap that no maintained upstream closes, and cite the reference implementation it follows) forbids building without SOTA references and evidence; here each carried change is a cited upstream PR or cited glue with a removal condition, so the
+Read with its context, the never-rebuild rule (`AGENTS.md`, top rule: never rebuild or fork what an upstream already ships, glue only fills a demonstrated gap, cited at a pin; `docs/harness-defaults.md:75`: write local code only for a recorded gap that no maintained upstream closes, citing the reference implementation it follows) forbids building without SOTA references and evidence; here each carried change is a cited upstream PR or cited glue with a removal condition, so the
 current composition is allowed and max quality is wanted. The relay is the basis of this record and the user may withdraw it.
 
 ## What the published-only swap would have changed (read-only measurements, 2026-10-05)
