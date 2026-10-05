@@ -16618,8 +16618,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-typesafe-sdk-transport.md",
-      "sha256": "71fbf27f7ff1920ef4d20f698c37addb5e0a668fdd4682938335708e8ce0d66f",
-      "bytes": 6867
+      "sha256": "d197ab297186fe55e6c83624c78a06ead264e00d66a7fe2d5e62cfc1b653dbd6",
+      "bytes": 9226
     },
     {
       "path": "docs/direct-results.md",
