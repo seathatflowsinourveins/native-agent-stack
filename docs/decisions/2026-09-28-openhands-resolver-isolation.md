@@ -1078,8 +1078,8 @@ Git, synthetic artifacts and fake zizmor, not upstream execution or filesystem a
 ### Review-item dispositions
 
 Labels C and S refer to the original correctness and security reads; Delta refers to
-the r2 delta read. A retained existing refusal is identified as such, rather than
-presented as a new r3 fix. The residuals retain their coordinator preconditions.
+the r2 delta read. Retained behavior with no repair is labeled `already_covered`;
+`repaired` identifies an actual change. The residuals retain their coordinator preconditions.
 
 | Review item | Disposition | Evidence, reason and reopening condition |
 | --- | --- | --- |
@@ -1089,11 +1089,11 @@ presented as a new r3 fix. The residuals retain their coordinator preconditions.
 | C4: gate-only commit docs and landing order | residual | The earlier gate commit already describes enablement, and r2 repairs followed enablement in branch history. Rewriting old commits is outside this repair and the issue is moot under a squash merge. The coordinator must re-split before any separate sequential landing; current gate fixes and instruction wording remain separate hunks. |
 | C5: unreachable `diff_failed` | repaired | R2 uses `check=False` with an explicit return-code check; a subprocess-level failure control returns `diff_failed` and refuses. |
 | S2: compiled-module aliases | repaired | R2 refuses every `__pycache__` component and `.pyc`, `.pyo`, `.so`, `.pyd`, `.dylib`, `.dll` suffix, independently of import resolution. |
-| S2(a): instruction files | newly_refused | R3 adds `instruction_file` for the ten named instruction files/templates below, at any depth and even with exact ownership; native add/modify/delete controls are red before and green after. |
+| S2(a): instruction files | newly_refused | R3 adds `instruction_file` for ten named basenames. R4 corrects the missing real Codex template and includes the default plus five role carrier blocks; native add/modify/delete controls are red before and green after. |
 | S2(b): Git semantic dot files | newly_refused | R3 adds `git_semantic_file` for `.mailmap` and `.git*` names at any depth; `.git`, `.gitmodules`, `.github` retain their categories. Git's checkout attributes justify the conservative name boundary. |
 | S2(b): other dot paths | residual | The gate does not blanket-refuse all dot paths; the validator requires exact ownership unless otherwise forbidden. A harmless exact-owned `.notes` fixture still passes. CI configuration reachable only through advisory reads remains subject to manual scope review. Reopen when a demonstrated semantic input needs an independent refusal, or a qualified enforcing inventory covers it. |
 | S2(c): new top-level entries | residual | `path_is_owned` denies an unowned new top-level entry, but explicit ownership can authorize one. There is no top-level comparison in `_check_paths`; the validator's separate `new_top_level_entry` rule remains the first layer. Both decisions are retained as fixtures. Never own a new top-level entry; reopen if this independent boundary must also cover a defect in that validator rule. |
-| S2(d): aliases of unchanged protected paths | repaired | Retained existing coverage: `Protected` unions trusted/base/head rules and `_check` probes `path_aliases` even when the protected base path is unchanged. Native case/NFC/NFKC controls refuse; no new matching code is needed. |
+| S2(d): aliases of unchanged protected paths | already_covered | Retained existing coverage: `Protected` unions trusted/base/head rules and `_check` probes `path_aliases` even when the protected base path is unchanged. Native case/NFC/NFKC controls refuse; no new matching code is needed. |
 | S2(d): aliases of unchanged unprotected base paths | residual | `_check_paths` compares changed paths with one another, and `_check` compares them with protected paths, not all base entries. Case/NFKC aliases of unchanged ordinary docs pass the gate; the validator independently refuses base aliases. Do not own such aliases. Reopen for an independent whole-base collision requirement or a demonstrated false push. |
 | S3: resolver driver as enforcement input | repaired | R2 adds `resolver.py` to `ENFORCING_FILES`, with local-modification and trusted/base-mismatch refusals. |
 | S4: untraced CI execution after enablement | residual | Documentation and a coordinator precondition were added in r2; an advisory-only input is still not `Protected`. The inventory is monitoring only, so addition 2 cannot enforce it. Reopen under the qualified-inventory trigger below. |
@@ -1143,13 +1143,24 @@ The separate validator comparison is
   `.mailmap` and `.gitconfig`. Case/Unicode, NTFS suffix/ADS and HFS-ignorable forms
   receive the same new code.
 - The independent instruction-name list includes `AGENTS.md`, `AGENTS.override.md`,
-  `AGENTS.template.md`, `CLAUDE.md`, `CLAUDE.local.md`, `GEMINI.md`, `SKILL.md`, `RTK.md`,
-  `codex-user-instructions.md` and `claude-user-instructions.md`. At `56fced827`, the
-  repository names these formats in `RESOLVER.md:299-300`,
+  `AGENTS.template.md`, `codex.AGENTS.template.md`, `CLAUDE.md`, `CLAUDE.local.md`,
+  `GEMINI.md`, `SKILL.md`, `RTK.md`, `codex-user-instructions.md`,
+  `claude-user-instructions.md`, `token-lanes-block.md`, `token-lanes-block.builder.md`,
+  `token-lanes-block.researcher.md`, `token-lanes-block.reviewer.md`,
+  `token-lanes-block.scout.md` and `token-lanes-block.verifier.md`. The earlier policy
+  drew its references from `RESOLVER.md:299-300` at `56fced827`,
   `recipes/README.md:184,212,218-220`, `docs/harness-defaults.md:208` and
-  `adoption/platforms/linux-wsl2-new-distro.md:1082-1083`; Gemini is required by this
-  repair's scope. Templates and named instruction blocks are conservatively included,
-  without claiming clients auto-load every basename. The gate does not import the
+  `adoption/platforms/linux-wsl2-new-distro.md:1082-1083`; Gemini was required by r3's
+  scope. The original r3 claim to include the real instruction template was
+  wrong: `recipes/README.md:184` names `codex.AGENTS.template.md`, which the exact
+  basename check missed. R4 verifies the actual basename against
+  [tools/adoption/apply_codex_lane.py:111](https://github.com/seathatflowsinourveins/native-agent-stack/blob/656f263dc33bcbaa37c9e82628b47776679fae34/tools/adoption/apply_codex_lane.py#L111)
+  and includes it. Carrier blocks also contain instructions: the
+  [SubagentStart hook:16-23,33-38](https://github.com/seathatflowsinourveins/native-agent-stack/blob/656f263dc33bcbaa37c9e82628b47776679fae34/adoption/hooks/claude/token-lanes-subagent-start.py#L16)
+  selects the default and all five role variants, which R4 now refuses too. The generic
+  `AGENTS.template.md` basename stays conservatively reserved; no file at that starting
+  head has that basename. These are concrete listed carriers, not a claim that every
+  instruction-like file is protected or auto-loaded. The gate does not import the
   validator's instruction-name list. A newly adopted instruction filename reopens this
   finite policy; its inventory is also checked against both agent-facing lists.
 - CI's target is CPython **3.12.3**, recorded in `.github/workflows/validate.yml:227-228`
@@ -1262,3 +1273,25 @@ documentation remains a report-only historical issue, moot under squash merge.
 Fail-first evidence is appended to `evidence/owned-path-gate-fail-first.txt`; registration
 is the final repository mutation. Targeted acceptance runs offline with a private TMPDIR
 outside the checkout, correcting the previous builder's fixture placement.
+
+### R4 delta corrections (2026-10-05)
+
+The r3 delta verdict accepts without P1 and raises two P2 findings. R4 starts at
+`656f263dc33bcbaa37c9e82628b47776679fae34`. The first is repaired by matching the
+actual Codex template basename and the six concrete instruction carriers selected by
+the SubagentStart hook. Under directory ownership, native add/modify/delete controls
+for all seven names pass the old gate and refuse after repair. The ordinary
+`adoption/templates/codex.config.template.toml` add/modify control continues to pass;
+this repair does not blanket-refuse the adoption directory. Exact basenames keep the
+change scoped and independent of the validator. A new adopted carrier name reopens
+the inventory under the existing fork-isolation overturn.
+
+The second is a documentary correction: the protected-alias disposition is now
+`already_covered`, preserving its evidence without counting it as a repair. Its
+existing native negative controls are retained. Gate-only hunks are the basename
+inventory/comment in `push_gate.py` and three native fixture tests in
+`tests/test_runtime_worker_openhands_push_gate.py`. Instruction/enablement hunks are
+only `resolver_instruction` and the resolver skill's enumerated refusal list. Docs
+and evidence hunks record these corrections and actual returned checks. No import
+guard, startup control, public-entry behavior, advisory enforcement or addition 2
+changes are part of R4. Registration remains the final repository mutation.

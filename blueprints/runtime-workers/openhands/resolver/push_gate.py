@@ -1061,11 +1061,18 @@ MODULE_ARTIFACT_SUFFIXES = (".pyc", ".pyo", ".so", ".pyd", ".dylib", ".dll")
 # Independent instruction-name policy: RESOLVER.md's validator contract;
 # recipes/README.md:184, :212, :218-220; docs/harness-defaults.md:208;
 # adoption/platforms/linux-wsl2-new-distro.md:1082-1083 (at 56fced827).
-# Include the repository's named instruction templates/blocks and Gemini's
-# instruction file. This gate does not reuse patch_policy.INSTRUCTION_FILES.
+# The actual Codex template is named by tools/adoption/apply_codex_lane.py:111;
+# the default and role carrier blocks are selected by
+# adoption/hooks/claude/token-lanes-subagent-start.py:16-23,33-38 (at 656f263dc).
+# Include these concrete basenames and Gemini's instruction file independently
+# of patch_policy.INSTRUCTION_FILES. AGENTS.template.md remains reserved too.
 INSTRUCTION_FILE_NAMES = frozenset({"agents.md", "agents.override.md", "agents.template.md", "claude.md",
                                     "claude.local.md", "gemini.md", "skill.md", "rtk.md",
-                                    "codex-user-instructions.md", "claude-user-instructions.md"})
+                                    "codex-user-instructions.md", "claude-user-instructions.md",
+                                    "codex.agents.template.md", "token-lanes-block.md",
+                                    "token-lanes-block.builder.md", "token-lanes-block.researcher.md",
+                                    "token-lanes-block.reviewer.md", "token-lanes-block.scout.md",
+                                    "token-lanes-block.verifier.md"})
 RAW_CHANGE = re.compile(rb":(000000|100644|100755|120000|160000) "
                         rb"(000000|100644|100755|120000|160000) "
                         rb"([0-9a-f]{40}) ([0-9a-f]{40}) ([AMDT])")

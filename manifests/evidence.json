@@ -9584,8 +9584,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/RESOLVER.md",
-      "sha256": "467ad8f8d84d614fc0d1890ac8308181da27ddb22d4e73c7ce8ec86f2e79357a",
-      "bytes": 73224
+      "sha256": "25d30e54cb35c5d23d2b9bf9e94397ab0973913ab3656b0b4907a00cb4eb74ae",
+      "bytes": 73617
     },
     {
       "path": "blueprints/runtime-workers/openhands/build-requirements.lock",
@@ -9669,8 +9669,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/owned-path-gate-fail-first.txt",
-      "sha256": "3a36943f4fc975dbc0991ce02bb1446e20eb9b92f00bc7e8aab65d02d3d45011",
-      "bytes": 41349
+      "sha256": "b4f7922dbc28d3b4595195f3f55bac33fb2ec8e85a7fc3dfd117e3aed4106e4c",
+      "bytes": 49368
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/phase1-commands.json",
@@ -10129,8 +10129,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver.py",
-      "sha256": "6b58aaabb3b1f02466722c0940f645af1fa1746fb8ef52956019570015939d65",
-      "bytes": 103262
+      "sha256": "64d159c12bfea6922981d53165005befa810e947f89c799bdb1f5e89587cfc08",
+      "bytes": 103496
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/gate_reads.py",
@@ -10154,8 +10154,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver/push_gate.py",
-      "sha256": "5b377f0943a1ffb32d29b008fa405e2e3356739aa69c76b8266e91445b53c9bb",
-      "bytes": 74112
+      "sha256": "14872b80656d4b6df384ff77d3563a5c0dcbdf20c0d4a6229da03b2f7a6c028b",
+      "bytes": 74692
     },
     {
       "path": "blueprints/runtime-workers/openhands/run-e2e.sh",
@@ -10169,8 +10169,8 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/skills/resolver/SKILL.md",
-      "sha256": "3fc4a894f028840e277b1c3cd4a2b0cac166663c5c3d7f26e91b1168c070312b",
-      "bytes": 6996
+      "sha256": "76e5e575fb8a356290438f1424f8e1c8272ab635b5990b8bb83993047604543a",
+      "bytes": 7215
     },
     {
       "path": "blueprints/runtime-workers/openhands/worker.py",
@@ -16219,8 +16219,8 @@
     },
     {
       "path": "docs/decisions/2026-09-28-openhands-resolver-isolation.md",
-      "sha256": "dc344e56605ffb8a6248132726360c08bc89fa7fa45b089ef5f0cd0eb09671a6",
-      "bytes": 113174
+      "sha256": "715f0ff742cea52794a83e5373784dd7726f213ec08f771b5f4a9c50f979ef6f",
+      "bytes": 115783
     },
     {
       "path": "docs/decisions/2026-09-28-terminal-experience.md",
@@ -53164,8 +53164,8 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "a2880dbde277f6354cae551394efeb6f95778570073eb22ebb461aedc55b0493",
-      "bytes": 148457
+      "sha256": "7a2838c6c280ca4e115e4290a67fc6e91d6919433b15e62fe15a96edde210076",
+      "bytes": 152084
     },
     {
       "path": "tests/test_runtime_worker_openhands_resolver.py",

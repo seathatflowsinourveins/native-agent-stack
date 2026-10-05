@@ -266,3 +266,72 @@ Gate-only: push_gate.py independent name checks and phrase metadata; tests/test_
 Instruction/enablement: resolver.py resolver_instruction wording only; skills/resolver/SKILL.md refusal list; tests/test_runtime_worker_openhands_resolver.py source-derived phrase protocol. Import guard, startup control and public main are unchanged.
 Docs/evidence: RESOLVER.md current rules and Known limits; the decision's honest disposition inventory and pinned sources; this receipt. Historical gate-only commit docs/ordering are report-only and moot under squash merge.
 Registration of all changed authored files is the final repository mutation. Read-only validate.py, evidence_manifest --check and diff --check results follow in the handoff.
+
+10. Instruction-template delta repair — resolver-gate-r4 — 2026-10-05
+Starting production source: 656f263dc33bcbaa37c9e82628b47776679fae34.
+The independent delta verdict has no P1 and two P2. Both are addressed: the real Codex instruction template and six hook-selected carrier basenames now refuse, and unchanged protected-alias coverage is labeled already_covered rather than repaired.
+Evidence class: native Git plus local unittest fixtures; no live resolver, provider call, GitHub mutation or upstream test acceptance is claimed.
+All commands inherit nice -n 19 and TMPDIR=~/.cache/tres4 outside /tmp and the worktree.
+Pinned rules: tools/adoption/apply_codex_lane.py:111 and adoption/hooks/claude/token-lanes-subagent-start.py:16-23,33-38 at 656f263dc; cited in the decision record's R4 corrections.
+
+Definitive red on the unchanged starting source:
+A local clone retains production 656f263dc; only test files are overlaid.
+python3 -m unittest tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_real_instruction_template_and_carrier_additions_refuse tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_real_instruction_template_and_carrier_modify_delete_refuse tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_ordinary_adoption_config_template_remains_editable tests.test_runtime_worker_openhands_resolver.IssueSelectionTests.test_emitted_gate_path_rules_match_instruction_and_receipt_policy -v
+exit 1; returned summary: Ran 4 tests in 5.034s; FAILED (failures=21).
+Seven additions, seven modifications and seven deletions pass the old gate instead of refusing instruction_file. They cover codex.AGENTS.template.md and the default/builder/researcher/reviewer/scout/verifier token-lanes blocks under directory ownership.
+The ordinary codex.config.template.toml add/modify positive controls and the existing phrase protocol pass before.
+
+Green after:
+python3 -m unittest tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_real_instruction_template_and_carrier_additions_refuse tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_real_instruction_template_and_carrier_modify_delete_refuse tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_ordinary_adoption_config_template_remains_editable tests.test_runtime_worker_openhands_resolver.IssueSelectionTests.test_emitted_gate_path_rules_match_instruction_and_receipt_policy -v
+exit 0; returned summary: Ran 4 tests in 2.164s; OK.
+All 21 new negative controls refuse with instruction_file; both ordinary config-template positives continue to pass. The source-derived instruction protocol also passes. This is a finite exact-basename repair, preserving the independent matcher and receipt boundary.
+
+Returned paired decisions (aggregate only identical codes/counts/outcomes; 23 native Git fixture decisions; no contents):
+{"after_reasons": [], "after_status": "pass", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "ordinary_template_add", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": [], "after_status": "pass", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "ordinary_template_modify", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "real_instruction_add", "fixtures": 7, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "real_instruction_delete", "fixtures": 7, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "real_instruction_modify", "fixtures": 7, "owned_path_count": 1}
+
+Initial vertical repair checks:
+Three new native fixture selectors on the old worktree source: exit 1, Ran 3 tests in 5.150s, FAILED (failures=21).
+The same selectors after the gate inventory change: exit 0, Ran 3 tests in 2.373s, OK.
+Existing source-derived phrase selector after metadata but before instruction wording: exit 1, Ran 1 test in 0.043s, FAILED (failures=7).
+After updating both agent-facing inventories: exit 0, Ran 1 test in 0.036s, OK.
+
+Required targeted acceptance and verdict nv observations:
+python3 -m unittest tests.test_runtime_worker_openhands_push_gate tests.test_runtime_worker_openhands_resolver tests.test_runtime_worker_openhands -v
+exit 1; returned summary: Ran 378 tests in 69.707s; FAILED (errors=1, skipped=3). No assertion failures.
+The sole error is the unchanged installed-gitleaks control: RuntimeError(gitleaks_failed). A native benign-input probe using the guard's scanner returns exit 1 because the runtime scan lock is on a read-only filesystem; no scan starts. The coordinator must rerun with a writable lock.
+Recorded skips: missing PyYAML workflow-reader parity, and two host-path subcontrols whose home-directory TMPDIR matches PRIVATE_CONTENT before host-path detection. The real pinned-zizmor injection control ran and passed. These skips are not passes.
+The earlier reported coordinator OK run has no actual returned output supplied to this worker; it is not promoted to a passed receipt.
+
+Prior R3 fail-first evidence replay requested by nv:
+The ten selectors in section 9 were rerun with test files from 9c310acb3.
+On production 56fced827: exit 1, Ran 10 tests in 11.405s, FAILED (failures=45).
+On production 9c310acb3: exit 0, Ran 10 tests in 5.968s, OK.
+No original production source was disarmed.
+
+Alias nv command:
+python3 -m unittest tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_unchanged_protected_file_case_and_unicode_aliases_refuse tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_explicit_ownership_limits_top_level_and_unprotected_alias_checks -v
+exit 0; Ran 2 tests in 1.411s, OK on this Linux host. Native git diff-tree -r --name-status inspection of all five case/Unicode fixtures: each exit 0, each an addition here. macos-15/APFS execution is unavailable in this sandbox and is not claimed; the coordinator must observe those filesystem-specific effects there.
+
+git diff --check 56fced827..656f263dc
+exit 0, no whitespace findings in the prior committed range.
+
+Pinned Git source nv:
+Read git/git v2.43.0 from its upstream tag archive. The gitattributes, gitignore, gitmailmap and config files are byte-identical to the prior cited source.
+sed -n '69,82p;110,118p;391,409p' Documentation/gitattributes.txt: exit 0.
+sed -n '29,34p' Documentation/gitignore.txt: exit 0.
+sed -n '16,20p' Documentation/gitmailmap.txt: exit 0.
+sed -n '1,12p;86,101p' Documentation/config.txt: exit 0.
+These pinned archive reads verify the requested line citations without requiring a new Git repository for the source archive.
+make t/helper/test-tool: exit 2, missing openssl/ssl.h (and curl-config).
+make NO_OPENSSL=YesPlease NO_CURL=YesPlease NO_EXPAT=YesPlease NO_GETTEXT=YesPlease t/helper/test-tool: exit 2, missing zlib.h.
+The flags are supported by Git v2.43.0 Makefile:43,414,439,450; INSTALL:115 says Git cannot build without zlib. No replacement path-utils runner is written. Native is_dotgitattributes / is_dotgitignore / is_dotmailmap commands remain unrun because the upstream test-tool could not be built.
+
+Landing ownership:
+Gate-only: push_gate.py instruction inventory/comment and the three native fixture tests.
+Instruction/enablement: resolver.py resolver_instruction wording and skills/resolver/SKILL.md enumerated refusal list. Startup self-test, import guard and public main are unchanged.
+Docs/evidence: RESOLVER.md's exact inventory; decision record's corrected template/carrier claim, already_covered disposition and R4 entry; this receipt.
+Every changed authored file is registered last. Read-only validate.py, evidence_manifest --check and current diff --check results follow in the handoff.

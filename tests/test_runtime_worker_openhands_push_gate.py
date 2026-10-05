@@ -1401,6 +1401,58 @@ class OwnedPathGateTests(unittest.TestCase):
                     self.assertEqual(record["status"], "fail")
                     self.assertIn("instruction_file", record["reasons"])
 
+    def test_real_instruction_template_and_carrier_additions_refuse(self):
+        # 656f263dc tools/adoption/apply_codex_lane.py:111 names the real
+        # Codex template. token-lanes-subagent-start.py:16-23,33-38 selects
+        # the default carrier and five role variants for additionalContext.
+        paths = ("adoption/templates/codex.AGENTS.template.md",
+                 "adoption/hooks/claude/token-lanes-block.md",
+                 "adoption/hooks/claude/token-lanes-block.builder.md",
+                 "adoption/hooks/claude/token-lanes-block.researcher.md",
+                 "adoption/hooks/claude/token-lanes-block.reviewer.md",
+                 "adoption/hooks/claude/token-lanes-block.scout.md",
+                 "adoption/hooks/claude/token-lanes-block.verifier.md")
+        for path in paths:
+            with self.subTest(path=path):
+                clone, head = self.fixture.agent_commit({path: "# fixture instructions\n"})
+                self.refuse("real_instruction_add", clone, head, "instruction_file", (str(Path(path).parent),))
+
+    def test_real_instruction_template_and_carrier_modify_delete_refuse(self):
+        paths = ("adoption/templates/codex.AGENTS.template.md",
+                 "adoption/hooks/claude/token-lanes-block.md",
+                 "adoption/hooks/claude/token-lanes-block.builder.md",
+                 "adoption/hooks/claude/token-lanes-block.researcher.md",
+                 "adoption/hooks/claude/token-lanes-block.reviewer.md",
+                 "adoption/hooks/claude/token-lanes-block.scout.md",
+                 "adoption/hooks/claude/token-lanes-block.verifier.md")
+        fixture = GateFixture(self.tmp / "real-instruction-existing", dict.fromkeys(paths, "# fixture\n"),
+                              source=self.fixture.trusted)
+        gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        for path in paths:
+            for control, data in (("real_instruction_modify", "# changed\n"), ("real_instruction_delete", None)):
+                with self.subTest(path=path, control=control), contextlib.redirect_stderr(io.StringIO()):
+                    clone, head = fixture.agent_commit({path: data})
+                    record = gate.check(str(clone), base=fixture.base, head=head,
+                                        owned_paths=(str(Path(path).parent),))
+                    self.observe(control, record)
+                    self.assertEqual(record["status"], "fail")
+                    self.assertIn("instruction_file", record["reasons"])
+
+    def test_ordinary_adoption_config_template_remains_editable(self):
+        path = "adoption/templates/codex.config.template.toml"
+        fixture = GateFixture(self.tmp / "adoption-config-existing", {path: "# fixture config\n"},
+                              source=self.fixture.trusted)
+        gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        for control, current, data in (("ordinary_template_add", self.fixture, "# added config\n"),
+                                       ("ordinary_template_modify", fixture, "# changed config\n")):
+            with self.subTest(control=control), contextlib.redirect_stderr(io.StringIO()):
+                clone, head = current.agent_commit({path: data})
+                selected_gate = self.gate if current is self.fixture else gate
+                record = selected_gate.check(str(clone), base=current.base, head=head,
+                                             owned_paths=("adoption/templates",))
+                self.observe(control, record)
+                self.assertEqual(record["status"], "pass")
+
     def test_compiled_module_artifacts_refuse_even_when_owned(self):
         # CI targets CPython v3.12.3 (.github/workflows/validate.yml:227-228).
         # Its Lib/importlib/_bootstrap_external.py:1724-1732 tries extensions

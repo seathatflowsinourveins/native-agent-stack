@@ -53,8 +53,13 @@ future `.git*` names too; it does not claim every such file is automatically rea
 Per-directory `.gitattributes` can alter the checkout of unchanged files through
 attributes and configured filters, as [Git v2.43.0 gitattributes(5)](https://github.com/git/git/blob/v2.43.0/Documentation/gitattributes.txt#L69)
 documents. Instruction files (`instruction_file`) also refuse at any depth: `AGENTS.md`,
-`AGENTS.override.md`, `AGENTS.template.md`, `CLAUDE.md`, `CLAUDE.local.md`, `GEMINI.md`,
-`SKILL.md`, `RTK.md`, `codex-user-instructions.md` and `claude-user-instructions.md`.
+`AGENTS.override.md`, `AGENTS.template.md`, `codex.AGENTS.template.md`, `CLAUDE.md`,
+`CLAUDE.local.md`, `GEMINI.md`, `SKILL.md`, `RTK.md`, `codex-user-instructions.md`,
+`claude-user-instructions.md`, `token-lanes-block.md`, `token-lanes-block.builder.md`,
+`token-lanes-block.researcher.md`, `token-lanes-block.reviewer.md`, `token-lanes-block.scout.md`
+and `token-lanes-block.verifier.md`. The actual Codex template and all six carrier blocks
+selected by the repository's SubagentStart hook are included; `AGENTS.template.md`
+remains a conservative reserved basename.
 These name checks include case/Unicode forms, NTFS suffix/ADS forms and Git's
 HFS-ignorable characters. So do casefold
 and NFC/NFKC aliases of protected paths and collisions between changed paths. Exceptions

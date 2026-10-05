@@ -66,8 +66,10 @@ unowned path, including either end of a rename. Even inside the owned paths, it 
   `.gitattributes`, `.gitignore` and `.gitconfig`, plus `.mailmap`; `.git`, `.gitmodules`
   and `.github` keep their existing refusals;
 - instruction files (`instruction_file`) at any depth: `AGENTS.md`, `AGENTS.override.md`,
-  `AGENTS.template.md`, `CLAUDE.md`, `CLAUDE.local.md`, `GEMINI.md`, `SKILL.md`, `RTK.md`,
-  `codex-user-instructions.md` and `claude-user-instructions.md`;
+  `AGENTS.template.md`, `codex.AGENTS.template.md`, `CLAUDE.md`, `CLAUDE.local.md`, `GEMINI.md`,
+  `SKILL.md`, `RTK.md`, `codex-user-instructions.md`, `claude-user-instructions.md`,
+  `token-lanes-block.md`, `token-lanes-block.builder.md`, `token-lanes-block.researcher.md`,
+  `token-lanes-block.reviewer.md`, `token-lanes-block.scout.md` and `token-lanes-block.verifier.md`;
 - a casefold or NFC/NFKC alias of a protected path, or a collision with another changed path;
 - `.github/`: workflows, local actions, rulesets and CI requirements;
 - a file named `CODEOWNERS`, anywhere;
