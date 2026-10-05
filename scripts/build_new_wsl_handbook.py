@@ -267,6 +267,15 @@ def read_host_requalification(inputs):
     require(isinstance(review, dict) and review.get("status") == "pending"
             and isinstance(review.get("scope"), str) and bool(review["scope"].strip()),
             "host requalification needs its pending independent review scope")
+    for source, prefix, label, kind in (
+            (readiness.get("official_source"), "evidence/receipts/", "official source", "receipt"),
+            (review.get("recorded_source_review"), "evidence/artifacts/", "recorded source review", "artifact")):
+        require(isinstance(source, str) and bool(source.strip()), f"host requalification needs its {label}")
+        source = public_path(source)
+        require(source.startswith(prefix) and source.endswith(".json"),
+                f"host requalification {label} must name a published {kind}")
+        require(safe_file(inputs.root, source).is_file(), f"host requalification {label} must exist")
+        inputs.read(source, as_json=False)
     return {"source": HOST_REQUALIFICATION, "receipt_id": receipt["id"], "receipt_kind": receipt["kind"],
             **{key: data[key] for key in ("host", "publication_date_utc", "readiness", "disputed_slot_ids",
                                          "independent_review", "qualification_scope", "source_class", "decision_record")}}

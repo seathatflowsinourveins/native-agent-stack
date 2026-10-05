@@ -95,6 +95,10 @@ class NewWslHandbookTests(unittest.TestCase):
         path = self.root / decision
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text("# Synthetic qualification decision\n\nNo host acceptance is claimed.\n")
+        official = "evidence/receipts/fixture-e2e.json"
+        source_review = "evidence/artifacts/fixture-requalification/review.json"
+        for source in (official, source_review):
+            self.write(source, {"scope": "Synthetic source fixture; no host acceptance is claimed."})
         return {"schema_version": 1, "id": "ns2604-requalification-20261005", "kind": "historical_inventory",
                 "data": {
                     "host": "NativeStack2604", "publication_date_utc": "2026-10-05",
@@ -102,6 +106,7 @@ class NewWslHandbookTests(unittest.TestCase):
                     "readiness": {
                         "provisional": True,
                         "formula": "(READY + BY_DESIGN) / all 80 slots in scope",
+                        "official_source": official,
                         "baseline": {"numerator": 30, "denominator": 80, "percent": 37.5},
                         "current": {"numerator": 27, "denominator": 80, "percent": 33.75,
                                     "status": "provisional_pending_independent_review"},
@@ -109,7 +114,8 @@ class NewWslHandbookTests(unittest.TestCase):
                                         "status": "conditional_pending_four_slot_adjudication"}},
                     "disputed_slot_ids": [f"token-efficiency/{slot}" for slot in
                                           ("repo-packing", "command-output", "output-compression", "code-index")],
-                    "independent_review": {"status": "pending", "scope": "New dated command-center qualification, independent review and adjudication are required."},
+                    "independent_review": {"status": "pending", "scope": "New dated command-center qualification, independent review and adjudication are required.",
+                                           "recorded_source_review": source_review},
                     "source_class": "synthetic projection contract, not host or upstream acceptance",
                     "qualification_scope": "Synthetic lower counts exercise consistency; no independently verified labels are claimed."}}
 
@@ -213,6 +219,27 @@ class NewWslHandbookTests(unittest.TestCase):
                 self.write(handbook.HOST_REQUALIFICATION, receipt)
                 with self.assertRaisesRegex(ValueError, "host requalification|public repository path"):
                     handbook.read_host_requalification(handbook.Inputs(self.root))
+
+    def test_host_requalification_requires_and_hashes_official_and_review_sources(self):
+        fields = (("readiness", "official_source", "official source"),
+                  ("independent_review", "recorded_source_review", "recorded source review"))
+        for section, field, label in fields:
+            with self.subTest(missing=field):
+                receipt = self.host_requalification_fixture()
+                (self.root / receipt["data"][section][field]).unlink()
+                self.write(handbook.HOST_REQUALIFICATION, receipt)
+                failed = self.public_cli()
+                self.assertEqual(failed.returncode, 1, failed.stdout + failed.stderr)
+                self.assertIn(f"host requalification {label} must exist", failed.stderr)
+        receipt = self.host_requalification_fixture()
+        self.write(handbook.HOST_REQUALIFICATION, receipt)
+        result = self.public_cli()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        sources = {source["path"]: source["sha256"] for source in self.read(handbook.OUTPUTS[1])["sources"]}
+        for section, field, _ in fields:
+            source = receipt["data"][section][field]
+            self.assertIn(source, sources)
+            self.assertEqual(sources[source], handbook.digest((self.root / source).read_bytes()))
 
     def test_host_requalification_rejects_inconsistent_or_promoted_receipt_facts(self):
         changes = [

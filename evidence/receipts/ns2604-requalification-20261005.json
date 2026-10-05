@@ -3,6 +3,23 @@
   "id": "ns2604-requalification-20261005",
   "kind": "historical_inventory",
   "recorded_at_utc": "2026-10-05T04:23:07Z",
+  "amendments": [
+    {
+      "amended_at_utc": "2026-10-05T19:12:17Z",
+      "source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T114416Z.md",
+      "change": "Claim revised at 8c1629baaf5c42b5767d66be3c9b47422efb69e2 after #715 source review: superseded 40/44 scenarios and retained 37/32 as provisional source_review proposals; official 30/80 unchanged."
+    },
+    {
+      "amended_at_utc": "2026-10-05T19:12:17Z",
+      "source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
+      "change": "Claim revised at 73d75df4b33f390c30cd435253b6d675103eb95d: superseded 37/40/44/32 proposals, retained captured-status provisional 30/80 as of 11:44Z excluding custody at 13:02Z, and deferred organic qualification to final verified E2E S4."
+    },
+    {
+      "amended_at_utc": "2026-10-05T19:28:40Z",
+      "source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T181852Z.md",
+      "change": "Claim revised at bfff257c0f61be6857cdc50cf0284e57584ab873: restored the #700 qualification bar and distinguished captured-status counts and model READY source_review leads from measured qualification; official 30/80 unchanged."
+    }
+  ],
   "component_ids": [
     "claude-code",
     "codex",
@@ -11,7 +28,7 @@
   "claim": "Historical NativeStack2604 documentary publication. The official baseline uses the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present. Captured-status counts and model READY leads remain source_review. Official readiness remains PR#700 historical30/80. Earlier37/40/44/32proposals are superseded by review-715-corrections.json#/bounded_repair_rulings. CC captured-status provisional30/80 asof11:44Z excludes custody13:02Z BY_DESIGN. It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar. The organic native arm differs in one respect: no harness text names the tool; upstream acceptance, wiring and fresh-session use remain required. its count comes only from final verified E2E S4, independent review and adjudication. No new execution, acceptance or aggregate derivation.",
   "limitations": [
     "This is historical inventory, not live verification or a new host execution. The historical 30/80 receipt remains the official readiness until the command center own new dated same-80-slot qualification, independent review and adjudication. Reviewing this PR or projection never lifts provisional.",
-    "Earlier37/40/44/32proposals are superseded by the exact-head ruling; reported old-bar provisional30/80 asof11:44Z excludes custody13:02Z BY_DESIGN.",
+    "Earlier37/40/44/32proposals are superseded by the exact-head ruling; reported old-bar provisional30/80 asof11:44Z excludes custody13:02Z BY_DESIGN. The official baseline uses the #700 bar. Captured-status counts and model READY leads remain source_review; they are not measured qualification at that bar.",
     "The former44/80 conditional scenario is superseded; no current-plus-four relationship is assumed. Original Opus READY/GPT PARTIAL token reviews and native acceptance gaps remain retained.",
     "The first post-install census has 80 rows: 50 exit-zero, 28 skipped and two failures. The later raw census has a duplicate skill-authoring attempt; attempt rows are not distinct slots. Omitted stages and held slots remain in the denominator.",
     "The later observations at 4c897418f are retained private source files, not a completed persistent co-op census in fixwave-4c897418f at publication. Sources and observation scope are inventoried by hash without copying raw session streams.",
@@ -27,7 +44,7 @@
     "host": "NativeStack2604",
     "source_class": "Historical native client outputs, local plan-integration checks and source review. Official readiness 30/80 is retained from receipt #700; current/conditional are null. New proposals are attributed in the decision record.",
     "north_star_action": "Keep foundation readiness recoverable for complex engineering, US-equities research and historical simulation before independently qualified paper operation.",
-    "qualification_scope": "Historical documentary publication. The official baseline uses the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present. CC captured-status provisional30/80 is asof11:44Z and excludes custody13:02Z BY_DESIGN. It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar. The organic native arm differs in one respect: no harness text names the tool; upstream acceptance, wiring and fresh-session use remain required. No new-bar count is supplied until final verified E2E S4, independent review and adjudication. Earlier37/40/44/32proposals are superseded by review-715-corrections.json#/micro_repair_rulings. Evidence classes remain distinct; no new acceptance or execution.",
+    "qualification_scope": "Historical documentary publication. The official baseline uses the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present. CC captured-status provisional30/80 is asof11:44Z and excludes custody13:02Z BY_DESIGN. It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar. The organic native arm differs in one respect: no harness text names the tool; upstream acceptance, wiring and fresh-session use remain required. No new-bar count is supplied until final verified E2E S4, independent review and adjudication. Earlier37/40/44/32proposals are superseded by review-715-corrections.json#/bounded_repair_rulings. Evidence classes remain distinct; no new acceptance or execution.",
     "readiness": {
       "provisional": true,
       "formula": "(READY + BY_DESIGN) / all 80 PR #700 foundation slots; PARTIAL, FAIL, INTERIM and UNJUDGED contribute zero; BY_DESIGN is an intentional disposition, not execution",

@@ -45,6 +45,7 @@ null with this decision as its pointer. Its earlier #713 ownership hold ended
 when #713 landed at15:58Z as1796303f9; its application on2604 ran16:01–16:46Z.
 The publication is reconciled with current main424b8a77, after #730;
 older coupled projections supply no current readiness authority.
+On 2026-10-05, #715 merged main `ecfa11276` (#703) at `44bf09713710cd353712d2a764137634326890d0`.
 
 ## Sources and reuse
 
@@ -458,5 +459,6 @@ includes the five fresh-session-use-not-evidenced slots and is not measured
 qualification on that bar. The organic native arm differs only in the absence
 of harness text naming the tool. The reported32 proposal is superseded.
 Publication is rebased onto424b8a77, including #730/e8c1edec; registry is taken
-from main and own evidence re-registered. The next command-center check covers
-only these three items before its ACK; it is not a final S4 or readiness lift.
+from main and own evidence re-registered.
+On 2026-10-05, #715 merged main `ecfa11276` (#703) at `44bf09713710cd353712d2a764137634326890d0`.
+The next command-center check covers only these three items before its ACK; it is not a final S4 or readiness lift.

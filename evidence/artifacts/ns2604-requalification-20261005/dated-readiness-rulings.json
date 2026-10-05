@@ -188,7 +188,7 @@
       "drafted_disposition":"The documented alternative retains one private0600 file per provider outside worktrees, pointer variables, value-free status checks, the id-based runner and scoped client guards. Native sign-ins stay in their supported stores. No dedicated custody product is added. This is a policy disposition, not credential inspection or acceptance.",
       "draft_source":"roadmap:/records/10/final/slots/2/jobs/4",
       "practice_source":"seathatflowsinourveins/native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:docs/secret-storage.md:3–10",
-      "superseded_changes":{"ids":[1,2,3],"status":"superseded","scope":"Eligibility-gate criteria and systemd-creds sentences; no storage-hardening comparison or acknowledgement-completion dependency remains.","historical_source":"seathatflowsinourveins/native-agent-stack@1d74a851e83227e8d72e877171cabf9696b2c6b7:evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json:474–476"},
+      "superseded_changes":{"ids":[1,2,3],"status":"superseded","scope":"Eligibility-gate criteria and systemd-creds sentences; no storage-hardening comparison or acknowledgement-completion dependency remains.","historical_source":"seathatflowsinourveins/native-agent-stack@c148e049efee75f8ea8a9a009e7b96b1e97f5c28:evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json:474–476"},
       "superseded_roadmap_jobs":[0,1,2,3],
       "superseded_jobs_source":"roadmap:/records/10/final/slots/2/jobs",
       "new_custody_execution":false,

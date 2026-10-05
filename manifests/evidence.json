@@ -4444,7 +4444,7 @@
       "claim": "Historical NativeStack2604 documentary publication. The official baseline uses the #700 bar: upstream acceptance, wiring and fresh-session use, with the harness text present. Captured-status counts and model READY leads remain source_review. Official readiness remains PR#700 historical30/80. Earlier37/40/44/32proposals are superseded by review-715-corrections.json#/bounded_repair_rulings. CC captured-status provisional30/80 asof11:44Z excludes custody13:02Z BY_DESIGN. It includes difftastic, structural-search, inspect-ai, harbor and codex-sdk at their captured status despite fresh-session use not evidenced; it is not measured qualification on the #700 bar. The organic native arm differs in one respect: no harness text names the tool; upstream acceptance, wiring and fresh-session use remain required. its count comes only from final verified E2E S4, independent review and adjudication. No new execution, acceptance or aggregate derivation.",
       "limitations": [
         "This is historical inventory, not live verification or a new host execution. The historical 30/80 receipt remains the official readiness until the command center own new dated same-80-slot qualification, independent review and adjudication. Reviewing this PR or projection never lifts provisional.",
-        "Earlier37/40/44/32proposals are superseded by the exact-head ruling; reported old-bar provisional30/80 asof11:44Z excludes custody13:02Z BY_DESIGN.",
+        "Earlier37/40/44/32proposals are superseded by the exact-head ruling; reported old-bar provisional30/80 asof11:44Z excludes custody13:02Z BY_DESIGN. The official baseline uses the #700 bar. Captured-status counts and model READY leads remain source_review; they are not measured qualification at that bar.",
         "The former44/80 conditional scenario is superseded; no current-plus-four relationship is assumed. Original Opus READY/GPT PARTIAL token reviews and native acceptance gaps remain retained.",
         "The first post-install census has 80 rows: 50 exit-zero, 28 skipped and two failures. The later raw census has a duplicate skill-authoring attempt; attempt rows are not distinct slots. Omitted stages and held slots remain in the denominator.",
         "The later observations at 4c897418f are retained private source files, not a completed persistent co-op census in fixwave-4c897418f at publication. Sources and observation scope are inventoried by hash without copying raw session streams.",
@@ -16048,8 +16048,8 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "0fa7e4a7422b6d9900f7d8f91571072dfb4a9a58432e5d6d64d7efecad09976c",
-      "bytes": 324972
+      "sha256": "3a8081049976785e320cfd99bc93bd3dcefa0a8a351fcc4f3cab1d8022a6b1cd",
+      "bytes": 325006
     },
     {
       "path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
@@ -17118,8 +17118,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-ns2604-foundation-requalification.md",
-      "sha256": "f5e2ac671236b940d0270d15a225bc78db9800b3a3a5db17c787e2fa41182dd9",
-      "bytes": 29885
+      "sha256": "44d667b2b63de07784aa8816c65bd8949ed91bfb83a8cc77b69c52516663fc6d",
+      "bytes": 30081
     },
     {
       "path": "docs/decisions/2026-10-05-omniroute-gateway-composition.md",
@@ -17408,13 +17408,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "c11d2d1affc274e0cfb15480110aa77f8b2695dea508e5ddd524273c2617ca57",
-      "bytes": 689404
+      "sha256": "1c4d4b498b100ef6c4a666f9335851d05f0d13576235f0b5c79f3514ef980e05",
+      "bytes": 689754
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "cfb5c3ea852d756268667802d66d203789024d5f357eeeb90023e631d7fc5316",
-      "bytes": 366377
+      "sha256": "f34e1fda47736ad0ddf7c7b0e4dba2d937b85b6e5896541bacc7254aeef23247",
+      "bytes": 366781
     },
     {
       "path": "docs/next-host-stages.md",
@@ -39548,8 +39548,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "bd4ee35b83888fed2cee9c8059dea1702f202a997d5c10cf22ee33f70f186998",
-      "bytes": 21158
+      "sha256": "19dc3a3507246b8c07aa59edc8262ae011cb627f78858416735c9437e63a9182",
+      "bytes": 23305
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -40608,13 +40608,13 @@
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/dated-readiness-rulings.json",
-      "sha256": "b72335e252c07998d7d9a6432b7cba04dbf10a5bfefa2a2c76de59e50a5daca5",
+      "sha256": "0a1923311e64f4430163e153189a0fcec16c491da64f360d8ef6cfdfe952d5fe",
       "bytes": 30725
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",
-      "sha256": "f1f530eec05bc09329618e888163cbb5341df1a9a2ba409ce9ff2c60d73ccc6f",
-      "bytes": 16974
+      "sha256": "5bf74e9e6efb2e904ee5ad7f6f7f0c2572735d8a1ab5881a7f043d15aef78cdc",
+      "bytes": 17270
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/roadmap-dispositions.json",
@@ -52728,13 +52728,13 @@
     },
     {
       "path": "evidence/receipts/ns2604-requalification-20261005.json",
-      "sha256": "544b7a262226b7372ef6a28965b1720485a4ccb30f8c8dee7e62e3c7d76c2472",
-      "bytes": 15107
+      "sha256": "1d0afd73a954e448eb00bac14dbe0f2c7384d65a51efd0ad0c5e990f7ae3273b",
+      "bytes": 16469
     },
     {
       "path": "evidence/receipts/ns2604-roadmap-evidence-20261005.json",
-      "sha256": "f7918b1a2e2fa93888185176142fa5098ab8ea95eb2ca7f6a657af89e1e8bdaa",
-      "bytes": 10592
+      "sha256": "a01e1b8b9a4d4a917b891ecbb6df3076c72fef06588628f127772ec51683466e",
+      "bytes": 11795
     },
     {
       "path": "evidence/receipts/omniroute-3851-npm-qualification-20260930.json",
@@ -53848,8 +53848,8 @@
     },
     {
       "path": "scripts/build_new_wsl_handbook.py",
-      "sha256": "d6dba4004564275b53cd1b44a86f2ae04349ca278e6a05b9bb9803569d5166ee",
-      "bytes": 85697
+      "sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
+      "bytes": 86393
     },
     {
       "path": "scripts/catalog_decisions.py",
@@ -54898,8 +54898,8 @@
     },
     {
       "path": "tests/test_new_wsl_handbook.py",
-      "sha256": "62497fb9cd5dd5a4709cd33b56ec018cd64afe7a085b49b91c3b42a208b309a5",
-      "bytes": 102894
+      "sha256": "7a151c05cccf4a0b0f96ae27302497be6035850fbe0272c35a3438a58d5ab0b9",
+      "bytes": 104637
     },
     {
       "path": "tests/test_new_wsl_profile.py",

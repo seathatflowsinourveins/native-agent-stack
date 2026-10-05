@@ -3,11 +3,11 @@
   "kind": "new-wsl-handbook-profile-integration",
   "source_main": "424b8a778222ae8857aade42c49ae6f7a13b3138",
   "evidence_class": "local_integration",
-  "generator_sha256": "d6dba4004564275b53cd1b44a86f2ae04349ca278e6a05b9bb9803569d5166ee",
+  "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04",
   "outputs": {
-    "docs/new-wsl-handbook.md": "cfb5c3ea852d756268667802d66d203789024d5f357eeeb90023e631d7fc5316",
-    "docs/new-wsl-handbook.json": "c11d2d1affc274e0cfb15480110aa77f8b2695dea508e5ddd524273c2617ca57"
+    "docs/new-wsl-handbook.md": "f34e1fda47736ad0ddf7c7b0e4dba2d937b85b6e5896541bacc7254aeef23247",
+    "docs/new-wsl-handbook.json": "1c4d4b498b100ef6c4a666f9335851d05f0d13576235f0b5c79f3514ef980e05"
   },
   "inventory": {
     "layers": 37,
@@ -82,6 +82,16 @@
       "returned_output": "Ran86tests in36.581s; FAILED(failures=1): generator_sha256 receipt mismatch.",
       "evidence_class": "local_integration",
       "correction": "Refresh actual generator/output hashes; retain failure and rerun suite."
+    },
+    {
+      "condition": "Round 715-r3 initial 97-test run found stale handbook receipt generator/output hashes after the required builder source checks and regeneration.",
+      "command": "python3 -m unittest tests.test_new_wsl_handbook tests.test_architecture_pin_source tests.test_stack_lifecycle",
+      "native_exit_code": 1,
+      "tests": 97,
+      "failures": 1,
+      "returned_output": "Ran 97 tests in 34.301s\n\nFAILED (failures=1)",
+      "evidence_class": "local_integration",
+      "correction": "Refresh the existing receipt generator/output hashes from actual files, retain the failed check and rerun the native suite."
     }
   ],
   "derived_catalog_correction": {
@@ -375,6 +385,27 @@
         "docs/new-wsl-handbook.md": "2e101dc51d736495f25a9e54ee3efd60d2ae7b316f090397d9de139143d7265b",
         "docs/new-wsl-handbook.json": "8ef7beeea33ed43f78c3d80a602751369c5e2ea2fa8c55ce7603dcedbd72f60a"
       },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "recorded_at_utc": "2026-10-05T23:09:15Z",
+      "round": "715-r3",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "evidence_class": "local_integration",
+      "cause": "Check and hash official baseline and recorded source-review inputs; restore the bounded-ruling locator, date later amendments and clarify the qualification boundary. The existing receipt mirrors the regenerated generator/output hashes; no new host acceptance is claimed.",
+      "previous_generator_sha256": "d6dba4004564275b53cd1b44a86f2ae04349ca278e6a05b9bb9803569d5166ee",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "cfb5c3ea852d756268667802d66d203789024d5f357eeeb90023e631d7fc5316",
+        "docs/new-wsl-handbook.json": "c11d2d1affc274e0cfb15480110aa77f8b2695dea508e5ddd524273c2617ca57"
+      },
+      "output_sha256": {
+        "docs/new-wsl-handbook.md": "f34e1fda47736ad0ddf7c7b0e4dba2d937b85b6e5896541bacc7254aeef23247",
+        "docs/new-wsl-handbook.json": "1c4d4b498b100ef6c4a666f9335851d05f0d13576235f0b5c79f3514ef980e05"
+      },
+      "source": "seathatflowsinourveins/native-agent-stack@d25ea1f7d47eb9cb325503f94935b6611cf0c23c:evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
+      "receipt_contract": "tests/test_new_wsl_handbook.py:test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them",
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
     }
   ]

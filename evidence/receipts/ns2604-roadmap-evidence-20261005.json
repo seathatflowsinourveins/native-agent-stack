@@ -3,6 +3,23 @@
   "id": "ns2604-roadmap-evidence-20261005",
   "kind": "historical_inventory",
   "recorded_at_utc": "2026-10-05T10:57:55Z",
+  "amendments": [
+    {
+      "amended_at_utc": "2026-10-05T19:12:17Z",
+      "source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T114416Z.md",
+      "change": "Claim revised at 8c1629baaf5c42b5767d66be3c9b47422efb69e2 after #715 source review: superseded 40/44 scenarios and retained 37/32 as provisional source_review proposals; official 30/80 unchanged."
+    },
+    {
+      "amended_at_utc": "2026-10-05T19:12:17Z",
+      "source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T170827Z.md",
+      "change": "Claim revised at 73d75df4b33f390c30cd435253b6d675103eb95d: superseded 37/40/44/32 proposals, retained captured-status provisional 30/80 as of 11:44Z excluding custody at 13:02Z, and deferred organic qualification to final verified E2E S4."
+    },
+    {
+      "amended_at_utc": "2026-10-05T19:28:40Z",
+      "source_item": "coordination-root:command-center/ITEM-ns2604-coop-20261005T181852Z.md",
+      "change": "Claim revised at bfff257c0f61be6857cdc50cf0284e57584ab873: restored the #700 qualification bar and distinguished captured-status counts and model READY source_review leads from measured qualification; official 30/80 unchanged."
+    }
+  ],
   "component_ids": [
     "claude-code",
     "codex",
