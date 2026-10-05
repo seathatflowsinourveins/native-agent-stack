@@ -267,7 +267,7 @@ memory, and a successful JSON report is stored twice in its snapshot, as
 `stdout_text` and as the parsed `raw`, so use bounded queries for full-history
 reports.
 
-The OmniRoute entries send no credential. OmniRoute (the 3.8.50 pin in
+The OmniRoute entries send no credential. OmniRoute (the 3.8.51 pin in
 `manifests/stack.json`) answers both routes without one only while its login is
 off (`requireLogin` false; the upstream default is true) or during first-run setup
 from loopback (`src/shared/utils/apiAuth.ts`). Otherwise they require management

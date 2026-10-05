@@ -209,11 +209,11 @@
         {
           "component_id": "worktrunk",
           "repository": "https://github.com/max-sixty/worktrunk",
-          "pin": "0.79.0",
+          "pin": "0.80.0",
           "pin_source": "manifests/stack.json:1067",
-          "install": {"command": "gh release view v0.79.0 --repo max-sixty/worktrunk --json assets; gh release download v0.79.0 --repo max-sixty/worktrunk (worktrunk-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix", "kind": "repo_recipe", "source_path": "recipes/native-upgrades-20260921.md"},
+          "install": {"command": "gh release view v0.80.0 --repo max-sixty/worktrunk --json assets; gh release download v0.80.0 --repo max-sixty/worktrunk (worktrunk-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix", "kind": "repo_recipe", "source_path": "recipes/native-upgrades-20260921.md"},
           "acceptance": {"command": "wt list --format json", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
-          "upstream_currency": {"latest_release": "v0.80.0 (2026-09-27)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/max-sixty/worktrunk/releases"}
+          "upstream_currency": {"latest_release": "v0.80.0 (2026-09-27)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/max-sixty/worktrunk/releases"}
         }
       ],
       "verdict": "comparison_required",
@@ -259,20 +259,33 @@
         {
           "component_id": "worktrunk",
           "repository": "https://github.com/max-sixty/worktrunk",
-          "pin": "0.79.0",
+          "pin": "0.80.0",
           "pin_source": "manifests/stack.json:1067",
-          "install": {"command": "gh release view v0.79.0 --repo max-sixty/worktrunk --json assets; gh release download v0.79.0 --repo max-sixty/worktrunk (worktrunk-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix", "kind": "repo_recipe", "source_path": "recipes/native-upgrades-20260921.md"},
+          "install": {"command": "gh release view v0.80.0 --repo max-sixty/worktrunk --json assets; gh release download v0.80.0 --repo max-sixty/worktrunk (worktrunk-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix", "kind": "repo_recipe", "source_path": "recipes/native-upgrades-20260921.md"},
           "acceptance": {"command": "wt list --format json", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
-          "upstream_currency": {"latest_release": "v0.80.0 (2026-09-27)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/max-sixty/worktrunk/releases"}
+          "upstream_currency": {"latest_release": "v0.80.0 (2026-09-27)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/max-sixty/worktrunk/releases"}
         },
         {
           "component_id": "sandbox-runtime",
           "repository": "https://github.com/anthropics/sandbox-runtime",
-          "pin": "0.0.77",
+          "pin": "0.0.78",
           "pin_source": "manifests/stack.json:865",
-          "install": {"command": "npm install --global --prefix \"$STACK_HOME/tools/sandbox-runtime-0.0.77\" --ignore-scripts @anthropic-ai/sandbox-runtime@0.0.77", "kind": "repo_recipe", "source_path": "recipes/README.md"},
-          "acceptance": {"command": "env -i HOME=\"$HOME\" PATH=\"$PATH\" srt --settings \"$SANDBOX_POLICY\" -- cat \"$FIXTURE_ROOT/blocked/marker.txt\" (must be denied)", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
-          "upstream_currency": {"latest_release": "v0.0.78 (2026-09-30)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/anthropics/sandbox-runtime/releases"}
+          "install": {
+            "command": "npm install --global --prefix \"$STACK_HOME/tools/sandbox-runtime-0.0.78\" --ignore-scripts @anthropic-ai/sandbox-runtime@0.0.78",
+            "kind": "repo_recipe",
+            "source_path": "recipes/README.md"
+          },
+          "acceptance": {
+            "command": "env -i HOME=\"$HOME\" PATH=\"$PATH\" srt --settings \"$SANDBOX_POLICY\" -- cat \"$FIXTURE_ROOT/blocked/marker.txt\" (must be denied)",
+            "evidence_class": "none_recorded",
+            "source_path": "recipes/README.md"
+          },
+          "upstream_currency": {
+            "latest_release": "v0.0.78 (2026-09-30)",
+            "checked_at": "2026-10-01T07:41Z",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/anthropics/sandbox-runtime/releases"
+          }
         }
       ],
       "verdict": "selection_of_record_open",
@@ -299,7 +312,7 @@
       ],
       "new_host_steps": [
         "Install srt's Linux prerequisites (bubblewrap, socat and ripgrep are named by the recipe; no repository command installs them) and check kernel.apparmor_restrict_unprivileged_userns on the new kernel.",
-        "Install sandbox-runtime 0.0.77 with npm into its prefix; read the version from the installed package.json, because `srt --version` prints a fallback string.",
+        "Install sandbox-runtime 0.0.78 with npm into its prefix, matching the reviewed 2604 plan. Run the upstream smoke, then the plan's fresh native shell/policy controls; a version call alone cannot qualify isolation.",
         "Run the on-demand isolation fixture with an owned sandbox policy and record allowed, blocked and write-protected results.",
         "Install Worktrunk as in row workers if that row has not."
       ],
@@ -504,7 +517,7 @@
           "name": "nvidia/Nemotron-3-Embed-1B-BF16 (embedding model)",
           "repository": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16",
           "pin": "c0c9fea93ea424587517f2c59e20db9f1d6bf615",
-          "pin_source": "manifests/stack.json:2081",
+          "pin_source": "manifests/stack.json:2086",
           "install": {"command": "hf download nvidia/Nemotron-3-Embed-1B-BF16 --revision c0c9fea93ea424587517f2c59e20db9f1d6bf615 --local-dir \"${MODEL_DIRECTORY}\" --max-workers 2 --json", "kind": "repo_recipe", "source_path": "manifests/stack.json"},
           "acceptance": {"command": "an embeddings request to the vLLM service with the recipe's request body; the receipt records identical embeddings and identical top-10 code-index results after the switch to vLLM 0.30.0", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/vllm-030-switch-20260925.json"},
           "upstream_currency": {"latest_release": "model revision c0c9fea9 (last modified 2026-08-27) is the current head of the model repository", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://huggingface.co/nvidia/Nemotron-3-Embed-1B-BF16"}
@@ -612,7 +625,7 @@
           "component_id": "tavily-cli",
           "repository": "https://github.com/tavily-ai/tavily-cli",
           "pin": "0.1.8",
-          "pin_source": "manifests/stack.json:1921",
+          "pin_source": "manifests/stack.json:1926",
           "install": {"command": "uv tool install 'tavily-cli==0.1.8'", "kind": "repo_recipe", "source_path": "recipes/tavily.md"},
           "acceptance": {"command": "tvly search \"Codex CLI Claude Code native agent harness skills official documentation\" --depth basic --max-results 4 --include-domains developers.openai.com,code.claude.com --json", "evidence_class": "upstream_example_or_native_operation", "source_path": "recipes/tavily.md"},
           "upstream_currency": {"latest_release": "no GitHub release; PyPI tavily-cli 0.1.8 (2026-09-02)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://pypi.org/project/tavily-cli/"}
@@ -861,11 +874,24 @@
         {
           "component_id": "syft",
           "repository": "https://github.com/anchore/syft",
-          "pin": "1.52.0",
+          "pin": "1.54.0",
           "pin_source": "manifests/stack.json:1404",
-          "install": {"command": "gh release download v1.52.0 --repo anchore/syft (the linux_amd64 archive and its checksums); verify, then tar --no-same-owner -xzf into a versioned prefix", "kind": "repo_recipe", "source_path": "blueprints/us-equities/supply-chain/README.md"},
-          "acceptance": {"command": "syft scan dir:/sdk --base-path /sdk --source-name equity-worker-sdk (inside the recipe's read-only bubblewrap)", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/supply-chain/README.md"},
-          "upstream_currency": {"latest_release": "v1.52.0 (2026-09-17)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/anchore/syft/releases"}
+          "install": {
+            "command": "mise use -g syft@1.54.0",
+            "kind": "repo_recipe",
+            "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md"
+          },
+          "acceptance": {
+            "command": "syft alpine:latest",
+            "evidence_class": "upstream_example_or_native_operation",
+            "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md"
+          },
+          "upstream_currency": {
+            "latest_release": "v1.54.0 (2026-10-01)",
+            "checked_at": "2026-10-04",
+            "pin_is_latest": "yes",
+            "url": "https://github.com/anchore/syft/releases"
+          }
         },
         {
           "name": "actions/attest",
@@ -1099,11 +1125,11 @@
         {
           "component_id": "opentelemetry-collector-contrib",
           "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
-          "pin": "0.161.0",
+          "pin": "0.162.0",
           "pin_source": "manifests/stack.json:1095",
-          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"; python3 observability/backends/configure.py --tools-root \"$STACK_TOOLS_ROOT\" --config-root \"$STACK_CONFIG_ROOT\" --data-root \"$STACK_DATA_ROOT\" --unit-root \"$HOME/.config/systemd/user\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
-          "acceptance": {"command": "otelcol-contrib validate --config=\"$OTEL_CONFIG\"", "evidence_class": "structural_validation", "source_path": "observability/README.md"},
-          "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
+          "install": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only otel-collector-contrib", "kind": "repo_recipe", "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md"},
+          "acceptance": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage post_install; bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage service_health (revised G4 commands UNRUN on a distribution)", "evidence_class": "upstream_example_or_native_operation", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"},
+          "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-04T21:22:09Z", "pin_is_latest": "yes", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
         },
         {
           "component_id": "prometheus",
@@ -1329,11 +1355,11 @@
         {
           "component_id": "worktrunk",
           "repository": "https://github.com/max-sixty/worktrunk",
-          "pin": "0.79.0",
+          "pin": "0.80.0",
           "pin_source": "manifests/stack.json:1067",
-          "install": {"command": "gh release view v0.79.0 --repo max-sixty/worktrunk --json assets; gh release download v0.79.0 --repo max-sixty/worktrunk (worktrunk-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix", "kind": "repo_recipe", "source_path": "recipes/native-upgrades-20260921.md"},
+          "install": {"command": "gh release view v0.80.0 --repo max-sixty/worktrunk --json assets; gh release download v0.80.0 --repo max-sixty/worktrunk (worktrunk-x86_64-unknown-linux-musl.tar.xz and its checksum asset); sha256sum -c; extract into a versioned prefix", "kind": "repo_recipe", "source_path": "recipes/native-upgrades-20260921.md"},
           "acceptance": {"command": "wt list --format json", "evidence_class": "none_recorded", "source_path": "recipes/README.md"},
-          "upstream_currency": {"latest_release": "v0.80.0 (2026-09-27)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "no", "url": "https://github.com/max-sixty/worktrunk/releases"}
+          "upstream_currency": {"latest_release": "v0.80.0 (2026-09-27)", "checked_at": "2026-10-01T07:41Z", "pin_is_latest": "yes", "url": "https://github.com/max-sixty/worktrunk/releases"}
         },
         {
           "name": "GitHub CLI (gh)",
@@ -1667,11 +1693,11 @@
         {
           "component_id": "opentelemetry-collector-contrib",
           "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
-          "pin": "0.161.0",
+          "pin": "0.162.0",
           "pin_source": "manifests/stack.json:1095",
-          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
-          "acceptance": {"command": "otelcol-contrib validate --config=\"$OTEL_CONFIG\"", "evidence_class": "structural_validation", "source_path": "observability/README.md"},
-          "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
+          "install": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only otel-collector-contrib", "kind": "repo_recipe", "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md"},
+          "acceptance": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage post_install; bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage service_health (revised G4 commands UNRUN on a distribution)", "evidence_class": "upstream_example_or_native_operation", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"},
+          "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-04T21:22:09Z", "pin_is_latest": "yes", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
         },
         {
           "component_id": "prometheus",
@@ -1694,11 +1720,11 @@
         {
           "component_id": "grafana",
           "repository": "https://github.com/grafana/grafana",
-          "pin": "13.2.2",
+          "pin": "13.2.3",
           "pin_source": "manifests/stack.json:1201",
-          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
-          "acceptance": {"command": "systemd-analyze --user verify of the rendered ecosystem units, then systemctl --user enable --now ecosystem-{prometheus,loki,grafana,alertmanager,ntfy}.service", "evidence_class": "upstream_example_or_native_operation", "source_path": "observability/backends/README.md"},
-          "upstream_currency": {"latest_release": "v13.2.3 (2026-09-29)", "checked_at": "2026-10-01T08:17Z", "pin_is_latest": "no", "url": "https://github.com/grafana/grafana/releases"}
+          "install": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only grafana", "kind": "repo_recipe", "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md"},
+          "acceptance": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only grafana --stage post_install; bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only grafana --stage service_health (revised G4 commands UNRUN on a distribution)", "evidence_class": "upstream_example_or_native_operation", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"},
+          "upstream_currency": {"latest_release": "v13.2.3 (2026-09-29)", "checked_at": "2026-10-04T21:22:09Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/grafana/releases"}
         },
         {
           "component_id": "restic",
@@ -2093,11 +2119,11 @@
         {
           "component_id": "opentelemetry-collector-contrib",
           "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
-          "pin": "0.161.0",
+          "pin": "0.162.0",
           "pin_source": "manifests/stack.json:1095",
-          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
-          "acceptance": {"command": "otelcol-contrib validate --config=\"$OTEL_CONFIG\"", "evidence_class": "structural_validation", "source_path": "observability/README.md"},
-          "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
+          "install": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only otel-collector-contrib", "kind": "repo_recipe", "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md"},
+          "acceptance": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage post_install; bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage service_health (revised G4 commands UNRUN on a distribution)", "evidence_class": "upstream_example_or_native_operation", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"},
+          "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-04T21:22:09Z", "pin_is_latest": "yes", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
         },
         {
           "component_id": "prometheus",
@@ -2120,11 +2146,11 @@
         {
           "component_id": "grafana",
           "repository": "https://github.com/grafana/grafana",
-          "pin": "13.2.2",
+          "pin": "13.2.3",
           "pin_source": "manifests/stack.json:1201",
-          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
-          "acceptance": {"command": "systemd-analyze --user verify of the rendered ecosystem units, then systemctl --user enable --now ecosystem-{prometheus,loki,grafana,alertmanager,ntfy}.service", "evidence_class": "upstream_example_or_native_operation", "source_path": "observability/backends/README.md"},
-          "upstream_currency": {"latest_release": "v13.2.3 (2026-09-29)", "checked_at": "2026-10-01T08:17Z", "pin_is_latest": "no", "url": "https://github.com/grafana/grafana/releases"}
+          "install": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only grafana", "kind": "repo_recipe", "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md"},
+          "acceptance": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only grafana --stage post_install; bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only grafana --stage service_health (revised G4 commands UNRUN on a distribution)", "evidence_class": "upstream_example_or_native_operation", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"},
+          "upstream_currency": {"latest_release": "v13.2.3 (2026-09-29)", "checked_at": "2026-10-04T21:22:09Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/grafana/releases"}
         },
         {
           "component_id": "restic",
@@ -2345,11 +2371,11 @@
         {
           "component_id": "opentelemetry-collector-contrib",
           "repository": "https://github.com/open-telemetry/opentelemetry-collector-contrib",
-          "pin": "0.161.0",
+          "pin": "0.162.0",
           "pin_source": "manifests/stack.json:1095",
-          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
-          "acceptance": {"command": "otelcol-contrib validate --config=\"$OTEL_CONFIG\"", "evidence_class": "structural_validation", "source_path": "observability/README.md"},
-          "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
+          "install": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only otel-collector-contrib", "kind": "repo_recipe", "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md"},
+          "acceptance": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage post_install; bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only otel-collector-contrib --stage service_health (revised G4 commands UNRUN on a distribution)", "evidence_class": "upstream_example_or_native_operation", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"},
+          "upstream_currency": {"latest_release": "v0.162.0 (2026-09-29)", "checked_at": "2026-10-04T21:22:09Z", "pin_is_latest": "yes", "url": "https://github.com/open-telemetry/opentelemetry-collector-contrib/releases"}
         },
         {
           "component_id": "prometheus",
@@ -2372,11 +2398,11 @@
         {
           "component_id": "grafana",
           "repository": "https://github.com/grafana/grafana",
-          "pin": "13.2.2",
+          "pin": "13.2.3",
           "pin_source": "manifests/stack.json:1201",
-          "install": {"command": "python3 observability/backends/install.py --tools-root \"$STACK_TOOLS_ROOT\" --evidence-dir \"$STACK_EVIDENCE_ROOT\"", "kind": "repo_recipe", "source_path": "observability/backends/README.md"},
-          "acceptance": {"command": "systemd-analyze --user verify of the rendered ecosystem units, then systemctl --user enable --now ecosystem-{prometheus,loki,grafana,alertmanager,ntfy}.service", "evidence_class": "upstream_example_or_native_operation", "source_path": "observability/backends/README.md"},
-          "upstream_currency": {"latest_release": "v13.2.3 (2026-09-29)", "checked_at": "2026-10-01T08:17Z", "pin_is_latest": "no", "url": "https://github.com/grafana/grafana/releases"}
+          "install": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only grafana", "kind": "repo_recipe", "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/README.md"},
+          "acceptance": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only grafana --stage post_install; bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only grafana --stage service_health (revised G4 commands UNRUN on a distribution)", "evidence_class": "upstream_example_or_native_operation", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md"},
+          "upstream_currency": {"latest_release": "v13.2.3 (2026-09-29)", "checked_at": "2026-10-04T21:22:09Z", "pin_is_latest": "yes", "url": "https://github.com/grafana/grafana/releases"}
         },
         {
           "component_id": "restic",
@@ -2489,7 +2515,7 @@
           "name": "Ubuntu 24.04.5 LTS WSL image (Canonical)",
           "repository": "https://releases.ubuntu.com/24.04.5/",
           "pin": "sha256 bb415d824822c4b878125729af451a5d18fb13d1cf5cbed9a7393ad64ac6039e",
-          "pin_source": "adoption/platforms/linux-wsl2-new-distro.md:250",
+          "pin_source": "adoption/platforms/linux-wsl2-new-distro.md:295",
           "install": {"command": "The recipe, rehearsal first: R1 runs the page once on a throwaway name and removes it; P1 to P3 in the workstation distribution verify the signed checksums, the user-data schema and the storage-error baseline; then stage 1 on the Windows host (W1 to W7): verify the image hash against both publications, render the cloud-init user data, `wsl.exe --install --from-file` with `--no-launch`, the first launch with standard input at end of file, one terminate and the file-ownership probe", "kind": "repo_recipe", "source_path": "adoption/platforms/linux-wsl2-new-distro.md"},
           "acceptance": {"command": "W5 and F1 to F3 of the recipe: the first launch exits 0 as the cloud-init user, `systemctl is-system-running --wait` prints running, linger is enabled and the user bus is a socket owned by the user", "evidence_class": "none_recorded", "source_path": "adoption/platforms/linux-wsl2-new-distro.md"},
           "upstream_currency": {"latest_release": "Ubuntu 26.04.1 LTS is the newer LTS; it is queued as a bounded comparison before any switch", "checked_at": "2026-10-01", "pin_is_latest": "no", "url": "https://releases.ubuntu.com/"}
@@ -2544,11 +2570,11 @@
         {
           "name": "OpenHands software-agent-sdk (runtime worker)",
           "repository": "https://github.com/OpenHands/software-agent-sdk",
-          "pin": "v1.49.6 @ fcc102a697874d54a357e36004e02c95040dbdc0",
-          "pin_source": "blueprints/runtime-workers/openhands/pins.json:3-6",
-          "install": {"command": "bash blueprints/runtime-workers/openhands/install.sh (host.py install into a versioned prefix and a private state directory), then install-container.sh and install-grader.sh", "kind": "repo_recipe", "source_path": "blueprints/runtime-workers/openhands/README.md"},
-          "acceptance": {"command": "blueprints/runtime-workers/openhands/run-e2e.sh on one official task, after the P0-P2 isolation probe passes on the live topology", "evidence_class": "none_recorded", "source_path": "blueprints/runtime-workers/openhands/README.md"},
-          "upstream_currency": {"latest_release": "v1.50.1 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/OpenHands/software-agent-sdk/releases"}
+          "pin": "v1.50.1 @ 1e1390acc8788346ba4804c34323284009bf3f5e",
+          "pin_source": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+          "install": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only agent-runtime-worker", "kind": "repo_recipe", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g2-mcp-workers.md"},
+          "acceptance": {"command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only agent-runtime-worker && bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only agent-runtime-worker --stage after_sign_in", "evidence_class": "none_recorded", "source_path": "docs/decisions/2026-10-04-2604-e2e-fix-wave-g2-mcp-workers.md"},
+          "upstream_currency": {"latest_release": "v1.51.0 (2026-10-03)", "checked_at": "2026-10-04", "pin_is_latest": "no", "url": "https://github.com/OpenHands/software-agent-sdk/releases"}
         }
       ],
       "verdict": "selection_of_record_open",
@@ -2583,7 +2609,7 @@
         {"text": "AgentRelay and Relaycast have no catalog layer yet; they are judged as candidates once a layer or a cross row with its own decision record names them. The production program reports that automatic Codex PTY submission through AgentRelay is held on the current host (receipts not published): that is a hold of this host's integration, to be re-tested on a clean install, not evidence about the repository.", "kind": "lane", "source_path": "docs/decisions/2026-10-01-definitive-sota-wsl-program.md"}
       ],
       "owner_lane": "foundation",
-      "notes": "AgentRelay and Relaycast commits were confirmed upstream on 2026-10-01 (release commits for v13.0.0 and v8.14.0); a pin of record needs a repository record and its own qualification."
+      "notes": "2026-10-04 G2 repair: the clean-host bounded SDK plan pin remains the declared v1.50.1 baseline; v1.51.0 stays a currency comparison follow-up requiring a declared amendment; its unchanged focused tests, upstream example, per-job srt unit and fresh native client checks are unrun by this builder. The frozen container/SWE-bench recipe remains v1.49.6 @ fcc102a697874d54a357e36004e02c95040dbdc0 in blueprints/runtime-workers/openhands/pins.json, with its historical qualification boundary. AgentRelay and Relaycast commits were confirmed upstream on 2026-10-01 (release commits for v13.0.0 and v8.14.0); a pin of record needs a repository record and its own qualification."
     },
     {
       "layer_id": "cross:gpt6-harnesses",
@@ -2602,11 +2628,24 @@
         {
           "component_id": "omniroute",
           "repository": "https://github.com/diegosouzapw/OmniRoute",
-          "pin": "3.8.50",
+          "pin": "3.8.52-canary (23a11484 + PR13788 + PR15167)",
           "pin_source": "manifests/stack.json:1887",
-          "install": {"command": "npm install --global --prefix \"$OMNIROUTE_PREFIX\" omniroute@3.8.50 --include=optional --no-audit --no-fund, then the recipe's npm rebuild with its allow-scripts list", "kind": "repo_recipe", "source_path": "docs/foundation-stack.md"},
-          "acceptance": {"command": "npm install --global --prefix \"$OMNIROUTE_PREFIX\" omniroute@3.8.50 into a clean prefix, then the scoped checks: 14 service checks passed on an isolated loopback port, a native restart and the native plaintext backup restore (2026-09-20)", "evidence_class": "upstream_example_or_native_operation", "source_path": "evidence/receipts/foundation-native-20260920.json"},
-          "upstream_currency": {"latest_release": "v3.8.51 (2026-09-30)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "no", "url": "https://github.com/diegosouzapw/OmniRoute/releases"}
+          "install": {
+            "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/install.sh --only gpt-gateway",
+            "kind": "repo_recipe",
+            "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute-canary-install.sh"
+          },
+          "acceptance": {
+            "command": "bash evidence/artifacts/new-wsl-install-plan-20261002/accept.sh --only gpt-gateway --stage post_install; repeat with --stage service_health and --stage after_sign_in",
+            "evidence_class": "none_recorded",
+            "source_path": "evidence/artifacts/new-wsl-install-plan-20261002/config/omniroute-canary-evidence.json"
+          },
+          "upstream_currency": {
+            "latest_release": "v3.8.51 (2026-09-30)",
+            "checked_at": "2026-10-01T07:42Z",
+            "pin_is_latest": "unknown",
+            "url": "https://github.com/diegosouzapw/OmniRoute/releases"
+          }
         }
       ],
       "verdict": "comparison_required",
@@ -2635,7 +2674,7 @@
         "Codex installs with the token-efficiency profile at 0.159.2; sign in with `codex login --device-auth`.",
         "Render the Codex lane: `python3 tools/adoption/apply_codex_lane.py` (dry run), review, then `--apply --expect-config-sha256 <sha> --expect-agents-sha256 <sha>`; the codex-lane step of --configure-full-profile runs the same tool.",
         "Prove it with `python3 tools/adoption/prove_codex_lane.py`; add --live only when worker runs are intended.",
-        "Only for gateway-routed lanes: install OmniRoute 3.8.50 into a fresh prefix with a private DATA_DIR, bound to 127.0.0.1 with REQUIRE_API_KEY=true on a port outside the workstation's 20128 and 20129, and create provider connections in its own store.",
+        "For the 2604 gateway lane, use the install-plan's release/v3.8.52 @23a11484 plus PR13788 and PR15167 canary recipe, with its upstream tests/build/pack gates and npm 3.8.51 as rollback. The separate user service uses DATA_DIR ~/.local/share/omniroute and loopback 21128/21129/21131, keyless by the wave-2 ruling. Reuse the bound historical host gates and fresh Codex turn; fresh accounts sign in natively only when absent. The workstation stable 3.8.50 registry receipt is a separate historical scope.",
         "Qualify Codex 0.159.3 on the new distribution (npm tarball hash, provenance, CLI surface) before moving the pin."
       ],
       "gates": [

@@ -3,6 +3,100 @@ Status: revised to the merged definitive manifest after the real-distribution ru
 North-star action served: a reproducible foundation installation plan for subsequent US-equities research and historical simulation. No trading readiness or live/paper operation is claimed.
 Discovery was bounded to the supplied owners/pins, selected upstream READMEs/docs, mise registry entries, release assets/checksums, and the existing repository adoption recipes. search-first and context-mode were used; researchers were read-only.
 The specialized stack-researcher role retained its defined Astra/Max model. Consequential source judgment trigger: native-versus-Compose host listener boundaries and SDK route/package classification. Acceptance result: coordinator accepted the pinned primary-source conclusions only; runtime acceptance remains unrun.
+## Git fix wave sources (2026-10-04)
+
+North-star action served: native Git isolation, syntax-aware change inspection
+and review by the other model family before subsequent US-equities research and
+historical simulation. This is a bounded plan repair, not a new WSL E2E result.
+
+- **Worktrunk install and release:** `max-sixty/worktrunk@v0.80.0`, source
+  `b49ca7eea9b03145791a5b94eccaf9c59412ed37`; the
+  [release](https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0) publishes
+  the installer and shell-integration step. The existing supported mise route is
+  [jdx/mise@v2026.10.0:registry/worktrunk.toml:1](https://github.com/jdx/mise/blob/v2026.10.0/registry/worktrunk.toml#L1).
+  Bash integration:
+  [docs/src/content/docs/shell-integration.md:16](https://github.com/max-sixty/worktrunk/blob/v0.80.0/docs/src/content/docs/shell-integration.md#L16).
+  Client plugin installation and the Claude-only isolation boundary:
+  [docs/src/content/docs/claude-code.md:7](https://github.com/max-sixty/worktrunk/blob/v0.80.0/docs/src/content/docs/claude-code.md#L7),
+  [Claude installation:21](https://github.com/max-sixty/worktrunk/blob/v0.80.0/docs/src/content/docs/claude-code.md#L21),
+  [Codex installation:37](https://github.com/max-sixty/worktrunk/blob/v0.80.0/docs/src/content/docs/claude-code.md#L37).
+  The `--yes` parameter is implemented in
+  [src/commands/config/plugins.rs:23](https://github.com/max-sixty/worktrunk/blob/v0.80.0/src/commands/config/plugins.rs#L23)
+  and [src/commands/config/codex.rs:16](https://github.com/max-sixty/worktrunk/blob/v0.80.0/src/commands/config/codex.rs#L16).
+- **Worktrunk acceptance:** the unchanged native command examples in
+  [docs/src/content/docs/switch.md:20](https://github.com/max-sixty/worktrunk/blob/v0.80.0/docs/src/content/docs/switch.md#L20),
+  [README.md:153](https://github.com/max-sixty/worktrunk/blob/v0.80.0/README.md#L153)
+  and [docs/src/content/docs/remove.md:11](https://github.com/max-sixty/worktrunk/blob/v0.80.0/docs/src/content/docs/remove.md#L11).
+  Their disposable repository, state assertions and dirty-removal control are
+  local integration checks. `cargo test` is separately documented at
+  [README.md:237](https://github.com/max-sixty/worktrunk/blob/v0.80.0/README.md#L237);
+  this plan does not replace or claim to execute that Rust suite. Native Claude
+  listing semantics:
+  [src/commands/config/plugins.rs:173](https://github.com/max-sixty/worktrunk/blob/v0.80.0/src/commands/config/plugins.rs#L173).
+  Codex's installed/enabled JSON fields:
+  [openai/codex@rust-v0.160.0:codex-rs/cli/src/plugin_cmd.rs:481](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/cli/src/plugin_cmd.rs#L481).
+- **Difftastic install and acceptance:**
+  [Wilfred/difftastic@0.71.0 release](https://github.com/Wilfred/difftastic/releases/tag/0.71.0),
+  [jdx/mise@v2026.10.0:registry/difftastic.toml:1](https://github.com/jdx/mise/blob/v2026.10.0/registry/difftastic.toml#L1),
+  [manual/src/usage.md:10](https://github.com/Wilfred/difftastic/blob/0.71.0/manual/src/usage.md#L10).
+  The unchanged fixtures are
+  [sample_files/simple_1.js:1](https://github.com/Wilfred/difftastic/blob/0.71.0/sample_files/simple_1.js#L1)
+  (SHA256 `106256fcefb82debbc83be06ceeec073e35a4a1bfa4b22bd3530e2d97314d1db`) and
+  [sample_files/simple_2.js:1](https://github.com/Wilfred/difftastic/blob/0.71.0/sample_files/simple_2.js#L1)
+  (SHA256 `bd078aaecc828327c5b21ceb14a5f40e2e853f0468fb70b1b77d1aa08017ae31`).
+  The upstream assertions are
+  [tests/cli.rs:85](https://github.com/Wilfred/difftastic/blob/0.71.0/tests/cli.rs#L85)
+  (`has_changes_requested_exit_code`) and
+  [tests/cli.rs:106](https://github.com/Wilfred/difftastic/blob/0.71.0/tests/cli.rs#L106)
+  (`check_only`). JavaScript language detection and an identical-input exit-0
+  control are additional integration assertions. A Markdown Text fallback does
+  not establish structural diffing.
+- **Native fresh sessions and cross-family review:** installed `codex-cli
+  0.159.3` and Claude Code `2.1.289` help were checked locally; the plan uses the
+  selected Codex `rust-v0.160.0` source. Its
+  [exec CLI:35](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/exec/src/cli.rs#L35)
+  documents ephemeral sessions, [CLI:60](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/exec/src/cli.rs#L60)
+  JSONL/final-message output, and
+  [CLI:273](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/exec/src/cli.rs#L273)
+  enforces the review target/prompt conflicts. The fetched
+  [official Codex noninteractive page](https://developers.openai.com/codex/noninteractive/)
+  supports `codex exec` and complete JSONL output. Anthropic's headless route is
+  [documented here](https://code.claude.com/docs/en/headless#add-claude-to-a-build-script);
+  this network returned HTTP 403 for that page, so the actual command flags were
+  verified against installed Claude Code `--help`, the original executor's
+  successful native stream and the already-fetched upstream SDK command builder:
+  [anthropics/claude-agent-sdk-python@v0.2.163:src/claude_agent_sdk/_internal/transport/subprocess_cli.py:574](https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/src/claude_agent_sdk/_internal/transport/subprocess_cli.py#L574)
+  supplies `--output-format stream-json --verbose`,
+  [line 611](https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/src/claude_agent_sdk/_internal/transport/subprocess_cli.py#L611)
+  supplies `--max-turns`,
+  [line 623](https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/src/claude_agent_sdk/_internal/transport/subprocess_cli.py#L623)
+  supplies `--model`,
+  [line 637](https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/src/claude_agent_sdk/_internal/transport/subprocess_cli.py#L637)
+  supplies `--permission-mode`, and
+  [line 778](https://github.com/anthropics/claude-agent-sdk-python/blob/v0.2.163/src/claude_agent_sdk/_internal/transport/subprocess_cli.py#L778)
+  supplies `--effort`. No unavailable page is treated as newly fetched.
+  Named profile resolution comes from
+  [codex-rs/core/src/config/mod.rs:2025](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/core/src/config/mod.rs#L2025):
+  it resolves `<profile>.config.toml` under `CODEX_HOME`, so absence of legacy
+  profile tables is not evidence of a missing named file. The optional command
+  form is `codex exec -p omniroute review ...`.
+  Codex JSONL intentionally emits only the thread ID at initialization:
+  [event_processor_with_jsonl_output.rs:403](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/exec/src/event_processor_with_jsonl_output.rs#L403).
+  Preserve actual model/effort as a separate independent observation; requested
+  flags do not supply it. The immutable review inputs are public repository
+  commits [8c32a84b](https://github.com/seathatflowsinourveins/native-agent-stack/commit/8c32a84b246da66e43a6188c973741b09329e223)
+  (Claude Opus trailer) and
+  [b9dbe3c5](https://github.com/seathatflowsinourveins/native-agent-stack/commit/b9dbe3c5a09cdefca435cd78c7f3dad46ca883a4)
+  (Codex trailer); local original commit objects verified those bindings.
+
+Completeness critic: distinguish plugin installation from live hook execution,
+Claude isolation from Codex guidance/activity, parsed diffing from the Text
+fallback, complete native streams from a model's final summary, requested model
+flags from observed route metadata, and local plan checks from destination
+qualification. These distinctions feed the next Git capability sweep. The
+existing claude-hud statusline and optional OmniRoute route are separate selected
+capabilities; no new competing review service or global diff setting is adopted.
+
 ## Supporting upstream sources
 Each owner's install and acceptance source is in install-plan.json. The following sources explain script glue, runtime pins, and service configuration.
 - system prerequisites (plan wrapper adapts package list): [source, line 206](https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/bootstrap-linux.sh#L206).
@@ -86,7 +180,7 @@ Published artifact: https://dl.grafana.com/grafana/release/13.2.3/grafana_13.2.3
 Status: all UNRUN at the source review. In the clean run of 2026-10-02 the OTel collector, Prometheus, Alertmanager and Ollama were started once with the commands below in a throwaway distribution and passed their health checks, and Docker and Dagu were started by their installers. The gateway and the research harnesses were not started; Loki and Grafana are measurement-only and were not installed.
 These invoke documented upstream foreground/daemon forms. No systemd user unit was created except those installed upstream by Docker and Dagu.
 The shell variables below are the portable prefixes defined in install.sh/accept.sh; run foreground services in their own terminals. Configuration is installed from config/ without overwriting existing files.
-- OTel: `otelcol-contrib --config "$config_root/otel.yaml"`. Only OTLP grpc21317/http21318, health21333, and metrics21888 bind loopback; optional pprof/zpages/Jaeger/Zipkin are omitted from the upstream distribution template.
+- OTel: `NS2604_OBSERVABILITY_DATA="${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability" otelcol-contrib --config "$config_root/otel.yaml"`. Only OTLP grpc21317/http21318, health21333, and metrics21888 bind loopback; optional pprof/zpages/Jaeger/Zipkin are omitted from the upstream distribution template.
 - Prometheus: `prometheus --config.file="$config_root/prometheus.yaml" --web.listen-address=127.0.0.1:21090 --storage.tsdb.path="$tool_root/prometheus/data"`. [CLI flags](https://raw.githubusercontent.com/prometheus/prometheus/v3.15.0/docs/command-line/prometheus.md#L17).
 - Alertmanager: `alertmanager --config.file="$config_root/alertmanager.yaml" --web.listen-address=127.0.0.1:21093 --cluster.listen-address= --storage.path="$tool_root/alertmanager/data"`. [Flags used together upstream, Procfile line 1](https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/Procfile#L1); [flag definitions, main.go lines 51-52, 63](https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/cmd/alertmanager/main.go#L51); an empty `--cluster.listen-address=` turns clustering off ([README, line 396](https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/README.md#L396)); readiness is `GET /-/ready` ([management API, line 22](https://raw.githubusercontent.com/prometheus/alertmanager/v0.34.1/docs/management_api.md#L22)). HTTP21093 binds loopback; no cluster listener is bound.
 - Loki (measurement-only): `cd "$tool_root/loki"`, then `loki -config.file="$config_root/loki.yaml"`. [Upstream foreground invocation](https://raw.githubusercontent.com/grafana/loki/v3.7.8/docs/sources/setup/install/local.md#L74). HTTP21300/grpc21396 bind loopback; persistent paths are relative to this owned directory.
@@ -107,6 +201,7 @@ Rootless Docker exposes a Unix socket, no host TCP port. All assigned host ports
 - Supplemental Grafana citation correction: the guessed start-restart-grafana/index.md path returned404; the tagged tree and raw read establish start-restart-grafana.md. The install source itself returned200 on its first required fetch.
 ## Completeness critic
 Reviewed omitted modalities/classes: native self-updating clients, SDK libraries, CLI tools, marketplaces, workflow-only owners, rootless containers, services/auxiliary listeners, repository practices, and excluded overlaps.
+
 Original review limits, updated after round 1: route enum has no precise library/marketplace labels; individual security plugins are unselected; Dependabot has no uses reference; host acceptance is unavailable for workflow-only/guard rows; most services ship no documented user unit; Prometheus has no quoted transport command. At the source review, revised commands, model/account setup, WSL GPU execution and real-distribution rootless/systemd/browser acceptance were unrun. The clean run of 2026-10-02 then exercised the revised commands, and both throwaway-distribution runs of that day exercised the rootless Docker and systemd user-session acceptance (VALIDATION.md). Model/account setup, GPU execution and the browser check (its owner is measurement-only and was not installed) remain unrun in the throwaway distributions. On the destination distribution the 64-row revision ran once (main 6652b78e); the record of that run is private, and its public receipt comes with that distribution's acceptance. Git's former route gap is resolved below.
 DeerFlow's make doctor is documented but requires host pnpm/nginx/backend environment, inapplicable to the selected Compose install. Its shipped /health/ready probe is used instead; no alternative runtime manager or passed container check is claimed.
 No benchmark, convergence/SOTA superiority, billing saving, new model run, or E2E acceptance is claimed. This record feeds the next foundation lifecycle/source sweep.
@@ -170,7 +265,7 @@ Pins opened for this revision, each read at its pin: ast-grep tag `0.45.3` (comm
 
 ### Rows added
 
-- **ast-grep (`structural-search`).** mise's registry entry lists `aqua:ast-grep/ast-grep` first and tests `sg --version` ([registry/ast-grep.toml:1,3](https://github.com/jdx/mise/blob/v2026.10.0/registry/ast-grep.toml#L1)); ast-grep's README documents `mise use -g ast-grep` ([:61](https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md#L61)) and the form `ast-grep -p '$A && $A()' -l ts -r '$A?.()'` ([:84](https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md#L84)); a pattern search exits 1 when nothing matches ([run.rs:349](https://github.com/ast-grep/ast-grep/blob/0.45.3/crates/cli/src/run.rs#L349)). The acceptance uses the README form without `--rewrite`, on a temporary file, and runs `ast-grep`, not the registry test's `sg`: on Ubuntu `/usr/bin/sg` is `newgrp` from the `login` package, which a mise shim hides only while the shims directory comes first on `PATH`.
+- **ast-grep (`structural-search`).** mise's registry entry lists `aqua:ast-grep/ast-grep` first and tests `sg --version` ([registry/ast-grep.toml:1,3](https://github.com/jdx/mise/blob/v2026.10.0/registry/ast-grep.toml#L1)); ast-grep's README documents `mise use -g ast-grep` ([:61](https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md#L61)) and the form `ast-grep -p '$A && $A()' -l ts -r '$A?.()'` ([:84](https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md#L84)); a pattern search exits 1 when nothing matches ([run.rs:349](https://github.com/ast-grep/ast-grep/blob/0.45.3/crates/cli/src/run.rs#L349)). The acceptance uses the complete README rewrite-preview form on a temporary file, asserts the replacement, and requires exit 1 on a nonmatching control, and runs `ast-grep`, not the registry test's `sg`: on Ubuntu `/usr/bin/sg` is `newgrp` from the `login` package, which a mise shim hides only while the shims directory comes first on `PATH`.
 - **Alertmanager (`alerting`).** Release-binary form as for Prometheus (see the quotation boundary above). The configuration is `route: {receiver: sink}` and `receivers: [{name: sink}]`: a receiver is a name plus optional integration lists ([configuration.md:821–829](https://github.com/prometheus/alertmanager/blob/v0.34.1/docs/configuration.md#L821)), upstream's own test fixture uses a receiver with none ([conf.nil-match_re-route.yml:1–8](https://github.com/prometheus/alertmanager/blob/v0.34.1/config/testdata/conf.nil-match_re-route.yml#L1)), and the root route must name a receiver ([README.md:59–62](https://github.com/prometheus/alertmanager/blob/v0.34.1/README.md#L59)). Port 21093 is in the plan's 21xxx band beside Prometheus's 21090, and no other row or config file uses it (`check_plan.py` checks that no row or config file claims a port twice). `--web.listen-address` appears upstream only in the HA example `Procfile` and in the flag registration in `main.go`, not in documentation prose. `amtool` stays in the extracted directory, as `promtool` does.
 - **mattpocock/skills (`engineering-process-skills`).** The five skills of the critic's verdict exist at `v1.2.3` under `skills/engineering/` (`tdd`, `diagnosing-bugs`, `codebase-design`, `domain-modeling`) and `skills/productivity/` (`writing-for-agents`), with `setup-matt-pocock-skills` under `skills/engineering/`. The README asks that the setup skill be one of the selected skills ([:55](https://github.com/mattpocock/skills/blob/v1.2.3/README.md#L55)); it is user-invoked and run once per repository ([:198](https://github.com/mattpocock/skills/blob/v1.2.3/README.md#L198)), which is not part of this plan. The installer at `v1.7.0` accepts `-g`, `-a <agents>`, `-s <skills>` and `-y` as its non-interactive form ([README:110–111](https://github.com/vercel-labs/skills/blob/v1.7.0/README.md#L110)), names the agents `claude-code` and `codex` ([agents.ts:155, 224](https://github.com/vercel-labs/skills/blob/v1.7.0/src/agents.ts#L155)), disables telemetry through `DISABLE_TELEMETRY` ([README:540, 554](https://github.com/vercel-labs/skills/blob/v1.7.0/README.md#L540), [telemetry.ts:86–88](https://github.com/vercel-labs/skills/blob/v1.7.0/src/telemetry.ts#L86)), parses `owner/repo#ref` ([source-parser.ts:284–314, 540–549](https://github.com/vercel-labs/skills/blob/v1.7.0/src/source-parser.ts#L284), unit test [source-parser.test.ts:129](https://github.com/vercel-labs/skills/blob/v1.7.0/src/source-parser.test.ts#L129)), clones with `git clone --depth 1 --branch <ref>` ([git.ts:295–302](https://github.com/vercel-labs/skills/blob/v1.7.0/src/git.ts#L295)) and records the ref in its global lock file at `$XDG_STATE_HOME/skills/.skill-lock.json` or `$HOME/.agents/.skill-lock.json` ([skill-lock.ts:20–21, 63–72](https://github.com/vercel-labs/skills/blob/v1.7.0/src/skill-lock.ts#L20)). The `#ref` pin is not in the installer's README; it rests on the source and its unit test and is first exercised by the target-distribution run. The acceptance reads `list --json` ([list.ts:113–127](https://github.com/vercel-labs/skills/blob/v1.7.0/src/list.ts#L113)), whose `agents` field holds display names (`Claude Code`, `Codex`), and the lock's `ref`; `jq` comes with the plan's prerequisite packages.
 
@@ -240,7 +335,7 @@ Each install function first calls `interim_acknowledged`, which reads `wave2.ack
 
 ### Revised rows
 
-- **research-harnesses**: DeerFlow v2.1.0 [README, line 1658](https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/README.md#L1658) (the embedded client, lines 1639-1686), [Makefile, line 96](https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/Makefile#L96) (`uv sync --locked`) and [Install.md, line 38](https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/Install.md#L38); GPT Researcher at `0957c301ed06c2a5857b834358c7227c739041d4`: [pyproject.toml, line 23](https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/pyproject.toml#L23), [cli.py, line 336](https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/cli.py#L336) and [config.py, line 158](https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/config/config.py#L158); runs go through `tools/research/gpt_researcher.sh` (synthesis X18).
+- **research-harnesses**: DeerFlow v2.1.0 [README, line 1658](https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/README.md#L1658) (the embedded client, lines 1639-1686), [Makefile, line 96](https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/Makefile#L96) (`uv sync --locked`) and [Install.md, line 38](https://raw.githubusercontent.com/bytedance/deer-flow/v2.1.0/Install.md#L38); GPT Researcher at `0957c301ed06c2a5857b834358c7227c739041d4`: [pyproject.toml, line 23](https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/pyproject.toml#L23), [cli.py, line 336](https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/cli.py#L336) and [config.py, line 158](https://raw.githubusercontent.com/assafelovic/gpt-researcher/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/config/config.py#L158); runs go through `tools/research/gpt_researcher.sh` (synthesis X18), including the byte-identical installed copy and public config. G2 adds the active model from [config.example.yaml:250-278](https://github.com/bytedance/deer-flow/blob/v2.1.0/config.example.yaml#L250), the upstream [DuckDuckGo tool:802](https://github.com/bytedance/deer-flow/blob/v2.1.0/config.example.yaml#L802), unchanged [client tests](https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/tests/test_client.py), and functional [chat():1193](https://github.com/bytedance/deer-flow/blob/v2.1.0/backend/packages/harness/deerflow/client.py#L1193). Native-session and reference checks are repository integration assertions.
 - **tobi-qmd**: v2.8.3 [README, line 32](https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L32), [line 671](https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L671) and [line 1021](https://raw.githubusercontent.com/tobi/qmd/v2.8.3/README.md#L1021); `src/llm.ts` at `facd35e` for GPU auto (retrieval ruling, change 16).
 - **gpt-gateway**: OmniRoute v3.8.51 `docs/reference/ENVIRONMENT.md` lines 158-190, with `EMBED_WS_PROXY_PORT=21131` and plain lines for systemd's `EnvironmentFile=` (gateway ruling, change 12).
 - **engineering-process-skills, skill-discovery and skill-authoring**: the `skills` installer at `vercel-labs/skills` `7407f3893ad4dceab546ac002c3ef806e4000c73` ([README, line 44](https://raw.githubusercontent.com/vercel-labs/skills/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L44)), run through the repository's `tools/adoption/install_skills.py`.
@@ -257,7 +352,7 @@ The rows the wave-3 batch of the layer consensus added or changed, on the owner'
 
 - **RTK 0.51.0 (`command-output`)**: the Linux asset ([README, line 113](https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L113)); checks: [`--version`, line 121](https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L121), [`rtk git log`, line 193](https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L193), [`rtk proxy`, line 313](https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L313) and [`RTK_TELEMETRY_DISABLED`, line 551](https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L551). The archive holds only `rtk`. Its freshly downloaded SHA-256 `5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5` matches the [v0.51.0 checksums file](https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt) and GitHub asset digest. The [release notes](https://github.com/rtk-ai/rtk/releases/tag/v0.51.0) require `--shell` for executable positional scripts that need shell expansion; this plan uses direct arguments. The persisted `config/rtk-config.toml` retains one `[hooks]` table and the exact five exclusions required by [main bootstrap](https://github.com/seathatflowsinourveins/native-agent-stack/blob/14048b840425c2569e0df60a6596e94e601da15b/adoption/bootstrap.md#L551); [config.rs, lines 119-123](https://github.com/rtk-ai/rtk/blob/v0.51.0/src/core/config.rs#L119-L123) declares `exclude_commands`.
 - **Headroom 0.37.0 (`output-compression`)**: [README, line 92](https://raw.githubusercontent.com/headroomlabs-ai/headroom/v0.37.0/README.md#L92) (`uv tool install --python 3.13`, with the pins file's `[mcp]` extra instead of the README's `[all]`); [`headroom --version`, line 437](https://raw.githubusercontent.com/headroomlabs-ai/headroom/v0.37.0/README.md#L437).
-- **jcodemunch-mcp 1.108.319 (`code-index`)**, source `8f7b34abe16fb459e0bf1c04747d584216dfe32e`: [README, line 91](https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91) (`uv tool install`) and [line 113](https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L113) (`--version`); the pin and the root: recipes/README.md lines 519-524.
+- **jcodemunch-mcp 1.108.327 (`code-index`)**, source `6d5ae86c130f96624e2ca2d797fa3b853c210b9d`: [README, line 91](https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L91) (`uv tool install`) and [line 113](https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/6d5ae86c130f96624e2ca2d797fa3b853c210b9d/README.md#L113) (`--version`); the pin and the root: recipes/README.md lines 519-524. The selected .327 pin is in `manifests/stack.json`; its recorded W1 qualification and limitations are in `evidence/receipts/jcodemunch-1108327-qualification-20261003.json`.
 - **codebase-memory-mcp 0.11.0 (`code-graph`)**: [README, lines 88-95](https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/v0.11.0/README.md#L88) (the archive, then its `install.sh`, which the plan does not run); [`--version`, src/main.c line 1236](https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/v0.11.0/src/main.c#L1236). The archive holds the executable, `LICENSE`, `THIRD_PARTY_NOTICES.md` and `install.sh`.
 - **Repomix 1.18.1 (`repo-packing`)**, source `80b4280a9196feace092fc672dfe2b5fac62ef08`: [README, line 109](https://raw.githubusercontent.com/yamadashy/repomix/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L109) (`npm install -g repomix`); checks: [`--version`, line 609](https://raw.githubusercontent.com/yamadashy/repomix/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L609), [`--include`, line 204](https://raw.githubusercontent.com/yamadashy/repomix/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L204) and [`--style`, line 628](https://raw.githubusercontent.com/yamadashy/repomix/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L628); the two-file pack is this project's integration check.
 - **TOON 4.1.1 (`structured-data`)**: [packages/cli/README.md, line 11](https://raw.githubusercontent.com/toon-format/toon/v4.1.1/packages/cli/README.md#L11) (`npm install -g @toon-format/cli`), [line 63](https://raw.githubusercontent.com/toon-format/toon/v4.1.1/packages/cli/README.md#L63) (`-o`) and [line 65](https://raw.githubusercontent.com/toon-format/toon/v4.1.1/packages/cli/README.md#L65) (`--decode`); `--version` prints only the version (adoption/pins-linux-x86_64.json, line 267). The round trip is this project's integration check.
@@ -272,3 +367,324 @@ The rows the wave-3 batch of the layer consensus added or changed, on the owner'
 - **agentsview 0.43.0 (`session-analytics`)**: [README, line 25](https://raw.githubusercontent.com/kenn-io/agentsview/v0.43.0/README.md#L25) (GitHub Releases) and [line 695](https://raw.githubusercontent.com/kenn-io/agentsview/v0.43.0/README.md#L695) (`AGENTSVIEW_TELEMETRY_ENABLED=0`); `AGENTSVIEW_DISABLE_UPDATE_CHECK=1` is from the agentsview use commands of `docs/token-efficiency-stack.json`, and the README at that tag does not name it.
 - **context-mode 1.0.169 (`context-supply`)**: the wave-2 sources above, unchanged; only the gate call is gone.
 - **SocratiCode 1.15.0 (`code-search`)**, source `f6191f076a42405f0d5508139f3a8b505cfef93a`: the recipes/README.md socraticode row (`--ignore-scripts --before=2026-09-24T12:00:00Z`); its version is read from `package.json`, because every invocation starts its MCP server (adoption/pins-linux-x86_64.json, line 334).
+
+## G1 client plan repairs (2026-10-04)
+
+These sources were read at the selected pins for the three owned rows. The
+commands are planned destination operations; source review and scratch checks
+are distinct from a new host run.
+
+- **SDK and app-server.** `openai/codex@rust-v0.160.0` (commit
+  `a956835d020762cb2b570053af06f643a11c0ecc`):
+  [sdk/typescript/README.md:10,15,110](https://github.com/openai/codex/blob/rust-v0.160.0/sdk/typescript/README.md#L15)
+  supplies the local npm installation, unchanged quickstart and skipGitRepoCheck
+  option. [codex-rs/cli/src/main.rs:923](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/cli/src/main.rs#L923)
+  dispatches `debug app-server send-message-v2` to the native test client.
+  [codex-rs/app-server-test-client/src/lib.rs:1072](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/app-server-test-client/src/lib.rs#L1072)
+  performs initialize, thread/start and turn/start;
+  [:1624](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/app-server-test-client/src/lib.rs#L1624)
+  starts the stdio child; and
+  [:1994](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/app-server-test-client/src/lib.rs#L1994)
+  prints turn status but also returns success after Failed. The Completed/reply
+  predicates are local integration checks of these upstream outputs. Official
+  [SDK](https://developers.openai.com/codex/sdk) and
+  [app-server](https://developers.openai.com/codex/app-server) pages were fetched.
+- **Engineering cleanup and listings.** `vercel-labs/skills@1.7.0`, commit
+  `7407f3893ad4dceab546ac002c3ef806e4000c73`:
+  [src/remove.ts:40,182,209,247,323](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/remove.ts#L182)
+  resolves only requested installed names, removes client placements and updates
+  the lock. No-match cleanup returns without error, supporting a clean rerun.
+  [src/list.ts:113](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/list.ts#L113)
+  supplies JSON listing names and agent display names. The three-name settings
+  fragment uses Claude's native
+  [skillOverrides](https://code.claude.com/docs/en/skills#override-skill-visibility-from-settings)
+  and the repository's existing merge implementation,
+  `seathatflowsinourveins/native-agent-stack@PR #684's head`:
+  [tools/adoption/apply_claude_settings.py:191](../../../tools/adoption/apply_claude_settings.py).
+  Exact per-skill pins remain in adoption/skills/manifest.json. In particular,
+  writing-for-agents is `mattpocock/skills@c55ee46073ed923f86ce59a5eb3b6d895095d1b7`:
+  `skills/productivity/writing-for-agents/SKILL.md:1`; the other three selected
+  engineering skills use `d81f3a183412e71a5b1e84ca21bc1a35eea03a60`.
+- **Authoring dependency and upstream acceptance.**
+  `anthropics/skills@8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4`:
+  [skills/skill-creator/scripts/quick_validate.py:9,96](https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/scripts/quick_validate.py#L9)
+  imports yaml and returns failure for an invalid skill;
+  [scripts/package_skill.py:17](https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/scripts/package_skill.py#L17)
+  imports that validator. `openai/codex@rust-v0.160.0`:
+  [codex-rs/skills/src/assets/samples/skill-creator/scripts/quick_validate.py:10,120](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/skills/src/assets/samples/skill-creator/scripts/quick_validate.py#L10)
+  has the same runtime dependency and native exit-status contract. Native
+  [codex-rs/cli/src/main.rs:2044](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/cli/src/main.rs#L2044)
+  installs the skills extension for `debug prompt-input`;
+  [codex-rs/ext/skills/src/host_service.rs:125](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/ext/skills/src/host_service.rs#L125)
+  initializes the embedded cache through
+  [codex-rs/skills/src/lib.rs:69](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/skills/src/lib.rs#L69).
+  This native initialization precedes the validators on a clean Codex home.
+  `astral-sh/uv@0.12.22`:
+  [docs/pip/environments.md:100](https://github.com/astral-sh/uv/blob/0.12.22/docs/pip/environments.md#L100)
+  supports installation into a selected interpreter with --python.
+  [PyYAML 6.0.3](https://pypi.org/project/PyYAML/6.0.3/) is the pinned dependency.
+  The creator's native paired evaluation is in the pinned
+  [SKILL.md](https://github.com/anthropics/skills/blob/8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4/skills/skill-creator/SKILL.md#running-and-evaluating-test-cases).
+- **Listing capture.** Skills' [src/cli.ts:419](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/cli.ts#L419)
+  forces process exit. `nodejs/node@v24.21.0`:
+  [doc/api/process.md:4228](https://github.com/nodejs/node/blob/v24.21.0/doc/api/process.md#L4228)
+  documents synchronous writes to files and asynchronous POSIX pipe writes.
+  The earlier install-repair patch supplied this lead; only its skill-authoring
+  file-capture hunk was ported by hand.
+
+### G2 MCP and worker plan repair (2026-10-04)
+
+- Repository wiring sources are `this PR: adoption/new-wsl/client-config-map.json:27` and `this PR: tools/research/gpt_researcher.sh:27`, read from [PR #684's head](https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files). The branch-local pre-rebase hash is deliberately omitted from these citations.
+- **mcp-inspector**: `modelcontextprotocol/inspector@2.9.0` (`ae865a19178ddf6f375780a02e9c77c4cf4da184`), [README:9-26](https://github.com/modelcontextprotocol/inspector/blob/2.9.0/README.md#L9), [publishing.md:16-18](https://github.com/modelcontextprotocol/inspector/blob/2.9.0/docs/publishing.md#L16), [package.json:84-90](https://github.com/modelcontextprotocol/inspector/blob/2.9.0/package.json#L84), [launcher README:15-25](https://github.com/modelcontextprotocol/inspector/blob/2.9.0/clients/launcher/README.md#L15) and [memory-only secret store:148](https://github.com/modelcontextprotocol/inspector/blob/2.9.0/docs/secret-storage.md#L148). `pack:verify` builds and packs a publishable tarball from the tagged source; `smoke:web:tabs` runs the source build. QMD calls, inherited client environment and fresh-client Web probes remain separate local integration checks.
+- **agent-runtime-worker**: `OpenHands/software-agent-sdk@v1.50.1` (`1e1390acc8788346ba4804c34323284009bf3f5e`), [release](https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.50.1), [SDK/tool dependencies](https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/openhands-tools/pyproject.toml), [frozen lock](https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/uv.lock), [unchanged CI test setup:94-123](https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/.github/workflows/tests.yml#L94), [unchanged hello-world:9-28](https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/examples/01_standalone_sdk/01_hello_world.py#L9), [preset tools:37-171](https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/openhands-tools/openhands/tools/preset/default.py#L37) and [successful-response metrics:113-129](https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/openhands-sdk/openhands/sdk/llm/utils/metrics.py#L113). [uv export](https://docs.astral.sh/uv/reference/cli/#uv-export) and `uv pip install --python -c` parameterize the pinned upstream lock. The copied phase-1 dispatcher, per-job unit, sandbox rendering and report assertions are repository glue, not upstream tests. The separate frozen 1.49.6 container grader retains its pin.
+- **native wiring for these worker slots**: [Codex user skill root at rust-v0.160.0:103](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/ext/skills/src/host_roots.rs#L103), [Claude skill directories](https://code.claude.com/docs/en/skills#where-skills-live), [Codex native completed command schema:159](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/exec/src/exec_events.rs#L159) and [Claude streaming JSON](https://code.claude.com/docs/en/cli-reference). Fresh-session checks use the installed native CLIs and preserve their original JSONL. The srt composition follows [sandbox-runtime@v0.0.78 README](https://github.com/anthropic-experimental/sandbox-runtime/blob/v0.0.78/README.md); unit registration/dispatch follows [systemd.service](https://www.freedesktop.org/software/systemd/man/latest/systemd.service.html). No WSL, provider or native-client execution is claimed by this source-only repair.
+
+
+## G3 code and document plan repairs (2026-10-04)
+
+Sources below were re-read at the exact selected revisions. These are sources for recipe commands and integration assertions; no distribution acceptance or native model run was executed by this builder.
+
+### Serena
+
+- The plan now matches the pre-existing development pin in `manifests/stack.json`, `adoption/new-wsl-profile.json` and `catalogs/foundation/new-wsl-architecture-20261001.json`. The commit identity is [oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143](https://api.github.com/repos/oraios/serena/commits/c6fbd1c5932df2494ffa0020af5a9fbe80b82143). Its PyPI predecessor remains [release v1.7.0](https://api.github.com/repos/oraios/serena/releases/tags/v1.7.0); that release does not supply the selected development code. The Git tool-install route is [uv's tools guide](https://docs.astral.sh/uv/guides/tools/), with the selected commit passed as the Git requirement and `--force` for reconciliation.
+- Upstream install verification is [README.md:229-237](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/README.md#L229). [serena_config.py:66](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/config/serena_config.py#L66) supports `SERENA_HOME`, so the initialization check isolates Serena's state without changing HOME.
+- Python is a published identifier in [project.template.yml:40](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/resources/project.template.yml#L40). The project-local override is loaded in [serena_config.py:723](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/config/serena_config.py#L723). The thin configuration merge adopts upstream's comment-preserving [load_yaml:75 and atomic save_yaml:214](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/util/yaml.py#L75); the only key it changes is `language_servers`, retaining existing languages while adding Python.
+- Indexing is [cli.py:803](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/cli.py#L803). The unchanged upstream [project health-check:957](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/cli.py#L957) exercises symbols and reference queries; [cli.py:1035-1087](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/src/serena/cli.py#L1035) makes empty symbol results or a reference-query exception fail the command.
+- Native MCP command and contexts are [Claude Code clients.md:134](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/docs/02-usage/030_clients.md#L134) and [Codex clients.md:302-315](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/docs/02-usage/030_clients.md#L302). The existing F8 writer already implements them: [this PR: client-config-map.json:371](https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files), and [:555](https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files). The fresh-session checks verify returned tool results after F8; they are project integration checks.
+
+### Structural search
+
+- Installation remains [mise@v2026.10.0:registry/ast-grep.toml:1](https://github.com/jdx/mise/blob/v2026.10.0/registry/ast-grep.toml#L1) and [ast-grep@0.45.3:README.md:61](https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md#L61). The [0.45.3 release notes](https://api.github.com/repos/ast-grep/ast-grep/releases/tags/0.45.3) were read.
+- The acceptance restores the unchanged published preview [README.md:84](https://github.com/ast-grep/ast-grep/blob/0.45.3/README.md#L84), `ast-grep -p '$A && $A()' -l ts -r '$A?.()'`, with a temporary input file as the parameter. It asserts the replacement in returned output. A separate no-match file must exit exactly 1, as [crates/cli/src/run.rs:349](https://github.com/ast-grep/ast-grep/blob/0.45.3/crates/cli/src/run.rs#L349) defines. The conditional catches the expected failure under `bash -e`; command substitution exposes the preview command's own status. Without `-U` or `-i`, this is a preview and writes no source. The source-build coverage proposal was rejected by the Opus adjudication; no cargo acceptance is adopted.
+
+### MinerU
+
+- Package installation remains the pinned [README.md:307](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/README.md#L307); [README.md:365](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/README.md#L365) calls `mineru --help` installation verification. The [4.0.10 release notes](https://api.github.com/repos/opendatalab/MinerU/releases/tags/mineru-4.0.10-released) and [pyproject.toml:10,39-87](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/pyproject.toml#L10) were read. [README.md:448,458](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/README.md#L448) documents the base ONNX plus llama.cpp Standard option on CPU, with at least 8 GB RAM; the row therefore requires no GPU. [README.md:397](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/README.md#L397) supplies telemetry disable.
+- Agent wiring is upstream's [README.md:66](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/README.md#L66) and unchanged [skills/mineru/SKILL.md](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/skills/mineru/SKILL.md). At that peeled commit the skill directory's Git tree is `38d108595980854f65640d46ab27ecea002b549d` ([Git Trees API](https://api.github.com/repos/opendatalab/MinerU/git/trees/d222e58396e1cfc6668f6ad5922e649b5f5d3e50)); SKILL.md SHA256 is `dec330a3549d232fed44db2b0c9bc0b64505a11d2526008ddf044b3f94681d96`, calculated from the exact downloaded source. `config/mineru-skills-manifest.json` supplies those pins to the existing [tools/adoption/install_skills.py:622 --manifest](../../../tools/adoption/install_skills.py) route. Its [process_skill:460](../../../tools/adoption/install_skills.py) runs the pinned CLI's native `add` for both agents. No unpinned npx add is introduced, and the shared adoption manifest is untouched.
+- The CLI remains [vercel-labs/skills@7407f3893ad4dceab546ac002c3ef806e4000c73:README.md:44](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/README.md#L44), version 1.7.0 from the existing manifest. Its native structured listing is [src/list.ts:113](https://github.com/vercel-labs/skills/blob/7407f3893ad4dceab546ac002c3ef806e4000c73/src/list.ts#L113). It is captured to a regular file before jq; JSON pipes are not needed. The repository installer independently checks SKILL.md and the lock tree, and the post-install check verifies both native agent listings and Claude's link to the canonical skill.
+- Standard setup uses the unchanged command sequence in [README.md:559-575](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/README.md#L559): download, verify, managed tier, then managed mode. [README.md:467](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/README.md#L467) supplies `mineru server start`. [docs/next/cli/mineru-server.md:38](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/docs/next/cli/mineru-server.md#L38) describes UDS with loopback TCP fallback; [:103-120](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/docs/next/cli/mineru-server.md#L103) defines the health and tier fields used by the readiness assertion. The bounded poll implements the README:576 requirement to wait for a healthy target tier.
+- The public source fixture is [demo/pdfs/demo1.pdf at c221cc41](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/demo/pdfs/demo1.pdf), SHA256 `f3b3be345bf2df8979f2491ca9466e078e4fd1d6a216611faa8566e4c44d474b`, calculated from downloaded bytes; its first-page title contains `afforestation`. Parse/read are [README.md:223-224](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/README.md#L223). The integration check uses the returned content scope/range locator at page granularity, defined by [mineru/doclib/types.py:266-291](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/mineru/doclib/types.py#L266). Parse's envelope is [mineru/cli/commands/parse.py:388](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/mineru/cli/commands/parse.py#L388), and read's response is [docs/next/cli/mineru-read.md:143](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/docs/next/cli/mineru-read.md#L143). These content assertions are project integration checks, with no inference result claimed here. [README.md:372-375](https://github.com/opendatalab/MinerU/blob/c221cc41bc911ad0df3eaeda97acf6a1bfe9bf93/README.md#L372) requires explicit remote permission; every new command stays local.
+
+### Native fresh-session contracts
+
+Both rows use [Claude Code's documented headless CLI](https://code.claude.com/docs/en/headless), `claude -p --output-format stream-json --verbose`, and [Codex's documented noninteractive CLI](https://developers.openai.com/codex/noninteractive), `codex exec --json -C`. There is no resume flag or provider/model override. The upstream Codex event definitions are [openai/codex@rust-v0.160.0:codex-rs/exec/src/exec_events.rs:9-37](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/exec/src/exec_events.rs#L9), [command execution:161](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/exec/src/exec_events.rs#L161) and [MCP results/calls:263-296](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/exec/src/exec_events.rs#L263). jq checks actual successful native tool responses and completed turns, rather than accepting the model's final declaration. Those assertions are explicitly project integration checks. Native sign-in and application of the existing F8 client writer precede the stage.
+
+## G4 observability repair (2026-10-04)
+
+The selected release/source pins and original sources were re-read for this
+bounded repair. The staged commands were not run on a distribution. The full
+comparison and completeness critic are in
+`docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md`.
+
+- Collector Contrib **v0.162.0**, tag commit
+  `ae8c507510f48f433ab47dd1c6b01a59d6c388b5`: the release tar route/checksum already
+  in this plan is retained. [validate/DryRun](https://github.com/open-telemetry/opentelemetry-collector/blob/v0.162.0/otelcol/command_validate.go#L15)
+  and [file_storage directory validation](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/extension/storage/filestorage/config.go#L69)
+  establish the missing environment and directory conditions. The upstream
+  [create_directory option](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/extension/storage/filestorage/README.md#L39)
+  is used by the clean template; the earlier repair's exact container-path
+  migration preserves retained pipelines. Original integration reference:
+  `this PR: observability/collector/collector.yaml:1`.
+  Native metrics scrape **21889**, collector telemetry **21888**, OTLP HTTP
+  **21318** and gRPC **21317**, health **21333**; Loki **21300** is an outgoing
+  reference. The validator and foreground service both receive
+  `NS2604_OBSERVABILITY_DATA` with the same resolved data root. Native aliases and
+  exporter formats follow the tagged [file receiver](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/receiver/filelogreceiver/README.md#L164)
+  and [Prometheus exporter](https://github.com/open-telemetry/opentelemetry-collector-contrib/blob/v0.162.0/exporter/prometheusexporter/README.md#L20).
+- Grafana OSS **v13.2.3**, tag commit
+  `6193dc03311b631b9727b560d24369e683dc396e`: the same OSS archive and SHA256
+  were found on the [official download page](https://grafana.com/grafana/download/13.2.3?edition=oss&platform=linux).
+  [native provisioning](https://github.com/grafana/grafana/blob/v13.2.3/docs/sources/administration/provisioning/index.md#L324)
+  supplies file providers and datasource YAML; [minimum step](https://github.com/grafana/grafana/blob/v13.2.3/docs/sources/datasources/prometheus/query-editor/_index.md#L47)
+  separates `1m` evaluation from the retained `[1h]` lookback. Dashboard form:
+  `this PR: observability/backends/templates/ecosystem-dashboard.json.example:1`.
+  The original E2E's 29 token-layer query records supply the expressions and
+  the six failing hourly targets; no metric values enter the new source.
+  Native functional checks use [POST /api/ds/query](https://github.com/grafana/grafana/blob/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/data_source.md#L657),
+  [dashboard GET](https://github.com/grafana/grafana/blob/v13.2.3/pkg/api/dashboard.go#L52),
+  and the frontend Alertmanager plugin's own
+  [testDatasource /api/v2/status request](https://github.com/grafana/grafana/blob/v13.2.3/public/app/plugins/datasource/alertmanager/DataSource.ts#L48).
+  Its generic backend health endpoint is not the acceptance oracle. Fresh
+  SDK production reuses
+  `this PR: examples/omniroute-codex-sdk/worker.py:395,596`,
+  which invokes the native SDK with a Sol/max route; its real result metadata is
+  sanitized into the file receiver's spool, without cumulative numeric usage.
+  Static archive/JSON checks remain repository integration checks, separate from
+  the running native APIs and observed panel data.
+- Alertmanager **v0.34.1**: retain the existing published tar SHA256 and native
+  [amtool check-config](https://github.com/prometheus/alertmanager/blob/v0.34.1/docs/configuration.md#L620).
+  Native receiver wiring uses [webhook url_file](https://github.com/prometheus/alertmanager/blob/v0.34.1/docs/configuration.md#L1939)
+  or [Telegram bot_token_file/chat_id_file](https://github.com/prometheus/alertmanager/blob/v0.34.1/docs/configuration.md#L1862).
+  The native [expiring alert command](https://github.com/prometheus/alertmanager/blob/v0.34.1/cli/alert_add.go#L46)
+  is parameterized with a fresh public acceptance ID and RFC3339 expiry.
+  Alertmanager's [native readiness API](https://github.com/prometheus/alertmanager/blob/v0.34.1/docs/management_api.md#L22)
+  is retained. Private files are metadata-checked only, per
+  `this PR: docs/secret-storage.md:31,95-97`.
+- Prometheus **v3.15.0** native [alert rules](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/configuration/alerting_rules.md#L15),
+  [promtool rule unit tests](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/configuration/unit_testing_rules.md#L6),
+  [file-SD/Alertmanager configuration](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/configuration/configuration.md),
+  and [rules/alerts/Alertmanager discovery APIs](https://github.com/prometheus/prometheus/blob/v3.15.0/docs/querying/api.md)
+  are the native oracles. Local adaptation references:
+  `this PR: observability/backends/templates/ecosystem-prometheus-rules.yml.example:1`
+  and `observability/backends/README.md:214-249`. Synthetic unit inputs do not
+  establish delivered alerts; future selected delivery acceptance also requires
+  real firing/resolution, increased native notification counters and the user's
+  independently confirmed receipt. Loki ruler qualification is deferred.
+
+Configuration transport is adapted from
+`this PR: observability/backends/configure.py:76-96`; the helper
+is a renderer/migration, not an alternative agent or E2E runner. It creates no
+service and reads no private destination values. The original alerting
+adjudication corrects the unit assignment to observe-eval-2. The user chooses
+webhook, Telegram or on-host delivery; the sink remains until safe files exist.
+
+## G5 analytics and evaluation sources (2026-10-04)
+
+The bounded builder re-read the original pinned source. The private `review-observe-eval-2.json` supplies the session-analytics repair; `adjudication.json` overrides the two evaluation reviews. The supplied `fixes.json` was absent at the input location when checked. The earlier install-repair patch contains no hunks for these three slots. The existing primary tool pins remain unchanged.
+
+- **agentsview 0.43.0**, tag commit `9be7745ad1906ee24e04eb05bb86c872ef0939a1`: [SHA256SUMS, line 32](https://github.com/kenn-io/agentsview/releases/download/v0.43.0/SHA256SUMS) matches the existing Linux archive digest `4520c6698772d2db7220212abf58d7d58c0966d7435f0a5ab134371f874df6d9`. [README.md:40-89](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/README.md#L40) documents daemon lifecycle, session listing, usage reporting and sync. The installed client was 0.44.0, so its help was a lead; the 0.43.0 release notes and tag source were re-read before choosing the commands.
+- **agentsview configuration and native roots**: [internal/config/config.go:688-713](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/config/config.go#L688) defines the local configuration, [600-641](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/config/config.go#L600) defines usage-only retention, and [1920-1944,1997-2002](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/config/config.go#L1920) implements directory, update and retention environment overrides. The launcher is local placement glue over those supported variables, with telemetry off as [README.md:695](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/README.md#L695) documents.
+- **agentsview artifact assertions**: [cmd/agentsview/session_list.go:129-168](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/session_list.go#L129) supports JSON, per-agent filtering and inclusion of headless/automated sessions. [session_get.go:21-53](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/session_get.go#L21) provides exact lookup and a missing-session error. [internal/db/sessions.go:295](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/db/sessions.go#L295) supplies ID, agent, start time and message counts. [cmd/agentsview/cli.go:538-557](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/cmd/agentsview/cli.go#L538) supports offline per-agent daily reports; [internal/db/usage.go:1886-1912](https://github.com/kenn-io/agentsview/blob/9be7745ad1906ee24e04eb05bb86c872ef0939a1/internal/db/usage.go#L1886) defines their token totals. Timestamp, nonempty-data and absent-ID assertions are local integration checks.
+- **Harbor 0.23.0**, tag commit `1e5c5c6db929a10a140d05e606882c671ae20729`: [README.md:22](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/README.md#L22) supplies the uv tool route. [tests/integration/test_hello_user_e2e.py:25-54](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/tests/integration/test_hello_user_e2e.py#L25) defines oracle=1.0, nop=0.0, no exception and completed verification. The plan runs the unchanged task through the native CLI, rather than claiming the unchanged pytest test ran. [src/harbor/cli/jobs.py:436-446,539,593,799-838,1054](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/cli/jobs.py#L436) supplies job names/directories, concurrency, agents, Docker, force-build and local task flags. [models/trial/paths.py:278,291](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/models/trial/paths.py#L278) names the native reward and result artifacts. Reading those artifacts and applying the positive gate to nop are local integration assertions.
+- **Inspect AI 0.3.273**, tag commit `9e44f1b77ed7c912bf58baf30db8560937e7ce53`: [docs/index.qmd:38](https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/docs/index.qmd#L38) supplies package installation. [examples/theory_of_mind.py:7-18](https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/examples/theory_of_mind.py#L7) is the unchanged scored example. [model/_providers/providers.py:379-391](https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/src/inspect_ai/model/_providers/providers.py#L379) requires the optional `openai` package at least 3.1.0. [openai_compatible.py:98-136](https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/src/inspect_ai/model/_providers/openai_compatible.py#L98) implements the service prefix and derives `OMNIROUTE_API_KEY` from `omniroute`. [cli/eval.py:288,965](https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/src/inspect_ai/_cli/eval.py#L288) supports the provider base URL and native log format. [cli/log.py:138-163](https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/src/inspect_ai/_cli/log.py#L138) provides the supported header reader; [log/_log.py:851-894,1228](https://github.com/UKGovernmentBEIS/inspect_ai/blob/9e44f1b77ed7c912bf58baf30db8560937e7ce53/src/inspect_ai/log/_log.py#L851) defines sample totals, scores and status. Success/error predicates and the absent-model control are local integration checks over native output.
+- **Provider dependency**: [PyPI openai 3.24.0 metadata](https://pypi.org/pypi/openai/3.24.0/json) identified a non-yanked release uploaded 2026-10-02 and Python >=3.10. The [v3.24.0 release](https://github.com/openai/openai-python/releases/tag/v3.24.0) and [openai/openai-python@637f1b8b:README.md:20](https://github.com/openai/openai-python/blob/637f1b8b2e9fdc3220fd4edbb8602cc89dc489c8/README.md#L20) confirm the SDK package. The [uv tool guide](https://docs.astral.sh/uv/guides/tools/) supports installing an additional dependency with `--with`; this adds it to Inspect's tool environment. [Official OpenAI SDK documentation](https://developers.openai.com/api/docs/libraries/) was fetched; official-domain search was unavailable, so the exact upstream release and PyPI metadata supplied version evidence.
+
+Corrections verified in original source: Harbor oracle/nop needs Docker and network, not a provider credential; model-backed native-agent trials are a later tier under the adjudication. Inspect's prior direct-ZIP traceback concerned unsupported compression, not missing `header.json`, and its bare wheel does not guarantee a provider SDK. Fresh-session invocation is further acceptance for the two unwired CLIs, rather than their READY gate. Session analytics requires native roots, actual imported sessions and usage; a blank archive or passing version line cannot prove it.
+
+Completeness critic: the plan now covers release integrity, fixture availability, native source roots, local daemon lifecycle, private retained native results, scored provider output, positive and negative controls, and fresh analytics sessions. Full upstream suites, container access to the gateway, native-agent Harbor trials and independent observation on the target distribution remain for the host/coordinator lane. The builder's syntax, consistency and repository tests are structural evidence only.
+
+
+## Verified E2E fix: Promptfoo, ccusage and Syft (2026-10-04)
+
+All commands remain planned for WSL. The fix-wave decision separates the bounded
+Linux observations from destination acceptance and from unchanged source suites.
+
+- **Promptfoo install:** `promptfoo/promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8:site/docs/installation.md:19`
+  ([source](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/installation.md#L19));
+  [npm install parameters](https://docs.npmjs.com/cli/v11/commands/npm-install)
+  supply the owned prefix, local verified tarball and `--include=optional`.
+  The tarball SHA256 `53471b239132b5e7a270fda458f78a1f1b920abb617ef4dc2b096608d480ee2f`
+  is retained from the source profile. The optional MCP SDK and STDIO command
+  are at `site/docs/integrations/mcp-server.md:13-35` at the same pin.
+- **Promptfoo evaluator acceptance:** `test/smoke/eval.test.ts:65-88`
+  ([source](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/test/smoke/eval.test.ts#L65))
+  uses `eval -c ... --no-cache`. `config/promptfoo-0.123.1-basic.yaml` and
+  `config/promptfoo-0.123.1-failing.yaml` are byte-for-byte copies of upstream
+  `test/smoke/fixtures/configs/basic.yaml:1` and `failing-assertion.yaml:1`.
+  Invoking the installed CLI with those fixtures is an integration check,
+  separate from `npm run test:smoke` in a built upstream checkout.
+- **Promptfoo real gateway acceptance:**
+  `examples/openai-compatible-gateway/promptfooconfig.yaml:1-24` and
+  [README, line 22](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/examples/openai-compatible-gateway/README.md#L22).
+  The config is parameterized for two owner-selected model IDs, the existing
+  gateway on 21128 and `apiKeyEnvar: GATEWAY_API_KEY`. CLI flags are at
+  `site/docs/usage/command-line.md:105-139`; MCP `cache`, `write`, `share` and
+  returned statistics are at `src/commands/mcp/tools/runEvaluation.ts:103-115,433-478`.
+- **Native wiring:** installed Claude Code 2.1.289 `mcp add --help` and
+  [Claude MCP documentation](https://code.claude.com/docs/en/mcp);
+  installed Codex 0.159.3 `mcp add --help` and
+  [Codex MCP documentation](https://developers.openai.com/codex/mcp).
+  `openai/codex@rust-v0.159.3:codex-rs/rmcp-client/src/utils.rs:16-26`
+  verifies name-only credential forwarding via `env_vars`; `mcp add` alone
+  does not forward it. `config/promptfoo-codex-env.py` reuses
+  `this PR: tools/adoption/new_wsl_client_config.py:1623,1735`
+  and `tools/adoption/apply_codex_lane.py:271`, preserving settings with a
+  compare-and-swap write. Fresh CLI flags were checked in the installed clients;
+  Codex event fields are at `codex-rs/exec/src/exec_events.rs:161,263-293`.
+- **ccusage:** `ccusage/ccusage@d9821088b98aa536c7a385aa1a4579d6fa02269b:docs/guide/installation.md:58,133-148`
+  ([source](https://github.com/ccusage/ccusage/blob/d9821088b98aa536c7a385aa1a4579d6fa02269b/docs/guide/installation.md#L133))
+  and `apps/ccusage/README.md:65-67` document install verification and the two
+  native daily reports. The three copied JSONL files are unchanged from
+  `apps/ccusage/test/fixtures/claude/projects/project-alpha/session-alpha/chat.jsonl:1`,
+  `project-beta/session-beta/chat.jsonl:1` and
+  `apps/ccusage/test/fixtures/codex/sessions/project-alpha/session-alpha.jsonl:1`.
+  The scoped-home native CLI test pattern is at
+  `rust/crates/ccusage/tests/claude_cli.rs:63-86` and `codex_cli.rs:130-146`.
+  The reports hide cost and remain offline; expected totals are numeric fixture
+  observations, not native provider runs. PR #684's verified install is retained.
+- **Syft:** `anchore/syft@cc326e45a6213360266dda4b30cc68095946d676:README.md:48-61`
+  ([source](https://github.com/anchore/syft/blob/cc326e45a6213360266dda4b30cc68095946d676/README.md#L48))
+  documents the actual public-container scan and JSON output.
+  `jdx/mise@v2026.10.0:registry/syft.toml:1` supports the retained user install.
+  [Release checksums](https://github.com/anchore/syft/releases/download/v1.54.0/syft_1.54.0_checksums.txt)
+  supply the Linux archive SHA256
+  `54a87372498168b2d033e876fd41fa4e8035b872699e525a57046e1f2f09c860`.
+  Historical 1.52.0 evidence is kept separate from the new clean-install pin.
+
+
+## Fix wave g8: base, srt, destination gateway and Betterleaks (2026-10-04)
+
+These sources were re-read for the bounded plan repair on `PR #684's head`.
+Upstream acceptance commands below are planned target checks, not new builder executions. Native metadata/help reads,
+source/tarball inspection, syntax checks and project unittests are distinct from WSL/provider acceptance.
+
+- **Canonical base image:**
+  [ubuntu/wsl-setup@73418e32:test/basic-assertions.sh:2-7,22-30](https://github.com/ubuntu/wsl-setup/blob/73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8/test/basic-assertions.sh#L2)
+  accepts the expected default user as argument; the script SHA-256 is
+  `c6e966a2e6041f2e91f4cccc146ee86042af1c052768944927394e23de947fd0`.
+  [test/systemd-assertions.sh:6-33](https://github.com/ubuntu/wsl-setup/blob/73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8/test/systemd-assertions.sh#L6)
+  requires `running` before its multipathd, conditional timesyncd and cloud-init assertions; its SHA-256 is
+  `83f2d89c00e70e994218ed3bed4ae19aee3539934dbe109aff76f9c57cfd2e83`.
+  Both original raw files were fetched and hashed. The separate F1 exception and identifier journal query follow
+  [this PR: adoption/platforms/linux-wsl2-new-distro.md:836-873](../../../adoption/platforms/linux-wsl2-new-distro.md),
+  with the WSL change at [microsoft/WSL PR40621](https://github.com/microsoft/WSL/pull/40621).
+  The image install stays that recipe's W2-W6, separate from Linux acceptance.
+- **srt install and native use:**
+  [anthropics/sandbox-runtime@v0.0.78:README.md:14](https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md#L14),
+  [README.md:166-179](https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md#L166) and
+  [src/cli.ts:276-324](https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/src/cli.ts#L276)
+  supply installation, the unchanged smoke, the settings interface and refusal when an explicit policy cannot load.
+  GitHub's tag API resolves v0.0.78 to `6f0ce155ccb136bda33a8a72201fe7f54fe47d9b`; its
+  [release notes](https://github.com/anthropics/sandbox-runtime/releases/tag/v0.0.78) were checked.
+  The [npm metadata](https://registry.npmjs.org/%40anthropic-ai%2Fsandbox-runtime/0.0.78) and downloaded archive agree on
+  SHA-512 integrity; its independently computed SHA-256 is
+  `a9cf9e35068a4c71d2d94de8b0abe8de51c7d44daef537cc92906848ccc67240`.
+  Fresh-session controls are local integration checks on the executor's existing synthetic fixtures, not unchanged
+  upstream tests. Native Claude Code 2.1.289 help and the original host-1 tool events establish the headless lane;
+  [headless docs](https://code.claude.com/docs/en/headless) are a locator (the worker's direct fetch returned 403).
+  The [2.1.289 changelog](https://github.com/anthropics/claude-code/releases/tag/v2.1.289) was fetched via `gh api`.
+- **Canary composition and unchanged gates:**
+  [OmniRoute@23a11484:package.json:119,134-135,181,253](https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/package.json#L119)
+  and [scripts/build/validate-pack-artifact.ts:215-225](https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/scripts/build/validate-pack-artifact.ts#L215)
+  supply the native test/build/typecheck/pack commands and explicit canary override.
+  [PR13788@6c799005:tests/unit/issue-8674-alpha-search.test.ts](https://github.com/diegosouzapw/OmniRoute/blob/6c7990058c4ce9677de79452c8cefb10b4bf1b3d/tests/unit/issue-8674-alpha-search.test.ts) and
+  [PR15167@0585aba5:tests/unit/codex-gpt6-sol-luna.test.ts:65](https://github.com/diegosouzapw/OmniRoute/blob/0585aba5589d5a1f49243a13a8db249558e7c9e3/tests/unit/codex-gpt6-sol-luna.test.ts#L65)
+  were fetched; the five-file runner is exactly the recorded B5a upstream runner, with no authored tests substituted.
+  The recorded canary (base plus three exact carries) and rollback are in
+  [this PR: wave2-records.json:279-300](../new-wsl-layer-consensus-20261002/wave2-records.json).
+  `config/omniroute-canary-evidence.json` retains sanitized original gate lines, original input hashes and independent
+  historical read-back. It records test counts as null because the original output has no counts.
+- **Gateway state, unit and clients:**
+  [OmniRoute@23a11484:bin/cli/data-dir.mjs:51](https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/bin/cli/data-dir.mjs#L51),
+  [bin/cli/commands/doctor.mjs:630-652](https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/bin/cli/commands/doctor.mjs#L630),
+  [src/app/healthz/route.ts:17](https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/src/app/healthz/route.ts#L17) and
+  [docs/reference/ENVIRONMENT.md:89,158-190,225,1188](https://github.com/diegosouzapw/OmniRoute/blob/23a11484862b3bb589a55e85b00e4ac53ffeb234/docs/reference/ENVIRONMENT.md#L158)
+  were fetched. The plan's unit is an explicit destination adaptation of
+  [this PR: adoption/templates/systemd/omniroute.service:65-97](../../../adoption/templates/systemd/omniroute.service),
+  with the supported foreground CLI, global mise shims, DATA_DIR and separate loopback ports. Native user-manager wiring
+  follows [systemctl daemon-reload](https://www.freedesktop.org/software/systemd/man/259/systemctl.html#daemon-reload).
+  [Codex@rust-v0.160.0:codex-rs/exec/src/cli.rs:36,65](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/exec/src/cli.rs#L36),
+  the installed Codex 0.159.3 `exec --help`, both installed/target release notes, and the fetched
+  [official noninteractive docs](https://developers.openai.com/codex/noninteractive) establish JSONL and ephemeral
+  native turns. The recorded clients-2 turn already passed with the destination profile and keyless placeholder;
+  its original event-count summary is line 18, not the adjudication's line 17. The fixed-prompt check is new and unrun.
+  [PR13788@6c799005:alpha/search/route.ts:136-172](https://github.com/diegosouzapw/OmniRoute/blob/6c7990058c4ce9677de79452c8cefb10b4bf1b3d/src/app/api/v1/alpha/search/route.ts#L136)
+  confirms the search_query-only adapter; open/click/find/screenshot remain unsupported in this carried revision.
+- **Betterleaks installation acceptance and retained gate:**
+  [betterleaks/betterleaks@v1.9.0:Makefile:15-16](https://github.com/betterleaks/betterleaks/blob/v1.9.0/Makefile#L15),
+  [go.mod:3-5](https://github.com/betterleaks/betterleaks/blob/v1.9.0/go.mod#L3),
+  [README.md:57](https://github.com/betterleaks/betterleaks/blob/v1.9.0/README.md#L57) and
+  [release notes](https://github.com/betterleaks/betterleaks/releases/tag/v1.9.0) were read.
+  GitHub's v1.9.0 tag API resolves to `81aff7a638638aae3a659845d089043e1d8fe9ac`.
+  [jdx/mise@v2026.10.0:docs/cli/exec.md:8-15](https://github.com/jdx/mise/blob/v2026.10.0/docs/cli/exec.md#L8)
+  supports supplying the toolchain for one command without moving the global Go configuration.
+  Betterleaks was not found on this builder's PATH; no binary acceptance or credential scan is claimed.
+  An Opus check the coordinator relayed (not a user statement) keeps gitleaks 8.30.1 required until
+  [this PR: 2026-10-02-github-automation-practice.md:40-57](../../../docs/decisions/2026-10-02-github-automation-practice.md)
+  P1 passes; the review's immediate hook/CI migration is deliberately not implemented. P1 is due before 2026-10-20.
+
+The provided `fixes.json` was absent from the read-only input directory. The original adjudication, host-1 and
+GPT-runtime executor/review records plus an Opus check the coordinator relayed for Betterleaks (not a user statement) supplied this wave's instructions.
+The earlier job-030 patch/report was inspected; its changed slots do not include these four, so no unrelated hunk was ported.
+Scoped ai-memory retrieval with pin priority and limit two was unavailable because the MCP call required approval under
+this job's never-approval policy. Context Mode tools were not exposed in this session's enabled tool list; bounded native reads and RTK handled output.

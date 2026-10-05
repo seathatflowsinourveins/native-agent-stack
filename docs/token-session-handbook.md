@@ -196,6 +196,12 @@ Checked on 2026-09-26 against Context Mode 1.0.169 at the reviewed revision `6f0
 
 ### Token lanes carried into subagents
 
+**Held out of the default since 2026-10-04.** The carriers are this repository's own adaptation, so the user's clean-install
+directive removes both hooks from the shared settings template, the default install copies none of their files, and a settings
+re-apply retires a hook entry a host already has ([decision](decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md);
+opt in with [`adoption/hooks/claude/README.md`](../adoption/hooks/claude/README.md)). The files and the text below stay as the
+reference until the command center's A/B at the operating point decides.
+
 The following sentences are the source of truth for the portable
 [`token-lanes-block.md`](../adoption/hooks/claude/token-lanes-block.md) carrier and its role blocks.
 Tool contracts cite upstream; selection thresholds and accounting rules are local
@@ -290,7 +296,7 @@ Sources: the evidence sentence follows [Claude Code best practices, L52](https:/
 
 ### Token lanes carried into the main session
 
-Since 2026-10-04 the settings template runs
+From 2026-10-04 until it was held out the same day (see above), the settings template ran
 [`token-lanes-session-start.py`](../adoption/hooks/claude/token-lanes-session-start.py) at SessionStart for
 `startup|resume|clear|compact|fork`, every source the [hooks guide](https://code.claude.com/docs/en/hooks#sessionstart)
 documents (read 2026-10-04; resume and fork run SessionStart hooks again). The script returns its sibling

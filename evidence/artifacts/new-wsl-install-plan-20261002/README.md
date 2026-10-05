@@ -2,7 +2,7 @@
 
 **Run the plan from a checkout of the repository** (step F7, "Clone origin/main", of `adoption/platforms/linux-wsl2-new-distro.md`). `worktrunk` and the convergence validators change into `repo_root`, the checkout three levels above this folder, so `install.sh` and `accept.sh` stop with a clear message when `repo_root` is not a git checkout (`install.sh --list` needs none).
 
-Revised to the merged definitive manifest (`evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json`) and to what the plan did on a real distribution. The inventory has one row per foundation row of that manifest: 80 rows, of which 56 are installed (54 by the default run, two of them interim installs, which wait for the wave-2 acknowledgements: section "Wave 2" below; and two only when named with `--only <slot>`), three are measurement-only (installed only by `--only <slot>`, for the measurement that decides them) and 21 are not installed. [VALIDATION.md](VALIDATION.md) keeps three results apart: the round 1 container run of the first plan (historical), the run of the previous revision in a throwaway distribution, and the clean run of this revision in a fresh throwaway distribution on 2026-10-02 (12:54Z to 13:17Z), recorded in [real-distribution-validation.json](real-distribution-validation.json). Both distribution runs were on one host, in distributions that were removed afterwards. Later on 2026-10-02 the plan's 64-row revision, as merged to main (`6652b78e`), ran once on the destination distribution, the one meant to stay; the record of that run is private, its public receipt comes with that distribution's acceptance, and this folder records no result of it. `python3 -B check_plan.py` checks that `install-plan.json`, `owners.json`, both scripts, `mise.toml`, `config/` and the manifest agree.
+Revised to the merged definitive manifest (`evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json`) and to what the plan did on a real distribution. The inventory has one row per foundation row of that manifest: 80 rows, of which 57 are installed (55 by the default run, two of them interim installs, which wait for the wave-2 acknowledgements: section "Wave 2" below; and two only when named with `--only <slot>`), three are measurement-only (installed only by `--only <slot>`, for the measurement that decides them) and 20 are not installed. [VALIDATION.md](VALIDATION.md) keeps three results apart: the round 1 container run of the first plan (historical), the run of the previous revision in a throwaway distribution, and the clean run of this revision in a fresh throwaway distribution on 2026-10-02 (12:54Z to 13:17Z), recorded in [real-distribution-validation.json](real-distribution-validation.json). Both distribution runs were on one host, in distributions that were removed afterwards. Later on 2026-10-02 the plan's 64-row revision, as merged to main (`6652b78e`), ran once on the destination distribution, the one meant to stay; the record of that run is private, its public receipt comes with that distribution's acceptance, and this folder records no result of it. `python3 -B check_plan.py` checks that `install-plan.json`, `owners.json`, both scripts, `mise.toml`, `config/` and the manifest agree.
 
 Six of the 70 rows were added after the clean run: five from the layer consensus of 2026-10-02 (`docs/decisions/2026-10-02-new-wsl-layer-consensus.md`) and `statusline` from its wave-2 batch of 2026-10-03, which also turned three rows into interim installs and revised four more. All three results above are about the 64 rows that existed then. The install and acceptance commands of the rows added or revised since (sections "Rows from the layer consensus" and "Wave 2" below) have not run anywhere, on any distribution; those sections say what was checked instead. Ten more rows came from the wave-3 batch of 2026-10-04, the owner's decision, which also turned `ccusage`, `session-analytics` and `context-supply` into owner defaults and widened `code-search` to both arms of its confirmatory (section "Wave 3" below); their commands have not run anywhere either.
 
@@ -25,12 +25,12 @@ Both scripts refuse root. Installation selects dependencies, isolates owner fail
 
 A row is installed by the default run when the manifest row says it installs something, its outcome is not `not_installed` and its state is not `split`, or when it carries an interim install (amendment 3 of the manifest's decision rule, 2026-10-03): an interim installs beside a decided default that installs nothing, whatever that row's state, so code search (split), durable memory (waiting for its measurement) and context supply (a definitive no-install row) install their interims, while their decided defaults stay as the rounds recorded them. `check_plan.py` requires the plan to install every interim the manifest records, with the interim's owner and repository, and requires each interim row's install function to call `interim_acknowledged` first. Two rows the manifest marks as installing are not: MCP Inspector (run on demand with `npx`; mcporter owns MCP calls from scripts) and the base distribution (the image the plan runs on). Two installed rows are left out of the default run: the local-model rows, which create their models through the model server that the plan does not start.
 
-- 42 rows are installed by default, three of them interim installs: ai-memory (`memory-owner`), semble (`code-search`) and context-mode (`context-supply`).
+- 55 rows are installed by default, two of them interim installs: ai-memory (`memory-owner`) and semble plus SocratiCode (`code-search`). Context-mode (`context-supply`), ccusage and session analytics are wave-3 owner defaults; Promptfoo is the wave-4 owner default from the additive fix-wave integration.
 - The two local-model rows (`local-generation-model`, `embedding-model`; manifest state `measurement`, returned) are installed only when named. The default run and the default acceptance skip them and print `skipped`. Once the model server answers on 127.0.0.1:21434 and reports version 0.35.0, `bash install.sh --only local-generation-model` (likewise `embedding-model`) installs one, `bash accept.sh --only <slot>` checks its files and `bash accept.sh --only <slot> --stage service_health` checks the created model through the server.
 - Loki, Grafana and Playwright CLI are measurement-only (manifest state `split`). The default run and the default acceptance skip them and print `skipped`. `bash install.sh --only loki` (likewise `grafana`, `playwright-cli`) installs one for the measurement, and `bash accept.sh --only <slot>` checks it.
-- 23 rows are not installed and keep a row with `installed: false`, `route: none` and the manifest's reason in `notes`: 14 with manifest outcome `not_installed` (the LSP plugins, reranker model, trafilatura, web search provider, ccusage, Phoenix, session analytics, Promptfoo, CodeQL SARIF, GPU container runtime, trufflehog, Claude Code Action, structural diff and chezmoi); agent messaging (split, waiting for a measurement); the container-boundary decision (nothing extra); attest and Dependabot (GitHub-hosted features: nothing is installed on the host); MCP Inspector and the base distribution; and three rows of the layer consensus: the research skill (waits for its activation gate), credential custody (waits for its measurement) and cross-family review (nothing additional installed).
+- 20 rows install no persistent package: `research-skill`, `mcp-inspector`, `agent-messaging`, `isolation-container-boundary`, `claude-plugins-official-code-intelligence-lsp-pl`, `reranker-model`, `trafilatura`, `web-search-provider`, `phoenix`, `attest`, `dependabot`, `codeql-sarif`, `gpu-container-runtime`, `trufflehog`, `credential-custody`, `claude-code-action`, `agent-structural-diff`, `cross-family-review`, `chezmoi`, `base-distribution`. Inspector runs on demand; base-distribution is an environment prerequisite with Canonical checks; cross-family-review executes native after-sign-in checks without another install. The other 17 rows have no acceptance function.
 
-An excluded row has no install or acceptance function; `accept.sh` prints `slot | stage | skipped` for it, and `install.sh` prints nothing.
+An excluded row without acceptance has no install or acceptance function; `accept.sh` prints `slot | stage | skipped` for it, and `install.sh` prints nothing. MCP Inspector is the on-demand exception: it retains a pinned launch command and a Node prerequisite, has no persistent install function, and runs its acceptance only with `--only mcp-inspector`. The default acceptance still skips it.
 
 `install-plan.json` schema version 2 stores acceptance as an object with up to three stage keys. Each check retains `command`, `kind` and `source`:
 
@@ -40,15 +40,15 @@ An excluded row has no install or acceptance function; `accept.sh` prints `slot 
 
 Output is `slot | stage | exit-code`. An excluded or measurement-only row in the default run, an absent stage or an unavailable host check prints `slot | stage | skipped`, and so does the `local-model-server` row's `after_sign_in` check until the `embedding-model` row has created the model it calls; a skip does not certify acceptance and does not fail the script. A selected executable check failing with any nonzero status makes the script exit 1. Application stdout stays suppressed to avoid printing private diagnostic/model data; stderr and status are retained.
 
-All 44 installed rows have a `post_install` entry: 28 smoke/configuration checks (two of them the local-model rows' file checks), 15 version checks and one explicit unavailable check, the credential guard, a repository practice with no installed host executable (`command: null`, `kind: unavailable`, a cited source and a reason). Ten installed rows have a service check (two of them the local-model rows' checks through the model server) and seven have a check after sign-in or model provisioning. The three measurement-only rows add three post-install checks and two service checks.
+All 57 installed rows have a `post_install` entry: 41 smoke/configuration checks, 13 version checks, two unavailable checks (credential guard and token-lane carriers), and one upstream-tests/native-smoke entry. Thirteen installed rows have a service stage and 18 have an after-sign-in/model-provisioning stage. The three measurement-only rows add three post-install, two service and one after-sign-in stage. Inspector adds two on-demand stages, base-distribution adds one prerequisite stage, and cross-family-review adds one native-client stage. Together these are 98 primary stage entries plus the two G1 additional native checks, 100 checks in total; the JSON carries 161 command entries, including the on-demand Inspector launch.
 
-Version-only post-install checks: Codex; Claude Agent SDK; Codex SDK; Ollama; Inspect AI; Harbor; actionlint (kjanat); Dagu; Docker Compose; Docker Engine; Git; gh; difftastic; Restic; OpenHands SDK/tools (and Grafana, measurement-only). SDK checks report package versions. GPT Researcher is checked by importing the source checkout and reporting its declared package version, because this route installs requirements rather than distribution metadata; its row is one row with DeerFlow (the manifest's `research-harnesses` slot), and since wave 2 the post-install check imports both gatherers and runs the research script's fail-closed preflight in one shell, so a failure in the first stops the rest. DeerFlow runs as its embedded client (`DeerFlowClient`), with no service, port or Compose stack; its check after sign-in is a short research run through the destination gateway.
+Version-only post-install checks: codex; claude-agent-sdk; codex-sdk-and-codex-exec-app-server; local-model-server; inspect-ai; harbor-containerized-agent-e2e-runner; actionlint-kjanat; dagu; docker-compose; container-engine; git; gh-github-cli; restic. SDK checks report package versions. GPT Researcher is imported from its pinned checkout and performs the fail-closed preflight; the combined research-harnesses row also runs unchanged DeerFlow client tests and checks its configured model. DeerFlow runs as its embedded `DeerFlowClient`, with no service, port or Compose stack; its after-sign-in stage performs actual research alongside GPT Researcher. OpenHands 1.50.1 runs unchanged upstream SDK and cross tests. Difftastic now has a structural fixture and failure control, and Grafana measurement-only acceptance uses native APIs.
 
 ## Routes and lifecycle
 
 Ubuntu's own `apt` package is Git's route. The base image/prerequisite installation already supplies it; rerunning this owner is idempotent. The Ubuntu candidate is not pinned to upstream Git v2.56.0. There is no PPA or source build.
 
-Installed route counts: native-installer 4; none 10; npm-global 4; uv-tool 5; mise 10; release-binary 4; apt-repo 2; apt 1; repository-recipe 2; model-server 2 (a label added with the two local-model rows: their models are created through the running model server). The measurement-only rows add one npm-global and two release-binary. The enum still lacks precise library/venv, local npm, skills-installer and marketplace labels; existing classification notes remain.
+Installed route counts: native-installer 4; none 14; npm-global 4; uv-tool 8; mise 10; model-server 2; release-binary 8; repository-recipe 3; apt-repo 2; apt 1; source-build 1. The measurement-only rows add one npm-global and two release-binary. The enum retains the existing library/venv, local-npm, skills-installer and marketplace classification limitations.
 
 `mise.toml` retains the exact global tools (ten: ast-grep 0.45.3 is new, chezmoi is gone) and Node 24.21.0, Python 3.13.16 and uv 0.12.22 pins. `install.sh` merges them through `mise use -g`. Noninteractive diagnostics add mise shims to the process PATH without changing the shell. Doctor runs in the owned global tool directory so selecting only mise does not require the inventory's optional tools. Playwright's pinned CLI (measurement-only) installs its own bundled Chromium; the real browser open/close smoke explicitly selects that browser. OmniRoute service-health requires `/readyz` to succeed before its full doctor; doctor alone can warn about a stopped service and return zero.
 
@@ -77,9 +77,61 @@ Added after the clean run, from `evidence/artifacts/new-wsl-layer-consensus-2026
 - **`skill-authoring` installs one folder for Claude Code only.** `skill-creator` from `anthropics/skills` at the record's commit `8a1541c4a3ffa5a20a5a91de0dcf3f0bab1d1ef4`, with `-a claude-code` and `--copy`. Nothing is installed for Codex and no same-name copy is placed for it: Codex embeds its own `skill-creator`, and the installer's shared directory `$HOME/.agents/skills` is the one it uses for Codex's global skills. The acceptance fails when `skill-creator` exists in that directory or in Codex's own global skills directory, `${CODEX_HOME:-$HOME/.codex}/skills` (the installer's README, line 298), a dangling symbolic link included; Codex keeps its embedded skills under `skills/.system`, which the check leaves alone. It also requires the installer's listing, run without an agent filter so that it reports every agent the installer detects, to name Claude Code as the only agent of `skill-creator`.
 - **Both pins are commits.** The installer documents no commit syntax in its README. Its source at the pinned installer commit first tries the ref as a branch or tag and then fetches a 40-character commit directly ([SOURCES.md](SOURCES.md), last section). That path is read from source and has not been exercised by this plan.
 - **Their acceptance follows the `engineering-process-skills` row.** The installer's own listing must name the skill for each intended agent (for `skill-authoring`, Claude Code and no other agent), and the `skillFolderHash` in the installer's lock file must equal the git tree hash of the folder at the pinned commit (`76a98a285cb0434f3d39e1a873823556330e398b` and `3cf9a8db32597ba3e24b584a3d696f4e11c7d7b6`, read from the GitHub tree API on 2026-10-02). It does not hash the installed directories and says nothing about a client loading or invoking a skill.
-- **`research-skill`, `credential-custody` and `cross-family-review` install nothing.** Each has `installed: false`, no command and no acceptance. Their `notes` give the activation gate, the deciding measurement and the open gate from the record. The plan carries no install command for a measurement arm.
+- **`research-skill` and `credential-custody` install nothing.** Each has `installed: false`, no command and no acceptance. Their `notes` give the activation gate and the deciding measurement from the record. The plan carries no install command for a measurement arm.
+- **`cross-family-review` installs no additional component.** The native client rows supply it. Its `acceptance_only` row now runs both native review directions after sign-in; the destination qualification gate still requires independent dispositions and later verification (the Git fix wave below).
 
 What was checked for these rows is static, and is listed in [VALIDATION.md](VALIDATION.md): `check_plan.py`, `bash -n`, `install.sh --list` and the two acceptance programs against stand-ins. For `skill-authoring` those stand-ins are now a committed test (`tests/test_new_wsl_definitive_defaults.py`, class `SkillAuthoringAcceptance`) that runs the program `accept.sh` runs and plants each of its conditions on its own. **The two install commands and the two acceptance checks have not run anywhere.** Their first run is owed in a throwaway distribution before the destination.
+
+## Git fix wave (2026-10-04)
+
+These three rows repair the verified E2E's plan gaps. The change is source and
+local integration work; it does not rerun acceptance on a WSL distribution.
+
+- **Worktrunk 0.80.0.** The mise pin stays. Installation now runs the upstream
+  `wt config shell install bash --yes`, `wt config plugins claude install --yes`
+  and `wt config plugins codex install --yes`. The post-install check requires
+  enabled native plugin listings and an active `wt` function in fresh Bash, then
+  exercises the upstream create/switch/list/remove examples in a disposable
+  repository with its own Git identity and configuration. A dirty-removal control
+  must fail while preserving the worktree; clean removal must delete its branch
+  and directory. The selected claude-hud statusline stays. Worktrunk's Codex plugin
+  provides guidance and activity tracking; its automatic worktree isolation is
+  Claude-only, so Codex uses the CLI lifecycle directly.
+- **Difftastic 0.71.0.** The mise pin stays. Two unchanged upstream JavaScript
+  fixtures are installed from `config/`, with their SHA256 checked on every run.
+  The installed binary must report `Has syntactic changes`, identify JavaScript,
+  return 1 with `--exit-code` on the changed pair and return 0 on the identical
+  input. A Text fallback fails the check. These are the inputs/assertions of
+  upstream `tests/cli.rs`, parameterized for the installed binary; the Rust suite
+  is not executed. No global Git external-diff or difftool setting is selected.
+- **Cross-family review.** `installed: false` continues to mean no additional
+  package. `acceptance_only: true` makes the existing client capability execute
+  instead of being in the skipped-slot loop. After sign-in, GPT Sol at max reviews
+  Claude commit `8c32a84b246da66e43a6188c973741b09329e223` using
+  `codex exec review --commit` without a positional prompt; Opus at max reviews
+  Codex commit `b9dbe3c5a09cdefca435cd78c7f3dad46ca883a4` through native headless diff
+  input. Both commits' author-family trailers and their immutable parents are
+  checked. The complete event streams, stderr, diff, final GPT review and before/
+  after worktree observations stay in private state outside the checkout. Native
+  sign-ins remain native. The smoke requires both reviews to complete; the
+  coordinator still must bind actual model and effort, independently disposition
+  every finding and retain later verification before closing the qualification
+  gate. Requested model/effort flags alone do not establish the actual route.
+
+Worktrunk and difftastic also gain `after_sign_in` checks. Each starts fresh
+`claude -p` and `codex exec` sessions and requires the actual successful shell-tool
+result of its functional post-install program, plus a complete successful turn.
+A final answer or a version report alone fails. Complete streams are retained
+under `${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/` with
+private permissions. These checks need the existing native client sign-ins; they
+install no review service and publish nothing. `--stage after_sign_in` executes
+these checks, including when running the full stage.
+
+The selected Worktrunk profile already named 0.80.0. The stack and architecture
+release cells now agree with it; their historical 0.79.0 receipts keep their
+original scope. [SOURCES.md](SOURCES.md) names the exact upstream references, and
+the [decision](../../../docs/decisions/2026-10-04-2604-e2e-fix-wave-g7-git.md) records
+the adjudication corrections, local returned results and remaining host gate.
 
 ## The two local-model rows (2026-10-03)
 
@@ -108,8 +160,294 @@ From the wave-2 batch of the layer consensus (`consensus.json`, key `wave2`, wit
 
 From the wave-3 batch of the layer consensus (`consensus.json`, key `wave3`), the owner's decision of 2026-10-04 under amendment 4 of the manifest's decision rule, relayed by `docs/decisions/2026-10-04-token-full-stack-owner-default.md`. The pins are those of `manifests/stack.json` and `adoption/pins-linux-x86_64.json` at `f77a35eb`. After main's PR #693 (2026-10-04) those files pin RTK 0.51.0 and mcporter 0.14.2, and this plan follows them. Every tool installs under the ecosystem root the client templates name, `${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}`: release archives and npm tarballs through `fetch_verified` against the recorded sha256 (no `gh release download`, so no GitHub sign-in), archives extracted whole into `tools/<tool>-<version>` (bundled licenses kept), npm packages with `npm install --global --prefix tools/<tool>-<version>` from the verified tarball, uv tools with `UV_TOOL_DIR` and `UV_TOOL_BIN_DIR` in the root, and each command linked into `${ECO_ROOT}/bin`. Sources are in [SOURCES.md](SOURCES.md), section "Wave 3", and the checks that ran in [VALIDATION.md](VALIDATION.md), section "Wave 3".
 
-- **Ten owner rows** in token-efficiency: `command-output` (RTK 0.51.0, the musl release archive; the hook is the client configuration's), `output-compression` (Headroom 0.37.0 with the `[mcp]` extra, MCP server only), `code-index` (jcodemunch-mcp 1.108.319), `code-graph` (codebase-memory-mcp 0.11.0, the release archive; neither its `install.sh` nor its `install` subcommand runs), `repo-packing` (Repomix 1.18.1), `structured-data` (TOON 4.1.1), `doc-conversion` (MarkItDown 0.1.8, the base converter), `api-docs` (Context Hub 0.1.4, telemetry and feedback off), `trace-viewer` (otel-tui 0.7.5, on demand, no service) and `token-lane-carriers` (written by the client configuration; its function only says so).
+- **Ten owner rows** in token-efficiency: `command-output` (RTK 0.51.0, the musl release archive; the hook is the client configuration's), `output-compression` (Headroom 0.37.0 with the `[mcp]` extra, MCP server only), `code-index` (jcodemunch-mcp 1.108.327, selected in `manifests/stack.json`; [W1 qualification](../../receipts/jcodemunch-1108327-qualification-20261003.json)), `code-graph` (codebase-memory-mcp 0.11.0, the release archive; neither its `install.sh` nor its `install` subcommand runs), `repo-packing` (Repomix 1.18.1), `structured-data` (TOON 4.1.1), `doc-conversion` (MarkItDown 0.1.8, the base converter), `api-docs` (Context Hub 0.1.4, telemetry and feedback off), `trace-viewer` (otel-tui 0.7.5, on demand, no service) and `token-lane-carriers` (written by the client configuration; its function only says so).
 - **Owner defaults**: `ccusage` (20.0.26, a read-only meter) and `session-analytics` (agentsview 0.43.0, a local archive only, telemetry and the update check off) now install; `context-supply` keeps its commands and checks and no longer calls `interim_acknowledged`, since its authority is the owner's decision and not amendment 3.
 - **`code-search`** installs SocratiCode 1.15.0 beside semble (its npm tarball with `--ignore-scripts --before=2026-09-24T12:00:00Z`, into the prefix the client templates run), keeps its gate, and its check reads SocratiCode's version from `package.json`, never by running it. SocratiCode serves nothing until the client configuration names a Qdrant store and an embedding endpoint, which no row installs yet.
 - **The gate** `interim_acknowledged` reads every wave batch and refuses while any of them owes an acknowledgement; an owner batch owes none.
 - **Not run.** None of these commands has run on any distribution. The four release archives and the five npm tarballs were downloaded to a scratch folder and matched their recorded sha256 on 2026-10-04, and the four archive checks passed against the archives' binaries there (VALIDATION.md); that is no installation.
+
+## G1 client plan repairs (2026-10-04)
+
+The bounded repair covers `codex-sdk-and-codex-exec-app-server`,
+`engineering-process-skills` and `skill-authoring`. Pins and owner selections stay
+as selected. The source comparisons and remaining host gates are in
+[the G1 decision](../../../docs/decisions/2026-10-04-2604-e2e-fix-wave-g1-clients.md).
+This revision has not run on a WSL distribution.
+
+- **SDK and app-server.** After native Codex sign-in, run
+  `accept.sh --only codex-sdk-and-codex-exec-app-server --stage after_sign_in`.
+  It runs the documented SDK quickstart with `new Codex()` and its default bundled
+  binary, followed by the native `codex debug app-server send-message-v2` client.
+  Require two result lines ending in `after_sign_in | 0`. The protocol check
+  requires initialize, thread/start, turn/start, a `Completed` notification and
+  the requested reply. The client starts a short-lived stdio child. Its exit
+  status alone permits a failed turn, so completion is checked explicitly. Output
+  is captured before grep to let the client finish writing its trace summary.
+- **Engineering skills.** Run the install from the operator shell outside a
+  Claude session. Before the existing manifest installer, the upstream Skills
+  CLI removes only `domain-modeling`, `setup-matt-pocock-skills`, `grill-me`,
+  `improve-codebase-architecture` and `semgrep`. The existing settings writer
+  merges the three retired names as `off` from
+  `config/engineering-process-skills.settings.json`, retaining other settings.
+  Post-install acceptance keeps the selected-skill hash/lock check and rejects
+  excluded listing names, remaining folders or dangling client links, stale lock
+  entries and incorrect retired-name overrides. Repeat fresh `tdd` invocation
+  in both clients and verify that all five excluded names are absent. The held
+  `agent-browser` selection keeps its existing gate.
+- **Skill authoring.** Install PyYAML 6.0.3 into the selected mise Python through
+  upstream `uv pip install --python`. Post-install acceptance has two independent
+  result lines: the existing Claude-only listing, tree and placement check, and
+  both tools' unchanged upstream `quick_validate.py` scripts through the
+  session-default `python -B`, against the pinned installed `find-skills` folder.
+  The second check first runs native `codex debug prompt-input` with stdout
+  discarded to initialize Codex's embedded cache through its own skills loader
+  on a clean home.
+  Require both lines ending in `post_install | 0`. Bytecode stays disabled so the
+  checks preserve the installed skill trees. A missing validator or Python
+  dependency fails the second check. Codex keeps its embedded creator; no shared
+  same-name creator is installed.
+
+The Skills CLI listings of the two owned skills rows write to a regular temporary
+file before jq reads them. Skills 1.7.0 calls `process.exit` after printing JSON;
+Node's POSIX pipe writes can still be pending at exit. A file avoids that
+truncation. The earlier repair's `skill-discovery` hunk belongs to another builder.
+
+Additional native checks are declared under a stage's `additional_checks` and
+run through a slot-owned helper. `check_plan.py` verifies the helper's stage,
+command, source and call from its owning function for these two client slots.
+The existing `SkillAuthoringAcceptance` fixtures continue to test the inventory
+and placement check; they are separate from the upstream Python validators.
+
+Inventory and validator success establish narrower properties than authoring
+quality. Complete creation and evaluation in fresh native sessions in disposable
+workspaces. Each client uses its installed skill-creator for authoring and
+validation. Promptfoo owns paired skill verification in both clients, with
+its upstream SDK harness and the pinned skill-comparison fixture. Retain
+actual artifacts and results. This patch adds no model benchmark or destination
+READY receipt.
+
+## G3 code and document plan repairs (2026-10-04)
+
+These changes serve code navigation and local document reading for the research and historical-simulation north star. They are recipe changes following the verified E2E's GPT review and the Opus adjudications; this builder performs no distribution installation, model inference or native sign-in. [The decision](../../../docs/decisions/2026-10-04-2604-e2e-fix-wave-g3-code-docs.md) and [SOURCES.md](SOURCES.md) retain the sources and remaining live checks.
+
+- **Serena.** The plan now installs commit `c6fbd1c5932df2494ffa0020af5a9fbe80b82143`, the `2.0.0.dev0` source already selected by the stack, profile and architecture. Before indexing, it adds `python` to the project's effective language-server list through `.serena/project.local.yml`, using upstream's YAML load/save helpers and retaining other overrides and languages. The upstream `serena init` check uses an isolated `SERENA_HOME`; `serena project health-check` checks the actual checkout's symbols and references. Step F8's existing client writer supplies the native `serena` MCP command with the Claude Code and Codex contexts. After that wiring and native sign-in, `after_sign_in` starts one fresh session per client and requires successful returned `find_symbol` and `find_referencing_symbols` results for `scripts/host_receipts.py:register_file`.
+- **Structural search.** The same mise-installed ast-grep 0.45.3 binary runs the unchanged README's `-r '$A?.()'` preview as well as search. The check requires the replacement text and a no-match control returning exactly 1. It uses neither `-U` nor `-i`, so the preview writes no source file. The Opus adjudication rejected the proposed source-build coverage stage; this recipe adds no Rust toolchain. Existing CLI wiring through PATH stays sufficient under that adjudication.
+- **MinerU.** The base 4.0.10 package uses CPU-capable ONNX and llama.cpp, and the row now records `needs.gpu: false`. The installer disables telemetry, installs the pinned upstream `mineru` skill for Claude Code and Codex, downloads and verifies Standard models, sets the managed tier before managed mode, and fetches upstream's public `demo1.pdf` by commit and sha256. The slot's own `config/mineru-skills-manifest.json` uses the existing repository installer's supported `--manifest` route because the shared adoption skills manifest is outside this builder's ownership. `post_install` retains upstream's `mineru --help`, adds pinned skill/list/placement checks and verifies model files. Skills CLI JSON goes to a regular file before parsing. Start the upstream server explicitly, then run `service_health`: healthy local Standard support, successful parse, and a read of the returned page locator must all pass, with first-page text containing `afforestation`. `after_sign_in` repeats parse and read through the skill in fresh sessions of both clients and checks actual successful tool output.
+
+Installation temporarily starts doclib for telemetry and configuration, then stops only the server it started. Run the persistent MinerU lifecycle in this order after installation:
+
+```sh
+mineru server start
+bash accept.sh --only mineru --stage service_health
+bash accept.sh --only mineru --stage after_sign_in
+bash accept.sh --only serena --stage after_sign_in
+```
+
+The native sessions use the clients' existing configuration and sign-ins. MinerU commands stay local and never add `--remote`. Parser assertions and native JSONL assertions are project integration checks; `init`, `health-check`, `--help`, model verification and the published rewrite example remain identified by their upstream sources. Private returned parse results and native streams are retained under `${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/`, with restrictive permissions, outside this checkout. A fresh host still owes these actual returned results; static recipe validation proves no host is READY.
+
+## G4 observability repair (2026-10-04)
+
+The [G4 decision](../../../docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md)
+and [sources](SOURCES.md#g4-observability-repair-2026-10-04) describe the three
+bounded plan repairs. Their revised native commands are **UNRUN** on a distribution.
+The coordinator has recalculated the shared current inventory above; historical run counts remain dated.
+
+Collector installation and native validation use the same data environment:
+`NS2604_OBSERVABILITY_DATA`, defaulting to
+`${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/observability`.
+The installer creates the owned queue and SDK-receipt directories. A clean
+configuration includes native privacy and metric/log export pipelines; the
+existing native client configuration map retains both clients' HTTP21318
+endpoint. Existing operator pipelines are preserved. Only the exact obsolete
+`/otelcol/queue` directory is migrated, with a backup and native validation.
+The foreground service must receive that same data environment.
+
+Grafana OSS 13.2.3 gains native datasource/dashboard provisioning and a loopback
+anonymous Viewer. Run `install.sh --only grafana` explicitly for finalization
+while its canonical selection remains split; Loki must also be installed and
+running for the log/receipt views. The six hourly Claude targets keep `[1h]` and
+now evaluate at `1m`. `service_health` checks native API operations, including
+the Alertmanager frontend plugin's proxied `/api/v2/status`. `after_sign_in`
+exercises fresh Claude telemetry and the existing native SDK worker, writes only
+a sanitized receipt, then requires observed values from those six Claude and
+three SDK receipt queries through `/api/ds/query`. Static post-install checks
+alone do not certify dashboard readiness. The maintained Prometheus startup
+feature flags for first counter samples are recorded in the G4 decision and
+must be carried by the service owner.
+
+Alerting retains the sink until a private destination file exists. The user
+chooses ntfy.sh (recommended; alert text leaves the host), Telegram or an on-host
+destination. The plan never reads or prints those private files. The default
+webhook pointer is
+`${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack/alertmanager-webhook-url`;
+`NATIVE_STACK_ALERT_URL_FILE` may supply another absolute pointer. The file must
+be owned, regular, singly linked and `0600`, in an owned `0700` directory outside
+every worktree. The user writes the ntfy URL with `?template=alertmanager` through
+their own terminal; do not put a URL/topic value in repository configuration or
+an agent prompt. `NATIVE_STACK_ALERT_RECEIVER=telegram` instead uses
+`alertmanager-telegram-token` and `alertmanager-telegram-chat-id` in that store,
+with optional `NATIVE_STACK_ALERT_BOT_TOKEN_FILE` and
+`NATIVE_STACK_ALERT_CHAT_ID_FILE` pointer overrides. `on-host` uses the same native
+webhook pointer and an independently qualified local receiver.
+
+After supplying the chosen files, rerun `install.sh --only alerting`, then deploy
+the changed Prometheus and Alertmanager configs through the destination's
+existing unit owner. The measured destination used `ns2604-*` observability
+units; the earlier `ecosystem-*` note was not a deployed unit inventory. Existing
+operator configuration that differs from the known source is retained and
+reported for its owner to merge. This installer starts no service.
+
+Alerting post-install acceptance uses upstream amtool and native promtool rule
+validation/unit tests; install the Prometheus owner before selecting that check.
+Native delivery acceptance is `--only alerting --stage after_sign_in`. It prints
+`needs_user` and skips when the destination files are absent. Once wired, it
+posts an expiring tagged alert, exercises the empty file-SD fixture using a
+confirmed closed loopback port, restores the empty target list and observes
+notification counters plus rule firing/resolution. It returns pending until
+a user attestation reports both received notifications for the emitted
+`acceptance_id`. The user may record that nonsecret confirmation in
+`$config_root/alerting-receiver-confirmation.json`:
+
+```json
+{"acceptance_id":"<the returned test id>","firing_received":true,"resolved_received":true,"confirmed_by":"user"}
+```
+
+Rerun the same stage within 30 minutes; it accepts the matching bounded receipt
+without sending another test. A local readiness result or notification counter
+does not substitute for this receiver attestation. This CLI checks the attestation fields and binding; it cannot independently verify who wrote the file. Stale or mismatched pairs are archived and a fresh delivery test runs automatically. Loki ruler evaluation remains
+explicitly deferred to that slot's owner. The synthetic promtool inputs are
+separate from these real delivery observations.
+
+## G5 analytics and evaluation acceptance (2026-10-04)
+
+The G5 plan repair keeps agentsview 0.43.0, Inspect AI 0.3.273 and Harbor 0.23.0. It follows the independent review for session analytics and the Opus adjudications for the two evaluation CLIs. The source pins, upstream operations and local assertions are in [SOURCES.md](SOURCES.md), section "G5 analytics and evaluation sources", and the decision is [2026-10-04-2604-e2e-fix-wave-g5-analytics-eval.md](../../../docs/decisions/2026-10-04-2604-e2e-fix-wave-g5-analytics-eval.md). These are plan changes; this builder ran no installation, service, provider evaluation or container trial on a distribution.
+
+- **Session analytics.** The verified release installs behind an owned launcher in both the ecosystem bin and `~/.local/bin`. Every invocation uses the owned archive directory, telemetry off, update checks off and upstream `archive_content=usage`. The supported `CLAUDE_PROJECTS_DIR` and `CODEX_SESSIONS_DIR` variables select the active Claude and Codex homes, including explicit `CLAUDE_CONFIG_DIR` and `CODEX_HOME` overrides. The archive configuration binds to `127.0.0.1:8080`; start it with `agentsview daemon start`, inspect it with `agentsview daemon status`, and stop it with `agentsview daemon stop`. Installation starts no daemon. The service stage runs upstream sync, session listing and daily usage reporting for both clients, requires nonempty session and token data, and retains their actual output privately. `--offline` uses fallback pricing; its costs are estimates.
+- **Harbor.** Installation also checks out the unchanged upstream `hello-user` task at the release's exact commit, since the wheel contains no examples. After rootless Docker starts, the service stage runs one oracle and one nop trial through `harbor run`, with `DOCKER_HOST=unix://$XDG_RUNTIME_DIR/docker.sock` explicit. It requires no model credential: the fixture pulls `ubuntu:24.04`. The upstream test's exception and verifier-reward assertions require 1.0 for oracle and 0.0 for nop; the local artifact checks also read each native `verifier/reward.txt` and require the positive reward gate to reject nop. Fresh run directories retain native job/trial results, verifier output and logs.
+- **Inspect AI.** The uv tool environment explicitly includes the optional provider SDK, `openai==3.24.0`. Installation checks out the unchanged `examples/theory_of_mind.py` at Inspect's exact release commit. The stage after sign-in evaluates one sample through the existing loopback gateway and `openai-api/omniroute/cx/gpt-6.1-sol`, then repeats it with an absent model. Inspect's own `inspect log dump --header-only` reads both logs. The positive gate requires success, one completed sample and nonempty scores; the negative run must produce an error log rejected by that same gate. Preserve the native logs and both control exit codes. This checks execution and scoring; no accuracy threshold is imposed. The keyless loopback uses a non-secret placeholder. If gateway authentication was enabled by the operator, provide `OMNIROUTE_API_KEY` through the existing credential runner.
+
+The E2E coordinator must create fresh sessions in both native clients for the session-analytics gate. Record an RFC3339 UTC timestamp before those sessions and retain their native IDs from the client receipts. Export that timestamp as `AGENTSVIEW_ACCEPT_STARTED_AT`, the Claude archive ID as `AGENTSVIEW_ACCEPT_CLAUDE_ID`, and the canonical Codex archive ID (`codex:<native-id>`) as `AGENTSVIEW_ACCEPT_CODEX_ID`. Then run:
+
+```sh
+bash accept.sh --only session-analytics
+bash accept.sh --only session-analytics --stage service_health
+bash accept.sh --only session-analytics --stage after_sign_in
+bash accept.sh --only harbor-containerized-agent-e2e-runner
+bash accept.sh --only harbor-containerized-agent-e2e-runner --stage service_health
+bash accept.sh --only inspect-ai
+bash accept.sh --only inspect-ai --stage after_sign_in
+```
+
+The fresh-session check requires each exact ID, the expected agent, messages and a start time at or after the recorded boundary. A missing ID, empty archive or historical session fails. An absent-session lookup supplies a retained failing control. Both analytics stages retain their records under the private user state directory; publish only sanitized receipts.
+
+Harbor and Inspect are CLIs with no declared MCP, plugin or hook wiring. Under the adjudication, provider-backed native-agent trials and fresh Claude/Codex shell invocation of Inspect are further E2E work, rather than their READY gates. In particular, a Harbor codex trial through OmniRoute still needs proof that its container reaches the loopback-only gateway. A claude-code arm would need native OAuth setup and is outside the credential-free Harbor gate. Version checks remain prerequisite evidence, and these planned functional stages require actual host execution before READY can be recorded.
+
+
+## Verified E2E fix: evaluation, usage and supply (2026-10-04)
+
+The bounded `fix-wave-g6-eval-supply` changes only `promptfoo`, `ccusage` and
+`syft`, on PR #684's head. The [decision](../../../docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md)
+records original evidence, primary sources, alternatives and the remaining
+coordinator integration work. These plan changes have not run on any WSL
+distribution. Earlier inventory totals and no-install descriptions above are
+historical; their shared count/header updates belong to the coordinator.
+
+- **Promptfoo 0.123.1** now installs as the wave-4 owner default (the owner's repository-quality rule; decide round 2 named promptfoo for paired skill verification), also serving gateway/LLM A/B.
+  Its npm tarball is verified and its optional MCP SDK is included. The native
+  STDIO server is registered with Claude Code in user scope and with Codex.
+  Codex's native `env_vars` forwards the name `GATEWAY_API_KEY`, without storing
+  its value, using the repository's existing preserving TOML merge/writer.
+  Post-install acceptance runs unchanged upstream positive/failing smoke
+  fixtures and checks actual results, including the failing control's exit 100.
+  The echo fixtures qualify evaluator plumbing only. For real acceptance,
+  edit `$config_root/promptfoo-gateway.yaml` to use the two exact GPT/Claude
+  model IDs served by the existing gateway; its loopback default is
+  `http://127.0.0.1:21128/v1`. The keyless default uses a literal placeholder. Supply `GATEWAY_API_KEY`
+  only when the operator enables gateway authentication. An existing configuration is retained. Run the slot's
+  `after_sign_in` stage: it requires an uncached two-provider evaluation plus
+  successful `run_evaluation` results observed in fresh Claude/Codex sessions.
+  Missing route identities or inherited auth are recorded as `needs_user`.
+  The plan and `owners.json` now follow the definitive manifest as written.
+  The checker rejects a Promptfoo install when the manifest excludes it.
+- **ccusage 20.0.26** keeps PR #684's two install commands and pin. Post-install
+  acceptance now runs both documented native daily reports on unchanged
+  upstream fixtures, checking exact token/cache totals offline with costs
+  hidden. The CLI needs no MCP server or hook. Its `after_sign_in` stage requires
+  fresh native sessions to invoke the absolute ecosystem executable, native
+  successful shell events and non-empty finalized daily reports from both
+  clients. The existing client sign-ins are the only account prerequisite.
+- **Syft 1.54.0** keeps its supported mise install. The allowed foundation,
+  profile and stack pins now match the plan. The documented public-image scan
+  must return a real non-empty SBOM containing `alpine-baselayout`; version and
+  source identity are checked separately. The slot has no MCP/hook or defined
+  fresh-session gate. Its historical trading records and three CI workflows
+  are retained for their respective owners to reconcile.
+
+Fresh-session output stays under private `$config_root/*-acceptance` directories
+with mode 0700. It is an integration observation, separate from unchanged
+upstream source suites and fixture checks. A fixture pass, a version check or
+agent prose does not establish live-provider or destination-host readiness.
+
+
+## Base, per-job isolation, GPT gateway and secret-scan installation acceptance (2026-10-04)
+
+Fix wave `fix-wave-g8-base-gateway` changes only these four slots. Its decision is
+[`2026-10-04-2604-e2e-fix-wave-g8-base-gateway.md`](../../../docs/decisions/2026-10-04-2604-e2e-fix-wave-g8-base-gateway.md).
+The recipes below require target execution by the coordinator; this builder ran no command on a WSL distribution,
+no gateway operation and no credential read. The earlier global counts and run histories above remain historical.
+
+- **`base-distribution`** remains the already installed environment, with no Linux package-install command.
+  Canonical's signed-image installation remains the Windows-side W2-W6 recipe in
+  [`linux-wsl2-new-distro.md`](../../../adoption/platforms/linux-wsl2-new-distro.md).
+  `accept.sh --only base-distribution` now runs both unchanged Canonical `wsl-setup` 0.6.3 assertion scripts at
+  `73418e32bb48d514c2c2853fa7e5cacdcaf3dfe8`, with their downloaded bytes bound to SHA-256. It takes the expected
+  default user from `WSL_USER` or `[user] default` in `/etc/wsl.conf`, and retains each script's exit code separately.
+  The upstream systemd test may exit 1. The F1 integration exception passes only for exactly
+  `systemd-binfmt.service` failed and the identifier-selected boot log's read-only binfmt flush diagnostic.
+  Its remaining upstream assertions then run separately; the script's exit 1 stays an upstream failure.
+  Interop records `cmd.exe`'s own exit and its version line. F3 failed OpenHands user units belong to the runtime-worker
+  owner. No extra client-session check applies to an OS image.
+- **`sandbox-runtime-srt`** keeps the upstream `npm install -g @anthropic-ai/sandbox-runtime@0.0.78` route and
+  `srt echo "hello world"` smoke. The stack, profile, tarball checksum and architecture selectors now match 0.0.78.
+  `accept.sh --only sandbox-runtime-srt --stage after_sign_in` adds a fresh Claude native Bash execution of that smoke
+  and the documented `srt --settings` policy form. Set `SRT_ACCEPT_FIXTURE_ROOT`, `SRT_ACCEPT_POLICY`,
+  `SRT_ACCEPT_DENY_READ`, `SRT_ACCEPT_DENY_WRITE` and `SRT_ACCEPT_ALLOWED_DIR` to existing disposable synthetic fixtures,
+  all within the fixture root. `SRT_ACCEPT_DENIED_URL` defaults to `https://example.com` and must be denied by that
+  policy. Unsandboxed read/write/network controls and a sandboxed allowed write must succeed; all three denied
+  operations must fail. Returned native tool-use/result events must show the successful recipe, rather than a
+  version call or model prose. `SRT_ACCEPT_CLIENT=codex` runs the recommended second client proof using native Codex
+  command-execution events. The runtime-worker owner must additionally retain a per-job `check_report` or exit 0 under
+  srt; a journal start alone is insufficient. Per-job isolation remains the wiring; no global policy or session-wide
+  sandbox is introduced.
+- **`gpt-gateway`** now installs the recorded canary composition: `release/v3.8.52 @23a11484`, the two pinned
+  PR13788 commits and PR15167 `0585aba5`. `config/omniroute-canary-install.sh` uses upstream `npm ci`, the five
+  unchanged carried Node test files, `typecheck:core`, `build:release`, the canary-enabled `check:pack-artifact`,
+  `npm pack` and user-prefix npm installation. It refuses an unrelated existing alias or a different existing unit.
+  It installs `config/omniroute.service` as a user unit with DATA_DIR under `~/.local/share/omniroute` and loopback
+  ports 21128/21129/21131, reloads the manager, and leaves startup separate:
+  `systemctl --user enable --now omniroute.service`. The existing new-WSL client-config writer renders the Codex
+  `omniroute` profile on 21128; it does not render systemd units. Claude keeps native sign-in and invokes GPT lanes
+  through that Codex profile. Fresh accounts sign in natively with the absolute canary CLI and
+  `--base-url http://127.0.0.1:21128 oauth start --provider codex --no-browser` only when absent.
+  Both doctor checks call `~/.local/bin/omniroute` explicitly with the service's DATA_DIR and port; `/readyz` must pass
+  before the liveness doctor. `--stage after_sign_in` uses the nonsecret `keyless-loopback` placeholder and requires
+  exit 0, native `turn.completed` and the fixed response. `config/omniroute-canary-evidence.json` binds the original
+  B5a gate exits, package digest, independent canary read-back and already passing clients-2 Codex turn.
+  That turn used a skills task, not this new fixed-prompt recipe. The five-test counts remain unknown.
+  npm 3.8.51 remains rollback; the workstation's separately qualified 3.8.50 registry pin stays a separate scope.
+- **`betterleaks`** keeps v1.9.0 through mise. `accept.sh --only betterleaks` runs the unchanged upstream
+  `make test` target at `81aff7a6` with the upstream Go 1.25.12 toolchain through process-scoped `mise exec`, then
+  a redacted native directory smoke limited to the plan. `make` and a C compiler are prerequisites; the default full
+  plan supplies them through its research and srt dependencies. This qualifies installation only.
+  **Gitleaks 8.30.1 remains the required CI and shared pre-commit scanner.** No hook migration occurs in this wave.
+  Preregistered P1 must qualify betterleaks v1.9.0 before 2026-10-20; the parity corpus, class-loss rule and blocking
+  false-positive rule remain in `docs/decisions/2026-10-02-github-automation-practice.md`.
+
+Sources and evidence boundaries are in the corresponding fix-wave section of [SOURCES.md](SOURCES.md).
+The base row now has acceptance despite installing nothing; `check_plan.py` scopes this exception to that row alone.
+The row order, owners table and installation counts are unchanged. The coordinator owns shared narrative/count updates,
+evidence-registry digests and the upstream-freshness snapshot following the srt selector move.
+
+## Integrated fix-wave boundary (2026-10-04)
+
+[The coordinator decision](../../../docs/decisions/2026-10-04-2604-e2e-fix-wave.md) records all 25 slot repairs, conflict resolutions, canonical Promptfoo owner-batch reconciliation, sources and remaining host gates. The revised merged recipes are UNRUN on a distribution. Earlier per-row statements are historical; no static integration check certifies the destination.

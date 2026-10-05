@@ -36,7 +36,7 @@
       "poppler",
       "tavily-cli"
     ],
-    "api_commands": 277,
+    "api_commands": 284,
     "api_nonzero_results": 8,
     "corrected_invalid_archive_digest_ref_attempts": 2,
     "newer_stable_release_review_queue": [
@@ -53,7 +53,7 @@
       }
     ],
     "recommendation": "Retain current qualified pins; review the four newer stable releases against actual capability gaps before upgrading. Refresh canonical Headroom identity in future manifest maintenance without treating its transfer as a functional replacement.",
-    "selected_component_api_commands": 260,
+    "selected_component_api_commands": 267,
     "initial_star_delta_commands": 1,
     "complete_star_snapshot_commands": 7,
     "added_candidate_source_screen_commands": 9,
@@ -5115,8 +5115,8 @@
       "component_id": "omniroute",
       "repository": "https://github.com/diegosouzapw/OmniRoute",
       "selected_repository_url": "https://github.com/diegosouzapw/OmniRoute",
-      "selected_version": "3.8.50",
-      "selected_source_pin": "5458026c216f77a3da68ea49152dc33470cfe2cb",
+      "selected_version": "3.8.51",
+      "selected_source_pin": "c1e30b7676975feb298b49eff6ff58923c04b89e",
       "checks": [
         {
           "endpoint": "repos/diegosouzapw/OmniRoute",
@@ -5149,33 +5149,81 @@
           "ended_at": "2026-09-21T22:34:38.087224+00:00",
           "stdout_sha256": "2853efc153b9758b22d675764e9a63854bd31a2f2453492248e3c97a99c8e50e",
           "status": "ok"
+        },
+        {
+          "endpoint": "repos/diegosouzapw/OmniRoute",
+          "exit_code": 0,
+          "started_at": "2026-10-03T03:56:36.986832+00:00",
+          "ended_at": "2026-10-03T03:56:37.296746+00:00",
+          "stdout_sha256": "3aa39e7aa570c91da9d553f3e67955991fd44f08f2f88b56018140a47615ffe1",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/diegosouzapw/OmniRoute/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-10-03T03:56:37.297180+00:00",
+          "ended_at": "2026-10-03T03:56:37.627452+00:00",
+          "stdout_sha256": "f7ac7cb7bb1026d82e934bbdd36321c1dcc491f08dd6362919fcc11710537091",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/diegosouzapw/OmniRoute/commits/c1e30b7676975feb298b49eff6ff58923c04b89e",
+          "exit_code": 0,
+          "started_at": "2026-10-03T03:56:37.629036+00:00",
+          "ended_at": "2026-10-03T03:56:38.313072+00:00",
+          "stdout_sha256": "7e2a08c858091abb160f75e637194a6afc700481b8f95fffc069931c6d664267",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/diegosouzapw/OmniRoute/commits/v3.8.51",
+          "exit_code": 0,
+          "started_at": "2026-10-03T03:56:38.321226+00:00",
+          "ended_at": "2026-10-03T03:56:38.959431+00:00",
+          "stdout_sha256": "7e2a08c858091abb160f75e637194a6afc700481b8f95fffc069931c6d664267",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/diegosouzapw/OmniRoute/git/ref/tags/v3.8.51",
+          "exit_code": 0,
+          "started_at": "2026-10-03T03:56:38.967575+00:00",
+          "ended_at": "2026-10-03T03:56:39.219144+00:00",
+          "stdout_sha256": "b1dc972305ec00533bd98e3adee57f72482f0a9e2bc6830a4f9003f513f24588",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/diegosouzapw/OmniRoute/git/tags/770faa7144f58ada625afc6efe572c8335484ec4",
+          "exit_code": 0,
+          "started_at": "2026-10-03T04:00:18.140192+00:00",
+          "ended_at": "2026-10-03T04:00:18.412671+00:00",
+          "stdout_sha256": "1b1bb4b696d8cc780f42bfa8d6b7b7ab13d21fcd8d8116a742d12501c404e3f4",
+          "status": "ok"
         }
       ],
       "canonical_repository": "https://github.com/diegosouzapw/OmniRoute",
       "archived": false,
       "disabled": false,
-      "default_branch": "release/v3.8.51",
-      "pushed_at": "2026-09-21T22:33:22Z",
+      "default_branch": "release/v3.8.52",
+      "pushed_at": "2026-10-02T18:26:57Z",
       "license_spdx": "MIT",
       "latest_stable_release": {
-        "tag_name": "v3.8.50",
-        "published_at": "2026-08-26T19:30:30Z",
-        "html_url": "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.50",
-        "target_commitish": "main",
+        "tag_name": "v3.8.51",
+        "published_at": "2026-09-30T01:41:50Z",
+        "html_url": "https://github.com/diegosouzapw/OmniRoute/releases/tag/v3.8.51",
+        "target_commitish": "release/v3.8.52",
         "prerelease": false,
         "draft": false
       },
       "selected_pin_source": {
-        "ref": "5458026c216f77a3da68ea49152dc33470cfe2cb",
-        "sha": "5458026c216f77a3da68ea49152dc33470cfe2cb",
-        "html_url": "https://github.com/diegosouzapw/OmniRoute/commit/5458026c216f77a3da68ea49152dc33470cfe2cb",
-        "committed_at": "2026-08-26T19:29:05Z"
+        "ref": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+        "sha": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+        "html_url": "https://github.com/diegosouzapw/OmniRoute/commit/c1e30b7676975feb298b49eff6ff58923c04b89e",
+        "committed_at": "2026-09-29T22:58:13Z"
       },
       "latest_release_source": {
-        "ref": "v3.8.50",
-        "sha": "5458026c216f77a3da68ea49152dc33470cfe2cb",
-        "html_url": "https://github.com/diegosouzapw/OmniRoute/commit/5458026c216f77a3da68ea49152dc33470cfe2cb",
-        "committed_at": "2026-08-26T19:29:05Z"
+        "ref": "v3.8.51",
+        "sha": "c1e30b7676975feb298b49eff6ff58923c04b89e",
+        "html_url": "https://github.com/diegosouzapw/OmniRoute/commit/c1e30b7676975feb298b49eff6ff58923c04b89e",
+        "committed_at": "2026-09-29T22:58:13Z"
       },
       "status": "metadata_checked",
       "adoption_recommendation": "retain_selected_pending_capability_comparison",

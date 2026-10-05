@@ -32,6 +32,7 @@ BLOCK = HOOK.with_name("token-lanes-block.main.md")
 SUBAGENT_HOOK = HOOK.with_name("token-lanes-subagent-start.py")
 SHA256SUMS = HOOK.with_name("SHA256SUMS")
 TEMPLATE = ROOT / "adoption/templates/claude.settings.template.json"
+ENTRIES = HOOK.with_name("held-out-hook-entries.json")
 HANDBOOK = ROOT / "docs/token-session-handbook.md"
 SECTION = "Token lanes carried into the main session"
 BUDGET_BYTES = 2_600
@@ -170,19 +171,30 @@ class MainBlockTextTests(unittest.TestCase):
 
 
 class RegistrationTests(unittest.TestCase):
-    def template(self, home: str) -> dict:
-        return json.loads(string.Template(TEMPLATE.read_text(encoding="utf-8")).safe_substitute(HOME=home))
+    """The carrier is held out of the default (docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md):
+    its registration is the opt-in entries file, and the default template and the default install carry none of it."""
 
-    def test_sha256sums_rows_match_and_the_installer_copies_both(self):
+    def template(self, home: str) -> dict:
+        return json.loads(string.Template(ENTRIES.read_text(encoding="utf-8")).safe_substitute(HOME=home))
+
+    def test_sha256sums_rows_match_and_the_installer_copies_both_when_named(self):
         rows = {name: digest for digest, name in
                 (line.split() for line in SHA256SUMS.read_text(encoding="utf-8").splitlines())}
         for path in (BLOCK, HOOK):
             with self.subTest(name=path.name):
                 self.assertEqual(rows[path.name], icp.sha256_of(path))
                 self.assertEqual(icp.expected_sha256(path), icp.sha256_of(path))
-                self.assertEqual(icp.HOOKS[path.name], path)
+                self.assertEqual(icp.HELD_OUT_HOOKS[path.name], path)
+                self.assertNotIn(path.name, icp.HOOKS)
 
-    def test_template_registers_one_group_that_merges_once(self):
+    def test_the_default_template_and_install_carry_neither_carrier_hook(self):
+        template_text = TEMPLATE.read_text(encoding="utf-8")
+        for name in (HOOK.name, SUBAGENT_HOOK.name):
+            with self.subTest(name=name):
+                self.assertNotIn(name, template_text)
+                self.assertNotIn(name, icp.HOOKS)
+
+    def test_the_held_out_entries_register_one_group_that_merges_once(self):
         import apply_claude_settings as acs
         with tempfile.TemporaryDirectory() as tmp:
             template = self.template(tmp)
@@ -198,7 +210,8 @@ class RegistrationTests(unittest.TestCase):
                 if event != "SessionStart":
                     with self.subTest(event=event):
                         self.assertNotIn(HOOK.name, json.dumps(event_groups))
-            memory = next(hook for group in template["hooks"]["SessionStart"] for hook in group["hooks"]
+            default = json.loads(string.Template(TEMPLATE.read_text(encoding="utf-8")).safe_substitute(HOME=tmp))
+            memory = next(hook for group in default["hooks"]["SessionStart"] for hook in group["hooks"]
                           if "--event session-start" in hook["command"])
             for initial in ({}, {"hooks": {"SessionStart": [{"matcher": "", "hooks": [memory]}]}}):
                 merged = initial
@@ -208,7 +221,7 @@ class RegistrationTests(unittest.TestCase):
                             for hook in group["hooks"]]
                     with self.subTest(existing=bool(initial), application=application):
                         self.assertEqual(keys.count(acs.command_key(wanted)), 1)
-                        self.assertEqual(keys.count(acs.command_key(memory["command"])), 1)
+                        self.assertEqual(keys.count(acs.command_key(memory["command"])), 1 if initial else 0)
                         if application == 2:
                             self.assertEqual(merged, previous)
 

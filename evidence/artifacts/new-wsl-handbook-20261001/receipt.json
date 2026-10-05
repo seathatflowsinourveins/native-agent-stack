@@ -4,10 +4,10 @@
   "source_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
   "evidence_class": "local_integration",
   "generator_sha256": "8a66e5eebe1429924d62545e2eee389f1fdd58e6c2f679d8280cec3e99027cf8",
-  "profile_sha256": "e5d642448e19c0bd02d643febf7d2491fe45e789e81dd966cf883f46f0b66fa2",
+  "profile_sha256": "1e191e6cf9f96399bde37894f287fb296ebd08d1d6291914ca9362d7ffc207e9",
   "outputs": {
-    "docs/new-wsl-handbook.md": "70a675d0dcbb7406b467db83d954915897b852ae6a98487dad82d6b991c3bed7",
-    "docs/new-wsl-handbook.json": "2f202e979c3fcc38c2c27fcf37b1fbeace82dad6d124578d7f8c7bcbe81540c4"
+    "docs/new-wsl-handbook.md": "216c20f07d8283ccbfc47bfe2219a102b53a32caea744d83834ee4f8d0b589a2",
+    "docs/new-wsl-handbook.json": "de1f2ab30c51683e4b693244d636350e5cbece234e0c3452ecd2f9ca88bebb62"
   },
   "inventory": {
     "layers": 37,
@@ -55,6 +55,14 @@
       "date_utc": "2026-10-04",
       "recorded_at_utc": "2026-10-05T01:51:22.461149+00:00",
       "scope": "Local regeneration for PR #642 merge with main e871259e; generated-byte verification, with no destination installation or upstream execution claimed.",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "returned_status": "written"
+    },
+    {
+      "date_utc": "2026-10-05",
+      "recorded_at_utc": "2026-10-05T03:39:08.219114+00:00",
+      "scope": "Local regeneration for PR #642 merge round 3 with main 4c897418f; generated-byte verification only, with no destination installation or upstream execution claimed.",
       "command": "python3 scripts/build_new_wsl_handbook.py --write",
       "native_exit_code": 0,
       "returned_status": "written"
@@ -135,5 +143,6 @@
     "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
     "adoption/new-wsl-profile.json",
     "docs/decisions/2026-10-01-new-wsl-handbook-generator.md"
-  ]
+  ],
+  "repair_round": "this PR: bounded job 058, 2026-10-04; hashes regenerated in place, destination acceptance remains owed"
 }

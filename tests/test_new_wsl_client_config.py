@@ -46,6 +46,188 @@ from tests import test_wsl_new_distro_recipe as recipe_tests  # noqa: E402
 MAP = ROOT / cfg.MAP_REL
 MANIFEST = ROOT / cfg.MANIFEST_REL
 PLAN = ROOT / cfg.PLAN_REL
+
+
+class ObservabilityMigrationRepairTests(unittest.TestCase):
+    """Synthetic integration control; does not claim native collector acceptance."""
+
+    def test_migrated_operator_pipelines_survive_reruns_and_are_never_owned(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config"
+            config.mkdir()
+            binary = root / "otelcol-contrib"
+            binary.write_text("#!/bin/sh\nexit 0\n")
+            binary.chmod(0o700)
+            original = "extensions:\n  file_storage:\n    directory: /otelcol/queue\nservice:\n  pipelines:\n    operator-custom: {}\n"
+            target = config / "otel.yaml"
+            target.write_text(original)
+            env = {**os.environ, "PATH": str(root) + os.pathsep + os.environ["PATH"],
+                   "NS2604_OBSERVABILITY_DATA": str(root / "data")}
+            command = [sys.executable, str(PLAN / "config/observability_config.py"), "otel",
+                       "--config-root", str(config), "--source-root", str(PLAN / "config")]
+            first = subprocess.run(command, env=env, capture_output=True, text=True)
+            self.assertEqual(first.returncode, 0, first.stderr)
+            migrated = target.read_text()
+            self.assertIn("operator-custom", migrated)
+            self.assertNotIn("/otelcol/queue\n", migrated)
+            ledger_path = config / ".g4-source-digests.json"
+            ledger = json.loads(ledger_path.read_text())
+            self.assertNotIn("otel.yaml", ledger)
+            second = subprocess.run(command, env=env, capture_output=True, text=True)
+            self.assertEqual(second.returncode, 0, second.stderr)
+            self.assertEqual(target.read_text(), migrated)
+            # Recover the old erroneous ownership ledger using the retained migration backup.
+            ledger["otel.yaml"] = hashlib.sha256(migrated.encode()).hexdigest()
+            ledger_path.write_text(json.dumps(ledger))
+            third = subprocess.run(command, env=env, capture_output=True, text=True)
+            self.assertEqual(third.returncode, 0, third.stderr)
+            self.assertEqual(target.read_text(), migrated)
+            self.assertNotIn("otel.yaml", json.loads(ledger_path.read_text()))
+
+    def test_operator_custody_survives_template_pristine_and_missing_file(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config"
+            config.mkdir()
+            target = config / "otel.yaml"
+            ledger_path = config / ".g4-source-digests.json"
+            # A synthetic pristine value exercises the same digest branch as an
+            # operator restoring the earlier template; no collector is executed.
+            pristine = "service:\n  pipelines:\n    operator-restored: {}\n"
+            script = root / "observability_config.py"
+            script.write_text((PLAN / "config/observability_config.py").read_text().replace(
+                '"otel.yaml": "1bcdf496537bab925fd39b42fd5b2b8226e2d4fb4f95b3aaba1d52e23c3d731f"',
+                '"otel.yaml": "' + hashlib.sha256(pristine.encode()).hexdigest() + '"'))
+            command = [sys.executable, str(script), "otel", "--config-root", str(config),
+                       "--source-root", str(PLAN / "config")]
+            for text in (pristine, (PLAN / "config/otel.yaml").read_text(), None):
+                with self.subTest(restored=text is not None):
+                    ledger_path.write_text(json.dumps({"otel.yaml": "old-owned-digest",
+                                                       "operator_migrations": {"otel.yaml": "migrated"}}))
+                    if text is None:
+                        target.unlink()
+                    else:
+                        target.write_text(text)
+                    result = subprocess.run(command, capture_output=True, text=True,
+                                            env={**os.environ, "NS2604_OBSERVABILITY_DATA": str(root / "data")})
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertNotIn("otel.yaml", json.loads(ledger_path.read_text()))
+                    self.assertEqual(target.read_text() if target.exists() else None, text)
+
+
+class GatewayCanaryBindingRepairTests(unittest.TestCase):
+    """Synthetic package controls; no gateway binary or provider is executed."""
+
+    def test_canary_binding_rejects_rollback_foreign_and_mismatched_builds(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            tool_root = Path(tmp) / "tools"
+            build = tool_root / "omniroute-canary-fixture"
+            (build / "source").mkdir(parents=True)
+            package = build / "prefix/lib/node_modules/omniroute"
+            (package / "bin").mkdir(parents=True)
+            (package / "dist").mkdir()
+            binary = package / "bin/omniroute"
+            binary.write_text("#!/bin/sh\nprintf '3.8.52\\n'\n")
+            binary.chmod(0o700)
+            marker = package / "dist/BUILD_SHA"
+            metadata = package / "package.json"
+            receipt = json.loads((PLAN / "config/omniroute-canary-evidence.json").read_text())
+            expected = receipt["composition"]
+            # Synthetic git output keeps this a local binding test, rather than
+            # claiming an upstream source checkout or gateway build was accepted.
+            shim = Path(tmp) / "git"
+            shim.write_text("#!/bin/sh\nprintf '" + receipt["reproduction"]["source_tree"] + "\\n'\n")
+            shim.chmod(0o700)
+            env = {**os.environ, "PATH": tmp + os.pathsep + os.environ["PATH"]}
+            command = [sys.executable, str(PLAN / "config/omniroute-canary-check.py"), str(binary),
+                       str(PLAN / "config/omniroute-canary-evidence.json"), str(tool_root)]
+            for name, version, sha, code in (("omniroute", "3.8.52", expected["recorded_build_sha"], 0),
+                                             ("omniroute", "3.8.51", expected["recorded_build_sha"], 1),
+                                             ("foreign", "3.8.52", expected["recorded_build_sha"], 1),
+                                             ("omniroute", "3.8.52", "foreign-build", 1)):
+                with self.subTest(name=name, version=version, sha=sha):
+                    metadata.write_text(json.dumps({"name": name, "version": version}))
+                    marker.write_text(sha)
+                    result = subprocess.run(command, capture_output=True, text=True, env=env)
+                    self.assertEqual(result.returncode, code, result.stderr)
+            metadata.write_text(json.dumps({"name": "omniroute", "version": "3.8.52"}))
+            marker.write_text(expected["recorded_build_sha"])
+            shim.write_text("#!/bin/sh\nprintf 'foreign-tree\\n'\n")
+            self.assertEqual(subprocess.run(command, capture_output=True, env=env).returncode, 1)
+            shim.write_text("#!/bin/sh\nprintf '" + receipt["reproduction"]["source_tree"] + "\\n'\n")
+            outside = Path(tmp) / "foreign"
+            shutil.copytree(package, outside)
+            command[2] = str(outside / "bin/omniroute")
+            self.assertEqual(subprocess.run(command, capture_output=True, env=env).returncode, 1)
+
+
+class AlertingAttestationRepairTests(unittest.TestCase):
+    """Cached receipt controls, without delivery, secrets or service operations."""
+
+    def test_invalid_attestation_is_retained_and_does_not_block_a_fresh_test(self):
+        rows = json.loads((PLAN / "install-plan.json").read_text())["owners"]
+        row = next(r for r in rows if r["slot"] == "alerting")
+        command = row["acceptance"]["after_sign_in"]["command"]
+        cache = "receipt=" + command.split("\nreceipt=", 1)[1].split("\nfixture=", 1)[0]
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in ("alertmanager.yaml", "prometheus.yaml", "prometheus-alerts.yaml"):
+                (root / name).write_text("synthetic nonsecret config\n")
+            config_digest = hashlib.sha256(b"".join((root / name).read_bytes() for name in (
+                "alertmanager.yaml", "prometheus.yaml", "prometheus-alerts.yaml"))).hexdigest()
+            for stale, mismatched in ((True, False), (False, True), (False, False)):
+                with self.subTest(stale=stale, mismatched=mismatched):
+                    receipt = {"observed_unix": time.time() - (3600 if stale else 0),
+                               "acceptance_id": "synthetic-id", "config_sha256": config_digest,
+                               "rule_fired": True, "rule_resolved": True, "notification_delta": 1}
+                    confirmation = {"acceptance_id": "different" if mismatched else "synthetic-id",
+                                    "firing_received": True, "resolved_received": True, "confirmed_by": "user"}
+                    (root / "alerting-delivery-receipt.json").write_text(json.dumps(receipt))
+                    (root / "alerting-receiver-confirmation.json").write_text(json.dumps(confirmation))
+                    result = subprocess.run(["bash", "-euo", "pipefail", "-c", cache +
+                                             '\nprintf "FRESH_DELIVERY_TEST\\n"'], capture_output=True, text=True,
+                                            env={**os.environ, "config_root": str(root)})
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    if stale or mismatched:
+                        self.assertIn("FRESH_DELIVERY_TEST", result.stdout)
+                        self.assertFalse((root / "alerting-delivery-receipt.json").exists())
+                        self.assertTrue(list(root.glob("alerting-stale.*/alerting-delivery-receipt.json")))
+                    else:
+                        self.assertNotIn("FRESH_DELIVERY_TEST", result.stdout)
+                        self.assertIn("user_attestation; provenance_not_verified", result.stdout)
+
+
+class SrtWriteRepairNegativeControlTests(unittest.TestCase):
+    def test_a_bypassed_write_policy_cannot_pass_the_native_recipe(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            allowed = root / "allowed"
+            allowed.mkdir()
+            protected, unreadable, policy = (root / name for name in ("protected", "unreadable", "policy.json"))
+            for fixture in (protected, unreadable, policy):
+                fixture.write_text("synthetic fixture\n")
+            # A synthetic srt enforces the read control but bypasses write protection.
+            shim = root / "srt"
+            shim.write_text('#!/bin/bash\nif [[ "$1" == --settings ]]; then shift 2; fi\n'
+                            'if [[ "$1" == -- ]]; then shift; fi\n'
+                            'if [[ "$1" == cat ]]; then exit 1; fi\nexec "$@"\n')
+            shim.chmod(0o700)
+            curl = root / "curl"
+            curl.write_text("#!/bin/sh\nexit 0\n")
+            curl.chmod(0o700)
+            source = (PLAN / "config/srt-client-accept.sh").read_text()
+            recipe = source.split("<<'SRT'\n", 1)[1].split("\nSRT\n", 1)[0]
+            env = {**os.environ, "PATH": str(root) + os.pathsep + os.environ["PATH"],
+                   "SRT_ACCEPT_POLICY": str(policy), "SRT_ACCEPT_DENY_READ": str(unreadable),
+                   "SRT_ACCEPT_DENY_WRITE": str(protected), "SRT_ACCEPT_ALLOWED_DIR": str(allowed),
+                   "SRT_ACCEPT_DENIED_URL": "https://example.com"}
+            result = subprocess.run(["bash", "-c", recipe], env=env, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 1, result.stderr)
+            self.assertIn("SRT_ALLOW_WRITE_CONTROL=passed", result.stdout)
+            self.assertIn("SRT_DENY_READ_EXIT=1", result.stdout)
+            self.assertIn("sandboxed write", protected.read_text())
+            self.assertNotIn("SRT_NATIVE_USE_OK", result.stdout)
 EXAMPLE_HOST = "example"
 
 # A synthetic stand-in for the claude client: --version and `mcp get|add|remove` against a JSON file under $HOME, in the
@@ -539,8 +721,8 @@ class ManifestRuleTests(unittest.TestCase):
         planned = {slot for slot, row in plan.items() if row["installed"]}
         self.assertEqual(installing - planned, {"mcp-inspector", "base-distribution"})
         self.assertEqual(planned - installing, set())
-        # The 44 previously installed rows plus wave 3's ten new rows, ccusage and session-analytics.
-        self.assertEqual(len(planned), 56)
+        # The 56 wave-3 installs plus the wave-4 Promptfoo owner default (the repository-quality rule).
+        self.assertEqual(len(planned), 57)
 
     def test_a_split_slot_that_is_changed_to_installing_wires_its_piece_and_back(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -921,19 +1103,16 @@ class RenderTests(unittest.TestCase):
             self.assertTrue(source.is_file(), name)
             self.assertEqual(hashlib.sha256(source.read_bytes()).hexdigest(), icp.expected_sha256(source), name)
 
-    def test_the_token_lane_carriers_are_held_out_of_the_clean_default(self):
+    def test_the_token_lane_carriers_are_held_out_of_the_shared_template_and_the_default_install(self):
         # The carriers are this repository's own adaptation, not a feature of an upstream tool, so the owner's directive of
-        # 2026-10-04 (a clean install: upstream installers with upstream defaults) holds them out of the new distribution:
-        # the two hook entries and the nine files install_claude_profile.py copies are unwired, and no rendered file other
-        # than the wiring record runs or names one.
-        carriers = [v for v in cfg.analyse(ROOT)[0] if "token-lanes" in v.piece.key]
-        self.assertEqual(len(carriers), 11, [v.piece.key for v in carriers])
-        for v in carriers:
-            self.assertFalse(v.wired, v.piece.key)
-            self.assertIn("own adaptation", v.reason)
+        # 2026-10-04 (a clean install: upstream installers with upstream defaults) holds them out of every host's default
+        # (docs/decisions/2026-10-04-claude-template-holds-out-token-lane-carriers.md): the shared Claude settings template
+        # registers neither hook and install_claude_profile.py copies none of the nine files unless a caller names it, so
+        # the builder has no carrier piece to wire or to leave unwired, and no rendered file, the wiring record included,
+        # runs or names one.
+        self.assertEqual([v.piece.key for v in cfg.analyse(ROOT)[0] if "token-lanes" in v.piece.key], [])
         for name, text in self.files.items():
-            if name != "wiring.json":
-                self.assertNotIn("token-lanes", text, name)
+            self.assertNotIn("token-lanes", text, name)
 
     def test_a_checksum_that_does_not_match_fails_the_check_and_the_install(self):
         def wrong_for_the_guard(source):
@@ -1058,7 +1237,7 @@ class InstructionBlockTests(unittest.TestCase):
         verdicts = {v.piece.key: v for v in results}
         for piece, (relative, text, dropped) in cfg.generate_blocks(ROOT, names).items():
             self.assertEqual((ROOT / relative).read_text(encoding="utf-8"), text, relative)
-            self.assertTrue(dropped, relative)
+            self.assertEqual(dropped, [], relative)  # every named harness is now selected
             self.assertTrue(verdicts[piece].wired, piece)
             self.assertIn("filtered", verdicts[piece].reason)
 
@@ -1110,14 +1289,14 @@ class InstructionBlockTests(unittest.TestCase):
 
     def test_no_tool_that_is_not_wired_is_named_in_either_block(self):
         names = unwired_names_independently()
-        self.assertTrue({"codex-plugin-cc", "codex-rescue", "context-mode-cache-heal", "openai-codex", "promptfoo"} <= {
+        self.assertTrue({"codex-plugin-cc", "codex-rescue", "context-mode-cache-heal", "openai-codex", "phoenix"} <= {
             n.lower() for n in names}, names)
         for piece in self.PIECES:
-            self.assertTrue(name_hits("\n".join(source_lines(piece)), names), f"the sources name some: {piece}")
+            self.assertEqual(name_hits("\n".join(source_lines(piece)), names), [], piece)
             self.assertEqual(name_hits(generated_text(piece), names), [], piece)
         # Control: the same scan finds a name that is added back, whole or in a different case.
-        self.assertIn("Promptfoo", name_hits(generated_text(cfg.CODEX_MD_PIECE) + "Use promptfoo.\n", names))
-        self.assertIn("Promptfoo", name_hits(generated_text(cfg.CLAUDE_MD_PIECE) + "Ask PROMPTFOO.\n", names))
+        self.assertIn("Phoenix", name_hits(generated_text(cfg.CODEX_MD_PIECE) + "Use phoenix.\n", names))
+        self.assertIn("Phoenix", name_hits(generated_text(cfg.CLAUDE_MD_PIECE) + "Ask PHOENIX.\n", names))
 
     def test_the_kept_and_the_dropped_text_together_are_the_whole_source(self):
         results, manifest, *_ = cfg.analyse(ROOT)
@@ -1129,40 +1308,40 @@ class InstructionBlockTests(unittest.TestCase):
 
     def test_every_dropped_unit_names_a_tool_that_is_not_wired_or_is_a_heading_left_with_nothing(self):
         names = unwired_names_independently()
-        results, manifest, *_ = cfg.analyse(ROOT)
-        total, dependents = 0, []
-        for piece, (_, _, dropped) in cfg.generate_blocks(ROOT, cfg.unwired_names(results, manifest)).items():
-            for number, unit in enumerate(dropped):
-                total += 1
-                if unit.kind == "heading" and "nothing is kept under it" in unit.note:
-                    continue
-                if cfg.DEPENDS_NOTE in unit.note:
-                    # a dependent sentence names no tool; the unit before it, on the same line, is dropped by name
-                    before = dropped[number - 1]
-                    self.assertEqual((before.line, before.kind), (unit.line, "sentence"))
-                    self.assertTrue(name_hits(before.text, names), before.text)
-                    dependents.append(unit.text)
-                    continue
-                self.assertTrue(name_hits(unit.text, names), (piece, unit.line, unit.text))
-        self.assertEqual(total, 2)           # the installed token lanes now stay; only the two Promptfoo units go
-        # ai-memory is wired (the memory-owner row's interim install), so the sentence that depends on its sentence stays;
-        # test_the_two_blocks_lose_the_sentence_that_only_made_sense_with_the_ai_memory_one_and_list_it runs that case.
-        self.assertEqual(dependents, [])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+            for source in cfg.BLOCK_TEXT_REL.values():
+                path = root / source
+                path.write_text(path.read_text() + "\nUse Phoenix.\n")
+            results, manifest, *_ = cfg.analyse(root, check_blocks=False)
+            total = 0
+            for piece, (_, _, dropped) in cfg.generate_blocks(root, cfg.unwired_names(results, manifest)).items():
+                self.assertGreater(len(dropped), 0, piece)
+                for unit in dropped:
+                    total += 1
+                    self.assertTrue(name_hits(unit.text, names), (piece, unit.line, unit.text))
+            self.assertEqual(total, len(self.PIECES))
 
     def test_the_dropped_list_is_printed_in_full_by_the_check_and_by_write_blocks(self):
-        results, manifest, *_ = cfg.analyse(ROOT)
-        units = [(unit, piece) for piece, (_, _, dropped) in
-                 cfg.generate_blocks(ROOT, cfg.unwired_names(results, manifest)).items() for unit in dropped]
-        code, out, _ = run_main("--check", "--dropped")
-        self.assertEqual(code, 0)
-        for unit, _piece in units:
-            for line in unit.text.split("\n"):
-                self.assertIn("    " + line, out)
         with tempfile.TemporaryDirectory() as tmp:
-            code, written, _ = run_main("--write-blocks", "--dropped", "--root", str(make_catalog(Path(tmp))))
-        self.assertEqual(code, 0)
-        self.assertIn("kept", written)
-        self.assertEqual(written.count("\n    "), out.count("\n    "))
+            root = make_catalog(Path(tmp))
+            for source in cfg.BLOCK_TEXT_REL.values():
+                path = root / source
+                path.write_text(path.read_text() + "\nUse Phoenix.\n")
+            write_blocks(root)
+            results, manifest, *_ = cfg.analyse(root)
+            units = [(unit, piece) for piece, (_, _, dropped) in
+                     cfg.generate_blocks(root, cfg.unwired_names(results, manifest)).items() for unit in dropped]
+            self.assertEqual(len(units), len(self.PIECES))
+            code, out, _ = run_main("--check", "--dropped", "--root", str(root))
+            self.assertEqual(code, 0)
+            for unit, _piece in units:
+                for line in unit.text.split("\n"):
+                    self.assertIn("    " + line, out)
+            code, written, _ = run_main("--write-blocks", "--dropped", "--root", str(root))
+            self.assertEqual(code, 0)
+            self.assertIn("kept", written)
+            self.assertEqual(written.count("\n    "), out.count("\n    "))
 
     def test_the_filter_drops_sentences_bullets_paragraphs_and_headings_and_writes_nothing_new(self):
         names = ["alpha-tool", "beta"]
@@ -1206,7 +1385,8 @@ class InstructionBlockTests(unittest.TestCase):
         # Control: were the filter to let a name through, the scan that follows it would still keep the block out.
         results, manifest, *_ = cfg.analyse(ROOT)
         names = cfg.unwired_names(results, manifest)
-        with mock.patch.object(cfg, "filter_block", lambda text, names, dependents=(): (text, [])):
+        with mock.patch.object(cfg, "filter_block",
+                               lambda text, names, dependents=(): (text + "\nUse Phoenix.\n", [])):
             by_key = {v.piece.key: v for v in cfg.resolve_blocks(ROOT, results, names)}
         for key in self.PIECES:
             self.assertFalse(by_key[key].wired, key)
@@ -1309,12 +1489,17 @@ class BlocksSentenceTests(unittest.TestCase):
         results, manifest, *_ = cfg.analyse(ROOT)
         names = cfg.unwired_names(results, manifest)
         by_map, by_manifest = map_unwired_names_independently(), former_default_names_independently()
-        # The names that decide are those two sources and nothing else, and the second is not empty of its own: Promptfoo is
-        # in no map entry, and comes from the manifest row `promptfoo`, whose former default it is.
+        # The names that decide are those two sources and nothing else, and the second is not empty of its own: Phoenix is
+        # in no map entry, and comes from the manifest row `phoenix`, whose former default it is.
         self.assertEqual(set(names), by_map | by_manifest)
-        self.assertIn("Promptfoo", by_manifest - by_map)
-        self.assertEqual([e for e in json.loads(MAP.read_text())["entries"] if "Promptfoo" in json.dumps(e)], [])
-        generated = cfg.generate_blocks(ROOT, names)
+        self.assertIn("Phoenix", by_manifest - by_map)
+        self.assertEqual([e for e in json.loads(MAP.read_text())["entries"] if "Phoenix" in json.dumps(e)], [])
+        with tempfile.TemporaryDirectory() as tmp:
+            root = make_catalog(Path(tmp))
+            for source in cfg.BLOCK_TEXT_REL.values():
+                path = root / source
+                path.write_text(path.read_text() + "\nUse Phoenix and skill-creator.\n")
+            generated = cfg.generate_blocks(root, names)
         for piece, (_, kept, dropped) in generated.items():
             with self.subTest(block=piece):
                 for unit in dropped:
@@ -1322,12 +1507,12 @@ class BlocksSentenceTests(unittest.TestCase):
                         self.assertTrue(set(unit.names) <= set(names) and independent_name_hits(unit.text, unit.names), unit)
                     else:                # none does but a heading left empty or a declared dependent sentence, which say why
                         self.assertTrue(unit.note, unit)
-                # The Promptfoo unit: left out although no map entry lists the name, and although it names a skill too.
-                promptfoo = [unit for unit in dropped if "Promptfoo" in unit.names]
-                self.assertEqual(len(promptfoo), 1)
-                self.assertTrue(set(promptfoo[0].names) <= by_manifest - by_map, promptfoo[0].names)
-                self.assertIn("skill-creator", promptfoo[0].text)
-                self.assertEqual(independent_name_hits(kept, ["Promptfoo"]), [])
+                # The Phoenix unit: left out although no map entry lists the name, and although it names a skill too.
+                phoenix = [unit for unit in dropped if "Phoenix" in unit.names]
+                self.assertEqual(len(phoenix), 1)
+                self.assertTrue(set(phoenix[0].names) <= by_manifest - by_map, phoenix[0].names)
+                self.assertIn("skill-creator", phoenix[0].text)
+                self.assertEqual(independent_name_hits(kept, ["Phoenix"]), [])
         # And not left out merely for naming a skill or a timer: every kept line that names one names no tool that is not
         # wired, and each of the four stays in at least one block.
         kept_lines = [line for _, kept, _ in generated.values() for line in kept.splitlines()]
@@ -2530,36 +2715,36 @@ class RenderedScanTests(unittest.TestCase):
     def test_a_name_in_a_rendered_file_fails_the_check_and_the_message_says_which_render(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
-            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["env"].update(SCAN_PROBE="use promptfoo here"))
+            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["env"].update(SCAN_PROBE="use phoenix here"))
             edit_json(root / cfg.MAP_REL, lambda d: d["entries"].insert(0, {
                 "match": ["claude/settings/env/SCAN_PROBE"], "wiring": "practice"}))
             code, _, err = run_main("--check", "--root", str(root))
         self.assertEqual(code, 1)
-        self.assertIn("the render for the example host without --with-authorization-settings: settings.json names Promptfoo, "
+        self.assertIn("the render for the example host without --with-authorization-settings: settings.json names Phoenix, "
                       "which is not wired", err)
-        self.assertIn("the render for the example host with --with-authorization-settings: settings.json names Promptfoo", err)
+        self.assertIn("the render for the example host with --with-authorization-settings: settings.json names Phoenix", err)
 
     def test_a_name_that_only_an_authorization_setting_carries_is_found_in_the_render_with_the_option_only(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
-            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["permissions"].update(defaultMode="promptfoo-default"))
+            edit_json(root / cfg.TEMPLATES["claude/settings"], lambda d: d["permissions"].update(defaultMode="phoenix-default"))
             errors = cfg.rendered_name_errors(root)
             code, _, err = run_main("--check", "--root", str(root))
         self.assertEqual(code, 1)
         self.assertEqual(errors, ["the render for the example host with --with-authorization-settings: settings.json "
-                                  "names Promptfoo, which is not wired"])
-        self.assertIn("with --with-authorization-settings: settings.json names Promptfoo", err)
+                                  "names Phoenix, which is not wired"])
+        self.assertIn("with --with-authorization-settings: settings.json names Phoenix", err)
 
     def test_a_name_in_an_instruction_block_or_the_codex_config_is_found_too(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = make_catalog(Path(tmp))
             path = root / cfg.TEMPLATES["codex/config"]
-            path.write_text(path.read_text().replace('web_search = "live"', 'web_search = "live"\nprobe_note = "promptfoo"'),
+            path.write_text(path.read_text().replace('web_search = "live"', 'web_search = "live"\nprobe_note = "phoenix"'),
                             encoding="utf-8")
             edit_json(root / cfg.MAP_REL, lambda d: d["entries"].insert(0, {
                 "match": ["codex/config/probe_note"], "wiring": "practice"}))
             errors = cfg.rendered_name_errors(root)
-        self.assertTrue(any("codex.config.toml names Promptfoo" in error for error in errors), errors)
+        self.assertTrue(any("codex.config.toml names Phoenix" in error for error in errors), errors)
 
     def test_a_render_that_fails_is_reported_and_not_taken_for_a_clean_scan(self):
         with mock.patch.object(cfg, "render", side_effect=cfg.ConfigError("boom")):
@@ -3656,7 +3841,7 @@ class RecordTests(unittest.TestCase):
         manifest = cfg.load_manifest(ROOT)
         listed = cfg.dropped_markdown(ROOT, cfg.generate_blocks(ROOT, cfg.unwired_names(results, manifest))).rstrip("\n")
         self.assertIn(listed, text, "regenerate the record's dropped list with `--check --markdown`")
-        self.assertEqual(listed.count("\nline "), 2)          # only the two Promptfoo units go after wave 3
+        self.assertEqual(listed.count("\nline "), 0)          # all harnesses in the sources are now selected
         # Control: a table whose row differs from the tool's is not in the record.
         self.assertNotIn(tables.replace("| `not_wired` |", "| `slot:other` |", 1), text)
         piece_rows = tables.split("\n\n")[0].splitlines()[2:]

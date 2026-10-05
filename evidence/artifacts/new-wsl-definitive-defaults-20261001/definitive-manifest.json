@@ -37,6 +37,17 @@
   "acknowledgements": [],
   "acknowledgements_owed": []
  },
+ "consensus_wave4": {
+  "date_utc": "2026-10-04",
+  "meaning": "the 2026-10-04 owner default on promptfoo under the owner's repository-quality rule: decide round 2 named promptfoo the owner of paired skill verification in both clients, and the fix wave's G6 recipe installs it; selection record only: no comparison named here has run",
+  "authority": {
+   "kind": "owner_decision",
+   "date_utc": "2026-10-04",
+   "relayed_by": "docs/decisions/2026-10-04-2604-e2e-fix-wave.md"
+  },
+  "acknowledgements": [],
+  "acknowledgements_owed": []
+ },
  "not_claimed": "no candidate is installed or measured by these rounds; a default decided on documented fit says so; a definitive default is the slot's install decision, not a merit acceptance: the full-field re-vote, the measured comparison and new-host acceptance stay separate",
  "sources": {
   "foundation": {
@@ -66,7 +77,7 @@
   },
   "consensus": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-   "sha256": "791d949e53168e2f61f9bc13fbe246097d03cebd3a634e10d21da6ece5455934"
+   "sha256": "d3fb06dc20e53f1daa7a6d029e414db4987fe066a75c7f8e0f73384bf0d1acfc"
   }
  },
  "counts": {
@@ -90,7 +101,7 @@
    "split": 5,
    "open": 25
   },
-  "installed": 72,
+  "installed": 73,
   "interim": 2
  },
  "pinned_requirements": {
@@ -2649,36 +2660,70 @@
    "layer_id": "quality-evaluation",
    "slot_id": "promptfoo",
    "row_kind": "first_round",
-   "default": "Not installed: prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it",
-   "repository": "",
-   "installs_nothing_extra": true,
+   "default": "Promptfoo 0.123.1",
+   "repository": "https://github.com/promptfoo/promptfoo",
+   "installs_nothing_extra": false,
    "definitive": false,
-   "label": "not installed: resolved by the rule or a blind critic",
+   "label": "owner decision of 2026-10-04 (wave 4, amendment 4): the owner's repository-quality rule; installed because decide round 2 named promptfoo the owner of paired skill verification in both clients; the blind no-install decision stays under overturned; live acceptance unrun; not a blind result, consensus or measurement",
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
-   "claude": "returned",
-   "gpt": "returned: 0 of 2 blind GPT samples",
+   "claude": "Opus checks of both decide rounds (2026-10-04): round 1's contested check upheld its critic's switch from skill-creator to promptfoo on capability fit; round 2's verification upheld the owner and adopt true against live upstream, read at promptfoo 0.123.1 (site/docs/guides/test-agent-skills.md), and corrected the overturn comparator and the existing-evaluator premise; not a new blind judgment of this row",
+   "gpt": "decide round 2 (2026-10-04): both blind GPT-6.1 Sol deciders and the GPT Astra critic named promptfoo for paired skill verification (the deciders took it for the existing evaluator); not a new blind judgment of this row",
    "job": "prompt and provider regression tests",
    "resolution": {
-    "outcome": "not_installed",
-    "by": "one blind Claude critic",
-    "reason": "prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it",
-    "covered_by": [
-     "inspect-ai"
-    ],
-    "evidence": {
-     "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
-     "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+    "outcome": "owner_default",
+    "by": "the owner's repository-quality rule of 2026-10-04",
+    "batch": "wave4",
+    "reason": "Decide round 2, under the owner's repository-quality rule, named promptfoo the owner of paired skill verification in both clients (its Test Agent Skills guide drives the claude-agent-sdk and codex-sdk providers), and the Opus check upheld it. The row's decided default installed nothing, so the owner default installs Promptfoo 0.123.1 with G6's pinned recipe; Inspect AI keeps model and task evaluation.",
+    "pin": "Promptfoo 0.123.1; source 34f74d34e140b5e17d23770dfb2340057b1936b8",
+    "overturn": "the verified overturn check: run promptfoo and Harbor v0.23.0 (--skill injection plus Rewardkit) on the same frozen skill regressions with oracle-labelled outcomes, in both clients; transfer ownership if Harbor detects strictly more true regressions, with no more false flags and complete reproducible records, scoring verification correctness separately from the agents' task success; or failed upstream fixture/control or uncached two-route gateway/fresh-client MCP acceptance; each reports to the owner and removes nothing by itself.",
+    "sources": [
+     "docs/decisions/2026-10-04-2604-e2e-fix-wave.md",
+     "docs/decisions/2026-10-04-repository-quality-rule.md",
+     "evidence/artifacts/new-wsl-fix-wave-20261004/repository-quality-promptfoo.json",
+     "docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md",
+     "https://github.com/promptfoo/promptfoo/blob/0.123.1/site/docs/guides/test-agent-skills.md",
+     "https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/examples/openai-compatible-gateway/promptfooconfig.yaml"
+    ]
+   },
+   "overturned": {
+    "amendment": {
+     "date_utc": "2026-10-04",
+     "by": "the owner's repository-quality rule of 2026-10-04 (wave 4, amendment 4)",
+     "decision": "Promptfoo 0.123.1 installs as the owner of the row's prompt and provider regression tests and of the paired skill-version regression verification in both clients that decide round 2 gave it; skill-authoring (skill-creator) keeps authoring and authoring-time evaluation; the blind no-install decision stays under overturned."
     },
-    "former_default": {
-     "name": "Promptfoo",
-     "repository": "https://github.com/promptfoo/promptfoo"
-    },
-    "first_round_record": {
+    "fields": {
+     "default": "Not installed: prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it",
+     "repository": "",
+     "installs_nothing_extra": true,
+     "definitive": false,
+     "label": "not installed: resolved by the rule or a blind critic",
+     "state": "resolved",
+     "measurement": null,
      "claude": "returned",
-     "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
-     "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+     "gpt": "returned: 0 of 2 blind GPT samples",
+     "resolution": {
+      "outcome": "not_installed",
+      "by": "one blind Claude critic",
+      "reason": "prompt and provider evaluation is owned by Inspect AI; neither blind Sol-ultra order picked it",
+      "covered_by": [
+       "inspect-ai"
+      ],
+      "evidence": {
+       "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+       "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+      },
+      "former_default": {
+       "name": "Promptfoo",
+       "repository": "https://github.com/promptfoo/promptfoo"
+      },
+      "first_round_record": {
+       "claude": "returned",
+       "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+       "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+      }
+     }
     }
    }
   },
