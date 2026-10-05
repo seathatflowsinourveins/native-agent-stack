@@ -46,20 +46,12 @@ from scripts import adoption_status  # noqa: E402
 
 TEMPLATES = ROOT / "adoption" / "templates"
 FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
-# The staged top-rule block (822 words by Python `str.split()`, marker line included; 153 before the standing
-# clauses, routing and skill-matching lines of docs/decisions/2026-09-30-rule-text-every-layer.md, 595 before the
-# wave-2 records of 2026-10-03 added semble to the token lanes and the session-lanes lines: context-mode's working
-# directory, semble, GPT Researcher and Claude Code messaging, and 800 before the long-command line that runs the
-# research script and the messaging courier with yield_time_ms and write_stdin polling, wave-2 messaging ruling,
-# change 1; the word count is unchanged by the 2026-10-04 user-scope jCodeMunch registration, which gave jcodemunch
-# serena's lane and shortened "where it is connected" to "if connected" to stay under the 8192-byte budget) and
-# rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec),
-# both byte for byte.
-# Re-baselined from 827 words on 2026-10-05: the official-upstream sentence and six session-lane compressions
-# (docs/decisions/2026-10-05-official-upstream-never-rebuild.md); the upstream RTK text and exceptions stay unchanged.
-TOP_RULE_SHA256 = "819e63e9e6c2e90eca91a788f4f0b33c382271ebff9d7a99f6cc45b6d45bb54f"
+# The canonical routing move is recorded in 2026-10-05-harness-context-budget.md.
+# RTK's unchanged 0.51.0 awareness fixture is pinned to e001f773 and checked
+# separately from the qualified excerpt, which omits only its two false assurances.
+TOP_RULE_SHA256 = "aeb3cf728f0f4116a063b0d7408f0a0aa5dab4920d12d7aac7873545fe12f196"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
-UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
+UPSTREAM_MARKER = '<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, qualified excerpt -->\n'
 
 # A minimal TOML writer for the fake (tables, arrays of tables, strings, numbers, booleans, string arrays): enough for
 # these fixtures, including the user template's [[skills.config]].
@@ -441,11 +433,15 @@ class TemplateTests(unittest.TestCase):
         self.assertFalse([line for line in text.splitlines() if line.startswith("@")])
         self.assertLess(len(text.encode("utf-8")), 8192)  # local size budget; the project-doc limit does not cap global instructions
 
-    def test_top_rule_and_upstream_text_are_verbatim(self):
+    def test_top_rule_is_pinned_and_rtk_excerpt_qualifies_the_pinned_source(self):
         top, upstream, _ = template_segments()
         self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
-        self.assertEqual(len(top.split()), 822)
-        self.assertEqual(hashlib.sha256(upstream.encode("utf-8")).hexdigest(), RTK_AWARENESS_SHA256)
+        native = (FIXTURES / "rtk-awareness-full.md").read_text(encoding="utf-8")
+        self.assertEqual(hashlib.sha256(native.encode("utf-8")).hexdigest(), RTK_AWARENESS_SHA256)
+        expected = native.replace(" Commands RTK has no filter for\nrun as-is, so the prefix is always safe.", "")
+        expected = expected.replace("; behavior and exit code are unchanged", "")
+        self.assertEqual(upstream, expected)
+        self.assertNotIn("the prefix is always safe", upstream)
 
     # The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md, as the Codex block states them,
     # with the Sol-primary routing of docs/decisions/2026-09-30-sol-primary-quality-defaults.md and skill matching.
@@ -475,6 +471,16 @@ class TemplateTests(unittest.TestCase):
         for needle in ("`git show REV:path`", "git -C DIR show REV:path", "`diff`", "`git branch`", "`git log`",
                        "`jq`", "`find`", "`rtk proxy <command>`", "`cd`", "`export`", "`source`", "127"):
             self.assertIn(needle, exceptions)
+
+    def test_adoption_status_accepts_the_qualified_excerpt_of_native_rtk_text(self):
+        native = (FIXTURES / "rtk-awareness-full.md").read_text(encoding="utf-8")
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            (home / "RTK.md").write_text(native, encoding="utf-8")
+            (home / "AGENTS.md").write_text(lane.agents_block(), encoding="utf-8")
+            self.assertTrue(adoption_status.rtk_instructions_inline(home))
+            (home / "AGENTS.md").write_text(lane.agents_block().replace("- `rtk discover`", "- `different tool`"))
+            self.assertFalse(adoption_status.rtk_instructions_inline(home))
 
     def test_adoption_status_finds_the_rtk_text_inline(self):
         # scripts/adoption_status.py (#368) counts RTK as wired only when RTK.md's text is inline in what Codex

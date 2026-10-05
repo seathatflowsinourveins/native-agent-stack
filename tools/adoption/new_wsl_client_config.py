@@ -154,7 +154,7 @@ GENERATED_BLOCKS = {CLAUDE_MD_PIECE: "adoption/new-wsl/claude-user-instructions.
                     CODEX_MD_PIECE: "adoption/new-wsl/codex-user-instructions.md"}
 RENDERED_BLOCKS = {CLAUDE_MD_PIECE: "claude-user-instructions.md", CODEX_MD_PIECE: "codex-user-instructions.md"}
 STEP_PIECES = ("step/claude-launcher", "step/login-path-block", "step/skills", "path/local-bin", "path/mise-shims",
-               "step/codex-remote-plugin-rules")
+               "step/codex-remote-plugin-rules", "step/rtk-claude-init")
 REMOTE_PLUGIN_PIECE = STEP_PIECES[5]
 # The account's remote plugins, which no row of the definitive manifest selects: Codex keeps their bundles under
 # <Codex home>/plugins/cache/<marketplace>/<plugin>/<version>/ (core-plugin-common/src/installed.rs PLUGINS_CACHE_DIR,
@@ -194,7 +194,7 @@ AUTHORIZATION_STEP = {"claude/settings": "claude-settings", "claude/overlay": "c
 EXAMPLE_HOST = "example"   # the host value file whose render --check scans
 LAUNCHER_PIECE, PATH_BLOCK_PIECE = STEP_PIECES[0], STEP_PIECES[1]
 # The steps --apply runs, in order; --skip names one.
-STEPS = ("claude-hooks", "claude-agents", "claude-mcp", "claude-settings", "claude-launcher", "claude-md",
+STEPS = ("claude-hooks", "claude-agents", "claude-mcp", "claude-settings", "claude-launcher", "rtk-claude-init", "claude-md",
          "codex-config", "codex-files", "codex-md", "login-path", "verify")
 # Command words a practice hook may run besides the files the repository copies: the shell's own words, python3 (the
 # interpreter of every tool in tools/adoption/) and jq (F4 of adoption/platforms/linux-wsl2-new-distro.md installs it and
@@ -205,7 +205,7 @@ LIST_ITEM = re.compile(r"^\s*(?:[-*+]|\d+[.)])\s+")
 HEADING = re.compile(r"^(#{1,6})\s")
 SENTENCE_BREAK = re.compile(r"(?<=[.!?])(\s+)(?=[A-Z`\[(<\"'*_])")
 SENTENCE_END = re.compile(r"[.!?][\"')\]`*_]*$")
-# The wrap width of the RTK awareness text that adoption/templates/codex.AGENTS.template.md carries verbatim
+# The wrap width of the RTK awareness excerpt that adoption/templates/codex.AGENTS.template.md carries
 # (rtk-ai/rtk hooks/rtk-awareness-full.md): a run of lines that are all this short, with a sentence running on from
 # one line into the next, is one wrapped paragraph; longer lines are one statement each.
 WRAP_WIDTH = 80
@@ -2210,6 +2210,29 @@ class Apply:
         argv = [str(ROOT / "tools/adoption/managed_block.py"), "--home", str(self.home)]
         argv += ["--dry-run"] if self.dry else []
         self.done(step, self.tool(step, argv + subcommand))
+
+    def step_rtk_claude_init(self) -> None:
+        """RTK 0.51.0's native global default owns RTK.md and the @RTK.md import.
+        Source: rtk-ai/rtk@e001f773:src/hooks/init/claude.rs:305. No local RTK file renderer.
+        """
+        step = "rtk-claude-init"
+        if "step/rtk-claude-init" not in self.wired:
+            self.record(step, "left out", "the command-output slot does not wire RTK")
+            return
+        argv = [str(self.eco / "bin" / "rtk"), "init", "-g", "--no-patch"]
+        if self.dry:
+            self.record(step, "planned", "would run " + shlex.join(argv))
+            return
+        result = subprocess.run(argv, env=self.env(), stdin=subprocess.DEVNULL,
+                                capture_output=True, text=True, timeout=300)
+        for line in (result.stdout + result.stderr).splitlines():
+            self.say(step, "  " + line)
+        target = self.home / ".claude"
+        current, _ = managed_block.read_target(target / "CLAUDE.md")
+        ready = (result.returncode == 0 and (target / "RTK.md").is_file()
+                 and any(managed_block.RTK_IMPORT.fullmatch(line) for line in current.splitlines()))
+        self.record(step, "applied" if ready else "failed",
+                    f"native init exit {result.returncode}; RTK.md and @RTK.md " + ("present" if ready else "not verified"))
 
     def step_claude_md(self) -> None:
         self.instruction_step("claude-md", CLAUDE_MD_PIECE, [

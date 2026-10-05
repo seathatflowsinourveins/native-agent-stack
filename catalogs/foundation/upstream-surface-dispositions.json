@@ -1,6 +1,6 @@
 {
  "schema_version": 1,
- "generated_utc": "2026-10-04T16:23:19Z",
+ "generated_utc": "2026-10-05T00:00:00Z",
  "baseline_versions": {
   "claude_code": "2.1.289",
   "codex": "rust-v0.160.0"
@@ -2121,26 +2121,28 @@
   },
   {
    "key": "claude:setting:skillListingBudgetFraction",
-   "disposition": "adopt-pending",
-   "reason": "Template has 0.05 since #553 (all model-invocable skills listed on); 2604 has it, NativeStack lacks it. Costs up to 5% of context per turn.",
-   "source": "https://code.claude.com/docs/en/settings.md",
-   "carrier": "adoption/templates/claude.settings.template.json",
-   "value": "0.05",
-   "scope": "NativeStack",
-   "overturn": "/doctor shows the listing fits under 1%, or a skill-use A/B shows no gain.",
-   "reviewed_utc": "2026-10-04T16:23:19Z",
+   "disposition": "default-on",
+   "reason": "Remove the repository override: upstream fits skill descriptions to 1% of context by default.",
+   "source": "https://code.claude.com/docs/en/skills",
+   "carrier": null,
+   "value": null,
+   "scope": "repository-default",
+   "overturn": "A dated comparison shows the native default loses required skill matches after scoped name-only overrides.",
+   "reviewed_utc": "2026-10-05T00:00:00Z",
    "version": "2.1.289"
   },
   {
    "key": "claude:setting:skillOverrides",
-   "disposition": "adopt-pending",
-   "reason": "Both trail the template: NativeStack 10 stale entries (pre-#553 name-only, no skill-creator); 2604 3 (#659 set grill-me, improve-codebase-architecture.",
-   "source": "https://code.claude.com/docs/en/settings.md",
+   "disposition": "enabled",
+   "reason": "Keep specialized audit skills invocable by name while omitting their descriptions from the startup listing.",
+   "source": "https://code.claude.com/docs/en/skills",
    "carrier": "adoption/templates/claude.settings.template.json",
-   "value": "template's 29-entry map (template:378-408)",
-   "scope": "both",
-   "overturn": "A manifest change sets a skill back to name-only or on.",
-   "reviewed_utc": "2026-10-04T16:23:19Z",
+   "value": {
+    "record": "docs/decisions/2026-10-05-harness-context-budget.md"
+   },
+   "scope": "repository-default",
+   "overturn": "A native skill-doctor report or task comparison shows a named audit skill must regain its description.",
+   "reviewed_utc": "2026-10-05T00:00:00Z",
    "version": "2.1.289"
   },
   {
@@ -2350,7 +2352,7 @@
   {
    "key": "claude:host:mcp-user",
    "disposition": "adopt-pending",
-   "reason": "2604's user-scope MCP set widens to the full token stack (codebase-memory, headroom MCP-only, jcodemunch, pinned socraticode) through #684 and its follow-up…",
+   "reason": "2604's user-scope MCP set widens to the full token stack (codebase-memory, headroom MCP-only, jcodemunch, pinned socraticode) through #684 and its follow-up\u2026",
    "source": "https://code.claude.com/docs/en/settings.md",
    "carrier": "adoption/new-wsl/client-config-map.json (new-WSL builder: PR #684 and its follow-up)",
    "value": "ai-memory, codebase-memory, headroom, socraticode per adoption/mcp/claude-user.json; jcodemunch and hindsight are NS-only, builder decides",
@@ -3287,7 +3289,7 @@
    "key": "codex:config:otel.environment",
    "disposition": "enabled",
    "reason": "set in the configuration of both hosts (read 2026-10-04); the cited record names it",
-   "source": "examples/codex-native/README.md:170",
+   "source": "examples/codex-native/README.md:184",
    "carrier": "host configuration",
    "value": null,
    "scope": "both",
@@ -3642,6 +3644,48 @@
    "overturn": "upstream removes or changes the switch, or a measured regression",
    "reviewed_utc": "2026-10-04T16:23:19Z",
    "version": "rust-v0.160.0"
+  },
+  {
+   "key": "claude:doc:memory",
+   "disposition": "enabled",
+   "reason": "Watch this instruction document body; a changed digest reopens the October 5 harness context audit.",
+   "source": "https://code.claude.com/docs/en/memory",
+   "carrier": "docs/decisions/2026-10-05-harness-context-budget.md",
+   "value": {
+    "sha256": "fe99e50e312feae327c1e16847bc5853c71aaf2755fa554f9014c9008850e2cb"
+   },
+   "scope": "startup-instructions",
+   "overturn": "Any fetched body change requires re-reading the document and rerunning the harness context audit before updating this digest.",
+   "reviewed_utc": "2026-10-05T00:00:00Z",
+   "version": "2.1.289"
+  },
+  {
+   "key": "claude:doc:skills",
+   "disposition": "enabled",
+   "reason": "Watch this instruction document body; a changed digest reopens the October 5 harness context audit.",
+   "source": "https://code.claude.com/docs/en/skills",
+   "carrier": "docs/decisions/2026-10-05-harness-context-budget.md",
+   "value": {
+    "sha256": "acdf96599200090206dd21327022aa58b21e23dfebdaffaa974b2fdb25077e00"
+   },
+   "scope": "startup-instructions",
+   "overturn": "Any fetched body change requires re-reading the document and rerunning the harness context audit before updating this digest.",
+   "reviewed_utc": "2026-10-05T00:00:00Z",
+   "version": "2.1.289"
+  },
+  {
+   "key": "codex:doc:agents-md",
+   "disposition": "enabled",
+   "reason": "Watch this instruction document body; a changed digest reopens the October 5 harness context audit.",
+   "source": "https://developers.openai.com/codex/guides/agents-md",
+   "carrier": "docs/decisions/2026-10-05-harness-context-budget.md",
+   "value": {
+    "sha256": "af22c038b1e5ce2fdf28cacdc996c2790232e13cb90a39f7d325d352256e412c"
+   },
+   "scope": "startup-instructions",
+   "overturn": "Any fetched body change requires re-reading the document and rerunning the harness context audit before updating this digest.",
+   "reviewed_utc": "2026-10-05T00:00:00Z",
+   "version": "rust-v0.159.3"
   }
  ]
 }

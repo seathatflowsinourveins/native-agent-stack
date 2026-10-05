@@ -250,10 +250,13 @@ class LlmNativeListingTests(unittest.TestCase):
         cls.manifest = load_json(MANIFEST_PATH)
         cls.skills = cls.manifest["skills"]
 
-    def test_every_model_invocable_skill_is_listed_on(self):
+    def test_every_model_invocable_skill_stays_listed_with_the_dated_audit_overrides(self):
         for skill in self.skills:
             with self.subTest(skill=skill["name"]):
-                expected = "user-invocable-only" if skill["upstream_disable_model_invocation"] else "on"
+                audits = {"security-best-practices", "security-threat-model", "codeql", "supply-chain-risk-auditor",
+                          "agentic-actions-auditor", "sarif-parsing", "fp-check", "variant-analysis", "security-audit"}
+                expected = ("user-invocable-only" if skill["upstream_disable_model_invocation"]
+                            else "name-only" if skill["name"] in audits else "on")
                 self.assertEqual(skill["claude_listing"], expected)
 
     def test_codex_disables_only_the_skill_codex_ships_natively(self):
@@ -278,14 +281,10 @@ class LlmNativeListingTests(unittest.TestCase):
 class ListingBudgetTemplateTests(unittest.TestCase):
     """The listing budgets the two client templates set (2026-09-30 record)."""
 
-    def test_claude_template_raises_the_listing_budget_fraction_without_a_fixed_char_budget(self):
+    def test_claude_template_uses_the_upstream_listing_budget_default(self):
+        # https://code.claude.com/docs/en/skills: 1% default, explicit audit skills name-only.
         template = load_json(SETTINGS_TEMPLATE_PATH)
-        fraction = template.get("skillListingBudgetFraction")
-        # Settings reference: "a fraction greater than 0 and at most 1", default 0.01.
-        self.assertIsInstance(fraction, float)
-        self.assertTrue(0 < fraction <= 1, fraction)
-        self.assertEqual(fraction, 0.05)
-        # SLASH_COMMAND_TOOL_CHAR_BUDGET would pin a fixed character count instead (skills page).
+        self.assertNotIn("skillListingBudgetFraction", template)
         self.assertNotIn("SLASH_COMMAND_TOOL_CHAR_BUDGET", template.get("env", {}))
 
     def test_codex_template_sets_the_catalog_token_budget_and_no_per_skill_tables(self):

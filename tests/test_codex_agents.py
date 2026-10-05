@@ -1,7 +1,8 @@
 """Structural validation of custom-agent instruction payloads.
 
 Sources: openai/codex rust-v0.157.1 (commit 36650394), codex-rs/agent-roles/src/agent_role_config.rs
-and codex-rs/core/src/agent/role.rs; rtk-ai/rtk v0.50.0, hooks/rtk-awareness-full.md. These are local
+and codex-rs/core/src/agent/role.rs; rtk-ai/rtk v0.51.0, hooks/rtk-awareness-full.md (qualified
+excerpt, docs/decisions/2026-10-05-harness-context-budget.md). These are local
 checks, not spawned-agent acceptance.
 
 The two stack role carriers (`stack-researcher` and `stack-verifier`, 2026-09-29) are checked as bytes
@@ -36,11 +37,12 @@ ADOPTION_AGENTS = ROOT / "adoption" / "agents" / "codex"
 README = ROOT / "examples" / "codex-native" / "README.md"
 PREREGISTRATION = ROOT / "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json"
 SEALED_TEST = ROOT / "tests" / "test_token_e2e_preregistration.py"
-UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
+UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.51.0 hooks/rtk-awareness-full.md, qualified excerpt -->\n"
 EXCEPTIONS_MARKER = "<!-- native-agent-stack:rtk-exceptions -->\n"
 END_MARKER = "<!-- native-agent-stack:codex-user-instructions:end -->"
-# Byte identity of upstream hooks/rtk-awareness-full.md, also checked by the worker-lane tests.
-RTK_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
+# Byte identity of the qualified excerpt; the worker-lane tests retain and check
+# the unchanged upstream original separately.
+RTK_SHA256 = "e14f6845e503d3df94ed23017a6bb3f26480ded04a11c4a4dd7b71bbbef7915f"
 
 STACK_ROLES = ("stack-researcher", "stack-verifier")
 STACK_STEMS = {"evidence-reviewer", "isolated-builder", "semantic-evidence-reviewer", *STACK_ROLES}
@@ -57,8 +59,8 @@ README_HEADING = "## 2026-09-29: Stack role carriers"
 # section of 2026-09-29 repeats these rows verbatim, and Amendment 4 copies them; any later change to a
 # carrier needs a new dated amendment and new rows here.
 STACK_ROLE_ROWS = (
-    "| `stack-researcher.toml` | `48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77` |",
-    "| `stack-verifier.toml` | `18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b` |",
+    "| `stack-researcher.toml` | `9b8838cf074223e302061e1953f687223b62163b637421801ccd37f8b2633e84` |",
+    "| `stack-verifier.toml` | `7bc14292b6a4c2a5eb8f9eea7ebd2275309b6008020cd1afe2a745a89404f448` |",
 )
 
 # The spawn_agent tool text shows a role's description to every parent in every arm (role.rs:294-334), so each

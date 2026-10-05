@@ -969,3 +969,20 @@ The [official-upstream rule decision](2026-10-05-official-upstream-never-rebuild
 
 ```text
 ```
+
+
+## Addendum 2026-10-05: fixed startup context and native RTK layout
+
+The [context-budget decision](2026-10-05-harness-context-budget.md) moves specialized rules behind pointers, removes the skill-listing fraction override, and wires the native RTK global initializer to create RTK.md and its import. The current instruction projection follows; earlier dated projections keep their original counts. This is repository rendering evidence, with RTK init separately exercised in an isolated temporary home, and establishes no destination client or provider acceptance.
+
+Today: 393 pieces, 354 wired (206 practice, 148 through a slot), 24 not wired (0 through a slot that does not install, 24 by their own entry) and 15 authorization pieces.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 52 of 52 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 66 of 66 lines stay):
+
+```text
+```

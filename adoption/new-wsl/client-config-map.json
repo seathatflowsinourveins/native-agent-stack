@@ -346,9 +346,7 @@
         "claude/settings/setting/verbose",
         "claude/settings/setting/showThinkingSummaries",
         "claude/settings/setting/cleanupPeriodDays",
-        "claude/settings/setting/syncClaudeAiSkills",
-        "claude/settings/setting/skillListingBudgetFraction",
-        "claude/settings/setting/skillOverrides"
+        "claude/settings/setting/syncClaudeAiSkills"
       ],
       "wiring": "practice",
       "source": "https://code.claude.com/docs/en/settings-reference (read 2026-10-02): skillOverrides applies to the skills that exist and says nothing of a name with no skill."
@@ -879,6 +877,27 @@
       "owner": "mise",
       "home_dir": ".local/share/mise/shims",
       "source": "jdx/mise bc11f90c docs/dev-tools/shims.md L60-80 (default shims directory, PATH line) and settings.toml L2112-2115 (node.npm_shim, on by default, reshims after npm install -g)."
+    },
+    {
+      "match": [
+        "claude/settings/setting/skillOverrides"
+      ],
+      "wiring": "practice",
+      "source": "https://code.claude.com/docs/en/skills (read 2026-10-05): name-only keeps skills invocable while omitting descriptions; leave skillListingBudgetFraction unset for the upstream 1% default.",
+      "note": "Specialized audit skills from adoption/skills/manifest.json use name-only; selection and fixed context budgets: docs/decisions/2026-10-05-harness-context-budget.md."
+    },
+    {
+      "match": [
+        "step/rtk-claude-init"
+      ],
+      "wiring": "slot:command-output",
+      "owner": "rtk",
+      "names": [
+        "rtk"
+      ],
+      "directive": "docs/decisions/2026-10-04-new-wsl-token-layer-default.md",
+      "source": "rtk-ai/rtk@e001f773f80b22b7dc4c7a79521b30e35aaef026:src/hooks/init/claude.rs:305",
+      "note": "Use the native global default to create RTK.md and its @RTK.md import; --no-patch leaves settings to the map's hook configuration, and the managed block keeps the import."
     }
   ],
   "slot_configs": {

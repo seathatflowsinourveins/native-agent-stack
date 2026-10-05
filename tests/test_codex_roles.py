@@ -27,8 +27,8 @@ sys.path.insert(0, str(ROOT / "tools" / "adoption"))
 SOURCE = ROOT / "adoption" / "agents" / "codex"
 NAMES = ("stack-researcher.toml", "stack-verifier.toml")
 GOOD_ROWS = {
-    "stack-researcher.toml": "48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77",
-    "stack-verifier.toml": "18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b",
+    "stack-researcher.toml": "9b8838cf074223e302061e1953f687223b62163b637421801ccd37f8b2633e84",
+    "stack-verifier.toml": "7bc14292b6a4c2a5eb8f9eea7ebd2275309b6008020cd1afe2a745a89404f448",
 }
 # The worker roles: their own folder and SHA256SUMS, so the carriers' folder keeps exactly the two files the frozen
 # E2E pinned (tests/test_codex_agents.py test_stack_role_files_rows_and_mirrors).
