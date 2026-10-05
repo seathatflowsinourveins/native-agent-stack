@@ -1,0 +1,7 @@
+# kenn-io/agentsview@v0.43.0 (9be7745a): internal/config/config.go:688-713.
+# Native Claude/Codex roots follow CLAUDE_CONFIG_DIR and CODEX_HOME, including archives.
+host = "127.0.0.1"
+port = 21808
+no_browser = true
+disable_update_check = true
+archive_content = "usage"

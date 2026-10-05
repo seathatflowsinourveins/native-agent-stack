@@ -354,7 +354,11 @@ GitHub-hosted macOS runner; see
    installed by the **guard hooks** step of `install_claude_profile.py` below, so
    every non-blind subagent except `semantic-evidence-reviewer` receives the token-lanes block matched to its role
    ([decision](../docs/decisions/2026-09-27-token-lanes-subagent-start.md#addendum-2026-09-27-role-matched-blocks)); while that
-   file is absent the command exits 0 and adds nothing.
+   file is absent the command exits 0 and adds nothing. The same template then also gained a `SessionStart` group
+   (matcher `startup|resume|clear|compact|fork`) that runs `~/.claude/hooks/token-lanes-session-start.py`, which hands the
+   main session its own block before the first prompt
+   ([decision](../docs/decisions/2026-09-27-token-lanes-subagent-start.md#addendum-2026-10-04-main-session-carrier));
+   it is silent for `blind-*` roles and `semantic-evidence-reviewer`, and while its file is absent the command exits 0 and adds nothing.
    `claude.settings.template.json` also changed after `v2026.09.26.2`: it sets `MCP_TIMEOUT` to `"120000"`, the startup timeout of every MCP server (default 30 s, [environment variables](https://code.claude.com/docs/en/env-vars)); the value is global because Claude Code 2.1.285 and 2.1.286 have no per-server startup setting (`claude mcp add --help` lists no timeout option, and a server's `timeout` field bounds tool calls only), and 120 s matches the Codex template's slowest `startup_timeout_sec` ([decision](../docs/decisions/2026-09-30-mcp-startup-timeout.md)). It also denies, in every session, the Skills CLI's install, remove and update commands and `Edit(~/.agents/**)`, so skills install only through `tools/adoption/install_skills.py` ([lifecycle](skills/lifecycle.md#install-and-inspect)).
    `codex.config.template.toml` changed after `v2026.09.26`: it turns the context-mode plugin's own MCP server off and registers context-mode at user scope with no `cwd`, running the pinned npm install's `start.mjs`, so each Codex session's server binds that session's own directory ([recipe](../recipes/README.md#retained-context-mode)), and its `headroom` entry adds `HF_HUB_OFFLINE` and `TRANSFORMERS_OFFLINE`; `project.codex.config.template.toml` changed after `v2026.09.26` in its comments only.
    The recipe's project-scoped alternative changed after `v2026.09.26.2`: it adds `default_tools_approval_mode = "approve"` and a `CLAUDE_PROJECT_DIR` equal to its project directory, as upstream `start.mjs` sets, so a project entry keeps Codex tool approvals and the server-side project `Bash(...)` denies ([recipe](../recipes/README.md#retained-context-mode)).
@@ -391,13 +395,12 @@ GitHub-hosted macOS runner; see
    Its MCP sub-step registers the template's commands but installs none of
    them, so first install Serena (the MCP sub-step below names where the
    template's other stdio servers come from) and
-   jCodeMunch, which the per-project opt-in below uses, at their pins, with the
+   jCodeMunch, which its user-scope registration below uses, at their pins, with the
    uv-tool layout `bootstrap-linux.sh` uses for its uv-tool pins
    (`python-tools/` and `bin/` under the ecosystem prefix, on either
    platform). That puts `serena` and `jcodemunch-mcp` in `${ECO_ROOT}/bin`,
    where the template and the opt-in point (changed after `v2026.09.24.1`,
-   whose template names a `serena-context` wrapper instead of `serena` and
-   also registers `jcodemunch` at user scope):
+   whose template names a `serena-context` wrapper instead of `serena`):
    ```sh
    eco="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
    UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
@@ -429,7 +432,10 @@ GitHub-hosted macOS runner; see
      and its sibling [`adoption/hooks/claude/token-lanes-block.md`](hooks/claude/token-lanes-block.md)
      with the five role blocks `adoption/hooks/claude/token-lanes-block.<role>.md`
      (`builder`, `researcher`, `reviewer`, `scout`, `verifier`)
-     into `~/.claude/hooks/` (all seven files added after `v2026.09.26.2`).
+     into `~/.claude/hooks/` (all seven files added after `v2026.09.26.2`), and the main-session pair
+     [`adoption/hooks/claude/token-lanes-session-start.py`](hooks/claude/token-lanes-session-start.py) and
+     [`adoption/hooks/claude/token-lanes-block.main.md`](hooks/claude/token-lanes-block.main.md) beside them
+     (added after the pair above, with the same sha256 rule; [main-session carrier](../docs/token-session-handbook.md#token-lanes-carried-into-the-main-session)).
      The hook supplies token-lane guidance before each non-blind subagent's first prompt
      through the [SubagentStart context contract](https://code.claude.com/docs/en/hooks#subagentstart):
      a shipped role with a `tools:` allowlist receives the role block that names only the lanes it grants,
@@ -451,8 +457,8 @@ GitHub-hosted macOS runner; see
      than the builder's worktree.
    - **MCP servers**: for each entry in
      [`adoption/mcp/claude-user.json`](mcp/claude-user.json) (`ai-memory`
-     over http; `serena`, `socraticode`, `headroom`, `codebase-memory` and
-     `qmd` over stdio), renders its `${HOME}` and
+     over http; `serena`, `socraticode`, `headroom`, `codebase-memory`, `qmd`
+     and `jcodemunch` over stdio), renders its `${HOME}` and
      `${ECO_ROOT}` placeholders (`--eco-root`, default `$ECO_INSTALL_ROOT` or
      `~/.local/share/codex-ecosystem`), then runs `claude mcp add --scope user
      <name> [-e KEY=VALUE ...] -- <command> [args...]`; skipped when `claude
@@ -491,16 +497,24 @@ GitHub-hosted macOS runner; see
      installer reports it as matching (same command, arguments and variable
      names) or as differing, and replaces it only with `--replace-mcp`.
 
-   **jCodeMunch, per project.** The template leaves `jcodemunch` out (changed
-   after `v2026.09.24.1`). At user scope its server instruction ("Prefer it
-   over Read/Grep/Glob/Bash for code navigation") loaded into every session
-   and contradicted agent-lab's routing (`rg` for discovery, Serena for
-   symbols). On 2026-09-25 the recording host's 5,076 retained Claude Code
-   transcripts, the oldest from 2026-09-18, held 15 jCodeMunch tool calls
-   (Serena 33, SocratiCode 7), and in a retrieval comparison it scored hit@5
-   0.25 against SocratiCode's 0.85
-   ([addendum](../docs/decisions/2026-09-23-claude-user-profile.md#addendum-2026-09-25-jcodemunch-registers-per-project-not-at-user-scope)).
-   A project that wants it registers it from the project root, privately:
+   **jCodeMunch, user scope.** The template registers `jcodemunch` at user
+   scope again (changed 2026-10-04, on the user's directive that every fresh
+   session starts with the tools ready; [decision](../docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md)).
+   It had been left out since 2026-09-25 ([addendum](../docs/decisions/2026-09-23-claude-user-profile.md#addendum-2026-09-25-jcodemunch-registers-per-project-not-at-user-scope)):
+   its server instruction ("Prefer it over Read/Grep/Glob/Bash for code
+   navigation") loads into every session and contradicted agent-lab's routing,
+   and 5,076 retained transcripts held 15 jCodeMunch tool calls (Serena 33,
+   SocratiCode 7). The Harbor E2E of 2026-09-30 measured upstream's faithful
+   adoption, `init` with its hooks and prompt policy, at 1.387 times the lean
+   arm's cost (95% CI 1.230 to 1.553, Holm p = 0.0006; 36 SWE-bench Verified
+   tasks, Sonnet 5.5 at medium effort); this registration runs no `init`, and the
+   command center's A/B at the operating point decides whether the tool stays
+   in the default. The entry is the pinned README's own (`claude mcp add -s user
+   jcodemunch jcodemunch-mcp`) with `JCODEMUNCH_SHARE_SAVINGS=0`, the documented
+   opt-out of its anonymous savings counter, in its env block.
+
+   **jCodeMunch, per project.** A project that wants its own private
+   registration beside the user-scope one registers it from the project root:
    ```sh
    claude mcp add --scope local jcodemunch \
      -e "CODE_INDEX_PATH=$HOME/.code-index" -e JCODEMUNCH_SHARE_SAVINGS=0 \
@@ -570,11 +584,9 @@ GitHub-hosted macOS runner; see
    above. On a host already registered from the tag the installer reports
    `serena` as differing; run `claude mcp remove serena -s user`, then
    `python3 tools/adoption/install_claude_profile.py --only mcp`. The tag's
-   template also registers `jcodemunch` at user scope. This one has no
-   `jcodemunch` entry, and the installer only visits the servers the template
-   names, so it neither adds nor removes one: a host registered from the tag
-   runs `claude mcp remove jcodemunch -s user` and opts in per project as
-   above.
+   template also registered `jcodemunch` at user scope, as this one does again
+   (changed 2026-10-04), so a host registered from the tag keeps that entry and
+   the installer reports it as already registered.
 
    **Plugin revision check** (added after `v2026.09.23.1`; it reads only this
    host's plugin registry, so it runs the same from any checkout). A Claude

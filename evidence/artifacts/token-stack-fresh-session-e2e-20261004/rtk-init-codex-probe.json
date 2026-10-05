@@ -1,0 +1,454 @@
+{
+  "evidence_class": "local_integration: one run, one host, scratch homes",
+  "rtk": "rtk 0.51.0",
+  "scenarios": [
+    {
+      "scenario": "a Codex home with its own AGENTS.md and a hooks.json",
+      "steps": [
+        {
+          "args": [
+            "init",
+            "--show",
+            "--codex"
+          ],
+          "exit": 0,
+          "files": [],
+          "history_db_created": false,
+          "show": [
+            "[--] Global RTK.md: not found",
+            "[--] Global hooks.json exists but RTK hook is not configured",
+            "[--] Global AGENTS.md: exists but rtk not configured",
+            "[--] Local RTK.md: not found",
+            "[--] Local hooks.json exists but RTK hook is not configured",
+            "[--] Local AGENTS.md: not found"
+          ],
+          "step": "show before"
+        },
+        {
+          "args": [
+            "init",
+            "-g",
+            "--codex",
+            "--dry-run"
+          ],
+          "exit": 0,
+          "files": [],
+          "history_db_created": false,
+          "stderr": [],
+          "stdout_first_lines": [
+            "[dry-run] would create RTK.md: <scratch>/fake-home/.codex/RTK.md",
+            "[dry-run] would add @<scratch>/fake-home/.codex/RTK.md reference to AGENTS.md: <scratch>/fake-home/.codex/AGENTS.md",
+            "[dry-run] would patch Codex hooks: <scratch>/fake-home/.codex/hooks.json",
+            "[dry-run] Nothing written."
+          ],
+          "step": "dry run"
+        },
+        {
+          "args": [
+            "init",
+            "-g",
+            "--codex"
+          ],
+          "exit": 0,
+          "files": [
+            {
+              "change": "changed",
+              "file": "fake-home/.codex/AGENTS.md",
+              "lines": [
+                "+",
+                "+@<scratch>/fake-home/.codex/RTK.md"
+              ]
+            },
+            {
+              "bytes": 546,
+              "change": "created",
+              "file": "fake-home/.codex/RTK.md"
+            },
+            {
+              "change": "changed",
+              "file": "fake-home/.codex/hooks.json",
+              "lines": [
+                "+      },",
+                "+      {",
+                "+        \"matcher\": \"Bash\",",
+                "+        \"hooks\": [",
+                "+          {",
+                "+            \"type\": \"command\",",
+                "+            \"command\": \"rtk hook codex\"",
+                "+          }",
+                "+        ]"
+              ]
+            },
+            {
+              "bytes": 227,
+              "change": "created",
+              "file": "fake-home/.codex/hooks.json.bak"
+            }
+          ],
+          "history_db_created": true,
+          "stderr": [],
+          "stdout_first_lines": [
+            "RTK configured for Codex CLI.",
+            "  RTK.md:    <scratch>/fake-home/.codex/RTK.md",
+            "  Hook:      <scratch>/fake-home/.codex/hooks.json (registered)",
+            "  AGENTS.md: @<scratch>/fake-home/.codex/RTK.md reference added",
+            "  Codex global instructions path: <scratch>/fake-home/.codex/AGENTS.md",
+            "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+            "  Optional: if history recording fails with SQLITE_CANTOPEN in the"
+          ],
+          "step": "init"
+        },
+        {
+          "args": [
+            "init",
+            "--show",
+            "--codex"
+          ],
+          "exit": 0,
+          "files": [],
+          "history_db_created": false,
+          "show": [
+            "[ok] Global RTK.md: <scratch>/fake-home/.codex/RTK.md",
+            "[ok] Global hook: <scratch>/fake-home/.codex/hooks.json",
+            "[ok] Global AGENTS.md: RTK.md reference",
+            "[--] Local RTK.md: not found",
+            "[ok] Local hook: .codex/hooks.json",
+            "[--] Local AGENTS.md: not found"
+          ],
+          "step": "show after"
+        },
+        {
+          "args": [
+            "init",
+            "-g",
+            "--codex"
+          ],
+          "exit": 0,
+          "files": [],
+          "history_db_created": false,
+          "stderr": [],
+          "stdout_first_lines": [
+            "RTK configured for Codex CLI.",
+            "  RTK.md:    <scratch>/fake-home/.codex/RTK.md",
+            "  Hook:      <scratch>/fake-home/.codex/hooks.json (already present)",
+            "  AGENTS.md: @<scratch>/fake-home/.codex/RTK.md reference already present",
+            "  Codex global instructions path: <scratch>/fake-home/.codex/AGENTS.md",
+            "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+            "  Optional: if history recording fails with SQLITE_CANTOPEN in the"
+          ],
+          "step": "init again"
+        },
+        {
+          "args": [
+            "init",
+            "-g",
+            "--codex",
+            "--uninstall"
+          ],
+          "exit": 0,
+          "files": [
+            {
+              "change": "changed",
+              "file": "fake-home/.codex/AGENTS.md",
+              "lines": [
+                "-",
+                "-@<scratch>/fake-home/.codex/RTK.md"
+              ]
+            },
+            {
+              "change": "removed",
+              "file": "fake-home/.codex/RTK.md"
+            },
+            {
+              "change": "changed",
+              "file": "fake-home/.codex/hooks.json",
+              "lines": [
+                "-      },",
+                "-      {",
+                "-        \"matcher\": \"Bash\",",
+                "-        \"hooks\": [",
+                "-          {",
+                "-            \"type\": \"command\",",
+                "-            \"command\": \"rtk hook codex\"",
+                "-          }",
+                "-        ]"
+              ]
+            },
+            {
+              "change": "changed",
+              "file": "fake-home/.codex/hooks.json.bak",
+              "lines": [
+                "+      },",
+                "+      {",
+                "+        \"matcher\": \"Bash\",",
+                "+        \"hooks\": [",
+                "+          {",
+                "+            \"type\": \"command\",",
+                "+            \"command\": \"rtk hook codex\"",
+                "+          }",
+                "+        ]"
+              ]
+            }
+          ],
+          "history_db_created": false,
+          "stderr": [],
+          "stdout_first_lines": [
+            "RTK uninstalled for Codex CLI:",
+            "  - hooks.json: removed rtk hook codex entry",
+            "  - RTK.md: <scratch>/fake-home/.codex/RTK.md",
+            "  - AGENTS.md: removed @RTK.md reference"
+          ],
+          "step": "uninstall"
+        },
+        {
+          "args": [
+            "init",
+            "--show",
+            "--codex"
+          ],
+          "exit": 0,
+          "files": [],
+          "history_db_created": false,
+          "show": [
+            "[--] Global RTK.md: not found",
+            "[--] Global hooks.json exists but RTK hook is not configured",
+            "[--] Global AGENTS.md: exists but rtk not configured",
+            "[--] Local RTK.md: not found",
+            "[--] Local hooks.json exists but RTK hook is not configured",
+            "[--] Local AGENTS.md: not found"
+          ],
+          "step": "show after uninstall"
+        }
+      ]
+    },
+    {
+      "scenario": "a Codex home with a hooks.json and no AGENTS.md",
+      "steps": [
+        {
+          "args": [
+            "init",
+            "-g",
+            "--codex"
+          ],
+          "exit": 0,
+          "files": [
+            {
+              "bytes": 48,
+              "change": "created",
+              "file": "fake-home/.codex/AGENTS.md"
+            },
+            {
+              "bytes": 546,
+              "change": "created",
+              "file": "fake-home/.codex/RTK.md"
+            },
+            {
+              "change": "changed",
+              "file": "fake-home/.codex/hooks.json",
+              "lines": [
+                "+      },",
+                "+      {",
+                "+        \"matcher\": \"Bash\",",
+                "+        \"hooks\": [",
+                "+          {",
+                "+            \"type\": \"command\",",
+                "+            \"command\": \"rtk hook codex\"",
+                "+          }",
+                "+        ]"
+              ]
+            },
+            {
+              "bytes": 227,
+              "change": "created",
+              "file": "fake-home/.codex/hooks.json.bak"
+            }
+          ],
+          "history_db_created": true,
+          "stderr": [],
+          "stdout_first_lines": [
+            "RTK configured for Codex CLI.",
+            "  RTK.md:    <scratch>/fake-home/.codex/RTK.md",
+            "  Hook:      <scratch>/fake-home/.codex/hooks.json (registered)",
+            "  AGENTS.md: @<scratch>/fake-home/.codex/RTK.md reference added",
+            "  Codex global instructions path: <scratch>/fake-home/.codex/AGENTS.md",
+            "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+            "  Optional: if history recording fails with SQLITE_CANTOPEN in the"
+          ],
+          "step": "init"
+        },
+        {
+          "args": [
+            "init",
+            "-g",
+            "--codex",
+            "--uninstall"
+          ],
+          "exit": 0,
+          "files": [
+            {
+              "change": "changed",
+              "file": "fake-home/.codex/AGENTS.md",
+              "lines": [
+                "-@<scratch>/fake-home/.codex/RTK.md"
+              ]
+            },
+            {
+              "change": "removed",
+              "file": "fake-home/.codex/RTK.md"
+            },
+            {
+              "change": "changed",
+              "file": "fake-home/.codex/hooks.json",
+              "lines": [
+                "-      },",
+                "-      {",
+                "-        \"matcher\": \"Bash\",",
+                "-        \"hooks\": [",
+                "-          {",
+                "-            \"type\": \"command\",",
+                "-            \"command\": \"rtk hook codex\"",
+                "-          }",
+                "-        ]"
+              ]
+            },
+            {
+              "change": "changed",
+              "file": "fake-home/.codex/hooks.json.bak",
+              "lines": [
+                "+      },",
+                "+      {",
+                "+        \"matcher\": \"Bash\",",
+                "+        \"hooks\": [",
+                "+          {",
+                "+            \"type\": \"command\",",
+                "+            \"command\": \"rtk hook codex\"",
+                "+          }",
+                "+        ]"
+              ]
+            }
+          ],
+          "history_db_created": false,
+          "stderr": [],
+          "stdout_first_lines": [
+            "RTK uninstalled for Codex CLI:",
+            "  - hooks.json: removed rtk hook codex entry",
+            "  - RTK.md: <scratch>/fake-home/.codex/RTK.md",
+            "  - AGENTS.md: removed @RTK.md reference"
+          ],
+          "step": "uninstall"
+        }
+      ]
+    },
+    {
+      "scenario": "flags combined with --codex",
+      "steps": [
+        {
+          "args": [
+            "init",
+            "-g",
+            "--codex",
+            "--hook-only"
+          ],
+          "exit": 1,
+          "files": [],
+          "history_db_created": false,
+          "stderr": [
+            "rtk: --codex cannot be combined with --hook-only"
+          ],
+          "stdout_first_lines": [],
+          "step": "--hook-only"
+        },
+        {
+          "args": [
+            "init",
+            "-g",
+            "--codex",
+            "--no-patch"
+          ],
+          "exit": 1,
+          "files": [],
+          "history_db_created": false,
+          "stderr": [
+            "rtk: --codex cannot be combined with --no-patch"
+          ],
+          "stdout_first_lines": [],
+          "step": "--no-patch"
+        },
+        {
+          "args": [
+            "init",
+            "-g",
+            "--codex",
+            "--auto-patch"
+          ],
+          "exit": 1,
+          "files": [],
+          "history_db_created": false,
+          "stderr": [
+            "rtk: --codex cannot be combined with --auto-patch"
+          ],
+          "stdout_first_lines": [],
+          "step": "--auto-patch"
+        }
+      ]
+    },
+    {
+      "scenario": "CODEX_HOME outside HOME",
+      "steps": [
+        {
+          "args": [
+            "init",
+            "-g",
+            "--codex"
+          ],
+          "exit": 0,
+          "files": [
+            {
+              "bytes": 47,
+              "change": "created",
+              "file": "codex-elsewhere/AGENTS.md"
+            },
+            {
+              "bytes": 546,
+              "change": "created",
+              "file": "codex-elsewhere/RTK.md"
+            },
+            {
+              "change": "changed",
+              "file": "codex-elsewhere/hooks.json",
+              "lines": [
+                "+      },",
+                "+      {",
+                "+        \"matcher\": \"Bash\",",
+                "+        \"hooks\": [",
+                "+          {",
+                "+            \"type\": \"command\",",
+                "+            \"command\": \"rtk hook codex\"",
+                "+          }",
+                "+        ]"
+              ]
+            },
+            {
+              "bytes": 227,
+              "change": "created",
+              "file": "codex-elsewhere/hooks.json.bak"
+            }
+          ],
+          "history_db_created": true,
+          "stderr": [],
+          "stdout_first_lines": [
+            "RTK configured for Codex CLI.",
+            "  RTK.md:    <scratch>/codex-elsewhere/RTK.md",
+            "  Hook:      <scratch>/codex-elsewhere/hooks.json (registered)",
+            "  AGENTS.md: @<scratch>/codex-elsewhere/RTK.md reference added",
+            "  Codex global instructions path: <scratch>/codex-elsewhere/AGENTS.md",
+            "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+            "  Optional: if history recording fails with SQLITE_CANTOPEN in the"
+          ],
+          "step": "init"
+        }
+      ]
+    }
+  ],
+  "schema": "rtk-init-codex-probe/1"
+}

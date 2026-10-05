@@ -5,6 +5,8 @@ reconciled with accepted main `85543efe5abcddb7b7cddb14e8774e83b6758616`; its Co
 recommendations and isolated comparison arms. It establishes no merit winner,
 provider/model/GPU result or replacement-host acceptance.
 
+The RTK and mcporter source rows follow [PR #693](https://github.com/seathatflowsinourveins/native-agent-stack/pull/693), main `14048b840425c2569e0df60a6596e94e601da15b`: **RTK 0.51.0** and **mcporter 0.14.2**. The RTK archive SHA-256 is checked against the [release checksums](https://github.com/rtk-ai/rtk/releases/download/v0.51.0/checksums.txt); the mcporter tarball is rehashed and checked against [npm integrity](https://registry.npmjs.org/mcporter/0.14.2). This source refresh establishes no new host acceptance.
+
 The native manifest profile is `new-wsl-clean-foundation`. Its component list is
 only Codex and Claude Code; the existing bootstrap adds its pinned Node, uv and
 gh prerequisites. CPython 3.13.15 is supplied through uv without replacing the
@@ -66,7 +68,15 @@ minimal bootstrap extracts the pinned official Node archive directly, so its
 upstream mise reproduction example adds no default mise dependency.
 
 Comparison positions are display/dependency order. Every arm has
-`default_install: false` and `default_precedence: null`. The Ubuntu 26.04.1 and
+`default_install: false` and `default_precedence: null`. On 2026-10-04 the owner's
+decision ([record](../docs/decisions/2026-10-04-token-full-stack-owner-default.md),
+amendment 4 of the definitive manifest's rule) made the token-efficiency tools default
+installs: RTK and Headroom are no longer comparison arms, ccusage gained its install and
+acceptance, and context-mode, jcodemunch-mcp, codebase-memory-mcp, Repomix, TOON,
+MarkItDown, Context Hub, otel-tui and agentsview have rows. They install through the
+[install plan](../evidence/artifacts/new-wsl-install-plan-20261002/README.md)'s slot rows,
+not by iterating over entries; SocratiCode stays an arm of the split code-search slot,
+which the plan's interim installs beside semble. The Ubuntu 26.04.1 and
 24.04.5 images are symmetric provisional arms. Canonical publishes a separate
 checksum for each; the dual-image recipe owner supplies their install/acceptance
 steps. The engine comparison precedes container-boundary qualification, and
@@ -74,6 +84,17 @@ code retrieval precedes the one embedding-server comparison. Do not install by
 iterating over entries. Optional services, hosted workflows, paid services and
 task-specific choices remain unprovisioned with reasons. Trading's twelve
 layers await their owner's report after October 3.
+
+The 2026-10-04 G4 observability plan repair synchronizes the Collector's **0.162.0**
+pin and Grafana OSS **13.2.3**, including the plan's published tar-archive SHA256s.
+Their entries now name the staged install and native acceptance commands in the
+[install plan](../evidence/artifacts/new-wsl-install-plan-20261002/README.md).
+The [G4 decision](../docs/decisions/2026-10-04-2604-e2e-fix-wave-g4-observability.md)
+records the native data-directory environment, Grafana provisioning and the alert
+receiver's pending user choice. The changed recipes are **UNRUN** on a distribution.
+Historical source-review gaps remain in their original receipts. Grafana's
+canonical selection remains split; explicit `--only grafana` installs the display
+for finalization, pending the coordinator's selection reconciliation.
 
 The generator owner can import `load_profile(root)` from
 [scripts/new_wsl_profile.py](../scripts/new_wsl_profile.py), or consume its public
@@ -190,9 +211,9 @@ have no default-install precedence.
 | CPython 3.13 | 3.13.15 | [reviewed install source](https://github.com/astral-sh/uv/blob/0.12.17/docs/guides/install-python.md) |
 | Codex | 0.160.0 | [reviewed install source](https://github.com/openai/codex/blob/rust-v0.160.0/README.md), [npm version syntax](https://docs.npmjs.com/cli/v11/commands/npm-install) |
 | Claude Code | 2.1.284 | [reviewed install source](https://code.claude.com/docs/en/setup#install-a-specific-version) |
-| mcporter | 0.14.1 | [reviewed install source](https://github.com/openclaw/mcporter/blob/93e0916cafe2d624b94271e31b75ca681a016514/README.md) |
+| mcporter | 0.14.2 | [reviewed install source](https://github.com/openclaw/mcporter/blob/aa0f55f9bffcde9d2070c86145f37d4dd3525f6c/README.md) |
 | MCP Inspector | 2.9.0 | [reviewed install source](https://github.com/modelcontextprotocol/inspector/blob/ae865a19178ddf6f375780a02e9c77c4cf4da184/README.md) |
-| sandbox-runtime | 0.0.77 | [reviewed install source](https://github.com/anthropics/sandbox-runtime/blob/6fa731368807419ee157f9a3fac955fefe1019c6/README.md) |
+| sandbox-runtime | 0.0.78 | [reviewed install source](https://github.com/anthropics/sandbox-runtime/blob/v0.0.78/README.md) |
 | Worktrunk | 0.80.0 | [exact release installer and shell setup](https://github.com/max-sixty/worktrunk/releases/tag/v0.80.0) |
 | Serena | c6fbd1c5932df2494ffa0020af5a9fbe80b82143 | [local install from the exact source checkout](https://github.com/oraios/serena/blob/c6fbd1c5932df2494ffa0020af5a9fbe80b82143/CONTRIBUTING.md#L70) |
 | trafilatura | 2.2.0 | [tagged installation guide](https://github.com/adbar/trafilatura/blob/v2.2.0/docs/installation.rst#L73) |
@@ -211,9 +232,9 @@ have no default-install precedence.
 | ai-memory | 2.5.2 | [upstream mise example](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L1622), [GitHub backend version syntax](https://mise.jdx.dev/dev-tools/backends/github.html) |
 | Hindsight | 0.10.2 | [reviewed install source](https://github.com/vectorize-io/hindsight/blob/5fc4ce20917b916240cef27c212c387a177f115b/README.md) |
 | agentmemory | 0.9.29 | [reviewed install source](https://github.com/rohitg00/agentmemory/blob/2d38dafede67d0d4ed920cde94d2106e98825b8a/README.md) |
-| RTK | 0.50.0 | [upstream Git install](https://github.com/rtk-ai/rtk/blob/1d87b8e719ce0a50c223cd93ca64dd16921f9aec/README.md#L106), [Cargo tag/lock syntax](https://doc.rust-lang.org/cargo/commands/cargo-install.html) |
+| RTK | 0.51.0 | [release asset](https://github.com/rtk-ai/rtk/blob/v0.51.0/README.md#L113) through the [archive procedure](../recipes/README.md#official-release-archives) (0.50.0 until the #693 refresh of 2026-10-04) |
 | sqz | 1.9.0 | [reviewed install source](https://github.com/ojuschugh1/sqz/blob/726e77bd7e9d6ae7529e2750da69d86e622ca699/README.md) |
-| Headroom | 0.37.0 | [reviewed install source](https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md) |
+| Headroom | 0.37.0 | [reviewed install source](https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/README.md); since 2026-10-04 the [uv tool form](https://github.com/headroomlabs-ai/headroom/blob/v0.37.0/README.md#L92) with the `[mcp]` extra, not `[all]` |
 | Phoenix | 20.18.0 | [reviewed install source](https://github.com/Arize-ai/phoenix/blob/d2ad1d916fa8afa21ea218ef7918ef7e4df6ab60/README.md) |
 | Dagu | 2.16.6 | [reviewed install source](https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md) |
 | mise | 2026.9.18 | [tagged installation guide](https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md), [version normalization in the selected installer source](https://github.com/jdx/mise/blob/v2026.9.18/packaging/standalone/install.envsubst#L300) |
@@ -234,3 +255,38 @@ after integrating the parallel patches remain with their owner.
 The wave-1 profile adapter and prerequisite-status commands returned exit 0,
 and the existing eight `NewWslProfileCliTests` passed. These are local contract
 checks; the upstream install and source-test examples remain unrun.
+
+## G2 runtime-worker plan pin (2026-10-04)
+
+The clean-host install plan keeps its isolated OpenHands SDK/tools/dispatcher at
+v1.50.1 (`1e1390acc8788346ba4804c34323284009bf3f5e`), the definitive manifest's
+selection and comparison baseline, using constraints exported from the upstream frozen lock; the move to
+v1.51.0 is a currency follow-up with its own declared amendment. [The release](https://github.com/OpenHands/software-agent-sdk/releases/tag/v1.50.1)
+and [the dated G2 decision](../docs/decisions/2026-10-04-2604-e2e-fix-wave-g2-mcp-workers.md)
+record the source and acceptance boundary. The architecture's
+`cross:runtime-workers` winner now records this SDK plan pin; the separate frozen
+1.49.6 container/SWE-bench recipe retains its original pin in the blueprint. This profile has no OpenHands
+component entry, so the repair adds no inventory row or shared count.
+
+Inspector already has a 2.9.0 on-demand entry here. Its pinned Web launch,
+published-package acceptance and fresh-session checks now live in the install
+plan's own row. GPT Researcher v3.7.0 and embedded DeerFlow v2.1.0 retain their
+plan pins and now have an active second-gatherer configuration and functional
+checks through both native clients. These are unexecuted plan commands; the
+coordinator's destination-host E2E must qualify them.
+
+
+## Syft clean-install pin correction (2026-10-04)
+
+The bounded [verified-E2E fix-wave decision](../docs/decisions/2026-10-04-2604-e2e-fix-wave-g6-eval-supply.md)
+moves this profile's Syft row from historical 1.52.0 to the install plan's
+**1.54.0**, source `cc326e45a6213360266dda4b30cc68095946d676`. The owned install
+is `mise use -g syft@1.54.0`, supported by
+[jdx/mise@v2026.10.0:registry/syft.toml:1](https://github.com/jdx/mise/blob/v2026.10.0/registry/syft.toml#L1).
+The upstream acceptance is `syft alpine:latest`, from
+[anchore/syft@cc326e45a6213360266dda4b30cc68095946d676:README.md:48](https://github.com/anchore/syft/blob/cc326e45a6213360266dda4b30cc68095946d676/README.md#L48).
+The Linux archive and its published SHA256 were rehashed in this bounded Linux
+job; that observation is separate from the still-UNRUN destination profile.
+The historical source-review references and trading receipts are retained.
+The row's two source-review command gaps are now filled. Shared aggregate counts
+and registry receipts are the coordinator's integration work.

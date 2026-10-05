@@ -1,0 +1,7 @@
+{
+  "skillOverrides": {
+    "grill-me": "off",
+    "improve-codebase-architecture": "off",
+    "semgrep": "off"
+  }
+}

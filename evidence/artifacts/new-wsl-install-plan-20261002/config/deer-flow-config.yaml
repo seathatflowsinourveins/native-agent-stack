@@ -1,0 +1,23 @@
+# bytedance/deer-flow@v2.1.0 config.example.yaml:23,250-278,802-807,1060-1065,1436-1437.
+# Public research through the selected keyless loopback gateway; no provider secret.
+config_version: 45
+models:
+  - name: gpt-runtime
+    use: langchain_openai:ChatOpenAI
+    model: cx/gpt-6.1-sol-max
+    base_url: http://127.0.0.1:21128/v1
+    api_key: local-loopback
+    use_responses_api: true
+    output_version: responses/v1
+    request_timeout: 600.0
+    max_retries: 2
+tools:
+  - name: web_search
+    group: web
+    use: deerflow.community.ddg_search.tools:web_search_tool
+    max_results: 5
+  - name: web_fetch
+    group: web
+    use: deerflow.community.jina_ai.tools:web_fetch_tool
+sandbox:
+  use: deerflow.sandbox.local:LocalSandboxProvider
