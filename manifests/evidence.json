@@ -4315,8 +4315,8 @@
     },
     {
       "path": ".github/requirements-ci.txt",
-      "sha256": "0b37433fb0fb165c893737e8e887581a07a6469683fbdf67ada1a08288758605",
-      "bytes": 467
+      "sha256": "7f6d55d0845ac87432ea24bafe162583a7c97938d164bd5a0b47fcb04e9877aa",
+      "bytes": 947
     },
     {
       "path": ".github/tag-ruleset.json",
@@ -16755,6 +16755,11 @@
       "bytes": 22253
     },
     {
+      "path": "docs/decisions/2026-10-05-ci-decision-metadata.md",
+      "sha256": "924bdbf07725868ee32256345c2d16cb34489166737d2e327e0b23e584a99e56",
+      "bytes": 6834
+    },
+    {
       "path": "docs/decisions/2026-10-05-dagu-mise-pin-move.md",
       "sha256": "c1eaaffe72e840c7655e05a44e71116174dc1701675d2e08730ba54a8c9a6e87",
       "bytes": 135389
@@ -16773,6 +16778,11 @@
       "path": "docs/decisions/2026-10-05-typesafe-sdk-transport.md",
       "sha256": "d197ab297186fe55e6c83624c78a06ead264e00d66a7fe2d5e62cfc1b653dbd6",
       "bytes": 9226
+    },
+    {
+      "path": "docs/decisions/decision-metadata-index.json",
+      "sha256": "5ea2b38985646f42eba0f178e04e622976471e017acf7de013b76f08f40bcfb0",
+      "bytes": 209
     },
     {
       "path": "docs/direct-results.md",
@@ -33103,6 +33113,11 @@
       "path": "evidence/artifacts/github-ci-measurements-20261003/later-reads-20261003.json",
       "sha256": "b100809511623c4cc13ef62939f7cf52e3113b40eae63952146657ed47f56ab3",
       "bytes": 56770
+    },
+    {
+      "path": "evidence/artifacts/github-ci-r5-20261005.json",
+      "sha256": "1a35ac27458b48412e7516313cde937117465e19cd71e38abcf9396504116adb",
+      "bytes": 14222
     },
     {
       "path": "evidence/artifacts/gitleaks-macos-memory-bound-20260924/measure.py",
@@ -53161,8 +53176,13 @@
     },
     {
       "path": "scripts/currency_due.py",
-      "sha256": "4b2e9ecd31ebe0801d7ae44f958a173b372819a0b1984838277502a13ebfb9fe",
-      "bytes": 54767
+      "sha256": "a6ed5fce54db8a8b11e4e9aaa4cac9f0bfd982c4a7c4660aa11928d5bb439c62",
+      "bytes": 57156
+    },
+    {
+      "path": "scripts/decision_metadata.py",
+      "sha256": "47394030dca1e6d6e305236953b8a057a005eb75173700faa99db171f4d305f9",
+      "bytes": 7692
     },
     {
       "path": "scripts/env_freshness.py",
@@ -53266,8 +53286,8 @@
     },
     {
       "path": "scripts/validate.py",
-      "sha256": "2deb008f40032fd860c1386e11518bc8d8f5b21df40b5ff70f13ef4151ca69ab",
-      "bytes": 26751
+      "sha256": "362c04b6d5ff29aa6184a5596bbec3e6d6bbb7eb99b0e57efa0b68d7ac606239",
+      "bytes": 27389
     },
     {
       "path": "scripts/validate_catalogs.py",
@@ -53833,6 +53853,11 @@
       "path": "tests/test_currency_due.py",
       "sha256": "ce3f688cebe5a66b89b7a2770ceb018f0b9b7a144fc5e26fa6a167b1c8626d92",
       "bytes": 103359
+    },
+    {
+      "path": "tests/test_decision_metadata.py",
+      "sha256": "df0ac30283bab63b104de7ff9727f8e88827c826c52cd1b891555c7118f51542",
+      "bytes": 10642
     },
     {
       "path": "tests/test_delisting_coverage.py",
