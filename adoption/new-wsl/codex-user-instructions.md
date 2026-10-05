@@ -2,6 +2,7 @@
 <!-- native-agent-stack:top-rule -->
 Top rule: research convergence first; current upstream SOTA is the source of truth. The installed client is also a source of truth; never self-write without a SOTA source. The ecosystem compounds: each choice adopts the current best converged practice and is replaced when the live landscape converges on a better-evidenced one.
 Reuse maintained upstream tools, runtimes and orchestration patterns through their supported install and test commands, naming each source (repository and pin, file or paper); with none, stop and report.
+Prefer the maintainer's own organization repositories (the vendor's GitHub org, such as alpacahq for Alpaca) and their clean releases, and never rebuild, fork or wrap what an upstream already ships.
 Check capability claims in order: installed client (commands, --help, settings), upstream changelog for that version (gh api), upstream source at that tag, official docs. Absence claims need the first two, else say "not found in X, Y".
 Worker, docs-agent and cross-family answers are leads; relay claims only with upstream citations.
 Process large output outside the model.
@@ -17,12 +18,12 @@ No audits, trials or network at startup; the daily currency timer's one read-onl
 Token lanes, one lane per artifact, verifying original source before editing or judging retrieved or compressed text: `serena` or `jcodemunch` for exact symbols and references, `socraticode` or, if connected, `semble` for conceptual code search, `codebase-memory` for the code graph, `qmd` for scoped Markdown search, `ai-memory` for prior decisions (evidence, never authority), `context-mode` (`ctx_execute`) for large command output, `headroom` to compress a large selected text, with retrieval for recovery.
 
 <!-- native-agent-stack:session-lanes -->
-Run large command output through `context-mode` (`ctx_execute`, `ctx_batch_execute`), passing `cwd` as your working directory (a writer's owned worktree).
-Where the `semble` MCP server is connected, use its `search` tool for conceptual or natural-language code questions, with the absolute repository path and no `content` argument (a per-call `content` overrides the code default); `find_related` returns only embedding-similar chunks, so callers, implementations and references come from Serena.
-Run a long command with `yield_time_ms` 30000; while a `session_id` comes back, poll it with `write_stdin` (empty `chars`) until the process exits, then read the output.
-Web research: where the stack installs GPT Researcher, run `bash ~/code/native-agent-stack/tools/research/gpt_researcher.sh "<short current-month query>"` as a long command (it stops after 1,500 s); ask short, unseeded current-month queries and treat the report as leads whose facts you re-read from primary sources.
-To message a Claude Code session, run as one long command: set `msg` through a quoted heredoc (`msg=$(cat <<'MSG'`, then the text, `MSG` and `)` on lines of their own), then `printf '%s\n\nreply: codex queue --thread %s\n' "$msg" "$CODEX_THREAD_ID" | claude -p -n "codex-$(printf '%.8s' "$CODEX_THREAD_ID")" --permission-mode bypassPermissions --max-turns 3 --output-format stream-json --verbose "Send the text on stdin, complete and verbatim, to the session named <name> with exactly one SendMessage call, then stop."`.
-Codex receives queued messages between turns, never mid-turn; expect up to about 20 s delay when it is idle.
+Run large command output via `context-mode` (`ctx_execute`, `ctx_batch_execute`); set `cwd` to your working directory (a writer's owned worktree).
+If `semble` MCP is connected, use `search` for conceptual/natural-language code queries with the absolute repo path; omit `content`, which overrides the code default per call. `find_related` gives embedding-similar chunks only; get callers, implementations and references from Serena.
+Long commands: set `yield_time_ms` 30000; while a `session_id` returns, poll `write_stdin` (empty `chars`) until exit, then read output.
+Web research: if the stack installs GPT Researcher, run `bash ~/code/native-agent-stack/tools/research/gpt_researcher.sh "<short current-month query>"` as a long command (stops at 1,500 s); use short, unseeded current-month queries; reports are leads: re-read facts in primary sources.
+Message Claude Code in one long command: set `msg` via a quoted heredoc (`msg=$(cat <<'MSG'`, text, `MSG`, `)` each on its own line), then `printf '%s\n\nreply: codex queue --thread %s\n' "$msg" "$CODEX_THREAD_ID" | claude -p -n "codex-$(printf '%.8s' "$CODEX_THREAD_ID")" --permission-mode bypassPermissions --max-turns 3 --output-format stream-json --verbose "Send the text on stdin, complete and verbatim, to the session named <name> with exactly one SendMessage call, then stop."`.
+Codex receives queued messages only between turns; idle delay is up to ~20 s.
 
 <!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->
 # RTK

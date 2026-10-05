@@ -46,7 +46,7 @@ from scripts import adoption_status  # noqa: E402
 
 TEMPLATES = ROOT / "adoption" / "templates"
 FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
-# The staged top-rule block (827 words by Python `str.split()`, marker line included; 153 before the standing
+# The staged top-rule block (822 words by Python `str.split()`, marker line included; 153 before the standing
 # clauses, routing and skill-matching lines of docs/decisions/2026-09-30-rule-text-every-layer.md, 595 before the
 # wave-2 records of 2026-10-03 added semble to the token lanes and the session-lanes lines: context-mode's working
 # directory, semble, GPT Researcher and Claude Code messaging, and 800 before the long-command line that runs the
@@ -55,7 +55,9 @@ FIXTURES = ROOT / "tests" / "fixtures" / "codex-worker-lane"
 # serena's lane and shortened "where it is connected" to "if connected" to stay under the 8192-byte budget) and
 # rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md (tag commit 1d87b8e719ce0a50c223cd93ca64dd16921f9aec),
 # both byte for byte.
-TOP_RULE_SHA256 = "147d7a08029039a335f1938888b406feffc53d680eae2a8cf04d524316e13aad"
+# Re-baselined from 827 words on 2026-10-05: the official-upstream sentence and six session-lane compressions
+# (docs/decisions/2026-10-05-official-upstream-never-rebuild.md); the upstream RTK text and exceptions stay unchanged.
+TOP_RULE_SHA256 = "819e63e9e6c2e90eca91a788f4f0b33c382271ebff9d7a99f6cc45b6d45bb54f"
 RTK_AWARENESS_SHA256 = "278274ef3d08c858d4247cc91419c4d74ef922b95719e987b22e896aef10e1fc"
 UPSTREAM_MARKER = "<!-- native-agent-stack:rtk-upstream rtk-ai/rtk v0.50.0 hooks/rtk-awareness-full.md, verbatim -->\n"
 
@@ -442,7 +444,7 @@ class TemplateTests(unittest.TestCase):
     def test_top_rule_and_upstream_text_are_verbatim(self):
         top, upstream, _ = template_segments()
         self.assertEqual(hashlib.sha256(top.encode("utf-8")).hexdigest(), TOP_RULE_SHA256)
-        self.assertEqual(len(top.split()), 827)
+        self.assertEqual(len(top.split()), 822)
         self.assertEqual(hashlib.sha256(upstream.encode("utf-8")).hexdigest(), RTK_AWARENESS_SHA256)
 
     # The standing clauses of docs/decisions/2026-09-30-rule-text-every-layer.md, as the Codex block states them,

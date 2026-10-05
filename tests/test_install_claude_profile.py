@@ -1733,6 +1733,8 @@ class StandingRuleSurfacesTests(unittest.TestCase):
     SURFACES = {"AGENTS.md": ROOT / "AGENTS.md", "portable": ROOT / "examples" / "claude-native" / "CLAUDE.md",
                 "codex": ROOT / "adoption" / "templates" / "codex.AGENTS.template.md"}
     SHARED = (
+        "Prefer the maintainer's own organization repositories (the vendor's GitHub org, such as alpacahq for Alpaca) "
+        "and their clean releases, and never rebuild, fork or wrap what an upstream already ships.",
         "A coordinator, not a delegated child, invokes `search-first` before custom code or a tool choice; when no "
         "listed skill fits the task, it discovers one with `find-skills` and verifies or A/B-tests it with `skill-creator`.",
         "A/B and E2E use upstream harnesses: promptfoo for gateway and LLM A/B, Claude's `skill-creator` paired "
@@ -1799,6 +1801,7 @@ class PortableTopRuleTests(unittest.TestCase):
     # answers as leads, the token practice in every lane, and recording a proven mistake.
     PROCEDURE_PHRASES = (
         "never self-write without a SOTA source",
+        "never rebuild, fork or wrap what an upstream already ships",
         "source of truth",
         "orchestration patterns",
         "installed client",

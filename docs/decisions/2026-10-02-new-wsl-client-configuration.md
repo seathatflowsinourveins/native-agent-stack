@@ -955,3 +955,17 @@ authorization). Source: this PR:docs/decisions/2026-10-04-final-architecture-rou
 ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df:
 docs/client-configurations.md:71,109. No destination runtime acceptance is
 claimed by this projection.
+
+## Addendum 2026-10-05: official upstream rule projection
+
+The [official-upstream rule decision](2026-10-05-official-upstream-never-rebuild.md) adds the requested standing sentence to both client sources and compresses only the Codex source's session-lane wording to keep its byte budget. The generated instruction carriers retain every unit. The current projection below is the output of `new_wsl_client_config.py --check --markdown`; earlier dated projections retain their original counts. This is instruction projection evidence, not a new host installation or runtime qualification.
+
+`examples/claude-native/CLAUDE.md`, written to `adoption/new-wsl/claude-user-instructions.md` (0 unit(s) left out; 58 of 58 lines stay):
+
+```text
+```
+
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 66 of 66 lines stay):
+
+```text
+```
