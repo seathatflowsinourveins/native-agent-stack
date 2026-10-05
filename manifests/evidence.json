@@ -53113,8 +53113,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_metrics.py",
-      "sha256": "aeee74bd789ff2687b32095138446cb00103bf45a46858a4bab89280aaedbc55",
-      "bytes": 35428
+      "sha256": "1d6eaf940021fbaba3ac687a3d3a2d9f6e5492e85a5a372621299d4363ec3ee5",
+      "bytes": 32823
     },
     {
       "path": "tests/test_adaptive_paper_mover.py",
