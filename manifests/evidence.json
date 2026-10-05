@@ -4207,6 +4207,29 @@
         "Sanitized projections only; private original hashes, failed cases and corrections retained. The projection step ran no new provider/test/control execution and made no shared edits; registration in manifests/evidence.json is separate from that step."
       ],
       "path": "evidence/receipts/native-sdk-role-mcp-followup-20261002.json"
+    },
+    {
+      "id": "ns2604-currency-qualification-20261005",
+      "kind": "native_cli_e2e",
+      "component_ids": [
+        "jcodemunch-mcp",
+        "dagu",
+        "sandbox-runtime",
+        "worktrunk",
+        "syft"
+      ],
+      "claim": "Five canonical stack owners and one plan prerequisite have destination installation and selected native use qualification on NativeStack2604. Scope and evidence classes are per owner; no whole-stack or full-lifecycle recertification.",
+      "limitations": [
+        "Prior receipts and lifecycle stages retain their original hosts, dates and pins. The saturation audit aggregation remains current_host_recertified_by_this_audit=false.",
+        "Version checks, release/advisory review, registry integrity, native examples, local assertions, synthetic controls and unchanged upstream tests are different evidence classes.",
+        "Original full output from the first jCodeMunch failure was truncated by the collector; its returned summary/exits remain, but missing traceback detail is not reconstructed. The later unchanged harness summary is retained verbatim.",
+        "Raw native conversations and policy fixture paths remain private. The successful SRT stream is deleted by the native wrapper; its stdout success predicate and output hash are retained. Worktrunk streams remain private.",
+        "No permission/client account/model/effort settings, OS restart, trading operation or main checkout change was performed.",
+        "No causal provider-token, savings, cost or convergence superiority claim. Open holds are documented in the currency decision.",
+        "The native collector recorded mise with --allow-unbound-version, but its host validator rejects IDs absent from canonical component catalogs. The four original mise receipt bytes are retained unchanged as prerequisite artifacts outside the component census; they are not valid catalog host-enrollment receipts.",
+        "Second independent mise drift to2026.10.0 at05:05Z; final authorized reapply/doctor/version/digest pass at05:07:28Z is an immediate observation only. Durable shared-host state remains a coordinator serialization question."
+      ],
+      "path": "evidence/receipts/ns2604-currency-qualification-20261005.json"
     }
   ],
   "files": [
@@ -4637,8 +4660,8 @@
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "8be6b5bb2981843c3beca082169211fb0bd7071abf0e5abccdc9f31632152841",
-      "bytes": 254949
+      "sha256": "1c1c84be9e1591dfb3fa6273ea799c5bb8e11d387e0a237e06ab0d747272e22e",
+      "bytes": 258074
     },
     {
       "path": "adoption/new-wsl-profile.md",
@@ -4652,7 +4675,7 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "4a0c77c9412326fc1c9bcb9b9744824cd85071fba745b44c8f0cd3afeb7bd197",
+      "sha256": "a35717837534636378074314d1c4568687222ffbdec1f6555cf21b66487fcfd3",
       "bytes": 46809
     },
     {
@@ -10308,8 +10331,8 @@
     },
     {
       "path": "blueprints/token-native-focus/saturation-audit.json",
-      "sha256": "a0229ad6acc3b1d81857d606bbac02db43a25a8f774540fe826a5f132a2380f7",
-      "bytes": 484781
+      "sha256": "dece18a23f72ce651251699b4842dc61e1693220a1400c00b74352946e1cdb9d",
+      "bytes": 487549
     },
     {
       "path": "blueprints/trials-20260926/README.md",
@@ -15578,8 +15601,8 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "0cd26fdab18ab685ea2fb0f5d996416befbade4e3bcefb0fcb0c5b2f904cc2bc",
-      "bytes": 308538
+      "sha256": "287fc3304fd739f9e73d50d2c529ea4566ef23eabad0e38741c96f497f16edd0",
+      "bytes": 308537
     },
     {
       "path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
@@ -15628,7 +15651,7 @@
     },
     {
       "path": "catalogs/landscape/component-evidence-matrix.json",
-      "sha256": "a3d4df9eb0f9cea278deb99a6370eb7f17e46c87e63b2092a649e9831d147519",
+      "sha256": "ae2bd9a66a033efc868ca4cfe0f81c6db1db9594c8b4e9f555154862aa29ccf9",
       "bytes": 314853
     },
     {
@@ -15693,8 +15716,8 @@
     },
     {
       "path": "catalogs/landscape/upstream-snapshot.json",
-      "sha256": "107c6176702bdc95c586762cf9521c1d91b79bbd4ce6ad9e92c3c08afe063f84",
-      "bytes": 255589
+      "sha256": "3193bef5f6cd92dc5992278077fc206801dd7169ef7d3f2021b032b2a96c41e8",
+      "bytes": 261751
     },
     {
       "path": "catalogs/landscape/us-equities.json",
@@ -16163,7 +16186,7 @@
     },
     {
       "path": "docs/component-evidence-matrix.md",
-      "sha256": "f09a0e803184d4e31e48c534ae6d717774516bc2f42d1f7195fa4bee434eb0cb",
+      "sha256": "1e3deadb0c7a5c4e1927a02bd38a409984e3fadf0654c9ab6322f043601ab469",
       "bytes": 32903
     },
     {
@@ -16418,8 +16441,8 @@
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-definitive-defaults.md",
-      "sha256": "9ac59bf6179fc92979ba23ef628cbc6975031aac40797953f0e231684dc302b8",
-      "bytes": 76076
+      "sha256": "193a3aeb0a93ea0bb828f7e59644faabc44ae4b4341e6a6cc5253894c6f672be",
+      "bytes": 76808
     },
     {
       "path": "docs/decisions/2026-10-01-new-wsl-distro-recipe.md",
@@ -16615,6 +16638,11 @@
       "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",
       "sha256": "1389de18bbaf5c41d8f22093a9642d982230a851f954183b7c8254e0b5890bce",
       "bytes": 18701
+    },
+    {
+      "path": "docs/decisions/2026-10-05-ns2604-currency-wave.md",
+      "sha256": "aef8ae59915a30466c6725eca7624f409cc206619599665af1c1a2f0dabf92fa",
+      "bytes": 12315
     },
     {
       "path": "docs/direct-results.md",
@@ -16878,13 +16906,13 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "a62a12a6b48f3ef9183893aa4eadce2e37aa1ad35350d7af0a347b603ca89a36",
-      "bytes": 651837
+      "sha256": "6fd04fceb4c1c014f7fdd8b11d3817c33e23e5fe348bbc1f49630ede44a2f231",
+      "bytes": 652496
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "e4c94b2a748ed09a86c63129bba9a9acf5eb11475a354a1ec17660af052b16d0",
-      "bytes": 354052
+      "sha256": "491926bed720f982e1bbb3fe5e999c67aa4094d2b25fba49020c5f48b409fee6",
+      "bytes": 353687
     },
     {
       "path": "docs/next-host-stages.md",
@@ -16978,8 +17006,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "0cf61d527319aa065dcf74da19b78214c527005cd2a5f4bf73b5b7c0dcfceda6",
-      "bytes": 591301
+      "sha256": "3f07eeaa9aa7473372658fbcb2b624d8235b74e255943cf40aad8e0b3c25ac82",
+      "bytes": 591658
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -38153,8 +38181,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "9982349afc6b914a5fc5a6a085f3b343f49a9d3bb863bf5d949c1deb3b32752e",
-      "bytes": 199933
+      "sha256": "5081cdaa23938e4fecf6cc02fd258147f3b2ffabdaf7ed8a2f4ef6c17c92dd3f",
+      "bytes": 200482
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -38903,8 +38931,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "3c54a5a4e9a03c67ae52f161c8403559f33faf64229484470d4e932c85a396cd",
-      "bytes": 4790
+      "sha256": "0d4b8ccca83ebc6bdf041792ad81e94fe32b9d3c9e6b6327784c7842962073a8",
+      "bytes": 5513
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -38918,8 +38946,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/SOURCES.md",
-      "sha256": "073b250d7d55f038979a9921e6599a7f5fcf8e3557129ed1f0f8ba61b6766d0c",
-      "bytes": 140617
+      "sha256": "cc69999fc3217c9079570ee781625e3c23bcc0845150dba7a385229d23a366ac",
+      "bytes": 147613
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/VALIDATION.md",
@@ -38928,8 +38956,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "719c3386ff4e4edda10dbe3d23e7599d097b0a27dee92c061d92ebc438a26d79",
-      "bytes": 127896
+      "sha256": "bdc459e836283c6dff5845060efa18578c4fdbec3ff603bcc7ea7c8b0b4a1a07",
+      "bytes": 127844
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
@@ -39183,8 +39211,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/config/srt-client-accept.sh",
-      "sha256": "5e9f6f87bb98c4023e5a174a7b3154dc2490ebaabd2860e73ec1009548857d2a",
-      "bytes": 6237
+      "sha256": "524ac314254d684ae5ee464a70d6da826a28cf06ffc7d265a8b50423a6ce6eea",
+      "bytes": 6376
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/container-validation.json",
@@ -39193,13 +39221,13 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "44b2175638441c59b6fe3a46c6c5e5ce1d72fa5b8393dccd769cb82b2aad22a3",
-      "bytes": 313874
+      "sha256": "05640ef28b6ef8935bb969e81580137aaf12376d80d34beed93059b42154a27e",
+      "bytes": 316551
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
-      "sha256": "b1707542184300681cce017aa3f383552d4b9ae8d3d3c06e222f8a4d5784ec3c",
-      "bytes": 102158
+      "sha256": "97f54324a6159503f291dc2ccbdd0bf29e8c5807cb99d1f2cba8ec8a4e2ff6bd",
+      "bytes": 102199
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/mise.toml",
@@ -39223,8 +39251,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/owners.json",
-      "sha256": "c9e701881f70752c06dbf6e2db6024268712b8df70bba0b77e52c6d6f253361c",
-      "bytes": 33121
+      "sha256": "052a706885e2dfb261e8a4de580cf2d9f03cec2026f363446a8f04f6f71882ac",
+      "bytes": 33311
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/real-distribution-validation.json",
@@ -39263,8 +39291,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "53b5dc9c43c6e40d5e9bb62c8cf9967ba61388ab1b9b2c13f77d3eaafe38b892",
-      "bytes": 109862
+      "sha256": "d2b0caa8e229d2b269d411088df923404acc8eab8bf19f4aba41bd62598218ee",
+      "bytes": 110411
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/copy-notes.json",
@@ -39885,6 +39913,51 @@
       "path": "evidence/artifacts/notification-types-20260929/tmux_bell_probe.py",
       "sha256": "b13ffd5fe0995830da568e5582f1bd3fdea77d3b16d651d660d16c4fa56628ef",
       "bytes": 23333
+    },
+    {
+      "path": "evidence/artifacts/ns2604-currency-20261005/artifact-integrity.json",
+      "sha256": "7738cf9211706450c5f960b8f29300c6ec9f2fcefb78d4f4b9dd060f3bf8aeea",
+      "bytes": 4938
+    },
+    {
+      "path": "evidence/artifacts/ns2604-currency-20261005/input-files.json",
+      "sha256": "ea03df2ada4906153ab2a4c49a8b39dfee1ce765ee748b07d01dde991b552fda",
+      "bytes": 2066
+    },
+    {
+      "path": "evidence/artifacts/ns2604-currency-20261005/jcodemunch-upstream-harness-output.md",
+      "sha256": "78f700ae649448ee366e0bfc137192f73634c67e324653607f94f71d388564f9",
+      "bytes": 315
+    },
+    {
+      "path": "evidence/artifacts/ns2604-currency-20261005/mise-final-observation.json",
+      "sha256": "559da1c41c035235acc7739ef2bcb9addee194b3a7315b6d29940bc925aa022c",
+      "bytes": 1153
+    },
+    {
+      "path": "evidence/artifacts/ns2604-currency-20261005/prerequisite-receipts/ns2604-currency-20261005--mise--install--20261005-2.json",
+      "sha256": "d68061a073a2de21b61805df564f96584d20fb2a5c1af89e9474bd796b2808b0",
+      "bytes": 2032
+    },
+    {
+      "path": "evidence/artifacts/ns2604-currency-20261005/prerequisite-receipts/ns2604-currency-20261005--mise--install--20261005.json",
+      "sha256": "866439222bf1b8f41d3f73dcc08b40cd0d3186cf91aa8378a06fdc556fcd6960",
+      "bytes": 1980
+    },
+    {
+      "path": "evidence/artifacts/ns2604-currency-20261005/prerequisite-receipts/ns2604-currency-20261005--mise--use--20261005-2.json",
+      "sha256": "1061dee7da9a8896b9d57f279ced75a60a0cfaa5b8df7dba4957cdb50ad35d28",
+      "bytes": 2168
+    },
+    {
+      "path": "evidence/artifacts/ns2604-currency-20261005/prerequisite-receipts/ns2604-currency-20261005--mise--use--20261005.json",
+      "sha256": "219ad10bc17de7bbc1e32ff4d15b7e84a621cbd95008c10994f81cd07bf3f68f",
+      "bytes": 2651
+    },
+    {
+      "path": "evidence/artifacts/ns2604-currency-20261005/syft-empty-control.json",
+      "sha256": "889c7228cef8c0a9b87179a7bcaff56362e225dbc1a0576e0c141a130961052a",
+      "bytes": 53
     },
     {
       "path": "evidence/artifacts/ns2604-e2e-20261004/adjudication-prompt.md",
@@ -50932,6 +51005,91 @@
       "bytes": 8175
     },
     {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--dagu--install--20261005.json",
+      "sha256": "478df32b11eb62a3b36209f6ce73da8d127484f746174ad123059977d9590b13",
+      "bytes": 1966
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--dagu--use--20261005.json",
+      "sha256": "4ec88d56f0329ad9503002a40869a15e2af2580ec74c4e5b3891c74a1503ec61",
+      "bytes": 5756
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--jcodemunch-mcp--install--20261005.json",
+      "sha256": "6486a1a3f812a307921d46b584a5f2fdefc6bee9c98842cbbec1a79391a8cbe1",
+      "bytes": 2032
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--jcodemunch-mcp--use--20261005-2.json",
+      "sha256": "5ceaf33d689059feb81e0343a8702ac2905216c18c0391ebee89e4d2baea335d",
+      "bytes": 3016
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--jcodemunch-mcp--use--20261005.json",
+      "sha256": "ee5a97b130e5e04b8a5a9f05b5e94f652722453f28dfefd257646ba41a970cd6",
+      "bytes": 4132
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--sandbox-runtime--install--20261005-2.json",
+      "sha256": "36781f521d8fad3631173a379d8724c8df7b814c7d881aceabff1468fa79cc18",
+      "bytes": 2149
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--sandbox-runtime--install--20261005.json",
+      "sha256": "f04148f9e7f62b2298f5b4fb764fea20a7693e392f4571eacb7a8b8cc56bf566",
+      "bytes": 2048
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--sandbox-runtime--use--20261005-2.json",
+      "sha256": "7570512916d4635c2c3dde0f2dec370f9c99c595e2e714e28822c1c128107108",
+      "bytes": 3205
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--sandbox-runtime--use--20261005-3.json",
+      "sha256": "57740809ebd528910f49afdadaa53813cc2fe36fef7f9e1a40c2aca174e3475f",
+      "bytes": 2374
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--sandbox-runtime--use--20261005.json",
+      "sha256": "f3a2f457e38cdc59d9c236fc40d5a49bfc5804449980ffce68a856603a5f9161",
+      "bytes": 2757
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--syft--install--20261005.json",
+      "sha256": "e5ba4c958e42fd96c4dda449d05d6cebabefd8c2013e36b6a2c8c0cf16b82581",
+      "bytes": 1989
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--syft--use--20261005-2.json",
+      "sha256": "c3ce1ba9adb7c7a3a39a4a34cef71d7963d069f94b11306548193b63669cae40",
+      "bytes": 1948
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--syft--use--20261005.json",
+      "sha256": "e719818f624ed430445fa59f1876a285708feab34c6bb88c98c3b07184f6939c",
+      "bytes": 2502
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--worktrunk--install--20261005.json",
+      "sha256": "eb61007c358603190f0a06e97741ebfe4fd15b5c124872b8d01b3894f447a01d",
+      "bytes": 2015
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--worktrunk--use--20261005-2.json",
+      "sha256": "26cfc82b729201f731c02244b1006aff1f0117b5a6da982ff3131a24dd9c6af8",
+      "bytes": 3105
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--worktrunk--use--20261005-3.json",
+      "sha256": "f08fc26641e509195b6e7a84eb743a9fa27ae282e17e18c06484e25db0779fef",
+      "bytes": 2003
+    },
+    {
+      "path": "evidence/hosts/ns2604-currency-20261005/ns2604-currency-20261005--worktrunk--use--20261005.json",
+      "sha256": "13c14473c8a687de61e3ebbebfc221bfd1d3992fd3cffd68638e26ca238fd95b",
+      "bytes": 2942
+    },
+    {
       "path": "evidence/hosts/rtx5090-laptop-20260923/rtx5090-laptop-20260923--vllm--use--20260923.json",
       "sha256": "3d5a293615e6ddd3e82e9323e54f8784d46d7adaa94606ec373b81f9426a2a4e",
       "bytes": 3875
@@ -51610,6 +51768,11 @@
       "path": "evidence/receipts/notification-types-20260929.json",
       "sha256": "7f5422e2b4d7c60801b48d735619689802b3b353199e149c2667c586cc90cf5d",
       "bytes": 24695
+    },
+    {
+      "path": "evidence/receipts/ns2604-currency-qualification-20261005.json",
+      "sha256": "553560251dc043bf633c9414b776df90664f588cbc13bd6125b8b2c30a69b16e",
+      "bytes": 21668
     },
     {
       "path": "evidence/receipts/ns2604-e2e-20261004.json",
@@ -52368,8 +52531,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "07a9ba1f192497808897040543ae605a1da686c7743b23df58503e927f453520",
-      "bytes": 102293
+      "sha256": "fa268024cc6ef12e2f968fd878d443a7b2c7cb3b2152f51f51a6154e8f6ee269",
+      "bytes": 103455
     },
     {
       "path": "observability/README.md",
@@ -52783,7 +52946,7 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "4c25e7d13eb9f1ee11418427b6bf9c65800ac55f5b6e6fc7e9f70e21efbc068d",
+      "sha256": "95d45da579b1035c4cfa54f330f1ab179b949bbdb49555dd82c5163d2367300a",
       "bytes": 117733
     },
     {

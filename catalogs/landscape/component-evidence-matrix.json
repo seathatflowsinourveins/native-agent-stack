@@ -446,8 +446,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 2,
-                "latest": "2026-09-25T15:35:18Z",
-                "pass": 2
+                "latest": "2026-10-05T04:40:27Z",
+                "pass": 5
               },
               "qualified_models": []
             },
@@ -1577,11 +1577,11 @@
               "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
-                "fail": 0,
+                "fail": 2,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 2,
-                "latest": "2026-09-25T15:35:22Z",
-                "pass": 2
+                "latest": "2026-10-05T04:34:07Z",
+                "pass": 4
               },
               "qualified_models": []
             },
@@ -2715,11 +2715,11 @@
               "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
-                "fail": 0,
+                "fail": 2,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 2,
-                "latest": "2026-09-25T15:35:22Z",
-                "pass": 2
+                "latest": "2026-10-05T04:34:07Z",
+                "pass": 4
               },
               "qualified_models": []
             },
@@ -2761,11 +2761,11 @@
               "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
-                "fail": 0,
+                "fail": 2,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 1,
-                "latest": "2026-09-25T15:37:27Z",
-                "pass": 1
+                "latest": "2026-10-05T04:33:37Z",
+                "pass": 4
               },
               "qualified_models": []
             },
@@ -4718,8 +4718,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 2,
-                "latest": "2026-09-25T15:33:59Z",
-                "pass": 2
+                "latest": "2026-10-05T04:19:30Z",
+                "pass": 4
               },
               "qualified_models": []
             },
@@ -6395,11 +6395,11 @@
               "e2e_state": "host_verified",
               "host_receipts": {
                 "dissented": 0,
-                "fail": 0,
+                "fail": 2,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 2,
-                "latest": "2026-09-25T15:35:22Z",
-                "pass": 2
+                "latest": "2026-10-05T04:34:07Z",
+                "pass": 4
               },
               "qualified_models": []
             },
@@ -7227,8 +7227,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 2,
-                "latest": "2026-09-25T15:33:59Z",
-                "pass": 2
+                "latest": "2026-10-05T04:19:30Z",
+                "pass": 4
               },
               "qualified_models": []
             },
@@ -8978,8 +8978,8 @@
                 "fail": 0,
                 "independently_reviewed_fail": 0,
                 "independently_reviewed_pass": 2,
-                "latest": "2026-09-25T15:35:18Z",
-                "pass": 2
+                "latest": "2026-10-05T04:40:27Z",
+                "pass": 5
               },
               "qualified_models": []
             },
