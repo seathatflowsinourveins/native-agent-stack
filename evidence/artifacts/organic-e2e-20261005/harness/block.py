@@ -32,7 +32,8 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 from common import (append_jsonl, clean_login_env, gateway_build, gateway_get, load_json, run, s7_compare,  # noqa: E402
-                    s7_snapshot, sha256_file, stop_flag_names, trial_dir, utc_now, utc_stamp, write_json)
+                    s7_host_only, s7_persistent_change, sha256_file, stable_s7_snapshot, stop_flag_names, trial_dir,
+                    utc_now, utc_stamp, write_json)
 
 
 def stop_flags(root: Path, client: str) -> list[str]:
@@ -159,9 +160,10 @@ def main(argv=None) -> int:
     if flags:
         refusals.append(f"stop flags: {flags}")
     baseline = load_json(cfg["s7_baseline"])
-    pre = s7_snapshot({"fixture_tar": cfg["fixture"]["tar_path"]})
-    host = s7_compare(baseline, pre)
+    pre, pre_read = stable_s7_snapshot({"fixture_tar": cfg["fixture"]["tar_path"]})
+    host = s7_compare(s7_host_only(baseline), s7_host_only(pre))
     row["pre_vs_baseline"] = {k: v for k, v in host.items() if k != "new_trust_paths_private"}
+    row["s7_reads_pre"] = pre_read
     if not host["equal"] or any(host["new_trust"].values()):
         refusals.append(f"host exposure differs from the stage-1 baseline: {host['changed'][:8]}")
     from prepare import config_settled, in_blackout
@@ -239,14 +241,17 @@ def main(argv=None) -> int:
         if client == "codex":
             outcome["gateway_window"] = gateway_window(started, ended)
         outcomes.append(outcome)
-    post = s7_snapshot({"fixture_tar": cfg["fixture"]["tar_path"]})
-    within = s7_compare(pre, post)
+    post, post_read = stable_s7_snapshot({"fixture_tar": cfg["fixture"]["tar_path"]})
+    judged = s7_persistent_change(baseline, pre, post)
+    within = judged["within"]
     row.update({"outcomes": outcomes, "post_vs_pre": {k: v for k, v in within.items() if k != "new_trust_paths_private"},
-                "at": utc_now()})
+                "post_vs_baseline": {k: v for k, v in judged["vs_baseline"].items() if k != "new_trust_paths_private"},
+                "persistent_change": judged["persistent"], "transient_pre": judged["transient_before"],
+                "s7_reads_post": post_read, "at": utc_now()})
     write_json(root / "s7" / f"block-{cell_name}-{utc_stamp()}.after.json", post, 0o600)
     append_jsonl(root / "blocks.jsonl", row)
     print(json.dumps({"cell": cell_name, "outcomes": [{k: o.get(k) for k in ("rc", "results", "attempts", "dry_run")} for o in outcomes],
-                      "host_unchanged": within["equal"], "new_trust": within["new_trust"]}, default=str))
+                      "host_unchanged": not judged["persistent"], "new_trust": judged["vs_baseline"]["new_trust"]}, default=str))
     return 0
 
 

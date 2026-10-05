@@ -386,6 +386,36 @@ def s7_gate_view(snap: dict) -> dict:
     return view
 
 
+def stable_s7_snapshot(extra_files: dict | None = None, tries: int = 5, wait_s: float = 2.0) -> tuple[dict, dict]:
+    """A snapshot whose gated view held still across two consecutive reads (at most `tries`, `wait_s` apart). Codex
+    sessions re-sync the remote curated plugins into the shared ~/.codex/plugins/cache at start (a clone symlinks
+    plugins, §4.3), so a single read can catch another session's sync half done. Returns (snapshot, {stable, reads})."""
+    previous = s7_snapshot(extra_files)
+    for read in range(2, tries + 1):
+        time.sleep(wait_s)
+        current = s7_snapshot(extra_files)
+        if s7_compare(previous, current)["equal"]:
+            return current, {"stable": True, "reads": read}
+        previous = current
+    return previous, {"stable": False, "reads": tries}
+
+
+def s7_host_only(snap: dict) -> dict:
+    """The snapshot without its per-trial clone part, for a comparison with the stage-1 baseline (which has none)."""
+    return {k: v for k, v in snap.items() if k not in ("clone_config", "trial_files")}
+
+
+def s7_persistent_change(baseline: dict, before: dict, after: dict) -> dict:
+    """The S7 judgement for one trial or block: a persistent change is an `after` view that differs from the stage-1
+    baseline, or any new trust entry (against `before` or the baseline). A `before` that differs from both `after` and
+    the baseline is a transient another session left mid-write, recorded, never a STOP."""
+    within = s7_compare(before, after)
+    vs_base = s7_compare(s7_host_only(baseline), s7_host_only(after))
+    new_trust = any(within["new_trust"].values()) or any(vs_base["new_trust"].values())
+    return {"within": within, "vs_baseline": vs_base, "persistent": (not vs_base["equal"]) or new_trust,
+            "transient_before": (not within["equal"]) and vs_base["equal"]}
+
+
 def s7_compare(before: dict, after: dict) -> dict:
     """{equal, changed: [paths], new_trust: {claude, codex, clone}, new_claude_project_keys: n} for two snapshots."""
     a, b = s7_gate_view(before), s7_gate_view(after)

@@ -39,8 +39,8 @@ sys.path.insert(0, str(HERE))
 from common import (CLAUDE_LOCK, CLAUDE_SESSION_CAP, KILL_AFTER, KILL_FIVE_HOUR, KILL_FIVE_HOUR_RISE, KILL_SEVEN_DAY,  # noqa: E402
                     LANE, LOCK_WAIT_S, POST_RESULT_GRACE_S, PRIOR_FIVE_HOUR, PRIOR_SEVEN_DAY, T_SECONDS, append_jsonl,
                     clean_login_env, gateway_build, load_json, manifest_digest, newest_meter_reading, prior_allows,
-                    rate_limit_readings, read_jsonl, s7_compare, s7_snapshot, sha256_bytes, sha256_file, stop_flag_names,
-                    trial_dir, tree_manifest, utc_now, write_json)
+                    rate_limit_readings, read_jsonl, s7_persistent_change, sha256_bytes, sha256_file, stable_s7_snapshot,
+                    stop_flag_names, trial_dir, tree_manifest, utc_now, write_json)
 
 RATE_LIMIT_WORDS = ("rate limit", "rate_limit", "429", "usage limit", "too many requests", "quota")
 # Kill reasons that end a trial at or above a §9.1 window threshold: the client's remaining tests wait for the next
@@ -607,8 +607,8 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
                 _defer(root, client, f"meter_prior {why}")
                 raise Censored("meter_prior")
         # S7 before-snapshot after the lock wait (finding 15), so a change another lane makes while this trial waits
-        # is not attributed to it.
-        before = s7_snapshot(trial_files)
+        # is not attributed to it; read until it holds still (another session's plugin sync can be half done).
+        before, before_read = stable_s7_snapshot(trial_files)
         write_json(root / "s7" / f"{trial_id}.before.json", before, 0o600)
         (root / "raw").mkdir(exist_ok=True)
         (work / "last").mkdir(exist_ok=True)
@@ -643,13 +643,14 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
                     "meter_readings": outcome["meter_readings"], "nested_clients": outcome["nested"],
                     "tree_exes": outcome["tree_exes"], "rate_limit_error": outcome["rate_limit_error"],
                     "stream_sha256": sha256_file(stream_path), "stream_bytes": stream_path.stat().st_size}
-        host_compare = None
+        judged = None
         try:
             # A launched trial always gets its exit row: a failure here is recorded, and G4 then fails for want of the
             # host comparison instead of the trial vanishing from the ledger.
-            after = s7_snapshot(trial_files)
+            after, after_read = stable_s7_snapshot(trial_files)
             write_json(root / "s7" / f"{trial_id}.after.json", after, 0o600)
-            host_compare = s7_compare(before, after)
+            judged = s7_persistent_change(load_json(cfg["s7_baseline"]), before, after)
+            host_compare = judged["within"]
             fixture_manifest = tree_manifest(fixture)
             write_json(root / "manifests" / f"{trial_id}.fixture.json", fixture_manifest, 0o600)
             template_manifest = load_json(cfg["fixture"]["template_manifest_path"])
@@ -665,15 +666,21 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
                              "fixture_removed": removed[:200], "fixture_removed_count": len(removed),
                              "draft_manifest_sha256": manifest_digest(tree_manifest(draft_dst)),
                              "host_s7": {k: v for k, v in host_compare.items() if k != "new_trust_paths_private"},
-                             "host_s7_private": host_compare.get("new_trust_paths_private")})
+                             "host_s7_private": host_compare.get("new_trust_paths_private"),
+                             "host_s7_vs_baseline": {k: v for k, v in judged["vs_baseline"].items() if k != "new_trust_paths_private"},
+                             "host_s7_persistent_change": judged["persistent"],
+                             "host_s7_transient_before": judged["transient_before"],
+                             "s7_reads": {"before": before_read, "after": after_read}})
         except Exception as error:  # noqa: BLE001
             exit_row["bookkeeping_error"] = f"{type(error).__name__}: {str(error)[:300]}"
             with open(root / "launcher-errors.log", "a") as handle:
                 handle.write(f"{utc_now()} {trial_id} after exit: {traceback.format_exc()}\n")
         ledger(root, {**exit_row, "at": utc_now()})
-        if host_compare is not None and (not host_compare["equal"] or any(host_compare["new_trust"].values())):
+        if judged is not None and judged["persistent"]:
+            vs_base = judged["vs_baseline"]
             (root / "STOP").write_text(f"{utc_now()} host exposure or trust changed during {trial_id}: "
-                                       f"{host_compare['changed'][:6]} new_trust={host_compare['new_trust']}\n")
+                                       f"{vs_base['changed'][:6]} new_trust={vs_base['new_trust']} "
+                                       f"within={judged['within']['changed'][:6]}\n")
         return result
     except Censored as censor:
         result.update({"censored": True, "reason": censor.reason})
