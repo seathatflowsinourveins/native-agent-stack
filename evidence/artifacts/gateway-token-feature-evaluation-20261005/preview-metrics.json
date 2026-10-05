@@ -1,0 +1,617 @@
+[
+  {
+    "case": "log",
+    "arm": "raw",
+    "originalTokens": 1223,
+    "compressedTokens": 1223,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1131x1131 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "log",
+    "arm": "rtk",
+    "originalTokens": 1223,
+    "compressedTokens": 23,
+    "tokensSaved": 1200,
+    "savingsPct": 98,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 1223,
+        "compressedTokens": 23,
+        "savingsPercent": 98,
+        "techniquesUsed": [
+          "rtk-filter"
+        ],
+        "rulesApplied": [
+          "docker-logs:keep",
+          "docker-logs:collapse"
+        ],
+        "durationMs": 0.91
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "log",
+    "arm": "caveman",
+    "originalTokens": 1223,
+    "compressedTokens": 1223,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1131x1131 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 1223,
+        "compressedTokens": 1223,
+        "savingsPercent": 0,
+        "techniquesUsed": [],
+        "durationMs": 0.03
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "diff",
+    "arm": "raw",
+    "originalTokens": 1241,
+    "compressedTokens": 1241,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1159x1159 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "diff",
+    "arm": "rtk",
+    "originalTokens": 1241,
+    "compressedTokens": 1241,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1159x1159 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": true,
+      "fallbackReason": "compression-fallback"
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 1241,
+        "compressedTokens": 1241,
+        "savingsPercent": 0,
+        "techniquesUsed": [
+          "rtk-filter"
+        ],
+        "rulesApplied": [
+          "docker-logs:keep",
+          "docker-logs:collapse"
+        ],
+        "durationMs": 0.78,
+        "rejected": true,
+        "rejectReason": "número \"1\" ausente no output"
+      }
+    ],
+    "fallbackApplied": true
+  },
+  {
+    "case": "diff",
+    "arm": "caveman",
+    "originalTokens": 1241,
+    "compressedTokens": 1241,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1159x1159 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 1241,
+        "compressedTokens": 1241,
+        "savingsPercent": 0,
+        "techniquesUsed": [],
+        "durationMs": 0.04
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "json",
+    "arm": "raw",
+    "originalTokens": 1241,
+    "compressedTokens": 1241,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "json",
+    "arm": "rtk",
+    "originalTokens": 1241,
+    "compressedTokens": 41,
+    "tokensSaved": 1200,
+    "savingsPct": 97,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 1241,
+        "compressedTokens": 41,
+        "savingsPercent": 97,
+        "techniquesUsed": [
+          "rtk-filter"
+        ],
+        "rulesApplied": [
+          "docker-logs:keep",
+          "docker-logs:collapse"
+        ],
+        "durationMs": 0.84
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "json",
+    "arm": "caveman",
+    "originalTokens": 1241,
+    "compressedTokens": 1241,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 1241,
+        "compressedTokens": 1241,
+        "savingsPercent": 0,
+        "techniquesUsed": [],
+        "durationMs": 0.04
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "revision",
+    "arm": "raw",
+    "originalTokens": 1264,
+    "compressedTokens": 1264,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1139x1139 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "revision",
+    "arm": "rtk",
+    "originalTokens": 1264,
+    "compressedTokens": 1264,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1139x1139 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": true,
+      "fallbackReason": "compression-fallback"
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 1264,
+        "compressedTokens": 1264,
+        "savingsPercent": 0,
+        "techniquesUsed": [
+          "rtk-filter"
+        ],
+        "rulesApplied": [
+          "docker-logs:keep",
+          "docker-logs:collapse"
+        ],
+        "durationMs": 0.78,
+        "rejected": true,
+        "rejectReason": "número \"01\" ausente no output"
+      }
+    ],
+    "fallbackApplied": true
+  },
+  {
+    "case": "revision",
+    "arm": "caveman",
+    "originalTokens": 1264,
+    "compressedTokens": 1264,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1139x1139 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 1264,
+        "compressedTokens": 1264,
+        "savingsPercent": 0,
+        "techniquesUsed": [],
+        "durationMs": 0.03
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "citation",
+    "arm": "raw",
+    "originalTokens": 1243,
+    "compressedTokens": 1243,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "citation",
+    "arm": "rtk",
+    "originalTokens": 1243,
+    "compressedTokens": 103,
+    "tokensSaved": 1140,
+    "savingsPct": 92,
+    "validation": {
+      "valid": false,
+      "errors": [
+        "URL changed or missing: https://github.com/example/vendor/blob/0123456789abcdef0123456789abcdef01234567/"
+      ],
+      "warnings": [],
+      "fallbackApplied": true,
+      "fallbackReason": "validation-failed: URL changed or missing: https://github.com/example/vendor/blob/0123456789abcdef0123456789abcdef01234567/"
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 1243,
+        "compressedTokens": 103,
+        "savingsPercent": 92,
+        "techniquesUsed": [
+          "rtk-filter"
+        ],
+        "rulesApplied": [
+          "docker-logs:collapse"
+        ],
+        "durationMs": 1.11
+      }
+    ],
+    "fallbackApplied": true
+  },
+  {
+    "case": "citation",
+    "arm": "caveman",
+    "originalTokens": 1243,
+    "compressedTokens": 1243,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 1243,
+        "compressedTokens": 1243,
+        "savingsPercent": 0,
+        "techniquesUsed": [],
+        "durationMs": 0.25
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "semantic",
+    "arm": "raw",
+    "originalTokens": 1236,
+    "compressedTokens": 1236,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "semantic",
+    "arm": "rtk",
+    "originalTokens": 1236,
+    "compressedTokens": 1236,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "fallbackApplied": true,
+      "fallbackReason": "compression-fallback"
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 1236,
+        "compressedTokens": 1236,
+        "savingsPercent": 0,
+        "techniquesUsed": [
+          "rtk-filter"
+        ],
+        "rulesApplied": [
+          "docker-logs:keep",
+          "docker-logs:collapse"
+        ],
+        "durationMs": 0.66,
+        "rejected": true,
+        "rejectReason": "número \"0\" ausente no output"
+      }
+    ],
+    "fallbackApplied": true
+  },
+  {
+    "case": "semantic",
+    "arm": "caveman",
+    "originalTokens": 1236,
+    "compressedTokens": 1236,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 1236,
+        "compressedTokens": 1236,
+        "savingsPercent": 0,
+        "techniquesUsed": [],
+        "durationMs": 0.04
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "gate",
+    "arm": "raw",
+    "originalTokens": 1230,
+    "compressedTokens": 1230,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1149x1149 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "gate",
+    "arm": "rtk",
+    "originalTokens": 1230,
+    "compressedTokens": 91,
+    "tokensSaved": 1139,
+    "savingsPct": 93,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 1230,
+        "compressedTokens": 91,
+        "savingsPercent": 93,
+        "techniquesUsed": [
+          "rtk-filter"
+        ],
+        "rulesApplied": [
+          "docker-logs:collapse"
+        ],
+        "durationMs": 0.86
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "gate",
+    "arm": "caveman",
+    "originalTokens": 1230,
+    "compressedTokens": 1230,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1149x1149 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 1230,
+        "compressedTokens": 1230,
+        "savingsPercent": 0,
+        "techniquesUsed": [],
+        "durationMs": 0.05
+      }
+    ],
+    "fallbackApplied": false
+  },
+  {
+    "case": "instruction",
+    "arm": "raw",
+    "originalTokens": 1235,
+    "compressedTokens": 1235,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1145x1145 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [],
+    "fallbackApplied": false
+  },
+  {
+    "case": "instruction",
+    "arm": "rtk",
+    "originalTokens": 1235,
+    "compressedTokens": 1235,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1145x1145 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": true,
+      "fallbackReason": "compression-fallback"
+    },
+    "engineBreakdown": [
+      {
+        "engine": "rtk",
+        "originalTokens": 1235,
+        "compressedTokens": 1235,
+        "savingsPercent": 0,
+        "techniquesUsed": [
+          "rtk-filter"
+        ],
+        "rulesApplied": [
+          "docker-logs:keep",
+          "docker-logs:collapse"
+        ],
+        "durationMs": 0.65,
+        "rejected": true,
+        "rejectReason": "número \"0\" ausente no output"
+      }
+    ],
+    "fallbackApplied": true
+  },
+  {
+    "case": "instruction",
+    "arm": "caveman",
+    "originalTokens": 1235,
+    "compressedTokens": 1235,
+    "tokensSaved": 0,
+    "savingsPct": 0,
+    "validation": {
+      "valid": true,
+      "errors": [],
+      "warnings": [
+        "Preview diff omitted because token product 1145x1145 exceeds safe limit 1000000."
+      ],
+      "fallbackApplied": false
+    },
+    "engineBreakdown": [
+      {
+        "engine": "caveman",
+        "originalTokens": 1235,
+        "compressedTokens": 1235,
+        "savingsPercent": 0,
+        "techniquesUsed": [],
+        "durationMs": 0.03
+      }
+    ],
+    "fallbackApplied": false
+  }
+]

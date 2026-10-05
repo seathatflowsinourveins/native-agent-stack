@@ -1,0 +1,14 @@
+{
+  "frozen_before_model_execution": true,
+  "files": 27,
+  "bundle_sha256": "cc080876bd6d03785305abb251eef5990d30e65a4cb3cd061ebace4ff011c25a",
+  "bundle_algorithm": "SHA256 of sorted relative-path NUL file-SHA256 newline entries for the 27 JSON files present before this freeze file",
+  "promptfoo_sha256": "0b596a115a7ef7941ecc8094154250c5680b3bca80be052b57b5606c825f5c7d",
+  "plan_sha256": "54a48aad3c15298d58d06de148e4023d3a1205776c6cc095d6461fecc1df25b6",
+  "changes_from_retained_first_run": [
+    "Native raw.output_text assertion excludes reasoning-summary formatting without changing transport or usage.",
+    "Gate question explicitly names the qualified/unqualified label contract.",
+    "Four user-prose fixtures exercise Caveman's default eligible role; four tool-text fixtures remain."
+  ],
+  "model_execution": "48 new calls via unchanged native promptfoo runtime, one at a time; no result replay qualifies this phase"
+}

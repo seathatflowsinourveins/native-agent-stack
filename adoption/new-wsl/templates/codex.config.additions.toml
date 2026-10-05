@@ -23,6 +23,18 @@ service_tier = "fast"
 [mcp_servers.ai-memory]
 default_tools_approval_mode = "approve"
 
+# Codex 0.160.0's auto policy requests approval for unannotated tools and tools
+# marked destructive (codex-rs/core/src/mcp_tool_call.rs L2466-L2495).
+# The selected servers expose such tools; approval_policy=never refuses them.
+# Keep the direct Codex lane usable under its authorized never policy, as the
+# stack-worker profile already does for headroom and SocratiCode. Slot-bound
+# authorization entries gate both keys; no setting reaches another host.
+[mcp_servers.socraticode]
+default_tools_approval_mode = "approve"
+
+[mcp_servers.headroom]
+default_tools_approval_mode = "approve"
+
 # semble 0.6.1 (MinishLab/semble, a uv tool), the code-search slot's interim install (definitive manifest, amendment 3;
 # wave-2 code-search ruling, changes 2-5). Stdio, CPU only, no port. Its two tools carry no MCP annotations, so Codex
 # 0.160.0 asks before each call unless the approval mode approves them (authorization, as above); enabled_tools names

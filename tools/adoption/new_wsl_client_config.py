@@ -2269,15 +2269,15 @@ class Apply:
             self.authorization.update({v.piece.key: "added" for v in self.results
                                        if v.authorization and v.wired and v.piece.group == "codex/config"})
 
-    def merge_codex_config(self, config: Path) -> None:
+    def merge_codex_config(self, config: Path, *, staged: str = "codex.config.toml",
+                           group: str = "codex/config", step: str = "codex-config") -> None:
         """Merge, never rewrite: every key and table the file has stays as it is, what the render has and the file lacks is
         added, and a value that differs stays (shown beside the render's). The file is backed up first, read back after
         the write and put back from memory when it is not the merge. `features.daemon_auto_start` goes through Codex's
         own writer when a codex binary is at hand, as codex_home.py does; every other key is a text edit that the
         read-back proves. A running Codex writes the same file, so the write waits until none runs."""
-        step = "codex-config"
         try:
-            rendered = tomllib.loads((self.stage / "codex.config.toml").read_text(encoding="utf-8"))
+            rendered = tomllib.loads((self.stage / staged).read_text(encoding="utf-8"))
             if config.is_symlink() or not config.is_file():
                 raise MergeError(f"{config} is a symlink or not a regular file, so it is not written through; compare it "
                                  "with codex.config.toml from `--render --host <host> --out <dir>` by hand")
@@ -2287,7 +2287,7 @@ class Apply:
             except (UnicodeDecodeError, tomllib.TOMLDecodeError) as error:
                 raise MergeError(f"{config} is not valid UTF-8 TOML ({error}); fix it, then run again") from None
             plan = plan_merge(existing, rendered)
-            adds_daemon = (not lane.get_path(existing, list(DAEMON_PATH))[0]
+            adds_daemon = (group == "codex/config" and not lane.get_path(existing, list(DAEMON_PATH))[0]
                            and lane.get_path(plan.expected, list(DAEMON_PATH))[0])
             writer = self.binary("codex", self.args.codex_bin) if adds_daemon else None
             text_plan = plan.without(DAEMON_PATH) if writer else plan
@@ -2308,12 +2308,14 @@ class Apply:
             self.say(step, f"  {line}")
         found = {}
         for verdict in self.results:
-            if verdict.authorization and verdict.wired and verdict.piece.group == "codex/config":
+            if verdict.authorization and verdict.wired and verdict.piece.group == group:
                 # A piece's path is the template's: a key that names a placeholder (a project's trust grant under
                 # projects."${PROJECT_ROOT}") is looked up as the render filled it.
                 path = [string.Template(part).safe_substitute(self.values) if isinstance(part, str) else part
                         for part in verdict.piece.path]
                 have = lane.get_path(existing, path)
+                if not lane.get_path(plan.expected, path)[0]:
+                    continue  # an ancestor type conflict kept the whole table out
                 found[verdict.piece.key] = ("added" if not have[0] else "same" if strict_equal(
                     have[1], lane.get_path(rendered, path)[1]) else "kept")
         changes = new_text is not None or writer is not None
@@ -2378,7 +2380,12 @@ class Apply:
             return False
 
     def step_codex_files(self) -> None:
-        """The two profiles and the role carriers, created only when absent, as apply_codex_lane.py creates them."""
+        """Merge missing profile-v2 keys; keep role carriers create-only.
+
+        Profile-v2 is a full user config layer (openai/codex rust-v0.160.0,
+        codex-rs/config/src/loader/mod.rs). Reuse the config merge's backup,
+        process guard, expected-byte write and read-back, preserving existing values.
+        """
         items, groups = [], {}
         for target_name, group, staged in (("stack-worker.config.toml", "codex/stack-worker",
                                             "codex.stack-worker.config.toml"),
@@ -2389,7 +2396,16 @@ class Apply:
         items += [(codex_roles.ROLES_SOURCE / name, self.codex_home / "agents" / name)
                   for name in self.wired_files("codex/role/")]  # none while the map leaves the carriers out
         states = []
+        outcomes_before = len(self.outcomes)
         for source, target in items:
+            if target in groups:
+                if os.path.lexists(target):
+                    self.merge_codex_config(target, staged=source.name, group=groups[target], step="codex-files")
+                    continue
+                running, how = self.codex_guard()
+                if running and not self.dry:
+                    self.record("codex-files", "failed", self.codex_refusal(running, how))
+                    continue
             data = source.read_bytes()
             state = lane.file_state(target.read_bytes() if target.is_file() else None, data)
             if state == "create" and not self.dry:
@@ -2404,6 +2420,15 @@ class Apply:
             shown = {"create": "would create" if self.dry else "created", "same": "already there",
                      "differs": "differs from the render and is never overwritten"}[state]
             self.say("codex-files", f"  {target.name}: {shown}")
+        profile_outcomes = self.outcomes[outcomes_before:]
+        if any(outcome[1] == "failed" for outcome in profile_outcomes):
+            self.record("codex-files", "failed", "at least one profile failed; individual outcomes retained")
+            return
+        if any(outcome[1] == "merged with conflicts kept" for outcome in profile_outcomes):
+            self.record("codex-files", "merged with conflicts kept", "existing profile values retained")
+            return
+        if not states and profile_outcomes:
+            return
         done = ("planned" if self.dry else "applied") if "create" in states else "current"
         self.record("codex-files", done, f"{len(items)} file(s)")
 
