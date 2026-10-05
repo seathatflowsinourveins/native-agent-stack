@@ -4,10 +4,10 @@
   "source_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
   "evidence_class": "local_integration",
   "generator_sha256": "f12da714276918f4951f8220a3fb95e0bfd9d5d25022c4b22dc6d7a65bb310ef",
-  "profile_sha256": "8be6b5bb2981843c3beca082169211fb0bd7071abf0e5abccdc9f31632152841",
+  "profile_sha256": "4a86d142e1a629f6c806a036cce46ac4298b595d48d57505b1bd3cd852cb41f2",
   "outputs": {
-    "docs/new-wsl-handbook.md": "b72ec0299a300da82d9f35bc7ed98658bd167c9ee156a5ef5a7466f59e277149",
-    "docs/new-wsl-handbook.json": "97360d359377f9eedbbc9c580e3080038b326eab09fba6a2e627d8401e97041e"
+    "docs/new-wsl-handbook.md": "b9d88fb6d21704da1d89d7fde3f07fcbbb278af18206103285ca369204912aad",
+    "docs/new-wsl-handbook.json": "3a900090ef89ff7f9c77610feedede73fc084f6442582119aaefb4fe0d16be27"
   },
   "inventory": {
     "layers": 37,
@@ -140,6 +140,75 @@
         "docs/new-wsl-handbook.json": "a62a12a6b48f3ef9183893aa4eadce2e37aa1ad35350d7af0a347b603ca89a36"
       },
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "round": "dagu-pin-r1",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "Selected Dagu 2.18.2 and new-WSL mise 2026.10.1 change the live profile and generated handbook; the committed receipt is a current hash mirror.",
+      "previous_generator_sha256": "f12da714276918f4951f8220a3fb95e0bfd9d5d25022c4b22dc6d7a65bb310ef",
+      "previous_profile_sha256": "8be6b5bb2981843c3beca082169211fb0bd7071abf0e5abccdc9f31632152841",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "b72ec0299a300da82d9f35bc7ed98658bd167c9ee156a5ef5a7466f59e277149",
+        "docs/new-wsl-handbook.json": "97360d359377f9eedbbc9c580e3080038b326eab09fba6a2e627d8401e97041e"
+      },
+      "failed_acceptance": {
+        "command": "python3 -B -m unittest tests.test_new_wsl_handbook",
+        "native_exit_code": 1,
+        "tests": 75,
+        "failures": 1,
+        "condition": "The receipt profile_sha256 did not match the regenerated profile; prior validation retained."
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "round": "dagu-pin-r2",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "Restore the held stack and stack-bound architecture winners to 2.16.6 while retaining independent new-WSL Dagu 2.18.2/mise 2026.10.1; make existing-home rollback restore the pre-upgrade home.",
+      "previous_generator_sha256": "f12da714276918f4951f8220a3fb95e0bfd9d5d25022c4b22dc6d7a65bb310ef",
+      "previous_profile_sha256": "5bad498f80b3b662db7f13889534620ae3bf60e4b2ac3169ae55877702eb6dfa",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "2696b2c5aec661336e241bddcf1a7d5ae96a8e40d5085abbe7ad327bfd4e1137",
+        "docs/new-wsl-handbook.json": "c13616fd07abab5d8d08a77a299a92b01f3c6d6618e882e42fe5723504d6c269"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "round": "dagu-pin-r3",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "cause": "Propagate generic existing-home rollback prerequisites and NativeStack2604 one-way re-provisioning state; detach the independent new-WSL compatibility receipt from the held stack component.",
+      "previous_generator_sha256": "f12da714276918f4951f8220a3fb95e0bfd9d5d25022c4b22dc6d7a65bb310ef",
+      "previous_profile_sha256": "d2fffba6a1b7afc8baa5050d9180c53170402d06eae72dbfe9dd1c45fe6eb4b4",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "84fa9a08d3bb401423bb25924082c3c6ea855fb98e0501760fd580f2c5e70700",
+        "docs/new-wsl-handbook.json": "4ba9696007ff70dbbb3b5b77e3106f1faf70232cf28ceb40d96a9a4ea0d3feaa"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check",
+      "validation": [
+        {
+          "command": "python3 -B -m unittest tests.test_new_wsl_handbook",
+          "native_exit_code": 0,
+          "tests": 75,
+          "returned_output": "Ran 75 tests in 28.836s\nOK",
+          "scope": "local integration"
+        },
+        {
+          "command": "python3 -B -m unittest tests.test_new_wsl_profile",
+          "native_exit_code": 0,
+          "tests": 18,
+          "returned_output": "Ran 18 tests in 4.902s\nOK",
+          "scope": "local integration"
+        },
+        {
+          "command": "python3 scripts/build_new_wsl_handbook.py --check",
+          "native_exit_code": 0,
+          "returned_output": "{\"outputs\": {\"docs/new-wsl-handbook.json\": \"3a900090ef89ff7f9c77610feedede73fc084f6442582119aaefb4fe0d16be27\", \"docs/new-wsl-handbook.md\": \"b9d88fb6d21704da1d89d7fde3f07fcbbb278af18206103285ca369204912aad\"}, \"status\": \"passed\"}",
+          "scope": "generated-output integrity"
+        }
+      ]
     }
   ]
 }

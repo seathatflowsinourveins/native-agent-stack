@@ -29,6 +29,11 @@
       "date": "2026-10-03",
       "scope": "SDK pin refresh and B2 repair",
       "detail": "The current source pin is openai/codex rust-v0.160.0 at a956835d020762cb2b570053af06f643a11c0ecc. The before_provider_execution declaration and using-superpowers/native-judge/Dagu quality contract belong to the September 30 trial at 0.159.2; its original plan is retained under evidence/artifacts/omniroute-sdk-worker-0160-20261003/historical/acceptance-plan.json.source.txt. This edited plan does not preregister or qualify writing dispatch at 0.160.0. New fixture, limited read-only live and coordinator shell observations belong to experiment-sdk-0160-20261003.json and the October 3 receipt."
+    },
+    {
+      "date": "2026-10-05",
+      "scope": "dagu-pin-r2 standing hold",
+      "detail": "This maintained example follows the held stack pin Dagu 2.16.6 at 58fed633d58c1dd1319091fdb2c2f6158ecfa053. runtime-worker.yaml, enhancements.md and this SHA-only source mirror agree. The independent new-WSL profile selects 2.18.2 and does not change this example or the trading hosting cutover."
     }
   ]
 }
