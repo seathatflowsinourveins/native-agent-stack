@@ -280,10 +280,6 @@ class IssueSelectionTests(unittest.TestCase):
         instruction = self.r.resolver_instruction(selected, task="Implement issue 12 within scope.",
                                                   owned_paths=["docs/example.md"])
         skill = (RECIPE / "skills/resolver/SKILL.md").read_text(encoding="utf-8")
-        for phrase in sorted({*gate.AGENT_RULE_PHRASES.values(), gate.STOP_AND_REPORT}):
-            with self.subTest(phrase=phrase):
-                self.assertIn(phrase, " ".join(skill.split()))
-                self.assertIn(phrase, " ".join(instruction.split()))
         for stale in ("Add or update tests", "write the failing test first"):
             self.assertNotIn(stale, instruction)
             self.assertNotIn(stale, skill)
@@ -316,6 +312,24 @@ class IssueSelectionTests(unittest.TestCase):
         self.assertFalse(named & unnamed)
         self.assertEqual(named | unnamed, rules)
         self.assertEqual(set(receipt.PUSH_GATE_RULES), named)
+        # Unnamed means the receipt omits paths, not that the agent is left
+        # uninformed. Every emitted rule needs an instruction phrase, except
+        # the explicitly gate-only diagnostics. Check the gate-refusal section
+        # of the skill, so a validator-only mention cannot hide instruction drift.
+        unnamed_phrases = getattr(gate, "UNNAMED_RULE_PHRASES", {})
+        self.assertEqual(set(unnamed_phrases), unnamed)
+        self.assertEqual(set(gate.AGENT_RULE_PHRASES) | set(unnamed_phrases), rules - gate.GATE_ONLY_RULES)
+        phrases = {gate.STOP_AND_REPORT}
+        for rule in rules - gate.GATE_ONLY_RULES:
+            phrases.update((gate.AGENT_RULE_PHRASES[rule],) if rule in gate.AGENT_RULE_PHRASES
+                           else unnamed_phrases[rule])
+        phrases.update(gate.MODULE_ARTIFACT_SUFFIXES)
+        phrases.update(gate.INSTRUCTION_FILE_NAMES)
+        skill_refusals = skill.split("## What the push gate refuses\n", 1)[1].split("\n## Workflow", 1)[0]
+        for phrase in sorted(phrases):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase.casefold(), " ".join(skill_refusals.split()).casefold())
+                self.assertIn(phrase.casefold(), " ".join(instruction.split()).casefold())
 
 
 # -- Unit 2 helpers: fixture repositories with local git only (no network).

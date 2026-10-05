@@ -206,3 +206,63 @@ Gate-only source/test hunks: push_gate.py path checks, ENFORCING_FILES, rule cla
 Documentation hunks: RESOLVER.md aliases/receipt policy/current driver/Known limits; gate_reads.py docstring; decision record corrections and dated repair. No resolver.py enablement implementation changes.
 The advisory-CI-input residual remains: never own a path holding files CI executes through untraced forms. Addition 2 is not adopted or implemented.
 Registration of every changed authored file is the final repository mutation; validate.py, evidence_manifest --check and diff --check results are returned in the handoff after registration.
+
+9. Delta-review repair — resolver-gate-r3 — 2026-10-05
+Starting production source: 56fced82727921f2de0d99790148acec0bdd11ca (tree identical to r2 ffda8b1e2).
+Evidence class: native Git plus local unittest integration and synthetic paths; no upstream harness run, native Windows/macOS test, live resolver, provider call or GitHub mutation.
+All commands inherit nice -n 19 and TMPDIR=~/.cache/tres3, outside /tmp and the worktree.
+Pinned checkout/import sources and the complete repaired/newly-refused/residual inventory:
+docs/decisions/2026-09-28-openhands-resolver-isolation.md#owned-path-gate-review-repairs-2026-10-05
+
+Red before:
+A local clone of HEAD has only the two updated test files overlaid; its production source is unchanged.
+python3 -m unittest tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_git_semantic_dot_files_refuse_even_when_owned tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_git_semantic_modify_and_delete_refuse tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_instruction_files_refuse_even_when_owned tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_instruction_file_modify_and_delete_refuse tests.test_runtime_worker_openhands_resolver.IssueSelectionTests.test_emitted_gate_path_rules_match_instruction_and_receipt_policy tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_unchanged_protected_file_case_and_unicode_aliases_refuse tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_explicit_ownership_limits_top_level_and_unprotected_alias_checks tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_transitive_stdlib_shadow_is_a_documented_scope_residual tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_unreserved_exactly_owned_dot_file_and_instruction_like_name_pass tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_owned_only_change_passes -v
+exit 1; returned summary: Ran 10 tests in 11.622s; FAILED (failures=45).
+Forty-four exact-commit controls pass the old gate: fourteen Git-semantic additions, four modifications and four deletions; sixteen instruction-file additions, three modifications and three deletions. The new source-derived phrase protocol is also red: unnamed classes have no checked instruction map. Forty-five assertions fail in total.
+Git-semantic controls cover root/nested .gitattributes, .gitignore, .mailmap, .gitconfig, other .git* names and case/NFKC/HFS/NTFS forms. Instruction controls cover all ten policy names and case/NFKC/HFS/NTFS forms, including root and nested paths.
+
+Green after:
+python3 -m unittest tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_git_semantic_dot_files_refuse_even_when_owned tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_git_semantic_modify_and_delete_refuse tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_instruction_files_refuse_even_when_owned tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_instruction_file_modify_and_delete_refuse tests.test_runtime_worker_openhands_resolver.IssueSelectionTests.test_emitted_gate_path_rules_match_instruction_and_receipt_policy tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_unchanged_protected_file_case_and_unicode_aliases_refuse tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_explicit_ownership_limits_top_level_and_unprotected_alias_checks tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_transitive_stdlib_shadow_is_a_documented_scope_residual tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_unreserved_exactly_owned_dot_file_and_instruction_like_name_pass tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_owned_only_change_passes -v
+exit 0; returned summary: Ran 10 tests in 5.512s; OK.
+All forty-four commit controls now refuse with git_semantic_file or instruction_file, with one changed path and one owned entry. The source-derived protocol checks named AND unnamed classes in both agent-facing lists, plus every compiled suffix and instruction filename. No receipt path-name category is expanded.
+
+Returned decisions aggregated only when codes, counts and outcomes are identical (55 native fixture decisions paired in order; no contents):
+{"after_reasons": ["git_semantic_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "git_semantic_add", "fixtures": 14, "owned_path_count": 1}
+{"after_reasons": ["git_semantic_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "git_semantic_delete", "fixtures": 4, "owned_path_count": 1}
+{"after_reasons": ["git_semantic_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "git_semantic_modify", "fixtures": 4, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "instruction_file_add", "fixtures": 16, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "instruction_file_delete", "fixtures": 3, "owned_path_count": 1}
+{"after_reasons": ["instruction_file"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "instruction_file_modify", "fixtures": 3, "owned_path_count": 1}
+{"after_reasons": [], "after_status": "pass", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "owned_new_top_level_residual", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": [], "after_status": "pass", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "owned_only_positive", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": ["unowned_path"], "after_status": "fail", "before_reasons": ["unowned_path"], "before_status": "fail", "changed_path_count": 1, "control": "stdlib_shadow_scope_residual", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": [], "after_status": "pass", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "stdlib_shadow_scope_residual", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": ["protected_path"], "after_status": "fail", "before_reasons": ["protected_path"], "before_status": "fail", "changed_path_count": 1, "control": "unchanged_protected_alias", "fixtures": 2, "owned_path_count": 1}
+{"after_reasons": ["protected_path_alias", "protected_path"], "after_status": "fail", "before_reasons": ["protected_path_alias", "protected_path"], "before_status": "fail", "changed_path_count": 1, "control": "unchanged_protected_alias", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": [], "after_status": "pass", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "unchanged_unprotected_alias_residual", "fixtures": 2, "owned_path_count": 1}
+{"after_reasons": ["unowned_path"], "after_status": "fail", "before_reasons": ["unowned_path"], "before_status": "fail", "changed_path_count": 1, "control": "unowned_new_top_level", "fixtures": 1, "owned_path_count": 1}
+{"after_reasons": [], "after_status": "pass", "before_reasons": [], "before_status": "pass", "changed_path_count": 2, "control": "unreserved_owned_names_positive", "fixtures": 1, "owned_path_count": 2}
+
+Retained controls, green before and after:
+- Case/NFC/NFKC aliases of an unchanged protected file refuse. This is existing coverage, not a new r3 fix.
+- An unowned new top-level entry refuses; an explicitly owned one passes (residual).
+- Case/NFKC aliases of an unchanged unprotected base file pass (residual).
+- A synthetic sibling re.py beside a workflow-named script importing json passes with directory ownership, and refuses with ownership limited to the existing script. Neither script nor module is executed; actual CI module-cache reachability is unverified (stdlib residual).
+- Ordinary owned-only docs and harmless exact-owned .notes / AGENTS-guide.md changes pass.
+
+Preserved exploratory failures:
+The first Git-semantic test used an invalid exact owned entry ending in a space; that vector refused invalid_owned_path rather than testing the desired boundary. It was corrected to directory ownership. An early source-selection replay left standalone fixtures on current source; the definitive clone replay above eliminates that mixture. Their raw outputs remain in the private task cache.
+The phrase test initially exits 1 for missing unnamed phrase metadata. After metadata alone, unchanged instructions still fail 35 phrase assertions. Updating both instruction lists makes it exit 0. These are protocol/wording failures, not previous false pushes.
+
+Required targeted acceptance:
+python3 -m unittest tests.test_runtime_worker_openhands_push_gate tests.test_runtime_worker_openhands_resolver tests.test_runtime_worker_openhands -v
+exit 1; returned summary: Ran 375 tests in 72.480s; FAILED (errors=1, skipped=3). No assertion failures.
+The sole error is OutgoingGuardTests.test_installed_gitleaks_refuses_a_token_shape_even_with_an_allow_comment: RuntimeError(gitleaks_failed).
+A native benign-stdin probe through the unchanged guard's exact scanner command also returns exit 1: the installed wrapper cannot open the per-user runtime scan lock on the read-only filesystem. No scan starts. This is the same host limitation retained in r2, not a gate failure; the coordinator must rerun targeted acceptance where that lock is writable.
+Three recorded skips: the PyYAML workflow-reader parity test (PyYAML absent), and two host-path subcontrols (TMPDIR under a personal home path matches PRIVATE_CONTENT before the host-path check). These skips are not passes. The installed real-zizmor control ran and passed; it did not skip.
+
+Landing ownership:
+Gate-only: push_gate.py independent name checks and phrase metadata; tests/test_runtime_worker_openhands_push_gate.py native commit controls and retained/residual fixtures.
+Instruction/enablement: resolver.py resolver_instruction wording only; skills/resolver/SKILL.md refusal list; tests/test_runtime_worker_openhands_resolver.py source-derived phrase protocol. Import guard, startup control and public main are unchanged.
+Docs/evidence: RESOLVER.md current rules and Known limits; the decision's honest disposition inventory and pinned sources; this receipt. Historical gate-only commit docs/ordering are report-only and moot under squash merge.
+Registration of all changed authored files is the final repository mutation. Read-only validate.py, evidence_manifest --check and diff --check results follow in the handoff.

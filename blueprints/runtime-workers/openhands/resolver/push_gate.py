@@ -582,11 +582,11 @@ def _without_pattern_lists(code):
 # GateReads inventories use it separately; Protected never receives those collectors.
 RULE_PRECEDENCE = ("ci_local_action", "ci_discovered", "ci_named", "ci_import", "ci_read")
 
-# Named protected-path rules and their instruction phrases. The skill and generated
-# instruction state these phrases and STOP_AND_REPORT. Ownership, mode and path-safety
-# refusals in UNNAMED_PATH_RULES deliberately retain only codes/counts in the receipt;
-# their paths can contain untrusted or unsafe names. A test derives rules from their
-# emitting code and checks this partition and the receipt's named-rule allowlist.
+# Instruction phrases for every path rule, named or unnamed in receipts. The skill
+# and generated instruction state these phrases and STOP_AND_REPORT. Rules in
+# UNNAMED_PATH_RULES retain only codes/counts in the receipt because their paths can
+# contain untrusted or unsafe names. A test derives rules from their emitting code,
+# checks both phrase maps against the instructions, and checks the receipt partition.
 # unresolved_read names an unparseable gate script, not a computed read.
 AGENT_RULE_PHRASES = {
     "github": ".github/",
@@ -602,9 +602,23 @@ AGENT_RULE_PHRASES = {
     "zizmor_finding": "workflow or action",
 }
 GATE_ONLY_RULES = frozenset({"unresolved_read"})
-UNNAMED_PATH_RULES = frozenset({"unowned_path", "symlink", "gitlink", "mode_change", "type_change",
-                                "invalid_path_component", "absolute_path", "git_component", "gitmodules",
-                                "changed_path_collision", "compiled_module_artifact"})
+UNNAMED_RULE_PHRASES = {
+    "unowned_path": ("unowned path",),
+    "symlink": ("symlink",),
+    "gitlink": ("gitlink",),
+    "mode_change": ("mode/type change",),
+    "type_change": ("mode/type change",),
+    "invalid_path_component": ("unsafe path component", "empty, . or .. components"),
+    "absolute_path": ("absolute path",),
+    "git_component": (".git", "HFS/NTFS aliases"),
+    "gitmodules": (".gitmodules",),
+    "changed_path_collision": ("casefold", "NFC/NFKC", "protected path", "another changed path"),
+    "compiled_module_artifact": ("compiled or bytecode artifacts", "compiled_module_artifact", "__pycache__"),
+    "git_semantic_file": ("Git semantic dot files", "git_semantic_file", ".git*", ".gitattributes", ".gitignore",
+                          ".mailmap", ".gitconfig"),
+    "instruction_file": ("instruction files", "instruction_file"),
+}
+UNNAMED_PATH_RULES = frozenset(UNNAMED_RULE_PHRASES)
 STOP_AND_REPORT = ("including a new or changed test, change nothing: stop and report which file would need to "
                    "change and why")
 
@@ -1044,6 +1058,14 @@ HFS_IGNORED = frozenset([*range(0x200c, 0x2010), *range(0x202a, 0x202f), *range(
 # caches. PEP 3147 cache names are documented in Doc/library/importlib.rst:1265-1308.
 # Deny these artifacts everywhere, independently of the source-module closure.
 MODULE_ARTIFACT_SUFFIXES = (".pyc", ".pyo", ".so", ".pyd", ".dylib", ".dll")
+# Independent instruction-name policy: RESOLVER.md's validator contract;
+# recipes/README.md:184, :212, :218-220; docs/harness-defaults.md:208;
+# adoption/platforms/linux-wsl2-new-distro.md:1082-1083 (at 56fced827).
+# Include the repository's named instruction templates/blocks and Gemini's
+# instruction file. This gate does not reuse patch_policy.INSTRUCTION_FILES.
+INSTRUCTION_FILE_NAMES = frozenset({"agents.md", "agents.override.md", "agents.template.md", "claude.md",
+                                    "claude.local.md", "gemini.md", "skill.md", "rtk.md",
+                                    "codex-user-instructions.md", "claude-user-instructions.md"})
 RAW_CHANGE = re.compile(rb":(000000|100644|100755|120000|160000) "
                         rb"(000000|100644|100755|120000|160000) "
                         rb"([0-9a-f]{40}) ([0-9a-f]{40}) ([AMDT])")
@@ -1143,6 +1165,18 @@ def path_refusals(path):
         module_names = [component.split(":", 1)[0].rstrip(" .").casefold() for component in components]
         if "__pycache__" in module_names or module_names[-1].endswith(MODULE_ARTIFACT_SUFFIXES):
             reasons.add("compiled_module_artifact")
+        # git/git v2.43.0 Documentation/gitattributes.txt:69-82, :110-118,
+        # :391-409: per-directory attributes can alter even unchanged files
+        # on checkout. gitignore.txt:29-34 and gitmailmap.txt:16-20 describe
+        # the other semantic inputs. Conservatively reserve all .git* names;
+        # .git, .gitmodules and .github keep their existing refusal categories.
+        semantic_names = ["".join(char for char in name if ord(char) not in HFS_IGNORED).rstrip(" .")
+                          for name in module_names]
+        if any(name == ".mailmap" or name.startswith(".git")
+               and name not in (".git", ".gitmodules", ".github") for name in semantic_names):
+            reasons.add("git_semantic_file")
+        if semantic_names[-1] in INSTRUCTION_FILE_NAMES:
+            reasons.add("instruction_file")
     return sorted(reasons)
 
 def _git(git, repo, *args, check=True, binary=False):

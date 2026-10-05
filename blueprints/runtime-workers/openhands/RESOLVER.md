@@ -45,7 +45,18 @@ Git HFS/NTFS equivalents, and `.gitmodules` (including fsck aliases) refuse. Its
 fallback aliases include an empty prefix, such as `~1000000` and `~9999999`, as well as
 prefixes of `gi7eba`; Git's eight-character loop accepts `~` at index zero. Every
 `__pycache__` component and `.pyc`, `.pyo`, `.so`, `.pyd`, `.dylib` or `.dll` suffix also
-refuses, including case/Unicode and NTFS suffix/ADS equivalents. So do casefold
+refuses, including case/Unicode and NTFS suffix/ADS equivalents. At any depth, the gate
+also refuses Git semantic dot files (`git_semantic_file`): `.git*` names, including
+`.gitattributes`, `.gitignore` and `.gitconfig`, plus `.mailmap`. The existing `.git`,
+`.gitmodules` and `.github` categories remain. This conservative boundary reserves
+future `.git*` names too; it does not claim every such file is automatically read by Git.
+Per-directory `.gitattributes` can alter the checkout of unchanged files through
+attributes and configured filters, as [Git v2.43.0 gitattributes(5)](https://github.com/git/git/blob/v2.43.0/Documentation/gitattributes.txt#L69)
+documents. Instruction files (`instruction_file`) also refuse at any depth: `AGENTS.md`,
+`AGENTS.override.md`, `AGENTS.template.md`, `CLAUDE.md`, `CLAUDE.local.md`, `GEMINI.md`,
+`SKILL.md`, `RTK.md`, `codex-user-instructions.md` and `claude-user-instructions.md`.
+These name checks include case/Unicode forms, NTFS suffix/ADS forms and Git's
+HFS-ignorable characters. So do casefold
 and NFC/NFKC aliases of protected paths and collisions between changed paths. Exceptions
 or malformed raw Git output refuse. Gate records and their receipt projection retain
 `changed_path_count`, `owned_path_count` and refusal codes, with unknown counts as `null`
@@ -53,29 +64,59 @@ and no file contents. [Fail-first evidence](evidence/owned-path-gate-fail-first.
 the old and new decisions; the old gate already refused exceptions, so that retained
 control is honestly recorded as green on both versions.
 
-Named protected-path categories have instruction phrases and can appear as sanitized
-known paths in receipts. Ownership, mode, unsafe-path, collision and compiled-artifact
-classes deliberately stay unnamed in receipts, retaining their refusal codes and counts.
+Every path-refusal class has an agent instruction phrase. Named protected-path categories
+can appear as sanitized known paths in receipts. Ownership, mode, unsafe-path, collision,
+compiled-artifact, Git-semantic and instruction-file classes deliberately stay unnamed
+in receipts, retaining their refusal codes and counts.
 Their paths may contain unsafe or agent-chosen names. The protocol test derives emitted
-rules from the gate's code and checks the named/unnamed partition and receipt allowlist.
+rules from the gate's code and checks both instruction lists for named and unnamed
+classes, the suffix/instruction-name inventories, the partition and the receipt allowlist.
 
 ### Known limits
 
 **Coordinator precondition: never own a path that holds files CI executes through
-untraced forms.** The allowlist proves scope; it does not prove that an owned file is
-safe for CI to execute. A file reached only by a GateReads advisory inventory never
-reaches `Protected`. For example, `python_references` does not follow a script invoked
-through `subprocess` even when its path is literal. If that script sits in an owned
-directory and no explicit category protects it, the resolver can change it and CI can
-execute it after enablement. The coordinator must inspect the task's proposed scope
-against these execution forms before assigning ownership; the gate does not perform
-this check automatically.
+untraced forms, or a directory containing a CI Python script run by path with an unsafe
+import search path (including any ancestor ownership scope).** Do not explicitly own
+sibling modules or packages that can shadow the script's direct or transitive imports.
+Prefer reviewed exact-file ownership for ordinary task files. The coordinator must
+inspect both CI execution forms and import environments before assigning ownership;
+the gate does not perform this check automatically.
+
+The allowlist proves scope; it does not prove that an owned file is safe for CI to
+execute. A file reached only by a GateReads advisory inventory never reaches `Protected`.
+For example, `python_references` does not follow a script invoked through `subprocess`
+even when its path is literal. The requested plan/receipt display of ownership overlap
+with `advisory_gate_reads` is also unimplemented; this remains a manual scope check.
+
+**Transitive standard-library shadowing remains a residual, including beside a traced
+CI script.** `.github/workflows/validate.yml:121` runs
+`blueprints/blind-catalog-convergence/audit_reports.py` by path without `-P` or `-I`.
+That script imports `json`. On CPython 3.12.3 the script directory enters `sys.path`,
+and the standard library's JSON decoder imports `re` and `_json`. A new sibling `re.py`
+can therefore run before the checks while escaping the repository-only import closure,
+if the coordinator grants that scope and the module is not already cached. The gate
+does not trace the standard library's imports. A synthetic native-Git control confirms
+this scope gap without executing the shadow module. Actual GitHub runner reachability
+depends on its module cache and remains unverified. The [dated review inventory](../../../docs/decisions/2026-09-28-openhands-resolver-isolation.md#owned-path-gate-review-repairs-2026-10-05)
+gives pinned CPython sources, the remaining review dispositions and reopening triggers.
+
+An unowned new top-level entry refuses, but an explicitly owned one can pass the gate.
+Case/Unicode aliases of protected paths and collisions among changed paths refuse;
+aliases of unchanged, unprotected base paths can pass. The patch validator separately
+refuses new top-level entries and base-tree aliases. The coordinator must not own those
+changes; these independent-gate residuals are recorded rather than claimed repaired.
+Other dot files are not blanket-refused by the gate; the validator requires exact
+ownership for them, and CI configuration reached only by advisory analysis remains
+subject to the execution/import precondition above.
 
 Addition 2 (plan-time pre-refusal) remains unadopted. Its adoption trigger is a reviewed,
-independently qualified enforcing inventory that covers these CI execution forms, followed
-by an acceptable measured cost for intersecting that inventory with owned paths at plan
-time. The current monitoring-only derivation cannot supply that inventory. These repairs
-do not promote its advisory paths into enforcement or add a plan-time gate.
+independently qualified enforcing inventory that covers these CI execution forms and
+import environments, followed by an acceptable measured cost for intersecting that
+inventory with owned paths at plan time. The current monitoring-only derivation cannot
+supply that inventory. Reopen the stdlib residual when a reviewed directory-protection
+rule, a closure covering transitive imports, or coordinator-owned safe-path workflow
+changes pass independent negative controls on the actual CI interpreter. These repairs
+do not promote advisory paths into enforcement or add a plan-time gate.
 
 `PushGate.check` prints `advisory_gate_reads` on stderr on every run and records it under
 the same clearly named field in the receipt. It includes `mode: "monitoring_only"`, sorted

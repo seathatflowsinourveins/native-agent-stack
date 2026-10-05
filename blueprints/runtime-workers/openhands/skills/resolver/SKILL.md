@@ -58,8 +58,16 @@ must refuse a real unowned addition before any handler proceeds.
 
 Before the host pushes, a trusted gate checks your exact change and refuses every
 unowned path, including either end of a rename. Even inside the owned paths, it refuses:
-- a symlink, gitlink, mode/type change, unsafe path component, absolute path, `.git`
+- a symlink, gitlink, mode/type change, unsafe path component (empty, . or .. components), absolute path, `.git`
   or its HFS/NTFS aliases, or `.gitmodules` and its aliases;
+- compiled or bytecode artifacts (`compiled_module_artifact`): every `__pycache__`
+  component and `.pyc`, `.pyo`, `.so`, `.pyd`, `.dylib` or `.dll` suffix, anywhere;
+- Git semantic dot files (`git_semantic_file`) at any depth: `.git*` names including
+  `.gitattributes`, `.gitignore` and `.gitconfig`, plus `.mailmap`; `.git`, `.gitmodules`
+  and `.github` keep their existing refusals;
+- instruction files (`instruction_file`) at any depth: `AGENTS.md`, `AGENTS.override.md`,
+  `AGENTS.template.md`, `CLAUDE.md`, `CLAUDE.local.md`, `GEMINI.md`, `SKILL.md`, `RTK.md`,
+  `codex-user-instructions.md` and `claude-user-instructions.md`;
 - a casefold or NFC/NFKC alias of a protected path, or a collision with another changed path;
 - `.github/`: workflows, local actions, rulesets and CI requirements;
 - a file named `CODEOWNERS`, anywhere;
@@ -70,6 +78,9 @@ unowned path, including either end of a rename. Even inside the owned paths, it 
   closure of those names, local actions and reusable workflows;
 - a workflow or action step that uses pull-request or issue text, and a workflow or action
   that zizmor flags.
+
+Case/Unicode and NTFS trailing-dot, space or stream forms are refused too; instruction
+and Git names also discard Git's HFS-ignorable characters. Ownership cannot authorize these files.
 
 If the fix needs any of these, including a new or changed test, change nothing: stop and
 report which file would need to change and why. The owner makes that change.

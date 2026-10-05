@@ -1062,15 +1062,52 @@ The preserved read-monitor limitations remain separate and are not repaired here
 
 ## Owned-path gate review repairs (2026-10-05)
 
-The correctness and adversarial reads accepted the gate without P1 findings and raised
-the P2 items repaired here. The starting branch head is
+The correctness and adversarial reads accepted the gate without P1 findings. Repairs
+are partial: the inventory below distinguishes code repairs, new refusals and residuals
+instead of implying every review suggestion was implemented. The r2 starting head was
 `ee78a711a4c2e1ec92637c1b3f7b241aa1f9146e`, after gate `ed889cf62`, enablement
-`8ce7136dc` and registration. These changes serve the same foundation action: the
+`8ce7136dc` and registration. R3 starts at `56fced82727921f2de0d99790148acec0bdd11ca`,
+whose tree matches r2 `ffda8b1e2`; its delta read also accepted with no P1 and identified
+the remaining items recorded here. These changes serve the same foundation action: the
 trusted host authorizes the exact commit proposed by a contained worker. They retain
 addition 1, the trusted-memory ownership trace and the fork-isolation overturn.
 No new enablement code, live resolver, GitHub mutation, model/provider call or container
 start is part of the repair. New tests are local unittest integration checks with native
 Git, synthetic artifacts and fake zizmor, not upstream execution or filesystem acceptance.
+
+### Review-item dispositions
+
+Labels C and S refer to the original correctness and security reads; Delta refers to
+the r2 delta read. A retained existing refusal is identified as such, rather than
+presented as a new r3 fix. The residuals retain their coordinator preconditions.
+
+| Review item | Disposition | Evidence, reason and reopening condition |
+| --- | --- | --- |
+| C1 / S1: empty-prefix `.gitmodules` NTFS fallback | repaired | R2 ports Git's loop at index zero and retains its upstream vectors and exact-commit controls. |
+| C2: present-tense disabled-driver claims | repaired | R2 makes the #489 status historical in RESOLVER.md and current-true in `gate_reads.py`. |
+| C3: rule metadata and closed-set protocol test | repaired | R2 derives emissions from source and checks the receipt partition; r3 also checks phrases for every unnamed class and derives suffix/instruction-name coverage from their inventories. |
+| C4: gate-only commit docs and landing order | residual | The earlier gate commit already describes enablement, and r2 repairs followed enablement in branch history. Rewriting old commits is outside this repair and the issue is moot under a squash merge. The coordinator must re-split before any separate sequential landing; current gate fixes and instruction wording remain separate hunks. |
+| C5: unreachable `diff_failed` | repaired | R2 uses `check=False` with an explicit return-code check; a subprocess-level failure control returns `diff_failed` and refuses. |
+| S2: compiled-module aliases | repaired | R2 refuses every `__pycache__` component and `.pyc`, `.pyo`, `.so`, `.pyd`, `.dylib`, `.dll` suffix, independently of import resolution. |
+| S2(a): instruction files | newly_refused | R3 adds `instruction_file` for the ten named instruction files/templates below, at any depth and even with exact ownership; native add/modify/delete controls are red before and green after. |
+| S2(b): Git semantic dot files | newly_refused | R3 adds `git_semantic_file` for `.mailmap` and `.git*` names at any depth; `.git`, `.gitmodules`, `.github` retain their categories. Git's checkout attributes justify the conservative name boundary. |
+| S2(b): other dot paths | residual | The gate does not blanket-refuse all dot paths; the validator requires exact ownership unless otherwise forbidden. A harmless exact-owned `.notes` fixture still passes. CI configuration reachable only through advisory reads remains subject to manual scope review. Reopen when a demonstrated semantic input needs an independent refusal, or a qualified enforcing inventory covers it. |
+| S2(c): new top-level entries | residual | `path_is_owned` denies an unowned new top-level entry, but explicit ownership can authorize one. There is no top-level comparison in `_check_paths`; the validator's separate `new_top_level_entry` rule remains the first layer. Both decisions are retained as fixtures. Never own a new top-level entry; reopen if this independent boundary must also cover a defect in that validator rule. |
+| S2(d): aliases of unchanged protected paths | repaired | Retained existing coverage: `Protected` unions trusted/base/head rules and `_check` probes `path_aliases` even when the protected base path is unchanged. Native case/NFC/NFKC controls refuse; no new matching code is needed. |
+| S2(d): aliases of unchanged unprotected base paths | residual | `_check_paths` compares changed paths with one another, and `_check` compares them with protected paths, not all base entries. Case/NFKC aliases of unchanged ordinary docs pass the gate; the validator independently refuses base aliases. Do not own such aliases. Reopen for an independent whole-base collision requirement or a demonstrated false push. |
+| S3: resolver driver as enforcement input | repaired | R2 adds `resolver.py` to `ENFORCING_FILES`, with local-modification and trusted/base-mismatch refusals. |
+| S4: untraced CI execution after enablement | residual | Documentation and a coordinator precondition were added in r2; an advisory-only input is still not `Protected`. The inventory is monitoring only, so addition 2 cannot enforce it. Reopen under the qualified-inventory trigger below. |
+| S4: plan/receipt ownership-overlap display | residual | The suggested intersection with `advisory_gate_reads` is not displayed in the plan or receipt. R2 supplied only a manual precondition; no automatic scope check is claimed. Reopen when the coordinator scopes and qualifies a monitoring-only visibility change, or when addition 2 has an enforcing source. |
+| Delta 1: transitive stdlib shadowing | residual | The repository import closure omits imports made by the stdlib itself beside a CI script run by path. R3 records a pass fixture without executing it, expands the coordinator precondition to import environments, and names independent directory/closure/safe-path acceptance as the reopening trigger. |
+| Delta 3: agent-facing refusal-list drift | repaired | R3 names compiled artifacts and both new refusal classes in the skill and generated instruction; source-derived phrase checks include unnamed classes and fail on the old wording. |
+
+The scope decisions cite the unchanged r3 starting source: git tree `56fced827`,
+[path_is_owned:1068-1073](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56fced82727921f2de0d99790148acec0bdd11ca/blueprints/runtime-workers/openhands/resolver/push_gate.py#L1068),
+[Protected:995-1027](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56fced82727921f2de0d99790148acec0bdd11ca/blueprints/runtime-workers/openhands/resolver/push_gate.py#L995),
+[_check:1247-1261](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56fced82727921f2de0d99790148acec0bdd11ca/blueprints/runtime-workers/openhands/resolver/push_gate.py#L1247),
+and [_check_paths:1345-1369](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56fced82727921f2de0d99790148acec0bdd11ca/blueprints/runtime-workers/openhands/resolver/push_gate.py#L1345).
+The separate validator comparison is
+[_rule_reasons:864-899](https://github.com/seathatflowsinourveins/native-agent-stack/blob/56fced82727921f2de0d99790148acec0bdd11ca/blueprints/runtime-workers/openhands/resolver/patch_policy.py#L864).
 
 ### Pinned sources and corrections
 
@@ -1089,6 +1126,32 @@ Git, synthetic artifacts and fake zizmor, not upstream execution or filesystem a
   with [is_ntfs_dotgit at path.c:1419-1453](https://github.com/git/git/blob/v2.43.0/path.c#L1419).
   Existing alias controls are retained. This corrects the earlier code and completeness
   claim; it does not claim these locally ported vectors ran Git's upstream harness.
+- Git `v2.43.0` [Documentation/gitattributes.txt:69-82](https://github.com/git/git/blob/v2.43.0/Documentation/gitattributes.txt#L69)
+  gives per-directory attribute precedence and the index fallback at checkout;
+  [110-118](https://github.com/git/git/blob/v2.43.0/Documentation/gitattributes.txt#L110)
+  describes changes to working-tree contents, and
+  [391-409](https://github.com/git/git/blob/v2.43.0/Documentation/gitattributes.txt#L391)
+  documents configured smudge/process filters. A changed `.gitattributes` can therefore
+  affect an unchanged protected file in its directory. The gate now independently
+  refuses `.git*` names and `.mailmap`, with the three existing category exceptions.
+  This broader prefix is a conservative policy, not a claim that arbitrary `.git*`
+  files are automatically read. The other direct inputs are described in
+  [gitignore.txt:29-34](https://github.com/git/git/blob/v2.43.0/Documentation/gitignore.txt#L29),
+  [gitmailmap.txt:16-20](https://github.com/git/git/blob/v2.43.0/Documentation/gitmailmap.txt#L16)
+  and [config.txt:1-12, 86-101](https://github.com/git/git/blob/v2.43.0/Documentation/config.txt#L86).
+  Refusal at every depth is deliberately stricter than the default locations for
+  `.mailmap` and `.gitconfig`. Case/Unicode, NTFS suffix/ADS and HFS-ignorable forms
+  receive the same new code.
+- The independent instruction-name list includes `AGENTS.md`, `AGENTS.override.md`,
+  `AGENTS.template.md`, `CLAUDE.md`, `CLAUDE.local.md`, `GEMINI.md`, `SKILL.md`, `RTK.md`,
+  `codex-user-instructions.md` and `claude-user-instructions.md`. At `56fced827`, the
+  repository names these formats in `RESOLVER.md:299-300`,
+  `recipes/README.md:184,212,218-220`, `docs/harness-defaults.md:208` and
+  `adoption/platforms/linux-wsl2-new-distro.md:1082-1083`; Gemini is required by this
+  repair's scope. Templates and named instruction blocks are conservatively included,
+  without claiming clients auto-load every basename. The gate does not import the
+  validator's instruction-name list. A newly adopted instruction filename reopens this
+  finite policy; its inventory is also checked against both agent-facing lists.
 - CI's target is CPython **3.12.3**, recorded in `.github/workflows/validate.yml:227-228`
   at the starting head. The host normalizer's 3.13.15 pin is a separate scope. CPython
   `v3.12.3` [Doc/library/importlib.rst:959-970](https://github.com/python/cpython/blob/v3.12.3/Doc/library/importlib.rst#L959)
@@ -1115,9 +1178,10 @@ parser boundary and harness were already present. Receipt projection does not au
 pushes and adds no new enforcement input. A locally changed driver returns
 `gate_file_modified`; a trusted/base driver mismatch returns `gate_differs_from_base`.
 
-The instruction map covers named protected-path rules. Ownership, mode, unsafe-path,
-collision and compiled-artifact rules deliberately remain **unnamed** in sanitized
-receipts, with codes and counts retained. Their names can be unsafe or agent-chosen;
+The instruction maps cover every path rule. Ownership, mode, unsafe-path, collision,
+compiled-artifact, Git-semantic and instruction-file rules deliberately remain
+**unnamed in sanitized receipts**, with codes and counts retained. Unnamed does not
+mean omitted from agent instructions. Their paths can be unsafe or agent-chosen;
 publishing additional path strings is unnecessary. The comments now state that policy.
 The keep-in-step test derives emitted rules from their code producers and checks their
 named/unnamed partition, instruction phrases and receipt allowlist. An added emission
@@ -1128,36 +1192,73 @@ nonzero result reaches `diff_failed`, preserving fail-closed behavior; malformed
 still reaches `diff_output_invalid`. The test injects failure at subprocess, so it cannot
 accidentally bypass `_git`'s return-code handling.
 
-### Known limit and coordinator precondition after enablement
+### Known limits and coordinator precondition after enablement
 
-**Never own a path that holds files CI executes through untraced forms.** Inside an
+**Never own a path that holds files CI executes through untraced forms, or a directory
+containing a CI Python script run by path with an unsafe import search path, including
+an ancestor ownership scope.** Do not explicitly own sibling modules/packages that can
+shadow direct or transitive imports; prefer reviewed exact-file ownership for ordinary
+task files. Inside an
 owned path, a CI input reached only by GateReads advisory analysis still receives no
 `Protected` rule. A literal-path script started by `subprocess` is one example:
 `patch_policy.python_references:413-477` traces imports, importlib/runpy path loads and
 sys.path, but not that invocation. `Protected` excludes monitoring-only inventories.
 The owned-path gate proves scope and cannot determine whether every owned file is safe
-for CI to execute. The coordinator must inspect proposed ownership against these forms;
-there is no automatic plan-time check. This residual became operational when the driver
-was enabled and is prominent in RESOLVER.md's current Known limits section.
+for CI to execute. The coordinator must inspect proposed ownership against execution
+forms and import environments; there is no automatic plan-time check or ownership/
+advisory-overlap display. This residual became operational when the driver was enabled
+and is prominent in RESOLVER.md's current Known limits section.
+
+**Transitive stdlib shadowing is still allowed by the gate when owned.** At `56fced827`,
+`.github/workflows/validate.yml:121` runs
+`blueprints/blind-catalog-convergence/audit_reports.py`, which imports `json` at :7,
+without `-P`, `-I` or `PYTHONSAFEPATH`. CPython `v3.12.3`
+[Doc/library/sys.rst:1300-1312](https://github.com/python/cpython/blob/v3.12.3/Doc/library/sys.rst#L1300)
+documents script-directory precedence; [Modules/main.c:583-607](https://github.com/python/cpython/blob/v3.12.3/Modules/main.c#L583)
+implements the `safe_path` branch. The stdlib JSON
+[initializer:106-107](https://github.com/python/cpython/blob/v3.12.3/Lib/json/__init__.py#L106)
+loads [decoder.py:3-7](https://github.com/python/cpython/blob/v3.12.3/Lib/json/decoder.py#L3),
+which imports `re` and `_json`. Inference: an owned sibling `re.py` can run during this
+CI check if it is not already cached. The gate traces repository imports, not the
+stdlib's transitive closure; its existing head-tree derivation still catches direct
+source/package aliases. The new synthetic pass fixture models `import json` beside a
+workflow-named script and an added `re.py`, without executing either. This establishes
+the gate's gap, not the actual runner's module-cache reachability, which is unverified.
+Reopen when independently qualified directory protection, a transitive import closure,
+or coordinator-owned safe-path workflow changes refuse the negative control on the
+actual CI interpreter. This repair adds no workflow change or new directory prefix.
 
 **Addition 2 remains not adopted.** Its adoption trigger is a reviewed, independently
-qualified enforcing inventory covering these execution forms, followed by an acceptable
-measured cost for the plan-time ownership intersection. The original cost trigger alone
+qualified enforcing inventory covering these execution forms and import environments,
+followed by an acceptable measured cost for the plan-time ownership intersection. The original cost trigger alone
 is insufficient while the derivation is monitoring only. No evaluator precision repair,
 advisory-to-enforcing promotion or plan-time pre-refusal is built in this round.
 
-Alternatives were to add each compiled alias to the source-module closure, publish path
+For r3, the alternatives were a blanket dot-path refusal and whole-base/top-level
+collision checks, or the requested cheap independent Git/instruction name refusals.
+The latter adds no dependence on advisory derivation or the validator's matcher, while
+the unimplemented broader checks are explicitly residuals with manual preconditions.
+New adopted instruction names, a changed pinned Git rule or a demonstrated false pass
+reopen this boundary under the existing fork-isolation overturn.
+
+R2 alternatives were to add each compiled alias to the source-module closure, publish path
 names for every new rule, or leave the generic `git_failed` diagnostic. Blanket artifact
 refusal avoids a dependence on loader/platform suffix enumeration; code/count-only
 receipts preserve their existing data boundary; explicit diff failure makes the intended
 diagnostic reachable. A pinned upstream rule change or a demonstrated false pass reopens
 these choices under the existing fork-isolation overturn.
 
-Gate-only hunks are the path checks, enforcement-input list, rule metadata and diff
-handling in `push_gate.py`, the receipt policy comment, and their test/fixture changes.
-Documentation hunks are the alias correction, current driver wording, receipt policy,
-residual/precondition and this dated entry; `gate_reads.py` changes only its docstring.
-No `resolver.py` enablement handler or startup self-test changes in this repair.
+R2 gate-only hunks are its path checks, enforcement-input list, rule metadata and diff
+handling in `push_gate.py`, receipt policy comment, and test/fixture changes. R3 gate
+hunks are its two independent name refusals, phrase metadata and native commit fixtures
+in `push_gate.py` and `tests/test_runtime_worker_openhands_push_gate.py`. The
+source-derived protocol test in `tests/test_runtime_worker_openhands_resolver.py`
+depends on the instruction wording and belongs with it when landing separately.
+R3 instruction/enablement hunks are only `resolver_instruction` in `resolver.py`, the
+resolver `SKILL.md` and that protocol test; the import guard, startup control and public
+entry point are unchanged. Documentation hunks are RESOLVER.md's rule/limit inventory,
+this corrected dated entry and fail-first evidence. The earlier gate-only commit's
+documentation remains a report-only historical issue, moot under squash merge.
 Fail-first evidence is appended to `evidence/owned-path-gate-fail-first.txt`; registration
 is the final repository mutation. Targeted acceptance runs offline with a private TMPDIR
 outside the checkout, correcting the previous builder's fixture placement.
