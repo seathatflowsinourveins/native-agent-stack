@@ -57,7 +57,11 @@ pin was not compared (any exclusion above, or ``unversioned``) publishes
 ``pin_behind_upstream`` status on an OS-package pin is published as
 ``distro_managed`` (see ``reconcile_status_with_pin``). A tag-only upstream
 whose tag is not version-shaped is flagged under ``upstream.latest_flag``
-instead of being published as ``upstream.latest``.
+instead of being published as ``upstream.latest``. Prerelease pins select the
+newest published release of their pinned major from the bounded release list,
+including prereleases, and compare alpha/beta/rc ordinals before the final release.
+A missing, failed or capped list yields not_compared with an explicit reason;
+stable pins keep their existing releases/latest and leading-version comparison.
 
 Lane entries join cards on ``(layer, repo_join_key(repository))`` -- the
 normalized GitHub slug -- so a ``/releases/tag/...`` or ``/tree/...`` card URL
@@ -72,6 +76,7 @@ survival never upgrades a label. See ``disposition``.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import re
 from collections import Counter, defaultdict
@@ -79,6 +84,11 @@ from datetime import date
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
+# Load the sibling by exact path: both CLIs are also imported standalone in tests.
+# Selection/comparison and the workflow share github_freshness.py's stream policy.
+_currency_spec = importlib.util.spec_from_file_location("release_currency", HERE / "github_freshness.py")
+release_currency = importlib.util.module_from_spec(_currency_spec)
+_currency_spec.loader.exec_module(release_currency)
 # The catalog repository checkout this tool runs from: the default
 # --checkout-root, whose paths are published repository-relative.
 REPO_ROOT = HERE.parents[1]
@@ -124,7 +134,8 @@ def parse_version(text):
     return tuple(int(g) if g else 0 for g in match.groups())
 
 
-def classify_pin(pin, repository, upstream_latest, component_id=None, os_package_ids=DEFAULT_OS_PACKAGE_IDS):
+def classify_pin(pin, repository, upstream_latest, component_id=None, os_package_ids=DEFAULT_OS_PACKAGE_IDS,
+                 upstream_unknown_reason=None):
     """Return {"behind": bool, "excluded": bool, "reason": str|None}.
 
     ``os_package_ids`` is an explicit allow-list of component/entry ids
@@ -137,8 +148,16 @@ def classify_pin(pin, repository, upstream_latest, component_id=None, os_package
         return {"behind": False, "excluded": True, "reason": "os_package_pin"}
     if pin and DEV_PIN_RE.search(pin):
         return {"behind": False, "excluded": True, "reason": "commit_pinned"}
-    pin_version = parse_version(pin)
-    upstream_version = parse_version(upstream_latest)
+    if release_currency.is_prerelease_pin(pin):
+        if upstream_unknown_reason:
+            return {"behind": False, "excluded": False, "reason": upstream_unknown_reason}
+        pin_version = release_currency.release_version(pin)
+        upstream_version = release_currency.release_version(upstream_latest)
+        if upstream_version is not None and upstream_version[0] != pin_version[0]:
+            upstream_version = None
+    else:
+        pin_version = parse_version(pin)
+        upstream_version = parse_version(upstream_latest)
     if pin_version is None or upstream_version is None:
         return {"behind": False, "excluded": False, "reason": "unversioned"}
     return {"behind": pin_version < upstream_version, "excluded": False, "reason": None}
@@ -152,9 +171,8 @@ def github_repo_slug(url: str):
     repository already resolves to the same owner/repo pair; '.git' is
     stripped and the result is lower-cased so a canonical URL and any of
     those alias forms normalize identically. Mirrors
-    ``github_freshness.github_slug`` (kept independent here so this module
-    has no import-time dependency on that sibling script -- both files are
-    also loaded standalone, by file path, in tests/test_sota_convergence.py).
+    ``github_freshness.github_slug``; both files are also loaded standalone, by
+    file path, in tests/test_sota_convergence.py.
     """
     match = GITHUB_URL_RE.match(url or "")
     if not match:
@@ -218,12 +236,17 @@ def freshness_record(repository, repositories: dict) -> dict | None:
     return record
 
 
-def compute_upstream(repository, repositories: dict) -> dict:
+def compute_upstream(repository, repositories: dict, pin=None) -> dict:
     record = freshness_record(repository, repositories) or {}
     release = record.get("latest_release") or {}
     latest = release.get("tag") or record.get("latest_tag")
     flagged_tag = None
-    if not release.get("tag") and latest and parse_version(latest) is None:
+    unknown_reason = None
+    if release_currency.is_prerelease_pin(pin):
+        release, unknown_reason = release_currency.select_release_for_pin(pin, record)
+        release = release or {}
+        latest = release.get("tag")
+    elif not release.get("tag") and latest and parse_version(latest) is None:
         # No release channel, and the tag-listing fallback is not
         # version-shaped: github_freshness.py reads repos/{slug}/tags?per_page=1,
         # which returns the first tag in the API's name order, not the newest
@@ -243,6 +266,8 @@ def compute_upstream(repository, repositories: dict) -> dict:
     }
     if flagged_tag is not None:
         upstream["latest_flag"] = {"tag": flagged_tag, "reason": LATEST_TAG_NOT_A_RELEASE}
+    if unknown_reason:
+        upstream["latest_flag"] = {"tag": None, "reason": unknown_reason}
     return upstream
 
 
@@ -258,9 +283,10 @@ def build_baseline_foundation(foundation_layers: dict, repositories: dict,
         for component in layer.get("components", []):
             repository = component.get("repository")
             pin = component.get("version") or component.get("pin")
-            upstream = compute_upstream(repository, repositories)
+            upstream = compute_upstream(repository, repositories, pin=pin)
             classification = classify_pin(pin, repository, upstream.get("latest"),
-                                           component_id=component["id"], os_package_ids=os_package_ids)
+                                           component_id=component["id"], os_package_ids=os_package_ids,
+                                           upstream_unknown_reason=(upstream.get("latest_flag") or {}).get("reason"))
             components.append({
                 "id": component["id"], "repository": repository, "pin": pin,
                 "upstream": upstream, "behind": classification["behind"],
@@ -324,9 +350,10 @@ def build_baseline_trading(trading_by_layer: dict, repositories: dict,
                 continue
             repository = entry.get("repository")
             pin = entry.get("version_or_commit") or entry.get("pin")
-            upstream = compute_upstream(repository, repositories)
+            upstream = compute_upstream(repository, repositories, pin=pin)
             classification = classify_pin(pin, repository, upstream.get("latest"),
-                                           component_id=entry["id"], os_package_ids=os_package_ids)
+                                           component_id=entry["id"], os_package_ids=os_package_ids,
+                                           upstream_unknown_reason=(upstream.get("latest_flag") or {}).get("reason"))
             row = {
                 "id": entry["id"], "repository": repository, "decision": entry.get("decision"),
                 "pin": pin, "upstream": upstream, "behind": classification["behind"],
@@ -434,9 +461,10 @@ def build_trading_freshness(trading_by_layer: dict, trading_pins: dict | None, r
     for pin in (trading_pins or {}).get("entries", []):
         if pin["id"] in rows:
             raise ValueError(f"trading pin {pin['id']!r} collides with a selected trading card id")
-        upstream = compute_upstream(pin["repository"], repositories)
+        upstream = compute_upstream(pin["repository"], repositories, pin=pin["pin"])
         classification = classify_pin(pin["pin"], pin["repository"], upstream.get("latest"),
-                                      component_id=pin["id"], os_package_ids=os_package_ids)
+                                      component_id=pin["id"], os_package_ids=os_package_ids,
+                                      upstream_unknown_reason=(upstream.get("latest_flag") or {}).get("reason"))
         rows[pin["id"]] = {
             "id": pin["id"], "source": "pin_source", "pin_source": pin.get("pin_source"),
             "layers": [pin["layer"]], "repository": pin["repository"], "pin": pin["pin"],
@@ -602,7 +630,7 @@ def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, check
     entries = []
     for pin in sorted((runtime_pins or {}).get("entries", []), key=lambda item: str(item.get("id"))):
         repository = pin.get("repository")
-        upstream = compute_upstream(repository, repositories) if repository else {}
+        upstream = compute_upstream(repository, repositories, pin=pin.get("pin")) if repository else {}
         tags = pin.get("tags")
         if repository and isinstance(tags, dict):
             upstream = apply_tag_declaration(upstream, tags, freshness_record(repository, repositories))
@@ -620,7 +648,9 @@ def build_runtime_freshness(runtime_pins: dict | None, repositories: dict, check
         else:
             pin_fields = pin_comparison_fields(classify_pin(
                 pin.get("pin"), repository, upstream.get("latest"),
-                component_id=pin.get("id"), os_package_ids=os_package_ids))
+                component_id=pin.get("id"), os_package_ids=os_package_ids,
+                upstream_unknown_reason=(upstream.get("latest_flag") or {}).get("reason")
+                if not isinstance(tags, dict) else None))
         entries.append({
             "id": pin.get("id"), "group": pin.get("group"), "kind": pin.get("kind"),
             "repository": repository, "pin": pin.get("pin"), "pin_source": pin.get("pin_source"),

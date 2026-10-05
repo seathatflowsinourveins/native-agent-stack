@@ -20,6 +20,7 @@ Writes --out (default <work-dir>/github-freshness.json):
    runtime_only_errors, runtime_only_partial_errors, runtime_only_repositories,
    fetched_this_run, retained_from_prior_runs, observation_window: {min, max},
    repositories: {repo_url: {..., observed_at, slug, aliases, matching_tags?,
+                             release_list?,
                              matching_tags_truncated?, matching_tags_errors?, partial_errors?}}}
 
 Runtime-only repositories: a repository that runtime-pins.json names and no other
@@ -63,6 +64,11 @@ and the next run fetches that repository again. A record that carries
 runtime-pins.json now declares for its repository, is pending too; the resume is
 per repository, so the next run fetches that whole repository again. --max-repos
 bounds a trial run to the first N (sorted) slugs that still need fetching.
+Prerelease pins in the extracted working files additionally request up to three
+100-release REST pages, alongside releases/latest; release_list retains compact
+published, non-draft release metadata and its page/cap/exhaustion state. Older
+snapshots lacking this list are pending for those repositories. A full third page
+means unknown beyond cap, never a complete newest-release observation.
 """
 from __future__ import annotations
 
@@ -88,6 +94,75 @@ MATCHING_TAGS_CAP = 5000
 # extract_layers.py's literal tag-prefix rule (RUNTIME_TAG_PREFIX_RE, kept independent
 # here): a declared prefix outside it is ignored, so it never reaches the API path.
 TAG_PREFIX_RE = re.compile(r"[A-Za-z0-9._=+-]*")
+
+# REST "Get the latest release" excludes prereleases; keep that channel for stable
+# pins and additionally use "List releases" for pins in a prerelease major stream:
+# https://docs.github.com/en/rest/releases/releases#get-the-latest-release
+# https://docs.github.com/en/rest/releases/releases#list-releases
+# Request pages explicitly, never gh --paginate: at most 3 * 100 releases. A full
+# third page leaves the newest release unknown beyond cap, even if a candidate was
+# seen; no assumption about the endpoint's ordering can prove the unseen tail.
+RELEASES_PER_PAGE = 100
+RELEASES_PAGE_CAP = 3
+# The release/pre subset of pypa/packaging 26.0's _VERSION_PATTERN and _cmpkey:
+# https://github.com/pypa/packaging/blob/26.0/src/packaging/version.py
+# Scope: dotted major.minor[.patch], alpha/beta/rc (including normalized spellings),
+# and final releases. Development, post, local and epoch versions are not compared
+# by this stream watch. Existing stable-pin parsing remains in build_manifest.py.
+RELEASE_VERSION_RE = re.compile(
+    r"v?([0-9]+)\.([0-9]+)(?:\.([0-9]+))?"
+    r"(?:[._-]?(alpha|a|beta|b|preview|pre|c|rc)[._-]?([0-9]+)?)?",
+    re.IGNORECASE,
+)
+PRE_RELEASE_RANK = {"alpha": 0, "a": 0, "beta": 1, "b": 1,
+                    "preview": 2, "pre": 2, "c": 2, "rc": 2}
+
+
+def release_version(text):
+    """Ordering key for the supported published-release stream, or None."""
+    if not isinstance(text, str) or not text.strip():
+        return None
+    # Pins may carry whitespace-separated source annotations; tags do not.
+    match = RELEASE_VERSION_RE.fullmatch(text.strip().split()[0])
+    if not match:
+        return None
+    major, minor, patch, stage, number = match.groups()
+    return (int(major), int(minor), int(patch or 0),
+            PRE_RELEASE_RANK[stage.lower()] if stage else 3, int(number or 0))
+
+
+def is_prerelease_pin(pin) -> bool:
+    version = release_version(pin)
+    return version is not None and version[3] < 3
+
+
+def select_release_for_pin(pin, record):
+    """(release, unknown reason) for the newest published release in pin's major.
+
+    Only prerelease pins use the bounded list. Publication time, rather than list
+    position or another major's stable backport, selects the release. Its version
+    key then determines drift. A missing, failed or capped list never falls back
+    to releases/latest or an unpublished Git tag.
+    """
+    if not is_prerelease_pin(pin):
+        return record.get("latest_release"), None
+    listing = record.get("release_list")
+    if not isinstance(listing, dict):
+        return None, "release list not fetched"
+    if listing.get("error"):
+        return None, "release list unavailable"
+    if listing.get("truncated"):
+        return None, "unknown beyond cap"
+    major = release_version(pin)[0]
+    candidates = []
+    for release in listing.get("releases", []):
+        version = release_version(release.get("tag"))
+        if (version is not None and version[0] == major and not release.get("draft")
+                and release.get("published_at")):
+            candidates.append(release)
+    if not candidates:
+        return None, "no published release in pinned major"
+    return max(candidates, key=lambda item: (item["published_at"], release_version(item["tag"]))), None
 
 WORKING_FILE_REPO_PATHS = (
     ("foundation-layers.json", lambda doc: (
@@ -170,6 +245,24 @@ def collect_declared_tag_prefixes(work_dir: Path) -> dict:
     return {slug: tuple(sorted(values)) for slug, values in prefixes.items()}
 
 
+def collect_prerelease_slugs(work_dir: Path) -> set:
+    """Repositories with prerelease pins in the extracted working files only."""
+    slugs = set()
+    for filename in ("foundation-layers.json", "trading-catalog.json", "trading-pins.json", "runtime-pins.json"):
+        path = work_dir / filename
+        if not path.exists():
+            continue
+        doc = load_json(path)
+        entries = (component for layer in doc.get("layers", []) for component in layer.get("components", [])) \
+            if filename == "foundation-layers.json" else doc.get("entries", [])
+        for entry in entries:
+            pin = entry.get("version") or entry.get("version_or_commit") or entry.get("pin")
+            slug = github_slug(entry.get("repository"))
+            if slug and is_prerelease_pin(pin):
+                slugs.add(slug)
+    return slugs
+
+
 def missing_tag_prefixes(record, prefixes) -> list:
     """The prefixes in ``prefixes`` that ``record`` has no "matching_tags" list for."""
     held = record.get("matching_tags") if isinstance(record, dict) else None
@@ -177,16 +270,20 @@ def missing_tag_prefixes(record, prefixes) -> list:
     return [prefix for prefix in prefixes if not isinstance(held.get(prefix), list)]
 
 
-def record_is_covered(record, tag_prefixes: dict) -> bool:
+def record_is_covered(record, tag_prefixes: dict, prerelease_slugs=()) -> bool:
     """True when a retained record needs no fetch this run: it carries no "error",
     no "partial_errors" and no "matching_tags_errors", and it holds a
     "matching_tags" list for every prefix ``tag_prefixes``
     (collect_declared_tag_prefixes) declares for its slug now, so a prefix declared
-    since, or a list a run never fetched or failed to fetch, leaves it pending."""
+    since, or a list a run never fetched or failed to fetch, leaves it pending.
+    A prerelease-pinned repository also needs release_list; a prior snapshot that
+    only read releases/latest cannot cover that stream."""
     if (not isinstance(record, dict) or record.get("error") or record.get("partial_errors")
             or record.get("matching_tags_errors")):
         return False
     slug = str(record.get("slug") or "").lower()
+    if slug in prerelease_slugs and not isinstance(record.get("release_list"), dict):
+        return False
     return not missing_tag_prefixes(record, tag_prefixes.get(slug, ()))
 
 
@@ -284,12 +381,40 @@ def fetch_matching_tag_names(slug: str, prefix: str):
             and ref["ref"].startswith(TAG_REF_PREFIX)], None
 
 
-def fetch_repository(slug: str, tag_prefixes=()) -> dict:
+def fetch_release_list(slug: str) -> dict:
+    """At most RELEASES_PAGE_CAP explicit REST pages, with visible uncertainty.
+
+    A short page proves exhaustion. A full final page is conservatively marked
+    truncated, including an exactly-cap-sized history: no extra probe is made.
+    Drafts/unpublished releases count toward pagination but never become candidates.
+    """
+    result = {"releases": [], "pages": 0, "per_page": RELEASES_PER_PAGE,
+              "page_cap": RELEASES_PAGE_CAP, "truncated": False}
+    for page in range(1, RELEASES_PAGE_CAP + 1):
+        releases, err = gh_api(f"repos/{slug}/releases?per_page={RELEASES_PER_PAGE}&page={page}")
+        result["pages"] = page
+        if err is not None or not isinstance(releases, list):
+            result["error"] = str(err or "releases response is not a JSON array")[:160]
+            return result
+        result["releases"].extend(
+            {"tag": release["tag_name"], "published_at": release["published_at"],
+             "prerelease": release.get("prerelease")}
+            for release in releases if isinstance(release, dict) and not release.get("draft")
+            and release.get("published_at") and release.get("tag_name")
+        )
+        if len(releases) < RELEASES_PER_PAGE:
+            return result
+    result["truncated"] = True
+    return result
+
+
+def fetch_repository(slug: str, tag_prefixes=(), *, include_prereleases=False) -> dict:
     """One repository's record. ``tag_prefixes`` (collect_declared_tag_prefixes)
     adds one matching-refs call per distinct prefix and the record's
     "matching_tags", with "matching_tags_truncated" for a list over
     MATCHING_TAGS_CAP and "matching_tags_errors" for a failed call (never
-    "partial_errors"); without it the calls and the record are what they were."""
+    "partial_errors"). ``include_prereleases`` adds the bounded published release
+    list; stable-only repositories retain the prior calls and record shape."""
     out = {"slug": slug, "observed_at": datetime.now(timezone.utc).isoformat()}
     partial_errors = {}
     repo, err = gh_api(f"repos/{slug}")
@@ -318,6 +443,11 @@ def fetch_repository(slug: str, tag_prefixes=()) -> dict:
             out["latest_tag"] = tags[0]["name"] if tags else None
         elif not is_expected_missing(tags_err):
             partial_errors["tags"] = tags_err
+
+    if include_prereleases:
+        out["release_list"] = fetch_release_list(slug)
+        if out["release_list"].get("error"):
+            partial_errors["release_list"] = out["release_list"]["error"]
 
     commit, commit_err = gh_api(f"repos/{slug}/commits/{repo.get('default_branch')}")
     if commit:
@@ -459,6 +589,7 @@ def main(argv=None) -> int:
     slug_aliases = build_slug_aliases(urls)
     non_github = sorted(u for u in urls if u and not github_slug(u))
     tag_prefixes = collect_declared_tag_prefixes(args.work_dir)
+    prerelease_slugs = collect_prerelease_slugs(args.work_dir)
     # Only the counting changes for these (build_document); they are fetched, resumed
     # and recorded like every other repository.
     runtime_only_slugs = collect_runtime_only_slugs(args.work_dir)
@@ -481,7 +612,7 @@ def main(argv=None) -> int:
     # each prefix declared now, is pending as well (record_is_covered); the whole
     # repository is fetched again, because the resume is per repository.
     already_covered_slugs = {str(rec.get("slug") or "").lower() for rec in results.values()
-                              if record_is_covered(rec, tag_prefixes)}
+                              if record_is_covered(rec, tag_prefixes, prerelease_slugs)}
     pending = {slug: url for slug, url in sorted(targets.items())
                if args.refresh or slug not in already_covered_slugs}
     if args.max_repos is not None:
@@ -491,6 +622,8 @@ def main(argv=None) -> int:
           f"already-covered {len(targets) - len(pending)} to-fetch {len(pending)}", flush=True)
 
     def fetch(slug):
+        if slug in prerelease_slugs:
+            return fetch_repository(slug, tag_prefixes=tag_prefixes.get(slug, ()), include_prereleases=True)
         return fetch_repository(slug, tag_prefixes=tag_prefixes.get(slug, ()))
 
     fetched_count = 0
