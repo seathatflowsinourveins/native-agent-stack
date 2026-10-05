@@ -13840,21 +13840,6 @@
       "bytes": 47180
     },
     {
-      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/README.md",
-      "sha256": "eb75cee480437f48de1baf7ddb6907150f57022786d51fd1293bb1125e0cf29a",
-      "bytes": 18541
-    },
-    {
-      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/plan.json",
-      "sha256": "24ffca56dfa7bd647bcf423dbc91ae3f605384a81a0ad9523cc024a36ac3ec72",
-      "bytes": 3390
-    },
-    {
-      "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/run.py",
-      "sha256": "188e0078fc8f4a36ef54eb856bf2ef2660cad1ae280332dc86e405b7a230a0f5",
-      "bytes": 51113
-    },
-    {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/README.md",
       "sha256": "1a0d91d7f5db609f654dc8b8329f186a90e0d88cb48cdf7df98a2dcd9f9df178",
       "bytes": 21648
@@ -16146,8 +16131,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "a8b35a097b6f7016408ad113e42b8bc61ed3f31bd2033fce5763bfd6ce76ca78",
-      "bytes": 23257
+      "sha256": "9e9491592ca1ef4a1a1ba152b45c3b0a38afa4fa18f869eca9d92d30fc88d680",
+      "bytes": 22812
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",
@@ -53923,11 +53908,6 @@
       "path": "tests/test_ibkr_paper_orders.py",
       "sha256": "787be818d3b4e5693597979da34fa09683697275de146520ccc438c3b897afc6",
       "bytes": 67010
-    },
-    {
-      "path": "tests/test_ibkr_paper_orders_rc5.py",
-      "sha256": "694ac6e5a0dd1c2e3392b27f57563d21fdc5c233411c9140ce48b5ec76191bc3",
-      "bytes": 37020
     },
     {
       "path": "tests/test_ingest_snapshot.py",
