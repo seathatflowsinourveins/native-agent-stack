@@ -15310,18 +15310,18 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/README.md",
-      "sha256": "c737cd4e9ceab2d82a71dd7434c2227729e90e370aeb9e0ce94430edbeea0fd9",
-      "bytes": 22887
+      "sha256": "bc79b7f5c16b26be638a0c73b16b99c527b076369c466ad5927271e45faa1304",
+      "bytes": 26069
     },
     {
       "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
-      "sha256": "f540971c2cb0e517531645514c130e01ebf99f003ab9143e9e7cd2406030845a",
-      "bytes": 13216
+      "sha256": "900be972121b8be41a54871ec12eb2b61d11dbc077bc2af61dd208743664a26d",
+      "bytes": 13161
     },
     {
       "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
-      "sha256": "e2c4b87e26e2296563eac60805a0aba8748e5cad02d726f5c3af2d801e864f80",
-      "bytes": 19350
+      "sha256": "1ee8707a248d2c988f468ac721a85b22103d0f2c4a95076e2e2b5ca86c4d0b92",
+      "bytes": 19205
     },
     {
       "path": "blueprints/us-equities/runtime-2604/sync-trading-2604.sh",
@@ -15330,13 +15330,13 @@
     },
     {
       "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml",
-      "sha256": "36b85fd48566fedff258ec4a8bef496cace0ea00954afd7c9255bffda0894fdb",
-      "bytes": 767
+      "sha256": "30f47dfbcb247c01e8e3ed8733fbf63bf5de6ad4ea7e4c0807e3ea484b975958",
+      "bytes": 496
     },
     {
       "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
-      "sha256": "4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2",
-      "bytes": 353312
+      "sha256": "1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c",
+      "bytes": 303829
     },
     {
       "path": "blueprints/us-equities/security-identity/README.md",
@@ -16785,8 +16785,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-trading-2604-preparation.md",
-      "sha256": "b8ab7f8ac4bc1e364431dac4ac9f744acdf0bc00f598cfbf9348b7747131984a",
-      "bytes": 36222
+      "sha256": "5202c9c3c0d31124f61d0914b9d43fd2c80ec0cc0df22f81303f9f08652094aa",
+      "bytes": 41875
     },
     {
       "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",
@@ -49629,6 +49629,11 @@
       "bytes": 34164
     },
     {
+      "path": "evidence/artifacts/trading-runtime-2604-20261004/diskcache-removal-20261005.json",
+      "sha256": "3bc07fc2b12486271844f5d787cf60cfdd985e0d78054a514c4b39ac02151df5",
+      "bytes": 29310
+    },
+    {
       "path": "evidence/artifacts/trading-runtime-2604-20261004/result-summary.json",
       "sha256": "622621ea1c9b824ad899245575e74b9c7e28ab30617eabf1316827774111ae06",
       "bytes": 1158
@@ -54400,8 +54405,8 @@
     },
     {
       "path": "tests/test_trading_2604_lock.py",
-      "sha256": "8b68859f400b3bd571d722bf688f4a6e70cd3a077aa1d5bb70b44eb13e28eddd",
-      "bytes": 8839
+      "sha256": "be76cc58f3fed437dba0b198ab1897f5bf544a1c43c5d076d6681472816b9272",
+      "bytes": 9251
     },
     {
       "path": "tests/test_trading_gates.py",

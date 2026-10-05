@@ -24,7 +24,6 @@ specs=(
     'alpaca-py|0.44.0|alpaca'
     'edgartools|5.60.0|edgar'
     'exchange-calendars|4.13.2|exchange_calendars'
-    'dvc|3.67.1|dvc'
     'duckdb|1.5.5|duckdb'
     'pandera|0.33.1|pandera.pandas'
     'skfolio|1.2.9|skfolio'
@@ -56,7 +55,7 @@ IFS= read -r recorded_owner < "$project/.trading-2604-owner" || blocked 73
 [[ $recorded_owner == native-stack-trading-2604-v1 ]] || blocked 73
 [[ -f "$project/.trading-2604-complete" ]] || blocked 69 'installation completion marker is missing'
 IFS= read -r recorded_completion < "$project/.trading-2604-complete" || blocked 73
-[[ $recorded_completion == native-stack-trading-2604-hashed-build-r3 ]] || blocked 69 'installation completion marker is stale'
+[[ $recorded_completion == native-stack-trading-2604-no-dvc-r4 ]] || blocked 69 'installation completion marker is stale'
 [[ -d "$adapter/.git" && -f "$project/.upstream/nautilus-quickstart.py" ]] || blocked 69
 for path in .python .venv .upstream .install-home .docker-config vendor vendor/adaptive-paper acceptance; do
     [[ ! -L "$project/$path" ]] || blocked 73
@@ -64,7 +63,7 @@ done
 [[ -d "$project/.install-home" && -d "$project/.docker-config" ]] || blocked 69
 
 # Read only the context endpoint, then use it explicitly with a clean config.
-# No image pull or container start occurs; failed staging cannot become 25/25.
+# No image pull or container start occurs; failed staging cannot become 24/24.
 if ! docker_host=$(docker context inspect --format '{{.Endpoints.docker.Host}}' 2>/dev/null); then
     blocked 69 'selected Docker context endpoint is unavailable'
 fi
@@ -98,7 +97,7 @@ sandbox=(timeout --kill-after=5s 180s bwrap --unshare-all --die-with-parent --ne
     --setenv HOME "$sandbox_home" --setenv PATH /usr/bin:/bin
     --setenv XDG_CACHE_HOME "$sandbox_home/.cache" --setenv PYTHONDONTWRITEBYTECODE 1
     --setenv MPLBACKEND Agg --setenv OMP_NUM_THREADS 1 --setenv OPENBLAS_NUM_THREADS 1
-    --setenv DVC_NO_ANALYTICS 1 --setenv UV_OFFLINE 1 --setenv GIT_OPTIONAL_LOCKS 0 --chdir /out)
+    --setenv UV_OFFLINE 1 --setenv GIT_OPTIONAL_LOCKS 0 --chdir /out)
 failed=0
 last_exit=0
 check() {

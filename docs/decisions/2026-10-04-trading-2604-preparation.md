@@ -537,3 +537,85 @@ the next DuckDB-only run exited **1**, with three missing-`pytz` import errors.
 Adding already locked, hash-verified pytz to that scratch environment passes
 all 14 tests, exit **0**. Every scratch environment/cache was removed after its
 result was recorded. These corrections change no runtime dependency or sync flag.
+
+## 2026-10-05 — Remove unused DVC after the diskcache advisory
+
+The required OSV scan reported
+[PYSEC-2026-2447](https://osv.dev/vulnerability/PYSEC-2026-2447), alias
+[GHSA-w8v5-vhqr-4h9v](https://github.com/advisories/GHSA-w8v5-vhqr-4h9v), for
+diskcache 5.6.3 in the runtime's `dvc -> dvc-data -> diskcache` dependency chain.
+The pinned OSV-Scanner 2.6.0 reproduces that failure before the change: ordinary
+inventory exit **1**, frozen macOS inventory exit **0**. The
+[removal artifact](../../evidence/artifacts/trading-runtime-2604-20261004/diskcache-removal-20261005.json)
+retains the returned finding, source reads, removed packages and subsequent scans.
+
+The advisory covers diskcache through 5.6.3 and lists no fixed release. Its
+trigger requires attacker write access to the SQLite cache or value files and
+a subsequent victim cache read. At
+[diskcache v5.6.3, 323787f5](https://github.com/grantjenks/python-diskcache/blob/323787f507a6456c56cce213156a78b17073fe00/diskcache/core.py#L254-L284),
+`Disk.fetch` passes `MODE_PICKLE` data to `pickle.load`; key decoding does the
+same in `Disk.get`. This confirms the affected package/code path, rather than
+demonstrating exploitability on NativeStack2604. No exploit payload was run.
+
+Remedies were checked in the required order. [PyPI diskcache metadata](https://pypi.org/pypi/diskcache/json)
+still names 5.6.3 as the latest published release. The latest published
+[dvc-data 3.18.3](https://pypi.org/pypi/dvc-data/json), at source
+[56af66a2](https://github.com/treeverse/dvc-data/blob/56af66a26d8c140b812e6a75b3f0cc0c6e77628d/pyproject.toml#L29),
+still requires `diskcache>=5.2.1`. The latest published
+[DVC 3.67.1](https://pypi.org/pypi/dvc/json), at source
+[356dfa03](https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/pyproject.toml#L44),
+still requires `dvc-data>=3.18.2,<3.19.0`. Neither release replaces that dependency.
+
+**Decision: remove DVC from this runtime.** At the reviewed base
+`ac5ca66581251e677d885dac62d441a79dedafd7`, the runtime only installs DVC and
+[imports it for a version probe](https://github.com/seathatflowsinourveins/native-agent-stack/blob/ac5ca66581251e677d885dac62d441a79dedafd7/blueprints/us-equities/runtime-2604/accept-trading-2604.sh#L27);
+its offline examples do not use a DVC repository, stage, remote or cache API.
+The dependency serves no exercised research or simulation function in this
+bundle. An exception would retain an unused vulnerable dependency; an upstream
+upgrade is unavailable. No OSV ignore, policy exception or catalog selection
+change is introduced. A demonstrated DVC workflow would overturn removal only
+after a separately reviewed dependency and cache-security decision.
+
+Native uv **0.12.17**, using its supported
+[dependency-removal workflow](https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/dependencies.md#L92-L104),
+removed the requirement and regenerated the lock with Python 3.12.3,
+prerelease `if-necessary`, the PyPI default index and the existing
+`exclude-newer=2026-10-06T04:00:00Z`. This relock used the native executable,
+without mise, and fetched only package metadata/source for resolution.
+`uv lock --check --offline` passes with that same vector. The lock changes from
+SHA256 `4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2` to
+`1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c`.
+It drops **54** DVC-exclusive distributions, reducing 242 entries to 188,
+including project metadata. All **187** retained distribution entries, including
+their versions, archive hashes, dependencies and markers, remain identical.
+
+The removed closure includes the sole package without any wheel,
+`antlr4-python3-runtime`, and runtime `setuptools`. Their obsolete build
+constraint and manifest entry are removed too; the round-c proof and host
+receipts keep their recorded content. The qualification test now rejects any
+nonvirtual package without any wheel, stale build constraints, and reintroduced
+DVC/dvc-data/diskcache entries. It compares the project, install and acceptance
+pin matrices and retains every shared-vector and installer-hash check. The old
+source-build expectations fail after dependency removal (exit **1**); the
+updated contract passes 12 tests (exit **0**). As before, the census does not
+check target-compatible wheel coverage under Linux markers.
+
+The installer embeds the new project/lock hashes, accepts the recorded round-c
+bundle for migration, and uses a new completion marker shared by acceptance.
+The current acceptance recipe has **24** checks after dropping `import_dvc`.
+NativeStack2604's prior **25/25** result at `d02c0827` on lock `4c98672d14147a1b`
+remains historical evidence, with independent review pending. Installation and
+offline acceptance on this new lock are pending a separate destination-host
+run and receipt; the packaging checks do not qualify that host.
+
+The pinned scanner runs both disjoint CI groups, with `--no-resolve` and the
+existing configs: **58 ordinary inputs** and **one frozen macOS input**.
+Both now exit **0**, `No issues found`. That result is an observation of the
+current OSV database, not a guarantee against future advisories.
+
+Setup corrections are retained in the artifact: the default uv cache was
+read-only (exit **2**), so a writable cache under `TMPDIR` was used. Native uv
+rejects `remove --frozen --no-sync` (exit **2**); `--frozen` alone is the
+supported removal step before relocking. An offline relock with an empty
+metadata cache failed (exit **1**, missing alpaca-py metadata); resolving with
+read-only PyPI metadata succeeded, and the subsequent offline lock check passed.

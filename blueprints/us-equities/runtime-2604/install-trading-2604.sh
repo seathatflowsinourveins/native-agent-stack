@@ -78,7 +78,7 @@ readonly project="$HOME/projects/us-equities-runtime"
 # https://github.com/seathatflowsinourveins/native-agent-stack/blob/dca821cca85dce3647fa7b488d5a23fbe5b85d4a/blueprints/us-equities/adaptive-paper/requirements.txt
 # https://github.com/seathatflowsinourveins/native-agent-stack/blob/d323b53437e025be3d054b9b5e4d292fe396c75e/evidence/receipts/native-nautilus-v2-20260920.json
 readonly owner='native-stack-trading-2604-v1'
-readonly completion='native-stack-trading-2604-hashed-build-r3'
+readonly completion='native-stack-trading-2604-no-dvc-r4'
 script_directory=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 readonly script_directory
 readonly sync_vector_hash=4df2974e7fbc27fe7feea90ccdc6d180d0bd2c6b254cb5265dfd5e3368756f9a
@@ -88,12 +88,12 @@ printf '%s  %s\n' "$sync_vector_hash" "$script_directory/sync-trading-2604.sh" |
 source "$script_directory/sync-trading-2604.sh"
 # END shared-sync-source
 readonly lock_bundle="$script_directory/trading-2604-runtime"
-readonly project_hash=36b85fd48566fedff258ec4a8bef496cace0ea00954afd7c9255bffda0894fdb
-readonly lock_hash=4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2
-# Only exact approved bundles may migrate on the owned host: round b2 and the
-# originally recorded 5.58.0 run. No new host acceptance is inferred from either.
-readonly previous_project_hash=f71b08811eb580cf5c3772da7327ec5554154b81839b80c6259d69eae6bd1338
-readonly previous_lock_hash=6b4e6a4d4fc61cbda56c36d1ee0c65c263a5e938d968ce2806cc32330a8335f1
+readonly project_hash=30f47dfbcb247c01e8e3ed8733fbf63bf5de6ad4ea7e4c0807e3ea484b975958
+readonly lock_hash=1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c
+# Only exact approved bundles may migrate on the owned host: the recorded
+# round-c 5.60.0 lock and original 5.58.0 run. Neither qualifies this new lock.
+readonly previous_project_hash=36b85fd48566fedff258ec4a8bef496cace0ea00954afd7c9255bffda0894fdb
+readonly previous_lock_hash=4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2
 readonly recorded_project_hash=581bbb38a265068791c1a8c92435f9859876fd613d3c2c87d618a223376b01e0
 readonly recorded_lock_hash=c6b5f25cd3198c1b847c1cb602fe5441dce7e038aa16976c46ecf5f0beb7b086
 readonly engine_commit=1b0a49d2792a9432a3aca3fcb617ce7a630d905e
@@ -143,7 +143,7 @@ safe=(env -i PATH="$PATH" HOME="$project/.install-home" \
     UV_CACHE_DIR="$project/.uv-cache" UV_PYTHON_INSTALL_DIR="$project/.python" \
     UV_PROJECT_ENVIRONMENT="$project/.venv" UV_PYTHON_PREFERENCE=only-managed \
     PYTHONDONTWRITEBYTECODE=1 GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0 \
-    DOCKER_CONFIG="$project/.docker-config" DOCKER_HOST="$docker_host" DVC_NO_ANALYTICS=1)
+    DOCKER_CONFIG="$project/.docker-config" DOCKER_HOST="$docker_host")
 step=docker-daemon
 if ! "${safe[@]}" timeout --kill-after=5s 30s docker info --format '{{.ID}}' >/dev/null 2>&1; then
     blocked 'BLOCKED: no Docker daemon answers at the captured rootless endpoint.' 69 docker-daemon-unavailable
@@ -171,8 +171,6 @@ requirements=(
     'edgartools==5.60.0'
     # https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md
     'exchange-calendars==4.13.2'
-    # https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst
-    'dvc==3.67.1'
     # https://github.com/duckdb/duckdb-python/blob/b236c8194ed14c7a7c685e0534dde501cc855b3a/README.md
     'duckdb==1.5.5'
     # https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md

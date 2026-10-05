@@ -11,19 +11,24 @@ No paper or broker execution occurred.
 
 The current bundle selects **EdgarTools 5.60.0**, matching the catalog after
 [native SEC index acceptance on NativeStack](../catalyst-provenance/native-network-edgartools-5600-20261004.json).
-NativeStack2604's own installation and **25/25 offline checks passed** at this
-pin on **2026-10-05, 01:00:17Z–01:01:07Z**, at commit `d02c0827` on the final
-lock below. The [rerun receipt](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json)
+NativeStack2604's recorded installation and **25/25 offline checks passed** at this
+pin on **2026-10-05, 01:00:17Z–01:01:07Z**, at commit `d02c0827` on lock
+`4c98672d14147a1b`. The [rerun receipt](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json)
 records this separate execution; independent review remains pending. The earlier
-receipt continues to describe its 5.58.0 execution.
+receipt continues to describe its 5.58.0 execution. Neither run qualifies the
+current DVC-free bundle; its destination-host install and offline rerun are pending.
 
 The current lock SHA256 is
-`4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2`.
+`1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c`.
+The [2026-10-05 DVC removal](../../../evidence/artifacts/trading-runtime-2604-20261004/diskcache-removal-20261005.json)
+reduces the lock from 242 to 188 entries, including project metadata. All 187
+retained distributions have unchanged versions and archive hashes; only the
+project metadata, removed dependency closure and obsolete build constraint change.
 The [lock comparison](../../../evidence/artifacts/edgartools-5600-20261004/runtime-lock-change.json)
 records the preceding EdgarTools version/artifact change and project requirement
-metadata; all other 240 entries were unchanged. The build-constraint relock below
-adds only lock manifest metadata; all 242 package entries remain identical to
-that 5.60.0 lock. The
+metadata; all other 240 entries were unchanged at that step. The subsequent
+round-c build-constraint relock added only lock manifest metadata, leaving all
+242 package entries identical before DVC removal. The
 [this-host import smoke](../../../evidence/artifacts/edgartools-5600-20261004/this-host-import-smoke.json)
 passes the exact acceptance import/version assertion in a hash-locked 42-package
 CPython 3.12.3 environment with networking disabled; its old-version control
@@ -41,7 +46,7 @@ installed native uv 0.12.17 executable on the packaging worker, with mise
 unavailable: the EdgarTools upgrade (`uv lock --upgrade-package edgartools`)
 produced lock `6b4e6a4d`, as recorded in the
 [lock comparison](../../../evidence/artifacts/edgartools-5600-20261004/runtime-lock-change.json);
-the round-c build-constraint relock produced final lock `4c98672d14147a1b`, as
+the round-c build-constraint relock produced then-final lock `4c98672d14147a1b`, as
 recorded in the
 [build-constraint proof](../../../evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json).
 Neither relock ran through mise.
@@ -66,12 +71,12 @@ matrix below. These supplemental pins remain subject to trading-lane ratificatio
 ## Files and use
 
 Keep both host scripts and `sync-trading-2604.sh` beside `trading-2604-runtime/`. Its `pyproject.toml` and
-`uv.lock` now carry the directed 5.60.0 pin move from the original staged project.
+`uv.lock` carry the directed 5.60.0 pin move and the 2026-10-05 removal of unused DVC.
 The lock contains
-242 package entries, including project metadata; it is not a claim of 242
+188 package entries, including project metadata; it is not a claim of 188
 installed distributions. The installer checks both embedded SHA256 values and
 refuses arbitrary modified project metadata on rerun. It can migrate the exact
-approved round-1 or round-b2 project/lock hashes, including a partly completed migration;
+approved round-1 or recorded round-c project/lock hashes, including a partly completed migration;
 both files are checked before either is replaced atomically. It checks the lock,
 runs `uv sync --locked --no-dev`, then runs `uv pip check` on the project
 environment, failing closed at every step. The mise route below supplies uv
@@ -105,29 +110,23 @@ passed explicitly with a clean configuration. Default system sockets are refused
 an unavailable daemon blocks installation before Python work. The installer
 removes a stale completion marker and writes a replacement atomically only after
 both immutable images have been inspected. Acceptance requires that marker and
-both images. An incomplete install blocks all 25 checks.
+both images. An incomplete install blocks all 24 checks in the current recipe.
 
-## Hash-pinned source build and shared sync
+## Wheel census and shared sync
 
-The only nonvirtual lock distribution without a wheel is
-`antlr4-python3-runtime==4.9.3`. Its source archive lacks `pyproject.toml`, so
-[uv 0.12.17's legacy backend](https://github.com/astral-sh/uv/blob/0.12.17/crates/uv-build-frontend/src/lib.rs#L53-L60)
-otherwise resolves `setuptools>=40.8.0` separately. The project now uses uv's
-[hash-carrying build constraint](https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/build.md#L61-L79)
-and [schema](https://github.com/astral-sh/uv/blob/0.12.17/uv.schema.json#L788-L815)
-to pin **setuptools 84.0.0** with exactly the runtime lock entry's wheel and
-sdist SHA256 values. The lock manifest records both hashes. Native uv 0.12.17
-performed this relock because mise remains unavailable to the packaging worker;
-Python 3.12.3, prerelease `if-necessary`, the PyPI default index and
-`exclude-newer=2026-10-06T04:00:00Z` are unchanged. No package version or archive moved.
+The current lock has no nonvirtual package without any wheel. Removing DVC
+also removes `antlr4-python3-runtime`, its only such package, and the runtime
+`setuptools` dependency. The unused build constraint and lock manifest entry
+are removed together. The source-build evidence below remains historical.
 
 [tests.test_trading_2604_lock](../../../tests/test_trading_2604_lock.py) checks the
-pyproject/manifest agreement, the backend version and exact archive hashes, and
-the census of packages without any wheel. Planted fixtures reject a second
-package without any wheel, a different backend version, missing hashes and a
-differing manifest. The virtual project entry has no distribution archive and
-is excluded from that census. This test does not check target-compatible wheel
-coverage under Linux markers.
+census of packages without any wheel, rejects unused project or lock manifest
+build constraints, and prevents DVC, dvc-data or diskcache from returning to this
+bundle. Planted fixtures reject a package without any wheel, stale constraints
+and a reintroduced diskcache entry. It also checks that every direct dependency
+agrees with the install and acceptance pin matrices. The virtual project entry
+has no distribution archive and is excluded from the census. This test does not
+check target-compatible wheel coverage under Linux markers.
 
 [sync-trading-2604.sh](sync-trading-2604.sh) defines the sole host/CI argument
 vector and its Python/uv/cutoff pins. The installer verifies its SHA256 before
@@ -140,6 +139,20 @@ direct shared-source call, rejects retyped or altered installer calls and stale
 source hashes, and plants failures at all three steps. This follows the
 [repository's install-command pin pattern](../../../.github/workflows/validate.yml#L196-L225).
 
+## Round-c source-build evidence (historical)
+
+Before DVC removal, the only nonvirtual lock distribution without a wheel was
+`antlr4-python3-runtime==4.9.3`. Its source archive lacks `pyproject.toml`, so
+[uv 0.12.17's legacy backend](https://github.com/astral-sh/uv/blob/0.12.17/crates/uv-build-frontend/src/lib.rs#L53-L60)
+otherwise resolves `setuptools>=40.8.0` separately. Round c used uv's
+[hash-carrying build constraint](https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/build.md#L61-L79)
+and [schema](https://github.com/astral-sh/uv/blob/0.12.17/uv.schema.json#L788-L815)
+to pin **setuptools 84.0.0** with exactly the runtime lock entry's wheel and
+sdist SHA256 values. That lock manifest records both hashes. Native uv 0.12.17
+performed this relock because mise remains unavailable to the packaging worker;
+Python 3.12.3, prerelease `if-necessary`, the PyPI default index and
+`exclude-newer=2026-10-06T04:00:00Z` are unchanged. No package version or archive moved.
+
 The [build-constraint proof](../../../evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json)
 records a this-host cold-cache sync with managed CPython 3.12.3 and antlr4's
 installed WHEEL generator, plus three negative controls. Invalid-only hash
@@ -147,11 +160,11 @@ controls remove the valid alternative archive hash; retaining that alternative
 can legitimately succeed. A fresh resolution exercises the backend download,
 while the locked-sync control preserves runtime archive hashes. These are local
 integration and structural checks. The earlier 25/25 summary is **pre-relock
-evidence**; NativeStack2604's rerun on this final lock is recorded in its
+evidence**; NativeStack2604's rerun on that round-c lock is recorded in its
 [separate receipt](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json),
 with installation and 25/25 offline checks passing. Independent review remains
 pending.
-The final completion marker also differs from the prior bundles.
+The current DVC-free bundle uses a new completion marker and still needs its own rerun.
 
 ## Pinned sources
 
@@ -163,7 +176,6 @@ The final completion marker also differs from the prior bundles.
 | Separate Alpaca adapter | `dca821cca85dce3647fa7b488d5a23fbe5b85d4a` | [Native adapter source](https://github.com/seathatflowsinourveins/native-agent-stack/blob/dca821cca85dce3647fa7b488d5a23fbe5b85d4a/blueprints/us-equities/adaptive-paper/native_adapter.py) |
 | EdgarTools | 5.60.0; source `1e7a61b3a142dbf5d19bc82444f85239c1786348` | [Release](https://github.com/dgunning/edgartools/releases/tag/v5.60.0), [README at the tag commit](https://github.com/dgunning/edgartools/blob/1e7a61b3a142dbf5d19bc82444f85239c1786348/README.md), [native SEC index receipt](../catalyst-provenance/native-network-edgartools-5600-20261004.json) |
 | exchange_calendars | 4.13.2 | [README at dbe38b1f](https://github.com/gerrymanoim/exchange_calendars/blob/dbe38b1f6887434bbdd1a7d2df6ff8f1742a048a/README.md) |
-| DVC | 3.67.1 | [README at 356dfa03](https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst) |
 | DuckDB | 1.5.5 | [Python README at b236c819](https://github.com/duckdb/duckdb-python/blob/b236c8194ed14c7a7c685e0534dde501cc855b3a/README.md) |
 | pandera[pandas] | 0.33.1 | [README at 62f55e2d](https://github.com/unionai-oss/pandera/blob/62f55e2dccf0a199cfe4d6ce3eda0c1d29e2e4e6/README.md) |
 | skfolio | 1.2.9 | [Installation at c99fcf71](https://github.com/skfolio/skfolio/blob/c99fcf71349e2df4a7a1033ee85ca2e9ced9abee/docs/user_guide/install.rst) |
@@ -275,11 +287,41 @@ selected CIK/accession rows on NativeStack with CPython 3.12.3. Together with th
 directed move, it supersedes the 5.59.1 overturn item and moves `data-edgartools`
 to 5.60.0. It does not qualify broader data, strategy or broker gates. The
 [separate NativeStack2604 rerun](../../../evidence/receipts/native-trading-runtime-2604-rerun-20261005.json)
-records installation and 25/25 offline acceptance at this pin on the final lock;
+records installation and 25/25 offline acceptance at this pin on lock `4c98672d14147a1b`;
 independent review remains pending.
+
+## Diskcache advisory and unused DVC removal — 2026-10-05
+
+[PYSEC-2026-2447](https://osv.dev/vulnerability/PYSEC-2026-2447)
+([GHSA-w8v5-vhqr-4h9v](https://github.com/advisories/GHSA-w8v5-vhqr-4h9v))
+affects diskcache through 5.6.3: an attacker who can write its SQLite cache or
+value files can trigger Python pickle deserialization on a subsequent cache
+read. The [5.6.3 implementation](https://github.com/grantjenks/python-diskcache/blob/323787f507a6456c56cce213156a78b17073fe00/diskcache/core.py#L254-L284)
+confirms that path. No fixed release is listed by OSV; the latest published
+[diskcache release](https://pypi.org/pypi/diskcache/json) remains 5.6.3.
+The latest published [dvc-data 3.18.3](https://pypi.org/pypi/dvc-data/3.18.3/json)
+still [requires diskcache](https://github.com/treeverse/dvc-data/blob/56af66a26d8c140b812e6a75b3f0cc0c6e77628d/pyproject.toml#L29),
+and [DVC 3.67.1](https://pypi.org/pypi/dvc/3.67.1/json)
+still [requires dvc-data](https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/pyproject.toml#L44).
+
+The delivered recipe called DVC only for an import/version probe; no DVC
+repository, stage, remote or cache operation serves these offline examples.
+Removing its direct dependency removes dvc-data and diskcache without an OSV
+ignore. Native uv 0.12.17's supported
+[dependency removal](https://github.com/astral-sh/uv/blob/0.12.17/docs/concepts/projects/dependencies.md#L92-L104)
+and relock preserve the existing Python, prerelease, index and cutoff settings.
+Both CI inventory groups pass OSV-Scanner 2.6.0 with their existing configs.
+The [removal artifact](../../../evidence/artifacts/trading-runtime-2604-20261004/diskcache-removal-20261005.json)
+records the advisory reads, unchanged retained artifacts, removed closure and
+red/green scans. These are packaging-worker checks; the historical destination
+host receipts remain unchanged. A future demonstrated DVC workflow requires a
+separate reviewed dependency and cache-security decision before reinstatement.
 
 ## Open qualification
 
+- Re-run installation and the current **24 offline checks** on NativeStack2604
+  against lock `1fb9f8ca6fef9c47`; record a new receipt. The prior 25/25 result
+  on lock `4c98672d14147a1b` remains historical, with independent review pending.
 - Ratify supplemental **CPython 3.12.3 against 3.13**, including the foundation's
   3.13.15 alternative, and ratify the complete runtime matrix on frozen matching
   engine/adapter inputs. A successful 3.12.3 smoke does not complete this comparison.

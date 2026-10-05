@@ -1,8 +1,9 @@
-"""Local lock/build and shared-vector contracts; no installer or network runs.
+"""Local lock/census and shared-vector contracts; no installer or network runs.
 
-uv 0.12.17's uv.schema.json and docs/concepts/projects/build.md define the
-hash-carrying constraint. The virtual project is metadata, not a distribution
-in the source-build census. Shell calls below only record synthetic argv bytes.
+uv 0.12.17's docs/concepts/projects/dependencies.md defines removal/relocking.
+Removing unused DVC also removed the sole no-wheel dependency and its backend.
+The virtual project is metadata, not a distribution in the wheel census.
+Shell calls below only record synthetic argv bytes.
 """
 
 import copy
@@ -34,59 +35,63 @@ class Trading2604LockTests(unittest.TestCase):
         self.lock = tomllib.loads((PROJECT / "uv.lock").read_text())
 
     def assert_contract(self, project, lock):
-        backends = [p for p in lock["package"] if p["name"] == "setuptools"]
-        self.assertEqual(len(backends), 1, "one runtime setuptools entry")
-        backend = backends[0]
         constraints = project["tool"]["uv"].get("build-constraint-dependencies", [])
-        self.assertEqual(len(constraints), 1, "one hashed build constraint")
-        constraint = constraints[0]
-        self.assertIsInstance(constraint, dict, "hash-carrying constraint table")
-        self.assertEqual(
-            constraint.get("requirement"), "setuptools==" + backend["version"],
-            "constraint must pin runtime setuptools with ==",
-        )
-        archives = [w["hash"] for w in backend["wheels"]] + [backend["sdist"]["hash"]]
-        hashes = constraint.get("hashes", [])
-        self.assertEqual(sorted(hashes), sorted(archives), "constraint archive hashes")
-        self.assertTrue(all(re.fullmatch(r"sha256:[0-9a-f]{64}", h) for h in hashes))
-        self.assertEqual(lock.get("manifest", {}).get("build-constraints"), [{
-            "name": "setuptools", "specifier": "==" + backend["version"],
-            "hashes": hashes,
-        }], "manifest must equal the normalized pyproject constraint, including hashes")
+        self.assertEqual(constraints, [], "no unused build constraint")
+        self.assertEqual(lock.get("manifest", {}).get("build-constraints", []), [],
+                         "no stale lock manifest build constraint")
         source_builds = {
             p["name"] for p in lock["package"]
             if "virtual" not in p["source"] and not p.get("wheels")
         }
-        self.assertEqual(source_builds, {"antlr4-python3-runtime"}, "wheel census")
+        self.assertEqual(source_builds, set(), "wheel census: no package without any wheel")
+        names = {p["name"] for p in lock["package"]}
+        self.assertFalse(names & {"dvc", "dvc-data", "diskcache"}, "unused DVC chain removed")
 
     def test_checked_in_lock_contract(self):
         self.assert_contract(self.project, self.lock)
 
-    def test_second_package_without_wheel_fails(self):
+    def test_package_without_any_wheel_fails(self):
         lock = copy.deepcopy(self.lock)
         next(p for p in lock["package"] if p["name"] == "edgartools").pop("wheels")
         with self.assertRaisesRegex(AssertionError, "wheel census"):
             self.assert_contract(self.project, lock)
 
-    def test_constraint_version_different_from_runtime_fails(self):
-        project, lock = copy.deepcopy(self.project), copy.deepcopy(self.lock)
-        project["tool"]["uv"]["build-constraint-dependencies"][0]["requirement"] = "setuptools==0.0.0"
-        lock["manifest"]["build-constraints"][0]["specifier"] = "==0.0.0"
-        with self.assertRaisesRegex(AssertionError, "runtime setuptools"):
-            self.assert_contract(project, lock)
+    def test_unused_build_constraint_fails(self):
+        project = copy.deepcopy(self.project)
+        project["tool"]["uv"]["build-constraint-dependencies"] = ["setuptools==84.0.0"]
+        with self.assertRaisesRegex(AssertionError, "unused build constraint"):
+            self.assert_contract(project, self.lock)
 
-    def test_constraint_without_hashes_fails(self):
-        project, lock = copy.deepcopy(self.project), copy.deepcopy(self.lock)
-        del project["tool"]["uv"]["build-constraint-dependencies"][0]["hashes"]
-        del lock["manifest"]["build-constraints"][0]["hashes"]
-        with self.assertRaisesRegex(AssertionError, "constraint archive hashes"):
-            self.assert_contract(project, lock)
-
-    def test_manifest_different_from_pyproject_fails(self):
+    def test_stale_manifest_constraint_fails(self):
         lock = copy.deepcopy(self.lock)
-        lock["manifest"]["build-constraints"][0]["hashes"][0] = "sha256:" + "0" * 64
-        with self.assertRaisesRegex(AssertionError, "manifest must equal"):
+        lock["manifest"] = {"build-constraints": [{"name": "setuptools", "specifier": "==84.0.0"}]}
+        with self.assertRaisesRegex(AssertionError, "stale lock manifest"):
             self.assert_contract(self.project, lock)
+
+    def test_reintroduced_diskcache_fails(self):
+        lock = copy.deepcopy(self.lock)
+        package = copy.deepcopy(next(p for p in lock["package"] if p["name"] == "edgartools"))
+        package["name"] = "diskcache"
+        lock["package"].append(package)
+        with self.assertRaisesRegex(AssertionError, "DVC chain removed"):
+            self.assert_contract(self.project, lock)
+
+    def test_project_installer_and_acceptance_pins_agree(self):
+        installer = (BUNDLE / "install-trading-2604.sh").read_text()
+        acceptance = (BUNDLE / "accept-trading-2604.sh").read_text()
+        requirements = re.search(r"^requirements=\(\n(.*?)^\)\n", installer, re.M | re.S)[1]
+        requirements = "\n".join(line for line in requirements.splitlines()
+                                 if not line.lstrip().startswith("#"))
+        self.assertEqual(sorted(re.findall(r"'([^']+)'", requirements)),
+                         sorted(self.project["project"]["dependencies"]))
+        expected = {name.split("[", 1)[0].replace("_", "-"): version
+                    for name, version in (r.split("==") for r in self.project["project"]["dependencies"])}
+        specs = re.search(r"^specs=\(\n(.*?)^\)\n", acceptance, re.M | re.S)[1]
+        observed = {name: version for name, version, _ in
+                    (s.split("|") for s in re.findall(r"'([^']+)'", specs))}
+        self.assertEqual(observed, expected, "every installed pin has the same acceptance probe")
+        root = next(p for p in self.lock["package"] if p["name"] == "us-equities-runtime")
+        self.assertEqual({p["name"] for p in root["dependencies"]}, set(expected))
 
 
 class Trading2604SyncVectorTests(unittest.TestCase):
