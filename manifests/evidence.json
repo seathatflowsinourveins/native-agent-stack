@@ -4717,8 +4717,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "254b3275b5e611df17ef5b4a9035edf1ba6158e6503c8d37eca1e4fce22c74d5",
-      "bytes": 92780
+      "sha256": "93b5b0ec3aba25ce978bc936c31d807cbc9824c99ba004c87f574770c1292517",
+      "bytes": 92809
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -16878,12 +16878,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "0f48e68f61eff710d602b6f4343a64b4ab77960261c875d01c5146da314a41cb",
+      "sha256": "5d34aedc608ad0fa04a2fedb181fc620941a0ac53c6035cf4d9132eddaeef5ad",
       "bytes": 652707
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "69231a6ad6e900897f5c4bc74dd03125174019dfdf801d7a8f7159f28ca4b60d",
+      "sha256": "08028f9ffa3d922c420b550d30d46f89c774ec75e175ee338c90b4bbbf91223f",
       "bytes": 354511
     },
     {
@@ -38908,7 +38908,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "a84c946f533bf77b1438342566d4bf3be725086203b3eb47744133fa60f2faf2",
+      "sha256": "d593fc292242207f6b8f6c50519936bc68727fdfac3136b09c1504698b697d19",
       "bytes": 5760
     },
     {
