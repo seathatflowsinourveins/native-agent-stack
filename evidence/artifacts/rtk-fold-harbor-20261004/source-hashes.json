@@ -1,0 +1,552 @@
+{
+  "schema_version": 1,
+  "meaning": "SHA256 and byte lengths of original private files, not sanitized public copies; public copy hashes are registered in manifests/evidence.json. Hashes prove byte identity, not execution or correctness.",
+  "sanitization": "Private state roots are <state>; native trial directory names in result locators are <trial>. Original raw files stay private. Session identifiers in freeze-manifest locators are <session-id>.",
+  "originals": [
+    {
+      "source": "<state>/PREREGISTRATION.md",
+      "sha256": "260238de8e1c2318766996eeb5355322dafc5939ff73049020ae16e87f2d6f65",
+      "bytes": 27105
+    },
+    {
+      "source": "<state>/AMENDMENT-2026-10-04.md",
+      "sha256": "03472c19bd031e3854d8fb832343197a73872a556a3632af0bf515f7b09f00f0",
+      "bytes": 6461
+    },
+    {
+      "source": "<state>/FREEZE-v4.json",
+      "sha256": "96954eba01557a3e8e2aaeeffc9fc2d25d25a60010a6f16755a6aa636c7bcfde",
+      "bytes": 1675
+    },
+    {
+      "source": "<state>/FREEZE-v4.sha256",
+      "sha256": "6522f2289afb28360aae14b5d51f5b37e29cd9c6ee63c11e01d545e6ea5961f8",
+      "bytes": 112433
+    },
+    {
+      "source": "<state>/FREEZE.json",
+      "sha256": "25c536ac7944f38d3780f691cb9a23487a63b0f0342dc600d99aaacb86e6e5fc",
+      "bytes": 1827
+    },
+    {
+      "source": "<state>/FREEZE.sha256",
+      "sha256": "819f87338f079bded755071bba299244fa2d63dda2884d258e9eb8a64c4bed3f",
+      "bytes": 113723
+    },
+    {
+      "source": "<state>/adjudication/PROTOCOL.frozen.md",
+      "sha256": "a45f6b868ae65e1289de00021e6f9dd8a631ed1de50f5a08c982da07aa24f77b",
+      "bytes": 4759
+    },
+    {
+      "source": "<state>/docs/decisions/2026-10-04-rtk-fold-harbor-phase1.md",
+      "sha256": "8f6e5f1eea82caba80f64aa363d104a3e1821730b4290d9817bc587368576a71",
+      "bytes": 13075
+    },
+    {
+      "source": "<state>/phase2-analysis.json",
+      "sha256": "9af49853d0204bc32d9f977d144b17f9bab075b2e74066b8ae892880e5b1fae0",
+      "bytes": 457622
+    },
+    {
+      "source": "<state>/phase2-measures.json",
+      "sha256": "88eb18cc556f192b3d5b70a5e76c06076f6a6332664726fecd1727bb251b0d65",
+      "bytes": 3254805
+    },
+    {
+      "source": "<state>/phase2-adjudicated.json",
+      "sha256": "119bafb9bc62ffdf3a5d0b91ae7f40886d672c3d43c6324190bddd1def905f48",
+      "bytes": 3254373
+    },
+    {
+      "source": "<state>/phase2-measures.adjudications.csv",
+      "sha256": "8c28dd3b07c7825b846d06b1e10bd470dcb4434fac76caeca17adb15ad1efb7c",
+      "bytes": 76536
+    },
+    {
+      "source": "<state>/adjudication/adjudication-summary.json",
+      "sha256": "48697c3e9135c1b3a49226a01af51e8fe442e0d8cfe96698828afb001693a98b",
+      "bytes": 141
+    },
+    {
+      "source": "<state>/adjudication/batches.json",
+      "sha256": "6b58cbbca02fe4fbd711da15328ab5ed27da4b58e9f3abee64afec861da913be",
+      "bytes": 2272
+    },
+    {
+      "source": "<state>/adjudication/primary-labels.json",
+      "sha256": "1b9486dd039c933013085a07d236073dae59dce69a717b300cee7edbbf30c19f",
+      "bytes": 86871
+    },
+    {
+      "source": "<state>/adjudication/audit-rows.json",
+      "sha256": "708bd553eac2130f6c6a0014108e41c0dc94b3650029ce45bb82a221704bb626",
+      "bytes": 3657
+    },
+    {
+      "source": "<state>/adjudication/audit-labels-gpt.json",
+      "sha256": "0bbf51727033ed715ddc50d3caf7bd539d25a6dd92dedf79305b8ebb3d4f4480",
+      "bytes": 18179
+    },
+    {
+      "source": "<state>/PHASE1.json",
+      "sha256": "50c8eafddac140c4cd26240776d010856ae36c30d560986cd618c0caa582763f",
+      "bytes": 6448
+    },
+    {
+      "source": "<state>/README.md",
+      "sha256": "c6b02099130f4f016d73b0921acc2da772acf09085dcd7b4c173d1b3be6c7ed9",
+      "bytes": 9068
+    },
+    {
+      "source": "<state>/PREREGISTRATION-v1.md",
+      "sha256": "58d5fb699182a6e82694dd74d59984b22ba63ed3abd8e84f48e22717b2990ebc",
+      "bytes": 16342
+    },
+    {
+      "source": "<state>/pins.json",
+      "sha256": "16316dc08f901d8e3504654ef7a946d1c7b57ed1ea95f4e5d9ec5f744deecd01",
+      "bytes": 1047
+    },
+    {
+      "source": "<state>/schedule.json",
+      "sha256": "150fd7356a04e61abbe319de041c853165e3607a395d31b6f3e2888cee8da256",
+      "bytes": 10841
+    },
+    {
+      "source": "<state>/analyze.py",
+      "sha256": "a36a0080b692e6c2ae971141b894bb4a3eeb884b5744f1234be5b982daf8d244",
+      "bytes": 3454
+    },
+    {
+      "source": "<state>/analyze.py.lock",
+      "sha256": "a4ad5823c4dcb536d34546d9c5b62be0c9dae12bb5d3ad2a943541b699d8ee5b",
+      "bytes": 153979
+    },
+    {
+      "source": "<state>/measure.py",
+      "sha256": "5be7e131c0d5da45e14275ababe93e442b28da4e8121fdf851f5b92767c8200b",
+      "bytes": 12235
+    },
+    {
+      "source": "<state>/run_phase2.sh",
+      "sha256": "0778efdaf3ae9065bd0d5c87822a6ee26d4485ab3bb0a0e1a4953e7c52a1b8ca",
+      "bytes": 1113
+    },
+    {
+      "source": "<state>/smoke2-acceptance.json",
+      "sha256": "4fae834afffb0a3b811688b34a2c1e0723fe924fcec413f8455d58a268954213",
+      "bytes": 5284
+    },
+    {
+      "source": "<state>/logs/phase2-run.log",
+      "sha256": "f915a4ca7d31930c7c73fefc5e0b9a544a2decb93996062b4586537b66329e5b",
+      "bytes": 9317
+    },
+    {
+      "source": "<state>/logs/phase2-freeze-check.txt",
+      "sha256": "01c578d40983951c762cb4a45e6742feb41e89dfb648e1b42dd7c0f734bd2783",
+      "bytes": 76275
+    }
+  ],
+  "measured_result_files": [
+    {
+      "source": "<state>/jobs/p2-fold-01-r1-A/<trial>/result.json",
+      "sha256": "d4a3d049c0dcaaeaff8dfa49e011dd85901298d9abed6a4624a0e6de1c3369df",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-01-r1-B/<trial>/result.json",
+      "sha256": "1c99eee725f1e2a11ddc4fa9e0aa5c9fb28fe8f5221e9be949bbf7bc7364f183",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-01-r1-C/<trial>/result.json",
+      "sha256": "76ff1f36dc5e65597b8f389623a4e934c436b066d9d936a8c6a5876538fcd746",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-01-r2-A/<trial>/result.json",
+      "sha256": "31375075dd81b5e782a93d1b1927b03e68f41b81e67fdbebfc24f0994a4f86c6",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-01-r2-B/<trial>/result.json",
+      "sha256": "feee4a2865dfbb85a363e0ced514c18214a822be5614d4e8ba584f5ad8a4eb82",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-01-r2-C/<trial>/result.json",
+      "sha256": "2551323ccccaf1628c3f9213dae14b4be21d136a98e321c69c62e5b3ba0ca1af",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-01-r3-A/<trial>/result.json",
+      "sha256": "ac8a8ae38acc27d21b147d5481399a26491550c748402f0a7dfa7b63c6ea1b39",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-01-r3-B/<trial>/result.json",
+      "sha256": "d3d848a0387caa6e7429c520556e820a97d45100ae5e38d4fb4e41f67d902428",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-01-r3-C/<trial>/result.json",
+      "sha256": "1ee4accb5206b348f6bfb975f95876bade3c0dda3cdb18a4e7b48c545dd89170",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-02-r1-A/<trial>/result.json",
+      "sha256": "d31eab478a0105ce2c941b1b4ca30f8c601d216e447d8568a356507c97f6e0cc",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-02-r1-B/<trial>/result.json",
+      "sha256": "6a66d3074f8625b8be32af1a4ed4365f8c6a12c947fedffabab6c3ff4bc5f6b1",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-02-r1-C/<trial>/result.json",
+      "sha256": "da49266f2b907a3851faf9d6b9d0a65aae169e7662700bff118b3390e4326ed3",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-02-r2-A/<trial>/result.json",
+      "sha256": "13299274edc192f27c9471e077f384d7c91e1f6e42b73ca0ed80ed6afc1e6f06",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-02-r2-B/<trial>/result.json",
+      "sha256": "eccbec2d642a13e07d8e241e452c97ba013a1ede8f15bc92c0897d2e83418542",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-02-r2-C/<trial>/result.json",
+      "sha256": "d121fc4760f7181429f95fc17949f2c747a8c6b6dabade33438bf5882da8a7df",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-02-r3-A/<trial>/result.json",
+      "sha256": "67ee24b72afb4a4d86b3e1b0d9ef2ea8d4bf13ea07cf0336d4885e33acb6d03d",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-02-r3-B/<trial>/result.json",
+      "sha256": "1bdddd412fa8661f84bf4d353d64bad940a8f0d5fbededbb135f739967dac87f",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-02-r3-C/<trial>/result.json",
+      "sha256": "528613e13a286a50f69b5b66ccea4f42966ce606e6ab947f4b2120a7957ea251",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-03-r1-A/<trial>/result.json",
+      "sha256": "916a0104ab5750ac9da81aca0d4eee9a476c699400a31b71650e05a664258191",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-03-r1-B/<trial>/result.json",
+      "sha256": "162081c4dd021a1789cdd2129de09fe8176f63aecc5967669c09a7e93d29eab8",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-03-r1-C/<trial>/result.json",
+      "sha256": "5d5ead1b199b92d390a607ef142efca28ff50f1ea0fe07648e64e252ccc58373",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-03-r2-A/<trial>/result.json",
+      "sha256": "625bd6a76d71804cafc5e47c0a8031c855b67fe06e83e6b68e356165f05183b5",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-03-r2-B/<trial>/result.json",
+      "sha256": "d5029a6745f483154f62f7368079b9d955cbac0722057f437e80fb596ca473dd",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-03-r2-C/<trial>/result.json",
+      "sha256": "12fe5f8d11504b246bc3a0d0351d1031eab4f4189ed70ad38156fb0f728e2bdb",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-03-r3-A/<trial>/result.json",
+      "sha256": "a4c0b917ff70832f9b615ef3d9050b7061f914b9f3674a68ed07eac61fb3c46e",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-03-r3-B/<trial>/result.json",
+      "sha256": "7fd314dfdbaee0705ea0b527104f3543b30eba0f4cba3d4565a32a4a946471ae",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-03-r3-C/<trial>/result.json",
+      "sha256": "0f11421a2bbe4d23e49ffe492150c8923a886efe5958a3d297d7f293b182cd09",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-04-r1-A/<trial>/result.json",
+      "sha256": "36f7ad726a1dbceaefa121317aacefd59ff39ef24c5517c02c36c8827654eada",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-04-r1-B/<trial>/result.json",
+      "sha256": "14495792fe2605d589158f3e8e21763d7a202b86b51425b021d2330fe1480003",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-04-r1-C/<trial>/result.json",
+      "sha256": "cb94e876dca2a4a6a98bea628263f5d31b04cb51c78dd17040ca673ce3c50723",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-04-r2-A/<trial>/result.json",
+      "sha256": "a492afbc881765f4efcd6e4a87b6af5fb242106b9281fd92618442dbb23f4d2e",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-04-r2-B/<trial>/result.json",
+      "sha256": "5e92efbe480a7c6a25182b662b97137cd012682094bb646e0d8042fb4bcf038a",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-04-r2-C/<trial>/result.json",
+      "sha256": "eb581cae6fba1d2655db062dbd7791dc0dd23a65e3b0a9c60e5d3ef6701d7ca3",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-04-r3-A/<trial>/result.json",
+      "sha256": "7c3f7bc6cc06378b747fa9099d735c5e07242b11c3095f6cb2ff4c9fc9ec3cc5",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-04-r3-B/<trial>/result.json",
+      "sha256": "d909a7e2d7edf22f1f5c9760840379efc87de424877ceeac0497b26010e00b88",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-04-r3-C/<trial>/result.json",
+      "sha256": "810a27e373bddd4cce87a6d407eb509e9980ab022300b1972d339c4c2056581f",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-05-r1-A/<trial>/result.json",
+      "sha256": "8a8257f2e793785030cfa0a408e36042144157cb9d4fc7d01c02a98052aaf156",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-05-r1-B/<trial>/result.json",
+      "sha256": "caddf18394bdea4251835b6205e675f9a514c244254a18d3aea644f1f55b4741",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-05-r1-C/<trial>/result.json",
+      "sha256": "b38d3a2dab0fd7d38eb2687f1cf5a97d2eb2f0cdbf9725dcbe904470e8f0666f",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-05-r2-A/<trial>/result.json",
+      "sha256": "68c0db7f0c06e635289db5f6b6aad5f7301be210948879edc8c1d936a973d909",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-05-r2-B/<trial>/result.json",
+      "sha256": "1b6a05131d3b60f22e9b259c525c5a82a9deee4087f627561e0f35b98cf5edf1",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-05-r2-C/<trial>/result.json",
+      "sha256": "2909e7b11dcd2f1457b736c2b427c3858400a61868bb23feaa8d61c623fff191",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-05-r3-A/<trial>/result.json",
+      "sha256": "d11f1046ed6dce4db6452888f3d92ae69826ea4c8fe43f63992596e0f9519083",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-05-r3-B/<trial>/result.json",
+      "sha256": "da4e9bb5bd9a30a02a8ce207025518921e57a055ea8d08c9abeee32e715f13ea",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-05-r3-C/<trial>/result.json",
+      "sha256": "00c6a547b4c444262104e71a1b52c044c6becf509f5eb64559ef2611dd2ac097",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-06-r1-A/<trial>/result.json",
+      "sha256": "dfb83b4ac911e2f4543e2eadf8457a3e3df663616659a070893c834063e44a0b",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-06-r1-B/<trial>/result.json",
+      "sha256": "d874dff0dcd0d55c42bc6f4caa72db7bd8dc6862cc5e4ede398e3eb988ac67f9",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-06-r1-C/<trial>/result.json",
+      "sha256": "aade448ea0be57417cbc6e2d18336de9b44713097b98282138cc0f9c68cd678c",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-06-r2-A/<trial>/result.json",
+      "sha256": "027cb2f6b6d8c0bd02cf385c5232cad52886ec72811dc9aa80ceb42558c21d12",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-06-r2-B/<trial>/result.json",
+      "sha256": "9b81d64abb42fa571024e307952d7acb563fdc11358b71e9eab47bec02bd69e4",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-06-r2-C/<trial>/result.json",
+      "sha256": "9d537799cf8a5ccc87d2ffe0458169eb7ca24db0a8a1f647dbef83b44d18db3e",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-06-r3-A/<trial>/result.json",
+      "sha256": "99b8860021b597c9e81943362e5d833d12698f159efeb91ea7397aa6f1e9c3f3",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-06-r3-B/<trial>/result.json",
+      "sha256": "7ded9a81864b122c9f8044575a571f6bf05d91a1ae907aed08b008d3beb1a569",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-06-r3-C/<trial>/result.json",
+      "sha256": "01fd3e4c70d9ca4ef1aa213603a649453f4bf7b3d1efc4c1b74fca24f84a5038",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-07-r1-A/<trial>/result.json",
+      "sha256": "eebc2e07c8ac11b3468bb51b468d21bb7365b5529e1cf9d9f73e759c7d4e6e35",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-07-r1-B/<trial>/result.json",
+      "sha256": "489e16c5d73e0b17ee75a35dfcf5f9b7bdb105ef20e714cc18e74ede4bc55388",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-07-r1-C/<trial>/result.json",
+      "sha256": "a76b8ea3ac3034194370a15ae6cb6603dcb6bf44d87adf00b4ba9937bdffdc20",
+      "bytes": 5376
+    },
+    {
+      "source": "<state>/jobs/p2-fold-07-r2-A/<trial>/result.json",
+      "sha256": "138a19d9538df9a2cda6f2261907b2b2a6f66554e37ec7a66869053b150034d8",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-07-r2-B/<trial>/result.json",
+      "sha256": "2e7b5b756cb47367bab8aba6a363fd992454da6407773134b91d482391a1587e",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-07-r2-C/<trial>/result.json",
+      "sha256": "322d16173100e45d5c06143642bfd309be089476837a677f06f38acc08c6ba49",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-07-r3-A/<trial>/result.json",
+      "sha256": "e3d74fee4c1bd3d472ef1c3f960cc114337999fbccbcc81490f232f15f98b6f5",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-07-r3-B/<trial>/result.json",
+      "sha256": "25b949a0209ad99e6ceaba15a84a173c2e401abff0bbcbc3f23c0282116ea80a",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-07-r3-C/<trial>/result.json",
+      "sha256": "5cd20c4f949597e3aca65d1409a94c97a26903fb06119dcbb0d9c4264b93c47d",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-08-r1-A/<trial>/result.json",
+      "sha256": "d1a724645ce8e164cd89755b6389eae40045fae107ff6c60ada2b77b36f48559",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-08-r1-B/<trial>/result.json",
+      "sha256": "325a6cb044f226d9e8b5bf3fd523366b54b931bb1ff3f30d85152c36ca228070",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-08-r1-C/<trial>/result.json",
+      "sha256": "c0aaa27ecfcb64412128cf9b458d63ca023b8bdc492af95dc8f4832577934bde",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-08-r2-A/<trial>/result.json",
+      "sha256": "a2281214ec982c8724685768257cdc9544c07738f915d2279496c390a5576a64",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-08-r2-B/<trial>/result.json",
+      "sha256": "fc456af214d20a9660a4883043af57c1175fc7bf10346f4b609cc72f0d16ff8f",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-08-r2-C/<trial>/result.json",
+      "sha256": "2f277f37b2e796bca4c5d6c9e53d79551497e5dc6fc3f41d86df05d34c48ceb3",
+      "bytes": 5374
+    },
+    {
+      "source": "<state>/jobs/p2-fold-08-r3-A/<trial>/result.json",
+      "sha256": "4ecd2f4e52b0830b8c70c4c003d0eb6e4f2baf884d74abee1052ed6b96620e91",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-08-r3-B/<trial>/result.json",
+      "sha256": "69a8c212d7d3e9ff3cae038f028cd7f902278f13fa900d8deda686c844c9cae5",
+      "bytes": 5373
+    },
+    {
+      "source": "<state>/jobs/p2-fold-08-r3-C/<trial>/result.json",
+      "sha256": "0dd91daf1f99e081a6ec57206b6e24e9a5c09f0c4bf46dd7bd742b330e99f8e5",
+      "bytes": 5374
+    }
+  ],
+  "publication_base_commit": "f946c6d4ca988a17b6fa4392ecb488909f147883",
+  "freeze_correction": {
+    "requested_v4_manifest_sha256": "6522f2289afb28360aae14b5d51f5b37e29cd9c6ee63c11e01d545e6ea5961f8",
+    "requested_v4_input_files": 596,
+    "archived_v4_files_rehashed": 596,
+    "effective_pre_measurement_manifest_sha256": "819f87338f079bded755071bba299244fa2d63dda2884d258e9eb8a64c4bed3f",
+    "effective_pre_measurement_version": 5,
+    "effective_pre_measurement_input_files": 604,
+    "current_files_rehashed": 604,
+    "verification_path": "README.md, PHASE1.json and run_phase2.sh identify FREEZE.sha256; logs/phase2-freeze-check.txt records all 604 entries OK. The final manifest is version 5. Version 4 is retained as an earlier reporting freeze.",
+    "preregistration_sha256": "260238de8e1c2318766996eeb5355322dafc5939ff73049020ae16e87f2d6f65"
+  },
+  "upstream_source_reads": [
+    {
+      "url": "https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/src/discover/registry.rs",
+      "sha256": "eace5d47033a80ec85b2481a8e9a0710114752f4ff99cd8fbbee1ad6ecb72464",
+      "read_lines": "1553-1581"
+    },
+    {
+      "url": "https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/src/harbor/agents/installed/base.py",
+      "sha256": "4ad4d5891db891645dcdb044566cb150502fb7d2ee5fdaef80eabd652d6bf6a9",
+      "read_lines": "973-997"
+    }
+  ],
+  "publication_sanitization_correction": {
+    "initial_full_validation_exit": 1,
+    "initial_manifest_scan_exits": {
+      "FREEZE-v4.sha256": 1,
+      "FREEZE.sha256": 1
+    },
+    "cause": "UUID session identifiers in copied freeze-manifest locators survived the initial path-only sanitization.",
+    "fix": "Use the existing scripts/validate.py PRIVATE_CONTENT local-session-identifier pattern to replace locator matches with <session-id>; keep all original input digests.",
+    "redacted_locator_identifier_occurrences": {
+      "FREEZE-v4.sha256": 4,
+      "FREEZE.sha256": 4
+    },
+    "verification_path": "Explicit validate.py --scan-file checks on both manifests and full validate.py, followed by re-registration. Failed outputs retained outside the checkout."
+  }
+}
