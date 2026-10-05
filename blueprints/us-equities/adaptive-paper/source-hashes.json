@@ -46,7 +46,7 @@
   "tests/test_adaptive_paper_fees.py": "9a181eb3d2e20ff34ac6551022bf252d51688ab3014162ca696a37b45bdc5221",
   "tests/test_adaptive_paper_financing.py": "8d9f1f21f9d53c9ed120281409bdcb97b8c9ddacc615d0cdfa392cfcf111fa90",
   "tests/test_adaptive_paper_live_manifest.py": "4596f301ac44effefee5b787c5e3627a9cd38f8ff0cf436ef778b7378a0667c2",
-  "tests/test_adaptive_paper_metrics.py": "1d6eaf940021fbaba3ac687a3d3a2d9f6e5492e85a5a372621299d4363ec3ee5",
+  "tests/test_adaptive_paper_metrics.py": "eaeb416047c69d63bb2feda7ecef1a886293eede4e964a566872b03454f13b2c",
   "tests/test_adaptive_paper_mover.py": "51878f9e0121b856e2157db1626c61a2653ff0ac181fdb89b092dc8e763f0062",
   "tests/test_adaptive_paper_mover_native.py": "ce89aa0ae3447017ae56778f19687d819a2f0701052cf4d780a650c37e0d4003",
   "tests/test_adaptive_paper_native.py": "728458624788243abcaf653f6a20a5a6201cfa9ec3328e8d7eb3fd58fdfa94b0",
