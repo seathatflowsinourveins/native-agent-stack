@@ -13841,8 +13841,8 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/README.md",
-      "sha256": "ca1fefa1f0b2ea88b83c6bd043f721096ea70e3508b1e8be0fb41982086e7176",
-      "bytes": 24273
+      "sha256": "4976d8533aa146b6b494dfd2c49813216390ba52be9a35d923f012348d254225",
+      "bytes": 24414
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/evidence/harness/run.py.188e0078fc8f",

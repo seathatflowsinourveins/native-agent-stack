@@ -317,21 +317,22 @@ original binding, rather than by an invented Python mutation method.
 
 The run used one plan, `plan.json` (`24ffca56dfa7…`), the rc5 environment from this README (nautilus_trader
 2.0.0rc5, official ibapi 10.45.1, protobuf 5.29.6), and node client 91 with checker client 92. Every attempt is
-retained. Each receipt's `harness_sha256` resolves to `run.py` or to `evidence/harness/run.py.<12 hex>`.
+retained. Each receipt's `harness_sha256` resolves to `run.py` or to `evidence/harness/run.py.<12 hex>`. Run times are the
+receipts' `started_at` and `ended_at`, truncated to the second.
 
 - **Run 1.** 17:40:15-17:40:45Z, harness `188e0078fc8f…` (r2), `evidence/receipt-20261005-run1-not-connected.json`.
   - Result: `not_connected`, exit 2.
   - The flat pre-check on client 92 passed. Quote admission then opened a second client-92 connection and reached
     `quote_check_deadline` at its 30-second limit. The node never started and no order was sent. r3 now runs the
     pre-check and quote admission in one client-92 session and records per-stage diagnostics.
-- **Run 2.** 18:22:52-18:23:43Z, harness `67429251370f…` (r3), `evidence/receipt-20261005-run2-failed.json`.
+- **Run 2.** 18:22:52-18:23:42Z, harness `67429251370f…` (r3), `evidence/receipt-20261005-run2-failed.json`.
   - Result: `failed`, exit 1.
   - Quote admission passed in the shared session. At node start, rc5's startup reconciliation imported the account's
     14:26Z fills from the separate 1.231 harness trial as `reconciliation=true` orders. Upstream's configuration
     claims external SPY orders, so the case mapping attributed those fills to C3 and C4, and the node stopped before
     ExecTester sent any order. The flat proof passed. r4 now maps cases only from orders this run submitted and
     records other orders under `reconciled_external`.
-- **Run 3.** 18:55:11-18:56:02Z (14:55 ET), harness `5a061ff06f41…` (r4), `evidence/receipt-20261005-passed.json`.
+- **Run 3.** 18:55:11-18:56:01Z (14:55 ET), harness `5a061ff06f41…` (r4), `evidence/receipt-20261005-passed.json`.
   - Result: **passed**, exit 0.
   - Quote admission: bid 775.24, ask 775.26, fresh.
 
@@ -344,7 +345,7 @@ retained. Each receipt's `harness_sha256` resolves to `run.py` or to `evidence/h
 
   - Gross −0.02 USD and net −2.04 USD, against the 5 USD round-trip bound.
   - The independent client-92 flat proof found 0 positions and 0 open orders.
-  - Six reconciled external orders are recorded separately.
+  - Two reconciled external orders (six events: initialization, acceptance and fill for each) are recorded separately.
   - The receipt's risk note reads: "engine notional cap configured, not enforced on this route (#4946, fixed on
     develop, unreleased); bound held by qty=1 and quote admission". v2.0.0rc6 ships that fix.
 
