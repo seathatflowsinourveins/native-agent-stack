@@ -1,0 +1,34 @@
+# Handler-level end-to-end check of the post-terminal client disconnect (2026-10-05, node 24.21.0; nothing deployed)
+# The test (scripts/handler-e2e-terminal-close.test.ts.txt) calls the real handleChat -> chatCore -> stream pipeline -> call-log and usage writers with a stubbed upstream fetch and a temporary database, in the style of upstream's tests/integration/chat-pipeline.test.ts.
+# A Responses client reads until response.completed and closes (reader.cancel(), in two scenarios after aborting the request signal first, as a server does when the socket closes) while the upstream body stays open for 150 ms more.
+# composition C = the v3.8.51 tag commit + the affinity patch + PR 15167's commit 0585aba55 (tree f1336dfd...); the patch under test is patches/drain-after-terminal.patch (sha256 74c0f449...), applied to C it gives tree b7c68690...
+# script: scripts/handler-e2e.sh.txt. The block below is its progress log, byte for byte except that the home directory is written $HOME.
+
+22:38:26Z clone exit=0
+22:38:26Z fetch pr15167 exit=0
+22:38:30Z checkout tag exit=0
+22:39:36Z npm ci exit=0
+22:39:36Z apply affinity patch exit=0
+22:39:36Z apply pr15167 diff exit=0
+22:39:36Z commit composition exit=0
+22:39:36Z composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f equals the expected tree
+22:39:36Z copy the e2e test file exit=0
+22:40:05Z U-e2e-unpatched exit=1 tests=4 pass=1 fail=3
+22:40:05Z apply patch under test exit=0
+22:40:05Z commit patch under test exit=0
+22:40:05Z patched tree=b7c6869001ce8bdd23e2e2352f48ce3058bc13d2 equals the expected tree
+22:40:10Z P-e2e-patched exit=0 tests=4 pass=4 fail=0
+22:40:10Z DONE; the scratch tree and the logs stay in $HOME/.cache/omniroute-handler-e2e-SiFsFW (remove it with rm -rf after reading)
+
+## U: the e2e test on the unpatched composition (3 of 4 fail: the Codex-originated client, and the two clients whose request signal aborts first)
+✔ handler e2e: a Responses client that closes the body right after response.completed still gets its call_logs row and its usage_history row (1204.972851ms)
+✖ handler e2e: a Codex-originated client (originator codex_exec) that closes the body right after response.completed still gets its call_logs row and its usage_history row (6567.374814ms)
+✖ handler e2e: a Codex-originated client whose request signal aborts and whose body closes right after response.completed still gets its call_logs row and its usage_history row (6559.303744ms)
+✖ handler e2e: a Responses client whose request signal aborts and whose body closes right after response.completed still gets its call_logs row and its usage_history row (6601.688552ms)
+assertion messages of the failures: exactly one call_logs row for the request
+
+## P: the same test on the patched tree (4 of 4 pass)
+✔ handler e2e: a Responses client that closes the body right after response.completed still gets its call_logs row and its usage_history row (744.616579ms)
+✔ handler e2e: a Codex-originated client (originator codex_exec) that closes the body right after response.completed still gets its call_logs row and its usage_history row (681.492065ms)
+✔ handler e2e: a Codex-originated client whose request signal aborts and whose body closes right after response.completed still gets its call_logs row and its usage_history row (674.5989ms)
+✔ handler e2e: a Responses client whose request signal aborts and whose body closes right after response.completed still gets its call_logs row and its usage_history row (675.465241ms)

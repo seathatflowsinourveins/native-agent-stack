@@ -1,0 +1,19 @@
+# Control for the tree check of scripts/handler-e2e.sh.txt (2026-10-05): the script run with EXPECT_TREE=0000000000000000000000000000000000000000 instead of the real tree id b7c6869001ce8bdd23e2e2352f48ce3058bc13d2
+# Expected: it prints the patched tree id, reports the mismatch and stops with exit 3 before the patched stage. Observed: the wrapper's `control run exit=3` and the progress log below, which has no P line.
+# The progress log is byte for byte except that the home directory is written $HOME.
+
+22:36:45Z clone exit=0
+22:36:45Z fetch pr15167 exit=0
+22:36:49Z checkout tag exit=0
+22:37:57Z npm ci exit=0
+22:37:57Z apply affinity patch exit=0
+22:37:57Z apply pr15167 diff exit=0
+22:37:58Z commit composition exit=0
+22:37:58Z composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f equals the expected tree
+22:37:58Z copy the e2e test file exit=0
+22:38:26Z U-e2e-unpatched exit=1 tests=4 pass=1 fail=3
+22:38:26Z apply patch under test exit=0
+22:38:26Z commit patch under test exit=0
+22:38:26Z patched tree=b7c6869001ce8bdd23e2e2352f48ce3058bc13d2 DIFFERS from the expected tree 0000000000000000000000000000000000000000: stopping before the patched stage
+
+control run exit=3

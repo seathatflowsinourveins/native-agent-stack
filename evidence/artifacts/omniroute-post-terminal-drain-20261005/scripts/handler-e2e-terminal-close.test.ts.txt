@@ -1,0 +1,178 @@
+/**
+ * Handler-level check of the post-terminal client disconnect, through the real request path (handleChat -> chatCore -> stream pipeline -> call log and usage writers),
+ * built on the helpers and the fetch-stub style of tests/integration/chat-pipeline.test.ts.
+ *
+ * A Responses client reads the streamed response until response.completed and then closes it (reader.cancel(), and in one case also aborts the request signal first, as a
+ * server does when the socket closes) while the upstream body is still open for a short tail. The request must still end with its call_logs row and its usage_history row.
+ * The upstream stub is a ReadableStream that stays open for TAIL_MS after the terminal event, like a provider that closes its stream a moment after response.completed.
+ */
+import test from "node:test";
+import assert from "node:assert/strict";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
+
+const TEST_DATA_DIR = fs.mkdtempSync(path.join(os.tmpdir(), "omniroute-terminal-close-e2e-"));
+process.env.DATA_DIR = TEST_DATA_DIR;
+process.env.REQUIRE_API_KEY = "false";
+process.env.API_KEY_SECRET = process.env.API_KEY_SECRET || "test-terminal-close-secret";
+
+const core = await import("../../src/lib/db/core.ts");
+const providersDb = await import("../../src/lib/db/providers.ts");
+const apiKeysDb = await import("../../src/lib/db/apiKeys.ts");
+const readCacheDb = await import("../../src/lib/db/readCache.ts");
+const { getResponsesCallLogs } = await import("./_chatPipelineCallLogs.ts");
+const { waitForCallLogSaves } = await import("../../src/lib/usage/callLogs.ts");
+const { invalidateMemorySettingsCache } = await import("../../src/lib/memory/settings.ts");
+const { handleChat } = await import("../../src/sse/handlers/chat.ts");
+const { initTranslators } = await import("../../open-sse/translator/index.ts");
+const { clearInflight } = await import("../../open-sse/services/requestDedup.ts");
+const { resetAllCircuitBreakers } = await import("../../src/shared/utils/circuitBreaker.ts");
+
+const originalFetch = globalThis.fetch;
+const encoder = new TextEncoder();
+const decoder = new TextDecoder();
+const TAIL_MS = 150;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function waitFor<T>(read: () => Promise<T | null> | T | null, ms = 4000): Promise<T | null> {
+  const end = Date.now() + ms;
+  for (;;) {
+    const value = await read();
+    if (value) return value;
+    if (Date.now() >= end) return null;
+    await sleep(25);
+  }
+}
+
+async function resetStorage() {
+  globalThis.fetch = originalFetch;
+  process.env.REQUIRE_API_KEY = "false";
+  clearInflight();
+  resetAllCircuitBreakers();
+  apiKeysDb.resetApiKeyState();
+  readCacheDb.invalidateDbCache();
+  invalidateMemorySettingsCache();
+  await sleep(20);
+  await waitForCallLogSaves(10_000);
+  core.resetDbInstance();
+  fs.rmSync(TEST_DATA_DIR, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 });
+  fs.mkdirSync(TEST_DATA_DIR, { recursive: true });
+  initTranslators();
+}
+
+function usageRows(): number {
+  return Number((core.getDbInstance().prepare("SELECT COUNT(*) AS n FROM usage_history").get() as { n: number }).n);
+}
+
+function completedFrame(): string {
+  const payload = {
+    type: "response.completed",
+    response: {
+      id: "resp_e2e",
+      object: "response",
+      status: "completed",
+      model: "gpt-5.6-sol",
+      output: [
+        { id: "msg_e2e", type: "message", role: "assistant", content: [{ type: "output_text", text: "ok", annotations: [] }] },
+      ],
+      usage: { input_tokens: 22, output_tokens: 5 },
+    },
+  };
+  return `event: response.completed\ndata: ${JSON.stringify(payload)}\n\n`;
+}
+
+// An upstream whose body carries response.completed at once and ends TAIL_MS later.
+function upstreamWithTail() {
+  const state = { cancelled: false, ended: false };
+  let resolveEnded: () => void = () => {};
+  const ended = new Promise<void>((resolve) => (resolveEnded = resolve));
+  const body = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(encoder.encode(completedFrame()));
+      setTimeout(() => {
+        try {
+          controller.enqueue(encoder.encode("data: [DONE]\n\n"));
+          controller.close();
+        } catch {
+          // the stream was cancelled before its tail
+        }
+        state.ended = true;
+        resolveEnded();
+      }, TAIL_MS);
+    },
+    cancel() {
+      state.cancelled = true;
+      resolveEnded();
+    },
+  });
+  return { response: new Response(body, { status: 200, headers: { "Content-Type": "text/event-stream" } }), state, ended };
+}
+
+async function runScenario({ codexHeaders, abortSignalFirst }: { codexHeaders: boolean; abortSignalFirst: boolean }) {
+  await resetStorage();
+  await providersDb.createProviderConnection({
+    provider: "codex",
+    authType: "apikey",
+    name: "codex-e2e",
+    apiKey: "sk-codex-e2e",
+    isActive: true,
+    testStatus: "active",
+    providerSpecificData: {},
+  });
+  const upstream = upstreamWithTail();
+  globalThis.fetch = async () => upstream.response;
+
+  const controller = new AbortController();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (codexHeaders) headers.originator = "codex_exec";
+  const response = await handleChat(
+    new Request("http://localhost/v1/responses", {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ model: "codex/gpt-5.6-sol", stream: true, input: "terminal close e2e" }),
+      signal: controller.signal,
+    })
+  );
+  assert.equal(response.status, 200);
+
+  const reader = response.body!.getReader();
+  let received = "";
+  while (!received.includes("response.completed")) {
+    const chunk = await reader.read();
+    assert.equal(chunk.done, false, "the stream ended before response.completed");
+    received += decoder.decode(chunk.value, { stream: true });
+  }
+  // the client has the terminal event and closes: first the request signal (as a server does), then the body
+  if (abortSignalFirst) controller.abort("client_closed");
+  await reader.cancel("client_closed");
+  await upstream.ended;
+  await sleep(300);
+  await waitForCallLogSaves(10_000);
+
+  const calls = await waitFor(async () => {
+    const rows = (await getResponsesCallLogs()).filter((row) => row.provider === "codex");
+    return rows.length > 0 ? rows : null;
+  });
+  const usage = await waitFor(() => (usageRows() > 0 ? usageRows() : null), 2000);
+  return { calls: calls ?? [], usage: usage ?? 0, upstream: upstream.state };
+}
+
+const SCENARIOS: Array<[string, { codexHeaders: boolean; abortSignalFirst: boolean }]> = [
+  ["a Responses client that closes the body right after response.completed", { codexHeaders: false, abortSignalFirst: false }],
+  ["a Codex-originated client (originator codex_exec) that closes the body right after response.completed", { codexHeaders: true, abortSignalFirst: false }],
+  ["a Codex-originated client whose request signal aborts and whose body closes right after response.completed", { codexHeaders: true, abortSignalFirst: true }],
+  ["a Responses client whose request signal aborts and whose body closes right after response.completed", { codexHeaders: false, abortSignalFirst: true }],
+];
+
+for (const [name, options] of SCENARIOS) {
+  test(`handler e2e: ${name} still gets its call_logs row and its usage_history row`, async () => {
+    const { calls, usage, upstream } = await runScenario(options);
+    assert.equal(calls.length, 1, "exactly one call_logs row for the request");
+    assert.equal(calls[0].status, 200);
+    assert.equal(calls[0].path, "/v1/responses");
+    assert.ok(usage >= 1, "a usage_history row for the request");
+    assert.equal(upstream.cancelled, false, "the completed response is drained, not aborted");
+  });
+}
