@@ -21,12 +21,15 @@ and all three of its votes replace the earlier round's; a vote missing from that
 earlier one.
 Retained failures: a round that returned nothing, a discovery family that did not return, a missing vote, a lost
 completeness critic, a critic-flagged layer beyond the follow-up cap, a GPT-6 copy problem and (with --usage) a worker
-measured at another effort than max (effort_deviation) or a worker with a WebSearch call the session's cap refused
+measured at another effort than max without a complete same-label max-effort re-run (effort_deviation), or a worker
+with a WebSearch call the session's cap refused
 (web_search_capped: Claude Code allows CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION WebSearch calls per session, default
 200, across the coordinator and every subagent, and a capped call returns a notice telling the worker to go on
 without searching) are listed under failures/<layer>; the critic's effort_deviation or web_search_capped belongs to
 every layer. The layer gets the reopen entry {trigger: retained_failure, ref: @RETURNS@#/failures/<layer>}, so it
-never counts as a clean layer. A layer none of whose rounds returned is left out of layers.json (excluded_layers in
+never counts as a clean layer. Superseded attempts whose same-label re-run completed at max remain visible per layer
+under superseded_retained in the returns and summary (child, agent_id, superseded_by, reason and round), without an
+effort_deviation or a reopen entry of their own. A layer none of whose rounds returned is left out of layers.json (excluded_layers in
 the summary).
 Refuted by absence: a proposal that no returned vote refutes, but that is refuted because a vote did not return
 (the vote object, or a fit family member, is {missing: true}), is listed under refuted like any refuted proposal, and
@@ -36,8 +39,24 @@ Models and effort: each Claude vote names the resolved model and the effort its 
 (child-usage.mjs output; a call the runtime re-ran is measured by the attempt that returned, and the client-written
 <synthetic> rows name no model); without it, the requested alias and effort null (not measured). The GPT-6 vote
 names the model and effort its job reported.
-Privacy: work-dir, checkout and home paths become <work-dir>, <repo> and ~. Any string still matching
-scripts/validate.py PRIVATE_CONTENT is listed by pointer and kind (never its text), and the exit code is 3.
+Privacy: work-dir, checkout and home paths become <work-dir>, <repo> and ~. Their dash encodings
+(every character outside ASCII letters and digits becomes '-') and project-directory suffixes become
+<project-dir>, including bare home segments. Local and generic rules run over the whole text, including URLs,
+queries, fragments and assignments: privacy takes priority over preserving an encoded slug in a source URL.
+Generic roots and the (?<![\\w-]) boundary derive from #697 at 0d2a38b2: -home- is case-sensitive; -Users-,
+-mnt-<drive>-Users- and <drive>--Users- ignore case. The converter is deliberately stricter about tails:
+a name starts with [A-Za-z0-9_.] and needs no restricted terminator, so punctuation and Unicode tails redact
+in bare text, native directory anchors, URLs, assignments, keys and values. Word characters, dots, dashes
+and project suffixes are consumed. Lowercase example followed by a dash, end or a character outside
+[A-Za-z0-9_.] is exempt. Dots-only names are removed; ordinary names keep sentence-ending periods.
+Extra Windows separators and known local encodings also receive stricter coverage; local continuations use
+Unicode-aware word characters, dots and dashes. Ordinary home-assistant and my-home-page prose survives.
+Both key collisions and any residue matching the selected checkout's PRIVATE_CONTENT refuse with exit 3,
+checking decoded documents and their exact emitted JSON text, including the summary (ensure_ascii=False),
+before --out is created or updated and before any summary is printed. Findings name the kind and a locator;
+matching keys use document-order indices, and collision locators use only indices, never key text.
+The required regression loads scripts/validate.py's landed encoded home path rule by name, checking decoded
+and serialized output; another CLI fixture checks --repo-root selection without mocking the validator.
 Integrity: with --work-dir, every GPT-6 output is compared with the file Codex wrote (gpt6/<job>/last.json). Exit 4
 when the workflow used an output that differs from that file (mismatch), that Codex never wrote (no_file) or that
 Codex wrote as non-JSON (file_unparseable), or when a job that finished with exit 0 wrote an output that never
@@ -55,13 +74,16 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
-from sweep_common import (REPO_ROOT, canon, deviation_rounds, host_replacements, ledger_module, load_json,  # noqa: E402
-                          pointer_token, private_content, private_findings, sanitize, slug, write_json)
+from sweep_common import (REPO_ROOT, RedactionKeyCollision, canon, deviation_rounds, host_replacements, json_text,  # noqa: E402
+                          ledger_module, load_json, pointer_token, private_content, private_findings,
+                          rewrite_strings, sanitize, slug)
+from usage_record import superseded_at_required_effort  # noqa: E402
 
 # The Claude judgment roles all run on Opus (sweep.js WORKER, adoption/agents/claude/landscape-sweep-worker.md): the
 # facts refuter verifies, and the global model rule keeps Sonnet for command wrappers and mechanical extraction.
@@ -77,6 +99,17 @@ SYNTHETIC_MODEL = "<synthetic>"  # child-usage.mjs: the model of client-written 
 COPY_FAILURES = ("mismatch", "no_file", "file_unparseable", "file_only")
 VOTE_ROLES = (("facts", "facts"), ("fit_claude", "Claude fit"), ("fit_gpt6", "GPT-6 fit"))
 SKILLS_CATALOG = "skills"  # build_inputs.SKILLS: the catalog of a skills-* layer, whose proposals are skill refs
+# Follow #697 at 0d2a38b2: /home is case-sensitive, every Users branch ignores case, example is case-sensitive.
+# Deliberately cover any name delimiter, additional Windows separators and the whole project suffix.
+# Local paths are derived at the redaction call site; no rule excludes URL contexts.
+ENCODED_PROFILE_ROOT = (
+    r"(?:-home-|(?i:-Users-|-mnt-[a-z]-Users-|[a-z]-{2,}Users-))")
+ENCODED_PROFILE_START = ENCODED_PROFILE_ROOT + r"(?!example(?:-|(?![A-Za-z0-9_.])))"
+# No restricted tail: punctuation or Unicode after a real name is private in every context. Preserve
+# sentence periods after ordinary names; a dots-only name is consumed entirely rather than left as a residue.
+ENCODED_USER_PROFILE = re.compile(
+    r"(?<![\w-])" + ENCODED_PROFILE_START
+    + r"(?=[A-Za-z0-9_.])(?:[\w.-]*[\w-]|\.+)")
 
 
 def method_limits(models: dict, gpt6_model: str = GPT6_DEFAULT["model"], skills: bool = False) -> list[str]:
@@ -148,15 +181,29 @@ def usage_children(usage: dict | None) -> dict:
 
 
 def effort_deviations(usage: dict | None) -> list:
-    """{child, efforts[, superseded_by]} for every child and superseded attempt of the usage record that did not run
-    at effort max alone (as child-usage.mjs --require-effort max reports them)."""
+    """{child, efforts[, superseded_by]} for attempts not at max and not covered by a complete same-label max re-run."""
     child_usage = as_dict(as_dict(usage).get("child_usage"))
     out = []
     for child in [*(child_usage.get("children") or []), *(child_usage.get("superseded_attempts") or [])]:
-        if isinstance(child, dict) and child.get("efforts") != [REQUIRED_EFFORT]:
+        if (isinstance(child, dict) and child.get("efforts") != [REQUIRED_EFFORT]
+                and not superseded_at_required_effort(child, child_usage, REQUIRED_EFFORT)):
             item = {"child": child.get("label") or child.get("agent_id"), "efforts": child.get("efforts")}
             if child.get("superseded_by"):
                 item["superseded_by"] = child["superseded_by"]
+            out.append(item)
+    return out
+
+
+def superseded_retained(usage: dict | None) -> list:
+    """Superseded attempts covered by a complete same-label max re-run, retained separately from failures."""
+    child_usage = as_dict(as_dict(usage).get("child_usage"))
+    out = []
+    for child in child_usage.get("superseded_attempts") or []:
+        if superseded_at_required_effort(child, child_usage, REQUIRED_EFFORT):
+            item = {"child": child.get("label") or child.get("agent_id"), "superseded_by": child["superseded_by"],
+                    "reason": child.get("reason") or "re-run completed at effort max"}
+            if child.get("agent_id"):
+                item["agent_id"] = child["agent_id"]
             out.append(item)
     return out
 
@@ -398,6 +445,9 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
     # it loads) is a retained failure of its layer, like a lost vote: its return is kept and the layer is reopened.
     deviations = effort_deviations(usage)
     deviations_by_layer, deviations_unmapped = deviation_rounds(deviations, rounds_by_layer)
+    superseded, superseded_unmapped = deviation_rounds(superseded_retained(usage), rounds_by_layer)
+    returns["superseded_retained"] = {layer_id: [{"round": rnd, **item} for rnd, item in entries]
+                                      for layer_id, entries in superseded.items()}
     # A worker whose WebSearch call the session's cap refused went on without searching (the notice tells it to), so
     # its layer's lane ran without a capability the prompts grant: a retained failure, like an effort deviation.
     capped = web_search_capped(usage)
@@ -643,6 +693,8 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                         "degraded_discovery": degraded, "critic_lost": critic_lost,
                         "effort_deviations": [item["child"] for item in deviations],
                         "effort_deviations_unmapped": [item["child"] for item in deviations_unmapped],
+                        "superseded_retained": returns["superseded_retained"],
+                        "superseded_retained_unmapped": [item["child"] for item in superseded_unmapped],
                         "web_search": as_dict(as_dict(usage).get("child_usage")).get("web_search"),
                         "web_search_capped": [item["child"] for item in capped],
                         "web_search_capped_unmapped": [item["child"] for item in capped_unmapped],
@@ -650,6 +702,32 @@ def convert(res: dict, scope: dict, lane: str, models: dict, work: Path | None =
                         "retained_failures": failures_summary, "reopened_layers": sorted(failures_summary),
                         "calls": calls_total, "skills_usage": skills_usage, "gpt6_jobs": gpt6_usage["jobs"],
                         "gpt6_by_status": gpt6_usage["by_status"], "gpt6_copy_check": checks}}
+
+
+def redact_project_dirs(value, work: Path | None = None, repo_root: Path | None = REPO_ROOT):
+    """Redact local and generic encoded user profiles throughout strings and keys, including URLs.
+
+    Use host_replacements' home, checkout, optional work directory and realpath forms; a bare encoded home is
+    also private. Generic roots and boundary derive from #697 at 0d2a38b2: home is case-sensitive and every
+    Users branch ignores case. A name starts with [A-Za-z0-9_.] and needs no restricted terminator. Lowercase
+    example before a dash, end or any character outside that ASCII class is exempt. Project suffixes and
+    dots-only names are removed. Local encodings and extra Windows separators receive stricter coverage;
+    local continuations consume Unicode word characters, dots and dashes. Plain home-assistant and my-home-page prose survives;
+    URL, query, fragment and assignment contexts receive no exemption. Colliding keys raise RedactionKeyCollision.
+    The CLI scans decoded documents and exact emitted JSON with the selected checkout's PRIVATE_CONTENT
+    before writing or printing. Regression fixtures use its actual encoded home path rule, not a synthetic marker.
+    """
+    encoded_paths = sorted({re.sub(r"[^a-zA-Z0-9]", "-", prefix)
+                            for prefix, _ in host_replacements(work, repo_root)}, key=lambda form: -len(form))
+    local = (re.compile(r"(?<![\w.-])(?:" + "|".join(re.escape(form) for form in encoded_paths)
+                        + r")(?:[\w.-]*[\w-])?(?![\w-])") if encoded_paths else None)
+
+    def fix(text):
+        if local:
+            text = local.sub("<project-dir>", text)
+        return ENCODED_USER_PROFILE.sub("<project-dir>", text)
+
+    return rewrite_strings(value, fix)
 
 
 def main(argv=None) -> int:
@@ -678,22 +756,41 @@ def main(argv=None) -> int:
     except (ValueError, OSError, KeyError) as error:
         print(f"convert.py: {error}", file=sys.stderr)
         return 2
-    replacements = host_replacements(work, args.repo_root.resolve())
-    args.out.mkdir(parents=True, exist_ok=True)
-    findings = []
-    for name in ("returns", "lanes", "layers", "survivors"):
-        document = sanitize(out[name], replacements)
-        write_json(args.out / f"{name}.json", document)
-        findings.extend((f"{name}.json#{pointer}", kind) for pointer, kind in private_findings(document, patterns))
+    repo_root = args.repo_root.resolve()
+    replacements = host_replacements(work, repo_root)
     summary = {**out["summary"], "run": meta}
     if meta.get("status") not in (None, "completed"):
         summary["warning"] = f"the run record's status is {meta.get('status')!r}, not completed"
-    print(json.dumps(summary, indent=1))
+    documents = {}
+    try:
+        for name in ("returns", "lanes", "layers", "survivors", "summary"):
+            value = summary if name == "summary" else out[name]
+            documents[name] = redact_project_dirs(sanitize(value, replacements), work, repo_root)
+    except RedactionKeyCollision as error:
+        pointer = "/" + "/".join(pointer_token(part) for part in error.path)
+        location = "printed summary" if name == "summary" else f"{name}.json"
+        print(f"convert.py: {location}#{pointer}: redaction key collision (no artifacts written)", file=sys.stderr)
+        return EXIT_PRIVATE
+    emitted = {name: json_text(document) for name, document in documents.items()}
+    findings = []
+    for name, document in documents.items():
+        location = "printed summary" if name == "summary" else f"{name}.json"
+        decoded = private_findings(document, patterns)
+        findings.extend((f"{location}#{pointer}", kind) for pointer, kind in decoded)
+        for kind, pattern in patterns:
+            if pattern.search(emitted[name]) and not any(description in (kind, f"{kind} (in a key)")
+                                                        for _, description in decoded):
+                findings.append((f"{location}#/<serialized>", kind))
     if findings:
-        print("possible private content (redact before registering; text not shown):", file=sys.stderr)
+        print("refusing to publish: possible private content (no artifacts written; text not shown):", file=sys.stderr)
         for pointer, kind in findings:
             print(f"  {pointer}: {kind}", file=sys.stderr)
         return EXIT_PRIVATE
+    args.out.mkdir(parents=True, exist_ok=True)
+    for name, text in emitted.items():
+        if name != "summary":
+            (args.out / f"{name}.json").write_bytes(text.encode("utf-8"))
+    sys.stdout.write(emitted["summary"])
     copy_problems = {kind: count for kind, count in out["summary"]["gpt6_copy_check"].items() if kind in COPY_FAILURES}
     if copy_problems:
         print(f"GPT-6 copy check failed {json.dumps(copy_problems, sort_keys=True)}; see raw/<layer>/<round>/"

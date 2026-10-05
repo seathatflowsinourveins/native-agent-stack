@@ -39,6 +39,11 @@ from pathlib import Path
 from scripts import freshness_propose as fp
 from scripts.validate import validate
 
+if __package__:
+    from .repository_copy import guarded_copytree
+else:
+    from repository_copy import guarded_copytree
+
 
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github/workflows/catalog-freshness.yml"
@@ -726,7 +731,7 @@ class RebuildExplorerSubprocessTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.scratch = Path(tempfile.mkdtemp(prefix="freshness-default-scratch-"))
-        shutil.copytree(
+        guarded_copytree(
             ROOT, cls.scratch, dirs_exist_ok=True,
             ignore=shutil.ignore_patterns(".git", "__pycache__", "*.pyc", ".pytest_cache"),
         )
@@ -770,7 +775,7 @@ class TrackedExplorerSubprocessTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.scratch = Path(tempfile.mkdtemp(prefix="freshness-tracked-scratch-"))
-        shutil.copytree(
+        guarded_copytree(
             ROOT, cls.scratch, dirs_exist_ok=True,
             ignore=shutil.ignore_patterns(".git", "__pycache__", "*.pyc", ".pytest_cache"),
         )
