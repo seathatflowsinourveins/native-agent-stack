@@ -4,6 +4,7 @@ Date: 2026-10-05. Lane: trading. Builder base:
 `4c897418fe35a030a1188ae447eaf31c893f8eff`.
 Repair round 2 base: `b3a01ce273952260df0b552d5075997b737b71ad`, whose tree
 matches the coordinator's round 1 commit. No commit or pin move by the builder.
+Repair round 3 starts from `f417d2257869b8fdf90ad91b3246196a8b6a81f2`.
 North-star action: run US-equities local research/evidence after each NYSE
 session and preserve the research journals needed to reproduce its state.
 This implements the coordinator's final `decision-record-T-final.md`, lines
@@ -98,12 +99,18 @@ operator commands and source-linked rule table. The verified original sources ar
   external oracle, then integrity and required-table counts as secondary checks.
   [Restore syntax](https://github.com/restic/restic/blob/v0.19.1/doc/050_restore.rst#L55).
 - `systemd/systemd@v255:man/systemd.service.xml:818-836` defines on-failure
-  restart. The later operator drill verifies identity before SIGKILL and uses
+  restart. `man/systemctl.xml:541-549,2377-2388` supplies unit-addressed
+  `kill --kill-whom=main --signal=SIGKILL`. The later operator drill verifies
+  identity before native fault delivery and uses
   Dagu's original status fields:
   `dagucloud/dagu@v2.16.6:internal/cmd/history.go:568-602`,
   `internal/persis/file/dagrun/dagrun.go:55-59`,
   `internal/ir/run_status.go:156-179`, `internal/ir/status.go:10-18,133-149`.
   History alone omits the slot/trigger, so it must be corroborated.
+  The supported REST run-details alternative exposes both fields at
+  `internal/service/frontend/api/v1/dagruns.go:2066-2096; transformer.go:362,371`.
+  Original `status.jsonl` is retained to hash/corroborate native bytes without
+  an HTTP/auth dependency; its internal format must be revalidated on pin moves.
   [Restart policy](https://github.com/systemd/systemd/blob/v255/man/systemd.service.xml#L818).
 
 The SDK_ENV lock evidence at this base is
@@ -147,7 +154,7 @@ native copying function; we do not rebuild it.
 | --- | --- |
 | `session_day.py` | exchange_calendars `@4.13.2:pyproject.toml:67-68; exchange_calendars/ecal.py:100-149` ships calendar rendering, leaving our post-close and input-freshness token to compose its native session/close API. |
 | `journal_recovery.py` | restic `@v0.19.1:doc/040_backup.rst:679-703; doc/045_working_with_repos.rst:482-521; doc/050_restore.rst:55-73` supplies backup/check/restore, leaving the frozen external oracle, required tables, bounded rotation and controls as consumer policy. |
-| `drill_process_restart.py` | systemd `@v255:man/systemd.service.xml:818-836` supplies supervision and Dagu `@v2.16.6:internal/cmd/history.go:568-602` supplies history without slot/trigger, leaving the guarded signal and exact-slot correlation as acceptance glue. |
+| `drill_process_restart.py` | systemd `@v255:man/systemctl.xml:541-549,2377-2388; man/systemd.service.xml:818-836` supplies unit-addressed kill and supervision; Dagu `@v2.16.6:internal/service/frontend/api/v1/transformer.go:362,371` supplies slot/trigger, leaving identity/time/holiday guards and exact-slot correlation as acceptance policy. |
 | `drill_local_recovery.py` | CPython `@v3.12.3:Modules/_sqlite/connection.c:2067-2102` supplies copying and restic `@v0.19.1:doc/050_restore.rst:55-73` supplies restore, leaving synthetic concurrent writers, failure controls and sanitized evidence as our integration fixture. |
 
 **Replaced** the exclusive-create lock sentinel with native `fcntl.flock`
@@ -161,6 +168,11 @@ or alert handler policy. An independent alert path remains decision 2.
 The recovery worker calls native `Connection.backup(..., pages=-1)` in one read
 transaction, permitting concurrent WAL writers while avoiding incremental-copy
 restarts (`python/cpython@v3.12.3:Modules/_sqlite/connection.c:2013,2067-2102`).
+It checks source `PRAGMA journal_mode` and refuses non-WAL journals unless
+`--allow-non-wal` explicitly accepts rollback-journal writer blocking. The read
+transaction holds a SHARED lock for the whole bounded copy; those writers can
+receive `SQLITE_BUSY` at commit. Prefer quiescing writers before opting in
+(`sqlite/sqlite@version-3.53.1:src/backup.c:346-354,383-389`).
 That API has no hard wall-time parameter; `subprocess.run(timeout=...)` bounds
 the isolated worker (`Doc/library/subprocess.rst:62-68`). The documented defaults are **120 seconds and 256 MiB per
 journal**, with explicit `--backup-timeout`/`--max-journal-bytes` parameters;
@@ -174,14 +186,19 @@ over-seven-day idle gaps and old state until successful full checking. Backup
 and any later forget policy group by **host,tags**
 (`restic/restic@v0.19.1:doc/040_backup.rst:197-206; doc/060_forget.rst:225-233`),
 so disposable staging paths share parent/retention groups. No forget/prune ran.
+Control backups use a separate `equity-research-recovery-control` host and
+`journal-recovery-control` tag, isolating incomplete snapshots from production
+parents/retention. Controls are documented for disposable repositories only.
 
 The seven research-runtime passthrough entries are restored as well as the four
 scheduled-job entries: Dagu's allowlist is at
 `dagucloud/dagu@v2.16.6:internal/cmn/config/loader.go:344-347; internal/cmn/config/env.go:77-95`.
 The research operator's simulation job must atomically publish `LEAN_EVENTS`
 after the session's actual close **by 16:25 New York**. Its mtime must be between
-close and check time. Missing/stale/future tokens visibly skip the native
-precondition chain. This availability check does not establish market-data
+close and check time. Missing/stale/future tokens exit 1 and fail the native run,
+blocking its dependents and remaining visible to failed-history/handler queries.
+Only covered non-session/before-close tokens retain a skipped research chain.
+This availability check does not establish market-data
 freshness or point-in-time correctness inside the file.
 
 The hosting README again carries the verified pinned-download/checksum recipe,
@@ -201,6 +218,33 @@ counts and file bytes remain equal; external SHA-256 comparison still refuses it
 Tests cover symlinked roots, both controls, native lock contention/stale files,
 slow/overdue rotation, real holiday/early-close calendars and native Dagu
 skip/success chains, all on scratch directories without a scheduler.
+
+## Round 3 corrections and verification
+
+The cross-family read found seven new p2 defects and a missing manual run/cancel
+recipe. Each behavioral regression was run against the old code first (exit 1),
+then against its scoped repair (exit 0), including a native Dagu failure probe.
+The hosting recipe restores native `start --run-id`, `stop --run-id` and
+`history --status succeeded,failed,aborted` commands for operator inspection and
+replay (`dagucloud/dagu@v2.16.6:internal/cmd/start.go:45-67; stop.go:20-38,53-91;
+history.go:160-345; flags.go:463-481`; all three installed help commands exit 0).
+
+Native systemctl fault delivery replaces `os.kill`; identity guards remain.
+The restart window reserves more than 150 seconds, rechecks immediately before
+the fault and refuses a restart observed at/after due with a distinct reason.
+Dagu does not replay missed slots when `catchup_window` is omitted
+(`dagucloud/dagu@v2.16.6:internal/cmn/schema/dag.schema.json:151-153`).
+No operating-host process was signalled during this repair.
+
+The historical round-2 receipt now names the published main base and explicitly
+identifies its tested working tree by `integration_source_sha256`; its old source
+hashes and results remain historical. The native test helper uses its private
+scratch root even with caller `TMPDIR` unset. Round-3 verification uses the locked
+SDK, so real-calendar tests execute rather than skip. Fresh native evidence is
+recorded in the [native DAG artifact](../../blueprints/us-equities/hosting/evidence/native-dagu-probes-r3.json),
+[recovery artifact](../../blueprints/us-equities/hosting/evidence/offline-proof-r3.json) and
+[local-integration receipt](../../evidence/receipts/trading-unattended-hosting-recovery-r3-20261005.json); a private copy of
+the deployed DAG uses synthetic post-close time/input, not a live market run.
 
 ## Dagu 2.16.6 to 2.18.2 scheduler comparison
 

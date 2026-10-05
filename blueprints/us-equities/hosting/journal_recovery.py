@@ -75,7 +75,7 @@ def journal_state(path: Path, tables: list[str]) -> dict:
     return {"integrity_check": "ok", "required_tables": counts}
 
 
-def copy_journal(source: Path, target: Path, max_bytes: int) -> dict:
+def copy_journal(source: Path, target: Path, max_bytes: int, *, allow_non_wal=False) -> dict:
     """Use upstream Online Backup unchanged, with a single WAL read transaction.
 
     CPython@v3.12.3:Modules/_sqlite/connection.c:2013,2067-2102 passes pages=-1
@@ -83,6 +83,9 @@ def copy_journal(source: Path, target: Path, max_bytes: int) -> dict:
     The caller bounds this worker with subprocess.run(timeout=...).
     """
     with closing(sqlite3.connect(source.resolve().as_uri() + "?mode=ro", uri=True)) as src:
+        mode = src.execute("PRAGMA journal_mode").fetchone()[0].lower()
+        if mode != "wal" and not allow_non_wal:
+            raise RecoveryError("source must use WAL; --allow-non-wal explicitly accepts writer blocking")
         src.execute("BEGIN")
         size = src.execute("PRAGMA page_count").fetchone()[0] * src.execute("PRAGMA page_size").fetchone()[0]
         if size > max_bytes:
@@ -96,7 +99,8 @@ def copy_journal(source: Path, target: Path, max_bytes: int) -> dict:
 
 
 def snapshot_journals(journals: dict, stage: Path, oracle: Path, *, observation=None,
-                      backup_timeout=BACKUP_TIMEOUT, max_journal_bytes=MAX_JOURNAL_BYTES) -> dict:
+                      backup_timeout=BACKUP_TIMEOUT, max_journal_bytes=MAX_JOURNAL_BYTES,
+                      allow_non_wal=False) -> dict:
     """One Online Backup per journal; no cross-journal atomicity is promised.
 
     An isolated stdlib worker permits a hard wall timeout even within a native step.
@@ -121,7 +125,8 @@ def snapshot_journals(journals: dict, stage: Path, oracle: Path, *, observation=
         target = stage / "journals" / f"{name}.sqlite3"
         completed = subprocess.run(
             [sys.executable, str(Path(__file__).resolve()), "_copy", "--source", str(source.resolve()),
-             "--target", str(target.resolve()), "--max-journal-bytes", str(max_journal_bytes)],
+             "--target", str(target.resolve()), "--max-journal-bytes", str(max_journal_bytes),
+             *(["--allow-non-wal"] if allow_non_wal else [])],
             env={"PATH": "/usr/bin:/bin", "LC_ALL": "C", "TMPDIR": os.environ.get("TMPDIR", str(stage.parent))},
             capture_output=True, text=True, timeout=backup_timeout, check=False)
         if completed.returncode:
@@ -283,7 +288,8 @@ def check_rotation(restic, state_path: Path, *, parts=CHECK_PARTS, now=None,
 
 def cycle(restic: Restic, journals: dict, state_path: Path, *, parts=CHECK_PARTS,
           full_check=False, control=None, observation=None,
-          backup_timeout=BACKUP_TIMEOUT, max_journal_bytes=MAX_JOURNAL_BYTES) -> dict:
+          backup_timeout=BACKUP_TIMEOUT, max_journal_bytes=MAX_JOURNAL_BYTES,
+          allow_non_wal=False) -> dict:
     cycle_started = datetime.now(timezone.utc)
     stage, oracle, restored = (restic.work / name for name in ("stage", "frozen-inventory.json", "restored"))
     if restored.exists() or not restic.repository.is_dir() or not restic.password_file.is_file():
@@ -294,14 +300,18 @@ def cycle(restic: Restic, journals: dict, state_path: Path, *, parts=CHECK_PARTS
     if not version_output.startswith("restic 0.19.1 "):
         raise RecoveryError("restic must stay pinned to 0.19.1")
     inventory = snapshot_journals(journals, stage, oracle, observation=observation,
-                                 backup_timeout=backup_timeout, max_journal_bytes=max_journal_bytes)
+                                 backup_timeout=backup_timeout, max_journal_bytes=max_journal_bytes,
+                                 allow_non_wal=allow_non_wal)
     verify(stage, oracle)  # Refuse a staging change before attempting backup.
     unreadable = stage / inventory["files"][0]["path"]
     if control == "snapshot":
         unreadable.chmod(0)  # Keep another readable file, so restic can create an incomplete snapshot.
+    # restic/restic@v0.19.1:doc/040_backup.rst:197-206 groups parents by host/tags.
+    # Keep deliberately failing controls outside the production parent/forget group.
+    suffix = "-control" if control else ""
     try:
-        output = restic.run("backup", str(stage), "--host", "equity-research-recovery",
-                            "--tag", "journal-recovery", "--group-by", "host,tags", "--json")
+        output = restic.run("backup", str(stage), "--host", "equity-research-recovery" + suffix,
+                            "--tag", "journal-recovery" + suffix, "--group-by", "host,tags", "--json")
     finally:
         unreadable.chmod(0o400)
     if control == "snapshot":
@@ -368,6 +378,8 @@ def main(argv=None) -> int:
                        help="hard seconds per isolated Online Backup worker (default 120)")
         p.add_argument("--max-journal-bytes", type=int, default=MAX_JOURNAL_BYTES,
                        help="maximum logical bytes per journal (default 256 MiB)")
+        p.add_argument("--allow-non-wal", action="store_true",
+                       help="accept blocking rollback-journal writers for the entire bounded copy")
         if name == "snapshot":
             p.add_argument("--stage", type=Path, required=True)
             p.add_argument("--inventory", type=Path, required=True)
@@ -387,23 +399,27 @@ def main(argv=None) -> int:
     p.add_argument("--source", type=Path, required=True)
     p.add_argument("--target", type=Path, required=True)
     p.add_argument("--max-journal-bytes", type=int, required=True)
+    p.add_argument("--allow-non-wal", action="store_true")
     args = parser.parse_args(argv)
     try:
         if args.command == "_copy":
-            result = copy_journal(args.source, args.target, args.max_journal_bytes)
+            result = copy_journal(args.source, args.target, args.max_journal_bytes,
+                                  allow_non_wal=args.allow_non_wal)
         elif args.command == "verify":
             result = verify(args.restored, args.inventory)
         else:
             journals = selections(args.journal, args.required_table)
             if args.command == "snapshot":
                 result = snapshot_journals(journals, args.stage, args.inventory,
-                                          backup_timeout=args.backup_timeout, max_journal_bytes=args.max_journal_bytes)
+                                          backup_timeout=args.backup_timeout, max_journal_bytes=args.max_journal_bytes,
+                                          allow_non_wal=args.allow_non_wal)
             else:
                 args.work.mkdir(mode=0o700)
                 runner = Restic(args.restic_bin, args.repository, args.password_file, args.work)
                 result = cycle(runner, journals, args.rotation_state, parts=args.check_parts,
                                full_check=args.full_check, control=args.control,
-                               backup_timeout=args.backup_timeout, max_journal_bytes=args.max_journal_bytes)
+                               backup_timeout=args.backup_timeout, max_journal_bytes=args.max_journal_bytes,
+                               allow_non_wal=args.allow_non_wal)
         print(json.dumps({"result": "passed", **result}, sort_keys=True))
         return 0
     except (RecoveryError, OSError, sqlite3.Error, KeyError, TypeError,

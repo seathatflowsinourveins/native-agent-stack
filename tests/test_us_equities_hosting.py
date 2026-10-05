@@ -89,7 +89,7 @@ class RealCalendarTests(unittest.TestCase):
         self.assertIn("DateOutOfBounds", checked.stderr)
 
 
-def native_dagu_probe(token):
+def native_dagu_probe(token, *, session_script=None):
     """Native runner + original status, without UI/scheduler/services or network.
 
     Minimal reproduction of the deployed output/scalar-precondition/dependency
@@ -100,6 +100,19 @@ def native_dagu_probe(token):
         marker = root / "ran"
         config = root / "config.yaml"
         config.write_text((HERE / "config.yaml.example").read_text())
+        calendar_command = f"printf {token}"
+        if session_script is not None:
+            (root / "sdk").symlink_to(Path(CALENDAR_PYTHON).parent.parent, target_is_directory=True)
+            (root / "session_day.py").write_text(Path(session_script).read_text())
+            events = root / "events.json"
+            if token != "missing_input":
+                events.write_text("[]")
+                instant = {"stale_input": "2026-11-26T22:00:00Z",
+                           "future_input": "2026-11-27T21:31:00Z"}.get(token, "2026-11-27T19:00:00Z")
+                epoch = datetime.fromisoformat(instant).timestamp()
+                os.utime(events, (epoch, epoch))
+            calendar_command = (f'"{root}/sdk/bin/python" "{root}/session_day.py" '
+                                f'--at 2026-11-27T21:30:00Z --events "{events}"')
         dag = root / "native-chain.yaml"
         dag.write_text(f'''type: graph
 timeout_sec: 15
@@ -107,7 +120,7 @@ artifacts:
   enabled: false
 steps:
   - id: calendar_check
-    run: 'printf {token}'
+    run: {json.dumps(calendar_command)}
     output: SESSION_DAY
   - id: nyse_session
     preconditions:
@@ -119,7 +132,7 @@ steps:
     run: 'touch "{marker}"'
     depends: [nyse_session]
 ''')
-        env = {"HOME": str(root), "PATH": "/usr/bin:/bin", "TMPDIR": os.environ["TMPDIR"]}
+        env = {"HOME": str(root), "PATH": "/usr/bin:/bin", "TMPDIR": str(root)}
         version = subprocess.run([str(DAGU), "version"], env=env, cwd=root,
                                  capture_output=True, text=True, timeout=15, check=False)
         if version.returncode or "2.16.6" not in version.stdout:
@@ -158,6 +171,26 @@ class NativeDaguTests(unittest.TestCase):
 
     def test_native_stale_input_is_visible_and_skips_dependents(self):
         self.check_probe("stale_input", 5, False)
+
+    def test_native_probe_uses_its_private_root_when_tmpdir_is_unset(self):
+        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR")) as temporary, \
+                mock.patch.dict(os.environ), mock.patch.object(tempfile, "tempdir", temporary):
+            os.environ.pop("TMPDIR", None)
+            proof = native_dagu_probe("session")
+        self.assertEqual(proof["exit"], 0, proof["output"])
+        self.assertEqual(proof["native_status"]["status"], 4)
+        self.assertTrue(proof["marker_created"])
+
+    @unittest.skipUnless(CALENDAR_PYTHON, "requires the locked calendar SDK")
+    def test_native_unavailable_input_fails_run_and_blocks_dependents(self):
+        for token in ("missing_input", "stale_input", "future_input"):
+            with self.subTest(token=token):
+                proof = native_dagu_probe(token, session_script=HERE / "session_day.py")
+                self.assertNotEqual(proof["exit"], 0, proof["output"])
+                self.assertEqual(proof["native_status"]["status"], 2)
+                self.assertEqual(proof["native_status"]["nodes"][0]["status"], 2)
+                self.assertIn(token, proof["output"])
+                self.assertFalse(proof["marker_created"])
 
 
 class HostingContractTests(unittest.TestCase):
@@ -214,6 +247,34 @@ class HostingContractTests(unittest.TestCase):
             calendar.is_session.return_value = False
             self.assertEqual(SESSION.eligibility(calendar, now, events), "non_session")
 
+    def test_session_cli_fails_unavailable_inputs_but_keeps_calendar_skips(self):
+        calendar = mock.Mock()
+        calendar.is_session.return_value = True
+        calendar.session_close.return_value = datetime.fromisoformat("2026-11-27T18:00:00Z")
+        now = "2026-11-27T21:30:00Z"
+        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR")) as temporary:
+            events = Path(temporary) / "events.json"
+            for token, instant in (("missing_input", None),
+                                   ("stale_input", "2026-11-26T22:00:00Z"),
+                                   ("future_input", "2026-11-27T21:31:00Z")):
+                if instant:
+                    events.write_text("[]")
+                    epoch = datetime.fromisoformat(instant).timestamp()
+                    os.utime(events, (epoch, epoch))
+                output = io.StringIO()
+                with self.subTest(token=token), mock.patch.object(SESSION, "version", return_value="4.13.2"), \
+                        mock.patch.object(SESSION, "calendar_for", return_value=calendar), redirect_stdout(output):
+                    self.assertEqual(SESSION.main(["--at", now, "--events", str(events)]), 1)
+                    self.assertEqual(output.getvalue().strip(), token)
+            for token, at, is_session in (("non_session", now, False),
+                                          ("before_close", "2026-11-27T17:00:00Z", True)):
+                calendar.is_session.return_value = is_session
+                output = io.StringIO()
+                with self.subTest(token=token), mock.patch.object(SESSION, "version", return_value="4.13.2"), \
+                        mock.patch.object(SESSION, "calendar_for", return_value=calendar), redirect_stdout(output):
+                    self.assertEqual(SESSION.main(["--at", at, "--events", str(events)]), 0)
+                    self.assertEqual(output.getvalue().strip(), token)
+
     def test_wrong_calendar_version_fails_in_the_normal_step(self):
         with mock.patch.object(SESSION, "version", return_value="0.0"):
             with self.assertRaisesRegex(RuntimeError, "locked exchange-calendars"):
@@ -260,8 +321,62 @@ class HostingContractTests(unittest.TestCase):
             with self.subTest(script=name):
                 ast.parse((HERE / f"{name}.py").read_text(), feature_version=(3, 11))
 
+    def test_round2_receipt_names_published_base_and_hash_pinned_working_tree(self):
+        receipt = json.loads((ROOT / "evidence/receipts/trading-unattended-hosting-recovery-r2-20261005.json").read_text())
+        self.assertTrue(receipt["source_git_commit"].startswith("4c897418f"))
+        self.assertEqual(receipt["source_revision"],
+                         "working tree after round-2 repair; files pinned by integration_source_sha256")
+        self.assertTrue(receipt["integration_source_sha256"])
+
 
 class DrillGuardTests(unittest.TestCase):
+    def restart_fixture(self, *, restart_at=None, kill_code=0):
+        due = datetime.fromisoformat("2026-10-05T16:30:00-04:00")
+        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR")) as temporary:
+            root = Path(temporary)
+            config = root / "config.yaml"
+            config.write_text("permissions:\n  run_dags: false\n")
+            history = root / "history"
+            history.mkdir()
+            binary = root / "dagu"
+            status = {"name": "equity-research-evidence", "dagRunId": "fixture-run", "triggerType": 1,
+                      "status": 4, "scheduleTime": due.isoformat(),
+                      "nodes": [{"step": {"id": step}, "status": 4} for step in
+                                ("calendar_check", "nyse_session", "prepare_output", "summarize",
+                                 "baseline_evidence", "catalog_evidence")]}
+            (history / "status.jsonl").write_text(json.dumps(status) + "\n")
+            before = {"ActiveState": "active", "Restart": "on-failure", "MainPID": "10", "NRestarts": "0",
+                      "ExecStart": f"{binary} start-all --config {config}"}
+            after = {**before, "MainPID": "20", "NRestarts": "1"}
+            commands = []
+
+            def run(command, **kwargs):
+                commands.append(command)
+                return SimpleNamespace(returncode=kill_code if command[0] == "systemctl" else 0,
+                                       stdout="" if command[0] == "systemctl" else '[{"dagRunId":"fixture-run"}]')
+
+            output = io.StringIO()
+            with mock.patch.object(RESTART, "datetime", wraps=datetime) as clock, \
+                    mock.patch.object(RESTART, "require_session"), \
+                    mock.patch.object(RESTART, "validate_process"), \
+                    mock.patch.object(RESTART, "unit_state", side_effect=[before, after]), \
+                    mock.patch.object(RESTART.subprocess, "run", side_effect=run), \
+                    mock.patch.object(RESTART.os, "kill") as kill, \
+                    mock.patch.object(RESTART.time, "monotonic", return_value=0), redirect_stdout(output):
+                clock.now.side_effect = [due - timedelta(minutes=5), due - timedelta(minutes=5),
+                                         restart_at or due - timedelta(minutes=4)]
+                result = RESTART.main(["--dagu-bin", str(binary), "--dagu-home", str(root),
+                                       "--config", str(config), "--dag-history", str(history),
+                                       "--due-at", due.isoformat()])
+                return result, json.loads(output.getvalue()), commands, kill.called
+
+    def test_restart_fault_is_delivered_by_native_unit_addressed_kill(self):
+        result, observed, commands, pid_signal = self.restart_fixture()
+        self.assertEqual(result, 0, observed)
+        self.assertEqual(commands[0], ["systemctl", "--user", "kill", "--kill-whom=main",
+                                       "--signal=SIGKILL", "dagu-equities.service"])
+        self.assertFalse(pid_signal)
+
     def test_restart_time_window_refuses_wrong_slot_past_close_and_short_reserve(self):
         due = datetime.fromisoformat("2026-10-05T16:30:00-04:00")
         RESTART.validate_window(due, due - timedelta(minutes=5), 900)
@@ -272,6 +387,19 @@ class DrillGuardTests(unittest.TestCase):
                                 (due, due - timedelta(minutes=5), 3601)):
             with self.subTest(slot=slot, wait=wait), self.assertRaises(ValueError):
                 RESTART.validate_window(slot, now, wait)
+
+    def test_restart_reserves_150_seconds_before_due_and_refuses_late_restart(self):
+        due = datetime.fromisoformat("2026-10-05T16:30:00-04:00")
+        for seconds in (20, 90, 149, 150):
+            with self.subTest(seconds=seconds), self.assertRaises(ValueError):
+                RESTART.validate_window(due, due - timedelta(seconds=seconds), 900)
+        RESTART.validate_window(due, due - timedelta(seconds=151), 900)
+        for restart_at in (due, due + timedelta(seconds=1)):
+            with self.subTest(restart_at=restart_at):
+                result, observed, commands, _ = self.restart_fixture(restart_at=restart_at)
+                self.assertEqual(result, 1, observed)
+                self.assertIn("at or after the due slot", observed["reason"])
+                self.assertEqual(len(commands), 1)  # No history polling after a missed slot.
 
     def test_restart_refuses_holiday_and_calendar_failure_before_signalling(self):
         due = datetime.fromisoformat("2026-01-01T16:30:00-05:00")
@@ -430,6 +558,28 @@ class JournalRecoveryTests(unittest.TestCase):
                 RECOVERY.snapshot_journals(self.sources, self.root / "timeout-stage", self.oracle,
                                            backup_timeout=1)
         self.assertFalse(self.oracle.exists())
+
+    def test_snapshot_cli_refuses_rollback_sources_without_explicit_writer_blocking_opt_in(self):
+        source = self.root / "rollback.sqlite3"
+        with closing(sqlite3.connect(source)) as db:
+            self.assertEqual(db.execute("PRAGMA journal_mode").fetchone()[0], "delete")
+            db.execute("CREATE TABLE events(id INTEGER PRIMARY KEY)")
+            db.execute("INSERT INTO events VALUES (1)")
+            db.commit()
+        args = ["snapshot", "--journal", f"rollback={source}", "--required-table", "rollback=events"]
+        output = io.StringIO()
+        with redirect_stdout(output):
+            result = RECOVERY.main(args + ["--stage", str(self.stage), "--inventory", str(self.oracle)])
+        self.assertEqual(result, 1, output.getvalue())
+        self.assertIn("WAL", json.loads(output.getvalue())["reason"])
+        self.assertFalse(self.oracle.exists())
+        output = io.StringIO()
+        with redirect_stdout(output):
+            result = RECOVERY.main(args + ["--stage", str(self.root / "opt-in-stage"),
+                                          "--inventory", str(self.root / "opt-in-inventory.json"),
+                                          "--allow-non-wal"])
+        self.assertEqual(result, 0, output.getvalue())
+        self.assertEqual(json.loads(output.getvalue())["files"][0]["required_tables"], {"events": 1})
 
     def test_missing_required_table_prevents_freezing(self):
         path = self.sources["research"][0]
@@ -619,6 +769,24 @@ class JournalRecoveryTests(unittest.TestCase):
         for parts in (0, 8):
             with self.assertRaises(RECOVERY.RecoveryError):
                 RECOVERY.check_rotation(runner, self.root / "new-rotation", parts=parts)
+
+    def test_control_backups_use_groups_distinct_from_production_retention(self):
+        for control in (None, "snapshot", "restore"):
+            label = control or "production"
+            work = self.root / f"group-{label}"
+            work.mkdir()
+            runner = FakeRestic("unused", self.root / "repository", self.root / "unused-password-file", work)
+            with self.subTest(control=control):
+                if control:
+                    with self.assertRaises(RECOVERY.RecoveryError):
+                        RECOVERY.cycle(runner, self.sources, self.root / f"{label}-state.json", parts=1, control=control)
+                else:
+                    RECOVERY.cycle(runner, self.sources, self.root / f"{label}-state.json", parts=1)
+                backup = next(args for args in runner.commands if args[0] == "backup")
+                suffix = "-control" if control else ""
+                self.assertEqual(backup[backup.index("--host") + 1], "equity-research-recovery" + suffix)
+                self.assertEqual(backup[backup.index("--tag") + 1], "journal-recovery" + suffix)
+                self.assertEqual(backup[backup.index("--group-by") + 1], "host,tags")
 
     def test_both_controls_make_the_procedure_exit_nonzero(self):
         for control in ("snapshot", "restore"):

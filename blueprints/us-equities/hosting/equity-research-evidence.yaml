@@ -25,8 +25,8 @@ steps:
   # A normal command surfaces import/version/calendar failures instead of silently skipping.
   - id: calendar_check
     # LEAN_EVENTS producer: research operator's simulation job publishes this
-    # session's input after its actual close and by 16:25 ET. Stale/missing input
-    # is a visible token and skips the native precondition/dependent chain.
+    # session's input after its actual close and by 16:25 ET. Missing/stale/future
+    # input prints a visible token and exits nonzero, failing the native run.
     run: '"${SDK_ENV}/bin/python" "${STACK_REPO}/blueprints/us-equities/hosting/session_day.py" --events "${LEAN_EVENTS}"'
     output: SESSION_DAY
   # dagucloud/dagu@v2.16.6:internal/runtime/runner.go:1633-1648, 1267-1281:

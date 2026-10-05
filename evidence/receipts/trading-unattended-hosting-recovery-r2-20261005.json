@@ -7,7 +7,7 @@
     "restic"
   ],
   "evidence_class": "local_integration",
-  "source_git_commit": "b3a01ce273952260df0b552d5075997b737b71ad",
+  "source_git_commit": "4c897418fe35a030a1188ae447eaf31c893f8eff",
   "observed_at_utc": "2026-10-05T05:34:37.145949+00:00",
   "claim": "Round 2 native restic 0.19.1 backed up two synthetic WAL journals using CPython Online Backup pages=-1 during independently observed commits, checked subset 1/1, restored 16531456 identical journal bytes against the external inventory and required state, and refused native-exit-3 snapshot and same-count/same-integrity content-mutation restore controls. Dagu 2.16.6 validated the revised DAG and executed native manual skip/success/stale-input probes. 42 stdlib tests passed including real exchange_calendars 4.13.2 cases. Cron Next was not executable: no Go compiler found. Operating-host and off-host gates remain open.",
   "limitations": [
@@ -192,8 +192,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/evidence/upstream-glue-review-r2.json",
-      "sha256": "2f8c7896b7277264801fc4b701375c612574619a2b96190202396fb52b00e2e7",
-      "bytes": 15859
+      "sha256": "5b739577ab84d9c2316d9fba07bc93ae3bd13ac4873cbd3f253891a6132fb488",
+      "bytes": 17556
     },
     {
       "path": "blueprints/us-equities/hosting/evidence/cron-next-probe-r2.json",
@@ -532,5 +532,6 @@
   "review": {
     "kind": "self",
     "scope": "Original pinned source/native capability review, real calendar regression, native manual Dagu runs, native restic controls and independent bytes/state observations. Coordinator review remains separate."
-  }
+  },
+  "source_revision": "working tree after round-2 repair; files pinned by integration_source_sha256"
 }

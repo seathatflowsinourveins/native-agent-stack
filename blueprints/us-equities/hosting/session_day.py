@@ -71,8 +71,10 @@ def main(argv=None) -> int:
     now = datetime.fromisoformat(args.at) if args.at else datetime.now(MARKET_ZONE)
     if now.utcoffset() is None:
         raise ValueError("--at requires an explicit offset")
-    print(eligibility(calendar_for(now), now, args.events))
-    return 0
+    token = eligibility(calendar_for(now), now, args.events)
+    print(token)
+    # Unavailable session input must be visible to Dagu's failed-run history/handlers.
+    return 1 if token in {"missing_input", "stale_input", "future_input"} else 0
 
 
 if __name__ == "__main__":

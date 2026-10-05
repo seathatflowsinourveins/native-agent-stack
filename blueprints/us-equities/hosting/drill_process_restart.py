@@ -20,11 +20,13 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import signal
 import subprocess
 import time
 
 import session_day
+
+RESTART_ALLOWANCE_SECONDS = 90
+RESTART_MARGIN_SECONDS = 60
 
 
 def unit_state(unit: str) -> dict:
@@ -72,8 +74,8 @@ def validate_window(due: datetime, now: datetime, wait_seconds: int) -> None:
     market = due.astimezone(session_day.MARKET_ZONE)
     if (market.hour, market.minute, market.second, market.microsecond) != (16, 30, 0, 0):
         raise ValueError("--due-at must be the named schedule's 16:30 New York slot")
-    if not now + timedelta(seconds=15) < due < now + timedelta(seconds=wait_seconds - 180):
-        raise ValueError("run the drill shortly before the next due slot; reserve 180 seconds for completion")
+    if not now + timedelta(seconds=RESTART_ALLOWANCE_SECONDS + RESTART_MARGIN_SECONDS) < due < now + timedelta(seconds=wait_seconds - 180):
+        raise ValueError("reserve more than 150 seconds before the due slot and 180 seconds for completion")
 
 
 def require_session(due: datetime) -> None:
@@ -120,14 +122,23 @@ def main(argv=None) -> int:
         pid = int(before["MainPID"])
         # Linux operating-host drill: verify identity before signalling this one process.
         validate_process(pid, args.dagu_bin)
+        validate_window(due, datetime.now(timezone.utc), args.wait_seconds)
         deadline = time.monotonic() + args.wait_seconds
-        os.kill(pid, signal.SIGKILL)  # SIGTERM is a clean exit and need not trigger on-failure.
-        restart_deadline = min(deadline, time.monotonic() + 90)
+        # systemd/systemd@v255:man/systemctl.xml:541-549,2377-2388:
+        # Address the unit's current main process, avoiding PID reuse after the guard.
+        fault = subprocess.run(["systemctl", "--user", "kill", "--kill-whom=main",
+                                "--signal=SIGKILL", args.unit],
+                               capture_output=True, text=True, timeout=15, check=False)
+        if fault.returncode:
+            raise ValueError(f"systemctl kill failed (exit {fault.returncode})")
+        restart_deadline = min(deadline, time.monotonic() + RESTART_ALLOWANCE_SECONDS)
         while True:
             after = unit_state(args.unit)
             if (after.get("ActiveState") == "active" and int(after.get("MainPID", "0")) not in (0, pid) and
                     int(after.get("NRestarts", "0")) > int(before["NRestarts"])):
                 validate_process(int(after["MainPID"]), args.dagu_bin)
+                if datetime.now(timezone.utc) >= due:
+                    raise ValueError("start-all restarted at or after the due slot; schedule was missed")
                 break
             if time.monotonic() >= restart_deadline:
                 raise ValueError("start-all did not restart within 90 seconds")

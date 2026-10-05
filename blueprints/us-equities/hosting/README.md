@@ -172,13 +172,42 @@ additional cron or run. Step skip and dependency propagation come from
 On a session after close, `--events "${LEAN_EVENTS}"` also requires the events
 file's mtime to be between that session's actual close and the check instant.
 `missing_input`, `stale_input` or `future_input` are visible normal-step output
-tokens; the **native Dagu precondition** skips the evidence chain, so stale input
-cannot produce a succeeded summarization. The native run itself can be succeeded
-with skipped steps; inspect its token and node statuses. Calendar/import/IO errors
-remain failures. The producer must complete and atomically publish that session's
+tokens with **exit 1**, so Dagu fails the run and blocks the dependent evidence
+chain. They appear in `dagu history --status failed`; only `non_session` and
+`before_close` retain a successful guard and a skipped research chain.
+Calendar/import/IO errors remain failures. The producer must complete and atomically publish that session's
 local LEAN simulation output by 16:25; mtime is an availability contract, not
 proof of the market dates or quality inside a file. No upstream acquisition job
 is introduced here.
+
+## Manual run, cancellation and replay
+
+On the chosen operating host, use the same private config and DAG as the service.
+Start a manual check with a fresh, operator-chosen run ID:
+
+```sh
+"$DAGU_BIN" start --context local --dagu-home "$PRIVATE_DAGU_HOME" \
+  --config "$PRIVATE_CONFIG" --run-id "$NEW_RUN_ID" "$PRIVATE_DAG"
+```
+
+In another terminal, cancel that exact active run and inspect its native history:
+
+```sh
+"$DAGU_BIN" stop --context local --dagu-home "$PRIVATE_DAGU_HOME" \
+  --config "$PRIVATE_CONFIG" --run-id "$NEW_RUN_ID" equity-research-evidence
+"$DAGU_BIN" history --context local --dagu-home "$PRIVATE_DAGU_HOME" \
+  --config "$PRIVATE_CONFIG" --run-id "$NEW_RUN_ID" \
+  --status succeeded,failed,aborted --limit 1000 --format json equity-research-evidence
+```
+
+An aborted or failed run needs inspection and corrected input before replay.
+Replay with another fresh run ID using the start command; `DAG_RUN_ID` keeps
+earlier output intact. A manual run before close or on a holiday skips the
+research steps. A manual run never proves scheduler dispatch or catch-up. These
+commands are operator procedures, not commands run by this builder. Sources:
+`dagucloud/dagu@v2.16.6:internal/cmd/start.go:45-67; internal/cmd/stop.go:20-38,53-91;
+internal/cmd/history.go:160-345; internal/cmd/flags.go:463-481`, corroborated by
+the installed 2.16.6 `start`, `stop` and `history --help` (all exit 0).
 
 ## Journal snapshot and restic procedure
 
@@ -191,6 +220,13 @@ Select **every journal required by the research consumer**, with explicit requir
 tables. The procedure opens each source read-only and uses
 `sqlite3.Connection.backup(..., pages=-1)` within a read transaction to a new staging directory, then closes the destination
 in DELETE journal mode. Never copy an active SQLite, WAL or SHM file directly.
+The source must already use **WAL**; the worker checks `PRAGMA journal_mode`
+and refuses other modes by default without modifying the source. Explicit
+`--allow-non-wal` on `snapshot` or `cycle` accepts writer blocking: the source
+read transaction holds a SHARED lock throughout the bounded copy, so a
+rollback-journal writer can receive `SQLITE_BUSY` while trying to commit.
+Prefer quiescing those writers before opting in. WAL permits concurrent writers.
+Source: `sqlite/sqlite@version-3.53.1:src/backup.c:346-354,383-389`.
 Sources: `python/cpython@v3.12.3:Doc/library/sqlite3.rst:1107-1155`
 ([concurrent backup and example](https://github.com/python/cpython/blob/v3.12.3/Doc/library/sqlite3.rst#L1107))
 and `Modules/_sqlite/connection.c:2013,2067-2102`. One native step avoids restarting
@@ -276,6 +312,11 @@ with the chosen retention counts. Retention counts and deletion remain unaccepte
 this procedure performs neither forget nor prune. Sources:
 `restic/restic@v0.19.1:doc/040_backup.rst:197-206` and
 `doc/060_forget.rst:225-233`.
+Controls are for **disposable repositories only**. Their backups use the distinct
+host `equity-research-recovery-control` and tag `journal-recovery-control` with
+the same `host,tags` grouping. An exit-3 control snapshot therefore cannot become
+a production backup parent or count in production retention. The local drill
+creates its disposable repository; never point a control at the operating repository.
 
 Remote repository URLs are outside this local procedure. A second-host consumer
 can run `verify --restored "$RESTORE" --inventory "$FROZEN_INVENTORY"` against
@@ -288,8 +329,13 @@ Run [drill_process_restart.py](drill_process_restart.py) **later on the operatin
 host**, shortly before the next eligible 16:30 slot, using its locked trading
 Python. Supply `--dagu-bin`, `--dagu-home`, `--config`, this one DAG's
 `--dag-history` directory and the exact aware `--due-at` timestamp. The script
-verifies an existing unit's MainPID and executable, kills `start-all` with
-SIGKILL, observes automatic restart and waits for the next successful due run.
+verifies an existing unit's MainPID and executable, then uses native
+`systemctl --user kill --kill-whom=main --signal=SIGKILL <unit>` to address that
+unit's current main process. The window must reserve **more than 150 seconds**
+before due (90 seconds restart allowance plus 60 seconds margin) and 180 seconds
+after due for completion; it is checked again just before fault delivery.
+A restart observed at or after due fails with a distinct missed-slot reason.
+The drill observes automatic restart and waits for the next successful due run.
 Native history plus original `status.jsonl` must attest the exact `scheduleTime`
 and scheduler trigger, with every required research step succeeded, while the
 deployed UI has `run_dags: false`. A skipped evidence chain does not count. A manual run
@@ -297,6 +343,15 @@ does not count. The script installs, enables and starts no unit. SIGKILL induces
 failure; under `Restart=on-failure`, clean SIGTERM need not trigger restart
 (`systemd/systemd@v255:man/systemd.service.xml:818-836`
 [source](https://github.com/systemd/systemd/blob/v255/man/systemd.service.xml#L818)).
+Unit-addressed fault delivery is provided by
+`systemd/systemd@v255:man/systemctl.xml:541-549,2377-2388`.
+Dagu's supported REST run-details API also exposes `scheduleTime` and
+`triggerType` (`dagucloud/dagu@v2.16.6:internal/service/frontend/api/v1/dagruns.go:2066-2096;
+transformer.go:362,371`). This later acceptance drill retains original
+`status.jsonl` to hash and corroborate the native bytes without an HTTP/auth
+dependency. That internal format requires revalidation on a Dagu pin move.
+The omitted `catchup_window` does not replay missed slots
+(`dagucloud/dagu@v2.16.6:internal/cmn/schema/dag.schema.json:151-153`).
 
 **A process-restart drill is not reboot, missed-run or independent-alert acceptance.**
 It observes one process failure and the following slot. Host boot, downtime across
@@ -341,6 +396,18 @@ and success chains. The [pinned cron Next probe](evidence/cron-next-probe-r2.jso
 was prepared from v3.0.1 source but returned 127 because no Go compiler was found;
 its DST expectations are recorded, not measured. No compiler was installed.
 
+The [round 3 native DAG proof](evidence/native-dagu-probes-r3.json) executes all
+six deployed steps in a private scratch copy with the locked SDK, synthetic
+historical LEAN input and a fixed post-close guard clock. All six steps and the
+run succeed; native history with `--context local --from <UTC Z> --status succeeded
+--limit 1000` returns that manual run. Separate real-guard missing/stale/future
+probes each exit 1 and record failed run/guard status 2 with no dependent marker.
+The [round 3 recovery proof](evidence/offline-proof-r3.json) observes concurrent
+WAL writes during both copies and verifies that both failing controls use their
+separate host/tag group. These are local integration fixtures; no scheduler or
+operating-host restart ran. The [round 3 receipt](../../../evidence/receipts/trading-unattended-hosting-recovery-r3-20261005.json)
+pins tested source hashes and records the red/green regressions and native output.
+
 ## Why this glue exists
 
 The [pinned native review](evidence/upstream-glue-review-r2.json) records installed
@@ -355,7 +422,7 @@ job, and independent alerts still need user decision 2.
 | --- | --- |
 | `session_day.py` | `gerrymanoim/exchange_calendars@4.13.2:pyproject.toml:67-68; exchange_calendars/ecal.py:100-149` ships a calendar renderer; its `exchange_calendar.py:1012-1016,1257-1279` APIs supply session/close queries, leaving our eligibility/freshness token as job policy. |
 | `journal_recovery.py` | `restic/restic@v0.19.1:doc/040_backup.rst:679-703; doc/045_working_with_repos.rst:482-521; doc/050_restore.rst:55-73` supplies stream backup, partition checks and restore, leaving the external frozen oracle, required table contract, bounded rotation and failure controls to the consumer. |
-| `drill_process_restart.py` | `systemd/systemd@v255:man/systemd.service.xml:818-836` supplies restart and Dagu `@v2.16.6:internal/cmd/history.go:568-602` supplies history without slot/trigger fields, leaving identity guards and exact-slot evidence correlation as the acceptance drill. |
+| `drill_process_restart.py` | `systemd/systemd@v255:man/systemctl.xml:541-549,2377-2388` supplies unit-addressed kill and `man/systemd.service.xml:818-836` supplies restart; Dagu `@v2.16.6:internal/service/frontend/api/v1/transformer.go:362,371` supplies slot/trigger fields, leaving identity/time/holiday guards and exact-slot correlation as acceptance policy. |
 | `drill_local_recovery.py` | `python/cpython@v3.12.3:Modules/_sqlite/connection.c:2067-2102` supplies Online Backup and restic `@v0.19.1:doc/050_restore.rst:55-73` supplies restore, leaving the concurrent-write fixture, two deliberately failing controls and path-free receipt as our local integration evidence. |
 
 Specifically checked: `restic backup --stdin-from-command -- sqlite3 "$DB"
