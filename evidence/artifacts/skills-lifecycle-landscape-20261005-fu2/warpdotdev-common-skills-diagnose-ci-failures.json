@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-warpdotdev-common-skills-diagnose-ci-failures",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "warpdotdev/common-skills@diagnose-ci-failures",
+ "reviewed_commit": "69b4753651ab7fab518c82be087b9f1d5b966631",
+ "readme_path": ".agents/skills/diagnose-ci-failures/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-ci-pr"
+ ],
+ "claim": "Source review of the skill diagnose-ci-failures in warpdotdev/common-skills at commit 69b4753651ab7fab518c82be087b9f1d5b966631 (the adjudicated pin; license MIT), read from .agents/skills/diagnose-ci-failures/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for diagnose-ci-failures; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is bcea6d2791a949c4ee98fd126cb22c55a512d77a. Survived the landscape-sweep-skills-20261005-fu2-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6 through the OmniRoute pool (requested routes; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 604,
+  "pushed_at": "2026-09-30T22:51:00Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "69b4753651ab7fab518c82be087b9f1d5b966631",
+  "pin_lookup": "ok",
+  "skill_md_found_by": ".agents/skills/, the first location the CLI searches that holds a valid folder named diagnose-ci-failures",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "eacf6cc68063d5c92e1d0a87051b4c5cdd0a18cf8931cb4def3ae541808ddfc8",
+  "skill_md_bytes": 3997,
+  "survivor_skill_md_sha256": "eacf6cc68063d5c92e1d0a87051b4c5cdd0a18cf8931cb4def3ae541808ddfc8",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "bcea6d2791a949c4ee98fd126cb22c55a512d77a",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": ".agents/skills/diagnose-ci-failures/SKILL.md@69b4753651ab7fab518c82be087b9f1d5b966631",
+   "text": "Programmatically diagnose CI failures for a PR and generate a plan to fix them."
+  },
+  {
+   "source": ".agents/skills/diagnose-ci-failures/SKILL.md@69b4753651ab7fab518c82be087b9f1d5b966631",
+   "text": "This skill provides a deterministic workflow to check CI status for a PR, extract failure logs, analyze errors, and create a plan (not code changes) to resolve issues. The output is always a plan document that can be reviewed before execution."
+  },
+  {
+   "source": ".agents/skills/diagnose-ci-failures/SKILL.md@69b4753651ab7fab518c82be087b9f1d5b966631",
+   "text": "# Check for PR GH_PAGER=cat gh pr view <branch-name> --json number,title,url,state ```"
+  }
+ ]
+}

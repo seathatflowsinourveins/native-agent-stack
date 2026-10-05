@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-anthropics-claude-plugins-official-claude-md-improver",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "anthropics/claude-plugins-official@claude-md-improver",
+ "reviewed_commit": "d182ca456ca09d31d139f7d3818d1d333b103cce",
+ "readme_path": "plugins/claude-md-management/skills/claude-md-improver/SKILL.md",
+ "license": "Apache-2.0",
+ "layers": [
+  "skills-agent-docs"
+ ],
+ "claim": "Source review of the skill claude-md-improver in anthropics/claude-plugins-official at commit d182ca456ca09d31d139f7d3818d1d333b103cce (the adjudicated pin; license Apache-2.0), read from plugins/claude-md-management/skills/claude-md-improver/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for claude-md-improver; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 7188018e6710998fbc3227fdacd1b2b6e0508c38. Survived the landscape-sweep-skills-20261005-fu2-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6 through the OmniRoute pool (requested routes; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 37425,
+  "pushed_at": "2026-10-05T17:22:01Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "Apache-2.0",
+  "adjudicated_pin": "d182ca456ca09d31d139f7d3818d1d333b103cce",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "plugins/claude-md-management/skills/, the first location the CLI searches that holds a valid folder named claude-md-improver",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "b06c7420be08ca1c7f6d75f7f4709fdb787624a2d363e2f8052216d8c780f85b",
+  "skill_md_bytes": 6028,
+  "survivor_skill_md_sha256": "b06c7420be08ca1c7f6d75f7f4709fdb787624a2d363e2f8052216d8c780f85b",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "7188018e6710998fbc3227fdacd1b2b6e0508c38",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "plugins/claude-md-management/skills/claude-md-improver/SKILL.md@d182ca456ca09d31d139f7d3818d1d333b103cce",
+   "text": "Audit, evaluate, and improve CLAUDE.md files across a codebase to ensure Claude Code has optimal project context."
+  },
+  {
+   "source": "plugins/claude-md-management/skills/claude-md-improver/SKILL.md@d182ca456ca09d31d139f7d3818d1d333b103cce",
+   "text": "**This skill can write to CLAUDE.md files.** After presenting a quality report and getting user approval, it updates CLAUDE.md files with targeted improvements."
+  },
+  {
+   "source": "plugins/claude-md-management/skills/claude-md-improver/SKILL.md@d182ca456ca09d31d139f7d3818d1d333b103cce",
+   "text": "```bash find . -name \"CLAUDE.md\" -o -name \".claude.md\" -o -name \".claude.local.md\" 2>/dev/null | head -50 ```"
+  }
+ ]
+}

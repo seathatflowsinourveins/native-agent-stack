@@ -1,0 +1,130 @@
+[
+ {
+  "repository": "agent-sh/agnix@agnix",
+  "path": "agent-sh-agnix-agnix.json",
+  "layers": [
+   "skills-agent-docs"
+  ]
+ },
+ {
+  "repository": "anthropics/claude-plugins-official@claude-md-improver",
+  "path": "anthropics-claude-plugins-official-claude-md-improver.json",
+  "layers": [
+   "skills-agent-docs"
+  ]
+ },
+ {
+  "repository": "ast-grep/agent-skill@ast-grep",
+  "path": "ast-grep-agent-skill-ast-grep.json",
+  "layers": [
+   "skills-review"
+  ]
+ },
+ {
+  "repository": "BoundaryML/baml@baml-core",
+  "path": "boundaryml-baml-baml-core.json",
+  "layers": [
+   "skills-review"
+  ]
+ },
+ {
+  "repository": "dyoshikawa/rulesync@rulesync",
+  "path": "dyoshikawa-rulesync-rulesync.json",
+  "layers": [
+   "skills-agent-docs"
+  ]
+ },
+ {
+  "repository": "EveryInc/compound-engineering-plugin@ce-babysit-pr",
+  "path": "everyinc-compound-engineering-plugin-ce-babysit-pr.json",
+  "layers": [
+   "skills-ci-pr"
+  ]
+ },
+ {
+  "repository": "getsentry/skills@agents-md",
+  "path": "getsentry-skills-agents-md.json",
+  "layers": [
+   "skills-agent-docs"
+  ]
+ },
+ {
+  "repository": "mattpocock/skills@code-review",
+  "path": "mattpocock-skills-code-review.json",
+  "layers": [
+   "skills-review"
+  ]
+ },
+ {
+  "repository": "mblode/agent-skills@agents-md",
+  "path": "mblode-agent-skills-agents-md.json",
+  "layers": [
+   "skills-agent-docs"
+  ]
+ },
+ {
+  "repository": "Parcha-ai/parcha-skills@review-loop",
+  "path": "parcha-ai-parcha-skills-review-loop.json",
+  "layers": [
+   "skills-ci-pr"
+  ]
+ },
+ {
+  "repository": "warpdotdev/common-skills@diagnose-ci-failures",
+  "path": "warpdotdev-common-skills-diagnose-ci-failures.json",
+  "layers": [
+   "skills-ci-pr"
+  ]
+ },
+ {
+  "repository": "warpdotdev/common-skills@resolve-merge-conflicts",
+  "path": "warpdotdev-common-skills-resolve-merge-conflicts.json",
+  "layers": [
+   "skills-ci-pr"
+  ]
+ },
+ {
+  "repository": "warpdotdev/common-skills@respond-to-pr-comments-in-blocklist",
+  "path": "warpdotdev-common-skills-respond-to-pr-comments-in-blocklist.json",
+  "layers": [
+   "skills-ci-pr"
+  ]
+ },
+ {
+  "repository": "Zandereins/schliff@schliff",
+  "path": "zandereins-schliff-schliff.json",
+  "layers": [
+   "skills-agent-docs"
+  ]
+ },
+ {
+  "repository": "addyosmani/agent-skills@context-engineering",
+  "layers": [
+   "skills-agent-docs"
+  ],
+  "status": "stopped",
+  "pin": "1401c8b8030e023baeebb31781a6653fe8e93026",
+  "pin_lookup": null,
+  "reason": "addyosmani/agent-skills@context-engineering: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the refuters judged"
+ },
+ {
+  "repository": "cursor/plugins@get-pr-comments",
+  "layers": [
+   "skills-ci-pr"
+  ],
+  "status": "stopped",
+  "pin": "77526ffa67f8dafc698d14b5356e6d4fc78c3127",
+  "pin_lookup": null,
+  "reason": "cursor/plugins@get-pr-comments: the survivor's skill_md_sha256 is null, so nothing ties a review to the bytes the refuters judged"
+ },
+ {
+  "repository": "openai/plugins@verify-fix",
+  "layers": [
+   "skills-review"
+  ],
+  "status": "stopped",
+  "pin": "5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f",
+  "pin_lookup": "ok",
+  "reason": "openai/plugins@verify-fix at 5fd93af4cd0c623e020d0cc7e9ce178b4ac1f70f: no folder named verify-fix in the locations the CLI searches without --full-depth"
+ }
+]

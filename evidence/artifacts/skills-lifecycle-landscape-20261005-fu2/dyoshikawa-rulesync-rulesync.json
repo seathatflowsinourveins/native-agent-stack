@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-dyoshikawa-rulesync-rulesync",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "dyoshikawa/rulesync@rulesync",
+ "reviewed_commit": "f14b5bd1273329514c1a0b2762f6f1f1435e089b",
+ "readme_path": "skills/rulesync/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-agent-docs"
+ ],
+ "claim": "Source review of the skill rulesync in dyoshikawa/rulesync at commit f14b5bd1273329514c1a0b2762f6f1f1435e089b (the adjudicated pin; license MIT), read from skills/rulesync/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for rulesync; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 18973d3f686e837ced2148845aae995be6b37986. Survived the landscape-sweep-skills-20261005-fu2-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6 through the OmniRoute pool (requested routes; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 1500,
+  "pushed_at": "2026-10-05T04:28:31Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "f14b5bd1273329514c1a0b2762f6f1f1435e089b",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named rulesync",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "838e7d2a887a45c961729a9626d2363803240dd60f0363f62a24662792ca98bc",
+  "skill_md_bytes": 3568,
+  "survivor_skill_md_sha256": "838e7d2a887a45c961729a9626d2363803240dd60f0363f62a24662792ca98bc",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "18973d3f686e837ced2148845aae995be6b37986",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/rulesync/SKILL.md@f14b5bd1273329514c1a0b2762f6f1f1435e089b",
+   "text": "Rulesync generates and synchronizes AI rule configuration files across 20+ coding tools (Claude Code, Cursor, Copilot, Cline, Gemini CLI, and more) from a single set of unified rule files in `.rulesync/`."
+  },
+  {
+   "source": "skills/rulesync/SKILL.md@f14b5bd1273329514c1a0b2762f6f1f1435e089b",
+   "text": "# New project: initialize config, rules, and directory structure rulesync init"
+  },
+  {
+   "source": "skills/rulesync/SKILL.md@f14b5bd1273329514c1a0b2762f6f1f1435e089b",
+   "text": "# Import existing AI tool configs into unified format rulesync import --targets claudecode # From CLAUDE.md rulesync import --targets cursor # From .cursorrules rulesync import --targets copilot # From .github/copilot-instructions.md"
+  }
+ ]
+}

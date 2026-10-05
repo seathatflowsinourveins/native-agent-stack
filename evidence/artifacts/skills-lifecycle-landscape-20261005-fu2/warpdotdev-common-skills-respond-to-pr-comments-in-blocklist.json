@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-warpdotdev-common-skills-respond-to-pr-comments-in-blocklist",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "warpdotdev/common-skills@respond-to-pr-comments-in-blocklist",
+ "reviewed_commit": "69b4753651ab7fab518c82be087b9f1d5b966631",
+ "readme_path": ".agents/skills/respond-to-pr-comments-in-blocklist/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-ci-pr"
+ ],
+ "claim": "Source review of the skill respond-to-pr-comments-in-blocklist in warpdotdev/common-skills at commit 69b4753651ab7fab518c82be087b9f1d5b966631 (the adjudicated pin; license MIT), read from .agents/skills/respond-to-pr-comments-in-blocklist/SKILL.md at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for respond-to-pr-comments-in-blocklist; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is 2064d298296ff9a893690124ab6df0e223e988bf. Survived the landscape-sweep-skills-20261005-fu2-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6 through the OmniRoute pool (requested routes; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 604,
+  "pushed_at": "2026-09-30T22:51:00Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "69b4753651ab7fab518c82be087b9f1d5b966631",
+  "pin_lookup": "ok",
+  "skill_md_found_by": ".agents/skills/, the first location the CLI searches that holds a valid folder named respond-to-pr-comments-in-blocklist",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "e0fb9b1fd723745ffa767c0b8a8a9f41c035ad19046f22573232af59cd21934b",
+  "skill_md_bytes": 14253,
+  "survivor_skill_md_sha256": "e0fb9b1fd723745ffa767c0b8a8a9f41c035ad19046f22573232af59cd21934b",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "2064d298296ff9a893690124ab6df0e223e988bf",
+  "disable_model_invocation": false,
+  "openai_yaml_path": null,
+  "openai_yaml_reader": null,
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no agents/openai.yaml: Codex allows implicit invocation"
+ },
+ "documentation_excerpts": [
+  {
+   "source": ".agents/skills/respond-to-pr-comments-in-blocklist/SKILL.md@69b4753651ab7fab518c82be087b9f1d5b966631",
+   "text": "Use this skill to respond to PR comments on the current branch. If comments are already visible in the conversation, typically from the built-in `/pr-comments` skill, continue from that context. If comments are not already visible, fetch and display them first, then guide the user through each actionable comment, collect an explicit decision, make requested code changes, and only then ask for approval before posting GitHub replies or resolving review threads."
+  },
+  {
+   "source": ".agents/skills/respond-to-pr-comments-in-blocklist/SKILL.md@69b4753651ab7fab518c82be087b9f1d5b966631",
+   "text": "Skip this skill when the user only wants PR comments fetched or displayed (use `pr-comments` instead) or only wants the underlying code changes made, with no intent to post replies or resolve threads on GitHub. Read this skill only once the user has confirmed they want replies posted or threads resolved."
+  },
+  {
+   "source": ".agents/skills/respond-to-pr-comments-in-blocklist/SKILL.md@69b4753651ab7fab518c82be087b9f1d5b966631",
+   "text": "- Work in the repository checkout for the PR branch. - Do not refetch comments unless the loaded context is missing essential fields such as comment body, author, URL, path, or line metadata. - Do not post GitHub replies, submit reviews, or resolve threads until the final preview is approved by the user."
+  }
+ ]
+}

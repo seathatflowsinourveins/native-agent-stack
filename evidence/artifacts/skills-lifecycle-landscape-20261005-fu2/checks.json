@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "checked_at_utc": "2026-10-05T20:30:13Z",
+  "fixed_main": "424b8a778222ae8857aade42c49ae6f7a13b3138",
+  "commands": [
+    {
+      "command": "python3 -m unittest tests.test_saturation_ledger tests.test_landscape_sweep_harness tests.test_landscape_sweep_skills",
+      "exit_code": 0,
+      "tests": 498,
+      "failures": 0,
+      "skipped": 6,
+      "elapsed_seconds": 139.243,
+      "raw_log_sha256": "abdd990d489622048f1e42d02da2652582a7a90d6fcff9c31f22ef330e6e934d",
+      "temporary_directory_scope": "owned-cache TMPDIR outside shared tmpfs"
+    },
+    {
+      "command": "python3 -m unittest tests.test_skills_manifest tests.test_install_skills tests.test_skills_status tests.test_render_config tests.test_adoption_docs_consistency tests.test_runtime_worker_skills",
+      "exit_code": 0,
+      "tests": 272,
+      "failures": 0,
+      "skipped": 1,
+      "elapsed_seconds": 34.72,
+      "raw_log_sha256": "0e66c81fecb73d5ee940d51d0f5d82690d9e8a413747a4ed19b5b5c435822aac",
+      "temporary_directory_scope": "owned-cache TMPDIR outside shared tmpfs"
+    },
+    {
+      "command": "python3 -m unittest tests.test_runtime_worker_openhands tests.test_runtime_worker_openhands_resolver tests.test_runtime_worker_openhands_push_gate tests.test_codex_worker_skill",
+      "exit_code": 0,
+      "tests": 392,
+      "failures": 0,
+      "skipped": 3,
+      "elapsed_seconds": 78.682,
+      "raw_log_sha256": "296f629230442d5db4532eade6031dca2529fb2db2229806b4176fabd000fe72",
+      "temporary_directory_scope": "owned-cache TMPDIR outside shared tmpfs"
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "phase": "publication step11 before FU2 ledger append and checks receipt",
+      "exit_code": 0,
+      "components": 69,
+      "hashed_files": 10426,
+      "profiles": 4,
+      "receipts": 208,
+      "raw_log_sha256": "f17b08bc74fe1055977a240535ad07a17212447f356a5fe8e490ce51dd801e8d",
+      "limit": "Integrity and scope only; no live provider or GPU execution."
+    },
+    {
+      "command": "python3 scripts/saturation_ledger.py --append evidence/artifacts/skills-lifecycle-landscape-20261005-fu2/RESULT-input.json",
+      "exit_code": 0,
+      "status": "stopped",
+      "counts_or_resets_saturation": false
+    },
+    {
+      "command": "host_receipts.register_file(Path('.'), 'catalogs/saturation/ledger.json')",
+      "phase": "immediately after append",
+      "exit_code": 0
+    },
+    {
+      "command": "python3 scripts/saturation_ledger.py --check --base 424b8a778222ae8857aade42c49ae6f7a13b3138",
+      "exit_code": 0,
+      "records": 8,
+      "result": "chain intact; bindings verified"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0
+    }
+  ],
+  "independent_review": {
+    "evidence_class": "local_integration",
+    "source_bindings": 14,
+    "result_file_pointers": 83,
+    "publication_files_reviewed": 29,
+    "private_pattern_hits": 0,
+    "checks": [
+      "Bound reviews match adjudicated pins and SKILL.md hashes; all17 original source dispositions preserved, exactly3 excluded from RESULT binding.",
+      "Converted/provenance public files match durable originals byte-for-byte; original/sanitized raw run hashes and exactly one changed note verified.",
+      "Frozen prompt digest recomputes; counter scopes remain separate; OmniRoute transport expressly producer-reported.",
+      "Rebased main's full document bytes and236anti-pattern table rows remain before exactly3lane rows.",
+      "Central manifest's main prose remains an unchanged UTF-8 prefix; prior skill rows identical; only existing research registration and three+153-character budget adjustments added.",
+      "Claude template preserves0.05 and all other main fields; research:on is sole semantic addition. Parsed Codex TOML equals main."
+    ]
+  },
+  "registry": {
+    "method": "Restore fixed main's registry, then official host_receipts.register_file for lane-owned historical deltas and every FU2 artifact; shared ledger and registry commit last.",
+    "publication_phase": {
+      "prior_registered": 174,
+      "new_registered": 29,
+      "total_registered": 203,
+      "unowned_main_rows_preserved": true,
+      "other_registry_keys_preserved": true
+    },
+    "checks_receipt_registered_before_final_validation": true
+  },
+  "retained_local_verification_corrections": [
+    {
+      "kind": "freshness table placement proof",
+      "initial_exit_code": 1,
+      "correction": "Aborted/restarted rebase and restored all main bytes before appending3lane rows; corrected proof0 and independent review agree."
+    },
+    {
+      "kind": "template property lookup",
+      "initial_exit_code": 1,
+      "correction": "Local proof used an absent skills key; corrected to actual skillOverrides before rebase continuation. No native test or upstream source altered."
+    }
+  ],
+  "limitations": [
+    "Repository tests are local integration/fixture evidence; these executions do not qualify vendor skills or establish model-side discovery.",
+    "Native source_reviews.py exit1 and make_result.py exit2 remain actual failed source/completed-result gates; stderr retained in adjacent attempts directory.",
+    "Initial converter exit3 is producer-reported; failed stdout/stderr was not present in the handoff.",
+    "Three source stops and the CI/PR GPT discovery timeout remain reopened; no candidate benchmark, adoption or installation occurs here.",
+    "No shared-host installation, model session, live client setting apply or platform-status promotion."
+  ]
+}

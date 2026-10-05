@@ -1,0 +1,56 @@
+{
+ "schema_version": 1,
+ "id": "source-review-mattpocock-skills-code-review",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "mattpocock/skills@code-review",
+ "reviewed_commit": "4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
+ "readme_path": "skills/engineering/code-review/SKILL.md",
+ "license": "MIT",
+ "layers": [
+  "skills-review"
+ ],
+ "claim": "Source review of the skill code-review in mattpocock/skills at commit 4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d (the adjudicated pin; license MIT), read from skills/engineering/code-review/SKILL.md and skills/engineering/code-review/agents/openai.yaml at that commit, the SKILL.md the pinned skills CLI (vercel-labs/skills v1.7.0) discovers for code-review; its sha256 matches the survivor's skill_md_sha256, and the skill folder's git tree at that commit is d8e341cee7980127dddda05159bedf25dc853615. Survived the landscape-sweep-skills-20261005-fu2-ns2604 facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6 through the OmniRoute pool (requested routes; actual metadata retained in returns)); no install, invocation, benchmark or comparison with an installed skill.",
+ "observed": {
+  "stars": 276972,
+  "pushed_at": "2026-10-05T12:04:32Z",
+  "archived": false,
+  "default_branch": "main",
+  "repository_license": "MIT",
+  "adjudicated_pin": "4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
+  "pin_lookup": "ok",
+  "skill_md_found_by": "skills/, the first location the CLI searches that holds a valid folder named code-review",
+  "skipped_skill_md": [],
+  "skill_md_sha256": "47f4e52c21694def9c7c11cbfbf891ca35eac7a93e395797515be3c8a409ae50",
+  "skill_md_bytes": 6589,
+  "survivor_skill_md_sha256": "47f4e52c21694def9c7c11cbfbf891ca35eac7a93e395797515be3c8a409ae50",
+  "skill_md_reader": {
+   "package": "yaml@2.9.0",
+   "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+   "pin_sha256": "0e4755bfd05d130603b2991af4fb834bcb4e05d08d67af216596a9fbb320399b",
+   "script": "skill_md.mjs"
+  },
+  "skill_folder_tree_sha": "d8e341cee7980127dddda05159bedf25dc853615",
+  "disable_model_invocation": false,
+  "openai_yaml_path": "skills/engineering/code-review/agents/openai.yaml",
+  "openai_yaml_reader": "PyYAML 6.0.3 compose_all with CSafeLoader",
+  "codex_implicit": true,
+  "unverified_reason": null,
+  "openai_yaml_policy_value": null,
+  "openai_yaml_policy_note": "no policy mapping: Codex defaults allow_implicit_invocation to true"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "skills/engineering/code-review/SKILL.md@4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
+   "text": "Two-axis review of the diff between `HEAD` and a fixed point the user supplies:"
+  },
+  {
+   "source": "skills/engineering/code-review/SKILL.md@4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
+   "text": "- **Standards**: does the code conform to this repo's documented coding standards? - **Spec**: does the code faithfully implement the originating issue / spec?"
+  },
+  {
+   "source": "skills/engineering/code-review/SKILL.md@4588b32ecab9ecc9fc8cc6b6c5e7d675b6004b0d",
+   "text": "Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings."
+  }
+ ]
+}
