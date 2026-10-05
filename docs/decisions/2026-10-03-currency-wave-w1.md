@@ -581,13 +581,14 @@ This PR now edits these configuration-owner files, superseding the earlier
 scope statement retained above as dated history:
 
 - `adoption/new-wsl-profile.json`: the jcodemunch-mcp entry and the Collector/Grafana qualification limits recorded in fix round 2 below.
+- `catalogs/foundation/new-wsl-architecture-20261001.json`: fix round 3 rebinds its stack pin sources to the current component version lines and the embedding model revision line; recorded pins and verdicts are unchanged.
 - `evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json`: the wave3 code-index owner row; main's wave4 Promptfoo owner is preserved.
 - `evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json`: regenerated from the merged consensus.
 - `docs/decisions/2026-10-01-new-wsl-definitive-defaults.md`: the tables rendered from that manifest.
 - `docs/new-wsl-handbook.json` and `docs/new-wsl-handbook.md`: regenerated from the merged profile and definitive manifest.
-- `evidence/artifacts/new-wsl-handbook-20261001/receipt.json`: refreshed generator/profile/output hashes and retained validation[6]-[8]; fix round 2 records its new regeneration and check separately.
-- `evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json`, `owners.json`, `install.sh` and `accept.sh`: the code-index owner, install/list/version commands and source citations.
-- `evidence/artifacts/new-wsl-install-plan-20261002/README.md` and `SOURCES.md`: the current code-index pin, wave-3 refresh and verified source locations.
+- `evidence/artifacts/new-wsl-handbook-20261001/receipt.json`: refreshed generator/profile/output hashes and retained validation[6]-[8]; fix round 2 records its generated hashes and the check in validation[9]. Fix round 3 records its regeneration and check as separate entries.
+- `evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json`, `owners.json`, `install.sh` and `accept.sh`: the code-index owner, install/list/version commands and source citations. Fix round 2 also adds Collector/Grafana qualification limits and release-hold notes in `install-plan.json`.
+- `evidence/artifacts/new-wsl-install-plan-20261002/README.md` and `SOURCES.md`: the current code-index pin, wave-3 refresh and verified source locations, plus fix round 2's dated "Currency qualification limits (2026-10-05)" README section and "Currency qualification source scope (2026-10-05)" SOURCES section for Collector/Grafana.
 
 Main's 25 fix-wave slot repairs and wave4 Promptfoo 0.123.1 owner survive.
 The current configuration-owner handoff is only playwright-cli **0.1.21** in
@@ -663,3 +664,34 @@ and token evidence notes, foundation and observability guides, and install-plan
 notes carry these qualification scopes. Historical receipts and raw dated
 qualification/review outputs retain their original bytes. Selection and metadata
 enums remain unchanged; the scope is recorded in their supported prose fields.
+
+## Fix round 3: pin citations and historical attribution (2026-10-05)
+
+The architecture catalog's 53 distinct `manifests/stack.json:N` locators now
+cite the owning component's current `version` line, or the embedding model's
+`revision` line. W1's stack layout had shifted 37 distinct locators, repeated
+at 74 winner entries. The rebinding uses the current file rather than the
+merge-base layout: Collector points to **1100**, Grafana to **1208**, and the
+Nemotron embedding revision to **2095**. Recorded architecture pins, verdicts
+and stack pins are unchanged, including the Grafana 13.2.3 architecture versus
+13.2.2 stack comparison. The configuration-owner file list above includes this
+catalog edit and fix round 2's Collector/Grafana install-plan notes and dated
+README/SOURCES sections.
+
+Both Collector token-row fields now start with a historical **0.161.0**
+qualification: the September 20 health observation and the lifecycle statuses
+belong to that deployed version. The explorer still displays the selected
+0.162.0 pin, whose scratch/synthetic scope, release hold and pending host
+acceptance remain explicit.
+
+Two regressions exercise the repository through the explorer's native render
+command. The architecture-link test failed against the old catalog with 37
+misbound locators and passed after rebinding; the historical Collector test
+failed for both old fields and passed after their version attribution. These
+are repository integration checks, not upstream or destination acceptance.
+
+The handbook is regenerated from the rebound catalog with its own generator.
+Its receipt retains prior validation entries and records this round's actual
+`--write` and `--check` commands, returned statuses, exit codes and UTC dates
+separately. The earlier fix-round-2 entry remains a check record; no historical
+write exit code is inferred or backfilled.

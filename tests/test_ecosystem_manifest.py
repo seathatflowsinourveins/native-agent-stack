@@ -2122,6 +2122,66 @@ process.stdout.write(JSON.stringify({errors, missing, app_hidden: byId["catalog-
         self.assertGreater(len(hashed), 3)
         self.assertEqual(sorted(hashed - tracked), [])
 
+    def repository_page_data(self):
+        """Observe the real repository through the explorer's native render command."""
+        target = self.root / "repository-explorer.html"
+        result = subprocess.run(
+            [sys.executable, str(GENERATOR), "--root", str(ROOT), "--render-to", str(target)],
+            capture_output=True, text=True, timeout=60)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        return json.loads(Page(target.read_text(encoding="utf-8")).data)
+
+    def test_repository_architecture_links_cite_the_owners_current_pin_fields(self):
+        """A drifted edition still links the owner's current version, or the model revision."""
+        data = self.repository_page_data()
+        stack = json.loads((ROOT / "manifests/stack.json").read_text(encoding="utf-8"))
+        components = {row["id"]: row for row in stack["components"]}
+        models = {row["id"]: row for row in stack["models"]}
+        lines = (ROOT / "manifests/stack.json").read_text(encoding="utf-8").splitlines()
+        checked = set()
+        errors = []
+        for row in data["architecture"]["rows"]:
+            for winner in row["winners"]:
+                source = winner["pin_source"]
+                match = re.fullmatch(r"manifests/stack.json:([1-9][0-9]*)", source["locator"])
+                if match is None:
+                    continue
+                checked.add(source["locator"])
+                index = int(match[1]) - 1
+                identifier = winner["component_id"]
+                if identifier is None:
+                    identifier = winner["repository"].removeprefix("https://huggingface.co/")
+                    field, expected = "revision", models[identifier]["revision"]
+                else:
+                    field, expected = "version", components[identifier]["version"]
+                owner_line = next(line for line in reversed(lines[:index])
+                                  if re.match(r'\s{6}"id":', line))
+                owner = json.loads("{" + owner_line.strip().rstrip(",") + "}")["id"]
+                expected_line = f'"{field}": {json.dumps(expected)},'
+                if owner != identifier or lines[index].strip() != expected_line:
+                    errors.append(f"{identifier}: {source['locator']} cites {lines[index].strip()}")
+                self.assertTrue(source["url"].endswith(f"/manifests/stack.json#L{index + 1}"))
+        self.assertTrue(checked)
+        self.assertEqual(sorted(set(errors)), [])
+
+    def test_repository_collector_statuses_name_their_historical_pin(self):
+        """The current-pin card attributes September observations to deployed 0.161.0."""
+        data = self.repository_page_data()
+        row = next(item for item in data["efficiency"]["topic"]["rows"]
+                   if item["component_id"] == "opentelemetry-collector-contrib")
+        stack = json.loads((ROOT / "manifests/stack.json").read_text(encoding="utf-8"))
+        selected = next(item["version"] for item in stack["components"]
+                        if item["id"] == row["component_id"])
+        self.assertEqual(row["version"], selected)
+        for field, historical_fact in (("returned_result_summary", "2026-09-20"),
+                                       ("lifecycle_summary", "install: observed_installed")):
+            with self.subTest(field=field):
+                text = row[field]
+                self.assertIn("0.161.0", text)
+                self.assertLess(text.index("0.161.0"), text.index(historical_fact))
+                self.assertIn("historical", text[:text.index(historical_fact)].lower())
+                self.assertIn("host acceptance pending", text)
+
     def test_the_repository_architecture_record_keeps_the_acceptance_invariant(self):
         """The record states the rule every winner's acceptance class follows and the dated review that corrected
         the edition. The build cannot read prose, so this test keeps a later edit from dropping either silently."""
