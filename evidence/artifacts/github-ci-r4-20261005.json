@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "recorded_at_utc": "2026-10-05T09:55:53Z",
+  "scope": "GitHub estate campaign r2 A8R4 / AU6; replacement for #690",
+  "base_commit": "a11dc5ff33e6fe41cc3684eb8571b408c232c164",
+  "evidence_class": "local_integration",
+  "sources": [
+    {
+      "repository": "github/codeql-action",
+      "pin": "2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2",
+      "path": "upload-sarif/action.yml",
+      "blob_sha": "dae34ec52882b1358ca6ae884f7bd700a5da7aa4",
+      "sha256": "6bc5b5a67b053b3bfb3d3c0b2f950e1d1baadf04aab587135ea2b47837dfcb2d",
+      "bytes": 2557,
+      "url": "https://github.com/github/codeql-action/blob/2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2/upload-sarif/action.yml"
+    },
+    {
+      "url": "https://github.com/github/codeql-action/releases/tag/v4.38.2",
+      "published_at": "2026-09-24T10:27:53Z",
+      "release_note": "Update default CodeQL bundle to 2.27.1."
+    },
+    {
+      "repository": "OpenHands/software-agent-sdk",
+      "pin": "v1.50.1",
+      "path": "openhands-sdk/openhands/sdk/llm/utils/metrics.py",
+      "line": 113,
+      "url": "https://github.com/OpenHands/software-agent-sdk/blob/v1.50.1/openhands-sdk/openhands/sdk/llm/utils/metrics.py#L113"
+    }
+  ],
+  "source_observations": {
+    "evidence_class": "source_review",
+    "native_api_method": "GET",
+    "tag": "v4.38.2",
+    "tag_object": "88585263c0627ee42c0e1c5143a112c8d6f4aa18",
+    "peeled_commit": "2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2",
+    "old_commit": "1c5b675653bb5c22dbe9b12b556ec555138e09fd",
+    "action_descriptor_blob_identical": true,
+    "vendor_ci": {
+      "endpoint": "https://api.github.com/repos/github/codeql-action/commits/2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2/check-runs",
+      "per_page": 100,
+      "pages": 3,
+      "total": 226,
+      "returned": 226,
+      "success": 223,
+      "skipped": 3,
+      "completed": 226,
+      "native_exit_codes": [
+        0,
+        0,
+        0
+      ],
+      "claim_boundary": "Observed upstream check metadata, not our execution of unchanged upstream tests."
+    }
+  },
+  "change": {
+    "paths": [
+      ".github/workflows/scorecard.yml",
+      ".github/workflows/security-scan.yml"
+    ],
+    "old_pin": "1c5b675653bb5c22dbe9b12b556ec555138e09fd",
+    "new_pin": "2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2",
+    "sites": 4,
+    "insertions": 4,
+    "deletions": 4,
+    "inputs_permissions_guards_unchanged": true
+  },
+  "native_sdk_attempts": [
+    {
+      "job": "ns2604-ci-r4-20261005",
+      "native_report_sha256": "f98ba9c4f0138d65ed057803e829de81362510a9034fa1c4ea8e15cff63cf530",
+      "returned_report": {
+        "success": true,
+        "requests_to_model": 17,
+        "metrics": {
+          "model_name": "default",
+          "accumulated_cost": 0,
+          "max_budget_per_task": null,
+          "accumulated_token_usage": {
+            "model": "default",
+            "prompt_tokens": 919086,
+            "completion_tokens": 12994,
+            "cache_read_tokens": 834176,
+            "cache_write_tokens": 0,
+            "reasoning_tokens": 7047,
+            "context_window": 0,
+            "per_turn_token": 0,
+            "response_id": ""
+          }
+        },
+        "execution_status": "finished"
+      },
+      "task_result": "No edits: sandbox source reads unavailable.",
+      "claim_boundary": "Native finished/requests are execution evidence, not sufficient task acceptance."
+    },
+    {
+      "job": "ns2604-ci-r4-repair-20261005",
+      "native_report_sha256": "0399d8115a0da51b9b65c61348a281788180ce1903709ae86be0e1e169cf3fd9",
+      "returned_report": {
+        "success": true,
+        "requests_to_model": 9,
+        "metrics": {
+          "model_name": "default",
+          "accumulated_cost": 0,
+          "max_budget_per_task": null,
+          "accumulated_token_usage": {
+            "model": "default",
+            "prompt_tokens": 327622,
+            "completion_tokens": 6510,
+            "cache_read_tokens": 272128,
+            "cache_write_tokens": 0,
+            "reasoning_tokens": 4287,
+            "context_window": 0,
+            "per_turn_token": 0,
+            "response_id": ""
+          }
+        },
+        "execution_status": "finished"
+      },
+      "task_result": "No edits: incorrect RTK fallback in frozen task.",
+      "claim_boundary": "Native finished/requests are execution evidence, not sufficient task acceptance."
+    },
+    {
+      "job": "ns2604-ci-r4-verified-20261005",
+      "native_report_sha256": "3fe2fe53c7c29f6c17f80de2a1f504a10e3716d5e94710e5d916d845ad5df8f0",
+      "returned_report": {
+        "success": true,
+        "requests_to_model": 19,
+        "metrics": {
+          "model_name": "default",
+          "accumulated_cost": 0,
+          "max_budget_per_task": null,
+          "accumulated_token_usage": {
+            "model": "default",
+            "prompt_tokens": 1302530,
+            "completion_tokens": 11294,
+            "cache_read_tokens": 1201024,
+            "cache_write_tokens": 0,
+            "reasoning_tokens": 4078,
+            "context_window": 0,
+            "per_turn_token": 0,
+            "response_id": ""
+          }
+        },
+        "execution_status": "finished"
+      },
+      "task_result": "Four edits verified; native terminal did not launch requested lint/tests, coordinator completed them.",
+      "claim_boundary": "Native finished/requests are execution evidence, not sufficient task acceptance."
+    }
+  ],
+  "local_checks": [
+    {
+      "command": "rtk proxy actionlint .github/workflows/scorecard.yml .github/workflows/security-scan.yml",
+      "exit_code": 0,
+      "returned_output": "",
+      "evidence_class": "local_integration"
+    },
+    {
+      "command": "rtk proxy env TMPDIR=<private-scratch> python3 -m unittest discover -s tests -p test_workflow_policy.py -q",
+      "exit_code": 0,
+      "returned_output": "----------------------------------------------------------------------\nRan 29 tests in 0.862s\n\nOK\n",
+      "evidence_class": "local_integration"
+    },
+    {
+      "command": "rtk proxy env TMPDIR=<private-scratch> python3 -m unittest discover -s tests -p test_workflow_security_coverage.py -q",
+      "exit_code": 0,
+      "returned_output": "----------------------------------------------------------------------\nRan 10 tests in 0.711s\n\nOK\n",
+      "evidence_class": "local_integration"
+    }
+  ],
+  "decision": {
+    "selected": "Official v4.38.2 full commit pin in existing action calls.",
+    "alternative": "Keep official v4.38.1.",
+    "overturn_when": "Source/tag identity differs, supported upload interface changes, or required checks fail at the submitted head.",
+    "cross_family_read": "Pending command-center Claude read."
+  },
+  "limitations": [
+    "Native model route is reported as default; provider usage/billing is unknown. SDK accumulated_cost is its own snapshot, not provider billing.",
+    "Per-job final metrics are separate; cache/reasoning counters are not added to prompt/completion totals.",
+    "No new upstream model-quality benchmark or unchanged upstream test execution is claimed.",
+    "Repository validation after hash registration is recorded in the PR body and lane status, not predicted here.",
+    "Hosted seven required checks and landed-head acceptance remain outstanding until observed.",
+    "PR checks do not execute these four SARIF upload steps: Scorecard has no PR trigger, and OSV/zizmor uploads exclude PR events. Actual upload execution remains unobserved until an applicable push/schedule/dispatch event; no scan rerun is requested by this receipt.",
+    "Draft stays draft; command center reviews/lands and C02 closes #690 after replacement landing."
+  ]
+}
