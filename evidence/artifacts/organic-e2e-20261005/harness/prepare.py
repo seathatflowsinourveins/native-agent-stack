@@ -218,7 +218,8 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--cells", default=",".join(c for c in suite.CELLS if c != "codex-native-gate0"))
-    parser.add_argument("--tasks", default="", help="restrict to item_id:INSTANCE pairs (comma-separated)")
+    parser.add_argument("--tasks", default="", help="restrict to item_id:INSTANCE pairs (comma-separated); "
+                        "cell@item_id:INSTANCE restricts a pair to one cell")
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--lane", default=LANE)
     parser.add_argument("--repo", default=str(repo_root()))
@@ -267,13 +268,26 @@ def main(argv=None) -> int:
     wanted_cells = [c for c in args.cells.split(",") if c]
     if "codex-native" in wanted_cells and not args.no_gate0 and "codex-native-gate0" not in wanted_cells:
         wanted_cells.append("codex-native-gate0")
-    wanted_tasks = {tuple(t.split(":", 1)) for t in args.tasks.split(",") if t}
+    # --tasks entries: item_id:INSTANCE (every selected cell) or cell@item_id:INSTANCE (that cell only).
+    wanted_tasks, cell_tasks = set(), {}
+    for entry in (t for t in args.tasks.split(",") if t):
+        cell_part, _, task_part = entry.rpartition("@")
+        pair = tuple(task_part.split(":", 1))
+        if cell_part:
+            cell_tasks.setdefault(cell_part, set()).add(pair)
+        else:
+            wanted_tasks.add(pair)
+    restricted = bool(wanted_tasks or cell_tasks)
+
+    def task_selected(cell: str, item_id: str, instance: str) -> bool:
+        return not restricted or (item_id, instance) in wanted_tasks or (item_id, instance) in cell_tasks.get(cell, set())
+
     skip = {k for k in args.skip_tests.split(",") if k}
     # The Claude cap holds before anything is built (finding 4): organic and prompted Claude tests together.
     organic_claude = sum((args.repeat_override or suite.CELLS[cell]["repeat"])
                          for cell in wanted_cells if suite.CELLS[cell]["client"] == "claude"
                          for item_id, instance, _ in suite.CELLS[cell]["tasks"]
-                         if (not wanted_tasks or (item_id, instance) in wanted_tasks)
+                         if task_selected(cell, item_id, instance)
                          and f"{suite.task_key(item_id, instance)}|{cell}" not in skip)
     prompted_claude = sum(1 for e in prompted_entries if suite.CELLS[e["cell"]]["client"] == "claude"
                           and f"{e['key']}|prompted-{e['cell']}" not in skip)
@@ -415,7 +429,7 @@ def main(argv=None) -> int:
         spec = suite.CELLS[cell]
         tests = []
         for item_id, instance, sandbox in spec["tasks"]:
-            if wanted_tasks and (item_id, instance) not in wanted_tasks and not spec.get("gate_trial"):
+            if not task_selected(cell, item_id, instance) and not spec.get("gate_trial"):
                 continue
             task = by_key[(item_id, instance)]
             tests.append({"description": f"{task['key']}|{cell}", "test_key": f"{task['key']}|{cell}",
@@ -518,7 +532,8 @@ def main(argv=None) -> int:
                                         "claude_stage2": [s for s in schedule if s["client"] == "claude" and s["stage"] == 2],
                                         "codex_stage2": [s for s in schedule if s["client"] == "codex" and s["stage"] == 2],
                                         "codex_blocks": sorted({s["cell"] for s in schedule if s["client"] == "codex" and s["stage"] == 4})})
-    tasks_frozen = [{k: v for k, v in t.items()} for t in tasks if not wanted_tasks or (t["task_id"], t["instance"]) in wanted_tasks
+    selected_pairs = wanted_tasks | {pair for pairs in cell_tasks.values() for pair in pairs}
+    tasks_frozen = [{k: v for k, v in t.items()} for t in tasks if not restricted or (t["task_id"], t["instance"]) in selected_pairs
                     or (t["task_id"], t["instance"]) == ("control/both/G1", "N")]
     tasks_frozen += prompted_tasks
     write_json(root / "tasks.json", {"amendments": amend_log, "tasks": tasks_frozen})
