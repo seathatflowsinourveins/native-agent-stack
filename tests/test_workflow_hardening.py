@@ -2157,6 +2157,11 @@ class ChangesModeComputationTests(unittest.TestCase):
         self.assert_mode(outputs, "full", bootstrap="true")
         self.assertIn("- `adoption/bootstrap-macos.sh`", summary)
 
+    def test_a_calendar_relock_selects_full_mode(self):
+        outputs, summary = self.run_changes({".github/requirements-calendar.txt": "# calendar relock\n"})
+        self.assert_mode(outputs, "full", bootstrap="true")
+        self.assertIn("- `.github/requirements-calendar.txt`", summary)
+
     def test_a_listed_test_module_selects_full_mode(self):
         outputs, _ = self.run_changes({"tests/test_workflow_hardening.py": "# changed\n"})
         self.assert_mode(outputs, "full", bootstrap="false")

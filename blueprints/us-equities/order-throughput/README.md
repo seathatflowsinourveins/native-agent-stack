@@ -168,11 +168,11 @@ evidence of strategy quality.
 ### Offline (fixture, no credentials, no network)
 
 Use the adaptive-paper engine venv, or install the calendar subset in an
-isolated test interpreter first. Set `TMPDIR` to a writable scratch directory
+isolated Python >=3.12 test interpreter first. Set `TMPDIR` to a writable scratch directory
 outside the checkout:
 
 ```sh
-python3 -m venv "$TMPDIR/capacity-tests"
+python3.12 -m venv "$TMPDIR/capacity-tests"
 "$TMPDIR/capacity-tests/bin/python" -m pip install --require-hashes --only-binary=:all: \
   -r .github/requirements-calendar.txt
 source "$TMPDIR/capacity-tests/bin/activate"

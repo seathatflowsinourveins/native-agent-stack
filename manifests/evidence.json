@@ -4277,7 +4277,7 @@
     },
     {
       "path": ".github/requirements-ci.txt",
-      "sha256": "aacff5cda093363538e69dcafb9b7a750236a62e7269e807bb6c3bf038276512",
+      "sha256": "0b37433fb0fb165c893737e8e887581a07a6469683fbdf67ada1a08288758605",
       "bytes": 467
     },
     {
@@ -4292,8 +4292,8 @@
     },
     {
       "path": ".github/workflows/adoption-bootstrap.yml",
-      "sha256": "72add89531022f11a31c752a5f1e3dcb9d5c879780be269e0bd2e822382df839",
-      "bytes": 58133
+      "sha256": "a5a61ef48d7be71aee55dbc9e1c79b2dc970a753e04cff1f671a09543b41164c",
+      "bytes": 58273
     },
     {
       "path": ".github/workflows/catalog-freshness.yml",
@@ -4427,8 +4427,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "723bc5e9c3dab27de59f6d83f59b6135e6b5334ce27ec7d5f2c52b1300d11290",
-      "bytes": 23596
+      "sha256": "81459545301d187ab97ee106f60ec9805cca26cbd884a05a3f056833af5e2def",
+      "bytes": 23613
     },
     {
       "path": "SECURITY.md",
@@ -11843,8 +11843,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/leverage.py",
-      "sha256": "7f4a86f312d718a0a0b87e6eafe9a2d57b8709ec85a8746fdf7def0a5b502ea0",
-      "bytes": 16339
+      "sha256": "6a72d9f66b5c6de176cb9ff6fca235908e151d9c0107f631dc9f8aa0100ad753",
+      "bytes": 16423
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/live_manifest.py",
@@ -12062,6 +12062,11 @@
       "bytes": 31856
     },
     {
+      "path": "blueprints/us-equities/adaptive-paper/receipts/xnys-primary-20261005/repair-round-3.json",
+      "sha256": "cd555b541602ea28e70b2d6d5325a88445907d6cbd21945a10f9ee53bdc693ce",
+      "bytes": 13121
+    },
+    {
       "path": "blueprints/us-equities/adaptive-paper/receipts/xnys-primary-20261005/resolution-diff.json",
       "sha256": "0fb68d730d71c94d4f44e33bc49fb8cbf278ef8ed6af4657847ec595b41e7f35",
       "bytes": 2742
@@ -12093,8 +12098,8 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/safety.py",
-      "sha256": "5d5e119798c1422bff6c5f612191eae51d984a9979dc359768d45379e115d55b",
-      "bytes": 88569
+      "sha256": "bfec57e021b65aee058c8d2e7c0cbafad46f6203edbe9396eec739c8546b0fd9",
+      "bytes": 88683
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/selector.py",
@@ -12113,7 +12118,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "3ed2b9b3bd408dc4f752f352dd1aa68364d5e206807e1b781e809628fd99f72d",
+      "sha256": "a6cc50ee9102eb31a0d5620a691a9597d47ab97add11d8244008e5a204d8a7e6",
       "bytes": 7076
     },
     {
@@ -14933,8 +14938,8 @@
     },
     {
       "path": "blueprints/us-equities/order-throughput/README.md",
-      "sha256": "849c41459255397a1b85b037f7da9fba6d398bb94b32f9088983104d259f09c4",
-      "bytes": 26053
+      "sha256": "2566538eb7fcdca0ed08f2177c8da75c1127c221a32e30498f7553ca3cd2fda1",
+      "bytes": 26070
     },
     {
       "path": "blueprints/us-equities/order-throughput/rate_limit_evidence.py",
@@ -53153,8 +53158,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_safety.py",
-      "sha256": "3e957ff5c005dcb497e81b95560f4ee45080cbaa8c11e3c602b15eb26191700b",
-      "bytes": 95872
+      "sha256": "dda093e5428a58ac667ae4d9a620acbf7ee78b8b26db83fccf08b530f1e58c7e",
+      "bytes": 97574
     },
     {
       "path": "tests/test_adaptive_paper_sessions.py",
@@ -53193,8 +53198,8 @@
     },
     {
       "path": "tests/test_adoption_bootstrap_macos.py",
-      "sha256": "2d1f03c09fc7697a7ed05280dd0b47709d798d97fdfa5435daa29ebcd0631ae1",
-      "bytes": 230983
+      "sha256": "9c62a6bbd07bf32a9af5627725f6e925bd2ba4eecd29066b20955b523251d021",
+      "bytes": 231032
     },
     {
       "path": "tests/test_adoption_bootstrap_parity.py",
@@ -54113,8 +54118,8 @@
     },
     {
       "path": "tests/test_workflow_hardening.py",
-      "sha256": "efdc1aee74ada1e1b70d75c076b0b91de83a084a49e55a47a81f2b11787ab824",
-      "bytes": 151129
+      "sha256": "77086c6f6d24060b36021e1667dce09ef272bc076e99c8dd14798722bb94f9e6",
+      "bytes": 151424
     },
     {
       "path": "tests/test_workflow_policy.py",

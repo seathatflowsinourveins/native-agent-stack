@@ -196,12 +196,12 @@ The public source fixture removes personal path literals and independently recou
 4. Validate the portable repository:
 
    The unit tests import the adaptive-paper XNYS clock. Install the hash-locked
-   calendar subset in an isolated test interpreter first, or use the qualified
+   calendar subset in an isolated Python >=3.12 test interpreter first, or use the qualified
    adaptive-paper engine venv. Set `TMPDIR` to a writable scratch directory
    outside the checkout:
 
 ```bash
-python3 -m venv "$TMPDIR/stack-tests"
+python3.12 -m venv "$TMPDIR/stack-tests"
 "$TMPDIR/stack-tests/bin/python" -m pip install --require-hashes --only-binary=:all: \
   -r .github/requirements-calendar.txt
 source "$TMPDIR/stack-tests/bin/activate"
