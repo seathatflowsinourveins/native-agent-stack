@@ -2127,7 +2127,7 @@ Reference edition: [catalogs/foundation/new-wsl-architecture-20261001.json](../c
 
 | Repository source | SHA-256 |
 | --- | --- |
-| [adoption/manifest.json](../adoption/manifest.json) | `7bb179e8440be17b75484c21495e66385ea8eb959a491d43d2488056ddede09a` |
+| [adoption/manifest.json](../adoption/manifest.json) | `159ad1f56a9a654951eb16a4a66645378d225d8b924eede282815f49342add55` (without source.release_tag, source.release_commit, updated_at) |
 | [adoption/new-wsl-profile.json](../adoption/new-wsl-profile.json) | `e8ad7ec74d13697e54d5af18bcf097e92abf7f8b585e5a58acb4a3c0deb964d8` |
 | [adoption/platforms/linux-wsl2-new-distro.md](../adoption/platforms/linux-wsl2-new-distro.md) | `e4655b7fbc3862cdd26f302030f58f0843570b6d3ff3a7ff5770343bec53c04b` |
 | [catalogs/foundation/new-wsl-architecture-20261001.json](../catalogs/foundation/new-wsl-architecture-20261001.json) | `799a2809775197f2fbdd231602ecd5797d7d7c4a9e8044c8fd4a70460250b425` |

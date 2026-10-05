@@ -3,11 +3,11 @@
   "kind": "new-wsl-handbook-profile-integration",
   "source_main": "85543efe5abcddb7b7cddb14e8774e83b6758616",
   "evidence_class": "local_integration",
-  "generator_sha256": "5e4e3fe6064f6342a88709f9c49eeecc229c466f5968c7e006471e8fec9fbfd6",
+  "generator_sha256": "6e6ee9cfb4d697b3bea2d7684e042e638be20634792f43e517b205463b1967f9",
   "profile_sha256": "e8ad7ec74d13697e54d5af18bcf097e92abf7f8b585e5a58acb4a3c0deb964d8",
   "outputs": {
-    "docs/new-wsl-handbook.md": "fe0e82fd3d04689196ab4ed7a9ecc2398f137ffbe4e64285955d5298daf0d7aa",
-    "docs/new-wsl-handbook.json": "d0f3ccc1fcd6bbc413bb8bdf8a6c688f4c0e0bbdbb2ae63545fd8835bb501d8e"
+    "docs/new-wsl-handbook.md": "f8b1850f2c94aa4149e155a2ecd029006a2a77155b6114eb4e529d5e23642867",
+    "docs/new-wsl-handbook.json": "5a046ab9a280e9af964ae6b8a25174d8170bbebe870a2f25a4af8473956b314b"
   },
   "inventory": {
     "layers": 37,
@@ -128,5 +128,28 @@
     "adoption/new-wsl-profile.json",
     "docs/decisions/2026-10-01-new-wsl-handbook-generator.md"
   ],
-  "repair_round": "this PR: bounded job 058, 2026-10-04; hashes regenerated in place, destination acceptance remains owed"
+  "repair_round": "this PR: bounded job 058, 2026-10-04; hashes regenerated in place, destination acceptance remains owed",
+  "regenerations": [
+    {
+      "date": "2026-10-05",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "The generator now hashes adoption/manifest.json without its release pointer (source.release_tag, source.release_commit, updated_at), as scripts/release_due.py compares it. Hashing the raw file made every re-pin change this handbook, a new-machine file, so a re-pin PR could pass neither the handbook check nor release_due --strict-if-repinned (CI validate run 37266900705 on the v2026.10.05 re-pin).",
+      "previous_generator_sha256": "8a66e5eebe1429924d62545e2eee389f1fdd58e6c2f679d8280cec3e99027cf8",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "e4c94b2a748ed09a86c63129bba9a9acf5eb11475a354a1ec17660af052b16d0",
+        "docs/new-wsl-handbook.json": "a62a12a6b48f3ef9183893aa4eadce2e37aa1ad35350d7af0a347b603ca89a36"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "PR #713 (wave 5) rebased onto main 77d7516d8, after #724 changed the generator's adoption-manifest hashing; regenerated from this PR's profile, plan and catalog inputs.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "fe0e82fd3d04689196ab4ed7a9ecc2398f137ffbe4e64285955d5298daf0d7aa",
+        "docs/new-wsl-handbook.json": "d0f3ccc1fcd6bbc413bb8bdf8a6c688f4c0e0bbdbb2ae63545fd8835bb501d8e"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    }
+  ]
 }
