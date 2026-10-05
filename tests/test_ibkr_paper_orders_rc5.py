@@ -96,6 +96,39 @@ def cache_order(client_id, events, *, strategy="EXEC_TESTER-001", status="FILLED
 
 
 class RunOrderOwnership(unittest.TestCase):
+    def test_generated_identity_excludes_old_or_mismatched_intents(self):
+        scope = RUN.RunOrderScope(2_100_000_000)
+        cases = [
+            ("O-19700101-000001-001-001-1", 3_000_000_000),
+            ("O-19700101-000002-001-001-1", 4_000_000_000),
+            ("O-19700101-000002-002-001-1", 3_000_000_000),
+            ("O-19700101-000002-001-002-1", 3_000_000_000),
+            ("O-19700101-000002-001-001-0", 3_000_000_000),
+        ]
+        for client_id, ts_init in cases:
+            with self.subTest(client_id=client_id, ts_init=ts_init):
+                order = cache_order(client_id, [event("OrderInitialized", typ="MARKET", when=ts_init)], status="INITIALIZED")
+                self.assertFalse(scope.generated_here(order.events()[0]))
+                self.assertEqual(scope.partition([order])[0], [])
+        current = cache_order("O-19700101-000002-001-001-1", [event("OrderInitialized", typ="MARKET", when=3_000_000_000)])
+        self.assertTrue(scope.generated_here(current.events()[0]))
+
+    def test_run3_old_generator_id_without_submission_stays_external(self):
+        old = cache_order("O-19700101-000001-001-001-2", [
+            event("OrderInitialized", typ="MARKET", when=3_000_000_000),
+            event("OrderAccepted", typ="MARKET", when=1_000_000_000, reconciliation=True),
+            event("OrderFilled", typ="MARKET", when=1_000_000_000, reconciliation=True)], status="ACCEPTED")
+        cache = SimpleNamespace(orders=lambda: [old])
+        scope = RUN.RunOrderScope(2_100_000_000)
+        receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+        RUN.update_observations(receipt, RUN.snapshot_events(cache, scope), PLAN)
+        receipt["reconciled_external"] = RUN.snapshot_events(cache, scope, external=True)
+        self.assertEqual(len(receipt["reconciled_external"]), 3)
+        self.assertEqual(receipt["events"], [])
+        self.assertEqual(receipt["fills"], [])
+        self.assertEqual(receipt["failures"], [])
+        self.assertTrue(RUN.stop_ready(RUN.tester_orders(cache, scope), 1, 2))
+
     def test_pending_native_intent_and_pre_submit_denial_are_owned(self):
         client_id = "O-19700101-000001-001-001-9"
         initialized = event("OrderInitialized", typ="MARKET")
@@ -287,11 +320,28 @@ class QuoteAdmission(unittest.TestCase):
         self.assertEqual(result["status"], "refused_quote_loss_bound")
         self.assertEqual(result["stage"], "spread_and_commissions")
         self.assertEqual(RUN.decimal(result["spread_loss_usd"]), 220)
-        self.assertEqual(RUN.decimal(result["expected_roundtrip_commissions_usd"]), 2)
-        self.assertEqual(RUN.decimal(result["expected_roundtrip_loss_usd"]), 222)
+        self.assertEqual(RUN.decimal(result["expected_roundtrip_commissions_usd"]), RUN.decimal("2.04"))
+        self.assertEqual(RUN.decimal(result["expected_roundtrip_loss_usd"]), RUN.decimal("222.04"))
         self.assertEqual(RUN.decimal(result["max_roundtrip_loss_usd"]), 5)
-        for ask, status in (("773", "passed"), ("773.01", "refused_quote_loss_bound")):
+        for ask, status in (("772.96", "passed"), ("772.97", "refused_quote_loss_bound")):
             self.assertEqual(RUN.admit_quote(PLAN, dict(quote, ask=ask), 1001)["status"], status)
+
+    def test_tier1_core_band_notional_boundary(self):
+        for ask, expected in (("942.85", "passed"), ("942.86", "refused_quote_notional"), ("990", "refused_quote_notional")):
+            with self.subTest(ask=ask):
+                quote = {"bid": str(RUN.decimal(ask) - RUN.decimal("0.01")), "ask": ask, "quote_time_epoch": 1000}
+                result = RUN.admit_quote(PLAN, quote, 1001)
+                self.assertEqual(result["status"], expected)
+                self.assertEqual(RUN.decimal(result["luld_core_band_fraction"]), RUN.decimal("0.05"))
+                stressed = RUN.decimal(ask) * RUN.decimal("1.05") + RUN.decimal("10")
+                self.assertEqual(RUN.decimal(result["band_adjusted_notional_usd"]) + RUN.decimal(result["headroom_usd"]), stressed)
+                self.assertEqual(stressed <= 1000, expected == "passed")
+
+    def test_commission_allowance_covers_observed_sell_commission(self):
+        result = RUN.admit_quote(PLAN, {"bid": "775.24", "ask": "775.26", "quote_time_epoch": 1000}, 1001)
+        self.assertEqual(result["status"], "passed")
+        self.assertEqual(RUN.decimal(result["commission_margin_per_order_usd"]), RUN.decimal("0.02"))
+        self.assertGreaterEqual(RUN.decimal(result["expected_roundtrip_commissions_usd"]), RUN.decimal("1.00") + RUN.decimal("1.02"))
 
     def test_precheck_observed_is_frozen_before_quote_callbacks(self):
         client = RUN.AdmissionState()
@@ -440,7 +490,7 @@ class QuoteAdmission(unittest.TestCase):
         admitted = admitted_quote()
         self.assertEqual(admitted["status"], "passed")
         self.assertEqual((admitted["bid"], admitted["ask"], admitted["quote_age_seconds"]), ("770.01", "770.02", 1))
-        for ask, expected in (("1001", "refused_quote_notional"), ("991", "refused_quote_notional"), ("990", "passed")):
+        for ask, expected in (("1001", "refused_quote_notional"), ("991", "refused_quote_notional"), ("990", "refused_quote_notional"), ("942.85", "passed")):
             result = RUN.admit_quote(PLAN, {"bid": str(RUN.decimal(ask) - RUN.decimal("0.01")), "ask": ask, "quote_time_epoch": 1000}, 1001)
             self.assertEqual(result["status"], expected)
 
@@ -813,7 +863,10 @@ class LeaseAndJournal(unittest.TestCase):
                     self.assertEqual((receipt["status"], receipt["exit_code"]), ("not_started", 3))
                     self.assertEqual(receipt["failures"][-1]["reason"], "account_writer_already_running")
                     self.assertFalse(receipt["account_lease"]["acquired"])
-                    self.assertRegex(receipt["account_lease"]["lock_name"], r"^[a-f0-9]{64}\.lock$")
+                    self.assertEqual(receipt["account_lease"], {"acquired": False})
+                    raw = json.dumps(receipt)
+                    self.assertNotIn(first.lock_name, raw)
+                    self.assertNotIn(first.lock_name.removesuffix(".lock"), raw)
                     admission.assert_not_called()
                     process.assert_not_called()
                     self.assertFalse((root / "private").exists())
@@ -832,6 +885,60 @@ class LeaseAndJournal(unittest.TestCase):
         self.assertEqual(receipt["status"], "not_started")
         self.assertEqual(receipt["failures"][-1]["reason"], "paper_account_required_for_lease")
         admission.assert_not_called()
+
+    def test_pre_admission_refusals_preserve_existing_receipt_bytes(self):
+        for condition in ("held_lease", "existing_journal", "missing_account", "changed_account", "failed_precheck", "quote_refusal"):
+            with self.subTest(condition=condition), tempfile.TemporaryDirectory() as directory, contextlib.ExitStack() as stack:
+                root = Path(directory)
+                args = self.args(root)
+                original = b'{"status":"passed","marker":"previous-run"}\n'
+                args.receipt.write_bytes(original)
+                account = "" if condition == "missing_account" else FAKE_ACCOUNT
+                stack.enter_context(mock.patch.dict(RUN.os.environ, {"TWS_ACCOUNT": account, "XDG_STATE_HOME": directory}))
+                if condition == "held_lease":
+                    lease = RUN.safety().AccountLease(FAKE_ACCOUNT)
+                    stack.callback(lease.close)
+                if condition == "existing_journal":
+                    journal = RUN.safety().Journal(root / "private", "offline-run", ROOT, create=True)
+                    journal.close()
+                pre = copy.deepcopy(FLAT)
+                pre.update(liquid_hours="20261005:0930-20261005:1600", time_zone_id="US/Eastern")
+                pre_account = "DU" + "9999999" if condition == "changed_account" else FAKE_ACCOUNT
+                if condition == "failed_precheck":
+                    pre["status"] = "refused_existing_state"
+                quote = {"status": "refused_quote_loss_bound"} if condition == "quote_refusal" else admitted_quote()
+                admission = stack.enter_context(mock.patch.object(RUN, "official_admission", return_value=(pre, pre_account, quote)))
+                process = stack.enter_context(mock.patch.object(RUN.subprocess, "Popen"))
+                stack.enter_context(mock.patch.object(RUN.frozen(), "rth_check", return_value=(True, "synthetic")))
+                receipt = RUN.run_trial(args, now=NOW, versions=PINNED)
+                self.assertNotEqual(receipt["status"], "passed")
+                self.assertEqual(args.receipt.read_bytes(), original)
+                process.assert_not_called()
+                if condition in ("held_lease", "existing_journal", "missing_account"):
+                    admission.assert_not_called()
+
+    def test_journal_denial_reason_scrubs_account_and_keeps_lock_key_private(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            journal = RUN.safety().Journal(root / "private", "reason-run", ROOT, create=True)
+            self.addCleanup(journal.close)
+            order = cache_order("O-19700101-000001-001-001-9", [
+                event("OrderInitialized", typ="MARKET"),
+                event("OrderDenied", typ="MARKET", reason="account " + FAKE_ACCOUNT + "; echoed prefix" + FAKE_ACCOUNT + "suffix")], status="DENIED")
+            scope = RUN.RunOrderScope(900_000_000)
+            RUN.journal_order_events(SimpleNamespace(orders=lambda: [order]), scope, journal, FAKE_ACCOUNT)
+            records = journal.records()
+            self.assertEqual(records[-1]["kind"], "OrderDenied")
+            self.assertIn("reason", records[-1])
+            self.assertNotIn(FAKE_ACCOUNT, records[-1]["reason"])
+            receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+            receipt["account_lease"]["acquired"] = True
+            receipt["journal"] = journal.summary()
+            lock_name = RUN.safety().account_lock_name(FAKE_ACCOUNT)
+            for raw in (json.dumps(receipt), RUN.serialized_receipt(receipt), journal.path.read_text()):
+                for private in (FAKE_ACCOUNT, lock_name, lock_name.removesuffix(".lock")):
+                    self.assertNotIn(private, raw)
+            self.assertEqual(receipt["account_lease"], {"acquired": True})
 
     def test_existing_journal_refuses_before_admission_and_preserves_bytes(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -898,6 +1005,21 @@ class LeaseAndJournal(unittest.TestCase):
     def test_private_output_rejects_repository_paths(self):
         with self.assertRaises(RUN.safety().SafetyError):
             RUN.safety().Journal(DIRECTORY, "offline-run", ROOT, create=True)
+
+    def test_refusal_publication_preserves_a_concurrent_receipt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "receipt.json"
+            original = b'{"status":"passed","marker":"concurrent-run"}\n'
+
+            def concurrent_writer(source, destination):
+                Path(destination).write_bytes(original)
+                raise FileExistsError("synthetic concurrent publication")
+
+            with mock.patch.object(RUN.os, "link", side_effect=concurrent_writer):
+                result = RUN.write_receipt(path, RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED), replace=False)
+            self.assertFalse(result)
+            self.assertEqual(path.read_bytes(), original)
+            self.assertEqual(list(path.parent.glob(".paper-receipt-*")), [])
 
 
 class AdmissionRefusals(unittest.TestCase):
@@ -1006,7 +1128,7 @@ class ChildRefusals(unittest.TestCase):
 
 class SyntheticOrchestration(unittest.TestCase):
     """Official checks, quote admission and node execution are synthetic."""
-    def drive(self, proof=None, proof_account=FAKE_ACCOUNT, pre_status="passed", events=None, quote=None, proof_hook=None, pre_account=FAKE_ACCOUNT):
+    def drive(self, proof=None, proof_account=FAKE_ACCOUNT, pre_status="passed", events=None, quote=None, proof_hook=None, pre_account=FAKE_ACCOUNT, fail_final_write=False):
         directory = tempfile.TemporaryDirectory()
         self.addCleanup(directory.cleanup)
         path = Path(directory.name) / "receipt.json"
@@ -1043,6 +1165,12 @@ class SyntheticOrchestration(unittest.TestCase):
                 test.assertNotIn(FAKE_ACCOUNT, str(command))
                 test.assertEqual(kwargs["stdout"], RUN.subprocess.DEVNULL)
                 test.assertEqual(kwargs["stderr"], RUN.subprocess.DEVNULL)
+                test.assertEqual(len(kwargs["pass_fds"]), 1)
+                lease_fd = kwargs["pass_fds"][0]
+                lock = Path(directory.name) / "native-agent-stack/ibkr-paper/locks" / RUN.safety().account_lock_name(FAKE_ACCOUNT)
+                test.assertEqual(os.fstat(lease_fd).st_ino, lock.stat().st_ino)
+                with test.assertRaises(RUN.safety().SafetyError):
+                    RUN.safety().AccountLease(FAKE_ACCOUNT)
                 for key in ("RUST_LOG", "NAUTILUS_LOG", "TWS_ACCOUNT"):
                     test.assertNotIn(key, kwargs["env"])
                 self.stdin = Pipe()
@@ -1053,9 +1181,25 @@ class SyntheticOrchestration(unittest.TestCase):
             def poll(self):
                 return self.returncode
 
-        with mock.patch.object(RUN, "datetime", FixedDateTime), mock.patch.object(RUN, "official_admission", return_value=(pre, pre_account, admitted_quote() if quote is None else quote)), mock.patch.object(RUN, "official_check", return_value=(proof, proof_account), side_effect=proof_hook) as checker, mock.patch.object(RUN.subprocess, "Popen", Process), mock.patch.dict(RUN.os.environ, {"RUST_LOG": "trace", "NAUTILUS_LOG": "trace", "TWS_ACCOUNT": FAKE_ACCOUNT, "XDG_STATE_HOME": directory.name}):
+        original_write = RUN.write_receipt
+        injected = []
+
+        def write(path, value, *args, **kwargs):
+            if fail_final_write and value["flat_proof"] is not None and not injected:
+                injected.append(True)
+                raise OSError("synthetic final receipt storage failure")
+            return original_write(path, value, *args, **kwargs)
+
+        with mock.patch.object(RUN, "datetime", FixedDateTime), mock.patch.object(RUN, "official_admission", return_value=(pre, pre_account, admitted_quote() if quote is None else quote)), mock.patch.object(RUN, "official_check", return_value=(proof, proof_account), side_effect=proof_hook) as checker, mock.patch.object(RUN.subprocess, "Popen", Process), mock.patch.object(RUN, "write_receipt", side_effect=write), mock.patch.dict(RUN.os.environ, {"RUST_LOG": "trace", "NAUTILUS_LOG": "trace", "TWS_ACCOUNT": FAKE_ACCOUNT, "XDG_STATE_HOME": directory.name}):
             receipt = RUN.run_trial(args, now=NOW, versions=PINNED)
+        if fail_final_write:
+            self.assertEqual(injected, [True])
         self.assertNotIn(FAKE_ACCOUNT, path.read_text())
+        self.assertEqual(receipt["account_lease"], {"acquired": True})
+        lock_name = RUN.safety().account_lock_name(FAKE_ACCOUNT)
+        for raw in (json.dumps(receipt), path.read_text()):
+            self.assertNotIn(lock_name, raw)
+            self.assertNotIn(lock_name.removesuffix(".lock"), raw)
         return receipt, checker
 
     def test_provisional_receipt_and_final_flat_proof(self):
@@ -1063,6 +1207,38 @@ class SyntheticOrchestration(unittest.TestCase):
         self.assertEqual(checker.call_count, 1)
         self.assertFalse(checker.call_args_list[0].kwargs["with_session"])
         self.assertEqual(receipt["status"], "passed")
+
+    def test_final_write_failure_retains_child_evidence_and_never_not_started(self):
+        receipt, checker = self.drive(fail_final_write=True)
+        self.assertEqual((receipt["status"], receipt["exit_code"]), ("incomplete", 1))
+        self.assertTrue(receipt["node"]["child_launched"])
+        self.assertTrue(receipt["node"]["started"])
+        self.assertEqual(len(receipt["fills"]), 2)
+        self.assertTrue(receipt["roundtrip"]["closed"])
+        self.assertEqual(receipt["flat_proof"]["status"], "passed")
+        self.assertEqual(checker.call_count, 1)
+        self.assertTrue(any(f["reason"] == "final_receipt_write_error" for f in receipt["failures"]))
+
+    def test_failure_after_child_launch_preserves_latest_evidence(self):
+        def proof(*args, **kwargs):
+            raise OSError("synthetic proof storage error")
+
+        receipt, checker = self.drive(proof_hook=proof)
+        self.assertEqual((receipt["status"], receipt["exit_code"]), ("cleanup_required", 3))
+        self.assertTrue(receipt["node"]["child_launched"])
+        self.assertTrue(receipt["node"]["started"])
+        self.assertEqual(len(receipt["fills"]), 2)
+        self.assertEqual(checker.call_count, 1)
+
+    def test_final_write_error_does_not_downgrade_an_observed_bound_breach(self):
+        events = sequence()
+        events[2]["fill_price"] = "1001"
+        receipt, checker = self.drive(events=events, fail_final_write=True)
+        self.assertEqual((receipt["status"], receipt["exit_code"]), ("failed", 1))
+        self.assertTrue(receipt["node"]["child_launched"])
+        self.assertEqual(checker.call_count, 1)
+        self.assertTrue(any(f["reason"].startswith("observed_") for f in receipt["failures"]))
+        self.assertTrue(any(f["reason"] == "final_receipt_write_error" for f in receipt["failures"]))
 
     def test_unproven_flat_is_cleanup_required(self):
         receipt, _ = self.drive({"status": "refused_existing_state", "observed": {"positions": 1, "open_orders": 0}}, proof_account=None)
@@ -1136,6 +1312,29 @@ class SyntheticOrchestration(unittest.TestCase):
 
 @unittest.skipUnless(RUN.runtime_versions()["nautilus_trader"] == "2.0.0rc5", "requires installed NautilusTrader 2.0.0rc5; no broker")
 class InstalledRc5Surface(unittest.TestCase):
+    def test_reconstructed_market_init_explains_external_receipt_flag(self):
+        # engine/mod.rs and live execution manager create True. The pinned
+        # MarketOrder TryFrom calls new_checked, which reconstructs False.
+        # Python from_dict exercises the same constructor, without any engine run.
+        from nautilus_trader.core import UUID4
+        from nautilus_trader.model import ClientOrderId, InstrumentId, MarketOrder, OrderInitialized, OrderSide, Quantity, StrategyId, TimeInForce, TraderId
+        order = MarketOrder(trader_id=TraderId.from_str("TESTER-001"), strategy_id=StrategyId.from_str("EXEC_TESTER-001"),
+                            instrument_id=InstrumentId.from_str("SPY=STK.SMART"), client_order_id=ClientOrderId.from_str("O-19700101-000001-001-001-1"),
+                            order_side=OrderSide.BUY, quantity=Quantity.from_str("1"), init_id=UUID4(), ts_init=3_000_000_000,
+                            time_in_force=TimeInForce.IOC, reduce_only=False, quote_quantity=False)
+        materialization = order.init_event.to_dict()
+        materialization["reconciliation"] = True
+        initialized = OrderInitialized.from_dict(materialization)
+        self.assertTrue(initialized.reconciliation)
+        state = order.to_dict()
+        state["reconciliation"] = initialized.reconciliation
+        reconstructed = MarketOrder.from_dict(state)
+        self.assertFalse(reconstructed.events()[0].reconciliation)
+        scope = RUN.RunOrderScope(2_100_000_000)
+        cache = SimpleNamespace(orders=lambda: [reconstructed])
+        self.assertEqual(RUN.tester_orders(cache, scope), [])
+        self.assertEqual(len(RUN.snapshot_events(cache, scope, external=True)), 1)
+
     def test_real_builder_and_shared_cache_handle_without_running(self):
         # Upstream builder.rs build_in_place constructs clients; connect is in
         # the run/start path. This test never calls run, run_async or start.

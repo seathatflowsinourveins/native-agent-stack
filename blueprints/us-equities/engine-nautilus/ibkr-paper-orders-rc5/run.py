@@ -38,6 +38,11 @@ SOURCE = f"https://github.com/nautechsystems/nautilus_trader/blob/{UPSTREAM_COMM
 CASE_IDS = ("C1", "C2", "C3", "C4")
 SIGNALS = (signal.SIGINT, signal.SIGTERM, signal.SIGHUP)
 TERMINAL_FAILURES = {"OrderDenied", "OrderRejected", "OrderExpired", "OrderCancelRejected"}
+# NMS Limit Up-Limit Down Plan, Tier 1 core-session price band. This is a
+# single-band admission stress, not a submission-time engine notional cap.
+LULD_TIER1_CORE_BAND = Decimal("0.05")
+# The frozen USD 1/order allowance needs USD 0.02 for run 3's USD 1.02 sell fee.
+COMMISSION_MARGIN_PER_ORDER_USD = Decimal("0.02")
 TESTER_SETTINGS = {
     "order_qty": "1", "open_position_on_start_qty": "1", "open_position_on_first_quote": True,
     "open_position_time_in_force": "IOC", "enable_limit_buys": True, "enable_limit_sells": False,
@@ -257,17 +262,20 @@ def admit_quote(plan, quote, server_time_epoch, *, elapsed_seconds=0, delayed=Fa
         else:
             notional = ask * plan["bounds"]["max_quantity_per_order"]
             headroom = decimal(plan["risk"]["notional_headroom_usd"])
+            band_notional = notional * (1 + LULD_TIER1_CORE_BAND)
             result.update(ask_notional_usd=str(notional), headroom_usd=str(headroom),
+                          luld_core_band_fraction=str(LULD_TIER1_CORE_BAND), band_adjusted_notional_usd=str(band_notional),
                           tob_offset_ticks=resting_offset_ticks(bid, plan))
             spread_loss = (ask - bid) * plan["bounds"]["max_quantity_per_order"]
-            commissions = 2 * decimal(plan["bounds"]["commission_allowance_per_order_usd"])
+            commissions = 2 * (decimal(plan["bounds"]["commission_allowance_per_order_usd"]) + COMMISSION_MARGIN_PER_ORDER_USD)
             loss_bound = decimal(plan["bounds"]["max_roundtrip_loss_usd"])
             result.update(spread_loss_usd=str(spread_loss), expected_roundtrip_commissions_usd=str(commissions),
+                          commission_margin_per_order_usd=str(COMMISSION_MARGIN_PER_ORDER_USD),
                           expected_roundtrip_loss_usd=str(spread_loss + commissions), max_roundtrip_loss_usd=str(loss_bound))
-            if notional + headroom > decimal(plan["bounds"]["max_notional_per_order_usd"]) or result["tob_offset_ticks"] <= 0:
-                result.update(status="refused_quote_notional", stage="notional")
-            elif spread_loss + commissions > loss_bound:
+            if spread_loss + commissions > loss_bound:
                 result.update(status="refused_quote_loss_bound", stage="spread_and_commissions")
+            elif band_notional + headroom > decimal(plan["bounds"]["max_notional_per_order_usd"]) or result["tob_offset_ticks"] <= 0:
+                result.update(status="refused_quote_notional", stage="notional")
             else:
                 result.update(status="passed", stage="admitted")
     except (KeyError, TypeError, ValueError, InvalidOperation):
@@ -542,11 +550,13 @@ def serialized_receipt(receipt, secret_values=()):
     return frozen().scrub_serialized(text, secret_values) + "\n"
 
 
-def write_receipt(path, receipt, secret_values=()):
+def write_receipt(path, receipt, secret_values=(), *, replace=True):
     path = Path(path)
     protected = {PLAN_PATH.resolve(), Path(__file__).resolve(), FROZEN_RUN.resolve()}
     if path.resolve() in protected or frozen().is_gate_receipt(path):
         raise ValueError("protected receipt destination")
+    if not replace and path.exists():
+        return False
     raw = serialized_receipt(receipt, secret_values)
     path.parent.mkdir(parents=True, exist_ok=True)
     temporary = None
@@ -554,7 +564,16 @@ def write_receipt(path, receipt, secret_values=()):
         with tempfile.NamedTemporaryFile(mode="w", dir=path.parent, prefix=".paper-receipt-", delete=False) as stream:
             temporary = Path(stream.name)
             stream.write(raw)
-        os.replace(temporary, path)
+        if replace:
+            os.replace(temporary, path)
+        else:
+            # Publish complete bytes without replacing a receipt created by
+            # another parent. Python os.link provides atomic create-if-absent.
+            try:
+                os.link(temporary, path)
+            except FileExistsError:
+                return False
+        return True
     finally:
         if temporary is not None:
             temporary.unlink(missing_ok=True)
@@ -660,8 +679,8 @@ def new_receipt(plan, plan_path, versions):
             "source_hashes": {"frozen_checker_sha256": sha256(FROZEN_RUN), "safety_sha256": sha256(HERE / "safety.py")},
             "upstream_commit": UPSTREAM_COMMIT, "pre_check": None, "quote_admission": None,
             "cases": case_outcomes([]), "events": [], "reconciled_external": [], "fills": [], "roundtrip": None,
-            "flat_proof": None, "node": {"started": False, "stop_ns": None},
-            "account_lease": {"acquired": False, "lock_name": None}, "journal": None,
+            "flat_proof": None, "node": {"started": False, "child_launched": False, "stop_ns": None},
+            "account_lease": {"acquired": False}, "journal": None,
             "risk": {"bypass": False, "max_notional_per_order_usd": cap,
                      "enforcement": "runner_quantity_and_quote_admission", "note": RISK_NOTE,
                      "engine_route": RISK_ROUTE, "submit_budget_enforcement": "engine_throttle",
@@ -735,11 +754,16 @@ class RunOrderScope:
     OrderSubmitted with the original client_order_id on this run's submit path.
     The supported factory's O-date-time-trader_tag-strategy_tag-counter identity
     identifies local intents before submission; its creation second must belong
-    to this launch and match initialization. This excludes old orders whose
-    cache initialization is reconstructed with reconciliation=False. Source:
+    to this launch and match initialization. Pinned engine/mod.rs (1176, 1273)
+    and live/src/execution/manager.rs (4379) set reconciliation=True on external
+    materialization. model/src/orders/market.rs TryFrom<OrderInitialized> (533)
+    then calls new_checked, which rebuilds initialization with False (99-108).
+    This explains the external MARKET init flags in historical cache receipts;
+    it does not describe the original materialization event. Identity checks
+    exclude old orders independently. Source:
     crates/common/src/generators/client_order_id.rs write_fixed_prefix/generate.
     Also retain the matching local submission lineage for already sent orders.
-    retain ownership if later events reconcile, so the never-pass rule applies.
+    Retain ownership if later events reconcile, so the never-pass rule applies.
     Raw identifiers stay here; receipts use stable O/X aliases only.
     """
 
@@ -1124,6 +1148,16 @@ def final_status(receipt, *, interrupted=False, child_returncode=0):
     return "incomplete", "cases_or_commissions_unresolved", 3, CASE_IDS
 
 
+def parent_failure_status(receipt):
+    """Parent I/O failure must preserve launch evidence and any known failure."""
+    node = receipt["node"]
+    if not (node.get("child_launched", False) or node.get("started", False)):
+        return "not_started"
+    if not receipt.get("flat_proof") or receipt["flat_proof"].get("status") != "passed":
+        return "cleanup_required"
+    return "failed" if receipt["status"] == "failed" else "incomplete"
+
+
 def run_trial(args, *, now=None, versions=None):
     """Every admission refusal precedes official-check and node construction."""
     started_monotonic = time.monotonic()
@@ -1144,13 +1178,13 @@ def run_trial(args, *, now=None, versions=None):
     if status:
         finish(receipt, status, reason="; ".join(errors) if errors else status)
         if args.receipt:
-            write_receipt(args.receipt, receipt)
+            write_receipt(args.receipt, receipt, replace=False)
         return receipt
     if args.plan_only:
         finish(receipt, "passed")
         receipt["evidence_class"] = "structural_validation"
         if args.receipt:
-            write_receipt(args.receipt, receipt)
+            write_receipt(args.receipt, receipt, replace=False)
         return receipt
     if args.receipt is None:
         finish(receipt, "refused_receipt_required", reason="receipt required before node")
@@ -1162,7 +1196,7 @@ def run_trial(args, *, now=None, versions=None):
     private_accounts = [expected_account]
     lease = journal = None
     try:
-        receipt["account_lease"]["lock_name"] = safety().account_lock_name(expected_account)
+        # Account-derived lock keys stay on the host; never put them in evidence.
         lease = safety().AccountLease(expected_account)
         receipt["account_lease"]["acquired"] = True
         run_id = args.run_id or uuid.uuid4().hex
@@ -1172,10 +1206,10 @@ def run_trial(args, *, now=None, versions=None):
         receipt["journal"] = journal.summary()
         receipt = run_admitted_trial(args, plan, receipt, deadline, expected_account, lease, journal, now, private_accounts)
     except (safety().SafetyError, OSError) as exc:
-        status = "not_started" if not receipt["node"]["started"] else "cleanup_required"
-        if receipt.get("flat_proof") and receipt["flat_proof"].get("status") == "passed":
-            status = "failed"
-        finish(receipt, status, reason=str(exc) if isinstance(exc, safety().SafetyError) else "lease_or_journal_storage_error")
+        launched = receipt["node"].get("child_launched", False)
+        reason = str(exc) if isinstance(exc, safety().SafetyError) else (
+            "post_launch_io_error" if launched else "lease_or_journal_storage_error")
+        finish(receipt, parent_failure_status(receipt), reason=reason, step=4 if launched else 2)
     finally:
         try:
             if journal is not None:
@@ -1184,11 +1218,18 @@ def run_trial(args, *, now=None, versions=None):
                 finally:
                     journal.close()
         except Exception as exc:
-            finish(receipt, "failed" if receipt.get("flat_proof", {}) and receipt["flat_proof"].get("status") == "passed" else "cleanup_required",
+            finish(receipt, parent_failure_status(receipt),
                    reason="private_journal: " + frozen().redact(exc))
         finally:
             try:
-                write_receipt(args.receipt, receipt, private_accounts)
+                # Refusals are console-only if any prior receipt already exists.
+                # A child launch owns its provisional receipt and can refresh it.
+                write_receipt(args.receipt, receipt, private_accounts,
+                              replace=receipt["node"].get("child_launched", False))
+            except OSError:
+                launched = receipt["node"].get("child_launched", False)
+                finish(receipt, parent_failure_status(receipt),
+                       reason="final_receipt_write_error", step=4 if launched else 2)
             finally:
                 if lease is not None:
                     lease.close()
@@ -1206,20 +1247,16 @@ def run_admitted_trial(args, plan, receipt, deadline, expected_account, lease, j
     receipt["quote_admission"] = admitted
     if pre["status"] != "passed" or not account_id:
         finish(receipt, pre["status"] if pre["status"] != "passed" else "refused_account_scope", reason="pre_check")
-        write_receipt(args.receipt, receipt, (account_id,))
         return receipt
     if account_id != expected_account:
         finish(receipt, "refused_changed_account", reason="pre_check_expected_account")
-        write_receipt(args.receipt, receipt, (account_id, expected_account))
         return receipt
     sessions = frozen().parse_liquid_hours(liquid, zone, now.astimezone(frozen().ZoneInfo("America/New_York")).date())
     if sessions is None or not frozen().rth_check(datetime.now(timezone.utc), plan, sessions, horizon_s=deadline - time.monotonic())[0]:
         finish(receipt, "refused_liquid_hours", reason="whole_run_broker_window")
-        write_receipt(args.receipt, receipt, (account_id,))
         return receipt
     if admitted["status"] != "passed":
         finish(receipt, admitted["status"], reason="quote_admission")
-        write_receipt(args.receipt, receipt, (account_id,))
         return receipt
     # Atomic provisional cleanup_required receipt BEFORE creating the child/node.
     write_receipt(args.receipt, receipt, (account_id,))
@@ -1240,6 +1277,9 @@ def run_admitted_trial(args, plan, receipt, deadline, expected_account, lease, j
                    "--port", str(port), "--receipt", str(Path(args.receipt).resolve())]
         child_env = {key: value for key, value in os.environ.items()
                      if key not in ("RUST_LOG", "NAUTILUS_LOG", "TWS_ACCOUNT")}
+        # Conservative launch marker survives Popen/pipe/storage failures even
+        # when the child never manages to persist node.started.
+        receipt["node"]["child_launched"] = True
         child = subprocess.Popen(command, stdin=subprocess.PIPE, text=True,
                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, env=child_env, pass_fds=(lease.fd,))
         # Anonymous pipe only: no account in argv, environment, file or receipt.
@@ -1269,9 +1309,15 @@ def run_admitted_trial(args, plan, receipt, deadline, expected_account, lease, j
         for sig, handler in old_handlers.items():
             signal.signal(sig, handler)
         saved_failures = receipt["failures"]
+        launched = receipt["node"].get("child_launched", False)
         try:
-            receipt = json.loads(Path(args.receipt).read_text())
-            receipt["failures"].extend(saved_failures)
+            latest = json.loads(Path(args.receipt).read_text())
+            latest["failures"].extend(saved_failures)
+            latest["node"]["child_launched"] = launched
+            # Keep the caller's object current even if flat proof or a later
+            # receipt write raises. Never revert to pre-node evidence.
+            receipt.clear()
+            receipt.update(latest)
         except (OSError, ValueError):
             pass  # Preserve provisional state; a corrupt receipt can never pass.
         proof, proof_account = official_check(plan, port, with_session=False, deadline=deadline)
@@ -1288,7 +1334,11 @@ def run_admitted_trial(args, plan, receipt, deadline, expected_account, lease, j
         status, reason, step, cases = final_status(receipt, interrupted=bool(interrupted),
                                                  child_returncode=child.returncode if child is not None else None)
         finish(receipt, status, reason=reason, step=step, cases=cases)
-        write_receipt(args.receipt, receipt, (account_id, proof_account))
+        try:
+            write_receipt(args.receipt, receipt, (account_id, proof_account))
+        except OSError:
+            finish(receipt, parent_failure_status(receipt),
+                   reason="final_receipt_write_error", step=4)
     return receipt
 
 

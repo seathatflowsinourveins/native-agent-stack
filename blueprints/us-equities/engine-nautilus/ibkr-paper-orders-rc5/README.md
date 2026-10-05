@@ -142,8 +142,8 @@ rtk "$orders_env/bin/python" \
   blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/run.py \
   --port 4002 --receipt "$orders_env/../receipt-rc5-orders.json" \
   --run-id "$orders_run_id" --private-output-dir "$orders_output" \
-  > "$orders_output/console-redacted.log"
-rtk chmod 600 "$orders_output/console-redacted.log"
+  > "$orders_output/console.log"
+rtk chmod 600 "$orders_output/console.log"
 ```
 
 That recipe performs the flat pre-check and quote admission before starting the
@@ -164,20 +164,28 @@ The directory is 0700 and the file 0600. This follows
 bounded IBKR adaptation. A held lease returns `not_started`, exit 3, before any
 client connects. The lease lasts through the independent flat proof; the child
 inherits its file descriptor so an orphaned child retains the lock until exit.
-The receipt retains acquired/not-acquired and only the hash-based lock filename.
-The lock is host-local: it cannot exclude a writer on another host or the WSL
-distro that hosts the Gateway.
+The receipt retains only `account_lease: {"acquired": true|false}`. The lock name
+and its account-derived hash stay on the host and never enter the receipt or
+journal. The lease excludes only cooperating processes that use the same lock
+path and the same `XDG_STATE_HOME` (or the same HOME-derived default). The frozen
+1.231 harness does not take this lease. It cannot exclude nonparticipating
+writers or a writer on another host, including the WSL distro hosting the Gateway.
 
 Each order run creates `<run_id>.jsonl` in its private output directory outside
-the repository, beside `console-redacted.log`. The default run id is a fresh
+the repository, beside the private, unredacted `console.log`. The default run id is a fresh
 UUID; the default directory is `private-<run_id>` beside the receipt. Supply the
 same run id and directory for a retry: an existing journal refuses before
-admission. Creation uses `O_EXCL`; appends use `O_APPEND`, mode 0600, flush and
+admission. A pre-admission refusal preserves any existing receipt byte for byte
+and reports its new reason only to the console. If the receipt is absent, the
+runner publishes the refusal with atomic create-if-absent semantics. Creation
+of the journal uses `O_EXCL`; appends use `O_APPEND`, mode 0600, flush and
 `os.fsync` after every record. The parent records `run_start` with plan/harness
 hashes, then the child records owned native order events, client/venue identity
 mappings and the stop request. The parent resumes appending after child exit to
 record the independent flat proof. No account is written. The sanitized receipt
 contains only the journal's SHA-256, record count and record kinds.
+
+## Recorded residuals
 
 The journal preserves `OrderInitialized` before `OrderSubmitted` in native
 event-history order, including pre-submission denials. Its capture is through
@@ -212,7 +220,7 @@ Changes from the upstream example are bounded configuration and observation:
 | --- | --- |
 | Instrument and endpoint | AAPL becomes SPY, using upstream RAW `SPY=STK.SMART`; 7497/101 become 4002/91, with 7497 allowed. |
 | Account discovery | Replace `TWS_ACCOUNT` with the official pre-check's in-memory account. |
-| Risk engine | Set `bypass=False` and `max_notional_per_order={"SPY=STK.SMART": "1000"}`. State the route's cap limitation and hold admission through quantity one and a fresh ask plus USD 10 headroom. |
+| Risk engine | Set `bypass=False` and `max_notional_per_order={"SPY=STK.SMART": "1000"}`. State the route's cap limitation and hold admission through quantity one, a fresh ask stressed upward by 5%, and USD 10 headroom. |
 | Submit rate | `6/00:07:00` limits native dispatch over the whole run instead of the example's default rate. |
 | Quotes | REALTIME and `batch_quotes=False` replace DELAYED. Delayed data cannot establish bounded current-price admission. |
 | Sell quotes and other orders | Disable limit sells, stops and brackets. Entry quantity and limit quantity remain one; entry stays MARKET IOC on the first quote. |
@@ -222,6 +230,12 @@ Changes from the upstream example are bounded configuration and observation:
 | Node timeouts | Use `_common.py`'s builder methods with the frozen 60-second connection budget, 5-second reconciliation/portfolio/disconnection timeouts and a 45-second post-stop grace for callbacks. |
 | Runtime control | Host the node with upstream `run_async()`, capture cache/handle first and handle SIGINT, SIGTERM and SIGHUP. A parent process reserves the final 60 seconds for independent observation and requests graceful stop before enforcing the hard deadline. |
 | Logging | Set native stdout/file log levels OFF and `print_config=False`; send child stdout/stderr to DEVNULL and remove RUST_LOG, NAUTILUS_LOG and TWS_ACCOUNT from its environment. Read receipt evidence from the shared cache. |
+
+Admission also requires spread times quantity plus the frozen commission
+allowance to fit the USD 5 loss bound. The runner adds an explicit USD 0.02
+margin to the plan's USD 1.00 allowance for each order, covering run 3's USD 1.02
+sell commission. Expected round-trip commissions are therefore USD 2.04, and
+an admitted one-share spread can be at most USD 2.96. The plan values are unchanged.
 
 The half-bid placement reuses the frozen harness's distant resting probe.
 IB precautionary settings are configurable; this build has not observed the
@@ -251,6 +265,16 @@ same strategy. The submission lineage follows upstream's
 [IB submit path](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/adapters/interactive_brokers/src/execution/core_orders.rs#L142)
 and distinguishes the
 [external-order materialization path](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/execution/src/engine/mod.rs#L1101).
+Source correction from r6: external materialization sets `reconciliation=true`
+in that engine and the
+[live execution manager](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/live/src/execution/manager.rs#L4379).
+The subsequent
+[MarketOrder conversion](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/model/src/orders/market.rs#L533)
+calls the constructor, which creates another initialization event with
+`reconciliation=false`. That conversion explains the cache receipt's false
+external-init flag; the original external materialization did not set it false.
+The installed rc5 reconstruction regression checks the constructor behavior,
+and old generated identities without a local submission remain external.
 All other cache orders appear under `reconciled_external` with stable `X` labels,
 types, sides, quantities, fill prices and event timestamps. They do not contribute
 to cases, bounds observations or deferred stop. A reconciliation event on an
@@ -273,14 +297,27 @@ PR #754 submission-time notional disposition: rc5 does not enforce the engine
 cap on the SMART/IB route affected by #4946. The fix ships in v2.0.0rc6;
 qualifying rc6 moves the bound to the engine. This selected rc5 trial holds its
 bound through quantity one and quote admission without wrapping or modifying
-upstream ExecTester's submission. For one SPY share to exceed USD 1000 after
-admission around USD 775, its price must rise about 29% between the admission
-recheck and submission, within the roughly 60-second startup budget. Under the
-National Market System Plan to Address Extraordinary Market Volatility (the
-Limit Up-Limit Down Plan), a Tier 1 NMS security such as SPY has 5% price bands
-during the core session and 10% bands in the opening and closing windows.
-Trading pauses rather than trading through those bands. The independent
-client-92 flat proof still runs at the end.
+upstream ExecTester's submission. Admission and the child recheck require
+`ask × qty × 1.05 + USD 10 ≤ USD 1000`. At quantity one and a USD 0.01 tick,
+USD 942.85 is the highest admitted ask; USD 942.86 refuses. The 0.05 constant
+names the National Market System Plan to Address Extraordinary Market Volatility
+(Limit Up-Limit Down Plan) Tier 1 core-session band. The guard leaves the existing
+USD 10 headroom intact after a 5% rise from any admitted ask.
+
+The roughly 60-second startup budget covers entry. C4's close-on-stop MARKET
+SELL can begin as late as `node_stop_at`, 300 seconds after the parent starts:
+420 seconds overall minus 60 for independent proof, 45 for cleanup, and 15 for
+stop allowance. Its fill can arrive during shutdown. The admission guard applies
+one 5% price stress; LULD does not freeze the price for this entire interval.
+Its bands use a rolling reference price and can move; Tier 1 bands above USD 3
+are 5%, doubling to 10% during the last 25 minutes. Since February 2020, the
+opening 15 minutes use single-width bands, correcting the earlier opening-window
+claim. Trades cannot execute outside active bands and a persistent limit state
+triggers a pause. See the [LULD Plan overview](https://www.luldplan.com/) and
+its [2021 Annual Report](https://cdn.luldplan.com/reports/LULD-2021-Annual-Report.pdf).
+The admission stress is not a guaranteed submission-time cap over 300 seconds;
+rc6 qualification moves that bound to the engine. The independent client-92
+flat proof still runs at the end.
 
 ## Receipts and remaining acceptance
 
@@ -292,6 +329,11 @@ atomically written before starting the node and refreshed as observations arrive
 A killed child leaves that provisional state for the parent and reviewer.
 Pre-node child refusals write a `refused_child_*` reason before exiting; the
 parent retains that cause after successful independent flat proof.
+The parent marks the child launch before `Popen` and adopts child evidence into
+its existing receipt object. A later storage failure cannot revert to
+`not_started`: unavailable flat proof leaves `cleanup_required`, while successful
+flat proof plus a final write error yields `incomplete`. An already observed
+bound or case failure remains `failed`.
 The shared client-92 session freezes `pre_check.observed` with a deep copy before
 quote admission. A pre-check timeout or exception records `pre_check` as
 `incomplete` with its phase-specific cause and leaves quote admission `not_run`.
