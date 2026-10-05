@@ -122,7 +122,8 @@ def expected_ranges(root, path, winner):
         else:
             values = [str(fields[key][1]) for key in keys]
             if keys == ("selected_path",):
-                if winner["component_id"] + pin not in values[0]:
+                if not re.search(re.escape(winner["component_id"]) + r'\s*'
+                                 + re.escape(pin) + r'(?![\d.])', values[0]):
                     continue
             elif not all(value in pin for value in values):
                 continue
@@ -177,6 +178,26 @@ class ArchitecturePinSourceTests(unittest.TestCase):
                              if line.strip() == "},")
             self.assertNotIn((wrong_line, wrong_line), ranges)
             self.assertNotIn((delimiter, delimiter), ranges)
+
+    def test_alpaca_selected_path_accepts_whitespace_but_rejects_other_versions(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            path = "catalogs/us-equities/runtime-target.json"
+            (root / path).parent.mkdir(parents=True)
+            winner = {"component_id": "alpaca-py", "repository": "https://github.com/alpacahq/alpaca-py",
+                      "pin": "0.44.0"}
+            for description, accepted in (("Official alpaca-py0.44.0 for ingestion", True),
+                                          ("Official alpaca-py 0.44.0 for ingestion", True),
+                                          ("Official alpaca-py\t0.44.0 for ingestion", True),
+                                          ("Official alpaca-py 0.45.0 for ingestion", False),
+                                          ("Official alpaca-py 0.44.01 for ingestion", False),
+                                          ("Official alpaca-py 0.44.0.1 for ingestion", False)):
+                with self.subTest(description=description):
+                    text = json.dumps({"brokers": [{"id": "alpaca", "selected_path": description}]}, indent=2)
+                    (root / path).write_text(text, encoding="utf-8")
+                    ranges = expected_ranges(root, path, winner)
+                    self.assertEqual(ranges, {(5, 5)} if accepted else set())
+                    self.assertNotIn((6, 6), ranges, "the closing delimiter is not a pin field")
 
 
 if __name__ == "__main__":

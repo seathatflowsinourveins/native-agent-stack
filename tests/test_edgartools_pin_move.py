@@ -56,6 +56,7 @@ class EdgarToolsPinMoveTests(unittest.TestCase):
         self.assertTrue("pin_classification_correction_20261005" in receipt,
                         "the receipt must correct its relayed classification")
         note = receipt["pin_classification_correction_20261005"]
+        self.assertIn(f"relayed by {RECEIPT}:", note)
         self.assertEqual(note, inventory["correction_note_20261005"])
         self.assertTrue(note.startswith("2026-10-05:"))
         evidence = json.loads((ROOT / "manifests/evidence.json").read_text(encoding="utf-8"))

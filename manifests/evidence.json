@@ -4269,7 +4269,7 @@
       ],
       "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json",
       "superseded_note_20261005": "2026-10-05: The EdgarTools 5.60.0 move, supported by native SEC acceptance native-sec-edgartools-5600-20261004, supersedes the historical sentence that the 5.59.1 overturn comparison remains open and delivered EdgarTools stays at catalog 5.58.0. NativeStack2604 installation PASS and 25/25 offline acceptance on the final 5.60.0 lock are recorded in native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json), at d02c0827 on lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z, with the install script's shared sync under mise exec uv@0.12.17: uv lock --check, uv sync --locked --no-dev and uv pip check, as blueprints/us-equities/runtime-2604/sync-trading-2604.sh:14 shows. Both relocks used the installed native uv 0.12.17 executable on the packaging worker, with mise unavailable: the EdgarTools upgrade (uv lock --upgrade-package edgartools) produced lock 6b4e6a4d, as recorded in evidence/artifacts/edgartools-5600-20261004/runtime-lock-change.json; the round-c build-constraint relock produced final lock 4c98672d14147a1b, as recorded in evidence/artifacts/trading-runtime-2604-20261004/build-constraint-proof.json. Neither relock ran through mise. This supersedes the earlier pending notes for the rerun and destination-host install sync; independent review remains pending. The recorded 2026-10-04 measurements, limitations and 5.58.0 runtime remain historical.",
-      "pin_classification_correction_20261005": "2026-10-05: Correction to the 2026-10-04 pin-site classification relayed by this receipt: five sites previously labelled dated historical snapshot / keep_history are live selection mirrors that moved to 5.60.0 in pinsrc-b (95cf94ca4). The sites are saturation-audit.json:3209 (version), and upstream-snapshot.json:3496 (selected_version), :3539 (latest_stable_release/tag_name), :3541 (latest_stable_release/html_url) and :3553 (latest_release_source/ref); these line numbers are at the inventory base 29da752f5. The explicit classification_corrections_20261005 in evidence/artifacts/edgartools-5600-20261004/pin-site-classification.json supersede those five classifications while retaining the original records. upstream-snapshot.json:3524 is the dated v5.58.0 check endpoint and stays historical. Verification: inspect the EdgarTools rows at 95cf94ca4 and run python3 -m unittest tests.test_edgartools_pin_move."
+      "pin_classification_correction_20261005": "2026-10-05: Correction to the 2026-10-04 pin-site classification relayed by evidence/receipts/edgartools-5600-pin-move-20261004.json: five sites previously labelled dated historical snapshot / keep_history are live selection mirrors that moved to 5.60.0 in pinsrc-b (95cf94ca4). The sites are saturation-audit.json:3209 (version), and upstream-snapshot.json:3496 (selected_version), :3539 (latest_stable_release/tag_name), :3541 (latest_stable_release/html_url) and :3553 (latest_release_source/ref); these line numbers are at the inventory base 29da752f5. The explicit classification_corrections_20261005 in evidence/artifacts/edgartools-5600-20261004/pin-site-classification.json supersede those five classifications while retaining the original records. upstream-snapshot.json:3524 is the dated v5.58.0 check endpoint and stays historical. Verification: inspect the EdgarTools rows at 95cf94ca4 and run python3 -m unittest tests.test_edgartools_pin_move."
     },
     {
       "id": "native-trading-runtime-2604-rerun-d02c0827-20261005",
@@ -16930,8 +16930,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "e62961e9581d6c5c3a44bdf4d3441222bd4a0ce7b60fc84a5a6d77810af82aa4",
-      "bytes": 197866
+      "sha256": "5f278bcfb415fc9934816d60dcb8844c69d185202afbd4ad375cce6ddefea86b",
+      "bytes": 198585
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -18910,8 +18910,8 @@
     },
     {
       "path": "evidence/artifacts/edgartools-5600-20261004/pin-site-classification.json",
-      "sha256": "519ac56085d56d1913273c33316e3818ac5642eb26fedd5dcd20fa118853cf33",
-      "bytes": 106957
+      "sha256": "d596730c1dfb46beee3c91374d6318a3a6ce4de6b3c9db79a46dfecbe51d8bd0",
+      "bytes": 107001
     },
     {
       "path": "evidence/artifacts/edgartools-5600-20261004/release-evidence.json",
@@ -51540,8 +51540,8 @@
     },
     {
       "path": "evidence/receipts/edgartools-5600-pin-move-20261004.json",
-      "sha256": "ce425342337df74c77d2807ac544e43c4a3e5c2a4e4e105dc7a8b23b7b53937b",
-      "bytes": 7987
+      "sha256": "f83b6157f94a0ca5bf40a2ee0b836c67ce89ae7fe3a65a20b975529efcbc9849",
+      "bytes": 8031
     },
     {
       "path": "evidence/receipts/env-freshness-wsl-ubuntu-main-20260924.json",
@@ -53565,8 +53565,8 @@
     },
     {
       "path": "tests/test_architecture_pin_source.py",
-      "sha256": "b5d628e8ee19a0fd9295b0b1269fe9f3e427223285c4a31a80e77c20e13f35c2",
-      "bytes": 9148
+      "sha256": "4bb36cb956117d6ff5ee35451b3aed23dbd79c750b61f9dbbc86bbf0c0fd27bb",
+      "bytes": 10721
     },
     {
       "path": "tests/test_blind_layer_decisions.py",
@@ -53765,8 +53765,8 @@
     },
     {
       "path": "tests/test_edgartools_pin_move.py",
-      "sha256": "7144a07b35ee807d363d7cf8e25c8e95d873d8635fcbffa3380f30524ba4a990",
-      "bytes": 4190
+      "sha256": "85cb0c9ae125daf379328cfba9da825c66d7205e6b2a4b4f55a831d24908989a",
+      "bytes": 4244
     },
     {
       "path": "tests/test_effort_default_guard.py",
