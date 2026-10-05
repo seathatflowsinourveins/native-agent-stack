@@ -16423,6 +16423,11 @@
       "bytes": 15230
     },
     {
+      "path": "docs/decisions/2026-10-04-host-baseline-recorder.md",
+      "sha256": "ce0068b279a43237a1789362995a0f79e788ab038714975fe671e51e062a529f",
+      "bytes": 6667
+    },
+    {
       "path": "docs/decisions/2026-10-04-pwsh7-windows-guidance.md",
       "sha256": "635fb536fb82377c4f1dd8d1acefe73d4fa6cc9298ce578164c372142ac36a8a",
       "bytes": 16799
@@ -32791,6 +32796,16 @@
       "path": "evidence/artifacts/hf-memory-models-20260921/native-results.json",
       "sha256": "01263899ad06977b5fc855f9667f2c29bdffd13d2036705485b24bb7095c5e50",
       "bytes": 17286
+    },
+    {
+      "path": "evidence/artifacts/host-baseline-20261004/coreutils-2604-upgrade.json",
+      "sha256": "5869c88fa349ed59bea95887ca5596e0f6f482ba8b8c3cd4ff406342accd6130",
+      "bytes": 597
+    },
+    {
+      "path": "evidence/artifacts/host-baseline-20261004/nativestack-2404.json",
+      "sha256": "65334b8940654e64b05448795f47b431e9c41e173cc185f9df43293d58c4bbf5",
+      "bytes": 12182
     },
     {
       "path": "evidence/artifacts/host-upgrade-20260923/upgrade-evidence.json",
@@ -49528,6 +49543,11 @@
       "bytes": 10269
     },
     {
+      "path": "evidence/hosts/nativestack-2404-20261004/nativestack-2404-20261004--claude-code--install--20261005.json",
+      "sha256": "84cf0bd5748c0afc8ba7602a465914c710b8c48d5eef6796de16c7f67cc63bb0",
+      "bytes": 2557
+    },
+    {
       "path": "evidence/hosts/nativestack-5975wx-20260925/nativestack-5975wx-20260925--affaan-m%2FECC--install--20260926-2.json",
       "sha256": "dfd7527058a6efdd8daf8d9a38b1401b025ea13413a02b4bb8260aee459bc12e",
       "bytes": 5539
@@ -52798,6 +52818,11 @@
       "bytes": 5155
     },
     {
+      "path": "tests/test_host_baseline_probe.py",
+      "sha256": "c44b7f6781cd046177adbbe6fb5ebfc4e321b9e3fc6bdf51c790ee4b7b9fa71b",
+      "bytes": 8392
+    },
+    {
       "path": "tests/test_host_receipts.py",
       "sha256": "04f54683ee97d99f3383ac1f9989c0aad843562bdc31f890dece4177f114448f",
       "bytes": 144843
@@ -53406,6 +53431,16 @@
       "path": "tools/adoption/embed_acceptance.py",
       "sha256": "b567a3ce64d66f0798bd5fc73cf78d8a12074d583177c204d5465050873258b1",
       "bytes": 8209
+    },
+    {
+      "path": "tools/adoption/host-baseline.md",
+      "sha256": "724223cde399939a5553571426757cde5fd8695a70316e60958acc68fdc78b41",
+      "bytes": 7210
+    },
+    {
+      "path": "tools/adoption/host_baseline_probe.py",
+      "sha256": "21f3d8e96d1f4b9d24b7b30f280dba2f44af14135fdd0852468444c25d86bedf",
+      "bytes": 11784
     },
     {
       "path": "tools/adoption/install_claude_profile.py",
