@@ -4378,12 +4378,12 @@
     },
     {
       "path": ".github/workflows/scorecard.yml",
-      "sha256": "051dd11d0b7be79e7086b58952c19420e3dfc83360bfcbe64387d1d1d769ace2",
+      "sha256": "4f939ddd54c245bd18c83ba214b324ec3ef5cd9d783b78369158fab7050e6772",
       "bytes": 2212
     },
     {
       "path": ".github/workflows/security-scan.yml",
-      "sha256": "f1fcc7f05ecd9eab1b59f6d84d2e0274981da7046914c1a0d26c9189ea876ac6",
+      "sha256": "3e7da021b19042d00c274783ffd2c8e0160a74e9b1953959667b4a06ef8216f6",
       "bytes": 13178
     },
     {
@@ -16671,6 +16671,11 @@
       "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",
       "sha256": "1389de18bbaf5c41d8f22093a9642d982230a851f954183b7c8254e0b5890bce",
       "bytes": 18701
+    },
+    {
+      "path": "docs/decisions/2026-10-05-ci-upload-sarif-pin.md",
+      "sha256": "8f3911069f7c919ad2df53f20e739993746438f8888289dfdc344da5ba59d2a3",
+      "bytes": 2759
     },
     {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
@@ -32991,6 +32996,11 @@
       "path": "evidence/artifacts/github-ci-measurements-20261003/later-reads-20261003.json",
       "sha256": "b100809511623c4cc13ef62939f7cf52e3113b40eae63952146657ed47f56ab3",
       "bytes": 56770
+    },
+    {
+      "path": "evidence/artifacts/github-ci-r4-20261005.json",
+      "sha256": "6f6bf7c119cf23357fb235805c4fc75bc7f10093fc5a04f22be04b6204588b11",
+      "bytes": 7658
     },
     {
       "path": "evidence/artifacts/gitleaks-macos-memory-bound-20260924/measure.py",
