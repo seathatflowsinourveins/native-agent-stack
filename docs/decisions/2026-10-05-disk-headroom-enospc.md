@@ -147,7 +147,10 @@ space crosses the floor (faster than about 50 GiB per two minutes), the configur
 worst-phase budget after crossing the low-space floor is approximately
 **30 + 1 + 15 + 15 + 15 = 76s**, including the new pending interval. For slower fills
 the page arrives roughly (120 s − observation delay − 15 s) before the forecast
-reaches zero, whatever the fill speed (independent delta read, 2026-10-05). This is a configuration budget, not a measured
+reaches zero. In general, for a linear fill at r GiB/s the lead is about
+min(50/r, 120) s − observation delay − 15 s, so a fill of 1 GiB/s or faster can exhaust
+the disk before the page (independent delta reads, 2026-10-05); the copy guards and the
+host's two-minute headroom guard cover that case. This is a configuration budget, not a measured
 latency guarantee; transport, scheduling and an unestablished regression can add
 delay. At least two float samples are required, and changing the slope can take
 time to dominate the two-minute history. Alertmanager's initial **5s group_wait**

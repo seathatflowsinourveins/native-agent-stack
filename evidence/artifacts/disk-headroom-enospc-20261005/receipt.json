@@ -455,5 +455,39 @@
       }
     ],
     "note": "The builder's 91- and 175-test runs predate the final edits; this block binds the passes to the committed files."
+  },
+  "coordinator_acceptance_final": {
+    "at": "2026-10-05T03:51:38Z",
+    "bound_to": "the tested input files' sha256 (the receipt itself is part of the content, so it binds to its inputs rather than to a tree that contains it)",
+    "inputs": {
+      "observability/backends/templates/ecosystem-prometheus-rules.yml.example": "cda25710e34c4235c784d451037e5d8ae614c58139ee827ae6d614a7188702a4",
+      "tests/test_observability_backends_alerts.py": "fa3ab3ed890fd3beaa88ea3be0629c5ec8eb7d36556a4777e564926d5d8ed8eb",
+      "tests/test_tmpdir_guard.py": "36263b6a675b849f92cd10d4ea9d03828082888978facf5f467ee6ea0fd16cba",
+      "tests/repository_copy.py": "83c560926cb36a5fa767db2b0bc2180f018435b053c2a407635a1c492d646b9d",
+      "tests/__init__.py": "5f32f38f71e5e8ad9c26bd4c83080b4ce1584802b92dd6a7c860678a241c8461"
+    },
+    "runs": [
+      {
+        "cmd": "promtool check rules observability/backends/templates/ecosystem-prometheus-rules.yml.example (pinned promtool 3.15.0)",
+        "exit": 0,
+        "result": "SUCCESS: 26 rules found"
+      },
+      {
+        "cmd": "python3 -m unittest tests.test_observability_backends_alerts.RootFilesystemRuleTests",
+        "exit": 0,
+        "result": "Ran 9 tests, OK (pinned promtool test rules)"
+      },
+      {
+        "cmd": "python3 -m unittest discover -s tests -p test_tmpdir_guard.py",
+        "exit": 0,
+        "result": "Ran 9 tests, OK"
+      },
+      {
+        "cmd": "python3 -m unittest tests.test_observability_backends_alerts tests.test_tmpdir_guard tests.test_catalog_freshness_propose tests.test_wsl_retrieval",
+        "exit": "see note",
+        "result": "175 tests; the one validator-subprocess test passes only after the registry commit, re-run then"
+      }
+    ],
+    "supersedes": "coordinator_acceptance (bound to 6d1a37b8d, before the description edits; GPT delta read 712d P2-1)"
   }
 }
