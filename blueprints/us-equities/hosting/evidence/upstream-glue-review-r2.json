@@ -194,35 +194,35 @@
   "native_choices": [
     {
       "glue": "session_day.py",
-      "decision": "kept",
+      "upstream_outcome": "kept",
       "checked": "Native ecal CLI, native is_session/session_close and Dagu preconditions/retries/handlers.",
       "gap_citation": "gerrymanoim/exchange_calendars@4.13.2:pyproject.toml:67-68; exchange_calendars/ecal.py:100-149; exchange_calendars/exchange_calendar.py:1012-1016,1257-1279",
       "why": "ecal renders a calendar; compose native session/close queries into the job eligibility/input-mtime token and leave skipping to Dagu."
     },
     {
       "glue": "journal_recovery.py",
-      "decision": "kept",
+      "upstream_outcome": "kept",
       "checked": "restic stdin-from-command, SQLite CLI .backup/.dump, SQLite sqlite3_rsync, CPython Online Backup and subprocess timeout.",
       "gap_citation": "restic/restic@v0.19.1:doc/040_backup.rst:679-703; doc/045_working_with_repos.rst:482-521; doc/050_restore.rst:55-73; sqlite/sqlite@version-3.53.1:src/shell.c.in:9074-9099; tool/sqlite3_rsync.c:13-40",
       "why": "Native operations do the copying/backups/checks/restores; consumer glue freezes the external oracle and required tables, rotates checks with a deadline and refuses controls."
     },
     {
       "glue": "journal_recovery.py rotation lock",
-      "decision": "replaced",
+      "upstream_outcome": "replaced",
       "checked": "CPython native fcntl.flock",
       "gap_citation": "python/cpython@v3.12.3:Doc/library/fcntl.rst:139-149",
       "why": "Replace exclusive-create sentinels with nonblocking process-owned flock; stale file survives safely and no custom stale-lock recovery runs."
     },
     {
       "glue": "drill_process_restart.py",
-      "decision": "kept",
+      "upstream_outcome": "kept",
       "checked": "systemd Restart=on-failure, Dagu native history/status and native handlers/retries.",
       "gap_citation": "systemd/systemd@v255:man/systemd.service.xml:818-836; dagucloud/dagu@v2.16.6:internal/cmd/history.go:568-602; internal/ir/status.go:133-149",
       "why": "Upstreams own supervision and run records; identity/time/holiday guards and exact due-slot correlation are our acceptance procedure."
     },
     {
       "glue": "drill_local_recovery.py",
-      "decision": "kept",
+      "upstream_outcome": "kept",
       "checked": "Native Online Backup, restic backup/check/restore and .backup/.dump/sqlite3_rsync alternatives.",
       "gap_citation": "python/cpython@v3.12.3:Modules/_sqlite/connection.c:2067-2102; restic/restic@v0.19.1:doc/050_restore.rst:55-73",
       "why": "Synthetic concurrent WAL writers, failures preserving integrity/counts and path-free integration evidence are consumer acceptance rather than replacement backup tools."

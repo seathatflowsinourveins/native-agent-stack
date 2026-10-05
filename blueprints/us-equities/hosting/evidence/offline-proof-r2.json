@@ -40,7 +40,30 @@
           ],
           "duration_s": 0.83599,
           "exit": 0,
-          "output": "{\"message_type\":\"summary\",\"files_new\":3,\"files_changed\":0,\"files_unmodified\":0,\"dirs_new\":3,\"dirs_changed\":5,\"dirs_unmodified\":0,\"data_blobs\":1,\"tree_blobs\":9,\"data_added\":440024,\"data_added_packed\":4408,\"total_files_processed\":3,\"total_bytes_processed\":16532001,\"total_duration\":0.800409374,\"backup_start\":\"2026-10-05T01:32:31.299715116-04:00\",\"backup_end\":\"2026-10-05T01:32:32.10012451-04:00\",\"snapshot_id\":\"0f8689841dd2a17de838454f93f004cd439c69f8e9f685a1b76f0ced3945f2b0\"}\n"
+          "output": {
+            "representation": "parsed_json_lines",
+            "lines": [
+              {
+                "message_type": "summary",
+                "files_new": 3,
+                "files_changed": 0,
+                "files_unmodified": 0,
+                "dirs_new": 3,
+                "dirs_changed": 5,
+                "dirs_unmodified": 0,
+                "data_blobs": 1,
+                "tree_blobs": 9,
+                "data_added": 440024,
+                "data_added_packed": 4408,
+                "total_files_processed": 3,
+                "total_bytes_processed": 16532001,
+                "total_duration": 0.800409374,
+                "backup_start": "2026-10-05T01:32:31.299715116-04:00",
+                "backup_end": "2026-10-05T01:32:32.10012451-04:00",
+                "snapshot_id": "0f8689841dd2a17de838454f93f004cd439c69f8e9f685a1b76f0ced3945f2b0"
+              }
+            ]
+          }
         },
         {
           "args": [
@@ -64,7 +87,18 @@
           ],
           "duration_s": 0.766378,
           "exit": 0,
-          "output": "{\"message_type\":\"summary\",\"total_files\":4,\"files_restored\":4,\"total_bytes\":16532001,\"bytes_restored\":16532001}\n"
+          "output": {
+            "representation": "parsed_json_lines",
+            "lines": [
+              {
+                "message_type": "summary",
+                "total_files": 4,
+                "files_restored": 4,
+                "total_bytes": 16532001,
+                "bytes_restored": 16532001
+              }
+            ]
+          }
         }
       ],
       "returned": {
@@ -97,7 +131,43 @@
           ],
           "duration_s": 0.786509,
           "exit": 3,
-          "output": "{\"message_type\":\"summary\",\"files_new\":2,\"files_changed\":0,\"files_unmodified\":0,\"dirs_new\":3,\"dirs_changed\":5,\"dirs_unmodified\":0,\"data_blobs\":2,\"tree_blobs\":9,\"data_added\":439323,\"data_added_packed\":4764,\"total_files_processed\":2,\"total_bytes_processed\":8266273,\"total_duration\":0.759458587,\"backup_start\":\"2026-10-05T01:32:30.20588227-04:00\",\"backup_end\":\"2026-10-05T01:32:30.965340857-04:00\",\"snapshot_id\":\"32eac2d2e6d8e8a4b83723f540cf10a456cfc73011ef7ef7bf6882c65eb502fc\"}\n{\"message_type\":\"error\",\"error\":{\"message\":\"open <scratch>/control-snapshot/stage/journals/evidence.sqlite3: permission denied\"},\"during\":\"archival\",\"item\":\"<scratch>/control-snapshot/stage/journals/evidence.sqlite3\"}\n{\"message_type\":\"exit_error\",\"code\":3,\"message\":\"Warning: at least one source file could not be read\"}\n"
+          "output": {
+            "representation": "parsed_json_lines",
+            "lines": [
+              {
+                "message_type": "summary",
+                "files_new": 2,
+                "files_changed": 0,
+                "files_unmodified": 0,
+                "dirs_new": 3,
+                "dirs_changed": 5,
+                "dirs_unmodified": 0,
+                "data_blobs": 2,
+                "tree_blobs": 9,
+                "data_added": 439323,
+                "data_added_packed": 4764,
+                "total_files_processed": 2,
+                "total_bytes_processed": 8266273,
+                "total_duration": 0.759458587,
+                "backup_start": "2026-10-05T01:32:30.20588227-04:00",
+                "backup_end": "2026-10-05T01:32:30.965340857-04:00",
+                "snapshot_id": "32eac2d2e6d8e8a4b83723f540cf10a456cfc73011ef7ef7bf6882c65eb502fc"
+              },
+              {
+                "message_type": "error",
+                "error": {
+                  "message": "open <scratch>/control-snapshot/stage/journals/evidence.sqlite3: permission denied"
+                },
+                "during": "archival",
+                "item": "<scratch>/control-snapshot/stage/journals/evidence.sqlite3"
+              },
+              {
+                "message_type": "exit_error",
+                "code": 3,
+                "message": "Warning: at least one source file could not be read"
+              }
+            ]
+          }
         }
       ],
       "returned": {
@@ -179,7 +249,16 @@
       ],
       "duration_s": 3.024287,
       "exit": 0,
-      "output": "{\"message_type\":\"initialized\",\"id\":\"ae4d596bfa0825e01e55666740ec5e48b4908d963ed797f29c7766c789e81b93\",\"repository\":\"<scratch>/repository\"}\n"
+      "output": {
+        "representation": "parsed_json_lines",
+        "lines": [
+          {
+            "message_type": "initialized",
+            "id": "ae4d596bfa0825e01e55666740ec5e48b4908d963ed797f29c7766c789e81b93",
+            "repository": "<scratch>/repository"
+          }
+        ]
+      }
     },
     {
       "args": [
@@ -203,7 +282,30 @@
       ],
       "duration_s": 0.816045,
       "exit": 0,
-      "output": "{\"message_type\":\"summary\",\"files_new\":3,\"files_changed\":0,\"files_unmodified\":0,\"dirs_new\":8,\"dirs_changed\":0,\"dirs_unmodified\":0,\"data_blobs\":17,\"tree_blobs\":9,\"data_added\":9312577,\"data_added_packed\":22498,\"total_files_processed\":3,\"total_bytes_processed\":16532001,\"total_duration\":0.77918784,\"backup_start\":\"2026-10-05T01:32:27.526759927-04:00\",\"backup_end\":\"2026-10-05T01:32:28.305947767-04:00\",\"snapshot_id\":\"e173073f1aea68433d4502f2f7406cdde7a741f2fc8308a24ed9f49eb3d75e8b\"}\n"
+      "output": {
+        "representation": "parsed_json_lines",
+        "lines": [
+          {
+            "message_type": "summary",
+            "files_new": 3,
+            "files_changed": 0,
+            "files_unmodified": 0,
+            "dirs_new": 8,
+            "dirs_changed": 0,
+            "dirs_unmodified": 0,
+            "data_blobs": 17,
+            "tree_blobs": 9,
+            "data_added": 9312577,
+            "data_added_packed": 22498,
+            "total_files_processed": 3,
+            "total_bytes_processed": 16532001,
+            "total_duration": 0.77918784,
+            "backup_start": "2026-10-05T01:32:27.526759927-04:00",
+            "backup_end": "2026-10-05T01:32:28.305947767-04:00",
+            "snapshot_id": "e173073f1aea68433d4502f2f7406cdde7a741f2fc8308a24ed9f49eb3d75e8b"
+          }
+        ]
+      }
     },
     {
       "args": [
@@ -227,7 +329,18 @@
       ],
       "duration_s": 0.738478,
       "exit": 0,
-      "output": "{\"message_type\":\"summary\",\"total_files\":4,\"files_restored\":4,\"total_bytes\":16532001,\"bytes_restored\":16532001}\n"
+      "output": {
+        "representation": "parsed_json_lines",
+        "lines": [
+          {
+            "message_type": "summary",
+            "total_files": 4,
+            "files_restored": 4,
+            "total_bytes": 16532001,
+            "bytes_restored": 16532001
+          }
+        ]
+      }
     }
   ],
   "restic_pin": "0.19.1",

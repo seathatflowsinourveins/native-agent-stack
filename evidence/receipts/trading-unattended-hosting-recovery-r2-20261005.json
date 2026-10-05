@@ -182,8 +182,8 @@
   "artifacts": [
     {
       "path": "blueprints/us-equities/hosting/evidence/offline-proof-r2.json",
-      "sha256": "8738887500d41c47c15f0647f3cc6ad8d9af69e00aab894aad57c410549ab8a1",
-      "bytes": 9016
+      "sha256": "c80b455622e549c21e3a0df78ce300c0722182f529bcdae09ddf5ce5c25637b1",
+      "bytes": 10789
     },
     {
       "path": "blueprints/us-equities/hosting/evidence/native-dagu-probes-r2.json",
@@ -192,8 +192,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/evidence/upstream-glue-review-r2.json",
-      "sha256": "49f02ebf9e5456b587af0aeef8b2800e4ddcab8313601f9fc682f37d3cbdad56",
-      "bytes": 15819
+      "sha256": "2f8c7896b7277264801fc4b701375c612574619a2b96190202396fb52b00e2e7",
+      "bytes": 15859
     },
     {
       "path": "blueprints/us-equities/hosting/evidence/cron-next-probe-r2.json",
@@ -220,7 +220,19 @@
       "cmd": "env TMPDIR=<private-scratch-root> nice -n 19 python3 blueprints/us-equities/hosting/drill_local_recovery.py --restic-bin <restic-0.19.1> --scratch-root <private-scratch-root> --output <new-sanitized-report>",
       "exit": 0,
       "invocation_proxy": "Builder prefixed the command with rtk env, which ran env through RTK fallback. The portable recipe does not require RTK.",
-      "returned_output": "{\"checked_subset\": \"1/1\", \"matched_journals\": 2, \"restore_control_exit\": 1, \"result\": \"passed\", \"snapshot_control_exit\": 1, \"throwaway_password_deleted\": true}\n",
+      "returned_output": {
+        "representation": "parsed_json_lines",
+        "lines": [
+          {
+            "checked_subset": "1/1",
+            "matched_journals": 2,
+            "restore_control_exit": 1,
+            "result": "passed",
+            "snapshot_control_exit": 1,
+            "throwaway_password_deleted": true
+          }
+        ]
+      },
       "started_at_utc": "2026-10-05T05:32:23.230897+00:00",
       "completed_at_utc": "2026-10-05T05:32:33.774862+00:00"
     },
@@ -324,7 +336,30 @@
           ],
           "duration_s": 0.83599,
           "exit": 0,
-          "output": "{\"message_type\":\"summary\",\"files_new\":3,\"files_changed\":0,\"files_unmodified\":0,\"dirs_new\":3,\"dirs_changed\":5,\"dirs_unmodified\":0,\"data_blobs\":1,\"tree_blobs\":9,\"data_added\":440024,\"data_added_packed\":4408,\"total_files_processed\":3,\"total_bytes_processed\":16532001,\"total_duration\":0.800409374,\"backup_start\":\"2026-10-05T01:32:31.299715116-04:00\",\"backup_end\":\"2026-10-05T01:32:32.10012451-04:00\",\"snapshot_id\":\"0f8689841dd2a17de838454f93f004cd439c69f8e9f685a1b76f0ced3945f2b0\"}\n"
+          "output": {
+            "representation": "parsed_json_lines",
+            "lines": [
+              {
+                "message_type": "summary",
+                "files_new": 3,
+                "files_changed": 0,
+                "files_unmodified": 0,
+                "dirs_new": 3,
+                "dirs_changed": 5,
+                "dirs_unmodified": 0,
+                "data_blobs": 1,
+                "tree_blobs": 9,
+                "data_added": 440024,
+                "data_added_packed": 4408,
+                "total_files_processed": 3,
+                "total_bytes_processed": 16532001,
+                "total_duration": 0.800409374,
+                "backup_start": "2026-10-05T01:32:31.299715116-04:00",
+                "backup_end": "2026-10-05T01:32:32.10012451-04:00",
+                "snapshot_id": "0f8689841dd2a17de838454f93f004cd439c69f8e9f685a1b76f0ced3945f2b0"
+              }
+            ]
+          }
         },
         {
           "args": [
@@ -348,7 +383,18 @@
           ],
           "duration_s": 0.766378,
           "exit": 0,
-          "output": "{\"message_type\":\"summary\",\"total_files\":4,\"files_restored\":4,\"total_bytes\":16532001,\"bytes_restored\":16532001}\n"
+          "output": {
+            "representation": "parsed_json_lines",
+            "lines": [
+              {
+                "message_type": "summary",
+                "total_files": 4,
+                "files_restored": 4,
+                "total_bytes": 16532001,
+                "bytes_restored": 16532001
+              }
+            ]
+          }
         }
       ],
       "returned": {
@@ -381,7 +427,43 @@
           ],
           "duration_s": 0.786509,
           "exit": 3,
-          "output": "{\"message_type\":\"summary\",\"files_new\":2,\"files_changed\":0,\"files_unmodified\":0,\"dirs_new\":3,\"dirs_changed\":5,\"dirs_unmodified\":0,\"data_blobs\":2,\"tree_blobs\":9,\"data_added\":439323,\"data_added_packed\":4764,\"total_files_processed\":2,\"total_bytes_processed\":8266273,\"total_duration\":0.759458587,\"backup_start\":\"2026-10-05T01:32:30.20588227-04:00\",\"backup_end\":\"2026-10-05T01:32:30.965340857-04:00\",\"snapshot_id\":\"32eac2d2e6d8e8a4b83723f540cf10a456cfc73011ef7ef7bf6882c65eb502fc\"}\n{\"message_type\":\"error\",\"error\":{\"message\":\"open <scratch>/control-snapshot/stage/journals/evidence.sqlite3: permission denied\"},\"during\":\"archival\",\"item\":\"<scratch>/control-snapshot/stage/journals/evidence.sqlite3\"}\n{\"message_type\":\"exit_error\",\"code\":3,\"message\":\"Warning: at least one source file could not be read\"}\n"
+          "output": {
+            "representation": "parsed_json_lines",
+            "lines": [
+              {
+                "message_type": "summary",
+                "files_new": 2,
+                "files_changed": 0,
+                "files_unmodified": 0,
+                "dirs_new": 3,
+                "dirs_changed": 5,
+                "dirs_unmodified": 0,
+                "data_blobs": 2,
+                "tree_blobs": 9,
+                "data_added": 439323,
+                "data_added_packed": 4764,
+                "total_files_processed": 2,
+                "total_bytes_processed": 8266273,
+                "total_duration": 0.759458587,
+                "backup_start": "2026-10-05T01:32:30.20588227-04:00",
+                "backup_end": "2026-10-05T01:32:30.965340857-04:00",
+                "snapshot_id": "32eac2d2e6d8e8a4b83723f540cf10a456cfc73011ef7ef7bf6882c65eb502fc"
+              },
+              {
+                "message_type": "error",
+                "error": {
+                  "message": "open <scratch>/control-snapshot/stage/journals/evidence.sqlite3: permission denied"
+                },
+                "during": "archival",
+                "item": "<scratch>/control-snapshot/stage/journals/evidence.sqlite3"
+              },
+              {
+                "message_type": "exit_error",
+                "code": 3,
+                "message": "Warning: at least one source file could not be read"
+              }
+            ]
+          }
         }
       ],
       "returned": {
@@ -410,7 +492,7 @@
       "sha256": "4809d2613be676b45b97bae9704f8e8c61b7a63b1450a009fcb6d623c3eb1f4f"
     }
   ],
-  "sanitization": "Canonical scratch root resolved at creation; lexical/canonical roots and executable paths scrubbed, then absolute-path assertions run before --output. New receipts contain no host path, login name or password; native fixture IDs/hashes and timestamps remain. Private raw output stays in scratch custody.",
+  "sanitization": "Canonical scratch root resolved at creation; lexical/canonical roots and executable paths scrubbed, then absolute-path assertions run before --output. New receipts contain no host path, login name or password; native fixture IDs/hashes and timestamps remain. Private raw output stays in scratch custody. JSON command output is stored as parsed_json_lines records with all original JSON fields preserved; non-JSON lines remain text and raw formatting stays in private custody.",
   "prior_attempts": [
     {
       "command": "real-calendar regression before fix",

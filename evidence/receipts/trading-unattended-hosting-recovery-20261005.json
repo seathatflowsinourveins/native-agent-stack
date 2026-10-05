@@ -58,8 +58,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/evidence/offline-proof.json",
-      "sha256": "0ce53c85fad755c9ceabe4d8d648493a3877100ce86f65b841157fcc5180f6ac",
-      "bytes": 8610
+      "sha256": "1d2aea2c11578aab27fb20d6d549241cd9b0c1b7b709c9f5081025ff612a7ce4",
+      "bytes": 10383
     }
   ],
   "integration_source_sha256": {
@@ -76,7 +76,19 @@
     {
       "cmd": "rtk env TMPDIR=<private-scratch-root> nice -n 19 python3 blueprints/us-equities/hosting/drill_local_recovery.py --restic-bin <restic-0.19.1> --scratch-root <private-scratch-root> --output <private-output>",
       "exit": 0,
-      "returned_output": "{\"checked_subset\": \"1/1\", \"matched_journals\": 2, \"restore_control_exit\": 1, \"result\": \"passed\", \"snapshot_control_exit\": 1, \"throwaway_password_deleted\": true}\n",
+      "returned_output": {
+        "representation": "parsed_json_lines",
+        "lines": [
+          {
+            "checked_subset": "1/1",
+            "matched_journals": 2,
+            "restore_control_exit": 1,
+            "result": "passed",
+            "snapshot_control_exit": 1,
+            "throwaway_password_deleted": true
+          }
+        ]
+      },
       "started_at_utc": "2026-10-05T03:51:15.065593+00:00",
       "completed_at_utc": "2026-10-05T03:51:24.642607+00:00",
       "invocation_proxy": "Historical builder used rtk env through its fallback. This is an execution record, not a portable prerequisite; the current README recipes use plain env TMPDIR=... nice -n 19 python3 ... ."
@@ -163,7 +175,7 @@
       "sha256": "7712822fae54114f0124caf9fb0d8604fcc9dddfda05e511aad364174df61159"
     }
   ],
-  "sanitization": "Native command args and output replace the private executable and scratch root with explicit placeholders. Password contents were never output; no host name, login name or host path is published. Native timestamps, restic snapshot IDs and fixture hashes remain. Raw returned output stays in private scratch custody.",
+  "sanitization": "Native command args and output replace the private executable and scratch root with explicit placeholders. Password contents were never output; no host name, login name or host path is published. Native timestamps, restic snapshot IDs and fixture hashes remain. Raw returned output stays in private scratch custody. JSON command output is stored as parsed_json_lines records with all original JSON fields preserved; non-JSON lines remain text and raw formatting stays in private custody.",
   "prior_attempts": [
     {
       "command": "python3 -m unittest tests.test_us_equities_hosting",

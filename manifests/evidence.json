@@ -14619,18 +14619,18 @@
     },
     {
       "path": "blueprints/us-equities/hosting/evidence/offline-proof-r2.json",
-      "sha256": "8738887500d41c47c15f0647f3cc6ad8d9af69e00aab894aad57c410549ab8a1",
-      "bytes": 9016
+      "sha256": "c80b455622e549c21e3a0df78ce300c0722182f529bcdae09ddf5ce5c25637b1",
+      "bytes": 10789
     },
     {
       "path": "blueprints/us-equities/hosting/evidence/offline-proof.json",
-      "sha256": "0ce53c85fad755c9ceabe4d8d648493a3877100ce86f65b841157fcc5180f6ac",
-      "bytes": 8610
+      "sha256": "1d2aea2c11578aab27fb20d6d549241cd9b0c1b7b709c9f5081025ff612a7ce4",
+      "bytes": 10383
     },
     {
       "path": "blueprints/us-equities/hosting/evidence/upstream-glue-review-r2.json",
-      "sha256": "49f02ebf9e5456b587af0aeef8b2800e4ddcab8313601f9fc682f37d3cbdad56",
-      "bytes": 15819
+      "sha256": "2f8c7896b7277264801fc4b701375c612574619a2b96190202396fb52b00e2e7",
+      "bytes": 15859
     },
     {
       "path": "blueprints/us-equities/hosting/journal_recovery.py",
@@ -51899,13 +51899,13 @@
     },
     {
       "path": "evidence/receipts/trading-unattended-hosting-recovery-20261005.json",
-      "sha256": "efbefa4eefa213c26b991ec75422efb98e36db336ea431d2c8950fd0bd883bfe",
-      "bytes": 9341
+      "sha256": "5162c8dfc2fa3ea8112589fe6f34ed9be7d403f0812a91c2334ee13b69f1a171",
+      "bytes": 9674
     },
     {
       "path": "evidence/receipts/trading-unattended-hosting-recovery-r2-20261005.json",
-      "sha256": "6a550142131af97df8f2fd58b8dfc98edd07f44f3895a8ddde1865a95c9ca438",
-      "bytes": 29384
+      "sha256": "b09880d7ac0e58526c3c0377afbe7d435c6903d2b2328c9ab961fbb5c1654f9d",
+      "bytes": 30897
     },
     {
       "path": "evidence/receipts/ultracode-token-routing-20260921.json",
