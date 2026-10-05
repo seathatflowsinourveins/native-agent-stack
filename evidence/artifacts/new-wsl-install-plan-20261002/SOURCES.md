@@ -555,6 +555,36 @@ supplied firing and resolved messages for acceptance
 and on-host; nothing was overturned. These are coordinator-supplied host facts,
 not a new live run by this PR. Only pointer names are retained.
 
+## Repair round 4: CI portability and research configuration (2026-10-05)
+
+The measured research baseline is retained in
+`this PR: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json`,
+`layers.gpt-runtimes.ruling`: its default names the high/max request aliases,
+and change 2 binds the profile to session 80's configuration, including the
+12000-token budget, scraper bounds, 4096-character chunks, 1500-word report and
+600-second timeout. The credential-bearing session file is not opened or copied.
+
+Option (b), a dated source compatibility amendment, is recorded in
+`this PR: evidence/artifacts/final-architecture-round2-20261004/integration-resolutions.json`,
+`repair_round_4.research_configuration_amendment`. It binds the exact committed
+configuration hash and the retained baseline record hash, lists the preserved
+measured values and names each compatibility change. It is not a new measurement.
+Restoring the historical max aliases alone would not establish compatibility
+with the clean 3.8.51 pin: its
+[max-alias set and suffix parser](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11)
+do not include `gpt-6.1-sol` in that set. The
+[unlisted-model cap](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L315)
+is xhigh. Keep the unsuffixed smart/strategic route and explicit xhigh request
+from #637's record; an alias label supplies no delivered-effort evidence.
+
+The per-run correlation header remains `x-omniroute-session-id`, as the pinned
+[chat handler reads](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/handlers/chatCore.ts#L1084)
+before assigning `call_logs.session_tag`. Chrome Signed-By and Claude MCP
+registration checks use `grep -E`, with `[[:space:]]` and a literal `[.]` where
+needed; their positive and negative controls run with ripgrep absent from PATH.
+Other ripgrep checks are unchanged. All checks here are repository integration
+evidence, separate from a fresh research or provider run.
+
 ## G5 analytics and evaluation sources (2026-10-04)
 
 The bounded builder re-read the original pinned source. The private `review-observe-eval-2.json` supplies the session-analytics repair; `adjudication.json` overrides the two evaluation reviews. The supplied `fixes.json` was absent at the input location when checked. The earlier install-repair patch contains no hunks for these three slots. The existing primary tool pins remain unchanged.

@@ -6,8 +6,10 @@
 #
 # Either client runs it through its own shell (wave-2 synthesis X18). It follows the wave-2 research ruling
 # (2026-10-03; evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json, layers.gpt-runtimes, changes 2-5):
-# - The configuration is tools/research/gpt-researcher.config.json beside this file: the measured session-80 values
-#   without the key. Each run gets its own copy, in its own directory, with base_url set to the gateway below and one
+# - tools/research/gpt-researcher.config.json preserves session 80's measured profile without its key, with the
+#   dated compatibility amendments in integration-resolutions.json:repair_round_4.research_configuration_amendment
+#   (unsuffixed smart/strategic aliases and explicit xhigh follow #637; this is not a new measurement).
+#   Each run gets its own copy, in its own directory, with base_url set to the gateway below and one
 #   x-omniroute-session-id value, the join key of the gateway's call log
 #   (OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e:open-sse/handlers/chatCore.ts:1087-1090,1133).
 # - The run starts from an empty environment (env -i). Upstream's Config lets an environment variable override a file

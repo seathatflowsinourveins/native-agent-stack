@@ -1594,5 +1594,197 @@
       "byte_hash_unchanged": false,
       "note": "No staging, commit or index-writing command was run. The cached diff is empty, but the index byte hash changed during the job; the origin of the refresh is not established. No index restoration was attempted."
     }
+  },
+  "repair_round_4": {
+    "date_utc": "2026-10-05",
+    "job": "r2-repair4",
+    "scope": "Four supplied hosted-CI failures for PR #713; working-tree edits only, no staging/commits or coordinator evidence-registry edits.",
+    "north_star_action": "Keep reproducible new-WSL research and browser configuration checks usable on the hosted runner before further complex-system and north-star R&D work.",
+    "ci": {
+      "run": 37282838742,
+      "job": 111674903542,
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37282838742/job/111674903542",
+      "independent_log_read": true,
+      "returned": "Ran 11044 tests in 1904.889s; FAILED (failures=4, errors=1, skipped=1043). Only selected failure lines were retained outside the checkout."
+    },
+    "findings": [
+      {
+        "id": "CI-1",
+        "status": "fixed",
+        "reason": "Choose authorized option (b): a dated source compatibility amendment binds the current unsuffixed smart/strategic route and exact config bytes to the historical measured profile. Rename the test to state that profile-and-amendment contract; check the baseline and config hashes and each declared field. No live call or re-measurement is claimed."
+      },
+      {
+        "id": "CI-2",
+        "status": "fixed",
+        "reason": "The runtime preflight test asserts x-omniroute-session-id and rejects the legacy x-omniroute-session key. The committed placeholder uses the correct key, matching the existing per-run renderer and pinned chatCore.ts:1087-1090,1133."
+      },
+      {
+        "id": "CI-3",
+        "status": "fixed",
+        "reason": "The Chrome Signed-By acceptance uses grep -Eq; [.] preserves the literal period of the former fixed-string match. Current/future builds still pass, and old builds or a non-Google origin still fail. Sync its declared plan command; other rg uses are preserved."
+      },
+      {
+        "id": "CI-4",
+        "status": "fixed",
+        "reason": "Both Claude registration lines use grep -Eq with POSIX [[:space:]]* and unchanged exact command/argument constraints. Update the existing fixture selector to run those real checks and synchronize the plan command."
+      }
+    ],
+    "research_configuration_amendment": {
+      "date_utc": "2026-10-05",
+      "kind": "source_compatibility_amendment",
+      "measurement_performed": false,
+      "configuration_path": "tools/research/gpt-researcher.config.json",
+      "configuration_sha256": "4c4d077808a03f4937b129fc349b65ebf0841a75df2456f37eb3db6a51e3bf97",
+      "measured_record": {
+        "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json",
+        "sha256": "c091152fb1a277ce6fecbf95d388215137e48aa1f28d781d35ef8a9b4e3cfca5",
+        "pointer": "layers.gpt-runtimes.ruling.decided_default and changes.2-5",
+        "boundary": "The public retained ruling binds these values to session 80; the credential-bearing original configuration was not read. This is historical evidence, not a new model run."
+      },
+      "preserved_measured_values": {
+        "FAST_LLM": "openai:cx/gpt-6.1-sol-high",
+        "RETRIEVER": "duckduckgo",
+        "CONTEXT_FILTER": "keyword",
+        "LLM_KWARGS.max_tokens": 12000,
+        "LLM_KWARGS.timeout": 600,
+        "MAX_SCRAPER_WORKERS": 4,
+        "SCRAPER_RATE_LIMIT_DELAY": 0.5,
+        "BROWSE_CHUNK_MAX_LENGTH": 4096,
+        "TOTAL_WORDS": 1500
+      },
+      "compatibility_amendments": {
+        "SMART_LLM": {
+          "historical_value": "openai:cx/gpt-6.1-sol-max",
+          "value": "openai:cx/gpt-6.1-sol",
+          "reason": "Keep R2-05's source-backed unsuffixed route for the clean 3.8.51 gateway; the tag's max-alias set does not name gpt-6.1-sol."
+        },
+        "STRATEGIC_LLM": {
+          "historical_value": "openai:cx/gpt-6.1-sol-max",
+          "value": "openai:cx/gpt-6.1-sol",
+          "reason": "The same source compatibility correction applies to strategic calls."
+        },
+        "LLM_KWARGS.reasoning_effort": {
+          "value": "xhigh",
+          "reason": "Explicit request consistent with #637's clean-pin source cap. The retained baseline ruling does not establish delivered wire max; FAST keeps its high suffix, which the tag parser recognizes."
+        },
+        "LLM_KWARGS.default_headers": {
+          "value": {
+            "x-omniroute-session-id": "set-per-run-by-gpt_researcher.sh"
+          },
+          "reason": "Pinned chatCore.ts reads x-omniroute-session-id; the renderer replaces this nonsecret placeholder with a fresh per-run ID. This is a correlation correction, not a new measurement."
+        }
+      },
+      "sources": [
+        "this PR:docs/decisions/2026-10-03-omniroute-3851-pin.md:77-86",
+        "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11",
+        "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L38",
+        "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L315",
+        "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L1401",
+        "https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/handlers/chatCore.ts#L1084"
+      ],
+      "alternative_not_selected": "Option (a) would restore the historical max aliases. The pinned suffix parser only strips max/ultra aliases whose base model is in the explicit sets; gpt-6.1-sol is not named there. Retaining the supported unsuffixed route with an honest dated amendment is preferable to assuming alias compatibility from the old label.",
+      "unmeasured": "This amendment does not qualify a new model run, unchanged report quality/latency or delivered wire effort. Those require the destination's native acceptance; the tests bind source and configuration only."
+    },
+    "local_reproduction": {
+      "rg_on_path": false,
+      "exit": 1,
+      "returned": "4 selected tests; FAILED (failures=4, errors=1), reproducing all supplied failures including both Chrome builds.",
+      "after": {
+        "exit": 0,
+        "returned": "Ran 4 tests in 0.095s; OK",
+        "boundary": "The same four targeted controls execute with rg absent from PATH; the first control now states its measured-profile plus dated-amendment contract."
+      }
+    },
+    "source_access": {
+      "skills": [
+        "gh-fix-ci",
+        "diagnosing-bugs"
+      ],
+      "authorization": "The user explicitly specified and authorized these four repairs; no further plan approval was needed.",
+      "ai_memory": "Scoped pin_first=true, limit=2 read required approval under policy never; exact canonical records and pinned upstream source were read instead.",
+      "upstream": "The three cited pinned OmniRoute files were fetched with gh api and retained outside the checkout. No provider call, install row or live host/credential file inspection was run."
+    },
+    "completeness_critic": {
+      "coverage": "Measured profile and amended fields have distinct evidence; runtime headers use the pinned join key; positive and negative Chrome/registration controls execute under a PATH without rg; all other rg uses and previous receiver/authorization repairs remain.",
+      "next_sweep": "The gateway owner should qualify a clean upstream release whose exact alias sets include gpt-6.1-sol before changing the served-effort contract."
+    },
+    "acceptance": {
+      "rg_on_path": false,
+      "path_method": "Remove every PATH directory providing rg, then retain native executables through an external scratch symlink directory that excludes rg. Verify shutil.which(\"rg\") is None and shell command -v rg fails before every acceptance invocation.",
+      "tests": {
+        "test_research_entry": {
+          "cmd": "python3 -m unittest tests.test_research_entry",
+          "exit": 0,
+          "counts": "Ran 6 tests in 0.326s; OK"
+        },
+        "test_new_wsl_client_config": {
+          "cmd": "python3 -m unittest tests.test_new_wsl_client_config",
+          "exit": 0,
+          "counts": "Ran 183 tests in 52.428s; OK"
+        },
+        "test_new_wsl_definitive_defaults": {
+          "cmd": "python3 -m unittest tests.test_new_wsl_definitive_defaults",
+          "exit": 0,
+          "counts": "Ran 86 tests in 4.640s; OK"
+        },
+        "test_new_wsl_handbook": {
+          "cmd": "python3 -m unittest tests.test_new_wsl_handbook",
+          "exit": 0,
+          "counts": "Ran 76 tests in 31.136s; OK"
+        },
+        "test_new_wsl_profile": {
+          "cmd": "python3 -m unittest tests.test_new_wsl_profile",
+          "exit": 0,
+          "counts": "Ran 18 tests in 5.444s; OK"
+        },
+        "test_wsl_new_distro_recipe": {
+          "cmd": "python3 -m unittest tests.test_wsl_new_distro_recipe",
+          "exit": 0,
+          "counts": "Ran 100 tests in 1.694s; OK"
+        }
+      },
+      "check_plan": {
+        "cmd": "python3 evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+        "exit": 0,
+        "problems": 0
+      },
+      "handbook": {
+        "cmd": "python3 scripts/build_new_wsl_handbook.py --check",
+        "exit": 0
+      },
+      "validate": {
+        "cmd": "python3 scripts/validate.py",
+        "exit": 1,
+        "registry_drift_only": true
+      },
+      "bash_n_accept": {
+        "cmd": "bash -n evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+        "exit": 0
+      },
+      "git_diff_check": {
+        "cmd": "git diff --check",
+        "receipt": "The final command exit is retained outside the checkout and reported in the bounded final JSON."
+      }
+    },
+    "regeneration": {
+      "exit": 0,
+      "source": "Existing coordinator job-050-fix-wave-integrate/regen.sh, run with rg absent from PATH; generated handbook and receipt remain byte-identical."
+    },
+    "protected_files": {
+      "manifests/evidence.json": {
+        "unchanged": true
+      },
+      "manifests/stack.json": {
+        "unchanged": true
+      },
+      "catalogs/landscape/upstream-snapshot.json": {
+        "unchanged": true
+      }
+    },
+    "git_index": {
+      "byte_hash_unchanged": true,
+      "entries_unchanged": true,
+      "staging_or_commit_commands": 0
+    }
   }
 }

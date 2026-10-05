@@ -544,7 +544,7 @@ apt-cache madison google-chrome-stable | awk -F '"'"'|'"'"' -v installed="$insta
 { gsub(/^[[:space:]]+|[[:space:]]+$/, "", $2);
   if ($2 == installed && $3 ~ /https:\/\/dl\.google\.com\/linux\/chrome\/deb\/?[[:space:]]+stable\/main[[:space:]]+amd64[[:space:]]+Packages/) found=1 }
 END { exit !found }'"'"'
-rg -Fq "Signed-By: /etc/apt/keyrings/google-chrome.asc EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796" /etc/apt/sources.list.d/native-stack-google-chrome.sources
+grep -Eq "Signed-By: /etc/apt/keyrings/google-chrome[.]asc EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796" /etc/apt/sources.list.d/native-stack-google-chrome.sources
 test ! -e /etc/apt/sources.list.d/google-chrome.sources
 test ! -e /etc/apt/sources.list.d/google-chrome.list
 cd "$tool_root/chrome-devtools-mcp-source"
@@ -562,8 +562,8 @@ native_probe="$(mktemp -d "$native_receipts/clients.XXXXXX")"
 fixture_url="file://$plan_dir/config/chrome-devtools-accept.html"
 cd "$repo_root"
 claude mcp get chrome-devtools > "$native_probe/claude-registration.txt"
-rg -q '"'"'^\s*Command: npx$'"'"' "$native_probe/claude-registration.txt"
-rg -q '"'"'^\s*Args: -y chrome-devtools-mcp@1\.10\.1 --headless --isolated --no-usage-statistics --no-performance-crux$'"'"' "$native_probe/claude-registration.txt"
+grep -Eq '"'"'^[[:space:]]*Command: npx$'"'"' "$native_probe/claude-registration.txt"
+grep -Eq '"'"'^[[:space:]]*Args: -y chrome-devtools-mcp@1\.10\.1 --headless --isolated --no-usage-statistics --no-performance-crux$'"'"' "$native_probe/claude-registration.txt"
 codex mcp get chrome-devtools --json > "$native_probe/codex-registration.json"
 jq -e '"'"'.transport.type == "stdio" and .transport.command == "npx" and .transport.args == ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"]'"'"' "$native_probe/codex-registration.json" >/dev/null
 prompt="Use only the configured chrome-devtools MCP server for this browser acceptance. Call navigate_page to $fixture_url. Then call take_snapshot and list_console_messages for that page (use its pageId when returned). The title must be NativeStack Chrome MCP acceptance and the console must include native-stack-chrome-devtools-ready. Report failure if a required call fails. Do not substitute shell tools, file-reading tools, another browser server or another browser registration."

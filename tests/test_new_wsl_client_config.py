@@ -159,7 +159,7 @@ class Round2RepairIntegrationTests(unittest.TestCase):
         spec.loader.exec_module(checker)
         body = checker.functions((PLAN / "accept.sh").read_text())["playwright-cli"]
         program, = [command for stage, _, _, command in checker.checks_of(body) if stage == "after_sign_in"]
-        checks = "\n".join(line for line in program.splitlines() if "rg -q" in line and "claude-registration.txt" in line)
+        checks = "\n".join(line for line in program.splitlines() if "grep -Eq" in line and "claude-registration.txt" in line)
         with tempfile.TemporaryDirectory() as scratch:
             path = Path(scratch) / "claude-registration.txt"
             for package, expected in (("1.10.1", 0), ("1.10.0", 1)):
