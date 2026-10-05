@@ -312,3 +312,41 @@ Cache probe correction: the installed public `Cache` view does not expose
 `add_order`; that method belongs to the separate mutable Rust binding. Shared
 observation is established by `PyCache::from_rc` and per-call borrows in the
 original binding, rather than by an invented Python mutation method.
+
+## Paper runs, 2026-10-05 (NativeStack, against the paper Gateway hosted on NativeStack2604, 127.0.0.1:4002)
+
+The run used one plan, `plan.json` (`24ffca56dfa7…`), the rc5 environment from this README (nautilus_trader
+2.0.0rc5, official ibapi 10.45.1, protobuf 5.29.6), and node client 91 with checker client 92. Every attempt is
+retained. Each receipt's `harness_sha256` resolves to `run.py` or to `evidence/harness/run.py.<12 hex>`.
+
+- **Run 1.** 17:40:15-17:40:45Z, harness `188e0078fc8f…` (r2), `evidence/receipt-20261005-run1-not-connected.json`.
+  - Result: `not_connected`, exit 2.
+  - The flat pre-check on client 92 passed. Quote admission then opened a second client-92 connection and reached
+    `quote_check_deadline` at its 30-second limit. The node never started and no order was sent. r3 now runs the
+    pre-check and quote admission in one client-92 session and records per-stage diagnostics.
+- **Run 2.** 18:22:52-18:23:43Z, harness `67429251370f…` (r3), `evidence/receipt-20261005-run2-failed.json`.
+  - Result: `failed`, exit 1.
+  - Quote admission passed in the shared session. At node start, rc5's startup reconciliation imported the account's
+    14:26Z fills from the separate 1.231 harness trial as `reconciliation=true` orders. Upstream's configuration
+    claims external SPY orders, so the case mapping attributed those fills to C3 and C4, and the node stopped before
+    ExecTester sent any order. The flat proof passed. r4 now maps cases only from orders this run submitted and
+    records other orders under `reconciled_external`.
+- **Run 3.** 18:55:11-18:56:02Z (14:55 ET), harness `5a061ff06f41…` (r4), `evidence/receipt-20261005-passed.json`.
+  - Result: **passed**, exit 0.
+  - Quote admission: bid 775.24, ask 775.26, fresh.
+
+  | Case | Result |
+  |---|---|
+  | C1 resting LIMIT BUY 1 SPY at half the bid (387.62) | accepted |
+  | C2 cancel | canceled |
+  | C3 MARKET BUY 1 | filled 775.26, commission 1.00 USD |
+  | C4 MARKET SELL 1 (close on stop) | filled 775.24, commission 1.02 USD |
+
+  - Gross −0.02 USD and net −2.04 USD, against the 5 USD round-trip bound.
+  - The independent client-92 flat proof found 0 positions and 0 open orders.
+  - Six reconciled external orders are recorded separately.
+  - The receipt's risk note reads: "engine notional cap configured, not enforced on this route (#4946, fixed on
+    develop, unreleased); bound held by qty=1 and quote admission". v2.0.0rc6 ships that fix.
+
+The Nautilus console is not redacted, so it stayed private. Acceptance steps 2-4 (reconnect with an open order,
+restart reconciliation, the kill switch) were not exercised and remain blocked upstream (#5007, #5057, #5060).
