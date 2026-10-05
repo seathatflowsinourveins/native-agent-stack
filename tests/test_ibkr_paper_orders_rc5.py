@@ -74,6 +74,83 @@ def sequence():
             event("OrderFilled", "O3", "MARKET", "SELL", 3_000_000_000)]
 
 
+def cache_order(client_id, events, *, strategy="EXEC_TESTER-001", status="FILLED"):
+    """Synthetic native histories, including external orders claimed by ExecTester."""
+    native = []
+    for index, record in enumerate(events):
+        item = type(record["type"], (), {})()
+        item.__dict__.update(record, event_id=f"{client_id}-{index}", client_order_id=client_id,
+                             strategy_id=strategy, trader_id="TESTER-001")
+        if record["type"] == "OrderFilled":
+            item.last_px, item.last_qty, item.currency = record["fill_price"], record["fill_quantity"], "USD"
+            item.commission = SimpleNamespace(as_decimal=lambda: RUN.decimal("1.00"), currency="USD")
+        native.append(item)
+    first = events[0]
+    return SimpleNamespace(client_order_id=client_id, strategy_id=strategy, trader_id="TESTER-001",
+                           ts_init=first["ts_init"], events=lambda: native,
+                           order_type=SimpleNamespace(name=first["order_type"]), side=SimpleNamespace(name=first["side"]),
+                           instrument_id=first["instrument_id"], quantity=first["quantity"], price=first["price"],
+                           status=SimpleNamespace(name=status), venue_order_id=None, time_in_force=SimpleNamespace(name="IOC"))
+
+
+class RunOrderOwnership(unittest.TestCase):
+    def test_run2_external_fills_then_current_submissions(self):
+        # Run 2 imported fills had a fresh, non-reconciled initialization and
+        # even the claimed EXEC_TESTER strategy. Neither establishes ownership.
+        history = []
+        for side, price in (("BUY", "772.93"), ("SELL", "772.90")):
+            history.append(cache_order("historical-" + side, [
+                event("OrderInitialized", typ="MARKET", side=side, when=1_000_000_000),
+                event("OrderAccepted", typ="MARKET", side=side, when=500_000_000, reconciliation=True),
+                event("OrderFilled", typ="MARKET", side=side, when=500_000_000, reconciliation=True, fill_price=price)],
+                status="ACCEPTED"))  # Nonterminal external MARKET must not defer stop either.
+        cache = SimpleNamespace(orders=lambda **kwargs: list(history))
+        scope = RUN.RunOrderScope(900_000_000)
+        receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+
+        def observe():
+            RUN.update_observations(receipt, RUN.snapshot_events(cache, scope), PLAN)
+            receipt["reconciled_external"] = RUN.snapshot_events(cache, scope, external=True)
+
+        observe()
+        self.assertEqual([c["outcome"] for c in receipt["cases"].values()], ["not_run"] * 4)
+        self.assertEqual(receipt["fills"], [])
+        self.assertIsNone(receipt["roundtrip"])
+        self.assertEqual(receipt["failures"], [])
+        self.assertTrue(RUN.stop_ready(RUN.tester_orders(cache, scope), 1, 2))
+        external = copy.deepcopy(receipt["reconciled_external"])
+        self.assertEqual({e["fill_price"] for e in external if e["type"] == "OrderFilled"}, {"772.93", "772.90"})
+        for alias in ("O1", "O2", "O3"):
+            history.append(cache_order("current-" + alias, [e for e in sequence() if e["order"] == alias]))
+        receipt["node"]["stop_ns"], receipt["flat_proof"] = STOP_NS, copy.deepcopy(FLAT)
+        observe()
+        self.assertEqual([c["outcome"] for c in receipt["cases"].values()], ["passed"] * 4)
+        self.assertEqual(receipt["roundtrip"]["net_usd"], "-2.06")
+        self.assertEqual(len(receipt["fills"]), 2)
+        self.assertEqual(receipt["failures"], [])
+        self.assertEqual(receipt["reconciled_external"], external)
+        raw = RUN.serialized_receipt(receipt)
+        self.assertNotIn("historical-", raw)
+        self.assertNotIn("current-", raw)
+
+    def test_lineage_needs_local_init_and_submit_for_same_strategy_and_id(self):
+        local = sequence()[:3]
+        cases = [cache_order("own", local), cache_order("wrong-strategy", local, strategy="OTHER-001"),
+                 cache_order("old", [dict(e, ts_init=100) for e in local]),
+                 cache_order("reconciled-init", [dict(local[0], reconciliation=True), *local[1:]]),
+                 cache_order("reconciled-submit", [local[0], dict(local[1], reconciliation=True), local[2]])]
+        mismatch = cache_order("mismatch", local)
+        mismatch.events()[1].client_order_id = "different"
+        cases.append(mismatch)
+        cache = SimpleNamespace(orders=lambda **kwargs: cases)
+        scope = RUN.RunOrderScope(900_000_000)
+        self.assertEqual([str(o.client_order_id) for o in RUN.tester_orders(cache, scope)], ["own"])
+        # Reconciliation on an already owned order still fails its cases.
+        cases[0].events()[-1].reconciliation = True
+        outcomes = RUN.case_outcomes(RUN.snapshot_events(cache, scope))
+        self.assertEqual(outcomes["C3"]["outcome"], "failed")
+
+
 class PlanValidation(unittest.TestCase):
     def test_frozen_plan(self):
         self.assertEqual(RUN.validate_plan(PLAN), [])
@@ -181,6 +258,63 @@ class WindowsAndPins(unittest.TestCase):
 
 
 class QuoteAdmission(unittest.TestCase):
+    def test_precheck_observed_is_frozen_before_quote_callbacks(self):
+        client = RUN.AdmissionState()
+        client.disconnect = mock.Mock()
+
+        def precheck(*args, **kwargs):
+            client.managedAccounts(FAKE_ACCOUNT)
+            client.currentTime(1000)
+            client.r["server_minus_local_s"] = 0.1
+            return {"status": "passed", "observed": client.r}, FAKE_ACCOUNT
+
+        def quote(*args, **kwargs):
+            client.currentTime(1001)
+            client.error(9202, 1001, 10190, "quote error")
+            return {"status": "refused_quote_error"}
+
+        with mock.patch.object(RUN.frozen(), "run_check", side_effect=precheck), mock.patch.object(RUN, "quote_check", side_effect=quote):
+            pre, _, _ = RUN.official_admission(PLAN, 4002, deadline=time.monotonic() + 1, client_factory=lambda: client)
+        self.assertEqual(pre["observed"]["server_time_epoch"], 1000)
+        self.assertEqual(pre["observed"]["server_minus_local_s"], 0.1)
+        self.assertEqual(pre["observed"]["errors"], [])
+        self.assertIsNot(pre["observed"], client.r)
+        self.assertIsNot(pre["observed"]["errors"], client.r["errors"])
+        self.assertEqual(client.r["server_time_epoch"], 1001)
+        client.disconnect.assert_called_once()
+
+    def test_precheck_exception_and_alarm_have_the_correct_phase(self):
+        for mode in ("exception", "alarm", "caught-alarm"):
+            with self.subTest(mode=mode):
+                client = RUN.AdmissionState()
+                client.disconnect = mock.Mock()
+
+                def precheck(*args, **kwargs):
+                    client.mark("connected")
+                    client.managedAccounts(FAKE_ACCOUNT)
+                    if mode == "exception":
+                        raise RuntimeError("positions wait failed " + FAKE_ACCOUNT)
+                    handler = RUN.signal.getsignal(RUN.signal.SIGALRM)
+                    if mode == "caught-alarm":
+                        try:
+                            handler(None, None)
+                        except OSError:
+                            return {"status": "not_connected", "observed": client.r}, None
+                    handler(None, None)
+
+                with mock.patch.object(RUN.frozen(), "run_check", side_effect=precheck), mock.patch.object(RUN, "quote_check") as quote:
+                    pre, account, result = RUN.official_admission(PLAN, 4002, deadline=time.monotonic() + 1, client_factory=lambda: client)
+                self.assertEqual(pre["status"], "incomplete")
+                self.assertEqual(RUN.frozen().exit_code_for(pre["status"]), 1)
+                self.assertIn("pre_check", pre["error"])
+                self.assertNotIn("quote_check_deadline", json.dumps((pre, result)))
+                self.assertNotIn(FAKE_ACCOUNT, json.dumps((pre, result)))
+                self.assertEqual(pre["observed"]["account_count"], 1)
+                self.assertIsNone(account)
+                self.assertEqual(result["status"], "not_run")
+                quote.assert_not_called()
+                client.disconnect.assert_called_once()
+
     def test_unrelated_farm_notices_are_info_and_relevant_errors_are_fatal(self):
         state = RUN.QuoteState()
         state.managedAccounts(FAKE_ACCOUNT)
@@ -412,6 +546,47 @@ class StopLifecycle(unittest.IsolatedAsyncioTestCase):
             self.assertFalse(RUN.stop_ready([self.order("ACCEPTED", "venue", order_type, tif)], 1, 2))
             self.assertTrue(RUN.stop_ready([self.order("FILLED", "venue", order_type, tif)], 1, 2))
 
+    async def test_external_startup_fills_do_not_trigger_case_failure(self):
+        receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+        history = [cache_order("external-" + side, [
+            event("OrderInitialized", typ="MARKET", side=side, when=time.time_ns()),
+            event("OrderFilled", typ="MARKET", side=side, when=100, reconciliation=True)])
+            for side in ("BUY", "SELL")]
+        done = asyncio.Event()
+        before_submit = []
+
+        def current_order(alias, records):
+            when = time.time_ns()
+            return cache_order("current-" + alias, [dict(e, ts_init=when, ts_event=when) for e in records])
+
+        def stop():
+            done.set()
+            limit = next(o for o in history if str(o.client_order_id) == "current-O1")
+            cancels = current_order("O1", sequence()[6:8]).events()
+            for item in cancels:
+                item.event_id += "-cancel"
+            limit.events().extend(cancels)
+            history.append(current_order("O3", sequence()[8:]))
+
+        async def run_async():
+            await asyncio.sleep(0.15)
+            before_submit.append(copy.deepcopy(receipt["cases"]))
+            history.extend([current_order("O2", sequence()[:3]), current_order("O1", sequence()[3:6])])
+            await done.wait()
+
+        node = SimpleNamespace(cache=SimpleNamespace(orders=lambda: list(history)),
+                               handle=lambda: SimpleNamespace(is_running=True, stop=stop), run_async=run_async,
+                               dispose=mock.Mock())
+        loop = asyncio.get_running_loop()
+        with mock.patch.object(RUN, "build_node", return_value=node), mock.patch.object(RUN, "write_receipt"), mock.patch.object(loop, "add_signal_handler"), mock.patch.object(loop, "remove_signal_handler"):
+            result = await asyncio.wait_for(RUN.node_phase(PLAN, 4002, Path("unused-receipt"), node_payload(receipt)), 2)
+        self.assertEqual([c["outcome"] for c in before_submit[0].values()], ["not_run"] * 4)
+        self.assertEqual(result["node"]["stop_reason"], "C1_accepted_C3_filled")
+        self.assertEqual(result["failures"], [])
+        self.assertEqual([result["cases"][c]["outcome"] for c in RUN.CASE_IDS], ["passed", "passed", "passed", "filled_unproven"])
+        self.assertEqual(len(result["fills"]), 2)
+        self.assertEqual(len(result["reconciled_external"]), 4)
+
     async def exercise(self, *, observer_error=False):
         receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
         done = asyncio.Event()
@@ -430,7 +605,7 @@ class StopLifecycle(unittest.IsolatedAsyncioTestCase):
         node = SimpleNamespace(cache=object(), handle=lambda: SimpleNamespace(is_running=True, stop=stop),
                                run_async=run_async, dispose=lambda: disposed.append(True))
 
-        def orders(_cache):
+        def orders(_cache, _scope):
             probes.append(True)
             status = "SUBMITTED" if len(probes) == 1 else "ACCEPTED" if len(probes) == 2 else "FILLED"
             return [self.order(status, "venue", "MARKET", "IOC")]
@@ -817,13 +992,20 @@ class InstalledRc5Surface(unittest.TestCase):
 
     def test_real_market_order_cache_projection(self):
         from nautilus_trader.core import UUID4
-        from nautilus_trader.model import ClientOrderId, InstrumentId, MarketOrder, OrderSide, Quantity, StrategyId, TimeInForce, TraderId
+        from nautilus_trader.model import AccountId, ClientOrderId, InstrumentId, MarketOrder, OrderSide, OrderSubmitted, Quantity, StrategyId, TimeInForce, TraderId
         order = MarketOrder(trader_id=TraderId.from_str("TESTER-001"), strategy_id=StrategyId.from_str("EXEC_TESTER-001"),
                             instrument_id=InstrumentId.from_str("SPY=STK.SMART"), client_order_id=ClientOrderId.from_str("SYNTHETIC-001"),
                             order_side=OrderSide.BUY, quantity=Quantity.from_str("1"), init_id=UUID4(),
                             ts_init=1_000_000_000, time_in_force=TimeInForce.IOC, reduce_only=False, quote_quantity=False)
-        projected = RUN.snapshot_events(SimpleNamespace(orders=lambda **kwargs: [order]))
-        self.assertEqual(len(projected), 1)
+        cache = SimpleNamespace(orders=lambda **kwargs: [order])
+        scope = RUN.RunOrderScope(900_000_000)
+        self.assertEqual(RUN.snapshot_events(cache, scope), [])
+        order.apply(OrderSubmitted(trader_id=order.trader_id, strategy_id=order.strategy_id,
+                                   instrument_id=order.instrument_id, client_order_id=order.client_order_id,
+                                   account_id=AccountId.from_str("IB-" + FAKE_ACCOUNT), event_id=UUID4(),
+                                   ts_event=1_100_000_000, ts_init=1_100_000_000))
+        projected = RUN.snapshot_events(cache, scope)
+        self.assertEqual(len(projected), 2)
         self.assertEqual(projected[0]["type"], "OrderInitialized")
         self.assertIsNone(projected[0]["price"])
         self.assertEqual(projected[0]["order_type"], "MARKET")

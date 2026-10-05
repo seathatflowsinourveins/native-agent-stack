@@ -182,6 +182,20 @@ custom strategy's sequential chronology. The wrapper watches until C1 acceptance
 and C3's full fill are present, or a failure, signal, case timeout or deadline
 requests stop. The native strategy then supplies C2 and C4. Native cache events
 with `reconciliation=True` cannot establish venue acceptance or cancellation.
+Case outcomes, fills, the round trip and stop decisions use only this run's
+ExecTester submissions. An in-memory client-order-id registry requires matching
+non-reconciled `OrderInitialized` and `OrderSubmitted` events for `EXEC_TESTER-001`
+and `TESTER-001` after node launch. Strategy identity and initialization time alone
+are insufficient: startup reconciliation can claim external SPY orders for the
+same strategy. The submission lineage follows upstream's
+[IB submit path](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/adapters/interactive_brokers/src/execution/core_orders.rs#L142)
+and distinguishes the
+[external-order materialization path](https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/execution/src/engine/mod.rs#L1101).
+All other cache orders appear under `reconciled_external` with stable `X` labels,
+types, sides, quantities, fill prices and event timestamps. They do not contribute
+to cases, bounds observations or deferred stop. A reconciliation event on an
+already owned order still fails that order's cases. Startup reconciliation and
+`external_order_instrument_ids=[SPY]` remain enabled as in the upstream example.
 An observer exception also waits for in-flight entry resolution before native
 stop, bounded by the deadline, then awaits the running task;
 snapshot, receipt, signal removal and disposal each have independent cleanup.
@@ -205,6 +219,9 @@ atomically written before starting the node and refreshed as observations arrive
 A killed child leaves that provisional state for the parent and reviewer.
 Pre-node child refusals write a `refused_child_*` reason before exiting; the
 parent retains that cause after successful independent flat proof.
+The shared client-92 session freezes `pre_check.observed` with a deep copy before
+quote admission. A pre-check timeout or exception records `pre_check` as
+`incomplete` with its phase-specific cause and leaves quote admission `not_run`.
 
 The reader records order aliases, types, sides, limit prices, event types,
 Nautilus event/init timestamps, fills, quantities, commissions and currencies.

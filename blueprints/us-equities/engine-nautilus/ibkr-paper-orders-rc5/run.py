@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import copy
 import hashlib
 import importlib.metadata
 import importlib.util
@@ -638,7 +639,7 @@ def new_receipt(plan, plan_path, versions):
             "plan_sha256": plan_hash, "harness_sha256": sha256(__file__),
             "source_hashes": {"frozen_checker_sha256": sha256(FROZEN_RUN)},
             "upstream_commit": UPSTREAM_COMMIT, "pre_check": None, "quote_admission": None,
-            "cases": case_outcomes([]), "events": [], "fills": [], "roundtrip": None,
+            "cases": case_outcomes([]), "events": [], "reconciled_external": [], "fills": [], "roundtrip": None,
             "flat_proof": None, "node": {"started": False, "stop_ns": None},
             "risk": {"bypass": False, "max_notional_per_order_usd": cap,
                      "enforcement": "runner_quantity_and_quote_admission", "note": RISK_NOTE,
@@ -704,24 +705,70 @@ def build_node(plan, port, account_id, *, tob_offset_ticks):
     return node
 
 
-def tester_orders(cache):
-    from nautilus_trader.model import StrategyId
-    return cache.orders(strategy_id=StrategyId.from_str("EXEC_TESTER-001"))
+class RunOrderScope:
+    """In-memory client-order-id lineage for this ExecTester's submissions.
+
+    Pinned upstream: crates/execution/src/engine/mod.rs materializes and claims
+    external orders using this strategy id and the current initialization time.
+    Neither alone proves ownership. IB execution/core_orders.rs emits a local
+    OrderSubmitted with the original client_order_id on this run's submit path.
+    Require its matching non-reconciled initialization after run_async launch;
+    retain ownership if later events reconcile, so the never-pass rule applies.
+    Raw identifiers stay here; receipts use stable O/X aliases only.
+    """
+
+    def __init__(self, started_ns):
+        self.started_ns = started_ns
+        self.owned = {}
+        self.external = {}
+
+    def submitted_here(self, order):
+        if str(order.strategy_id) != "EXEC_TESTER-001" or str(order.trader_id) != "TESTER-001":
+            return False
+        initialized = submitted = False
+        for event in order.events():
+            if (str(event.client_order_id) != str(order.client_order_id)
+                    or str(event.strategy_id) != str(order.strategy_id)
+                    or str(event.trader_id) != str(order.trader_id)
+                    or event.ts_init < self.started_ns
+                    or getattr(event, "reconciliation", False)):
+                continue
+            initialized |= type(event).__name__ == "OrderInitialized"
+            submitted |= type(event).__name__ == "OrderSubmitted"
+        return initialized and submitted
+
+    def partition(self, orders):
+        own, other = [], []
+        for order in sorted(orders, key=lambda order: (order.ts_init, str(order.client_order_id))):
+            key = str(order.client_order_id)
+            if key not in self.owned and self.submitted_here(order):
+                self.owned[key] = f"O{len(self.owned) + 1}"
+            if key in self.owned:
+                own.append(order)
+            else:
+                self.external.setdefault(key, f"X{len(self.external) + 1}")
+                other.append(order)
+        return own, other
 
 
-def snapshot_events(cache):
+def tester_orders(cache, scope):
+    return scope.partition(cache.orders())[0]
+
+
+def snapshot_events(cache, scope, *, external=False):
     """Read cloned order histories, never serialize account/order/venue/trade ids."""
-    orders = tester_orders(cache)
+    orders = scope.partition(cache.orders())[1 if external else 0]
     orders.sort(key=lambda order: (order.ts_init, str(order.client_order_id)))
     events, seen = [], set()
-    for index, order in enumerate(orders, 1):
+    for order in orders:
         for event in order.events():
             key = str(event.event_id)
             if key in seen:
                 continue
             seen.add(key)
             price = getattr(order, "price", None)
-            record = {"order": f"O{index}", "order_type": order.order_type.name, "side": order.side.name,
+            alias = (scope.external if external else scope.owned)[str(order.client_order_id)]
+            record = {"order": alias, "order_type": order.order_type.name, "side": order.side.name,
                       "instrument_id": str(order.instrument_id),
                       "quantity": str(order.quantity), "price": str(price) if price is not None else None,
                       "type": type(event).__name__, "ts_event": int(event.ts_event), "ts_init": int(event.ts_init),
@@ -731,7 +778,9 @@ def snapshot_events(cache):
                 record.update(fill_price=str(event.last_px), fill_quantity=str(event.last_qty), currency=str(event.currency),
                               commission=str(commission.as_decimal()) if commission is not None else None,
                               commission_currency=str(commission.currency) if commission is not None else None)
-            if hasattr(event, "reason"):
+            if external:
+                record.pop("instrument_id")
+            if not external and hasattr(event, "reason"):
                 record["reason"] = frozen().redact(event.reason)
             events.append(record)
     return sorted(events, key=lambda event: (event["ts_init"], event["ts_event"]))
@@ -793,6 +842,11 @@ async def node_phase(plan, port, receipt_path, payload):
     pending_stop = None
     registered_signals = []
     task = None
+    scope = RunOrderScope(time.time_ns())
+
+    def observe():
+        update_observations(receipt, snapshot_events(cache, scope), plan)
+        receipt["reconciled_external"] = snapshot_events(cache, scope, external=True)
 
     def stop(reason):
         if receipt["node"]["stop_ns"] is None:
@@ -818,7 +872,7 @@ async def node_phase(plan, port, receipt_path, payload):
                 if handle.is_running:
                     receipt["node"]["started"] = True
                     observed_start = observed_start or time.monotonic()
-                update_observations(receipt, snapshot_events(cache), plan)
+                observe()
                 cases = receipt["cases"]
                 now = time.monotonic()
                 if receipt["failures"] or any(c["outcome"] == "failed" for c in cases.values()):
@@ -830,7 +884,7 @@ async def node_phase(plan, port, receipt_path, payload):
                 if now >= payload["node_stop_at"]:
                     stop("deadline")
                 elif pending_stop:
-                    if stop_ready(tester_orders(cache), now, payload["node_stop_at"]):
+                    if stop_ready(tester_orders(cache, scope), now, payload["node_stop_at"]):
                         stop(pending_stop)
                 write_receipt(receipt_path, receipt, (account_id,))
                 await asyncio.sleep(0.1)
@@ -840,7 +894,7 @@ async def node_phase(plan, port, receipt_path, payload):
             # one opportunity to see its position even if observation failed.
             while not task.done() and time.monotonic() < payload["node_stop_at"]:
                 try:
-                    if stop_ready(tester_orders(cache), time.monotonic(), payload["node_stop_at"]):
+                    if stop_ready(tester_orders(cache, scope), time.monotonic(), payload["node_stop_at"]):
                         break
                 except Exception:
                     pass  # Unknown state waits only to the bounded deadline.
@@ -857,7 +911,7 @@ async def node_phase(plan, port, receipt_path, payload):
                 record_error("node_shutdown", task_exc)
     finally:
         try:
-            update_observations(receipt, snapshot_events(cache), plan)
+            observe()
         except Exception as exc:
             record_error("final_snapshot", exc)
         try:
@@ -909,8 +963,10 @@ def official_admission(plan, port, *, deadline, client_factory=None):
     client = (client_factory or build_admission_client)()
     session = CheckSession(client)
     check_deadline = time.monotonic() + seconds
-    pre = {"client": "ibapi", "client_id": 92, "status": "not_connected", "observed": client.r}
+    pre = {"client": "ibapi", "client_id": 92, "status": "incomplete", "observed": {}}
     account_id = None
+    phase = "pre_check"
+    pre_timed_out = False
 
     def failure(exc):
         status = "not_connected"
@@ -923,21 +979,35 @@ def official_admission(plan, port, *, deadline, client_factory=None):
         return {"status": status, "error": frozen().redact(exc), **client.diagnostics()}
 
     if seconds <= 0:
-        return pre, None, failure("quote_check_deadline")
+        pre["error"] = "CheckTimeout: pre_check_deadline"
+        return pre, None, {"status": "not_run", **client.diagnostics()}
 
     def expired(_sig, _frame):
-        raise CheckTimeout("quote_check_deadline")
+        nonlocal pre_timed_out
+        pre_timed_out = phase == "pre_check"
+        raise CheckTimeout(f"{phase}_deadline")
 
     previous = signal.signal(signal.SIGALRM, expired)
     signal.setitimer(signal.ITIMER_REAL, seconds)
     try:
         pre, account_id = frozen().run_check(plan, port, with_session=True,
                                              client_factory=lambda: session, deadline_s=seconds)
+        pre["observed"] = copy.deepcopy(pre.get("observed", {}))
+        # ibapi.connect / frozen run_check can catch TimeoutError as OSError.
+        # Preserve the alarm's phase even when that path returns normally.
+        if pre_timed_out:
+            pre.update(status="incomplete", error="CheckTimeout: pre_check_deadline")
+            return pre, None, {"status": "not_run", **client.diagnostics()}
+        phase = "quote_check"
         if pre["status"] != "passed" or not account_id:
             return pre, account_id, {"status": "not_run", **client.diagnostics()}
         admitted = quote_check(plan, account_id, deadline=check_deadline, client=client)
         return pre, account_id, admitted
     except Exception as exc:
+        if phase == "pre_check":
+            pre.update(status="incomplete", observed=copy.deepcopy(client.r), requests_completed=client.completed(),
+                       error=frozen().redact(f"pre_check: {type(exc).__name__}: {exc}"))
+            return pre, None, {"status": "not_run", **client.diagnostics()}
         return pre, account_id, failure(exc)
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)
