@@ -16563,8 +16563,8 @@
     },
     {
       "path": "docs/decisions/2026-10-04-codex-rtk-hook-qualified.md",
-      "sha256": "80c82b093709567d81ad1a915c40d169ebaba419872bb362096b4bd1e0fc8b9d",
-      "bytes": 34363
+      "sha256": "79f09b6041b4886cf6662570d46952e6d7924310bf092307fd192d9c8973f01d",
+      "bytes": 34672
     },
     {
       "path": "docs/decisions/2026-10-04-coordinator-dispatch-and-spend.md",
@@ -48843,8 +48843,8 @@
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/fixtures/hcom-deny.rules",
-      "sha256": "845f06b0ca31d03956df813ea7ab426e42ab784de7f39010c4a70cc91e3bc0e1",
-      "bytes": 2814
+      "sha256": "ac6254ee9bb7ac20deca69bb03bead76dacbe4e53a41cbc563a8b3614fa6a6aa",
+      "bytes": 2939
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/fresh_session_e2e.sh",
@@ -48858,7 +48858,7 @@
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/plan-row-scratch-run.json",
-      "sha256": "22e10bbdec0fd7bb5af2bff6a36a62cc20e73e743b2268a803dcc5577bc2f149",
+      "sha256": "ecb4ba9168d3d8f75ad44b1497760288f79f031a0a2ac6abf0a4789ca7382478",
       "bytes": 50805
     },
     {
@@ -48883,7 +48883,7 @@
     },
     {
       "path": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/rtk-rewrite-heads-check.json",
-      "sha256": "b85e51c25d1e048caeb33f474022681df3dd3f0a0bc02cad86355358bc2c85f9",
+      "sha256": "2be061a74036d26fb21e356e9a356de8ee1940441890bdb3ed24350cf41fd82b",
       "bytes": 22361
     },
     {
