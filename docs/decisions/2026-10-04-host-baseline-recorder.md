@@ -244,22 +244,22 @@ The Opus delta read accepted t1 without p1 findings and identified four p2 gaps
 at `d06098ffb070dacfcbc9a424874de989cb55c8db`. Its banner finding is confirmed
 against all three retained artifacts: the NativeStack captures report
 `2.1.289 (Claude Code)` and StackMeasure2604 reports `2.1.288 (Claude Code)`.
-In each banner the tool name is not leading. The gate now exempts declared tool-name words
-anywhere in that tool's own version banner and exempts the OS-release ID only
-as the opening distribution-vendor tag. Path segments and identity forms such
-as `USER=<login>` remain checked. Fixtures replay the retained Claude banners
-without querying a host and cover an Ubuntu gdb banner and real identity paths.
+In each banner the tool name is not leading. The t2 gate exempted declared
+tool-name words throughout their version banner and removed matching vendor
+tags without limiting them to the first parenthesized group. The t3 review
+below showed that these substitutions also erased explicit account forms such
+as `USER=<login>` and `uid=N(<login>)`. The t2 fixtures covered the retained
+Claude banners, an Ubuntu gdb banner and identity paths, but missed these forms.
 
 The whole-document gate copies the personal-home and Windows-user-path patterns
 unchanged from `scripts/validate.py:29-30`. Windows/WSL profile names with suffixes
 are rejected regardless of the current login, including when a path appears in
 a key or command description. The existing Linux home-prefix check remains.
-Outside those recognized profile prefixes, compound names such as
-`<login>-data` and `<login>.HOST` are accepted by design, as the guide now states.
-A narrow attached-user-option check rejects `-u<login>`. There is no blanket
-component-prefix rule, so login `user` still accepts the marker's fixed filename
-in a stat diagnostic. The old mixed partial-token/path fixture is split into
-explicit token and documented compound-name controls.
+The t2 gate accepted compound names outside those recognized profile prefixes,
+including `<login>-data` and `<login>.HOST`, and only checked the attached option
+`-u<login>`. This weakening preserved login `user` on the marker diagnostic but
+also admitted account compounds. The t3 repair replaces that policy with a
+narrow fixed-marker exemption and stronger compound controls.
 
 All four receipts now contain a dated amendment entry referring to
 `PR #710 t1 (7ec3f2a5f) and t2`. The stamp comes from `date -u` and dates this
@@ -287,3 +287,54 @@ six retained artifact files have unchanged SHA256s. TMPDIR is
 probe invocation is the authorized local stdin dry run to scratch; historical
 captures and archived sources retain their bytes. Registration follows the
 completed source, receipt, guide, decision and test changes.
+
+## Delta-review repair t3 (2026-10-05)
+
+The Opus delta read accepted t2 without p1 findings and identified two privacy
+gaps at `22ec2b15419cb5f508976bac586aece72c3a7a3b`. Both are confirmed through
+the existing `main()` fixture boundary. Before the first fix, all 42 new banner
+subtests failed with exit 1: standalone tool-name logins, account assignments,
+user options, login-at-host and tilde forms, UID and passwd forms, punctuation
+identities, and a vendor label in a later parenthesized group. The gate now
+checks unstripped values for `USER=`, `LOGNAME=`, `--user=`, `-u <login>`,
+`<login>@`, `~<login>`, `uid=N(<login>)`, `<login>:x:` and standalone-login values
+before any exemption. Tool-name exemptions require start, whitespace or `(`
+on the left and whitespace, `)` or end on the right. A vendor ID must open the
+first parenthesized group. The 20-test module then passed with exit 0.
+
+The next discriminating run exited 1 with 19 failed compound subtests/assertions
+before the compound fix. Casefolded login matching now uses ASCII alphanumeric
+boundaries, rejecting punctuation compounds in output and stderr; attached
+option checks cover `-[a-z]*u<login>` and `-g<login>`. A separate numeric-suffix
+check also rejects `<login>123`. Only the complete fixed marker path is exempt,
+so login `user` accepts the real stat diagnostic while a path ending in
+`90-wsl-default-user-data` fails closed. There is no blanket path-prefix rule.
+
+The first whole-document replay passed 10 of 15 combinations and exited 1.
+The stronger checks found two additional system-label collisions in the original
+captures: the default `~/.local/share/codex-ecosystem/bin` launcher parent for
+login `codex`, and the numeric version `0.0.0~ubuntu25` for login `ubuntu`.
+The five failing capture/login pairs became a regression test, which exited 1
+before the scoped exemptions. The exact default launcher parent is now exempt
+only in a matching executable lookup; its definition is retained in
+`scripts/adoption_status.py:1124-1134` at the t2 HEAD. A distro tag followed by
+digits is exempt only inside a numeric dpkg version in a row matching the queried
+package. Raw identity checks still run first, and recorded strings are unchanged.
+Codex's own `codex-cli` banner brand has the same narrow word bounds as its
+tool name. No arbitrary parent paths or compound prefixes are exempted.
+
+The boundary policy still deliberately accepts a login embedded in a longer
+ASCII word or preceded by another letter/digit, unlike r1's arbitrary substring
+check. The existing `fixture-userland` and `1ubuntu2` controls are system/package
+labels that require this distinction. All compound forms listed in the t3 review,
+including the numeric-only suffix, now fail closed outside scoped labels.
+
+The final targeted module passed all 21 tests with exit 0. The whole-document
+gate passed all three unchanged committed captures with each of `claude`,
+`codex`, `ubuntu`, `user` and `alice` (15 of 15, exit 0). The authorized local
+stdin dry run exited 0 with one JSON object, empty stderr and zero login,
+home-prefix, actual-home and profile-path matches. Its output stays in scratch.
+TMPDIR is `~/.cache/t710t3`, outside the checkout, and commands use nice 19.
+The three captures, both source archives and upgrade artifact retain their
+original SHA256s. The receipts retain their dated amendments. No host is
+recaptured; registration follows the completed source, tests, guide and decision.

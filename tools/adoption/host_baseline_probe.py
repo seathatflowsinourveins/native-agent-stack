@@ -211,28 +211,50 @@ def assert_private_output_absent(document, login):
     clean = HOME_PREFIX.casefold() not in text.casefold() and not any(pattern.search(text) for pattern in PRIVATE_PROFILE_PATHS)
     if not clean:  # Remains effective under python3 -O.
         raise PrivacyFailure()
-    token = re.compile(r"(?<![\w.-])" + re.escape(login.casefold()) + r"(?![\w.-])")
-    user_option = re.compile(r"(?<![\w.-])-u" + re.escape(login.casefold()) + r"(?![\w.-])")
+    account = re.escape(login.casefold())
+    token = re.compile(r"(?<![a-z0-9])" + account + r"(?![a-z0-9])")
+    numeric_suffix = re.compile(r"(?<![a-z0-9])" + account + r"[0-9]+(?![a-z0-9])")
+    user_option = re.compile(r"(?<![a-z0-9])-(?:[a-z]*u|g)" + account + r"(?![a-z0-9])")
+    identity = re.compile(
+        r"(?<![a-z0-9])(?:(?:user=|logname=|--user=|-u\s+|~)" + account + r"(?![a-z0-9])"
+        r"|" + account + r"(?:@|:x:)|uid=[0-9]+\(" + account + r"\))"
+    )
     release = document.get("os_release", {}).get("output", {})
     vendor_id = release.get("ID") if isinstance(release, dict) else None
-    vendor_tag = re.compile(r"(?<=\()" + re.escape(vendor_id) + r"(?=[\s)])", re.I) if isinstance(vendor_id, str) else None
+    vendor_tag = re.compile(r"\A([^()]*)\(" + re.escape(vendor_id) + r"(?=[\s)])", re.I) if isinstance(vendor_id, str) else None
+    marker_path = re.compile(r"(?<![\w./\\-])/etc/sudoers\.d/90-wsl-default-user(?![\w./\\-])")
 
     def check_output(value, command=""):
         if isinstance(value, str):
+            # Never erase account syntax while exempting a tool/vendor label.
+            if value.strip().casefold() == login.casefold() or identity.search(value.casefold()) or user_option.search(value.casefold()):
+                raise PrivacyFailure()
+            # Only this complete, fixed marker path is a system label.
+            value = marker_path.sub("", value)
             argv = shlex.split(command)
             if len(argv) == 3 and argv[:2] == ["command", "-v"]:
                 # A resolved executable's declared basename is a tool identity.
                 # Its parent path remains subject to the login-component check.
                 if value.startswith(("/", "~/")) and "\n" not in value and value.rsplit("/", 1)[-1] == Path(argv[2]).name:
                     value = value.rsplit("/", 1)[0]
+                    # The repository's exact default launcher root is a label.
+                    if value == "~/.local/share/codex-ecosystem/bin":
+                        value = ""
             elif len(argv) == 2 and argv[1] == "--version":
                 name = Path(argv[0]).name
-                # Tool-name words anywhere in their banner are not identities.
-                # Keep path segments intact even when they share the tool name.
-                value = re.sub(r"(?<![\w./\\-])" + re.escape(name) + r"(?![\w./\\-])", "", value, flags=re.I)
+                # Exempt standalone tool/brand labels, never account syntax.
+                names = (name, "codex-cli") if name == "codex" else (name,)
+                value = re.sub(r"(?<![^\s(])(?:" + "|".join(map(re.escape, names)) + r")(?=[\s)]|$)", "", value, flags=re.I)
                 if vendor_tag is not None:
-                    value = vendor_tag.sub("", value)
-            if token.search(value.casefold()) or user_option.search(value.casefold()):
+                    # A vendor label must begin the first parenthesized group.
+                    value = vendor_tag.sub(r"\1(", value, count=1)
+            elif len(argv) == 4 and argv[:2] == ["dpkg-query", "-W"] and argv[2].startswith("-f="):
+                fields = value.split()
+                if isinstance(vendor_id, str) and len(fields) in (2, 3) and fields[0] == argv[3] and re.fullmatch(r"[0-9][A-Za-z0-9.+:~\-]*", fields[1]):
+                    # Distro suffixes inside a numeric package version are labels.
+                    fields[1] = re.sub(r"(?<![a-z0-9])" + re.escape(vendor_id) + r"(?=[0-9])", "", fields[1], flags=re.I)
+                    value = " ".join(fields)
+            if token.search(value.casefold()) or numeric_suffix.search(value.casefold()):
                 raise PrivacyFailure()
         elif isinstance(value, dict):
             for item in value.values():

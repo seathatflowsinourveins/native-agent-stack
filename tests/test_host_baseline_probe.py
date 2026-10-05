@@ -219,18 +219,13 @@ class HostBaselineProbeTests(unittest.TestCase):
             ("codex", "/srv/CODEX/bin/codex"),
             ("user", "warning: USER"),
             ("fixture-login", "/srv/FIXTURE-LOGIN/bin/env"),
+            ("fixture-login", "fixture-login-helper (fixture native) 1.2.3"),
             ("alice", "-ualice"),
         )
         for login, value in cases:
             with self.subTest(login=login, value=value):
                 document = {"env": {"command": "env --version", "exit": 0, "output": value}}
                 self.assertEqual(self.mocked_main(login, document), (3, "", ""))
-        document = {"env": {"command": "env --version", "exit": 0,
-                            "output": "fixture-login-helper (fixture native) 1.2.3"}}
-        code, out, err = self.mocked_main("fixture-login", document)
-        self.assertEqual(code, 0)
-        self.assertEqual(json.loads(out), document)
-        self.assertEqual(err, "")
 
     def test_committed_claude_banners_are_tool_identity(self):
         banners = {"nativestack-2404": "2.1.289 (Claude Code)",
@@ -263,6 +258,32 @@ class HostBaselineProbeTests(unittest.TestCase):
                 document["gdb"] = {"command": command, "exit": 0, "output": value}
                 self.assertEqual(self.mocked_main(login, document), (3, "", ""))
 
+    def test_banner_exemptions_never_hide_explicit_account_forms(self):
+        banners = {"claude": "2.1.289 (Claude Code)", "codex": "codex-cli 0.159.3",
+                   "gdb": "GNU gdb (GDB) 15.1", "env": "env (GNU coreutils) 9.4"}
+        for login, banner in banners.items():
+            forms = (
+                f"USER={login}", f"LOGNAME={login}", f"--user={login}",
+                f"-u {login}", f"{login}@host", f"~{login}",
+                f"uid=1000({login})", f"{login}:x:1000:1000", f"{login}: local account",
+            )
+            for value in (login,) + tuple(f"{banner} {form}" for form in forms):
+                with self.subTest(login=login, value=value):
+                    document = {"version": {"command": f"{login} --version", "exit": 0,
+                                             "output": value}}
+                    self.assertEqual(self.mocked_main(login, document), (3, "", ""))
+
+    def test_vendor_exemption_is_limited_to_first_banner_group(self):
+        for value in ("GNU gdb (Ubuntu 15.1) uid=1000(ubuntu)",
+                      "GNU gdb (GDB) (Ubuntu 15.1)"):
+            with self.subTest(value=value):
+                document = {
+                    "os_release": {"command": "read /etc/os-release", "exit": 0,
+                                   "output": {"ID": "ubuntu", "VERSION_ID": "24.04"}},
+                    "gdb": {"command": "gdb --version", "exit": 0, "output": value},
+                }
+                self.assertEqual(self.mocked_main("ubuntu", document), (3, "", ""))
+
     def test_profile_paths_fail_closed_anywhere_regardless_of_login(self):
         profiles = (
             "/mnt/c/" + "Users/alice.HOST/AppData/fixture",
@@ -281,15 +302,40 @@ class HostBaselineProbeTests(unittest.TestCase):
                         record[location] = profile
                     self.assertEqual(self.mocked_main("alice", {"env": record}), (3, "", ""))
 
-    def test_compounds_outside_profile_prefixes_are_accepted_by_design(self):
+    def test_compound_identities_and_attached_options_fail_closed(self):
         cases = (
-            ("alice", "/srv/alice-data/bin/env alice.HOST"),
+            ("alice", "/srv/alice-data/bin/env"),
+            ("alice", "/var/lib/alice.d/state"),
+            ("alice", "alice.HOST"),
+            ("alice", "alice_backup"),
+            ("alice", "alice123"),
+            ("alice", "-nualice"),
+            ("alice", "-galice"),
             ("fixture-login", "fixture-login-helper /srv/fixture-login-data/bin/env"),
-            ("user", "stat: cannot statx '/etc/sudoers.d/90-wsl-default-user': No such file or directory"),
+            ("user", "stat: cannot statx '/etc/sudoers.d/90-wsl-default-user-data': No such file or directory"),
         )
         for login, value in cases:
-            with self.subTest(login=login):
-                document = {"marker": {"command": "stat marker", "exit": 1, "output": value}}
+            for location in ("output", "stderr"):
+                with self.subTest(login=login, value=value, location=location):
+                    record = {"command": "stat marker", "exit": 1, "output": ""}
+                    record[location] = value
+                    self.assertEqual(self.mocked_main(login, {"marker": record}), (3, "", ""))
+        document = {"marker": {"command": "stat marker", "exit": 1,
+                               "output": "stat: cannot statx '/etc/sudoers.d/90-wsl-default-user': No such file or directory"}}
+        code, out, err = self.mocked_main("user", document)
+        self.assertEqual(code, 0)
+        self.assertEqual(json.loads(out), document)
+        self.assertEqual(err, "")
+
+    def test_committed_launcher_paths_and_package_versions_are_system_labels(self):
+        cases = (
+            ("codex", "nativestack-2404"), ("codex", "nativestack2604"),
+            ("codex", "stackmeasure2604"), ("ubuntu", "nativestack2604"),
+            ("ubuntu", "stackmeasure2604"),
+        )
+        for login, name in cases:
+            with self.subTest(login=login, artifact=name):
+                document = json.loads((ROOT / f"evidence/artifacts/host-baseline-20261004/{name}.json").read_text())
                 code, out, err = self.mocked_main(login, document)
                 self.assertEqual(code, 0)
                 self.assertEqual(json.loads(out), document)

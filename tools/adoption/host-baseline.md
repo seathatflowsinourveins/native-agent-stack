@@ -68,21 +68,40 @@ They apply to the whole document and do not depend on the current login. Their
 reserved `example` placeholder exception is retained; the existing Linux home
 prefix check remains stricter and has no placeholder exception.
 
-Login checks inspect observation output and stderr values, matching whole tokens
-or path components case-insensitively, and rejecting the attached `-u<login>`
-form. Outside the recognized profile prefixes, compound tokens and components
-such as `<login>-data` and `<login>.HOST` are accepted by design; they do not
-identify an account unambiguously. There is no blanket component-prefix rule.
-This permits the marker diagnostic ending in `90-wsl-default-user` for login
-`user`. A standalone login or `USER=<login>` remains a disclosure.
+Login checks inspect observation output and stderr values after casefolding.
+They match the login at ASCII alphanumeric boundaries, rejecting compounds such
+as `/srv/<login>-data`, `/var/lib/<login>.d`, `<login>.HOST` and `<login>_backup`.
+A separate check rejects a numeric trailing suffix such as `<login>123`.
+Attached user/group options, including `-u<login>`, `-nu<login>` and `-g<login>`,
+are rejected. The complete fixed marker path
+`/etc/sudoers.d/90-wsl-default-user` is exempt; a longer lookalike path is checked.
+There is no blanket component-prefix exemption.
+
+Before any label exemption, unstripped values are checked for `USER=<login>`,
+`LOGNAME=<login>`, `--user=<login>`, `-u <login>`, `<login>@`, `~<login>`,
+`uid=N(<login>)` and `<login>:x:`. A value consisting only of the login also fails
+closed, even when it is a tool name.
 
 Fixed schema keys, command descriptions and selected OS identifiers are not
 account identities. An executable's declared basename is excluded while its
-parent path is checked. In its own `--version` banner, the declared tool name
-is exempt wherever it appears as a word, and the OS-release ID is exempt as
-the opening distribution-vendor tag `(<ID> ...)`. Path segments remain checked.
-Thus login `claude` accepts `2.1.289 (Claude Code)`, and login `ubuntu` accepts
-`GNU gdb (Ubuntu ...)`; names outside those scoped banner forms remain checked.
+parent path is checked. The exact default launcher parent
+`~/.local/share/codex-ecosystem/bin` is also a system label in a matching
+`command -v` result; arbitrary parent paths remain checked. In its own
+`--version` output, the declared tool name is exempt only between start,
+whitespace or `(` and whitespace, `)` or end. The same bounds apply to the
+`codex-cli` brand in Codex's banner. The OS-release ID is exempt only when it
+opens the first parenthesized group, as `(<ID> ...)`. Thus login `claude` accepts
+`2.1.289 (Claude Code)`, and login `ubuntu` accepts `GNU gdb (Ubuntu ...)`, while
+explicit account forms are rejected before either exemption.
+
+In a returned dpkg row matching the queried package, a distribution tag followed
+by digits inside a numeric version is also a label: for example, `~ubuntu25` in
+`0.0.0~ubuntu25`. Checking exemptions do not change the recorded values. The
+boundary rule deliberately accepts a login embedded within a longer ASCII word
+or preceded by a letter/digit, preserving `fixture-userland` for login `user`
+and `1ubuntu2` for login `ubuntu`. This is weaker than r1's arbitrary substring
+check because those fragments are system/package labels; punctuation compounds
+and trailing numeric-only suffixes remain checked.
 A detected disclosure returns exit 3 with empty stdout and stderr, including with
 `python3 -O`. Every exception in `main()`
 is caught and returns the same silent exit 3, including unexpected identity,
@@ -181,6 +200,10 @@ The evidence manifest does not register its own bytes.
   `scripts/validate.py:29-30` supplies the unchanged personal-home and
   Windows-user-path patterns; the three committed host artifacts supply the
   Claude version-banner fixtures. No host is recaptured to test those banners.
+- Privacy repair reference `22ec2b15419cb5f508976bac586aece72c3a7a3b`:
+  `scripts/adoption_status.py:1124-1134` defines the default launcher root; the
+  committed 26.04 package rows retain `coreutils-from-uutils 0.0.0~ubuntu25`.
+  Replaying those captures supplies the scoped system-label controls.
 - Installed `dpkg-query --help` and `dpkg-query(1)` at
   `/usr/share/man/man1/dpkg-query.1.gz`: `-W` reports package information,
   `-f` selects fields, and `db:Status-Status` supplies the package status word.
