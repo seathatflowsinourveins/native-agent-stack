@@ -282,6 +282,18 @@ mcporter() {
   run_command 'npm install -g mcporter@0.14.2' || return "$?"
 }
 
+agent-messaging() {
+  # hcom@v0.7.27; cross-client transport only.
+  copy_config 'hcom-client-config.py' || return "$?"
+  copy_config 'hcom-deny.rules' || return "$?"
+  # Source: https://api.github.com/repos/aannoo/hcom/releases/tags/v0.7.27
+  run_command 'fetch_verified https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh 3bc057fcd763748c32fae0ae25e150abf2b1df0d4c9451432c28f4ddde176a98 "$tool_root/hcom-0.7.27/hcom-installer.sh"' || return "$?"
+  # Source: https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh
+  run_command 'HCOM_INSTALL_DIR="$HOME/.local/bin" HCOM_NO_MODIFY_PATH=1 sh "$tool_root/hcom-0.7.27/hcom-installer.sh"' || return "$?"
+  # Source: https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972504465
+  run_command 'python3 "$config_root/hcom-client-config.py" --repo-root "$repo_root" --apply' || return "$?"
+}
+
 sandbox-runtime-srt() {
   # sandbox-runtime (srt) | npm-global | planned
   # Planned. Source: https://raw.githubusercontent.com/anthropics/sandbox-runtime/v0.0.78/README.md#L14
@@ -861,6 +873,54 @@ convergence-validators() {
   printf '%s\n' 'UNRUN. Adoption recipe, no new install command. Check verifies repository evidence, not host installation. Scoped convergence experiments require their own records; not generated for this source-only install inventory. Recipe/source: https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/8b51946ee16e542e544936e19bb793114fea948e/adoption/README.md#L58'
 }
 
+# Round2 wave5: lm-program-optimization; destination installation UNRUN.
+lm-program-optimization() {
+  # Source: https://pypi.org/pypi/dspy/3.4.0/json
+  run_command 'fetch_verified https://files.pythonhosted.org/packages/17/96/31628d4231b5dd7edbe9eaf5c975d1055f4b79b337062a1f957dca6dd931/dspy-3.4.0-py3-none-any.whl 36de329ecdaf18e31977e26c61b587caa470a34f574f2fe6cb7f4c82bcbf97cc "$tool_root/downloads/dspy-3.4.0-py3-none-any.whl"' || return "$?"
+  # Source: https://pypi.org/pypi/gepa/0.1.4/json
+  run_command 'fetch_verified https://files.pythonhosted.org/packages/fd/77/5b3a281cfd9caaa9e68349b434cf27f1ca448003ee0067a1ae2184dc52d1/gepa-0.1.4-py3-none-any.whl 12b971039599625c156d2231f6d72a29c31a22e9c237689459b5f1a3c353f532 "$tool_root/downloads/gepa-0.1.4-py3-none-any.whl"' || return "$?"
+  # Source: https://github.com/astral-sh/uv/blob/0.12.22/docs/guides/projects.md#L139
+  run_command 'if [[ ! -f "$tool_root/dspy-3.4.0/pyproject.toml" ]]; then uv init --bare --no-workspace --no-pin-python --name native-stack-dspy --python 3.13.16 "$tool_root/dspy-3.4.0"; fi; uv add --project "$tool_root/dspy-3.4.0" --no-sync "dspy @ file://$tool_root/downloads/dspy-3.4.0-py3-none-any.whl" "gepa[dspy] @ file://$tool_root/downloads/gepa-0.1.4-py3-none-any.whl"; uv add --project "$tool_root/dspy-3.4.0" --no-sync --group acceptance '"'"'dspy[dev]==3.4.0'"'"'; uv sync --project "$tool_root/dspy-3.4.0" --locked --group acceptance --python 3.13.16' || return "$?"
+  # Source: https://github.com/stanfordnlp/dspy/blob/3.4.0/README.md#L34
+  run_command 'checkout_tag https://github.com/stanfordnlp/dspy.git 3.4.0 "$tool_root/dspy-source-3.4.0"; [[ "$(git -C "$tool_root/dspy-source-3.4.0" rev-parse HEAD)" == 2413b67a4d08a476e4bc6f40b9f8f42f87711ee7 ]]' || return "$?"
+  # Source: https://github.com/astral-sh/uv/blob/0.12.22/docs/guides/projects.md#L107
+  run_command 'umask 077; receipt="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/install-receipts/lm-program-optimization"; install -d -m 0700 -- "$receipt"; install -m 0600 -- "$tool_root/dspy-3.4.0/uv.lock" "$receipt/uv.lock"; uv pip freeze --python "$tool_root/dspy-3.4.0/.venv/bin/python" > "$receipt/resolved.txt"; sha256sum "$receipt/uv.lock" > "$receipt/uv.lock.sha256"' || return "$?"
+}
+
+# Round2 wave5: skill-vetting; destination installation UNRUN.
+skill-vetting() {
+  # Source: https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/README.md#L45
+  run_command 'uv tool install --python 3.13.16 git+https://github.com/NVIDIA/skillspector.git@c7958a3268d9498644b22edb75d0f051bbc8cbfc --with pytest --with pytest-asyncio' || return "$?"
+  # Source: https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/.github/workflows/ci.yml#L88
+  run_command 'checkout_tag https://github.com/NVIDIA/skillspector.git v2.12.0 "$tool_root/skillspector-source-2.12.0"; [[ "$(git -C "$tool_root/skillspector-source-2.12.0" rev-parse HEAD)" == c7958a3268d9498644b22edb75d0f051bbc8cbfc ]]' || return "$?"
+  # Source: https://github.com/astral-sh/uv/blob/0.12.22/docs/pip/inspection.md#L18
+  run_command 'umask 077; receipt="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/install-receipts/skill-vetting"; install -d -m 0700 -- "$receipt"; uv pip freeze --python "$(uv tool dir)/skillspector/bin/python" > "$receipt/resolved.txt"' || return "$?"
+}
+
+# Round2 wave5: trajectory-analysis; destination installation UNRUN.
+trajectory-analysis() {
+  # Source: https://pypi.org/pypi/inspect-scout/0.5.3/json
+  run_command 'fetch_verified https://files.pythonhosted.org/packages/68/0c/474e38758bdf796d2f8c90ffb026790003b112b57405958cfdbe21b86a66/inspect_scout-0.5.3-py3-none-any.whl 097c1f1174bb3372bb15d72a69f979d6bf63e80752eac71062d4d9217136bd30 "$tool_root/downloads/inspect_scout-0.5.3-py3-none-any.whl"' || return "$?"
+  # Source: https://pypi.org/pypi/harbor/0.23.0/json
+  run_command 'fetch_verified https://files.pythonhosted.org/packages/19/c7/607ff037dff1f40d1f941b9854742d66fd43630274fd4e7b8de8480dad34/harbor-0.23.0-py3-none-any.whl 8747400dbb2a5e2298e1338e17e88eba38433c0433fd700f34d1a9021bba5c37 "$tool_root/downloads/harbor-0.23.0-py3-none-any.whl"' || return "$?"
+  # Source: https://github.com/astral-sh/uv/blob/0.12.22/docs/guides/tools.md#L225
+  run_command 'uv tool install --python 3.13 inspect-ai==0.3.273 --with openai==3.24.0 --with "inspect-scout @ file://$tool_root/downloads/inspect_scout-0.5.3-py3-none-any.whl" --with "harbor @ file://$tool_root/downloads/harbor-0.23.0-py3-none-any.whl" --with-executables-from inspect-scout --with pytest --with pytest-asyncio --with pytest-xdist' || return "$?"
+  # Source: https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/README.md#L1
+  run_command 'checkout_tag https://github.com/meridianlabs-ai/inspect_scout.git 0.5.3 "$tool_root/inspect-scout-source-0.5.3"; [[ "$(git -C "$tool_root/inspect-scout-source-0.5.3" rev-parse HEAD)" == 0e8fc055a3cebba1a14c11bc35856767b6405173 ]]' || return "$?"
+  # Source: https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/examples/scanner/grep_examples.py#L102
+  run_command 'install -d -m 0700 -- "$config_root"; install -m 0600 -- "$plan_dir/config/scout-round2-delegation.py" "$config_root/scout-round2-delegation.py"' || return "$?"
+  # Source: https://github.com/astral-sh/uv/blob/0.12.22/docs/pip/inspection.md#L18
+  run_command 'umask 077; receipt="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/install-receipts/trajectory-analysis"; install -d -m 0700 -- "$receipt"; uv pip freeze --python "$(uv tool dir)/inspect-ai/bin/python" > "$receipt/resolved.txt"' || return "$?"
+}
+
+# Round2 wave5: mcp-protocol-conformance; destination installation UNRUN.
+mcp-protocol-conformance() {
+  # Source: https://registry.npmjs.org/@modelcontextprotocol%2Fconformance/0.2.0-alpha.11
+  run_command 'mkdir -p -- "$tool_root/downloads"; curl --proto '"'"'=https'"'"' --tlsv1.2 -fL https://registry.npmjs.org/@modelcontextprotocol/conformance/-/conformance-0.2.0-alpha.11.tgz -o "$tool_root/downloads/conformance-0.2.0-alpha.11.tgz"; printf '"'"'%s  %s\n'"'"' 8a63caf6dc79810b0be99290ab832bb320d87d2688c294665fafa88236de017b3d2c6bf1901c56718eca712ed3bf068193f66255697a6ff9da178abcdd4c0344 "$tool_root/downloads/conformance-0.2.0-alpha.11.tgz" | sha512sum --check --status; [[ "$(npm view @modelcontextprotocol/conformance@0.2.0-alpha.11 dist.integrity)" == sha512-imPK9tx5gQsL6ZKQq4MrsyDYfSaIwpRmX6+ogjbeAXs9LGvxkBxWcY7KcS7TvwaBk/ZiVWl6b/naF4q83UwDRA== ]]; npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 list --requirements 2026-07-28' || return "$?"
+  # Source: https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/.github/workflows/ci.yml#L26
+  run_command 'source_dir="$tool_root/mcp-conformance-source-0.2.0-alpha.11"; if [[ ! -d "$source_dir/.git" ]]; then git clone --filter=blob:none --no-checkout https://github.com/modelcontextprotocol/conformance.git "$source_dir"; fi; [[ "$(git -C "$source_dir" config --get remote.origin.url)" == https://github.com/modelcontextprotocol/conformance.git ]]; git -C "$source_dir" diff --quiet; git -C "$source_dir" diff --cached --quiet; git -C "$source_dir" fetch --depth 1 origin c321dd32035556e6769d3724a8ee97d87c3faaac; git -C "$source_dir" checkout --detach c321dd32035556e6769d3724a8ee97d87c3faaac; [[ "$(git -C "$source_dir" rev-parse HEAD)" == c321dd32035556e6769d3724a8ee97d87c3faaac ]]' || return "$?"
+}
+
 if $list; then
   printf '%s\n' 'claude-code | Claude Code | native-installer | planned'
   printf '%s\n' 'codex | Codex | native-installer | planned'
@@ -873,7 +933,7 @@ if $list; then
   printf '%s\n' 'research-skill | Not installed until its activation gate returns (GPT Researcher'\''s own skill with its MCP server) | none | excluded'
   printf '%s\n' 'mcporter | mcporter | npm-global | planned'
   printf '%s\n' 'mcp-inspector | MCP Inspector | none | excluded'
-  printf '%s\n' 'agent-messaging | Not installed until the deciding measurement returns | none | excluded'
+  printf '%s\n' 'agent-messaging | hcom 0.7.27 (the Claude Code <-> Codex message transport only; Claude <-> Claude stays on native cross-session messaging) | native-installer | planned'
   printf '%s\n' 'sandbox-runtime-srt | sandbox-runtime (srt) | npm-global | planned'
   printf '%s\n' 'isolation-container-boundary | No additional component: rootless containers on the container engine that the hosting layer installs | none | excluded'
   printf '%s\n' 'serena | Serena | uv-tool | planned'
@@ -942,10 +1002,14 @@ if $list; then
   printf '%s\n' 'research-harnesses | GPT Researcher and DeerFlow, kept as two independent evidence gatherers | none | planned'
   printf '%s\n' 'credential-guard | Command and secret-path guard (K4) | repository-recipe | planned'
   printf '%s\n' 'convergence-validators | Convergence practice and its validators | repository-recipe | planned'
+  printf '%s\n' 'lm-program-optimization | DSPy 3.4.0 (dspy.GEPA and the other DSPy optimizers; GEPA 0.1.4 comes in as its pinned dependency) | uv-project | planned'
+  printf '%s\n' 'skill-vetting | SkillSpector 2.12.0 CLI (on demand; advisory, never an allow decision; no MCP server and no install hook) | uv-tool | planned'
+  printf '%s\n' 'trajectory-analysis | Inspect Scout 0.5.3 (in the Inspect AI owner'"'"'s environment, with harbor 0.23.0 for ATIF import) | uv-tool-owner-extension | planned'
+  printf '%s\n' 'mcp-protocol-conformance | MCP conformance suite (npm @modelcontextprotocol/conformance, on demand through npx; 0.2.0-alpha.11 until 0.2.0-alpha.12 clears the cooldown on 2026-10-08) | npx-on-demand | planned'
   exit 0
 fi
 case "$only" in
-  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|command-output|output-compression|code-index|code-graph|repo-packing|structured-data|doc-conversion|api-docs|trace-viewer|token-lane-carriers|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
+  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|command-output|output-compression|code-index|code-graph|repo-packing|structured-data|doc-conversion|api-docs|trace-viewer|token-lane-carriers|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators|lm-program-optimization|skill-vetting|trajectory-analysis|mcp-protocol-conformance) ;;
   *) printf 'Unknown slot: %s\n' "$only" >&2; exit 2 ;;
 esac
 # Planned. Two acceptance checks change into repo_root, so the plan runs from a checkout of the repository (README.md); --list needs none.
@@ -960,6 +1024,9 @@ for slot in 'mcp-inspector' 'playwright-cli' 'loki' 'grafana' 'local-generation-
 for slot in 'claude-agent-sdk' 'codex-sdk-and-codex-exec-app-server' 'trail-of-bits-security-skills-trailofbits-skills' 'engineering-process-skills' 'skill-discovery' 'skill-authoring' 'mcporter' 'sandbox-runtime-srt' 'serena' 'structural-search' 'code-search' 'tobi-qmd' 'mineru' 'context-supply' 'statusline' 'ccusage' 'output-compression' 'code-index' 'repo-packing' 'structured-data' 'doc-conversion' 'api-docs' 'local-model-server' 'inspect-ai' 'harbor-containerized-agent-e2e-runner' 'promptfoo' 'zizmor' 'syft' 'actionlint-kjanat' 'betterleaks' 'gh-github-cli' 'worktrunk' 'difftastic' 'restic' 'gpt-gateway' 'agent-runtime-worker' 'research-harnesses'; do selected "$slot" && needs_runtime=true; done
 for slot in 'mcp-inspector' 'playwright-cli'; do named "$slot" && needs_runtime=true; done
 for slot in 'harbor-containerized-agent-e2e-runner' 'docker-compose'; do selected "$slot" && needs_docker=true; done
+
+for slot in 'lm-program-optimization' 'skill-vetting' 'trajectory-analysis' 'mcp-protocol-conformance'; do selected "$slot" && needs_execution=true; done
+for slot in 'lm-program-optimization' 'skill-vetting' 'trajectory-analysis' 'mcp-protocol-conformance'; do selected "$slot" && needs_runtime=true; done
 
 if $needs_execution; then
   # Planned. Repository bootstrap-linux.sh:206-216; selected owner prereqs extend its package list.
@@ -1008,7 +1075,8 @@ if selected 'engineering-process-skills'; then run_slot 'engineering-process-ski
 if selected 'skill-discovery'; then run_slot 'skill-discovery'; fi
 if selected 'skill-authoring'; then run_slot 'skill-authoring'; fi
 if selected 'mcporter'; then run_slot 'mcporter'; fi
-if selected 'sandbox-runtime-srt'; then run_slot 'sandbox-runtime-srt'; fi
+if selected 'sandbox-runtime-srt'; then run_slot 'agent-messaging'
+run_slot 'sandbox-runtime-srt'; fi
 if selected 'serena'; then run_slot 'serena'; fi
 if selected 'structural-search'; then run_slot 'structural-search'; fi
 if selected 'tobi-qmd'; then run_slot 'tobi-qmd'; fi
@@ -1070,4 +1138,8 @@ if named 'embedding-model'; then run_slot 'embedding-model'; elif selected 'embe
 if selected 'dagu'; then run_slot 'dagu'; fi
 if selected 'gpt-gateway'; then run_slot 'gpt-gateway'; fi
 if selected 'research-harnesses'; then run_slot 'research-harnesses'; fi
+if selected 'lm-program-optimization'; then run_slot 'lm-program-optimization'; fi
+if selected 'skill-vetting'; then run_slot 'skill-vetting'; fi
+if selected 'trajectory-analysis'; then run_slot 'trajectory-analysis'; fi
+if named 'mcp-protocol-conformance'; then run_slot 'mcp-protocol-conformance'; elif selected 'mcp-protocol-conformance'; then printf '%s | install | skipped\n' 'mcp-protocol-conformance'; fi
 exit "$failed"

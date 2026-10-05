@@ -760,26 +760,93 @@
     {
       "layer": "workers",
       "slot": "agent-messaging",
-      "owner": "Not installed until the deciding measurement returns",
-      "repository": "",
-      "release": null,
-      "installed": false,
-      "route": "none",
-      "commands": [],
+      "owner": "hcom 0.7.27 (the Claude Code <-> Codex message transport only; Claude <-> Claude stays on native cross-session messaging)",
+      "repository": "https://github.com/aannoo/hcom",
+      "release": "v0.7.27",
+      "installed": true,
+      "route": "native-installer",
+      "commands": [
+        "fetch_verified https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh 3bc057fcd763748c32fae0ae25e150abf2b1df0d4c9451432c28f4ddde176a98 \"$tool_root/hcom-0.7.27/hcom-installer.sh\"",
+        "HCOM_INSTALL_DIR=\"$HOME/.local/bin\" HCOM_NO_MODIFY_PATH=1 sh \"$tool_root/hcom-0.7.27/hcom-installer.sh\"",
+        "python3 \"$config_root/hcom-client-config.py\" --repo-root \"$repo_root\" --apply"
+      ],
       "needs": {
         "sudo": false,
         "systemd_user_unit": false,
         "docker": false,
         "gpu": false,
         "node": false,
-        "python": false
+        "python": true
       },
-      "version_pinned": false,
-      "install_source": null,
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://github.com/aannoo/hcom/releases/tag/v0.7.27"
+      },
       "service": null,
-      "acceptance": {},
-      "config_paths": [],
-      "notes": "native facilities do not cover messaging into a running Codex session, but installing hcom changes how sessions start and what they may do without asking, which is the owner's decision and not a default install"
+      "acceptance": {
+        "post_install": {
+          "command": "smoke=\"$(mktemp -d)\"\ntrap 'rm -rf -- \"$smoke\"' EXIT\nHCOM_DIR=\"$smoke\" hcom status --json > \"$smoke/status.json\"\njq -e --arg expected \"$smoke\" '.hcom_dir == $expected and .instances.total == 0' \"$smoke/status.json\" >/dev/null\nHCOM_DIR=\"$smoke\" hcom list --json | jq -e 'type == \"array\" and length == 0' >/dev/null\npython3 \"$config_root/hcom-client-config.py\" --repo-root \"$repo_root\" --check",
+          "kind": "upstream smoke + native integration",
+          "source": {
+            "url": "https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/tests/cli_smoke.rs#L129",
+            "line": 129
+          }
+        }
+      },
+      "config_paths": [
+        "$tool_root/hcom-0.7.27/hcom-installer.sh",
+        "$HOME/.local/bin/hcom",
+        "${XDG_CONFIG_HOME:-$HOME/.config}/hcom/hcom-receipt.json",
+        "${HCOM_DIR:-$HOME/.hcom}/config.toml",
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/settings.json",
+        "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/CLAUDE.md",
+        "${CODEX_HOME:-$HOME/.codex}/rules/hcom-deny.rules",
+        "${CODEX_HOME:-$HOME/.codex}/AGENTS.md",
+        "$plan_dir/config/hcom-client-config.py",
+        "$plan_dir/config/hcom-deny.rules",
+        "$config_root/hcom-client-config.py",
+        "$config_root/hcom-deny.rules"
+      ],
+      "notes": "Round-2 wave5 owner default (2026-10-04), not a local trial. UNRUN on NativeStack2604. hcom owns Claude Code <-> Codex transport only; Claude <-> Claude uses native SendMessage/ListAgents and crossSessionInbound=accept, and Codex-internal work keeps multi_agent/queue. Install the pinned upstream checksum-verifying installer; do not add an hcom Claude launcher or global hooks. Codex uses upstream hcom codex for terminal delivery. Plain Claude uses hcom start/listen; automatic idle Claude receive is not established by this posture, because 0.7.27 per-run Claude hooks require HCOM_PROCESS_ID. Preserve auto_approve=true, relay.enabled=false, auto_trust_workspace=false and title_mode=off. The map owns both clients' deny/peer-hint configuration; the bounded adapter reuses new_wsl_client_config.py's native merge/block/write helpers. Qualify the separate hcom-deny.rules with codex execpolicy check; leave hcom.rules upstream-owned. Prefix denies have the posture's stated reordered/equals-joined/numbered-launch/script limits, including executable wrappers; they are not an OS security boundary. The user's OS-sandbox decision is outside this row. Upstream tag CI is repository-quality evidence; the temporary-directory status/list commands parameterize its CLI smoke assertions, and client-file/rule checks are local integration acceptance. No new model run, cross-client E2E or upstream suite execution is claimed.",
+      "source_commit": "2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b",
+      "checksums": [
+        {
+          "artifact": "hcom-installer.sh",
+          "algorithm": "sha256",
+          "value": "3bc057fcd763748c32fae0ae25e150abf2b1df0d4c9451432c28f4ddde176a98",
+          "source": "https://api.github.com/repos/aannoo/hcom/releases/tags/v0.7.27"
+        },
+        {
+          "artifact": "hcom-x86_64-unknown-linux-gnu.tar.gz",
+          "algorithm": "sha256",
+          "value": "8ae97ff6fef63c637d66ddf882651aadd035bd74ae26c0787743869c20a5391d",
+          "source": "https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-x86_64-unknown-linux-gnu.tar.gz.sha256"
+        }
+      ],
+      "supporting_sources": [
+        {
+          "url": "https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/common.rs#L46",
+          "line": 46
+        },
+        {
+          "url": "https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/claude.rs#L135",
+          "line": 135
+        },
+        {
+          "url": "https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/config.rs#L126",
+          "line": 126
+        },
+        {
+          "url": "https://developers.openai.com/codex/rules"
+        },
+        {
+          "url": "https://github.com/aannoo/hcom/actions/runs/36803903267"
+        },
+        {
+          "url": "https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972504465"
+        }
+      ],
+      "needs_user": "Use the clients' own native sign-ins; trust each Codex lane folder once yourself (hcom never answers trust prompts). Close Codex before configuration apply and restart it to load the rules. Existing conflicting hcom configuration, deny file or Claude inbound choice is retained and reported as needs_user. Plain-Claude idle automatic receive remains an upstream capability gap; no hcom Claude wrapper or OS-sandbox change is introduced."
     },
     {
       "layer": "isolation",
@@ -4114,6 +4181,412 @@
         "adoption/README.md"
       ],
       "notes": "Planned. Adoption recipe, no new install command. Check verifies repository evidence, not host installation. Scoped convergence experiments require their own records; not generated for this source-only install inventory."
+    },
+    {
+      "layer": "cross:gpt6-harnesses",
+      "slot": "lm-program-optimization",
+      "owner": "DSPy 3.4.0 (dspy.GEPA and the other DSPy optimizers; GEPA 0.1.4 comes in as its pinned dependency)",
+      "repository": "https://github.com/stanfordnlp/dspy",
+      "release": "3.4.0",
+      "installed": true,
+      "route": "uv-project",
+      "commands": [
+        "fetch_verified https://files.pythonhosted.org/packages/17/96/31628d4231b5dd7edbe9eaf5c975d1055f4b79b337062a1f957dca6dd931/dspy-3.4.0-py3-none-any.whl 36de329ecdaf18e31977e26c61b587caa470a34f574f2fe6cb7f4c82bcbf97cc \"$tool_root/downloads/dspy-3.4.0-py3-none-any.whl\"",
+        "fetch_verified https://files.pythonhosted.org/packages/fd/77/5b3a281cfd9caaa9e68349b434cf27f1ca448003ee0067a1ae2184dc52d1/gepa-0.1.4-py3-none-any.whl 12b971039599625c156d2231f6d72a29c31a22e9c237689459b5f1a3c353f532 \"$tool_root/downloads/gepa-0.1.4-py3-none-any.whl\"",
+        "if [[ ! -f \"$tool_root/dspy-3.4.0/pyproject.toml\" ]]; then uv init --bare --no-workspace --no-pin-python --name native-stack-dspy --python 3.13.16 \"$tool_root/dspy-3.4.0\"; fi; uv add --project \"$tool_root/dspy-3.4.0\" --no-sync \"dspy @ file://$tool_root/downloads/dspy-3.4.0-py3-none-any.whl\" \"gepa[dspy] @ file://$tool_root/downloads/gepa-0.1.4-py3-none-any.whl\"; uv add --project \"$tool_root/dspy-3.4.0\" --no-sync --group acceptance 'dspy[dev]==3.4.0'; uv sync --project \"$tool_root/dspy-3.4.0\" --locked --group acceptance --python 3.13.16",
+        "checkout_tag https://github.com/stanfordnlp/dspy.git 3.4.0 \"$tool_root/dspy-source-3.4.0\"; [[ \"$(git -C \"$tool_root/dspy-source-3.4.0\" rev-parse HEAD)\" == 2413b67a4d08a476e4bc6f40b9f8f42f87711ee7 ]]",
+        "umask 077; receipt=\"${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/install-receipts/lm-program-optimization\"; install -d -m 0700 -- \"$receipt\"; install -m 0600 -- \"$tool_root/dspy-3.4.0/uv.lock\" \"$receipt/uv.lock\"; uv pip freeze --python \"$tool_root/dspy-3.4.0/.venv/bin/python\" > \"$receipt/resolved.txt\"; sha256sum \"$receipt/uv.lock\" > \"$receipt/uv.lock.sha256\""
+      ],
+      "needs": {
+        "sudo": true,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": true
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://github.com/stanfordnlp/dspy/blob/3.4.0/README.md#L31",
+        "line": 31
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "kind": "smoke",
+          "command": "uv run --project \"$tool_root/dspy-3.4.0\" --frozen --no-sync python - <<'PY'\nfrom importlib.metadata import version\nimport dspy\nassert version(\"dspy\") == \"3.4.0\"\nassert version(\"gepa\") == \"0.1.4\"\nassert callable(dspy.GEPA)\nPY\ncd \"$tool_root/dspy-source-3.4.0\"\nuv run --project \"$tool_root/dspy-3.4.0\" --frozen --no-sync python -m pytest -q tests/teleprompt/test_gepa.py tests/predict/test_predict.py",
+          "source": {
+            "url": "https://github.com/stanfordnlp/dspy/blob/3.4.0/tests/teleprompt/test_gepa.py#L632",
+            "line": 632
+          }
+        },
+        "after_sign_in": {
+          "kind": "smoke",
+          "command": "uv run --project \"$tool_root/dspy-3.4.0\" --frozen --no-sync python - <<'PY'\nimport os\nimport dspy\nlm = dspy.LM(\"openai/cx/gpt-6.1-sol\", api_base=\"http://127.0.0.1:21128/v1\", api_key=os.environ.get(\"OMNIROUTE_API_KEY\", \"local-loopback\"), cache=False)\ndspy.configure(lm=lm)\nresponse = lm(\"Return only the digit 4 as the answer to 2 + 2.\")\nassert response and response[0].strip() == \"4\"\nPY",
+          "source": {
+            "url": "https://github.com/stanfordnlp/dspy/blob/3.4.0/docs/docs/learn/programming/language_models.md#L139",
+            "line": 139
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Round2 wave5, UNRUN. A dedicated uv-managed project installs checksum-verified DSPy 3.4.0 and its exact gepa[dspy] 0.1.4 dependency. The acceptance dependency group follows DSPy upstream dev extras. Keep uv.lock and the resolved inventory (including uncapped LiteLLM) in the private install receipt; reuse its frozen lock on rerun, without claiming the historical LiteLLM 1.104.0 resolution recurred. Unchanged upstream tests are post-install acceptance; the configured LM call is a separate provider integration check. Skill trigger/description optimization stays with skill-creator. Both native clients invoke uv run --project \"$tool_root/dspy-3.4.0\"; no client setting or MCP registration is required. The existing wrapper apt prerequisites explain needs.sudo; these package commands require no sudo.",
+      "checksums": [
+        {
+          "filename": "dspy-3.4.0-py3-none-any.whl",
+          "algorithm": "sha256",
+          "value": "36de329ecdaf18e31977e26c61b587caa470a34f574f2fe6cb7f4c82bcbf97cc",
+          "source": "https://pypi.org/pypi/dspy/3.4.0/json",
+          "url": "https://files.pythonhosted.org/packages/17/96/31628d4231b5dd7edbe9eaf5c975d1055f4b79b337062a1f957dca6dd931/dspy-3.4.0-py3-none-any.whl"
+        },
+        {
+          "filename": "gepa-0.1.4-py3-none-any.whl",
+          "algorithm": "sha256",
+          "value": "12b971039599625c156d2231f6d72a29c31a22e9c237689459b5f1a3c353f532",
+          "source": "https://pypi.org/pypi/gepa/0.1.4/json",
+          "url": "https://files.pythonhosted.org/packages/fd/77/5b3a281cfd9caaa9e68349b434cf27f1ca448003ee0067a1ae2184dc52d1/gepa-0.1.4-py3-none-any.whl"
+        }
+      ],
+      "needs_user": "The after_sign_in LM integration requires the existing OmniRoute provider sign-in and running loopback gateway. If gateway authentication is enabled, OMNIROUTE_API_KEY must be supplied by the existing credential runner; no credential file is read here.",
+      "source_checkout": {
+        "tag": "3.4.0",
+        "commit": "2413b67a4d08a476e4bc6f40b9f8f42f87711ee7",
+        "path": "${tool_root}/dspy-source-3.4.0",
+        "purpose": "unchanged upstream optimizer and Predict tests"
+      },
+      "supporting_sources": [
+        {
+          "url": "https://github.com/stanfordnlp/dspy/blob/3.4.0/pyproject.toml#L37",
+          "line": 37
+        },
+        {
+          "url": "https://github.com/stanfordnlp/dspy/blob/3.4.0/pyproject.toml#L50",
+          "line": 50
+        },
+        {
+          "url": "https://github.com/stanfordnlp/dspy/blob/3.4.0/.github/workflows/run_tests.yml#L98",
+          "line": 98
+        },
+        {
+          "url": "https://github.com/astral-sh/uv/blob/0.12.22/docs/concepts/projects/dependencies.md#L412",
+          "line": 412
+        },
+        {
+          "url": "https://github.com/astral-sh/uv/blob/0.12.22/docs/pip/inspection.md#L18",
+          "line": 18
+        }
+      ]
+    },
+    {
+      "layer": "instructions-skills",
+      "slot": "skill-vetting",
+      "owner": "SkillSpector 2.12.0 CLI (on demand; advisory, never an allow decision; no MCP server and no install hook)",
+      "repository": "https://github.com/NVIDIA/skillspector",
+      "release": "2.12.0",
+      "installed": true,
+      "route": "uv-tool",
+      "commands": [
+        "uv tool install --python 3.13.16 git+https://github.com/NVIDIA/skillspector.git@c7958a3268d9498644b22edb75d0f051bbc8cbfc --with pytest --with pytest-asyncio",
+        "checkout_tag https://github.com/NVIDIA/skillspector.git v2.12.0 \"$tool_root/skillspector-source-2.12.0\"; [[ \"$(git -C \"$tool_root/skillspector-source-2.12.0\" rev-parse HEAD)\" == c7958a3268d9498644b22edb75d0f051bbc8cbfc ]]",
+        "umask 077; receipt=\"${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/install-receipts/skill-vetting\"; install -d -m 0700 -- \"$receipt\"; uv pip freeze --python \"$(uv tool dir)/skillspector/bin/python\" > \"$receipt/resolved.txt\""
+      ],
+      "needs": {
+        "sudo": true,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": true
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/README.md#L45",
+        "line": 45
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "kind": "smoke",
+          "command": "tool_python=\"$(uv tool dir)/skillspector/bin/python\"\n\"$tool_python\" - <<'PY'\nimport json\nfrom importlib.metadata import distribution\npackage = distribution(\"skillspector\")\nassert package.version == \"2.12.0\"\norigin = json.loads(package.read_text(\"direct_url.json\"))\nassert origin[\"vcs_info\"][\"commit_id\"] == \"c7958a3268d9498644b22edb75d0f051bbc8cbfc\"\nPY\ncd \"$tool_root/skillspector-source-2.12.0\"\n\"$tool_python\" -m pytest -q tests/unit/test_cli.py tests/unit/test_agent_cli.py",
+          "source": {
+            "url": "https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/tests/unit/test_cli.py#L17",
+            "line": 17
+          }
+        },
+        "after_sign_in": {
+          "kind": "smoke",
+          "command": "codex login status >/dev/null\numask 077\nstate=\"${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/skill-vetting\"\ninstall -d -m 0700 -- \"$state\"\nrun=\"$(mktemp -d \"$state/semantic.XXXXXXXX\")\"\nSKILLSPECTOR_PROVIDER=codex_cli skillspector scan \"$tool_root/skillspector-source-2.12.0/tests/fixtures/safe_skill\" --format json --output \"$run/report.json\" --fail-on-incomplete\n\"$(uv tool dir)/skillspector/bin/python\" - \"$run/report.json\" <<'PY'\nimport json, sys\nreport = json.load(open(sys.argv[1]))\nassert report[\"analysis_completeness\"][\"is_complete\"] is True\nassert report[\"execution_successful\"] is True\nassert report[\"metadata\"][\"llm_requested\"] is True\nassert report[\"metadata\"][\"llm_available\"] is True\nassert report[\"metadata\"][\"meta_analysis_applied\"] is True\nPY",
+          "source": {
+            "url": "https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/cli.py#L560",
+            "line": 560
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Round2 wave5, UNRUN. Install the CLI from tag commit c7958a3268d9498644b22edb75d0f051bbc8cbfc with uv tool install. No [mcp] extra, server, hook or approval policy. Record release asset hashes as publication evidence distinct from the actual Git source; it has no signature/provenance attestation. uv tool install resolves transitives independently of the repository uv.lock, so record the actual installed freeze privately. Upstream CLI/provider-adapter unit tests are acceptance, not a local skill-quality trial. Coordinator scans remain on demand and advisory beside skills.sh audits and manual source review. Static usage: skillspector scan <artifact> --no-llm --format json --fail-on-findings. Semantic usage sets SKILLSPECTOR_PROVIDER=codex_cli per invocation, reusing native Codex sign-in. Existing native PATH gives both clients the CLI; no client setting changes. needs.sudo declares only the existing wrapper apt prerequisite.",
+      "git_pin": "c7958a3268d9498644b22edb75d0f051bbc8cbfc",
+      "checksums": [
+        {
+          "filename": "skillspector-2.12.0-py3-none-any.whl",
+          "algorithm": "sha256",
+          "value": "62973f6254d30c871480246869f88a01e17dff6f12e9d43010962eb0d7e305f4",
+          "source": "https://api.github.com/repos/NVIDIA/skillspector/releases/tags/v2.12.0",
+          "scope": "published release asset; installation uses Git at the tag commit"
+        },
+        {
+          "filename": "skillspector-2.12.0.tar.gz",
+          "algorithm": "sha256",
+          "value": "507c367b8f53b821adf0568bb32c7e08dd2da8f63900efa7ceccb53e9b401b53",
+          "source": "https://api.github.com/repos/NVIDIA/skillspector/releases/tags/v2.12.0",
+          "scope": "published release asset; installation uses Git at the tag commit"
+        }
+      ],
+      "needs_user": "Only semantic acceptance requires native Codex sign-in. Static advisory scans and upstream CLI tests need no model or API key. Findings and incomplete scans inform the coordinator; they never authorize installation.",
+      "source_checkout": {
+        "tag": "v2.12.0",
+        "commit": "c7958a3268d9498644b22edb75d0f051bbc8cbfc",
+        "path": "${tool_root}/skillspector-source-2.12.0",
+        "purpose": "unchanged upstream CLI tests and safe_skill semantic example"
+      },
+      "supporting_sources": [
+        {
+          "url": "https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/pyproject.toml#L60",
+          "line": 60
+        },
+        {
+          "url": "https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/.github/workflows/ci.yml#L97",
+          "line": 97
+        },
+        {
+          "url": "https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/nodes/report.py#L1215",
+          "line": 1215
+        },
+        {
+          "url": "https://github.com/astral-sh/uv/blob/0.12.22/docs/concepts/projects/dependencies.md#L331",
+          "line": 331
+        },
+        {
+          "url": "https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/nodes/report.py#L1337",
+          "line": 1337
+        },
+        {
+          "url": "https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/.github/workflows/ci.yml#L88",
+          "line": 88
+        },
+        {
+          "url": "https://github.com/astral-sh/uv/blob/0.12.22/docs/pip/inspection.md#L18",
+          "line": 18
+        }
+      ]
+    },
+    {
+      "layer": "quality-evaluation",
+      "slot": "trajectory-analysis",
+      "owner": "Inspect Scout 0.5.3 (in the Inspect AI owner's environment, with harbor 0.23.0 for ATIF import)",
+      "repository": "https://github.com/meridianlabs-ai/inspect_scout",
+      "release": "0.5.3",
+      "installed": true,
+      "route": "uv-tool-owner-extension",
+      "commands": [
+        "fetch_verified https://files.pythonhosted.org/packages/68/0c/474e38758bdf796d2f8c90ffb026790003b112b57405958cfdbe21b86a66/inspect_scout-0.5.3-py3-none-any.whl 097c1f1174bb3372bb15d72a69f979d6bf63e80752eac71062d4d9217136bd30 \"$tool_root/downloads/inspect_scout-0.5.3-py3-none-any.whl\"",
+        "fetch_verified https://files.pythonhosted.org/packages/19/c7/607ff037dff1f40d1f941b9854742d66fd43630274fd4e7b8de8480dad34/harbor-0.23.0-py3-none-any.whl 8747400dbb2a5e2298e1338e17e88eba38433c0433fd700f34d1a9021bba5c37 \"$tool_root/downloads/harbor-0.23.0-py3-none-any.whl\"",
+        "uv tool install --python 3.13 inspect-ai==0.3.273 --with openai==3.24.0 --with \"inspect-scout @ file://$tool_root/downloads/inspect_scout-0.5.3-py3-none-any.whl\" --with \"harbor @ file://$tool_root/downloads/harbor-0.23.0-py3-none-any.whl\" --with-executables-from inspect-scout --with pytest --with pytest-asyncio --with pytest-xdist",
+        "checkout_tag https://github.com/meridianlabs-ai/inspect_scout.git 0.5.3 \"$tool_root/inspect-scout-source-0.5.3\"; [[ \"$(git -C \"$tool_root/inspect-scout-source-0.5.3\" rev-parse HEAD)\" == 0e8fc055a3cebba1a14c11bc35856767b6405173 ]]",
+        "install -d -m 0700 -- \"$config_root\"; install -m 0600 -- \"$plan_dir/config/scout-round2-delegation.py\" \"$config_root/scout-round2-delegation.py\"",
+        "umask 077; receipt=\"${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/install-receipts/trajectory-analysis\"; install -d -m 0700 -- \"$receipt\"; uv pip freeze --python \"$(uv tool dir)/inspect-ai/bin/python\" > \"$receipt/resolved.txt\""
+      ],
+      "needs": {
+        "sudo": true,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": false,
+        "python": true
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/docs/index.qmd#L28",
+        "line": 28
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "kind": "smoke",
+          "command": "tool_python=\"$(uv tool dir)/inspect-ai/bin/python\"\n\"$tool_python\" - <<'PY'\nfrom importlib.metadata import version\nassert version(\"inspect-ai\") == \"0.3.273\"\nassert version(\"openai\") == \"3.24.0\"\nassert version(\"inspect-scout\") == \"0.5.3\"\nassert version(\"harbor\") == \"0.23.0\"\nPY\n[[ \"$(readlink -f \"$(command -v scout)\")\" == \"$(readlink -f \"$(uv tool dir)/inspect-ai/bin/scout\")\" ]]\ncd \"$tool_root/inspect-scout-source-0.5.3\"\n\"$tool_python\" -m pytest -q -n 0 tests/grep_scanner/test_grep_scanner.py tests/sources/claude_code_source/test_integration.py tests/sources/atif_source/test_integration.py",
+          "source": {
+            "url": "https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/tests/sources/atif_source/test_integration.py#L44",
+            "line": 44
+          }
+        },
+        "after_sign_in": {
+          "kind": "smoke",
+          "command": ": \"${SCOUT_CLAUDE_SESSION_FILE:?Select a current Claude session JSONL with a known Agent/Task call and consent to private local import}\"\n: \"${SCOUT_HARBOR_ATIF_FILE:?Select one existing Harbor trajectory.json and consent to private local import}\"\n[[ -f \"$SCOUT_CLAUDE_SESSION_FILE\" && -f \"$SCOUT_HARBOR_ATIF_FILE\" ]]\numask 077\nstate=\"${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/trajectory-analysis\"\ninstall -d -m 0700 -- \"$state\"\nrun=\"$(mktemp -d \"$state/import-scan.XXXXXXXX\")\"\ncd \"$run\"\nscout import claude_code -P \"path=$SCOUT_CLAUDE_SESSION_FILE\" -T \"$run/claude/db\" --fail-on-error\nscout import atif -P \"path=$SCOUT_HARBOR_ATIF_FILE\" -T \"$run/harbor/db\" --fail-on-error\nfor source in claude harbor; do\n  scout scan \"$config_root/scout-round2-delegation.py\" --transcripts \"$run/$source/db\" --scans \"$run/$source/scans\" --max-processes 1 --fail-on-error\n  \"$(uv tool dir)/inspect-ai/bin/python\" - \"$run/$source/scans\" \"$source\" \"$run/$source-summary.json\" <<'PY'\nimport json, sys\nfrom pathlib import Path\nfrom inspect_scout import scan_list, scan_results_df\nlocations = scan_list(sys.argv[1])\nassert len(locations) == 1, \"Expected exactly one fresh scan\"\nresults = scan_results_df(locations[0].location)\nassert results.complete\nassert not results.errors\nassert len(results.scanners) == 1\nname, frame = next(iter(results.scanners.items()))\nassert name.split(\"/\")[-1] == \"delegation\"\nassert not frame.empty, \"Selected source produced no transcripts\"\nmatches = int(frame[\"value\"].sum())\nif sys.argv[2] == \"claude\":\n    assert matches > 0, \"Current Claude positive control produced no Agent/Task match\"\nPath(sys.argv[3]).write_text(json.dumps(dict(source=sys.argv[2], complete=True, transcripts=len(frame), delegation_matches=matches)) + \"\\n\")\nPY\ndone",
+          "source": {
+            "url": "https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/src/inspect_scout/_cli/import_command.py#L317",
+            "line": 317
+          }
+        }
+      },
+      "config_paths": [
+        "config/scout-round2-delegation.py"
+      ],
+      "notes": "Round2 wave5, UNRUN. Extend only the Inspect AI owner uv tool environment, exactly inspect-ai==0.3.273 with its openai==3.24.0, adding checksum-verified inspect-scout==0.5.3 and harbor==0.23.0 plus upstream pytest dependencies. --with-executables-from inspect-scout exposes scout without a second tool environment or second inspect-ai. The released owner satisfies Scout inspect-ai>=0.3.268; no pin move is needed. Record actual installed inventory privately. Post-install tests are unchanged upstream grep and Claude/ATIF importer fixtures. Destination acceptance imports a selected current Claude session with an actual Agent/Task positive control and one selected Harbor trial through native scout import/scan. The config only parameterizes upstream grep_scanner over tool-event headers. Native scan results must be complete, nonempty and error-free; Claude must have a positive match, Harbor may have zero delegation matches. Private local databases/results stay outside the checkout, with no cloud/model scanner. Direct Codex import was not found in the tagged source list and 0.5.3 release notes; this plan uses Harbor ATIF for Codex. Both clients can call scout through the existing PATH. needs.sudo is the existing apt wrapper prerequisite, not a Scout command.",
+      "checksums": [
+        {
+          "filename": "inspect_scout-0.5.3-py3-none-any.whl",
+          "algorithm": "sha256",
+          "value": "097c1f1174bb3372bb15d72a69f979d6bf63e80752eac71062d4d9217136bd30",
+          "source": "https://pypi.org/pypi/inspect-scout/0.5.3/json",
+          "url": "https://files.pythonhosted.org/packages/68/0c/474e38758bdf796d2f8c90ffb026790003b112b57405958cfdbe21b86a66/inspect_scout-0.5.3-py3-none-any.whl"
+        },
+        {
+          "filename": "harbor-0.23.0-py3-none-any.whl",
+          "algorithm": "sha256",
+          "value": "8747400dbb2a5e2298e1338e17e88eba38433c0433fd700f34d1a9021bba5c37",
+          "source": "https://pypi.org/pypi/harbor/0.23.0/json",
+          "url": "https://files.pythonhosted.org/packages/19/c7/607ff037dff1f40d1f941b9854742d66fd43630274fd4e7b8de8480dad34/harbor-0.23.0-py3-none-any.whl"
+        }
+      ],
+      "needs_user": "Select SCOUT_CLAUDE_SESSION_FILE (current Claude session JSONL with a known Agent/Task call) and SCOUT_HARBOR_ATIF_FILE (one existing Harbor trial). Consent to private local transcript/scan storage; Claude import can merge related same-slug sessions. No sign-in or provider is required for the grep scan.",
+      "source_checkout": {
+        "tag": "0.5.3",
+        "commit": "0e8fc055a3cebba1a14c11bc35856767b6405173",
+        "path": "${tool_root}/inspect-scout-source-0.5.3",
+        "purpose": "unchanged upstream scanner and importer tests"
+      },
+      "supporting_sources": [
+        {
+          "url": "https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/pyproject.toml#L24",
+          "line": 24
+        },
+        {
+          "url": "https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/docs/db_importing.qmd#L238",
+          "line": 238
+        },
+        {
+          "url": "https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/docs/db_importing.qmd#L281",
+          "line": 281
+        },
+        {
+          "url": "https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/src/inspect_scout/_cli/scan.py#L453",
+          "line": 453
+        },
+        {
+          "url": "https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/src/inspect_scout/_scanresults.py#L83",
+          "line": 83
+        },
+        {
+          "url": "https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/.github/workflows/build.yaml#L113",
+          "line": 113
+        },
+        {
+          "url": "https://github.com/astral-sh/uv/blob/0.12.22/docs/guides/tools.md#L229",
+          "line": 229
+        },
+        {
+          "url": "https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/src/inspect_scout/sources/__init__.py#L1",
+          "line": 1
+        },
+        {
+          "url": "https://github.com/astral-sh/uv/blob/0.12.22/docs/pip/inspection.md#L18",
+          "line": 18
+        },
+        {
+          "url": "https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/src/inspect_scout/_scanlist.py#L7",
+          "line": 7
+        },
+        {
+          "url": "https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/src/inspect_scout/_recorder/recorder.py#L58",
+          "line": 58
+        }
+      ]
+    },
+    {
+      "layer": "mcp-surfaces",
+      "slot": "mcp-protocol-conformance",
+      "owner": "MCP conformance suite (npm @modelcontextprotocol/conformance, on demand through npx; 0.2.0-alpha.11 until 0.2.0-alpha.12 clears the cooldown on 2026-10-08)",
+      "repository": "https://github.com/modelcontextprotocol/conformance",
+      "release": "0.2.0-alpha.11",
+      "installed": true,
+      "route": "npx-on-demand",
+      "commands": [
+        "mkdir -p -- \"$tool_root/downloads\"; curl --proto '=https' --tlsv1.2 -fL https://registry.npmjs.org/@modelcontextprotocol/conformance/-/conformance-0.2.0-alpha.11.tgz -o \"$tool_root/downloads/conformance-0.2.0-alpha.11.tgz\"; printf '%s  %s\\n' 8a63caf6dc79810b0be99290ab832bb320d87d2688c294665fafa88236de017b3d2c6bf1901c56718eca712ed3bf068193f66255697a6ff9da178abcdd4c0344 \"$tool_root/downloads/conformance-0.2.0-alpha.11.tgz\" | sha512sum --check --status; [[ \"$(npm view @modelcontextprotocol/conformance@0.2.0-alpha.11 dist.integrity)\" == sha512-imPK9tx5gQsL6ZKQq4MrsyDYfSaIwpRmX6+ogjbeAXs9LGvxkBxWcY7KcS7TvwaBk/ZiVWl6b/naF4q83UwDRA== ]]; npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 list --requirements 2026-07-28",
+        "source_dir=\"$tool_root/mcp-conformance-source-0.2.0-alpha.11\"; if [[ ! -d \"$source_dir/.git\" ]]; then git clone --filter=blob:none --no-checkout https://github.com/modelcontextprotocol/conformance.git \"$source_dir\"; fi; [[ \"$(git -C \"$source_dir\" config --get remote.origin.url)\" == https://github.com/modelcontextprotocol/conformance.git ]]; git -C \"$source_dir\" diff --quiet; git -C \"$source_dir\" diff --cached --quiet; git -C \"$source_dir\" fetch --depth 1 origin c321dd32035556e6769d3724a8ee97d87c3faaac; git -C \"$source_dir\" checkout --detach c321dd32035556e6769d3724a8ee97d87c3faaac; [[ \"$(git -C \"$source_dir\" rev-parse HEAD)\" == c321dd32035556e6769d3724a8ee97d87c3faaac ]]"
+      ],
+      "needs": {
+        "sudo": true,
+        "systemd_user_unit": false,
+        "docker": false,
+        "gpu": false,
+        "node": true,
+        "python": false
+      },
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/README.md#L32",
+        "line": 32
+      },
+      "service": null,
+      "acceptance": {
+        "post_install": {
+          "kind": "smoke",
+          "command": "cd \"$tool_root/mcp-conformance-source-0.2.0-alpha.11\"\nnpm ci\nnpm run check\nnpm run build\nnpm test\nnpx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 list --requirements 2026-07-28",
+          "source": {
+            "url": "https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/.github/workflows/ci.yml#L33",
+            "line": 33
+          }
+        },
+        "after_sign_in": {
+          "kind": "smoke",
+          "command": "if [[ -z \"${MCP_CONFORMANCE_SERVER_URL:-}\" && -z \"${MCP_CONFORMANCE_CLIENT_COMMAND:-}\" ]]; then\n  printf 'Select MCP_CONFORMANCE_SERVER_URL and/or MCP_CONFORMANCE_CLIENT_COMMAND for on-demand conformance acceptance.\\n' >&2\n  exit 78\nfi\nextra=()\nif [[ -n \"${MCP_CONFORMANCE_EXPECTED_FAILURES:-}\" ]]; then\n  [[ -f \"$MCP_CONFORMANCE_EXPECTED_FAILURES\" ]]\n  extra+=(--expected-failures \"$MCP_CONFORMANCE_EXPECTED_FAILURES\")\nfi\numask 077\nstate=\"${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/mcp-protocol-conformance\"\ninstall -d -m 0700 -- \"$state\"\nrun=\"$(mktemp -d \"$state/conformance.XXXXXXXX\")\"\ncd \"$run\"\nif [[ -n \"${MCP_CONFORMANCE_SERVER_URL:-}\" ]]; then\n  npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 server --url \"$MCP_CONFORMANCE_SERVER_URL\" --requirements 2026-07-28 \"${extra[@]}\"\nfi\nif [[ -n \"${MCP_CONFORMANCE_CLIENT_COMMAND:-}\" ]]; then\n  npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 client --command \"$MCP_CONFORMANCE_CLIENT_COMMAND\" --requirements 2026-07-28 \"${extra[@]}\"\nfi",
+          "source": {
+            "url": "https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/README.md#L59",
+            "line": 59
+          }
+        }
+      },
+      "config_paths": [],
+      "notes": "Round2 wave5, UNRUN. Selected owner, on-demand npx runtime only: both install and acceptance require --only mcp-protocol-conformance, and the default run skips it. No global npm executable, daemon, MCP registration or install hook. Source acceptance uses the unchanged upstream npm ci/check/build/test commands at the published main-ancestor commit; list --requirements is discovery, not acceptance by itself. Hash-check the published npm SHA-512 package and require its registry integrity before exact-version npx. Node 24 is supplied by the existing runtime bootstrap. Destination acceptance runs protocol requirements against an operator-selected HTTP MCP endpoint and/or scenario-driven client with only an explicitly supplied expected-failures baseline; Inspector keeps interactive/smoke ownership. Alpha.11 is the pre-cooldown pin, with SLSA v1 provenance; alpha.12 is not eligible before 2026-10-08T12:07:36Z and its later harness-correctness fixes are not claimed here. Eligibility does not auto-upgrade a pinned artifact. Native clients invoke the same shell npx command. needs.sudo declares only existing wrapper apt prerequisites.",
+      "on_demand": true,
+      "checksums": [
+        {
+          "filename": "conformance-0.2.0-alpha.11.tgz",
+          "algorithm": "sha512",
+          "value": "8a63caf6dc79810b0be99290ab832bb320d87d2688c294665fafa88236de017b3d2c6bf1901c56718eca712ed3bf068193f66255697a6ff9da178abcdd4c0344",
+          "integrity": "sha512-imPK9tx5gQsL6ZKQq4MrsyDYfSaIwpRmX6+ogjbeAXs9LGvxkBxWcY7KcS7TvwaBk/ZiVWl6b/naF4q83UwDRA==",
+          "source": "https://registry.npmjs.org/@modelcontextprotocol%2Fconformance/0.2.0-alpha.11"
+        }
+      ],
+      "cooldown": {
+        "candidate": "0.2.0-alpha.12",
+        "eligible_at_utc": "2026-10-08T12:07:36Z",
+        "current_pin": "0.2.0-alpha.11",
+        "source": "https://registry.npmjs.org/@modelcontextprotocol%2Fconformance"
+      },
+      "needs_user": "Choose an HTTP MCP endpoint (MCP_CONFORMANCE_SERVER_URL), a scenario-driven client command (MCP_CONFORMANCE_CLIENT_COMMAND), or both; supply a reviewed expected-failures YAML only if applicable. The suite supplies no default destination and starts no persistent service.",
+      "source_checkout": {
+        "commit": "c321dd32035556e6769d3724a8ee97d87c3faaac",
+        "path": "${tool_root}/mcp-conformance-source-0.2.0-alpha.11",
+        "purpose": "unchanged upstream npm acceptance, only on demand"
+      },
+      "supporting_sources": [
+        {
+          "url": "https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/README.md#L147",
+          "line": 147
+        },
+        {
+          "url": "https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/README.md#L188",
+          "line": 188
+        },
+        {
+          "url": "https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/package.json#L15",
+          "line": 15
+        },
+        {
+          "url": "https://registry.npmjs.org/-/npm/v1/attestations/@modelcontextprotocol%2fconformance@0.2.0-alpha.11",
+          "line": 1
+        }
+      ]
     }
   ]
 }

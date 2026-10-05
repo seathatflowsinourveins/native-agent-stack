@@ -33,7 +33,7 @@ case "$stage" in
   *) printf 'Unknown stage: %s\n' "$stage" >&2; usage; exit 2 ;;
 esac
 case "$only" in
-  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|command-output|output-compression|code-index|code-graph|repo-packing|structured-data|doc-conversion|api-docs|trace-viewer|token-lane-carriers|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators) ;;
+  ''|claude-code|codex|claude-agent-sdk|codex-sdk-and-codex-exec-app-server|trail-of-bits-security-skills-trailofbits-skills|engineering-process-skills|skill-discovery|skill-authoring|research-skill|mcporter|mcp-inspector|agent-messaging|sandbox-runtime-srt|isolation-container-boundary|serena|claude-plugins-official-code-intelligence-lsp-pl|structural-search|code-search|embedding-model|reranker-model|tobi-qmd|mineru|trafilatura|playwright-cli|web-search-provider|memory-owner|ccusage|context-supply|statusline|command-output|output-compression|code-index|code-graph|repo-packing|structured-data|doc-conversion|api-docs|trace-viewer|token-lane-carriers|otel-collector-contrib|prometheus|loki|grafana|phoenix|local-model-server|alerting|local-generation-model|session-analytics|inspect-ai|harbor-containerized-agent-e2e-runner|promptfoo|zizmor|attest|syft|dependabot|codeql-sarif|actionlint-kjanat|dagu|docker-compose|container-engine|gpu-container-runtime|betterleaks|trufflehog|credential-custody|git|gh-github-cli|worktrunk|difftastic|claude-code-action|agent-structural-diff|cross-family-review|mise|restic|chezmoi|base-distribution|gpt-gateway|agent-runtime-worker|research-harnesses|credential-guard|convergence-validators|lm-program-optimization|skill-vetting|trajectory-analysis|mcp-protocol-conformance) ;;
   *) printf 'Unknown slot: %s\n' "$only" >&2; exit 2 ;;
 esac
 # Planned. Two checks change into repo_root, so the plan runs from a checkout of the repository (README.md).
@@ -286,6 +286,23 @@ mcporter() {
       check mcporter smoke 'mcporter list'
       ;;
     *) skipped mcporter ;;
+  esac
+}
+
+agent-messaging() {
+  # Native upstream CLI smoke assertions; client wiring is a separate integration check.
+  case "$stage" in
+    post_install)
+      # Kind: upstream smoke + native integration; Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/tests/cli_smoke.rs#L129
+      # Source: https://developers.openai.com/codex/rules
+      check agent-messaging 'upstream smoke + native integration' 'smoke="$(mktemp -d)"
+trap '"'"'rm -rf -- "$smoke"'"'"' EXIT
+HCOM_DIR="$smoke" hcom status --json > "$smoke/status.json"
+jq -e --arg expected "$smoke" '"'"'.hcom_dir == $expected and .instances.total == 0'"'"' "$smoke/status.json" >/dev/null
+HCOM_DIR="$smoke" hcom list --json | jq -e '"'"'type == "array" and length == 0'"'"' >/dev/null
+python3 "$config_root/hcom-client-config.py" --repo-root "$repo_root" --check'
+      ;;
+    *) skipped agent-messaging ;;
   esac
 }
 
@@ -1908,6 +1925,169 @@ python3 scripts/validate.py'
   esac
 }
 
+lm-program-optimization() {
+  # Round2 wave5; destination acceptance UNRUN.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/stanfordnlp/dspy/blob/3.4.0/tests/teleprompt/test_gepa.py#L632
+      check lm-program-optimization smoke 'uv run --project "$tool_root/dspy-3.4.0" --frozen --no-sync python - <<'"'"'PY'"'"'
+from importlib.metadata import version
+import dspy
+assert version("dspy") == "3.4.0"
+assert version("gepa") == "0.1.4"
+assert callable(dspy.GEPA)
+PY
+cd "$tool_root/dspy-source-3.4.0"
+uv run --project "$tool_root/dspy-3.4.0" --frozen --no-sync python -m pytest -q tests/teleprompt/test_gepa.py tests/predict/test_predict.py'
+      ;;
+    after_sign_in)
+      # Kind: smoke; Source: https://github.com/stanfordnlp/dspy/blob/3.4.0/docs/docs/learn/programming/language_models.md#L139
+      check lm-program-optimization smoke 'uv run --project "$tool_root/dspy-3.4.0" --frozen --no-sync python - <<'"'"'PY'"'"'
+import os
+import dspy
+lm = dspy.LM("openai/cx/gpt-6.1-sol", api_base="http://127.0.0.1:21128/v1", api_key=os.environ.get("OMNIROUTE_API_KEY", "local-loopback"), cache=False)
+dspy.configure(lm=lm)
+response = lm("Return only the digit 4 as the answer to 2 + 2.")
+assert response and response[0].strip() == "4"
+PY'
+      ;;
+    *) skipped lm-program-optimization ;;
+  esac
+}
+
+skill-vetting() {
+  # Round2 wave5; destination acceptance UNRUN.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/tests/unit/test_cli.py#L17
+      check skill-vetting smoke 'tool_python="$(uv tool dir)/skillspector/bin/python"
+"$tool_python" - <<'"'"'PY'"'"'
+import json
+from importlib.metadata import distribution
+package = distribution("skillspector")
+assert package.version == "2.12.0"
+origin = json.loads(package.read_text("direct_url.json"))
+assert origin["vcs_info"]["commit_id"] == "c7958a3268d9498644b22edb75d0f051bbc8cbfc"
+PY
+cd "$tool_root/skillspector-source-2.12.0"
+"$tool_python" -m pytest -q tests/unit/test_cli.py tests/unit/test_agent_cli.py'
+      ;;
+    after_sign_in)
+      # Kind: smoke; Source: https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/cli.py#L560
+      check skill-vetting smoke 'codex login status >/dev/null
+umask 077
+state="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/skill-vetting"
+install -d -m 0700 -- "$state"
+run="$(mktemp -d "$state/semantic.XXXXXXXX")"
+SKILLSPECTOR_PROVIDER=codex_cli skillspector scan "$tool_root/skillspector-source-2.12.0/tests/fixtures/safe_skill" --format json --output "$run/report.json" --fail-on-incomplete
+"$(uv tool dir)/skillspector/bin/python" - "$run/report.json" <<'"'"'PY'"'"'
+import json, sys
+report = json.load(open(sys.argv[1]))
+assert report["analysis_completeness"]["is_complete"] is True
+assert report["execution_successful"] is True
+assert report["metadata"]["llm_requested"] is True
+assert report["metadata"]["llm_available"] is True
+assert report["metadata"]["meta_analysis_applied"] is True
+PY'
+      ;;
+    *) skipped skill-vetting ;;
+  esac
+}
+
+trajectory-analysis() {
+  # Round2 wave5; destination acceptance UNRUN.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/tests/sources/atif_source/test_integration.py#L44
+      check trajectory-analysis smoke 'tool_python="$(uv tool dir)/inspect-ai/bin/python"
+"$tool_python" - <<'"'"'PY'"'"'
+from importlib.metadata import version
+assert version("inspect-ai") == "0.3.273"
+assert version("openai") == "3.24.0"
+assert version("inspect-scout") == "0.5.3"
+assert version("harbor") == "0.23.0"
+PY
+[[ "$(readlink -f "$(command -v scout)")" == "$(readlink -f "$(uv tool dir)/inspect-ai/bin/scout")" ]]
+cd "$tool_root/inspect-scout-source-0.5.3"
+"$tool_python" -m pytest -q -n 0 tests/grep_scanner/test_grep_scanner.py tests/sources/claude_code_source/test_integration.py tests/sources/atif_source/test_integration.py'
+      ;;
+    after_sign_in)
+      # Kind: smoke; Source: https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/src/inspect_scout/_cli/import_command.py#L317
+      check trajectory-analysis smoke ': "${SCOUT_CLAUDE_SESSION_FILE:?Select a current Claude session JSONL with a known Agent/Task call and consent to private local import}"
+: "${SCOUT_HARBOR_ATIF_FILE:?Select one existing Harbor trajectory.json and consent to private local import}"
+[[ -f "$SCOUT_CLAUDE_SESSION_FILE" && -f "$SCOUT_HARBOR_ATIF_FILE" ]]
+umask 077
+state="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/trajectory-analysis"
+install -d -m 0700 -- "$state"
+run="$(mktemp -d "$state/import-scan.XXXXXXXX")"
+cd "$run"
+scout import claude_code -P "path=$SCOUT_CLAUDE_SESSION_FILE" -T "$run/claude/db" --fail-on-error
+scout import atif -P "path=$SCOUT_HARBOR_ATIF_FILE" -T "$run/harbor/db" --fail-on-error
+for source in claude harbor; do
+  scout scan "$config_root/scout-round2-delegation.py" --transcripts "$run/$source/db" --scans "$run/$source/scans" --max-processes 1 --fail-on-error
+  "$(uv tool dir)/inspect-ai/bin/python" - "$run/$source/scans" "$source" "$run/$source-summary.json" <<'"'"'PY'"'"'
+import json, sys
+from pathlib import Path
+from inspect_scout import scan_list, scan_results_df
+locations = scan_list(sys.argv[1])
+assert len(locations) == 1, "Expected exactly one fresh scan"
+results = scan_results_df(locations[0].location)
+assert results.complete
+assert not results.errors
+assert len(results.scanners) == 1
+name, frame = next(iter(results.scanners.items()))
+assert name.split("/")[-1] == "delegation"
+assert not frame.empty, "Selected source produced no transcripts"
+matches = int(frame["value"].sum())
+if sys.argv[2] == "claude":
+    assert matches > 0, "Current Claude positive control produced no Agent/Task match"
+Path(sys.argv[3]).write_text(json.dumps(dict(source=sys.argv[2], complete=True, transcripts=len(frame), delegation_matches=matches)) + "\n")
+PY
+done'
+      ;;
+    *) skipped trajectory-analysis ;;
+  esac
+}
+
+mcp-protocol-conformance() {
+  # Round2 wave5; destination acceptance UNRUN.
+  case "$stage" in
+    post_install)
+      # Kind: smoke; Source: https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/.github/workflows/ci.yml#L33
+      check mcp-protocol-conformance smoke 'cd "$tool_root/mcp-conformance-source-0.2.0-alpha.11"
+npm ci
+npm run check
+npm run build
+npm test
+npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 list --requirements 2026-07-28'
+      ;;
+    after_sign_in)
+      # Kind: smoke; Source: https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/README.md#L59
+      check mcp-protocol-conformance smoke 'if [[ -z "${MCP_CONFORMANCE_SERVER_URL:-}" && -z "${MCP_CONFORMANCE_CLIENT_COMMAND:-}" ]]; then
+  printf '"'"'Select MCP_CONFORMANCE_SERVER_URL and/or MCP_CONFORMANCE_CLIENT_COMMAND for on-demand conformance acceptance.\n'"'"' >&2
+  exit 78
+fi
+extra=()
+if [[ -n "${MCP_CONFORMANCE_EXPECTED_FAILURES:-}" ]]; then
+  [[ -f "$MCP_CONFORMANCE_EXPECTED_FAILURES" ]]
+  extra+=(--expected-failures "$MCP_CONFORMANCE_EXPECTED_FAILURES")
+fi
+umask 077
+state="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/mcp-protocol-conformance"
+install -d -m 0700 -- "$state"
+run="$(mktemp -d "$state/conformance.XXXXXXXX")"
+cd "$run"
+if [[ -n "${MCP_CONFORMANCE_SERVER_URL:-}" ]]; then
+  npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 server --url "$MCP_CONFORMANCE_SERVER_URL" --requirements 2026-07-28 "${extra[@]}"
+fi
+if [[ -n "${MCP_CONFORMANCE_CLIENT_COMMAND:-}" ]]; then
+  npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 client --command "$MCP_CONFORMANCE_CLIENT_COMMAND" --requirements 2026-07-28 "${extra[@]}"
+fi'
+      ;;
+    *) skipped mcp-protocol-conformance ;;
+  esac
+}
+
 if [[ -z "$only" || "$only" == claude-code ]]; then claude-code; fi
 if [[ -z "$only" || "$only" == codex ]]; then codex; fi
 if [[ -z "$only" || "$only" == claude-agent-sdk ]]; then claude-agent-sdk; fi
@@ -1917,6 +2097,7 @@ if [[ -z "$only" || "$only" == engineering-process-skills ]]; then engineering-p
 if [[ -z "$only" || "$only" == skill-discovery ]]; then skill-discovery; fi
 if [[ -z "$only" || "$only" == skill-authoring ]]; then skill-authoring; fi
 if [[ -z "$only" || "$only" == mcporter ]]; then mcporter; fi
+if [[ -z "$only" || "$only" == agent-messaging ]]; then agent-messaging; fi
 if [[ -z "$only" || "$only" == sandbox-runtime-srt ]]; then sandbox-runtime-srt; fi
 if [[ -z "$only" || "$only" == serena ]]; then serena; fi
 if [[ -z "$only" || "$only" == structural-search ]]; then structural-search; fi
@@ -1973,7 +2154,11 @@ if [[ -z "$only" || "$only" == research-harnesses ]]; then research-harnesses; f
 if [[ -z "$only" || "$only" == credential-guard ]]; then credential-guard; fi
 if [[ -z "$only" || "$only" == convergence-validators ]]; then convergence-validators; fi
 # Planned. Rows the plan does not install (merged manifest): nothing to check, so each prints its skip.
-for slot in 'research-skill' 'agent-messaging' 'isolation-container-boundary' 'claude-plugins-official-code-intelligence-lsp-pl' 'reranker-model' 'trafilatura' 'web-search-provider' 'phoenix' 'attest' 'dependabot' 'codeql-sarif' 'gpu-container-runtime' 'trufflehog' 'credential-custody' 'claude-code-action' 'agent-structural-diff' 'chezmoi'; do
+for slot in 'research-skill' 'isolation-container-boundary' 'claude-plugins-official-code-intelligence-lsp-pl' 'reranker-model' 'trafilatura' 'web-search-provider' 'phoenix' 'attest' 'dependabot' 'codeql-sarif' 'gpu-container-runtime' 'trufflehog' 'credential-custody' 'claude-code-action' 'agent-structural-diff' 'chezmoi'; do
   if [[ -z "$only" || "$only" == "$slot" ]]; then skipped "$slot"; fi
 done
+if [[ -z "$only" || "$only" == lm-program-optimization ]]; then lm-program-optimization; fi
+if [[ -z "$only" || "$only" == skill-vetting ]]; then skill-vetting; fi
+if [[ -z "$only" || "$only" == trajectory-analysis ]]; then trajectory-analysis; fi
+if [[ "$only" == mcp-protocol-conformance ]]; then mcp-protocol-conformance; elif [[ -z "$only" ]]; then skipped mcp-protocol-conformance; fi
 exit "$failed"

@@ -702,3 +702,115 @@ Only the verified release assets were installed in a disposable root for version
 The current new-WSL row carries its own Dagu 2.18.2 pin. The workstation/trading stack remains held at 2.16.6; its hosting cutover belongs to the trading lane. [v2.17.0 release notes](https://github.com/dagucloud/dagu/releases/tag/v2.17.0) describe #2784 (default suspend flags under data_dir) and #2776 (partitioned/indexed artifacts); [v2.17.2](https://github.com/dagucloud/dagu/releases/tag/v2.17.2) describes #2858 (DAG definition index under data_dir). The [standing hold](../../../docs/decisions/2026-09-25-workstation-sota-refresh.md#held-by-the-trading-lane) records that 2.17.2 opening a DAG repository removes legacy dags/.dag.index.
 
 For a future upgrade of any existing owned installation, stop its owned unit and retain a complete pre-upgrade DAGU_HOME copy, together with the old checksum-verified binary, unit and environment. Keep newer commands away from the saved copy. Conditional rollback stops the new unit, preserves post-upgrade state separately, restores the saved home and prior binary/unit/environment together, then verifies the native version and owned workflow. A fresh empty installation has no prior home to restore. NativeStack2604 is already on 2.18.2 with no pre-upgrade copy, so its rollback is re-provisioning; its unit-file backups restore the unit, not the data. See [Command center correction and NativeStack2604 state](../../../docs/decisions/2026-10-05-dagu-mise-pin-move.md#command-center-correction-and-nativestack2604-state-2026-10-05-r2b). No host rollback or legacy-index rebuild was executed in this builder round.
+
+## Round 2: hcom transport and client posture (2026-10-04)
+
+- **Owner:** the `workers/agent-messaging` verdict in
+  `evidence/artifacts/final-architecture-round2-20261004/verdicts.json` and
+  `docs/decisions/2026-10-04-final-architecture-round2.md`; adopted by wave5.
+- **Install:** https://github.com/aannoo/hcom/releases/tag/v0.7.27;
+  release commit `2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b`.
+  https://api.github.com/repos/aannoo/hcom/releases/tags/v0.7.27 publishes
+  installer SHA-256 `3bc057fcd763748c32fae0ae25e150abf2b1df0d4c9451432c28f4ddde176a98`.
+  https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh:51-54,313,374-375,777-783
+  supplies HCOM_NO_MODIFY_PATH/HCOM_INSTALL_DIR and checks the downloaded archive.
+  The archive's published checksum is
+  https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-x86_64-unknown-linux-gnu.tar.gz.sha256
+  (`8ae97ff6fef63c637d66ddf882651aadd035bd74ae26c0787743869c20a5391d`).
+- **Posture:** accepted r1 at
+  https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972504465;
+  aannoo/hcom@2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b:src/config.rs:126-152;
+  https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/common.rs#L46.
+  Native Claude deny and inbound keys:
+  https://code.claude.com/docs/en/permissions and
+  https://code.claude.com/docs/en/cross-session-messaging.
+  Native Codex forbidden rules and checker:
+  https://developers.openai.com/codex/rules;
+  openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/core/src/exec_policy.rs:394-406,645.
+- **CLI acceptance:**
+  https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/tests/cli_smoke.rs#L129
+  (`status_json_in_fresh_dir`, `list_json_empty`). The Bash commands parameterize
+  those assertions against the installed binary; they are upstream-derived smoke
+  integration, not an execution of the unchanged Cargo test suite.
+- **Repository quality:**
+  https://github.com/aannoo/hcom/actions/runs/36803903267;
+  Linux real-tool jobs 110183965480 (Claude) and 110183965493 (Codex), steps 8/13
+  successful. Native command and pins:
+  https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/.github/workflows/ci.yml#L121.
+  This builder ran no hcom install, model session, messaging E2E or new local trial.
+- **Configuration glue:** this PR, tools/adoption/new_wsl_client_config.py:549,577,1623,2289;
+  tools/adoption/apply_claude_settings.py:191; tools/adoption/managed_block.py:104.
+  `config/hcom-client-config.py` reads the slot's map extension because the shared
+  mapper enumerates existing template pieces only. It reuses those merge/block
+  writers, preserving native authorization classification and existing inbound choices.
+- **Known plain-Claude gap:**
+  https://github.com/aannoo/hcom/releases/tag/v0.7.27;
+  https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/claude.rs#L135
+  returns silently without HCOM_PROCESS_ID. The no-wrapper posture uses start/listen
+  and does not establish idle Claude wake. No global hook is authored to claim it.
+
+The bounded source sweep reused the adopted candidate comparison and read the
+selected release, installer, native formats, CLI assertions and tag CI. Scoped
+ai-memory retrieval was unavailable under this job's tool approval policy; the
+exact supplied posture and current source originals were read directly. Official
+Claude doc fetches returned HTTP 403, so their native format references reuse the
+source-accepted posture rather than claiming a new successful fetch. The builder's
+Codex 0.159.3 native policy check returned forbidden; 0.160.0 remains the plan pin.
+The accepted OS-sandbox boundary and prefix limitations remain explicit in the
+[decision](../../../docs/decisions/2026-10-04-round2-plan-g1-messaging.md).
+
+## Round-2 G3 sources (2026-10-04)
+
+North-star action: reproduce optimization, advisory skill vetting, local
+trajectory analysis and MCP qualification for complex engineering and the
+US-equities research/historical-simulation foundation. The owner selection is
+`this PR: docs/decisions/2026-10-04-final-architecture-round2.md` and
+`this PR: evidence/artifacts/final-architecture-round2-20261004/verdicts.json`.
+No candidate or destination acceptance was executed by this builder.
+
+- DSPy: [installation](https://github.com/stanfordnlp/dspy/blob/3.4.0/README.md#L31),
+  `stanfordnlp/dspy@3.4.0:pyproject.toml:37` (exact GEPA dependency),
+  [GEPA acceptance](https://github.com/stanfordnlp/dspy/blob/3.4.0/tests/teleprompt/test_gepa.py#L632),
+  [Predict tests](https://github.com/stanfordnlp/dspy/blob/3.4.0/tests/predict/test_predict.py#L1),
+  and [OpenAI-compatible LM configuration/call](https://github.com/stanfordnlp/dspy/blob/3.4.0/docs/docs/learn/programming/language_models.md#L139).
+  Tag commit: `2413b67a4d08a476e4bc6f40b9f8f42f87711ee7`.
+  [DSPy wheel hashes](https://pypi.org/pypi/dspy/3.4.0/json) and
+  [GEPA wheel hashes](https://pypi.org/pypi/gepa/0.1.4/json) are checked before
+  installing those artifacts. The resolved host lock is acceptance evidence for
+  dependency identity, not an upstream lock or a model-quality result.
+- SkillSpector: [uv-tool installation](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/README.md#L45),
+  [CLI test entry point](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/tests/unit/test_cli.py#L17),
+  `NVIDIA/skillspector@c7958a3268d9498644b22edb75d0f051bbc8cbfc:tests/unit/test_agent_cli.py:1`,
+  [CI test command](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/.github/workflows/ci.yml#L97),
+  [native Codex provider](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/cli.py#L560),
+  and [actual JSON report schema](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/nodes/report.py#L1306).
+  [v2.12.0 release-asset SHA-256 metadata](https://api.github.com/repos/NVIDIA/skillspector/releases/tags/v2.12.0)
+  is recorded as publication evidence distinct from this Git-source install.
+  There is no release signature/provenance claim.
+- Scout: [installation](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/docs/index.qmd#L28),
+  [Inspect AI dependency](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/pyproject.toml#L24),
+  [Claude and ATIF import](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/docs/db_importing.qmd#L238),
+  [upstream grep tests](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/tests/grep_scanner/test_grep_scanner.py#L1),
+  [ATIF fixture acceptance](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/tests/sources/atif_source/test_integration.py#L44),
+  [native import CLI](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/src/inspect_scout/_cli/import_command.py#L317),
+  [tool-event scanner example](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/examples/scanner/grep_examples.py#L102),
+  and [native result reader](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/src/inspect_scout/_scanresults.py#L83).
+  Tag commit: `0e8fc055a3cebba1a14c11bc35856767b6405173`.
+  [Scout hashes](https://pypi.org/pypi/inspect-scout/0.5.3/json) and
+  [Harbor 0.23.0 hashes](https://pypi.org/pypi/harbor/0.23.0/json) are checked
+  before adding their wheels to the owner's one environment. The grep config
+  parameterizes upstream `grep_scanner`; import/scan still run through Scout.
+  Current-session positive-control predicates are local integration checks.
+- MCP: `modelcontextprotocol/conformance@c321dd32035556e6769d3724a8ee97d87c3faaac:README.md:12,23,147,188`
+  ([npx and protocol requirements](https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/README.md#L147)),
+  [unchanged CI acceptance](https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/.github/workflows/ci.yml#L33),
+  [alpha.11 npm integrity](https://registry.npmjs.org/@modelcontextprotocol%2Fconformance/0.2.0-alpha.11),
+  and [SLSA provenance](https://registry.npmjs.org/-/npm/v1/attestations/@modelcontextprotocol%2fconformance@0.2.0-alpha.11).
+  The source is the published main-ancestor commit, not alpha.12's publication
+  branch. The verdict's alpha.12 cooldown ends 2026-10-08T12:07:36Z.
+- uv integration: `astral-sh/uv@0.12.22:docs/guides/projects.md:139`,
+  [project dependency management](https://github.com/astral-sh/uv/blob/0.12.22/docs/guides/projects.md#L139),
+  [file sources](https://github.com/astral-sh/uv/blob/0.12.22/docs/concepts/projects/dependencies.md#L412),
+  and [shared tool dependencies/executable export](https://github.com/astral-sh/uv/blob/0.12.22/docs/guides/tools.md#L225).
+  Installed uv 0.12.17 help confirmed the used init/add and
+  `--with-executables-from` forms; the destination plan retains uv 0.12.22.

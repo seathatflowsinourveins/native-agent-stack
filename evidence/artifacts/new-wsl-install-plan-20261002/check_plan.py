@@ -153,6 +153,48 @@ def client_additional_checks(row, funcs, bad):
         if any(token not in entry["command"] for token in required):
             bad("acceptance", f"row {slot}: initialize the native embedded cache, then run both upstream validators through python with bytecode disabled")
 
+def agent_messaging_contract(plan_dir, by_slot, bad):
+    """Round-2 hcom pin and mapped posture; no new model trial.
+
+    Sources: aannoo/hcom@2c5f343:tests/cli_smoke.rs:129,140;
+    https://developers.openai.com/codex/rules; this PR: config/hcom-client-config.py.
+    """
+    row = by_slot.get("agent-messaging", {})
+    if not row.get("installed") or row.get("release") != "v0.7.27":
+        bad("agent-messaging", "round 2 adopts the pinned hcom 0.7.27 transport")
+        return
+    try:
+        # --plan-dir supports a standalone copied plan in the existing tests.
+        # Its native map stays beside this checker in the source checkout;
+        # check the rules and adapter from the selected plan, including copies.
+        source_root = pathlib.Path(__file__).resolve().parents[3]
+        mapping = json.loads((source_root / "adoption/new-wsl/client-config-map.json").read_text())
+        spec = mapping["slot_configs"]["agent-messaging"]
+        posture = spec["hcom_config"]
+        if (posture["terminal"]["title_mode"] != "off" or posture["relay"]["enabled"] is not False
+                or posture["launch"]["auto_trust_workspace"] is not False
+                or posture["preferences"]["auto_approve"] is not True):
+            bad("agent-messaging", "mapped hcom configuration differs from the accepted posture")
+        deny = set(spec["claude_settings"]["permissions"]["deny"])
+        for prefix in ("hcom", "uvx hcom"):
+            for tail in ("term *", "relay *", "config *", "hooks *", "run *", "kill *", "stop *", "reset *",
+                         "update *", "claude-pty *", "* claude-pty *", "--name *", "--go *",
+                         "send -b *", "send --from *", "send --from=*"):
+                if f"Bash({prefix} {tail})" not in deny:
+                    bad("agent-messaging", f"mapped Claude deny is missing: {prefix} {tail}")
+        rules = (plan_dir / "config" / pathlib.Path(spec["codex_rule_file"]).name).read_text()
+        if rules.count('decision = "forbidden"') != 4 or "not_match =" not in rules:
+            bad("agent-messaging", "Codex requires all four forbidden rules and their native inline examples")
+        adapter = (plan_dir / "config/hcom-client-config.py").read_text()
+        if '"execpolicy", "check", "--pretty", "--rules"' not in adapter:
+            bad("agent-messaging", "the configuration adapter must run the mandatory native rule check")
+    except (OSError, ValueError, KeyError, TypeError):
+        bad("agent-messaging", "mapped native posture or rules are missing")
+    acceptance = row.get("acceptance", {}).get("post_install", {}).get("command", "")
+    if "hcom status --json" not in acceptance or "hcom list --json" not in acceptance or "--check" not in acceptance:
+        bad("agent-messaging", "post-install must check upstream CLI smoke behavior and installed client posture")
+
+
 def code_docs_contract(plan_dir, by_slot, bad):
     """The three g3 fixes: selected Serena pin, search AND rewrite, and local MinerU skill/quality wiring."""
     serena = by_slot.get("serena", {})
@@ -235,6 +277,7 @@ def main():
                 or r["route"] != "none" or r["commands"] or set(r["acceptance"]) != {"after_sign_in"}):
             bad("rows", f"row {r['slot']}: acceptance_only is reserved for native cross-family-review after sign-in")
     by_slot = {r["slot"]: r for r in rows}
+    agent_messaging_contract(plan_dir, by_slot, bad)
     code_docs_contract(plan_dir, by_slot, bad)
 
     # Node rows must receive the runtime bootstrap even when selected alone.

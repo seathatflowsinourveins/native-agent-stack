@@ -451,3 +451,68 @@ evidence-registry digests and the upstream-freshness snapshot following the srt 
 ## Integrated fix-wave boundary (2026-10-04)
 
 [The coordinator decision](../../../docs/decisions/2026-10-04-2604-e2e-fix-wave.md) records all 25 slot repairs, conflict resolutions, canonical Promptfoo owner-batch reconciliation, sources and remaining host gates. The revised merged recipes are UNRUN on a distribution. Earlier per-row statements are historical; no static integration check certifies the destination.
+
+## Round 2: agent messaging (2026-10-04)
+
+The `agent-messaging` row installs adopted hcom 0.7.27 with its upstream
+checksum-verifying installer. It applies the accepted posture from the slot's
+extension of `adoption/new-wsl/client-config-map.json`, using the scoped
+`config/hcom-client-config.py` adapter and the shared mapper's existing merge,
+instruction-block and atomic-write functions. It writes hcom's title/relay/trust
+preferences, Claude deny rules and native inbound setting, both clients' peer
+hints, and a separate Codex `hcom-deny.rules`. The adapter runs the mandatory
+native `codex execpolicy check`; upstream retains `hcom.rules`.
+
+Run `bash install.sh --only agent-messaging`, then
+`bash accept.sh --only agent-messaging`. Close Codex before apply and restart it
+afterward. Native client sign-ins and each lane folder's trust remain the user's
+own inputs. Existing conflicting hcom configuration, rule file or inbound choice
+is retained with `needs_user`, without printing its values. The installer needs
+no sudo. Post-install acceptance checks the installed binary's status/list
+behavior in a disposable HCOM_DIR, then installed client posture and native rule
+matching; it is separate from upstream repository-quality CI.
+
+Claude <-> Claude stays on native messaging. Codex transport sessions use
+upstream `hcom codex`; this row creates no Claude hcom launch wrapper or global
+hooks. Plain Claude uses `hcom start` and `hcom listen`, which does not wake an
+idle plain Claude. Prefix denies have the accepted posture's known unmatched
+forms, including executable wrappers; the OS-sandbox change is the user's and
+outside this row. Full source, evidence classes, correction and overturn checks:
+[round-2 messaging decision](../../../docs/decisions/2026-10-04-round2-plan-g1-messaging.md).
+
+The coordinator must refresh shared summary counts and `owners.json` when the
+parallel groups integrate; this bounded job leaves those shared headers intact.
+
+## Round-2 G3 tool owners (2026-10-04, UNRUN)
+
+The `wave5` owner batch adds four plan rows. The source review and boundaries are
+in [the G3 decision](../../../docs/decisions/2026-10-04-round2-plan-g3-tools.md).
+These are planned destination commands; this builder ran no candidate trial.
+
+| Slot | Install and upstream acceptance | User-dependent destination gate |
+| --- | --- | --- |
+| `lm-program-optimization` | DSPy 3.4.0 and its exact GEPA 0.1.4 wheels, verified against PyPI SHA-256 values, in one dedicated uv project. Preserve the resolved `uv.lock` and installed inventory privately. Run the unchanged upstream GEPA and Predict pytest files. | Existing OmniRoute provider readiness for the documented DSPy LM call. Skill-description optimization remains with skill-creator. |
+| `skill-vetting` | SkillSpector CLI from tag commit `c7958a3268d9498644b22edb75d0f051bbc8cbfc`, using upstream `uv tool install` without `[mcp]`. Run its unchanged CLI and native-client adapter tests. Record the actual tool dependency inventory; the upstream project lock does not lock a uv tool. | Native Codex sign-in only for semantic acceptance, with `SKILLSPECTOR_PROVIDER=codex_cli`. Findings remain advisory beside source review and skills.sh audits. |
+| `trajectory-analysis` | Add Scout 0.5.3 and Harbor 0.23.0 to the existing Inspect AI 0.3.273 uv-tool environment, retaining OpenAI 3.24.0. Expose `scout` through uv's `--with-executables-from`. Run unchanged upstream grep and Claude/ATIF import tests. | Set `SCOUT_CLAUDE_SESSION_FILE` to a current session with a known Agent/Task call and `SCOUT_HARBOR_ATIF_FILE` to one existing trial. Consent to private local storage, including upstream same-slug session merging. The native import/scan must finish without errors and detect the Claude positive control. |
+| `mcp-protocol-conformance` | On demand through `npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11`. Verify published SHA-512 integrity and run the unchanged upstream npm check/build/test commands. `list --requirements` is discovery. | Select an HTTP MCP endpoint with `MCP_CONFORMANCE_SERVER_URL` and/or a scenario client with `MCP_CONFORMANCE_CLIENT_COMMAND`. Supply a reviewed `MCP_CONFORMANCE_EXPECTED_FAILURES` YAML only when needed. |
+
+The conformance row requires `--only mcp-protocol-conformance` in both scripts;
+the default run skips it. It installs no global npm executable. Keep alpha.11
+until alpha.12 is eligible at 2026-10-08T12:07:36Z; updating the pin requires the
+existing release-verification procedure. Inspector keeps its own interactive
+and smoke-test slot. The Scout grep check uses the local upstream harness and
+requires no model; this plan handles Codex trajectories through Harbor ATIF.
+
+Both native clients can invoke these tools through their existing shell and
+PATH wiring. DSPy runs with
+`uv run --project "${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/tools/dspy-3.4.0" --frozen --no-sync`.
+Skill vetting uses `skillspector scan <artifact> --no-llm --format json --fail-on-findings`
+on demand; a finding never authorizes an install. Scout uses `scout`, exposed
+from the one Inspect AI environment. There is no new client setting, hook or
+MCP registration for these slots. Tool commands use user scope; `needs.sudo`
+declares the existing wrapper's clean-host apt prerequisite.
+
+Full pin, checksum and test citations are in each row and
+[SOURCES.md](SOURCES.md). The coordinator integrates `owners.json`, shared
+row/stage comments and the evidence registry; this job edits only its rows and
+sections.
