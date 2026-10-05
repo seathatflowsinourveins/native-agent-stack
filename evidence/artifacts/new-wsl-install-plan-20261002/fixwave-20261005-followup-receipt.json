@@ -1357,5 +1357,570 @@
       }
     }
   ],
-  "final_validation_scope": "Final registered sources and publication index checked before commit/push; source/evidence consistency only, not native acceptance."
+  "final_validation_scope": "Final registered sources and publication index checked before commit/push; source/evidence consistency only, not native acceptance.",
+  "post713_serial_native_stage_followup": {
+    "recorded_at_utc": "2026-10-05T18:11:36Z",
+    "evidence_class": "native_host_execution_and_local_integration_separated",
+    "source_head": "b3969b21a1079f7bb441f003123acb1d07a9e29c",
+    "source_frozen_during_native_runs": true,
+    "timestamp_scope": "Record creation observed now; exact whole-stage start/end timestamps not independently captured. Native Inspect logs carry their own timestamps. Log filename date labels are not launch timestamps.",
+    "fresh_claude_lock": "Every fresh native Claude command used canonical co-op util-linux flock lock; one heavy step at a time. No install.sh/shared plan apply by this lane.",
+    "source_files": [
+      {
+        "locator": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "bytes": 444360,
+        "sha256": "6057740ebcfb5e05593514652af197f46f6d1a423d62622b1b0580def4ee561b"
+      },
+      {
+        "locator": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
+        "bytes": 188556,
+        "sha256": "322bba3ddeb6dd33ca7f30d74df500afca3c6a8fe6c83209bda6fc7c6b4f11da"
+      },
+      {
+        "locator": "evidence/artifacts/new-wsl-install-plan-20261002/inspector-client-probe.sh",
+        "bytes": 2197,
+        "sha256": "2f82b600dcebf957cfbec84bd85ba64b5abbafde20283392b03ff5dfa150f811"
+      },
+      {
+        "locator": "evidence/artifacts/new-wsl-install-plan-20261002/config/srt-client-accept.sh",
+        "bytes": 12159,
+        "sha256": "1004ef72ec7902897deb539707f7d679a065f8bfae8e39883be45c6023a5bbfa"
+      },
+      {
+        "locator": "evidence/artifacts/new-wsl-install-plan-20261002/config/betterleaks-accept.sh",
+        "bytes": 1111,
+        "sha256": "702270a1a29c68a79fee0541edb8e3f2938e25330a6f9427b220302564c12f7b"
+      }
+    ],
+    "stage_recipe_identities": [
+      {
+        "row": "difftastic",
+        "stage": "after_sign_in",
+        "command_bytes": 4916,
+        "command_sha256": "a12cb692abc1231b536e4ce869993e5d5b273a7a1bdbb65f67a2289cc691f0a9"
+      },
+      {
+        "row": "worktrunk",
+        "stage": "after_sign_in",
+        "command_bytes": 5031,
+        "command_sha256": "1363583c78c40e639ccaf7ee3ab9d88803161de0a4673747536512d5297726a2"
+      },
+      {
+        "row": "mcp-inspector",
+        "stage": "after_sign_in",
+        "command_bytes": 6776,
+        "command_sha256": "d0ade052e8ecdc601b6b052556badbddf00fe056800fb9756543e3c3a340a868"
+      },
+      {
+        "row": "inspect-ai",
+        "stage": "after_sign_in",
+        "command_bytes": 1724,
+        "command_sha256": "d0b0b70749f1e6ceb10b5f6d1035d9dc7ef4bb6132ddb7568c45389e29ec68b8"
+      },
+      {
+        "row": "sandbox-runtime-srt",
+        "stage": "after_sign_in",
+        "command_bytes": 44,
+        "command_sha256": "4703f621399c3d87f3681e727d0def2dc6a74aa504928222f95172ab768f3b93"
+      },
+      {
+        "row": "agent-runtime-worker",
+        "stage": "after_sign_in",
+        "command_bytes": 9709,
+        "command_sha256": "8af36176339f1890e258ec4777f45b077a01f472d515a58644efb39a361b1ff9"
+      },
+      {
+        "row": "betterleaks",
+        "stage": "post_install",
+        "command_bytes": 41,
+        "command_sha256": "0d354a401be5ab2e19e2d74af398a04d1055acc4416eadcbacbf36c8c604a7e2"
+      }
+    ],
+    "native_stage_results": [
+      {
+        "row": "difftastic",
+        "stage": "after_sign_in",
+        "whole_stage_exit_code": 0,
+        "clients": {
+          "claude": {
+            "terminal": "result",
+            "subtype": "success",
+            "is_error": false,
+            "native_reported_num_turns": 7,
+            "native_terminal_usage": {
+              "input_tokens": 14,
+              "cache_creation_input_tokens": 116702,
+              "cache_read_input_tokens": 558709,
+              "output_tokens": 9577
+            },
+            "usage_scope": "Scalar counters from one returned terminal snapshot per client; nested/model/iteration counters not copied or summed. Cache/detail subset counters are separate fields, not additive. Native num_turns differs from max-turns guard."
+          },
+          "codex": {
+            "terminal": "turn.completed",
+            "subtype": null,
+            "is_error": null,
+            "native_reported_num_turns": null,
+            "native_terminal_usage": {
+              "input_tokens": 44516,
+              "cached_input_tokens": 34176,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 344,
+              "reasoning_output_tokens": 181
+            },
+            "usage_scope": "Scalar counters from one returned terminal snapshot per client; nested/model/iteration counters not copied or summed. Cache/detail subset counters are separate fields, not additive. Native num_turns differs from max-turns guard."
+          }
+        },
+        "retained_artifacts": [
+          {
+            "locator": "private-post713-difftastic-run.Ziy3WP/claude.jsonl",
+            "bytes": 118721,
+            "sha256": "6df77d263bcd1fdf6f23b8b70951068db7cedc0d7a32461a2d5a12776b7803c7"
+          },
+          {
+            "locator": "private-post713-difftastic-run.Ziy3WP/codex.jsonl",
+            "bytes": 1360,
+            "sha256": "a897f68511428bf7f568f2ad70d432842143eaf613c87784c5dc3013d65a6beb"
+          }
+        ]
+      },
+      {
+        "row": "worktrunk",
+        "stage": "after_sign_in",
+        "whole_stage_exit_code": 0,
+        "clients": {
+          "claude": {
+            "terminal": "result",
+            "subtype": "success",
+            "is_error": false,
+            "native_reported_num_turns": 5,
+            "native_terminal_usage": {
+              "input_tokens": 12,
+              "cache_creation_input_tokens": 62468,
+              "cache_read_input_tokens": 526301,
+              "output_tokens": 11325
+            },
+            "usage_scope": "Scalar counters from one returned terminal snapshot per client; nested/model/iteration counters not copied or summed. Cache/detail subset counters are separate fields, not additive. Native num_turns differs from max-turns guard."
+          },
+          "codex": {
+            "terminal": "turn.completed",
+            "subtype": null,
+            "is_error": null,
+            "native_reported_num_turns": null,
+            "native_terminal_usage": {
+              "input_tokens": 44810,
+              "cached_input_tokens": 21888,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 287,
+              "reasoning_output_tokens": 128
+            },
+            "usage_scope": "Scalar counters from one returned terminal snapshot per client; nested/model/iteration counters not copied or summed. Cache/detail subset counters are separate fields, not additive. Native num_turns differs from max-turns guard."
+          }
+        },
+        "retained_artifacts": [
+          {
+            "locator": "private-post713-worktrunk-run.KTfJw7/claude.jsonl",
+            "bytes": 133239,
+            "sha256": "d3c808b11225cb6a8b093ee848af56fbabeeb0410f9f1f0af8e33a047249b8c4"
+          },
+          {
+            "locator": "private-post713-worktrunk-run.KTfJw7/codex.jsonl",
+            "bytes": 2707,
+            "sha256": "fc395ae2920267045768e34317136b2cb9f0a682d9a2e92f14a6d34dcc7370a0"
+          }
+        ]
+      },
+      {
+        "row": "mcp-inspector",
+        "stage": "after_sign_in",
+        "whole_stage_exit_code": 0,
+        "clients": {
+          "claude": {
+            "terminal": "result",
+            "subtype": "success",
+            "is_error": false,
+            "native_reported_num_turns": 2,
+            "native_terminal_usage": {
+              "input_tokens": 4,
+              "cache_creation_input_tokens": 45691,
+              "cache_read_input_tokens": 122529,
+              "output_tokens": 4940
+            },
+            "usage_scope": "Scalar counters from one returned terminal snapshot per client; nested/model/iteration counters not copied or summed. Cache/detail subset counters are separate fields, not additive. Native num_turns differs from max-turns guard."
+          },
+          "codex": {
+            "terminal": "turn.completed",
+            "subtype": null,
+            "is_error": null,
+            "native_reported_num_turns": null,
+            "native_terminal_usage": {
+              "input_tokens": 66703,
+              "cached_input_tokens": 55168,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 1176,
+              "reasoning_output_tokens": 843
+            },
+            "usage_scope": "Scalar counters from one returned terminal snapshot per client; nested/model/iteration counters not copied or summed. Cache/detail subset counters are separate fields, not additive. Native num_turns differs from max-turns guard."
+          }
+        },
+        "retained_artifacts": [
+          {
+            "locator": "private-post713-inspector-clients.u3YY6qux/probe.sh",
+            "bytes": 2197,
+            "sha256": "2f82b600dcebf957cfbec84bd85ba64b5abbafde20283392b03ff5dfa150f811"
+          },
+          {
+            "locator": "private-post713-inspector-clients.u3YY6qux/claude.jsonl",
+            "bytes": 58303,
+            "sha256": "58dcf8d64a6e17547c6df258de6086601bc102dacae0f240136693659a0ac615"
+          },
+          {
+            "locator": "private-post713-inspector-clients.u3YY6qux/codex.jsonl",
+            "bytes": 1733,
+            "sha256": "cf66cb6900b6759816e93e22da0d28c6ed9f5cbe024980cc32e32d8239eebbed"
+          },
+          {
+            "locator": "private-post713-inspector-clients.u3YY6qux/claude-tools.json",
+            "bytes": 8420,
+            "sha256": "b80ca85749bbbded237596d54c02a247909ed5a0e4fecc0bea36bc427ec3b0df"
+          },
+          {
+            "locator": "private-post713-inspector-clients.u3YY6qux/codex-tools.json",
+            "bytes": 8420,
+            "sha256": "b80ca85749bbbded237596d54c02a247909ed5a0e4fecc0bea36bc427ec3b0df"
+          },
+          {
+            "locator": "private-post713-inspector-clients.u3YY6qux/claude-page.html",
+            "bytes": 897,
+            "sha256": "4b3a2b69a3d5f7aa8e4f346c86896a40002a667747448bc3feedbe5db95fcb10"
+          },
+          {
+            "locator": "private-post713-inspector-clients.u3YY6qux/codex-page.html",
+            "bytes": 897,
+            "sha256": "bcf22f1dd1f66c78a1b914cd8f7fe3dad0aacf06fdfe8ce223b630cbf2785d34"
+          },
+          {
+            "locator": "private-post713-inspector-clients.u3YY6qux/claude-env.txt",
+            "bytes": 6,
+            "sha256": "2ed27c1421e6928dbe13dbfdb5c59e1045b30341fe7ebe05700006bc5ac572c0"
+          },
+          {
+            "locator": "private-post713-inspector-clients.u3YY6qux/codex-env.txt",
+            "bytes": 6,
+            "sha256": "2ed27c1421e6928dbe13dbfdb5c59e1045b30341fe7ebe05700006bc5ac572c0"
+          }
+        ],
+        "probe_matches_candidate": true,
+        "integration_gates": "Both native clients completed exact foreground probe; inherited false control, CLI tool JSON, web HTML and stopped listener gates passed."
+      },
+      {
+        "row": "inspect-ai",
+        "stage": "after_sign_in",
+        "whole_stage_exit_code": 0,
+        "positive_status": "success",
+        "positive_task_file": "examples/theory_of_mind.py",
+        "positive_model": "openai-api/omniroute/cx/gpt-6.1-sol",
+        "positive_completed_samples": 1,
+        "native_positive_usage": {
+          "openai-api/omniroute/cx/gpt-6.1-sol": {
+            "input_tokens": 425,
+            "output_tokens": 117,
+            "total_tokens": 542
+          }
+        },
+        "negative_status": "error",
+        "negative_cli_exit_code": 0,
+        "positive_gate_on_negative_exit_code": 1,
+        "scope": "Unchanged upstream one-sample relative-path example with native eval logs; absent-model control is local integration. No benchmark/general quality claim. CLI exit0 alone does not accept the negative; parsed status and rejected positive predicate govern.",
+        "retained_artifacts": [
+          {
+            "locator": "private-post713-inspect-eval.qXNhme/positive-header.json",
+            "bytes": 6620,
+            "sha256": "d1564c4534b83e19733cdb7c89e5b26301b53092999be2bb7e75b52343694451"
+          },
+          {
+            "locator": "private-post713-inspect-eval.qXNhme/negative-header.json",
+            "bytes": 28562,
+            "sha256": "d9a8af98e0d27521a024bbdeb7d4ed197071bdb5d1ecde521d59e70a5bdcc313"
+          },
+          {
+            "locator": "private-post713-inspect-eval.qXNhme/negative-cli-exit.txt",
+            "bytes": 2,
+            "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa"
+          },
+          {
+            "locator": "private-post713-inspect-eval.qXNhme/negative-gate-exit.txt",
+            "bytes": 2,
+            "sha256": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
+          },
+          {
+            "locator": "private-post713-inspect-eval.qXNhme/positive/2026-10-05T18-09-03-00-00_theory-of-mind_8aXd3TJAKjpwnZCGRckn96.eval",
+            "bytes": 8956,
+            "sha256": "28839c9d628322211e4f98925794e733f47a2799216718763341d9e066f30bc1"
+          },
+          {
+            "locator": "private-post713-inspect-eval.qXNhme/negative/2026-10-05T18-09-16-00-00_theory-of-mind_Y65s7YBL4MMEJhM6RaRbnj.eval",
+            "bytes": 12723,
+            "sha256": "a3f8d3c980e8f754ccbd5c1c1ef1c6c09b021a5a0634777f6a502cd1468cea1d"
+          }
+        ]
+      },
+      {
+        "row": "sandbox-runtime-srt",
+        "stage": "after_sign_in",
+        "client_runs": [
+          {
+            "client": "claude",
+            "stage_exit_code": 0,
+            "native": {
+              "terminal": "result",
+              "subtype": "success",
+              "is_error": false,
+              "native_reported_num_turns": 2,
+              "native_terminal_usage": {
+                "input_tokens": 6,
+                "cache_creation_input_tokens": 119045,
+                "cache_read_input_tokens": 163794,
+                "output_tokens": 10267
+              },
+              "usage_scope": "Scalar counters from one returned terminal snapshot per client; nested/model/iteration counters not copied or summed. Cache/detail subset counters are separate fields, not additive. Native num_turns differs from max-turns guard."
+            },
+            "retained_artifact": {
+              "locator": "private-post713-srt-run.N4XqRI/events.jsonl",
+              "bytes": 93714,
+              "sha256": "da99a04859547be2021fa8dba154095b8d66f3f0a31539f9d0aabedf6996c683"
+            }
+          },
+          {
+            "client": "codex",
+            "stage_exit_code": 0,
+            "native": {
+              "terminal": "turn.completed",
+              "subtype": null,
+              "is_error": null,
+              "native_reported_num_turns": null,
+              "native_terminal_usage": {
+                "input_tokens": 46366,
+                "cached_input_tokens": 34688,
+                "cache_write_input_tokens": 0,
+                "output_tokens": 1094,
+                "reasoning_output_tokens": 0
+              },
+              "usage_scope": "Scalar counters from one returned terminal snapshot per client; nested/model/iteration counters not copied or summed. Cache/detail subset counters are separate fields, not additive. Native num_turns differs from max-turns guard."
+            },
+            "retained_artifact": {
+              "locator": "private-post713-srt-run.DkYxMF/events.jsonl",
+              "bytes": 8160,
+              "sha256": "34a6c1cf43486dbd32b39b647b37a91e7d260b2866e99621ab1b2e670310ba0d"
+            }
+          }
+        ],
+        "helper": {
+          "locator": "candidate/config/srt-client-accept.sh",
+          "bytes": 12159,
+          "sha256": "1004ef72ec7902897deb539707f7d679a065f8bfae8e39883be45c6023a5bbfa"
+        },
+        "policy": {
+          "locator": "private-existing-synthetic-srt-policy",
+          "bytes": 397,
+          "sha256": "080ec65a33c809bc08a74e491ea0efc2be79b33a460e49d08fa8b1b4b80bb63b"
+        },
+        "scope": "Native clients exercise synthetic denial/allow fixtures; 9 unique positive zero exit controls, allow write and preservation passed; native deny exits read1/write2/network22. Existing inherit=none and production AF_UNIX boundary unchanged. This is integration, not a general security guarantee."
+      },
+      {
+        "row": "agent-runtime-worker",
+        "stage": "after_sign_in",
+        "whole_stage_exit_code": 0,
+        "jobs": {
+          "negative": {
+            "success": false,
+            "requests_to_model": 0,
+            "reason": "preflight_failed",
+            "report": {
+              "locator": "private-post713-worker-negative/run-report.json",
+              "bytes": 81,
+              "sha256": "3b3dd1230e8a23802042b332168074dbfaac5bc16f04aef5d203885a5f3ee810"
+            }
+          },
+          "claude": {
+            "success": true,
+            "requests_to_model": 2,
+            "reason": null,
+            "report": {
+              "locator": "private-post713-worker-claude/run-report.json",
+              "bytes": 491,
+              "sha256": "b2c19366a91b2606aa2feb183cde7413e7f245bfd54b833433f7c48d1388247c"
+            },
+            "result": "55"
+          },
+          "codex": {
+            "success": true,
+            "requests_to_model": 2,
+            "reason": null,
+            "report": {
+              "locator": "private-post713-worker-codex/run-report.json",
+              "bytes": 488,
+              "sha256": "395575a6481c0d39c56849148c26c4344e865306aa0e258d2593f7cdc20999b7"
+            },
+            "result": "55"
+          }
+        },
+        "clients": {
+          "claude": {
+            "terminal": "result",
+            "subtype": "success",
+            "is_error": false,
+            "native_reported_num_turns": 6,
+            "native_terminal_usage": {
+              "input_tokens": 12,
+              "cache_creation_input_tokens": 152092,
+              "cache_read_input_tokens": 534315,
+              "output_tokens": 17887
+            },
+            "usage_scope": "Scalar counters from one returned terminal snapshot per client; nested/model/iteration counters not copied or summed. Cache/detail subset counters are separate fields, not additive. Native num_turns differs from max-turns guard."
+          },
+          "codex": {
+            "terminal": "turn.completed",
+            "subtype": null,
+            "is_error": null,
+            "native_reported_num_turns": null,
+            "native_terminal_usage": {
+              "input_tokens": 203382,
+              "cached_input_tokens": 152192,
+              "cache_write_input_tokens": 0,
+              "output_tokens": 4065,
+              "reasoning_output_tokens": 2490
+            },
+            "usage_scope": "Scalar counters from one returned terminal snapshot per client; nested/model/iteration counters not copied or summed. Cache/detail subset counters are separate fields, not additive. Native num_turns differs from max-turns guard."
+          }
+        },
+        "retained_artifacts": [
+          {
+            "locator": "private-post713-worker-accept.y9OkfCyN/claude.jsonl",
+            "bytes": 147969,
+            "sha256": "2b28eae135c2fe4af6b55dde439d2b22aa584d7b9469cf70d8f454c18c1b7f38"
+          },
+          {
+            "locator": "private-post713-worker-accept.y9OkfCyN/codex.jsonl",
+            "bytes": 30747,
+            "sha256": "7186bf4bd10e662b404bf6f0ed3755ec0763ce75a2cc3062edb48928d99aed4b"
+          }
+        ],
+        "production_policy_sha256": "3150fb6509d9af91ae964fec9fd4f14f90b7b8189e9ba81da2dc5753b8b67b0f",
+        "post_run_independent_service_reads": "Both user-unit reads exit0: inactive/dead/Result=success.",
+        "upstream_test": "Unchanged OpenHands v1.50.1 test_forced_terminal_types ran under srt production policy/subprocess. Existing check() discards stdout; no new detailed upstream test-count/output claim. Earlier detailed two-pin native controls remain separate.",
+        "isolated_bootstrap": "Automatic Node24.21 bootstrap stayed inside disposable test HOME; isolated install ctime17:52:28Z and shared install ctime2026-10-02T14:51:01Z independently observed. No host tool pin qualification/change."
+      },
+      {
+        "row": "betterleaks",
+        "stage": "post_install",
+        "default_installed_helper_stage_exit_code": 0,
+        "default_installed_helper_sha256": "5d6214bdbf37b67f87771d94f266e5f2e7cd300f4fc725208e49b72783184d9f",
+        "candidate_isolated_config_stage_exit_code": 0,
+        "candidate_helper": {
+          "locator": "private-candidate-config/betterleaks-accept.sh",
+          "bytes": 1111,
+          "sha256": "702270a1a29c68a79fee0541edb8e3f2938e25330a6f9427b220302564c12f7b"
+        },
+        "candidate_binding": "Existing XDG_CONFIG_HOME points only to private ignored candidate-config; exact candidate helper copy, no shared helper apply.",
+        "unchanged_upstream_command": "make test -> go test -v --race ./...",
+        "returned_pass_lines": 963,
+        "returned_skip_lines": 0,
+        "returned_fail_lines": 0,
+        "test_count_scope": "Returned Go result-line counts including nested subtests; not independently enumerated tests. Native directory smoke0; P1 and required gitleaks gate remain unchanged. The first installed-helper0 does not qualify candidate stdout retention."
+      }
+    ],
+    "retained_logs": [
+      {
+        "locator": "private-lane-cache/betterleaks.native-upstream-retained-20261005.log",
+        "bytes": 816,
+        "sha256": "7fc31290c70237dccb5d08c52e17df5896a8f50dda7199e423f94e805b5fcb77"
+      },
+      {
+        "locator": "private-lane-cache/betterleaks.candidate-upstream-output-20261005.log",
+        "bytes": 256615,
+        "sha256": "47a7038f98736278febcb970295599c105a0965c1fc7e9e63b9f9b81987f0467"
+      },
+      {
+        "locator": "private-lane-cache/srt.explicit-controls-claude-post713-20261005.log",
+        "bytes": 97,
+        "sha256": "0d82b183508d68a266e6eed0714e0f3a9c5033700bb6932e9b10616cd4a5f1ff"
+      },
+      {
+        "locator": "private-lane-cache/srt.explicit-controls-codex-post713-20261005.log",
+        "bytes": 96,
+        "sha256": "a3c402e552abbb9b667991e067b967b79815e54aa09ac0df473d766f47cba020"
+      },
+      {
+        "locator": "private-lane-cache/agent-runtime-worker.post713-native-20261005.log",
+        "bytes": 314,
+        "sha256": "fe604bb4cf0920cd651997844fe31fc9df9caa4a16bb20917bfdcabe5c8a963f"
+      },
+      {
+        "locator": "private-lane-cache/difftastic.post713-native-20261005.log",
+        "bytes": 152,
+        "sha256": "bb35fb4d0bf31db4bc51689a450c5c0e981a47c41ac751398c8fb8a7ffe5a1ec"
+      },
+      {
+        "locator": "private-lane-cache/worktrunk.post713-native-20261005.log",
+        "bytes": 150,
+        "sha256": "c83329b99f5458e5414176e1e927a5f951bf51f72952876215737fbff5b3b46b"
+      },
+      {
+        "locator": "private-lane-cache/mcp-inspector.post713-native-20261005.log",
+        "bytes": 34,
+        "sha256": "f1ada666ca46fba7e7e9bb4cf73642487ba6ff2e72dc84cd8ae83d89de4fa465"
+      },
+      {
+        "locator": "private-lane-cache/inspect-ai.post713-native-20261005.log",
+        "bytes": 104,
+        "sha256": "1eae7b2812949be0b225396dbbc743a0d86d93e6524850ec3a30d292296211e2"
+      }
+    ],
+    "matching_historical_native_execution_reused": [
+      {
+        "row": "mcp-inspector",
+        "stage": "post_install",
+        "command_bytes": 1201,
+        "command_sha256": "32a9de594ab958ffaac4bb87e82fa585c0936d73c5727268bf04b74412f71148",
+        "reference_receipt": "evidence/artifacts/new-wsl-install-plan-20261002/fixwave-20261005-receipt.json",
+        "native_stage_exit_code": 0,
+        "claim_scope": "Historical passing execution reused after exact command-hash match; not a new upstream/model run. Inspector probe exact blob2f82b600 also unchanged. Full current host environment is not retrospectively identified."
+      },
+      {
+        "row": "session-analytics",
+        "stage": "post_install",
+        "command_bytes": 326,
+        "command_sha256": "0e2c14da5cfb39eb33cabc58a9aad0e90ccca9c22fff706cf60e81d4ea1baea4",
+        "reference_receipt": "evidence/artifacts/new-wsl-install-plan-20261002/fixwave-20261005-receipt.json",
+        "native_stage_exit_code": 0,
+        "claim_scope": "Historical passing execution reused after exact command-hash match; not a new upstream/model run. Inspector probe exact blob2f82b600 also unchanged. Full current host environment is not retrospectively identified."
+      }
+    ],
+    "remaining_gates": [
+      "Cross actual whole stage1, both reviewers delivered; corrected retained-stream replay0/0 remains local; further whole retry owner-directed.",
+      "Research actual whole stage1 at metadata before DeerFlow/fresh clients; updated candidate observer local0, sole co-op apply and another whole direction pending.",
+      "Canonical explicit Claude gateway route pending; Promptfoo native provider acceptance unqualified.",
+      "Fresh actual Telegram receiver confirmation pending; retained earlier needs_user unchanged.",
+      "Co-op Prometheus effective-feature apply/acceptance pending; lane render-only.",
+      "Grafana wave-1 provisioning-name custody unsettled; no unknown/operator file retirement.",
+      "Draft PR requires command-center Claude read; lane never lands.",
+      "Imported #713 gpt-gateway3.8.51 full destination stages have no matching qualification in this lane receipt; owner composition decision/matching native receipts are required (roadmap job10). Alias-source review and one joined research report do not qualify installation, health and full stage.",
+      "Owner-gated roadmap jobs not started."
+    ],
+    "privacy": "Only sanitized outcomes/source locators/hashes/counters; raw native conversations, job reports and host active configuration remain private. No credentials read, printed, copied or committed.",
+    "completeness_critic": {
+      "recorded_at_utc": "2026-10-05T18:14:50Z",
+      "scope": "Read-only exact source/recipe hashes, native outcomes, counter classes, required-stage gap and source variant review; no provider runs.",
+      "result": "No additional ungated original-stage rerun gap. Imported gateway qualification stays gated Job10; independent review binding/dispositions remain separate.",
+      "metadata_correction_after_native_runs": "Removed stale Promptfoo needs_user model-selection instruction; IDs/endpoint come from canonical topology and missing explicit Claude route is command-center dependency. Native recipes and frozen source hashes above describe b3969b21 before this descriptive note correction.",
+      "next_sweep_axes": [
+        "source identity versus installed helper",
+        "native command/output versus local replay",
+        "counter subsets",
+        "negative CLI versus parsed native status",
+        "canonical route ownership",
+        "historical configuration custody"
+      ]
+    }
+  }
 }
