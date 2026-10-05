@@ -129,7 +129,7 @@ was enabled; the operator must run daily and complete every rotation within seve
 
 The 2026-10-05 standing rule applies on every new Linux/WSL operating host: use
 clean maintained upstream installations, replacing only the consumer's integration
-policy. The [native glue review](../../blueprints/us-equities/hosting/evidence/upstream-glue-review-r2.json)
+policy. The [native glue review](../../blueprints/us-equities/hosting/evidence/upstream-glue-review-r3.json)
 records pinned installed help, release notes and source. Checked restic 0.19.1's
 `--stdin-from-command`, SQLite 3.53.1's `.backup`/`.dump` and maintained
 `sqlite3_rsync`, CPython's native backup/subprocess/flock, Dagu 2.16.6's
@@ -245,6 +245,16 @@ recorded in the [native DAG artifact](../../blueprints/us-equities/hosting/evide
 [recovery artifact](../../blueprints/us-equities/hosting/evidence/offline-proof-r3.json) and
 [local-integration receipt](../../evidence/receipts/trading-unattended-hosting-recovery-r3-20261005.json); a private copy of
 the deployed DAG uses synthetic post-close time/input, not a live market run.
+
+Round 4 restores the round-2 review's exact `f417d2257` bytes and its original
+receipt hash/15859-byte pin. Round-3 additions have a separate review linked by
+the round-3 receipt; its parent link retains the earlier native observations.
+The operator replay window is the same New York date after that session's close,
+with input mtime after close; later runs skip or process another session.
+Native `dagu status --run-id` must show every research node succeeded before
+replay counts as recovery (`dagucloud/dagu@v2.16.6:internal/cmd/status.go:18-47`).
+The restart drill refuses unit globs before fault delivery, because literals
+refer to exactly one unit (`systemd/systemd@v255:man/systemctl.xml:1826-1833`).
 
 ## Dagu 2.16.6 to 2.18.2 scheduler comparison
 

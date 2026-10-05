@@ -168,21 +168,6 @@
       "pin": "systemd/systemd@v255",
       "locator": "man/systemd.service.xml:818-836",
       "sha256": "439322b120014971f37e0a96adc6cb827367846ff6c16f193e9ec4b15931033b"
-    },
-    {
-      "pin": "systemd/systemd@v255",
-      "locator": "man/systemctl.xml:541-549,2377-2388",
-      "sha256": "7f06242ce06d9d895bf7445e3d29680f8e6a7284004122b4e209097b8313b6d5"
-    },
-    {
-      "pin": "dagucloud/dagu@v2.16.6",
-      "locator": "internal/service/frontend/api/v1/dagruns.go:2066-2096",
-      "sha256": "f07b1b89d784251594bd68478a1120f88111a7f538081158826f7a99cb62f75f"
-    },
-    {
-      "pin": "dagucloud/dagu@v2.16.6",
-      "locator": "internal/service/frontend/api/v1/transformer.go:362,371",
-      "sha256": "923e6b2e76fa03473cde1c4ed82d9106acfc99f3e95e7fe961d21e0d11849d31"
     }
   ],
   "release_checks": [
@@ -231,16 +216,9 @@
     {
       "glue": "drill_process_restart.py",
       "upstream_outcome": "kept",
-      "checked": "systemd Restart=on-failure and unit-addressed systemctl kill; Dagu history, REST run-details, original status records, handlers/retries.",
-      "gap_citation": "systemd/systemd@v255:man/systemctl.xml:541-549,2377-2388; dagucloud/dagu@v2.16.6:internal/service/frontend/api/v1/transformer.go:362,371",
-      "why": "Upstreams deliver the fault and supervise; acceptance glue guards identity/time/holiday and correlates the exact due slot. Original status bytes avoid HTTP/auth and require revalidation on pin moves."
-    },
-    {
-      "glue": "drill_process_restart.py signal delivery",
-      "upstream_outcome": "replaced",
-      "checked": "Installed systemctl 255.4 help and systemd v255 unit-addressed kill.",
-      "gap_citation": "systemd/systemd@v255:man/systemctl.xml:541-549,2377-2388",
-      "why": "Use native systemctl --user kill --kill-whom=main --signal=SIGKILL rather than os.kill after a PID lookup."
+      "checked": "systemd Restart=on-failure, Dagu native history/status and native handlers/retries.",
+      "gap_citation": "systemd/systemd@v255:man/systemd.service.xml:818-836; dagucloud/dagu@v2.16.6:internal/cmd/history.go:568-602; internal/ir/status.go:133-149",
+      "why": "Upstreams own supervision and run records; identity/time/holiday guards and exact due-slot correlation are our acceptance procedure."
     },
     {
       "glue": "drill_local_recovery.py",
@@ -265,19 +243,10 @@
     "SDK_ENV lock authority is adoption/sdk/requirements-linux-x86_64-py313.lock:241 at the repair base, not an unlanded runtime bundle.",
     "exchange_calendars ships ecal; pyproject.toml:67-68 and installed CLI were checked, so no CLI-absence claim is made.",
     "An initial source lookup under internal/cmn/env/env.go was wrong; rg located internal/cmn/config/env.go and lines 77-95 were read.",
-    "exchange_calendars CHANGELOG.md and etc/changes.rst returned HTTP 404 at 4.13.2; tagged GitHub release notes were read instead.",
-    "Round 3 unavailable-input tokens exit 1 so native Dagu fails the run; holidays/before-close still skip.",
-    "Round 3 source journal_mode must be WAL unless explicit opt-in accepts rollback-journal writer blocking.",
-    "Round 3 control backups use a distinct host/tag; controls remain disposable-repository only."
+    "exchange_calendars CHANGELOG.md and etc/changes.rst returned HTTP 404 at 4.13.2; tagged GitHub release notes were read instead."
   ],
   "limitations": [
     "Source gap judgments are scoped inferences from documented native interfaces, not exhaustive ecosystem absence claims.",
     "No SQLite CLI or sqlite3_rsync installation/trial; pinned SQLite source and installed CPython Online Backup are the evidence."
-  ],
-  "round3_review": {
-    "scope": "Unit-addressed fault delivery and supported run-details API; earlier native observations remain historical.",
-    "systemctl_version": "255.4",
-    "systemctl_help_exit": 0,
-    "systemctl_version_exit": 0
-  }
+  ]
 }

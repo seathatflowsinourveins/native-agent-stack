@@ -201,12 +201,26 @@ In another terminal, cancel that exact active run and inspect its native history
 ```
 
 An aborted or failed run needs inspection and corrected input before replay.
-Replay with another fresh run ID using the start command; `DAG_RUN_ID` keeps
-earlier output intact. A manual run before close or on a holiday skips the
-research steps. A manual run never proves scheduler dispatch or catch-up. These
+Replay with another fresh run ID using the start command **on the same New York
+date, after that session's close**, with input mtime after the close and no later
+than the check time. `DAG_RUN_ID` keeps earlier output intact. A later replay
+evaluates its current New York date: before close or on a non-session day it
+records a succeeded run with skipped research steps; after another session's
+close it processes that other session, subject to the freshness guard. It does
+not recover the original session. Before counting a replay as recovery, inspect:
+
+```sh
+"$DAGU_BIN" status --context local --dagu-home "$PRIVATE_DAGU_HOME" \
+  --config "$PRIVATE_CONFIG" --run-id "$NEW_RUN_ID" equity-research-evidence
+```
+
+Every research node (`calendar_check`, `nyse_session`, `prepare_output`,
+`summarize`, `baseline_evidence`, `catalog_evidence`) must show succeeded;
+a green run with skipped nodes does not count as recovery. A manual run never
+proves scheduler dispatch or catch-up. These
 commands are operator procedures, not commands run by this builder. Sources:
 `dagucloud/dagu@v2.16.6:internal/cmd/start.go:45-67; internal/cmd/stop.go:20-38,53-91;
-internal/cmd/history.go:160-345; internal/cmd/flags.go:463-481`, corroborated by
+internal/cmd/history.go:160-345; internal/cmd/flags.go:463-481; internal/cmd/status.go:18-47`, corroborated by
 the installed 2.16.6 `start`, `stop` and `history --help` (all exit 0).
 
 ## Journal snapshot and restic procedure
@@ -410,8 +424,10 @@ pins tested source hashes and records the red/green regressions and native outpu
 
 ## Why this glue exists
 
-The [pinned native review](evidence/upstream-glue-review-r2.json) records installed
+The [pinned native review](evidence/upstream-glue-review-r3.json) records installed
 help, tagged release notes/source and the alternatives checked before repair.
+Its parent link preserves the unchanged [round 2 review](evidence/upstream-glue-review-r2.json)
+for the earlier CLI and release observations.
 Native `ecal` **does exist** in exchange_calendars 4.13.2. It renders calendars;
 it provides neither the post-close eligibility token nor this input-freshness
 contract. Native Dagu already owns preconditions, dependency skips, retries and

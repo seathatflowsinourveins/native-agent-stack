@@ -107,6 +107,9 @@ def main(argv=None) -> int:
     parser.add_argument("--wait-seconds", type=int, default=900)
     args = parser.parse_args(argv)
     try:
+        # systemd/systemd@v255:man/systemctl.xml:1826-1833: PATTERN accepts globs.
+        if any(char in args.unit for char in "*?[]"):
+            raise ValueError("--unit must be a literal unit name; glob patterns are refused")
         due = datetime.fromisoformat(args.due_at)
         now = datetime.now(timezone.utc)
         validate_window(due, now, args.wait_seconds)

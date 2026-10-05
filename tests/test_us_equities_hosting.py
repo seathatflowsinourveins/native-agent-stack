@@ -6,7 +6,7 @@ All mutable state belongs to a temporary directory; no service or broker is used
 
 from __future__ import annotations
 
-from contextlib import closing, redirect_stdout
+from contextlib import closing, nullcontext, redirect_stdout
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 import fcntl
@@ -16,6 +16,7 @@ import json
 import os
 from pathlib import Path
 import re
+import shlex
 import shutil
 import sqlite3
 import subprocess
@@ -111,7 +112,7 @@ def native_dagu_probe(token, *, session_script=None):
                            "future_input": "2026-11-27T21:31:00Z"}.get(token, "2026-11-27T19:00:00Z")
                 epoch = datetime.fromisoformat(instant).timestamp()
                 os.utime(events, (epoch, epoch))
-            calendar_command = (f'"{root}/sdk/bin/python" "{root}/session_day.py" '
+            calendar_command = (f'"{root}/sdk/bin/{Path(CALENDAR_PYTHON).name}" "{root}/session_day.py" '
                                 f'--at 2026-11-27T21:30:00Z --events "{events}"')
         dag = root / "native-chain.yaml"
         dag.write_text(f'''type: graph
@@ -169,8 +170,9 @@ class NativeDaguTests(unittest.TestCase):
     def test_native_session_executes_success_chain(self):
         self.check_probe("session", 4, True)
 
-    def test_native_stale_input_is_visible_and_skips_dependents(self):
-        self.check_probe("stale_input", 5, False)
+    def test_native_precondition_defense_in_depth_blocks_before_close(self):
+        # An exit-0 ineligible token must still block the research chain.
+        self.check_probe("before_close", 5, False)
 
     def test_native_probe_uses_its_private_root_when_tmpdir_is_unset(self):
         with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR")) as temporary, \
@@ -180,6 +182,23 @@ class NativeDaguTests(unittest.TestCase):
         self.assertEqual(proof["exit"], 0, proof["output"])
         self.assertEqual(proof["native_status"]["status"], 4)
         self.assertTrue(proof["marker_created"])
+
+    @unittest.skipUnless(CALENDAR_PYTHON, "requires the locked calendar SDK")
+    def test_native_probe_preserves_interpreter_basename_without_bin_python(self):
+        with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR")) as temporary:
+            sdk = Path(temporary) / "fixture-sdk"
+            (sdk / "bin").mkdir(parents=True)
+            interpreter = sdk / "bin/python3"
+            interpreter.write_text('#!/bin/sh\nexec ' + shlex.quote(CALENDAR_PYTHON) + ' "$@"\n')
+            interpreter.chmod(0o700)
+            self.assertFalse((sdk / "bin/python").exists())
+            # Keep the synthetic SDK inside the native probe's scrubbed root.
+            with mock.patch(__name__ + ".CALENDAR_PYTHON", str(interpreter)), \
+                    mock.patch.object(tempfile, "TemporaryDirectory", return_value=nullcontext(temporary)):
+                proof = native_dagu_probe("session", session_script=HERE / "session_day.py")
+            self.assertEqual(proof["exit"], 0, proof["output"])
+            self.assertEqual(proof["native_status"]["status"], 4)
+            self.assertTrue(proof["marker_created"])
 
     @unittest.skipUnless(CALENDAR_PYTHON, "requires the locked calendar SDK")
     def test_native_unavailable_input_fails_run_and_blocks_dependents(self):
@@ -328,9 +347,23 @@ class HostingContractTests(unittest.TestCase):
                          "working tree after round-2 repair; files pinned by integration_source_sha256")
         self.assertTrue(receipt["integration_source_sha256"])
 
+    def test_historical_review_bytes_and_round3_artifact_custody(self):
+        import hashlib
+        review = HERE / "evidence/upstream-glue-review-r2.json"
+        expected = "2f8c7896b7277264801fc4b701375c612574619a2b96190202396fb52b00e2e7"
+        self.assertEqual(hashlib.sha256(review.read_bytes()).hexdigest(), expected)
+        self.assertEqual(review.stat().st_size, 15859)
+        for round_number in (2, 3):
+            receipt = json.loads((ROOT / f"evidence/receipts/trading-unattended-hosting-recovery-r{round_number}-20261005.json").read_text())
+            relative = f"blueprints/us-equities/hosting/evidence/upstream-glue-review-r{round_number}.json"
+            artifact = next(a for a in receipt["artifacts"] if a["path"] == relative)
+            data = (ROOT / relative).read_bytes()
+            self.assertEqual(artifact["sha256"], hashlib.sha256(data).hexdigest())
+            self.assertEqual(artifact["bytes"], len(data))
+
 
 class DrillGuardTests(unittest.TestCase):
-    def restart_fixture(self, *, restart_at=None, kill_code=0):
+    def restart_fixture(self, *, restart_at=None, kill_code=0, unit="dagu-equities.service"):
         due = datetime.fromisoformat("2026-10-05T16:30:00-04:00")
         with tempfile.TemporaryDirectory(dir=os.environ.get("TMPDIR")) as temporary:
             root = Path(temporary)
@@ -367,8 +400,17 @@ class DrillGuardTests(unittest.TestCase):
                                          restart_at or due - timedelta(minutes=4)]
                 result = RESTART.main(["--dagu-bin", str(binary), "--dagu-home", str(root),
                                        "--config", str(config), "--dag-history", str(history),
-                                       "--due-at", due.isoformat()])
+                                       "--due-at", due.isoformat(), "--unit", unit])
                 return result, json.loads(output.getvalue()), commands, kill.called
+
+    def test_restart_refuses_unit_patterns_before_fault_delivery(self):
+        for unit in ("dagu-*.service", "dagu-?.service", "dagu-[ab].service", "dagu-].service"):
+            with self.subTest(unit=unit):
+                result, observed, commands, pid_signal = self.restart_fixture(unit=unit)
+                self.assertEqual(result, 1, observed)
+                self.assertIn("glob", observed["reason"])
+                self.assertEqual(commands, [])
+                self.assertFalse(pid_signal)
 
     def test_restart_fault_is_delivered_by_native_unit_addressed_kill(self):
         result, observed, commands, pid_signal = self.restart_fixture()

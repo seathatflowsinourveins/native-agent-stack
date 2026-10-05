@@ -44,9 +44,9 @@
       "bytes": 11577
     },
     {
-      "path": "blueprints/us-equities/hosting/evidence/upstream-glue-review-r2.json",
-      "sha256": "5b739577ab84d9c2316d9fba07bc93ae3bd13ac4873cbd3f253891a6132fb488",
-      "bytes": 17556
+      "path": "blueprints/us-equities/hosting/evidence/upstream-glue-review-r3.json",
+      "sha256": "79237a01bbe3d7c6997409e910894664aa0a41e8d36240689259e92a9673b5d2",
+      "bytes": 2790
     }
   ],
   "upstream_sources": [

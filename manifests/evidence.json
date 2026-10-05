@@ -14544,8 +14544,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/README.md",
-      "sha256": "1c5070ee6b29889850c0664ac660ea060859a92cf674e527eccec17ca4a58fd5",
-      "bytes": 29796
+      "sha256": "74ca3f3c74f7f125ac4d49f973bef7c78942c7fa91152619cab185147d4d5388",
+      "bytes": 30720
     },
     {
       "path": "blueprints/us-equities/hosting/backup/README.md",
@@ -14589,8 +14589,8 @@
     },
     {
       "path": "blueprints/us-equities/hosting/drill_process_restart.py",
-      "sha256": "2262abdbb9a05aefc77eceaeb0503a2053ded179b3825e3fb8e75dfb602c0701",
-      "bytes": 9663
+      "sha256": "e6f5815515c417a120c356356834c8536201cf584a03383a6580fa34f82e1b7a",
+      "bytes": 9894
     },
     {
       "path": "blueprints/us-equities/hosting/equity-research-evidence.yaml",
@@ -14639,8 +14639,13 @@
     },
     {
       "path": "blueprints/us-equities/hosting/evidence/upstream-glue-review-r2.json",
-      "sha256": "5b739577ab84d9c2316d9fba07bc93ae3bd13ac4873cbd3f253891a6132fb488",
-      "bytes": 17556
+      "sha256": "2f8c7896b7277264801fc4b701375c612574619a2b96190202396fb52b00e2e7",
+      "bytes": 15859
+    },
+    {
+      "path": "blueprints/us-equities/hosting/evidence/upstream-glue-review-r3.json",
+      "sha256": "79237a01bbe3d7c6997409e910894664aa0a41e8d36240689259e92a9673b5d2",
+      "bytes": 2790
     },
     {
       "path": "blueprints/us-equities/hosting/journal_recovery.py",
@@ -16724,8 +16729,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-trading-unattended-hosting-recovery.md",
-      "sha256": "1ee875b9f3f9637e0fd5fb62da9e568cf26bad7de5effcc0f300d2a9676a4a15",
-      "bytes": 26858
+      "sha256": "c70bfb7988b18a56bf6aa56f4384270dd7ac638f66492ef5e37dddf1596f5a3c",
+      "bytes": 27568
     },
     {
       "path": "docs/direct-results.md",
@@ -51914,13 +51919,13 @@
     },
     {
       "path": "evidence/receipts/trading-unattended-hosting-recovery-r2-20261005.json",
-      "sha256": "63380e24f91b61b811475732d9c751da71355a93159e3649d538300fccfa28ef",
+      "sha256": "46bcef63ef1ab2542f6c056da0bdd91c949f94e68e76881c690f0732196191c7",
       "bytes": 30998
     },
     {
       "path": "evidence/receipts/trading-unattended-hosting-recovery-r3-20261005.json",
-      "sha256": "c43121452a00ffd5b51c67d678823fa360afdf00527e18c950593dba0b31a105",
-      "bytes": 16210
+      "sha256": "4cb50ba3c449da96f241b5ed6b0c7aa51c71e98cce094ef73a319e15b45767c7",
+      "bytes": 16209
     },
     {
       "path": "evidence/receipts/ultracode-token-routing-20260921.json",
@@ -54164,8 +54169,8 @@
     },
     {
       "path": "tests/test_us_equities_hosting.py",
-      "sha256": "06cd7a9ecae755b13001f2aae3bb7cfff0e0218ac4abb044480ab3f56a9c95b2",
-      "bytes": 45839
+      "sha256": "39bc789787ae09e87dfa288b9fbda8ae9de4f309541708194fe3e98b4c90cac4",
+      "bytes": 48594
     },
     {
       "path": "tests/test_validate.py",
