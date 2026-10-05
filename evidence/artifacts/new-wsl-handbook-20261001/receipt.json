@@ -6,8 +6,8 @@
   "generator_sha256": "8a66e5eebe1429924d62545e2eee389f1fdd58e6c2f679d8280cec3e99027cf8",
   "profile_sha256": "9abbb77704c9208d049518368f97786d1ef09060d420c5aebf183ee4575e7632",
   "outputs": {
-    "docs/new-wsl-handbook.md": "328d76d670dee6620e3c4f0e036e9af5a97a26a98c5571793493bd67321fb67a",
-    "docs/new-wsl-handbook.json": "bfa36dd4aaa5a49ddd723cde6d9d21d45de3695be26835509abce692101c95fa"
+    "docs/new-wsl-handbook.md": "1eb9a9cb1b3d8f10bbfffb8eea33a2f67a2500a208e3b77e59fed73d680f4dae",
+    "docs/new-wsl-handbook.json": "a93532300fc174884d0d6feba2466780f87b300ad21362a5daa0b62a2e49c31c"
   },
   "inventory": {
     "layers": 37,
@@ -114,6 +114,30 @@
         "docs/new-wsl-handbook.json": "bfa36dd4aaa5a49ddd723cde6d9d21d45de3695be26835509abce692101c95fa",
         "docs/new-wsl-handbook.md": "328d76d670dee6620e3c4f0e036e9af5a97a26a98c5571793493bd67321fb67a"
       }
+    },
+    {
+      "date_utc": "2026-10-05",
+      "recorded_at_utc": "2026-10-05T07:53:06Z",
+      "scope": "PR #642 fix round 4: dated architecture citation scope; local regeneration only, with no host or upstream acceptance claimed.",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "native_exit_code": 0,
+      "returned_status": "written",
+      "returned_outputs": {
+        "docs/new-wsl-handbook.json": "a93532300fc174884d0d6feba2466780f87b300ad21362a5daa0b62a2e49c31c",
+        "docs/new-wsl-handbook.md": "1eb9a9cb1b3d8f10bbfffb8eea33a2f67a2500a208e3b77e59fed73d680f4dae"
+      }
+    },
+    {
+      "date_utc": "2026-10-05",
+      "recorded_at_utc": "2026-10-05T07:53:07Z",
+      "scope": "PR #642 fix round 4: dated architecture citation scope; local generated-byte verification only, with no host or upstream acceptance claimed.",
+      "command": "python3 scripts/build_new_wsl_handbook.py --check",
+      "native_exit_code": 0,
+      "returned_status": "passed",
+      "returned_outputs": {
+        "docs/new-wsl-handbook.json": "a93532300fc174884d0d6feba2466780f87b300ad21362a5daa0b62a2e49c31c",
+        "docs/new-wsl-handbook.md": "1eb9a9cb1b3d8f10bbfffb8eea33a2f67a2500a208e3b77e59fed73d680f4dae"
+      }
     }
   ],
   "failed_conditions_retained": [
@@ -194,5 +218,5 @@
     "docs/decisions/2026-10-03-currency-wave-w1.md",
     "docs/decisions/2026-10-04-2604-e2e-fix-wave.md"
   ],
-  "repair_round": "this PR: bounded job 058, 2026-10-04; hashes regenerated in place, destination acceptance remains owed; PR #642 fix round 2, 2026-10-05: regenerated qualification limits and release holds, hashes refreshed, destination acceptance pending; PR #642 fix round 3: rebound architecture pin citations, refreshed output hashes, separately recorded native write/check results"
+  "repair_round": "this PR: bounded job 058, 2026-10-04; hashes regenerated in place, destination acceptance remains owed; PR #642 fix round 2, 2026-10-05: regenerated qualification limits and release holds, hashes refreshed, destination acceptance pending; PR #642 fix round 3: rebound architecture pin citations, refreshed output hashes, separately recorded native write/check results; PR #642 fix round 4: dated architecture citation scope, refreshed output hashes, separately recorded native write/check results"
 }

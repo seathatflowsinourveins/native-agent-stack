@@ -15727,8 +15727,8 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "b8ce6bc5d6c11390be3e2e174be820ee063d5d4b43a2f8eb07fdd0be2253f0e9",
-      "bytes": 308538
+      "sha256": "58871b0fa9dbcc8b2b6582eb0f7e197e1f5e7e56e8669aa2b9bae61c94aba163",
+      "bytes": 308759
     },
     {
       "path": "catalogs/foundation/new-wsl-layer-crosswalk-20261001.json",
@@ -17032,12 +17032,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "bfa36dd4aaa5a49ddd723cde6d9d21d45de3695be26835509abce692101c95fa",
+      "sha256": "a93532300fc174884d0d6feba2466780f87b300ad21362a5daa0b62a2e49c31c",
       "bytes": 654194
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "328d76d670dee6620e3c4f0e036e9af5a97a26a98c5571793493bd67321fb67a",
+      "sha256": "1eb9a9cb1b3d8f10bbfffb8eea33a2f67a2500a208e3b77e59fed73d680f4dae",
       "bytes": 355757
     },
     {
@@ -17132,8 +17132,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "0de081f557449d7d1c8d36c1daf9a66bb7d8f735a16b7d8b9ba739b7cdda0d81",
-      "bytes": 593139
+      "sha256": "4514b17518be902f7eb43df462a3280cc2299ac81cded6440e4b9d7a93a3b300",
+      "bytes": 593723
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -39092,8 +39092,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "6bd050686f2d4a1850196d4eeccdbe6241db58285fbebcd51bd216922f063722",
-      "bytes": 8630
+      "sha256": "68240222e7ad203b0ce68b2d5f852ae34b73c3edd393006ff0514dab71ccda11",
+      "bytes": 10009
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -53632,8 +53632,8 @@
     },
     {
       "path": "tests/test_ecosystem_manifest.py",
-      "sha256": "48186b4f263f510f02ef489e72f40eb9023a981285f5f702f4c4e657a175eab4",
-      "bytes": 141162
+      "sha256": "03900b5be52d6e13a4a15ae46347eddf5eb09d3324ff973a967455fe40b18202",
+      "bytes": 142162
     },
     {
       "path": "tests/test_effort_default_guard.py",
