@@ -12083,7 +12083,7 @@
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/source-hashes.json",
-      "sha256": "167e7ac9af24bd1fb12c9073b85635856faac09e1df85b95ef016ec099094137",
+      "sha256": "d5e6e6da20a4e8a0ba471ef798339c560dac7ab5d781be37ed12fb780ac8a580",
       "bytes": 7076
     },
     {
@@ -16640,6 +16640,11 @@
       "path": "docs/decisions/2026-10-04-upstream-surface-watch.md",
       "sha256": "1389de18bbaf5c41d8f22093a9642d982230a851f954183b7c8254e0b5890bce",
       "bytes": 18701
+    },
+    {
+      "path": "docs/decisions/2026-10-05-filesd-registration-test-flake.md",
+      "sha256": "866fb67a29403b92b482914b057e2bc499df63d6b9cd13ae5da85ab78070c95f",
+      "bytes": 4416
     },
     {
       "path": "docs/decisions/2026-10-05-overfitting-riskl-parity.md",
@@ -53113,8 +53118,8 @@
     },
     {
       "path": "tests/test_adaptive_paper_metrics.py",
-      "sha256": "1d6eaf940021fbaba3ac687a3d3a2d9f6e5492e85a5a372621299d4363ec3ee5",
-      "bytes": 32823
+      "sha256": "eaeb416047c69d63bb2feda7ecef1a886293eede4e964a566872b03454f13b2c",
+      "bytes": 35752
     },
     {
       "path": "tests/test_adaptive_paper_mover.py",
