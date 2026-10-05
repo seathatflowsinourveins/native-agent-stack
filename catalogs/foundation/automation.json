@@ -228,7 +228,7 @@
     },
     {
       "repository": "seathatflowsinourveins/native-agent-stack",
-      "version": "adoption-bootstrap.yml@2026-09-22",
+      "version": "adoption-bootstrap.yml@2026-10-05",
       "source": ".github/workflows/adoption-bootstrap.yml",
       "command": "bash adoption/bootstrap-linux.sh --profile foundation-cpu (run inside the bootstrap-linux job on ubuntu-24.04)",
       "selection": "bootstrap-linux (20-minute timeout) exercises adoption/bootstrap-linux.sh's real pinned-download/SHA-256-verify/isolated-prefix install path for the foundation-cpu profile from adoption/pins-linux-x86_64.json, on pushes to main matching adoption-bootstrap.yml's existing paths filter, on pull requests whose diff matches that filter through the changes job, nightly at 06:47 UTC, and on manual dispatch. Current scheduling follows docs/github-automation.md's 2026-10-05 scheduled portability and report-only lanes section.",
@@ -459,7 +459,7 @@
   },
   "current_practice_20261005": {
     "observed_at": "2026-10-05",
-    "source": "Read-only gh api GET of ruleset 23739774; required contexts, strict policy and merge methods match .github/main-ruleset.json",
+    "source": "Read-only gh api GET of ruleset 23739774 (read again 2026-10-05 03:24Z: enforcement active, strict false, merge methods squash only); required contexts, strict policy and merge methods match .github/main-ruleset.json",
     "required_checks": [
       "validate",
       "token-report",

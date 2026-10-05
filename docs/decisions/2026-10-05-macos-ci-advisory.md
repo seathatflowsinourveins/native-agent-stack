@@ -103,15 +103,17 @@ when to compare those alternatives again.
 [PR #711](https://github.com/seathatflowsinourveins/native-agent-stack/pull/711)
 reports **builder-run results**: the original workflow produced **133 failing
 subtests** in the PR-event control (exit 1), and the new workflow passed that
-control (exit 0). The builder's selected modules reported **388 tests OK,
+control (exit 0). The 133 count was measured with the first round's helper
+(b4f76da95 in this PR), which ran each event combination as its own subtest.
+The repaired helper stops at a job's first failing combination, so the same
+control now shows at most one failing subtest per job. The repair round's
+builder re-ran the strengthened control from red to green. The builder's selected modules reported **388 tests OK,
 36 skipped**. These are local integration and synthetic checks using the
 existing unittest tests and expression oracle.
 
-[PR #711's adoption-bootstrap CI run](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37255957059)
-reports `validate-macos`, `bootstrap-macos` and `bootstrap-macos-brew` as
-skipped on the PR. Its
-[validation CI run](https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37255957046)
-provides the separate hosted execution record; the 133 and 388 counts above
+PR #711's adoption-bootstrap CI on its final head reports `validate-macos`,
+`bootstrap-macos` and `bootstrap-macos-brew` as skipped on the PR, and its
+`validate` run is the hosted execution record. The 133 and 388 counts above
 are the builder-run results reported in the PR.
 
 The builder-run acceptance results for the submitted change were:
