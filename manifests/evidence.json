@@ -4477,38 +4477,38 @@
     },
     {
       "path": "adoption/agents/codex/SHA256SUMS",
-      "sha256": "b07d7697f01ed1b1472b727af2d6e77b20a9b2846410b655cd6354a2adca856c",
+      "sha256": "e3bf86c89ca5f5f686b89119108d302908997632af2a34378d092bd272e957b5",
       "bytes": 174
     },
     {
       "path": "adoption/agents/codex/stack-researcher.toml",
-      "sha256": "48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77",
-      "bytes": 7223
+      "sha256": "a8e416feffb47afd36ba8f4afd2076f7168d766bfb5efd847cf1b600e6110c4f",
+      "bytes": 7220
     },
     {
       "path": "adoption/agents/codex/stack-verifier.toml",
-      "sha256": "18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b",
-      "bytes": 6685
+      "sha256": "d35bcd8f77bcdfe58e879c3c752c152219a8725f55d2b17f5fc67a7832595561",
+      "bytes": 6682
     },
     {
       "path": "adoption/agents/codex/workers/SHA256SUMS",
-      "sha256": "e5d75d7e7e6a68ac6460e4b447221c2fc254feb532f570661d7d95b1ba3064d2",
+      "sha256": "5dffbf3173782b66daa82294412db057bd3325621dc46e3af0649908a9564b24",
       "bytes": 275
     },
     {
       "path": "adoption/agents/codex/workers/evidence-reviewer.toml",
-      "sha256": "91ed272d63ff5a7271be87550488ad1bff99bde09bd1a699332fdd3f41b06a6c",
-      "bytes": 6148
+      "sha256": "27b98b399fea6377a8b9afbf3bb01541d96281bd70cb3f1a42c699afac48c7c5",
+      "bytes": 6152
     },
     {
       "path": "adoption/agents/codex/workers/isolated-builder.toml",
-      "sha256": "7c46a4cd994764101f2864e590fe71c8dfa8e3b78242f1a793eaac1d5af091d9",
-      "bytes": 6656
+      "sha256": "2c855056c579e979a1e1410cfebfcd6262fdfd997317ca09e8a558fe6a189b3c",
+      "bytes": 6660
     },
     {
       "path": "adoption/agents/codex/workers/semantic-evidence-reviewer.toml",
-      "sha256": "5a2a28e12b6fa1a894fd45afa572f54bd7546408c40b2446c417d493d622ebae",
-      "bytes": 6250
+      "sha256": "1efdcb37e2eda74b7407a78c8cf4e766046c6b894a03f04da42a41f21e4d4134",
+      "bytes": 6254
     },
     {
       "path": "adoption/bootstrap-linux.sh",
@@ -4657,8 +4657,8 @@
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
-      "sha256": "899ca1d57eea56424fa626bc2014abc9c623ed9e8672d74a703611e6327d8481",
-      "bytes": 8187
+      "sha256": "f570b56170d2ec53f382cbdb9e319b22e4e52671733f1b9a4eb84f1d3b062c86",
+      "bytes": 8191
     },
     {
       "path": "adoption/new-wsl/templates/claude-user.mcp.additions.json",
@@ -4787,8 +4787,8 @@
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
-      "sha256": "899ca1d57eea56424fa626bc2014abc9c623ed9e8672d74a703611e6327d8481",
-      "bytes": 8187
+      "sha256": "f570b56170d2ec53f382cbdb9e319b22e4e52671733f1b9a4eb84f1d3b062c86",
+      "bytes": 8191
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
@@ -16443,8 +16443,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "cdb7375539f753fb614083c3fdf5dc54c96cb1ad2a5afe18174e238dbc594dfc",
-      "bytes": 112663
+      "sha256": "57edd0d217524567fa76a06ced8650551fcfa3cffcb1d5853d91a69e49a3e043",
+      "bytes": 114315
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -16602,6 +16602,11 @@
       "bytes": 16799
     },
     {
+      "path": "docs/decisions/2026-10-04-rtk-051-f4-exceptions.md",
+      "sha256": "f317dd5e4f24d37250c6549b391b72e13943167e20103f4722145497bea67c88",
+      "bytes": 16010
+    },
+    {
       "path": "docs/decisions/2026-10-04-rtk-file-list-control.md",
       "sha256": "cbe7566aa8843bc18c1d25018dec6ddd04c871a599554aaa1d75a36954a2db9c",
       "bytes": 15171
@@ -16748,8 +16753,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "ca1091c14b65605c72d7aa6fdeb429f80a49c26774c6899dc1d757d1c67f19f7",
-      "bytes": 187468
+      "sha256": "937157aa8c2c06bcad79afd6eaa300f4a39bc915494bd6e8b2cf11b40dd54ccc",
+      "bytes": 189229
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -44652,6 +44657,21 @@
       "bytes": 3721
     },
     {
+      "path": "evidence/artifacts/rtk-f4-remeasurement-20261004/hook-and-prefix-probe.json",
+      "sha256": "d5251099fa4a0d42b13e988e3b16aa66a45ab0d36a13521e1f9ee55834368789",
+      "bytes": 30800
+    },
+    {
+      "path": "evidence/artifacts/rtk-f4-remeasurement-20261004/rtk-behaviour-probe.json",
+      "sha256": "3d7b5a0e527113a7e3ef13413dd35d5e15b3913ba8e87c96dcca6ee7888713e4",
+      "bytes": 11041
+    },
+    {
+      "path": "evidence/artifacts/rtk-f4-remeasurement-20261004/scratch-supplement.json",
+      "sha256": "840cb31e2fe3e596e0f358a7cdd1e11de241e218f3cf0209b95a39f3ebfeae15",
+      "bytes": 182211
+    },
+    {
       "path": "evidence/artifacts/rtk-native-git256-20261002/receipt.json",
       "sha256": "3746287baeda32c343247eb8f87ecc3b79b6605dfe564f31c2a85ca1f714368a",
       "bytes": 29878
@@ -52058,33 +52078,33 @@
     },
     {
       "path": "examples/codex-native/README.md",
-      "sha256": "071881280df5d12a7826ec4e1c162529f8f037027c45b01cfc9ed37a847c2ee3",
-      "bytes": 24461
+      "sha256": "5dcdf3e461fbbc66b9c70ff94a3eebdb3ef6bd4ae8e12326c801a98603262c6f",
+      "bytes": 28107
     },
     {
       "path": "examples/codex-native/agents/evidence-reviewer.toml",
-      "sha256": "b1f528c65c6f6004b2371e4dd4caf92fb19c0d7d6dbef782ea38fd6003b6a122",
-      "bytes": 3127
+      "sha256": "1e709c15946bd99e181c28134aba6e540b0ac725e2b0963e62c431ce8419b74a",
+      "bytes": 3131
     },
     {
       "path": "examples/codex-native/agents/isolated-builder.toml",
-      "sha256": "548b1b6aed15f8947d9441259678ebae5ac0f34c0113a27ce76c146821c2dee4",
-      "bytes": 3183
+      "sha256": "1da5122e0fa6fd81abc3ceab68cb852eb44debe02bbba9ef929e1aa7c9be28c9",
+      "bytes": 3187
     },
     {
       "path": "examples/codex-native/agents/semantic-evidence-reviewer.toml",
-      "sha256": "74e43905022e58fb6a2c3ce65f5e43212573f2e2dcd5026bf0dea41d14b1b1b8",
-      "bytes": 4786
+      "sha256": "c0518681409f8618b55f813a80afd9b117545475b73dbe08c4ec2bd2f17677ec",
+      "bytes": 4790
     },
     {
       "path": "examples/codex-native/agents/stack-researcher.toml",
-      "sha256": "48575cafe20e254e90efecef57b2697e16341881b989c77c1bbeccbdc933bc77",
-      "bytes": 7223
+      "sha256": "a8e416feffb47afd36ba8f4afd2076f7168d766bfb5efd847cf1b600e6110c4f",
+      "bytes": 7220
     },
     {
       "path": "examples/codex-native/agents/stack-verifier.toml",
-      "sha256": "18b2326d0219821a1dc9b2c822fee1e6ce601954bdf8e5a2dd8e7d769626611b",
-      "bytes": 6685
+      "sha256": "d35bcd8f77bcdfe58e879c3c752c152219a8725f55d2b17f5fc67a7832595561",
+      "bytes": 6682
     },
     {
       "path": "examples/codex-native/config.agents.toml.example",
@@ -52653,8 +52673,8 @@
     },
     {
       "path": "recipes/README.md",
-      "sha256": "ad750498ace3022cdaab34bc6cafb42300379d9a9e0f9e76f00414916c9d8a96",
-      "bytes": 128978
+      "sha256": "654048b6e489f1beabf9f38cd2afb1a4e5b651660c163d978f168af917c830fc",
+      "bytes": 131195
     },
     {
       "path": "recipes/claude-codex-cooperation-lanes.md",
@@ -53313,8 +53333,8 @@
     },
     {
       "path": "tests/test_codex_agents.py",
-      "sha256": "bbeb41fee103f03db2cc3f2f9ca22a182b53b4304997297b8ff1c16cb26b7d76",
-      "bytes": 39933
+      "sha256": "2517af8017a953dc4b97bded6340e92dec578a1da2ae947001068d9898d05820",
+      "bytes": 39915
     },
     {
       "path": "tests/test_codex_quota.py",
@@ -53323,13 +53343,13 @@
     },
     {
       "path": "tests/test_codex_roles.py",
-      "sha256": "0cbc0a490d3e42223cb4442d53196bc5c6e9447c1180143f3c581b1b0c20fb03",
-      "bytes": 33199
+      "sha256": "fe2ad5b46b2fe91c54e03a88c39b50c38746c604d2b6460d1a4aae17885f2bb2",
+      "bytes": 33204
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "b6135344dac4e93f46a8ea6e6d30384960daec228b7cc20c059f606a4b0a7db2",
-      "bytes": 190722
+      "sha256": "86ec9db291fbfa23e09ee6a41254f228abcf4de4caaf151faaf6feeb44f2e595",
+      "bytes": 191667
     },
     {
       "path": "tests/test_codex_worker_skill.py",
@@ -54118,8 +54138,8 @@
     },
     {
       "path": "tools/adoption/codex_roles.py",
-      "sha256": "d02975b4d5e7f4e43ab347f18d99a4973a9e262cdad816147e63410c0543feff",
-      "bytes": 34229
+      "sha256": "b32ff615c5a48b452a95fb370de6a79ae49698963419ad6608cf00459426d7c8",
+      "bytes": 34215
     },
     {
       "path": "tools/adoption/embed_acceptance.py",
