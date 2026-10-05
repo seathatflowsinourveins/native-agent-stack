@@ -181,6 +181,92 @@ class WindowsAndPins(unittest.TestCase):
 
 
 class QuoteAdmission(unittest.TestCase):
+    def test_unrelated_farm_notices_are_info_and_relevant_errors_are_fatal(self):
+        state = RUN.QuoteState()
+        state.managedAccounts(FAKE_ACCOUNT)
+        for code in (2103, 2105, 2157, 2104, 2106, 2158, 1101, 1102):
+            state.error(-1, 1000, code, "farm notice " + FAKE_ACCOUNT)
+        state.error(999, 1000, 354, "unrelated entitlement")
+        self.assertEqual(state.errors, [])
+        self.assertEqual(len(state.info), 9)
+        self.assertNotIn(FAKE_ACCOUNT, json.dumps(state.diagnostics()))
+        for req_id, code in ((9202, 354), (-1, 326), (-1, 1100), (-1, 10089), (-1, 10167)):
+            other = RUN.QuoteState()
+            other.error(req_id, 1000, code, "failure")
+            self.assertEqual(other.errors[0]["reqId"], req_id)
+            self.assertEqual(other.errors[0]["code"], code)
+
+    def test_quote_wait_deadlines_identify_each_missing_callback(self):
+        for missing, stage, status in (("nextValidId", "accounts", "not_connected"),
+                                        ("quote", "tick requested", "refused_quote_unavailable"),
+                                        ("clock", "quote", "refused_quote_clock")):
+            class Client(RUN.QuoteState):
+                def isConnected(self):
+                    return True
+
+                def reqMarketDataType(self, kind):
+                    pass
+
+                def reqTickByTickData(self, *args):
+                    if missing != "quote":
+                        self.tickByTickBidAsk(9202, 1000, 770, 771, 1, 1, None)
+
+                def reqCurrentTime(self):
+                    if missing != "clock":
+                        self.currentTime(1001)
+
+                def cancelTickByTickData(self, req_id):
+                    pass
+
+            client = Client()
+            client.mark("connected")
+            if missing != "nextValidId":
+                client.nextValidId(1)
+            client.managedAccounts(FAKE_ACCOUNT)
+            with mock.patch.object(RUN.frozen(), "spy_contract", return_value=object()):
+                result = RUN.quote_check(PLAN, FAKE_ACCOUNT, deadline=time.monotonic() + 0.01, client=client)
+            self.assertEqual((result["last_stage"], result["status"]), (stage, status))
+            self.assertIn(stage, result["stage_duration_seconds"])
+            self.assertGreaterEqual(result["elapsed_seconds"], 0.01)
+            self.assertEqual(result["error"], "quote_check_deadline")
+
+    def test_sigalrm_path_preserves_stages_codes_and_teardown(self):
+        client = RUN.AdmissionState()
+        client.disconnect = mock.Mock()
+
+        def precheck(*args, **kwargs):
+            client.mark("connected")
+            client.nextValidId(1)
+            client.managedAccounts(FAKE_ACCOUNT)
+            return copy.deepcopy(FLAT), FAKE_ACCOUNT
+
+        def interrupted(*args, **kwargs):
+            client.mark("tick requested")
+            client.error(-1, 1000, 2105, "notice " + FAKE_ACCOUNT)
+            client.error(9202, 1000, 10190, "limit " + FAKE_ACCOUNT)
+            raise RUN.CheckTimeout("quote_check_deadline")
+
+        with mock.patch.object(RUN.frozen(), "run_check", side_effect=precheck), mock.patch.object(RUN, "quote_check", side_effect=interrupted):
+            pre, account, result = RUN.official_admission(PLAN, 4002, deadline=time.monotonic() + 1, client_factory=lambda: client)
+        self.assertEqual(pre["status"], "passed")
+        self.assertEqual(account, FAKE_ACCOUNT)
+        self.assertEqual(result["last_stage"], "tick requested")
+        self.assertEqual(result["error"], "quote_check_deadline")
+        self.assertEqual(result["errors"][0]["code"], 10190)
+        self.assertEqual(result["info"][0]["code"], 2105)
+        self.assertNotIn(FAKE_ACCOUNT, json.dumps(result))
+        client.disconnect.assert_called_once()
+
+    def test_connectivity_failure_wakes_the_quote_wait(self):
+        client = RUN.QuoteState()
+        client.isConnected = lambda: True
+        client.mark("connected")
+        client.managedAccounts(FAKE_ACCOUNT)
+        client.error(-1, 1000, 326, "client id in use")
+        result = RUN.quote_check(PLAN, FAKE_ACCOUNT, deadline=time.monotonic() + 1, client=client)
+        self.assertEqual(result["errors"][0]["code"], 326)
+        self.assertLess(result["elapsed_seconds"], 0.1)
+
     def test_fresh_quote_and_headroom(self):
         admitted = admitted_quote()
         self.assertEqual(admitted["status"], "passed")
@@ -211,7 +297,7 @@ class QuoteAdmission(unittest.TestCase):
             state = RUN.QuoteState()
             state.error(9202, 1000, code, FAKE_ACCOUNT)
             self.assertTrue(state.delayed)
-            self.assertIn(code, state.errors)
+            self.assertIn(code, [entry["code"] for entry in state.errors])
         state = RUN.QuoteState()
         state.marketDataType(9202, 3)
         self.assertTrue(state.delayed)
@@ -232,25 +318,47 @@ class QuoteAdmission(unittest.TestCase):
         self.assertFalse(RUN.validate_child_admission(PLAN, {}))
 
     def test_invalid_child_admission_never_builds_node(self):
-        with mock.patch.object(RUN, "build_node") as build:
-            with self.assertRaises(ValueError):
-                asyncio.run(RUN.node_phase(PLAN, 4002, Path("unused-receipt"), {}))
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(RUN, "build_node") as build:
+            path = Path(directory) / "receipt.json"
+            receipt = asyncio.run(RUN.node_phase(PLAN, 4002, path, {}))
+            self.assertEqual(receipt["status"], "refused_child_quote_admission")
+            self.assertEqual(json.loads(path.read_text())["exit_code"], 3)
             build.assert_not_called()
 
     def test_official_requests_with_synthetic_client(self):
         calls = []
 
-        class Client(RUN.QuoteState):
+        class Client(RUN.AdmissionState):
+            def __init__(self):
+                super().__init__()
+                self.closed = RUN.threading.Event()
+                self.connected = False
+
             def connect(self, host, port, client_id):
                 calls.append(("connect", host, port, client_id))
-                self.nextValidId(1)
-                self.managedAccounts(FAKE_ACCOUNT)
-
-            def isConnected(self):
-                return True
+                self.connected = True
 
             def run(self):
+                self.nextValidId(1)
+                self.managedAccounts(FAKE_ACCOUNT)
+                self.closed.wait(1)
+
+            def isConnected(self):
+                return self.connected
+
+            def reqPositions(self):
+                self.positionEnd()
+
+            def cancelPositions(self):
                 pass
+
+            def reqAllOpenOrders(self):
+                self.openOrderEnd()
+
+            def reqContractDetails(self, req_id, contract):
+                self._liquid_hours = "20261005:0930-20261005:1600"
+                self._time_zone_id = "US/Eastern"
+                self.done["contract"].set()
 
             def reqMarketDataType(self, kind):
                 calls.append(("data_type", kind))
@@ -268,20 +376,30 @@ class QuoteAdmission(unittest.TestCase):
 
             def disconnect(self):
                 calls.append(("disconnect",))
+                self.connected = False
+                self.closed.set()
 
         with mock.patch.object(RUN.frozen(), "spy_contract", return_value=object()):
-            result = RUN.quote_check(PLAN, 4002, FAKE_ACCOUNT, deadline=time.monotonic() + 1, client_factory=Client)
+            pre, account, result = RUN.official_admission(PLAN, 4002, deadline=time.monotonic() + 1, client_factory=Client)
+        self.assertEqual(pre["status"], "passed")
+        self.assertEqual(account, FAKE_ACCOUNT)
         self.assertEqual(result["status"], "passed")
         self.assertIn(("quote", 9202, "BidAsk", 0, False), calls)
         self.assertIn(("connect", "127.0.0.1", 4002, 92), calls)
-        self.assertLess(calls.index(("quote", 9202, "BidAsk", 0, False)), calls.index(("clock",)))
+        self.assertEqual(sum(call[0] == "connect" for call in calls), 1)
+        self.assertEqual(sum(call[0] == "clock" for call in calls), 2)
+        self.assertLess(calls.index(("clock",)), calls.index(("quote", 9202, "BidAsk", 0, False)))
+        self.assertEqual(calls[-3], ("clock",))
+        self.assertEqual(result["last_stage"], "clock")
+        self.assertEqual(set(result["stage_elapsed_seconds"]), {"connected", "nextValidId", "accounts", "tick requested", "quote", "clock"})
         self.assertEqual(calls[-1], ("disconnect",))
 
 
 class StopLifecycle(unittest.IsolatedAsyncioTestCase):
     @staticmethod
-    def order(status, venue_id=None):
-        return SimpleNamespace(status=SimpleNamespace(name=status), venue_order_id=venue_id)
+    def order(status, venue_id=None, order_type="LIMIT", tif="GTD"):
+        return SimpleNamespace(status=SimpleNamespace(name=status), venue_order_id=venue_id,
+                               order_type=SimpleNamespace(name=order_type), time_in_force=SimpleNamespace(name=tif))
 
     def test_deferred_stop_and_deadline(self):
         for status, venue_id, expected in (("SUBMITTED", "venue", False), ("INITIALIZED", None, False),
@@ -290,6 +408,9 @@ class StopLifecycle(unittest.IsolatedAsyncioTestCase):
             orders = [self.order(status, venue_id)]
             self.assertEqual(RUN.stop_ready(orders, 1, 2), expected)
             self.assertTrue(RUN.stop_ready(orders, 2, 2))
+        for order_type, tif in (("MARKET", "GTC"), ("MARKET", "IOC"), ("LIMIT", "IOC"), ("LIMIT", "FOK")):
+            self.assertFalse(RUN.stop_ready([self.order("ACCEPTED", "venue", order_type, tif)], 1, 2))
+            self.assertTrue(RUN.stop_ready([self.order("FILLED", "venue", order_type, tif)], 1, 2))
 
     async def exercise(self, *, observer_error=False):
         receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
@@ -311,7 +432,8 @@ class StopLifecycle(unittest.IsolatedAsyncioTestCase):
 
         def orders(_cache):
             probes.append(True)
-            return [self.order("SUBMITTED" if len(probes) < 3 else "FILLED")]
+            status = "SUBMITTED" if len(probes) == 1 else "ACCEPTED" if len(probes) == 2 else "FILLED"
+            return [self.order(status, "venue", "MARKET", "IOC")]
 
         snapshots = mock.Mock(side_effect=RuntimeError("snapshot failed")) if observer_error else mock.Mock(return_value=[event("OrderRejected")])
         writes = mock.Mock(side_effect=[RuntimeError("write failed"), None]) if observer_error else mock.Mock()
@@ -478,7 +600,7 @@ class AdmissionRefusals(unittest.TestCase):
                      (("--node-client-id", "101"), PINNED, NOW, "refused_plan"),
                      (("--check-client-id", "91"), PINNED, NOW, "refused_plan")]
             for extra, versions, now, expected in tests:
-                with self.subTest(expected=expected, extra=extra), mock.patch.object(RUN, "official_check") as check, mock.patch.object(RUN, "build_node") as node:
+                with self.subTest(expected=expected, extra=extra), mock.patch.object(RUN, "official_admission") as check, mock.patch.object(RUN, "build_node") as node:
                     receipt = RUN.run_trial(self.args(path, *extra), now=now, versions=versions)
                     self.assertEqual(receipt["status"], expected)
                     self.assertEqual(receipt["exit_code"], 3)
@@ -486,7 +608,7 @@ class AdmissionRefusals(unittest.TestCase):
                     node.assert_not_called()
 
     def test_runner_admission_replaces_unenforced_cap_refusal(self):
-        with tempfile.TemporaryDirectory() as directory, mock.patch.object(RUN, "official_check") as check, mock.patch.object(RUN, "build_node") as node, mock.patch.object(RUN.subprocess, "Popen") as process:
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(RUN, "official_admission") as check, mock.patch.object(RUN, "build_node") as node, mock.patch.object(RUN.subprocess, "Popen") as process:
             receipt = RUN.run_trial(self.args(Path(directory) / "receipt.json", "--plan-only"), now=NOW, versions=PINNED)
             self.assertEqual(receipt["status"], "passed")
             self.assertEqual(receipt["risk"]["engine_route"]["issue_state"], "closed")
@@ -497,7 +619,7 @@ class AdmissionRefusals(unittest.TestCase):
             process.assert_not_called()
 
     def test_plan_only_has_no_socket_path(self):
-        with tempfile.TemporaryDirectory() as directory, mock.patch.object(RUN, "official_check") as check, mock.patch.object(RUN, "official_quote") as quote:
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(RUN, "official_check") as check, mock.patch.object(RUN, "official_admission") as quote:
             receipt = RUN.run_trial(self.args(Path(directory) / "receipt.json", "--plan-only"), now=NOW, versions=PINNED)
             self.assertEqual(receipt["exit_code"], 0)
             check.assert_not_called()
@@ -510,6 +632,47 @@ class AdmissionRefusals(unittest.TestCase):
             args = self.args(Path(directory) / "receipt.json", "--plan", str(plan))
             receipt = RUN.run_trial(args, now=NOW, versions=PINNED)
             self.assertEqual(receipt["status"], "refused_plan")
+
+
+class ChildRefusals(unittest.TestCase):
+    def test_pre_node_refusals_are_written_and_preserved_by_parent_mapping(self):
+        for condition, expected in (("plan", "refused_child_plan"), ("runtime", "refused_child_runtime"),
+                                     ("window", "refused_child_window"), ("quote", "refused_child_quote_admission"),
+                                     ("payload", "refused_child_payload")):
+            with self.subTest(condition=condition), tempfile.TemporaryDirectory() as directory:
+                path = Path(directory) / "receipt.json"
+                receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+                RUN.write_receipt(path, receipt)
+                payload = node_payload(receipt)
+                plan = copy.deepcopy(PLAN)
+                if condition == "plan":
+                    plan["host"] = "not_loopback"
+                if condition == "quote":
+                    payload["quote_admission"]["admitted_monotonic"] -= 11
+                if condition == "payload":
+                    del payload["node_stop_at"]
+                versions = {} if condition == "runtime" else PINNED
+                args = RUN.parser().parse_args(["--_node-phase", "--port", "4002", "--receipt", str(path)])
+                with mock.patch.object(RUN.sys, "stdin", io.StringIO(json.dumps(payload))), mock.patch.object(RUN, "load_plan", return_value=plan), mock.patch.object(RUN, "runtime_versions", return_value=versions), mock.patch.object(RUN.frozen(), "rth_check", return_value=(condition != "window", "synthetic")), mock.patch.object(RUN, "build_node") as node:
+                    self.assertEqual(RUN.run_child(args), 3)
+                    node.assert_not_called()
+                saved = json.loads(path.read_text())
+                self.assertEqual(saved["status"], expected)
+                self.assertEqual(saved["node"]["pre_node_refusal"], expected)
+                self.assertEqual(saved["failures"][-1]["cases_blocked"], list(RUN.CASE_IDS))
+                self.assertNotIn(FAKE_ACCOUNT, path.read_text())
+                saved["flat_proof"] = copy.deepcopy(FLAT)
+                self.assertEqual(RUN.final_status(saved, child_returncode=3)[0], expected)
+
+    def test_bad_stdin_payload_preserves_provisional_receipt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "receipt.json"
+            RUN.write_receipt(path, RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED))
+            args = RUN.parser().parse_args(["--_node-phase", "--receipt", str(path)])
+            with mock.patch.object(RUN.sys, "stdin", io.StringIO("{broken")), mock.patch.object(RUN, "build_node") as node:
+                self.assertEqual(RUN.run_child(args), 3)
+                node.assert_not_called()
+            self.assertEqual(json.loads(path.read_text())["status"], "refused_child_payload")
 
 
 class SyntheticOrchestration(unittest.TestCase):
@@ -561,16 +724,15 @@ class SyntheticOrchestration(unittest.TestCase):
             def poll(self):
                 return self.returncode
 
-        with mock.patch.object(RUN, "datetime", FixedDateTime), mock.patch.object(RUN, "official_quote", return_value=admitted_quote() if quote is None else quote), mock.patch.object(RUN, "official_check", side_effect=[(pre, FAKE_ACCOUNT), (proof, proof_account)]) as checker, mock.patch.object(RUN.subprocess, "Popen", Process), mock.patch.dict(RUN.os.environ, {"RUST_LOG": "trace", "NAUTILUS_LOG": "trace", "TWS_ACCOUNT": FAKE_ACCOUNT}):
+        with mock.patch.object(RUN, "datetime", FixedDateTime), mock.patch.object(RUN, "official_admission", return_value=(pre, FAKE_ACCOUNT, admitted_quote() if quote is None else quote)), mock.patch.object(RUN, "official_check", return_value=(proof, proof_account)) as checker, mock.patch.object(RUN.subprocess, "Popen", Process), mock.patch.dict(RUN.os.environ, {"RUST_LOG": "trace", "NAUTILUS_LOG": "trace", "TWS_ACCOUNT": FAKE_ACCOUNT}):
             receipt = RUN.run_trial(args, now=NOW, versions=PINNED)
         self.assertNotIn(FAKE_ACCOUNT, path.read_text())
         return receipt, checker
 
     def test_provisional_receipt_and_final_flat_proof(self):
         receipt, checker = self.drive()
-        self.assertEqual(checker.call_count, 2)
-        self.assertTrue(checker.call_args_list[0].kwargs["with_session"])
-        self.assertFalse(checker.call_args_list[1].kwargs["with_session"])
+        self.assertEqual(checker.call_count, 1)
+        self.assertFalse(checker.call_args_list[0].kwargs["with_session"])
         self.assertEqual(receipt["status"], "passed")
 
     def test_unproven_flat_is_cleanup_required(self):
@@ -607,7 +769,7 @@ class SyntheticOrchestration(unittest.TestCase):
         for status in ("refused_quote_notional", "refused_stale_quote", "refused_delayed_quote"):
             receipt, checker = self.drive(quote={"status": status})
             self.assertEqual((receipt["status"], receipt["exit_code"]), (status, 3))
-            self.assertEqual(checker.call_count, 1)
+            self.assertEqual(checker.call_count, 0)
             self.assertFalse(receipt["node"]["started"])
             self.assertEqual(receipt["failures"][-1]["cases_blocked"], list(RUN.CASE_IDS))
 
@@ -617,7 +779,7 @@ class SyntheticOrchestration(unittest.TestCase):
 
     def test_precheck_refusal_does_not_construct_node(self):
         receipt, checker = self.drive(pre_status="refused_existing_state")
-        self.assertEqual(checker.call_count, 1)
+        self.assertEqual(checker.call_count, 0)
         self.assertEqual(receipt["exit_code"], 3)
 
 

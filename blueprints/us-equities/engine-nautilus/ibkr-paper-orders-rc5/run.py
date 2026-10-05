@@ -257,6 +257,7 @@ def admit_quote(plan, quote, server_time_epoch, *, elapsed_seconds=0, delayed=Fa
 # Official ibapi 10.45.1 client.py reqTickByTickData and wrapper.py callbacks
 # were inspected in the prepared runtime. Delayed enums come from ticktype.py.
 DELAYED_TICKS = set(range(66, 77)) | {80, 81, 82, 83, 88, 90, 103, 104}
+CONNECTIVITY_CODES = {326, 502, 503, 504, 507, 1100, 1300, 2110}
 
 
 class QuoteState:
@@ -273,30 +274,62 @@ class QuoteState:
         self.clock_received = None
         self.delayed = False
         self.errors = []
+        self.info = []
+        self.started_monotonic = time.monotonic()
+        self.last_stage = "initializing"
+        self.stage_elapsed_seconds = {}
+        self.stage_duration_seconds = {}
+        self.stage_started = self.started_monotonic
+        self.quote_phase = False
+
+    def mark(self, stage):
+        if stage not in self.stage_elapsed_seconds:
+            now = time.monotonic()
+            self.stage_elapsed_seconds[stage] = round(now - self.started_monotonic, 4)
+            self.stage_duration_seconds[stage] = round(now - self.stage_started, 4)
+            self.stage_started, self.last_stage = now, stage
+
+    def diagnostics(self):
+        return {"last_stage": self.last_stage, "elapsed_seconds": round(time.monotonic() - self.started_monotonic, 4),
+                "last_stage_elapsed_seconds": round(time.monotonic() - self.stage_started, 4),
+                "stage_elapsed_seconds": dict(self.stage_elapsed_seconds),
+                "stage_duration_seconds": dict(self.stage_duration_seconds),
+                "errors": list(self.errors), "info": list(self.info)}
 
     def nextValidId(self, orderId):
+        self.mark("nextValidId")
         self.ready.set()
 
     def managedAccounts(self, accountsList):
         self.accounts = [value.strip() for value in (accountsList or "").split(",") if value.strip()]
+        self.mark("accounts")
         self.accounts_ready.set()
 
     def tickByTickBidAsk(self, reqId, timestamp, bidPrice, askPrice, bidSize, askSize, tickAttribBidAsk):
         if reqId == 9202:
             self.quote = {"bid": str(bidPrice), "ask": str(askPrice), "quote_time_epoch": timestamp}
+            self.mark("quote")
             self.quote_ready.set()
 
     def currentTime(self, timestamp):
         self.server_time, self.clock_received = timestamp, time.monotonic()
+        if self.quote_phase:
+            self.mark("clock")
         self.clock_ready.set()
 
     def error(self, reqId, errorTime, errorCode, errorString, advancedOrderRejectJson=""):
         if errorCode in (10089, 10167):
             self.delayed = True
-        if errorCode not in frozen().INFO_CODES or self.delayed:
-            self.errors.append(errorCode)
+        entry = {"reqId": reqId, "code": errorCode,
+                 "text": frozen().scrub_serialized(frozen().redact(errorString)[:160], self.accounts)}
+        fatal = reqId == 9202 or errorCode in CONNECTIVITY_CODES or errorCode in (10089, 10167)
+        (self.errors if fatal else self.info).append(entry)
+        if fatal:
             self.quote_ready.set()
             self.clock_ready.set()
+            if errorCode in CONNECTIVITY_CODES:
+                self.ready.set()
+                self.accounts_ready.set()
 
     def marketDataType(self, reqId, marketDataType):
         if marketDataType in (3, 4):
@@ -324,61 +357,126 @@ class QuoteState:
         self.delayed_tick(tickType)
 
 
-def build_quote_client():
+class AdmissionState(frozen().CheckState, QuoteState):
+    """Reuse frozen flat-check callbacks and quote callbacks on one session."""
+
+    def __init__(self):
+        frozen().CheckState.__init__(self)
+        QuoteState.__init__(self)
+
+    def managedAccounts(self, accountsList):
+        frozen().CheckState.managedAccounts(self, accountsList)
+        QuoteState.managedAccounts(self, accountsList)
+
+    def currentTime(self, timestamp):
+        frozen().CheckState.currentTime(self, timestamp)
+        QuoteState.currentTime(self, timestamp)
+
+    def error(self, reqId, errorTime, errorCode, errorString, advancedOrderRejectJson=""):
+        frozen().CheckState.error(self, reqId, errorTime, errorCode, errorString, advancedOrderRejectJson)
+        QuoteState.error(self, reqId, errorTime, errorCode, errorString, advancedOrderRejectJson)
+
+
+def build_admission_client():
     from ibapi.client import EClient
     from ibapi.wrapper import EWrapper
 
-    class QuoteClient(QuoteState, EWrapper, EClient):
+    class QuoteClient(AdmissionState, EWrapper, EClient):
         def __init__(self):
-            QuoteState.__init__(self)
+            AdmissionState.__init__(self)
             EClient.__init__(self, self)
 
     return QuoteClient()
 
 
-def quote_check(plan, port, account_id, *, deadline, client_factory=None):
-    """A separate client-92 read after the flat pre-check, before node creation."""
-    client = (client_factory or build_quote_client)()
-    reader = None
+class CheckSession:
+    """Hold the frozen check's session until quote admission and join its reader.
+
+    Official ibapi 10.45.1 client.py: connect creates EReader and startApi;
+    run drains the shared message queue; disconnect closes/reset but does not
+    join those threads. Intercept only the frozen harness's final disconnect,
+    leaving EClient's own disconnect on connection loss unchanged.
+    """
+
+    def __init__(self, client):
+        self.client, self.runner = client, None
+
+    def __getattr__(self, name):
+        return getattr(self.client, name)
+
+    def connect(self, host, port, client_id):
+        self.client.connect(host, port, client_id)
+        if self.client.isConnected():
+            self.client.mark("connected")
+
+    def run(self):
+        self.runner = threading.current_thread()
+        self.client.run()
+
+    def disconnect(self):
+        pass  # The outer admission scope owns teardown after both read phases.
+
+    def close(self, deadline):
+        reader = getattr(self.client, "reader", None)
+        try:
+            self.client.disconnect()
+        finally:
+            for thread in (self.runner, reader):
+                if thread is not None and thread is not threading.current_thread():
+                    thread.join(timeout=max(0, deadline - time.monotonic()))
+
+
+def quote_check(plan, account_id, *, deadline, client):
+    """Continue the already-connected flat-check client; never reconnect."""
     requested = False
 
     def wait(event):
-        return event.wait(max(0, deadline - time.monotonic()))
+        while not event.is_set() and time.monotonic() < deadline:
+            if client.errors or not client.isConnected():
+                return False
+            event.wait(min(0.05, max(0, deadline - time.monotonic())))
+        return event.is_set()
+
+    def result(value):
+        return {**value, **client.diagnostics()}
+
+    def failed_wait(status):
+        if client.errors or client.delayed:
+            return result(admit_quote(plan, client.quote, client.server_time,
+                                      delayed=client.delayed, errors=[entry["code"] for entry in client.errors]))
+        return result({"status": status, "error": "quote_check_deadline" if time.monotonic() >= deadline else "connection_lost"})
 
     try:
-        client.connect(plan["host"], port, plan["client_ids"]["check"])
         if not client.isConnected():
-            return {"status": "not_connected"}
-        reader = threading.Thread(target=client.run, daemon=True)
-        reader.start()
+            return result({"status": "not_connected"})
         if not wait(client.ready) or not wait(client.accounts_ready):
-            return {"status": "not_connected"}
+            return failed_wait("not_connected")
+        if client.errors:
+            return failed_wait("not_connected")
         if client.accounts != [account_id] or not account_id.startswith("DU"):
-            return {"status": "refused_quote_account_scope"}
+            return result({"status": "refused_quote_account_scope"})
+        client.quote_phase = True
         client.reqMarketDataType(1)
         requested = True
+        client.mark("tick requested")
         client.reqTickByTickData(9202, frozen().spy_contract(), "BidAsk", 0, False)
         if not wait(client.quote_ready):
-            return {"status": "refused_quote_unavailable"}
+            return failed_wait("refused_quote_unavailable")
         if client.delayed or client.errors:
-            return admit_quote(plan, client.quote, client.server_time,
-                               delayed=client.delayed, errors=client.errors)
+            return failed_wait("refused_quote_error")
+        client.clock_ready.clear()  # Discard the clock from the flat pre-check.
+        client.server_time, client.clock_received = None, None
         client.reqCurrentTime()
         if not wait(client.clock_ready):
-            return {"status": "refused_quote_clock"}
+            return failed_wait("refused_quote_clock")
         elapsed = max(0, time.monotonic() - client.clock_received) if client.clock_received is not None else 0
-        result = admit_quote(plan, client.quote, client.server_time, elapsed_seconds=elapsed,
-                             delayed=client.delayed, errors=client.errors)
-        result["admitted_monotonic"] = time.monotonic()
-        return result
+        admitted = admit_quote(plan, client.quote, client.server_time, elapsed_seconds=elapsed,
+                              delayed=client.delayed, errors=[entry["code"] for entry in client.errors])
+        admitted["admitted_monotonic"] = time.monotonic()
+        return result(admitted)
     finally:
-        try:
-            if requested:
-                client.cancelTickByTickData(9202)
-        finally:
-            client.disconnect()
-            if reader is not None:
-                reader.join(timeout=1)
+        if requested:
+            client.cancelTickByTickData(9202)
 
 
 def validate_child_admission(plan, payload, *, monotonic_now=None):
@@ -669,7 +767,8 @@ def orders_in_flight(orders):
     """Upstream close-on-stop runs once; wait for entry resolution before stop."""
     terminal = {"FILLED", "CANCELED", "EXPIRED", "REJECTED", "DENIED"}
     return any(order.status.name not in terminal and
-               (order.status.name == "SUBMITTED" or order.venue_order_id is None) for order in orders)
+               (order.order_type.name == "MARKET" or order.time_in_force.name in ("IOC", "FOK")
+                or order.status.name == "SUBMITTED" or order.venue_order_id is None) for order in orders)
 
 
 def stop_ready(orders, now, node_stop_at):
@@ -683,7 +782,7 @@ async def node_phase(plan, port, receipt_path, payload):
     the hard deadline; OS process termination cannot strand this awaitable.
     """
     if not validate_child_admission(plan, payload):
-        raise ValueError("refused_child_quote_admission")
+        return persist_child_refusal(receipt_path, payload, "refused_child_quote_admission")
     receipt, account_id = payload["receipt"], payload["account_id"]
     node = build_node(plan, port, account_id, tob_offset_ticks=payload["tob_offset_ticks"])
     # Live view: node.rs py_cache uses PyCache::from_rc(kernel.cache());
@@ -737,6 +836,15 @@ async def node_phase(plan, port, receipt_path, payload):
                 await asyncio.sleep(0.1)
         except Exception as exc:
             record_error("node_poll", exc)
+            # An accepted MARKET IOC can still fill; preserve close-on-stop's
+            # one opportunity to see its position even if observation failed.
+            while not task.done() and time.monotonic() < payload["node_stop_at"]:
+                try:
+                    if stop_ready(tester_orders(cache), time.monotonic(), payload["node_stop_at"]):
+                        break
+                except Exception:
+                    pass  # Unknown state waits only to the bounded deadline.
+                await asyncio.sleep(0.1)
             stop("poll_exception")
         await task  # Native cancel/close runs even after an observer exception.
     except Exception as exc:
@@ -795,10 +903,27 @@ def official_check(plan, port, *, with_session, deadline):
         signal.signal(signal.SIGALRM, previous)
 
 
-def official_quote(plan, port, account_id, *, deadline):
+def official_admission(plan, port, *, deadline, client_factory=None):
+    """Flat pre-check and quote admission share one official client-92 session."""
     seconds = min(plan["timeouts"]["check_seconds"], max(0, deadline - time.monotonic()))
+    client = (client_factory or build_admission_client)()
+    session = CheckSession(client)
+    check_deadline = time.monotonic() + seconds
+    pre = {"client": "ibapi", "client_id": 92, "status": "not_connected", "observed": client.r}
+    account_id = None
+
+    def failure(exc):
+        status = "not_connected"
+        if "tick requested" in client.stage_elapsed_seconds:
+            status = "refused_quote_clock" if "quote" in client.stage_elapsed_seconds else "refused_quote_unavailable"
+        if client.delayed:
+            status = "refused_delayed_quote"
+        elif client.errors and status != "not_connected":
+            status = "refused_quote_error"
+        return {"status": status, "error": frozen().redact(exc), **client.diagnostics()}
+
     if seconds <= 0:
-        return {"status": "refused_quote_deadline"}
+        return pre, None, failure("quote_check_deadline")
 
     def expired(_sig, _frame):
         raise CheckTimeout("quote_check_deadline")
@@ -806,22 +931,27 @@ def official_quote(plan, port, account_id, *, deadline):
     previous = signal.signal(signal.SIGALRM, expired)
     signal.setitimer(signal.ITIMER_REAL, seconds)
     try:
-        return quote_check(plan, port, account_id, deadline=time.monotonic() + seconds)
-    except OSError as exc:
-        return {"status": "not_connected", "error": frozen().redact(exc)}
-    except CheckTimeout:
-        return {"status": "refused_quote_deadline"}
+        pre, account_id = frozen().run_check(plan, port, with_session=True,
+                                             client_factory=lambda: session, deadline_s=seconds)
+        if pre["status"] != "passed" or not account_id:
+            return pre, account_id, {"status": "not_run", **client.diagnostics()}
+        admitted = quote_check(plan, account_id, deadline=check_deadline, client=client)
+        return pre, account_id, admitted
     except Exception as exc:
-        return {"status": "refused_quote_error", "error": frozen().redact(exc)}
+        return pre, account_id, failure(exc)
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)
         signal.signal(signal.SIGALRM, previous)
+        session.close(check_deadline)
 
 
 def final_status(receipt, *, interrupted=False, child_returncode=0):
     """Flat-proof failure dominates; observed/case/loss breaches remain failed."""
     if receipt["flat_proof"]["status"] != "passed":
         return "cleanup_required", "independent_flat_proof", 4, ("C4",)
+    child_refusal = receipt["node"].get("pre_node_refusal")
+    if not receipt["node"]["started"] and child_refusal:
+        return child_refusal, child_refusal, 2, CASE_IDS
     rt = receipt["roundtrip"]
     if (any(f["reason"].startswith("observed_") for f in receipt["failures"])
             or any(c["outcome"] == "failed" for c in receipt["cases"].values())
@@ -869,11 +999,12 @@ def run_trial(args, *, now=None, versions=None):
     # bound; the engine cap remains configured with its route limitation stated.
     deadline = started_monotonic + plan["timeouts"]["overall_deadline_seconds"]
     port = args.port if args.port is not None else plan["default_port"]
-    pre, account_id = official_check(plan, port, with_session=True, deadline=deadline)
+    pre, account_id, admitted = official_admission(plan, port, deadline=deadline)
     liquid = pre.pop("liquid_hours", "")
     pre.pop("trading_hours", None)
     zone = pre.pop("time_zone_id", "America/New_York")
     receipt["pre_check"] = pre
+    receipt["quote_admission"] = admitted
     if pre["status"] != "passed" or not account_id:
         finish(receipt, pre["status"] if pre["status"] != "passed" else "refused_account_scope", reason="pre_check")
         write_receipt(args.receipt, receipt, (account_id,))
@@ -883,8 +1014,6 @@ def run_trial(args, *, now=None, versions=None):
         finish(receipt, "refused_liquid_hours", reason="whole_run_broker_window")
         write_receipt(args.receipt, receipt, (account_id,))
         return receipt
-    admitted = official_quote(plan, port, account_id, deadline=deadline)
-    receipt["quote_admission"] = admitted
     if admitted["status"] != "passed":
         finish(receipt, admitted["status"], reason="quote_admission")
         write_receipt(args.receipt, receipt, (account_id,))
@@ -970,20 +1099,63 @@ def parser():
     return result
 
 
+def persist_child_refusal(path, payload, reason):
+    """Keep a sanitized pre-node reason even though child output is discarded."""
+    receipt = payload.get("receipt") if isinstance(payload, dict) else None
+    if not isinstance(receipt, dict):
+        try:
+            receipt = json.loads(Path(path).read_text())
+        except (OSError, TypeError, ValueError):
+            receipt = new_receipt(load_plan(), PLAN_PATH, runtime_versions())
+    receipt["node"]["pre_node_refusal"] = reason
+    finish(receipt, reason, reason=reason)
+    if path is not None:
+        account = payload.get("account_id") if isinstance(payload, dict) else None
+        write_receipt(path, receipt, (account,))
+    return receipt
+
+
+def run_child(args):
+    try:
+        payload = json.load(sys.stdin)
+        if not isinstance(payload, dict):
+            raise ValueError("invalid child payload")
+    except (ValueError, OSError):
+        persist_child_refusal(args.receipt, {}, "refused_child_payload")
+        return 3
+    try:
+        plan = load_plan(args.plan)
+        reason = "refused_child_plan" if validate_plan(plan, port=args.port) else None
+    except (ValueError, OSError):
+        reason = "refused_child_plan"
+    if reason is None and runtime_refusal(runtime_versions()):
+        reason = "refused_child_runtime"
+    if reason is None:
+        try:
+            inside = frozen().rth_check(datetime.now(timezone.utc), plan,
+                                        horizon_s=max(0, payload["node_stop_at"] - time.monotonic()))[0]
+            if not inside:
+                reason = "refused_child_window"
+        except (KeyError, TypeError, ValueError):
+            reason = "refused_child_payload"
+    if reason is None and not validate_child_admission(plan, payload):
+        reason = "refused_child_quote_admission"
+    if reason:
+        persist_child_refusal(args.receipt, payload, reason)
+        return 3
+    receipt = asyncio.run(node_phase(plan, args.port, args.receipt, payload))
+    if receipt["node"].get("pre_node_refusal"):
+        return 3
+    return 1 if receipt["failures"] else 0
+
+
 def main(argv=None):
     args = parser().parse_args(argv)
     try:
         if args._node_phase:
             # The pipe supplies the admitted quote and derived offset; validate
             # before node creation. This entry never loads an account from env.
-            plan = load_plan(args.plan)
-            if validate_plan(plan, port=args.port) or runtime_refusal(runtime_versions()):
-                return 3
-            payload = json.load(sys.stdin)
-            if not frozen().rth_check(datetime.now(timezone.utc), plan, horizon_s=max(0, payload["node_stop_at"] - time.monotonic()))[0] or not validate_child_admission(plan, payload):
-                return 3
-            receipt = asyncio.run(node_phase(plan, args.port, args.receipt, payload))
-            return 1 if receipt["failures"] else 0
+            return run_child(args)
         receipt = run_trial(args)
     except Exception as exc:
         print(frozen().scrub_serialized(json.dumps({"status": "incomplete", "exit_code": 1, "error": frozen().redact(exc)})))

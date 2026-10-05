@@ -75,6 +75,23 @@ helpers and official read-only checker are loaded. Its 1.231.0 strategy is never
 constructed. The receipt binds that dependency with `source_hashes` in addition
 to the new runner and plan hashes.
 
+Round r3 keeps the flat pre-check and quote admission in **one client-92
+session**. A small session proxy postpones the frozen check's final disconnect
+until the quote is admitted, then closes and joins the message-loop and EReader
+threads within the unchanged 30-second check deadline. The official ibapi
+10.45.1 `client.py` source supplied with the installed package justifies this:
+`connect()` creates EReader and starts the API, `run()` drains its message queue,
+and `disconnect()` closes/resets the transport without joining either reader.
+Keeping that session removes the immediate same-id reconnect boundary.
+
+Quote diagnostics retain the last milestone (`connected`, `nextValidId`,
+`accounts`, `tick requested`, `quote`, `clock`), elapsed and per-stage timings,
+and reqIds/codes with redacted text for errors and information. A deadline
+exception retains the same diagnostics. Only quote-request 9202 errors,
+connectivity failures and delayed-data codes refuse quote admission; unrelated
+farm notices remain information. The original trial's exact timeout cause is
+unproven, so the next coordinator run can distinguish the remaining callbacks.
+
 ## Environment and commands
 
 Use the prepared Python 3.12 environment. To reproduce its three pins with uv:
@@ -147,7 +164,7 @@ Changes from the upstream example are bounded configuration and observation:
 | Sell quotes and other orders | Disable limit sells, stops and brackets. Entry quantity and limit quantity remain one; entry stays MARKET IOC on the first quote. |
 | Resting order | Derive `tob_offset_ticks=floor(0.5 * admitted_bid / 0.01)`; pass and validate it through the pipe. Set `use_post_only=False` because rc5's IB adapter denies every post-only submit. |
 | Resting lifetime | Use GTD with seven-minute expiration and explicitly disable modify/cancel-replace. Upstream `limit_order_is_one_shot` treats an expiration as one attempt, preventing repeated rejected or filled limit buys. |
-| Stop | Preserve native cancel/close-on-stop and `reduce_only_on_stop=False`; enable `use_individual_cancels_on_stop=True`. Defer requested stops until no strategy order is SUBMITTED or lacks a venue id, with terminal orders excluded and the deadline as the bound. Native close remains MARKET GTC. |
+| Stop | Preserve native cancel/close-on-stop and `reduce_only_on_stop=False`; enable `use_individual_cancels_on_stop=True`. Nonterminal MARKET and IOC/FOK orders remain in flight through acceptance until terminal; other orders defer stop when SUBMITTED or lacking a venue id. The deadline bounds the wait. Native close remains MARKET GTC. |
 | Node timeouts | Use `_common.py`'s builder methods with the frozen 60-second connection budget, 5-second reconciliation/portfolio/disconnection timeouts and a 45-second post-stop grace for callbacks. |
 | Runtime control | Host the node with upstream `run_async()`, capture cache/handle first and handle SIGINT, SIGTERM and SIGHUP. A parent process reserves the final 60 seconds for independent observation and requests graceful stop before enforcing the hard deadline. |
 | Logging | Set native stdout/file log levels OFF and `print_config=False`; send child stdout/stderr to DEVNULL and remove RUST_LOG, NAUTILUS_LOG and TWS_ACCOUNT from its environment. Read receipt evidence from the shared cache. |
@@ -165,7 +182,8 @@ custom strategy's sequential chronology. The wrapper watches until C1 acceptance
 and C3's full fill are present, or a failure, signal, case timeout or deadline
 requests stop. The native strategy then supplies C2 and C4. Native cache events
 with `reconciliation=True` cannot establish venue acceptance or cancellation.
-An observer exception requests native stop and awaits the running task;
+An observer exception also waits for in-flight entry resolution before native
+stop, bounded by the deadline, then awaits the running task;
 snapshot, receipt, signal removal and disposal each have independent cleanup.
 The handle receives stop only once. Parent deadline enforcement and independent
 flat proof remain in place if graceful shutdown cannot complete.
@@ -185,6 +203,8 @@ The receipt kind is `ibkr_paper_orders_nautilus_2_0_0rc5`, with evidence class
 blocked acceptance step and cases. A provisional `cleanup_required` receipt is
 atomically written before starting the node and refreshed as observations arrive.
 A killed child leaves that provisional state for the parent and reviewer.
+Pre-node child refusals write a `refused_child_*` reason before exiting; the
+parent retains that cause after successful independent flat proof.
 
 The reader records order aliases, types, sides, limit prices, event types,
 Nautilus event/init timestamps, fills, quantities, commissions and currencies.
@@ -233,7 +253,7 @@ from this builder advances broker readiness or a strategy gate.
 Use a scratch directory outside the worktree and outside `/tmp`, with nice 19:
 
 ```sh
-orders_scratch="${XDG_CACHE_HOME:-$HOME/.cache}/rc5-orders-r2/tmp"
+orders_scratch="${XDG_CACHE_HOME:-$HOME/.cache}/rc5-orders-r3/tmp"
 rtk mkdir -p "$orders_scratch"
 rtk env TMPDIR="$orders_scratch" PYTHONDONTWRITEBYTECODE=1 nice -n 19 \
   "$orders_env/bin/python" -m unittest tests.test_ibkr_paper_orders_rc5
@@ -247,7 +267,9 @@ rtk env TMPDIR="$orders_scratch" nice -n 19 git diff --check
 The tests cover plan and endpoint violations, windows, pins, redaction, receipts,
 synthetic C1–C4 mapping, quote age/delay/headroom refusals, offset validation,
 deferred and single stop, observer cleanup failures, provisional receipt timing,
-flat-proof causes and final breach statuses. Installed checks exercise the real
+flat-proof causes and final breach statuses. Round r3 also tests shared-session
+admission, missing-callback and deadline diagnostics, farm notice routing,
+accepted entry deferral and persisted child refusals. Installed checks exercise the real
 config/model constructors, post-only and individual-cancel flags and logger
 config and the real builder/cache handle without starting the node. They skip
 without rc5. All network readers and node execution are
