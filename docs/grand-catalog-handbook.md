@@ -444,7 +444,8 @@ maintenance design. In brief:
   check. `dependency-review` fails on high-severity advisories, and
   `security-scan`'s `osv-scanner` fails on any unignored advisory in every
   tracked lockfile except a reasoned test-fixture exclusion. Both are required
-  checks, observed since 2026-10-02. The committed G-11 target turns strict
+  checks, live by 2026-09-25 (github-automation.md, "Ruleset upgrade,
+  2026-09-22") and re-read on 2026-10-02 and 2026-10-04. The committed G-11 target turns strict
   up-to-date checks on; the coordinator applies it after merge and the landing
   queue's `BEHIND` refresh change is ready. The target retains the CodeQL
   `code_scanning` rule and leaves `required_signatures` out
