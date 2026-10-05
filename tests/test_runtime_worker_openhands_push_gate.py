@@ -33,7 +33,7 @@ from tests.test_runtime_worker_openhands_resolver import (
 ROOT = Path(__file__).resolve().parents[1]
 RESOLVER = "blueprints/runtime-workers/openhands/resolver"
 ENFORCING = (f"{RESOLVER}/push_gate.py", f"{RESOLVER}/patch_policy.py", f"{RESOLVER}/gate_reads.py",
-             f"{RESOLVER}/gh_harness.py")
+             f"{RESOLVER}/gh_harness.py", "blueprints/runtime-workers/openhands/resolver.py")
 # The zizmor version the gate enforces, read from the file and with the pattern the gate uses
 # (push_gate.ZIZMOR_PIN_FILE, push_gate.ZIZMOR_PIN), so a pin bump moves these tests with it and the real-zizmor test
 # keeps running against the newly pinned release instead of skipping.
@@ -117,7 +117,7 @@ GATE_FILES = {
 
 
 class GateFixture:
-    """A bare fixture origin whose main carries the three enforcing files, the trusted checkout
+    """A bare fixture origin whose main carries the enforcing sources and driver, the trusted checkout
     the gate runs from (a clone of that main), and agent clones with planted commits."""
 
     def __init__(self, root, overrides=None, *, source=ROOT):
@@ -471,6 +471,45 @@ class WorkflowReaderTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.g = load_gate(ROOT)
+
+    def test_git_v2430_dotgitmodules_path_utils_vectors(self):
+        # git/git v2.43.0 t/t0060-path-utils.sh:439-528, including both --not
+        # controls and the empty-prefix fallback names at :495-496. The helper
+        # t/helper/test-path-utils.c:406-409 checks HFS and NTFS equivalents.
+        matches = (
+            ".gitmodules", ".git\u200cmodules", ".Gitmodules", ".gitmoduleS",
+            ".gitmodules ", ".gitmodules.", ".gitmodules  ", ".gitmodules. ",
+            ".gitmodules .", ".gitmodules..", ".gitmodules   ", ".gitmodules.  ",
+            ".gitmodules . ", ".gitmodules  .",
+            ".Gitmodules ", ".Gitmodules.", ".Gitmodules  ", ".Gitmodules. ",
+            ".Gitmodules .", ".Gitmodules..", ".Gitmodules   ", ".Gitmodules.  ",
+            ".Gitmodules . ", ".Gitmodules  .",
+            "GITMOD~1", "gitmod~1", "GITMOD~2", "gitmod~3", "GITMOD~4",
+            "GITMOD~1 ", "gitmod~2.", "GITMOD~3  ", "gitmod~4. ",
+            "GITMOD~1 .", "gitmod~2   ", "GITMOD~3.  ", "gitmod~4 . ",
+            "GI7EBA~1", "gi7eba~9", "GI7EB~10", "GI7EB~11", "GI7EB~99",
+            "GI7EB~10", "GI7E~100", "GI7E~101", "GI7E~999", "~1000000", "~9999999",
+            ".gitmodules:$DATA", "gitmod~4 . :$DATA",
+        )
+        nonmatches = (
+            ".gitmodules x", ".gitmodules .x", " .gitmodules", "..gitmodules", "gitmodules",
+            ".gitmodule", ".gitmodules x ", ".gitmodules .x",
+            "GI7EBA~", "GI7EBA~0", "GI7EBA~~1", "GI7EBA~X", "Gx7EBA~1", "GI7EBX~1",
+            "GI7EB~1", "GI7EB~01", "GI7EB~1X", ".gitmodules,:$DATA",
+        )
+        for expected, vectors in ((True, matches), (False, nonmatches)):
+            for vector in vectors:
+                with self.subTest(vector=vector, expected=expected):
+                    self.assertEqual("gitmodules" in self.g.path_refusals("docs/" + vector), expected)
+
+    def test_git_v2430_dotgit_rejection_vectors(self):
+        # t0060 has is_dotgitmodules, not an is_ntfs_dotgit vector block.
+        # git/git v2.43.0 t/t1014-read-tree-confusing.sh:45-54 supplies these
+        # .git forms; path.c:1419-1453 supplies the component/suffix semantics.
+        for vector in (".git", ".GIT", "\u200c.Git", ".gI\u200cT", ".GiT\u200c", "git~1",
+                       ".git. ", ".\\.GIT\\foobar", ".git\\foobar", ".git...:alternate-stream"):
+            with self.subTest(vector=vector):
+                self.assertIn("git_component", self.g.path_refusals("docs/" + vector))
 
     def test_values_are_read_in_every_supported_form(self):
         text = ("on: [push, pull_request]\n"
@@ -1292,6 +1331,43 @@ class OwnedPathGateTests(unittest.TestCase):
                 clone, head = self.literal_commit(path)
                 self.refuse(control, clone, head, "gitmodules")
 
+    def test_gitmodules_empty_prefix_fallback_refuses(self):
+        for path in ("docs/~1000000", "docs/~9999999"):
+            with self.subTest(path=path):
+                clone, head = self.literal_commit(path)
+                self.refuse("gitmodules_empty_prefix_fallback", clone, head, "gitmodules")
+
+    def test_compiled_module_artifacts_refuse_even_when_owned(self):
+        # CI targets CPython v3.12.3 (.github/workflows/validate.yml:227-228).
+        # Its Lib/importlib/_bootstrap_external.py:1724-1732 tries extensions
+        # before source. :1095-1126 loads unchecked-hash caches without checking
+        # source (PEP 552); Doc/library/importlib.rst:1265-1308 maps PEP 3147 caches.
+        paths = (
+            "scripts/__pycache__/gate_helpers.cpython-312.pyc",
+            "scripts/gate_helpers.pyc", "scripts/gate_helpers.pyo", "scripts/gate_helpers.abi3.so",
+            "scripts/gate_helpers.pyd", "scripts/gate_helpers.dylib", "scripts/gate_helpers.dll",
+            "docs/outer/__pycache__/inventory.txt", "docs/__PYCACHE__/inventory.txt", "docs/m.SO",
+            "docs/__\uff50\uff59\uff43\uff41\uff43\uff48\uff45__/inventory.txt",
+            "docs/m.\uff53\uff4f", "docs/m.so. ", "docs/m.pyd:stream",
+        )
+        for path in paths:
+            with self.subTest(path=path):
+                clone, head = self.fixture.agent_commit({path: b"synthetic module artifact\n"})
+                self.refuse("compiled_module_add", clone, head, "compiled_module_artifact", ("docs", "scripts"))
+
+    def test_compiled_module_modify_and_delete_refuse(self):
+        path = "docs/m.abi3.so"
+        fixture = GateFixture(self.tmp / "compiled-existing", {path: b"existing artifact\n"})
+        gate = load_gate(fixture.trusted).PushGate(git=REAL_GIT, zizmor=self.zizmor)
+        for control, data in (("compiled_module_modify", b"changed artifact\n"), ("compiled_module_delete", None)):
+            with self.subTest(control=control):
+                clone, head = fixture.agent_commit({path: data})
+                with contextlib.redirect_stderr(io.StringIO()):
+                    record = gate.check(str(clone), base=fixture.base, head=head, owned_paths=("docs",))
+                self.observe(control, record)
+                self.assertEqual(record["status"], "fail")
+                self.assertIn("compiled_module_artifact", record["reasons"])
+
     def test_case_and_unicode_collisions(self):
         for control, paths in (("case_collision", ("docs/Readme", "docs/readme")),
                                ("unicode_nfc_collision", ("docs/caf\u00e9", "docs/cafe\u0301")),
@@ -1328,6 +1404,23 @@ class OwnedPathGateTests(unittest.TestCase):
 
                 with mock.patch.object(self.module, "_git", side_effect=git):
                     self.refuse(control, clone, head, "diff_output_invalid")
+
+    def test_diff_tree_failure_reports_diff_failed_and_refuses(self):
+        clone, head = self.fixture.agent_commit({"docs/a.md": "changed\n"})
+        native_run = self.module.subprocess.run
+
+        def run(argv, *args, **kwargs):
+            if "diff-tree" in argv:
+                return subprocess.CompletedProcess(argv, 128, b"", b"fixture diff failure\n")
+            return native_run(argv, *args, **kwargs)
+
+        # Inject at subprocess, so _git's check=True cannot be bypassed by a
+        # fake high-level return value. The old code reports git_failed here.
+        with mock.patch.object(self.module.subprocess, "run", side_effect=run):
+            record = self.refuse("diff_tree_nonzero", clone, head, "diff_failed")
+        self.assertEqual(record["paths"], [])
+        self.assertIsNone(record["changed_path_count"])
+        self.assertEqual(record["owned_path_count"], 1)
 
     def test_missing_and_invalid_owned_list_refuse(self):
         clone, head = self.fixture.agent_commit({"docs/a.md": "changed\n"})
@@ -1581,6 +1674,24 @@ class PushGateTests(unittest.TestCase):
                 record, _ = self.check({"docs/a.md": "b\n"}, fixture=fixture,
                                        gate=self.gate(module=load_gate(fixture.trusted)))
                 self.assertEqual((record["status"], record["reasons"]), ("fail", ["gate_file_modified"]))
+
+    def test_a_locally_modified_resolver_driver_refuses(self):
+        fixture = GateFixture(self.tmp / f"driver-modified-{secrets.token_hex(3)}")
+        with open(fixture.trusted / "blueprints/runtime-workers/openhands/resolver.py", "a",
+                  encoding="utf-8") as handle:
+            handle.write("# uncommitted enforcement-input change\n")
+        record, _ = self.check({"docs/a.md": "b\n"}, fixture=fixture,
+                               gate=self.gate(module=load_gate(fixture.trusted)))
+        self.assertEqual((record["status"], record["reasons"]), ("fail", ["gate_file_modified"]))
+
+    def test_a_stale_resolver_driver_refuses(self):
+        fixture = GateFixture(self.tmp / f"driver-stale-{secrets.token_hex(3)}")
+        stale = load_gate(fixture.trusted)
+        driver = "blueprints/runtime-workers/openhands/resolver.py"
+        newer = fixture.advance({driver: (ROOT / driver).read_bytes() + b"# reviewed driver change\n"})
+        clone, head = fixture.agent_commit({"docs/a.md": "b\n"})
+        record = self.gate(module=stale).check(str(clone), base=newer, head=head, owned_paths=("docs",))
+        self.assertEqual((record["status"], record["reasons"]), ("fail", ["gate_differs_from_base"]))
 
     def test_a_trusted_checkout_off_main_refuses(self):
         fixture = GateFixture(self.tmp / f"offmain-{secrets.token_hex(3)}")

@@ -8,8 +8,10 @@ file passes `python3 scripts/validate.py --scan-file`.
 """
 
 import contextlib
+import ast
 import hashlib
 import importlib.util
+import inspect
 import io
 import json
 import os
@@ -23,6 +25,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import textwrap
 import unittest
 from unittest import mock
 import uuid
@@ -267,11 +270,11 @@ class IssueSelectionTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.r.resolver_instruction(selected, task="x", owned_paths=[])
 
-    def test_the_agent_instructions_state_every_category_the_push_gate_refuses(self):
+    def test_emitted_gate_path_rules_match_instruction_and_receipt_policy(self):
         # Cross-family review P2 of 2026-10-04: the skill and the generated instruction told the
         # agent to add or update tests, which the gate refuses on this repository, and omitted the
-        # gate's categories. Both now state each category's phrase and the stop-and-report rule, and
-        # the gate's rules, its agent map and the receipt's rule set stay in step.
+        # gate's categories. Derive emitted rules from their producers, rather than
+        # trusting a closed list that could miss a new path-safety rule.
         gate, receipt = self.r.push_gate, self.r._recipe("receipt")
         selected = self.r.select_issue(issue_fixture(), [], 12, provenance=self.provenance())
         instruction = self.r.resolver_instruction(selected, task="Implement issue 12 within scope.",
@@ -284,10 +287,35 @@ class IssueSelectionTests(unittest.TestCase):
         for stale in ("Add or update tests", "write the failing test first"):
             self.assertNotIn(stale, instruction)
             self.assertNotIn(stale, skill)
-        rules = {*gate.RULE_PRECEDENCE, "github", "codeowners", "gate_code", "workflow_policy_test",
-                 "pr_text_interpolation", "zizmor_finding", "unresolved_read"}
-        self.assertEqual(set(gate.AGENT_RULE_PHRASES) | gate.GATE_ONLY_RULES, rules)
-        self.assertEqual(set(receipt.PUSH_GATE_RULES), rules)
+        rules = set(gate.RULE_PRECEDENCE)
+        safety_producers = (gate.path_refusals, gate.PushGate._check_paths)
+        for producer in (gate.static_rule, gate.Protected.__init__, *safety_producers,
+                         gate.PushGate._check, gate.PushGate._zizmor):
+            syntax = ast.parse(textwrap.dedent(inspect.getsource(producer)))
+            for node in ast.walk(syntax):
+                if producer is gate.static_rule and isinstance(node, ast.Return):
+                    if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
+                        rules.add(node.value.value)
+                if producer is gate.Protected.__init__ and isinstance(node, ast.Assign):
+                    if (isinstance(node.value, ast.Constant) and isinstance(node.value.value, str)
+                            and any(isinstance(target, ast.Subscript)
+                                    and isinstance(target.value, ast.Attribute) and target.value.attr == "files"
+                                    for target in node.targets)):
+                        rules.add(node.value.value)
+                if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Attribute) or not node.args:
+                    continue
+                value = node.args[-1]
+                if not isinstance(value, ast.Constant) or not isinstance(value.value, str):
+                    continue
+                if (node.func.attr == "setdefault" and isinstance(node.func.value, ast.Name)
+                        and node.func.value.id == "paths"
+                        or producer in safety_producers and node.func.attr in ("add", "append")):
+                    rules.add(value.value)
+        named = set(gate.AGENT_RULE_PHRASES) | gate.GATE_ONLY_RULES
+        unnamed = getattr(gate, "UNNAMED_PATH_RULES", frozenset())
+        self.assertFalse(named & unnamed)
+        self.assertEqual(named | unnamed, rules)
+        self.assertEqual(set(receipt.PUSH_GATE_RULES), named)
 
 
 # -- Unit 2 helpers: fixture repositories with local git only (no network).

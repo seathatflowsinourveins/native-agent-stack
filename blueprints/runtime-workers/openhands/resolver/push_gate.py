@@ -37,7 +37,7 @@ and actions with this module's own flags (no configuration file, no ignore comme
 excessive-permissions, dangerous-triggers, cache-poisoning, artipacked or
 template-injection finding refuses (`zizmor_finding`), and an unavailable zizmor fails closed.
 
-Immutable to the agent: this module, its siblings patch_policy.py and gate_reads.py and the
+Immutable to the agent: this module, patch_policy.py, gate_reads.py, gh_harness.py, resolver.py and the
 rules above run from the checkout this file sits in (TRUSTED_ROOT, from __file__ only, never
 from an argument or the environment). check() refuses when that checkout or a tool lies inside an
 agent tree, when an enforcing file differs from the trusted commit's blob, when the trusted
@@ -78,10 +78,11 @@ DRIVER = "blueprints/runtime-workers/openhands/resolver.py"
 GATE_RELATIVE = f"{RESOLVER_DIR}/push_gate.py"
 # The checkout this file sits in. Never taken from an argument, the environment or cwd.
 TRUSTED_ROOT = GATE_FILE.parents[4]
-# The files that decide what is refused: this module, the derivation it reuses and the
-# harness that calls it. Each must equal the trusted commit's blob and the base's.
+# The files that decide what is refused, including the driver's owned-path
+# freezing/transport and startup control. Each must equal the trusted commit's
+# blob and the base's. Receipt projection does not authorize a push.
 ENFORCING_FILES = (GATE_RELATIVE, f"{RESOLVER_DIR}/patch_policy.py", f"{RESOLVER_DIR}/gate_reads.py",
-                   f"{RESOLVER_DIR}/gh_harness.py")
+                   f"{RESOLVER_DIR}/gh_harness.py", DRIVER)
 
 
 def _sibling(name):
@@ -581,11 +582,12 @@ def _without_pattern_lists(code):
 # GateReads inventories use it separately; Protected never receives those collectors.
 RULE_PRECEDENCE = ("ci_local_action", "ci_discovered", "ci_named", "ci_import", "ci_read")
 
-# Every rule a refused path can carry, with the phrase the agent's instructions use for it
-# (cross-family review P2 of 2026-10-04). skills/resolver/SKILL.md and
-# resolver.resolver_instruction state each phrase and STOP_AND_REPORT, and a test keeps them, this
-# map and the receipt's rule set in step, so no rule reaches the gate without reaching the
-# instructions. unresolved_read now names an unparseable gate script, not a computed read.
+# Named protected-path rules and their instruction phrases. The skill and generated
+# instruction state these phrases and STOP_AND_REPORT. Ownership, mode and path-safety
+# refusals in UNNAMED_PATH_RULES deliberately retain only codes/counts in the receipt;
+# their paths can contain untrusted or unsafe names. A test derives rules from their
+# emitting code and checks this partition and the receipt's named-rule allowlist.
+# unresolved_read names an unparseable gate script, not a computed read.
 AGENT_RULE_PHRASES = {
     "github": ".github/",
     "codeowners": "CODEOWNERS",
@@ -600,6 +602,9 @@ AGENT_RULE_PHRASES = {
     "zizmor_finding": "workflow or action",
 }
 GATE_ONLY_RULES = frozenset({"unresolved_read"})
+UNNAMED_PATH_RULES = frozenset({"unowned_path", "symlink", "gitlink", "mode_change", "type_change",
+                                "invalid_path_component", "absolute_path", "git_component", "gitmodules",
+                                "changed_path_collision", "compiled_module_artifact"})
 STOP_AND_REPORT = ("including a new or changed test, change nothing: stop and report which file would need to "
                    "change and why")
 
@@ -1034,6 +1039,11 @@ class Protected:
 # The owned-list grammar below independently implements patch_policy's documented
 # coordinator contract; neither its normalizer nor its matcher is reused here.
 HFS_IGNORED = frozenset([*range(0x200c, 0x2010), *range(0x202a, 0x202f), *range(0x206a, 0x2070), 0xfeff])
+# CI's CPython v3.12.3 Lib/importlib/_bootstrap_external.py:1724-1732
+# searches extensions before source; :1095-1126 accepts PEP 552 unchecked
+# caches. PEP 3147 cache names are documented in Doc/library/importlib.rst:1265-1308.
+# Deny these artifacts everywhere, independently of the source-module closure.
+MODULE_ARTIFACT_SUFFIXES = (".pyc", ".pyo", ".so", ".pyd", ".dylib", ".dll")
 RAW_CHANGE = re.compile(rb":(000000|100644|100755|120000|160000) "
                         rb"(000000|100644|100755|120000|160000) "
                         rb"([0-9a-f]{40}) ([0-9a-f]{40}) ([AMDT])")
@@ -1081,13 +1091,37 @@ def _git_component(component):
 
 def _gitmodules_component(component):
     hfs = "".join(char for char in component if ord(char) not in HFS_IGNORED).lower()
-    ntfs = component.lower().split(":", 1)[0].rstrip(" .")
-    if hfs == ".gitmodules" or ntfs == ".gitmodules" or re.fullmatch(r"gitmod~[1-4]", ntfs):
+    if hfs == ".gitmodules":
         return True
-    # path.c's fallback 8.3 spelling: a prefix of gi7eba, '~', then decimal digits
-    # to fill exactly eight characters, with the first digit nonzero.
-    return any(re.fullmatch("gi7eba"[:size] + r"~[1-9]" + r"[0-9]" * (6 - size), ntfs)
-               for size in range(1, 7))
+
+    def only_spaces_and_periods(index):
+        return all(char in " ." for char in component[index:].split(":", 1)[0])
+
+    # git/git v2.43.0 path.c:1489-1510, is_ntfs_dot_generic's fallback loop,
+    # with the gitmodules/gi7eba arguments at :1524-1527. Keep its
+    # index zero: the prefix can be empty (~1000000), followed by a nonzero
+    # first digit and enough decimal digits to fill eight characters.
+    if component[:11].lower() == ".gitmodules":
+        return only_spaces_and_periods(11)
+    if component[:7].lower() == "gitmod~" and component[7:8] in ("1", "2", "3", "4"):
+        return only_spaces_and_periods(8)
+    index, saw_tilde = 0, False
+    while index < 8:
+        if index >= len(component):
+            return False
+        char = component[index]
+        if saw_tilde:
+            if not "0" <= char <= "9":
+                return False
+        elif char == "~":
+            index += 1
+            if index >= len(component) or not "1" <= component[index] <= "9":
+                return False
+            saw_tilde = True
+        elif index >= 6 or ord(char) >= 128 or char.lower() != "gi7eba"[index]:
+            return False
+        index += 1
+    return only_spaces_and_periods(index)
 
 
 def path_refusals(path):
@@ -1104,6 +1138,11 @@ def path_refusals(path):
             reasons.add("git_component")
         if any(_gitmodules_component(component) for component in components):
             reasons.add("gitmodules")
+        # Include case/Unicode forms above and NTFS trailing-dot/space/ADS
+        # forms, so an equivalent name cannot bypass the artifact refusal.
+        module_names = [component.split(":", 1)[0].rstrip(" .").casefold() for component in components]
+        if "__pycache__" in module_names or module_names[-1].endswith(MODULE_ARTIFACT_SUFFIXES):
+            reasons.add("compiled_module_artifact")
     return sorted(reasons)
 
 def _git(git, repo, *args, check=True, binary=False):
@@ -1276,7 +1315,7 @@ class PushGate:
     def _changed(self, clone, base, head):
         """git-diff-tree(1): every path the commit adds, deletes, modifies or retypes; renames off."""
         out = _git(self.git, clone, "diff-tree", "-r", "-z", "--no-renames", "--raw", "--no-abbrev",
-                   base, head, binary=True)
+                   base, head, check=False, binary=True)
         if out.returncode != 0:
             raise GateError("diff_failed")
         if not isinstance(out.stdout, bytes) or (out.stdout and not out.stdout.endswith(b"\0")):

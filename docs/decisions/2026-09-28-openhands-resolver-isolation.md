@@ -954,7 +954,7 @@ transport. No general absence claim about all OpenHands capabilities follows.
 | --- | --- | --- |
 | Installed Git, `git version 2.43.0`, exit 0; git/git `v2.43.0` | [read-cache.c](https://github.com/git/git/blob/v2.43.0/read-cache.c#L896), `verify_dotfile`, `verify_path_internal` | Relative component checks; dot/dotdot, empty separators, DOS drive prefixes, case-insensitive `.git`; mode handling |
 | git/git `v2.43.0` | [utf8.c](https://github.com/git/git/blob/v2.43.0/utf8.c#L684), `next_hfs_char`, `is_hfs_dot_generic`, `is_hfs_dotgit` | Every HFS ignorable code point and `.git` equivalence |
-| git/git `v2.43.0` | [path.c](https://github.com/git/git/blob/v2.43.0/path.c#L1381), `is_ntfs_dotgit`, `is_ntfs_dot_generic`, `is_ntfs_dotgitmodules` | Trailing spaces/periods, `git~1`, ADS, backslash separators and `.gitmodules` 8.3/fallback aliases |
+| git/git `v2.43.0` | [path.c](https://github.com/git/git/blob/v2.43.0/path.c#L1489), `is_ntfs_dotgit`, `is_ntfs_dot_generic`, `is_ntfs_dotgitmodules` | Trailing spaces/periods, `git~1`, ADS, backslash separators and `.gitmodules` regular/fallback 8.3 aliases; the fallback loop starts at zero and accepts an empty prefix (`~1000000`, `~9999999`). The first matcher missed that case; the 2026-10-05 repair below corrects it |
 | git/git `v2.43.0` | [fsck.c](https://github.com/git/git/blob/v2.43.0/fsck.c#L590), `fsck_tree`, `check_gitmodules` | Invalid tree names, dotgit aliases, gitmodules symlink and configuration checks; this gate conservatively refuses `.gitmodules` altogether without reading its contents |
 | git/git `v2.43.0` | [Documentation/diff-format.txt](https://github.com/git/git/blob/v2.43.0/Documentation/diff-format.txt#L1), [git-hash-object.txt](https://github.com/git/git/blob/v2.43.0/Documentation/git-hash-object.txt), [git-commit-tree.txt](https://github.com/git/git/blob/v2.43.0/Documentation/git-commit-tree.txt) | Native raw NUL-delimited mode/OID/status/path records, A/M/D/T, renames disabled; native temporary and adversarial-object fixtures |
 | GitHub docs, `82fb420ff85c1b3e66035c4f902bac339de3dd2d`, read 2026-10-04 | [repo-rules.md](https://github.com/github/docs/blob/82fb420ff85c1b3e66035c4f902bac339de3dd2d/data/reusables/gated-features/repo-rules.md), [push-rulesets-overview.md](https://github.com/github/docs/blob/82fb420ff85c1b3e66035c4f902bac339de3dd2d/data/reusables/repositories/push-rulesets-overview.md), [available-rules-for-rulesets.md](https://github.com/github/docs/blob/82fb420ff85c1b3e66035c4f902bac339de3dd2d/content/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets.md#L293) | Hosted file-path push restrictions are the analogue. Push rulesets cover private/internal repositories and their fork networks under the documented Team/Enterprise availability; they are unavailable for this User-owned public repository. Ordinary branch/tag ruleset availability does not confer push-path rules |
@@ -1049,8 +1049,8 @@ exact pushed commit. A demonstrated escape, rather than source popularity, overt
 
 **Completeness critic.** The source/control sweep includes add/modify/delete, both rename
 ends, symlink/gitlink and mode/type changes, literal malformed Git-object components,
-all Git HFS ignorable code points, NTFS suffix/8.3/ADS/backslash classes, fsck gitmodules
-aliases, case/NFC/NFKC collisions, protected compatibility aliases, parser failures,
+all Git HFS ignorable code points, NTFS suffix/8.3/ADS/backslash classes, sampled fsck gitmodules
+aliases (the empty-prefix fallback was missed and is corrected below), case/NFC/NFKC collisions, protected compatibility aliases, parser failures,
 missing/invalid scope, scope provenance, patch/gate independence and exceptions through
 output. The missed modality in a Linux fixture is native HFS/NTFS filesystem execution;
 these are source-derived synthetic Git objects, not a fresh macOS/Windows acceptance.
@@ -1059,3 +1059,105 @@ to Git's aliases/raw format, hosted availability changes, and an independently q
 live attempt on reviewed main. The lifecycle skill sweep for this change used research
 and agent-document writing; installation/activation/service management were out of scope.
 The preserved read-monitor limitations remain separate and are not repaired here.
+
+## Owned-path gate review repairs (2026-10-05)
+
+The correctness and adversarial reads accepted the gate without P1 findings and raised
+the P2 items repaired here. The starting branch head is
+`ee78a711a4c2e1ec92637c1b3f7b241aa1f9146e`, after gate `ed889cf62`, enablement
+`8ce7136dc` and registration. These changes serve the same foundation action: the
+trusted host authorizes the exact commit proposed by a contained worker. They retain
+addition 1, the trusted-memory ownership trace and the fork-isolation overturn.
+No new enablement code, live resolver, GitHub mutation, model/provider call or container
+start is part of the repair. New tests are local unittest integration checks with native
+Git, synthetic artifacts and fake zizmor, not upstream execution or filesystem acceptance.
+
+### Pinned sources and corrections
+
+- Installed Git still reports `git version 2.43.0`. In git/git `v2.43.0`,
+  [path.c:1489-1510](https://github.com/git/git/blob/v2.43.0/path.c#L1489)
+  starts `is_ntfs_dot_generic`'s fallback loop at zero; its `.gitmodules` arguments are
+  [at 1524-1527](https://github.com/git/git/blob/v2.43.0/path.c#L1524).
+  The earlier prefix range of 1-6 was incorrect: the empty prefix is accepted too.
+  The repair ports the loop, including ASCII-only prefix/digit checks and its suffix
+  rule. [t/t0060-path-utils.sh:439-528](https://github.com/git/git/blob/v2.43.0/t/t0060-path-utils.sh#L439)
+  supplies the complete positive/negative `.gitmodules` vector block, including
+  `~1000000` and `~9999999`. Its command is `is_dotgitmodules`, dispatching both HFS
+  and NTFS checks in [t/helper/test-path-utils.c:406-409](https://github.com/git/git/blob/v2.43.0/t/helper/test-path-utils.c#L406).
+  The `.git` rejection vectors instead come from
+  [t/t1014-read-tree-confusing.sh:45-54](https://github.com/git/git/blob/v2.43.0/t/t1014-read-tree-confusing.sh#L45),
+  with [is_ntfs_dotgit at path.c:1419-1453](https://github.com/git/git/blob/v2.43.0/path.c#L1419).
+  Existing alias controls are retained. This corrects the earlier code and completeness
+  claim; it does not claim these locally ported vectors ran Git's upstream harness.
+- CI's target is CPython **3.12.3**, recorded in `.github/workflows/validate.yml:227-228`
+  at the starting head. The host normalizer's 3.13.15 pin is a separate scope. CPython
+  `v3.12.3` [Doc/library/importlib.rst:959-970](https://github.com/python/cpython/blob/v3.12.3/Doc/library/importlib.rst#L959)
+  documents FileFinder's loader/suffix interface; its
+  [cache mapping at 1265-1308](https://github.com/python/cpython/blob/v3.12.3/Doc/library/importlib.rst#L1265)
+  implements PEP 3147 naming. The
+  [import reference at 714-739](https://github.com/python/cpython/blob/v3.12.3/Doc/reference/import.rst#L714)
+  and [PEP 552 description at whatsnew/3.7.rst:425-456](https://github.com/python/cpython/blob/v3.12.3/Doc/whatsnew/3.7.rst#L425)
+  explain unchecked hash caches. The exact import order is in
+  [Lib/importlib/_bootstrap_external.py:1724-1732](https://github.com/python/cpython/blob/v3.12.3/Lib/importlib/_bootstrap_external.py#L1724):
+  extension loaders precede source, then sourceless bytecode. Its
+  [SourceLoader at 1095-1126](https://github.com/python/cpython/blob/v3.12.3/Lib/importlib/_bootstrap_external.py#L1095)
+  can return unchecked cache bytecode without comparing the source hash. From these
+  sources, a compiled sibling or unchecked cache can replace a protected source
+  module's behavior. The gate therefore refuses every `__pycache__` component and
+  `.pyc`, `.pyo`, `.so`, `.pyd`, `.dylib`, `.dll` suffix anywhere, including owned
+  paths and case/normalization/NTFS equivalents, with `compiled_module_artifact`.
+  The broader historical/platform suffix list is a conservative policy; it does not
+  claim every suffix is a default import suffix on this Linux interpreter.
+
+`resolver.py` is now in `ENFORCING_FILES`: its frozen owned tuple, direct harness
+transport and startup control are enforcement inputs. The existing gate, patch policy,
+parser boundary and harness were already present. Receipt projection does not authorize
+pushes and adds no new enforcement input. A locally changed driver returns
+`gate_file_modified`; a trusted/base driver mismatch returns `gate_differs_from_base`.
+
+The instruction map covers named protected-path rules. Ownership, mode, unsafe-path,
+collision and compiled-artifact rules deliberately remain **unnamed** in sanitized
+receipts, with codes and counts retained. Their names can be unsafe or agent-chosen;
+publishing additional path strings is unnecessary. The comments now state that policy.
+The keep-in-step test derives emitted rules from their code producers and checks their
+named/unnamed partition, instruction phrases and receipt allowlist. An added emission
+must be accounted for; a hard-coded closed expected set can no longer hide drift.
+
+`diff-tree` now runs with `_git(check=False)` and an explicit return-code check. A
+nonzero result reaches `diff_failed`, preserving fail-closed behavior; malformed output
+still reaches `diff_output_invalid`. The test injects failure at subprocess, so it cannot
+accidentally bypass `_git`'s return-code handling.
+
+### Known limit and coordinator precondition after enablement
+
+**Never own a path that holds files CI executes through untraced forms.** Inside an
+owned path, a CI input reached only by GateReads advisory analysis still receives no
+`Protected` rule. A literal-path script started by `subprocess` is one example:
+`patch_policy.python_references:413-477` traces imports, importlib/runpy path loads and
+sys.path, but not that invocation. `Protected` excludes monitoring-only inventories.
+The owned-path gate proves scope and cannot determine whether every owned file is safe
+for CI to execute. The coordinator must inspect proposed ownership against these forms;
+there is no automatic plan-time check. This residual became operational when the driver
+was enabled and is prominent in RESOLVER.md's current Known limits section.
+
+**Addition 2 remains not adopted.** Its adoption trigger is a reviewed, independently
+qualified enforcing inventory covering these execution forms, followed by an acceptable
+measured cost for the plan-time ownership intersection. The original cost trigger alone
+is insufficient while the derivation is monitoring only. No evaluator precision repair,
+advisory-to-enforcing promotion or plan-time pre-refusal is built in this round.
+
+Alternatives were to add each compiled alias to the source-module closure, publish path
+names for every new rule, or leave the generic `git_failed` diagnostic. Blanket artifact
+refusal avoids a dependence on loader/platform suffix enumeration; code/count-only
+receipts preserve their existing data boundary; explicit diff failure makes the intended
+diagnostic reachable. A pinned upstream rule change or a demonstrated false pass reopens
+these choices under the existing fork-isolation overturn.
+
+Gate-only hunks are the path checks, enforcement-input list, rule metadata and diff
+handling in `push_gate.py`, the receipt policy comment, and their test/fixture changes.
+Documentation hunks are the alias correction, current driver wording, receipt policy,
+residual/precondition and this dated entry; `gate_reads.py` changes only its docstring.
+No `resolver.py` enablement handler or startup self-test changes in this repair.
+Fail-first evidence is appended to `evidence/owned-path-gate-fail-first.txt`; registration
+is the final repository mutation. Targeted acceptance runs offline with a private TMPDIR
+outside the checkout, correcting the previous builder's fixture placement.

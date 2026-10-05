@@ -41,13 +41,41 @@ The gate independently implements patch_policy's owned-path contract: sorted uni
 relative POSIX entries, trailing slashes dropped, matching an exact entry or a descendant
 under `entry + "/"`. Every A, M, D and T path must match. Even when owned, symlinks,
 gitlinks, mode/type changes, empty/dot/dotdot components, absolute paths, `.git` and its
-Git HFS/NTFS equivalents, and `.gitmodules` (including fsck aliases) refuse. So do casefold
+Git HFS/NTFS equivalents, and `.gitmodules` (including fsck aliases) refuse. Its NTFS
+fallback aliases include an empty prefix, such as `~1000000` and `~9999999`, as well as
+prefixes of `gi7eba`; Git's eight-character loop accepts `~` at index zero. Every
+`__pycache__` component and `.pyc`, `.pyo`, `.so`, `.pyd`, `.dylib` or `.dll` suffix also
+refuses, including case/Unicode and NTFS suffix/ADS equivalents. So do casefold
 and NFC/NFKC aliases of protected paths and collisions between changed paths. Exceptions
 or malformed raw Git output refuse. Gate records and their receipt projection retain
 `changed_path_count`, `owned_path_count` and refusal codes, with unknown counts as `null`
 and no file contents. [Fail-first evidence](evidence/owned-path-gate-fail-first.txt) records
 the old and new decisions; the old gate already refused exceptions, so that retained
 control is honestly recorded as green on both versions.
+
+Named protected-path categories have instruction phrases and can appear as sanitized
+known paths in receipts. Ownership, mode, unsafe-path, collision and compiled-artifact
+classes deliberately stay unnamed in receipts, retaining their refusal codes and counts.
+Their paths may contain unsafe or agent-chosen names. The protocol test derives emitted
+rules from the gate's code and checks the named/unnamed partition and receipt allowlist.
+
+### Known limits
+
+**Coordinator precondition: never own a path that holds files CI executes through
+untraced forms.** The allowlist proves scope; it does not prove that an owned file is
+safe for CI to execute. A file reached only by a GateReads advisory inventory never
+reaches `Protected`. For example, `python_references` does not follow a script invoked
+through `subprocess` even when its path is literal. If that script sits in an owned
+directory and no explicit category protects it, the resolver can change it and CI can
+execute it after enablement. The coordinator must inspect the task's proposed scope
+against these execution forms before assigning ownership; the gate does not perform
+this check automatically.
+
+Addition 2 (plan-time pre-refusal) remains unadopted. Its adoption trigger is a reviewed,
+independently qualified enforcing inventory that covers these CI execution forms, followed
+by an acceptable measured cost for intersecting that inventory with owned paths at plan
+time. The current monitoring-only derivation cannot supply that inventory. These repairs
+do not promote its advisory paths into enforcement or add a plan-time gate.
 
 `PushGate.check` prints `advisory_gate_reads` on stderr on every run and records it under
 the same clearly named field in the receipt. It includes `mode: "monitoring_only"`, sorted
@@ -129,10 +157,11 @@ dated baseline therefore remains unchanged, as instructed; the table above retai
 earlier tree's historical measurements. [Evidence part 15](evidence/push-gate-fail-first.txt)
 records the current measurements, failing-first controls and native command results.
 
-The dormant `run` parser still exposes neither `--gate` nor `--run-id`. The disabled
-public driver still exits 3 before parsing or external calls; its control now patches
-both `subprocess.run` and `socket.create_connection`. The later owned-path allowlist
-gate remains the enablement precondition, and the monitoring reader's known gaps remain.
+At 489-r7, the `run` parser exposed neither `--gate` nor `--run-id`, and the disabled
+public driver exited 3 before parsing or external calls. Its control patched both
+`subprocess.run` and `socket.create_connection`; the owned-path gate was the later
+enablement precondition. The adoption above supersedes that driver status. The parser
+still exposes neither override, and the monitoring reader's known gaps remain.
 
 ### Tree-read failures during monitoring, 489-r8 (2026-10-04)
 

@@ -139,3 +139,70 @@ git diff --check
 exit 0; no output.
 These returned integrity results were recorded, then all ten authored files were registered with scripts.host_receipts.register_file as the final repository mutation. manifests/evidence.json is the generated registration container and excludes its own hash. Read-only checks after that registration are retained in the continuation's structured handoff.
 Run-generated scratch fixtures were removed after the full-suite process exited; all retained acceptance and control logs remain outside TMPDIR under .tmp-build/.
+
+8. Independent-review repair — resolver-gate-r2 — 2026-10-05
+Starting branch source: ee78a711a4c2e1ec92637c1b3f7b241aa1f9146e (gate ed889cf62; enablement 8ce7136dc; registry).
+Evidence class: local unittest integration and synthetic Git/artifact fixtures, not upstream test execution, native Windows/macOS acceptance or a live resolver.
+All commands inherit nice -n 19 and TMPDIR=~/.cache/tres2 outside /tmp and the checkout.
+Pinned sources and the retained trust precondition: docs/decisions/2026-09-28-openhands-resolver-isolation.md#owned-path-gate-review-repairs-2026-10-05
+
+Red on the exact original production source:
+A local clone checks out ee78a711a; only the two current test files overlay it. No production source is replaced or disarmed.
+python3 -m unittest tests.test_runtime_worker_openhands_push_gate.WorkflowReaderTests.test_git_v2430_dotgitmodules_path_utils_vectors tests.test_runtime_worker_openhands_push_gate.WorkflowReaderTests.test_git_v2430_dotgit_rejection_vectors tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_gitmodules_empty_prefix_fallback_refuses tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_compiled_module_artifacts_refuse_even_when_owned tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_compiled_module_modify_and_delete_refuse tests.test_runtime_worker_openhands_push_gate.PushGateTests.test_a_locally_modified_resolver_driver_refuses tests.test_runtime_worker_openhands_push_gate.PushGateTests.test_a_stale_resolver_driver_refuses tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_diff_tree_failure_reports_diff_failed_and_refuses tests.test_runtime_worker_openhands_resolver.IssueSelectionTests.test_emitted_gate_path_rules_match_instruction_and_receipt_policy -v
+exit 1; returned summary: Ran 9 tests in 5.100s; FAILED (failures=24).
+The complete t0060 is_dotgitmodules block has 50 positive and 18 negative vectors. Two empty-prefix positives fail; the other vectors already pass.
+t0060 dispatches is_dotgitmodules to HFS/NTFS checks, rather than a dotgit-only block. Ten .git rejection vectors from t1014 are retained regressions: green before and after.
+The exact-commit empty-prefix controls pass before; all 14 compiled-artifact additions and both modify/delete controls pass before.
+Locally modified and stale resolver.py controls pass before, instead of gate_file_modified/gate_differs_from_base.
+The source-derived rule test fails before: the ten emitted ownership/mode/path-safety rules have no named/unnamed classification.
+The nonzero diff-tree control already refuses before, but incorrectly reports git_failed; its diff_failed assertion is red. This is diagnostic reachability, not a previous false pass.
+
+Green after repair, using the identical nine selectors:
+python3 -m unittest tests.test_runtime_worker_openhands_push_gate.WorkflowReaderTests.test_git_v2430_dotgitmodules_path_utils_vectors tests.test_runtime_worker_openhands_push_gate.WorkflowReaderTests.test_git_v2430_dotgit_rejection_vectors tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_gitmodules_empty_prefix_fallback_refuses tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_compiled_module_artifacts_refuse_even_when_owned tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_compiled_module_modify_and_delete_refuse tests.test_runtime_worker_openhands_push_gate.PushGateTests.test_a_locally_modified_resolver_driver_refuses tests.test_runtime_worker_openhands_push_gate.PushGateTests.test_a_stale_resolver_driver_refuses tests.test_runtime_worker_openhands_push_gate.OwnedPathGateTests.test_diff_tree_failure_reports_diff_failed_and_refuses tests.test_runtime_worker_openhands_resolver.IssueSelectionTests.test_emitted_gate_path_rules_match_instruction_and_receipt_policy -v
+exit 0; returned summary: Ran 9 tests in 2.340s; OK.
+Empty-prefix controls now return gitmodules; all 16 compiled-artifact controls return compiled_module_artifact.
+Driver integrity controls now return gate_file_modified and gate_differs_from_base. The rule protocol accounts for all eleven unnamed classes, including compiled artifacts.
+Nonzero diff-tree returns diff_failed with unknown changed count, owned count 1 and no path names. Malformed-output refusal remains unchanged.
+
+Returned commit decisions (codes/counts only; paired in native fixture order):
+{"after_reasons": ["gitmodules"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "gitmodules_empty_prefix_fallback", "fixture": 1, "owned_path_count": 1}
+{"after_reasons": ["gitmodules"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "gitmodules_empty_prefix_fallback", "fixture": 2, "owned_path_count": 1}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_add", "fixture": 3, "owned_path_count": 2}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_add", "fixture": 4, "owned_path_count": 2}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_add", "fixture": 5, "owned_path_count": 2}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_add", "fixture": 6, "owned_path_count": 2}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_add", "fixture": 7, "owned_path_count": 2}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_add", "fixture": 8, "owned_path_count": 2}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_add", "fixture": 9, "owned_path_count": 2}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_add", "fixture": 10, "owned_path_count": 2}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_add", "fixture": 11, "owned_path_count": 2}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_add", "fixture": 12, "owned_path_count": 2}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_add", "fixture": 13, "owned_path_count": 2}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_add", "fixture": 14, "owned_path_count": 2}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_add", "fixture": 15, "owned_path_count": 2}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_add", "fixture": 16, "owned_path_count": 2}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_modify", "fixture": 17, "owned_path_count": 1}
+{"after_reasons": ["compiled_module_artifact"], "after_status": "fail", "before_reasons": [], "before_status": "pass", "changed_path_count": 1, "control": "compiled_module_delete", "fixture": 18, "owned_path_count": 1}
+{"after_reasons": ["diff_failed"], "after_status": "fail", "before_reasons": ["git_failed"], "before_status": "fail", "changed_path_count": null, "control": "diff_tree_nonzero", "fixture": 19, "owned_path_count": 1}
+
+Preserved per-item red/green steps (native exit codes):
+item 1: red exit 1, 3 tests / 4 failures; green exit 0, 4 tests including the existing fsck-alias test.
+item 2: red exit 1, 2 tests / 16 failures. First green command exited 1 because the guessed test_owned_only_positive selector does not exist; the two new controls themselves passed. Corrected command uses test_owned_only_change_passes: exit 0, 3 tests; owned-only positive returns pass.
+item 3: red exit 1, 2 failures; green exit 0, 3 tests including the existing all-enforcing-files integrity control.
+item 4: both red attempts exit 1 with one assertion failure; the final selector extracts the Protected assignment too. Green exit 0, one test; no hard-coded closed emitted-rule set remains.
+item 5: red exit 1 with git_failed; green exit 0, two tests including existing malformed-output controls.
+
+Required targeted acceptance:
+tests.test_runtime_worker_openhands_receipt does not exist, verified by its exact filename; it is dropped as authorized.
+python3 -m unittest tests.test_runtime_worker_openhands_push_gate tests.test_runtime_worker_openhands_resolver
+exit 1; returned summary: Ran 246 tests in 89.066s; FAILED (errors=1, skipped=3). No test assertion failures.
+The sole error is OutgoingGuardTests.test_installed_gitleaks_refuses_a_token_shape_even_with_an_allow_comment: RuntimeError(gitleaks_failed).
+A single-test replay on the exact original production source also exits 1: Ran 1 test in 0.029s; FAILED (errors=1), with the same exception.
+Installed gitleaks version reports 8.30.1, exit 0. An exact scanner-command probe with benign text returns native exit 1: the installed wrapper cannot open its runtime scan lock because the filesystem is read-only. The guard refuses before a scan; this is not caused by the gate repair.
+The existing scanner test and lock policy are unchanged. Passing targeted acceptance remains open for the coordinator in a host context with access to the runtime lock.
+
+Scope and limits:
+Gate-only source/test hunks: push_gate.py path checks, ENFORCING_FILES, rule classification and diff handling; receipt.py policy comment; both test files and fixtures.
+Documentation hunks: RESOLVER.md aliases/receipt policy/current driver/Known limits; gate_reads.py docstring; decision record corrections and dated repair. No resolver.py enablement implementation changes.
+The advisory-CI-input residual remains: never own a path holding files CI executes through untraced forms. Addition 2 is not adopted or implemented.
+Registration of every changed authored file is the final repository mutation; validate.py, evidence_manifest --check and diff --check results are returned in the handoff after registration.

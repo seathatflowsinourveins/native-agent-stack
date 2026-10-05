@@ -240,7 +240,10 @@ def _matching(value, pattern):
 
 
 # The trusted pre-push gate's records (resolver/push_gate.py, journaled by GhHarness.gates).
-# The rules a path can break, and zizmor's audit names (docs.zizmor.sh/audits).
+# Named protected-path categories, and zizmor's audit names (docs.zizmor.sh/audits).
+# Ownership/mode/path-safety/compiled-artifact classes in push_gate.UNNAMED_PATH_RULES
+# stay unnamed even if marked known: keep their codes and counts, never their paths.
+# The gate's source-derived protocol test checks the named/unnamed partition.
 PUSH_GATE_RULES = frozenset({"github", "codeowners", "gate_code", "workflow_policy_test", "ci_named", "ci_import",
                              "ci_read", "ci_discovered", "ci_local_action", "pr_text_interpolation", "zizmor_finding",
                              "unresolved_read"})
