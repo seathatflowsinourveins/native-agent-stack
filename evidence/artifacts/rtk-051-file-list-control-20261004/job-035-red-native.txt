@@ -1,0 +1,12 @@
+{"failure": "rtk-exactness-controls-diff-and-grep-unchanged", "controls": {"t2b-diff-two-files": {"native": {"exit": 1, "bytes": 23, "lines": 4, "stdout_sha256": "ee59707a39a95e78dc651a9f3ffa61000e8501f933c992b7d53f0809671a57c1"}, "rtk": {"exit": 1, "bytes": 23, "lines": 4, "stdout_sha256": "ee59707a39a95e78dc651a9f3ffa61000e8501f933c992b7d53f0809671a57c1"}, "proxy": {"exit": 1, "bytes": 23, "lines": 4, "stdout_sha256": "ee59707a39a95e78dc651a9f3ffa61000e8501f933c992b7d53f0809671a57c1"}}, "t6-grep-file-list": {"native": {"exit": 0, "bytes": 60, "lines": 3, "stdout_sha256": "10cbbe62c9d8f6f78f4be9bca00c0bdc78742ce0f8158287b5dd275618e457e9"}, "rtk": {"exit": 0, "bytes": 45, "lines": 4, "stdout_sha256": "12b025570adb76a33aab0cb6c977a7b9f99f248e8b4d1a5a075c6fce280ed7cb"}, "proxy": {"exit": 0, "bytes": 60, "lines": 3, "stdout_sha256": "10cbbe62c9d8f6f78f4be9bca00c0bdc78742ce0f8158287b5dd275618e457e9"}}}}
+Traceback (most recent call last):
+  File "<stdin>", line 13, in <module>
+  File "<CHECKOUT>/scripts/native_token_ci.py", line 1497, in rtk_exactness_fixture
+    run.check(name, check)
+    ~~~~~~~~~^^^^^^^^^^^^^
+  File "<CHECKOUT>/scripts/native_token_ci.py", line 743, in check
+    require(condition, label)
+    ~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "<CHECKOUT>/scripts/native_token_ci.py", line 249, in require
+    raise AssertionError(message)
+AssertionError: rtk-exactness-controls-diff-and-grep-unchanged

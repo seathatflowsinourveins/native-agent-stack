@@ -1,0 +1,85 @@
+--- validate-base.txt (selected failure/summary lines; remaining output omitted) ---
+Publication validation failed:
+.bounded-job-042<TEMP_PATH> contains possible personal home path
+.bounded-job-042<TEMP_PATH> contains possible personal home path
+
+--- acceptance-unittest.txt (selected failure/summary lines; remaining output omitted) ---
+ERROR: setUpClass (tests.test_adoption_bootstrap_macos.PlatformDependencyInstallTests)
+ERROR: test_global_prefix_install_of_an_optional_dependency_writes_no_lockfile_or_integrity_field (tests.test_adoption_bootstrap_macos.RealNpmLockfileEvidenceTests.test_global_prefix_install_of_an_optional_dependency_writes_no_lockfile_or_integrity_field)
+FAIL: test_keys_at_the_pinned_revision (tests.test_token_e2e_grader.F27c_KeysOnRealContent.test_keys_at_the_pinned_revision)
+AssertionError: git clone failed: fatal: failed to create link '<path>': Invalid cross-device link
+FAIL: test_every_prerequisite_present_gets_past_the_check (tests.test_adoption_bootstrap_macos.PrerequisitesBeforeAndAfterBrewTests.test_every_prerequisite_present_gets_past_the_check)
+AssertionError: 1 != 0 : Run as your normal macOS user, not root.
+FAIL: test_skip_system_packages_with_a_hidden_prerequisite_exits_4 (tests.test_adoption_bootstrap_macos.PrerequisitesBeforeAndAfterBrewTests.test_skip_system_packages_with_a_hidden_prerequisite_exits_4)
+AssertionError: 1 != 4 : Run as your normal macOS user, not root.
+FAIL: test_install_root_that_resolves_to_home_or_root_is_refused (tests.test_adoption_bootstrap_macos.ScriptBehaviorTests.test_install_root_that_resolves_to_home_or_root_is_refused) (root='home-dot')
+AssertionError: 'ECO_INSTALL_ROOT must name a dedicated' not found in 'Run as your normal macOS user, not root.\n'
+FAIL: test_install_root_that_resolves_to_home_or_root_is_refused (tests.test_adoption_bootstrap_macos.ScriptBehaviorTests.test_install_root_that_resolves_to_home_or_root_is_refused) (root='home-symlink')
+AssertionError: 'ECO_INSTALL_ROOT must name a dedicated' not found in 'Run as your normal macOS user, not root.\n'
+FAIL: test_install_root_that_resolves_to_home_or_root_is_refused (tests.test_adoption_bootstrap_macos.ScriptBehaviorTests.test_install_root_that_resolves_to_home_or_root_is_refused) (root='home-parent-walk')
+AssertionError: 'ECO_INSTALL_ROOT must name a dedicated' not found in 'Run as your normal macOS user, not root.\n'
+FAIL: test_install_root_that_resolves_to_home_or_root_is_refused (tests.test_adoption_bootstrap_macos.ScriptBehaviorTests.test_install_root_that_resolves_to_home_or_root_is_refused) (root='filesystem-root')
+AssertionError: 'ECO_INSTALL_ROOT must name a dedicated' not found in 'Run as your normal macOS user, not root.\n'
+FAIL: test_null_hash_pin_is_refused_and_installs_nothing (tests.test_adoption_bootstrap_macos.ScriptBehaviorTests.test_null_hash_pin_is_refused_and_installs_nothing)
+AssertionError: 'Refusing to install' not found in 'Run as your normal macOS user, not root.\n'
+FAIL: test_plan_invokes_no_network_or_package_manager_command (tests.test_adoption_bootstrap_macos.ScriptBehaviorTests.test_plan_invokes_no_network_or_package_manager_command) (args=['--skip-system-packages'])
+AssertionError: 1 != 0 : Run as your normal macOS user, not root.
+FAIL: test_plan_invokes_no_network_or_package_manager_command (tests.test_adoption_bootstrap_macos.ScriptBehaviorTests.test_plan_invokes_no_network_or_package_manager_command) (args=[])
+AssertionError: 1 != 0 : Run as your normal macOS user, not root.
+FAIL: test_plan_lists_every_pinned_component_without_network_or_install (tests.test_adoption_bootstrap_macos.ScriptBehaviorTests.test_plan_lists_every_pinned_component_without_network_or_install)
+AssertionError: 1 != 0 : Run as your normal macOS user, not root.
+FAIL: test_plan_recorder_catches_an_injected_network_call (tests.test_adoption_bootstrap_macos.ScriptBehaviorTests.test_plan_recorder_catches_an_injected_network_call)
+AssertionError: 1 != 0 : Run as your normal macOS user, not root.
+FAIL: test_a_uv_tool_from_git_pin_without_a_40_hex_commit_is_refused (tests.test_adoption_bootstrap_macos.TokenEfficiencyPlanTests.test_a_uv_tool_from_git_pin_without_a_40_hex_commit_is_refused) (bash='bash')
+AssertionError: 'Refusing to install serena 2.0.0.dev0: pin has no verified 40-hex commit' not found in 'Run as your normal macOS user, not root.\n'
+FAIL: test_the_headroom_plan_line_names_the_wheel_install_uv_tool_verifies (tests.test_adoption_bootstrap_macos.TokenEfficiencyPlanTests.test_the_headroom_plan_line_names_the_wheel_install_uv_tool_verifies)
+AssertionError: 1 != 0 : Run as your normal macOS user, not root.
+FAIL: test_token_efficiency_and_foundation_cpu_plan_in_full (tests.test_adoption_bootstrap_macos.TokenEfficiencyPlanTests.test_token_efficiency_and_foundation_cpu_plan_in_full) (profile='token-efficiency')
+AssertionError: 1 != 0 : Run as your normal macOS user, not root.
+FAIL: test_token_efficiency_and_foundation_cpu_plan_in_full (tests.test_adoption_bootstrap_macos.TokenEfficiencyPlanTests.test_token_efficiency_and_foundation_cpu_plan_in_full) (profile='foundation-cpu')
+AssertionError: 1 != 0 : Run as your normal macOS user, not root.
+FAIL: test_allow_unpinned_equals_form_is_accepted (tests.test_adoption_bootstrap_macos.UnpinnedComponentFailClosedTests.test_allow_unpinned_equals_form_is_accepted)
+AssertionError: 1 != 0 : Run as your normal macOS user, not root.
+FAIL: test_allow_unpinned_skips_it_and_the_plan_exits_zero (tests.test_adoption_bootstrap_macos.UnpinnedComponentFailClosedTests.test_allow_unpinned_skips_it_and_the_plan_exits_zero)
+AssertionError: 1 != 0 : Run as your normal macOS user, not root.
+FAIL: test_partial_allow_unpinned_still_fails_closed_on_the_rest (tests.test_adoption_bootstrap_macos.UnpinnedComponentFailClosedTests.test_partial_allow_unpinned_still_fails_closed_on_the_rest)
+AssertionError: 1 != 3 : Run as your normal macOS user, not root.
+FAIL: test_socraticode_is_pinned_so_the_shipped_profile_needs_no_documented_skip (tests.test_adoption_bootstrap_macos.UnpinnedComponentFailClosedTests.test_socraticode_is_pinned_so_the_shipped_profile_needs_no_documented_skip)
+AssertionError: 1 != 0 : Run as your normal macOS user, not root.
+FAIL: test_unpinned_selected_component_exits_3_in_plan_mode (tests.test_adoption_bootstrap_macos.UnpinnedComponentFailClosedTests.test_unpinned_selected_component_exits_3_in_plan_mode)
+AssertionError: 1 != 3 : Run as your normal macOS user, not root.
+FAIL: test_a_change_touching_neither_is_skipped_as_untested (tests.test_workflow_hardening.ChangesModeComputationTests.test_a_change_touching_neither_is_skipped_as_untested)
+FAIL: test_a_listed_path_is_shown_in_the_summary_only_in_a_safe_spelling (tests.test_workflow_hardening.ChangesModeComputationTests.test_a_listed_path_is_shown_in_the_summary_only_in_a_safe_spelling)
+FAIL: test_a_listed_test_module_selects_full_mode (tests.test_workflow_hardening.ChangesModeComputationTests.test_a_listed_test_module_selects_full_mode)
+FAIL: test_a_mac_relevant_path_selects_full_mode (tests.test_workflow_hardening.ChangesModeComputationTests.test_a_mac_relevant_path_selects_full_mode)
+FAIL: test_a_pull_request_that_only_deletes_a_test_module_is_skipped (tests.test_workflow_hardening.ChangesModeComputationTests.test_a_pull_request_that_only_deletes_a_test_module_is_skipped)
+FAIL: test_anything_else_under_tests_selects_full_mode (tests.test_workflow_hardening.ChangesModeComputationTests.test_anything_else_under_tests_selects_full_mode) [nested data]
+FAIL: test_anything_else_under_tests_selects_full_mode (tests.test_workflow_hardening.ChangesModeComputationTests.test_anything_else_under_tests_selects_full_mode) [a helper]
+FAIL: test_anything_else_under_tests_selects_full_mode (tests.test_workflow_hardening.ChangesModeComputationTests.test_anything_else_under_tests_selects_full_mode) [a malformed module name]
+FAIL: test_anything_else_under_tests_selects_full_mode (tests.test_workflow_hardening.ChangesModeComputationTests.test_anything_else_under_tests_selects_full_mode) [a non-ASCII module name]
+FAIL: test_anything_else_under_tests_selects_full_mode (tests.test_workflow_hardening.ChangesModeComputationTests.test_anything_else_under_tests_selects_full_mode) [a module-shaped nested path]
+FAIL: test_controls_each_guard_holds_its_scenario (tests.test_workflow_hardening.ChangesModeComputationTests.test_controls_each_guard_holds_its_scenario) [a deleted module is kept]
+FAIL: test_controls_each_guard_holds_its_scenario (tests.test_workflow_hardening.ChangesModeComputationTests.test_controls_each_guard_holds_its_scenario) [no module-name check]
+FAIL: test_controls_each_guard_holds_its_scenario (tests.test_workflow_hardening.ChangesModeComputationTests.test_controls_each_guard_holds_its_scenario) [a helper does not force full mode]
+FAIL: test_top_level_test_modules_alone_select_changed_tests_mode (tests.test_workflow_hardening.ChangesModeComputationTests.test_top_level_test_modules_alone_select_changed_tests_mode)
+Ran 942 tests in 184.017s
+FAILED (failures=35, errors=2, skipped=35)
+
+--- acceptance-unittest-final.txt (selected failure/summary lines; remaining output omitted) ---
+
+
+--- acceptance-unittest-final-2.txt (selected failure/summary lines; remaining output omitted) ---
+FAIL: test_M17c_manifest_canary_off (tests.test_token_e2e_grader.F19c_Stage3Mutants.test_M17c_manifest_canary_off)
+FAIL: test_M56c_the_export_backstop_is_off (tests.test_token_e2e_grader.F19d_RepairRoundMutants.test_M56c_the_export_backstop_is_off)
+FAIL: test_the_canary_runs_over_the_whole_manifest (tests.test_token_e2e_grader.F29_Export.test_the_canary_runs_over_the_whole_manifest)
+AssertionError: 'E_EXPORT_DIR reason=canary' != 'E_PRIVACY'
+- E_EXPORT_DIR reason=canary
+FAIL: test_the_manifest_holds_only_placeholders_and_attaches_the_aggregate_by_a_relative_path (tests.test_token_e2e_grader.F29_Export.test_the_manifest_holds_only_placeholders_and_attaches_the_aggregate_by_a_relative_path)
+AssertionError: 2 != 0 : E_EXPORT_DIR reason=canary
+FAIL: test_the_token_report_importer_accepts_the_manifest (tests.test_token_e2e_grader.F29_Export.test_the_token_report_importer_accepts_the_manifest)
+FAIL: test_check_html_accepts_the_render_reports_output_of_a_relativized_capture (tests.test_token_e2e_grader.F29b_CheckHtml.test_check_html_accepts_the_render_reports_output_of_a_relativized_capture)
+FAIL: test_the_real_report_templates_and_their_script_pass_the_canary (tests.test_token_e2e_grader.F29b_CheckHtml.test_the_real_report_templates_and_their_script_pass_the_canary)
+FAIL: test_a_grade_run_that_spells_its_flags_with_equals_records_no_path (tests.test_token_e2e_grader.F29c_ArgvSanitizer.test_a_grade_run_that_spells_its_flags_with_equals_records_no_path)
+AssertionError: 2 != 0 : E_EXPORT_DIR reason=canary
+Ran 966 tests in 244.027s
+FAILED (failures=8, skipped=35)

@@ -1,0 +1,36 @@
+Publication validation failed:
+docs/decisions/2026-10-04-rtk-file-list-control.md: SHA-256 mismatch
+docs/decisions/2026-10-04-rtk-file-list-control.md: byte count mismatch
+docs/native-token-ci.md: SHA-256 mismatch
+docs/native-token-ci.md: byte count mismatch
+evidence/receipts/rtk-051-qualification-20261004.json: SHA-256 mismatch
+evidence/receipts/rtk-051-qualification-20261004.json: byte count mismatch
+scripts/native_token_ci.py: SHA-256 mismatch
+scripts/native_token_ci.py: byte count mismatch
+tests/test_native_token_ci.py: SHA-256 mismatch
+tests/test_native_token_ci.py: byte count mismatch
+receipt rtk-051-qualification-20261004: payload limitations differs from manifest
+evidence/artifacts/rtk-051-file-list-control-20261004/README.md: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-035-acceptance-native-token-ci-final.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-035-acceptance-other-referencing-modules.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-035-acceptance-referencing-excerpt.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-035-acceptance-validate-final.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-035-grader-isolated-failure.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-035-green-fold-unittest.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-035-green-guard-unittest.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-035-green-native-final.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-035-red-fold-cr-unittest.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-035-red-guard-unittest.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-035-red-native.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-035-red-unittest.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-042-acceptance-unittest-final.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-042-environment-failure-excerpts.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-042-green-export-environment.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-042-green-focused.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-042-green-native-final.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-042-red-distinctness-deleted.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-042-red-lf-count-deleted.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-042-red-order.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-042-validate-base-after-ignore.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/job-042-validate-final.txt: evidence file is not hash-listed
+evidence/artifacts/rtk-051-file-list-control-20261004/native-controls.json: evidence file is not hash-listed

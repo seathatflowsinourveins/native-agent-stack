@@ -4116,7 +4116,9 @@
         "gh attestation verification returned HTTP 404 (exit 1); no signature verification or source rebuild was recorded. Later upstream fixes and issue #4404 are follow-ups, not included in this stable pin.",
         "NativeStack runs AgentsView 0.44.0 ahead of the repository pin. The 2026-09-27 qualification hold stands: synthetic_ccusage_parity failed, fresh_four_native_lanes is blocked, and the v0.44.0 MCP reported zero Codex counters. The recorded recipe rewire and qualification must pass in a separate follow-up before a repository pin move.",
         "RTK replay is unavailable at 0.51.0: vendored child-usage.mjs and the test_token_measurement.py/test_skill_usage.py replay gates require exactly rtk 0.50.0. Skipped replay tests are not coverage; the kernel and gates remain unchanged.",
-        "The repair-round placeholder guard probes allowed the --shell form rtk test --shell sh 'cat ~/.ssh/config' (exit 0), while rtk proxy cat ~/.ssh/config was blocked (exit 2). These strings were guard input only; no credential reader was executed. This finding belongs to PR #685; the guard is unchanged in this pin move."
+        "The repair-round placeholder guard probes allowed the --shell form rtk test --shell sh 'cat ~/.ssh/config' (exit 0), while rtk proxy cat ~/.ssh/config was blocked (exit 2). These strings were guard input only; no credential reader was executed. This finding belongs to PR #685; the guard is unchanged in this pin move.",
+        "2026-10-04 control correction after PR #693 CI run 37226622626: v0.51.0 intentionally folds grep file lists (feac25d), so the former byte-unchanged grep control is superseded by counted prefix-plus-tail reconstruction of the exact native path set, byte-identical proxy recovery and a CR-filename verbatim guard fixture (3223a80). The diff half is unchanged. The repaired native fixture passes nine checks over 11 cases / 33 arms; this is local integration of the installed Linux CLI, not new host or upstream Cargo-suite acceptance. Agent-facing expansion of folded paths is unmeasured; an E2E observation of a wrong expanded path leads to adding grep -l/-rl to hook exclusions. Sources and retained red-then-green observations: docs/decisions/2026-10-04-rtk-file-list-control.md.",
+        "2026-10-04 PR #698 follow-up from the pre-rebase review head 45a7218c0 (rebased onto 38ac9aca1; no branch keeps it): the grep inverse now preserves native engine order, and a CR-free explicit-operand t6c sibling proves that the same grep -l shape folds without the 3223a80 guard signal. Native distinctness and the CR-case LF record count have isolating rejection controls with separate predicate-deletion red runs and restored green runs. The installed Linux CLI passes ten checks across 12 cases / 36 arms / 76 fixture commands plus one version command. Historical shell_sites line 1477 is retained; a dated appended entry corrects the direct-argv locator. Minimal sanitized original red/green outputs from job 035 and new job 042 outputs are retained under evidence/artifacts/rtk-051-file-list-control-20261004/ (README.md and native-controls.json), with the dated decision at docs/decisions/2026-10-04-rtk-file-list-control.md. This is local integration, not a WSL rerun, upstream Cargo-suite, new-host or native-model acceptance; model interpretation remains unmeasured."
       ],
       "path": "evidence/receipts/rtk-051-qualification-20261004.json"
     },
@@ -16513,6 +16515,11 @@
       "bytes": 16799
     },
     {
+      "path": "docs/decisions/2026-10-04-rtk-file-list-control.md",
+      "sha256": "cbe7566aa8843bc18c1d25018dec6ddd04c871a599554aaa1d75a36954a2db9c",
+      "bytes": 15171
+    },
+    {
       "path": "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
       "sha256": "d6d0ba48d8881d746bdb9d4dc214339c2f8dba9842fad4152675437811a818d5",
       "bytes": 26023
@@ -16759,8 +16766,8 @@
     },
     {
       "path": "docs/native-token-ci.md",
-      "sha256": "00d27f25f98cc2b906bff8f8887d28efe0b268a10c0d0b8e377f7aeb3313787c",
-      "bytes": 11644
+      "sha256": "e69fa833e82f85254105e64f76b96a32f1d40d9d8ff92b3cc2084e7d54710bac",
+      "bytes": 12745
     },
     {
       "path": "docs/native-ultracode-20260921.md",
@@ -44088,6 +44095,126 @@
       "bytes": 2166
     },
     {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/README.md",
+      "sha256": "159b488a8754ee0a573962d910f006693c13748cb50a49d486f262dd854e148f",
+      "bytes": 6038
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-035-acceptance-native-token-ci-final.txt",
+      "sha256": "cc3bde9ad614e672852dc2f4a9b105c6c2536f920baf1f2cdefeaf34b53b8e75",
+      "bytes": 148
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-035-acceptance-other-referencing-modules.txt",
+      "sha256": "63ec9a73a63df861fe1174e3b63924a7844dfe5361e589671a782bc903b75248",
+      "bytes": 404
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-035-acceptance-referencing-excerpt.txt",
+      "sha256": "d75ab8138f17c9635e3bf0a863b038c13a9681c1510a1c4886550532e511b811",
+      "bytes": 201
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-035-acceptance-validate-final.txt",
+      "sha256": "9ac03c28d02752629a23eaaef689d40eb9f76b3707b1a1bc7c89ee1515aa72ba",
+      "bytes": 452
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-035-grader-isolated-failure.txt",
+      "sha256": "acd5880d5b92732779fdb11ed386fb97602cd3f5753f368aecd88851bf2858a0",
+      "bytes": 1559
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-035-green-fold-unittest.txt",
+      "sha256": "bf36f30bf9a6dec90e1026e0d53d3119f8340fbe4f405df3647dbf5d076e22f9",
+      "bytes": 101
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-035-green-guard-unittest.txt",
+      "sha256": "ebc478192e3c70f9b36de54ebd776b29225eccac9330163c1f1a2da57631cc1e",
+      "bytes": 101
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-035-green-native-final.txt",
+      "sha256": "8a0b3cd52209b36321a3b6af2a4f9baac3de6d2b27014e4e627493c89ca8b707",
+      "bytes": 854
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-035-red-fold-cr-unittest.txt",
+      "sha256": "a1b4687362576af008d0744b7658d2204295050b5cdaad8917110edd1fe99cfb",
+      "bytes": 1128
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-035-red-guard-unittest.txt",
+      "sha256": "93d6ebcf8b298c484ffc0fe49f332583464eddbfd62cd393b5ad328b71b73506",
+      "bytes": 1569
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-035-red-native.txt",
+      "sha256": "97a2449c364b51738ecda7900980b08cdca829b189b4f4707a1f7f7f151ebd95",
+      "bytes": 1418
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-035-red-unittest.txt",
+      "sha256": "5f8a9b2f867424ba3a1caafb876965c0cf6bdea3df3617540896750266904fad",
+      "bytes": 1027
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-042-acceptance-unittest-final.txt",
+      "sha256": "0cbd8da91f18b9776e703fafbf1efbf13eaee6922fc3523a59c49b5b8366cdfc",
+      "bytes": 1258
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-042-environment-failure-excerpts.txt",
+      "sha256": "e12495fb80f67420a21a2e87172726c31d36dd4101c855620e00edd708245645",
+      "bytes": 10829
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-042-green-export-environment.txt",
+      "sha256": "dc9c4ae9c9f3cc6c97bf668f4baa2c7cd41b850926ea4060bc6066c7a91e47e9",
+      "bytes": 106
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-042-green-focused.txt",
+      "sha256": "ddfa74e3436e1c180e0924521a78de04885c5592e5082596cc9c7f5bc6ff16e6",
+      "bytes": 104
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-042-green-native-final.txt",
+      "sha256": "323bc0a2d6f230efdb559d15f9bb7a80e8bc672b577363fb6b78f21c8b6f772b",
+      "bytes": 1048
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-042-red-distinctness-deleted.txt",
+      "sha256": "9f0720939e44174c97ba406c3da9de2ac40c5c7203afea59c40c45ea684966f7",
+      "bytes": 902
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-042-red-lf-count-deleted.txt",
+      "sha256": "5c6dfb8f16ff021b2c765e877bd8e1e4951a33e22f516c810bbe13b2b74dce6f",
+      "bytes": 1698
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-042-red-order.txt",
+      "sha256": "9e00dadf0821595fa84e2ca0c371b193c299a14105d78431039202c7967d9fcd",
+      "bytes": 879
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-042-validate-base-after-ignore.txt",
+      "sha256": "e77d7285e06be85f7b86deff7654307a7acadbb8e0abb40a8925d1d29c845e87",
+      "bytes": 161
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/job-042-validate-final.txt",
+      "sha256": "c005502cee466453fd4631781609003bdf78d04f3cfc4f9836eaf9cce2d5be30",
+      "bytes": 3573
+    },
+    {
+      "path": "evidence/artifacts/rtk-051-file-list-control-20261004/native-controls.json",
+      "sha256": "24a20eac67364cddbf7e681e2f1121128a1fdd8a857a48ac719e909aee704df4",
+      "bytes": 17532
+    },
+    {
       "path": "evidence/artifacts/rtk-coverage-study-20260927/METHOD.md",
       "sha256": "4ae86b6eb0922d30c8366552ec7d9288fc3431781d63964fe269ca19653e7599",
       "bytes": 11434
@@ -51109,8 +51236,8 @@
     },
     {
       "path": "evidence/receipts/rtk-051-qualification-20261004.json",
-      "sha256": "cc8755ce20c23c94f8a1a0101002d4eae28be4a1161f05f11c898f643714f519",
-      "bytes": 20715
+      "sha256": "f35ef95e65d1a8c621c62102eba41f6c05bd39c8c79fc64e6550a04190912d6e",
+      "bytes": 23051
     },
     {
       "path": "evidence/receipts/runtime-sdk-20261003.json",
@@ -52184,8 +52311,8 @@
     },
     {
       "path": "scripts/native_token_ci.py",
-      "sha256": "a5dce8ae180876bd6f676464fbfbda2bf60e479b1b865ca801c592d96e427e81",
-      "bytes": 115304
+      "sha256": "4c25e7d13eb9f1ee11418427b6bf9c65800ac55f5b6e6fc7e9f70e21efbc068d",
+      "bytes": 117733
     },
     {
       "path": "scripts/new_wsl_profile.py",
@@ -53074,8 +53201,8 @@
     },
     {
       "path": "tests/test_native_token_ci.py",
-      "sha256": "ff3152a8520417b0a7e8930401b1b0a2831c6545f5d64dd119597522c29db374",
-      "bytes": 108663
+      "sha256": "f099cfc4ae6813f2d88f6c7fc3de4f2e0cdba576cec53362f3f3aa9cdc4d15be",
+      "bytes": 117232
     },
     {
       "path": "tests/test_native_worker_fixture.py",
