@@ -13,7 +13,7 @@ import unittest
 from unittest.mock import patch
 import zlib
 
-from scripts.validate import InvalidPublication, scan_file_for_private_content, validate
+from scripts.validate import PRIVATE_CONTENT, InvalidPublication, scan_file_for_private_content, validate
 
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATE_SCRIPT = ROOT / "scripts/validate.py"
@@ -165,6 +165,24 @@ class PublicationValidationTests(unittest.TestCase):
     def test_generic_variable_paths_are_allowed(self):
         self.write("README.md", 'Use "${HOME}/.codex" and "${PROJECT_ROOT}"; /dev/null is valid. Anonymized /home/example and /mnt/c/Users/example are permitted.')
         validate(self.root)
+
+    def test_encoded_home_paths_rejected_without_echoing(self):
+        paths = (
+            "/tmp/claude-1000/" + "-".join(("", "home", "alice", "code", "proj")) + "/<id>/scratchpad/",
+            "~/.claude/projects/" + "-".join(("", "Users", "bob", "src", "app")) + "/",
+            "-".join(("C", "", "Users", "carol", "repo")),
+            "/tmp/claude-1000/" + "-".join(("", "home", "alice")) + "/<id>/",
+            "~/.claude/projects/" + "-".join(("", "Users", "bob")) + "/",
+            '"' + "-".join(("C", "", "Users", "carol")) + '"',
+            "~/.claude/projects/" + "-".join(("", "mnt", "c", "Users", "carol", "repo")) + "/",
+        )
+        for index, content in enumerate(paths):
+            with self.subTest(form=index):
+                self.write("README.md", content)
+                with self.assertRaises(InvalidPublication) as error:
+                    validate(self.root)
+                self.assertIn("encoded home path", str(error.exception))
+                self.assertNotIn(content, str(error.exception))
 
     def test_session_identifiers_rejected_even_when_glued_to_words(self):
         session_id = "-".join(("01234567", "89ab", "cdef", "0123", "456789abcdef"))
@@ -490,6 +508,110 @@ class PublicationValidationTests(unittest.TestCase):
                 self.assert_invalid("unsupported PDF framing")
 
 
+class EncodedHomePathTests(unittest.TestCase):
+    def test_bare_homes_and_name_characters_match(self):
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        for parts in (("", "home"), ("", "Users"), ("C", "", "Users")):
+            for name in ("alice", "john.doe", "john-doe", "user99", "j_doe", "example.person"):
+                slug = "-".join((*parts, name))
+                for suffix in ("/", "\\", '"', "'", " ", "\t", "\n", "`", ")", "]", ""):
+                    with self.subTest(root=parts, name=name, suffix=suffix):
+                        self.assertIsNotNone(pattern.search(slug + suffix))
+
+    def test_wsl_profiles_and_name_characters_match(self):
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        for drive in ("c", "C", "d", "Z"):
+            for name in ("alice", "john.doe", "john-doe", "user99", "j_doe", "example.person"):
+                slug = "-".join(("", "mnt", drive, "Users", name))
+                for suffix in ("-repo/", "/", "\\", '"', " ", "]", ""):
+                    with self.subTest(drive=drive, name=name, suffix=suffix):
+                        self.assertIsNotNone(pattern.search("~/.claude/projects/" + slug + suffix))
+
+    def test_users_branches_ignore_case_and_home_stays_case_sensitive(self):
+        # Review thread on #697: Windows (and default macOS) path components are case-insensitive.
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        # Slugs are joined at run time so this file never carries a literal that the rule flags.
+        for parts in (("C", "", "USERS", "carol", "repo"), ("c", "", "users", "carol", "repo"),
+                      ("C", "", "uSeRs", "carol/"), ("", "users", "bob", "src"), ("", "USERS", "bob/"),
+                      ("", "mnt", "c", "USERS", "carol", "repo"), ("", "mnt", "C", "users", "carol/")):
+            slug = "-".join(parts)
+            with self.subTest(parts=parts):
+                self.assertIsNotNone(pattern.search("~/.claude/projects/" + slug))
+        for parts in (("", "HOME", "alice", "x"), ("", "Home", "alice/"), ("C", "", "USERS", "example", "repo"),
+                      ("", "users", "example/")):
+            slug = "-".join(parts)
+            with self.subTest(parts=parts):
+                self.assertIsNone(pattern.search("~/.claude/projects/" + slug))
+
+    def test_bare_home_and_wsl_placeholders_and_invalid_forms_do_not_match(self):
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        roots = (("", "home"), ("", "Users"), ("C", "", "Users"), ("", "mnt", "c", "Users"))
+        for parts in roots:
+            for name in ("<user>", "example", ""):
+                slug = "-".join((*parts, name))
+                for suffix in ("-repo/", "/", "\\", '"', "'", " ", "\t", "\n", "`", ")", "]", ""):
+                    with self.subTest(root=parts, name=name, suffix=suffix):
+                        self.assertIsNone(pattern.search(slug + suffix))
+            for name in ("alice", "john.doe", "user99", "j_doe"):
+                slug = "-".join((*parts, name))
+                for suffix in (":", "=", "@", ">", "(", "{", ",", ";"):
+                    with self.subTest(root=parts, name=name, invalid_suffix=suffix):
+                        self.assertIsNone(pattern.search(slug + suffix))
+        for drive in ("", "cd", "1", "_"):
+            with self.subTest(invalid_drive=drive):
+                self.assertIsNone(pattern.search("-".join(("", "mnt", drive, "Users", "alice", "repo"))))
+
+    def test_example_prefix_names_keep_existing_matches(self):
+        # Only the complete example placeholder is exempt; punctuation in a
+        # real name must not make an existing match disappear.
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        for parts in (("", "home"), ("", "Users"), ("C", "", "Users")):
+            for name in ("example.person", "example99", "example_user", "examples"):
+                with self.subTest(root=parts, name=name):
+                    self.assertIsNotNone(pattern.search("-".join((*parts, name, "repo"))))
+
+    def test_posix_and_windows_forms_match(self):
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        paths = (
+            "/tmp/claude-1000/" + "-".join(("", "home", "alice", "code", "proj")) + "/<id>/scratchpad/",
+            "~/.claude/projects/" + "-".join(("", "Users", "bob", "src", "app")) + "/",
+            "-".join(("C", "", "Users", "carol", "repo")),
+        )
+        for index, content in enumerate(paths):
+            with self.subTest(form=index):
+                self.assertIsNotNone(pattern.search(content))
+
+    def test_placeholders_examples_options_and_words_do_not_match(self):
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        for content in (
+            "-home-<user>-code", "-home-example-code", "--home-dir", "pre-home-run",
+            "C--Users-example-x", "-Users-<user>-src", "-Users-example-src",
+            "C--Users-<user>-repo", "-home-", "-Users-", "C--Users-",
+        ):
+            with self.subTest(content=content):
+                self.assertIsNone(pattern.search(content))
+
+    def test_encoded_path_boundary_is_required(self):
+        pattern = dict(PRIVATE_CONTENT)["encoded home path"]
+        paths = (
+            "-".join(("", "home", "alice", "code")),
+            "-".join(("", "Users", "bob", "src")),
+            "-".join(("C", "", "Users", "carol", "repo")),
+            "-".join(("", "home", "alice")),
+            "-".join(("", "Users", "bob")),
+            "-".join(("C", "", "Users", "carol")),
+            "-".join(("", "mnt", "c", "Users", "carol", "repo")),
+            "-".join(("", "mnt", "c", "Users", "carol")),
+        )
+        for index, content in enumerate(paths):
+            for prefix in ("a", "Z", "0", "_", "-", "é", "９"):
+                with self.subTest(form=index, prefix=prefix):
+                    self.assertIsNone(pattern.search(prefix + content))
+            for prefix in ("", "/", " ", "`", "("):
+                with self.subTest(form=index, prefix=prefix):
+                    self.assertIsNotNone(pattern.search(prefix + content))
+
+
 class ScanFileForPrivateContentTests(unittest.TestCase):
     """`scan_publication()` only walks git-tracked/listed paths; a generated,
     gitignored artifact built fresh right before publication (e.g.
@@ -555,6 +677,16 @@ class ScanFileForPrivateContentTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
         report = json.loads(result.stdout)
         self.assertEqual(report, {"status": "passed", "scanned_files": 1})
+
+    def test_cli_scan_file_fails_on_an_encoded_home_path_without_echoing_it(self):
+        content = "-".join(("C", "", "Users", "carol", "repo"))
+        path = self.write("explorer.html", f"<html>{content}</html>")
+        findings = scan_file_for_private_content(path)
+        self.assertEqual(findings, [f"{path}: contains possible encoded home path"])
+        result = self.run_cli("--scan-file", str(path))
+        self.assertEqual(result.returncode, 1, result.stdout + result.stderr)
+        self.assertIn("encoded home path", result.stdout)
+        self.assertNotIn(content, result.stdout + result.stderr)
 
     def test_cli_scan_file_fails_on_a_planted_secret_without_echoing_it(self):
         secret = ("sk-ant-" + "b" * 30)

@@ -8,6 +8,8 @@
              token-lanes-subagent-start.py and its sibling token-lanes-block.md
              plus the five role blocks token-lanes-block.<role>.md from
              adoption/hooks/claude/ (role-matched non-blind child context),
+             token-lanes-session-start.py and its sibling
+             token-lanes-block.main.md (SessionStart main-session context),
              and currency-due-notice.py (SessionStart stack-currency due line)
   agents  -- verbatim copies of adoption/agents/claude/*.md to ~/.claude/agents/
   workflows -- opt-in (--only workflows), checksum-checked, create-only copies of
@@ -60,17 +62,19 @@ SECRET_GUARD_SRC = ROOT / "scripts" / "hooks" / "secret_path_guard.py"
 TOKEN_LANES_BLOCK_SRC = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-block.md"
 TOKEN_LANES_HOOK_SRC = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-subagent-start.py"
 SHA256SUMS = ROOT / "adoption" / "hooks" / "claude" / "SHA256SUMS"
-# Installed name under ~/.claude/hooks/ -> checked-in source; includes the carrier's sibling blocks.
+# Installed name under ~/.claude/hooks/ -> checked-in source; includes both carriers' sibling blocks.
 HOOKS = {
     "currency-due-notice.py": GUARD_SRC.with_name("currency-due-notice.py"),  # SessionStart currency due line
     "effort-default-guard.py": GUARD_SRC,
     "secret_path_guard.py": SECRET_GUARD_SRC,
     "token-lanes-block.md": TOKEN_LANES_BLOCK_SRC,
     "token-lanes-block.builder.md": TOKEN_LANES_BLOCK_SRC.with_name("token-lanes-block.builder.md"),
+    "token-lanes-block.main.md": TOKEN_LANES_BLOCK_SRC.with_name("token-lanes-block.main.md"),  # SessionStart text
     "token-lanes-block.researcher.md": TOKEN_LANES_BLOCK_SRC.with_name("token-lanes-block.researcher.md"),
     "token-lanes-block.reviewer.md": TOKEN_LANES_BLOCK_SRC.with_name("token-lanes-block.reviewer.md"),
     "token-lanes-block.scout.md": TOKEN_LANES_BLOCK_SRC.with_name("token-lanes-block.scout.md"),
     "token-lanes-block.verifier.md": TOKEN_LANES_BLOCK_SRC.with_name("token-lanes-block.verifier.md"),
+    "token-lanes-session-start.py": TOKEN_LANES_HOOK_SRC.with_name("token-lanes-session-start.py"),  # SessionStart
     "token-lanes-subagent-start.py": TOKEN_LANES_HOOK_SRC,
 }
 AGENTS_SRC_DIR = ROOT / "adoption" / "agents" / "claude"

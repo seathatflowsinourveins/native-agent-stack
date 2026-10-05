@@ -1,6 +1,6 @@
 {
   "schema": "native-agent-stack/new-wsl-client-config-map/v1",
-  "about": "Which pieces of the client templates the new WSL distribution wires, decided from the definitive manifest (evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json). tools/adoption/new_wsl_client_config.py reads this file. Each entry has `match`, a list of patterns over piece keys (fnmatch: * is any text; the keys are listed by `new_wsl_client_config.py --check`), and one `wiring`: `slot:<foundation slot id>` (the piece is wired while the manifest says that slot installs something and its default names `owner`; otherwise it is not wired and says why), `practice` (repository practice that needs no tool outside the repository; a hook of this kind may run only python3, jq and the shell's own words, which the recipe's F4 installs and adoption/bootstrap-linux.sh requires, and only files that tools/adoption/install_claude_profile.py copies), `not_wired:<reason>`, or `authorization:<reason>` (a setting that grants a permission or suppresses a confirmation: Claude Code permissions.defaultMode and skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode, a Codex project's `trust_level` (any value), and the Codex tool approval modes `default_tools_approval_mode` (any value) and `approval_mode` when it approves; it is neither rendered nor written unless --with-authorization-settings is given, and then never over a value the file already has; an entry may also name a `slot` and its `owner`, and the piece is then written only while that slot installs the owner, as the tool approval modes of an MCP server are; the tool refuses such a setting classed practice or slot). The pieces are those of the client templates and, for the Claude settings, the Claude user MCP servers and the Codex user config, of the new distribution's additions in adoption/new-wsl/templates/ (keys only this tool renders, so each shared template stays what every other host renders; a key a template and its additions both define is refused). A piece goes to the first entry that matches it, so a specific entry stands before a general one. A piece no entry matches, and an entry that no piece reaches, fail the check. `names` lists how the tool appears in templates and instruction text; `--check` renders the example host, without and with --with-authorization-settings, and fails when a rendered file or an instruction block holds the name of a piece that is not wired. `override` replaces the piece's value (for an MCP server, the keys it names); `rewrite` replaces text inside a string value, and `{gateway_port}` is the install plan's port; `home_dir` is a directory under the home that a wired path piece adds to PATH. Sources: adoption/bootstrap.md steps 2, 4 and 4a; adoption/bootstrap-linux.sh (full_profile_* functions, install_native); docs/decisions/2026-10-02-new-wsl-client-configuration.md. `keep_existing` (a Claude setting only) writes the template's value only when the host's settings.json has no value for it. `dependent_sentences` declares a sentence of an instruction block that depends on the one before it on its line (`starts` is its opening words, `on` is always `previous`): the block filter drops it whenever that sentence goes, and the dropped list shows it. The dependency is declared here, never inferred.",
+  "about": "Which pieces of the client templates the new WSL distribution wires, decided from the definitive manifest (evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json). tools/adoption/new_wsl_client_config.py reads this file. Each entry has `match`, a list of patterns over piece keys (fnmatch: * is any text; the keys are listed by `new_wsl_client_config.py --check`), and one `wiring`: `slot:<foundation slot id>` (the piece is wired while the manifest says that slot installs something and its default names `owner`; otherwise it is not wired and says why), `practice` (repository practice that needs no tool outside the repository; a hook of this kind may run only python3, jq and the shell's own words, which the recipe's F4 installs and adoption/bootstrap-linux.sh requires, and only files that tools/adoption/install_claude_profile.py copies), `not_wired:<reason>`, or `authorization:<reason>` (a setting that grants a permission or suppresses a confirmation: Claude Code permissions.defaultMode, skipDangerousModePermissionPrompt and crossSessionInbound, Codex approval_policy and sandbox_mode, a Codex project's `trust_level` (any value), and the Codex tool approval modes `default_tools_approval_mode` (any value) and `approval_mode` when it approves; it is neither rendered nor written unless --with-authorization-settings is given, and then never over a value the file already has; an entry may also name a `slot` and its `owner`, and the piece is then written only while that slot installs the owner, as the tool approval modes of an MCP server are; the tool refuses such a setting classed practice or slot). The pieces are those of the client templates and, for the Claude settings, the Claude user MCP servers and the Codex user config, of the new distribution's additions in adoption/new-wsl/templates/ (keys only this tool renders, so each shared template stays what every other host renders; a key a template and its additions both define is refused). A piece goes to the first entry that matches it, so a specific entry stands before a general one. A piece no entry matches, and an entry that no piece reaches, fail the check. `names` lists how the tool appears in templates and instruction text; `--check` renders the example host, without and with --with-authorization-settings, and fails when a rendered file or an instruction block holds the name of a piece that is not wired. `override` replaces the piece's value (for an MCP server, the keys it names); `rewrite` replaces text inside a string value, and `{gateway_port}` is the install plan's port; `home_dir` is a directory under the home that a wired path piece adds to PATH. Sources: adoption/bootstrap.md steps 2, 4 and 4a; adoption/bootstrap-linux.sh (full_profile_* functions, install_native); docs/decisions/2026-10-02-new-wsl-client-configuration.md. `directive` (a slot entry only) names the dated record of the owner's directive that adds the entry's `owner` beside what its slot installs: the piece is wired while that slot installs anything and unwires with it, and --check fails when the record is not a file of the repository. `keep_existing` (a Claude setting only) writes the template's value only when the host's settings.json has no value for it. `dependent_sentences` declares a sentence of an instruction block that depends on the one before it on its line (`starts` is its opening words, `on` is always `previous`): the block filter drops it whenever that sentence goes, and the dropped list shows it. The dependency is declared here, never inferred.",
   "dependent_sentences": [
     {
       "starts": "Check relevance; retry without pin priority",
@@ -12,16 +12,16 @@
     {
       "match": [
         "claude/settings/env/RTK_TELEMETRY_DISABLED",
-        "codex/*/shell_environment_policy.set.RTK_TELEMETRY_DISABLED",
-        "codex/*/mcp_servers.*.env.RTK_TELEMETRY_DISABLED"
+        "codex/*/shell_environment_policy.set.RTK_TELEMETRY_DISABLED"
       ],
-      "wiring": "slot:context-supply",
+      "wiring": "slot:command-output",
       "owner": "rtk",
       "names": [
         "RTK_TELEMETRY_DISABLED",
         "rtk"
       ],
-      "note": "rtk filters command output between the tools and the model, the job of the context-supply slot."
+      "note": "RTK 0.51.0 owns command-output under the owner's full-stack decision of 2026-10-04 (docs/decisions/2026-10-04-token-full-stack-owner-default.md). A copy of the variable inside an MCP server's table follows that server's own entry, so an unwired server never gets a table of its own.",
+      "directive": "docs/decisions/2026-10-04-new-wsl-token-layer-default.md"
     },
     {
       "match": [
@@ -74,13 +74,35 @@
     },
     {
       "match": [
+        "claude/settings/env/CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS"
+      ],
+      "wiring": "practice",
+      "source": "https://code.claude.com/docs/en/agent-teams (read 2026-10-04): agent teams are off unless CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS is 1 in settings.json or the environment, and 0 turns named subagents back into subagents. The piece is in adoption/new-wsl/templates/claude.settings.additions.json, which only this tool reads; the owner's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-token-layer-default.md) names agent teams."
+    },
+    {
+      "match": [
+        "claude/settings/plugin/cc-plugin-you-should-know@builtin"
+      ],
+      "wiring": "practice",
+      "source": "https://code.claude.com/docs/en/plugins/mods/overview (read 2026-10-04): the built-in mod cc-plugin-you-should-know runs a side agent that watches long tasks and shows notes above the prompt; it is disabled by default and an enabledPlugins entry turns it on (Claude Code 2.1.287 changelog: 'Added You should know'). The owner asked on 2026-10-04 for the latest changelog features on both hosts; the side agent costs tokens, which are counted apart from the token-efficiency measurements. NativeStack carries the entry in its own user settings; the piece is in adoption/new-wsl/templates/claude.settings.additions.json, which only this tool reads."
+    },
+    {
+      "match": [
+        "claude/settings/hook/ConfigChange/*"
+      ],
+      "wiring": "practice",
+      "source": "https://code.claude.com/docs/en/hooks-guide ('Audit configuration changes', read 2026-10-04): a logging-only ConfigChange hook that appends the change's source and file to ~/claude-config-audit.log and ends with `|| true`; NativeStack runs the same literal command (the 2026-09-28 community-sweep decision recorded it, and its template half never landed). The piece is in adoption/new-wsl/templates/claude.settings.additions.json."
+    },
+    {
+      "match": [
         "claude/settings/hook/PreToolUse/matcher=Bash/rtk hook claude"
       ],
-      "wiring": "slot:context-supply",
+      "wiring": "slot:command-output",
       "owner": "rtk",
       "names": [
         "rtk"
-      ]
+      ],
+      "directive": "docs/decisions/2026-10-04-new-wsl-token-layer-default.md"
     },
     {
       "match": [
@@ -122,31 +144,37 @@
     {
       "match": [
         "claude/settings/hook/*/*currency-due-notice.py*",
-        "claude/profile/hook-file/currency-due-notice.py",
+        "claude/profile/hook-file/currency-due-notice.py"
+      ],
+      "wiring": "practice",
+      "note": "The session-start currency notice (adoption/hooks/claude/currency-due-notice.py, byte-pinned in adoption/hooks/claude/SHA256SUMS), wired by the owner's directive of 2026-10-04 (docs/decisions/2026-10-04-new-wsl-token-layer-default.md). It prints the due file that the stack-currency timer writes (adoption/lifecycle.md, the timer's install commands); until that timer runs on the host it prints nothing and exits within its 5-second timeout."
+    },
+    {
+      "match": [
         "codex/hooks/hook/*",
         "codex/hooks/setting/description"
       ],
-      "wiring": "not_wired:the hook prints the due file that the daily stack-currency timer writes and no installed owner runs that timer, so it would never print",
-      "names": [
-        "currency-due-notice"
-      ]
+      "wiring": "not_wired:~/.codex/hooks.json is written by ai-memory 2.5.2's own install-hooks (the hooks.state entry below), so this tool would be a second writer of that file, and the template's handler has no reviewed trust hash; the Claude Code notice is wired"
     },
     {
       "match": [
         "claude/settings/hook/*/*token-lanes-subagent-start.py*",
+        "claude/settings/hook/*/*token-lanes-session-start.py*",
         "claude/profile/hook-file/token-lanes-block.md",
+        "claude/profile/hook-file/token-lanes-block.main.md",
         "claude/profile/hook-file/token-lanes-block.builder.md",
         "claude/profile/hook-file/token-lanes-block.researcher.md",
         "claude/profile/hook-file/token-lanes-block.reviewer.md",
         "claude/profile/hook-file/token-lanes-block.scout.md",
         "claude/profile/hook-file/token-lanes-block.verifier.md",
+        "claude/profile/hook-file/token-lanes-session-start.py",
         "claude/profile/hook-file/token-lanes-subagent-start.py"
       ],
-      "wiring": "not_wired:the token-lane carrier names retrieval and compression servers (SocratiCode, jCodeMunch, headroom, codebase-memory) that this distribution does not install, and the wave-2 code-search ruling keeps it unwired here (change 7)",
+      "wiring": "not_wired:the token-lane carriers are this repository's own adaptation, not a feature of an upstream tool, so the clean default holds them out (the owner's directive of 2026-10-04, docs/decisions/2026-10-04-new-wsl-clean-default-holdouts.md); the files stay byte-pinned in adoption/hooks/claude/SHA256SUMS for a host that opts in",
       "names": [
-        "token-lanes",
-        "jcodemunch"
-      ]
+        "token-lanes"
+      ],
+      "note": "The token-lane carriers: python3 and the nine files install_claude_profile.py copies (the SubagentStart hook with its default block and five role blocks, and the SessionStart hook with its main-session block). Held out of this distribution's default; an adopter opts in by installing the profile's hook files and the two hook entries of the shared template."
     },
     {
       "match": [
@@ -224,12 +252,13 @@
       "match": [
         "claude/settings/permission/deny/Bash(rtk *"
       ],
-      "wiring": "slot:context-supply",
+      "wiring": "slot:command-output",
       "owner": "rtk",
       "names": [
         "rtk"
       ],
-      "note": "The force-push rules for the rtk-prefixed form of git; the plain rules stay."
+      "note": "The force-push rules for the rtk-prefixed form of git; the plain rules stay.",
+      "directive": "docs/decisions/2026-10-04-new-wsl-token-layer-default.md"
     },
     {
       "match": [
@@ -256,7 +285,14 @@
     },
     {
       "match": [
-        "claude/settings/setting/advisorModel",
+        "claude/settings/setting/advisorModel"
+      ],
+      "wiring": "practice",
+      "override": "opus",
+      "source": "The user's decision of 2026-10-04 (question tool, about 04:50Z): \"ONLY USE fable when situation truly needed, otherwise use opus5.5 as main\", carried to both hosts on his directive of the same day (\"we need all the sota features, latest changlogs, fully enalbed seamlessly within our naitve workflow for new wsl also\"). The advisor is Opus 5.5, which NativeStack already carries as `advisorModel: \"opus\"` (Claude Code's native /advisor command writes the key). The shared template still says `fable` until the pull request that changes it lands; this entry renders the new distribution's own value, as the model entry does, so that change does not move it."
+    },
+    {
+      "match": [
         "claude/settings/setting/effortLevel",
         "claude/settings/setting/modelSettings",
         "claude/settings/setting/ultracode",
@@ -286,6 +322,13 @@
       ],
       "wiring": "authorization:they grant permissions and suppress confirmation prompts (bypassPermissions, never, danger-full-access), so they are written only with --with-authorization-settings and never over a value the file already has",
       "note": "Claude Code permissions.defaultMode and skipDangerousModePermissionPrompt, Codex approval_policy and sandbox_mode. The deny list stays practice: it only restricts. Claude Code writes skipDangerousModePermissionPrompt itself when the person accepts its dialog (settings reference, skipDangerousModePermissionPrompt)."
+    },
+    {
+      "match": [
+        "claude/settings/setting/crossSessionInbound"
+      ],
+      "wiring": "authorization:\"accept\" delivers messages from the user's other sessions to Claude without the approval hold that otherwise applies to a sender that is not in bypass mode, so it is written only with --with-authorization-settings and never over a value the file already has",
+      "note": "Claude Code crossSessionInbound = \"accept\" (one of \"accept\", \"hold\" or \"refuse\": settings reference, crossSessionInbound, and https://code.claude.com/docs/en/cross-session-messaging#control-inbound-messages, read 2026-10-04), which NativeStack carries. It overturns the wave-2 messaging ruling, which left the key unset because a message between two bypass-mode sessions delivers anyway, on the user's directive of 2026-10-04 (\"we need all the sota features, latest changlogs, fully enalbed seamlessly within our naitve workflow for new wsl also\") and his yes on the Claude-Codex messaging posture of 2026-10-02 (the new-WSL must-haves)."
     },
     {
       "match": [
@@ -369,7 +412,12 @@
       "names": [
         "socraticode"
       ],
-      "note": "The code-search slot is split between semble and SocratiCode and waits for the measurement; semble is its interim install."
+      "override": {
+        "args": [
+          "${ECO_ROOT}/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
+        ]
+      },
+      "note": "The code-search slot is split between semble and SocratiCode and waits for the measurement; the owner's full-stack decision of 2026-10-04 makes both its interim install."
     },
     {
       "match": [
@@ -386,7 +434,7 @@
       "match": [
         "claude/mcp/server/headroom"
       ],
-      "wiring": "slot:context-supply",
+      "wiring": "slot:output-compression",
       "owner": "headroom",
       "names": [
         "headroom"
@@ -397,10 +445,33 @@
         "claude/mcp/server/codebase-memory",
         "codex/*/mcp_servers.codebase-memory.*"
       ],
-      "wiring": "not_wired:no slot of the manifest names a code-graph tool (the code-navigation slot's owner is Serena)",
+      "wiring": "slot:code-graph",
+      "owner": "codebase-memory",
       "names": [
         "codebase-memory"
-      ]
+      ],
+      "source": "DeusData/codebase-memory-mcp v0.11.0, installed by the code-graph row of evidence/artifacts/new-wsl-install-plan-20261002/install.sh. docs/decisions/2026-09-25-codex-mcp-scope.md requires explicit index_repository and auto_index=false; this entry registers only the MCP server and never invokes indexing."
+    },
+    {
+      "match": [
+        "codex/*/mcp_servers.jcodemunch.default_tools_approval_mode"
+      ],
+      "wiring": "authorization:a tool approval mode of \"approve\" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has",
+      "slot": "code-index",
+      "owner": "jcodemunch",
+      "note": "jcodemunch's tools carry no MCP annotations, so Codex asks before each call, and a never policy refuses it (adoption/templates/project.codex.config.template.toml, which registers the same entry per project: approve auto-approves even under approval_policy = never, codex-rs/codex-mcp/src/mcp/mod.rs L89-L98 at rust-v0.157.1)."
+    },
+    {
+      "match": [
+        "claude/mcp/server/jcodemunch",
+        "codex/config/mcp_servers.jcodemunch.*"
+      ],
+      "wiring": "slot:code-index",
+      "owner": "jcodemunch",
+      "names": [
+        "jcodemunch"
+      ],
+      "source": "jgravelle/jcodemunch-mcp 1.108.319, revision 8f7b34abe16fb459e0bf1c04747d584216dfe32e: README.md L119-122 documents the user-scope registration (`claude mcp add -s user jcodemunch jcodemunch-mcp` after `uv tool install jcodemunch-mcp`), and CONFIGURATION.md L231 and SECURITY.md L311 document JCODEMUNCH_SHARE_SAVINGS=0 in the server's env block as the opt-out of the anonymous savings counter. Registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (\"we need to set up all the sota repos, mcp tools, harness rules, upstream cc native hooks and beyond, resolute them cleanly for future session to make sure their seamless pick up\"); docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md overturns the per-project rule of 2026-09-25 for this distribution. The install plan's code-index row installs the console script; jcodemunch-mcp init, which writes a prompt policy and hooks, is not run."
     },
     {
       "match": [
@@ -531,7 +602,7 @@
         "codex/*/mcp_servers.headroom.default_tools_approval_mode"
       ],
       "wiring": "authorization:a tool approval mode of \"approve\" makes Codex run every tool of that MCP server without asking, so it is written only with --with-authorization-settings, only while the slot that wires the server installs it, and never over a value the file already has",
-      "slot": "context-supply",
+      "slot": "output-compression",
       "owner": "headroom"
     },
     {
@@ -563,6 +634,17 @@
     },
     {
       "match": [
+        "codex/config/mcp_servers.socraticode.args"
+      ],
+      "wiring": "slot:code-search",
+      "owner": "SocratiCode",
+      "override": [
+        "${ECO_ROOT}/tools/socraticode-1.15.0/lib/node_modules/socraticode/dist/index.js"
+      ],
+      "source": "The install plan's code-search row installs socraticode 1.15.0 into this versioned prefix and creates no bin/socraticode link; docs/decisions/2026-09-25-codex-mcp-scope.md requires the pinned dist/index.js path."
+    },
+    {
+      "match": [
         "codex/*/mcp_servers.socraticode.*"
       ],
       "wiring": "slot:code-search",
@@ -575,7 +657,7 @@
       "match": [
         "codex/*/mcp_servers.headroom.*"
       ],
-      "wiring": "slot:context-supply",
+      "wiring": "slot:output-compression",
       "owner": "headroom",
       "names": [
         "headroom"
@@ -634,6 +716,7 @@
       "match": [
         "codex/config/model",
         "codex/config/model_reasoning_effort",
+        "codex/config/service_tier",
         "codex/config/mcp_oauth_credentials_store",
         "codex/config/web_search",
         "codex/config/agents.*",
@@ -643,7 +726,7 @@
         "codex/config/shell_environment_policy.set.PATH"
       ],
       "wiring": "practice",
-      "source": "Keys of the config schema at openai/codex rust-v0.159.2 and rust-v0.160.0 (codex-rs/core/config.schema.json). tools/adoption/codex_home.py needs features.daemon_auto_start = false and a PATH that starts with the ecosystem's bin directory."
+      "source": "Keys of the config schema at openai/codex rust-v0.159.2 and rust-v0.160.0 (codex-rs/core/config.schema.json). tools/adoption/codex_home.py needs features.daemon_auto_start = false and a PATH that starts with the ecosystem's bin directory. service_tier = \"fast\" is the user's choice of 2026-10-03 for every route that honours it, which NativeStack runs (measured 2026-10-03: 61 against 33 output tokens per second through the gateway); the 0.160.0 schema calls `fast` the legacy spelling of the `priority` tier and says it still works. features.analytics_plan_history comes from the shared template."
     },
     {
       "match": [
@@ -657,7 +740,8 @@
       "match": [
         "codex/stack-worker/shell_environment_policy.set.CHUB_*"
       ],
-      "wiring": "not_wired:the two variables opt a tool out of telemetry (Context Hub, chub), which the manifest does not install",
+      "wiring": "slot:api-docs",
+      "owner": "Context Hub",
       "names": [
         "chub",
         "CHUB_TELEMETRY",
@@ -690,8 +774,8 @@
         "codex/role/stack-researcher.toml",
         "codex/role/stack-verifier.toml"
       ],
-      "wiring": "not_wired:the carriers are byte-pinned in adoption/agents/codex/SHA256SUMS and ruled by tools/adoption/codex_roles.py, whose rules cwd_rule, exact_shapes and f4_block require the context-mode working-directory bullet, the exact-command-shapes bullet and the RTK block, so a copy without the lines that name tools that are not wired breaks all three and its hash; they could be installed only whole",
-      "note": "tests/test_new_wsl_client_config.py filters both carriers by the unwired names and shows the three rules failing; the carriers stay out until the tools they name are wired."
+      "wiring": "not_wired:the carriers are byte-pinned in adoption/agents/codex/SHA256SUMS and ruled by tools/adoption/codex_roles.py (cwd_rule, exact_shapes, f4_block); stack-researcher.toml names jCodeMunch, which this distribution does not install, so a copy without that sentence keeps the three rules but not its pinned hash; stack-verifier.toml names no tool that is not wired, and the 2026-10-04 token-layer record leaves both roles to its follow-up, the carriers filtered to the installed lanes",
+      "note": "tests/test_new_wsl_client_config.py filters both carriers by the unwired names: since the owner's directive of 2026-10-04 wires rtk, the filtered researcher copy keeps the three rules and loses one sentence, and the verifier loses nothing."
     },
     {
       "match": [

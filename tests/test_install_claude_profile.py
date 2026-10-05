@@ -29,10 +29,12 @@ import install_claude_profile as icp  # noqa: E402
 # The user-scope MCP template is checked against the SubagentStart carrier, the Codex user template and this
 # repository's default host endpoints (docs/decisions/2026-09-26-stack-agents-role-dispatch.md, addendum 2026-09-30).
 CARRIER = ROOT / "adoption" / "hooks" / "claude" / "token-lanes-block.md"
-# Every SubagentStart carrier block: the general block above and the five role blocks the hook picks by agent type
-# (adoption/hooks/claude/token-lanes-subagent-start.py). The user-scope template is checked against all of them.
-CARRIER_BLOCK_NAMES = ("token-lanes-block.builder.md", "token-lanes-block.md", "token-lanes-block.researcher.md",
-                       "token-lanes-block.reviewer.md", "token-lanes-block.scout.md", "token-lanes-block.verifier.md")
+# Every carrier block: the general block above and the five role blocks the SubagentStart hook picks by agent type
+# (adoption/hooks/claude/token-lanes-subagent-start.py), and the main-session block of the SessionStart hook
+# (adoption/hooks/claude/token-lanes-session-start.py). The user-scope template is checked against all of them.
+CARRIER_BLOCK_NAMES = ("token-lanes-block.builder.md", "token-lanes-block.main.md", "token-lanes-block.md",
+                       "token-lanes-block.researcher.md", "token-lanes-block.reviewer.md", "token-lanes-block.scout.md",
+                       "token-lanes-block.verifier.md")
 CODEX_TEMPLATE = ROOT / "adoption" / "templates" / "codex.config.template.toml"
 HOST_EXAMPLE = ROOT / "adoption" / "hosts" / "example.json"
 USER_SCOPE_SERVERS = {"ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd"}
@@ -150,9 +152,10 @@ def template_server_names() -> list[str]:
 class GuardInstallTests(unittest.TestCase):
     def test_token_lanes_assets_cli_dry_run_and_temp_home_install(self):
         script = "token-lanes-subagent-start.py"
+        session_script = "token-lanes-session-start.py"
         names = ("token-lanes-block.md", "token-lanes-block.builder.md", "token-lanes-block.researcher.md",
                  "token-lanes-block.reviewer.md", "token-lanes-block.scout.md", "token-lanes-block.verifier.md",
-                 script)
+                 script, "token-lanes-block.main.md", session_script)
         with tempfile.TemporaryDirectory() as tmp:
             home = Path(tmp)
             command = [sys.executable, str(ROOT / "tools/adoption/install_claude_profile.py"),
@@ -181,6 +184,15 @@ class GuardInstallTests(unittest.TestCase):
                     self.assertEqual(injected.returncode, 0, injected.stderr)
                     self.assertEqual(json.loads(injected.stdout)["hookSpecificOutput"]["additionalContext"],
                                      (home / ".claude/hooks" / block).read_text(encoding="utf-8"))
+            # The installed SessionStart script resolves the installed main-session block the same way.
+            with self.subTest(event="SessionStart"):
+                injected = subprocess.run([sys.executable, str(home / ".claude/hooks" / session_script)],
+                                          input=json.dumps({"hook_event_name": "SessionStart", "source": "startup"}),
+                                          env=env, cwd=home, capture_output=True, text=True, timeout=30)
+                self.assertEqual(injected.returncode, 0, injected.stderr)
+                self.assertEqual(json.loads(injected.stdout)["hookSpecificOutput"],
+                                 {"hookEventName": "SessionStart", "additionalContext":
+                                  (home / ".claude/hooks/token-lanes-block.main.md").read_text(encoding="utf-8")})
 
     def test_installs_when_absent(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -1379,8 +1391,8 @@ class McpTemplateShapeTests(unittest.TestCase):
 
 
 class McpCarrierCoverageTests(unittest.TestCase):
-    """The user-scope template registers exactly the servers the SubagentStart carrier blocks name (every
-    token-lanes-block*.md, the general block and the five role blocks), less the exceptions whose reason is still
+    """The user-scope template registers exactly the servers the carrier blocks name (every token-lanes-block*.md:
+    the general block, the five role blocks and the main-session block), less the exceptions whose reason is still
     written in the file each cites. Structural validation of repository files; no client runs."""
 
     BLOCKS = ROOT / "adoption" / "hooks" / "claude"
@@ -1392,7 +1404,8 @@ class McpCarrierCoverageTests(unittest.TestCase):
 
     def test_the_carrier_names_the_lane_servers(self):
         # Control for the parser: the carrier blocks' own ids, context-mode's plugin server left out. The role blocks
-        # name a subset of the general block's servers today, so the union is the general block's set.
+        # name a subset of the general block's servers today and the main-session block names servers by plain name
+        # only (no mcp__ ids), so the union is the general block's set.
         self.assertEqual(sorted(path.name for path in self.BLOCKS.glob("token-lanes-block*.md")),
                          sorted(CARRIER_BLOCK_NAMES))
         lanes = {"serena", "jcodemunch", "socraticode", "qmd", "ai-memory", "codebase-memory", "headroom"}
