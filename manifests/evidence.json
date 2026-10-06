@@ -17358,8 +17358,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-worker-gateway-defaults.md",
-      "sha256": "3dafc76f866bfac10790677d683616e21c7301900a271bf25bcddff000b56375",
-      "bytes": 7264
+      "sha256": "53340979b6c5cf1eb3e87637035916437300f8e651363a03f86276119b03037a",
+      "bytes": 9745
     },
     {
       "path": "docs/direct-results.md",
@@ -53227,6 +53227,11 @@
       "bytes": 1939
     },
     {
+      "path": "evidence/receipts/worker-census-markers-20261006.json",
+      "sha256": "afa4fdefd2b427920c8efa65bf43a3096c52f497705cb0d552578fdd066fb37f",
+      "bytes": 5327
+    },
+    {
       "path": "evidence/receipts/worker-gateway-defaults-20261006.json",
       "sha256": "3bec902a17127dbf380b80a61e9faff08a5e7e22228c330763dfb14c7b58b306",
       "bytes": 30178
@@ -53433,8 +53438,8 @@
     },
     {
       "path": "examples/claude-runtime-sdk/README.md",
-      "sha256": "abb5622dd2fa9dd6a3c4c0c36aab6170bc9df694a7e006ec434a2f58212ff885",
-      "bytes": 10259
+      "sha256": "2c1a3d6e38f12d3ec27f9b98ce17fea09a28d744ea4db99ca6148702dca10d45",
+      "bytes": 11079
     },
     {
       "path": "examples/claude-runtime-sdk/tests/check_controls.py",
@@ -53453,8 +53458,8 @@
     },
     {
       "path": "examples/claude-runtime-sdk/worker.py",
-      "sha256": "4cf3dcadabf497e05f10656e24cc796e8619c9601141a6d069bef6eba45fe155",
-      "bytes": 19889
+      "sha256": "90ffe3c43c822ba1c0b25c1aa89375469b38ca3b1889313321faacc9fc4e8698",
+      "bytes": 21425
     },
     {
       "path": "examples/claude-runtime-sdk/worker.py.lock",
@@ -53503,8 +53508,8 @@
     },
     {
       "path": "examples/deepagents-omniroute/README.md",
-      "sha256": "cea2995df0a41f320edc8d5f722ed0171c3c6925e926f4174c5bc2d78a5eab97",
-      "bytes": 15027
+      "sha256": "583884e3980920187862f566eed8f38511fdc89cc53223357ad2517bc9456300",
+      "bytes": 15731
     },
     {
       "path": "examples/deepagents-omniroute/acceptance-plan.json",
@@ -53538,8 +53543,8 @@
     },
     {
       "path": "examples/deepagents-omniroute/worker.py",
-      "sha256": "b7bfb2eb5190c31b5af47d4c206496095906ffc4f392a65ce401c54abc868214",
-      "bytes": 7853
+      "sha256": "4b5004b6f1b8b538cdae525b6590c6ac7152cd0e7a3f64397e1c6f22d0ca1e8a",
+      "bytes": 8268
     },
     {
       "path": "examples/mcporter.json.example",
@@ -54908,8 +54913,8 @@
     },
     {
       "path": "tests/test_gateway_worker_defaults.py",
-      "sha256": "6144a5443c6e2e82ac2331149df03386bd2a925a1efd131c9858de0452b23053",
-      "bytes": 10090
+      "sha256": "cb5d7b7b64497fe3e67c4319da3ff50f1e56aadd3ccca563dad5eac1618cc255",
+      "bytes": 13005
     },
     {
       "path": "tests/test_gitleaks_config.py",
