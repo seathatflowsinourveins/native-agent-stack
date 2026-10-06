@@ -1,45 +1,10 @@
 # Decision: test official Qwen3-Embedding-8B Q8_0 in qmd on CPU (2026-10-06)
 
-Status: superseded by the 2026-10-06 retrieval-first local-model ruling. The CPU
-8B experiment stopped before completion; no AFTER benchmark or accepted 8B
-embedding index exists. The selection and acceptance plan below are historical
-and withdrawn, including the proposed 8B client registration switch.
-
-The accepted direction retires qmd's embedding role. Semantic catalog Markdown
-retrieval moves to SocratiCode on the shared Nemotron endpoint; qmd keeps lexical
-search, its own upstream default reranker as a named exception, and query
-expansion. Client cutover and final deletion remain command-center owned.
-
-## Replacement backend and next review
-
-The separate lexical index was built with native qmd 2.8.3 update on CPU, at
-nice 19 and idle I/O priority, preserving the live collection patterns and the
-ecosystem ignore. Native status and independent read-only SQLite observation
-showed 425 documents, zero vectors and zero excluded ecosystem documents.
-A declared title-based lexical query returned its expected acceptance-policy
-document at rank 1 with actual reranking and no unavailable warning. An earlier
-credential query missed its expected document; its output is retained separately.
-This is a local integration smoke, not embedding or ranking-quality acceptance.
-
-Kept files use immutable upstream revisions: the
-[reranker](https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/tree/a02f48bb4f057028298c21fa033da2b30d7742d5)
-hashes to `22c9979ce4fbcdc5acdc310c6641c32797eff1aa980b8f7a2db8a8ea23429a48`;
-the [expansion model](https://huggingface.co/tobil/qmd-query-expansion-1.7B-gguf/tree/7816de0b72572c6c860ca1eddf97ba9e7fb8cc65)
-hashes to `000dfb1c06efa6a049e9f64ba921c3740e2454f62abab6fa10e77bd30bb2bcc0`.
-The native node-llama-cpp reader confirmed reranker pooling type 4 and the
-`cls.output.weight` tensor. Host-specific receipts stay in private lane state.
-
-Future embedding and reranker discovery includes every vendor organization and
-models without leaderboard rows. Contextual chunk encoders form a distinct
-candidate class. The one-card re-drive of
-[Perplexity's preview](https://huggingface.co/perplexity-ai/pplx-embed-v2-context-9b-preview/blob/b667039ee8b438a6350fbc91bbcecd86f9d363ba/README.md)
-found separate query/document encoding methods, contextual chunk outputs, and
-preview identity constraints. Its card supplies no comparative result rows;
-it is a discovery candidate, not evidence for replacing the shared endpoint.
-Task-relevant quality evidence and a supported runtime/encoding contract would
-be required to overturn the kept retrieval direction.
-
-## Historical 8B selection and withdrawn acceptance plan
+Status: selected for native acceptance in a separate named index; host build
+pending the authorized time window. The user's A1 resolves shared MCP maintenance
+by retaining the existing index and adopting the new index on natural client
+restarts. This is a selection record, not a passed benchmark or installation
+receipt.
 
 The north-star action is source-backed catalog retrieval for complex engineering
 and US-equities research and historical simulation. No trading operation or
@@ -162,3 +127,50 @@ inline comment; use documented `qmd status`. Current bench rejects missing/empty
 collections despite a stale README warning, while individual backend failures
 still become zero metrics. These claims were checked in installed 2.8.3 and the
 matching pinned upstream source.
+
+## Amendment (2026-10-06): retired
+
+Superseded by the [qmd lexical supersession record](2026-10-06-qmd-lexical-supersession.md), a public companion to the existing dated lane supersession record. The original decided text and historical observations above remain intact.
+
+Status: superseded by the 2026-10-06 retrieval-first local-model ruling. The CPU
+8B experiment stopped before completion; no AFTER benchmark or accepted 8B
+embedding index exists. The selection and acceptance plan below are historical
+and withdrawn, including the proposed 8B client registration switch.
+
+The accepted direction retires qmd's embedding role. Semantic catalog Markdown
+retrieval moves to SocratiCode on the shared Nemotron endpoint; qmd keeps lexical
+search, its own upstream default reranker as a named exception, and query
+expansion. Client cutover and final deletion remain command-center owned.
+
+## Replacement backend and next review
+
+The separate lexical index was built with native qmd 2.8.3 update on CPU, at
+nice 19 and idle I/O priority, preserving the live collection patterns and the
+ecosystem ignore. Native status and independent read-only SQLite observation
+showed 425 documents, zero vectors and zero excluded ecosystem documents.
+A declared title-based lexical query returned its expected acceptance-policy
+document at rank 1 with actual reranking and no unavailable warning. An earlier
+credential query missed its expected document; its output is retained separately.
+This is a local integration smoke, not embedding or ranking-quality acceptance.
+
+Kept files use immutable upstream revisions: the
+[reranker](https://huggingface.co/ggml-org/Qwen3-Reranker-0.6B-Q8_0-GGUF/tree/a02f48bb4f057028298c21fa033da2b30d7742d5)
+hashes to `22c9979ce4fbcdc5acdc310c6641c32797eff1aa980b8f7a2db8a8ea23429a48`;
+the [expansion model](https://huggingface.co/tobil/qmd-query-expansion-1.7B-gguf/tree/7816de0b72572c6c860ca1eddf97ba9e7fb8cc65)
+hashes to `000dfb1c06efa6a049e9f64ba921c3740e2454f62abab6fa10e77bd30bb2bcc0`.
+The native node-llama-cpp reader confirmed reranker pooling type 4 and the
+`cls.output.weight` tensor. Host-specific receipts stay in private lane state.
+
+Future embedding and reranker discovery includes every vendor organization and
+models without leaderboard rows. Contextual chunk encoders form a distinct
+candidate class. The one-card re-drive of
+[Perplexity's preview](https://huggingface.co/perplexity-ai/pplx-embed-v2-context-9b-preview/blob/b667039ee8b438a6350fbc91bbcecd86f9d363ba/README.md)
+found separate query/document encoding methods, contextual chunk outputs, and
+preview identity constraints. Its card supplies no comparative result rows;
+it is a discovery candidate, not evidence for replacing the shared endpoint.
+Task-relevant quality evidence and a supported runtime/encoding contract would
+be required to overturn the kept retrieval direction.
+
+## Historical 8B selection and withdrawn acceptance plan
+
+The original 8B selection and its withdrawn acceptance plan remain above as historical text. This appended amendment records the final retirement direction; it does not authorize another embed attempt or the retired 8B client switch.
