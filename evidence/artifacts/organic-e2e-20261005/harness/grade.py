@@ -824,6 +824,19 @@ def _children(children_dir: Path) -> list[dict]:
     return out
 
 
+def termination_ns(ledger_rows: dict) -> int | None:
+    """When the trial's client was terminated, in ns: the launcher's own kill time, else, for a trial the `timeout`
+    command ended (rc 124), its launched time plus T, less one second for the launched row's whole-second stamp. None for
+    a client that exited on its own."""
+    exit_row, launched = ledger_rows.get("exit", {}) or {}, ledger_rows.get("launched", {}) or {}
+    if exit_row.get("kill_at"):
+        return _ts_ns(exit_row["kill_at"])
+    if exit_row.get("rc") == 124 and launched.get("at") and exit_row.get("t_seconds"):
+        start = _ts_ns(launched["at"])
+        return start + (int(exit_row["t_seconds"]) - 1) * 10**9 if start else None
+    return None
+
+
 def _order_for_tool(tool_use_id: str | None, calls_by_id: dict, hook_name: str | None, fallback):
     """A hook attachment's place in its actor's order: PreToolUse context reaches the model with the call's result,
     PostToolUse context just after it; session-level hooks come first."""
@@ -908,6 +921,15 @@ def grade_claude_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) ->
     catalog = skill_catalog("claude")
     result_order = stream.get("result_order")
     result_ns = _ts_ns(exit_row.get("result_at"))
+    # A call still running when the trial was terminated gets a shutdown result in the transcript ("Connection closed",
+    # written as the client exits) and no Loki row (smoke-20261006c claude-env: a ctx_batch_execute started at
+    # 10:30:06Z, result at 10:43:17Z after the timeout's SIGTERM). Such a call is marked terminated: never a completed use,
+    # and unresolved in G3, like a call with no result.
+    terminated_ns = termination_ns(ledger_rows)
+    for call in calls:
+        res_ns = _ts_ns((call.get("result") or {}).get("ts"))
+        if terminated_ns and res_ns and res_ns >= terminated_ns and call.get("status") != "no_result":
+            call["status"] = "terminated"
     uses = []
     for call in calls:
         for use in claude_uses(call, catalog, cwd):
@@ -985,7 +1007,7 @@ def grade_claude_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) ->
         and joins["loki_task_rows_same_session"] and transcript_found
     # G3 agreement on MCP and Skill calls, by tool_use_id.
     loki_results = {r.get("tool_use_id"): r for r in by_session if r.get("event_name") == "tool_result" and r.get("tool_use_id")}
-    disagreements, checked, checked_children, unresolved = [], 0, 0, 0
+    disagreements, checked, checked_children, unresolved, unresolved_terminated = [], 0, 0, 0, 0
     for call in calls:
         name = call.get("name") or ""
         if not (name.startswith("mcp__") or name == "Skill"):
@@ -996,6 +1018,10 @@ def grade_claude_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) ->
             if row is not None:
                 disagreements.append({"tool_use_id": call["id"], "issue": "Loki has a result the transcript lacks"})
             unresolved += 1
+            continue
+        if call.get("status") == "terminated":
+            # Its only result is the shutdown one, written after the trial was terminated (termination_ns).
+            unresolved_terminated += 1
             continue
         checked += 1
         if call.get("source") == "child-transcript":
@@ -1014,6 +1040,7 @@ def grade_claude_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) ->
     extra_loki = [k for k, r in loki_results.items() if (r.get("mcp_server_name") or r.get("tool_name") == "Skill") and k not in stream_call_ids]
     skill_rows = [r for r in by_session if r.get("event_name") == "skill_activated"]
     agreement = {"checked": checked, "checked_child_transcript_calls": checked_children, "unresolved_both_sides": unresolved,
+                 "unresolved_terminated": unresolved_terminated,
                  "disagreements": disagreements, "loki_only_mcp_or_skill": len(extra_loki),
                  "skill_activated_rows": [{k: r.get(k) for k in ("skill_name", "invocation_trigger")} for r in skill_rows]}
     agreement["pass"] = not disagreements and not extra_loki
@@ -1801,6 +1828,7 @@ def grade_run(root: Path) -> dict:
     gates["G7"]["canaries"] = canaries or "missing (no gate0.json: stage 2 has not run)"
     gates["G7"]["pass"] = bool(gates["G7"]["pass"]) and bool(canaries) and all(canaries.values())
     gates["G10"] = sdk_parity(cfg, graded_by)
+    gaps += gates["G10"].get("gaps") or []
     g12 = cfg.get("oracles_reproduce") or {}
     gates["G12"] = {"pass": g12.get("pass"), "differing": g12.get("differing"), "tests_run": g12.get("tests_run")}
     gates["G15"] = {"observed": observed, "gaps": [k for k, v in observed.items() if not v], "negatives": negatives}
@@ -1847,17 +1875,27 @@ def sdk_parity(cfg: dict, graded_by: dict) -> dict:
         row["pass"] = bool(ref_claude) and all(row.get(k) for k in ("mcp_servers", "skills", "agents"))
         checks.append(row)
     ref_codex = next(((r, g) for r, g in by_cell.get("codex-native", []) if g.get("skills_body_sha256")), (None, None))
+    gaps = []
     for cell in ("codex-sdk", "codex-app-server"):
         for record, graded in by_cell.get(cell, []):
             ref_record, ref_graded = ref_codex
             row = {"trial_id": record["trial_id"], "cell": cell, "provider_omniroute": graded.get("model_provider") == "omniroute",
-                   "gateway_entry": graded["effort"]["gateway_calls"] > 0,
                    "skills_equal_cl3": bool(ref_graded) and graded.get("skills_body_sha256") == ref_graded.get("skills_body_sha256"),
                    "clone_mcp_equal_cl3": bool(ref_record) and (record.get("codex") or {}).get("clone_mcp_servers")
                    == (ref_record.get("codex") or {}).get("clone_mcp_servers")}
             if cell == "codex-app-server":
                 row["one_main_rollout"] = graded.get("main_rollouts") == 1
             row["pass"] = all(v for k, v in row.items() if k not in ("trial_id", "cell"))
+            # The route rests on client-side telemetry (the rollout's session_meta provider). The gateway call log is
+            # best-effort under the command center's telemetry caveat (item task-ns2604-coop-20261005T200956Z): a client
+            # that exits right after response.completed can leave its rows unfinished (smoke-20261006c CL7b: three
+            # /v1/responses rows with status 0 whose detail returns 404, so no thread join). A joined entry is recorded;
+            # its absence is a gap, never the gate.
+            row["gateway_entry_best_effort"] = graded["effort"]["gateway_calls"] > 0
+            if not row["gateway_entry_best_effort"]:
+                gaps.append({"gate": "G10", "trial_id": record["trial_id"], "gap": "no gateway call-log entry joined to the "
+                             "thread (best-effort source under CC item 200956Z's telemetry caveat); the route rests on the "
+                             "rollout's omniroute provider"})
             checks.append(row)
     # G10 holds only when every SDK cell was exercised and passed: a cell with no graded trial is reported as not
     # exercised, never as a pass (a failed check still fails the gate).
@@ -1865,9 +1903,10 @@ def sdk_parity(cfg: dict, graded_by: dict) -> dict:
     not_exercised = [label for label, cell in cells.items() if not by_cell.get(cell)]
     failed = [c["trial_id"] for c in checks if not c["pass"]]
     if not checks:
-        return {"pass": None, "n": 0, "not_exercised": not_exercised, "note": "no CL6, CL7 or CL7b trial in this run"}
+        return {"pass": None, "n": 0, "not_exercised": not_exercised, "note": "no CL6, CL7 or CL7b trial in this run",
+                "gaps": gaps}
     return {"pass": False if failed else (None if not_exercised else True), "n": len(checks), "checks": checks,
-            "failed": failed, "not_exercised": not_exercised}
+            "failed": failed, "not_exercised": not_exercised, "gaps": gaps}
 
 
 # ---------------------------------------------------------------------------------------------------------------------
