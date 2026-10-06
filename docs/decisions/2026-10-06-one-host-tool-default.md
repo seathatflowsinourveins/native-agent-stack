@@ -28,14 +28,29 @@ At main@0d5e6506434fab598dee861c749a22e628beb75a, the [profile summary:4655](htt
 
 Updating the summary alone would leave the executable bootstrap unchanged. [bootstrap-linux.sh:233](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0d5e6506434fab598dee861c749a22e628beb75a/adoption/bootstrap-linux.sh#L233) consumes [pins-linux-x86_64.json:24-39](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0d5e6506434fab598dee861c749a22e628beb75a/adoption/pins-linux-x86_64.json#L24-L39), whose uv and gh rows still name the old versions. Its Python request is the 3.13 family at :989,:1007,:1450. The bootstrap owner must make the exact default explicit while retaining the supported native installation route. The existing preservation policy applies to a native self-installing client: [bootstrap-linux.sh:843-852](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0d5e6506434fab598dee861c749a22e628beb75a/adoption/bootstrap-linux.sh#L843-L852) and [:874-876](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0d5e6506434fab598dee861c749a22e628beb75a/adoption/bootstrap-linux.sh#L874-L876) retain a newer existing version above the installation floor; they do not define a second default.
 
-| Consumer | Required amendment | Owner / completion gate |
-| --- | --- | --- |
-| Profile/bootstrap | Align selected/default metadata and active artifact pins to the table; obtain each new artifact's native integrity verification | Existing profile/bootstrap owner; no historical source snapshot or receipt rewrite |
-| Install-plan configuration | Keep Node/uv/gh/host Python aligned; fold the selected harness-version amendments through the owners and generators | Existing install-plan/pin owners; exact installed/native receipts remain separate |
-| Trading uv gate | Change sync-trading-2604.sh:9 from 0.12.17 to 0.12.22; update its verified sync-vector hash in install-trading-2604.sh:84 | 5f; trading files are not edited by this PR |
-| CI promotion environment | Reconcile validate.yml:149-151's uv version and UV_SHA256 with0.12.22 | CI owner; verify the actual selected artifact, not only a renamed version |
-| Codex CLI/SDK/template consumers | Reconcile the0.160.1 CLI default and its supported paired SDK/launcher expectations | Live Codex owners; reapply the identity launcher after a version switch |
-| Harbor, Collector and vLLM | Fold the table's selected versions and their actual native qualification evidence | Live component owners; host-stack pin includes its saturation-audit row and qualification receipt |
+The amendments below were checked against main@4ce7632b865a19fe806f12442f64d7157f08f18c. Currency's profile/bootstrap follow-up starts after #642 and #645 land, or is folded into an unlanded wave only if 5f requests it; currency does not push to those queued branches.
+
+| File and line | Current pin | Selected pin / amendment | Owner |
+| --- | --- | --- | --- |
+| adoption/new-wsl-profile.json:226; bootstrap summary:4663 | Node24.21.0 | Keep24.21.0 | currency after #642/#645 |
+| adoption/new-wsl-profile.json:283; bootstrap summary:4664 | uv0.12.17 | 0.12.22 | currency after #642/#645 |
+| adoption/new-wsl-profile.json:334; bootstrap summary:4665 | gh2.101.0 | 2.102.0 | currency after #642/#645 |
+| adoption/new-wsl-profile.json:396; summary:4657 | Python3.13.15 | host Python3.13.16 | currency after #642/#645 |
+| adoption/new-wsl-profile.json:444 | Codex0.160.0 | 0.160.1; coordinate the supported paired SDK/launcher requirements | currency with live Codex owners |
+| adoption/new-wsl-profile.json:550 | Claude2.1.284 floor | selected default2.1.292 after cooldown; keep newer-client preservation | currency with native-client owner |
+| adoption/new-wsl-profile.json:1740 | Harbor0.23.0 | 0.24.0 after native qualification | currency with Harbor owner |
+| adoption/new-wsl-profile.json:3460 | Collector0.162.0 | Keep0.162.0 | currency with Collector owner |
+| adoption/pins-linux-x86_64.json:9,24,39,54,106 | Node24.21.0;uv0.12.17;gh2.101.0;Codex0.160.0;Claude2.1.284 | 24.21.0;0.12.22;2.102.0;0.160.1;2.1.292, with corresponding verified artifacts and native promotion gates | currency after #642/#645 |
+| adoption/bootstrap-linux.sh:989,1007,1450 | Python3.13 family request | Make the host default3.13.16 explicit through the native uv route | currency bootstrap follow-up |
+| evidence/artifacts/new-wsl-install-plan-20261002/mise.toml:6-8,15 | Node24.21.0;Python3.13.16;uv0.12.22;gh2.102.0 | Keep all four aligned | fixwave-defects (#723) |
+| evidence/artifacts/new-wsl-install-plan-20261002/transfer-mise.toml (#776) | No Node/Python/uv/gh entry; named-only Gitleaks/Grype/ntfy/Qdrant transfer | Keep named-only scope; do not introduce a second host-toolchain default | fixwave-defects (#776) |
+| evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json:11,52,2208,2848 | Claude2.1.287;Codex0.160.0;Collector0.162.0;Harbor0.23.0 | 2.1.292;0.160.1;0.162.0;0.24.0 through each owner's generator/qualification amendment | fixwave-defects and native component owners |
+| manifests/stack.json:190,296,1035,1093 | Claude2.1.284;Codex0.160.0;vLLM0.30.0;Collector0.161.0 | 2.1.292;0.160.1;0.31.0;0.162.0 with saturation-audit rows and real qualification receipts | currency wave/native component owners; queued branches remain 5f-only |
+| .github/workflows/validate.yml:149-151 | uv0.12.17 and its UV_SHA256 | uv0.12.22 and the verified selected archive checksum | github-ci-finalize |
+| blueprints/us-equities/runtime-2604/sync-trading-2604.sh:9 | uv0.12.17 | 0.12.22 | 5f |
+| blueprints/us-equities/runtime-2604/install-trading-2604.sh:84-112 | Frozen sync-vector digest and exact uv check | Refresh the digest with the changed sync file; retain the exact0.12.22 gate and failure path | 5f |
+
+The transfer manifest was read at #776's head8d4f16be8903f313bc96d555cebf4f593a6faf36; it does not declare the four host-toolchain tools. Profile and bootstrap amendments require the native integrity verifier for each changed artifact. The table is an owner handoff, not a new installer or permission to mutate a queued branch.
 
 The trading [installer:84-88](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0d5e6506434fab598dee861c749a22e628beb75a/blueprints/us-equities/runtime-2604/install-trading-2604.sh#L84-L88) verifies the sync file before sourcing it; its exact uv check at [:112](https://github.com/seathatflowsinourveins/native-agent-stack/blob/0d5e6506434fab598dee861c749a22e628beb75a/blueprints/us-equities/runtime-2604/install-trading-2604.sh#L112) exits 69 on mismatch. Both edits belong to 5f. Retain the failed 0.12.17 observation as dated evidence.
 

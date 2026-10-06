@@ -3,6 +3,8 @@
   "kind": "source_review_and_dated_installed_version_observation",
   "recorded_at_utc": "2026-10-06T20:45:51Z",
   "base_commit": "0d5e6506434fab598dee861c749a22e628beb75a",
+  "amendment_table_verified_at_main": "4ce7632b865a19fe806f12442f64d7157f08f18c",
+  "transfer_mise_verified_at_pr_head": "8d4f16be8903f313bc96d555cebf4f593a6faf36",
   "purpose": "One logical host default; coordinated executable consumer amendments remain pending owners.",
   "source_class": "maintainer release/tag metadata; installed version observations; no new install or native qualification",
   "command_and_observation_semantics": "command strings are readable labels, not full argv; installed version values are normalized observations, not raw stdout. Exit codes refer to the corresponding native version/metadata checks.",
