@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "id": "worker-census-markers-20261006",
+  "kind": "source_review_and_local_integration",
+  "recorded_at_utc": "2026-10-06T16:02:00Z",
+  "base_revision": "bbe1b8d4362862cefc78e72f5c3757ad835a5124",
+  "claim": "Claude bridge selects the canonical 2604 endpoint as an Anthropic root or falls back to 21128. DeepAgents and Claude SDK configure supported census markers. Delivery and live census acceptance are not claimed.",
+  "sources": [
+    "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-topology.json:9",
+    "langchain-ai/langchain@026c3da2b615abe52f8446e37de460b844d07a43:libs/partners/openai/langchain_openai/chat_models/base.py:1016,1464-1468",
+    "anthropics/claude-agent-sdk-python@f2204bb956bab02907aaf3cb88eb9dead28eaa35:src/claude_agent_sdk/types.py:2124-2127;_internal/transport/subprocess_cli.py:819-825",
+    "https://code.claude.com/docs/en/env-vars",
+    "diegosouzapw/OmniRoute@2f42a9ac19d1a247ec9ce5473b790843724b3061:open-sse/services/conversationTracker.ts:453,462-468;open-sse/handlers/chatCore.ts:1082-1095,1127-1133;src/lib/usage/callLogs.ts:741,804-821,995-996",
+    "https://docs.python.org/3.13/library/uuid.html#uuid.uuid4"
+  ],
+  "markers": {
+    "header": "X-OmniRoute-Session-Id",
+    "deepagents_prefix": "nas-deepagents-omniroute-",
+    "claude_prefix": "nas-claude-runtime-sdk-",
+    "suffix": "fresh UUID hex",
+    "deepagents_scope": "Separate main/specialist model instances, each holding its own tag; distinct conversations are not joined.",
+    "claude_scope": "One fresh standalone invocation through worker-scoped options.env.",
+    "gateway_scope": "Header groups conversation/reasoning replay and persists as call_logs.session_tag. Not a purely cosmetic label.",
+    "counting": "Prefix attributes logged attempts; distinct DeepAgents model tags are not worker-invocation counts. No live logs inspected."
+  },
+  "checks": [
+    {
+      "command": "nice -n 19 python3 -m unittest -v tests.test_gateway_worker_defaults",
+      "exit_code": 0,
+      "output": "Ran 8 tests in 0.075s\n\nOK\n",
+      "evidence_class": "synthetic local configuration; inert provider imports and constructors"
+    },
+    {
+      "command": "nice -n 19 uv run --no-project --offline --no-build --python 3.13 --with claude-agent-sdk==0.2.162 python -m unittest discover -s examples/claude-runtime-sdk/tests; task-private UV_CACHE_DIR/TMPDIR",
+      "exit_code": 0,
+      "output": "..........................\n----------------------------------------------------------------------\nRan 26 tests in 0.353s\n\nOK\n",
+      "evidence_class": "repository integration with real pinned SDK and synthetic clients/results; no provider requests"
+    },
+    {
+      "command": "Native pinned SDK bundled executable --version",
+      "exit_code": 0,
+      "output": "2.1.285 (Claude Code)\n",
+      "evidence_class": "native client metadata; not a model turn or header-delivery observation"
+    },
+    {
+      "command": "uv lock --script examples/claude-runtime-sdk/worker.py --check --offline",
+      "exit_code": 0,
+      "output": "Resolved 32 packages in 3ms\n",
+      "evidence_class": "native frozen script-lock metadata; no lock rewrite"
+    }
+  ],
+  "failed_attempts": [
+    {
+      "command": "uv run --no-project --offline --no-build --python 3.13 --with claude-agent-sdk==0.2.162 python -m unittest discover -s examples/claude-runtime-sdk/tests -v",
+      "exit_code": 1,
+      "cause": "Pinned SDK unavailable in default offline cache.",
+      "recovery": "Native supported uv installed the upstream wheel in task-private cache/environment, without a build; 30 packages installed. First successful 26-test run: exit 0, 0.405s. Repeated final offline run above is separate."
+    },
+    {
+      "condition": "Initial synthetic marker fixture assumed main/specialist sharing was desirable.",
+      "exit_code": 0,
+      "correction": "Pinned gateway source shows conversation/reasoning-replay scope. Revised implementation and final test assert four distinct tags across two graph constructions; the earlier pass is not acceptance of the final scope."
+    }
+  ],
+  "evidence_classes": {
+    "upstream_feature_and_gateway_persistence": "source_review at named pins",
+    "configured_defaults_and_markers": "synthetic local integration",
+    "existing_claude_sdk_cases": "local integration with real pinned SDK and synthetic runtime fixtures",
+    "unchanged_upstream_tests": "not_run",
+    "live_gateway_or_provider": "not_run",
+    "native_bar_closure": "not_claimed"
+  },
+  "retained_prior_evidence": "worker-gateway-defaults-20261006.json remains byte-identical at this fold; its historical observations, failed controls and warnings are not replaced by these checks.",
+  "sanitization": "Summary output comes from actual returned native commands; task-private paths and random tag values are omitted. No credentials, private conversations or native session IDs are recorded.",
+  "limits": [
+    "Header source/persistence review is not an observed new live request.",
+    "Canonical endpoint changes require renewed default tests; model/profile/effort/provider/deployment acceptance remains separate.",
+    "Original historical records and another owner's host configuration remain untouched."
+  ]
+}

@@ -37,6 +37,15 @@ provider execution or promote this candidate to a default.
   Matching package metadata alone does not establish source identity: the
   earlier LangGraph `49cce0ca` source differs from these published bytes.
 
+Each model sends `X-OmniRoute-Session-Id: nas-deepagents-omniroute-<UUID hex>`
+through LangChain's pinned `default_headers` interface. The main model and
+specialist keep distinct fresh tags, held for each model instance. OmniRoute's
+[`session_tag` persistence](https://github.com/diegosouzapw/OmniRoute/blob/2f42a9ac19d1a247ec9ce5473b790843724b3061/src/lib/usage/callLogs.ts#L741)
+and prefix filter at :995-996 support census attribution. This header also scopes
+gateway conversation/reasoning replay; sharing a tag between those conversations
+was rejected. Count attempts and distinct model tags separately from worker
+invocations. `--describe` reports the prefix, not a live request or census result.
+
 The main worker and named `source-reviewer` each receive their own configured
 Sol/Max model. A native harness profile disables implicit general-purpose
 subagents and the `execute` tool. Native `ToolCallLimitMiddleware` limits `task`

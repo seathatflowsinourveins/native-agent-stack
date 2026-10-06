@@ -5,6 +5,7 @@ import argparse
 import importlib.metadata
 import json
 import os
+import uuid
 from pathlib import Path
 from urllib.parse import urlsplit
 
@@ -27,6 +28,7 @@ GATEWAY_TOPOLOGY = (
     Path("evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-topology.json")
 )
 MODEL = "cx/gpt-6.1-sol-max"
+RUN_MARKER = "nas-deepagents-omniroute"
 
 
 def default_gateway_base_url():
@@ -65,6 +67,10 @@ def chat_model(api_key_env, base_url):
         model=MODEL,
         base_url=base_url,
         api_key=os.environ[api_key_env],
+        # langchain@026c3da2 base.py:1016,1467; OmniRoute@2f42a9ac
+        # attemptLogging.ts:296-299 persists this native header as session_tag.
+        # Each model keeps its own conversation/reasoning-replay scope.
+        default_headers={"X-OmniRoute-Session-Id": RUN_MARKER + "-" + uuid.uuid4().hex},
         use_responses_api=True,
         use_previous_response_id=False,
         reasoning={"effort": "max"},
@@ -158,6 +164,7 @@ def main():
                 },
                 "base_url": args.base_url,
                 "underlying_lane": default_base_url,
+                "run_marker_prefix": RUN_MARKER + "-",
                 "model": MODEL,
                 "reasoning": {"effort": "max"},
                 "api_key_env": args.api_key_env,

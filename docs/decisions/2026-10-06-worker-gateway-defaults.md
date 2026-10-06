@@ -65,12 +65,35 @@ configuration coverage, not a new Dagu graph execution.
 A root-env `${WORKER_BASE_URL:-...}` default was considered but rejected:
 pinned Dagu leaves unavailable variables unresolved before operator expansion.
 The supported required-binding recipe avoids claiming an unset-variable
-default. Other stale defaults remain outside this assignment and need their
-owners' scoped follow-up: `examples/claude-runtime-sdk/worker.py:46` still selects 20128, and
+default. The earlier fold left the Claude bridge default for a scoped follow-up.
+The token-audit assignment now adds its canonical topology reader, 21128 fallback
+and explicit `--gateway` override. It removes `/v1` from the OpenAI-shaped endpoint
+because Claude appends `/v1/messages` to its root. Another owner-scoped default,
 `tools/sota-convergence/landscape-sweep/build_args.py:116,696` retains both its
 20128 default URL and fallback host. These source paths are at ecfa11276.
 Historical trial plans and receipts remain historical evidence. The proposed
 Claude route in open draft #723 still awaits its canonical owner's decision.
+
+The same bounded assignment adds supported census markers to DeepAgents and the
+Claude SDK bridge. LangChain `default_headers` and Claude's official
+`ANTHROPIC_CUSTOM_HEADERS` through SDK `options.env` send the gateway-native
+`X-OmniRoute-Session-Id`. Prefixes `nas-deepagents-omniroute-` and
+`nas-claude-runtime-sdk-` plus fresh UUID hex fit the pinned gateway's 128-character
+cap and persist as `call_logs.session_tag`. This header also scopes conversation
+and reasoning replay. A first local fixture expected both DeepAgents models to
+share a tag; pinned gateway source refuted the assumption that tagging was
+cosmetic, so the final change gives each model a distinct tag. Each model keeps
+its own tag for its instance; Claude keeps one fresh invocation tag. Stable
+global tags and arbitrary unpersisted headers were rejected. Distinct model tags
+and call attempts are not worker-invocation counts.
+
+Eight current synthetic configuration checks and all 26 existing repository
+Claude SDK integration cases pass. The native upstream wheel is installed only
+in task-private uv state, without building. Its bundled CLI reports 2.1.285,
+above the official header interface's 2.1.227 minimum. An initial offline-cache
+attempt failed and is retained; the private install and later offline check
+passed. No gateway/model request was made. Live marker persistence remains an
+after-relaunch qualification, not an inference from constructor fixtures.
 
 Overturn the fallback when the command center adopts a different canonical
 NativeStack2604 endpoint. Requalify default selection when the topology schema,
@@ -88,3 +111,6 @@ Sources:
 - [Dagu value-resolution specification](https://github.com/dagu-org/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/specs/006-value-resolution-env.md#L393) and [undefined-variable handling](https://github.com/dagu-org/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/cmn/value/expand.go#L146) support the required root-env binding.
 - [Pinned Codex SDK](https://github.com/openai/codex/tree/a956835d020762cb2b570053af06f643a11c0ecc/sdk/python) and the existing `native-agent-stack@ecfa11276:examples/omniroute-codex-sdk/test_worker.py:502,774` support the bounded native configuration/preflight checks.
 - [Pinned DeepAgents API](https://github.com/langchain-ai/deepagents/tree/4394bcd00b8eb46e7c423939643a0dfcfb5d8773) and [LangChain OpenAI base_url](https://github.com/langchain-ai/langchain/blob/026c3da2b615abe52f8446e37de460b844d07a43/libs/partners/openai/langchain_openai/chat_models/base.py) remain the example's supported runtime APIs.
+- `langchain-ai/langchain@026c3da2b615abe52f8446e37de460b844d07a43:libs/partners/openai/langchain_openai/chat_models/base.py:1016,1464-1468` supports request default headers.
+- `anthropics/claude-agent-sdk-python@f2204bb956bab02907aaf3cb88eb9dead28eaa35:src/claude_agent_sdk/types.py:2124-2127;_internal/transport/subprocess_cli.py:819-825` passes worker-scoped environment. [Official Claude header interface](https://code.claude.com/docs/en/env-vars), read 2026-10-06.
+- `diegosouzapw/OmniRoute@2f42a9ac19d1a247ec9ce5473b790843724b3061:open-sse/services/conversationTracker.ts:453,462-468;open-sse/handlers/chatCore.ts:1082-1095,1127-1133;src/lib/usage/callLogs.ts:741,804-821,995-996` defines header scope, persistence and filtering. [UUID generation](https://docs.python.org/3.13/library/uuid.html#uuid.uuid4) supplies distinct identifiers without credential or path content.

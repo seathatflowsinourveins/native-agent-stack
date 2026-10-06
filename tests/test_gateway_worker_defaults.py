@@ -16,7 +16,7 @@ import shlex
 from string import Template
 import sys
 import tempfile
-from types import ModuleType
+from types import ModuleType, SimpleNamespace
 import unittest
 from unittest.mock import patch
 from urllib.parse import urlsplit
@@ -57,6 +57,14 @@ def imports_without_providers():
         "langgraph": {},
         "langgraph.checkpoint": {},
         "langgraph.checkpoint.sqlite": {"SqliteSaver": provider_forbidden},
+        "anyio": {"run": provider_forbidden},
+        "claude_agent_sdk": {
+            "ClaudeAgentOptions": SimpleNamespace,
+            "ClaudeSDKClient": provider_forbidden,
+            **{name: type(name, (), {}) for name in
+               ("AssistantMessage", "ResultMessage", "SystemMessage", "ToolResultBlock",
+                "ToolUseBlock", "UserMessage")},
+        },
     }
     modules = {}
     for name, values in exports.items():
@@ -74,12 +82,16 @@ class GatewayWorkerDefaultTests(unittest.TestCase):
         strict = os.environ.get("LANGGRAPH_STRICT_MSGPACK")
         try:
             with patch.dict(sys.modules, imports_without_providers()):
-                for name, directory in (("codex", "omniroute-codex-sdk"), ("deepagents", "deepagents-omniroute")):
+                for name, directory in (("codex", "omniroute-codex-sdk"),
+                                        ("deepagents", "deepagents-omniroute"),
+                                        ("claude", "claude-runtime-sdk")):
                     spec = importlib.util.spec_from_file_location(
                         "gateway_default_" + name, ROOT / "examples" / directory / "worker.py"
                     )
                     module = importlib.util.module_from_spec(spec)
-                    spec.loader.exec_module(module)
+                    # dataclasses resolves the module while decorating Observation.
+                    with patch.dict(sys.modules, {spec.name: module}):
+                        spec.loader.exec_module(module)
                     cls.workers[name] = module
         finally:
             if strict is None:
@@ -89,6 +101,16 @@ class GatewayWorkerDefaultTests(unittest.TestCase):
 
     def selected_url(self, name, topology, explicit=None):
         worker = self.workers[name]
+        if name == "claude":
+            argv = ["--cwd", str(ROOT)]
+            if explicit is not None:
+                argv.extend(["--gateway", explicit.removesuffix("/v1")])
+            with patch.object(worker, "GATEWAY_TOPOLOGY", topology), \
+                    patch.dict(os.environ, {}, clear=True):
+                options = worker.build_options(worker.parser().parse_args(argv))
+            root = options.env["ANTHROPIC_BASE_URL"]
+            self.assertEqual(urlsplit(root).path, "")
+            return root + "/v1"
         argv = ["--workspace", str(ROOT)]
         if explicit is not None:
             argv.extend(["--base-url", explicit])
@@ -204,6 +226,35 @@ class GatewayWorkerDefaultTests(unittest.TestCase):
                     if "<" in argv:
                         argv = argv[:argv.index("<")]
                     self.assertEqual(self.workers["codex"].parse_args(argv).base_url, expected)
+
+    def test_deepagents_models_have_distinct_countable_conversation_markers(self):
+        worker = self.workers["deepagents"]
+        with patch.dict(os.environ, {"FIXTURE_KEY": "synthetic-not-a-credential"}, clear=True), \
+                patch.object(worker, "ChatOpenAI") as model, \
+                patch.object(worker, "register_harness_profile"), \
+                patch.object(worker, "GeneralPurposeSubagentProfile"), \
+                patch.object(worker, "HarnessProfile"), \
+                patch.object(worker, "FilesystemBackend"), \
+                patch.object(worker, "ToolCallLimitMiddleware"), \
+                patch.object(worker, "create_deep_agent"):
+            worker.build_graph(ROOT, [], object(), "FIXTURE_KEY", FALLBACK)
+            worker.build_graph(ROOT, [], object(), "FIXTURE_KEY", FALLBACK)
+        self.assertEqual(model.call_count, 4)
+        tags = [call.kwargs["default_headers"]["X-OmniRoute-Session-Id"]
+                for call in model.call_args_list]
+        self.assertEqual(len(set(tags)), 4)
+        for tag in tags:
+            self.assertRegex(tag, r"^nas-deepagents-omniroute-[0-9a-f]{32}$")
+
+    def test_claude_native_header_keeps_a_distinct_invocation_marker(self):
+        worker = self.workers["claude"]
+        with patch.dict(os.environ, {}, clear=True):
+            options = [worker.build_options(worker.parser().parse_args(["--cwd", str(ROOT)]))
+                       for _ in range(2)]
+        headers = [option.env["ANTHROPIC_CUSTOM_HEADERS"] for option in options]
+        self.assertNotEqual(headers[0], headers[1])
+        for header in headers:
+            self.assertRegex(header, r"^X-OmniRoute-Session-Id: nas-claude-runtime-sdk-[0-9a-f]{32}$")
 
 
 if __name__ == "__main__":
