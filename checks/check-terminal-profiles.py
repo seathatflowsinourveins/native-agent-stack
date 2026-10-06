@@ -1,7 +1,7 @@
 """Repository-only port of the maintained Windows Terminal policy checker.
 
 Source: nativestack-practice@a7b8018524575cabbd979e6f2e1c84ee6e94700f:
-checks/check-terminal-profiles.py (SHA2567e85df7e).
+checks/check-terminal-profiles.py (SHA256 7e85df7e).
 Usage: python3 -B checks/check-terminal-profiles.py [fragment.json [settings-fixture.json]]
 No arguments check windows/nativestack2604.json. Only explicit fixture paths
 are read; native client configuration and deployed files are never discovered.
@@ -9,7 +9,6 @@ are read; native client configuration and deployed files are never discovered.
 import json, os, pathlib, re, sys
 
 root = pathlib.Path(__file__).resolve().parents[1]
-fixture = True
 fragment = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else root / 'windows/nativestack2604.json'
 settings_files = [pathlib.Path(sys.argv[2])] if len(sys.argv) > 2 else []
 sys.path.insert(0, str(root / 'scripts'))
@@ -29,9 +28,6 @@ def quiet_sound(sound):
 def sound_present(sound):
     """Check file existence only in an explicitly selected media directory."""
     return MEDIA_DIR is None or (MEDIA_DIR / sound[len(MEDIA):]).is_file()
-# openai/codex rust-v0.157.1 codex-rs/tui/src/chatwidget/notifications.rs type_name(), L72-L81.
-CODEX_KINDS = {'agent-turn-complete', 'approval-requested', 'plan-mode-prompt', 'async-question'}
-CODEX_WANTED = ['approval-requested', 'plan-mode-prompt', 'async-question']
 errors = []
 # Windows Terminal gives a fragment profile that declares no guid a stable one: UUIDv5 of the profile name under UUIDv5 of the fragment folder's name,
 # both under the fragment namespace, names as UTF-16LE (Profile::_GenerateGuidForProfile and the fragment page's "Generating a new profile GUID" at
@@ -228,5 +224,5 @@ if errors:
         print('FAIL ' + message)
     sys.exit(1)
 print('PASS ' + str(len(profiles)) + ' profiles: AI clients let titles through, ring audible+taskbar with a quiet sound and pass none of the barred options; static shells stay silent; '
-      'every Claude profile sets COLORTERM through the profile environment key' + ('' if fixture else '; Codex kinds and the deployed copy verified')
+      'every Claude profile sets COLORTERM through the profile environment key'
       + ('; ' + str(settings_scanned) + ' settings.json scanned (AI profiles there follow the same rules)' if settings_scanned else ''))

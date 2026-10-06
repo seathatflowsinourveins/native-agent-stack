@@ -9,7 +9,7 @@ import sys
 import tempfile
 import unittest
 
-from scripts.terminal_profile_ids import derived_guid
+from scripts.terminal_profile_ids import derived_guid, project_terminal_settings
 from scripts.validate import scan_file_for_private_content
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -63,6 +63,15 @@ class TerminalFragmentTests(unittest.TestCase):
         static.pop("bellSound")
         result = self.run_check([profile(), profile("NativeStack2604 - Codex", "codex"), static])
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+
+    def test_real_repository_fragment_passes_the_default_checker(self):
+        env = dict(os.environ, HOME=str(self.home))
+        env.pop("NATIVESTACK_MEDIA_DIR", None)
+        result = subprocess.run([sys.executable, "-B", str(CHECKER)], cwd=ROOT,
+                                env=env, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        self.assertIn("PASS 16 profiles", result.stdout)
+        self.assertNotIn("deployed copy verified", result.stdout)
 
     def test_missing_wrong_and_duplicate_identifiers_fail(self):
         for change in ("missing", "wrong", "duplicate"):
@@ -176,6 +185,124 @@ class TerminalFragmentTests(unittest.TestCase):
                 findings = scan_file_for_private_content(self.path)
                 self.assertTrue(findings)
                 self.assertTrue(all(value not in finding for finding in findings))
+
+
+class TerminalSettingsProjectionTests(unittest.TestCase):
+    def setUp(self):
+        self.canonical = json.loads((ROOT / "windows/nativestack2604.json").read_text())["profiles"]
+        self.claude = next(p for p in self.canonical if p["name"] == "NativeStack2604 - Claude")
+        self.obsolete = {
+            "name": "NativeStack2604 - Codex token lane",
+            "guid": derived_guid("NativeStack", "Legacy explicit token identity"),
+            "source": "NativeStack", "hidden": False,
+        }
+
+    def test_obsolete_owned_profile_is_hidden_without_changing_other_profiles(self):
+        canonical = [{"guid": p["guid"], "name": p["name"], "source": "NativeStack",
+                      "hidden": p.get("hidden", False)} for p in self.canonical]
+        other = {"guid": derived_guid("Other", "Custom"), "source": "Other",
+                 "name": "NativeStack2604 - Custom", "hidden": False}
+        old = {"guid": derived_guid("NativeStack", "NativeStack - Shell"),
+               "source": "NativeStack", "name": "NativeStack - Shell", "hidden": False}
+        settings = {"defaultProfile": self.claude["guid"], "theme": "system",
+                    "profiles": {"defaults": {"colorScheme": "Keep"},
+                                 "list": [copy.deepcopy(self.obsolete), *canonical, other, old]}}
+        before = copy.deepcopy(settings)
+        projected, changed = project_terminal_settings(settings, self.canonical)
+        self.assertTrue(changed)
+        self.assertEqual(settings, before)
+        self.assertTrue(projected["profiles"]["list"][0]["hidden"])
+        self.assertEqual(projected["profiles"]["list"][1:], before["profiles"]["list"][1:])
+        self.assertEqual(projected["profiles"]["defaults"], before["profiles"]["defaults"])
+        self.assertEqual(projected["defaultProfile"], before["defaultProfile"])
+        self.assertEqual(projected["theme"], before["theme"])
+
+    def test_legacy_fragment_metadata_upserts_an_absent_override(self):
+        settings = {"defaultProfile": self.claude["name"], "profiles": {"list": []}}
+        legacy = copy.deepcopy(self.obsolete)
+        legacy.pop("source")  # The argument itself supplies NativeStack ownership.
+        projected, changed = project_terminal_settings(
+            settings, self.canonical, legacy_native_stack_profiles=[legacy])
+        self.assertTrue(changed)
+        self.assertEqual(projected["profiles"]["list"], [
+            {"guid": legacy["guid"], "source": "NativeStack", "hidden": True}])
+        self.assertEqual(projected["defaultProfile"], self.claude["name"])
+        self.assertEqual(settings["profiles"]["list"], [])
+
+    def test_repeat_projection_is_idempotent(self):
+        settings = {"profiles": {"list": []}}
+        first, changed = project_terminal_settings(
+            settings, self.canonical, legacy_native_stack_profiles=[self.obsolete])
+        self.assertTrue(changed)
+        second, changed = project_terminal_settings(
+            first, self.canonical, legacy_native_stack_profiles=[self.obsolete])
+        self.assertFalse(changed)
+        self.assertEqual(second, first)
+
+    def test_correct_default_name_or_guid_needs_no_settings_rewrite(self):
+        for value in (self.claude["name"], self.claude["guid"], self.claude["guid"].upper()):
+            with self.subTest(value=value):
+                settings = {"defaultProfile": value, "profiles": {"list": []}}
+                projected, changed = project_terminal_settings(settings, self.canonical)
+                self.assertFalse(changed)
+                self.assertEqual(projected, settings)
+                self.assertEqual(projected["defaultProfile"], value)
+
+    def test_wrong_default_is_changed_to_the_canonical_claude_guid(self):
+        settings = {"defaultProfile": "Other profile"}
+        projected, changed = project_terminal_settings(settings, self.canonical)
+        self.assertTrue(changed)
+        self.assertEqual(projected, {"defaultProfile": self.claude["guid"]})
+        self.assertEqual(settings, {"defaultProfile": "Other profile"})
+
+    def test_same_name_from_another_identity_selects_the_canonical_guid(self):
+        other = {"name": self.claude["name"], "source": "Other",
+                 "guid": derived_guid("Other", self.claude["name"])}
+        settings = {"defaultProfile": self.claude["name"], "profiles": {"list": [other]}}
+        projected, changed = project_terminal_settings(settings, self.canonical)
+        self.assertTrue(changed)
+        self.assertEqual(projected["defaultProfile"], self.claude["guid"])
+        self.assertEqual(projected["profiles"], settings["profiles"])
+
+    def test_already_correct_default_does_not_skip_visibility_migration(self):
+        settings = {"defaultProfile": self.claude["name"],
+                    "profiles": {"list": [copy.deepcopy(self.obsolete)]}}
+        projected, changed = project_terminal_settings(settings, self.canonical)
+        self.assertTrue(changed)
+        self.assertTrue(projected["profiles"]["list"][0]["hidden"])
+        self.assertEqual(projected["defaultProfile"], self.claude["name"])
+
+    def test_flat_profile_array_and_guid_only_override_are_preserved(self):
+
+        override = {"guid": self.obsolete["guid"].upper(), "font": {"size": 14}}
+        settings = {"defaultProfile": self.claude["guid"], "profiles": [override]}
+        projected, changed = project_terminal_settings(
+            settings, self.canonical, legacy_native_stack_profiles=[self.obsolete])
+        self.assertTrue(changed)
+        self.assertEqual(projected["profiles"], [{**override, "hidden": True}])
+        self.assertIsInstance(projected["profiles"], list)
+
+    def test_unresolved_same_name_profile_selects_the_canonical_guid(self):
+        for guid in (None, "invalid profile identity"):
+            with self.subTest(guid=guid):
+                other = {"name": self.claude["name"], "commandline": "cmd.exe"}
+                if guid is not None:
+                    other["guid"] = guid
+                settings = {"defaultProfile": self.claude["name"],
+                            "profiles": {"list": [other]}}
+                projected, changed = project_terminal_settings(settings, self.canonical)
+                self.assertTrue(changed)
+                self.assertEqual(projected["defaultProfile"], self.claude["guid"])
+                self.assertEqual(projected["profiles"], settings["profiles"])
+
+    def test_legacy_metadata_cannot_hide_another_sources_same_guid(self):
+        settings = {"defaultProfile": self.claude["guid"], "profiles": {"list": [
+            {**self.obsolete, "source": "Other"}]}}
+        before = copy.deepcopy(settings)
+        with self.assertRaisesRegex(ValueError, "conflicting profile source"):
+            project_terminal_settings(settings, self.canonical,
+                                      legacy_native_stack_profiles=[self.obsolete])
+        self.assertEqual(settings, before)
 
 
 if __name__ == "__main__":

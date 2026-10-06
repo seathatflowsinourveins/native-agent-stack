@@ -13,8 +13,8 @@
     "Librarium cwd and clone/vault binding are DEFERRED to P1-CLI; its profile remains hidden. Librarium course is a distinct project.",
     "Operations and Local Chat depend on the installed nativestack CLI; four lane launcher/prompt files must be staged by their owner. No prompt body is authored here.",
     "The old independent HTTP omniroute-fw on 20129 has no established 2604 equivalent. Its references are DEFERRED to Phase 3; WebSocket 21129 is not a replacement.",
-    "The broader 174-test regression retained one installed-client currency failure: Claude2.1.291 exposes auth_storage_failure, absent from the unchanged notification decision table. 173 tests passed; no test or setting was changed to conceal it.",
-    "Independent review and operator host apply/read-back remain pending. The bounded same-lane completeness critic is a source-review lead, not independent acceptance."
+    "The broader 174-test regression retained one installed-client currency failure: Claude 2.1.291 exposes auth_storage_failure, absent from the unchanged notification decision table. 173 tests passed; no test or setting was changed to conceal it.",
+    "The command-center exact-head read at b216f9d7884d4d8519743b9e1c8f4f3c53181513 returned ACK_AFTER with two P2 and four P3 findings. Repair micro-check and operator host apply/read-back remain pending; a source review is not deployment acceptance."
   ],
   "evidence_class": "source_review",
   "source_date": "2026-10-06",
@@ -29,7 +29,8 @@
       "released_utc": "2026-10-02T20:27:27Z",
       "paths": [
         "src/cascadia/TerminalSettingsModel/Profile.cpp:307-318",
-        "doc/cascadia/profiles.schema.json"
+        "doc/cascadia/profiles.schema.json",
+        "src/cascadia/TerminalSettingsModel/CascadiaSettingsSerialization.cpp:370-371,915,1074-1092"
       ],
       "url": "https://github.com/microsoft/terminal/releases/tag/v1.25.2733.0"
     },
@@ -67,13 +68,15 @@
         "docs/decisions/2026-09-28-terminal-experience.md:57-64,292",
         "docs/acceptance-evidence-policy.md:26",
         "scripts/validate.py:26-32",
-        "tests/test_windows_terminal_defaults.py:49-59,129-141"
+        "tests/test_windows_terminal_defaults.py:49-59,129-141",
+        "docs/decisions/2026-09-28-terminal-experience.md:51,292,618",
+        "tests/test_windows_terminal_defaults.py:398-399"
       ]
     }
   ],
   "operator_sources": {
     "approved_plan_sha256": "775119dc6840552def19142a10e2730b489b6365c346e6f9fb6f5db5f2572ba2",
-    "approved_plan_section": "Phase1, step5, lines88-96",
+    "approved_plan_section": "Phase 1, step 5, lines 88-96",
     "portable_locators": [
       {
         "path": "%LOCALAPPDATA%/Microsoft/Windows Terminal/Fragments/NativeStack/NativeStack2604.json",
@@ -87,9 +90,9 @@
       }
     ],
     "rulings": [
-      "ns2604-coop A19,2026-10-06T03:44:12Z",
-      "ns2604-coop A20,2026-10-06T03:44:12Z",
-      "command-center port-role correction,2026-10-06T03:32:37Z"
+      "ns2604-coop A19, 2026-10-06T03:44:12Z",
+      "ns2604-coop A20, 2026-10-06T03:44:12Z",
+      "command-center port-role correction, 2026-10-06T03:32:37Z"
     ]
   },
   "transformations": [
@@ -97,8 +100,12 @@
     "Use default WSL user and portable home-relative project paths; omit private fixed session identifiers and authentication assignments without recording their values.",
     "Ordinary client resumes use native pickers; three special roles delegate to owner-supplied private launchers.",
     "Add source-defined Operations and Local Chat; carry a hidden Librarium profile with its cwd contract deferred.",
-    "Carry four source-defined lane profiles in a separate commit, repointing distribution/name/project paths to2604; retain the original launcher/prompt basenames. Prompt bodies and any 20129 HTTP replacement are not supplied.",
-    "Preserve AI audible+taskbar bells/quiet sound, Claude COLORTERM=truecolor, static taskbar bells and application-driven AI titles."
+    "Carry four source-defined lane profiles in a separate commit, repointing distribution/name/project paths to 2604; retain the original launcher/prompt basenames. Prompt bodies and any 20129 HTTP replacement are not supplied.",
+    "Preserve AI audible+taskbar bells/quiet sound, Claude COLORTERM=truecolor, static taskbar bells and application-driven AI titles.",
+    "The token lane intentionally changes from the source lane fragment's explicit identity to the canonical derived identity. Deploy hides obsolete NativeStack-source 2604 identities absent from the canonical set, preserving canonical, other-source and old NativeStack profiles.",
+    "Deliberately omit the nine source tabTitle values for the profile-name initial-title fallback, and omit closeOnExit graceful for Terminal's automatic default, which is graceful for Terminal-launched processes. Four lane titles remain explicit. Default/title fallback behavior is qualified by preserved user, GUID-specific and profiles.defaults overrides.",
+    "Apply checks all visible launcher, prompt, native CLI and project-directory dependencies before copying. Preserve exact settings bytes when the effective default and obsolete-profile overrides already match; name or GUID defaults are accepted, without bypassing duplicate hiding.",
+    "Keep the original private fragment and its backup outside every AI/co-op copy/read operation: original backup and restoration are human-owned. The automatic recipe handles settings and the public replacement only; absence markers never read private contents."
   ],
   "checks": [
     {
@@ -106,23 +113,40 @@
       "exit_code": 0,
       "stdout": "PASS 16 profiles: AI clients let titles through, ring audible+taskbar with a quiet sound and pass none of the barred options; static shells stay silent; every Claude profile sets COLORTERM through the profile environment key",
       "evidence_class": "local_integration",
-      "scope": "Declarations in16profiles; no host deployment or actual bell/session execution."
+      "scope": "Declarations in 16 profiles; no host deployment or actual bell/session execution."
     },
     {
       "command": "nice -n 19 python3 -B -m unittest tests.test_terminal_fragment tests.test_validate tests.test_native_token_ci",
       "exit_code": 0,
-      "returned_summary": "Ran132tests; OK",
+      "returned_summary": "Ran 132 tests; OK",
       "evidence_class": "synthetic",
-      "scope": "Local fixture controls, including empty/malformed identifiers, media/colour/title/bell defects, cold file-spec import and private-content rejection. No upstream suite."
+      "scope": "Local fixture controls, including empty/malformed identifiers, media/colour/title/bell defects, cold file-spec import and private-content rejection. No upstream suite.",
+      "summary_format": "paraphrased from retained unittest output"
     },
     {
       "command": "nice -n 19 python3 -B -m unittest tests.test_terminal_fragment tests.test_validate tests.test_native_token_ci tests.test_windows_terminal_defaults",
       "exit_code": 1,
-      "returned_summary": "Ran174tests; FAILED(failures=1),173passed",
+      "returned_summary": "Ran 174 tests; FAILED (failures=1); 173 passed",
       "evidence_class": "local_integration",
       "failed_test": "tests.test_windows_terminal_defaults.OverlayTests.test_the_installed_client_knows_no_notification_type_without_a_decision",
-      "failure": "auth_storage_failure absent from pinned unchanged DECISIONS for installed Claude2.1.291",
-      "owner_followup": "grand-catalog Q21; notification owner decision pending"
+      "failure": "auth_storage_failure absent from pinned unchanged DECISIONS for installed Claude 2.1.291",
+      "owner_followup": "grand-catalog Q21; notification owner decision pending",
+      "summary_format": "paraphrased from retained unittest output"
+    },
+    {
+      "command": "nice -n 19 python3 -B -m unittest tests.test_terminal_fragment tests.test_validate tests.test_native_token_ci",
+      "exit_code": 0,
+      "returned_summary": "Ran 143 tests in 2.181s\n\nOK",
+      "summary_format": "verbatim unittest summary",
+      "evidence_class": "synthetic",
+      "scope": "Repair regression: 143 tests, including source-scoped migration/default controls and a real-fragment declaration check. No upstream suite or host deploy."
+    },
+    {
+      "command": "nice -n 19 python3 -B checks/check-terminal-profiles.py",
+      "exit_code": 0,
+      "stdout": "PASS 16 profiles: AI clients let titles through, ring audible+taskbar with a quiet sound and pass none of the barred options; static shells stay silent; every Claude profile sets COLORTERM through the profile environment key",
+      "evidence_class": "local_integration",
+      "scope": "Repaired checker on actual 16-profile repository fragment; no settings, media, native client or host discovery."
     }
   ],
   "port_observations": {
@@ -147,9 +171,14 @@
     "fw_equivalent_on_2604": "not_established"
   },
   "review": {
-    "independent_review": "pending",
+    "independent_review": "ACK_AFTER at b216f9d7884d4d8519743b9e1c8f4f3c53181513; repaired-head micro-check pending",
     "operator_apply": "pending",
-    "operator_readback": "pending"
+    "operator_readback": "pending",
+    "finding_counts": {
+      "P2": 2,
+      "P3": 4
+    },
+    "verdict_sha256": "8959678d793a631fd404100318f4008f647494e620b9d957c2c1cfcfd55ea978"
   },
   "artifacts": [
     {
@@ -164,18 +193,32 @@
     },
     {
       "path": "checks/check-terminal-profiles.py",
-      "sha256": "235d2f8e49e82813434373bb337c34a0200bf115d0ab0ebc6c93b5607721ab8b",
-      "bytes": 13480
+      "sha256": "acebacc0b1ed1c6f7c4e242af6506476749a13140d8a1afe9fe54c907a9b7e30",
+      "bytes": 13126
     },
     {
       "path": "scripts/terminal_profile_ids.py",
-      "sha256": "d637316cfa5ebdb99df624d04789026875b4deb9528dc69a8b069b7bc406337a",
-      "bytes": 764
+      "sha256": "33127acd396afdc0070f2cf9bee3bc4987079f6e002879af52ea3a81578645c8",
+      "bytes": 4951
     },
     {
       "path": "tests/test_terminal_fragment.py",
-      "sha256": "7f0ab1897114de35bed78698ac3c69c809959684e4d46d5a128fc64ec36ad6c9",
-      "bytes": 9337
+      "sha256": "51a332e0efd450cb368ee0590cfa9bbd602888ade4ffef4f4d2a617c3b06ab1d",
+      "bytes": 16799
     }
-  ]
+  ],
+  "repair_scope": {
+    "publication": "P2/P3 bounded repair of #768 at b216f9d7884d4d8519743b9e1c8f4f3c53181513",
+    "findings_addressed": [
+      "P2 obsolete token identity hiding and declared migration",
+      "P2 real default fragment in CI tests",
+      "P3 deliberate tabTitle/closeOnExit departures",
+      "P3 portable cwd, all visible prerequisites and no-op byte preservation",
+      "P3 checker dead-code removal",
+      "P3 spaces and explicit summary formats"
+    ],
+    "host_apply_executed": false,
+    "micro_check": "pending",
+    "source_critic": "The bounded source critic identified unresolved name-only default ambiguity, inherited default semantics and private-fragment backup custody. All are corrected; this is a source-review lead, not independent host acceptance."
+  }
 }
