@@ -1,5 +1,7 @@
 # Upstream practice and acceptance evidence
 
+Foundation-component selection and readiness follow the [2026-10-06 upstream-evidence rule](decisions/2026-10-06-upstream-evidence-over-local-evaluation.md); the evidence classes, returned-result requirements and discriminating controls below continue to govern claims about our own wiring.
+
 The foundation uses research to select a supported upstream solution, then
 qualifies its actual behavior. Repository popularity, local test totals and a
 well-formed receipt are discovery or validation signals; none establishes native
