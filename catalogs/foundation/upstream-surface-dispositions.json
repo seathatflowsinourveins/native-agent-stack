@@ -2614,8 +2614,8 @@
   {
    "key": "codex:feature:context_management",
    "disposition": "declined",
-   "reason": "off on both hosts (read 2026-10-04)); the repository record at docs/convergence-architecture.md:132 names it",
-   "source": "docs/convergence-architecture.md:132",
+   "reason": "off on both hosts (read 2026-10-04)); the repository record at docs/convergence-architecture.md:134 names it",
+   "source": "docs/convergence-architecture.md:134",
    "carrier": null,
    "value": null,
    "scope": null,
