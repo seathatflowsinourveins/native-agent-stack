@@ -1741,10 +1741,11 @@ class AlpacaPaperTransport:
                         "fees": fees, "complete": True, "history_start": self.history_start.isoformat(),
                         "fee_history_start": self.fee_history_start.isoformat(),
                         "scope": "all_open_and_recent_plus_owned", "health": self.health}
-            except Exception as exc:
+            except Exception:
                 self.freeze_health("snapshot_incomplete")
-                # Chained (not suppressed), so a recovery receipt can name the failing read.
-                raise TransportError("snapshot incomplete; admissions remain frozen") from exc
+                # Suppressed, so no caller's traceback or log prints the failing read's foreign text. The
+                # exception still keeps __context__, from which a recovery receipt records only its type.
+                raise TransportError("snapshot incomplete; admissions remain frozen") from None
 
     async def stop(self):
         self._stopping = True

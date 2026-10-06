@@ -24,14 +24,21 @@ def _code(exc):
     return text if isinstance(exc, SafetyError) and re.fullmatch(r"[a-z_]{1,100}", text) else type(exc).__name__
 
 
-_REDACT = [(re.compile(r"/(?:home|Users|root)/[^\s'\"]*"), "<path>"), (re.compile(r"[A-Za-z0-9+/=_-]{24,}"), "<redacted>")]
+_HOME_PATH = re.compile(r"/(?:home|Users|root)/[^\s'\"]*")
+_LONG_TOKEN = re.compile(r"[A-Za-z0-9+/=_-]{24,}")
+# The engine's own words: reason codes joined by "_" (quotes_subscription_rejected, the shape _code keeps) and
+# fixed phrases joined by "/" (authentication/subscription/quote). Lowercase letters only, so no credential,
+# digest or identifier (digits, capitals, "+", "=", "-") has that shape.
+_ENGINE_WORDS = re.compile(r"[a-z]+(?:[_/][a-z]+)+")
 
 
 def _text(value):
-    text = str(value)[:300]
-    for pattern, replacement in _REDACT:
-        text = pattern.sub(replacement, text)
-    return text
+    """Redact the whole text, then stop it at 300 characters, so a long token that crosses the cut is redacted
+    whole and never survives as a short fragment. Home paths and long tokens are redacted; the engine's own words
+    stay readable."""
+    text = _HOME_PATH.sub("<path>", str(value))
+    text = _LONG_TOKEN.sub(lambda m: m.group(0) if _ENGINE_WORDS.fullmatch(m.group(0)) else "<redacted>", text)
+    return text[:300]
 
 
 def _engine_text(exc):
@@ -43,7 +50,7 @@ def _engine_text(exc):
 def _detail(exc, prefix=""):
     """The receipt's view of one failure: its code (the `errors` entry) and type, the message when the engine authored
     it, and the chained or suppressed context's type (an exception raised `from None` still keeps __context__), with
-    that context's message under the same rule. Home paths and long tokens are redacted; texts stop at 300 chars."""
+    that context's message under the same rule. Texts are redacted (_text) and then stop at 300 chars."""
     context = exc.__cause__ or exc.__context__
     detail = {"code": prefix + _code(exc), "type": type(exc).__name__}
     if _engine_text(exc):
@@ -292,6 +299,7 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
         await observe_snapshot()  # A fresh broker proof is required even if already flat.
     except asyncio.CancelledError:
         errors.append("recovery_cancelled")
+        details.append({"code": "recovery_cancelled", "type": "CancelledError"})
     except Exception as exc:
         errors.append(_code(exc))
         details.append(_detail(exc))

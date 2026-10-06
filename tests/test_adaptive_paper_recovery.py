@@ -452,6 +452,63 @@ class RecoveryTests(unittest.TestCase):
         self.assertIn("<redacted>", detail["context_message"])
         self.assertNotIn("B" * 30, json.dumps(detail))
 
+    def test_readiness_failure_keeps_each_subscription_reason(self):
+        # The command center's #809 review (P2): the engine's fixed reason codes (28-33 characters) survive the
+        # long-token redaction, so the receipt names which subscription was rejected
+        from transport import TransportError
+        for reason in ("orders_subscription_rejected", "quotes_subscription_rejected",
+                       "halt_status_subscription_rejected"):
+            with self.subTest(reason):
+                self.setUp()
+                # the shape of transport.start's readiness failure: the sorted freeze reasons in parentheses
+                message = ("stream authentication/subscription/quote readiness failed ("
+                           + ",".join(sorted([reason, "start_not_ready"])) + ")")
+
+                class ReadinessPort(FakePort):
+                    async def start(self, on_quote, on_order):
+                        raise TransportError(message)
+                self.original_buy()
+                self.port.__class__ = ReadinessPort
+                result = self.recover()
+                self.assertEqual(result["errors"], ["TransportError"])
+                self.assertEqual(result["error_details"][0]["message"], message)
+
+    def test_engine_codes_stay_and_other_long_tokens_are_redacted(self):
+        import recovery
+        kept = ("halt_status_subscription_rejected", "recovery_observation_integrity_lost",
+                "authentication/subscription/quote")
+        redacted = ("Kx7Pq2Wm9Rt4Yb8Nc3Vd6Hf1Lz", "abcdefghijklmnopqrstuvwxyz0123", "UPPER_CASE_WORDS_ARE_NOT_CODES",
+                    "lowercase-words-joined-by-hyphens", "relative/path/with/digit9/inside", "/srv/engine/state/directory/file")
+        text = recovery._text(" ".join(kept + redacted))
+        for token in kept:
+            self.assertIn(token, text)
+        for token in redacted:
+            self.assertNotIn(token, text)
+
+    def test_redaction_runs_before_the_length_cap(self):
+        # #809 review (P3): a long token that crosses character 300 is redacted whole, never cut into a short
+        # fragment, in the message and in an engine-authored context alike
+        from transport import TransportError
+        boundary = "word " * 56 + " " + "A" * 40
+
+        class BoundaryPort(FakePort):
+            async def snapshot(self):
+                try:
+                    raise TransportError(boundary)
+                except TransportError as cause:
+                    raise TransportError(boundary) from cause
+        self.original_buy()
+        self.port.__class__ = BoundaryPort
+        detail = self.recover()["error_details"][0]
+        for key in ("message", "context_message"):
+            with self.subTest(key):
+                self.assertLessEqual(len(detail[key]), 300)
+                self.assertNotIn("AA", detail[key])
+                self.assertTrue(detail[key].endswith(" <redacted>"))
+        import recovery
+        long_text = recovery._text("word " * 100)
+        self.assertEqual(len(long_text), 300)
+
     def test_a_clean_recovery_has_no_error_details(self):
         self.original_buy()
         self.assertEqual(self.recover()["error_details"], [])
@@ -545,6 +602,30 @@ class RecoveryTests(unittest.TestCase):
             return await task
         result = asyncio.run(exercise())
         self.assertEqual(result["errors"], ["recovery_cancelled"])
+        self.assertEqual(result["error_details"], [{"code": "recovery_cancelled", "type": "CancelledError"}])
+        self.assertEqual(self.port.stopped, 1)
+        self.assertFalse(result["flat"])
+
+    def test_cancellation_then_teardown_failure_keeps_both_details(self):
+        # #809 review (P3): one detail per failure, the cancellation's included
+        class FailingStopPort(FakePort):
+            async def stop(self):
+                await super().stop()
+                raise RuntimeError("teardown failed for " + "/".join(["", "ho" + "me", "someone"]))
+        self.original_buy()
+        self.port.__class__ = FailingStopPort
+        self.port.mode = "slow_snapshot"
+        async def exercise():
+            task = asyncio.create_task(recover(self.controller, self.meta, self.config, reconcile_fn=proof))
+            await asyncio.sleep(.02)
+            task.cancel()
+            return await task
+        result = asyncio.run(exercise())
+        self.assertEqual(result["errors"], ["recovery_cancelled", "stop_RuntimeError"])
+        self.assertEqual(result["error_details"][0], {"code": "recovery_cancelled", "type": "CancelledError"})
+        teardown = result["error_details"][1]
+        self.assertEqual((teardown["code"], teardown["type"]), ("stop_RuntimeError", "RuntimeError"))
+        self.assertNotIn("message", teardown)  # a foreign exception contributes its type only
         self.assertEqual(self.port.stopped, 1)
         self.assertFalse(result["flat"])
 
