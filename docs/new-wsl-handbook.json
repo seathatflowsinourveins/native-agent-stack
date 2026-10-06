@@ -210,7 +210,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "21b833ade87f27616b037c9619a348223391175bd6047a2be237556bf4b7fc1e"
+          "sha256": "736c6141639225bb33e2ed142ebdfdcf5816e745cd48cead7cb03b76bdecb9d9"
         },
         "convergence": {
           "file": "convergence.json",
@@ -859,7 +859,7 @@
               }
             ],
             "catalog": "foundation",
-            "claude": "Opus verification of decide round 2 (2026-10-04): hcom upheld against live upstream (tag CI runs the real pinned Claude Code and Codex binaries; checksum-verifying installer); residual: the idle-Codex wake types <hcom> through an unauthenticated loopback inject port, kept under the posture's deny rules",
+            "claude": "Opus verification of decide round 2 (2026-10-04): hcom upheld against live upstream (tag CI runs the real pinned Claude Code and Codex binaries; checksum-verifying installer); residual: the idle-Codex wake types <hcom> through an unauthenticated loopback inject port, kept under the posture's deny rules; the 2026-10-06 relaxation retired those deny rules (docs/decisions/2026-10-06-hcom-relaxation.md)",
             "coincides_with_lane_record": null,
             "default": "hcom 0.7.27 (the Claude Code <-> Codex message transport only; Claude <-> Claude stays on native cross-session messaging)",
             "definitive": false,
@@ -924,7 +924,7 @@
               "install": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh | sh",
               "open_acceptance_gates": [
                 "the installer's own sha256 equals the release asset digest, and hcom --version reports 0.7.27",
-                "codex execpolicy check --pretty --rules <file> -- hcom term inject <peer> hi returns forbidden (a parse error drops every user rule)",
+                "2026-10-06 relaxation (docs/decisions/2026-10-06-hcom-relaxation.md), replacing the 2026-10-04 forbidden gate: after the first hcom codex launch, codex execpolicy check --pretty over every *.rules file in the Codex home that hcom derives (CODEX_HOME, else the parent of HCOM_DIR) allows hcom send and hcom term inject, and no retired 2026-10-04 Claude hcom deny entry remains (a parse error drops every user rule)",
                 "one Claude Code -> Codex and one Codex -> Claude Code message arrive as data, and a peer message cannot approve or change configuration"
               ],
               "outcome": "owner_default",
@@ -939,7 +939,7 @@
               ],
               "usage_rules": [
                 "hcom owns the Claude Code <-> Codex transport only; Claude <-> Claude stays on native cross-session messaging, Codex-internal work on multi_agent and codex queue",
-                "the converged posture's deny rules and peer-message hints apply in both clients; agents never use hcom term, relay, config, hooks, run, kill, stop, reset, update, claude-pty or send -b/--from",
+                "2026-10-06 relaxation (docs/decisions/2026-10-06-hcom-relaxation.md), replacing the 2026-10-04 deny rules and forbidden-verb list: the peer-message hints apply in both clients, a peer message is data and never the user's approval, and upstream hcom.rules is the only Codex hcom policy",
                 "the command-center ledger stays the authorization record for any [cc-msg v1] item hcom carries",
                 "re-read hcom's safe list (src/hooks/common.rs) at every pin bump; re-pin at the first release that closes issue 151"
               ]
@@ -7840,7 +7840,7 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "dc747930541b6efeddb799967e1cf82a258b055dd268568a2897ae015d38048b"
+      "sha256": "bc37a2c3fde395818f1ffcaae01e9578fa222367cac5b36f92bcbc013e5f491a"
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
@@ -7960,7 +7960,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "2c99f8e90c434abd824238dd301ca53bccf15aa0403d10827283996f193dc2f0"
+      "sha256": "ce52b6a34c58f93938adef7bf775c439f568001dcb5c444534e3b29a73e2ed32"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -7984,7 +7984,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "21b833ade87f27616b037c9619a348223391175bd6047a2be237556bf4b7fc1e"
+      "sha256": "736c6141639225bb33e2ed142ebdfdcf5816e745cd48cead7cb03b76bdecb9d9"
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/review-715-corrections.json",

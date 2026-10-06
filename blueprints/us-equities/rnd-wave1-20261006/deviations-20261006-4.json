@@ -1,0 +1,2975 @@
+{
+ "schema_version": 1,
+ "kind": "rnd_wave1_preregistration_deviations",
+ "recorded_at_utc": "2026-10-06T18:01:31+00:00",
+ "frozen_commit": "d4601bfcbc4db74e57cd5c387bf48faebe263642",
+ "previous_deviation_commits": [
+  "c5834a1ba3b11261e7621e363e23420e6c2f98bf",
+  "22fa80187",
+  "b0df1fb0440698b0f210cb6becdcb24c685e232b"
+ ],
+ "kept_sha256": {
+  "PREREGISTRATION.md": "7b7f4ce3f4506abf2370938a36556dbcdb5596bcbcdf792f2a92b494671e4f96",
+  "plan.json": "36e55742ec837809cf6d41ae1b35e22237cc25a0c3abf01d0f36384cee0e1743",
+  "deviations.json": "6dfca17ac1fa1a011a36a4fd37919fcdcd29941bef4c9a359ce3675f941bae42",
+  "deviations-20261006-2.json": "b2974b6f3c76d3308d9450437dbbc015f89449ef607cffa57b049ac6a83d9ac0",
+  "deviations-20261006-3.json": "44f3fa81a1d6f483b4715b02c12dab5b35f23ea816acccf6b2afc825329b2d1a"
+ },
+ "found_by": "R1 attempt 1's completeness critic found one in-window read that R1.known_reads does not list: the overnight-volume watch of 2026-09-28/29 (its proposal in the R1 lane's private research state, research/rnd-wave1-20261006/r1/deviation-proposal-20261006-completeness.json, sha256 7e7bd262eb8c8fec17f07311d410433b427653e67daf25fe193ddc3f775c2bfd). The command center's item task-native-agent-stack-5f-20261006T143150Z asked for that read to be bound and for its class, in-window observation receipts, to be reviewed. The class review read 100 records at the base commit.",
+ "policy": "Earlier files stay byte-identical (kept_sha256). D6 only adds registry entries and one supporting receipt; it changes no hypothesis, decision rule, segment, contract or protocol. Under H1.1 a miss found after the freeze is added, never dropped. Binding more entries can only mark more cases inspected; it can never raise eligibility.",
+ "deviations": [
+  {
+   "id": "D6.1",
+   "finding": "The critic's miss: a completed real market-data watch inside the window, outside every known read.",
+   "rule": "R1 adds the entry below. Its file sha256 and three span hashes equal the critic's proposal exactly (proposal sha256 7e7bd262...; file f10be4a5...; spans 1-5, 70-74, 97-110).",
+   "entries": [
+    {
+     "id": "D6-C01",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "overnight-tradable US equities on the paper asset list (9,683 names; receipt.json:187-193)",
+     "date_range": [
+      "2026-08-20",
+      "2026-09-29"
+     ],
+     "access_kind": "outcome_selected",
+     "purpose": "overnight-volume: BOATS overnight snapshots every 120 s, SIP split-adjusted 1Day bars, BOATS 1Day bars, asset list; alert tiers by overnight dollar volume, ADV fraction, move from prior close and relative volume",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/overnight-volume/runs/20260929/README.md:1-5,70-74,97-110",
+     "source_sha256": "f10be4a53c43bdef7fb9d9a0393a1c2104647b365b3b64721726b0c49f99315a",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        5
+       ],
+       "span_sha256": "90577c521ec7d6195f895459432712e6510685adbd5594c3e4a04528a9ce9422"
+      },
+      {
+       "lines": [
+        70,
+        74
+       ],
+       "span_sha256": "64589c3aa5cd0eabc4c8e2952bd4e5f7b8ef1480aecf96778776cb7811475613"
+      },
+      {
+       "lines": [
+        97,
+        110
+       ],
+       "span_sha256": "afd96cbeec2d2d62f79c688bc96cabc69a94efc9d955dbbf100df7ee3b8d2c76"
+      }
+     ],
+     "dates_as_recorded": {
+      "trade_date": "2026-09-29",
+      "overnight_session": [
+       "2026-09-28T20:00-04:00",
+       "2026-09-29T04:00-04:00"
+      ],
+      "reference_sessions": [
+       "2026-08-31",
+       "2026-09-28"
+      ]
+     },
+     "data_class": "market_data",
+     "reason": "Completed real market-data watch inside the window; no known_reads item covers it. This is the read R1 attempt 1's completeness critic found.",
+     "flags": [
+      "The critic's spans give 2026-08-31..2026-09-29; watch.py:61,708-709 show the SIP 1Day request began 40 calendar days before the trade date (2026-08-20). Proposed range uses the request window.",
+      "access_kind: alerts and top-25 lists select names partly by realized overnight move, and 6 were pushed to the operator, so outcome_selected is proposed; result_inspected is the weaker alternative. The alerted identities are private, so the scope stays the watched universe."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "D6.2",
+   "finding": "The same class holds 47 further in-window reads outside every known read (a record with disjoint recorded windows gives one entry per window).",
+   "rule": "R1 adds each entry below. Verdict rule (COUNTS): COUNTS: a completed read of real market data (bars, quotes, trades, snapshots, auctions, screeners, corporate actions or news served by a market-data API; OPRA; FINRA short volume), or a real paper or broker session that consumed it, whose data dates fall inside the window and which no known_reads item covers. Window membership is judged by the dates of the data read, not the run date. OUT (a market-data classification only; it never removes a required inspection binding, which D6.3 makes for every recorded in-window read): synthetic content (made-up data; a real record kept as a test fixture is not synthetic), not run, data dated outside the window, no market data (filings, documents, account state), covered by a known_reads item, a local re-read inside a bound item's scope, or a wrapper of another record. Access kind: data_read: the record shows only data, counts or coverage. result_inspected: the record shows per-case results (fills, realized P&L, flags, ranks). outcome_selected: names were chosen by a realized outcome (a gain or move threshold, a ranking by realized return, a known mover). Where one scope mixes kinds and the record cannot split it, the stronger kind is proposed and flagged. Where a record cannot split a scope, the stronger access kind is bound. Step 3's conservative rule (PREREGISTRATION.md:51-52) applies to every universe-wide entry, whatever its access kind.",
+   "entries": [
+    {
+     "id": "D6-C02",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the securities named at README.md:49-53 (one index ETF and one large-cap stock); the probe's full symbol set and 1Day request windows are not recorded",
+     "date_range": [
+      "unknown",
+      "2026-09-29"
+     ],
+     "access_kind": "data_read",
+     "purpose": "overnight-volume: BOATS and overnight-feed snapshots, SIP and BOATS 1Day bars, paper asset list attributes",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/overnight-volume/README.md:42-64",
+     "source_sha256": "b168126f03dc333f7ab3a480dbc9371d45786933694dc55825a3680d4a355719",
+     "source_spans": [
+      {
+       "lines": [
+        42,
+        64
+       ],
+       "span_sha256": "cf8a66a4d6ce097f00aea6a9c852a14193615e6254863e7d694fa002237001d7"
+      }
+     ],
+     "dates_as_recorded": {
+      "probe_time_utc": "2026-09-29T01:14:21Z",
+      "bar_dates_stated": [
+       "2026-09-28",
+       "2026-09-29"
+      ]
+     },
+     "data_class": "market_data",
+     "reason": "Completed read-only probe of real overnight market data inside the window, separate from the watch run. The README calls the probe outputs scratch, not evidence; that describes evidence quality, not exposure.",
+     "flags": [
+      "Start date and full symbol set unknown: under D1 an unknown field covers every case in the potential scope (all earlier dates for these names).",
+      "An endpoint is unknown in the record and is recorded as unknown (frozen D1: an entry with an unknown field covers every case that could fall within its scope)."
+     ]
+    },
+    {
+     "id": "D6-C03",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "13,499 active tradable US equities (README.md:44)",
+     "date_range": [
+      "2026-08-25",
+      "2026-09-29"
+     ],
+     "access_kind": "outcome_selected",
+     "purpose": "incentive-monitor: SIP snapshots every 20 s, screener (most actives, movers top 50 each side), option chains for top-25 board names, OPRA trades, news, EDGAR filings, Nasdaq halts, corporate-action events, FINRA daily short-sale volume, daily bars for ADV",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/incentive-monitor/runs/20260929/README.md:1-7,40-48,94-101,115-116",
+     "source_sha256": "73b6b6246baee4b01d489da6debb62f9b51e6db34ca5bf846571ffa053c0886b",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        7
+       ],
+       "span_sha256": "7c595e91a0415fc2eaa9cd13d7070371ee04247410c31007ee413338b1e9a743"
+      },
+      {
+       "lines": [
+        40,
+        48
+       ],
+       "span_sha256": "176db90d95e4e7d5f8b3c0233040f67691850da7590425816db11d7c5cab3833"
+      },
+      {
+       "lines": [
+        94,
+        101
+       ],
+       "span_sha256": "86dae1b083169a5d33a3d1276619b5bcbb5cc1dee31b86da9fd785ba97660805"
+      },
+      {
+       "lines": [
+        115,
+        116
+       ],
+       "span_sha256": "f7d19fa0886bcb841cd2119b0e6434e8dec0e3fb88d38d4f1a8a3a092d4b00a3"
+      }
+     ],
+     "dates_as_recorded": {
+      "sweeps": [
+       "2026-09-29T07:55:01Z",
+       "2026-09-30T00:00:10Z"
+      ],
+      "finra_files": [
+       "2026-09-25",
+       "2026-09-28",
+       "2026-09-29"
+      ],
+      "corporate_action_replay_since": "2026-08-30"
+     },
+     "data_class": "market_data",
+     "reason": "Completed real market-data monitor run inside the window; no known_reads item covers it.",
+     "flags": [
+      "access_kind: the screener's movers lists and regime 10%-mover counts select by realized same-day move; identities are private, so outcome_selected is proposed over the universe. result_inspected is the weaker alternative.",
+      "The daily-bar window comes from monitor.py, not from the run record."
+     ]
+    },
+    {
+     "id": "D6-C04",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "every active tradable US equity (13,191 symbols) on 2026-09-24; market-wide corporate-action events 2026-07-09..2026-09-24",
+     "date_range": [
+      "2026-07-09",
+      "2026-09-24"
+     ],
+     "access_kind": "data_read",
+     "purpose": "incentive-monitor: SIP snapshots, OPRA trades, IEX/SIP status and LULD messages, Nasdaq halts RSS, news stream, EDGAR current filings, corporate-action SSE replay",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/incentive-monitor/README.md:7-21,113-115",
+     "source_sha256": "0b7b3d2deda7d003c60d682c68c369fba5f6a99cbff44b19085a46b68c8c7055",
+     "source_spans": [
+      {
+       "lines": [
+        7,
+        21
+       ],
+       "span_sha256": "193611e302cadea75513a891c716202a61c88332e92269b1c0f92c804b779942"
+      },
+      {
+       "lines": [
+        113,
+        115
+       ],
+       "span_sha256": "e2e4ba54fe2fbfd9be92a0e3ea598650e8f54998f81653aebd4c39029556a0e4"
+      }
+     ],
+     "dates_as_recorded": {
+      "measured_on": "2026-09-24",
+      "corporate_action_replay_from": "2026-07-09"
+     },
+     "data_class": "market_data",
+     "reason": "Completed live entitlement measurements on real market data inside the window, recorded only in the README.",
+     "flags": [
+      "The corporate-action replay is market-wide event data; under the conservative rule it covers every case 2026-07-09..2026-09-24."
+     ]
+    },
+    {
+     "id": "D6-C05",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "every symbol with SIP daily bars from the asset master plus the corporate-action supplement (24,664 requested; 17,997 with bars; receipt.json:97-98)",
+     "date_range": [
+      "2016-01-04",
+      "2026-09-21"
+     ],
+     "access_kind": "data_read",
+     "purpose": "broad-universe: SIP 1Day bars raw and all, market-wide corporate actions, entitlement probes (quotes, minute bars, news, movers and most-actives screens)",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/broad-universe/README.md:25-34,36-49,75-79",
+     "source_sha256": "b0aaac2a7d6124eb769fab5d2964bd554a9ebd132df59c0570517771878fc674",
+     "source_spans": [
+      {
+       "lines": [
+        25,
+        34
+       ],
+       "span_sha256": "d8e62bc8bbbfc9b5f5b536fa38e9a895570353cf54f8825fb21e6647683915ed"
+      },
+      {
+       "lines": [
+        36,
+        49
+       ],
+       "span_sha256": "2c7220803b21ad2fdee303e2348ad25404cee59b4b8fa93ccffb499a8f13f470"
+      },
+      {
+       "lines": [
+        75,
+        79
+       ],
+       "span_sha256": "ce103a26eade93f533d6f1977cfb927ae8ce2e9560224b129aa0826b97fc43a0"
+      }
+     ],
+     "dates_as_recorded": {
+      "daily_bars": [
+       "2016-01-04",
+       "2026-09-18"
+      ],
+      "corporate_actions_latest": "2026-09-21",
+      "probes_on": "2026-09-21"
+     },
+     "data_class": "market_data",
+     "reason": "Universe-wide real data read inside the window that known_reads[0] does not cover: D4.1 binds the main-universe evaluation (decision dates 2017-01-01..2026-08-14), while this read spans every symbol with bars and runs to 2026-09-18 (bars) and 2026-09-21 (corporate actions, probes).",
+     "flags": [
+      "Material: under plan.json R1.conservative_rule a universe-wide data_read over 2021-01-04..2026-09-18 marks every case of that universe inspected, which on its own leaves no v1 session eligible. The reviewer should confirm that data_read entries carry that effect."
+     ]
+    },
+    {
+     "id": "D6-C06",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "13,171 active tradable non-OTC symbols (README.md:139)",
+     "date_range": [
+      "2026-09-21",
+      "2026-09-21"
+     ],
+     "access_kind": "outcome_selected",
+     "purpose": "broad-universe: SIP snapshots, ranks by percent change and dollar volume, research flags, provider movers screen, news for pinned names and the top 20 movers",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/broad-universe/README.md:133-153",
+     "source_sha256": "b0aaac2a7d6124eb769fab5d2964bd554a9ebd132df59c0570517771878fc674",
+     "source_spans": [
+      {
+       "lines": [
+        133,
+        153
+       ],
+       "span_sha256": "c5090b404ad0b4ffc5a62cbef5fe026020d296e5d943b28c968b04a2955b52ac"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-21",
+      "run_time_utc": "2026-09-21T23:48:09Z"
+     },
+     "data_class": "market_data",
+     "reason": "Completed live scan inside the window; not part of known_reads[0] (the evaluation).",
+     "flags": [
+      "access_kind: the record names the day's largest movers by realized percent change, so outcome_selected is proposed; the rest of the scanned universe is at least result_inspected."
+     ]
+    },
+    {
+     "id": "D6-C07",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the broad-universe main universe as defined in broad-universe/protocol.json",
+     "date_range": [
+      "2026-08-15",
+      "2026-09-18"
+     ],
+     "access_kind": "result_inspected",
+     "purpose": "broad-universe: realized exit closes of the reserved-segment events (H1/H5/H20)",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/broad-universe/protocol.json:81-81,116-117",
+     "source_sha256": "f3428ad980b25f69020d07f193ff9f916ed3d7990ebc7eaec4aa2c3299352139",
+     "source_spans": [
+      {
+       "lines": [
+        81,
+        81
+       ],
+       "span_sha256": "acd45b7533b2850c8dd0abb7c88c50e4281b0b52fc3a99e23f04e0f9ec3dfac1"
+      },
+      {
+       "lines": [
+        116,
+        117
+       ],
+       "span_sha256": "9c3b62b7b44ec534360f7b875eb74a768e676fcfdedd7edf7f23a1b36fc2bf36"
+      }
+     ],
+     "dates_as_recorded": {
+      "reserved_decisions": [
+       "2024-01-01",
+       "2026-08-14"
+      ],
+      "dataset_end": "2026-09-18"
+     },
+     "data_class": "market_data",
+     "reason": "Residual of known_reads[0] beyond its D4.1-pinned range: segments are assigned by decision date, and the evaluation read realized closes up to 20 sessions after 2026-08-14.",
+     "flags": [
+      "Judgment for the command center: D4.1/A6 pin 2024-01-01..2026-08-14 exactly. This residual already sits inside D6-C05's data_read scope, so binding it raises access_kind for 2026-08-15..2026-09-18 and changes no case's inspected status."
+     ]
+    },
+    {
+     "id": "D6-C08",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "market-wide; the news endpoint was not symbol-scoped",
+     "date_range": [
+      "2015-01-01",
+      "2026-09-23"
+     ],
+     "access_kind": "data_read",
+     "purpose": "data-lake: licensed news records (with content) from the market-data vendor's news endpoint",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/data-lake/README.md:55-57,68-72,75-79",
+     "source_sha256": "956d0d74837b26ac93a95b7ba16071c25ab471b0d7f919aa4051dc0588dc54c9",
+     "source_spans": [
+      {
+       "lines": [
+        55,
+        57
+       ],
+       "span_sha256": "e1f858380fe72a4a71594aa36cf23accceb6c3cccb67f141e2e2b782da8fbd32"
+      },
+      {
+       "lines": [
+        68,
+        72
+       ],
+       "span_sha256": "9a67290692dd3e94e9bad86efb0ea76111c99f7983d6d50b7580aa98a20c9a5b"
+      },
+      {
+       "lines": [
+        75,
+        79
+       ],
+       "span_sha256": "d34d7fc1911c18a5002fe8f96293f2dfd77bcbe1c0e166e5605bd539c7d5f89d"
+      }
+     ],
+     "dates_as_recorded": {
+      "news_days": [
+       "2015-01-01",
+       "2026-09-23"
+      ],
+      "collected_on": [
+       "2026-09-14..20 (7 days)",
+       "2026-09-24"
+      ]
+     },
+     "data_class": "news",
+     "reason": "Completed collection of real vendor news covering the whole window; no known_reads item covers it.",
+     "flags": [
+      "News, not prices. It is counted because it came from the market-data API and is catalyst-relevant; the reviewer may class it separately. Under the conservative rule a market-wide read covers every case 2021-01-01..2026-09-23."
+     ]
+    },
+    {
+     "id": "D6-C09",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the two-symbol positive control (plan.json:48)",
+     "date_range": [
+      "2026-09-21",
+      "2026-09-28"
+     ],
+     "access_kind": "outcome_selected",
+     "purpose": "mover-coverage-asof: daily bars raw, split and all, and auctions, asof 2026-09-28",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/mover-coverage-asof/README.md:28-31,115-120,138-138",
+     "source_sha256": "9d17fba8072711aa083e42d478a4110de016732484000031af2a5b5fd9fd9454",
+     "source_spans": [
+      {
+       "lines": [
+        28,
+        31
+       ],
+       "span_sha256": "6f1261ec30a20a12b50ec341d99f91ab5537490f431745a64ebee29cda409777"
+      },
+      {
+       "lines": [
+        115,
+        120
+       ],
+       "span_sha256": "45686cac8f420dc1c3f4546d21d62f35ba2f5945a3f88cb19af4d7aa6494c400"
+      },
+      {
+       "lines": [
+        138,
+        138
+       ],
+       "span_sha256": "8d2c1d70bd4b47f51ce9f8f13d37f88607604b2f85271e5a15a4121640240421"
+      }
+     ],
+     "dates_as_recorded": {
+      "control_session": "2026-09-28",
+      "request_range": [
+       "2026-09-21",
+       "2026-09-28"
+      ],
+      "sent_utc": "2026-09-29T02:11:45Z"
+     },
+     "data_class": "market_data",
+     "reason": "Residual of known_reads[3]: its D4.1 fixture is the 715 package events dated 2021-01-04..2025-12-31; the positive control lies outside that range and was chosen because both names were large movers on 2026-09-28."
+    },
+    {
+     "id": "D6-C10",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "every symbol-day with a previous daily row in the broad-universe daily dataset (pre-market scan), the candidate union (daily or pre-market high at least 1.20 x the previous low) and its intraday collections",
+     "date_range": [
+      "2021-01-04",
+      "2026-09-25"
+     ],
+     "access_kind": "outcome_selected",
+     "purpose": "mover-early-entry: pre-market 30-minute SIP bars, 1-minute bars, auctions, news pages, corporate actions",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/mover-early-entry/deviations.json:21-21,38-38,42-51,53-53",
+     "source_sha256": "4161db806360c2b56afb3a721ad1757c8b7ca02ab09e365fb86b7709073bd4eb",
+     "source_spans": [
+      {
+       "lines": [
+        21,
+        21
+       ],
+       "span_sha256": "b51b2041e84fb60b17f05612290e4e65f79c410ad39df7b53e93ef88f2cd3987"
+      },
+      {
+       "lines": [
+        38,
+        38
+       ],
+       "span_sha256": "21d4f72f942fbe48e826afd739da81c4beff190ea43de2a95e419b9f117ffeba"
+      },
+      {
+       "lines": [
+        42,
+        51
+       ],
+       "span_sha256": "b15b06a1e00812bf108692a78f97bfdaa350ff88949ae6d7a9c2951fea0612a3"
+      },
+      {
+       "lines": [
+        53,
+        53
+       ],
+       "span_sha256": "67628be105fbdaf6aa6f9b8780fb108092210241bff41fbe8751f552135a4e54"
+      }
+     ],
+     "dates_as_recorded": {
+      "candidate_sessions": [
+       "2021-01-04",
+       "2026-09-18"
+      ],
+      "holdout_split": [
+       "2026-01-02",
+       "2026-09-18"
+      ],
+      "corporate_actions_ex_dates": [
+       "2026-09-21",
+       "2026-09-25"
+      ]
+     },
+     "data_class": "market_data",
+     "reason": "Candidate selection by realized high and collection covered every session 2021-01-04..2026-09-18, the protocol's holdout included, plus a corporate-action page for 2026-09-21..25. It is bound over the full period as an ADDITIONAL outcome_selected binding: it overlaps known_reads[1]'s D4.1 fixture (2021-01-04..2025-12-31, result_inspected), which stays unchanged, so the stronger annotation is kept for the whole selection period.",
+     "flags": [
+      "Judgment for the command center: D4.1 ends known_reads[1] at 2025-12-31 deliberately. The record shows holdout-session data was collected and filtered by realized high, though post-entry outcomes were not computed (README.md:22).",
+      "The same candidate filter within 2021-01-04..2025-12-31 is a selection by realized high, so the earlier interval carries outcome_selected through this additional binding; D4.1's result_inspected fixture is not changed (the stronger kind is never dropped for any range).",
+      "Additional binding over the full selection period, 2021-01-04..2026-09-25, outcome_selected. It overlaps known_reads[1]'s D4.1 fixture (2021-01-04..2025-12-31, result_inspected), which stays unchanged: the record selects by realized high over the whole period, and the access-kind rule binds the stronger kind where kinds cannot be split (frozen D1 makes access_kind gate-bearing). The stronger annotation is never dropped for any range."
+     ]
+    },
+    {
+     "id": "D6-C11",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the 5 large-cap securities of plan.json:13",
+     "date_range": [
+      "2016-01-01",
+      "2026-09-22"
+     ],
+     "access_kind": "data_read",
+     "purpose": "pit-availability: SIP 1Day bars raw and fully adjusted; corporate actions",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/pit-availability/README.md:136-142",
+     "source_sha256": "38927add939457ee81552dd87e366fa4caa7154ce7743131edbcf5ea0cbe2902",
+     "source_spans": [
+      {
+       "lines": [
+        136,
+        142
+       ],
+       "span_sha256": "67145dfde3d8f10f94e0f8b4689c80315d8ecedb7fc0f46bb8b9553d267135f3"
+      }
+     ],
+     "dates_as_recorded": {
+      "bars": [
+       "2016-01-01",
+       "2026-09-22"
+      ],
+      "observed_utc": "2026-09-22T22:23:32Z"
+     },
+     "data_class": "market_data",
+     "reason": "Completed real price read across all v1 segments for named securities; no known_reads item covers it (mover-v3/README.md:182-183 already treats this wave as prior exposure)."
+    },
+    {
+     "id": "D6-C12-w1",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the 20 securities of plan.json:8-12",
+     "date_range": [
+      "2021-03-08",
+      "2021-03-14"
+     ],
+     "access_kind": "data_read",
+     "purpose": "pit-availability: news records (with timestamps) from the market-data vendor's news endpoint",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/pit-availability/README.md:99-105",
+     "source_sha256": "38927add939457ee81552dd87e366fa4caa7154ce7743131edbcf5ea0cbe2902",
+     "source_spans": [
+      {
+       "lines": [
+        99,
+        105
+       ],
+       "span_sha256": "9c96ea24487823fe11aa03dd6bde6f45a793790c18171ed2c2a63bf8bfc0e523"
+      }
+     ],
+     "dates_as_recorded": {
+      "weeks_in_window": [
+       [
+        "2021-03-08",
+        "2021-03-14"
+       ],
+       [
+        "2022-03-14",
+        "2022-03-20"
+       ],
+       [
+        "2023-03-13",
+        "2023-03-19"
+       ],
+       [
+        "2024-03-11",
+        "2024-03-17"
+       ],
+       [
+        "2025-03-10",
+        "2025-03-16"
+       ],
+       [
+        "2026-03-09",
+        "2026-03-15"
+       ]
+      ],
+      "observed_utc": "2026-09-22T22:23:32Z"
+     },
+     "data_class": "news",
+     "reason": "Completed real news read for named securities in six in-window weeks; no known_reads item covers it.",
+     "flags": [
+      "News, not prices: the reviewer may class it with D6-O-N01 (filings) instead.",
+      "Window 1 of 6 recorded at the cited lines; one entry per window."
+     ]
+    },
+    {
+     "id": "D6-C12-w2",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the 20 securities of plan.json:8-12",
+     "date_range": [
+      "2022-03-14",
+      "2022-03-20"
+     ],
+     "access_kind": "data_read",
+     "purpose": "pit-availability: news records (with timestamps) from the market-data vendor's news endpoint",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/pit-availability/README.md:99-105",
+     "source_sha256": "38927add939457ee81552dd87e366fa4caa7154ce7743131edbcf5ea0cbe2902",
+     "source_spans": [
+      {
+       "lines": [
+        99,
+        105
+       ],
+       "span_sha256": "9c96ea24487823fe11aa03dd6bde6f45a793790c18171ed2c2a63bf8bfc0e523"
+      }
+     ],
+     "dates_as_recorded": {
+      "weeks_in_window": [
+       [
+        "2021-03-08",
+        "2021-03-14"
+       ],
+       [
+        "2022-03-14",
+        "2022-03-20"
+       ],
+       [
+        "2023-03-13",
+        "2023-03-19"
+       ],
+       [
+        "2024-03-11",
+        "2024-03-17"
+       ],
+       [
+        "2025-03-10",
+        "2025-03-16"
+       ],
+       [
+        "2026-03-09",
+        "2026-03-15"
+       ]
+      ],
+      "observed_utc": "2026-09-22T22:23:32Z"
+     },
+     "data_class": "news",
+     "reason": "Completed real news read for named securities in six in-window weeks; no known_reads item covers it.",
+     "flags": [
+      "News, not prices: the reviewer may class it with D6-O-N01 (filings) instead.",
+      "Window 2 of 6 recorded at the cited lines; one entry per window."
+     ]
+    },
+    {
+     "id": "D6-C12-w3",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the 20 securities of plan.json:8-12",
+     "date_range": [
+      "2023-03-13",
+      "2023-03-19"
+     ],
+     "access_kind": "data_read",
+     "purpose": "pit-availability: news records (with timestamps) from the market-data vendor's news endpoint",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/pit-availability/README.md:99-105",
+     "source_sha256": "38927add939457ee81552dd87e366fa4caa7154ce7743131edbcf5ea0cbe2902",
+     "source_spans": [
+      {
+       "lines": [
+        99,
+        105
+       ],
+       "span_sha256": "9c96ea24487823fe11aa03dd6bde6f45a793790c18171ed2c2a63bf8bfc0e523"
+      }
+     ],
+     "dates_as_recorded": {
+      "weeks_in_window": [
+       [
+        "2021-03-08",
+        "2021-03-14"
+       ],
+       [
+        "2022-03-14",
+        "2022-03-20"
+       ],
+       [
+        "2023-03-13",
+        "2023-03-19"
+       ],
+       [
+        "2024-03-11",
+        "2024-03-17"
+       ],
+       [
+        "2025-03-10",
+        "2025-03-16"
+       ],
+       [
+        "2026-03-09",
+        "2026-03-15"
+       ]
+      ],
+      "observed_utc": "2026-09-22T22:23:32Z"
+     },
+     "data_class": "news",
+     "reason": "Completed real news read for named securities in six in-window weeks; no known_reads item covers it.",
+     "flags": [
+      "News, not prices: the reviewer may class it with D6-O-N01 (filings) instead.",
+      "Window 3 of 6 recorded at the cited lines; one entry per window."
+     ]
+    },
+    {
+     "id": "D6-C12-w4",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the 20 securities of plan.json:8-12",
+     "date_range": [
+      "2024-03-11",
+      "2024-03-17"
+     ],
+     "access_kind": "data_read",
+     "purpose": "pit-availability: news records (with timestamps) from the market-data vendor's news endpoint",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/pit-availability/README.md:99-105",
+     "source_sha256": "38927add939457ee81552dd87e366fa4caa7154ce7743131edbcf5ea0cbe2902",
+     "source_spans": [
+      {
+       "lines": [
+        99,
+        105
+       ],
+       "span_sha256": "9c96ea24487823fe11aa03dd6bde6f45a793790c18171ed2c2a63bf8bfc0e523"
+      }
+     ],
+     "dates_as_recorded": {
+      "weeks_in_window": [
+       [
+        "2021-03-08",
+        "2021-03-14"
+       ],
+       [
+        "2022-03-14",
+        "2022-03-20"
+       ],
+       [
+        "2023-03-13",
+        "2023-03-19"
+       ],
+       [
+        "2024-03-11",
+        "2024-03-17"
+       ],
+       [
+        "2025-03-10",
+        "2025-03-16"
+       ],
+       [
+        "2026-03-09",
+        "2026-03-15"
+       ]
+      ],
+      "observed_utc": "2026-09-22T22:23:32Z"
+     },
+     "data_class": "news",
+     "reason": "Completed real news read for named securities in six in-window weeks; no known_reads item covers it.",
+     "flags": [
+      "News, not prices: the reviewer may class it with D6-O-N01 (filings) instead.",
+      "Window 4 of 6 recorded at the cited lines; one entry per window."
+     ]
+    },
+    {
+     "id": "D6-C12-w5",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the 20 securities of plan.json:8-12",
+     "date_range": [
+      "2025-03-10",
+      "2025-03-16"
+     ],
+     "access_kind": "data_read",
+     "purpose": "pit-availability: news records (with timestamps) from the market-data vendor's news endpoint",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/pit-availability/README.md:99-105",
+     "source_sha256": "38927add939457ee81552dd87e366fa4caa7154ce7743131edbcf5ea0cbe2902",
+     "source_spans": [
+      {
+       "lines": [
+        99,
+        105
+       ],
+       "span_sha256": "9c96ea24487823fe11aa03dd6bde6f45a793790c18171ed2c2a63bf8bfc0e523"
+      }
+     ],
+     "dates_as_recorded": {
+      "weeks_in_window": [
+       [
+        "2021-03-08",
+        "2021-03-14"
+       ],
+       [
+        "2022-03-14",
+        "2022-03-20"
+       ],
+       [
+        "2023-03-13",
+        "2023-03-19"
+       ],
+       [
+        "2024-03-11",
+        "2024-03-17"
+       ],
+       [
+        "2025-03-10",
+        "2025-03-16"
+       ],
+       [
+        "2026-03-09",
+        "2026-03-15"
+       ]
+      ],
+      "observed_utc": "2026-09-22T22:23:32Z"
+     },
+     "data_class": "news",
+     "reason": "Completed real news read for named securities in six in-window weeks; no known_reads item covers it.",
+     "flags": [
+      "News, not prices: the reviewer may class it with D6-O-N01 (filings) instead.",
+      "Window 5 of 6 recorded at the cited lines; one entry per window."
+     ]
+    },
+    {
+     "id": "D6-C12-w6",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the 20 securities of plan.json:8-12",
+     "date_range": [
+      "2026-03-09",
+      "2026-03-15"
+     ],
+     "access_kind": "data_read",
+     "purpose": "pit-availability: news records (with timestamps) from the market-data vendor's news endpoint",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/pit-availability/README.md:99-105",
+     "source_sha256": "38927add939457ee81552dd87e366fa4caa7154ce7743131edbcf5ea0cbe2902",
+     "source_spans": [
+      {
+       "lines": [
+        99,
+        105
+       ],
+       "span_sha256": "9c96ea24487823fe11aa03dd6bde6f45a793790c18171ed2c2a63bf8bfc0e523"
+      }
+     ],
+     "dates_as_recorded": {
+      "weeks_in_window": [
+       [
+        "2021-03-08",
+        "2021-03-14"
+       ],
+       [
+        "2022-03-14",
+        "2022-03-20"
+       ],
+       [
+        "2023-03-13",
+        "2023-03-19"
+       ],
+       [
+        "2024-03-11",
+        "2024-03-17"
+       ],
+       [
+        "2025-03-10",
+        "2025-03-16"
+       ],
+       [
+        "2026-03-09",
+        "2026-03-15"
+       ]
+      ],
+      "observed_utc": "2026-09-22T22:23:32Z"
+     },
+     "data_class": "news",
+     "reason": "Completed real news read for named securities in six in-window weeks; no known_reads item covers it.",
+     "flags": [
+      "News, not prices: the reviewer may class it with D6-O-N01 (filings) instead.",
+      "Window 6 of 6 recorded at the cited lines; one entry per window."
+     ]
+    },
+    {
+     "id": "D6-C13-w1",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "three named large-cap securities (lines 10-35)",
+     "date_range": [
+      "2024-06-01",
+      "2024-06-15"
+     ],
+     "access_kind": "data_read",
+     "purpose": "adaptive-paper: corporate actions (forward split, cash dividend) from the market-data API",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/corporate-actions-native-check-20260924.json:5-5,9-26,31-36",
+     "source_sha256": "510decdbdbaafd475bbbf5a997f6a3e2148abb7783b93bf0c585b44f1074c729",
+     "source_spans": [
+      {
+       "lines": [
+        5,
+        5
+       ],
+       "span_sha256": "48de3b6ece7fb854ca3b839246df2f5242c4660b9c8316650075fffc1f34d203"
+      },
+      {
+       "lines": [
+        9,
+        26
+       ],
+       "span_sha256": "e82f6c0b8635d06a02becbce2bcb9f624d0d9b89d992761bd33031d73b7d044d"
+      },
+      {
+       "lines": [
+        31,
+        36
+       ],
+       "span_sha256": "7493fe207bf168ac40603174d65b4f29d384e83348206d51b3dc76843d7ff4c0"
+      }
+     ],
+     "dates_as_recorded": {
+      "windows": [
+       [
+        "2024-06-01",
+        "2024-06-15"
+       ],
+       [
+        "2024-08-01",
+        "2024-11-10"
+       ]
+      ],
+      "observed_on": "2026-09-24"
+     },
+     "data_class": "market_data_reference",
+     "reason": "Live read of real corporate-action records inside v1's validation segment (2024); no known_reads item covers it.",
+     "flags": [
+      "Reference data, not prices. The same securities and dates also fall inside D6-C05.",
+      "Window 1 of 2 recorded at the cited lines; one entry per window."
+     ]
+    },
+    {
+     "id": "D6-C13-w2",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "three named large-cap securities (lines 10-35)",
+     "date_range": [
+      "2024-08-01",
+      "2024-11-10"
+     ],
+     "access_kind": "data_read",
+     "purpose": "adaptive-paper: corporate actions (forward split, cash dividend) from the market-data API",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/corporate-actions-native-check-20260924.json:5-5,9-26,31-36",
+     "source_sha256": "510decdbdbaafd475bbbf5a997f6a3e2148abb7783b93bf0c585b44f1074c729",
+     "source_spans": [
+      {
+       "lines": [
+        5,
+        5
+       ],
+       "span_sha256": "48de3b6ece7fb854ca3b839246df2f5242c4660b9c8316650075fffc1f34d203"
+      },
+      {
+       "lines": [
+        9,
+        26
+       ],
+       "span_sha256": "e82f6c0b8635d06a02becbce2bcb9f624d0d9b89d992761bd33031d73b7d044d"
+      },
+      {
+       "lines": [
+        31,
+        36
+       ],
+       "span_sha256": "7493fe207bf168ac40603174d65b4f29d384e83348206d51b3dc76843d7ff4c0"
+      }
+     ],
+     "dates_as_recorded": {
+      "windows": [
+       [
+        "2024-06-01",
+        "2024-06-15"
+       ],
+       [
+        "2024-08-01",
+        "2024-11-10"
+       ]
+      ],
+      "observed_on": "2026-09-24"
+     },
+     "data_class": "market_data_reference",
+     "reason": "Live read of real corporate-action records inside v1's validation segment (2024); no known_reads item covers it.",
+     "flags": [
+      "Reference data, not prices. The same securities and dates also fall inside D6-C05.",
+      "Window 2 of 2 recorded at the cited lines; one entry per window."
+     ]
+    },
+    {
+     "id": "D6-C14",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the adaptive-paper fixture universe (24 names: index-ETF proxies plus liquid large caps; README.md:25-27, ingest-receipt symbols=24)",
+     "date_range": [
+      "2026-09-20",
+      "2026-09-21"
+     ],
+     "access_kind": "data_read",
+     "purpose": "adaptive-paper: latest quotes, snapshots, news",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/receipt.json:134-148,150-163",
+     "source_sha256": "9bd58237bd11890010855a7508d36cb03ad3c7500774a403aadb8891757f569c",
+     "source_spans": [
+      {
+       "lines": [
+        134,
+        148
+       ],
+       "span_sha256": "5cc0055b22a96b0a7b1bc3e2d555b8d743732bffedd00f1884045c4e0adc774a"
+      },
+      {
+       "lines": [
+        150,
+        163
+       ],
+       "span_sha256": "a4c7e4e28b02cea6a46c51ec4e147e30576c631bf395ebbdd4258d008a356365"
+      }
+     ],
+     "dates_as_recorded": {
+      "observed_utc": [
+       "2026-09-21T21:02:23Z",
+       "2026-09-21T21:11:37Z"
+      ],
+      "news_lookback_hours": 24
+     },
+     "data_class": "market_data",
+     "reason": "Completed real quote, snapshot and news reads inside the window."
+    },
+    {
+     "id": "D6-G01",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the adaptive-paper fixture universe (24 names: index-ETF proxies plus liquid large caps; README.md:25-27, ingest-receipt symbols=24)",
+     "date_range": [
+      "2026-08-25",
+      "2026-09-22"
+     ],
+     "access_kind": "data_read",
+     "purpose": "evidence/artifacts/gap-wave2-20260923: SIP 1Day bars",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/README.md:24-26",
+     "source_sha256": "711713be10b8850561ee61b3ff316d1459f70e0506304ab68095e2e64b034dec",
+     "source_spans": [
+      {
+       "lines": [
+        24,
+        26
+       ],
+       "span_sha256": "64585b07fb5fe45e309ed348447f29da814b238511ec074eb3e40e3fa5c0cf6d"
+      }
+     ],
+     "dates_as_recorded": {
+      "sessions": [
+       "2026-08-25",
+       "2026-09-22"
+      ],
+      "fetched_utc": [
+       "2026-09-22T21:55:59Z",
+       "2026-09-23T00:33:24Z"
+      ]
+     },
+     "data_class": "market_data",
+     "reason": "Two completed real snapshot fetches inside the window, outside the trial directories; no known_reads item covers them."
+    },
+    {
+     "id": "D6-G02",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the 17 tickers of real-snapshot-summary-r2.json:252-270 (stocks and ETFs; the 5-symbol set at :198-204 is a subset)",
+     "date_range": [
+      "1998-01-02",
+      "2021-03-31"
+     ],
+     "access_kind": "data_read",
+     "purpose": "evidence/artifacts/gap-wave2-20260923: LEAN-bundled vendor daily bars (real historical data shipped with the engine); data-quality gate, Parquet round trip, per-symbol return aggregates stored only as a hash",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "evidence/artifacts/gap-wave2-20260923/us-equities__storage-compute/README.md:30-30",
+     "source_sha256": "711713be10b8850561ee61b3ff316d1459f70e0506304ab68095e2e64b034dec",
+     "source_spans": [
+      {
+       "lines": [
+        30,
+        30
+       ],
+       "span_sha256": "a41fecd2d57715817ca96a8514b79e19ea68505f3f4342a6dea5c899be7f43a7"
+      }
+     ],
+     "dates_as_recorded": {
+      "five_symbols": [
+       "2020-04-01",
+       "2021-03-31"
+      ],
+      "seventeen_tickers": [
+       "1998-01-02",
+       "2021-03-31"
+      ],
+      "run_on": "2026-09-23"
+     },
+     "data_class": "market_data",
+     "reason": "Completed read of real bundled daily bars whose last quarter, 2021-01-04..2021-03-31, lies inside the window. known_reads[4] covers the 2021Q1 ETF control only; the stocks in this set are not covered by it.",
+     "flags": [
+      "Most of these securities also fall inside D6-C05 for 2021Q1; three of the 17 tickers may not exist in the vendor universe of D6-C05.",
+      "Per-symbol return aggregates were computed but only their hash was kept; if that counts as inspection, use result_inspected."
+     ]
+    },
+    {
+     "id": "D6-I01",
+     "scope_kind": "security_date",
+     "identifiers_or_universe": "one index ETF (contract identity in the file)",
+     "date_range": [
+      "2026-09-16",
+      "2026-09-23"
+     ],
+     "access_kind": "data_read",
+     "purpose": "engine-nautilus: IBKR paper read-only: quote, five-minute bars",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/ibapi-readonly-20260923.json:10-12,40-51",
+     "source_sha256": "af4d968cf9d6508883b53ac80f1532d3b888188000c6173fbd3f725447f56756",
+     "source_spans": [
+      {
+       "lines": [
+        10,
+        12
+       ],
+       "span_sha256": "ca1f5d12891abaa3f7132b1e0970cdf360f0d71a4ebb7f63e6246281a8b282b5"
+      },
+      {
+       "lines": [
+        40,
+        51
+       ],
+       "span_sha256": "c786819ca79e46bfc33346b2a1f77389a1e83cf836f85944615946d1f83f6ad9"
+      }
+     ],
+     "dates_as_recorded": {
+      "bars_utc": [
+       "2026-09-22T13:30:00Z",
+       "2026-09-23T14:55:00Z"
+      ],
+      "quote_on": "2026-09-23",
+      "related_attempts": "the 2026-09-23 attempts read bars from the 2026-09-16 session (Nautilus probes) and 156 bars from 2026-09-21 (ibapi drafts)"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed read-only IBKR paper session with real market data inside the window. One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect."
+    },
+    {
+     "id": "D6-I02",
+     "scope_kind": "security_date",
+     "identifiers_or_universe": "one index ETF",
+     "date_range": [
+      "2026-09-16",
+      "2026-09-23"
+     ],
+     "access_kind": "data_read",
+     "purpose": "engine-nautilus: IBKR historical daily and five-minute bars through the native adapter",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/nautilus-readonly-20260923.json:9-9,16-16,29-45",
+     "source_sha256": "cc9c87daf3cfe58f8a4882b71a19cdc8dc0b5b6c44a36d125c6f3d617720c780",
+     "source_spans": [
+      {
+       "lines": [
+        9,
+        9
+       ],
+       "span_sha256": "cbd10812f90bd126b4b6a0b65f1d666810b70a2f5d5d5d230794e198502af867"
+      },
+      {
+       "lines": [
+        16,
+        16
+       ],
+       "span_sha256": "937e3c42a9166e864d286e2df9d2a9098ad70331d8fd03724d7920a1b7797bb4"
+      },
+      {
+       "lines": [
+        29,
+        45
+       ],
+       "span_sha256": "d0b19043f1ed871f1cbfa73f72aa1944274c0f0984a4edad4ed7c45282313617"
+      }
+     ],
+     "dates_as_recorded": {
+      "daily_bars_close_stamps": [
+       "2026-09-17T00:00Z",
+       "2026-09-23T00:00Z"
+      ],
+      "five_minute_bars_utc": [
+       "2026-09-16T13:35Z",
+       "2026-09-22T20:00Z"
+      ]
+     },
+     "data_class": "market_data",
+     "reason": "Completed read-only bar read inside the window. One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect."
+    },
+    {
+     "id": "D6-I03",
+     "scope_kind": "security_date",
+     "identifiers_or_universe": "one index ETF",
+     "date_range": [
+      "2026-09-28",
+      "2026-09-30"
+     ],
+     "access_kind": "data_read",
+     "purpose": "engine-nautilus: IBKR historical daily and five-minute bars",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/nautilus-readonly-20261005.json:9-9,16-16,29-45",
+     "source_sha256": "b6ff1c664fdf8d21891072e30f7091aa08eeed05158602b3ad997e621e21ff81",
+     "source_spans": [
+      {
+       "lines": [
+        9,
+        9
+       ],
+       "span_sha256": "30c03dbd454c931224f8bde689fae562ee3a2d3e35cd09b9ab471c6f8785986a"
+      },
+      {
+       "lines": [
+        16,
+        16
+       ],
+       "span_sha256": "937e3c42a9166e864d286e2df9d2a9098ad70331d8fd03724d7920a1b7797bb4"
+      },
+      {
+       "lines": [
+        29,
+        45
+       ],
+       "span_sha256": "6d9a7946ba66b944d2f923b2cc3ef1aacf8b58853cc16a01eb2a7d4093e80782"
+      }
+     ],
+     "dates_as_recorded": {
+      "daily_bars_close_stamps": [
+       "2026-09-29T00:00Z",
+       "2026-10-03T00:00Z"
+      ],
+      "five_minute_bars_utc": [
+       "2026-09-28T13:35Z",
+       "2026-10-02T20:00Z"
+      ]
+     },
+     "data_class": "market_data",
+     "reason": "Run dated 2026-10-05, but its bars cover 2026-09-28..2026-10-02, so 2026-09-28..2026-09-30 lie inside the window. One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect."
+    },
+    {
+     "id": "D6-I04",
+     "scope_kind": "security_date",
+     "identifiers_or_universe": "one index ETF",
+     "date_range": [
+      "2026-09-23",
+      "2026-09-23"
+     ],
+     "access_kind": "result_inspected",
+     "purpose": "engine-nautilus: IBKR paper quotes, orders, fills, realized P&L",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-passed.json:4-4,11-11,135-136,167-167,230-231,332-332",
+     "source_sha256": "e813c655d664966a6910926d284887815d933ac81d0552d2c985aadbdb5d43dc",
+     "source_spans": [
+      {
+       "lines": [
+        4,
+        4
+       ],
+       "span_sha256": "97643d51ae8cee074fc6a6c79a521d3915c39027d63a90f0b7a429a68959d24f"
+      },
+      {
+       "lines": [
+        11,
+        11
+       ],
+       "span_sha256": "937e3c42a9166e864d286e2df9d2a9098ad70331d8fd03724d7920a1b7797bb4"
+      },
+      {
+       "lines": [
+        135,
+        136
+       ],
+       "span_sha256": "23e52b72580d3c0e401c196e563a1c28079b848a472259e536df85ef915412d6"
+      },
+      {
+       "lines": [
+        167,
+        167
+       ],
+       "span_sha256": "2355c9df733a08463eeecb6eb69945f40b8066a9c1d1e0b61ea87f22153ecaf6"
+      },
+      {
+       "lines": [
+        230,
+        231
+       ],
+       "span_sha256": "219f21b2910cc56a88c440c20bc46a3552951d14da5888a5554cea695bdfe349"
+      },
+      {
+       "lines": [
+        332,
+        332
+       ],
+       "span_sha256": "d0b23dcde3aa15700a94af4b92896f22db85ba39863ea0b5e28901d0e992c201"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-23"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed IBKR paper session inside the window. One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect."
+    },
+    {
+     "id": "D6-I05",
+     "scope_kind": "security_date",
+     "identifiers_or_universe": "one index ETF",
+     "date_range": [
+      "2026-09-23",
+      "2026-09-23"
+     ],
+     "access_kind": "result_inspected",
+     "purpose": "engine-nautilus: IBKR paper quotes, orders, fill, realized P&L",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20260923-post-incomplete.json:4-4,11-11,136-137,168-170,231-231,336-336",
+     "source_sha256": "3e88b88012ce7e05b127d7149ba5ae5a362ef39278f42dadbf3525b2e125663e",
+     "source_spans": [
+      {
+       "lines": [
+        4,
+        4
+       ],
+       "span_sha256": "b6bd9f18edd78afcc7dff5d58b1d061a668137a2be52457bc068f7718c6c08f5"
+      },
+      {
+       "lines": [
+        11,
+        11
+       ],
+       "span_sha256": "7c2ecb3c2fa8b7d325db81b7ebc6b439b207c1882cac888f6126c34a95cde0ed"
+      },
+      {
+       "lines": [
+        136,
+        137
+       ],
+       "span_sha256": "6592679083f639b390037712adc42c4a696e47daf74d406ac2e48e8e4ca15496"
+      },
+      {
+       "lines": [
+        168,
+        170
+       ],
+       "span_sha256": "dc8e2bba03e45ecbea5b5ac2621d03bf12e9a144ddce0eead8685bbdac6523e7"
+      },
+      {
+       "lines": [
+        231,
+        231
+       ],
+       "span_sha256": "26f2b2d830221ebac3e017c097622852fb8f83d43bf01254962d6bc64e0f8603"
+      },
+      {
+       "lines": [
+        336,
+        336
+       ],
+       "span_sha256": "b35da34b9115478bb85158db002776d4313f31d8e224739ee59c2b4892cab81e"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-23 (post-market)"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed (incomplete-status) IBKR paper session inside the window. One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect."
+    },
+    {
+     "id": "D6-N01",
+     "scope_kind": "security_date",
+     "identifiers_or_universe": "one index ETF",
+     "date_range": [
+      "2026-09-23",
+      "2026-09-23"
+     ],
+     "access_kind": "data_read",
+     "purpose": "adaptive-paper: latest quote and paper broker-fault cases (accept, cancel)",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/native-faults/receipt-20260923.json:160-160,170-170,174-174",
+     "source_sha256": "28b9db92ecef7ef16e27774f9266d0bf9ddb7f55259d645ee2356c316464099a",
+     "source_spans": [
+      {
+       "lines": [
+        160,
+        160
+       ],
+       "span_sha256": "21a3ae91a2b7c4fe7547911e07104ddf4f70c8809499ce73c3f19a7a476800da"
+      },
+      {
+       "lines": [
+        170,
+        170
+       ],
+       "span_sha256": "be24404eac272d781b1a3fd24514788d3e0248d9db3ec785f7ee3125817808e2"
+      },
+      {
+       "lines": [
+        174,
+        174
+       ],
+       "span_sha256": "ad6752cacf2b102d6c4b82166a6fc54ed03ea90878664df74b03890526a2e030"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-23"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real paper broker session that read a live quote inside the window. One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect."
+    },
+    {
+     "id": "D6-N02",
+     "scope_kind": "security_date",
+     "identifiers_or_universe": "one index ETF",
+     "date_range": [
+      "2026-09-24",
+      "2026-09-24"
+     ],
+     "access_kind": "data_read",
+     "purpose": "adaptive-paper: latest quote and paper broker-fault cases (accept, cancel)",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/native-faults/receipt-20260924t143905.json:181-181,191-191,195-195",
+     "source_sha256": "e3cec5a67b2030589b114cbf6822965c140049b15836c669ef01dca782b3a105",
+     "source_spans": [
+      {
+       "lines": [
+        181,
+        181
+       ],
+       "span_sha256": "613995712e43e310005ffdba746957b583f33f89132533c8923b0dad537983db"
+      },
+      {
+       "lines": [
+        191,
+        191
+       ],
+       "span_sha256": "32daaec04f5c555ce130a3f83f4e186c9e558d439df5f16bf93edbd4196aa836"
+      },
+      {
+       "lines": [
+        195,
+        195
+       ],
+       "span_sha256": "ad6752cacf2b102d6c4b82166a6fc54ed03ea90878664df74b03890526a2e030"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-24"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real paper broker session that read a live quote inside the window. One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect."
+    },
+    {
+     "id": "D6-N03",
+     "scope_kind": "security_date",
+     "identifiers_or_universe": "one index ETF",
+     "date_range": [
+      "2026-09-24",
+      "2026-09-24"
+     ],
+     "access_kind": "data_read",
+     "purpose": "adaptive-paper: latest quote and paper broker-fault cases (accept, cancel)",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/native-faults/receipt-20260924t185811.json:182-182,192-192,196-196",
+     "source_sha256": "d7f1cf2f9eff872094ba3e89b8aa6c95247cf47ea98d7551db5a854566f8469c",
+     "source_spans": [
+      {
+       "lines": [
+        182,
+        182
+       ],
+       "span_sha256": "04f6e2be179264f11c95f98bc39951a3ac2178ab9f27f3e08deace8de28c6948"
+      },
+      {
+       "lines": [
+        192,
+        192
+       ],
+       "span_sha256": "99f29dcf096c99d21ad8e94195c06b0fd2206517091974f6ddfa681b36cf25fd"
+      },
+      {
+       "lines": [
+        196,
+        196
+       ],
+       "span_sha256": "ad6752cacf2b102d6c4b82166a6fc54ed03ea90878664df74b03890526a2e030"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-24"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real paper broker session that read a live quote inside the window. One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect."
+    },
+    {
+     "id": "D6-N04",
+     "scope_kind": "security_date",
+     "identifiers_or_universe": "one index ETF",
+     "date_range": [
+      "2026-09-25",
+      "2026-09-25"
+     ],
+     "access_kind": "data_read",
+     "purpose": "adaptive-paper: latest quote and paper broker-fault cases (accept, cancel)",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/native-faults/receipt-20260925t182513.json:182-182,192-192,196-196",
+     "source_sha256": "31c112e3f1ff4471543b5ca034ef879561467a85e6d456000971f075d605e90d",
+     "source_spans": [
+      {
+       "lines": [
+        182,
+        182
+       ],
+       "span_sha256": "095fa1828ee1f5c979aaffa255778eb380c75add4c07f3df63280182c4598229"
+      },
+      {
+       "lines": [
+        192,
+        192
+       ],
+       "span_sha256": "d631da53cf852dfd58edc281e612c213506b60b4f9b5a16710b15a89d2dc5232"
+      },
+      {
+       "lines": [
+        196,
+        196
+       ],
+       "span_sha256": "ad6752cacf2b102d6c4b82166a6fc54ed03ea90878664df74b03890526a2e030"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-25"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real paper broker session that read a live quote inside the window. One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect."
+    },
+    {
+     "id": "D6-P01",
+     "scope_kind": "security_date",
+     "identifiers_or_universe": "one index ETF (capacity-200-20260924-rth.json:66)",
+     "date_range": [
+      "2026-09-24",
+      "2026-09-24"
+     ],
+     "access_kind": "data_read",
+     "purpose": "order-throughput: latest quotes and non-marketable paper order probes",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/order-throughput/evidence/index-20260924.json:3-7,20-29",
+     "source_sha256": "082b68473dcfd1a52eb47abdb5f5365ac28570d3f42c2342f75a83fc04246a61",
+     "source_spans": [
+      {
+       "lines": [
+        3,
+        7
+       ],
+       "span_sha256": "8f1e2ca205aa4ff4c7536dd7b8d218a413495161557505dbf4cc714da3e1148c"
+      },
+      {
+       "lines": [
+        20,
+        29
+       ],
+       "span_sha256": "096ef3af49d2195fe20326294fdfc11cd8ca4b96c77dd917cf36971d45276a97"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-24"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real paper broker session that read live quotes inside the window. One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect."
+    },
+    {
+     "id": "D6-P02",
+     "scope_kind": "security_date",
+     "identifiers_or_universe": "one index ETF",
+     "date_range": [
+      "2026-09-21",
+      "2026-09-21"
+     ],
+     "access_kind": "result_inspected",
+     "purpose": "paper-e2e-20260921: IEX quote, paper order fills, realized P&L",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/paper-e2e-20260921/README.md:1-3",
+     "source_sha256": "81315bad5c7e1263ecea292db9a5691c4ddcc27437dc7e8b904d034538e48134",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        3
+       ],
+       "span_sha256": "e8aec845ec15027f2f80ac37de37838bb5eec5987c0df3162d9326ca788d853a"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-21"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real paper session inside the window. One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect."
+    },
+    {
+     "id": "D6-S01",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the 8 symbols of receipts/*.json \"symbols\" (three index ETFs, five large caps)",
+     "date_range": [
+      "2026-09-24",
+      "2026-09-24"
+     ],
+     "access_kind": "data_read",
+     "purpose": "sim-capacity: SIP historical quotes and trades; simulated capacity fills",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/sim-capacity/README.md:99-116",
+     "source_sha256": "983da123fd5ebf6a3da8c2fa6c792357104fdc176e996399a98f9e9c2d2ca077",
+     "source_spans": [
+      {
+       "lines": [
+        99,
+        116
+       ],
+       "span_sha256": "229070be0a06fd74b55911948a6b0fa40921265466ee2d85698a33dcb9502e2b"
+      }
+     ],
+     "dates_as_recorded": {
+      "window_utc": [
+       "2026-09-24T14:00:00Z",
+       "2026-09-24T14:35:00Z"
+      ]
+     },
+     "data_class": "market_data",
+     "reason": "Completed real SIP quote/trade fetch inside the window; no known_reads item covers it."
+    },
+    {
+     "id": "D6-S02",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the names traded in trial 20260923g (a subset of the fixture universe)",
+     "date_range": [
+      "2026-09-23",
+      "2026-09-23"
+     ],
+     "access_kind": "result_inspected",
+     "purpose": "sim-paper-compare: SIP historical quotes for the trial window; replayed versus paper fills",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/sim-paper-compare/receipts/20260923g-main-passed.json:43-51,1467-1470",
+     "source_sha256": "45dd2f15f0576098b87d73b8771b1d518868b3fc12d23e7262c00c18251d8646",
+     "source_spans": [
+      {
+       "lines": [
+        43,
+        51
+       ],
+       "span_sha256": "bca66eb174b7fae1b40cd79421a82d95e54f738258fb8282059ffcb7df520435"
+      },
+      {
+       "lines": [
+        1467,
+        1470
+       ],
+       "span_sha256": "cb4fcb40ea972c014510ecfd5e189a9183547d9d4d886d3d1a511a3bdaabcb04"
+      }
+     ],
+     "dates_as_recorded": {
+      "window_utc": [
+       "2026-09-23T16:46:00Z",
+       "2026-09-23T16:53:00Z"
+      ]
+     },
+     "data_class": "market_data",
+     "reason": "Completed post-hoc read of real quotes inside the window (pages fetched earlier into the cache). Its scope lies inside D6-T07."
+    },
+    {
+     "id": "D6-T01",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the adaptive-paper fixture universe (24 names: index-ETF proxies plus liquid large caps; README.md:25-27, ingest-receipt symbols=24)",
+     "date_range": [
+      "2026-08-25",
+      "2026-09-23"
+     ],
+     "access_kind": "data_read",
+     "purpose": "adaptive-paper: promotion-gate snapshot of 20 SIP 1Day bars per name, then SIP quotes during the run; quotes for the fixture universe; 0 orders",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/20260923-interrupted/README.md:1-1,8-10",
+     "source_sha256": "f356d277af70bdc8f548cc37bd9f04e8946fca7c76e384710ec188a7036cd422",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        1
+       ],
+       "span_sha256": "da0e56b1cb5b005deb36898eb20b5fcb47915e2b9f66e0c826f3665867ffcad1"
+      },
+      {
+       "lines": [
+        8,
+        10
+       ],
+       "span_sha256": "26934ec60b4f4503f8f53906732f9ada89ea9453779006a568498b358bcf0215"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-23",
+      "gate_snapshot_sessions": [
+       "2026-08-25",
+       "2026-09-22"
+      ]
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real Alpaca paper session on SIP market data inside the window; no known_reads item covers it."
+    },
+    {
+     "id": "D6-T02",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the adaptive-paper fixture universe (24 names: index-ETF proxies plus liquid large caps; README.md:25-27, ingest-receipt symbols=24); trial universe narrowed to 4 of those names (README.md:13)",
+     "date_range": [
+      "2026-08-26",
+      "2026-09-23"
+     ],
+     "access_kind": "data_read",
+     "purpose": "adaptive-paper: promotion-gate snapshot of 20 SIP 1Day bars per name, then SIP quotes during the run; after-hours SIP samples of the 24 fixture names (about 18:50 and 19:20 ET) and a 4-name trial; no order",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/20260923-post-extended-hours/README.md:1-1,9-16",
+     "source_sha256": "ca7fdd9c1891ed058f9fb6ae11834b050927cbd47a65e8b7d8f230a3696b2b8f",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        1
+       ],
+       "span_sha256": "382748340e2c58935033a4234eabbd653416a4ffdb8333dffd18f0f020837c8c"
+      },
+      {
+       "lines": [
+        9,
+        16
+       ],
+       "span_sha256": "acc0834242c795d20ca6a09c296e93c15ac95c4f6900524b7ae340a21ffe5b9b"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-23",
+      "gate_snapshot_sessions": [
+       "2026-08-26",
+       "2026-09-23"
+      ]
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real Alpaca paper session on SIP market data inside the window; no known_reads item covers it."
+    },
+    {
+     "id": "D6-T03",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the adaptive-paper fixture universe (24 names: index-ETF proxies plus liquid large caps; README.md:25-27, ingest-receipt symbols=24)",
+     "date_range": [
+      "2026-08-25",
+      "2026-09-23"
+     ],
+     "access_kind": "data_read",
+     "purpose": "adaptive-paper: promotion-gate snapshot of 20 SIP 1Day bars per name, then SIP quotes during the run; quotes and a quote-validity measurement for the fixture universe; 0 orders",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/20260923b-needs-attention/README.md:1-1,8-8",
+     "source_sha256": "8d91fce7ff3c3217e20921e94c56987a1d258aa0e512eb7ec9a451cd776c8147",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        1
+       ],
+       "span_sha256": "50386afcbc77c9edd1e1a7d29ca421a2623b97614008864e6420c453b8be147e"
+      },
+      {
+       "lines": [
+        8,
+        8
+       ],
+       "span_sha256": "5a33a81a81615472aee0b59381c4cf0f4b167126c74da0a746e719540e9ae948"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-23",
+      "gate_snapshot_sessions": [
+       "2026-08-25",
+       "2026-09-22"
+      ]
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real Alpaca paper session on SIP market data inside the window; no known_reads item covers it."
+    },
+    {
+     "id": "D6-T04",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the adaptive-paper fixture universe (24 names: index-ETF proxies plus liquid large caps; README.md:25-27, ingest-receipt symbols=24)",
+     "date_range": [
+      "2026-08-25",
+      "2026-09-23"
+     ],
+     "access_kind": "data_read",
+     "purpose": "adaptive-paper: promotion-gate snapshot of 20 SIP 1Day bars per name, then SIP quotes during the run; quotes for the fixture universe; 0 orders",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/20260923c-reconcile-refusal/README.md:1-1,6-10",
+     "source_sha256": "81e0b2a6aeaa86a18d78bf928693c1ff7cb5ce9447f5407bc7a8de1a908c55d4",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        1
+       ],
+       "span_sha256": "fed14c325b820c5fa60a87a1fa228ee3e3bf683c7ace6ed04c64a9619aac2fc2"
+      },
+      {
+       "lines": [
+        6,
+        10
+       ],
+       "span_sha256": "346954027e124d6f7f28b8bc40121b57e5cbeb07e08f25bec52c91d3994b9832"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-23",
+      "gate_snapshot_sessions": [
+       "2026-08-25",
+       "2026-09-22"
+      ]
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real Alpaca paper session on SIP market data inside the window; no known_reads item covers it."
+    },
+    {
+     "id": "D6-T05",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the adaptive-paper fixture universe (24 names: index-ETF proxies plus liquid large caps; README.md:25-27, ingest-receipt symbols=24)",
+     "date_range": [
+      "2026-08-25",
+      "2026-09-23"
+     ],
+     "access_kind": "result_inspected",
+     "purpose": "adaptive-paper: promotion-gate snapshot of 20 SIP 1Day bars per name, then SIP quotes during the run; quotes, one filled round trip with realized P&L",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/20260923e-first-roundtrip/README.md:1-1,8-13",
+     "source_sha256": "68ee97cb2e531c6b499d13d88bfebd6af3bf2ba6a5d9dbb31b2d76faaccd695d",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        1
+       ],
+       "span_sha256": "0328209303af1225ba8bbf76133178be85015ee76041cfc6b92cfb24e02601af"
+      },
+      {
+       "lines": [
+        8,
+        13
+       ],
+       "span_sha256": "5e1388793cb8e3d8fa0f0d1832fa7fe788f1b5161e3a0aff04791a346da1f584"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-23",
+      "gate_snapshot_sessions": [
+       "2026-08-25",
+       "2026-09-22"
+      ]
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real Alpaca paper session on SIP market data inside the window; no known_reads item covers it."
+    },
+    {
+     "id": "D6-T06",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the adaptive-paper fixture universe (24 names: index-ETF proxies plus liquid large caps; README.md:25-27, ingest-receipt symbols=24)",
+     "date_range": [
+      "2026-08-25",
+      "2026-09-23"
+     ],
+     "access_kind": "result_inspected",
+     "purpose": "adaptive-paper: promotion-gate snapshot of 20 SIP 1Day bars per name, then SIP quotes during the run; quotes, four round trips with realized P&L",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/20260923f-first-passed/README.md:1-1,8-15",
+     "source_sha256": "8bd72394d1c2c8bafd474d7e5c05ee4827fe1fefd443755a080b437673ea02e7",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        1
+       ],
+       "span_sha256": "be524f1efa3b75d117b940d1b36a697c415165a445f55f0b79c11e00ba22e8e5"
+      },
+      {
+       "lines": [
+        8,
+        15
+       ],
+       "span_sha256": "24165af3c57a5a5db5d4bd38d7db2d4c15b2e2b729fde1381be872ba0a55ec0e"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-23",
+      "gate_snapshot_sessions": [
+       "2026-08-25",
+       "2026-09-22"
+      ]
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real Alpaca paper session on SIP market data inside the window; no known_reads item covers it."
+    },
+    {
+     "id": "D6-T07",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the adaptive-paper fixture universe (24 names: index-ETF proxies plus liquid large caps; README.md:25-27, ingest-receipt symbols=24)",
+     "date_range": [
+      "2026-08-25",
+      "2026-09-23"
+     ],
+     "access_kind": "result_inspected",
+     "purpose": "adaptive-paper: promotion-gate snapshot of 20 SIP 1Day bars per name, then SIP quotes during the run; quotes, two round trips with realized P&L",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/20260923g-main-passed/README.md:1-1,7-13",
+     "source_sha256": "25814d1187a9b3318ee49da9cde9131f08c650294d60c580e38d73c341a8b911",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        1
+       ],
+       "span_sha256": "c3708db4f9a61ed56ca45a9929171021028ebd0e7c7b0298edf728568f1e1471"
+      },
+      {
+       "lines": [
+        7,
+        13
+       ],
+       "span_sha256": "60b5c4340b9cd1d6ff9928be31299457ab9f8a15d0cf607a6874949a66f2218f"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-23",
+      "gate_snapshot_sessions": [
+       "2026-08-25",
+       "2026-09-22"
+      ]
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real Alpaca paper session on SIP market data inside the window; no known_reads item covers it."
+    },
+    {
+     "id": "D6-T08",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the adaptive-paper fixture universe (24 names: index-ETF proxies plus liquid large caps; README.md:25-27, ingest-receipt symbols=24)",
+     "date_range": [
+      "2026-08-25",
+      "2026-09-23"
+     ],
+     "access_kind": "data_read",
+     "purpose": "adaptive-paper: promotion-gate snapshot of 20 SIP 1Day bars per name, then SIP quotes during the run; quotes for the fixture universe; no order",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/20260923j-regular-no-signals/README.md:1-1,13-16",
+     "source_sha256": "0e64fd2537a67d075c514879ee83b5419a348f76d2f98f53a7ae9c6aea7898ae",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        1
+       ],
+       "span_sha256": "7e10c8f674b90fc27b50dec22952bcf9fe29e0312b5259b98ea487f930c15d46"
+      },
+      {
+       "lines": [
+        13,
+        16
+       ],
+       "span_sha256": "557c0ab5d6a16c7829b8b2a3ec3c80873ac7cb54171eccca7ecf3036374532cc"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-23",
+      "gate_snapshot_sessions": [
+       "2026-08-25",
+       "2026-09-22"
+      ]
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real Alpaca paper session on SIP market data inside the window; no known_reads item covers it."
+    },
+    {
+     "id": "D6-T09",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the adaptive-paper fixture universe (24 names: index-ETF proxies plus liquid large caps; README.md:25-27, ingest-receipt symbols=24)",
+     "date_range": [
+      "2026-08-26",
+      "2026-09-24"
+     ],
+     "access_kind": "result_inspected",
+     "purpose": "adaptive-paper: promotion-gate snapshot of 20 SIP 1Day bars per name, then SIP quotes during the run; quotes, fills and realized P&L",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/ladder-1x-20260924a-needs-attention/README.md:1-1,12-19,31-37",
+     "source_sha256": "6269a028df26dbd3fe1d3a70e9d9c710ef607242ec98eb24518216b09f0a346e",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        1
+       ],
+       "span_sha256": "9b3bceb24dea6d8ba93755db78a2675db8541e75b68a8058dcf5ff8997353621"
+      },
+      {
+       "lines": [
+        12,
+        19
+       ],
+       "span_sha256": "923d0a0801548137707024ee7434c4245e7044b7c7356aa4ac77474c00ecad00"
+      },
+      {
+       "lines": [
+        31,
+        37
+       ],
+       "span_sha256": "1520df1d34e550ced2fbf82669da6c69e0a2999460085388830dec852069eda1"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-24",
+      "gate_snapshot_sessions": [
+       "2026-08-26",
+       "2026-09-23"
+      ]
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real Alpaca paper session on SIP market data inside the window; no known_reads item covers it."
+    },
+    {
+     "id": "D6-T10",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the adaptive-paper fixture universe (24 names: index-ETF proxies plus liquid large caps; README.md:25-27, ingest-receipt symbols=24)",
+     "date_range": [
+      "2026-08-26",
+      "2026-09-24"
+     ],
+     "access_kind": "result_inspected",
+     "purpose": "adaptive-paper: promotion-gate snapshot of 20 SIP 1Day bars per name, then SIP quotes during the run; quotes, fifteen round trips with realized P&L",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-a-passed/README.md:1-6,30-39,61-62",
+     "source_sha256": "780618de4c11f5879c4996843a6552824a0803ec00c549346fbf474f84ea9705",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        6
+       ],
+       "span_sha256": "a8a1bb68b2c7d5e18fc8d0bf1cc9683689eba3644b6f375de65da0888f6d135f"
+      },
+      {
+       "lines": [
+        30,
+        39
+       ],
+       "span_sha256": "0ad8a6ff82b6d4035f243f871a20b9d9417f379406a31ebfc14eb209c43fcb37"
+      },
+      {
+       "lines": [
+        61,
+        62
+       ],
+       "span_sha256": "ecc52a3da48eea9b16dcb9987fdb045736f45c6f0043e2649060ac7c075312c0"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-24",
+      "gate_snapshot_sessions": [
+       "2026-08-26",
+       "2026-09-23"
+      ]
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real Alpaca paper session on SIP market data inside the window; no known_reads item covers it."
+    },
+    {
+     "id": "D6-T11",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the adaptive-paper fixture universe (24 names: index-ETF proxies plus liquid large caps; README.md:25-27, ingest-receipt symbols=24)",
+     "date_range": [
+      "2026-08-26",
+      "2026-09-24"
+     ],
+     "access_kind": "data_read",
+     "purpose": "adaptive-paper: promotion-gate snapshot of 20 SIP 1Day bars per name, then SIP quotes during the run; quotes; one unfilled order",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-b-stop-drill/README.md:1-5,31-34",
+     "source_sha256": "13d2510c21c4171e149046791c3654f7de6a55793fffe52556da3940acb53309",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        5
+       ],
+       "span_sha256": "00c6340c1554a1c52b915b13d476ffb8b4ba104764b8265583c995ebe5608178"
+      },
+      {
+       "lines": [
+        31,
+        34
+       ],
+       "span_sha256": "bc50037118a66a042063dd967688f51ba1eda83d6b7b0d9163e59b2be4e6f8d1"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-24",
+      "gate_snapshot_sessions": [
+       "2026-08-26",
+       "2026-09-23"
+      ]
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real Alpaca paper session on SIP market data inside the window; no known_reads item covers it."
+    },
+    {
+     "id": "D6-T12",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "every active tradable US equity on NASDAQ/NYSE/ARCA/AMEX/BATS less likely derivatives (mover_scan.py:10-12): snapshot prefilter, then 1-minute bars, prior-session auctions and daily bars for prefiltered names; the fired names are listed in the record",
+     "date_range": [
+      "2025-05-12",
+      "2026-09-24"
+     ],
+     "access_kind": "outcome_selected",
+     "purpose": "adaptive-paper: SIP snapshots and 1-minute bars, prior-session auctions and daily bars, news for fired names, one index ETF's 500-day daily bars; paper fills and realized P&L of the traded names",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-a/README.md:1-6,28-30,40-41",
+     "source_sha256": "f992f078b46d75fec86561b0e53e5960f6957993afc8149d91c8f1ea3f6951af",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        6
+       ],
+       "span_sha256": "ebe21c0689281941dac7674b85352883da53750c7bed85831135412ec58c9a09"
+      },
+      {
+       "lines": [
+        28,
+        30
+       ],
+       "span_sha256": "436991958a44613c21bd69d317811821abe9149d1fd6634bd87a1ffaca98165b"
+      },
+      {
+       "lines": [
+        40,
+        41
+       ],
+       "span_sha256": "cfc5f9d1eb1d8896c8f2edd98106f50ebe1be8ab7c3db59fb04410fbf76cef5f"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-24",
+      "prior_session_reads": "2026-09-23"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real paper mover session inside the window: the scan selects names by realized intraday gain over the prior close, then trades them; no known_reads item covers it.",
+     "flags": [
+      "The 500-day index-ETF lookback reaches 2025 (v1 reserved segment). One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect.",
+      "Scanner reads come from mover_scan.py at the base commit; the run records cite the scan and its hashes."
+     ]
+    },
+    {
+     "id": "D6-T13",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "every active tradable US equity on NASDAQ/NYSE/ARCA/AMEX/BATS less likely derivatives (mover_scan.py:10-12): snapshot prefilter, then 1-minute bars, prior-session auctions and daily bars for prefiltered names; the fired names are listed in the record",
+     "date_range": [
+      "2025-05-12",
+      "2026-09-24"
+     ],
+     "access_kind": "outcome_selected",
+     "purpose": "adaptive-paper: SIP snapshots and 1-minute bars, prior-session auctions and daily bars, news for fired names, one index ETF's 500-day daily bars; paper fills and realized P&L of the traded names",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-mover-c/README.md:1-8,12-16",
+     "source_sha256": "08cb83d7d97d50a035060ed5ac698b6ff0ba3cc693dea018ee97ba4b6c073072",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        8
+       ],
+       "span_sha256": "1f448a604c8d45c8e7af77e1e95562ce04963203d9c22e65498f3a6193fa7da0"
+      },
+      {
+       "lines": [
+        12,
+        16
+       ],
+       "span_sha256": "1c259a7f608e9297b0780bd0e77cfd16bdfc4cd9359dcc15442e15d3f53982de"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-24",
+      "prior_session_reads": "2026-09-23"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real paper mover session inside the window: the scan selects names by realized intraday gain over the prior close, then trades them; no known_reads item covers it.",
+     "flags": [
+      "The 500-day index-ETF lookback reaches 2025 (v1 reserved segment). One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect.",
+      "Scanner reads come from mover_scan.py at the base commit; the run records cite the scan and its hashes."
+     ]
+    },
+    {
+     "id": "D6-T14",
+     "scope_kind": "security_date",
+     "identifiers_or_universe": "one index ETF (lines 16-19)",
+     "date_range": [
+      "2026-09-24",
+      "2026-09-24"
+     ],
+     "access_kind": "data_read",
+     "purpose": "adaptive-paper: latest quote and paper order acknowledgements",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/mac-2026-09-24-native-faults/README.md:1-8,14-19",
+     "source_sha256": "51b44f362e66f1351ec03dccd63fc836ef90490187d29baba40ffdf76485b5fd",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        8
+       ],
+       "span_sha256": "3c6ead0cd4d09f3588d1568c9e9e850ef97d1a213e995736f8e632d7ec4afc5d"
+      },
+      {
+       "lines": [
+        14,
+        19
+       ],
+       "span_sha256": "d4ab7a8f803ecb71d0070f23198eb4e081bf9115bbd57eab4320f1389804ec1d"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-24"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real paper broker session that read a live quote inside the window. One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect."
+    },
+    {
+     "id": "D6-T15",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "every active tradable US equity on NASDAQ/NYSE/ARCA/AMEX/BATS less likely derivatives (mover_scan.py:10-12): snapshot prefilter, then 1-minute bars, prior-session auctions and daily bars for prefiltered names; the fired names are listed in the record",
+     "date_range": [
+      "2025-05-16",
+      "2026-09-28"
+     ],
+     "access_kind": "outcome_selected",
+     "purpose": "adaptive-paper: SIP snapshots and 1-minute bars, prior-session auctions and daily bars, news for fired names, one index ETF's 500-day daily bars; paper fills and realized P&L of the traded names",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/ext-20260928/README.md:1-4,38-38,49-49,74-74,84-84",
+     "source_sha256": "14d165861b70403e3000a6b7bfbb5c909dc03ef9c1e3c773e509e9799979b926",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        4
+       ],
+       "span_sha256": "2696fcac73739b12957f5ea4d4ab0ae0a64b3809b0304de365d878f1c79f0a0c"
+      },
+      {
+       "lines": [
+        38,
+        38
+       ],
+       "span_sha256": "ffc1cb500c298811457a519af171067f85b68a3d7f50c7d109867bb8ae23b86d"
+      },
+      {
+       "lines": [
+        49,
+        49
+       ],
+       "span_sha256": "db9d50bc25cbadb151208e662a4bb3e8fc12b603f17cd7415a8040bc37ea6358"
+      },
+      {
+       "lines": [
+        74,
+        74
+       ],
+       "span_sha256": "e3ad1e0edd98ec2692e8cc43b8697b3d5a15210576a8944239fc74b476a157e8"
+      },
+      {
+       "lines": [
+        84,
+        84
+       ],
+       "span_sha256": "daba74bc490294aed3afda33e457ebe435edb5233362bee77000d587b306f844"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-28",
+      "prior_session_reads": "2026-09-25"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real paper mover session inside the window: the scan selects names by realized intraday gain over the prior close, then trades them; no known_reads item covers it.",
+     "flags": [
+      "The 500-day index-ETF lookback reaches 2025 (v1 reserved segment). One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect.",
+      "Scanner reads come from mover_scan.py at the base commit; the run records cite the scan and its hashes."
+     ]
+    },
+    {
+     "id": "D6-T16",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "every active tradable US equity on NASDAQ/NYSE/ARCA/AMEX/BATS less likely derivatives (mover_scan.py:10-12): snapshot prefilter, then 1-minute bars, prior-session auctions and daily bars for prefiltered names; the fired names are listed in the record",
+     "date_range": [
+      "2025-05-17",
+      "2026-09-29"
+     ],
+     "access_kind": "outcome_selected",
+     "purpose": "adaptive-paper: SIP snapshots and 1-minute bars, prior-session auctions and daily bars, news for fired names, one index ETF's 500-day daily bars; paper fills and realized P&L of the traded names",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/pre-20260929/README.md:1-4,43-43,54-55,77-77",
+     "source_sha256": "bca4cbfc305ff6548a87a72277dcec52e076bf6f993edb49be770b88bb5bed80",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        4
+       ],
+       "span_sha256": "2bafc214f80feecc39925237f63d067380abd4455ee8e7bbd04ae7e5efb305f9"
+      },
+      {
+       "lines": [
+        43,
+        43
+       ],
+       "span_sha256": "899943887503de77efd2f521004bb9d10a0b92355a2eb6ee07383f8ed1d5e592"
+      },
+      {
+       "lines": [
+        54,
+        55
+       ],
+       "span_sha256": "9c7d8086f813ba0888b866e7997f48f26252635de4d7e24624ec60ad20568621"
+      },
+      {
+       "lines": [
+        77,
+        77
+       ],
+       "span_sha256": "fa1bfa9c22430188042596f501c1199b2f64e7e8680558a05233dd8bd1dae4cc"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-29",
+      "prior_session_reads": "2026-09-28"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real paper mover session inside the window: the scan selects names by realized intraday gain over the prior close, then trades them; no known_reads item covers it.",
+     "flags": [
+      "The 500-day index-ETF lookback reaches 2025 (v1 reserved segment). One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect.",
+      "Scanner reads come from mover_scan.py at the base commit; the run records cite the scan and its hashes."
+     ]
+    },
+    {
+     "id": "D6-T17",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "every active tradable US equity on NASDAQ/NYSE/ARCA/AMEX/BATS less likely derivatives (mover_scan.py:10-12): snapshot prefilter, then 1-minute bars, prior-session auctions and daily bars for prefiltered names; the fired names are listed in the record",
+     "date_range": [
+      "2025-05-17",
+      "2026-09-29"
+     ],
+     "access_kind": "outcome_selected",
+     "purpose": "adaptive-paper: SIP snapshots and 1-minute bars, prior-session auctions and daily bars, news for fired names, one index ETF's 500-day daily bars; paper fills and realized P&L of the traded names",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/rth-20260929/README.md:1-4,45-45,58-59,85-85",
+     "source_sha256": "9b6e15ed539ee41049d1d889b569c439893a2f8da1e9918083691d3cb48d57ac",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        4
+       ],
+       "span_sha256": "4db3fda806c3ac004bf3d205a730b1e10b0f85459f6a7b9039160ade0c1fb74b"
+      },
+      {
+       "lines": [
+        45,
+        45
+       ],
+       "span_sha256": "44094d37e942cccda311a4f401e35a5df0526be69870e8c3fec9967239f66384"
+      },
+      {
+       "lines": [
+        58,
+        59
+       ],
+       "span_sha256": "9c7d8086f813ba0888b866e7997f48f26252635de4d7e24624ec60ad20568621"
+      },
+      {
+       "lines": [
+        85,
+        85
+       ],
+       "span_sha256": "914595632feefaa42cd2bf0513e16b716cb6ce55f0d77532792a965772f96eb9"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-29",
+      "prior_session_reads": "2026-09-28"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real paper mover session inside the window: the scan selects names by realized intraday gain over the prior close, then trades them; no known_reads item covers it.",
+     "flags": [
+      "The 500-day index-ETF lookback reaches 2025 (v1 reserved segment). One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect.",
+      "Scanner reads come from mover_scan.py at the base commit; the run records cite the scan and its hashes."
+     ]
+    },
+    {
+     "id": "D6-T18",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "every active tradable US equity on NASDAQ/NYSE/ARCA/AMEX/BATS less likely derivatives (mover_scan.py:10-12): snapshot prefilter, then 1-minute bars, prior-session auctions and daily bars for prefiltered names; the fired names are listed in the record",
+     "date_range": [
+      "2025-05-17",
+      "2026-09-29"
+     ],
+     "access_kind": "outcome_selected",
+     "purpose": "adaptive-paper: SIP snapshots and 1-minute bars, prior-session auctions and daily bars, news for fired names, one index ETF's 500-day daily bars; paper fills and realized P&L of the traded names",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/ext-20260929/README.md:1-4,51-51,63-64,89-89",
+     "source_sha256": "3e0187d6dec1c958d8f98bd46c5ba313d6d309f7b6d364d649ba0eb6611d1f0f",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        4
+       ],
+       "span_sha256": "a0548521962409b2385e054e3787f2243c8bb891f5e062cf178f49cac3986182"
+      },
+      {
+       "lines": [
+        51,
+        51
+       ],
+       "span_sha256": "da03532e1edb02294881cc87f6e86687ac7a484fb5af9323b171a1cf4b213029"
+      },
+      {
+       "lines": [
+        63,
+        64
+       ],
+       "span_sha256": "c6c3fbe532b9c963a8f09cc8efb384d1f7fa54b5ba0de06df818ab24381cb861"
+      },
+      {
+       "lines": [
+        89,
+        89
+       ],
+       "span_sha256": "4d8155224f068d9ade7dfff6d910877b38543f553780f981c5a67c86dd9fdaa6"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-09-29",
+      "prior_session_reads": "2026-09-28"
+     },
+     "data_class": "market_data_paper_session",
+     "reason": "Completed real paper mover session inside the window: the scan selects names by realized intraday gain over the prior close, then trades them; no known_reads item covers it.",
+     "flags": [
+      "The 500-day index-ETF lookback reaches 2025 (v1 reserved segment). One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect.",
+      "Scanner reads come from mover_scan.py at the base commit; the run records cite the scan and its hashes."
+     ]
+    },
+    {
+     "id": "D6-T19",
+     "scope_kind": "security_date",
+     "identifiers_or_universe": "one index ETF (regime factor) for the in-window part; the scanned universe was read for 2026-10-01..02, outside the window",
+     "date_range": [
+      "2025-05-20",
+      "2026-09-30"
+     ],
+     "access_kind": "data_read",
+     "purpose": "adaptive-paper: adjusted daily bars of one index ETF",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/adaptive-paper/trials/series-20261002/receipt.json:5-5,56-56,65-65,140-140,149-149,245-245,254-254,265-265,274-274",
+     "source_sha256": "c40f2301584c85c88e6d457cfa7923d51d69f9448fcd370198ed2c6896dd34fc",
+     "source_spans": [
+      {
+       "lines": [
+        5,
+        5
+       ],
+       "span_sha256": "6701ba5e3c48cf7e89bf34f5a0a32d31db09b0472a132b8bfe0ceb79e1740d5c"
+      },
+      {
+       "lines": [
+        56,
+        56
+       ],
+       "span_sha256": "eb3598a74796819176a9482da8a000b75b985bd9d09508701591fac9da582d14"
+      },
+      {
+       "lines": [
+        65,
+        65
+       ],
+       "span_sha256": "6c397ae6b3e5a63fd9e11dc2f40c391e23091b4438074fa42fa5614adf8bcdbf"
+      },
+      {
+       "lines": [
+        140,
+        140
+       ],
+       "span_sha256": "06ee31dc2fdd08db10d79546a832fbcb49bdf79ed2603caa2c6e58ba0e3697d4"
+      },
+      {
+       "lines": [
+        149,
+        149
+       ],
+       "span_sha256": "c03029b4a5a4d067781ff6eaa842729fdbef70e4d3fe8f9e69e0b87ea98a6b53"
+      },
+      {
+       "lines": [
+        245,
+        245
+       ],
+       "span_sha256": "c11c7b51a25971414cf9162f177fe0b13e7695c9aed18454073db182c345ecb8"
+      },
+      {
+       "lines": [
+        254,
+        254
+       ],
+       "span_sha256": "4e4cf895b32700df00c6c8e91db1d6c5cf515c508f03f7e2193f385fa01c7d85"
+      },
+      {
+       "lines": [
+        265,
+        265
+       ],
+       "span_sha256": "cdc2361c16ec843a63d0e84969ab6182bd1ffe005cc070b517205d5cddd5cdbf"
+      },
+      {
+       "lines": [
+        274,
+        274
+       ],
+       "span_sha256": "0265be984785bf58a80f93346d75920a78cc0476aec2cda9a6aba9cda0ed1e3c"
+      }
+     ],
+     "dates_as_recorded": {
+      "session": "2026-10-02"
+     },
+     "data_class": "market_data",
+     "reason": "Run dated after the window, but its four scans read about 500 calendar days of one index ETF's daily bars, which reach inside the window. One index ETF only: an ETF is outside catalyst v1's ordinary-common-share scope (catalyst-experiment/protocol.json scope.market), so binding it has no v1 effect.",
+     "flags": [
+      "security_date is used for a single-security scope over a range; no D4.1 fixture defines a single-security token (PREREGISTRATION.md:44 says \"one security on one date\").",
+      "The in-window read is known only from mover_scan.py, not from the run record."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "D6.3",
+   "finding": "Three in-window reads of non-market data: SEC filing metadata, issuer and exchange documents, and one real 8-K filing kept as a test fixture.",
+   "rule": "Step 1 (PREREGISTRATION.md:40-42) enumerates every recorded read, and H1.1 (:57-58) adds a miss as a dated deviation, never silently; neither allows a fixture exception. All three are bound as data_read; their market-data verdicts stay OUT in the class review.",
+   "entries": [
+    {
+     "id": "D6-O-N01",
+     "scope_kind": "universe_date_range",
+     "identifiers_or_universe": "the 20 symbols of pit-availability's frozen plan (plan.json:8-12, cited at the README span)",
+     "date_range": [
+      "2016-01-01",
+      "2026-09-22"
+     ],
+     "access_kind": "data_read",
+     "purpose": "pit-availability: SEC filing metadata (acceptance times)",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/pit-availability/README.md:35-47",
+     "source_sha256": "38927add939457ee81552dd87e366fa4caa7154ce7743131edbcf5ea0cbe2902",
+     "source_spans": [
+      {
+       "lines": [
+        35,
+        47
+       ],
+       "span_sha256": "70b8f3f5e2d75223acd72cee69d66e6fef1672bfa5d2327c5b2865424ae5a928"
+      }
+     ],
+     "dates_as_recorded": {
+      "filings": [
+       "2016-01-01",
+       "2026-09-22"
+      ],
+      "observed_utc": "2026-09-22T22:23:32Z"
+     },
+     "data_class": "filings",
+     "reason": "No market data observed: SEC filing metadata (acceptance times) only.",
+     "flags": [
+      "Judgment: PREREGISTRATION.md:40 asks R1 to enumerate every recorded read touching the window. If filing reads count, bind this as universe_date_range over plan.json:8-12, 2021-01-01..2026-09-22, data_read.",
+      "tests/test_pit_availability.py freezes three real filing headers as a test fixture (not reviewed further).",
+      "Bound conservatively under PREREGISTRATION.md:40 (every recorded read), proposed for the command center's confirmation."
+     ]
+    },
+    {
+     "id": "D6-O-N02",
+     "scope_kind": "event",
+     "identifiers_or_universe": "the 2022 rename and suspension events documented at the cited lines (issuer announcements, one SEC 8-K, one exchange notice)",
+     "date_range": [
+      "2022-01-01",
+      "2022-12-31"
+     ],
+     "access_kind": "data_read",
+     "purpose": "lifecycle-sample: issuer and exchange documents for 2022 lifecycle events",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/lifecycle-sample/README.md:1-6,96-105",
+     "source_sha256": "689cd0625dc9cc9525f5f46059a987d48fb7aa24f081af5325ae932cfb7b4637",
+     "source_spans": [
+      {
+       "lines": [
+        1,
+        6
+       ],
+       "span_sha256": "481ed75604f99361d5a43653032122d297a81c73ca8eb38e8f37d9f6106b98d3"
+      },
+      {
+       "lines": [
+        96,
+        105
+       ],
+       "span_sha256": "a432de704c70a8b3812723650dd2dcbf126f05a2771c084ebfb9132ad292c8c9"
+      }
+     ],
+     "dates_as_recorded": null,
+     "data_class": "documents",
+     "reason": "No market data observed: issuer announcements, an SEC 8-K and an exchange notice for 2022 rename and suspension events.",
+     "flags": [
+      "Judgment: these are event documents for named issuers in 2022 (inside v1 development). If document reads count, bind them as event entries, data_read.",
+      "Bound conservatively under PREREGISTRATION.md:40 (every recorded read), proposed for the command center's confirmation.",
+      "The record gives the events' year; the calendar year is pinned (conservative)."
+     ]
+    },
+    {
+     "id": "D6-O-N03",
+     "scope_kind": "event",
+     "identifiers_or_universe": "the one historical 8-K filing (event date 2021-03-29, Items 8.01 and 9.01) vendored as an upstream test fixture, at the cited lines",
+     "date_range": [
+      "2021-03-29",
+      "2021-03-29"
+     ],
+     "access_kind": "data_read",
+     "purpose": "catalyst-provenance: one real 8-K filing parsed locally by the native parser",
+     "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+     "source_path_line": "blueprints/us-equities/catalyst-provenance/README.md:30-44",
+     "source_sha256": "9c49080c900c5c8101f6c0208cc923d499959099664a914741b58be97a29968e",
+     "source_spans": [
+      {
+       "lines": [
+        30,
+        44
+       ],
+       "span_sha256": "7ca9a355a08fb0f369d0a1391dfd0b4841ad692a19c63a594af32e38cdb022cc"
+      }
+     ],
+     "dates_as_recorded": null,
+     "data_class": "filings",
+     "reason": "No market data observed: one vendored upstream test-fixture 8-K (event date 2021-03-29, Items 8.01 and 9.01, not the Item 1.01 v1 catalyst), parsed locally.",
+     "flags": [
+      "Judgment: a real 2021 filing inside the window. If filing reads count, bind it as one event entry, data_read.",
+      "Bound under PREREGISTRATION.md:40-42 and :57-58 (every recorded read; a miss is added, never excluded): neither the frozen enumeration rule nor the deviation procedure allows a fixture exception (the command center's adjudication of #796, P1-1). Its market-data verdict stays OUT."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "D6.4",
+   "finding": "Judgment calls the class review flagged.",
+   "rule": "Each is resolved conservatively and proposed for the command center's confirmation at its ACK. (1) D6-C05 and D6-C08 are universe-wide data reads; the conservative rule applies with no access-kind exception. (2) D6-C07 binds only the residual beyond the range D4.1 pins for known_reads[0]. D6-C10 is an ADDITIONAL binding over 2021-01-04..2026-09-25 with the stronger access kind outcome_selected: it overlaps known_reads[1]'s D4.1 fixture (2021-01-04..2025-12-31, result_inspected), which stays unchanged, so the stronger annotation is kept for the whole selection period; it is never dropped for any range. (3) D6-G02's LEAN-bundled bars reach 2021-03-31; it is bound beyond known_reads[4]'s ETF control. (4) outcome_selected is applied across a whole universe where its selected subset is private or partly named. (5) Code-derived request windows are bound as derived; an endpoint the record does not determine is recorded as unknown (frozen D1, deviations.json rule.unknown), never replaced by the window endpoint. (6) The market-data OUT classification (synthetic content, runs that observed nothing, data outside the window, wrapper records) is separate from the required inspection bindings: a real record kept as a test fixture is not synthetic, and every recorded in-window read is bound (D6.3) whatever its market-data verdict.",
+   "judgment_calls_as_reviewed": [
+    "D6-C05: a universe-wide data_read 2016-01-04..2026-09-18 marks every v1 case inspected under the conservative rule; confirm that data_read entries carry that effect.",
+    "D6-C07: a residual beyond the exact range D4.1 pins for known_reads[0] (exit closes to 2026-09-18). D6-C10: an additional full-range outcome_selected binding over known_reads[1]'s unchanged D4.1 fixture (the command center's ruling, item task-native-agent-stack-5f-20261006T175928Z).",
+    "D6-C08, D6-C12, D6-C13: news and corporate actions counted as market data because a market-data API served them; filings and issuer documents (D6-O-N01..N03) are OUT as non-market data although PREREGISTRATION.md:40 says every recorded read.",
+    "access_kind outcome_selected for D6-C01, C03, C06 and the mover trials applies the strongest kind over a universe whose outcome-selected subset is private or only partly named.",
+    "D6-C02 and the code-derived request windows (D6-C01, C03, T12-T19) rely on code at the base commit or leave a field unknown.",
+    "D6-O-K11: the 2022 identity sample is covered by known_reads[4] by name, but D4.1 pins no fixture for it.",
+    "D6-G02: LEAN-bundled daily bars run to 2021-03-31, so a read of them reaches into the window; known_reads[4] covers only the ETF control for that quarter.",
+    "ETF-only items (T14, T19, N01-N04, I01-I05, P01, P02) have no v1 effect; they are bound for completeness."
+   ]
+  },
+  {
+   "id": "D6.5",
+   "finding": "The scope kind for one security over a date range has no D4.1 spelling.",
+   "rule": "security_date names one security over the bound date range (PREREGISTRATION.md:44, 'one security on one date'). identifiers_or_universe gives the identity as recorded at the cited lines, without naming it here. A builder that cannot match a case to it treats every case in that range as unresolved, which is a refusal (conservative)."
+  },
+  {
+   "id": "D6.6",
+   "finding": "Eligibility.",
+   "rule": "D6 binds records; it declares no eligibility. R1 attempt 1 already reported zero eligible sessions in every v1 segment from the known reads alone. R1's rerun reports the counts with D6's entries added; D1's prospective-holdout clause governs what follows."
+  }
+ ],
+ "class_review": {
+  "receipt": "d6-class-review-20261006.json",
+  "receipt_sha256": "63c66ae2ec42923272b25d2b239ae60f6706c1968d9f3d9b1766cc9dad7ea071",
+  "items_reviewed": 100,
+  "counts": {
+   "COUNTS": 48,
+   "OUT": 52
+  },
+  "source_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "bound_conservatively_despite_out_verdict": [
+   "D6-O-N01",
+   "D6-O-N02",
+   "D6-O-N03"
+  ],
+  "critic_hashes_compared": true,
+  "span_hash_convention": "sha256 over the exact lines a..b (1-based, inclusive) joined with \"\\n\" plus one trailing \"\\n\"; for LF files this is byte-identical to `git show <rev>:<path> | sed -n \"a,bp\" | sha256sum`. File hashes are sha256 of `git show <rev>:<path>`.",
+  "not_searched": [
+   "tests/** (320 files) not reviewed: synthetic by construction; tests/test_pit_availability.py is known to freeze three real filing headers (see D6-O-N01).",
+   "35 binary files under the scanned prefixes were skipped by git grep -I (extensions: png); 285 empty files were also skipped. Binary examples: evidence/artifacts/claude-foundation-finalization-20260921/workers-desktop.png, evidence/artifacts/claude-foundation-finalization-20260921/workers-mobile.png, evidence/artifacts/claude-repository-evidence-20260921/shots/alertmanager-alerts.png, evidence/artifacts/claude-repository-evidence-20260921/shots/alertmanager-status.png, evidence/artifacts/claude-repository-evidence-20260921/shots/dagu-dag-latest-run.png, evidence/artifacts/claude-repository-evidence-20260921/shots/dagu-runs.r1.png",
+   "files over 3 MB under the scanned prefixes were skipped by the date-histogram loop and some regex loops: [[\"evidence/artifacts/landscape-sweep-20260926/returns.json\", 3114964]]",
+   "docs/** and observability/** were grep-sampled only; every hit was a policy, plan or citation of a bound record.",
+   "foundation-lane evidence/artifacts directories (about 200) were searched only by the keyword greps above, not opened.",
+   "Private state outside git (retained run directories, packages, caches, ledgers) was not opened, as D5.3 requires.",
+   "History before the base commit (deleted or rewritten files, other branches, unmerged PR heads) was not searched.",
+   "Dates written in other forms (month names, quarters such as 2021Q1, compact YYYYMMDD inside prose) were searched only where a record was already open.",
+   "Request windows taken from code (watch.py, monitor.py, mover_scan.py) are what the code at the base commit requests; the run records do not restate them.",
+   "Superseded earlier snapshot (the first review, before 2026-10-06T17:31:26Z): the critic's span hashes were not supplied then, so that review compared the file hash only. Closed by critic_span_check.critic_comparison at 2026-10-06T17:31:26Z: all seven fields equal."
+  ]
+ },
+ "out_items": [
+  {
+   "id": "D6-O-K01",
+   "path": "blueprints/us-equities/broad-universe/README.md",
+   "reason": "Covered by known_reads[0] (broad-universe reserved segment evaluation) and its D4.1 fixtures; residuals are D6-C05, D6-C06 and D6-C07."
+  },
+  {
+   "id": "D6-O-K02",
+   "path": "blueprints/us-equities/mover-early-entry/README.md",
+   "reason": "Covered by known_reads[1] (mover-early-entry validation read) and its D4.1 fixture 2021-01-04..2025-12-31; the holdout-window collection is D6-C10."
+  },
+  {
+   "id": "D6-O-K03",
+   "path": "blueprints/us-equities/extreme-gainer-audit/README.md",
+   "reason": "Covered by known_reads[2] (extreme-gainer price audit, 957 events; D4.1 event fixture 2021-01-06..2026-09-22)."
+  },
+  {
+   "id": "D6-O-K04",
+   "path": "blueprints/us-equities/mover-coverage-asof/evidence/summary-asof-20260929.json",
+   "reason": "Covered by known_reads[3] (E2, 715 events 2021-01-04..2025-12-31). E2 also read 979 lookback rows before 2021-01-04 (outside the window). The positive control is D6-C09."
+  },
+  {
+   "id": "D6-O-K05",
+   "path": "blueprints/us-equities/research-evaluation/README.md",
+   "reason": "Covered by known_reads[4]: the inspected 2021Q1 ETF control (D4.1 fixture 2021-01-01..2021-03-31). Earlier data (2014-2020) is outside the window."
+  },
+  {
+   "id": "D6-O-K06",
+   "path": "blueprints/us-equities/simulation-research/README.md",
+   "reason": "Same 2021Q1 ETF control as D6-O-K05; covered by known_reads[4]."
+  },
+  {
+   "id": "D6-O-K07",
+   "path": "blueprints/us-equities/overfitting-controls/README.md",
+   "reason": "Reads the research-evaluation ledger: development data before 2021 is outside the window and the reserved 2021Q1 segment is excluded; nothing is left in the window."
+  },
+  {
+   "id": "D6-O-K08",
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__portfolio-risk/README.md",
+   "reason": "Re-runs of the 2021Q1 ETF control episodes (dates 2021-01-04..2021-03-31 in raw/11 fills); covered by known_reads[4]."
+  },
+  {
+   "id": "D6-O-K09",
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__research-factors-ml/README.md",
+   "reason": "Frozen LEAN ETF inputs 2014-01-02..2021-03-31 (raw/r4/r4__frozen_ohlcv.json); the in-window part is the 2021Q1 ETF control, covered by known_reads[4]."
+  },
+  {
+   "id": "D6-O-K10",
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__evaluation-experiments/README.md",
+   "reason": "LEAN ETF data with in-window dates 2021-01-04..2021-03-31 only; covered by known_reads[4]."
+  },
+  {
+   "id": "D6-O-K11",
+   "path": "blueprints/us-equities/identity-readiness/README.md",
+   "reason": "The 2022 identity sample named in known_reads[4]; covered by name."
+  },
+  {
+   "id": "D6-O-K12",
+   "path": "blueprints/us-equities/security-identity/README.md",
+   "reason": "Same 2022 identity sample as D6-O-K11; covered by known_reads[4]."
+  },
+  {
+   "id": "D6-O-K13",
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/README.md",
+   "reason": "Re-run of the same 2022 identity sample (raw/dvc ledgers, 2022-06-08..2022-06-10); covered by known_reads[4]."
+  },
+  {
+   "id": "D6-O-K14",
+   "path": "blueprints/us-equities/research-efficiency/README.md",
+   "reason": "Model tasks over existing records of the 2022 identity sample; no new data read."
+  },
+  {
+   "id": "D6-O-K15",
+   "path": "blueprints/us-equities/catalyst-experiment/protocol.json",
+   "reason": "Source of known_reads[4]; the blueprint's own receipt is a synthetic contract exercise (catalyst-experiment/receipt.json)."
+  },
+  {
+   "id": "D6-O-N04",
+   "path": "blueprints/us-equities/financial-data/README.md",
+   "reason": "No data observed: HTTP 403, no payload."
+  },
+  {
+   "id": "D6-O-N05",
+   "path": "blueprints/us-equities/catalyst-dataset/README.md",
+   "reason": "Dated outside the window (2020) and no market data."
+  },
+  {
+   "id": "D6-O-N06",
+   "path": "blueprints/us-equities/catalyst-provenance/README.md",
+   "reason": "SEC index acquisitions (2026-09-24 new host, 2026-10-04 pin move) fetch the 2020-03-02 daily index: dated outside the window, no market data."
+  },
+  {
+   "id": "D6-O-N07",
+   "path": "blueprints/us-equities/delisting-coverage/README.md",
+   "reason": "Dated outside the window: Form 25 filings 2016-2019 and bar checks ending by about February 2020; current ticker mappings are not market data."
+  },
+  {
+   "id": "D6-O-W01",
+   "path": "blueprints/us-equities/authenticated-data/README.md",
+   "reason": "Dated outside the window (2020)."
+  },
+  {
+   "id": "D6-O-W02",
+   "path": "blueprints/us-equities/engine-nautilus/equity-replay/README.md",
+   "reason": "Replays the 2020 bars of D6-O-W01: outside the window."
+  },
+  {
+   "id": "D6-O-W03",
+   "path": "blueprints/us-equities/corporate-action-readiness/README.md",
+   "reason": "LEAN bundled data dated 2020: outside the window."
+  },
+  {
+   "id": "D6-O-W04",
+   "path": "blueprints/us-equities/engine/README.md",
+   "reason": "LEAN bundled 2013 sample data: outside the window."
+  },
+  {
+   "id": "D6-O-W05",
+   "path": "blueprints/us-equities/historical-simulation/README.md",
+   "reason": "LEAN bundled 2019-2020 data: outside the window."
+  },
+  {
+   "id": "D6-O-W06",
+   "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/probes/hook_probe.py",
+   "reason": "Synthetic only: the 2021 dates in the probes are made up."
+  },
+  {
+   "id": "D6-O-W07",
+   "path": "blueprints/us-equities/alpaca-history-fixture/README.md",
+   "reason": "Not run: no observation."
+  },
+  {
+   "id": "D6-O-W08",
+   "path": "blueprints/us-equities/data-lake/README.md",
+   "reason": "Not run: no observation."
+  },
+  {
+   "id": "D6-O-W09",
+   "path": "blueprints/us-equities/data-lake/README.md",
+   "reason": "Local re-read of the broad-universe daily dataset: same scope as D6-C05, adds no case."
+  },
+  {
+   "id": "D6-O-W10",
+   "path": "blueprints/us-equities/sim-engine-crosscheck/README.md",
+   "reason": "Local re-read of D6-S01's retained cache with a narrower scope; adds no case."
+  },
+  {
+   "id": "D6-O-W11",
+   "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/README.md",
+   "reason": "Synthetic only."
+  },
+  {
+   "id": "D6-O-W12",
+   "path": "blueprints/us-equities/nanosecond-replay/README.md",
+   "reason": "Synthetic only."
+  },
+  {
+   "id": "D6-O-W13",
+   "path": "blueprints/us-equities/mover-v3/README.md",
+   "reason": "Plan and protocol only; data/ holds calendars and fee schedules, not observations."
+  },
+  {
+   "id": "D6-O-W14",
+   "path": "blueprints/us-equities/adaptive-paper/evidence/alpaca-account-schema-20260923.json",
+   "reason": "No market data observed: account field names only."
+  },
+  {
+   "id": "D6-O-W15",
+   "path": "blueprints/us-equities/broad-universe/README.md",
+   "reason": "No market data observed: account state read only."
+  },
+  {
+   "id": "D6-O-W16",
+   "path": "blueprints/us-equities/adaptive-paper/native-faults/README.md",
+   "reason": "Quote and broker cases dated 2026-10-01: outside the window."
+  },
+  {
+   "id": "D6-O-W17",
+   "path": "blueprints/us-equities/adaptive-paper/receipts/xnys-primary-20261005/qualification.json",
+   "reason": "Offline fixture qualification dated 2026-10-05; no market data."
+  },
+  {
+   "id": "D6-O-W18",
+   "path": "blueprints/us-equities/engine-nautilus/ibkr-acceptance/evidence/ibapi-readonly-20261005.json",
+   "reason": "Bars dated 2026-10-02..05: outside the window."
+  },
+  {
+   "id": "D6-O-W19",
+   "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders/evidence/receipt-20261005-passed.json",
+   "reason": "Quotes and orders dated 2026-10-05: outside the window."
+  },
+  {
+   "id": "D6-O-W20",
+   "path": "catalogs/us-equities/research-20260928-movers.md",
+   "reason": "Research synthesis of documents; its one stated observed move (line 105) is the positive-control selection bound in D6-C09 and lies inside D6-T15's scan scope."
+  },
+  {
+   "id": "D6-O-W21",
+   "path": "evidence/artifacts/gap-wave2-20260923/us-equities__market-data-reference/5-parameterized-comparator.json",
+   "reason": "Local comparison of two retained datasets: the vendor daily parquet of D6-C05 and the LEAN bundled bars of D6-G02. Its securities and dates lie inside those items; it adds no case."
+  },
+  {
+   "id": "D6-O-X01",
+   "path": "evidence/receipts/broad-universe-research-20260921.json",
+   "reason": "Same observation as D6-C05, D6-C06 and known_reads[0]: a wrapper or summary record, not a separate read."
+  },
+  {
+   "id": "D6-O-X02",
+   "path": "evidence/receipts/alpaca-paper-e2e-20260921.json",
+   "reason": "Same observation as D6-P02: a wrapper or summary record, not a separate read."
+  },
+  {
+   "id": "D6-O-X03",
+   "path": "evidence/receipts/adaptive-paper-practice-20260921.json",
+   "reason": "Same observation as D6-C14: a wrapper or summary record, not a separate read."
+  },
+  {
+   "id": "D6-O-X04",
+   "path": "evidence/receipts/ibkr-readonly-acceptance-20260923.json",
+   "reason": "Same observation as D6-I01 and D6-I02: a wrapper or summary record, not a separate read."
+  },
+  {
+   "id": "D6-O-X05",
+   "path": "evidence/receipts/ibkr-readonly-acceptance-20261005.json",
+   "reason": "Same observation as D6-I03 and D6-O-W18: a wrapper or summary record, not a separate read."
+  },
+  {
+   "id": "D6-O-X06",
+   "path": "evidence/receipts/pit-availability.json",
+   "reason": "Same observation as D6-C11, D6-C12 and D6-O-N01: a wrapper or summary record, not a separate read."
+  },
+  {
+   "id": "D6-O-X07",
+   "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--alpaca-py--use--20260924.json",
+   "reason": "Same observation as D6-T10 and D6-T11: a wrapper or summary record, not a separate read."
+  },
+  {
+   "id": "D6-O-X08",
+   "path": "evidence/hosts/macos-m5pro-20260924/macos-m5pro-20260924--nautilus-trader--use--20260924.json",
+   "reason": "Same observation as D6-T10 and D6-T11: a wrapper or summary record, not a separate read."
+  },
+  {
+   "id": "D6-O-X09",
+   "path": "catalogs/us-equities/paper-practice-20260921.md",
+   "reason": "Same observation as D6-P02 (readiness read): a wrapper or summary record, not a separate read."
+  }
+ ],
+ "execution_gate": "R1's rerun waits for the command center's ACK of this file. It loads this file beside the earlier ones and adds every entry in D6.1-D6.3. Before keeping an entry, it confirms the path, each span's lines and hash, and the file sha256 at the base commit. A mismatch is REJECTED_DERIVATION; a missing record is NOT_STARTED."
+}

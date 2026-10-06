@@ -1,0 +1,312 @@
+{
+  "schema": "hcom-relaxation-probe/1",
+  "evidence_class": "synthetic: the real installed codex-cli and jq on frozen fixtures; not a native hcom run, not host acceptance",
+  "host": "NativeStack2604 (WSL2, the builder's checkout); every codex and bash run had a scratch HOME (env -i), so no client home, rules directory or settings file of the host was read or written",
+  "tools": {
+    "codex": "codex-cli 0.160.1",
+    "jq": "jq-1.8.1",
+    "bash": "GNU bash, version 5.3.9(1)-release (x86_64-pc-linux-gnu)"
+  },
+  "inputs": {
+    "evidence/artifacts/hcom-relaxation-20261006/hcom.rules": {
+      "sha256": "2a667dcb60c745ea954cba620b066a118b6721e6c8c3fda150b35e5e6eb86ada",
+      "bytes": 1945,
+      "derivation": "aannoo/hcom@2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b src/hooks/codex.rs:1538-1563 (build_codex_rules) over src/hooks/common.rs:52-72 (SAFE_HCOM_COMMANDS) and src/hooks/codex.rs:569-576 (HCOM_TOOL_NAMES), prefix [\"hcom\"]"
+    },
+    "evidence/artifacts/token-stack-fresh-session-e2e-20261004/fixtures/hcom-deny.rules": {
+      "sha256": "ac6254ee9bb7ac20deca69bb03bead76dacbe4e53a41cbc563a8b3614fa6a6aa",
+      "bytes": 2939,
+      "derivation": "the retired plan file config/hcom-deny.rules at ecfa11276 has the same sha256 (manifests/evidence.json at ecfa11276)"
+    }
+  },
+  "native_checker_probes": [
+    {
+      "argv": [
+        "codex",
+        "execpolicy",
+        "check",
+        "--pretty",
+        "--rules",
+        "evidence/artifacts/hcom-relaxation-20261006/hcom.rules",
+        "--",
+        "hcom",
+        "send",
+        "@luna",
+        "--",
+        "hi"
+      ],
+      "cwd": "<checkout root>",
+      "env": {
+        "HOME": "<scratch>/userhome",
+        "PATH": "<inherited>"
+      },
+      "started_utc": "2026-10-06T13:11:32.433689Z",
+      "finished_utc": "2026-10-06T13:11:32.454272Z",
+      "exit_code": 0,
+      "stdout": "{\n  \"matchedRules\": [\n    {\n      \"prefixRuleMatch\": {\n        \"matchedPrefix\": [\n          \"hcom\",\n          \"send\"\n        ],\n        \"decision\": \"allow\"\n      }\n    }\n  ],\n  \"decision\": \"allow\"\n}\n",
+      "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<scratch>/userhome/.codex\"))\n",
+      "decision": "allow"
+    },
+    {
+      "argv": [
+        "codex",
+        "execpolicy",
+        "check",
+        "--pretty",
+        "--rules",
+        "evidence/artifacts/hcom-relaxation-20261006/hcom.rules",
+        "--",
+        "hcom",
+        "term",
+        "inject",
+        "luna",
+        "hi"
+      ],
+      "cwd": "<checkout root>",
+      "env": {
+        "HOME": "<scratch>/userhome",
+        "PATH": "<inherited>"
+      },
+      "started_utc": "2026-10-06T13:11:32.454334Z",
+      "finished_utc": "2026-10-06T13:11:32.475870Z",
+      "exit_code": 0,
+      "stdout": "{\n  \"matchedRules\": [\n    {\n      \"prefixRuleMatch\": {\n        \"matchedPrefix\": [\n          \"hcom\",\n          \"term\"\n        ],\n        \"decision\": \"allow\"\n      }\n    }\n  ],\n  \"decision\": \"allow\"\n}\n",
+      "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<scratch>/userhome/.codex\"))\n",
+      "decision": "allow"
+    },
+    {
+      "argv": [
+        "codex",
+        "execpolicy",
+        "check",
+        "--pretty",
+        "--rules",
+        "evidence/artifacts/hcom-relaxation-20261006/hcom.rules",
+        "--",
+        "hcom",
+        "kill",
+        "luna"
+      ],
+      "cwd": "<checkout root>",
+      "env": {
+        "HOME": "<scratch>/userhome",
+        "PATH": "<inherited>"
+      },
+      "started_utc": "2026-10-06T13:11:32.475928Z",
+      "finished_utc": "2026-10-06T13:11:32.497731Z",
+      "exit_code": 0,
+      "stdout": "{\n  \"matchedRules\": []\n}\n",
+      "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<scratch>/userhome/.codex\"))\n",
+      "decision": null
+    },
+    {
+      "argv": [
+        "codex",
+        "execpolicy",
+        "check",
+        "--pretty",
+        "--rules",
+        "evidence/artifacts/hcom-relaxation-20261006/hcom.rules",
+        "--rules",
+        "evidence/artifacts/token-stack-fresh-session-e2e-20261004/fixtures/hcom-deny.rules",
+        "--",
+        "hcom",
+        "send",
+        "@luna",
+        "--",
+        "hi"
+      ],
+      "cwd": "<checkout root>",
+      "env": {
+        "HOME": "<scratch>/userhome",
+        "PATH": "<inherited>"
+      },
+      "started_utc": "2026-10-06T13:11:32.497788Z",
+      "finished_utc": "2026-10-06T13:11:32.518299Z",
+      "exit_code": 0,
+      "stdout": "{\n  \"matchedRules\": [\n    {\n      \"prefixRuleMatch\": {\n        \"matchedPrefix\": [\n          \"hcom\",\n          \"send\"\n        ],\n        \"decision\": \"allow\"\n      }\n    }\n  ],\n  \"decision\": \"allow\"\n}\n",
+      "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<scratch>/userhome/.codex\"))\n",
+      "decision": "allow"
+    },
+    {
+      "argv": [
+        "codex",
+        "execpolicy",
+        "check",
+        "--pretty",
+        "--rules",
+        "evidence/artifacts/hcom-relaxation-20261006/hcom.rules",
+        "--rules",
+        "evidence/artifacts/token-stack-fresh-session-e2e-20261004/fixtures/hcom-deny.rules",
+        "--",
+        "hcom",
+        "term",
+        "inject",
+        "luna",
+        "hi"
+      ],
+      "cwd": "<checkout root>",
+      "env": {
+        "HOME": "<scratch>/userhome",
+        "PATH": "<inherited>"
+      },
+      "started_utc": "2026-10-06T13:11:32.518356Z",
+      "finished_utc": "2026-10-06T13:11:32.539015Z",
+      "exit_code": 0,
+      "stdout": "{\n  \"matchedRules\": [\n    {\n      \"prefixRuleMatch\": {\n        \"matchedPrefix\": [\n          \"hcom\",\n          \"term\"\n        ],\n        \"decision\": \"allow\"\n      }\n    },\n    {\n      \"prefixRuleMatch\": {\n        \"matchedPrefix\": [\n          \"hcom\",\n          \"term\"\n        ],\n        \"decision\": \"forbidden\",\n        \"justification\": \"Use hcom send, list, events, listen, start or status for peer transport; these listed prefixes forbid configuration and terminal-control verbs, with the coverage limits above.\"\n      }\n    }\n  ],\n  \"decision\": \"forbidden\"\n}\n",
+      "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<scratch>/userhome/.codex\"))\n",
+      "decision": "forbidden"
+    }
+  ],
+  "after_sign_in_runs": [
+    {
+      "scenario": "no-rules-default-home",
+      "expected_exit": 78,
+      "exit_code": 78,
+      "env": {
+        "HOME": "<scratch>/userhome",
+        "PATH": "<inherited>"
+      },
+      "files": {},
+      "claude_settings_deny_entries": null,
+      "started_utc": "2026-10-06T13:11:32.545457Z",
+      "finished_utc": "2026-10-06T13:11:32.550795Z",
+      "stdout": "",
+      "stderr": "needs_user: launch hcom codex once so that upstream writes its hcom.rules.\n"
+    },
+    {
+      "scenario": "hcom-rules-only-default-home",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "env": {
+        "HOME": "<scratch>/userhome",
+        "PATH": "<inherited>"
+      },
+      "files": {
+        "userhome/.codex/rules/hcom.rules": "evidence/artifacts/hcom-relaxation-20261006/hcom.rules"
+      },
+      "claude_settings_deny_entries": null,
+      "started_utc": "2026-10-06T13:11:32.550990Z",
+      "finished_utc": "2026-10-06T13:11:32.608505Z",
+      "stdout": "",
+      "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<scratch>/userhome/.codex\"))\nWARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<scratch>/userhome/.codex\"))\n"
+    },
+    {
+      "scenario": "hcom-rules-plus-retired-hcom-deny",
+      "expected_exit": 78,
+      "exit_code": 78,
+      "env": {
+        "HOME": "<scratch>/userhome",
+        "PATH": "<inherited>"
+      },
+      "files": {
+        "userhome/.codex/rules/hcom.rules": "evidence/artifacts/hcom-relaxation-20261006/hcom.rules",
+        "userhome/.codex/rules/hcom-deny.rules": "evidence/artifacts/token-stack-fresh-session-e2e-20261004/fixtures/hcom-deny.rules"
+      },
+      "claude_settings_deny_entries": null,
+      "started_utc": "2026-10-06T13:11:32.608835Z",
+      "finished_utc": "2026-10-06T13:11:32.668946Z",
+      "stdout": "",
+      "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<scratch>/userhome/.codex\"))\nWARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<scratch>/userhome/.codex\"))\nneeds_user: the Codex rules in this home give allow for hcom send and forbidden for hcom term, so a stricter rules file (such as the retired hcom-deny.rules) remains beside upstream hcom.rules.\n"
+    },
+    {
+      "scenario": "custom-hcom-dir-codex-home-unset",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "env": {
+        "HOME": "<scratch>/userhome",
+        "HCOM_DIR": "<scratch>/state/hub",
+        "PATH": "<inherited>"
+      },
+      "files": {
+        "state/.codex/rules/hcom.rules": "evidence/artifacts/hcom-relaxation-20261006/hcom.rules"
+      },
+      "claude_settings_deny_entries": null,
+      "started_utc": "2026-10-06T13:11:32.669194Z",
+      "finished_utc": "2026-10-06T13:11:32.732259Z",
+      "stdout": "",
+      "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<scratch>/userhome/.codex\"))\nWARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<scratch>/userhome/.codex\"))\n"
+    },
+    {
+      "scenario": "custom-hcom-dir-rules-only-in-default-home",
+      "expected_exit": 78,
+      "exit_code": 78,
+      "env": {
+        "HOME": "<scratch>/userhome",
+        "HCOM_DIR": "<scratch>/state/hub",
+        "PATH": "<inherited>"
+      },
+      "files": {
+        "userhome/.codex/rules/hcom.rules": "evidence/artifacts/hcom-relaxation-20261006/hcom.rules"
+      },
+      "claude_settings_deny_entries": null,
+      "started_utc": "2026-10-06T13:11:32.732492Z",
+      "finished_utc": "2026-10-06T13:11:32.738723Z",
+      "stdout": "",
+      "stderr": "needs_user: launch hcom codex once so that upstream writes its hcom.rules.\n"
+    },
+    {
+      "scenario": "explicit-codex-home-wins",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "env": {
+        "HOME": "<scratch>/userhome",
+        "HCOM_DIR": "<scratch>/state/hub",
+        "CODEX_HOME": "<scratch>/explicit",
+        "PATH": "<inherited>"
+      },
+      "files": {
+        "explicit/rules/hcom.rules": "evidence/artifacts/hcom-relaxation-20261006/hcom.rules"
+      },
+      "claude_settings_deny_entries": null,
+      "started_utc": "2026-10-06T13:11:32.738922Z",
+      "finished_utc": "2026-10-06T13:11:32.793826Z",
+      "stdout": "",
+      "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<scratch>/explicit\"))\nWARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<scratch>/explicit\"))\n"
+    },
+    {
+      "scenario": "claude-retired-denies-remain",
+      "expected_exit": 78,
+      "exit_code": 78,
+      "env": {
+        "HOME": "<scratch>/userhome",
+        "PATH": "<inherited>"
+      },
+      "files": {
+        "userhome/.codex/rules/hcom.rules": "evidence/artifacts/hcom-relaxation-20261006/hcom.rules"
+      },
+      "claude_settings_deny_entries": 186,
+      "started_utc": "2026-10-06T13:11:32.794194Z",
+      "finished_utc": "2026-10-06T13:11:32.805708Z",
+      "stdout": "",
+      "stderr": "needs_user: 52 retired 2026-10-04 hcom deny entries remain in the Claude settings.\n"
+    },
+    {
+      "scenario": "claude-template-denies-only",
+      "expected_exit": 0,
+      "exit_code": 0,
+      "env": {
+        "HOME": "<scratch>/userhome",
+        "PATH": "<inherited>"
+      },
+      "files": {
+        "userhome/.codex/rules/hcom.rules": "evidence/artifacts/hcom-relaxation-20261006/hcom.rules"
+      },
+      "claude_settings_deny_entries": 134,
+      "started_utc": "2026-10-06T13:11:32.806061Z",
+      "finished_utc": "2026-10-06T13:11:32.872763Z",
+      "stdout": "",
+      "stderr": "WARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<scratch>/userhome/.codex\"))\nWARNING: proceeding, even though we could not create PATH aliases: Refusing to create helper binaries under temporary dir \"/tmp\" (codex_home: AbsolutePathBuf(\"<scratch>/userhome/.codex\"))\n"
+    }
+  ],
+  "after_sign_in_program": {
+    "source": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json agent-messaging acceptance.after_sign_in.command (check_plan.py holds accept.sh byte-equal)",
+    "sha256": "5205ab9034235241728bac55aafa74eedd735dab1296037c2849ac644370c7d5",
+    "invocation": "env -i HOME=<scratch>/userhome PATH=<inherited> [HCOM_DIR|CODEX_HOME|CLAUDE_CONFIG_DIR=<scratch>/...] bash -euo pipefail -c <program>, cwd <scratch> (accept.sh's check() runs bash -euo pipefail -c)"
+  },
+  "claude_settings_inputs": {
+    "retired": "the 52 entries of slot_configs.agent-messaging.claude_settings.permissions.deny at ecfa11276 (adoption/new-wsl/client-config-map.json)",
+    "template": "the 134 permissions.deny entries of adoption/templates/claude.settings.template.json (sha256 304dc11b5fca6e4001382a8cb884712e10d28bdfa8551fcac6dbfc2b4d36cf70)"
+  },
+  "all_expected": true
+}

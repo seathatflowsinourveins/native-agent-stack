@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3",
   "outputs": {
-    "docs/new-wsl-handbook.md": "f2b224c2eb081be6ca73834ef0a589a69a9c7029f2c2233678de893dd5a061b1",
-    "docs/new-wsl-handbook.json": "e5a825c8542eafe57744301ed16f8bd0cae373ddc0544f39e5be194b5be117bd"
+    "docs/new-wsl-handbook.md": "193d6560d9ec3e20284bfce36fefdd0363b524edcd3498f613f0770999812056",
+    "docs/new-wsl-handbook.json": "efd48eae032b0556f8679b3177c6f03fcae364bb6d353836e5254a2edd1722b1"
   },
   "inventory": {
     "layers": 37,
@@ -545,6 +545,29 @@
     {
       "date": "2026-10-06",
       "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "PR #771 (hcom relaxation) updated the source record behind the agent-messaging row (evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave5: the retired deny gate and usage rule replaced, a dated marker on the Opus residual), regenerated definitive-manifest.json with assemble_manifest.py, and revised the hashed WSL distro recipe's exec-rules sentence. Regenerated through the unchanged native builder, so the handbook no longer states the retired 2026-10-04 deny posture.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "41fd677124836481cf669e7b92632c165f0766d01f8d81afe6dbac7c162646a7",
+        "docs/new-wsl-handbook.json": "36768f00f8a0438603d834dbd856458fa4c130dafe6419c1de3aa668f2cefbda"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "Custody refresh of PR #771 onto main 0d5e65064: main and this branch had each regenerated the hashed handbook, so both generated outputs conflicted. Regenerated through the unchanged native builder on the merged sources, as a mechanical carry (the command center's ruling (a), item task-native-agent-stack-5f-20261006T112334Z); every regeneration entry of both sides is kept unchanged.",
+      "regenerated_against_main": "0d5e6506434fab598dee861c749a22e628beb75a",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "05ec525a60a6bad90b5f4161473a2aa015107c724fdfe0328f2166e3e73453a0",
+        "docs/new-wsl-handbook.json": "bb5a4dc62aabc938b56b038ddb4ae3df036395ccd44cc72720436ad3aa19b33d"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
       "cause": "Custody refresh of PR #642 onto main b0df1fb04: main and this branch had each regenerated the hashed handbook, so both generated outputs conflicted. Regenerated through the unchanged native builder on the merged sources, as a mechanical carry (the command center's ruling (a), item task-native-agent-stack-5f-20261006T112334Z); every regeneration entry of both sides is kept unchanged.",
       "regenerated_against_main": "b0df1fb0440698b0f210cb6becdcb24c685e232b",
       "previous_outputs": {
@@ -574,6 +597,18 @@
       "previous_outputs": {
         "docs/new-wsl-handbook.md": "05ec525a60a6bad90b5f4161473a2aa015107c724fdfe0328f2166e3e73453a0",
         "docs/new-wsl-handbook.json": "bb5a4dc62aabc938b56b038ddb4ae3df036395ccd44cc72720436ad3aa19b33d"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "Custody refresh of PR #642 onto main e28d0eec1: main and this branch had each regenerated the hashed handbook, so both generated outputs conflicted. Regenerated through the unchanged native builder on the merged sources, as a mechanical carry (the command center's ruling (a), item task-native-agent-stack-5f-20261006T112334Z); every regeneration entry of both sides is kept unchanged.",
+      "regenerated_against_main": "e28d0eec112527ac02659ac23753533b8ed39a73",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "31a48ab41085815989d066fa9a5b76a7f9ca9f26fc51887600f37e70121ea278",
+        "docs/new-wsl-handbook.json": "62a34bba39a6f18a13f218569cd8eebc5aaeff201be54fdab93f81cfb158ea3f"
       },
       "native_exit_code": 0,
       "check": "python3 scripts/build_new_wsl_handbook.py --check"

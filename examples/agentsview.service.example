@@ -1,0 +1,11 @@
+[Unit]
+Description=AgentsView session monitor (supervised serve)
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/agentsview serve --host 127.0.0.1 --port 21808 --no-browser --no-update-check --replace
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
