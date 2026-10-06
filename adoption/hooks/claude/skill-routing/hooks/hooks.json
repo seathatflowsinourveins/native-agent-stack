@@ -1,0 +1,7 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [{"hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/skill-routing.py\" --client claude --benchmark-hints", "timeout": 1}]}],
+    "PostToolUse": [{"matcher": "Bash|Read|Write|Edit|mcp__plugin_context-mode_context-mode__ctx_execute", "hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/skill-routing.py\" --client claude --benchmark-hints", "timeout": 1}]}],
+    "SubagentStart": [{"hooks": [{"type": "command", "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/skill-routing.py\" --client claude --benchmark-hints", "timeout": 1}]}]
+  }
+}
