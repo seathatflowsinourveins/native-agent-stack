@@ -303,25 +303,43 @@ the news feed off (Grafana v13.2.3 `conf/defaults.ini:1994-1996` turns it on).
 The foundation dashboard's savings, memory and coverage tables wait for a
 native-data collector on this host, which is not part of this row.
 
-Apply, then restart Grafana, which reads provider files and `grafana.ini` only
-when it starts:
+Apply from the long-lived main checkout once it contains the merged change;
+keep that checkout in place because the emitter unit records its absolute path.
+Run the commands below from that checkout's install-plan directory. Restart
+Grafana, which reads provider files and `grafana.ini` when it starts, then wait
+for its health endpoint before acceptance:
 
 ```sh
 bash install.sh --only grafana
 systemctl --user restart ns2604-grafana.service
+timeout 90 bash -c 'until curl -fsS http://127.0.0.1:21301/api/health >/dev/null; do sleep 2; done'
 systemctl --user start ns2604-research-progress.service
 bash accept.sh --only grafana --stage post_install
 bash accept.sh --only grafana --stage service_health
 ```
 
 Read back: `/api/search` lists the four dashboards, `/d/research-grand` opens
-with no sign-in and its "Native workflow history" table lists the three DAGs,
+with no sign-in and its "Native workflow history" table lists the three DAGs.
+Service acceptance checks a nonzero oneshot exit timestamp and independently
+reads all three DAGs without `--cache` (no Loki push), rejecting failed native
+history reads. An empty native history window is valid and remains distinct
+from an unavailable read. Also verify that
 `/api/frontend/settings` reports `newsFeedEnabled: false`, and
 `/api/v1/dags` on Dagu (21080) still answers 401. Roll back with
 `systemctl --user disable --now ns2604-research-progress.timer`, removal of the two
 units from `~/.config/systemd/user` and `systemctl --user daemon-reload`, then
 `bash install.sh --only grafana` from a checkout of the previous revision, which
-re-renders `grafana.ini` and the one-provider file, and a Grafana restart. On start
+re-renders `grafana.ini` and the one-provider file, and a Grafana restart. The
+previous revision's installer repeats its package-install steps, including
+`sudo apt-get update` and installation when that revision uses apt. Keep those
+steps outside the paper windows (6:35–9:45 AM EDT / 10:35–13:45Z, and
+3:50–8:10 PM EDT / 19:50–00:10Z). After the restart, remove the generated
+`$config_root/ecosystem-grafana-dashboards/` directory, the three dashboard
+template copies and two research-unit template copies in `$config_root/`, the
+two research-unit files in `$config_root/systemd/` (remove that directory only
+if empty), and the observation data folder's `grand-dashboard/` cache. Remove
+the now-empty Ecosystem folder through Grafana's existing administrator
+interface. Preserve unrelated configuration and data. On start
 Grafana deletes the dashboards of a provider that is no longer configured (Grafana
 v13.2.3 `pkg/services/provisioning/dashboards/dashboard.go:127-141`); removing
 only a dashboard file would not, because the provider sets `disableDeletion: true`.

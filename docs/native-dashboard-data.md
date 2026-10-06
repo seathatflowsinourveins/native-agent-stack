@@ -28,7 +28,8 @@ Another PC must configure its own paths, scope, services and native accounts.
 | Provider and host telemetry | [Native telemetry](http://127.0.0.1:13000/d/ecosystem-native) | Typed exported counters and host metrics, not estimated savings |
 | Research checkpoints | [Research Grafana](http://127.0.0.1:13000/d/research-grand) | Dated coordinator checkpoints, recorded experiment results and bounded native workflow history |
 
-On NativeStack2604 (2026-10-06) port 13000 has no listener. Its Grafana is
+On NativeStack2604 (2026-10-06), port 13000 can reach the legacy distribution's
+Grafana while it runs: WSL2 distributions share loopback listeners. Use this host's Grafana at
 `http://127.0.0.1:21301` (anonymous Viewer): [research](http://127.0.0.1:21301/d/research-grand)
 with Dagu run history, [native telemetry](http://127.0.0.1:21301/d/ecosystem-native),
 [native foundation](http://127.0.0.1:21301/d/native-foundation-data) and
@@ -37,6 +38,52 @@ install plan's `grafana` row has run. The foundation view's savings, memory and
 coverage tables stay empty there until a native-data collector runs on that host.
 Its other loopback UIs are listed in
 [native dashboard access](native-dashboards.md#nativestack2604-equivalents-2026-10-06).
+
+### NativeStack2604 token events and hook counter (2026-10-06)
+
+The token-layer dashboard keeps exported log records, native counter increases
+and the counts-only rollout census separate. Its GPT MCP panels count retained
+`codex.tool_result` records by namespace. Its RTK panels classify retained
+request-prefix markers, which do not distinguish explicit prefixes from hook
+rewrites. Missing data is unobserved coverage, not zero tool use; the queries
+do not manufacture zero-valued series. Loki's
+[`count_over_time` at v3.7.8](https://github.com/grafana/loki/blob/v3.7.8/docs/sources/query/metric_queries.md)
+counts log entries, not deduplicated rollout calls.
+
+Installed Codex reports 0.160.1; the source checks use its upstream revision
+`d27764b82f7118f674371e6d6e76271d9d606edb`. Its native
+[`codex.tool_decision` log source](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/otel/src/events/session_telemetry.rs#L1166)
+is AutomatedReviewer, Config or User, an approval origin rather than a hook or
+RTK identifier. Hook-named log records currently have only qualified partial
+diagnostic coverage: an
+[`after_agent` failure warning](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/core/src/hook_runtime.rs#L653).
+Command-hook instrumentation is a
+[`codex.hooks.command` trace span](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/hooks/src/engine/command_runner.rs#L199),
+so it is not counted as a firing log.
+
+The completion panel uses the actual native metric owner. The pinned
+[`codex.hooks.run` constant](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/otel/src/metrics/names.rs#L61)
+(plural `hooks`, not `codex.hook.run`) increments
+[once per completed hook run](https://github.com/openai/codex/blob/d27764b82f7118f674371e6d6e76271d9d606edb/codex-rs/core/src/hook_runtime.rs#L931).
+Read-only Prometheus observation returned the actual exported family
+`codex_hooks_run_total`; its current labels retained status but not lifecycle.
+The coordinated Collector change retains the bounded native metric labels;
+until it is applied, absent lifecycle labels display as `unknown`. `hook_name`
+is a lifecycle label, not a script or processor identity. Prometheus `increase`
+is a scrape-based estimate and can miss the first positive sample or missing
+exports. Confirmed RTK rewrite totals and per-processor RTK/ai-memory hook
+firings remain unmeasured here. No host deployment is established by these
+repository changes.
+
+Claude Code 2.1.291 is separately verified. Its
+[official hook completion log schema](https://code.claude.com/docs/en/monitoring-usage#hook-execution-complete-event)
+defines `num_success`, `num_blocking`, `num_non_blocking_error` and
+`num_cancelled` for all matching hook commands. The Claude hook-outcome panel
+sums those native fields instead of treating each completion log as one
+command. Lifecycle is grouped by `hook_event`; raw matcher and script names
+are not displayed. These sums require native hook event export and the
+reviewed Collector numeric-field retention. An empty panel does not establish
+zero hook executions.
 
 ## What changed after the HTTP-only checks
 

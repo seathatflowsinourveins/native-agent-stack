@@ -94,11 +94,18 @@ def retarget(board):
 def dashboards():
     research = module('observability/grand-dashboard/render.py', 'grand_render').dashboard(DAGS)
     native = json.loads((REPO / 'observability/backends/templates/ecosystem-dashboard.json.example').read_text())
+    native = retarget(native)
+    health = next(panel for panel in native['panels'] if panel['id'] == 4)
+    health['title'] = 'Collector HTTP response status (200 expected)'
+    health['description'] = (
+        'NativeStack2604\'s http_check/ecosystem receiver checks the Collector health endpoint '
+        'on loopback port 21333. This panel reports that endpoint\'s HTTP status.'
+    )
     foundation = module('observability/native-data/render.py', 'native_render').dashboard(
         header=NATIVE_DATA_HEADER, omit=NATIVE_DATA_OMIT)
     return {
         'grafana-research-grand.json': retarget(research),
-        'grafana-ecosystem-native.json': retarget(native),
+        'grafana-ecosystem-native.json': native,
         'grafana-native-foundation-data.json': retarget(foundation),
     }
 

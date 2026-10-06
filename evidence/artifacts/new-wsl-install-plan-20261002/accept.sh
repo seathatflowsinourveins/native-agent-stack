@@ -1171,6 +1171,8 @@ curl -fsS http://127.0.0.1:21301/api/frontend/settings | jq -e '\''.newsFeedEnab
 for uid in research-grand ecosystem-native native-foundation-data; do curl -fsS "http://127.0.0.1:21301/api/dashboards/uid/$uid" | jq -e --arg uid "$uid" '\''.dashboard.uid == $uid and (.meta.provisioned == true)'\'' >/dev/null; done
 systemctl --user is-active --quiet ns2604-research-progress.timer
 test "$(systemctl --user show ns2604-research-progress.service -p Result --value)" = success
+test "$(systemctl --user show ns2604-research-progress.service -p ExecMainExitTimestampMonotonic --value)" != 0
+python3 "$repo_root/observability/grand-dashboard/progress.py" --repo "$repo_root" --dagu-bin "$HOME/.local/bin/dagu" --dagu-home "$HOME/.dagu" --dagu-dag restic-backup --dagu-dag restic-restore-check --dagu-dag tz-currency-check | jq -e '\''[.[] | select(.record_kind == "workflow" and (.entity_id | endswith("/history")))] | length == 3 and all(.state != "unavailable / native history failed")'\'' >/dev/null
 curl -fsS -G http://127.0.0.1:21300/loki/api/v1/query --data-urlencode '\''query=sum(count_over_time({service_name="agent-stack-progress",record_kind="workflow"}[30m]))'\'' | jq -e '\''.status == "success" and (.data.result | length > 0)'\'' >/dev/null'
       ;;
     after_sign_in)

@@ -64,6 +64,49 @@ class Ns2604DashboardTests(unittest.TestCase):
         unit = (PLAN / "config/ns2604-research-progress.service").read_text()
         self.assertEqual(list(G.DAGS), re.findall(r"--dagu-dag (\S+)", unit))
 
+    def grafana_health_lines(self):
+        plan = json.loads((PLAN / "install-plan.json").read_text())
+        owner = next(row for row in plan["owners"] if row["slot"] == "grafana")
+        return owner["acceptance"]["service_health"]["command"].splitlines()
+
+    @unittest.skipUnless(shutil.which("jq"), "the native acceptance predicate needs jq")
+    def test_acceptance_reads_each_dag_and_rejects_failed_native_history(self):
+        # Execute the plan's real, non-pushing check against synthetic native history.
+        checks = [line for line in self.grafana_health_lines() if "progress.py" in line]
+        self.assertEqual(1, len(checks), "service acceptance must independently read Dagu history")
+        check = checks[0]
+        self.assertNotIn("--cache", check)
+        self.assertEqual(list(G.DAGS), re.findall(r"--dagu-dag (\S+)", check))
+        with tempfile.TemporaryDirectory() as d:
+            history_home = Path(d)
+            (history_home / ".local/bin").mkdir(parents=True)
+            (history_home / ".dagu").mkdir()
+            dagu = history_home / ".local/bin/dagu"
+            fixture_check = check.replace("$HOME/.local/bin/dagu", str(dagu)).replace(
+                "$HOME/.dagu", str(history_home / ".dagu"))
+            env = dict(os.environ, repo_root=str(ROOT))
+            for fail in (False, True):
+                with self.subTest(native_history_failed=fail):
+                    dagu.write_text("#!/usr/bin/python3\nimport sys\n" +
+                                    ("sys.exit(1)\n" if fail else "print('[]')\n"))
+                    dagu.chmod(0o700)
+                    result = subprocess.run(["bash", "-o", "pipefail", "-c", fixture_check],
+                                            capture_output=True, text=True, env=env)
+                    self.assertEqual(1 if fail else 0, result.returncode, result.stderr)
+
+    def test_acceptance_rejects_a_service_that_never_ran(self):
+        checks = [line for line in self.grafana_health_lines() if "ExecMainExitTimestampMonotonic" in line]
+        self.assertEqual(1, len(checks), "Result=success alone accepts a never-run oneshot")
+        with tempfile.TemporaryDirectory() as d:
+            binary = Path(d) / "systemctl"
+            fixture_check = checks[0].replace("systemctl --user show", shlex.quote(str(binary)) + " --user show")
+            for stamp, expected in (("0", 1), ("1000000", 0)):
+                with self.subTest(exit_timestamp=stamp):
+                    binary.write_text("#!/bin/sh\nprintf '%s\\n' " + shlex.quote(stamp) + "\n")
+                    binary.chmod(0o700)
+                    result = subprocess.run(["bash", "-c", fixture_check], capture_output=True, text=True)
+                    self.assertEqual(expected, result.returncode, result.stderr)
+
     def render(self, root):
         env = dict(os.environ, NS2604_OBSERVABILITY_DATA=str(root / "data"), XDG_CONFIG_HOME=str(root / "xdg"))
         def run(*args):

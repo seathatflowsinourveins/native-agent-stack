@@ -28,8 +28,9 @@ test suite, provider inference, or a token-saving benchmark. See the
 
 ### NativeStack2604 equivalents (2026-10-06)
 
-The table above is the authoring host's; on NativeStack2604 nothing listens on
-13000. Its install plan
+The table above is the authoring host's. WSL2 distributions share loopback
+listeners, so 13000 can reach the legacy distribution's Grafana while it runs.
+NativeStack2604 uses 21301. Its install plan
 ([`new-wsl-install-plan-20261002`](../evidence/artifacts/new-wsl-install-plan-20261002/README.md))
 uses these loopback URLs. The three ported dashboards exist once the plan's
 `grafana` row has run with the 2026-10-06 port; until then `/api/search` lists

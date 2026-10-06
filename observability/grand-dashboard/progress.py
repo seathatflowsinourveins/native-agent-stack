@@ -101,7 +101,12 @@ def history_output(command, home, timeout=5):
 
 
 def loki_push_url(value):
-    """Accept only a loopback Loki push endpoint, so a host's emitter cannot write to another host's Loki."""
+    """Restrict pushes to loopback; the caller must select its Loki port.
+
+    WSL2 distributions share loopback listeners. NativeStack2604 must pass
+    --loki-url http://127.0.0.1:21300/loki/api/v1/push; the default 13100 can
+    reach the legacy distribution's Loki while that distribution runs.
+    """
     match = LOKI_PUSH.fullmatch(value) if isinstance(value, str) else None
     if not match or not 0 < int(match.group(1)) < 65536:
         raise ValueError('Loki push URL must be http://127.0.0.1:<port>/loki/api/v1/push')

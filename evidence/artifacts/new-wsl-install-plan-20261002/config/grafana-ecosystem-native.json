@@ -94,7 +94,7 @@
     },
     {
       "id": 4,
-      "title": "HTTP response status (200 expected for local Dagu)",
+      "title": "Collector HTTP response status (200 expected)",
       "type": "table",
       "datasource": {
         "uid": "ns2604-prometheus"
@@ -114,7 +114,7 @@
         }
       ],
       "options": {},
-      "description": "Active status class/code only. A Dagu401 proves its API is protected, not that a job can execute. Gateway200 proves local readiness, not provider access."
+      "description": "NativeStack2604's http_check/ecosystem receiver checks the Collector health endpoint on loopback port 21333. This panel reports that endpoint's HTTP status."
     },
     {
       "id": 5,
