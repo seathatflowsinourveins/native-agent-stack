@@ -1089,7 +1089,7 @@ After the refresh onto main 9e9553277, which carries wave 5's four browser-regis
 ```text
 ```
 
-`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 69 of 69 lines stay):
+`adoption/templates/codex.AGENTS.template.md`, written to `adoption/new-wsl/codex-user-instructions.md` (0 unit(s) left out; 70 of 70 lines stay):
 
 ```text
 ```

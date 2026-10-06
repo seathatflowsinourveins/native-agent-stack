@@ -39,6 +39,7 @@ tokens; behavior and exit code are unchanged.
 
 The exceptions below override RTK's blanket prefix and output/exit-status assurances.
 rtk 0.51.0 positional expansion needs `--shell`. An explicit `rtk` prefix bypasses its exclusion list. Preserve output and exit status for the forms below with native commands or `rtk proxy <command>`:
+- A skill's `SKILL.md`: read it with plain `sed -n '1,400p' <path>` (no `rtk` prefix, not `cat`/`head`/`tail`) so Codex counts the load as `codex.skill.injected`.
 - `git show REV:path` in any form, including `git -C DIR show REV:path`: rtk keeps about 8 KiB of the blob.
 - `diff`: rtk 0.51.0 read errors exit 2 (bf23cff); 0.50.0: 1.
 - `git branch`: rtk can list a branch checked out in another worktree as remote-only.
