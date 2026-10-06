@@ -34,7 +34,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
 from common import (app_server_service_tier, append_jsonl, classify_provider_error, clean_login_env, clone_trust_view,  # noqa: E402
-                    current_s7_baseline, gateway_build, gateway_cache_state, gateway_get, load_json, read_jsonl, rebaseline_cost_ok,
+                    current_s7_baseline, gateway_build, gateway_cache_state, gateway_cache_window, gateway_get, load_json, read_jsonl, rebaseline_cost_ok,
                     rebaselines_between, run, s7_compare, s7_host_only, s7_persistent_change, sha256_file,
                     stable_s7_snapshot, stop_flag_names, trial_dir, try_rebaseline, utc_now, utc_stamp, write_json)
 import isolation  # noqa: E402
@@ -258,7 +258,7 @@ def main(argv=None) -> int:
         if args.dry_run:
             outcomes.append({"command": command, "dry_run": True})
             continue
-        clone_before = None
+        clone_before, forwarder = None, None
         if trial:
             if not (trial.get("clone_gate") or {}).get("pass", True):
                 append_jsonl(root / "ledger.jsonl", {"run_id": cfg["run_id"], "trial_id": trial["trial_id"], "cell": cell_name,
@@ -292,6 +292,18 @@ def main(argv=None) -> int:
                                           clone=work / "clones" / trial["trial_id"])
                 isolation.write_app_server_wrapper(iso_plan, codex_real)
                 iso_receipt = isolation.receipt(iso_plan, [codex_real, "app-server", "<the provider's arguments>"])
+                # CC item task-ns2604-coop-20261006T155742Z (B): the attempt's forwards, served before the eval starts.
+                try:
+                    forwarder = isolation.NetworkForwarder(iso_plan).start()
+                except (OSError, RuntimeError) as error:
+                    append_jsonl(root / "ledger.jsonl", {"run_id": cfg["run_id"], "trial_id": trial["trial_id"],
+                                                         "cell": cell_name, "client": "codex", "arm": cell["arm"],
+                                                         "ref": trial["ref"], "test_key": trial["test_key"],
+                                                         "phase": "exit", "at": started, "rc": None, "censored": True,
+                                                         "reason": "network_forwarder_failed",
+                                                         "error": str(error)[:200], "launched": False})
+                    outcomes.append({"trial_id": trial["trial_id"], "refused": "network_forwarder_failed"})
+                    continue
             # CL7b has no launcher, so its launched row carries the gateway build (CL9, G11) the launcher records for
             # the other Codex cells, and the attempt's config name, by which a resume finds a still-running attempt.
             append_jsonl(root / "ledger.jsonl", {"run_id": cfg["run_id"], "trial_id": trial["trial_id"], "cell": cell_name,
@@ -309,6 +321,7 @@ def main(argv=None) -> int:
                 proc = subprocess.run(command, cwd=str(work), env=env, stdout=handle, stderr=subprocess.STDOUT)
         finally:
             tree = census.stop() if census else None
+            network_runtime = forwarder.stop() if forwarder else None
         ended = utc_now()
         kept = root / "cells" / cell_name / results.name
         if results.exists():
@@ -322,6 +335,8 @@ def main(argv=None) -> int:
             provider = (attempts or {}).get("trials") or [{}]
             failed = proc.returncode not in (0, 100) or not kept.exists() or any(t.get("error") for t in provider)
             reason, error_class = app_server_exit_reason(failed, provider)
+            # CC item task-ns2604-coop-20261006T155742Z (A): the reading after the attempt.
+            gateway_after = gateway_cache_state()
             clone_after = clone_trust_view(work / "clones" / trial["trial_id"])
             clone_changed = sorted(k for k in clone_before if clone_before[k] != clone_after.get(k)) if clone_before else []
             rebaselined = None if clone_changed else straddled_rebaseline(root, started, ended)
@@ -338,7 +353,9 @@ def main(argv=None) -> int:
                                                  "host_s7_clone_trust_changed": [f"/clone_config/{k}" for k in clone_changed],
                                                  "attempt": trial.get("attempt", 1),
                                                  "isolation_runtime": isolation.app_server_runtime(iso_plan, tree) if iso_plan else None,
-                                                 "gateway_cache": gateway_cache_state(),
+                                                 "network_runtime": network_runtime,
+                                                 "gateway_cache": gateway_after,
+                                                 "gateway_cache_window": gateway_cache_window(gateway_before, gateway_after),
                                                  "provider_output_sha256": provider[0].get("provider_output_sha256")})
             if reason == "rate_limited":
                 (root / "STOP.codex").write_text(f"{utc_now()} rate_limit_error_from_provider {trial['trial_id']}\n")

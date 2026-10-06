@@ -8,6 +8,9 @@
   - `task-ns2604-coop-20261006T143846Z` rules on the residual channels, receipt privacy and fanotify.
   - `task-ns2604-coop-20261006T144256Z` puts Codex cells on the normal service tier.
   - `task-ns2604-coop-20261006T151719Z`, section C1, rules on the GPT read of 2044b2ab. It accepts P2-1 (bind triples) and P3 (the public receipt), and upholds P2-2 (host execution brokers) in a commit of its own. It returns the gateway's residual to the command center with this round's read-only probe.
+- **Round 6, 15:57Z and 16:43Z:** two command-center items, recorded in "Round 6" below.
+  - `task-ns2604-coop-20261006T155742Z`, section 2: (A) the dated Gate 0 amendment that keeps the response cache on; (B) a network namespace per trial with explicit forwards only.
+  - `task-ns2604-coop-20261006T164313Z`, section 3: approves both, approves the answer-channel closure as a separate commit, and folds in the GPT read of a513616d.
 - **Applies to:** PROTOCOL-v1.1.md (organic-e2e-v1.1-20261005), which stays verbatim, and PILOT-SPEC-v1.1.md. Where they differ from this file, this file governs from 2026-10-06 10:55Z.
 - **Harness:** each decision's code is in `harness/`, in the commit that adds this file.
   - `CC_V11_DECISIONS` in `harness/common.py` names the item.
@@ -76,6 +79,83 @@ Item `task-ns2604-coop-20261006T132948Z` decided that a classifier of the comman
 - Services reached over a socket run outside the namespace: the ai-memory server, MCP servers configured by URL, the OmniRoute gateway, and a user systemd or Docker daemon. A file such a service reads for a trial is not hidden by the mount namespace; R10's per-trial scoping of those stores still applies. Round 5, below, narrows this.
 - `/tmp` and `/dev/shm` stay shared outside Claude's own area (made private in round 5, below).
 - A setuid helper (sudo) does not work inside the user namespace.
+
+## Round 6 (CC 15:57Z and 16:43Z)
+
+### Gate 0 amendment, 2026-10-06 (decided by the command center, item task-ns2604-coop-20261006T155742Z, section 2 (A))
+
+This amends round 5's gate-0 `gateway-cache` check, which passed only with the semantic cache off. The cache **stays on**, because the user's token-saving features stay on. The command center accepts the source evidence together with an observed reading per trial.
+
+- **The source evidence, cited at the tags:**
+  - OmniRoute v3.8.51 reads or stores a cached response only for a request with an explicit numeric `temperature: 0`: `src/lib/semanticCache.ts`, `isCacheableForRead` and `isCacheableForWrite`.
+  - codex 0.160.x requests carry no temperature: `codex-rs/codex-api/src/common.rs`, `ResponsesApiRequest`, lines 279 to 304, identical at `rust-v0.160.0` and `rust-v0.160.1`.
+  - The running gateway build (`omniroute-3.8.51-5f4b3d577-affinity-pr15167`) adds the affinity patch and upstream PR 15167. Neither touches the cache code:
+    - the patch changes `src/sse/services/auth.ts` and `sessionAffinityPin.ts` (`evidence/artifacts/omniroute-wire-effort-20261005/patches/045aa81f3.patch`);
+    - the PR's file list names no cache file.
+- **The per-trial reading (fail closed).** Every trial records GET `/api/cache` before and after it: the launcher for every cell, and `block.py` for CL7b. A trial is **void** when either of these holds (`common.gateway_cache_window`, applied by G13):
+  - either reading shows a hit;
+  - the database or memory entry count changed between the readings.
+
+  A missing reading, a failed one, or one without its counts voids it too.
+- **Gate 0's check** (`grade.gateway_cache_gate`) needs all of the following, or fails:
+  - stage 1's reading, with 0 hits and its entry counts;
+  - a gateway build that starts `omniroute-3.8.51-`;
+  - Codex `codex-cli 0.160.0` or `0.160.1`, the versions the evidence was read at.
+
+### A network namespace per trial, explicit forwards only (item 155742Z (B), approved at 16:43Z)
+
+Each trial runs with `--unshare-net`. Its only routes out are the forwards below, each with its reason (`isolation.NET_FORWARDS`). The pattern is Anthropic's sandbox-runtime (anthropics/sandbox-runtime, tag v0.0.78, `README.md`):
+- line 108: on Linux, bubblewrap with network namespace isolation;
+- line 124: the sandboxed process's network namespace is removed, so all traffic goes through proxies on the host, reached over Unix sockets bound into the sandbox;
+- line 365: an allowlist entry may be an IP literal;
+- line 553: socat bridges the proxies.
+
+Inside the namespace, socat listens on each forward's usual loopback port (`isolation.NET_PRELUDE`, which fails closed if the listeners are not ready). Outside, `netfilter.py` serves the sockets, which are bound read-only inside the private runtime folder.
+
+| Forward | Client | Inside | Rule | Reason |
+| --- | --- | --- | --- | --- |
+| gateway | Codex | 127.0.0.1:21128 | HTTP: `/v1/...` only | Codex's model API (the omniroute profile's base URL). `/api`, the dashboard and the call logs share the port, so the filter is by path. |
+| otlp | both | 127.0.0.1:21318 | HTTP: POST `/v1/logs`, `/v1/metrics`, `/v1/traces` | both clients' telemetry export, which the grader's joins read. A receiver serves no reads. |
+| ai-memory | both | 127.0.0.1:29374 | HTTP: `/mcp`; POST `/hook` and `/hook/batch`, GET `/handoff`, each naming the trial's own scope | ai-memory stays in the treatment (CC 14:38Z). The web interface, `/admin` and the other routes stay out. |
+| model-egress | Claude | 127.0.0.1:3128 (`HTTPS_PROXY`, set for Claude trials only) | CONNECT to `api.anthropic.com:443` and `platform.claude.com:443` | Claude Code's model API and OAuth token refresh (the installed 2.1.291 binary's `BASE_API_URL` and `TOKEN_URL`). |
+
+- **The HTTP filter** admits one request per connection. The request goes upstream with `Connection: close`, and nothing the client sends after its body is relayed. It must be in plain form: no percent-encoding, dot segment or doubled slash in the path, no Upgrade, and one body framing.
+- **The CONNECT proxy** tunnels only to the listed host and port pairs. TLS stays end to end.
+- **The access log** keeps forward, method, path, decision and status, and never a query, header or body. The only header kept is the gateway's `X-OmniRoute-Request-Id` (below).
+- **A login on the management routes is rejected**, as the user's rule is passwordless and frictionless. The path filter replaces it.
+- **G13 requires all of the following:**
+  - the receipt's network record equal to the plan's for the client: forwards, rules, allowlists, environment and scope;
+  - a network namespace of the trial's own (`--info-fd`), distinct from the host's;
+  - the record that its forwards ran.
+- **What a trial can no longer reach:** every other service on the host's loopback (Dagu, Serena, hcom, the codebase-memory daemon, agentsview, Loki, Grafana and the rest), and the internet except Claude's two model hosts. That includes web tools, `gh`, npm (chrome-devtools' `npx`) and socraticode's Qdrant and embedding servers. This is a treatment boundary for the CC: any further forward is added to `NET_FORWARDS` with its reason.
+
+### The GPT read of a513616d (CHANGES_REQUESTED), folded in (item 164313Z)
+
+- **P1, the call-log detail GET.** The command guard permits it through its id exception (`scripts/hooks/secret_path_guard.py:4657-4658`). Under the CC's interim rule, `common.gateway_calls_for_trial` replaces the thread scan:
+  - It runs on the coordinator side after the trial (`collect.py`), never inside a trial.
+  - It requests a detail **only** for list rows whose id or correlation id is one of the `X-OmniRoute-Request-Id` values the trial's own responses carried. The gateway forward records those values (OmniRoute v3.8.51 `src/shared/constants/headers.ts`).
+  - It keeps only model, status, received and forwarded effort and tier, and the cache source. No body enters a receipt.
+  - That the header value is the call log's id or correlation id is read from source, not yet observed. With no match, nothing is requested and G11 stays failed.
+  - A test checks that a foreign id is never requested.
+- **P2, closure evidence.** Gate 0 (`network-closure`) and G13 require the stage-1 self-test's verified denials (`grade.closure_evidence`, 13 required probes). These cover:
+  - `/api/health`, the call logs and the dashboard refused by the filter;
+  - the dot-segment and percent-encoded detours;
+  - ai-memory's web interface and another scope's handoff;
+  - no gateway port for Claude;
+  - the local listeners;
+  - direct egress, and egress to an unlisted host.
+
+  A missing probe, a failed one or any access fails. Payload-flag counts alone never establish closure.
+- **P2, G11 fails closed.**
+  - G11 needs the recorded launch tier `default`, and for every gateway call a forwarded tier of `default` or none (OmniRoute then forwards the upstream default) (`grade.tier_evidence`).
+  - A missing or unrecognized tier fails, and the call ids are reported. Nulls stay null.
+- **P2, ai-memory page detection.** Transport envelopes are normalized apart from content (`grade.mcp_payloads`). Pages are recognized by each tool's response contract (`grade.pages_returned`):
+  - `memory_query`: hits;
+  - `memory_read_page`: one page with a body;
+  - the listing tools: their items;
+  - the briefing, handoff and message tools: their text.
+
+  Validity and G13 share one predicate (`grade.ai_memory_invalidates`).
 
 ## Round 5 (CC 14:38Z, 14:42Z and 15:17Z)
 
@@ -568,6 +648,15 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
 
 ## Verification (offline; no pilot or smoke)
 
+- **Round 6** (the Gate 0 amendment, the network namespace and the GPT read of a513616d): the focused module passes 76 of 76 tests, client starts included.
+  - **Red run.** The same tests on the round-5 head a513616d: 4 fail and 16 error, one of them the network class's set-up, whose 4 tests do not run.
+  - **Stage-1 self-test** (`isolation.py selftest --clients`, no model call):
+    - 49 probes hidden, all with ENOENT, and 7 of 7 client checks pass;
+    - 18 of 18 network expectations are met, over 10 sampled local listeners;
+    - the IPC and network namespaces are distinct from the host's;
+    - the broker sockets are absent, and the runtime folder holds only the forwards' socket folder;
+    - no home path or home slug is in the report.
+  - **Read-only re-grade of smoke-20261006c.** The run root is unchanged, and no gate's pass changes against its 10:48Z grade. G13's closure evidence is missing, since that run predates the probes. G11's tier evidence fails for its 11 Codex trials, as it fails closed.
 - **P2-2's commit** (host execution brokers): the focused module passes 59 of 59 tests, client starts included.
   - **Red runs** of the same 59 tests:
     - on the harness without P2-2 (round 5's first commit), exactly P2-2's 8 checks are red: 7 fail and 1 errors, because the self-test report has no broker probes. The other 51 pass;

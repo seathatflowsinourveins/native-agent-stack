@@ -25,7 +25,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from common import HOME, gateway_calls_for_threads, load_json, parse_stream_text, read_jsonl, run, utc_now, write_json  # noqa: E402
+from common import HOME, gateway_calls_for_trial, load_json, parse_stream_text, read_jsonl, run, utc_now, write_json  # noqa: E402
 
 LOKI = "http://127.0.0.1:21300/loki/api/v1/query_range"
 KEEP_FIELDS = ("event_name", "tool_name", "tool_use_id", "success", "decision", "mcp_server_name", "mcp_tool_name",
@@ -245,11 +245,16 @@ def main(argv=None) -> int:
                 except (OSError, ValueError):
                     continue
             threads.discard(None)
-            if threads:
-                calls = gateway_calls_for_threads(threads, start, time.strftime("%Y-%m-%dT%H:%M:%S.999Z", time.gmtime(iso_to_ns(end) / 1e9 + 60)))
-                write_json(root / "gateway" / f"{tid}.json", calls, 0o600)
-                record["gateway"] = {"threads": len(threads), "calls": sum(len(v) for v in calls["by_thread"].values()),
-                                     "errors": calls["errors"]}
+            # GPT read of a513616d, P1 (CC item task-ns2604-coop-20261006T164313Z): only the call ids this trial's own
+            # responses carried (its gateway forward's record), read here on the coordinator side after the trial.
+            request_ids = ((exit_row.get("network_runtime") or {}).get("gateway_request_ids")) or []
+            calls = gateway_calls_for_trial(request_ids, start, time.strftime(
+                "%Y-%m-%dT%H:%M:%S.999Z", time.gmtime(iso_to_ns(end) / 1e9 + 60)))
+            calls["by_thread"] = {k: v for k, v in calls["by_thread"].items() if k in threads or not threads}
+            write_json(root / "gateway" / f"{tid}.json", calls, 0o600)
+            record["gateway"] = {"threads": len(threads), "calls": sum(len(v) for v in calls["by_thread"].values()),
+                                 "request_ids": calls["request_ids"], "unmatched": calls["unmatched_request_ids"],
+                                 "errors": calls["errors"]}
         summary["trials"][tid] = record
     # agentsview second parse (S10): one export per client, tool calls per trial session.
     if first_start:

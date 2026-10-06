@@ -53,8 +53,8 @@ import isolation  # noqa: E402
 import suite  # noqa: E402
 
 HARNESS_FILES = ("common.py", "suite.py", "fixture.py", "arms.py", "launcher.py", "sdk_claude.py", "sdk_codex.mjs",
-                 "prepare.py", "block.py", "collect.py", "grade.py", "pilot.py", "isolation.py", "stage2-canaries.json",
-                 "stage3-oracles.json")
+                 "prepare.py", "block.py", "collect.py", "grade.py", "pilot.py", "isolation.py", "netfilter.py",
+                 "stage2-canaries.json", "stage3-oracles.json")
 PROBE_HASHES = {"claude/CLAUDE.md": "b86ea2c4655637fa", "claude/settings.json": "861959ff0e49803f"}
 BLACKOUTS = (("10:35", "10:55"), ("13:20", "13:45"))
 GH_EMPTY = HOME / ".cache" / "ws-empty-config"   # neutral name: no experiment, tool, client, arm or task word
@@ -751,7 +751,10 @@ def main(argv=None) -> int:
         # The structural G13 (CC item task-ns2604-coop-20261006T132948Z): the launcher and block.py run every trial's
         # client tree under bwrap with the answer sources hidden; stage 1's self-test result is isolation-selftest.json.
         "isolation": ({"decision": isolation.ISOLATION_DECISION, "wrapper": isolation.BWRAP,
-                       "version": isolation.bwrap_version(), "selftest": isolation.SELFTEST_FILE}
+                       "version": isolation.bwrap_version(), "selftest": isolation.SELFTEST_FILE,
+                       # CC item task-ns2604-coop-20261006T155742Z (B): each trial's network namespace and its forwards.
+                       "network": {"decision": isolation.ROUND6_DECISION, "forwards": isolation.NET_FORWARDS,
+                                   "setenv": isolation.NET_ENV}}
                       if args.isolation == "bwrap" else None),
         "isolation_off_amendment": args.amendment_ref if args.isolation == "off" else None,
         # CC item task-ns2604-coop-20261006T143846Z, (a): the gateway's cache switch and counters at stage 1 (GET

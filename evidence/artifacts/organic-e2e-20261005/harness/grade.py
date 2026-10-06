@@ -29,7 +29,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from common import (CARRY_FORWARD_REASONS, CC_V11_DECISIONS, CLI_NATIVE_SURFACES, CLI_PROGRAMS, CLI_TASK_KINDS,  # noqa: E402
+from common import (CACHE_EVIDENCE_CODEX, CACHE_EVIDENCE_GATEWAY_BUILD, CACHE_RULE_DECISION,  # noqa: E402
+                    CARRY_FORWARD_REASONS, CC_V11_DECISIONS, CLI_NATIVE_SURFACES, CLI_PROGRAMS, CLI_TASK_KINDS,
                     CLI_VENDOR_SKILL_SURFACES, CLI_WRAPPERS, CLONE_TRUST_KEYS, HOME, MARKERS, MCP_SERVER_ITEMS, METER_CALIBRATION,
                     deadline_without_result, decision_times,
                     REBASELINE_LOG, RUNS_ROOT, V1_ROOT, headroom_allows, load_json, meter_calibration,
@@ -1338,6 +1339,8 @@ def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> 
               "gateway_service_tier": sorted({str(c.get("received_service_tier")) for c in calls}),
               # CC item task-ns2604-coop-20261006T144256Z: the tier the gateway forwarded (pipeline details only).
               "gateway_forwarded_service_tier": sorted({str(c.get("forwarded_service_tier")) for c in exposed}),
+              # GPT read of a513616d, P2: every call's forwarded tier as recorded, null when missing (never "None").
+              "tier_calls": [{"id": c.get("id"), "forwarded": c.get("forwarded_service_tier")} for c in calls],
               # CC item task-ns2604-coop-20261006T143846Z, (a): calls the gateway's semantic cache answered.
               "gateway_semantic_cache_calls": [c.get("id") for c in calls if c.get("cache_source") == "semantic"],
               "gateway_backend_models": sorted({c.get("backend_model") for c in calls if c.get("backend_model")}),
@@ -1868,32 +1871,83 @@ def _scope_pairs(value, out: list | None = None) -> list[tuple]:
     return out
 
 
-def _mcp_payload(text: str):
-    """The JSON an ai-memory tool returned: the text itself (Claude's transcripts keep the tool's text), or the JSON in
-    the text blocks of an MCP result envelope (Codex's mcp_tool_call items keep the envelope)."""
+def _parse(text):
+    if isinstance(text, (dict, list)):
+        return text
     try:
-        data = json.loads(text) if text else None
-    except ValueError:
-        return None
-    if isinstance(data, dict) and isinstance(data.get("content"), list):
-        payloads = []
-        for block in data["content"]:
+        return json.loads(text) if text else None
+    except (TypeError, ValueError):
+        return text if isinstance(text, str) and text.strip() else None
+
+
+def mcp_payloads(raw) -> list:
+    """GPT read of a513616d, P2: the transport envelope, normalized apart from content detection. A Claude transcript
+    keeps the tool's text; a Codex mcp_tool_call item keeps the MCP result envelope ({"content": [{"type": "text",
+    "text": ...}], "structuredContent": ...}). Returns the payloads the tool sent, each parsed JSON or plain text, with
+    no wrapper added."""
+    data = _parse(raw)
+    if data is None:
+        return []
+    if isinstance(data, dict) and ("content" in data or "structuredContent" in data) \
+            and set(data) <= {"content", "structuredContent", "isError", "_meta"}:
+        if isinstance(data.get("structuredContent"), (dict, list)):
+            return [data["structuredContent"]]
+        out = []
+        for block in data.get("content") or []:
             if isinstance(block, dict) and isinstance(block.get("text"), str):
-                try:
-                    payloads.append(json.loads(block["text"]))
-                except ValueError:
-                    continue
-        return payloads or data
-    return data
+                parsed = _parse(block["text"])
+                if parsed is not None:
+                    out.append(parsed)
+        return out
+    return [data]
 
 
-def _returned_anything(value) -> bool:
-    """A result that holds at least one page, hit or observation (a non-empty list anywhere in it)."""
-    if isinstance(value, list):
-        return bool(value)
-    if isinstance(value, dict):
-        return any(_returned_anything(item) for item in value.values())
-    return False
+# Each ai-memory 2.5.2 tool's response contract for content a trial could read (crates/ai-memory-mcp/src/server.rs):
+# memory_query returns {"hits": [...]}; memory_read_page returns one page (its body, content or markdown); the listing
+# tools return a list of pages or items; the text tools return a brief, a handoff or a message. The other tools return
+# no page.
+PAGE_LISTS = ("hits", "pages", "items", "results", "observations", "handoffs", "messages", "nodes", "entries")
+PAGE_TEXT = ("body", "content", "markdown", "text", "summary", "brief", "briefing")
+LIST_TOOLS = {"memory_recent", "memory_explore", "memory_handoff_list", "memory_message_list",
+              "memory_read_session_observations"}
+TEXT_TOOLS = {"memory_briefing", "memory_handoff_accept", "memory_message_pop"}
+
+
+def _has_text(value) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
+def pages_returned(tool: str, payloads: list) -> int:
+    """How many pages, hits or items a call returned, by its tool's response contract."""
+    name = str(tool or "").split("__")[-1]
+    count = 0
+    for payload in payloads:
+        if name == "memory_query":
+            hits = payload.get("hits") if isinstance(payload, dict) else None
+            count += len(hits) if isinstance(hits, list) else 0
+        elif name == "memory_read_page":
+            if isinstance(payload, dict):
+                page = payload.get("page") if isinstance(payload.get("page"), dict) else payload
+                count += int(any(_has_text(page.get(k)) for k in PAGE_TEXT))
+            else:
+                count += int(_has_text(payload))
+        elif name in LIST_TOOLS:
+            if isinstance(payload, list):
+                count += len(payload)
+            elif isinstance(payload, dict):
+                count += sum(len(payload[k]) for k in PAGE_LISTS if isinstance(payload.get(k), list))
+        elif name in TEXT_TOOLS:
+            if isinstance(payload, dict):
+                count += int(any(_has_text(payload.get(k)) for k in PAGE_TEXT)
+                             or any(isinstance(payload.get(k), list) and payload[k] for k in PAGE_LISTS))
+            else:
+                count += int(_has_text(payload))
+    return count
+
+
+def ai_memory_invalidates(check: dict) -> bool:
+    """The validity and G13 decision of a trial's ai-memory record: a page of another scope, or an unverifiable one."""
+    return bool(check.get("foreign_scope_pages") or check.get("unverifiable_scope_pages"))
 
 
 def ai_memory_check(calls: list[dict], trial_id: str, other_fixtures: set[str]) -> dict:
@@ -1917,13 +1971,13 @@ def ai_memory_check(calls: list[dict], trial_id: str, other_fixtures: set[str]) 
         is_implicit = not scopes and not args.get("global")
         if is_implicit:
             implicit.append(call["id"])
-        data = _mcp_payload(call["result"])
-        if not call["ok"] or data is None:
+        payloads = mcp_payloads(call["result"])
+        if not call["ok"] or not payloads:
             continue
-        found = [p for p in _scope_pairs(data) if foreign(p)]
-        if _returned_anything(data):
+        found = [p for p in _scope_pairs(payloads) if foreign(p)]
+        if pages_returned(call["tool"], payloads):
             found += [p for p in scopes if p[0] and p[1] and foreign(p)]
-            if is_implicit and not _scope_pairs(data):
+            if is_implicit and not _scope_pairs(payloads):
                 # A call without workspace + project reads the server's active-project pointer, which every other
                 # session's hooks move; its pages carry no scope (ai-memory 2.5.2), so whose they are cannot be
                 # checked. The static-client rule asks for the explicit pair, so such a call that returned pages counts
@@ -2081,12 +2135,68 @@ def clone_trust_from_exit(exit_row: dict) -> list:
     return sorted(p for p in ((exit_row.get("host_s7") or {}).get("changed") or []) if p.startswith(CLONE_TRUST_KEYS))
 
 
-def g11_trial_ok(effort: dict) -> bool:
+# GPT read of a513616d, P2 (G11 fails closed), ruled by CC item task-ns2604-coop-20261006T164313Z: a forwarded tier is
+# normal evidence only when it is "default", or when the forwarded request names no tier (OmniRoute then forwards the
+# upstream default). Anything else (priority, flex, auto, an unknown value) and a missing record (no pipeline details)
+# are rejected; nulls stay null.
+NORMAL_FORWARDED_TIERS = ("default", "(unset)")
+
+
+def tier_evidence(effort: dict, launch_tier) -> dict:
+    """The tier record of one Codex trial: the launch tier, and for every gateway call its forwarded tier as recorded,
+    null when missing. ok only when the launch tier is default and every call carries a normal forwarded tier."""
+    calls = effort.get("tier_calls") or []
+    missing = [c.get("id") for c in calls if c.get("forwarded") is None]
+    other = [c.get("id") for c in calls if c.get("forwarded") is not None and c.get("forwarded") not in NORMAL_FORWARDED_TIERS]
+    return {"launch": launch_tier, "calls": len(calls), "missing_calls": missing, "unrecognized_calls": other,
+            "ok": launch_tier == "default" and bool(calls) and not missing and not other}
+
+
+# GPT read of a513616d, P2 (closure evidence), ruled by CC item task-ns2604-coop-20261006T164313Z: gate 0 and G13
+# require the stage-1 self-test's verified denial of a trial's access to the gateway's log, payload and management
+# routes, and to the other local listeners. A probe that is missing or inconclusive fails, as does any access.
+CLOSURE_EXPECTATIONS = ("codex /api/health refused by the filter", "codex /api/usage/call-logs refused by the filter",
+                        "codex dashboard refused by the filter", "codex dot-segment detour refused",
+                        "codex percent-encoded detour refused", "ai-memory web interface refused",
+                        "ai-memory handoff of another scope refused", "claude has no gateway port",
+                        "local listeners refused (codex)", "local listeners refused (claude)",
+                        "codex direct egress fails", "claude direct egress fails",
+                        "claude egress to another host refused")
+
+
+def gateway_cache_gate(cfg: dict) -> dict:
+    """Gate 0's cache check as amended by CC item task-ns2604-coop-20261006T155742Z (A): the cache may stay on. The
+    stage-1 GET /api/cache reading must exist with 0 hits and its entry counts, and the gateway build and the Codex
+    version must be the ones the source evidence was read at."""
+    reading = cfg.get("gateway_cache") or {}
+    semantic = reading.get("semantic_cache") or {}
+    build = str(cfg.get("gateway_build") or "")
+    codex_version = ((cfg.get("binaries") or {}).get("codex") or {}).get("version")
+    return {"pass": bool(reading) and not reading.get("error") and semantic.get("hits") == 0
+            and isinstance(semantic.get("dbEntries"), int) and isinstance(semantic.get("memoryEntries"), int)
+            and build.startswith(CACHE_EVIDENCE_GATEWAY_BUILD) and codex_version in CACHE_EVIDENCE_CODEX,
+            "decision": CACHE_RULE_DECISION, "verdict": reading.get("verdict"), "cache_config": reading.get("cache_config"),
+            "semantic_cache": semantic, "gateway_build": build, "codex_version": codex_version,
+            "rule": "cache on; source evidence at the pinned builds; per-trial readings with 0 hits and unchanged entries"}
+
+
+def closure_evidence(selftest: dict | None) -> dict:
+    """Whether the self-test verified every required denial (CLOSURE_EXPECTATIONS); missing probes are listed."""
+    expect = ((selftest or {}).get("network") or {}).get("expect") or {}
+    missing = [k for k in CLOSURE_EXPECTATIONS if k not in expect]
+    failed = [k for k in CLOSURE_EXPECTATIONS if k in expect and expect[k] is not True]
+    return {"pass": not missing and not failed, "missing": missing, "failed": failed,
+            "verified": [k for k in CLOSURE_EXPECTATIONS if expect.get(k) is True]}
+
+
+def g11_trial_ok(effort: dict, launch_tier=None) -> bool:
     """G11 for one Codex trial (PILOT-SPEC: requested and forwarded effort and the gateway build recorded). Finding 7 of
     the GPT read of 5aa2bfdc: the forwarded effort must be an observed, nonempty value; pipeline exposure alone is not
-    the record (it is reported apart, with the calls that hold no value)."""
+    the record. GPT read of a513616d, P2: the launch tier must be default and every call's forwarded tier normal
+    (tier_evidence); missing or unrecognized tier evidence fails."""
     return bool(effort.get("requested_turn_context")) and bool(effort.get("gateway_build")) \
-        and (effort.get("gateway_calls") or 0) > 0 and bool(effort.get("gateway_forwarded"))
+        and (effort.get("gateway_calls") or 0) > 0 and bool(effort.get("gateway_forwarded")) \
+        and tier_evidence(effort, launch_tier)["ok"]
 
 
 def cli_exposure(item: str, client: str, graded: dict) -> dict:
@@ -2211,8 +2321,7 @@ def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_too
     if trial.get("client") == "codex":
         record["service_tier"] = recorded_service_tier(rows.get("launched") or {})
     record["valid"] = bool(graded["joins"]["pass"] and marker_ok and not exit_row.get("censored")
-                           and record["isolation"]["ok"] and not record["ai_memory"]["foreign_scope_pages"]
-                           and not record["ai_memory"]["unverifiable_scope_pages"])
+                           and record["isolation"]["ok"] and not ai_memory_invalidates(record["ai_memory"]))
     record["watcher"] = watcher(graded, trial.get("client"), record["reach"])
     record["target_exposure"] = cli_exposure(task.get("item"), trial.get("client"), graded) \
         if task.get("kind") in CLI_TASK_KINDS else None
@@ -2412,14 +2521,13 @@ def gate0(root: Path) -> dict:
         selftest = load_json(root / isolation.SELFTEST_FILE) if (root / isolation.SELFTEST_FILE).exists() else None
         checks["isolation-selftest"] = {"pass": bool(selftest and selftest.get("pass")),
                                         "probes": (selftest or {}).get("probes"), "version": (selftest or {}).get("version")}
-        # CC item task-ns2604-coop-20261006T143846Z, (a): no gateway cache enabled that could serve one trial's output to
-        # another. OmniRoute's semantic cache is its only response cache, so this check passes only while it is off
-        # (stage 1's GET /api/cache reading). Turning it off is the co-op's gateway setting; a ruling that accepts it on
-        # needs an amendment. Each Codex trial's call logs and hit counts are checked as well (G13).
-        reading = cfg.get("gateway_cache") or {}
-        checks["gateway-cache"] = {"pass": reading.get("verdict") == "semantic cache off",
-                                   "verdict": reading.get("verdict"), "cache_config": reading.get("cache_config"),
-                                   "semantic_cache": reading.get("semantic_cache")}
+        # GPT read of a513616d, P2: the verified denial of a trial's access to the log, payload and management routes.
+        checks["network-closure"] = closure_evidence(selftest)
+        # Gate 0 amendment (CC item task-ns2604-coop-20261006T155742Z, section 2 (A), amending the 14:38Z check): the
+        # semantic cache stays on. The check accepts the source evidence, which is pinned to the builds it was read at
+        # (CACHE_EVIDENCE_GATEWAY_BUILD, CACHE_EVIDENCE_CODEX), and requires stage 1's GET /api/cache reading with 0
+        # hits. Each trial's readings before and after it decide that trial (G13, common.gateway_cache_window).
+        checks["gateway-cache"] = gateway_cache_gate(cfg)
     canary_keys = ("canary-gh-auth", "canary-gh-auth-ctx", "canary-gh-auth-ctx-env", "canary-exec-rules")
     canaries = {k: checks.get(k, {}).get("pass") for k in canary_keys}
     report = {"at": utc_now(), "run_id": cfg["run_id"], "checks": checks, "trials": records, "canaries": canaries,
@@ -2544,7 +2652,9 @@ def grade_run(root: Path) -> dict:
             # Finding 11: G11 needs the forwarded effort, not only the requested one. GPT read of 5aa2bfdc, finding 7:
             # an observed, nonempty forwarded effort value is the record; pipeline exposure alone is not, and is
             # reported apart, with the calls that hold no value listed.
-            gate_rows["G11"].append(g11_trial_ok(effort))
+            launch_tier = recorded_service_tier(rows.get("launched") or {})
+            record["tier_evidence"] = tier_evidence(effort, launch_tier)
+            gate_rows["G11"].append(g11_trial_ok(effort, launch_tier))
             if not effort["gateway_forwarded_exposed"]:
                 gaps.append({"gate": "G11", "trial_id": tid, "gap": "forwarded effort not exposed: the gateway call log has "
                              "no pipeline details (pipelinePayloads null); under decision 8 (RP4) the co-op turns them on "
@@ -2556,8 +2666,7 @@ def grade_run(root: Path) -> dict:
                              "calls": effort["gateway_calls_missing_forwarded_effort"][:20]})
         # G13, structural (CC item task-ns2604-coop-20261006T132948Z): every listed answer source stayed hidden from the
         # trial's mount namespace for its whole lifetime; the command classifier's reads are diagnostic tags.
-        gate_rows["G13"].append(record["isolation"]["ok"] and not record["ai_memory"]["foreign_scope_pages"]
-                                and not record["ai_memory"]["unverifiable_scope_pages"])
+        gate_rows["G13"].append(record["isolation"]["ok"] and not ai_memory_invalidates(record["ai_memory"]))
         gate_rows["G14"].append(all(u.get("tag") for u in uses))
         if record["valid"] and trial.get("lane") == cfg.get("lane", "organic-e2e") and task.get("kind") != "prompted" \
                 and not (cfg.get("tests_by_ref") or {}).get(trial.get("ref") or "", {}).get("gate_trial"):
@@ -2673,7 +2782,13 @@ def grade_run(root: Path) -> dict:
                       and (g.get("effort") or {}).get("gateway_forwarded_service_tier")}}
     fast = {tid: tiers_ for tid, tiers_ in gates["G11"]["service_tier"]["forwarded"].items() if "priority" in tiers_}
     gates["G11"]["service_tier"]["forwarded_priority"] = fast
-    if gates["G11"]["service_tier"]["other"] or fast:
+    # GPT read of a513616d, P2: fail closed. Each Codex trial's tier evidence, with the affected call ids.
+    evidence = {r["trial_id"]: r.get("tier_evidence") for r in table if r.get("launched") and r.get("client") == "codex"}
+    gates["G11"]["service_tier"]["evidence"] = {
+        "rule": f"launch tier default and every call's forwarded tier in {list(NORMAL_FORWARDED_TIERS)}",
+        "failing": {tid: {k: v for k, v in (e or {}).items() if k != "ok"} for tid, e in evidence.items()
+                    if not (e or {}).get("ok")}}
+    if gates["G11"]["service_tier"]["other"] or fast or gates["G11"]["service_tier"]["evidence"]["failing"]:
         gates["G11"]["pass"] = False
     # G13, structural (CC item task-ns2604-coop-20261006T132948Z): every launched trial's receipt shows each listed
     # answer source hidden from its mount namespace for its whole lifetime, and stage 1's wrapper-only self-test
@@ -2711,11 +2826,21 @@ def grade_run(root: Path) -> dict:
                          "host_service_tags": _count([tag for r in table for tag in r.get("host_service_tags") or {}]),
                          "gateway_cache_stage1": {k: (cfg.get("gateway_cache") or {}).get(k)
                                                   for k in ("verdict", "cache_config", "semantic_cache", "idempotency")},
-                         # GPT read of 2044b2ab: a documented residual for the command center, never a pass condition.
-                         "gateway_logs_stage1": cfg.get("gateway_logs"),
-                         "gateway_from_namespace": (selftest or {}).get("gateway_from_namespace")})
+                         # Round 6 (CC item task-ns2604-coop-20261006T155742Z, section 2): (A) the trials the cache rule
+                         # voided; (B) the forwards' requests, and the ones the filters refused (diagnostic: a refused
+                         # request changes nothing, and the trial stays valid).
+                         "gateway_cache_voided": {r["trial_id"]: (r["isolation"].get("gateway_cache_window") or {}).get("reasons")
+                                                  for r in table if r.get("isolation")
+                                                  and (r["isolation"].get("gateway_cache_window") or {}).get("void")},
+                         "network": {"requests": sum((r.get("isolation") or {}).get("network_requests") or 0 for r in table),
+                                     "denied_trials": {r["trial_id"]: r["isolation"]["network_denied"] for r in table
+                                                       if (r.get("isolation") or {}).get("network_denied")},
+                                     "selftest_probes": ((selftest or {}).get("network") or {}).get("expect")},
+                         "gateway_logs_stage1": cfg.get("gateway_logs")})
+    gates["G13"]["network_closure"] = closure_evidence(selftest)
     if gates["G13"].get("pass") is not None:
-        gates["G13"]["pass"] = bool(gates["G13"]["pass"] and cfg.get("isolation") and (selftest or {}).get("pass"))
+        gates["G13"]["pass"] = bool(gates["G13"]["pass"] and cfg.get("isolation") and (selftest or {}).get("pass")
+                                    and gates["G13"]["network_closure"]["pass"])
     g12 = cfg.get("oracles_reproduce") or {}
     gates["G12"] = {"pass": g12.get("pass"), "differing": g12.get("differing"), "tests_run": g12.get("tests_run")}
     gates["G15"] = {"observed": observed, "gaps": [k for k, v in observed.items() if not v], "negatives": negatives}

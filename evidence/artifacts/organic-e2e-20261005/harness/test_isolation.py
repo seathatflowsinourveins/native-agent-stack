@@ -41,6 +41,7 @@ HOST_READY = os.access("/usr/bin/bwrap", os.X_OK) and \
     (Path.home() / ".local/state/native-agent-stack/coordination").is_dir()
 # P2-2's paths, named here rather than read from isolation.py, so the negative tests also run (and fail) on a harness
 # that binds the host's runtime folder in.
+READING = {"semantic_cache": {"hits": 0, "misses": 0, "dbEntries": 0, "memoryEntries": 0}}
 RUNTIME = Path(f"/run/user/{os.getuid()}")
 WSL_RUN = Path("/run/WSL")
 WINDOWS_CMD = Path("/mnt/c/Windows/System32/cmd.exe")
@@ -145,15 +146,21 @@ class StructuralG13(unittest.TestCase):
         self.assertTrue(brokers["sockets"], brokers)
         self.assertTrue(all(s["inside"] == "ABSENT" for s in brokers["sockets"].values()), brokers)
         self.assertTrue(all(a["unreachable"] for a in brokers["attempts"].values()), brokers)
-        self.assertEqual((brokers["runtime_dir"]["mode"], brokers["runtime_dir"]["entries"]), ("700", 0), brokers)
+        # The folder holds only what the plan mounts there: the forwards' socket folder (round 6).
+        self.assertEqual(brokers["runtime_dir"]["mode"], "700", brokers)
+        self.assertEqual(brokers["runtime_dir"]["entries"], brokers["runtime_dir"]["expected_entries"], brokers)
 
-    def test_the_gateway_reachability_is_recorded(self):
-        """A documented residual, never a pass condition: the HTTP status of two allowlisted gateway routes asked
-        from the namespace without credentials."""
-        reach = self.report["gateway_from_namespace"]
-        self.assertFalse(reach.get("credentials_sent", True), reach)
-        self.assertIn("GET /api/health", reach)
-        self.assertIn("GET /api/usage/call-logs?limit=1", reach)
+    def test_the_network_probe_set_passes(self):
+        """Round 6 (CC item task-ns2604-coop-20261006T155742Z, (B)): the stage-1 self-test's network probes, in each
+        client's own network namespace with its forwards served. /v1 answers; the gateway's management routes, its
+        dashboard and the detours to them are refused by the filter; every sampled local listener and direct egress
+        are unreachable; Claude's egress reaches only its listed hosts."""
+        network = self.report["network"]
+        self.assertTrue(network["ok"], json.dumps(network["expect"], indent=1))
+        self.assertGreaterEqual(len(network["listeners_sampled"]), 3, network["listeners_sampled"])
+        for client, ns in self.report["namespaces"].items():
+            self.assertTrue(ns["net_namespace"], ns)
+            self.assertNotEqual(ns["net_namespace"], ns["host_net_namespace"], ns)
 
     def test_launch_paths_start_under_the_wrapper(self):
         if os.environ.get("ISOLATION_SKIP_CLIENTS") == "1":
@@ -315,11 +322,15 @@ class G13Check(unittest.TestCase):
             plan = isolation.plan(cfg, isolation.RUNS_ROOT / "unit-run", trial_id, client, fixture,
                                   clone=plan["clone"], settings=plan["settings"], prompt=plan["prompt"])
         rec = isolation.receipt(plan, ["bash", "-lc", "<line>"])
-        rows = {"prepared": {"fixture_private": str(fixture)}, "launched": {"isolation": rec},
+        reading = {"semantic_cache": {"hits": 0, "misses": 0, "dbEntries": 0, "memoryEntries": 0}}
+        rows = {"prepared": {"fixture_private": str(fixture)},
+                "launched": {"isolation": rec, "gateway_cache": json.loads(json.dumps(reading))},
                 "exit": {"isolation_runtime": {"namespace": "mnt:[1]", "host_namespace": "mnt:[2]",
-                                               "info": {"mnt-namespace": 1, "ipc-namespace": 11},
-                                               "host_ipc_namespace": "ipc:[12]",
-                                               "tree": {"processes_seen": 4, "in_trial_namespace": 4, "outside": []}}}}
+                                               "info": {"mnt-namespace": 1, "ipc-namespace": 11, "net-namespace": 21},
+                                               "host_ipc_namespace": "ipc:[12]", "host_net_namespace": "net:[22]",
+                                               "tree": {"processes_seen": 4, "in_trial_namespace": 4, "outside": []}},
+                         "network_runtime": {"started": True, "requests": 3, "denied": []},
+                         "gateway_cache": json.loads(json.dumps(reading))}}
         return isolation, cfg, trial_id, rows
 
     def _check(self, isolation, cfg, trial_id, rows, client="claude"):
@@ -330,7 +341,7 @@ class G13Check(unittest.TestCase):
         rec = rows["launched"]["isolation"]
         ops = [(op, isolation.untilde(src), isolation.untilde(dest)) for op, src, dest in rec["ops"]]
         rec["options_sha256"] = isolation.sha256_text("\0".join(isolation.options(
-            {"ops": ops, "fixture": rows["prepared"]["fixture_private"]})))
+            {"ops": ops, "fixture": rows["prepared"]["fixture_private"], "network": rec.get("network")})))
 
     def _swap_source(self, isolation, rows, dest, new_src):
         rec = rows["launched"]["isolation"]
@@ -497,16 +508,157 @@ class G13Check(unittest.TestCase):
         rows["launched"]["isolation"]["ops"] = [op for op in ops if not (op[0] == "tmpfs" and op[2] == "/tmp")]
         self.assertFalse(self._check(isolation, cfg, trial_id, rows)["ok"])
 
-    def test_a_semantic_cache_hit_during_a_codex_trial_fails(self):
+    def test_the_cache_rule_voids_a_trial(self):
+        """Round 6 (A), the Gate 0 amendment: every trial needs both readings of GET /api/cache, with 0 hits at both and
+        unchanged entries. A hit, an entry change, or a missing or failed reading voids it."""
+        for client in ("claude", "codex"):
+            isolation, cfg, trial_id, rows = self._rows(client)
+            self.assertTrue(self._check(isolation, cfg, trial_id, rows, client)["ok"])
+            cases = {"a hit after": ("exit", {"semantic_cache": {"hits": 1, "misses": 0, "dbEntries": 0, "memoryEntries": 0}}),
+                     "a hit before": ("launched", {"semantic_cache": {"hits": 2, "misses": 0, "dbEntries": 0,
+                                                                      "memoryEntries": 0}}),
+                     "entries changed": ("exit", {"semantic_cache": {"hits": 0, "misses": 0, "dbEntries": 1,
+                                                                     "memoryEntries": 0}}),
+                     "a failed reading": ("exit", {"error": "URLError"}),
+                     "no reading": ("launched", None),
+                     "a reading without its counts": ("exit", {"semantic_cache": {"hits": 0}})}
+            for label, (row, value) in cases.items():
+                isolation, cfg, trial_id, rows = self._rows(client)
+                rows[row]["gateway_cache"] = value
+                result = self._check(isolation, cfg, trial_id, rows, client)
+                self.assertFalse(result["ok"], (client, label))
+                self.assertTrue(result["gateway_cache_window"]["void"], (client, label))
+                self.assertTrue(any(f.startswith("the gateway cache rule") for f in result["failures"]), (client, label))
+
+    def test_the_network_must_be_the_plans(self):
+        """Round 6 (B): a receipt with no network record, an extra forward, a forward with another filter, the host's
+        network namespace, or no record that the forwards ran fails."""
         isolation, cfg, trial_id, rows = self._rows("codex")
-        reading = {"semantic_cache": {"hits": 0}}
-        rows["launched"]["gateway_cache"] = reading
-        rows["exit"]["gateway_cache"] = reading
-        self.assertTrue(self._check(isolation, cfg, trial_id, rows, "codex")["ok"])
-        rows["exit"]["gateway_cache"] = {"semantic_cache": {"hits": 1}}
-        result = self._check(isolation, cfg, trial_id, rows, "codex")
-        self.assertFalse(result["ok"])
-        self.assertEqual(result["gateway_semantic_cache_hits"], 1)
+        rows["launched"]["isolation"]["network"] = None
+        self._reseal(isolation, rows)
+        self.assertIn("no network record: the trial ran without a network namespace of its own (round 6)",
+                      self._check(isolation, cfg, trial_id, rows, "codex")["failures"])
+        for edit in ("extra forward", "wider rule", "egress for codex"):
+            isolation, cfg, trial_id, rows = self._rows("codex")
+            network = rows["launched"]["isolation"]["network"]
+            if edit == "extra forward":
+                network["forwards"]["dagu"] = {"listen": 21080, "kind": "http", "upstream": ["127.0.0.1", 21080],
+                                               "rules": [{"prefix": "/", "methods": ["GET"]}]}
+            elif edit == "wider rule":
+                network["forwards"]["gateway"]["rules"] = [{"prefix": "/", "methods": ["GET", "POST"]}]
+            else:
+                network["setenv"] = [["HTTPS_PROXY", "http://127.0.0.1:3128"]]
+            self._reseal(isolation, rows)
+            self.assertIn("the receipt's network (forwards, environment or scope) is not the plan's for this client",
+                          self._check(isolation, cfg, trial_id, rows, "codex")["failures"], edit)
+        isolation, cfg, trial_id, rows = self._rows("codex")
+        rows["exit"]["isolation_runtime"]["info"]["net-namespace"] = 22
+        self.assertIn("the client shared the host's network namespace",
+                      self._check(isolation, cfg, trial_id, rows, "codex")["failures"])
+        rows["exit"]["isolation_runtime"]["info"].pop("net-namespace")
+        self.assertIn("no network namespace of its own (--unshare-net)",
+                      self._check(isolation, cfg, trial_id, rows, "codex")["failures"])
+        isolation, cfg, trial_id, rows = self._rows("codex")
+        rows["exit"]["network_runtime"] = {"started": False}
+        self.assertIn("no record that the trial's forwards ran (network_runtime)",
+                      self._check(isolation, cfg, trial_id, rows, "codex")["failures"])
+
+    def test_each_client_gets_only_its_forwards(self):
+        import isolation
+        codex = isolation.network_for("codex", "t")
+        claude = isolation.network_for("claude", "t")
+        self.assertEqual(sorted(codex["forwards"]), ["ai-memory", "gateway", "otlp"])
+        self.assertEqual(sorted(claude["forwards"]), ["ai-memory", "model-egress", "otlp"])
+        self.assertEqual(codex["setenv"], [])
+        self.assertIn(["HTTPS_PROXY", "http://127.0.0.1:3128"], claude["setenv"])
+        self.assertEqual(codex["forwards"]["gateway"]["rules"][0]["prefix"], "/v1/")
+        self.assertEqual(claude["forwards"]["model-egress"]["allow"], [["api.anthropic.com", 443],
+                                                                       ["platform.claude.com", 443]])
+        for name, forward in isolation.NET_FORWARDS.items():
+            self.assertTrue(forward["reason"], name)
+
+
+class NetFilterRules(unittest.TestCase):
+    """Round 6 (B): netfilter.py's decisions, with no network: what each forward admits and what it refuses."""
+
+    def setUp(self):
+        import isolation
+        import netfilter
+        self.nf = netfilter
+        self.scope = {"workspace": "organic-e2e", "project": "t1"}
+        self.gateway = isolation.NET_FORWARDS["gateway"]
+        self.memory = isolation.NET_FORWARDS["ai-memory"]
+        self.otlp = isolation.NET_FORWARDS["otlp"]
+
+    def admits(self, forward, method, target, headers=()):
+        try:
+            self.nf.judge(forward, self.scope, method, target, list(headers))
+            return True
+        except self.nf.Denied:
+            return False
+
+    def test_the_gateway_admits_v1_only(self):
+        for target in ("/v1/responses", "/v1/models", "/v1/models?client_version=0.160.1"):
+            self.assertTrue(self.admits(self.gateway, "POST" if target == "/v1/responses" else "GET", target), target)
+        for target in ("/api/health", "/api/usage/call-logs?limit=1", "/", "/dashboard", "/v1", "/v1/../api/health",
+                       "/v1/./x", "/v1//x", "/v1/%2e%2e/api/health", "/V1/models", "http://127.0.0.1:21128/v1/models",
+                       "/v1/models#x", "*"):
+            self.assertFalse(self.admits(self.gateway, "GET", target), target)
+        self.assertFalse(self.admits(self.gateway, "CONNECT", "/v1/x"))
+        self.assertFalse(self.admits(self.gateway, "TRACE", "/v1/x"))
+        self.assertFalse(self.admits(self.gateway, "GET", "/v1/models", [("Upgrade", "websocket")]))
+        self.assertFalse(self.admits(self.gateway, "POST", "/v1/responses",
+                                     [("Content-Length", "5"), ("Transfer-Encoding", "chunked")]))
+        self.assertFalse(self.admits(self.gateway, "POST", "/v1/responses", [("Transfer-Encoding", "gzip, chunked")]))
+        self.assertFalse(self.admits(self.gateway, "POST", "/v1/responses", [("Content-Length", "5"),
+                                                                            ("Content-Length", "6")]))
+
+    def test_ai_memory_admits_mcp_and_the_trials_own_hook_scope(self):
+        own = "workspace=organic-e2e&project=t1"
+        self.assertTrue(self.admits(self.memory, "POST", "/mcp"))
+        self.assertTrue(self.admits(self.memory, "GET", "/mcp"))
+        self.assertTrue(self.admits(self.memory, "POST", f"/hook?event=stop&agent=codex&cwd=%2Fx&{own}"))
+        self.assertTrue(self.admits(self.memory, "GET", f"/handoff?agent=codex&{own}"))
+        for target in ("/", "/w/organic-e2e/t2", "/search?q=x", "/admin/status", "/wiki", "/healthz",
+                       "/hook?event=stop&agent=codex&workspace=organic-e2e&project=t2",
+                       "/hook?event=stop&agent=codex", "/handoff?agent=codex&workspace=organic-e2e&project=t1&project=t2",
+                       "/handoff?agent=codex&workspace=default&project=t1"):
+            self.assertFalse(self.admits(self.memory, "GET" if not target.startswith("/hook") else "POST", target), target)
+        self.assertFalse(self.admits(self.memory, "GET", f"/hook?{own}"))   # /hook is POST only
+
+    def test_a_hook_batch_must_name_the_trials_scope_in_every_item(self):
+        own = "http://127.0.0.1:29374/hook?event=stop&agent=codex&workspace=organic-e2e&project=t1"
+        other = "http://127.0.0.1:29374/hook?event=stop&agent=codex&workspace=organic-e2e&project=t2"
+        self.assertTrue(self.nf.batch_ok(json.dumps([{"url": own, "body": {}}]).encode(), self.scope))
+        self.assertFalse(self.nf.batch_ok(json.dumps([{"url": own, "body": {}}, {"url": other, "body": {}}]).encode(),
+                                          self.scope))
+        self.assertFalse(self.nf.batch_ok(b"[]", self.scope))
+        self.assertFalse(self.nf.batch_ok(b"{}", self.scope))
+
+    def test_otlp_admits_post_exports_only(self):
+        for path in ("/v1/logs", "/v1/metrics", "/v1/traces"):
+            self.assertTrue(self.admits(self.otlp, "POST", path))
+            self.assertFalse(self.admits(self.otlp, "GET", path))
+        self.assertFalse(self.admits(self.otlp, "POST", "/"))
+
+    def test_the_egress_proxy_tunnels_to_listed_hosts_only(self):
+        import isolation
+        allow = isolation.NET_FORWARDS["model-egress"]["allow"]
+        self.assertEqual(self.nf.connect_target("api.anthropic.com:443", allow), ("api.anthropic.com", 443))
+        self.assertEqual(self.nf.connect_target("API.Anthropic.com:443", allow), ("api.anthropic.com", 443))
+        for target in ("api.anthropic.com:80", "example.com:443", "127.0.0.1:21128", "api.anthropic.com", ":443",
+                       "evil.api.anthropic.com:443"):
+            with self.assertRaises(self.nf.Denied, msg=target):
+                self.nf.connect_target(target, allow)
+
+    def test_a_request_head_is_parsed_strictly(self):
+        nf = self.nf
+        self.assertEqual(nf.parse_head(b"GET /v1/models HTTP/1.1\r\nHost: x")[0:3], ("GET", "/v1/models", "HTTP/1.1"))
+        for head in (b"GET /v1/models HTTP/2.0", b"GET /v1/models", b"GET  /v1/models HTTP/1.1",
+                     b"GET /v1/models HTTP/1.1\r\n folded: x", b"GET /v1/models HTTP/1.1\r\nbad header",
+                     b"G\xc3T /v1/models HTTP/1.1"):
+            with self.assertRaises(nf.Denied, msg=head):
+                nf.parse_head(head)
 
 
 class Round5Grading(unittest.TestCase):
@@ -580,6 +732,69 @@ class Round5Grading(unittest.TestCase):
         self.assertEqual(tags, {"wsl-interop": ["p", "w"], "gateway-management-api": ["g"], "local-service-http": ["l"],
                                 "ai-memory-http": ["m"]})
 
+    def test_g11_fails_closed_on_tier_evidence(self):
+        """GPT read of a513616d, P2: the launch tier must be default and every call's forwarded tier normal. A missing
+        tier, a partly missing one, an unrecognized one or a non-default launch fails, with the call ids reported."""
+        import grade
+        base = {"requested_turn_context": "max", "gateway_build": "b", "gateway_calls": 2, "gateway_forwarded": ["max"]}
+        full = {**base, "tier_calls": [{"id": "c1", "forwarded": "default"}, {"id": "c2", "forwarded": "(unset)"}]}
+        self.assertTrue(grade.g11_trial_ok(full, "default"))
+        cases = {"all tiers missing": ({**base, "tier_calls": [{"id": "c1", "forwarded": None},
+                                                               {"id": "c2", "forwarded": None}]}, "default", ["c1", "c2"]),
+                 "one tier missing": ({**base, "tier_calls": [{"id": "c1", "forwarded": "default"},
+                                                              {"id": "c2", "forwarded": None}]}, "default", ["c2"]),
+                 "no calls recorded": ({**base, "tier_calls": []}, "default", []),
+                 "priority forwarded": ({**base, "tier_calls": [{"id": "c1", "forwarded": "priority"}]}, "default", []),
+                 "auto forwarded": ({**base, "tier_calls": [{"id": "c1", "forwarded": "auto"}]}, "default", []),
+                 "launch tier unrecorded": (full, None, []),
+                 "launch tier priority": (full, "priority", [])}
+        for label, (effort, launch, missing) in cases.items():
+            self.assertFalse(grade.g11_trial_ok(effort, launch), label)
+            evidence = grade.tier_evidence(effort, launch)
+            self.assertFalse(evidence["ok"], label)
+            self.assertEqual(evidence["missing_calls"], missing, label)
+        self.assertEqual(grade.tier_evidence(cases["priority forwarded"][0], "default")["unrecognized_calls"], ["c1"])
+
+    def _codex_item(self, cid, tool, args, payload):
+        return {"id": cid, "type": "mcp_tool_call", "server": "ai-memory", "tool": tool, "status": "completed",
+                "arguments": json.dumps(args), "result": {"content": [{"type": "text", "text": json.dumps(payload)}]}}
+
+    def _claude_tool(self, cid, tool, args, payload):
+        return {"id": cid, "name": f"mcp__ai-memory__{tool}", "input": args, "status": "ok",
+                "result": {"text": json.dumps(payload)}}
+
+    def test_ai_memory_scalar_reads_and_empty_queries(self):
+        """GPT read of a513616d, P2: page detection by each tool's response contract, in both clients. A scalar
+        memory_read_page of another trial's scope (its scope only in the arguments) invalidates the trial; an empty
+        implicit query does not; an implicit read that returned a page is unverifiable. The validity and G13 decision
+        is grade.ai_memory_invalidates, which both use."""
+        import grade
+        own, other = str(uuid.uuid4()), str(uuid.uuid4())
+        page = {"path": "notes/a.md", "body": "the answer", "frontmatter": {}}
+        foreign_args = {"path": "notes/a.md", "workspace": "organic-e2e", "project": other}
+        own_args = {"path": "notes/a.md", "workspace": "organic-e2e", "project": own}
+        for client, make in (("claude", self._claude_tool), ("codex", self._codex_item)):
+            def check(*calls):
+                graded = {"calls": list(calls)} if client == "claude" else {"all_items": list(calls)}
+                return grade.ai_memory_check(grade.ai_memory_calls(graded, client), own, set())
+            scalar_foreign = check(make("r1", "memory_read_page", foreign_args, page))
+            self.assertEqual([b["call_id"] for b in scalar_foreign["foreign_scope_pages"]], ["r1"], client)
+            self.assertTrue(grade.ai_memory_invalidates(scalar_foreign), client)
+            scalar_own = check(make("r2", "memory_read_page", own_args, page))
+            self.assertFalse(grade.ai_memory_invalidates(scalar_own), client)
+            empty_implicit = check(make("q1", "memory_query", {"query": "x"}, {"hits": []}))
+            self.assertEqual(empty_implicit["implicit_scope_calls"], ["q1"], client)
+            self.assertEqual(empty_implicit["unverifiable_scope_pages"], [], client)
+            self.assertFalse(grade.ai_memory_invalidates(empty_implicit), client)
+            empty_foreign = check(make("q2", "memory_query", {"query": "x", "workspace": "organic-e2e", "project": other},
+                                       {"hits": []}))
+            self.assertFalse(grade.ai_memory_invalidates(empty_foreign), client)
+            implicit_read = check(make("r3", "memory_read_page", {"path": "notes/a.md"}, page))
+            self.assertEqual([u["call_id"] for u in implicit_read["unverifiable_scope_pages"]], ["r3"], client)
+            self.assertTrue(grade.ai_memory_invalidates(implicit_read), client)
+            empty_read = check(make("r4", "memory_read_page", foreign_args, {"path": "notes/a.md", "body": ""}))
+            self.assertFalse(grade.ai_memory_invalidates(empty_read), client)
+
     def test_every_codex_launch_sets_the_normal_tier(self):
         import common
         import launcher
@@ -631,12 +846,94 @@ class GatewayCacheReading(unittest.TestCase):
         off, _ = self._read({"config": {"semanticCacheEnabled": False}, "semanticCache": {"hits": 0}})
         self.assertEqual(off["verdict"], "semantic cache off")
 
-    def test_gate0_passes_only_with_the_semantic_cache_off(self):
+    def test_the_amended_gate0_cache_check(self):
+        """Gate 0 amendment (CC item task-ns2604-coop-20261006T155742Z (A)), by behaviour: the cache may stay on; the
+        stage-1 reading must show 0 hits and its counts, at the gateway build and Codex version the evidence was read
+        at. Anything else fails."""
         import grade
-        self.assertTrue(callable(grade.gate0))
-        import inspect
-        source = inspect.getsource(grade.gate0)
-        self.assertIn('reading.get("verdict") == "semantic cache off"', source)
+        good = {"gateway_cache": {"verdict": "semantic cache on", "semantic_cache": {"hits": 0, "misses": 0,
+                                                                                     "dbEntries": 0, "memoryEntries": 0}},
+                "gateway_build": "omniroute-3.8.51-5f4b3d577-affinity-pr15167",
+                "binaries": {"codex": {"version": "codex-cli 0.160.1"}}}
+        self.assertTrue(grade.gateway_cache_gate(good)["pass"])
+        bad = {"a hit": {"gateway_cache": {"semantic_cache": {"hits": 1, "dbEntries": 0, "memoryEntries": 0}}},
+               "no reading": {"gateway_cache": None},
+               "a failed reading": {"gateway_cache": {"error": "URLError"}},
+               "another gateway build": {"gateway_build": "omniroute-3.8.52-abc"},
+               "another Codex": {"binaries": {"codex": {"version": "codex-cli 0.161.0"}}},
+               "no counts": {"gateway_cache": {"semantic_cache": {"hits": 0}}}}
+        for label, change in bad.items():
+            cfg = json.loads(json.dumps(good))
+            cfg.update(change)
+            self.assertFalse(grade.gateway_cache_gate(cfg)["pass"], label)
+
+    def test_closure_evidence_is_required(self):
+        """GPT read of a513616d, P2: gate 0 and G13 require every verified denial; a missing or failed probe fails."""
+        import grade
+        full = {"network": {"expect": {k: True for k in grade.CLOSURE_EXPECTATIONS}}}
+        self.assertTrue(grade.closure_evidence(full)["pass"])
+        self.assertFalse(grade.closure_evidence(None)["pass"])
+        self.assertFalse(grade.closure_evidence({"network": {}})["pass"])
+        for key in grade.CLOSURE_EXPECTATIONS:
+            missing = {"network": {"expect": {k: True for k in grade.CLOSURE_EXPECTATIONS if k != key}}}
+            failed = {"network": {"expect": {k: (k != key) for k in grade.CLOSURE_EXPECTATIONS}}}
+            self.assertFalse(grade.closure_evidence(missing)["pass"], key)
+            self.assertFalse(grade.closure_evidence(failed)["pass"], key)
+        # Payload-flag counts alone never establish closure.
+        self.assertFalse(grade.closure_evidence({"gateway_logs": {"with_request_body": 0}})["pass"])
+
+    def test_the_collector_requests_only_the_trials_own_ids(self):
+        """GPT read of a513616d, P1 (CC 16:43Z): the detail GET is made only for call ids the trial's own responses
+        carried; a foreign id is never requested, and with no own id nothing is requested at all."""
+        import common
+        rows = [{"id": "own-1", "correlationId": "c-own-1", "timestamp": "2026-10-06T12:00:01Z", "path": "/v1/responses"},
+                {"id": "foreign-1", "correlationId": "c-foreign-1", "timestamp": "2026-10-06T12:00:02Z",
+                 "path": "/v1/responses"},
+                {"id": "own-2", "correlationId": "c-own-2", "timestamp": "2026-10-06T12:00:03Z", "path": "/v1/responses"}]
+        asked = []
+
+        def fake(path, timeout=30):
+            asked.append(path)
+            if path.startswith("/api/usage/call-logs?"):
+                return rows if "offset=0" in path else []
+            return {"requestBody": {"client_metadata": {"thread_id": "t1"}, "reasoning": {"effort": "max"},
+                                    "input": "a prompt that must not be kept"},
+                    "pipelinePayloads": {"providerRequest": {"service_tier": "default", "reasoning": {"effort": "max"}}}}
+
+        saved = common.gateway_get
+        common.gateway_get = fake
+        try:
+            out = common.gateway_calls_for_trial(["own-1", "c-own-2"], "2026-10-06T12:00:00Z", "2026-10-06T12:10:00Z")
+            details = [p for p in asked if not p.startswith("/api/usage/call-logs?")]
+            asked.clear()
+            nothing = common.gateway_calls_for_trial([], "2026-10-06T12:00:00Z", "2026-10-06T12:10:00Z")
+        finally:
+            common.gateway_get = saved
+        self.assertEqual(details, ["/api/usage/call-logs/own-1", "/api/usage/call-logs/own-2"])
+        self.assertEqual(out["unmatched_request_ids"], 0)
+        self.assertNotIn("a prompt that must not be kept", json.dumps(out))
+        self.assertEqual(sorted(c["id"] for c in out["by_thread"]["t1"]), ["own-1", "own-2"])
+        self.assertEqual(asked, [])
+        self.assertEqual(nothing["detail_requests"], [])
+
+    def test_the_harness_calls_only_allowlisted_gateway_routes(self):
+        """The allowlist rule (CC 15:57Z): every /api route the harness's code names is one the repository's command
+        guard admits (scripts/hooks/secret_path_guard.py, K4_GW_ROWS and its call-log id exception)."""
+        import re as _re
+        allowed = {"/api/health", "/api/settings/compression", "/api/context/combos", "/api/model-capability-overrides",
+                   "/api/resilience", "/api/settings/feature-flags", "/api/cache", "/api/analytics/compression",
+                   "/api/usage/call-logs", "/api/usage/provider-limits"}
+        found = set()
+        for path in HERE.glob("*.py"):
+            if path.name == "test_isolation.py":
+                continue
+            for line in path.read_text().splitlines():
+                code = line.split("#", 1)[0]
+                for match in _re.finditer(r'gateway_get\(f?"(/api/[^"?{]*)', code):
+                    found.add(match.group(1).rstrip("/"))
+        self.assertTrue(found)
+        for route in found:
+            self.assertTrue(route in allowed or route == "/api/usage/call-logs", route)
 
     def test_the_log_exposure_reading_keeps_only_flag_counts(self):
         """GPT read of 2044b2ab: whether call-log payloads are stored, from the allowlisted list route (limit only);
@@ -695,17 +992,23 @@ class WrappedLaunch(unittest.TestCase):
                     f"else echo hidden > {fixture}/verdict; fi; sleep 4'")
             run_cfg = {"binaries": {"claude": {"realpath": "/nonexistent/claude"}, "codex": {"realpath": "/nonexistent/codex"}},
                        "claude_completion": {"policy": "complete-at-result", "t_seconds": 60}}
-            with tempfile.TemporaryDirectory() as tmp:
-                root = Path(tmp)
-                outcome = launcher.run_client(root, run_cfg, "codex", line, fixture, root / "s.jsonl", root / "e.err", None,
-                                              plan)
+            forwarder = isolation.NetworkForwarder(plan).start()
+            try:
+                with tempfile.TemporaryDirectory() as tmp:
+                    root = Path(tmp)
+                    outcome = launcher.run_client(root, run_cfg, "codex", line, fixture, root / "s.jsonl",
+                                                  root / "e.err", None, plan)
+            finally:
+                network_runtime = forwarder.stop()
             tree = outcome["isolation_runtime"]["tree"]
             self.assertEqual((fixture / "verdict").read_text().strip(), "hidden")
             self.assertGreaterEqual(tree["in_nested_namespaces"], 1, tree)
             self.assertEqual(tree["outside"], [], tree)
             rows = {"prepared": {"fixture_private": str(fixture)},
                     "launched": {"isolation": isolation.receipt(plan, ["bash", "-lc", "<line>"])},
-                    "exit": {"isolation_runtime": outcome["isolation_runtime"]}}
+                    "exit": {"isolation_runtime": outcome["isolation_runtime"], "network_runtime": network_runtime,
+                             "gateway_cache": dict(READING)}}
+            rows["launched"]["gateway_cache"] = dict(READING)
             result = isolation.check(cfg, isolation.RUNS_ROOT / "unit-run", trial_id, "codex", rows)
             self.assertTrue(result["ok"], result["failures"])
         finally:
@@ -762,11 +1065,13 @@ class WrappedLaunch(unittest.TestCase):
             plan = isolation.plan(cfg, isolation.RUNS_ROOT / "unit-run", trial_id, "codex", fixture,
                                   clone=work / "clones" / trial_id, prompt=work / "prompts" / f"{trial_id}.txt")
             wrapper = isolation.write_app_server_wrapper(plan, "/usr/bin/sleep")
+            forwarder = isolation.NetworkForwarder(plan).start()
             census = isolation.AppServerCensus(plan, interval=0.5).start()
             try:
                 subprocess.run([str(wrapper), "3"], timeout=60, stdin=subprocess.DEVNULL, check=True)
             finally:
                 tree = census.stop()
+                network_runtime = forwarder.stop()
             self.assertGreaterEqual(tree["processes_seen"], 1, tree)
             self.assertEqual(tree["in_trial_namespace"], tree["processes_seen"], tree)
             self.assertEqual(tree["outside"], [], tree)
@@ -780,7 +1085,9 @@ class WrappedLaunch(unittest.TestCase):
                     isolation.CODEX_SESSIONS = saved
             rows = {"prepared": {"fixture_private": str(fixture)},
                     "launched": {"isolation": isolation.receipt(plan, ["/usr/bin/sleep", "app-server"])},
-                    "exit": {"isolation_runtime": runtime}}
+                    "exit": {"isolation_runtime": runtime, "network_runtime": network_runtime,
+                             "gateway_cache": dict(READING)}}
+            rows["launched"]["gateway_cache"] = dict(READING)
             result = isolation.check(cfg, isolation.RUNS_ROOT / "unit-run", trial_id, "codex", rows)
             self.assertTrue(result["ok"], result["failures"])
             self.assertTrue(result["ipc_namespace"])
@@ -885,12 +1192,13 @@ class HostBrokers(unittest.TestCase):
         runtime = RUNTIME
         marker = f"ut-{uuid.uuid4().hex[:8]}"
         try:
-            result = self._inside(["sh", "-c", f'stat -c %a {runtime}; ls -A {runtime} | wc -l; echo x > {runtime}/{marker}'])
+            result = self._inside(["sh", "-c", f'stat -c %a {runtime}; ls -A {runtime}; echo x > {runtime}/{marker}'])
             reached_host = (runtime / marker).exists()
         finally:
             (runtime / marker).unlink(missing_ok=True)   # a harness that binds the host's folder in would leave it there
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertEqual(result.stdout.split()[:2], ["700", "0"])
+        # Round 6: the folder holds only the forwards' socket folder (empty otherwise).
+        self.assertEqual(result.stdout.split(), ["700", "net"])
         self.assertFalse(reached_host, "a write to the private runtime folder reached the host's")
 
     def test_ssh_agent_socket_is_absent(self):
@@ -898,6 +1206,86 @@ class HostBrokers(unittest.TestCase):
         if not agent.is_socket():
             self.skipTest("no ssh-agent socket in the runtime folder")
         self.assertEqual(self._absent_inside(agent), "ABSENT")
+
+
+@unittest.skipUnless(HOST_READY, "needs /usr/bin/bwrap and the experiment's roots on this host")
+class NetworkNamespace(unittest.TestCase):
+    """Round 6 (CC item task-ns2604-coop-20261006T155742Z, (B)): negative tests from inside a trial's own network
+    namespace, with its forwards served as a launch serves them. /api/usage/call-logs and /api/health on 21128 are
+    unreachable (refused by the filter, never reaching the gateway), a sample of other local listeners refuses the
+    connection, and /v1 still answers. A Claude trial has no route to 21128 at all."""
+
+    @classmethod
+    def setUpClass(cls):
+        import isolation
+        cls.isolation, cls.plans, cls.paths, cls.forwarders = isolation, {}, [], []
+        try:
+            cls._set_up()
+        except BaseException:
+            cls.tearDownClass()   # a failed set-up leaves no forwarder or synthetic folder behind
+            raise
+
+    @classmethod
+    def _set_up(cls):
+        isolation = cls.isolation
+        for client in ("codex", "claude"):
+            isolation_, cfg, plan, trial_id, fixture, work = _synthetic_plan(client)
+            fixture.mkdir(parents=True)
+            for path in (plan["prompt"], plan["settings"]):
+                if path:
+                    path.parent.mkdir(parents=True, exist_ok=True)
+                    path.write_text("{}\n")
+            if plan["clone"]:
+                plan["clone"].mkdir(parents=True, exist_ok=True)
+            plan = isolation.plan(cfg, isolation.RUNS_ROOT / "unit-run", trial_id, client, fixture, clone=plan["clone"],
+                                  settings=plan["settings"], prompt=plan["prompt"])
+            isolation.prepare_dirs(plan)
+            cls.paths += [fixture, work] + ([plan["own_project"]] if plan["own_project"] else [])
+            cls.forwarders.append(isolation.NetworkForwarder(plan).start())
+            cls.plans[client] = plan
+        cls.listeners = [(name, port) for name, port in isolation.LISTENER_SAMPLE if isolation._listening(port)]
+
+    @classmethod
+    def tearDownClass(cls):
+        import shutil
+        cls.records = [f.stop() for f in cls.forwarders]
+        for path in cls.paths:
+            shutil.rmtree(path, ignore_errors=True)
+
+    def probe(self, client, probes):
+        return self.isolation._run_probes(self.plans[client], probes)
+
+    def test_v1_still_answers(self):
+        result = self.probe("codex", [("v1", ["http://127.0.0.1:21128/v1/models"])])["v1"]
+        self.assertEqual((result["rc"], result["status"], result["denied"]), (0, "200", False), result)
+
+    def test_call_logs_and_health_are_unreachable(self):
+        out = self.probe("codex", [("logs", ["http://127.0.0.1:21128/api/usage/call-logs?limit=1"]),
+                                   ("logs_offset", ["http://127.0.0.1:21128/api/usage/call-logs?limit=500&offset=0"]),
+                                   ("detail", [f"http://127.0.0.1:21128/api/usage/call-logs/{uuid.uuid4()}"]),
+                                   ("health", ["http://127.0.0.1:21128/api/health"]),
+                                   ("cache", ["http://127.0.0.1:21128/api/cache"])])
+        for label, result in out.items():
+            self.assertEqual((result["status"], result["denied"]), ("403", True), (label, result))
+        log = Path(self.plans["codex"]["private"]) / "net" / "codex" / "access.jsonl"
+        decisions = [json.loads(line) for line in log.read_text().splitlines()]
+        api = [d for d in decisions if str(d.get("path", "")).startswith("/api/")]
+        self.assertTrue(api)
+        self.assertTrue(all(d["decision"] == "denied" for d in api), api)
+
+    def test_a_claude_trial_has_no_route_to_the_gateway(self):
+        out = self.probe("claude", [("v1", ["--noproxy", "*", "http://127.0.0.1:21128/v1/models"]),
+                                    ("logs", ["--noproxy", "*", "http://127.0.0.1:21128/api/usage/call-logs?limit=1"])])
+        for label, result in out.items():
+            self.assertEqual(result["rc"], 7, (label, result))   # curl: could not connect
+
+    def test_other_local_listeners_are_unreachable(self):
+        self.assertGreaterEqual(len(self.listeners), 3, self.listeners)
+        for client in ("codex", "claude"):
+            out = self.probe(client, [(f"p{port}", ["--noproxy", "*", f"http://127.0.0.1:{port}/"])
+                                      for _, port in self.listeners])
+            for label, result in out.items():
+                self.assertEqual(result["rc"], 7, (client, label, result))
 
 
 def shutil_which(name):

@@ -908,6 +908,50 @@ def gateway_cache_state() -> dict:
     return out
 
 
+# CC item task-ns2604-coop-20261006T155742Z, section 2 (A): the response cache stays on. Gate 0 accepts the source
+# evidence (OmniRoute v3.8.51 caches only explicit temperature-0 requests; codex 0.160.x sends no temperature) together
+# with a reading of GET /api/cache before and after each trial: hits 0 at both and entries unchanged, or the trial is
+# void, and a missing reading voids it too.
+CACHE_RULE_DECISION = "task-ns2604-coop-20261006T155742Z"
+# The builds the source evidence was read at. OmniRoute: tag v3.8.51 (src/lib/semanticCache.ts isCacheableForRead and
+# isCacheableForWrite); the running composition adds the affinity patch (src/sse/services/auth.ts,
+# sessionAffinityPin.ts: evidence/artifacts/omniroute-wire-effort-20261005/patches/045aa81f3.patch) and PR 15167, neither
+# of which touches the cache. Codex: codex-rs/codex-api/src/common.rs (ResponsesApiRequest, lines 279-304, no temperature
+# field) at rust-v0.160.0 and rust-v0.160.1. Another build voids the evidence, so gate 0 fails on it.
+CACHE_EVIDENCE_GATEWAY_BUILD = "omniroute-3.8.51-"
+CACHE_EVIDENCE_CODEX = ("codex-cli 0.160.0", "codex-cli 0.160.1")
+
+
+def gateway_cache_window(before: dict | None, after: dict | None) -> dict:
+    """The per-trial cache rule over the trial's two readings (gateway_cache_state)."""
+    reasons: list[str] = []
+
+    def counts(state, label):
+        if not state:
+            reasons.append(f"no {label} reading")
+            return None
+        if state.get("error"):
+            reasons.append(f"the {label} reading failed ({state['error']})")
+            return None
+        semantic = state.get("semantic_cache") or {}
+        missing = [k for k in ("hits", "dbEntries", "memoryEntries") if not isinstance(semantic.get(k), int)]
+        if missing:
+            reasons.append(f"the {label} reading lacks {', '.join(missing)}")
+            return None
+        return semantic
+
+    first, last = counts(before, "before"), counts(after, "after")
+    for label, semantic in (("before", first), ("after", last)):
+        if semantic and semantic["hits"] != 0:
+            reasons.append(f"{semantic['hits']} cache hit(s) at the {label} reading")
+    if first and last and (first["dbEntries"], first["memoryEntries"]) != (last["dbEntries"], last["memoryEntries"]):
+        reasons.append(f"entries changed during the trial ({first['dbEntries']}+{first['memoryEntries']} to "
+                       f"{last['dbEntries']}+{last['memoryEntries']})")
+    view = {k: v for k, v in (("before", first), ("after", last))}
+    return {"decision": CACHE_RULE_DECISION, "before": view["before"], "after": view["after"], "void": bool(reasons),
+            "reasons": reasons}
+
+
 def gateway_log_exposure(rows: int = 20) -> dict:
     """GPT read of 2044b2ab, residual channels: whether the gateway keeps call-log payloads that its log API returns,
     and whether that API answers without credentials (this reading sends none). It reads only the allowlisted
@@ -948,12 +992,19 @@ def forwarded_effort_fields(pipeline) -> dict | None:
     return {"reasoning.effort": reasoning.get("effort"), "reasoning_effort": request.get("reasoning_effort")}
 
 
-def gateway_calls_for_threads(thread_ids: set[str], since_iso: str, until_iso: str, max_rows: int = 5000) -> dict:
-    """Call-log rows in [since, until] whose request body's client_metadata.thread_id is one of thread_ids. Only the
-    fields named here are kept (never the account, the request input or the response); from the pipeline details,
-    which the co-op turns on only for pilot runs (decision 8), only the forwarded effort fields."""
-    found, scanned, offset, errors = {}, 0, 0, []
-    while scanned < max_rows:
+def gateway_calls_for_trial(request_ids, since_iso: str, until_iso: str, max_rows: int = 5000) -> dict:
+    """GPT read of a513616d, P1, ruled by CC item task-ns2604-coop-20261006T164313Z (section 3): the trial's own gateway
+    calls, read on the coordinator side after the trial and never from inside one.
+    - The call-log list (GET /api/usage/call-logs with limit and offset) is scanned for rows in [since, until] whose id
+      or correlationId is one of request_ids: the X-OmniRoute-Request-Id values the trial's own responses carried,
+      which its gateway forward recorded.
+    - A detail GET is made only for those rows, so no other session's call is ever requested.
+    - Only the fields grading needs are kept: model, status, received and forwarded effort and tier, and the cache
+      source. No request or response body enters a record.
+    With no matching row, nothing is read, and G11 stays failed."""
+    wanted = {str(i) for i in request_ids or [] if i}
+    found, scanned, offset, errors, requested, matched = {}, 0, 0, [], [], set()
+    while wanted and scanned < max_rows:
         try:
             rows = gateway_get(f"/api/usage/call-logs?limit=500&offset={offset}")
         except Exception as error:  # noqa: BLE001
@@ -967,28 +1018,30 @@ def gateway_calls_for_threads(thread_ids: set[str], since_iso: str, until_iso: s
             stamp = row.get("timestamp") or ""
             if stamp < since_iso or stamp > until_iso:
                 continue
+            hit = wanted & {str(row.get("id")), str(row.get("correlationId"))}
+            if not hit:
+                continue
+            matched |= hit
+            requested.append(row["id"])
             try:
                 detail = gateway_get(f"/api/usage/call-logs/{row['id']}")
             except Exception as error:  # noqa: BLE001
                 errors.append(type(error).__name__)
                 continue
             body = detail.get("requestBody") or {}
-            meta = body.get("client_metadata") or {}
-            thread = meta.get("thread_id")
-            if thread in thread_ids:
-                pipeline = detail.get("pipelinePayloads")
-                found.setdefault(thread, []).append({
-                    "id": row.get("id"), "timestamp": stamp, "path": row.get("path"), "status": row.get("status"),
-                    "requested_model": row.get("requestedModel"), "backend_model": row.get("model"),
-                    "provider": row.get("provider"), "received_effort": (body.get("reasoning") or {}).get("effort"),
-                    "received_service_tier": body.get("service_tier"),
-                    "forwarded_effort": forwarded_effort_fields(pipeline),
-                    "forwarded_service_tier": forwarded_service_tier(pipeline),
-                    # CC item task-ns2604-coop-20261006T143846Z, (a): "semantic" marks a response the gateway's
-                    # cache served instead of the provider.
-                    "cache_source": row.get("cacheSource"),
-                    "pipeline_exposed": pipeline is not None, "error": bool(row.get("error")),
-                    "tokens": row.get("tokens")})
+            thread = (body.get("client_metadata") or {}).get("thread_id")
+            pipeline = detail.get("pipelinePayloads")
+            found.setdefault(thread or "(no thread)", []).append({
+                "id": row.get("id"), "timestamp": stamp, "path": row.get("path"), "status": row.get("status"),
+                "requested_model": row.get("requestedModel"), "backend_model": row.get("model"),
+                "provider": row.get("provider"), "received_effort": (body.get("reasoning") or {}).get("effort"),
+                "received_service_tier": body.get("service_tier"),
+                "forwarded_effort": forwarded_effort_fields(pipeline),
+                "forwarded_service_tier": forwarded_service_tier(pipeline),
+                # CC item task-ns2604-coop-20261006T143846Z, (a): "semantic" marks a response the gateway's cache served.
+                "cache_source": row.get("cacheSource"),
+                "pipeline_exposed": pipeline is not None, "error": bool(row.get("error"))})
         if (rows[-1].get("timestamp") or "") < since_iso:
             break
-    return {"by_thread": found, "rows_scanned": scanned, "errors": errors}
+    return {"by_thread": found, "rows_scanned": scanned, "errors": errors, "request_ids": len(wanted),
+            "detail_requests": requested, "unmatched_request_ids": len(wanted - matched)}
