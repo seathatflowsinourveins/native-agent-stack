@@ -14201,6 +14201,11 @@
       "bytes": 14090
     },
     {
+      "path": "blueprints/us-equities/engine-nautilus/spy-parity/deviation-acceptance-rc6.json",
+      "sha256": "28315835b1d34da729ee0d74d051a46a3b278a8390f086226e2a85a25645b7b1",
+      "bytes": 2603
+    },
+    {
       "path": "blueprints/us-equities/engine-nautilus/spy-parity/deviation-acceptance-v2.json",
       "sha256": "b279cf6a81489591e722a97f4e1f085041f358153a9f3553f61e559122dbeb89",
       "bytes": 1550
