@@ -628,11 +628,20 @@ Proof (path A, cloud-init provisioned the instance):
   2026-10-05: MicrosoftDocs/WSL `7ea1c6f9`, `WSL/wsl-config.md:152-158`, `useWindowsTimezone`, default `true`); W6
   writes the same key on path B. This read-back proves the file's text at this boot only; nothing reads it later.
 - `timedatectl show -p Timezone --value` prints the IANA zone that CLDR's `windowsZones` mapping gives for the Windows
-  zone that `tzutil /g` prints ([tzutil](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tzutil)
-  `/g`, read 2026-10-05) and the Windows region: the first zone of the region's row, else the `001` row, for example
-  `America/New_York` for `Eastern Standard Time` in the US. WSL maps the zone with the ICU that Windows ships and, while
-  `useWindowsTimezone` is true, links `/etc/localtime` to it at each instance start (microsoft/WSL `91f161fa`, tag
-  3.0.1: `src/windows/common/helpers.cpp:358-413`, `src/linux/init/timezone.cpp:22-110`). Record both outputs.
+  zone that `tzutil /g` prints and the Windows region: the first zone of the region's row, else the `001` row, for
+  example `America/New_York` for `Eastern Standard Time` in the US (unicode-org/cldr `release-48-2`, `11299982`,
+  `common/supplemental/windowsZones.xml:130` and `:133`). `tzutil /g` displays the current time zone ID
+  ([tzutil](https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/tzutil), read 2026-10-05:
+  MicrosoftDocs/windowsserverdocs `48fd0532`, `tzutil.md:18` and `:25`). WSL maps the zone with the ICU that Windows
+  ships and, while `useWindowsTimezone` was true when the instance started, links `/etc/localtime` to it at each
+  instance start and again in a running instance when Windows' time zone changes (microsoft/WSL `91f161fa`, tag 3.0.1:
+  `src/windows/common/helpers.cpp:358-413`, `src/linux/init/timezone.cpp:22-110`; the decision record cites both
+  paths). Record both outputs. On either path, a mismatch is recorded with both outputs and stops the run for review,
+  without the failed-proof recovery below: WSL leaves `/etc/localtime` unchanged when the Windows-to-IANA mapping is
+  empty (`Windows to Linux timezone mapping was not possible.`, `timezone.cpp:54-58`) or the image lacks the zone's
+  file (`... not found. Is the tzdata package installed?`, `:66-70`). The remedy is to check the Windows region and
+  zone against that mapping and the image's `tzdata` (`/usr/share/zoneinfo/<zone>`); unregistering the distribution
+  would not change either.
 - The marker file exists, and `sudo -l` lists `(ALL) NOPASSWD: ALL`.
 - The starred line of `--list --verbose` is still W1's (`default_distribution_after`).
 
@@ -682,8 +691,10 @@ proof: the mask did not take effect before the unit started. Record all of it, w
 kernel from W1 and the image revision from W2, in the receipt's `paired_isolation`: one object for the workstation and
 one for `<Name>`, each with `uid`, `system_state`, `failed_units`, `user_manager` and `cgroup_namespace`.
 
-When any W5 proof fails, or the user-session warning appears, stop the run and never stop or restart a unit in either
-distribution. Terminate only the new distribution, export its failed state, and unregister only that name. Do not
+The time-zone pair is the one exception, on path A and in path B's repeat: a mismatch is recorded and stops the run for
+review, as its proof above says, and the recovery below does not run for it. When any W5 proof fails, or the
+user-session warning appears, stop the run and never stop or restart a unit in either distribution. Terminate only the
+new distribution, export its failed state, and unregister only that name. Do not
 take path B for any such failure. Record its cause (`cgroup`, `tty` or a short text); this recovery block serves every
 failed W5 proof:
 

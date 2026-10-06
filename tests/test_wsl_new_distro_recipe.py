@@ -93,7 +93,8 @@ docs/decisions/2026-10-01-new-wsl-distro-recipe.md. Each test names the drift it
 - the review of the 2026-10-05 local-time change: W5 reads the zone the distribution reports,
   ``timedatectl show -p Timezone --value``, beside the Windows zone, ``tzutil /g``, once each and after ``id -u`` (so
   path B's repeat covers them); its proof names CLDR's ``windowsZones`` mapping, and the record's command table, the
-  checklist and the receipt example carry the pair.
+  checklist and the receipt example carry the pair. A mismatch is recorded and stops for review without the
+  failed-proof export and unregister, on both paths, and the proof names the remedy and the CLDR and tzutil pins.
 
 These are local consistency checks over repository text and an in-memory render of the templates.
 Nothing here runs wsl.exe, PowerShell, gpgv, journalctl or cloud-init; a pass is not a host run.
@@ -300,6 +301,15 @@ CLOUD_INIT_HOWTO = "https://ubuntu.com/wsl/docs/stable/howto/cloud-init/"
 # The review of the 2026-10-05 local-time change: W5 pairs the zone the distribution reports with the Windows zone.
 ZONE_DISTRIBUTION = "wsl.exe -d '<Name>' --exec timedatectl show -p Timezone --value"
 ZONE_WINDOWS = "tzutil /g"
+# Its round-3 review: a mismatch is recorded and stops for review without the failed-proof export and unregister, since
+# WSL leaves /etc/localtime alone when the mapping is empty or the zone's file is missing (timezone.cpp:54-58, :66-70);
+# the proof names the remedy and pins the CLDR mapping and the tzutil page it compares against.
+ZONE_MISMATCH_RULE = ("a mismatch is recorded with both outputs and stops the run for review, without the failed-proof "
+                      "recovery below")
+ZONE_EXCEPTION = "The time-zone pair is the one exception"
+ZONE_REMEDY = "the image's `tzdata`"
+ZONE_PINS = ("`release-48-2`", "`48fd0532`")
+CHECKLIST_ZONE_RULE = "stops for review without the export and unregister"
 WSL_CONF_SECTIONS_ERROR = ("the appended /etc/wsl.conf text is not [time] holding only useWindowsTimezone=true, then [user] "
                            "holding only the default user")
 STORVSC_COUNT = ("sudo journalctl -k -b 0 --no-pager | grep hv_storvsc | "
@@ -1126,7 +1136,9 @@ def time_zone_pair_errors(recipe: str, record: str, checklist: str, receipt: dic
     also reads the zone the distribution reports beside the Windows zone, once each and after ``id -u`` (path B
     repeats W5's checks from ``id -u`` on). Its proof says how the two agree: CLDR's ``windowsZones`` mapping for the
     Windows region, which WSL applies through the ICU that Windows ships (microsoft/WSL 3.0.1,
-    src/windows/common/helpers.cpp:358-413)."""
+    src/windows/common/helpers.cpp:358-413). Round 3 of the review: a mismatch is recorded and stops for review
+    without the failed-proof export and unregister, on both paths; the proof names the remedy and pins the CLDR
+    release and the tzutil page, and the record's row and the checklist say the same."""
     errors = []
     commands = [command for shell, command in step_commands(recipe, "W5") if shell == "powershell"]
     for command in (ZONE_DISTRIBUTION, ZONE_WINDOWS):
@@ -1139,12 +1151,21 @@ def time_zone_pair_errors(recipe: str, record: str, checklist: str, receipt: dic
     w5 = prose(section(recipe, "W5"))
     if "windowsZones" not in w5 or "`timedatectl show -p Timezone --value`" not in w5:
         errors.append("W5's proof does not say how the two zones agree (CLDR's windowsZones mapping)")
+    for phrase, what in ((ZONE_MISMATCH_RULE, "what a mismatch does"), (ZONE_EXCEPTION, "the failed-proof rule's exception"),
+                         (ZONE_REMEDY, "the remedy"), *((pin, "the CLDR or tzutil pin") for pin in ZONE_PINS)):
+        if phrase not in w5:
+            errors.append(f"W5 lacks {what}: {phrase}")
     rows = [command for step, _, command, _ in command_table_rows(record) if step == "W5"]
     if rows.count(ZONE_DISTRIBUTION) != 1 or rows.count(ZONE_WINDOWS) != 1:
         errors.append("the record's command table does not hold each W5 zone row once")
+    proofs = [proof for step, _, command, proof in command_table_rows(record) if step == "W5" and command == ZONE_DISTRIBUTION]
+    if len(proofs) != 1 or "stops the run for review" not in proofs[0]:
+        errors.append("the record's W5 zone row does not say that a mismatch stops for review")
     line = checklist_line(checklist, "W5")
     if "`timedatectl show -p Timezone --value`" not in line or f"`{ZONE_WINDOWS}`" not in line:
         errors.append("the checklist's W5 line does not name both zone commands")
+    if CHECKLIST_ZONE_RULE not in line:
+        errors.append("the checklist's W5 line does not say what a mismatch does")
     listed = [(entry.get("step"), entry.get("cmd")) for entry in receipt.get("steps", []) if isinstance(entry, dict)]
     if listed.count(("W5", ZONE_DISTRIBUTION)) != 1 or listed.count(("W5", ZONE_WINDOWS)) != 1:
         errors.append("the receipt example does not record each zone command once under W5")
@@ -2039,6 +2060,25 @@ class TimeZonePairTests(FollowUpCase):
             "checklist without the pair": (recipe, record, checklist.replace(f"`{ZONE_WINDOWS}`", "the Windows zone"),
                                            receipt),
             "receipt without the entries": (recipe, record, checklist, dict(receipt, steps=steps)),
+        })
+
+    def test_the_check_rejects_a_mismatch_that_unregisters_a_lost_remedy_and_lost_pins(self):
+        recipe, record, checklist, receipt = self.inputs()
+        w5 = section(recipe, "W5")
+        row_rule = "; a mismatch stops the run for review without the failed-proof export and unregister |"
+        self.assertIn(row_rule, record)
+        self.assert_mutants_fail(time_zone_pair_errors, {
+            "the mismatch runs the recovery": (recipe.replace(w5, reword(w5, "without the failed-proof recovery below",
+                                                                         "with the failed-proof recovery below")),
+                                               record, checklist, receipt),
+            "no exception in the failure rule": (recipe.replace(w5, w5.replace(ZONE_EXCEPTION,
+                                                                               "The time-zone pair is no exception")),
+                                                 record, checklist, receipt),
+            "no remedy": (recipe.replace(w5, w5.replace(ZONE_REMEDY, "the image")), record, checklist, receipt),
+            "no CLDR pin": (recipe.replace(w5, w5.replace(ZONE_PINS[0], "a CLDR release")), record, checklist, receipt),
+            "no tzutil pin": (recipe.replace(w5, w5.replace(ZONE_PINS[1], "the docs")), record, checklist, receipt),
+            "record row without the rule": (recipe, record.replace(row_rule, " |"), checklist, receipt),
+            "checklist without the rule": (recipe, record, checklist.replace(CHECKLIST_ZONE_RULE, "fails W5"), receipt),
         })
 
 

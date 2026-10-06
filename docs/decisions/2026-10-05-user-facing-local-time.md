@@ -19,9 +19,9 @@ UTC timeline across hosts and clients.
 - Agents relayed record times to the user as they were written, in UTC. No managed instruction told them to convert.
 - On NativeStack2604, each client's user-level file holds the user's own local-time rule, dated 2026-10-05, after the
   managed block's end marker (read 2026-10-05). This change leaves host files alone.
-- NativeStack2604's `/etc/wsl.conf` held `[time] useWindowsTimezone=false` with no repository record, and the coordinator
-  set it to `true` on that host. The distribution recipe wrote no `[time]` key, so a new host relied on the default and
-  nothing read the value back.
+- NativeStack2604's `/etc/wsl.conf` held `[time] useWindowsTimezone=false` with no repository record; a private host plan
+  had pinned it because Windows' automatic time zone setting was on. The coordinator set it to `true` on that host. The
+  distribution recipe wrote no `[time]` key, so a new host relied on the default and nothing read the value back.
 
 ## Decision
 
@@ -65,9 +65,16 @@ UTC timeline across hosts and clients.
      detected. Detecting it would need a recurring read in a host probe.
    - **The zone itself.** The read-back proves the file's text, not the zone. W5 therefore also pairs the zone the
      distribution reports, `timedatectl show -p Timezone --value`, with the Windows zone, `tzutil /g`. They agree when
-     the IANA zone is CLDR's `windowsZones` mapping of the Windows zone for the Windows region: WSL maps the zone with
-     the ICU that Windows ships and, while the key is `true`, links `/etc/localtime` to it at each instance start
-     (Sources). Both outputs go to the receipt.
+     the IANA zone is CLDR's `windowsZones` mapping of the Windows zone for the Windows region; WSL maps the zone with
+     the ICU that Windows ships. Both outputs go to the receipt. A mismatch is recorded and stops the run for review
+     without the failed-proof export and unregister: WSL leaves `/etc/localtime` unchanged when the mapping is empty or
+     the zone's file is missing, so the remedy lies in the Windows region and zone or the image's `tzdata`, and
+     unregistering the new distribution would change neither.
+   - **Two paths set the zone.** While the key was `true` when an instance started, WSL links `/etc/localtime` to the
+     mapped zone on two paths (Sources): at each instance start, and in every running instance when the WSL service
+     receives a Windows `WM_TIMECHANGE` broadcast. A Windows time-zone change therefore reaches a running distribution
+     mid-session, not only at its next start. A change of the key itself takes effect only at the next start, because
+     init reads `/etc/wsl.conf` once, when the instance starts.
    - **First run.** The 26.04.1 image's `wsl-setup` 0.6.3 only appends or completes `[user]`, so the section survives its
      first run.
    - **Claude Code's UI clock.** Claude Code's own UI times follow the system zone by default (below), so they show the
@@ -146,13 +153,15 @@ sentence is 227 bytes. The budget record has a dated addendum pointing here.
   row's proof says what the guard shows: a `[time]` section exists, and W5's repeated read-back confirms the value.
 - **The W5 zone pair.** `timedatectl show -p Timezone --value` and `tzutil /g` have their rows in the command table,
   their entries in the receipt example and their place in the checklist's W5 line. `TimeZonePairTests` checks them
-  with seven mutants.
+  with seven mutants, and with seven more checks what a mismatch does (recorded, a stop for review without the
+  failed-proof export and unregister, on both paths), the failure rule's exception, the remedy, and the CLDR and
+  tzutil pins.
 - **The client-configuration record.** It takes the tool's regenerated listing (59 and 70 lines) in a dated addendum.
 - **The new-WSL handbook.** It is regenerated on the rebased tree; it holds the recipe's SHA-256. Its receipt's
   `outputs` follow, with this change's `regenerations` entry after the one #703 added on main.
 - **The registry.** `manifests/evidence.json` takes the new hashes of the 20 changed files it lists and the five new
   files under `evidence/artifacts/user-facing-local-time-20261005/`.
-- **The passwordless-sudo criterion moved from recipe line 624 to 636.** The two live citations of it,
+- **The passwordless-sudo criterion moved from recipe line 624 to 645.** The two live citations of it,
   `tools/adoption/host_baseline_probe.py` and `tools/adoption/host-baseline.md`, follow. Dated records keep their own
   line citations.
 - **Unchanged.** The startup constants (`STARTUP_BUDGET_BYTES`), the scaffold, the moves fixture of the Codex top-rule
@@ -206,30 +215,39 @@ sentence is 227 bytes. The budget record has a dated addendum pointing here.
 ## Checks
 
 The first three rows are the first round's fail-first checks, on main `e8c1edec`. Every other row was run after the
-rebase, on the final tree at base `ecfa1127`, on NativeStack2604 (2026-10-05 and 2026-10-06 UTC); only this record's
-prose changed afterwards.
+rebase, at base `ecfa1127`, on NativeStack2604 (2026-10-05 and 2026-10-06 UTC). The review's third round changed:
+- the recipe's and the checklist's prose;
+- the 2026-10-01 record and this record;
+- `tests/test_wsl_new_distro_recipe.py`;
+- the probe's citation of the recipe;
+- the regenerated handbook, receipt and registry.
+
+Rows whose result starts "round 3" ran again on that final tree. The others ran on the round-2 tree, `608c5266`. The
+third round changed no template, carrier, user-data or startup file. Only this record's prose changed after the last
+checks.
 
 | Command | Exit | Result |
 | --- | ---: | --- |
 | `python3 -m unittest tests.test_install_claude_profile.StandingRuleSurfacesTests`, before the template edits | 1 | 4 failures: `0 != 1` on each of the four surfaces (fail first) |
 | `python3 -m unittest tests.test_wsl_new_distro_recipe.UserDataTemplateTests`, before the user-data edit | 1 | 3 failures: the two new `[time]` patterns, and the two new mutants were not yet mutations (fail first) |
 | The same two checks, run in process against main `e8c1edec`'s four instruction files and user-data template | n/a | the same 4 and 3 failures (fail first, repeated) |
-| `python3 -m unittest` (the full suite) | 1 | 10,347 tests in 1,719 s, 903 skipped, 11 failures and 18 errors, none in a test module this change edits. All 29 are the classes the first round found recurring unchanged in a clean clone of `e8c1edec`: a missing `exchange_calendars` module (the 18 errors, and the 5 `test_adaptive_paper_credential_race` failures, whose pristine baseline imports it), `dirname: command not found` (3), a systemd scope state (1), the installed Claude Code's `auth_storage_failure` notification type (1), and `test_token_e2e_grader` F27c (1), whose `git clone --local` cannot hard-link from this worktree into `/tmp`, another file system (it passed in that clone) |
-| `python3 -m unittest tests.test_install_claude_profile tests.test_codex_worker_lane tests.test_wsl_new_distro_recipe` | 0 | 333 tests, 13 skipped |
-| `python3 -m unittest` over the 19 other modules that pin the touched files (`test_new_wsl_handbook`, `test_new_wsl_client_config`, `test_new_wsl_profile`, `test_host_baseline_probe`, `test_managed_block`, `test_codex_agents`, `test_codex_roles`, `test_scaffold_repo`, `test_bootstrap_full_profile`, `test_token_e2e_grader`, `test_landscape_sweep_harness`, `test_landscape_sweep_skills`, `test_freeze_snapshot`, `test_blind_checkout`, `test_runtime_worker_openhands_push_gate`, `test_runtime_worker_openhands_resolver`, `test_upstream_surface_watch`, `test_catalog_freshness_runtime`, `test_new_wsl_definitive_defaults`) | 1 | 2,237 tests, 15 skipped, 1 failure: F27c, as above (`Invalid cross-device link` at the clone, before any check; the suite's `TMPDIR` guard refuses a directory inside the repository) |
-| `node test-envelope.mjs` and `node test-contract-mutations.mjs`, in `examples/claude-native/workflows` | 0 | 254 and 74 passed |
-| `python3 scripts/validate.py` | 0 | 10,277 hashed files, 212 receipts |
-| `python3 scripts/evidence_manifest.py --check` | 0 | passed |
-| `python3 scripts/validate_convergence.py blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json` | 0 | the record is valid with the relocated frozen inputs |
-| `python3 -B tools/adoption/new_wsl_client_config.py --check` | 0 | check passed, with one warning about slot `mcp-inspector`, from inputs this change does not touch |
-| `python3 -B tools/adoption/new_wsl_client_config.py --render --host nativestack2604 --out <scratch>/user-times-render` | 0 | each rendered carrier holds the sentence once and equals the committed carrier byte for byte; `managed_block`'s merge of each gives 12,071 and 8,601 bytes with one copy |
-| `python3 scripts/build_new_wsl_handbook.py --check` | 0 | current outputs |
-| Startup bytes: `PortableTopRuleTests.startup_files` on this tree, and on main `ecfa1127`'s startup files in a scratch directory | 0 | the Startup bytes table, unchanged from the first round |
-| P2's render, then `cloud-init schema -c` (26.1-0ubuntu3~26.04.1, on NativeStack2604) | 0 | `Valid schema` |
-| Path A simulation: `[boot]` and `systemd=true`, then the user-data's `write_files` content as cloud-init's YAML gives it, then wsl-setup 0.6.3's own `set_user_as_default` with only its file path changed | 0 | six lines, each once; wsl-setup changes nothing |
-| Path B simulation: W6's `[user]` and `[time]` lines, run twice on `[boot]` and `systemd=true` | 0 | six lines, each once |
-| Host read: `timedatectl show -p Timezone --value`; `tzutil.exe /g` (not a W5 run) | 0; 0 | `America/New_York`; `Eastern Standard Time` |
-| `git diff --check` | 0 | clean |
+| `python3 -m unittest` (the full suite) | 1 | round 2: 10,347 tests in 1,719 s, 903 skipped, 11 failures and 18 errors, none in a test module this change edits. All 29 are the classes the first round found recurring unchanged in a clean clone of `e8c1edec`: a missing `exchange_calendars` module (the 18 errors, and the 5 `test_adaptive_paper_credential_race` failures, whose pristine baseline imports it), `dirname: command not found` (3), a systemd scope state (1), the installed Claude Code's `auth_storage_failure` notification type (1), and `test_token_e2e_grader` F27c (1), whose `git clone --local` cannot hard-link from this worktree into `/tmp`, another file system (it passed in that clone) |
+| `python3 -m unittest tests.test_install_claude_profile tests.test_codex_worker_lane tests.test_wsl_new_distro_recipe` | 0 | round 3: 334 tests, 13 skipped (round 2: 333) |
+| `python3 -m unittest tests.test_new_wsl_handbook tests.test_new_wsl_client_config tests.test_new_wsl_profile tests.test_host_baseline_probe` | 0 | round 3: 309 tests, the modules that read the recipe, the receipt or the probe |
+| `python3 -m unittest` over the 19 other modules that pin the touched files (`test_new_wsl_handbook`, `test_new_wsl_client_config`, `test_new_wsl_profile`, `test_host_baseline_probe`, `test_managed_block`, `test_codex_agents`, `test_codex_roles`, `test_scaffold_repo`, `test_bootstrap_full_profile`, `test_token_e2e_grader`, `test_landscape_sweep_harness`, `test_landscape_sweep_skills`, `test_freeze_snapshot`, `test_blind_checkout`, `test_runtime_worker_openhands_push_gate`, `test_runtime_worker_openhands_resolver`, `test_upstream_surface_watch`, `test_catalog_freshness_runtime`, `test_new_wsl_definitive_defaults`) | 1 | round 2: 2,237 tests, 15 skipped, 1 failure: F27c, as above (`Invalid cross-device link` at the clone, before any check; the suite's `TMPDIR` guard refuses a directory inside the repository) |
+| `node test-envelope.mjs` and `node test-contract-mutations.mjs`, in `examples/claude-native/workflows` | 0 | round 2: 254 and 74 passed |
+| `python3 scripts/validate.py` | 0 | round 3: 10,277 hashed files, 212 receipts |
+| `python3 scripts/evidence_manifest.py --check` | 0 | round 3: passed |
+| `python3 scripts/validate_convergence.py blueprints/convergence-practice/wsl-new-distro-image-20261001/experiment.json` | 0 | round 3: the record is valid with the relocated frozen inputs |
+| `python3 -B tools/adoption/new_wsl_client_config.py --check` | 0 | round 3: check passed, with two warnings, both about slot `mcp-inspector`, from inputs this change does not touch (round 2 reported one: it read only the output's last two lines) |
+| `python3 -B tools/adoption/new_wsl_client_config.py --render --host nativestack2604 --out <scratch>/user-times-render` | 0 | round 2: each rendered carrier holds the sentence once and equals the committed carrier byte for byte; `managed_block`'s merge of each gives 12,071 and 8,601 bytes with one copy |
+| `python3 scripts/build_new_wsl_handbook.py --check` | 0 | round 3: current outputs |
+| Startup bytes: `PortableTopRuleTests.startup_files` on this tree, and on main `ecfa1127`'s startup files in a scratch directory | 0 | round 2: the Startup bytes table, unchanged from the first round |
+| P2's render, then `cloud-init schema -c` (26.1-0ubuntu3~26.04.1, on NativeStack2604) | 0 | round 2: `Valid schema` |
+| Path A simulation: `[boot]` and `systemd=true`, then the user-data's `write_files` content as cloud-init's YAML gives it, then wsl-setup 0.6.3's own `set_user_as_default` with only its file path changed | 0 | round 2: six lines, each once; wsl-setup changes nothing |
+| Path B simulation: W6's `[user]` and `[time]` lines, run twice on `[boot]` and `systemd=true` | 0 | round 2: six lines, each once |
+| Host read: `timedatectl show -p Timezone --value`; `tzutil.exe /g` (not a W5 run) | 0; 0 | round 2: `America/New_York`; `Eastern Standard Time` |
+| `git diff --check` | 0 | round 3: clean |
 
 ## Sources
 
@@ -238,12 +256,23 @@ prose changed afterwards.
   - pinned source MicrosoftDocs/WSL `7ea1c6f9e25f1c89a05a0e97e5325a02a66ac6cd`, `WSL/wsl-config.md:152-158`, which was
     still that file's latest commit on 2026-10-05;
   - section `[time]`, key `useWindowsTimezone`, boolean, default `true`.
-- **microsoft/WSL** `91f161fa240dc355c1a88daabc8aac4273e35ba5` (tag 3.0.1, the release W1 requires), read 2026-10-05:
+- **microsoft/WSL** `91f161fa240dc355c1a88daabc8aac4273e35ba5` (tag 3.0.1, the release W1 requires), read 2026-10-05;
+  the running-instance lines re-read 2026-10-06 UTC:
   - `src/linux/init/WslDistributionConfig.h:25` (`time.useWindowsTimezone`) and `:58` (`bool AutoUpdateTimezone =
     true;`), registered at `WslDistributionConfig.cpp:42`;
-  - `src/linux/init/timezone.cpp:22-110` (`UpdateTimezone`): no change when the key is off (`:49`), the mapping is
-    empty (`:54`) or the zoneinfo file is missing (`:68`); otherwise it links `/etc/localtime` (`:82`) and writes
-    `/etc/timezone` (`:92`). `src/linux/init/config.cpp:882` calls it at instance start;
+  - `src/linux/init/timezone.cpp:22-110` (`UpdateTimezone`): no change when the key is off (`:49-52`), the mapping is
+    empty (`:54-58`) or the zoneinfo file is missing (`:66-70`); otherwise it relinks `/etc/localtime` and rewrites
+    `/etc/timezone` (`:76-106`);
+  - at instance start: `ConfigInitializeCommon` reads `/etc/wsl.conf` once (`src/linux/init/config.cpp:532`), and
+    `config.cpp:882` calls `UpdateTimezone`;
+  - in a running instance: the service's window receives broadcast messages
+    (`src/windows/service/exe/LxssUserSession.cpp:607-647`, whose comment at `:619` names `WM_TIMECHANGE`). On
+    `WM_TIMECHANGE` (`:4294-4305`) it calls `_TimezoneUpdated`, which logs "Received timezone change notification" and
+    updates every running instance (`:3835-3846`). Each instance sends the mapped zone to its init
+    (`src/windows/service/exe/WslCoreInstance.cpp:349-362`), whose message loops in `InitEntryUtilityVm` and
+    `InitEntryWsl` call `UpdateTimezone` with the configuration read at start (`src/linux/init/init.cpp:2559-2561` and
+    `:2745-2747`). That a Windows time-zone change raises `WM_TIMECHANGE` rests on WSL's own comment and log text; no
+    Microsoft document was read for it;
   - `src/windows/common/helpers.cpp:358-413` (`GetLinuxTimezone`): the Windows zone from `GetDynamicTimeZoneInformation`
     and the region from `GetUserDefaultGeoName`, mapped by `ucal_getTimeZoneIDForWindowsID`, with Windows' own ICU
     (`src/windows/common/precomp.h:40` includes `<icu.h>`; `CMakeLists.txt:386` links `icu.lib`).

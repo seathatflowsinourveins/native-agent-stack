@@ -701,7 +701,7 @@ workstation distribution (Evidence classes).
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cat /var/lib/cloud/data/status.json` | each of the four stages `finished` with empty `errors`; `recoverable_errors` recorded |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cloud-init schema --system` | path A: a line matching `^\s*Valid schema user-data$` and exit 0; skipped on path B |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec cat /etc/wsl.conf` | `[boot]`, `systemd=true`, `[time]`, `useWindowsTimezone=true`, `[user]`, `default=<WSL_USER>`, each once |
-| W5 | powershell | `wsl.exe -d '<Name>' --exec timedatectl show -p Timezone --value` | the IANA zone that CLDR's `windowsZones` mapping gives for `tzutil /g`'s zone and the Windows region, for example `America/New_York`; recorded |
+| W5 | powershell | `wsl.exe -d '<Name>' --exec timedatectl show -p Timezone --value` | the IANA zone that CLDR's `windowsZones` mapping gives for `tzutil /g`'s zone and the Windows region, for example `America/New_York`; recorded; a mismatch stops the run for review without the failed-proof export and unregister |
 | W5 | powershell | `tzutil /g` | the Windows time zone ID, for example `Eastern Standard Time`; recorded |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec ls -l /etc/cloud/cloud-init.disabled` | the marker exists |
 | W5 | powershell | `wsl.exe -d '<Name>' -u root --exec sudo -l -U '<WSL_USER>'` | `(ALL) NOPASSWD: ALL` |
@@ -1438,6 +1438,10 @@ leaves WSL's behavior unchanged and records the intent. W5 reads it back, so the
 another value or no `[time]` section; path B repeats W5's checks once after W6. Nothing reads `/etc/wsl.conf` after
 provisioning, so a later change of the key is not detected. W5 also pairs `timedatectl show -p Timezone --value` with
 `tzutil /g`, so the receipt holds the zone the distribution reports beside the Windows zone, not only the file's text.
+A mismatch is recorded and stops the run for review without the failed-proof export and unregister, because WSL leaves
+`/etc/localtime` unchanged when the mapping is empty or the zone's file is missing; the recipe names the remedy. While
+the key was true at an instance's start, WSL relinks the zone at that start and again whenever Windows' time zone
+changes during the run (the decision record cites both paths).
 The 26.04.1 image's `wsl-setup` 0.6.3 (`73418e32`, `wsl-setup:55-73`) only appends or completes `[user]`, so the
 section survives the first run. The coordinator measured on 2026-10-05 that NativeStack2604's `/etc/wsl.conf` held
 `useWindowsTimezone=false` with no repository record, and set it to `true` on that host. Only the content listings
