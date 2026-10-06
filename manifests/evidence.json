@@ -14043,7 +14043,7 @@
     },
     {
       "path": "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5/README.md",
-      "sha256": "f1c06b44a8a0ef52e3851aeaa0b07fd25f24672209f109809eacea650ac11ef2",
+      "sha256": "41356b001e424f10d6e4be8668a8991a83c8ffb72b12cd00bd6ff9b5c55c4036",
       "bytes": 36439
     },
     {
@@ -16498,8 +16498,8 @@
     },
     {
       "path": "catalogs/us-equities/runtime-target.json",
-      "sha256": "82077f9c635c5e50f36384de017e1844d3a65320fac06c4cac2dd26ca972d554",
-      "bytes": 26205
+      "sha256": "8e7dfb142491128ab77e4ce462c0d088c587c1500c394d58b16bbbc9b179baf6",
+      "bytes": 26361
     },
     {
       "path": "catalogs/us-equities/security-identity-review.json",

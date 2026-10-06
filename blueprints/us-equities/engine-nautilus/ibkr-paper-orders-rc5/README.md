@@ -509,7 +509,7 @@ receipts' `started_at` and `ended_at`, truncated to the second.
   - The receipt's risk note reads: "engine notional cap configured, not enforced on this route (#4946, fixed on
     develop, unreleased); bound held by qty=1 and quote admission". v2.0.0rc6 ships that fix.
 
-The Nautilus console is not redacted, so it stayed private. Acceptance steps 2-4 (reconnect with an open order,
+The Nautilus console is not redacted, so it stayed private. Acceptance steps 3-4 (reconnect with an open order,
 restart reconciliation, the kill switch) were not exercised and remain blocked upstream (#5007, #5057, #5060).
 
 **The current runner has not run natively.** Run 3 exercised the r4 harness. The r7 `run.py` (`72147d8627d7…`) added these r5-r7 changes, retained by r8:
