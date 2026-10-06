@@ -5196,13 +5196,13 @@
     },
     {
       "path": "adoption/skills/lifecycle.md",
-      "sha256": "164f4a30bbf0838c65b229885455693539a96f1e7b32ce6c9f563fdbbddb59e6",
-      "bytes": 20171
+      "sha256": "16bc3bdafa3260f38f8e62dd07bc549da77f0f162198bd9fcfbe11c854e50fb1",
+      "bytes": 22876
     },
     {
       "path": "adoption/skills/manifest.json",
-      "sha256": "731b79c977c430e0dd37e7ffa85b8a70df22c1ff1e53998b7cb0dc4923292259",
-      "bytes": 56885
+      "sha256": "09f280caa8ce33670a270cacba5648eb4372dda90c960be4c7bff44528af1418",
+      "bytes": 59044
     },
     {
       "path": "adoption/templates/claude.settings.linux-wsl2.overlay.json",
@@ -5221,8 +5221,8 @@
     },
     {
       "path": "adoption/templates/codex.config.template.toml",
-      "sha256": "f87509d1bc52e728bff767cf37e1fe24cace4e140f749e72319713ff5563a61b",
-      "bytes": 19129
+      "sha256": "49396b2d3d10d8c4cf495a4a7935fe595c7b7fadadcb3f9106547e22f295d690",
+      "bytes": 19118
     },
     {
       "path": "adoption/templates/codex.omniroute.config.toml",
@@ -17604,6 +17604,11 @@
       "path": "docs/decisions/2026-10-06-sharp-live-relock-frozen-variant.md",
       "sha256": "7fad1a25a8f3b1c151a7c1f125c1635d32d631757c68509588b55d72c1cf6f89",
       "bytes": 3898
+    },
+    {
+      "path": "docs/decisions/2026-10-06-skill-recording-and-live-catalog-budgets.md",
+      "sha256": "5926a2a7c531fe07387aca405b53ea74b4206bfc4061cb2f0936112ffd110abc",
+      "bytes": 10562
     },
     {
       "path": "docs/direct-results.md",
@@ -46621,6 +46626,11 @@
       "bytes": 17035
     },
     {
+      "path": "evidence/artifacts/skills-recording-live-catalog-20261006/local-checks.json",
+      "sha256": "07dac5610160c6b8222851a188bbe1009b9ec64c12819e874e22452b6159f09d",
+      "bytes": 5027
+    },
+    {
       "path": "evidence/artifacts/skills-trial-20260925/nativestack-5975wx-20260925.json",
       "sha256": "0f3d4e68227108db70730487a65991c71bad01544147962263b3b996f722e2f2",
       "bytes": 11280
@@ -54587,8 +54597,8 @@
     },
     {
       "path": "scripts/skills_status.py",
-      "sha256": "eeb462e9b6b2b4acb6cc39af42ea96bf4a6dd14892a45a71d9fa61db229b806d",
-      "bytes": 42439
+      "sha256": "12b61fc0a2a5460f2509826ffaa6f448596551e1bd32f0571f6e01a56aa8ccfc",
+      "bytes": 74131
     },
     {
       "path": "scripts/trading_gates.py",
@@ -55347,8 +55357,8 @@
     },
     {
       "path": "tests/test_install_skills.py",
-      "sha256": "7de56577e7b9aa721a9ad8799be488d6455986d381f9b6aa886af53416d33368",
-      "bytes": 103496
+      "sha256": "087313ebfb41b7a901e9fa43cd970d36ef6f93a979713bfcbaa1a3a957f3ac26",
+      "bytes": 115249
     },
     {
       "path": "tests/test_jcodemunch_config.py",
@@ -55772,13 +55782,13 @@
     },
     {
       "path": "tests/test_skills_manifest.py",
-      "sha256": "9020a7c87958c36df3c81e42e94869c5c49accde595e619c012e2f46d66d266e",
-      "bytes": 19524
+      "sha256": "aaa5bbb72ae06f9f02101b74019eec670f86f8f01fe9ff562409ba16790d732f",
+      "bytes": 20617
     },
     {
       "path": "tests/test_skills_status.py",
-      "sha256": "7c7ffee80a370d9a6c0d7510c16cd96abc0d7314e93579816400b317ab169fb5",
-      "bytes": 67576
+      "sha256": "a79d73a9cee6c84419ed5d4e2c707de5490bfd7c098f53d6823425f27f7784b0",
+      "bytes": 83023
     },
     {
       "path": "tests/test_sota_convergence.py",
@@ -55987,8 +55997,8 @@
     },
     {
       "path": "tools/adoption/install_skills.py",
-      "sha256": "c068934f1aa56204558e1b5b9898db6356a5682acca68b09ebaf49f3d9d7d538",
-      "bytes": 46809
+      "sha256": "243ee7435e4c6a434eb8a79086973cb777a28dc43dbbea81de7bfe3f0e88cd74",
+      "bytes": 63212
     },
     {
       "path": "tools/adoption/managed_block.py",
