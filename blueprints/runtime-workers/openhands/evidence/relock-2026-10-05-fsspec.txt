@@ -1,0 +1,41 @@
+Native returned-output excerpts, path-sanitized; per-command evidence classes remain separate.
+Wave: J-FSSPEC and extensions 1/2; baseline ecfa112764c664d35377dd66b8cfcb67e5a94d60.
+
+Paired relock (uv 0.12.22): actual exit0.
+control reproduces the committed lock byte for byte
+control SHA256 e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1
+new SHA256 2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401
+Changed package blocks: fsspec2025.9.0->2026.6.0, multidict6.7.0->6.9.1; no other pin.
+
+Hash-check actual exits0: fsspec2hashes, multidict14hashes; no unlisted supported artifacts.
+
+Isolated native install actual returned output:
+venv exit: 0
+build-requirements install exit: 0
+runtime lock install exit: 0
+Checked 178 packages in 4ms
+All installed packages are compatible
+uv pip check exit: 0
+SDK/tools 1.49.6 imports passed; no model request
+sdk import exit: 0
+fsspec 2026.6.0 multidict 6.9.1 huggingface-hub 0.35.3 litellm 1.93.2
+fixed-package imports exit: 0
+done, status 0
+
+Scan snapshots, actual native counts/exits (wrapper0 is not acceptance):
+Initial unchanged-main: ordinary1,2packages/2advisories; frozen1,1package/1advisory.
+Fresh unchanged-main extension2: ordinary1,5packages/5advisories; frozen1,1package/1advisory.
+After four production fixes: ordinary1,Werkzeug trial finding only; frozen1,source-map-js artifact only.
+After rulings: ordinary inputs58, frozen inputs1; ordinary0, frozen0; zero unignored findings.
+Full sanitized native reports: .osv-before.*.txt and .osv-after.*.txt beside this file.
+
+Failed conditions retained: UV_NO_CONFIG1 bypassed workspace settings; copied wheel
+formatter had two literalplus signs. Neither candidate was adopted. Corrected actual
+native replay passed. Historical negative guards have expected exit1; they do not
+supersede the separate native passing install. Subsequent data/source-pin corrections
+and final test counts are recorded in the receipt. No image build, provider execution
+or unchanged upstream test suite is claimed.
+
+Review: exact-head command-center cross-family read pending; old #562 reviews are
+historical source leads, not reviews of this head. Unchanged SDK/proxy/source-drift
+inputs were reused as source review; unrelated SDK-main probes were not rerun.

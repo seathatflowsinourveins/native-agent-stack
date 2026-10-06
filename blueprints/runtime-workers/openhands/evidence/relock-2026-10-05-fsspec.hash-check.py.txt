@@ -1,0 +1,37 @@
+"""Documentary #562 hash-check adaptation for fsspec's universal wheel and sdist.
+Source: native-stack@74cc5468:blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.hash-check.py.txt.
+Reads official pinned-version PyPI metadata; exit1 for unknown/yanked hashes,
+exit2 for omitted supported release artifacts, exit0 only for complete coverage.
+Usage: python <script> <requirements-lock> [package; default fsspec].
+"""
+import json
+import re
+import sys
+import urllib.request
+
+lines = open(sys.argv[1], encoding="utf-8").read().splitlines()
+package = sys.argv[2] if len(sys.argv) > 2 else "fsspec"
+start = next(n for n, line in enumerate(lines) if line.startswith(package + "=="))
+version = lines[start].split("==")[1].split()[0]
+hashes = []
+for line in lines[start + 1:]:
+    if not line.lstrip().startswith("--hash=sha256:"):
+        break
+    hashes.append(line.strip().split("sha256:")[1].split()[0])
+url = f"https://pypi.org/pypi/{package}/{version}/json"
+release = json.load(urllib.request.urlopen(url, timeout=30))
+by_hash = {f["digests"]["sha256"]: f for f in release["urls"]}
+print(f"{package}=={version}: {len(hashes)} hash lines; source {url}")
+status = 0
+for digest in hashes:
+    f = by_hash.get(digest)
+    if f is None or f.get("yanked"):
+        status = 1
+    print(f"  {digest} -> " + (f"{f['filename']} (uploaded {f['upload_time_iso_8601']}, {'yanked' if f.get('yanked') else 'not yanked'})" if f else "NO FILE OF THIS RELEASE HAS THIS SHA256"))
+# Include fsspec's universal wheel explicitly; a CPython-only pattern misses it.
+wanted = [f for f in release["urls"] if re.search(r"-py3-none-any\.whl$|-cp31[234]-cp31[234]-(manylinux|musllinux)\w*_x86_64\.whl$|\.tar\.gz$", f["filename"])]
+unlisted = sorted(f["filename"] for f in wanted if f["digests"]["sha256"] not in hashes)
+print("unlisted supported artifacts:", unlisted or "none")
+if not status and (unlisted or not wanted):
+    status = 2
+sys.exit(status)

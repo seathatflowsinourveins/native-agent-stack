@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "record": "Captured trial lockchecks exclusion under command-center ruling2",
+  "evidence_class": "source_review",
+  "checked_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "observed_utc": "2026-10-06T00:59:04Z",
+  "trial": "Preregistered 2026-09-26 HIST SPY one_zero engine trial, PR336",
+  "trial_commit": "20b52a5bbd132291dd6b7d49ae473789caa3362c",
+  "paths": ["blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock", "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock"],
+  "runtime_lock_sha256": "a8dce0af2b20c6a0a8829c8fcdd9a3c3207e9e2d57a62d2498bc0116f1af0f1f",
+  "trial_receipt": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/receipt.json",
+  "authorization": "Co-op J-FSSPEC RULINGS, command-center task-ns2604-coop-20261006T003954Z ruling2, with verified 5f condition",
+  "owner_confirmation": {"row": "report", "id": "report-native-agent-stack-5f-20261006T0045Z-osv", "timestamp": "2026-10-06T00:41:23Z", "from": "native-agent-stack-5f", "to": "wsl-architecture-design", "re": "task-native-agent-stack-5f-20261006T004011Z", "confirmation": "Both are captured trial evidence, not live inputs; Lumibot4.6.1 failed the trial and is not the selected engine"},
+  "decision": "Move both entries from scanned lockfiles to captured evidence fixtures in excluded. Preserve every artifact byte, rather than silently changing preregistered evidence or adding a Werkzeug ignore.",
+  "alternative_source_review": "Werkzeug3.1.8 safe_join device filtering is Windows-only; the recorded trial was Linux/offline under bwrap. A dated advisory-specific ignore was prepared as an alternative, but the command center selected exclusion after the owner confirmed retirement.",
+  "sources": ["https://github.com/advisories/GHSA-g6x2-hccm-hh4m", "pallets/werkzeug@c1a26b45fb06d5e086b4d6be820c3302f588d815:src/werkzeug/security.py:145,190", "https://github.com/pallets/werkzeug/commit/8d77320bcdf3a34941ec06dcf16b03c065cd21b6", "native-agent-stack@20b52a5bbd132291dd6b7d49ae473789caa3362c:blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/run.json:300", "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:blueprints/us-equities/adaptive-paper/receipts/xnys-primary-20261005/engine-baseline.lock"],
+  "limits": "The snapshot is replayable; historical status does not prove universal non-use. Live-input retirement is the owner's reported observation, not a new root host/process census. Exclusion removes future vulnerability scanning for these captured inputs.",
+  "overturn": "Before replay, adoption, changed consuming routes or live reuse, qualify and scan a separately maintained environment; revisit the exclusion if retirement no longer holds. No trial replay, provider/broker request, or trading experiment ran in this unit."
+}
