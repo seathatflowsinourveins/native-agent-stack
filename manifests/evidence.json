@@ -17267,6 +17267,11 @@
       "bytes": 9226
     },
     {
+      "path": "docs/decisions/2026-10-06-ai-memory-health-endpoint.md",
+      "sha256": "aa915055bf3c0e6fa6b77b0b22edaff7faa4d690c7b3cf702aca684e395419f7",
+      "bytes": 2513
+    },
+    {
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
       "sha256": "c12885d5d078f88cf6784d539e5b8261545a759b7aba8ff1eba566fb5d6366fb",
       "bytes": 3660
@@ -18070,6 +18075,11 @@
       "path": "evidence/artifacts/ai-memory-241-codex-capture-20260926/codex_capture_count.py",
       "sha256": "0ab020d17171b4c51a31aa19a9349ec51cdd1afd8a7b732ee47d03df0a3ecd79",
       "bytes": 1244
+    },
+    {
+      "path": "evidence/artifacts/ai-memory-health-20261006/receipt.json",
+      "sha256": "000f82f6d63ac51f7e753c528fe62946e5255ebbbac1e60658a049544884edea",
+      "bytes": 2130
     },
     {
       "path": "evidence/artifacts/alpaca-platform-landscape-20260926/README.md",
@@ -39698,8 +39708,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/accept.sh",
-      "sha256": "808fd9eef9b48db7a930573f28e660f1b5f9dfc569642ee31fac17a8fb043ba7",
-      "bytes": 152419
+      "sha256": "6a9646539ea7c4965ad3c701385660ffbb0c4435370a80a7e6a5e6e615e000ca",
+      "bytes": 152711
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
@@ -40003,8 +40013,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
-      "sha256": "5cab5a09a793a78bc48ac4d31d9ec2b409d75c58831b06426dae41776db4ba05",
-      "bytes": 387919
+      "sha256": "58f175f6ff917ee6e614bb7bd93aa97afa0c6cdf48e81c9fbf080424dc126d8f",
+      "bytes": 387988
     },
     {
       "path": "evidence/artifacts/new-wsl-install-plan-20261002/install.sh",
@@ -54995,6 +55005,11 @@
       "path": "tests/test_new_host_grand_list.py",
       "sha256": "8e24fa3326e9a4f3c5df3269eb81f8472a46963aa357609e2c8e9bff98057e0b",
       "bytes": 18369
+    },
+    {
+      "path": "tests/test_new_wsl_ai_memory_health.py",
+      "sha256": "5f10b00948154a2f83abbd77212d9f9d840a755b4bda8cd589e397dfd6cf6c7f",
+      "bytes": 3418
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
