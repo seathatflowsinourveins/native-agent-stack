@@ -53,7 +53,10 @@ Collection snapshots alone omit aliases and may miss SocratiCode's metadata
 and graph collections. Verify standalone mode with `GET /cluster`; this
 CLI recovery procedure does not apply to a distributed cluster.
 
-1. Quiesce every writer, including automatic watchers. Record version/commit,
+1. Quiesce every writer, including background startup indexing and watchers.
+   Use the acceptance controls below before any owned process connects.
+   Drain already-running indexing; no foreground call is not proof of idle
+   background work. Record version/commit,
    all collection names, aliases, vector configurations and point counts.
    Keep writers quiesced through validation/cutover. Full snapshots assemble
    collections sequentially; continuing writes do not produce an atomic
@@ -133,12 +136,31 @@ Before releasing writers, retain:
 - An ordinary unit restart followed by the same known-answer search.
   Retain failures and usage; unknown usage stays null.
 
+Verify startup quiescence too: retain collection/metadata inventories before
+and after connecting a fresh owned acceptance process. Investigate unexpected
+changes; a read-like tool name does not prove that process startup was read-only.
+
 Use the [semantic-search recipe](README.md#local-semantic-code-search).
-Client configuration stays with its authorized owner. Require manual
-SocratiCode watcher mode in owned acceptance configs throughout the quiesced
-cutover; auto mode can restart watching on query/status calls. Stop the
-original owner's watcher before changing the owned test config. Allow any
-already-active work to finish before snapshotting or releasing writers.
+Client configuration stays with its authorized owner. Set both supported
+controls in **every owned acceptance process before its initial connection**:
+
+```json
+{
+  "SOCRATICODE_AUTO_RESUME": "off",
+  "SOCRATICODE_WATCHER": "manual"
+}
+```
+
+Manual mode alone suppresses watcher startup but still permits background
+startup incremental indexing, including metadata writes before scanning.
+`SOCRATICODE_AUTO_RESUME=off` returns before startup Docker/Qdrant access and
+overrides an explicit resume-project list. Already-retained processes keep
+their original environment: drain existing indexing and stop owned watchers
+on their verified connections, then recreate affected owned acceptance
+connections with both settings. Do not stop a global MCPorter daemon serving
+other owners, or use cross-process SIGTERM as a presumed batch checkpoint.
+Keep these controls throughout the quiesced snapshot/restore and validation.
+Production-client startup policy remains the client's owner's decision.
 
 Before new native writes, rollback stops the native unit and restarts the
 preserved owned rootless container on its original port. After new writes,
@@ -151,6 +173,9 @@ snapshot restores into 1.19.1.
 
 Sources: [snapshot compatibility](https://qdrant.tech/documentation/operations/snapshots/),
 [SocratiCode@f6191f0 watcher modes](https://github.com/giancarloerra/socraticode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/src/services/watcher.ts#L593),
+[startup off control](https://github.com/giancarloerra/socraticode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/src/services/startup.ts#L56),
+[startup incremental update](https://github.com/giancarloerra/socraticode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/src/services/startup.ts#L299),
+[pre-scan metadata write](https://github.com/giancarloerra/socraticode/blob/f6191f076a42405f0d5508139f3a8b505cfef93a/src/services/indexer.ts#L1657),
 [canonical user-unit example](../examples/native-stack-qdrant.service.example).
 
 ## Organic use is a separate gate
