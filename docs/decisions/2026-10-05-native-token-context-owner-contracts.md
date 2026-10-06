@@ -84,3 +84,7 @@ Proposed comparison: use the existing pinned promptfoo 0.123.1 workflow, or Insp
 ## Completeness critic and overturn
 
 The independent critic required distinct search contracts, actual-choice telemetry, output fidelity controls and automatic-hook accounting. Its schema-overhead finding fed a source sweep of native deferral versus MCP-compressor; native clients remain the source-fit first owner, and host exposure must be measured. The next sweep must cover direct MCP responses, fetched HTML, structured tables/logs, large single records, repeated reads, schema-description overhead, post-compaction recovery and durable-history contamination. A release or source showing a better native routing surface reopens that surface review; a quality-passing native-arm comparison overturns a provisional owner. A grade, source review or artifact-token reduction alone cannot declare the whole stack non-overlapping or READY.
+
+## Operational census follow-up (2026-10-06)
+
+TOKEN-STACK-VERIFY separately authorizes operational repository/F9 routing proposals. [The census/routing decision](2026-10-06-codex-token-census-routing-proposals.md) and its [review artifact](../proposals/2026-10-06-codex-token-routing.md) preserve the counts, source contracts and live template owner's handoff. Their harness-enabled after counts do not qualify the original U1 native-arm study, READY or exclusions. This dated owner map remains provisional on its original evidence gates.
