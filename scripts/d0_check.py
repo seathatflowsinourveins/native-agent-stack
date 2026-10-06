@@ -6,6 +6,9 @@ The Windows reads use the native SCM, Registry and ScheduledTasks interfaces.
 Automatic/backoff sources are the two pinned Microsoft documents in the runbook;
 SERVICE_TRIGGER actions 1/2 are documented in Microsoft's winsvc.h reference
 (2021-04-02). No service, registry, clock or task mutation is performed here.
+WSL's system-distro PHC agent is started by mini_init, independently of user distros:
+https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L3219-L3222
+https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L3665-L3708
 """
 
 from __future__ import annotations
@@ -21,7 +24,7 @@ import sys
 import time
 
 POWERSHELL = "/mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe"
-CHRONY_PORT = 3323  # NativeStack2604 observer; 323 is the old distro's on shared WSL loopback.
+CHRONY_PORT = 323  # WSL platform PHC agent; the distro's NTP observer is on 3323.
 REMEDIATION = (
     "The user re-applies CLOCK-R2 fixes 1 and 2 as Windows administrator: "
     "sc.exe config w32time start= auto; ResolvePeerBackoffMinutes=1, leaving MaxTimes=7. "

@@ -115,24 +115,24 @@ class PersistenceTests(unittest.TestCase):
 
 
 class NativeBoundaryTests(unittest.TestCase):
-    def test_reference_query_uses_native_port_for_both_loopback_families(self):
+    def test_reference_query_uses_platform_port_for_both_loopback_families(self):
         missing = subprocess.CompletedProcess([], 1, "")
-        native = subprocess.CompletedProcess([], 0, "Reference ID    : 50484330 (PHC0)\nUpdate interval : 8.0 seconds\n")
-        with mock.patch.object(d0.subprocess, "run", side_effect=[missing, native]) as query:
+        platform = subprocess.CompletedProcess([], 0, "Reference ID    : 50484330 (PHC0)\nUpdate interval : 8.0 seconds\n")
+        with mock.patch.object(d0.subprocess, "run", side_effect=[missing, platform]) as query:
             self.assertEqual(d0.read_agent_reference(), "50484330 (PHC0) | 8.0 seconds")
         self.assertEqual([call.args[0][2] for call in query.call_args_list], ["::1", "127.0.0.1"])
-        self.assertTrue(all(call.args[0][4] == "3323" for call in query.call_args_list))
+        self.assertTrue(all(call.args[0][4] == "323" for call in query.call_args_list))
 
-    def test_old_port_phc0_cannot_mask_missing_native_observer(self):
+    def test_observer_reference_cannot_mask_missing_platform_agent(self):
         def response(command, **kwargs):
-            if command[4] == "323":
-                return subprocess.CompletedProcess(command, 0, "Reference ID : 50484330 (PHC0)\n")
+            if command[4] == "3323":
+                return subprocess.CompletedProcess(command, 0, "Reference ID : A29FC801 (Cloudflare)\n")
             return subprocess.CompletedProcess(command, 1, "")
 
         with mock.patch.object(d0.subprocess, "run", side_effect=response) as query:
             self.assertEqual(d0.read_agent_reference(), "none")
         self.assertEqual(query.call_count, 2)
-        self.assertTrue(all(call.args[0][4] == "3323" for call in query.call_args_list))
+        self.assertTrue(all(call.args[0][4] == "323" for call in query.call_args_list))
 
     def test_timex_boundary_uses_only_the_read_mask(self):
         def query(pointer):

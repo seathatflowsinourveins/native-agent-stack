@@ -13,11 +13,16 @@ immediately with the administrator remediation. `--persistence-only` reads
 Windows without a census; `--agent-only 60` retains the original census behavior.
 The script accepts the original positional duration as well as `--seconds`.
 
-The NativeStack2604 census queries its observer on UDP **3323** for both loopback
-families. UDP 323 belongs to the older distribution on WSL's shared network;
-an old PHC0 answer must not mask a missing native observer. Reports name the
-actual `chrony_port` and use `chrony_phc0_answers`/`chrony_refs`. The installed
-chronyc 4.8 `-p PORT` option selects that target ([upstream manual](https://chrony-project.org/doc/4.8/chronyc.html)).
+The census queries WSL's platform PHC agent on UDP **323**, preferring `::1`
+with an IPv4 fallback. mini_init starts it inside WSL's system distro at each
+VM boot, independently of NativeStack; retiring NativeStack leaves that writer
+in place. Its source config uses `refclock PHC /dev/ptp0 poll 3 dpoll -2`.
+[WSL 3.0.1 agent call](https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L3219-L3222),
+[agent configuration/start](https://github.com/microsoft/WSL/blob/91f161fa240dc355c1a88daabc8aac4273e35ba5/src/linux/init/main.cpp#L3665-L3708).
+The distribution's independent NTP observer uses **3323**, stays observe-only
+(`-x`), and is not expected to return PHC0. It cannot substitute for the platform
+agent in D0. Reports name `chrony_port` and use `chrony_phc0_answers`/`chrony_refs`.
+The installed chronyc 4.8 `-p PORT` option selects the target ([upstream manual](https://chrony-project.org/doc/4.8/chronyc.html)).
 This does not change the administrator script or persistence-only mode. The
 candidate boot oneshot runs both checks with `--seconds 60`.
 
@@ -57,6 +62,8 @@ systemctl --user enable clock-persistence-check.service  # no --now
 This unit runs when the distro's user manager reaches `default.target`. It is
 not a Windows-boot task and adds no ordering dependency to other user units.
 `RemainAfterExit=yes` avoids repeat execution within that manager's lifetime.
+Its `After=ns2604-alertmanager.service` orders it after the existing alertmanager
+when both are in the boot transaction; it does not start that dependency.
 Its `OnFailure=paper-alert@%n.service` uses the existing paper-alert receiver;
 verify that dependency and its alert route before the acceptance boot. The
 runtime contains no credential file and writes no Windows setting or clock.
@@ -85,8 +92,8 @@ unit without `--now`, restores the saved unit/runtime files (or removes only
 files recorded absent), and runs `daemon-reload`. Do not interrupt a running
 check. Preserve its journal and clock evidence. Restore a prior enablement
 state only if the backup recorded one. This reverses the Linux integration;
-the administrator runbook's `start= delayed-auto` command is the separate,
-explicit Windows-startup rollback. No trigger restoration/deletion, task-state
+the administrator runbook records the separate Windows-setting rollback,
+including `start= delayed-auto`. No trigger restoration/deletion, task-state
 change or manager restart is added.
 
 Sources: [systemd v259.5 service semantics](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.service.xml),
