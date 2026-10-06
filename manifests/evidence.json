@@ -17777,12 +17777,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "597b8ebe58355e24473e96670b48444bfec6e3302c984ec3d90289c876031f71",
+      "sha256": "e5a825c8542eafe57744301ed16f8bd0cae373ddc0544f39e5be194b5be117bd",
       "bytes": 692111
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "e86f96359863af80761aa28d91b6d82ee0c702824d4b57e902b1245bd1ea7060",
+      "sha256": "f2b224c2eb081be6ca73834ef0a589a69a9c7029f2c2233678de893dd5a061b1",
       "bytes": 368486
     },
     {
@@ -39962,8 +39962,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "7e31de178995d4c174ddc7f3f5c5a53554d4cee87f87a276ba53d80ce30a38f5",
-      "bytes": 34020
+      "sha256": "154b0cd9c3bb688051f1743d649637d13a07f48feb2a162bce162539bd32ce7d",
+      "bytes": 34823
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
