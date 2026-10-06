@@ -37,6 +37,15 @@ Every path below was verified against `main` at `6d9a7a5`.
   rewrites them, but only with their `--write` commands (see the
   [hot-file protocol](#hot-file-protocol)).
 
+Resolve a writer's actual directory with `git worktree list --porcelain`;
+use `git worktree list --porcelain -z` for programmatic reads. Verify the
+branch and HEAD in that directory against the assignment, then confirm the
+selected paths' current owner. Read the recorded directory instead of
+constructing it from a branch name. Git's
+[stable porcelain format](https://github.com/git/git/blob/v2.53.0/Documentation/git-worktree.adoc#L251-L260)
+and [labelled worktree records](https://github.com/git/git/blob/v2.53.0/Documentation/git-worktree.adoc#L454-L460)
+support this lookup.
+
 ### Trading tests
 
 A test module belongs to the lane of the code or receipts it loads. At
@@ -200,6 +209,12 @@ gh pr merge <N> --squash --match-head-commit <SHA>
   Merging `main` right before the merge narrows that window without closing
   it, and `validate.yml` runs again on every push to `main`.
 
+Account for local cleanup separately: at gh v2.101.0, when branch deletion
+is requested, local deletion is enabled and the head branch is checked out
+in another linked worktree, the
+[deletion path removes that worktree before deleting the branch](https://github.com/cli/cli/blob/v2.101.0/pkg/cmd/pr/merge/merge.go#L398-L504).
+Inspect the actual worktree list before selecting cleanup options.
+
 ## Coordination
 
 When another live session owns an area, hand off instead of editing it.
@@ -208,6 +223,23 @@ client supports it (for Claude Code peers, see
 [Lane B of the cooperation recipe](../recipes/claude-codex-cooperation-lanes.md#lane-b-live-session-coordination)).
 Mirror the handoff as a GitHub issue or PR comment so other clients, hosts and
 later sessions see it.
+
+Coordinate workers' user-authenticated GitHub REST reads against
+[the documented per-user primary allowance and its authentication-specific exceptions](https://docs.github.com/en/rest/using-the-rest-api/rate-limits-for-the-rest-api#primary-rate-limit-for-authenticated-users).
+Reuse a pinned source checkout or retained source capture for repeated file
+reads so workers avoid fetching identical source again.
+
+Coordinate heavy work with the measurement owner's posted windows before
+starting it. Retain each native run's actual start, end and exit status,
+and record concurrent load as a confound. Treat
+[`nice` as advice to the scheduler](https://github.com/coreutils/coreutils/blob/v9.8/doc/coreutils.texi#L18754-L18761);
+keep its setting separate from measured isolation or performance results.
+
+Generate each new event's timestamp from the actual clock when writing its
+record ([date invocation at Coreutils v9.8](https://github.com/coreutils/coreutils/blob/v9.8/doc/coreutils.texi#L16608-L16626)).
+For an earlier action, use the time retained in its original native event
+or platform record, following the
+[independent-observation policy](acceptance-evidence-policy.md).
 
 ## No CI lane check for now
 
