@@ -222,6 +222,7 @@ STORE_PATHS = (
     (LinearScan(r"\bgh\s+auth\s+status\b[^;&|\n]*\s-t\b", gh_status_token_scan), "native_token_print"),
     (re.compile(r"\bsecurity\s+(?:find-generic-password|find-internet-password|dump-keychain)\b"), "keychain_read"),
     (re.compile(r"\bsecret-tool\s+lookup\b"), "keychain_read"),
+    (re.compile(r"new-wsl-native-stack/grafana\.env"), "service_secret_path"),
 )
 # Every secret `variables` name and every `must_not_be_set` name of
 # adoption/credential-inventory.json; tests/test_secret_path_guard.py fails when

@@ -1174,7 +1174,7 @@ class RepositoryWorkflowTests(unittest.TestCase):
         advisory = derived.advisory
         print(json.dumps({"advisory_gate_reads": self.g.advisory_gate_reads([derived])}, sort_keys=True))
         baseline = json.loads((ROOT / "blueprints/runtime-workers/openhands/evidence/"
-                               "unclassified-gate-reads-20261004.json").read_text())
+                               "unclassified-gate-reads-20261006.json").read_text())
         def scripts(locations):
             return Counter(location.rsplit(":", 1)[0] for location in locations)
 

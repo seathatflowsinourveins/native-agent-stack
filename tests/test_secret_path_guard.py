@@ -1873,6 +1873,7 @@ STORE_PATH_LEADS = {
     4: ["gh/hosts.yml"], 5: ["huggingface", "HF_HOME:-", "HF_HOME"], 6: [".tavily/config.json"], 7: ["ecosystem-grafana.env"],
     8: ["nativestack/generation.key"], 9: ["/proc", "/proc/"], 10: ["gh ", "gh auth "], 11: ["hf ", "hf auth "], 12: ["huggingface-cli "],
     13: ["--show-token"], 14: ["gh auth status ", "gh auth status  -tX"], 15: ["security "], 16: ["secret-tool "],
+    17: ["new-wsl-native-stack/"],
 }
 _LINEAR_CHILD = (
     "import json, sys, time\n"
@@ -2022,6 +2023,17 @@ def review_685_monotonicity_commands():
 
 
 class SecretPathGuardTests(unittest.TestCase):
+    def test_selected_grafana_store_has_explicit_reader_and_template_coverage(self):
+        for path in ("~/.config/new-wsl-native-stack/grafana.env",
+                     "${XDG_CONFIG_HOME:-$HOME/.config}/new-wsl-native-stack/grafana.env",
+                     "/custom-config/new-wsl-native-stack/grafana.env"):
+            for reader in ("cat", "head", "tail -n 4", "rtk read", "rtk proxy cat"):
+                with self.subTest(path=path, reader=reader):
+                    self.assertEqual(guard.check(f"{reader} {path}"), "service_secret_path")
+        denies = json.loads((ROOT / "adoption/templates/claude.settings.template.json").read_text())["permissions"]["deny"]
+        self.assertIn("Read(~/.config/new-wsl-native-stack/*.env)", denies)
+        self.assertIn("Read(**/.config/new-wsl-native-stack/*.env)", denies)
+
     def test_blocked_commands(self):
         for command, reason in {**BLOCKED, **KEYRING_BLOCKED}.items():
             with self.subTest(command=command):

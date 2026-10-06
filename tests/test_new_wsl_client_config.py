@@ -11,6 +11,7 @@ Claude Code or Codex session on a new distribution uses what the render wires.
 from __future__ import annotations
 
 import contextlib
+import copy
 import fnmatch
 import hashlib
 import io
@@ -625,7 +626,7 @@ def make_catalog(tmp: Path) -> Path:
     """A scratch copy of everything the tool reads from a catalog checkout, to break one input at a time. The committed
     filtered blocks are copied too, so the copy starts clean."""
     root = tmp / "catalog"
-    files = [cfg.MAP_REL, cfg.MANIFEST_REL, cfg.BOOTSTRAP_REL, cfg.HOST_TEMPLATE_REL, *cfg.TEMPLATES.values(),
+    files = [cfg.MAP_REL, cfg.MANIFEST_REL, cfg.BOOTSTRAP_REL, cfg.HOST_TEMPLATE_REL, cfg.ENVIRONMENT_TEMPLATE, *cfg.TEMPLATES.values(),
              *cfg.TEMPLATE_ADDITIONS.values(), *cfg.BLOCK_TEXT_REL.values(), *cfg.GENERATED_BLOCKS.values(), f"{cfg.PLAN_REL}/install-plan.json",
              f"{cfg.PLAN_REL}/config/otel.yaml", f"{cfg.PLAN_REL}/config/omniroute.env.example",
              cfg.SKILLS_MANIFEST_REL, cfg.managed_block.RTK_AWARENESS_REL]
@@ -1067,7 +1068,7 @@ class RenderTests(unittest.TestCase):
         self.assertEqual(set(self.files), {"settings.json", "settings.linux-wsl2.overlay.json", "mcp-servers.json",
                                            "codex.config.toml", "codex.hooks.json", "codex.stack-worker.config.toml",
                                            "codex.omniroute.config.toml", "wiring.json", "claude-user-instructions.md",
-                                           "codex-user-instructions.md"})
+                                       "codex-user-instructions.md", "60-native-agent-stack.conf"})
         for piece, name in cfg.RENDERED_BLOCKS.items():
             self.assertEqual(self.files[name], (ROOT / cfg.GENERATED_BLOCKS[piece]).read_text(encoding="utf-8"), name)
         with tempfile.TemporaryDirectory() as tmp:
@@ -1219,8 +1220,10 @@ class RenderTests(unittest.TestCase):
                                                         "context-used", "five-hour-limit", "weekly-limit"])
         policy = config["shell_environment_policy"]
         self.assertEqual(policy["inherit"], "none")
-        self.assertEqual(sorted(policy["set"]), ["DOCKER_HOST", "HOME", "LANG", "MCP_AUTO_OPEN_ENABLED", "PATH",
-                                                 "RTK_TELEMETRY_DISABLED", "TERM", "TMPDIR", "XDG_RUNTIME_DIR"])
+        self.assertEqual(sorted(policy["set"]), ["DOCKER_HOST", "HOME", "IBKR_PAPER_LOGIN_ENV", "IBKR_PAPER_TWS_FILE",
+                                                 "IBKR_PAPER_VNC_FILE", "LANG", "MCP_AUTO_OPEN_ENABLED", "PAPER_ENV_FILE",
+                                                 "PAPER_ENV_FILE_2", "PATH", "PIT_ALPACA_ENV_PATH", "PIT_SEC_ENV_PATH",
+                                                 "RTK_TELEMETRY_DISABLED", "SEC_CONTACT_ENV", "TERM", "TMPDIR", "XDG_RUNTIME_DIR"])
         self.assertEqual(policy["set"]["HOME"], "/home/example")
         # The user's systemd runtime directory, for systemctl --user and the messaging courier, and the rootless Docker
         # socket in it (wave-2 custody ruling, change 7; synthesis X12): the id of the user the tool runs as.
@@ -2173,6 +2176,202 @@ class CodexOwnedMigrationTests(ApplyCase):
         self.assertTrue("needs the native Codex app-server writer" in out)
         self.assertEqual(tree(self.home), before)
         self.assertEqual(self.edits, [])
+class LoginEnvironmentTests(ApplyCase):
+    def test_one_render_matches_pointer_source_codex_and_a_fresh_login_shell(self):
+        self.installed_state()
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-600:] + err)
+        conf = self.home / ".config/environment.d/60-native-agent-stack.conf"
+        pointers = {key: str(value) for key, value in tomllib.loads(conf.read_text()).items()}
+        policy = tomllib.loads((self.home / ".codex/config.toml").read_text())["shell_environment_policy"]
+        self.assertEqual(policy["inherit"], "none")
+        self.assertEqual({key: policy["set"][key] for key in cfg.ENVIRONMENT_KEYS}, pointers)
+        probe = subprocess.run(["bash", "--noprofile", "--norc", "-c", '. "$HOME/.profile"; python3 -c \'import os,json; print(json.dumps({k:os.environ.get(k) for k in ' + json.dumps(list(cfg.ENVIRONMENT_KEYS)) + '}))\''],
+                               env={"HOME": str(self.home), "PATH": os.environ["PATH"]}, capture_output=True, text=True)
+        self.assertEqual(probe.returncode, 0, probe.stderr)
+        self.assertEqual(json.loads(probe.stdout), pointers)
+        self.assertEqual(run_main("--check-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))[0], 0)
+
+    def test_env_step_is_idempotent_and_dry_run_creates_nothing(self):
+        self.installed_state()
+        before = tree(self.home)
+        self.assertEqual(self.apply(dry=True)[0], 0)
+        self.assertEqual(tree(self.home), before)
+        self.assertEqual(self.apply()[0], 0)
+        once = tree(self.home)
+        self.assertEqual(self.apply()[0], 0)
+        self.assertEqual(tree(self.home), once)
+
+    def test_login_env_check_detects_drift_and_shadowed_profile_without_values(self):
+        self.installed_state()
+        self.assertEqual(self.apply()[0], 0)
+        conf = self.home / ".config/environment.d/60-native-agent-stack.conf"
+        conf.write_text(conf.read_text().replace("alpaca-paper.env", "wrong-pointer.env"))
+        (self.home / ".bash_profile").write_text("# Shadows .profile; operator-owned\n")
+        code, out, err = run_main("--check-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+        self.assertEqual(code, 1, err)
+        self.assertFalse(json.loads(out)["checks"]["environment_source"])
+        self.assertFalse(json.loads(out)["checks"]["profile_not_shadowed"])
+        self.assertNotIn(str(self.home), out)
+        self.assertNotIn("wrong-pointer.env", out)
+
+    def test_login_env_accepts_the_native_2604_profile_chain(self):
+        self.installed_state()
+        (self.home / ".bash_profile").write_text('if [ -r "$HOME/.profile" ]; then . "$HOME/.profile"; fi\n')
+        self.assertEqual(self.apply()[0], 0)
+        code, out, err = run_main("--check-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+        self.assertEqual(code, 0, out + err)
+        self.assertTrue(json.loads(out)["checks"]["profile_not_shadowed"])
+        self.assertNotIn(str(self.home), out + err)
+
+    def test_login_env_preflight_accepts_missing_keys_without_writing(self):
+        self.installed_state()
+        (self.home / ".bash_profile").write_text('if [ -r "$HOME/.profile" ]; then . "$HOME/.profile"; fi\n')
+        before = tree(self.home)
+        code, out, err = run_main("--preflight-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+        self.assertEqual(code, 0, out + err)
+        self.assertTrue(all(json.loads(out)["checks"].values()))
+        self.assertEqual(tree(self.home), before)
+        self.assertNotIn(str(self.home), out + err)
+
+    def test_login_env_preflight_refuses_a_non_chaining_profile_without_writing(self):
+        self.installed_state()
+        (self.home / ".bash_profile").write_text("# Operator profile does not chain\n")
+        before = tree(self.home)
+        code, out, err = run_main("--preflight-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+        self.assertEqual(code, 1, out + err)
+        self.assertFalse(json.loads(out)["checks"]["profile_not_shadowed"])
+        self.assertEqual(tree(self.home), before)
+
+    def test_login_env_preflight_refuses_preserved_policy_conflicts_without_values(self):
+        self.installed_state()
+        target = self.home / ".codex/config.toml"
+        for text, failed_key in (("[shell_environment_policy]\ninherit = \"all\"\n", "codex_inherit_none"),
+                ("[shell_environment_policy]\ninclude_only = [\"*PATH*\"]\n", "codex_pointer_filters"),
+                ("[shell_environment_policy.set]\nPAPER_ENV_FILE = \"operator-private-path\"\n", "codex_pointer_values")):
+            with self.subTest(key=failed_key):
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text(text)
+                before = tree(self.home)
+                code, out, err = run_main("--preflight-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+                self.assertEqual(code, 1, out + err)
+                self.assertFalse(json.loads(out)["checks"][failed_key])
+                self.assertEqual(tree(self.home), before)
+                self.assertNotIn("operator-private-path", out + err)
+
+    def test_login_env_preflight_rejects_malformed_empty_filter_fields(self):
+        self.installed_state()
+        target = self.home / ".codex/config.toml"
+        for field in ('filters = []', 'filters = false', 'include_only = ""', 'include_only = false',
+                      'filters = {}\ninclude_only = []', 'filters = {}\nexclude = []',
+                      'exclude = false', 'exclude = [1]', 'rules = {}'):
+            with self.subTest(field=field):
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_text('[shell_environment_policy]\n' + field + '\n')
+                before = tree(self.home)
+                code, out, err = run_main("--preflight-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+                self.assertEqual(code, 1, out + err)
+                self.assertFalse(json.loads(out)["checks"]["codex_pointer_filters"])
+                self.assertEqual(tree(self.home), before)
+        for field in ('include_only = []', 'filters = {}', 'exclude = ["*SECRET*"]'):
+            target.write_text('[shell_environment_policy]\n' + field + '\n')
+            code, out, err = run_main("--preflight-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+            self.assertEqual(code, 0, out + err)
+
+    def test_login_profile_uses_only_the_first_candidate_without_skipping_read_errors(self):
+        first, second = self.home / ".bash_profile", self.home / ".bash_login"
+        second.write_text('. "$HOME/.profile"\n')
+        self.assertTrue(cfg.login_profile_reaches_profile(self.home))
+        first.write_text("# Readable file prevents fallback\n")
+        self.assertFalse(cfg.login_profile_reaches_profile(self.home))
+        with mock.patch.object(cfg.os, "access", return_value=False):
+            self.assertFalse(cfg.login_profile_reaches_profile(self.home))
+        first.write_text('source "${HOME}/.profile"\n')
+        self.assertTrue(cfg.login_profile_reaches_profile(self.home))
+        first.unlink()
+        second.write_text("if false; then . \"$HOME/.profile\"; fi\n")
+        self.assertFalse(cfg.login_profile_reaches_profile(self.home))
+        second.write_text(". '$HOME/.profile'\n")
+        self.assertFalse(cfg.login_profile_reaches_profile(self.home))
+
+    def test_login_profile_rejects_non_native_line_and_blank_normalization(self):
+        target = self.home / ".bash_profile"
+        for text in ('. "$HOME/.profile"\r\n', '# comment\u2028. "$HOME/.profile"\n',
+                     '\u00a0. "$HOME/.profile"\n', '. "$HOME/.profile"\x00\n'):
+            with self.subTest(text=repr(text)):
+                target.write_bytes(text.encode("utf-8"))
+                self.assertFalse(cfg.login_profile_reaches_profile(self.home))
+        target.write_bytes(b'# comment\n\t. "$HOME/.profile"\n')
+        self.assertTrue(cfg.login_profile_reaches_profile(self.home))
+
+    def test_login_env_preflight_refuses_malformed_managed_block_without_writing(self):
+        self.installed_state()
+        (self.home / ".profile").write_text(managed_block.PROFILE_ENV_BEGIN + "\n")
+        before = tree(self.home)
+        code, out, err = run_main("--preflight-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+        self.assertEqual(code, 1, out + err)
+        self.assertEqual(tree(self.home), before)
+        self.assertNotIn(str(self.home), out + err)
+
+    def test_login_env_preflight_refuses_an_unextendable_inline_policy_without_writing(self):
+        self.installed_state()
+        target = self.home / ".codex/config.toml"
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text('shell_environment_policy = {inherit = "none"}\n')
+        before = tree(self.home)
+        code, out, err = run_main("--preflight-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+        self.assertEqual(code, 1, out + err)
+        self.assertEqual(tree(self.home), before)
+        self.assertNotIn(str(self.home), out + err)
+
+    def test_pointer_template_rejects_executable_or_undefined_substitutions(self):
+        with tempfile.TemporaryDirectory() as scratch:
+            root = Path(scratch)
+            target = root / cfg.ENVIRONMENT_TEMPLATE
+            target.parent.mkdir(parents=True)
+            original = (ROOT / cfg.ENVIRONMENT_TEMPLATE).read_text()
+            for substitute in ("$(id)", "`id`", "${UNDECLARED}"):
+                target.write_text(original.replace("${HOME}", substitute))
+                with self.assertRaises(cfg.ConfigError):
+                    cfg.pointer_environment(root, {"HOME": str(self.home)})
+
+    def test_pointer_renderer_rejects_home_control_characters(self):
+        for char in ("\t", "\x01", "\x7f"):
+            with self.subTest(codepoint=ord(char)), self.assertRaises(cfg.ConfigError):
+                cfg.pointer_environment(ROOT, {"HOME": "/synthetic" + char})
+
+    def test_own_check_rejects_a_codex_filter_that_discards_pointers(self):
+        self.installed_state()
+        self.assertEqual(self.apply()[0], 0)
+        path = self.home / ".codex/config.toml"
+        data = tomllib.loads(path.read_text())
+        for name, filters in (("include_only", ["PATH"]), ("filters", {"PATH": "include"})):
+            with self.subTest(filter_api=name):
+                changed = copy.deepcopy(data)
+                changed["shell_environment_policy"][name] = filters
+                path.write_text(cfg.emit_toml(changed, ""))
+                code, out, err = run_main("--check-login-env", "--host", EXAMPLE_HOST, "--home", str(self.home))
+                self.assertEqual(code, 1, err)
+                self.assertTrue(json.loads(out)["checks"]["codex_pointer_values"])
+                self.assertFalse(json.loads(out)["checks"]["codex_pointer_filters"])
+
+    def test_pointer_env_concurrent_write_is_preserved_and_reported(self):
+        self.installed_state()
+        target = self.home / ".config/environment.d/60-native-agent-stack.conf"
+        native_write = cfg.lane.atomic_write
+        concurrent = b"# another pointer-source writer\n"
+
+        def changed(path, data, mode, expected, **kwargs):
+            if path == target:
+                path.write_bytes(concurrent)
+            return native_write(path, data, mode, expected, **kwargs)
+
+        with mock.patch.object(cfg.lane, "atomic_write", side_effect=changed):
+            code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-600:] + err)
+        self.assertEqual(target.read_bytes(), concurrent)
+        self.assertIn("login-env failed", out)
+        self.assertIn("summary:", out)
 
 
 class ApplyTests(ApplyCase):
@@ -2226,16 +2425,16 @@ class ApplyTests(ApplyCase):
         self.assertEqual(tree(self.home), once)
         summary = second[1].split("summary: ")[1]
         for step in ("claude-hooks", "claude-agents", "claude-mcp", "claude-settings", "claude-launcher", "claude-md",
-                     "codex-config", "codex-files", "codex-md", "login-path"):
+                     "codex-config", "codex-files", "codex-md", "login-path", "login-env"):
             self.assertIn(f"{step} current", summary)
         # Native RTK first creates the import; adopting our managed block backs
         # that original file up once. The complete tree comparison above proves
         # the second adoption neither changes files nor adds another backup.
         backups = [p for p in self.home.rglob("*") if ".bak." in p.name]
-        self.assertEqual(len(backups), 1)
-        self.assertEqual(backups[0].parent, self.home / ".claude")
-        self.assertTrue(backups[0].name.startswith("CLAUDE.md.bak."))
-        self.assertEqual(backups[0].read_text(encoding="utf-8"), "@RTK.md\n")
+        self.assertEqual(len(backups), 2)  # Native RTK import and the intermediate PATH-only profile.
+        imported = next(p for p in backups if p.parent == self.home / ".claude")
+        self.assertTrue(imported.name.startswith("CLAUDE.md.bak."))
+        self.assertEqual(imported.read_text(encoding="utf-8"), "@RTK.md\n")
 
     def test_the_first_run_writes_what_the_wired_pieces_name_and_nothing_else(self):
         self.installed_state()
@@ -2419,8 +2618,8 @@ class ApplyTests(ApplyCase):
         self.assertEqual(code, 0, out[-800:])
         for path, content in original.items():
             backups = [p for p in path.parent.iterdir() if p.name.startswith(path.name + ".bak.")]
-            self.assertEqual(len(backups), 1, path.name)
-            self.assertEqual(backups[0].read_bytes(), content)
+            self.assertEqual(len(backups), 2 if path.name == ".profile" else 1, path.name)
+            self.assertTrue(any(p.read_bytes() == content for p in backups))
         settings = json.loads((claude / "settings.json").read_text())
         self.assertEqual(settings["hostOnly"], {"keep": 1})
         self.assertEqual(settings["theme"], "light")   # a person's choice: the template's "dark" is not written over it
@@ -2501,7 +2700,7 @@ class ApplyTests(ApplyCase):
 
     def test_a_skipped_step_changes_nothing(self):
         self.installed_state()
-        code, out, _ = self.apply("--skip", "claude-agents", "--skip", "codex-files", "--skip", "login-path")
+        code, out, _ = self.apply("--skip", "claude-agents", "--skip", "codex-files", "--skip", "login-path", "--skip", "login-env")
         self.assertEqual(code, 0, out[-400:])
         self.assertFalse((self.home / ".claude/agents").exists())
         self.assertFalse((self.home / ".codex/agents").exists())

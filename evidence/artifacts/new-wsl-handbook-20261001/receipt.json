@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04",
   "outputs": {
-    "docs/new-wsl-handbook.md": "05ec525a60a6bad90b5f4161473a2aa015107c724fdfe0328f2166e3e73453a0",
-    "docs/new-wsl-handbook.json": "bb5a4dc62aabc938b56b038ddb4ae3df036395ccd44cc72720436ad3aa19b33d"
+    "docs/new-wsl-handbook.md": "ce3f7a93c41f9cca64915464254ea55a19eaf8c82345d338ead425ba70eb1c2b",
+    "docs/new-wsl-handbook.json": "69373591665f6591885bee2df05ad64ed7d1e0adfa02b53b7c17080de32a697a"
   },
   "inventory": {
     "layers": 37,
@@ -451,6 +451,20 @@
       },
       "native_exit_code": 0,
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "PYTHONDONTWRITEBYTECODE=1 rtk proxy nice -n 19 python3 -B scripts/build_new_wsl_handbook.py --write",
+      "cause": "PR #770 rebased onto main 0d5e6506434fab598dee861c749a22e628beb75a, retaining the landed service-tier migration; pointer-source inputs and unreleased guide markers changed the native handbook digests. Original regeneration and execution records remain historical.",
+      "regenerated_against_main": "0d5e6506434fab598dee861c749a22e628beb75a",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "05ec525a60a6bad90b5f4161473a2aa015107c724fdfe0328f2166e3e73453a0",
+        "docs/new-wsl-handbook.json": "bb5a4dc62aabc938b56b038ddb4ae3df036395ccd44cc72720436ad3aa19b33d"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check",
+      "evidence_class": "local_integration",
+      "limits": "Generated-output integrity; no new host, provider or GPU acceptance."
     }
   ]
 }

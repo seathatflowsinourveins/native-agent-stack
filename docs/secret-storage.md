@@ -20,7 +20,7 @@ against it.
 | `typesafe` | Typesafe key, for the live-judge mode of `gap_crosswalk.py` and the native-skill-practice Jev provider in `blueprints/native-skill-practice/promptfooconfig.yaml`; start each through `tools/credentials/credential_run.py typesafe -- <command>`. A trading-lane use needs its own, separately authorized key | only when you pay for it | `<store>/typesafe.env` | `TYPESAFE_API_KEY` |
 | `omniroute` | OmniRoute local gateway key, one per lane. The workstation gateway runs keyless on loopback, so callers pass the placeholder `local-loopback` ([decision](decisions/2026-09-27-omniroute-account-pool.md)) | optional | `<store>/omniroute.env` | `OMNIROUTE_API_KEY` |
 | `tavily` | Tavily API key. Until 2026-09-29 it lived only in the kernel keyring; its first file write comes from that copy through the create-only chain in [Kernel keyring](#kernel-keyring-transport-and-per-boot-spare-2026-09-29) | optional | `<store>/tavily.env` | `TAVILY_API_KEY` |
-| `grafana-admin` | Local Grafana admin account and secret key | generated locally | `~/.config/ecosystem-observability/ecosystem-grafana.env` | `GF_SECURITY_*` |
+| `grafana-admin` | Local Grafana admin account and secret key; selected new-WSL store | generated locally | `~/.config/new-wsl-native-stack/grafana.env` | `GF_SECURITY_*` |
 | `nativestack-generation-key` | Host service key | generated locally | `~/.config/nativestack/generation.key` | none |
 | `openhands-session` | OpenHands agent-server session key for one runtime-worker attempt ([decision](decisions/2026-09-28-openhands-resolver-isolation.md)) | generated locally, per attempt; deleted after the attempt's containers are confirmed removed | `~/.local/state/native-agent-stack/runtime-workers/openhands/secrets/<run-id>-<arm>.server.env`, plus the `.headers` file beside it | none on the host; `OH_SESSION_API_KEYS_0` exists only inside the agent-server container (Docker `--env-file`) |
 | `claude-native`, `codex-native`, `gh-native` | Native sign-ins | stored by each tool | each tool's own store | none |
@@ -280,17 +280,49 @@ Live broker keys are out of scope for this repository. Live trading is handled o
 
 ## Picking up in a new session
 
-Put the file paths, never the values, in your shell startup file once:
+On the new WSL profile there is nothing to set in a new session. F9 installs the pointer-only source
+`~/.config/environment.d/60-native-agent-stack.conf` from
+[`adoption/templates/environment.d/60-native-agent-stack.conf`](../adoption/templates/environment.d/60-native-agent-stack.conf).
+The systemd user manager reads it; the managed `profile-env` block in `~/.profile` exports its assignments; Codex's
+`inherit = "none"` policy receives the same resolved pointer names in its explicit `set` table. The original five names are
+`PAPER_ENV_FILE`, `PAPER_ENV_FILE_2`, `SEC_CONTACT_ENV`, `PIT_ALPACA_ENV_PATH`, and `PIT_SEC_ENV_PATH`. The IBKR owner's three
+additional names are `IBKR_PAPER_LOGIN_ENV`, `IBKR_PAPER_TWS_FILE` and `IBKR_PAPER_VNC_FILE`; telemetry is disabled
+with `RTK_TELEMETRY_DISABLED=1`. Only paths are exported, never credential values.
 
-```sh
-# ~/.bashrc or ~/.zshrc: pointers only; no credential value is exported
-_nas_store="${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack"
-export PAPER_ENV_FILE="$_nas_store/alpaca-paper.env"
-export PAPER_ENV_FILE_2="$_nas_store/alpaca-paper-2.env"   # second paper account, where this host holds one
-export SEC_CONTACT_ENV="$_nas_store/sec-contact.env"
-export PIT_ALPACA_ENV_PATH="$PAPER_ENV_FILE" PIT_SEC_ENV_PATH="$SEC_CONTACT_ENV"
-unset _nas_store
-```
+The selected profile renders the conventional stores under the chosen home's `.config/native-agent-stack`.
+`python3 scripts/credential_status.py --require-pointers` checks each pointer's presence and inventory-path parity,
+without opening or resolving the pointed-to store or printing either path. Optional second-account file presence remains
+informational; it does not remove that pointer from the eight-name contract. The separately owned IBKR store/security
+rows must land before the host `--require-pointers` gate can pass; this environment change does not duplicate those rows.
+
+For the frozen 2026-10-06 paper units, keep the `PAPER_ENV_FILE_2` export in `~/.bashrc` unchanged until
+2026-10-07T00:10Z: they still launch through `/bin/bash -ic`. The owner performs the guarded by-name cleanup as a
+separate phase after that cutoff. Before future units rely on environment.d, a new user-manager child must prove every
+pointer is nonempty and its store is readable in its intended consumer context, with no value output; the co-op reports
+the result to the paper owner. The two IBKR passwords retain their rootless-container ownership: their readability is
+proved as that container's uid 1000, with readonly-mount identity checked, rather than weakening custody for a host-shell check.
+systemd v259.5 reruns environment generators on manager startup and `daemon-reload`
+([native lifecycle](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.environment-generator.xml#L54-L73)).
+The [owner procedure](../evidence/artifacts/pointer-environment-transfer-20261006/README.md) runs value-free preflight
+before any mutation. It defers all host writes, manager reload and Dagu restart until the frozen 10-06 paper run has
+finished, no earlier than 2026-10-07T00:10Z. A later apply or rollback also requires that day's explicit 5f-approved
+windows; missing, malformed or stale scheduling data fails closed. No running case is killed.
+
+For this transfer, `grafana-admin` names the existing `new-wsl-native-stack/grafana.env` store; this is an inventory
+correction, not a rerun of the generic `observability/backends/configure.py` producer.
+The selected `grafana-admin` entry names no producer; `grafana-admin-generic` separately preserves that recipe's
+`ecosystem-observability/ecosystem-grafana.env` inventory coverage. The Claude template denies reads of service `.env`
+files in `new-wsl-native-stack`, and the guard explicitly recognizes the selected Grafana path. Its preexisting dotenv
+reader rule already blocked modeled Bash reads; this change does not claim those reads were previously unrestricted.
+
+The host generation key is regenerated through its own service only if that service moves. The separate
+`omniroute-fw-lane.env` store remains
+conditional on Phase 3 selecting an actual 20129 route; otherwise it is excluded. These conditions do not copy a
+credential or private key between hosts.
+
+Sources: [systemd/systemd@v259.5 environment.d(5)](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/environment.d.xml#L59),
+[environment generators](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.environment-generator.xml#L116),
+and [Codex's literal set values](https://github.com/openai/codex/blob/a956835d020762cb2b570053af06f643a11c0ecc/codex-rs/protocol/src/shell_environment.rs#L138).
 
 Every later session, whether yours or an agent's, then uses the existing
 recipes unchanged. For example:
@@ -497,6 +529,8 @@ Values never go through an agent, a chat, a gist, GitHub or shell history.
    `%h/.config/native-agent-stack/alpaca-paper.env` in `ExecStart=`. Do not
    use `EnvironmentFile=`: it puts the values into
    `/proc/<pid>/environ`. No secret is written into the unit or plist.
+    For paper units generated from 2026-10-07, use the runner's direct `--env-file` argument in `ExecStart=` and no
+    `bash -ic` wrapper. The 2026-10-06 units stay untouched; historical launch receipts are not a generation template.
    Model-serving units need no Hugging Face token at all: they serve from a
    pinned local directory, and new units set `Environment=HF_HUB_OFFLINE=1`
    (see [Hugging Face sign-in](#hugging-face-sign-in) for llama.cpp, which

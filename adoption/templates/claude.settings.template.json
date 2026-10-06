@@ -38,6 +38,8 @@
       "Edit(~/.config/native-agent-stack/**)",
       "Read(~/.config/ecosystem-observability/*.env)",
       "Read(**/.config/ecosystem-observability/*.env)",
+      "Read(~/.config/new-wsl-native-stack/*.env)",
+      "Read(**/.config/new-wsl-native-stack/*.env)",
       "Read(~/.config/nativestack/*.key)",
       "Read(**/.config/nativestack/*.key)",
       "Read(~/.claude/.credentials.json)",

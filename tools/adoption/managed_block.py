@@ -287,6 +287,31 @@ def merged_profile(current: str, eco_root: str, home: str, extra_dirs: tuple[str
     return with_block(current, profile_block(eco_root, home, extra_dirs), PROFILE_BEGIN, PROFILE_END)
 
 
+PROFILE_ENV_BEGIN = "# native-agent-stack:profile-env:begin"
+PROFILE_ENV_END = "# native-agent-stack:profile-env:end"
+
+
+def profile_env_block(env_file: str, home: str) -> str:
+    """Source only the generated pointer file; POSIX set -a exports its assignments.
+
+    systemd/systemd@b3d8fc43:man/environment.d.xml:59-74 and bash@5.3:builtins/set.def (allexport).
+    Preserve a caller that already enabled allexport, while restoring the ordinary disabled state.
+    """
+    target = shell_dir(env_file, home, "pointer environment file")
+    return (f"{PROFILE_ENV_BEGIN}\n"
+            f'if [ -r "{target}" ]; then\n'
+            "  case $- in\n"
+            f'    *a*) . "{target}" ;;\n'
+            f'    *) set -a; . "{target}"; set +a ;;\n'
+            "  esac\n"
+            "fi\n"
+            f"{PROFILE_ENV_END}\n")
+
+
+def merged_profile_env(current: str, env_file: str, home: str) -> str:
+    return with_block(current, profile_env_block(env_file, home), PROFILE_ENV_BEGIN, PROFILE_ENV_END)
+
+
 def read_target(path: Path) -> tuple[str, int | None]:
     """(text, mode) of the target; ("", None) when it does not exist."""
     try:
@@ -362,6 +387,9 @@ def build_parser() -> argparse.ArgumentParser:
                          help="another absolute directory to put on PATH when it is not on it yet, behind the "
                               "ecosystem's bin directory (repeatable; none by default). A host whose tools come from "
                               "native installers and mise names ~/.local/bin and mise's shims directory here")
+    env = blocks.add_parser("profile-env", help="source the generated non-secret pointer file from ~/.profile")
+    env.add_argument("--target", type=Path, help="default: <home>/.profile")
+    env.add_argument("--env-file", required=True, help="generated environment.d pointer file (no credential file)")
     return parser
 
 
@@ -408,6 +436,8 @@ def main(argv: list[str] | None = None) -> int:
             template = args.template.read_text(encoding="utf-8")
             return apply(codex_home / "AGENTS.md", lambda text: merged_codex_md(text, template), dry_run=args.dry_run)
         target = args.target or Path(home) / ".profile"
+        if args.block == "profile-env":
+            return apply(target, lambda text: merged_profile_env(text, args.env_file, home), dry_run=args.dry_run)
         extra_dirs = tuple(args.extra_dir)
         return apply(target, lambda text: merged_profile(text, args.eco_root, home, extra_dirs), dry_run=args.dry_run)
     except (Refused, file_io.ApplyError) as error:

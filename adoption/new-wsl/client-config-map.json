@@ -703,6 +703,14 @@
       "match": [
         "codex/config/shell_environment_policy.inherit",
         "codex/config/shell_environment_policy.set.HOME",
+        "codex/config/shell_environment_policy.set.PAPER_ENV_FILE",
+        "codex/config/shell_environment_policy.set.PAPER_ENV_FILE_2",
+        "codex/config/shell_environment_policy.set.SEC_CONTACT_ENV",
+        "codex/config/shell_environment_policy.set.PIT_ALPACA_ENV_PATH",
+        "codex/config/shell_environment_policy.set.PIT_SEC_ENV_PATH",
+        "codex/config/shell_environment_policy.set.IBKR_PAPER_LOGIN_ENV",
+        "codex/config/shell_environment_policy.set.IBKR_PAPER_TWS_FILE",
+        "codex/config/shell_environment_policy.set.IBKR_PAPER_VNC_FILE",
         "codex/config/shell_environment_policy.set.LANG",
         "codex/config/shell_environment_policy.set.TERM",
         "codex/config/shell_environment_policy.set.TMPDIR",
@@ -846,6 +854,11 @@
       ],
       "wiring": "practice",
       "note": "The managed PATH block of managed_block.py profile-path, in ~/.profile."
+    },
+    {
+      "match": ["step/login-env-block"],
+      "wiring": "practice",
+      "source": "systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:man/environment.d.xml:59-74; one pointer template is read by the user manager, managed_block.py profile-env and the explicit Codex environment table."
     },
     {
       "match": [

@@ -71,7 +71,8 @@ class CredentialStatusTests(unittest.TestCase):
 
     def report(self, env=None, **kwargs):
         kwargs.setdefault("proc_keys", self.proc_keys)
-        return cs.inspect(ROOT, self.inventory, self.env if env is None else env, **kwargs)
+        inventory = kwargs.pop("inventory", self.inventory)
+        return cs.inspect(ROOT, inventory, self.env if env is None else env, **kwargs)
 
     def entry(self, report, identifier="alpaca-paper"):
         return next(e for e in report["entries"] if e["id"] == identifier)
@@ -96,6 +97,88 @@ class CredentialStatusTests(unittest.TestCase):
                          "huggingface-native", "huggingface-native-stored"} <= ids)
         self.assertIn("HUGGING_FACE_HUB_TOKEN", self.inventory["must_not_be_set"])
         self.assertIn("HF_TOKEN", self.inventory["must_not_be_set"])
+
+    def test_selected_and_generic_grafana_stores_keep_separate_provenance(self):
+        rows = {e["id"]: e for e in self.inventory["entries"]}
+        selected, generic = rows["grafana-admin"], rows["grafana-admin-generic"]
+        self.assertEqual(selected["loaders"], [])
+        self.assertTrue(selected["store"]["path_template"].endswith("/new-wsl-native-stack/grafana.env"))
+        self.assertTrue(generic["store"]["path_template"].endswith("/ecosystem-observability/ecosystem-grafana.env"))
+        self.assertEqual(generic["loaders"], ["observability/backends/configure.py#systemd-EnvironmentFile"])
+        self.assertEqual(selected["status"], generic["status"])
+
+    def pointer_inventory(self):
+        # Synthetic metadata for the separately owned IBKR rows, whose canonical paths are pinned at bf1d143c.
+        inventory = copy.deepcopy(self.inventory)
+        for name, basename in (("IBKR_PAPER_LOGIN_ENV", "ibkr-paper-login.env"),
+                               ("IBKR_PAPER_TWS_FILE", "ibkr-paper-tws.password"),
+                               ("IBKR_PAPER_VNC_FILE", "ibkr-paper-vnc.password")):
+            existing = [e for e in inventory["entries"] if name in e.get("pointer_variables", [])]
+            if existing:
+                self.assertEqual(len(existing), 1)
+                self.assertEqual(existing[0]["store"]["path_template"], cs.STORE_ROOT + "/" + basename)
+                continue
+            inventory["entries"].append({"id": "synthetic-" + name.lower().replace("_", "-"), "label": "Synthetic pointer metadata",
+                "class": "local_service_secret", "status": "optional", "lane": "test", "store": {
+                    "kind": "private_file", "path_template": cs.STORE_ROOT + "/" + basename},
+                "variables": [], "optional_variables": [], "pointer_variables": [name], "loaders": [],
+                "environment_only_consumers": [], "rotation": "fixture only", "notes": "No credential file created."})
+        return inventory
+
+    def test_pointer_fixture_reuses_landed_owner_rows(self):
+        self.inventory = self.pointer_inventory()
+        repeated = self.pointer_inventory()
+        self.assertEqual(repeated, self.inventory)
+        self.assertTrue(all(row["inventory_declared"] for row in cs.pointer_status(repeated, self.matching_pointer_env())))
+
+    def matching_pointer_env(self):
+        env = dict(self.env)
+        for name in cs.REQUIRED_POINTERS:
+            row = next(e for e in self.pointer_inventory()["entries"] if name in e.get("pointer_variables", []))
+            env[name] = str(cs.expand_template(row["store"]["path_template"], env))
+        return env
+
+    def test_pointer_matching_is_value_free_and_does_not_open_or_resolve_targets(self):
+        env = self.matching_pointer_env()
+        with patch.object(Path, "open", side_effect=AssertionError("pointer target read")), patch.object(Path, "resolve", side_effect=AssertionError("pointer target resolution")):
+            rows = cs.pointer_status(self.pointer_inventory(), env)
+        self.assertEqual(len(rows), 8)
+        self.assertTrue(all(r["set"] and r["matches_inventory"] for r in rows))
+        self.assert_no_values(json.dumps(rows))
+
+    def test_required_pointers_are_independent_of_optional_store_presence(self):
+        report = self.report(env=self.matching_pointer_env(), require_pointers=True, inventory=self.pointer_inventory())
+        self.assertEqual(report["pointer_failures"], [])
+        self.assertEqual(self.entry(report, "alpaca-paper-2")["state"], "missing")
+        self.assert_no_values(json.dumps(report), cs.render_text(report))
+
+    def test_unset_empty_wrong_and_undeclared_pointer_fail_without_echoing_values(self):
+        for value in (None, "", str(self.home / "private-sentinel")):
+            with self.subTest(value_state=type(value).__name__):
+                env = self.matching_pointer_env()
+                if value is None:
+                    del env["PAPER_ENV_FILE"]
+                else:
+                    env["PAPER_ENV_FILE"] = value
+                report = self.report(env=env, require_pointers=True, inventory=self.pointer_inventory())
+                self.assertEqual(report["pointer_failures"], ["PAPER_ENV_FILE"])
+                self.assertEqual(report["result"], "pointer_mismatch")
+                self.assert_no_values(json.dumps(report), cs.render_text(report))
+        inventory = self.pointer_inventory()
+        next(e for e in inventory["entries"] if e["id"] == "alpaca-paper")["pointer_variables"].remove("PAPER_ENV_FILE")
+        row = cs.pointer_status(inventory, self.matching_pointer_env())[0]
+        self.assertFalse(row["inventory_declared"])
+        self.assertFalse(row["matches_inventory"])
+
+    def test_require_pointer_cli_json_and_text_gate_are_private(self):
+        for mode in ((), ("--json",)):
+            self.env = self.matching_pointer_env()
+            result = self.run_cli("--require-pointers", "--inventory", str(self.planted(self.pointer_inventory())), *mode)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertIn("PAPER_ENV_FILE", result.stdout)
+            self.env["PAPER_ENV_FILE"] = str(self.home / "wrong-pointer")
+            result = self.run_cli("--require-pointers", "--inventory", str(self.planted(self.pointer_inventory())), *mode)
+            self.assertEqual(result.returncode, 1, result.stderr)
 
     def test_second_paper_row_mirrors_the_first(self):
         # alpaca-paper-2 names the second paper account's existing file: same class, lane, store kind and variables as

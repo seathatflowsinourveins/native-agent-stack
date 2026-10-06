@@ -468,6 +468,42 @@ class DecisionMdBlockTests(ManagedBlockCase):
         self.assertEqual(list(self.target.parent.glob(".shared.md.*.tmp")), [])
 
 
+class ProfileEnvBlockTests(ManagedBlockCase):
+    def test_pointer_reader_preserves_operator_text_and_is_idempotent(self):
+        target = self.home / ".profile"
+        target.write_text("# operator owns this\n")
+        pointer = self.home / ".config/environment.d/60-native-agent-stack.conf"
+        args = ["--home", str(self.home), "profile-env", "--env-file", str(pointer)]
+        self.assertEqual(run(*args)[0], 0)
+        before = target.read_bytes()
+        self.assertIn(b"# operator owns this", before)
+        self.assertIn(b"set -a; .", before)
+        self.assertEqual(run(*args)[0], 0)
+        self.assertEqual(target.read_bytes(), before)
+        self.assertEqual(len(self.backups(target)), 1)
+
+    def test_pointer_assignments_are_exported_and_allexport_state_is_preserved(self):
+        pointer = self.home / ".config/environment.d/60-native-agent-stack.conf"
+        pointer.parent.mkdir(parents=True)
+        pointer.write_text('PAPER_ENV_FILE="${HOME}/synthetic-pointer"\nRTK_TELEMETRY_DISABLED=1\n')
+        target = self.home / ".profile"
+        self.assertEqual(run("--home", str(self.home), "profile-env", "--env-file", str(pointer))[0], 0)
+        for enabled in (False, True):
+            code = ('set -a; ' if enabled else '') + '. "$HOME/.profile"; '
+            code += 'case $- in *a*) echo on;; *) echo off;; esac; sh -c \'test "$PAPER_ENV_FILE" = "$HOME/synthetic-pointer" && test "$RTK_TELEMETRY_DISABLED" = 1\''
+            result = subprocess.run([SH, "-c", code], env={"HOME": str(self.home), "PATH": "/usr/bin:/bin"},
+                                    capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            self.assertEqual(result.stdout.strip(), "on" if enabled else "off")
+
+    def test_profile_env_dry_run_writes_nothing(self):
+        pointer = self.home / ".config/environment.d/60-native-agent-stack.conf"
+        code, out, err = run("--home", str(self.home), "--dry-run", "profile-env", "--env-file", str(pointer))
+        self.assertEqual(code, 0, err)
+        self.assertIn("DRY RUN", out)
+        self.assertEqual(list(self.home.iterdir()), [])
+
+
 class ProfilePathBlockTests(ManagedBlockCase):
     # Blocks pinned as text, not computed by the code under test. ORDINARY_BLOCK, OMITTED_PROFILE and ROOT_ECO_BLOCK
     # are the bytes the code wrote before the root-directory fix; ROOT_EXTRA_BLOCK replaces the empty component that
