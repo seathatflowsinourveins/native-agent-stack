@@ -94,8 +94,23 @@ def ignored(rel: str) -> bool:
     return git("check-ignore", "-q", rel).returncode == 0  # host-local files (adoption/hosts/*.json)
 
 
+SCAFFOLD = "adoption/scaffold/"
+
+
 def at_commit(commit: str, rel: str) -> bool:
     return git("cat-file", "-e", f"{commit}:{rel}").returncode == 0
+
+
+def held(commit: str, rel: str) -> bool:
+    """For the pinned release's self-consistency only: the commit holds rel, or rel names a file that
+    tools/adoption/scaffold_repo.py writes into another repository (adoption/bootstrap.md's "File in the new repository"
+    table, adoption/update.md's --force example) and the commit holds its source under adoption/scaffold/, as the file or
+    its .template. The scaffold reading applies only when no file of this repository has that path, so a real file that a
+    release lacks is never hidden; due() keeps the literal at_commit."""
+    if at_commit(commit, rel):
+        return True
+    return repo_file(rel) is None and any(
+        at_commit(commit, f"{SCAFFOLD}{rel}{suffix}") for suffix in ("", ".template"))
 
 
 def worktree_paths() -> set[str]:
@@ -132,8 +147,8 @@ def new_host_docs() -> list[str]:
 def repo_file(rel: str) -> str | None:
     """rel normalized, if it names a regular file (or a symlink) inside the repository."""
     rel = posixpath.normpath(rel)
-    if rel.startswith(("../", "/")) or rel in (".", ".."):
-        return None
+    if rel.startswith(("../", "/", ".git/")) or rel in (".", "..", ".git"):
+        return None  # Git metadata (a clone's .git/info/exclude) is never a release input
     path = ROOT / rel
     return rel if (path.is_file() or path.is_symlink()) and not path.is_dir() else None
 

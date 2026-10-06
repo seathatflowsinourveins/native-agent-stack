@@ -1507,6 +1507,8 @@ Hosted and live results after merge. Evidence class: hosted runs and GitHub API 
 
 ## validate-macos required (2026-09-25)
 
+> Superseded 2026-10-05: macOS CI is advisory; see [docs/decisions/2026-10-05-macos-ci-advisory.md](2026-10-05-macos-ci-advisory.md).
+
 > **Superseded in part 2026-10-03:** flake overturn met 09-30; the prescribed non-required lane was rejected; see
 > [2026-10-03-macos-ci-scope.md](2026-10-03-macos-ci-scope.md). `validate-macos` stays required; on a pull request it
 > now runs in full, runs only the changed test modules, or is skipped, as the `changes` job decides.
@@ -2022,3 +2024,47 @@ follows. The `gh api` GETs quoted below were taken by the coordinator on
   `github_owned_allowed`/`patterns_allowed` (add a `patterns_allowed` entry
   here with a dated reason), or a currently-used GitHub-owned action becomes
   blocked under `selected`.
+
+### Four production relocks and preserved receipt inputs (2026-10-06)
+
+The J-FSSPEC wave fixes fsspec 2025.9.0 to 2026.6.0 and multidict 6.7.0 to
+6.9.1 in the OpenHands lock, Mako 1.4.1 to 1.4.2 in the application Python
+lock, and source-map-js 1.2.1 to 1.2.2 in its pnpm lock. Published dependent
+ranges permit each fix; native targeted resolvers change no other package.
+The #562 OpenHands control reproduces the original lock byte for byte, and
+the hashed isolated install/imports and #587 frontend qualification pass.
+The first live scan found two ordinary findings; a subsequent unchanged-main
+scan found five as fresh records reached OSV. Both snapshots remain evidence.
+
+The command center's task-ns2604-coop-20261006T003954Z selects a dated exception
+for GHSA-68fv-2mgg-jv7q under the existing dedicated macOS config until
+2026-12-24. Indexed section offsets enter SourceMapConsumer's indexed consumer
+and SourceNode reconstruction; PR 79 also fixes nested getter/generator work.
+The retained artifact is hash-bound and has no current supported installer,
+build or server route in the inspected entrypoints. Manual replay is possible;
+this source review does not qualify it. Its bytes stay unchanged. Evidence:
+evidence/receipts/osv-frozen-macos-source-map-js-20261005.json. The `.frozen`
+rename remains a separate follow-up, not an alternative silently applied here.
+
+The same ruling excludes the captured Lumibot runtime and sibling ibapi build
+lockchecks of the preregistered 2026-09-26 SPY one_zero trial (#336, 20b52a5b).
+The condition is met by native-agent-stack-5f's confirmation **report** row
+report-native-agent-stack-5f-20261006T0045Z-osv at 2026-10-06T00:41:23Z,
+replying to task-native-agent-stack-5f-20261006T004011Z: both are captured
+evidence, not live inputs. The ledger row is a report, despite the co-op's
+informal description as an ack. No trial bytes are changed and no Werkzeug
+ignore is added. Before replay or adoption, qualify a separately maintained,
+scanned environment. The inventory description now covers captured evidence
+fixtures as well as deliberately vulnerable test fixtures, following the
+existing XNYS engine-baseline precedent.
+
+The ordinary and frozen scans both exit 0 after these rulings. A local scan,
+install/import or synthetic guard is distinct from hosted acceptance and from
+unchanged upstream tests. A fresh finding, changed artifact bytes, any new
+consuming route, manual replay or expiry reopens the respective acceptance.
+Sources: the four GitHub advisories GHSA-27vj-qcqg-25rc,
+GHSA-54p9-h82j-f925, GHSA-5639-2j2p-m4mx and GHSA-68fv-2mgg-jv7q;
+fsspec/filesystem_spec@2026.6.0, aio-libs/multidict@v6.9.1,
+sqlalchemy/mako@rel_1_4_2 and 7rulnik/source-map-js@v1.2.2; #562 at
+74cc5468 and #587 at 798ac445. Native evidence is retained in the three
+relock-2026-10-05 prefixes and linked receipts.

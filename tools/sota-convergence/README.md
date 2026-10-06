@@ -167,9 +167,16 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    (with every taxonomy layer it sits in) plus each `trading-pins.json` entry
    (`--trading-pins`, default `<work-dir>/trading-pins.json`). Rows use the
    manifest's own `compute_upstream`/`classify_pin` fields and add a
-   `dormancy` block from `compute_dormancy`. An upstream is dormant when its
-   newest GitHub release and default-branch head commit are both at least 180
-   days before `--checked-at`. `pushed_at` stands in only when the commit date
+   `dormancy` block from `compute_dormancy`. A row is dormant when the newest
+   of `releases/latest`, that row's definitively selected release-stream
+   publication (if any), and the default-branch head commit is at least 180
+   days before `--checked-at`. Known limitation: stable-pinned and tag-declared
+   rows ignore fresh RCs in a `release_list` fetched for another row; unknown
+   or capped selections also supply no extra publication date. The same
+   repository can therefore appear dormant in one row and active in another.
+   This preserves the stable/tag dormancy channel and aligns activity with
+   each row's selected release evidence, excluding unused or withheld stream
+   candidates. `pushed_at` stands in only when the commit date
    is unknown. `dormant` is `null`, never `false`, when the run has no data
    for the repository. The manifest's key layout and rows are unchanged.
    `--runtime-freshness-out PATH` writes the report-only
@@ -192,7 +199,13 @@ The model-running landscape-sweep lane of `recipes/saturation-sweep.md` has its 
    activity. With no match (a pattern that is missing or does not compile
    counts as none), or no list (never fetched, or the call failed), the row
    keeps every `compute_upstream` field with `latest_source`
-   `tag_pattern_unmatched` or `tag_pattern_unfetched`. When the record carries
+   `tag_pattern_unmatched` or `tag_pattern_unfetched`. For a prerelease-shaped
+   pin, either miss publishes `pin_comparison: "not_compared"`, a null
+   `pin_behind_upstream`, and that `latest_source` as `pin_comparison_reason`.
+   The release fallback stays visible as metadata; it may belong to another
+   package and cannot establish the declared package's currency. Stable pins
+   keep their existing fallback comparison; matched tags keep their numeric
+   comparison. When the record carries
    `matching_tags_truncated`, a higher version may be among the names cut, so
    `latest_source` is `tag_pattern_truncated` in place of `matching_tag` or
    `tag_pattern_unmatched`: the latest is still the tag selected from the

@@ -228,10 +228,10 @@
     },
     {
       "repository": "seathatflowsinourveins/native-agent-stack",
-      "version": "adoption-bootstrap.yml@2026-09-22",
+      "version": "adoption-bootstrap.yml@2026-10-05",
       "source": ".github/workflows/adoption-bootstrap.yml",
       "command": "bash adoption/bootstrap-linux.sh --profile foundation-cpu (run inside the bootstrap-linux job on ubuntu-24.04)",
-      "selection": "New job bootstrap-linux (20-minute timeout) exercises adoption/bootstrap-linux.sh's real pinned-download/SHA-256-verify/isolated-prefix install path for the foundation-cpu profile from adoption/pins-linux-x86_64.json, on push to main, on pull requests touching adoption/** or blueprints/convergence-practice/wsl-native-tools/pins.json, weekly (Monday 06:47 UTC), and on manual dispatch.",
+      "selection": "bootstrap-linux (20-minute timeout) exercises adoption/bootstrap-linux.sh's real pinned-download/SHA-256-verify/isolated-prefix install path for the foundation-cpu profile from adoption/pins-linux-x86_64.json, on pushes to main matching adoption-bootstrap.yml's existing paths filter, on pull requests whose diff matches that filter through the changes job, nightly at 06:47 UTC, and on manual dispatch. Current scheduling follows docs/github-automation.md's 2026-10-05 scheduled portability and report-only lanes section.",
       "acceptance": "In-run scripts/adoption_status.py --profile foundation-cpu --json assertion that every required command is present, plus direct codex/claude/uv/node --version checks; workflow header records this as synthetic/local-integration evidence on a disposable runner, not a second-machine developer-laptop acceptance."
     },
     {
@@ -456,5 +456,33 @@
       "the 2026-09-23 ruleset snapshot in docs/github-automation.md"
     ],
     "decision_record": "docs/decisions/2026-10-02-github-automation-practice.md"
+  },
+  "current_practice_20261005": {
+    "observed_at": "2026-10-05",
+    "source": "Read-only gh api GET of ruleset 23739774 (read again 2026-10-05 03:24Z: enforcement active, strict false, merge methods squash only); required contexts, strict policy and merge methods match .github/main-ruleset.json",
+    "required_checks": [
+      "validate",
+      "token-report",
+      "secret-scan",
+      "dependency-review",
+      "osv-scanner",
+      "verdict-review-gate",
+      "sota-sources"
+    ],
+    "strict_required_status_checks": false,
+    "allowed_merge_methods": [
+      "squash"
+    ],
+    "macos_ci": "Advisory only; validate-macos, bootstrap-macos and bootstrap-macos-brew skip every pull_request",
+    "macos_events": [
+      "push to main matching adoption-bootstrap.yml paths",
+      "nightly schedule at 06:47 UTC",
+      "workflow_dispatch"
+    ],
+    "merge_guard": "docs/lanes.md#labels-and-prs",
+    "supersedes": [
+      "current_practice_20261002.required_checks (8 contexts, including validate-macos)"
+    ],
+    "decision_record": "docs/decisions/2026-10-05-macos-ci-advisory.md"
   }
 }

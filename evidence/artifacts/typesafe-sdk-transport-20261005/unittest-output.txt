@@ -1,0 +1,27 @@
+test_build_check_is_up_to_date (test_gap_crosswalk.GapCrosswalkTests.test_build_check_is_up_to_date) ... ok
+test_build_rejects_candidates_outside_the_rule (test_gap_crosswalk.GapCrosswalkTests.test_build_rejects_candidates_outside_the_rule) ... ok
+test_build_rejects_receipt_content_changed_since_judging (test_gap_crosswalk.GapCrosswalkTests.test_build_rejects_receipt_content_changed_since_judging) ... ok
+test_every_gap_of_the_source_revision_is_covered (test_gap_crosswalk.GapCrosswalkTests.test_every_gap_of_the_source_revision_is_covered) ... ok
+test_every_layer_has_one_known_owner (test_gap_crosswalk.GapCrosswalkTests.test_every_layer_has_one_known_owner) ... ok
+test_judgment_and_review_files_match_their_recorded_hashes (test_gap_crosswalk.GapCrosswalkTests.test_judgment_and_review_files_match_their_recorded_hashes) ... ok
+test_no_host_paths_or_session_identifiers (test_gap_crosswalk.GapCrosswalkTests.test_no_host_paths_or_session_identifiers) ... ok
+test_status_follows_the_final_decisions (test_gap_crosswalk.GapCrosswalkTests.test_status_follows_the_final_decisions) ... ok
+test_a3_a_gap_with_a_digit_sends_every_pair_to_review (test_gap_crosswalk_routing.CrosswalkRoutingTests.test_a3_a_gap_with_a_digit_sends_every_pair_to_review) ... ok
+test_a7_a_gap_with_no_reviewed_pair_is_not_open (test_gap_crosswalk_routing.CrosswalkRoutingTests.test_a7_a_gap_with_no_reviewed_pair_is_not_open) ... ok
+test_a7_a_pair_no_reviewer_saw_has_no_final_decision (test_gap_crosswalk_routing.CrosswalkRoutingTests.test_a7_a_pair_no_reviewer_saw_has_no_final_decision) ... ok
+test_negative_control_the_2026_09_23_rule_fails_both_checks (test_gap_crosswalk_routing.CrosswalkRoutingTests.test_negative_control_the_2026_09_23_rule_fails_both_checks) ... ok
+test_each_rule_on_the_retained_inputs (test_gap_crosswalk_routing.RetainedLedgerRoutingTests.test_each_rule_on_the_retained_inputs) ... ok
+test_missing_sdk_fails_with_pinned_install_command (test_gap_crosswalk_sdk.OptionalSDKTests.test_missing_sdk_fails_with_pinned_install_command) ... ok
+test_module_import_does_not_load_sdk (test_gap_crosswalk_sdk.OptionalSDKTests.test_module_import_does_not_load_sdk) ... ok
+test_other_sdk_version_fails_before_transport (test_gap_crosswalk_sdk.OptionalSDKTests.test_other_sdk_version_fails_before_transport) ... ok
+test_missing_request_id_stays_optional (test_gap_crosswalk_sdk.SDKTransportTests.test_missing_request_id_stays_optional) ... ok
+test_missing_usage_remains_invalid (test_gap_crosswalk_sdk.SDKTransportTests.test_missing_usage_remains_invalid) ... ok
+test_non_retryable_status_stops_immediately (test_gap_crosswalk_sdk.SDKTransportTests.test_non_retryable_status_stops_immediately) ... ok
+test_retries_stop_after_five_attempts_with_legacy_backoff (test_gap_crosswalk_sdk.SDKTransportTests.test_retries_stop_after_five_attempts_with_legacy_backoff) ... ok
+test_structured_questions_metadata_and_final_attempt_retry_count (test_gap_crosswalk_sdk.SDKTransportTests.test_structured_questions_metadata_and_final_attempt_retry_count) ... ok
+test_wrong_probability_keys_remain_invalid (test_gap_crosswalk_sdk.SDKTransportTests.test_wrong_probability_keys_remain_invalid) ... ok
+
+----------------------------------------------------------------------
+Ran 22 tests in 0.439s
+
+OK

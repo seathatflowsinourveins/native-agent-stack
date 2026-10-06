@@ -364,7 +364,6 @@
   "autoContinueAtUsageLimit": true,
   "switchModelsOnFlag": false,
   "syncClaudeAiSkills": false,
-  "skillListingBudgetFraction": 0.05,
   "skillOverrides": {
     "typesafe-ai": "on",
     "gh-fix-ci": "on",
@@ -395,5 +394,6 @@
     "writing-for-agents": "on",
     "security-audit": "on",
     "skill-creator": "on"
-  }
+  },
+  "skillListingBudgetFraction": 0.05
 }

@@ -1,0 +1,17 @@
+#!/bin/bash
+# Build the verified composition (published v3.8.51 tag commit c1e30b767 + local affinity patch 045aa81f3 + upstream #15167 0585aba55) with upstream's own
+# release scripts in the existing build worktree (HEAD 5f4b3d577); no live unit is touched.
+set -u
+B=$HOME/.cache/omniroute-build-20261005
+export PATH="$HOME/.local/share/codex-ecosystem/tools/node-24.21.0/bin:/usr/local/bin:/usr/bin:/bin"
+export TMPDIR="$B/tmp"
+step() { local name="$1"; shift; local t0; t0=$(date +%s); "$@" > "$B/$name.log" 2>&1; local rc=$?; echo "$(date -u +%H:%M:%SZ) $name exit=$rc seconds=$(( $(date +%s) - t0 ))" | tee -a "$B/progress2.txt"; return $rc; }
+cd "$B/src" || exit 2
+git log --oneline -3 | tee -a "$B/progress2.txt"
+step build-release-2 nice -n 19 npm run build:release || exit 1
+step check-pack-artifact-2 env OMNIROUTE_ALLOW_CANARY_BUILD=1 npm run check:pack-artifact || exit 1
+rm -f "$B"/omniroute-3.8.51.tgz
+step pack-2 npm pack --pack-destination "$B" || exit 1
+echo "BUILD_SHA $(cat dist/BUILD_SHA)" | tee -a "$B/progress2.txt"
+sha256sum "$B"/omniroute-3.8.51.tgz | tee -a "$B/progress2.txt"
+echo "$(date -u +%H:%M:%SZ) BUILD2 DONE" | tee -a "$B/progress2.txt"

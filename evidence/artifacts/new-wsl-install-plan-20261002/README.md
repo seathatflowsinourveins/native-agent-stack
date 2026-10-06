@@ -2,7 +2,7 @@
 
 **Run the plan from a checkout of the repository** (step F7, "Clone origin/main", of `adoption/platforms/linux-wsl2-new-distro.md`). `worktrunk` and the convergence validators change into `repo_root`, the checkout three levels above this folder, so `install.sh` and `accept.sh` stop with a clear message when `repo_root` is not a git checkout (`install.sh --list` needs none).
 
-Revised to the merged definitive manifest (`evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json`) and to what the plan did on a real distribution. The inventory has one row per foundation row of that manifest: 80 rows, of which 57 are installed (55 by the default run, two of them interim installs, which wait for the wave-2 acknowledgements: section "Wave 2" below; and two only when named with `--only <slot>`), three are measurement-only (installed only by `--only <slot>`, for the measurement that decides them) and 20 are not installed. [VALIDATION.md](VALIDATION.md) keeps three results apart: the round 1 container run of the first plan (historical), the run of the previous revision in a throwaway distribution, and the clean run of this revision in a fresh throwaway distribution on 2026-10-02 (12:54Z to 13:17Z), recorded in [real-distribution-validation.json](real-distribution-validation.json). Both distribution runs were on one host, in distributions that were removed afterwards. Later on 2026-10-02 the plan's 64-row revision, as merged to main (`6652b78e`), ran once on the destination distribution, the one meant to stay; the record of that run is private, its public receipt comes with that distribution's acceptance, and this folder records no result of it. `python3 -B check_plan.py` checks that `install-plan.json`, `owners.json`, both scripts, `mise.toml`, `config/` and the manifest agree.
+Revised to the merged definitive manifest (`evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json`) and to what the plan did on a real distribution. The inventory has one row per foundation row of that manifest: 84 rows, of which 63 are installed (60 by the default run, two of them interim installs, which wait for the wave-2 acknowledgements: section "Wave 2" below; and three only when named with `--only <slot>`), two are measurement-only (installed only by `--only <slot>`, for the measurement that decides them) and 19 are not installed. [VALIDATION.md](VALIDATION.md) keeps three results apart: the round 1 container run of the first plan (historical), the run of the previous revision in a throwaway distribution, and the clean run of this revision in a fresh throwaway distribution on 2026-10-02 (12:54Z to 13:17Z), recorded in [real-distribution-validation.json](real-distribution-validation.json). Both distribution runs were on one host, in distributions that were removed afterwards. Later on 2026-10-02 the plan's 64-row revision, as merged to main (`6652b78e`), ran once on the destination distribution, the one meant to stay; the record of that run is private, its public receipt comes with that distribution's acceptance, and this folder records no result of it. `python3 -B check_plan.py` checks that `install-plan.json`, `owners.json`, both scripts, `mise.toml`, `config/` and the manifest agree.
 
 Six of the 70 rows were added after the clean run: five from the layer consensus of 2026-10-02 (`docs/decisions/2026-10-02-new-wsl-layer-consensus.md`) and `statusline` from its wave-2 batch of 2026-10-03, which also turned three rows into interim installs and revised four more. All three results above are about the 64 rows that existed then. The install and acceptance commands of the rows added or revised since (sections "Rows from the layer consensus" and "Wave 2" below) have not run anywhere, on any distribution; those sections say what was checked instead. Ten more rows came from the wave-3 batch of 2026-10-04, the owner's decision, which also turned `ccusage`, `session-analytics` and `context-supply` into owner defaults and widened `code-search` to both arms of its confirmatory (section "Wave 3" below); their commands have not run anywhere either.
 
@@ -23,12 +23,13 @@ bash accept.sh --only <slot> --stage after_sign_in
 
 Both scripts refuse root. Installation selects dependencies, isolates owner failures and retains existing operator configuration. No default-shell or Windows-side change is prescribed. `--list` is read-only and prints `slot | owner | route | status` for every row; the status is `planned`, `measurement-only` or `excluded`.
 
-A row is installed by the default run when the manifest row says it installs something, its outcome is not `not_installed` and its state is not `split`, or when it carries an interim install (amendment 3 of the manifest's decision rule, 2026-10-03): an interim installs beside a decided default that installs nothing, whatever that row's state, so code search (split), durable memory (waiting for its measurement) and context supply (a definitive no-install row) install their interims, while their decided defaults stay as the rounds recorded them. `check_plan.py` requires the plan to install every interim the manifest records, with the interim's owner and repository, and requires each interim row's install function to call `interim_acknowledged` first. Two rows the manifest marks as installing are not: MCP Inspector (run on demand with `npx`; mcporter owns MCP calls from scripts) and the base distribution (the image the plan runs on). Two installed rows are left out of the default run: the local-model rows, which create their models through the model server that the plan does not start.
+A row is installed by the default run when the manifest row says it installs something, its outcome is not `not_installed` and its state is not `split`, or when it carries an interim install (amendment 3 of the manifest's decision rule, 2026-10-03): an interim installs beside a decided default that installs nothing, whatever that row's state, so code search (split), durable memory (waiting for its measurement) and context supply (a definitive no-install row) install their interims, while their decided defaults stay as the rounds recorded them. `check_plan.py` requires the plan to install every interim the manifest records, with the interim's owner and repository, and requires each interim row's install function to call `interim_acknowledged` first. Two rows the manifest marks as installing are not: MCP Inspector (run on demand with `npx`; mcporter owns MCP calls from scripts) and the base distribution (the image the plan runs on). Three installed rows are left out of the default run: the two local-model rows, which create their models through the model server that the plan does not start, and MCP protocol conformance, which qualifies explicitly named project transports on demand.
 
-- 55 rows are installed by default, two of them interim installs: ai-memory (`memory-owner`) and semble plus SocratiCode (`code-search`). Context-mode (`context-supply`), ccusage and session analytics are wave-3 owner defaults; Promptfoo is the wave-4 owner default from the additive fix-wave integration.
+- 60 rows are installed by default, two of them interim installs: ai-memory (`memory-owner`) and semble plus SocratiCode (`code-search`). Context-mode (`context-supply`), ccusage and session analytics are wave-3 owner defaults; Promptfoo is the wave-4 owner default from the additive fix-wave integration.
 - The two local-model rows (`local-generation-model`, `embedding-model`; manifest state `measurement`, returned) are installed only when named. The default run and the default acceptance skip them and print `skipped`. Once the model server answers on 127.0.0.1:21434 and reports version 0.35.0, `bash install.sh --only local-generation-model` (likewise `embedding-model`) installs one, `bash accept.sh --only <slot>` checks its files and `bash accept.sh --only <slot> --stage service_health` checks the created model through the server.
-- Loki, Grafana and Playwright CLI are measurement-only (manifest state `split`). The default run and the default acceptance skip them and print `skipped`. `bash install.sh --only loki` (likewise `grafana`, `playwright-cli`) installs one for the measurement, and `bash accept.sh --only <slot>` checks it.
-- 20 rows install no persistent package: `research-skill`, `mcp-inspector`, `agent-messaging`, `isolation-container-boundary`, `claude-plugins-official-code-intelligence-lsp-pl`, `reranker-model`, `trafilatura`, `web-search-provider`, `phoenix`, `attest`, `dependabot`, `codeql-sarif`, `gpu-container-runtime`, `trufflehog`, `credential-custody`, `claude-code-action`, `agent-structural-diff`, `cross-family-review`, `chezmoi`, `base-distribution`. Inspector runs on demand; base-distribution is an environment prerequisite with Canonical checks; cross-family-review executes native after-sign-in checks without another install. The other 17 rows have no acceptance function.
+- Loki and Grafana are measurement-only (manifest state `split`). The default run and the default acceptance skip them and print `skipped`. `bash install.sh --only loki` (likewise `grafana`) installs one for the measurement, and `bash accept.sh --only <slot>` checks it. Wave 5 makes the existing `playwright-cli` slot a default Chrome DevTools MCP install; see its browser section below.
+- MCP protocol conformance is a selected, pinned on-demand qualification recipe. Its install and acceptance run only with `--only mcp-protocol-conformance`; the default run skips it.
+- 19 rows install no persistent package: `research-skill`, `mcp-inspector`, `isolation-container-boundary`, `claude-plugins-official-code-intelligence-lsp-pl`, `reranker-model`, `trafilatura`, `web-search-provider`, `phoenix`, `attest`, `dependabot`, `codeql-sarif`, `gpu-container-runtime`, `trufflehog`, `credential-custody`, `claude-code-action`, `agent-structural-diff`, `cross-family-review`, `chezmoi`, `base-distribution`. Inspector runs on demand; base-distribution is an environment prerequisite with Canonical checks; cross-family-review executes native after-sign-in checks without another install. The other 16 rows have no acceptance function.
 
 An excluded row without acceptance has no install or acceptance function; `accept.sh` prints `slot | stage | skipped` for it, and `install.sh` prints nothing. MCP Inspector is the on-demand exception: it retains a pinned launch command and a Node prerequisite, has no persistent install function, and runs its acceptance only with `--only mcp-inspector`. The default acceptance still skips it.
 
@@ -38,19 +39,19 @@ An excluded row without acceptance has no install or acceptance function; `accep
 - `service_health` retains the readiness/runtime checks and runs after the corresponding service starts. It does not perform sign-in or configure a provider.
 - `after_sign_in` retains native-client diagnostics that need credentials and upstream model examples. Local Ollama also belongs here once its server and model route are provisioned; it needs no remote account.
 
-Output is `slot | stage | exit-code`. An excluded or measurement-only row in the default run, an absent stage or an unavailable host check prints `slot | stage | skipped`, and so does the `local-model-server` row's `after_sign_in` check until the `embedding-model` row has created the model it calls; a skip does not certify acceptance and does not fail the script. A selected executable check failing with any nonzero status makes the script exit 1. Application stdout stays suppressed to avoid printing private diagnostic/model data; stderr and status are retained.
+Output is `slot | stage | exit-code`. An excluded or measurement-only row in the default run, an absent stage or an unavailable host check prints `slot | stage | skipped`, and so does the `local-model-server` row's `after_sign_in` check until the `embedding-model` row has created the model it calls; a skip does not certify acceptance and does not fail the script. A selected executable check returning 78 prints needs_user and leaves the prerequisite unresolved; every other nonzero status makes the script exit 1. Application stdout stays suppressed to avoid printing private diagnostic/model data; stderr and status are retained.
 
-All 57 installed rows have a `post_install` entry: 41 smoke/configuration checks, 13 version checks, two unavailable checks (credential guard and token-lane carriers), and one upstream-tests/native-smoke entry. Thirteen installed rows have a service stage and 18 have an after-sign-in/model-provisioning stage. The three measurement-only rows add three post-install, two service and one after-sign-in stage. Inspector adds two on-demand stages, base-distribution adds one prerequisite stage, and cross-family-review adds one native-client stage. Together these are 98 primary stage entries plus the two G1 additional native checks, 100 checks in total; the JSON carries 161 command entries, including the on-demand Inspector launch.
+All 63 installed rows have a `post_install` entry: 45 smoke/configuration checks, 12 version checks, two unavailable checks (credential guard and token-lane carriers), two unchanged upstream-test subsets (Chrome DevTools MCP and Harbor), one upstream-smoke/native-integration entry and one upstream-tests/native-smoke entry. Thirteen installed rows have a service stage and 25 have an after-sign-in/model-provisioning stage. The two measurement-only rows add two post-install, two service and one after-sign-in stage. Inspector adds two on-demand stages, base-distribution adds one prerequisite stage, and cross-family-review adds one native-client stage. Together these are 110 primary stage entries plus the two G1 additional native checks, 112 checks in total; the JSON carries 183 command entries, including the on-demand Inspector launch.
 
-Version-only post-install checks: codex; claude-agent-sdk; codex-sdk-and-codex-exec-app-server; local-model-server; inspect-ai; harbor-containerized-agent-e2e-runner; actionlint-kjanat; dagu; docker-compose; container-engine; git; gh-github-cli; restic. SDK checks report package versions. GPT Researcher is imported from its pinned checkout and performs the fail-closed preflight; the combined research-harnesses row also runs unchanged DeerFlow client tests and checks its configured model. DeerFlow runs as its embedded `DeerFlowClient`, with no service, port or Compose stack; its after-sign-in stage performs actual research alongside GPT Researcher. OpenHands 1.50.1 runs unchanged upstream SDK and cross tests. Difftastic now has a structural fixture and failure control, and Grafana measurement-only acceptance uses native APIs.
+Version-only post-install checks: codex; claude-agent-sdk; codex-sdk-and-codex-exec-app-server; local-model-server; inspect-ai; actionlint-kjanat; dagu; docker-compose; container-engine; git; gh-github-cli; restic. Harbor runs the unchanged upstream ATIF validator unit tests at post-install; its telemetry-contract qualification remains a separate after-sign-in acceptance. SDK checks report package versions. GPT Researcher is imported from its pinned checkout and performs the fail-closed preflight; the combined research-harnesses row also runs unchanged DeerFlow client tests and checks its configured model. DeerFlow runs as its embedded `DeerFlowClient`, with no service, port or Compose stack; its after-sign-in stage performs actual research alongside GPT Researcher. OpenHands 1.50.1 runs unchanged upstream SDK and cross tests. Difftastic now has a structural fixture and failure control, and Grafana measurement-only acceptance uses native APIs.
 
 ## Routes and lifecycle
 
 Ubuntu's own `apt` package is Git's route. The base image/prerequisite installation already supplies it; rerunning this owner is idempotent. The Ubuntu candidate is not pinned to upstream Git v2.56.0. There is no PPA or source build.
 
-Installed route counts: native-installer 4; none 14; npm-global 4; uv-tool 8; mise 10; model-server 2; release-binary 8; repository-recipe 3; apt-repo 2; apt 1; source-build 1. The measurement-only rows add one npm-global and two release-binary. The enum retains the existing library/venv, local-npm, skills-installer and marketplace classification limitations.
+Installed route counts: native-installer 5; none 14; npm-global 5; uv-tool 9; mise 10; model-server 2; npm-npx-stdio 1; release-binary 8; repository-recipe 3; apt-repo 2; apt 1; uv-project 1; uv-tool-owner-extension 1; npx-on-demand 1. The two measurement-only rows add two release-binary routes. The enum retains the existing library/venv, local-npm, skills-installer and marketplace classification limitations.
 
-`mise.toml` retains the exact global tools (ten: ast-grep 0.45.3 is new, chezmoi is gone) and Node 24.21.0, Python 3.13.16 and uv 0.12.22 pins. `install.sh` merges them through `mise use -g`. Noninteractive diagnostics add mise shims to the process PATH without changing the shell. Doctor runs in the owned global tool directory so selecting only mise does not require the inventory's optional tools. Playwright's pinned CLI (measurement-only) installs its own bundled Chromium; the real browser open/close smoke explicitly selects that browser. OmniRoute service-health requires `/readyz` to succeed before its full doctor; doctor alone can warn about a stopped service and return zero.
+`mise.toml` retains the exact global tools (ten: ast-grep 0.45.3 is new, chezmoi is gone) and Node 24.21.0, Python 3.13.16 and uv 0.12.22 pins. `install.sh` merges them through `mise use -g`. Noninteractive diagnostics add mise shims to the process PATH without changing the shell. Doctor runs in the owned global tool directory so selecting only mise does not require the inventory's optional tools. The selected Chrome DevTools MCP browser owner installs Linux stable Chrome from Google's signed apt repository with a pinned key fingerprint and version; its unchanged upstream subset and native-client smoke use that browser. OmniRoute service-health requires `/readyz` to succeed before its full doctor; doctor alone can warn about a stopped service and return zero.
 
 Docker requires uidmap, dbus-user-session, kernel/rootless prerequisites and its upstream user unit. Exact Engine 29.8.2/Compose 5.5.1 apt revisions come from repository metadata; missing versions fail. Harbor's CLI installed in round 1; its overall installer failed later in Docker setup. Keep this prerequisite gate for the real distribution.
 
@@ -160,7 +161,7 @@ From the wave-2 batch of the layer consensus (`consensus.json`, key `wave2`, wit
 
 From the wave-3 batch of the layer consensus (`consensus.json`, key `wave3`), the owner's decision of 2026-10-04 under amendment 4 of the manifest's decision rule, relayed by `docs/decisions/2026-10-04-token-full-stack-owner-default.md`. The original wave-3 pins came from `manifests/stack.json` and `adoption/pins-linux-x86_64.json` at `f77a35eb`. After main's PR #693 (2026-10-04) those files pin RTK 0.51.0 and mcporter 0.14.2, and this plan follows them. PR #642 W1 also moved jcodemunch-mcp after `f77a35eb` to 1.108.327, source `6d5ae86c130f96624e2ca2d797fa3b853c210b9d`, and this plan follows that selected pin. Its README was read at 6d5ae86c and the prior 8f7b34ab pin on 2026-10-05; install, version and session-stats anchors 91, 113 and 141 are unchanged (SOURCES.md, the code-index row). Every tool installs under the ecosystem root the client templates name, `${ECO_ROOT:-$HOME/.local/share/codex-ecosystem}`: release archives and npm tarballs through `fetch_verified` against the recorded sha256 (no `gh release download`, so no GitHub sign-in), archives extracted whole into `tools/<tool>-<version>` (bundled licenses kept), npm packages with `npm install --global --prefix tools/<tool>-<version>` from the verified tarball, uv tools with `UV_TOOL_DIR` and `UV_TOOL_BIN_DIR` in the root, and each command linked into `${ECO_ROOT}/bin`. Sources are in [SOURCES.md](SOURCES.md), section "Wave 3", and the checks that ran in [VALIDATION.md](VALIDATION.md), section "Wave 3".
 
-- **Ten owner rows** in token-efficiency: `command-output` (RTK 0.51.0, the musl release archive; the hook is the client configuration's), `output-compression` (Headroom 0.37.0 with the `[mcp]` extra, MCP server only), `code-index` (jcodemunch-mcp 1.108.327, selected in `manifests/stack.json`; [W1 qualification](../../receipts/jcodemunch-1108327-qualification-20261003.json)), `code-graph` (codebase-memory-mcp 0.11.0, the release archive; neither its `install.sh` nor its `install` subcommand runs), `repo-packing` (Repomix 1.18.1), `structured-data` (TOON 4.1.1), `doc-conversion` (MarkItDown 0.1.8, the base converter), `api-docs` (Context Hub 0.1.4, telemetry and feedback off), `trace-viewer` (otel-tui 0.7.5, on demand, no service) and `token-lane-carriers` (written by the client configuration; its function only says so).
+- **Ten owner rows** in token-efficiency: `command-output` (RTK 0.51.0, the musl release archive; the Claude hook is the client configuration's, and the Codex hook is installed and trusted by this row, on the decision of 2026-10-04), `output-compression` (Headroom 0.37.0 with the `[mcp]` extra, MCP server only), `code-index` (jcodemunch-mcp 1.108.327, selected in `manifests/stack.json`; [W1 qualification](../../receipts/jcodemunch-1108327-qualification-20261003.json)), `code-graph` (codebase-memory-mcp 0.11.0, the release archive; neither its `install.sh` nor its `install` subcommand runs), `repo-packing` (Repomix 1.18.1), `structured-data` (TOON 4.1.1), `doc-conversion` (MarkItDown 0.1.8, the base converter), `api-docs` (Context Hub 0.1.4, telemetry and feedback off), `trace-viewer` (otel-tui 0.7.5, on demand, no service) and `token-lane-carriers` (written by the client configuration; its function only says so).
 - **Owner defaults**: `ccusage` (20.0.26, a read-only meter) and `session-analytics` (agentsview 0.43.0, a local archive only, telemetry and the update check off) now install; `context-supply` keeps its commands and checks and no longer calls `interim_acknowledged`, since its authority is the owner's decision and not amendment 3.
 - **`code-search`** installs SocratiCode 1.15.0 beside semble (its npm tarball with `--ignore-scripts --before=2026-09-24T12:00:00Z`, into the prefix the client templates run), keeps its gate, and its check reads SocratiCode's version from `package.json`, never by running it. SocratiCode serves nothing until the client configuration names a Qdrant store and an embedding endpoint, which no row installs yet.
 - **The gate** `interim_acknowledged` reads every wave batch and refuses while any of them owes an acknowledgement; an owner batch owes none.
@@ -275,14 +276,20 @@ alone do not certify dashboard readiness. The maintained Prometheus startup
 feature flags for first counter samples are recorded in the G4 decision and
 must be carried by the service owner.
 
-Alerting retains the sink until a private destination file exists. The user
-chooses ntfy.sh (recommended; alert text leaves the host), Telegram or an on-host
-destination. The plan never reads or prints those private files. The default
+Alerting supports webhook/ntfy, Telegram and an on-host destination, retaining
+the disarmed sink until the selected receiver's private files exist. ntfy.sh was
+the coordinator's delegated pick on 2026-10-04. The user personally configured
+and accepted Telegram on NativeStack2604 at about 06:58Z on 2026-10-05; that live
+choice supersedes the delegated pick, and no supported receiver was overturned.
+Note: with ntfy.sh or Telegram the alert text leaves the host. Sources:
+[main `2d849ba1f`'s receiver note, :7](https://github.com/seathatflowsinourveins/native-agent-stack/blob/2d849ba1f/evidence/artifacts/new-wsl-final-architecture-20261002/critics/added-summary.md#L7)
+and [Alertmanager v0.34.1's Telegram receiver, :1862](https://github.com/prometheus/alertmanager/blob/v0.34.1/docs/configuration.md#L1862).
+The plan never reads or prints those private files. The default
 webhook pointer is
 `${XDG_CONFIG_HOME:-$HOME/.config}/native-agent-stack/alertmanager-webhook-url`;
 `NATIVE_STACK_ALERT_URL_FILE` may supply another absolute pointer. The file must
 be owned, regular, singly linked and `0600`, in an owned `0700` directory outside
-every worktree. The user writes the ntfy URL with `?template=alertmanager` through
+every worktree. For ntfy, the user writes the URL with `?template=alertmanager` through
 their own terminal; do not put a URL/topic value in repository configuration or
 an agent prompt. `NATIVE_STACK_ALERT_RECEIVER=telegram` instead uses
 `alertmanager-telegram-token` and `alertmanager-telegram-chat-id` in that store,
@@ -300,7 +307,7 @@ reported for its owner to merge. This installer starts no service.
 Alerting post-install acceptance uses upstream amtool and native promtool rule
 validation/unit tests; install the Prometheus owner before selecting that check.
 Native delivery acceptance is `--only alerting --stage after_sign_in`. It prints
-`needs_user` and skips when the destination files are absent. Once wired, it
+`needs_user (78)` when the destination files are absent. Once wired, it
 posts an expiring tagged alert, exercises the empty file-SD fixture using a
 confirmed closed loopback port, restores the empty target list and observes
 notification counters plus rule firing/resolution. It returns pending until
@@ -317,6 +324,13 @@ without sending another test. A local readiness result or notification counter
 does not substitute for this receiver attestation. This CLI checks the attestation fields and binding; it cannot independently verify who wrote the file. Stale or mismatched pairs are archived and a fresh delivery test runs automatically. Loki ruler evaluation remains
 explicitly deferred to that slot's owner. The synthetic promtool inputs are
 separate from these real delivery observations.
+
+The coordinator reports that the user supplied both firing and resolved
+Telegram messages for acceptance `9e6f4a70b5874573aff1d22b40e87a32` on
+NativeStack2604. Main `4c897418f`'s unmodified delivery check returned 0 with
+`receiver_evidence=user_attestation`. This is the reported 2026-10-05 host
+acceptance, separate from this PR's local checks; no message contents or
+destination values are recorded here.
 
 ## G5 analytics and evaluation acceptance (2026-10-04)
 
@@ -451,6 +465,168 @@ evidence-registry digests and the upstream-freshness snapshot following the srt 
 ## Integrated fix-wave boundary (2026-10-04)
 
 [The coordinator decision](../../../docs/decisions/2026-10-04-2604-e2e-fix-wave.md) records all 25 slot repairs, conflict resolutions, canonical Promptfoo owner-batch reconciliation, sources and remaining host gates. The revised merged recipes are UNRUN on a distribution. Earlier per-row statements are historical; no static integration check certifies the destination.
+
+## Round 2: agent messaging (2026-10-04)
+
+The `agent-messaging` row installs adopted hcom 0.7.27 with its upstream
+checksum-verifying installer. It applies the accepted posture from the slot's
+extension of `adoption/new-wsl/client-config-map.json`, using the scoped
+`config/hcom-client-config.py` adapter and the shared mapper's existing merge,
+instruction-block and atomic-write functions. It writes hcom's title/relay/trust
+preferences, Claude deny rules and native inbound setting, both clients' peer
+hints, and a separate Codex `hcom-deny.rules`. The adapter runs the mandatory
+native `codex execpolicy check`; upstream retains `hcom.rules`.
+
+Run `bash install.sh --only agent-messaging`, then
+`bash accept.sh --only agent-messaging`. Close Codex before apply and restart it
+afterward. Native client sign-ins and each lane folder's trust remain the user's
+own inputs. Existing conflicting hcom configuration, rule file or inbound choice
+is retained with `needs_user`, without printing its values. The installer needs
+no sudo. Post-install acceptance checks the installed binary's status/list
+behavior in a disposable HCOM_DIR, then installed client posture and native rule
+matching; it is separate from upstream repository-quality CI.
+
+Claude <-> Claude stays on native messaging. Codex transport sessions use
+upstream `hcom codex`; this row creates no Claude hcom launch wrapper or global
+hooks. Plain Claude uses `hcom start` and `hcom listen`, which does not wake an
+idle plain Claude. Prefix denies have the accepted posture's known unmatched
+forms, including executable wrappers; the OS-sandbox change is the user's and
+outside this row. Full source, evidence classes, correction and overturn checks:
+[round-2 messaging decision](../../../docs/decisions/2026-10-04-round2-plan-g1-messaging.md).
+
+The coordinator must refresh shared summary counts and `owners.json` when the
+parallel groups integrate; this bounded job leaves those shared headers intact.
+
+## Round-2 G3 tool owners (2026-10-04, UNRUN)
+
+The `wave5` owner batch adds four plan rows. The source review and boundaries are
+in [the G3 decision](../../../docs/decisions/2026-10-04-round2-plan-g3-tools.md).
+These are planned destination commands; this builder ran no candidate trial.
+
+| Slot | Install and upstream acceptance | User-dependent destination gate |
+| --- | --- | --- |
+| `lm-program-optimization` | DSPy 3.4.0 and its exact GEPA 0.1.4 wheels, verified against PyPI SHA-256 values, in one dedicated uv project. Preserve the resolved `uv.lock` and installed inventory privately. Run the unchanged upstream GEPA and Predict pytest files. | Existing OmniRoute provider readiness for the documented DSPy LM call. Skill-description optimization remains with skill-creator. |
+| `skill-vetting` | SkillSpector CLI from tag commit `c7958a3268d9498644b22edb75d0f051bbc8cbfc`, using upstream `uv tool install` without `[mcp]`. Run its unchanged CLI and native-client adapter tests. Record the actual tool dependency inventory; the upstream project lock does not lock a uv tool. | Native Codex sign-in only for semantic acceptance, with `SKILLSPECTOR_PROVIDER=codex_cli`. Findings remain advisory beside source review and skills.sh audits. |
+| `trajectory-analysis` | Add Scout 0.5.3 and Harbor 0.23.0 to the existing Inspect AI 0.3.273 uv-tool environment, retaining OpenAI 3.24.0. Expose `scout` through uv's `--with-executables-from`. Run unchanged upstream grep and Claude/ATIF import tests. | Set `SCOUT_CLAUDE_SESSION_FILE` to a current session with a known Agent/Task call and `SCOUT_HARBOR_ATIF_FILE` to one existing trial. Consent to private local storage, including upstream same-slug session merging. The native import/scan must finish without errors and detect the Claude positive control. |
+| `mcp-protocol-conformance` | On demand through `npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11`. Verify published SHA-512 integrity and run the unchanged upstream npm check/build/test commands. `list --requirements` is discovery. | Select an HTTP MCP endpoint with `MCP_CONFORMANCE_SERVER_URL` and/or a scenario client with `MCP_CONFORMANCE_CLIENT_COMMAND`. Supply a reviewed `MCP_CONFORMANCE_EXPECTED_FAILURES` YAML only when needed. |
+
+The conformance row requires `--only mcp-protocol-conformance` in both scripts;
+the default run skips it. It installs no global npm executable. Keep alpha.11
+until alpha.12 is eligible at 2026-10-08T12:07:36Z; updating the pin requires the
+existing release-verification procedure. Inspector keeps its own interactive
+and smoke-test slot. The Scout grep check uses the local upstream harness and
+requires no model; this plan handles Codex trajectories through Harbor ATIF.
+
+Both native clients can invoke these tools through their existing shell and
+PATH wiring. DSPy runs with
+`uv run --project "${XDG_DATA_HOME:-$HOME/.local/share}/new-wsl-native-stack/tools/dspy-3.4.0" --frozen --no-sync`.
+Skill vetting uses `skillspector scan <artifact> --no-llm --format json --fail-on-findings`
+on demand; a finding never authorizes an install. Scout uses `scout`, exposed
+from the one Inspect AI environment. There is no new client setting, hook or
+MCP registration for these slots. Tool commands use user scope; `needs.sudo`
+declares the existing wrapper's clean-host apt prerequisite.
+
+Full pin, checksum and test citations are in each row and
+[SOURCES.md](SOURCES.md). The coordinator integrates `owners.json`, shared
+row/stage comments and the evidence registry; this job edits only its rows and
+sections.
+
+## Wave 5 browser owner: `playwright-cli` (2026-10-04)
+
+The existing slot now installs Chrome DevTools MCP 1.10.1 from
+ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df,
+release `chrome-devtools-mcp-v1.10.1`, by default. One `chrome-devtools` stdio
+registration in each native client serves browser automation and diagnostics.
+Both use `npx -y chrome-devtools-mcp@1.10.1 --headless --isolated
+--no-usage-statistics`. The upstream experimental CLI and Claude plugin are not
+registered. The former Playwright CLI measurement install is superseded; its
+unstarted, 20-task comparison through upstream Harbor remains an owner-reported
+removal check. This builder performs source review and the required structural
+checks, with no new browser or model trial.
+
+The privileged prerequisite is explicit in the row's `needs.sudo` and
+`prerequisite_steps`: the declared program must equal the actual helper.
+The helper verifies Google's active primary key fingerprint, installs its public
+keyring and a restricted Signed-By in native-stack-google-chrome.sources, and
+uses apt-get update/install for current stable and its dependencies. It sets
+repo_add_once=false before installing, preserves other defaults and requires
+the package-managed google-chrome.sources and google-chrome.list to be absent.
+The digest-verified package postinst recreates its own .sources whenever that
+file exists, even when repo_add_once is false; the separate filename avoids this
+overwrite and a conflicting Signed-By. Existing package sources need operator
+review. The package source and exact postinst locators are in
+[the source receipt](../final-architecture-round2-20261004/repair-round2-sources-20261005.json).
+Both installation and post_install record the installed Chrome version in
+private acceptance state. Acceptance requires minimum 154.0.8037.97-1 and the
+installed-version entry's Google repository origin, permitting later stable
+builds. The MCP package retains its exact npm pin and published SRI check.
+
+`post_install` runs six unchanged upstream test files with the release's own
+`npm run test:no-build` runner. Its preparation follows the release CI:
+submodules, `PUPPETEER_SKIP_DOWNLOAD=true npm ci` and `npm run bundle`.
+CI prepares Chrome for Testing. This row sets the documented
+`PUPPETEER_EXECUTABLE_PATH` to the installed Linux-side Google Chrome stable for
+its unchanged tests and also exercises that browser through both native clients. Remaining
+upstream suites and other CI matrix jobs are omitted, not claimed passed.
+
+`after_sign_in` needs the destination's native Claude Code and Codex sign-ins.
+Fresh sessions must each navigate the local synthetic fixture, return its title
+through `take_snapshot`, and return its console marker through
+`list_console_messages`. The checker matches actual successful tool results
+with native invocation events; assistant summaries alone cannot pass. Raw
+streams and upstream-test output remain under the private acceptance state,
+outside the checkout. READY requires both stages to return success.
+
+The destination map and its template additions own both registrations. Native
+CLI read-back asserts their exact arguments, accepting the indentation in
+Claude's Command and Args fields. [The browser decision](../../../docs/decisions/2026-10-04-round2-plan-g2-browser.md)
+records the single writer and the destination acceptance still owed.
+
+Sources and scope: [SOURCES.md](SOURCES.md), "Wave 5 browser owner". The npm SRI
+is an upstream checksum; browser installation is verified by signed apt metadata.
+`--no-usage-statistics` does not disable optional CrUX URL lookups;
+upstream documents `--no-performance-crux` for that separate choice.
+
+## Round-2 G4 configuration (2026-10-04)
+
+[The bounded decision](../../../docs/decisions/2026-10-04-round2-plan-g4-config.md)
+implements four configuration verdicts on the existing owners. Destination
+execution remains UNRUN; this builder runs repository checks only.
+
+| Existing owner | Configuration and native acceptance | Remaining input |
+| --- | --- | --- |
+| Promptfoo 0.123.1 | Its Test Agent Skills providers select the host's Claude and Codex executables through `path_to_claude_code_executable` and `codex_path_override`. Native Codex/openai carries Sol/max and its existing login. Post-install also checks both optional SDK dependencies; the existing upstream echo controls and paired skill controls remain. | Native sign-in if absent; the existing gateway A/B template's two exact provider model IDs. |
+| GPT Researcher v3.7.0 and embedded DeerFlow v2.1.0 | Both gatherers use OmniRoute `/v1` with keyless search and per-run x-omniroute-session-id headers. On 3.8.51, smart/strategic GPT Researcher and DeerFlow request plain Sol/xhigh; FAST retains its high alias. DeerFlow enables supports_reasoning_effort. Preflight/configuration read-back and fresh successful logged Sol routes are asserted. Default call-list metadata exposes no delivered-effort field, so wire effort remains unasserted; pipeline capture remains an operator decision. A window/model fallback cannot prove attribution or whole-run zero embeddings. Native Codex uses native Sol/max. | Live cited gatherer runs and independent gateway metadata observation remain owed. Delivered wire effort is not certified by this recipe. |
+| OmniRoute 3.8.51 (selected recipe) | The recipe uses the published npm package with its registry SHA512 integrity, upstream doctor/readiness acceptance and a fresh pool/fallback turn. The client-config map renders Sol/xhigh. [The topology record](config/gpt-gateway-topology.json) assigns Sol/max to native Codex until a release includes PR #15167. Historical canary assets remain for historical tests and are not installed by this row. #637 already qualified the stack's 3.8.51 pin; the architecture now cites that existing pin. | Provider sign-in if absent; review a differing existing destination service unit. Start the installed user unit before service-health acceptance. |
+| Harbor 0.23.0 | Verify the published wheel SHA256 and run unchanged upstream ATIF unit tests. Retain the hello-user oracle/nop READY gate. Add [the worker telemetry-contract recipe](config/harbor-worker-telemetry-contract.md), using Harbor's native job runner and trajectory validator. | A maintained, commit-pinned native-verifier task corpus, public Harbor job config and container-reachable provider/Collector inputs. The recipe reports `needs_user` while these are absent. |
+
+Harbor remains the containerized task-level A/B owner and skill-creator remains
+the authoring owner. Telemetry producers and the Collector retain their own
+slots. The research consumers keep the verdict's exact model spelling;
+no source or version check establishes gateway Sol/max or a live research run.
+Sources, integrity values and the named removal comparisons are in
+[SOURCES.md](SOURCES.md) and the bounded decision. Shared row order and headers
+are unchanged; the coordinator integrates the other groups and registry digests.
+
+## Round-2 integration, 2026-10-05
+
+Wave 5 adds four owner rows and makes agent-messaging (hcom 0.7.27) and
+playwright-cli (Chrome DevTools MCP 1.10.1) owner defaults. The configuration
+map owns Chrome's one stdio registration in each native client. OmniRoute
+installation and acceptance follow published 3.8.51; retained carried-prefix
+composition checks do not substitute for that release's identity. Harbor
+qualifies worker telemetry, Promptfoo carries the paired skill-lifecycle
+configuration, and both research gatherers keep their documented LLM route.
+Source: this PR:docs/decisions/2026-10-04-final-architecture-round2.md:19;
+this PR:docs/decisions/2026-10-03-omniroute-3851-pin.md:108.
+
+The shared inventory above comes from the actual final plan rows. owners.json
+was regenerated using the original U2 gen_plan.py owner_row export and its
+serializer, located with rg; no owner row was hand-written. The host stack,
+upstream snapshot, evidence registry and shared gateway template remain under
+their owners. Source: this PR:tests/test_stack_lifecycle.py:21. Destination
+installation, upstream runtime tests, native model/browser acceptance and
+provider/GPU checks have not run in this integration job.
 
 ## Currency qualification limits (2026-10-05)
 

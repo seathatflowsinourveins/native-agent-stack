@@ -1,0 +1,292 @@
+{
+  "schema_version": 1,
+  "record": "OpenHands fsspec security relock, native integration receipt",
+  "purpose": "Remove GHSA-27vj-qcqg-25rc while keeping every other runtime pin and existing OAuthlib review scope",
+  "checked_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "observed_utc": "2026-10-05T23:32:05Z",
+  "observed_until_utc": "2026-10-06T00:59:04Z",
+  "authorization": "Queued user/co-op J-FSSPEC; prerequisite metadata gate, #562 pattern, draft then ready only when all required acceptance passes",
+  "sources": [
+    "https://github.com/advisories/GHSA-27vj-qcqg-25rc",
+    "https://github.com/fsspec/filesystem_spec/tree/2026.6.0",
+    "https://pypi.org/pypi/fsspec/2026.6.0/json",
+    "https://pypi.org/pypi/huggingface-hub/0.35.3/json",
+    "https://github.com/astral-sh/uv/releases/tag/0.12.22",
+    "native-agent-stack@74cc5468691ada09674f325ebb2cddbdfe4ad68c:blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.relock.sh.txt",
+    "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:.github/workflows/security-scan.yml:49-69"
+  ],
+  "lock": "blueprints/runtime-workers/openhands/requirements.lock",
+  "sha256_before": "e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1",
+  "sha256": "2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401",
+  "moved_pins": [
+    {
+      "package": "fsspec",
+      "before": "2025.9.0",
+      "after": "2026.6.0",
+      "reason": "First fixed release for GHSA-27vj-qcqg-25rc"
+    },
+    {
+      "package": "multidict",
+      "before": "6.7.0",
+      "after": "6.9.1",
+      "reason": "J-FSSPEC extension2; first fixed release for GHSA-54p9-h82j-f925"
+    }
+  ],
+  "reproduction": {
+    "evidence_class": "local_integration",
+    "uv_version": "0.12.22",
+    "sdk_source_archive_sha256": "2d3006de86eaec690a82e497fcd4459816637afe6e53f7da87783183792148a8",
+    "resolver_exit": 0,
+    "control_matches_before_bytes": true,
+    "adopted_matches_native_export_exit": 0,
+    "changed_package_blocks": [
+      "fsspec",
+      "multidict"
+    ],
+    "other_exported_requirements_unchanged": true,
+    "sdk_build_lock_and_wheel_pins_unchanged": true,
+    "intermediate_fsspec_only_sha256": "2ec63fb527bf9b47f3e3fb80444e628338a574eca021eb8795d5dec5feba169f"
+  },
+  "dependent_metadata": {
+    "evidence_class": "source_review",
+    "pinned_pairs_checked": 334,
+    "distributions": 333,
+    "declared_requirements_parsed": 2219,
+    "null_requires_dist_records": 51,
+    "null_fallback_wheel_metadata": 50,
+    "null_fallback_sdist_pkg_info": 1,
+    "direct_dependents": [
+      {
+        "package": "huggingface-hub",
+        "version": "0.35.3",
+        "requirement": "fsspec>=2023.5.0",
+        "fixed_version_permitted": true
+      }
+    ],
+    "caps_below_fixed": [],
+    "request_or_parse_failures": 0,
+    "limitations": "Aggregate derived results retained; per-record metadata inventory is not a committed replay artifact. func-timeout4.3.5 publishes legacy Metadata-Version1.2/noRequires-Dist; this is not install acceptance. The actual isolated install/check is separate evidence.",
+    "extension2": {
+      "evidence_class": "source_review",
+      "sdk_pairs": 334,
+      "app_registry_pairs": 31,
+      "distinct_pairs": 362,
+      "parsed_requirements": 2402,
+      "null_metadata_records": 61,
+      "fallback_wheels": 60,
+      "fallback_legacy_pkg_info": 1,
+      "caps_below_fixed": [],
+      "parents": [
+        {
+          "package": "aiohttp",
+          "version": "3.14.3",
+          "requirement": "multidict<7.0,>=4.5",
+          "url": "https://pypi.org/pypi/aiohttp/3.14.3/json"
+        },
+        {
+          "package": "yarl",
+          "version": "1.22.0",
+          "requirement": "multidict>=4.0",
+          "url": "https://pypi.org/pypi/yarl/1.22.0/json"
+        },
+        {
+          "package": "alembic",
+          "version": "1.20.0",
+          "requirement": "Mako",
+          "url": "https://pypi.org/pypi/alembic/1.20.0/json"
+        }
+      ],
+      "derived_inventory_sha256": "0ea5161776d5fe2f2fbf88dc239e36cf1529e1315266e70d53774e11ec195460",
+      "derived_inventory_bytes": 156116,
+      "limits": "Aggregate source review; canonical per-record inventory not committed. Actual resolver and install integration are separate."
+    }
+  },
+  "hash_check": {
+    "evidence_class": "local_integration",
+    "exit": 0,
+    "listed_hashes": 2,
+    "universal_wheel_and_sdist_verified": true,
+    "unlisted_supported_files": [],
+    "multidict": {
+      "exit": 0,
+      "listed_hashes": 14,
+      "unlisted_supported_files": []
+    }
+  },
+  "install_check": {
+    "evidence_class": "local_integration",
+    "exit": 0,
+    "python": "3.13.16",
+    "isolated_environment": true,
+    "venv_exit": 0,
+    "hashed_build_install_exit": 0,
+    "hashed_runtime_install_exit": 0,
+    "uv_pip_check_exit": 0,
+    "active_packages_checked": 178,
+    "sdk_tool_import_exit": 0,
+    "fsspec_import_exit": 0,
+    "versions": {
+      "fsspec": "2026.6.0",
+      "huggingface-hub": "0.35.3",
+      "openhands-sdk": "1.49.6",
+      "openhands-tools": "1.49.6",
+      "litellm": "1.93.2",
+      "multidict": "6.9.1"
+    },
+    "limits": "Recipe install/import integration; no unchanged upstream test suite, model request, image build or container acceptance"
+  },
+  "osv": {
+    "evidence_class": "local_integration",
+    "version": "2.6.0",
+    "binary_sha256": "ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108",
+    "ordinary_inputs": 58,
+    "frozen_inputs": 1,
+    "before": {
+      "ordinary_exit": 1,
+      "ordinary_packages": 5,
+      "ordinary_advisories": 5,
+      "frozen_exit": 1,
+      "frozen_packages": 1,
+      "frozen_advisories": 1
+    },
+    "after": {
+      "ordinary_exit": 0,
+      "ordinary_packages": 0,
+      "ordinary_advisories": 0,
+      "frozen_exit": 0,
+      "frozen_packages": 0,
+      "frozen_advisories": 0
+    },
+    "removed_advisory": "GHSA-27vj-qcqg-25rc",
+    "remaining_advisory": null,
+    "remaining_paths": [],
+    "acceptance": "Actual ordinary and frozen native exits0 under command-center rulings after four production fixes. This is local integration, not hosted CI acceptance.",
+    "initial_inputs": {
+      "ordinary": 60,
+      "frozen": 1
+    },
+    "before_extension2": {
+      "ordinary_exit": 1,
+      "ordinary_packages": 5,
+      "ordinary_advisories": 5,
+      "frozen_exit": 1,
+      "frozen_packages": 1,
+      "frozen_advisories": 1
+    },
+    "initial_historical_before": {
+      "ordinary_exit": 1,
+      "ordinary_packages": 2,
+      "ordinary_advisories": 2,
+      "frozen_exit": 1,
+      "frozen_packages": 1,
+      "frozen_advisories": 1
+    },
+    "output_refs": {
+      "before": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.osv-before",
+      "after": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.osv-after",
+      "sanitization": "Only known private scan/worktree path and old owner label replaced; native reports/arguments/partitions preserved."
+    }
+  },
+  "carried_forward_reviews": {
+    "prior_receipt": "evidence/receipts/osv-openhands-litellm-relock-20260930.json",
+    "original_review": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
+    "unchanged_advisories": [
+      "GHSA-hj66-6f7g-4r5v",
+      "GHSA-xpv3-w29h-x7cv"
+    ],
+    "reason": "Byte-identical baseline control and fsspec/multidict-only changes preserve the prior OAuthlib bytes/reachability review; no new ordinary advisory ignore or expiry extension."
+  },
+  "failed_attempts": [
+    {
+      "cause": "Root-added UV_NO_CONFIG1 bypassed Linux workspace settings; unadopted candidate had platform packages/extra cryptography",
+      "retained": "failed-uv-no-config",
+      "adopted": false,
+      "relock_script_exit": 1,
+      "native_lock_exit": 0,
+      "native_lock_check_exit": 0,
+      "native_export_exit": 0
+    },
+    {
+      "cause": "Root-copied wheel formatter had two literal plus signs; only these bytes differed from control",
+      "retained": "failed-wheel-formatter",
+      "adopted": false,
+      "relock_script_exit": 1,
+      "native_lock_exit": 0,
+      "native_lock_check_exit": 0,
+      "native_export_exit": 0
+    }
+  ],
+  "tests": {
+    "evidence_class": "local_integration",
+    "exit": 0,
+    "passed": 70,
+    "duration_seconds": 7.169,
+    "modules": [
+      "tests.test_openhands_lock_binding",
+      "tests.test_osv_lockfile_coverage",
+      "tests.test_frozen_macos_variant_no_use"
+    ],
+    "temporary_space": "Existing lane cache outside checkout; initial inside-checkout TMPDIR was rejected before tests ran",
+    "earlier_run": {
+      "passed": 60,
+      "duration_seconds": 11.82,
+      "modules": [
+        "tests.test_openhands_lock_binding",
+        "tests.test_osv_lockfile_coverage"
+      ]
+    }
+  },
+  "guard_controls": {
+    "evidence_class": "synthetic",
+    "exit": 0,
+    "clean": 0,
+    "stale_receipt": 1,
+    "wrong_pins_digest": 1,
+    "other_lock_receipt": 1,
+    "wrong_grant_digest_pipeline": 1,
+    "all_fsspec_hashes_zero": 1,
+    "poisoned_isolated_install": 1,
+    "all_negative_exits_expected": true,
+    "final_run": {
+      "exit": 0,
+      "clean": 0,
+      "stale_receipt": 1,
+      "wrong_pins_digest": 1,
+      "other_lock_receipt": 1,
+      "wrong_grant_digest_pipeline": 1,
+      "all_fsspec_hashes_zero": 1,
+      "poisoned_isolated_install": 1,
+      "all_negative_exits_expected": true
+    }
+  },
+  "hosted_acceptance": "unobserved",
+  "cross_family_review": "pending command-center exact-head read",
+  "pending": [
+    "Final integrity/registry validation and exact-head command-center review; hosted acceptance unobserved"
+  ],
+  "overturn": "Any other pin/block change, incomplete hash coverage, incompatible dependent, failed install/guard, or a fresh OSV finding reopens acceptance; never suppress it through a new ignore without a ruling",
+  "artifact_rulings": {
+    "macos": "Dedicated frozen config only, GHSA-68fv-2mgg-jv7q until2026-12-24; preserved SHA f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
+    "lumibot": "Captured trial/runtime and build lockchecks excluded under Ruling2 after verified 5f confirmation; original bytes unchanged",
+    "owner_confirmation": {
+      "row": "report",
+      "id": "report-native-agent-stack-5f-20261006T0045Z-osv",
+      "timestamp": "2026-10-06T00:41:23Z",
+      "from": "native-agent-stack-5f",
+      "re": "task-native-agent-stack-5f-20261006T004011Z",
+      "note": "Owner confirms both are captured trial evidence, not live inputs. Host/process claim is the owner's observation, not a new root host census."
+    }
+  },
+  "failed_conditions": [
+    {
+      "status": 1,
+      "stage": "test import",
+      "cause": "TMPDIR inside checkout rejected before tests ran; corrected to existing lane cache."
+    },
+    {
+      "status": 1,
+      "stage": "intermediate70tests",
+      "cause": "SDK receipt still held earlier digest after paired relock, and the newly reviewed macOS reason line was not yet pinned; corrected in same change."
+    }
+  ]
+}

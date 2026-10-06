@@ -108,8 +108,9 @@ scanner. The [dataset bridge](../catalyst-dataset/dataset.py) already has the
 EdgarTools header/item taxonomy, DuckDB materialization and as-of filtering.
 Extend those contracts rather than duplicate their timestamp or filing parsers.
 
-The installed **EdgarTools 5.58.0**, reviewed at
-[`abe44344c56cf4bfb5443e0debca7e39342f6e7a`](https://github.com/dgunning/edgartools/tree/abe44344c56cf4bfb5443e0debca7e39342f6e7a),
+The current **EdgarTools 5.60.0** recipe is pinned at
+[`1e7a61b3a142dbf5d19bc82444f85239c1786348`](https://github.com/dgunning/edgartools/tree/1e7a61b3a142dbf5d19bc82444f85239c1786348),
+with bounded [SEC index acceptance](../catalyst-provenance/native-network-edgartools-5600-20261004.json). It
 has `edgar.get_current_filings(form="8-K", page_size=40)` for a bounded current
 page. Do not use `page_size=None`, which walks all pages. Source review of
 `edgar/current_filings.py::get_current_entries_on_page` identifies a 503-as-empty

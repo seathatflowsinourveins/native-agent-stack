@@ -1,10 +1,12 @@
 import csv
 import hashlib
 import importlib.util
+import json
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[1]
 SPEC = importlib.util.spec_from_file_location(
@@ -85,14 +87,37 @@ class IngestSnapshotCompleteness(unittest.TestCase):
     def test_expected_latest_session_with_the_engine_calendar_skips_holidays(self):
         import sys
         sys.path.insert(0, str(ROOT / "blueprints/us-equities/adaptive-paper"))
-        from sessions import _is_trading_day, previous_trading_day
+        from sessions import is_trading_day, previous_trading_day
         # Friday 2026-11-27 09:00 ET: Thanksgiving (Thu 2026-11-26) is closed, so the
         # latest completed session is Wed 2026-11-25.
         now = datetime(2026, 11, 27, 14, 0, tzinfo=timezone.utc)
-        self.assertEqual(ingest.expected_latest_session(now, _is_trading_day, previous_trading_day), date(2026, 11, 25))
+        self.assertEqual(ingest.expected_latest_session(now, is_trading_day, previous_trading_day), date(2026, 11, 25))
         # Monday 2026-09-07 is Labor Day; Tuesday morning expects Friday 2026-09-04.
         now = datetime(2026, 9, 8, 13, 0, tzinfo=timezone.utc)
-        self.assertEqual(ingest.expected_latest_session(now, _is_trading_day, previous_trading_day), date(2026, 9, 4))
+        self.assertEqual(ingest.expected_latest_session(now, is_trading_day, previous_trading_day), date(2026, 9, 4))
+
+    def test_main_uses_the_engine_calendar_for_a_holiday_snapshot(self):
+        # Exercise the scheduled-trial entry point without credentials or a
+        # broker call. After 17:00 on Labor Day the completed session is Friday.
+        import sys
+        import runner
+        now = datetime(2026, 9, 7, 22, 0, tzinfo=timezone.utc)
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            config = root / "config.json"
+            config.write_text(json.dumps({"symbols": ["SPY"], "feed": "iex"}))
+            receipt = root / "receipt.json"
+            with mock.patch.object(runner, "credentials", return_value=("fixture", "fixture")), \
+                    mock.patch.object(ingest, "fetch", return_value={"SPY": [self._bar(2026, 9, 4)]}), \
+                    mock.patch.object(ingest, "datetime", wraps=datetime) as clock, \
+                    mock.patch.dict(sys.modules, {"alpaca": mock.Mock(__version__="0.44.0")}), \
+                    mock.patch("builtins.print"):
+                clock.now.return_value = now
+                result = ingest.main(["--env-file", str(root / "unused.env"), "--config", str(config),
+                                      "--out", str(root / "snapshot.csv"), "--receipt", str(receipt),
+                                      "--sessions", "1"])
+            self.assertEqual(result, 0)
+            self.assertEqual(json.loads(receipt.read_text())["expected_latest_session"], "2026-09-04")
 
     def test_non_positive_sessions_is_refused(self):
         with self.assertRaises(SystemExit):

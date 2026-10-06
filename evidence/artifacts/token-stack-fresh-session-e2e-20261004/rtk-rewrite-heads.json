@@ -1,0 +1,1111 @@
+{
+  "schema": "rtk-rewrite-heads/1",
+  "rtk_version_output": "rtk 0.51.0",
+  "source": {
+    "repository": "rtk-ai/rtk",
+    "tag": "v0.51.0",
+    "commit": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+    "blobs_sha256": {
+      "src/discover/rules.rs": "b74498df73de75ed1015bca05c3e26ddd8c0e9ed0dbdec6fed5e34d047a0a61d",
+      "src/discover/registry.rs": "eace5d47033a80ec85b2481a8e9a0710114752f4ff99cd8fbbee1ad6ecb72464"
+    },
+    "rules_patterns": 94,
+    "toml_filters": 62,
+    "filters_tree_sha256": "d8c432fda6acedfb973f8aa01e838a160047764596cb072ae7c121d110887127"
+  },
+  "rule": "A rule's first pattern token (every alternative, reduced to its basename) that fullmatches a head can be rewritten out of the rule's reach.",
+  "not_in_file": "[hooks].transparent_prefixes of the host's rtk config: the review reads them from `rtk config`.",
+  "php_tool_names": {
+    "names": [
+      "phpunit",
+      "phpstan",
+      "ecs",
+      "pest",
+      "paratest",
+      "pint"
+    ],
+    "from": "src/discover/registry.rs:L15 PHP_TOOL_NAMES",
+    "rule": "rtk normalizes a PHP tool word before it matches (normalize_php_tool_path, L364-L430: backslashes become slashes, a leading ./ goes, a .bat, .cmd, .exe or .ps1 extension goes), and a shell removes the backslashes of the raw word, so a rule token that ends with one of these names (after the same extension strip) is a head too."
+  },
+  "heads": [
+    {
+      "head": "ast-grep",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L153"
+      ]
+    },
+    {
+      "head": "aws",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L710"
+      ]
+    },
+    {
+      "head": "biome",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L209"
+      ]
+    },
+    {
+      "head": "brew",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L799",
+        "src/filters/brew-install.toml:L3"
+      ]
+    },
+    {
+      "head": "builtin",
+      "regex": false,
+      "from": [
+        "src/discover/registry.rs:L1392 SHELL_KEYWORD_PREFIXES"
+      ]
+    },
+    {
+      "head": "bun",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L743"
+      ]
+    },
+    {
+      "head": "bundle",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L584",
+        "src/discover/rules.rs:L593",
+        "src/discover/rules.rs:L609",
+        "src/discover/rules.rs:L618",
+        "src/filters/bundle-install.toml:L3"
+      ]
+    },
+    {
+      "head": "bunx",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L762"
+      ]
+    },
+    {
+      "head": "cargo",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L94"
+      ]
+    },
+    {
+      "head": "cat",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L128"
+      ]
+    },
+    {
+      "head": "command",
+      "regex": false,
+      "from": [
+        "src/discover/registry.rs:L1392 SHELL_KEYWORD_PREFIXES"
+      ]
+    },
+    {
+      "head": "composer",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L808",
+        "src/filters/composer-install.toml:L3"
+      ]
+    },
+    {
+      "head": "ctest",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L388"
+      ]
+    },
+    {
+      "head": "curl",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L485"
+      ]
+    },
+    {
+      "head": "deno",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L770"
+      ]
+    },
+    {
+      "head": "df",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L817",
+        "src/filters/df.toml:L3"
+      ]
+    },
+    {
+      "head": "diff",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L477"
+      ]
+    },
+    {
+      "head": "docker",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L444"
+      ]
+    },
+    {
+      "head": "dotnet",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L825",
+        "src/filters/dotnet-build.toml:L3"
+      ]
+    },
+    {
+      "head": "ecs",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L692"
+      ]
+    },
+    {
+      "head": "env",
+      "regex": false,
+      "from": [
+        "src/discover/registry.rs:L64 ENV_PREFIX"
+      ]
+    },
+    {
+      "head": "eslint",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L209"
+      ]
+    },
+    {
+      "head": "exec",
+      "regex": false,
+      "from": [
+        "src/discover/registry.rs:L1392 SHELL_KEYWORD_PREFIXES"
+      ]
+    },
+    {
+      "head": "find",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L176"
+      ]
+    },
+    {
+      "head": "gh",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L76"
+      ]
+    },
+    {
+      "head": "git",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L61"
+      ]
+    },
+    {
+      "head": "glab",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L85"
+      ]
+    },
+    {
+      "head": "go",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L555"
+      ]
+    },
+    {
+      "head": "golangci",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L565"
+      ]
+    },
+    {
+      "head": "golangci-lint",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L565"
+      ]
+    },
+    {
+      "head": "gradle",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L857",
+        "src/filters/spring-boot.toml:L3"
+      ]
+    },
+    {
+      "head": "gradlew",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L857"
+      ]
+    },
+    {
+      "head": "gradlew.bat",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L857"
+      ]
+    },
+    {
+      "head": "grep",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L135"
+      ]
+    },
+    {
+      "head": "gt",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L1112"
+      ]
+    },
+    {
+      "head": "head",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L128"
+      ]
+    },
+    {
+      "head": "java",
+      "regex": false,
+      "from": [
+        "src/filters/spring-boot.toml:L3"
+      ]
+    },
+    {
+      "head": "jest",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L310"
+      ]
+    },
+    {
+      "head": "kubectl",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L452"
+      ]
+    },
+    {
+      "head": "lint",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L209"
+      ]
+    },
+    {
+      "head": "liquibase",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L1120",
+        "src/filters/liquibase.toml:L3"
+      ]
+    },
+    {
+      "head": "ls",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L167"
+      ]
+    },
+    {
+      "head": "mise",
+      "regex": false,
+      "from": [
+        "src/filters/mise.toml:L3"
+      ]
+    },
+    {
+      "head": "mix",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L909",
+        "src/filters/mix-compile.toml:L3",
+        "src/filters/mix-format.toml:L3"
+      ]
+    },
+    {
+      "head": "mvn",
+      "regex": false,
+      "from": [
+        "src/filters/spring-boot.toml:L3"
+      ]
+    },
+    {
+      "head": "mypy",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L501"
+      ]
+    },
+    {
+      "head": "next",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L285"
+      ]
+    },
+    {
+      "head": "nice",
+      "regex": false,
+      "from": [
+        "src/discover/registry.rs:L1429 PROCESS_WRAPPERS"
+      ]
+    },
+    {
+      "head": "nocorrect",
+      "regex": false,
+      "from": [
+        "src/discover/registry.rs:L1392 SHELL_KEYWORD_PREFIXES"
+      ]
+    },
+    {
+      "head": "noglob",
+      "regex": false,
+      "from": [
+        "src/discover/registry.rs:L1392 SHELL_KEYWORD_PREFIXES"
+      ]
+    },
+    {
+      "head": "nohup",
+      "regex": false,
+      "from": [
+        "src/discover/registry.rs:L1437 PROCESS_WRAPPERS"
+      ]
+    },
+    {
+      "head": "npm",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L112",
+        "src/discover/rules.rs:L185",
+        "src/discover/rules.rs:L209",
+        "src/discover/rules.rs:L260",
+        "src/discover/rules.rs:L285",
+        "src/discover/rules.rs:L310",
+        "src/discover/rules.rs:L349",
+        "src/discover/rules.rs:L396",
+        "src/discover/rules.rs:L420"
+      ]
+    },
+    {
+      "head": "npx",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L120"
+      ]
+    },
+    {
+      "head": "oc",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L460"
+      ]
+    },
+    {
+      "head": "ollama",
+      "regex": false,
+      "from": [
+        "src/filters/ollama.toml:L3"
+      ]
+    },
+    {
+      "head": "paratest",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L683"
+      ]
+    },
+    {
+      "head": "pest",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L674"
+      ]
+    },
+    {
+      "head": "php",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L628",
+        "src/discover/rules.rs:L636",
+        "src/discover/rules.rs:L643",
+        "src/discover/rules.rs:L651",
+        "src/discover/rules.rs:L664"
+      ]
+    },
+    {
+      "head": "phpstan",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L664"
+      ]
+    },
+    {
+      "head": "phpunit",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L651"
+      ]
+    },
+    {
+      "head": "pint",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L701"
+      ]
+    },
+    {
+      "head": "pio",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L949",
+        "src/filters/pio-run.toml:L3"
+      ]
+    },
+    {
+      "head": "pip",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L537"
+      ]
+    },
+    {
+      "head": "pip3",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L537"
+      ]
+    },
+    {
+      "head": "playwright",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L396"
+      ]
+    },
+    {
+      "head": "pnpm",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L104",
+        "src/discover/rules.rs:L185",
+        "src/discover/rules.rs:L209",
+        "src/discover/rules.rs:L260",
+        "src/discover/rules.rs:L285",
+        "src/discover/rules.rs:L310",
+        "src/discover/rules.rs:L349",
+        "src/discover/rules.rs:L396",
+        "src/discover/rules.rs:L420",
+        "src/filters/nx.toml:L3"
+      ]
+    },
+    {
+      "head": "poetry",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L958",
+        "src/filters/poetry-install.toml:L3"
+      ]
+    },
+    {
+      "head": "prettier",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L260"
+      ]
+    },
+    {
+      "head": "prisma",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L420"
+      ]
+    },
+    {
+      "head": "ps",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L976",
+        "src/filters/ps.toml:L3"
+      ]
+    },
+    {
+      "head": "psql",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L734"
+      ]
+    },
+    {
+      "head": "pulumi",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L984",
+        "src/filters/pulumi-destroy.toml:L3",
+        "src/filters/pulumi-preview.toml:L3",
+        "src/filters/pulumi-refresh.toml:L3",
+        "src/filters/pulumi-stack.toml:L3",
+        "src/filters/pulumi-up.toml:L3"
+      ]
+    },
+    {
+      "head": "pytest",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L528"
+      ]
+    },
+    {
+      "head": "python",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L501",
+        "src/discover/rules.rs:L528"
+      ]
+    },
+    {
+      "head": "python3",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L501"
+      ]
+    },
+    {
+      "head": "quarto",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L999",
+        "src/filters/quarto-render.toml:L3"
+      ]
+    },
+    {
+      "head": "rails",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L593"
+      ]
+    },
+    {
+      "head": "rake",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L593"
+      ]
+    },
+    {
+      "head": "rg",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L144"
+      ]
+    },
+    {
+      "head": "rspec",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L609"
+      ]
+    },
+    {
+      "head": "rubocop",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L618"
+      ]
+    },
+    {
+      "head": "ruff",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L510"
+      ]
+    },
+    {
+      "head": "sbt",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L575"
+      ]
+    },
+    {
+      "head": "shopify",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L1025",
+        "src/filters/shopify-theme.toml:L3"
+      ]
+    },
+    {
+      "head": "sqlfluff",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L520"
+      ]
+    },
+    {
+      "head": "ssh",
+      "regex": false,
+      "from": [
+        "src/filters/ssh.toml:L3"
+      ]
+    },
+    {
+      "head": "swift",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L1041",
+        "src/filters/swift-build.toml:L3"
+      ]
+    },
+    {
+      "head": "systemctl",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L1051",
+        "src/filters/systemctl-status.toml:L3"
+      ]
+    },
+    {
+      "head": "tail",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L128"
+      ]
+    },
+    {
+      "head": "terraform",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L1060",
+        "src/filters/terraform-plan.toml:L3"
+      ]
+    },
+    {
+      "head": "time",
+      "regex": false,
+      "from": [
+        "src/discover/registry.rs:L1413 PROCESS_WRAPPERS"
+      ]
+    },
+    {
+      "head": "timeout",
+      "regex": false,
+      "from": [
+        "src/discover/registry.rs:L1405 PROCESS_WRAPPERS"
+      ]
+    },
+    {
+      "head": "tofu",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L1069",
+        "src/filters/tofu-fmt.toml:L3",
+        "src/filters/tofu-init.toml:L3",
+        "src/filters/tofu-plan.toml:L3",
+        "src/filters/tofu-validate.toml:L3"
+      ]
+    },
+    {
+      "head": "tree",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L468"
+      ]
+    },
+    {
+      "head": "trunk",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L1078",
+        "src/filters/trunk-build.toml:L3"
+      ]
+    },
+    {
+      "head": "tsc",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L185"
+      ]
+    },
+    {
+      "head": "uv",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L537",
+        "src/discover/rules.rs:L547",
+        "src/discover/rules.rs:L1087",
+        "src/filters/uv-sync.toml:L3",
+        "src/discover/registry.rs:L1388 ROUTABLE_WRAPPER_PREFIXES"
+      ]
+    },
+    {
+      "head": "vitest",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L349"
+      ]
+    },
+    {
+      "head": "wc",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L1104"
+      ]
+    },
+    {
+      "head": "wget",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L493"
+      ]
+    },
+    {
+      "head": "yadm",
+      "regex": false,
+      "from": [
+        "src/discover/rules.rs:L61"
+      ]
+    },
+    {
+      "head": "[A-Z_][A-Z0-9_]*=.*",
+      "regex": true,
+      "from": [
+        "src/discover/registry.rs:L64 ENV_PREFIX"
+      ]
+    },
+    {
+      "head": "ansible\\-playbook\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L791",
+        "src/filters/ansible-playbook.toml:L3"
+      ]
+    },
+    {
+      "head": "basedpyright\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/basedpyright.toml:L3"
+      ]
+    },
+    {
+      "head": "biome\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/biome.toml:L3"
+      ]
+    },
+    {
+      "head": "du\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L834",
+        "src/filters/du.toml:L3"
+      ]
+    },
+    {
+      "head": "fail2ban\\-client\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L842",
+        "src/filters/fail2ban-client.toml:L3"
+      ]
+    },
+    {
+      "head": "g\\+\\+\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/gcc.toml:L3"
+      ]
+    },
+    {
+      "head": "gcc\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/gcc.toml:L3"
+      ]
+    },
+    {
+      "head": "gcloud\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L849",
+        "src/filters/gcloud.toml:L3"
+      ]
+    },
+    {
+      "head": "hadolint\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L866",
+        "src/filters/hadolint.toml:L3"
+      ]
+    },
+    {
+      "head": "helm\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L875",
+        "src/filters/helm.toml:L3"
+      ]
+    },
+    {
+      "head": "iptables\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L884",
+        "src/filters/iptables.toml:L3"
+      ]
+    },
+    {
+      "head": "jira\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/jira.toml:L3"
+      ]
+    },
+    {
+      "head": "jj\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/jj.toml:L3"
+      ]
+    },
+    {
+      "head": "jq\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/jq.toml:L3"
+      ]
+    },
+    {
+      "head": "just\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/just.toml:L3"
+      ]
+    },
+    {
+      "head": "make\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L892",
+        "src/filters/make.toml:L3"
+      ]
+    },
+    {
+      "head": "markdownlint\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L900",
+        "src/filters/markdownlint.toml:L3"
+      ]
+    },
+    {
+      "head": "mvn\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L918"
+      ]
+    },
+    {
+      "head": "mvnd\\.cmd\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L934"
+      ]
+    },
+    {
+      "head": "mvnd\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L934"
+      ]
+    },
+    {
+      "head": "mvnw\\.cmd\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L918"
+      ]
+    },
+    {
+      "head": "mvnw\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L918"
+      ]
+    },
+    {
+      "head": "np[mx]",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L185",
+        "src/discover/rules.rs:L209",
+        "src/discover/rules.rs:L260",
+        "src/discover/rules.rs:L285",
+        "src/discover/rules.rs:L310",
+        "src/discover/rules.rs:L349",
+        "src/discover/rules.rs:L396",
+        "src/discover/rules.rs:L420"
+      ]
+    },
+    {
+      "head": "nx\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/nx.toml:L3"
+      ]
+    },
+    {
+      "head": "oxlint\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/oxlint.toml:L3"
+      ]
+    },
+    {
+      "head": "ping\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L942",
+        "src/filters/ping.toml:L3"
+      ]
+    },
+    {
+      "head": "pnp[mx]",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L185",
+        "src/discover/rules.rs:L209",
+        "src/discover/rules.rs:L260",
+        "src/discover/rules.rs:L285",
+        "src/discover/rules.rs:L310",
+        "src/discover/rules.rs:L349",
+        "src/discover/rules.rs:L396",
+        "src/discover/rules.rs:L420"
+      ]
+    },
+    {
+      "head": "pre\\-commit\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L967",
+        "src/filters/pre-commit.toml:L3"
+      ]
+    },
+    {
+      "head": "python[0-9\\.]*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L528"
+      ]
+    },
+    {
+      "head": "rsync\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L1008",
+        "src/filters/rsync.toml:L3"
+      ]
+    },
+    {
+      "head": "shellcheck\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L1016",
+        "src/filters/shellcheck.toml:L3"
+      ]
+    },
+    {
+      "head": "skopeo\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/skopeo.toml:L3"
+      ]
+    },
+    {
+      "head": "sops\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L1034",
+        "src/filters/sops.toml:L3"
+      ]
+    },
+    {
+      "head": "stat\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/stat.toml:L3"
+      ]
+    },
+    {
+      "head": "task\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/task.toml:L3"
+      ]
+    },
+    {
+      "head": "turbo\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/turbo.toml:L3"
+      ]
+    },
+    {
+      "head": "ty\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/ty.toml:L3"
+      ]
+    },
+    {
+      "head": "xcodebuild\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/xcodebuild.toml:L3"
+      ]
+    },
+    {
+      "head": "yadm\\S*",
+      "regex": true,
+      "from": [
+        "src/filters/yadm.toml:L3"
+      ]
+    },
+    {
+      "head": "yamllint\\S*",
+      "regex": true,
+      "from": [
+        "src/discover/rules.rs:L1095",
+        "src/filters/yamllint.toml:L3"
+      ]
+    }
+  ]
+}

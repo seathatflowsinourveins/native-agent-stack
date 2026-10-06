@@ -1,4 +1,560 @@
 {
+  "codex_hook_check": {
+    "repository_exclusions": [
+      {
+        "command": "git push origin main",
+        "exit": 0,
+        "rewritten_to": "rtk git push origin main"
+      },
+      {
+        "command": "git push --force origin main",
+        "exit": 0,
+        "rewritten_to": "rtk git push --force origin main"
+      },
+      {
+        "command": "git commit -m x",
+        "exit": 0,
+        "rewritten_to": "rtk git commit -m x"
+      },
+      {
+        "command": "git add -A",
+        "exit": 0,
+        "rewritten_to": "rtk git add -A"
+      },
+      {
+        "command": "git checkout -- .",
+        "exit": 0,
+        "rewritten_to": "rtk git checkout -- ."
+      },
+      {
+        "command": "git checkout -b topic",
+        "exit": 0,
+        "rewritten_to": "rtk git checkout -b topic"
+      },
+      {
+        "command": "git pull",
+        "exit": 0,
+        "rewritten_to": "rtk git pull"
+      },
+      {
+        "command": "git stash",
+        "exit": 0,
+        "rewritten_to": "rtk git stash"
+      },
+      {
+        "command": "git worktree add ../w",
+        "exit": 0,
+        "rewritten_to": "rtk git worktree add ../w"
+      },
+      {
+        "command": "git reset --hard HEAD~1",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git clean -fd",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git rebase main",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git merge topic",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git rm -r dir",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "gh pr merge 1",
+        "exit": 0,
+        "rewritten_to": "rtk gh pr merge 1"
+      },
+      {
+        "command": "gh pr create --fill",
+        "exit": 0,
+        "rewritten_to": "rtk gh pr create --fill"
+      },
+      {
+        "command": "gh api -X DELETE repos/o/r",
+        "exit": 0,
+        "rewritten_to": "rtk gh api -X DELETE repos/o/r"
+      },
+      {
+        "command": "gh release create v1",
+        "exit": 0,
+        "rewritten_to": "rtk gh release create v1"
+      },
+      {
+        "command": "docker run --rm alpine sh",
+        "exit": 0,
+        "rewritten_to": "rtk docker run --rm alpine sh"
+      },
+      {
+        "command": "docker exec c sh",
+        "exit": 0,
+        "rewritten_to": "rtk docker exec c sh"
+      },
+      {
+        "command": "docker build .",
+        "exit": 0,
+        "rewritten_to": "rtk docker build ."
+      },
+      {
+        "command": "docker rm c",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "kubectl apply -f x.yaml",
+        "exit": 0,
+        "rewritten_to": "rtk kubectl apply -f x.yaml"
+      },
+      {
+        "command": "kubectl delete pod x",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "helm install r chart",
+        "exit": 0,
+        "rewritten_to": "rtk helm install r chart"
+      },
+      {
+        "command": "terraform apply",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "pulumi up",
+        "exit": 0,
+        "rewritten_to": "rtk pulumi up"
+      },
+      {
+        "command": "pip install x",
+        "exit": 0,
+        "rewritten_to": "rtk pip install x"
+      },
+      {
+        "command": "pip uninstall x",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "npm install",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "npm publish",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "cargo install x",
+        "exit": 0,
+        "rewritten_to": "rtk cargo install x"
+      },
+      {
+        "command": "cargo publish",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "make install",
+        "exit": 0,
+        "rewritten_to": "rtk make install"
+      },
+      {
+        "command": "curl -X POST http://x",
+        "exit": 0,
+        "rewritten_to": "rtk curl -X POST http://x"
+      },
+      {
+        "command": "wget http://x",
+        "exit": 0,
+        "rewritten_to": "rtk wget http://x"
+      },
+      {
+        "command": "rsync -a --delete a/ b/",
+        "exit": 0,
+        "rewritten_to": "rtk rsync -a --delete a/ b/"
+      },
+      {
+        "command": "aws s3 rm s3://b/k",
+        "exit": 0,
+        "rewritten_to": "rtk aws s3 rm s3://b/k"
+      },
+      {
+        "command": "systemctl stop x",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "iptables -F",
+        "exit": 0,
+        "rewritten_to": "rtk iptables -F"
+      },
+      {
+        "command": "rm -rf build",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "mv a b",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "chmod 777 f",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "sed -i s/a/b/ f",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "tee f",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "dd if=a of=b",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git status",
+        "exit": 0,
+        "rewritten_to": "rtk git status"
+      },
+      {
+        "command": "git log --oneline -3",
+        "exit": 0,
+        "rewritten_to": "rtk git log --oneline -3"
+      },
+      {
+        "command": "git diff",
+        "exit": 0,
+        "rewritten_to": "rtk git diff"
+      },
+      {
+        "command": "ls -la",
+        "exit": 0,
+        "rewritten_to": "rtk ls -la"
+      },
+      {
+        "command": "cat a/x/util.py",
+        "exit": 0,
+        "rewritten_to": "rtk read a/x/util.py"
+      },
+      {
+        "command": "grep -rn needle .",
+        "exit": 0,
+        "rewritten_to": "rtk grep -rn needle ."
+      },
+      {
+        "command": "find . -name x",
+        "exit": 0,
+        "rewritten_to": "rtk find . -name x"
+      },
+      {
+        "command": "pytest -q",
+        "exit": 0,
+        "rewritten_to": "rtk pytest -q"
+      },
+      {
+        "command": "cargo test",
+        "exit": 0,
+        "rewritten_to": "rtk cargo test"
+      }
+    ],
+    "upstream_defaults": [
+      {
+        "command": "git push origin main",
+        "exit": 0,
+        "rewritten_to": "rtk git push origin main"
+      },
+      {
+        "command": "git push --force origin main",
+        "exit": 0,
+        "rewritten_to": "rtk git push --force origin main"
+      },
+      {
+        "command": "git commit -m x",
+        "exit": 0,
+        "rewritten_to": "rtk git commit -m x"
+      },
+      {
+        "command": "git add -A",
+        "exit": 0,
+        "rewritten_to": "rtk git add -A"
+      },
+      {
+        "command": "git checkout -- .",
+        "exit": 0,
+        "rewritten_to": "rtk git checkout -- ."
+      },
+      {
+        "command": "git checkout -b topic",
+        "exit": 0,
+        "rewritten_to": "rtk git checkout -b topic"
+      },
+      {
+        "command": "git pull",
+        "exit": 0,
+        "rewritten_to": "rtk git pull"
+      },
+      {
+        "command": "git stash",
+        "exit": 0,
+        "rewritten_to": "rtk git stash"
+      },
+      {
+        "command": "git worktree add ../w",
+        "exit": 0,
+        "rewritten_to": "rtk git worktree add ../w"
+      },
+      {
+        "command": "git reset --hard HEAD~1",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git clean -fd",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git rebase main",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git merge topic",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git rm -r dir",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "gh pr merge 1",
+        "exit": 0,
+        "rewritten_to": "rtk gh pr merge 1"
+      },
+      {
+        "command": "gh pr create --fill",
+        "exit": 0,
+        "rewritten_to": "rtk gh pr create --fill"
+      },
+      {
+        "command": "gh api -X DELETE repos/o/r",
+        "exit": 0,
+        "rewritten_to": "rtk gh api -X DELETE repos/o/r"
+      },
+      {
+        "command": "gh release create v1",
+        "exit": 0,
+        "rewritten_to": "rtk gh release create v1"
+      },
+      {
+        "command": "docker run --rm alpine sh",
+        "exit": 0,
+        "rewritten_to": "rtk docker run --rm alpine sh"
+      },
+      {
+        "command": "docker exec c sh",
+        "exit": 0,
+        "rewritten_to": "rtk docker exec c sh"
+      },
+      {
+        "command": "docker build .",
+        "exit": 0,
+        "rewritten_to": "rtk docker build ."
+      },
+      {
+        "command": "docker rm c",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "kubectl apply -f x.yaml",
+        "exit": 0,
+        "rewritten_to": "rtk kubectl apply -f x.yaml"
+      },
+      {
+        "command": "kubectl delete pod x",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "helm install r chart",
+        "exit": 0,
+        "rewritten_to": "rtk helm install r chart"
+      },
+      {
+        "command": "terraform apply",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "pulumi up",
+        "exit": 0,
+        "rewritten_to": "rtk pulumi up"
+      },
+      {
+        "command": "pip install x",
+        "exit": 0,
+        "rewritten_to": "rtk pip install x"
+      },
+      {
+        "command": "pip uninstall x",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "npm install",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "npm publish",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "cargo install x",
+        "exit": 0,
+        "rewritten_to": "rtk cargo install x"
+      },
+      {
+        "command": "cargo publish",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "make install",
+        "exit": 0,
+        "rewritten_to": "rtk make install"
+      },
+      {
+        "command": "curl -X POST http://x",
+        "exit": 0,
+        "rewritten_to": "rtk curl -X POST http://x"
+      },
+      {
+        "command": "wget http://x",
+        "exit": 0,
+        "rewritten_to": "rtk wget http://x"
+      },
+      {
+        "command": "rsync -a --delete a/ b/",
+        "exit": 0,
+        "rewritten_to": "rtk rsync -a --delete a/ b/"
+      },
+      {
+        "command": "aws s3 rm s3://b/k",
+        "exit": 0,
+        "rewritten_to": "rtk aws s3 rm s3://b/k"
+      },
+      {
+        "command": "systemctl stop x",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "iptables -F",
+        "exit": 0,
+        "rewritten_to": "rtk iptables -F"
+      },
+      {
+        "command": "rm -rf build",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "mv a b",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "chmod 777 f",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "sed -i s/a/b/ f",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "tee f",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "dd if=a of=b",
+        "exit": 1,
+        "rewritten_to": null
+      },
+      {
+        "command": "git status",
+        "exit": 0,
+        "rewritten_to": "rtk git status"
+      },
+      {
+        "command": "git log --oneline -3",
+        "exit": 0,
+        "rewritten_to": "rtk git log --oneline -3"
+      },
+      {
+        "command": "git diff",
+        "exit": 0,
+        "rewritten_to": "rtk git diff"
+      },
+      {
+        "command": "ls -la",
+        "exit": 0,
+        "rewritten_to": "rtk ls -la"
+      },
+      {
+        "command": "cat a/x/util.py",
+        "exit": 0,
+        "rewritten_to": "rtk read a/x/util.py"
+      },
+      {
+        "command": "grep -rn needle .",
+        "exit": 0,
+        "rewritten_to": "rtk grep -rn needle ."
+      },
+      {
+        "command": "find . -name x",
+        "exit": 0,
+        "rewritten_to": "rtk find . -name x"
+      },
+      {
+        "command": "pytest -q",
+        "exit": 0,
+        "rewritten_to": "rtk pytest -q"
+      },
+      {
+        "command": "cargo test",
+        "exit": 0,
+        "rewritten_to": "rtk cargo test"
+      }
+    ]
+  },
   "compared": [
     {
       "command": "git status --short",

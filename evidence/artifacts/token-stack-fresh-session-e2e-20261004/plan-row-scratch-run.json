@@ -1,0 +1,1268 @@
+{
+  "schema": "plan-row-scratch-run/3",
+  "evidence_class": "local_integration: one run, one host, scratch HOMEs, the real rtk and codex (the stream is synthetic)",
+  "rtk": "rtk 0.51.0",
+  "codex": "codex-cli 0.159.3",
+  "deviation": "8 codex process(es) were running on the host, so the trust command carries --codex-process-name no-such-process-name (the tool would otherwise refuse, exit 2)",
+  "steps": [
+    {
+      "step": "--check before any rtk hook exists",
+      "exit": 4,
+      "expected_exit": 4,
+      "stdout_tail": [],
+      "stderr_tail": [
+        "no user-layer hook of <scratch>/fake-home/.codex has a command named (rtk hook codex): register it first, for rtk `rtk init -g --codex`"
+      ]
+    },
+    {
+      "step": "plan command 3: the exact five-entry exclusions config",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "plan command 5: rtk init -g --codex",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/fake-home/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/fake-home/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/fake-home/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "--check after init, before the trust",
+      "exit": 5,
+      "expected_exit": 5,
+      "stdout_tail": [
+        "hooks named in <scratch>/fake-home/.codex:",
+        "  <scratch>/fake-home/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted"
+      ],
+      "stderr_tail": [
+        "not trusted: <scratch>/fake-home/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted"
+      ]
+    },
+    {
+      "step": "plan command 6: the trust",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "hooks named in <scratch>/fake-home/.codex:",
+        "  <scratch>/fake-home/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
+        "backup: <scratch>/fake-home/.codex/config.toml.bak.20261005T074320Z",
+        "trusted 1 hook(s) in <scratch>/fake-home/.codex/config.toml; read back from hooks/list by key and hash"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "the plan's post_install acceptance program",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "    or a user filter. This closes the residual \"project-trusted filters are not read\". Not covered, and recorded: the environment Codex itself runs the",
+        "    hook in. The scratch run gains two homes (a trusted project filter, the override variable) with the real rtk's rewrite recorded before and after;",
+        "    81 unit tests (FakeRtk answers `trust --list`; every test starts without the variable), 63 mutants all killed, 76 scratch-run steps as expected.",
+        "    Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>",
+        "commit 5ff53d65233992acd8d3f404095c4856d755d013",
+        "Author: Scout <scout@local>",
+        "Date:   Mon Oct 5 03:00:31 2026 -0400",
+        "    registry: register the files changed by the reviewed-list update for #713 repair round 2",
+        "    Co-Authored-By: Claude Sonnet 5.5 <noreply@anthropic.com>",
+        "hooks named in <scratch>/fake-home/.codex:",
+        "  <scratch>/fake-home/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is trusted",
+        "every named hook is trusted at its current hash"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "the after_sign_in filter and test on a synthetic stream: the rewritten command ran and exited 0 (the model call is not run)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "true"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "the after_sign_in filter and test on a synthetic stream: the rewritten command failed (rtk not on the launcher's PATH: exit 127) (the model call is not run)",
+      "exit": 1,
+      "expected_exit": 1,
+      "stdout_tail": [
+        "false"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "the after_sign_in filter and test on a synthetic stream: the rewritten command completed with a non-zero exit status (the model call is not run)",
+      "exit": 1,
+      "expected_exit": 1,
+      "stdout_tail": [
+        "false"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "the after_sign_in filter and test on a synthetic stream: the rewritten command was declined (the model call is not run)",
+      "exit": 1,
+      "expected_exit": 1,
+      "stdout_tail": [
+        "false"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "the after_sign_in filter and test on a synthetic stream: the command ran without the rtk prefix (no hook) (the model call is not run)",
+      "exit": 1,
+      "expected_exit": 1,
+      "stdout_tail": [
+        "false"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "the after_sign_in filter and test on a synthetic stream: no command item at all (the model call is not run)",
+      "exit": 1,
+      "expected_exit": 1,
+      "stdout_tail": [
+        "false"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-hcom/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-hcom/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-hcom/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom (#713's hcom-deny.rules, on the reviewed list by its sha256): --check before the trust",
+      "exit": 5,
+      "expected_exit": 5,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-hcom/.codex/rules: hcom-deny.rules; 1 on the reviewed list, 0 Codex allow-only, 0 not accepted",
+        "  every rule file is accepted",
+        "hooks named in <scratch>/rules-hcom/.codex:",
+        "  <scratch>/rules-hcom/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted"
+      ],
+      "stderr_tail": [
+        "not trusted: <scratch>/rules-hcom/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted"
+      ]
+    },
+    {
+      "step": "rules-hcom: the plan's trust command proceeds",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-hcom/.codex/rules: hcom-deny.rules; 1 on the reviewed list, 0 Codex allow-only, 0 not accepted",
+        "  every rule file is accepted",
+        "hooks named in <scratch>/rules-hcom/.codex:",
+        "  <scratch>/rules-hcom/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
+        "backup: <scratch>/rules-hcom/.codex/config.toml.bak.20261005T074322Z",
+        "trusted 1 hook(s) in <scratch>/rules-hcom/.codex/config.toml; read back from hooks/list by key and hash"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom: --check",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-hcom/.codex/rules: hcom-deny.rules; 1 on the reviewed list, 0 Codex allow-only, 0 not accepted",
+        "  every rule file is accepted",
+        "hooks named in <scratch>/rules-hcom/.codex:",
+        "  <scratch>/rules-hcom/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is trusted",
+        "every named hook is trusted at its current hash"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom: a git push forbid rule is added after the grant: --check exits 6",
+      "exit": 6,
+      "expected_exit": 6,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-hcom/.codex/rules: default.rules, hcom-deny.rules; 1 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 f481703c6aec) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r",
+        "hooks named in <scratch>/rules-hcom/.codex:",
+        "  <scratch>/rules-hcom/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is trusted"
+      ],
+      "stderr_tail": [
+        "not accepted: the hook is trusted beside an execution-rule exposure (above); fix the rules, or --allow-exec-rules accepts it"
+      ]
+    },
+    {
+      "step": "rules-hcom: the trust command now refuses although the hook is already trusted",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-hcom/.codex/rules: default.rules, hcom-deny.rules; 1 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 f481703c6aec) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-hcom-modified: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom-modified: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-hcom-modified/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-hcom-modified/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-hcom-modified/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom-modified (the reviewed bytes plus one comment line): refused, one added byte ends the review",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-hcom-modified/.codex/rules: hcom-deny.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: hcom-deny.rules (sha256 4eda6b7e402e) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-allow-only: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-allow-only: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-allow-only/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-allow-only/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-allow-only/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-allow-only (Codex's default.rules format and hcom's hcom.rules format): the trust proceeds",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-allow-only/.codex/rules: default.rules, hcom.rules; 0 on the reviewed list, 2 Codex allow-only, 0 not accepted",
+        "  every rule file is accepted",
+        "hooks named in <scratch>/rules-allow-only/.codex:",
+        "  <scratch>/rules-allow-only/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
+        "backup: <scratch>/rules-allow-only/.codex/config.toml.bak.20261005T074324Z",
+        "trusted 1 hook(s) in <scratch>/rules-allow-only/.codex/config.toml; read back from hooks/list by key and hash"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-allow-only: --check",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-allow-only/.codex/rules: default.rules, hcom.rules; 0 on the reviewed list, 2 Codex allow-only, 0 not accepted",
+        "  every rule file is accepted",
+        "hooks named in <scratch>/rules-allow-only/.codex:",
+        "  <scratch>/rules-allow-only/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is trusted",
+        "every named hook is trusted at its current hash"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom-prefix: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom-prefix: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-hcom-prefix/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-hcom-prefix/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-hcom-prefix/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom-prefix (the reviewed file, a configured rtk transparent prefix): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-hcom-prefix/.codex/rules: hcom-deny.rules; 1 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: hcom-deny.rules: rtk's [hooks].transparent_prefixes is not empty, or `rtk config` does not say it is: rtk rewrites the command after a configured prefix"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-hcom-filter: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom-filter: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-hcom-filter/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-hcom-filter/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-hcom-filter/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom-filter (the reviewed file, a user TOML filter beside rtk's config): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-hcom-filter/.codex/rules: hcom-deny.rules; 1 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: hcom-deny.rules: rtk has user TOML filters (filters.toml holds more than comments and schema_version): a filter's match_command can make rtk rewrite any command"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-hcom-trusted-filter: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom-trusted-filter: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-hcom-trusted-filter/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-hcom-trusted-filter/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-hcom-trusted-filter/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom-trusted-filter (the reviewed file, a trusted project filter that makes rtk rewrite hcom): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-hcom-trusted-filter/.codex/rules: hcom-deny.rules; 1 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: hcom-deny.rules: rtk trusts TOML filter files (`rtk trust --list` does not say `No trusted filters.`, or failed): a trusted project or global filter can make rtk rewrite any command, `hcom ...` included"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-hcom-trust-override: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom-trust-override: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-hcom-trust-override/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-hcom-trust-override/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-hcom-trust-override/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-hcom-trust-override (the reviewed file, RTK_TRUST_PROJECT_FILTERS in the tool's environment): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-hcom-trust-override/.codex/rules: hcom-deny.rules; 1 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: hcom-deny.rules: RTK_TRUST_PROJECT_FILTERS is set: with a CI variable rtk trusts every project filters file without a store entry"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-exposed: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-exposed: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-exposed/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-exposed/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-exposed/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-exposed (a git push forbid rule, no rtk twin): the trust command is refused before anything is written",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-exposed/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 f481703c6aec) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-exposed: --check says the hook is not trusted (nothing was written)",
+      "exit": 5,
+      "expected_exit": 5,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-exposed/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 f481703c6aec) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r",
+        "hooks named in <scratch>/rules-exposed/.codex:",
+        "  <scratch>/rules-exposed/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted"
+      ],
+      "stderr_tail": [
+        "not trusted: <scratch>/rules-exposed/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted"
+      ]
+    },
+    {
+      "step": "rules-exposed: --allow-exec-rules accepts the exposure",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-exposed/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 f481703c6aec) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r",
+        "hooks named in <scratch>/rules-exposed/.codex:",
+        "  <scratch>/rules-exposed/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
+        "backup: <scratch>/rules-exposed/.codex/config.toml.bak.20261005T074326Z",
+        "trusted 1 hook(s) in <scratch>/rules-exposed/.codex/config.toml; read back from hooks/list by key and hash"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-exposed: --check after the accepted trust exits 6",
+      "exit": 6,
+      "expected_exit": 6,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-exposed/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 f481703c6aec) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r",
+        "hooks named in <scratch>/rules-exposed/.codex:",
+        "  <scratch>/rules-exposed/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is trusted"
+      ],
+      "stderr_tail": [
+        "not accepted: the hook is trusted beside an execution-rule exposure (above); fix the rules, or --allow-exec-rules accepts it"
+      ]
+    },
+    {
+      "step": "rules-exposed: --check --allow-exec-rules",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-exposed/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 f481703c6aec) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r",
+        "hooks named in <scratch>/rules-exposed/.codex:",
+        "  <scratch>/rules-exposed/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is trusted",
+        "every named hook is trusted at its current hash"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-twin: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-twin: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-twin/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-twin/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-twin/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-twin (the git push rule and its rtk git push twin): still refused, a twin cannot be shown to cover every rewrite",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-twin/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 84a079dfaa1a) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-twin: --allow-exec-rules accepts it",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-twin/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 84a079dfaa1a) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r",
+        "hooks named in <scratch>/rules-twin/.codex:",
+        "  <scratch>/rules-twin/.codex/hooks.json:pre_tool_use:1:0: preToolUse Bash 'rtk hook codex' is untrusted",
+        "backup: <scratch>/rules-twin/.codex/config.toml.bak.20261005T074328Z",
+        "trusted 1 hook(s) in <scratch>/rules-twin/.codex/config.toml; read back from hooks/list by key and hash"
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705e-extension: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705e-extension: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-705e-extension/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-705e-extension/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-705e-extension/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705e-extension (`git -C .` forbidden; rtk leaves `git -C .` alone but rewrites `git -C . push origin main`): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-705e-extension/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 f9bfc0cebac0) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-705e-broad: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705e-broad: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-705e-broad/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-705e-broad/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-705e-broad/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705e-broad (broad `uv` and `npx` rules): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-705e-broad/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 29736bd88f4c) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-705e-nested: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705e-nested: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-705e-nested/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-705e-nested/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-705e-nested/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705e-nested (a prefix_rule nested in host_executable, which the real evaluator registers): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-705e-nested/.codex/rules: nested.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: nested.rules (sha256 f62d63b4e608) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the re"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-705f-raw-cr: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705f-raw-cr: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-705f-raw-cr/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-705f-raw-cr/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-705f-raw-cr/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705f-raw-cr (a raw CR inside a triple-quoted token: Codex's lexer reads `git push`): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-705f-raw-cr/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 654b4d735e4b) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-705f-bash-lc: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705f-bash-lc: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-705f-bash-lc/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-705f-bash-lc/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-705f-bash-lc/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705f-bash-lc (an assignment-prefixed script matched against the whole shell argv): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-705f-bash-lc/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 fa5bed72a3dc) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-705f-phpunit: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705f-phpunit: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-705f-phpunit/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-705f-phpunit/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-705f-phpunit/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705f-phpunit (`phpunit.exe`, which rtk normalizes to its PHP tool word): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-705f-phpunit/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 e4040d297f99) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-allow-rtk: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-allow-rtk: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-allow-rtk/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-allow-rtk/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-allow-rtk/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-allow-rtk (an allow rule that names rtk: it matches the rewritten command and not the original, a widened approval): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-allow-rtk/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 d12485eac0c3) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-705g-allow-rtk-script: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705g-allow-rtk-script: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-705g-allow-rtk-script/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-705g-allow-rtk-script/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-705g-allow-rtk-script/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705g-allow-rtk-script (an allow rule for a shell script that holds rtk: the rewritten script matches it and the original does not): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-705g-allow-rtk-script/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 29ae2df09944) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-705f-unicode: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705f-unicode: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-705f-unicode/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-705f-unicode/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-705f-unicode/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-705f-unicode (`g++` plus a combining mark, which rtk's Rust regex rewrites): refused",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "execution rules in <scratch>/rules-705f-unicode/.codex/rules: default.rules; 0 on the reviewed list, 0 Codex allow-only, 1 not accepted",
+        "  exposed: default.rules (sha256 599e845d40a5) is not on the reviewed list (exec_rules_reviewed.json) and is not Codex's own allow-only format (allow rules without an `rtk` token): rtk can rewrite a command out of the reach of a restricting rule, or into the r"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    },
+    {
+      "step": "rules-unreadable: plan command 3 (the exclusions config)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-unreadable: plan command 5 (rtk init -g --codex)",
+      "exit": 0,
+      "expected_exit": 0,
+      "stdout_tail": [
+        "  AGENTS.md: @<scratch>/rules-unreadable/.codex/RTK.md reference added",
+        "  Codex global instructions path: <scratch>/rules-unreadable/.codex/AGENTS.md",
+        "  Restart Codex. For a project hook, approve it when Codex asks you to trust it.",
+        "  Optional: if history recording fails with SQLITE_CANTOPEN in the",
+        "  workspace-write sandbox, grant write access to the tracking directory:",
+        "sandbox_mode = \"workspace-write\"",
+        "[sandbox_workspace_write]",
+        "writable_roots = [\"<scratch>/rules-unreadable/.local/share/rtk\"]",
+        "  Merge this into Codex config.toml only if you want persistent history.",
+        "  Keep existing writable_roots; do not add a duplicate table.",
+        "  This grants access to the directory, including SQLite sidecar files.",
+        "  No Codex permission settings have been changed."
+      ],
+      "stderr_tail": []
+    },
+    {
+      "step": "rules-unreadable (the rules directory cannot be listed): the trust command fails closed",
+      "exit": 2,
+      "expected_exit": 2,
+      "stdout_tail": [
+        "cannot check the execution rules: cannot list <scratch>/rules-unreadable/.codex/rules: [Errno 13] Permission denied: '<scratch>/rules-unreadable/.codex/rules'"
+      ],
+      "stderr_tail": [
+        "refused: a rule file of the user layer is not accepted, or the rules could not be checked (above). Trusting `rtk hook codex` activates a hook that makes Codex run `rtk <command>` in place of each command rtk rewrites, and Codex matches execution rules against "
+      ]
+    }
+  ],
+  "execpolicy_check": [
+    {
+      "command": "git push origin main",
+      "exit": 0,
+      "valid": true,
+      "decision": "forbidden",
+      "matched_prefixes": [
+        [
+          "git",
+          "push"
+        ]
+      ]
+    },
+    {
+      "command": "rtk git push origin main",
+      "exit": 0,
+      "valid": true,
+      "decision": null,
+      "matched_prefixes": []
+    },
+    {
+      "command": "git commit -m x",
+      "exit": 0,
+      "valid": true,
+      "decision": "prompt",
+      "matched_prefixes": [
+        [
+          "git",
+          "commit"
+        ]
+      ]
+    },
+    {
+      "command": "rtk git commit -m x",
+      "exit": 0,
+      "valid": true,
+      "decision": null,
+      "matched_prefixes": []
+    },
+    {
+      "command": "git status",
+      "exit": 0,
+      "valid": true,
+      "decision": null,
+      "matched_prefixes": []
+    },
+    {
+      "command": "rtk git status",
+      "exit": 0,
+      "valid": true,
+      "decision": null,
+      "matched_prefixes": []
+    }
+  ],
+  "rtk_hook_check": [
+    {
+      "command": "git -C .",
+      "exit": 1,
+      "rewritten_to": null
+    },
+    {
+      "command": "git -C . push origin main",
+      "exit": 0,
+      "rewritten_to": "rtk git -C . push origin main"
+    },
+    {
+      "command": "uv",
+      "exit": 1,
+      "rewritten_to": null
+    },
+    {
+      "command": "uv run harmless.py",
+      "exit": 0,
+      "rewritten_to": "rtk uv run harmless.py"
+    },
+    {
+      "command": "npx",
+      "exit": 1,
+      "rewritten_to": null
+    },
+    {
+      "command": "npx prisma migrate deploy",
+      "exit": 0,
+      "rewritten_to": "rtk prisma migrate deploy"
+    },
+    {
+      "command": "uvx hcom kill luna",
+      "exit": 1,
+      "rewritten_to": null
+    },
+    {
+      "command": "phpunit.exe tests/",
+      "exit": 0,
+      "rewritten_to": "rtk phpunit tests/"
+    },
+    {
+      "command": "g++\u0301 --version",
+      "exit": 0,
+      "rewritten_to": "rtk g++\u0301 --version"
+    },
+    {
+      "command": "FOO=1 git push origin main",
+      "exit": 0,
+      "rewritten_to": "FOO=1 rtk git push origin main"
+    },
+    {
+      "command": "hcom kill luna",
+      "exit": 1,
+      "rewritten_to": null
+    }
+  ],
+  "nested_host_executable_check": [
+    {
+      "command": "git push origin main",
+      "exit": 0,
+      "valid": true,
+      "decision": "forbidden"
+    },
+    {
+      "command": "rtk git push origin main",
+      "exit": 0,
+      "valid": true,
+      "decision": null
+    }
+  ],
+  "allow_rtk_check": [
+    {
+      "command": "rtk git push origin main",
+      "exit": 0,
+      "valid": true,
+      "decision": "allow"
+    },
+    {
+      "command": "git push origin main",
+      "exit": 0,
+      "valid": true,
+      "decision": null
+    }
+  ],
+  "allow_rtk_script_check": [
+    {
+      "argv": [
+        "/bin/bash",
+        "-lc",
+        "FOO=1 git push origin main"
+      ],
+      "exit": 0,
+      "valid": true,
+      "decision": null
+    },
+    {
+      "argv": [
+        "/bin/bash",
+        "-lc",
+        "FOO=1 rtk git push origin main"
+      ],
+      "exit": 0,
+      "valid": true,
+      "decision": "allow"
+    }
+  ],
+  "project_filter_check": [
+    {
+      "step": "project filter present, untrusted: hook check hcom kill luna",
+      "exit": 1,
+      "stdout": [],
+      "stderr_first": "No rewrite for: hcom kill luna"
+    },
+    {
+      "step": "rtk trust --yes in the project",
+      "exit": 0,
+      "stdout": [
+        "Risk summary:",
+        "  Filters: 1",
+        "  No high-risk patterns detected."
+      ],
+      "stderr_first": "\u001b[33mDetected 1 custom project scoped toml filter(s) in .rtk/filters.toml \u2014 they rewrite matching co"
+    },
+    {
+      "step": "project filter trusted: hook check hcom kill luna",
+      "exit": 0,
+      "stdout": [
+        "rtk hcom kill luna"
+      ],
+      "stderr_first": ""
+    },
+    {
+      "step": "rtk trust --list from another directory",
+      "exit": 0,
+      "stdout": [
+        "Trusted filters:",
+        "\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550",
+        "  <scratch>/rules-hcom-trusted-filter/project/.rtk/filters.toml (trusted 2026-10-05)"
+      ],
+      "stderr_first": ""
+    },
+    {
+      "step": "exclusions for hcom and uvx hcom in rtk's config, the project filter still trusted: hook check hcom kill luna",
+      "exit": 1,
+      "stdout": [],
+      "stderr_first": "No rewrite for: hcom kill luna"
+    },
+    {
+      "step": "exclusions for hcom and uvx hcom in rtk's config, the project filter still trusted: hook check uvx hcom kill luna",
+      "exit": 1,
+      "stdout": [],
+      "stderr_first": "No rewrite for: uvx hcom kill luna"
+    },
+    {
+      "step": "exclusions for hcom and uvx hcom in rtk's config, the project filter still trusted: hook check git status",
+      "exit": 0,
+      "stdout": [
+        "rtk git status"
+      ],
+      "stderr_first": ""
+    },
+    {
+      "step": "no store entry, no override: hook check hcom kill luna",
+      "exit": 1,
+      "stdout": [],
+      "stderr_first": "No rewrite for: hcom kill luna"
+    },
+    {
+      "step": "RTK_TRUST_PROJECT_FILTERS=1 and CI=1, no store entry: hook check hcom kill luna",
+      "exit": 0,
+      "stdout": [
+        "rtk hcom kill luna"
+      ],
+      "stderr_first": ""
+    },
+    {
+      "step": "RTK_TRUST_PROJECT_FILTERS=1 and CI=1: rtk trust --list",
+      "exit": 0,
+      "stdout": [
+        "No trusted filters."
+      ],
+      "stderr_first": ""
+    },
+    {
+      "step": "exclusions for hcom and uvx hcom, RTK_TRUST_PROJECT_FILTERS=1 and CI=1: hook check hcom kill luna",
+      "exit": 1,
+      "stdout": [],
+      "stderr_first": "No rewrite for: hcom kill luna"
+    }
+  ],
+  "all_as_expected": true
+}

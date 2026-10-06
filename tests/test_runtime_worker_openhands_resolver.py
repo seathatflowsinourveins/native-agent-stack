@@ -8,8 +8,10 @@ file passes `python3 scripts/validate.py --scan-file`.
 """
 
 import contextlib
+import ast
 import hashlib
 import importlib.util
+import inspect
 import io
 import json
 import os
@@ -23,6 +25,7 @@ import stat
 import subprocess
 import sys
 import tempfile
+import textwrap
 import unittest
 from unittest import mock
 import uuid
@@ -267,27 +270,76 @@ class IssueSelectionTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.r.resolver_instruction(selected, task="x", owned_paths=[])
 
-    def test_the_agent_instructions_state_every_category_the_push_gate_refuses(self):
+    def test_emitted_gate_path_rules_match_instruction_and_receipt_policy(self):
         # Cross-family review P2 of 2026-10-04: the skill and the generated instruction told the
         # agent to add or update tests, which the gate refuses on this repository, and omitted the
-        # gate's categories. Both now state each category's phrase and the stop-and-report rule, and
-        # the gate's rules, its agent map and the receipt's rule set stay in step.
+        # gate's categories. Derive emitted rules from their producers, rather than
+        # trusting a closed list that could miss a new path-safety rule.
         gate, receipt = self.r.push_gate, self.r._recipe("receipt")
         selected = self.r.select_issue(issue_fixture(), [], 12, provenance=self.provenance())
         instruction = self.r.resolver_instruction(selected, task="Implement issue 12 within scope.",
                                                   owned_paths=["docs/example.md"])
         skill = (RECIPE / "skills/resolver/SKILL.md").read_text(encoding="utf-8")
-        for phrase in sorted({*gate.AGENT_RULE_PHRASES.values(), gate.STOP_AND_REPORT}):
-            with self.subTest(phrase=phrase):
-                self.assertIn(phrase, " ".join(skill.split()))
-                self.assertIn(phrase, " ".join(instruction.split()))
         for stale in ("Add or update tests", "write the failing test first"):
             self.assertNotIn(stale, instruction)
             self.assertNotIn(stale, skill)
-        rules = {*gate.RULE_PRECEDENCE, "github", "codeowners", "gate_code", "workflow_policy_test",
-                 "pr_text_interpolation", "zizmor_finding", "unresolved_read"}
-        self.assertEqual(set(gate.AGENT_RULE_PHRASES) | gate.GATE_ONLY_RULES, rules)
-        self.assertEqual(set(receipt.PUSH_GATE_RULES), rules)
+        rules = set(gate.RULE_PRECEDENCE)
+        safety_producers = (gate.path_refusals, gate.PushGate._check_paths)
+        for producer in (gate.static_rule, gate.Protected.__init__, *safety_producers,
+                         gate.PushGate._check, gate.PushGate._zizmor):
+            syntax = ast.parse(textwrap.dedent(inspect.getsource(producer)))
+            for node in ast.walk(syntax):
+                if producer is gate.static_rule and isinstance(node, ast.Return):
+                    if isinstance(node.value, ast.Constant) and isinstance(node.value.value, str):
+                        rules.add(node.value.value)
+                if producer is gate.Protected.__init__ and isinstance(node, ast.Assign):
+                    if (isinstance(node.value, ast.Constant) and isinstance(node.value.value, str)
+                            and any(isinstance(target, ast.Subscript)
+                                    and isinstance(target.value, ast.Attribute) and target.value.attr == "files"
+                                    for target in node.targets)):
+                        rules.add(node.value.value)
+                if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Attribute) or not node.args:
+                    continue
+                value = node.args[-1]
+                if not isinstance(value, ast.Constant) or not isinstance(value.value, str):
+                    continue
+                if (node.func.attr == "setdefault" and isinstance(node.func.value, ast.Name)
+                        and node.func.value.id == "paths"
+                        or producer in safety_producers and node.func.attr in ("add", "append")):
+                    rules.add(value.value)
+        named = set(gate.AGENT_RULE_PHRASES) | gate.GATE_ONLY_RULES
+        unnamed = getattr(gate, "UNNAMED_PATH_RULES", frozenset())
+        self.assertFalse(named & unnamed)
+        self.assertEqual(named | unnamed, rules)
+        self.assertEqual(set(receipt.PUSH_GATE_RULES), named)
+        # Unnamed means the receipt omits paths, not that the agent is left
+        # uninformed. Every emitted rule needs an instruction phrase, except
+        # the explicitly gate-only diagnostics. Check the gate-refusal section
+        # of the skill, so a validator-only mention cannot hide instruction drift.
+        unnamed_phrases = getattr(gate, "UNNAMED_RULE_PHRASES", {})
+        self.assertEqual(set(unnamed_phrases), unnamed)
+        self.assertEqual(set(gate.AGENT_RULE_PHRASES) | set(unnamed_phrases), rules - gate.GATE_ONLY_RULES)
+        phrases = {gate.STOP_AND_REPORT}
+        for rule in rules - gate.GATE_ONLY_RULES:
+            phrases.update((gate.AGENT_RULE_PHRASES[rule],) if rule in gate.AGENT_RULE_PHRASES
+                           else unnamed_phrases[rule])
+        phrases.update(gate.MODULE_ARTIFACT_SUFFIXES)
+        skill_refusals = skill.split("## What the push gate refuses\n", 1)[1].split("\n## Workflow", 1)[0]
+        for phrase in sorted(phrases):
+            with self.subTest(phrase=phrase):
+                self.assertIn(phrase.casefold(), " ".join(skill_refusals.split()).casefold())
+                self.assertIn(phrase.casefold(), " ".join(instruction.split()).casefold())
+        # Parse the actual lists: codex.AGENTS.template.md must not satisfy a
+        # missing AGENTS.template.md, and an extra name must fail too.
+        expected = set(gate.INSTRUCTION_FILE_NAMES) | set(gate.INSTRUCTION_PATH_PREFIXES)
+        skill_list = skill_refusals.split("- instruction files (`instruction_file`)", 1)[1].split("\n- ", 1)[0]
+        skill_names = {name.casefold().rstrip("/") for name in re.findall(r"`([^`]+)`", skill_list)}
+        instruction_list = instruction.split("Instruction files (instruction_file)", 1)[1].split(": ", 1)[1]
+        instruction_list = instruction_list.split(". ", 1)[0].replace(" and ", ", ")
+        instruction_names = {name.strip().casefold().rstrip("/") for name in instruction_list.split(",")}
+        for source, names in (("skill", skill_names), ("generated instruction", instruction_names)):
+            with self.subTest(instruction_inventory=source):
+                self.assertEqual(names, expected)
 
 
 # -- Unit 2 helpers: fixture repositories with local git only (no network).
@@ -958,8 +1010,9 @@ class PassingGate:
     def __init__(self):
         self.calls = []
 
-    def check(self, clone, *, base, head, agent_trees=()):
-        self.calls.append({"clone": clone, "base": base, "head": head, "agent_trees": tuple(agent_trees)})
+    def check(self, clone, *, base, head, owned_paths=None, agent_trees=()):
+        self.calls.append({"clone": clone, "base": base, "head": head, "owned_paths": owned_paths,
+                           "agent_trees": tuple(agent_trees)})
         return {"commit": head, "base": base, "status": "pass", "reasons": [], "paths": [], "trusted_commit": "f" * 40,
                 "protected": None, "zizmor": {"version": "1.30.1", "findings": 0, "failing": []}}
 
@@ -1003,7 +1056,7 @@ class GhHarnessTests(unittest.TestCase):
 
     def harness(self, runner=subprocess.run, guard=None, base=None, gate=None):
         return self.h.GhHarness(self.fake.gh, git=self.fake.git, base_env=base or planted_base(self.home),
-                                workdir=self.workdir, runner=runner, guard=guard, push_gate=gate)
+                                workdir=self.workdir, runner=runner, guard=guard, push_gate=gate, owned_paths=("docs",))
 
     def test_child_environment_is_an_allowlist_that_drops_planted_credentials(self):
         base = planted_base(self.home, xdg=self.tmp / "xdg")
@@ -1402,7 +1455,8 @@ class GhHarnessTests(unittest.TestCase):
         self.assertEqual(harness.push(self.clone, "openhands/issue-12", base=base, head=head).returncode, 0)
         calls = self.fake.calls()
         self.assertEqual([(call["tool"], call["argv"]) for call in calls], [("git", urls[1:]), ("git", push[1:])])
-        self.assertEqual(gate.calls, [{"clone": self.clone, "base": base, "head": head, "agent_trees": ()}])
+        self.assertEqual(gate.calls, [{"clone": self.clone, "base": base, "head": head,
+                                       "owned_paths": ("docs",), "agent_trees": ()}])
         self.assertEqual([(record["status"], record["commit"]) for record in harness.gates], [("pass", head)])
         names = sorted(self.h.child_env(planted_base(self.home), gh_path=self.fake.gh, workdir=self.workdir))
         for call in calls:
@@ -1417,6 +1471,20 @@ class GhHarnessTests(unittest.TestCase):
             self.assertEqual([call["argv"] for call in self.fake.calls()], [urls[1:]])
             self.assertEqual(gate.calls, [])
 
+    def test_owned_paths_use_a_frozen_host_copy_and_ignore_environment(self):
+        base, head = "a" * 40, "c" * 40
+        source = ["docs"]
+        gate = PassingGate()
+        harness = self.h.GhHarness(self.fake.gh, git=self.fake.git, base_env=planted_base(self.home),
+                                    workdir=self.workdir, push_gate=gate, owned_paths=source)
+        source[:] = ["src"]
+        self.fake.respond(self.h.op_push_urls(self.clone)[1:], ORIGIN + "\n")
+        self.fake.respond(self.h.op_push(self.clone, "openhands/issue-12", head, gh=self.fake.gh)[1:], "")
+        with mock.patch.dict(os.environ, {"OWNED_PATHS": "src", "OPENHANDS_OWNED_PATHS": "src"}):
+            harness.push(self.clone, "openhands/issue-12", base=base, head=head)
+        self.assertEqual(harness.owned_paths, ("docs",))
+        self.assertEqual(gate.calls[0]["owned_paths"], ("docs",))
+
     def test_a_gate_record_that_is_not_a_pass_for_the_exact_commit_refuses_the_push(self):
         base, head = "a" * 40, "c" * 40
         self.fake.respond(self.h.op_push_urls(self.clone)[1:], ORIGIN + "\n")
@@ -1426,8 +1494,8 @@ class GhHarnessTests(unittest.TestCase):
                 super().__init__()
                 self.record = record
 
-            def check(self, clone, *, base, head, agent_trees=()):
-                super().check(clone, base=base, head=head, agent_trees=agent_trees)
+            def check(self, clone, *, base, head, owned_paths=None, agent_trees=()):
+                super().check(clone, base=base, head=head, owned_paths=owned_paths, agent_trees=agent_trees)
                 return self.record
 
         passing = PassingGate().check(self.clone, base=base, head=head)
@@ -1802,7 +1870,8 @@ def completed(args, stdout="", code=0, stderr=""):
     return subprocess.CompletedProcess(list(args), code, stdout, stderr)
 
 
-# The required contexts of main's rules, read with a GET on 2026-09-28 (review item D3).
+# Dated observation of 2026-09-28: eight required contexts of main's rules (GET, review item D3).
+# This fixture preserves that observed list, rather than describing the current ruleset.
 REQUIRED_CONTEXTS = ("validate", "token-report", "secret-scan", "dependency-review", "osv-scanner",
                      "verdict-review-gate", "validate-macos", "sota-sources")
 
@@ -2359,22 +2428,62 @@ class CommandLineTests(unittest.TestCase):
         import io
         out = io.StringIO()
         with contextlib.redirect_stdout(out):
-            code = self.r._dormant_main(list(argv), **kwargs)
+            code = self.r.main(list(argv), **kwargs)
         return code, out.getvalue()
 
-    def test_public_driver_refuses_before_parsing_or_any_external_call(self):
+    def test_public_driver_refuses_when_gate_import_is_unavailable(self):
         import contextlib
         import io
-        expected = ('resolver disabled until the owned-path allowlist gate lands '
-                    '(docs/decisions/2026-09-28-openhands-resolver-isolation.md)')
         output = io.StringIO()
-        with mock.patch.object(self.r, "build_parser", side_effect=AssertionError("parser reached")), \
+        with mock.patch.object(self.r, "push_gate", None), \
+                mock.patch.object(self.r, "build_parser", side_effect=AssertionError("parser reached")), \
                 mock.patch("subprocess.run", side_effect=AssertionError("subprocess reached")), \
                 mock.patch("socket.create_connection", side_effect=AssertionError("network reached")), \
                 contextlib.redirect_stderr(output):
             code = self.r.main(["run"])
         self.assertEqual(code, 3)
-        self.assertEqual(output.getvalue().strip(), expected)
+        self.assertEqual(output.getvalue().strip(), self.r.DISABLED_MESSAGE)
+
+    def test_public_driver_refuses_when_negative_control_is_allowed(self):
+        output = io.StringIO()
+        with mock.patch.object(self.r.push_gate.PushGate, "check", return_value={"status": "pass"}), \
+                mock.patch.object(self.r, "build_parser", side_effect=AssertionError("parser reached")), \
+                mock.patch("socket.create_connection", side_effect=AssertionError("network reached")), \
+                contextlib.redirect_stderr(output):
+            self.assertEqual(self.r.main(["run"]), 3)
+        self.assertEqual(output.getvalue().strip(), self.r.DISABLED_MESSAGE)
+
+    def test_startup_negative_control_runs_the_native_git_fixture(self):
+        self.assertTrue(self.r._startup_gate_self_test())
+
+    def test_public_driver_proceeds_after_self_test(self):
+        with mock.patch.object(self.r, "_dormant_main", return_value=7) as dispatch:
+            self.assertEqual(self.r.main(["plan"], session_key=None), 7)
+        dispatch.assert_called_once_with(["plan"], session_key=None)
+
+    def test_gate_import_exception_keeps_the_public_stderr_and_exit_3(self):
+        original = importlib.util.spec_from_file_location
+
+        class BrokenLoader:
+            def create_module(self, _):
+                return None
+
+            def exec_module(self, _):
+                raise ImportError("fixture gate import failed")
+
+        def spec(name, path, **kwargs):
+            selected = original(name, path, **kwargs)
+            if str(path).endswith("resolver/push_gate.py"):
+                selected.loader = BrokenLoader()
+            return selected
+
+        output = io.StringIO()
+        with mock.patch.object(importlib.util, "spec_from_file_location", side_effect=spec):
+            resolver = load_resolver()
+        with mock.patch("subprocess.run", side_effect=AssertionError("subprocess reached")), \
+                contextlib.redirect_stderr(output):
+            self.assertEqual(resolver.main(["--help"]), 3)
+        self.assertEqual(output.getvalue().strip(), resolver.DISABLED_MESSAGE)
 
     def test_dormant_run_parser_keeps_stage_2_options_without_gate_or_run_id(self):
         parser = self.r.build_parser()
@@ -2490,15 +2599,16 @@ class CommandLineTests(unittest.TestCase):
         self.assertNotIn(key, printed)
         self.assertEqual((self.tmp / "leaky.jsonl").read_text(encoding="utf-8"), "")
 
-    def test_public_cli_is_disabled_even_for_help_or_incomplete_arguments(self):
-        for argv in (("run", "--issue", "12"), ("--help",), ("run", "--help")):
+    def test_public_cli_checks_the_gate_then_parses_help_or_incomplete_arguments(self):
+        for argv, expected in ((("run", "--issue", "12"), 2), (("--help",), 0), (("run", "--help"), 0)):
             with self.subTest(argv=argv):
                 run = subprocess.run([sys.executable, str(RECIPE / "resolver.py"), *argv],
                                      capture_output=True, text=True, timeout=60,
                                      env=hermetic_git_environment())
-                self.assertEqual(run.returncode, 3)
-                self.assertEqual(run.stderr.strip(), self.r.DISABLED_MESSAGE)
-                self.assertEqual(run.stdout, "")
+                self.assertEqual(run.returncode, expected, run.stderr)
+                self.assertNotIn(self.r.DISABLED_MESSAGE, run.stderr)
+                if expected == 0:
+                    self.assertIn("usage:", run.stdout)
 
 
 class ResolverSkillTests(unittest.TestCase):
@@ -2547,7 +2657,8 @@ class Stage2HarnessTests(unittest.TestCase):
 
     def harness(self, runner=subprocess.run, guard=None, gate=None):
         return self.h.GhHarness(self.fake.gh, git=self.fake.git, base_env=planted_base(self.home),
-                                workdir=self.h.private_workdir(self.tmp), runner=runner, guard=guard, push_gate=gate)
+                                workdir=self.h.private_workdir(self.tmp), runner=runner, guard=guard, push_gate=gate,
+                                owned_paths=("docs",))
 
     def test_base_and_repository_reads_are_fixed_read_only_templates(self):
         h = self.h
@@ -3613,7 +3724,7 @@ class ResolverAttemptTests(unittest.TestCase):
         self.assertEqual(github.pushes, [{"refspec": f"{head}:refs/heads/openhands/issue-12", "head": head}])
         # The trusted gate saw the exact pushed commit, its base, and the attempt's result directory.
         self.assertEqual(self.gate.calls, [{"clone": str(attempt.clone), "base": self.base, "head": head,
-                                            "agent_trees": (str(result),)}])
+                                            "owned_paths": ("docs",), "agent_trees": (str(result),)}])
         self.assertEqual([(record["status"], record["commit"]) for record in outcome["push_gate"]], [("pass", head)])
         self.assertEqual({key: outcome[key] for key in ("failure_stage", "branch", "pr", "head", "paths_changed",
                                                          "sota_sources", "patch_sha256", "writes")},
@@ -3962,7 +4073,7 @@ class ResolverRunTests(unittest.TestCase):
                 mocks["time"] = enter(mock.patch.object(dispatch, "time", dispatch_time))
             enter(contextlib.redirect_stdout(out))
             extra = ["--dry-run"] if dry_run else ["--reviewer-command", self.reviewer]
-            code = self.r._dormant_main(self.argv(*extra), runner=github, clock=clock.clock, sleep=clock.sleep, gate=self.gate)
+            code = self.r.main(self.argv(*extra), runner=github, clock=clock.clock, sleep=clock.sleep, gate=self.gate)
         return code, json.loads(out.getvalue()), mocks
 
     def receipt(self, printed):

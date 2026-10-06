@@ -1,0 +1,182 @@
+commit e14d1e8e0034468ddd1ab3fc1c9983b25d2d8ace
+Author: Scout <scout@local>
+Date:   Mon Sep 28 00:34:19 2026 -0400
+
+    fix(sse): let a reused session pin outrank OAuth session occupancy
+    
+    getProviderCredentials ran the OAuth session-occupancy re-pick after
+    session affinity. It replaced the connection that
+    selectSessionAffinityConnection had chosen with any OAuth peer (priority
+    <= selected + 1) that had fewer foreign sessions, and left the pin
+    unchanged, so pinned sessions were served off-pin. chat.ts sets
+    reserveOAuthSession on its dispatch call, and the same flag drives the
+    occupancy reservation, so no setting turned the re-pick off. Issue #8939
+    and PR #8940 state that same-session affinity must stay stronger than
+    occupancy; PR #5943 gave affinity the same precedence over reset-aware
+    re-scoring.
+    
+    - sessionAffinityPin.ts: the re-pick moves into the affinity leaf as
+      pickMoreAvailableOAuthPeer, with the same logic. The fresh-pin path of
+      selectSessionAffinityConnection applies it to the LRU pick before it
+      writes the pin, with no await between the pin read, that decision and
+      the write, so the pin names the account selected for dispatch for
+      every non-lease caller. That includes the combo availability check
+      (chat.ts:1096-1108): it passes no reserveOAuthSession, and the
+      dispatch reuses the pin it writes. The reuse branch and
+      planSessionAffinityConnection (lease path) are unchanged.
+    - auth.ts: the re-pick is skipped after a non-lease affinity selection.
+      This adapts the flag-and-skip of open PR #13102
+      (selectedByApiKeyPreference). The re-pick still runs for strategy
+      picks, sessionless calls and the lease path. auth.ts neither reads nor
+      writes pins, so no second write can replace a newer pin written under
+      another selection-mutex key, and no pin can expire between two reads.
+      An ineligible pin is not in the pool, so it is not reused and
+      occupancy decides the new binding as before.
+    
+    References:
+    - CLIProxyAPI v8.0.2 (4a2c818) sdk/cliproxy/auth/selector.go L1059-1077:
+      keep the cached auth when it is available, otherwise bind the
+      fallback selector's pick.
+    - LiteLLM v1.102.1 (d09bbae)
+      litellm/router_utils/pre_call_checks/deployment_affinity_check.py:
+      first-writer-wins pin claims, _claim_pin (L344) with the synchronous
+      check-and-set of _claim_pin_in_memory (L397), used for the session pin
+      at L655. Here each selection makes one read-decide-write.
+    - sub2api v0.2.8 (fd80b08)
+      backend/internal/service/openai_account_scheduler.go L1323-1330 binds
+      the session only after tryAcquireAccountSlot succeeds. That is
+      stronger than this patch, which writes the pin at selection, before
+      the credentials are materialized and the occupancy is reserved.
+    
+    Unchanged: the occupancy reservation in materializeConnection and its
+    release paths.
+    
+    Regression test: tests/unit/affinity-outranks-occupancy-8940.test.ts.
+    
+    (cherry picked from commit 045aa81f30cb9a1fc4f6b426ed940c1956cceda2)
+
+diff --git a/src/sse/services/auth.ts b/src/sse/services/auth.ts
+index d22d86d41..4e192a89d 100644
+--- a/src/sse/services/auth.ts
++++ b/src/sse/services/auth.ts
+@@ -156,6 +156,7 @@ import {
+   applySessionAffinityPin,
+   formatSessionKeyForLog,
+   isForcedConnectionMissingFromPool,
++  pickMoreAvailableOAuthPeer,
+   resolveForcedConnectionForCredentialPool,
+   resolveSessionAffinityTtlMs,
+   selectSessionAffinityConnection,
+@@ -2157,24 +2158,13 @@ export async function getProviderCredentials(
+       connection = orderedConnections[0];
+     }
+ 
+-    if (options.reserveOAuthSession === true && connection?.authType === "oauth") {
+-      const selectedPriority = connection.priority || 999;
+-      const selectedAvailability = getOAuthSessionAvailability(connection.id, options.sessionKey);
+-      const moreAvailablePeer = [...orderedConnections]
+-        .filter(
+-          (candidate) =>
+-            candidate.authType === "oauth" && (candidate.priority || 999) <= selectedPriority + 1
+-        )
+-        .sort(
+-          (a, b) =>
+-            getOAuthSessionAvailability(b.id, options.sessionKey) -
+-            getOAuthSessionAvailability(a.id, options.sessionKey)
+-        )
+-        .find(
+-          (candidate) =>
+-            getOAuthSessionAvailability(candidate.id, options.sessionKey) > selectedAvailability
+-        );
+-      if (moreAvailablePeer) connection = moreAvailablePeer;
++    // #8940: non-lease affinity picks keep reused pins; the leaf applies occupancy to fresh ones.
++    if (
++      options.reserveOAuthSession === true &&
++      connection?.authType === "oauth" &&
++      (options.lease || !affinityConnection)
++    ) {
++      connection = pickMoreAvailableOAuthPeer(connection, orderedConnections, options.sessionKey);
+     }
+ 
+     let exclusiveLease: ExclusiveConnectionLease | undefined;
+diff --git a/src/sse/services/sessionAffinityPin.ts b/src/sse/services/sessionAffinityPin.ts
+index 262db8491..3dbb5674e 100644
+--- a/src/sse/services/sessionAffinityPin.ts
++++ b/src/sse/services/sessionAffinityPin.ts
+@@ -42,6 +42,7 @@ import {
+   isModelLocked,
+ } from "@omniroute/open-sse/services/accountFallback.ts";
+ import { isComboPerModelTimeoutAbort } from "@omniroute/open-sse/services/combo/comboAbortReasons.ts";
++import { getOAuthSessionAvailability } from "@omniroute/open-sse/services/oauthSessionOccupancy.ts";
+ import * as log from "../utils/logger";
+ import { readHeaderValue } from "./headerReader.ts";
+ 
+@@ -235,6 +236,7 @@ export interface SessionAffinityConnection {
+   lastUsedAt?: string | null;
+   consecutiveUseCount?: number | null;
+   priority?: number | null;
++  authType?: string | null;
+ }
+ 
+ export function syncSessionAffinityRuntimeFields(
+@@ -263,11 +265,46 @@ function compareLruConnections(a: SessionAffinityConnection, b: SessionAffinityC
+   return (a.priority || 999) - (b.priority || 999);
+ }
+ 
++/**
++ * #8940 OAuth session-occupancy re-pick, moved from getProviderCredentials (auth.ts)
++ * with the same logic, like the rest of this leaf, so that auth.ts shrinks and the
++ * fresh-pin path below can apply it before the pin is written. Returns `selected`
++ * unless it is OAuth and an OAuth candidate with priority <= selected + 1 has
++ * strictly higher availability (fewer foreign sessions).
++ */
++export function pickMoreAvailableOAuthPeer<T extends SessionAffinityConnection>(
++  selected: T,
++  candidates: T[],
++  sessionKey: string | null | undefined
++): T {
++  if (selected.authType !== "oauth") return selected;
++  const selectedPriority = selected.priority || 999;
++  const selectedAvailability = getOAuthSessionAvailability(selected.id, sessionKey);
++  const moreAvailablePeer = [...candidates]
++    .filter(
++      (candidate) =>
++        candidate.authType === "oauth" && (candidate.priority || 999) <= selectedPriority + 1
++    )
++    .sort(
++      (a, b) =>
++        getOAuthSessionAvailability(b.id, sessionKey) -
++        getOAuthSessionAvailability(a.id, sessionKey)
++    )
++    .find(
++      (candidate) => getOAuthSessionAvailability(candidate.id, sessionKey) > selectedAvailability
++    );
++  return moreAvailablePeer ?? selected;
++}
++
+ /**
+  * Session-affinity account selection (moved from auth.ts alongside the #5903
+  * pin-override so all session-affinity logic lives in one leaf). Reuses an
+- * active pin when its connection is in the pool; otherwise picks the LRU
+- * connection and creates a fresh pin. Behavior byte-identical to the original.
++ * active pin when its connection is in the pool, and getProviderCredentials
++ * then skips its occupancy re-pick (#8939/#8940: same-session affinity outranks
++ * occupancy). Otherwise it picks the LRU connection, lets the occupancy re-pick
++ * replace that pick, and pins the result; the read, that decision and the pin
++ * write run without an intervening await, so the pin names the account
++ * selected for dispatch.
+  */
+ export async function selectSessionAffinityConnection<T extends SessionAffinityConnection>(
+   provider: string,
+@@ -303,8 +340,9 @@ export async function selectSessionAffinityConnection<T extends SessionAffinityC
+     );
+   }
+ 
+-  const connection = [...connections].sort(compareLruConnections)[0] ?? null;
+-  if (!connection) return null;
++  const lruPick = [...connections].sort(compareLruConnections)[0] ?? null;
++  if (!lruPick) return null;
++  const connection = pickMoreAvailableOAuthPeer(lruPick, connections, sessionKey);
+ 
+   upsertSessionAccountAffinity(sessionKey, provider, connection.id, Date.now(), ttlMs);
+   await touchConnectionLastUsed(connection.id, 1);

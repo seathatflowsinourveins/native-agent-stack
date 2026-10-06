@@ -1,5 +1,5 @@
 {
-  "description": "Every tracked dependency lockfile or manifest that security-scan.yml's osv-scanner job scans. A lockfile entry without a parser lets OSV-Scanner infer it from the file name; parser names the OSV-Scanner v2 extractor for names it cannot infer (--lockfile=<parser>:<path>). A covered_by_lockfile entry is a manifest OSV-Scanner v2.6.0 has no source extractor for; its sibling lockfile is scanned instead. A dependency_free entry is a package.json that declares no dependency and has no lockfile beside it, so nothing is scanned for it; it needs a reason and an evidence path. An excluded entry is a tracked lockfile deliberately left out of the scan; it needs a reason and an evidence path, and only a deliberately vulnerable test fixture qualifies. A lockfile entry that names a config is scanned in an invocation of its own under that config alone (an explicit --config applies to every input of one invocation), and every other entry together under .github/osv-scanner.toml; the tests bind each such config to its one lock. tests/test_osv_lockfile_coverage.py fails when a tracked lockfile or manifest is in none of the four lists.",
+  "description": "Every tracked dependency lockfile or manifest that security-scan.yml's osv-scanner job scans. A lockfile entry without a parser lets OSV-Scanner infer it from the file name; parser names the OSV-Scanner v2 extractor for names it cannot infer (--lockfile=<parser>:<path>). A covered_by_lockfile entry is a manifest OSV-Scanner v2.6.0 has no source extractor for; its sibling lockfile is scanned instead. A dependency_free entry is a package.json that declares no dependency and has no lockfile beside it, so nothing is scanned for it; it needs a reason and an evidence path. An excluded entry is a tracked lockfile deliberately left out of the scan; it needs a reason and an evidence path, and a deliberately vulnerable test fixture or captured evidence lock that is not a live input qualifies. A lockfile entry that names a config is scanned in an invocation of its own under that config alone (an explicit --config applies to every input of one invocation), and every other entry together under .github/osv-scanner.toml; the tests bind each such config to its one lock. tests/test_osv_lockfile_coverage.py fails when a tracked lockfile or manifest is in none of the four lists.",
   "lockfiles": [
     {
       "path": "examples/claude-runtime-sdk/worker.py.lock",
@@ -30,6 +30,10 @@
       "parser": "requirements.txt"
     },
     {
+      "path": ".github/requirements-calendar.txt",
+      "parser": "requirements.txt"
+    },
+    {
       "path": "blueprints/us-equities/sim-crosscheck-hftbacktest/requirements.lock",
       "parser": "requirements.txt"
     },
@@ -49,6 +53,9 @@
     },
     {
       "path": "blueprints/memory-stack/native-qualification/uv.lock"
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
     },
     {
       "path": "blueprints/us-equities/adaptive-paper/requirements.txt"
@@ -187,11 +194,11 @@
       "parser": "requirements.txt"
     },
     {
-      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock",
+      "path": "blueprints/us-equities/overfitting-controls/requirements-riskl-parity.lock",
       "parser": "requirements.txt"
     },
     {
-      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock",
+      "path": "blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock",
       "parser": "requirements.txt"
     },
     {
@@ -225,6 +232,10 @@
       "lockfile": "blueprints/memory-stack/native-qualification/uv.lock"
     },
     {
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml",
+      "lockfile": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock"
+    },
+    {
       "path": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.in",
       "lockfile": "blueprints/gap-wave2-20260923/us-equities__portfolio-risk/requirements-libs.lock"
     },
@@ -247,6 +258,10 @@
     {
       "path": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.in",
       "lockfile": "evidence/artifacts/macos-syn-e2e-20260924/requirements-macos-arm64-py312.lock"
+    },
+    {
+      "path": "blueprints/us-equities/overfitting-controls/requirements-riskl-parity.in",
+      "lockfile": "blueprints/us-equities/overfitting-controls/requirements-riskl-parity.lock"
     }
   ],
   "dependency_free": [
@@ -271,6 +286,21 @@
       "path": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/raw/dvc/repo-identity__dvc.lock",
       "reason": "Gap-wave-2 captured evidence fixture for layer us-equities__identity-provenance (catalog PR: gap-wave2 agent-lab-17): the dependency list a gap check installed into an isolated cache prefix, or a copy of a probe repository's lock, retained so the receipt is reproducible. Nothing in the catalog installs it, and scanning it would report advisories for a probe environment rather than for a shipped dependency.",
       "evidence": "evidence/artifacts/gap-wave2-20260923/us-equities__identity-provenance/2-dvc-executes-selection-quarantine.json"
+    },
+    {
+      "path": "blueprints/us-equities/adaptive-paper/receipts/xnys-primary-20261005/engine-baseline.lock",
+      "reason": "Captured evidence fixture of the XNYS-primary session-clock qualification (2026-10-05): the pre-change engine resolution, frozen as a receipt artifact to show the 20 baseline distributions stayed unchanged. It is not an install input; the active engine lock blueprints/us-equities/adaptive-paper/requirements-linux-x86_64-py312.lock is scanned.",
+      "evidence": "blueprints/us-equities/adaptive-paper/receipts/xnys-primary-20261005/qualification.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/lumibot.lock",
+      "reason": "Captured evidence fixture of the preregistered 2026-09-26 SPY one_zero engine trial (#336, 20b52a5bbd132291dd6b7d49ae473789caa3362c; Lumibot 4.6.1 failed). It records that evaluated environment only. Owner native-agent-stack-5f confirmed at 2026-10-06T00:41:23Z, report-native-agent-stack-5f-20261006T0045Z-osv, that both lockchecks are not live inputs. Relocking would alter trial evidence. Before replay, adoption or a new consuming route, qualify a separately maintained environment and restore vulnerability scanning.",
+      "evidence": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/receipt.json"
+    },
+    {
+      "path": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/lockcheck/ibapi-build/build.lock",
+      "reason": "Captured evidence fixture of the preregistered 2026-09-26 SPY one_zero engine trial (#336, 20b52a5bbd132291dd6b7d49ae473789caa3362c; Lumibot 4.6.1 failed). It records that evaluated environment only. Owner native-agent-stack-5f confirmed at 2026-10-06T00:41:23Z, report-native-agent-stack-5f-20261006T0045Z-osv, that both lockchecks are not live inputs. Relocking would alter trial evidence. Before replay, adoption or a new consuming route, qualify a separately maintained environment and restore vulnerability scanning.",
+      "evidence": "blueprints/us-equities/engine-trials/spy-one-zero-20260926/lumibot/receipt.json"
     }
   ]
 }

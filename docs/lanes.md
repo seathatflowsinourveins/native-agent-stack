@@ -163,7 +163,7 @@ gh pr merge <N> --squash --match-head-commit <SHA>
   completed. `gh pr checks --required` lists only the required checks that exist
   and keeps the latest run of each, so a check that failed and then passed shows
   as passed. Merge only when the second command prints the ruleset's number of
-  required contexts (8 in `.github/main-ruleset.json`) with the single bucket
+  required contexts (7 in `.github/main-ruleset.json`) with the single bucket
   `pass`; a shorter count means a required check has not started. Do not read the
   command's exit code as that verdict. It is 1 when any required check failed,
   even while others are pending, 8 when none failed and one is pending, and 0

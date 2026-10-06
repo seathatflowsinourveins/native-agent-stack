@@ -175,6 +175,31 @@ class NewWslHandbookTests(unittest.TestCase):
         self.write(handbook.PROFILE, profile)
         return profile, [package for _, _, package, _ in packages]
 
+    def test_a_re_pin_leaves_the_adoption_manifest_digest_unchanged(self):
+        """The handbook is a new-machine file: hashing the release pointer would make every re-pin stale it."""
+        manifest = {"schema_version": 1, "updated_at": "2026-10-04",
+                    "source": {"repository": "example/repo", "release_tag": "v1", "release_commit": "a" * 40},
+                    "profiles": {"workstation": ["step"]}}
+        digests = []
+        for change in (None, "repin", "content"):
+            data = deepcopy(manifest)
+            if change == "repin":
+                data["updated_at"] = "2026-10-05"
+                data["source"].update(release_tag="v2", release_commit="b" * 40)
+            elif change == "content":
+                data["profiles"]["workstation"].append("new step")
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                (root / "adoption").mkdir()
+                (root / handbook.ADOPTION).write_text(json.dumps(data, indent=2) + "\n")
+                inputs = handbook.Inputs(root)
+                inputs.read(handbook.ADOPTION)
+                record = inputs.sources[handbook.ADOPTION]
+                self.assertEqual(record["excludes"], list(handbook.ADOPTION_POINTER_FIELDS))
+                digests.append(record["sha256"])
+        self.assertEqual(digests[0], digests[1])
+        self.assertNotEqual(digests[0], digests[2])
+
     def test_cli_separates_installable_packages_in_one_repository(self):
         profile, packages = self.package_profile()
         result = self.public_cli()
@@ -214,6 +239,28 @@ class NewWslHandbookTests(unittest.TestCase):
                           if tool["name"] == "Codex SDK and codex exec/app-server")
         self.assertNotIn("package_id", unresolved)
         self.assertTrue(any("package identity" in gap for gap in unresolved["blocking_gaps"]))
+
+    def test_owner_browser_replacement_has_one_pick_and_a_complete_checksum(self):
+        self.real_tree()
+        data = handbook.build_data(self.root)
+        self.assertFalse(any(tool["name"] == "Playwright CLI" and tool["status"] == "picked"
+                             for tool in data["tools"]))
+        chrome, = [tool for tool in data["tools"] if tool["name"] == "Chrome DevTools MCP"]
+        self.assertEqual(chrome["status"], "picked")
+        self.assertEqual(chrome["checksum"]["algorithm"], "sha256")
+        self.assertRegex(chrome["checksum"]["value"], r"^[0-9a-f]{64}$")
+        self.assertTrue(chrome["checksum"]["integrity"].startswith("sha512-"))
+        self.assertFalse(any("checksum" in gap.lower() for gap in chrome["blocking_gaps"]))
+
+        # A profile without the explicit historical-name binding must still
+        # surface the unfulfilled old pick; this is not a global name filter.
+        profile = self.read(handbook.PROFILE)
+        entry, = [entry for entry in profile["entries"] if entry["name"] == "Chrome DevTools MCP"]
+        entry.pop("source_selection_name")
+        self.write(handbook.PROFILE, profile)
+        control = handbook.build_data(self.root)
+        self.assertTrue(any(tool["name"] == "Playwright CLI" and tool["status"] == "picked"
+                            and tool["blocking_gaps"] for tool in control["tools"]))
 
     def test_cli_same_package_checksum_conflicts_still_reject(self):
         variants = [
@@ -386,7 +433,19 @@ class NewWslHandbookTests(unittest.TestCase):
                  for state in ("definitive", "resolved", "split", "measurement", "open")}
         self.assertEqual({state: count for state, count in shown.items() if count}, manifest["counts"]["by_state"])
         self.assertEqual(data["default_decisions"]["inventory"]["by_state"], manifest["counts"]["by_state"])
-        self.assertEqual(data["tools"], before["tools"])
+        # The published owner amendment replaces the historical browser pick.
+        # All other tools retain exactly their previous inventory and metadata.
+        old_tools = {tool["tool_id"]: tool for tool in before["tools"]}
+        new_tools = {tool["tool_id"]: tool for tool in data["tools"]}
+        removed, = old_tools.keys() - new_tools.keys()
+        self.assertEqual(old_tools[removed]["name"], "Playwright CLI")
+        self.assertFalse(new_tools.keys() - old_tools.keys())
+        for identity, tool in new_tools.items():
+            self.assertEqual(tool, old_tools[identity], identity)
+        chrome, = [tool for tool in data["tools"] if tool["name"] == "Chrome DevTools MCP"]
+        browser = next(slot for slot in manifest["slots"] if slot["slot_id"] == "playwright-cli")
+        self.assertIn(chrome["name"], browser["default"])
+        self.assertEqual(browser["resolution"]["outcome"], "owner_default")
         self.assertEqual([row["status"] for row in data["layers"]],
                          [row["status"] for row in before["layers"]])
         self.assertFalse(data["new_host_acceptance_claimed"])
@@ -984,18 +1043,18 @@ class NewWslHandbookTests(unittest.TestCase):
                 rows[cells[0]] = cells
         return rows
 
-    def test_inventory_holds_all_100_manifest_rows_the_ten_added_the_six_consensus_and_the_ten_owner_ones(self):
+    def test_inventory_holds_all_104_manifest_rows_the_ten_added_the_six_consensus_and_the_fourteen_owner_ones(self):
         # The sixth consensus row, statusline, comes from the layer consensus's wave-2 batch (2026-10-03), and the ten owner
-        # rows from its wave-3 batch (2026-10-04, amendment 4).
+        # rows from wave 3 and four round-2 rows from wave 5 (amendment 4).
         data, markdown = self.generated()
         manifest = self.read(DEFAULTS_SOURCE)
-        self.assertEqual(len(manifest["slots"]), 100)
+        self.assertEqual(len(manifest["slots"]), 104)
         self.assertEqual(sum(row["row_kind"] == "added" for row in manifest["slots"]), 10)
         self.assertEqual(sum(row["row_kind"] == "consensus" for row in manifest["slots"]), 6)
-        self.assertEqual(sum(row["row_kind"] == "owner_decision" for row in manifest["slots"]), 10)
+        self.assertEqual(sum(row["row_kind"] == "owner_decision" for row in manifest["slots"]), 14)
         rows = {slot["record"]["slot_id"]: (layer["layer_id"], slot)
                 for layer in data["layers"] for slot in layer.get("default_slots", [])}
-        self.assertEqual(len(rows), 100)
+        self.assertEqual(len(rows), 104)
         lines = self.slot_lines(markdown)
         self.assertEqual(set(lines), set(rows))
         for row in manifest["slots"]:
@@ -1015,11 +1074,11 @@ class NewWslHandbookTests(unittest.TestCase):
         # Counts come from the rows and agree with the manifest's own.
         inventory = data["default_decisions"]["inventory"]
         self.assertEqual({key: inventory[key] for key in manifest["counts"]}, manifest["counts"])
-        self.assertEqual(inventory["installed"] + inventory["not_installed"], 100)
-        self.assertIn("The manifest holds 100 slots in 37 layers.", markdown)
+        self.assertEqual(inventory["installed"] + inventory["not_installed"], 104)
+        self.assertIn("The manifest holds 104 slots in 37 layers.", markdown)
         self.assertIn("added 10", markdown)
         self.assertIn("consensus 6", markdown)
-        self.assertIn("owner_decision 10", markdown)
+        self.assertIn("owner_decision 14", markdown)
         # The interim installs of amendment 3 are counted apart from the decided installs, as the producer counts them.
         self.assertEqual(inventory["interim"], sum(1 for row in manifest["slots"] if row.get("interim")))
         self.assertIn(f"{inventory['interim']} of the slots that install nothing by their decided default carry an "
@@ -1103,9 +1162,10 @@ class NewWslHandbookTests(unittest.TestCase):
         manifest = self.read(DEFAULTS_SOURCE)
         consensus = self.read(manifest["sources"]["consensus"]["path"])
         lines = self.slot_lines(markdown)
-        added = {row["slot_id"]: row for row in consensus["wave3"]["add_rows"]}
+        added = {row["slot_id"]: row for batch in (consensus["wave3"], consensus["wave5"])
+                 for row in batch["add_rows"]}
         self.assertEqual({row["slot_id"] for row in manifest["slots"] if row["row_kind"] == "owner_decision"}, set(added))
-        self.assertEqual(len(added), 10)
+        self.assertEqual(len(added), 14)
         for slot_id, row in added.items():
             with self.subTest(owner_row=slot_id):
                 cells = lines[slot_id]
@@ -1114,7 +1174,8 @@ class NewWslHandbookTests(unittest.TestCase):
                 self.assertIn(f"{row['catalog']} / {row['layer_id']} / owner_decision", cells[9])
         overturned = [row for row in manifest["slots"] if row.get("overturned")]
         self.assertEqual(sorted(row["slot_id"] for row in overturned),
-                         ["ccusage", "code-search", "context-supply", "promptfoo", "session-analytics"])
+                         ["agent-messaging", "ccusage", "code-search", "context-supply", "playwright-cli",
+                          "promptfoo", "session-analytics"])
         for row in overturned:
             item = row["overturned"]["amendment"]
             with self.subTest(owner_amendment=row["slot_id"]):
@@ -1200,8 +1261,15 @@ class NewWslHandbookTests(unittest.TestCase):
         self.assertEqual(sorted(slot["record"]["slot_id"] for slot in waiting if slot["record"].get("interim")),
                          ["code-search", "memory-owner"])
         messaging = next(slot for slot in rows if slot["record"]["slot_id"] == "agent-messaging")
-        self.assertEqual(messaging["state"], "split")
-        self.assertTrue(lines["agent-messaging"][4].startswith("not installed: native facilities do not cover"))
+        consensus = self.read("evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json")
+        owner = next(e["owner_default"] for e in consensus["wave5"]["amend_rows"]
+                     if e["slot_id"] == "agent-messaging")
+        self.assertEqual(messaging["state"], "resolved")
+        self.assertEqual(messaging["record"]["default"], owner["default"])
+        self.assertEqual(lines["agent-messaging"][4], "installed")
+        self.assertEqual(messaging["record"]["overturned"]["fields"]["state"], "split")
+        self.assertTrue(messaging["record"]["overturned"]["fields"]["resolution"]["reason"].startswith(
+            "native facilities do not cover"))
         returned = [slot for slot in rows
                     if slot["record"]["measurement"] and slot["record"]["measurement"]["returned"]]
         self.assertTrue(returned)

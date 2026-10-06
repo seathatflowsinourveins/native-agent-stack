@@ -1,6 +1,6 @@
 {
  "generated_at_utc": "2026-10-02T02:12:15Z",
- "revised_at_utc": "2026-10-04T23:58:00Z",
+ "revised_at_utc": "2026-10-05T00:00:00Z",
  "source": "origin/main definitive manifest, one row per foundation row",
  "owners": [
   {
@@ -124,10 +124,10 @@
   {
    "layer": "workers",
    "slot": "agent-messaging",
-   "owner": "Not installed until the deciding measurement returns",
-   "repository": "",
-   "installed": false,
-   "note": "native facilities do not cover messaging into a running Codex session, but installing hcom changes how sessions start and what they may do without asking, which is the owner's decision and not a default install"
+   "owner": "hcom 0.7.27 (the Claude Code <-> Codex message transport only; Claude <-> Claude stays on native cross-session messaging)",
+   "repository": "https://github.com/aannoo/hcom",
+   "installed": true,
+   "note": "wave-5 round-2 owner decision; pin and sources are in install-plan.json; no new repository metadata or destination acceptance"
   },
   {
    "layer": "isolation",
@@ -240,15 +240,10 @@
   {
    "layer": "web-research",
    "slot": "playwright-cli",
-   "owner": "Playwright CLI",
-   "repository": "https://github.com/microsoft/playwright-cli",
-   "installed": false,
-   "measurement_only": true,
-   "note": "",
-   "tag_name": "v0.1.22",
-   "published_at": "2026-09-28T23:23:13Z",
-   "pushed_at": "2026-09-28T23:23:12Z",
-   "default_branch": "main"
+   "owner": "Chrome DevTools MCP 1.10.1 (one stdio MCP server, chrome-devtools, in both clients; it also serves browser diagnostics)",
+   "repository": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+   "installed": true,
+   "note": "wave-5 round-2 owner decision; pin and sources are in install-plan.json; no new repository metadata or destination acceptance"
   },
   {
    "layer": "web-research",
@@ -573,9 +568,9 @@
    "owner": "Dagu",
    "repository": "https://github.com/dagucloud/dagu",
    "installed": true,
-   "note": "",
-   "tag_name": "v2.18.1",
-   "published_at": "2026-09-29T15:24:51Z",
+   "note": "Selected tag/publication re-read for the 2026-10-05 pin move; pushed_at/default_branch retain the earlier repository observation.",
+   "tag_name": "v2.18.2",
+   "published_at": "2026-10-04T03:54:02Z",
    "pushed_at": "2026-10-02T01:19:01Z",
    "default_branch": "main"
   },
@@ -715,9 +710,9 @@
    "owner": "mise",
    "repository": "https://github.com/jdx/mise",
    "installed": true,
-   "note": "",
-   "tag_name": "v2026.10.0",
-   "published_at": "2026-10-02T01:42:32Z",
+   "note": "Selected tag/publication re-read for the 2026-10-05 pin move; pushed_at/default_branch retain the earlier repository observation.",
+   "tag_name": "v2026.10.1",
+   "published_at": "2026-10-03T14:12:48Z",
    "pushed_at": "2026-10-02T02:08:56Z",
    "default_branch": "main"
   },
@@ -808,6 +803,38 @@
    "published_at": "2026-09-26T16:04:55Z",
    "pushed_at": "2026-10-02T00:34:31Z",
    "default_branch": "main"
+  },
+  {
+   "layer": "cross:gpt6-harnesses",
+   "slot": "lm-program-optimization",
+   "owner": "DSPy 3.4.0 (dspy.GEPA and the other DSPy optimizers; GEPA 0.1.4 comes in as its pinned dependency)",
+   "repository": "https://github.com/stanfordnlp/dspy",
+   "installed": true,
+   "note": "wave-5 round-2 owner decision; pin and sources are in install-plan.json; no new repository metadata or destination acceptance"
+  },
+  {
+   "layer": "instructions-skills",
+   "slot": "skill-vetting",
+   "owner": "SkillSpector 2.12.0 CLI (on demand; advisory, never an allow decision; no MCP server and no install hook)",
+   "repository": "https://github.com/NVIDIA/skillspector",
+   "installed": true,
+   "note": "wave-5 round-2 owner decision; pin and sources are in install-plan.json; no new repository metadata or destination acceptance"
+  },
+  {
+   "layer": "quality-evaluation",
+   "slot": "trajectory-analysis",
+   "owner": "Inspect Scout 0.5.3 (in the Inspect AI owner's environment, with harbor 0.23.0 for ATIF import)",
+   "repository": "https://github.com/meridianlabs-ai/inspect_scout",
+   "installed": true,
+   "note": "wave-5 round-2 owner decision; pin and sources are in install-plan.json; no new repository metadata or destination acceptance"
+  },
+  {
+   "layer": "mcp-surfaces",
+   "slot": "mcp-protocol-conformance",
+   "owner": "MCP conformance suite (npm @modelcontextprotocol/conformance, on demand through npx; 0.2.0-alpha.11 until 0.2.0-alpha.12 clears the cooldown on 2026-10-08)",
+   "repository": "https://github.com/modelcontextprotocol/conformance",
+   "installed": true,
+   "note": "wave-5 round-2 owner decision; pin and sources are in install-plan.json; no new repository metadata or destination acceptance"
   }
  ]
 }

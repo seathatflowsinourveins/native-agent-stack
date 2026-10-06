@@ -1,0 +1,102 @@
+{
+  "id": "typesafe-sdk-transport-20261005",
+  "date": "2026-10-05",
+  "base_commit": "f946c6d4ca988a17b6fa4392ecb488909f147883",
+  "purpose": "Replace only the landscape crosswalk's transport and retry with the public vendor SDK after all compatibility gates pass.",
+  "sources": {
+    "repository": "https://github.com/typesafe-ai/typesafe-sdk-python",
+    "tag": "v0.7.2",
+    "commit": "f078f1e208a0d885154dc758344ae4fce77ac168",
+    "registry": "https://pypi.org/pypi/typesafe-sdk/0.7.2/json",
+    "wheel": "typesafe_sdk-0.7.2-py3-none-any.whl",
+    "published_sha256": "0a961148187d52e18276ed7f2d02617cfac48e3b97673cb631a8749397d43d1e",
+    "downloaded_sha256": "0a961148187d52e18276ed7f2d02617cfac48e3b97673cb631a8749397d43d1e",
+    "download_exit_code": 0,
+    "sha256sum_exit_code": 0,
+    "compatibility_gates": {
+      "structured_questions": "pass; src/typesafe_sdk/_core/question_types.py:39-49 and questions.py:10-23",
+      "response_metadata": "pass; src/typesafe_sdk/_core/response_types.py:65-120, schemas/base.py:81-94 and src/typesafe_sdk/_schemas/models.py:25-30",
+      "retry_policy": "pass; src/typesafe_sdk/_core/retry.py:52-123"
+    },
+    "evidence_class": "source_review"
+  },
+  "environment": {
+    "installation": "isolated uv --with environment; --no-build, --no-config and --no-env-file; scratch and cache outside /tmp",
+    "installed_packages": {
+      "typesafe-sdk": "0.7.2",
+      "httpx2": "2.13.1",
+      "httpcore2": "2.13.1",
+      "pydantic": "2.13.5",
+      "pydantic_core": "2.46.5",
+      "tenacity": "9.1.4",
+      "typing_extensions": "4.16.0",
+      "typing-inspection": "0.4.4",
+      "anyio": "4.15.1",
+      "h11": "0.16.0",
+      "annotated-types": "0.8.0",
+      "idna": "3.20",
+      "truststore": "0.10.4"
+    }
+  },
+  "checks": [
+    {
+      "command": "python3 tools/sota-convergence/gap_crosswalk.py build --check",
+      "phase": "baseline with SDK absent",
+      "exit_code": 0,
+      "returned_stdout": "crosswalk up to date\n",
+      "returned_stderr": "",
+      "evidence_class": "local_integration"
+    },
+    {
+      "command": "uv run --no-project --no-config --no-env-file --no-build --no-managed-python --no-python-downloads --default-index https://pypi.org/simple --with typesafe-sdk==0.7.2 python3 -m unittest discover -s tests -p test_gap_crosswalk_sdk.py -v",
+      "phase": "first stub fixture",
+      "exit_code": 1,
+      "returned_summary": "Ran 8 tests in 0.324s; FAILED (errors=3)",
+      "failure": "test_missing_request_id_stays_optional, test_missing_usage_remains_invalid, and test_structured_questions_metadata_and_final_attempt_retry_count failed at raw.elapsed: RuntimeError: '.elapsed' may only be accessed after the response has been read or closed.",
+      "correction": "The preloaded MockTransport fixture had no elapsed metadata. A subsequent explicit synthetic elapsed fixture passed all eight tests (exit 0). The final fixture instead streams its response through native ByteStream so the native client read/close sets elapsed; production transport code is unchanged by this correction.",
+      "evidence_class": "synthetic"
+    },
+    {
+      "command": "python3 -S tools/sota-convergence/gap_crosswalk.py build --check",
+      "phase": "changed transport with site packages disabled",
+      "exit_code": 0,
+      "returned_stdout": "crosswalk up to date\n",
+      "returned_stderr": "",
+      "evidence_class": "local_integration"
+    },
+    {
+      "command": "uv run --no-project --no-config --no-env-file --no-build --no-managed-python --no-python-downloads --offline --with typesafe-sdk==0.7.2 python3 -m unittest discover -s tests -p 'test_gap_crosswalk*.py' -v",
+      "phase": "final streamed SDK stub plus existing crosswalk and routing tests",
+      "exit_code": 0,
+      "returned_summary": "Ran 22 tests in 0.439s; OK",
+      "returned_output_path": "evidence/artifacts/typesafe-sdk-transport-20261005/unittest-output.txt",
+      "skipped": 0,
+      "new_sdk_tests": 9,
+      "evidence_class": "synthetic"
+    },
+    {
+      "command": "python3 tools/sota-convergence/gap_crosswalk.py build --check",
+      "phase": "changed transport with ordinary standard-library interpreter",
+      "exit_code": 0,
+      "returned_stdout": "crosswalk up to date\n",
+      "returned_stderr": "",
+      "evidence_class": "local_integration"
+    }
+  ],
+  "preservation": {
+    "byte_identical_functions": ["request_body", "validate", "judge", "build"],
+    "threshold": 0.3,
+    "recorded_judgments_changed": false,
+    "catalog_ledger_changed": false,
+    "user_agent": "SDK-owned typesafe-sdk/0.7.2; explicit authorized change from agent-lab-gap-crosswalk/1 (python-urllib)",
+    "latency_s": "Final successful HTTP exchange; excludes prior attempts, backoff and SDK decoding. Prior timer also included final JSON decoding."
+  },
+  "independent_review_correction": "The first missing-SDK hint omitted required judge --set/--out arguments. Final hint asks to prefix the original judge command, preserving its flags/output path; strengthened guard test passes.",
+  "limitations": [
+    "No live judge call, provider acceptance, credential value read or new judgment.",
+    "Stub tests are locally authored synthetic integration checks through the unchanged SDK implementation; they are not an unchanged upstream suite.",
+    "Stub timing does not establish live service latency.",
+    "Source gates establish compatibility at the selected pin, not live service correctness.",
+    "Repository validation checks integrity and declared consistency; its final exit code is reported in the draft PR and private lane status after the registry commit."
+  ]
+}

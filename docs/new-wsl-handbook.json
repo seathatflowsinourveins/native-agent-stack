@@ -51,7 +51,7 @@
         "first_round": 53,
         "judged": 11,
         "no_blind_default_today": 2,
-        "owner_decision": 10,
+        "owner_decision": 14,
         "pinned": 6,
         "project_practice": 2
       },
@@ -59,18 +59,18 @@
         "definitive": 30,
         "measurement": 6,
         "open": 25,
-        "resolved": 34,
-        "split": 5
+        "resolved": 40,
+        "split": 3
       },
       "definitive": 30,
-      "installed": 73,
+      "installed": 79,
       "interim": 2,
       "layers": 37,
-      "measurements_pending": 8,
+      "measurements_pending": 6,
       "measurements_returned": 3,
-      "not_installed": 27,
-      "owner_amendments": 5,
-      "slots": 100
+      "not_installed": 25,
+      "owner_amendments": 7,
+      "slots": 104
     },
     "metadata": {
       "consensus_wave2": {
@@ -114,6 +114,17 @@
         "date_utc": "2026-10-04",
         "meaning": "the 2026-10-04 owner default on promptfoo under the owner's repository-quality rule: decide round 2 named promptfoo the owner of paired skill verification in both clients, and the fix wave's G6 recipe installs it; selection record only: no comparison named here has run"
       },
+      "consensus_wave5": {
+        "acknowledgements": [],
+        "acknowledgements_owed": [],
+        "authority": {
+          "date_utc": "2026-10-04",
+          "kind": "owner_decision",
+          "relayed_by": "docs/decisions/2026-10-04-final-architecture-round2.md"
+        },
+        "date_utc": "2026-10-04",
+        "meaning": "the wave-5 batch of 2026-10-04: decide round 2 under the owner's repository-quality rule, as its Opus verification left it: four rows added and owner defaults on two split rows whose decided default installs nothing; selection records only: no comparison named here has run"
+      },
       "counts": {
         "by_row_kind": {
           "added": 10,
@@ -121,7 +132,7 @@
           "first_round": 53,
           "judged": 11,
           "no_blind_default_today": 2,
-          "owner_decision": 10,
+          "owner_decision": 14,
           "pinned": 6,
           "project_practice": 2
         },
@@ -129,14 +140,14 @@
           "definitive": 30,
           "measurement": 6,
           "open": 25,
-          "resolved": 34,
-          "split": 5
+          "resolved": 40,
+          "split": 3
         },
         "definitive": 30,
-        "installed": 73,
+        "installed": 79,
         "interim": 2,
         "layers": 37,
-        "slots": 100
+        "slots": 104
       },
       "date_utc": "2026-10-01",
       "decision_rule": "A foundation first-round default is definitive when it is in the Claude record and in enough blind GPT samples under the combination rule (evidence/artifacts/new-wsl-final-architecture-20261002/convergence/RULE.md and its amendment 1); a contested one is resolved by a blind Claude critic or split to a named measurement. A decision-round default is definitive when both deciders of both families name it and both critics return converged, and a split is settled by the measurement the critics name. A manifest row may be added or amended by a recorded direct consensus: one family's sourced proposal, the other family's independent primary-source review, and both acknowledgements on record. Such a row has row_kind consensus and is never definitive. Its label names the direct consensus of both families and says either that the row is neither a blind result nor a measurement or, for a row whose install waits for a gate or a comparison, that the gate or the measurement decides and that nothing is installed until it returns. Acceptance gates that an installed or resolved row still has to pass on the destination are listed as its open acceptance gates and do not hold its install. A direct consensus never replaces a blind definitive default or a measured result; where the families differ, or where the consensus itself names a comparison, the measurement decides. Amendment 3 (wave 2, 2026-10-03): a row whose decided default installs nothing may carry an interim install, recorded in the row's interim field beside the fields the rounds decided, which stay as they were. The interim names what it installs and at which pin, the measurement or comparison that replaces or removes it, the authority that installs it meanwhile, each family's recorded review and its hashed records. The authority is the owner's dated decision, as the record that relays it states it, or a direct consensus with both families' acknowledgements on record. On the owner's decision an interim may sit on a definitive row whose default installs nothing: the definitive verdict stays recorded beside it, and the named measurement reports to the owner instead of removing the interim by itself. An interim is never definitive and is neither a blind result nor a measurement; no other installed row may own its job; its label starts with 'interim install', names its authority and says what decides it. The install plan installs it as the row's owner, and the client configuration wires what it installs while the row carries it. Amendment 4 (wave 3, 2026-10-04): on the owner's dated decision, as the record that relays it states it, a batch may add rows of kind owner_decision and give a row whose decided default installs nothing an owner default. An owner row or an owner default names what it installs and at which pin, the job it owns and the comparison that would remove it; that comparison reports to the owner and removes nothing by itself. The fields an owner default replaces, and an interim it drops, stay recorded on the row under overturned. Neither is definitive, a blind result, a consensus or a measurement, and no other installed row may own its job; its label starts with 'owner decision' and names its authority. The relaying record is hashed in the batch, quotes the owner's words and names every slot the batch changes. The install plan installs it as the row's owner, and the client configuration wires what it installs.",
@@ -199,7 +210,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "d3fb06dc20e53f1daa7a6d029e414db4987fe066a75c7f8e0f73384bf0d1acfc"
+          "sha256": "21b833ade87f27616b037c9619a348223391175bd6047a2be237556bf4b7fc1e"
         },
         "convergence": {
           "file": "convergence.json",
@@ -649,6 +660,46 @@
             "state": "measurement"
           },
           "state": "measurement"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "Opus verification of decide round 2 (2026-10-04): upheld against live upstream; not on PyPI and without release attestations, so the pin is the tag commit",
+            "coincides_with_lane_record": null,
+            "default": "SkillSpector 2.12.0 CLI (on demand; advisory, never an allow decision; no MCP server and no install hook)",
+            "definitive": false,
+            "gpt": "decide round 2 (2026-10-04): both blind deciders and the critic named SkillSpector",
+            "installs_nothing_extra": false,
+            "job": "advisory scanning of third-party skill artifacts before the coordinator pins a skill",
+            "label": "owner decision of 2026-10-04 (wave 5, amendment 4): the owner's repository-quality rule; decide round 2 and its Opus verification named this owner; not a blind result, a consensus or a measurement; its removal check reports to the owner",
+            "layer_id": "instructions-skills",
+            "measurement": null,
+            "repository": "https://github.com/NVIDIA/skillspector",
+            "resolution": {
+              "batch": "wave5",
+              "by": "the owner's repository-quality rule of 2026-10-04",
+              "install": "uv tool install git+https://github.com/NVIDIA/skillspector.git@c7958a3268d9498644b22edb75d0f051bbc8cbfc\n(This is the upstream README v2.12.0 command `uv tool install git+https://github.com/NVIDIA/skillspector.git`, pinned with uv's documented @ref form for git sources. CLI only, without the [mcp] extra.)\nRun as: skillspector scan <skill-dir|git-url> --no-llm --format json --fail-on-findings\nFor the semantic stage, use SKILLSPECTOR_PROVIDER=codex_cli, which reuses the existing Codex sign-in and needs no API key.",
+              "open_acceptance_gates": [
+                "skillspector --version reports 2.12.0 from the tag-commit install",
+                "skillspector scan <fixture skill> --no-llm --format json --fail-on-findings exits non-zero on a planted finding and zero on a clean skill"
+              ],
+              "outcome": "added_by_owner_decision",
+              "overturn": "the frozen seven-case malicious-skill comparison stated in this record (manual source review plus skills.sh audit labels versus SkillSpector 2.12.0, high/critical recall, false positives, tokens, wall time and no external file access on m7), or a paired Inspect comparison; remove SkillSpector if the current procedure matches its recall with no more false positives; it reports to the owner and removes nothing by itself",
+              "pin": "- Release: v2.12.0, published 2026-09-23T22:28:18Z; tag commit c7958a3268d9498644b22edb75d0f051bbc8cbfc.\n- GitHub release-asset sha256: wheel skillspector-2.12.0-py3-none-any.whl 62973f6254d30c871480246869f88a01e17dff6f12e9d43010962eb0d7e305f4; sdist skillspector-2.12.0.tar.gz 507c367b8f53b821adf0568bb32c7e08dd2da8f63900efa7ceccb53e9b401b53.\n- Not on PyPI, and the release has no signature or provenance attestation.\n- Transitive dependencies are resolved fresh at install time, because `uv tool install` does not use the repo's uv.lock.",
+              "reason": "Decide round 2 applied the owner's repository-quality rule to the gap skill-vetting; its Opus verification named NVIDIA/SkillSpector CLI v2.12.0, limited to an on-demand scan of third-party skill artifacts by the coordinator before it pins a skill. The scan is an advisory signal beside the rule-3 skills.sh audits and manual source review, never an allow decision. No MCP server and no install hook. against live upstream. Upheld; adopt SkillSpector v2.12.0. Live reads at 2026-10-04T22:18Z.\n\n**Requirement gate.** Met under A(1), because skills belong to the two-client foundation and its supply chain. Also met under A(2): the round-1 critic recorded \"third-party skill artifacts warrant security scanning\" as holding. The repo itself records \"no local content scan precedes a pin\" as an open gap (origin/main, 2026-09-25 skills decision L318-335 and skills manifest L765-774). The threat is concrete: the coordinator pins third-party skills whose bundled scripts run on a host holding 0600 provider credentials. One on-d",
+              "sources": [
+                "docs/decisions/2026-10-04-final-architecture-round2.md",
+                "docs/decisions/2026-10-04-repository-quality-rule.md",
+                "evidence/artifacts/final-architecture-round2-20261004/verdicts.json"
+              ]
+            },
+            "row_kind": "owner_decision",
+            "slot_id": "skill-vetting",
+            "state": "resolved"
+          },
+          "state": "resolved"
         }
       ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
@@ -732,8 +783,8 @@
       },
       "default_slots": [
         {
-          "installed": false,
-          "not_installed_reason": "native facilities do not cover messaging into a running Codex session, but installing hcom changes how sessions start and what they may do without asking, which is the owner's decision and not a default install",
+          "installed": true,
+          "not_installed_reason": null,
           "record": {
             "amendments": [
               {
@@ -769,52 +820,96 @@
               }
             ],
             "catalog": "foundation",
-            "claude": "not judged in the first round",
+            "claude": "Opus verification of decide round 2 (2026-10-04): hcom upheld against live upstream (tag CI runs the real pinned Claude Code and Codex binaries; checksum-verifying installer); residual: the idle-Codex wake types <hcom> through an unauthenticated loopback inject port, kept under the posture's deny rules",
             "coincides_with_lane_record": null,
-            "default": "Not installed until the deciding measurement returns",
+            "default": "hcom 0.7.27 (the Claude Code <-> Codex message transport only; Claude <-> Claude stays on native cross-session messaging)",
             "definitive": false,
-            "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
-            "installs_nothing_extra": true,
+            "gpt": "decide round 2 (2026-10-04): decider A hcom, decider B agmsg, critic hcom; the Codex root source-accepted the hcom posture r1 on 2026-10-03",
+            "installs_nothing_extra": false,
             "job": "messages between running agent sessions of both clients",
-            "label": "split: decided by the named measurement, nothing installed until it returns",
+            "label": "owner decision of 2026-10-04 (wave 5, amendment 4): the owner's repository-quality rule; decide round 2 and its Opus verification named hcom for the cross-client transport, under the hcom posture both lanes converged on 2026-10-03; the split's preregistered measurement (r3, frozen, never started) becomes its removal check; not a blind result, a consensus or a measurement; its removal check reports to the owner",
             "layer_id": "workers",
-            "measurement": {
-              "receipts": [],
-              "returned": false
-            },
-            "repository": "",
-            "resolution": {
-              "arms": [
-                {
-                  "name": "hcom",
-                  "repository": "https://github.com/aannoo/hcom",
-                  "support": "both blind GPT orders; the critic at medium confidence"
+            "measurement": null,
+            "overturned": {
+              "amendment": {
+                "by": "the owner's repository-quality rule of 2026-10-04 (wave 5, amendment 4)",
+                "date_utc": "2026-10-04",
+                "decision": "hcom 0.7.27 (the Claude Code <-> Codex message transport only; Claude <-> Claude stays on native cross-session messaging) becomes the slot's owner default; the split's decided no-install default stays under overturned"
+              },
+              "fields": {
+                "claude": "not judged in the first round",
+                "default": "Not installed until the deciding measurement returns",
+                "definitive": false,
+                "gpt": "returned: named by the critic or the added-slot round, not by the layer's blind samples",
+                "installs_nothing_extra": true,
+                "label": "split: decided by the named measurement, nothing installed until it returns",
+                "measurement": {
+                  "receipts": [],
+                  "returned": false
                 },
-                {
-                  "name": "the clients' native facilities only",
-                  "repository": "",
-                  "support": "the no-install default until the owner decides"
-                }
+                "repository": "",
+                "resolution": {
+                  "arms": [
+                    {
+                      "name": "hcom",
+                      "repository": "https://github.com/aannoo/hcom",
+                      "support": "both blind GPT orders; the critic at medium confidence"
+                    },
+                    {
+                      "name": "the clients' native facilities only",
+                      "repository": "",
+                      "support": "the no-install default until the owner decides"
+                    }
+                  ],
+                  "by": "one refuting Claude critic",
+                  "deciding_measurement": "First the owner's decision on hcom's default permission posture (the critic reports auto-approve, auto-trust of the workspace and a relay enabled by default, network access for Codex, client hooks and sessions started through its launcher). Then the critic's overturn test: 200 messages each way against Concord MCP and a native-only control.",
+                  "evidence": {
+                    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/added-critics-result.json",
+                    "sha256": "ed444353fae463da52f5f461fb5975eb5d607260d6c219407e77567255b69622"
+                  },
+                  "former_default": {
+                    "name": "hcom",
+                    "repository": "https://github.com/aannoo/hcom"
+                  },
+                  "measurement_id": "agent-messaging",
+                  "outcome": "split",
+                  "reason": "native facilities do not cover messaging into a running Codex session, but installing hcom changes how sessions start and what they may do without asking, which is the owner's decision and not a default install"
+                },
+                "state": "split"
+              }
+            },
+            "repository": "https://github.com/aannoo/hcom",
+            "resolution": {
+              "batch": "wave5",
+              "by": "the owner's repository-quality rule of 2026-10-04",
+              "install": "curl --proto '=https' --tlsv1.2 -LsSf https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh | sh",
+              "open_acceptance_gates": [
+                "the installer's own sha256 equals the release asset digest, and hcom --version reports 0.7.27",
+                "codex execpolicy check --pretty --rules <file> -- hcom term inject <peer> hi returns forbidden (a parse error drops every user rule)",
+                "one Claude Code -> Codex and one Codex -> Claude Code message arrive as data, and a peer message cannot approve or change configuration"
               ],
-              "by": "one refuting Claude critic",
-              "deciding_measurement": "First the owner's decision on hcom's default permission posture (the critic reports auto-approve, auto-trust of the workspace and a relay enabled by default, network access for Codex, client hooks and sessions started through its launcher). Then the critic's overturn test: 200 messages each way against Concord MCP and a native-only control.",
-              "evidence": {
-                "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/added-critics-result.json",
-                "sha256": "ed444353fae463da52f5f461fb5975eb5d607260d6c219407e77567255b69622"
-              },
-              "former_default": {
-                "name": "hcom",
-                "repository": "https://github.com/aannoo/hcom"
-              },
-              "measurement_id": "agent-messaging",
-              "outcome": "split",
-              "reason": "native facilities do not cover messaging into a running Codex session, but installing hcom changes how sessions start and what they may do without asking, which is the owner's decision and not a default install"
+              "outcome": "owner_default",
+              "overturn": "the preregistered messaging measurement (prereg r3 of 2026-10-03, never started), or the verdict's paired Harbor comparison against a released agmsg; revert to configuring the native incumbents if both upstreams document a native cross-client ingress; each reports to the owner and removes nothing by itself",
+              "pin": "aannoo/hcom tag v0.7.27 = commit 2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b, published 2026-10-01T02:11:55Z. hcom-installer.sh sha256 3bc057fcd763748c32fae0ae25e150abf2b1df0d4c9451432c28f4ddde176a98, which equals the release API asset digest. hcom-x86_64-unknown-linux-gnu.tar.gz sha256 8ae97ff6fef63c637d66ddf882651aadd035bd74ae26c0787743869c20a5391d; the installer embeds this value and checks it with verify_checksum (installer L313, L374-375). Installs to ~/.local/bin; receipt goes to ~/.config/hcom. The upstream alternative is uv tool install hcom==0.7.27 (PyPI manylinux x86_64 wheel; no provenance). Re-pin at the first release that closes issue 151.",
+              "posture": "the hcom posture both lanes converged on (2026-10-03; Codex root source-accept), from the owner's answer on the posture question, quoted: \"we need full sota convergneced llm native automation at highest quality\"; verbatim record: https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972022684",
+              "reason": "Decide round 2 applied the owner's repository-quality rule to the gap workers/agent-messaging; its Opus verification named hcom against live upstream. Uphold: the critic's revised verdict (hcom) survives refutation.\n\n(1) Requirement gate. Met under A(1), two-client Claude Code plus Codex work, and A(3): the 2026-10-02 amendment quotes the owner asking for \"claude-codex messaging\", and the user's Q11 answer is quoted verbatim in https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972022684: \"we need full sota convergneced llm native automation at highest quality\"; that answer names no tool.\n\n(2) hcom passes every candidate gate:\n- Maintained: not archived; main commit 2026-10-04; release 2026-10-01.\n- Linux x86_64 install: documented, with a checksum-verifying installer; the source has explicit WSL detection.\n- Self-hosted: local SQLite. The relay stays inactive until",
+              "sources": [
+                "docs/decisions/2026-10-04-final-architecture-round2.md",
+                "docs/decisions/2026-10-04-repository-quality-rule.md",
+                "evidence/artifacts/final-architecture-round2-20261004/verdicts.json"
+              ],
+              "usage_rules": [
+                "hcom owns the Claude Code <-> Codex transport only; Claude <-> Claude stays on native cross-session messaging, Codex-internal work on multi_agent and codex queue",
+                "the converged posture's deny rules and peer-message hints apply in both clients; agents never use hcom term, relay, config, hooks, run, kill, stop, reset, update, claude-pty or send -b/--from",
+                "the command-center ledger stays the authorization record for any [cc-msg v1] item hcom carries",
+                "re-read hcom's safe list (src/hooks/common.rs) at every pin bump; re-pin at the first release that closes issue 151"
+              ]
             },
             "row_kind": "added",
             "slot_id": "agent-messaging",
-            "state": "split"
+            "state": "resolved"
           },
-          "state": "split"
+          "state": "resolved"
         }
       ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
@@ -1888,61 +1983,103 @@
           "state": "resolved"
         },
         {
-          "installed": false,
-          "not_installed_reason": "both critics agree on one browser tool, not two, and disagree on which: agent-browser's WSL2 launch issues are open upstream (critic 1) against one binary with no Node at run time (critic 2)",
+          "installed": true,
+          "not_installed_reason": null,
           "record": {
             "catalog": "foundation",
-            "claude": "returned",
+            "claude": "Opus verification of decide round 2 (2026-10-04): upheld against live upstream (release CI, SLSA provenance, SECURITY.md, two-client and WSL documentation); residuals: the Chrome binary cannot be pinned through the upstream route, and concurrent sessions need --isolated",
             "coincides_with_lane_record": null,
-            "default": "Not installed until the deciding measurement returns",
+            "default": "Chrome DevTools MCP 1.10.1 (one stdio MCP server, chrome-devtools, in both clients; it also serves browser diagnostics)",
             "definitive": false,
-            "gpt": "returned: 1 of 2 blind GPT samples",
-            "installs_nothing_extra": true,
+            "gpt": "decide round 2 (2026-10-04): both blind deciders and the critic named Chrome DevTools MCP (MCP interface)",
+            "installs_nothing_extra": false,
             "job": "browser automation for agents",
-            "label": "split: decided by the named measurement, nothing installed until it returns",
+            "label": "owner decision of 2026-10-04 (wave 5, amendment 4): the owner's repository-quality rule; decide round 2 and its Opus verification named Chrome DevTools MCP for browser automation; the split's named Harbor comparison (never started) becomes its removal check; not a blind result, a consensus or a measurement; its removal check reports to the owner",
             "layer_id": "web-research",
-            "measurement": {
-              "receipts": [],
-              "returned": false
-            },
-            "repository": "",
-            "resolution": {
-              "arms": [
-                {
-                  "name": "Playwright CLI",
-                  "repository": "https://github.com/microsoft/playwright-cli",
-                  "support": "the Claude record; one of two blind Sol-ultra orders; critic 1"
-                },
-                {
-                  "name": "agent-browser",
-                  "repository": "https://github.com/vercel-labs/agent-browser",
-                  "support": "both blind Sol-ultra orders; critic 2"
-                }
-              ],
-              "by": "two blind Claude critics",
-              "deciding_measurement": "Gate first: on the target WSL build, after the documented install, 20 consecutive default launches of agent-browser (close --all, open about:blank, snapshot) from a Claude Code shell and from a Codex shell with no connect-port workaround; if any fails, Playwright CLI. If all pass: a 20-task Harbor comparison (static page, redirect, JavaScript-rendered page, form fill, login fixture, long page; both agents; same budgets).",
-              "evidence": {
-                "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
-                "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+            "measurement": null,
+            "overturned": {
+              "amendment": {
+                "by": "the owner's repository-quality rule of 2026-10-04 (wave 5, amendment 4)",
+                "date_utc": "2026-10-04",
+                "decision": "Chrome DevTools MCP 1.10.1 (one stdio MCP server, chrome-devtools, in both clients; it also serves browser diagnostics) becomes the slot's owner default; the split's decided no-install default stays under overturned"
               },
-              "first_round_record": {
+              "fields": {
                 "claude": "returned",
-                "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
-                "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
-              },
-              "former_default": {
-                "name": "Playwright CLI",
-                "repository": "https://github.com/microsoft/playwright-cli"
-              },
-              "measurement_id": "browser-tool",
-              "outcome": "split",
-              "reason": "both critics agree on one browser tool, not two, and disagree on which: agent-browser's WSL2 launch issues are open upstream (critic 1) against one binary with no Node at run time (critic 2)"
+                "default": "Not installed until the deciding measurement returns",
+                "definitive": false,
+                "gpt": "returned: 1 of 2 blind GPT samples",
+                "installs_nothing_extra": true,
+                "label": "split: decided by the named measurement, nothing installed until it returns",
+                "measurement": {
+                  "receipts": [],
+                  "returned": false
+                },
+                "repository": "",
+                "resolution": {
+                  "arms": [
+                    {
+                      "name": "Playwright CLI",
+                      "repository": "https://github.com/microsoft/playwright-cli",
+                      "support": "the Claude record; one of two blind Sol-ultra orders; critic 1"
+                    },
+                    {
+                      "name": "agent-browser",
+                      "repository": "https://github.com/vercel-labs/agent-browser",
+                      "support": "both blind Sol-ultra orders; critic 2"
+                    }
+                  ],
+                  "by": "two blind Claude critics",
+                  "deciding_measurement": "Gate first: on the target WSL build, after the documented install, 20 consecutive default launches of agent-browser (close --all, open about:blank, snapshot) from a Claude Code shell and from a Codex shell with no connect-port workaround; if any fails, Playwright CLI. If all pass: a 20-task Harbor comparison (static page, redirect, JavaScript-rendered page, form fill, login fixture, long page; both agents; same budgets).",
+                  "evidence": {
+                    "path": "evidence/artifacts/new-wsl-final-architecture-20261002/critics/round2-critics-result.json",
+                    "sha256": "3d619c17ca5c89cfc4492deef75877d4a60e1ec10b68ec7eaad300a10cc81d3f"
+                  },
+                  "first_round_record": {
+                    "claude": "returned",
+                    "gpt": "pending: the blind GPT-6.1 Sol run over the 21 first-round packets is in progress",
+                    "label": "first-round pick: one blind judge, critic verdict upheld; the judge flagged a close call"
+                  },
+                  "former_default": {
+                    "name": "Playwright CLI",
+                    "repository": "https://github.com/microsoft/playwright-cli"
+                  },
+                  "measurement_id": "browser-tool",
+                  "outcome": "split",
+                  "reason": "both critics agree on one browser tool, not two, and disagree on which: agent-browser's WSL2 launch issues are open upstream (critic 1) against one binary with no Node at run time (critic 2)"
+                },
+                "state": "split"
+              }
+            },
+            "repository": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+            "resolution": {
+              "batch": "wave5",
+              "by": "the owner's repository-quality rule of 2026-10-04",
+              "install": "1) Linux-side Chrome, from the upstream WSL section (docs/troubleshooting.md#wsl at tag chrome-devtools-mcp-v1.10.1): wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && sudo dpkg -i google-chrome-stable_current_amd64.deb (if dpkg reports unmet dependencies, the standard Debian fix-up is sudo apt-get -f install; that step is not in the upstream text and is not verified on Ubuntu 26.04). 2) Claude Code, from docs/client-configurations.md:71 with @latest replaced by the pin; the -- separator lets the server flags reach npx: claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics. 3) Codex, from docs/client-configurations.md:109: codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics. Every flag is documented upstream. --isolated is the a",
+              "open_acceptance_gates": [
+                "google-chrome-stable is installed on the Linux side (upstream WSL section) and its version is recorded",
+                "claude mcp get chrome-devtools and codex mcp list show the server at 1.10.1",
+                "a fresh session in each client opens a local page and returns its title and one console message through the server"
+              ],
+              "outcome": "owner_default",
+              "overturn": "the slot's named comparison, run through upstream Harbor: the adopted MCP interface against Playwright CLI 0.1.22 on the same 20 browser tasks; it reports to the owner and removes nothing by itself",
+              "pin": "chrome-devtools-mcp@1.10.1 on npm. Tag chrome-devtools-mcp-v1.10.1 = commit e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df, published 2026-09-23T10:37:16Z; still the latest release when checked on 2026-10-04. npm gitHead matches the tag, with SLSA v1 provenance and 2 registry signatures; engines node ^20.19.0 || ^22.12.0 || >=23. The browser is google-chrome-stable amd64 and cannot be pinned through the upstream route: the README requires \"current stable version or newer\", so the host receipt should record the installed Chrome version.",
+              "reason": "Decide round 2 applied the owner's repository-quality rule to the gap web-research/playwright-cli; its Opus verification named Chrome DevTools MCP against live upstream. I upheld the converged verdict. The evidence supports Chrome DevTools MCP 1.10.1 through its MCP interface under criteria-quality.txt rule D(1).\n\n(1) Requirement gate: met three ways. A(1): agent browser automation serves the two-client coding and research scope. A(2): the round-1 critics agreed one browser tool is needed (definitive-manifest resolution: \"both critics agree on one browser tool, not two\"). A(3): the repository-quality rule is quoted verbatim in docs/decisions/2026-10-04-repository-quality-rule.md; the earlier 20:45Z packet gloss is a coordinator summary, not the user's words.\n\n(2) Candidate gates, re-checked live on 2026-10-04, all pass:\n- Unarchive",
+              "sources": [
+                "docs/decisions/2026-10-04-final-architecture-round2.md",
+                "docs/decisions/2026-10-04-repository-quality-rule.md",
+                "evidence/artifacts/final-architecture-round2-20261004/verdicts.json"
+              ],
+              "usage_rules": [
+                "register the MCP server only, never its experimental CLI and never a second browser tool",
+                "run with --headless --isolated --no-usage-statistics --no-performance-crux; record the installed google-chrome-stable version in the host receipt",
+                "browser diagnostics (performance traces, network requests, console messages) use the same server, with no second registration"
+              ]
             },
             "row_kind": "first_round",
             "slot_id": "playwright-cli",
-            "state": "split"
+            "state": "resolved"
           },
-          "state": "split"
+          "state": "resolved"
         },
         {
           "installed": false,
@@ -2042,7 +2179,7 @@
       "title": "Web research",
       "tools": [
         "8854a22b77817147",
-        "dd1462ee4e754917"
+        "263b2d469bfc5351"
       ],
       "uses": []
     },
@@ -2352,12 +2489,13 @@
               "install": "the install plan's command-output function: the release archive through the plan's checksum-verified download, extracted into ${ECO_ROOT}/tools/rtk-0.51.0 and linked into ${ECO_ROOT}/bin",
               "open_acceptance_gates": [
                 "${ECO_ROOT}/bin/rtk reports 0.51.0, and rtk git log -3 and rtk proxy git log -3 both return in a checkout",
-                "a Claude Code Bash call to a supported command is rewritten by the hook, and rtk gain --format json reads back the session's counters"
+                "a Claude Code Bash call to a supported command is rewritten by the hook, and rtk gain --format json reads back the session's counters",
+                "a fresh codex exec, told to add no prefix, runs rtk git status with exit 0 (the after_sign_in check of the command-output row)"
               ],
               "outcome": "added_by_owner_decision",
               "overturn": "the F-token ablation of the Gate A multi-agent E2E on the new distribution (the stack without RTK against the full stack and the lean base), or the fresh-session invocation census, reports that RTK adds nothing at equal task success; the result goes to the owner and removes nothing by itself",
               "pin": "tag v0.51.0; release asset rtk-x86_64-unknown-linux-musl.tar.gz, sha256 5028d3b19a8f0990d30fec9fbb07e32782bc5698e618fb1861aad8a9ccba4eb5 (adoption/pins-linux-x86_64.json; the release's checksums.txt and the GitHub asset digest read 2026-10-04 state the same digest)",
-              "reason": "the owner's order installs the token-efficiency repositories by default; RTK is the first core row of docs/token-efficiency-stack.json (compact supported command outputs, keep failure and raw recovery). Claude Code's Bash hook rewrites supported commands; Codex calls rtk explicitly at this pin",
+              "reason": "the owner's order installs the token-efficiency repositories by default; RTK is the first core row of docs/token-efficiency-stack.json (compact supported command outputs, keep failure and raw recovery). Claude Code's Bash hook rewrites supported commands; Codex's PreToolUse hook rewrites them too from the decision of 2026-10-04 (it was explicit rtk commands at the 0.50.0 pin)",
               "sources": [
                 "docs/decisions/2026-10-04-token-full-stack-owner-default.md",
                 "docs/token-efficiency-stack.json (rows[component_id=rtk].upstream_commands)",
@@ -2369,7 +2507,7 @@
               ],
               "usage_rules": [
                 "the pin follows main 14048b840 after PR #693: v0.51.0 requires --shell for executable positional scripts that need shell expansion; the plan uses direct git/proxy arguments and hook-check inspection strings",
-                "retain explicit rtk commands for Codex; this plan never runs rtk init --global --codex (docs/token-session-handbook.md:397)",
+                "Codex calls rtk through its PreToolUse hook: the plan's command-output row runs rtk init -g --codex and then codex_hook_trust.py --apply (the decision of 2026-10-04, docs/decisions/2026-10-04-codex-rtk-hook-qualified.md; rtk-ai/rtk v0.51.0 README.md L133)",
                 "RTK_TELEMETRY_DISABLED=1 in both clients; rtk proxy returns the raw output when a condensed result is unusable"
               ]
             },
@@ -3013,6 +3151,46 @@
             },
             "row_kind": "first_round",
             "slot_id": "promptfoo",
+            "state": "resolved"
+          },
+          "state": "resolved"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "Opus verification of decide round 2 (2026-10-04): settled the split under rule D (every gate passes; no candidate clearly stronger); never a second inspect-ai beside the owner's",
+            "coincides_with_lane_record": null,
+            "default": "Inspect Scout 0.5.3 (in the Inspect AI owner's environment, with harbor 0.23.0 for ATIF import)",
+            "definitive": false,
+            "gpt": "decide round 2 (2026-10-04): both blind deciders ended at their deadline with no output and the critic left the gap split; no GPT judgment of Inspect Scout is on record",
+            "installs_nothing_extra": false,
+            "job": "scanning agent transcripts and trajectories for behaviours and failures",
+            "label": "owner decision of 2026-10-04 (wave 5, amendment 4): the owner's repository-quality rule; decide round 2 and its Opus verification named this owner; not a blind result, a consensus or a measurement; its removal check reports to the owner",
+            "layer_id": "quality-evaluation",
+            "measurement": null,
+            "repository": "https://github.com/meridianlabs-ai/inspect_scout",
+            "resolution": {
+              "batch": "wave5",
+              "by": "the owner's repository-quality rule of 2026-10-04",
+              "install": "Install in one Python >= 3.12 environment shared with the Inspect AI owner: python -m pip install \"inspect-scout==0.5.3\" \"harbor==0.23.0\". Upstream forms: `pip install inspect-scout` (docs/index.qmd:28 @0.5.3). For Harbor ATIF import, upstream says to install `pip install \"harbor>=0.6.0\"` in the same environment, Python >= 3.12 (docs/db_importing.qmd:285-288 @0.5.3). Prerequisite: inspect-scout 0.5.3 hard-depends on inspect-ai>=0.3.268 and inspect-swe>=0.2.56 (PyPI metadata). Either install it into the Inspect AI owner's environment, or move that owner's pin to released inspect-ai 0.3.276; never install a second inspect-ai beside the owner's. The owner pin, commit 0321960a dated 2026-10-01, postdates inspect-ai 0.3.268 (2026-09-22), but the version string of that editable install was not checked. Acceptance (not run): `scout scan` with a grep_scanner over claude_code() on one current ses",
+              "open_acceptance_gates": [
+                "scout --version reports 0.5.3 inside the Inspect AI environment, with one inspect-ai",
+                "scout scan with a grep scanner over one Claude Code session returns a result row"
+              ],
+              "outcome": "added_by_owner_decision",
+              "overturn": "Scout against Monocle trace assertions on one frozen, human-labelled set of this stack's sessions and Harbor ATIF trials; Monocle replaces Scout if it detects more labelled failures at the same false-positive rate, with an interval excluding zero; it reports to the owner and removes nothing by itself",
+              "pin": "inspect-scout 0.5.3: GitHub release 2026-09-23T00:29:02Z; tag 0.5.3 is commit 0e8fc055a3cebba1a14c11bc35856767b6405173. PyPI wheel inspect_scout-0.5.3-py3-none-any.whl, uploaded 2026-09-23T00:30:00Z, carries a trusted-publishing provenance attestation (publisher meridianlabs-ai/inspect_scout, workflow publish.yaml, environment pypi). Companion: harbor==0.23.0, the stack's existing Harbor pin.",
+              "reason": "Decide round 2 applied the owner's repository-quality rule to the gap trajectory-analysis; its Opus verification named Inspect Scout against live upstream. Refuted. The verdict rests on one procedural step: \"recovering A and B is the single next check.\" Both deciders ended with deadline_exceeded and 0 chars (runs/p02-observability/status.json, out-A.jsonl, out-B.jsonl), so there is nothing to recover. The facts the critic itself checked are enough to settle the split under rule D.\n\n(1) Requirement gate: met under A(1), observability and evaluation of the two-client coding work and the Harbor A/B lane. The stack has repeatedly built its own transcript scanning (origin/main 3b8f9c8a1):\n- an ad hoc subagent_scan, a pattern scan over 308 Claude Code ",
+              "sources": [
+                "docs/decisions/2026-10-04-final-architecture-round2.md",
+                "docs/decisions/2026-10-04-repository-quality-rule.md",
+                "evidence/artifacts/final-architecture-round2-20261004/verdicts.json"
+              ]
+            },
+            "row_kind": "owner_decision",
+            "slot_id": "trajectory-analysis",
             "state": "resolved"
           },
           "state": "resolved"
@@ -4640,6 +4818,46 @@
             "state": "definitive"
           },
           "state": "definitive"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "Opus verification of decide round 2 (2026-10-04): upheld the critic against live upstream; the MCP Inspector keeps its interactive and smoke-test slot",
+            "coincides_with_lane_record": null,
+            "default": "MCP conformance suite (npm @modelcontextprotocol/conformance, on demand through npx; 0.2.0-alpha.11 until 0.2.0-alpha.12 clears the cooldown on 2026-10-08)",
+            "definitive": false,
+            "gpt": "decide round 2 (2026-10-04): both blind deciders chose no extra install (configure the MCP Inspector); the critic named the conformance suite",
+            "installs_nothing_extra": false,
+            "job": "automated protocol conformance of MCP servers and clients",
+            "label": "owner decision of 2026-10-04 (wave 5, amendment 4): the owner's repository-quality rule; decide round 2 and its Opus verification named this owner; not a blind result, a consensus or a measurement; its removal check reports to the owner",
+            "layer_id": "mcp-surfaces",
+            "measurement": null,
+            "repository": "https://github.com/modelcontextprotocol/conformance",
+            "resolution": {
+              "batch": "wave5",
+              "by": "the owner's repository-quality rule of 2026-10-04",
+              "install": "npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.12 list --requirements 2026-07-28, then npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.12 server --url http://<host>:<port>/mcp --requirements 2026-07-28 --expected-failures ./conformance-baseline.yml (and the matching client --command form). This is upstream's documented npx CLI (README@c37eec888e, lines 7-33 and 121-150) with an exact version, in the same pinned form python-sdk v2.3.0 CI uses (CONFORMANCE_PKG passed verbatim to npx --yes). It needs Node; upstream CI uses Node 24. Never use the bare documented `npx @modelcontextprotocol/conformance`: it resolves to npm latest 0.1.16, which is outside the 180-day window and has no --requirements option. Installed only when named (install.sh --only mcp-protocol-conformance); the default run skips it.",
+              "open_acceptance_gates": [
+                "npx --yes @modelcontextprotocol/conformance@<pin> list --requirements 2026-07-28 lists the scenarios",
+                "one local HTTP MCP server runs the server scenarios with a committed expected-failures baseline"
+              ],
+              "outcome": "added_by_owner_decision",
+              "overturn": "the MCP Inspector's documented automated checks against the suite on the same servers; the suite goes if the Inspector covers the same requirements; it reports to the owner and removes nothing by itself",
+              "pin": "Adopted version: @modelcontextprotocol/conformance@0.2.0-alpha.12 (npm dist-tag alpha). Published 2026-10-01T12:07:36.856Z by GitHub Actions from ci.yml run 34856531653, at gitHead f44482ba17df816d3176962a11cdf36aec9bda00 on branch paulc/bump-0.2.0-alpha.12; there is no git tag. Integrity sha512-eXtZFgmtZiU5SsvXty+RGXGnyIqEVm3GLU/HZmg1wMjtKOocPZZgD9HQKd30oJhio5UB0wFJmsc6r8u48Q+EYA==, with SLSA v1 provenance. It becomes eligible under the repo's 7-day non-security cooldown at 2026-10-08T12:07:36Z. The recorded 10-03 waiver covers only tagged non-prerelease releases, so the only earlier path is an explicit user waiver. For an install before that date, use 0.2.0-alpha.11: published 2026-08-07T14:01:03Z from refs/heads/main at c321dd32035556e6769d3724a8ee97d87c3faaac (an ancestor of main), test and publish succeeded, SLSA v1 provenance from run 31185306763. Its integrity is sha512-imPK9tx5gQ",
+              "reason": "Decide round 2 applied the owner's repository-quality rule to the gap mcp-protocol-conformance; its Opus verification named modelcontextprotocol/conformance against live upstream. Upheld. (1) Requirement gate A passes. The round-1 critic agreed the need is real: \"the packet expressly assigns that job\", and keeping Inspector \"leaves formal qualification ... unresolved\". All three round-2 GPT judges also found A(1). The job is not a landscape proposal without a use: the stack's own 09-26 record names concrete targets, ai-memory's loopback HTTP MCP endpoint and the mcporter bridge client, and the Codex template configures ai-memory over HTTP. (2) Candidate gates for Conformance:\n- Not archived.\n- Main commit c37eec888e on 2026-10-01, 3 days old.\n- The release gate passes o",
+              "sources": [
+                "docs/decisions/2026-10-04-final-architecture-round2.md",
+                "docs/decisions/2026-10-04-repository-quality-rule.md",
+                "evidence/artifacts/final-architecture-round2-20261004/verdicts.json"
+              ]
+            },
+            "row_kind": "owner_decision",
+            "slot_id": "mcp-protocol-conformance",
+            "state": "resolved"
+          },
+          "state": "resolved"
         }
       ],
       "evidence_class_today": "source_review: model judges read upstream public evidence; all 14 agents were one model family (Claude Opus 5.5); no candidate was installed or measured by this run",
@@ -7140,6 +7358,46 @@
             "state": ""
           },
           "state": "open"
+        },
+        {
+          "installed": true,
+          "not_installed_reason": null,
+          "record": {
+            "catalog": "foundation",
+            "claude": "Opus verification of decide round 2 (2026-10-04): upheld against live upstream; skill-description optimization stays with skill-creator",
+            "coincides_with_lane_record": null,
+            "default": "DSPy 3.4.0 (dspy.GEPA and the other DSPy optimizers; GEPA 0.1.4 comes in as its pinned dependency)",
+            "definitive": false,
+            "gpt": "decide round 2 (2026-10-04): both blind deciders and the critic named DSPy",
+            "installs_nothing_extra": false,
+            "job": "optimizing LM programs (prompts and demonstrations) for the GPT lane",
+            "label": "owner decision of 2026-10-04 (wave 5, amendment 4): the owner's repository-quality rule; decide round 2 and its Opus verification named this owner; not a blind result, a consensus or a measurement; its removal check reports to the owner",
+            "layer_id": "cross:gpt6-harnesses",
+            "measurement": null,
+            "repository": "https://github.com/stanfordnlp/dspy",
+            "resolution": {
+              "batch": "wave5",
+              "by": "the owner's repository-quality rule of 2026-10-04",
+              "install": "Upstream install (stanfordnlp/dspy@3.4.0 README.md line 31: `pip install dspy`), pinned: `pip install \"dspy==3.4.0\"`. Run it inside a dedicated virtual environment on NativeStack2604, for example `python3 -m venv <venv> && <venv>/bin/pip install \"dspy==3.4.0\"`. The 26.04.1 system interpreter is distro-managed Python 3.14.4 (origin/main:adoption/platforms/linux-wsl2-new-distro.md:214); that PEP 668 blocks a bare system pip there is expected but not checked on this host. Python 3.10 to 3.14 is supported (requires-python >=3.10,<3.15), so the uv-selected 3.13 also works. Configure the model as dspy.LM('openai/<model>', api_base=<OmniRoute URL>, api_key=<from the stack's credential runner>), following docs/docs/learn/programming/language_models.md@3.4.0 lines 139-143.",
+              "open_acceptance_gates": [
+                "the dedicated environment imports dspy 3.4.0 and gepa 0.1.4, with the resolved lock recorded",
+                "one dspy.LM call through the OmniRoute endpoint returns, with the key supplied by the credential runner"
+              ],
+              "outcome": "added_by_owner_decision",
+              "overturn": "on one stack program, dspy.GEPA against standalone gepa with the same model, splits and budget, scored in Inspect; standalone GEPA replaces DSPy if it reproducibly wins on the held-out metric; it reports to the owner and removes nothing by itself",
+              "pin": "dspy==3.4.0, published 2026-09-25 and still the latest on PyPI on 2026-10-04. Git tag 3.4.0 is commit 2413b67a4d08a476e4bc6f40b9f8f42f87711ee7. Wheel dspy-3.4.0-py3-none-any.whl sha256 36de329ecdaf18e31977e26c61b587caa470a34f574f2fe6cb7f4c82bcbf97cc; sdist sha256 4dea089c6bd1f8d314e1095e7f64b4b4ff64bb8a09549efee026c0a609f08c16. It pulls in the exact pin gepa==0.1.4 (gepa[dspy]==0.1.4): tag v0.1.4 is commit 8b0ce6cd99a234f6b74daf37558a2ac0ce18f975, wheel sha256 12b971039599625c156d2231f6d72a29c31a22e9c237689459b5f1a3c353f532. litellm is uncapped (>=1.65.8). It resolved to 1.104.0 on 2026-10-03, which ships a cp310-abi3 manylinux_2_28_x86_64 wheel, so Python 3.14 installs without a Rust build. Record the resolved lock in the install receipt.",
+              "reason": "Decide round 2 applied the owner's repository-quality rule to the gap lm-program-optimization; its Opus verification named stanfordnlp/dspy 3.4.0. It owns GPT-lane LM program optimization through dspy.GEPA and the other DSPy optimizers. GEPA 0.1.4 comes in as DSPy's declared, pinned dependency, not as a second owner. Optimizing skill descriptions and triggers stays with skill-creator, the existing skill-authoring owner. against live upstream. I tried to refute the verdict and it holds.\n\n(1) Requirement gate: met under the frozen rule.\n- A(2) holds: round 1's critic rejected treating missing experiment inputs as a failed requirement and called \"no extra install\" a deferral, not a dismissal (prompt-C.md line 58). Round 1's Opus check objected that no program, metric or examples were named, but A(2) needs only one of the two.\n- A(1) holds through the GPT-lane workers and research scope.\n- The stack had already recorded a concrete use: optimizing its judge and shortlist prompts against sealed held-out judgments (origin/main 3b8f9c8a1, ",
+              "sources": [
+                "docs/decisions/2026-10-04-final-architecture-round2.md",
+                "docs/decisions/2026-10-04-repository-quality-rule.md",
+                "evidence/artifacts/final-architecture-round2-20261004/verdicts.json"
+              ]
+            },
+            "row_kind": "owner_decision",
+            "slot_id": "lm-program-optimization",
+            "state": "resolved"
+          },
+          "state": "resolved"
         }
       ],
       "evidence_class_today": "pending clean-install assessment",
@@ -7529,20 +7787,25 @@
   "schema_version": 1,
   "sources": [
     {
+      "excludes": [
+        "source.release_tag",
+        "source.release_commit",
+        "updated_at"
+      ],
       "path": "adoption/manifest.json",
-      "sha256": "4aedebfa4528918a008d99c2ef6044b307a6fcf7646afe8857ee8db936241714"
+      "sha256": "67d53c69ab322a37437aeaaceaec73655710657abc08ec269d5e5bbb115abdfb"
     },
     {
       "path": "adoption/new-wsl-profile.json",
-      "sha256": "9abbb77704c9208d049518368f97786d1ef09060d420c5aebf183ee4575e7632"
+      "sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3"
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "c496b08e4b26cd1f29b2057109028b341dc72ab17229e15f6502f57e3aa1ec53"
+      "sha256": "f640139255f1e093b018f47c1346c9f03b36d3fb941e08f4e910c928a08b3bec"
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "58871b0fa9dbcc8b2b6582eb0f7e197e1f5e7e56e8669aa2b9bae61c94aba163"
+      "sha256": "b53fe19b4010cad6125cb060006cec873e19c758f897ce38f3fed5ee62aa4962"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -7654,7 +7917,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "b1327417e21e00e079a97ae10c5c74fc2488ecbab5e389df80e568f9e41ebe7a"
+      "sha256": "2c99f8e90c434abd824238dd301ca53bccf15aa0403d10827283996f193dc2f0"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -7678,7 +7941,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "d3fb06dc20e53f1daa7a6d029e414db4987fe066a75c7f8e0f73384bf0d1acfc"
+      "sha256": "21b833ade87f27616b037c9619a348223391175bd6047a2be237556bf4b7fc1e"
     }
   ],
   "stage_order": [
@@ -8995,76 +9258,6 @@
     },
     {
       "acceptance": {
-        "command": "npm ci && npm run test",
-        "evidence_class": "upstream_test_command_not_executed",
-        "execution_status": "UNRUN",
-        "prerequisites": [
-          "Run from the v0.1.21 source checkout; the workflow selects Node.js 20 and npm ci.",
-          "A working browser/runtime required by the upstream CLI tests must be available. The source integration fixture launches playwright-cli.js in a test output directory and opens a persistent data:text/html,hello page; npm test has not been run and no browser availability was checked."
-        ],
-        "scope": "Source CI test command including the upstream data-URL fixture; not acceptance of an installed browser, MCP surface or destination WSL.",
-        "source": "https://github.com/microsoft/playwright-cli/blob/v0.1.21/.github/workflows/ci.yml",
-        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
-      },
-      "aliases": [
-        "Playwright CLI"
-      ],
-      "blocking_gaps": [],
-      "checksum": {
-        "algorithm": "sha256",
-        "kind": "artifact",
-        "source": "https://registry.npmjs.org/%40playwright%2Fcli/0.1.21",
-        "value": "46d0b66061dd4a84c287e36965fd3f1a8c6a49cbcf3b3f90f842023833d5234c"
-      },
-      "documented_install": [
-        {
-          "command": "npm install -g @playwright/cli@latest && playwright-cli install --skills",
-          "source": "https://github.com/microsoft/playwright-cli#installation"
-        }
-      ],
-      "evidence_refs": [
-        "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-        "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
-        "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/web-research.json",
-        "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/microsoft/playwright-cli/blob/74354ecc7a43da16d91a9bc54fa8db8283a3fcf5/README.md",
-        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
-      ],
-      "install": {
-        "command": "npm install -g @playwright/cli@0.1.21",
-        "execution_status": "UNRUN",
-        "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "prerequisites": [
-          "Node/npm and the selected package installation target must be available."
-        ],
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
-        "source": "https://github.com/microsoft/playwright-cli/blob/v0.1.21/README.md",
-        "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
-      },
-      "name": "Playwright CLI",
-      "owner_layer_id": "web-research",
-      "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "package_id": "npm:@playwright/cli",
-      "pin": "0.1.21",
-      "position": 7,
-      "provisioning_status": "unprovisioned_source_review",
-      "repository": "https://github.com/microsoft/playwright-cli",
-      "selection_sources": [
-        {
-          "layer_id": "web-research",
-          "name": "Playwright CLI",
-          "source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json"
-        }
-      ],
-      "stage": "native-extensions",
-      "status": "picked",
-      "tool_id": "dd1462ee4e754917",
-      "used_by": [
-        "web-research"
-      ]
-    },
-    {
-      "acceptance": {
         "alias_source": "https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/.cargo/config.toml",
         "command": "cargo t",
         "evidence_class": "upstream_test_command_not_executed",
@@ -9432,7 +9625,7 @@
         "prerequisites": [
           "tar and sha256sum."
         ],
-        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. This replaces the UNRUN cargo build of the tagged source: the release binary is the asset the recorded sha256 identifies. The Claude Code hook and its exclude_commands are the client configuration's; rtk init --global --codex is never run at 0.51.0.",
+        "scope": "The release archive and its sha256, as recipes/README.md 'Official release archives' gives the procedure; the install plan downloads the same asset with its checksum-verified download instead of gh, extracts it into ${ECO_ROOT}/tools/<tool>-<version> and links the command into ${ECO_ROOT}/bin. This replaces the UNRUN cargo build of the tagged source: the release binary is the asset the recorded sha256 identifies. The Claude Code hook and its exclude_commands are the client configuration's. The install plan's command-output row also runs rtk init -g --codex (the Codex PreToolUse hook, RTK.md and an inert @RTK.md pointer line in the Codex AGENTS.md; upstream: rtk-ai/rtk v0.51.0 README.md L133 (rtk init -g --codex)) and then tools/adoption/codex_hook_trust.py --command \"rtk hook codex\" --apply, which trusts that one hook at its current hash, on the decision of 2026-10-04 (docs/decisions/2026-10-04-codex-rtk-hook-qualified.md).",
         "source": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/14048b840425c2569e0df60a6596e94e601da15b/recipes/README.md#L41"
       },
       "name": "RTK",
@@ -10427,7 +10620,7 @@
       "acceptance": {
         "command": "make test",
         "evidence_class": "upstream_test_command_not_executed",
-        "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md"
+        "source": "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md"
       },
       "aliases": [
         "Dagu"
@@ -10436,8 +10629,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://api.github.com/repos/dagucloud/dagu/releases/tags/v2.16.6",
-        "value": "06c3ed951fb58408313b1db25bc9f90ff2f427cbdbe68aaff55cd5465c167717"
+        "source": "https://github.com/dagucloud/dagu/releases/download/v2.18.2/checksums.txt",
+        "value": "5a84c093b9ba9d02b7a60e106bb91d46f9383fd01c62bd51560e41193f05792b"
       },
       "documented_install": [
         {
@@ -10450,19 +10643,20 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/scheduling-supervision.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md",
-        "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md"
+        "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md",
+        "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md",
+        "evidence/receipts/dagu-mise-pin-qualification-20261005.json"
       ],
       "install": {
-        "command": "npm install -g --ignore-scripts=false @dagucloud/dagu@2.16.6",
+        "command": "npm install -g --ignore-scripts=false @dagucloud/dagu@2.18.2",
         "pinning_source": "https://docs.npmjs.com/cli/v11/commands/npm-install",
-        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version.",
-        "source": "https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/README.md"
+        "scope": "Reviewed upstream package-manager form with the verified package release supplied as its explicit version. Independent new-WSL pin only; the workstation/trading stack remains held at 2.16.6. For a future upgrade of any existing owned Dagu installation, stop its owned unit and retain a complete pre-upgrade DAGU_HOME copy plus the prior binary, unit and environment. Conditional rollback restores that copy and the prior binary/unit/environment together. NativeStack2604 is already on 2.18.2 with no pre-upgrade copy, so its rollback is re-provisioning. See [Command center correction and NativeStack2604 state](../docs/decisions/2026-10-05-dagu-mise-pin-move.md#command-center-correction-and-nativestack2604-state-2026-10-05-r2b).",
+        "source": "https://github.com/dagucloud/dagu/blob/5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4/README.md"
       },
       "name": "Dagu",
       "owner_layer_id": "scheduling-supervision",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "2.16.6",
+      "pin": "2.18.2",
       "position": 6,
       "provisioning_status": "unprovisioned_optional_service",
       "repository": "https://github.com/dagucloud/dagu",
@@ -11114,11 +11308,11 @@
         "evidence_class": "upstream_test_command_not_executed",
         "execution_status": "UNRUN",
         "prerequisites": [
-          "Run from the v2026.9.18 source checkout after its documented development setup: suitable Rust, a working mise meeting min_version, git/host dependencies, mise install and mise run build.",
+          "Run from the v2026.10.1 source checkout after its documented development setup: suitable Rust, a working mise meeting min_version, git/host dependencies, mise install and mise run build.",
           "The E2E selector is the documented basename regex ^test_use$; it does not select the full suite."
         ],
         "scope": "Documented unit suite plus one selected upstream E2E case, both UNRUN. No host installation, lifecycle or new-host acceptance.",
-        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/contributing.md",
+        "source": "https://github.com/jdx/mise/blob/v2026.10.1/docs/contributing.md",
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "aliases": [
@@ -11128,8 +11322,8 @@
       "checksum": {
         "algorithm": "sha256",
         "kind": "artifact",
-        "source": "https://api.github.com/repos/jdx/mise/releases/tags/v2026.9.18",
-        "value": "4312f8fd72a8d6a869cd2aca7444929e2a0ef6f45d2c6f2866a1eacc5bdc2e84"
+        "source": "https://github.com/jdx/mise/releases/download/v2026.10.1/SHASUMS256.txt",
+        "value": "9b92aa39b8fde54b28c8f974a68f2501925a1523d6c05a52719145df3acdd75a"
       },
       "documented_install": [
         {
@@ -11142,23 +11336,24 @@
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/selection.json",
         "evidence/artifacts/new-wsl-clean-install-selection-20261001/packets/recovery-portability.json",
         "evidence/artifacts/new-wsl-profile-20261001/source-review.json",
-        "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
-        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
+        "https://github.com/jdx/mise/blob/v2026.10.1/docs/installing-mise.md",
+        "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json",
+        "evidence/receipts/dagu-mise-pin-qualification-20261005.json"
       ],
       "install": {
-        "command": "curl -fsSL https://mise.run | MISE_VERSION=v2026.9.18 sh",
+        "command": "curl -fsSL https://mise.run | MISE_VERSION=v2026.10.1 sh",
         "execution_status": "UNRUN",
         "prerequisites": [
           "curl, sh and a chosen owned installation target; no installer was executed.",
-          "The selected installer source's resolve_release function removes the leading v from MISE_VERSION at line 300. The live mise.run endpoint is the guide's installer route, not an independently frozen installer-byte artifact."
+          "The selected release asset install.sh resolves the pinned MISE_VERSION after removing one leading v; its API digest was verified during the pin review. The live mise.run endpoint is the guide's installer route, not the archive installation used for isolated qualification."
         ],
-        "source": "https://github.com/jdx/mise/blob/v2026.9.18/docs/installing-mise.md",
+        "source": "https://github.com/jdx/mise/blob/v2026.10.1/docs/installing-mise.md",
         "source_review_ref": "evidence/artifacts/new-wsl-profile-20261001/core-native-recipe-wave-1.json"
       },
       "name": "mise",
       "owner_layer_id": "recovery-portability",
       "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
-      "pin": "2026.9.18",
+      "pin": "2026.10.1",
       "position": 1,
       "provisioning_status": "unprovisioned_source_review",
       "repository": "https://github.com/jdx/mise",
@@ -11701,6 +11896,73 @@
       "tool_id": "78da7220cba3bdfe",
       "used_by": [
         "recovery-portability"
+      ]
+    },
+    {
+      "acceptance": {
+        "command": "PUPPETEER_EXECUTABLE_PATH=\"$(command -v google-chrome-stable)\" npm run test:no-build -- tests/index.test.ts tests/tools/pages.test.ts tests/tools/snapshot.test.ts tests/tools/console.test.ts tests/tools/network.test.ts tests/tools/performance.test.ts",
+        "evidence_class": "upstream_test_command_not_executed",
+        "execution_status": "UNRUN",
+        "prerequisites": [
+          "At the exact release source commit, git submodule update --init, PUPPETEER_SKIP_DOWNLOAD=true npm ci, npm run bundle.",
+          "After native client sign-ins, the plan additionally requires both clients to navigate the local fixture and return its snapshot title and console marker.",
+          "Puppeteer 25.11.0 getConfiguration.ts:140-145 supports the explicit Linux Chrome executable override; no CI AppArmor-disable step is applied to the host."
+        ],
+        "scope": "Six unchanged upstream files through the published test runner; separate synthetic native-client integration. Neither is a new host pass or a comparative trial.",
+        "source": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/.github/workflows/run-tests.yml#L72",
+        "source_review_ref": "docs/decisions/2026-10-04-round2-plan-g2-browser.md"
+      },
+      "aliases": [
+        "Chrome DevTools MCP"
+      ],
+      "blocking_gaps": [],
+      "checksum": {
+        "algorithm": "sha256",
+        "integrity": "sha512-Klw6HWDqHC/XS1JwZldd2r49aUhbUJN9m9Mvcx4SEueIPXtzuQX+QelxAViobv8YUkDZ7HWDrmViR6LeYK0wAw==",
+        "kind": "artifact",
+        "source": "https://registry.npmjs.org/chrome-devtools-mcp/1.10.1",
+        "value": "012cbcf6e832d4f6709dad0c21d7bef17089e94adee9cf33179d15ea0a9adf2b"
+      },
+      "documented_install": [],
+      "evidence_refs": [
+        "docs/decisions/2026-10-04-final-architecture-round2.md",
+        "evidence/artifacts/final-architecture-round2-20261004/verdicts.json",
+        "docs/decisions/2026-10-04-round2-plan-g2-browser.md",
+        "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71",
+        "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/tests/index.test.ts#L38"
+      ],
+      "install": {
+        "command": "claude mcp add chrome-devtools --scope user -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics --no-performance-crux && codex mcp add chrome-devtools -- npx -y chrome-devtools-mcp@1.10.1 --headless --isolated --no-usage-statistics --no-performance-crux",
+        "execution_status": "UNRUN",
+        "pinning_source": "https://registry.npmjs.org/chrome-devtools-mcp/1.10.1",
+        "prerequisites": [
+          "NativeStack2604 amd64, Linux-side Google Chrome 154.0.8037.97-1 through the signed apt repository and fingerprint-restricted keyring; privilege is declared by its helper.",
+          "Plan Node 24.21.0; destination client templates must include the prepared chrome-devtools entries."
+        ],
+        "scope": "Release-pinned documented npx stdio route and Linux-side WSL Chrome prerequisites; single browser owner for both clients and diagnostics.",
+        "source": "https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71",
+        "source_review_ref": "docs/decisions/2026-10-04-round2-plan-g2-browser.md"
+      },
+      "name": "Chrome DevTools MCP",
+      "owner_layer_id": "web-research",
+      "ownership_source": "evidence/artifacts/new-wsl-clean-install-selection-20261001/ownership.json",
+      "package_id": "npm:chrome-devtools-mcp",
+      "pin": "1.10.1",
+      "position": 7,
+      "provisioning_status": "unprovisioned_source_review",
+      "repository": "https://github.com/ChromeDevTools/chrome-devtools-mcp",
+      "selection_sources": [
+        {
+          "layer_id": "web-research",
+          "name": "Chrome DevTools MCP",
+          "source": "adoption/new-wsl-profile.json"
+        }
+      ],
+      "stage": "native-extensions",
+      "status": "picked",
+      "tool_id": "263b2d469bfc5351",
+      "used_by": [
+        "web-research"
       ]
     },
     {

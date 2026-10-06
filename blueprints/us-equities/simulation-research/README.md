@@ -52,7 +52,9 @@ the frozen plan, all native commands and reviewed artifact hashes.
 
 ## SEC and repository review result
 
-[EdgarTools 5.58.0](../catalyst-provenance/README.md) is installed in a separate
+The current [EdgarTools recipe](../catalyst-provenance/README.md) selects 5.60.0
+after the October 4 [native SEC index acceptance](../catalyst-provenance/native-network-edgartools-5600-20261004.json).
+The historical wave below used EdgarTools 5.58.0 in a separate
 42-package version-pinned environment. Its native parser processed a pinned real
 8-K HTML fixture into Markdown. A missing acceptance timestamp keeps that document
 quarantined for historical trading decisions. Two synthetic index members separately

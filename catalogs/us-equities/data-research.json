@@ -154,8 +154,8 @@
       "role": "SEC filing objects, XBRL, ownership and filing-text extraction",
       "decision": "default",
       "rationale": "Use structured filing access for research while retaining accession-keyed original filings and acquisition metadata.",
-      "version_or_commit": "v5.58.0; source abe44344c56cf4bfb5443e0debca7e39342f6e7a",
-      "release_date": "2026-09-11",
+      "version_or_commit": "v5.60.0; source 1e7a61b3a142dbf5d19bc82444f85239c1786348",
+      "release_date": "2026-10-02",
       "license": "MIT",
       "us_equities_fit": "10-K/10-Q/8-K, insider filings and 13F can enrich US-company research; CIK is an issuer identifier, not a security/share-class identifier.",
       "alpaca_fit": "Adds research context to a symbol-linked data plane; filing analysis must not directly submit Alpaca orders.",
@@ -163,7 +163,8 @@
       "evidence_refs": [
         "https://github.com/dgunning/edgartools/blob/abe44344c56cf4bfb5443e0debca7e39342f6e7a/README.md",
         "blueprints/us-equities/catalyst-provenance/receipt.json",
-        "blueprints/us-equities/catalyst-provenance/access-resolution.json"
+        "blueprints/us-equities/catalyst-provenance/access-resolution.json",
+        "blueprints/us-equities/catalyst-provenance/native-network-edgartools-5600-20261004.json"
       ],
       "native_workflow": [
         "# Native SEC archive acquisition now accepted for371indexrows; see access-resolution.md. Historical trading availability remains a separate gate.",
@@ -179,6 +180,7 @@
         "SEC public availability can lag acceptance. Historical downloads today do not prove what an agent actually observed in the past.",
         "Automated filings parsing requires validation of units, dimensions, duplicate facts and issuer/security mappings.",
         "Native5.58.0 accepted the selected SEC index request after contact correction:371CIK/accession entries represent360uniqueaccessions. Initial synthetic and real-fixture parser receipts remain dated. Bounded acquired samples do not establish a historical trading universe or strategy.",
+        "2026-10-04: native-sec-edgartools-5600-20261004 records EdgarTools 5.60.0 on NativeStack with CPython 3.12.3: one SEC archive GET returned HTTP 200 with zero retries, 371 index rows and the same five selected CIK/accession rows as the earlier receipts. It does not repeat unique-accession or complete source-byte measurements, accept the provenance adapter, or qualify historical availability. NativeStack2604 rerun native-trading-runtime-2604-rerun-d02c0827-20261005 (evidence/receipts/native-trading-runtime-2604-rerun-20261005.json) records install PASS and 25/25 offline acceptance at d02c0827 on lock 4c98672d14147a1b, 2026-10-05T01:00:17Z-01:01:07Z; independent review pending.",
         "Dependencies are version-frozen in a separate42-package environment, not wheel-hash-locked; new hosts need native acceptance."
       ],
       "sources": [
@@ -187,7 +189,9 @@
         "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
         "https://www.sec.gov/about/webmaster-frequently-asked-questions",
         "https://github.com/dgunning/edgartools/releases/tag/v5.58.0",
-        "https://pypi.org/pypi/edgartools/5.58.0/json"
+        "https://pypi.org/pypi/edgartools/5.58.0/json",
+        "https://github.com/dgunning/edgartools/releases/tag/v5.60.0",
+        "https://pypi.org/pypi/edgartools/5.60.0/json"
       ]
     },
     {
@@ -705,9 +709,11 @@
       "alpaca_fit": "Versions research inputs independently of broker state; do not expose licensed market data through a public remote.",
       "evidence_level": "source_review",
       "evidence_refs": [
-        "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst"
+        "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst",
+        "evidence/artifacts/trading-runtime-2604-20261004/diskcache-removal-20261005.json"
       ],
       "native_workflow": [
+        "# 2026-10-05: install workflow ON HOLD for PYSEC-2026-2447 (diskcache 5.6.3); re-judge the data-versioning default before using this prospective recipe.",
         "# Prospective and UNEXECUTED in this catalog review. Use an isolated environment; commands are upstream entrypoints with illustrative local inputs, not end-to-end trading evidence.",
         "python -m pip install 'dvc==3.67.1'",
         "# Run only inside a NEW private research Git repository, with an existing local data snapshot:",
@@ -723,7 +729,8 @@
       "limitations": [
         "Content hashes prove identity, not data validity or point-in-time correctness.",
         "GitHub canonical repository now resolves to treeverse/dvc; older iterative URLs redirect.",
-        "Even metadata can reveal identifiers; review public manifests separately from private data/cache."
+        "Even metadata can reveal identifiers; review public manifests separately from private data/cache.",
+        "2026-10-05: DVC 3.67.1 pulls dvc-data and diskcache 5.6.3, affected by PYSEC-2026-2447 (GHSA-w8v5-vhqr-4h9v): attacker-writable cache data can reach unsafe pickle deserialization. No fixed release was listed in evidence/artifacts/trading-runtime-2604-20261004/diskcache-removal-20261005.json, which records removal of unused DVC and its closure from the NativeStack2604 runtime without an OSV ignore. The source-reviewed default remains recorded; its prospective install workflow is on hold pending a data-versioning re-judgement. No replacement or safe-use qualification is established."
       ],
       "sources": [
         "https://github.com/treeverse/dvc/blob/356dfa03278058b02df42124f243c2c345329dae/README.rst",
@@ -731,7 +738,9 @@
         "https://dvc.org/doc/command-reference/add",
         "https://dvc.org/doc/command-reference/stage/add",
         "https://github.com/treeverse/dvc/releases/tag/3.67.1",
-        "https://pypi.org/pypi/dvc/3.67.1/json"
+        "https://pypi.org/pypi/dvc/3.67.1/json",
+        "https://osv.dev/vulnerability/PYSEC-2026-2447",
+        "https://github.com/advisories/GHSA-w8v5-vhqr-4h9v"
       ]
     },
     {

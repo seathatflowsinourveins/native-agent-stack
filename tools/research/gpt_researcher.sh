@@ -6,9 +6,12 @@
 #
 # Either client runs it through its own shell (wave-2 synthesis X18). It follows the wave-2 research ruling
 # (2026-10-03; evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json, layers.gpt-runtimes, changes 2-5):
-# - The configuration is tools/research/gpt-researcher.config.json beside this file: the measured session-80 values
-#   without the key. Each run gets its own copy, in its own directory, with base_url set to the gateway below and one
-#   x-omniroute-session value, the join key of the gateway's call log.
+# - tools/research/gpt-researcher.config.json preserves session 80's measured profile without its key, with the
+#   dated compatibility amendments in integration-resolutions.json:repair_round_4.research_configuration_amendment
+#   (unsuffixed smart/strategic aliases and explicit xhigh follow #637; this is not a new measurement).
+#   Each run gets its own copy, in its own directory, with base_url set to the gateway below and one
+#   x-omniroute-session-id value, the join key of the gateway's call log
+#   (OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e:open-sse/handlers/chatCore.ts:1087-1090,1133).
 # - The run starts from an empty environment (env -i). Upstream's Config lets an environment variable override a file
 #   setting (gpt_researcher/config/config.py L63-76 at 0957c301), so nothing inherited may reach it.
 # - The key is the gateway's placeholder, inline: the destination gateway is keyless on loopback, the credential runner
@@ -56,7 +59,7 @@ with open(source, encoding="utf-8") as handle:
 kwargs = config.setdefault("LLM_KWARGS", {})
 kwargs.pop("api_key", None)
 kwargs["base_url"] = gateway
-kwargs["default_headers"] = {"x-omniroute-session": session}
+kwargs["default_headers"] = {"x-omniroute-session-id": session}
 with open(target, "w", encoding="utf-8") as handle:
     json.dump(config, handle, indent=1)
 PY
@@ -80,13 +83,16 @@ if config.retrievers != ["duckduckgo"]:
     problems.append(f"retrievers {config.retrievers!r}, not ['duckduckgo']")
 if getattr(config, "context_filter", None) != "keyword":
     problems.append(f"context filter {getattr(config, 'context_filter', None)!r}, not 'keyword'")
-wanted = {"fast": ("openai", "cx/gpt-6.1-sol-high"), "smart": ("openai", "cx/gpt-6.1-sol-max"),
-          "strategic": ("openai", "cx/gpt-6.1-sol-max")}
+wanted = {"fast": ("openai", "cx/gpt-6.1-sol-high"), "smart": ("openai", "cx/gpt-6.1-sol"),
+          "strategic": ("openai", "cx/gpt-6.1-sol")}
 for role, pair in wanted.items():
     found = (getattr(config, f"{role}_llm_provider", None), getattr(config, f"{role}_llm_model", None))
     if found != pair:
         problems.append(f"{role} model {found!r}, not {pair!r}")
-base_url = (getattr(config, "llm_kwargs", None) or {}).get("base_url")
+kwargs = getattr(config, "llm_kwargs", None) or {}
+if kwargs.get("reasoning_effort") != "xhigh":
+    problems.append("gateway research reasoning_effort must be xhigh on OmniRoute 3.8.51")
+base_url = kwargs.get("base_url")
 if not base_url == os.environ.get("OPENAI_BASE_URL") == gateway:
     problems.append(f"base_url {base_url!r} and OPENAI_BASE_URL {os.environ.get('OPENAI_BASE_URL')!r} are not {gateway!r}")
 if problems:

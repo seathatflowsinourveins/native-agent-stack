@@ -20,11 +20,13 @@ try:
     from .catalog_decisions import safe_file
     from .new_wsl_profile import validate_default_installs
     from .validate import PRIVATE_CONTENT
+    from .release_due import comparable_manifest
 except ImportError:
     from build_ecosystem import canonical_json, digest, require
     from catalog_decisions import safe_file
     from new_wsl_profile import validate_default_installs
     from validate import PRIVATE_CONTENT
+    from release_due import comparable_manifest
 
 
 BASE = "evidence/artifacts/new-wsl-clean-install-selection-20261001"
@@ -37,6 +39,7 @@ RESEARCH = "catalogs/landscape/research-state.json"
 TRADING = "catalogs/landscape/us-equities.json"
 DISTRO = "adoption/platforms/linux-wsl2-new-distro.md"
 ADOPTION = "adoption/manifest.json"
+ADOPTION_POINTER_FIELDS = ("source.release_tag", "source.release_commit", "updated_at")
 PROFILE = "adoption/new-wsl-profile.json"
 DEFAULTS_MANIFEST = "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json"
 OUTPUTS = ("docs/new-wsl-handbook.md", "docs/new-wsl-handbook.json")
@@ -185,6 +188,12 @@ class Inputs:
         path = public_path(path)
         raw = (override if override is not None else safe_file(self.root, path)).read_bytes()
         self.sources[path] = {"path": path, "sha256": digest(raw)}
+        if path == ADOPTION:
+            # A re-pin rewrites the release pointer, and this handbook is itself a new-machine file. Hash the manifest
+            # without the pointer, as scripts/release_due.py compares it, so a re-pin cannot make the release it
+            # points at look stale (CI validate run 37266900705).
+            self.sources[path] = {"path": path, "sha256": digest(comparable_manifest(raw.decode("utf-8")).encode()),
+                                  "excludes": list(ADOPTION_POINTER_FIELDS)}
         value = json.loads(raw) if as_json else raw.decode("utf-8")
         if override is not None:
             validate_payload(value)
@@ -796,6 +805,22 @@ def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=Non
             tool["_entries"].append(entry)
             tool["status"] = entry["status"]
 
+    # Keep the judged selection bytes intact. An owner default can supersede a
+    # historical pick; bind that replacement to the manifest and profile rather
+    # than emitting a second picked tool with invented missing metadata.
+    superseded_picks = set()
+    if default_decisions is not None:
+        records = {slot["record"]["slot_id"]: slot["record"]
+                   for slots in default_decisions["slots"].values() for slot in slots}
+        for entry in entries:
+            record = records.get(entry.get("component_id"), {})
+            previous_name = entry.get("source_selection_name", entry["name"])
+            if (record.get("overturned")
+                    and record.get("resolution", {}).get("outcome") == "owner_default"
+                    and previous_name != entry["name"]
+                    and entry["name"] in str(record.get("default", ""))):
+                superseded_picks.add((entry.get("source_selection_layer", entry["layer_id"]), previous_name))
+
     for layer_id, row in selected.items():
         require(row["status"] in {"recommended", "compare"}, f"unknown selection status: {row['status']}")
         names = set()
@@ -803,6 +828,8 @@ def build_data(root, profile_path=None, claude_verdicts=None, codex_verdicts=Non
             require(choice["name"] not in names, f"duplicate selected tool in {layer_id}: {choice['name']}")
             names.add(choice["name"])
             key = (layer_id, choice["name"])
+            if key in superseded_picks:
+                continue
             entry = entry_map.get(key)
             consumed.add(key)
             add_tool(layer_id, choice, "picked" if row["status"] == "recommended" else "head-to-head-arm", entry)
@@ -1167,7 +1194,9 @@ def render_markdown(data):
             if tool["documented_install"]:
                 lines += [f"- {tool['name']} packet install reference (not a pinned recipe): {cell(tool['documented_install'])}"]
     lines += ["", "## Input provenance", "", "| Repository source | SHA-256 |", "| --- | --- |"]
-    lines += [f"| {link(source['path'])} | `{source['sha256']}` |" for source in data["sources"]]
+    lines += [f"| {link(source['path'])} | `{source['sha256']}`"
+              + (f" (without {', '.join(source['excludes'])})" if source.get("excludes") else "") + " |"
+              for source in data["sources"]]
     return ("\n".join(lines).rstrip() + "\n").encode()
 
 

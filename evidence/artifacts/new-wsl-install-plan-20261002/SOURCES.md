@@ -117,8 +117,8 @@ Each owner's install and acceptance source is in install-plan.json. The followin
 - Loki config: [source, line 1](https://raw.githubusercontent.com/grafana/loki/v3.7.8/cmd/loki/loki-local-config.yaml#L1).
 - Loki bind configuration: [source, line 6196](https://raw.githubusercontent.com/grafana/loki/v3.7.8/docs/sources/shared/configuration.md#L6196).
 - Grafana bind configuration: [source, line 50](https://raw.githubusercontent.com/grafana/grafana/v13.2.3/conf/defaults.ini#L50).
-- Dagu native installer options/unit: [source, line 109](https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/scripts/installer.sh#L109).
-- Dagu coordinator defaults: [source, line 2017](https://raw.githubusercontent.com/dagucloud/dagu/v2.18.1/internal/cmn/config/loader.go#L2017).
+- Dagu native installer options/unit: [source, line 109](https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/scripts/installer.sh#L109).
+- Dagu coordinator defaults: [source, line 2029](https://raw.githubusercontent.com/dagucloud/dagu/v2.18.2/internal/cmn/config/loader.go#L2029).
 - Rootless Docker install: [source, line 75](https://raw.githubusercontent.com/docker/docs/2d7809c7a74ba1e99609a44f421a15cbf8a4a4bc/content/manuals/engine/security/rootless/_index.md#L75).
 - Rootless Docker user unit: [source, line 15](https://raw.githubusercontent.com/docker/docs/a20e3585feaf72f0be0ca0177e3bbb523f372ff2/content/manuals/engine/security/rootless/tips.md#L15).
 - Rootless dbus prerequisite: [source, line 219](https://raw.githubusercontent.com/docker/docs/0571430b6a9c6ff1742baede7c265c3c5e9e3322/content/manuals/engine/security/rootless/troubleshoot.md#L219).
@@ -538,6 +538,53 @@ service and reads no private destination values. The original alerting
 adjudication corrects the unit assignment to observe-eval-2. The user chooses
 webhook, Telegram or on-host delivery; the sink remains until safe files exist.
 
+Receiver support is restored from main `f946c6d4c` / `77d7516d8`:
+`config/observability_config.py:65-78` selects the native webhook or Telegram
+pointer files, and `accept.sh` selects the matching native notification counters.
+The upstream Alertmanager v0.34.1 file fields are documented at
+`docs/configuration.md:1875-1882,1947-1950`. The round-2 handling of exit 78 as
+`needs_user` remains.
+
+The coordinator's 2026-10-05 round-3 brief corrects the choice record: ntfy.sh
+was the coordinator's delegated pick on 2026-10-04; the user personally configured
+and accepted Telegram on NativeStack2604 at about 06:58Z on 2026-10-05. The user
+supplied firing and resolved messages for acceptance
+`9e6f4a70b5874573aff1d22b40e87a32`; main `4c897418f`'s unmodified
+`accept.sh --only alerting --stage after_sign_in` returned 0 with
+`receiver_evidence=user_attestation`. The plan supports webhook/ntfy, Telegram
+and on-host; nothing was overturned. These are coordinator-supplied host facts,
+not a new live run by this PR. Only pointer names are retained.
+
+## Repair round 4: CI portability and research configuration (2026-10-05)
+
+The measured research baseline is retained in
+`this PR: evidence/artifacts/new-wsl-layer-consensus-20261002/wave2-records.json`,
+`layers.gpt-runtimes.ruling`: its default names the high/max request aliases,
+and change 2 binds the profile to session 80's configuration, including the
+12000-token budget, scraper bounds, 4096-character chunks, 1500-word report and
+600-second timeout. The credential-bearing session file is not opened or copied.
+
+Option (b), a dated source compatibility amendment, is recorded in
+`this PR: evidence/artifacts/final-architecture-round2-20261004/integration-resolutions.json`,
+`repair_round_4.research_configuration_amendment`. It binds the exact committed
+configuration hash and the retained baseline record hash, lists the preserved
+measured values and names each compatibility change. It is not a new measurement.
+Restoring the historical max aliases alone would not establish compatibility
+with the clean 3.8.51 pin: its
+[max-alias set and suffix parser](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11)
+do not include `gpt-6.1-sol` in that set. The
+[unlisted-model cap](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L315)
+is xhigh. Keep the unsuffixed smart/strategic route and explicit xhigh request
+from #637's record; an alias label supplies no delivered-effort evidence.
+
+The per-run correlation header remains `x-omniroute-session-id`, as the pinned
+[chat handler reads](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/handlers/chatCore.ts#L1084)
+before assigning `call_logs.session_tag`. Chrome Signed-By and Claude MCP
+registration checks use `grep -E`, with `[[:space:]]` and a literal `[.]` where
+needed; their positive and negative controls run with ripgrep absent from PATH.
+Other ripgrep checks are unchanged. All checks here are repository integration
+evidence, separate from a fresh research or provider run.
+
 ## G5 analytics and evaluation sources (2026-10-04)
 
 The bounded builder re-read the original pinned source. The private `review-observe-eval-2.json` supplies the session-analytics repair; `adjudication.json` overrides the two evaluation reviews. The supplied `fixes.json` was absent at the input location when checked. The earlier install-repair patch contains no hunks for these three slots. The existing primary tool pins remain unchanged.
@@ -688,6 +735,257 @@ GPT-runtime executor/review records plus an Opus check the coordinator relayed f
 The earlier job-030 patch/report was inspected; its changed slots do not include these four, so no unrelated hunk was ported.
 Scoped ai-memory retrieval with pin priority and limit two was unavailable because the MCP call required approval under
 this job's never-approval policy. Context Mode tools were not exposed in this session's enabled tool list; bounded native reads and RTK handled output.
+
+## 2026-10-05 Dagu/mise pin move
+
+The current Dagu installation row selects [v2.18.2](https://github.com/dagucloud/dagu/releases/tag/v2.18.2), commit `5ca5c59f6b67734c9f0ae186bd59f5e0bb5846f4`; its native installer reads the release archive and [checksums.txt](https://github.com/dagucloud/dagu/releases/download/v2.18.2/checksums.txt). The Linux amd64 archive's published sha256 is `5a84c093b9ba9d02b7a60e106bb91d46f9383fd01c62bd51560e41193f05792b`. Version-command and installer health locators were re-read at that pin (version.go:13, installer.sh:1989); coordinator binding defaults are loader.go:2029-2031, and effective enabled=true is loader.go:1314-1321.
+
+The current mise installation row selects [v2026.10.1](https://github.com/jdx/mise/releases/tag/v2026.10.1), annotated tag `b752bdc18b1b5961e4f9ba01a63bc3c11a0a1f79` / peeled commit `050ce5a20287a0aafd872b1191699a5fdafff5ac`. Its Linux x64 tar.gz sha256 from [SHASUMS256.txt](https://github.com/jdx/mise/releases/download/v2026.10.1/SHASUMS256.txt) is `9b92aa39b8fde54b28c8f974a68f2501925a1523d6c05a52719145df3acdd75a`; the current [installing guide](https://github.com/jdx/mise/blob/v2026.10.1/docs/installing-mise.md) documents the version pin and checksums, and doctor/mod.rs:532 still requires activation or shims. Other registry citations and prior source-read/repair observations above retain their reviewed revisions.
+
+Only the verified release assets were installed in a disposable root for version/validation/start-all/doctor qualification. No target-WSL install-plan run is added: the original validation/host receipts keep their bytes. The waiver, reader classification and qualification scope are in [the pin decision](../../../docs/decisions/2026-10-05-dagu-mise-pin-move.md); actual sanitized results are in [the new receipt](../../receipts/dagu-mise-pin-qualification-20261005.json).
+
+### Existing-home Dagu upgrade and conditional rollback (dagu-pin-r3)
+
+The current new-WSL row carries its own Dagu 2.18.2 pin. The workstation/trading stack remains held at 2.16.6; its hosting cutover belongs to the trading lane. [v2.17.0 release notes](https://github.com/dagucloud/dagu/releases/tag/v2.17.0) describe #2784 (default suspend flags under data_dir) and #2776 (partitioned/indexed artifacts); [v2.17.2](https://github.com/dagucloud/dagu/releases/tag/v2.17.2) describes #2858 (DAG definition index under data_dir). The [standing hold](../../../docs/decisions/2026-09-25-workstation-sota-refresh.md#held-by-the-trading-lane) records that 2.17.2 opening a DAG repository removes legacy dags/.dag.index.
+
+For a future upgrade of any existing owned installation, stop its owned unit and retain a complete pre-upgrade DAGU_HOME copy, together with the old checksum-verified binary, unit and environment. Keep newer commands away from the saved copy. Conditional rollback stops the new unit, preserves post-upgrade state separately, restores the saved home and prior binary/unit/environment together, then verifies the native version and owned workflow. A fresh empty installation has no prior home to restore. NativeStack2604 is already on 2.18.2 with no pre-upgrade copy, so its rollback is re-provisioning; its unit-file backups restore the unit, not the data. See [Command center correction and NativeStack2604 state](../../../docs/decisions/2026-10-05-dagu-mise-pin-move.md#command-center-correction-and-nativestack2604-state-2026-10-05-r2b). No host rollback or legacy-index rebuild was executed in this builder round.
+
+## Round 2: hcom transport and client posture (2026-10-04)
+
+- **Owner:** the `workers/agent-messaging` verdict in
+  `evidence/artifacts/final-architecture-round2-20261004/verdicts.json` and
+  `docs/decisions/2026-10-04-final-architecture-round2.md`; adopted by wave5.
+- **Install:** https://github.com/aannoo/hcom/releases/tag/v0.7.27;
+  release commit `2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b`.
+  https://api.github.com/repos/aannoo/hcom/releases/tags/v0.7.27 publishes
+  installer SHA-256 `3bc057fcd763748c32fae0ae25e150abf2b1df0d4c9451432c28f4ddde176a98`.
+  https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-installer.sh:51-54,313,374-375,777-783
+  supplies HCOM_NO_MODIFY_PATH/HCOM_INSTALL_DIR and checks the downloaded archive.
+  The archive's published checksum is
+  https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-x86_64-unknown-linux-gnu.tar.gz.sha256
+  (`8ae97ff6fef63c637d66ddf882651aadd035bd74ae26c0787743869c20a5391d`).
+- **Posture:** accepted r1 at
+  https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972504465;
+  aannoo/hcom@2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b:src/config.rs:126-152;
+  https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/common.rs#L46.
+  Native Claude deny and inbound keys:
+  https://code.claude.com/docs/en/permissions and
+  https://code.claude.com/docs/en/cross-session-messaging.
+  Native Codex forbidden rules and checker:
+  https://developers.openai.com/codex/rules;
+  openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/core/src/exec_policy.rs:394-406,645.
+- **CLI acceptance:**
+  https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/tests/cli_smoke.rs#L129
+  (`status_json_in_fresh_dir`, `list_json_empty`). The Bash commands parameterize
+  those assertions against the installed binary; they are upstream-derived smoke
+  integration, not an execution of the unchanged Cargo test suite.
+- **Repository quality:**
+  https://github.com/aannoo/hcom/actions/runs/36803903267;
+  Linux real-tool jobs 110183965480 (Claude) and 110183965493 (Codex), steps 8/13
+  successful. Native command and pins:
+  https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/.github/workflows/ci.yml#L121.
+  This builder ran no hcom install, model session, messaging E2E or new local trial.
+- **Configuration glue:** this PR, tools/adoption/new_wsl_client_config.py:549,577,1623,2289;
+  tools/adoption/apply_claude_settings.py:191; tools/adoption/managed_block.py:104.
+  `config/hcom-client-config.py` reads the slot's map extension because the shared
+  mapper enumerates existing template pieces only. It reuses those merge/block
+  writers, preserving native authorization classification and existing inbound choices.
+- **Known plain-Claude gap:**
+  https://github.com/aannoo/hcom/releases/tag/v0.7.27;
+  https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/claude.rs#L135
+  returns silently without HCOM_PROCESS_ID. The no-wrapper posture uses start/listen
+  and does not establish idle Claude wake. No global hook is authored to claim it.
+
+The bounded source sweep reused the adopted candidate comparison and read the
+selected release, installer, native formats, CLI assertions and tag CI. Scoped
+ai-memory retrieval was unavailable under this job's tool approval policy; the
+exact supplied posture and current source originals were read directly. Official
+Claude doc fetches returned HTTP 403, so their native format references reuse the
+source-accepted posture rather than claiming a new successful fetch. The builder's
+Codex 0.159.3 native policy check returned forbidden; 0.160.0 remains the plan pin.
+The accepted OS-sandbox boundary and prefix limitations remain explicit in the
+[decision](../../../docs/decisions/2026-10-04-round2-plan-g1-messaging.md).
+
+## Round-2 G3 sources (2026-10-04)
+
+North-star action: reproduce optimization, advisory skill vetting, local
+trajectory analysis and MCP qualification for complex engineering and the
+US-equities research/historical-simulation foundation. The owner selection is
+`this PR: docs/decisions/2026-10-04-final-architecture-round2.md` and
+`this PR: evidence/artifacts/final-architecture-round2-20261004/verdicts.json`.
+No candidate or destination acceptance was executed by this builder.
+
+- DSPy: [installation](https://github.com/stanfordnlp/dspy/blob/3.4.0/README.md#L31),
+  `stanfordnlp/dspy@3.4.0:pyproject.toml:37` (exact GEPA dependency),
+  [GEPA acceptance](https://github.com/stanfordnlp/dspy/blob/3.4.0/tests/teleprompt/test_gepa.py#L632),
+  [Predict tests](https://github.com/stanfordnlp/dspy/blob/3.4.0/tests/predict/test_predict.py#L1),
+  and [OpenAI-compatible LM configuration/call](https://github.com/stanfordnlp/dspy/blob/3.4.0/docs/docs/learn/programming/language_models.md#L139).
+  Tag commit: `2413b67a4d08a476e4bc6f40b9f8f42f87711ee7`.
+  [DSPy wheel hashes](https://pypi.org/pypi/dspy/3.4.0/json) and
+  [GEPA wheel hashes](https://pypi.org/pypi/gepa/0.1.4/json) are checked before
+  installing those artifacts. The resolved host lock is acceptance evidence for
+  dependency identity, not an upstream lock or a model-quality result.
+- SkillSpector: [uv-tool installation](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/README.md#L45),
+  [CLI test entry point](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/tests/unit/test_cli.py#L17),
+  `NVIDIA/skillspector@c7958a3268d9498644b22edb75d0f051bbc8cbfc:tests/unit/test_agent_cli.py:1`,
+  [CI test command](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/.github/workflows/ci.yml#L97),
+  [native Codex provider](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/cli.py#L560),
+  and [actual JSON report schema](https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/nodes/report.py#L1306).
+  [v2.12.0 release-asset SHA-256 metadata](https://api.github.com/repos/NVIDIA/skillspector/releases/tags/v2.12.0)
+  is recorded as publication evidence distinct from this Git-source install.
+  There is no release signature/provenance claim.
+- Scout: [installation](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/docs/index.qmd#L28),
+  [Inspect AI dependency](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/pyproject.toml#L24),
+  [Claude and ATIF import](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/docs/db_importing.qmd#L238),
+  [upstream grep tests](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/tests/grep_scanner/test_grep_scanner.py#L1),
+  [ATIF fixture acceptance](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/tests/sources/atif_source/test_integration.py#L44),
+  [native import CLI](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/src/inspect_scout/_cli/import_command.py#L317),
+  [tool-event scanner example](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/examples/scanner/grep_examples.py#L102),
+  and [native result reader](https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/src/inspect_scout/_scanresults.py#L83).
+  Tag commit: `0e8fc055a3cebba1a14c11bc35856767b6405173`.
+  [Scout hashes](https://pypi.org/pypi/inspect-scout/0.5.3/json) and
+  [Harbor 0.23.0 hashes](https://pypi.org/pypi/harbor/0.23.0/json) are checked
+  before adding their wheels to the owner's one environment. The grep config
+  parameterizes upstream `grep_scanner`; import/scan still run through Scout.
+  Current-session positive-control predicates are local integration checks.
+- MCP: `modelcontextprotocol/conformance@c321dd32035556e6769d3724a8ee97d87c3faaac:README.md:12,23,147,188`
+  ([npx and protocol requirements](https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/README.md#L147)),
+  [unchanged CI acceptance](https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/.github/workflows/ci.yml#L33),
+  [alpha.11 npm integrity](https://registry.npmjs.org/@modelcontextprotocol%2Fconformance/0.2.0-alpha.11),
+  and [SLSA provenance](https://registry.npmjs.org/-/npm/v1/attestations/@modelcontextprotocol%2fconformance@0.2.0-alpha.11).
+  The source is the published main-ancestor commit, not alpha.12's publication
+  branch. The verdict's alpha.12 cooldown ends 2026-10-08T12:07:36Z.
+- uv integration: `astral-sh/uv@0.12.22:docs/guides/projects.md:139`,
+  [project dependency management](https://github.com/astral-sh/uv/blob/0.12.22/docs/guides/projects.md#L139),
+  [file sources](https://github.com/astral-sh/uv/blob/0.12.22/docs/concepts/projects/dependencies.md#L412),
+  and [shared tool dependencies/executable export](https://github.com/astral-sh/uv/blob/0.12.22/docs/guides/tools.md#L225).
+  Installed uv 0.12.17 help confirmed the used init/add and
+  `--with-executables-from` forms; the destination plan retains uv 0.12.22.
+
+## Wave 5 browser owner (2026-10-04)
+
+Owner authority: `docs/decisions/2026-10-04-final-architecture-round2.md` and
+`evidence/artifacts/final-architecture-round2-20261004/verdicts.json`, verdicts
+`web-research/playwright-cli` and `browser-debugging`. Their merge selects one
+stdio MCP server, never the experimental CLI or a second diagnostics install.
+The preceding Playwright fix-wave observations remain historical predecessor
+evidence and do not accept this owner.
+
+Every Chrome source below was read at
+ChromeDevTools/chrome-devtools-mcp@e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df
+(`chrome-devtools-mcp-v1.10.1`, npm 1.10.1). The [release changelog](https://github.com/ChromeDevTools/chrome-devtools-mcp/releases/tag/chrome-devtools-mcp-v1.10.1)
+reports the bundle export-conditions fix; its target commit and the npm gitHead
+match the pin.
+
+- [Linux-side WSL Chrome install, docs/troubleshooting.md:99-105](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/troubleshooting.md#L99) identifies Linux-side stable amd64 Chrome. [README.md:64-65](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/README.md#L64) requires Node LTS and current stable Chrome or newer. The recipe uses [Google's signed apt repository and published key](https://www.google.com/linuxrepositories/) with pinned primary fingerprint EB4C1BFD4F042F6DDDCCEC917721F63BD38B4796, restricted Signed-By and current-stable installation. It records the installed version; acceptance checks Google repository origin and minimum 154.0.8037.97-1, permitting later builds. The downloaded package digest and postinst source locators in [the sanitized receipt](../final-architecture-round2-20261004/repair-round2-sources-20261005.json) verify why repo_add_once=false and a separate source filename prevent package-managed Signed-By conflicts.
+- [Claude CLI setup, docs/client-configurations.md:71](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L71) and [Codex CLI setup, :109](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/client-configurations.md#L109). Parameterization replaces `@latest` with 1.10.1, adds the documented `-y`, and forwards the required server flags with the native `--` separator. Installed `claude mcp add --help` and `codex mcp add --help` confirm that syntax without registering anything on this builder host.
+- [Flags, docs/configuration.md:79,88](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/configuration.md#L79), [independent sessions, docs/advanced-usage.md:22-25](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/advanced-usage.md#L22), [telemetry opt-out, README.md:45](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/README.md#L45). `--headless --isolated --no-usage-statistics` are mandatory here. [README.md:35-39](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/README.md#L35) documents the independent optional CrUX opt-out.
+- [npm release metadata and published SHA512 SRI](https://registry.npmjs.org/chrome-devtools-mcp/1.10.1): `sha512-Klw6HWDqHC/XS1JwZldd2r49aUhbUJN9m9Mvcx4SEueIPXtzuQX+QelxAViobv8YUkDZ7HWDrmViR6LeYK0wAw==`; hex `2a5c3a1d60ea1c2fd74b527066575ddabe3d69485b50937d9bd32f731e1212e7883d7b73b905fe41e9710158a86eff185240d9ec7583ae656247a2de60ad3003`. The digest is base64-decoded from upstream metadata, not a locally invented checksum. `package.json:104-105` sets engines `^20.19.0 || ^22.12.0 || >=23`; the plan's Node 24.21.0 satisfies it.
+- [Release CI preparation and test invocation, .github/workflows/run-tests.yml:30-74](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/.github/workflows/run-tests.yml#L30) and [scripts/test.js:28-38](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/scripts/test.js#L28). The upstream runner accepts explicit original test filenames. This row selects `tests/index.test.ts` and `tests/tools/{pages,snapshot,console,network,performance}.test.ts`; unchanged files, no invented E2E runner. [tests/index.test.ts:38-48](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/tests/index.test.ts#L38) starts the MCP server headless/isolated. This row selects installed Linux-side Chrome stable through the supported `PUPPETEER_EXECUTABLE_PATH`; it downloads no additional Chrome for Testing browser.
+- [First client prompt, README.md:105-116](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/README.md#L105), [navigate_page, docs/tool-reference.md:223](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/tool-reference.md#L223), [list_console_messages, :431](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/tool-reference.md#L431), [take_snapshot, :462](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/docs/tool-reference.md#L462). `after_sign_in` adapts those native operations to this PR's local synthetic fixture and native event assertions. It is project integration, not an unchanged upstream test, a model trial or a selection result.
+- Native Codex configuration source: [official MCP guide](https://developers.openai.com/codex/mcp), and [openai/codex@rust-v0.160.0:codex-rs/cli/src/mcp_cmd.rs:937-980](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/cli/src/mcp_cmd.rs#L937). The pinned implementation returns the `transport.type`, `transport.command` and `transport.args` JSON fields used by the targeted registration check. The existing `serena` acceptance in this plan is the main-source reference for Claude and Codex event/result correlation; this PR changes its tool names and oracle to the browser fixture.
+- Native signed-source and dependency handling use [Debian's Signed-By semantics](https://manpages.debian.org/bookworm/apt/sources.list.5.en.html) and [Ubuntu 26.04 apt-get(8)](https://manpages.ubuntu.com/manpages/resolute/en/man8/apt-get.8.html); these are OS integration, not a Chrome upstream test or an observed destination pass.
+
+No install, Chrome launch, upstream browser test, native model invocation or
+comparative trial was executed for this browser owner by this builder.
+
+- Explicit installed-browser test selection: [puppeteer/puppeteer@puppeteer-v25.11.0:packages/puppeteer/src/getConfiguration.ts:140-145](https://github.com/puppeteer/puppeteer/blob/puppeteer-v25.11.0/packages/puppeteer/src/getConfiguration.ts#L140) reads `PUPPETEER_EXECUTABLE_PATH` into executable configuration. The pinned MCP [tests/utils.ts:89-92](https://github.com/ChromeDevTools/chrome-devtools-mcp/blob/e52c6b59b476c5e04d8dd9fd4bd017ba3b3d65df/tests/utils.ts#L89) also passes that environment directly to browser launch. The row does not copy the CI's host-wide AppArmor-disable operation into destination setup.
+
+## Round-2 G4 existing-owner configuration (2026-10-04)
+
+This section records the bounded `r2-g4-config` source checks. The earlier
+canary sections describe historical fix-wave recipes; the round-2 clean gateway
+row proposes published 3.8.51 with native Codex as the only Sol/max route.
+Stack and architecture pin changes are deferred pending the saturation audit
+and qualification receipt required by `this PR:tests/test_stack_lifecycle.py:21-37`.
+No upstream install, provider inference, gateway request or new local trial ran
+in this builder.
+
+- **Promptfoo providers and skills:** `promptfoo/promptfoo@34f74d34e140b5e17d23770dfb2340057b1936b8:site/docs/guides/test-agent-skills.md:204`
+  ([guide](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/guides/test-agent-skills.md#L204));
+  `:site/docs/providers/claude-agent-sdk.md:45` documents native sign-in with
+  `apiKeyRequired=false`, and `:890` documents the custom CLI path
+  ([provider](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/providers/claude-agent-sdk.md#L45));
+  `:site/docs/providers/openai-codex-sdk.md:62` documents native ChatGPT sign-in
+  and the authentication boundary of an overridden CODEX_HOME; `:232` documents
+  `codex_path_override`
+  ([provider](https://github.com/promptfoo/promptfoo/blob/34f74d34e140b5e17d23770dfb2340057b1936b8/site/docs/providers/openai-codex-sdk.md#L62)).
+  Retain the existing published 0.123.1 tarball SHA256 and unchanged upstream
+  echo fixtures documented above. `npm ls --global --prefix <owned-prefix>
+  --all @anthropic-ai/claude-agent-sdk @openai/codex-sdk` checks both optional
+  providers, as the verdict's install note requires. Native provider execution
+  remains owed. The config explicitly selects both host binaries and native
+  sign-ins; the paired project fixtures and inverted skill assertion are
+  supported-harness integration, not unchanged upstream test acceptance.
+- **Research configuration:** `assafelovic/gpt-researcher@0957c301ed06c2a5857b834358c7227c739041d4:gpt_researcher/config/config.py:63`
+  and `:158`
+  ([config](https://github.com/assafelovic/gpt-researcher/blob/0957c301ed06c2a5857b834358c7227c739041d4/gpt_researcher/config/config.py#L63));
+  `bytedance/deer-flow@345f08be00c8a9495079b732a39b46aa9af1584e:backend/packages/harness/deerflow/config/app_config.py:681`
+  ([effective config](https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/config/app_config.py#L681));
+  `:backend/packages/harness/deerflow/client.py:1229`
+  ([model read-back](https://github.com/bytedance/deer-flow/blob/345f08be00c8a9495079b732a39b46aa9af1584e/backend/packages/harness/deerflow/client.py#L1229)).
+  The existing pinned keyless configs and upstream `tests/test_client.py` are
+  retained. Read-back adds endpoint/model/tool checks without printing keys.
+  [This PR](https://github.com/seathatflowsinourveins/native-agent-stack/pull/684/files)
+  carries `tools/research/gpt_researcher.sh:27`: the installed runner starts
+  from `env -i`, with its per-run CONFIG_PATH and literal keyless-loopback
+  placeholder. Consumer runs and independent gateway zero-embeddings
+  observation remain owed.
+- **Clean gateway installation and effort boundary:**
+  `diegosouzapw/OmniRoute@c1e30b7676975feb298b49eff6ff58923c04b89e:docs/guides/SETUP_GUIDE.md:28`
+  ([npm installation](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/docs/guides/SETUP_GUIDE.md#L28));
+  `:open-sse/executors/codex/reasoningSuffix.ts:11`
+  ([alias sets](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex/reasoningSuffix.ts#L11));
+  `:open-sse/executors/codex.ts:331`
+  ([clamp](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/open-sse/executors/codex.ts#L331));
+  `:bin/cli/commands/doctor.mjs:632`
+  ([upstream acceptance command](https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/bin/cli/commands/doctor.mjs#L632)).
+  [The registry](https://registry.npmjs.org/omniroute/3.8.51) publishes
+  `sha512-VwwSt+bP9lJiPJXFJMz0nNGGuoewPZU3nFe1SLuO11ADgdSwTegGCxhg8Ov75+31m/cocPxHiO63zygn1XQ0MQ==`.
+  The recipe compares that SRI before native npm install, which enforces
+  downloaded package integrity. Published SLSA provenance is a source record,
+  not a verified attestation here. [PR #15167](https://github.com/diegosouzapw/OmniRoute/pull/15167)
+  was queried through `gh api` on 2026-10-04 and is open/unmerged.
+  The map overrides the destination pool/fallback profile to Sol/xhigh and
+  disables the standalone-search settings whose previous source was the
+  PR #13788 carry. Re-pin only to a release with both Sol alias entries and a
+  separately observed max-effort wire request.
+- **Native Codex routing:** installed `codex --version` and `codex exec --help`
+  report the builder's 0.159.3 CLI; the clean host's separate selected pin is
+  rust-v0.160.0. Its
+  [release record](https://github.com/openai/codex/releases/tag/rust-v0.160.0),
+  [SDK documentation](https://developers.openai.com/codex/sdk/),
+  [config reference](https://developers.openai.com/codex/config-reference/)
+  and [noninteractive events](https://developers.openai.com/codex/noninteractive/)
+  were retrieved. Path discovery and native flags do not claim a new model run.
+- **Harbor installation integrity:**
+  [PyPI 0.23.0](https://pypi.org/pypi/harbor/0.23.0/json) publishes wheel
+  `harbor-0.23.0-py3-none-any.whl` SHA256
+  `8747400dbb2a5e2298e1338e17e88eba38433c0433fd700f34d1a9021bba5c37`.
+  `fetch_verified` verifies that exact wheel before the supported
+  `uv tool install --python 3.13 <wheel>` invocation. This does not establish
+  PyPI attestations or hashes of the wheel's dependency tree.
+  [uv's native install reference](https://docs.astral.sh/uv/reference/cli/#uv-tool-install)
+  and installed `uv tool install --help` were read.
+- **Harbor qualification:**
+  `harbor-framework/harbor@1e5c5c6db929a10a140d05e606882c671ae20729:tests/unit/test_trajectory_validator.py:1`
+  ([unchanged unit acceptance](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/tests/unit/test_trajectory_validator.py#L1));
+  `:docs-mintlify/core-concepts/jobs/configs.mdx:6`
+  ([native job configs](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/docs-mintlify/core-concepts/jobs/configs.mdx#L6));
+  `:docs-mintlify/core-concepts/agents/atif.mdx:121`
+  ([upstream trajectory validator](https://github.com/harbor-framework/harbor/blob/1e5c5c6db929a10a140d05e606882c671ae20729/docs-mintlify/core-concepts/agents/atif.mdx#L121));
+  `:src/harbor/agents/installed/base.py:560`,
+  `:src/harbor/agents/installed/codex.py:328`,
+  `:src/harbor/agents/installed/openhands_sdk.py:150`,
+  `:src/harbor/agents/installed/deerflow.py:181` establish documented native
+  adapter pinning. `:src/harbor/models/trial/result.py:76` describes retained native
+  trial receipts. `:tests/integration/test_hello_user_e2e.py:25`
+  remains the source for the unchanged hello-user controls and the qualified
+  verifier reward/exception assertions. The new shell recipe only invokes the
+  upstream runner/validator; the maintained native-verifier corpus is
+  `needs_user` and no trial is invented. ATIF schema acceptance is separate from
+  the native telemetry-contract assertions described in
+  `config/harbor-worker-telemetry-contract.md`.
 
 ## Currency qualification source scope (2026-10-05)
 

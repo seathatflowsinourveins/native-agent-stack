@@ -9,9 +9,10 @@ install, and the suite fails when the provisioning step is dropped, moved after 
 no longer exports the directory, or can be skipped.
 
 Every Actions job is held to that runtime tripwire except the recorded gaps. Two other jobs run the whole suite under
-GITHUB_ACTIONS=true without installing the parser: adoption-bootstrap.yml validate-macos (a required check in
-.github/main-ruleset.json) and catalog-freshness.yml freshness. Holding them to the tripwire would fail both, and
-those workflows are outside this unit's owned paths, so KNOWN_UNPROVISIONED records them and the tripwire skips there
+GITHUB_ACTIONS=true without installing the parser: adoption-bootstrap.yml validate-macos (advisory since
+2026-10-05, on matching main pushes, nightly schedules and dispatches) and catalog-freshness.yml freshness.
+Holding them to the tripwire would fail both, and those workflows are outside this unit's owned paths, so
+KNOWN_UNPROVISIONED records them and the tripwire skips there
 and says so. A job that is not listed fails closed, as does an Actions environment that names no job. A whole-suite
 job that neither provisions nor is listed there fails the suite, so the list can only shrink.
 
@@ -61,9 +62,10 @@ PROVISIONING_WORKFLOW = "validate.yml"
 PROVISIONING_JOB = "validate"
 PROVISIONING_KEY = f"{PROVISIONING_WORKFLOW}:{PROVISIONING_JOB}"
 # Whole-suite jobs that do not provision the parser yet: adoption-bootstrap.yml runs the suite on macOS in its
-# validate-macos job (step "Run the full test suite (gating on macOS)"; the job is a required check in
-# .github/main-ruleset.json) and catalog-freshness.yml runs it daily in its freshness job (step "Run project test
-# suite"). Their lane tests skip today, and the runtime tripwire skips in exactly these jobs and says so. To close a
+# validate-macos job (step "Run the full test suite (gating on macOS)"; advisory since
+# docs/decisions/2026-10-05-macos-ci-advisory.md) and catalog-freshness.yml runs it daily in its freshness job
+# (step "Run project test suite"). Their lane tests skip today, and the runtime tripwire skips in exactly these jobs
+# and says so. To close a
 # gap, add a provisioning step to that job in its own workflow and delete its entry here, nothing else: until the entry
 # is deleted the ratchet reports it as stale (test_every_whole_suite_job_provisions_the_parser_or_is_a_recorded_gap),
 # and once it is deleted the runtime tripwire and the structure checks hold that job like validate.yml's.

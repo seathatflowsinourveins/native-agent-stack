@@ -1,0 +1,29 @@
+✓ Lockfile passes supply-chain policies (verified 2m ago)
+Lockfile is up to date, resolution step is skipped
+Downloading next@16.3.8: 0.00 B/42.04 MB
+Downloading @next/swc-linux-x64-gnu@16.3.8: 0.00 B/33.79 MB
+Downloading @img/sharp-libvips-linux-x64@1.3.3: 0.00 B/8.17 MB
+Update available! 12.4.2 → 12.9.1.
+Changelog: https://pnpm.io/v/12.9.1
+To update, run: curl -fsSL https://get.pnpm.io/install.sh | sh -
+Packages are hard linked from the content-addressable store to the virtual store.
+  Content-addressable store is at: <owned-store>/v11
+  Virtual store is at:             node_modules/.pnpm
+Packages: +62
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+Progress: resolved 62, reused 0, downloaded 62, added 62, done
+
+dependencies:
++ next 16.3.8
++ react 19.3.0
++ react-dom 19.3.0
+
+devDependencies:
++ @playwright/test 1.63.0
++ @types/node 24.13.6
++ @types/react 19.3.0
++ @types/react-dom 19.3.0
++ openapi-typescript 7.13.0
++ typescript 5.9.3
+
+Done in 1.1s using pnpm v12.4.2

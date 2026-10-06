@@ -195,6 +195,21 @@ The public source fixture removes personal path literals and independently recou
 3. Adopt the inactive [examples](examples/) deliberately. They contain no credentials, blanket trust settings or active machine-specific configuration.
 4. Validate the portable repository:
 
+   The unit tests import the adaptive-paper XNYS clock. Install the hash-locked
+   calendar subset in an isolated Python >=3.12 test interpreter first, or use the qualified
+   adaptive-paper engine venv. Set `TMPDIR` to a writable scratch directory
+   outside the checkout:
+
+```bash
+python3.12 -m venv "$TMPDIR/stack-tests"
+"$TMPDIR/stack-tests/bin/python" -m pip install --require-hashes --only-binary=:all: \
+  -r .github/requirements-calendar.txt
+source "$TMPDIR/stack-tests/bin/activate"
+```
+
+   For the commands below, `python3` means that prepared interpreter. CI's
+   broader dependency set is `.github/requirements-ci.txt`.
+
 ```bash
 python3 scripts/validate.py
 python3 scripts/validate_catalogs.py

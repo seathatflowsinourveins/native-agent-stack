@@ -191,8 +191,8 @@ def main():
             publish("prometheus.yaml", (source / "prometheus.yaml").read_text())
         mode, pointers, ready = destination()
         if not ready:
-            print("needs_user: choose the alert destination and supply its private destination file(s); sink retained", file=sys.stderr)
-            return 3 if args.action == "alerting-ready" else 0
+            print("needs_user: choose the alert destination and supply its private destination file(s); disarmed placeholder retained", file=sys.stderr)
+            return 78 if args.action == "alerting-ready" else 0
         template = (source / ("alertmanager-telegram.yaml" if mode == "telegram" else "alertmanager-webhook.yaml")).read_text()
         rendered = template
         for marker, pointer in pointers.items():
