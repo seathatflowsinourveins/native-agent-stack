@@ -4797,13 +4797,13 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "9ea67939f6e5443576cdc2aad3ff997cc554aca3292e877afbe0c000d7d9e6ae",
-      "bytes": 65967
+      "sha256": "56538fae2d904dc9e43b1481fe015f00fddda77a83e15ce856b84eabc9fbbf88",
+      "bytes": 66121
     },
     {
       "path": "adoption/credential-inventory.json",
-      "sha256": "6e1e50f3ad647859915eefa64835ff4c43767bf8abec104b5d30f47895cef097",
-      "bytes": 24095
+      "sha256": "e78aa059b042768a3b0b9904e1cfab02d79f774fcfee9c2c35a730484fa49fb8",
+      "bytes": 25358
     },
     {
       "path": "adoption/hardware-profiles.json",
@@ -4812,7 +4812,7 @@
     },
     {
       "path": "adoption/hooks/claude/SHA256SUMS",
-      "sha256": "032b710787fb62ffffd532758eea07c6ead6f9e064396f7d3f2802b192901ae3",
+      "sha256": "7cc2dafe1fa711567f3e9e7fc2bfee59605f23ddf74aad735169d1f6c4882c57",
       "bytes": 1137
     },
     {
@@ -4927,8 +4927,8 @@
     },
     {
       "path": "adoption/new-wsl/client-config-map.json",
-      "sha256": "3199e41f7722adb694906ba78d09d765be2c7ec63c111183645db73c95567508",
-      "bytes": 57818
+      "sha256": "043a55a1c6197fc02dbe8a30dbd67cbbd16a06707f8beedb76f92f5c7d00fc5b",
+      "bytes": 58695
     },
     {
       "path": "adoption/new-wsl/codex-user-instructions.md",
@@ -4947,8 +4947,8 @@
     },
     {
       "path": "adoption/new-wsl/templates/codex.config.additions.toml",
-      "sha256": "16a2942d0538d7a3ffbf5fbe8a57db3aaefb036253350fae229cb824ade6dc6b",
-      "bytes": 4579
+      "sha256": "98e7d77e803d35554f3f6ff4748157f5a1d4716d0a11951649f309509682b157",
+      "bytes": 4927
     },
     {
       "path": "adoption/paired/README.md",
@@ -4992,8 +4992,8 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "f640139255f1e093b018f47c1346c9f03b36d3fb941e08f4e910c928a08b3bec",
-      "bytes": 93206
+      "sha256": "a34320015026bc20240f699eb21004065eee62d15272eae3006c3d8ed55c518e",
+      "bytes": 93346
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
@@ -5057,8 +5057,8 @@
     },
     {
       "path": "adoption/templates/claude.settings.template.json",
-      "sha256": "304dc11b5fca6e4001382a8cb884712e10d28bdfa8551fcac6dbfc2b4d36cf70",
-      "bytes": 12744
+      "sha256": "65605ff57c0ccde637b2068d604dac8d44ff889c60e9a2d917dbef2221ed2665",
+      "bytes": 12849
     },
     {
       "path": "adoption/templates/codex.AGENTS.template.md",
@@ -5084,6 +5084,11 @@
       "path": "adoption/templates/decision-routing.md",
       "sha256": "217ef8f17ffe258876268c244381555710b544ce8fc6589ed03932a6de32137f",
       "bytes": 606
+    },
+    {
+      "path": "adoption/templates/environment.d/60-native-agent-stack.conf",
+      "sha256": "a5b68ef8a53bb7e6780332efa3a14da40b7b768bcd30655ff3fffcb2d4d82fe8",
+      "bytes": 733
     },
     {
       "path": "adoption/templates/project.codex.config.template.toml",
@@ -10610,6 +10615,11 @@
       "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261004.json",
       "sha256": "426f94947d3defb5f22371daea6226011390ca0206a10ebb039fbd44514d2a39",
       "bytes": 23058
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/unclassified-gate-reads-20261006.json",
+      "sha256": "ff720e32c0a5f36d3671f2cc214daf06af10fc2c11fc514a9fc02d48453b9616",
+      "bytes": 23101
     },
     {
       "path": "blueprints/runtime-workers/openhands/evidence/unit-pass.txt",
@@ -16273,7 +16283,7 @@
     },
     {
       "path": "catalogs/foundation/upstream-surface-dispositions.json",
-      "sha256": "7a11c341ad0c194ae42e4bcd8fc0fc61c3765bb871e97fec31bef03f3c933594",
+      "sha256": "0d22179366e773be7ced871141d7fe50cda10ad46c50039efa99a3d84f7b8dec",
       "bytes": 155287
     },
     {
@@ -17113,8 +17123,8 @@
     },
     {
       "path": "docs/decisions/2026-10-02-new-wsl-client-configuration.md",
-      "sha256": "2bcc4e1c173e1780cd6f48f863e6e4fcb134d9374971f95d1217e755e7f336d4",
-      "bytes": 135623
+      "sha256": "0ea86f8b6ed5cd6c8ee7afff7706e62d7c79ee15cd400df1d2a297f4014cee0d",
+      "bytes": 135729
     },
     {
       "path": "docs/decisions/2026-10-02-omniroute-mac-rebuild.md",
@@ -17355,6 +17365,11 @@
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
       "sha256": "c12885d5d078f88cf6784d539e5b8261545a759b7aba8ff1eba566fb5d6366fb",
       "bytes": 3660
+    },
+    {
+      "path": "docs/decisions/2026-10-06-pointer-environment-transfer.md",
+      "sha256": "e5ac0f1ef560922a2c1eda6e613cae4e011b8dad90bda83903d9ccaa5ebfbd9f",
+      "bytes": 19473
     },
     {
       "path": "docs/direct-results.md",
@@ -17618,12 +17633,12 @@
     },
     {
       "path": "docs/new-wsl-handbook.json",
-      "sha256": "bb5a4dc62aabc938b56b038ddb4ae3df036395ccd44cc72720436ad3aa19b33d",
+      "sha256": "69373591665f6591885bee2df05ad64ed7d1e0adfa02b53b7c17080de32a697a",
       "bytes": 689754
     },
     {
       "path": "docs/new-wsl-handbook.md",
-      "sha256": "05ec525a60a6bad90b5f4161473a2aa015107c724fdfe0328f2166e3e73453a0",
+      "sha256": "ce3f7a93c41f9cca64915464254ea55a19eaf8c82345d338ead425ba70eb1c2b",
       "bytes": 366781
     },
     {
@@ -17658,8 +17673,8 @@
     },
     {
       "path": "docs/secret-storage.md",
-      "sha256": "61039915b9fe31c5931f3cffbd60bdc686fa3433a495ce91dd56501bb67b0ef7",
-      "bytes": 184073
+      "sha256": "45ed6dfc74c8dfef7b9fa36cd1b2caeeb8b451b6b732dd6cc779cc8fbf38c42a",
+      "bytes": 188055
     },
     {
       "path": "docs/stack.md",
@@ -39768,8 +39783,8 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/receipt.json",
-      "sha256": "8a6efae7585476f1b8f32e490b22066910316cd56a9c2667d5670350c34ebf6f",
-      "bytes": 26931
+      "sha256": "4bdf3ddd730dfba03454a9fbea97398d66e1b2e56a6495af07b32d3a7face89c",
+      "bytes": 27927
     },
     {
       "path": "evidence/artifacts/new-wsl-handbook-20261001/slot-state-and-core-recipes.json",
@@ -42895,6 +42910,16 @@
       "path": "evidence/artifacts/osv-split-hardening-port-20261003/zizmor-offline.stdout.txt",
       "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
       "bytes": 2
+    },
+    {
+      "path": "evidence/artifacts/pointer-environment-transfer-20261006/README.md",
+      "sha256": "805579de83b2a3486fdbbbd736656394fb554590d8726e1645def84cf9710790",
+      "bytes": 21657
+    },
+    {
+      "path": "evidence/artifacts/pointer-environment-transfer-20261006/receipt.json",
+      "sha256": "a446fd8cb2c1a57406aed539c508eca96e8de45fc426d04e5ab292a4ca99d059",
+      "bytes": 29246
     },
     {
       "path": "evidence/artifacts/portable-claude-native-qualification-20260921/angle1-upstream.json",
@@ -54128,8 +54153,8 @@
     },
     {
       "path": "scripts/credential_status.py",
-      "sha256": "0d997b483438ff1b728f97de08c4beb020110b440c293f4c3d3adc872c665b54",
-      "bytes": 34277
+      "sha256": "eb7aca343d04364db26cc89e4a20b5521768316de71891f3775a0aef6cc811c8",
+      "bytes": 36233
     },
     {
       "path": "scripts/currency_due.py",
@@ -54163,8 +54188,8 @@
     },
     {
       "path": "scripts/hooks/secret_path_guard.py",
-      "sha256": "fd516d8b78de7e3a9da4917c8d126fc71d7ab216a014bb28fb8bd189d6b0fb7b",
-      "bytes": 296975
+      "sha256": "08fdfc3c7d7e85a3f41c5b003b5486059f15025472c49bc9afdb1e790e6bf924",
+      "bytes": 297054
     },
     {
       "path": "scripts/host_receipts.py",
@@ -54793,13 +54818,13 @@
     },
     {
       "path": "tests/test_credential_run.py",
-      "sha256": "d65c6551a7070b225179ac73316998081857c0f1e256a8e6f39ded12cd587757",
-      "bytes": 128507
+      "sha256": "9525fb458f2fc90ac4a1818b6c637c44ba16d6c1c5999a832cec54c27403aded",
+      "bytes": 128773
     },
     {
       "path": "tests/test_credential_status.py",
-      "sha256": "3840065b72c62fe51278b513baee5a01eeff623eb7a3f814e55e3f345c282bf4",
-      "bytes": 53736
+      "sha256": "843d4dc459c25ef0c0200be7f1cfe1fc6cfa0370bc69361dc16214ef833e83da",
+      "bytes": 59185
     },
     {
       "path": "tests/test_credential_tools.py",
@@ -55043,8 +55068,8 @@
     },
     {
       "path": "tests/test_managed_block.py",
-      "sha256": "78d17b9ead5412bd6ce2dd8372947a3be1672a0b33c0512515fceab884d868df",
-      "bytes": 33994
+      "sha256": "609afb8b4e7b8d5401de208e63d115d17169e190138e4aadbedcec25d256fc05",
+      "bytes": 36150
     },
     {
       "path": "tests/test_memory_lifecycle.py",
@@ -55148,8 +55173,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "7c3533b29e9eb6c39ff12b3b94c20cb4e6eab0e7b303349b5b68023f2dbcaa6d",
-      "bytes": 298226
+      "sha256": "a5c26d2b99ed0b4477bce66fbe3ab2c2b1baa7617fa9c945272ed7bd21787a2a",
+      "bytes": 310454
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -55328,7 +55353,7 @@
     },
     {
       "path": "tests/test_runtime_worker_openhands_push_gate.py",
-      "sha256": "aef98d31834907cb8489e0e36415e54653919626ae5649d4602ee0c5449e0868",
+      "sha256": "706e138bc9046ab4cb627b988febd59cdb43b411746b167f705a5cd66b54c849",
       "bytes": 157423
     },
     {
@@ -55353,8 +55378,8 @@
     },
     {
       "path": "tests/test_secret_path_guard.py",
-      "sha256": "36edfe372be11f424e36576c1533111514662958063f429aec7a7284cc81b958",
-      "bytes": 391697
+      "sha256": "fa29ade808f6d30d01218a1122f7fc922df603c5781490afce0cc410c79d9793",
+      "bytes": 392565
     },
     {
       "path": "tests/test_security_identity.py",
@@ -55623,13 +55648,13 @@
     },
     {
       "path": "tools/adoption/managed_block.py",
-      "sha256": "0a60f63d6540d1999df93168fc560884e29f1cb5de3a09caa1b19eeb3c5fabc5",
-      "bytes": 24430
+      "sha256": "646d2f60ac0796fbefd1ad5aad29548f89b6b50c2a29461941debc17a959d257",
+      "bytes": 25889
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "08639afa0c43d537a9071055fbae81b219bff9550be76b2afaba50d386c2e147",
-      "bytes": 160807
+      "sha256": "d1d7dc71b3bd6cc3227a970347f950ef64e192cd12a0ccb4d71aa80daa71ba2a",
+      "bytes": 172184
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
