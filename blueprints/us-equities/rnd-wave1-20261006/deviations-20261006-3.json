@@ -29,7 +29,28 @@
     {
       "id": "D5.3",
       "finding": "Event-scope fixtures came from private data while R1 was repository-only",
-      "rule": "R1 may read two retained records by their pins, as the cited records of the event-scope reads: the package zip a0b0aabf32175f0759e5911a7258eb829b29d5b6c0a72314e086335b53a6c19c (the extreme-gainer audit's 957-event set) and mover-coverage-asof/evidence/summary-asof-20260929.json with the retained E2 run (E2's 715 events). Every other R1 input stays repository-only. The D4.1 event fixtures stand as pinned; R1's extractor must derive them from those records."
+      "clarified_at_utc": "2026-10-06T11:51:38+00:00",
+      "clarifies": "The P2 of the cross-family D5 check at 0fa685b03, which the R1 lane also raised: bind exactly two records by path and sha256 and open no other retained or private file.",
+      "rule": "Besides repository files at the base commit, R1 opens exactly the two records below, each only after its sha256 equals the pin; a missing record or a different hash means R1 is NOT_STARTED (30) and runs nothing. R1 opens no other retained or private file: none of the retained E2 run's other files (its e2/ outputs, snapshots, request log, control or fetch status), no other member of the package zip (the alias map included) and no copy in an R2a job. The retained E2 run only says where the package zip is kept; it permits no read. The D4.1 event fixtures stand as pinned, and R1's extractor derives them from these two records and the repository files D4.1 cites, using only the fields named per record.",
+      "records": [
+        {
+          "path": "inputs/extreme-gainer-research-package.zip",
+          "path_root": "RUN, the retained 2026-09-29 mover-coverage-asof E2 run directory asof-20260929 in the private research state outside git (mover-coverage-asof/README.md:48); the same locator the R2a job's D3 check used",
+          "sha256": "a0b0aabf32175f0759e5911a7258eb829b29d5b6c0a72314e086335b53a6c19c",
+          "member": {
+            "path": "extreme-gainer-research-package/datasets/forward-returns-2021-2026.csv",
+            "sha256": "d4f80668ea33191a955d2b86b125e2d4dfcbe3263421410117920e73fde48ec0",
+            "rows": 957
+          },
+          "fields": "The member's Date column only, compared as written: its row count and its minimum and maximum give the extreme-gainer fixture (957; 2021-01-06..2026-09-22), and the count of rows dated 2021-01-04..2025-12-31 inclusive gives the E2 fixture's 715, the same filter as mover-coverage-asof/refetch.py:68 and :924. No other member or column is read."
+        },
+        {
+          "path": "blueprints/us-equities/mover-coverage-asof/evidence/summary-asof-20260929.json",
+          "path_root": "the repository (registered in manifests/evidence.json)",
+          "sha256": "1258bd04252ad100acc9f81b821f739d77e49b6348fa8efad7b97084f34aacde",
+          "fields": "E2.package_events_in_window only, which must equal the count derived from the zip member (715). The E2 fixture's date range is the window that mover-coverage-asof/README.md:24 states, a repository source."
+        }
+      ]
     },
     {
       "id": "D5.4",
