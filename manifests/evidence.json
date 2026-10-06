@@ -17358,8 +17358,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-ns2604-native-bar-recount.md",
-      "sha256": "c5dd251b81ee2798f94133b0dfee6b96fa89fa9b8b908e0c3308afcdd2c7ccf9",
-      "bytes": 3051
+      "sha256": "38eaa7cfb9f4e2fea54f7dd5084d68a3b4fa25a67271b43b8ce18cd452234ca7",
+      "bytes": 3636
     },
     {
       "path": "docs/direct-results.md",
@@ -40828,13 +40828,13 @@
     },
     {
       "path": "evidence/artifacts/ns2604-native-bar-20261006/README.md",
-      "sha256": "ca2bd2132d4806828bd84fa58813999c2704192cab0a7ba25acd5d97ab8a33bd",
-      "bytes": 13672
+      "sha256": "e2eec9b166508f8508385c5c1ca4a98f24e45f26949effcc6003377aed858f21",
+      "bytes": 14389
     },
     {
       "path": "evidence/artifacts/ns2604-native-bar-20261006/board.json",
-      "sha256": "4035ac988bff49b6de3855409595ad962a787065765a771530b7e0aad28360be",
-      "bytes": 77543
+      "sha256": "49505761283727e2352bb1609f0acd69631e8af81b4db32598c256271d9f8fdc",
+      "bytes": 85547
     },
     {
       "path": "evidence/artifacts/ns2604-requalification-20261005/README.md",
@@ -53978,8 +53978,8 @@
     },
     {
       "path": "observability/grand-dashboard/state.json",
-      "sha256": "a40230c5b23aa74bba0c56b14861fe5fa34a74766a133ee9dc817a1a60aa7810",
-      "bytes": 23789
+      "sha256": "bfc89be43341bd4b38ee723164f7d45eeb4886b862b1dcb173c9ede552604926",
+      "bytes": 23937
     },
     {
       "path": "observability/memory-scheduled-20260923.json",

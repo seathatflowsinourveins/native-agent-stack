@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "recorded_at_utc": "2026-10-06T14:09:07Z",
-  "meaning": "Operational NativeStack2604 native-bar recount against main 0d5e6506434fab598dee861c749a22e628beb75a: 27 of 80 operational closures (13 inherited READY and 14 BY_DESIGN), including the landed custody policy decision; final S4 qualification remains unknown. The complete 80-row evidence/owner board is linked from the existing distribution gate, preserving the 128-entity cap. Proposed lane dispatches remain explicit. All other lane/gate/worker entries retain their previous historical scope and evidence; this checkpoint is not a fresh native run or live process registry.",
+  "recorded_at_utc": "2026-10-06T14:17:29Z",
+  "meaning": "Operational NativeStack2604 native-bar recount against main 0d5e6506434fab598dee861c749a22e628beb75a: 27 of 80 operational closures (13 inherited READY and 14 BY_DESIGN), including the landed custody policy decision; final S4 qualification remains unknown. The complete 80-row evidence/owner board is linked from the existing distribution gate, preserving the 128-entity cap. All 18 formerly proposed handoffs are accepted by the co-op; individual lane acknowledgment remains unverified. Seven token tools remain under the CC client-wiring hold pending its ordered install plan. All other lane/gate/worker entries retain their previous historical scope and evidence; this checkpoint is not a fresh native run or live process registry.",
   "lanes": [
     {
       "kind": "lane",
@@ -366,7 +366,7 @@
       "kind": "gate",
       "id": "new-wsl-distribution-20261002",
       "title": "NativeStack2604 native bar / readiness-runner",
-      "state": "operational 27 of 80 / native baseline 26 / final S4 unknown / 53 open with named lanes / 18 proposed dispatches / ceiling 79 / owner readiness-runner",
+      "state": "operational 27 of 80 / native 26 / S4 unknown / 53 open / 18 handoffs accepted / client wiring held / ceiling 79 / owner readiness-runner",
       "evidence_ref": "evidence/artifacts/ns2604-native-bar-20261006/README.md"
     },
     {
