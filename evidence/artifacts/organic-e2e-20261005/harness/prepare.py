@@ -2,10 +2,16 @@
 """Stage 1: preconditions and builds, no sessions (pilot spec stage 1).
 
   python3 -B prepare.py --run-id <id> [--cells c1,c2] [--tasks item_id:INSTANCE,...] [--seed N] [--prompted file]
-                        [--claude-completion censor-at-T|complete-at-result --amendment-ref TEXT]
-                        [--claude-grace-s N] [--claude-t-seconds N] [--registry-review file]
+                        [--claude-completion censor-at-T|complete-at-result] [--claude-t-seconds N]
+                        [--amendment-ref TEXT] [--claude-grace-s N] [--claude-expected-usage X]
+                        [--gateway-pipeline-details on|off] [--registry-review file]
                         [--allow-provisional-registry] [--repeat-override K] [--skip-oracle-tests] [--skip-quota]
                         [--allow-timing]
+
+The defaults carry the command center's decisions on v1.1 (CC item task-ns2604-coop-20261006T105529Z, recorded in
+AMENDMENT-v1.1-20261006.md): complete-at-result with T = 1,800 s (decision 1; another policy or T needs its own
+--amendment-ref), the amended §9.1 meter rule with the run's expected per-trial usage (decision 6), and the operator's
+record of whether the gateway's pipeline details are on for this run (decision 8; the co-op switches them).
 
 Creates RUNS_ROOT/<run_id>/ with run.json (every frozen input and hash), harness/ (frozen copy of this directory's
 code), codex-rules/, settings templates, clone samples, s7/baseline.json and schedule.json; and a neutral trial root
@@ -31,9 +37,10 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from common import (CLAUDE_SESSION_CAP, CODEX_HOME_REAL, FREEZE_COMMIT, HOME, LANE, LANE_PROMPTED, NEUTRAL_ROOT,  # noqa: E402
+from common import (CC_V11_DECISIONS, CLAUDE_COMPLETION_DEFAULT, CLAUDE_SESSION_CAP, CODEX_HOME_REAL,  # noqa: E402
+                    EXPECTED_TRIAL_USAGE, FREEZE_COMMIT, HOME, LANE, LANE_PROMPTED, METER_CEILING, NEUTRAL_ROOT,
                     POST_RESULT_GRACE_S, PROTOCOL_ID, RUNS_ROOT, T_SECONDS, TRIAL_ROOT_BASE, append_jsonl, gateway_build,
-                    load_json, login_path, newest_meter_reading, parse_stream_text, prior_allows, run, s7_snapshot,
+                    headroom_allows, load_json, login_path, newest_meter_reading, parse_stream_text, run, s7_snapshot,
                     sha256_bytes, sha256_file, sha256_json, utc_now, write_json)
 import arms  # noqa: E402
 import fixture  # noqa: E402
@@ -269,12 +276,21 @@ def main(argv=None) -> int:
     parser.add_argument("--skip-tests", default="", help="test keys to leave out (comma-separated), e.g. the give-way "
                         "rule's G1|claude-sdk when a Claude probe is required")
     parser.add_argument("--no-gate0", action="store_true", help="leave out the stage-2 gate-0 cell (self-tests only)")
-    parser.add_argument("--claude-completion", choices=("censor-at-T", "complete-at-result"), default=None,
-                        help="what a Claude result event before T means; needs --amendment-ref (finding 3)")
+    parser.add_argument("--claude-completion", choices=("censor-at-T", "complete-at-result"), default=CLAUDE_COMPLETION_DEFAULT,
+                        help="what a Claude result event before T means (finding 3); decision 1's complete-at-result by "
+                        "default, another policy needs --amendment-ref")
     parser.add_argument("--claude-grace-s", type=int, default=POST_RESULT_GRACE_S)
     parser.add_argument("--claude-t-seconds", type=int, default=T_SECONDS,
-                        help="the run's T for every cell, CL7b's turn timeout included (another value needs --amendment-ref)")
-    parser.add_argument("--amendment-ref", default=None, help="the CC amendment the completion policy or T rests on")
+                        help="the run's T for every cell, CL7b's turn timeout included (decision 1: 1,800 s; another "
+                        "value needs --amendment-ref)")
+    parser.add_argument("--amendment-ref", default=None, help="the CC amendment a policy or T other than decision 1's rests "
+                        f"on (the defaults rest on {CC_V11_DECISIONS})")
+    parser.add_argument("--claude-expected-usage", type=float, default=EXPECTED_TRIAL_USAGE,
+                        help="decision 6: a Claude trial's expected usage of each meter window; a start needs that much "
+                        "headroom")
+    parser.add_argument("--gateway-pipeline-details", choices=("on", "off"), default=None,
+                        help="decision 8 (RP4, G11): whether the co-op turned the gateway's pipeline details on for this "
+                        "run; recorded only (the harness never switches them, and keeps only their effort fields)")
     parser.add_argument("--registry-review", default=None, help="JSON {reviewed: [paths], reviewer, at}: the hint "
                         "reader's reviewed routing-file registry; organic trials refuse while it is provisional")
     parser.add_argument("--allow-provisional-registry", action="store_true",
@@ -283,8 +299,11 @@ def main(argv=None) -> int:
     args = parser.parse_args(argv)
     if not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,63}", args.run_id):
         parser.error("run id: letters, digits, dot, underscore and hyphen")
-    if (args.claude_completion or args.claude_t_seconds != T_SECONDS) and not args.amendment_ref:
-        parser.error("a completion policy or a T other than the protocol's 900 s needs --amendment-ref")
+    decision_1 = args.claude_completion == CLAUDE_COMPLETION_DEFAULT and args.claude_t_seconds == T_SECONDS
+    if not decision_1 and not args.amendment_ref:
+        parser.error("a completion policy or T other than decision 1's (complete-at-result, 1,800 s) needs --amendment-ref")
+    if not 0 < args.claude_expected_usage <= METER_CEILING:
+        parser.error("--claude-expected-usage is a share of one meter window, in (0, 1]")
     root = RUNS_ROOT / args.run_id
     if (root / "run.json").exists():
         parser.error(f"run root exists: {root}")
@@ -599,15 +618,25 @@ def main(argv=None) -> int:
                     or (t["task_id"], t["instance"]) == ("control/both/G1", "N")]
     tasks_frozen += prompted_tasks
     write_json(root / "tasks.json", {"amendments": amend_log, "tasks": tasks_frozen})
-    completion = {"policy": args.claude_completion or "censor-at-T", "grace_s": args.claude_grace_s,
-                  "t_seconds": args.claude_t_seconds, "amendment": args.amendment_ref,
-                  "decided": bool(args.claude_completion and args.amendment_ref)}
+    completion = {"policy": args.claude_completion, "grace_s": args.claude_grace_s, "t_seconds": args.claude_t_seconds,
+                  "amendment": args.amendment_ref or f"{CC_V11_DECISIONS} #1", "decided": True,
+                  "rule": "a cell completes only when its result event arrives before T; the final turn end and the "
+                          "result event are recorded per trial; a Claude trial with no result by T holds its cell for "
+                          "diagnosis (HOLD.<cell>)"}
+    claude_meter = {"expected_usage": args.claude_expected_usage, "ceiling": METER_CEILING,
+                    "rule": f"{CC_V11_DECISIONS} #6: start when the expected usage fits the remaining headroom of both "
+                            "windows; no quiet-account rule; a trial that hits a rate limit is marked and re-run"}
+    pipeline_details = {"declared": args.gateway_pipeline_details, "decision": f"{CC_V11_DECISIONS} #8",
+                        "rule": "the co-op turns the gateway's pipeline details on only for pilot runs and off again; "
+                                "receipts keep only the forwarded effort fields; the grader reports what the call "
+                                "logs showed"}
     run_json = {
         "run_id": args.run_id, "protocol": PROTOCOL_ID, "created_at": utc_now(), "seed": seed, "lane": args.lane,
         "repo": str(repo), "repo_head": fixture.git(repo, "rev-parse", "HEAD").decode().strip(),
         "trial_root": str(work), "stub_sha256": stub_hashes, "login_path": path_value,
         "protocol_file_sha256": sha256_file(HERE.parent / "PROTOCOL-v1.1.md") if (HERE.parent / "PROTOCOL-v1.1.md").exists() else None,
         "pilot_spec_file_sha256": sha256_file(HERE.parent / "PILOT-SPEC-v1.1.md") if (HERE.parent / "PILOT-SPEC-v1.1.md").exists() else None,
+        "amendment_file_sha256": sha256_file(HERE.parent / "AMENDMENT-v1.1-20261006.md") if (HERE.parent / "AMENDMENT-v1.1-20261006.md").exists() else None,
         "harness_sha256": harness_hashes, "binaries": bins, "host_fanout": host_fanout(), "timing": timing,
         "suite": {"path": loaded["path"], "sha256": loaded["sha256"], "sha_matches_protocol": loaded["sha_matches_protocol"],
                   "amended_sha256": sha256_json(items), "amendments": amend_log},
@@ -631,8 +660,9 @@ def main(argv=None) -> int:
         "baseline_hash_prefixes": {k: (baseline["files"].get(k) or "")[:16] for k in PROBE_HASHES} | {
             "codex/AGENTS.md": (baseline["files"].get("codex/AGENTS.md") or "")[:16]},
         "meter_stage1": {k: v for k, v in (meter or {}).items() if k != "source_private"} or None,
-        "meter_stage1_allows": prior_allows(meter), "quota_stage1": quota, "gateway_build": gateway_build(),
-        "claude_session_cap": CLAUDE_SESSION_CAP, "claude_completion": completion,
+        "meter_stage1_allows": headroom_allows(meter, args.claude_expected_usage), "quota_stage1": quota,
+        "gateway_build": gateway_build(), "gateway_pipeline_details": pipeline_details,
+        "claude_session_cap": CLAUDE_SESSION_CAP, "claude_completion": completion, "claude_meter": claude_meter,
         "cells": cells, "cell_codes": cell_codes, "tests_by_ref": tests_by_ref, "schedule": str(root / "schedule.json"),
         "unavailable_cells": suite.UNAVAILABLE_CELLS, "label_vector_sha256": None,
         "labels": "pending: R4 labels come from the other model family before any trajectory (coordinator)",
@@ -643,7 +673,8 @@ def main(argv=None) -> int:
                "fixture_tar_sha256": fx["tar"]["sha256"], "fixture_reused": fx.get("reused", False), "gate": fx["gate_after_setup"]["pass"],
                "experiment_check": fx["experiment_check"], "rules_check": {k: rules_check[k] for k in ("probes", "passed", "pass")},
                "clone_gates": {a: r["gate"]["pass"] for a, r in clone_samples.items()}, "probe_required": probe_required,
-               "lint_hits": {k: len(v) for k, v in lint.items() if v}, "meter_allows": prior_allows(meter),
+               "lint_hits": {k: len(v) for k, v in lint.items() if v},
+               "meter_allows": headroom_allows(meter, args.claude_expected_usage),
                "quota": quota.get("rc"), "gateway_build": run_json["gateway_build"], "timing": timing,
                "g12": {k: g12[k] for k in ("pass", "differing")}, "registry": registry_status,
                "claude_completion": completion, "claude_sessions": claude_sessions}

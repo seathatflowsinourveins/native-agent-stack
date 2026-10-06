@@ -28,9 +28,10 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from common import (CARRY_FORWARD_REASONS, CLI_PROGRAMS, CLI_WRAPPERS, HOME, MARKERS, MCP_SERVER_ITEMS,  # noqa: E402
-                    PRIOR_FIVE_HOUR, PRIOR_SEVEN_DAY, RUNS_ROOT, V1_ROOT, load_json, parse_stream_text, read_jsonl,
-                    sha256_bytes, sha256_file, trial_dir, utc_now, write_json)
+from common import (CARRY_FORWARD_REASONS, CC_V11_DECISIONS, CLI_NATIVE_SURFACES, CLI_PROGRAMS, CLI_TASK_KINDS,  # noqa: E402
+                    CLI_WRAPPERS, HOME, MARKERS, MCP_SERVER_ITEMS, REBASELINE_LOG, RUNS_ROOT, V1_ROOT, headroom_allows,
+                    load_json, parse_stream_text, read_jsonl, run_expected_usage, sha256_bytes, sha256_file, trial_dir,
+                    utc_now, write_json)
 
 HARNESS_SKILLS = {"native-stack-research", "native-stack-worker", "standing-delegation"}
 READ_PROGRAMS = {"cat", "sed", "head", "tail", "nl", "less", "rg", "grep", "bat", "more"}
@@ -56,17 +57,24 @@ CREDENTIAL_READ = re.compile(r"(\.claude/\.credentials\.json|\.codex/auth\.json|
                              r"\.config/native-agent-stack/|/proc/\d+/environ|huggingface/(token|stored_tokens)|(^|/)\.env(\.|$|\s))")
 _H = re.escape(str(HOME))
 # G13 categories (finding 9): what a call's input reaches outside the trial's own fixture, clone and project directory.
+# Decision 3 of CC item task-ns2604-coop-20261006T105529Z: these reads are tagged, never denied (a deny changes the
+# treatment), and the primary analysis reports tagged trials separately. A trial is invalid only when it reads the
+# task's gold or a fixture answer source: the harness's own stores (coordination: run roots with the oracle runs and
+# other trials' drafts, the suite cards, the fixture cache with oracles.json), or the fixture or transcript of another
+# trial of the same task (that trial's draft and answer). Reads of host checkouts, user-level harness files, the trial
+# root and trials of other tasks are tags.
 REACH = {
     "coordination": re.compile(r"\.local/state/native-agent-stack/coordination|organic-e2e|ns2604-organic-fixtures"),
     "other-transcripts": re.compile(r"\.claude/projects/|\.codex/sessions/"),
     "host-checkout": re.compile(rf"{_H}/(code|projects)(/|\b)"),
     "user-harness-file": re.compile(rf"{_H}/\.claude/(CLAUDE\.md|RTK\.md|agents\b|hooks\b)|{_H}/\.codex/(AGENTS\.md|RTK\.md)"),
     "trial-root": re.compile(rf"{_H}/\.cache/wsr(/|\b)"),
-    "other-fixture": re.compile(rf"{_H}/\.cache/ws/[0-9a-f]{{8}}"),
+    "other-fixture": re.compile(rf"{_H}/\.cache/ws/[0-9a-f]{{8}}|\.claude/projects/-[^/\s\"']*-cache-ws-[0-9a-f]{{8}}"),
 }
+FIXTURE_ID = re.compile(r"(?:\.cache/ws/|-cache-ws-)([0-9a-f]{8})")
 # The chrome-devtools MCP server joined both clients' MCP lists after the protocol was written (the #713 plan rows). It
-# runs outside the Codex sandbox and reaches the network; R8 has no pre-execution rule for it, so the watcher logs every
-# call (never a halt) and the report shows it.
+# runs outside the Codex sandbox and reaches the network. Decision 4 of CC item 105529Z: the watcher logs every call
+# (never a halt) and the report shows it; there is no pre-execution deny, because a deny would change the treatment.
 BROWSER_MCP_PREFIX = "mcp__chrome-devtools__"
 GH_HELP_TEXT = "Add a comment to a GitHub pull request"
 POLICY_TEXT = re.compile(r"blocked by policy|forbidden|not permitted in this workspace|rejected|execpolicy", re.I)
@@ -522,7 +530,24 @@ def parse_rollout(path: Path) -> dict:
                                 "tools_before": tools_done})
     return {"meta": meta, "items": items, "messages": messages, "wrappers": wrappers, "functions": functions,
             "turn_context": turn_context, "outputs": outputs, "skills_body_sha256": sha256_bytes(skills_body.encode()) if skills_body else None,
-            "path": str(path)}
+            "skill_names": skill_names_in_catalog(skills_body), "path": str(path)}
+
+
+SKILL_LINE = re.compile(r"^\s*-\s+([A-Za-z0-9_.-]+(?::[A-Za-z0-9_.-]+)?):\s")
+
+
+def skill_names_in_catalog(body: str | None) -> list[str]:
+    """Skill names in the session's own world_state skills catalog ("### Available skills", one "- name: ..." line
+    each), for decision 2's exposure check."""
+    names, inside = [], False
+    for line in (body or "").splitlines():
+        if line.startswith("### "):
+            inside = line.strip().lower() == "### available skills"
+            continue
+        match = SKILL_LINE.match(line) if inside else None
+        if match:
+            names.append(match.group(1))
+    return sorted(set(names))
 
 
 def codex_instruction_texts(rollout: dict) -> list[str]:
@@ -824,6 +849,29 @@ def _children(children_dir: Path) -> list[dict]:
     return out
 
 
+def claude_turn_times(events: list, launched_at: str | None) -> dict:
+    """Decision 1 from the stream itself, for a run whose launcher predates it: the model's final turn end (the main
+    thread's last assistant text with nothing on the main thread after it; Claude Code 2.1.291 leaves stop_reason unset
+    on stream-json assistant events) and the result event's own fields. Seconds count from the launched row's stamp."""
+    final_stamp, result = None, None
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        kind = event.get("type")
+        if kind == "result" and result is None:
+            result = {k: event.get(k) for k in ("subtype", "is_error", "duration_ms", "num_turns", "stop_reason")}
+        if kind in ("assistant", "user") and not event.get("parent_tool_use_id"):
+            kinds = {b.get("type") for b in ((event.get("message") or {}).get("content") or []) if isinstance(b, dict)}
+            if kind == "assistant" and "text" in kinds and "tool_use" not in kinds:
+                final_stamp = event.get("timestamp") or final_stamp
+            elif "tool_use" in kinds or "tool_result" in kinds:
+                final_stamp = None
+    start_ns, end_ns = _ts_ns(launched_at), _ts_ns(final_stamp)
+    return {"final_turn_end_at": final_stamp,
+            "final_turn_end_s": round((end_ns - start_ns) / 1e9, 1) if start_ns and end_ns else None,
+            "result_event": result}
+
+
 def termination_ns(ledger_rows: dict) -> int | None:
     """When the trial's client was terminated, in ns: the launcher's own kill time, else, for a trial the `timeout`
     command ended (rc 124), its launched time plus T, less one second for the launched row's whole-second stamp. None for
@@ -1069,6 +1117,7 @@ def grade_claude_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) ->
             _, server, fn = tool.split("__", 2)
             tools_by_server.setdefault(server, []).append(fn)
     return {"stream": stream, "transcript": transcript, "calls": calls, "uses": uses, "joins": joins, "agreement": agreement,
+            "turn_times": claude_turn_times(events, ledger_rows.get("launched", {}).get("at")),
             "markers": markers, "instruction_files": [len(t) for t in instruction_texts],
             "instruction_records": sum(1 for a in transcript.get("attachments") or [] if a.get("type") == "instructions"),
             "efforts": efforts, "models": models,
@@ -1087,6 +1136,16 @@ def grade_claude_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) ->
             "hook_sources": _count([h.get("hook_name") for h in stream["hooks"] if h.get("subtype") == "hook_response"]),
             "hook_output_classes": _count([h.get("source_class") for h in all_hooks
                                           if h.get("additional_context") or h.get("system_message")])}
+
+
+def _forwarded_efforts(call: dict) -> list:
+    """The forwarded effort values of one gateway call-log row: decision 8's effort-only record, or the effort inside
+    the reasoning object a row collected before it kept."""
+    fields = call.get("forwarded_effort")
+    if isinstance(fields, dict):
+        return [fields.get("reasoning.effort"), fields.get("reasoning_effort")]
+    legacy = call.get("forwarded_reasoning")
+    return [legacy.get("effort")] if isinstance(legacy, dict) else []
 
 
 def _count(values) -> dict:
@@ -1210,8 +1269,10 @@ def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> 
     effort = {"requested_turn_context": ((main or {}).get("turn_context") or {}).get("effort"),
               "conversation_starts": sorted({r.get("reasoning_effort") for r in starts if r.get("reasoning_effort")}),
               "gateway_received": sorted({c.get("received_effort") for c in calls if c.get("received_effort")}),
-              "gateway_forwarded": sorted({json.dumps(c.get("forwarded_reasoning")) for c in exposed}) or None,
+              # Decision 8: only the forwarded effort fields (rows collected before it kept the reasoning object).
+              "gateway_forwarded": sorted({str(v) for c in exposed for v in _forwarded_efforts(c) if v}) or None,
               "gateway_forwarded_exposed": bool(exposed),
+              "gateway_calls_with_pipeline": len(exposed),
               "gateway_service_tier": sorted({str(c.get("received_service_tier")) for c in calls}),
               "gateway_backend_models": sorted({c.get("backend_model") for c in calls if c.get("backend_model")}),
               "gateway_calls": len(calls), "gateway_build": ledger_rows.get("pre-launch", {}).get("gateway_build")
@@ -1222,7 +1283,7 @@ def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> 
             "uses": uses, "joins": joins, "agreement": agreement, "markers": markers, "effort": effort,
             "rollouts": [Path(r["path"]).name for r in rollouts], "model_provider": (main or {}).get("meta", {}).get("model_provider") if main else None,
             "main_rollouts": sum(1 for r in rollouts if not (r.get("meta") or {}).get("parent_thread_id")),
-            "skills_body_sha256": (main or {}).get("skills_body_sha256"),
+            "skills_body_sha256": (main or {}).get("skills_body_sha256"), "skill_names": (main or {}).get("skill_names") or [],
             "hook_context_items": sum(1 for r in rollouts for m in r["messages"] if m.get("kinds") and "hooks.additional_context" in json.dumps(m["kinds"])),
             "hook_context_items_nonempty": sum(1 for r in rollouts for m in r["messages"] if m.get("kinds")
                                                and "hooks.additional_context" in json.dumps(m["kinds"]) and m["text"].strip()),
@@ -1366,11 +1427,12 @@ def _call_texts(graded: dict, client: str) -> list[tuple[str, str]]:
             for item in graded.get("all_items") or graded["items"]]
 
 
-def reach(graded: dict, client: str, cfg: dict, trial_id: str) -> list[dict]:
+def reach(graded: dict, client: str, cfg: dict, trial_id: str, same_task_fixtures: set[str] | None = None) -> list[dict]:
     """G13 (extended by finding 9): calls whose input reaches coordination paths, other sessions' transcripts, host
     checkouts (~/code, ~/projects), user-level harness files, harness trial roots or another trial's fixture. The
     trial's own fixture, clone, trial files and project directory (its auto memory, exempt and logged under §8.4) are
-    not counted."""
+    not counted. Decision 3: each entry is a tag; answer_source marks the reads that make the trial invalid (the
+    harness's stores, or the fixture or Claude transcript of another trial of the same task)."""
     cwd = graded.get("cwd") or ""
     own = [p for p in (cwd, f"{HOME}/.claude/projects/{_claude_slug(cwd)}" if cwd else None) if p]
     work = cfg.get("trial_root")
@@ -1383,7 +1445,9 @@ def reach(graded: dict, client: str, cfg: dict, trial_id: str) -> list[dict]:
             text = re.sub(re.escape(work) + r"/[a-z]+/" + re.escape(trial_id) + r"[^\s\"']*", "<own-trial-file>", text)
         cats = sorted(name for name, pattern in REACH.items() if pattern.search(text))
         if cats:
-            found.append({"call_id": call_id, "categories": cats})
+            same_task = bool(set(FIXTURE_ID.findall(text)) & (same_task_fixtures or set())) if "other-fixture" in cats else False
+            found.append({"call_id": call_id, "categories": cats,
+                          "answer_source": "coordination" in cats or same_task, "same_task_fixture": same_task})
     return found
 
 
@@ -1469,6 +1533,25 @@ def ledger_by_trial(root: Path) -> dict:
     return ledger
 
 
+def cli_exposure(item: str, client: str, graded: dict) -> dict:
+    """Decision 2 (finding 17): whether a CLI item was exposed in this session, from the session's own listing (the
+    Claude init's plugins and skills, the Codex rollout's skills catalog; plugin skills fold to their plugin). Exposed
+    means a native surface the CLI's own upstream installer put in place is loaded (common.CLI_NATIVE_SURFACES); a CLI
+    that is only on PATH is PATH-only, not exposed, and its trial stays out of the item's OIR."""
+    if client == "claude":
+        init = graded.get("init") or {}
+        plugins = set(init.get("plugins") or [])
+        skills = {skill_item(s) for s in init.get("skills") or []} | set(init.get("skills") or [])
+    else:
+        names = graded.get("skill_names") or []
+        plugins = {skill_item(s) for s in names if ":" in s}
+        skills = {skill_item(s) for s in names} | set(names)
+    surfaces = [f"{kind}:{name}" for kind, name in CLI_NATIVE_SURFACES.get(item, ())
+                if name in (plugins if kind == "plugin" else skills)]
+    return {"item": item, "exposed": bool(surfaces), "class": "native-surface" if surfaces else "PATH-only",
+            "surfaces": surfaces}
+
+
 def effective_exit(exit_row: dict) -> dict:
     """The exit row with the completion rule re-checked: under complete-at-result a Claude result counts only if it
     reached the stream before T (launcher.result_before_t). A launcher frozen before that rule marked a result written
@@ -1481,8 +1564,10 @@ def effective_exit(exit_row: dict) -> dict:
     return exit_row
 
 
-def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_tools: dict) -> tuple[dict, dict | None]:
-    """(table record, graded) for one trial; graded is None for a trial that never launched."""
+def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_tools: dict,
+              fixtures_by_task: dict | None = None) -> tuple[dict, dict | None]:
+    """(table record, graded) for one trial; graded is None for a trial that never launched. fixtures_by_task maps
+    (task, instance) to {trial_id: fixture id} for decision 3's same-task answer-source check."""
     rows = trial["rows"]
     exit_row = effective_exit(rows.get("exit", {}))
     if exit_row is not rows.get("exit"):
@@ -1496,7 +1581,12 @@ def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_too
               "reason": exit_row.get("reason"), "duration_s": exit_row.get("duration_s"), "launched": launched,
               "time_to_result_s": exit_row.get("time_to_result_s"), "post_result_s": exit_row.get("post_result_s"),
               "post_result_terminated": exit_row.get("post_result_terminated"), "terminated_by": exit_row.get("terminated_by"),
-              "grader_override": exit_row.get("grader_override")}
+              "grader_override": exit_row.get("grader_override"),
+              # Decision 1: the model's final turn end and the result event, recorded separately.
+              "final_turn_end_s": exit_row.get("final_turn_end_s"), "final_turn_end_at": exit_row.get("final_turn_end_at"),
+              "result_event": exit_row.get("result_event"), "no_result_diagnosis": exit_row.get("no_result_diagnosis"),
+              "held_cell": exit_row.get("held_cell"), "rate_limited": bool(exit_row.get("rate_limited")),
+              "rebaseline": exit_row.get("rebaseline"), "reason_before_rebaseline": exit_row.get("reason_before_rebaseline")}
     if not launched:
         return record, None
     task = tasks.get((trial.get("task"), trial.get("instance")), {})
@@ -1528,9 +1618,22 @@ def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_too
     record["markers"] = graded["markers"]
     marker_ok = (not graded["markers"]) if trial.get("arm") == "native" else bool(graded["markers"])
     record["marker_ok"] = marker_ok
-    record["valid"] = bool(graded["joins"]["pass"] and marker_ok and not exit_row.get("censored"))
-    record["reach"] = reach(graded, trial.get("client"), cfg, tid)
+    key = (trial.get("task"), trial.get("instance"))
+    same_task = {fid for other, fid in ((fixtures_by_task or {}).get(key) or {}).items() if other != tid and fid}
+    record["reach"] = reach(graded, trial.get("client"), cfg, tid, same_task)
+    # Decision 3: reach entries are tags (reported as their own stratum); only a gold or answer-source read invalidates.
+    record["tagged"] = sorted({c for entry in record["reach"] for c in entry["categories"]})
+    record["answer_source_reads"] = [entry["call_id"] for entry in record["reach"] if entry.get("answer_source")]
+    record["valid"] = bool(graded["joins"]["pass"] and marker_ok and not exit_row.get("censored")
+                           and not record["answer_source_reads"])
     record["watcher"] = watcher(graded, trial.get("client"), record["reach"])
+    record["target_exposure"] = cli_exposure(task.get("item"), trial.get("client"), graded) \
+        if task.get("kind") in CLI_TASK_KINDS else None
+    if trial.get("client") == "claude" and record["final_turn_end_s"] is None and graded.get("turn_times"):
+        # A run whose launcher predates decision 1: the same two times, read from the stream.
+        times = graded["turn_times"]
+        record.update({"final_turn_end_s": times["final_turn_end_s"], "final_turn_end_at": times["final_turn_end_at"],
+                       "result_event": record["result_event"] or times["result_event"], "turn_times_source": "stream"})
     record["harness_text_reads"] = {"count": graded["ctx_counts"]["harness_reads"], "markers": graded["harness_read_markers"]}
     record["process_table_reads"] = graded["ctx_counts"]["process_table_reads"]
     record["own_auto_memory_reads"] = own_memory_reads(graded) if trial.get("client") == "claude" else []
@@ -1548,14 +1651,21 @@ def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_too
     record["host_argv_exposure"] = rows.get("launched", {}).get("host_argv_exposure_at_launch")
     if trial.get("client") == "claude":
         first = exit_row.get("meter_first") or {}
-        started_below_prior = first.get("five_hour") is not None and first["five_hour"] < PRIOR_FIVE_HOUR \
-            and (first.get("seven_day") or 0) < PRIOR_SEVEN_DAY
+        # Decision 6: the trial's own first reading, judged when the trial launched, left headroom for its expected
+        # usage (the amended §9.1 start rule; it replaces the protocol's 0.50 / 0.75 prior).
+        launched_ns = _ts_ns(rows.get("launched", {}).get("at"))
+        expected = exit_row.get("meter_expected_usage") or run_expected_usage(cfg)
+        started_with_headroom = first.get("five_hour") is not None and headroom_allows(
+            first, expected, now=launched_ns / 1e9 if launched_ns else None)[0]
+        delta = {w: round(exit_row["meter_last"][w] - first[w], 4) for w in ("five_hour", "seven_day")
+                 if isinstance(first.get(w), (int, float)) and isinstance((exit_row.get("meter_last") or {}).get(w), (int, float))}
         record["claude"] = {"efforts": graded["efforts"], "models": graded["models"], "main_model": graded["main_model"],
                             "efforts_by_model_and_source": graded["efforts_by_model_and_source"],
                             "rate_limit_events": graded["rate_limit_events"],
                             "hook_events": graded["hook_events"], "meter_first": exit_row.get("meter_first"),
                             "meter_last": exit_row.get("meter_last"), "meter_lock_time": rows.get("meter", {}).get("reading"),
-                            "started_below_prior": started_below_prior,
+                            "started_with_headroom": started_with_headroom, "meter_expected_usage": expected,
+                            "meter_delta_account_wide": delta,
                             "cost_usd_result": graded["cost_usd_result"], "cost_usd_loki": graded["cost_usd_loki"],
                             "cost_usd_loki_pre_result": graded["cost_usd_loki_pre_result"],
                             "cost_usd_loki_post_result": graded["cost_usd_loki_post_result"],
@@ -1726,11 +1836,16 @@ def grade_run(root: Path) -> dict:
     run_tools: dict = dict(cfg.get("tools_by_server") or {})
     gate_rows = {g: [] for g in ("G2", "G3", "G5", "G6", "G7", "G8", "G9", "G11", "G13", "G14")}
     gaps, carried_forward = [], []
+    fixtures_by_task: dict = {}
+    for tid, trial in ledger.items():
+        fixture_dir = (trial["rows"].get("prepared", {}) or {}).get("fixture_private")
+        if fixture_dir:
+            fixtures_by_task.setdefault((trial.get("task"), trial.get("instance")), {})[tid] = Path(fixture_dir).name
     for tid, trial in sorted(ledger.items(), key=lambda kv: (kv[1].get("client") != "claude",
                                                              kv[1]["rows"].get("pre-launch", {}).get("at", ""))):
         rows = trial["rows"]
         exit_row = rows.get("exit", {})
-        record, graded = grade_one(root, cfg, tid, trial, tasks, run_tools)
+        record, graded = grade_one(root, cfg, tid, trial, tasks, run_tools, fixtures_by_task)
         table.append(record)
         if graded is None:
             if str(record.get("reason") or "").startswith("lint_f"):
@@ -1749,9 +1864,9 @@ def grade_run(root: Path) -> dict:
             gate_rows["G3"].append(graded["agreement"]["pass"])
             gate_rows["G5"].append(record["marker_ok"] and not rows.get("prepared", {}).get("lint_f_hits") and not record["argv_lint"])
             if trial.get("client") == "claude":
-                # G6 on the trial's own first in-stream reading (the launcher applies the prior to it as well).
+                # G6 on the trial's own first in-stream reading (the launcher applies decision 6's headroom rule to it).
                 gate_rows["G6"].append(graded["hook_events"] > 0 and graded["rate_limit_events"] > 0 and graded["efforts"] == ["max"]
-                                       and record["claude"]["started_below_prior"])
+                                       and record["claude"]["started_with_headroom"])
         gate_rows["G7"].append(not [h for h in record["watcher"] if h["got_past"] and h.get("halts", True)]
                                and not exit_row.get("nested_clients"))
         gate_rows["G8"].append(record["kept"]["draft_copy"] and record["kept"]["fixture_exists"])
@@ -1763,19 +1878,33 @@ def grade_run(root: Path) -> dict:
             gate_rows["G11"].append(ok)
             if not effort["gateway_forwarded_exposed"]:
                 gaps.append({"gate": "G11", "trial_id": tid, "gap": "forwarded effort not exposed: the gateway call log has "
-                             "no pipeline details (pipelinePayloads null); enabling them is a host configuration change (RP4)"})
-        gate_rows["G13"].append(not record["reach"])
+                             "no pipeline details (pipelinePayloads null); under decision 8 (RP4) the co-op turns them on "
+                             "only for pilot runs, and this run's record says: "
+                             f"{(cfg.get('gateway_pipeline_details') or {}).get('declared') or 'not declared'}"})
+        # G13 (decision 3): no trial read the task's gold or a fixture answer source; other reaches are tags.
+        gate_rows["G13"].append(not record["answer_source_reads"])
         gate_rows["G14"].append(all(u.get("tag") for u in uses))
         if record["valid"] and trial.get("lane") == cfg.get("lane", "organic-e2e") and task.get("kind") != "prompted" \
                 and not (cfg.get("tests_by_ref") or {}).get(trial.get("ref") or "", {}).get("gate_trial"):
             target = task.get("item")
             entry = per_item.setdefault((target, trial.get("cell")), {"n": 0, "used": 0, "used_excl_fixture_mentioned": 0,
                                                                      "n_excl_process_table_trials": 0,
-                                                                     "used_excl_process_table_trials": 0, "arm": trial.get("arm")})
-            entry["n"] += 1
+                                                                     "used_excl_process_table_trials": 0,
+                                                                     "n_untagged": 0, "used_untagged": 0,
+                                                                     "n_tagged": 0, "used_tagged": 0,
+                                                                     "not_exposed_path_only": 0, "arm": trial.get("arm")})
             pool = record["native_U_items"] if trial.get("arm") == "native" else record["U_env_items"]
+            if record["target_exposure"] is not None and not record["target_exposure"]["exposed"]:
+                # Decision 2: a CLI only on PATH was not exposed; its trial is counted apart, never as a miss.
+                entry["not_exposed_path_only"] += 1
+                continue
+            entry["n"] += 1
             if target in (pool or []):
                 entry["used"] += 1
+            stratum = "tagged" if record["tagged"] else "untagged"
+            entry[f"n_{stratum}"] += 1
+            if target in (pool or []):
+                entry[f"used_{stratum}"] += 1
             if target in (record.get("native_U_items_excl_fixture_mentioned") or []):
                 entry["used_excl_fixture_mentioned"] += 1
             if not record["process_table_reads"]:
@@ -1790,7 +1919,18 @@ def grade_run(root: Path) -> dict:
             if any(count != block.get("repeat", 1) for count in per_test.values()):
                 attempts_ok = False
     gate_rows["G9"] = [len(ids) == len(set(ids)) and attempts_ok]
-    oir = {f"{item}|{cell}": {**v, "oir": round(v["used"] / v["n"], 4) if v["n"] else None, "wilson95": wilson(v["used"], v["n"])}
+    def rate(used: int, n: int) -> float | None:
+        return round(used / n, 4) if n else None
+
+    # Decision 3: the tagged trials (a host-checkout, harness-file, trial-root or other-trial read) are reported as their
+    # own stratum beside the untagged ones; "oir" pools both. Decision 2: a PATH-only CLI target is not exposed, so its
+    # trials sit in not_exposed_path_only and the item has no OIR of its own.
+    oir = {f"{item}|{cell}": {**v, "oir": rate(v["used"], v["n"]), "wilson95": wilson(v["used"], v["n"]),
+                              "oir_untagged": rate(v["used_untagged"], v["n_untagged"]),
+                              "wilson95_untagged": wilson(v["used_untagged"], v["n_untagged"]),
+                              "oir_tagged": rate(v["used_tagged"], v["n_tagged"]),
+                              "wilson95_tagged": wilson(v["used_tagged"], v["n_tagged"]),
+                              "exposure": "not exposed (PATH-only)" if v["not_exposed_path_only"] and not v["n"] else None}
            for (item, cell), v in per_item.items()}
     # A verified negative (G15): a valid trial on a control task (R4: G1-G6' are should_not for every item) whose joins
     # and stream-Loki agreement hold, so its non-use of each item is checked against the raw sources. Items it did use
@@ -1813,14 +1953,20 @@ def grade_run(root: Path) -> dict:
         if carried_forward:
             gates[g]["carried_forward_skipped"] = carried_forward
     # G4: every block's S7 view equal before and after, and every launcher trial's own comparison present and equal
-    # (CL7b has no launcher; its block's comparison covers it).
+    # (CL7b has no launcher; its block's comparison covers it). Decision 7: a trial whose host change became the run's
+    # recorded in-run re-baseline (or that ran across it) is carried forward and re-run, so it is listed, not failed.
     per_trial = [r for r in table if r.get("launched") and r.get("cell") != "codex-app-server"]
+    rebaselines = [r for r in read_jsonl(root / REBASELINE_LOG) if r.get("baseline")]
+    rebaselined = {r["trial_id"] for r in per_trial if r.get("reason") == "host_change_rebaselined" and r.get("rebaseline")}
     gates["G4"] = {"pass": all(host_unchanged(b, block=True) for b in blocks if b.get("outcomes"))
-                   and all(host_unchanged(r) for r in per_trial),
+                   and all(host_unchanged(r) for r in per_trial if r["trial_id"] not in rebaselined),
                    "blocks": len([b for b in blocks if b.get("outcomes")]),
                    "trials_without_host_comparison": [r["trial_id"] for r in per_trial if not r.get("host_s7")],
                    "transient_states_recorded": sum(1 for r in per_trial if r.get("host_s7_transient_before"))
-                   + sum(1 for b in blocks if b.get("transient_pre"))}
+                   + sum(1 for b in blocks if b.get("transient_pre")),
+                   "rebaselines": [{k: r.get(k) for k in ("at", "trigger", "trial_id", "cell", "arm", "changed", "baseline_sha256")}
+                                   for r in rebaselines],
+                   "rebaselined_trials": sorted(rebaselined)}
     # G7 also needs the stage-2 canaries (finding 11): the exec-rules canary refused, gh showing no identity (or the
     # read-only one) through the shell and through ctx_*.
     g0 = load_json(root / "gate0.json") if (root / "gate0.json").exists() else None
@@ -1828,17 +1974,54 @@ def grade_run(root: Path) -> dict:
     gates["G7"]["canaries"] = canaries or "missing (no gate0.json: stage 2 has not run)"
     gates["G7"]["pass"] = bool(gates["G7"]["pass"]) and bool(canaries) and all(canaries.values())
     gates["G10"] = sdk_parity(cfg, graded_by)
+    gates["G10"]["gateway_entry"] = (f"best-effort, confirmed by decision 5 of {CC_V11_DECISIONS}: the gateway's call "
+                                     "logs undercount clients that exit fast (right after response.completed), so a "
+                                     "missing entry is a gap, never the gate")
     gaps += gates["G10"].get("gaps") or []
+    # G11 and decision 8: the operator's record of the gateway's pipeline details for this run, and what the call logs
+    # showed (only the forwarded effort fields are kept).
+    codex_effort = [g["effort"] for _, (r, g) in graded_by.items() if r.get("client") == "codex" and g.get("effort")]
+    calls_seen = sum(e.get("gateway_calls") or 0 for e in codex_effort)
+    with_pipeline = sum(e.get("gateway_calls_with_pipeline") or 0 for e in codex_effort)
+    gates["G11"]["gateway_pipeline_details"] = {
+        "declared": (cfg.get("gateway_pipeline_details") or {}).get("declared"),
+        "observed": ("on" if with_pipeline == calls_seen else "partly on") if with_pipeline else ("off" if calls_seen else "no calls"),
+        "calls": calls_seen, "calls_with_pipeline": with_pipeline}
+    # G13 and decision 3: tags are reported, only gold or answer-source reads fail the gate.
+    gates["G13"].update({"rule": f"decision 3 of {CC_V11_DECISIONS}: host-checkout and other reads are tagged, never "
+                                 "denied; a trial is invalid only if it reads the task's gold or a fixture answer source",
+                         "tagged_trials": sorted(r["trial_id"] for r in table if r.get("tagged")),
+                         "tag_categories": _count([c for r in table for c in r.get("tagged") or []]),
+                         "answer_source_trials": sorted(r["trial_id"] for r in table if r.get("answer_source_reads"))})
     g12 = cfg.get("oracles_reproduce") or {}
     gates["G12"] = {"pass": g12.get("pass"), "differing": g12.get("differing"), "tests_run": g12.get("tests_run")}
     gates["G15"] = {"observed": observed, "gaps": [k for k, v in observed.items() if not v], "negatives": negatives}
+    exposure = [{"trial_id": r["trial_id"], "cell": r.get("cell"), **r["target_exposure"]}
+                for r in table if r.get("target_exposure")]
     return {"graded_at": utc_now(), "run_id": cfg["run_id"], "grader_sha256": sha256_file(Path(__file__)),
-            "common_sha256": sha256_file(HERE / "common.py"), "trials": table, "oir": oir, "gates": gates, "gaps": gaps,
+            "common_sha256": sha256_file(HERE / "common.py"), "cc_decisions": CC_V11_DECISIONS, "trials": table,
+            "oir": oir, "gates": gates, "gaps": gaps,
             "carried_forward": carried_forward, "registry_status": (cfg.get("registry") or {}).get("status"),
-            "claude_completion": cfg.get("claude_completion"),
+            "claude_completion": cfg.get("claude_completion"), "claude_meter": cfg.get("claude_meter"),
+            "completion_times": [{k: r.get(k) for k in ("trial_id", "cell", "reason", "final_turn_end_s", "time_to_result_s",
+                                                        "turn_times_source")}
+                                 for r in table if r.get("client") == "claude" and r.get("launched")],
+            "no_result_trials": [{"trial_id": r["trial_id"], "cell": r.get("cell"), "reason": r.get("reason"),
+                                  "diagnosis": r.get("no_result_diagnosis")}
+                                 for r in table if r.get("client") == "claude" and r.get("launched")
+                                 and str(r.get("reason_before_rebaseline") or r.get("reason") or "")
+                                 in ("timeout", "timeout_after_result", "wall_guard")],
+            "held_cells": sorted(p.name for p in root.glob("HOLD.*")),
+            "rate_limited_trials": sorted(r["trial_id"] for r in table if r.get("rate_limited")),
+            "cli_exposure": exposure,
             "notes": ["Outcome grading (D then R oracles, 0-4) is the coordinator's blind GPT step; none is computed here.",
                       "Labels (R4) are pending, so OIR uses each task's own item as the target; no verdict is derived.",
-                      "fixture-directed uses the reviewed routing registry when run.json has one, else the provisional list."]}
+                      "fixture-directed uses the reviewed routing registry when run.json has one, else the provisional list.",
+                      f"The command center's v1.1 decisions ({CC_V11_DECISIONS}) are recorded in AMENDMENT-v1.1-20261006.md "
+                      "beside the protocol: completion at the result event with T = 1,800 s (1), CLI exposure by native "
+                      "surface (2), tagged host reads with gold-only invalidation (3), watcher-only chrome-devtools (4), "
+                      "best-effort G10 gateway entry (5), the headroom meter rule (6), one in-run re-baseline (7) and "
+                      "effort-only pipeline receipts (8)."]}
 
 
 def host_unchanged(row: dict, block: bool = False) -> bool:
@@ -1887,8 +2070,9 @@ def sdk_parity(cfg: dict, graded_by: dict) -> dict:
                 row["one_main_rollout"] = graded.get("main_rollouts") == 1
             row["pass"] = all(v for k, v in row.items() if k not in ("trial_id", "cell"))
             # The route rests on client-side telemetry (the rollout's session_meta provider). The gateway call log is
-            # best-effort under the command center's telemetry caveat (item task-ns2604-coop-20261005T200956Z): a client
-            # that exits right after response.completed can leave its rows unfinished (smoke-20261006c CL7b: three
+            # best-effort under the command center's telemetry caveat (item task-ns2604-coop-20261005T200956Z), which
+            # decision 5 of item task-ns2604-coop-20261006T105529Z confirmed: the call logs undercount clients that exit
+            # fast, right after response.completed, and can leave their rows unfinished (smoke-20261006c CL7b: three
             # /v1/responses rows with status 0 whose detail returns 404, so no thread join). A joined entry is recorded;
             # its absence is a gap, never the gate.
             row["gateway_entry_best_effort"] = graded["effort"]["gateway_calls"] > 0

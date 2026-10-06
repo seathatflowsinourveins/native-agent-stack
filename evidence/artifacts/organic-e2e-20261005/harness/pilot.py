@@ -22,14 +22,18 @@ or experiment word while sessions run.
    oracle-<base cell> cells, one block per cell.
 4  Codex blocks C1-C5 in order and, in parallel, the Claude schedule (G1 first, then the seeded order), one eval per
    test at -j 1 under the shared lock. Needs gate0.json passing and a reviewed routing-file registry (or a recorded
-   development allowance); the Claude chain also needs the run's completion policy decided by a CC amendment
-   (prepare.py --claude-completion ... --amendment-ref ...).
+   development allowance); the Claude chain also needs the run's completion policy decided by a CC amendment. Stage 1
+   records decision 1 of CC item task-ns2604-coop-20261006T105529Z by default (complete-at-result, T = 1,800 s); another
+   policy or T goes in through prepare.py --claude-completion ... --claude-t-seconds ... --amendment-ref ....
 5  collect.py.  6  grade.py trials.
 Resume: --from-stage 2, 3 or 4 runs only tests whose launched trials are fewer than their repeat; a test refused before
-launch (meter, lock, DEFER), or a Claude trial the launcher killed at its own first meter reading, is carried forward.
+launch (meter, lock, DEFER, HOLD), or a trial carried forward (common.CARRY_FORWARD_REASONS: killed at its own first
+meter reading, rate-limited, or re-run after an in-run re-baseline), runs again.
 --from-stage 2 --rerun-gate0-failures runs once more only the stage-2 tests whose gate-0 check failed (for example a
-Claude probe stopped by the meter, in the next 5-hour window), then collects and checks gate 0 again. A DEFER.claude flag is cleared on resume once the newest meter reading allows a
-start; STOP flags stay until the operator removes them.
+Claude probe stopped by the meter, in the next 5-hour window), then collects and checks gate 0 again. A DEFER.claude
+flag is cleared on resume once the newest meter reading leaves headroom for the run's expected usage (decision 6);
+STOP flags, and the HOLD.<cell> flag a Claude trial without a result event by T sets for the operator's diagnosis
+(decision 1), stay until the operator removes them.
 """
 from __future__ import annotations
 
@@ -44,8 +48,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from common import (CARRY_FORWARD_REASONS, HOME, RUNS_ROOT, load_json, newest_meter_reading, prior_allows,  # noqa: E402
-                    read_jsonl, sha256_file, utc_now)
+from common import (CARRY_FORWARD_REASONS, HOME, RUNS_ROOT, headroom_allows, load_json, newest_meter_reading,  # noqa: E402
+                    read_jsonl, run_expected_usage, sha256_file, utc_now)
 
 PROTOCOL_PREFIXES = {HOME / ".claude/CLAUDE.md": "b86ea2c4655637fa", HOME / ".claude/settings.json": "861959ff0e49803f"}
 CLAUDE_PROBE = {"key": "probe-claude-native", "cell": "claude-native", "prompt": "Reply with the single word: ready."}
@@ -53,7 +57,7 @@ CODEX_STAGE2 = ("prompted-codex-native", "prompted-codex-env", "codex-native-gat
 CLAUDE_STAGE2 = ("prompted-claude-native", "prompted-claude-env")
 CODEX_BLOCKS = ("codex-native", "codex-env", "codex-native-ultra", "codex-sdk", "codex-app-server")
 PREPARE_FLAGS = ("--claude-completion", "--amendment-ref", "--claude-grace-s", "--claude-t-seconds", "--registry-review",
-                 "--repeat-override", "--seed")
+                 "--repeat-override", "--seed", "--claude-expected-usage", "--gateway-pipeline-details")
 PREPARE_SWITCHES = ("--allow-provisional-registry", "--skip-oracle-tests", "--skip-quota", "--allow-timing")
 
 
@@ -178,7 +182,7 @@ def main(argv=None) -> int:
 
     def clear_defer() -> None:
         if not args.keep_defer and (root / "DEFER.claude").exists():
-            allowed, why = prior_allows(newest_meter_reading())
+            allowed, why = headroom_allows(newest_meter_reading(), run_expected_usage(cfg))
             log.append({"at": utc_now(), "step": "DEFER.claude", "cleared": allowed, "why": why})
             if allowed:
                 (root / "DEFER.claude").unlink()

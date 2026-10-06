@@ -4,17 +4,19 @@
   python3 -B <trial_root>/bin/b.py --cell <cell code or name> [--ref <test ref>] [--repeat K] [-j J] [--allow-timing]
   python3 -B block.py --run-root <root> --cell <cell> ...         (the same, from the run root's frozen harness)
 
-Before: no STOP, STOP.<client> or DEFER.<client> flag; the host S7 view equals the stage-1 baseline (a change needs a
-reviewed new baseline); outside the blackout windows; Claude blocks also need the host configuration settled for 30
-minutes; Codex blocks run `scripts/codex_quota.py --gate 70` under the real CODEX_HOME and check the gateway build is
-unchanged.
+Before: no STOP, STOP.<client>, DEFER.<client> or HOLD.<cell> flag; the host S7 view equals the baseline in force (the
+stage-1 baseline or the run's one in-run re-baseline; a change found here becomes that re-baseline when decision 7 of
+CC item task-ns2604-coop-20261006T105529Z allows it, and is refused otherwise); outside the blackout windows; Claude
+blocks also need the host configuration settled for 30 minutes; Codex blocks run `scripts/codex_quota.py --gate 70`
+under the real CODEX_HOME and check the gateway build is unchanged.
 The eval: `PROMPTFOO_DISABLE_ADAPTIVE_SCHEDULER=true promptfoo eval -c <config> --repeat <k> -j <j> --no-cache --no-write
 --no-share -o <results>` in a clean login environment (env -i semantics, the login shell's PATH), with telemetry and
 update checks off. Every argv on the way is neutral (finding 10): promptfoo runs as `node <trial_root>/bin/r eval ...`
 (a neutral link to its entry point), from the trial root, on configs and results under opaque names there; the results
 are then copied into the run root. One test is selected with --filter-metadata ref=<opaque ref>.
-After: the S7 view again, promptfoo's attempts per test (G9), and for Codex the gateway's requests and limit errors in
-the block window. One row per block is appended to blocks.jsonl. CL7b (promptfoo's own app-server provider, no
+After: the S7 view again against the baseline in force (a persistent change that no launcher absorbed writes STOP; a
+CL7b trial that ran across an in-run re-baseline is carried forward), promptfoo's attempts per test (G9), and for Codex
+the gateway's requests and limit errors in the block window. One row per block is appended to blocks.jsonl. CL7b (promptfoo's own app-server provider, no
 launcher) gets its launched and exit ledger rows here.
 """
 from __future__ import annotations
@@ -31,13 +33,19 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from common import (append_jsonl, clean_login_env, gateway_build, gateway_get, load_json, run, s7_compare,  # noqa: E402
-                    s7_host_only, s7_persistent_change, sha256_file, stable_s7_snapshot, stop_flag_names, trial_dir,
-                    utc_now, utc_stamp, write_json)
+from common import (append_jsonl, clean_login_env, current_s7_baseline, gateway_build, gateway_get, load_json,  # noqa: E402
+                    rebaselines_between, run, s7_compare, s7_host_only, s7_persistent_change, sha256_file,
+                    stable_s7_snapshot, stop_flag_names, trial_dir, try_rebaseline, utc_now, utc_stamp, write_json)
 
 
-def stop_flags(root: Path, client: str) -> list[str]:
-    return [name for name in stop_flag_names(client) if (root / name).exists()]
+def stop_flags(root: Path, client: str, cell: str | None = None) -> list[str]:
+    return [name for name in stop_flag_names(client, cell) if (root / name).exists()]
+
+
+def straddled_rebaseline(root: Path, started: str, ended: str) -> str | None:
+    """Decision 7 for a trial without a launcher (CL7b): a re-baseline recorded while it ran makes it a re-run."""
+    during = rebaselines_between(root, started, ended)
+    return f"re-baselined during the trial ({str(during[-1].get('baseline', '')).rsplit('/', 1)[-1]})" if during else None
 
 
 def quota_gate(script: Path) -> dict:
@@ -156,16 +164,25 @@ def main(argv=None) -> int:
     work = trial_dir(cfg, root)
     row = {"cell": cell_name, "client": client, "ref": ref, "repeat": repeat, "j": jobs, "planned_at": utc_now()}
     refusals = []
-    flags = stop_flags(root, client)
+    flags = stop_flags(root, client, cell_name)
     if flags:
         refusals.append(f"stop flags: {flags}")
-    baseline = load_json(cfg["s7_baseline"])
+    baseline, baseline_path = current_s7_baseline(cfg, root)
     pre, pre_read = stable_s7_snapshot({"fixture_tar": cfg["fixture"]["tar_path"]})
     host = s7_compare(s7_host_only(baseline), s7_host_only(pre))
     row["pre_vs_baseline"] = {k: v for k, v in host.items() if k != "new_trust_paths_private"}
     row["s7_reads_pre"] = pre_read
+    row["s7_baseline_used"] = Path(baseline_path).name
     if not host["equal"] or any(host["new_trust"].values()):
-        refusals.append(f"host exposure differs from the stage-1 baseline: {host['changed'][:8]}")
+        # Decision 7: a change between blocks costs no trial, so it becomes the run's in-run re-baseline if allowed.
+        done, why = (False, "stop flags set") if flags else try_rebaseline(
+            root, host, any(host["new_trust"].values()), pre, {"trigger": "block-start", "cell": cell_name, "arm": cell["arm"]})
+        row["rebaseline"] = why
+        if done:
+            baseline, baseline_path = current_s7_baseline(cfg, root)
+            row["s7_baseline_used"] = Path(baseline_path).name
+        else:
+            refusals.append(f"host exposure differs from the baseline in force ({why}): {host['changed'][:8]}")
     from prepare import config_settled, in_blackout
     if in_blackout() and not args.allow_timing:
         refusals.append("blackout window")
@@ -235,23 +252,38 @@ def main(argv=None) -> int:
             outcome["trial_id"] = trial["trial_id"]
             provider = (attempts or {}).get("trials") or [{}]
             failed = proc.returncode not in (0, 100) or not kept.exists() or any(t.get("error") for t in provider)
+            reason = "app_server_provider_error" if failed else None
+            rebaselined = straddled_rebaseline(root, started, ended)
             append_jsonl(root / "ledger.jsonl", {"run_id": cfg["run_id"], "trial_id": trial["trial_id"], "cell": cell_name,
                                                  "client": "codex", "arm": cell["arm"], "ref": trial["ref"],
                                                  "test_key": trial["test_key"], "phase": "exit", "at": ended,
-                                                 "rc": proc.returncode, "censored": bool(failed),
-                                                 "reason": "app_server_provider_error" if failed else None,
+                                                 "rc": proc.returncode, "censored": bool(failed or rebaselined),
+                                                 "reason": "host_change_rebaselined" if rebaselined else reason,
+                                                 "reason_before_rebaseline": reason if rebaselined else None,
+                                                 "rebaseline": rebaselined,
                                                  "provider_output_sha256": provider[0].get("provider_output_sha256")})
         if client == "codex":
             outcome["gateway_window"] = gateway_window(started, ended)
         outcomes.append(outcome)
     post, post_read = stable_s7_snapshot({"fixture_tar": cfg["fixture"]["tar_path"]})
-    judged = s7_persistent_change(baseline, pre, post)
+    # The baseline in force at the block's end: a trial's in-run re-baseline during the block (decision 7) is judged
+    # there, and its own trials were carried forward by the launcher.
+    baseline_end, baseline_end_path = current_s7_baseline(cfg, root)
+    judged = s7_persistent_change(baseline_end, pre, post)
     within = judged["within"]
+    row["s7_baseline_end"] = Path(baseline_end_path).name
     row.update({"outcomes": outcomes, "post_vs_pre": {k: v for k, v in within.items() if k != "new_trust_paths_private"},
                 "post_vs_baseline": {k: v for k, v in judged["vs_baseline"].items() if k != "new_trust_paths_private"},
                 "persistent_change": judged["persistent"], "transient_pre": judged["transient_before"],
                 "s7_reads_post": post_read, "at": utc_now()})
     write_json(root / "s7" / f"block-{cell_name}-{utc_stamp()}.after.json", post, 0o600)
+    if judged["persistent"]:
+        # A change during the block that no launcher absorbed (CL7b has none, and a change after a block's last trial
+        # exits is seen only here) stops the run as before decision 7; the block-start re-baseline is only for a change
+        # made while no block ran.
+        (root / "STOP").write_text(f"{utc_now()} host exposure or trust changed during block {cell_name}: "
+                                   f"{judged['vs_baseline']['changed'][:6]} new_trust={judged['vs_baseline']['new_trust']}\n")
+        row["stopped"] = "persistent change during the block"
     append_jsonl(root / "blocks.jsonl", row)
     print(json.dumps({"cell": cell_name, "outcomes": [{k: o.get(k) for k in ("rc", "results", "attempts", "dry_run")} for o in outcomes],
                       "host_unchanged": not judged["persistent"], "new_trust": judged["vs_baseline"]["new_trust"]}, default=str))

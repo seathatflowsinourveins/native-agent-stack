@@ -10,11 +10,15 @@ the launcher lints every ancestor's argv before it starts a client (R2 (f)).
 Steps (numbering as in §4.1): read argv; trial_id = uuid4; pre-launch ledger row; extract the hashed fixture to
 NEUTRAL_ROOT/<8 hex>/ and build the per-trial settings file (Claude) or CODEX_HOME clone (Codex); refuse an organic
 trial while the routing-file registry is unreviewed; Claude takes the shared lock on a file descriptor and, inside it,
-checks the session cap (14 per run) and reads the meter; the S7 before-snapshot is taken after the lock; the native
-line runs from bash -lc under timeout in a clean login environment; a Claude stream is tailed for rate_limit_event (the
-prior applies to every trial's first in-stream reading) and killed on the §9.1 thresholds; the run's completion policy
-decides what a result event before T means; after exit the fixture is hash-manifested, ./draft/ is copied to the run
-root, nothing is deleted; exactly one JSON line is printed and the exit status is always 0, so promptfoo can never
+checks the session cap (14 per run) and compares the meter's remaining headroom with the trial's expected usage
+(decision 6 of CC item task-ns2604-coop-20261006T105529Z; the same check applies to every trial's first in-stream
+reading); the S7 before-snapshot is taken after the lock; the native line runs from bash -lc under timeout in a clean
+login environment; a Claude stream is tailed for rate_limit_event, rate-limit hits (the trial is marked rate_limited and
+carried forward for a re-run), the model's final turn end and the result event (decision 1: the run's completion
+policy decides what a result event before T means, and a trial with no result by T holds its cell with a
+no_result_diagnosis); after exit the S7 view is judged against the baseline in force, and a persistent change becomes an
+in-run re-baseline where decision 7 allows it, else a STOP; the fixture is hash-manifested, ./draft/ is copied to the
+run root, nothing is deleted; exactly one JSON line is printed and the exit status is always 0, so promptfoo can never
 relaunch a paid session.
 """
 from __future__ import annotations
@@ -36,16 +40,20 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from common import (CLAUDE_LOCK, CLAUDE_SESSION_CAP, KILL_AFTER, KILL_FIVE_HOUR, KILL_FIVE_HOUR_RISE, KILL_SEVEN_DAY,  # noqa: E402
-                    LANE, LOCK_WAIT_S, POST_RESULT_GRACE_S, PRIOR_FIVE_HOUR, PRIOR_SEVEN_DAY, T_SECONDS, append_jsonl,
-                    clean_login_env, gateway_build, load_json, manifest_digest, newest_meter_reading, prior_allows,
-                    rate_limit_readings, read_jsonl, s7_persistent_change, sha256_bytes, sha256_file, stable_s7_snapshot,
-                    stop_flag_names, trial_dir, tree_manifest, utc_now, write_json)
+from common import (CLAUDE_COMPLETION_DEFAULT, CLAUDE_LOCK, CLAUDE_SESSION_CAP, KILL_AFTER, LANE, LOCK_WAIT_S,  # noqa: E402
+                    POST_RESULT_GRACE_S, PROTOCOL_T_SECONDS, T_SECONDS, append_jsonl, clean_login_env,
+                    current_s7_baseline, gateway_build, headroom_allows, load_json, manifest_digest,
+                    newest_meter_reading, rate_limit_hit, rate_limit_readings, read_jsonl, rebaselines_between,
+                    resume_after, run_expected_usage, s7_persistent_change, sha256_bytes, sha256_file,
+                    stable_s7_snapshot, stop_flag_names, trial_dir, tree_manifest, try_rebaseline, utc_now, write_json)
 
 RATE_LIMIT_WORDS = ("rate limit", "rate_limit", "429", "usage limit", "too many requests", "quota")
-# Kill reasons that end a trial at or above a §9.1 window threshold: the client's remaining tests wait for the next
-# window (DEFER.<client>, cleared by pilot.py on resume once the meter allows), never consumed as censored.
-DEFER_REASONS = ("meter_kill_five_hour", "meter_kill_seven_day", "meter_prior_first_event")
+# Kill reasons after which the client's remaining tests wait for headroom (DEFER.<client>, cleared by pilot.py on
+# resume once the newest meter reading allows a start), never consumed as censored (decision 6).
+DEFER_REASONS = ("meter_headroom_first_event", "rate_limited")
+# Censoring reasons that mean no result event arrived before T: the trial's cell is held for diagnosis (decision 1).
+HOLD_REASONS = ("timeout", "timeout_after_result", "wall_guard")
+BACKGROUND_SUBTYPES = ("background_tasks_changed", "task_started", "task_progress", "task_notification")
 
 
 class Censored(Exception):
@@ -69,9 +77,13 @@ def iso_ms(stamp: float) -> str:
 def completion_policy(cfg: dict) -> dict:
     """The run's Claude completion policy (run.json claude_completion). censor-at-T is the protocol as written (§9.1:
     T = 900 s censors); complete-at-result counts a result event before T as completion and ends the process group
-    after a grace. Either one, and any T other than 900 s, is set at stage 1 with the CC amendment it rests on."""
+    after a grace. Decision 1 (CC item 105529Z) sets complete-at-result with T = 1,800 s: a cell completes only when
+    its result event arrives, never on a final turn alone, since background Workflows may still run. A run prepared
+    without a completion record keeps the protocol as written."""
     raw = cfg.get("claude_completion") or {}
-    return {"policy": raw.get("policy") or "censor-at-T", "grace_s": int(raw.get("grace_s") or POST_RESULT_GRACE_S),
+    if not raw:
+        return {"policy": "censor-at-T", "grace_s": POST_RESULT_GRACE_S, "t_seconds": PROTOCOL_T_SECONDS, "amendment": None}
+    return {"policy": raw.get("policy") or CLAUDE_COMPLETION_DEFAULT, "grace_s": int(raw.get("grace_s") or POST_RESULT_GRACE_S),
             "t_seconds": int(raw.get("t_seconds") or T_SECONDS), "amendment": raw.get("amendment")}
 
 
@@ -364,8 +376,8 @@ def _kill_group(proc: subprocess.Popen) -> None:
             pass
 
 
-def _stop_flag(root: Path, client: str) -> Path | None:
-    for name in stop_flag_names(client):
+def _stop_flag(root: Path, client: str, cell: str | None = None) -> Path | None:
+    for name in stop_flag_names(client, cell):
         if (root / name).exists():
             return root / name
     return None
@@ -377,10 +389,12 @@ def _defer(root: Path, client: str, reason: str) -> None:
 
 def run_client(root: Path, cfg: dict, client: str, line: str, fixture: Path, stream_path: Path, err_path: Path,
                meter_source: dict | None) -> dict:
-    """Run the line and watch it. Returns rc, the kill reason (if the launcher killed it), the result event's arrival,
-    meter readings and the process-tree observations."""
+    """Run the line and watch it. Returns rc, the kill reason (if the launcher killed it), the result event's arrival
+    and the model's final turn end (decision 1), meter readings and rate-limit hits (decision 6), the process-tree
+    observations, and for a Claude trial without a result event before T a no_result_diagnosis."""
     env = clean_login_env()
     policy = completion_policy(cfg)
+    expected = run_expected_usage(cfg)
     claude_bin, codex_bin = cfg["binaries"]["claude"]["realpath"], cfg["binaries"]["codex"]["realpath"]
     with open(stream_path, "wb") as out, open(err_path, "wb") as err:
         proc = subprocess.Popen(["bash", "-lc", line], cwd=str(fixture), env=env, stdout=out, stderr=err,
@@ -389,9 +403,19 @@ def run_client(root: Path, cfg: dict, client: str, line: str, fixture: Path, str
     offset, buffer = 0, b""
     first, last, readings = None, None, 0
     kill_reason, kill_at, nested_seen, exes = None, None, [], set()
-    result_at = None
-    rate_limit_error = False
+    result_at, result_info = None, None
+    rate_limit_error = False      # Codex: an error or turn.failed naming a limit
+    rate_limited = False          # Claude: a rejected rate_limit_event or an error result naming a limit (decision 6)
     next_tree = 0.0
+    # Decision 1: the model's final turn end, from the main thread's events. Claude Code 2.1.291 leaves stop_reason
+    # unset on stream-json assistant events, so content decides: an assistant text block opens a final-turn candidate,
+    # and a later tool_use or tool_result closes it again. The result event is recorded separately: a print-mode CLI
+    # holds it while a background Workflow runs (smoke-20261006c claude-native: final text at about 576 s, result at
+    # 900.7 s on SIGTERM).
+    candidate, candidate_stamp, last_main = None, None, None
+    open_tools: dict[str, str] = {}
+    background = {"events": 0, "last_event_s": None, "tasks": {}, "notifications": 0}
+    last_tree: list[str] = []
 
     def set_kill(reason: str) -> None:
         nonlocal kill_reason, kill_at
@@ -419,25 +443,45 @@ def run_client(root: Path, cfg: dict, client: str, line: str, fixture: Path, str
             except ValueError:
                 continue
             if client == "claude":
-                if event.get("type") == "result" and result_at is None:
-                    result_at = time.time()
+                now = time.time()
+                kind = event.get("type")
+                if kind == "result" and result_at is None:
+                    result_at = now
+                    result_info = {k: event.get(k) for k in ("subtype", "is_error", "duration_ms", "num_turns", "stop_reason")}
+                if kind in ("assistant", "user") and not event.get("parent_tool_use_id"):
+                    blocks = [b for b in ((event.get("message") or {}).get("content") or []) if isinstance(b, dict)]
+                    kinds = {b.get("type") for b in blocks if b.get("type")}
+                    last_main = {"type": kind, "content": sorted(kinds), "at_s": round(now - started, 1)}
+                    if kind == "assistant":
+                        open_tools.update({b["id"]: b.get("name") for b in blocks if b.get("type") == "tool_use" and b.get("id")})
+                        if "tool_use" in kinds:
+                            candidate, candidate_stamp = None, None
+                        elif "text" in kinds:
+                            candidate, candidate_stamp = now, event.get("timestamp")
+                    elif "tool_result" in kinds:
+                        for block in blocks:
+                            open_tools.pop(block.get("tool_use_id"), None)
+                        candidate, candidate_stamp = None, None
+                if kind == "system" and event.get("subtype") in BACKGROUND_SUBTYPES:
+                    background["events"] += 1
+                    background["last_event_s"] = round(now - started, 1)
+                    background["notifications"] += event.get("subtype") == "task_notification"
+                    for task in event.get("tasks") or []:
+                        if isinstance(task, dict) and task.get("task_id"):
+                            background["tasks"][task["task_id"]] = task.get("task_type")
+                if rate_limit_hit(event):
+                    # Decision 6: mark the trial and stop it; it is carried forward and re-run once headroom returns.
+                    rate_limited = True
+                    set_kill("rate_limited")
                 for reading in rate_limit_readings([event]):
                     readings += 1
                     last = reading
-                    five, seven = reading.get("five_hour"), reading.get("seven_day")
                     if first is None:
                         first = reading
-                        # The prior applies to every trial's own first in-stream reading (G6), whatever the lock-time
-                        # reading said.
-                        if five is not None and seven is not None and not (five < PRIOR_FIVE_HOUR and seven < PRIOR_SEVEN_DAY):
-                            set_kill("meter_prior_first_event")
-                    if five is not None and five >= KILL_FIVE_HOUR:
-                        set_kill("meter_kill_five_hour")
-                    if seven is not None and seven >= KILL_SEVEN_DAY:
-                        set_kill("meter_kill_seven_day")
-                    if (five is not None and first and first.get("five_hour") is not None
-                            and five - first["five_hour"] >= KILL_FIVE_HOUR_RISE):
-                        set_kill("meter_kill_rise")
+                        # Decision 6: the trial's own first in-stream reading must leave room for its expected usage,
+                        # whatever the lock-time reading said; a later rise from another session's use never kills it.
+                        if not headroom_allows(reading, expected)[0]:
+                            set_kill("meter_headroom_first_event")
             else:
                 kind = event.get("type")
                 if kind in ("error", "turn.failed"):
@@ -447,6 +491,7 @@ def run_client(root: Path, cfg: dict, client: str, line: str, fixture: Path, str
         if time.time() >= next_tree and rc is None:
             nested, seen = nested_clients(proc.pid, claude_bin, codex_bin)
             exes.update(seen)
+            last_tree = seen
             if nested:
                 nested_seen.extend(nested)
                 set_kill("nested_client")
@@ -467,16 +512,36 @@ def run_client(root: Path, cfg: dict, client: str, line: str, fixture: Path, str
         time.sleep(1)
     ended = time.time()
     if kill_reason in DEFER_REASONS:
-        _defer(root, client, kill_reason)
+        _defer(root, client, f"{kill_reason} resume_after={resume_after(last, expected)}")
     if rate_limit_error:
+        # §9.2 unchanged: a Codex limit error stops the Codex chain (the Sol route's account is [nv]); the trial itself is
+        # marked rate_limited and carried forward, so the resume after the operator clears STOP.codex re-runs it.
         (root / f"STOP.{client}").write_text(f"{utc_now()} rate_limit_error_in_stream\n")
+    final_turn_end_s = round(candidate - started, 1) if candidate else None
+    diagnosis = None
+    if client == "claude" and (result_at is None or result_at - started >= policy["t_seconds"]):
+        # Decision 1: no result event before T. Record why the session had not finished, for the operator's diagnosis
+        # before the cell continues (for example a background Workflow that never ends).
+        tools: dict[str, int] = {}
+        for name in open_tools.values():
+            tools[str(name)] = tools.get(str(name), 0) + 1
+        diagnosis = {"final_turn_ended": candidate is not None, "final_turn_end_s": final_turn_end_s,
+                     "last_main_event": last_main, "open_main_tool_uses": dict(sorted(tools.items())),
+                     "background_tasks": {"tasks": len(background["tasks"]),
+                                          "types": sorted({str(t) for t in background["tasks"].values()}),
+                                          "events": background["events"], "last_event_s": background["last_event_s"],
+                                          "notifications": background["notifications"]},
+                     "processes_at_last_poll": last_tree, "result_at_s": round(result_at - started, 1) if result_at else None}
     return {"rc": rc, "kill_reason": kill_reason, "kill_at": iso_ms(kill_at) if kill_at else None,
             "duration_s": round(ended - started, 1), "result_at": iso_ms(result_at) if result_at else None,
             "time_to_result_s": round(result_at - started, 1) if result_at else None,
             "post_result_s": round(ended - result_at, 1) if result_at else None,
             "result_before_kill": bool(result_at and (kill_at is None or result_at <= kill_at)),
-            "meter_first": first, "meter_last": last, "meter_readings": readings, "nested": nested_seen,
-            "tree_exes": sorted(exes), "rate_limit_error": rate_limit_error}
+            "result_event": result_info, "final_turn_end_s": final_turn_end_s,
+            "final_turn_end_at": candidate_stamp or (iso_ms(candidate) if candidate else None),
+            "no_result_diagnosis": diagnosis, "meter_first": first, "meter_last": last, "meter_readings": readings,
+            "meter_expected_usage": expected if client == "claude" else None, "nested": nested_seen,
+            "tree_exes": sorted(exes), "rate_limit_error": rate_limit_error, "rate_limited": rate_limited or rate_limit_error}
 
 
 def stream_completed(client: str, stream_path: Path) -> bool:
@@ -511,8 +576,10 @@ def trial_reason(client: str, policy: dict, outcome: dict, completed: bool) -> t
     """(censoring reason or None, post_result_terminated). Under complete-at-result a Claude trial whose result event
     arrived before T and before any kill counts as complete, however the process then ended (grace, T, a window kill);
     a result that arrived only at or after T (written on the timeout's SIGTERM) censors as timeout_after_result; a nested
-    client always censors."""
+    client always censors; a trial that hit a rate limit censors as rate_limited and is re-run (decision 6)."""
     rc, kill = outcome["rc"], outcome["kill_reason"]
+    if outcome.get("rate_limited"):
+        return "rate_limited", False
     if (client == "claude" and policy["policy"] == "complete-at-result" and outcome["result_at"]
             and outcome["result_before_kill"] and result_before_t(policy, outcome) and kill != "nested_client"):
         terminated = bool(kill) or rc in (124, 137, -9, 143, -15)
@@ -576,8 +643,9 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
     try:
         if frozen_sha and frozen_sha != prompt_sha:
             raise Censored("prompt_mismatch")
-        if _stop_flag(root, client):
-            raise Censored("block_stopped")
+        flag = _stop_flag(root, client, cell)
+        if flag:
+            raise Censored("held_for_diagnosis" if flag.name.startswith("HOLD.") else "block_stopped")
         if client == "codex" and test.get("network") not in (None, "", "off"):
             raise Censored("network_on_unsupported_in_pilot")
         registry = cfg.get("registry") or {}
@@ -628,8 +696,9 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
             if lock_fd is None:
                 _defer(root, client, "lock_timeout")
                 raise Censored("lock_timeout")
-            if _stop_flag(root, client):
-                raise Censored("block_stopped")
+            flag = _stop_flag(root, client, cell)
+            if flag:
+                raise Censored("held_for_diagnosis" if flag.name.startswith("HOLD.") else "block_stopped")
             cap = int(cfg.get("claude_session_cap") or CLAUDE_SESSION_CAP)
             launched = {r.get("trial_id") for r in read_jsonl(root / "ledger.jsonl")
                         if r.get("phase") == "launched" and r.get("client") == "claude"}
@@ -637,13 +706,15 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
                 (root / "STOP.claude").write_text(f"{utc_now()} claude session cap {cap} reached\n")
                 raise Censored("claude_cap")
             meter_source = newest_meter_reading()
-            allowed, why = prior_allows(meter_source)
+            expected = run_expected_usage(cfg)
+            allowed, why = headroom_allows(meter_source, expected)
             ledger(root, {**base, "phase": "meter", "at": utc_now(), "allowed": allowed, "why": why,
-                          "claude_sessions_launched_before": len(launched), "cap": cap,
+                          "expected_usage": expected, "claude_sessions_launched_before": len(launched), "cap": cap,
                           "reading": {k: v for k, v in (meter_source or {}).items() if k != "source_private"}})
             if not allowed:
-                _defer(root, client, f"meter_prior {why}")
-                raise Censored("meter_prior")
+                # Decision 6: not enough headroom for this trial's expected usage; it waits for the window reset.
+                _defer(root, client, f"meter_headroom {why} resume_after={resume_after(meter_source, expected)}")
+                raise Censored("meter_headroom")
         # S7 before-snapshot after the lock wait (finding 15), so a change another lane makes while this trial waits
         # is not attributed to it; read until it holds still (another session's plugin sync can be half done).
         before, before_read = stable_s7_snapshot(trial_files)
@@ -664,7 +735,8 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
         else:
             raise Censored(f"unsupported_cell_kind:{kind}")
         exposure = host_argv_exposure(cfg["lexicon"], {os.getpid()})
-        ledger(root, {**base, "phase": "launched", "at": utc_now(), "line_sha256": sha256_bytes(line.encode()),
+        launched_at = utc_now()
+        ledger(root, {**base, "phase": "launched", "at": launched_at, "line_sha256": sha256_bytes(line.encode()),
                       "line_shape": line.replace(trial_id, "<trial_id>").replace(str(Path.home()), "~"),
                       "host_argv_exposure_at_launch": exposure})
         outcome = run_client(root, cfg, client, line, fixture, stream_path, err_path, meter_source)
@@ -674,20 +746,48 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
         exit_row = {**base, "phase": "exit", **result,
                     "completed_stream": completed, "duration_s": outcome["duration_s"],
                     "completion_policy": policy["policy"] if client == "claude" else None, "t_seconds": t_seconds,
+                    "completion_amendment": policy["amendment"] if client == "claude" else None,
                     "terminated_by": outcome["kill_reason"], "kill_at": outcome["kill_at"],
                     "result_at": outcome["result_at"], "time_to_result_s": outcome["time_to_result_s"],
+                    "final_turn_end_s": outcome["final_turn_end_s"], "final_turn_end_at": outcome["final_turn_end_at"],
+                    "result_event": outcome["result_event"], "no_result_diagnosis": outcome["no_result_diagnosis"],
                     "post_result_s": outcome["post_result_s"], "post_result_terminated": post_result_terminated,
                     "meter_first": outcome["meter_first"], "meter_last": outcome["meter_last"],
-                    "meter_readings": outcome["meter_readings"], "nested_clients": outcome["nested"],
-                    "tree_exes": outcome["tree_exes"], "rate_limit_error": outcome["rate_limit_error"],
+                    "meter_readings": outcome["meter_readings"], "meter_expected_usage": outcome["meter_expected_usage"],
+                    "nested_clients": outcome["nested"], "tree_exes": outcome["tree_exes"],
+                    "rate_limit_error": outcome["rate_limit_error"], "rate_limited": outcome["rate_limited"],
                     "stream_sha256": sha256_file(stream_path), "stream_bytes": stream_path.stat().st_size}
-        judged = None
+        if client == "claude" and reason in HOLD_REASONS:
+            # Decision 1: no result event by T. The cell waits until the operator has read this trial's
+            # no_result_diagnosis (for example a background Workflow that never ends) and removed the flag.
+            (root / f"HOLD.{cell}").write_text(f"{utc_now()} {trial_id}: no result event by T = {t_seconds} s ({reason}); "
+                                               "read its no_result_diagnosis in ledger.jsonl, then remove this flag\n")
+            exit_row["held_cell"] = cell
+        judged, rebaselined, rebase_done = None, None, False
         try:
             # A launched trial always gets its exit row: a failure here is recorded, and G4 then fails for want of the
             # host comparison instead of the trial vanishing from the ledger.
             after, after_read = stable_s7_snapshot(trial_files)
             write_json(root / "s7" / f"{trial_id}.after.json", after, 0o600)
-            judged = s7_persistent_change(load_json(cfg["s7_baseline"]), before, after)
+            baseline_now, baseline_path = current_s7_baseline(cfg, root)
+            judged = s7_persistent_change(baseline_now, before, after)
+            exit_row["s7_baseline_used"] = Path(baseline_path).name
+            # Decision 7: a re-baseline recorded while this trial ran (by another chain's trial or block), or a
+            # persistent change this trial saw that the run may still absorb, makes it a re-run; else the run stops.
+            during = rebaselines_between(root, launched_at, utc_now())
+            if judged["persistent"]:
+                new_trust = any(judged["within"]["new_trust"].values()) or any(judged["vs_baseline"]["new_trust"].values())
+                done, why = try_rebaseline(root, judged["vs_baseline"], new_trust, after,
+                                           {"trigger": "trial", "trial_id": trial_id, "cell": cell, "arm": arm})
+                if done:
+                    rebaselined, rebase_done = why, True
+                else:
+                    exit_row["rebaseline_refused"] = why
+            if during and not rebaselined:
+                rebaselined = f"re-baselined during the trial ({str(during[-1].get('baseline', '')).rsplit('/', 1)[-1]})"
+            if rebaselined:
+                result.update({"censored": True, "reason": "host_change_rebaselined"})
+                exit_row.update({**result, "reason_before_rebaseline": reason, "rebaseline": rebaselined})
             host_compare = judged["within"]
             fixture_manifest = tree_manifest(fixture)
             write_json(root / "manifests" / f"{trial_id}.fixture.json", fixture_manifest, 0o600)
@@ -714,11 +814,12 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
             with open(root / "launcher-errors.log", "a") as handle:
                 handle.write(f"{utc_now()} {trial_id} after exit: {traceback.format_exc()}\n")
         ledger(root, {**exit_row, "at": utc_now()})
-        if judged is not None and judged["persistent"]:
+        if judged is not None and judged["persistent"] and not rebase_done:
             vs_base = judged["vs_baseline"]
             (root / "STOP").write_text(f"{utc_now()} host exposure or trust changed during {trial_id}: "
                                        f"{vs_base['changed'][:6]} new_trust={vs_base['new_trust']} "
-                                       f"within={judged['within']['changed'][:6]}\n")
+                                       f"within={judged['within']['changed'][:6]}; "
+                                       f"no in-run re-baseline: {exit_row.get('rebaseline_refused')}\n")
         return result
     except Censored as censor:
         result.update({"censored": True, "reason": censor.reason})

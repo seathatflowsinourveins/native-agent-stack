@@ -38,7 +38,12 @@ CODEX_HOME_REAL = HOME / ".codex"
 
 LANE = "organic-e2e"                  # R10: prompted runs use LANE_PROMPTED
 LANE_PROMPTED = "organic-e2e-prompted"
-T_SECONDS = 900                       # §4.4 / §9.1 (run.json claude_completion.t_seconds overrides it only by amendment)
+# The command center's decisions on v1.1 (CC item task-ns2604-coop-20261006T105529Z), recorded with their numbers in
+# AMENDMENT-v1.1-20261006.md beside the protocol; PROTOCOL-v1.1.md stays verbatim.
+CC_V11_DECISIONS = "task-ns2604-coop-20261006T105529Z"
+PROTOCOL_T_SECONDS = 900              # §4.4 / §9.1 as written; runs prepared without a completion record keep it
+T_SECONDS = 1800                      # decision 1 (finding 3): T is 1,800 s for every cell, CL7b's turn timeout included
+CLAUDE_COMPLETION_DEFAULT = "complete-at-result"   # decision 1: a cell completes only when its result event arrives
 KILL_AFTER = "30s"
 CLAUDE_SESSION_CAP = 14               # §9.1 Cap: every Claude session of one run counts (CL2, CL6, env, probe, canary)
 POST_RESULT_GRACE_S = 30              # complete-at-result policy: grace between a result event and the group kill
@@ -51,24 +56,29 @@ USER_HARNESS_PATHS = (HOME / ".claude/CLAUDE.md", HOME / ".claude/RTK.md", HOME 
 HOST_CHECKOUT_ROOTS = (HOME / "code", HOME / "projects")
 
 
-def stop_flag_names(client: str) -> tuple[str, ...]:
-    """Flags that refuse a client's launches: STOP (any client), STOP.<client>, and DEFER.<client> (a meter or lock
-    refusal: the remaining tests wait for the next window and are carried forward, never consumed)."""
-    return ("STOP", f"STOP.{client}", f"DEFER.{client}")
+def stop_flag_names(client: str, cell: str | None = None) -> tuple[str, ...]:
+    """Flags that refuse a client's launches: STOP (any client), STOP.<client>, DEFER.<client> (a meter or lock
+    refusal: the remaining tests wait for the next window and are carried forward, never consumed) and, for a cell,
+    HOLD.<cell> (decision 1: a Claude trial with no result event by T holds its cell until the operator has read the
+    trial's no_result_diagnosis and removed the flag)."""
+    return ("STOP", f"STOP.{client}", f"DEFER.{client}") + ((f"HOLD.{cell}",) if cell else ())
 
 
-# Exit reasons whose test pilot.py carries forward on resume, as it does a test refused before launch (finding 4): a
-# Claude trial the launcher killed at its own first in-stream meter reading (the §9.1 prior) never did the task. The
+# Exit reasons whose test pilot.py carries forward on resume, as it does a test refused before launch (finding 4). The
 # session still counts toward the cap of 14 (the launcher counts every launched Claude session), and the grader keeps
 # such a trial out of the session-content gates (G2, G3, G5, G6) while containment, S7 and kept-file gates still apply.
-CARRY_FORWARD_REASONS = ("meter_prior_first_event",)
+# - meter_headroom_first_event (meter_prior_first_event before the amendment): killed at the trial's own first
+#   in-stream meter reading, so it never did the task;
+# - rate_limited (decision 6): the trial hit a rate limit, so it is marked and re-run;
+# - host_change_rebaselined (decision 7): the host changed while it ran and the run re-baselined, so it is re-run.
+CARRY_FORWARD_REASONS = ("meter_prior_first_event", "meter_headroom_first_event", "rate_limited", "host_change_rebaselined")
 
-# §9.1 Claude meter. The prior is the pilot's start rule; the kill rule censors a running trial.
-PRIOR_FIVE_HOUR = 0.50
-PRIOR_SEVEN_DAY = 0.75
-KILL_FIVE_HOUR = 0.80
-KILL_SEVEN_DAY = 0.85
-KILL_FIVE_HOUR_RISE = 0.15
+# §9.1 Claude meter, amended by decision 6. A start compares the trial's expected usage with the remaining headroom of
+# each window (1.0 minus its utilization; a window whose resetsAt has passed counts as fresh). There is no quiet-account
+# rule and no kill on another session's use: the old prior (0.50 / 0.75), kill thresholds (0.80 / 0.85) and the +0.15
+# rise guard read the account-wide meter. A trial that hits a rate limit is marked rate_limited and re-run.
+EXPECTED_TRIAL_USAGE = 0.15           # per window, until prepare.py --claude-expected-usage sets the run's own value
+METER_CEILING = 1.0                   # a window's limit (utilization 1.0)
 METER_MAX_AGE_S = 30 * 60
 LOCK_WAIT_S = 3600
 
@@ -127,6 +137,22 @@ CLI_PROGRAMS = {
     "mineru": "mineru", "gh": "gh", "git": "git", "wt": "worktrunk",
 }
 CLI_WRAPPERS = ("rtk", "env", "sudo", "nohup", "command", "exec", "time", "nice")
+
+# Decision 2 (finding 17): a CLI item counts as exposed in a trial only when a native surface that the CLI's own upstream
+# installer put in place is loaded in that session (a skill, or a plugin with its skills and hooks); presence on PATH
+# alone is not exposure, so such a trial is PATH-only and stays out of the item's OIR. Checked against the session's
+# own listing: the Claude init (plugins, skills) and the Codex rollout's world_state skills catalog. Sources:
+# - mineru: MinerU's own skill (opendatalab/MinerU skills/mineru at c221cc41, installed by the supported --manifest
+#   route; docs/decisions/2026-10-04-2604-e2e-fix-wave-g3-code-docs.md);
+# - worktrunk: Worktrunk's own Claude and Codex plugins (`wt config plugins ... install`; the g7-git fix-wave record).
+# Not listed, so PATH-only: gh (gh-fix-ci and gh-address-comments come from openai/skills, not from gh's installer)
+# and rtk on Codex (`rtk init -g` registers a hook the clone leaves untrusted, §12.3, and Codex does not expand the
+# @RTK.md line, §2.2); on Claude rtk is the hook item hook/claude/rtk, not a CLI item.
+CLI_NATIVE_SURFACES = {
+    "mineru": (("skill", "mineru"),),
+    "worktrunk": (("plugin", "worktrunk"), ("skill", "worktrunk")),
+}
+CLI_TASK_KINDS = ("cli", "cli+skill")
 
 # MCP server names as the clients spell them, mapped to the suite's item names.
 MCP_SERVER_ITEMS = {
@@ -476,6 +502,66 @@ def s7_compare(before: dict, after: dict) -> dict:
 
 
 # ---------------------------------------------------------------------------------------------------------------------
+# In-run re-baseline (decision 7: adopted where it costs at most one extra cell per arm). A persistent host change no
+# longer always stops the run: the first one, unless it touches a key in REBASELINE_REFUSED_S7_KEYS or adds a trusted
+# project, becomes the run's new S7 baseline, and the trials that were running when it happened are carried forward
+# and re-run: at most the Claude chain's one trial and the Codex block in flight (up to its -j trials, 3 for
+# codex-native and codex-env in the pilot). A change found between blocks costs no trial. A second persistent change in
+# the same run, or a refused key, still stops the run, as before.
+
+REBASELINE_LOG = "rebaselines.jsonl"
+REBASELINES_PER_RUN = 1
+# Changes a re-baseline never absorbs: the env arm's single factor (§2.2), the Claude settings file whose hash the
+# native arm's probe rests on (§2.1: a change needs a new probe), and every trust-bearing key. s7_compare's new_trust
+# counts only newly trusted projects, so hook trust (hooks_state), the trust fields of existing projects, removed
+# projects and the Codex project table are refused by path.
+REBASELINE_REFUSED_S7_KEYS = ("/files/claude/CLAUDE.md", "/files/codex/AGENTS.md", "/files/claude/settings.json",
+                              "/codex_config/hooks_state", "/codex_config/projects", "/codex_config/trusted_projects",
+                              "/claude_json/trusted_projects", "/claude_json/trust_fields_of_existing_project",
+                              "/claude_json/project_removed")
+
+
+def current_s7_baseline(cfg: dict, root: Path) -> tuple[dict, str]:
+    """(snapshot, path) of the S7 baseline in force: the newest in-run re-baseline, else stage 1's."""
+    rows = [r for r in read_jsonl(Path(root) / REBASELINE_LOG) if r.get("baseline")]
+    path = rows[-1]["baseline"] if rows else cfg["s7_baseline"]
+    return load_json(path), path
+
+
+def rebaselines_between(root: Path, since_iso: str | None, until_iso: str | None) -> list[dict]:
+    """Re-baselines recorded in [since, until] (ISO stamps compare as text)."""
+    return [r for r in read_jsonl(Path(root) / REBASELINE_LOG)
+            if (not since_iso or r.get("at", "") >= since_iso) and (not until_iso or r.get("at", "") <= until_iso)]
+
+
+def try_rebaseline(root: Path, vs_baseline: dict, new_trust: bool, after: dict, trigger: dict) -> tuple[bool, str]:
+    """Record an in-run re-baseline when decision 7 allows it, under a lock (the Claude and Codex chains run in
+    parallel). Returns (re-baselined, why). `after` becomes the baseline; `trigger` names the trial or block."""
+    root = Path(root)
+    if new_trust:
+        return False, "a new trust entry needs a reviewed baseline"
+    refused = sorted({key for path in vs_baseline.get("changed") or [] for key in REBASELINE_REFUSED_S7_KEYS
+                      if path == key or path.startswith(key + "/")})
+    if refused:
+        return False, f"a change a re-baseline never absorbs: {refused}"
+    lock_path = root / "rebaselines.lock"
+    with open(lock_path, "a") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        try:
+            rows = read_jsonl(root / REBASELINE_LOG)
+            if len(rows) >= REBASELINES_PER_RUN:
+                return False, f"the run already used its {REBASELINES_PER_RUN} in-run re-baseline"
+            path = root / "s7" / f"baseline-r{len(rows) + 1}.json"
+            sha = write_json(path, s7_host_only(after), 0o600)
+            append_jsonl(root / REBASELINE_LOG, {"at": utc_now(), "baseline": str(path), "baseline_sha256": sha,
+                                                 "changed": (vs_baseline.get("changed") or [])[:20], **trigger,
+                                                 "decision": f"{CC_V11_DECISIONS} #7"})
+            return True, f"re-baselined to {path.name}"
+        finally:
+            fcntl.flock(lock, fcntl.LOCK_UN)
+
+
+# ---------------------------------------------------------------------------------------------------------------------
 # Meter (§9.1): rate_limit_event readings from Claude streams.
 
 def rate_limit_readings(events) -> list[dict]:
@@ -547,15 +633,59 @@ def newest_meter_reading(search_roots=None, max_age_s: int = METER_MAX_AGE_S) ->
     return None
 
 
-def prior_allows(reading: dict | None) -> tuple[bool, str]:
+def window_utilization(reading: dict, window: str, now: float | None = None) -> float | None:
+    """A window's utilization in a reading; a window whose resetsAt (epoch seconds) has passed counts as fresh (0.0),
+    so a reading taken before its own window reset no longer blocks starts until the next stream (decision 6)."""
+    value = reading.get(window)
+    resets = reading.get(f"{window}_resets_at")
+    if value is not None and isinstance(resets, (int, float)) and resets <= (time.time() if now is None else now):
+        return 0.0
+    return value
+
+
+def run_expected_usage(cfg: dict | None) -> float:
+    """The run's expected per-trial usage of each window (run.json claude_meter.expected_usage), else the default."""
+    value = ((cfg or {}).get("claude_meter") or {}).get("expected_usage")
+    return float(value) if isinstance(value, (int, float)) else EXPECTED_TRIAL_USAGE
+
+
+def headroom_allows(reading: dict | None, expected: float = EXPECTED_TRIAL_USAGE, now: float | None = None) -> tuple[bool, str]:
+    """Decision 6: start when the trial's expected usage fits in the remaining headroom of both windows. Another
+    session's use only matters through the headroom it leaves; the account need not be quiet."""
     if not reading:
         return True, "no-recent-stream: the trial's own first event decides"
-    five, seven = reading.get("five_hour"), reading.get("seven_day")
+    five, seven = window_utilization(reading, "five_hour", now), window_utilization(reading, "seven_day", now)
     if five is None or seven is None:
         return True, "reading-incomplete: the trial's own first event decides"
-    if five < PRIOR_FIVE_HOUR and seven < PRIOR_SEVEN_DAY:
-        return True, f"prior-ok five_hour={five} seven_day={seven}"
-    return False, f"prior-refused five_hour={five} seven_day={seven}"
+    head_five, head_seven = round(METER_CEILING - five, 4), round(METER_CEILING - seven, 4)
+    state = f"five_hour={five} seven_day={seven} headroom={head_five}/{head_seven} expected={expected}"
+    if expected <= head_five and expected <= head_seven:
+        return True, f"headroom-ok {state}"
+    return False, f"headroom-short {state}"
+
+
+def resume_after(reading: dict | None, expected: float = EXPECTED_TRIAL_USAGE) -> str | None:
+    """When a deferred start fits again: the latest resetsAt among the windows short of headroom (ISO), or None. Limits
+    never gate for good: pilot.py clears DEFER.claude on resume once the newest reading allows a start."""
+    stamps = []
+    for window in ("five_hour", "seven_day"):
+        value, resets = (reading or {}).get(window), (reading or {}).get(f"{window}_resets_at")
+        if value is not None and isinstance(resets, (int, float)) and resets > time.time() \
+                and expected > round(METER_CEILING - value, 4):
+            stamps.append(resets)
+    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(max(stamps))) if stamps else None
+
+
+def rate_limit_hit(event: dict) -> bool:
+    """Decision 6: a Claude stream event that shows the trial hit a rate limit: a rate_limit_event with status
+    rejected, or an error result naming a limit (smoke-20261006c's probe: utilization 1.08, status rejected, then the
+    result "You've hit your session limit")."""
+    if event.get("type") == "rate_limit_event":
+        return (event.get("rate_limit_info") or {}).get("status") == "rejected"
+    if event.get("type") == "result" and event.get("is_error"):
+        return bool(re.search(r"session limit|usage limit|rate limit|rate_limit|too many requests|\b429\b",
+                              str(event.get("result") or ""), re.I))
+    return False
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -584,9 +714,20 @@ def gateway_get(path: str, timeout: int = 30):
         return json.load(response)
 
 
+def forwarded_effort_fields(pipeline) -> dict | None:
+    """Decision 8 (RP4, G11): from a call log's pipeline details keep only the effort fields of the request the gateway
+    forwarded, never the rest of the payload. None when the gateway exposed no pipeline details for the row."""
+    if not isinstance(pipeline, dict):
+        return None
+    request = pipeline.get("providerRequest") or {}
+    reasoning = request.get("reasoning") if isinstance(request.get("reasoning"), dict) else {}
+    return {"reasoning.effort": reasoning.get("effort"), "reasoning_effort": request.get("reasoning_effort")}
+
+
 def gateway_calls_for_threads(thread_ids: set[str], since_iso: str, until_iso: str, max_rows: int = 5000) -> dict:
     """Call-log rows in [since, until] whose request body's client_metadata.thread_id is one of thread_ids. Only the
-    fields named here are kept (never the account, the request input or the response)."""
+    fields named here are kept (never the account, the request input or the response); from the pipeline details,
+    which the co-op turns on only for pilot runs (decision 8), only the forwarded effort fields."""
     found, scanned, offset, errors = {}, 0, 0, []
     while scanned < max_rows:
         try:
@@ -612,14 +753,12 @@ def gateway_calls_for_threads(thread_ids: set[str], since_iso: str, until_iso: s
             thread = meta.get("thread_id")
             if thread in thread_ids:
                 pipeline = detail.get("pipelinePayloads")
-                forwarded = None
-                if isinstance(pipeline, dict):
-                    forwarded = ((pipeline.get("providerRequest") or {}).get("reasoning"))
                 found.setdefault(thread, []).append({
                     "id": row.get("id"), "timestamp": stamp, "path": row.get("path"), "status": row.get("status"),
                     "requested_model": row.get("requestedModel"), "backend_model": row.get("model"),
                     "provider": row.get("provider"), "received_effort": (body.get("reasoning") or {}).get("effort"),
-                    "received_service_tier": body.get("service_tier"), "forwarded_reasoning": forwarded,
+                    "received_service_tier": body.get("service_tier"),
+                    "forwarded_effort": forwarded_effort_fields(pipeline),
                     "pipeline_exposed": pipeline is not None, "error": bool(row.get("error")),
                     "tokens": row.get("tokens")})
         if (rows[-1].get("timestamp") or "") < since_iso:
