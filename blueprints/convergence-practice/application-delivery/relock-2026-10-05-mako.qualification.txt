@@ -1,0 +1,60 @@
+Actual returned-output capture from native commands; private paths replaced by placeholders.
+
+uv lock --upgrade-package mako==1.4.2:
+Using CPython 3.13.16 interpreter at: <python>
+Resolved 32 packages in 270ms
+Updated mako v1.4.1 -> v1.4.2
+
+uv lock --check:
+Using CPython 3.13.16 interpreter at: <python>
+Resolved 32 packages in 1ms
+
+uv sync --frozen --no-build (owned environment):
+Using CPython 3.13.16 interpreter at: <python>
+Creating virtual environment at: <owned-scratch>/backend-venv
+Downloading pydantic-core (2.0MiB)
+Downloading sqlalchemy (3.3MiB)
+Downloading pygments (1.2MiB)
+Downloading psycopg-binary (5.0MiB)
+ Downloaded pygments
+ Downloaded pydantic-core
+ Downloaded sqlalchemy
+ Downloaded psycopg-binary
+Prepared 25 packages in 476ms
+Installed 28 packages in 78ms
+ + alembic==1.20.0
+ + annotated-doc==0.0.5
+ + annotated-types==0.8.0
+ + anyio==4.15.1
+ + click==8.5.0
+ + fastapi==0.141.1
+ + greenlet==3.5.6
+ + h11==0.16.0
+ + httpcore2==2.13.0
+ + httpx2==2.13.0
+ + idna==3.20
+ + iniconfig==2.3.0
+ + mako==1.4.2
+ + markupsafe==3.0.3
+ + packaging==26.3
+ + pluggy==1.6.0
+ + psycopg==3.3.6
+ + psycopg-binary==3.3.6
+ + pydantic==2.13.5
+ + pydantic-core==2.46.5
+ + pygments==2.21.0
+ + pytest==9.1.1
+ + sqlalchemy==2.0.54
+ + starlette==1.6.0
+ + truststore==0.10.4
+ + typing-extensions==4.16.0
+ + typing-inspection==0.4.4
+ + uvicorn==0.53.0
+
+uv pip check:
+Using Python 3.13.16 environment at: <owned-scratch>/backend-venv
+Checked 28 packages in 40ms
+All installed packages are compatible
+
+Native import/render smoke:
+Mako 1.4.2 Alembic 1.20.0 native imports/render passed; no database/provider request

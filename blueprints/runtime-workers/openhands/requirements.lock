@@ -185,9 +185,9 @@ frozenlist==1.8.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
     --hash=sha256:b3210649ee28062ea6099cfda39e147fa1bc039583c8ee4481cb7811e2448c51 \
     --hash=sha256:cba69cb73723c3f329622e34bdbf5ce1f80c21c290ff04256cff1cd3c2036ed2 \
     --hash=sha256:fb30f9626572a76dfe4293c7194a09fb1fe93ba94c7d4f720dfae3b646b45027
-fsspec==2025.9.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
-    --hash=sha256:19fd429483d25d28b65ec68f9f4adc16c17ea2c7c7bf54ec61360d478fb19c19 \
-    --hash=sha256:530dc2a2af60a414a832059574df4a6e10cce927f6f4a78209390fe38955cfb7
+fsspec==2026.6.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:02e0b71817df9b2169dc30a16832045764def1191b43dcff5bb85bdee212d2a1 \
+    --hash=sha256:f5bac145310fe30e16e1471bd6840b2d990d609e872251d7e674241822abf01a
 func-timeout==4.3.5 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
     --hash=sha256:74cd3c428ec94f4edfba81f9b2f14904846d5ffccc27c92433b8b5939b5575dd
 google-api-core==2.26.0 ; python_full_version < '3.13' and platform_machine == 'x86_64' and sys_platform == 'linux' \
@@ -371,19 +371,21 @@ mdurl==0.1.2 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
 more-itertools==10.8.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
     --hash=sha256:52d4362373dcf7c52546bc4af9a86ee7c4579df9a8dc268be0a2f949d376cc9b \
     --hash=sha256:f638ddf8a1a0d134181275fb5d58b086ead7c6a72429ad725c67503f13ba30bd
-multidict==6.7.0 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
-    --hash=sha256:123e2a72e20537add2f33a79e605f6191fba2afda4cbb876e35c1a7074298a7d \
-    --hash=sha256:171b73bd4ee683d307599b66793ac80981b06f069b62eea1c9e29c9241aa66b0 \
-    --hash=sha256:18706cc31dbf402a7945916dd5cddf160251b6dab8a2c5f3d6d5a55949f676b3 \
-    --hash=sha256:394fc5c42a333c9ffc3e421a4c85e08580d990e08b99f6bf35b4132114c5dcb3 \
-    --hash=sha256:3e8bfdd0e487acf992407a140d2589fe598238eaeffa3da8448d63a63cd363f8 \
-    --hash=sha256:94218fcec4d72bc61df51c198d098ce2b378e0ccbac41ddbed5ef44092913288 \
-    --hash=sha256:9fe04da3f79387f450fd0061d4dd2e45a72749d31bf634aecc9e27f24fdc4b3f \
-    --hash=sha256:9ff96e8815eecacc6645da76c413eb3b3d34cfca256c70b16b286a687d013c32 \
-    --hash=sha256:c6e99d9a65ca282e578dfea819cfa9c0a62b2499d8677392e09feaf305e9e6f5 \
-    --hash=sha256:caf53b15b1b7df9fbd0709aa01409000a2b4dd03a5f6f5cc548183c7c8f8b63c \
-    --hash=sha256:d1bed1b467ef657f2a0ae62844a607909ef1c6889562de5e1d505f74457d0b96 \
-    --hash=sha256:f0feece2ef8ebc42ed9e2e8c78fc4aa3cf455733b507c09ef7406364c94376c6
+multidict==6.9.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
+    --hash=sha256:0f06e60fa190aa7abd0914c2a766736fdc8e9f34878c4346338534b73d1b20e2 \
+    --hash=sha256:475d04d5192eba487a3e2f935976340baa24529046e9c1c9c7a3b7bf80445ae1 \
+    --hash=sha256:6441cc837aea58be7d9baef1b2383eb8311ab9303f500f99ac90b584cd78bb14 \
+    --hash=sha256:6b7e54fd883671d1a8810704851c044b7173287c552b9f5c3d9e0eb9f00ae194 \
+    --hash=sha256:79da2491348b30810728050b4a8ec0416f85884125c2fd44655b3d01150d9c3e \
+    --hash=sha256:7bf6478188f4e47bf5686e8a33da4ae28bf43b1b2528d9ee144d28492bfac60b \
+    --hash=sha256:7fd79c521f6290c69125fa2b85fa65d9e657e6a8ffaf722dc881b926bef4aa5c \
+    --hash=sha256:8b193bf7a443c97d81c47052f60c486071a4bdef4a573fa2514f920089414d45 \
+    --hash=sha256:976fd7689d69ec78d67d31d38d396d8adb562f7e8368279f76aed4aa451fa06d \
+    --hash=sha256:9c62e71e6289d78c0108d8aeb495f8bd3cad4bc1632fedddc9297ddf287ecc20 \
+    --hash=sha256:b69651732c64afb691e50cdc3387cae305e0eeff8804fe3e3ce203876494932a \
+    --hash=sha256:c148e8b596000dd3e4bfe206e70f3e666be18d72032e0012555f2373c52e35d6 \
+    --hash=sha256:ecc89dbd4155b2f8a47f4bbd89242a35ed15e8e0ec581cab5ac65fa38407329d \
+    --hash=sha256:f2524ec55b3e65cbe235a8b3c36e2af3b635be02ed05e20c94e70c5c943c009e
 oauthlib==3.3.1 ; platform_machine == 'x86_64' and sys_platform == 'linux' \
     --hash=sha256:0f0f8aa759826a193cf66c12ea1af1637f87b9b4622d46e866952bb022e538c9 \
     --hash=sha256:88119c938d2b8fb88561af5f6ee0eec8cc8d552b7bb1f712743136eb7523b7a1

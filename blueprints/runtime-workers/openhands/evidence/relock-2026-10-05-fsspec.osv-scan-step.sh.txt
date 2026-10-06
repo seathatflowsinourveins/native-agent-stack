@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Documentary copy of #562's ordinary/frozen OSV scan step, with RTK tracking.
+# Source: native-stack@74cc5468:blueprints/runtime-workers/openhands/evidence/
+# relock-2026-09-30-litellm.osv-scan-step.sh.txt; current security-scan.yml.
+# Usage: bash <script> <OSV-Scanner 2.6.0 binary> <tree> <out-prefix> <rtk-binary>
+# Script exit0 means both native exits were captured, not that both passed.
+set -u
+bin=$1; tree=$2; out=$3; RTK=$4
+cd "$tree" || exit 2
+inventory=.github/osv-scanner-lockfiles.json
+frozen_config=.github/osv-scanner-frozen-macos.toml
+mapfile -t lockfiles < <("$RTK" proxy jq -r '.lockfiles[] | select(has("config") | not) | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
+mapfile -t frozen < <("$RTK" proxy jq -r --arg config "$frozen_config" '.lockfiles[] | select(.config == $config) | "--lockfile=\(.parser // ""):\(.path)"' "$inventory")
+echo "ordinary entries ${#lockfiles[@]}; frozen entries ${#frozen[@]}"
+"$RTK" proxy "$bin" scan source --config .github/osv-scanner.toml --no-resolve "${lockfiles[@]}" > "$out.ordinary.txt" 2>&1
+ordinary=$?
+echo "ordinary scan exit: $ordinary"
+"$RTK" proxy "$bin" scan source --config "$frozen_config" --no-resolve "${frozen[@]}" > "$out.frozen.txt" 2>&1
+frozen_status=$?
+echo "frozen scan exit: $frozen_status"
+"$RTK" sed -i -e "s#$tree#<scan-root>#g" -e 's#owner: bc, session native-agent-stack-bc#owner: <previous owner>#g' "$out.ordinary.txt" "$out.frozen.txt"
+"$RTK" rg '^Total [0-9]+ package|^\| https://osv.dev/' "$out.ordinary.txt" "$out.frozen.txt" || true
+"$RTK" sha256sum "$out.ordinary.txt" "$out.frozen.txt"
+exit 0

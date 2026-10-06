@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "record": "Targeted Mako production backend lock relock and isolated native qualification",
+  "evidence_class": "local_integration",
+  "base_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "authorization": "J-FSSPEC extension2, same PR",
+  "lock": "blueprints/convergence-practice/application-delivery/uv.lock",
+  "before_sha256": "552d8834e745d7c91daa15e47c5f6d0cd9063db18c98790d2f1af05038f7417d",
+  "after_sha256": "0f5e1fbdb0aaa20697eda0f3721610275bd2f80e7223b63993b84ec21d7f6b50",
+  "moved_pins": [
+    {
+      "package": "mako",
+      "before": "1.4.1",
+      "after": "1.4.2",
+      "advisory": "GHSA-5639-2j2p-m4mx"
+    }
+  ],
+  "other_package_blocks_unchanged": true,
+  "native_lock_format_revision": {
+    "before": 3,
+    "after": 5,
+    "reason": "Native uv0.12.22 writer; no other package move"
+  },
+  "metadata_review": {
+    "evidence_class": "source_review",
+    "app_registry_pairs": 31,
+    "parent": {
+      "package": "alembic",
+      "version": "1.20.0",
+      "requirement": "Mako",
+      "unconditional": true,
+      "allows_fixed": true,
+      "source": "https://pypi.org/pypi/alembic/1.20.0/json"
+    },
+    "incompatible_caps": []
+  },
+  "native_client": {
+    "uv": "0.12.22",
+    "python": "3.13.16"
+  },
+  "commands": [
+    {
+      "command": "uv lock --project <project> --upgrade-package mako==1.4.2",
+      "exit": 0,
+      "returned_output": {
+        "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-mako.qualification.txt",
+        "sha256": "64c946f3c9adf9ced4b7b3ee2b1dd9df67a4ba8eac35ca55a67385800f8dec6c",
+        "bytes": 1609
+      }
+    },
+    {
+      "command": "uv lock --project <project> --check",
+      "exit": 0,
+      "returned_output": {
+        "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-mako.qualification.txt",
+        "sha256": "64c946f3c9adf9ced4b7b3ee2b1dd9df67a4ba8eac35ca55a67385800f8dec6c",
+        "bytes": 1609
+      }
+    },
+    {
+      "command": "UV_PROJECT_ENVIRONMENT=<owned-venv> uv sync --project <project> --frozen --no-build",
+      "exit": 0,
+      "returned_output": {
+        "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-mako.qualification.txt",
+        "sha256": "64c946f3c9adf9ced4b7b3ee2b1dd9df67a4ba8eac35ca55a67385800f8dec6c",
+        "bytes": 1609
+      }
+    },
+    {
+      "command": "uv pip check --python <owned-venv>/bin/python",
+      "exit": 0,
+      "packages_checked": 28,
+      "returned_output": {
+        "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-mako.qualification.txt",
+        "sha256": "64c946f3c9adf9ced4b7b3ee2b1dd9df67a4ba8eac35ca55a67385800f8dec6c",
+        "bytes": 1609
+      }
+    },
+    {
+      "command": "Native Mako/Alembic imports, exact Mako1.4.2 and Template.render smoke",
+      "exit": 0,
+      "returned_output": {
+        "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-mako.qualification.txt",
+        "sha256": "64c946f3c9adf9ced4b7b3ee2b1dd9df67a4ba8eac35ca55a67385800f8dec6c",
+        "bytes": 1609
+      }
+    },
+    {
+      "command": "Native PyPI hash check on frozen uv export",
+      "exit": 0,
+      "verified_hashes": 2,
+      "returned_output": {
+        "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-mako.hash-check.txt",
+        "sha256": "6910a7464a95739d21d059212e02eb4ea4063efdd294b5a56d466e72e6280368",
+        "bytes": 395
+      }
+    }
+  ],
+  "sources": [
+    "https://github.com/advisories/GHSA-5639-2j2p-m4mx",
+    "https://github.com/sqlalchemy/mako/releases/tag/rel_1_4_2",
+    "https://pypi.org/pypi/Mako/1.4.2/json",
+    "https://github.com/astral-sh/uv/releases/tag/0.12.22",
+    "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:blueprints/convergence-practice/application-delivery/Makefile:3"
+  ],
+  "osv_after_rulings": {
+    "ordinary_exit": 0,
+    "frozen_exit": 0
+  },
+  "limits": "Isolated install/import/render integration only; no unchanged upstream suite, live database, PostgreSQL setup, provider/model call, browser/API E2E or hosted CI acceptance.",
+  "overturn": "Any additional package move, incompatible dependency, failed install/check or fresh advisory reopens acceptance.",
+  "output_sanitization": "Known private interpreter/worktree/store paths replaced by explicit placeholders; captured command output retained, not another run."
+}

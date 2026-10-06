@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Documentary #562 guard controls; defects exist only in owned one-use copies.
+# Source: native-stack@74cc5468:.../relock-2026-09-30-litellm.guard-controls.sh.txt.
+# Usage: bash <script> <owned-scratch> <tree> <rtk-binary> <uv-binary>
+# The digest pipeline targets the existing digest assertion; the whole two-module
+# suite is separately executed on the actual tree. No self-written test oracle.
+set -uo pipefail
+R=$1; W=$2; RTK=$3; UV=$4; D=$R/mutants; rc=0
+OH=blueprints/runtime-workers/openhands
+"$RTK" mkdir -p "$D" "$R/tmp"
+copy() {
+  "$RTK" mkdir -p "$D/$1"
+  (cd "$W" && "$RTK" proxy tar --exclude=.git --exclude=.local -cf - .) | "$RTK" proxy tar -xf - -C "$D/$1"
+}
+result() { echo "$1 actual exit: $2; expected: $3"; [ "$2" -eq "$3" ] || rc=1; }
+check() {
+  (cd "$D/$1" && TMPDIR="$R/tmp" PYTHONDONTWRITEBYTECODE=1 "$RTK" python3 -B -m unittest tests.test_openhands_lock_binding) > "$D/$1.out" 2>&1
+  code=$?; "$RTK" tail -7 "$D/$1.out"; result "$1" "$code" "$2"
+}
+copy clean; check clean 0; "$RTK" rm -rf "$D/clean"
+copy stale-receipt
+"$RTK" sed -i 's#osv-openhands-fsspec-relock-20261005.json#osv-openhands-litellm-relock-20260930.json#' "$D/stale-receipt/tests/test_osv_lockfile_coverage.py"
+check stale-receipt 1; "$RTK" rm -rf "$D/stale-receipt"
+copy zero-pins
+"$RTK" sed -i 's#"requirements_sha256": "[0-9a-f]\{64\}"#"requirements_sha256": "0000000000000000000000000000000000000000000000000000000000000000"#' "$D/zero-pins/$OH/pins.json"
+check zero-pins 1; "$RTK" rm -rf "$D/zero-pins"
+copy other-lock
+"$RTK" sed -i 's#"evidence": "evidence/receipts/osv-frozen-macos-source-map-js-20261005.json"#"evidence": "evidence/receipts/osv-openhands-fsspec-relock-20261005.json"#' "$D/other-lock/tests/test_osv_lockfile_coverage.py"
+check other-lock 1; "$RTK" rm -rf "$D/other-lock"
+copy digest-mutation
+"$RTK" sed -i 's#2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401#0000000000000000000000000000000000000000000000000000000000000000#' "$D/digest-mutation/tests/test_osv_lockfile_coverage.py"
+(set -o pipefail; cd "$D/digest-mutation"; TMPDIR="$R/tmp" PYTHONDONTWRITEBYTECODE=1 "$RTK" python3 -B -m unittest tests.test_osv_lockfile_coverage.AllowedLockTests.test_every_allowed_lock_matches_its_reviewed_digest 2>&1 | "$RTK" tail -8)
+code=$?; result digest-pipeline "$code" 1; "$RTK" rm -rf "$D/digest-mutation"
+copy bad-lock
+"$RTK" proxy awk -v z=0000000000000000000000000000000000000000000000000000000000000000 '/^fsspec==/ {inl=1; print; next} inl && /^[[:space:]]+--hash=sha256:/ {sub(/sha256:[0-9a-f]+/, "sha256:" z); print; next} {inl=0; print}' "$D/bad-lock/$OH/requirements.lock" > "$D/bad-lock/lock.new"
+"$RTK" mv "$D/bad-lock/lock.new" "$D/bad-lock/$OH/requirements.lock"
+"$RTK" python3 "$W/$OH/evidence/relock-2026-10-05-fsspec.hash-check.py.txt" "$D/bad-lock/$OH/requirements.lock" > "$D/bad-hash.out" 2>&1
+code=$?; "$RTK" cat "$D/bad-hash.out"; result bad-hash "$code" 1
+"$RTK" bash "$W/$OH/evidence/relock-2026-10-05-fsspec.install-check.sh.txt" "$R" "$D/bad-lock" "$RTK" "$UV" > "$D/bad-install.out" 2>&1
+code=$?; "$RTK" rg 'runtime lock install exit|uv pip check exit|done, status' "$D/bad-install.out"; result bad-install "$code" 1
+"$RTK" rm -rf "$D/bad-lock"
+echo "guard controls status $rc"
+exit "$rc"

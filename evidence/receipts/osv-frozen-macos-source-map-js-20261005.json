@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "record": "Source review of the immutable macOS application dependency evidence",
+  "evidence_class": "source_review",
+  "checked_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "observed_utc": "2026-10-06T00:47:46Z",
+  "lock": "evidence/artifacts/macos-application-20260924/variant/pnpm-lock.yaml",
+  "sha256": "f1c707b8295e85bd396e49b990de92dc82bc0d58eca1e4e4bef31262d9898cd2",
+  "advisories": ["GHSA-vcvr-r3jv-pc5j", "GHSA-68fv-2mgg-jv7q"],
+  "ignore_until": "2026-12-24",
+  "authorization": "Co-op J-FSSPEC RULINGS, command-center task-ns2604-coop-20261006T003954Z, ruling1: dated isolated-config exception; preserve lock bytes",
+  "carried_forward_review": "evidence/receipts/osv-urllib3-next-20260930.json",
+  "sources": [
+    "https://github.com/advisories/GHSA-68fv-2mgg-jv7q",
+    "7rulnik/source-map-js@428d49f6b1e1614f082b7706fa879a3d9c64f728:lib/source-map-consumer.js:14,944-961,1166",
+    "7rulnik/source-map-js@428d49f6b1e1614f082b7706fa879a3d9c64f728:lib/source-node.js:115",
+    "https://github.com/7rulnik/source-map-js/pull/79",
+    "native-agent-stack@8fc86119eacfd5be9b8a139e1ed167d85748091b:.github/osv-scanner-frozen-macos.toml:13",
+    "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:tests/test_frozen_macos_variant_no_use.py:47"
+  ],
+  "reachability": "Caller-supplied indexed source maps select IndexedSourceMapConsumer; unchecked section offsets reach SourceNode reconstruction loops. PR79 also fixes nested getter/generator amplification. The retained directory has executable package scripts and historical scratch execution, but inspected current supported installers/build/server routes use the maintained application directory and current artifact consumers hash or scan metadata. No current supported route consuming the frozen variant was found in those inspected routes.",
+  "scope": "Exception only under .github/osv-scanner-frozen-macos.toml for this one digest-bound inventory entry; no ordinary-config source-map-js exception",
+  "limits": "Source review, not universal unreachability, safe manual replay, fresh browser execution or host-process observation. Indirect loaders, globs, fragmented paths and external commands exceed the no-use guard's demonstrated boundary.",
+  "overturn": "Remove/re-review before replay/manual installation, a new consuming route, adoption, changed bytes or expiry. The .frozen rename is a separately tracked follow-up."
+}

@@ -4477,13 +4477,13 @@
     },
     {
       "path": ".github/osv-scanner-frozen-macos.toml",
-      "sha256": "6b093b4320cc481c4b1d5722648ab37fba4a5b50d0553c62c936e1a78e0edbf2",
-      "bytes": 2547
+      "sha256": "b5cda8737d918b227e31c71d3394d250d33ba30675eff8b27d7a467d650bd9d4",
+      "bytes": 3574
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
-      "sha256": "c82191344fda77d094d53c20774cd3281b37e2de88f94e9dabb48fb937c476de",
-      "bytes": 13817
+      "sha256": "6ac40e443963ca0bc93d75e440c697268682bd11810ea6203794d063a4d6be76",
+      "bytes": 15075
     },
     {
       "path": ".github/osv-scanner.toml",
@@ -5247,13 +5247,13 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
-      "sha256": "eb2ceb9c57ed3f11125a5091a85bf19dcb10e364dfb2b67d8c1b444970b300f3",
-      "bytes": 25990
+      "sha256": "a570469dde6b81515348892eb064a0136e5f84be7680f940ef87a4790bee627b",
+      "bytes": 26007
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/experiment.json",
-      "sha256": "9372ee1635b6c818ca31fc3d73d33802d85293218bcea7467c4fc5aebbd43ec9",
-      "bytes": 11094
+      "sha256": "fc24bcf6af67d39e368fa0ac111e7cc4eacfa833d47fb68ebf06363b2abc4f8c",
+      "bytes": 11111
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/freeze.json",
@@ -5291,14 +5291,24 @@
       "bytes": 32972
     },
     {
+      "path": "blueprints/convergence-practice/application-delivery/history/pnpm-lock.ecfa1127.yaml",
+      "sha256": "866ae6c5246832ed6446c106ec657dd3acdb1a59fc6ba7517d4c7573fb530fd4",
+      "bytes": 32972
+    },
+    {
       "path": "blueprints/convergence-practice/application-delivery/history/recipe-revisions.json",
-      "sha256": "845b07ff640a7108d5f604d951be424ac2f8df4ae7944fede225379b6b56a05a",
-      "bytes": 11694
+      "sha256": "fc54e659bd9c4ccd97188e3dc9a05aa9cc4145e45d1e228401be8ca093c2aa84",
+      "bytes": 16245
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/history/serve.cabbe2c.py",
       "sha256": "e3e59b5315d5f2b3c2fe863cdecabfd9f7ffd1977a83d332331a10e33a42a14e",
       "bytes": 1842
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/history/uv.lock.ecfa1127",
+      "sha256": "552d8834e745d7c91daa15e47c5f6d0cd9063db18c98790d2f1af05038f7417d",
+      "bytes": 73451
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/migration-rollback.json",
@@ -5342,7 +5352,7 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
-      "sha256": "866ae6c5246832ed6446c106ec657dd3acdb1a59fc6ba7517d4c7573fb530fd4",
+      "sha256": "e31f7b3cc3336fa0424cfed0f63c11a8d7d448e7f1f8e20f82094434187f3cfd",
       "bytes": 32972
     },
     {
@@ -5366,6 +5376,91 @@
       "bytes": 11391
     },
     {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-mako.hash-check.txt",
+      "sha256": "6910a7464a95739d21d059212e02eb4ea4063efdd294b5a56d466e72e6280368",
+      "bytes": 395
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-mako.osv-after.frozen.txt",
+      "sha256": "349345bb34f6d7e7829cf119a53462e76762989fb35de033f214ea6a29d29aa1",
+      "bytes": 2821
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-mako.osv-after.ordinary.txt",
+      "sha256": "39f191cc1e0801bfab2cf7004f7fbd1279511564ccbc2864aa8bf1241e098872",
+      "bytes": 10109
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-mako.osv-before.frozen.txt",
+      "sha256": "d404cdb3214dc1c0f4fb162ed663f3e6312f9adf6e992bf09fb397fd1a1877dc",
+      "bytes": 2807
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-mako.osv-before.ordinary.txt",
+      "sha256": "68f327a5f29f0ae67cbccbb6190fe395219e6f6824afac3b1975384b10209e53",
+      "bytes": 17388
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-mako.qualification.txt",
+      "sha256": "64c946f3c9adf9ced4b7b3ee2b1dd9df67a4ba8eac35ca55a67385800f8dec6c",
+      "bytes": 1609
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-mako.sh.txt",
+      "sha256": "67bf9652d222f7982aa3804094e2ac3d7582939bab28e45d12ae42477966f2df",
+      "bytes": 928
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.build.txt",
+      "sha256": "7faa2f64f42e23d9ac4c076bcb1c56637268da80edd67cee4bf29e16997d155a",
+      "bytes": 663
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.install.txt",
+      "sha256": "bca4edfcd2dcebf76a05d5ef258653d0b9edce7cf9f30671d25487208abe8020",
+      "bytes": 999
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.osv-after.frozen.txt",
+      "sha256": "349345bb34f6d7e7829cf119a53462e76762989fb35de033f214ea6a29d29aa1",
+      "bytes": 2821
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.osv-after.ordinary.txt",
+      "sha256": "39f191cc1e0801bfab2cf7004f7fbd1279511564ccbc2864aa8bf1241e098872",
+      "bytes": 10109
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.osv-before.frozen.txt",
+      "sha256": "d404cdb3214dc1c0f4fb162ed663f3e6312f9adf6e992bf09fb397fd1a1877dc",
+      "bytes": 2807
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.osv-before.ordinary.txt",
+      "sha256": "68f327a5f29f0ae67cbccbb6190fe395219e6f6824afac3b1975384b10209e53",
+      "bytes": 17388
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.peers.txt",
+      "sha256": "5ecf82a3fc1f9007eeea79ce3bf0d9c587150219ef245bb5a5a23609cdb562fb",
+      "bytes": 32
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.sh.txt",
+      "sha256": "b3b5e5d6acbb489576886aaaa3563a7bd691d0bb3c258115a74197bb431a377f",
+      "bytes": 788
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.typecheck.txt",
+      "sha256": "99d7c2179cdd316467c51f37901025a0753453664d741214ba56fc631fa6c0bc",
+      "bytes": 90
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.update.txt",
+      "sha256": "e5231b332c2dd0c7cf51e99ea5fb3d2324ad66655ea9d0c6fd02b80d03a3bfec",
+      "bytes": 162
+    },
+    {
       "path": "blueprints/convergence-practice/application-delivery/serve.py",
       "sha256": "bba1f9655cce0b412257fbd0c40680b6b0ccc0ecffb91a2f3605323491655aed",
       "bytes": 2043
@@ -5377,8 +5472,8 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/test_portability.py",
-      "sha256": "13b18b0a4e29e41338778852dae877952f92df26fbfe56fbfb496dce1eb54947",
-      "bytes": 6802
+      "sha256": "495033afa1e0670c656b40ca47f72855f688f2d79124414458ef93ea9b50af5d",
+      "bytes": 7614
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/tsconfig.json",
@@ -5387,8 +5482,8 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/uv.lock",
-      "sha256": "552d8834e745d7c91daa15e47c5f6d0cd9063db18c98790d2f1af05038f7417d",
-      "bytes": 73451
+      "sha256": "0f5e1fbdb0aaa20697eda0f3721610275bd2f80e7223b63993b84ec21d7f6b50",
+      "bytes": 73450
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/verification.txt",
@@ -10332,6 +10427,81 @@
       "bytes": 8296
     },
     {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.builder.sh.txt",
+      "sha256": "9ada0df3211f5f122f6d4bfd5a54a1ef23bd778ceabdb3b207cc2869bb373bfb",
+      "bytes": 1184
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.guard-controls.final.txt",
+      "sha256": "b74175e0eb4171f5fe6f9e7e9d0fbf05fc7ede9ed55e11f8fc203efd3948966c",
+      "bytes": 6225
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.guard-controls.initial.txt",
+      "sha256": "d7683c33131a854173f47af3deccce6ea4c3f3abde339fd308ca5bf7856704a4",
+      "bytes": 2975
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.guard-controls.sh.txt",
+      "sha256": "8e7624d0b07b869ca1646ee991e7e1be8b0c18baf122155b2637a5161a0b7640",
+      "bytes": 3264
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.hash-check.py.txt",
+      "sha256": "0c9e79ecf49ace174480138a065a0489c56edfa826f9d224fbe2a02849d3bedd",
+      "bytes": 1945
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.install-check.sh.txt",
+      "sha256": "9a26afeaff6a229ca341af7c1545035ab777945ef13a8d9a017300f8fe5fcdda",
+      "bytes": 2130
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.osv-advisories.py.txt",
+      "sha256": "869ba6442963bf1fb5e0f636639c8f19d9817464f6c78d505a7be1d9d5d400f2",
+      "bytes": 1521
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.osv-after.frozen.txt",
+      "sha256": "349345bb34f6d7e7829cf119a53462e76762989fb35de033f214ea6a29d29aa1",
+      "bytes": 2821
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.osv-after.ordinary.txt",
+      "sha256": "39f191cc1e0801bfab2cf7004f7fbd1279511564ccbc2864aa8bf1241e098872",
+      "bytes": 10109
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.osv-before.frozen.txt",
+      "sha256": "d404cdb3214dc1c0f4fb162ed663f3e6312f9adf6e992bf09fb397fd1a1877dc",
+      "bytes": 2807
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.osv-before.ordinary.txt",
+      "sha256": "68f327a5f29f0ae67cbccbb6190fe395219e6f6824afac3b1975384b10209e53",
+      "bytes": 17388
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.osv-scan-step.sh.txt",
+      "sha256": "593d681f18b0c208202c3c2e9610400848e5aa8c84a41887a762fdc7e49f814d",
+      "bytes": 1613
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.relock.sh.txt",
+      "sha256": "eb18355c88050077c6c06335e9dfc236c5498ff0de41f0a73d53e5c52c6bd373",
+      "bytes": 3289
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.relock.txt",
+      "sha256": "2fa09b2756a567f6a0a5a9dd48ca730f46681962e54a3d1f01287b5af19bfa2e",
+      "bytes": 2048
+    },
+    {
+      "path": "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.txt",
+      "sha256": "acaaa1ab1dd527ff7ba49f76c2b291620e2e84c9028687108624a979026d9577",
+      "bytes": 2266
+    },
+    {
       "path": "blueprints/runtime-workers/openhands/evidence/repair-round-commands.json",
       "sha256": "89e32d55231db27386ed16dc077fa56dbd710c9c45f80433fa02c6b42e13b54e",
       "bytes": 24151
@@ -10438,7 +10608,7 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/pins.json",
-      "sha256": "36f9ab6c1b901621d685b6721b789dcbcc3cc0ce4526f9c997772c371cf24464",
+      "sha256": "10a548ea8734e7c2c64f42c1f1bdb5fdf0de80a0e2efd770a38d1c01524f7845",
       "bytes": 4460
     },
     {
@@ -10458,13 +10628,13 @@
     },
     {
       "path": "blueprints/runtime-workers/openhands/requirements.lock",
-      "sha256": "e24df8328149c921f751eb93d682b3f5b66eb4efd09bf4b053ffcfca057181e1",
-      "bytes": 106257
+      "sha256": "2837036a2bb832958e2daad6094811610d1fd605a315dacd9a0616841e9e2401",
+      "bytes": 106427
     },
     {
       "path": "blueprints/runtime-workers/openhands/research.md",
-      "sha256": "ca047a295fe9f6ff5f23544cd10f2cac2687a93ab3eea4e4e351620058a85d9b",
-      "bytes": 75592
+      "sha256": "3d0f7da2b69ff91702d7db7fd6a9c3b14689a9d4f1e408c6457b272269229795",
+      "bytes": 77696
     },
     {
       "path": "blueprints/runtime-workers/openhands/resolver.py",
@@ -16638,8 +16808,8 @@
     },
     {
       "path": "docs/decisions/2026-09-22-github-automation-closure.md",
-      "sha256": "329aa284c373b0889e28337cb45c0c8d235efbb3901d87fda15f1ef1f972e6e7",
-      "bytes": 155548
+      "sha256": "d6999be5e233e7a6c6f249e29584a9143d0de4be60d15ab87e1a1ef97664f4ca",
+      "bytes": 158403
     },
     {
       "path": "docs/decisions/2026-09-24-secret-storage.md",
@@ -17067,6 +17237,11 @@
       "bytes": 135389
     },
     {
+      "path": "docs/decisions/2026-10-05-harness-context-budget.md",
+      "sha256": "d11e199975995de0b328cc4603c6a3a158eeba43c627e92d74d2f1f256cd272a",
+      "bytes": 54584
+    },
+    {
       "path": "docs/decisions/2026-10-05-main-checkout-backup-disposition.md",
       "sha256": "22839061d0826b5272f5b840f1765e5b175845b25b8f0e3c9a8ce8ccc8dfedba",
       "bytes": 129176
@@ -17095,6 +17270,16 @@
       "path": "docs/decisions/2026-10-05-typesafe-sdk-transport.md",
       "sha256": "d197ab297186fe55e6c83624c78a06ead264e00d66a7fe2d5e62cfc1b653dbd6",
       "bytes": 9226
+    },
+    {
+      "path": "docs/decisions/2026-10-05-user-facing-local-time.md",
+      "sha256": "d906951e9dcf27bad23e2f599fa9a74aeb2796ab9cd6d5315072ecce69d21427",
+      "bytes": 27979
+    },
+    {
+      "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
+      "sha256": "c12885d5d078f88cf6784d539e5b8261545a759b7aba8ff1eba566fb5d6366fb",
+      "bytes": 3660
     },
     {
       "path": "docs/direct-results.md",
@@ -42802,6 +42987,16 @@
       "bytes": 195
     },
     {
+      "path": "evidence/artifacts/pr765-bindings-amendment-20261006/historical/experiment-macos-20260924.json.source.txt",
+      "sha256": "eb2ceb9c57ed3f11125a5091a85bf19dcb10e364dfb2b67d8c1b444970b300f3",
+      "bytes": 25990
+    },
+    {
+      "path": "evidence/artifacts/pr765-bindings-amendment-20261006/historical/experiment.json.source.txt",
+      "sha256": "9372ee1635b6c818ca31fc3d73d33802d85293218bcea7467c4fc5aebbd43ec9",
+      "bytes": 11094
+    },
+    {
       "path": "evidence/artifacts/pra-u1-differential-20260929/README.md",
       "sha256": "48a1760f276c42d4d4b74dad240bbaa899068e197237697db8b29a18f0863a0b",
       "bytes": 36809
@@ -52362,6 +52557,11 @@
       "bytes": 893
     },
     {
+      "path": "evidence/receipts/mako-142-qualification-20261005.json",
+      "sha256": "2554df77a35c39cd4898d073d22a0f1eed341a2ccc610473b4cda98540124e05",
+      "bytes": 4446
+    },
+    {
       "path": "evidence/receipts/markitdown-018-qualification-20260925.json",
       "sha256": "d9a1a3484c229f7d530009143672ef1ee6756dafff8ad72aeca1dba86cef3b2f",
       "bytes": 18417
@@ -52682,9 +52882,24 @@
       "bytes": 149558
     },
     {
+      "path": "evidence/receipts/osv-captured-lumibot-lockchecks-20261005.json",
+      "sha256": "f211de55c2cbbf1f712c35f51bbe846f8a08341d24a240b51e654a6df6fd2b6c",
+      "bytes": 2891
+    },
+    {
+      "path": "evidence/receipts/osv-frozen-macos-source-map-js-20261005.json",
+      "sha256": "ce33fcee0c43a46ea95aba70e4bd0b39e3870a37369e809deee25c0331fbfe9a",
+      "bytes": 2442
+    },
+    {
       "path": "evidence/receipts/osv-oauthlib-pyjwt-reachability-20260929.json",
       "sha256": "f89e3a45ac10d44d00c268cc617c1fb7b5f77636fb1150af3c9e7bf4b26441ef",
       "bytes": 21768
+    },
+    {
+      "path": "evidence/receipts/osv-openhands-fsspec-relock-20261005.json",
+      "sha256": "d70042c1d2fd5f8591e58332598262b6ef62627ae904935d91ac0da03f0c0777",
+      "bytes": 11062
     },
     {
       "path": "evidence/receipts/osv-openhands-litellm-relock-20260930.json",
@@ -52725,6 +52940,11 @@
       "path": "evidence/receipts/portable-userspace-install-20260921.json",
       "sha256": "9d138ccc152d7e110b71e957f55d17a4464fbb29862bc9b2050e4e9df8bbc662",
       "bytes": 12703
+    },
+    {
+      "path": "evidence/receipts/pr765-bindings-amendment-20261006.json",
+      "sha256": "2d244c6967bed30a335bf671803857acd08939b2595cab400d1a76b15b99f485",
+      "bytes": 5094
     },
     {
       "path": "evidence/receipts/pre-2020-delisting-coverage.json",
@@ -52785,6 +53005,11 @@
       "path": "evidence/receipts/sota-convergence-20260922.json",
       "sha256": "24be77b12057c9cc7d29d0edbd0ba8af5005ceff82c2f1b1ffe34e5c424d1ab2",
       "bytes": 4906
+    },
+    {
+      "path": "evidence/receipts/source-map-js-122-qualification-20261005.json",
+      "sha256": "7b08474683f67c1f8a1512bf0e7cfee8b878f3d9cb72c264b61e31c10cdac630",
+      "bytes": 4832
     },
     {
       "path": "evidence/receipts/suite-parallelism-trial-20261003.json",
@@ -54528,8 +54753,8 @@
     },
     {
       "path": "tests/test_frozen_macos_variant_no_use.py",
-      "sha256": "b3aa81bc327cb35fd71c96b820afd1fa81f5c20fe03604d73f64062bfe11d314",
-      "bytes": 35340
+      "sha256": "509e5eb6ba4f58958f366e78652cb21ff9b285634d956ad9b7e5494d9ce90212",
+      "bytes": 36760
     },
     {
       "path": "tests/test_gap_crosswalk.py",
@@ -54873,8 +55098,8 @@
     },
     {
       "path": "tests/test_openhands_lock_binding.py",
-      "sha256": "60ff8e66e308d623ea229578dc2ec66559ef91118bd237feccbca86fecf21b8f",
-      "bytes": 3206
+      "sha256": "375ae103ef88810fda95c78173d9f91e997c6afeff44b96736b85e3ed6c3042d",
+      "bytes": 3201
     },
     {
       "path": "tests/test_order_contract.py",
@@ -54888,8 +55113,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "cb4d002908f17185127d1d98caaec8ef47b4fd23adefe9c28ee4b3050e53d3a3",
-      "bytes": 75839
+      "sha256": "e89585ef067044a90eb0685a38116816271400f07a4c11bcf25cb3cef486d947",
+      "bytes": 75144
     },
     {
       "path": "tests/test_overfitting_riskl_parity.py",

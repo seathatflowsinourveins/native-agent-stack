@@ -1,0 +1,79 @@
+{
+  "schema_version": 1,
+  "id": "pr765-bindings-amendment-20261006",
+  "kind": "source_review_and_local_integrity",
+  "base_revision": "67c6594d2c252bdd253626dc54789c70e54c4a28",
+  "amendment_date": "2026-10-06",
+  "claim": "Dated path-only canonical metadata amendments preserve original trial bytes and all measured fields while production lock-current mappings follow the separately qualified relocks.",
+  "sources": [
+    "native-agent-stack@c96c2555c2d84683d9e519623354c814aeb6a584:blueprints/convergence-practice/application-delivery/history/recipe-revisions.json:121-139",
+    "native-agent-stack@798ac445307e2cd8eba6e74d7722ac0e16da02c7:blueprints/convergence-practice/application-delivery/history/recipe-revisions.json:99-137",
+    "native-agent-stack@67c6594d2c252bdd253626dc54789c70e54c4a28:blueprints/convergence-practice/application-delivery/test_portability.py:101-131",
+    "native-agent-stack@67c6594d2c252bdd253626dc54789c70e54c4a28:scripts/validate_convergence.py:60-71,203-243"
+  ],
+  "preserved": {
+    "uv_lock_original_sha256": "552d8834e745d7c91daa15e47c5f6d0cd9063db18c98790d2f1af05038f7417d",
+    "pnpm_pre_relock_sha256": "866ae6c5246832ed6446c106ec657dd3acdb1a59fc6ba7517d4c7573fb530fd4",
+    "experiment_pre_amendment_sha256": "9372ee1635b6c818ca31fc3d73d33802d85293218bcea7467c4fc5aebbd43ec9",
+    "macos_experiment_pre_amendment_sha256": "eb2ceb9c57ed3f11125a5091a85bf19dcb10e364dfb2b67d8c1b444970b300f3",
+    "raw_receipt_freeze_prior_history": "unchanged; existing test hash assertions retained",
+    "production_pins": "unchanged from the four adopted relocks"
+  },
+  "amendment": {
+    "uv_input_to": "blueprints/convergence-practice/application-delivery/history/uv.lock.ecfa1127",
+    "canonical_record_scope": "One exact source path per record, never frozen hash/commands/observations/outputs/usage",
+    "original_snapshots": [
+      "evidence/artifacts/pr765-bindings-amendment-20261006/historical/experiment.json.source.txt",
+      "evidence/artifacts/pr765-bindings-amendment-20261006/historical/experiment-macos-20260924.json.source.txt"
+    ],
+    "recipe_scope": "Append PNPM supersession with full prior change/verification, add original/current UV mapping; retain original recipe revisions and all historical evidence"
+  },
+  "before_checks": [
+    {
+      "command": "python3 scripts/validate_convergence.py --all-recorded --root . --json",
+      "exit_code": 1,
+      "declared_records": 32,
+      "invalid_records": 2,
+      "errors": "UV frozen sources[3] SHA-256 mismatch in each application-delivery record"
+    },
+    {
+      "command": "python3 -m unittest tests.test_native_maintenance -v",
+      "exit_code": 1,
+      "tests": 29,
+      "failure": "PNPM current_sha256 stale866 versus livee31"
+    }
+  ],
+  "evidence_classes": {
+    "original_trials": "Historical records retained; no new execution claim",
+    "amendment": "source_review",
+    "byte_hash_path_tests": "local_integration and integrity checks",
+    "native_model_provider_or_full_stack": "Not run",
+    "hosted_acceptance": "Reported separately at the new pushed head"
+  },
+  "limitations": [
+    "Local checks do not establish hosted acceptance.",
+    "New lock archive filenames are archival input evidence; no install or advisory-ignore execution is introduced.",
+    "A22 authorizes only copied temporary-fixture install.sh --list through the full local suite. Installer apply paths remain banned. The actual full suite failed and is retained separately; it is not a passed acceptance.",
+    "Pre-existing native systemd property-order test correction belongs to P1-GIT#767 and is not silently imported here."
+  ],
+  "after_checks": {
+    "validate": {"exit_code": 0, "hashed_files": 10315, "scope": "working-tree amendment integrity before this result supplement"},
+    "all_recorded_convergence": {"exit_code": 0, "records": 32, "invalid": 0},
+    "native_maintenance": {"exit_code": 0, "tests": 29},
+    "convergence_and_lock_boundary_tests": {"exit_code": 0, "tests": 102},
+    "full_local_unittest": {
+      "exit_code": 1,
+      "tests": 10343,
+      "seconds": 2217.568,
+      "failures": 18,
+      "errors": 18,
+      "skipped": 905,
+      "authorization": "A22 copied-fixture read-only --list exception",
+      "scope": "Complete local discovery on the shared host; not a passed result. Raw returned output retained privately; known #767 native systemd-parser defect remains separate.",
+      "reported_groups": ["missing exchange_calendars / mutation prerequisite imports", "bootstrap/launchd dirname PATH fixtures", "native systemd property-order parser (#767)", "token export canary fixtures", "Windows Terminal notification-type drift"]
+    }
+  },
+  "superseded_assertion": "Initial relock acceptance list omitted all-recorded convergence/native-maintenance gates. Historical local checks stay historical; they did not imply upstream7/7 acceptance.",
+  "overturn": "Any archived byte mismatch or non-path canonical change invalidates this amendment; new application execution belongs to a new trial record.",
+  "recorded_at_utc": "2026-10-06T05:32:41Z"
+}
