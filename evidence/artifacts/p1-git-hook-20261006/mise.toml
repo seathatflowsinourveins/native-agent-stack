@@ -1,0 +1,4 @@
+# Native mise slot; repository helper/hook semantics remain unchanged.
+# jdx/mise@050ce5a20287a0aafd872b1191699a5fdafff5ac:registry/gitleaks.toml:1
+[tools]
+"aqua:gitleaks/gitleaks" = "8.30.1"

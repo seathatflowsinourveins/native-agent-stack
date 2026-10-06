@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "id": "p1-git-hook-acceptance-20261006",
+  "kind": "local_integration",
+  "recorded_at_utc": "2026-10-06T03:35:17Z",
+  "checked_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "component_ids": [
+    "gitleaks"
+  ],
+  "claim": "The unchanged tracked pre-commit hook, isolated mise-aqua Gitleaks8.30.1 and existing guarded launcher pass a clean scratch-clone commit and reject one generated inert AWS-shaped value with exit1, unchangedHEAD and redacted output. The native guard measurement test uses named systemd properties rather than assuming output order.",
+  "evidence_classes": {
+    "source_review": "Pinned upstream defaults/backend/systemd source; vendor release metadata.",
+    "local_integration": "Actual isolated installer, native guard and Git scratch-clone commits.",
+    "synthetic_fixture": "One generated inert AWS-shaped value; actual value is not published.",
+    "unchanged_upstream_tests": "Not run.",
+    "host_application": "Not applied by the lane.",
+    "hosted_ci": "Not observed."
+  },
+  "source_refs": [
+    "https://github.com/gitleaks/gitleaks/releases/tag/v8.30.1",
+    "gitleaks/gitleaks@83d9cd684c87d95d656c1458ef04895a7f1cbd8e:config/gitleaks.toml",
+    "betterleaks/betterleaks@81aff7a638638aae3a659845d089043e1d8fe9ac:config/betterleaks.toml",
+    "jdx/mise@050ce5a20287a0aafd872b1191699a5fdafff5ac:registry/gitleaks.toml:1",
+    "jdx/mise@050ce5a20287a0aafd872b1191699a5fdafff5ac:docs/directories.md:13-23",
+    "systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:src/shared/bus-print-properties.c:36-39,354-378",
+    "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:scripts/git-hooks/pre-commit:7-12",
+    "https://git-scm.com/docs/githooks#_pre_commit"
+  ],
+  "source_review": {
+    "default_rules": {
+      "gitleaks": 222,
+      "betterleaks": 463,
+      "equivalence": false,
+      "gitleaks_config_sha256": "e163e53b9e7e8a8511e77271e2b323ed057759542a6d988258afe3a1fa329caf",
+      "betterleaks_config_sha256": "a8f553eb634ac3c5c1ca3f0dc95e2b8abdea7d14b622604c5af07f30ce7926ef",
+      "default_findings_exit_code": 1
+    },
+    "gitleaks_release_published_at": "2026-03-21T02:17:58Z",
+    "currency": "Explicit task compatibility pin; older than180days. Do not reuse central plan's contradictory 90-day due date as fresh evidence.",
+    "vendor_archive_expected_sha256": "551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb",
+    "archive_identity": "Vendor HTTPS release metadata/checksum through supported aqua backend; no verified Sigstore identity claimed."
+  },
+  "data": {
+    "mise_version": "2026.10.1",
+    "gitleaks_version": "8.30.1",
+    "native_binary_sha256": "88f91962aa2f93ac6ab281d553b9e125f5197bbbce38f9f2437f7299c32e5509",
+    "pre_commit_sha256": "58fd9d28e55ac2396c487d1cd7f1ac1743737abcf16de5787ab75cb33cc4fb9a",
+    "repository_rules_sha256": "36d8049cef393b9786c912975cbad5eddf676d1e357f2773ed47afee0dc7d342",
+    "guard_sha256": "7ead675d3a539b964e6d432427e5564cc9fa228e9196e715731d51c916a3acc9",
+    "runner_sha256": "cde3374b1a6146d89a768fbe99d80ef934c150e0bad1a50e53bc73d3bc3c9c0e",
+    "scratch_clone": {
+      "hooks_path": "scripts/git-hooks",
+      "clean_commit_exit": 0,
+      "finding_commit_exit": 1,
+      "head_unchanged": true,
+      "generated_value_absent_from_output": true
+    },
+      "checks": [
+        {
+          "command": "python3 -m unittest tests.test_pre_push_gate; external TMPDIR; nice 19",
+          "exit_code": 0,
+          "output": "................\n----------------------------------------------------------------------\nRan 16 tests in 42.926s\n\nOK\n"
+        },
+      {
+        "command": "mise install --jobs=1 aqua:gitleaks/gitleaks@8.30.1 (six documented task-private mise directories; nice 19)",
+        "exit_code": 0,
+        "output": "mise by @jdx – installing 1 tool\nmise ✓ aqua:gitleaks/gitleaks@8.30.1  1.1s  gitleaks_8.30.1_linux_x64.tar.gz\nmise ████████████████ 1/1 · installed 1 tool in 1.1s\n"
+      },
+      {
+        "command": "mise exec aqua:gitleaks/gitleaks@8.30.1 -- gitleaks version",
+        "exit_code": 0,
+        "output": "8.30.1"
+      },
+      {
+        "command": "guarded git commit in scratch clone: clean staged file; nice 19",
+        "exit_code": 0,
+        "output": "11:25PM INF 0 commits scanned.\n11:25PM INF scanned ~44 bytes (44 bytes) in 138ms\n11:25PM INF no leaks found\n[codex/ns2604-p1-git-20261006 0311c0a3] test: clean scratch commit\n 1 file changed, 1 insertion(+)\n create mode 100644 p1-git-clean-check.txt\n"
+      },
+      {
+        "command": "guarded git commit in scratch clone: generated inert AWS-shaped value; nice 19",
+        "exit_code": 1,
+        "expected_exit_code": 1,
+        "output": "11:26PM INF 0 commits scanned.\n11:26PM INF scanned ~41 bytes (41 bytes) in 142ms\n11:26PM WRN leaks found: 1\n"
+      },
+      {
+        "command": "python3 -m unittest tests.test_pre_commit_gate tests.test_gitleaks_config; guarded scanner and external TMPDIR; nice 19",
+        "exit_code": 0,
+        "output": "........................................\n----------------------------------------------------------------------\nRan 40 tests in 90.702s\n\nOK\n"
+      },
+      {
+        "command": "python3 -m unittest tests.test_adoption_guarded_runners; external TMPDIR; nice 19",
+        "exit_code": 0,
+        "output": "........................s........\n----------------------------------------------------------------------\nRan 33 tests in 6.557s\n\nOK (skipped=1)\n\n[branch] containment: cgroup v2 and a native systemd --user bus are present\n[branch] job ran inside <transient-scope> with MemoryMax=6442450944 and pids.max=256\n[branch] <transient-scope> released after 0.006s\n"
+      }
+    ]
+  },
+  "failed_attempts": [
+    {
+      "phase": "registry CLI preflight",
+      "exit_code": 2,
+      "reason": "register_file is a supported Python function, not a CLI subcommand. Recovered using the exact docs/lanes.md:105-107 import/call recipe; no registry mutation occurred during the failed help probe."
+    },
+    {
+      "phase": "source processing",
+      "exit_code": 1,
+      "reason": "Overbroad filename suffix classified registry/gitleaks.toml as a rule config, raising KeyError after successful native GETs. Classifier corrected; backend/source/release GETs independently verified. Default config hashes/counts remain actual successful results."
+    },
+    {
+      "phase": "initial three-module guard suite",
+      "exit_code": 1,
+      "output": "...F.......................s.............................................\n======================================================================\nFAIL: test_containment_or_refusal (tests.test_adoption_guarded_runners.BoundedRunContainmentTests.test_containment_or_refusal)\n----------------------------------------------------------------------\nTraceback (most recent call last):\n  File \"<owned-worktree>/tests/test_adoption_guarded_runners.py\", line 484, in test_containment_or_refusal\n    unit, job_path = self._run_self_reporting_job(Path(tmp))\n                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^\n  File \"<owned-worktree>/tests/test_adoption_guarded_runners.py\", line 451, in _run_self_reporting_job\n    self.assertTrue(\n    ~~~~~~~~~~~~~~~^\n        tasks_inside.isdigit() and int(tasks_inside) >= 1,\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n        f\"{unit} reported TasksCurrent={tasks_inside!r} while the job ran\",\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\nAssertionError: False is not true : <transient-scope> reported TasksCurrent='running' while the job ran\n\n----------------------------------------------------------------------\nRan 73 tests in 98.664s\n\nFAILED (failures=1, skipped=1)\n\n[branch] containment: cgroup v2 and a native systemd --user bus are present\n",
+      "reason": "TasksCurrent was read positionally as running. Corrected only test parsing with upstream named output; preserved containment assertions."
+    },
+    {
+      "phase": "local scratch clone resource rule",
+      "exit_code": 0,
+      "resource_rule_met": false,
+      "reason": "Initial git clone completed in2.1s but omitted nice19. Not repeated as new acceptance. Scanner install, commit checks and tests used nice19."
+    }
+  ],
+  "limitations": [
+    "One clone/synthetic value, not complete coverage or corpus parity.",
+    "Forty hook/config tests had zero skips;33guardtests had one existing native-shellcheck-unavailable skip. It is not a passed shellcheck run.",
+    "Named-property test correction is a repository integration change, not unchanged upstream acceptance.",
+    "Task-private tool/config/symlink directories only; no host profile/hooksPath or shared checkout mutation.",
+    "Central installer integration belongs to P1-CLI under A21; supplied prerequisite/acceptance input is not activated there by this PR.",
+    "No install.sh execution, broker/provider/model run, old-distribution start, credential read or merge."
+  ],
+  "sanitization": "Actual output retained with owned/scratch path prefixes replaced and transient scope identifiers removed. The generated fake value is omitted; no credential values were read.",
+  "overturn": "New compatibility pin or accepted preregistered Betterleaks migration; scanner/guard/config input changes; any refusal/timeout/contention instead of native finding1 requires new qualification."
+}
