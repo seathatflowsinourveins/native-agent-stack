@@ -42437,6 +42437,106 @@
       "bytes": 12542
     },
     {
+      "path": "evidence/artifacts/organic-e2e-20261005/AMENDMENT-v1.1-20261006.md",
+      "sha256": "05ce624f34b8823de9c3ac119e83dd3af4c6ade982e7d6e5951d2154d3473eb8",
+      "bytes": 94877
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/PILOT-SPEC-v1.1.md",
+      "sha256": "6807a490552067dff39c30f303c694d21842a503f93f254956fa19edbe074fa1",
+      "bytes": 13890
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/PROTOCOL-v1.1.md",
+      "sha256": "85ed6f5d6f12088d9d45d6e6c5fa127ae137fb6276b63d890a6abdbf812bd886",
+      "bytes": 60470
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/arms.py",
+      "sha256": "4c1d4e8ef76c90fcabc510be1ef50f02aead23c90b0ecba0476c93163a018869",
+      "bytes": 17398
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/block.py",
+      "sha256": "f57c3438f5994b77808d95e72f44ad407186a72825f18f6497ee72d848718db0",
+      "bytes": 26154
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/collect.py",
+      "sha256": "867d66dfc4e1dce75433c0929af377efeddb1abc6e346ed475b9422efa68acab",
+      "bytes": 17667
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/common.py",
+      "sha256": "3ff6ef222e5b69b9f236eee0f88b6e2c8e322fe0e5d369db199470a07dcb49b2",
+      "bytes": 62211
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/fixture.py",
+      "sha256": "0ce86bab617c69bcfc14b394bcad7b2818cb31231b482c5dc293e19ecdf7f3e6",
+      "bytes": 31396
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/grade.py",
+      "sha256": "1324d012a7ab1067ea072a2fd824e03de707d32bd230362c870d9132c0077c9a",
+      "bytes": 222393
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/isolation.py",
+      "sha256": "ce0a83cd1fd7f43d96c2b2ae944c9083e472f6d015ff97da39d87b0f98554903",
+      "bytes": 112628
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/launcher.py",
+      "sha256": "2ba75a6350de45a1f872dc65f43ff407bff15243b3a3247e19c1e57936c7a3fd",
+      "bytes": 61223
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/netfilter.py",
+      "sha256": "9787116947e5f77b2d167a4f83def8ccb8ac1a93407a43e86681b403dede7f44",
+      "bytes": 30130
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/pilot.py",
+      "sha256": "971bced1d10b54db6343e6654b4d575ca02c63c0d5fd4429327d777b58002154",
+      "bytes": 26928
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/prepare.py",
+      "sha256": "df7c08e16c7eadec72491ab265a695dd4271fb0674b248954d8b836904853c53",
+      "bytes": 58037
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/sdk_claude.py",
+      "sha256": "feaf9839731717cbf5fdc935b48d81ff80d995b89f1bd85cc8405e4d260f8c0f",
+      "bytes": 4134
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/sdk_codex.mjs",
+      "sha256": "3c645a968781e0dda935c6aec9c69f39c908d3c7afcb957d01d6f775af8c0ef0",
+      "bytes": 2132
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/stage2-canaries.json",
+      "sha256": "7391569413e371123b769a59d9c064a14b0e6b57f0d60d8ca88957943c5cae09",
+      "bytes": 1050
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/stage3-oracles.json",
+      "sha256": "0b5c01ca7a6b73cec61b201a8cc0622fcbb55a25f08ea9a34fb4bf53b9436c36",
+      "bytes": 4015
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/suite.py",
+      "sha256": "363a701644f542db39c61b5ef4d4dae8049a465fc63eb6db69635506d4df3ba3",
+      "bytes": 13921
+    },
+    {
+      "path": "evidence/artifacts/organic-e2e-20261005/harness/test_isolation.py",
+      "sha256": "678b698104298a8c4d7700781828dd468df926d283c3c79af441a0f1307b9130",
+      "bytes": 135272
+    },
+    {
       "path": "evidence/artifacts/osv-split-hardening-port-20261003/acceptance-runs.json",
       "sha256": "932b155b20a059f3c5b7d350470e0e09ac97584a5398bb74360c38e27f8fff95",
       "bytes": 13809
