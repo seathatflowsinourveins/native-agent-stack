@@ -1,0 +1,383 @@
+{
+ "receipt": "ai-memory embedder switch, NativeStack2604, 2026-10-06",
+ "plan_run": "wf_9044bb3b-c29 (18 steps, 10 gates)",
+ "north_star_action": "reliable cross-client memory for north-star R&D",
+ "decision": "ACCEPTED",
+ "accepted_at_utc": "2026-10-06T16:45:58Z",
+ "evidence_class": "native_proven: actual execution on NativeStack2604 with retained private run files; manager-level service environment check is an untested boundary (blocked by the project secret guard)",
+ "versions": {
+  "ai_memory": "2.5.2 (latest release v2.5.2, 2026-10-01T07:40:18Z; tag af8c6820, commit 7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83)",
+  "promptfoo": "0.123.1",
+  "claude_code": "2.1.291",
+  "codex_cli": "0.160.1",
+  "vllm": "0.31.0 (plan record; not re-read)",
+  "model": "nvidia/Nemotron-3-Embed-8B-BF16 (HF revision d1f2f25730bb, plan record)"
+ },
+ "embedder": {
+  "before": [
+   "local",
+   "all-MiniLM-L6-v2",
+   384
+  ],
+  "after": [
+   "openai-compat",
+   "nvidia/Nemotron-3-Embed-8B-BF16+dp1-707ad539ebca7d87",
+   4096
+  ],
+  "config_keys_set": {
+   "embedding_provider": "openai-compat",
+   "embedding_model": "nvidia/Nemotron-3-Embed-8B-BF16",
+   "embedding_base_url": "http://127.0.0.1:28231/v1",
+   "embedding_dim": 4096,
+   "embedding_query_prefix": "query: ",
+   "embedding_document_prefix": "passage: ",
+   "maintenance.embedding_backfill_interval_secs": 900
+  }
+ },
+ "config_sha256": {
+  "before": "e717939d5fc1182fdce2bd84f7cce163051c05af3b106285539a9a305badfda0",
+  "after": "14dd8836ae9dc844514dd29d55d4f52dde5d973a9e00581f34a68ea994855e19"
+ },
+ "backups": {
+  "backup-1": {
+   "sha256": "84e0a243856eca499808bcfc02b886d1252001ee528ff176de2a9e85025f8c58",
+   "bytes": 205750948
+  },
+  "backup-2": {
+   "sha256": "af02c3d7f31d313439416a5b052119396ffda04d5520e0fe6ee0f838f0db0c5e",
+   "bytes": 214091359
+  },
+  "archive_holds": "db/memory.sqlite and wiki/ only; config.toml not included (live config is outside the data dir)"
+ },
+ "restore_test": {
+  "counts_match": true,
+  "integrity_check": "ok",
+  "wiki_files_restored": 6160,
+  "wiki_files_archived": 6160,
+  "server_downtime_s": 2.9
+ },
+ "census": {
+  "t0_minilm": {
+   "pages": 548,
+   "latest": 324,
+   "embeddable": 324,
+   "latest_current": 324,
+   "latest_triples": [
+    [
+     "local",
+     "all-MiniLM-L6-v2",
+     384,
+     324
+    ]
+   ],
+   "superseded_rows": 224,
+   "embedding_rows": 548,
+   "observations": 225376,
+   "sessions": 368,
+   "workspaces": 3,
+   "projects": 168,
+   "scopes_with_latest": 148,
+   "failures": {}
+  },
+  "pre_switch_minilm": {
+   "pages": 556,
+   "latest": 331,
+   "embeddable": 331,
+   "latest_current": 331,
+   "latest_triples": [
+    [
+     "local",
+     "all-MiniLM-L6-v2",
+     384,
+     331
+    ]
+   ],
+   "superseded_rows": 225,
+   "embedding_rows": 556,
+   "observations": 235025,
+   "sessions": 375,
+   "workspaces": 3,
+   "projects": 171,
+   "scopes_with_latest": 152,
+   "failures": {}
+  },
+  "post_switch_nemotron": {
+   "pages": 557,
+   "latest": 331,
+   "embeddable": 331,
+   "latest_current": 331,
+   "latest_triples": [
+    [
+     "openai-compat",
+     "nvidia/Nemotron-3-Embed-8B-BF16+dp1-707ad539ebca7d87",
+     4096,
+     331
+    ]
+   ],
+   "superseded_rows": 226,
+   "embedding_rows": 557,
+   "observations": 235464,
+   "sessions": 375,
+   "workspaces": 3,
+   "projects": 171,
+   "scopes_with_latest": 152,
+   "failures": {}
+  },
+  "verify_nemotron": {
+   "pages": 557,
+   "latest": 331,
+   "embeddable": 331,
+   "latest_current": 331,
+   "latest_triples": [
+    [
+     "openai-compat",
+     "nvidia/Nemotron-3-Embed-8B-BF16+dp1-707ad539ebca7d87",
+     4096,
+     331
+    ]
+   ],
+   "superseded_rows": 226,
+   "embedding_rows": 557,
+   "observations": 235673,
+   "sessions": 375,
+   "workspaces": 3,
+   "projects": 171,
+   "scopes_with_latest": 152,
+   "failures": {}
+  },
+  "accept_nemotron": {
+   "pages": 562,
+   "latest": 335,
+   "embeddable": 335,
+   "latest_current": 335,
+   "latest_triples": [
+    [
+     "openai-compat",
+     "nvidia/Nemotron-3-Embed-8B-BF16+dp1-707ad539ebca7d87",
+     4096,
+     335
+    ]
+   ],
+   "superseded_rows": 227,
+   "embedding_rows": 562,
+   "observations": 239600,
+   "sessions": 382,
+   "workspaces": 3,
+   "projects": 171,
+   "scopes_with_latest": 152,
+   "failures": {}
+  },
+  "incomplete_scopes": {
+   "post_switch": 0,
+   "verify": 0,
+   "accept": 0
+  }
+ },
+ "re_embed": {
+  "log": "startup embedding backfill completed scopes=171 embedded=331 skipped=0 failed=0 errors=0 elapsed_ms=78632",
+  "elapsed_ms": 78632,
+  "vllm_stop_requests_delta": 333,
+  "restart_2": {
+   "mismatch_warning": false,
+   "startup_backfill_line": false
+  }
+ },
+ "known_answer": {
+  "scope": "default/native-agent-stack",
+  "corpus_pages": 58,
+  "targets": 29,
+  "skipped": {
+   "contentless_lifecycle_only": 24,
+   "duplicate_or_count_only": 5
+  },
+  "n_valid": 29,
+  "hit_at_1": {
+   "before": 23,
+   "after": 27
+  },
+  "hit_at_5": {
+   "before": 29,
+   "after": 29
+  },
+  "vector_active": {
+   "before": 29,
+   "after": 29
+  },
+  "test_errors": {
+   "before": 0,
+   "after": 0
+  },
+  "latency_ms_p50_p95": {
+   "before": [
+    184,
+    341
+   ],
+   "after": [
+    54,
+    173
+   ]
+  },
+  "vllm_stop_requests_during_after_run": 29,
+  "degrade_lines": {
+   "before": 0,
+   "after": 0
+  },
+  "rank_changes": [
+   {
+    "test": "ka-04",
+    "before_rank": 1,
+    "after_rank": 0
+   },
+   {
+    "test": "ka-14",
+    "before_rank": 2,
+    "after_rank": 0
+   },
+   {
+    "test": "ka-19",
+    "before_rank": 1,
+    "after_rank": 0
+   },
+   {
+    "test": "ka-20",
+    "before_rank": 1,
+    "after_rank": 0
+   },
+   {
+    "test": "ka-21",
+    "before_rank": 2,
+    "after_rank": 0
+   },
+   {
+    "test": "ka-29",
+    "before_rank": 0,
+    "after_rank": 1
+   }
+  ],
+  "frozen_sha256": {
+   "corpus.json": "a7d052811bf9f40bbcbe5fc6cc5c9ba8a4aa4a7f8ec3e1b15cb460d08a5dc4f7",
+   "tests.yaml": "ddf21f2d6d08a4b1fd27414ce28ab84251cf01fa91e9696adcc8b52adcf90e6a",
+   "pf-live.yaml": "b921ec53d57e49181b2b8ba05a1adf4371293fa69941f714d01b270d1e0ca7e4"
+  }
+ },
+ "prefix_proof": {
+  "pass": true,
+  "targets": [
+   {
+    "returned_cosine": 0.5876076,
+    "variants": {
+     "query+passage": 0.58761,
+     "none+passage": 0.444789,
+     "query+none": 0.479855,
+     "none+none": 0.601864
+    },
+    "abs_diff_query_passage": 2e-06,
+    "margin_to_next": 0.014254,
+    "dims": 4096,
+    "pass": true,
+    "test": "ka-01"
+   },
+   {
+    "returned_cosine": 0.6533209,
+    "variants": {
+     "query+passage": 0.65332,
+     "none+passage": 0.53052,
+     "query+none": 0.556539,
+     "none+none": 0.67327
+    },
+    "abs_diff_query_passage": 1e-06,
+    "margin_to_next": 0.019947,
+    "dims": 4096,
+    "pass": true,
+    "test": "ka-02"
+   }
+  ]
+ },
+ "gate3": {
+  "scope": "readiness-20261005-runner/canaries (scratch)",
+  "pre_minilm": {
+   "claude_to_codex": {
+    "capture_present": false,
+    "recall_pass": false,
+    "control_clean": true,
+    "strict_control_no_canary_fact_text": false
+   },
+   "codex_to_claude": {
+    "capture_present": true,
+    "recall_pass": true,
+    "control_clean": true,
+    "strict_control_no_canary_fact_text": false
+   }
+  },
+  "post_nemotron": {
+   "codex_to_claude": {
+    "capture_present": true,
+    "recall_pass": true,
+    "control_clean": true,
+    "strict_control_no_canary_fact_text": false,
+    "vector_stream": true,
+    "receiver_utc": "~16:43Z (late, after Claude login change)"
+   },
+   "claude_to_codex": {
+    "capture_present": false,
+    "source_session_ran": false,
+    "reason": "claude -p 429 session limit",
+    "control_clean": true
+   }
+  },
+  "verdict": "PARTIAL (non-blocking): Codex->Claude, the only direction that passed on MiniLM, passed late (~16:43Z) on Nemotron with recall_pass, control_clean and the vector stream. Claude->Codex was not run post-switch (Claude source session 429); its capture defect already existed in the step 6 baseline and job 10."
+ },
+ "gates": {
+  "1_restore": "PASS",
+  "2_baseline_validity": "PASS",
+  "3_pre_restart_config": "PASS (manager-env read blocked by project guard; unit-level 0)",
+  "4_switch_start": "PASS",
+  "5_no_half_embedded": "PASS",
+  "6_quality": "PASS",
+  "7_prefix_proof": "PASS",
+  "8_gate3_cross_client": "PARTIAL (non-blocking): Codex->Claude, the only direction that passed on MiniLM, passed late (~16:43Z) on Nemotron with recall_pass, control_clean and the vector stream. Claude->Codex was not run post-switch (Claude source session 429); its capture defect already existed in the step 6 baseline and job 10.",
+  "9_rollback_verification": "n/a (no rollback)",
+  "10_other": "PASS: service active throughout, vLLM 200, every run valid, 0 degrade lines since t-switch"
+ },
+ "timeline_utc": {
+  "t0": "15:40:52Z",
+  "backup_1": "15:45:00Z",
+  "restore_window": "15:46:26.9-15:46:29.7Z",
+  "freeze": "15:53:57Z",
+  "baseline_eval": "15:54Z",
+  "gate3_pre": "15:55:50-16:06:49Z",
+  "backup_2": "16:07Z",
+  "config_edit": "16:07:34Z",
+  "restart_1": "16:07:46Z",
+  "re_embed_done": "16:09:05Z",
+  "restart_2": "16:09:27Z",
+  "after_eval": "16:10:30Z",
+  "prefix_proof": "16:11:03Z",
+  "gate3_post": "16:11:13-16:16:11Z; late receiver ~16:43Z",
+  "accepted": "2026-10-06T16:45:58Z"
+ },
+ "deviations": [
+  "Manager-level env check (systemctl --user show-environment) blocked by the project secret guard; per-unit Environment names count 0 and no EnvironmentFile used instead.",
+  "29 known-answer targets instead of 30: 24 of 58 stable pages are lifecycle-only, 5 more are duplicates or count-only; thresholds applied as 29.",
+  "promptfoo 0.123.1 MCP provider output is the JSON-encoded content-block array; assertions unwrap the text block before reading hits.",
+  "Gate 3 control judged on the association reading; strict fact-text reading is false in every run (low-cosine canary neighbours in a small scope).",
+  "Gate 3 Codex->Claude receiver ran late after a Claude login change; Claude->Codex post-switch source never ran (429).",
+  "Optional embed --force purge of the superseded MiniLM rows not run."
+ ],
+ "superseded_minilm_rows_remaining": 227,
+ "host_cleanup": {
+  "at_utc": "2026-10-06T16:46:10Z",
+  "removed": {
+   "snap1/": 298733568,
+   "restore-test/": 417964688
+  },
+  "bytes_freed": 716698256,
+  "kept": [
+   "backup-1.tar.gz (0600, sha256 verified OK)",
+   "backup-2.tar.gz (0600, sha256 verified OK)",
+   "config.toml.pre-switch (0600, sha256 e717939d5fc1182f...)"
+  ],
+  "keep_backups_until_at_least": "2026-10-13"
+ },
+ "acceptance_basis": "Accepted with Gate 3 at PARTIAL: PARTIAL is the plan's named outcome when the failing direction's cause is a missing source capture rather than the embedder (gate 8); the step 15 rollback trigger (a direction that passed in step 6 now fails while its source capture is present) was never met; the command center (CC) directed ACCEPTED at ~16:44Z. All other gates pass."
+}

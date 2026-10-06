@@ -5,6 +5,23 @@
 # Use "none" for a deliberately FTS-only profile. This is separate from the
 # SocratiCode/Nemotron code index and does not enable LLM consolidation.
 embedding_provider = "local"
+# Accepted GPU profile on NativeStack2604 (2026-10-06 native receipt):
+# Replace the active local provider above and uncomment these six fields.
+# Keep them above the first [table]; never define embedding_provider twice.
+# embedding_provider = "openai-compat"
+# embedding_model = "nvidia/Nemotron-3-Embed-8B-BF16"
+# embedding_base_url = "http://127.0.0.1:28231/v1"
+# embedding_dim = 4096
+# embedding_query_prefix = "query: "
+# embedding_document_prefix = "passage: "
+# For a deployment already bound on 29374, the CC separately applies:
+# server_url = "http://127.0.0.1:29374"
+# This client consistency line is pending; it is not part of the receipt hash.
+# Source: ai-memory@7580b74d config.rs:461-502 and embedding.rs:465-485;
+# model README at d1f2f25730bbd775b99b29185134bc86653bf2d1.
 backfill_on_start = false
 capture_assistant = false
 consolidate_on_session_end = false
+
+[maintenance]
+embedding_backfill_interval_secs = 900

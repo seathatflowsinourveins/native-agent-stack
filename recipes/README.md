@@ -327,6 +327,29 @@ ai-memory init
 
 Use the relevant fields from [ai-memory-config.toml.example](../examples/ai-memory-config.toml.example) in the default data directory's `config.toml`. The selected semantic-memory profile uses upstream `embedding_provider="local"`: checksum-pinned MiniLM, 384 dimensions, about 87 MiB downloaded once, with inference inside ai-memory. Use `none` for a deliberately FTS-only profile. Leave the LLM provider and reranker unset; literal `llm_provider="none"` is invalid. Historical transcript backfill, assistant capture and session-end LLM consolidation remain disabled. Embedding backfill is separate: an enabled server embeds existing latest pages across its configured store, so inspect that store's scope first. Keep one data directory/config shared by service and native hooks; choosing a different server config alone does not redirect hook fallback storage. See the [qualified memory/RAG workflow](../docs/memory-rag-native-practice.md) for native returns, recovery and interface boundaries.
 
+The portable CPU default above remains available. NativeStack2604's accepted
+GPU alternative uses ai-memory2.5.2's supported prefix keys and the already
+served Nemotron8B endpoint. Replace the local provider with this profile;
+top-level embedding keys must stay above the first TOML table:
+
+```toml
+embedding_provider = "openai-compat"
+embedding_model = "nvidia/Nemotron-3-Embed-8B-BF16"
+embedding_base_url = "http://127.0.0.1:28231/v1"
+embedding_dim = 4096
+embedding_query_prefix = "query: "
+embedding_document_prefix = "passage: "
+[maintenance]
+embedding_backfill_interval_secs = 900
+```
+
+See the [2026-10-06 decision and native receipt](../docs/decisions/2026-10-06-ai-memory-nemotron-embedder.md)
+for335/335 latest-page coverage, the29-target known-answer comparison,
+prefix proof and the remaining cross-client/environment boundaries. This
+profile changes ai-memory's embedder; it does not select the D3r4 memory owner
+or change the separate SocratiCode index. The [pinned upstream prefix path](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-llm/src/embedding.rs#L465)
+preserves the significant spaces in both strings.
+
 For a text-only clean-install trial, explicitly set `embedding_provider="none"`
 or the supported `AI_MEMORY_EMBEDDING_PROVIDER=none` in that owned service's
 environment. An unset embedding provider can select the local default and start

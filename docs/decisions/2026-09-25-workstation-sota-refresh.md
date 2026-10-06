@@ -674,6 +674,14 @@ sends no prefixes, and ai-memory's config accepts unknown keys, so setting prefi
 production since 2026-09-26, is the same here: it does not contain #859, and its `config.rs`
 has no prefix keys.
 
+**Correction2026-10-06.** The2.4.x review above remains historical. Prefix
+keys shipped in2.5.0 (#859) and are supported by2.5.2@7580b74d:
+[config.rs:461–502](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-cli/src/config.rs#L461),
+[query/document application](https://github.com/akitaonrails/ai-memory/blob/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/crates/ai-memory-llm/src/embedding.rs#L465).
+The `local` provider still uses MiniLM; the supported OpenAI-compatible route
+now applies publisher prefixes. See the [accepted NativeStack2604 record](2026-10-06-ai-memory-nemotron-embedder.md)
+for the8B integration, its actual native gates and remaining boundaries.
+
 **Alternatives.** Switch on 2.4.x without prefixes (only if an unprefixed arm passes the
 same preregistered rule); instruction-free models such as pplx-embed-v1-0.6b (needs a
 serving runtime this stack does not run) or granite-embedding-english-r2 (weaker).
