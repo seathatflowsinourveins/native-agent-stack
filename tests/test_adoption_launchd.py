@@ -881,6 +881,11 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
             restricted = tmp_path / "restricted-path"
             restricted.mkdir()
             (restricted / "python3").symlink_to(python3)
+            # The script's prelude uses dirname before reaching cmd_lint
+            # (native-agent-stack@0d5e6506:launchd-agents.sh:65).
+            dirname = shutil.which("dirname")
+            self.assertIsNotNone(dirname)
+            (restricted / "dirname").symlink_to(dirname)
             result = subprocess.run(
                 [BASH, str(SCRIPT_PATH), "lint", "--dir", str(rendered_dir)],
                 capture_output=True, text=True, timeout=30,
@@ -918,6 +923,9 @@ class LaunchdAgentsScriptBehaviorTests(unittest.TestCase):
                 "exit 0\n"
             )
             (shim / "plutil").chmod(0o755)
+            dirname = shutil.which("dirname")
+            self.assertIsNotNone(dirname)
+            (shim / "dirname").symlink_to(dirname)
             result = subprocess.run(
                 [BASH, str(SCRIPT_PATH), "lint", "--dir", str(rendered_dir)],
                 capture_output=True, text=True, timeout=30,

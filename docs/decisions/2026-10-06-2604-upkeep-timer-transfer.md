@@ -16,9 +16,30 @@ Keep HOME, production root validation and every apply/rollback command unchanged
 A positive control forces the cached default to /tmp without creating a fixture
 there; an out-of-home manifest still fails before any manager call and preserves
 the candidate bytes. The [CI repair receipt](../../evidence/artifacts/ns2604-p1-upkeep-timers-20261006/ci-repair-20261006.json)
-keeps the hosted failure and later local results distinct. Full-suite validation
-waits until after the 2026-10-06 paper window ends at 13:45Z; publication requires
-that run.
+keeps the hosted failure and later local results distinct. The first full discovery
+after the paper window ran 10,400 tests and exited 1 (21 failures, 18 errors,
+905 skips); the timer module had no failure. Required calendar packages were absent,
+the caller's umask masked permission fixtures, and home-path export fixtures hit
+the existing canary. Those setup errors remain failed evidence. The corrected
+private CI prerequisites have hash-checked wheels, separate promotion dependencies
+and verified pinned npm loaders. Logs stay private; regenerated fixtures use a
+short non-home scratch path and CI-style umask022.
+
+Fresh full discovery also found three restricted-PATH fixtures missing the
+production script's dirname prelude, and a native containment test reading
+multi-property values positionally. Add the required prelude executables while
+preserving jq/plutil absence. Keep named systemd properties, exactly three rows
+and keys, and every task/state/memory/kernel/cgroup/release assertion. This follows
+[systemd's --value contract:2174-2178](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemctl.xml#L2174)
+and the maintained keyed reader in upkeep-transfer.md:494 at6b19ae22. Eight focused
+regressions and three loader/native-containment preflight checks pass. No production
+policy or limit changes.
+
+The installed client's new auth_storage_failure Notification type still requires
+its notification owner's dated decision (Q55); this lane chooses neither ring nor
+quiet. The qualified full retry is pending GO-RELAUNCH under command-center item
+task-ns2604-coop-20261006T143738Z. No full-pass or publication claim is made from
+this checkpoint.
 
 The private approved `PLAN-full-resolution-20261005.md` has SHA256 775119dc6840552def19142a10e2730b489b6365c346e6f9fb6f5db5f2572ba2. Its Phase 1 at 63-106 and timer assignment at 100-104 distinguish these two timers from the other upkeep jobs assigned to Dagu. Command-center item task-ns2604-coop-20261006T031317Z and the co-op's A49 govern the bounded transfer.
 

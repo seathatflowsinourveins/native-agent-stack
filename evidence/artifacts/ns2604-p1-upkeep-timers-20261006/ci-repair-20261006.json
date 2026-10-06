@@ -2,9 +2,14 @@
   "schema_version": 1,
   "kind": "upkeep_timer_ci_fixture_repair",
   "date_utc": "2026-10-06",
-  "evidence_classes": ["source", "synthetic", "local_integration"],
+  "evidence_classes": [
+    "source",
+    "synthetic",
+    "local_integration"
+  ],
   "prior_head": "28d82fc4fbfb3b24db46bf74404cb33c8f5f9e1b",
-  "rebase_base": "c1300c15b42f1a6643f3dc4172f40c01d99abdcd",
+  "rebase_base": "0d5e6506434fab598dee861c749a22e628beb75a",
+  "previous_rebase_base": "c1300c15b42f1a6643f3dc4172f40c01d99abdcd",
   "failed_ci": {
     "url": "https://github.com/seathatflowsinourveins/native-agent-stack/actions/runs/37424811527/job/112143463618",
     "result": "failure",
@@ -42,6 +47,35 @@
       "path": "adoption/templates/systemd/upkeep-transfer.md",
       "lines": "547-573",
       "contract": "The real rollback rejects an unowned private batch or out-of-home manifest roots before manager calls."
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "0d5e6506434fab598dee861c749a22e628beb75a",
+      "path": "adoption/bootstrap-linux.sh",
+      "lines": "47,221",
+      "contract": "The restricted prerequisite fixture must supply the script's dirname prelude and required Python while keeping jq absent."
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "0d5e6506434fab598dee861c749a22e628beb75a",
+      "path": "adoption/launchd/launchd-agents.sh",
+      "lines": "65",
+      "contract": "Both lint-selection fixtures must supply dirname before cmd_lint, preserving the intended plutil/Python choice."
+    },
+    {
+      "repository": "systemd/systemd",
+      "pin": "b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a",
+      "path": "man/systemctl.xml",
+      "lines": "2174-2178",
+      "url": "https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemctl.xml#L2174",
+      "contract": "--value drops names and equals signs; keep native names when querying multiple properties."
+    },
+    {
+      "repository": "seathatflowsinourveins/native-agent-stack",
+      "pin": "6b19ae228f506f7199bd8ca84ebf16faea40f2cf",
+      "path": "adoption/templates/systemd/upkeep-transfer.md",
+      "lines": "494",
+      "contract": "Reuse the maintained keyed native-show parsing in the test's observation path."
     }
   ],
   "commands": [
@@ -62,38 +96,174 @@
       "command": "nice -n 19 python3 -B scripts/validate.py",
       "exit_code": 0,
       "log": "ci-repair-validate.log",
-      "output": {"components": 69, "hashed_files": 10328, "profiles": 4, "receipts": 212, "status": "passed"},
+      "output": {
+        "components": 69,
+        "hashed_files": 10328,
+        "profiles": 4,
+        "receipts": 212,
+        "status": "passed"
+      },
       "evidence_class": "local_integration"
     },
     {
       "command": "git diff --check",
       "exit_code": 0,
       "evidence_class": "local_integration"
+    },
+    {
+      "command": "nice -n19 private CI interpreter -B -m unittest -v <three PATH fixtures, native containment, private-state mode, two role-mode preservation controls, token export>",
+      "tests": 8,
+      "exit_code": 0,
+      "log": "ci-fixture-focused.log",
+      "evidence_classes": [
+        "synthetic",
+        "local_integration"
+      ]
+    },
+    {
+      "command": "nice -n19 privateCI Python -B -m unittest -v tests.test_new_wsl_upkeep_timers tests.test_native_dashboard_data tests.test_disk_headroom_guard",
+      "tests": 70,
+      "exit_code": 0,
+      "elapsed_seconds": 4.852,
+      "log": "park-upkeep-touched.log",
+      "evidence_classes": [
+        "synthetic",
+        "local_integration"
+      ]
+    },
+    {
+      "command": "nice -n19 privateCI Python -B evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py",
+      "exit_code": 0,
+      "rows": 84,
+      "commands": 185,
+      "acceptance_entries": 113,
+      "log": "park-check-plan.log",
+      "evidence_class": "local_integration"
+    },
+    {
+      "command": "nice -n19 privateCI Python -B scripts/validate.py",
+      "exit_code": 0,
+      "output": {
+        "components": 69,
+        "hashed_files": 10349,
+        "profiles": 4,
+        "receipts": 214,
+        "status": "passed"
+      },
+      "log": "park-validate.log",
+      "evidence_class": "local_integration"
     }
   ],
   "full_suite": {
-    "status": "pending",
+    "status": "failed_first_attempt_retry_held_for_mcp_relaunch",
     "not_before_utc": "2026-10-06T13:45:00Z",
     "command": "nice -n 19 python3 -B -m unittest -v --durations 50",
-    "source": ".github/workflows/validate.yml:227-239 at c1300c15b42f1a6643f3dc4172f40c01d99abdcd"
+    "source": ".github/workflows/validate.yml:227-239 at 0d5e6506434fab598dee861c749a22e628beb75a",
+    "tests": 10400,
+    "elapsed_seconds": 2671.738,
+    "failures": 21,
+    "errors": 18,
+    "skipped": 905,
+    "exit_code": 1,
+    "log": "ci-repair-full-suite.log",
+    "sha256": "e93f8e14b65a7821ffd25b1bb45b7de93a95ab0d70194059bed658a9a0f2698a",
+    "observed_exit_utc": "2026-10-06T14:41:48Z",
+    "timer_module_failures": 0
   },
   "preservation": {
     "backup_branch": "codex/ns2604-p1-timers-ci-backup-28d82fc4",
     "dropped_commit": "28d82fc4fbfb3b24db46bf74404cb33c8f5f9e1b",
-    "dropped_commit_changes_only": ["manifests/evidence.json"],
+    "dropped_commit_changes_only": [
+      "manifests/evidence.json"
+    ],
     "prior_source_preserved": true,
     "guard_service_sha256": "23a5f7433022f2fa3daf99f28e7160b9af6e97c9e7369cf0c37494c512d4b3a4",
-    "guard_script_sha256": "2d8b3e4129043bd30ae02538e598300243980874338a54b72932e146cf099009"
+    "guard_script_sha256": "2d8b3e4129043bd30ae02538e598300243980874338a54b72932e146cf099009",
+    "production_files_unchanged": true
   },
   "completeness_critic": {
-    "result": "No material gap found; no production custody gate weakened.",
-    "scope": "Read-only source review of the explicit fixture dir binding, external-default control, wrong-root preservation control and stub manager PATH.",
+    "result": "No material gap found; no production gate or permission policy relaxed.",
+    "scope": "Read-only fixture/prelude and keyed native-observation review: dirname/Python additions preserve absence controls; exact rows/keys, cgroup, native/kernel memory/tasks/state/release gates retained.",
     "evidence_class": "source"
   },
   "limits": [
-    "No production unit, guard script, observer or apply/rollback block changes.",
+    "No production unit, guard script, observer or apply/rollback block changes in this CI correction; additional changes repair only test observation/prelude contracts.",
     "These are synthetic fixtures and local integration, not upstream test acceptance, host activation or a successful GitHub CI rerun.",
-    "Full unittest validation and publication wait until the paper window closes; the CI failure remains disclosed.",
+    "The first full attempt remains a failure. A qualified full retry and publication awaitGO-RELAUNCH; no J772 done claim is made.",
     "No real user-manager, pruning, native-data publication, model or credential-store call is made."
-  ]
+  ],
+  "first_full_attempt_corrections": [
+    "The first full attempt used the host interpreter before qualifying required CI packages. All 18 import errors reported missing exchange_calendars; dependent mutation assertions also failed.",
+    "The caller's umask077 changed directory mode fixtures. The corrected command opens its retained log under077, then runs fixtures underCI-style022. No production permission check changes.",
+    "Home/state export fixture paths were rejected by the existing canary gate. Regenerable fixture scratch outside the home passes the unchanged export control; no Unix-socket attribution is made.",
+    "Three restricted-PATH fixtures lacked the script prelude's dirname; add only required prelude executables while preserving jq/plutil absence gates.",
+    "The native containment test parsed three --value results positionally and observed TasksCurrent='running'. Preserve names and exact row/key counts; every task/state/memory/kernel/cgroup/release gate remains."
+  ],
+  "qualified_prerequisites": {
+    "scope": "private state prefixes only; no shared/client/host plan apply",
+    "unit_python": "3.13.16",
+    "unit_install": {
+      "source": ".github/workflows/validate.yml:63-68 at0d5e6506434fab598dee861c749a22e628beb75a",
+      "requirements": ".github/requirements-ci.txt including requirements-calendar.txt",
+      "binary_only": true,
+      "hashes_required": true,
+      "config_files": "/dev/null sentinel with pip --isolated",
+      "exit_code": 0,
+      "packages": {
+        "exchange-calendars": "4.13.2",
+        "numpy": "2.5.3",
+        "pandas": "3.0.6",
+        "zizmor": "1.30.1",
+        "pip": "26.2.1"
+      }
+    },
+    "promotion": {
+      "uv": "0.12.17",
+      "archive_sha256": "fa82fd8dde8e8eefdecada6aa0889666556cfceb690d06e0c3bca49eb3070a63",
+      "checksum_exit_code": 0,
+      "python": "3.14.4 via native /usr/bin/python3",
+      "lock": "blueprints/us-equities/data/requirements.lock",
+      "install_exit_code": 0,
+      "no_build": true,
+      "limit": "CI's image uses Python3.12; this is local qualification on installed interpreters, not a hostedCI replay."
+    },
+    "npm": [
+      {
+        "pin": "examples/claude-native/workflows/shell-parser.pin.json",
+        "packages": [
+          "web-tree-sitter@0.27.0",
+          "tree-sitter-bash@0.25.1"
+        ],
+        "install_exit_code": 0
+      },
+      {
+        "pin": "tools/sota-convergence/landscape-sweep/skills-yaml.pin.json",
+        "packages": [
+          "yaml@2.9.0"
+        ],
+        "install_exit_code": 0
+      }
+    ],
+    "npm_scripts": "disabled by the maintained pin commands; isolated empty config files, no copied authentication data",
+    "loader_preflight": {
+      "command": "GITHUB_ACTIONS=true with the exact four CI selectors; unittest shell-parser verified-runtime test, skills-yaml verified-runtime test, native containment test",
+      "tests": 3,
+      "exit_code": 0,
+      "log": "ci-loader-preflight.log"
+    }
+  },
+  "host_only_open_gap": {
+    "test": "tests.test_windows_terminal_defaults.OverlayTests.test_the_installed_client_knows_no_notification_type_without_a_decision",
+    "returned_unknown_type": "auth_storage_failure",
+    "result": "failure",
+    "owner": "command center/notification decision owner",
+    "action": "Q55 requests its dated owner decision; no ring/quiet decision or client configuration change by this lane"
+  },
+  "park": {
+    "source_item": "task-ns2604-coop-20261006T143738Z",
+    "direction_time_utc": "2026-10-06T14:38:01Z",
+    "read_utc": "2026-10-06T14:52:14Z",
+    "reason": "Finish short fixes; start no new full matrix untilGO-RELAUNCH.",
+    "qualified_full_retry_started": false
+  }
 }

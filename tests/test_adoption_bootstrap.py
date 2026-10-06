@@ -455,14 +455,15 @@ class SystemPackagesBeforePrerequisiteCheckTests(unittest.TestCase):
 
             stub_bin = tmp_path / "stub-bin"
             stub_bin.mkdir()
-            # Symlink uname (needed before the check runs) and every normally-
+            # Symlink the prelude's dirname (bootstrap-linux.sh:47 at
+            # native-agent-stack@0d5e6506), uname and every normally-
             # required tool except jq, so only jq is reported missing. PATH is
             # restricted to exactly this directory so nothing falls back to a
             # real system jq.
             import os
             import shutil as _shutil
             bash_path = _shutil.which("bash")
-            for tool in ("uname", "curl", "git", "tar", "sha256sum", "realpath", "flock", "mktemp"):
+            for tool in ("dirname", "uname", "python3", "curl", "git", "tar", "sha256sum", "realpath", "flock", "mktemp"):
                 found = _shutil.which(tool)
                 if found:
                     (stub_bin / tool).symlink_to(found)
