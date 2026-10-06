@@ -1,0 +1,63 @@
+{
+  "schema_version": 1,
+  "date": "2026-10-06",
+  "unit": "qmd-instruction-citation-followup",
+  "lane": "foundation",
+  "base": "1eb8013c685370d7f65cb52d291bd381b8144205",
+  "evidence_class": [
+    "source-review",
+    "local-integration-check",
+    "structural-validation"
+  ],
+  "prior_receipt": {
+    "file": "evidence/artifacts/qmd-lexical-catalog-instructions-20261006/receipt.json",
+    "sha256": "acdffe5707ba8f652f5d08a4e432d714afb5c302815131a3756c158753860c73",
+    "retained_unchanged": true
+  },
+  "source": {
+    "repository": "seathatflowsinourveins/native-agent-stack",
+    "pin": "1eb8013c685370d7f65cb52d291bd381b8144205",
+    "path": "examples/codex-native/README.md",
+    "line": 192,
+    "claim": "The current example names the full otel.environment configuration key on line 192."
+  },
+  "repair": {
+    "file": "catalogs/foundation/upstream-surface-dispositions.json",
+    "key": "codex:config:otel.environment",
+    "field": "source",
+    "before": "examples/codex-native/README.md:188",
+    "after": "examples/codex-native/README.md:192",
+    "reason": "The added QMD catalog instruction paragraph shifted this unchanged example by four lines.",
+    "all_other_row_fields_and_rows_preserved": true
+  },
+  "retained_failed_attempt": {
+    "command": "python3 -B -m unittest tests.test_upstream_surface_watch",
+    "runner": "Root prepublication integration check",
+    "base": "1eb8013c685370d7f65cb52d291bd381b8144205",
+    "exit_code": 1,
+    "tests": 114,
+    "failures": 2,
+    "skips": 6,
+    "checks": [
+      "DispositionCitationTests.test_a_dotted_key_has_its_parent_near_the_citation",
+      "DispositionCitationTests.test_every_cited_line_names_the_key"
+    ],
+    "raw_log_sha256": "0a55fdec1b513982c2e9145138867de1df373a473463211d7c9ad505e7ef9ef4",
+    "raw_log": "Retained privately as upstream-surface-root.log in the lane's durable QMD instruction directory."
+  },
+  "qualification": {
+    "command": "env CI=true nice -n 19 ionice -c3 python3 -B -m unittest tests.test_upstream_surface_watch",
+    "umask": "022",
+    "exit_code": 0,
+    "tests": 114,
+    "skips": 6,
+    "duration_seconds": 1.947,
+    "raw_log": "Retained privately as upstream-surface.qualified.log in the same directory."
+  },
+  "host_changes": false,
+  "limits": [
+    "This repairs one current catalog source locator; it does not establish or change host configuration.",
+    "The original QMD instruction receipt, supersession artifact and all historical records remain unchanged.",
+    "The earlier result of 333 tests is retained in its original receipt; this followup reruns only the affected module of 114 tests."
+  ]
+}
