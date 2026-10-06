@@ -17752,8 +17752,8 @@
     },
     {
       "path": "docs/token-efficiency-stack.json",
-      "sha256": "172d1d75458d9af2c24f1a1f63615fbaa34dc6abaf9428c58d6cacee3ec58b95",
-      "bytes": 592422
+      "sha256": "beb1b775d8c69527ddd1ee02564efc7ddf26dbc7e40d1737355f5cc69e22547b",
+      "bytes": 592549
     },
     {
       "path": "docs/token-efficiency-stack.md",
@@ -53902,8 +53902,8 @@
     },
     {
       "path": "manifests/stack.json",
-      "sha256": "2d0b3dc547cfecc5d6ee5dccb4d0cc0aa7e65fc5d69570a1306c288e247af6f4",
-      "bytes": 103873
+      "sha256": "4a4b8a4e41978d5e0ce9887c2810d43659d218b89834f775574284c8b2f865e3",
+      "bytes": 103920
     },
     {
       "path": "observability/README.md",
