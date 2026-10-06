@@ -63,7 +63,7 @@ point here.
    in the host repository refuses, on the Claude and Codex profiles, any `bellSound` that is not exactly a measured quiet file directly in `C:\Windows\Media` (a subdirectory or a `..` path is refused; since 2026-09-30, after a cross-family review, and where that folder is readable from WSL the file must exist) and refuses
    `audible` on the static ones.
 3. **Alerts only when a decision is pending.** `~/.claude/settings.json`: `preferredNotifChannel` is
-   `notifications_disabled` (hooks still run) and one `Notification` hook, matcher <!-- operative-matcher -->`permission_prompt|elicitation_dialog|elicitation_url_dialog|agent_needs_input|quota_auto_resume_stale|quota_auto_resume_disabled|worker_permission_prompt|push_notification`, command `jq -nc --arg s "$(printf '\a')" '{terminalSequence:$s}'` (the hooks reference's construction, so no control
+   `notifications_disabled` (hooks still run) and one `Notification` hook, matcher <!-- operative-matcher -->`auth_storage_failure|permission_prompt|elicitation_dialog|elicitation_url_dialog|agent_needs_input|quota_auto_resume_stale|quota_auto_resume_disabled|worker_permission_prompt|push_notification`, command `jq -nc --arg s "$(printf '\a')" '{terminalSequence:$s}'` (the hooks reference's construction, so no control
    byte sits in the settings string). The dialog types wait about 6 s for the user first; `agent_needs_input` fires when a background
    session starts waiting while agent view is open (its documented 6 s applies to an agent-team setup question); the
    quota types fire when the quota event occurs; `worker_permission_prompt` fires from the team inbox poller; `push_notification` was added on 2026-09-29 (see the last update). `idle_prompt` (the finished-and-waiting
