@@ -340,14 +340,36 @@ def _listing(root: Path, depth: int = 2) -> list[str]:
     return sorted(out)
 
 
+# Keys every Codex launch sets itself (CL3's -m and -c model_reasoning_effort; CL7's model and modelReasoningEffort;
+# CL7b's model and model_reasoning_effort): a change to them in the omniroute profile file changes no trial.
+PROFILE_KEYS_SET_BY_LAUNCH = ("model", "model_reasoning_effort")
+
+
+def omniroute_profile_effective(path: Path | None = None) -> str | None:
+    """Hash of the omniroute profile as the trials see it: the parsed file without the keys each launch sets. The S7
+    view gates on this (smoke-20261006a stopped on another lane's edit of the profile's default model, which every cell
+    overrides); the raw file hash is kept as information."""
+    path = path or CODEX_HOME_REAL / "omniroute.config.toml"
+    if not path.exists():
+        return None
+    try:
+        import tomllib
+        data = tomllib.loads(path.read_text(encoding="utf-8"))
+    except Exception:  # noqa: BLE001 - an unparsable profile gates on its raw bytes
+        return "unparsed:" + sha256_file(path)
+    return sha256_json({k: v for k, v in data.items() if k not in PROFILE_KEYS_SET_BY_LAUNCH})
+
+
 def s7_snapshot(extra_files: dict | None = None) -> dict:
     """Host exposure snapshot (S7). extra_files maps a label to a path (per-trial clone, settings, tarball)."""
     claude_dir = HOME / ".claude"
-    snap = {"taken_at": utc_now(), "files": {}}
+    snap = {"taken_at": utc_now(), "files": {}, "info": {}}
     for label, path in (("claude/settings.json", claude_dir / "settings.json"), ("claude/CLAUDE.md", claude_dir / "CLAUDE.md"),
-                        ("codex/hooks.json", CODEX_HOME_REAL / "hooks.json"), ("codex/AGENTS.md", CODEX_HOME_REAL / "AGENTS.md"),
-                        ("codex/omniroute.config.toml", CODEX_HOME_REAL / "omniroute.config.toml")):
+                        ("codex/hooks.json", CODEX_HOME_REAL / "hooks.json"), ("codex/AGENTS.md", CODEX_HOME_REAL / "AGENTS.md")):
         snap["files"][label] = sha256_file(path) if path.exists() else None
+    profile = CODEX_HOME_REAL / "omniroute.config.toml"
+    snap["files"]["codex/omniroute profile (launch-effective)"] = omniroute_profile_effective(profile)
+    snap["info"]["codex/omniroute.config.toml (raw, not gated)"] = sha256_file(profile) if profile.exists() else None
     agents = sorted((claude_dir / "agents").glob("*.md"))
     snap["files"]["claude/agents/*.md"] = sha256_json({p.name: sha256_file(p) for p in agents})
     # The currency due file feeds a harness SessionStart hook's additionalContext (finding 16): its presence and hash.

@@ -139,9 +139,7 @@ def yaml_quote(text: str) -> str:
     return json.dumps(text, ensure_ascii=False)
 
 
-# Keys every Codex launch sets itself (CL3's -m and -c model_reasoning_effort; CL7's model and modelReasoningEffort;
-# CL7b's model and model_reasoning_effort), so the profile layer below leaves them out.
-PROFILE_KEYS_SET_BY_LAUNCH = ("model", "model_reasoning_effort")
+from common import PROFILE_KEYS_SET_BY_LAUNCH  # noqa: E402 - the keys each launch sets (common.py), left out below
 
 
 def codex_profile_layer(profile: str = "omniroute") -> dict:
