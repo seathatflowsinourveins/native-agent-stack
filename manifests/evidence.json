@@ -17417,6 +17417,11 @@
       "bytes": 3660
     },
     {
+      "path": "docs/decisions/2026-10-06-cc-orchestration-composition.md",
+      "sha256": "5f5a6d54e9de82ba99fda40547036677800785787d6670f449280af0cfaef964",
+      "bytes": 21371
+    },
+    {
       "path": "docs/decisions/2026-10-06-sharp-live-relock-frozen-variant.md",
       "sha256": "7fad1a25a8f3b1c151a7c1f125c1635d32d631757c68509588b55d72c1cf6f89",
       "bytes": 3898
@@ -17553,8 +17558,8 @@
     },
     {
       "path": "docs/harness-defaults.md",
-      "sha256": "26ec355b96aa6bc91fba8fd4f1ff33d84b13ce7865c4eb3108d98ead4dfa534c",
-      "bytes": 225647
+      "sha256": "c7333423ba0e6ee597341ed6a23e2f00a98969b98f4f28283a99abd51b6bae5f",
+      "bytes": 229655
     },
     {
       "path": "docs/harness-rules-convergence-20260922.md",
@@ -53352,6 +53357,11 @@
       "bytes": 1066
     },
     {
+      "path": "examples/agentsview.service.example",
+      "sha256": "76e23702d95e08282145319dccfdde79338bfe009af6a96606dd567feb67535a",
+      "bytes": 264
+    },
+    {
       "path": "examples/agentsview.toml.example",
       "sha256": "98ae8c2403a41e862f99131c86c8e3d9d525dec8f8fa7ed9eb396a86b97ab39a",
       "bytes": 553
@@ -53605,6 +53615,16 @@
       "path": "examples/deepagents-omniroute/worker.py",
       "sha256": "cc6ebc1878b4b10f295e59a18cde7afc152a6dd7bd4faf6e7f5eb64ef2ede8cd",
       "bytes": 6531
+    },
+    {
+      "path": "examples/hcom-lanes.conf",
+      "sha256": "534e68dd5093b99e45373547dae819b11226ccd9deddc77f518ad64542b4b3fd",
+      "bytes": 486
+    },
+    {
+      "path": "examples/hcom-wt-tmux.toml.example",
+      "sha256": "fa678712a77428da7e7bff2e39349471e551a29ca1671135267945b8ecba0ed2",
+      "bytes": 718
     },
     {
       "path": "examples/mcporter.json.example",
