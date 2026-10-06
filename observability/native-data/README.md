@@ -20,7 +20,11 @@ python3 observability/native-data/snapshot.py --config /absolute/private/config.
 python3 observability/native-data/snapshot.py --config /absolute/private/config.json --publish
 ```
 
-Publishing uses only `http://127.0.0.1:13100/loki/api/v1/push`. Optional Qdrant
+Publishing uses only the recorded literal loopback endpoints:
+`http://127.0.0.1:13100/loki/api/v1/push` on the original host, or
+`http://127.0.0.1:21300/loki/api/v1/push` on NativeStack2604, as selected by
+the install plan's Loki row at `ecfa112764c664d35377dd66b8cfcb67e5a94d60`.
+The config must choose one explicitly; no endpoint is inferred. Optional Qdrant
 configuration is an explicit literal loopback origin and one collection, for
 example `{"url":"http://127.0.0.1:16333","collection":"selected-collection"}`.
 HTTP proxies and redirects are disabled. There is no authentication discovery,
@@ -165,7 +169,7 @@ for QMD's `env node` launcher. Install the results as
 native lifecycle commands:
 
 ```sh
-systemd-analyze --user verify ~/.config/systemd/user/ecosystem-native-data.service ~/.config/systemd/user/ecosystem-native-data.timer
+systemd-analyze --user --man=no --generators=no --recursive-errors=no verify ~/.config/systemd/user/ecosystem-native-data.service ~/.config/systemd/user/ecosystem-native-data.timer
 systemctl --user daemon-reload
 systemctl --user start ecosystem-native-data.service
 systemctl --user show ecosystem-native-data.service --property=Result,ExecMainStatus
@@ -202,6 +206,53 @@ rm ~/.config/systemd/user/ecosystem-native-data.service ~/.config/systemd/user/e
 rm "$STACK_CONFIG_ROOT/ecosystem-grafana-dashboards/native-foundation-data.json"
 systemctl --user daemon-reload
 ```
+
+### NativeStack2604 transfer
+
+The reviewed transfer uses the maintained
+[`ecosystem-native-data.service`](../../adoption/templates/systemd/ecosystem-native-data.service)
+and [timer](../../adoption/templates/systemd/ecosystem-native-data.timer).
+It keeps the original two-minute cadence and observer, orders after the destination
+`ns2604-loki.service`, and uses the explicitly selected 21300 push endpoint.
+The co-op installs and enables these units; source checks activate no service.
+
+Before rendering, the co-op verifies that the persistent checkout contains the
+approved observer revision, the selected directory supplies Node 22 or later,
+native binary and project paths resolve, and the private configuration selects
+the intended report scopes. The state directory must be owned, nonsymlinked and
+mode 0700. Substitute reviewed absolute paths for the three existing placeholders.
+Quoted values support spaces. This transfer's simple substitution accepts no
+NUL, newline, carriage return, double quote, backslash, dollar sign or percent;
+the Node directory also accepts no colon. These characters require a separate
+documented systemd escaping step rather than silent substitution. See
+[ExecStart expansion](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.service.xml#L1490)
+and [unit specifiers](https://github.com/systemd/systemd/blob/b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a/man/systemd.unit.xml#L2318).
+
+Use the strict verification command above: the installed 259.5 default verifier
+can return 0 with warnings. After a synchronous manual start, record Result,
+ExecMainStatus and the journal cursor/start-job boundary. systemd can unload an
+inactive oneshot and discard its live ExecMainStartTimestamp/InvocationID; neither
+field is a reliable finished-run freshness gate. Successful oneshots normally
+end inactive; `status` can return 3. Also retain the fresh snapshot generation,
+Loki publication status, unknown_count and stale_count. HTTP 204 and a successful
+service prove returned publication and execution, not complete native-tool health.
+The transfer additionally requires an independent query_range on Loki 21300 to
+return the exact generated snapshot marker, joined to the journal invocation
+and hash-bound local snapshot. The destination render gate enforces ai-memory
+29374 and optional Qdrant 21633, verifies Node 22+, selected paths and a clean
+approved persistent checkout. Use
+[config.ns2604.example.json](config.ns2604.example.json) for reviewed private
+bindings; the original example remains the old host's configuration.
+
+Capture prior unit bytes, enablement and activation before applying. Roll back
+only this transfer's changes and restore those recorded states, including any
+prior symlink or absent-path state. Keep private observation state and receipts.
+The broader rollback above removes a dashboard; this timer transfer creates no
+dashboard and must not use that removal command.
+
+The [transfer runbook](../../adoption/templates/systemd/upkeep-transfer.md) gives
+the co-op's exact rendering, install, read-back and rollback sequence for both
+timers. Host activation remains separate from repository verification.
 
 The private config and state directory hold no credential and stay until you
 remove them. Rows already pushed expire with Loki's retention.

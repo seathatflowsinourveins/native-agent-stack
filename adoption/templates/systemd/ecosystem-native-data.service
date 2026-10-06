@@ -1,0 +1,19 @@
+# NativeStack2604 Phase-1 transfer; no automatic activation.
+# native-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:
+# observability/native-data/native-data.service.example:1-15 and README.md:158-174.
+# Installed systemd 259.5 source: systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a
+# man/systemd.service.xml:209-219; man/systemd.exec.xml:1315-1322 (Nice).
+# Substitute the three existing example placeholders with reviewed absolute paths.
+[Unit]
+Description=Observe selected native memory and token metadata on NativeStack2604
+After=ns2604-loki.service
+
+[Service]
+Type=oneshot
+UMask=0077
+NoNewPrivileges=true
+TimeoutStartSec=90
+Nice=19
+Environment="PATH=@NODE_DIRECTORY@:/usr/local/bin:/usr/bin:/bin"
+Environment=RTK_TELEMETRY_DISABLED=1
+ExecStart=/usr/bin/python3 -B "@REPOSITORY@/observability/native-data/snapshot.py" --config "@PRIVATE_CONFIG@" --publish

@@ -21,6 +21,10 @@ import urllib.parse
 import urllib.request
 
 LOKI = "http://127.0.0.1:13100/loki/api/v1/push"
+# The approved 2604 plan uses Loki 21300; preserve the recorded original host.
+# native-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:
+# evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json (loki).
+LOKI_ENDPOINTS = frozenset({LOKI, "http://127.0.0.1:21300/loki/api/v1/push"})
 LIMIT = 1024 * 1024
 # An explicit consumer ceiling, not a producer maximum: the token report bounds its
 # returned-results attachments (16 MiB in total, tools/token-report/README.md) but not its
@@ -129,8 +133,8 @@ def validate_config(config):
     if "server_url" in config["ai_memory"]:
         # ai-memory 2.4 `status` asks the running server's /admin/status at this URL.
         loopback_origin(config["ai_memory"]["server_url"], "ai-memory server")
-    if config["loki_url"] != LOKI:
-        raise ValueError("Loki must use the fixed loopback push endpoint")
+    if not isinstance(config["loki_url"], str) or config["loki_url"] not in LOKI_ENDPOINTS:
+        raise ValueError("Loki must use an exact recorded loopback push endpoint")
     q = config.get("qdrant")
     if q is not None:
         if not isinstance(q, dict) or set(q) != {"url", "collection"}:

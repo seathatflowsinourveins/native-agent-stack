@@ -355,6 +355,60 @@ class NativeDataTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             M.validate_config(c)
 
+    def test_loki_targets_are_exact_recorded_native_host_endpoints(self):
+        # Phase-1 transfer follows the destination plan's Loki 21300 listener;
+        # retain the established NativeStack13100 endpoint and other guards.
+        for endpoint in (
+            "http://127.0.0.1:13100/loki/api/v1/push",
+            "http://127.0.0.1:21300/loki/api/v1/push",
+        ):
+            with self.subTest(endpoint=endpoint):
+                config = self.config()
+                config["loki_url"] = endpoint
+                M.validate_config(config)
+        for endpoint in (
+            None, True, 21300, [], {},
+            "http://127.0.0.1:21301/loki/api/v1/push",
+            "http://127.0.0.1:21300/ready",
+            "http://localhost:21300/loki/api/v1/push",
+            "http://0.0.0.0:21300/loki/api/v1/push",
+            "http://user@127.0.0.1:21300/loki/api/v1/push",
+            "http://127.0.0.1:21300/loki/api/v1/push?redirect=1",
+            "http://127.0.0.1:21300/loki/api/v1/push#fragment",
+            "http://127.0.0.1:21300/loki/api/v1/push/",
+            "https://127.0.0.1:21300/loki/api/v1/push",
+        ):
+            with self.subTest(endpoint=endpoint):
+                config = self.config()
+                config["loki_url"] = endpoint
+                with self.assertRaises(ValueError):
+                    M.validate_config(config)
+
+    def test_publishing_uses_the_configured_2604_endpoint_and_requires_success(self):
+        # Synthetic metadata and transport; no installed clients or live Loki.
+        endpoint = "http://127.0.0.1:21300/loki/api/v1/push"
+        for status, expected in ((204, 0), (500, 1)):
+            with self.subTest(status=status), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                config = self.config()
+                config.update(loki_url=endpoint, state_dir=str(root / "state"))
+                path = root / "config.json"
+                path.write_text(json.dumps(config))
+                marker = M.base_row("snapshot", "Fixture", "fixture", "fixture",
+                                    "synthetic", 123, "snapshot")
+                marker.update(state="ok", row_count=1, unknown_count=0, stale_count=0)
+                snapshot = {"schema_version": 1, "observed_unix": 123,
+                            "rows": [marker], "commands": []}
+                with patch.object(sys, "argv", ["snapshot.py", "--config", str(path), "--publish"]), \
+                     patch.object(M, "Recorder"), patch.object(M, "collect", return_value=snapshot), \
+                     patch.object(M, "request", return_value=(status, b"")) as request, \
+                     patch("builtins.print"):
+                    self.assertEqual(M.main(), expected)
+                self.assertEqual(request.call_args.args[0], endpoint)
+                observed = json.loads((root / "state/snapshot.json").read_text())
+                self.assertEqual(observed["loki"]["http_status"], status)
+                self.assertEqual(observed["loki"]["error"], None if expected == 0 else "unexpected_http_status")
+
     def test_configured_report_scopes_select_their_labels_without_publishing_them(self):
         # Token-report labels observed on the WSL workstation: Context Mode scopes are the
         # report's context_roots names and Headroom uses the reporter's default label.

@@ -1,0 +1,14 @@
+# NativeStack source read 2026-10-06: timer SHA256 3d975232392dd4b76f35cd8a941214cd1a8829816605aa02e33426d81928990c.
+# Preserve the source's boot delay, two-minute cadence and fifteen-second accuracy.
+# systemd/systemd@b3d8fc43e9cb531d958c17ef2cd93b374bc14e8a:man/systemd.timer.xml.
+[Unit]
+Description=Run the NativeStack2604 disk headroom guard every two minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=2min
+AccuracySec=15s
+Unit=disk-headroom-guard.service
+
+[Install]
+WantedBy=timers.target
