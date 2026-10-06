@@ -644,3 +644,37 @@ Open after the repair round:
 - **G5's limits:** it cannot see a Codex connection's app-server opt-in
   (`open-sse/executors/codex.ts:415-439`). It counts inactive rows as served. Its
   provider lists are tied to the two builds read.
+
+## Runtime lock security relock: fsspec and multidict (2026-10-05/06)
+
+GHSA-27vj-qcqg-25rc fixes fsspec in 2026.6.0; GHSA-54p9-h82j-f925 fixes
+multidict in 6.9.1. J-FSSPEC extension 2 authorizes both, with the same #562
+archive/control/native export and isolated hashed-install pattern. The installed
+uv 0.12.22 reproduces the original lock byte for byte; no downgrade to #562's
+historical 0.12.17 is needed. Only those two package blocks change. SDK/tools,
+build-lock, source archive and wheel pins remain unchanged; no image acceptance
+or new runtime model call follows from the local checks.
+
+Published huggingface-hub 0.35.3 requires fsspec>=2023.5.0; aiohttp 3.14.3
+requires multidict<7.0,>=4.5 and yarl 1.22.0 requires multidict>=4.0. Every
+locked pair's metadata was checked, including optional markers and null-metadata
+fallbacks. Native release hashes, isolated install, dependency consistency and
+SDK/tool/fixed-package imports pass. Source review is separate from that
+integration evidence and from synthetic negative controls.
+
+The wave also fixes the active application-delivery Mako and source-map-js
+locks under their native uv/pnpm patterns. Both whole-repository scan partitions
+pass after the command center's preserved-artifact rulings: a dated macOS
+exception in its isolated config, and exclusion of two captured, retired
+Lumibot lockchecks after 5f's verified owner report. No frozen bytes change.
+Sources: https://github.com/advisories/GHSA-27vj-qcqg-25rc,
+https://github.com/advisories/GHSA-54p9-h82j-f925,
+https://pypi.org/pypi/fsspec/2026.6.0/json,
+https://pypi.org/pypi/multidict/6.9.1/json and native-agent-stack@74cc5468.
+Evidence: evidence/receipts/osv-openhands-fsspec-relock-20261005.json and
+the relock-2026-10-05-fsspec prefix beside this recipe. Failed UV_NO_CONFIG and
+formatter attempts remain disclosed; neither candidate was adopted.
+
+Overturn: any additional package move, incompatible declared range, failed
+hash/install/check, new consuming route into preserved evidence, expiry or a
+fresh OSV finding reopens acceptance. A local pass is not hosted acceptance.

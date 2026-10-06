@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+# Documentary receipt script, adapted from native-stack@74cc5468:
+# blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-litellm.relock.sh.txt.
+# Uses the pinned SDK archive, existing uv 0.12.22 and its supported lock/export commands.
+# No upstream package is rebuilt or forked by resolution. Both scratch workspaces
+# retain the already accepted LiteLLM override and six preceding maintenance pins.
+# The control must reproduce today's committed lock; only the new variant adds
+# --upgrade-package fsspec==2026.6.0 and multidict==6.9.1, authorized by
+# J-FSSPEC extension 2 for GHSA-27vj-qcqg-25rc and GHSA-54p9-h82j-f925.
+# Usage: bash <this-script> <owned-scratch> <owned-worktree> <rtk-binary> <uv-binary>
+set -euo pipefail
+R=$1; W=$2; OH=blueprints/runtime-workers/openhands; U=$R/u3
+BASE=ecfa112764c664d35377dd66b8cfcb67e5a94d60
+RTK=$3
+UV=$4
+export UV_CACHE_DIR=$R/uv-cache UV_PYTHON_DOWNLOADS=never TMPDIR=$R/tmp
+# #562's resolver reads tool.uv from the extracted workspace. --no-config would
+# discard its Linux-only environments/constraints; disable only an inherited
+# UV_NO_CONFIG override, rather than disabling the workspace configuration.
+unset UV_NO_CONFIG
+stamp() { "$RTK" date -u +%FT%TZ; }
+"$RTK" mkdir -p "$U" "$TMPDIR"
+"$RTK" proxy git -C "$W" show "$BASE:$OH/requirements.lock" > "$U/base.lock"
+echo "[$(stamp)] $($RTK $UV --version)"
+echo "base archive and lock hashes:"
+"$RTK" sha256sum "$R/sdk-fcc102a.tar.gz" "$U/base.lock"
+for variant in control new; do
+  D=$U/$variant
+  "$RTK" mkdir -p "$D"
+  "$RTK" tar -xzf "$R/sdk-fcc102a.tar.gz" --strip-components=1 -C "$D"
+  # Same resolution-only workspace edits as #562; never installed as a fork.
+  "$RTK" sed -i "/^\[tool\.uv\]\$/a environments = [\"sys_platform == 'linux' and platform_machine == 'x86_64'\"]" "$D/pyproject.toml"
+  "$RTK" sed -i -e 's/litellm = "2026-07-20T00:00:00Z"/litellm = "2026-08-10T00:00:00Z"/' -e 's/"litellm==1\.93\.0"/"litellm==1.93.2"/' "$D/pyproject.toml"
+  args=(--upgrade-package anyio==4.14.2 --upgrade-package click==8.5.0
+        --upgrade-package pypdf==6.19.0 --upgrade-package soupsieve==2.9.2
+        --upgrade-package pyjwt==2.15.0 --upgrade-package urllib3==2.8.0
+        --upgrade-package litellm==1.93.2)
+  if [ "$variant" = new ]; then args+=(--upgrade-package fsspec==2026.6.0 --upgrade-package multidict==6.9.1); fi
+  echo "[$(stamp)] $variant uv lock ${args[*]}"
+  (
+    cd "$D"
+    "$RTK" "$UV" lock "${args[@]}" > lock.out 2>&1
+    echo 'lock exit: 0'
+    "$RTK" "$UV" lock --check > check.out 2>&1
+    echo 'check exit: 0'
+    "$RTK" "$UV" export --frozen --format requirements.txt --no-header --no-annotate --package openhands-tools --no-emit-workspace > export.txt 2> export.err
+    echo 'export exit: 0'
+    "$RTK" proxy jq -r '.wheels | to_entries[] | "\(.key) @ \(.value.url) \\\n    --hash=sha256:\(.value.sha256)"' "$W/$OH/pins.json" > wheels.txt
+    "$RTK" cat export.txt wheels.txt > requirements.lock.repro
+  )
+  "$RTK" rg '^Updated|^Resolved' "$D/lock.out" || true
+  "$RTK" sha256sum "$D/requirements.lock.repro"
+done
+"$RTK" cmp "$U/control/requirements.lock.repro" "$U/base.lock"
+echo 'control reproduces the committed lock byte for byte'
+echo "[$(stamp)] new paired lock generated; inspect every pin delta before adoption"

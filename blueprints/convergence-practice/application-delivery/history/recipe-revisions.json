@@ -102,8 +102,8 @@
         "sha256": "73ba78a623c6448e5e67a3f488f2e50f20b3b4b4c2da12cd29077f25f6a57c2b",
         "retained_path": "history/pnpm-lock.0472177.yaml"
       },
-      "current_sha256": "866ae6c5246832ed6446c106ec657dd3acdb1a59fc6ba7517d4c7573fb530fd4",
-      "change": "Regenerated with pnpm 12.4.2 (pnpm install --lockfile-only --ignore-scripts) after the package.json bump to 16.3.8: next, @next/env and the eight @next/swc-* entries change and every other entry is byte-identical. The 16.3.6 file is retained under superseded_revisions.",
+      "current_sha256": "e31f7b3cc3336fa0424cfed0f63c11a8d7d448e7f1f8e20f82094434187f3cfd",
+      "change": "2026-10-06 dated security supersession: source-map-js1.2.1\u21921.2.2 for GHSA-68fv-2mgg-jv7q, using pinned pnpm12.4.2 supported selective update. Every other package resolution stays unchanged; pre-relock16.3.8 bytes and prior qualification are retained as a superseded revision.",
       "superseded_revisions": [
         {
           "next": "16.3.6",
@@ -122,19 +122,53 @@
             "status": "passed",
             "scope": "Locked install, peer, type and production-build checks only. The PostgreSQL, API and browser stages of make verify were not rerun, so the 2026-09-20 receipt still qualifies 16.3.5, not 16.3.6."
           }
+        },
+        {
+          "next": "16.3.8",
+          "revision": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+          "sha256": "866ae6c5246832ed6446c106ec657dd3acdb1a59fc6ba7517d4c7573fb530fd4",
+          "retained_path": "history/pnpm-lock.ecfa1127.yaml",
+          "change": "Regenerated with pnpm 12.4.2 (pnpm install --lockfile-only --ignore-scripts) after the package.json bump to 16.3.8: next, @next/env and the eight @next/swc-* entries change and every other entry is byte-identical. The 16.3.6 file is retained under superseded_revisions.",
+          "verification": {
+            "host": "linux-wsl2-x86_64, Node 24.21.0, pnpm 12.4.2",
+            "commands": [
+              "pnpm install --frozen-lockfile --ignore-scripts --store-dir .runtime/pnpm-store",
+              "pnpm peers check",
+              "pnpm typecheck",
+              "NEXT_TELEMETRY_DISABLED=1 pnpm build"
+            ],
+            "status": "passed",
+            "receipt": "evidence/receipts/nextjs-1638-qualification-20261001.json",
+            "scope": "Locked install, peer, type and production-build checks only, run after pnpm's release-age window; a first frozen install inside the window exited 1 and is kept in the receipt. The PostgreSQL, API and browser stages of make verify were not rerun, so the 2026-09-20 receipt still qualifies 16.3.5, not 16.3.8."
+          }
         }
       ],
       "verification": {
-        "host": "linux-wsl2-x86_64, Node 24.21.0, pnpm 12.4.2",
         "commands": [
-          "pnpm install --frozen-lockfile --ignore-scripts --store-dir .runtime/pnpm-store",
+          "pnpm update source-map-js --no-save --lockfile-only --ignore-scripts",
+          "pnpm install --frozen-lockfile --ignore-scripts",
           "pnpm peers check",
           "pnpm typecheck",
           "NEXT_TELEMETRY_DISABLED=1 pnpm build"
         ],
         "status": "passed",
-        "receipt": "evidence/receipts/nextjs-1638-qualification-20261001.json",
-        "scope": "Locked install, peer, type and production-build checks only, run after pnpm's release-age window; a first frozen install inside the window exited 1 and is kept in the receipt. The PostgreSQL, API and browser stages of make verify were not rerun, so the 2026-09-20 receipt still qualifies 16.3.5, not 16.3.8."
+        "receipt": "evidence/receipts/source-map-js-122-qualification-20261005.json",
+        "scope": "Recorded locked install/peer/type/build qualification only. No new execution in this amendment; original PostgreSQL/API/browser full-stack acceptance remains tied to its original16.3.5 inputs."
+      }
+    },
+    {
+      "current_path": "uv.lock",
+      "original": {
+        "revision": "047217793fdc7c0d9bcefb15d1915ab580bb5eed",
+        "sha256": "552d8834e745d7c91daa15e47c5f6d0cd9063db18c98790d2f1af05038f7417d",
+        "retained_path": "history/uv.lock.ecfa1127"
+      },
+      "current_sha256": "0f5e1fbdb0aaa20697eda0f3721610275bd2f80e7223b63993b84ec21d7f6b50",
+      "change": "2026-10-06 dated security supersession: Mako1.4.1\u21921.4.2 for GHSA-5639-2j2p-m4mx, pinned uv0.12.22 targeted upgrade. Only the Mako package entry changes; native lock format revision3\u21925 is recorded separately. Original frozen bytes are retained and are not qualified as current dependencies.",
+      "verification": {
+        "status": "passed",
+        "receipt": "evidence/receipts/mako-142-qualification-20261005.json",
+        "scope": "Recorded frozen backend install/hash/import/render qualification only; no new provider or original full-stack replay in this amendment."
       }
     }
   ],
@@ -186,14 +220,47 @@
         "sha256": "1d6df4651976293bef2a18867430912db51496ecb3fd60224b44061f31098556",
         "retained_path": "history/experiment.json.0472177"
       },
-      "current_sha256": "9372ee1635b6c818ca31fc3d73d33802d85293218bcea7467c4fc5aebbd43ec9",
-      "relocated": {
-        "pointer": "/frozen_inputs/sources/4",
-        "from_path": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
-        "to_path": "blueprints/convergence-practice/application-delivery/history/pnpm-lock.0472177.yaml",
-        "sha256": "73ba78a623c6448e5e67a3f488f2e50f20b3b4b4c2da12cd29077f25f6a57c2b"
+      "current_sha256": "fc24bcf6af67d39e368fa0ac111e7cc4eacfa833d47fb68ebf06363b2abc4f8c",
+      "relocated": [
+        {
+          "pointer": "/frozen_inputs/sources/4",
+          "from_path": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
+          "to_path": "blueprints/convergence-practice/application-delivery/history/pnpm-lock.0472177.yaml",
+          "sha256": "73ba78a623c6448e5e67a3f488f2e50f20b3b4b4c2da12cd29077f25f6a57c2b"
+        },
+        {
+          "pointer": "/frozen_inputs/sources/3",
+          "from_path": "blueprints/convergence-practice/application-delivery/uv.lock",
+          "to_path": "blueprints/convergence-practice/application-delivery/history/uv.lock.ecfa1127",
+          "sha256": "552d8834e745d7c91daa15e47c5f6d0cd9063db18c98790d2f1af05038f7417d"
+        }
+      ],
+      "change": "The 2026-09-25 Next.js 16.3.6 lock replaced pnpm-lock.yaml. The recorded convergence experiment still binds the exact 16.3.5 lock it ran with, now at its byte-identical retained path; the frozen hash and every other byte of the record are unchanged. The experiment does not qualify the 16.3.6 lock. 2026-10-06 dated binding amendment: also relocate the UV input to byte-identical ecfa1127 retained bytes after the Mako production relock. Commands, measured outputs, frozen digests and usage do not change; this original experiment does not qualify Mako1.4.2.",
+      "amendment_date": "2026-10-06",
+      "amendment_receipt": "evidence/receipts/pr765-bindings-amendment-20261006.json",
+      "pre_amendment_record": {
+        "revision": "67c6594d2c252bdd253626dc54789c70e54c4a28",
+        "sha256": "9372ee1635b6c818ca31fc3d73d33802d85293218bcea7467c4fc5aebbd43ec9",
+        "retained_path": "../../../evidence/artifacts/pr765-bindings-amendment-20261006/historical/experiment.json.source.txt"
+      }
+    },
+    {
+      "record": "experiment-macos-20260924.json",
+      "original": {
+        "revision": "67c6594d2c252bdd253626dc54789c70e54c4a28",
+        "sha256": "eb2ceb9c57ed3f11125a5091a85bf19dcb10e364dfb2b67d8c1b444970b300f3",
+        "retained_path": "../../../evidence/artifacts/pr765-bindings-amendment-20261006/historical/experiment-macos-20260924.json.source.txt"
       },
-      "change": "The 2026-09-25 Next.js 16.3.6 lock replaced pnpm-lock.yaml. The recorded convergence experiment still binds the exact 16.3.5 lock it ran with, now at its byte-identical retained path; the frozen hash and every other byte of the record are unchanged. The experiment does not qualify the 16.3.6 lock."
+      "current_sha256": "a570469dde6b81515348892eb064a0136e5f84be7680f940ef87a4790bee627b",
+      "relocated": {
+        "pointer": "/frozen_inputs/sources/3",
+        "from_path": "blueprints/convergence-practice/application-delivery/uv.lock",
+        "to_path": "blueprints/convergence-practice/application-delivery/history/uv.lock.ecfa1127",
+        "sha256": "552d8834e745d7c91daa15e47c5f6d0cd9063db18c98790d2f1af05038f7417d"
+      },
+      "change": "2026-10-06 dated binding amendment: only relocate the original UV input to byte-identical retained ecfa1127 bytes. Original macOS observations, usage, outputs, frozen digests and lock-artifact references remain unchanged; no new macOS or Mako1.4.2 execution is claimed.",
+      "amendment_date": "2026-10-06",
+      "amendment_receipt": "evidence/receipts/pr765-bindings-amendment-20261006.json"
     }
   ]
 }
