@@ -24,6 +24,37 @@ def _code(exc):
     return text if isinstance(exc, SafetyError) and re.fullmatch(r"[a-z_]{1,100}", text) else type(exc).__name__
 
 
+_REDACT = [(re.compile(r"/(?:home|Users|root)/[^\s'\"]*"), "<path>"), (re.compile(r"[A-Za-z0-9+/=_-]{24,}"), "<redacted>")]
+
+
+def _text(value):
+    text = str(value)[:300]
+    for pattern, replacement in _REDACT:
+        text = pattern.sub(replacement, text)
+    return text
+
+
+def _engine_text(exc):
+    """Only the engine's own exceptions carry receipt text: their messages are authored here (transport, safety).
+    A foreign exception (SDK, network, OS) may quote a request or a credential, so it contributes its type only."""
+    return type(exc).__module__ in ("transport", "safety") and type(exc).__name__ in ("TransportError", "SafetyError")
+
+
+def _detail(exc, prefix=""):
+    """The receipt's view of one failure: its code (the `errors` entry) and type, the message when the engine authored
+    it, and the chained or suppressed context's type (an exception raised `from None` still keeps __context__), with
+    that context's message under the same rule. Home paths and long tokens are redacted; texts stop at 300 chars."""
+    context = exc.__cause__ or exc.__context__
+    detail = {"code": prefix + _code(exc), "type": type(exc).__name__}
+    if _engine_text(exc):
+        detail["message"] = _text(exc)
+    if context is not None:
+        detail["context_type"] = type(context).__name__
+        if _engine_text(context):
+            detail["context_message"] = _text(context)
+    return detail
+
+
 async def recover(controller, metadata, config, *, reconcile_fn=None):
     """Reconcile/cancel/exit owned residuals using a fresh, unstarted port.
 
@@ -49,6 +80,7 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
     sequence = max((int(i.client_id[len(prefix):]) for i in ledger.intents()
                     if i.client_id.startswith(prefix) and i.client_id[len(prefix):].isdigit()), default=0)
     errors, cancelled, submitted = [], [], []
+    details = []
     # Held symbols without a fresh quote at the last exit turn (#215). The result's
     # stale_symbols is meaningful only together with recovery_quote_not_fresh; after any
     # other error (one before the exit loop included) it says nothing about quote freshness.
@@ -262,6 +294,7 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
         errors.append("recovery_cancelled")
     except Exception as exc:
         errors.append(_code(exc))
+        details.append(_detail(exc))
     finally:
         controller.stop = True
         try:
@@ -269,6 +302,7 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
             await asyncio.wait_for(port.stop(), 10)
         except Exception as exc:
             errors.append("stop_" + _code(exc))
+            details.append(_detail(exc, "stop_"))
         finally:
             if before_request is not None:
                 port.before_request = before_request
@@ -280,7 +314,7 @@ async def recover(controller, metadata, config, *, reconcile_fn=None):
             and proof["positions"] == 0 and proof["open_orders"] == 0)
     return {"mode": "official_sdk_recovery", "native_engine_resumed": False,
             "status": "passed" if flat else "needs_attention", "flat": flat,
-            "errors": errors, "positions": positions, "unresolved_orders": unresolved,
+            "errors": errors, "error_details": details, "positions": positions, "unresolved_orders": unresolved,
             "stale_symbols": sorted(stale & set(ledger.positions())),
             "broker_positions_last_observed": None if last_snapshot is None else
                 [{"symbol": p["symbol"], "qty": str(p["qty"])} for p in last_snapshot["positions"]],

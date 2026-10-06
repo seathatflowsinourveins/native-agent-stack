@@ -102,6 +102,15 @@ class FakePort:
         self.snapshots += 1
         if self.mode == "slow_snapshot":
             await asyncio.sleep(5)
+        if self.mode in ("snapshot_chained", "snapshot_suppressed"):
+            # the shape of transport.snapshot's failure: a TransportError over the failing read
+            from transport import TransportError
+            try:
+                raise ConnectionError("read failed for /home/someone/.config/x token " + "A" * 40)
+            except ConnectionError as cause:
+                if self.mode == "snapshot_chained":
+                    raise TransportError("snapshot incomplete; admissions remain frozen") from cause
+                raise TransportError("snapshot incomplete; admissions remain frozen") from None
         for row in self.rows.values():
             self.c.observe(row)
         return {"complete": True, "account": {"cash": str(self.cash)}, "orders": list(self.rows.values()),
@@ -403,6 +412,49 @@ class RecoveryTests(unittest.TestCase):
         self.port.health["reasons"] = ["quotes_disconnected"]
         result = self.recover()
         self.assertEqual(result["status"], "passed")
+
+    def test_receipt_carries_the_message_and_its_context(self):
+        # 2026-10-06 (the command center's item for account 2): `errors` keeps the code; `error_details` adds the
+        # message and the chained or suppressed context, with home paths and long tokens redacted
+        import json
+        for mode in ("snapshot_chained", "snapshot_suppressed"):
+            with self.subTest(mode):
+                self.setUp()
+                self.original_buy()
+                self.port.mode = mode
+                result = self.recover()
+                self.assertEqual(result["errors"][0], "TransportError")
+                detail = result["error_details"][0]
+                self.assertEqual((detail["code"], detail["type"]), ("TransportError", "TransportError"))
+                self.assertIn("snapshot incomplete", detail["message"])
+                self.assertEqual(detail["context_type"], "ConnectionError")
+                self.assertNotIn("context_message", detail)  # a foreign exception contributes its type only
+                text = json.dumps(result)
+                self.assertNotIn("/home/", text)
+                self.assertNotIn("A" * 40, text)
+                self.assertNotIn("token", text)
+
+    def test_engine_authored_context_is_kept_and_redacted(self):
+        import json
+        from transport import TransportError
+
+        class EnginePort(FakePort):
+            async def snapshot(self):
+                try:
+                    raise TransportError("fee activity page bound reached; path /home/someone/x " + "B" * 30)
+                except TransportError as cause:
+                    raise TransportError("snapshot incomplete; admissions remain frozen") from cause
+        self.original_buy()
+        self.port.__class__ = EnginePort
+        detail = self.recover()["error_details"][0]
+        self.assertEqual(detail["context_type"], "TransportError")
+        self.assertIn("fee activity page bound reached; path <path>", detail["context_message"])
+        self.assertIn("<redacted>", detail["context_message"])
+        self.assertNotIn("B" * 30, json.dumps(detail))
+
+    def test_a_clean_recovery_has_no_error_details(self):
+        self.original_buy()
+        self.assertEqual(self.recover()["error_details"], [])
 
     def test_ambiguous_exit_is_retained_never_retried_or_rejected(self):
         self.original_buy()

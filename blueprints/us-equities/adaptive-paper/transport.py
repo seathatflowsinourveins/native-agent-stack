@@ -1508,8 +1508,11 @@ class AlpacaPaperTransport:
         while not self.ready:
             if time.monotonic() >= deadline or self.health["frozen"]:
                 self.freeze_health("start_not_ready")
+                with self._state_lock:
+                    reasons = ",".join(sorted(self._reasons))
                 await self.stop()
-                raise TransportError("stream authentication/subscription/quote readiness failed")
+                # The freeze reasons name what failed (for example quotes_disconnected or quote_stale).
+                raise TransportError("stream authentication/subscription/quote readiness failed (" + reasons + ")")
             await asyncio.sleep(0.02)
         self._ever_ready = True
 
@@ -1738,9 +1741,10 @@ class AlpacaPaperTransport:
                         "fees": fees, "complete": True, "history_start": self.history_start.isoformat(),
                         "fee_history_start": self.fee_history_start.isoformat(),
                         "scope": "all_open_and_recent_plus_owned", "health": self.health}
-            except Exception:
+            except Exception as exc:
                 self.freeze_health("snapshot_incomplete")
-                raise TransportError("snapshot incomplete; admissions remain frozen") from None
+                # Chained (not suppressed), so a recovery receipt can name the failing read.
+                raise TransportError("snapshot incomplete; admissions remain frozen") from exc
 
     async def stop(self):
         self._stopping = True
