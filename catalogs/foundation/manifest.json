@@ -15,6 +15,7 @@
     "shared_research_inventory": "catalogs/us-equities/decision-index.json"
   },
   "decisions_file": "catalogs/foundation/decisions.json",
+  "finalized_selection_file": "catalogs/foundation/finalized-sota-catalog.json",
   "layers": [
     {
       "id": "native-clients",

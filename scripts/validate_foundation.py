@@ -11,21 +11,23 @@ import argparse
 import json
 from pathlib import Path
 
-try:
-    from scripts.validate_catalogs import (
-        InvalidCatalog, Validator, dated, enum, https, object_value, require,
-        sequence, strings, text,
+if __package__:
+    from .validate_catalogs import (
+        InvalidCatalog, SHA, Validator, dated, enum, https, object_value,
+        repository, require, sequence, strings, text,
     )
-except ModuleNotFoundError:
+else:
     from validate_catalogs import (
-        InvalidCatalog, Validator, dated, enum, https, object_value, require,
-        sequence, strings, text,
+        InvalidCatalog, SHA, Validator, dated, enum, https, object_value,
+        repository, require, sequence, strings, text,
     )
 
 
 ROOT = Path(__file__).resolve().parents[1]
 MANIFEST = "catalogs/foundation/manifest.json"
 DECISIONS = "catalogs/foundation/decisions.json"
+FINALIZED_SELECTION = "catalogs/foundation/finalized-sota-catalog.json"
+REPOSITORY_COVERAGE = "catalogs/us-equities/coverage.json"
 SOURCES = {
     "components": "manifests/stack.json",
     "evidence": "manifests/evidence.json",
@@ -47,9 +49,10 @@ STATUSES = {
 EXECUTION = {"native_model_e2e", "native_cli_e2e", "artifact_measurement"}
 
 
-def fields(value, expected, label):
+def fields(value, expected, label, *, optional=frozenset()):
     object_value(value, label)
-    require(not value.keys() - expected, label, f"unknown fields: {sorted(value.keys() - expected)}")
+    unknown = value.keys() - expected - optional
+    require(not unknown, label, f"unknown fields: {sorted(unknown)}")
     require(not expected - value.keys(), label, f"missing fields: {sorted(expected - value.keys())}")
 
 
@@ -68,11 +71,104 @@ def source_paths(values, validator, label):
         validator.path(path, label)
 
 
+def validate_finalized_selection(root: Path, manifest=None) -> dict | None:
+    """Check the explicit selection projection, leaving research overlap valid.
+
+    Reuse native-agent-stack@e28d0eec112527ac02659ac23753533b8ed39a73:
+    scripts/validate_catalogs.py:110-127,156-186 and this file:56-63.
+    Those readers retain duplicate-key rejection through object_pairs_hook:
+    https://docs.python.org/3/library/json.html#json.load
+    The census is a separate declaration, never generated from the slot rows.
+    """
+    validator = Validator(root)
+    if manifest is None:
+        manifest = validator.load(MANIFEST)
+    object_value(manifest, MANIFEST)
+    if "finalized_selection_file" not in manifest:
+        return None
+    require(manifest["finalized_selection_file"] == FINALIZED_SELECTION,
+            MANIFEST, "finalized_selection_file must name the canonical selection file")
+    document = validator.load(FINALIZED_SELECTION)
+    object_value(document, FINALIZED_SELECTION)
+    require(type(document.get("schema_version")) is int
+            and document["schema_version"] == 1,
+            FINALIZED_SELECTION, "schema_version must be 1")
+    status = enum(document.get("status"), {"pending_synthesis", "finalized"},
+                  f"{FINALIZED_SELECTION}.status")
+    validator.path(document.get("decision_record"), "finalized_selection.decision_record")
+    base = text(document.get("source_base_commit"), "finalized_selection.source_base_commit")
+    require(bool(SHA.fullmatch(base)), "finalized_selection.source_base_commit",
+            "expected full lowercase Git commit SHA")
+    validator.read_aliases(validator.load(REPOSITORY_COVERAGE))
+
+    def identity(value, label):
+        name = repository(value, label)
+        # The source reader checks .git before lowercasing; keep this projection
+        # canonical for mixed-case suffixes without changing legacy research.
+        require(not name.endswith(".git"), label,
+                "expected canonical https://github.com/owner/repo URL")
+        return validator.canonical(name)
+
+    require("included_repositories" in document, FINALIZED_SELECTION,
+            "missing included_repositories census")
+    census = set()
+    if status == "pending_synthesis":
+        require(document["included_repositories"] is None, FINALIZED_SELECTION,
+                "pending synthesis must keep the repository census null")
+    else:
+        for value in sequence(document["included_repositories"], "included_repositories"):
+            name = identity(value, "included_repositories")
+            require(name not in census, "included_repositories",
+                    f"duplicate canonical repository {name}")
+            census.add(name)
+
+    slots = indexed(document.get("slots"), "id", "finalized_selection.slots")
+    owners = {}
+    references = set()
+    for identifier, slot in slots.items():
+        enum(slot.get("layer_id"), LAYERS, f"{identifier}.layer_id")
+        for key in ("role", "purpose"):
+            text(slot.get(key), f"{identifier}.{key}")
+        if "language" in slot:
+            text(slot["language"], f"{identifier}.language")
+        if "supported_languages" in slot:
+            strings(slot["supported_languages"], f"{identifier}.supported_languages")
+        rows = sequence(slot.get("repositories"), f"{identifier}.repositories", nonempty=False)
+        if status == "pending_synthesis":
+            require(not rows, identifier,
+                    "pending synthesis cannot declare repository selections")
+        defaults = 0
+        for row in rows:
+            object_value(row, f"{identifier}.repositories")
+            name = identity(row.get("repository"), f"{identifier}.repository")
+            selection = enum(row.get("selection"), {"default", "alternative", "excluded"},
+                             f"{identifier}.selection")
+            require(name not in owners, identifier,
+                    f"canonical repository {name} already owned by slot {owners.get(name)}")
+            owners[name] = identifier
+            defaults += selection == "default"
+        if status == "finalized":
+            require(defaults == 1, identifier, "exactly one default repository required")
+        # References are links, not ownership declarations; repetition is allowed.
+        for value in sequence(slot.get("references"), f"{identifier}.references", nonempty=False):
+            references.add(identity(value, f"{identifier}.references"))
+    if status == "finalized":
+        require(set(owners) == census, FINALIZED_SELECTION,
+                "repository ownership must exactly equal the independent census; "
+                f"unowned={sorted(census - owners.keys())}, "
+                f"outside_census={sorted(owners.keys() - census)}")
+        require(references <= census, FINALIZED_SELECTION,
+                f"reference outside included repository census: {sorted(references - census)}")
+    return {"status": status, "slots": len(slots),
+            "repositories": len(owners) if status == "finalized" else None}
+
+
 def validate_foundation(root: Path) -> dict:
     validator = Validator(root)
     manifest = validator.load(MANIFEST)
     fields(manifest, {"schema_version", "catalog_id", "checked_at", "scope", "limitations",
-                      "canonical_sources", "decisions_file", "layers", "domain_boundary", "top_gaps", "open_gates"}, MANIFEST)
+                      "canonical_sources", "decisions_file", "layers", "domain_boundary", "top_gaps", "open_gates"},
+           MANIFEST, optional={"finalized_selection_file"})
     validator.header(manifest, MANIFEST)
     require(manifest["catalog_id"] == "foundation", MANIFEST, "catalog_id must be foundation")
     text(manifest["scope"], "manifest.scope")
@@ -231,6 +327,7 @@ def validate_foundation(root: Path) -> dict:
             require(dated(previous["checked_at"], "superseded date") < dated(row["checked_at"], "decision date"),
                     identifier, "superseded decision must be earlier; cycles forbidden")
 
+    validate_finalized_selection(root, manifest)
     return {"layers": len(layers), "decisions": len(decisions), "foundation_components": len(used_components),
             "domain_components": len(domain), "evidence_receipts": len(used_receipts), "candidates": len(candidates)}
 

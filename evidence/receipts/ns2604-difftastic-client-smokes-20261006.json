@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-difftastic-client-smokes-20261006",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "difftastic"
+  ],
+  "claim": "One actual pinned Difftastic JavaScript structural smoke per consuming native client, Codex and Claude. Both returned the expected syntactic-change output; this named smoke is not organic use or an upstream test-suite acceptance.",
+  "limitations": [
+    "These are prompted local integration smokes on NativeStack2604, not independently reviewed adoption or aggregate readiness.",
+    "No organic trials/uses/OIR/selection-rate counters are derived; the named-tool turns are ineligible for organic use.",
+    "The Claude client process returned0 and its one native Bash tool result completed without error; its native stream/transcript does not expose a numeric shell-exit field, so command_exit_code remains null rather than taking the model's reported value.",
+    "No source, fixture, service, client configuration, runtime or credential value was changed."
+  ],
+  "date": "2026-10-06",
+  "host_scope": "NativeStack2604",
+  "evidence_class": "local_integration",
+  "source_base_commit": "e28d0eec112527ac02659ac23753533b8ed39a73",
+  "slot": "git-github-automation/difftastic",
+  "upstream": {
+    "repository": "https://github.com/Wilfred/difftastic",
+    "pin": "0.71.0",
+    "reported_revision": "b7d119e 2026-09-18",
+    "binary_sha256": "4d6ce594dde852cc0703bb8c15207f696f4c4989a718a38faf6e46cb41af0545",
+    "example_source": "https://github.com/Wilfred/difftastic/blob/0.71.0/tests/cli.rs#L106-L115"
+  },
+  "command": "difft --color never --check-only simple_1.js simple_2.js",
+  "native_execution_prefix": "rtk proxy nice -n 19 ionice -c3",
+  "cwd": "${tool_root}/difftastic-fixtures",
+  "plan_pointer": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json#/owners/67/acceptance/post_install/command",
+  "fixtures": [
+    {
+      "name": "simple_1.js",
+      "bytes": 60,
+      "sha256": "106256fcefb82debbc83be06ceeec073e35a4a1bfa4b22bd3530e2d97314d1db",
+      "source": "https://github.com/Wilfred/difftastic/blob/0.71.0/sample_files/simple_1.js#L1"
+    },
+    {
+      "name": "simple_2.js",
+      "bytes": 67,
+      "sha256": "bd078aaecc828327c5b21ceb14a5f40e2e853f0468fb70b1b77d1aa08017ae31",
+      "source": "https://github.com/Wilfred/difftastic/blob/0.71.0/sample_files/simple_2.js#L1"
+    }
+  ],
+  "observations": [
+    {
+      "client": "codex",
+      "tool": "exec_command",
+      "started_at_utc": "2026-10-06T23:05:00Z",
+      "completed_at_utc": "2026-10-06T23:05:01Z",
+      "command_exit_code": 0,
+      "completed_structural_calls": 1,
+      "stdout": "simple_2.js --- JavaScript\nHas syntactic changes.\n\n",
+      "stderr": "",
+      "result": "pass"
+    },
+    {
+      "client": "claude",
+      "client_version": "2.1.292",
+      "tool": "Bash",
+      "model": "claude-opus-5-5",
+      "effort": "max",
+      "client_started_at_utc": "2026-10-06T23:07:01Z",
+      "client_observation_completed_at_utc": "2026-10-06T23:07:48Z",
+      "client_exit_code": 0,
+      "command_exit_code": null,
+      "native_tool_is_error": false,
+      "completed_structural_calls": 1,
+      "matched_native_request_result_pairs": 1,
+      "stdout": "simple_2.js --- JavaScript\nHas syntactic changes.",
+      "stderr": "",
+      "client_stream_sha256": "f41a2417168b3b846041dd5282532c948a5ffcd19719ddf4ea54dea90c85ef8b",
+      "native_transcript_sha256": "dc649839c644ea468950797d7b710afe04010bb361e92d0012f0246e135e091f",
+      "result": "pass"
+    }
+  ],
+  "expected_output": {
+    "language": "JavaScript",
+    "message": "Has syntactic changes.",
+    "text_fallback": false
+  },
+  "organic_counters": null,
+  "independent_review": "pending",
+  "readiness_change": "none claimed"
+}

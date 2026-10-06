@@ -1,0 +1,664 @@
+{
+  "schema_version": 1,
+  "status": "pending_synthesis",
+  "decision_record": "docs/decisions/2026-10-07-finalized-sota-catalog.md",
+  "source_base_commit": "e28d0eec112527ac02659ac23753533b8ed39a73",
+  "included_repositories": null,
+  "slots": [
+    {
+      "id": "codex-native-client",
+      "layer_id": "native-clients",
+      "role": "codex-native-client",
+      "purpose": "Candidate functional partition for codex native client; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "claude-native-client",
+      "layer_id": "native-clients",
+      "role": "claude-native-client",
+      "purpose": "Candidate functional partition for claude native client; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "model-gateway",
+      "layer_id": "native-clients",
+      "role": "model-gateway",
+      "purpose": "Candidate functional partition for model gateway; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "skill-discovery",
+      "layer_id": "instructions-skills",
+      "role": "skill-discovery",
+      "purpose": "Candidate functional partition for skill discovery; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "skill-authoring",
+      "layer_id": "instructions-skills",
+      "role": "skill-authoring",
+      "purpose": "Candidate functional partition for skill authoring; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "skill-reference-validation",
+      "layer_id": "instructions-skills",
+      "role": "skill-reference-validation",
+      "purpose": "Candidate functional partition for skill reference validation; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "native-task-worker",
+      "layer_id": "workers",
+      "role": "native-task-worker",
+      "purpose": "Candidate functional partition for native task worker; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "runtime-worker-harness",
+      "layer_id": "workers",
+      "role": "runtime-worker-harness",
+      "purpose": "Candidate functional partition for runtime worker harness; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "dependency-task-queue",
+      "layer_id": "workers",
+      "role": "dependency-task-queue",
+      "purpose": "Candidate functional partition for dependency task queue; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "os-sandbox",
+      "layer_id": "isolation",
+      "role": "os-sandbox",
+      "purpose": "Candidate functional partition for os sandbox; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "linux-container-boundary",
+      "layer_id": "isolation",
+      "role": "linux-container-boundary",
+      "purpose": "Candidate functional partition for linux container boundary; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "macos-container-boundary",
+      "layer_id": "isolation",
+      "role": "macos-container-boundary",
+      "purpose": "Candidate functional partition for macos container boundary; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "symbol-navigation",
+      "layer_id": "code-navigation",
+      "role": "symbol-navigation",
+      "purpose": "Candidate functional partition for symbol navigation; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "structural-search",
+      "layer_id": "code-navigation",
+      "role": "structural-search",
+      "purpose": "Candidate functional partition for structural search; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "code-graph",
+      "layer_id": "code-navigation",
+      "role": "code-graph",
+      "purpose": "Candidate functional partition for code graph; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "compact-symbol-index",
+      "layer_id": "code-navigation",
+      "role": "compact-symbol-index",
+      "purpose": "Candidate functional partition for compact symbol index; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "markdown-lexical-search",
+      "layer_id": "document-retrieval",
+      "role": "markdown-lexical-search",
+      "purpose": "Candidate functional partition for markdown lexical search; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "developer-documentation",
+      "layer_id": "document-retrieval",
+      "role": "developer-documentation",
+      "purpose": "Candidate functional partition for developer documentation; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "document-parsing-ocr",
+      "layer_id": "document-retrieval",
+      "role": "document-parsing-ocr",
+      "purpose": "Candidate functional partition for document parsing ocr; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "semantic-code-retrieval",
+      "layer_id": "semantic-rag",
+      "role": "semantic-code-retrieval",
+      "purpose": "Candidate functional partition for semantic code retrieval; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "vector-store",
+      "layer_id": "semantic-rag",
+      "role": "vector-store",
+      "purpose": "Candidate functional partition for vector store; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "cross-client-durable-memory",
+      "layer_id": "durable-memory",
+      "role": "cross-client-durable-memory",
+      "purpose": "Candidate functional partition for cross client durable memory; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "browser-worker",
+      "layer_id": "web-research",
+      "role": "browser-worker",
+      "purpose": "Candidate functional partition for browser worker; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "browser-diagnostics",
+      "layer_id": "web-research",
+      "role": "browser-diagnostics",
+      "purpose": "Candidate functional partition for browser diagnostics; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "research-worker",
+      "layer_id": "web-research",
+      "role": "research-worker",
+      "purpose": "Candidate functional partition for research worker; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "literature-retrieval",
+      "layer_id": "web-research",
+      "role": "literature-retrieval",
+      "purpose": "Candidate functional partition for literature retrieval; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "web-search-provider",
+      "layer_id": "web-research",
+      "role": "web-search-provider",
+      "purpose": "Candidate functional partition for web search provider; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "content-extraction",
+      "layer_id": "web-research",
+      "role": "content-extraction",
+      "purpose": "Candidate functional partition for content extraction; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "command-output-compression",
+      "layer_id": "token-efficiency",
+      "role": "command-output-compression",
+      "purpose": "Candidate functional partition for command output compression; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "context-execution",
+      "layer_id": "token-efficiency",
+      "role": "context-execution",
+      "purpose": "Candidate functional partition for context execution; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "recoverable-context-compression",
+      "layer_id": "token-efficiency",
+      "role": "recoverable-context-compression",
+      "purpose": "Candidate functional partition for recoverable context compression; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "repository-packing",
+      "layer_id": "token-efficiency",
+      "role": "repository-packing",
+      "purpose": "Candidate functional partition for repository packing; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "structured-encoding",
+      "layer_id": "token-efficiency",
+      "role": "structured-encoding",
+      "purpose": "Candidate functional partition for structured encoding; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "usage-inspection",
+      "layer_id": "token-efficiency",
+      "role": "usage-inspection",
+      "purpose": "Candidate functional partition for usage inspection; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "llm-ab-evaluation",
+      "layer_id": "quality-evaluation",
+      "role": "llm-ab-evaluation",
+      "purpose": "Candidate functional partition for llm ab evaluation; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "agent-evaluation",
+      "layer_id": "quality-evaluation",
+      "role": "agent-evaluation",
+      "purpose": "Candidate functional partition for agent evaluation; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "container-agent-evaluation",
+      "layer_id": "quality-evaluation",
+      "role": "container-agent-evaluation",
+      "purpose": "Candidate functional partition for container agent evaluation; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "browser-flow-evaluation",
+      "layer_id": "quality-evaluation",
+      "role": "browser-flow-evaluation",
+      "purpose": "Candidate functional partition for browser flow evaluation; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "shell-checks",
+      "layer_id": "quality-evaluation",
+      "role": "shell-checks",
+      "purpose": "Candidate functional partition for shell checks; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "workflow-lint",
+      "layer_id": "ci-supply-chain",
+      "role": "workflow-lint",
+      "purpose": "Candidate functional partition for workflow lint; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "workflow-analysis",
+      "layer_id": "ci-supply-chain",
+      "role": "workflow-analysis",
+      "purpose": "Candidate functional partition for workflow analysis; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "dependency-maintenance",
+      "layer_id": "ci-supply-chain",
+      "role": "dependency-maintenance",
+      "purpose": "Candidate functional partition for dependency maintenance; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "artifact-attestations",
+      "layer_id": "ci-supply-chain",
+      "role": "artifact-attestations",
+      "purpose": "Candidate functional partition for artifact attestations; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "software-inventory",
+      "layer_id": "ci-supply-chain",
+      "role": "software-inventory",
+      "purpose": "Candidate functional partition for software inventory; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "semantic-security-analysis",
+      "layer_id": "ci-supply-chain",
+      "role": "semantic-security-analysis",
+      "purpose": "Candidate functional partition for semantic security analysis; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "durable-execution-scheduling",
+      "layer_id": "scheduling-supervision",
+      "role": "durable-execution-scheduling",
+      "purpose": "Candidate functional partition for durable execution scheduling; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "process-supervision",
+      "layer_id": "scheduling-supervision",
+      "role": "process-supervision",
+      "purpose": "Candidate functional partition for process supervision; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "hosting-cli",
+      "layer_id": "hosting-services",
+      "role": "hosting-cli",
+      "purpose": "Candidate functional partition for hosting cli; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "web-framework",
+      "layer_id": "hosting-services",
+      "role": "web-framework",
+      "purpose": "Candidate functional partition for web framework; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "api-framework",
+      "layer_id": "hosting-services",
+      "role": "api-framework",
+      "purpose": "Candidate functional partition for api framework; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "ui-framework",
+      "layer_id": "hosting-services",
+      "role": "ui-framework",
+      "purpose": "Candidate functional partition for ui framework; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "relational-store",
+      "layer_id": "hosting-services",
+      "role": "relational-store",
+      "purpose": "Candidate functional partition for relational store; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "backup-restore",
+      "layer_id": "recovery-portability",
+      "role": "backup-restore",
+      "purpose": "Candidate functional partition for backup restore; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "artifact-distribution",
+      "layer_id": "recovery-portability",
+      "role": "artifact-distribution",
+      "purpose": "Candidate functional partition for artifact distribution; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "telemetry-collection",
+      "layer_id": "observation-inference",
+      "role": "telemetry-collection",
+      "purpose": "Candidate functional partition for telemetry collection; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "metrics",
+      "layer_id": "observation-inference",
+      "role": "metrics",
+      "purpose": "Candidate functional partition for metrics; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "logs",
+      "layer_id": "observation-inference",
+      "role": "logs",
+      "purpose": "Candidate functional partition for logs; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "dashboards",
+      "layer_id": "observation-inference",
+      "role": "dashboards",
+      "purpose": "Candidate functional partition for dashboards; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "alert-routing",
+      "layer_id": "observation-inference",
+      "role": "alert-routing",
+      "purpose": "Candidate functional partition for alert routing; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "notification-delivery",
+      "layer_id": "observation-inference",
+      "role": "notification-delivery",
+      "purpose": "Candidate functional partition for notification delivery; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "trace-evaluation",
+      "layer_id": "observation-inference",
+      "role": "trace-evaluation",
+      "purpose": "Candidate functional partition for trace evaluation; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "session-analytics",
+      "layer_id": "observation-inference",
+      "role": "session-analytics",
+      "purpose": "Candidate functional partition for session analytics; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "model-serving",
+      "layer_id": "observation-inference",
+      "role": "model-serving",
+      "purpose": "Candidate functional partition for model serving; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "agent-sdk-python",
+      "layer_id": "agent-sdks",
+      "role": "agent-sdk-python",
+      "purpose": "Candidate functional partition for agent sdk python; synthesis must define its consumer and avoid duplicate ownership.",
+      "language": "python",
+      "supported_languages": [
+        "python"
+      ],
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "agent-sdk-typescript",
+      "layer_id": "agent-sdks",
+      "role": "agent-sdk-typescript",
+      "purpose": "Candidate functional partition for agent sdk typescript; synthesis must define its consumer and avoid duplicate ownership.",
+      "language": "typescript",
+      "supported_languages": [
+        "typescript"
+      ],
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "agent-sdk-go",
+      "layer_id": "agent-sdks",
+      "role": "agent-sdk-go",
+      "purpose": "Candidate functional partition for agent sdk go; synthesis must define its consumer and avoid duplicate ownership.",
+      "language": "go",
+      "supported_languages": [
+        "go"
+      ],
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "agent-sdk-java",
+      "layer_id": "agent-sdks",
+      "role": "agent-sdk-java",
+      "purpose": "Candidate functional partition for agent sdk java; synthesis must define its consumer and avoid duplicate ownership.",
+      "language": "java",
+      "supported_languages": [
+        "java"
+      ],
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "agent-sdk-dotnet",
+      "layer_id": "agent-sdks",
+      "role": "agent-sdk-dotnet",
+      "purpose": "Candidate functional partition for agent sdk dotnet; synthesis must define its consumer and avoid duplicate ownership.",
+      "language": "dotnet",
+      "supported_languages": [
+        "dotnet"
+      ],
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "agent-sdk-rust",
+      "layer_id": "agent-sdks",
+      "role": "agent-sdk-rust",
+      "purpose": "Candidate functional partition for agent sdk rust; synthesis must define its consumer and avoid duplicate ownership.",
+      "language": "rust",
+      "supported_languages": [
+        "rust"
+      ],
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "mcp-cli-bridge",
+      "layer_id": "mcp-surfaces",
+      "role": "mcp-cli-bridge",
+      "purpose": "Candidate functional partition for mcp cli bridge; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "mcp-protocol-inspection",
+      "layer_id": "mcp-surfaces",
+      "role": "mcp-protocol-inspection",
+      "purpose": "Candidate functional partition for mcp protocol inspection; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "secret-detection",
+      "layer_id": "secrets-credentials",
+      "role": "secret-detection",
+      "purpose": "Candidate functional partition for secret detection; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "credential-custody-practice",
+      "layer_id": "secrets-credentials",
+      "role": "credential-custody-practice",
+      "purpose": "Candidate functional partition for credential custody practice; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "git-cli",
+      "layer_id": "git-github-automation",
+      "role": "git-cli",
+      "purpose": "Candidate functional partition for git cli; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "github-cli",
+      "layer_id": "git-github-automation",
+      "role": "github-cli",
+      "purpose": "Candidate functional partition for github cli; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "worktree-lifecycle",
+      "layer_id": "git-github-automation",
+      "role": "worktree-lifecycle",
+      "purpose": "Candidate functional partition for worktree lifecycle; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "structural-diff",
+      "layer_id": "git-github-automation",
+      "role": "structural-diff",
+      "purpose": "Candidate functional partition for structural diff; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    },
+    {
+      "id": "cross-family-review-bridge",
+      "layer_id": "git-github-automation",
+      "role": "cross-family-review-bridge",
+      "purpose": "Candidate functional partition for cross family review bridge; synthesis must define its consumer and avoid duplicate ownership.",
+      "repositories": [],
+      "references": []
+    }
+  ],
+  "limitations": [
+    "This is a proposed layer-by-role partition, not a default, installed tool census or readiness count.",
+    "No repositories or winners are selected before the command center's adoption synthesis.",
+    "SDK languages are coverage questions, not availability/installation claims. Coalesce monorepo language/interface roles before finalization when repository ownership would collide.",
+    "Practices without a repository require explicit source/owner decisions; never invent repository identities.",
+    "Default proof fields link canonical pins, receipts and scoped refutations; a successful overlap check proves declarations only."
+  ]
+}

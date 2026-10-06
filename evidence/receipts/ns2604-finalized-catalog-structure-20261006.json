@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "id": "ns2604-finalized-catalog-structure-20261006",
+  "kind": "upstream_provenance",
+  "component_ids": [
+    "codex",
+    "claude-code"
+  ],
+  "claim": "Source-only finalized-catalog publication scaffold and scoped declaration guard; pending synthesis selects no repository, unknown census remains null, and prior research overlap stays allowed. Actual repository checks retained; no native adoption or readiness aggregate.",
+  "limitations": [
+    "The slot plan is a proposed taxonomy; final repository/default/census and complete evidence references await the command center synthesis.",
+    "Synthetic and structural checks prove declarations and compatibility only, not external evidence truth.",
+    "The source completeness critic is a same-family lead, not independent cross-family acceptance.",
+    "Organic observations and four facts/fit/family scopes are separate pending owner records; named smokes supply none."
+  ],
+  "date": "2026-10-06",
+  "source_base_commit": "e28d0eec112527ac02659ac23753533b8ed39a73",
+  "evidence_class": "source_review",
+  "projection": "catalogs/foundation/finalized-sota-catalog.json",
+  "decision_record": "docs/decisions/2026-10-07-finalized-sota-catalog.md",
+  "selected_repositories": null,
+  "native_readiness_change": null,
+  "checks": [
+    {
+      "command": "python3 -m unittest tests.test_foundation tests.test_catalogs",
+      "exit_code": 1,
+      "evidence_class": "synthetic",
+      "returned_summary": "ModuleNotFoundError: No module named 'tests.test_foundation'\nRan 48 tests in 0.205s\nFAILED (errors=1)",
+      "retained_output_sha256": "a88e0138b7567d2c5c9cd9c230d06385fa2df8ce1b11d5da6f66764a628a1eaa"
+    },
+    {
+      "command": "python3 -m unittest tests.test_finalized_foundation_catalog tests.test_foundation_catalog tests.test_catalogs tests.test_validate",
+      "exit_code": 0,
+      "evidence_class": "synthetic",
+      "returned_summary": "...........................................................................................................................................................\n----------------------------------------------------------------------\nRan 155 tests in 2.686s\n\nOK",
+      "retained_output_sha256": "36bb24b3e2adc1ace0ddc1c2f6a5601595416e2f0d8048d736826b7917857628"
+    },
+    {
+      "command": "python3 scripts/validate_foundation.py",
+      "exit_code": 0,
+      "evidence_class": "structural_validation",
+      "returned_summary": "FOUNDATION catalog valid: layers=20, decisions=54, foundation_components=61, domain_components=7, evidence_receipts=84, candidates=3",
+      "retained_output_sha256": "bc6cd2683b69bf571d75857c4a2431bc662e370bcdee7ea27c5188fc875039ea"
+    },
+    {
+      "command": "python3 scripts/component_matrix.py --write",
+      "exit_code": 0,
+      "evidence_class": "structural_validation",
+      "returned_summary": "{\"flip_rule_violations\": 0, \"rows\": 32, \"status\": \"written\"}",
+      "retained_output_sha256": "4cd2e50526b588cf998c7136436856094ee43628f56bf7db7f397105a40df225"
+    },
+    {
+      "command": "python3 scripts/new_host_grand_list.py --write",
+      "exit_code": 0,
+      "evidence_class": "structural_validation",
+      "returned_summary": "{\"status\": \"written\", \"layers\": 32, \"winners\": 66}",
+      "retained_output_sha256": "f161f06c41a6dffe6e66c88c61f6e8de9ac981c52fc179231fb0df66ccb30b5a"
+    },
+    {
+      "command": "python3 scripts/validate.py",
+      "exit_code": 0,
+      "evidence_class": "structural_validation",
+      "returned_summary": "{\"components\": 69, \"hashed_files\": 10365, \"profiles\": 4, \"receipts\": 215, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution.",
+      "retained_output_sha256": "e71597ffbc0265694109f880aaa3530c45daaaee92560d2f84bac93ee97d8b08"
+    }
+  ],
+  "retained_corrections": [
+    {
+      "condition": "The first structure receipt used an empty component list, which the existing publication receipt contract rejects.",
+      "attempt_result": 1,
+      "correction": "Link the two existing native-client components whose shared catalog interface this structural record serves; no new default or adoption declared."
+    },
+    {
+      "condition": "Initial existing test name was misspelled test_foundation; actual test_foundation_catalog and publication cases then passed.",
+      "attempt_result": 1,
+      "corrected_result": 0
+    },
+    {
+      "condition": "An ambient original-worktree scripts namespace broke a registration helper import; native/package-safe and lazy scoped loading preserve cold privacy-helper imports.",
+      "attempt_result": 1,
+      "verification": "Final155fixtures and full structural validator passed."
+    },
+    {
+      "condition": "Pending repository summary was zero despite unknown census.",
+      "correction": "Null for pending; no measured zero fabricated."
+    },
+    {
+      "condition": "Mixed-case .GIT/.GiT bypassed inherited canonical-form rejection.",
+      "correction": "Reject normalized suffix only in new projection; historical research parser remains unchanged."
+    }
+  ],
+  "completeness_critic": {
+    "class": "same_family_source_review",
+    "findings": 3,
+    "repairs_applied": 3,
+    "delta_read": "Source delta: zero unresolved findings in the three scoped repairs; source review only, not independent native acceptance."
+  },
+  "first_pass": {
+    "pr": 804,
+    "observed_head": "8b844d37ac7f89b116d69f86681d06f5d4dc7791",
+    "status": "owner_managed_draft",
+    "fold_policy": "Preserve dated inputs and use qualified stable-pin references after command-center synthesis; no duplicate usage or historical rewrite."
+  }
+}

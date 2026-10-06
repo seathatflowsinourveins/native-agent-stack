@@ -17,7 +17,6 @@ import subprocess
 import zlib
 from pathlib import Path, PurePosixPath
 
-
 RECEIPT_KINDS = {
     "native_model_e2e", "native_cli_e2e", "artifact_measurement",
     "historical_inventory", "upstream_provenance", "compatibility_attempt",
@@ -148,6 +147,36 @@ class Validator:
 
     def error(self, message: str) -> None:
         self.errors.append(message)
+
+    def check_finalized_foundation_selection(self) -> None:
+        """Only the opt-in projection asserts exclusive repository ownership."""
+        relative = "catalogs/foundation/manifest.json"
+        manifest_path = self.root / relative
+        if not manifest_path.exists() and not manifest_path.is_symlink():
+            return
+        manifest_path = self.path(relative, relative)
+        if manifest_path is None:
+            return
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"),
+                                  object_pairs_hook=_json_without_duplicates)
+            if not isinstance(manifest, dict):
+                raise ValueError(f"{relative}: expected JSON object")
+            if "finalized_selection_file" not in manifest:
+                return
+            # Keep file-spec users of PRIVATE_CONTENT independent of optional
+            # catalog imports. Native commands resolve local siblings; packaged
+            # calls use their own namespace, never an ambient scripts package.
+            # https://docs.python.org/3.13/library/importlib.html#importing-a-source-file-directly
+            if __package__:
+                from . import validate_foundation as foundation
+            else:
+                import validate_foundation as foundation
+            if Path(foundation.__file__).resolve() != Path(__file__).resolve().with_name("validate_foundation.py"):
+                raise ImportError("foundation guard must come from this validator's sibling source")
+            foundation.validate_finalized_selection(self.root, manifest)
+        except (OSError, UnicodeError, ValueError, ImportError) as error:
+            self.error(f"Finalized foundation selection invalid: {error}")
 
     def text(self, value, label: str) -> bool:
         valid = isinstance(value, str) and bool(value.strip())
@@ -475,6 +504,7 @@ class Validator:
                 if receipt_id not in receipts:
                     self.error(f"model: unknown evidence {receipt_id}")
         self.check_credential_inventory()
+        self.check_finalized_foundation_selection()
         self.scan_publication(files)
         if self.errors:
             raise InvalidPublication("\n".join(self.errors))
