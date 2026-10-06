@@ -19,6 +19,7 @@ def candidate_fixture():
     """Reuse the established fixture, changing only candidate identity metadata."""
     receipt = baseline._v2_receipt()
     receipt["engine"] = copy.deepcopy(MANIFEST["engine"])
+    receipt["case_configuration"]["fee_model"] = copy.deepcopy(MANIFEST["case_configuration"]["fee_model"])
     receipt["mapping_manifest"]["sha256"] = COMPARE.SEALED_V2_MANIFEST_SHA256
     receipt["local_source_sha256"] = {name: "a" * 64 for name in COMPARE.REVIEWED_HARNESS_FILES}
     context = baseline._context()
