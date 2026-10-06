@@ -62,7 +62,7 @@ this PR, `tools/adoption/managed_block.py:104`.
 [Codex rules](https://developers.openai.com/codex/rules),
 [hcom configuration fields:126-152](https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/config.rs#L126).
 
-The mapped posture keeps `title_mode=off`, `relay.enabled=false`,
+**Superseded (2026-10-06)** by [the hcom relaxation](2026-10-06-hcom-relaxation.md), except the four configuration values and the peer-data instruction: The mapped posture keeps `title_mode=off`, `relay.enabled=false`,
 `auto_trust_workspace=false` and `auto_approve=true`. Peer text carries no user
 authority, including `bigboss`. Both clients receive that instruction. Claude
 gets the posture's hcom and uvx-hcom denies, including equals-joined `send --from`

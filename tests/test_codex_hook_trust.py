@@ -1051,7 +1051,7 @@ class ReviewedListTests(unittest.TestCase):
             self.assertEqual(record["rtk"], entry["reviewed_for"]["rtk_version_output"])
 
     def test_every_rule_file_of_the_install_plan_is_on_the_list_or_allow_only(self):
-        """Vacuous until a plan row ships a rule file (#713's config/hcom-deny.rules): then it fails if the file differs from the reviewed bytes."""
+        """Vacuous while the plan ships no rule file (the 2026-10-06 relaxation retired #713's config/hcom-deny.rules): a plan rule file fails unless its bytes are reviewed or allow-only."""
         listed = {entry["sha256"] for entry in self.entries}
         for path in sorted(PLAN_CONFIG.glob("*.rules")):
             data = path.read_bytes()

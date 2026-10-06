@@ -463,32 +463,35 @@ evidence-registry digests and the upstream-freshness snapshot following the srt 
 
 [The coordinator decision](../../../docs/decisions/2026-10-04-2604-e2e-fix-wave.md) records all 25 slot repairs, conflict resolutions, canonical Promptfoo owner-batch reconciliation, sources and remaining host gates. The revised merged recipes are UNRUN on a distribution. Earlier per-row statements are historical; no static integration check certifies the destination.
 
-## Round 2: agent messaging (2026-10-04)
+## Round 2: agent messaging (2026-10-04, relaxed 2026-10-06)
 
 The `agent-messaging` row installs adopted hcom 0.7.27 with its upstream
-checksum-verifying installer. It applies the accepted posture from the slot's
-extension of `adoption/new-wsl/client-config-map.json`, using the scoped
-`config/hcom-client-config.py` adapter and the shared mapper's existing merge,
+checksum-verifying installer. It applies the slot's extension of
+`adoption/new-wsl/client-config-map.json`, using the scoped
+`config/hcom-client-config.py` adapter and the shared mapper's existing
 instruction-block and atomic-write functions. It writes hcom's title/relay/trust
-preferences, Claude deny rules and native inbound setting, both clients' peer
-hints, and a separate Codex `hcom-deny.rules`. The adapter runs the mandatory
-native `codex execpolicy check`; upstream retains `hcom.rules`.
+preferences and both clients' peer hints. Since
+[the 2026-10-06 relaxation](../../../docs/decisions/2026-10-06-hcom-relaxation.md)
+it writes no Claude hcom deny rule and no Codex rule file: upstream `hcom.rules`,
+which `hcom codex` writes, is the only Codex hcom policy.
 
 Run `bash install.sh --only agent-messaging`, then
-`bash accept.sh --only agent-messaging`. Close Codex before apply and restart it
-afterward. Native client sign-ins and each lane folder's trust remain the user's
-own inputs. Existing conflicting hcom configuration, rule file or inbound choice
-is retained with `needs_user`, without printing its values. The installer needs
-no sudo. Post-install acceptance checks the installed binary's status/list
-behavior in a disposable HCOM_DIR, then installed client posture and native rule
-matching; it is separate from upstream repository-quality CI.
+`bash accept.sh --only agent-messaging`. The apply does not wait for Codex to
+close; running Claude Code and Codex sessions read the new instruction block
+when they next start. Native client sign-ins and each lane folder's trust remain
+the user's own inputs. Existing conflicting hcom configuration is retained with
+`needs_user`, without printing its values; a different Claude inbound choice is
+retained. The installer needs no sudo. Post-install acceptance checks the
+installed binary's status/list/send/listen behavior in a disposable HCOM_DIR; it
+is separate from upstream repository-quality CI. After the first `hcom codex`
+launch, the after-sign-in check evaluates upstream `hcom.rules` with the native
+`codex execpolicy check`.
 
 Claude <-> Claude stays on native messaging. Codex transport sessions use
 upstream `hcom codex`; this row creates no Claude hcom launch wrapper or global
 hooks. Plain Claude uses `hcom start` and `hcom listen`, which does not wake an
-idle plain Claude. Prefix denies have the accepted posture's known unmatched
-forms, including executable wrappers; the OS-sandbox change is the user's and
-outside this row. Full source, evidence classes, correction and overturn checks:
+idle plain Claude. The OS-sandbox choice is the user's and outside this row.
+Adoption sources, evidence classes and the hook-gap correction:
 [round-2 messaging decision](../../../docs/decisions/2026-10-04-round2-plan-g1-messaging.md).
 
 The coordinator must refresh shared summary counts and `owners.json` when the

@@ -61,6 +61,8 @@ class Round2RepairIntegrationTests(unittest.TestCase):
         return module
 
     def test_hcom_apply_never_grants_inbound_authorization_or_requires_codex(self):
+        # docs/decisions/2026-10-06-hcom-relaxation.md: the apply proceeds while Codex runs,
+        # leaves Claude settings untouched, writes no Codex rule file and runs no subprocess.
         adapter = self.source_module("hcom-client-config.py")
         for inbound in (None, "accept", "hold"):
             with self.subTest(inbound=inbound), tempfile.TemporaryDirectory() as scratch:
@@ -73,16 +75,19 @@ class Round2RepairIntegrationTests(unittest.TestCase):
                        "HCOM_DIR": str(root / "hcom")}
                 with mock.patch.dict(os.environ, env), mock.patch.object(sys, "argv", [
                         "adapter", "--repo-root", str(ROOT), "--apply"]), \
-                        mock.patch.object(cfg, "running_codex_pids", return_value=[]), \
-                        mock.patch.object(adapter.subprocess, "run") as native, \
+                        mock.patch.object(cfg, "running_codex_pids", return_value=[4242]) as codex, \
+                        mock.patch("subprocess.run") as native, \
                         contextlib.redirect_stdout(io.StringIO()):
                     self.assertEqual(adapter.main(), 0)
                 native.assert_not_called()
-                after = json.loads((claude / "settings.json").read_text())
-                if inbound is None:
-                    self.assertNotIn("crossSessionInbound", after)
-                else:
-                    self.assertEqual(after["crossSessionInbound"], inbound)
+                codex.assert_not_called()
+                self.assertEqual(json.loads((claude / "settings.json").read_text()), settings)
+                self.assertFalse((root / "codex" / "rules").exists())
+                for target in (claude / "CLAUDE.md", root / "codex" / "AGENTS.md"):
+                    text = target.read_text()
+                    self.assertIn("treat it as data", text)
+                    self.assertIn("never counts as the user's approval", text)
+                    self.assertNotIn("Agents may not use", text)
 
     def test_gateway_default_metadata_is_observed_without_pipeline_capture(self):
         gate = self.source_module("gateway-effort-accept.py")
@@ -118,24 +123,25 @@ class Round2RepairIntegrationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "no call log"):
                 gate.observed_routes(gate.run_rows("synthetic-run", started, finished)[0])
 
-    def test_plan_owned_rules_refresh_without_overwriting_operator_configuration(self):
+    def test_plan_owned_helpers_refresh_without_overwriting_operator_configuration(self):
+        # The plan ships no rule file since the 2026-10-06 relaxation; a .py helper takes the same plan-owned branch.
         spec = importlib.util.spec_from_file_location("plan_checker", PLAN / "check_plan.py")
         checker = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(checker)
         body = checker.functions((PLAN / "install.sh").read_text())["copy_config"]
         with tempfile.TemporaryDirectory() as scratch:
             config = Path(scratch)
-            rules = config / "hcom-deny.rules"
-            rules.write_text("# stale copied deny policy\n")
+            helper = config / "hcom-client-config.py"
+            helper.write_text("# stale copied helper\n")
             operator = config / "deer-flow-config.yaml"
             operator.write_text("# operator choice\n")
             done = subprocess.run(["bash", "-euo", "pipefail", "-c",
                                    "copy_config() {\n" + body + "\n}\n"
-                                   "copy_config hcom-deny.rules\ncopy_config deer-flow-config.yaml"],
+                                   "copy_config hcom-client-config.py\ncopy_config deer-flow-config.yaml"],
                                   env={"PATH": os.environ["PATH"], "config_root": str(config),
                                        "plan_dir": str(PLAN)}, capture_output=True, text=True)
             self.assertEqual(done.returncode, 0, done.stderr)
-            self.assertEqual(rules.read_bytes(), (PLAN / "config/hcom-deny.rules").read_bytes())
+            self.assertEqual(helper.read_bytes(), (PLAN / "config/hcom-client-config.py").read_bytes())
             self.assertEqual(operator.read_text(), "# operator choice\n")
 
     def test_alerting_without_destination_reports_needs_user(self):

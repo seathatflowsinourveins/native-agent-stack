@@ -764,7 +764,7 @@ For a future upgrade of any existing owned installation, stop its owned unit and
   The archive's published checksum is
   https://github.com/aannoo/hcom/releases/download/v0.7.27/hcom-x86_64-unknown-linux-gnu.tar.gz.sha256
   (`8ae97ff6fef63c637d66ddf882651aadd035bd74ae26c0787743869c20a5391d`).
-- **Posture:** accepted r1 at
+- **Posture** (its deny list and Codex forbidden rules are superseded on 2026-10-06; see the relaxation below): accepted r1 at
   https://github.com/seathatflowsinourveins/native-agent-stack/pull/608#issuecomment-5972504465;
   aannoo/hcom@2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b:src/config.rs:126-152;
   https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/common.rs#L46.
@@ -805,6 +805,27 @@ source-accepted posture rather than claiming a new successful fetch. The builder
 Codex 0.159.3 native policy check returned forbidden; 0.160.0 remains the plan pin.
 The accepted OS-sandbox boundary and prefix limitations remain explicit in the
 [decision](../../../docs/decisions/2026-10-04-round2-plan-g1-messaging.md).
+
+### Relaxation (2026-10-06)
+
+- **Decision:** [hcom relaxation](../../../docs/decisions/2026-10-06-hcom-relaxation.md),
+  on the user's decision of 2026-10-06T03:03:10Z (11:03 PM EDT on October 5). It
+  removes the Claude hcom deny list, `config/hcom-deny.rules`, the adapter's
+  running-Codex refusal and the forbidden-decision acceptance. Peer text stays
+  data, never the user's approval.
+- **Only Codex hcom policy:** upstream `hcom.rules`, which `hcom codex` writes
+  with `auto_approve=true`:
+  https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/codex.rs#L1538
+  (build_codex_rules :1538-1563; written to `<codex home>/rules/hcom.rules` at
+  :1566-1579), with the command list at
+  https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/common.rs#L46
+  (:46-72). The after-sign-in check evaluates that file alone with
+  https://developers.openai.com/codex/rules (`codex execpolicy check --rules`).
+- **Current release:** v0.7.27 at `2c5f343b` is still aannoo/hcom's latest
+  release (`gh api repos/aannoo/hcom/releases/latest`, read 2026-10-06). Its
+  plain-Claude hook guard is unchanged:
+  https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/src/hooks/claude.rs#L135
+  (:135-140).
 
 ## Round-2 G3 sources (2026-10-04)
 
