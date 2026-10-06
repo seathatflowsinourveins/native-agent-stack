@@ -17357,6 +17357,11 @@
       "bytes": 3660
     },
     {
+      "path": "docs/decisions/2026-10-06-token-tools-upstream-install.md",
+      "sha256": "0e20a9d7277a888d528b192af7c0c7fe920fbcca58dfbc349c5ba2de12304368",
+      "bytes": 11602
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
