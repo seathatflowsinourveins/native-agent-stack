@@ -58,11 +58,22 @@ GPT read of 2044b2ab, accepted by CC item task-ns2604-coop-20261006T151719Z (C1)
 - A published receipt hashes every folder name derived from the home path (public_text).
 - CL7b's process tree is sampled like the launcher's (AppServerCensus).
 
+P2-2 of the same read, upheld by the same item: host execution brokers are out of reach.
+- Each trial gets an empty private runtime folder (/run/user/$UID, tmpfs, mode 0700) and an empty /run/WSL.
+- So the user manager's and the session bus's sockets (systemd-run --user), rootless Docker's socket, the ssh-agent
+  and gpg-agent sockets, and WSL interop's sockets (a Windows program would read the distribution from outside) do not
+  exist in its namespace.
+- Nothing is passed through (RUNTIME_PASS_THROUGH, with the evidence).
+- The self-test and the focused tests attempt each connection inside and require it to fail (host_broker_probes).
+- The system bus stays: an unprivileged systemd-run against the system manager needs polkit's admin authentication
+  (org.freedesktop.systemd1.manage-units: auth_admin, or auth_admin_keep when active, in
+  /usr/share/polkit-1/actions/org.freedesktop.systemd1.policy), which a trial cannot give.
+
 Limits:
-- Services reached over a socket outside /tmp run outside the namespace: the ai-memory server, MCP servers configured
-  by URL, the OmniRoute gateway, and a user systemd or Docker daemon. So a file such a service reads for the trial is
-  not hidden by this mount namespace. The grader tags user systemd, Docker, WSL interop and direct HTTP to local
-  services, checks every ai-memory call's scope, and the per-trial scoping of those stores (R10) still applies.
+- Services reached over the network run outside the namespace: the ai-memory server, MCP servers configured by URL
+  and the OmniRoute gateway. So a file such a service reads for the trial is not hidden by this mount namespace. The
+  grader tags direct HTTP to local services, checks every ai-memory call's scope, and the per-trial scoping of those
+  stores (R10) still applies. Use of user systemd, Docker or WSL interop is still tagged, as a diagnostic.
 - The network is the host's, so every service on its loopback is reachable. That includes the gateway's management
   routes: its call logs, with request and response payloads, answer without credentials.
 - ai-memory's shared `_global` scope carries no trial ownership, so a page another trial wrote there is not caught by
@@ -134,8 +145,25 @@ STORE_LABELS = {"codex-sessions": "Codex transcripts", "claude-file-history": "C
                 "codex-context-mode-sessions": "Codex context-mode session stores",
                 "codex-context-mode-content": "Codex context-mode content stores",
                 "claude-tmp": "Claude scratch and task output"}
-# Writable over the read-only runtime: the native home, the temporary folders and the user's runtime folder (sockets).
-WRITABLE = (HOME, Path(f"/run/user/{UID}"))
+# Writable over the read-only runtime: the native home (the temporary folders and the runtime folder are private).
+WRITABLE = (HOME,)
+# P2-2 of the GPT read of 2044b2ab, upheld by CC item task-ns2604-coop-20261006T151719Z (C1): host execution brokers.
+# A process outside the namespace that runs a command on request would read a hidden answer for the trial:
+# - the user manager (`systemd-run --user --pipe --wait cat <answer>`, through $XDG_RUNTIME_DIR/systemd/private or
+#   the session bus);
+# - the rootless Docker daemon (docker.sock, whose containers mount the host's view);
+# - WSL interop: a Windows program started from the trial reads the distribution through \\wsl.localhost\<distro>.
+# Each trial gets an empty private runtime folder (tmpfs, mode 0700, as XDG_RUNTIME_DIR must be) and an empty /run/WSL,
+# so none of those sockets exists in its namespace. The runtime folder's ssh-agent and gpg-agent sockets go with it.
+RUNTIME_DIR = Path(f"/run/user/{UID}")
+WSL_INTEROP_DIR = Path("/run/WSL")
+# What a trial's clients need from the host's runtime folder, each with its reason: nothing. Each launch path's client
+# starts with the empty folder (selftest(clients=True)). No MCP server of either native client is launched through
+# Docker. Codex keeps MCP OAuth credentials in files (mcp_oauth_credentials_store = "file"), and no Secret Service
+# runs on this host. No suite task names Docker, systemd or a Windows program.
+RUNTIME_PASS_THROUGH: tuple[tuple[str, str], ...] = ()
+BROKER_SOCKETS = (RUNTIME_DIR / "systemd" / "private", RUNTIME_DIR / "bus", RUNTIME_DIR / "docker.sock",
+                  RUNTIME_DIR / "openssh_agent")
 # Private per trial (RESIDUALS_DECISION (a)): an empty tmpfs over each, so no file passes between trials through them.
 # The X11 socket folder is bound back when it exists (sockets only, no trial content), so a display keeps working.
 PRIVATE_TMP = (Path("/tmp"), Path("/var/tmp"), Path("/dev/shm"))
@@ -229,6 +257,11 @@ def listed_locations(cfg: dict, run_root, trial_id: str, client: str, fixture, c
     rows += [(f"the shared {STORE_LABELS[label]}" if label == "codex-sessions" else f"other sessions' {STORE_LABELS[label]}",
               target, target, "private") for label, target in PRIVATE_STORES]
     rows += [(f"the host's {path} (other trials' scratch files)", path, path, "tmpfs") for path in PRIVATE_TMP]
+    rows.append(("the host's runtime folder: the user manager's, the session bus's and Docker's sockets (host "
+                 "execution brokers)", RUNTIME_DIR, RUNTIME_DIR, "tmpfs"))
+    if WSL_INTEROP_DIR.is_dir():
+        rows.append(("WSL interop's sockets (a Windows program runs outside the namespace)", WSL_INTEROP_DIR,
+                     WSL_INTEROP_DIR, "tmpfs"))
     for path in _declared(cfg):
         cover = next((root for root in HIDDEN_ROOTS if under(path, root)), path)
         rows.append(("declared answer source", path, cover,
@@ -244,6 +277,11 @@ def plan(cfg: dict, run_root, trial_id: str, client: str, fixture, *, clone=None
     work, private = trial_dir(cfg, run_root), private_dir(cfg, run_root, trial_id)
     ops: list[list] = [["ro-bind", "/", "/"], ["dev-bind", "/dev", "/dev"], ["proc", None, "/proc"]]
     ops += [["bind-try", str(path), str(path)] for path in WRITABLE]
+    # P2-2: a private runtime folder (a tmpfs op's source field carries its mode) and no WSL interop sockets.
+    ops.append(["tmpfs", "0700", str(RUNTIME_DIR)])
+    ops += [["bind", str(src), str(src)] for src, _ in RUNTIME_PASS_THROUGH]
+    if WSL_INTEROP_DIR.is_dir():
+        ops.append(["tmpfs", None, str(WSL_INTEROP_DIR)])
     # Private /tmp, /var/tmp and /dev/shm; Claude's /tmp area is bound below into the private /tmp.
     ops += [["tmpfs", None, str(path)] for path in PRIVATE_TMP]
     ops.append(["bind-try", str(X11_SOCKETS), str(X11_SOCKETS)])
@@ -312,7 +350,7 @@ def options(plan_: dict, info_fd: int | None = None) -> list[str]:
         if op == "proc":
             out += ["--proc", dest]
         elif op == "tmpfs":
-            out += ["--tmpfs", dest]
+            out += (["--perms", src] if src else []) + ["--tmpfs", dest]
         else:
             out += [f"--{op}", src, dest]
     out += ["--unshare-pid", "--unshare-ipc", "--die-with-parent", "--chdir", str(plan_["fixture"])]
@@ -337,6 +375,10 @@ def receipt(plan_: dict, command: list[str]) -> dict:
             "ai_memory_scope": {**plan_["ai_memory_scope"], "marker": tilde(plan_["ai_memory_scope"]["marker"]),
                                 "decision": RESIDUALS_DECISION},
             "namespaces": "user (implied: unprivileged bwrap), mount, pid, ipc; network and uts are the host's",
+            # P2-2: the runtime folder is private, so no host execution broker's socket is in the namespace.
+            "runtime_dir": {"path": str(RUNTIME_DIR), "private": "tmpfs, mode 0700",
+                            "passed_through": [{"path": tilde(p), "why": why} for p, why in RUNTIME_PASS_THROUGH],
+                            "wsl_interop_hidden": WSL_INTEROP_DIR.is_dir()},
             "environment": "inherited unchanged"}
 
 
@@ -529,6 +571,7 @@ def permitted_binds(cfg: dict, run_root, trial_id: str, client: str, fixture) ->
                ("ro-bind", str(work / "bin"), str(work / "bin")),
                ("bind", str(private / "last"), str(work / "last"))}
     triples |= {("bind-try", str(path), str(path)) for path in WRITABLE}
+    triples |= {("bind", str(src), str(src)) for src, _ in RUNTIME_PASS_THROUGH}
     triples |= {("ro-bind", str(path), str(path))
                 for path in (work / "settings" / f"{trial_id}.json", work / "prompts" / f"{trial_id}.txt")}
     if client == "codex":
@@ -873,6 +916,8 @@ def selftest(cfg: dict | None = None, run_root=None, clients: bool = False) -> d
         # trial's namespace (the network is the host's) without credentials. Only the HTTP status of two routes the
         # repository's command guard allowlists is kept; the bodies are discarded.
         report["gateway_from_namespace"] = gateway_reachability(plans["claude"])
+        # P2-2: the host execution brokers are unreachable from the namespace.
+        report["host_brokers"] = host_broker_probes(plans["claude"])
         if clients:
             report["clients"] = _client_checks(plans, fixture, [p for _, p in targets][:1])
     finally:
@@ -892,7 +937,82 @@ def selftest(cfg: dict | None = None, run_root=None, clients: bool = False) -> d
         and all(m["ok"] for m in (report.get("ai_memory") or {}).values()) and len(report.get("ai_memory") or {}) == 2 \
         and all(n["namespace"] and n["namespace"] != n["host_namespace"] for n in report["namespaces"].values()) \
         and all(n["ipc_namespace"] and n["ipc_namespace"] != n["host_ipc_namespace"] for n in report["namespaces"].values()) \
+        and bool((report.get("host_brokers") or {}).get("ok")) \
         and all(c.get("ok") for c in report["clients"].values())
+    return report
+
+
+def _wsl_interop_socket() -> Path | None:
+    value = os.environ.get("WSL_INTEROP")
+    if value and Path(value).is_socket():
+        return Path(value)
+    return next((p for p in sorted(WSL_INTEROP_DIR.glob("*_interop")) if p.is_socket()), None) \
+        if WSL_INTEROP_DIR.is_dir() else None
+
+
+WINDOWS_CMD = Path("/mnt/c/Windows/System32/cmd.exe")
+
+
+def broker_attempts() -> dict[str, dict]:
+    """Each host execution broker present on this host: its socket, the outside control (the socket exists, and for
+    the user manager and Docker a read-only query answers), and the connection a trial would make, which must fail in
+    its namespace. The attempts are harmless if a broker did answer: `true` as a transient unit, Docker's /_ping and
+    cmd.exe's `ver`."""
+    out: dict[str, dict] = {}
+    if (RUNTIME_DIR / "systemd" / "private").is_socket() or (RUNTIME_DIR / "bus").is_socket():
+        out["the user manager (systemd-run --user)"] = {
+            "socket": RUNTIME_DIR / "systemd" / "private",
+            "control": ["systemctl", "--user", "is-system-running"],
+            "attempt": ["systemd-run", "--user", "--pipe", "--wait", "--quiet", "true"]}
+    if (RUNTIME_DIR / "docker.sock").is_socket():
+        ping = ["curl", "-s", "-m", "10", "--unix-socket", str(RUNTIME_DIR / "docker.sock"), "http://localhost/_ping"]
+        out["the Docker daemon (docker.sock)"] = {"socket": RUNTIME_DIR / "docker.sock", "control": ping, "attempt": ping}
+    interop = _wsl_interop_socket()
+    if interop and WINDOWS_CMD.exists():
+        out["WSL interop (a Windows program)"] = {"socket": interop, "control": None,
+                                                  "attempt": [str(WINDOWS_CMD), "/c", "ver"]}
+    return out
+
+
+def host_broker_probes(plan_: dict) -> dict:
+    """P2-2's self-test: in the trial's namespace each broker socket (and the ssh-agent's) is absent, each broker's
+    connection attempt fails, and the runtime folder is empty with mode 0700. Outside, the same sockets exist."""
+    attempts = broker_attempts()
+    sockets = [p for p in (*BROKER_SOCKETS, *(a["socket"] for a in attempts.values())) if p.is_socket()]
+    sockets = list(dict.fromkeys(sockets))
+    script = 'for p in "$@"; do if [ -e "$p" ]; then echo PRESENT; else echo ABSENT; fi; done'
+    seen, _ = run_wrapped(plan_, ["sh", "-c", script, "socket-probe", *[str(p) for p in sockets]], timeout=60)
+    lines = seen.stdout.split()
+    report: dict = {"sockets": {tilde(p): {"outside": "socket", "inside": lines[i] if i < len(lines) else None}
+                                for i, p in enumerate(sockets)}, "attempts": {}}
+    runtime, _ = run_wrapped(plan_, ["sh", "-c", f'stat -c %a {RUNTIME_DIR}; ls -A {RUNTIME_DIR} | wc -l'], timeout=60)
+    mode_entries = runtime.stdout.split()
+    report["runtime_dir"] = {"path": str(RUNTIME_DIR), "mode": mode_entries[0] if mode_entries else None,
+                             "entries": int(mode_entries[1]) if len(mode_entries) > 1 and mode_entries[1].isdigit() else None,
+                             "passed_through": [{"path": tilde(p), "why": why} for p, why in RUNTIME_PASS_THROUGH]}
+    for name, attempt in attempts.items():
+        if (report["sockets"].get(tilde(attempt["socket"])) or {}).get("inside") != "ABSENT":
+            # Fail closed without contacting a broker the namespace can reach.
+            report["attempts"][name] = {"socket": tilde(attempt["socket"]), "unreachable": False,
+                                        "not_attempted": "its socket is present in the namespace"}
+            continue
+        control = None
+        if attempt["control"]:
+            try:
+                ran = subprocess.run(attempt["control"], capture_output=True, text=True, timeout=30)
+                control = {"rc": ran.returncode, "output": public_text(tilde(ran.stdout.strip()))[:60]}
+            except (OSError, subprocess.SubprocessError) as error:
+                control = {"error": type(error).__name__}
+        inside, _ = run_wrapped(plan_, attempt["attempt"], timeout=90)
+        report["attempts"][name] = {
+            "socket": tilde(attempt["socket"]), "control_outside": control, "argv": attempt["attempt"],
+            "rc_inside": inside.returncode,
+            "stderr_inside": public_text(tilde((inside.stderr or inside.stdout).strip().splitlines()[-1]
+                                               if (inside.stderr or inside.stdout).strip() else ""))[:160],
+            "unreachable": inside.returncode != 0}
+    report["ok"] = all(s["inside"] == "ABSENT" for s in report["sockets"].values()) \
+        and all(a["unreachable"] for a in report["attempts"].values()) \
+        and report["runtime_dir"]["mode"] == "700" and report["runtime_dir"]["entries"] == 0
     return report
 
 

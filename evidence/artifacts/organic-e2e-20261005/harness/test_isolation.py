@@ -18,6 +18,8 @@
   - G13's bind triples, ordering and options checks, with their negative cases;
   - the public receipt;
   - CL7b's census.
+- P2-2, in its own commit (HostBrokers): inside a trial's namespace, the user manager (`systemd-run --user`), rootless
+  Docker's socket and WSL interop are unreachable, and the runtime folder is private.
 These are local integration checks of this harness, not upstream acceptance."""
 from __future__ import annotations
 
@@ -37,6 +39,18 @@ sys.path.insert(0, str(HERE))
 # The structural checks need this host's bubblewrap and the experiment's roots; elsewhere (a CI runner) they skip.
 HOST_READY = os.access("/usr/bin/bwrap", os.X_OK) and \
     (Path.home() / ".local/state/native-agent-stack/coordination").is_dir()
+# P2-2's paths, named here rather than read from isolation.py, so the negative tests also run (and fail) on a harness
+# that binds the host's runtime folder in.
+RUNTIME = Path(f"/run/user/{os.getuid()}")
+WSL_RUN = Path("/run/WSL")
+WINDOWS_CMD = Path("/mnt/c/Windows/System32/cmd.exe")
+
+
+def _wsl_interop_socket():
+    value = os.environ.get("WSL_INTEROP")
+    if value and Path(value).is_socket():
+        return Path(value)
+    return next((p for p in sorted(WSL_RUN.glob("*_interop")) if p.is_socket()), None) if WSL_RUN.is_dir() else None
 
 
 def _synthetic_plan(client: str = "claude"):
@@ -122,6 +136,17 @@ class StructuralG13(unittest.TestCase):
             self.assertTrue(ns["ipc_namespace"], ns)
             self.assertNotEqual(ns["ipc_namespace"], ns["host_ipc_namespace"], ns)
 
+    def test_host_brokers_are_unreachable(self):
+        """P2-2 (CC item task-ns2604-coop-20261006T151719Z, C1): the stage-1 self-test's own probes. Every broker socket
+        that exists on the host is absent in the namespace, each connection attempt fails there, and the runtime
+        folder is private, empty and 0700."""
+        brokers = self.report["host_brokers"]
+        self.assertTrue(brokers["ok"], brokers)
+        self.assertTrue(brokers["sockets"], brokers)
+        self.assertTrue(all(s["inside"] == "ABSENT" for s in brokers["sockets"].values()), brokers)
+        self.assertTrue(all(a["unreachable"] for a in brokers["attempts"].values()), brokers)
+        self.assertEqual((brokers["runtime_dir"]["mode"], brokers["runtime_dir"]["entries"]), ("700", 0), brokers)
+
     def test_the_gateway_reachability_is_recorded(self):
         """A documented residual, never a pass condition: the HTTP status of two allowlisted gateway routes asked
         from the namespace without credentials."""
@@ -173,6 +198,14 @@ class Receipt(unittest.TestCase):
                       f"{isolation.tilde(isolation.NEUTRAL_ROOT / '.ai-memory.toml')}", argv)
         self.assertEqual(rec["ai_memory_scope"]["project"], trial_id)
         self.assertEqual(rec["ai_memory_scope"]["workspace"], "organic-e2e")
+        # P2-2: a private runtime folder (mode 0700) and, on WSL, no interop sockets; nothing passed through.
+        self.assertIn(f"--perms 0700 --tmpfs {RUNTIME}", argv)
+        self.assertNotIn(f"--bind-try {RUNTIME} ", argv)
+        self.assertIn("the host's runtime folder: the user manager's, the session bus's and Docker's sockets (host "
+                      "execution brokers)", locations)
+        if WSL_RUN.is_dir():
+            self.assertIn(f"--tmpfs {WSL_RUN}", argv)
+        self.assertEqual((rec.get("runtime_dir") or {}).get("passed_through"), [])
         json.dumps(rec)   # the launched row is written with plain json.dumps
 
     def test_a_published_receipt_keeps_only_the_count_and_hash_of_kept_projects(self):
@@ -375,6 +408,17 @@ class G13Check(unittest.TestCase):
         result = self._check(isolation, cfg, trial_id, rows)
         self.assertFalse(result["ok"])
         self.assertTrue(any(f.startswith("bind-try ~ after the cover") for f in result["failures"]), result["failures"])
+
+    def test_the_hosts_runtime_folder_bound_in_fails(self):
+        """P2-2: the round-4 plan bound the host's runtime folder (its brokers' sockets) into the namespace."""
+        isolation, cfg, trial_id, rows = self._rows()
+        rec = rows["launched"]["isolation"]
+        runtime = str(RUNTIME)
+        rec["ops"] = [["bind-try", runtime, runtime] if op == ["tmpfs", "0700", runtime] else op for op in rec["ops"]]
+        self._reseal(isolation, rows)
+        failures = self._check(isolation, cfg, trial_id, rows)["failures"]
+        self.assertTrue(any(f.startswith(f"no tmpfs over {runtime}") for f in failures), failures)
+        self.assertIn(f"a bind outside the trial's plan: bind-try {runtime} -> {runtime}", failures)
 
     def test_options_that_differ_from_the_operations_fail(self):
         isolation, cfg, trial_id, rows = self._rows()
@@ -770,6 +814,95 @@ class WrappedLaunch(unittest.TestCase):
             for path in (fixture, work, plan["own_project"]):
                 if path:
                     shutil.rmtree(path, ignore_errors=True)
+
+
+@unittest.skipUnless(HOST_READY, "needs /usr/bin/bwrap and the experiment's roots on this host")
+class HostBrokers(unittest.TestCase):
+    """P2-2, upheld by CC item task-ns2604-coop-20261006T151719Z (C1): negative tests. Each attempts, inside a trial's
+    namespace, the connection that would let a process outside it read a hidden answer, and expects it to fail. Each
+    runs only where the broker exists on the host (its socket outside is the control). A broker that did answer would
+    run `true` as a transient unit, answer Docker's /_ping, or print cmd.exe's version: harmless."""
+
+    @classmethod
+    def setUpClass(cls):
+        isolation, cfg, plan, trial_id, fixture, work = _synthetic_plan("codex")
+        fixture.mkdir(parents=True)
+        (work / "prompts").mkdir(parents=True)
+        (work / "prompts" / f"{trial_id}.txt").write_text("prompt\n")
+        (work / "clones" / trial_id).mkdir(parents=True)
+        cls.isolation, cls.fixture, cls.work = isolation, fixture, work
+        cls.plan = isolation.plan(cfg, isolation.RUNS_ROOT / "unit-run", trial_id, "codex", fixture,
+                                  clone=work / "clones" / trial_id, prompt=work / "prompts" / f"{trial_id}.txt")
+        isolation.prepare_dirs(cls.plan)
+
+    @classmethod
+    def tearDownClass(cls):
+        import shutil
+        shutil.rmtree(cls.fixture, ignore_errors=True)
+        shutil.rmtree(cls.work, ignore_errors=True)
+
+    def _inside(self, argv):
+        result, _ = self.isolation.run_wrapped(self.plan, argv, timeout=90)
+        return result
+
+    def _absent_inside(self, path):
+        result = self._inside(["sh", "-c", 'if [ -e "$1" ]; then echo PRESENT; else echo ABSENT; fi', "p", str(path)])
+        return result.stdout.strip()
+
+    def test_systemd_run_user_cannot_reach_the_user_manager(self):
+        manager = RUNTIME / "systemd" / "private"
+        bus = RUNTIME / "bus"
+        if not (manager.is_socket() or bus.is_socket()):
+            self.skipTest("no user manager socket on this host")
+        self.assertEqual(self._absent_inside(manager), "ABSENT")
+        self.assertEqual(self._absent_inside(bus), "ABSENT")
+        result = self._inside(["systemd-run", "--user", "--pipe", "--wait", "--quiet", "true"])
+        self.assertNotEqual(result.returncode, 0, (result.stdout, result.stderr))
+        self.assertIn("connect", result.stderr.lower(), result.stderr)
+
+    def test_docker_sock_is_unreachable(self):
+        sock = RUNTIME / "docker.sock"
+        if not sock.is_socket():
+            self.skipTest("no rootless Docker socket on this host")
+        self.assertEqual(self._absent_inside(sock), "ABSENT")
+        result = self._inside(["curl", "-s", "-m", "10", "--unix-socket", str(sock), "http://localhost/_ping"])
+        self.assertEqual(result.returncode, 7, (result.stdout, result.stderr))   # curl: failed to connect
+        docker = shutil_which("docker")
+        if docker:
+            result = self._inside([docker, "-H", f"unix://{sock}", "version", "--format", "{{.Server.Version}}"])
+            self.assertNotEqual(result.returncode, 0, (result.stdout, result.stderr))
+
+    def test_wsl_interop_is_unreachable(self):
+        interop = _wsl_interop_socket()
+        if not interop or not WINDOWS_CMD.exists():
+            self.skipTest("not a WSL host with interop")
+        self.assertEqual(self._absent_inside(interop), "ABSENT")
+        result = self._inside([str(WINDOWS_CMD), "/c", "ver"])
+        self.assertNotEqual(result.returncode, 0, (result.stdout, result.stderr))
+        self.assertNotIn("Microsoft Windows", result.stdout)
+
+    def test_the_runtime_folder_is_private(self):
+        runtime = RUNTIME
+        marker = f"ut-{uuid.uuid4().hex[:8]}"
+        try:
+            result = self._inside(["sh", "-c", f'stat -c %a {runtime}; ls -A {runtime} | wc -l; echo x > {runtime}/{marker}'])
+            reached_host = (runtime / marker).exists()
+        finally:
+            (runtime / marker).unlink(missing_ok=True)   # a harness that binds the host's folder in would leave it there
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(result.stdout.split()[:2], ["700", "0"])
+        self.assertFalse(reached_host, "a write to the private runtime folder reached the host's")
+
+    def test_ssh_agent_socket_is_absent(self):
+        agent = RUNTIME / "openssh_agent"
+        if not agent.is_socket():
+            self.skipTest("no ssh-agent socket in the runtime folder")
+        self.assertEqual(self._absent_inside(agent), "ABSENT")
+
+
+def shutil_which(name):
+    import shutil
+    return shutil.which(name)
 
 
 class UnroundedDeadline(unittest.TestCase):

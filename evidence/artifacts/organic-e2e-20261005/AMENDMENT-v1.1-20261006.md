@@ -240,9 +240,49 @@ G13 now checks each bind in the receipt as an exact (operation, source, destinat
   - the ai-memory server (checked by scope).
 
   The proposed closure is a per-trial network namespace with explicit forwards.
-- **Host execution brokers over local sockets** (the user manager, the session bus, rootless Docker, WSL interop): tagged.
+- **Host execution brokers over local sockets** (the user manager, the session bus, rootless Docker, WSL interop): unreachable since P2-2's commit, below, and still tagged.
 - **ai-memory's `_global` scope:** its pages carry no trial ownership, so a page another trial wrote there is not caught (a write to it is tagged).
 - **The Windows drives** (`/mnt/c`, `/mnt/e`, `/mnt/f`, `/mnt/z`) are visible read-only. They hold no hidden root, but a copy of one there, such as a backup, would not be hidden. They were not searched.
+
+### Host execution brokers: unreachable (P2-2, upheld at 15:17Z, in its own commit)
+
+**The finding.** `/run/user/$UID` stayed visible and writable in round 4, so a process outside the namespace could be asked to read a hidden answer:
+- `systemd-run --user --pipe --wait cat <answer>` has the user manager run the command and return its output (systemd-run(1));
+- rootless Docker's socket was reachable the same way, through a container that mounts the host's view;
+- **WSL interop**, found this round, does the same. A Windows program started from the trial runs outside its namespace and reads the distribution through `\\wsl.localhost\<distro>`:
+  - `cmd.exe` ran from a bwrap namespace and named that path;
+  - with `/run/WSL` hidden, it failed (`UtilConnectUnix ... connect failed 2`).
+
+**The closure** (`harness/isolation.py`):
+- **Empty private folders.** Each trial gets an empty private runtime folder, a tmpfs over `/run/user/$UID` with mode 0700 (`--perms 0700 --tmpfs`), as XDG_RUNTIME_DIR must be. It also gets an empty `/run/WSL`.
+- **No broker socket in the namespace:** not the user manager's (`systemd/private`), the session bus's (`bus`), rootless Docker's (`docker.sock`), the ssh-agent's or the gpg-agent's.
+- **Nothing is passed through.** The evidence:
+  - every launch path's client starts with the empty folder (the self-test's 7 client checks);
+  - neither native client launches an MCP server through Docker;
+  - Codex keeps MCP OAuth credentials in files (`mcp_oauth_credentials_store = "file"`), and no Secret Service runs on this host;
+  - no suite task names Docker, systemd or a Windows program.
+
+  `RUNTIME_PASS_THROUGH` would name any later pass-through, each with its reason.
+- **The system bus stays visible.** An unprivileged `systemd-run` against the system manager needs polkit's admin authentication, which a trial cannot give: `org.freedesktop.systemd1.manage-units` is `auth_admin`, or `auth_admin_keep` when active (`/usr/share/polkit-1/actions/org.freedesktop.systemd1.policy`, systemd 259).
+- **G13** lists the runtime folder and `/run/WSL`:
+  - a receipt without their tmpfs fails;
+  - binding the host's runtime folder in is a bind outside the plan.
+
+**Negative tests** (`test_isolation.HostBrokers`). Each attempts, inside a trial's namespace, the connection a trial would make, and expects it to fail. Each runs only where the broker exists on the host:
+- `systemd-run --user --pipe --wait true` fails: "Failed to connect to user scope bus via local transport: No such file or directory";
+- Docker's `/_ping` over `docker.sock` (`curl --unix-socket`) exits 7, and `docker -H unix://... version` fails;
+- WSL interop (`cmd.exe /c ver`) fails;
+- the runtime folder is 0700 and empty, and a write there never reaches the host's;
+- the ssh-agent's socket is absent.
+
+Each test first checks that the socket is absent. On a harness that binds the host's folder in, it fails there, before contacting any broker.
+
+**Self-test probes** (`isolation.host_broker_probes`, a stage-1 pass condition):
+- Outside, the sockets exist, and the user manager and Docker answer read-only queries: `systemctl --user is-system-running` gave `degraded`, and Docker's `/_ping` gave `OK`.
+- Inside, all five sockets (the user manager, the session bus, Docker, the ssh-agent and WSL interop) are absent, and each attempt fails.
+- A broker whose socket is present inside is never contacted: the probe fails closed.
+
+The tags stay, as diagnostics. As the 15:17Z item ruled, tags alone do not close this, since validity is structural.
 
 ## Confirmed (CC 11:43Z)
 
@@ -528,6 +568,14 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
 
 ## Verification (offline; no pilot or smoke)
 
+- **P2-2's commit** (host execution brokers): the focused module passes 59 of 59 tests, client starts included.
+  - **Red runs** of the same 59 tests:
+    - on the harness without P2-2 (round 5's first commit), exactly P2-2's 8 checks are red: 7 fail and 1 errors, because the self-test report has no broker probes. The other 51 pass;
+    - on round 4 (2044b2ab), 17 fail and 17 error.
+  - **Stage-1 self-test with the private runtime folder:**
+    - 49 probes hidden, all with ENOENT, and all 7 client checks pass;
+    - the five broker sockets are absent inside, and each attempt failed;
+    - the folder is 0700 and empty.
 - **Round 5 (the 14:38Z, 14:42Z and 15:17Z items, without P2-2's commit):** the focused module (`nice -n 19 python3 -B -m unittest test_isolation`) passes 52 of 52 tests, client starts included.
   - **Red run.** The same 52 tests on the harness at 2044b2ab (round 4): 11 fail and 16 error, and the remaining 25 pass. The harness was exported with `tools/skill-usage`, which the grader loads.
   - **Checks the new tests add:**
