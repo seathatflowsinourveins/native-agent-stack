@@ -6,8 +6,8 @@
   "generator_sha256": "1a63ce9f991ec29f7a7e00564940a178b329c47e7661c77a09a60a4c54670f99",
   "profile_sha256": "b837312fcf1a81a9e9d47b71496bf08550d848cfbe6be4353f01bf75659b28f3",
   "outputs": {
-    "docs/new-wsl-handbook.md": "e86f96359863af80761aa28d91b6d82ee0c702824d4b57e902b1245bd1ea7060",
-    "docs/new-wsl-handbook.json": "597b8ebe58355e24473e96670b48444bfec6e3302c984ec3d90289c876031f71"
+    "docs/new-wsl-handbook.md": "f2b224c2eb081be6ca73834ef0a589a69a9c7029f2c2233678de893dd5a061b1",
+    "docs/new-wsl-handbook.json": "e5a825c8542eafe57744301ed16f8bd0cae373ddc0544f39e5be194b5be117bd"
   },
   "inventory": {
     "layers": 37,
@@ -558,6 +558,18 @@
       "date": "2026-10-06",
       "command": "python3 scripts/build_new_wsl_handbook.py --write",
       "cause": "Custody refresh of PR #642 onto main 0d5e65064: main and this branch had each regenerated the hashed handbook, so both generated outputs conflicted. Regenerated through the unchanged native builder on the merged sources, as a mechanical carry (the command center's ruling (a), item task-native-agent-stack-5f-20261006T112334Z); every regeneration entry of both sides is kept unchanged.",
+      "regenerated_against_main": "0d5e6506434fab598dee861c749a22e628beb75a",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "05ec525a60a6bad90b5f4161473a2aa015107c724fdfe0328f2166e3e73453a0",
+        "docs/new-wsl-handbook.json": "bb5a4dc62aabc938b56b038ddb4ae3df036395ccd44cc72720436ad3aa19b33d"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "Regeneration on PR #642 after its adoption-docs disclosure (4ae82b011) changed a hashed handbook input (adoption/platforms/linux-wsl2-new-distro.md); the native builder is unchanged; the command center's item task-native-agent-stack-5f-20261006T150622Z.",
       "regenerated_against_main": "0d5e6506434fab598dee861c749a22e628beb75a",
       "previous_outputs": {
         "docs/new-wsl-handbook.md": "05ec525a60a6bad90b5f4161473a2aa015107c724fdfe0328f2166e3e73453a0",
