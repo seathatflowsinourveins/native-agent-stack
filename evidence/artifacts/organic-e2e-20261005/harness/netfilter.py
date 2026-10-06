@@ -47,6 +47,8 @@ PLAIN_PATH = re.compile(r"\A/[A-Za-z0-9._~!$&'()*+,;=:@/-]*\Z")
 HOP_BY_HOP = {"connection", "keep-alive", "proxy-connection", "te", "trailer", "upgrade", "proxy-authorization",
               "proxy-authenticate"}
 DENIED_HEADER = b"X-Trial-Network: denied"
+# The model-call routes on the gateway (OpenAI Responses and Chat Completions; Codex's compaction is under /v1/responses).
+MODEL_CALL_PATHS = ("/v1/responses", "/v1/chat/completions", "/v1/completions")
 # Response headers the access log keeps (no other header, no body).
 RESPONSE_META = {"x-omniroute-request-id": "request_id", "x-omniroute-cache": "cache",
                  "x-omniroute-cache-hit": "cache_hit"}
@@ -402,8 +404,12 @@ def summarize(access_log) -> dict:
         if row.get("decision") == "denied" and len(out["denied"]) < 30:
             out["denied"].append({k: row.get(k) for k in ("forward", "method", "path", "reason")})
         if row.get("forward") == "gateway" and row.get("decision") == "allowed":
-            if row.get("request_id"):
+            # The model calls' ids are the trial's required calls (each leaves a call-log row); other /v1 reads, such
+            # as the model list, are kept apart.
+            if row.get("request_id") and str(row.get("path") or "").startswith(MODEL_CALL_PATHS):
                 out["gateway_request_ids"].append(row["request_id"])
+            elif row.get("request_id"):
+                out.setdefault("gateway_other_request_ids", []).append(row["request_id"])
             if str(row.get("cache_hit") or "").lower() in ("true", "1", "hit") or str(row.get("cache") or "").upper() == "HIT":
                 out["gateway_cache_hits"] += 1
     return out

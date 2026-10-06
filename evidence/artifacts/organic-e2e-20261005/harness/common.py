@@ -1023,16 +1023,22 @@ def gateway_calls_for_trial(request_ids, since_iso: str, until_iso: str, max_row
                 continue
             matched |= hit
             requested.append(row["id"])
+            request_id = sorted(hit)[0]
             try:
                 detail = gateway_get(f"/api/usage/call-logs/{row['id']}")
             except Exception as error:  # noqa: BLE001
                 errors.append(type(error).__name__)
+                # GPT read of 80be1483, P2-1: a failed detail keeps a placeholder, so grading sees the call it lacks.
+                found.setdefault("(detail failed)", []).append({
+                    "id": row.get("id"), "request_id": request_id, "timestamp": stamp, "path": row.get("path"),
+                    "status": row.get("status"), "detail_error": type(error).__name__, "forwarded_effort": None,
+                    "forwarded_service_tier": None, "pipeline_exposed": False})
                 continue
             body = detail.get("requestBody") or {}
             thread = (body.get("client_metadata") or {}).get("thread_id")
             pipeline = detail.get("pipelinePayloads")
             found.setdefault(thread or "(no thread)", []).append({
-                "id": row.get("id"), "timestamp": stamp, "path": row.get("path"), "status": row.get("status"),
+                "id": row.get("id"), "request_id": request_id, "timestamp": stamp, "path": row.get("path"), "status": row.get("status"),
                 "requested_model": row.get("requestedModel"), "backend_model": row.get("model"),
                 "provider": row.get("provider"), "received_effort": (body.get("reasoning") or {}).get("effort"),
                 "received_service_tier": body.get("service_tier"),
@@ -1044,4 +1050,5 @@ def gateway_calls_for_trial(request_ids, since_iso: str, until_iso: str, max_row
         if (rows[-1].get("timestamp") or "") < since_iso:
             break
     return {"by_thread": found, "rows_scanned": scanned, "errors": errors, "request_ids": len(wanted),
+            "required_request_ids": sorted(wanted), "unresolved_request_ids": sorted(wanted - matched),
             "detail_requests": requested, "unmatched_request_ids": len(wanted - matched)}

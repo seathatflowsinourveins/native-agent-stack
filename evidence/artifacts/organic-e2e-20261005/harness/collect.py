@@ -250,7 +250,8 @@ def main(argv=None) -> int:
             request_ids = ((exit_row.get("network_runtime") or {}).get("gateway_request_ids")) or []
             calls = gateway_calls_for_trial(request_ids, start, time.strftime(
                 "%Y-%m-%dT%H:%M:%S.999Z", time.gmtime(iso_to_ns(end) / 1e9 + 60)))
-            calls["by_thread"] = {k: v for k, v in calls["by_thread"].items() if k in threads or not threads}
+            # GPT read of 80be1483, P2-1: no thread filter here. Every call collected is the trial's own by its request
+            # id, so grading reconciles coverage against the trial's required ids, and nothing is dropped first.
             write_json(root / "gateway" / f"{tid}.json", calls, 0o600)
             record["gateway"] = {"threads": len(threads), "calls": sum(len(v) for v in calls["by_thread"].values()),
                                  "request_ids": calls["request_ids"], "unmatched": calls["unmatched_request_ids"],

@@ -1341,6 +1341,8 @@ def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> 
               "gateway_forwarded_service_tier": sorted({str(c.get("forwarded_service_tier")) for c in exposed}),
               # GPT read of a513616d, P2: every call's forwarded tier as recorded, null when missing (never "None").
               "tier_calls": [{"id": c.get("id"), "forwarded": c.get("forwarded_service_tier")} for c in calls],
+              # GPT read of 80be1483, P2-1: every collected call with the request id it matched, failed details kept.
+              "evidence_calls": evidence_calls(calls),
               # CC item task-ns2604-coop-20261006T143846Z, (a): calls the gateway's semantic cache answered.
               "gateway_semantic_cache_calls": [c.get("id") for c in calls if c.get("cache_source") == "semantic"],
               "gateway_backend_models": sorted({c.get("backend_model") for c in calls if c.get("backend_model")}),
@@ -2236,14 +2238,36 @@ def closure_evidence(selftest: dict | None) -> dict:
             "verified": [k for k in CLOSURE_EXPECTATIONS if expect.get(k) is True]}
 
 
-def g11_trial_ok(effort: dict, launch_tier=None) -> bool:
+def evidence_calls(calls: list) -> list[dict]:
+    """Each collected call (failed details included) with the request id it matched and its tier and effort evidence."""
+    return [{"id": c.get("id"), "request_id": c.get("request_id"), "forwarded_tier": c.get("forwarded_service_tier"),
+             "forwarded_effort": [v for v in _forwarded_efforts(c) if v], "detail_error": c.get("detail_error")}
+            for c in calls]
+
+
+def call_coverage(required_ids, evidence_calls) -> dict:
+    """GPT read of 80be1483, P2-1: G11 fails closed unless every required call of the trial (its gateway forward's
+    model-call request ids) has collected tier and effort evidence. A call the collection lost (unmatched, its detail
+    failed, or no record) is listed by id."""
+    required = [r for r in (required_ids or []) if r]
+    by_request: dict = {}
+    for call in evidence_calls or []:
+        by_request.setdefault(call.get("request_id"), []).append(call)
+    missing = [r for r in required if r not in by_request]
+    incomplete = [r for r in required if r in by_request
+                  and not any(c.get("forwarded_tier") is not None and c.get("forwarded_effort") for c in by_request[r])]
+    return {"required": len(required), "missing": missing, "incomplete": incomplete,
+            "ok": bool(required) and not missing and not incomplete}
+
+
+def g11_trial_ok(effort: dict, launch_tier=None, coverage: dict | None = None) -> bool:
     """G11 for one Codex trial (PILOT-SPEC: requested and forwarded effort and the gateway build recorded). Finding 7 of
     the GPT read of 5aa2bfdc: the forwarded effort must be an observed, nonempty value; pipeline exposure alone is not
     the record. GPT read of a513616d, P2: the launch tier must be default and every call's forwarded tier normal
     (tier_evidence); missing or unrecognized tier evidence fails."""
     return bool(effort.get("requested_turn_context")) and bool(effort.get("gateway_build")) \
         and (effort.get("gateway_calls") or 0) > 0 and bool(effort.get("gateway_forwarded")) \
-        and tier_evidence(effort, launch_tier)["ok"]
+        and tier_evidence(effort, launch_tier)["ok"] and bool((coverage or {}).get("ok"))
 
 
 def cli_exposure(item: str, client: str, graded: dict) -> dict:
@@ -2702,7 +2726,10 @@ def grade_run(root: Path) -> dict:
             # reported apart, with the calls that hold no value listed.
             launch_tier = recorded_service_tier(rows.get("launched") or {})
             record["tier_evidence"] = tier_evidence(effort, launch_tier)
-            gate_rows["G11"].append(g11_trial_ok(effort, launch_tier))
+            record["call_coverage"] = call_coverage(
+                ((rows.get("exit") or {}).get("network_runtime") or {}).get("gateway_request_ids"),
+                effort.get("evidence_calls"))
+            gate_rows["G11"].append(g11_trial_ok(effort, launch_tier, record["call_coverage"]))
             if not effort["gateway_forwarded_exposed"]:
                 gaps.append({"gate": "G11", "trial_id": tid, "gap": "forwarded effort not exposed: the gateway call log has "
                              "no pipeline details (pipelinePayloads null); under decision 8 (RP4) the co-op turns them on "
@@ -2837,7 +2864,12 @@ def grade_run(root: Path) -> dict:
         "rule": f"launch tier default and every call's forwarded tier in {list(NORMAL_FORWARDED_TIERS)}",
         "failing": {tid: {k: v for k, v in (e or {}).items() if k != "ok"} for tid, e in evidence.items()
                     if not (e or {}).get("ok")}}
-    if gates["G11"]["service_tier"]["other"] or fast or gates["G11"]["service_tier"]["evidence"]["failing"]:
+    # GPT read of 80be1483, P2-1: every required call collected, with the lost ones listed by id.
+    gates["G11"]["call_coverage"] = {r["trial_id"]: r.get("call_coverage") for r in table
+                                     if r.get("launched") and r.get("client") == "codex"
+                                     and not (r.get("call_coverage") or {}).get("ok")}
+    if gates["G11"]["service_tier"]["other"] or fast or gates["G11"]["service_tier"]["evidence"]["failing"] \
+            or gates["G11"]["call_coverage"]:
         gates["G11"]["pass"] = False
     # Round 6b (2): the calibration cell must have passed (gate0.json); otherwise G11 stays failed.
     calibration = (((load_json(root / "gate0.json") if (root / "gate0.json").exists() else {}).get("checks") or {})

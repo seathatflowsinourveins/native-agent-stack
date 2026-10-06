@@ -155,6 +155,21 @@ This extends the Gate 0 network amendment above. Each forward serves a tool unde
   - **If it fails, G11 stays failed.** The key is then fixed from the deployed build's source (`omniroute-3.8.51-5f4b3d577-affinity-pr15167`), cited by file and line, and the calibration re-runs. There is no fallback that reads foreign ids.
 - **Claude's credentials file** written back to the host is accepted as is (CC 17:06Z).
 
+### Round 6c: the GPT read of 80be1483 (CHANGES_REQUESTED, two P2s)
+
+- **P2-1, fixed: G11 accepted an incomplete call collection.** G11 now fails closed unless every required call of the trial has collected tier and effort evidence (`grade.call_coverage`, required by `grade.g11_trial_ok`).
+  - **The required set** is the trial's own record: the model-call request ids its gateway forward logged. Each is an `X-OmniRoute-Request-Id` on `/v1/responses` (compaction included), `/v1/chat/completions` or `/v1/completions`. Other `/v1` reads, such as the model list, are kept apart (`netfilter.MODEL_CALL_PATHS`).
+  - **The collector loses nothing silently:**
+    - a failed detail keeps a placeholder with its request id and error;
+    - the ids no call-log row matched are listed as `unresolved_request_ids`;
+    - every collected call carries the request id it matched;
+    - the thread filter in `collect.py` is gone, since every collected call is the trial's own by its id, so none is dropped before grading.
+  - **Reported in G11:** a missing call (no row) or an incomplete one (no forwarded tier or effort) fails G11 and is listed by id, under `call_coverage`.
+  - **Regressions, collection to grading:** A good and B's detail failed; A good and B unmatched; and a required call from another thread, which is kept and counted.
+- **P2-2, SocratiCode's backends: closed for Codex cells, recorded as NOT-TESTABLE for Claude cells.**
+  - **Codex cells:** SocratiCode's configured backends are now forwarded, path-filtered (round 6b, above): vLLM on 28231 for embeddings and the model list, and Qdrant on 21633 for the trial's own prefixed collections, with every other collection and route refused. The self-test checks both.
+  - **Claude cells:** SocratiCode is recorded NOT-TESTABLE, with this cause. Claude's user configuration points it at `127.0.0.1:16333` (Qdrant) and `127.0.0.1:8231` (embeddings), which no forward serves and where nothing listens on the host either. It stays NOT-TESTABLE until the CC's window fixes Claude's SocratiCode endpoints.
+
 ### The GPT read of a513616d (CHANGES_REQUESTED), folded in (item 164313Z)
 
 - **P1, the call-log detail GET.** The command guard permits it through its id exception (`scripts/hooks/secret_path_guard.py:4657-4658`). Under the CC's interim rule, `common.gateway_calls_for_trial` replaces the thread scan:
@@ -692,6 +707,9 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
 
 ## Verification (offline; no pilot or smoke)
 
+- **Round 6c** (the GPT read of 80be1483): the focused module passes 95 of 95 tests, client starts included.
+  - **Red run.** On the round-6b head, exactly its 3 tests are red (1 fails, 2 error), and the other 92 pass.
+  - **Stage-1 self-test:** 79 probes return ENOENT, 7 of 7 client checks pass, and 27 of 27 network expectations are met.
 - **Round 6b** (the tools-under-test forwards, NOT-TESTABLE and the calibration cell): the focused module passes 93 of 93 tests, client starts included.
   - **Red run.** On the round-6 head (the closure commit), exactly its 7 tests are red (1 fails, 6 error), and the other 86 pass.
   - **Stage-1 self-test:**

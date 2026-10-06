@@ -771,6 +771,72 @@ class Round5Grading(unittest.TestCase):
         self.assertEqual(tags, {"wsl-interop": ["p", "w"], "gateway-management-api": ["g"], "local-service-http": ["l"],
                                 "ai-memory-http": ["m"]})
 
+    def _collect(self, rows, details):
+        """common.gateway_calls_for_trial against a stand-in gateway: the list answers rows; a detail answers from
+        details, or fails when details holds an exception."""
+        import common
+
+        def fake(path, timeout=30):
+            if path.startswith("/api/usage/call-logs?"):
+                return rows if "offset=0" in path else []
+            answer = details[path.rsplit("/", 1)[1]]
+            if isinstance(answer, Exception):
+                raise answer
+            return answer
+
+        saved = common.gateway_get
+        common.gateway_get = fake
+        try:
+            return common.gateway_calls_for_trial(["req-a", "req-b"], "2026-10-06T12:00:00Z", "2026-10-06T13:00:00Z")
+        finally:
+            common.gateway_get = saved
+
+    def test_g11_requires_every_required_call(self):
+        """GPT read of 80be1483, P2-1: G11 fails closed unless every required call (the trial's own model-call request
+        ids) has collected tier and effort evidence. Collection to grading: A good and B's detail failed; A good and B
+        unmatched; and a required call from another thread, which is kept (no thread filter drops it)."""
+        import grade
+        good = {"requestBody": {"client_metadata": {"thread_id": "t1"}, "reasoning": {"effort": "max"}},
+                "pipelinePayloads": {"providerRequest": {"service_tier": "default", "reasoning": {"effort": "max"}}}}
+        other_thread = json.loads(json.dumps(good))
+        other_thread["requestBody"]["client_metadata"]["thread_id"] = "t-child"
+        base = {"requested_turn_context": "max", "gateway_build": "b", "gateway_calls": 2, "gateway_forwarded": ["max"]}
+        row = lambda i, rid: {"id": i, "correlationId": rid, "timestamp": "2026-10-06T12:00:01Z", "path": "/v1/responses"}
+
+        def judge(out):
+            calls = [c for v in out["by_thread"].values() for c in v]
+            effort = {**base, "tier_calls": [{"id": c["id"], "forwarded": c.get("forwarded_service_tier")} for c in calls]}
+            coverage = grade.call_coverage(["req-a", "req-b"], grade.evidence_calls(calls))
+            return coverage, grade.g11_trial_ok(effort, "default", coverage)
+
+        both = self._collect([row("A", "req-a"), row("B", "req-b")], {"A": good, "B": other_thread})
+        coverage, ok = judge(both)
+        self.assertTrue(ok, coverage)   # the call from another thread is kept and counted
+        failed = self._collect([row("A", "req-a"), row("B", "req-b")], {"A": good, "B": TimeoutError()})
+        coverage, ok = judge(failed)
+        self.assertFalse(ok)
+        self.assertEqual((coverage["missing"], coverage["incomplete"]), ([], ["req-b"]))
+        unmatched = self._collect([row("A", "req-a")], {"A": good})
+        coverage, ok = judge(unmatched)
+        self.assertFalse(ok)
+        self.assertEqual(coverage["missing"], ["req-b"])
+        self.assertEqual(unmatched["unresolved_request_ids"], ["req-b"])
+        self.assertFalse(grade.call_coverage([], [])["ok"])   # no required call recorded: nothing to establish
+
+    def test_only_model_calls_are_required(self):
+        """The gateway forward's required ids are the model calls' (each leaves a call-log row); a model-list read is
+        kept apart."""
+        import netfilter
+        with tempfile.TemporaryDirectory() as tmp:
+            log = Path(tmp) / "access.jsonl"
+            log.write_text("\n".join(json.dumps(r) for r in (
+                {"forward": "gateway", "decision": "allowed", "path": "/v1/responses", "request_id": "r1"},
+                {"forward": "gateway", "decision": "allowed", "path": "/v1/responses/compact", "request_id": "r2"},
+                {"forward": "gateway", "decision": "allowed", "path": "/v1/models", "request_id": "m1"})) + "\n")
+            summary = netfilter.summarize(log)
+        self.assertEqual(summary["gateway_request_ids"], ["r1", "r2"])
+        self.assertEqual(summary["gateway_other_request_ids"], ["m1"])
+
     def test_a_tool_that_cannot_run_is_not_testable(self):
         """Round 6b (1): a tool under test that cannot run inside a trial has its cells marked NOT-TESTABLE with the
         cause, never NOT-READY; the others are testable."""
@@ -813,7 +879,8 @@ class Round5Grading(unittest.TestCase):
         import grade
         base = {"requested_turn_context": "max", "gateway_build": "b", "gateway_calls": 2, "gateway_forwarded": ["max"]}
         full = {**base, "tier_calls": [{"id": "c1", "forwarded": "default"}, {"id": "c2", "forwarded": "(unset)"}]}
-        self.assertTrue(grade.g11_trial_ok(full, "default"))
+        self.assertTrue(grade.g11_trial_ok(full, "default", {"ok": True}))
+        self.assertFalse(grade.g11_trial_ok(full, "default"))   # no coverage record: fail closed
         cases = {"all tiers missing": ({**base, "tier_calls": [{"id": "c1", "forwarded": None},
                                                                {"id": "c2", "forwarded": None}]}, "default", ["c1", "c2"]),
                  "one tier missing": ({**base, "tier_calls": [{"id": "c1", "forwarded": "default"},
@@ -824,7 +891,7 @@ class Round5Grading(unittest.TestCase):
                  "launch tier unrecorded": (full, None, []),
                  "launch tier priority": (full, "priority", [])}
         for label, (effort, launch, missing) in cases.items():
-            self.assertFalse(grade.g11_trial_ok(effort, launch), label)
+            self.assertFalse(grade.g11_trial_ok(effort, launch, {"ok": True}), label)
             evidence = grade.tier_evidence(effort, launch)
             self.assertFalse(evidence["ok"], label)
             self.assertEqual(evidence["missing_calls"], missing, label)
