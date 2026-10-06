@@ -1,0 +1,531 @@
+{
+  "blocked_steps": [
+    {
+      "acceptance_step": 3,
+      "exercised": false,
+      "issue_states_checked_at": "2026-10-05",
+      "issues": [
+        {
+          "number": 5057,
+          "state": "open",
+          "url": "https://github.com/nautechsystems/nautilus_trader/issues/5057"
+        },
+        {
+          "number": 5060,
+          "state": "open",
+          "url": "https://github.com/nautechsystems/nautilus_trader/issues/5060"
+        }
+      ],
+      "operation": "reconnect_with_open_order"
+    },
+    {
+      "acceptance_step": 3,
+      "exercised": false,
+      "issue_states_checked_at": "2026-10-05",
+      "issues": [
+        {
+          "number": 5007,
+          "state": "open",
+          "url": "https://github.com/nautechsystems/nautilus_trader/issues/5007"
+        },
+        {
+          "number": 5057,
+          "state": "open",
+          "url": "https://github.com/nautechsystems/nautilus_trader/issues/5057"
+        },
+        {
+          "number": 5060,
+          "state": "open",
+          "url": "https://github.com/nautechsystems/nautilus_trader/issues/5060"
+        }
+      ],
+      "operation": "restart_reconciliation"
+    },
+    {
+      "acceptance_step": 4,
+      "exercised": false,
+      "issue_states_checked_at": "2026-10-05",
+      "issues": [
+        {
+          "number": 5060,
+          "state": "open",
+          "url": "https://github.com/nautechsystems/nautilus_trader/issues/5060"
+        }
+      ],
+      "operation": "kill_switch"
+    }
+  ],
+  "cases": {
+    "C1": {
+      "events": [],
+      "id": "C1",
+      "order": null,
+      "order_type": "LIMIT",
+      "outcome": "not_run",
+      "price": null,
+      "reason": null,
+      "side": "BUY"
+    },
+    "C2": {
+      "events": [],
+      "id": "C2",
+      "order": null,
+      "order_type": "LIMIT",
+      "outcome": "not_run",
+      "price": null,
+      "reason": null,
+      "side": "BUY"
+    },
+    "C3": {
+      "events": [
+        {
+          "at": "2026-10-05T18:22:55.675839+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O1",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791224575675839175,
+          "ts_init": 1791224575675839175,
+          "type": "OrderInitialized"
+        },
+        {
+          "at": "2026-10-05T14:26:14+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O1",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": true,
+          "side": "BUY",
+          "ts_event": 1791210374000000000,
+          "ts_init": 1791224575676468916,
+          "type": "OrderAccepted"
+        },
+        {
+          "at": "2026-10-05T14:26:14+00:00",
+          "commission": "1.00",
+          "commission_currency": "USD",
+          "currency": "USD",
+          "fill_price": "772.93",
+          "fill_quantity": "1",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O1",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": true,
+          "side": "BUY",
+          "ts_event": 1791210374000000000,
+          "ts_init": 1791224575676976124,
+          "type": "OrderFilled"
+        }
+      ],
+      "id": "C3",
+      "order": "O1",
+      "order_type": "MARKET",
+      "outcome": "failed",
+      "price": null,
+      "reason": "C3_unconfirmed_or_rejected",
+      "side": "BUY"
+    },
+    "C4": {
+      "events": [
+        {
+          "at": "2026-10-05T18:22:55.677837+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "SELL",
+          "ts_event": 1791224575677837312,
+          "ts_init": 1791224575677837312,
+          "type": "OrderInitialized"
+        },
+        {
+          "at": "2026-10-05T14:26:15+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": true,
+          "side": "SELL",
+          "ts_event": 1791210375000000000,
+          "ts_init": 1791224575677857533,
+          "type": "OrderAccepted"
+        },
+        {
+          "at": "2026-10-05T14:26:15+00:00",
+          "commission": "1.02",
+          "commission_currency": "USD",
+          "currency": "USD",
+          "fill_price": "772.90",
+          "fill_quantity": "1",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": true,
+          "side": "SELL",
+          "ts_event": 1791210375000000000,
+          "ts_init": 1791224575677879194,
+          "type": "OrderFilled"
+        }
+      ],
+      "id": "C4",
+      "order": "O2",
+      "order_type": "MARKET",
+      "outcome": "failed",
+      "price": null,
+      "reason": "C4_unconfirmed_or_rejected",
+      "side": "SELL"
+    }
+  },
+  "ended_at": "2026-10-05T18:23:42.104418+00:00",
+  "events": [
+    {
+      "at": "2026-10-05T18:22:55.675839+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O1",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791224575675839175,
+      "ts_init": 1791224575675839175,
+      "type": "OrderInitialized"
+    },
+    {
+      "at": "2026-10-05T14:26:14+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O1",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": true,
+      "side": "BUY",
+      "ts_event": 1791210374000000000,
+      "ts_init": 1791224575676468916,
+      "type": "OrderAccepted"
+    },
+    {
+      "at": "2026-10-05T14:26:14+00:00",
+      "commission": "1.00",
+      "commission_currency": "USD",
+      "currency": "USD",
+      "fill_price": "772.93",
+      "fill_quantity": "1",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O1",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": true,
+      "side": "BUY",
+      "ts_event": 1791210374000000000,
+      "ts_init": 1791224575676976124,
+      "type": "OrderFilled"
+    },
+    {
+      "at": "2026-10-05T18:22:55.677837+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O2",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "SELL",
+      "ts_event": 1791224575677837312,
+      "ts_init": 1791224575677837312,
+      "type": "OrderInitialized"
+    },
+    {
+      "at": "2026-10-05T14:26:15+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O2",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": true,
+      "side": "SELL",
+      "ts_event": 1791210375000000000,
+      "ts_init": 1791224575677857533,
+      "type": "OrderAccepted"
+    },
+    {
+      "at": "2026-10-05T14:26:15+00:00",
+      "commission": "1.02",
+      "commission_currency": "USD",
+      "currency": "USD",
+      "fill_price": "772.90",
+      "fill_quantity": "1",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O2",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": true,
+      "side": "SELL",
+      "ts_event": 1791210375000000000,
+      "ts_init": 1791224575677879194,
+      "type": "OrderFilled"
+    }
+  ],
+  "evidence_class": "native_paper",
+  "exit_code": 1,
+  "failures": [
+    {
+      "acceptance_step": 2,
+      "cases_blocked": [
+        "C1",
+        "C2",
+        "C3",
+        "C4"
+      ],
+      "reason": "case_or_loss_bound"
+    }
+  ],
+  "fills": [
+    {
+      "at": "2026-10-05T14:26:14+00:00",
+      "commission": "1.00",
+      "commission_currency": "USD",
+      "currency": "USD",
+      "fill_price": "772.93",
+      "fill_quantity": "1",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O1",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": true,
+      "side": "BUY",
+      "ts_event": 1791210374000000000,
+      "ts_init": 1791224575676976124,
+      "type": "OrderFilled"
+    },
+    {
+      "at": "2026-10-05T14:26:15+00:00",
+      "commission": "1.02",
+      "commission_currency": "USD",
+      "currency": "USD",
+      "fill_price": "772.90",
+      "fill_quantity": "1",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O2",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": true,
+      "side": "SELL",
+      "ts_event": 1791210375000000000,
+      "ts_init": 1791224575677879194,
+      "type": "OrderFilled"
+    }
+  ],
+  "flat_proof": {
+    "client": "ibapi",
+    "client_id": 92,
+    "observed": {
+      "account_count": 1,
+      "contract": null,
+      "errors": [],
+      "info": [
+        {
+          "code": 2104,
+          "reqId": -1,
+          "text": "Market data farm connection is OK:usfarm"
+        },
+        {
+          "code": 2106,
+          "reqId": -1,
+          "text": "HMDS data farm connection is OK:ushmds"
+        },
+        {
+          "code": 2158,
+          "reqId": -1,
+          "text": "Sec-def data farm connection is OK:secdefil"
+        }
+      ],
+      "open_order_statuses": [],
+      "open_orders": 0,
+      "paper_accounts": true,
+      "positions": 0,
+      "server_minus_local_s": -0.983,
+      "server_time_epoch": 1791224621,
+      "spy_position": false
+    },
+    "port": 4002,
+    "requests_completed": {
+      "accounts": true,
+      "contract": false,
+      "orders": true,
+      "positions": true,
+      "time": true
+    },
+    "status": "passed"
+  },
+  "harness_sha256": "67429251370f1d397e53e69c5ff0b8b0ef7c2cb0e069687f0b087e6cca2ba013",
+  "kind": "ibkr_paper_orders_nautilus_2_0_0rc5",
+  "node": {
+    "started": true,
+    "stop_ns": 1791224575758864574,
+    "stop_reason": "case_failure"
+  },
+  "plan_sha256": "24ffca56dfa7bd647bcf423dbc91ae3f605384a81a0ad9523cc024a36ac3ec72",
+  "pre_check": {
+    "client": "ibapi",
+    "client_id": 92,
+    "observed": {
+      "account_count": 1,
+      "contract": {
+        "currency": "USD",
+        "exchange": "SMART",
+        "minTick": 0.01,
+        "primaryExchange": "ARCA",
+        "secType": "STK",
+        "timeZoneId": "US/Eastern"
+      },
+      "errors": [],
+      "info": [
+        {
+          "code": 2104,
+          "reqId": -1,
+          "text": "Market data farm connection is OK:usfarm"
+        },
+        {
+          "code": 2106,
+          "reqId": -1,
+          "text": "HMDS data farm connection is OK:ushmds"
+        },
+        {
+          "code": 2158,
+          "reqId": -1,
+          "text": "Sec-def data farm connection is OK:secdefil"
+        }
+      ],
+      "open_order_statuses": [],
+      "open_orders": 0,
+      "paper_accounts": true,
+      "positions": 0,
+      "server_minus_local_s": -0.394,
+      "server_time_epoch": 1791224573,
+      "spy_position": false
+    },
+    "port": 4002,
+    "requests_completed": {
+      "accounts": true,
+      "contract": true,
+      "orders": true,
+      "positions": true,
+      "time": true
+    },
+    "status": "passed"
+  },
+  "quote_admission": {
+    "admitted_monotonic": 142706.909029817,
+    "ask": "774.88",
+    "ask_notional_usd": "774.88",
+    "bid": "774.87",
+    "elapsed_seconds": 1.3857,
+    "errors": [],
+    "headroom_usd": "10",
+    "info": [
+      {
+        "code": 2104,
+        "reqId": -1,
+        "text": "Market data farm connection is OK:usfarm"
+      },
+      {
+        "code": 2106,
+        "reqId": -1,
+        "text": "HMDS data farm connection is OK:ushmds"
+      },
+      {
+        "code": 2158,
+        "reqId": -1,
+        "text": "Sec-def data farm connection is OK:secdefil"
+      }
+    ],
+    "last_stage": "clock",
+    "last_stage_elapsed_seconds": 0.0002,
+    "quote_age_seconds": 8.24510061647743e-05,
+    "quote_time_epoch": 1791224573,
+    "server_time_epoch": 1791224573,
+    "source": "ibapi.reqTickByTickData.BidAsk/reqCurrentTime",
+    "stage_duration_seconds": {
+      "accounts": 0.0086,
+      "clock": 0.0488,
+      "connected": 0.0242,
+      "nextValidId": 0.001,
+      "quote": 1.003,
+      "tick requested": 0.2999
+    },
+    "stage_elapsed_seconds": {
+      "accounts": 0.0328,
+      "clock": 1.3855,
+      "connected": 0.0242,
+      "nextValidId": 0.0338,
+      "quote": 1.3367,
+      "tick requested": 0.3337
+    },
+    "status": "passed",
+    "tob_offset_ticks": 38743
+  },
+  "risk": {
+    "bypass": false,
+    "enforcement": "runner_quantity_and_quote_admission",
+    "engine_route": {
+      "issue": "https://github.com/nautechsystems/nautilus_trader/issues/4946",
+      "issue_state": "closed",
+      "pin_fix_present": false,
+      "reason": "rc5 stock orders can skip account-scoped max_notional_per_order on the SMART/IB venue path",
+      "source": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/risk/src/engine/mod.rs#L1218",
+      "upstream_fix": "fixed on develop; included in v2.0.0rc6; absent from the selected rc5 pin"
+    },
+    "max_notional_per_order_usd": "1000",
+    "note": "engine notional cap configured, not enforced on this route (#4946, fixed on develop, unreleased); bound held by qty=1 and quote admission",
+    "release_verification": {
+      "checked_at": "2026-10-05",
+      "correction": "The requested note's unreleased clause reflects earlier metadata; the fix is now released in rc6, while this trial stays pinned to rc5.",
+      "fix_commit": "ed6fc8bf47fd37dda97d63b9b2df160719ee2bac",
+      "published_at": "2026-10-05T03:03:18Z",
+      "released_in": "v2.0.0rc6",
+      "source": "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc6"
+    },
+    "submit_budget_enforcement": "engine_throttle"
+  },
+  "roundtrip": {
+    "buy_quantity": "1",
+    "closed": true,
+    "commission_unresolved": false,
+    "commissions_usd": "2.02",
+    "gross_usd": "-0.03",
+    "loss_bound_breach": false,
+    "net_usd": "-2.05",
+    "sell_quantity": "1"
+  },
+  "schema_version": 1,
+  "source_hashes": {
+    "frozen_checker_sha256": "1b697f237275a725a0dcc39ee886c4f07aa27bfba1c2b442982b3c76b02e1012"
+  },
+  "started_at": "2026-10-05T18:22:52.241961+00:00",
+  "status": "failed",
+  "upstream_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+  "versions": {
+    "ibapi": "10.45.1",
+    "nautilus_ibapi_distribution": "10.45.1",
+    "nautilus_trader": "2.0.0rc5",
+    "nautilus_trader_distribution": "2.0.0rc5",
+    "protobuf": "5.29.6",
+    "python": "3.12.3"
+  },
+  "window": "inside_window"
+}

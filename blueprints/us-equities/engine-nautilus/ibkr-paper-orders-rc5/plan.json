@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "kind": "ibkr_paper_orders_plan_rc5",
+  "frozen_at": "2026-10-05",
+  "evidence_class": "native_paper",
+  "engine": {
+    "version": "2.0.0rc5",
+    "ibapi_version": "10.45.1",
+    "adapter": "NautilusTrader native InteractiveBrokers adapter",
+    "upstream_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e"
+  },
+  "host": "127.0.0.1",
+  "paper_ports": [4002, 7497],
+  "default_port": 4002,
+  "account_prefix": "DU",
+  "require_single_managed_account": true,
+  "client_ids": {"node": 91, "check": 92},
+  "instrument": {
+    "symbol": "SPY",
+    "sec_type": "STK",
+    "exchange": "SMART",
+    "primary_exchange": "ARCA",
+    "currency": "USD",
+    "nautilus_instrument_id": "SPY=STK.SMART",
+    "expected_price_increment": "0.01"
+  },
+  "bounds": {
+    "max_orders": 6,
+    "max_quantity_per_order": 1,
+    "max_notional_per_order_usd": 1000,
+    "max_roundtrip_loss_usd": 5,
+    "commission_allowance_per_order_usd": 1.0
+  },
+  "session": {
+    "timezone": "America/New_York",
+    "weekdays_only": true,
+    "open": "09:30",
+    "close": "16:00",
+    "close_buffer_minutes": 10,
+    "whole_run_inside_window": true,
+    "use_contract_liquid_hours": true
+  },
+  "data": {
+    "market_data_type": "REALTIME",
+    "quote_max_age_seconds": 10,
+    "clock_resolution_tolerance_seconds": 2,
+    "batch_quotes": false
+  },
+  "timeouts": {
+    "check_seconds": 30,
+    "node_start_seconds": 60,
+    "per_step_seconds": 45,
+    "cleanup_seconds": 45,
+    "node_stop_allowance_seconds": 15,
+    "post_check_reserve_seconds": 60,
+    "overall_deadline_seconds": 420
+  },
+  "risk": {
+    "bypass": false,
+    "max_order_submit_rate": "6/00:07:00",
+    "require_enforced_notional_before_connection": false,
+    "notional_headroom_usd": 10,
+    "known_pin_blocker": "https://github.com/nautechsystems/nautilus_trader/issues/4946"
+  },
+  "exec_tester": {
+    "order_qty": "1",
+    "open_position_on_start_qty": "1",
+    "open_position_on_first_quote": true,
+    "open_position_time_in_force": "IOC",
+    "enable_limit_buys": true,
+    "enable_limit_sells": false,
+    "enable_stop_buys": false,
+    "enable_stop_sells": false,
+    "enable_brackets": false,
+    "tob_offset_ticks": "floor(0.5 * admitted_bid / 0.01)",
+    "limit_time_in_force": "GTD",
+    "order_expire_time_delta_mins": 7,
+    "modify_orders_to_maintain_tob_offset": false,
+    "cancel_replace_orders_to_maintain_tob_offset": false,
+    "use_post_only": false,
+    "use_individual_cancels_on_stop": true,
+    "cancel_orders_on_stop": true,
+    "close_positions_on_stop": true,
+    "reduce_only_on_stop": false,
+    "dry_run": false,
+    "log_data": false
+  },
+  "cases": [
+    {"id": "C1", "name": "accept_resting", "order_type": "LIMIT", "side": "BUY", "expect": "OrderAccepted"},
+    {"id": "C2", "name": "cancel_resting", "order_type": "LIMIT", "side": "BUY", "expect": "OrderCanceled for C1 after stop"},
+    {"id": "C3", "name": "fill_buy", "order_type": "MARKET", "side": "BUY", "expect": "OrderFilled quantity 1"},
+    {"id": "C4", "name": "flatten", "order_type": "MARKET", "side": "SELL", "expect": "OrderFilled quantity 1 after stop and independent flat proof"}
+  ],
+  "end_disposition": {"positions": 0, "open_orders": 0},
+  "receipt": {"kind": "ibkr_paper_orders_nautilus_2_0_0rc5"},
+  "exit_codes": {"passed": 0, "failed_or_incomplete": 1, "not_connected": 2, "refused_or_cleanup_required": 3}
+}

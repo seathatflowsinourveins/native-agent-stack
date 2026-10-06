@@ -1846,7 +1846,7 @@
           "component_id": "alpaca-py",
           "repository": "https://github.com/alpacahq/alpaca-py",
           "pin": "0.44.0",
-          "pin_source": "catalogs/us-equities/runtime-target.json:158",
+          "pin_source": "catalogs/us-equities/runtime-target.json:159",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the research-runtime profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
           "acceptance": {"command": "the September 20 run of installed alpaca-py 0.44.0: five authenticated GET requests, all returned HTTP 200", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/authenticated-data/README.md"},
           "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
@@ -1923,7 +1923,7 @@
           "component_id": "alpaca-py",
           "repository": "https://github.com/alpacahq/alpaca-py",
           "pin": "0.44.0",
-          "pin_source": "catalogs/us-equities/runtime-target.json:158",
+          "pin_source": "catalogs/us-equities/runtime-target.json:159",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the research-runtime profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
           "acceptance": {"command": "the September 20 run of installed alpaca-py 0.44.0: five authenticated GET requests, all returned HTTP 200", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/authenticated-data/README.md"},
           "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
@@ -2018,7 +2018,7 @@
           "component_id": "alpaca-py",
           "repository": "https://github.com/alpacahq/alpaca-py",
           "pin": "0.44.0",
-          "pin_source": "catalogs/us-equities/runtime-target.json:158",
+          "pin_source": "catalogs/us-equities/runtime-target.json:159",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the research-runtime profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
           "acceptance": {"command": "the September 20 run of installed alpaca-py 0.44.0: five authenticated GET requests, all returned HTTP 200", "evidence_class": "upstream_example_or_native_operation", "source_path": "blueprints/us-equities/authenticated-data/README.md"},
           "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
@@ -2294,7 +2294,7 @@
           "role": "separate Alpaca path",
           "repository": "https://github.com/alpacahq/alpaca-py",
           "pin": "0.44.0",
-          "pin_source": "catalogs/us-equities/runtime-target.json:158",
+          "pin_source": "catalogs/us-equities/runtime-target.json:159",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the trading-nautilus profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
           "acceptance": {"command": "the 2026-09-29 pre-market Alpaca paper series through the adaptive-paper engine (alpaca-py 0.44.0 LimitOrderRequest orders, engine b528bb55): 3 of 3 attempts passed, 9 entries and 9 exits filled, every fill matched to the broker, flat at the series end", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/adaptive-paper/trials/pre-20260929/receipt.json"},
           "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
@@ -2359,7 +2359,7 @@
           "role": "Alpaca broker boundary",
           "repository": "https://github.com/alpacahq/alpaca-py",
           "pin": "0.44.0",
-          "pin_source": "catalogs/us-equities/runtime-target.json:158",
+          "pin_source": "catalogs/us-equities/runtime-target.json:159",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the trading-nautilus profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
           "acceptance": {"command": "bounded Alpaca paper roundtrips through the adaptive-paper engine in the 2026-09-29 pre-market series (engine b528bb55, alpaca-py 0.44.0): 3 of 3 attempts passed, every fill matched to the broker, flat at the series end", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/adaptive-paper/trials/pre-20260929/receipt.json"},
           "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}
@@ -2454,7 +2454,7 @@
           "role": "Alpaca boundary",
           "repository": "https://github.com/alpacahq/alpaca-py",
           "pin": "0.44.0",
-          "pin_source": "catalogs/us-equities/runtime-target.json:158",
+          "pin_source": "catalogs/us-equities/runtime-target.json:159",
           "install": {"command": "uv pip install --python \"$GATE_TOOL_DIR/.venv/bin/python3\" with the recipe's pinned requirements (the trading-nautilus profile has no Linux pins)", "kind": "repo_recipe", "source_path": "blueprints/us-equities/order-contract/README.md"},
           "acceptance": {"command": "the 2026-09-29 pre-market Alpaca paper series through the adaptive-paper engine (alpaca-py 0.44.0 LimitOrderRequest orders, engine b528bb55): 3 of 3 attempts passed, 9 entries and 9 exits filled, every fill matched to the broker, flat at the series end", "evidence_class": "local_integration_check", "source_path": "blueprints/us-equities/adaptive-paper/trials/pre-20260929/receipt.json"},
           "upstream_currency": {"latest_release": "v0.44.0 (2026-08-11)", "checked_at": "2026-10-01T07:42Z", "pin_is_latest": "yes", "url": "https://github.com/alpacahq/alpaca-py/releases"}

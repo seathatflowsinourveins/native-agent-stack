@@ -1,0 +1,1516 @@
+"""Offline local integration checks and synthetic fixtures; never a broker run.
+
+Native configuration/model checks require exactly rc5 and otherwise skip.
+Every orchestration test supplies fake checker/process results. No test starts
+a LiveNode, official-ibapi reader or gateway connection.
+"""
+import copy
+import asyncio
+import contextlib
+import importlib.util
+import io
+import json
+import re
+import os
+import stat
+import tempfile
+import time
+import unittest
+from datetime import datetime, timezone
+from pathlib import Path
+from types import SimpleNamespace
+from unittest import mock
+from zoneinfo import ZoneInfo
+
+ROOT = Path(__file__).resolve().parents[1]
+DIRECTORY = ROOT / "blueprints/us-equities/engine-nautilus/ibkr-paper-orders-rc5"
+SPEC = importlib.util.spec_from_file_location("ibkr_orders_rc5", DIRECTORY / "run.py")
+RUN = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(RUN)
+PLAN = RUN.load_plan()
+PINNED = {"nautilus_trader": "2.0.0rc5", "ibapi": "10.45.1"}
+NY = ZoneInfo("America/New_York")
+# Generated synthetic identifier, never an actual account.
+FAKE_ACCOUNT = "DU" + "7654321"
+FAKE_HOME = "/" + "home/" + "synthetic"
+NOW = datetime(2026, 10, 5, 10, tzinfo=NY).astimezone(timezone.utc)
+STOP_NS = 2_000_000_000
+FLAT = {"client": "ibapi", "client_id": 92, "status": "passed",
+        "observed": {"account_count": 1, "paper_accounts": True, "positions": 0, "open_orders": 0}}
+
+
+def admitted_quote():
+    result = RUN.admit_quote(PLAN, {"bid": "770.01", "ask": "770.02", "quote_time_epoch": 1000}, 1001)
+    result["admitted_monotonic"] = time.monotonic()
+    return result
+
+
+def node_payload(receipt):
+    admission = admitted_quote()
+    return {"account_id": FAKE_ACCOUNT, "receipt": receipt, "node_stop_at": time.monotonic() + 30,
+            "run_nonce": receipt.get("run_nonce"), "quote_admission": admission, "tob_offset_ticks": admission["tob_offset_ticks"]}
+
+
+def event(kind, order="O1", typ="LIMIT", side="BUY", when=1_000_000_000, **changes):
+    value = {"type": kind, "order": order, "order_type": typ, "side": side,
+             "quantity": "1", "price": "765.00" if typ == "LIMIT" else None,
+             "instrument_id": "SPY=STK.SMART", "ts_event": when, "ts_init": when,
+             "at": RUN.frozen().ns_to_iso(when), "reconciliation": False}
+    if kind == "OrderFilled":
+        value.update(fill_price="770.00" if side == "BUY" else "769.94", fill_quantity="1",
+                     commission="1.00", commission_currency="USD", currency="USD")
+    value.update(changes)
+    return value
+
+
+def sequence():
+    # ExecTester opens the market position before resting the limit: case labels
+    # describe obligations rather than implying the frozen strategy's chronology.
+    return [event("OrderInitialized", "O2", "MARKET"),
+            event("OrderSubmitted", "O2", "MARKET"),
+            event("OrderFilled", "O2", "MARKET"),
+            event("OrderInitialized"), event("OrderSubmitted"), event("OrderAccepted"),
+            event("OrderPendingCancel", when=3_000_000_000), event("OrderCanceled", when=3_000_000_000),
+            event("OrderInitialized", "O3", "MARKET", "SELL", 3_000_000_000),
+            event("OrderSubmitted", "O3", "MARKET", "SELL", 3_000_000_000),
+            event("OrderFilled", "O3", "MARKET", "SELL", 3_000_000_000)]
+
+
+def cache_order(client_id, events, *, strategy="EXEC_TESTER-001", status="FILLED"):
+    """Synthetic native histories, including external orders claimed by ExecTester."""
+    native = []
+    for index, record in enumerate(events):
+        item = type(record["type"], (), {})()
+        item.__dict__.update(record, event_id=f"{client_id}-{index}", client_order_id=client_id,
+                             strategy_id=strategy, trader_id="TESTER-001")
+        if record["type"] == "OrderFilled":
+            item.last_px, item.last_qty, item.currency = record["fill_price"], record["fill_quantity"], "USD"
+            item.commission = SimpleNamespace(as_decimal=lambda: RUN.decimal("1.00"), currency="USD")
+        native.append(item)
+    first = events[0]
+    return SimpleNamespace(client_order_id=client_id, strategy_id=strategy, trader_id="TESTER-001",
+                           ts_init=first["ts_init"], events=lambda: native,
+                           order_type=SimpleNamespace(name=first["order_type"]), side=SimpleNamespace(name=first["side"]),
+                           instrument_id=first["instrument_id"], quantity=first["quantity"], price=first["price"],
+                           status=SimpleNamespace(name=status), venue_order_id=None, time_in_force=SimpleNamespace(name="IOC"))
+
+
+class RunOrderOwnership(unittest.TestCase):
+    def test_started_second_is_required_even_when_skew_and_init_time_fit(self):
+        scope = RUN.RunOrderScope(2_100_000_000)
+        order = cache_order("O-19700101-000001-001-001-1", [
+            event("OrderInitialized", typ="MARKET", when=2_500_000_000)], status="INITIALIZED")
+        native = order.events()[0]
+        self.assertGreaterEqual(native.ts_init, scope.started_ns)
+        # Removing the started-second guard leaves every other condition true.
+        self.assertEqual(native.ts_init // 1_000_000_000 - 1, 1)
+        self.assertFalse(scope.generated_here(native))
+        self.assertEqual(scope.partition([order])[0], [])
+
+    def test_generated_identity_excludes_old_or_mismatched_intents(self):
+        scope = RUN.RunOrderScope(2_100_000_000)
+        cases = [
+            ("O-19700101-000001-001-001-1", 3_000_000_000),
+            ("O-19700101-000002-001-001-1", 4_000_000_000),
+            ("O-19700101-000002-002-001-1", 3_000_000_000),
+            ("O-19700101-000002-001-002-1", 3_000_000_000),
+            ("O-19700101-000002-001-001-0", 3_000_000_000),
+        ]
+        for client_id, ts_init in cases:
+            with self.subTest(client_id=client_id, ts_init=ts_init):
+                order = cache_order(client_id, [event("OrderInitialized", typ="MARKET", when=ts_init)], status="INITIALIZED")
+                self.assertFalse(scope.generated_here(order.events()[0]))
+                self.assertEqual(scope.partition([order])[0], [])
+        current = cache_order("O-19700101-000002-001-001-1", [event("OrderInitialized", typ="MARKET", when=3_000_000_000)])
+        self.assertTrue(scope.generated_here(current.events()[0]))
+
+    def test_run3_old_generator_id_without_submission_stays_external(self):
+        old = cache_order("O-19700101-000001-001-001-2", [
+            event("OrderInitialized", typ="MARKET", when=3_000_000_000),
+            event("OrderAccepted", typ="MARKET", when=1_000_000_000, reconciliation=True),
+            event("OrderFilled", typ="MARKET", when=1_000_000_000, reconciliation=True)], status="ACCEPTED")
+        cache = SimpleNamespace(orders=lambda: [old])
+        scope = RUN.RunOrderScope(2_100_000_000)
+        receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+        RUN.update_observations(receipt, RUN.snapshot_events(cache, scope), PLAN)
+        receipt["reconciled_external"] = RUN.snapshot_events(cache, scope, external=True)
+        self.assertEqual(len(receipt["reconciled_external"]), 3)
+        self.assertEqual(receipt["events"], [])
+        self.assertEqual(receipt["fills"], [])
+        self.assertEqual(receipt["failures"], [])
+        self.assertTrue(RUN.stop_ready(RUN.tester_orders(cache, scope), 1, 2))
+
+    def test_pending_native_intent_and_pre_submit_denial_are_owned(self):
+        client_id = "O-19700101-000001-001-001-9"
+        initialized = event("OrderInitialized", typ="MARKET")
+        pending = cache_order(client_id, [initialized], status="INITIALIZED")
+        cache = SimpleNamespace(orders=lambda: [pending])
+        scope = RUN.RunOrderScope(900_000_000)
+        self.assertEqual(RUN.tester_orders(cache, scope), [pending])
+        self.assertTrue(RUN.orders_in_flight(RUN.tester_orders(cache, scope)))
+        self.assertEqual(RUN.snapshot_events(cache, scope, external=True), [])
+        denied = cache_order(client_id, [initialized, event("OrderDenied", typ="MARKET", when=1_100_000_000)], status="DENIED")
+        cache.orders = lambda: [denied]
+        receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+        RUN.update_observations(receipt, RUN.snapshot_events(cache, scope), PLAN)
+        self.assertEqual(receipt["cases"]["C3"]["outcome"], "failed")
+        self.assertEqual(receipt["cases"]["C3"]["events"][-1]["type"], "OrderDenied")
+        self.assertFalse(RUN.orders_in_flight(RUN.tester_orders(cache, scope)))
+        many = [cache_order(f"O-19700101-000001-001-001-{i}", [initialized, event("OrderDenied", typ="MARKET")], status="DENIED") for i in range(1, 8)]
+        cache.orders = lambda: many
+        RUN.update_observations(receipt, RUN.snapshot_events(cache, scope), PLAN)
+        self.assertTrue(any(f["reason"] == "observed_order_budget_breach" for f in receipt["failures"]))
+
+    def test_run2_external_fills_then_current_submissions(self):
+        # Run 2 imported fills had a fresh, non-reconciled initialization and
+        # even the claimed EXEC_TESTER strategy. Neither establishes ownership.
+        history = []
+        for side, price in (("BUY", "772.93"), ("SELL", "772.90")):
+            history.append(cache_order("historical-" + side, [
+                event("OrderInitialized", typ="MARKET", side=side, when=1_000_000_000),
+                event("OrderAccepted", typ="MARKET", side=side, when=500_000_000, reconciliation=True),
+                event("OrderFilled", typ="MARKET", side=side, when=500_000_000, reconciliation=True, fill_price=price)],
+                status="ACCEPTED"))  # Nonterminal external MARKET must not defer stop either.
+        cache = SimpleNamespace(orders=lambda **kwargs: list(history))
+        scope = RUN.RunOrderScope(900_000_000)
+        receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+
+        def observe():
+            RUN.update_observations(receipt, RUN.snapshot_events(cache, scope), PLAN)
+            receipt["reconciled_external"] = RUN.snapshot_events(cache, scope, external=True)
+
+        observe()
+        self.assertEqual([c["outcome"] for c in receipt["cases"].values()], ["not_run"] * 4)
+        self.assertEqual(receipt["fills"], [])
+        self.assertIsNone(receipt["roundtrip"])
+        self.assertEqual(receipt["failures"], [])
+        self.assertTrue(RUN.stop_ready(RUN.tester_orders(cache, scope), 1, 2))
+        external = copy.deepcopy(receipt["reconciled_external"])
+        self.assertEqual({e["fill_price"] for e in external if e["type"] == "OrderFilled"}, {"772.93", "772.90"})
+        for alias in ("O1", "O2", "O3"):
+            history.append(cache_order("current-" + alias, [e for e in sequence() if e["order"] == alias]))
+        receipt["node"]["stop_ns"], receipt["flat_proof"] = STOP_NS, copy.deepcopy(FLAT)
+        observe()
+        self.assertEqual([c["outcome"] for c in receipt["cases"].values()], ["passed"] * 4)
+        self.assertEqual(receipt["roundtrip"]["net_usd"], "-2.06")
+        self.assertEqual(len(receipt["fills"]), 2)
+        self.assertEqual(receipt["failures"], [])
+        self.assertEqual(receipt["reconciled_external"], external)
+        raw = RUN.serialized_receipt(receipt)
+        self.assertNotIn("historical-", raw)
+        self.assertNotIn("current-", raw)
+
+    def test_lineage_needs_local_init_and_submit_for_same_strategy_and_id(self):
+        local = sequence()[:3]
+        cases = [cache_order("own", local), cache_order("wrong-strategy", local, strategy="OTHER-001"),
+                 cache_order("old", [dict(e, ts_init=100) for e in local]),
+                 cache_order("reconciled-init", [dict(local[0], reconciliation=True), *local[1:]]),
+                 cache_order("reconciled-submit", [local[0], dict(local[1], reconciliation=True), local[2]])]
+        mismatch = cache_order("mismatch", local)
+        mismatch.events()[1].client_order_id = "different"
+        cases.append(mismatch)
+        cache = SimpleNamespace(orders=lambda **kwargs: cases)
+        scope = RUN.RunOrderScope(900_000_000)
+        self.assertEqual([str(o.client_order_id) for o in RUN.tester_orders(cache, scope)], ["own"])
+        # Reconciliation on an already owned order still fails its cases.
+        cases[0].events()[-1].reconciliation = True
+        outcomes = RUN.case_outcomes(RUN.snapshot_events(cache, scope))
+        self.assertEqual(outcomes["C3"]["outcome"], "failed")
+
+
+class PlanValidation(unittest.TestCase):
+    def test_frozen_plan(self):
+        self.assertEqual(RUN.validate_plan(PLAN), [])
+        self.assertEqual(PLAN["bounds"]["max_orders"], 6)
+        self.assertEqual(PLAN["timeouts"]["overall_deadline_seconds"], 420)
+
+    def test_destination_keeps_rc5_route_issue_and_rerun_trigger(self):
+        destination = json.loads((ROOT / "catalogs/us-equities/runtime-target.json").read_text())
+        ibkr = next(boundary for boundary in destination["broker_boundaries"] if boundary["id"] == "ibkr")
+        issues = {entry["ref"].rsplit("/", 1)[-1]: entry for entry in ibkr["rc5_blockers"]}
+        self.assertTrue({"4946", "5007", "5057", "5060"} <= set(issues))
+        self.assertEqual(issues["4946"]["state"], "closed")
+        self.assertIn("selected rc5 pin remains affected", issues["4946"]["upstream_fix"])
+        self.assertIn("over-limit", issues["4946"]["rerun_trigger"])
+
+    def test_bound_mutations(self):
+        mutations = [("max_orders", 7), ("max_orders", True), ("max_quantity_per_order", 2),
+                     ("max_quantity_per_order", True), ("max_notional_per_order_usd", 1001),
+                     ("max_notional_per_order_usd", 0), ("max_notional_per_order_usd", float("nan")),
+                     ("max_roundtrip_loss_usd", 5.01), ("max_roundtrip_loss_usd", float("inf"))]
+        for name, value in mutations:
+            with self.subTest(name=name, value=value):
+                plan = copy.deepcopy(PLAN)
+                plan["bounds"][name] = value
+                self.assertTrue(RUN.validate_plan(plan))
+
+    def test_symbol_host_account_and_strategy_scope(self):
+        for section, key, value in [("instrument", "symbol", "AAPL"), ("instrument", "currency", "EUR"),
+                                    ("exec_tester", "order_qty", "2"), ("exec_tester", "enable_limit_sells", True),
+                                    ("exec_tester", "enable_brackets", True), ("risk", "bypass", True),
+                                    ("risk", "require_enforced_notional_before_connection", True),
+                                    ("session", "weekdays_only", False), ("session", "close_buffer_minutes", 9)]:
+            with self.subTest(section=section, key=key):
+                plan = copy.deepcopy(PLAN)
+                plan[section][key] = value
+                self.assertTrue(RUN.validate_plan(plan))
+        for key, value in [("host", "192.0.2.1"), ("account_prefix", "U"), ("require_single_managed_account", False)]:
+            plan = copy.deepcopy(PLAN)
+            plan[key] = value
+            self.assertTrue(RUN.validate_plan(plan))
+
+    def test_ports_and_client_ids(self):
+        for port in (4001, 7496, 0, True, 4002.0):
+            self.assertTrue(RUN.validate_plan(PLAN, port=port))
+        for port in (4002, 7497):
+            self.assertEqual(RUN.validate_plan(PLAN, port=port), [])
+        for node, check in ((92, 92), (91, 91), (101, 92), (91.0, 92), (91, 92.0)):
+            self.assertTrue(RUN.validate_plan(PLAN, node_client_id=node, check_client_id=check))
+        plan = copy.deepcopy(PLAN)
+        plan["paper_ports"] = [4001]
+        self.assertTrue(RUN.validate_plan(plan))
+
+    def test_malformed(self):
+        for value in (None, [], {}, {"schema_version": 1}, "not a plan"):
+            self.assertTrue(RUN.validate_plan(value))
+
+    def test_duplicate_plan_keys(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "duplicate.json"
+            path.write_text('{"host": "127.0.0.1", "host": "elsewhere"}')
+            with self.assertRaises(ValueError):
+                RUN.load_plan(path)
+
+    def test_native_argument_types_are_checked_before_connection(self):
+        for section, key, value in (("exec_tester", "enable_limit_buys", 1),
+                                    ("exec_tester", "order_expire_time_delta_mins", 7.0),
+                                    ("timeouts", "node_start_seconds", 60.0)):
+            plan = copy.deepcopy(PLAN)
+            plan[section][key] = value
+            self.assertTrue(RUN.validate_plan(plan))
+        plan = copy.deepcopy(PLAN)
+        plan["schema_version"] = True
+        self.assertTrue(RUN.validate_plan(plan))
+
+    def test_malformed_cli_is_refused_with_exit_three(self):
+        stderr = io.StringIO()
+        with contextlib.redirect_stderr(stderr), self.assertRaises(SystemExit) as refused:
+            RUN.parser().parse_args(["--port", FAKE_ACCOUNT])
+        self.assertEqual(refused.exception.code, 3)
+        self.assertNotIn(FAKE_ACCOUNT, stderr.getvalue())
+
+
+class WindowsAndPins(unittest.TestCase):
+    def test_whole_run_and_buffer(self):
+        for hour, minute, allowed in ((9, 29, False), (9, 30, True), (15, 43, True),
+                                      (15, 44, False), (15, 50, False), (16, 0, False)):
+            now = NOW.astimezone(NY).replace(hour=hour, minute=minute)
+            self.assertEqual(RUN.frozen().rth_check(now, PLAN)[0], allowed)
+
+    def test_weekend_and_early_close(self):
+        self.assertFalse(RUN.frozen().rth_check(NOW.replace(day=10), PLAN)[0])
+        local = NOW.astimezone(NY)
+        sessions = [(local.replace(hour=9, minute=30), local.replace(hour=13, minute=0))]
+        self.assertFalse(RUN.frozen().rth_check(local.replace(hour=12, minute=44), PLAN, sessions)[0])
+        self.assertFalse(RUN.frozen().rth_check(NOW, PLAN, [])[0])
+        self.assertIsNone(RUN.frozen().parse_liquid_hours("malformed", "US/Eastern", local.date()))
+
+    def test_runtime_pins(self):
+        self.assertIsNone(RUN.runtime_refusal(PINNED))
+        for versions in ({}, {"nautilus_trader": "1.231.0", "ibapi": "10.45.1"},
+                         {"nautilus_trader": "2.0.0rc5", "ibapi": "10.44.0"},
+                         {"nautilus_trader": "2.0.0rc5", "ibapi": "10.45.1", "nautilus_trader_distribution": "1.231.0"},
+                         {"nautilus_trader": "2.0.0rc5.dev1", "ibapi": "10.45.1"}):
+            self.assertEqual(RUN.runtime_refusal(versions), "refused_unpinned_runtime")
+
+
+class QuoteAdmission(unittest.TestCase):
+    def test_spread_and_expected_commissions_fit_the_loss_bound(self):
+        quote = {"bid": "770", "ask": "990", "quote_time_epoch": 1000}
+        result = RUN.admit_quote(PLAN, quote, 1001)
+        self.assertEqual(result["status"], "refused_quote_loss_bound")
+        self.assertEqual(result["stage"], "spread_and_commissions")
+        self.assertEqual(RUN.decimal(result["spread_loss_usd"]), 220)
+        self.assertEqual(RUN.decimal(result["expected_roundtrip_commissions_usd"]), RUN.decimal("2.04"))
+        self.assertEqual(RUN.decimal(result["expected_roundtrip_loss_usd"]), RUN.decimal("222.04"))
+        self.assertEqual(RUN.decimal(result["max_roundtrip_loss_usd"]), 5)
+        for ask, status in (("772.96", "passed"), ("772.97", "refused_quote_loss_bound")):
+            self.assertEqual(RUN.admit_quote(PLAN, dict(quote, ask=ask), 1001)["status"], status)
+
+    def test_tier1_core_band_notional_boundary(self):
+        for ask, expected in (("942.85", "passed"), ("942.86", "refused_quote_notional"), ("990", "refused_quote_notional")):
+            with self.subTest(ask=ask):
+                quote = {"bid": str(RUN.decimal(ask) - RUN.decimal("0.01")), "ask": ask, "quote_time_epoch": 1000}
+                result = RUN.admit_quote(PLAN, quote, 1001)
+                self.assertEqual(result["status"], expected)
+                self.assertEqual(RUN.decimal(result["luld_core_band_fraction"]), RUN.decimal("0.05"))
+                stressed = RUN.decimal(ask) * RUN.decimal("1.05") + RUN.decimal("10")
+                self.assertEqual(RUN.decimal(result["band_adjusted_notional_usd"]) + RUN.decimal(result["headroom_usd"]), stressed)
+                self.assertEqual(stressed <= 1000, expected == "passed")
+
+    def test_commission_allowance_covers_observed_sell_commission(self):
+        result = RUN.admit_quote(PLAN, {"bid": "775.24", "ask": "775.26", "quote_time_epoch": 1000}, 1001)
+        self.assertEqual(result["status"], "passed")
+        self.assertEqual(RUN.decimal(result["commission_margin_per_order_usd"]), RUN.decimal("0.02"))
+        self.assertGreaterEqual(RUN.decimal(result["expected_roundtrip_commissions_usd"]), RUN.decimal("1.00") + RUN.decimal("1.02"))
+
+    def test_precheck_observed_is_frozen_before_quote_callbacks(self):
+        client = RUN.AdmissionState()
+        client.disconnect = mock.Mock()
+
+        def precheck(*args, **kwargs):
+            client.managedAccounts(FAKE_ACCOUNT)
+            client.currentTime(1000)
+            client.r["server_minus_local_s"] = 0.1
+            return {"status": "passed", "observed": client.r}, FAKE_ACCOUNT
+
+        def quote(*args, **kwargs):
+            client.currentTime(1001)
+            client.error(9202, 1001, 10190, "quote error")
+            return {"status": "refused_quote_error"}
+
+        with mock.patch.object(RUN.frozen(), "run_check", side_effect=precheck), mock.patch.object(RUN, "quote_check", side_effect=quote):
+            pre, _, _ = RUN.official_admission(PLAN, 4002, deadline=time.monotonic() + 1, client_factory=lambda: client)
+        self.assertEqual(pre["observed"]["server_time_epoch"], 1000)
+        self.assertEqual(pre["observed"]["server_minus_local_s"], 0.1)
+        self.assertEqual(pre["observed"]["errors"], [])
+        self.assertIsNot(pre["observed"], client.r)
+        self.assertIsNot(pre["observed"]["errors"], client.r["errors"])
+        self.assertEqual(client.r["server_time_epoch"], 1001)
+        client.disconnect.assert_called_once()
+
+    def test_precheck_exception_and_alarm_have_the_correct_phase(self):
+        for mode in ("exception", "alarm", "caught-alarm"):
+            with self.subTest(mode=mode):
+                client = RUN.AdmissionState()
+                client.disconnect = mock.Mock()
+
+                def precheck(*args, **kwargs):
+                    client.mark("connected")
+                    client.managedAccounts(FAKE_ACCOUNT)
+                    if mode == "exception":
+                        raise RuntimeError("positions wait failed " + FAKE_ACCOUNT)
+                    handler = RUN.signal.getsignal(RUN.signal.SIGALRM)
+                    if mode == "caught-alarm":
+                        try:
+                            handler(None, None)
+                        except OSError:
+                            return {"status": "not_connected", "observed": client.r}, None
+                    handler(None, None)
+
+                with mock.patch.object(RUN.frozen(), "run_check", side_effect=precheck), mock.patch.object(RUN, "quote_check") as quote:
+                    pre, account, result = RUN.official_admission(PLAN, 4002, deadline=time.monotonic() + 1, client_factory=lambda: client)
+                self.assertEqual(pre["status"], "incomplete")
+                self.assertEqual(RUN.frozen().exit_code_for(pre["status"]), 1)
+                self.assertIn("pre_check", pre["error"])
+                self.assertNotIn("quote_check_deadline", json.dumps((pre, result)))
+                self.assertNotIn(FAKE_ACCOUNT, json.dumps((pre, result)))
+                self.assertEqual(pre["observed"]["account_count"], 1)
+                self.assertIsNone(account)
+                self.assertEqual(result["status"], "not_run")
+                quote.assert_not_called()
+                client.disconnect.assert_called_once()
+
+    def test_unrelated_farm_notices_are_info_and_relevant_errors_are_fatal(self):
+        state = RUN.QuoteState()
+        state.managedAccounts(FAKE_ACCOUNT)
+        for code in (2103, 2105, 2157, 2104, 2106, 2158, 1101, 1102):
+            state.error(-1, 1000, code, "farm notice " + FAKE_ACCOUNT)
+        state.error(999, 1000, 354, "unrelated entitlement")
+        self.assertEqual(state.errors, [])
+        self.assertEqual(len(state.info), 9)
+        self.assertNotIn(FAKE_ACCOUNT, json.dumps(state.diagnostics()))
+        for req_id, code in ((9202, 354), (-1, 326), (-1, 1100), (-1, 10089), (-1, 10167)):
+            other = RUN.QuoteState()
+            other.error(req_id, 1000, code, "failure")
+            self.assertEqual(other.errors[0]["reqId"], req_id)
+            self.assertEqual(other.errors[0]["code"], code)
+
+    def test_quote_wait_deadlines_identify_each_missing_callback(self):
+        for missing, stage, status in (("nextValidId", "accounts", "not_connected"),
+                                        ("quote", "tick requested", "refused_quote_unavailable"),
+                                        ("clock", "quote", "refused_quote_clock")):
+            class Client(RUN.QuoteState):
+                def isConnected(self):
+                    return True
+
+                def reqMarketDataType(self, kind):
+                    pass
+
+                def reqTickByTickData(self, *args):
+                    if missing != "quote":
+                        self.tickByTickBidAsk(9202, 1000, 770, 771, 1, 1, None)
+
+                def reqCurrentTime(self):
+                    if missing != "clock":
+                        self.currentTime(1001)
+
+                def cancelTickByTickData(self, req_id):
+                    pass
+
+            client = Client()
+            client.mark("connected")
+            if missing != "nextValidId":
+                client.nextValidId(1)
+            client.managedAccounts(FAKE_ACCOUNT)
+            with mock.patch.object(RUN.frozen(), "spy_contract", return_value=object()):
+                result = RUN.quote_check(PLAN, FAKE_ACCOUNT, deadline=time.monotonic() + 0.01, client=client)
+            self.assertEqual((result["last_stage"], result["status"]), (stage, status))
+            self.assertIn(stage, result["stage_duration_seconds"])
+            self.assertGreaterEqual(result["elapsed_seconds"], 0.01)
+            self.assertEqual(result["error"], "quote_check_deadline")
+
+    def test_sigalrm_path_preserves_stages_codes_and_teardown(self):
+        client = RUN.AdmissionState()
+        client.disconnect = mock.Mock()
+
+        def precheck(*args, **kwargs):
+            client.mark("connected")
+            client.nextValidId(1)
+            client.managedAccounts(FAKE_ACCOUNT)
+            return copy.deepcopy(FLAT), FAKE_ACCOUNT
+
+        def interrupted(*args, **kwargs):
+            client.mark("tick requested")
+            client.error(-1, 1000, 2105, "notice " + FAKE_ACCOUNT)
+            client.error(9202, 1000, 10190, "limit " + FAKE_ACCOUNT)
+            raise RUN.CheckTimeout("quote_check_deadline")
+
+        with mock.patch.object(RUN.frozen(), "run_check", side_effect=precheck), mock.patch.object(RUN, "quote_check", side_effect=interrupted):
+            pre, account, result = RUN.official_admission(PLAN, 4002, deadline=time.monotonic() + 1, client_factory=lambda: client)
+        self.assertEqual(pre["status"], "passed")
+        self.assertEqual(account, FAKE_ACCOUNT)
+        self.assertEqual(result["last_stage"], "tick requested")
+        self.assertEqual(result["error"], "quote_check_deadline")
+        self.assertEqual(result["errors"][0]["code"], 10190)
+        self.assertEqual(result["info"][0]["code"], 2105)
+        self.assertNotIn(FAKE_ACCOUNT, json.dumps(result))
+        client.disconnect.assert_called_once()
+
+    def test_connectivity_failure_wakes_the_quote_wait(self):
+        client = RUN.QuoteState()
+        client.isConnected = lambda: True
+        client.mark("connected")
+        client.managedAccounts(FAKE_ACCOUNT)
+        client.error(-1, 1000, 326, "client id in use")
+        result = RUN.quote_check(PLAN, FAKE_ACCOUNT, deadline=time.monotonic() + 1, client=client)
+        self.assertEqual(result["errors"][0]["code"], 326)
+        self.assertLess(result["elapsed_seconds"], 0.1)
+
+    def test_fresh_quote_and_headroom(self):
+        admitted = admitted_quote()
+        self.assertEqual(admitted["status"], "passed")
+        self.assertEqual((admitted["bid"], admitted["ask"], admitted["quote_age_seconds"]), ("770.01", "770.02", 1))
+        for ask, expected in (("1001", "refused_quote_notional"), ("991", "refused_quote_notional"), ("990", "refused_quote_notional"), ("942.85", "passed")):
+            result = RUN.admit_quote(PLAN, {"bid": str(RUN.decimal(ask) - RUN.decimal("0.01")), "ask": ask, "quote_time_epoch": 1000}, 1001)
+            self.assertEqual(result["status"], expected)
+
+    def test_stale_future_invalid_and_delayed_quotes(self):
+        quote = {"bid": "770", "ask": "771", "quote_time_epoch": 1000}
+        for server_time, expected in ((1010, "passed"), (1011, "refused_stale_quote"), (997, "refused_stale_quote")):
+            self.assertEqual(RUN.admit_quote(PLAN, quote, server_time)["status"], expected)
+        self.assertEqual(RUN.admit_quote(PLAN, quote, 1001, elapsed_seconds=10)["status"], "refused_stale_quote")
+        for code in (10089, 10167):
+            self.assertEqual(RUN.admit_quote(PLAN, quote, 1001, errors=[code])["status"], "refused_delayed_quote")
+        for bad in ({"bid": "0", "ask": "1", "quote_time_epoch": 1000},
+                    {"bid": "771", "ask": "770", "quote_time_epoch": 1000},
+                    {"bid": "NaN", "ask": "770", "quote_time_epoch": 1000}, None):
+            self.assertEqual(RUN.admit_quote(PLAN, bad, 1001)["status"], "refused_invalid_quote")
+
+    def test_delayed_callbacks_are_latched(self):
+        for tick in RUN.DELAYED_TICKS:
+            state = RUN.QuoteState()
+            state.tickPrice(9202, tick, 770, None)
+            state.tickByTickBidAsk(9202, 1000, 770, 771, 1, 1, None)
+            self.assertTrue(state.delayed)
+        for code in (10089, 10167):
+            state = RUN.QuoteState()
+            state.error(9202, 1000, code, FAKE_ACCOUNT)
+            self.assertTrue(state.delayed)
+            self.assertIn(code, [entry["code"] for entry in state.errors])
+        state = RUN.QuoteState()
+        state.marketDataType(9202, 3)
+        self.assertTrue(state.delayed)
+
+    def test_half_bid_offset_and_child_validation(self):
+        self.assertEqual(RUN.resting_offset_ticks("770.01", PLAN), 38500)
+        self.assertEqual(RUN.resting_offset_ticks("770.03", PLAN), 38501)
+        payload = node_payload({})
+        self.assertTrue(RUN.validate_child_admission(PLAN, payload))
+        for mutate in (lambda p: p.update(tob_offset_ticks=500),
+                       lambda p: p.update(tob_offset_ticks=38500.0),
+                       lambda p: p["quote_admission"].update(ask="1001"),
+                       lambda p: p["quote_admission"].update(status="refused_delayed_quote"),
+                       lambda p: p["quote_admission"].update(admitted_monotonic=time.monotonic() - 11)):
+            changed = copy.deepcopy(payload)
+            mutate(changed)
+            self.assertFalse(RUN.validate_child_admission(PLAN, changed))
+        self.assertFalse(RUN.validate_child_admission(PLAN, {}))
+
+    def test_invalid_child_admission_never_builds_node(self):
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(RUN, "build_node") as build:
+            path = Path(directory) / "receipt.json"
+            receipt = asyncio.run(RUN.node_phase(PLAN, 4002, path, {}))
+            self.assertEqual(receipt["status"], "refused_child_quote_admission")
+            self.assertEqual(json.loads(path.read_text())["exit_code"], 3)
+            build.assert_not_called()
+
+    def test_official_requests_with_synthetic_client(self):
+        calls = []
+
+        class Client(RUN.AdmissionState):
+            def __init__(self):
+                super().__init__()
+                self.closed = RUN.threading.Event()
+                self.connected = False
+
+            def connect(self, host, port, client_id):
+                calls.append(("connect", host, port, client_id))
+                self.connected = True
+
+            def run(self):
+                self.nextValidId(1)
+                self.managedAccounts(FAKE_ACCOUNT)
+                self.closed.wait(1)
+
+            def isConnected(self):
+                return self.connected
+
+            def reqPositions(self):
+                self.positionEnd()
+
+            def cancelPositions(self):
+                pass
+
+            def reqAllOpenOrders(self):
+                self.openOrderEnd()
+
+            def reqContractDetails(self, req_id, contract):
+                self._liquid_hours = "20261005:0930-20261005:1600"
+                self._time_zone_id = "US/Eastern"
+                self.done["contract"].set()
+
+            def reqMarketDataType(self, kind):
+                calls.append(("data_type", kind))
+
+            def reqTickByTickData(self, req_id, contract, tick_type, count, ignore_size):
+                calls.append(("quote", req_id, tick_type, count, ignore_size))
+                self.tickByTickBidAsk(req_id, 1000, 770, 771, 1, 1, None)
+
+            def reqCurrentTime(self):
+                calls.append(("clock",))
+                self.currentTime(1001)
+
+            def cancelTickByTickData(self, req_id):
+                calls.append(("cancel", req_id))
+
+            def disconnect(self):
+                calls.append(("disconnect",))
+                self.connected = False
+                self.closed.set()
+
+        with mock.patch.object(RUN.frozen(), "spy_contract", return_value=object()):
+            pre, account, result = RUN.official_admission(PLAN, 4002, deadline=time.monotonic() + 1, client_factory=Client)
+        self.assertEqual(pre["status"], "passed")
+        self.assertEqual(account, FAKE_ACCOUNT)
+        self.assertEqual(result["status"], "passed")
+        self.assertIn(("quote", 9202, "BidAsk", 0, False), calls)
+        self.assertIn(("connect", "127.0.0.1", 4002, 92), calls)
+        self.assertEqual(sum(call[0] == "connect" for call in calls), 1)
+        self.assertEqual(sum(call[0] == "clock" for call in calls), 2)
+        self.assertLess(calls.index(("clock",)), calls.index(("quote", 9202, "BidAsk", 0, False)))
+        self.assertEqual(calls[-3], ("clock",))
+        self.assertEqual(result["last_stage"], "clock")
+        self.assertEqual(set(result["stage_elapsed_seconds"]), {"connected", "nextValidId", "accounts", "tick requested", "quote", "clock"})
+        self.assertEqual(calls[-1], ("disconnect",))
+
+
+class StopLifecycle(unittest.IsolatedAsyncioTestCase):
+    @staticmethod
+    def order(status, venue_id=None, order_type="LIMIT", tif="GTD"):
+        return SimpleNamespace(status=SimpleNamespace(name=status), venue_order_id=venue_id,
+                               order_type=SimpleNamespace(name=order_type), time_in_force=SimpleNamespace(name=tif))
+
+    def test_deferred_stop_and_deadline(self):
+        for status, venue_id, expected in (("SUBMITTED", "venue", False), ("INITIALIZED", None, False),
+                                            ("ACCEPTED", None, False), ("ACCEPTED", "venue", True),
+                                            ("FILLED", None, True), ("DENIED", None, True)):
+            orders = [self.order(status, venue_id)]
+            self.assertEqual(RUN.stop_ready(orders, 1, 2), expected)
+            self.assertTrue(RUN.stop_ready(orders, 2, 2))
+        for order_type, tif in (("MARKET", "GTC"), ("MARKET", "IOC"), ("LIMIT", "IOC"), ("LIMIT", "FOK")):
+            self.assertFalse(RUN.stop_ready([self.order("ACCEPTED", "venue", order_type, tif)], 1, 2))
+            self.assertTrue(RUN.stop_ready([self.order("FILLED", "venue", order_type, tif)], 1, 2))
+
+    async def test_external_startup_fills_do_not_trigger_case_failure(self):
+        receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+        history = [cache_order("external-" + side, [
+            event("OrderInitialized", typ="MARKET", side=side, when=time.time_ns()),
+            event("OrderFilled", typ="MARKET", side=side, when=100, reconciliation=True)])
+            for side in ("BUY", "SELL")]
+        done = asyncio.Event()
+        before_submit = []
+
+        def current_order(alias, records):
+            when = time.time_ns()
+            return cache_order("current-" + alias, [dict(e, ts_init=when, ts_event=when) for e in records])
+
+        def stop():
+            done.set()
+            limit = next(o for o in history if str(o.client_order_id) == "current-O1")
+            cancels = current_order("O1", sequence()[6:8]).events()
+            for item in cancels:
+                item.event_id += "-cancel"
+            limit.events().extend(cancels)
+            history.append(current_order("O3", sequence()[8:]))
+
+        async def run_async():
+            await asyncio.sleep(0.15)
+            before_submit.append(copy.deepcopy(receipt["cases"]))
+            history.extend([current_order("O2", sequence()[:3]), current_order("O1", sequence()[3:6])])
+            await done.wait()
+
+        node = SimpleNamespace(cache=SimpleNamespace(orders=lambda: list(history)),
+                               handle=lambda: SimpleNamespace(is_running=True, stop=stop), run_async=run_async,
+                               dispose=mock.Mock())
+        loop = asyncio.get_running_loop()
+        with mock.patch.object(RUN, "build_node", return_value=node), mock.patch.object(RUN, "write_receipt"), mock.patch.object(loop, "add_signal_handler"), mock.patch.object(loop, "remove_signal_handler"):
+            result = await asyncio.wait_for(RUN.node_phase(PLAN, 4002, Path("unused-receipt"), node_payload(receipt)), 2)
+        self.assertEqual([c["outcome"] for c in before_submit[0].values()], ["not_run"] * 4)
+        self.assertEqual(result["node"]["stop_reason"], "C1_accepted_C3_filled")
+        self.assertEqual(result["failures"], [])
+        self.assertEqual([result["cases"][c]["outcome"] for c in RUN.CASE_IDS], ["passed", "passed", "passed", "filled_unproven"])
+        self.assertEqual(len(result["fills"]), 2)
+        self.assertEqual(len(result["reconciled_external"]), 4)
+
+    async def exercise(self, *, observer_error=False):
+        receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+        done = asyncio.Event()
+        probes = []
+        stop_calls = []
+        disposed = []
+
+        def stop():
+            stop_calls.append(len(probes))
+            done.set()
+
+        async def run_async():
+            await done.wait()
+            await asyncio.sleep(0.15)  # Simulate native post-stop callback grace.
+
+        node = SimpleNamespace(cache=object(), handle=lambda: SimpleNamespace(is_running=True, stop=stop),
+                               run_async=run_async, dispose=lambda: disposed.append(True))
+
+        def orders(_cache, _scope):
+            probes.append(True)
+            status = "SUBMITTED" if len(probes) == 1 else "ACCEPTED" if len(probes) == 2 else "FILLED"
+            return [self.order(status, "venue", "MARKET", "IOC")]
+
+        snapshots = mock.Mock(side_effect=RuntimeError("snapshot failed")) if observer_error else mock.Mock(return_value=[event("OrderRejected")])
+        writes = mock.Mock(side_effect=[RuntimeError("write failed"), None]) if observer_error else mock.Mock()
+        loop = asyncio.get_running_loop()
+        with mock.patch.object(RUN, "build_node", return_value=node), mock.patch.object(RUN, "snapshot_events", snapshots), mock.patch.object(RUN, "tester_orders", side_effect=orders), mock.patch.object(RUN, "write_receipt", writes), mock.patch.object(loop, "add_signal_handler") as add_signal, mock.patch.object(loop, "remove_signal_handler") as remove_signal:
+            result = await RUN.node_phase(PLAN, 4002, Path("unused-receipt"), node_payload(receipt))
+        self.assertEqual(len(stop_calls), 1)
+        self.assertEqual(disposed, [True])
+        self.assertEqual(add_signal.call_count, 3)
+        self.assertEqual(remove_signal.call_count, 3)
+        self.assertTrue(done.is_set())
+        return result, stop_calls
+
+    async def test_case_failure_waits_for_entry_then_stops_once(self):
+        _, stop_calls = await self.exercise()
+        self.assertGreaterEqual(stop_calls[0], 3)
+
+    async def test_poll_and_final_snapshot_errors_still_stop_await_and_dispose(self):
+        receipt, _ = await self.exercise(observer_error=True)
+        reasons = [failure["reason"] for failure in receipt["failures"]]
+        self.assertTrue(any("node_poll" in reason for reason in reasons))
+        self.assertTrue(any("final_snapshot" in reason for reason in reasons))
+        self.assertTrue(any("final_receipt" in reason for reason in reasons))
+
+
+class EventsAndRoundtrip(unittest.TestCase):
+    def test_complete_sequence(self):
+        outcomes = RUN.case_outcomes(sequence(), stop_ns=STOP_NS, flat_proof=FLAT)
+        self.assertEqual([outcomes[c]["outcome"] for c in RUN.CASE_IDS], ["passed"] * 4)
+        self.assertEqual(outcomes["C1"]["order"], outcomes["C2"]["order"])
+        self.assertEqual(outcomes["C3"]["order_type"], "MARKET")
+        self.assertEqual(outcomes["C1"]["price"], "765.00")
+        rt = RUN.roundtrip(sequence(), 5)
+        self.assertEqual((rt["gross_usd"], rt["commissions_usd"], rt["net_usd"]), ("-0.06", "2.00", "-2.06"))
+        self.assertFalse(rt["loss_bound_breach"])
+
+    def test_independent_flat_proof_required(self):
+        for proof in (None, {"status": "passed"}, {"status": "incomplete"},
+                      {"status": "passed", "observed": {"positions": 1, "open_orders": 0}}):
+            self.assertEqual(RUN.case_outcomes(sequence(), stop_ns=STOP_NS, flat_proof=proof)["C4"]["outcome"], "filled_unproven")
+
+    def test_wrong_cancel_or_before_stop_cannot_pass(self):
+        events = sequence()
+        events[7]["order"] = "another_order"
+        self.assertNotEqual(RUN.case_outcomes(events, stop_ns=STOP_NS, flat_proof=FLAT)["C2"]["outcome"], "passed")
+        self.assertNotEqual(RUN.case_outcomes(sequence(), stop_ns=4_000_000_000, flat_proof=FLAT)["C2"]["outcome"], "passed")
+        self.assertNotEqual(RUN.case_outcomes(sequence(), stop_ns=4_000_000_000, flat_proof=FLAT)["C4"]["outcome"], "passed")
+
+    def test_reconciliation_cannot_supply_venue_acceptance(self):
+        events = sequence()
+        events[5]["reconciliation"] = True
+        outcomes = RUN.case_outcomes(events, stop_ns=STOP_NS, flat_proof=FLAT)
+        self.assertEqual(outcomes["C1"]["outcome"], "failed")
+        self.assertEqual(outcomes["C2"]["outcome"], "failed")
+
+    def test_missing_fill_and_wrong_quantity(self):
+        events = [e for e in sequence() if not (e["type"] == "OrderFilled" and e["side"] == "BUY")]
+        self.assertEqual(RUN.case_outcomes(events, stop_ns=STOP_NS, flat_proof=FLAT)["C3"]["outcome"], "incomplete")
+        events = sequence()
+        for e in events:
+            if e["order"] == "O2":
+                e["quantity"] = "2"
+        self.assertEqual(RUN.case_outcomes(events, stop_ns=STOP_NS, flat_proof=FLAT)["C3"]["outcome"], "failed")
+
+    def test_accidental_resting_fill_fails(self):
+        events = sequence() + [event("OrderFilled")]
+        self.assertEqual(RUN.case_outcomes(events, stop_ns=STOP_NS, flat_proof=FLAT)["C1"]["outcome"], "failed")
+        self.assertFalse(RUN.roundtrip(events, 5)["closed"])
+
+    def test_missing_or_zero_commission_and_loss_breach(self):
+        for fee in (None, "0.00"):
+            events = sequence()
+            events[-1]["commission"] = fee
+            rt = RUN.roundtrip(events, 5)
+            self.assertTrue(rt["commission_unresolved"])
+            self.assertIsNone(rt["net_usd"])
+        events = sequence()
+        events[-1]["fill_price"] = "760.00"
+        self.assertTrue(RUN.roundtrip(events, 5)["loss_bound_breach"])
+
+    def test_empty_sequence(self):
+        self.assertIsNone(RUN.roundtrip([], 5))
+        self.assertEqual([c["outcome"] for c in RUN.case_outcomes([]).values()], ["not_run"] * 4)
+
+    def test_observed_bounds_never_pass_silently(self):
+        for field, value in (("quantity", "2"), ("price", "1000.01"), ("instrument_id", "AAPL=STK.SMART")):
+            events = sequence()
+            for e in events:
+                if e["order"] == "O1":
+                    e[field] = value
+            receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+            RUN.update_observations(receipt, events, PLAN)
+            self.assertTrue(receipt["failures"])
+
+    def test_event_seconds_need_not_match_observation_nanoseconds(self):
+        events = sequence()
+        events[-1]["ts_event"] = 1_000_000_000
+        self.assertEqual(RUN.case_outcomes(events, stop_ns=STOP_NS, flat_proof=FLAT)["C4"]["outcome"], "passed")
+
+
+class SanitizationAndReceipt(unittest.TestCase):
+    def test_account_ids_endpoints_paths_and_amounts(self):
+        raw = {"error": f"IB-{FAKE_ACCOUNT}: margin [123456.78 USD], Available Funds: 98765.43 at 127.0.0.1:4002 {FAKE_HOME}/private/file.txt",
+               "nested": {"I1234567": ["U1234567", "DF1234567", "F1234567", FAKE_ACCOUNT]},
+               "fill_price": "770.00", "commission": "1.00"}
+        encoded = RUN.serialized_receipt(raw, (FAKE_ACCOUNT,))
+        self.assertIsNone(re.search(r"\b(?:D?[UF]|I)\d{5,}\b", encoded))
+        for secret in (FAKE_ACCOUNT, "127.0.0.1", FAKE_HOME, "123456.78", "98765.43"):
+            self.assertNotIn(secret, encoded)
+        self.assertEqual(json.loads(encoded)["fill_price"], "770.00")
+
+    def test_exact_known_secret_removed_without_word_boundaries(self):
+        self.assertNotIn(FAKE_ACCOUNT, RUN.serialized_receipt({"error": "prefix" + FAKE_ACCOUNT + "suffix"}, (FAKE_ACCOUNT,)))
+
+    def test_source_urls_survive_but_untrusted_urls_are_scrubbed(self):
+        raw = {"source": RUN.RISK_ROUTE["source"], "error": f"https://github.com/nautechsystems/nautilus_trader/{FAKE_ACCOUNT}/127.0.0.1/file"}
+        encoded = RUN.serialized_receipt(raw, (FAKE_ACCOUNT,))
+        self.assertEqual(json.loads(encoded)["source"], RUN.RISK_ROUTE["source"])
+        self.assertNotIn("127.0.0.1", encoded)
+
+    def test_shape_and_atomic_replacement(self):
+        receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+        for key in ("kind", "evidence_class", "versions", "plan_sha256", "harness_sha256", "source_hashes",
+                    "pre_check", "cases", "fills", "roundtrip", "flat_proof", "status", "exit_code", "blocked_steps"):
+            self.assertIn(key, receipt)
+        self.assertEqual(receipt["kind"], RUN.KIND)
+        self.assertEqual(receipt["status"], "cleanup_required")
+        self.assertEqual(json.loads(RUN.serialized_receipt(receipt))["risk"]["note"], RUN.RISK_NOTE)
+        self.assertEqual(set(receipt["cases"]), {"C1", "C2", "C3", "C4"})
+        for key in ("plan_sha256", "harness_sha256"):
+            self.assertRegex(receipt[key], r"^[a-f0-9]{64}$")
+        issues = {issue["number"]: issue["state"] for step in receipt["blocked_steps"] for issue in step["issues"]}
+        self.assertEqual(issues, {5007: "open", 5057: "open", 5060: "open"})
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "receipt.json"
+            RUN.write_receipt(path, receipt)
+            RUN.finish(receipt, "refused_unpinned_runtime", reason="pin")
+            RUN.write_receipt(path, receipt)
+            self.assertEqual(json.loads(path.read_text())["exit_code"], 3)
+            self.assertEqual(list(path.parent.glob(".paper-receipt-*")), [])
+
+    def test_protected_destinations(self):
+        for destination in (RUN.PLAN_PATH, DIRECTORY / "run.py", RUN.FROZEN_RUN, RUN.frozen().GATE_RECEIPT):
+            with self.assertRaises(ValueError):
+                RUN.write_receipt(destination, {})
+
+    def test_exit_codes(self):
+        for status, expected in (("passed", 0), ("failed", 1), ("incomplete", 1), ("not_connected", 2),
+                                 ("refused_plan", 3), ("cleanup_required", 3), ("not_started", 3)):
+            receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+            self.assertEqual(RUN.finish(receipt, status), expected)
+
+
+class LeaseAndJournal(unittest.TestCase):
+    def args(self, root, run_id="offline-run"):
+        return RUN.parser().parse_args(["--receipt", str(root / "receipt.json"),
+                                       "--private-output-dir", str(root / "private"), "--run-id", run_id])
+
+    def test_held_second_file_description_refuses_before_connect(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with mock.patch.dict(RUN.os.environ, {"TWS_ACCOUNT": FAKE_ACCOUNT, "XDG_STATE_HOME": directory}):
+                first = RUN.safety().AccountLease(FAKE_ACCOUNT)
+                try:
+                    with mock.patch.object(RUN, "official_admission") as admission, mock.patch.object(RUN.subprocess, "Popen") as process:
+                        receipt = RUN.run_trial(self.args(root), now=NOW, versions=PINNED)
+                    self.assertEqual((receipt["status"], receipt["exit_code"]), ("not_started", 3))
+                    self.assertEqual(receipt["failures"][-1]["reason"], "account_writer_already_running")
+                    self.assertFalse(receipt["account_lease"]["acquired"])
+                    self.assertEqual(receipt["account_lease"], {"acquired": False})
+                    raw = json.dumps(receipt)
+                    self.assertNotIn(first.lock_name, raw)
+                    self.assertNotIn(first.lock_name.removesuffix(".lock"), raw)
+                    admission.assert_not_called()
+                    process.assert_not_called()
+                    self.assertFalse((root / "private").exists())
+                    self.assertNotIn(FAKE_ACCOUNT, (root / "receipt.json").read_text())
+                    locks = root / "native-agent-stack/ibkr-paper/locks"
+                    self.assertEqual(stat.S_IMODE(locks.stat().st_mode), 0o700)
+                    self.assertEqual(stat.S_IMODE((locks / first.lock_name).stat().st_mode), 0o600)
+                finally:
+                    first.close()
+                second = RUN.safety().AccountLease(FAKE_ACCOUNT)
+                second.close()
+
+    def test_missing_account_refuses_without_connect(self):
+        with tempfile.TemporaryDirectory() as directory, mock.patch.dict(RUN.os.environ, {"TWS_ACCOUNT": "", "XDG_STATE_HOME": directory}), mock.patch.object(RUN, "official_admission") as admission:
+            receipt = RUN.run_trial(self.args(Path(directory)), now=NOW, versions=PINNED)
+        self.assertEqual(receipt["status"], "not_started")
+        self.assertEqual(receipt["failures"][-1]["reason"], "paper_account_required_for_lease")
+        admission.assert_not_called()
+
+    def test_pre_admission_refusals_preserve_existing_receipt_bytes(self):
+        for condition in ("held_lease", "existing_journal", "missing_account", "changed_account", "failed_precheck", "quote_refusal"):
+            with self.subTest(condition=condition), tempfile.TemporaryDirectory() as directory, contextlib.ExitStack() as stack:
+                root = Path(directory)
+                args = self.args(root)
+                original = b'{"status":"passed","marker":"previous-run"}\n'
+                args.receipt.write_bytes(original)
+                account = "" if condition == "missing_account" else FAKE_ACCOUNT
+                stack.enter_context(mock.patch.dict(RUN.os.environ, {"TWS_ACCOUNT": account, "XDG_STATE_HOME": directory}))
+                if condition == "held_lease":
+                    lease = RUN.safety().AccountLease(FAKE_ACCOUNT)
+                    stack.callback(lease.close)
+                if condition == "existing_journal":
+                    journal = RUN.safety().Journal(root / "private", "offline-run", ROOT, create=True)
+                    journal.close()
+                pre = copy.deepcopy(FLAT)
+                pre.update(liquid_hours="20261005:0930-20261005:1600", time_zone_id="US/Eastern")
+                pre_account = "DU" + "9999999" if condition == "changed_account" else FAKE_ACCOUNT
+                if condition == "failed_precheck":
+                    pre["status"] = "refused_existing_state"
+                quote = {"status": "refused_quote_loss_bound"} if condition == "quote_refusal" else admitted_quote()
+                admission = stack.enter_context(mock.patch.object(RUN, "official_admission", return_value=(pre, pre_account, quote)))
+                process = stack.enter_context(mock.patch.object(RUN.subprocess, "Popen"))
+                stack.enter_context(mock.patch.object(RUN.frozen(), "rth_check", return_value=(True, "synthetic")))
+                receipt = RUN.run_trial(args, now=NOW, versions=PINNED)
+                self.assertNotEqual(receipt["status"], "passed")
+                self.assertEqual(args.receipt.read_bytes(), original)
+                process.assert_not_called()
+                if condition in ("held_lease", "existing_journal", "missing_account"):
+                    admission.assert_not_called()
+
+    def test_journal_denial_reason_scrubs_account_and_keeps_lock_key_private(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            journal = RUN.safety().Journal(root / "private", "reason-run", ROOT, create=True)
+            self.addCleanup(journal.close)
+            order = cache_order("O-19700101-000001-001-001-9", [
+                event("OrderInitialized", typ="MARKET"),
+                event("OrderDenied", typ="MARKET", reason="account " + FAKE_ACCOUNT + "; echoed prefix" + FAKE_ACCOUNT + "suffix")], status="DENIED")
+            scope = RUN.RunOrderScope(900_000_000)
+            RUN.journal_order_events(SimpleNamespace(orders=lambda: [order]), scope, journal, FAKE_ACCOUNT)
+            records = journal.records()
+            self.assertEqual(records[-1]["kind"], "OrderDenied")
+            self.assertIn("reason", records[-1])
+            self.assertNotIn(FAKE_ACCOUNT, records[-1]["reason"])
+            receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+            receipt["account_lease"]["acquired"] = True
+            receipt["journal"] = journal.summary()
+            lock_name = RUN.safety().account_lock_name(FAKE_ACCOUNT)
+            for raw in (json.dumps(receipt), RUN.serialized_receipt(receipt), journal.path.read_text()):
+                for private in (FAKE_ACCOUNT, lock_name, lock_name.removesuffix(".lock")):
+                    self.assertNotIn(private, raw)
+            self.assertEqual(receipt["account_lease"], {"acquired": True})
+
+    def test_existing_journal_refuses_before_admission_and_preserves_bytes(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            journal = RUN.safety().Journal(root / "private", "offline-run", ROOT, create=True,
+                                           hashes={"plan_sha256": "a" * 64, "harness_sha256": "b" * 64})
+            path = journal.path
+            journal.close()
+            original = path.read_bytes()
+            with mock.patch.dict(RUN.os.environ, {"TWS_ACCOUNT": FAKE_ACCOUNT, "XDG_STATE_HOME": directory}), mock.patch.object(RUN, "official_admission") as admission:
+                receipt = RUN.run_trial(self.args(root), now=NOW, versions=PINNED)
+            self.assertEqual(receipt["status"], "not_started")
+            self.assertEqual(receipt["failures"][-1]["reason"], "journal_run_already_exists")
+            self.assertEqual(path.read_bytes(), original)
+            admission.assert_not_called()
+
+    def test_fsynced_event_order_mapping_deduplication_and_hash_only_receipt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+            journal = RUN.safety().Journal(root / "private", "offline-run", ROOT, create=True,
+                                           hashes={"plan_sha256": receipt["plan_sha256"], "harness_sha256": receipt["harness_sha256"]})
+            rows = [event("OrderInitialized", typ="MARKET"), event("OrderSubmitted", typ="MARKET"),
+                    event("OrderAccepted", typ="MARKET"), event("OrderFilled", typ="MARKET")]
+            order = cache_order("O-19700101-000001-001-001-9", rows)
+            order.venue_order_id = "synthetic-venue"
+            cache = SimpleNamespace(orders=lambda: [order])
+            scope = RUN.RunOrderScope(900_000_000)
+            synced_counts = []
+            original_fsync = RUN.safety().os.fsync
+
+            def fsync(fd):
+                original_fsync(fd)
+                synced_counts.append(len(journal.path.read_text().splitlines()))
+
+            try:
+                with mock.patch.object(RUN.safety().os, "fsync", side_effect=fsync):
+                    RUN.journal_order_events(cache, scope, journal, FAKE_ACCOUNT)
+                    RUN.journal_order_events(cache, scope, journal, FAKE_ACCOUNT)
+                    journal.append("stop_request", reason="C1_accepted_C3_filled")
+                    journal.append("flat_proof", status="passed", positions=0, open_orders=0)
+                records = journal.records()
+                expected = ["run_start", "OrderInitialized", "OrderSubmitted", "OrderAccepted", "OrderFilled", "stop_request", "flat_proof"]
+                self.assertEqual([record["kind"] for record in records], expected)
+                self.assertEqual(synced_counts, [2, 3, 4, 5, 6, 7])
+                self.assertIsNone(records[1]["venue_order_id"])
+                self.assertEqual(records[3]["venue_order_id"], "synthetic-venue")
+                self.assertEqual(records[1]["client_order_id"], str(order.client_order_id))
+                flags = RUN.safety().fcntl.fcntl(journal.stream.fileno(), RUN.safety().fcntl.F_GETFL)
+                self.assertTrue(flags & os.O_APPEND)
+                self.assertEqual(stat.S_IMODE(journal.path.stat().st_mode), 0o600)
+                self.assertEqual(stat.S_IMODE(journal.path.parent.stat().st_mode), 0o700)
+                receipt["journal"] = journal.summary()
+                self.assertEqual(set(receipt["journal"]), {"sha256", "record_count", "record_kinds"})
+                self.assertEqual(receipt["journal"]["sha256"], RUN.sha256(journal.path))
+                self.assertEqual(receipt["journal"]["record_count"], 7)
+                raw = RUN.serialized_receipt(receipt, (FAKE_ACCOUNT,))
+                for private in (FAKE_ACCOUNT, str(order.client_order_id), "synthetic-venue", str(journal.path), "offline-run"):
+                    self.assertNotIn(private, raw)
+                self.assertNotIn(FAKE_ACCOUNT, journal.path.read_text())
+            finally:
+                journal.close()
+
+    def test_private_output_rejects_repository_paths(self):
+        with self.assertRaises(RUN.safety().SafetyError):
+            RUN.safety().Journal(DIRECTORY, "offline-run", ROOT, create=True)
+
+    def test_refusal_publication_preserves_a_concurrent_receipt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "receipt.json"
+            original = b'{"status":"passed","marker":"concurrent-run"}\n'
+
+            def concurrent_writer(source, destination):
+                Path(destination).write_bytes(original)
+                raise FileExistsError("synthetic concurrent publication")
+
+            with mock.patch.object(RUN.os, "link", side_effect=concurrent_writer):
+                result = RUN.write_receipt(path, RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED), replace=False)
+            self.assertFalse(result)
+            self.assertEqual(path.read_bytes(), original)
+            self.assertEqual(list(path.parent.glob(".paper-receipt-*")), [])
+
+
+class AdmissionRefusals(unittest.TestCase):
+    def args(self, path, *extra):
+        return RUN.parser().parse_args(["--receipt", str(path), *extra])
+
+    def test_luld_closing_overlap_refuses_before_any_broker_request(self):
+        for minute in (29, 35, 43):
+            with self.subTest(minute=minute), tempfile.TemporaryDirectory() as directory:
+                now = NOW.astimezone(NY).replace(hour=15, minute=minute, second=0)
+                # These times satisfy the old whole-run RTH rule.
+                self.assertTrue(RUN.frozen().rth_check(now, PLAN)[0])
+                with mock.patch.object(RUN, "official_admission") as admission, mock.patch.object(RUN, "official_check") as proof, mock.patch.object(RUN, "build_node") as node, mock.patch.object(RUN.subprocess, "Popen") as process, mock.patch.object(RUN.safety(), "AccountLease") as lease:
+                    receipt = RUN.run_trial(self.args(Path(directory) / "receipt.json"), now=now, versions=PINNED)
+                self.assertEqual((receipt["status"], receipt["exit_code"]), ("refused_luld_closing_period", 3))
+                self.assertIsNone(receipt["quote_admission"])
+                closing = receipt["closing_period_admission"]
+                self.assertEqual(closing["stage"], "luld_tier1_closing_period_band")
+                self.assertEqual(closing["reason"], "planned_order_window_overlaps_luld_closing_period")
+                self.assertEqual(closing["order_horizon_seconds"], 360)
+                self.assertEqual(closing["closing_band_fraction"], "0.10")
+                self.assertIsNone(receipt["pre_check"])
+                for operation in (admission, proof, node, process, lease):
+                    operation.assert_not_called()
+
+    def test_luld_order_window_boundary_in_new_york_and_utc(self):
+        start = NOW.astimezone(NY).replace(hour=15, minute=28, second=59)
+        admitted = RUN.closing_period_admission(PLAN, start.astimezone(timezone.utc))
+        self.assertEqual(admitted["status"], "passed")
+        self.assertTrue(admitted["planned_order_window_end"].startswith("2026-10-05T15:34:59"))
+        refused = RUN.closing_period_admission(PLAN, start.replace(minute=29, second=0))
+        self.assertEqual(refused["status"], "refused_luld_closing_period")
+        self.assertTrue(refused["planned_order_window_end"].startswith("2026-10-05T15:35:00"))
+
+    def test_luld_cutoff_uses_the_same_liquid_session_as_the_window(self):
+        for end_hour in (16, 13):
+            with self.subTest(end_hour=end_hour):
+                start = NOW.astimezone(NY).replace(hour=end_hour - 1, minute=28, second=59)
+                sessions = RUN.frozen().parse_liquid_hours(
+                    f"20261005:0930-20261005:{end_hour:02}00", "US/Eastern", start.date())
+                admitted = RUN.closing_period_admission(PLAN, start.astimezone(timezone.utc), liquid_sessions=sessions)
+                self.assertEqual(admitted["status"], "passed")
+                self.assertEqual(admitted["session_source"], "broker_liquid_hours")
+                self.assertEqual(admitted["closing_period_start"], start.replace(minute=35, second=0).isoformat())
+                for minute in (29, 35, 43):
+                    later = start.replace(minute=minute, second=0)
+                    self.assertTrue(RUN.frozen().rth_check(later, PLAN, sessions)[0])
+                    refused = RUN.closing_period_admission(PLAN, later, liquid_sessions=sessions)
+                    self.assertEqual(refused["status"], "refused_luld_closing_period")
+
+    def test_early_close_refuses_before_quote_or_node(self):
+        for minute in (29, 35, 43):
+            with self.subTest(minute=minute), tempfile.TemporaryDirectory() as directory:
+                now = NOW.astimezone(NY).replace(hour=12, minute=minute, second=0)
+                pre = copy.deepcopy(FLAT)
+                pre.update(liquid_hours="20261005:0930-20261005:1300", time_zone_id="US/Eastern")
+                client = RUN.AdmissionState()
+                client.disconnect = mock.Mock()
+
+                class FixedDateTime(datetime):
+                    @classmethod
+                    def now(cls, tz=None):
+                        return now.astimezone(tz) if tz is not None else now.replace(tzinfo=None)
+
+                with mock.patch.object(RUN, "datetime", FixedDateTime), mock.patch.object(RUN.frozen(), "run_check", return_value=(pre, FAKE_ACCOUNT)), mock.patch.object(RUN, "build_admission_client", return_value=client), mock.patch.object(RUN, "quote_check") as quote, mock.patch.object(RUN, "official_check") as proof, mock.patch.object(RUN, "build_node") as node, mock.patch.object(RUN.subprocess, "Popen") as process, mock.patch.dict(RUN.os.environ, {"TWS_ACCOUNT": FAKE_ACCOUNT, "XDG_STATE_HOME": directory}):
+                    receipt = RUN.run_trial(self.args(Path(directory) / "receipt.json"), now=now, versions=PINNED)
+                self.assertEqual((receipt["status"], receipt["exit_code"]), ("refused_luld_closing_period", 3))
+                self.assertEqual(receipt["pre_check"]["status"], "passed")
+                self.assertEqual(receipt["quote_admission"]["status"], "not_run")
+                closing = receipt["closing_period_admission"]
+                self.assertTrue(closing["closing_period_start"].startswith("2026-10-05T12:35:00"))
+                self.assertTrue(closing["liquid_session_end"].startswith("2026-10-05T13:00:00"))
+                self.assertEqual(closing["session_source"], "broker_liquid_hours")
+                for operation in (quote, proof, node, process):
+                    operation.assert_not_called()
+                client.disconnect.assert_called_once()
+
+    def test_pins_window_ports_and_ids_refuse_without_connecting(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "receipt.json"
+            tests = [((), {"nautilus_trader": "1.231.0", "ibapi": "10.45.1"}, NOW, "refused_unpinned_runtime"),
+                     ((), PINNED, NOW.replace(hour=1), "refused_outside_window"),
+                     (("--port", "4001"), PINNED, NOW, "refused_plan"),
+                     (("--node-client-id", "101"), PINNED, NOW, "refused_plan"),
+                     (("--check-client-id", "91"), PINNED, NOW, "refused_plan")]
+            for extra, versions, now, expected in tests:
+                with self.subTest(expected=expected, extra=extra), mock.patch.object(RUN, "official_admission") as check, mock.patch.object(RUN, "build_node") as node:
+                    receipt = RUN.run_trial(self.args(path, *extra), now=now, versions=versions)
+                    self.assertEqual(receipt["status"], expected)
+                    self.assertEqual(receipt["exit_code"], 3)
+                    check.assert_not_called()
+                    node.assert_not_called()
+
+    def test_runner_admission_replaces_unenforced_cap_refusal(self):
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(RUN, "official_admission") as check, mock.patch.object(RUN, "build_node") as node, mock.patch.object(RUN.subprocess, "Popen") as process:
+            receipt = RUN.run_trial(self.args(Path(directory) / "receipt.json", "--plan-only"), now=NOW, versions=PINNED)
+            self.assertEqual(receipt["status"], "passed")
+            self.assertEqual(receipt["risk"]["engine_route"]["issue_state"], "closed")
+            self.assertFalse(receipt["risk"]["engine_route"]["pin_fix_present"])
+            self.assertEqual(receipt["risk"]["note"], RUN.RISK_NOTE)
+            check.assert_not_called()
+            node.assert_not_called()
+            process.assert_not_called()
+
+    def test_plan_only_has_no_socket_path(self):
+        with tempfile.TemporaryDirectory() as directory, mock.patch.object(RUN, "official_check") as check, mock.patch.object(RUN, "official_admission") as quote:
+            receipt = RUN.run_trial(self.args(Path(directory) / "receipt.json", "--plan-only"), now=NOW, versions=PINNED)
+            self.assertEqual(receipt["exit_code"], 0)
+            check.assert_not_called()
+            quote.assert_not_called()
+
+    def test_invalid_json_refused(self):
+        with tempfile.TemporaryDirectory() as directory:
+            plan = Path(directory) / "bad.json"
+            plan.write_text("{broken")
+            args = self.args(Path(directory) / "receipt.json", "--plan", str(plan))
+            receipt = RUN.run_trial(args, now=NOW, versions=PINNED)
+            self.assertEqual(receipt["status"], "refused_plan")
+
+
+class ChildRefusals(unittest.TestCase):
+    def test_corrupt_or_mismatched_journal_refuses_before_node_build(self):
+        for content in ("{broken\n", "7\n", '{"kind": "run_start", "run_id": "different"}\n'):
+            with self.subTest(content=content), tempfile.TemporaryDirectory() as directory:
+                path = Path(directory) / "receipt.json"
+                receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+                payload = node_payload(receipt)
+                journal_path = Path(directory) / "offline-run.jsonl"
+                journal_path.write_text(content)
+                payload.update(run_id="offline-run", journal_path=str(journal_path))
+                with mock.patch.object(RUN, "build_node") as node:
+                    result = asyncio.run(RUN.node_phase(PLAN, 4002, path, payload))
+                    node.assert_not_called()
+                self.assertEqual(result["status"], "refused_child_journal")
+                self.assertEqual(json.loads(path.read_text())["node"]["pre_node_refusal"], "refused_child_journal")
+                self.assertNotIn(FAKE_ACCOUNT, path.read_text())
+
+    def test_pre_node_refusals_are_written_and_preserved_by_parent_mapping(self):
+        for condition, expected in (("plan", "refused_child_plan"), ("runtime", "refused_child_runtime"),
+                                     ("window", "refused_child_window"), ("quote", "refused_child_quote_admission"),
+                                     ("payload", "refused_child_payload"), ("nonce", "refused_child_receipt_nonce")):
+            with self.subTest(condition=condition), tempfile.TemporaryDirectory() as directory:
+                path = Path(directory) / "receipt.json"
+                receipt = RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED)
+                RUN.write_receipt(path, receipt)
+                payload = node_payload(receipt)
+                plan = copy.deepcopy(PLAN)
+                if condition == "plan":
+                    plan["host"] = "not_loopback"
+                if condition == "quote":
+                    payload["quote_admission"]["admitted_monotonic"] -= 11
+                if condition == "payload":
+                    del payload["node_stop_at"]
+                if condition == "nonce":
+                    payload["run_nonce"] = "0" * 32
+                versions = {} if condition == "runtime" else PINNED
+                args = RUN.parser().parse_args(["--_node-phase", "--port", "4002", "--receipt", str(path)])
+                with mock.patch.object(RUN.sys, "stdin", io.StringIO(json.dumps(payload))), mock.patch.object(RUN, "load_plan", return_value=plan), mock.patch.object(RUN, "runtime_versions", return_value=versions), mock.patch.object(RUN.frozen(), "rth_check", return_value=(condition != "window", "synthetic")), mock.patch.object(RUN, "build_node") as node:
+                    self.assertEqual(RUN.run_child(args), 3)
+                    node.assert_not_called()
+                saved = json.loads(path.read_text())
+                self.assertEqual(saved["status"], expected)
+                self.assertEqual(saved["node"]["pre_node_refusal"], expected)
+                self.assertEqual(saved["failures"][-1]["cases_blocked"], list(RUN.CASE_IDS))
+                self.assertNotIn(FAKE_ACCOUNT, path.read_text())
+                saved["flat_proof"] = copy.deepcopy(FLAT)
+                self.assertEqual(RUN.final_status(saved, child_returncode=3)[0], expected)
+
+    def test_bad_stdin_payload_preserves_provisional_receipt(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "receipt.json"
+            RUN.write_receipt(path, RUN.new_receipt(PLAN, DIRECTORY / "plan.json", PINNED))
+            args = RUN.parser().parse_args(["--_node-phase", "--receipt", str(path)])
+            with mock.patch.object(RUN.sys, "stdin", io.StringIO("{broken")), mock.patch.object(RUN, "build_node") as node:
+                self.assertEqual(RUN.run_child(args), 3)
+                node.assert_not_called()
+            self.assertEqual(json.loads(path.read_text())["status"], "refused_child_payload")
+
+
+class SyntheticOrchestration(unittest.TestCase):
+    """Official checks, quote admission and node execution are synthetic."""
+    def drive(self, proof=None, proof_account=FAKE_ACCOUNT, pre_status="passed", events=None, quote=None, proof_hook=None, pre_account=FAKE_ACCOUNT, fail_final_write=False, foreign_receipt=False, malformed_receipt=False):
+        directory = tempfile.TemporaryDirectory()
+        self.addCleanup(directory.cleanup)
+        path = Path(directory.name) / "receipt.json"
+        args = RUN.parser().parse_args(["--receipt", str(path)])
+        pre = copy.deepcopy(FLAT)
+        pre.update(status=pre_status, liquid_hours="20261005:0930-20261005:1600", time_zone_id="US/Eastern")
+        proof = copy.deepcopy(FLAT if proof is None else proof)
+        test = self
+        own_nonce = []
+
+        class FixedDateTime(datetime):
+            @classmethod
+            def now(cls, tz=None):
+                return NOW.astimezone(tz) if tz is not None else NOW.replace(tzinfo=None)
+
+        class Pipe(io.StringIO):
+            def close(pipe):
+                payload = json.loads(pipe.getvalue())
+                test.assertEqual(payload["account_id"], FAKE_ACCOUNT)
+                receipt = payload["receipt"]
+                if not foreign_receipt:
+                    test.assertEqual(payload["run_nonce"], receipt["run_nonce"])
+                    test.assertRegex(payload["run_nonce"], r"^[0-9a-f]{32}$")
+                own_nonce.append(receipt.get("run_nonce"))
+                receipt["node"].update(started=True, stop_ns=STOP_NS)
+                test.assertTrue(RUN.validate_child_admission(PLAN, payload))
+                RUN.update_observations(receipt, sequence() if events is None else events, PLAN)
+                if foreign_receipt:
+                    # Another account's independently initialized parent uses
+                    # the same receipt path and writes otherwise passing evidence.
+                    receipt["run_nonce"] = "0" * 32
+                RUN.write_receipt(path, receipt, (FAKE_ACCOUNT,))
+                if malformed_receipt:
+                    path.write_text(json.dumps(["synthetic", "non-dict receipt"]))
+                super().close()
+
+        class Process:
+            returncode = None
+
+            def __init__(self, command, **kwargs):
+                # The provisional state exists before process construction.
+                provisional = json.loads(path.read_text())
+                test.assertEqual(provisional["status"], "cleanup_required")
+                test.assertNotIn(FAKE_ACCOUNT, path.read_text())
+                test.assertNotIn(FAKE_ACCOUNT, str(command))
+                test.assertEqual(kwargs["stdout"], RUN.subprocess.DEVNULL)
+                test.assertEqual(kwargs["stderr"], RUN.subprocess.DEVNULL)
+                test.assertEqual(len(kwargs["pass_fds"]), 1)
+                lease_fd = kwargs["pass_fds"][0]
+                lock = Path(directory.name) / "native-agent-stack/ibkr-paper/locks" / RUN.safety().account_lock_name(FAKE_ACCOUNT)
+                test.assertEqual(os.fstat(lease_fd).st_ino, lock.stat().st_ino)
+                with test.assertRaises(RUN.safety().SafetyError):
+                    RUN.safety().AccountLease(FAKE_ACCOUNT)
+                for key in ("RUST_LOG", "NAUTILUS_LOG", "TWS_ACCOUNT"):
+                    test.assertNotIn(key, kwargs["env"])
+                self.stdin = Pipe()
+
+            def wait(self, timeout=None):
+                self.returncode = 0
+
+            def poll(self):
+                return self.returncode
+
+        original_write = RUN.write_receipt
+        injected = []
+
+        def write(path, value, *args, **kwargs):
+            if fail_final_write and value["flat_proof"] is not None and not injected:
+                injected.append(True)
+                raise OSError("synthetic final receipt storage failure")
+            return original_write(path, value, *args, **kwargs)
+
+        with mock.patch.object(RUN, "datetime", FixedDateTime), mock.patch.object(RUN, "official_admission", return_value=(pre, pre_account, admitted_quote() if quote is None else quote)), mock.patch.object(RUN, "official_check", return_value=(proof, proof_account), side_effect=proof_hook) as checker, mock.patch.object(RUN.subprocess, "Popen", Process), mock.patch.object(RUN, "write_receipt", side_effect=write), mock.patch.dict(RUN.os.environ, {"RUST_LOG": "trace", "NAUTILUS_LOG": "trace", "TWS_ACCOUNT": FAKE_ACCOUNT, "XDG_STATE_HOME": directory.name}):
+            receipt = RUN.run_trial(args, now=NOW, versions=PINNED)
+        if fail_final_write:
+            self.assertEqual(injected, [True])
+        self.assertNotIn(FAKE_ACCOUNT, path.read_text())
+        if foreign_receipt:
+            self.assertEqual(receipt.get("run_nonce"), own_nonce[0])
+        self.assertEqual(receipt["account_lease"], {"acquired": True})
+        lock_name = RUN.safety().account_lock_name(FAKE_ACCOUNT)
+        for raw in (json.dumps(receipt), path.read_text()):
+            self.assertNotIn(lock_name, raw)
+            self.assertNotIn(lock_name.removesuffix(".lock"), raw)
+        return receipt, checker
+
+    def test_provisional_receipt_and_final_flat_proof(self):
+        receipt, checker = self.drive()
+        self.assertEqual(checker.call_count, 1)
+        self.assertFalse(checker.call_args_list[0].kwargs["with_session"])
+        self.assertEqual(receipt["status"], "passed")
+
+    def test_foreign_run_receipt_is_not_adopted_and_flat_proof_still_runs(self):
+        receipt, checker = self.drive(foreign_receipt=True)
+        self.assertEqual((receipt["status"], receipt["exit_code"]), ("incomplete", 1))
+        self.assertFalse(receipt["node"]["started"])
+        self.assertTrue(receipt["node"]["child_launched"])
+        self.assertEqual(receipt["events"], [])
+        self.assertEqual(receipt["fills"], [])
+        self.assertIsNone(receipt["roundtrip"])
+        self.assertEqual([case["outcome"] for case in receipt["cases"].values()], ["not_run"] * 4)
+        self.assertTrue(any(f["reason"] == "child_receipt_nonce_mismatch" for f in receipt["failures"]))
+        self.assertEqual(receipt["flat_proof"]["status"], "passed")
+        self.assertEqual(checker.call_count, 1)
+
+    def test_list_receipt_keeps_provisional_evidence_and_runs_flat_proof(self):
+        receipt, checker = self.drive(malformed_receipt=True)
+        self.assertEqual((receipt["status"], receipt["exit_code"]), ("incomplete", 1))
+        self.assertFalse(receipt["node"]["started"])
+        self.assertTrue(receipt["node"]["child_launched"])
+        self.assertEqual(receipt["events"], [])
+        self.assertEqual(receipt["fills"], [])
+        self.assertIsNone(receipt["roundtrip"])
+        self.assertEqual([case["outcome"] for case in receipt["cases"].values()], ["not_run"] * 4)
+        self.assertTrue(any(f["reason"] == "child_receipt_unreadable" for f in receipt["failures"]))
+        self.assertEqual(receipt["flat_proof"]["status"], "passed")
+        self.assertEqual(checker.call_count, 1)
+
+    def test_final_write_failure_retains_child_evidence_and_never_not_started(self):
+        receipt, checker = self.drive(fail_final_write=True)
+        self.assertEqual((receipt["status"], receipt["exit_code"]), ("incomplete", 1))
+        self.assertTrue(receipt["node"]["child_launched"])
+        self.assertTrue(receipt["node"]["started"])
+        self.assertEqual(len(receipt["fills"]), 2)
+        self.assertTrue(receipt["roundtrip"]["closed"])
+        self.assertEqual(receipt["flat_proof"]["status"], "passed")
+        self.assertEqual(checker.call_count, 1)
+        self.assertTrue(any(f["reason"] == "final_receipt_write_error" for f in receipt["failures"]))
+
+    def test_failure_after_child_launch_preserves_latest_evidence(self):
+        def proof(*args, **kwargs):
+            raise OSError("synthetic proof storage error")
+
+        receipt, checker = self.drive(proof_hook=proof)
+        self.assertEqual((receipt["status"], receipt["exit_code"]), ("cleanup_required", 3))
+        self.assertTrue(receipt["node"]["child_launched"])
+        self.assertTrue(receipt["node"]["started"])
+        self.assertEqual(len(receipt["fills"]), 2)
+        self.assertEqual(checker.call_count, 1)
+
+    def test_final_write_error_does_not_downgrade_an_observed_bound_breach(self):
+        events = sequence()
+        events[2]["fill_price"] = "1001"
+        receipt, checker = self.drive(events=events, fail_final_write=True)
+        self.assertEqual((receipt["status"], receipt["exit_code"]), ("failed", 1))
+        self.assertTrue(receipt["node"]["child_launched"])
+        self.assertEqual(checker.call_count, 1)
+        self.assertTrue(any(f["reason"].startswith("observed_") for f in receipt["failures"]))
+        self.assertTrue(any(f["reason"] == "final_receipt_write_error" for f in receipt["failures"]))
+
+    def test_unproven_flat_is_cleanup_required(self):
+        receipt, _ = self.drive({"status": "refused_existing_state", "observed": {"positions": 1, "open_orders": 0}}, proof_account=None)
+        self.assertEqual((receipt["status"], receipt["exit_code"]), ("cleanup_required", 3))
+        self.assertEqual(receipt["failures"][-1]["cases_blocked"], ["C4"])
+        self.assertEqual(receipt["flat_proof"]["status"], "refused_existing_state")
+
+    def test_disconnected_proof_preserves_its_cause(self):
+        receipt, _ = self.drive({"status": "not_connected", "observed": {}}, proof_account=None)
+        self.assertEqual(receipt["status"], "cleanup_required")
+        self.assertEqual(receipt["flat_proof"]["status"], "not_connected")
+
+    def test_observed_bounds_map_to_failed(self):
+        for changes in ({"quantity": "2"}, {"fill_price": "1001"}, {"instrument_id": "AAPL=STK.SMART"}):
+            events = sequence()
+            events[2].update(changes)
+            receipt, _ = self.drive(events=events)
+            self.assertEqual((receipt["status"], receipt["exit_code"]), ("failed", 1))
+        events = sequence()
+        events.extend(event("OrderInitialized", order=f"EXTRA{number}") for number in range(4))
+        receipt, _ = self.drive(events=events)
+        self.assertEqual(receipt["status"], "failed")
+
+    def test_loss_breach_is_failed_and_unresolved_fees_are_incomplete(self):
+        events = sequence()
+        events[-1]["fill_price"] = "760"
+        self.assertEqual(self.drive(events=events)[0]["status"], "failed")
+        events[-1]["fill_price"] = "770"
+        events[-1]["commission"] = None
+        self.assertEqual(self.drive(events=events)[0]["status"], "incomplete")
+
+    def test_quote_refusal_blocks_node_and_cases(self):
+        for status in ("refused_quote_notional", "refused_stale_quote", "refused_delayed_quote", "refused_quote_loss_bound"):
+            receipt, checker = self.drive(quote={"status": status})
+            self.assertEqual((receipt["status"], receipt["exit_code"]), (status, 3))
+            self.assertEqual(checker.call_count, 0)
+            self.assertFalse(receipt["node"]["started"])
+            self.assertEqual(receipt["failures"][-1]["cases_blocked"], list(RUN.CASE_IDS))
+
+    def test_writer_lease_is_held_through_proof_and_then_released(self):
+        states = []
+
+        def proof(*args, **kwargs):
+            states.append(RUN.os.environ["XDG_STATE_HOME"])
+            with self.assertRaises(RUN.safety().SafetyError):
+                RUN.safety().AccountLease(FAKE_ACCOUNT)
+            return copy.deepcopy(FLAT), FAKE_ACCOUNT
+
+        receipt, checker = self.drive(proof_hook=proof)
+        self.assertTrue(receipt["account_lease"]["acquired"])
+        self.assertEqual(checker.call_count, 1)
+        with mock.patch.dict(RUN.os.environ, {"XDG_STATE_HOME": states[0]}):
+            subsequent = RUN.safety().AccountLease(FAKE_ACCOUNT)
+            subsequent.close()
+
+    def test_precheck_must_match_the_locally_leased_account(self):
+        receipt, checker = self.drive(pre_account="DU" + "9999999")
+        self.assertEqual(receipt["status"], "refused_changed_account")
+        self.assertFalse(receipt["node"]["started"])
+        self.assertEqual(checker.call_count, 0)
+
+    def test_changed_account_is_cleanup_required(self):
+        receipt, _ = self.drive(proof_account="DU" + "9999999")
+        self.assertEqual(receipt["status"], "cleanup_required")
+
+    def test_precheck_refusal_does_not_construct_node(self):
+        receipt, checker = self.drive(pre_status="refused_existing_state")
+        self.assertEqual(checker.call_count, 0)
+        self.assertEqual(receipt["exit_code"], 3)
+
+
+@unittest.skipUnless(RUN.runtime_versions()["nautilus_trader"] == "2.0.0rc5", "requires installed NautilusTrader 2.0.0rc5; no broker")
+class InstalledRc5Surface(unittest.TestCase):
+    def test_reconstructed_market_init_explains_external_receipt_flag(self):
+        # engine/mod.rs and live execution manager create True. The pinned
+        # MarketOrder TryFrom calls new_checked, which reconstructs False.
+        # Python from_dict exercises the same constructor, without any engine run.
+        from nautilus_trader.core import UUID4
+        from nautilus_trader.model import ClientOrderId, InstrumentId, MarketOrder, OrderInitialized, OrderSide, Quantity, StrategyId, TimeInForce, TraderId
+        order = MarketOrder(trader_id=TraderId.from_str("TESTER-001"), strategy_id=StrategyId.from_str("EXEC_TESTER-001"),
+                            instrument_id=InstrumentId.from_str("SPY=STK.SMART"), client_order_id=ClientOrderId.from_str("O-19700101-000001-001-001-1"),
+                            order_side=OrderSide.BUY, quantity=Quantity.from_str("1"), init_id=UUID4(), ts_init=3_000_000_000,
+                            time_in_force=TimeInForce.IOC, reduce_only=False, quote_quantity=False)
+        materialization = order.init_event.to_dict()
+        materialization["reconciliation"] = True
+        initialized = OrderInitialized.from_dict(materialization)
+        self.assertTrue(initialized.reconciliation)
+        state = order.to_dict()
+        state["reconciliation"] = initialized.reconciliation
+        reconstructed = MarketOrder.from_dict(state)
+        self.assertFalse(reconstructed.events()[0].reconciliation)
+        scope = RUN.RunOrderScope(2_100_000_000)
+        cache = SimpleNamespace(orders=lambda: [reconstructed])
+        self.assertEqual(RUN.tester_orders(cache, scope), [])
+        self.assertEqual(len(RUN.snapshot_events(cache, scope, external=True)), 1)
+
+    def test_real_builder_and_shared_cache_handle_without_running(self):
+        # Upstream builder.rs build_in_place constructs clients; connect is in
+        # the run/start path. This test never calls run, run_async or start.
+        node = RUN.build_node(PLAN, 4002, FAKE_ACCOUNT, tob_offset_ticks=38500)
+        try:
+            cache = node.cache
+            self.assertEqual(cache.orders(), [])
+            self.assertFalse(node.handle().is_running)
+        finally:
+            node.dispose()
+
+    def test_real_configs_without_node_or_connection(self):
+        _, data, execution, risk, tester = RUN.native_configs(PLAN, 4002, FAKE_ACCOUNT, tob_offset_ticks=38500)
+        self.assertEqual((data.client_id, execution.client_id), (91, 91))
+        self.assertEqual(execution.account_id, FAKE_ACCOUNT)
+        self.assertFalse(risk.bypass)
+        self.assertEqual(risk.max_notional_per_order, {"SPY=STK.SMART": "1000"})
+        self.assertEqual(risk.max_order_submit_rate, "6/00:07:00")
+        self.assertEqual(str(tester.order_qty), "1")
+        self.assertEqual(str(tester.open_position_on_start_qty), "1")
+        self.assertTrue(tester.cancel_orders_on_stop and tester.close_positions_on_stop)
+        self.assertFalse(tester.enable_limit_sells or tester.enable_stop_buys or tester.enable_stop_sells or tester.enable_brackets)
+        self.assertFalse(tester.modify_orders_to_maintain_tob_offset or tester.cancel_replace_orders_to_maintain_tob_offset)
+        self.assertFalse(tester.use_post_only)
+        self.assertTrue(tester.use_individual_cancels_on_stop)
+        self.assertEqual(tester.tob_offset_ticks, 38500)
+        from nautilus_trader.common import LoggerConfig, LogLevel
+        logger = LoggerConfig(stdout_level=LogLevel.OFF, fileout_level=LogLevel.OFF, print_config=False)
+        self.assertEqual(logger.stdout_level, LogLevel.OFF)
+
+    def test_real_market_order_cache_projection(self):
+        from nautilus_trader.core import UUID4
+        from nautilus_trader.model import AccountId, ClientOrderId, InstrumentId, MarketOrder, OrderSide, OrderSubmitted, Quantity, StrategyId, TimeInForce, TraderId
+        order = MarketOrder(trader_id=TraderId.from_str("TESTER-001"), strategy_id=StrategyId.from_str("EXEC_TESTER-001"),
+                            instrument_id=InstrumentId.from_str("SPY=STK.SMART"), client_order_id=ClientOrderId.from_str("O-19700101-000001-001-001-1"),
+                            order_side=OrderSide.BUY, quantity=Quantity.from_str("1"), init_id=UUID4(),
+                            ts_init=1_000_000_000, time_in_force=TimeInForce.IOC, reduce_only=False, quote_quantity=False)
+        cache = SimpleNamespace(orders=lambda **kwargs: [order])
+        scope = RUN.RunOrderScope(900_000_000)
+        self.assertEqual(len(RUN.snapshot_events(cache, scope)), 1)
+        self.assertEqual(RUN.tester_orders(cache, scope), [order])
+        order.apply(OrderSubmitted(trader_id=order.trader_id, strategy_id=order.strategy_id,
+                                   instrument_id=order.instrument_id, client_order_id=order.client_order_id,
+                                   account_id=AccountId.from_str("IB-" + FAKE_ACCOUNT), event_id=UUID4(),
+                                   ts_event=1_100_000_000, ts_init=1_100_000_000))
+        projected = RUN.snapshot_events(cache, scope)
+        self.assertEqual(len(projected), 2)
+        self.assertEqual(projected[0]["type"], "OrderInitialized")
+        self.assertIsNone(projected[0]["price"])
+        self.assertEqual(projected[0]["order_type"], "MARKET")
+        self.assertTrue(RUN.orders_in_flight([order]))
+        self.assertNotIn(str(order.client_order_id), json.dumps(projected))
+
+
+if __name__ == "__main__":
+    unittest.main()

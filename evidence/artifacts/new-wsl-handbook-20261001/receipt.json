@@ -6,8 +6,8 @@
   "generator_sha256": "6e6ee9cfb4d697b3bea2d7684e042e638be20634792f43e517b205463b1967f9",
   "profile_sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04",
   "outputs": {
-    "docs/new-wsl-handbook.md": "b1dd8bdb72f32d3ab449aa90014b9621f779a5a7b3db590e4253120ba6c0bdfe",
-    "docs/new-wsl-handbook.json": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e"
+    "docs/new-wsl-handbook.md": "aa6515ab958fd48038e853e91ebf29e196da7d4d6736aa90240c12a8cf6dabd5",
+    "docs/new-wsl-handbook.json": "e30b11544f28a0a8682f930afef47a2af9c441591d25a8dbadbfb255921d8212"
   },
   "inventory": {
     "layers": 37,
@@ -247,6 +247,16 @@
       "previous_outputs": {
         "docs/new-wsl-handbook.md": "e8b739408bf4bd24c19ab2c88440bd18084582350c8aa108c575c0362f42c15d",
         "docs/new-wsl-handbook.json": "c49d7d2457692e6d3895cd0896ed601d81d55a90b2f3dd9ff27cec6116da7a16"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-05",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "PR #754 refreshed onto main ecfa11276. #754's #4946 entry in catalogs/us-equities/runtime-target.json shifted the alpaca selected_path line from 158 to 159, so the foundation catalog's six alpaca-py pin_source citations were remapped through the difflib line map (MERGE_HEAD to merged, 6 changed, 0 unmapped). The catalog digest changed the handbook inputs; regenerated with --write, and --check passed.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "b1dd8bdb72f32d3ab449aa90014b9621f779a5a7b3db590e4253120ba6c0bdfe",
+        "docs/new-wsl-handbook.json": "32da2ef7bbb47cbd8e75a1674b19c9dd1ee8e3cc855a05efee322765186e079e"
       },
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
     }

@@ -1,0 +1,1090 @@
+{
+  "blocked_steps": [
+    {
+      "acceptance_step": 3,
+      "exercised": false,
+      "issue_states_checked_at": "2026-10-05",
+      "issues": [
+        {
+          "number": 5057,
+          "state": "open",
+          "url": "https://github.com/nautechsystems/nautilus_trader/issues/5057"
+        },
+        {
+          "number": 5060,
+          "state": "open",
+          "url": "https://github.com/nautechsystems/nautilus_trader/issues/5060"
+        }
+      ],
+      "operation": "reconnect_with_open_order"
+    },
+    {
+      "acceptance_step": 3,
+      "exercised": false,
+      "issue_states_checked_at": "2026-10-05",
+      "issues": [
+        {
+          "number": 5007,
+          "state": "open",
+          "url": "https://github.com/nautechsystems/nautilus_trader/issues/5007"
+        },
+        {
+          "number": 5057,
+          "state": "open",
+          "url": "https://github.com/nautechsystems/nautilus_trader/issues/5057"
+        },
+        {
+          "number": 5060,
+          "state": "open",
+          "url": "https://github.com/nautechsystems/nautilus_trader/issues/5060"
+        }
+      ],
+      "operation": "restart_reconciliation"
+    },
+    {
+      "acceptance_step": 4,
+      "exercised": false,
+      "issue_states_checked_at": "2026-10-05",
+      "issues": [
+        {
+          "number": 5060,
+          "state": "open",
+          "url": "https://github.com/nautechsystems/nautilus_trader/issues/5060"
+        }
+      ],
+      "operation": "kill_switch"
+    }
+  ],
+  "cases": {
+    "C1": {
+      "events": [
+        {
+          "at": "2026-10-05T18:55:15.222024+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515222024228,
+          "ts_init": 1791226515222024228,
+          "type": "OrderInitialized"
+        },
+        {
+          "at": "2026-10-05T18:55:15.222774+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515222773383,
+          "ts_init": 1791226515222773383,
+          "type": "OrderSubmitted"
+        },
+        {
+          "at": "2026-10-05T18:55:15.222774+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515222773383,
+          "ts_init": 1791226515222773383,
+          "type": "OrderAccepted"
+        },
+        {
+          "at": "2026-10-05T18:55:15.380576+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515380575780,
+          "ts_init": 1791226515380575780,
+          "type": "OrderUpdated"
+        },
+        {
+          "at": "2026-10-05T18:55:15.394644+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515394644527,
+          "ts_init": 1791226515394644527,
+          "type": "OrderUpdated"
+        },
+        {
+          "at": "2026-10-05T18:55:15.506701+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515506700548,
+          "ts_init": 1791226515506700548,
+          "type": "OrderPendingCancel"
+        },
+        {
+          "at": "2026-10-05T18:55:15.507013+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515507013335,
+          "ts_init": 1791226515507013335,
+          "type": "OrderPendingCancel"
+        },
+        {
+          "at": "2026-10-05T18:55:15.516966+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515516965638,
+          "ts_init": 1791226515516965638,
+          "type": "OrderUpdated"
+        },
+        {
+          "at": "2026-10-05T18:55:15.611890+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reason": "",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515611889727,
+          "ts_init": 1791226515611889727,
+          "type": "OrderCanceled"
+        }
+      ],
+      "id": "C1",
+      "order": "O2",
+      "order_type": "LIMIT",
+      "outcome": "passed",
+      "price": "387.62",
+      "reason": null,
+      "side": "BUY"
+    },
+    "C2": {
+      "events": [
+        {
+          "at": "2026-10-05T18:55:15.222024+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515222024228,
+          "ts_init": 1791226515222024228,
+          "type": "OrderInitialized"
+        },
+        {
+          "at": "2026-10-05T18:55:15.222774+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515222773383,
+          "ts_init": 1791226515222773383,
+          "type": "OrderSubmitted"
+        },
+        {
+          "at": "2026-10-05T18:55:15.222774+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515222773383,
+          "ts_init": 1791226515222773383,
+          "type": "OrderAccepted"
+        },
+        {
+          "at": "2026-10-05T18:55:15.380576+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515380575780,
+          "ts_init": 1791226515380575780,
+          "type": "OrderUpdated"
+        },
+        {
+          "at": "2026-10-05T18:55:15.394644+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515394644527,
+          "ts_init": 1791226515394644527,
+          "type": "OrderUpdated"
+        },
+        {
+          "at": "2026-10-05T18:55:15.506701+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515506700548,
+          "ts_init": 1791226515506700548,
+          "type": "OrderPendingCancel"
+        },
+        {
+          "at": "2026-10-05T18:55:15.507013+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515507013335,
+          "ts_init": 1791226515507013335,
+          "type": "OrderPendingCancel"
+        },
+        {
+          "at": "2026-10-05T18:55:15.516966+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515516965638,
+          "ts_init": 1791226515516965638,
+          "type": "OrderUpdated"
+        },
+        {
+          "at": "2026-10-05T18:55:15.611890+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O2",
+          "order_type": "LIMIT",
+          "price": "387.62",
+          "quantity": "1",
+          "reason": "",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515611889727,
+          "ts_init": 1791226515611889727,
+          "type": "OrderCanceled"
+        }
+      ],
+      "id": "C2",
+      "order": "O2",
+      "order_type": "LIMIT",
+      "outcome": "passed",
+      "price": "387.62",
+      "reason": null,
+      "side": "BUY"
+    },
+    "C3": {
+      "events": [
+        {
+          "at": "2026-10-05T18:55:15.221774+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O1",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515221774419,
+          "ts_init": 1791226515221774419,
+          "type": "OrderInitialized"
+        },
+        {
+          "at": "2026-10-05T18:55:15.222548+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O1",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515222547365,
+          "ts_init": 1791226515222547365,
+          "type": "OrderSubmitted"
+        },
+        {
+          "at": "2026-10-05T18:55:15.222548+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O1",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515222547365,
+          "ts_init": 1791226515222547365,
+          "type": "OrderAccepted"
+        },
+        {
+          "at": "2026-10-05T18:55:15.319377+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O1",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515319376713,
+          "ts_init": 1791226515319376713,
+          "type": "OrderUpdated"
+        },
+        {
+          "at": "2026-10-05T18:55:15+00:00",
+          "commission": "1.00",
+          "commission_currency": "USD",
+          "currency": "USD",
+          "fill_price": "775.26",
+          "fill_quantity": "1",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O1",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "BUY",
+          "ts_event": 1791226515000000000,
+          "ts_init": 1791226515331725867,
+          "type": "OrderFilled"
+        }
+      ],
+      "id": "C3",
+      "order": "O1",
+      "order_type": "MARKET",
+      "outcome": "passed",
+      "price": null,
+      "reason": null,
+      "side": "BUY"
+    },
+    "C4": {
+      "events": [
+        {
+          "at": "2026-10-05T18:55:15.506788+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O3",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "SELL",
+          "ts_event": 1791226515506788511,
+          "ts_init": 1791226515506788511,
+          "type": "OrderInitialized"
+        },
+        {
+          "at": "2026-10-05T18:55:15.507042+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O3",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "SELL",
+          "ts_event": 1791226515507041860,
+          "ts_init": 1791226515507041860,
+          "type": "OrderSubmitted"
+        },
+        {
+          "at": "2026-10-05T18:55:15.507042+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O3",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "SELL",
+          "ts_event": 1791226515507041860,
+          "ts_init": 1791226515507041860,
+          "type": "OrderAccepted"
+        },
+        {
+          "at": "2026-10-05T18:55:15.570492+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O3",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "SELL",
+          "ts_event": 1791226515570492015,
+          "ts_init": 1791226515570492015,
+          "type": "OrderUpdated"
+        },
+        {
+          "at": "2026-10-05T18:55:15.610740+00:00",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O3",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "SELL",
+          "ts_event": 1791226515610740329,
+          "ts_init": 1791226515610740329,
+          "type": "OrderUpdated"
+        },
+        {
+          "at": "2026-10-05T18:55:15+00:00",
+          "commission": "1.02",
+          "commission_currency": "USD",
+          "currency": "USD",
+          "fill_price": "775.24",
+          "fill_quantity": "1",
+          "instrument_id": "SPY=STK.SMART",
+          "order": "O3",
+          "order_type": "MARKET",
+          "price": null,
+          "quantity": "1",
+          "reconciliation": false,
+          "side": "SELL",
+          "ts_event": 1791226515000000000,
+          "ts_init": 1791226515610820931,
+          "type": "OrderFilled"
+        }
+      ],
+      "id": "C4",
+      "order": "O3",
+      "order_type": "MARKET",
+      "outcome": "passed",
+      "price": null,
+      "reason": null,
+      "side": "SELL"
+    }
+  },
+  "ended_at": "2026-10-05T18:56:01.763903+00:00",
+  "events": [
+    {
+      "at": "2026-10-05T18:55:15.221774+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O1",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226515221774419,
+      "ts_init": 1791226515221774419,
+      "type": "OrderInitialized"
+    },
+    {
+      "at": "2026-10-05T18:55:15.222024+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O2",
+      "order_type": "LIMIT",
+      "price": "387.62",
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226515222024228,
+      "ts_init": 1791226515222024228,
+      "type": "OrderInitialized"
+    },
+    {
+      "at": "2026-10-05T18:55:15.222548+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O1",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226515222547365,
+      "ts_init": 1791226515222547365,
+      "type": "OrderSubmitted"
+    },
+    {
+      "at": "2026-10-05T18:55:15.222548+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O1",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226515222547365,
+      "ts_init": 1791226515222547365,
+      "type": "OrderAccepted"
+    },
+    {
+      "at": "2026-10-05T18:55:15.222774+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O2",
+      "order_type": "LIMIT",
+      "price": "387.62",
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226515222773383,
+      "ts_init": 1791226515222773383,
+      "type": "OrderSubmitted"
+    },
+    {
+      "at": "2026-10-05T18:55:15.222774+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O2",
+      "order_type": "LIMIT",
+      "price": "387.62",
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226515222773383,
+      "ts_init": 1791226515222773383,
+      "type": "OrderAccepted"
+    },
+    {
+      "at": "2026-10-05T18:55:15.319377+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O1",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226515319376713,
+      "ts_init": 1791226515319376713,
+      "type": "OrderUpdated"
+    },
+    {
+      "at": "2026-10-05T18:55:15+00:00",
+      "commission": "1.00",
+      "commission_currency": "USD",
+      "currency": "USD",
+      "fill_price": "775.26",
+      "fill_quantity": "1",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O1",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226515000000000,
+      "ts_init": 1791226515331725867,
+      "type": "OrderFilled"
+    },
+    {
+      "at": "2026-10-05T18:55:15.380576+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O2",
+      "order_type": "LIMIT",
+      "price": "387.62",
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226515380575780,
+      "ts_init": 1791226515380575780,
+      "type": "OrderUpdated"
+    },
+    {
+      "at": "2026-10-05T18:55:15.394644+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O2",
+      "order_type": "LIMIT",
+      "price": "387.62",
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226515394644527,
+      "ts_init": 1791226515394644527,
+      "type": "OrderUpdated"
+    },
+    {
+      "at": "2026-10-05T18:55:15.506701+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O2",
+      "order_type": "LIMIT",
+      "price": "387.62",
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226515506700548,
+      "ts_init": 1791226515506700548,
+      "type": "OrderPendingCancel"
+    },
+    {
+      "at": "2026-10-05T18:55:15.506788+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O3",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "SELL",
+      "ts_event": 1791226515506788511,
+      "ts_init": 1791226515506788511,
+      "type": "OrderInitialized"
+    },
+    {
+      "at": "2026-10-05T18:55:15.507013+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O2",
+      "order_type": "LIMIT",
+      "price": "387.62",
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226515507013335,
+      "ts_init": 1791226515507013335,
+      "type": "OrderPendingCancel"
+    },
+    {
+      "at": "2026-10-05T18:55:15.507042+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O3",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "SELL",
+      "ts_event": 1791226515507041860,
+      "ts_init": 1791226515507041860,
+      "type": "OrderSubmitted"
+    },
+    {
+      "at": "2026-10-05T18:55:15.507042+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O3",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "SELL",
+      "ts_event": 1791226515507041860,
+      "ts_init": 1791226515507041860,
+      "type": "OrderAccepted"
+    },
+    {
+      "at": "2026-10-05T18:55:15.516966+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O2",
+      "order_type": "LIMIT",
+      "price": "387.62",
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226515516965638,
+      "ts_init": 1791226515516965638,
+      "type": "OrderUpdated"
+    },
+    {
+      "at": "2026-10-05T18:55:15.570492+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O3",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "SELL",
+      "ts_event": 1791226515570492015,
+      "ts_init": 1791226515570492015,
+      "type": "OrderUpdated"
+    },
+    {
+      "at": "2026-10-05T18:55:15.610740+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O3",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "SELL",
+      "ts_event": 1791226515610740329,
+      "ts_init": 1791226515610740329,
+      "type": "OrderUpdated"
+    },
+    {
+      "at": "2026-10-05T18:55:15+00:00",
+      "commission": "1.02",
+      "commission_currency": "USD",
+      "currency": "USD",
+      "fill_price": "775.24",
+      "fill_quantity": "1",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O3",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "SELL",
+      "ts_event": 1791226515000000000,
+      "ts_init": 1791226515610820931,
+      "type": "OrderFilled"
+    },
+    {
+      "at": "2026-10-05T18:55:15.611890+00:00",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O2",
+      "order_type": "LIMIT",
+      "price": "387.62",
+      "quantity": "1",
+      "reason": "",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226515611889727,
+      "ts_init": 1791226515611889727,
+      "type": "OrderCanceled"
+    }
+  ],
+  "evidence_class": "native_paper",
+  "exit_code": 0,
+  "failures": [],
+  "fills": [
+    {
+      "at": "2026-10-05T18:55:15+00:00",
+      "commission": "1.00",
+      "commission_currency": "USD",
+      "currency": "USD",
+      "fill_price": "775.26",
+      "fill_quantity": "1",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O1",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226515000000000,
+      "ts_init": 1791226515331725867,
+      "type": "OrderFilled"
+    },
+    {
+      "at": "2026-10-05T18:55:15+00:00",
+      "commission": "1.02",
+      "commission_currency": "USD",
+      "currency": "USD",
+      "fill_price": "775.24",
+      "fill_quantity": "1",
+      "instrument_id": "SPY=STK.SMART",
+      "order": "O3",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "SELL",
+      "ts_event": 1791226515000000000,
+      "ts_init": 1791226515610820931,
+      "type": "OrderFilled"
+    }
+  ],
+  "flat_proof": {
+    "client": "ibapi",
+    "client_id": 92,
+    "observed": {
+      "account_count": 1,
+      "contract": null,
+      "errors": [],
+      "info": [
+        {
+          "code": 2104,
+          "reqId": -1,
+          "text": "Market data farm connection is OK:usfarm"
+        },
+        {
+          "code": 2106,
+          "reqId": -1,
+          "text": "HMDS data farm connection is OK:ushmds"
+        },
+        {
+          "code": 2158,
+          "reqId": -1,
+          "text": "Sec-def data farm connection is OK:secdefil"
+        }
+      ],
+      "open_order_statuses": [],
+      "open_orders": 0,
+      "paper_accounts": true,
+      "positions": 0,
+      "server_minus_local_s": -0.644,
+      "server_time_epoch": 1791226561,
+      "spy_position": false
+    },
+    "port": 4002,
+    "requests_completed": {
+      "accounts": true,
+      "contract": false,
+      "orders": true,
+      "positions": true,
+      "time": true
+    },
+    "status": "passed"
+  },
+  "harness_sha256": "5a061ff06f41fa1b5721f10fb01037ce790639f715481c2efdd98ea32700ee3b",
+  "kind": "ibkr_paper_orders_nautilus_2_0_0rc5",
+  "node": {
+    "started": true,
+    "stop_ns": 1791226515413701132,
+    "stop_reason": "C1_accepted_C3_filled"
+  },
+  "plan_sha256": "24ffca56dfa7bd647bcf423dbc91ae3f605384a81a0ad9523cc024a36ac3ec72",
+  "pre_check": {
+    "client": "ibapi",
+    "client_id": 92,
+    "observed": {
+      "account_count": 1,
+      "contract": {
+        "currency": "USD",
+        "exchange": "SMART",
+        "minTick": 0.01,
+        "primaryExchange": "ARCA",
+        "secType": "STK",
+        "timeZoneId": "US/Eastern"
+      },
+      "errors": [],
+      "info": [
+        {
+          "code": 2104,
+          "reqId": -1,
+          "text": "Market data farm connection is OK:usfarm"
+        },
+        {
+          "code": 2106,
+          "reqId": -1,
+          "text": "HMDS data farm connection is OK:ushmds"
+        },
+        {
+          "code": 2158,
+          "reqId": -1,
+          "text": "Sec-def data farm connection is OK:secdefil"
+        }
+      ],
+      "open_order_statuses": [],
+      "open_orders": 0,
+      "paper_accounts": true,
+      "positions": 0,
+      "server_minus_local_s": -1.482,
+      "server_time_epoch": 1791226510,
+      "spy_position": false
+    },
+    "port": 4002,
+    "requests_completed": {
+      "accounts": true,
+      "contract": true,
+      "orders": true,
+      "positions": true,
+      "time": true
+    },
+    "status": "passed"
+  },
+  "quote_admission": {
+    "admitted_monotonic": 144645.565294293,
+    "ask": "775.26",
+    "ask_notional_usd": "775.26",
+    "bid": "775.24",
+    "elapsed_seconds": 0.9157,
+    "errors": [],
+    "headroom_usd": "10",
+    "info": [
+      {
+        "code": 2104,
+        "reqId": -1,
+        "text": "Market data farm connection is OK:usfarm"
+      },
+      {
+        "code": 2106,
+        "reqId": -1,
+        "text": "HMDS data farm connection is OK:ushmds"
+      },
+      {
+        "code": 2158,
+        "reqId": -1,
+        "text": "Sec-def data farm connection is OK:secdefil"
+      }
+    ],
+    "last_stage": "clock",
+    "last_stage_elapsed_seconds": 0.0001,
+    "quote_age_seconds": 0.0,
+    "quote_time_epoch": 1791226512,
+    "server_time_epoch": 1791226511,
+    "source": "ibapi.reqTickByTickData.BidAsk/reqCurrentTime",
+    "stage_duration_seconds": {
+      "accounts": 0.0049,
+      "clock": 0.0442,
+      "connected": 0.0156,
+      "nextValidId": 0.0009,
+      "quote": 0.6237,
+      "tick requested": 0.2262
+    },
+    "stage_elapsed_seconds": {
+      "accounts": 0.0205,
+      "clock": 0.9156,
+      "connected": 0.0156,
+      "nextValidId": 0.0214,
+      "quote": 0.8713,
+      "tick requested": 0.2476
+    },
+    "status": "passed",
+    "tob_offset_ticks": 38762
+  },
+  "reconciled_external": [
+    {
+      "at": "2026-10-05T18:55:14.205701+00:00",
+      "order": "X1",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "BUY",
+      "ts_event": 1791226514205701129,
+      "ts_init": 1791226514205701129,
+      "type": "OrderInitialized"
+    },
+    {
+      "at": "2026-10-05T14:26:14+00:00",
+      "order": "X1",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": true,
+      "side": "BUY",
+      "ts_event": 1791210374000000000,
+      "ts_init": 1791226514205911216,
+      "type": "OrderAccepted"
+    },
+    {
+      "at": "2026-10-05T14:26:14+00:00",
+      "commission": "1.00",
+      "commission_currency": "USD",
+      "currency": "USD",
+      "fill_price": "772.93",
+      "fill_quantity": "1",
+      "order": "X1",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": true,
+      "side": "BUY",
+      "ts_event": 1791210374000000000,
+      "ts_init": 1791226514206105212,
+      "type": "OrderFilled"
+    },
+    {
+      "at": "2026-10-05T18:55:14.206405+00:00",
+      "order": "X2",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": false,
+      "side": "SELL",
+      "ts_event": 1791226514206404603,
+      "ts_init": 1791226514206404603,
+      "type": "OrderInitialized"
+    },
+    {
+      "at": "2026-10-05T14:26:15+00:00",
+      "order": "X2",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": true,
+      "side": "SELL",
+      "ts_event": 1791210375000000000,
+      "ts_init": 1791226514206424863,
+      "type": "OrderAccepted"
+    },
+    {
+      "at": "2026-10-05T14:26:15+00:00",
+      "commission": "1.02",
+      "commission_currency": "USD",
+      "currency": "USD",
+      "fill_price": "772.90",
+      "fill_quantity": "1",
+      "order": "X2",
+      "order_type": "MARKET",
+      "price": null,
+      "quantity": "1",
+      "reconciliation": true,
+      "side": "SELL",
+      "ts_event": 1791210375000000000,
+      "ts_init": 1791226514206448034,
+      "type": "OrderFilled"
+    }
+  ],
+  "risk": {
+    "bypass": false,
+    "enforcement": "runner_quantity_and_quote_admission",
+    "engine_route": {
+      "issue": "https://github.com/nautechsystems/nautilus_trader/issues/4946",
+      "issue_state": "closed",
+      "pin_fix_present": false,
+      "reason": "rc5 stock orders can skip account-scoped max_notional_per_order on the SMART/IB venue path",
+      "source": "https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/crates/risk/src/engine/mod.rs#L1218",
+      "upstream_fix": "fixed on develop; included in v2.0.0rc6; absent from the selected rc5 pin"
+    },
+    "max_notional_per_order_usd": "1000",
+    "note": "engine notional cap configured, not enforced on this route (#4946, fixed on develop, unreleased); bound held by qty=1 and quote admission",
+    "release_verification": {
+      "checked_at": "2026-10-05",
+      "correction": "The requested note's unreleased clause reflects earlier metadata; the fix is now released in rc6, while this trial stays pinned to rc5.",
+      "fix_commit": "ed6fc8bf47fd37dda97d63b9b2df160719ee2bac",
+      "published_at": "2026-10-05T03:03:18Z",
+      "released_in": "v2.0.0rc6",
+      "source": "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc6"
+    },
+    "submit_budget_enforcement": "engine_throttle"
+  },
+  "roundtrip": {
+    "buy_quantity": "1",
+    "closed": true,
+    "commission_unresolved": false,
+    "commissions_usd": "2.02",
+    "gross_usd": "-0.02",
+    "loss_bound_breach": false,
+    "net_usd": "-2.04",
+    "sell_quantity": "1"
+  },
+  "schema_version": 1,
+  "source_hashes": {
+    "frozen_checker_sha256": "1b697f237275a725a0dcc39ee886c4f07aa27bfba1c2b442982b3c76b02e1012"
+  },
+  "started_at": "2026-10-05T18:55:11.370630+00:00",
+  "status": "passed",
+  "upstream_commit": "1b0a49d2792a9432a3aca3fcb617ce7a630d905e",
+  "versions": {
+    "ibapi": "10.45.1",
+    "nautilus_ibapi_distribution": "10.45.1",
+    "nautilus_trader": "2.0.0rc5",
+    "nautilus_trader_distribution": "2.0.0rc5",
+    "protobuf": "5.29.6",
+    "python": "3.12.3"
+  },
+  "window": "inside_window"
+}
