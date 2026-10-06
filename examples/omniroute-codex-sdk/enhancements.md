@@ -3,7 +3,7 @@
 Use this kit by default for foundation OmniRoute workers dispatched by Claude,
 with selected skills, MCP tools, native agents and a readiness gate. The official
 SDK owns execution, tools, compaction, resume and interruption. The worker retains
-Sol/Max on port 20128; native parent sessions retain their accounts.
+Sol/Max on NativeStack2604's port 21128; native parent sessions retain their accounts.
 
 ## Prepare an owned worker
 
@@ -53,8 +53,13 @@ legacy `profile=` key is not a substitute.
 
 ## Check readiness, then execute
 
+On NativeStack2604, first complete both model-free checks in
+[2604 gateway preflights](README.md#2604-gateway-preflights). Every launch passes
+the explicit 21128 flag; the guarded reader remains a fallback.
+
 ```sh
 rtk uv run --locked --script examples/omniroute-codex-sdk/worker.py \
+  --base-url http://127.0.0.1:21128/v1 \
   --workspace "$WORKER_PROJECT" --codex-home "$WORKER_CODEX_HOME" \
   --preflight --require-mcp context-mode \
   --timeout 60
@@ -84,7 +89,12 @@ selecting retry or fresh recovery.
 [runtime-worker.yaml](runtime-worker.yaml) uses maintained Dagu 2.16.6 to run
 readiness before one bounded SDK task. Export `STACK_ROOT`, `WORKER_PROJECT`,
 `WORKER_CODEX_HOME`, `WORKER_TASK_FILE`, `WORKER_BASE_URL` (normally
-`http://127.0.0.1:20128/v1`) and a new private `WORKER_RESULT` path.
+`http://127.0.0.1:21128/v1`) and a new private `WORKER_RESULT` path.
+`WORKER_BASE_URL` is required: both steps pass it as an explicit override of
+the worker's guarded canonical default. Set it deliberately; an empty or
+unset binding is not the worker's implicit-default path. Dagu's pinned value
+resolution preserves unavailable variables rather than supplying an unset
+`${NAME:-word}` default (`specs/006-value-resolution-env.md:393-414`).
 The task comes from the owned input file rather than a scheduler prompt.
 Keep skill requirements in the task's graph configuration: add
 `--require-skill NAME` only after the documented installer and `--check-only`
@@ -159,6 +169,8 @@ hook support and optional scheduler/tool recipes keep their own execution gates.
   read tools and worker-scoped state do not qualify all language servers.
 - [Dagu 2.16.6 native graph example](https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/examples/embedded/local/workflow.yaml)
   and [native root environment import](https://github.com/dagucloud/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/internal/spec/dag.go#L694-L710).
+  Its [value-resolution specification](https://github.com/dagu-org/dagu/blob/58fed633d58c1dd1319091fdb2c2f6158ecfa053/specs/006-value-resolution-env.md#L393)
+  defines unavailable-variable handling for the required binding.
   The repository's pinned native job-recovery recipe qualifies a separate recovery scope.
 - [Claude native workflows](https://code.claude.com/docs/en/workflows); the
   repository's vendored scripts retain their reviewed agent-lab pins and bytes.

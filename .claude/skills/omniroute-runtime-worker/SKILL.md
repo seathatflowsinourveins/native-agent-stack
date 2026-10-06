@@ -20,22 +20,31 @@ Pass native readiness before dispatch, requiring Context Mode. Add
 `--require-skill NAME` only after the documented installer has installed that
 selected skill in the private worker home; a new home with none installed has
 no skill requirement. Require Serena too when the task needs semantic navigation. Tell it other workers
-are present and that it must preserve their edits. Feed the task on stdin:
+are present and that it must preserve their edits. Feed the task on stdin.
+For every NativeStack2604 launch, pass `--base-url http://127.0.0.1:21128/v1`
+explicitly, including readiness checks. Before dispatch, complete both model-free
+checks in `examples/omniroute-codex-sdk/README.md`, "2604 gateway preflights".
 
 ```sh
 rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
+  --base-url http://127.0.0.1:21128/v1 \
   --workspace "$WORKER_PROJECT" \
   --codex-home "$PRIVATE_WORKER_HOME" \
   --preflight --require-mcp context-mode \
   --timeout 60 &&
 rtk proxy uv run --locked --script examples/omniroute-codex-sdk/worker.py \
+  --base-url http://127.0.0.1:21128/v1 \
   --workspace "$WORKER_PROJECT" \
   --codex-home "$PRIVATE_WORKER_HOME" \
   --timeout 600 \
   --prompt -
 ```
 
-Use the selected gateway's native Responses lane at loopback port 20128. Keep
+Use NativeStack2604's native Responses lane at loopback port 21128. WSL
+distributions share networking, and ports 20128 and 20129 belong to NativeStack. The worker
+reads `gateway.endpoint` from the install plan's checked-out
+`config/gpt-gateway-topology.json`, with 21128 as the fallback. An explicit
+`--base-url` selects the caller's intended endpoint. Keep
 the exact model route in the live catalog; the default Sol/max suffix requires
 an OmniRoute build carrying PR #15167. Requested effort does not establish
 gateway-forwarded effort or backend identity. Keep

@@ -24,7 +24,7 @@ the package installation is the SDK's
 
 ```sh
 rtk uv lock --script examples/claude-runtime-sdk/worker.py --check
-rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --preflight
+rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --gateway http://127.0.0.1:21128 --preflight
 ```
 
 Preflight makes no provider request. It reports selected options, package pin,
@@ -35,7 +35,8 @@ the worker launch environment when needed; do not change the coordinator's
 environment or settings. The standalone worker adopts OmniRoute's pinned
 [`buildClaudeEnv`](https://github.com/diegosouzapw/OmniRoute/blob/2f42a9ac19d1a247ec9ce5473b790843724b3061/bin/cli/commands/launch.mjs#L23)
 transport: it removes inherited `ANTHROPIC_*` from its own process, sets the
-loopback Anthropic root (normally `http://127.0.0.1:20128`, without `/v1`), enables
+loopback Anthropic root (the checked-out topology's `gateway.endpoint` with its
+`/v1` suffix removed, fallback `http://127.0.0.1:21128`), enables
 native gateway model discovery and supplies the documented `omniroute-no-auth`
 sentinel for a keyless loopback gateway. An authenticated gateway may use
 `--gateway-token-env APPLICATION_BINDING`: the runtime copies that opaque
@@ -50,6 +51,17 @@ The native coordinator environment is unaffected. The launcher source's fixed
 Use the selected host's native credential recipe. This script does not read
 authentication stores, select accounts, restart OmniRoute or configure a remote
 service. A sentinel is transport setup, not gateway/provider readiness evidence.
+
+Each standalone invocation supplies a fresh
+`X-OmniRoute-Session-Id: nas-claude-runtime-sdk-<UUID hex>` through the official
+[`ANTHROPIC_CUSTOM_HEADERS`](https://code.claude.com/docs/en/env-vars) environment
+interface and the pinned SDK's worker-scoped `options.env`. OmniRoute records it
+as [`call_logs.session_tag`](https://github.com/diegosouzapw/OmniRoute/blob/2f42a9ac19d1a247ec9ce5473b790843724b3061/src/lib/usage/callLogs.ts#L741),
+filterable by the documented prefix. Distinct tags establish census attribution;
+effective replay isolation remains unqualified because the pinned gateway
+[`sessionAffinityKey` can outrank the marker](https://github.com/diegosouzapw/OmniRoute/blob/2f42a9ac19d1a247ec9ce5473b790843724b3061/open-sse/handlers/chatCore.ts#L1093).
+Preflight reports only the prefix. Count logged attempts separately from native
+sessions or invocations; local option tests do not prove delivery or a live census.
 
 The modern-python skill's statement that PEP 723 scripts have no lockfile was
 checked against installed `uv lock --help`: uv 0.12.17 supports `--script`, and
@@ -88,6 +100,11 @@ Actual hook/MCP/plugin activation needs an observed worker run.
 
 ## Run, interrupt and recover
 
+Before dispatch on NativeStack2604, complete both
+[model-free gateway preflights](../omniroute-codex-sdk/README.md#2604-gateway-preflights).
+Every invocation, including this bridge's preflight, explicitly passes
+`--gateway http://127.0.0.1:21128`; its Anthropic transport adds `/v1/messages`.
+
 Supply a prompt on stdin and an isolated owned cwd. A run contains one native
 SDK query and no retries. The native client handles additional model/tool turns.
 The runner observes the first native result, so independent background jobs need
@@ -95,6 +112,7 @@ their own completion and usage qualification.
 
 ```sh
 rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py \
+  --gateway http://127.0.0.1:21128 \
   --cwd "$WORKER_CHECKOUT" --setting-source project \
   --skill search-first --allow-tool Read --timeout 180 \
   --result-output "$PRIVATE_RUN/returned.txt" < "$PRIVATE_RUN/prompt.txt"
@@ -146,7 +164,7 @@ wrong-family, token-binding, missing-result, cancellation and cumulative-snapsho
 are not unchanged upstream tests or live provider evidence.
 
 ```sh
-rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --preflight
+rtk uv run --frozen --script examples/claude-runtime-sdk/worker.py --gateway http://127.0.0.1:21128 --preflight
 rtk uv run --with claude-agent-sdk==0.2.162 \
   python -m unittest discover -s examples/claude-runtime-sdk/tests -v
 rtk uv run --with claude-agent-sdk==0.2.162 \

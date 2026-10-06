@@ -43,7 +43,11 @@ SDK_VERSION = "0.2.162"
 SDK_COMMIT = "f2204bb956bab02907aaf3cb88eb9dead28eaa35"
 OMNIROUTE_LAUNCH_COMMIT = "2f42a9ac19d1a247ec9ce5473b790843724b3061"
 DEFAULT_MODEL = "dva/claude-opus-5-max"
-DEFAULT_GATEWAY = "http://127.0.0.1:20128"
+DEFAULT_GATEWAY = "http://127.0.0.1:21128"
+RUN_MARKER = "nas-claude-runtime-sdk"
+GATEWAY_TOPOLOGY = Path(
+    "evidence/artifacts/new-wsl-install-plan-20261002/config/gpt-gateway-topology.json"
+)
 MODEL_ID = re.compile(r"(?:[A-Za-z0-9_.:-]+/)?claude-[A-Za-z0-9_.:-]+\Z")
 USAGE_COUNTERS = {
     "input_tokens",
@@ -62,6 +66,30 @@ MODEL_COUNTERS = {
     "contextWindow",
     "maxOutputTokens",
 }
+
+
+def default_gateway_root() -> str:
+    # Main's canonical gateway.endpoint is OpenAI-shaped; Claude adds /v1/messages.
+    # Source: native-agent-stack@ecfa11276, plan topology JSON:9.
+    try:
+        topology = Path(__file__).resolve().parents[2] / GATEWAY_TOPOLOGY
+        endpoint = json.loads(topology.read_text(encoding="utf-8"))["gateway"]["endpoint"]
+        if isinstance(endpoint, str):
+            parsed = urlsplit(endpoint)
+            if (
+                parsed.scheme == "http"
+                and parsed.hostname in {"127.0.0.1", "localhost", "::1"}
+                and parsed.port not in {None, 20128, 20129}
+                and parsed.username is None
+                and parsed.password is None
+                and not parsed.query
+                and not parsed.fragment
+                and parsed.path.rstrip("/") == "/v1"
+            ):
+                return endpoint.rstrip("/").removesuffix("/v1")
+    except (OSError, ValueError, KeyError, TypeError, IndexError):
+        pass
+    return DEFAULT_GATEWAY
 
 
 def loopback_root(value: str) -> str:
@@ -130,6 +158,11 @@ def build_options(args: argparse.Namespace) -> ClaudeAgentOptions:
         env={
             "ANTHROPIC_BASE_URL": gateway,
             "ANTHROPIC_AUTH_TOKEN": auth_token,
+            # SDK@f2204bb9 subprocess_cli.py:819-825 passes native CLI env.
+            # ANTHROPIC_CUSTOM_HEADERS is the documented Claude header interface.
+            "ANTHROPIC_CUSTOM_HEADERS": (
+                "X-OmniRoute-Session-Id: " + RUN_MARKER + "-" + uuid.uuid4().hex
+            ),
             "CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY": "1",
         },
         setting_sources=args.setting_source or ["user", "project"],
@@ -178,6 +211,7 @@ def preflight(options: ClaudeAgentOptions) -> dict[str, Any]:
         "mcp_config_explicit": isinstance(options.mcp_servers, str),
         "gateway_loopback": True,
         "gateway_port": urlsplit(options.env["ANTHROPIC_BASE_URL"]).port,
+        "run_marker_prefix": RUN_MARKER + "-",
         "gateway_auth_injected": "ANTHROPIC_AUTH_TOKEN" in options.env,
         "gateway_model_discovery": True,
         "cwd_exists": Path(options.cwd).is_dir(),
@@ -386,7 +420,7 @@ def parser() -> argparse.ArgumentParser:
     cli.add_argument("--cwd", type=Path, default=Path.cwd())
     cli.add_argument(
         "--gateway",
-        default=DEFAULT_GATEWAY,
+        default=default_gateway_root(),
         help="loopback Anthropic root, without /v1",
     )
     cli.add_argument(
