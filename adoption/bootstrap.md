@@ -406,9 +406,9 @@ GitHub-hosted macOS runner; see
    UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
      uv tool install --python 3.13 git+https://github.com/oraios/serena@c6fbd1c5932df2494ffa0020af5a9fbe80b82143
    UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
-     uv tool install --python 3.13 jcodemunch-mcp==1.108.319
+     uv tool install --python 3.13 'jcodemunch-mcp[watch]==1.108.330'
    "$eco/bin/serena" --version           # Serena 2.0.0.dev0
-   "$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.319
+   "$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.330
    ```
    Then run the installer:
    ```sh

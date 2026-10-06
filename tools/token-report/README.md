@@ -30,15 +30,19 @@ gh release download v0.51.0 --repo rtk-ai/rtk \
 )
 uv venv "$REPORT_TOOLS/headroom-0.37.0"
 uv pip install --python "$REPORT_TOOLS/headroom-0.37.0/bin/python" headroom-ai==0.37.0
-uv tool install jcodemunch-mcp==1.108.319
+UV_TOOL_DIR="$REPORT_TOOLS/jcodemunch-1.108.330/python-tools" \
+  UV_TOOL_BIN_DIR="$REPORT_TOOLS/jcodemunch-1.108.330/bin" \
+  uv tool install --python 3.13 'jcodemunch-mcp[watch]==1.108.330'
 npm install --prefix "$REPORT_TOOLS/mcporter-0.14.2" mcporter@0.14.2
-export PATH="$REPORT_TOOLS/rtk-0.51.0:$REPORT_TOOLS/headroom-0.37.0/bin:$REPORT_TOOLS/mcporter-0.14.2/node_modules/.bin:$HOME/.local/bin:$PATH"
+export PATH="$REPORT_TOOLS/rtk-0.51.0:$REPORT_TOOLS/headroom-0.37.0/bin:$REPORT_TOOLS/jcodemunch-1.108.330/bin:$REPORT_TOOLS/mcporter-0.14.2/node_modules/.bin:$HOME/.local/bin:$PATH"
 ```
 
 The checksum command must report the selected archive as `OK`. Other operating
 systems need their matching upstream release assets. The jcodemunch
-[upstream installation guide](https://github.com/jgravelle/jcodemunch-mcp/tree/v1.108.319#install)
-uses `uv tool install`; its dual-use license still applies. The reporter only
+[upstream installation guide](https://github.com/jgravelle/jcodemunch-mcp/blob/288033668f0425ab0547f420dd647c14bd186c7f/README.md)
+uses `uv tool install`; the pinned [package definition](https://github.com/jgravelle/jcodemunch-mcp/blob/288033668f0425ab0547f420dd647c14bd186c7f/pyproject.toml)
+defines the `watch` extra. Installing it does not start a watcher, and the
+dual-use license still applies. The reporter only
 requests statistics and does not index code or invoke AI summarizers.
 
 ## Create one explicit configuration and refresh
@@ -75,11 +79,12 @@ mcporter call --stdio "$(command -v jcodemunch-mcp)" \
   --args '{"action":"get_session_stats","args":{}}' --output json --no-oauth
 ```
 
-jcodemunch 1.108.319 has a custom-index-root accounting mismatch: source retrieval
-writes its native default savings ledger even when another index root is selected.
-The initializer therefore uses the upstream default `.code-index` root. It does
-not modify that root's configuration. Using its `counter` tool surface keeps six
-resident MCP tools; changing the surface is separate from this reporter.
+The retained jcodemunch 1.108.319 acceptance showed a custom-index-root accounting
+mismatch: source retrieval wrote its native default savings ledger even when
+another index root was selected. That older observation does not establish the
+behavior of 1.108.330. The initializer retains the default `.code-index` root
+without modifying its configuration. Changing the MCP surface is separate from
+this reporter.
 
 ## Optional scheduled refresh
 

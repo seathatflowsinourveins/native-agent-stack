@@ -996,7 +996,7 @@ class AgentGapTests(unittest.TestCase):
         self.assertEqual(errors, [])
         gaps = cfg.agent_gaps(ROOT, results, plan)
         # Wave 3 wires the token servers; context-mode's plugin tools and skill retain their native names.
-        wired_servers = {"serena", "qmd", "ai-memory", "semble", "socraticode", "headroom", "codebase-memory",
+        wired_servers = {"serena", "qmd", "ai-memory", "semble", "socraticode", "headroom", "codebase-memory-mcp",
                          "jcodemunch", "plugin_context-mode_context-mode"}
         for path in sorted((ROOT / cfg.CLAUDE_AGENTS_REL).glob("*.md")):
             text = path.read_text()
@@ -1035,7 +1035,7 @@ class AgentGapTests(unittest.TestCase):
             # Keep the absent-server control now that the committed interim installs SocratiCode too.
             edit_json(root / cfg.MANIFEST_REL, lambda data: next(
                 r for r in data["slots"] if r["slot_id"] == "code-search" and r["catalog"] == "foundation")[
-                    "interim"].update(default="semble 0.6.1"))
+                    "interim"].update(default="semble 0.6.2"))
             before = cfg.agent_gaps(root, *[cfg.analyse(root)[i] for i in (0, 2)])
             edit_json(root / cfg.MANIFEST_REL, install)
             after = cfg.agent_gaps(root, *[cfg.analyse(root)[i] for i in (0, 2)])
@@ -1220,7 +1220,7 @@ class RenderTests(unittest.TestCase):
     def test_the_wired_servers_are_registered_and_serena_and_qmd_by_the_command_their_readmes_give(self):
         servers = json.loads(self.files["mcp-servers.json"])["mcpServers"]
         # The owner-selected token stack joins Serena, QMD and the interim memory/search installs.
-        self.assertEqual(list(servers), ["ai-memory", "serena", "socraticode", "headroom", "codebase-memory", "qmd",
+        self.assertEqual(list(servers), ["ai-memory", "serena", "socraticode", "headroom", "codebase-memory-mcp", "qmd",
                                          "jcodemunch", "semble", "chrome-devtools"])
         self.assertEqual(servers["serena"]["command"], "serena")
         self.assertEqual(servers["serena"]["args"][:1] + servers["serena"]["args"][3:6],
@@ -1236,8 +1236,15 @@ class RenderTests(unittest.TestCase):
             "SEMBLE_CACHE_LOCATION": "${HOME}/.cache/semble-claude"})
         config = tomllib.loads(self.files["codex.config.toml"])
         # semble comes from the new distribution's additions, merged after the shared template's servers.
-        self.assertEqual(list(config["mcp_servers"]), ["serena", "ai-memory", "socraticode", "headroom", "codebase-memory",
+        self.assertEqual(list(config["mcp_servers"]), ["serena", "ai-memory", "socraticode", "headroom", "codebase-memory-mcp",
                                                       "qmd", "context-mode", "jcodemunch", "semble", "chrome-devtools"])
+        # Separate vendor windows changed both native namespaces; Codex forwards names, never host values.
+        self.assertNotIn("codebase-memory", config["mcp_servers"])
+        self.assertNotIn("codebase-memory", servers)
+        self.assertIn("codebase-memory-mcp", servers)
+        self.assertEqual(config["mcp_servers"]["codebase-memory-mcp"], {
+            "command": host["ECO_ROOT"] + "/bin/codebase-memory-mcp",
+            "env_vars": ["CBM_CACHE_DIR", "CBM_RUNTIME_DIR"]})
         # Round-2 browser verdict: one stdio server serves automation and diagnostics.
         chrome_args = ["-y", "chrome-devtools-mcp@1.10.1", "--headless", "--isolated", "--no-usage-statistics", "--no-performance-crux"]
         self.assertEqual(servers["chrome-devtools"], {"type": "stdio", "command": "npx", "args": chrome_args})
@@ -1249,11 +1256,10 @@ class RenderTests(unittest.TestCase):
         # (the user's directive of 2026-10-04; JCODEMUNCH_SHARE_SAVINGS=0, CONFIGURATION.md at the pinned revision).
         self.assertEqual(servers["jcodemunch"], {"type": "stdio", "command": "${ECO_ROOT}/bin/jcodemunch-mcp", "args": [],
                                                  "env": {"JCODEMUNCH_SHARE_SAVINGS": "0"}})
-        # The Codex entry is the one the project template registers per project (startup allowance, the three verbs of the
-        # front door, the savings opt-out); its approval mode is an authorization piece, written only with the option.
+        # The Codex window removes the three-verb allowlist while retaining the startup allowance and savings opt-out.
+        # Its approval mode is an authorization piece, written only with the option.
         self.assertEqual(config["mcp_servers"]["jcodemunch"], {
             "command": host["ECO_ROOT"] + "/bin/jcodemunch-mcp", "startup_timeout_sec": 60,
-            "enabled_tools": ["route", "menu", "order"],
             "env": {"RTK_TELEMETRY_DISABLED": "1", "PATH": config["mcp_servers"]["context-mode"]["env"]["PATH"],
                     "JCODEMUNCH_SHARE_SAVINGS": "0"}})
         self.assertTrue(config["mcp_servers"]["jcodemunch"]["env"]["PATH"].startswith(host["ECO_ROOT"] + "/bin:"))
@@ -1322,7 +1328,7 @@ class RenderTests(unittest.TestCase):
         # All installed servers' worker policies remain; without the option no approval mode.
         self.assertEqual(profile["mcp_servers"], {
             "serena": {"startup_timeout_sec": 60, "required": True},
-            "codebase-memory": {"startup_timeout_sec": 60},
+            "codebase-memory-mcp": {"startup_timeout_sec": 60},
             "ai-memory": {"enabled_tools": ["memory_query", "memory_read_page", "memory_recent", "memory_status",
                                             "memory_briefing"]},
             "socraticode": {"enabled_tools": ["codebase_search", "codebase_status", "codebase_list_projects", "codebase_health"],
@@ -1349,7 +1355,7 @@ class RenderTests(unittest.TestCase):
         self.assertEqual(installed_names & {n.lower() for n in names}, set())
         # The owner defaults and interim installs are wired, so their names are no longer scanned for.
         self.assertEqual({"ai-memory", "context-mode", "claude-hud", "semble", "rtk", "socraticode", "headroom",
-                          "codebase-memory", "jcodemunch", "chub"} & {n.lower() for n in names}, set())
+                          "codebase-memory", "codebase-memory-mcp", "jcodemunch", "chub"} & {n.lower() for n in names}, set())
         with tempfile.TemporaryDirectory() as tmp:    # the render with the authorization settings is scanned too
             self.assertEqual(run_main("--render", "--host", EXAMPLE_HOST, "--out", tmp, "--with-authorization-settings")[0], 0)
             with_option = {path.name: path.read_text(encoding="utf-8") for path in Path(tmp).iterdir()}
@@ -2324,7 +2330,7 @@ class ApplyTests(ApplyCase):
                              icp.expected_sha256(icp.HOOKS[name]))
         self.assertEqual(len(list((self.home / ".claude/agents").iterdir())), 11)
         self.assertEqual(sorted(json.loads((self.home / ".stub-claude-mcp.json").read_text())),
-                         ["ai-memory", "chrome-devtools", "codebase-memory", "headroom", "jcodemunch", "qmd", "semble", "serena", "socraticode"])
+                         ["ai-memory", "chrome-devtools", "codebase-memory-mcp", "headroom", "jcodemunch", "qmd", "semble", "serena", "socraticode"])
         settings = json.loads((self.home / ".claude/settings.json").read_text())
         # The repository's hooks and the overlay's Notification, and the events ai-memory's hooks take (an interim install).
         self.assertEqual(sorted(settings["hooks"]), ["ConfigChange", "Notification", "PostToolUse", "PreCompact", "PreToolUse",

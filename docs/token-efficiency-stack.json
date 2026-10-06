@@ -1727,7 +1727,7 @@
       "purpose": "Explicitly scoped code index and exact symbol retrieval through a six-tool MCP surface",
       "upstream_commands": {
         "install": [
-          "uv tool install jcodemunch-mcp==1.108.319"
+          "uv tool install --python 3.13 'jcodemunch-mcp[watch]==1.108.330'"
         ],
         "use": [
           "order({\"action\":\"search_symbols\",\"args\":{\"repo\":\"RETURNED_REPOSITORY_ID\",\"query\":\"requested_function\",\"kind\":\"function\",\"max_results\":1}})",
@@ -4724,7 +4724,8 @@
       "upstream_commands": {
         "install": [
           "gh release download v0.11.0 --repo DeusData/codebase-memory-mcp --pattern codebase-memory-mcp-linux-amd64.tar.gz --dir \"$DOWNLOAD_DIR\"",
-          "tar -xf \"$DOWNLOAD_DIR/codebase-memory-mcp-linux-amd64.tar.gz\" -C \"$PREFIX\""
+          "tar -xf \"$DOWNLOAD_DIR/codebase-memory-mcp-linux-amd64.tar.gz\" -C \"$PREFIX\"",
+          "codebase-memory-mcp install --skip-binary --dir=\"${ECO_ROOT}/bin\" --clients=codex"
         ],
         "use": [
           "mcporter --config \"${MCPORTER_CONFIG}\" call codebase-memory.search_graph --args '{\"project\":\"agent-lab\",\"name_pattern\":\"^collect$\",\"file_pattern\":\"tools/ecosystem/linux-usage-report.cjs\",\"format\":\"json\",\"limit\":1}' --output json --no-oauth",
@@ -4732,7 +4733,7 @@
         ],
         "statistics": [],
         "command_kind": "Upstream CLI/MCP commands and portable placeholders from linked recipes; documentation is not execution evidence.",
-        "install_note": "Official [DeusData/codebase-memory-mcp v0.11.0](https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0), asset `codebase-memory-mcp-linux-amd64.tar.gz`; recorded SHA-256 `032b33c1833919a2d1de67ff6367fa6ea46aee8689c86ef223c88fae3b6e4536`",
+        "install_note": "Official [DeusData/codebase-memory-mcp v0.11.0](https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0), asset `codebase-memory-mcp-linux-amd64.tar.gz`; recorded SHA-256 `032b33c1833919a2d1de67ff6367fa6ea46aee8689c86ef223c88fae3b6e4536`. The third command is the separate supported Codex agents-only setup after the binary exists, not another download; the same upstream subcommand supports --clients=claude. The [2026-10-06 window record](../evidence/artifacts/ns2604-tools-window-20261006/README.md) binds both actual client operations and their readbacks; it is not graph-use acceptance. Both native clients register codebase-memory-mcp; the existing MCPorter recipe below retains its separate codebase-memory alias. The later Claude log proves the CC's effort:max additions to the three agents, without a model/type override; a separate Claude instruction-pointer marker is not independently asserted.",
         "statistics_note": "No upstream lifetime/session savings counter. Listed status or per-conversion commands, if any, are not cumulative avoided-token accounting."
       },
       "returned_result_summary": "2026-09-19 native Claude and Desktop searched collect in tools/ecosystem/linux-usage-report.cjs lines 91\u2013127 and traced four static callees:installation, sourcesFor, runParser, overlaps. Native Codex additional lane was quota-blocked before tools. Static edges do not attest runtime execution.",

@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "kind": "retained-host-installation-source-review",
+  "recorded_at_utc": "2026-10-06T22:29:03Z",
+  "source_revision": "0d5e6506434fab598dee861c749a22e628beb75a",
+  "north_star_action": "Native foundation for US-equities research and historical simulation.",
+  "evidence_class": "source_review",
+  "boundary": "Review of retained CC installation/configuration steps; no new host apply, provider execution, graph indexing, native smoke, organic count, upstream suite or benchmark. Per-step exits are retained, not invented per-subcommand exits.",
+  "sanitization": "Private HOME prefixes in argv are replaced by ${HOME}; placeholders are not claimed as literal executed arguments. Configured environment values, credentials, backups and raw conversations are omitted.",
+  "upstreams": {
+    "semble": {"version": "0.6.2", "source_pin": "f1daa42a7dd42fa765eb7ef47862fc0c116fa2b0", "repository": "https://github.com/MinishLab/semble"},
+    "jcodemunch-mcp": {"version": "1.108.330", "source_pin": "288033668f0425ab0547f420dd647c14bd186c7f", "repository": "https://github.com/jgravelle/jcodemunch-mcp"},
+    "codebase-memory-mcp": {"version": "0.11.0", "source_pin": "8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798", "repository": "https://github.com/DeusData/codebase-memory-mcp"}
+  },
+  "sources": [
+    {"locator": "coordination:command-center/cc-tools/tools-window/tools-window-codex-r2.sh", "sha256": "1e73bc66ebba0269d420f07fdc083bb453152cbeb69696dd7f9c146a79e543bf", "selected_lines": [162, 169, 176, 183, 278, 284, 285, 286, 287, 288, 289, 290]},
+    {"locator": "coordination:command-center/cc-tools/tools-window/run-codex-20261006T1818Z/steps.jsonl", "sha256": "72ef586250fc843f57cf9b5a4cca33d8fa5a174481115b6b01fdcb7aeeb9c4d9"},
+    {"locator": "coordination:command-center/cc-tools/tools-window/run-codex-20261006T1857Z-r2/steps.jsonl", "sha256": "0561e66b7d25ccdd3c82955767f3e7f0e02114cc363cc36ddd9ecc96c1029d50"},
+    {"locator": "coordination:command-center/cc-tools/tools-window/run-codex-20261006T1857Z-r3/steps.jsonl", "sha256": "5b7e23664b96947601c3cac518a84aaa94f9b6c32e73fb1f0837582af43db758"},
+    {"locator": "coordination:command-center/cc-tools/tools-window/run-codex-20261006T1857Z-r3/window.log", "sha256": "a2f537c69d14f9cb65f8eedb95483ae2f5172d60898944c3cfe4036f8ee4dc81"},
+    {"locator": "coordination:command-center/cc-tools/tools-window/run-codex-20261006T1859Z-r4resume/steps.jsonl", "sha256": "7303e07d4e02a56a32ee9160a624bf975dbba79d86ff5122fdc84dd0eeb768ab"},
+    {"locator": "coordination:command-center/cc-tools/tools-window/run-claude-20261006T2119Z/steps.jsonl", "sha256": "a180132f84323c58c9f06cbc08efd0ad3696d854c615954bbce3617c461a6129"},
+    {"locator": "coordination:command-center/cc-tools/tools-window/run-claude-20261006T2119Z/window.log", "sha256": "7abed75aa14f972057cd8379dc6cb95cbc8126c33ec574a2db5799b2d47bbba1", "selected_lines": [31, 52, 62, 63, 64]},
+    {"locator": "coordination:command-center/cc-tools/tools-window/tools-window-claude.rev3.sh", "sha256": "f6e120b0e7edbbaf2048d1936038952555c696d873168a747b035d683e7aa659", "role": "reviewed relevant-body snapshot; not an asserted executed whole-script digest", "line_range": [375, 410]},
+    {"locator": "coordination:command-center/cc-tools/tools-window/tools-window-claude.rev3b.sh", "sha256": "07e88d98ed97e968f32ba9f248c958c0b2ee2051ac35deda9b4e16c8ffc0dff2", "role": "reviewed relevant-body snapshot; not an asserted executed whole-script digest", "line_range": [384, 419]}
+  ],
+  "attempts": [
+    {"id": "1818Z", "window_exit_code": 1, "retained_condition": "Step8 succeeded; step9 failed1; later operations skipped."},
+    {"id": "1857Z-r2", "window_exit_code": 1, "retained_condition": "Quiescence gate failed1 with one app-server process; no tool change."},
+    {"id": "1857Z-r3", "window_exit_code": 1, "retained_condition": "Steps8/9/11/13 succeeded within recorded scope; step15 failed2 on unsupported RTK -v. The successful steps were retained."},
+    {"id": "1859Z-r4resume", "window_exit_code": 0, "completed_at_utc": "2026-10-06T19:00:01Z", "retained_condition": "Previously passed installs skipped; corrected steps15-17 succeeded. Final0 does not erase earlier failures or nested jCodeMunch1."},
+    {"id": "claude-2119Z", "window_exit_code": 0, "completed_at_utc": "2026-10-06T21:21:13Z", "retained_condition": "Claude steps12a/12b/13/13b/14 succeeded; step9j explicitly skipped (-1), so no new jCodeMunch version is claimed."}
+  ],
+  "operations": [
+    {"step": "8", "run": "1857Z-r3", "completed_at_utc": "2026-10-06T18:58:04Z", "step_exit_code": 0, "argv_from_retained_script_sanitized": ["uv", "tool", "install", "--python", "3.13", "semble[mcp]==0.6.2"], "readback": "Package/version assertions matched0.6.2; no client-use or embedding-quality claim."},
+    {"step": "9", "run": "1857Z-r3", "completed_at_utc": "2026-10-06T18:58:08Z", "step_exit_code": 0, "argv_from_retained_script_sanitized": ["env", "UV_TOOL_DIR=${HOME}/.local/share/codex-ecosystem/python-tools", "UV_TOOL_BIN_DIR=${HOME}/.local/share/codex-ecosystem/bin", "uv", "tool", "install", "--force", "--python", "3.13", "jcodemunch-mcp[watch]==1.108.330"], "config_upgrade_exit_scope": "Included in recorded step; no standalone subcommand exit capture claimed.", "native_config_check_exit_code": 1, "native_config_check_condition": "Exactly one admitted advisory: missing jCodeMunch mention in unchanged Claude CLAUDE.md; counter tool surface asserted separately."},
+    {"step": "11a", "run": "1857Z-r3", "completed_at_utc": "2026-10-06T18:58:10Z", "step_exit_code": 0, "readback": "Old Codex codebase-memory registration removed before vendor setup."},
+    {"step": "11b", "run": "1857Z-r3", "completed_at_utc": "2026-10-06T18:58:10Z", "step_exit_code": 0, "readback": "Qualified SocratiCode launcher/settings retained: node wrapper, timeout120, nice19, automatic watching off, external Qdrant and autoresume false. No SocratiCode package change claimed."},
+    {"step": "11c", "run": "1857Z-r3", "completed_at_utc": "2026-10-06T18:58:10Z", "step_exit_code": 0, "readback": "Codex jCodeMunch enabled_tools restriction absent."},
+    {"step": "13", "run": "1857Z-r3", "completed_at_utc": "2026-10-06T18:58:12Z", "step_exit_code": 0, "argv_from_retained_script_sanitized": ["${HOME}/.local/share/codex-ecosystem/bin/codebase-memory-mcp", "install", "--skip-binary", "--dir=${HOME}/.local/share/codex-ecosystem/bin", "--clients=codex"], "stdin": "closed (/dev/null)", "readback": {"codex_server_key": "codebase-memory-mcp", "environment_variable_names": ["CBM_CACHE_DIR", "CBM_RUNTIME_DIR"], "old_codex_key_absent": true, "codex_vendor_agents": ["codebase-memory.toml", "codebase-memory-scout.toml", "codebase-memory-auditor.toml"], "codex_skill_present": "codebase-memory", "vendor_hooks_present": ["SessionStart", "SubagentStart"], "preexisting_rtk_hook_preserved": true, "single_instruction_pointer": true, "bashrc_unchanged": true, "claude_settings_unchanged_by_step13": true, "claude_cbm_native_artifacts_absent": true}, "scope": "Existing binary/indexes retained; native Codex setup only. No graph use, role effort override or active worker-profile apply proved."}
+  ],
+  "subsequent_claude_operations": [
+    {"step": "12a", "run": "claude-2119Z", "completed_at_utc": "2026-10-06T21:21:10Z", "step_exit_code": 0, "readback": "Legacy Claude codebase-memory registration removed and absence asserted."},
+    {"step": "12b", "run": "claude-2119Z", "completed_at_utc": "2026-10-06T21:21:11Z", "step_exit_code": 0, "scope": "Separate SocratiCode consumer route; no package upgrade or new route writer introduced in this repository follow-up."},
+    {"step": "13", "run": "claude-2119Z", "completed_at_utc": "2026-10-06T21:21:12Z", "step_exit_code": 0, "argv_from_reviewed_script_sanitized": ["${HOME}/.local/share/codex-ecosystem/bin/codebase-memory-mcp", "install", "--skip-binary", "--dir=${HOME}/.local/share/codex-ecosystem/bin", "--clients=claude"], "stdin": "closed (/dev/null)", "readback": {"claude_server_key": "codebase-memory-mcp", "old_claude_key_absent": true, "claude_factory_tool_prefix": "mcp__codebase-memory-mcp__", "claude_skill_present": "codebase-memory", "claude_vendor_agents": ["codebase-memory.md", "codebase-memory-scout.md", "codebase-memory-auditor.md"], "vendor_hook_events": ["PreToolUse", "PostToolUse", "SessionStart", "SubagentStart"], "existing_guard_and_rtk_order_preserved": true, "prior_codex_pointer_preserved": true, "separate_claude_instruction_pointer_marker": "not independently asserted"}},
+    {"step": "13b", "run": "claude-2119Z", "completed_at_utc": "2026-10-06T21:21:13Z", "step_exit_code": 0, "native_log_readback": "effort:max added to each of the three Claude vendor agents", "scope": "Applied CC overlay; no upstream-default, model or agent-type override claim."},
+    {"step": "14", "run": "claude-2119Z", "completed_at_utc": "2026-10-06T21:21:13Z", "step_exit_code": 0, "scope": "Separate RTK Claude native installer/readback; source changes remain with its owner."}
+  ],
+  "codex_attempt_deferred_claude_steps": ["12a", "12b", "13b", "14"],
+  "pending_claude_sites": ["separate Claude instruction-pointer marker, not independently asserted by this source review"],
+  "whole_slot_closures": [],
+  "organic_counts": {"before": "not measured by this source review", "after": "not measured by this source review", "first_relaunch_turn": "excluded under the co-op's native counting rule"},
+  "historical_evidence": "Earlier receipts and upstream suite failures remain immutable and separate; published wheel digests in the profile are not newly downloaded/rehashed artifacts.",
+  "landscape_selection_maintenance": {"path": "catalogs/landscape/upstream-snapshot.json", "pointer": "/components/58", "base_revision": "0d5e6506434fab598dee861c749a22e628beb75a", "previous_selected_version": "1.108.319", "previous_selected_source_pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e", "historical_row_file": "jcodemunch-selection-before.json", "historical_row_sha256": "c06a871626441069b4cdd4d4122fcf1d7c407f7bed85ee65ab17bef52bbd39f6", "historical_slice_contract": "Four leading spaces before the row opening brace through its closing brace, excluding the list comma, followed by one LF. The object bytes equal the base row; standalone JSON has its own final LF.", "current_selected_version": "1.108.330", "current_selected_source_pin": "288033668f0425ab0547f420dd647c14bd186c7f", "native_metadata_receipt": "coordination:ns2604-coop/readiness-20261005/jobs/N28-20261006/jcodemunch-public-refresh-20261006T2224Z/source-readback.json", "native_metadata_receipt_sha256": "754d0bcfacf1397de7e0c06eee6c1b12212311378e3ec01953e5eca7aeb25667", "native_metadata_argv": [["gh", "api", "--cache", "120s", "repos/jgravelle/jcodemunch-mcp/releases/latest"], ["gh", "api", "--cache", "120s", "repos/jgravelle/jcodemunch-mcp/commits/288033668f0425ab0547f420dd647c14bd186c7f"], ["gh", "api", "--cache", "120s", "repos/jgravelle/jcodemunch-mcp/commits/v1.108.331"]], "native_metadata_exit_codes": [0, 0, 0], "sanitizer_exit_codes": [0, 0, 0], "latest_observed_version": "1.108.331", "scope": "Preserve the complete previous row and its four dated checks; append three actual native API observations and derive current selected-source/latest-release metadata and unequal-commit predicate. Global snapshot observation date and unrelated rows remain unchanged. Newer release metadata does not claim installation or acceptance of1.108.331."},
+  "repository_checks": {
+    "evidence_class": "local_integration",
+    "runner_source": "Repository README and .github/workflows/validate.yml document python3 -m unittest; no pytest dependency was installed or custom test runner written.",
+    "retained_failed_attempts": [
+      {"command": "python3 -m pytest tests/test_new_wsl_client_config.py tests/test_token_lanes_subagent_start.py tests/test_task_model_routing.py tests/test_new_wsl_definitive_defaults.py -q", "native_exit_code": 1, "condition": "Installed Python had no pytest; source-correct documented unittest driver used instead."},
+      {"native_exit_code": 1, "tests": 320, "failures": 3, "skips": 3, "condition": "Current package pins were being compared to immutable dated definitive selections; historical assertions restored and current-profile pin consistency checked separately."},
+      {"native_exit_code": 1, "tests": 20, "failures": 1, "condition": "Current landscape selected-version mirror was stale; source maintenance and bounded actual metadata reads corrected it, with the old row preserved."},
+      {"native_exit_code": 1, "tests": 320, "failures": 3, "skips": 3, "condition": "Longer current CBM name exceeded the unchanged4096-byte carrier budget and its handbook copy was stale; guidance shortened with the same rules and both sources aligned."},
+      {"native_exit_code": 1, "tests": 201, "failures": 1, "condition": "Generated handbook passed generation but its maintained hash receipt was stale; prior hashes retained in the appended regeneration record and failed contract rerun passed."}
+    ],
+    "completed_checks": [
+      {"command": "python3 -m unittest tests.test_new_wsl_client_config tests.test_token_lanes_subagent_start tests.test_task_model_routing tests.test_new_wsl_definitive_defaults", "native_exit_code": 0, "sanitizer_exit_code": 0, "tests": 320, "skips": 3},
+      {"command": "python3 -m unittest tests.test_new_wsl_definitive_defaults.Manifest.test_interims_are_the_records_beside_the_decided_rows tests.test_new_wsl_definitive_defaults.Manifest.test_current_profile_pins_are_the_repository_pins tests.test_new_wsl_profile tests.test_landscape", "native_exit_code": 0, "sanitizer_exit_code": 0},
+      {"command": "python3 -m unittest tests.test_new_wsl_handbook.NewWslHandbookTests.test_the_committed_outputs_are_current_and_the_handbook_receipt_names_them", "native_exit_code": 0, "sanitizer_exit_code": 0},
+      {"command": "python3 scripts/build_new_wsl_handbook.py --write", "native_exit_code": 0, "sanitizer_exit_code": 0},
+      {"command": "python3 scripts/build_new_wsl_handbook.py --check", "native_exit_code": 0, "sanitizer_exit_code": 0},
+      {"command": "python3 evidence/artifacts/new-wsl-install-plan-20261002/check_plan.py", "native_exit_code": 0, "sanitizer_exit_code": 0},
+      {"command": "python3 tools/adoption/new_wsl_client_config.py --check", "native_exit_code": 0, "sanitizer_exit_code": 0, "scope": "Repository map/template contract; no --check-host drift or deployed profile repair claim."},
+      {"command": "python3 scripts/component_matrix.py --write", "native_exit_code": 0, "sanitizer_exit_code": 0},
+      {"command": "python3 scripts/new_host_grand_list.py --write", "native_exit_code": 0, "sanitizer_exit_code": 0},
+      {"command": "python3 scripts/validate.py", "native_exit_code": 0, "sanitizer_exit_code": 0, "returned_output": "69 components;10339 hashed files;4 profiles;214 receipts; integrity/scope only"},
+      {"command": "git diff --check", "native_exit_code": 0}
+    ],
+    "execution_transport": "Every test/generator above ran at nice19 and ionice-c3 through the existing native-exit-preserving command metadata transport. Exact argv, UTC times, stdout and native/sanitizer codes remain in private N28/checks."
+  },
+  "completeness_corrections": ["P2: current selected/latest landscape predicates now derive from three actual metadata reads; old complete row preserved.", "P3: Semble0.6.2 template attribution names the actual10-06 window; the definitive amendment retains its original0.6.1 ownership history."],
+  "repository_check_status": "Required focused matrix, native plan check, generator/current-hash contracts, publication validation and whitespace check passed. Three focused skips and every failed attempt remain recorded. Registry-last publication follows; local repository checks cannot become upstream or native smoke evidence."
+}

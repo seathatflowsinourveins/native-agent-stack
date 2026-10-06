@@ -441,15 +441,25 @@
     },
     {
       "match": [
-        "claude/mcp/server/codebase-memory",
-        "codex/*/mcp_servers.codebase-memory.*"
+        "claude/mcp/server/codebase-memory-mcp"
       ],
       "wiring": "slot:code-graph",
-      "owner": "codebase-memory",
+      "owner": "codebase-memory-mcp",
       "names": [
-        "codebase-memory"
+        "codebase-memory-mcp"
       ],
-      "source": "DeusData/codebase-memory-mcp v0.11.0, installed by the code-graph row of evidence/artifacts/new-wsl-install-plan-20261002/install.sh. docs/decisions/2026-09-25-codex-mcp-scope.md requires explicit index_repository and auto_index=false; this entry registers only the MCP server and never invokes indexing."
+      "source": "DeusData/codebase-memory-mcp v0.11.0 at 8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798. The CC's Claude-only window of 2026-10-06 removed the legacy codebase-memory key at step12a and ran the binary's install --skip-binary --clients=claude route at step13, reading back this canonical key. The vendor owns its PreToolUse/PostToolUse/SessionStart/SubagentStart hook-augment entries, codebase-memory skill and codebase-memory/codebase-memory-scout/codebase-memory-auditor agents; step13b added effort:max to those three agents, without a model/type override. src/cli/agent_profiles.c:294-301 renders Claude tool ids with the literal mcp__codebase-memory-mcp__ prefix, while src/cli/agent_clients.c:21 defines this registration key. F9 does not copy or recreate vendor assets. docs/decisions/2026-09-25-codex-mcp-scope.md retains explicit index_repository and auto_index=false."
+    },
+    {
+      "match": [
+        "codex/*/mcp_servers.codebase-memory-mcp.*"
+      ],
+      "wiring": "slot:code-graph",
+      "owner": "codebase-memory-mcp",
+      "names": [
+        "codebase-memory-mcp"
+      ],
+      "source": "DeusData/codebase-memory-mcp v0.11.0 at 8972ea69c6ad94b1ef1d4ffbf0a92d78d2db1798, README.md native installer/client matrix. The CC's Codex-only tools-window step13 ran the binary's install --skip-binary --clients=codex route and read back this canonical MCP key with forwarded CBM_CACHE_DIR and CBM_RUNTIME_DIR names. The later Claude-only window separately registered the same canonical key without replacing these Codex vendor assets. The native vendor installer owns its SessionStart/SubagentStart hook-augment entries in hooks.json, codebase-memory skill, codebase-memory/codebase-memory-scout/codebase-memory-auditor agents, and managed AGENTS.md activation pointer. This map documents that ownership; F9 does not copy or create those vendor assets. Explicit index_repository and auto_index=false remain the repository's portable scope."
     },
     {
       "match": [
@@ -470,7 +480,7 @@
       "names": [
         "jcodemunch"
       ],
-      "source": "jgravelle/jcodemunch-mcp 1.108.319, revision 8f7b34abe16fb459e0bf1c04747d584216dfe32e: README.md L119-122 documents the user-scope registration (`claude mcp add -s user jcodemunch jcodemunch-mcp` after `uv tool install jcodemunch-mcp`), and CONFIGURATION.md L231 and SECURITY.md L311 document JCODEMUNCH_SHARE_SAVINGS=0 in the server's env block as the opt-out of the anonymous savings counter. Registered at user scope for Claude Code and Codex on the user's directive of 2026-10-04 (\"we need to set up all the sota repos, mcp tools, harness rules, upstream cc native hooks and beyond, resolute them cleanly for future session to make sure their seamless pick up\"); docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md overturns the per-project rule of 2026-09-25 for this distribution. The install plan's code-index row installs the console script; jcodemunch-mcp init, which writes a prompt policy and hooks, is not run."
+      "source": "jgravelle/jcodemunch-mcp 1.108.330 at 288033668f0425ab0547f420dd647c14bd186c7f: README.md documents native user-scope registration of the preinstalled executable; pyproject.toml defines the watch extra. CONFIGURATION.md L231 and SECURITY.md L311 document JCODEMUNCH_SHARE_SAVINGS=0 as the anonymous savings opt-out. The CC's 2026-10-06 Codex window removed enabled_tools from this entry; all native resident tools remain exposed. docs/decisions/2026-10-04-new-wsl-jcodemunch-user-scope.md records the user's standing user-scope choice for both clients and overturns the per-project rule of 2026-09-25 for this distribution. The source recipe installs the console script; init is not implicitly invoked."
     },
     {
       "match": [

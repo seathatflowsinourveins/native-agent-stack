@@ -521,9 +521,14 @@ rendered entry would name a missing file (changed after `v2026.09.26.2`):
 ```sh
 eco="${ECO_INSTALL_ROOT:-$HOME/.local/share/codex-ecosystem}"
 UV_TOOL_DIR="$eco/python-tools" UV_TOOL_BIN_DIR="$eco/bin" \
-  uv tool install --python 3.13 jcodemunch-mcp==1.108.319
-"$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.319
+  uv tool install --python 3.13 'jcodemunch-mcp[watch]==1.108.330'
+"$eco/bin/jcodemunch-mcp" --version   # jcodemunch-mcp 1.108.330
 ```
+
+The current package pin and `watch` extra follow the clean upstream tools window
+of 2026-10-06 ([pinned package definition](https://github.com/jgravelle/jcodemunch-mcp/blob/288033668f0425ab0547f420dd647c14bd186c7f/pyproject.toml)).
+Installing the extra does not start a watcher. The older source and native
+acceptance descriptions below retain their original 1.108.319 scope.
 
 The retained upstream license is **Dual-Use License 1.1**; the bounded local
 acceptance does not establish eligibility for commercial deployment. Keep its

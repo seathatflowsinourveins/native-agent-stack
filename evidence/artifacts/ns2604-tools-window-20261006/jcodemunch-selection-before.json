@@ -1,0 +1,73 @@
+    {
+      "component_id": "jcodemunch-mcp",
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "selected_repository_url": "https://github.com/jgravelle/jcodemunch-mcp",
+      "selected_version": "1.108.319",
+      "selected_source_pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "checks": [
+        {
+          "endpoint": "repos/jgravelle/jcodemunch-mcp",
+          "exit_code": 0,
+          "started_at": "2026-09-21T22:34:01.751354+00:00",
+          "ended_at": "2026-09-21T22:34:02.126165+00:00",
+          "stdout_sha256": "c849803bc3d321fd40ad4fe2fb8255edb729f9a65d77bc8276ab9cc04a2a53d8",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/jgravelle/jcodemunch-mcp/releases/latest",
+          "exit_code": 0,
+          "started_at": "2026-09-21T22:34:02.126268+00:00",
+          "ended_at": "2026-09-21T22:34:02.458347+00:00",
+          "stdout_sha256": "cbef3e853428d4793c7deb80cce843c1dffb01e237596dfd3269a300d6fb6eb7",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/jgravelle/jcodemunch-mcp/commits/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+          "exit_code": 0,
+          "started_at": "2026-09-21T22:34:02.458507+00:00",
+          "ended_at": "2026-09-21T22:34:02.968666+00:00",
+          "stdout_sha256": "b2360a54a4a270be57230c921cefc697b33ec91f9f9342c91dc64a710a1d30ea",
+          "status": "ok"
+        },
+        {
+          "endpoint": "repos/jgravelle/jcodemunch-mcp/commits/v1.108.319",
+          "exit_code": 0,
+          "started_at": "2026-09-21T22:34:02.968825+00:00",
+          "ended_at": "2026-09-21T22:34:03.360901+00:00",
+          "stdout_sha256": "b2360a54a4a270be57230c921cefc697b33ec91f9f9342c91dc64a710a1d30ea",
+          "status": "ok"
+        }
+      ],
+      "canonical_repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "archived": false,
+      "disabled": false,
+      "default_branch": "main",
+      "pushed_at": "2026-09-21T20:58:37Z",
+      "license_spdx": "NOASSERTION",
+      "latest_stable_release": {
+        "tag_name": "v1.108.319",
+        "published_at": "2026-09-16T14:04:32Z",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/releases/tag/v1.108.319",
+        "target_commitish": "main",
+        "prerelease": false,
+        "draft": false
+      },
+      "selected_pin_source": {
+        "ref": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+        "sha": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+        "committed_at": "2026-09-16T11:26:45Z"
+      },
+      "latest_release_source": {
+        "ref": "v1.108.319",
+        "sha": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+        "html_url": "https://github.com/jgravelle/jcodemunch-mcp/commit/8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+        "committed_at": "2026-09-16T11:26:45Z"
+      },
+      "status": "metadata_checked",
+      "adoption_recommendation": "retain_selected_pending_capability_comparison",
+      "source_pin_kind": "git_commit",
+      "primary_repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "release_relationship": "selected_version_matches_latest_stable",
+      "selected_pin_matches_latest_release_commit": true
+    }

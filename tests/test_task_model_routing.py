@@ -36,7 +36,7 @@ PIN_FILES = ("adoption/pins-linux-x86_64.json", "adoption/pins-macos-arm64.json"
 # code-navigation layer's current choice, installed on demand until each has a reviewed pin on both platforms.
 CARRIER_TOOLS = ("jcodemunch-mcp", "codebase-memory-mcp", "ast-grep")
 CARRIER_LANES = ("mcp__jcodemunch__route", "mcp__jcodemunch__menu", "mcp__jcodemunch__order",
-                 "mcp__codebase-memory__search_graph", "mcp__codebase-memory__trace_path")
+                 "mcp__codebase-memory-mcp__search_graph", "mcp__codebase-memory-mcp__trace_path")
 SECTIONS = ["Context", "Alternatives", "Decision", "Overturn condition", "Sources"]
 HEADER = ["Task class", "Client", "Model", "Effort", "Enforced today", "Rule source"]
 # The task classes the routing brief names (research split into breadth and judgment, building split by whether a
