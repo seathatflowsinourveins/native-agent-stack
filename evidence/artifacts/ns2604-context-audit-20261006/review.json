@@ -14,7 +14,7 @@
       "key": "claude:setting:idleCompaction",
       "disposition": "declined",
       "reason": "Leave the native rollout/default alone; true cannot force rollout and false is an opt-out, so no override is justified.",
-      "source": "evidence/artifacts/ns2604-context-audit-20261006/review.json:1",
+      "source": "evidence/artifacts/ns2604-context-audit-20261006/review.json:113",
       "carrier": null,
       "value": null,
       "scope": "native setting; no override",
