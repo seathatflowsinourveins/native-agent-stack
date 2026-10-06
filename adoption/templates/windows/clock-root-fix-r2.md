@@ -14,8 +14,7 @@ Get-FileHash .\clock-root-fix-r2.ps1 -Algorithm SHA256  # match the CC's receipt
 .\clock-root-fix-r2.ps1
 ```
 
-`-WhatIf` provides a read-only preview before the apply window. Its final line is
-`CLOCK-R2 PLAN complete`, and its printed registry values are the current values.
+`-WhatIf` previews existing values and ends with `CLOCK-R2 PLAN complete`.
 Each actual write prints an immediate read-back and stops on mismatch.
 
 | Step | Expected actual read-back |
@@ -42,14 +41,17 @@ sc.exe config w32time start= delayed-auto
 sc.exe qc w32time  # read back AUTO_START (DELAYED)
 ```
 
-This rollback restores only the prior startup setting. It does not import or
-delete triggers or change SynchronizeTime. Before the acceptance boot, the
-co-op uses the corrected A0–A12 plan and the read-only D0 persistence check;
-configuration read-backs alone are not clock acceptance. Final A2: first
-Time-Service 35 must be <=75 s after OS StartTime **and** <=network identification
-+30 s when that event exists; without it, use <=75 s and record the gap. Missed
-relative bounds through +151 s are PARTIAL; >151 s is FAIL. The CC rejected an
-absolute-only PASS because it hides a slow DNS/acquisition path.
+Rollback restores the startup setting; triggers and SynchronizeTime are preserved.
+The co-op uses A0–A12 and D0; configuration read-backs are not clock acceptance.
+
+**Final A2 (CC 7:18 AM EDT, 11:18Z):** PASS requires the first Time-Service 35 <=75 s after
+OS StartTime **and** <=network identification+30 s when that event exists.
+Without it, use <=75 s and record the missing relative evidence. Evaluate PASS
+first; all remaining cases through +151 s are PARTIAL, including a missed
+relative bound and slow +75-to-+151-s results. Attribute each using KB 816043's
+debug log to 134/47 or acquisition. >151 s is FAIL and overturns the shortened-window
+claim. The +35-to-+45-s prediction and +18.6-to-+34.6-s network range across 39
+boots require the relative bound: rejected option 2 could hide a 50-s acquisition.
 
 Sources: [Automatic, 16dafadd, ms.date 2025-02-25](https://github.com/MicrosoftDocs/windowsserverdocs/blob/16dafaddc757fb0b4ad7e5f8da33fbfc888fbcd4/WindowsServerDocs/networking/windows-time-service/configuring-systems-for-high-accuracy.md#L47-L50);
 [backoff, ef9afdb7, ms.date 2025-09-18](https://github.com/MicrosoftDocs/windowsserverdocs/blob/ef9afdb74d7e649d54aeaf104efe28dcd857ff2f/WindowsServerDocs/networking/windows-time-service/Windows-Time-Service-Tools-and-Settings.md#L375-L376);
