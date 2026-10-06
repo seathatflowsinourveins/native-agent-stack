@@ -2307,8 +2307,8 @@ class Apply:
             try:
                 current = tomllib.loads(config.read_text(encoding="utf-8"))
                 rendered = tomllib.loads(self.files["codex.config.toml"])
-                pending = self.pending_codex_migrations(current, rendered)
-                self.complete_codex_migrations(pending, current)
+                pending = self.pending_codex_migrations(rendered)
+                self.complete_codex_migrations(pending, current, rendered)
             except (MergeError, OSError, ValueError, lane.Failed) as error:
                 self.record("codex-config", "failed", f"migration marker: {error}")
         if self.outcomes[-1][1] != "failed":
@@ -2334,7 +2334,7 @@ class Apply:
             except (UnicodeDecodeError, tomllib.TOMLDecodeError) as error:
                 raise MergeError(f"{config} is not valid UTF-8 TOML ({error}); fix it, then run again") from None
             plan = plan_merge(existing, rendered)
-            pending = self.pending_codex_migrations(existing, rendered)
+            pending = self.pending_codex_migrations(rendered)
             migrations = [rule for rule, _ in pending
                           if strict_equal(lane.get_path(existing, list(rule[0])), (True, rule[1]))]
             for path, previous, new in migrations:
@@ -2344,7 +2344,7 @@ class Apply:
                     holder = holder[part]
                 holder[path[-1]] = new
             migration_writer = self.binary("codex", self.args.codex_bin) if migrations else None
-            if migrations and not migration_writer and not self.dry:
+            if migrations and not migration_writer:
                 raise MergeError("owned-value migration needs the native Codex app-server writer; nothing written")
             adds_daemon = (not lane.get_path(existing, list(DAEMON_PATH))[0]
                            and lane.get_path(plan.expected, list(DAEMON_PATH))[0])
@@ -2383,10 +2383,20 @@ class Apply:
                 have = lane.get_path(existing, path)
                 found[verdict.piece.key] = ("added" if not have[0] else "same" if strict_equal(
                     have[1], lane.get_path(rendered, path)[1]) else "kept")
-        changes = new_text is not None or writer is not None or bool(pending)
+        changes = new_text is not None or writer is not None or bool(migrations)
         label = "merged with conflicts kept" if plan.conflicts else "applied"
         if not changes:
-            self.record(step, "merged with conflicts kept" if plan.conflicts else "current",
+            if pending:
+                if self.dry:
+                    self.say(step, "  DRY RUN: would record one-time migration completion; config.toml unchanged")
+                else:
+                    try:
+                        current = tomllib.loads(config.read_text(encoding="utf-8"))
+                        self.complete_codex_migrations(pending, current, plan.expected)
+                    except (MergeError, OSError, ValueError, lane.Failed) as error:
+                        self.record(step, "failed", f"migration marker: {error}")
+                        return
+            self.record(step, "current" if pending else "merged with conflicts kept" if plan.conflicts else "current",
                         f"{config} already holds every key of the render"
                         + (f"; {len(plan.conflicts)} value(s) differ and stay as the file has them" if plan.conflicts
                            else ""))
@@ -2418,11 +2428,12 @@ class Apply:
             if migrations:
                 rollback_sha = self.migrate_owned_codex_values(migrations, migration_writer, rollback_sha, plan.expected)
                 touched = True
-            difference = first_difference(tomllib.loads(config.read_bytes().decode("utf-8")), plan.expected)
+            current = tomllib.loads(config.read_bytes().decode("utf-8"))
+            difference = first_difference(current, plan.expected)
             if difference is not None:
                 raise MergeError(f"read-back: the file does not equal the merge (it differs at "
                                   f"{lane.key_path(list(difference))})")
-            self.complete_codex_migrations(pending, plan.expected)
+            self.complete_codex_migrations(pending, current, plan.expected)
         except (MergeError, OSError, subprocess.SubprocessError, lane.Failed, tomllib.TOMLDecodeError,
                 UnicodeDecodeError) as error:
             if not touched:   # the file changed under this run before anything was written: leave it as it now is
@@ -2436,15 +2447,13 @@ class Apply:
         self.record(step, label, f"merged into {config} (backup {backup})")
         self.authorization.update(found)
 
-    def pending_codex_migrations(self, current: dict, rendered: dict) -> list:
-        """Only declared old/new values qualify. Existing markers (including symlinks) are presence-only."""
+    def pending_codex_migrations(self, rendered: dict) -> list:
+        """The rendered policy qualifies every tier; only literal previous values migrate. Markers are presence-only."""
         pending = []
         for rule, name in CODEX_OWNED_MIGRATIONS.items():
             path, previous, new = rule
             marker = self.codex_home / ".native-agent-stack-migrations" / f"{name}.json"
-            have = lane.get_path(current, list(path))
-            if (not os.path.lexists(marker) and strict_equal(lane.get_path(rendered, list(path)), (True, new))
-                    and (not have[0] or strict_equal(have, (True, previous)) or strict_equal(have, (True, new)))):
+            if not os.path.lexists(marker) and strict_equal(lane.get_path(rendered, list(path)), (True, new)):
                 pending.append((rule, marker))
         return pending
 
@@ -2473,12 +2482,13 @@ class Apply:
                 raise MergeError("native migration disk snapshot differs from the intended config")
             return lane.sha256_bytes(snapshot)  # Hash the same bytes that were validated, not a later read.
         except (lane.AppServerError, lane.Failed) as error:
-            raise MergeError(f"native migration writer failed ({type(error).__name__})") from None
+            raise MergeError(f"native migration writer failed ({type(error).__name__}): {error}") from None
 
-    def complete_codex_migrations(self, pending: list, current: dict) -> None:
-        """Stamp only confirmed adoption, including fresh/default cases, so a later /fast survives."""
+    def complete_codex_migrations(self, pending: list, current: dict, expected: dict) -> None:
+        """Confirm actual readback against the merge, including any preserved tier, so a later /fast survives."""
         for (path, previous, new), marker in pending:
-            if not strict_equal(lane.get_path(current, list(path)), (True, new)):
+            have, want = lane.get_path(current, list(path)), lane.get_path(expected, list(path))
+            if have[0] != want[0] or not strict_equal(have[1], want[1]):
                 raise MergeError(f"cannot record migration before {lane.key_path(list(path))} reads back as intended")
             if marker.parent.is_symlink():
                 raise MergeError("migration marker directory is a symlink")

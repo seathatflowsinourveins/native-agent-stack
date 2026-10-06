@@ -131,7 +131,8 @@
     "new": "default",
     "marker": ".native-agent-stack-migrations/service-tier-fast-to-default-20261005.json",
     "marker_policy": "create-only, mode 0600, presence-only; do not read or overwrite an existing marker",
-    "successful_completion": ["fresh default", "missing-key default addition", "already-default adoption", "fast-to-default migration"],
+    "successful_completion": ["fresh default", "missing-key default addition", "already-default adoption", "any preserved non-fast tier", "fast-to-default migration"],
+    "marker_only": "actual path readback must match plan.expected; no config write, pgrep, process guard, native client call or backup; reports current and one-time migration recorded",
     "later_fast_choice": "kept as a reported conflict once the marker exists",
     "unowned_scalars": "always kept as conflicts",
     "dry_run": "no home/config/backup/marker or native client mutation",
@@ -146,6 +147,73 @@
     "findings_closed": ["reuse supported native scalar writer", "preserve native no-write rejection", "guard rollback against intervening edits", "native version agreement and one disk-snapshot capture"],
     "result": "approved within documented bounds",
     "native_execution": false
+  },
+  "round3": {
+    "reviewed_head": "3bbcc780dfc34829219dff169b283f29a10845c1",
+    "date": "2026-10-06",
+    "evidence_class": "local_integration",
+    "fixture_class": "synthetic",
+    "source_review": [
+      "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/tui/src/chatwidget/service_tiers.rs:47-57",
+      "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/tui/src/app/event_dispatch.rs:2391-2396",
+      "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/tui/src/config_update.rs:105-122",
+      "openai/codex@a956835d020762cb2b570053af06f643a11c0ecc:codex-rs/protocol/src/config_types.rs:547-551",
+      "native-agent-stack@3bbcc780dfc34829219dff169b283f29a10845c1:docs/decisions/2026-10-02-new-wsl-client-configuration.md:210",
+      "native-agent-stack@3bbcc780dfc34829219dff169b283f29a10845c1:tests/test_new_wsl_client_config.py:3599-3602,3662-3668"
+    ],
+    "executions": [
+      {
+        "phase": "red Round 3 controls",
+        "command": "nice -n 19 python3 -m unittest tests.test_new_wsl_client_config.CodexOwnedMigrationTests.test_preserved_flex_is_marked_and_a_later_fast_choice_is_kept tests.test_new_wsl_client_config.CodexOwnedMigrationTests.test_native_requirement_rejection_reports_the_local_error_text tests.test_new_wsl_client_config.CodexOwnedMigrationTests.test_a_dry_run_without_a_native_migration_writer_refuses_without_writes tests.test_new_wsl_client_config.CodexMergeTests.test_marker_only_default_completes_while_a_process_runs_without_guard_or_backup tests.test_new_wsl_client_config.CodexMergeTests.test_marker_only_default_completes_without_invoking_a_failing_pgrep -q",
+        "exit_code": 1,
+        "tests": 5,
+        "failures": 5,
+        "duration_seconds": 2.520,
+        "observation": "Preserved flex lacked completion; marker-only failed with running/failing process checks; local native error text was lost; a missing writer incorrectly passed dry-run."
+      },
+      {
+        "phase": "focused repair",
+        "command": "nice -n 19 python3 -m unittest tests.test_new_wsl_client_config.CodexOwnedMigrationTests tests.test_new_wsl_client_config.CodexMergeTests.test_marker_only_default_completes_while_a_process_runs_without_guard_or_backup tests.test_new_wsl_client_config.CodexMergeTests.test_marker_only_default_completes_without_invoking_a_failing_pgrep -q",
+        "exit_code": 0,
+        "tests": 16,
+        "duration_seconds": 14.104
+      },
+      {
+        "phase": "full module after Round 3 code repairs",
+        "command": "nice -n 19 python3 -m unittest tests.test_new_wsl_client_config -q",
+        "exit_code": 0,
+        "tests": 205,
+        "duration_seconds": 76.629,
+        "returned_output": "Ran 205 tests in 76.629s\n\nOK"
+      },
+      {
+        "phase": "repository client wiring check",
+        "command": "nice -n 19 python3 -B tools/adoption/new_wsl_client_config.py --check",
+        "exit_code": 0,
+        "returned_output": "check passed",
+        "existing_warnings": ["MCP_AUTO_OPEN_ENABLED: manifest installs mcp-inspector but install plan does not", "shell_environment_policy.set.MCP_AUTO_OPEN_ENABLED: same manifest/plan mismatch"],
+        "limit": "Structural repository check, not installed host-profile or native-client acceptance."
+      },
+      {
+        "phase": "Round 3 repository integrity and scope",
+        "command": "nice -n 19 python3 scripts/validate.py",
+        "exit_code": 0,
+        "returned_output": "{\"components\": 69, \"hashed_files\": 10274, \"profiles\": 4, \"receipts\": 212, \"status\": \"passed\"}\nIntegrity and scope checks only; no live provider or GPU execution."
+      },
+      {
+        "phase": "Round 3 whitespace check",
+        "command": "git diff --check",
+        "exit_code": 0
+      }
+    ],
+    "controls": ["flex adoption then later fast with no native edit", "marker-only while an owned sleep process runs", "marker-only with failing pgrep stand-in, not invoked", "marker-only dry-run without writes", "marker-only actual readback mismatch preserves concurrent tier", "native readonly requirement diagnostic", "missing native writer refuses dry-run"],
+    "independent_review": "Bounded read-only source/completeness reviewer approved both P2 repairs and optional diagnostic/dry-run/doc links within documented recovery limits. No native execution by reviewer.",
+    "optional_findings": {
+      "native_error_diagnostics": "closed using existing AppServer error text",
+      "missing_writer_dry_run": "closed with consistent refusal",
+      "operator_decision_links": "closed in recipe, Decision 11 and changelog amendment",
+      "disposition_row": "dated follow-up recorded in migration decision; catalog row unchanged"
+    }
   },
   "limits": [
     "Source metadata, synthetic native RPC replies and local integrity checks are not real native writer or provider acceptance.",

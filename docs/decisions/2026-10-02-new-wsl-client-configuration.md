@@ -205,6 +205,9 @@ handbook, any convergence record, and every step of the recipe except F7 to F9 a
     that looks like a table inside a multi-line string or array is not taken for one, an inline table or dotted keys that
     would need a new key are refused); the result is parsed before it is written and the file is read back with `tomllib`
     after, and put back from the original bytes, with the step failed, when it is not exactly the expected merge.
+    The declared one-time [`service_tier` migration](2026-10-05-codex-service-tier-migration.md) changes only the previous
+    managed `fast` to `default`; its completion marker preserves later `/fast` choices, and marker-only completion
+    makes no config write, process check or backup.
     `features.daemon_auto_start` goes through Codex's own writer (`codex features disable daemon_auto_start`) when a
     `codex` binary is at hand, as `codex_home.py` does, and by the text edit when none is. A second `--apply` changes
     nothing and makes no second backup. The running-Codex refusal comes before either write of `config.toml`: while a process named

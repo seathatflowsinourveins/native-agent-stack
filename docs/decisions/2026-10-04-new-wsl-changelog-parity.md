@@ -92,3 +92,5 @@ Sources at `openai/codex` **rust-v0.160.0**, fetched read-only:
 [fast toggle, :47-56](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/tui/src/chatwidget/service_tiers.rs#L47-L56),
 and [config persistence, :105-121](https://github.com/openai/codex/blob/rust-v0.160.0/codex-rs/tui/src/config_update.rs#L105-L121).
 The client-config map and render assertion follow this choice. A later user choice would overturn it.
+The declared one-time [`service_tier` migration](2026-10-05-codex-service-tier-migration.md) changes the previous managed
+`fast` to `default` and records a completion marker so later `/fast` choices survive adoption.

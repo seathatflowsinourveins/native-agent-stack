@@ -2131,6 +2131,49 @@ class CodexOwnedMigrationTests(ApplyCase):
         self.assertFalse(self.migration_marker.exists())
         self.assertIn("native migration version changed", out)
 
+    def test_preserved_flex_is_marked_and_a_later_fast_choice_is_kept(self):
+        self.config.write_text("service_tier = 'flex'\n[features]\ndaemon_auto_start = false\n")
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-600:] + err)
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "flex")
+        self.assertTrue(self.migration_marker.is_file())
+        data = tomllib.loads(self.config.read_text())
+        data["service_tier"] = "fast"  # Native /fast persists this spelling from another tier.
+        self.config.write_text(cfg.emit_toml(data, ""))
+        before = self.config.read_bytes()
+        code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-600:] + err)
+        self.assertEqual(self.config.read_bytes(), before)
+        self.assertEqual(self.edits, [])
+
+    def test_native_requirement_rejection_reports_the_local_error_text(self):
+        self.fast_config()
+        rejection = cfg.lane.AppServerError("config/batchWrite", {
+            "message": "synthetic service tier requirement is readonly",
+            "data": {"config_write_error_code": "ConfigRequirementReadonly"},
+        })
+        with mock.patch.object(self.synthetic_server, "batch_write", side_effect=rejection):
+            code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-600:] + err)
+        self.assertTrue("synthetic service tier requirement is readonly" in out)
+        self.assertTrue("ConfigRequirementReadonly" in out)
+        self.assertFalse(self.migration_marker.exists())
+
+    def test_a_dry_run_without_a_native_migration_writer_refuses_without_writes(self):
+        self.fast_config()
+        before = tree(self.home)
+        native_binary = cfg.Apply.binary
+
+        def no_codex(apply, name, explicit):
+            return None if name == "codex" else native_binary(apply, name, explicit)
+
+        with mock.patch.object(cfg.Apply, "binary", no_codex):
+            code, out, err = self.apply(dry=True)
+        self.assertEqual(code, 1, out[-600:] + err)
+        self.assertTrue("needs the native Codex app-server writer" in out)
+        self.assertEqual(tree(self.home), before)
+        self.assertEqual(self.edits, [])
+
 
 class ApplyTests(ApplyCase):
     def test_apply_keeps_the_owned_skill_listing_fraction_and_host_only_settings(self):
@@ -3606,6 +3649,79 @@ class CodexMergeTests(unittest.TestCase):
         directory = self.base / "stand-in-pgrep"
         write_exe(directory / "pgrep", "#!/bin/sh\n" + body)
         return mock.patch.dict(os.environ, {"PATH": f"{directory}{os.pathsep}{os.environ['PATH']}"})
+
+    def prepare_marker_only_default(self):
+        self.put(DESTINATION_CODEX)
+        self.assertEqual(self.apply()[0], 0)
+        migration = self.codex_home / ".native-agent-stack-migrations/service-tier-fast-to-default-20261005.json"
+        migration.unlink()
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "default")
+        return migration, self.config.read_bytes(), self.backups(), self.calls()
+
+    def test_marker_only_default_completes_while_a_process_runs_without_guard_or_backup(self):
+        migration, before, backups, calls = self.prepare_marker_only_default()
+        sleeper = subprocess.Popen(["sleep", "120"])
+        self.addCleanup(lambda: (sleeper.kill(), sleeper.wait()))
+        for _ in range(100):
+            if str(sleeper.pid) in cfg.lane.codex_processes("sleep"):
+                break
+            time.sleep(0.05)
+        self.assertIsNone(sleeper.poll())
+        with mock.patch.object(cfg, "running_codex_pids", wraps=cfg.running_codex_pids) as probe:
+            code, out, err = self.apply(name="sleep")
+        self.assertEqual(code, 0, out[-600:] + err)
+        probe.assert_not_called()
+        self.assertEqual(self.config.read_bytes(), before)
+        self.assertEqual(self.backups(), backups)
+        self.assertEqual(self.calls(), calls)
+        self.assertTrue(migration.is_file())
+        self.assertIn("codex-config current", self.summary(out))
+        self.assertIn("one-time migration recorded", out)
+
+    def test_marker_only_default_completes_without_invoking_a_failing_pgrep(self):
+        migration, before, backups, calls = self.prepare_marker_only_default()
+        with self.stand_in_pgrep("exit 2\n"), mock.patch.object(cfg, "running_codex_pids", wraps=cfg.running_codex_pids) as probe:
+            code, out, err = self.apply()
+        self.assertEqual(code, 0, out[-600:] + err)
+        probe.assert_not_called()
+        self.assertEqual(self.config.read_bytes(), before)
+        self.assertEqual(self.backups(), backups)
+        self.assertEqual(self.calls(), calls)
+        self.assertTrue(migration.is_file())
+        self.assertIn("codex-config current", self.summary(out))
+        self.assertIn("one-time migration recorded", out)
+
+    def test_marker_only_dry_run_needs_no_process_check_and_writes_nothing(self):
+        migration, before, backups, calls = self.prepare_marker_only_default()
+        with self.stand_in_pgrep("exit 2\n"), mock.patch.object(cfg, "running_codex_pids", wraps=cfg.running_codex_pids) as probe:
+            code, out, err = self.apply(dry=True)
+        self.assertEqual(code, 0, out[-600:] + err)
+        probe.assert_not_called()
+        self.assertFalse(migration.exists())
+        self.assertEqual(self.config.read_bytes(), before)
+        self.assertEqual(self.backups(), backups)
+        self.assertEqual(self.calls(), calls)
+        self.assertIn("would record one-time migration completion", out)
+
+    def test_marker_only_completion_verifies_actual_readback_and_keeps_a_concurrent_tier(self):
+        migration, _, backups, calls = self.prepare_marker_only_default()
+        native_pending = cfg.Apply.pending_codex_migrations
+
+        def concurrent_choice(apply, rendered):
+            pending = native_pending(apply, rendered)
+            data = tomllib.loads(self.config.read_text())
+            data["service_tier"] = "flex"
+            self.config.write_text(cfg.emit_toml(data, ""))
+            return pending
+
+        with mock.patch.object(cfg.Apply, "pending_codex_migrations", concurrent_choice), mock.patch.object(cfg, "running_codex_pids", wraps=cfg.running_codex_pids) as probe:
+            code, out, err = self.apply()
+        self.assertEqual(code, 1, out[-600:] + err)
+        probe.assert_not_called()
+        self.assertFalse(migration.exists())
+        self.assertEqual(tomllib.loads(self.config.read_text())["service_tier"], "flex")
+        self.assertEqual(self.backups(), backups)
+        self.assertEqual(self.calls(), calls)
 
     def test_a_pgrep_that_fails_stops_the_merge_and_the_creation_and_the_message_names_the_status(self):
         calls = []
