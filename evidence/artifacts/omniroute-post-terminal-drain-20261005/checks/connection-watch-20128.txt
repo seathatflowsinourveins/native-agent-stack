@@ -1,7 +1,7 @@
 # Three value-free watches of the established connections to 20128, 75 s each, every 1 s (scripts/watch-20128-connections.py.txt; ports, process names and pids only).
 # Watch 1 ran 2026-10-06 from about 05:14:33Z to 05:15:48Z, while the 20129 framework gateway's connection was visible. Its output was not saved to a file when it ran: the text below is that run's output as displayed to the session (the display command cut lines at 230 characters; none of its lines was that long), recovered from the session transcript.
 # Watch 2 ran 06:13:55Z-06:15:10Z in a quiet window (output file kept as written): the poll was not seen.
-# Watch 3 ran 12:25:30Z-12:26:45Z right after the guard-4 trial (output file kept as written): connections of 29-31 s opened by the framework gateway's process (the owner is a process in omniroute-fw.service's cgroup), one idle connection whose owner is in another PID namespace (open for the whole watch), and one between the gateway's own processes.
+# Watch 3 ran 12:25:30Z-12:26:45Z right after the guard-4 trial (output file kept as written): connections of 29-31 s opened by the framework gateway's process (the owner is a process in omniroute-fw.service's cgroup), one connection whose owner is not visible in this PID namespace (open for the whole watch; the watch measures no bytes), and one between the gateway's own processes.
 ################ WATCH 1
 WATCH start MainPID=767 unit_process_tree=[767, 1631, 2311] port=20128 duration=75.0s
 +   0.0s OPEN  local_port=57971 peer_port=20128 owners=['omniroute (v16.(2335)'] gateway_own_pid_tree=no

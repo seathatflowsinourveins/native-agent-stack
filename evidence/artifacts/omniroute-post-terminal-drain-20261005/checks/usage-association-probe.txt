@@ -1,0 +1,7 @@
+# usage association probe on the live store (read-only), window 2026-10-05T12:00:00Z .. 2026-10-06T10:56:00Z; run 2026-10-06T12:44:13Z
+call_logs rows (status 200, /v1/responses or /v1/chat/completions): 458
+  with no usage_history look-alike (same model and token counts within 3 s): 0; with more than one: 0; with exactly one (a pair): 458
+pairs with equal provider: 458; equal connection_id: 458; equal api_key_id (NULL = NULL counts as equal): 458; usage endpoint equal to the call's path: 458
+latency difference |usage latency_ms - call duration| over 458 pairs (ms): median 1.0, p95 8.0, p99 18.0, max 51.0
+time-to-first-token difference over 456 pairs (ms): median 0.2532379999756813, p99 0.4959210008382797, max 0.4996360018849373
+pairs that meet EVERY field of the association (provider, account, endpoint, latency within 100 ms, ttft within 1 ms): 458 of 458

@@ -28,7 +28,7 @@ Each file below was committed with its UUID-shaped strings (the gateway's correl
 
 | committed file | bytes (unshortened) | sha256 (unshortened) | private copy |
 | --- | --- | --- | --- |
-| `checks/acceptance-controls.txt` | 274828 | `2f3f746728725ae1aa3ff6020e8457920bef9a608ad64ee4020dc9818bc7a4f9` | `raw-outputs/checks__acceptance-controls.txt.gz` |
+| `checks/acceptance-controls.txt` | 274917 | `989f0e8882ffd32e07c289637fff9d794375efec91c902bf711012c152801496` | `raw-outputs/checks__acceptance-controls.txt.gz` |
 | `checks/handler-e2e-session-tag-results.txt` | 5832 | `19393acdef858a66b6a2ec1fb713f4d37f0a650ddf9f8d870b35ebde6dd7fc51` | `raw-outputs/checks__handler-e2e-session-tag-results.txt.gz` |
 | `checks/live-acceptance-baseline-race.txt` | 4194 | `3dce6b8d192cd8ef5efdb684e337f94501f84e024e361708d3977fa7262e8576` | `raw-outputs/checks__live-acceptance-baseline-race.txt.gz` |
 | `checks/live-acceptance-baseline-raw.txt` | 13833 | `3b39e1ea8294aa4c90291cd6ac13f0f317bf9054f3d3e4e838669b12a4f53062` | `raw-outputs/checks__live-acceptance-baseline-raw.txt.gz` |
