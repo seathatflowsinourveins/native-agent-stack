@@ -4522,8 +4522,8 @@
     },
     {
       "path": ".github/osv-scanner-frozen-macos.toml",
-      "sha256": "b5cda8737d918b227e31c71d3394d250d33ba30675eff8b27d7a467d650bd9d4",
-      "bytes": 3574
+      "sha256": "28361ee967cce26b3c636a963b3b25e2f97fe29fd86193928bbc12825c1d40de",
+      "bytes": 4750
     },
     {
       "path": ".github/osv-scanner-lockfiles.json",
@@ -5227,8 +5227,8 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/README.md",
-      "sha256": "3a51743060848994b4da16076c7b4f0464507bf37c3cd40e1995fec8ae44e8bb",
-      "bytes": 10611
+      "sha256": "2f02b78f58664d80ae358bf4a1d359ed027bcfb7dec672f55033dd8fffb98e3a",
+      "bytes": 11238
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/acceptance-plan.json",
@@ -5331,6 +5331,11 @@
       "bytes": 32972
     },
     {
+      "path": "blueprints/convergence-practice/application-delivery/history/pnpm-lock.0d5e6506.yaml",
+      "sha256": "e31f7b3cc3336fa0424cfed0f63c11a8d7d448e7f1f8e20f82094434187f3cfd",
+      "bytes": 32972
+    },
+    {
       "path": "blueprints/convergence-practice/application-delivery/history/pnpm-lock.752714a.yaml",
       "sha256": "03aebeb4339167d6b22e5b34e53049569c4dd77fc6285470b23f7ddd6d596084",
       "bytes": 32972
@@ -5342,8 +5347,8 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/history/recipe-revisions.json",
-      "sha256": "fc54e659bd9c4ccd97188e3dc9a05aa9cc4145e45d1e228401be8ca093c2aa84",
-      "bytes": 16245
+      "sha256": "1d1014d536df408e413abf7ce7f382f3cb56eb49c162fd101281cdd71cb7ef57",
+      "bytes": 17843
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/history/serve.cabbe2c.py",
@@ -5397,7 +5402,7 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/pnpm-lock.yaml",
-      "sha256": "e31f7b3cc3336fa0424cfed0f63c11a8d7d448e7f1f8e20f82094434187f3cfd",
+      "sha256": "b657db5288b38fd1aa667c656b06154ed5c613bfb7bb6d0ab754ea5d65c979d7",
       "bytes": 32972
     },
     {
@@ -5504,6 +5509,51 @@
       "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js.update.txt",
       "sha256": "e5231b332c2dd0c7cf51e99ea5fb3d2324ad66655ea9d0c6fd02b80d03a3bfec",
       "bytes": 162
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.browser.txt",
+      "sha256": "d2a2ad4a74a7c583b75cfb940fca8066565db76f147b233143f10bf2033eedf3",
+      "bytes": 215
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.build.txt",
+      "sha256": "e661ed8e0f4821546c35a8e64e4ae10e526afe121bb064b82a6d0199efcc935a",
+      "bytes": 661
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.install.txt",
+      "sha256": "ae20cfa2145e1fe7be62fbe5dfb15b9dded3467760fddc5ebd4b7ac4a77afdb3",
+      "bytes": 1057
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.peers.txt",
+      "sha256": "5ecf82a3fc1f9007eeea79ce3bf0d9c587150219ef245bb5a5a23609cdb562fb",
+      "bytes": 32
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.review-build.txt",
+      "sha256": "f5db7e42544b6d14f717127a34bb8a3de5ff3742279b44d1e044d4c3f27db7bd",
+      "bytes": 664
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.review-db-init.txt",
+      "sha256": "592eb41fd45e7cdb0f8fa96b033c1fc0f29318661291616b1ab0283f71583844",
+      "bytes": 280
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.review-install.txt",
+      "sha256": "751c36ce92358d15d1410607d3d9d1d3542fdcd980e514c8bee4096f7a27bcc0",
+      "bytes": 143
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.sh.txt",
+      "sha256": "e7428c268c0794a6329666fab3d579f25dec4b0613ae1a3c9a89ee1362964ab9",
+      "bytes": 1070
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/relock-2026-10-06-sharp.typecheck.txt",
+      "sha256": "99d7c2179cdd316467c51f37901025a0753453664d741214ba56fc631fa6c0bc",
+      "bytes": 90
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/serve.py",
@@ -17365,6 +17415,11 @@
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
       "sha256": "c12885d5d078f88cf6784d539e5b8261545a759b7aba8ff1eba566fb5d6366fb",
       "bytes": 3660
+    },
+    {
+      "path": "docs/decisions/2026-10-06-sharp-live-relock-frozen-variant.md",
+      "sha256": "7fad1a25a8f3b1c151a7c1f125c1635d32d631757c68509588b55d72c1cf6f89",
+      "bytes": 3898
     },
     {
       "path": "docs/direct-results.md",
@@ -53107,6 +53162,16 @@
       "bytes": 1840
     },
     {
+      "path": "evidence/receipts/sharp-0355-qualification-20261006.json",
+      "sha256": "cbcee74c3a53fbbc940d4e2f53aa7dbf3ce112d193171bd844f54d93a2522363",
+      "bytes": 6089
+    },
+    {
+      "path": "evidence/receipts/sharp-review-followup-20261006.json",
+      "sha256": "52d42721df114b9be1ea7666228e5d31acbb11694b615605b15016cc761cd6bd",
+      "bytes": 5073
+    },
+    {
       "path": "evidence/receipts/skills-listing-restore-20260928.json",
       "sha256": "bc7bf6282e47aea4404b891631f4687510675b6b0e228e2a69811188cd6ee1fd",
       "bytes": 44230
@@ -55238,8 +55303,8 @@
     },
     {
       "path": "tests/test_osv_lockfile_coverage.py",
-      "sha256": "e89585ef067044a90eb0685a38116816271400f07a4c11bcf25cb3cef486d947",
-      "bytes": 75144
+      "sha256": "2d81844b1041b71019c3d0caa529dbbc13b6a86af3c634c0c442c31023e9d760",
+      "bytes": 75161
     },
     {
       "path": "tests/test_overfitting_riskl_parity.py",

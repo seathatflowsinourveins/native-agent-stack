@@ -33,6 +33,14 @@ the first frozen install while the release was a day old; no exclusion was added
 and the unchanged candidate passed the same bounded checks after the window
 ([receipt](../../../evidence/receipts/nextjs-1638-qualification-20261001.json)). `make verify` has not been repeated at 16.3.8.
 
+On October 6, 2026 the live lock moved sharp 0.35.4 to first patched **0.35.5**
+for [GHSA-wq5f-xc86-pv6w](https://github.com/lovell/sharp/security/advisories/GHSA-wq5f-xc86-pv6w).
+Its required companions select sharp-libvips 1.3.4 and librsvg 2.63.2. Frozen
+install, peers, schema/type checks and production build passed; the full recipe
+attempt failed on the unavailable dedicated PostgreSQL test database, and the
+browser attempt refused an occupied port. The [qualification receipt](../../../evidence/receipts/sharp-0355-qualification-20261006.json)
+retains these outcomes separately. The captured macOS lock is unchanged.
+
 Two compatibility decisions were made from actual evidence. The latest
 TypeScript 7.0.2 failed the current OpenAPI generator's declared `^5.x` peer and
 native type generation. The accepted project pins the latest supported
