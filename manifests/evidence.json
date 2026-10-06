@@ -53933,8 +53933,8 @@
     },
     {
       "path": "recipes/qdrant-user-service-migration.md",
-      "sha256": "7e38144c2c301ee126b1d6562c1094393f3a98cf8cec342c1f07d3046a251876",
-      "bytes": 8181
+      "sha256": "5177d21b8894f7ef184a0ff3b899cb5f19cdeed8171da83cf07b0b8ab2354efd",
+      "bytes": 9750
     },
     {
       "path": "recipes/saturation-sweep.md",
