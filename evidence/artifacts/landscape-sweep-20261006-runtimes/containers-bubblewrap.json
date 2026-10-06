@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-containers-bubblewrap",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/containers/bubblewrap",
+ "reviewed_commit": "0f8073dd9b547e15e8ec9451371f9729830b083d",
+ "readme_path": "README.md",
+ "license": "NOASSERTION",
+ "layers": [
+  "isolation"
+ ],
+ "claim": "Source and documentation review of containers/bubblewrap at commit 0f8073dd9b547e15e8ec9451371f9729830b083d (license NOASSERTION), read from README.md at that commit. Repository description: \"Low-level unprivileged sandboxing tool used by Flatpak and similar projects\". Survived the landscape-sweep-20261006-runtimes facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 8941,
+  "pushed_at": "2026-09-25T18:27:32Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@0f8073dd9b547e15e8ec9451371f9729830b083d",
+   "text": "Many container runtime tools like `systemd-nspawn`, `docker`, etc. focus on providing infrastructure for system administrators and orchestration tools (e.g. Kubernetes) to run containers."
+  },
+  {
+   "source": "README.md@0f8073dd9b547e15e8ec9451371f9729830b083d",
+   "text": "These tools are not suitable to give to unprivileged users, because it is trivial to turn such access into a fully privileged root shell on the host."
+  },
+  {
+   "source": "README.md@0f8073dd9b547e15e8ec9451371f9729830b083d",
+   "text": "There is a feature in the Linux kernel called [user namespaces](https://www.google.com/search?q=user+namespaces+site%3Ahttps%3A%2F%2Flwn.net) which allows unprivileged users to use container features. Bubblewrap uses these to build the sandbox, allowing any user to use the tool."
+  }
+ ]
+}

@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-slopus-happy",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/slopus/happy",
+ "reviewed_commit": "3d809c7d8cc919922ef9346c3575d35d4a7d23b3",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "native-clients"
+ ],
+ "claim": "Source and documentation review of slopus/happy at commit 3d809c7d8cc919922ef9346c3575d35d4a7d23b3 (license MIT), read from README.md at that commit. Repository description: \"Mobile and Web client for Codex and Claude Code, with realtime voice, encryption and fully featured\". Survived the landscape-sweep-20261006-roles facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 24033,
+  "pushed_at": "2026-10-05T22:09:45Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@3d809c7d8cc919922ef9346c3575d35d4a7d23b3",
+   "text": "[🖥️ **macOS App**](https://github.com/slopus/happy-desktop/releases/latest) • [📱 **iOS App**](https://apps.apple.com/us/app/happy-claude-code-client/id6748571505) • [🤖 **Android App**](https://play.google.com/store/apps/details?id=com.ex3ndr.happy) • [🌐 **Web App**](https://app.happy.engineering) • [🎥 **See a Demo**](https://youtu.be/GCS0OG9QMSE) • [📚 **Documentation**](https://happy.engineering/docs/) • [💬 **Discord**](https://discord.gg/fX9WBAhyfD)"
+  },
+  {
+   "source": "README.md@3d809c7d8cc919922ef9346c3575d35d4a7d23b3",
+   "text": "> Migrated from the `happy-coder` package. Thanks to [@franciscop](https://github.com/franciscop) for donating the `happy` package name!"
+  },
+  {
+   "source": "README.md@3d809c7d8cc919922ef9346c3575d35d4a7d23b3",
+   "text": "```bash # Instead of claude, use: happy claude # or happy codex ```"
+  }
+ ]
+}

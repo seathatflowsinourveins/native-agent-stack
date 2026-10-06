@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-ggml-org-llama-cpp",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/ggml-org/llama.cpp",
+ "reviewed_commit": "51ce9c11a6f2dfa895696c0048c4333e8953b728",
+ "readme_path": "README.md",
+ "license": "MIT",
+ "layers": [
+  "observation-inference"
+ ],
+ "claim": "Source and documentation review of ggml-org/llama.cpp at commit 51ce9c11a6f2dfa895696c0048c4333e8953b728 (license MIT), read from README.md at that commit. Repository description: \"LLM inference in C/C++\". Survived the landscape-sweep-20261006-runtimes facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 130488,
+  "pushed_at": "2026-10-06T19:27:05Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@51ce9c11a6f2dfa895696c0048c4333e8953b728",
+   "text": "[ggml](https://github.com/ggml-org/ggml) / [ops](https://github.com/ggml-org/llama.cpp/blob/master/docs/ops.md) / [maintainer PRs](https://github.com/ggml-org/llama.cpp/issues?q=is%3Apr%20is%3Aopen%20draft%3AFalse%20(author%3Argerganov%20OR%20author%3AKitaitiMakoto%20OR%20author%3Adanbev%20OR%20author%3Aaldehir%20OR%20author%3Amax-krasnyansky%20OR%20author%3ACISC%20OR%20author%3Aggerganov%20OR%20author%3Aam17an%20OR%20author%3Ajhen0409%20OR%20author%3Abartowski1182%20OR%20author%3Anikwen%20OR%20"
+  },
+  {
+   "source": "README.md@51ce9c11a6f2dfa895696c0048c4333e8953b728",
+   "text": "- Visit https://llama.app and follow the instructions - Run with Docker - see our [Docker documentation](docs/docker.md) - Download pre-built binaries from the [releases page](https://github.com/ggml-org/llama.cpp/releases) - Build from source by cloning this repository - check out [our build guide](docs/build.md)"
+  },
+  {
+   "source": "README.md@51ce9c11a6f2dfa895696c0048c4333e8953b728",
+   "text": "```sh # Download and run a model directly from Hugging Face llama cli -hf ggml-org/Qwen3.5-0.8B-GGUF"
+  }
+ ]
+}

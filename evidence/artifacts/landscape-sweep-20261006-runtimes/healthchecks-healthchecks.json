@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-healthchecks-healthchecks",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/healthchecks/healthchecks",
+ "reviewed_commit": "e623fa3b3a5e6c3dbcb92d0598a1f15d8e2e92ba",
+ "readme_path": "README.md",
+ "license": "BSD-3-Clause",
+ "layers": [
+  "scheduling-supervision"
+ ],
+ "claim": "Source and documentation review of healthchecks/healthchecks at commit e623fa3b3a5e6c3dbcb92d0598a1f15d8e2e92ba (license BSD-3-Clause), read from README.md at that commit. Repository description: \"Open-source cron job and background task monitoring service, written in Python & Django\". Survived the landscape-sweep-20261006-runtimes facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 10386,
+  "pushed_at": "2026-10-06T06:50:26Z",
+  "archived": false,
+  "default_branch": "master"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@e623fa3b3a5e6c3dbcb92d0598a1f15d8e2e92ba",
+   "text": "Healthchecks is a cron job monitoring service. It listens for HTTP requests and email messages (\"pings\") from your cron jobs and scheduled tasks (\"checks\"). When a ping does not arrive on time, Healthchecks sends out alerts."
+  },
+  {
+   "source": "README.md@e623fa3b3a5e6c3dbcb92d0598a1f15d8e2e92ba",
+   "text": "Healthchecks comes with a web dashboard, API, 25+ integrations for delivering notifications, monthly email reports, WebAuthn 2FA support, team management features: projects, team members, read-only access."
+  },
+  {
+   "source": "README.md@e623fa3b3a5e6c3dbcb92d0598a1f15d8e2e92ba",
+   "text": "Healthchecks is available as a hosted service at [https://healthchecks.io/](https://healthchecks.io/)."
+  }
+ ]
+}

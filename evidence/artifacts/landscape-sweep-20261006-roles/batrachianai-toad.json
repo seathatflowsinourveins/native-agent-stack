@@ -1,0 +1,34 @@
+{
+ "schema_version": 1,
+ "id": "source-review-batrachianai-toad",
+ "kind": "upstream_provenance",
+ "evidence_class": "source_review",
+ "repository": "https://github.com/batrachianai/toad",
+ "reviewed_commit": "dd4f90e8b3700c3de80ad4b0eaa488ad0105e2c1",
+ "readme_path": "README.md",
+ "license": "AGPL-3.0",
+ "layers": [
+  "native-clients"
+ ],
+ "claim": "Source and documentation review of batrachianai/toad at commit dd4f90e8b3700c3de80ad4b0eaa488ad0105e2c1 (license AGPL-3.0), read from README.md at that commit. Repository description: \"A unified interface for AI in your terminal.\". Survived the landscape-sweep-20261006-roles facts refuter and both fit refuters (Claude Opus 5.5 and GPT-6-Astra); no native install, run or comparison with a winner.",
+ "observed": {
+  "stars": 3465,
+  "pushed_at": "2026-05-26T08:43:50Z",
+  "archived": false,
+  "default_branch": "main"
+ },
+ "documentation_excerpts": [
+  {
+   "source": "README.md@dd4f90e8b3700c3de80ad4b0eaa488ad0105e2c1",
+   "text": "A unified interface for AI in your terminal ([release announcement](https://willmcgugan.github.io/toad-released/))."
+  },
+  {
+   "source": "README.md@dd4f90e8b3700c3de80ad4b0eaa488ad0105e2c1",
+   "text": "See [Getting Started](#getting-started) if you have any problems."
+  },
+  {
+   "source": "README.md@dd4f90e8b3700c3de80ad4b0eaa488ad0105e2c1",
+   "text": "Toad is an interface to coding agents, such as Claude, Gemini, Codex, OpenHand, and many more."
+  }
+ ]
+}
