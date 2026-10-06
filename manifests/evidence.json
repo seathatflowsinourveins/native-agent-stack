@@ -4762,8 +4762,8 @@
     },
     {
       "path": "adoption/git-hook-acceptance.md",
-      "sha256": "445e5ca63f39bcf539ceaded17dad8ff071c7d13f822a44c5c299092eb0561f1",
-      "bytes": 7770
+      "sha256": "2ccc2a78f737eed294cb05018c2dd3e8eb89cf75997184b6a87448ec07a88f8d",
+      "bytes": 7820
     },
     {
       "path": "adoption/hardware-profiles.json",
