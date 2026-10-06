@@ -1,11 +1,10 @@
 # Decision: Windows Terminal tab titles, needed-only alerts and colour depth for the native clients (2026-09-28)
 
-**Decided by:** the user's direction of 2026-09-28 in this session, verbatim: "make sure each one shown their title,each tab
-with sota convergenced practice,bell should NOT ring all the time, only with real speacial reasons when esclated and the
-sound should not too large"; "optimize with the best practice you deem the best" (asked whether to keep testing by hand);
-"with current best sota practice" (persistence and dashboard); "also with latest sota practice,only show notification for
-real needed choose action etc per user waiting,otherwise there are too much noise" (toasts); "Not now" (phone push); and
-the approval of the plan that preceded this record.
+**Decided by:** the user's approved policy of 2026-09-28: give each native-client
+tab a distinct title, use maintained upstream terminal practices, and reserve a
+quiet audible alert for an escalation or decision requiring the user. Research
+informs the defaults for persistence, dashboards and notifications; phone push
+was deferred. The user approved the plan before this record.
 
 **Scope:** one workstation (WSL2 distro `NativeStack`, Windows Terminal 1.24.11911.0, Claude Code 2.1.284, Codex 0.157.1).
 Runtime settings changed on the host only; the settings template and `AGENTS.md` are unchanged. The change also registers
@@ -62,9 +61,14 @@ point here.
    sound; Windows Ding is -40.9 (peak -22.7), 16 dB quieter; ding.wav is -50.0 (0.4 s) if that is still too loud. A check
    in the host repository refuses, on the Claude and Codex profiles, any `bellSound` that is not exactly a measured quiet file directly in `C:\Windows\Media` (a subdirectory or a `..` path is refused; since 2026-09-30, after a cross-family review, and where that folder is readable from WSL the file must exist) and refuses
    `audible` on the static ones.
-3. **Alerts only when a decision is pending.** `~/.claude/settings.json`: `preferredNotifChannel` is
+3. **Alerts only when a decision is pending — CURRENT SOURCE RECOMMENDATION (2026-10-06).**
+   The recommended `~/.claude/settings.json` sets `preferredNotifChannel` to
    `notifications_disabled` (hooks still run) and one `Notification` hook, matcher <!-- operative-matcher -->`auth_storage_failure|permission_prompt|elicitation_dialog|elicitation_url_dialog|agent_needs_input|quota_auto_resume_stale|quota_auto_resume_disabled|worker_permission_prompt|push_notification`, command `jq -nc --arg s "$(printf '\a')" '{terminalSequence:$s}'` (the hooks reference's construction, so no control
-   byte sits in the settings string). The dialog types wait about 6 s for the user first; `agent_needs_input` fires when a background
+   byte sits in the settings string). **Live application of this expanded matcher is PENDING CC action**;
+   [Q55](2026-10-06-auth-storage-failure-notification.md) adds the source-only
+   `auth_storage_failure` classification. Earlier dated host observations below
+   retain their original scope and do not establish application of this expansion.
+   The dialog types wait about 6 s for the user first; `agent_needs_input` fires when a background
    session starts waiting while agent view is open (its documented 6 s applies to an agent-team setup question); the
    quota types fire when the quota event occurs; `worker_permission_prompt` fires from the team inbox poller; `push_notification` was added on 2026-09-29 (see the last update). `idle_prompt` (the finished-and-waiting
    ping) is excluded on purpose, which also silences a question asked in prose and then left waiting; add it to the

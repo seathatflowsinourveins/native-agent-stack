@@ -94,7 +94,8 @@ export field except the Lite flags.
 ([`core/src/config/mod.rs:2143-2171`](https://github.com/openai/codex/blob/a956835d/codex-rs/core/src/config/mod.rs#L2143-L2171)),
 and the static manager keeps that catalog authoritative
 ([`models-manager/src/manager.rs:757-827`](https://github.com/openai/codex/blob/a956835d/codex-rs/models-manager/src/manager.rs#L757-L827)).
-There is no automatic refresh. Run the
+In that cited a956835d implementation, the static manager's refresh methods
+are no-ops. This source-scoped observation requires running the
 [currency upgrade checklist](../codex-currency-upgrade-checklist.md) at every
 Codex upgrade, before reusing the opt-in profile; record the new version and
 both export/projection hashes. The workhorse does not reference this projection.

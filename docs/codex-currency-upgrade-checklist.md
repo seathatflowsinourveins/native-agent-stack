@@ -6,11 +6,18 @@ catalog and Lite. The designated client-configuration owner applies profile
 and catalog changes; a currency lane prepares evidence and a review packet.
 See the [2026-10-06 decision](decisions/2026-10-06-codex-omniroute-opt-in-search.md).
 
-1. Confirm the installed version with `rtk codex --version` and read that
-   version's official release notes. Confirm `rtk codex debug models --help`
-   still documents `--bundled`, and verify the tag's implementation before
-   using a changed command. At 0.160.1, it directly serializes the embedded
-   catalog without loading client config/auth
+1. Check and record capability evidence in this order: **FIRST, installed
+   client** version (`rtk codex --version`), relevant help (including
+   `rtk codex debug models --help`) and the relevant non-secret settings it
+   reads; **SECOND, that installed version's changelog or official release
+   notes**; **THIRD, upstream source at the installed tag**; **FOURTH, official
+   documentation**. Retain commands, returned observations and dated source
+   locators in the upgrade record; never record credential values. Confirm the
+   installed help still documents `--bundled` and verify the implementation
+   before using a changed command. An absence claim must name at least the
+   installed-client and version-changelog checks, or be limited to what the
+   cited source shows. At 0.160.1, the inspected implementation directly
+   serializes the embedded catalog without loading client config/auth
    ([openai/codex@rust-v0.160.1: cli/src/main.rs:2068-2095](https://github.com/openai/codex/blob/rust-v0.160.1/codex-rs/cli/src/main.rs#L2068-L2095)).
 2. Export the newly installed binary's catalog and record its SHA256. Do not
    reuse the old projection or manually change model metadata. The native
@@ -26,8 +33,8 @@ See the [2026-10-06 decision](decisions/2026-10-06-codex-omniroute-opt-in-search
    **absolute** `model_catalog_json` path and retain the prior artifact for
    rollback. Keep `web_search = "live"` and both standalone switches false in
    the opt-in profile. Do not add that catalog path to the workhorse or base
-   config. The catalog replaces the default at startup and does not refresh
-   automatically
+   config. In the cited a956835d implementation, the startup catalog replaces
+   the default and the static manager's refresh methods are no-ops
    ([core/src/config/mod.rs:2143-2171 at a956835d](https://github.com/openai/codex/blob/a956835d/codex-rs/core/src/config/mod.rs#L2143-L2171),
    [models-manager/src/manager.rs:757-827](https://github.com/openai/codex/blob/a956835d/codex-rs/models-manager/src/manager.rs#L757-L827)).
 5. Start a fresh opt-in session after application. Under the coordinator's
