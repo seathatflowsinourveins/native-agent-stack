@@ -17238,8 +17238,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-harness-context-budget.md",
-      "sha256": "d11e199975995de0b328cc4603c6a3a158eeba43c627e92d74d2f1f256cd272a",
-      "bytes": 54584
+      "sha256": "9f1ddd367361a6f9c88b78d18e4f230b80935e966c9d1e3e91aacd578024c38e",
+      "bytes": 55486
     },
     {
       "path": "docs/decisions/2026-10-05-main-checkout-backup-disposition.md",
@@ -17273,8 +17273,8 @@
     },
     {
       "path": "docs/decisions/2026-10-05-user-facing-local-time.md",
-      "sha256": "4f85e48639c929983409d441a655c82d269c4cf6e6ffaf518861c49dc7227eab",
-      "bytes": 29182
+      "sha256": "8bc7cb99e2b415fff9a1c4a7784c21291f3cacefac97107277a11988af9b1a34",
+      "bytes": 35121
     },
     {
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
@@ -54643,7 +54643,7 @@
     },
     {
       "path": "tests/test_codex_worker_lane.py",
-      "sha256": "8ad69ae5015c4d212001d7eedca10a35fa3fbfc45201d336c57de010067375fc",
+      "sha256": "558925fea22815575e0dc5856bafba739d06bf0d4b3f40f8fb4f49960c322c0b",
       "bytes": 191495
     },
     {
@@ -55513,7 +55513,7 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "a4a3b5fd21037fbffe1f96cf1c3b55cdf429ffa8ae3a680c3b48bbab7f5bcd96",
+      "sha256": "0df4d00a9ca66f4f8b3ce3da9d27d0c6bbfec9b2045ead14dfdcf21911dd845c",
       "bytes": 153006
     },
     {
