@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "id": "skills-workflow-round2-source-checkpoint-20261006",
+  "evidence_class": "local_integration_check",
+  "status": "source_checkpoint_not_ready",
+  "checked_at": "2026-10-06",
+  "scope": "S1 canonical routing, S7 preload-only variants and S8 foundation rules. P0-1 token-tool grants are held; no client, runtime worker or host apply.",
+  "sources": [
+    "https://code.claude.com/docs/en/sub-agents#preload-skills-into-subagents",
+    "https://code.claude.com/docs/en/memory#path-specific-rules",
+    "native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a:adoption/agents/claude",
+    "native-agent-stack@0d5e6506434fab598dee861c749a22e628beb75a:docs/lanes.md",
+    "https://pypi.org/pypi/PyYAML/6.0.3/json"
+  ],
+  "selected_contract": {
+    "task_routes": 17,
+    "variant_definitions": 7,
+    "active_variants": 3,
+    "passive_variants": 4,
+    "full_base_role_copies_equal_main": "15 of 15 byte-identical",
+    "variant_tool_grants": "Base grants remain byte-identical; the passive packet-skill role adds only Skill.",
+    "pending_routes": "Unregistered skill sources, SDK consumers and packet delivery remain inert.",
+    "historical_decisions": "Entire September25 and September26 main files preserved; later candidate rows and hold rationale reside in the October6 decision."
+  },
+  "local_checks": [
+    {"command": "python3 tools/adoption/render_workflow.py", "exit_code": 0},
+    {"command": "python3 tools/adoption/render_workflow.py --check", "exit_code": 0},
+    {
+      "command_scope": "tests.test_workflow_manifest, tests.test_install_claude_profile, tests.test_token_e2e_preregistration and three required tracked-inventory/classification/workflow methods",
+      "exit_code": 0,
+      "tests": 183,
+      "skips": 0,
+      "duration_seconds": 4.331,
+      "private_log": {"name": "workflow-focused-scope-final.log", "bytes": 44068, "sha256": "5deab39fb169fd278b3596a7cadf409c6f9afabdd69d643c165555d620980bf0"},
+      "boundary": "Authored integration/preregistration tests, not unchanged upstream tests or fresh model discovery."
+    }
+  ],
+  "retained_failures": [
+    {
+      "private_log": {"name": "workflow-focused-1.log", "sha256": "276c28f728f757f610da37494e6e8a6cb7710833c42960623be152d63288669e"},
+      "exit_code": 1,
+      "tests": 146,
+      "failures": 3,
+      "errors": 1,
+      "skips": 1,
+      "corrections": "Read preload eligibility from the canonical kept/trial store instead of the historical table; remove the passive role from the active dispatch table; initialize the mutant's optional container; supply the existing installed context-mode security module. No runtime gate or rejection assertion was relaxed."
+    },
+    {
+      "private_log": {"name": "workflow-validate-checkpoint-1.log", "sha256": "4c2e03c1a085894780867f4a9a9c10a18f319c4f3efddf6a8ab3f8cf1042ab78"},
+      "exit_code": 1,
+      "actual_failure": "Registry reconstruction encountered unstaged withdrawn role files; validation consequently saw stale or missing entries.",
+      "correction": "Stage all owned withdrawals, restore the frozen main registry and verify its exact bytes before register_file; require registration success before validation."
+    },
+    {"check": "git diff --cached --check", "exit_code": 2, "correction": "Removed three trailing spaces in renderer source; final focused checks pass after the correction."}
+  ],
+  "readiness_limits": [
+    "A15 native per-role BEFORE census awaits repaired-adapter source review and the post-relaunch serial scan. Unknown values are not zero or a completed measurement.",
+    "AFTER remains pending the command center's grant deployment and first seven days; scopes are never added together.",
+    "P0-1 grants, including Serena, remain private plan inputs under the client-wiring hold.",
+    "Permission settings and host cleanup remain needs_user/command-center actions.",
+    "PR642 owns the three catalog PyYAML steps. This draft changes no owner workflow; its landing dependency remains explicit.",
+    "No first-party skill copy, executable worker copy or duplicate evaluation recipe is introduced here; source lifecycle registration and S11 consumers remain owner gates.",
+    "No native delivery, organic use, skills A/B, SDK provider or host acceptance is claimed."
+  ],
+  "publication_gate": "Official register_file reconstruction from the exact frozen-main registry, final validator, content commit then registry last; source checkpoint is durable before relaunch."
+}
