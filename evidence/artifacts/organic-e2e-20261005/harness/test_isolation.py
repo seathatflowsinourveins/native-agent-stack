@@ -20,6 +20,11 @@
   - CL7b's census.
 - P2-2, in its own commit (HostBrokers): inside a trial's namespace, the user manager (`systemd-run --user`), rootless
   Docker's socket and WSL interop are unreachable, and the runtime folder is private.
+- Round 6e (GPT read of b2d44f73, two P2s):
+  - the forward's access log counts every admitted model call at admission, and a call without a request id fails G11
+    and the calibration (netfilter's own Filter in front of a stand-in gateway, then collection and grading);
+  - stage 2's control flow in pilot.py, driven through pilot.main with a recording step (PilotStage2): the calibration
+    is run, collected and checked before any other cell or retry. These start no client and no process.
 These are local integration checks of this harness, not upstream acceptance."""
 from __future__ import annotations
 
@@ -66,6 +71,67 @@ def _synthetic_plan(client: str = "claude"):
     plan = isolation.plan(cfg, isolation.RUNS_ROOT / "unit-run", trial_id, client, fixture, clone=clone, settings=settings,
                           prompt=work / "prompts" / f"{trial_id}.txt")
     return isolation, cfg, plan, trial_id, fixture, work
+
+
+def _relay_log(tmp: Path, answers) -> Path:
+    """netfilter's own Filter in front of a stand-in gateway on this host's loopback, one POST /v1/responses per entry
+    of answers; returns the access log. An entry is the X-OmniRoute-Request-Id its response carries, None for a
+    response without that header, "hang" for a call still in flight when its handler is stopped (as when the forwarder
+    ends), or "down" for a gateway that no longer listens."""
+    import asyncio
+    import isolation
+    import netfilter
+    log, sock = tmp / "access.jsonl", tmp / "gateway.sock"
+
+    async def scenario():
+        async def gateway(reader, writer):
+            try:
+                head = await reader.readuntil(b"\r\n\r\n")
+                answer = head.split(b"X-Answer: ", 1)[1].split(b"\r\n", 1)[0].decode()
+                if answer == "hang":
+                    await reader.read()   # until the filter closes the connection
+                    return
+                await reader.readexactly(2)
+                extra = b"" if answer == "none" else f"X-OmniRoute-Request-Id: {answer}\r\n".encode()
+                writer.write(b"HTTP/1.1 200 OK\r\n" + extra + b"Content-Length: 2\r\nConnection: close\r\n\r\n{}")
+                await writer.drain()
+            finally:
+                writer.close()
+
+        upstream = await asyncio.start_server(gateway, "127.0.0.1", 0)
+        port = upstream.sockets[0].getsockname()[1]
+        forward = {**isolation.network_for("codex", str(uuid.uuid4()))["forwards"]["gateway"],
+                   "upstream": ["127.0.0.1", port]}
+        filt = netfilter.Filter({"access_log": str(log), "scope": {}})
+        tasks = []
+
+        def handler(reader, writer):
+            tasks.append(asyncio.ensure_future(filt.handle("gateway", forward, reader, writer)))
+
+        front = await asyncio.start_unix_server(handler, path=str(sock), limit=netfilter.MAX_HEAD)
+        for number, answer in enumerate(answers, 1):
+            if answer == "down" and upstream.is_serving():
+                upstream.close()
+            reader, writer = await asyncio.open_unix_connection(str(sock))
+            writer.write((f"POST /v1/responses HTTP/1.1\r\nHost: gateway\r\nX-Answer: {answer or 'none'}\r\n"
+                          "Content-Length: 2\r\n\r\n{}").encode())
+            await writer.drain()
+            if answer == "hang":
+                for _ in range(300):   # until this call's admission row is written
+                    if log.read_text().count('"admitted"') >= number:
+                        break
+                    await asyncio.sleep(0.01)
+                tasks[-1].cancel()
+            else:
+                await reader.read()
+            writer.close()
+        await asyncio.gather(*tasks, return_exceptions=True)
+        front.close()
+        upstream.close()
+        filt.log.close()
+
+    asyncio.run(scenario())
+    return log
 
 
 @unittest.skipUnless(HOST_READY, "needs /usr/bin/bwrap and the experiment's roots on this host")
@@ -719,6 +785,10 @@ class NetFilterRules(unittest.TestCase):
         self.assertEqual((out["status"], out["time"]), ("ok", 0.001))
         with self.assertRaises(ValueError):
             netfilter.filter_collection_list(b'{"result": []}', "x")
+        # A compressed listing is not passed through unread: it cannot be filtered, so the forward answers 502.
+        import gzip
+        with self.assertRaises(ValueError):
+            netfilter.filter_collection_list(gzip.compress(body), "ns2604_trial_a_")
 
     def test_vllm_admits_embeddings_and_models_only(self):
         import isolation
@@ -818,9 +888,9 @@ class Round5Grading(unittest.TestCase):
         self.assertEqual(tags, {"wsl-interop": ["p", "w"], "gateway-management-api": ["g"], "local-service-http": ["l"],
                                 "ai-memory-http": ["m"]})
 
-    def _collect(self, rows, details):
+    def _collect(self, rows, details, request_ids=("req-a", "req-b"), forward=None):
         """common.gateway_calls_for_trial against a stand-in gateway: the list answers rows; a detail answers from
-        details, or fails when details holds an exception."""
+        details, or fails when details holds an exception. forward is the trial's gateway forward record."""
         import common
 
         def fake(path, timeout=30):
@@ -834,7 +904,8 @@ class Round5Grading(unittest.TestCase):
         saved = common.gateway_get
         common.gateway_get = fake
         try:
-            return common.gateway_calls_for_trial(["req-a", "req-b"], "2026-10-06T12:00:00Z", "2026-10-06T13:00:00Z")
+            return common.gateway_calls_for_trial(list(request_ids), "2026-10-06T12:00:00Z", "2026-10-06T13:00:00Z",
+                                                  **({} if forward is None else {"forward": forward}))
         finally:
             common.gateway_get = saved
 
@@ -852,10 +923,13 @@ class Round5Grading(unittest.TestCase):
         row = lambda rid: {"id": rid, "correlationId": "c-" + rid, "timestamp": "2026-10-06T12:00:01Z",
                            "path": "/v1/responses"}
 
+        # Round 6e: the forward counted two admitted model calls, each with a request id.
+        counted = {"gateway_model_requests": 2, "gateway_model_calls_without_id": [], "unparsed_rows": 0}
+
         def judge(out):
             calls = [c for v in out["by_thread"].values() for c in v]
             effort = {**base, "tier_calls": [{"id": c["id"], "forwarded": c.get("forwarded_service_tier")} for c in calls]}
-            coverage = grade.call_coverage(["req-a", "req-b"], grade.evidence_calls(calls))
+            coverage = grade.call_coverage(["req-a", "req-b"], grade.evidence_calls(calls), counted)
             return coverage, grade.g11_trial_ok(effort, "default", coverage)
 
         both = self._collect([row("req-a"), row("req-b")], {"req-a": good, "req-b": other_thread})
@@ -871,20 +945,143 @@ class Round5Grading(unittest.TestCase):
         self.assertEqual(coverage["missing"], ["req-b"])
         self.assertEqual(unmatched["unresolved_request_ids"], ["req-b"])
         self.assertFalse(grade.call_coverage([], [])["ok"])   # no required call recorded: nothing to establish
+        # Round 6e (GPT read of b2d44f73, P2): the admitted model calls must be counted, each with an id of its own.
+        evidence = grade.evidence_calls([c for v in both["by_thread"].values() for c in v])
+        ids = ["req-a", "req-b"]
+        self.assertTrue(grade.call_coverage(ids, evidence, counted)["ok"])
+        self.assertFalse(grade.call_coverage(ids, evidence)["ok"])   # no count in the record: absent is not empty
+        without_list = {k: v for k, v in counted.items() if k != "gateway_model_calls_without_id"}
+        self.assertFalse(grade.call_coverage(ids, evidence, without_list)["ok"])
+        self.assertFalse(grade.call_coverage(ids, evidence, {**counted, "gateway_model_requests": 3})["ok"])
+        self.assertFalse(grade.call_coverage(ids, evidence, {**counted, "unparsed_rows": 1})["ok"])
+        self.assertFalse(grade.call_coverage(ids, evidence, {**counted, "unparsed_rows": None})["ok"])
+        shared = grade.call_coverage(["req-a", "req-a"], evidence, counted)
+        self.assertFalse(shared["ok"])
+        self.assertEqual(shared["duplicate_ids"], ["req-a"])
 
     def test_only_model_calls_are_required(self):
-        """The gateway forward's required ids are the model calls' (each leaves a call-log row); a model-list read is
-        kept apart."""
+        """The gateway forward's required calls are the model calls (each leaves a call-log row); a model-list read is
+        kept apart. Round 6e (GPT read of b2d44f73, P2): they are counted from their admission rows, so a model call
+        whose response carried no request id, or that has no outcome row, is listed and never dropped."""
         import netfilter
-        with tempfile.TemporaryDirectory() as tmp:
-            log = Path(tmp) / "access.jsonl"
-            log.write_text("\n".join(json.dumps(r) for r in (
-                {"forward": "gateway", "decision": "allowed", "path": "/v1/responses", "request_id": "r1"},
-                {"forward": "gateway", "decision": "allowed", "path": "/v1/responses/compact", "request_id": "r2"},
-                {"forward": "gateway", "decision": "allowed", "path": "/v1/models", "request_id": "m1"})) + "\n")
-            summary = netfilter.summarize(log)
+
+        def summarize(rows, tail=""):
+            with tempfile.TemporaryDirectory() as tmp:
+                log = Path(tmp) / "access.jsonl"
+                log.write_text("\n".join(json.dumps(r) for r in rows) + "\n" + tail)
+                return netfilter.summarize(log)
+
+        def pair(conn, path, method="POST", forward="gateway", **outcome):
+            base = {"forward": forward, "method": method, "path": path, "conn": conn}
+            return [{**base, "decision": "admitted"}, {**base, "decision": "allowed", "status": 200, **outcome}]
+
+        rows = (pair("1-1", "/v1/responses", request_id="r1") + pair("1-2", "/v1/responses/compact", request_id="r2")
+                + pair("1-3", "/v1/models", "GET", request_id="m1")
+                + pair("1-4", "/v1/responses")                          # answered without a request id
+                + pair("1-5", "/v1/chat/completions")[:1]              # admitted, and no outcome row
+                + pair("1-6", "/v1/logs", forward="otlp")
+                + [{"forward": "gateway", "method": "GET", "path": "/api/health", "decision": "denied", "reason": "x"}])
+        summary = summarize(rows)
+        self.assertEqual(len(summary["gateway_request_ids"]) + len(summary.get("gateway_model_calls_without_id") or []), 4,
+                         "an admitted model call is missing from the summary")
         self.assertEqual(summary["gateway_request_ids"], ["r1", "r2"])
         self.assertEqual(summary["gateway_other_request_ids"], ["m1"])
+        self.assertEqual(summary["gateway_model_requests"], 4)
+        self.assertEqual([(c["conn"], c["method"], c["path"], c["outcome"], c["status"])
+                          for c in summary["gateway_model_calls_without_id"]],
+                         [("1-4", "POST", "/v1/responses", "allowed", 200),
+                          ("1-5", "POST", "/v1/chat/completions", None, None)])
+        # An admission is not a second request: requests and by_forward count outcomes.
+        self.assertEqual((summary["requests"], summary["admitted"], summary["unparsed_rows"]), (6, 6, 0))
+        self.assertEqual(summary["by_forward"], {"gateway": {"allowed": 4, "denied": 1}, "otlp": {"allowed": 1}})
+        # A log without admission rows (written before round 6e): an allowed model row without an id is still a call.
+        earlier = summarize([{"forward": "gateway", "decision": "allowed", "path": "/v1/responses", "request_id": "r1"},
+                             {"forward": "gateway", "decision": "allowed", "path": "/v1/responses"}])
+        self.assertEqual((earlier["gateway_model_requests"], earlier["gateway_request_ids"],
+                          len(earlier["gateway_model_calls_without_id"])), (2, ["r1"], 1))
+        # A row that cannot be read is counted; a missing log counts nothing, which is unknown and never zero.
+        self.assertEqual(summarize(pair("1-1", "/v1/responses", request_id="r1"), '{"forward": "gatew')["unparsed_rows"], 1)
+        missing = netfilter.summarize(Path("/nonexistent/access.jsonl"))
+        self.assertEqual((missing["log"], missing["gateway_model_requests"], missing["gateway_model_calls_without_id"]),
+                         ("missing", None, None))
+
+    def test_the_access_log_counts_a_model_call_at_admission(self):
+        """Round 6e (GPT read of b2d44f73, P2): netfilter's own Filter in front of a stand-in gateway. Every admitted
+        model call is in the log from its admission, whatever its response carries: with its id, or listed without
+        one (a response without the header, a call in flight when the forwarder stops, a gateway that is down)."""
+        import netfilter
+        with tempfile.TemporaryDirectory() as tmp:
+            log = _relay_log(Path(tmp), ["req-a", None, "hang", "down"])
+            text = log.read_text()
+            summary = netfilter.summarize(log)
+        rows = [json.loads(line) for line in text.splitlines()]
+        self.assertEqual(len(summary["gateway_request_ids"]) + len(summary.get("gateway_model_calls_without_id") or []), 4,
+                         "an admitted model call is missing from the summary")
+        self.assertEqual(summary["gateway_model_requests"], 4)
+        self.assertEqual(summary["gateway_request_ids"], ["req-a"])
+        without = summary["gateway_model_calls_without_id"]
+        self.assertEqual([(c["outcome"], c["status"]) for c in without],
+                         [("allowed", 200), (None, None), ("upstream-unreachable", None)])
+        for call in without:
+            self.assertTrue(call["conn"] and call["at"], call)
+            self.assertEqual((call["method"], call["path"]), ("POST", "/v1/responses"))
+        # Each admission row comes before its connection's outcome row, and the log keeps no header or body.
+        order = [(r["decision"], r.get("conn")) for r in rows]
+        self.assertEqual(len({conn for decision, conn in order if decision == "admitted"}), 4, order)
+        for decision, conn in order:
+            if decision != "admitted":
+                self.assertLess(order.index(("admitted", conn)), order.index((decision, conn)), order)
+        self.assertEqual((summary["requests"], summary["admitted"]), (3, 4))
+        self.assertNotIn("X-Answer", text)
+        self.assertEqual({key for row in rows for key in row} - {"at", "forward", "method", "path", "decision", "conn",
+                                                                 "status", "request_id"}, set())
+
+    def test_a_model_call_without_a_request_id_fails_g11_and_the_calibration(self):
+        """Round 6e (GPT read of b2d44f73, P2), the regression through summarization, collection and grading: call A's
+        response carries its request id and its call-log row holds full evidence, and call B's response carries no id.
+        B is listed, G11 fails for the trial and the calibration fails. With both ids present, all three pass."""
+        import grade
+        import netfilter
+        good = {"requestBody": {"client_metadata": {"thread_id": "t1"}, "reasoning": {"effort": "max"}},
+                "pipelinePayloads": {"providerRequest": {"service_tier": "default", "reasoning": {"effort": "max"}}}}
+        base = {"requested_turn_context": "max", "gateway_build": "b", "gateway_forwarded": ["max"]}
+        row = lambda rid: {"id": rid, "correlationId": "c-" + rid, "timestamp": "2026-10-06T12:00:01Z",
+                           "path": "/v1/responses"}
+
+        def chain(answers, log_rows):
+            with tempfile.TemporaryDirectory() as tmp:
+                root = Path(tmp)
+                summary = netfilter.summarize(_relay_log(root, answers))                          # summarization
+                record = self._collect([row(r) for r in log_rows], {r: good for r in log_rows},   # collection
+                                       summary["gateway_request_ids"], summary)
+                (root / "gateway").mkdir()
+                (root / "gateway" / "t1.json").write_text(json.dumps(record))
+                calls = [c for v in record["by_thread"].values() for c in v]                      # grading
+                effort = {**base, "gateway_calls": len(calls),
+                          "tier_calls": [{"id": c["id"], "forwarded": c.get("forwarded_service_tier")} for c in calls]}
+                coverage = grade.call_coverage(summary["gateway_request_ids"], grade.evidence_calls(calls), summary)
+                return (summary, record, coverage, grade.g11_trial_ok(effort, "default", coverage),
+                        grade.call_id_calibration(root, "t1"))
+
+        summary, record, coverage, g11, calibration = chain(["req-a", None], ["req-a"])
+        self.assertFalse(g11, coverage)
+        self.assertFalse(coverage["ok"])
+        self.assertEqual((coverage["required"], coverage["model_requests"], coverage["missing"], coverage["incomplete"]),
+                         (1, 2, [], []))   # A's own evidence is complete: only the call without an id fails
+        self.assertEqual([(c["path"], c["outcome"], c["status"]) for c in coverage["without_id"]],
+                         [("/v1/responses", "allowed", 200)])
+        self.assertIn("no request id", coverage["uncounted"])
+        self.assertEqual((record["request_ids"], record["unmatched_request_ids"], record["model_requests"]), (1, 0, 2))
+        self.assertEqual(record["model_calls_without_id"], summary["gateway_model_calls_without_id"])
+        self.assertEqual(record["detail_requests"], ["req-a"])   # nothing is looked up for the call without an id
+        self.assertFalse(calibration["pass"])
+        self.assertIn("no request id", calibration["cause"])
+        self.assertEqual(calibration["model_calls_without_id"], summary["gateway_model_calls_without_id"])
+        # The same chain with both responses carrying their ids passes, so the failure above is B's missing id.
+        summary, record, coverage, g11, calibration = chain(["req-a", "req-b"], ["req-a", "req-b"])
+        self.assertTrue(g11, coverage)
+        self.assertEqual((coverage["model_requests"], coverage["without_id"], coverage["uncounted"]), (2, [], None))
+        self.assertTrue(calibration["pass"], calibration)
 
     def test_a_tool_that_cannot_run_is_not_testable(self):
         """Round 6b (1): a tool under test that cannot run inside a trial has its cells marked NOT-TESTABLE with the
@@ -916,11 +1113,12 @@ class Round5Grading(unittest.TestCase):
             (root / "gateway").mkdir()
             (root / "run.json").write_text(json.dumps({"tests_by_ref": {"r1": {"gate_trial": True, "stage": 2}}}))
             (root / "ledger.jsonl").write_text(json.dumps({"phase": "launched", "ref": "r1", "trial_id": "t1"}) + "\n")
+            counted = {"model_requests": 2, "model_calls_without_id": [], "access_log_unparsed_rows": 0}
             (root / "gateway" / "t1.json").write_text(json.dumps(
-                {"request_ids": 2, "unmatched_request_ids": 1, "by_thread": {"x": [{"id": "a"}]}}))
+                {"request_ids": 2, "unmatched_request_ids": 1, "by_thread": {"x": [{"id": "a"}]}, **counted}))
             self.assertEqual(grade.main(["calibration", "--run-root", str(root)]), 1)
             (root / "gateway" / "t1.json").write_text(json.dumps(
-                {"request_ids": 2, "unmatched_request_ids": 0, "by_thread": {"x": [{"id": "a"}, {"id": "b"}]}}))
+                {"request_ids": 2, "unmatched_request_ids": 0, "by_thread": {"x": [{"id": "a"}, {"id": "b"}]}, **counted}))
             self.assertEqual(grade.main(["calibration", "--run-root", str(root)]), 0)
             self.assertEqual(oct((root / "calibration.json").stat().st_mode & 0o777), "0o600")
 
@@ -933,14 +1131,27 @@ class Round5Grading(unittest.TestCase):
             (root / "gateway").mkdir()
             def write(tid, data):
                 (root / "gateway" / f"{tid}.json").write_text(json.dumps(data))
-            write("ok", {"request_ids": 3, "unmatched_request_ids": 0, "by_thread": {"t": [{"id": "a"}, {"id": "b"}]}})
-            write("unmatched", {"request_ids": 3, "unmatched_request_ids": 1, "by_thread": {"t": [{"id": "a"}]}})
-            write("none", {"request_ids": 0, "unmatched_request_ids": 0, "by_thread": {}})
+            counted = {"model_requests": 3, "model_calls_without_id": [], "access_log_unparsed_rows": 0}
+            matched = {"request_ids": 3, "unmatched_request_ids": 0, "by_thread": {"t": [{"id": "a"}, {"id": "b"}]}}
+            write("ok", {**matched, **counted})
+            write("unmatched", {"request_ids": 3, "unmatched_request_ids": 1, "by_thread": {"t": [{"id": "a"}]}, **counted})
+            write("none", {"request_ids": 0, "unmatched_request_ids": 0, "by_thread": {}, **counted, "model_requests": 0})
+            # Round 6e (GPT read of b2d44f73, P2): a model call without a request id fails the calibration, and so does
+            # a record that does not establish there was none.
+            no_id = {"conn": "1-4", "at": "2026-10-06T12:00:02Z", "method": "POST", "path": "/v1/responses",
+                     "outcome": "allowed", "status": 200}
+            write("no-id", {**matched, **counted, "model_requests": 4, "model_calls_without_id": [no_id]})
+            write("uncounted", matched)                                           # a record from before round 6e
+            write("unread", {**matched, **counted, "access_log_unparsed_rows": 1})
+            write("shared-id", {**matched, **counted, "model_requests": 4})        # four calls, three distinct ids
             self.assertTrue(grade.call_id_calibration(root, "ok")["pass"])
-            for tid in ("unmatched", "none", "missing", None):
+            for tid in ("unmatched", "none", "missing", None, "no-id", "uncounted", "unread", "shared-id"):
                 result = grade.call_id_calibration(root, tid)
                 self.assertFalse(result["pass"], tid)
                 self.assertTrue(result["cause"], tid)
+            listed = grade.call_id_calibration(root, "no-id")
+            self.assertIn("no request id", listed["cause"])
+            self.assertEqual(listed["model_calls_without_id"], [no_id])
 
     def test_g11_fails_closed_on_tier_evidence(self):
         """GPT read of a513616d, P2: the launch tier must be default and every call's forwarded tier normal. A missing
@@ -1688,6 +1899,123 @@ HOME_ = Path.home()
 def shutil_which(name):
     import shutil
     return shutil.which(name)
+
+
+class PilotStage2(unittest.TestCase):
+    """Round 6e (GPT read of b2d44f73, P2): stage 2's control flow, through pilot.main itself. pilot.step is replaced by
+    a recorder that answers with scripted exit codes, and starting any process fails the test, so no block, collector
+    or grader runs. The prompted test's reference sorts before G1's, as a random reference can."""
+
+    GATE, PROBE = "zz-gate", "aa-probe"
+    RERUN_G1, RERUN_PROBE = "stage 2 rerun gate0-G1", "stage 2 rerun probe-codex-native"
+    CELL_G1, CELL_PROBE = "stage 2 calibration codex-native-gate0", "stage 2 prompted-codex-native"
+    COLLECT, CHECK = "stage 2 calibration collect", "stage 2 calibration check"
+    END = ["stage 2 collect", "stage 2 gate0"]
+    BOTH = ("gate0-G1", "probe-codex-native")
+
+    def _run(self, failed=None, codes=None, ran_before=True, flag=True):
+        """(exit code, step labels in order, each step's command) of `pilot.py --from-stage 2 --to-stage 2`.
+        failed: the gate-0 checks that failed in an earlier pass (None: no gate0.json yet). codes: a step's exit code
+        by label, or its exit codes in order (0 unless named). ran_before: both tests ran once already, and G1's
+        attempt was collected."""
+        import contextlib
+        import io
+        from unittest import mock
+        import pilot
+        codes, steps, cmds = codes or {}, [], {}
+        with tempfile.TemporaryDirectory() as tmp:
+            runs = Path(tmp)
+            root = runs / "r1"
+            (root / "gateway").mkdir(parents=True)
+            cfg = {"trial_root": str(runs / "work"), "binaries": {},
+                   "cells": {"codex-native-gate0": {"code": "c0", "repeat": 1, "refs": [self.GATE]},
+                             "prompted-codex-native": {"code": "c1", "repeat": 1, "refs": [self.PROBE]}},
+                   "tests_by_ref": {
+                       self.PROBE: {"stage": 2, "cell": "prompted-codex-native", "probe_key": "probe-codex-native"},
+                       self.GATE: {"stage": 2, "cell": "codex-native-gate0", "gate_trial": True, "test_key": "G1|c"}}}
+            (root / "run.json").write_text(json.dumps(cfg, sort_keys=True))
+            ledger = root / "ledger.jsonl"
+            ledger.write_text("")
+
+            def attempt(ref, trial_id):
+                with open(ledger, "a") as handle:
+                    for row in ({"phase": "launched", "ref": ref, "trial_id": trial_id},
+                                {"phase": "exit", "trial_id": trial_id, "reason": "completed"}):
+                        handle.write(json.dumps(row) + "\n")
+
+            if ran_before:
+                attempt(self.GATE, "gate-1")
+                attempt(self.PROBE, "probe-1")
+                (root / "gateway" / "gate-1.json").write_text("{}")
+            if failed is not None:
+                (root / "gate0.json").write_text(json.dumps({"checks": {key: {"pass": key not in failed}
+                                                                         for key in self.BOTH}}))
+
+            def step(label, cmd, log):
+                steps.append(label)
+                cmds[label] = cmd
+                code = codes.get(label, 0)
+                if isinstance(code, list):
+                    code = code.pop(0) if code else 0
+                if label in (self.RERUN_G1, self.CELL_G1) and not code:
+                    attempt(self.GATE, "gate-2")   # the rows the block writes for the new attempt
+                log.append({"step": label})
+                return code
+
+            argv = ["--run-id", "r1", "--from-stage", "2", "--to-stage", "2", "--no-reexec"]
+            with mock.patch.object(pilot, "RUNS_ROOT", runs), mock.patch.object(pilot, "step", step), \
+                    mock.patch.object(pilot.subprocess, "run", side_effect=AssertionError("a process was started")), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                code = pilot.main(argv + (["--rerun-gate0-failures"] if flag else []))
+        return code, steps, cmds
+
+    def test_a_retry_runs_the_calibration_first_and_stops_when_it_fails(self):
+        """G1 and a prompted check both failed, and the calibration check fails again: only G1 runs again, its new
+        attempt is collected and checked, and the prompted test is not retried."""
+        code, steps, cmds = self._run(failed=self.BOTH, codes={self.CHECK: 1})
+        self.assertEqual(steps, [self.RERUN_G1, self.COLLECT, self.CHECK])
+        self.assertEqual(code, 2)
+        self.assertEqual(cmds[self.RERUN_G1][cmds[self.RERUN_G1].index("--ref") + 1], self.GATE)
+        self.assertEqual(cmds[self.COLLECT][-1], "gate-2")   # the new attempt; the earlier record is left as it is
+        self.assertEqual(cmds[self.CHECK][-3:-2], ["calibration"])
+
+    def test_a_retry_goes_on_only_after_the_calibration_passed(self):
+        """The same two failures with the calibration passing: the prompted retry follows the check, then stage 2's
+        collection and gate 0."""
+        code, steps, _ = self._run(failed=self.BOTH)
+        self.assertEqual(steps, [self.RERUN_G1, self.COLLECT, self.CHECK, self.RERUN_PROBE] + self.END)
+        self.assertEqual(code, 0)
+
+    def test_a_retry_of_another_check_still_needs_the_calibration(self):
+        """Only the prompted check failed. The calibration is checked from its collected record before the retry, with
+        nothing launched and a passing record not read again. A check that fails stops before the retry."""
+        self.assertEqual(self._run(failed=("probe-codex-native",))[:2],
+                         (0, [self.CHECK, self.RERUN_PROBE] + self.END))
+        self.assertEqual(self._run(failed=("probe-codex-native",), codes={self.CHECK: 1})[:2],
+                         (2, [self.CHECK, self.COLLECT, self.CHECK]))
+
+    def test_a_refused_calibration_rerun_stops_the_retries(self):
+        self.assertEqual(self._run(failed=self.BOTH, codes={self.RERUN_G1: 1})[:2], (2, [self.RERUN_G1]))
+
+    def test_a_record_that_does_not_pass_gets_one_fresh_read(self):
+        """A calibration record from an earlier run that does not pass is read again once, then checked again, on the
+        retry path and on a resume of the initial path. A new attempt's record is read once."""
+        code, steps, cmds = self._run(failed=("probe-codex-native",), codes={self.CHECK: [1, 0]})
+        self.assertEqual((code, steps), (0, [self.CHECK, self.COLLECT, self.CHECK, self.RERUN_PROBE] + self.END))
+        self.assertEqual(cmds[self.COLLECT][-1], "gate-1")
+        self.assertEqual(self._run(flag=False, codes={self.CHECK: [1, 0]})[:2],
+                         (0, [self.CHECK, self.COLLECT, self.CHECK] + self.END))
+        self.assertEqual(self._run(failed=self.BOTH, codes={self.CHECK: [1, 0]})[:2],
+                         (2, [self.RERUN_G1, self.COLLECT, self.CHECK]))
+
+    def test_the_initial_path_shares_the_sequence(self):
+        """Without an earlier gate0.json (with or without the retry flag), the calibration cell runs first, and no other
+        cell runs unless its check passed."""
+        for flag in (False, True):
+            self.assertEqual(self._run(ran_before=False, flag=flag, codes={self.CHECK: 1})[:2],
+                             (2, [self.CELL_G1, self.COLLECT, self.CHECK]))
+        self.assertEqual(self._run(ran_before=False, flag=False)[:2],
+                         (0, [self.CELL_G1, self.COLLECT, self.CHECK, self.CELL_PROBE] + self.END))
 
 
 class UnroundedDeadline(unittest.TestCase):

@@ -21,7 +21,10 @@ module fills:
 - a CONNECT proxy: a tunnel only to the listed host:port pairs. TLS stays end to end.
 
 Every decision goes to the access log: forward, method, path (never the query, a header or a body), decision, reason,
-upstream status.
+upstream status. Round 6e (GPT read of b2d44f73, P2): an admitted HTTP request gets its row at admission ("admitted",
+with the connection's id), before the upstream is contacted, and its outcome row names the same connection. So a model
+call is counted whatever its response carries, and also when the relay fails or the forwarder stops while it is in
+flight (summarize).
 
     python3 -B netfilter.py serve --spec <spec.json>     prints READY once every socket listens; SIGTERM ends it
 """
@@ -306,19 +309,29 @@ class Filter:
         self.scope = spec.get("scope") or {}
         fd = os.open(spec["access_log"], os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)
         self.log = os.fdopen(fd, "a", buffering=1)
+        self.admitted = 0
 
     def record(self, **row) -> None:
         row = {"at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), **row}
         self.log.write(json.dumps(row, sort_keys=True) + "\n")
 
+    def admit(self, name: str, method: str, path: str) -> str:
+        """The admission row of one HTTP request, written before anything is forwarded; returns the connection's id
+        (this forwarder's pid and a counter, so ids stay distinct when a log is appended to)."""
+        self.admitted += 1
+        conn = f"{os.getpid()}-{self.admitted}"
+        self.record(forward=name, method=method, path=path, decision="admitted", conn=conn)
+        return conn
+
     async def handle(self, name: str, forward: dict, reader: asyncio.StreamReader, writer: asyncio.StreamWriter) -> None:
+        seen: dict = {}   # the admitted request of this connection (conn, method, path), for a failure's row
         try:
             if forward["kind"] == "connect":
                 await self.tunnel(name, forward, reader, writer)
             else:
-                await self.http(name, forward, reader, writer)
+                await self.http(name, forward, reader, writer, seen)
         except Exception as error:  # noqa: BLE001 - one connection's failure never ends the forwarder
-            self.record(forward=name, decision="error", reason=type(error).__name__)
+            self.record(forward=name, decision="error", reason=type(error).__name__, **seen)
         finally:
             _close(writer)
 
@@ -331,7 +344,7 @@ class Filter:
             raise Denied("request head too long") from None
         return parse_head(head[:-4])
 
-    async def http(self, name: str, forward: dict, reader, writer) -> None:
+    async def http(self, name: str, forward: dict, reader, writer, seen: dict | None = None) -> None:
         method, path = "?", "?"
         try:
             parsed = await self._head(reader)
@@ -362,12 +375,17 @@ class Filter:
             await _respond(writer, 403, "Forbidden")
             self.record(forward=name, method=method, path=path, decision="denied", reason=str(denial))
             return
+        # Round 6e (GPT read of b2d44f73, P2): the request is admitted, so it is counted here, independently of the
+        # response and its headers. Every later row of this connection carries the same id.
+        conn = self.admit(name, method, path)
+        if seen is not None:
+            seen.update(conn=conn, method=method, path=path)
         host, port = forward["upstream"]
         try:
             up_reader, up_writer = await asyncio.wait_for(asyncio.open_connection(host, port, limit=4 * MAX_HEAD), 15)
         except (OSError, asyncio.TimeoutError):
             await _respond(writer, 502, "Bad Gateway")
-            self.record(forward=name, method=method, path=path, decision="upstream-unreachable")
+            self.record(forward=name, method=method, path=path, decision="upstream-unreachable", conn=conn)
             return
         kept = [(k, v) for k, v in headers if k.lower() not in HOP_BY_HOP]
         up_writer.write(f"{method} {target} {version}\r\n".encode("ascii")
@@ -409,7 +427,7 @@ class Filter:
             if not sender.done():
                 sender.cancel()
             _close(up_writer)
-        self.record(forward=name, method=method, path=path, decision="allowed", status=status, **meta)
+        self.record(forward=name, method=method, path=path, decision="allowed", status=status, conn=conn, **meta)
 
     async def _rewrite_listing(self, head: bytes, up_reader, writer, prefix: str) -> None:
         """Read the whole upstream response (Content-Length, chunked or until close), filter its collection names to
@@ -496,31 +514,62 @@ async def serve(spec: dict) -> None:
 
 
 def summarize(access_log) -> dict:
-    """Counts per forward and decision, and the first denied requests (forward, method, path, reason)."""
-    out: dict = {"requests": 0, "by_forward": {}, "denied": [], "gateway_request_ids": [], "gateway_cache_hits": 0}
+    """Counts per forward and decision, the first denied requests (forward, method, path, reason), and the gateway
+    forward's model calls.
+
+    Round 6e (GPT read of b2d44f73, P2): a model call is counted from its admission row, so the count never depends on
+    the response. gateway_model_requests is every admitted model call. gateway_request_ids holds the ids of the calls
+    whose response carried one, and gateway_model_calls_without_id the other calls, each identifiable by its
+    connection, time, method, path, outcome and status. A call with no outcome row (the forwarder stopped while it was
+    in flight), one whose upstream was unreachable and one whose relay failed are calls without an id. An allowed model
+    row with no admission row (a log from before round 6e) is counted the same way. An admission is not a second
+    request: requests and by_forward count outcomes, and admitted counts the admissions."""
+    out: dict = {"requests": 0, "admitted": 0, "by_forward": {}, "denied": [], "gateway_request_ids": [],
+                 "gateway_model_requests": 0, "gateway_model_calls_without_id": [], "gateway_cache_hits": 0,
+                 "unparsed_rows": 0}
     try:
         lines = Path(access_log).read_text().splitlines()
     except OSError:
-        return {**out, "log": "missing"}
-    for line in lines:
+        # No log, no count: the admitted model calls are unknown, never zero.
+        return {**out, "gateway_model_requests": None, "gateway_model_calls_without_id": None, "unparsed_rows": None,
+                "log": "missing"}
+    calls: dict = {}   # the gateway forward's model calls by connection, in admission order
+    for number, line in enumerate(lines, 1):
         try:
             row = json.loads(line)
         except ValueError:
+            out["unparsed_rows"] += 1
+            continue
+        forward, decision, conn = row.get("forward") or "?", row.get("decision") or "?", row.get("conn")
+        model_call = forward == "gateway" and str(row.get("path") or "").startswith(MODEL_CALL_PATHS)
+        fresh = {"conn": conn, "at": row.get("at"), "method": row.get("method"), "path": row.get("path"),
+                 "outcome": None, "status": None, "request_id": None}
+        if decision == "admitted":
+            out["admitted"] += 1
+            if model_call:
+                calls.setdefault(conn or f"line-{number}", fresh)
             continue
         out["requests"] += 1
-        counts = out["by_forward"].setdefault(row.get("forward") or "?", {})
-        counts[row.get("decision") or "?"] = counts.get(row.get("decision") or "?", 0) + 1
-        if row.get("decision") == "denied" and len(out["denied"]) < 30:
+        counts = out["by_forward"].setdefault(forward, {})
+        counts[decision] = counts.get(decision, 0) + 1
+        if decision == "denied" and len(out["denied"]) < 30:
             out["denied"].append({k: row.get(k) for k in ("forward", "method", "path", "reason")})
-        if row.get("forward") == "gateway" and row.get("decision") == "allowed":
-            # The model calls' ids are the trial's required calls (each leaves a call-log row); other /v1 reads, such
-            # as the model list, are kept apart.
-            if row.get("request_id") and str(row.get("path") or "").startswith(MODEL_CALL_PATHS):
-                out["gateway_request_ids"].append(row["request_id"])
-            elif row.get("request_id"):
-                out.setdefault("gateway_other_request_ids", []).append(row["request_id"])
-            if str(row.get("cache_hit") or "").lower() in ("true", "1", "hit") or str(row.get("cache") or "").upper() == "HIT":
-                out["gateway_cache_hits"] += 1
+        if forward != "gateway":
+            continue
+        if conn in calls or (decision == "allowed" and model_call):
+            # The outcome of a model call: the trial's required calls are these (each leaves a call-log row).
+            call = calls.setdefault(conn or f"line-{number}", fresh)
+            call.update(outcome=decision, status=row.get("status"), request_id=row.get("request_id") or call["request_id"])
+        elif decision == "allowed" and row.get("request_id"):
+            # Other /v1 reads, such as the model list, are kept apart.
+            out.setdefault("gateway_other_request_ids", []).append(row["request_id"])
+        if decision == "allowed" and (str(row.get("cache_hit") or "").lower() in ("true", "1", "hit")
+                                      or str(row.get("cache") or "").upper() == "HIT"):
+            out["gateway_cache_hits"] += 1
+    out["gateway_model_requests"] = len(calls)
+    out["gateway_request_ids"] = [call["request_id"] for call in calls.values() if call["request_id"]]
+    out["gateway_model_calls_without_id"] = [{k: call[k] for k in ("conn", "at", "method", "path", "outcome", "status")}
+                                             for call in calls.values() if not call["request_id"]]
     return out
 
 

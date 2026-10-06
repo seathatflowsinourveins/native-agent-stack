@@ -155,6 +155,50 @@ This extends the Gate 0 network amendment above. Each forward serves a tool unde
   - **If it fails, G11 stays failed.** The key is then fixed from the deployed build's source (`omniroute-3.8.51-5f4b3d577-affinity-pr15167`), cited by file and line, and the calibration re-runs. There is no fallback that reads foreign ids.
 - **Claude's credentials file** written back to the host is accepted as is (CC 17:06Z).
 
+### Round 6e: the GPT read of b2d44f73 (CHANGES_REQUESTED, two P2s)
+
+1. **P2, fixed: a model call whose response carried no request id disappeared from G11's coverage.** The required set was built from the `X-OmniRoute-Request-Id` values the responses carried, so a call without that header was in no set.
+   - **Reproduced on b2d44f73 before the fix:** two admitted `/v1/responses` calls, of which only A's response carried an id. Coverage held 1 required call with nothing missing, and G11 and the calibration both passed.
+   - **Counted at admission** (`netfilter.Filter.admit`, called from `Filter.http`): each admitted HTTP request gets an `admitted` row with its connection's id before the upstream is contacted. Its outcome row names the same connection. So the count does not depend on the response, on a relay failure, or on the forwarder stopping while the call is in flight.
+   - **Summarized without loss** (`netfilter.summarize`):
+     - `gateway_model_requests` is every admitted model call;
+     - `gateway_request_ids` holds the ids of the calls whose response carried one;
+     - `gateway_model_calls_without_id` lists the other calls, each with its connection, time, method, path, outcome and status.
+     - A call with no outcome row, one whose gateway was unreachable and one whose relay failed are calls without an id.
+     - A log without admission rows is counted from its allowed rows. A missing log gives null counts, never zero. Rows that cannot be read are counted (`unparsed_rows`).
+   - **Collected unchanged** (`common.gateway_calls_for_trial`, `collect.py`): the count and the list go into the trial's gateway record as `model_requests`, `model_calls_without_id` and `access_log_unparsed_rows`. Nothing is looked up for a call without an id, so there is still no read of a foreign id.
+   - **Required by G11** (`grade.call_coverage`, through `grade.uncounted_model_calls`). Coverage fails unless all of these hold:
+     - the forward's record counts the admitted model calls, and that count equals the number of request ids;
+     - no call lacks an id, and no access-log row was unreadable;
+     - no id is shared by two calls, since one call-log row is evidence for one call.
+     - A record without the count fails: an absent list is not an empty one.
+     - The calls without an id are listed under G11's `call_coverage`, as `without_id`.
+   - **Required by the calibration** (`grade.call_id_calibration`): the same rule on the collected record, with the calls listed in `calibration.json`.
+   - **Regression, summarization to grading:** netfilter's own `Filter` runs in front of a stand-in gateway. Call A's response carries its id, and call B's does not.
+     - B is listed, G11 fails for the trial and the calibration fails.
+     - With both ids present, all three pass.
+     - A second test adds a call in flight when its handler stops, and a gateway that is down.
+   - **Limit, unchanged:** a required call is a request on `netfilter.MODEL_CALL_PATHS` (`/v1/responses`, `/v1/chat/completions`, `/v1/completions`). Any other admitted `/v1` request is kept apart, as before, and is not required to carry an id.
+2. **P2, fixed: `--rerun-gate0-failures` could advance before the calibration passed.** The retry branch ran the failed stage-2 tests in the order their references sort, and never checked the calibration.
+   - **One sequence for both paths** (`pilot.calibrate_first`): run the calibration cell's pending work, collect its trials, run `grade.py calibration`, and stop with exit 2 unless it passed.
+   - **Initial path:** the calibration cell, then the check, then the other cells, as in round 6d.
+   - **Retry path:**
+     - A failed G1 test is the first retry.
+     - With G1 passed, nothing is launched, and the check still runs from the collected record.
+     - No other failed test is retried unless the check passed.
+     - The other retries then run in the stage's own cell order (`CODEX_STAGE2`, `CLAUDE_STAGE2`), never in reference order.
+   - **Collection:**
+     - A calibration trial without a gateway record is collected.
+     - A record that passes is never read again, so a resume hours later does not re-read rows the gateway's call log may no longer return.
+     - A record from an earlier run that does not pass gets one fresh read, then the check again. A call-log row can be written after its response, and a gateway read can fail.
+   - **Control-flow tests** (`PilotStage2`) drive `pilot.main` itself with a recording step, and no process starts:
+     - G1 and a prompted check both failed, and the calibration fails again: only G1 runs again, the prompted test is not retried, and the exit code is 2.
+     - The same two failures with the calibration passing: the prompted retry follows the check.
+     - Only the prompted check failed: the check runs first, and a failure stops before the retry.
+     - A refused G1 rerun stops the retries.
+     - A record that does not pass gets its one fresh read, on the retry path and on a resume of the initial path.
+     - The initial path runs the same sequence.
+
 ### Round 6d: the GPT read of 50752dde (CHANGES_REQUESTED, one P1 and three P2s)
 
 1. **P1, fixed: an owned collection route could return another collection's payload.** Grouped queries take `with_lookup`, as a string or an object, and queries take `lookup_from` (in @qdrant/js-client-rest 1.18.0's API schema). Through them, an owned route could read another collection.
@@ -728,6 +772,15 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
 
 ## Verification (offline; no pilot or smoke)
 
+- **Round 6e** (the GPT read of b2d44f73): the focused module runs 108 tests and passes, with 1 skipped: the client-start test (`ISOLATION_SKIP_CLIENTS=1`).
+  - **Not run in this round: the client starts.** `isolation.py selftest --clients` and the module's client-start test start `codex`, and no Codex process may run on this host during the co-op's Codex window. The wrapper-only self-test (hidden locations, forwards and network probes, no client) ran inside the module and passed. A later run of the client checks at this head is reported in the pull request, not in this file.
+  - **Red run.** On the round-6d head (b2d44f73), the four test classes this round touches hold 39 tests: 10 are red and 29 pass.
+    - 8 fail on behaviour:
+      - the access log's summary holds 1 of 4 admitted model calls (2 of 4 in the fixed-log case);
+      - a calibration record with a call without an id passes;
+      - on the retry path the prompted test runs first, and with only that check failed it runs with no calibration check at all.
+    - 2 error because they pass this round's new arguments to the old functions.
+  - **The read's counterexample, reproduced on b2d44f73** in that head's own terms: 2 admitted model calls, 1 request id in the summary, coverage `ok`, G11 true, and the calibration passed.
 - **Round 6d** (the GPT read of 50752dde): the focused module passes 100 of 100 tests, client starts included.
   - **Red run.** On the round-6c head, exactly its 6 tests are red (3 fail, 3 error), and the other 94 pass. There, the two-trial test fails because trial B sees trial A's collection; its clean-up removed that collection.
   - **Stage-1 self-test:**

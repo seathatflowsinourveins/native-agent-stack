@@ -2211,24 +2211,49 @@ def mark_testability(oir: dict, selftest: dict | None) -> dict:
 # substitution; common.gateway_calls_for_trial), and at least one did. Otherwise G11 stays failed: the key is fixed from the deployed build's source
 # (omniroute-3.8.51-5f4b3d577-affinity-pr15167), cited by file and line, and the calibration re-runs. There is no
 # fallback that reads foreign ids.
+# Round 6e (GPT read of b2d44f73, P2): it also fails when any admitted model call of the trial carried no request id
+# (the forward counts each call at admission, netfilter.summarize), or when the collected record lacks that count.
 CALIBRATION_DECISION = "task-ns2604-coop-20261006T170607Z"
 CALIBRATION_KEY = "gate0-G1"
 
 
+def uncounted_model_calls(model_requests, without_id, unparsed_rows) -> str | None:
+    """Round 6e (GPT read of b2d44f73, P2): why a trial's admitted model calls are not established as each carrying a
+    request id; None when they are. The gateway forward counts every admitted model call from its admission row
+    (netfilter.summarize). A record without that count, with an access-log row that could not be read, or with a call
+    that carried no id establishes nothing: an absent list is never an empty one."""
+    if isinstance(model_requests, bool) or not isinstance(model_requests, int) or not isinstance(without_id, list):
+        return "the gateway forward's record does not count the admitted model calls"
+    if isinstance(unparsed_rows, bool) or not isinstance(unparsed_rows, int):
+        return "the gateway forward's record does not say whether every access-log row was read"
+    if unparsed_rows:
+        return f"{unparsed_rows} access-log row(s) could not be read, so the admitted model calls are not counted"
+    if without_id:
+        return f"{len(without_id)} admitted model call(s) carried no request id"
+    return None
+
+
 def call_id_calibration(root: Path, trial_id: str | None) -> dict:
-    """The calibration cell's record: request ids recorded, matched and unmatched, and the pass or fail."""
+    """The calibration cell's record: admitted model calls, request ids recorded, matched and unmatched, the calls
+    without an id, and the pass or fail."""
     out = {"decision": CALIBRATION_DECISION, "cell": CALIBRATION_KEY, "trial_id": trial_id,
-           "rule": "every X-OmniRoute-Request-Id the trial's responses carried equals a call-log row's id (strict)"}
+           "rule": "every admitted model call carried an X-OmniRoute-Request-Id of its own, and each id equals a "
+                   "call-log row's id (strict)"}
     path = Path(root) / "gateway" / f"{trial_id}.json" if trial_id else None
     if not path or not path.exists():
         return {**out, "pass": False, "cause": "no collected gateway record for the calibration trial"}
     data = load_json(path)
     recorded, unmatched = data.get("request_ids") or 0, data.get("unmatched_request_ids")
     calls = sum(len(v) for v in (data.get("by_thread") or {}).values())
-    passed = bool(recorded) and unmatched == 0 and calls > 0
-    return {**out, "request_ids": recorded, "unmatched_request_ids": unmatched, "calls_matched": calls, "pass": passed,
-            "cause": None if passed else ("no request id recorded" if not recorded else
-                                          f"{unmatched} request id(s) matched no call-log row")}
+    model_requests, without_id = data.get("model_requests"), data.get("model_calls_without_id")
+    uncounted = uncounted_model_calls(model_requests, without_id, data.get("access_log_unparsed_rows"))
+    if uncounted is None and model_requests != recorded:
+        uncounted = f"{model_requests} admitted model call(s) but {recorded} distinct request id(s)"
+    passed = bool(recorded) and unmatched == 0 and calls > 0 and uncounted is None
+    return {**out, "request_ids": recorded, "unmatched_request_ids": unmatched, "calls_matched": calls,
+            "model_requests": model_requests, "model_calls_without_id": without_id, "pass": passed,
+            "cause": None if passed else (uncounted or ("no request id recorded" if not recorded else
+                                                        f"{unmatched} request id(s) matched no call-log row"))}
 
 
 def closure_evidence(selftest: dict | None) -> dict:
@@ -2247,10 +2272,14 @@ def evidence_calls(calls: list) -> list[dict]:
             for c in calls]
 
 
-def call_coverage(required_ids, evidence_calls) -> dict:
+def call_coverage(required_ids, evidence_calls, forward: dict | None = None) -> dict:
     """GPT read of 80be1483, P2-1: G11 fails closed unless every required call of the trial (its gateway forward's
     model-call request ids) has collected tier and effort evidence. A call the collection lost (unmatched, its detail
-    failed, or no record) is listed by id."""
+    failed, or no record) is listed by id.
+    Round 6e (GPT read of b2d44f73, P2): forward is the trial's gateway forward record (the exit row's network_runtime).
+    Every admitted model call must be counted there and carry a request id of its own. A call without an id is listed
+    (without_id) and fails; so do a record that lacks the count, a count that differs from the ids, and an id two
+    calls share (one call-log row is evidence for one call)."""
     required = [r for r in (required_ids or []) if r]
     by_request: dict = {}
     for call in evidence_calls or []:
@@ -2258,8 +2287,18 @@ def call_coverage(required_ids, evidence_calls) -> dict:
     missing = [r for r in required if r not in by_request]
     incomplete = [r for r in required if r in by_request
                   and not any(c.get("forwarded_tier") is not None and c.get("forwarded_effort") for c in by_request[r])]
-    return {"required": len(required), "missing": missing, "incomplete": incomplete,
-            "ok": bool(required) and not missing and not incomplete}
+    forward = forward or {}
+    model_requests, without_id = forward.get("gateway_model_requests"), forward.get("gateway_model_calls_without_id")
+    uncounted = uncounted_model_calls(model_requests, without_id, forward.get("unparsed_rows"))
+    if uncounted is None and model_requests != len(required):
+        uncounted = f"{model_requests} admitted model call(s) but {len(required)} request id(s)"
+    seen: dict = {}
+    for request_id in required:
+        seen[request_id] = seen.get(request_id, 0) + 1
+    duplicates = sorted(r for r, n in seen.items() if n > 1)
+    return {"required": len(required), "model_requests": model_requests, "without_id": without_id,
+            "uncounted": uncounted, "duplicate_ids": duplicates, "missing": missing, "incomplete": incomplete,
+            "ok": bool(required) and not missing and not incomplete and uncounted is None and not duplicates}
 
 
 def g11_trial_ok(effort: dict, launch_tier=None, coverage: dict | None = None) -> bool:
@@ -2728,9 +2767,11 @@ def grade_run(root: Path) -> dict:
             # reported apart, with the calls that hold no value listed.
             launch_tier = recorded_service_tier(rows.get("launched") or {})
             record["tier_evidence"] = tier_evidence(effort, launch_tier)
-            record["call_coverage"] = call_coverage(
-                ((rows.get("exit") or {}).get("network_runtime") or {}).get("gateway_request_ids"),
-                effort.get("evidence_calls"))
+            # Round 6e (GPT read of b2d44f73, P2): the forward's own count of admitted model calls decides coverage,
+            # so a call whose response carried no request id is listed and fails.
+            forward = (rows.get("exit") or {}).get("network_runtime") or {}
+            record["call_coverage"] = call_coverage(forward.get("gateway_request_ids"), effort.get("evidence_calls"),
+                                                    forward)
             gate_rows["G11"].append(g11_trial_ok(effort, launch_tier, record["call_coverage"]))
             if not effort["gateway_forwarded_exposed"]:
                 gaps.append({"gate": "G11", "trial_id": tid, "gap": "forwarded effort not exposed: the gateway call log has "
@@ -2866,7 +2907,8 @@ def grade_run(root: Path) -> dict:
         "rule": f"launch tier default and every call's forwarded tier in {list(NORMAL_FORWARDED_TIERS)}",
         "failing": {tid: {k: v for k, v in (e or {}).items() if k != "ok"} for tid, e in evidence.items()
                     if not (e or {}).get("ok")}}
-    # GPT read of 80be1483, P2-1: every required call collected, with the lost ones listed by id.
+    # GPT read of 80be1483, P2-1: every required call collected, with the lost ones listed by id. Round 6e: and every
+    # admitted model call counted with a request id of its own, the ones without an id listed (without_id).
     gates["G11"]["call_coverage"] = {r["trial_id"]: r.get("call_coverage") for r in table
                                      if r.get("launched") and r.get("client") == "codex"
                                      and not (r.get("call_coverage") or {}).get("ok")}

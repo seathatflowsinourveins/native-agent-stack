@@ -35,7 +35,9 @@ killed at its own first meter reading, rate-limited, re-run after an in-run re-b
 error after launch), runs again. An attempt that launched but has no exit row and no live process is first given its
 interrupted exit (reconcile_orphans). Each attempt has its own trial id, CL7b's included.
 --from-stage 2 --rerun-gate0-failures runs once more only the stage-2 tests whose gate-0 check failed (for example a
-Claude probe stopped by the meter, in the next 5-hour window), then collects and checks gate 0 again. A DEFER.claude
+Claude probe stopped by the meter, in the next 5-hour window), then collects and checks gate 0 again. The calibration
+comes first on this path too (calibrate_first, shared with the initial path): a failed G1 test runs again before any
+other, and no other failed test is retried unless the calibration check passes. A DEFER.claude
 flag is cleared on resume once the newest meter reading leaves headroom for the run's expected usage (decision 6);
 STOP flags, and the HOLD.<cell> flag a Claude trial without a result event by T sets for the operator's diagnosis
 (decision 1), stay until the operator removes them.
@@ -67,6 +69,49 @@ CODEX_BLOCKS = ("codex-native", "codex-env", "codex-native-ultra", "codex-sdk", 
 PREPARE_FLAGS = ("--claude-completion", "--amendment-ref", "--claude-grace-s", "--claude-t-seconds", "--registry-review",
                  "--repeat-override", "--seed", "--claude-expected-usage", "--gateway-pipeline-details")
 PREPARE_SWITCHES = ("--allow-provisional-registry", "--skip-oracle-tests", "--skip-quota", "--allow-timing")
+
+
+def calibrate_first(root: Path, cfg: dict, py: list[str], log: list, launch=None) -> int:
+    """Round 6e (GPT read of b2d44f73, P2): the one calibration-first sequence of stage 2, shared by its initial path
+    and its --rerun-gate0-failures path, so neither can advance past a calibration that has not passed.
+    - launch runs the calibration cell's pending work: the cell on the initial path, the failed G1 test on the retry
+      path (nothing there when G1 passed). A refused or failed launch stops here.
+    - Each calibration trial without a collected gateway record is collected.
+    - `grade.py calibration` checks the newest calibration trial and writes calibration.json.
+    - A record that passes is never read again, so a later resume does not re-read rows the gateway's call log may no
+      longer return. A record from an earlier run that does not pass gets one fresh read, then the check again (a
+      call-log row can be written after its response, and a gateway read can fail).
+    Returns 0 only when the check passed, or when this run has no calibration cell (a run restricted to other cells:
+    gate 0 and G11 then fail on their own); otherwise 2, and the caller stops before any other cell or retry."""
+    gate_refs = {ref for ref, test in (cfg.get("tests_by_ref") or {}).items() if test.get("gate_trial")}
+    if CALIBRATION_CELL not in cfg["cells"] or not gate_refs:
+        log.append({"at": utc_now(), "step": "stage 2 calibration", "skipped": "this run has no calibration cell"})
+        return 0
+    if launch is not None and launch():
+        return 2
+    launched = [r["trial_id"] for r in read_jsonl(root / "ledger.jsonl")
+                if r.get("phase") == "launched" and r.get("ref") in gate_refs]
+    pending = sorted({trial_id for trial_id in launched if not (root / "gateway" / f"{trial_id}.json").exists()})
+
+    def collect(trial_ids: list) -> None:
+        step("stage 2 calibration collect", py + [str(root / "harness" / "collect.py"), "--run-root", str(root),
+                                                  "--trials", ",".join(trial_ids)], log)
+
+    def check() -> int:
+        return step("stage 2 calibration check", py + [str(root / "harness" / "grade.py"), "calibration",
+                                                       "--run-root", str(root)], log)
+
+    if pending:
+        collect(pending)
+    failed = check()
+    if failed and launched and launched[-1] not in pending:
+        collect(launched[-1:])
+        failed = check()
+    if failed:
+        print(json.dumps({"refused": ["the call-id calibration failed (calibration.json names the cause): fix the key "
+                                      "from the deployed build's source and re-run the calibration"]}))
+        return 2
+    return 0
 
 
 def step(label: str, cmd: list[str], log: list) -> int:
@@ -190,7 +235,8 @@ def main(argv=None) -> int:
     parser.add_argument("--keep-defer", action="store_true", help="do not clear DEFER.claude on resume")
     parser.add_argument("--rerun-gate0-failures", action="store_true",
                         help="stage 2 on resume: run once more each stage-2 test whose gate-0 check failed (the failed "
-                        "part only; a Claude one belongs in a later 5-hour window), then collect and gate 0 again")
+                        "part only; a Claude one belongs in a later 5-hour window), then collect and gate 0 again; the "
+                        "calibration comes first and must pass before any other retry")
     for flag in PREPARE_FLAGS:
         parser.add_argument(flag, default=None)
     for switch in PREPARE_SWITCHES:
@@ -283,31 +329,36 @@ def main(argv=None) -> int:
         reconcile_orphans(root, log)   # finding 3: before any stage counts attempts
     if args.from_stage <= 2:
         clear_defer()
+        # The call-id calibration cell first (CC item task-ns2604-coop-20261006T170607Z (2)): run, collect and check it
+        # before advancing to any other cell; a failed calibration stops the pilot (fail closed). Round 6e (GPT read of
+        # b2d44f73, P2): calibrate_first is that sequence for both paths below.
         if args.rerun_gate0_failures and (root / "gate0.json").exists():
             failed = {k for k, check in (load_json(root / "gate0.json").get("checks") or {}).items() if not check.get("pass")}
-            for ref, test in (cfg.get("tests_by_ref") or {}).items():
-                if test.get("stage") == 2 and gate_key(test) in failed:
-                    if step(f"stage 2 rerun {gate_key(test)}", block(test["cell"], ref, 1), log):
-                        write_log(root, log)
-                        return 2
+            retries = {ref: test for ref, test in (cfg.get("tests_by_ref") or {}).items()
+                       if test.get("stage") == 2 and gate_key(test) in failed}
+
+            def rerun(refs) -> int:
+                for ref in refs:
+                    if step(f"stage 2 rerun {gate_key(retries[ref])}", block(retries[ref]["cell"], ref, 1), log):
+                        return 1
+                return 0
+
+            # A failed G1 test is the first retry. With G1 passed nothing is launched, and the check still runs. No
+            # other failed test is retried unless the calibration passed.
+            if calibrate_first(root, cfg, py, log,
+                               lambda: rerun(sorted(ref for ref, test in retries.items() if test.get("gate_trial")))):
+                write_log(root, log)
+                return 2
+            # The other retries in the stage's own cell order, never in the order the references happen to sort.
+            order = {cell: n for n, cell in enumerate(CODEX_STAGE2 + CLAUDE_STAGE2)}
+            if rerun(sorted((ref for ref, test in retries.items() if not test.get("gate_trial")),
+                            key=lambda ref: (order.get(retries[ref]["cell"], len(order)), ref))):
+                write_log(root, log)
+                return 2
         else:
-            # The call-id calibration cell first (CC item task-ns2604-coop-20261006T170607Z (2)): run, collect and check
-            # it before advancing to any other cell; a failed calibration stops the pilot (fail closed).
-            if CALIBRATION_CELL in cfg["cells"]:
-                if run_cell("stage 2 calibration", CALIBRATION_CELL):
-                    write_log(root, log)
-                    return 2
-                gate_refs = {ref for ref, test in (cfg.get("tests_by_ref") or {}).items() if test.get("gate_trial")}
-                cal_ids = sorted({r["trial_id"] for r in read_jsonl(root / "ledger.jsonl")
-                                  if r.get("phase") == "launched" and r.get("ref") in gate_refs})
-                step("stage 2 calibration collect", py + [str(root / "harness" / "collect.py"), "--run-root", str(root),
-                                                          "--trials", ",".join(cal_ids)], log)
-                if step("stage 2 calibration check", py + [str(root / "harness" / "grade.py"), "calibration",
-                                                           "--run-root", str(root)], log):
-                    print(json.dumps({"refused": ["the call-id calibration failed (calibration.json): fix the key from "
-                                                  "the deployed build's source and re-run the calibration"]}))
-                    write_log(root, log)
-                    return 2
+            if calibrate_first(root, cfg, py, log, lambda: run_cell("stage 2 calibration", CALIBRATION_CELL)):
+                write_log(root, log)
+                return 2
             for cell in CODEX_STAGE2[1:] + CLAUDE_STAGE2:
                 if cell in cfg["cells"] and run_cell("stage 2", cell):
                     write_log(root, log)

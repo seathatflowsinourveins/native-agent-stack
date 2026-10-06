@@ -992,7 +992,8 @@ def forwarded_effort_fields(pipeline) -> dict | None:
     return {"reasoning.effort": reasoning.get("effort"), "reasoning_effort": request.get("reasoning_effort")}
 
 
-def gateway_calls_for_trial(request_ids, since_iso: str, until_iso: str, max_rows: int = 5000) -> dict:
+def gateway_calls_for_trial(request_ids, since_iso: str, until_iso: str, max_rows: int = 5000,
+                            forward: dict | None = None) -> dict:
     """GPT read of a513616d, P1, ruled by CC item task-ns2604-coop-20261006T164313Z (section 3): the trial's own gateway
     calls, read on the coordinator side after the trial and never from inside one.
     - The call-log list (GET /api/usage/call-logs with limit and offset) is scanned for rows in [since, until] whose id
@@ -1001,7 +1002,11 @@ def gateway_calls_for_trial(request_ids, since_iso: str, until_iso: str, max_row
     - A detail GET is made only for those rows, so no other session's call is ever requested.
     - Only the fields grading needs are kept: model, status, received and forwarded effort and tier, and the cache
       source. No request or response body enters a record.
-    With no matching row, nothing is read, and G11 stays failed."""
+    With no matching row, nothing is read, and G11 stays failed.
+    Round 6e (GPT read of b2d44f73, P2): forward is the trial's gateway forward record (netfilter.summarize, in the exit
+    row's network_runtime). Its count of admitted model calls and its list of the calls whose response carried no
+    request id go into the record unchanged, null when the forward did not count them, so grading and the calibration
+    can require that no model call lacks an id. A call without an id is never looked up: no row is read for it."""
     wanted = {str(i) for i in request_ids or [] if i}
     found, scanned, offset, errors, requested, matched = {}, 0, 0, [], [], set()
     while wanted and scanned < max_rows:
@@ -1051,6 +1056,10 @@ def gateway_calls_for_trial(request_ids, since_iso: str, until_iso: str, max_row
                 "pipeline_exposed": pipeline is not None, "error": bool(row.get("error"))})
         if (rows[-1].get("timestamp") or "") < since_iso:
             break
+    counted = forward or {}
     return {"by_thread": found, "rows_scanned": scanned, "errors": errors, "request_ids": len(wanted),
             "required_request_ids": sorted(wanted), "unresolved_request_ids": sorted(wanted - matched),
-            "detail_requests": requested, "unmatched_request_ids": len(wanted - matched)}
+            "detail_requests": requested, "unmatched_request_ids": len(wanted - matched),
+            "model_requests": counted.get("gateway_model_requests"),
+            "model_calls_without_id": counted.get("gateway_model_calls_without_id"),
+            "access_log_unparsed_rows": counted.get("unparsed_rows")}

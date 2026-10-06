@@ -247,14 +247,19 @@ def main(argv=None) -> int:
             threads.discard(None)
             # GPT read of a513616d, P1 (CC item task-ns2604-coop-20261006T164313Z): only the call ids this trial's own
             # responses carried (its gateway forward's record), read here on the coordinator side after the trial.
-            request_ids = ((exit_row.get("network_runtime") or {}).get("gateway_request_ids")) or []
+            # Round 6e (GPT read of b2d44f73, P2): the forward's count of admitted model calls, and the calls without a
+            # request id, go into the record with them.
+            forward = exit_row.get("network_runtime") or {}
+            request_ids = forward.get("gateway_request_ids") or []
             calls = gateway_calls_for_trial(request_ids, start, time.strftime(
-                "%Y-%m-%dT%H:%M:%S.999Z", time.gmtime(iso_to_ns(end) / 1e9 + 60)))
+                "%Y-%m-%dT%H:%M:%S.999Z", time.gmtime(iso_to_ns(end) / 1e9 + 60)), forward=forward)
             # GPT read of 80be1483, P2-1: no thread filter here. Every call collected is the trial's own by its request
             # id, so grading reconciles coverage against the trial's required ids, and nothing is dropped first.
             write_json(root / "gateway" / f"{tid}.json", calls, 0o600)
             record["gateway"] = {"threads": len(threads), "calls": sum(len(v) for v in calls["by_thread"].values()),
                                  "request_ids": calls["request_ids"], "unmatched": calls["unmatched_request_ids"],
+                                 "model_requests": calls["model_requests"],
+                                 "model_calls_without_id": calls["model_calls_without_id"],
                                  "errors": calls["errors"]}
         summary["trials"][tid] = record
     # agentsview second parse (S10): one export per client, tool calls per trial session.

@@ -748,8 +748,9 @@ def info_net_namespace(info: dict | None) -> str | None:
 class NetworkForwarder:
     """ROUND6_DECISION (B): the trial's forwards, served outside its namespace by netfilter.py on the Unix sockets the
     wrapper binds in. start() returns once every socket listens and raises otherwise, so a trial never starts without
-    its forwards. stop() ends the process and returns its record: whether it ran, and the access log's counts and first
-    denied requests (forward, method, path, reason)."""
+    its forwards. stop() ends the process and returns its record: whether it ran, the access log's counts and first
+    denied requests (forward, method, path, reason), and the gateway forward's model calls, counted at admission, with
+    the ones whose response carried no request id listed (netfilter.summarize; round 6e)."""
 
     def __init__(self, plan_: dict):
         self.plan = plan_
