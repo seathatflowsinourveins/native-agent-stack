@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "evidence_class": "local_integration",
+  "scope": "Native uv lock preparation in the owned rc6 candidate checkout; not engine or broker acceptance.",
+  "baseline": "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+  "candidate": "provisional pending independent review",
+  "toolchain": {
+    "uv": "0.12.17",
+    "python": "3.12.3",
+    "mise": "2026.10.1",
+    "priority": "nice 19",
+    "exclude_newer": "2026-10-06T04:00:00Z"
+  },
+  "project_sha256": "721c3a9e40cb2a1f5220d302fd4fad4bae9dbf83983f15bc80e4c713fbe482da",
+  "lock_sha256": "853ad0a1ee272087bd0e79646dc1255150a6a9f0f45d0dbbf207ed084f7035b4",
+  "package_entries_before": 188,
+  "package_entries_after": 188,
+  "added": [],
+  "removed": [],
+  "version_changes": [
+    {
+      "package": "google-auth",
+      "before": "2.59.1",
+      "after": "2.60.0"
+    },
+    {
+      "package": "wcwidth",
+      "before": "0.9.1",
+      "after": "0.9.2"
+    },
+    {
+      "package": "aiohttp",
+      "before": "3.14.3",
+      "after": "3.14.4"
+    },
+    {
+      "package": "nautilus-trader",
+      "before": "2.0.0rc5",
+      "after": "2.0.0rc6"
+    },
+    {
+      "package": "cachetools",
+      "before": "7.2.0",
+      "after": "7.2.1"
+    },
+    {
+      "package": "filelock",
+      "before": "4.0.10",
+      "after": "4.0.12"
+    }
+  ],
+  "without_any_wheel": [],
+  "commands": [
+    {
+      "argv": [
+        "mise",
+        "exec",
+        "uv@0.12.17",
+        "--",
+        "uv",
+        "--no-config",
+        "lock",
+        "--project",
+        "blueprints/us-equities/runtime-2604/trading-2604-runtime",
+        "--python",
+        "<MANAGED_CPYTHON_3_12_3>",
+        "--no-python-downloads",
+        "--prerelease",
+        "if-necessary",
+        "--default-index",
+        "https://pypi.org/simple",
+        "--exclude-newer",
+        "2026-10-06T04:00:00Z",
+        "--upgrade"
+      ],
+      "exit_code": 0
+    },
+    {
+      "command": "same lock vector with --check and without --upgrade",
+      "exit_code": 0,
+      "returned_output": "Using CPython 3.12.3 interpreter at <MANAGED_CPYTHON_3_12_3>; Resolved 188 packages"
+    },
+    {
+      "command": "python3 -m unittest tests.test_trading_2604_lock",
+      "exit_code": 0,
+      "returned_output": "Ran 12 tests in 0.226s; OK",
+      "boundary": "Synthetic/local recipe consistency; no native engine execution"
+    }
+  ],
+  "installer_hash_update_reason": "Only project_hash and lock_hash change to bind the exact candidate files before the native installer copies them. The former approved-bundle hashes and shared sync-vector hash remain unchanged.",
+  "source": "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:blueprints/us-equities/runtime-2604/install-trading-2604.sh:91–98,200–216",
+  "scope_notes": [
+    "No package entry was added or removed.",
+    "Only the Nautilus direct pin changes; five transitive versions change under the requested full re-resolution.",
+    "A package having a wheel is a structural census, not target-compatible wheel qualification."
+  ]
+}

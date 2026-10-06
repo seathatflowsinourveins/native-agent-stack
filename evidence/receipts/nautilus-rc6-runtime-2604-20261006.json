@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "id": "nautilus-rc6-runtime-2604-20261006",
+  "kind": "native_cli_e2e",
+  "component_ids": [
+    "nautilus-trader"
+  ],
+  "claim": "In an owned isolated HOME on NativeStack2604, ns2604-coop executed the rc6 candidate recipe: installation exit0 and24offline checksPASS at lock853ad0a1. The four runtime inputs were identical before/after. This is the recorded operation scope; independent review, J2reruns and the destination pin decision remain pending.",
+  "evidence_class": "local_integration",
+  "limitations": [
+    "Candidate qualification is provisional until independent review; the canonical runtime-target remainsrc5.",
+    "The unchanged vendor quickstart establishes only its synthetic native workflow; import/version, isolation, adapted examples and integrity checks retain their individual classes. No upstream full test suite was run locally.",
+    "The failed64attempt remains retained, caused by absent WSLdistribution metadata in Codextools; the passing attempt used the co-op verified native route without changing a guard.",
+    "Three J2case reruns remain not-run with missing retained inputs, launcher/mount disposition and candidate version/fee metadata binding pending. Native24checks do not close economic parity.",
+    "No credentials, broker connection or actual orders were used; 5f owns the engine-cap C1\u2013C4run, review gates and runtime pin decision."
+  ],
+  "data": {
+    "artifact": "evidence/artifacts/nautilus-rc6-qualification-20261005/attempts.json",
+    "source_snapshot": "evidence/artifacts/nautilus-rc6-qualification-20261005/source-snapshot.json",
+    "lock_comparison": "evidence/artifacts/nautilus-rc6-qualification-20261005/lock-comparison.json",
+    "changed_lines": "evidence/artifacts/nautilus-rc6-qualification-20261005/changed-lines.json",
+    "host_run": {
+      "executor": "ns2604-coop verified NativeStack2604 session",
+      "base_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+      "lock_sha256": "853ad0a1ee272087bd0e79646dc1255150a6a9f0f45d0dbbf207ed084f7035b4",
+      "installed_engine": "2.0.0rc6",
+      "python": "3.12.3",
+      "uv": "0.12.17",
+      "priority": "nice19",
+      "install_exit_code": 0,
+      "accept_exit_code": 0,
+      "passed": 24,
+      "failed": 0,
+      "blocked": 0,
+      "install_start": "2026-10-06T00:00:57Z",
+      "accept_end": "2026-10-06T00:02:02Z",
+      "input_hashes_unchanged": true,
+      "docker_host_setting": "unix://$XDG_RUNTIME_DIR/docker.sock",
+      "isolated_home_size": "1.4G",
+      "task_tmpdir_removed": true
+    },
+    "independent_observation": {
+      "observer": "grand-catalog",
+      "observed_rc6_extension": {
+        "file": "_libnautilus.cpython-312-x86_64-linux-gnu.so",
+        "sha256": "da5fd063a9f0df9f1e6d0b8dfcdfcc9d9691fe6f8d4eeb89562c96c508805178",
+        "evidence_class": "local_integration",
+        "boundary": "Read-only digest of the installed release file, not a new native acceptance run."
+      },
+      "checks": [
+        "actualretained24statusrows with allnative rc0",
+        "actualinstall/accept rc/time files",
+        "before/afterfourfilehash equality withcurrentinputs",
+        "isolatedPython3.12.3 andnautilus-trader2.0.0rc6 versionmetadata"
+      ],
+      "boundary": "Documentary/directstate observation, not new host execution or cross-family acceptance"
+    },
+    "review_status": "pending cross-family review",
+    "case_reruns": {
+      "status": "pending J2 inputs, launcher route and candidate-binding ruling",
+      "source_contract": "J2 draft#760 at5617096b4c392b73ff47ef4f46c93c05d4ab625a, sourceharnesses atnative-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+      "cases": [
+        {
+          "case_id": "SPY/one_zero",
+          "native_exit_code": null,
+          "status": "not run",
+          "conditions": [
+            "retained inputs not staged",
+            "5f launcher/managed-Python mount route pending",
+            "Q17 candidate version/fee-model binding pending"
+          ]
+        },
+        {
+          "case_id": "AAPL/baseline",
+          "native_exit_code": null,
+          "status": "not run",
+          "conditions": [
+            "retained inputs not staged",
+            "5f launcher/managed-Python mount route pending",
+            "Q17 candidate version/fee-model binding pending"
+          ]
+        },
+        {
+          "case_id": "AAPL/fee_slippage_stress",
+          "native_exit_code": null,
+          "status": "not run",
+          "conditions": [
+            "retained inputs not staged",
+            "5f launcher/managed-Python mount route pending",
+            "Q17 candidate version/fee-model binding pending"
+          ]
+        }
+      ]
+    },
+    "readiness_effect": "none; no aggregate or canonical pin change"
+  }
+}

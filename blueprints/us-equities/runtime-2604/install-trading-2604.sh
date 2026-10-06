@@ -88,17 +88,17 @@ printf '%s  %s\n' "$sync_vector_hash" "$script_directory/sync-trading-2604.sh" |
 source "$script_directory/sync-trading-2604.sh"
 # END shared-sync-source
 readonly lock_bundle="$script_directory/trading-2604-runtime"
-readonly project_hash=30f47dfbcb247c01e8e3ed8733fbf63bf5de6ad4ea7e4c0807e3ea484b975958
-readonly lock_hash=1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c
+readonly project_hash=721c3a9e40cb2a1f5220d302fd4fad4bae9dbf83983f15bc80e4c713fbe482da
+readonly lock_hash=853ad0a1ee272087bd0e79646dc1255150a6a9f0f45d0dbbf207ed084f7035b4
 # Only exact approved bundles may migrate on the owned host: the recorded
 # round-c 5.60.0 lock and original 5.58.0 run. Neither qualifies this new lock.
 readonly previous_project_hash=36b85fd48566fedff258ec4a8bef496cace0ea00954afd7c9255bffda0894fdb
 readonly previous_lock_hash=4c98672d14147a1be712bf788b495cf318705631cbf5e04ebe230c8a13c516c2
 readonly recorded_project_hash=581bbb38a265068791c1a8c92435f9859876fd613d3c2c87d618a223376b01e0
 readonly recorded_lock_hash=c6b5f25cd3198c1b847c1cb602fe5441dce7e038aa16976c46ecf5f0beb7b086
-readonly engine_commit=1b0a49d2792a9432a3aca3fcb617ce7a630d905e
+readonly engine_commit=7b766f8825b2539c5b2ac1375e9d97b41c509edb
 readonly adapter_commit=dca821cca85dce3647fa7b488d5a23fbe5b85d4a
-readonly quickstart_hash=487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53
+readonly quickstart_hash=4c097d21c5501e5f0b804bca552fe25527f194cfa247e76d115fea7591d27da2
 # Version 10.45.1j is in the pinned gnzsnz README. Its image label identifies
 # build c147d206b8d5d8cd329feced09f02a9df61e84cc; e19aa0 is the documentation pin.
 # https://github.com/gnzsnz/ib-gateway-docker/blob/e19aa0bebe5d0ddd55c6d0e25549380f9c7d1bf7/README.md
@@ -161,7 +161,7 @@ printf '%s\n' "$python_pin" > "$project/.python-version"
 # transitive version and hash, including MLflow's requested MCP extra.
 requirements=(
     # https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/installation.md
-    'nautilus-trader==2.0.0rc5'
+    'nautilus-trader==2.0.0rc6'
     # rc5 quickstart explicitly requires NumPy and pandas; its wheel dependencies=[]:
     # https://github.com/nautechsystems/nautilus_trader/blob/1b0a49d2792a9432a3aca3fcb617ce7a630d905e/docs/getting_started/quickstart.py
     'numpy==2.5.3' 'pandas==3.0.6'

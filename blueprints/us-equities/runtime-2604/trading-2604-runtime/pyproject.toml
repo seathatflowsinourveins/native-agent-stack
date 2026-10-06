@@ -10,7 +10,7 @@ dependencies = [
     "exchange-calendars==4.13.2",
     "fincore==0.5.1",
     "mlflow[mcp]==3.16.1",
-    "nautilus-trader==2.0.0rc5",
+    "nautilus-trader==2.0.0rc6",
     "numpy==2.5.3",
     "pandas==3.0.6",
     "pandera[pandas]==0.33.1",

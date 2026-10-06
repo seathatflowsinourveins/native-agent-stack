@@ -1,0 +1,370 @@
+{
+  "schema_version": 1,
+  "evidence_class": "structural_validation",
+  "base": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+  "candidate_status": "provisional",
+  "files": [
+    {
+      "path": "blueprints/us-equities/runtime-2604/install-trading-2604.sh",
+      "blocks": [
+        {
+          "baseline_lines": [
+            91,
+            92
+          ],
+          "candidate_lines": [
+            91,
+            92
+          ],
+          "old": [
+            "readonly project_hash=30f47dfbcb247c01e8e3ed8733fbf63bf5de6ad4ea7e4c0807e3ea484b975958",
+            "readonly lock_hash=1fb9f8ca6fef9c47a4ded826ddf20012f78d6643926cce3a36b86c674f55eb9c"
+          ],
+          "new": [
+            "readonly project_hash=721c3a9e40cb2a1f5220d302fd4fad4bae9dbf83983f15bc80e4c713fbe482da",
+            "readonly lock_hash=853ad0a1ee272087bd0e79646dc1255150a6a9f0f45d0dbbf207ed084f7035b4"
+          ]
+        },
+        {
+          "baseline_lines": [
+            99,
+            99
+          ],
+          "candidate_lines": [
+            99,
+            99
+          ],
+          "old": [
+            "readonly engine_commit=1b0a49d2792a9432a3aca3fcb617ce7a630d905e"
+          ],
+          "new": [
+            "readonly engine_commit=7b766f8825b2539c5b2ac1375e9d97b41c509edb"
+          ]
+        },
+        {
+          "baseline_lines": [
+            101,
+            101
+          ],
+          "candidate_lines": [
+            101,
+            101
+          ],
+          "old": [
+            "readonly quickstart_hash=487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53"
+          ],
+          "new": [
+            "readonly quickstart_hash=4c097d21c5501e5f0b804bca552fe25527f194cfa247e76d115fea7591d27da2"
+          ]
+        },
+        {
+          "baseline_lines": [
+            164,
+            164
+          ],
+          "candidate_lines": [
+            164,
+            164
+          ],
+          "old": [
+            "    'nautilus-trader==2.0.0rc5'"
+          ],
+          "new": [
+            "    'nautilus-trader==2.0.0rc6'"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/accept-trading-2604.sh",
+      "blocks": [
+        {
+          "baseline_lines": [
+            14,
+            14
+          ],
+          "candidate_lines": [
+            14,
+            14
+          ],
+          "old": [
+            "readonly quickstart_hash=487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53"
+          ],
+          "new": [
+            "readonly quickstart_hash=4c097d21c5501e5f0b804bca552fe25527f194cfa247e76d115fea7591d27da2"
+          ]
+        },
+        {
+          "baseline_lines": [
+            21,
+            21
+          ],
+          "candidate_lines": [
+            21,
+            21
+          ],
+          "old": [
+            "    'nautilus-trader|2.0.0rc5|nautilus_trader'"
+          ],
+          "new": [
+            "    'nautilus-trader|2.0.0rc6|nautilus_trader'"
+          ]
+        }
+      ]
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml",
+      "blocks": [
+        {
+          "baseline_lines": [
+            13,
+            13
+          ],
+          "candidate_lines": [
+            13,
+            13
+          ],
+          "old": [
+            "    \"nautilus-trader==2.0.0rc5\","
+          ],
+          "new": [
+            "    \"nautilus-trader==2.0.0rc6\","
+          ]
+        }
+      ]
+    },
+    {
+      "path": "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock",
+      "blocks": [
+        {
+          "baseline_lines": [
+            45,
+            45
+          ],
+          "candidate_lines": [
+            45,
+            45
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            57,
+            57
+          ],
+          "candidate_lines": [
+            57,
+            57
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            59,
+            76
+          ],
+          "candidate_lines": [
+            59,
+            77
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            231,
+            231
+          ],
+          "candidate_lines": [
+            232,
+            232
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            233,
+            233
+          ],
+          "candidate_lines": [
+            234,
+            234
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            235,
+            235
+          ],
+          "candidate_lines": [
+            236,
+            236
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            703,
+            703
+          ],
+          "candidate_lines": [
+            704,
+            704
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            705,
+            705
+          ],
+          "candidate_lines": [
+            706,
+            706
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            707,
+            707
+          ],
+          "candidate_lines": [
+            708,
+            708
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            842,
+            842
+          ],
+          "candidate_lines": [
+            843,
+            843
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            848,
+            848
+          ],
+          "candidate_lines": [
+            849,
+            849
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            850,
+            850
+          ],
+          "candidate_lines": [
+            851,
+            851
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            1508,
+            1508
+          ],
+          "candidate_lines": [
+            1509,
+            1509
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            1510,
+            1510
+          ],
+          "candidate_lines": [
+            1511,
+            1511
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            1512,
+            1515
+          ],
+          "candidate_lines": [
+            1513,
+            1516
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            2631,
+            2631
+          ],
+          "candidate_lines": [
+            2632,
+            2632
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            2688,
+            2688
+          ],
+          "candidate_lines": [
+            2689,
+            2689
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            2690,
+            2690
+          ],
+          "candidate_lines": [
+            2691,
+            2691
+          ],
+          "old": null,
+          "new": null
+        },
+        {
+          "baseline_lines": [
+            2692,
+            2703
+          ],
+          "candidate_lines": [
+            2693,
+            2704
+          ],
+          "old": null,
+          "new": null
+        }
+      ]
+    }
+  ]
+}

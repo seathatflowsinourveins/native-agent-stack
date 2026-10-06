@@ -1,0 +1,445 @@
+{
+  "schema_version": 1,
+  "scope": "J4 isolated rc6 candidate attempt",
+  "state": "offline recipe observed passing; independent review and candidate pin decision pending",
+  "observed_at_utc": "2026-10-05T23:47:52Z",
+  "project_sha256": "721c3a9e40cb2a1f5220d302fd4fad4bae9dbf83983f15bc80e4c713fbe482da",
+  "lock_sha256": "853ad0a1ee272087bd0e79646dc1255150a6a9f0f45d0dbbf207ed084f7035b4",
+  "attempts": [
+    {
+      "stage": "install",
+      "evidence_class": "local_integration",
+      "priority": "nice 19",
+      "argv": [
+        "env",
+        "TMPDIR=<J4_TMPDIR>",
+        "nice",
+        "-n",
+        "19",
+        "mise",
+        "exec",
+        "uv@0.12.17",
+        "--",
+        "env",
+        "HOME=<J4_HOME>",
+        "bash",
+        "blueprints/us-equities/runtime-2604/install-trading-2604.sh"
+      ],
+      "exit_code": 64,
+      "returned_output": [
+        "Run inside NativeStack2604.",
+        "install | BLOCKED | wrong-distribution"
+      ],
+      "condition": "WSL_DISTRO_NAME is absent in the tool process; WSL_INTEROP is also absent. The WSL2 kernel alone does not identify the distribution.",
+      "package_work_started": false
+    },
+    {
+      "stage": "install",
+      "evidence_class": "local_integration",
+      "executor": "ns2604-coop verified native NativeStack2604 session",
+      "priority": "nice 19",
+      "argv": [
+        "env",
+        "TMPDIR=<J4_TMPDIR>",
+        "nice",
+        "-n",
+        "19",
+        "mise",
+        "exec",
+        "uv@0.12.17",
+        "--",
+        "env",
+        "HOME=<J4_HOME>",
+        "DOCKER_HOST=<ROOTLESS_DOCKER_ENDPOINT>",
+        "bash",
+        "blueprints/us-equities/runtime-2604/install-trading-2604.sh"
+      ],
+      "exit_code": 0,
+      "started_at_utc": "2026-10-06T00:00:57Z",
+      "ended_at_utc": "2026-10-06T00:01:11Z",
+      "stdout_proof": {
+        "ref": "coord:j4-rc6-hostrun-20261006T000057Z/install.out",
+        "sha256": "d8962eedb95ae4fbd3eb7d53ac2ecc48c14231d9353cd8f9240293f47775bbcd",
+        "bytes": 15
+      },
+      "stderr_proof": {
+        "ref": "coord:j4-rc6-hostrun-20261006T000057Z/install.err",
+        "sha256": "bd3e2a3529bf11ff6be729b7395dbae998be391596dd5a78869a10f450050a84",
+        "bytes": 8297
+      }
+    },
+    {
+      "stage": "accept",
+      "evidence_class": "local_integration",
+      "executor": "ns2604-coop verified native NativeStack2604 session",
+      "priority": "nice 19",
+      "argv": [
+        "env",
+        "TMPDIR=<J4_TMPDIR>",
+        "nice",
+        "-n",
+        "19",
+        "mise",
+        "exec",
+        "uv@0.12.17",
+        "--",
+        "env",
+        "HOME=<J4_HOME>",
+        "DOCKER_HOST=<ROOTLESS_DOCKER_ENDPOINT>",
+        "bash",
+        "blueprints/us-equities/runtime-2604/accept-trading-2604.sh"
+      ],
+      "exit_code": 0,
+      "started_at_utc": "2026-10-06T00:01:11Z",
+      "ended_at_utc": "2026-10-06T00:02:02Z",
+      "stdout_proof": {
+        "ref": "coord:j4-rc6-hostrun-20261006T000057Z/accept.out",
+        "sha256": "fb2b9f40441298c9219f4656970c734bd470ee0d227ea5f6490501d37d16e94c",
+        "bytes": 663
+      },
+      "stderr_proof": {
+        "ref": "coord:j4-rc6-hostrun-20261006T000057Z/accept.err",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "bytes": 0
+      }
+    }
+  ],
+  "isolation": {
+    "home": "<J4_HOME>",
+    "owned": true,
+    "symlink": false,
+    "allocated_size": "1.4G",
+    "rc5_runtime_touched": false,
+    "tmpdir": "<J4_TMPDIR>",
+    "tmpdir_removed": true,
+    "tmpdir_cleanup_command": "rmdir",
+    "tmpdir_cleanup_exit_code": 0,
+    "measurement_scope": "Co-op host-run measurement; original failed-attempt HOME size4.0K remains historical."
+  },
+  "acceptance": {
+    "expected_checks": 24,
+    "exit_code": 0,
+    "passed": 24,
+    "failed": 0,
+    "blocked": 0,
+    "status": "native recipe PASS; review pending",
+    "checks": [
+      {
+        "check": "offline_isolation",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "python",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "import_nautilus-trader",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "import_numpy",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "import_pandas",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "import_alpaca-py",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "import_edgartools",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "import_exchange-calendars",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "import_duckdb",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "import_pandera",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "import_skfolio",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "import_fincore",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "import_mlflow",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "import_arch",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "import_purgedcv",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "ibkr_adapter",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "alpaca_adapter_source",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "structural_validation"
+      },
+      {
+        "check": "alpaca_adapter_import",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "nautilus_quickstart_sha256",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "structural_validation"
+      },
+      {
+        "check": "nautilus_quickstart",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "native_proven"
+      },
+      {
+        "check": "duckdb_query",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "pandera_example",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "skfolio_example",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      },
+      {
+        "check": "arch_example",
+        "status": "PASS",
+        "native_exit_code": 0,
+        "evidence_class": "local_integration"
+      }
+    ],
+    "boundary": "Thirteen import/version assertions and the other authored probes retain local/structural classes. The unchanged pinned vendor quickstart is native_proven for this synthetic workflow, not broker or risk-policy qualification."
+  },
+  "simulation": {
+    "status": "pending J2 inputs, launcher route and candidate-binding ruling",
+    "source_contract": "J2 draft#760 at5617096b4c392b73ff47ef4f46c93c05d4ab625a, sourceharnesses atnative-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+    "cases": [
+      {
+        "case_id": "SPY/one_zero",
+        "native_exit_code": null,
+        "status": "not run",
+        "conditions": [
+          "retained inputs not staged",
+          "5f launcher/managed-Python mount route pending",
+          "Q17 candidate version/fee-model binding pending"
+        ]
+      },
+      {
+        "case_id": "AAPL/baseline",
+        "native_exit_code": null,
+        "status": "not run",
+        "conditions": [
+          "retained inputs not staged",
+          "5f launcher/managed-Python mount route pending",
+          "Q17 candidate version/fee-model binding pending"
+        ]
+      },
+      {
+        "case_id": "AAPL/fee_slippage_stress",
+        "native_exit_code": null,
+        "status": "not run",
+        "conditions": [
+          "retained inputs not staged",
+          "5f launcher/managed-Python mount route pending",
+          "Q17 candidate version/fee-model binding pending"
+        ]
+      }
+    ]
+  },
+  "native_context_observations": {
+    "evidence_class": "local_integration",
+    "current_docker_context": "non-system Unix endpoint",
+    "isolated_home_docker_context": "default system socket",
+    "context_inspect_exit_codes": [
+      0,
+      0
+    ],
+    "current_daemon_info_exit_code": 0,
+    "current_daemon_rootless": true,
+    "configuration_changed": false,
+    "credential_files_read_or_copied": false
+  },
+  "review_status": "pending independent review",
+  "hold_questions": [
+    "Q15 staged J2 retained inputs/route",
+    "Q17 candidate case bindings"
+  ],
+  "not_claimed": [
+    "independent acceptance of this publication",
+    "simulation parity or case completion",
+    "account-scoped risk fix behavioral acceptance",
+    "C1\u2013C4 paper acceptance",
+    "destination pin move"
+  ],
+  "native_run_input_proof": {
+    "base_commit": "ecfa112764c664d35377dd66b8cfcb67e5a94d60",
+    "runtime_files_sha256": {
+      "blueprints/us-equities/runtime-2604/install-trading-2604.sh": "7720762cdd62deb3738fc4298b24ef0ac0252edf9236875c4e3d335f96d44e6e",
+      "blueprints/us-equities/runtime-2604/accept-trading-2604.sh": "792ceee9276f3d58e65b40b70dc335997c8783ba7be2b69d0448c6ce5b8c9491",
+      "blueprints/us-equities/runtime-2604/trading-2604-runtime/pyproject.toml": "721c3a9e40cb2a1f5220d302fd4fad4bae9dbf83983f15bc80e4c713fbe482da",
+      "blueprints/us-equities/runtime-2604/trading-2604-runtime/uv.lock": "853ad0a1ee272087bd0e79646dc1255150a6a9f0f45d0dbbf207ed084f7035b4"
+    },
+    "before_after_identical": true,
+    "before": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/files-before.sha256",
+      "sha256": "6a0fc763bf2263129690823e2df601731e65b2cf6cef44768c8c8ecff66ad2d6",
+      "bytes": 520
+    },
+    "after": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/files-after.sha256",
+      "sha256": "6a0fc763bf2263129690823e2df601731e65b2cf6cef44768c8c8ecff66ad2d6",
+      "bytes": 520
+    },
+    "comparison": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/files-unchanged.txt",
+      "sha256": "a6328afc76e9db71da297ebff4b0d3e7a7eb3b01d917c05a6573fef121b6ecb6",
+      "bytes": 5
+    }
+  },
+  "host_log_proofs": {
+    "install.out": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/install.out",
+      "sha256": "d8962eedb95ae4fbd3eb7d53ac2ecc48c14231d9353cd8f9240293f47775bbcd",
+      "bytes": 15
+    },
+    "install.err": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/install.err",
+      "sha256": "bd3e2a3529bf11ff6be729b7395dbae998be391596dd5a78869a10f450050a84",
+      "bytes": 8297
+    },
+    "accept.out": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/accept.out",
+      "sha256": "fb2b9f40441298c9219f4656970c734bd470ee0d227ea5f6490501d37d16e94c",
+      "bytes": 663
+    },
+    "accept.err": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/accept.err",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "install.rc": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/install.rc",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "accept.rc": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/accept.rc",
+      "sha256": "9a271f2a916b0b6ee6cecb2426f0b3206ef074578be55d9bc94f6f3fe3ab86aa",
+      "bytes": 2
+    },
+    "install.start": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/install.start",
+      "sha256": "7b969a6e11681bca9c0641384bb4d6f5f97a28903c1cca8a99b058415252c218",
+      "bytes": 21
+    },
+    "install.end": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/install.end",
+      "sha256": "21252b27eb7dc995ce9774b0ca080329174d0dbfc3a965146f2687297f1e344c",
+      "bytes": 21
+    },
+    "accept.start": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/accept.start",
+      "sha256": "21252b27eb7dc995ce9774b0ca080329174d0dbfc3a965146f2687297f1e344c",
+      "bytes": 21
+    },
+    "accept.end": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/accept.end",
+      "sha256": "f8b43e8b0db94e49aa4fb6b9ad485f5e040b39d2cc38114b2f3b51933b313df4",
+      "bytes": 21
+    },
+    "files-before.sha256": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/files-before.sha256",
+      "sha256": "6a0fc763bf2263129690823e2df601731e65b2cf6cef44768c8c8ecff66ad2d6",
+      "bytes": 520
+    },
+    "files-after.sha256": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/files-after.sha256",
+      "sha256": "6a0fc763bf2263129690823e2df601731e65b2cf6cef44768c8c8ecff66ad2d6",
+      "bytes": 520
+    },
+    "files-unchanged.txt": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/files-unchanged.txt",
+      "sha256": "a6328afc76e9db71da297ebff4b0d3e7a7eb3b01d917c05a6573fef121b6ecb6",
+      "bytes": 5
+    },
+    "head.txt": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/head.txt",
+      "sha256": "5b439da89e45c819f757510037aed75c8f64dd58a2bdbe6b2a48dd35aa17bff8",
+      "bytes": 41
+    },
+    "iso-home-size.txt": {
+      "ref": "coord:j4-rc6-hostrun-20261006T000057Z/iso-home-size.txt",
+      "sha256": "0894122e42fe3107b09e5a907c70eca6d3f9c5547fc06d2244d83b5aa4f83020",
+      "bytes": 43
+    }
+  },
+  "route": {
+    "native_context_owner": "ns2604-coop",
+    "authority": "A16 in lane questions,2026-10-06T00:00:52Z",
+    "docker_host_setting": "unix://$XDG_RUNTIME_DIR/docker.sock; native UID1000 endpoint",
+    "source": "https://docs.docker.com/engine/security/rootless/",
+    "home_override_order": "after mise",
+    "no_guard_bypass_or_self_restored_distribution_variable": true
+  }
+}

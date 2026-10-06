@@ -1,0 +1,393 @@
+{
+  "schema_version": 1,
+  "evidence_class": "source_review",
+  "observed_at_utc": "2026-10-05T23:51:20Z",
+  "review_status": "pending independent review",
+  "candidate_status": "provisional",
+  "release": {
+    "tag_name": "v2.0.0rc6",
+    "name": "NautilusTrader 2.0.0rc6",
+    "prerelease": true,
+    "draft": false,
+    "published_at": "2026-10-05T03:03:18Z",
+    "html_url": "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc6"
+  },
+  "release_notes": {
+    "url": "https://github.com/nautechsystems/nautilus_trader/releases/tag/v2.0.0rc6",
+    "sha256": "9893c04c5ebf6ba7b254a19f3ae7eec1a6e3c32bb59f8c16c7264855f1931564",
+    "publication_date_caveat": "The release prose names October 4 UTC; the GitHub published_at field is October 5 UTC.",
+    "pinned_source": "nautechsystems/nautilus_trader@7b766f8825b2539c5b2ac1375e9d97b41c509edb:RELEASES.md",
+    "locators": {
+      "instrument_fee_migration": [
+        73,
+        74
+      ],
+      "explicit_backtest_fee_model": [
+        145,
+        146
+      ],
+      "rust_client_routing": 148,
+      "routed_account_risk_fix": 259,
+      "reconciliation_fixes": [
+        248,
+        249,
+        262
+      ]
+    },
+    "summary": "Fee rates move from instruments to venue models; backtests explicitly provide a model even when fees are zero. Rust client registration no longer adds venue routes; maintained live/backtest nodes retain their routing. The routed-account risk fix and reconciliation corrections are included."
+  },
+  "tag": {
+    "object": "d76a9032a7f747825e7fd65664bb47844bce32f9",
+    "commit": "7b766f8825b2539c5b2ac1375e9d97b41c509edb"
+  },
+  "fix": {
+    "commit": "ed6fc8bf47fd37dda97d63b9b2df160719ee2bac",
+    "rc6_comparison": {
+      "status": "ahead",
+      "behind_by": 0,
+      "merge_base": "ed6fc8bf47fd37dda97d63b9b2df160719ee2bac",
+      "url": "https://github.com/nautechsystems/nautilus_trader/compare/ed6fc8bf47fd37dda97d63b9b2df160719ee2bac...v2.0.0rc6"
+    },
+    "rc5_comparison": {
+      "status": "diverged",
+      "behind_by": 189,
+      "merge_base": "e91692d4e0c5054aa42c15284e4c9b23091e5b15",
+      "url": "https://github.com/nautechsystems/nautilus_trader/compare/ed6fc8bf47fd37dda97d63b9b2df160719ee2bac...v2.0.0rc5"
+    },
+    "source": "nautechsystems/nautilus_trader@ed6fc8bf47fd37dda97d63b9b2df160719ee2bac:crates/risk/src/engine/mod.rs:1244,1277"
+  },
+  "issues": [
+    {
+      "number": 4946,
+      "state": "closed",
+      "state_reason": "completed",
+      "title": "Risk engine silently skips all account-scoped pre-trade checks for broker-routed instruments",
+      "url": "https://github.com/nautechsystems/nautilus_trader/issues/4946"
+    },
+    {
+      "number": 5007,
+      "state": "open",
+      "state_reason": null,
+      "title": "[Interactive Brokers] `generate_fill_reports` sends the prefixed `AccountId` as the execution filter's account code: rejects with error 321",
+      "url": "https://github.com/nautechsystems/nautilus_trader/issues/5007"
+    },
+    {
+      "number": 5057,
+      "state": "open",
+      "state_reason": null,
+      "title": "[Interactive Brokers] Working orders from a previous session can't be managed after restart (PreSubmitted → unhandled SUBMITTED external order, 'Trader ID not found')",
+      "url": "https://github.com/nautechsystems/nautilus_trader/issues/5057"
+    },
+    {
+      "number": 5060,
+      "state": "open",
+      "state_reason": null,
+      "title": "[Interactive Brokers] External fills become refused reduce-only orders, fill queries are replayed as live fills, and the position check waits on them",
+      "url": "https://github.com/nautechsystems/nautilus_trader/issues/5060"
+    }
+  ],
+  "tag_ci": {
+    "total_count": 42,
+    "counts": {
+      "skipped": 2,
+      "success": 40
+    },
+    "all_completed": true,
+    "runs": [
+      {
+        "id": 111598512270,
+        "name": "publish-github-release",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111598512270"
+      },
+      {
+        "id": 111597896670,
+        "name": "publish-release-integrity",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111597896670"
+      },
+      {
+        "id": 111597548355,
+        "name": "publish-sdist-pypi",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111597548355"
+      },
+      {
+        "id": 111596595289,
+        "name": "publish-wheels-pypi",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111596595289"
+      },
+      {
+        "id": 111596595280,
+        "name": "publish-cargo-crates",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111596595280"
+      },
+      {
+        "id": 111594021034,
+        "name": "publish-wheels-master",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111594021034"
+      },
+      {
+        "id": 111593939482,
+        "name": "upload-sdist-release",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111593939482"
+      },
+      {
+        "id": 111592788603,
+        "name": "build-sdist",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111592788603"
+      },
+      {
+        "id": 111592558511,
+        "name": "publish",
+        "conclusion": "skipped",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111592558511"
+      },
+      {
+        "id": 111592558436,
+        "name": "security-gate-nightly",
+        "conclusion": "skipped",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111592558436"
+      },
+      {
+        "id": 111592557484,
+        "name": "tag-release",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111592557484"
+      },
+      {
+        "id": 111555993069,
+        "name": "merge-jupyterlab",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923109/job/111555993069"
+      },
+      {
+        "id": 111555456397,
+        "name": "build-docker-images (jupyterlab-linux/amd64)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923109/job/111555456397"
+      },
+      {
+        "id": 111555456352,
+        "name": "build-docker-images (jupyterlab-linux/arm64)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923109/job/111555456352"
+      },
+      {
+        "id": 111555181492,
+        "name": "merge-nautilus_trader",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923109/job/111555181492"
+      },
+      {
+        "id": 111548332100,
+        "name": "build-macos (3.12)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111548332100"
+      },
+      {
+        "id": 111548332070,
+        "name": "build-windows (3.12)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111548332070"
+      },
+      {
+        "id": 111548332063,
+        "name": "build-macos (3.13)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111548332063"
+      },
+      {
+        "id": 111548332060,
+        "name": "build - python 3.12 (ubuntu-22.04)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111548332060"
+      },
+      {
+        "id": 111548332053,
+        "name": "build-linux-arm (3.12)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111548332053"
+      },
+      {
+        "id": 111548332050,
+        "name": "build-macos (3.14)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111548332050"
+      },
+      {
+        "id": 111548332040,
+        "name": "build - python 3.13 (ubuntu-22.04)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111548332040"
+      },
+      {
+        "id": 111548332038,
+        "name": "build-linux-arm (3.14)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111548332038"
+      },
+      {
+        "id": 111548332028,
+        "name": "build - python 3.14 (ubuntu-22.04)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111548332028"
+      },
+      {
+        "id": 111548332012,
+        "name": "build-linux-arm (3.13)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111548332012"
+      },
+      {
+        "id": 111548332007,
+        "name": "build-windows (3.13)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111548332007"
+      },
+      {
+        "id": 111548331996,
+        "name": "rust tests (ubuntu-22.04)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111548331996"
+      },
+      {
+        "id": 111548331995,
+        "name": "build-windows (3.14)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111548331995"
+      },
+      {
+        "id": 111546934550,
+        "name": "release cargo publish preflight",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111546934550"
+      },
+      {
+        "id": 111546796930,
+        "name": "pre-commit",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111546796930"
+      },
+      {
+        "id": 111546744294,
+        "name": "security audit / audit-result",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111546744294"
+      },
+      {
+        "id": 111546539029,
+        "name": "script tests",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111546539029"
+      },
+      {
+        "id": 111546530678,
+        "name": "security audit / supply-chain",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111546530678"
+      },
+      {
+        "id": 111546530636,
+        "name": "security audit / zizmor",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111546530636"
+      },
+      {
+        "id": 111546421157,
+        "name": "security audit / changes",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111546421157"
+      },
+      {
+        "id": 111546421122,
+        "name": "cargo-vet",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111546421122"
+      },
+      {
+        "id": 111546421077,
+        "name": "release docs/features preflight",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111546421077"
+      },
+      {
+        "id": 111546421023,
+        "name": "cargo-deny",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111546421023"
+      },
+      {
+        "id": 111546420867,
+        "name": "plan",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923439/job/111546420867"
+      },
+      {
+        "id": 111546419656,
+        "name": "build-docker-images (nautilus_trader-linux/amd64)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923109/job/111546419656"
+      },
+      {
+        "id": 111546419430,
+        "name": "build-docker-images (nautilus_trader-linux/arm64)",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923109/job/111546419430"
+      },
+      {
+        "id": 111546419340,
+        "name": "build-docs",
+        "conclusion": "success",
+        "url": "https://github.com/nautechsystems/nautilus_trader/actions/runs/37239923107/job/111546419340"
+      }
+    ],
+    "evidence_class": "source_review",
+    "boundary": "GitHub check metadata at the tag; no local engine or broker qualification is inferred."
+  },
+  "quickstart": {
+    "rc5": {
+      "sha256": "487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53",
+      "bytes": 9054
+    },
+    "rc6": {
+      "sha256": "4c097d21c5501e5f0b804bca552fe25527f194cfa247e76d115fea7591d27da2",
+      "bytes": 9218
+    },
+    "rc6_source": "nautechsystems/nautilus_trader@7b766f8825b2539c5b2ac1375e9d97b41c509edb:docs/getting_started/quickstart.py:131,221",
+    "executable_delta": "Upstream adds MakerTakerFeeModel and explicit zero maker/taker rates to the venue.",
+    "prose_delta": "The supported Python prerequisite text narrows from 3.12+ to 3.12–3.14; the retained interpreter is 3.12.3."
+  },
+  "pypi": {
+    "url": "https://pypi.org/pypi/nautilus_trader/2.0.0rc6/json",
+    "version": "2.0.0rc6",
+    "requires_python": "<3.15,>=3.12",
+    "requires_dist": [
+      "pandas<4.0.0,>=2.3.3; extra == \"visualization\"",
+      "plotly<8.0.0,>=7.0.0; extra == \"visualization\"",
+      "kaleido<2.0.0,>=1.4.0; extra == \"visualization\"",
+      "simplejson<5.0.0,>=4.1.2; extra == \"visualization\""
+    ],
+    "linux_cp312_wheels": [
+      {
+        "filename": "nautilus_trader-2.0.0rc6-cp312-cp312-manylinux_2_34_x86_64.whl",
+        "sha256": "9b4002a7bf5e6399c51073039b740ccf3ca7a1e2584ff72c7d479f03eaa9658d",
+        "size": 69828675,
+        "uploaded_at": "2026-10-05T02:57:21.386880Z"
+      }
+    ]
+  },
+  "cooldown_source": "native-agent-stack@ecfa112764c664d35377dd66b8cfcb67e5a94d60:docs/decisions/2026-10-03-omniroute-3851-pin.md:14–17",
+  "not_claimed": [
+    "host acceptance",
+    "simulation parity",
+    "broker connection or orders",
+    "C1–C4 paper qualification",
+    "destination pin selection"
+  ]
+}

@@ -11,14 +11,14 @@ umask 077
 readonly project="$HOME/projects/us-equities-runtime"
 readonly python="$project/.venv/bin/python"
 readonly adapter="$project/vendor/adaptive-paper"
-readonly quickstart_hash=487e6807dedd1a38062638eb671f6110799451611819542bf0f0c10646cb2c53
+readonly quickstart_hash=4c097d21c5501e5f0b804bca552fe25527f194cfa247e76d115fea7591d27da2
 readonly adapter_commit=dca821cca85dce3647fa7b488d5a23fbe5b85d4a
 readonly ib_image='ghcr.io/gnzsnz/ib-gateway@sha256:91165c0752ca534c0dad3c40683ae7c2745974d4d277651a90e90411ca609d8d'
 readonly lean_image='docker.io/quantconnect/lean@sha256:70071d1bbb90385deb60c7d20bc3830c7f4c79f6c09c5d1ade9196c009f68861'
 
 # Version/import probes are integration checks, not upstream test-suite passes.
 specs=(
-    'nautilus-trader|2.0.0rc5|nautilus_trader'
+    'nautilus-trader|2.0.0rc6|nautilus_trader'
     'numpy|2.5.3|numpy'
     'pandas|3.0.6|pandas'
     'alpaca-py|0.44.0|alpaca'
