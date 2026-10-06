@@ -1,0 +1,19 @@
+"""Documentary #562 OSV/PyPI probe adaptation; public read-only endpoints, no credential.
+Source: native-stack@74cc5468:.../relock-2026-09-30-litellm.osv-advisories.py.txt.
+Prints actual package version queries and published advisory/release metadata.
+"""
+import json
+import urllib.request
+
+for advisory in ("GHSA-27vj-qcqg-25rc", "GHSA-68fv-2mgg-jv7q"):
+    url = f"https://api.osv.dev/v1/vulns/{advisory}"
+    data = json.load(urllib.request.urlopen(url, timeout=30))
+    print(json.dumps({"source": url, "id": data["id"], "published": data.get("published"), "modified": data.get("modified"), "aliases": data.get("aliases"), "affected": data.get("affected"), "severity": data.get("severity"), "database_specific": data.get("database_specific"), "references": data.get("references")}))
+for version in ("2025.9.0", "2026.6.0"):
+    request = urllib.request.Request("https://api.osv.dev/v1/query", headers={"Content-Type": "application/json"}, data=json.dumps({"package": {"name": "fsspec", "ecosystem": "PyPI"}, "version": version}).encode())
+    found = sorted(v["id"] for v in json.load(urllib.request.urlopen(request, timeout=30)).get("vulns", []))
+    print(f"query PyPI fsspec=={version}: {found if found else 'no advisories'}")
+    url = f"https://pypi.org/pypi/fsspec/{version}/json"
+    release = json.load(urllib.request.urlopen(url, timeout=30))
+    for f in release["urls"]:
+        print(f"{url}: {f['filename']} uploaded {f['upload_time_iso_8601']} yanked={f.get('yanked')} sha256={f['digests']['sha256']}")

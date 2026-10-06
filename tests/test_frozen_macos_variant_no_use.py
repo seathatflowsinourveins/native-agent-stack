@@ -143,12 +143,31 @@ RELOCK = "blueprints/runtime-workers/openhands/evidence/relock-2026-09-30-"
 SPLIT_PORT = "blueprints/runtime-workers/openhands/evidence/relock-2026-10-03-osv-split-hardening."
 RETIREMENT = "evidence/artifacts/wsl-retrieval-retirement-20261003/"
 PINNED_LINES: dict[str, list[tuple[str, str]]] = {
+    "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec.guard-controls.final.txt": [
+        ("9474ee986803aab9f694a75fcedac539ada37ea8fa2e4d802a08fe186a0f64d3", "synthetic binding failure metadata; no variant execution"),
+    ],
+    # Reviewed native scan data only; these captures neither install nor serve
+    # the variant. Explicit filenames and exact line hashes keep the tripwire.
+    **{
+        f"{prefix}.{phase}.frozen.txt": [
+            (OSV_SCANNED, "native scanner's metadata observation"),
+            ("99ed1345f35841de29e655641a9a1446c8d822c5f88da1be4d3b796b197a211e", "native existing Next exception report"),
+            ("ae16c4316e32a20b3ddd291f35f1feaefbd5803057eaa12f0442e778753b0c8a" if phase == "osv-before" else "a5a34c88df88df7c0e0b2ae9c8d91ca603ad7fa9cb9b3174ad71fdff68c2b6c3", "native source-map-js finding or reviewed exception report"),
+        ]
+        for prefix in (
+            "blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec",
+            "blueprints/convergence-practice/application-delivery/relock-2026-10-05-source-map-js",
+            "blueprints/convergence-practice/application-delivery/relock-2026-10-05-mako",
+        )
+        for phase in ("osv-before", "osv-after")
+    },
     ".github/dependabot.yml": [
         ("0aff72e75928d5620d72d7ca2d8b83710b80b66df2fb13bbcd1efbebc8fd1385", "comment on the frozen npm manifests"),
     ],
     ".github/osv-scanner-frozen-macos.toml": [
         ("b1da0e974ad07fe290e4eb8ab11fed6c9542794f21952c417e4e0cc347a7f510", "header comment naming its one lock"),
         ("28cf96a6b02e884b9ea3fdd019309d8126202a0687cce8f84d871224ecd15206", "the exception's reason"),
+        ("d76da0c3e01240d403c70e08e6a22c4ad011ab73296ce90cdb65e93f82f6e7a6", "reviewed source-map-js exception metadata; no install/build/server route"),
     ],
     ".github/osv-scanner-lockfiles.json": [
         (LOCK_PATH, "the frozen lock's inventory key"),

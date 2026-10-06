@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Documentary #562 builder adaptation. Native commands only; no model request.
+# Usage: bash <script> <scratch> <tree> <rtk> <uv> <osv> <external-test-tmp>
+# Sources: native-stack@74cc5468, install-container.sh and security-scan.yml.
+set -euo pipefail
+R=$1; W=$2; RTK=$3; UV=$4; OSV=$5; TEST_TMP=$6
+OH=$W/blueprints/runtime-workers/openhands/evidence/relock-2026-10-05-fsspec
+"$RTK" bash "$OH.relock.sh.txt" "$R" "$W" "$RTK" "$UV"
+"$RTK" cmp "$R/u3/new/requirements.lock.repro" "$W/blueprints/runtime-workers/openhands/requirements.lock"
+"$RTK" python3 "$OH.hash-check.py.txt" "$W/blueprints/runtime-workers/openhands/requirements.lock" fsspec
+"$RTK" python3 "$OH.hash-check.py.txt" "$W/blueprints/runtime-workers/openhands/requirements.lock" multidict
+"$RTK" bash "$OH.install-check.sh.txt" "$R" "$W" "$RTK" "$UV"
+(cd "$W" && TMPDIR="$TEST_TMP" PYTHONDONTWRITEBYTECODE=1 "$RTK" python3 -B -m unittest tests.test_openhands_lock_binding tests.test_osv_lockfile_coverage tests.test_frozen_macos_variant_no_use)
+"$RTK" bash "$OH.osv-scan-step.sh.txt" "$OSV" "$W" "$R/osv-builder" "$RTK"
+# The scan wrapper reports both actual native exits; caller checks each output.
