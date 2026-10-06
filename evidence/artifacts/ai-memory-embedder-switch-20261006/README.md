@@ -15,9 +15,14 @@ with cosine differences at most2e-6. p50 latency changed184→54ms.
 
 Evidence class is native execution by the named executor, with private raw
 files retained. This publication is not a rerun or an upstream test result.
-Gate3 is PARTIAL and non-blocking: Codex→Claude passed late after native login;
-Claude→Codex did not run post-switch because its source session hit429.
-The earlier missing Claude prompt-capture defect remains open. The
+The receipt's acceptance-time Gate3 is PARTIAL and non-blocking: Codex→Claude
+passed late after native login; Claude→Codex did not run post-switch because
+its source session hit429, and the missing Claude prompt-capture defect was
+then open. The CC later applied the upstream capture installer; a fresh
+Claude→Codex follow-up passed recall and the marker/fact association control.
+The strict no-canary-fact-text control still failed. The dated
+[decision](../../../docs/decisions/2026-10-06-ai-memory-nemotron-embedder.md)
+records that separate follow-up without changing this receipt. The
 manager-level environment check remains an untested boundary.
 
 Only the receipt is published. Questions, page paths, session identifiers,
