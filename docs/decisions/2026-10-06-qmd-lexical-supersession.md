@@ -41,3 +41,10 @@ acceptance would be required to overturn the current retrieval direction.
 CC owns final holder checks, deletion/unregistration, and both-client
 configuration application/read-back. Historical artifacts and decided text stay
 intact; further decision changes use dated addenda or supersession links.
+
+## Addendum (2026-10-06): source record identity
+
+The existing private record is `qmd-lexical-supersession-20261006T2244Z.md`,
+SHA256 `32cd72064f13bd60ed1dd059fe6a0b195f54d5f49464bccffee57358c1fc55a6`.
+This portable companion links its preserved decision/evidence boundaries without
+publishing a private host path. The private record itself remains unchanged.
