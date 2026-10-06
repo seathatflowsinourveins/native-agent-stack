@@ -56,6 +56,13 @@ def stop_flag_names(client: str) -> tuple[str, ...]:
     refusal: the remaining tests wait for the next window and are carried forward, never consumed)."""
     return ("STOP", f"STOP.{client}", f"DEFER.{client}")
 
+
+# Exit reasons whose test pilot.py carries forward on resume, as it does a test refused before launch (finding 4): a
+# Claude trial the launcher killed at its own first in-stream meter reading (the §9.1 prior) never did the task. The
+# session still counts toward the cap of 14 (the launcher counts every launched Claude session), and the grader keeps
+# such a trial out of the session-content gates (G2, G3, G5, G6) while containment, S7 and kept-file gates still apply.
+CARRY_FORWARD_REASONS = ("meter_prior_first_event",)
+
 # §9.1 Claude meter. The prior is the pilot's start rule; the kill rule censors a running trial.
 PRIOR_FIVE_HOUR = 0.50
 PRIOR_SEVEN_DAY = 0.75

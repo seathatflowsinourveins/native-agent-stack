@@ -24,7 +24,7 @@ or experiment word while sessions run.
    (prepare.py --claude-completion ... --amendment-ref ...).
 5  collect.py.  6  grade.py trials.
 Resume: --from-stage 2 or 4 runs only tests whose launched trials are fewer than their repeat; a test refused before
-launch (meter, lock, DEFER) is carried forward. --from-stage 2 --rerun-gate0-failures runs once more only the stage-2
+launch (meter, lock, DEFER), or a Claude trial the launcher killed at its own first meter reading, is carried forward. --from-stage 2 --rerun-gate0-failures runs once more only the stage-2
 tests whose gate-0 check failed (for example a Claude probe stopped by the meter, in the next 5-hour window), then
 collects and checks gate 0 again. A DEFER.claude flag is cleared on resume once the newest meter reading allows a
 start; STOP flags stay until the operator removes them.
@@ -42,7 +42,8 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from common import HOME, RUNS_ROOT, load_json, newest_meter_reading, prior_allows, read_jsonl, sha256_file, utc_now  # noqa: E402
+from common import (CARRY_FORWARD_REASONS, HOME, RUNS_ROOT, load_json, newest_meter_reading, prior_allows,  # noqa: E402
+                    read_jsonl, sha256_file, utc_now)
 
 PROTOCOL_PREFIXES = {HOME / ".claude/CLAUDE.md": "b86ea2c4655637fa", HOME / ".claude/settings.json": "861959ff0e49803f"}
 CLAUDE_PROBE = {"key": "probe-claude-native", "cell": "claude-native", "prompt": "Reply with the single word: ready."}
@@ -64,9 +65,12 @@ def step(label: str, cmd: list[str], log: list) -> int:
 
 
 def launched_by_ref(root: Path) -> dict:
+    """Launched trials per test ref, less those carried forward (common.CARRY_FORWARD_REASONS)."""
+    rows = read_jsonl(root / "ledger.jsonl")
+    carried = {r.get("trial_id") for r in rows if r.get("phase") == "exit" and r.get("reason") in CARRY_FORWARD_REASONS}
     counts = {}
-    for row in read_jsonl(root / "ledger.jsonl"):
-        if row.get("phase") == "launched" and row.get("ref"):
+    for row in rows:
+        if row.get("phase") == "launched" and row.get("ref") and row.get("trial_id") not in carried:
             counts[row["ref"]] = counts.get(row["ref"], 0) + 1
     return counts
 

@@ -28,9 +28,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 
-from common import (CLI_PROGRAMS, CLI_WRAPPERS, HOME, MARKERS, MCP_SERVER_ITEMS, PRIOR_FIVE_HOUR, PRIOR_SEVEN_DAY,  # noqa: E402
-                    RUNS_ROOT, V1_ROOT, load_json, parse_stream_text, read_jsonl, sha256_bytes, sha256_file, trial_dir,
-                    utc_now, write_json)
+from common import (CARRY_FORWARD_REASONS, CLI_PROGRAMS, CLI_WRAPPERS, HOME, MARKERS, MCP_SERVER_ITEMS,  # noqa: E402
+                    PRIOR_FIVE_HOUR, PRIOR_SEVEN_DAY, RUNS_ROOT, V1_ROOT, load_json, parse_stream_text, read_jsonl,
+                    sha256_bytes, sha256_file, trial_dir, utc_now, write_json)
 
 HARNESS_SKILLS = {"native-stack-research", "native-stack-worker", "standing-delegation"}
 READ_PROGRAMS = {"cat", "sed", "head", "tail", "nl", "less", "rg", "grep", "bat", "more"}
@@ -1672,7 +1672,7 @@ def grade_run(root: Path) -> dict:
     # init in this run (the same host MCP servers serve both clients). Claude trials sort first for that reason.
     run_tools: dict = dict(cfg.get("tools_by_server") or {})
     gate_rows = {g: [] for g in ("G2", "G3", "G5", "G6", "G7", "G8", "G9", "G11", "G13", "G14")}
-    gaps = []
+    gaps, carried_forward = [], []
     for tid, trial in sorted(ledger.items(), key=lambda kv: (kv[1].get("client") != "claude",
                                                              kv[1]["rows"].get("pre-launch", {}).get("at", ""))):
         rows = trial["rows"]
@@ -1686,13 +1686,19 @@ def grade_run(root: Path) -> dict:
         graded_by[tid] = (record, graded)
         task = graded["task"]
         uses = graded["uses"]
-        gate_rows["G2"].append(graded["joins"]["pass"])
-        gate_rows["G3"].append(graded["agreement"]["pass"])
-        gate_rows["G5"].append(record["marker_ok"] and not rows.get("prepared", {}).get("lint_f_hits") and not record["argv_lint"])
-        if trial.get("client") == "claude":
-            # G6 on the trial's own first in-stream reading (the launcher applies the prior to it as well).
-            gate_rows["G6"].append(graded["hook_events"] > 0 and graded["rate_limit_events"] > 0 and graded["efforts"] == ["max"]
-                                   and record["claude"]["started_below_prior"])
+        record["carried_forward"] = exit_row.get("reason") in CARRY_FORWARD_REASONS
+        if record["carried_forward"]:
+            # Killed at its own first meter reading (the §9.1 prior) and carried forward by pilot.py: the session never
+            # did the task, so the session-content gates (G2, G3, G5, G6) skip it; G4, G7, G8, G13 and G14 still apply.
+            carried_forward.append(tid)
+        else:
+            gate_rows["G2"].append(graded["joins"]["pass"])
+            gate_rows["G3"].append(graded["agreement"]["pass"])
+            gate_rows["G5"].append(record["marker_ok"] and not rows.get("prepared", {}).get("lint_f_hits") and not record["argv_lint"])
+            if trial.get("client") == "claude":
+                # G6 on the trial's own first in-stream reading (the launcher applies the prior to it as well).
+                gate_rows["G6"].append(graded["hook_events"] > 0 and graded["rate_limit_events"] > 0 and graded["efforts"] == ["max"]
+                                       and record["claude"]["started_below_prior"])
         gate_rows["G7"].append(not [h for h in record["watcher"] if h["got_past"] and h.get("halts", True)]
                                and not exit_row.get("nested_clients"))
         gate_rows["G8"].append(record["kept"]["draft_copy"] and record["kept"]["fixture_exists"])
@@ -1741,6 +1747,9 @@ def grade_run(root: Path) -> dict:
         "child or subagent representation": any(u.get("actor", "main") != "main" for r in table for u in r.get("uses", [])),
     }
     gates = {g: {"pass": all(v) if v else None, "n": len(v)} for g, v in gate_rows.items()}
+    for g in ("G2", "G3", "G5", "G6"):
+        if carried_forward:
+            gates[g]["carried_forward_skipped"] = carried_forward
     # G4: every block's S7 view equal before and after, and every launcher trial's own comparison present and equal
     # (CL7b has no launcher; its block's comparison covers it).
     per_trial = [r for r in table if r.get("launched") and r.get("cell") != "codex-app-server"]
@@ -1762,7 +1771,7 @@ def grade_run(root: Path) -> dict:
     gates["G15"] = {"observed": observed, "gaps": [k for k, v in observed.items() if not v]}
     return {"graded_at": utc_now(), "run_id": cfg["run_id"], "grader_sha256": sha256_file(Path(__file__)),
             "common_sha256": sha256_file(HERE / "common.py"), "trials": table, "oir": oir, "gates": gates, "gaps": gaps,
-            "registry_status": (cfg.get("registry") or {}).get("status"),
+            "carried_forward": carried_forward, "registry_status": (cfg.get("registry") or {}).get("status"),
             "claude_completion": cfg.get("claude_completion"),
             "notes": ["Outcome grading (D then R oracles, 0-4) is the coordinator's blind GPT step; none is computed here.",
                       "Labels (R4) are pending, so OIR uses each task's own item as the target; no verdict is derived.",
