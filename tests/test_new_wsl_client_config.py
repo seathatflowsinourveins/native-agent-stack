@@ -165,7 +165,7 @@ class Round2RepairIntegrationTests(unittest.TestCase):
                  "model": "gpt-6.1-sol", "requestedModel": "cx/gpt-6.1-sol"}]
         self.assertEqual(gate.observed_routes(rows), {"cx/gpt-6.1-sol"})
         for field, value in (("status", 503), ("path", "/v1/embeddings"),
-                             ("model", "another-model"), ("requestedModel", "cx/gpt-6.1-sol-max")):
+                             ("model", "another-model"), ("requestedModel", "cx/gpt-6.1-sol-unlisted")):
             with self.subTest(field=field), self.assertRaises(ValueError):
                 gate.observed_routes([dict(rows[0], **{field: value})])
         with self.assertRaisesRegex(ValueError, "no call log"):
@@ -174,7 +174,8 @@ class Round2RepairIntegrationTests(unittest.TestCase):
     def test_gateway_metadata_accepts_only_documented_codex_id_and_alias(self):
         gate = self.source_module("gateway-effort-accept.py")
         for prefix in ("cx", "codex"):
-            for model, effort in (("gpt-6.1-sol", "xhigh"), ("gpt-6.1-sol-high", "high")):
+            for model, effort in (("gpt-6.1-sol", "xhigh"), ("gpt-6.1-sol-high", "high"),
+                                  ("gpt-6.1-sol-max", "max")):
                 route = f"{prefix}/{model}"
                 row = {"status": 200, "path": "/v1/chat/completions", "model": model,
                        "requestedModel": route, "provider": "codex"}
@@ -182,12 +183,30 @@ class Round2RepairIntegrationTests(unittest.TestCase):
                     self.assertEqual(gate.observed_routes([row]), {route})
                     self.assertEqual(gate.ROUTES[route], effort)
                 for field, value in (("requestedModel", f"other/{model}"),
-                                     ("requestedModel", f"{prefix}/{model}-max"),
+                                     ("requestedModel", f"{prefix}/{model}-unlisted"),
                                      ("requestedModel", f"{prefix}/gpt-6.1-sol-high" if model == "gpt-6.1-sol" else f"{prefix}/gpt-6.1-sol"),
                                      ("provider", "other"), ("status", 503), ("active", True),
-                                     ("path", "/v1/embeddings")):
+                                     ("path", "/v1/embeddings"), ("path", "/v1/unlisted-inference")):
                     with self.subTest(route=route, field=field, value=value), self.assertRaises(ValueError):
                         gate.observed_routes([dict(row, **{field: value})])
+
+    def test_gateway_session_join_includes_canonical_deerflow_max_route_without_wire_claim(self):
+        gate = self.source_module("gateway-effort-accept.py")
+        started, finished = "2026-10-05T04:00:00+00:00", "2026-10-05T04:01:00+00:00"
+        rows = [
+            {"id": "synthetic-gptr", "timestamp": "2026-10-05T04:00:10Z", "sessionTag": "synthetic-research",
+             "status": 200, "path": "/v1/chat/completions", "model": "gpt-6.1-sol-high",
+             "requestedModel": "cx/gpt-6.1-sol-high", "provider": "codex"},
+            {"id": "synthetic-deerflow", "timestamp": "2026-10-05T04:00:20Z", "sessionTag": "synthetic-research",
+             "status": 200, "path": "/v1/responses", "model": "gpt-6.1-sol-max",
+             "requestedModel": "codex/gpt-6.1-sol-max", "provider": "codex"},
+        ]
+        with mock.patch.object(gate, "get_json", return_value=rows), contextlib.redirect_stdout(io.StringIO()) as out:
+            self.assertEqual(gate.main("synthetic-research", started, finished), 0)
+        self.assertIn("join=session", out.getvalue())
+        self.assertIn("high, max", out.getvalue())
+        self.assertIn("not observed wire", out.getvalue())
+        self.assertIn("Delivered wire effort is not asserted", out.getvalue())
 
     def test_gateway_paging_stops_at_old_persisted_rows_and_joins_the_run(self):
         gate = self.source_module("gateway-effort-accept.py")

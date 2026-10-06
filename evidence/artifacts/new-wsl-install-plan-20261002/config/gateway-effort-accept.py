@@ -28,9 +28,15 @@ import urllib.request
 
 BASE = "http://127.0.0.1:21128/api/usage/call-logs"
 # OmniRoute@c1e30b76: registry/codex/index.ts:9-13; services/model.ts:484-490.
+# Composed upstream@0585aba5589d5a1f49243a13a8db249558e7c9e3:
+# open-sse/config/providers/registry/codex/index.ts:73;
+# open-sse/executors/codex/reasoningSuffix.ts:11-18,35-50.
+# Canonical plan topology: pool_fallback.model=cx/gpt-6.1-sol-max.
 # Accept only the documented provider ID/alias and these exact model suffixes.
 ROUTES = {"cx/gpt-6.1-sol": "xhigh", "cx/gpt-6.1-sol-high": "high",
-          "codex/gpt-6.1-sol": "xhigh", "codex/gpt-6.1-sol-high": "high"}
+          "cx/gpt-6.1-sol-max": "max",
+          "codex/gpt-6.1-sol": "xhigh", "codex/gpt-6.1-sol-high": "high",
+          "codex/gpt-6.1-sol-max": "max"}
 MODELS = {route.split("/", 1)[1] for route in ROUTES}
 
 
