@@ -6,6 +6,18 @@
   "task_and_failure": "Frozen public multi-agent metadata/code answers; component invocation does not establish complete provider-token savings or equal quality.",
   "primary_sources_and_pins": [
     {
+      "url": "https://github.com/rtk-ai/rtk",
+      "revision": "e001f773f80b22b7dc4c7a79521b30e35aaef026"
+    },
+    {
+      "url": "https://github.com/mksglu/context-mode",
+      "revision": "6f0cc6841c687e754059f36714a11233fda1a02b"
+    },
+    {
+      "url": "https://github.com/headroomlabs-ai/headroom",
+      "revision": "32d7ca4577d599b8a5f811ada74cf31504302c9d"
+    },
+    {
       "url": "https://github.com/harbor-framework/harbor",
       "revision": "b53b8134e1241686dca7759af188f987ecc48e8b"
     },
@@ -74,7 +86,7 @@
       },
       {
         "path": "blueprints/convergence-practice/token-memory-ablation-20261006/source-review.json",
-        "sha256": "1904a8f56e969fb31aef8ecbb5cb279fe46a975e3a2045c57c9604a7c4f33ac1"
+        "sha256": "2e5284cc0cfd005775b64610352efc85aebf58b50147b8f76128dc814834583b"
       },
       {
         "path": "blueprints/convergence-practice/token-memory-ablation-20261006/component-pins.json",
@@ -186,7 +198,7 @@
     "evaluation": [
       {
         "path": "blueprints/convergence-practice/token-memory-ablation-20261006/preregistration.md",
-        "sha256": "a63ef4e212eb695adc715bbdba46b9de30a45550a8369fbd4997ac615bdf04a0"
+        "sha256": "d2473653b3b85b46bd34ffa609643aaaf20299a47459a0b152d92017527ffbba"
       },
       {
         "path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
@@ -199,8 +211,8 @@
     ]
   },
   "predeclared_metrics": {
-    "quality_rule": "Exact output-only factual and source/AST oracle in the frozen preregistration and tasks. Preserve wrong/empty negative controls. Conservative paired discordance quality bounds; small exploratory corpus cannot qualify confirmatory efficiency.",
-    "usage_rule": "Failure-inclusive complete provider tokens per accepted task; all preparation,parent,child,auxiliary,review,retry calls. Disjoint input categories and inclusive output; unknown remains null. Task-cluster intervals, fixed multiplicity and margins per frozen preregistration. No invokes-to-savings conversion."
+    "quality_rule": "EXPLORATORY lineage/accounting design only. Consider real native invocation rates, scoped upstream observation-layer reports and exact task quality together. Keep factual output-only oracles and negative controls; reserved confirmatory interval rules are inactive.",
+    "usage_rule": "Preserve invocation counts/opportunity denominators, client/actor scope and windows; unknown rates remain unknown. RTK gain, ctx_stats and Headroom savings are scoped upstream estimates, not causal complete-provider savings. Complete non-overlapping parent/child/retry categories remain the boundary for any future provider claim; never sum report estimates with provider totals."
   },
   "runtime_and_platform": {
     "platform": "Owned isolated Linux rootless trial state; actual host identity remains private.",
@@ -233,7 +245,7 @@
   "limitations": [
     "Preregistration/source review only; no pilot or outcome.",
     "Command-center ACK, exact native job/profile freeze, isolated upstream qualification and discriminating child/provider reconciliation required before execution.",
-    "Small public task slice cannot establish preregistered confirmatory quality margins; full matrix requires explicit exploratory approval or larger frozen corpus.",
+    "Keep the twelve-case corpus; do not enlarge it or run the matrix. Confirmatory floors of 68 token and 42 memory cases per client are best-case feasibility, not power. The reserved matrix needs a separately frozen amendment triggered by live-layer quality regression or the user's request for confirmatory savings.",
     "Enclosing preregistration/research usage is unknown and excluded; no whole-session or lifetime saving is claimed.",
     "Harbor Codex one-rollout import cannot alone prove complete child usage; native unresolved transport/accounting blocks that family."
   ],
@@ -243,7 +255,7 @@
     "qualification_run_ids": []
   },
   "rollback": "Keep accepted owner defaults and shared state intact; discard only the future owned trial state through its native cleanup after retained evidence.",
-  "next_decision_changing_test": "Exact-head CC ACK of the freeze, then isolated harness/profile/accounting qualification and the scoped discriminating pilot; no experiment starts from this record alone.",
+  "next_decision_changing_test": "A live layer shows a quality regression, or the user requests confirmatory savings: prepare a separately frozen confirmatory amendment. No corpus enlargement or matrix now; every future pilot/run still requires exact-head CC ACK and native qualification.",
   "usage_assessment": {
     "claim": "none",
     "coverage": "partial",

@@ -1,6 +1,6 @@
 # Freeze multi-agent token and memory savings before measurement
 
-Decision date: 2026-10-06. Scope: a source-reviewed, planned experiment only.
+Decision date: 2026-10-06. Scope: **EXPLORATORY preregistration and lineage-accounting input pack** only. Keep the twelve public cases; do not enlarge the corpus or run the matrix.
 
 Freeze the [preregistration](../../blueprints/convergence-practice/token-memory-ablation-20261006/preregistration.md), public cases and separate baseline/candidate records before any pilot. The command center must ACK the exact head; neither catalog inclusion nor structural validation starts a run. The north-star action is efficient multi-agent engineering with independently checked factual quality.
 
@@ -14,6 +14,10 @@ F-token and F-memory follow the owner's existing full/lean/removal scope in [the
 
 The Gate A public tasks are locally authored fixtures. An explicit output-only grading amendment lets both full and lean answer the same question. Tool hits remain a separate adoption diagnostic. Five memory cases and twelve total cases bound the claim; incomplete accounting, unavailable interfaces, underpowered intervals or failed controls produce blocked/inconclusive evidence.
 
-Use failure-inclusive complete-provider tokens per accepted task as the primary metric. Keep the historical Headroom 0.867 success-conditioned ratio as a prior only; its failure-inclusive ratio was 1.043. Organic invocation counts are not savings or native-arm qualification. A future measured result can overturn a scoped efficiency recommendation only under the preregistered equal-quality, complete-usage and interval rules; the owner decides any removal.
+The current observational criterion considers real invoke rates, scoped upstream savings reports and task quality together. Missing opportunity denominators leave rates unknown. RTK's [byte-based gain estimate](https://github.com/rtk-ai/rtk/blob/e001f773f80b22b7dc4c7a79521b30e35aaef026/docs/guide/analytics/gain.md#L113), Context Mode's [session/lifetime estimates](https://github.com/mksglu/context-mode/blob/6f0cc6841c687e754059f36714a11233fda1a02b/src/server.ts#L1032) and Headroom's [native ledger report](https://github.com/headroomlabs-ai/headroom/blob/32d7ca4577d599b8a5f811ada74cf31504302c9d/headroom/cli/savings.py#L48) remain their own evidence classes. They do not establish causal complete-provider savings, and are not summed with provider totals. Keep the historical Headroom 0.867 success-conditioned ratio as a prior only; its failure-inclusive ratio was 1.043. No new native report or invoke measurement has run here.
+
+The reserved confirmatory exact method needs at least **68 independent token cases per client at K=16**, or **42 memory cases per client at K=1**, to make the strict +/-0.10 bound reachable with zero discordance. This follows [SciPy's exact two-sided bound](https://github.com/scipy/scipy/blob/e4e854eaa8f18d807cd3496028e257e36caa93cc/scipy/stats/_binomtest.py#L130): U=1-(alpha/4)^(1/n), alpha=.05/K. Adjacent bounds are .1012814/.0998690 for n=67/68 and .1013653/.0990756 for n=41/42. These floors are not a power guarantee, and repetitions or children are not independent cases. Those interval rules remain inactive in this exploratory pack.
+
+**Overturn condition:** if a live layer shows a quality regression, or the user asks for confirmatory savings, prepare a separately frozen confirmatory amendment. Its corpus, power, controls and decision rules need review and exact-head ACK before any run. Neither this record nor native counters start that matrix or remove a default automatically.
 
 Evidence class: pinned source review and structural preparation. No new model task, measurement, native installation or host acceptance has run. The planned record's claim is none and usage coverage is partial. The completeness critic's missing larger-project, document, lifecycle and recovery classes feed the next sweep.

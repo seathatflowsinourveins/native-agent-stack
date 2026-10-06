@@ -3,6 +3,34 @@
   "kind": "pinned_source_review",
   "reviewed_at_utc": "2026-10-06",
   "claims_are_execution": false,
+  "observational_sources": {
+    "rtk": {
+      "repository": "https://github.com/rtk-ai/rtk",
+      "revision": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "source": "docs/guide/analytics/gain.md:12,58-62,113-127",
+      "command": "rtk gain --format json",
+      "boundary": "Command-output byte estimates over retained history; project views overlap."
+    },
+    "context_mode": {
+      "repository": "https://github.com/mksglu/context-mode",
+      "revision": "6f0cc6841c687e754059f36714a11233fda1a02b",
+      "source": "src/server.ts:1032-1052",
+      "command": "ctx_stats",
+      "boundary": "Session bytes/4 and separate lifetime event heuristic, not provider accounting."
+    },
+    "headroom": {
+      "repository": "https://github.com/headroomlabs-ai/headroom",
+      "revision": "32d7ca4577d599b8a5f811ada74cf31504302c9d",
+      "sources": [
+        "headroom/cli/savings.py:48-70",
+        "headroom/savings_ledger.py:53-54,291-300"
+      ],
+      "command": "headroom savings --json",
+      "boundary": "Native ledger capped at 30 days; a zero report does not prove zero guard activity or provider savings."
+    },
+    "evidence_class": "source_review",
+    "new_native_observations": []
+  },
   "harnesses": [
     {
       "repository": "https://github.com/harbor-framework/harbor",
