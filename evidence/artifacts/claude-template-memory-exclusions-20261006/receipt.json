@@ -1,0 +1,114 @@
+{
+  "schema": "native-agent-stack/claude-template-memory-exclusions/v1",
+  "recorded_at": "2026-10-06T23:54:24Z",
+  "status": "proposed; native owner acceptance pending",
+  "repository_base": "d9eb68750311d5f888adec140723da174f9fe10c",
+  "decision": "docs/decisions/2026-10-06-claude-template-memory-exclusions.md",
+  "north_star_action": "Read foundation examples and scaffold sources for US-equities R&D without adopting their template instructions as nested project memory.",
+  "provenance": {
+    "task": "C6, command-center item task-ns2604-coop-20261006T203515Z, section 5",
+    "peer_observation": "IMPROVEMENT-MANIFEST.md C6, lines 136-142, session-d91d55ad-20261006 private coordination record",
+    "peer_observation_class": "historical peer native observation; not reproduced by this lane"
+  },
+  "source_review": {
+    "evidence_class": "upstream source and documentation review",
+    "installed_client": {
+      "command": ["rtk", "claude", "--version"],
+      "exit_code": 0,
+      "returned": "2.1.292 (Claude Code)"
+    },
+    "installed_help": {
+      "command": ["rtk", "proxy", "claude", "--help"],
+      "exit_code": 0,
+      "supported_options_observed": ["--settings", "--setting-sources"],
+      "limit": "Help establishes the settings entry points, not this setting's runtime effect."
+    },
+    "official_release": {
+      "repository": "anthropics/claude-code",
+      "tag": "v2.1.292",
+      "pin": "fbe20e00e2851fc01506f54f98a8f0b875af3847",
+      "source": "CHANGELOG.md:2784",
+      "url": "https://github.com/anthropics/claude-code/blob/fbe20e00e2851fc01506f54f98a8f0b875af3847/CHANGELOG.md#L2784",
+      "observation": "The retained 2.1.239 entry records a fix for exclusions that name symlink paths. The pinned source reviewed here is the changelog, not the memory-loading engine implementation."
+    },
+    "official_docs": [
+      {
+        "url": "https://code.claude.com/docs/en/memory#exclude-specific-claude-md-files",
+        "read_date": "2026-10-06",
+        "supported_contract": "Glob patterns match absolute file paths; a leading **/ example is documented; project settings are supported; arrays merge across layers."
+      },
+      {
+        "url": "https://code.claude.com/docs/en/memory#when-claude-code-reads-agents-md",
+        "read_date": "2026-10-06",
+        "supported_contract": "Native nested AGENTS loading is documented, and imports and claudeMdExcludes apply to AGENTS files."
+      }
+    ],
+    "failed_fetch_preserved": {
+      "operation": "Python urllib request to the official memory.md URL",
+      "exit_code": 1,
+      "error_class": "HTTP 403",
+      "recovery": "The native context-mode fetch-and-index of the same public URL succeeded; its documented exclusions and AGENTS sections were read."
+    }
+  },
+  "client_map_gate": {
+    "evidence_class": "repository source review",
+    "sources": [
+      "native-agent-stack@d9eb68750311d5f888adec140723da174f9fe10c:adoption/new-wsl/client-config-map.json:3",
+      "native-agent-stack@d9eb68750311d5f888adec140723da174f9fe10c:tools/adoption/new_wsl_client_config.py:130-147"
+    ],
+    "result": "The map enumerates adoption templates and new-distribution additions; .claude/settings.json is outside those inputs. No explicit project-setting ban was found in that scope. No unmapped template key was added."
+  },
+  "configuration": {
+    "path": ".claude/settings.json",
+    "sha256": "dcdf3fc4eef8246792ab37eaa931d6304238f7db11d2c268316d383ef2cf63b0",
+    "added_key": "claudeMdExcludes",
+    "value": [
+      "**/examples/claude-native/CLAUDE.md",
+      "**/adoption/scaffold/CLAUDE.md",
+      "**/adoption/scaffold/AGENTS.md"
+    ],
+    "scope": "Three exact template suffixes, including the scaffold import/native-AGENTS target; no root or blueprint exclusion.",
+    "portability": "Documented **/ globs against absolute paths; no private host path or variable expansion.",
+    "all_existing_keys_equal_to_base": true,
+    "existing_key_comparison_class": "independent JSON comparison against the base git blob after removing the one added property"
+  },
+  "local_integration_checks": {
+    "evidence_class": "unchanged repository integration tests; not upstream tests or native memory acceptance",
+    "environment": {"CI": "true", "umask": "022"},
+    "command": [
+      "nice", "-n", "19", "ionice", "-c3", "python3", "-B", "-m", "unittest",
+      "tests.test_secret_path_guard.SecretPathGuardTests.test_project_settings_register_hook_and_deny_rules",
+      "tests.test_secret_path_guard.SecretPathGuardTests.test_every_anchored_read_deny_has_a_context_mode_twin",
+      "tests.test_install_claude_profile.SecretGuardProfileTests",
+      "tests.test_install_claude_profile.CommittedSettingsFallbackGuardTests",
+      "tests.test_install_claude_profile.PortableTopRuleTests"
+    ],
+    "execution_prefix": ["rtk", "proxy"],
+    "exit_code": 0,
+    "tests_run": 25,
+    "returned_summary": "Ran 25 tests in 0.228s; OK",
+    "raw_output_sha256": "8494a426ba9838bbe662a1aaca891dd36d6e5a11837ac7d9843c76b6787bf9f8",
+    "raw_output_location": "private durable lane C6 work directory, focused-tests.log",
+    "omissions": "No new mirror test, complete repository test suite, inference session, or interactive /context acceptance."
+  },
+  "overlap_check": {
+    "evidence_class": "GitHub open-PR file metadata",
+    "open_prs_read": 95,
+    "pull_request_pagination_complete": true,
+    "file_pagination_complete": true,
+    "matching_open_prs_for_project_settings": [],
+    "query_policy": "Rate limit checked; cached 120 seconds; followed only file continuation pages; no watcher."
+  },
+  "native_acceptance": {
+    "status": "pending command-center decision and owner execution",
+    "procedure": "A fresh interactive Claude session reads an ordinary example and scaffold source; native /context must show none of the three template paths as nested memory. Read a blueprint source and verify its domain instructions plus root/user instructions remain. Keep a same-scope unexcluded baseline as needed to prove the trigger.",
+    "counter_claim": "No native token saving is claimed."
+  },
+  "limitations": [
+    "Source review and local checks do not establish installed-host application or runtime memory loading.",
+    "Exact suffix globs may also match an external path with the same suffix while this project's settings apply.",
+    "Exclusion arrays merge across settings layers; the owner must inspect the effective native scopes during acceptance.",
+    "No client/user configuration, template contents, gateway, service, credential file or operating-system state was changed.",
+    "No observed historical value or decided text was edited; this is a new linked proposal and receipt."
+  ]
+}
