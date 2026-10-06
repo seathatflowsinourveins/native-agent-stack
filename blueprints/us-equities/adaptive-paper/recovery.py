@@ -32,19 +32,29 @@ _LONG_TOKEN = re.compile(r"[A-Za-z0-9+/=_-]{24,}")
 _ENGINE_WORDS = re.compile(r"[a-z]+(?:[_/][a-z]+)+")
 
 
-def _long_token(match):
-    word = match.group(0)
-    return _HOME_PATH.sub("<path>", word) if _ENGINE_WORDS.fullmatch(word) else "<redacted>"
-
-
 def _text(value):
-    """Redact the whole text, then stop it at 300 characters, so a long token that crosses the cut is redacted
-    whole and never survives as a short fragment. Long tokens are found in the original text, before any home path
-    is replaced, so a path inside a token cannot shorten it below the threshold; then the remaining home paths are
-    replaced, inside a kept engine word too. The engine's own words stay readable."""
-    text = _LONG_TOKEN.sub(_long_token, str(value))
-    text = _HOME_PATH.sub("<path>", text)
-    return text[:300]
+    """Redact, then stop the text at 300 characters, so a long token that crosses the cut is redacted whole and never
+    survives as a short fragment. Every home path and every long token that is not one of the engine's own words is
+    found in the ORIGINAL text; overlapping or touching spans are joined and each joined span is replaced once
+    (<path> when it holds a home path, else <redacted>). So neither rule can shorten the other's match: a path inside
+    a token cannot leave a short token prefix, and a token cannot consume a path's start and leave its suffix."""
+    text = str(value)
+    spans = sorted([(m.start(), m.end(), True) for m in _HOME_PATH.finditer(text)]
+                   + [(m.start(), m.end(), False) for m in _LONG_TOKEN.finditer(text)
+                      if not _ENGINE_WORDS.fullmatch(m.group(0))])
+    joined = []
+    for start, end, path in spans:
+        if joined and start <= joined[-1][1]:
+            first, last, held = joined[-1]
+            joined[-1] = (first, max(last, end), held or path)
+        else:
+            joined.append((start, end, path))
+    out, position = [], 0
+    for start, end, path in joined:
+        out += [text[position:start], "<path>" if path else "<redacted>"]
+        position = end
+    out.append(text[position:])
+    return "".join(out)[:300]
 
 
 def _engine_text(exc):

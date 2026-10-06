@@ -485,30 +485,74 @@ class RecoveryTests(unittest.TestCase):
         for token in redacted:
             self.assertNotIn(token, text)
 
-    def test_a_home_path_inside_a_long_token_cannot_shorten_it(self):
-        # #809 delta read (P3): replacing a home path first used to leave a 20-character prefix of a 30-character
-        # token below the threshold; tokens are now found in the original text, in the message and context alike
+    def test_a_home_path_and_a_long_token_cannot_shorten_each_other(self):
+        # #809 delta reads r2 and r3 (P3s): replacing paths first left a 20-character token prefix, and replacing
+        # tokens first left a punctuated path suffix. Both spans are now found in the original text and joined.
         from transport import TransportError
         for root in ("home", "Users", "root"):
-            with self.subTest(root):
-                self.setUp()
-                value = "read failed " + "A" * 20 + "/" + root + "/user"
+            path = "/" + root + "/user"  # built here: no literal home path in this file
+            for value, expected in (("read failed " + "A" * 20 + path, "read failed <path>"),
+                                    ("read failed " + "A" * 24 + path + "/.secret/key.txt", "read failed <path>"),
+                                    ("read failed " + path + "/<redacted>/x.y " + "B" * 30, "read failed <path> <redacted>")):
+                with self.subTest(root=root, value=value[12:40]):
+                    self.setUp()
 
-                class PathPort(FakePort):
-                    async def snapshot(self):
-                        try:
-                            raise TransportError(value)
-                        except TransportError as cause:
-                            raise TransportError(value) from cause
-                self.original_buy()
-                self.port.__class__ = PathPort
-                detail = self.recover()["error_details"][0]
-                for key in ("message", "context_message"):
-                    self.assertEqual(detail[key], "read failed <redacted>")
+                    class PathPort(FakePort):
+                        async def snapshot(self):
+                            try:
+                                raise TransportError(value)
+                            except TransportError as cause:
+                                raise TransportError(value) from cause
+                    self.original_buy()
+                    self.port.__class__ = PathPort
+                    detail = self.recover()["error_details"][0]
+                    for key in ("message", "context_message"):
+                        self.assertEqual(detail[key], expected)
         import recovery
-        inside = "data" + "/".join(["", "ho" + "me", "someone", "secret_value"])  # built here: no literal home path
-        self.assertEqual(recovery._text("kept engine/words " + inside),
+        home = "/".join(["", "ho" + "me", "someone"])
+        self.assertEqual(recovery._text("kept engine/words data" + home + "/secret_value"),
                          "kept engine/words data<path>")  # a home path inside a kept engine word is still replaced
+        self.assertEqual(recovery._text("kept datadatadata" + home + ".secret.value"),
+                         "kept datadatadata<path>")  # ... and its punctuated suffix with it
+
+    def test_random_texts_match_a_character_mask_oracle(self):
+        # A seeded check of the joined-span rule against an independent formulation: mask every character that a
+        # home path or a non-engine long token covers in the ORIGINAL text, then replace each maximal masked run
+        # once. The r2 (paths first) and r3 (tokens first) orders both fail it.
+        import random
+        import recovery
+        rng = random.Random(809)
+        roots = ["/" + r + "/" for r in ("ho" + "me", "Us" + "ers", "ro" + "ot")]
+        pieces = [lambda: "Q" * rng.randint(1, 40), lambda: rng.choice(roots) + rng.choice(["u", "Qx", "a.Q", "<path>", ""]),
+                  lambda: "a" * rng.randint(1, 30), lambda: "quotes_subscription_rejected",
+                  lambda: "authentication/subscription/quote", lambda: "data_set",
+                  lambda: rng.choice([" ", ".", ",", "<redacted>", "(", ")", "/", "-", "x", "_"])]
+
+        def oracle(text):
+            mask, path = [False] * len(text), [False] * len(text)
+            for m in recovery._HOME_PATH.finditer(text):
+                for i in range(m.start(), m.end()):
+                    mask[i] = path[i] = True
+            for m in recovery._LONG_TOKEN.finditer(text):
+                if not recovery._ENGINE_WORDS.fullmatch(m.group(0)):
+                    for i in range(m.start(), m.end()):
+                        mask[i] = True
+            out, i = [], 0
+            while i < len(text):
+                if not mask[i]:
+                    out.append(text[i]); i += 1
+                    continue
+                j, held = i, False
+                while j < len(text) and mask[j]:
+                    held, j = held or path[j], j + 1
+                out.append("<path>" if held else "<redacted>"); i = j
+            return "".join(out)[:300]
+        for _ in range(4000):
+            text = "".join(rng.choice(pieces)() for _ in range(rng.randint(1, 14)))
+            out = recovery._text(text)
+            self.assertEqual(out, oracle(text), text)
+            for root in roots:
+                self.assertNotIn(root, out, text)
 
     def test_redaction_runs_before_the_length_cap(self):
         # #809 review (P3): a long token that crosses character 300 is redacted whole, never cut into a short
