@@ -7,6 +7,8 @@ for every request, so a control driver can switch behaviour between runs:
 
   {"mode": "...", "tail_s": 3.0, "row_delay_s": 0.4, "http_status": 200, "flip_s": 3, "dup_s": 4, "effort_upstream_override": "xhigh", "responses_corr_header": true}
   (responses_corr_header: send X-Correlation-Id on /v1/responses too, as the real gateway does on some responses; by default only Chat Completions responses carry it, so a Responses client attributes rows by the response id)
+  ("null_effort": [true, false, ...]: a list cycled over the requests that write rows; a true entry writes BOTH effort columns as NULL, as the real gateway does for a response without encrypted reasoning; without it the columns
+   carry the client's requested effort and, for a model whose id ends in -max, an upstream effort max even when the client sent none; "effort_upstream_override" replaces the upstream effort of a row that is not NULL)
 
   mode "normal"            rows are written row_delay_s after the terminal event, whether or not the client is still connected (what the patched gateway does)
   mode "lose-on-early"     rows are written only when the client stayed connected until the stream ended; a client that closes after the terminal event leaves NO row (the unpatched gateway's drop)
@@ -34,14 +36,22 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ARGS = None
 LOCK = threading.Lock()
+ROW_COUNTER = [0]   # requests that wrote rows, for the null_effort pattern
 
 
 def now():
     return dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
 
 
+MODE_MTIME = [None]
+
+
 def mode():
     try:
+        mtime = os.stat(ARGS.mode_file).st_mtime_ns
+        if mtime != MODE_MTIME[0]:   # a driver rewrote the mode file for a new scenario: the null_effort pattern starts again
+            MODE_MTIME[0] = mtime
+            ROW_COUNTER[0] = 0
         return json.load(open(ARGS.mode_file))
     except Exception:
         return {"mode": "normal"}
@@ -181,7 +191,17 @@ class Handler(BaseHTTPRequestHandler):
             write_own = False
         if write_own:
             effort_up = cfg.get("effort_upstream_override")
-            row_id = insert_rows(path, model, tin, tout, corr, resp_id, tag, effort, effort_up=effort_up)
+            row_effort, null_row = effort, False
+            pattern = cfg.get("null_effort")
+            if pattern:
+                with LOCK:
+                    ROW_COUNTER[0] += 1
+                    null_row = bool(pattern[(ROW_COUNTER[0] - 1) % len(pattern)])
+                if null_row:
+                    row_effort, effort_up = None, None
+            if not null_row and effort_up is None and row_effort is None and model.endswith("-max"):
+                effort_up = "max"   # the model suffix carries the effort upstream although the client sent none
+            row_id = insert_rows(path, model, tin, tout, corr, resp_id, tag, row_effort, effort_up=effort_up)
             if m == "dup-usage":
                 with LOCK:
                     con = db()
@@ -190,7 +210,7 @@ class Handler(BaseHTTPRequestHandler):
                     con.close()
             if m == "double-row":
                 time.sleep(float(cfg.get("dup_s", 4)))
-                insert_rows(path, model, tin, tout, corr, resp_id, tag, effort, with_usage=False, effort_up=effort_up)
+                insert_rows(path, model, tin, tout, corr, resp_id, tag, row_effort, with_usage=False, effort_up=effort_up)
             if m == "status-flip":
                 flip_status_later(row_id, float(cfg.get("flip_s", 3)))
         elif m == "unrelated-only":

@@ -22,10 +22,10 @@ P=$(cd "$(dirname "$0")" && pwd)
 LIVE=$P/omniroute-live-acceptance-20261006.py
 NATIVE=$P/omniroute-native-exec-acceptance-20261006.py
 IDENT=$P/gateway-identity-20261006.py
-FROZEN_LIVE=15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b
+FROZEN_LIVE=fa8fa6f8dc3a0e7360be4a0737c34daaf4d4b58696df6a7ab3483896cb739e82
 FROZEN_NATIVE=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71
 FROZEN_IDENT=a7932710412e9e834f6b992f267db5620b64bbe62f25021013c8004a7eec6011
-FROZEN_BASELINE_RAW=40c6399d580e98706b02aa3eed8b64b997880c8324189a1067823f4561592c58
+FROZEN_BASELINE_RAW=@BASELINE_RAW_SHA@
 UNPATCHED_PREFIX=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167
 UNPATCHED_BUILD=cf6748d04
 DRAIN_PREFIX=omniroute-3.8.51-c1e30b76-affinity-pr15167-drain-b7c68690
@@ -36,8 +36,7 @@ BASEFILE=${3:-}
 WAITS="--wait1 12 --wait2 60"
 LIVE_ARGS=""; NATIVE_ARGS="--quiet-timeout 120 --exec-timeout 300"; IDENT_ARGS=""
 N_RACE=6; N_ASTRA=4; N_TWO=8
-# the raw set: eight requests of the five request kinds, then each effort probe three times in a row (its attempts form a group; the gateway stores the effort columns only for a response with encrypted reasoning)
-RAW_MODES="responses:eof responses:early:0 responses:early:0 responses:early:0.5 responses:early:2 chat:eof chat:early:0 chat:early:0 effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max effort:cx/gpt-6-astra:max effort:cx/gpt-6.1-sol-max effort:cx/gpt-6.1-sol-max effort:cx/gpt-6.1-sol-max effort:cx/gpt-6.1-sol:max effort:cx/gpt-6.1-sol:max effort:cx/gpt-6.1-sol:max"
+RAW_MODES="responses:eof responses:early:0 responses:early:0 responses:early:0.5 responses:early:2 chat:eof chat:early:0 chat:early:0 effort:cx/gpt-6-astra:max effort:cx/gpt-6.1-sol-max effort:cx/gpt-6.1-sol:max"
 JOURNAL_CMD='journalctl --user -u omniroute.service --since "$SINCE" -o cat --no-pager'
 case "$KIND" in
   baseline) EXPECT=observe; EXP_PREFIX=$UNPATCHED_PREFIX; EXP_BUILD=$UNPATCHED_BUILD;;
@@ -140,7 +139,7 @@ if [ $PRE = 1 ]; then
   echo "PRECONTROL race_lost=$LOST_RACE/$N_RACE tworequest_incomplete=$LOST_TWO/$N_TWO_PRE race_discriminating=$DISC (the protocol's rule: fewer than 2 of $N_RACE lost means the race set cannot discriminate at this hour)" | tee -a "$OUT/live-acceptance-$KIND-race.txt"
 else
   # shellcheck disable=SC2086
-  run "live-acceptance-$KIND-raw.txt" "$KIND, raw set (seventeen requests), frozen script v2, --expect $EXPECT" \
+  run "live-acceptance-$KIND-raw.txt" "$KIND, raw set (eleven requests), frozen script v2, --expect $EXPECT" \
     python3 "$LIVE" --expect "$EXPECT" "${RAWBASE[@]}" $WAITS $LIVE_ARGS $RAW_MODES
   # shellcheck disable=SC2086
   run "live-acceptance-$KIND-race.txt" "$KIND, race set (responses:early:0 x$N_RACE), frozen script v2, --expect $EXPECT" \

@@ -1,0 +1,55 @@
+# Publication note: UUID-shaped strings (the gateway's correlation ids) are shortened to their first 8 hex digits and an ellipsis, because the repository's publication check rejects full UUIDs; sha256 of this text before the shortening: e49c1d74e3027dd16995558901bf45adac7628e51e8adcc9dd05272a8d932c5b; the unshortened text is kept in the first host's private artifact directory (checks/logs/MANIFEST.txt)
+# Produced by version 2.0 of the raw script (sha256 fa8fa6f8...) and version 2 of the native script on the unpatched build cf6748d04, 2026-10-06 02:02-02:17Z (superseded; see superseded/README.md). The raw baseline shows the effort-probe flaw (the sol:max probe's columns are NULL where version 1's baseline had max/max); the native two-request run was cut off by the host restart (header only).
+# baseline, raw set (eleven requests), frozen script v2, --expect observe; started 2026-10-06T02:02:49Z; wrapper kind=baseline
+IDENTITY label=before-live-acceptance-baseline-raw.txt time=2026-10-06T02:02:49Z unit=omniroute.service MainPID=3396193 ExecMainStartTimestamp=Mon_2026-10-05_16:12:12_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=294 expect_prefix_ok=True expect_build_ok=True
+FROZEN version=2 script_sha256=fa8fa6f8dc3a0e7360be4a0737c34daaf4d4b58696df6a7ab3483896cb739e82 argv=['--expect', 'observe', '--wait1', '12', '--wait2', '60', 'responses:eof', 'responses:early:0', 'responses:early:0', 'responses:early:0.5', 'responses:early:2', 'chat:eof', 'chat:early:0', 'chat:early:0', 'effort:cx/gpt-6-astra:max', 'effort:cx/gpt-6.1-sol-max', 'effort:cx/gpt-6.1-sol:max'] cwd=/tmp start=2026-10-06T02:02:49.568Z expect=observe wait1=12.0 wait2=60.0 port=20128 db=$HOME/.local/share/omniroute/storage.sqlite baseline=None baseline_sha256=None
+RESULT mode=responses:eof http=200 terminal=True closed_early=False stream_s=70.2 corr=2556d021… response_id=resp_0c2363ac8b658f9e016ac456ca1e2887d194a6e56e66fe3e1e read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-06T02:02:54.577Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 37, 'ready', 'max', 'max') id8=2b58b1e3
+   usage_history: ('2026-10-06T02:02:54.570Z', 'gpt-6-astra', '200', 22, 37)
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=2.5 corr=54ba4754… response_id=resp_017ebbd1e0946b74016ac4571d35bc87d19abbde4627940876 read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0 http=200 terminal=True closed_early=True stream_s=3.5 corr=None response_id=resp_0280c693f19493b7016ac4572cb72487d1916fed83c116dd79 read1_call_logs=0 read1_usage=0 window_call_logs=0 window_usage=0 verdict=OBSERVED
+RESULT mode=responses:early:0.5 http=200 terminal=True closed_early=True stream_s=3.8 corr=c270dc14… response_id=resp_022bbd9af1b8c166016ac4573ccf6c87d1ae72f192a9654688 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-06T02:04:48.367Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 23, 'ready', 'max', 'max') id8=fea8e8ed
+   usage_history: ('2026-10-06T02:04:48.362Z', 'gpt-6-astra', '200', 22, 23)
+RESULT mode=responses:early:2 http=200 terminal=True closed_early=True stream_s=5.8 corr=None response_id=resp_0c5e67c938c4c03d016ac4574dee9487d1acd55d5ae5bfce33 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-06T02:05:05.721Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 20, 'ready', 'max', 'max') id8=94e20fcf
+   usage_history: ('2026-10-06T02:05:05.716Z', 'gpt-6-astra', '200', 22, 20)
+RESULT mode=chat:eof http=200 terminal=True closed_early=False stream_s=66.1 corr=da89bd21… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-06T02:05:21.251Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None) id8=19189596
+   usage_history: ('2026-10-06T02:05:21.245Z', 'gpt-6-astra', '200', 21, 5)
+RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=0.1 corr=d45d55ae… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-06T02:06:40.588Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None) id8=239931ed
+   usage_history: ('2026-10-06T02:06:40.582Z', 'gpt-6-astra', '200', 21, 5)
+RESULT mode=chat:early:0 http=200 terminal=True closed_early=True stream_s=0.2 corr=37378d52… response_id=None read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-06T02:06:54.298Z', '/v1/chat/completions', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 21, 5, 'ready', None, None) id8=e8abd9ad
+   usage_history: ('2026-10-06T02:06:54.293Z', 'gpt-6-astra', '200', 21, 5)
+RESULT mode=effort:cx/gpt-6-astra:max http=200 terminal=True closed_early=False stream_s=73.8 corr=None response_id=resp_0bd9c1bce76b6a66016ac457ccb7a081938ddc74ddba6cf413 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-06T02:07:15.124Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 31, 'ready', 'max', 'max') id8=dc144ef3
+   usage_history: ('2026-10-06T02:07:15.112Z', 'gpt-6-astra', '200', 22, 31)
+EFFORT mode=effort:cx/gpt-6-astra:max model=gpt-6-astra requested_model=codex/gpt-6-astra effort_requested=max effort_upstream=max
+RESULT mode=effort:cx/gpt-6.1-sol-max http=200 terminal=True closed_early=False stream_s=69.3 corr=None response_id=resp_07896f8a20ad16de016ac45821b41087d1856e2093c08b1d85 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-06T02:08:37.395Z', '/v1/responses', 200, 'gpt-6.1-sol-max', 'codex/gpt-6.1-sol-max', 22, 37, 'ready', None, 'max') id8=c7544366
+   usage_history: ('2026-10-06T02:08:37.392Z', 'gpt-6.1-sol-max', '200', 22, 37)
+EFFORT mode=effort:cx/gpt-6.1-sol-max model=gpt-6.1-sol-max requested_model=codex/gpt-6.1-sol-max effort_requested=None effort_upstream=max
+RESULT mode=effort:cx/gpt-6.1-sol:max http=200 terminal=True closed_early=False stream_s=66.8 corr=f069afc2… response_id=resp_0eb76a2364f6b9a4016ac45874036087d18a0e5fab2e5d9a07 read1_call_logs=1 read1_usage=1 window_call_logs=1 window_usage=1 verdict=OBSERVED
+   call_logs: ('2026-10-06T02:09:57.068Z', '/v1/responses', 200, 'gpt-6.1-sol', 'codex/gpt-6.1-sol', 22, 5, 'ready', None, None) id8=14e8295e
+   usage_history: ('2026-10-06T02:09:57.065Z', 'gpt-6.1-sol', '200', 22, 5)
+EFFORT mode=effort:cx/gpt-6.1-sol:max model=gpt-6.1-sol requested_model=codex/gpt-6.1-sol effort_requested=None effort_upstream=None
+LATE mode=responses:eof read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0 read2_call_logs=0 read2_usage=0 changed=False verdict=OBSERVED
+LATE mode=responses:early:0.5 read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=responses:early:2 read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=chat:eof read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=chat:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=chat:early:0 read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=effort:cx/gpt-6-astra:max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=effort:cx/gpt-6.1-sol-max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+LATE mode=effort:cx/gpt-6.1-sol:max read2_call_logs=1 read2_usage=1 changed=False verdict=OBSERVED
+SUMMARY {"OBSERVED": 11} end=2026-10-06T02:12:03.135Z exit=0
+exit=0
+IDENTITY label=after-live-acceptance-baseline-raw.txt time=2026-10-06T02:12:03Z unit=omniroute.service MainPID=3396193 ExecMainStartTimestamp=Mon_2026-10-05_16:12:12_EDT NRestarts=0 running_prefix=omniroute-3.8.51-2f42a9ac-pr13788-affinity2-pr15167 BUILD_SHA=cf6748d04 health=ok pending_total=296 expect_prefix_ok=True expect_build_ok=True
+journal_failed_to_save_call_log=0 (journalctl --user -u omniroute.service --since <the unit's ExecMainStartTimestamp> -o cat --no-pager | grep -c 'Failed to save call log')
+pending_delta=2 (informational: pending_total 294 -> 296)
+RUN-STATUS live-acceptance-baseline-raw.txt status=0 (ok)
+# finished 2026-10-06T02:12:03Z

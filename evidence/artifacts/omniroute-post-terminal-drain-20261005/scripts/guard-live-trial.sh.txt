@@ -1,0 +1,37 @@
+#!/bin/bash
+# A read-only trial of the pre-switch guard against the LIVE 20128 (nothing is written or restarted): the guard's own output, then a value-free table of the established connections to the gateway port
+# (peer port, receive and send queues, bytes received and sent, milliseconds since the last send and receive) taken from `ss -tni`, which is the evidence behind the guard's rule that idle keep-alive connections are tolerated and ACTIVE ones are not.
+# usage: guard-live-trial-20261006.sh <output file>      (run it when no acceptance run is in progress; the guard fails on active connections by design)
+# GUARD_SCRIPT=<path> runs another version of the guard (the superseded version 2 for its comparison trial); the default is the current one.
+set -u
+P=$HOME/.local/state/native-agent-stack/coordination/peer-99-20261004
+TOOL=${SWITCH_TOOL_COPY:-$HOME/.cache/switch_gateways_committed.py}
+OUTF=${1:?output file}
+cd /tmp || exit 2
+{
+  echo "# read-only trial of the pre-switch guard against the live 20128, $(date -u +%FT%TZ); the guard exit status is printed at the end"
+  python3 "${GUARD_SCRIPT:-$P/pre-switch-guard-20261006.py}" --switch-tool "$TOOL" --clean-for 40 --interval 5
+  echo "guard exit=$?"
+  echo
+  echo "## established connections to port 20128 right after the guard (value-free: ports, queues and counters only)"
+  ss -Htni state established '( sport = :20128 )' | python3 -c "
+import re, sys
+lines = sys.stdin.read().splitlines()
+rows = []
+for i in range(0, len(lines) - 1, 2):
+    addr = lines[i].split()
+    info = lines[i + 1]
+    def g(k):
+        m = re.search(k + r':(\d+)', info)
+        return int(m.group(1)) if m else None
+    rows.append((addr[3].split(':')[-1], addr[0], addr[1], g('bytes_received'), g('bytes_sent'), g('lastsnd'), g('lastrcv')))
+print('peer_port recv_q send_q bytes_received bytes_sent lastsnd_ms lastrcv_ms')
+for r in sorted(rows, key=lambda r: (r[6] if r[6] is not None else 0)):
+    print(*r)
+print('connections:', len(rows))
+"
+  echo
+  echo "## client-side owners visible to this PID namespace (process names only)"
+  ss -Htnp state established '( dport = :20128 )' | grep -o 'users:(("[^"]*"' | sort | uniq -c
+} > "$OUTF" 2>&1
+echo "written $OUTF"

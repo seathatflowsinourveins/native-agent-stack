@@ -1,0 +1,29 @@
+#!/usr/bin/env python3
+"""A fixture client for the pre-switch guard's controls: it stands in for the 20129 framework gateway's periodic poll of 20128. It keeps a connection to the stub gateway open with traffic on it (a request sent in slow pieces),
+finishes the request, reads the answer, closes, and opens a NEW connection shortly after, for --duration seconds, so that a guard sampling every couple of seconds sees a connection that carries traffic and a connection that appeared
+during its window. It is run inside a transient systemd scope (`systemd-run --user --scope --unit=<name>`), which gives its process a cgroup unit of a known name for the guard's --tolerate-unit.
+usage: poller.py --port N [--duration 60]
+"""
+import argparse
+import socket
+import time
+
+ap = argparse.ArgumentParser()
+ap.add_argument("--port", type=int, required=True)
+ap.add_argument("--duration", type=float, default=60.0)
+args = ap.parse_args()
+end = time.time() + args.duration
+while time.time() < end:
+    try:
+        s = socket.create_connection(("127.0.0.1", args.port), timeout=5)
+        s.sendall(b"GET /api/health HTTP/1.1\r\nHost: x\r\n")
+        for _ in range(3):
+            time.sleep(0.6)
+            s.sendall(b"X-Slow: 1\r\n")
+        s.sendall(b"\r\n")
+        s.settimeout(3)
+        s.recv(4096)
+        s.close()
+    except OSError:
+        pass
+    time.sleep(0.02)   # a gap this short between connections keeps a sampling guard from lining up with it (a 0.2 s gap and a 2 s sampling interval phase-lock: every sample can fall into the gap)

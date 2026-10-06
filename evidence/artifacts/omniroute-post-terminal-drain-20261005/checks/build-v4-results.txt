@@ -1,0 +1,103 @@
+# A run of scripts/build-drain.sh.txt (version 4) in its own scratch tree (2026-10-06 UTC): the composition and the patched tree are checked, `git status --porcelain --untracked-files=all` must be empty before the build, every gate decides the exit status, the SHA256SUMS step's status decides it too,
+# check:pack-artifact runs with OMNIROUTE_ALLOW_CANARY_BUILD=1 (upstream's override for a build that is not a release tag) and check:pack-boot with OMNIROUTE_SERVER_HOST=127.0.0.1, REQUIRE_API_KEY=true and the reviewed lsof shim first on PATH (version 3's two real runs failed there without it: checks/preflight-race-reproduction.txt).
+# This run is NOT the recorded tarball's build (that was version 1, checks/build-results.txt): it tests the script, and its tarball is compared with the recorded one in the second block below. The deployed tarball stays the recorded one.
+# Note: the header comment of scripts/build-drain.sh.txt was reworded after this run (a typo and the sentence about version 1's pass, whose cause was not recorded); no executable line changed: the sha256 of both texts with their comment lines removed is 7b13d74ce736142c695f81b99843bb3a9ce32d6076a33d93237607826f997afa; the text as it ran is superseded/build-drain-v4-as-ran-run3.sh.txt, and the controls in checks/build-controls.txt ran on the reworded text.
+# Progress log, byte for byte except that the home directory is written $HOME.
+
+06:11:12Z clone exit=0 seconds=0
+06:11:12Z fetch pr15167 exit=0 seconds=0
+06:11:18Z checkout tag exit=0 seconds=6
+06:11:18Z apply affinity patch exit=0 seconds=0
+06:11:18Z apply pr15167 diff exit=0 seconds=0
+06:11:18Z commit composition exit=0 seconds=0
+06:11:18Z composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f equals the expected tree
+06:11:18Z apply patch under test exit=0 seconds=0
+06:11:18Z commit patch under test exit=0 seconds=0
+06:11:18Z patched tree=b7c6869001ce8bdd23e2e2352f48ce3058bc13d2 equals the expected tree
+06:12:40Z npm-ci exit=0 seconds=82
+06:12:40Z git status --porcelain --untracked-files=all lines before the build: 0; git diff --quiet HEAD: clean
+06:12:40Z HEAD ef3db312b tree b7c6869001ce8bdd23e2e2352f48ce3058bc13d2
+06:19:06Z build-release exit=0 seconds=386
+06:20:51Z check-pack-artifact exit=0 seconds=105
+06:20:51Z check:pack-artifact ran with OMNIROUTE_ALLOW_CANARY_BUILD=1 (upstream's override for a build that is not a release tag)
+06:22:32Z pack exit=0 seconds=101
+06:22:32Z BUILD_SHA ef3db312b
+9ce5c1b2cc636e70774768b1624d986408461513aaf90ad489b60fc3176645c4  omniroute-3.8.51.tgz
+06:22:32Z check:pack-boot runs with the reviewed lsof shim v2 first on PATH (sha256 b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854)
+06:26:46Z check-pack-boot exit=0 seconds=254
+[pack-boot] packing v3.8.51…
+[pack-boot] installing omniroute-3.8.51.tgz into a clean prefix (postinstall runs for real)…
+[pack-boot] installed package contains the complete sql.js WASM runtime
+[pack-boot] installed package contains the node-machine-id runtime
+[pack-boot] boot #1: installed CLI on :23503 (DATA_DIR isolated)…
+[pack-boot] healthy: HTTP 200, version 3.8.51
+[pack-boot] machine-token auth passed with no/invalid/valid contrast controls
+[pack-boot] settings write/read succeeded through the forced sql.js driver
+[pack-boot] boot #2: rebooting on the same DATA_DIR to prove disk persistence…
+[pack-boot] healthy: HTTP 200, version 3.8.51
+[pack-boot] value survived a clean shutdown + restart — disk persistence proven
+[pack-boot] ✅ the packed tarball boots AND persists — #7065 class gate green
+06:28:23Z npm pack --dry-run exit=0
+06:28:23Z dry-run shasum 745abb37418753f608612b73a0a4fd4130c756ef | kept sha1 745abb37418753f608612b73a0a4fd4130c756ef | integrity equal: True | size 137828151 137828151 | entries 26762 | equal: True
+omniroute-3.8.51-drain-b7c68690.tgz: OK
+06:28:23Z DONE; every gate exited 0; the tarball is $HOME/.cache/omniroute-drain-build-eAsuYG/out/omniroute-3.8.51-drain-b7c68690.tgz (the scratch tree and the logs stay in $HOME/.cache/omniroute-drain-build-eAsuYG; remove it with rm -rf after reading)
+
+## The rebuilt tarball against the recorded one (scripts/compare-tarballs.py.txt: the sha256 of every entry's content)
+recorded tarball: sha256 5b0e986bdff81487130cfd7c7dad20c6534f447836ff1c757e7c4bcf82d0fa14 size 137825952 entries 26762
+rebuilt  tarball: sha256 9ce5c1b2cc636e70774768b1624d986408461513aaf90ad489b60fc3176645c4 size 137828151 entries 26762
+entries with identical content: 26566; different content: 192; only in the recorded tarball: 4; only in the rebuilt tarball: 4
+-- different content: 192; 148 page_client-reference-manifest.js entries counted, not listed (first 44 of the 44 listed)
+    package/dist/.build/next/BUILD_ID
+    package/dist/.build/next/build-manifest.json
+    package/dist/.build/next/prerender-manifest.json
+    package/dist/.build/next/required-server-files.json
+    package/dist/.build/next/server/app/_global-error.html
+    package/dist/.build/next/server/app/_global-error.rsc
+    package/dist/.build/next/server/app/_global-error.segments/__PAGE__.segment.rsc
+    package/dist/.build/next/server/app/_global-error.segments/_full.segment.rsc
+    package/dist/.build/next/server/app/_global-error.segments/_tree.segment.rsc
+    package/dist/.build/next/server/chunks/[root-of-the-server]__0h5ua__._.js
+    package/dist/.build/next/server/chunks/[root-of-the-server]__0ht1z36._.js
+    package/dist/.build/next/server/chunks/[root-of-the-server]__0qg9605._.js
+    package/dist/.build/next/server/chunks/[root-of-the-server]__1lpm6lx._.js
+    package/dist/.build/next/server/chunks/_0-s55ic._.js
+    package/dist/.build/next/server/chunks/_00oflsx._.js
+    package/dist/.build/next/server/chunks/_0423vnn._.js
+    package/dist/.build/next/server/chunks/_053ftfn._.js
+    package/dist/.build/next/server/chunks/_09-_jdq._.js
+    package/dist/.build/next/server/chunks/_0awp-km._.js
+    package/dist/.build/next/server/chunks/_0c1dngp._.js
+    package/dist/.build/next/server/chunks/_0ce2q60._.js
+    package/dist/.build/next/server/chunks/_0cg9m3u._.js
+    package/dist/.build/next/server/chunks/_0d91bn4._.js
+    package/dist/.build/next/server/chunks/_0ec0c-x._.js
+    package/dist/.build/next/server/chunks/_0ewgnpb._.js
+    package/dist/.build/next/server/chunks/_0xmtlme._.js
+    package/dist/.build/next/server/chunks/_10ps6vx._.js
+    package/dist/.build/next/server/chunks/_111ad94._.js
+    package/dist/.build/next/server/chunks/_17yuil6._.js
+    package/dist/.build/next/server/chunks/_183xkwx._.js
+    package/dist/.build/next/server/chunks/_19-72wi._.js
+    package/dist/.build/next/server/chunks/_1k63na3._.js
+    package/dist/.build/next/server/chunks/_1nn3gjy._.js
+    package/dist/.build/next/server/chunks/_1o8_9_i._.js
+    package/dist/.build/next/server/chunks/_1or2115._.js
+    package/dist/.build/next/server/chunks/_1z50rze._.js
+    package/dist/.build/next/server/chunks/_20x-xp1._.js
+    package/dist/.build/next/server/chunks/ssr/_0yde3ke._.js
+    package/dist/.build/next/server/middleware-build-manifest.js
+    package/dist/.build/next/server/pages/500.html
+    package/dist/.build/next/server/server-reference-manifest.js
+    package/dist/.build/next/server/server-reference-manifest.json
+    package/dist/BUILD_SHA
+    package/dist/server.js
+-- only in the recorded tarball: 4 (first 4 of the 4 listed)
+    package/dist/.build/next/static/chunks/2tavo0-chu0j8.js
+    package/dist/.build/next/static/jjRIKAZA5WQeF7tOB62wJ/_buildManifest.js
+    package/dist/.build/next/static/jjRIKAZA5WQeF7tOB62wJ/_clientMiddlewareManifest.js
+    package/dist/.build/next/static/jjRIKAZA5WQeF7tOB62wJ/_ssgManifest.js
+-- only in the rebuilt tarball: 4 (first 4 of the 4 listed)
+    package/dist/.build/next/static/chunks/0lpbcqiuuy42h.js
+    package/dist/.build/next/static/k5K178XR8uf2KOZoyigT3/_buildManifest.js
+    package/dist/.build/next/static/k5K178XR8uf2KOZoyigT3/_clientMiddlewareManifest.js
+    package/dist/.build/next/static/k5K178XR8uf2KOZoyigT3/_ssgManifest.js

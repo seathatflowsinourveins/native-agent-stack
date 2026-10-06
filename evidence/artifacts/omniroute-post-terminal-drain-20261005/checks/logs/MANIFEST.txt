@@ -17,6 +17,9 @@
 | `validation-P-new-test-patched.log` | 2662 | 42 | `8e42a3247e139b8f67e6c068f207487b817a6dc43e1918adc7e9e5fafa22f688` | `a25eca62ec133663c0deca6405f6eab84e09ebff472572f1c3bef196995530a6` | `checks/logs/validation-P-new-test-patched.log` |
 | `handler-e2e-P-e2e-patched.log` | 24108 | 509 | `edb61b3a4a3e0255ae57540e3c8d9fa72ca1a5944a49c40f2dd722bb37e5940d` | `9c1e130ef4089258515d438a1ade981f66163305673751b89ae6d0d6f13a1400` | `checks/logs/handler-e2e-P-e2e-patched.log` |
 | `handler-e2e-U-e2e-unpatched.log` | 27365 | 576 | `05ee9a1ee32afbc54204fdf492b4216ec950142f804b72483260cca7a9485a99` | `60b340ee26a01eddeb437c0771dd158e70b0525dcc8d41ce88016a65cb5adef0` | `checks/logs/handler-e2e-U-e2e-unpatched.log` |
+| `handler-e2e-session-tag-N-session-tag-wrong-header.log` | 24278 | 550 | `80b6b0f2fd96d6411fc4918fd4ecb0090dab858040e9ec048bbaa55fb57827c5` | `5f5728416664889a33bde7f96b8aa8bf6ed67188198e9bb1835edab9ca85bb15` | `checks/logs/handler-e2e-session-tag-N-session-tag-wrong-header.log` |
+| `handler-e2e-session-tag-P-session-tag-patched.log` | 21653 | 487 | `b1e73f8ed6141f5e1115f37eb30d0c7b6cf6a8b78709f83b9f68141fd3e90d0a` | `00c4a1063526c8d952d37c3cb8a42ecb33040f56195db8ace9f02f4558a47ed2` | `checks/logs/handler-e2e-session-tag-P-session-tag-patched.log` |
+| `handler-e2e-session-tag-U-session-tag-unpatched.log` | 21655 | 487 | `9f5251429d13d3f72a4a2ceb216e4b9bf35393599fbb495c6cc08ff1b6017f2e` | `4a47a1e27d353ac33a16572ecc4c8fb0d2fc6e2dd597cbe1c6e1ff16a0e96910` | `checks/logs/handler-e2e-session-tag-U-session-tag-unpatched.log` |
 
 ## Unshortened raw outputs
 
@@ -25,7 +28,12 @@ Each file below was committed with its UUID-shaped strings (the gateway's correl
 
 | committed file | bytes (unshortened) | sha256 (unshortened) | private copy |
 | --- | --- | --- | --- |
-| `checks/acceptance-controls.txt` | 132676 | `dd8648aa15689c13c2e0d671d89a07892afa72fd32e7582a01fac9a8b60c8520` | `raw-outputs/checks__acceptance-controls.txt.gz` |
+| `checks/acceptance-controls.txt` | 198451 | `07c6aef63bf542a0efa3246babfd8cc9443460e88e54343b2c05570d9750639b` | `raw-outputs/checks__acceptance-controls.txt.gz` |
+| `checks/handler-e2e-session-tag-results.txt` | 5832 | `19393acdef858a66b6a2ec1fb713f4d37f0a650ddf9f8d870b35ebde6dd7fc51` | `raw-outputs/checks__handler-e2e-session-tag-results.txt.gz` |
+| `checks/live-acceptance-baseline-race.txt` | 3750 | `1f9f64345aadafacd871f5d1f6fb554a3ed319bad7715cff12b9cfa642707287` | `raw-outputs/checks__live-acceptance-baseline-race.txt.gz` |
+| `checks/live-acceptance-baseline-raw.txt` | 13183 | `f71a3f13d7a893111148daff70ba84b4382ed38eec4546209a3510362ae0be99` | `raw-outputs/checks__live-acceptance-baseline-raw.txt.gz` |
 | `checks/live-acceptance-baseline-v1-race.txt` | 3137 | `4c4dd15ce3a3f2f9a0adc21ec05202eea344e3091c25699002adcf633e917e9e` | `raw-outputs/checks__live-acceptance-baseline-v1-race.txt.gz` |
 | `checks/live-acceptance-baseline-v1-raw.txt` | 7189 | `958f880b96a7753eceb908dd77a4bedbacce7e467b5b019834dbfbf75dca66d9` | `raw-outputs/checks__live-acceptance-baseline-v1-raw.txt.gz` |
 | `superseded/live-acceptance-baseline-attempt1-output.txt` | 6739 | `49203ff64f2f8f783b7889fcafd5388f03daf0fa3dfd81855789415c8546d3c2` | `raw-outputs/superseded__live-acceptance-baseline-attempt1-output.txt.gz` |
+| `superseded/live-acceptance-baseline-v2.0-race.txt` | 4264 | `8662d411eb5f22c6e88e2563d5f9f0107aecfa832674be35fd416a29d97dac38` | `raw-outputs/superseded__live-acceptance-baseline-v2.0-race.txt.gz` |
+| `superseded/live-acceptance-baseline-v2.0-raw.txt` | 8357 | `e49c1d74e3027dd16995558901bf45adac7628e51e8adcc9dd05272a8d932c5b` | `raw-outputs/superseded__live-acceptance-baseline-v2.0-raw.txt.gz` |

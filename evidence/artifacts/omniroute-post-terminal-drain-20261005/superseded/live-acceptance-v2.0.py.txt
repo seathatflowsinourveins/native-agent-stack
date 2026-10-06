@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-"""Live acceptance of the post-terminal drain on NativeStack's 20128, VERSION 2.1 (frozen before the canary switch; see checks/live-acceptance-protocol.md).
+"""Live acceptance of the post-terminal drain on NativeStack's 20128, VERSION 2 (frozen before the canary switch; see checks/live-acceptance-protocol.md).
 
 Version 1 (sha256 8aa14054...) is kept as superseded: its verdict ignored whether the client saw the terminal event and closed early, compared only the NUMBER of rows at the second read, and checked
 the call's status and the effort columns at the first read only (a full-scope read of 2026-10-06 reproduced a PASS with no terminal event and a PASS after the call's status changed from 200 to 499).
-Version 2.0 (sha256 fa8fa6f8..., kept as superseded; its baseline of 2026-10-06 02:02-02:17Z is kept too) compared the effort columns of ONE attempt per probe and so failed a healthy canary whenever the gateway stored no effort columns for that attempt
-(a response without encrypted reasoning); version 2.1 judges the effort columns per group of attempts, with the probe prompt chosen by a calibration series (checks/effort-probe-calibration.txt).
 
 Each MODE sends one tiny streamed request to the gateway (documented loopback placeholder key), reads the response's X-Correlation-Id and, for Responses, the response id, closes the socket as the mode says,
 and then reads only metadata columns of the gateway store (mode=ro). Rows are attributed to the request by the correlation id or the response id (call_logs) and by the same model and token counts within 3 s of that
@@ -16,22 +14,16 @@ MODE:
   responses:early:<sec>    /v1/responses, close the socket <sec> seconds after the data line that carries response.completed (what `codex exec` does when it exits)
   chat:eof                 /v1/chat/completions (a non-Responses client), read to the end
   chat:early:<sec>         /v1/chat/completions, close <sec> seconds after the line `data: [DONE]`
-  effort:<model>[:<eff>]   /v1/responses with the probe prompt (EFFORT_PROMPT: a question that makes the model reason) and client reasoning effort <eff> when given; the socket is closed --effort-close-after seconds (default 10) after the
-                           terminal event, long after the call-log row is written (about 4 s after the request starts; the gateway keeps the downstream open about a minute longer); prints the effort columns of the row.
-                           Give a probe's mode several times in a row: its attempts form a GROUP (the frozen argv gives each probe three attempts), see "effort groups".
+  effort:<model>[:<eff>]   /v1/responses, read to the end, with client reasoning effort <eff> when given; prints the effort columns of the call-log row
 
---expect observe           print what is observed (rows, the request's own outcome, the effort groups), no verdict (the baseline on the unpatched gateway)
+--expect observe           print what is observed (rows, the request's own outcome), no verdict (the baseline on the unpatched gateway)
 --expect all-logged        a verdict per mode, from TWO reads (READ1 --wait1 s after the request ended, READ2 --wait2 s after the last request ended):
     sample checks (INCONCLUSIVE: the request does not exercise what the mode means): the HTTP status is 5xx, 408 or 429; no terminal event was received; an early mode did not close early.
                   (FAIL: another 4xx status: the build rejects a request the baseline accepted.)
-    row checks, applied to BOTH reads (FAIL when violated): exactly one call_logs row for the request, status 200, the path of the mode, the model the gateway serves for the mode; exactly one usage_history row with status 200.
+    row checks, applied to BOTH reads (FAIL when violated): exactly one call_logs row for the request, status 200, the path of the mode, the model the gateway serves for the mode; exactly one usage_history row with status 200;
+                  with --baseline, an effort mode's four columns (model, requested model, requested effort, upstream effort) equal the EFFORT line of the baseline file for that mode.
     stability     (FAIL when violated): the rows at READ2 are the same rows with the same values as at READ1 (row id, status, path, model, tokens, effort columns), not only the same number.
     INCONCLUSIVE  when the usage match is ambiguous (more than one usage row with the request's model and token counts inside the 3 s window).
-    effort groups (with --baseline; EFFORT-GROUP lines, counted in the SUMMARY like a request): the gateway stores reasoning_effort_requested and reasoning_effort_upstream only when the response carried encrypted reasoning
-                  (src/lib/usage/callLogs.ts L660-670 at 0585aba55), so an attempt whose two columns are both NULL is UNOBSERVABLE, not wrong (a version-1 and a version-2 baseline of 2026-10-06 gave max/max and NULL/NULL for the same probe on the same build).
-                  An OBSERVED attempt has at least one non-NULL column; its four columns (model, requested model, requested effort, upstream effort) are compared with the baseline's observed columns for the mode (the EFFORT lines with observed=True).
-                  The group is FAIL when any observed attempt differs, INCONCLUSIVE when no attempt was observed, PASS when at least one was observed and all observed attempts are equal. The baseline file must hold at least one observed EFFORT line per
-                  effort mode and the observed lines of a mode must agree, else exit 3 before any request.
 exit code: 0 when every verdict is PASS or OBSERVED, 1 when any is FAIL, 2 when none failed but any is INCONCLUSIVE, 3 for a usage or script error (no verdict: bad arguments, an unknown mode, an unreadable store or baseline file,
 a gateway that does not answer its health endpoint, or an unexpected exception; the preflight raises these BEFORE any request is sent, so an error can never be mistaken for a FAIL). A run that printed no SUMMARY line is not a verdict.
 --baseline must name an existing file by a path that does not depend on the working directory's contents (use an absolute path); its sha256 is printed on the FROZEN line.
@@ -51,10 +43,6 @@ import urllib.request
 DEFAULT_DB = os.path.expanduser("~/.local/share/omniroute/storage.sqlite")
 DEFAULT_MODEL = "cx/gpt-6-astra"
 EXPECT_PATH = {"responses": "/v1/responses", "chat": "/v1/chat/completions"}
-# The probe prompt of the effort modes: a question that makes the model reason, so that the response carries encrypted reasoning (the condition under which the gateway stores the effort columns). Chosen by the calibration series
-# checks/effort-probe-calibration.txt; the other modes keep the prompt `Reply with: ok`.
-EFFORT_PROMPT = "A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost? Reply with only the amount in cents."
-EFFORT_CLOSE_AFTER = 10.0
 
 
 class UsageError(Exception):
@@ -83,7 +71,7 @@ def parse_mode(mode):
             return {"kind": parts[0], "model": DEFAULT_MODEL, "effort": None, "close_after": float(parts[2])}
     if parts[0] == "effort" and len(parts) >= 2:
         model = parts[1]
-        return {"kind": "responses", "model": model, "effort": parts[2] if len(parts) > 2 else None, "close_after": None, "probe": True, "prompt": EFFORT_PROMPT}
+        return {"kind": "responses", "model": model, "effort": parts[2] if len(parts) > 2 else None, "close_after": None}
     raise UsageError(f"unknown mode {mode!r}")
 
 
@@ -96,7 +84,7 @@ def send(spec, port):
     conn = http.client.HTTPConnection("127.0.0.1", port, timeout=300)
     if spec["kind"] == "responses":
         path = "/v1/responses"
-        body = {"model": spec["model"], "input": spec.get("prompt", "Reply with: ok"), "stream": True}
+        body = {"model": spec["model"], "input": "Reply with: ok", "stream": True}
         body["reasoning"] = {"effort": spec["effort"] or "max"} if spec["model"] == DEFAULT_MODEL or spec["effort"] else None
         if body["reasoning"] is None:
             del body["reasoning"]
@@ -188,19 +176,17 @@ def preflight(args, specs):
         problems.append(f"the gateway store {args.db} is not readable ({type(error).__name__})")
     if not health_ok(args.port):
         problems.append(f"no healthy gateway answers on port {args.port} (GET /api/health)")
-    efforts = sorted({m for m in args.modes if m.startswith("effort:")})
+    efforts = [m for m in args.modes if m.startswith("effort:")]
     if args.expect == "all-logged" and efforts and not args.baseline:
         problems.append("--expect all-logged with effort modes needs --baseline (the effort columns are compared with it)")
     if args.baseline:
         if not os.path.isfile(args.baseline):
             problems.append(f"--baseline {args.baseline!r} is not a readable file (give an absolute path)")
-        elif args.expect == "all-logged":
+        else:
             base = parse_baseline(args.baseline)
-            for m in efforts:
-                if m not in base:
-                    problems.append(f"the baseline file has no OBSERVED EFFORT line for {m} (every attempt of the probe had NULL effort columns, or the file was not written by this script version)")
-                elif len(base[m]) > 1:
-                    problems.append(f"the baseline's observed EFFORT lines for {m} disagree: {base[m]}")
+            missing = [m for m in efforts if m not in base]
+            if args.expect == "all-logged" and missing:
+                problems.append(f"the baseline file has no EFFORT line for: {missing}")
     if problems:
         raise UsageError("preflight: " + "; ".join(problems))
 
@@ -217,8 +203,8 @@ def sample_problems(out, spec):
     return []
 
 
-def judge_read(read, spec):
-    """One read of one request: (state, reasons) with state PASS, FAIL or INCONCLUSIVE. The effort columns are judged per group of attempts (judge_effort_group), not here."""
+def judge_read(read, spec, mode, base):
+    """One read of one request: (state, reasons) with state PASS, FAIL or INCONCLUSIVE."""
     if read["ambiguous"]:
         return "INCONCLUSIVE", ["more than one usage row matches the request's model and token counts"]
     calls, usage = read["calls"], read["usage"]
@@ -235,32 +221,13 @@ def judge_read(read, spec):
         reasons.append(f"usage_history rows for this request: {len(usage)} (expected 1)")
     elif str(usage[0]["status"]) != "200":
         reasons.append(f"usage_history status {usage[0]['status']} (expected 200)")
+    if mode.startswith("effort:") and base is not None:
+        now = (str(c["model"]), str(c["requested_model"]), str(c["effort_requested"]), str(c["effort_upstream"]))
+        if mode not in base:
+            reasons.append("no EFFORT line for this mode in the baseline file")
+        elif tuple(base[mode]) != now:
+            reasons.append(f"effort columns {now} differ from the baseline {tuple(base[mode])}")
     return ("FAIL", reasons) if reasons else ("PASS", [])
-
-
-def effort_observed(read):
-    """True when the request's call row carries at least one effort column (the gateway stores them only for responses with encrypted reasoning); None when it has no row."""
-    if not read["calls"]:
-        return None
-    c = read["calls"][0]
-    return c["effort_requested"] is not None or c["effort_upstream"] is not None
-
-
-def effort_tuple(read):
-    c = read["calls"][0]
-    return (str(c["model"]), str(c["requested_model"]), str(c["effort_requested"]), str(c["effort_upstream"]))
-
-
-def judge_effort_group(mode, members, base):
-    """(verdict, reasons) of one effort mode's attempts from the rows at READ2 (the request-level stability check makes READ1 equal to READ2 or fails the request)."""
-    expected = base[mode][0]
-    observed = [(i, effort_tuple(m["read2"])) for i, m in enumerate(members, 1) if effort_observed(m["read2"])]
-    wrong = [(i, t) for i, t in observed if t != expected]
-    if wrong:
-        return "FAIL", [f"attempt {i}: effort columns {t} differ from the baseline's {expected}" for i, t in wrong]
-    if not observed:
-        return "INCONCLUSIVE", [f"none of the {len(members)} attempts carried the effort columns (the gateway stores them only for responses with encrypted reasoning)"]
-    return "PASS", []
 
 
 def row_key(read):
@@ -283,17 +250,13 @@ def combine(problems, states):
     return "PASS", reasons
 
 
-EFFORT_LINE = re.compile(r"EFFORT mode=(\S+) model=(\S*) requested_model=(\S*) effort_requested=(\S*) effort_upstream=(\S*) observed=(True|False)")
-
-
 def parse_baseline(path):
-    """{mode: the distinct OBSERVED four-column tuples of the EFFORT lines of a baseline output}; a line of an attempt whose columns were both NULL (observed=False) is not an expectation."""
     base = {}
     for line in open(path, encoding="utf-8", errors="replace"):
-        m = EFFORT_LINE.match(line)
-        if m and m.group(6) == "True":
-            base.setdefault(m.group(1), set()).add(m.groups()[1:5])
-    return {mode: sorted(values) for mode, values in base.items()}
+        m = re.match(r"EFFORT mode=(\S+) model=(\S*) requested_model=(\S*) effort_requested=(\S*) effort_upstream=(\S*)", line)
+        if m:
+            base[m.group(1)] = m.groups()[1:]
+    return base
 
 
 def show_rows(read):
@@ -311,19 +274,15 @@ def main():
     ap.add_argument("--baseline")
     ap.add_argument("--wait1", type=float, default=12.0)
     ap.add_argument("--wait2", type=float, default=60.0)
-    ap.add_argument("--effort-close-after", type=float, default=EFFORT_CLOSE_AFTER)
     ap.add_argument("modes", nargs="+")
     args = ap.parse_args()
     me = open(os.path.abspath(__file__), "rb").read()
     specs = [parse_mode(m) for m in args.modes]
-    for spec in specs:
-        if spec.get("probe"):
-            spec["close_after"] = args.effort_close_after
     preflight(args, specs)
     base = parse_baseline(args.baseline) if args.baseline else None
     base_sha = hashlib.sha256(open(args.baseline, "rb").read()).hexdigest() if args.baseline else None
-    print(f"FROZEN version=2.1 script_sha256={hashlib.sha256(me).hexdigest()} argv={sys.argv[1:]} cwd={os.getcwd()} start={utc()} expect={args.expect} wait1={args.wait1} wait2={args.wait2} port={args.port} db={args.db} "
-          f"effort_close_after={args.effort_close_after} baseline={args.baseline} baseline_sha256={base_sha}")
+    print(f"FROZEN version=2 script_sha256={hashlib.sha256(me).hexdigest()} argv={sys.argv[1:]} cwd={os.getcwd()} start={utc()} expect={args.expect} wait1={args.wait1} wait2={args.wait2} port={args.port} db={args.db} "
+          f"baseline={args.baseline} baseline_sha256={base_sha}")
     reqs = []
     for mode, spec in zip(args.modes, specs):
         t_start = utc()
@@ -339,7 +298,7 @@ def main():
             v, reasons = "OBSERVED", [reason for _, reason in out["problems"]]
             out["state1"] = None
         else:
-            out["state1"] = judge_read(r, spec)
+            out["state1"] = judge_read(r, spec, mode, base)
             v, reasons = combine(out["problems"], [out["state1"]])
         out["verdict"] = v
         print(
@@ -349,19 +308,18 @@ def main():
         show_rows(r)
         if mode.startswith("effort:") and r["calls"]:
             c = r["calls"][0]
-            print(f"EFFORT mode={mode} model={c['model']} requested_model={c['requested_model']} effort_requested={c['effort_requested']} effort_upstream={c['effort_upstream']} observed={effort_observed(r)}")
+            print(f"EFFORT mode={mode} model={c['model']} requested_model={c['requested_model']} effort_requested={c['effort_requested']} effort_upstream={c['effort_upstream']}")
     last = max(r["end_epoch"] for r in reqs)
     time.sleep(max(0.0, last + args.wait2 - time.time()))
     for out in reqs:
         out["t_read_end"] = utc()
         late = read_rows(out, args.db)
-        out["read2"] = late
         r1 = out["read1"]
         changed = row_key(late) != row_key(r1)
         if args.expect == "observe":
             v, reasons = "OBSERVED", ([f"rows changed between READ1 and READ2"] if changed else [])
         else:
-            state2 = judge_read(late, out["spec"])
+            state2 = judge_read(late, out["spec"], out["mode"], base)
             states = [out["state1"], state2]
             if changed:
                 states.append(("FAIL", ["the rows at READ2 are not the rows (or not the values) of READ1"]))
@@ -373,21 +331,6 @@ def main():
     counts = {}
     for out in reqs:
         counts[out["verdict"]] = counts.get(out["verdict"], 0) + 1
-    groups = {}
-    for out in reqs:
-        if out["mode"].startswith("effort:"):
-            groups.setdefault(out["mode"], []).append(out)
-    for mode, members in groups.items():
-        n_obs = sum(1 for m in members if effort_observed(m["read2"]))
-        values = sorted({effort_tuple(m["read2"]) for m in members if effort_observed(m["read2"])})
-        if args.expect == "observe":
-            v, reasons = "OBSERVED", []
-            detail = f"values={values}"
-        else:
-            v, reasons = judge_effort_group(mode, members, base)
-            detail = f"expected={base[mode][0]} values={values}"
-        print(f"EFFORT-GROUP mode={mode} attempts={len(members)} observed={n_obs} {detail} verdict={v}" + (f" reasons={reasons}" if reasons else ""))
-        counts[v] = counts.get(v, 0) + 1
     code = 1 if counts.get("FAIL") else (2 if counts.get("INCONCLUSIVE") else 0)
     print(f"SUMMARY {json.dumps(counts, sort_keys=True)} end={utc()} exit={code}")
     sys.exit(code)

@@ -1,0 +1,21 @@
+# Two value-free watches of the established connections to 20128, 75 s each, every 1 s (scripts/watch-20128-connections.py.txt; ports, process names and pids only).
+# Watch 1 ran 2026-10-06 from about 05:14:33Z to 05:15:48Z, while the 20129 framework gateway's connection was visible. Its output was not saved to a file when it ran: the text below is that run's output as displayed to the session (the display command cut lines at 230 characters; none of its lines was that long), recovered from the session transcript.
+# Watch 2 ran 06:13:55Z-06:15:10Z in a quiet window (output file kept as written): the poll was not seen.
+
+################ WATCH 1
+WATCH start MainPID=767 unit_process_tree=[767, 1631, 2311] port=20128 duration=75.0s
++   0.0s OPEN  local_port=57971 peer_port=20128 owners=['omniroute (v16.(2335)'] gateway_own_pid_tree=no
++   0.0s OPEN  local_port=20128 peer_port=57971 owners=['omniroute (v16.(2311)'] gateway_own_pid_tree=yes
++  22.5s OPEN  local_port=58415 peer_port=20128 owners=['omniroute (v16.(2335)'] gateway_own_pid_tree=no
++  22.5s OPEN  local_port=20128 peer_port=58415 owners=['omniroute (v16.(2311)'] gateway_own_pid_tree=yes
++  22.5s CLOSE local_port=57971 peer_port=20128 (open for 22.5s)
++  22.5s CLOSE local_port=20128 peer_port=57971 (open for 22.5s)
++  52.1s OPEN  local_port=57869 peer_port=20128 owners=['omniroute (v16.(2335)'] gateway_own_pid_tree=no
++  52.1s OPEN  local_port=20128 peer_port=57869 owners=['omniroute (v16.(2311)'] gateway_own_pid_tree=yes
++  52.1s CLOSE local_port=58415 peer_port=20128 (open for 29.6s)
++  52.1s CLOSE local_port=20128 peer_port=58415 (open for 29.6s)
+WATCH end; still open: [('20128', '57869'), ('57869', '20128')]
+
+################ WATCH 2
+WATCH start MainPID=767 unit_process_tree=[767, 1631, 2311] port=20128 duration=75.0s
+WATCH end; still open: []

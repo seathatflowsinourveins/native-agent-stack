@@ -1,0 +1,59 @@
+# Publication note: UUID-shaped strings (the gateway's correlation ids) are shortened to their first 8 hex digits and an ellipsis, because the repository's publication check rejects full UUIDs; sha256 of this text before the shortening: 19393acdef858a66b6a2ec1fb713f4d37f0a650ddf9f8d870b35ebde6dd7fc51; the unshortened text is kept in the first host's private artifact directory (checks/logs/MANIFEST.txt)
+# Handler-level check of the identity mechanism of the native acceptance (2026-10-06 UTC, node 24.21.0; nothing deployed)
+# The native acceptance attributes each `codex exec` turn's rows by the turn's own X-OmniRoute-Session-Id header, which the gateway stores as call_logs.session_tag (upstream #8249; probed on the live unpatched gateway in checks/native-usage-calibration.txt).
+# This check shows the same mechanism through the real handleChat -> resolveConversationId -> chatCore -> call-log writer path, with a stubbed upstream fetch and a temporary database, on the unpatched composition AND on the patched tree
+# (the patch changes only the stream handler's cancel(); upstream's own tests/unit/call-logs-session-tag.test.ts covers only the storage layer). The client reads each response to the end, so the rows come from the normal completion path on every build.
+# Four scenarios: a Responses request and a Chat Completions request with the header, two sequential requests with different tags (no cross-contamination), a request without the header (it carries no tag that no request sent).
+# Stage N is the negative control for the oracle: the same test with E2E_SESSION_HEADER naming another header, so that the three tests that assert a tag must FAIL while the no-header test passes (the control disables nothing else).
+# composition C = the v3.8.51 tag commit + the affinity patch + PR 15167's commit 0585aba55 (tree f1336dfd...); the patch under test is patches/drain-after-terminal.patch (sha256 74c0f449...), applied to C it gives tree b7c68690...
+# script: scripts/handler-e2e-session-tag.sh.txt, test: scripts/handler-e2e-session-tag.test.ts.txt (sha256 pinned in the script). The block below is its progress log, byte for byte except that the home directory is written $HOME. Full stage logs: checks/logs/handler-e2e-session-tag-<stage>.log.
+
+05:44:38Z clone exit=0
+05:44:38Z fetch pr15167 exit=0
+05:44:43Z checkout tag exit=0
+05:46:09Z npm ci exit=0
+05:46:10Z apply affinity patch exit=0
+05:46:10Z apply pr15167 diff exit=0
+05:46:10Z commit composition exit=0
+05:46:10Z composition tree=f1336dfd6c8ebd81586dd6c71e7ef668ef8c949f equals the expected tree
+05:46:10Z copy the e2e test file exit=0
+05:46:10Z e2e test file sha256 f40472876b743faaa537ca80e3b58e8c7e3d35a2e0717b134f9fa54180e9b737 git blob 5524b0a6f9159aa69131b88627d8c7f264c70399
+05:46:25Z U-session-tag-unpatched exit=0 tests=4 suites=0 pass=4 fail=0 cancelled=0 skipped=0 todo=0
+05:46:25Z U-session-tag-unpatched expectation met: tests=4 pass=4 fail=0
+05:46:25Z U-session-tag-unpatched failing tests are as expected: 0 name(s)
+05:46:31Z N-session-tag-wrong-header exit=1 tests=4 suites=0 pass=1 fail=3 cancelled=0 skipped=0 todo=0
+05:46:31Z N-session-tag-wrong-header expectation met: tests=4 pass=1 fail=3
+05:46:31Z N-session-tag-wrong-header failing tests are as expected: 3 name(s)
+05:46:31Z apply patch under test exit=0
+05:46:31Z commit patch under test exit=0
+05:46:31Z patched tree=b7c6869001ce8bdd23e2e2352f48ce3058bc13d2 equals the expected tree
+05:46:38Z P-session-tag-patched exit=0 tests=4 suites=0 pass=4 fail=0 cancelled=0 skipped=0 todo=0
+05:46:38Z P-session-tag-patched expectation met: tests=4 pass=4 fail=0
+05:46:38Z P-session-tag-patched failing tests are as expected: 0 name(s)
+05:46:38Z DONE; the scratch tree and the logs stay in $HOME/.cache/omniroute-handler-e2e-session-tag-YzPmaE (remove it with rm -rf after reading)
+
+## Runner summaries of the three stages
+| stage | exit | tests | suites | pass | fail | cancelled | skipped | todo |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| U-session-tag-unpatched | 0 | 4 | 0 | 4 | 0 | 0 | 0 | 0 |
+| N-session-tag-wrong-header | 1 | 4 | 0 | 1 | 3 | 0 | 0 | 0 |
+| P-session-tag-patched | 0 | 4 | 0 | 4 | 0 | 0 | 0 | 0 |
+
+## U: the unpatched composition (four of four pass)
+{"name":"responses with header","expected":"acceptance-e2e-responses-1","rows":1,"tags":["acceptance-e2e-responses-1"],"status":200}
+{"name":"chat with header","expected":"acceptance-e2e-chat-1","rows":1,"tags":["acceptance-e2e-chat-1"],"status":200}
+{"name":"two tags","expected":["acceptance-e2e-turn-1","acceptance-e2e-turn-2"],"rows":2,"tags":["acceptance-e2e-turn-1","acceptance-e2e-turn-2"]}
+{"name":"no header","rows":1,"tags":["<generated conversation id>"]}
+
+## N: the oracle's negative control, another header name (the three tag assertions fail, the no-header test passes)
+{"name":"responses with header","expected":"acceptance-e2e-responses-1","rows":1,"tags":["conv_2a2fa353…"],"status":200}
+{"name":"chat with header","expected":"acceptance-e2e-chat-1","rows":1,"tags":["conv_f0e8e4d2…"],"status":200}
+{"name":"two tags","expected":["acceptance-e2e-turn-1","acceptance-e2e-turn-2"],"rows":2,"tags":["conv_8c9bdf88…","conv_a3d4f8f7…"]}
+{"name":"no header","rows":1,"tags":["<generated conversation id>"]}
+failing tests: handler e2e session tag: a Chat Completions request with X-OmniRoute-Session-Id stores that value as its row's session tag | handler e2e session tag: a Responses request with X-OmniRoute-Session-Id stores that value as its row's session tag | handler e2e session tag: two requests with different tags each get their own tag (no cross-contamination)
+
+## P: the patched tree (four of four pass)
+{"name":"responses with header","expected":"acceptance-e2e-responses-1","rows":1,"tags":["acceptance-e2e-responses-1"],"status":200}
+{"name":"chat with header","expected":"acceptance-e2e-chat-1","rows":1,"tags":["acceptance-e2e-chat-1"],"status":200}
+{"name":"two tags","expected":["acceptance-e2e-turn-1","acceptance-e2e-turn-2"],"rows":2,"tags":["acceptance-e2e-turn-1","acceptance-e2e-turn-2"]}
+{"name":"no header","rows":1,"tags":["<generated conversation id>"]}

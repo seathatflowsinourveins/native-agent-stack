@@ -1,57 +1,61 @@
 # Note: the fixture's scratch HOME directory is named `home` under the work directory; it is written `scratch-home` below, because the repository's publication check reads `/home/...` as a personal home path.
-# Offline controls of the live-acceptance scripts, version 1 (superseded) against version 2 (frozen), on the stub gateway and a scratch database. Nothing here touches a live gateway.
-# started 2026-10-06T01:53:01Z; codex-cli 0.159.3; python 3.13.15
+# Part D (the slow reproduction of the first review's P1: version 1 on three consecutive correctly logged turns, then version 2) ran with the same pgrep fixture shim as part B2 first on PATH (scripts/acceptance-controls/pgrep-shim.sh.txt, sha256 c7df53bebe7a30678416ec3e3466e7a5c4858037e25582d42df8aea539d9bda4), because a headless Codex SDK worker of another lane was running on the host and version 1's quiet check would have made every turn INCONCLUSIVE; the shim hides other lanes' workers from that one query only.
+
+# Offline controls of the live-acceptance scripts, version 1 (superseded) against version 2.1 (frozen; version 2.0 appears in the effort controls R8h), on the stub gateway and a scratch database. Nothing here touches a live gateway.
+# started 2026-10-06T09:51:47Z; codex-cli 0.159.3; python 3.13.15
 # live-acceptance v1: sha256 8aa14054401c00a5af1e8c180fc83af80c79cc0a807da98ea519149291188859
-# live-acceptance v2: sha256 fa8fa6f8dc3a0e7360be4a0737c34daaf4d4b58696df6a7ab3483896cb739e82
+# live-acceptance v2.0 (superseded): sha256 fa8fa6f8dc3a0e7360be4a0737c34daaf4d4b58696df6a7ab3483896cb739e82
+# live-acceptance v2.1: sha256 15b8cf04134aa8ead6526739e5a95b6dc15f4e5b77d59840e0d03aa56b33301b
 # native-exec v1: sha256 9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee
 # native-exec v2: sha256 9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71
 # show-log-receipt v2: sha256 7dd746bce15964c68d8b847f8072257a4b5712adca7ed7cd9089c09273ff26d6
 # gateway-identity: sha256 a7932710412e9e834f6b992f267db5620b64bbe62f25021013c8004a7eec6011
-# pre-switch-guard: sha256 b491de6b3e4a5a1d3a3761c8fa8aefc439cca8cf4c453d696c7b9cb41a73af3a
-# run-acceptance wrapper: sha256 57e96463568c534cecf5f25eb35c1586d3a1cb34073ba62ea7245ce6158bd2d1
+# pre-switch-guard: sha256 305a065227bff71dcbe3b46b157f4d3ed83f5a5b5ce90a2f73cbfa6b26805040
+# pre-switch-guard v2 (superseded; G12): sha256 b491de6b3e4a5a1d3a3761c8fa8aefc439cca8cf4c453d696c7b9cb41a73af3a
+# run-acceptance wrapper: sha256 abcbb5407c244062697fb94a677100b3e670b609b423582d9f39368073e9cb11
 # switch tool copy (committed evidence file): sha256 97d1b87bb651d6f43e184b9617d03afa7861ee7715e7030ad23ed29057bc23e3
-# stub-gateway: sha256 7b217bbfb6d2d108c74369a5fb7f9056bc78cfd909218e19bd97299199fcf6d1
+# stub-gateway: sha256 2e500af67bf1aae55d82e4972c34664650e48e3bf9c167675184c7517afe9bb7
 # fake-codex: sha256 6c9eecec7e3209ad9690510463632780c0f7204e0abb4782ce09c92883e4c206
-# run-controls: sha256 c0b2a8a5d98ef145e7ef8728a3410fae99c8e4b14dc4b627fd2a1b9c37b5ab9d
+# run-controls: sha256 cb249594fc5f256567837dcbab104b2a446324a9cbf894cd1eda78b7a90b74d8
 
 ### N1v1: version 1 on three consecutive correctly logged turns (the reviewer's P1): its quiet check waits for each earlier turn's rows to age past 120 s, and its second read then counts every later turn's rows in the earlier turns' windows
     stub mode: {"mode": "normal"}
 --- N1v1 / v1: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261005.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --repo $WORK/repo --quiet-timeout 140 astra-max astra-max astra-max   [env: HOME=$WORK/home]
-    FROZEN script_sha256=9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--repo', '$WORK/repo', '--quiet-timeout', '140', 'astra-max', 'astra-max', 'astra-max'] cwd=/tmp start=2026-10-06T01:53:04.016Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=140.0
-    RESULT shape=astra-max quiet=True exec_exit=0 elapsed_s=0.6 expected_each=1 read1_call_logs=1 read1_usage=1 verdict=PASS
+    FROZEN script_sha256=9f511620db390c3b4c7177f858342c6592680efd1d383e2e02ecf3f5d249fdee argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--repo', '$WORK/repo', '--quiet-timeout', '140', 'astra-max', 'astra-max', 'astra-max'] cwd=/tmp start=2026-10-06T09:51:49.340Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=140.0
+    RESULT shape=astra-max quiet=True exec_exit=0 elapsed_s=0.7 expected_each=1 read1_call_logs=1 read1_usage=1 verdict=PASS
        stdout tail: ok
-       call_logs: ('2026-10-06T01:53:04.883Z', '/v1/responses', 200, 'gpt-6-astra', 22, 19)
-       usage_history: ('2026-10-06T01:53:04.883Z', 'gpt-6-astra', '200', 22, 19)
+       call_logs: ('2026-10-06T09:51:50.262Z', '/v1/responses', 200, 'gpt-6-astra', 22, 19)
+       usage_history: ('2026-10-06T09:51:50.262Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT shape=astra-max quiet=True exec_exit=0 elapsed_s=0.3 expected_each=1 read1_call_logs=1 read1_usage=1 verdict=PASS
+       stdout tail: ok
+       call_logs: ('2026-10-06T09:53:55.701Z', '/v1/responses', 200, 'gpt-6-astra', 22, 19)
+       usage_history: ('2026-10-06T09:53:55.701Z', 'gpt-6-astra', '200', 22, 19)
     RESULT shape=astra-max quiet=True exec_exit=0 elapsed_s=0.4 expected_each=1 read1_call_logs=1 read1_usage=1 verdict=PASS
        stdout tail: ok
-       call_logs: ('2026-10-06T01:55:10.443Z', '/v1/responses', 200, 'gpt-6-astra', 22, 19)
-       usage_history: ('2026-10-06T01:55:10.443Z', 'gpt-6-astra', '200', 22, 19)
-    RESULT shape=astra-max quiet=True exec_exit=0 elapsed_s=0.4 expected_each=1 read1_call_logs=1 read1_usage=1 verdict=PASS
-       stdout tail: ok
-       call_logs: ('2026-10-06T01:57:16.141Z', '/v1/responses', 200, 'gpt-6-astra', 22, 19)
-       usage_history: ('2026-10-06T01:57:16.141Z', 'gpt-6-astra', '200', 22, 19)
+       call_logs: ('2026-10-06T09:56:01.097Z', '/v1/responses', 200, 'gpt-6-astra', 22, 19)
+       usage_history: ('2026-10-06T09:56:01.097Z', 'gpt-6-astra', '200', 22, 19)
     LATE shape=astra-max read2_call_logs=3 read2_usage=3 changed=True verdict=FAIL
     LATE shape=astra-max read2_call_logs=2 read2_usage=2 changed=True verdict=FAIL
     LATE shape=astra-max read2_call_logs=1 read2_usage=1 changed=False verdict=PASS
-    SUMMARY {'FAIL': 2, 'PASS': 1} end=2026-10-06T01:57:25.885Z exit=1
+    SUMMARY {'FAIL': 2, 'PASS': 1} end=2026-10-06T09:56:10.832Z exit=1
 CONTROL-RESULT N1v1 v1 expected_exit=1 observed_exit=1 elapsed_s=262 OK
 
 --- N1v1 / v2: python3 $HOME/.local/state/native-agent-stack/coordination/peer-99-20261004/omniroute-native-exec-acceptance-20261006.py --expect all-logged --wait1 5 --wait2 10 --quiet-timeout 1 --exec-timeout 60 --repo $WORK/repo --db $WORK/scratch-home/.local/share/omniroute/storage.sqlite --scratch $WORK/codex-home-N1v1-v2 astra-max astra-max astra-max
-    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N1v1-v2', 'astra-max', 'astra-max', 'astra-max'] cwd=/tmp start=2026-10-06T01:57:27.465Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T015727 template_sha256=bcc9414d712a4f0ada45cfd30526b9bc1f506245c4c03492947ff5af37f3d8e3
-    RESULT shape=astra-max session_id=acceptance-20261006T015727-astra-max-1 quiet=True recent_call_logs=0 other_workers=0 min_rows=1 exec_exit=0 elapsed_s=0.7 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(22, 19) rows_complete=True verdict=PASS
-       call_logs: ('2026-10-06T01:57:28.459Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=4e3206b0
-       usage_history: ('2026-10-06T01:57:28.459Z', 'gpt-6-astra', '200', 22, 19)
-    RESULT shape=astra-max session_id=acceptance-20261006T015727-astra-max-2 quiet=False recent_call_logs=1 other_workers=1 min_rows=1 exec_exit=0 elapsed_s=0.4 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(22, 19) rows_complete=True verdict=PASS
-       call_logs: ('2026-10-06T01:57:43.867Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=1c861168
-       usage_history: ('2026-10-06T01:57:43.867Z', 'gpt-6-astra', '200', 22, 19)
-    RESULT shape=astra-max session_id=acceptance-20261006T015727-astra-max-3 quiet=False recent_call_logs=2 other_workers=0 min_rows=1 exec_exit=0 elapsed_s=0.4 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(22, 19) rows_complete=True verdict=PASS
-       call_logs: ('2026-10-06T01:57:59.256Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=e22d1c39
-       usage_history: ('2026-10-06T01:57:59.256Z', 'gpt-6-astra', '200', 22, 19)
-    LATE shape=astra-max session_id=acceptance-20261006T015727-astra-max-1 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(22, 19) changed=False verdict=PASS
-    LATE shape=astra-max session_id=acceptance-20261006T015727-astra-max-2 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(22, 19) changed=False verdict=PASS
-    LATE shape=astra-max session_id=acceptance-20261006T015727-astra-max-3 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(22, 19) changed=False verdict=PASS
-    SUMMARY {'PASS': 3} end=2026-10-06T01:58:09.018Z exit=0
-CONTROL-RESULT N1v1 v2 expected_exit=0 observed_exit=0 elapsed_s=42 OK
+    FROZEN version=2 script_sha256=9bd478a1502839e7cfe2c5999e3485d6e9ba5d10bfe62e2593e061b7441dda71 argv=['--expect', 'all-logged', '--wait1', '5', '--wait2', '10', '--quiet-timeout', '1', '--exec-timeout', '60', '--repo', '$WORK/repo', '--db', '$WORK/scratch-home/.local/share/omniroute/storage.sqlite', '--scratch', '$WORK/codex-home-N1v1-v2', 'astra-max', 'astra-max', 'astra-max'] cwd=/tmp start=2026-10-06T09:56:12.418Z expect=all-logged wait1=5.0 wait2=10.0 quiet_timeout=1.0 exec_timeout=60.0 db=$WORK/scratch-home/.local/share/omniroute/storage.sqlite run_id=20261006T095612 template_sha256=12efdbf1929baa60adbf129a720f5522da02d572e7aefae1b6c6f29f5e43dde3
+    RESULT shape=astra-max session_id=acceptance-20261006T095612-astra-max-1 quiet=True recent_call_logs=0 other_workers=0 min_rows=1 exec_exit=0 elapsed_s=0.5 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(22, 19) rows_complete=True verdict=PASS
+       call_logs: ('2026-10-06T09:56:13.206Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=53def67f
+       usage_history: ('2026-10-06T09:56:13.206Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT shape=astra-max session_id=acceptance-20261006T095612-astra-max-2 quiet=False recent_call_logs=1 other_workers=0 min_rows=1 exec_exit=0 elapsed_s=0.3 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(22, 19) rows_complete=True verdict=PASS
+       call_logs: ('2026-10-06T09:56:28.536Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=eb62da3c
+       usage_history: ('2026-10-06T09:56:28.536Z', 'gpt-6-astra', '200', 22, 19)
+    RESULT shape=astra-max session_id=acceptance-20261006T095612-astra-max-3 quiet=False recent_call_logs=2 other_workers=0 min_rows=1 exec_exit=0 elapsed_s=0.3 client_usage={'input_tokens': 22, 'cached_input_tokens': 0, 'output_tokens': 19} command_executions=0 events=5 read1_call_logs=1 read1_usage=1 rows_tokens_in_out=(22, 19) rows_complete=True verdict=PASS
+       call_logs: ('2026-10-06T09:56:43.890Z', '/v1/responses', 200, 'gpt-6-astra', 'codex/gpt-6-astra', 22, 19, 'ready', 'max', 'max') id8=7bf6641d
+       usage_history: ('2026-10-06T09:56:43.890Z', 'gpt-6-astra', '200', 22, 19)
+    LATE shape=astra-max session_id=acceptance-20261006T095612-astra-max-1 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(22, 19) changed=False verdict=PASS
+    LATE shape=astra-max session_id=acceptance-20261006T095612-astra-max-2 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(22, 19) changed=False verdict=PASS
+    LATE shape=astra-max session_id=acceptance-20261006T095612-astra-max-3 read2_call_logs=1 read2_usage=1 rows_tokens_in_out=(22, 19) changed=False verdict=PASS
+    SUMMARY {'PASS': 3} end=2026-10-06T09:56:53.625Z exit=0
+CONTROL-RESULT N1v1 v2 expected_exit=0 observed_exit=0 elapsed_s=41 OK
 
-# finished 2026-10-06T01:58:09Z; scenarios with an unexpected exit status: none
+# finished 2026-10-06T09:56:53Z; scenarios with an unexpected exit status: none
 driver exit=0

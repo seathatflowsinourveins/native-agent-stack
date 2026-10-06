@@ -1,0 +1,487 @@
+[DB] Driver: better-sqlite3 | file: /tmp/omniroute-session-tag-e2e-QdSCCI/storage.sqlite
+[DB] Added provider_connections.last_ping_at column
+[DB] Added provider_connections.last_pinged_reset_key column
+[DB] Added usage_history.combo_strategy column
+[DB] Added call_logs.video_content_removed column
+[DB] Added call_logs.ttft_ms column
+[DB] Added call_logs.model_pinned column
+[DB] Added call_logs.session_tag column
+[DB] Added call_logs.reasoning_duration_ms column
+[DB] Added call_logs.reasoning_effort_requested column
+[DB] Added call_logs.reasoning_effort_upstream column
+[DB] Added call_logs.reasoning_encrypted column
+[DB] Added call_logs.has_content column
+[DB] Added call_logs.usage_provenance column
+[DB] Added call_logs.resilience_actions column
+[DB] Changing cache_size from 65536KB to 16384KB
+[DB] cache_size changed to 16384KB
+[DB] auto_vacuum drift detected (configured=INCREMENTAL, live=NONE); scheduling reconcile on the next vacuum-scheduler run
+[DB] SQLite database ready: /tmp/omniroute-session-tag-e2e-QdSCCI/storage.sqlite (DATA_DIR=/tmp/omniroute-session-tag-e2e-QdSCCI, SQLITE_FILE=/tmp/omniroute-session-tag-e2e-QdSCCI/storage.sqlite)
+[DB] SQLite WAL checkpoint completed (TRUNCATE)
+[DB] Driver: better-sqlite3 | file: /tmp/omniroute-session-tag-e2e-QdSCCI/storage.sqlite
+[DB] Added provider_connections.last_ping_at column
+[DB] Added provider_connections.last_pinged_reset_key column
+[DB] Added usage_history.combo_strategy column
+[DB] Added call_logs.video_content_removed column
+[DB] Added call_logs.ttft_ms column
+[DB] Added call_logs.model_pinned column
+[DB] Added call_logs.session_tag column
+[DB] Added call_logs.reasoning_duration_ms column
+[DB] Added call_logs.reasoning_effort_requested column
+[DB] Added call_logs.reasoning_effort_upstream column
+[DB] Added call_logs.reasoning_encrypted column
+[DB] Added call_logs.has_content column
+[DB] Added call_logs.usage_provenance column
+[DB] Added call_logs.resilience_actions column
+[DB] Changing cache_size from 65536KB to 16384KB
+[DB] cache_size changed to 16384KB
+[DB] auto_vacuum drift detected (configured=INCREMENTAL, live=NONE); scheduling reconcile on the next vacuum-scheduler run
+[DB] SQLite database ready: /tmp/omniroute-session-tag-e2e-QdSCCI/storage.sqlite (DATA_DIR=/tmp/omniroute-session-tag-e2e-QdSCCI, SQLITE_FILE=/tmp/omniroute-session-tag-e2e-QdSCCI/storage.sqlite)
+[INFO] [PLUGIN_SCANNER] scanner.dir_resolved {"dir":"$HOME/.omniroute/plugins","source":"home"}
+[INFO] [PLUGIN_MANAGER] manager.loadAll {"count":0}
+[bottleneck-patch] Applied doExpire fix for Bottleneck v2.19.5
+[bottleneck-patch] Applied _startHeartbeat fix for Bottleneck v2.19.5
+[CREDENTIALS] Could not load dataPaths module, using fallback: /tmp/omniroute-session-tag-e2e-QdSCCI
+[CREDENTIALS] No external credentials file found, using defaults.
+[05:46:21.307] INFO: [sse] 📥 POST /v1/responses | codex/gpt-5.6-sol | 42 msgs
+    module: "sse"
+    tag: "HTTP"
+    method: "POST"
+    path: "/v1/responses | codex/gpt-5.6-sol | 42 msgs"
+[05:46:21.308] DEBUG: [sse] No API key provided (local mode)
+    module: "sse"
+    tag: "AUTH"
+[05:46:21.320] DEBUG: [sse] Skipping: target model supports vision natively
+    module: "sse"
+    tag: "VISION_BRIDGE"
+[05:46:21.321] DEBUG: [sse] vision-bridge pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:21.321] DEBUG: [sse] audio-bridge pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:21.322] DEBUG: [sse] video-bridge pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:21.322] DEBUG: [sse] pii-masker pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:21.325] DEBUG: [sse] prompt-injection pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:21.325] DEBUG: [sse] credential-masker pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:21.332] INFO: [sse] Provider: codex, Model: gpt-5.6-sol
+    module: "sse"
+    tag: "ROUTING"
+[05:46:21.339] DEBUG: [sse] codex | active=1, excluded=0 (none), forcedId=none, blocked_forced=0, blocked_allowed=0
+    module: "sse"
+    tag: "AUTH"
+[05:46:21.340] DEBUG: [sse] codex | available: 1/1
+    module: "sse"
+    tag: "AUTH"
+[05:46:21.342] INFO: [sse] session_key=input:sha256:b0db1... has no available affinity target
+    module: "sse"
+    tag: "AUTH"
+[05:46:21.342] INFO: [sse] Using codex account: ***...
+    module: "sse"
+    tag: "AUTH"
+[05:46:21.404] DEBUG: [sse] openai-responses → openai-responses | stream=true
+    module: "sse"
+    tag: "FORMAT"
+[05:46:21.888] DEBUG: [sse] Prompt compression disabled or unavailable
+    module: "sse"
+    tag: "COMPRESSION"
+[05:46:21.890] DEBUG: [sse] Prompt Compression engines disabled; reactive context compaction is ALSO disabled — large histories will NOT be trimmed before reaching the upstream provider
+    module: "sse"
+    tag: "CONTEXT"
+[05:46:21.890] DEBUG: [sse] Checking compression: 18 tokens vs 610400 threshold (872000 limit, 0 reserved)
+    module: "sse"
+    tag: "CONTEXT"
+[05:46:21.892] DEBUG: [sse] native codex passthrough enabled
+    module: "sse"
+    tag: "FORMAT"
+[05:46:21.895] DEBUG: [sse] CODEX | gpt-5.6-sol | 0 msgs
+    module: "sse"
+    tag: "REQUEST"
+[05:46:22.005] DEBUG: [sse] fetch-start timeout capped 600000ms -> 110000ms (streaming)
+    module: "sse"
+    tag: "TIMEOUT"
+[05:46:22.029] DEBUG: [sse] Stream readiness confirmed in 0ms (codex/gpt-5.6-sol)
+    module: "sse"
+    tag: "STREAM"
+[05:46:22.031] DEBUG: [sse] Standard passthrough mode
+    module: "sse"
+    tag: "STREAM"
+[01:46:22] 📊 [USAGE] CODEX | in=22 | out=5 | account=8e1a87b2...
+[01:46:22] 🌊 [STREAM] CODEX | gpt-5.6-sol | 265ms | complete
+E2E_SCENARIO {"name":"responses with header","expected":"acceptance-e2e-responses-1","rows":1,"tags":["acceptance-e2e-responses-1"],"status":200}
+✔ handler e2e session tag: a Responses request with X-OmniRoute-Session-Id stores that value as its row's session tag (1500.508806ms)
+[DB] SQLite WAL checkpoint completed (TRUNCATE)
+[DB] Driver: better-sqlite3 | file: /tmp/omniroute-session-tag-e2e-QdSCCI/storage.sqlite
+[DB] Added provider_connections.last_ping_at column
+[DB] Added provider_connections.last_pinged_reset_key column
+[DB] Added usage_history.combo_strategy column
+[DB] Added call_logs.video_content_removed column
+[DB] Added call_logs.ttft_ms column
+[DB] Added call_logs.model_pinned column
+[DB] Added call_logs.session_tag column
+[DB] Added call_logs.reasoning_duration_ms column
+[DB] Added call_logs.reasoning_effort_requested column
+[DB] Added call_logs.reasoning_effort_upstream column
+[DB] Added call_logs.reasoning_encrypted column
+[DB] Added call_logs.has_content column
+[DB] Added call_logs.usage_provenance column
+[DB] Added call_logs.resilience_actions column
+[DB] Changing cache_size from 65536KB to 16384KB
+[DB] cache_size changed to 16384KB
+[DB] auto_vacuum drift detected (configured=INCREMENTAL, live=NONE); scheduling reconcile on the next vacuum-scheduler run
+[DB] SQLite database ready: /tmp/omniroute-session-tag-e2e-QdSCCI/storage.sqlite (DATA_DIR=/tmp/omniroute-session-tag-e2e-QdSCCI, SQLITE_FILE=/tmp/omniroute-session-tag-e2e-QdSCCI/storage.sqlite)
+[ProxyEgress] codex status=success
+[05:46:22.733] INFO: [sse] 📥 POST /v1/chat/completions | codex/gpt-5.6-sol | 1 msgs
+    module: "sse"
+    tag: "HTTP"
+    method: "POST"
+    path: "/v1/chat/completions | codex/gpt-5.6-sol | 1 msgs"
+[05:46:22.733] DEBUG: [sse] No API key provided (local mode)
+    module: "sse"
+    tag: "AUTH"
+[05:46:22.736] DEBUG: [sse] Skipping: target model supports vision natively
+    module: "sse"
+    tag: "VISION_BRIDGE"
+[05:46:22.736] DEBUG: [sse] vision-bridge pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:22.736] DEBUG: [sse] audio-bridge pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:22.736] DEBUG: [sse] video-bridge pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:22.736] DEBUG: [sse] pii-masker pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:22.737] DEBUG: [sse] prompt-injection pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:22.737] DEBUG: [sse] credential-masker pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:22.740] INFO: [sse] Provider: codex, Model: gpt-5.6-sol
+    module: "sse"
+    tag: "ROUTING"
+[05:46:22.742] DEBUG: [sse] codex | active=1, excluded=0 (none), forcedId=none, blocked_forced=0, blocked_allowed=0
+    module: "sse"
+    tag: "AUTH"
+[05:46:22.742] DEBUG: [sse] codex | available: 1/1
+    module: "sse"
+    tag: "AUTH"
+[05:46:22.743] INFO: [sse] session_key=input:sha256:c895d... has no available affinity target
+    module: "sse"
+    tag: "AUTH"
+[05:46:22.743] INFO: [sse] Using codex account: ***...
+    module: "sse"
+    tag: "AUTH"
+[05:46:22.745] DEBUG: [sse] openai → openai-responses | stream=true
+    module: "sse"
+    tag: "FORMAT"
+[05:46:22.747] DEBUG: [sse] Prompt compression disabled or unavailable
+    module: "sse"
+    tag: "COMPRESSION"
+[05:46:22.748] DEBUG: [sse] Prompt Compression engines disabled; reactive context compaction is ALSO disabled — large histories will NOT be trimmed before reaching the upstream provider
+    module: "sse"
+    tag: "CONTEXT"
+[05:46:22.748] DEBUG: [sse] Checking compression: 17 tokens vs 610400 threshold (872000 limit, 0 reserved)
+    module: "sse"
+    tag: "CONTEXT"
+[05:46:22.754] DEBUG: [sse] CODEX | gpt-5.6-sol | 0 msgs
+    module: "sse"
+    tag: "REQUEST"
+[05:46:22.756] DEBUG: [sse] fetch-start timeout capped 600000ms -> 110000ms (streaming)
+    module: "sse"
+    tag: "TIMEOUT"
+[05:46:22.759] DEBUG: [sse] Stream readiness confirmed in 0ms (codex/gpt-5.6-sol)
+    module: "sse"
+    tag: "STREAM"
+[05:46:22.760] DEBUG: [sse] Responses translation mode: openai-responses → openai
+    module: "sse"
+    tag: "STREAM"
+[01:46:22] 📊 [USAGE] CODEX | in=22 | out=5 | account=7cd10e7d...
+[01:46:22] 🌊 [STREAM] CODEX | gpt-5.6-sol | 111ms | error: Provider returned empty content
+E2E_SCENARIO {"name":"chat with header","expected":"acceptance-e2e-chat-1","rows":1,"tags":["acceptance-e2e-chat-1"],"status":200}
+✔ handler e2e session tag: a Chat Completions request with X-OmniRoute-Session-Id stores that value as its row's session tag (714.205887ms)
+[DB] SQLite WAL checkpoint completed (TRUNCATE)
+[DB] Driver: better-sqlite3 | file: /tmp/omniroute-session-tag-e2e-QdSCCI/storage.sqlite
+[DB] Added provider_connections.last_ping_at column
+[DB] Added provider_connections.last_pinged_reset_key column
+[DB] Added usage_history.combo_strategy column
+[DB] Added call_logs.video_content_removed column
+[DB] Added call_logs.ttft_ms column
+[DB] Added call_logs.model_pinned column
+[DB] Added call_logs.session_tag column
+[DB] Added call_logs.reasoning_duration_ms column
+[DB] Added call_logs.reasoning_effort_requested column
+[DB] Added call_logs.reasoning_effort_upstream column
+[DB] Added call_logs.reasoning_encrypted column
+[DB] Added call_logs.has_content column
+[DB] Added call_logs.usage_provenance column
+[DB] Added call_logs.resilience_actions column
+[DB] Changing cache_size from 65536KB to 16384KB
+[DB] cache_size changed to 16384KB
+[DB] auto_vacuum drift detected (configured=INCREMENTAL, live=NONE); scheduling reconcile on the next vacuum-scheduler run
+[DB] SQLite database ready: /tmp/omniroute-session-tag-e2e-QdSCCI/storage.sqlite (DATA_DIR=/tmp/omniroute-session-tag-e2e-QdSCCI, SQLITE_FILE=/tmp/omniroute-session-tag-e2e-QdSCCI/storage.sqlite)
+[ProxyEgress] codex status=success
+[05:46:23.447] INFO: [sse] 📥 POST /v1/responses | codex/gpt-5.6-sol | 37 msgs
+    module: "sse"
+    tag: "HTTP"
+    method: "POST"
+    path: "/v1/responses | codex/gpt-5.6-sol | 37 msgs"
+[05:46:23.447] DEBUG: [sse] No API key provided (local mode)
+    module: "sse"
+    tag: "AUTH"
+[05:46:23.449] DEBUG: [sse] Skipping: target model supports vision natively
+    module: "sse"
+    tag: "VISION_BRIDGE"
+[05:46:23.450] DEBUG: [sse] vision-bridge pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:23.450] DEBUG: [sse] audio-bridge pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:23.450] DEBUG: [sse] video-bridge pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:23.450] DEBUG: [sse] pii-masker pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:23.450] DEBUG: [sse] prompt-injection pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:23.450] DEBUG: [sse] credential-masker pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:23.452] INFO: [sse] Provider: codex, Model: gpt-5.6-sol
+    module: "sse"
+    tag: "ROUTING"
+[05:46:23.454] DEBUG: [sse] codex | active=1, excluded=0 (none), forcedId=none, blocked_forced=0, blocked_allowed=0
+    module: "sse"
+    tag: "AUTH"
+[05:46:23.454] DEBUG: [sse] codex | available: 1/1
+    module: "sse"
+    tag: "AUTH"
+[05:46:23.454] INFO: [sse] session_key=input:sha256:5f642... has no available affinity target
+    module: "sse"
+    tag: "AUTH"
+[05:46:23.455] INFO: [sse] Using codex account: ***...
+    module: "sse"
+    tag: "AUTH"
+[05:46:23.457] DEBUG: [sse] openai-responses → openai-responses | stream=true
+    module: "sse"
+    tag: "FORMAT"
+[05:46:23.458] DEBUG: [sse] Prompt compression disabled or unavailable
+    module: "sse"
+    tag: "COMPRESSION"
+[05:46:23.459] DEBUG: [sse] Prompt Compression engines disabled; reactive context compaction is ALSO disabled — large histories will NOT be trimmed before reaching the upstream provider
+    module: "sse"
+    tag: "CONTEXT"
+[05:46:23.459] DEBUG: [sse] Checking compression: 17 tokens vs 610400 threshold (872000 limit, 0 reserved)
+    module: "sse"
+    tag: "CONTEXT"
+[05:46:23.460] DEBUG: [sse] native codex passthrough enabled
+    module: "sse"
+    tag: "FORMAT"
+[05:46:23.460] DEBUG: [sse] CODEX | gpt-5.6-sol | 0 msgs
+    module: "sse"
+    tag: "REQUEST"
+[05:46:23.462] DEBUG: [sse] fetch-start timeout capped 600000ms -> 110000ms (streaming)
+    module: "sse"
+    tag: "TIMEOUT"
+[05:46:23.464] DEBUG: [sse] Stream readiness confirmed in 0ms (codex/gpt-5.6-sol)
+    module: "sse"
+    tag: "STREAM"
+[05:46:23.465] DEBUG: [sse] Standard passthrough mode
+    module: "sse"
+    tag: "STREAM"
+[01:46:23] 📊 [USAGE] CODEX | in=22 | out=5 | account=d621a0ed...
+[01:46:23] 🌊 [STREAM] CODEX | gpt-5.6-sol | 110ms | complete
+[ProxyEgress] codex status=success
+[05:46:23.886] INFO: [sse] 📥 POST /v1/responses | codex/gpt-5.6-sol | 37 msgs
+    module: "sse"
+    tag: "HTTP"
+    method: "POST"
+    path: "/v1/responses | codex/gpt-5.6-sol | 37 msgs"
+[05:46:23.886] DEBUG: [sse] No API key provided (local mode)
+    module: "sse"
+    tag: "AUTH"
+[05:46:23.888] DEBUG: [sse] Skipping: target model supports vision natively
+    module: "sse"
+    tag: "VISION_BRIDGE"
+[05:46:23.888] DEBUG: [sse] vision-bridge pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:23.888] DEBUG: [sse] audio-bridge pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:23.888] DEBUG: [sse] video-bridge pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:23.888] DEBUG: [sse] pii-masker pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:23.888] DEBUG: [sse] prompt-injection pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:23.888] DEBUG: [sse] credential-masker pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:23.890] INFO: [sse] Provider: codex, Model: gpt-5.6-sol
+    module: "sse"
+    tag: "ROUTING"
+[05:46:23.891] DEBUG: [sse] codex | active=1, excluded=0 (none), forcedId=none, blocked_forced=0, blocked_allowed=0
+    module: "sse"
+    tag: "AUTH"
+[05:46:23.891] DEBUG: [sse] codex | available: 1/1
+    module: "sse"
+    tag: "AUTH"
+[05:46:23.892] INFO: [sse] session_key=input:sha256:19851... has no available affinity target
+    module: "sse"
+    tag: "AUTH"
+[05:46:23.892] INFO: [sse] Using codex account: ***...
+    module: "sse"
+    tag: "AUTH"
+[05:46:23.894] DEBUG: [sse] openai-responses → openai-responses | stream=true
+    module: "sse"
+    tag: "FORMAT"
+[05:46:23.895] DEBUG: [sse] Prompt compression disabled or unavailable
+    module: "sse"
+    tag: "COMPRESSION"
+[05:46:23.896] DEBUG: [sse] Prompt Compression engines disabled; reactive context compaction is ALSO disabled — large histories will NOT be trimmed before reaching the upstream provider
+    module: "sse"
+    tag: "CONTEXT"
+[05:46:23.896] DEBUG: [sse] Checking compression: 17 tokens vs 610400 threshold (872000 limit, 0 reserved)
+    module: "sse"
+    tag: "CONTEXT"
+[05:46:23.897] DEBUG: [sse] native codex passthrough enabled
+    module: "sse"
+    tag: "FORMAT"
+[05:46:23.898] DEBUG: [sse] CODEX | gpt-5.6-sol | 0 msgs
+    module: "sse"
+    tag: "REQUEST"
+[05:46:23.899] DEBUG: [sse] fetch-start timeout capped 600000ms -> 110000ms (streaming)
+    module: "sse"
+    tag: "TIMEOUT"
+[05:46:23.901] DEBUG: [sse] Stream readiness confirmed in 0ms (codex/gpt-5.6-sol)
+    module: "sse"
+    tag: "STREAM"
+[05:46:23.901] DEBUG: [sse] Standard passthrough mode
+    module: "sse"
+    tag: "STREAM"
+[01:46:24] 📊 [USAGE] CODEX | in=22 | out=5 | account=d621a0ed...
+[01:46:24] 🌊 [STREAM] CODEX | gpt-5.6-sol | 106ms | complete
+E2E_SCENARIO {"name":"two tags","expected":["acceptance-e2e-turn-1","acceptance-e2e-turn-2"],"rows":2,"tags":["acceptance-e2e-turn-1","acceptance-e2e-turn-2"]}
+✔ handler e2e session tag: two requests with different tags each get their own tag (no cross-contamination) (1126.846767ms)
+[DB] SQLite WAL checkpoint completed (TRUNCATE)
+[DB] Driver: better-sqlite3 | file: /tmp/omniroute-session-tag-e2e-QdSCCI/storage.sqlite
+[DB] Added provider_connections.last_ping_at column
+[DB] Added provider_connections.last_pinged_reset_key column
+[DB] Added usage_history.combo_strategy column
+[DB] Added call_logs.video_content_removed column
+[DB] Added call_logs.ttft_ms column
+[DB] Added call_logs.model_pinned column
+[DB] Added call_logs.session_tag column
+[DB] Added call_logs.reasoning_duration_ms column
+[DB] Added call_logs.reasoning_effort_requested column
+[DB] Added call_logs.reasoning_effort_upstream column
+[DB] Added call_logs.reasoning_encrypted column
+[DB] Added call_logs.has_content column
+[DB] Added call_logs.usage_provenance column
+[DB] Added call_logs.resilience_actions column
+[DB] Changing cache_size from 65536KB to 16384KB
+[DB] cache_size changed to 16384KB
+[DB] auto_vacuum drift detected (configured=INCREMENTAL, live=NONE); scheduling reconcile on the next vacuum-scheduler run
+[DB] SQLite database ready: /tmp/omniroute-session-tag-e2e-QdSCCI/storage.sqlite (DATA_DIR=/tmp/omniroute-session-tag-e2e-QdSCCI, SQLITE_FILE=/tmp/omniroute-session-tag-e2e-QdSCCI/storage.sqlite)
+[ProxyEgress] codex status=success
+[05:46:24.613] INFO: [sse] 📥 POST /v1/responses | codex/gpt-5.6-sol | 20 msgs
+    module: "sse"
+    tag: "HTTP"
+    method: "POST"
+    path: "/v1/responses | codex/gpt-5.6-sol | 20 msgs"
+[05:46:24.613] DEBUG: [sse] No API key provided (local mode)
+    module: "sse"
+    tag: "AUTH"
+[05:46:24.615] DEBUG: [sse] Skipping: target model supports vision natively
+    module: "sse"
+    tag: "VISION_BRIDGE"
+[05:46:24.615] DEBUG: [sse] vision-bridge pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:24.615] DEBUG: [sse] audio-bridge pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:24.616] DEBUG: [sse] video-bridge pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:24.616] DEBUG: [sse] pii-masker pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:24.616] DEBUG: [sse] prompt-injection pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:24.616] DEBUG: [sse] credential-masker pre-call passed
+    module: "sse"
+    tag: "GUARDRAIL"
+[05:46:24.620] INFO: [sse] Provider: codex, Model: gpt-5.6-sol
+    module: "sse"
+    tag: "ROUTING"
+[05:46:24.622] DEBUG: [sse] codex | active=1, excluded=0 (none), forcedId=none, blocked_forced=0, blocked_allowed=0
+    module: "sse"
+    tag: "AUTH"
+[05:46:24.622] DEBUG: [sse] codex | available: 1/1
+    module: "sse"
+    tag: "AUTH"
+[05:46:24.622] INFO: [sse] session_key=input:sha256:25af8... has no available affinity target
+    module: "sse"
+    tag: "AUTH"
+[05:46:24.623] INFO: [sse] Using codex account: ***...
+    module: "sse"
+    tag: "AUTH"
+[05:46:24.625] DEBUG: [sse] openai-responses → openai-responses | stream=true
+    module: "sse"
+    tag: "FORMAT"
+[05:46:24.626] DEBUG: [sse] Prompt compression disabled or unavailable
+    module: "sse"
+    tag: "COMPRESSION"
+[05:46:24.627] DEBUG: [sse] Prompt Compression engines disabled; reactive context compaction is ALSO disabled — large histories will NOT be trimmed before reaching the upstream provider
+    module: "sse"
+    tag: "CONTEXT"
+[05:46:24.627] DEBUG: [sse] Checking compression: 13 tokens vs 610400 threshold (872000 limit, 0 reserved)
+    module: "sse"
+    tag: "CONTEXT"
+[05:46:24.628] DEBUG: [sse] native codex passthrough enabled
+    module: "sse"
+    tag: "FORMAT"
+[05:46:24.629] DEBUG: [sse] CODEX | gpt-5.6-sol | 0 msgs
+    module: "sse"
+    tag: "REQUEST"
+[05:46:24.631] DEBUG: [sse] fetch-start timeout capped 600000ms -> 110000ms (streaming)
+    module: "sse"
+    tag: "TIMEOUT"
+[05:46:24.633] DEBUG: [sse] Stream readiness confirmed in 0ms (codex/gpt-5.6-sol)
+    module: "sse"
+    tag: "STREAM"
+[05:46:24.634] DEBUG: [sse] Standard passthrough mode
+    module: "sse"
+    tag: "STREAM"
+[01:46:24] 📊 [USAGE] CODEX | in=22 | out=5 | account=d3e57ccb...
+[01:46:24] 🌊 [STREAM] CODEX | gpt-5.6-sol | 107ms | complete
+E2E_SCENARIO {"name":"no header","rows":1,"tags":["<generated conversation id>"]}
+✔ handler e2e session tag: a request without the header does not carry a tag that no request sent (743.483784ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 14480.892168
