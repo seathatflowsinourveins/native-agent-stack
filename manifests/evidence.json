@@ -17353,8 +17353,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-ai-memory-nemotron-embedder.md",
-      "sha256": "8d85aa3f04750d5b3fb111b38cc6b8661aaf3fb1e9966a16f18dec5b74532b8f",
-      "bytes": 7159
+      "sha256": "1bef4907ddefc0c5e342f158841bd3666404116f8742fc0342620540e1d3dce0",
+      "bytes": 9489
     },
     {
       "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
@@ -53303,8 +53303,8 @@
     },
     {
       "path": "examples/ai-memory-config.toml.example",
-      "sha256": "47b37149eea381d580b4b4c114049fdcbc6f0579d1485b18d20076c812a7c848",
-      "bytes": 1232
+      "sha256": "c6596ba68b8afa5aa4555c15e0e4426f8a4bec6617b0b671c233cdd23aebab6f",
+      "bytes": 1421
     },
     {
       "path": "examples/ai-memory-project.toml.example",
