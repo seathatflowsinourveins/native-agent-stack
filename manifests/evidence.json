@@ -4951,8 +4951,8 @@
     },
     {
       "path": "adoption/bootstrap.md",
-      "sha256": "1b7f5a15b75d23acb571dc5c30551919cec19e1ca4f44aa1d9bc3bc6dc4adb4f",
-      "bytes": 68761
+      "sha256": "1a5533bfcb028ef8c952fc1ebd08a2ca36dd22f7c3538bae7717e78e44501761",
+      "bytes": 68841
     },
     {
       "path": "adoption/credential-inventory.json",
@@ -5146,18 +5146,18 @@
     },
     {
       "path": "adoption/platforms/linux-wsl2-new-distro.md",
-      "sha256": "f640139255f1e093b018f47c1346c9f03b36d3fb941e08f4e910c928a08b3bec",
-      "bytes": 93206
+      "sha256": "dc747930541b6efeddb799967e1cf82a258b055dd268568a2897ae015d38048b",
+      "bytes": 93494
     },
     {
       "path": "adoption/platforms/linux-wsl2.md",
-      "sha256": "31f87db022f1fbadc33ae6483d09c9a2f094919660c9f0895c28cfa4be8952ed",
-      "bytes": 30087
+      "sha256": "1f3b29db1d2585b548a8595dd25b7ab3c7a2ff33af7e9f9a2ba750c3b0452174",
+      "bytes": 30164
     },
     {
       "path": "adoption/platforms/macos-arm64.md",
-      "sha256": "266da883e614f767929981e8e630c34cf3958020fb5a14f162d9f385bbb9427e",
-      "bytes": 65623
+      "sha256": "d7f026a3480e71374f25c33a92d3b0c4b30c1717846f74d0c3038872ad6d5870",
+      "bytes": 65911
     },
     {
       "path": "adoption/pre-login-observation.json",
