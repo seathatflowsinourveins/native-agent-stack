@@ -793,6 +793,16 @@ def meter_calibration(root: Path | str) -> dict:
             "method": "nearest-rank p90 of meter_last - meter_first per window over the run's organic Claude trials"}
 
 
+def deadline_without_result(duration_s, time_to_result_s, t_seconds) -> bool:
+    """Decision 1's hold condition (GPT micro-check of 87f9f1d7, finding 3): the session ran to T or past it (elapsed
+    time at least T) with no result event before T, however it then ended: the timeout's SIGTERM (rc 124), its SIGKILL
+    after the grace (rc 137), or a launcher kill at or after T. A session that failed or was killed before T is not a
+    deadline case."""
+    if not isinstance(duration_s, (int, float)) or not t_seconds:
+        return False
+    return duration_s >= t_seconds and (not isinstance(time_to_result_s, (int, float)) or time_to_result_s >= t_seconds)
+
+
 PROVIDER_ERROR_CLASSES = (
     ("rate_limit", re.compile(r"rate.?limit|usage limit|session limit|too many requests|\b429\b|quota", re.I)),
     ("timeout", re.compile(r"time.?out|timed out|deadline", re.I)),

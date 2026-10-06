@@ -2,6 +2,7 @@
 
 - **Source:** command-center item `task-ns2604-coop-20261006T105529Z`, section "Organic E2E v1.1: the CC's decisions before the pilot", sent 2026-10-06 at 10:55Z. The decisions below keep that item's numbers.
 - **Confirmations:** command-center item `task-ns2604-coop-20261006T114319Z`, sent at 11:43Z, settles the five points this file had marked for confirmation. Each is recorded below as "Confirmed (CC 11:43Z)", with its point number.
+- **Rulings of 12:30Z:** command-center item `task-ns2604-coop-20261006T123036Z` confirms one interpretation and extends decision 1's timing record to every cell. Both are recorded below as "Confirmed (CC 12:30Z)".
 - **Applies to:** PROTOCOL-v1.1.md (organic-e2e-v1.1-20261005), which stays verbatim, and PILOT-SPEC-v1.1.md. Where they differ from this file, this file governs from 2026-10-06 10:55Z.
 - **Harness:** each decision's code is in `harness/`, in the commit that adds this file.
   - `CC_V11_DECISIONS` in `harness/common.py` names the item.
@@ -12,7 +13,9 @@
 
 Item `task-ns2604-coop-20261006T114319Z` confirms the five points, with three additions the harness now implements:
 
-1. **The no-result hold applies to every Claude cell,** not only claude-env. One rule for all Claude cells keeps the arms symmetric. The launcher's `holds_cell()` depends on the client and the censoring reason only: CLI or SDK, native or env, stage 2, 3 or 4.
+1. **The no-result hold applies to every Claude cell,** not only claude-env. One rule for all Claude cells keeps the arms symmetric.
+   - The launcher's `holds_cell()` depends only on the client and the deadline evidence: the elapsed time and when the result arrived (see the 87f9f1d7 fixes below).
+   - It never depends on the cell, arm, kind (CLI or SDK) or stage.
 2. **gh counts as PATH-only.** It is also reported in its own "vendor-skill surface" stratum: a tool reached through a client vendor's official skills repository. `CLI_VENDOR_SKILL_SURFACES` holds gh through openai/skills@49f948fa (gh-fix-ci, gh-address-comments). Such trials stay out of OIR and are counted per item as `n_vendor_skill_surface` and `used_vendor_skill_surface`, with a use rate and its Wilson interval.
 3. **The answer-source list stands as written.** Two classes are added, and the principle is set: reading a source is legitimate work; reading an oracle's output is not. A host checkout's copy of an oracle input stays a tag.
    - Grader expected-output files outside oracles.json:
@@ -35,6 +38,56 @@ Item `task-ns2604-coop-20261006T114319Z` confirms the five points, with three ad
    - The operator step is `grade.py meter-calibration --run-root <root> [--write]`.
    - The value each trial started with is recorded in its ledger rows (`expected_usage`, `meter_expected_usage`) and in the grade (`meter_expected_usage`, with the calibration and the current p90).
    - On smoke-20261006c's three organic Claude trials, the p90 would be 0.06 (five-hour) and 0.01 (seven-day).
+
+## Confirmed (CC 12:30Z)
+
+Item `task-ns2604-coop-20261006T123036Z`:
+
+- **(a) The 2026-10-04 foundation E2E receipts stay sources.** Confirmed; no code change.
+  - The files in `evidence/artifacts/ns2604-e2e-20261004/` grade another E2E, and three suite tasks read `slots.json` and `summary.json` as input.
+  - A file there would become an answer source only if it held a graded output of this experiment's own trials. None does today.
+- **(b) The final-turn time and the result-event time are recorded for every cell,** Codex included (CL3, CL4, CL7, CL7b and the prompted and gate-0 cells), so the comparison keeps one schema across arms. In a Codex cell the two normally coincide.
+  - **Launcher Codex cells:** the final turn ends with the last `agent_message` that no tool item follows, and the result event is `turn.completed` (or `turn.failed`). Both are recorded in the exit row's `final_turn_end_s`, `final_turn_end_at`, `time_to_result_s` and `result_event` fields, as for Claude.
+  - **CL7b and runs prepared earlier:** CL7b has no launcher. For it, and for runs prepared before this ruling, the grader reads both times from the main rollout's own timestamps (`codex_turn_times`: the last `AgentMessage` with no tool item after it, and `task_complete`).
+  - **Grade report:** it lists both times for every launched trial (`completion_times`). It also checks that every Codex trial carries both (`timing_record`, which lists any Codex trial missing either).
+  - **Smoke-20261006c:** all 11 Codex trials carry both times in the read-only re-grade. The two times sit 0.1 to 0.4 s apart in most, with a few seconds between them in two of the 11 (8.4 s and 3.4 s).
+
+## Fixes from the GPT micro-check of 87f9f1d7 (2026-10-06)
+
+That check requested changes for four P2s (`cc-reads-20261005/pr786/GPT-VERDICT-87f9f1d72.md`, outside the repository). Each is fixed:
+
+1. **Filename-only operations invalidated trials.**
+   - Access is now judged from each command's arguments and each tool's output mode.
+   - **Content access:**
+     - a program that prints content or runs code over it;
+     - grep or rg printing matching lines;
+     - find (every `-exec`, `-execdir`, `-ok` or `-okdir` action) or xargs running such a program, judged by that program's own arguments (`find ... -exec grep -l` and `xargs grep -l` return names only). xargs options are read as the installed GNU findutils xargs 4.10.0 `--help` lists them, so `-i`, `-l`, `-e` and `--replace` take no separate word;
+     - git show, cat-file, blame, diff and grep, including after global options such as `git -C <dir>`;
+     - tar or unzip to stdout;
+     - an input redirection;
+     - the Read tool, and the Grep tool in content mode.
+   - **Names or metadata only, so a tag:** ls, find, stat, file, realpath, wc, git ls-files and status, rg --files, grep or rg with -l, -L, -c or -q, cp, mv and rsync, Glob, and the Grep tool's default `files_with_matches` and `count` modes.
+   - **A filter fed by a pipe:** when it names no file (`ls <dir> | head -n 5`, `... | sort -r`, `... | grep x`), it reads the previous command's output, not a file, so it is no read.
+   - Only successful content access that returned content can make an answer source invalidate a trial.
+2. **CL7b repetitions shared one attempt.** Chosen: the smaller correct change, which is to reject a CL7b repeat above 1 until each repetition gets its own attempt.
+   - `block.py` refuses such a block, and `prepare.py` refuses `--repeat-override` above 1 while `codex-app-server` is among the cells. Nothing is written in either case.
+   - The pilot's CL7b repeat is 1, and a re-run is a new block, which gets a fresh attempt.
+3. **The hold missed a timeout that needed SIGKILL.**
+   - The hold now reads the evidence (`deadline_without_result`): the session ran to T or past it with no result event before T, however it ended. That includes the timeout's SIGKILL after its grace (rc 137, now censored as `timeout_killed`) and a launcher kill at or after T.
+   - A session that fails or is killed before T is still `killed` and does not hold its cell.
+   - The grade's `no_result_trials` uses the same rule.
+4. **Same-task Codex transcripts stayed tags.**
+   - The grader now maps each Codex trial to its thread ids (`codex_threads_by_trial`): the thread collect.py joined, plus every collected rollout, main and child, whose file name ends with its thread id.
+   - A successful content read of a same-task trial's rollout is an answer source (`same-task transcript`), whichever copy it reads: the native original under `~/.codex/sessions`, a clone's alias of it, or a collected copy.
+   - A glob or directory-wide read (`cat ~/.codex/sessions/.../*.jsonl`, `rg` over `~/.claude/projects`) names no id in its input. For such a successful content read, the content it returned is scanned for same-task trial and thread ids (`answer_source_evidence: returned content`).
+   - The scan runs only when the read itself reaches a transcript, a store or another G13 location. That is judged from:
+     - its operands;
+     - the directory of an earlier `cd` in the same command;
+     - for a read whose operand comes from another command (a loop variable, `{}`, a command substitution, xargs), every path the command names;
+     - for an interpreter whose program comes from a heredoc (`python3 - <<'PY'`), the whole command text.
+   - A listing beside an unrelated read (`ls ~/.codex/sessions/... && cat notes.md`) is therefore not scanned, and neither is a listing piped into a filter.
+   - **Known limits:** a script file run by an interpreter (`python3 x.py`) and a `cd` from an earlier call are not followed. Their returned content is not scanned, though the reasons judged from the input still apply.
+   - Other tasks' transcripts stay tags.
 
 ## Fixes from the GPT first-pass read of 5aa2bfdc (2026-10-06)
 
@@ -84,7 +137,7 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
   - Another policy or T needs its own `--amendment-ref`.
   - T applies to every cell, including CL7b's turn timeout.
 - **`launcher.py` completion rule (unchanged):** a result event before T completes the trial. A result written at or after T, on the timeout's SIGTERM, censors as `timeout_after_result`.
-- **`launcher.py` records per Claude trial:**
+- **`launcher.py` records per trial (Claude since decision 1, Codex since the 12:30Z ruling):**
   - `final_turn_end_s` and `final_turn_end_at`: the main thread's last assistant text with no later tool call or tool result. Claude Code 2.1.291 leaves `stop_reason` unset on stream-json assistant events, so the content decides.
   - `time_to_result_s`, and the result event's own fields.
 - **`launcher.py` when a Claude trial has no result before T:**
@@ -100,6 +153,8 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
   - For runs whose launcher predates this decision, it reads the same two times from the stream.
   - The grade lists them as `completion_times` and `no_result_trials`.
 - **Confirmed (CC 11:43Z), point 1:** the hold applies to every Claude cell, not only claude-env (`holds_cell()`).
+  - Since the 87f9f1d7 micro-check, the rule reads the evidence, not the exit code: the session reached T with no result event before T. A timeout that needed SIGKILL therefore holds the cell too.
+- **Confirmed (CC 12:30Z), (b):** the two times are recorded for every cell, Codex included (see that section).
 
 **Offline re-grade of smoke-20261006c:**
 - claude-native's final turn ended at 578.7 s, and its result event reports duration_ms 575,920. The result arrived at 900.7 s.
@@ -235,10 +290,10 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
 ## Verification (offline; no pilot or smoke)
 
 - **Static checks:** every harness module parses (`ast.parse`) and imports. A stdlib `symtable` check found no undefined global names.
-- **Synthetic checks:** 96 checks of the decision helpers, all passing. The script is kept outside the repository.
+- **Synthetic checks:** 95 checks of the decision helpers, all passing. The script is kept outside the repository.
   - They cover headroom and resets, rate-limit hits, completion reasons, the hold flag, exposure, answer sources, effort-only fields, the re-baseline bound, each refused key class, the absorbed concurrent exit and the CL7b re-run rule.
-  - 37 of them cover the 11:43Z confirmations:
-    - the hold rule on every Claude cell of the run of record;
+  - 36 of them cover the 11:43Z confirmations:
+    - the evidence-based hold rule on every Claude cell of the run of record;
     - the vendor-skill stratum and its counting;
     - each answer-source reason, and that sources and oracle inputs stay tags;
     - the re-baseline cost bound and its fallback;
@@ -247,6 +302,23 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
 - **Red-green checks for the seven P2 findings:** 10 checks, kept outside the repository.
   - On the harness at 536487a4 all 10 fail; on this one all 10 pass.
   - They cover: the clone trust change (judgement, CL7b view, grader); the absorbed concurrent exit; the orphan reconciliation and counting; the CL7b rate-limit class; the fresh CL7b attempt and its counting; mentions, failed and empty reads; and G11's forwarded-effort value.
+- **Red-green checks for the 87f9f1d7 micro-check and the 12:30Z timing ruling:** 12 checks in two scripts, kept outside the repository.
+  - On the harness at 87f9f1d7 all 12 fail.
+  - At feebace4, the first push of this round, 7 of 12 pass. The two checks of the first review fail (find or xargs with grep -l, `git -C`, and glob or directory-wide reads), and so do the three of the second review.
+  - At 1c04fc79, the second push, 9 of 12 pass. The three checks of the second review fail: piped and sequenced listings, xargs options and multi-action find, and everyday commands.
+  - On this one all 12 pass.
+  - They cover:
+    - filename-only operations against content reads (ls, find, stat, realpath, rg --files and -l, git ls-files, wc, Grep's name modes, cat, head, rg, Read, Grep content mode, xargs cat);
+    - find -exec grep -l and xargs grep -l as tags, and `git -C <dir> show` and find -exec cat as content reads;
+    - a glob or directory-wide read of transcripts as an answer source only when its returned content names a same-task trial or thread;
+    - listings piped into head, sort, grep, awk or tr, or written beside an unrelated read, as tags even when the listing names a same-task id;
+    - against those, reads through `cd`, a find action's `sh -c`, a loop, a command substitution, xargs, `$HOME`, an input redirection or a heredoc program;
+    - xargs `-i`, `-l`, `-e`, `--replace` and `--process-slot-var`, and a find command with several actions;
+    - the CL7b repeat rejection;
+    - a real `timeout --kill-after` SIGKILL (rc 137) holding a Claude cell while a kill before T does not;
+    - same-task Codex rollouts (native, clone alias, collected child) against another task's;
+    - both Codex times from a real `printf` event stream through the launcher, and from a rollout;
+    - and, on smoke-20261006c read-only, all 11 Codex trials carrying both times.
 - **Operator step:** `grade.py meter-calibration` ran read-only on smoke-20261006c and wrote nothing in the run root. Its `--write` form was exercised on a copy of the ledger.
 - **Re-grade:** a read-only re-grade of smoke-20261006c with this `grade.py`, with its output kept outside the run root. Every gate matches the 10:48Z grade except G13, which now passes, as described under decision 3.
 - **Not yet run live:**
@@ -254,6 +326,7 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
   - the headroom start rule and rate-limit re-runs;
   - the in-run re-baseline with its cost check and in-lock reconciliation;
   - the pilot's meter recalibration and orphan reconciliation;
-  - CL7b's fresh attempts, clone trust comparison and rate-limit marking.
+  - CL7b's fresh attempts, clone trust comparison and rate-limit marking;
+  - the launcher's Codex timing record.
 
   The first pilot or smoke under these commits will be the first time they execute.

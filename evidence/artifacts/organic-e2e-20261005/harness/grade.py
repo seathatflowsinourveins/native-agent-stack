@@ -31,6 +31,7 @@ sys.path.insert(0, str(HERE))
 
 from common import (CARRY_FORWARD_REASONS, CC_V11_DECISIONS, CLI_NATIVE_SURFACES, CLI_PROGRAMS, CLI_TASK_KINDS,  # noqa: E402
                     CLI_VENDOR_SKILL_SURFACES, CLI_WRAPPERS, CLONE_TRUST_KEYS, HOME, MARKERS, MCP_SERVER_ITEMS, METER_CALIBRATION,
+                    deadline_without_result,
                     REBASELINE_LOG, RUNS_ROOT, V1_ROOT, headroom_allows, load_json, meter_calibration,
                     parse_stream_text, read_jsonl, run_expected_usage, sha256_bytes, sha256_file, trial_dir, utc_now,
                     write_json)
@@ -67,7 +68,7 @@ _H = re.escape(str(HOME))
 # root and trials of other tasks are tags.
 REACH = {
     "coordination": re.compile(r"\.local/state/native-agent-stack/coordination|organic-e2e|ns2604-organic-fixtures"),
-    "other-transcripts": re.compile(r"\.claude/projects/|\.codex/sessions/"),
+    "other-transcripts": re.compile(r"\.claude/projects(/|\b)|\.codex/sessions(/|\b)"),
     "host-checkout": re.compile(rf"{_H}/(code|projects)(/|\b)"),
     "user-harness-file": re.compile(rf"{_H}/\.claude/(CLAUDE\.md|RTK\.md|agents\b|hooks\b)|{_H}/\.codex/(AGENTS\.md|RTK\.md)"),
     "trial-root": re.compile(rf"{_H}/\.cache/wsr(/|\b)"),
@@ -117,40 +118,58 @@ def skill_usage(repo: Path | None = None):
     return _SKILL_USAGE
 
 
+SEPARATORS = re.compile(r"(\n|;|&&|\|\||\||&|\(|\)|`|\$\()")
+
+
 def segments(text: str) -> list[list[str]]:
     """Simple commands of a shell text: executed_text (data stays data), split on separators, wrappers stripped."""
+    return [tokens for tokens, _ in pipeline_segments(text)]
+
+
+def pipeline_segments(text: str) -> list[tuple[list[str], bool]]:
+    """segments(), each with whether a pipe feeds it (| or |&; a pipe may continue on the next line)."""
     su = skill_usage()
-    executed = su.executed_text(text or "")
-    out = []
-    for part in re.split(r"\n|;|&&|\|\||\||&|\(|\)|`|\$\(", executed):
-        part = part.strip()
+    executed = su.executed_text(text or "").replace("|&", "|")
+    out, piped = [], False
+    for index, piece in enumerate(SEPARATORS.split(executed)):
+        if index % 2:
+            piped = piece == "|" or (piece == "\n" and piped)
+            continue
+        part = piece.strip()
         if not part:
             continue
-        try:
-            tokens = shlex.split(part, posix=True)
-        except ValueError:
-            tokens = part.split()
-        while tokens and (re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", tokens[0]) or tokens[0] in ("do", "then", "else", "elif", "if",
-                                                                                              "while", "until", "!", "{")):
-            tokens = tokens[1:]
-        changed = True
-        while tokens and changed:
-            changed = False
-            head = os.path.basename(tokens[0])
-            if head in CLI_WRAPPERS:
-                tokens, changed = tokens[1:], True
-                while tokens and tokens[0].startswith("-"):
-                    tokens = tokens[1:]
-                while tokens and re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", tokens[0]):
-                    tokens = tokens[1:]
-            elif head == "timeout":
-                tokens, changed = tokens[1:], True
-                while tokens and tokens[0].startswith("-"):
-                    tokens = tokens[1:]
-                tokens = tokens[1:] if tokens else tokens
+        tokens = _command_words(part)
         if tokens:
-            out.append(tokens)
+            out.append((tokens, piped))
+        piped = False
     return out
+
+
+def _command_words(part: str) -> list[str]:
+    """One simple command's words: leading assignments and shell keywords dropped, wrappers stripped."""
+    try:
+        tokens = shlex.split(part, posix=True)
+    except ValueError:
+        tokens = part.split()
+    while tokens and (re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", tokens[0]) or tokens[0] in ("do", "then", "else", "elif", "if",
+                                                                                          "while", "until", "!", "{")):
+        tokens = tokens[1:]
+    changed = True
+    while tokens and changed:
+        changed = False
+        head = os.path.basename(tokens[0])
+        if head in CLI_WRAPPERS:
+            tokens, changed = tokens[1:], True
+            while tokens and tokens[0].startswith("-"):
+                tokens = tokens[1:]
+            while tokens and re.match(r"^[A-Za-z_][A-Za-z0-9_]*=", tokens[0]):
+                tokens = tokens[1:]
+        elif head == "timeout":
+            tokens, changed = tokens[1:], True
+            while tokens and tokens[0].startswith("-"):
+                tokens = tokens[1:]
+            tokens = tokens[1:] if tokens else tokens
+    return tokens
 
 
 def unwrap_command(command) -> str:
@@ -517,6 +536,7 @@ def parse_rollout(path: Path) -> dict:
     rows = read_jsonl(path)
     meta, items, messages, wrappers, functions, turn_context, outputs, skills_body = None, {}, [], [], [], None, [], None
     tools_done = 0
+    final_turn_end_at, task_complete_at = None, None
     for row in rows:
         payload = row.get("payload") or {}
         kind = row.get("type")
@@ -526,12 +546,17 @@ def parse_rollout(path: Path) -> dict:
             turn_context = payload
         elif kind == "world_state" and skills_body is None:
             skills_body = (((payload.get("state") or {}).get("host_skills")) or {}).get("body")
+        elif kind == "event_msg" and payload.get("type") in ("task_complete", "turn_complete") and task_complete_at is None:
+            task_complete_at = row.get("timestamp")   # the CC's 12:30Z ruling: a Codex cell's result-event time
         elif kind == "event_msg" and payload.get("type") == "item_completed":
             item = payload.get("item") or {}
             if item.get("id"):
                 items[item["id"]] = item
             if item.get("type") in ROLLOUT_TOOL_TYPES:
                 tools_done += 1
+                final_turn_end_at = None
+            elif item.get("type") == "AgentMessage":
+                final_turn_end_at = row.get("timestamp")   # ... and its final-turn time: the last message no tool follows
         elif kind == "response_item":
             ptype = payload.get("type")
             if ptype == "message":
@@ -549,7 +574,8 @@ def parse_rollout(path: Path) -> dict:
                                 "tools_before": tools_done})
     return {"meta": meta, "items": items, "messages": messages, "wrappers": wrappers, "functions": functions,
             "turn_context": turn_context, "outputs": outputs, "skills_body_sha256": sha256_bytes(skills_body.encode()) if skills_body else None,
-            "skill_names": skill_names_in_catalog(skills_body), "path": str(path)}
+            "skill_names": skill_names_in_catalog(skills_body), "final_turn_end_at": final_turn_end_at,
+            "task_complete_at": task_complete_at, "path": str(path)}
 
 
 SKILL_LINE = re.compile(r"^\s*-\s+([A-Za-z0-9_.-]+(?::[A-Za-z0-9_.-]+)?):\s")
@@ -1157,6 +1183,20 @@ def grade_claude_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) ->
                                           if h.get("additional_context") or h.get("system_message")])}
 
 
+def codex_turn_times(rollout: dict | None, launched_at: str | None) -> dict:
+    """The CC's 12:30Z ruling (item task-ns2604-coop-20261006T123036Z, b): a Codex cell's final-turn time (its last
+    agent message with no tool item after it) and result-event time (task_complete), from the main rollout's own
+    timestamps, in seconds from the launched row's stamp. CL7b has no launcher, and runs prepared before the ruling
+    recorded neither, so the grader reads both here; a launcher trial's own arrival times take precedence."""
+    rollout = rollout or {}
+    start_ns = _ts_ns(launched_at)
+    final_ns, result_ns = _ts_ns(rollout.get("final_turn_end_at")), _ts_ns(rollout.get("task_complete_at"))
+    return {"final_turn_end_at": rollout.get("final_turn_end_at"), "result_at": rollout.get("task_complete_at"),
+            "final_turn_end_s": round((final_ns - start_ns) / 1e9, 1) if start_ns and final_ns else None,
+            "time_to_result_s": round((result_ns - start_ns) / 1e9, 1) if start_ns and result_ns else None,
+            "result_event": {"type": "task_complete"} if result_ns else None}
+
+
 def _forwarded_efforts(call: dict) -> list:
     """The forwarded effort values of one gateway call-log row: decision 8's effort-only record, or the effort inside
     the reasoning object a row collected before it kept."""
@@ -1309,6 +1349,7 @@ def grade_codex_trial(root: Path, cfg: dict, trial: dict, ledger_rows: dict) -> 
             "hook_context_items_nonempty": sum(1 for r in rollouts for m in r["messages"] if m.get("kinds")
                                                and "hooks.additional_context" in json.dumps(m["kinds"]) and m["text"].strip()),
             "subagent_activity_items": subagent_activity, "child_rollouts": child_rollouts, "spawns": spawns,
+            "turn_times": codex_turn_times(main, (ledger_rows.get("launched") or {}).get("at")),
             "actor_types": actor_types, "cwd": cwd, "items": stream["items"], "all_items": all_items, "rollout_main": main}
 
 
@@ -1450,27 +1491,196 @@ def _call_texts(graded: dict, client: str) -> list[tuple[str, str]]:
 
 # GPT read of 5aa2bfdc, finding 6: an answer source invalidates a trial only through a successful read that returned
 # content; a path mentioned, listed, written or read without success stays a tag.
-READ_LIKE_PROGRAMS = READ_PROGRAMS | {"jq", "yq", "python", "python3", "node", "ruby", "perl", "awk", "gawk", "cut", "wc",
-                                      "diff", "cmp", "xxd", "od", "hexdump", "strings", "tac", "sort", "uniq", "base64",
-                                      "zcat", "gzip", "gunzip", "unzip", "tar", "cp", "rsync", "scp", "sqlite3", "view", "vim",
-                                      "nano", "emacs", "readlink", "realpath", "file", "difft", "markitdown", "toon"}
+# GPT micro-check of 87f9f1d7, finding 1: access is judged from each command's arguments and each tool's output mode.
+# Content access: a program that prints file content or runs code over it, grep/rg printing matching lines, find or
+# xargs running such a program, git show/cat-file/blame/diff/grep (log with a patch), tar or unzip to stdout, an input
+# redirection, the Read tool, the Grep tool in content mode. Names or metadata only, so a tag: ls, find, stat, file,
+# realpath, readlink, du, tree, wc, git ls-files/status/log, rg --files, grep/rg -l/-L/-c/-q, cp/mv/rsync, Glob, LS, and
+# the Grep tool's default files_with_matches or count mode. A filter that a pipe feeds and that names no file (ls dir |
+# head) reads the listing, not a file, so it is no read either (shell_read_texts).
+CONTENT_PROGRAMS = READ_PROGRAMS | {"jq", "yq", "python", "python3", "node", "ruby", "perl", "awk", "gawk", "cut", "diff",
+                                    "cmp", "xxd", "od", "hexdump", "strings", "tac", "sort", "uniq", "base64", "zcat", "bzcat",
+                                    "xzcat", "zless", "sqlite3", "view", "vim", "nano", "emacs", "difft", "markitdown",
+                                    "toon", "column", "fold", "fmt", "pr", "paste", "tr", "iconv", "sed", "awk"}
+GREP_PROGRAMS = {"grep", "egrep", "fgrep", "rg", "ugrep", "ag", "ack"}
+GREP_NAME_ONLY_LONG = {"--files-with-matches", "--files-without-match", "--count", "--count-matches", "--files", "--quiet",
+                       "--silent", "--list-files"}
+GREP_NAME_ONLY_SHORT = set("lLcq")
 CODE_READ_API = re.compile(r"\bopen\s*\(|readFileSync|readFile\s*\(|read_text\s*\(|read_bytes\s*\(|\.read\s*\(|"
                            r"json\.load|createReadStream|fs\.promises", re.I)
-MCP_READ_TOOL = re.compile(r"read|get|view|open|cat|fetch|file|search|find|grep|symbol|outline|content|index|quote|chunk",
-                           re.I)
-CLAUDE_READ_TOOLS = {"Read": ("file_path",), "NotebookRead": ("notebook_path",), "Grep": ("path",)}
+MCP_READ_TOOL = re.compile(r"read|get|view|open|cat|fetch|search|grep|symbol|outline|content|quote|chunk|source|show", re.I)
+MCP_LIST_TOOL = re.compile(r"list|find_file|glob|tree|\bls\b|_dir\b|exists|stat", re.I)
+
+
+def _grep_reads_content(args: list[str]) -> bool:
+    """grep or rg prints matching content unless a flag makes it print names, counts or nothing."""
+    longs = {a.split("=", 1)[0] for a in args if a.startswith("--")}
+    shorts = {ch for a in args if a.startswith("-") and not a.startswith("--") for ch in a[1:] if ch.isalpha()}
+    return not (longs & GREP_NAME_ONLY_LONG or shorts & GREP_NAME_ONLY_SHORT)
+
+
+GIT_VALUE_OPTIONS = {"-C", "-c", "--git-dir", "--work-tree", "--namespace", "--super-prefix", "--config-env"}
+# xargs options whose value is the next word, as the installed GNU findutils xargs 4.10.0 `--help` lists them. -i, -l
+# and -e (and --replace, --eof) take a value only when it is attached (-i{}, -l1, -eEND), so they take no word.
+XARGS_VALUE_OPTIONS = {"-a", "--arg-file", "-d", "--delimiter", "-E", "-I", "-L", "--max-lines", "-n", "--max-args",
+                       "-P", "--max-procs", "-s", "--max-chars", "--process-slot-var"}
+FIND_ACTIONS = {"-exec", "-execdir", "-ok", "-okdir"}
+# An action ends at ; or +. In segments() an escaped \; reads as _ (skill_usage.executed_text: an escaped character is
+# data) and a quoted ";" as a blank word.
+FIND_ACTION_ENDS = {";", "\\;", "+", "_", ""}
+
+
+def _inner_commands(program: str, args: list[str]) -> list[list[str]]:
+    """The commands find runs (every -exec/-execdir/-ok/-okdir action) or xargs runs (after its own options)."""
+    if program == "find":
+        commands, current = [], None
+        for arg in args:
+            if arg in FIND_ACTIONS:
+                current = []
+                commands.append(current)
+            elif current is not None:
+                if arg.strip() in FIND_ACTION_ENDS:
+                    current = None
+                else:
+                    current.append(arg)
+        return [command for command in commands if command]
+    index = 0
+    while index < len(args):
+        arg = args[index]
+        if arg in XARGS_VALUE_OPTIONS:
+            index += 2
+        elif arg.startswith("-"):
+            index += 1
+        else:
+            return [args[index:]]
+    return []
+
+
+def segment_reads_content(tokens: list[str]) -> bool:
+    """Whether one simple command (wrappers stripped) reads file content into its output."""
+    if not tokens:
+        return False
+    if "<" in tokens:
+        return True
+    program, args = os.path.basename(tokens[0]), tokens[1:]
+    if program in GREP_PROGRAMS:
+        return _grep_reads_content(args)
+    if program == "git":
+        # Global options before the subcommand, some with a value (git -C <dir> show ...).
+        index = 0
+        while index < len(args) and args[index].startswith("-"):
+            index += 2 if args[index] in GIT_VALUE_OPTIONS else 1
+        sub, rest = (args[index], args[index + 1:]) if index < len(args) else ("", [])
+        if sub in ("show", "cat-file", "blame", "annotate", "diff"):
+            return True
+        if sub == "grep":
+            return _grep_reads_content(rest)
+        if sub == "log":
+            return any(a in ("-p", "--patch") or (a.startswith("-p") and not a.startswith("--")) for a in rest)
+        return False
+    if program in ("find", "xargs"):
+        # The commands they run decide: grep -l over the files still returns only names.
+        return any(segment_reads_content(inner) for inner in _inner_commands(program, args))
+    if program == "tar":
+        cluster = [a for a in args[:1] if not a.startswith("-")] + [a for a in args if a.startswith("-") and not a.startswith("--")]
+        return "--to-stdout" in args or any("O" in a for a in cluster)
+    if program == "unzip":
+        return any(a in ("-p", "-c") for a in args)
+    return program in CONTENT_PROGRAMS
+
+
+# The first word a pattern-first program takes is its pattern or script unless an option gives it.
+PATTERN_FIRST = GREP_PROGRAMS | {"sed", "awk", "gawk", "mawk", "jq", "yq"}
+PATTERN_GIVEN = {"-e", "-f", "--regexp", "--file", "--expression", "--from-file"}
+INFO_ONLY = {"--version", "-V", "--help", "-h"}
+PLACEHOLDER = re.compile(r"\$\{?[A-Za-z_0-9@*#?]|\{\}")
+PATH_WORD = re.compile(r"[^\s;&|()<>'\"`=]*/[^\s;&|()<>'\"`]*")
+FILE_LIKE = re.compile(r"/|[*?\[]|^~|\.[A-Za-z][A-Za-z0-9]{0,7}$")   # an operand that names a file, not a count
+REDIRECTION = re.compile(r"^\d*(&>>?|>>?|<<<|<<-?|<)(.*)$")
+INTERPRETERS = {"python", "python3", "node", "ruby", "perl"}
+
+
+def _operands(tokens: list[str]) -> list[str] | None:
+    """The words a simple command reads from: its non-option words, without a pattern-first program's pattern or
+    script, an output redirection or a heredoc marker (an input redirection's file stays). None for a --version or
+    --help call, which reads nothing."""
+    program, args = os.path.basename(tokens[0]), tokens[1:]
+    if args and all(arg in INFO_ONLY for arg in args):
+        return None
+    words, skip = [], False
+    for arg in args:
+        if skip:
+            skip = False
+            continue
+        redirection = REDIRECTION.match(arg)
+        if redirection:
+            operator, rest = redirection.groups()
+            if operator == "<" and rest:
+                words.append(rest)
+            elif operator != "<":
+                skip = not rest
+            continue
+        if arg == "-" or not arg.startswith("-"):
+            words.append(arg)
+    if program in PATTERN_FIRST and words and not any(arg.split("=", 1)[0] in PATTERN_GIVEN for arg in args):
+        words = words[1:]
+    return words
 
 
 def shell_read_texts(text: str) -> list[str]:
-    """The simple commands of a shell text that read file content: a reading program (or one copying content), a
-    find that runs one, or an input redirection."""
-    out = []
-    for tokens in segments(text or ""):
-        program = os.path.basename(tokens[0])
-        if program in READ_LIKE_PROGRAMS or "<" in tokens or (program == "find" and any(
-                os.path.basename(t) in READ_PROGRAMS for t in tokens[1:])):
-            out.append(" ".join(tokens))
+    """The simple commands of a shell text that read file content, each with the places its operands come from.
+
+    - A pipeline that hands a listing to xargs running a content program (rg -l ... | xargs cat) reads the listed
+      files, so all its commands count.
+    - A command that a pipe feeds and that names no file (ls dir | head -n 5, ... | sort -r, ... | grep x) reads the
+      previous command's output, so it is not a read.
+    - A read with a relative operand, or none, after a cd in the same text also names that directory. A read whose
+      operand is a variable or {} (a loop, a find action's sh -c), or that names no operand (cat $(ls ...)), also names
+      every path in the text, since one of them produced its operand. An interpreter that takes its program from a
+      heredoc or stdin (python3 - <<'PY') names what the whole text names."""
+    segs = pipeline_segments(text)
+    if any(os.path.basename(t[0]) == "xargs" and segment_reads_content(t) for t, _ in segs):
+        return [" ".join(t) for t, _ in segs]
+    home = str(HOME)
+
+    def expand(word: str) -> str:
+        return word.replace("${HOME}", home).replace("$HOME", home)
+
+    out, cwd, paths = [], None, None
+    for tokens, piped in segs:
+        tokens = [expand(token) for token in tokens]
+        if os.path.basename(tokens[0]) in ("cd", "pushd"):
+            target = next((token for token in tokens[1:] if not token.startswith("-")), "~")
+            cwd = target if cwd is None or target.startswith(("/", "~", "$")) else f"{cwd}/{target}"
+            continue
+        if not segment_reads_content(tokens):
+            continue
+        operands = _operands(tokens)
+        if operands is None or (piped and "<" not in tokens and not any(FILE_LIKE.search(o) for o in operands)):
+            continue
+        context = [" ".join(tokens)]
+        if cwd and (not operands or any(not operand.startswith(("/", "~", "$")) for operand in operands)):
+            context.append(cwd)
+        if not operands or any(PLACEHOLDER.search(operand) for operand in operands):
+            if paths is None:
+                paths = PATH_WORD.findall(expand(skill_usage().executed_text(text or "")))
+            context += paths
+        if os.path.basename(tokens[0]) in INTERPRETERS and operands in ([], ["-"]):
+            context.append(expand(text or ""))
+        out.append(" ".join(context))
     return out
+
+
+def claude_tool_read_texts(name: str, args: dict) -> list[str]:
+    """The paths a Claude tool reads content from: Read and NotebookRead always, Grep only in content output mode (its
+    default, files_with_matches, and count return names or counts)."""
+    if name == "Read" and args.get("file_path"):
+        return [str(args["file_path"])]
+    if name == "NotebookRead" and args.get("notebook_path"):
+        return [str(args["notebook_path"])]
+    if name == "Grep" and args.get("output_mode") == "content":
+        return [str(args.get("path") or ""), str(args.get("glob") or "")]
+    return []
 
 
 def call_access(call: dict, client: str) -> dict:
@@ -1479,8 +1689,8 @@ def call_access(call: dict, client: str) -> dict:
     if client == "claude":
         name, args = call.get("name") or "", call.get("input") or {}
         ok = call.get("status") == "ok"
-        returned = len(((call.get("result") or {}).get("text")) or "")
-        reads = [str(args.get(key)) for key in CLAUDE_READ_TOOLS.get(name, ()) if args.get(key)]
+        text = ((call.get("result") or {}).get("text")) or ""
+        reads = claude_tool_read_texts(name, args)
         if name == "Bash":
             reads += shell_read_texts(args.get("command") or "")
         elif name.startswith("mcp__"):
@@ -1489,24 +1699,26 @@ def call_access(call: dict, client: str) -> dict:
     else:
         kind = call.get("type")
         ok = call.get("status") == "completed" and (call.get("exit_code") in (0, None)) and not call.get("error")
-        returned = len(codex_item_output(call) or "") if ok else 0
+        text = (codex_item_output(call) or "") if ok else ""
         reads = []
         if kind in ("command_execution", "CommandExecution"):
             reads = shell_read_texts(unwrap_command(call.get("command")))
         elif kind in ("mcp_tool_call", "McpToolCall"):
             reads = _mcp_read_texts(call.get("tool") or "", _json_arg(call.get("arguments")))
-    return {"ok": ok, "returned_chars": returned, "read_texts": reads}
+    text = text if isinstance(text, str) else json.dumps(text)
+    return {"ok": ok, "returned_chars": len(text), "read_texts": reads, "returned_text": text}
 
 
 def _mcp_read_texts(tool: str, args) -> list[str]:
-    """The input parts of an MCP call that read content: context-mode's nested shell, code that opens files and
-    ctx_execute_file's path; for another server, the whole input of a tool whose name reads, gets or searches."""
+    """The input parts of an MCP call that read content: context-mode's nested shell (judged per command), code that
+    opens files and ctx_execute_file's path; for another server, the whole input of a tool whose name reads, gets,
+    shows or searches content, never one that lists names or checks existence."""
     args = args if isinstance(args, dict) else {}
     if "ctx_" in tool:
         out = []
         for nested in ctx_nested(tool, args):
-            if nested["kind"] in ("shell", "program"):
-                out += shell_read_texts(nested["text"]) if nested["kind"] == "shell" else [nested["text"]]
+            if nested["kind"] == "shell":
+                out += shell_read_texts(nested["text"])
             elif nested["kind"] == "file":
                 out.append(nested["text"])
         code = args.get("code") or ""
@@ -1515,12 +1727,15 @@ def _mcp_read_texts(tool: str, args) -> list[str]:
         if tool.endswith("ctx_index") and args.get("path"):
             out.append(str(args["path"]))
         return out
-    return [json.dumps(args)] if MCP_READ_TOOL.search(tool) else []
+    return [json.dumps(args)] if MCP_READ_TOOL.search(tool) and not MCP_LIST_TOOL.search(tool) else []
 
 
 def answer_source_reasons(text: str, same_task_fixtures: set[str], same_task_trials: set[str],
-                          declared: list[str]) -> list[str]:
-    """Why a call's input reads an answer source (decision 3 as confirmed at 11:43Z), or [] for a source or a tag."""
+                          declared: list[str], same_task_threads: set[str] | None = None) -> list[str]:
+    """Why a call's input reads an answer source (decision 3 as confirmed at 11:43Z), or [] for a source or a tag. GPT
+    micro-check of 87f9f1d7, finding 4: a same-task Codex trial's rollout is matched by its thread ids (main and
+    collected child threads), wherever the read finds it: the native original under ~/.codex/sessions, a clone's alias
+    of it, or a collected copy."""
     reasons = []
     if ANSWER_STORES.search(text):
         reasons.append("harness store")
@@ -1529,15 +1744,18 @@ def answer_source_reasons(text: str, same_task_fixtures: set[str], same_task_tri
         reasons.append("experiment output")
     if set(FIXTURE_ID.findall(text)) & same_task_fixtures:
         reasons.append("same-task fixture")
-    if set(TRIAL_ID.findall(text)) & same_task_trials:
+    ids = set(TRIAL_ID.findall(text))
+    if ids & same_task_trials:
         reasons.append("same-task trial")
+    if ids & (same_task_threads or set()):
+        reasons.append("same-task transcript")
     if any(prefix and prefix in text for prefix in declared):
         reasons.append("declared grader output")
     return reasons
 
 
 def reach(graded: dict, client: str, cfg: dict, trial_id: str, same_task_fixtures: set[str] | None = None,
-          same_task_trials: set[str] | None = None) -> list[dict]:
+          same_task_trials: set[str] | None = None, same_task_threads: set[str] | None = None) -> list[dict]:
     """G13 (extended by finding 9): calls whose input reaches coordination paths, other sessions' transcripts, host
     checkouts (~/code, ~/projects), user-level harness files, harness trial roots or another trial's fixture. The
     trial's own fixture, clone, trial files and project directory (its auto memory, exempt and logged under §8.4) are
@@ -1548,7 +1766,7 @@ def reach(graded: dict, client: str, cfg: dict, trial_id: str, same_task_fixture
     own = [p for p in (cwd, f"{HOME}/.claude/projects/{_claude_slug(cwd)}" if cwd else None) if p]
     work = cfg.get("trial_root")
     declared = [str(p).replace("~/", f"{HOME}/", 1) for p in cfg.get("answer_source_paths") or []]
-    fixtures, trials = same_task_fixtures or set(), same_task_trials or set()
+    fixtures, trials, threads = same_task_fixtures or set(), same_task_trials or set(), same_task_threads or set()
 
     def clean(text: str) -> str:
         text = text.replace("~/", f"{HOME}/").replace('"~"', f'"{HOME}"')
@@ -1564,16 +1782,29 @@ def reach(graded: dict, client: str, cfg: dict, trial_id: str, same_task_fixture
         raw = (call.get("input") or {}) if client == "claude" else (call.get("command") or call.get("arguments") or "")
         text = clean(json.dumps(raw))
         cats = sorted(name for name, pattern in REACH.items() if pattern.search(text))
-        mentions = answer_source_reasons(text, fixtures, trials, declared)
+        mentions = answer_source_reasons(text, fixtures, trials, declared, threads)
         if not (cats or mentions):
             continue
         # Finding 6: an answer source needs a successful read that returned content; a mention, listing, write or
         # failed read stays a tag (answer_source_mentions).
         access = call_access(call, client)
-        reasons = sorted({r for part in access["read_texts"] for r in answer_source_reasons(clean(part), fixtures, trials, declared)}) \
-            if access["ok"] and access["returned_chars"] > 0 else []
+        content_read = access["ok"] and access["returned_chars"] > 0 and bool(access["read_texts"])
+        parts = [clean(part) for part in access["read_texts"]] if content_read else []
+        reasons = sorted({r for part in parts for r in answer_source_reasons(part, fixtures, trials, declared, threads)})
+        evidence = "input" if reasons else None
+        if reasons or any(pattern.search(part) for part in parts for pattern in REACH.values()):
+            # Round 3 (finding 4): a glob or directory-wide content read (cat ~/.codex/sessions/.../*.jsonl, rg over
+            # ~/.claude/projects) names no thread or session id in its input; the content it returned does. Only a read
+            # that itself reaches such a place is scanned, so a listing next to an unrelated read (ls ... && cat
+            # notes.md) does not count; a filter a pipe feeds is no read at all (shell_read_texts).
+            ids = set(TRIAL_ID.findall(access["returned_text"]))
+            from_content = (["same-task trial"] if ids & trials else []) + (["same-task transcript"] if ids & threads else [])
+            if from_content:
+                reasons = sorted(set(reasons) | set(from_content))
+                evidence = evidence or "returned content"
         found.append({"call_id": call.get("id"), "categories": cats or ["answer-source mention"],
                       "answer_source": bool(reasons), "answer_source_reasons": reasons,
+                      "answer_source_evidence": evidence,
                       "answer_source_mentions": mentions, "read_ok": access["ok"],
                       "returned_chars": access["returned_chars"], "read_parts": len(access["read_texts"]),
                       "same_task_fixture": "same-task fixture" in reasons})
@@ -1715,9 +1946,10 @@ def effective_exit(exit_row: dict) -> dict:
 
 
 def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_tools: dict,
-              fixtures_by_task: dict | None = None) -> tuple[dict, dict | None]:
+              fixtures_by_task: dict | None = None, threads_by_trial: dict | None = None) -> tuple[dict, dict | None]:
     """(table record, graded) for one trial; graded is None for a trial that never launched. fixtures_by_task maps
-    (task, instance) to {trial_id: fixture id} for decision 3's same-task answer-source check."""
+    (task, instance) to {trial_id: fixture id} and threads_by_trial maps a Codex trial to its thread ids, for decision
+    3's same-task answer-source check."""
     rows = trial["rows"]
     exit_row = effective_exit(rows.get("exit", {}))
     if exit_row is not rows.get("exit"):
@@ -1731,7 +1963,7 @@ def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_too
               "reason": exit_row.get("reason"), "duration_s": exit_row.get("duration_s"), "launched": launched,
               "time_to_result_s": exit_row.get("time_to_result_s"), "post_result_s": exit_row.get("post_result_s"),
               "post_result_terminated": exit_row.get("post_result_terminated"), "terminated_by": exit_row.get("terminated_by"),
-              "grader_override": exit_row.get("grader_override"),
+              "grader_override": exit_row.get("grader_override"), "t_seconds": exit_row.get("t_seconds"),
               # Decision 1: the model's final turn end and the result event, recorded separately.
               "final_turn_end_s": exit_row.get("final_turn_end_s"), "final_turn_end_at": exit_row.get("final_turn_end_at"),
               "result_event": exit_row.get("result_event"), "no_result_diagnosis": exit_row.get("no_result_diagnosis"),
@@ -1770,7 +2002,9 @@ def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_too
     record["marker_ok"] = marker_ok
     key = (trial.get("task"), trial.get("instance"))
     others = {other: fid for other, fid in ((fixtures_by_task or {}).get(key) or {}).items() if other != tid}
-    record["reach"] = reach(graded, trial.get("client"), cfg, tid, {fid for fid in others.values() if fid}, set(others))
+    threads = {th for other in others for th in (threads_by_trial or {}).get(other, ())}
+    record["reach"] = reach(graded, trial.get("client"), cfg, tid, {fid for fid in others.values() if fid}, set(others),
+                            threads)
     # Decision 3: reach entries are tags (reported as their own stratum); only a gold or answer-source read invalidates.
     record["tagged"] = sorted({c for entry in record["reach"] for c in entry["categories"]})
     record["answer_source_reads"] = [entry["call_id"] for entry in record["reach"] if entry.get("answer_source")]
@@ -1780,11 +2014,15 @@ def grade_one(root: Path, cfg: dict, tid: str, trial: dict, tasks: dict, run_too
     record["watcher"] = watcher(graded, trial.get("client"), record["reach"])
     record["target_exposure"] = cli_exposure(task.get("item"), trial.get("client"), graded) \
         if task.get("kind") in CLI_TASK_KINDS else None
-    if trial.get("client") == "claude" and record["final_turn_end_s"] is None and graded.get("turn_times"):
-        # A run whose launcher predates decision 1: the same two times, read from the stream.
+    if record["final_turn_end_s"] is None and graded.get("turn_times"):
+        # A run whose launcher predates decision 1 (and, for Codex, the 12:30Z ruling), or CL7b, which has no launcher:
+        # the same two times, read from the Claude stream or the Codex main rollout.
         times = graded["turn_times"]
         record.update({"final_turn_end_s": times["final_turn_end_s"], "final_turn_end_at": times["final_turn_end_at"],
-                       "result_event": record["result_event"] or times["result_event"], "turn_times_source": "stream"})
+                       "result_event": record["result_event"] or times["result_event"],
+                       "turn_times_source": "stream" if trial.get("client") == "claude" else "rollout"})
+        if record["time_to_result_s"] is None and times.get("time_to_result_s") is not None and trial.get("client") == "codex":
+            record["time_to_result_s"] = times["time_to_result_s"]
     record["harness_text_reads"] = {"count": graded["ctx_counts"]["harness_reads"], "markers": graded["harness_read_markers"]}
     record["process_table_reads"] = graded["ctx_counts"]["process_table_reads"]
     record["own_auto_memory_reads"] = own_memory_reads(graded) if trial.get("client") == "claude" else []
@@ -1978,6 +2216,29 @@ def gate0(root: Path) -> dict:
 # ---------------------------------------------------------------------------------------------------------------------
 # The run.
 
+ROLLOUT_THREAD = re.compile(r"([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\.jsonl$")
+
+
+def codex_threads_by_trial(root: Path) -> dict:
+    """Trial id -> the thread ids of its Codex rollouts (finding 4 of the GPT micro-check of 87f9f1d7): the thread
+    collect.py joined to the trial, and every rollout it copied for the trial (main and child threads; a rollout's file
+    name ends with its thread id, the name the native original and any clone alias of it share)."""
+    out: dict = {}
+    collected = (load_json(root / "collect.json").get("trials") or {}) if (root / "collect.json").exists() else {}
+    for tid, record in collected.items():
+        if isinstance(record, dict) and record.get("thread_id"):
+            out.setdefault(tid, set()).add(record["thread_id"])
+    rollouts = root / "rollouts"
+    if rollouts.exists():
+        for trial_dir_path in rollouts.iterdir():
+            if trial_dir_path.is_dir():
+                for path in trial_dir_path.glob("rollout-*.jsonl"):
+                    match = ROLLOUT_THREAD.search(path.name)
+                    if match:
+                        out.setdefault(trial_dir_path.name, set()).add(match.group(1))
+    return out
+
+
 def new_item_entry(arm: str | None) -> dict:
     """One OIR row (target item, cell) before any trial is counted."""
     return {"n": 0, "used": 0, "used_excl_fixture_mentioned": 0, "n_excl_process_table_trials": 0,
@@ -2028,11 +2289,12 @@ def grade_run(root: Path) -> dict:
         fixture_dir = (trial["rows"].get("prepared", {}) or {}).get("fixture_private")
         fixtures_by_task.setdefault((trial.get("task"), trial.get("instance")), {})[tid] = \
             Path(fixture_dir).name if fixture_dir else None
+    threads_by_trial = codex_threads_by_trial(root)
     for tid, trial in sorted(ledger.items(), key=lambda kv: (kv[1].get("client") != "claude",
                                                              kv[1]["rows"].get("pre-launch", {}).get("at", ""))):
         rows = trial["rows"]
         exit_row = rows.get("exit", {})
-        record, graded = grade_one(root, cfg, tid, trial, tasks, run_tools, fixtures_by_task)
+        record, graded = grade_one(root, cfg, tid, trial, tasks, run_tools, fixtures_by_task, threads_by_trial)
         table.append(record)
         if graded is None:
             if str(record.get("reason") or "").startswith("lint_f"):
@@ -2197,14 +2459,20 @@ def grade_run(root: Path) -> dict:
             "carried_forward": carried_forward, "registry_status": (cfg.get("registry") or {}).get("status"),
             "claude_completion": cfg.get("claude_completion"), "claude_meter": cfg.get("claude_meter"),
             "meter_expected_usage": meter, "cli_exposure_strata": _count([e.get("stratum") for e in exposure]),
-            "completion_times": [{k: r.get(k) for k in ("trial_id", "cell", "reason", "final_turn_end_s", "time_to_result_s",
-                                                        "turn_times_source")}
-                                 for r in table if r.get("client") == "claude" and r.get("launched")],
+            "completion_times": [{k: r.get(k) for k in ("trial_id", "client", "cell", "reason", "final_turn_end_s",
+                                                        "time_to_result_s", "turn_times_source")}
+                                 for r in table if r.get("launched")],
+            # The 12:30Z ruling's check: every launched Codex trial carries both times (one schema across arms).
+            "timing_record": {"codex_trials": sum(1 for r in table if r.get("launched") and r.get("client") == "codex"),
+                              "codex_missing": sorted(r["trial_id"] for r in table if r.get("launched")
+                                                      and r.get("client") == "codex" and (r.get("final_turn_end_s") is None
+                                                                                          or r.get("time_to_result_s") is None))},
+            # Finding 3 of the GPT micro-check of 87f9f1d7: the deadline cases by evidence (reached T, no result before T),
+            # whatever ended the session, so the timeout's SIGKILL is listed too.
             "no_result_trials": [{"trial_id": r["trial_id"], "cell": r.get("cell"), "reason": r.get("reason"),
                                   "diagnosis": r.get("no_result_diagnosis")}
                                  for r in table if r.get("client") == "claude" and r.get("launched")
-                                 and str(r.get("reason_before_rebaseline") or r.get("reason") or "")
-                                 in ("timeout", "timeout_after_result", "wall_guard")],
+                                 and deadline_without_result(r.get("duration_s"), r.get("time_to_result_s"), r.get("t_seconds"))],
             "held_cells": sorted(p.name for p in root.glob("HOLD.*")),
             "rate_limited_trials": sorted(r["trial_id"] for r in table if r.get("rate_limited")),
             "cli_exposure": exposure,

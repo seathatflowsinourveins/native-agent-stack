@@ -349,6 +349,11 @@ def main(argv=None) -> int:
         parser.error("a completion policy or T other than decision 1's (complete-at-result, 1,800 s) needs --amendment-ref")
     if not 0 < args.claude_expected_usage <= METER_CEILING:
         parser.error("--claude-expected-usage is a share of one meter window, in (0, 1]")
+    if (args.repeat_override or 1) > 1 and "codex-app-server" in (args.cells or "").split(","):
+        # GPT micro-check of 87f9f1d7, finding 2: CL7b runs one attempt per eval until each repetition gets its own
+        # trial id, fixture, clone and config; block.py refuses a CL7b repeat above 1 for the same reason.
+        parser.error("--repeat-override above 1 would repeat CL7b inside one attempt; leave codex-app-server out of "
+                     "--cells or keep the repeat at 1")
     root = RUNS_ROOT / args.run_id
     if (root / "run.json").exists():
         parser.error(f"run root exists: {root}")

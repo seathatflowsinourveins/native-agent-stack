@@ -178,6 +178,11 @@ def main(argv=None) -> int:
     work = trial_dir(cfg, root)
     row = {"cell": cell_name, "client": client, "ref": ref, "repeat": repeat, "j": jobs, "planned_at": utc_now()}
     refusals = []
+    if cell["kind"] == "app-server" and repeat > 1:
+        # GPT micro-check of 87f9f1d7, finding 2: promptfoo's --repeat would run every repetition on the one attempt
+        # (trial id, fixture, clone, config) this block selected. Until each repetition gets its own attempt, CL7b runs
+        # one attempt per eval; a re-run is a new block, which allocates a fresh attempt.
+        refusals.append("CL7b runs one attempt per eval: a repeat above 1 is rejected")
     flags = stop_flags(root, client, cell_name)
     if flags:
         refusals.append(f"stop flags: {flags}")

@@ -42,7 +42,7 @@ sys.path.insert(0, str(HERE))
 
 from common import (CLAUDE_COMPLETION_DEFAULT, CLAUDE_LOCK, CLAUDE_SESSION_CAP, KILL_AFTER, LANE, LOCK_WAIT_S,  # noqa: E402
                     POST_RESULT_GRACE_S, PROTOCOL_T_SECONDS, T_SECONDS, append_jsonl, clean_login_env,
-                    current_s7_baseline, gateway_build, headroom_allows, load_json, manifest_digest,
+                    current_s7_baseline, deadline_without_result, gateway_build, headroom_allows, load_json, manifest_digest,
                     newest_meter_reading, rate_limit_hit, rate_limit_readings, read_jsonl, rebaseline_cost_ok,
                     rebaselines_between, resume_after, run_expected_usage, s7_persistent_change, sha256_bytes,
                     sha256_file, stable_s7_snapshot, stop_flag_names, trial_dir, tree_manifest, try_rebaseline, utc_now,
@@ -53,14 +53,17 @@ RATE_LIMIT_WORDS = ("rate limit", "rate_limit", "429", "usage limit", "too many 
 # resume once the newest meter reading allows a start), never consumed as censored (decision 6).
 DEFER_REASONS = ("meter_headroom_first_event", "rate_limited")
 # Censoring reasons that mean no result event arrived before T: the trial's cell is held for diagnosis (decision 1).
-HOLD_REASONS = ("timeout", "timeout_after_result", "wall_guard")
+HOLD_REASONS = ("timeout", "timeout_after_result", "timeout_killed", "wall_guard")
 
 
-def holds_cell(client: str, reason: str | None) -> bool:
+def holds_cell(client: str, outcome: dict, t_seconds: int) -> bool:
     """Decision 1, confirmed at 11:43Z for every Claude cell (CC item task-ns2604-coop-20261006T114319Z, point 1): one
-    rule for all of them, whatever the arm, kind (CLI or SDK) or stage, so the arms stay symmetric. It depends on the
-    client and the censoring reason only."""
-    return client == "claude" and reason in HOLD_REASONS
+    rule for all of them, whatever the arm, kind (CLI or SDK) or stage, so the arms stay symmetric. GPT micro-check of
+    87f9f1d7, finding 3: the rule reads the evidence, not the exit code: the session reached T with no result event
+    before T (common.deadline_without_result), so a timeout that needed its SIGKILL (rc 137) holds the cell too, and a
+    session that failed before T does not."""
+    return client == "claude" and deadline_without_result(outcome.get("duration_s"), outcome.get("time_to_result_s"),
+                                                          t_seconds)
 BACKGROUND_SUBTYPES = ("background_tasks_changed", "task_started", "task_progress", "task_notification")
 
 
@@ -491,7 +494,19 @@ def run_client(root: Path, cfg: dict, client: str, line: str, fixture: Path, str
                         if not headroom_allows(reading, expected)[0]:
                             set_kill("meter_headroom_first_event")
             else:
+                # CC ruling of 12:30Z (item task-ns2604-coop-20261006T123036Z, b): the same two times for Codex cells.
+                # The final turn ends with the last agent message no tool item follows; the result event is
+                # turn.completed (or turn.failed). They normally coincide.
+                now = time.time()
                 kind = event.get("type")
+                item = event.get("item") if isinstance(event.get("item"), dict) else {}
+                if kind == "item.completed" and item.get("type") == "agent_message":
+                    candidate, candidate_stamp = now, None
+                elif kind in ("item.started", "item.completed") and item.get("type") not in ("agent_message", "reasoning", None):
+                    candidate, candidate_stamp = None, None
+                if kind in ("turn.completed", "turn.failed") and result_at is None:
+                    result_at = now
+                    result_info = {"type": kind, "usage_reported": bool(event.get("usage"))}
                 if kind in ("error", "turn.failed"):
                     text = json.dumps(event).lower()
                     if any(word in text for word in RATE_LIMIT_WORDS):
@@ -597,7 +612,10 @@ def trial_reason(client: str, policy: dict, outcome: dict, completed: bool) -> t
     if rc == 124:
         return ("timeout_after_result" if outcome["result_at"] else "timeout"), False
     if rc in (137, -9, 143, -15):
-        return "killed", False
+        # Finding 3: the timeout's SIGKILL after its grace (rc 137 at T + 30 s) is a deadline outcome, not a failure
+        # before T; the elapsed time and the result's arrival decide which.
+        deadline = deadline_without_result(outcome.get("duration_s"), outcome.get("time_to_result_s"), policy["t_seconds"])
+        return ("timeout_killed" if deadline else "killed"), False
     if not completed:
         return f"incomplete_stream_rc{rc}", False
     return None, False
@@ -766,7 +784,7 @@ def launch(cell_arg: str, prompt: str, options: dict, context: dict) -> dict:
                     "nested_clients": outcome["nested"], "tree_exes": outcome["tree_exes"],
                     "rate_limit_error": outcome["rate_limit_error"], "rate_limited": outcome["rate_limited"],
                     "stream_sha256": sha256_file(stream_path), "stream_bytes": stream_path.stat().st_size}
-        if holds_cell(client, reason):
+        if holds_cell(client, outcome, t_seconds):
             # Decision 1: no result event by T. The cell waits until the operator has read this trial's
             # no_result_diagnosis (for example a background Workflow that never ends) and removed the flag.
             (root / f"HOLD.{cell}").write_text(f"{utc_now()} {trial_id}: no result event by T = {t_seconds} s ({reason}); "
