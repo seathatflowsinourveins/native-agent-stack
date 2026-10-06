@@ -210,7 +210,7 @@
         },
         "consensus": {
           "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-          "sha256": "a34fb8c01429177cd2787a07a1edf0a0668d31898ff35fd798056964d5dab82e"
+          "sha256": "1b090476abd1ed517fa76c3acac7ff4b1eee39c676c7b8025b303633b18c6801"
         },
         "convergence": {
           "file": "convergence.json",
@@ -7803,7 +7803,7 @@
     },
     {
       "path": "catalogs/foundation/new-wsl-architecture-20261001.json",
-      "sha256": "e4680b2fb032d26302bae8b1f64b8e675c7f5db84685abfdcef8ee1fef203537"
+      "sha256": "fbce8e1fae85c5e26e0b51412b57234fee857e2960cf629f376afa9f0f5c80d9"
     },
     {
       "path": "catalogs/landscape/research-state.json",
@@ -7915,7 +7915,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/definitive-manifest.json",
-      "sha256": "8694fff119eded04b6009c75a5d328e82b4142b0a6ec6130398748307fc556d5"
+      "sha256": "93e88686117abe2fba1f6f91f40c25a54c34dc51396b084b8d8f630b3402d9e6"
     },
     {
       "path": "evidence/artifacts/new-wsl-definitive-defaults-20261001/foundation-definitive.compact.json",
@@ -7939,7 +7939,7 @@
     },
     {
       "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-      "sha256": "a34fb8c01429177cd2787a07a1edf0a0668d31898ff35fd798056964d5dab82e"
+      "sha256": "1b090476abd1ed517fa76c3acac7ff4b1eee39c676c7b8025b303633b18c6801"
     }
   ],
   "stage_order": [
