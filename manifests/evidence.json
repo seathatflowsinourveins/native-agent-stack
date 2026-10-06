@@ -4492,8 +4492,8 @@
         "Librarium cwd and clone/vault binding are DEFERRED to P1-CLI; its profile remains hidden. Librarium course is a distinct project.",
         "Operations and Local Chat depend on the installed nativestack CLI; four lane launcher/prompt files must be staged by their owner. No prompt body is authored here.",
         "The old independent HTTP omniroute-fw on 20129 has no established 2604 equivalent. Its references are DEFERRED to Phase 3; WebSocket 21129 is not a replacement.",
-        "The broader 174-test regression retained one installed-client currency failure: Claude2.1.291 exposes auth_storage_failure, absent from the unchanged notification decision table. 173 tests passed; no test or setting was changed to conceal it.",
-        "Independent review and operator host apply/read-back remain pending. The bounded same-lane completeness critic is a source-review lead, not independent acceptance."
+        "The broader 174-test regression retained one installed-client currency failure: Claude 2.1.291 exposes auth_storage_failure, absent from the unchanged notification decision table. 173 tests passed; no test or setting was changed to conceal it.",
+        "The command-center exact-head read at b216f9d7884d4d8519743b9e1c8f4f3c53181513 returned ACK_AFTER with two P2 and four P3 findings. Repair micro-check and operator host apply/read-back remain pending; a source review is not deployment acceptance."
       ],
       "path": "evidence/receipts/windows-terminal-2604-fragment-20261006.json"
     }
@@ -16767,8 +16767,8 @@
     },
     {
       "path": "checks/check-terminal-profiles.py",
-      "sha256": "235d2f8e49e82813434373bb337c34a0200bf115d0ab0ebc6c93b5607721ab8b",
-      "bytes": 13480
+      "sha256": "acebacc0b1ed1c6f7c4e242af6506476749a13140d8a1afe9fe54c907a9b7e30",
+      "bytes": 13126
     },
     {
       "path": "docs/acceptance-evidence-policy.md",
@@ -17382,8 +17382,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-windows-terminal-2604-fragment.md",
-      "sha256": "8833753bf6a55d606b1d753d7b64998dbb87ea89322ea56895b7d7c0df737311",
-      "bytes": 5189
+      "sha256": "95b8932613303acff86bab695023f77e8eddc90120bf0a3f3fb1b44e1f1336e6",
+      "bytes": 7568
     },
     {
       "path": "docs/direct-results.md",
@@ -53252,8 +53252,8 @@
     },
     {
       "path": "evidence/receipts/windows-terminal-2604-fragment-20261006.json",
-      "sha256": "bb6f84b451982accbbbc2a527560084e17924781b53a8d5c7330ef81c59da56b",
-      "bytes": 8721
+      "sha256": "240d0197ab30e6329d38b47aa9afae0316267a69a9cd55bbffad6a127808dccb",
+      "bytes": 12434
     },
     {
       "path": "evidence/receipts/worktrunk-list.json",
@@ -54262,8 +54262,8 @@
     },
     {
       "path": "scripts/terminal_profile_ids.py",
-      "sha256": "d637316cfa5ebdb99df624d04789026875b4deb9528dc69a8b069b7bc406337a",
-      "bytes": 764
+      "sha256": "33127acd396afdc0070f2cf9bee3bc4987079f6e002879af52ea3a81578645c8",
+      "bytes": 4951
     },
     {
       "path": "scripts/trading_gates.py",
@@ -55477,8 +55477,8 @@
     },
     {
       "path": "tests/test_terminal_fragment.py",
-      "sha256": "7f0ab1897114de35bed78698ac3c69c809959684e4d46d5a128fc64ec36ad6c9",
-      "bytes": 9337
+      "sha256": "51a332e0efd450cb368ee0590cfa9bbd602888ade4ffef4f4d2a617c3b06ab1d",
+      "bytes": 16799
     },
     {
       "path": "tests/test_token_e2e_grader.py",
@@ -56222,8 +56222,8 @@
     },
     {
       "path": "windows/README.md",
-      "sha256": "b0583bf0706b4edebb051eec561d3b52d185296eb89ac9f83df69594c6ba5c4a",
-      "bytes": 8517
+      "sha256": "5ce9eb3a499e66173c3f194259298ff54e24c9daef11f24fa53eab500292afe3",
+      "bytes": 12490
     },
     {
       "path": "windows/nativestack2604.json",
