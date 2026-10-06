@@ -1,0 +1,1019 @@
+{
+  "uid": "research-grand",
+  "title": "Research grand dashboard",
+  "schemaVersion": 39,
+  "version": 6,
+  "editable": false,
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "tags": [
+    "ecosystem",
+    "research"
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Research control room",
+      "type": "text",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 7
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "# US equities \u00b7 research control room\nHistorical simulation and broker-specific paper acceptance are tracked below. Live trading has no authority.\n\n**Observed:** service health, exported usage and bounded native workflow history. **Recorded:** lanes, decisions, gates and worker checkpoints, refreshed from public files. Emission age does not prove source freshness or an active worker. Unknown usage is not zero; counters are not savings.\n\n[Native telemetry](/d/ecosystem-native) \u00b7 [Workflow evidence](https://github.com/seathatflowsinourveins/native-agent-stack/tree/main/adoption/paired) \u00b7 [Architecture](https://github.com/seathatflowsinourveins/native-agent-stack/tree/main/blueprints/us-equities/convergence-program)"
+      }
+    },
+    {
+      "id": 2,
+      "title": "Last progress emission",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 7,
+        "w": 8,
+        "h": 4
+      },
+      "options": {},
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "1000 * max(last_over_time({service_name=\"agent-stack-progress\",record_kind=\"summary\"} | json | entity_id=\"snapshot\" | unwrap observed_unix | __error__=\"\" [24h]))",
+          "queryType": "instant"
+        }
+      ],
+      "description": "Relative age of the last emitted snapshot. Checkpoint UTC in each table records source age separately. More than 12 minutes suggests an emitter/backend failure.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeFromNow",
+          "noValue": "No observations",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "SDK reported tokens / selected range",
+      "description": "Deduplicated per receipt ID in the selected dashboard range. Receipt totals are separate from native histograms; never add them together.",
+      "gridPos": {
+        "x": 8,
+        "y": 7,
+        "w": 8,
+        "h": 4
+      },
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(max by (receipt_id) (max_over_time({service_name=\"codex-sdk-receipt\"} | receipt_id != \"\" | unwrap total_token_count | __error__=\"\" [$__range])))",
+          "queryType": "instant",
+          "legendFormat": "SDK reported tokens"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "blue"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "orientation": "auto",
+        "textMode": "auto",
+        "colorMode": "value",
+        "graphMode": "none"
+      }
+    },
+    {
+      "id": 4,
+      "title": "SDK receipts without usage",
+      "type": "stat",
+      "datasource": {
+        "type": "loki",
+        "uid": "ns2604-loki"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 7,
+        "w": 8,
+        "h": 4
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "count(sum by (receipt_id) (count_over_time({service_name=\"codex-sdk-receipt\"} | receipt_id != \"\" | usage_status != \"reported\" [$__range])))",
+          "queryType": "instant"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "none",
+          "noValue": "No matching data",
+          "decimals": 0,
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "#8e8e8e"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "#8e8e8e",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        }
+      },
+      "description": "Counts observed receipt IDs with unreported usage. No data is not zero usage or proof that every task reached the receiver."
+    },
+    {
+      "id": 5,
+      "title": "Lane readiness \u00b7 recorded",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 24,
+        "h": 7
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"agent-stack-progress\",record_kind=\"lane\"} | json | unwrap observed_unix | __error__=\"\" [24h]) == on() group_left() max(last_over_time({service_name=\"agent-stack-progress\",record_kind=\"summary\"} | json | entity_id=\"snapshot\" | unwrap observed_unix | __error__=\"\" [24h]))",
+          "queryType": "instant"
+        }
+      ],
+      "description": "Recorded coordinator checkpoint; consult evidence for native scope and source dates.",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "Value #A": true,
+              "record_kind": true,
+              "record_kind_extracted": true,
+              "detected_level": true,
+              "service_name": true,
+              "number": true,
+              "entity_id": true
+            },
+            "indexByName": {
+              "title": 0,
+              "equity_usd": 1,
+              "drawdown_pct": 2,
+              "fees_usd": 3,
+              "margin_call_count": 4,
+              "fill_count": 5,
+              "state": 6,
+              "source_updated_at": 7,
+              "evidence_ref": 8
+            },
+            "renameByName": {
+              "title": "Item",
+              "state": "Decision / state",
+              "source_updated_at": "Checkpoint UTC",
+              "evidence_ref": "Evidence path",
+              "equity_usd": "Final equity USD",
+              "drawdown_pct": "Observed drawdown %",
+              "fees_usd": "Fees USD",
+              "margin_call_count": "Margin calls",
+              "fill_count": "Fills"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "wrapText": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Evidence path"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open evidence",
+                    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/${__value.raw}",
+                    "targetBlank": true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "title": "Acceptance gates \u00b7 recorded",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 37,
+        "w": 24,
+        "h": 10
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"agent-stack-progress\",record_kind=\"gate\"} | json | unwrap observed_unix | __error__=\"\" [24h]) == on() group_left() max(last_over_time({service_name=\"agent-stack-progress\",record_kind=\"summary\"} | json | entity_id=\"snapshot\" | unwrap observed_unix | __error__=\"\" [24h]))",
+          "queryType": "instant"
+        }
+      ],
+      "description": "Recorded coordinator checkpoint; consult evidence for native scope and source dates.",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "Value #A": true,
+              "record_kind": true,
+              "record_kind_extracted": true,
+              "detected_level": true,
+              "service_name": true,
+              "number": true,
+              "entity_id": true
+            },
+            "indexByName": {
+              "title": 0,
+              "equity_usd": 1,
+              "drawdown_pct": 2,
+              "fees_usd": 3,
+              "margin_call_count": 4,
+              "fill_count": 5,
+              "state": 6,
+              "source_updated_at": 7,
+              "evidence_ref": 8
+            },
+            "renameByName": {
+              "title": "Item",
+              "state": "Decision / state",
+              "source_updated_at": "Checkpoint UTC",
+              "evidence_ref": "Evidence path",
+              "equity_usd": "Final equity USD",
+              "drawdown_pct": "Observed drawdown %",
+              "fees_usd": "Fees USD",
+              "margin_call_count": "Margin calls",
+              "fill_count": "Fills"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "wrapText": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Evidence path"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open evidence",
+                    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/${__value.raw}",
+                    "targetBlank": true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "title": "Worker checkpoints \u00b7 recorded",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 47,
+        "w": 24,
+        "h": 7
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"agent-stack-progress\",record_kind=\"worker\"} | json | unwrap observed_unix | __error__=\"\" [24h]) == on() group_left() max(last_over_time({service_name=\"agent-stack-progress\",record_kind=\"summary\"} | json | entity_id=\"snapshot\" | unwrap observed_unix | __error__=\"\" [24h]))",
+          "queryType": "instant"
+        }
+      ],
+      "description": "Recorded coordinator checkpoint; consult evidence for native scope and source dates.",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "Value #A": true,
+              "record_kind": true,
+              "record_kind_extracted": true,
+              "detected_level": true,
+              "service_name": true,
+              "number": true,
+              "entity_id": true
+            },
+            "indexByName": {
+              "title": 0,
+              "equity_usd": 1,
+              "drawdown_pct": 2,
+              "fees_usd": 3,
+              "margin_call_count": 4,
+              "fill_count": 5,
+              "state": 6,
+              "source_updated_at": 7,
+              "evidence_ref": 8
+            },
+            "renameByName": {
+              "title": "Item",
+              "state": "Decision / state",
+              "source_updated_at": "Checkpoint UTC",
+              "evidence_ref": "Evidence path",
+              "equity_usd": "Final equity USD",
+              "drawdown_pct": "Observed drawdown %",
+              "fees_usd": "Fees USD",
+              "margin_call_count": "Margin calls",
+              "fill_count": "Fills"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "wrapText": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Evidence path"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open evidence",
+                    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/${__value.raw}",
+                    "targetBlank": true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 8,
+      "title": "Research waves \u00b7 recorded",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 54,
+        "w": 24,
+        "h": 7
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"agent-stack-progress\",record_kind=\"wave\"} | json | unwrap observed_unix | __error__=\"\" [24h]) == on() group_left() max(last_over_time({service_name=\"agent-stack-progress\",record_kind=\"summary\"} | json | entity_id=\"snapshot\" | unwrap observed_unix | __error__=\"\" [24h]))",
+          "queryType": "instant"
+        }
+      ],
+      "description": "Recorded coordinator checkpoint; consult evidence for native scope and source dates.",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "Value #A": true,
+              "record_kind": true,
+              "record_kind_extracted": true,
+              "detected_level": true,
+              "service_name": true,
+              "number": true,
+              "entity_id": true
+            },
+            "indexByName": {
+              "title": 0,
+              "equity_usd": 1,
+              "drawdown_pct": 2,
+              "fees_usd": 3,
+              "margin_call_count": 4,
+              "fill_count": 5,
+              "state": 6,
+              "source_updated_at": 7,
+              "evidence_ref": 8
+            },
+            "renameByName": {
+              "title": "Item",
+              "state": "Decision / state",
+              "source_updated_at": "Checkpoint UTC",
+              "evidence_ref": "Evidence path",
+              "equity_usd": "Final equity USD",
+              "drawdown_pct": "Observed drawdown %",
+              "fees_usd": "Fees USD",
+              "margin_call_count": "Margin calls",
+              "fill_count": "Fills"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "wrapText": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Evidence path"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open evidence",
+                    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/${__value.raw}",
+                    "targetBlank": true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "title": "Repository decisions \u00b7 recorded",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 61,
+        "w": 24,
+        "h": 14
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"agent-stack-progress\",record_kind=\"decision\"} | json | unwrap observed_unix | __error__=\"\" [24h]) == on() group_left() max(last_over_time({service_name=\"agent-stack-progress\",record_kind=\"summary\"} | json | entity_id=\"snapshot\" | unwrap observed_unix | __error__=\"\" [24h]))",
+          "queryType": "instant"
+        }
+      ],
+      "description": "Recorded coordinator checkpoint; consult evidence for native scope and source dates.",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "Value #A": true,
+              "record_kind": true,
+              "record_kind_extracted": true,
+              "detected_level": true,
+              "service_name": true,
+              "number": true,
+              "entity_id": true
+            },
+            "indexByName": {
+              "title": 0,
+              "equity_usd": 1,
+              "drawdown_pct": 2,
+              "fees_usd": 3,
+              "margin_call_count": 4,
+              "fill_count": 5,
+              "state": 6,
+              "source_updated_at": 7,
+              "evidence_ref": 8
+            },
+            "renameByName": {
+              "title": "Item",
+              "state": "Decision / state",
+              "source_updated_at": "Checkpoint UTC",
+              "evidence_ref": "Evidence path",
+              "equity_usd": "Final equity USD",
+              "drawdown_pct": "Observed drawdown %",
+              "fees_usd": "Fees USD",
+              "margin_call_count": "Margin calls",
+              "fill_count": "Fills"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "wrapText": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Evidence path"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open evidence",
+                    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/${__value.raw}",
+                    "targetBlank": true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "title": "Historical stress results \u00b7 initial equity USD 100000",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 27,
+        "w": 24,
+        "h": 10
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"agent-stack-progress\",record_kind=\"experiment\"} | json | unwrap observed_unix | __error__=\"\" [24h]) == on() group_left() max(last_over_time({service_name=\"agent-stack-progress\",record_kind=\"summary\"} | json | entity_id=\"snapshot\" | unwrap observed_unix | __error__=\"\" [24h]))",
+          "queryType": "instant"
+        }
+      ],
+      "description": "Recorded metadata. Historical stress results use hourly SPY data and fixed parameters; no strategy profitability or broker execution is established. Exact values and assumptions remain in linked receipts.",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "Value #A": true,
+              "record_kind": true,
+              "record_kind_extracted": true,
+              "detected_level": true,
+              "service_name": true,
+              "number": true,
+              "entity_id": true
+            },
+            "indexByName": {
+              "title": 0,
+              "equity_usd": 1,
+              "drawdown_pct": 2,
+              "fees_usd": 3,
+              "margin_call_count": 4,
+              "fill_count": 5,
+              "state": 6,
+              "source_updated_at": 7,
+              "evidence_ref": 8
+            },
+            "renameByName": {
+              "title": "Item",
+              "state": "Decision / state",
+              "source_updated_at": "Checkpoint UTC",
+              "evidence_ref": "Evidence path",
+              "equity_usd": "Final equity USD",
+              "drawdown_pct": "Observed drawdown %",
+              "fees_usd": "Fees USD",
+              "margin_call_count": "Margin calls",
+              "fill_count": "Fills"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "wrapText": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Evidence path"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open evidence",
+                    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/${__value.raw}",
+                    "targetBlank": true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "title": "Live service scrape health",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 75,
+        "w": 12,
+        "h": 8
+      },
+      "options": {},
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "up",
+          "queryType": "range"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Live host memory usage",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 75,
+        "w": 12,
+        "h": 8
+      },
+      "options": {},
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "system_memory_usage_bytes",
+          "queryType": "range"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Progress history \u00b7 recorded checkpoints",
+      "type": "logs",
+      "gridPos": {
+        "x": 0,
+        "y": 83,
+        "w": 24,
+        "h": 9
+      },
+      "options": {
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service_name=\"agent-stack-progress\",record_kind=~\"wave|lane|worker\"}",
+          "queryType": "range"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "title": "Native agent activity \u00b7 sanitized telemetry",
+      "type": "logs",
+      "gridPos": {
+        "x": 0,
+        "y": 92,
+        "w": 24,
+        "h": 9
+      },
+      "options": {
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service_name=~\"Codex Desktop|codex-app-server|codex_exec|codex_cli_rs|claude-code|claude-code-desktop|codex-sdk-receipt\"}",
+          "queryType": "range"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "title": "Native workflow history \u00b7 restic-backup, restic-restore-check, tz-currency-check",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 11,
+        "w": 24,
+        "h": 9
+      },
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"agent-stack-progress\",record_kind=\"workflow\"} | json | unwrap observed_unix | __error__=\"\" [24h]) == on() group_left() max(last_over_time({service_name=\"agent-stack-progress\",record_kind=\"summary\"} | json | entity_id=\"snapshot\" | unwrap observed_unix | __error__=\"\" [24h]))",
+          "queryType": "instant"
+        }
+      ],
+      "description": "Read-only local Dagu history, read by the emitter with `dagu history <dag> --format json` (no Dagu login): for each of restic-backup, restic-restore-check, tz-currency-check, a summary row and up to 10 runs within 30 days. Native times and statuses describe stored runs, not a process heartbeat or new model acceptance. Counts cover only the returned sample. Missing configuration or failed observation is unknown; an empty successful query reports zero. Entry numbers are display positions, not run identifiers.",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true,
+              "Value #A": true,
+              "record_kind": true,
+              "record_kind_extracted": true,
+              "detected_level": true,
+              "service_name": true,
+              "entity_id": true,
+              "source_updated_at": true
+            },
+            "indexByName": {
+              "title": 0,
+              "state": 1,
+              "started_at": 2,
+              "finished_at": 3,
+              "duration_seconds": 4,
+              "history_count": 5,
+              "succeeded_count": 6,
+              "failed_count": 7,
+              "running_count": 8,
+              "evidence_ref": 20
+            },
+            "renameByName": {
+              "title": "Workflow / sample",
+              "state": "Native state / observation",
+              "started_at": "Native started UTC",
+              "finished_at": "Native finished UTC",
+              "duration_seconds": "Elapsed seconds",
+              "history_count": "Sample runs",
+              "succeeded_count": "Succeeded",
+              "failed_count": "Failed",
+              "running_count": "Running",
+              "evidence_ref": "Evidence path"
+            }
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "wrapText": true
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Evidence path"
+            },
+            "properties": [
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "title": "Open workflow evidence",
+                    "url": "https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/${__value.raw}",
+                    "targetBlank": true
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

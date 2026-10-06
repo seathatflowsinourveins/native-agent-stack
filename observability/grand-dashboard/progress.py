@@ -17,14 +17,23 @@ MAX_BYTES = 2_000_000
 # manifests/evidence.json lists every registered evidence file and passed MAX_BYTES on 2026-09-28; the snapshot reads
 # only its receipt count. When it nears this bound, count receipts from a smaller source instead of raising it again.
 SOURCE_MAX_BYTES = {'manifests/evidence.json': 8_000_000}
-# Includes catalog checkpoints and up to HISTORY_LIMIT native runs plus summary.
-# The combined foundation/paper inventory has already exceeded the former 80 rows.
-MAX_ENTITIES = 128
+# Includes catalog checkpoints and, for each configured DAG, a summary plus up to HISTORY_LIMIT native runs.
+# The combined foundation/paper inventory has already exceeded the former 80 rows. On 2026-10-06 the catalog
+# alone produced 117 rows, so 128 left room for exactly one DAG's history; NativeStack2604 reads up to MAX_DAGS
+# histories (117 + 4 x 11 = 161 rows), hence the bounded increase to 192.
+MAX_ENTITIES = 192
 HISTORY_BYTES = 131_072
 HISTORY_LIMIT = 10
 HISTORY_STATUSES = ('not_started', 'running', 'succeeded', 'failed', 'aborted',
                     'queued', 'waiting', 'rejected', 'partially_succeeded')
 WORKFLOW_EVIDENCE = 'adoption/paired/README.md'
+# The workstation's research pipeline; a host can name its own DAGs with --dagu-dag.
+DEFAULT_DAG = 'research-pair'
+MAX_DAGS = 4
+DAG_NAME = re.compile(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,63}')
+# Loki push API (grafana/loki v3.7.8 docs/sources/reference/loki-http-api.md:211-217), loopback only.
+DEFAULT_LOKI_PUSH = 'http://127.0.0.1:13100/loki/api/v1/push'
+LOKI_PUSH = re.compile(r'http://127\.0\.0\.1:([0-9]{1,5})/loki/api/v1/push')
 SOURCES = {
     'foundation': ('catalogs/us-equities/convergence-program/foundation.json', 'repositories'),
     'trading': ('catalogs/us-equities/convergence-program/trading.json', 'entries'),
@@ -91,23 +100,45 @@ def history_output(command, home, timeout=5):
     return json.loads(output)
 
 
-def workflow_unknown(state):
-    return [dict(record_kind='workflow', entity_id='workflow/history',
-                 title='Research pair / last 10 runs within 30 days', state=state,
+def loki_push_url(value):
+    """Accept only a loopback Loki push endpoint, so a host's emitter cannot write to another host's Loki."""
+    match = LOKI_PUSH.fullmatch(value) if isinstance(value, str) else None
+    if not match or not 0 < int(match.group(1)) < 65536:
+        raise ValueError('Loki push URL must be http://127.0.0.1:<port>/loki/api/v1/push')
+    return value
+
+
+def dag_names(dags):
+    """The configured DAG names: 1 to MAX_DAGS distinct plain names (they appear in commands and rows)."""
+    dags = tuple(dags)
+    if not 0 < len(dags) <= MAX_DAGS or len(set(dags)) != len(dags) or not all(
+            isinstance(dag, str) and DAG_NAME.fullmatch(dag) for dag in dags):
+        raise ValueError(f'configure 1 to {MAX_DAGS} distinct DAG names matching {DAG_NAME.pattern}')
+    return dags
+
+
+def dag_label(dag):
+    return 'Research pair' if dag == DEFAULT_DAG else dag
+
+
+def workflow_unknown(state, dag=DEFAULT_DAG, namespaced=False):
+    # Entity IDs carry the DAG name only when several DAGs share one generation; one DAG keeps the original IDs.
+    return [dict(record_kind='workflow', entity_id=f'workflow/{dag}/history' if namespaced else 'workflow/history',
+                 title=f'{dag_label(dag)} / last {HISTORY_LIMIT} runs within 30 days', state=state,
                  evidence_ref=WORKFLOW_EVIDENCE, source_updated_at='unknown')]
 
 
-def workflow_rows(entries):
-    """Accept only the fixed native history scope; no IDs, parameters or errors."""
+def workflow_rows(entries, dag=DEFAULT_DAG, namespaced=False):
+    """Accept only the configured DAG's native history scope; no IDs, parameters or errors."""
     if not isinstance(entries, list) or len(entries) > HISTORY_LIMIT:
         raise ValueError('invalid native history result count')
-    rows = workflow_unknown('observed / bounded local history' if entries else 'no history / last 30 days')
+    rows = workflow_unknown('observed / bounded local history' if entries else 'no history / last 30 days', dag, namespaced)
     summary = rows[0]
     summary['history_count'] = len(entries)
     summary.update({status + '_count': 0 for status in HISTORY_STATUSES})
     known_times = []
     for i, entry in enumerate(entries, 1):
-        if not isinstance(entry, dict) or entry.get('name') != 'research-pair' or entry.get('status') not in HISTORY_STATUSES:
+        if not isinstance(entry, dict) or entry.get('name') != dag or entry.get('status') not in HISTORY_STATUSES:
             raise ValueError('unexpected native history scope or status')
         times = {}
         for native, field in [('startedAt', 'started_at'), ('finishedAt', 'finished_at')]:
@@ -123,8 +154,8 @@ def workflow_rows(entries):
                 raise ValueError('native finish precedes start')
         updated = times.get('finished_at', times.get('started_at', 'unknown'))
         known_times.extend(times.values())
-        row = dict(record_kind='workflow', entity_id=f'workflow/recent-{i}',
-                   title=f'Research pair / recent entry {i}', state=entry['status'],
+        row = dict(record_kind='workflow', entity_id=f'workflow/{dag}/recent-{i}' if namespaced else f'workflow/recent-{i}',
+                   title=f'{dag_label(dag)} / recent entry {i}', state=entry['status'],
                    evidence_ref=WORKFLOW_EVIDENCE, source_updated_at=updated,
                    started_at=times.get('started_at', 'unknown'), finished_at=times.get('finished_at', 'unknown'))
         if duration is not None:
@@ -136,22 +167,27 @@ def workflow_rows(entries):
     return rows
 
 
-def workflow_snapshot(dagu_bin=None, dagu_home=None):
+def workflow_snapshot(dagu_bin=None, dagu_home=None, dags=(DEFAULT_DAG,)):
     if dagu_bin is None and dagu_home is None:
         return workflow_unknown('not configured / unknown')
-    try:
-        binary, home = Path(dagu_bin), Path(dagu_home)
-        if not binary.is_absolute() or not home.is_absolute() or not binary.is_file() or not home.is_dir():
-            raise ValueError('invalid native history paths')
-        command = [str(binary), 'history', 'research-pair', '--context', 'local',
-                   '--dagu-home', str(home), '--format', 'json', '--last', '30d', '--limit', str(HISTORY_LIMIT)]
-        return workflow_rows(history_output(command, home))
-    except (OSError, ValueError, TypeError, TimeoutError):
-        # Failure must replace previous successful rows in the same generation.
-        return workflow_unknown('unavailable / native history failed')
+    dags = dag_names(dags)  # a configuration error fails the generation instead of reading as unknown
+    namespaced = len(dags) > 1
+    rows = []
+    for dag in dags:
+        try:
+            binary, home = Path(dagu_bin), Path(dagu_home)
+            if not binary.is_absolute() or not home.is_absolute() or not binary.is_file() or not home.is_dir():
+                raise ValueError('invalid native history paths')
+            command = [str(binary), 'history', dag, '--context', 'local',
+                       '--dagu-home', str(home), '--format', 'json', '--last', '30d', '--limit', str(HISTORY_LIMIT)]
+            rows.extend(workflow_rows(history_output(command, home), dag, namespaced))
+        except (OSError, ValueError, TypeError, TimeoutError):
+            # Failure must replace previous successful rows in the same generation.
+            rows.extend(workflow_unknown('unavailable / native history failed', dag, namespaced))
+    return rows
 
 
-def snapshot(root, dagu_bin=None, dagu_home=None):
+def snapshot(root, dagu_bin=None, dagu_home=None, dags=(DEFAULT_DAG,)):
     root = Path(root)
     state = read(root, 'observability/grand-dashboard/state.json')
     plan_path = state.get('plan_ref', 'blueprints/us-equities/convergence-program/plan.json')
@@ -212,7 +248,7 @@ def snapshot(root, dagu_bin=None, dagu_home=None):
         raise ValueError('public star count mismatch')
     add('summary', 'stars', 'Public stars enumerated', 'identity audit', stars_path, count)
     add('summary', 'snapshot', 'Snapshot marker', 'recorded', 'observability/grand-dashboard/state.json')
-    rows.extend(workflow_snapshot(dagu_bin, dagu_home))
+    rows.extend(workflow_snapshot(dagu_bin, dagu_home, dags))
     if len(rows) > MAX_ENTITIES:
         raise ValueError('too many dashboard entities')
     if len({r['entity_id'] for r in rows}) != len(rows):
@@ -230,8 +266,9 @@ def payload(rows, now_ns):
                         for kind, values in streams.items()]}
 
 
-def publish(root, cache, now_ns=None, dagu_bin=None, dagu_home=None):
-    rows = snapshot(root, dagu_bin, dagu_home)
+def publish(root, cache, now_ns=None, dagu_bin=None, dagu_home=None, loki_url=DEFAULT_LOKI_PUSH, dags=(DEFAULT_DAG,)):
+    loki_url = loki_push_url(loki_url)
+    rows = snapshot(root, dagu_bin, dagu_home, dags)
     digest = hashlib.sha256(json.dumps(rows, sort_keys=True).encode()).hexdigest()
     now_ns = time.time_ns() if now_ns is None else now_ns
     cache = Path(cache)
@@ -239,7 +276,7 @@ def publish(root, cache, now_ns=None, dagu_bin=None, dagu_home=None):
     # Repeat a bounded heartbeat every ten minutes, or immediately on source change.
     if previous.get('digest') == digest and 0 <= now_ns - previous.get('sent_ns', 0) < 600_000_000_000:
         return {'status': 'unchanged', 'records': len(rows)}
-    request = urllib.request.Request('http://127.0.0.1:13100/loki/api/v1/push',
+    request = urllib.request.Request(loki_url,
         json.dumps(payload(rows, now_ns)).encode(), {'Content-Type': 'application/json'})
     with urllib.request.urlopen(request, timeout=10) as response:
         if response.status != 204:
@@ -257,13 +294,25 @@ def main():
     parser.add_argument('--cache', type=Path)
     parser.add_argument('--dagu-bin', type=Path)
     parser.add_argument('--dagu-home', type=Path)
+    parser.add_argument('--dagu-dag', action='append', metavar='NAME',
+                        help=f'DAG whose local history is read (repeatable, up to {MAX_DAGS}; default {DEFAULT_DAG})')
+    parser.add_argument('--loki-url', default=DEFAULT_LOKI_PUSH, metavar='URL',
+                        help=f'loopback Loki push endpoint (default {DEFAULT_LOKI_PUSH})')
     args = parser.parse_args()
     if (args.dagu_bin is None) != (args.dagu_home is None):
         parser.error('--dagu-bin and --dagu-home must be supplied together')
+    if args.dagu_dag and args.dagu_bin is None:
+        parser.error('--dagu-dag requires --dagu-bin and --dagu-home')
+    try:
+        dags = dag_names(args.dagu_dag or (DEFAULT_DAG,))
+        loki_url = loki_push_url(args.loki_url)
+    except ValueError as error:
+        parser.error(str(error))
     if args.cache:
-        print(json.dumps(publish(args.repo, args.cache, dagu_bin=args.dagu_bin, dagu_home=args.dagu_home)))
+        print(json.dumps(publish(args.repo, args.cache, dagu_bin=args.dagu_bin, dagu_home=args.dagu_home,
+                                 loki_url=loki_url, dags=dags)))
     else:
-        print(json.dumps(snapshot(args.repo, args.dagu_bin, args.dagu_home), indent=2))
+        print(json.dumps(snapshot(args.repo, args.dagu_bin, args.dagu_home, dags), indent=2))
 
 
 if __name__ == '__main__':

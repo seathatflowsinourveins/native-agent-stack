@@ -1,0 +1,14 @@
+# The timer that observability/grand-dashboard/install.py writes (this repository), named for NativeStack2604:
+# a check every 30 seconds; the emitter sends only changed data or a ten-minute heartbeat.
+# Source: https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html
+[Unit]
+Description=NativeStack2604: refresh research progress and Dagu run history
+
+[Timer]
+OnStartupSec=15
+OnUnitInactiveSec=30
+AccuracySec=5
+Unit=ns2604-research-progress.service
+
+[Install]
+WantedBy=timers.target

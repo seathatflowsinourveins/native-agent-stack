@@ -5,6 +5,8 @@ Reference: this PR: observability/backends/configure.py.
 Upstream formats: OTel Contrib v0.162.0 file_storage; Grafana v13.2.3 provisioning;
 Alertmanager v0.34.1 docs/configuration.md (webhook_config and telegram_config).
 Private destination files are inspected by metadata only, never opened here.
+The grafana action also renders the research dashboard's emitter units (observability/grand-dashboard/install.py
+adapted in ns2604-research-progress.service and .timer) into <config-root>/systemd/; install.sh installs them.
 """
 import argparse
 import hashlib
@@ -24,6 +26,21 @@ PRISTINE = {
     "alertmanager.yaml": "b4ff240a87515fa2c9b606c3570ed9c6c64dc36bd2cbad52c8ee62f22745f6a4",
     "prometheus.yaml": "1565e9df52167eb06e5b33a4d57bc45fa1f9d1bd87a1bc3c268f9a3d5f0e58c4",
 }
+# (template in config/, published path under the config root); the grafana action renders each.
+GRAFANA_FILES = (
+    ("grafana.ini", "grafana.ini"),
+    ("grafana-datasources.yaml", "grafana-provisioning/datasources/native-stack.yaml"),
+    ("grafana-dashboards.yaml", "grafana-provisioning/dashboards/native-stack.yaml"),
+    ("grafana-token-layer.json", "grafana-dashboards/token-layer.json"),
+    ("grafana-research-grand.json", "ecosystem-grafana-dashboards/research-grand.json"),
+    ("grafana-ecosystem-native.json", "ecosystem-grafana-dashboards/ecosystem-native.json"),
+    ("grafana-native-foundation-data.json", "ecosystem-grafana-dashboards/native-foundation-data.json"),
+    ("ns2604-research-progress.service", "systemd/ns2604-research-progress.service"),
+    ("ns2604-research-progress.timer", "systemd/ns2604-research-progress.timer"),
+)
+ECOSYSTEM_DASHBOARDS = ("research-grand", "ecosystem-native", "native-foundation-data")
+EMITTER_UNITS = ("ns2604-research-progress.service", "ns2604-research-progress.timer")
+UNIT_PATH_UNSAFE = re.compile(r"[\s%\"'\\$]")
 
 
 # Exact user-designated retired host renders; their bytes were hashed, but their
@@ -104,6 +121,9 @@ def main():
     parser.add_argument("--source-root", type=Path)
     parser.add_argument("--tools-root", type=Path)
     parser.add_argument("--plan-file", type=Path)
+    # The emitter unit runs progress.py from this checkout. Default: three levels above the plan folder, as
+    # install.sh derives repo_root.
+    parser.add_argument("--repo-root", type=Path)
     args = parser.parse_args()
     root = args.config_root
     source = args.source_root or root
@@ -246,15 +266,19 @@ def main():
             return 3
         publish("otel.yaml", template)
     elif args.action == "grafana":
-        for name in ("grafana", "grafana/logs", "grafana/plugins"):
+        for name in ("grafana", "grafana/logs", "grafana/plugins", "grand-dashboard"):
             (data / name).mkdir(parents=True, exist_ok=True, mode=0o700)
-        for name, output in (("grafana.ini", "grafana.ini"),
-                             ("grafana-datasources.yaml", "grafana-provisioning/datasources/native-stack.yaml"),
-                             ("grafana-dashboards.yaml", "grafana-provisioning/dashboards/native-stack.yaml"),
-                             ("grafana-token-layer.json", "grafana-dashboards/token-layer.json")):
+        repo = (args.repo_root or source / "../../../..").resolve()
+        if not (repo / "observability/grand-dashboard/progress.py").is_file():
+            raise ValueError("--repo-root must be a repository checkout that holds observability/grand-dashboard/progress.py")
+        if UNIT_PATH_UNSAFE.search(str(repo)) or UNIT_PATH_UNSAFE.search(str(data)):
+            raise ValueError("emitter unit paths require no whitespace, percent signs, quotes, backslashes or dollar signs")
+        for name, output in GRAFANA_FILES:
             template = (source / name).read_text()
             rendered = template.replace("@CONFIG_ROOT@", str(root)).replace("@DATA_ROOT@", str(data))
             rendered = rendered.replace("@DASHBOARD_PATH_JSON@", json.dumps(str(root / "grafana-dashboards")))
+            rendered = rendered.replace("@ECOSYSTEM_DASHBOARD_PATH_JSON@", json.dumps(str(root / "ecosystem-grafana-dashboards")))
+            rendered = rendered.replace("@REPO_ROOT@", str(repo))
             publish(output, rendered, template)
     elif args.action == "grafana-check":
         dashboard = json.loads((root / "grafana-dashboards/token-layer.json").read_text())
@@ -267,6 +291,26 @@ def main():
         for name in ("datasources", "dashboards"):
             if not (root / f"grafana-provisioning/{name}/native-stack.yaml").is_file():
                 raise ValueError("missing native Grafana provisioning")
+        # The ported dashboards query this host's datasources and metric names, and link no old-host port.
+        providers = (root / "grafana-provisioning/dashboards/native-stack.yaml").read_text()
+        if json.dumps(str(root / "ecosystem-grafana-dashboards")) not in providers:
+            raise ValueError("missing the Ecosystem dashboard provider")
+        for uid in ECOSYSTEM_DASHBOARDS:
+            text = (root / f"ecosystem-grafana-dashboards/{uid}.json").read_text()
+            board = json.loads(text)
+            if board["uid"] != uid or not board["panels"]:
+                raise ValueError(f"missing {uid} dashboard")
+            if re.search(r'"uid": "ecosystem-(?:loki|prometheus)"|(?<![\w:])ecosystem_(?!lane\b)|127\.0\.0\.1:13[01]00', text):
+                raise ValueError(f"{uid} still targets the workstation's datasources, metric prefix or ports")
+        if not re.search(r"(?m)^\[news\]\nnews_feed_enabled = false$", (root / "grafana.ini").read_text()):
+            raise ValueError("grafana.ini must disable the news feed")
+        units = Path(os.environ.get("XDG_CONFIG_HOME", str(Path.home() / ".config"))) / "systemd/user"
+        for name in EMITTER_UNITS:
+            rendered = (root / "systemd" / name).read_text()
+            if re.search(r"@[A-Z_]+@", rendered):
+                raise ValueError(f"{name} has an unrendered placeholder")
+            if not (units / name).is_file() or (units / name).read_text() != rendered:
+                raise ValueError(f"{name} is not installed as rendered; rerun install.sh --only grafana")
     else:
         if args.action == "alerting":
             # Install source/receiver wiring together for a pristine or previously owned plan.

@@ -186,6 +186,15 @@ unprovisions the dashboard (Grafana 13.2.3
 [`handleMissingDashboardFiles`](https://github.com/grafana/grafana/blob/v13.2.3/pkg/services/provisioning/dashboards/file_reader.go#L286-L298)); removing the remaining copy
 is an administrator action inside Grafana.
 
+On NativeStack2604 (2026-10-06) the dashboard comes from the install plan's
+`grafana` row instead: `observability/ns2604_dashboards.py` renders it with that
+host's links (no Qdrant, vLLM, token report or ntfy there) and without the four
+Qdrant and vLLM panels, then retargets it to the `ns2604-*` datasources and
+unprefixed metric names. That row does not install this collector, which needs
+2604's Loki push endpoint (21300) and a private config with that host's binaries
+and data. Until a collector runs there, the savings, memory and coverage tables
+stay empty; the provider-telemetry panels work.
+
 To undo the deployment, disable the timer, remove the installed units and the
 dashboard file, then reload the user manager. Undo only what the deployment
 changed ([lifecycle](../../adoption/lifecycle.md)): `enable --now` can change

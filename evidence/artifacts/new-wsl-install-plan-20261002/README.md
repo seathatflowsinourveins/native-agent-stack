@@ -286,6 +286,48 @@ supplies this check, so an older installed helper cannot bypass it. On
 NativeStack2604 the co-op holds the preserved backup until the command-center
 soak permits retirement; see the A30 custody record in the followup receipt.
 
+**Observation front door (2026-10-06).** The `grafana` row also provisions, in an
+Ecosystem folder, the workstation's `research-grand`, `ecosystem-native` and
+`native-foundation-data` dashboards. `observability/ns2604_dashboards.py` renders
+them into `config/` with this host's datasource UIDs and metric names (this
+collector's Prometheus exporter sets no `namespace`, so there is no `ecosystem_`
+prefix; opentelemetry-collector-contrib v0.162.0 `exporter/prometheusexporter/README.md:27`);
+rerun it after changing a workstation renderer, and the tests compare the
+committed copies with a fresh render. The row installs and starts the research
+emitter, `ns2604-research-progress.timer`: every 30 seconds `progress.py` reads
+the Dagu DAGs `restic-backup`, `restic-restore-check` and `tz-currency-check`
+through `dagu history <dag> --format json` and pushes changed rows, or a
+ten-minute heartbeat, to Loki on 21300. That shows Dagu run history in Grafana
+with no Dagu login; Dagu's own authentication is unchanged. `grafana.ini` turns
+the news feed off (Grafana v13.2.3 `conf/defaults.ini:1994-1996` turns it on).
+The foundation dashboard's savings, memory and coverage tables wait for a
+native-data collector on this host, which is not part of this row.
+
+Apply, then restart Grafana, which reads provider files and `grafana.ini` only
+when it starts:
+
+```sh
+bash install.sh --only grafana
+systemctl --user restart ns2604-grafana.service
+systemctl --user start ns2604-research-progress.service
+bash accept.sh --only grafana --stage post_install
+bash accept.sh --only grafana --stage service_health
+```
+
+Read back: `/api/search` lists the four dashboards, `/d/research-grand` opens
+with no sign-in and its "Native workflow history" table lists the three DAGs,
+`/api/frontend/settings` reports `newsFeedEnabled: false`, and
+`/api/v1/dags` on Dagu (21080) still answers 401. Roll back with
+`systemctl --user disable --now ns2604-research-progress.timer`, removal of the two
+units from `~/.config/systemd/user` and `systemctl --user daemon-reload`, then
+`bash install.sh --only grafana` from a checkout of the previous revision, which
+re-renders `grafana.ini` and the one-provider file, and a Grafana restart. On start
+Grafana deletes the dashboards of a provider that is no longer configured (Grafana
+v13.2.3 `pkg/services/provisioning/dashboards/dashboard.go:127-141`); removing
+only a dashboard file would not, because the provider sets `disableDeletion: true`.
+The Ecosystem provider reads a sibling folder of `grafana-dashboards/` because
+the file reader walks its path recursively (`file_reader.go:181`).
+
 Alerting supports webhook/ntfy, Telegram and an on-host destination, retaining
 the disarmed sink until the selected receiver's private files exist. ntfy.sh was
 the coordinator's delegated pick on 2026-10-04. The user personally configured

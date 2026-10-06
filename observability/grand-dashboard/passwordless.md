@@ -5,6 +5,13 @@ It opens without a password using Grafana's upstream anonymous **Viewer** mode.
 The listener remains `127.0.0.1:13000`. Routine viewing, telemetry and research
 progress do not require copying a credential or starting a model conversation.
 
+On NativeStack2604 (2026-10-06) the front door is
+[http://127.0.0.1:21301/d/research-grand?refresh=30s](http://127.0.0.1:21301/d/research-grand?refresh=30s)
+once the install plan's `grafana` row has run. That Grafana has anonymous Viewer
+and no sign-in path at all (`disable_login_form`, basic auth off, no initial
+admin; plan `config/grafana.ini`), and its emitter reads the host's Dagu DAGs
+through the same `dagu history` command (see the [README](README.md#nativestack2604)).
+
 The native Grafana configuration is:
 
 ```ini

@@ -685,6 +685,9 @@ def main():
         "prometheus.yaml": {21090, 21093, 21888, 21889},
         "grafana-datasources.yaml": {21090, 21300, 21093},
         "prometheus-alerts.test.yaml": {21090, 21997},
+        # The ported foundation dashboard links this host's UIs; the research emitter pushes to Loki.
+        "grafana-native-foundation-data.json": {9749, 21080, 21090, 21093, 21128, 29374},
+        "ns2604-research-progress.service": {21300},
     }
     for r in rows:
         if (r.get("service") or {}).get("port") is not None:

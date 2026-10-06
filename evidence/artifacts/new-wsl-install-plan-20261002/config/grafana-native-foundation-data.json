@@ -1,0 +1,1061 @@
+{
+  "uid": "native-foundation-data",
+  "title": "Native foundation \u00b7 memory, retrieval and savings",
+  "schemaVersion": 39,
+  "version": 5,
+  "editable": false,
+  "preload": true,
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "tags": [
+    "ecosystem",
+    "native",
+    "memory",
+    "tokens"
+  ],
+  "panels": [
+    {
+      "id": 1,
+      "title": "Native foundation \u00b7 useful views",
+      "type": "text",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 7
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "# Native foundation \u00b7 NativeStack2604\nReal command observations and existing service data on this host. Source dates and failed observations remain visible.\n\n**Collector-fed tables:** the savings, memory and coverage tables come from the native-data collector (`observability/native-data/snapshot.py`, run by `ecosystem-native-data.timer`) and stay empty while it does not run on this host; the provider-telemetry panels below read the live OTel Collector.\n\n[Memory UI](http://127.0.0.1:29374/web) \u00b7 [Code graph (Codebase Memory)](http://127.0.0.1:9749/) \u00b7 [Gateway usage](http://127.0.0.1:21128/dashboard/analytics) \u00b7 [Dagu (operator sign-in)](http://127.0.0.1:21080/) \u00b7 [Alerts (Alertmanager)](http://127.0.0.1:21093/#/alerts) \u00b7 [Prometheus targets](http://127.0.0.1:21090/targets)\n\n[Native telemetry](/d/ecosystem-native) \u00b7 [Research and Dagu run history](/d/research-grand) \u00b7 [Token layer](/d/token-layer) \u00b7 [Upstream commands and evidence](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/native-dashboard-data.md)\n\nDagu run history needs no sign-in on the research dashboard; the Dagu UI itself keeps its operator login. [Memory and RAG practice](https://github.com/seathatflowsinourveins/native-agent-stack/blob/main/docs/memory-rag-native-practice.md)\n\n**Accounting:** native savings are estimates. Project counts can be subsets of global counts. Provider usage and cache reads are separate; never add these into one savings total. The catalog records prior acceptance, not new execution of every component."
+      }
+    },
+    {
+      "id": 2,
+      "title": "Observation delivery time",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 7,
+        "w": 24,
+        "h": 4
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "1000 * max(last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"snapshot\"} | json | unwrap observed_unix | __error__=\"\" [30m]))",
+          "queryType": "instant",
+          "instant": true
+        }
+      ],
+      "description": "Delivery time only. Each source has its own observation date below. No data after 30 minutes is unknown.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "dateTimeFromNow",
+          "noValue": "No recent observation",
+          "color": {
+            "mode": "fixed",
+            "fixedColor": "text"
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 5,
+      "title": "Token-saving estimates \u00b7 separate native scopes",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 11,
+        "w": 24,
+        "h": 12
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"savings\"} | json | unwrap observed_unix | __error__=\"\" [30m]) == on() group_left() max(last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"snapshot\"} | json | entity_id=\"snapshot\" | unwrap observed_unix | __error__=\"\" [30m]))",
+          "queryType": "instant",
+          "instant": true
+        }
+      ],
+      "description": "Only the latest complete published generation is displayed. Failed sources replace prior successes with unknown. Historical source time is distinct from delivery time.",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "title",
+                "state",
+                "estimated_saved",
+                "session_estimated_saved",
+                "source_updated_at",
+                "kind",
+                "boundary",
+                "source_command"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "title": 0,
+              "state": 1,
+              "estimated_saved": 2,
+              "session_estimated_saved": 3,
+              "source_updated_at": 4,
+              "kind": 5,
+              "boundary": 6,
+              "source_command": 7
+            },
+            "renameByName": {
+              "title": "Source / scope",
+              "state": "Observation",
+              "value": "Native value",
+              "unit": "Unit",
+              "kind": "Measurement",
+              "estimated_saved": "Retained native estimate",
+              "session_estimated_saved": "Session byte estimate",
+              "source_updated_at": "Source updated UTC",
+              "source_command": "Command / source",
+              "coverage_status": "Original audit status",
+              "canonical_receipt_count": "Canonical receipts (read scope)",
+              "timestamp_basis": "Timestamp meaning",
+              "boundary": "Scope / limits",
+              "embedding_status": "Status",
+              "embedding_provider": "Provider",
+              "embedding_model": "Model",
+              "embedding_dimensions": "Dimensions",
+              "embedding_rows": "Stored",
+              "latest_pages_missing_embeddings": "Missing",
+              "embed_failures_unresolved": "Failures",
+              "llm_status": "LLM"
+            }
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "align": "auto",
+            "wrapText": false,
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 20,
+      "title": "Token-saving estimates over time \u00b7 one series per native scope, never summed",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 23,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"savings\"} | json entity_id, state, estimated_saved | state=\"ok\" | unwrap estimated_saved | __error__=\"\" [$__interval]) by (entity_id) and on(entity_id) (last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"savings\"} | json entity_id, state, observed_unix | state=\"ok\" | unwrap observed_unix | __error__=\"\" [$__interval]) by (entity_id) == on(entity_id) last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"savings\"} | json entity_id, observed_unix | unwrap observed_unix | __error__=\"\" [$__interval]) by (entity_id))",
+          "queryType": "range",
+          "instant": false,
+          "legendFormat": "{{entity_id}}"
+        }
+      ],
+      "interval": "3m",
+      "description": "Each savings row is its own series, grouped only by entity_id. A step shows a scope's native estimate only when that scope's newest row in the step is ok; a step whose newest row failed or is stale is a gap, and an earlier success never fills it. Steps are at least 3 minutes, so each holds a 2-minute snapshot. Series are never stacked or added, and the legend names them without values: the table above is the latest generation with each scope's current value, state and source time. Scopes overlap: global RTK includes its project subset, and each Context Mode row is one runtime snapshot. These are native estimates, not provider usage. The symlog axis keeps small counters visible.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0,
+          "noValue": "No recent successful observation",
+          "custom": {
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "spanNulls": false,
+            "scaleDistribution": {
+              "type": "symlog",
+              "log": 10,
+              "linearThreshold": 10
+            }
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "right",
+          "calcs": []
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Memory and retrieval \u00b7 actual scoped inventory",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 31,
+        "w": 24,
+        "h": 7
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"memory\"} | json | unwrap observed_unix | __error__=\"\" [30m]) == on() group_left() max(last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"snapshot\"} | json | entity_id=\"snapshot\" | unwrap observed_unix | __error__=\"\" [30m]))",
+          "queryType": "instant",
+          "instant": true
+        }
+      ],
+      "description": "Only the latest complete published generation is displayed. Failed sources replace prior successes with unknown. Historical source time is distinct from delivery time.",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "title",
+                "state",
+                "value",
+                "unit",
+                "source_updated_at"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "title": 0,
+              "state": 1,
+              "value": 2,
+              "unit": 3,
+              "source_updated_at": 4
+            },
+            "renameByName": {
+              "title": "Source / scope",
+              "state": "Observation",
+              "value": "Native value",
+              "unit": "Unit",
+              "kind": "Measurement",
+              "estimated_saved": "Retained native estimate",
+              "session_estimated_saved": "Session byte estimate",
+              "source_updated_at": "Source updated UTC",
+              "source_command": "Command / source",
+              "coverage_status": "Original audit status",
+              "canonical_receipt_count": "Canonical receipts (read scope)",
+              "timestamp_basis": "Timestamp meaning",
+              "boundary": "Scope / limits",
+              "embedding_status": "Status",
+              "embedding_provider": "Provider",
+              "embedding_model": "Model",
+              "embedding_dimensions": "Dimensions",
+              "embedding_rows": "Stored",
+              "latest_pages_missing_embeddings": "Missing",
+              "embed_failures_unresolved": "Failures",
+              "llm_status": "LLM"
+            }
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "align": "auto",
+            "wrapText": false,
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Source / scope"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 290
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Observation"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 125
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Native value"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 90
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Unit"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 85
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Source updated UTC"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 260
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "title": "ai-memory \u00b7 model and completeness",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 38,
+        "w": 24,
+        "h": 7
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"memory\"} | json | entity_id=\"ai-memory\" | unwrap observed_unix | __error__=\"\" [30m]) == on() group_left() max(last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"snapshot\"} | json | entity_id=\"snapshot\" | unwrap observed_unix | __error__=\"\" [30m]))",
+          "queryType": "instant",
+          "instant": true
+        }
+      ],
+      "description": "Only the latest complete published generation is displayed. Failed sources replace prior successes with unknown. Historical source time is distinct from delivery time. Stored includes superseded page vectors. Missing means latest pages without vectors; Failures means unresolved embedding failures. LLM disabled means automatic model-based consolidation is not configured.",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "state",
+                "embedding_model",
+                "embedding_dimensions",
+                "embedding_status",
+                "embedding_provider",
+                "embedding_rows",
+                "latest_pages_missing_embeddings",
+                "embed_failures_unresolved",
+                "llm_status"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "state": 0,
+              "embedding_model": 1,
+              "embedding_dimensions": 2,
+              "embedding_status": 3,
+              "embedding_provider": 4,
+              "embedding_rows": 5,
+              "latest_pages_missing_embeddings": 6,
+              "embed_failures_unresolved": 7,
+              "llm_status": 8
+            },
+            "renameByName": {
+              "title": "Source / scope",
+              "state": "Observation",
+              "value": "Native value",
+              "unit": "Unit",
+              "kind": "Measurement",
+              "estimated_saved": "Retained native estimate",
+              "session_estimated_saved": "Session byte estimate",
+              "source_updated_at": "Source updated UTC",
+              "source_command": "Command / source",
+              "coverage_status": "Original audit status",
+              "canonical_receipt_count": "Canonical receipts (read scope)",
+              "timestamp_basis": "Timestamp meaning",
+              "boundary": "Scope / limits",
+              "embedding_status": "Status",
+              "embedding_provider": "Provider",
+              "embedding_model": "Model",
+              "embedding_dimensions": "Dimensions",
+              "embedding_rows": "Stored",
+              "latest_pages_missing_embeddings": "Missing",
+              "embed_failures_unresolved": "Failures",
+              "llm_status": "LLM"
+            }
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "align": "auto",
+            "wrapText": false,
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Observation"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 100
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Model"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 185
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Dimensions"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 90
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Status"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 85
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Provider"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 80
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Stored"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 65
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Missing"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 75
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Failures"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 75
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "LLM"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 80
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "title": "Memory and retrieval \u00b7 source commands and limits",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 45,
+        "w": 24,
+        "h": 7
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"memory\"} | json | unwrap observed_unix | __error__=\"\" [30m]) == on() group_left() max(last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"snapshot\"} | json | entity_id=\"snapshot\" | unwrap observed_unix | __error__=\"\" [30m]))",
+          "queryType": "instant",
+          "instant": true
+        }
+      ],
+      "description": "Only the latest complete published generation is displayed. Failed sources replace prior successes with unknown. Historical source time is distinct from delivery time.",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "title",
+                "source_command",
+                "boundary"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "title": 0,
+              "source_command": 1,
+              "boundary": 2
+            },
+            "renameByName": {
+              "title": "Source / scope",
+              "state": "Observation",
+              "value": "Native value",
+              "unit": "Unit",
+              "kind": "Measurement",
+              "estimated_saved": "Retained native estimate",
+              "session_estimated_saved": "Session byte estimate",
+              "source_updated_at": "Source updated UTC",
+              "source_command": "Command / source",
+              "coverage_status": "Original audit status",
+              "canonical_receipt_count": "Canonical receipts (read scope)",
+              "timestamp_basis": "Timestamp meaning",
+              "boundary": "Scope / limits",
+              "embedding_status": "Status",
+              "embedding_provider": "Provider",
+              "embedding_model": "Model",
+              "embedding_dimensions": "Dimensions",
+              "embedding_rows": "Stored",
+              "latest_pages_missing_embeddings": "Missing",
+              "embed_failures_unresolved": "Failures",
+              "llm_status": "LLM"
+            }
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "align": "auto",
+            "wrapText": false,
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Source / scope"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 320
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Command / source"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 380
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "title": "Codex provider telemetry \u00b7 turn tokens per minute",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 60,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "60 * sum by (token_type) (rate(codex_turn_token_usage_sum{instance!=\"unscoped\"}[$__rate_interval]))",
+          "queryType": "range",
+          "instant": false
+        }
+      ],
+      "description": "Native per-turn histogram sums by token_type, one series per Codex process summed at query time; a turn is recorded when it ends. Overlapping cache/input/total fields must not be added. Not a counterfactual saving. Writers without a per-process identity (instance=\"unscoped\": a Claude session without session.id, or a Codex process started without the identity launcher) are excluded, because concurrent writers of one series make its increase meaningless; see the native-telemetry-integrity alert rules."
+    },
+    {
+      "id": 10,
+      "title": "Claude provider telemetry \u00b7 tokens per minute (Prometheus)",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 60,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "60 * sum by (type) (rate(claude_code_token_usage_tokens_total{instance!=\"unscoped\"}[$__rate_interval]))",
+          "queryType": "range",
+          "instant": false
+        }
+      ],
+      "description": "Native cumulative counters by type, one series per Claude session summed at query time. Without session ids every Claude process wrote one shared series: a raw sum showed whichever process wrote last (the undercount this panel used to report), and increase() read the resulting resets as usage (73 to 193 times the Loki sums over one hour on the workstation on 2026-09-26). Samples recorded before the writer-identity Collector profile (observability/collector/README.md) stay invalid; use the Loki api_request panels below for those hours. Writers without a per-process identity (instance=\"unscoped\": a Claude session without session.id, or a Codex process started without the identity launcher) are excluded, because concurrent writers of one series make its increase meaningless; see the native-telemetry-integrity alert rules."
+    },
+    {
+      "id": 11,
+      "title": "All selected repositories \u00b7 recorded acceptance, not live process status",
+      "type": "table",
+      "gridPos": {
+        "x": 0,
+        "y": 68,
+        "w": 24,
+        "h": 18
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"coverage\"} | json | unwrap observed_unix | __error__=\"\" [30m]) == on() group_left() max(last_over_time({service_name=\"agent-stack-native-data\",record_kind=\"snapshot\"} | json | entity_id=\"snapshot\" | unwrap observed_unix | __error__=\"\" [30m]))",
+          "queryType": "instant",
+          "instant": true
+        }
+      ],
+      "description": "Only the latest complete published generation is displayed. Failed sources replace prior successes with unknown. Historical source time is distinct from delivery time.",
+      "transformations": [
+        {
+          "id": "labelsToFields",
+          "options": {
+            "mode": "columns"
+          }
+        },
+        {
+          "id": "filterFieldsByName",
+          "options": {
+            "include": {
+              "names": [
+                "title",
+                "coverage_status",
+                "canonical_receipt_count",
+                "state",
+                "source_updated_at",
+                "timestamp_basis",
+                "boundary"
+              ]
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "indexByName": {
+              "title": 0,
+              "coverage_status": 1,
+              "canonical_receipt_count": 2,
+              "state": 3,
+              "source_updated_at": 4,
+              "timestamp_basis": 5,
+              "boundary": 6
+            },
+            "renameByName": {
+              "title": "Source / scope",
+              "state": "Observation",
+              "value": "Native value",
+              "unit": "Unit",
+              "kind": "Measurement",
+              "estimated_saved": "Retained native estimate",
+              "session_estimated_saved": "Session byte estimate",
+              "source_updated_at": "Source updated UTC",
+              "source_command": "Command / source",
+              "coverage_status": "Original audit status",
+              "canonical_receipt_count": "Canonical receipts (read scope)",
+              "timestamp_basis": "Timestamp meaning",
+              "boundary": "Scope / limits",
+              "embedding_status": "Status",
+              "embedding_provider": "Provider",
+              "embedding_model": "Model",
+              "embedding_dimensions": "Dimensions",
+              "embedding_rows": "Stored",
+              "latest_pages_missing_embeddings": "Missing",
+              "embed_failures_unresolved": "Failures",
+              "llm_status": "LLM"
+            }
+          }
+        }
+      ],
+      "options": {
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "noValue": "\u2014",
+          "custom": {
+            "align": "auto",
+            "wrapText": false,
+            "cellOptions": {
+              "type": "auto"
+            }
+          }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 12,
+      "title": "Sanitized native client activity",
+      "type": "logs",
+      "gridPos": {
+        "x": 0,
+        "y": 86,
+        "w": 24,
+        "h": 10
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{service_name=~\"Codex Desktop|codex-app-server|codex_exec|codex_cli_rs|claude-code|claude-code-desktop|codex-sdk-receipt\"}",
+          "queryType": "range",
+          "instant": false
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "sortOrder": "Descending",
+        "wrapLogMessage": true
+      },
+      "description": "Existing native telemetry; prompt/tool bodies are removed upstream in the collector."
+    },
+    {
+      "id": 15,
+      "title": "Cache-read tokens by query_source (Loki api_request)",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 96,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (query_source) (sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | unwrap cache_read_tokens [$__interval]))",
+          "queryType": "range",
+          "instant": false
+        }
+      ],
+      "description": "Live claude-code api_request events unwrapped and split by query_source, a free-form string the client sets per request (recent examples: repl_main_thread:outputStyle:Concise, agent:custom, agent:builtin:workflow-subagent, agent:builtin:general-purpose, agent_summary, compact, away_summary). One event per API request; it overlaps the Prometheus typed-counters panel above (both read the same underlying provider usage) and must not be summed with it or with the savings table. The legend sum equals the range total only when the query step equals $__interval; verify that in Grafana before reading it as a total.",
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "sum"
+          ]
+        }
+      }
+    },
+    {
+      "id": 16,
+      "title": "Input tokens by query_source (Loki api_request)",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 96,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (query_source) (sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | unwrap input_tokens [$__interval]))",
+          "queryType": "range",
+          "instant": false
+        }
+      ],
+      "description": "Live claude-code api_request events unwrapped and split by query_source, a free-form string the client sets per request (recent examples: repl_main_thread:outputStyle:Concise, agent:custom, agent:builtin:workflow-subagent, agent:builtin:general-purpose, agent_summary, compact, away_summary). One event per API request; it overlaps the Prometheus typed-counters panel above (both read the same underlying provider usage) and must not be summed with it or with the savings table. The legend sum equals the range total only when the query step equals $__interval; verify that in Grafana before reading it as a total.",
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "sum"
+          ]
+        }
+      }
+    },
+    {
+      "id": 17,
+      "title": "Output tokens by query_source (Loki api_request)",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 104,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (query_source) (sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | unwrap output_tokens [$__interval]))",
+          "queryType": "range",
+          "instant": false
+        }
+      ],
+      "description": "Live claude-code api_request events unwrapped and split by query_source, a free-form string the client sets per request (recent examples: repl_main_thread:outputStyle:Concise, agent:custom, agent:builtin:workflow-subagent, agent:builtin:general-purpose, agent_summary, compact, away_summary). One event per API request; it overlaps the Prometheus typed-counters panel above (both read the same underlying provider usage) and must not be summed with it or with the savings table. The legend sum equals the range total only when the query step equals $__interval; verify that in Grafana before reading it as a total.",
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "sum"
+          ]
+        }
+      }
+    },
+    {
+      "id": 18,
+      "title": "Cache-creation tokens by query_source (Loki api_request)",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 104,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "uid": "ns2604-loki"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (query_source) (sum_over_time({service_name=\"claude-code\"} | event_name=\"api_request\" | unwrap cache_creation_tokens [$__interval]))",
+          "queryType": "range",
+          "instant": false
+        }
+      ],
+      "description": "Live claude-code api_request events unwrapped and split by query_source, a free-form string the client sets per request (recent examples: repl_main_thread:outputStyle:Concise, agent:custom, agent:builtin:workflow-subagent, agent:builtin:general-purpose, agent_summary, compact, away_summary). One event per API request; it overlaps the Prometheus typed-counters panel above (both read the same underlying provider usage) and must not be summed with it or with the savings table. The legend sum equals the range total only when the query step equals $__interval; verify that in Grafana before reading it as a total.",
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": [
+            "sum"
+          ]
+        }
+      }
+    },
+    {
+      "id": 19,
+      "title": "Claude provider telemetry \u00b7 effort split (Prometheus)",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 112,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": {
+        "uid": "ns2604-prometheus"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (effort) (increase(claude_code_token_usage_tokens_total{instance!=\"unscoped\"}[$__rate_interval]))",
+          "queryType": "range",
+          "instant": false
+        }
+      ],
+      "description": "Per-interval increase, split by effort level (the metrics pipeline keeps the \"effort\" datapoint attribute; see observability/collector/collector.yaml). increase() is used rather than a raw sum of the cumulative counters because each session is its own series: series appear with a session and leave five minutes after it ends (the Prometheus exporter's default metric_expiration), so a raw sum follows series lifetimes, not token use. Writers without a per-process identity (instance=\"unscoped\": a Claude session without session.id, or a Codex process started without the identity launcher) are excluded, because concurrent writers of one series make its increase meaningless; see the native-telemetry-integrity alert rules."
+    }
+  ]
+}

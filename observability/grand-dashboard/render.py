@@ -12,7 +12,17 @@ def latest(kind, field='observed_unix'):
     return 'last_over_time(' + selector + ' | json | unwrap ' + field + ' | __error__="" [24h]) == on() group_left() max(last_over_time(' + marker + '))'
 
 
-def dashboard():
+def workflow_text(dags):
+    """Title and description of the native workflow table; no DAG list keeps the workstation's research-pair text."""
+    if not dags:
+        return ('Native workflow history · research pair',
+                'Read-only local Dagu history: up to 10 research-pair runs within 30 days. Native times and statuses describe stored runs, not a process heartbeat or new model acceptance. Counts cover only this returned sample. Missing configuration or failed observation is unknown; an empty successful query reports zero. Entry numbers are display positions, not run identifiers.')
+    names = ', '.join(dags)
+    return ('Native workflow history · ' + names,
+            'Read-only local Dagu history, read by the emitter with `dagu history <dag> --format json` (no Dagu login): for each of ' + names + ', a summary row and up to 10 runs within 30 days. Native times and statuses describe stored runs, not a process heartbeat or new model acceptance. Counts cover only the returned sample. Missing configuration or failed observation is unknown; an empty successful query reports zero. Entry numbers are display positions, not run identifiers.')
+
+
+def dashboard(workflow_dags=None):
     panels = []
     def panel(pid, title, typ, x, y, w, h, expr=None, source='ecosystem-loki', **extra):
         value = dict(id=pid, title=title, type=typ, gridPos=dict(x=x,y=y,w=w,h=h), options={})
@@ -42,8 +52,9 @@ def dashboard():
     panel(11,'Live host memory usage','timeseries',12,64,12,8,'ecosystem_system_memory_usage_bytes',source='ecosystem-prometheus')
     panel(12,'Progress history · recorded checkpoints','logs',0,72,24,9,'{service_name="agent-stack-progress",record_kind=~"wave|lane|worker"}', options={'showTime':True,'sortOrder':'Descending','wrapLogMessage':True})
     panel(14,'Native agent activity · sanitized telemetry','logs',0,81,24,9,'{service_name=~"Codex Desktop|codex-app-server|codex_exec|codex_cli_rs|claude-code|claude-code-desktop|codex-sdk-receipt"}',options={'showTime':True,'sortOrder':'Descending','wrapLogMessage':True})
-    panel(15,'Native workflow history · research pair','table',0,9,24,9,latest('workflow'),
-          description='Read-only local Dagu history: up to 10 research-pair runs within 30 days. Native times and statuses describe stored runs, not a process heartbeat or new model acceptance. Counts cover only this returned sample. Missing configuration or failed observation is unknown; an empty successful query reports zero. Entry numbers are display positions, not run identifiers.',
+    workflow_title, workflow_description = workflow_text(workflow_dags)
+    panel(15,workflow_title,'table',0,9,24,9,latest('workflow'),
+          description=workflow_description,
           transformations=[{'id':'labelsToFields','options':{'mode':'columns'}},
             {'id':'organize','options':{'excludeByName':{'Time':True,'Value':True,'Value #A':True,'record_kind':True,'record_kind_extracted':True,'detected_level':True,'service_name':True,'entity_id':True,'source_updated_at':True},
               'indexByName':{'title':0,'state':1,'started_at':2,'finished_at':3,'duration_seconds':4,'history_count':5,'succeeded_count':6,'failed_count':7,'running_count':8,'evidence_ref':20},
@@ -60,7 +71,9 @@ def dashboard():
 
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
+    parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--output',type=Path,required=True)
+    parser.add_argument('--dagu-dag',action='append',metavar='NAME',help='DAG named in the workflow table (repeatable; the emitter takes the same list)')
+    args=parser.parse_args()
     args.output.parent.mkdir(parents=True,exist_ok=True)
-    args.output.write_text(json.dumps(dashboard(),indent=2)+'\n')
+    args.output.write_text(json.dumps(dashboard(args.dagu_dag),indent=2)+'\n')
     print('Rendered research-grand dashboard.')

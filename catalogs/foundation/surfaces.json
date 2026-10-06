@@ -318,7 +318,7 @@
       "upstream_url": "https://github.com/grafana/grafana",
       "local_url": "http://127.0.0.1:13000/d/native-foundation-data",
       "launch": null,
-      "scope": "Upstream Grafana with locally provisioned foundation panels. Fresh exporter time does not establish fresh task acceptance or worker liveness.",
+      "scope": "Upstream Grafana with locally provisioned foundation panels. Fresh exporter time does not establish fresh task acceptance or worker liveness. NativeStack2604 (2026-10-06): http://127.0.0.1:21301/d/native-foundation-data after its install plan's grafana row runs; its savings, memory and coverage tables wait for a native-data collector on that host.",
       "source_paths": [
         "docs/native-dashboard-data.md",
         "observability/grand-dashboard/README.md"
@@ -337,7 +337,7 @@
       "upstream_url": "https://github.com/grafana/grafana",
       "local_url": "http://127.0.0.1:13000/d/ecosystem-native",
       "launch": null,
-      "scope": "Locally provisioned upstream Grafana panels for exported provider/host metrics. Native estimates and provider counters retain separate scopes.",
+      "scope": "Locally provisioned upstream Grafana panels for exported provider/host metrics. Native estimates and provider counters retain separate scopes. NativeStack2604 (2026-10-06): http://127.0.0.1:21301/d/ecosystem-native after its install plan's grafana row runs.",
       "source_paths": [
         "observability/backends/README.md",
         "docs/native-dashboard-data.md"

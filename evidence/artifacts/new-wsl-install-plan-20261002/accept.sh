@@ -1166,7 +1166,12 @@ grafana cli -v'
 curl -fsS http://127.0.0.1:21301/api/health | jq -e '\''.database == "ok"'\'' >/dev/null
 curl -fsS http://127.0.0.1:21301/api/dashboards/uid/token-layer | jq -e '\''.dashboard.uid == "token-layer" and (.meta.provisioned == true)'\'' >/dev/null
 curl -fsS http://127.0.0.1:21301/api/datasources/proxy/uid/ns2604-alertmanager/api/v2/status | jq -e '\''.versionInfo.version == "0.34.1"'\'' >/dev/null
-curl -fsS -H '\''Content-Type: application/json'\'' --data '\''{"from":"now-5m","to":"now","queries":[{"refId":"A","datasource":{"uid":"ns2604-prometheus"},"expr":"up{job=\"prometheus\"}","instant":true}]}'\'' http://127.0.0.1:21301/api/ds/query | jq -e '\''.results.A.status == 200 and (.results.A.frames | length > 0)'\'' >/dev/null'
+curl -fsS -H '\''Content-Type: application/json'\'' --data '\''{"from":"now-5m","to":"now","queries":[{"refId":"A","datasource":{"uid":"ns2604-prometheus"},"expr":"up{job=\"prometheus\"}","instant":true}]}'\'' http://127.0.0.1:21301/api/ds/query | jq -e '\''.results.A.status == 200 and (.results.A.frames | length > 0)'\'' >/dev/null
+curl -fsS http://127.0.0.1:21301/api/frontend/settings | jq -e '\''.newsFeedEnabled == false'\'' >/dev/null
+for uid in research-grand ecosystem-native native-foundation-data; do curl -fsS "http://127.0.0.1:21301/api/dashboards/uid/$uid" | jq -e --arg uid "$uid" '\''.dashboard.uid == $uid and (.meta.provisioned == true)'\'' >/dev/null; done
+systemctl --user is-active --quiet ns2604-research-progress.timer
+test "$(systemctl --user show ns2604-research-progress.service -p Result --value)" = success
+curl -fsS -G http://127.0.0.1:21300/loki/api/v1/query --data-urlencode '\''query=sum(count_over_time({service_name="agent-stack-progress",record_kind="workflow"}[30m]))'\'' | jq -e '\''.status == "success" and (.data.result | length > 0)'\'' >/dev/null'
       ;;
     after_sign_in)
       # Kind: smoke; Source: https://raw.githubusercontent.com/grafana/grafana/v13.2.3/docs/sources/developer-resources/api-reference/http-api/api-legacy/data_source.md#L657

@@ -26,6 +26,28 @@ observed. These are local dashboard/API integration checks, not a full upstream
 test suite, provider inference, or a token-saving benchmark. See the
 [command evidence](../evidence/receipts/native-dashboard-access-20260921.json).
 
+### NativeStack2604 equivalents (2026-10-06)
+
+The table above is the authoring host's; on NativeStack2604 nothing listens on
+13000. Its install plan
+([`new-wsl-install-plan-20261002`](../evidence/artifacts/new-wsl-install-plan-20261002/README.md))
+uses these loopback URLs. The three ported dashboards exist once the plan's
+`grafana` row has run with the 2026-10-06 port; until then `/api/search` lists
+only `token-layer`.
+
+| Upstream interface | NativeStack2604 URL | Scope |
+| --- | --- | --- |
+| Grafana | http://127.0.0.1:21301/d/research-grand | Anonymous Viewer, no sign-in path (plan `config/grafana.ini`). Also `/d/ecosystem-native`, `/d/native-foundation-data` and `/d/token-layer`. The research dashboard shows Dagu run history without a Dagu login |
+| Dagu | http://127.0.0.1:21080/ | Operator UI with its builtin login (Dagu 2.18.2's default when `auth.mode` is unset); `/api/v1/dags` answers 401 without it |
+| Prometheus | http://127.0.0.1:21090/query | No password challenge |
+| Alertmanager | http://127.0.0.1:21093/ | No password challenge; Telegram receiver |
+| OmniRoute | http://127.0.0.1:21128/dashboard | `requireLogin=false` and a keyless loopback client API, the user's posture ([account-pool decision](decisions/2026-09-27-omniroute-account-pool.md)); the Health page needs a dashboard session, see [OmniRoute's Health page](#omniroute-health-page-on-a-passwordless-install-2026-10-06) |
+| ai-memory | http://127.0.0.1:29374/web | Memory web UI |
+| Codebase Memory | http://127.0.0.1:9749/ | Code-graph UI |
+
+Qdrant, agent-browser and ntfy have no NativeStack2604 listener, and AgentsView
+was not listening on 21808 when this was checked (2026-10-06, 00:40 EDT, 04:40Z).
+
 ## Dagu: remove the repeated browser password box
 
 Dagu 2.16.6 served its HTML while `/api/v1/dags` returned 401 with
@@ -153,6 +175,39 @@ retain their upstream guards. Keep this profile on loopback.
 Sources: [pinned setting route](https://github.com/diegosouzapw/OmniRoute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/src/app/api/settings/require-login/route.ts),
 [API-key flag precedence](https://github.com/diegosouzapw/OmniRoute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/src/shared/utils/featureFlags.ts),
 [route guards](https://github.com/diegosouzapw/OmniRoute/blob/5458026c216f77a3da68ea49152dc33470cfe2cb/src/server/authz/routeGuard.ts).
+
+### OmniRoute Health page on a passwordless install (2026-10-06)
+
+On NativeStack2604's 21128 build (3.8.51 content plus PR 15167 and the affinity
+patch, `BUILD_SHA` `5f4b3d577`), `/dashboard/health` throws `TypeError: Cannot
+read properties of undefined (reading 'uptime')`. The cause in this install is
+its passwordless posture (`requireLogin=false` and no stored password, so no
+browser holds a dashboard session) meeting a route that ignores `requireLogin`;
+the install is not broken. Read in the installed build
+(`~/.local/share/omniroute-builds/omniroute-3.8.51-5f4b3d577-affinity-pr15167/lib/node_modules/omniroute/`):
+
+- `GET /api/monitoring/health` calls `requireManagementAuth(request, {alwaysRequireAuth: true})`
+  and, for a request without a dashboard session, answers HTTP 200 with only
+  `{status, setupComplete}` (`dist/.build/next/server/chunks/_14gdr2j._.js:1:290`,
+  the response helper, and `:1:539`, the auth call).
+- `alwaysRequireAuth` skips the `requireLogin=false` shortcut; only a dashboard
+  session cookie (`auth_token`), the internal service token, a CLI token or a
+  management access token pass (`dist/.build/next/server/chunks/src_04ajmw1._.js:1:1702`;
+  `isAuthRequired` returns false for `requireLogin === false` at `_0m42383._.js:1:33832`).
+- The page fetches that route, destructures `system` from the body and reads
+  `system.uptime` (`dist/.build/next/static/chunks/07_92fqf2xgq6.js:3:18913`, `:3:21720`
+  and `:3:27164`).
+
+Without a session the page cannot render, no other setting changes that, and no
+upstream file is to be patched. The choices are to set a management password and sign in once (the
+login route refuses while no password is stored, `dist/.build/next/server/chunks/_0ajtddf._.js:1:3030`;
+this gives up the passwordless posture, so it is the user's call), or to
+read health from the public `GET /api/health` and Prometheus. The two 404s on the compression settings page
+are upstream's too: the page links `/dashboard/context/<engine>` for every entry
+of `ENGINE_IDS` (`dist/.build/next/static/chunks/1tljxm1kldxz3.js:1:13502` and `:1:14016`), the catalog lists
+`codex-responses` and `relevance` (`open-sse/services/compression/engineCatalog.ts:85-86,112,192`),
+and the build has no page for either (`dist/.build/next/server/app-paths-manifest.json`).
+Next.js prefetches those links and gets 404; nothing else breaks.
 
 Start the installed browser dashboard with its native command:
 

@@ -284,6 +284,20 @@ class NativeDataTests(unittest.TestCase):
                 overlaps = ax0 < bx1 and bx0 < ax1 and ay0 < by1 and by0 < ay1
                 self.assertFalse(overlaps, f"panel {ids[i]} overlaps another panel's gridPos")
 
+    def test_dashboard_host_header_and_omitted_panels(self):
+        # Another host (NativeStack2604) passes its own links and omits panels whose source it does not run.
+        default = R.dashboard()
+        self.assertEqual(default, R.dashboard(header=R.HEADER, omit=()))
+        self.assertIn("http://127.0.0.1:18525/dag-runs", default["panels"][0]["options"]["content"])
+        board = R.dashboard(header="# Another host", omit=(3, 4, 7, 8))
+        ids = [panel["id"] for panel in board["panels"]]
+        self.assertEqual(sorted(set(p["id"] for p in default["panels"]) - {3, 4, 7, 8}), sorted(ids))
+        self.assertEqual("# Another host", board["panels"][0]["options"]["content"])
+        delivery = next(panel for panel in board["panels"] if panel["id"] == 2)
+        self.assertEqual(24, delivery["gridPos"]["w"])
+        exprs = [t["expr"] for panel in board["panels"] for t in panel.get("targets", [])]
+        self.assertFalse([e for e in exprs if 'job="qdrant"' in e or 'job="vllm"' in e])
+
     def test_qmd_collection_selection_and_bm25_zero(self):
         r = M.qmd_metrics(QMD, "selected-collection")
         self.assertEqual(r["collection_files"], 67)

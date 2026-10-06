@@ -1,6 +1,7 @@
 # Useful native dashboards and returned evidence
 
-Start with the authoring PC's [native foundation view](http://127.0.0.1:13000/d/native-foundation-data).
+Start with the authoring PC's [native foundation view](http://127.0.0.1:13000/d/native-foundation-data)
+(on NativeStack2604, [21301](http://127.0.0.1:21301/d/native-foundation-data); see below the table).
 The [rendered dashboard review](dashboard-rendered-acceptance.md) records actual
 screenshots, command comparisons, presentation repairs and remaining gaps.
 It uses the installed Grafana and Loki with locally provisioned integration panels.
@@ -26,6 +27,16 @@ Another PC must configure its own paths, scope, services and native accounts.
 | Evaluation result | [Promptfoo report](http://127.0.0.1:17500/promptfoo.html) | Official HTML export of two passing retained local echo assertions; no model-quality or new evaluation claim |
 | Provider and host telemetry | [Native telemetry](http://127.0.0.1:13000/d/ecosystem-native) | Typed exported counters and host metrics, not estimated savings |
 | Research checkpoints | [Research Grafana](http://127.0.0.1:13000/d/research-grand) | Dated coordinator checkpoints, recorded experiment results and bounded native workflow history |
+
+On NativeStack2604 (2026-10-06) port 13000 has no listener. Its Grafana is
+`http://127.0.0.1:21301` (anonymous Viewer): [research](http://127.0.0.1:21301/d/research-grand)
+with Dagu run history, [native telemetry](http://127.0.0.1:21301/d/ecosystem-native),
+[native foundation](http://127.0.0.1:21301/d/native-foundation-data) and
+[token layer](http://127.0.0.1:21301/d/token-layer), the first three once the
+install plan's `grafana` row has run. The foundation view's savings, memory and
+coverage tables stay empty there until a native-data collector runs on that host.
+Its other loopback UIs are listed in
+[native dashboard access](native-dashboards.md#nativestack2604-equivalents-2026-10-06).
 
 ## What changed after the HTTP-only checks
 

@@ -251,5 +251,105 @@ class GrandDashboardTests(unittest.TestCase):
             with self.subTest(service=service):
                 self.assertIn(service, services)
 
+    @staticmethod
+    def fake_dagu(home, runs):
+        """Synthetic Dagu CLI fixture: answers `history <dag> ...` from a dict, or fails for a missing DAG."""
+        binary = home/'dagu-fixture'
+        binary.write_text('#!/usr/bin/python3\nimport sys,json\nruns=' + repr(runs) +
+                          '\nassert sys.argv[1] == "history" and sys.argv[3:] == ["--context","local","--dagu-home",' +
+                          repr(str(home)) + ',"--format","json","--last","30d","--limit","10"]\n'
+                          'dag=sys.argv[2]\nsys.exit(7) if dag not in runs else print(json.dumps(runs[dag]))\n')
+        binary.chmod(0o700)
+        return binary
+
+    def test_several_dags_namespace_rows_and_fail_separately(self):
+        # Synthetic fixture: NativeStack2604 reads three DAGs; a failing DAG is unknown without hiding the others.
+        with tempfile.TemporaryDirectory() as d:
+            home = Path(d)
+            run = dict(status='succeeded', startedAt='2026-10-05T03:30:00-04:00', finishedAt='2026-10-05T03:31:21-04:00',
+                       dagRunId='PRIVATE_SENTINEL', workerId='PRIVATE_SENTINEL')
+            binary = self.fake_dagu(home, {'restic-backup': [dict(run, name='restic-backup')] * 3,
+                                           'tz-currency-check': []})
+            dags = ('restic-backup', 'restic-restore-check', 'tz-currency-check')
+            rows = progress.snapshot(ROOT, binary, home, dags)
+            workflow = {r['entity_id']: r for r in rows if r['record_kind'] == 'workflow'}
+            self.assertEqual(['workflow/restic-backup/history', 'workflow/restic-backup/recent-1',
+                              'workflow/restic-backup/recent-2', 'workflow/restic-backup/recent-3',
+                              'workflow/restic-restore-check/history', 'workflow/tz-currency-check/history'],
+                             list(workflow))
+            self.assertEqual(3, workflow['workflow/restic-backup/history']['succeeded_count'])
+            self.assertEqual('restic-backup / recent entry 1', workflow['workflow/restic-backup/recent-1']['title'])
+            self.assertEqual(81, workflow['workflow/restic-backup/recent-1']['duration_seconds'])
+            self.assertEqual('2026-10-05T07:31:21+00:00', workflow['workflow/restic-backup/recent-1']['finished_at'])
+            self.assertEqual('unavailable / native history failed', workflow['workflow/restic-restore-check/history']['state'])
+            self.assertEqual('no history / last 30 days', workflow['workflow/tz-currency-check/history']['state'])
+            self.assertEqual(0, workflow['workflow/tz-currency-check/history']['history_count'])
+            self.assertNotIn('PRIVATE_SENTINEL', json.dumps(progress.payload(rows, 1789855000123456789)))
+            # A single non-default DAG keeps the original entity IDs and labels rows with its own name.
+            single = [r for r in progress.snapshot(ROOT, binary, home, ('restic-backup',)) if r['record_kind'] == 'workflow']
+            self.assertEqual(['workflow/history', 'workflow/recent-1', 'workflow/recent-2', 'workflow/recent-3'],
+                             [r['entity_id'] for r in single])
+            self.assertEqual('restic-backup / last 10 runs within 30 days', single[0]['title'])
+            # Another DAG's runs never pass as the configured DAG's history.
+            binary = self.fake_dagu(home, {'restic-backup': [dict(run, name='other-dag')]})
+            rows = progress.workflow_snapshot(binary, home, ('restic-backup',))
+            self.assertEqual('unavailable / native history failed', rows[0]['state'])
+
+    def test_full_history_of_every_dag_fits_the_generation_limit(self):
+        # Synthetic capacity fixture: the catalog plus MAX_DAGS full histories stays within MAX_ENTITIES.
+        history = lambda dag: progress.workflow_rows([dict(name=dag, status='succeeded', startedAt='2026-09-19T21:00:00Z',
+                                                           finishedAt='2026-09-19T21:01:00Z')] * progress.HISTORY_LIMIT, dag, True)
+        dags = [f'dag-{i}' for i in range(progress.MAX_DAGS)]
+        full = [row for dag in dags for row in history(dag)]
+        with patch.object(progress, 'workflow_snapshot', return_value=full):
+            rows = progress.snapshot(ROOT)
+        self.assertEqual(progress.MAX_DAGS * (progress.HISTORY_LIMIT + 1), sum(r['record_kind'] == 'workflow' for r in rows))
+        self.assertLessEqual(len(rows), progress.MAX_ENTITIES)
+
+    def test_dag_configuration_is_bounded(self):
+        for dags in [(), ('a',) * 2, tuple(f'd{i}' for i in range(progress.MAX_DAGS + 1)), ('../x',), ('-x',), ('a b',), (7,)]:
+            with self.subTest(dags=dags), self.assertRaises(ValueError):
+                progress.dag_names(dags)
+        with tempfile.TemporaryDirectory() as d, self.assertRaises(ValueError):
+            progress.workflow_snapshot(Path(d)/'dagu', Path(d), ('a', 'a'))
+        self.assertEqual(('restic-backup', 'tz-currency-check'), progress.dag_names(['restic-backup', 'tz-currency-check']))
+
+    def test_loki_push_url_is_loopback_only_and_used(self):
+        self.assertEqual(progress.DEFAULT_LOKI_PUSH, progress.loki_push_url(progress.DEFAULT_LOKI_PUSH))
+        good = 'http://127.0.0.1:21300/loki/api/v1/push'
+        self.assertEqual(good, progress.loki_push_url(good))
+        for bad in ['http://10.0.0.5:3100/loki/api/v1/push', 'https://127.0.0.1:21300/loki/api/v1/push',
+                    'http://127.0.0.1:21300/otlp', 'http://127.0.0.1:0/loki/api/v1/push',
+                    'http://127.0.0.1:70000/loki/api/v1/push', 'http://localhost:21300/loki/api/v1/push', None]:
+            with self.subTest(url=bad), self.assertRaises(ValueError):
+                progress.loki_push_url(bad)
+        with tempfile.TemporaryDirectory() as d:
+            cache = Path(d)/'cache.json'
+            with patch.object(progress.urllib.request, 'urlopen') as send:
+                send.return_value.__enter__.return_value.status = 204
+                self.assertEqual('published', progress.publish(ROOT, cache, loki_url=good)['status'])
+            self.assertEqual(good, send.call_args.args[0].full_url)
+            with patch.object(progress.urllib.request, 'urlopen') as send, self.assertRaises(ValueError):
+                progress.publish(ROOT, Path(d)/'other.json', loki_url='http://192.0.2.1:3100/loki/api/v1/push')
+            send.assert_not_called()
+
+    def test_cli_requires_history_paths_for_named_dags(self):
+        import subprocess, sys
+        script = str(ROOT/'observability/grand-dashboard/progress.py')
+        for extra in (['--dagu-dag', 'restic-backup'], ['--loki-url', 'http://10.0.0.5:3100/loki/api/v1/push']):
+            with self.subTest(extra=extra):
+                result = subprocess.run([sys.executable, script, '--repo', str(ROOT), *extra], capture_output=True, text=True)
+                self.assertEqual(2, result.returncode)
+
+    def test_workflow_panel_names_the_configured_dags(self):
+        default = next(p for p in render.dashboard()['panels'] if p['id'] == 15)
+        self.assertEqual('Native workflow history · research pair', default['title'])
+        self.assertIn('up to 10 research-pair runs', default['description'])
+        board = render.dashboard(('restic-backup', 'tz-currency-check'))
+        table = next(p for p in board['panels'] if p['id'] == 15)
+        self.assertEqual('Native workflow history · restic-backup, tz-currency-check', table['title'])
+        self.assertNotIn('research-pair', table['description'])
+        self.assertEqual(render.dashboard()['panels'][:14], board['panels'][:14])
+
 
 if __name__=='__main__':unittest.main()
