@@ -1,0 +1,299 @@
+{
+  "schema_version": 1,
+  "kind": "baseline_component_pin_snapshot",
+  "base_revision": "c1300c15b42f1a6643f3dc4172f40c01d99abdcd",
+  "source_artifacts": [
+    {
+      "path": "manifests/stack.json",
+      "sha256": "3ca8f36178c4e61c9f8241fd6eb045172a9e66c38da5f4943b4532fc42f94a72"
+    },
+    {
+      "path": "adoption/pins-linux-x86_64.json",
+      "sha256": "804eba0e086670c75e6b2f3725734477914318987c99fb90195680188be337c9"
+    }
+  ],
+  "component_manifest_rows": [
+    {
+      "id": "ast-grep",
+      "version": "0.45.3",
+      "source_pin": null,
+      "repository": "https://github.com/ast-grep/ast-grep/releases/tag/0.45.3"
+    },
+    {
+      "id": "codebase-memory-mcp",
+      "version": "0.11.0",
+      "source_pin": null,
+      "repository": "https://github.com/DeusData/codebase-memory-mcp/releases/tag/v0.11.0"
+    },
+    {
+      "id": "context-hub",
+      "version": "0.1.4",
+      "source_pin": null,
+      "repository": "https://github.com/andrewyng/context-hub"
+    },
+    {
+      "id": "context-mode",
+      "version": "1.0.169",
+      "source_pin": null,
+      "repository": "https://github.com/mksglu/context-mode"
+    },
+    {
+      "id": "headroom",
+      "version": "0.37.0",
+      "source_pin": null,
+      "repository": "https://github.com/headroomlabs-ai/headroom"
+    },
+    {
+      "id": "markitdown",
+      "version": "0.1.8",
+      "source_pin": null,
+      "repository": "https://github.com/microsoft/markitdown/releases/tag/v0.1.8"
+    },
+    {
+      "id": "qmd",
+      "version": "2.8.3",
+      "source_pin": null,
+      "repository": "https://github.com/tobi/qmd/releases/tag/v2.8.3"
+    },
+    {
+      "id": "repomix",
+      "version": "1.18.1",
+      "source_pin": "80b4280a9196feace092fc672dfe2b5fac62ef08",
+      "repository": "https://github.com/yamadashy/repomix/releases/tag/v1.18.1"
+    },
+    {
+      "id": "rtk",
+      "version": "0.51.0",
+      "source_pin": "e001f773f80b22b7dc4c7a79521b30e35aaef026",
+      "repository": "https://github.com/rtk-ai/rtk/releases/tag/v0.51.0"
+    },
+    {
+      "id": "serena",
+      "version": "2.0.0.dev0 @ c6fbd1c5932df2494ffa0020af5a9fbe80b82143",
+      "source_pin": null,
+      "repository": "https://github.com/oraios/serena"
+    },
+    {
+      "id": "socraticode",
+      "version": "1.15.0",
+      "source_pin": "f6191f076a42405f0d5508139f3a8b505cfef93a",
+      "repository": "https://github.com/giancarloerra/SocratiCode"
+    },
+    {
+      "id": "toon",
+      "version": "4.1.1",
+      "source_pin": null,
+      "repository": "https://github.com/toon-format/toon/releases/tag/v4.1.1"
+    },
+    {
+      "id": "jcodemunch-mcp",
+      "version": "1.108.319",
+      "source_pin": "8f7b34abe16fb459e0bf1c04747d584216dfe32e",
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp"
+    }
+  ],
+  "install_plan_rows": [
+    {
+      "pointer": "/owners/17",
+      "layer": "semantic-rag",
+      "slot": "code-search",
+      "owner": "semble 0.6.1 + SocratiCode 1.15.0",
+      "repository": "https://github.com/MinishLab/semble; https://github.com/giancarloerra/SocratiCode",
+      "release": "v0.6.1",
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/MinishLab/semble/24497845460960db1839c8485319df189a889225/README.md#L41",
+        "line": 41
+      }
+    },
+    {
+      "pointer": "/owners/25",
+      "layer": "durable-memory",
+      "slot": "memory-owner",
+      "owner": "ai-memory 2.5.2",
+      "repository": "https://github.com/akitaonrails/ai-memory",
+      "release": "v2.5.2",
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/akitaonrails/ai-memory/7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83/docs/install.md#L1634",
+        "line": 1634
+      }
+    },
+    {
+      "pointer": "/owners/26",
+      "layer": "token-efficiency",
+      "slot": "ccusage",
+      "owner": "ccusage 20.0.26",
+      "repository": "https://github.com/ccusage/ccusage",
+      "release": "v20.0.26",
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/ccusage/ccusage/d9821088b98aa536c7a385aa1a4579d6fa02269b/apps/ccusage/README.md#L62",
+        "line": 62
+      }
+    },
+    {
+      "pointer": "/owners/27",
+      "layer": "token-efficiency",
+      "slot": "context-supply",
+      "owner": "context-mode 1.0.169",
+      "repository": "https://github.com/mksglu/context-mode",
+      "release": "6f0cc6841c687e754059f36714a11233fda1a02b ; npm 1.0.169",
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/mksglu/context-mode/6f0cc6841c687e754059f36714a11233fda1a02b/README.md#L72",
+        "line": 72
+      }
+    },
+    {
+      "pointer": "/owners/28",
+      "layer": "token-efficiency",
+      "slot": "statusline",
+      "owner": "claude-hud 0.10.0 (Claude Code status line plugin); Codex shows its native footer, tui.status_line",
+      "repository": "https://github.com/jarrodwatts/claude-hud",
+      "release": "v0.10.0",
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/jarrodwatts/claude-hud/75683c6de1ac07f6bbef00d739001679dba0740c/README.md#L29",
+        "line": 29
+      }
+    },
+    {
+      "pointer": "/owners/29",
+      "layer": "token-efficiency",
+      "slot": "command-output",
+      "owner": "RTK 0.51.0",
+      "repository": "https://github.com/rtk-ai/rtk",
+      "release": "v0.51.0",
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/rtk-ai/rtk/v0.51.0/README.md#L113",
+        "line": 113
+      }
+    },
+    {
+      "pointer": "/owners/30",
+      "layer": "token-efficiency",
+      "slot": "output-compression",
+      "owner": "Headroom 0.37.0 (headroom-ai[mcp], MCP server only)",
+      "repository": "https://github.com/headroomlabs-ai/headroom",
+      "release": "v0.37.0",
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/headroomlabs-ai/headroom/v0.37.0/README.md#L92",
+        "line": 92
+      }
+    },
+    {
+      "pointer": "/owners/31",
+      "layer": "token-efficiency",
+      "slot": "code-index",
+      "owner": "jcodemunch-mcp 1.108.319",
+      "repository": "https://github.com/jgravelle/jcodemunch-mcp",
+      "release": "v1.108.319",
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/jgravelle/jcodemunch-mcp/8f7b34abe16fb459e0bf1c04747d584216dfe32e/README.md#L91",
+        "line": 91
+      }
+    },
+    {
+      "pointer": "/owners/32",
+      "layer": "token-efficiency",
+      "slot": "code-graph",
+      "owner": "codebase-memory-mcp 0.11.0",
+      "repository": "https://github.com/DeusData/codebase-memory-mcp",
+      "release": "v0.11.0",
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/v0.11.0/README.md#L88",
+        "line": 88
+      }
+    },
+    {
+      "pointer": "/owners/33",
+      "layer": "token-efficiency",
+      "slot": "repo-packing",
+      "owner": "Repomix 1.18.1",
+      "repository": "https://github.com/yamadashy/repomix",
+      "release": "v1.18.1",
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/yamadashy/repomix/80b4280a9196feace092fc672dfe2b5fac62ef08/README.md#L109",
+        "line": 109
+      }
+    },
+    {
+      "pointer": "/owners/34",
+      "layer": "token-efficiency",
+      "slot": "structured-data",
+      "owner": "TOON 4.1.1 (@toon-format/cli)",
+      "repository": "https://github.com/toon-format/toon",
+      "release": "v4.1.1",
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/toon-format/toon/v4.1.1/packages/cli/README.md#L11",
+        "line": 11
+      }
+    },
+    {
+      "pointer": "/owners/35",
+      "layer": "token-efficiency",
+      "slot": "doc-conversion",
+      "owner": "MarkItDown 0.1.8",
+      "repository": "https://github.com/microsoft/markitdown",
+      "release": "v0.1.8",
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/microsoft/markitdown/v0.1.8/README.md#L62",
+        "line": 62
+      }
+    },
+    {
+      "pointer": "/owners/36",
+      "layer": "token-efficiency",
+      "slot": "api-docs",
+      "owner": "Context Hub 0.1.4 (context-hub, the chub CLI)",
+      "repository": "https://github.com/andrewyng/context-hub",
+      "release": "v0.1.4",
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/andrewyng/context-hub/v0.1.4/README.md#L12",
+        "line": 12
+      }
+    },
+    {
+      "pointer": "/owners/37",
+      "layer": "token-efficiency",
+      "slot": "trace-viewer",
+      "owner": "otel-tui 0.7.5",
+      "repository": "https://github.com/ymtdzzz/otel-tui",
+      "release": "v0.7.5",
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/ymtdzzz/otel-tui/3b25779a083469b732e3c628b4a412ee05cf9948/README.md#L131",
+        "line": 131
+      }
+    },
+    {
+      "pointer": "/owners/38",
+      "layer": "token-efficiency",
+      "slot": "token-lane-carriers",
+      "owner": "token-lanes carriers: the SubagentStart block and a SessionStart main-session block (Claude Code hooks)",
+      "repository": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "release": "checkout of the repository (adoption/hooks/claude/SHA256SUMS)",
+      "version_pinned": true,
+      "install_source": {
+        "url": "https://raw.githubusercontent.com/seathatflowsinourveins/native-agent-stack/f77a35eb2bf30bc4bf6f3b4ee51bc9ce5397b4c5/docs/token-session-handbook.md#L197",
+        "line": 197
+      }
+    }
+  ],
+  "token_carrier_sources": [
+    "adoption/hooks/claude/token-lanes-subagent-start.py",
+    "adoption/hooks/claude/token-lanes-block.md",
+    "adoption/hooks/claude/token-lanes-session-start.py",
+    "adoption/hooks/claude/token-lanes-block.main.md"
+  ],
+  "meaning": "Frozen repository declarations, not proof of deployed state or a pin upgrade. Null source_pin is retained exactly rather than invented. Before execution resolve the arm's native exposure and release digests against these immutable source bytes; any discrepancy blocks and requires a new exact-head freeze."
+}

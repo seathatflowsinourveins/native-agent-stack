@@ -1,0 +1,95 @@
+{
+  "schema_version": 1,
+  "kind": "frozen_public_task_selection",
+  "base_revision": "c1300c15b42f1a6643f3dc4172f40c01d99abdcd",
+  "source": {
+    "path": "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json",
+    "sha256": "d41152f460c475e6dabe0d8c144e7bd0ef59c0181835afbbba58a6eed445e81a"
+  },
+  "cases": [
+    {
+      "id": "seed-catalog-history-1",
+      "source_task_pointer": "/tasks/36",
+      "fixture_path": "catalogs/us-equities/README.md"
+    },
+    {
+      "id": "seed-catalog-history-2",
+      "source_task_pointer": "/tasks/37",
+      "fixture_path": "catalogs/us-equities/agents-operations.md"
+    },
+    {
+      "id": "seed-catalog-history-3",
+      "source_task_pointer": "/tasks/38",
+      "fixture_path": "catalogs/us-equities/lifecycle-source-review.md"
+    },
+    {
+      "id": "seed-catalog-history-4",
+      "source_task_pointer": "/tasks/39",
+      "fixture_path": "catalogs/us-equities/native-workflows.md"
+    },
+    {
+      "id": "seed-catalog-history-5",
+      "source_task_pointer": "/tasks/40",
+      "fixture_path": "catalogs/us-equities/foundation-memory.md"
+    },
+    {
+      "id": "seed-log-symbol-1",
+      "source_task_pointer": "/tasks/41",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl"
+    },
+    {
+      "id": "seed-log-symbol-2",
+      "source_task_pointer": "/tasks/43",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl"
+    },
+    {
+      "id": "seed-log-symbol-3",
+      "source_task_pointer": "/tasks/45",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl"
+    },
+    {
+      "id": "seed-log-symbol-4",
+      "source_task_pointer": "/tasks/47",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl"
+    },
+    {
+      "id": "seed-log-symbol-5",
+      "source_task_pointer": "/tasks/49",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl"
+    },
+    {
+      "id": "seed-main-output",
+      "source_task_pointer": "/tasks/62",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl"
+    },
+    {
+      "id": "seed-agent-path",
+      "source_task_pointer": "/tasks/63",
+      "fixture_path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl"
+    }
+  ],
+  "client_families": [
+    "claude-code",
+    "codex"
+  ],
+  "repetitions": 3,
+  "f_token_cases": "all twelve cases",
+  "f_memory_cases": "seed-catalog-history-1 through seed-catalog-history-5",
+  "prompt_amendment": {
+    "all_cases": "Each native parent gives one evidence-gathering child and one independent verification child the same task. It joins both and returns only the requested answer. Do not prescribe a tool. Identical instructions in all arms.",
+    "catalog_history_cases": "Replace 'Answer from the indexed project catalog:' with 'Answer using the available frozen project sources:'. Replace 'Separately retrieve the prior project decision about' with 'Separately identify the recorded project decision about'. Keep the remainder of each source task_text unchanged.",
+    "quality_oracle": "Keep source pass_fail_check factual values and source locations; remove requirements for an indexed-catalog or scoped-memory hit from factual quality. Evaluate those hits separately as adoption diagnostics. Use frozen base sources for AST locations, not historical locations."
+  },
+  "source_boundary": {
+    "code": "All tracked Python source under scripts/ and tests/ at base_revision, mounted byte-identically in every arm.",
+    "memory_seed": "The five specified canonical anti-pattern lessons and their frozen public source locators only; no host history. Every reset uses identical seed bytes and an empty inbox.",
+    "raw_event_fixture": {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "sha256": "81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e"
+    }
+  },
+  "limitations": [
+    "Twelve local public metadata/code fixtures; five memory cases; no generalization to real-project patch quality.",
+    "No trial configuration, qualification, provider usage, control or outcome is represented as executed."
+  ]
+}

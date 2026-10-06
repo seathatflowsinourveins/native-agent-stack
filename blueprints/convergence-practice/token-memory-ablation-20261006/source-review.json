@@ -1,0 +1,144 @@
+{
+  "schema_version": 1,
+  "kind": "pinned_source_review",
+  "reviewed_at_utc": "2026-10-06",
+  "claims_are_execution": false,
+  "harnesses": [
+    {
+      "repository": "https://github.com/harbor-framework/harbor",
+      "version": "0.24.0",
+      "revision": "b53b8134e1241686dca7759af188f987ecc48e8b",
+      "class": "source_review",
+      "verdict": "preferred current candidate; isolated qualification pending",
+      "release_url": "https://github.com/harbor-framework/harbor/releases/tag/v0.24.0",
+      "sources": [
+        {
+          "path": "src/harbor/models/job/config.py",
+          "lines": "291-296,397-451",
+          "supports": "native retries/concurrency/agents/tasks/artifacts/instructions"
+        },
+        {
+          "path": "src/harbor/models/trial/config.py",
+          "lines": "63-150",
+          "supports": "native agent config, fresh sessions, explicit MCP and retained logs"
+        },
+        {
+          "path": "src/harbor/agents/installed/claude_code.py",
+          "lines": "895-925,1116-1176",
+          "supports": "input categories, agent identity, parent/child JSONL, UUID dedup; missing usage can become zero"
+        },
+        {
+          "path": "src/harbor/agents/installed/codex.py",
+          "lines": "1109-1124,1628-1678",
+          "supports": "one-rollout import; credential-file transport opt-ins are excluded"
+        },
+        {
+          "path": "src/harbor/agents/installed/claude_code.py",
+          "lines": "1702-1715,1863-1895",
+          "supports": "seed copy runs in container and suppresses copy errors; child model routing needs observed fidelity"
+        },
+        {
+          "path": "tests/unit/agents/installed/test_claude_code_trajectory.py",
+          "lines": "1587-1617",
+          "supports": "unchanged upstream child-identity test is a future qualification candidate; not run here"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/harbor-framework/harbor",
+      "version": "0.23.0",
+      "revision": "1e5c5c6db929a10a140d05e606882c671ae20729",
+      "class": "historical_reference",
+      "verdict": "installed/published baseline; no new acceptance claimed"
+    },
+    {
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "version": "0.3.276",
+      "revision": "93f7182cf2ce9be22724b05e499cd1358d7ed41d",
+      "class": "source_review",
+      "verdict": "maintained fallback; bridge routing/profile/accounting qualification required",
+      "sources": [
+        {
+          "path": "CHANGELOG.md",
+          "lines": "1-18",
+          "supports": "current release changes; no demonstrated repair of this trial's native child accounting"
+        }
+      ]
+    },
+    {
+      "repository": "https://github.com/UKGovernmentBEIS/inspect_ai",
+      "version": "0.3.273",
+      "revision": "9e44f1b77ed7c912bf58baf30db8560937e7ce53",
+      "class": "source_review",
+      "sources": [
+        {
+          "path": "docs/agent-bridge.qmd",
+          "lines": "7-15,70-115",
+          "supports": "native sandbox bridge for Claude Code and Codex; model transport must be qualified"
+        }
+      ]
+    }
+  ],
+  "memory": {
+    "repository": "https://github.com/akitaonrails/ai-memory",
+    "version": "2.5.2",
+    "revision": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+    "class": "source_review",
+    "source": "docs/install.md:104-112",
+    "verdict": "existing install-plan interim is the frozen trial candidate, not a head-to-head winner"
+  },
+  "statistics": [
+    {
+      "repository": "https://github.com/scipy/scipy",
+      "version": "1.18.1",
+      "revision": "e4e854eaa8f18d807cd3496028e257e36caa93cc",
+      "sources": [
+        "scipy/stats/_resampling.py:300-303,363-367",
+        "scipy/stats/_binomtest.py:52-55,187-189"
+      ],
+      "class": "source_review"
+    },
+    {
+      "repository": "https://github.com/numpy/numpy",
+      "version": "2.5.3",
+      "revision": "dd88c0c19b54ad9ed3533224221285bf0873249a",
+      "class": "source_review",
+      "scope": "RNG dependency identity only; no installed-runtime claim"
+    }
+  ],
+  "historical_prior": {
+    "source": {
+      "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json",
+      "sha256": "a8e37af489566ef8ec25a33dfe9041cb64d2bc32e91959a9226bd9c2ec1c8fa6"
+    },
+    "success_conditioned_ratio": 0.867,
+    "ci95": [
+      0.775,
+      0.971
+    ],
+    "common_success_tasks": 27,
+    "all_trials_tokens_per_accepted_ratio": 1.043,
+    "cost_ratio": 0.983,
+    "cost_ci95": [
+      0.901,
+      1.102
+    ],
+    "limitations": [
+      "different release and proxy route",
+      "Sonnet5.5 medium",
+      "one repetition",
+      "no subagents",
+      "cache uncontrolled"
+    ]
+  },
+  "corrections": [
+    "Codex installed version is0.160.1, not historical0.121.",
+    "Harbor memory_dir is an in-container seed copy, not verified host upload or remote-memory clone.",
+    "AgentConfig.env does not establish bypass of Harbor's child-model route clamping.",
+    "The0.867 historical ratio excludes tasks not solved by both arms; all-trial primary ratio1.043 differs."
+  ],
+  "limitations": [
+    "Source review is not a pilot, local installation or upstream native test.",
+    "No release/adoption or permission change follows from the record."
+  ]
+}

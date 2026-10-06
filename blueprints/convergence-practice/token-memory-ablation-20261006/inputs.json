@@ -1,0 +1,114 @@
+{
+  "schema_version": 1,
+  "kind": "ablation_input_freeze",
+  "base_revision": "c1300c15b42f1a6643f3dc4172f40c01d99abdcd",
+  "token_components": [
+    "rtk",
+    "context-mode",
+    "headroom",
+    "jcodemunch-mcp",
+    "qmd",
+    "serena",
+    "socraticode",
+    "semble",
+    "repomix",
+    "toon",
+    "ast-grep",
+    "codebase-memory-mcp",
+    "context-hub",
+    "markitdown",
+    "token-lane-carriers"
+  ],
+  "token_component_pins": "Exact version/source/route tuples in the frozen current install-plan owner rows; no live-latest substitution. Semble/SocratiCode remain separately named interim code-search arms.",
+  "shared_measurement_components": [
+    "ccusage",
+    "agentsview",
+    "claude-hud",
+    "otel-tui",
+    "opentelemetry-collector-contrib",
+    "prometheus",
+    "loki",
+    "grafana",
+    "omniroute",
+    "mcporter"
+  ],
+  "memory_component": {
+    "name": "ai-memory",
+    "version": "2.5.2",
+    "source_revision": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83",
+    "selection": "install-plan interim, pending separate head-to-head",
+    "interfaces": [
+      "MCP",
+      "capture hooks",
+      "startup/handoff output"
+    ]
+  },
+  "source_artifacts": [
+    {
+      "path": "manifests/stack.json",
+      "sha256": "3ca8f36178c4e61c9f8241fd6eb045172a9e66c38da5f4943b4532fc42f94a72"
+    },
+    {
+      "path": "adoption/pins-linux-x86_64.json",
+      "sha256": "804eba0e086670c75e6b2f3725734477914318987c99fb90195680188be337c9"
+    },
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json",
+      "sha256": "d41152f460c475e6dabe0d8c144e7bd0ef59c0181835afbbba58a6eed445e81a"
+    },
+    {
+      "path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+      "sha256": "81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e"
+    },
+    {
+      "path": "scripts/host_receipts.py",
+      "sha256": "c3dc47cdab33e2ed2f1473700774a006a34c6218d6cd7ceb36f33d7f71f0fd6f"
+    },
+    {
+      "path": "docs/harness-defaults.md",
+      "sha256": "6857b6116387ceecdb7bfe821cfd2e44e98d25197064fbc4097adebf0fa5eccd"
+    },
+    {
+      "path": "catalogs/us-equities/README.md",
+      "sha256": "2bd80b8c4b9fe96f1cf42356f3bad3e169f38926c85462330475335c255ea215"
+    },
+    {
+      "path": "catalogs/us-equities/agents-operations.md",
+      "sha256": "a765c37d0d689de51920e742686f5ffa2adfecd606f99b2b963fd5450ad40363"
+    },
+    {
+      "path": "catalogs/us-equities/lifecycle-source-review.md",
+      "sha256": "c84c656f51d0f10003a9563b0730f47073a781ddb93facf891ef45a1e9cfc89a"
+    },
+    {
+      "path": "catalogs/us-equities/native-workflows.md",
+      "sha256": "efa0e68d34acfb790018eeb9a55c3d4e6c2eb9de4c7197cf3de3edcbbbd97768"
+    },
+    {
+      "path": "catalogs/us-equities/foundation-memory.md",
+      "sha256": "effe53a745b895b1683634bf0e174a62012a0bb62d2f173d40582cea2476f7d9"
+    },
+    {
+      "path": "docs/token-efficiency-stack.json",
+      "sha256": "172d1d75458d9af2c24f1a1f63615fbaa34dc6abaf9428c58d6cacee3ec58b95"
+    },
+    {
+      "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+      "sha256": "5cab5a09a793a78bc48ac4d31d9ec2b409d75c58831b06426dae41776db4ba05"
+    },
+    {
+      "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json",
+      "sha256": "a8e37af489566ef8ec25a33dfe9041cb64d2bc32e91959a9226bd9c2ec1c8fa6"
+    }
+  ],
+  "execution_release_gate": [
+    "Command-center ACK of exact frozen head",
+    "Harbor0.24.0 isolated qualification, native rootless environment acceptance",
+    "Exact arm-local declarative settings/skills/MCP/bin exposure map and hashes, resolved upstream job/task locks",
+    "Pinned statistical implementation and counterbalanced order; no post-outcome refreeze",
+    "Actual requested/observed parent+child model/effort mapping",
+    "No credential reading/copying; existing approved transport only",
+    "Complete native/provider role/attempt coverage, failed-answer and missing-child controls"
+  ],
+  "observed_runs": 0
+}

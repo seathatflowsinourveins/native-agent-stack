@@ -1,0 +1,253 @@
+{
+  "schema_version": 1,
+  "kind": "convergence_experiment",
+  "status": "planned",
+  "lane": "native-agent-engineering",
+  "task_and_failure": "Frozen public multi-agent metadata/code answers; component invocation does not establish complete provider-token savings or equal quality.",
+  "primary_sources_and_pins": [
+    {
+      "url": "https://github.com/harbor-framework/harbor",
+      "revision": "b53b8134e1241686dca7759af188f987ecc48e8b"
+    },
+    {
+      "url": "https://github.com/akitaonrails/ai-memory",
+      "revision": "7580b74d0fb9d14a6d949dc92f5ea8bb7feb3c83"
+    },
+    {
+      "url": "https://github.com/scipy/scipy",
+      "revision": "e4e854eaa8f18d807cd3496028e257e36caa93cc"
+    },
+    {
+      "url": "https://github.com/seathatflowsinourveins/native-agent-stack",
+      "revision": "c1300c15b42f1a6643f3dc4172f40c01d99abdcd"
+    }
+  ],
+  "discovery_provenance": [
+    "Owner-requested F-token/F-memory fresh-session ablation; before census records invokes only.",
+    "Existing full/lean/removal protocol and historical Harbor prior reopened for multi-agent lineage and complete usage."
+  ],
+  "license_and_compatibility": "Official pinned upstream harness/client interfaces; retain each component's current license. Local public fixtures and sanitised census projection. Native profiles/transport/rootless environment remain qualification gates.",
+  "baseline_and_candidate": {
+    "baseline": "T-full",
+    "candidate": "T-full-minus-jcodemunch-mcp"
+  },
+  "frozen_inputs": {
+    "base_revision": "c1300c15b42f1a6643f3dc4172f40c01d99abdcd",
+    "tasks": [
+      "claude-code.seed-catalog-history-1",
+      "codex.seed-catalog-history-1",
+      "claude-code.seed-catalog-history-2",
+      "codex.seed-catalog-history-2",
+      "claude-code.seed-catalog-history-3",
+      "codex.seed-catalog-history-3",
+      "claude-code.seed-catalog-history-4",
+      "codex.seed-catalog-history-4",
+      "claude-code.seed-catalog-history-5",
+      "codex.seed-catalog-history-5",
+      "claude-code.seed-log-symbol-1",
+      "codex.seed-log-symbol-1",
+      "claude-code.seed-log-symbol-2",
+      "codex.seed-log-symbol-2",
+      "claude-code.seed-log-symbol-3",
+      "codex.seed-log-symbol-3",
+      "claude-code.seed-log-symbol-4",
+      "codex.seed-log-symbol-4",
+      "claude-code.seed-log-symbol-5",
+      "codex.seed-log-symbol-5",
+      "claude-code.seed-main-output",
+      "codex.seed-main-output",
+      "claude-code.seed-agent-path",
+      "codex.seed-agent-path"
+    ],
+    "roles": [
+      "preparation",
+      "native-parent",
+      "evidence-child",
+      "verification-child",
+      "grading-review",
+      "auxiliary-model-calls"
+    ],
+    "sources": [
+      {
+        "path": "blueprints/convergence-practice/token-memory-ablation-20261006/inputs.json",
+        "sha256": "b43fd2d59a528d37c62bf2528c66c75a0c078be88e063786ae42334ad7660a81"
+      },
+      {
+        "path": "blueprints/convergence-practice/token-memory-ablation-20261006/source-review.json",
+        "sha256": "1904a8f56e969fb31aef8ecbb5cb279fe46a975e3a2045c57c9604a7c4f33ac1"
+      },
+      {
+        "path": "blueprints/convergence-practice/token-memory-ablation-20261006/component-pins.json",
+        "sha256": "c05ab7b1c899f5b854314d73e918ec82563fde3a6065f7ea0b364723bf9f4e8a"
+      },
+      {
+        "path": "evidence/artifacts/token-adoption-e2e-20260926/preregistration.json",
+        "sha256": "d41152f460c475e6dabe0d8c144e7bd0ef59c0181835afbbba58a6eed445e81a"
+      },
+      {
+        "path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+        "sha256": "81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e"
+      },
+      {
+        "path": "scripts/host_receipts.py",
+        "sha256": "c3dc47cdab33e2ed2f1473700774a006a34c6218d6cd7ceb36f33d7f71f0fd6f"
+      },
+      {
+        "path": "docs/harness-defaults.md",
+        "sha256": "6857b6116387ceecdb7bfe821cfd2e44e98d25197064fbc4097adebf0fa5eccd"
+      },
+      {
+        "path": "catalogs/us-equities/README.md",
+        "sha256": "2bd80b8c4b9fe96f1cf42356f3bad3e169f38926c85462330475335c255ea215"
+      },
+      {
+        "path": "catalogs/us-equities/agents-operations.md",
+        "sha256": "a765c37d0d689de51920e742686f5ffa2adfecd606f99b2b963fd5450ad40363"
+      },
+      {
+        "path": "catalogs/us-equities/lifecycle-source-review.md",
+        "sha256": "c84c656f51d0f10003a9563b0730f47073a781ddb93facf891ef45a1e9cfc89a"
+      },
+      {
+        "path": "catalogs/us-equities/native-workflows.md",
+        "sha256": "efa0e68d34acfb790018eeb9a55c3d4e6c2eb9de4c7197cf3de3edcbbbd97768"
+      },
+      {
+        "path": "catalogs/us-equities/foundation-memory.md",
+        "sha256": "effe53a745b895b1683634bf0e174a62012a0bb62d2f173d40582cea2476f7d9"
+      },
+      {
+        "path": "docs/token-efficiency-stack.json",
+        "sha256": "172d1d75458d9af2c24f1a1f63615fbaa34dc6abaf9428c58d6cacee3ec58b95"
+      },
+      {
+        "path": "evidence/artifacts/new-wsl-install-plan-20261002/install-plan.json",
+        "sha256": "5cab5a09a793a78bc48ac4d31d9ec2b409d75c58831b06426dae41776db4ba05"
+      },
+      {
+        "path": "evidence/receipts/harbor-e2e-token-tools-20260930.json",
+        "sha256": "a8e37af489566ef8ec25a33dfe9041cb64d2bc32e91959a9226bd9c2ec1c8fa6"
+      },
+      {
+        "path": "manifests/stack.json",
+        "sha256": "3ca8f36178c4e61c9f8241fd6eb045172a9e66c38da5f4943b4532fc42f94a72"
+      },
+      {
+        "path": "adoption/pins-linux-x86_64.json",
+        "sha256": "804eba0e086670c75e6b2f3725734477914318987c99fb90195680188be337c9"
+      },
+      {
+        "path": "adoption/hooks/claude/token-lanes-block.builder.md",
+        "sha256": "2f7a53031e6eabf6b9d08989b619b74204fa36dac2559e520fb72b06225a81d3"
+      },
+      {
+        "path": "adoption/hooks/claude/token-lanes-block.main.md",
+        "sha256": "9fdb10a34f2c2e313ca5c986d7682f30c934329e820e0b29cb3950f109b51b15"
+      },
+      {
+        "path": "adoption/hooks/claude/token-lanes-block.md",
+        "sha256": "dcd6996e9247f3c8f3d543545eb958518236b21449492ddf92721590aa3f60c8"
+      },
+      {
+        "path": "adoption/hooks/claude/token-lanes-block.researcher.md",
+        "sha256": "149ac69352a788ad67c84b4d545cab461015c4e73a9ba4c8675259402c955e4a"
+      },
+      {
+        "path": "adoption/hooks/claude/token-lanes-block.reviewer.md",
+        "sha256": "ec7c6b2a80c58e0156daab25b7cfd4eea6f2e3eac77137067051601045f9d2f8"
+      },
+      {
+        "path": "adoption/hooks/claude/token-lanes-block.scout.md",
+        "sha256": "81784c2edc0cc95c0c0eb3b443b5b228dd41e970236239553c66af90ddfc7eae"
+      },
+      {
+        "path": "adoption/hooks/claude/token-lanes-block.verifier.md",
+        "sha256": "a2eb3298126efd82622150e5717f10eb700f4aa3076d027c86ae1fe653f29eb0"
+      },
+      {
+        "path": "adoption/hooks/claude/token-lanes-session-start.py",
+        "sha256": "e6e3151d27e439a9392e1f3673f1168b6fb60a9c8b8616af01fff2b163757839"
+      },
+      {
+        "path": "adoption/hooks/claude/token-lanes-subagent-start.py",
+        "sha256": "81e28a7c2f5429301d3306dc5ee0ecf809c67ccded62a43a98281baa8f92fedd"
+      }
+    ],
+    "inputs": [
+      {
+        "path": "blueprints/convergence-practice/token-memory-ablation-20261006/tasks.json",
+        "sha256": "2f97a74c1165784ce61650cd7b429714d7e258a50a5f7d6c610ff329b1f298ac"
+      },
+      {
+        "path": "blueprints/convergence-practice/token-memory-ablation-20261006/organic-census.json",
+        "sha256": "c16bacc3e2682abbe67970809f2a37746bfce5be2c4935ff497c80bab43242f5"
+      }
+    ],
+    "evaluation": [
+      {
+        "path": "blueprints/convergence-practice/token-memory-ablation-20261006/preregistration.md",
+        "sha256": "a63ef4e212eb695adc715bbdba46b9de30a45550a8369fbd4997ac615bdf04a0"
+      },
+      {
+        "path": "evidence/artifacts/token-adoption-e2e-20260926/fixtures/events.jsonl",
+        "sha256": "81ef838c18cc81006269024e7270b991dbdfcb72bf223dec324f2fba9307930e"
+      },
+      {
+        "path": "scripts/host_receipts.py",
+        "sha256": "c3dc47cdab33e2ed2f1473700774a006a34c6218d6cd7ceb36f33d7f71f0fd6f"
+      }
+    ]
+  },
+  "predeclared_metrics": {
+    "quality_rule": "Exact output-only factual and source/AST oracle in the frozen preregistration and tasks. Preserve wrong/empty negative controls. Conservative paired discordance quality bounds; small exploratory corpus cannot qualify confirmatory efficiency.",
+    "usage_rule": "Failure-inclusive complete provider tokens per accepted task; all preparation,parent,child,auxiliary,review,retry calls. Disjoint input categories and inclusive output; unknown remains null. Task-cluster intervals, fixed multiplicity and margins per frozen preregistration. No invokes-to-savings conversion."
+  },
+  "runtime_and_platform": {
+    "platform": "Owned isolated Linux rootless trial state; actual host identity remains private.",
+    "tools": [
+      {
+        "name": "harbor",
+        "version": "0.24.0 source-reviewed candidate; qualification pending"
+      },
+      {
+        "name": "claude-code",
+        "version": "2.1.291 observed installed; actual trial pin must match release pack"
+      },
+      {
+        "name": "codex-cli",
+        "version": "0.160.1 observed installed; actual trial pin must match release pack"
+      },
+      {
+        "name": "scipy",
+        "version": "1.18.1 frozen analysis source; runtime not qualified"
+      }
+    ],
+    "isolation": "Independent resettable trial-local client settings, repository snapshot, MCP indexes/memory namespaces and inboxes. No shared settings or credential-file copying. Native cache preserved and observed."
+  },
+  "commands": [
+    "harbor run --config sealed-job.json --print-config",
+    "harbor run --config sealed-job.json"
+  ],
+  "observations": [],
+  "failures_and_skips": [],
+  "limitations": [
+    "Preregistration/source review only; no pilot or outcome.",
+    "Command-center ACK, exact native job/profile freeze, isolated upstream qualification and discriminating child/provider reconciliation required before execution.",
+    "Small public task slice cannot establish preregistered confirmatory quality margins; full matrix requires explicit exploratory approval or larger frozen corpus.",
+    "Enclosing preregistration/research usage is unknown and excluded; no whole-session or lifetime saving is claimed.",
+    "Harbor Codex one-rollout import cannot alone prove complete child usage; native unresolved transport/accounting blocks that family."
+  ],
+  "decision_and_scope": {
+    "decision": "trial",
+    "scope": "token-memory-ablation-20261006/token-minus-jcodemunch-mcp",
+    "qualification_run_ids": []
+  },
+  "rollback": "Keep accepted owner defaults and shared state intact; discard only the future owned trial state through its native cleanup after retained evidence.",
+  "next_decision_changing_test": "Exact-head CC ACK of the freeze, then isolated harness/profile/accounting qualification and the scoped discriminating pilot; no experiment starts from this record alone.",
+  "usage_assessment": {
+    "claim": "none",
+    "coverage": "partial",
+    "expected_run_ids": [],
+    "coverage_artifact": null
+  }
+}
