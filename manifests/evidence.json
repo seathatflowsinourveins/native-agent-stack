@@ -17438,8 +17438,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-harness-context-budget-refresh.md",
-      "sha256": "af2bcb90307943b619cb7791cec66ff502b9f9a84689679b30e36cf6124cc768",
-      "bytes": 7428
+      "sha256": "458384923606322df77c216e51358c162de5203e75da3ce47bb590d56486c1a9",
+      "bytes": 7698
     },
     {
       "path": "docs/decisions/2026-10-06-hcom-relaxation.md",
@@ -17448,8 +17448,8 @@
     },
     {
       "path": "docs/decisions/2026-10-06-one-host-tool-default.md",
-      "sha256": "4123f2e22192d43fe0226b0e49ce5d625a0ffe1c6e0dbba3b65515d871b3f8b7",
-      "bytes": 11333
+      "sha256": "f5bad3e1a844cd540eeb00b33e8d6355487f526be1d26fbdc2de467042d12a49",
+      "bytes": 18825
     },
     {
       "path": "docs/decisions/2026-10-06-sharp-live-relock-frozen-variant.md",
@@ -40902,9 +40902,14 @@
       "bytes": 23333
     },
     {
+      "path": "evidence/artifacts/ns2604-context-audit-20261006/resolver-assignment.json",
+      "sha256": "003c7819956d4633e1768be258f4e76eaecffd0f8804471799a27290b6ba2505",
+      "bytes": 783
+    },
+    {
       "path": "evidence/artifacts/ns2604-context-audit-20261006/review.json",
-      "sha256": "6c99336e7539d37ae9db7974a51e34238c5ad2aaf21aacbee92b056c7ba6302b",
-      "bytes": 8308
+      "sha256": "4f852add6729758d147ac08b5108f6fdfd15e76277d702c442598aac74c989b8",
+      "bytes": 8310
     },
     {
       "path": "evidence/artifacts/ns2604-e2e-20261004/adjudication-prompt.md",
