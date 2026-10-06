@@ -249,6 +249,16 @@
         "docs/new-wsl-handbook.json": "c49d7d2457692e6d3895cd0896ed601d81d55a90b2f3dd9ff27cec6116da7a16"
       },
       "check": "python3 scripts/build_new_wsl_handbook.py --check"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "maintained build_new_wsl_handbook.render() applied by native editor",
+      "cause": "Bounded J-723 hcom custom posture supersession; no new orchestration or host acceptance.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "dd5470428ff575f37568c72b7f72388250733601b35ebeb0680d4a05af7adde1",
+        "docs/new-wsl-handbook.json": "ebeddaa35a2c803e4ec710dda918cbca84c5a7fe412773775123bba0bd774bcb"
+      },
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
     }
   ]
 }
