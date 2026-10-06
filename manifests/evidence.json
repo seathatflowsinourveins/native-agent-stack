@@ -5247,13 +5247,13 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/experiment-macos-20260924.json",
-      "sha256": "eb2ceb9c57ed3f11125a5091a85bf19dcb10e364dfb2b67d8c1b444970b300f3",
-      "bytes": 25990
+      "sha256": "a570469dde6b81515348892eb064a0136e5f84be7680f940ef87a4790bee627b",
+      "bytes": 26007
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/experiment.json",
-      "sha256": "9372ee1635b6c818ca31fc3d73d33802d85293218bcea7467c4fc5aebbd43ec9",
-      "bytes": 11094
+      "sha256": "fc24bcf6af67d39e368fa0ac111e7cc4eacfa833d47fb68ebf06363b2abc4f8c",
+      "bytes": 11111
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/freeze.json",
@@ -5291,14 +5291,24 @@
       "bytes": 32972
     },
     {
+      "path": "blueprints/convergence-practice/application-delivery/history/pnpm-lock.ecfa1127.yaml",
+      "sha256": "866ae6c5246832ed6446c106ec657dd3acdb1a59fc6ba7517d4c7573fb530fd4",
+      "bytes": 32972
+    },
+    {
       "path": "blueprints/convergence-practice/application-delivery/history/recipe-revisions.json",
-      "sha256": "845b07ff640a7108d5f604d951be424ac2f8df4ae7944fede225379b6b56a05a",
-      "bytes": 11694
+      "sha256": "fc54e659bd9c4ccd97188e3dc9a05aa9cc4145e45d1e228401be8ca093c2aa84",
+      "bytes": 16245
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/history/serve.cabbe2c.py",
       "sha256": "e3e59b5315d5f2b3c2fe863cdecabfd9f7ffd1977a83d332331a10e33a42a14e",
       "bytes": 1842
+    },
+    {
+      "path": "blueprints/convergence-practice/application-delivery/history/uv.lock.ecfa1127",
+      "sha256": "552d8834e745d7c91daa15e47c5f6d0cd9063db18c98790d2f1af05038f7417d",
+      "bytes": 73451
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/migration-rollback.json",
@@ -5462,8 +5472,8 @@
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/test_portability.py",
-      "sha256": "13b18b0a4e29e41338778852dae877952f92df26fbfe56fbfb496dce1eb54947",
-      "bytes": 6802
+      "sha256": "495033afa1e0670c656b40ca47f72855f688f2d79124414458ef93ea9b50af5d",
+      "bytes": 7614
     },
     {
       "path": "blueprints/convergence-practice/application-delivery/tsconfig.json",
@@ -17255,6 +17265,11 @@
       "path": "docs/decisions/2026-10-05-typesafe-sdk-transport.md",
       "sha256": "d197ab297186fe55e6c83624c78a06ead264e00d66a7fe2d5e62cfc1b653dbd6",
       "bytes": 9226
+    },
+    {
+      "path": "docs/decisions/2026-10-06-application-input-binding-amendment.md",
+      "sha256": "c12885d5d078f88cf6784d539e5b8261545a759b7aba8ff1eba566fb5d6366fb",
+      "bytes": 3660
     },
     {
       "path": "docs/direct-results.md",
@@ -42962,6 +42977,16 @@
       "bytes": 195
     },
     {
+      "path": "evidence/artifacts/pr765-bindings-amendment-20261006/historical/experiment-macos-20260924.json.source.txt",
+      "sha256": "eb2ceb9c57ed3f11125a5091a85bf19dcb10e364dfb2b67d8c1b444970b300f3",
+      "bytes": 25990
+    },
+    {
+      "path": "evidence/artifacts/pr765-bindings-amendment-20261006/historical/experiment.json.source.txt",
+      "sha256": "9372ee1635b6c818ca31fc3d73d33802d85293218bcea7467c4fc5aebbd43ec9",
+      "bytes": 11094
+    },
+    {
       "path": "evidence/artifacts/pra-u1-differential-20260929/README.md",
       "sha256": "48a1760f276c42d4d4b74dad240bbaa899068e197237697db8b29a18f0863a0b",
       "bytes": 36809
@@ -52880,6 +52905,11 @@
       "path": "evidence/receipts/portable-userspace-install-20260921.json",
       "sha256": "9d138ccc152d7e110b71e957f55d17a4464fbb29862bc9b2050e4e9df8bbc662",
       "bytes": 12703
+    },
+    {
+      "path": "evidence/receipts/pr765-bindings-amendment-20261006.json",
+      "sha256": "2d244c6967bed30a335bf671803857acd08939b2595cab400d1a76b15b99f485",
+      "bytes": 5094
     },
     {
       "path": "evidence/receipts/pre-2020-delisting-coverage.json",
