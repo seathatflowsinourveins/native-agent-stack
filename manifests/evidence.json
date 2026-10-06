@@ -17277,6 +17277,11 @@
       "bytes": 3660
     },
     {
+      "path": "docs/decisions/2026-10-06-codex-codenav-parity-proposal.md",
+      "sha256": "75c784b870fd798d0acaf47729c301585fa79a988650a4265e73e86fc0c7c019",
+      "bytes": 14276
+    },
+    {
       "path": "docs/direct-results.md",
       "sha256": "12a511fee11f22c90b9b622701d5485be9c8247167102b5768d694244f939a5b",
       "bytes": 4022
@@ -18775,6 +18780,11 @@
       "path": "evidence/artifacts/cloudflare-audit-skill-trial-20260927/delta.json",
       "sha256": "a9acbb84eeb8b2a8f9c17c05bf8242d3e437160fe6441c0037fd2d5957ee3dca",
       "bytes": 52669
+    },
+    {
+      "path": "evidence/artifacts/codenav-parity-20261006/summary.json",
+      "sha256": "361f9867de3fc695b83449e163c5c0890ebf66f5093b4bb93740400fd32c1604",
+      "bytes": 5233
     },
     {
       "path": "evidence/artifacts/codeql-quality-measure-20260927/README.md",
