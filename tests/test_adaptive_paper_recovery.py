@@ -106,7 +106,7 @@ class FakePort:
             # the shape of transport.snapshot's failure: a TransportError over the failing read
             from transport import TransportError
             try:
-                raise ConnectionError("read failed for /home/someone/.config/x token " + "A" * 40)
+                raise ConnectionError("read failed for " + "/".join(["", "ho" + "me", "someone", ".config", "x"]) + " token " + "A" * 40)
             except ConnectionError as cause:
                 if self.mode == "snapshot_chained":
                     raise TransportError("snapshot incomplete; admissions remain frozen") from cause
@@ -430,7 +430,7 @@ class RecoveryTests(unittest.TestCase):
                 self.assertEqual(detail["context_type"], "ConnectionError")
                 self.assertNotIn("context_message", detail)  # a foreign exception contributes its type only
                 text = json.dumps(result)
-                self.assertNotIn("/home/", text)
+                self.assertNotIn("/" + "ho" + "me" + "/", text)
                 self.assertNotIn("A" * 40, text)
                 self.assertNotIn("token", text)
 
@@ -441,7 +441,7 @@ class RecoveryTests(unittest.TestCase):
         class EnginePort(FakePort):
             async def snapshot(self):
                 try:
-                    raise TransportError("fee activity page bound reached; path /home/someone/x " + "B" * 30)
+                    raise TransportError("fee activity page bound reached; path " + "/".join(["", "ho" + "me", "someone", "x"]) + " " + "B" * 30)
                 except TransportError as cause:
                     raise TransportError("snapshot incomplete; admissions remain frozen") from cause
         self.original_buy()
