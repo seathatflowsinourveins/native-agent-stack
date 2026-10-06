@@ -50,7 +50,7 @@
   "tests/test_adaptive_paper_mover.py": "76cebfa31f08b93a84965297b2f82ba8fa898b2de7d9b0cf5e65ca0feed87912",
   "tests/test_adaptive_paper_mover_native.py": "ce89aa0ae3447017ae56778f19687d819a2f0701052cf4d780a650c37e0d4003",
   "tests/test_adaptive_paper_native.py": "728458624788243abcaf653f6a20a5a6201cfa9ec3328e8d7eb3fd58fdfa94b0",
-  "tests/test_adaptive_paper_recovery.py": "08ef6bd6353c6fd4d4c6aa740ba394f6e562562cca4b082937d4518bb2c9ed1a",
+  "tests/test_adaptive_paper_recovery.py": "c21c8664297f4c23d25f69e4bf88bb5df109f160dc68d0419021b8deca43b539",
   "tests/test_adaptive_paper_runner.py": "a0e65fdf868869e61ff32c443213350ca9bb7e99366632b0417805141161a7a0",
   "tests/test_adaptive_paper_safety.py": "dda093e5428a58ac667ae4d9a620acbf7ee78b8b26db83fccf08b530f1e58c7e",
   "tests/test_adaptive_paper_selector.py": "27b431ac7911372d050f25d32ac24a3df9d2cf3c5e7dafdebfe51db6cab55936",

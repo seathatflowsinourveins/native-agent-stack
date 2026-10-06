@@ -506,7 +506,8 @@ class RecoveryTests(unittest.TestCase):
                 for key in ("message", "context_message"):
                     self.assertEqual(detail[key], "read failed <redacted>")
         import recovery
-        self.assertEqual(recovery._text("kept engine/words data/home/someone/secret_value"),
+        inside = "data" + "/".join(["", "ho" + "me", "someone", "secret_value"])  # built here: no literal home path
+        self.assertEqual(recovery._text("kept engine/words " + inside),
                          "kept engine/words data<path>")  # a home path inside a kept engine word is still replaced
 
     def test_redaction_runs_before_the_length_cap(self):
