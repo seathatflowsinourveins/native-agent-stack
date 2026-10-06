@@ -57,10 +57,16 @@ BASH32 = os.environ.get("BASH32_BINARY") if os.environ.get("BASH32_BINARY") and 
 # Claude-Code-only skill to read and never run. Previous value: 9c34fa7211bc…f14b.
 # 2026-10-03: the Skills paragraph of common and common_v2 drops semgrep (retired) and agent-browser (held) with the
 # wave-2 skills ruling, changes 1 and 3 (build_args.TEMPLATE_SKILLS). Previous value: b61956f351f5…726d.
-PROMPTS_SHA256_CURRENT = "a57b659ddc5738728ae25848979561ce84dd24139dd6ff05858ccaffa38cf5e2"
+# 2026-10-06: source-order/history/currency instructions; prior change-detector value retained below.
+PROMPTS_SHA256_CURRENT_PRE_20261006 = "a57b659ddc5738728ae25848979561ce84dd24139dd6ff05858ccaffa38cf5e2"
+# Unknown historical references require fresh adjudication; the pre-clarification detector remains retained.
+PROMPTS_SHA256_CURRENT_PRE_CLARIFICATION_20261006 = "a26bc54fb0b726072aac9f9f14129f90041d335c02841900e130a6bf23061f21"
+PROMPTS_SHA256_CURRENT = "836ebebb764ff6f9c15b64183cd902488baa5d9a5dceaabcd04db6da08e274b5"
 # Future U11 A/B source contract, filled with the same fixture values. This is not an activated runner's receipt.
 # 2026-10-03: the same Skills paragraph change in common_v2. Previous value: 67e3adfa24fd…e525.
-PROMPTS_SHA256_V2_CURRENT = "fab3672aac7490dd223fcadee194510055a64864fbe745fd05f9240cb8fc9191"
+# 2026-10-06: source-order/history/currency instructions; prior change-detector value retained below.
+PROMPTS_SHA256_V2_CURRENT_PRE_20261006 = "fab3672aac7490dd223fcadee194510055a64864fbe745fd05f9240cb8fc9191"
+PROMPTS_SHA256_V2_CURRENT = "fd568c5000e3eba5866b9bd2943d6d3680475cea89dc7fe509ce58a9453af5b5"
 # The same change detector for a skills run (filled with the same 2026-09-26 values and modality "skills"): discover
 # and critic are discover_skills and critic_skills, and facts and fit end in modality_skills. The skills templates name
 # the layer input's known_skills (installed and excluded skills as the manifest states them); the first value,
@@ -71,7 +77,11 @@ PROMPTS_SHA256_V2_CURRENT = "fab3672aac7490dd223fcadee194510055a64864fbe745fd05f
 # Later on 2026-09-30: common's Skills paragraph names skill-creator (see PROMPTS_SHA256_CURRENT). Previous value:
 # 2c2efbaed4d9…63d3. 2026-10-03: common's Skills paragraph drops semgrep and agent-browser (see PROMPTS_SHA256_CURRENT).
 # Previous value: a76ee858fe65…b460.
-PROMPTS_SHA256_SKILLS_CURRENT = "dabae268b07a8bc8c9b3dd1e7770a7f8dc181b40f77c06a3775591f56f280291"
+# 2026-10-06: source-order/history/currency instructions; prior change-detector value retained below.
+PROMPTS_SHA256_SKILLS_CURRENT_PRE_20261006 = "dabae268b07a8bc8c9b3dd1e7770a7f8dc181b40f77c06a3775591f56f280291"
+# Unknown historical references require fresh adjudication; the pre-clarification detector remains retained.
+PROMPTS_SHA256_SKILLS_CURRENT_PRE_CLARIFICATION_20261006 = "c6877773682d52d82b813d02c7ffbc13618a552b2b4bdbe86fce9ba2fc31b415"
+PROMPTS_SHA256_SKILLS_CURRENT = "defaa7f110bc19f8575cd44c86c91936cb6b579f5467a86b40cbb57fc7e5345f"
 # The 2026-09-26 run's own value, kept in that run's record (evidence/artifacts/landscape-sweep-20260926/README.md);
 # fixtures below use it as a historical run's recorded prompts_sha256.
 PROMPTS_SHA256_20260926 = "3adfbed7a83e85da3fd7951032e1fa3a579101772a47b211580065c6b42618d4"
@@ -495,7 +505,8 @@ class BuildInputsTests(unittest.TestCase):
         alpha = json.loads((self.work / "inputs/alpha.json").read_text())
         beta = json.loads((self.work / "inputs/beta.json").read_text())
         # Slugs keep repositories that end in t, i, g or a dot (the prototype's rstrip(".git") cut them).
-        self.assertEqual(alpha["known_repositories"], ["cli/cli", "facebook/react", "sharkdp/bat", "tauri-apps/tauri"])
+        self.assertEqual(alpha["known_repositories"], ["cli/cli", "facebook/react", "o/r", "o/s", "sharkdp/bat",
+                                                      "tauri-apps/tauri"])
         self.assertEqual(alpha["previous_sweep"], {"sweep_id": "sw-1", "survived": ["https://github.com/o/s"],
                                                    "refuted": ["https://github.com/o/r"]})
         self.assertEqual((alpha["requirement_sha256"], alpha["platform_profiles_sha256"]), (REQ, PLAT))
@@ -680,7 +691,7 @@ class NeutralSchemaTests(unittest.TestCase):
             self.assertNotIn(candidate_name, v2["common"])
         self.assertIn("mandatory paid service", v2["fit"])
         self.assertIn("missing credentials", v2["fit"])
-        # Existing source strings and frozen V1 hashes remain the explicit historical lane contract.
+        # Current template change detectors move intentionally; recorded historical run hashes remain unchanged.
         self.assertEqual(sweep_common.prompts_sha256(filled_templates("2026-09-26", 32, "2026-09-25")),
                          PROMPTS_SHA256_CURRENT)
         self.assertEqual(sweep_common.prompts_sha256(filled_templates("2026-09-26", 32, "2026-09-25", "skills")),

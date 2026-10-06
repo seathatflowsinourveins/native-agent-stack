@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "kind": "source_review",
+  "as_of": "2026-10-06",
+  "scope": "future repository sweep discovery inputs and source-reading instructions",
+  "base_revision": "e28d0eec112527ac02659ac23753533b8ed39a73",
+  "north_star_action": "finish foundation discovery for US-equities research and historical simulation",
+  "research_gather": {
+    "runtime": "installed repository GPT Researcher runner",
+    "query": "October 2026 maintained repository discovery and release provenance practices",
+    "exit_code": 0,
+    "report_sha256": "d7a0e460ae1c797fa5183ca311a511ceaa5ed2bed0ecce83378a698eafd83f95",
+    "report_bytes": 40684,
+    "distinct_report_urls": 14,
+    "report_role": "leads only; broad provenance advice is not adopted as new workflow requirements",
+    "retained_retrieval_failures": [
+      {
+        "class": "DNSError",
+        "scope": "one search endpoint",
+        "raw_output_retained": "private complete gather log",
+        "public_sanitization": "local DNS suffix and raw endpoint diagnostics omitted"
+      }
+    ],
+    "provider_native_usage": null,
+    "usage_note": "unknown; the report and runner exit establish no provider-native usage or model-quality comparison"
+  },
+  "primary_sources_reread": [
+    "https://docs.github.com/en/rest/using-the-rest-api/best-practices-for-using-the-rest-api#follow-redirects",
+    "https://docs.github.com/en/repositories/creating-and-managing-repositories/renaming-a-repository",
+    "https://docs.github.com/en/rest/releases/releases#get-the-latest-release",
+    "https://docs.github.com/en/rest/git/refs#list-matching-references",
+    "native-agent-stack@e28d0eec112527ac02659ac23753533b8ed39a73:tools/sota-convergence/landscape-sweep/build_inputs.py:151-171,604-686,883-898",
+    "native-agent-stack@e28d0eec112527ac02659ac23753533b8ed39a73:scripts/saturation_ledger.py:625-676,707-710",
+    "native-agent-stack@e28d0eec112527ac02659ac23753533b8ed39a73:tools/sota-convergence/github_freshness.py:420-478",
+    "native-agent-stack@e28d0eec112527ac02659ac23753533b8ed39a73:tools/sota-convergence/build_manifest.py:252-285,1953-1958"
+  ],
+  "verification_scope": {
+    "source_review": true,
+    "candidate_execution": false,
+    "runtime_installation": false,
+    "version_2_runner_activation": false,
+    "historical_vote_rewrite": false,
+    "new_model_quality_measurement": false,
+    "upstream_acceptance": false
+  },
+  "limits": [
+    "Source reading does not establish engineering quality or native acceptance of a candidate.",
+    "The ledger K-derived discovery window does not change clean-sweep saturation or spacing semantics.",
+    "Unknown old vote references and changed scope remain historical context, not verified current refutations.",
+    "Official release/tag metadata does not establish supported installation or adoption.",
+    "Catalog comparisons and overturn conditions authorize no local comparison campaign."
+  ]
+}
