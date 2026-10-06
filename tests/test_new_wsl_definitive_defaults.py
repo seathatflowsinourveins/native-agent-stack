@@ -2503,6 +2503,275 @@ class FixwaveAcceptanceRepairs(unittest.TestCase):
     def row(self, slot):
         return next(r for r in load(PLAN / "install-plan.json")["owners"] if r["slot"] == slot)
 
+    def test_hcom_start_capture_selects_one_native_base_name(self):
+        # hcom@2c5f343: start.rs:843-848 deliberately repeats the marker;
+        # tests/support/mod.rs:949-959 selects its first occurrence.
+        command = self.row("agent-messaging")["acceptance"]["post_install"]["command"]
+        begin = command.index('sender="$(')
+        end = command.index('\n"${isolated[@]}" "$hcom_binary" send "@$recipient"')
+        selection = command[begin:end]
+        cases = [
+            ("repeated bootstrap", "[hcom:nova]\nbootstrap\n[hcom:nova]\n",
+             "[hcom:luna]\nbootstrap\n[hcom:luna]\n", ("nova", "luna")),
+            ("native trim", "  [hcom:nova]\n[hcom:nova]\n", "\t[hcom:luna]\n", ("nova", "luna")),
+            ("native base characters", "[hcom:_7]\n[hcom:_7]\n", "[hcom:2lane]\n", ("_7", "2lane")),
+            ("trailing bootstrap", "[hcom:nova] continued\n[hcom:nova]\n", "[hcom:luna]\n", ("nova", "luna")),
+            ("empty capture", "", "[hcom:luna]\n", None),
+            ("empty marker", "[hcom:]\n", "[hcom:luna]\n", None),
+            ("invalid base", "[hcom:bad-name]\n", "[hcom:luna]\n", None),
+            ("uppercase base", "[hcom:Nova]\n", "[hcom:luna]\n", None),
+            ("first marker invalid", "[hcom:bad-name]\n[hcom:nova]\n", "[hcom:luna]\n", None),
+            ("same identity", "[hcom:nova]\n", "[hcom:nova]\n", None),
+            ("narrative marker", "bootstrap mentions [hcom:nova]\n", "[hcom:luna]\n", None),
+        ]
+        for name, sender, recipient, expected in cases:
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                (root / "sender.txt").write_text(sender)
+                (root / "recipient.txt").write_text(recipient)
+                env = {"PATH": os.environ["PATH"], "smoke": str(root), "TMPDIR": str(root)}
+                result = subprocess.run(
+                    ["bash", "-euo", "pipefail", "-c", selection + '\nprintf "%s\\n" "$sender" "$recipient"'],
+                    env=env, capture_output=True, text=True, timeout=10,
+                )
+                if expected is None:
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                else:
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(tuple(result.stdout.splitlines()), expected)
+
+    def test_skillspector_scans_bind_the_native_topology_model_and_keep_report_gates(self):
+        # Local integration fixture for the native SKILLSPECTOR_MODEL carrier.
+        # No Codex sign-in, scan provider, credential store or model is contacted.
+        command = self.row("skill-vetting")["acceptance"]["after_sign_in"]["command"]
+        self.assertIn('"$plan_dir/config/gpt-gateway-topology.json"', command)
+        cases = [
+            ("native", {"model_provider": "openai", "model": "fixture-native"}, "complete", "fixture-native"),
+            ("canonical change", {"model_provider": "openai", "model": "fixture-next"}, "complete", "fixture-next"),
+            ("empty", {"model_provider": "openai", "model": ""}, "complete", None),
+            ("missing model", {"model_provider": "openai"}, "complete", None),
+            ("wrong type", {"model_provider": "openai", "model": 42}, "complete", None),
+            ("wrong provider", {"model_provider": "omniroute", "model": "fixture-native"}, "complete", None),
+            ("incomplete malicious", {"model_provider": "openai", "model": "fixture-native"}, "bad-incomplete", None),
+            ("incomplete safe", {"model_provider": "openai", "model": "fixture-native"}, "safe-incomplete", None),
+            ("obsolete findings field", {"model_provider": "openai", "model": "fixture-native"}, "bad-legacy-field", None),
+            ("malformed issues", {"model_provider": "openai", "model": "fixture-native"}, "bad-issues-type", None),
+            ("safe no meta needed", {"model_provider": "openai", "model": "fixture-native"}, "safe-no-meta", "fixture-native"),
+            ("safe static only", {"model_provider": "openai", "model": "fixture-native"}, "safe-no-calls", None),
+            ("safe partial calls", {"model_provider": "openai", "model": "fixture-native"}, "safe-partial-calls", None),
+            ("safe boolean counters", {"model_provider": "openai", "model": "fixture-native"}, "safe-bool-calls", None),
+            ("safe findings", {"model_provider": "openai", "model": "fixture-native"}, "safe-issues", None),
+            ("malicious static only", {"model_provider": "openai", "model": "fixture-native"}, "bad-no-calls", None),
+            ("malicious partial calls", {"model_provider": "openai", "model": "fixture-native"}, "bad-partial-calls", None),
+            ("malicious missing meta", {"model_provider": "openai", "model": "fixture-native"}, "bad-no-meta", None),
+            ("safe degraded", {"model_provider": "openai", "model": "fixture-native"}, "safe-degraded", None),
+        ]
+        for name, route, report_case, expected in cases:
+            with self.subTest(name=name), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                binary = root / "bin"
+                binary.mkdir()
+                config = root / "plan/config"
+                config.mkdir(parents=True)
+                (config / "gpt-gateway-topology.json").write_text(json.dumps({
+                    "sol_max": route, "pool_fallback": {"model": "cx/fixture-unrelated", "model_reasoning_effort": "xhigh"},
+                }))
+                (binary / "codex").write_text("#!/bin/sh\n[ \"$*\" = 'login status' ]\n")
+                (binary / "uv").write_text("#!/bin/sh\n[ \"$*\" = 'tool dir' ] || exit 42\nprintf '%s\\n' \"$FIXTURE_UV_TOOLS\"\n")
+                (binary / "skillspector").write_text(
+                    "#!/usr/bin/env python3\nimport json,os,sys\nfrom pathlib import Path\n"
+                    "assert os.environ['SKILLSPECTOR_PROVIDER'] == 'codex_cli'\n"
+                    "args=sys.argv[1:]; bad='malicious_skill' in args[1]\n"
+                    "with open(os.environ['FIXTURE_CALLS'],'a') as f: f.write(json.dumps({'model':os.environ.get('SKILLSPECTOR_MODEL'),'bad':bad})+'\\n')\n"
+                    "case=os.environ['FIXTURE_REPORT_CASE']\n"
+                    "complete=not ((bad and case=='bad-incomplete') or (not bad and case=='safe-incomplete'))\n"
+                    "report={'analysis_completeness':{'is_complete':complete},'execution_successful':True,'issues':[{'fixture':True}] if bad else [],"
+                    "'metadata':{'llm_requested':True,'llm_available':True,'meta_analysis_applied':bad,'llm_calls_attempted':3,'llm_calls_succeeded':3}}\n"
+                    "if bad and case=='bad-legacy-field': report['findings']=report.pop('issues')\n"
+                    "if bad and case=='bad-issues-type': report['issues']='invalid'\n"
+                    "if not bad and case=='safe-no-calls': report['metadata'].update(llm_calls_attempted=0,llm_calls_succeeded=0)\n"
+                    "if not bad and case=='safe-partial-calls': report['metadata']['llm_calls_succeeded']=2\n"
+                    "if not bad and case=='safe-bool-calls': report['metadata'].update(llm_calls_attempted=True,llm_calls_succeeded=True)\n"
+                    "if not bad and case=='safe-issues': report['issues']=[{'fixture':True}]\n"
+                    "if bad and case=='bad-no-calls': report['metadata'].update(llm_calls_attempted=0,llm_calls_succeeded=0)\n"
+                    "if bad and case=='bad-partial-calls': report['metadata']['llm_calls_succeeded']=2\n"
+                    "if bad and case=='bad-no-meta': report['metadata']['meta_analysis_applied']=False\n"
+                    "if not bad and case=='safe-degraded': report['metadata']['llm_degraded']=True\n"
+                    "Path(args[args.index('--output')+1]).write_text(json.dumps(report))\n"
+                    "sys.exit(1 if bad else 0)\n"
+                )
+                for path in binary.iterdir():
+                    path.chmod(0o755)
+                tools = root / "uv-tools"
+                (tools / "skillspector/bin").mkdir(parents=True)
+                (tools / "skillspector/bin/python").symlink_to(sys.executable)
+                calls = root / "calls.jsonl"
+                env = {"PATH": str(binary) + os.pathsep + os.environ["PATH"], "TMPDIR": str(root),
+                       "plan_dir": str(root / "plan"), "config_root": str(root / "unpopulated-client-config"),
+                       "tool_root": str(root / "tools"), "XDG_STATE_HOME": str(root / "state"),
+                       "FIXTURE_UV_TOOLS": str(tools), "FIXTURE_CALLS": str(calls), "FIXTURE_REPORT_CASE": report_case}
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                                        env=env, capture_output=True, text=True, timeout=15)
+                observed = [json.loads(line) for line in calls.read_text().splitlines()] if calls.exists() else []
+                if expected is not None:
+                    self.assertEqual(result.returncode, 0, result.stderr)
+                    self.assertEqual(observed, [{"model": expected, "bad": True}, {"model": expected, "bad": False}])
+                else:
+                    self.assertNotEqual(result.returncode, 0, result.stdout)
+                    if report_case == "complete":
+                        self.assertEqual(observed, [], "Invalid topology reached a provider scan")
+
+    def test_conformance_release_cli_is_not_resolved_from_the_same_named_source_package(self):
+        # npm@bfacd33 libnpmexec:49-60 can select an unbuilt same-name checkout.
+        # Exercise the real row's working-directory transition with fixture CLIs.
+        command = self.row("mcp-protocol-conformance")["acceptance"]["post_install"]["command"]
+        probe = subprocess.run(["unshare", "--user", "--map-root-user", "--pid", "--fork", "--mount-proc",
+                                "--kill-child", "true"], capture_output=True, timeout=10)
+        if probe.returncode:
+            self.skipTest("Unprivileged namespace unavailable; native acceptance remains fail-closed")
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source = root / "tools/mcp-conformance-source-0.2.0-alpha.11"
+            source.mkdir(parents=True)
+            (source / "package.json").write_text(json.dumps({
+                "name": "@modelcontextprotocol/conformance", "version": "0.2.0-alpha.11",
+                "bin": {"conformance": "dist/index.js"},
+            }))
+            neutral = root / "plan"
+            neutral.mkdir()
+            (neutral / "config").mkdir()
+            (neutral / "config/mcp-conformance-accept.sh").write_bytes((PLAN / "config/mcp-conformance-accept.sh").read_bytes())
+            binaries = root / "bin"
+            binaries.mkdir()
+            for executable in ("npm", "npx"):
+                script = binaries / executable
+                script.write_text(
+                    "#!/usr/bin/env python3\nimport json,os,sys\nfrom pathlib import Path\n"
+                    "name=Path(sys.argv[0]).name; cwd=Path.cwd(); args=sys.argv[1:]\n"
+                    "with open(os.environ['FIXTURE_CALLS'],'a') as f: f.write(json.dumps({'tool':name,'args':args,'cwd':str(cwd)})+'\\n')\n"
+                    "if name=='npx' and (cwd/'package.json').is_file():\n"
+                    " print('conformance: not found (same-named source package)',file=sys.stderr); sys.exit(127)\n"
+                )
+                script.chmod(0o755)
+            calls = root / "calls.jsonl"
+            env = {"PATH": str(binaries) + os.pathsep + os.environ["PATH"], "TMPDIR": str(root),
+                   "tool_root": str(root / "tools"), "plan_dir": str(neutral), "FIXTURE_CALLS": str(calls),
+                   "HOME": os.environ["HOME"], "XDG_STATE_HOME": str(root / "state"), "XDG_CACHE_HOME": str(root)}
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                                    env=env, capture_output=True, text=True, timeout=15)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            observed = [json.loads(line) for line in calls.read_text().splitlines()]
+            self.assertEqual([c["args"] for c in observed if c["tool"] == "npm"],
+                             [["ci", "--ignore-scripts"], ["run", "check"], ["test"]])
+            release, = [c for c in observed if c["tool"] == "npx" and "list" in c["args"]]
+            self.assertEqual(release["cwd"], str(neutral))
+            self.assertEqual(release["args"], ["--offline", "--yes", "--ignore-scripts", "@modelcontextprotocol/conformance@0.2.0-alpha.11",
+                                               "list", "--requirements", "2026-07-28"])
+
+    def test_scout_scoped_dispatch_does_not_reinstall_the_inspect_owner(self):
+        text = (PLAN / "install.sh").read_text()
+        dispatch = text[text.index("if selected 'playwright-cli';"):]
+        for slot in ("trajectory-analysis", "inspect-ai"):
+            with self.subTest(slot=slot):
+                prelude = '''
+selected() { [[ "$only" == "$1" ]]; }
+named() { selected "$1"; }
+run_slot() { printf '%s\\n' "$1"; }
+measured_slot() { if selected "$1"; then run_slot "$1"; fi; }
+needs_docker=false
+failed=0
+'''
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", prelude + dispatch],
+                                        env={"PATH": os.environ["PATH"], "only": slot},
+                                        capture_output=True, text=True, timeout=10)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertEqual(result.stdout.splitlines(), [slot])
+
+    def test_scout_alias_migration_preserves_foreign_executables(self):
+        command = next(c for c in self.row("trajectory-analysis")["commands"] if "scout_alias=" in c)
+        cases = ("absent", "previous owner", "current owner", "foreign file", "foreign link", "dangling")
+        for case in cases:
+            with self.subTest(case=case), tempfile.TemporaryDirectory() as directory:
+                root = Path(directory)
+                binary = root / "bin"
+                binary.mkdir()
+                tools = root / "uv-tools"
+                for name in ("inspect-ai", "inspect-scout", "foreign"):
+                    (tools / name / "bin").mkdir(parents=True)
+                    (tools / name / "bin/scout").write_text("fixture")
+                alias = binary / "scout"
+                if case == "previous owner":
+                    alias.symlink_to(tools / "inspect-ai/bin/scout")
+                elif case == "current owner":
+                    alias.symlink_to(tools / "inspect-scout/bin/scout")
+                elif case == "foreign file":
+                    alias.write_text("foreign bytes")
+                elif case in ("foreign link", "dangling"):
+                    alias.symlink_to(tools / "foreign/bin/scout" if case == "foreign link" else root / "missing/scout")
+                before = alias.lstat() if alias.is_symlink() or alias.exists() else None
+                target = os.readlink(alias) if alias.is_symlink() else None
+                calls = root / "install-called"
+                uv = binary / "uv"
+                uv.write_text("#!/bin/sh\nif [ \"$*\" = 'tool dir --bin' ]; then printf '%s\\n' \"$FIXTURE_BIN\"; "
+                              "elif [ \"$*\" = 'tool dir' ]; then printf '%s\\n' \"$FIXTURE_TOOLS\"; "
+                              "else : > \"$FIXTURE_CALLED\"; fi\n")
+                uv.chmod(0o755)
+                env = {"PATH": str(binary) + os.pathsep + os.environ["PATH"], "TMPDIR": str(root),
+                       "tool_root": str(root / "tools"), "FIXTURE_BIN": str(binary),
+                       "FIXTURE_TOOLS": str(tools), "FIXTURE_CALLED": str(calls)}
+                result = subprocess.run(["bash", "-euo", "pipefail", "-c", command],
+                                        env=env, capture_output=True, text=True, timeout=10)
+                allowed = case in ("absent", "previous owner", "current owner")
+                self.assertEqual(result.returncode == 0, allowed, result.stderr)
+                self.assertEqual(calls.exists(), allowed)
+                if before is not None:
+                    after = alias.lstat()
+                    self.assertEqual((after.st_ino, after.st_mtime_ns, after.st_mode),
+                                     (before.st_ino, before.st_mtime_ns, before.st_mode))
+                    if target is not None:
+                        self.assertEqual(os.readlink(alias), target)
+                    else:
+                        self.assertEqual(alias.read_text(), "foreign bytes")
+
+    def test_research_post_install_binds_landed_model_metadata_without_relaxing_keyless_gates(self):
+        import copy
+        command = self.row("research-harnesses")["acceptance"]["post_install"]["command"]
+        program = command.split("<<'PY'\n", 1)[1].split("\nPY", 1)[0]
+        active = {"models": [{"name": "gpt-runtime", "use": "langchain_openai:ChatOpenAI",
+                              "model": "cx/gpt-6.1-sol-max", "base_url": "http://127.0.0.1:21128/v1",
+                              "supports_reasoning_effort": False}],
+                  "tools": [{"name": "web_search", "use": "deerflow.community.ddg_search.tools:web_search_tool"}]}
+        cases = [("landed metadata", active, True)]
+        for field, value in (("model", "cx/gpt-6.1-sol"), ("base_url", "http://127.0.0.1:1/v1"),
+                             ("supports_reasoning_effort", True), ("reasoning_effort", "xhigh")):
+            wrong = copy.deepcopy(active)
+            wrong["models"][0][field] = value
+            cases.append((field, wrong, False))
+        wrong = copy.deepcopy(active)
+        wrong["tools"][0]["use"] = "deerflow.community.tavily.tools:web_search_tool"
+        cases.append(("provider custody", wrong, False))
+        for name, config, expected in cases:
+            with self.subTest(name=name):
+                driver = '''import json,sys,types,os
+data=json.loads(sys.argv[1])
+client=types.ModuleType("deerflow.client")
+class Client:
+ def __init__(self,**kwargs): assert kwargs['config_path']==os.environ['DEER_FLOW_CONFIG_PATH']
+ def list_models(self): return {'models':[{'name':'gpt-runtime'}]}
+client.DeerFlowClient=Client
+app=types.ModuleType("deerflow.config.app_config")
+class Config:
+ def model_dump(self): return data
+app.get_app_config=lambda:Config()
+sys.modules['deerflow.client']=client
+sys.modules['deerflow.config.app_config']=app
+exec(sys.stdin.read())
+'''
+                result = subprocess.run([sys.executable, "-c", driver, json.dumps(config)], input=program,
+                                        env={"PATH": os.environ["PATH"], "DEER_FLOW_CONFIG_PATH": "fixture-public.yaml"},
+                                        capture_output=True, text=True, timeout=10)
+                self.assertEqual(result.returncode == 0, expected, result.stderr)
+
     def capture_claude(self, slot):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

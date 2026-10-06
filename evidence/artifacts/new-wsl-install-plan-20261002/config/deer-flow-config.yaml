@@ -1,12 +1,12 @@
 # bytedance/deer-flow@v2.1.0 config.example.yaml:23,250-278,801-806,1060-1065,1436-1437.
-# Keyless DDGS search and the loopback model route preserve the owner/custody ruling.
+# Keyless DDGS preserves custody; route follows landed #744 decision35-38 at0fb32ee5.
+# supports_reasoning_effort=false is metadata, not delivered-effort proof.
 config_version: 45
 models:
   - name: gpt-runtime
     use: langchain_openai:ChatOpenAI
-    model: cx/gpt-6.1-sol
-    supports_reasoning_effort: true
-    reasoning_effort: xhigh
+    model: cx/gpt-6.1-sol-max
+    supports_reasoning_effort: false
     base_url: http://127.0.0.1:21128/v1
     api_key: local-loopback
     use_responses_api: true

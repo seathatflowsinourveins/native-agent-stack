@@ -297,7 +297,8 @@ mcporter() {
 }
 
 agent-messaging() {
-  # Native upstream CLI smoke assertions; upstream hcom.rules is checked after the first hcom codex launch.
+  # Local native CLI integration; hcom@2c5f343 tests/support/mod.rs:949-959 first marker and identity.rs:14-15 base rule.
+  # Client wiring is separate; unchanged upstream suite acceptance is not claimed.
   case "$stage" in
     post_install)
       # Kind: upstream smoke; Source: https://github.com/aannoo/hcom/blob/2c5f343b2f9ec4bf2acf49c0431860e7c2ae578b/tests/cli_smoke.rs#L129
@@ -315,9 +316,9 @@ identity_rc=0
 rg -Fq "identity not found" "$smoke/no-identity.err"
 "${isolated[@]}" "$hcom_binary" start > "$smoke/sender.txt"
 "${isolated[@]}" "$hcom_binary" start > "$smoke/recipient.txt"
-sender="$(sed -n '"'"'s/^\[hcom:\([^]]*\)\].*/\1/p'"'"' "$smoke/sender.txt")"
-recipient="$(sed -n '"'"'s/^\[hcom:\([^]]*\)\].*/\1/p'"'"' "$smoke/recipient.txt")"
-[[ -n "$sender" && -n "$recipient" && "$sender" != "$recipient" ]]
+sender="$(sed -n '"'"'/^[[:space:]]*\[hcom:/{s/^[[:space:]]*\[hcom:\([^]]*\).*/\1/;p;q;}'"'"' "$smoke/sender.txt")"
+recipient="$(sed -n '"'"'/^[[:space:]]*\[hcom:/{s/^[[:space:]]*\[hcom:\([^]]*\).*/\1/;p;q;}'"'"' "$smoke/recipient.txt")"
+[[ "$sender" =~ ^[a-z0-9_]+$ && "$recipient" =~ ^[a-z0-9_]+$ && "$sender" != "$recipient" ]]
 "${isolated[@]}" "$hcom_binary" send "@$recipient" --name "$sender" -- "hello there"
 "${isolated[@]}" "$hcom_binary" events --last 10 > "$smoke/events.jsonl"
 jq -s -e --arg sender "$sender" '"'"'[.[] | select(.type == "message")] | length == 1 and .[0].instance == $sender and .[0].data.from == $sender and .[0].data.text == "hello there"'"'"' "$smoke/events.jsonl" >/dev/null
@@ -1999,43 +2000,67 @@ base-distribution() {
 }
 
 gpt-gateway() {
-  # Round-2 published 3.8.51; carried-prefix verification preserves #704.
+  # Supplied prebuilt composition identity; historical canary tests stay historical.
   case "$stage" in
     post_install)
       # Kind: smoke; Source: https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/bin/cli/commands/doctor.mjs#L632
-      check gpt-gateway smoke 'case "$(readlink -f "$HOME/.local/bin/omniroute")" in
-  "$tool_root"/omniroute-canary-*)
-    python3 "$plan_dir/config/omniroute-canary-check.py" "$HOME/.local/bin/omniroute" "$plan_dir/config/omniroute-canary-evidence.json" "$tool_root"
-    ;;
-esac
+      check gpt-gateway 'smoke' 'gateway_prefix="$HOME/.local/share/omniroute-builds/omniroute-3.8.51-5f4b3d577-affinity-pr15167"
+gateway_package="$gateway_prefix/lib/node_modules/omniroute"
+[[ -d "$gateway_prefix" && ! -L "$gateway_prefix" && ! -L "$gateway_package" && ! -L "$gateway_prefix/shim" ]]
+for gateway_regular in "$gateway_prefix/omniroute-serve.sh" "$gateway_prefix/shim/lsof" "$gateway_package/package.json" "$gateway_package/dist/BUILD_SHA"; do [[ -f "$gateway_regular" && ! -L "$gateway_regular" ]]; done
 test -x "$HOME/.local/bin/omniroute"
-[[ "$(readlink -f "$HOME/.local/bin/omniroute")" == "$(readlink -f "$tool_root/omniroute-3.8.51/bin/omniroute")" ]]
-node -e '"'"'if (require(process.argv[1]).version !== "3.8.51") process.exit(1)'"'"' "$tool_root/omniroute-3.8.51/lib/node_modules/omniroute/package.json"
+test -x "$gateway_prefix/omniroute-serve.sh"
+test -x "$gateway_prefix/shim/lsof"
+[[ "$(readlink -f -- "$HOME/.local/bin/omniroute")" == "$gateway_package/bin/omniroute.mjs" ]]
+[[ "$(readlink -f -- "$gateway_prefix/bin/omniroute")" == "$gateway_package/bin/omniroute.mjs" ]]
+node -e '"'"'if (require(process.argv[1]).version !== "3.8.51") process.exit(1)'"'"' "$gateway_package/package.json"
+[[ "$(cat "$gateway_package/dist/BUILD_SHA")" == "5f4b3d577" ]]
+printf '"'"'%s  %s\n'"'"' "672063a12174d46f7065ae7bb9adf1ed268c958cd264f64a25d0af3f74ae45bc" "$gateway_prefix/omniroute-serve.sh" "b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854" "$gateway_prefix/shim/lsof" | sha256sum --check --status
+for gateway_name in omniroute.service omniroute.service.d/10-show-log.conf; do gateway_target="$HOME/.config/systemd/user/$gateway_name"; [[ -f "$gateway_target" && ! -L "$gateway_target" ]]; cmp -s -- "$plan_dir/config/$gateway_name" "$gateway_target"; done
+for gateway_name in gpt-gateway-topology.json gpt-gateway-client-accept.sh; do [[ -f "$config_root/$gateway_name" && ! -L "$config_root/$gateway_name" ]]; cmp -s -- "$plan_dir/config/$gateway_name" "$config_root/$gateway_name"; done
 DATA_DIR="$HOME/.local/share/omniroute" PORT=21128 OMNIROUTE_SERVER_HOST=127.0.0.1 "$HOME/.local/bin/omniroute" --output json doctor --no-liveness'
       ;;
     service_health)
       # Kind: health; Source: https://github.com/diegosouzapw/OmniRoute/blob/c1e30b7676975feb298b49eff6ff58923c04b89e/src/app/readyz/route.ts#L1
-      check gpt-gateway health 'case "$(readlink -f "$HOME/.local/bin/omniroute")" in
-  "$tool_root"/omniroute-canary-*)
-    python3 "$plan_dir/config/omniroute-canary-check.py" "$HOME/.local/bin/omniroute" "$plan_dir/config/omniroute-canary-evidence.json" "$tool_root"
-    ;;
-esac
+      check gpt-gateway 'health' 'gateway_prefix="$HOME/.local/share/omniroute-builds/omniroute-3.8.51-5f4b3d577-affinity-pr15167"
+gateway_package="$gateway_prefix/lib/node_modules/omniroute"
+[[ -d "$gateway_prefix" && ! -L "$gateway_prefix" && ! -L "$gateway_package" && ! -L "$gateway_prefix/shim" ]]
+for gateway_regular in "$gateway_prefix/omniroute-serve.sh" "$gateway_prefix/shim/lsof" "$gateway_package/package.json" "$gateway_package/dist/BUILD_SHA"; do [[ -f "$gateway_regular" && ! -L "$gateway_regular" ]]; done
 test -x "$HOME/.local/bin/omniroute"
-[[ "$(readlink -f "$HOME/.local/bin/omniroute")" == "$(readlink -f "$tool_root/omniroute-3.8.51/bin/omniroute")" ]]
-node -e '"'"'if (require(process.argv[1]).version !== "3.8.51") process.exit(1)'"'"' "$tool_root/omniroute-3.8.51/lib/node_modules/omniroute/package.json"
+test -x "$gateway_prefix/omniroute-serve.sh"
+test -x "$gateway_prefix/shim/lsof"
+[[ "$(readlink -f -- "$HOME/.local/bin/omniroute")" == "$gateway_package/bin/omniroute.mjs" ]]
+[[ "$(readlink -f -- "$gateway_prefix/bin/omniroute")" == "$gateway_package/bin/omniroute.mjs" ]]
+node -e '"'"'if (require(process.argv[1]).version !== "3.8.51") process.exit(1)'"'"' "$gateway_package/package.json"
+[[ "$(cat "$gateway_package/dist/BUILD_SHA")" == "5f4b3d577" ]]
+printf '"'"'%s  %s\n'"'"' "672063a12174d46f7065ae7bb9adf1ed268c958cd264f64a25d0af3f74ae45bc" "$gateway_prefix/omniroute-serve.sh" "b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854" "$gateway_prefix/shim/lsof" | sha256sum --check --status
+for gateway_name in omniroute.service omniroute.service.d/10-show-log.conf; do gateway_target="$HOME/.config/systemd/user/$gateway_name"; [[ -f "$gateway_target" && ! -L "$gateway_target" ]]; cmp -s -- "$plan_dir/config/$gateway_name" "$gateway_target"; done
+for gateway_name in gpt-gateway-topology.json gpt-gateway-client-accept.sh; do [[ -f "$config_root/$gateway_name" && ! -L "$config_root/$gateway_name" ]]; cmp -s -- "$plan_dir/config/$gateway_name" "$config_root/$gateway_name"; done
+systemctl --user is-active --quiet omniroute.service
+[[ "$(systemctl --user show -p ExecStart --value omniroute.service)" == *"$gateway_prefix/omniroute-serve.sh"* ]]
+[[ "$(systemctl --user show -p DropInPaths --value omniroute.service)" == *"$HOME/.config/systemd/user/omniroute.service.d/10-show-log.conf"* ]]
 curl -fsS http://127.0.0.1:21128/readyz
 DATA_DIR="$HOME/.local/share/omniroute" PORT=21128 OMNIROUTE_SERVER_HOST=127.0.0.1 "$HOME/.local/bin/omniroute" --output json doctor --liveness-url http://127.0.0.1:21128/api/monitoring/health'
       ;;
     after_sign_in)
       # Kind: native client integration; Source: https://developers.openai.com/codex/noninteractive/
-      check gpt-gateway 'native client integration' 'case "$(readlink -f "$HOME/.local/bin/omniroute")" in
-  "$tool_root"/omniroute-canary-*)
-    python3 "$plan_dir/config/omniroute-canary-check.py" "$HOME/.local/bin/omniroute" "$plan_dir/config/omniroute-canary-evidence.json" "$tool_root"
-    ;;
-esac
+      check gpt-gateway 'native client integration' 'gateway_prefix="$HOME/.local/share/omniroute-builds/omniroute-3.8.51-5f4b3d577-affinity-pr15167"
+gateway_package="$gateway_prefix/lib/node_modules/omniroute"
+[[ -d "$gateway_prefix" && ! -L "$gateway_prefix" && ! -L "$gateway_package" && ! -L "$gateway_prefix/shim" ]]
+for gateway_regular in "$gateway_prefix/omniroute-serve.sh" "$gateway_prefix/shim/lsof" "$gateway_package/package.json" "$gateway_package/dist/BUILD_SHA"; do [[ -f "$gateway_regular" && ! -L "$gateway_regular" ]]; done
 test -x "$HOME/.local/bin/omniroute"
-[[ "$(readlink -f "$HOME/.local/bin/omniroute")" == "$(readlink -f "$tool_root/omniroute-3.8.51/bin/omniroute")" ]]
-node -e '"'"'if (require(process.argv[1]).version !== "3.8.51") process.exit(1)'"'"' "$tool_root/omniroute-3.8.51/lib/node_modules/omniroute/package.json"
+test -x "$gateway_prefix/omniroute-serve.sh"
+test -x "$gateway_prefix/shim/lsof"
+[[ "$(readlink -f -- "$HOME/.local/bin/omniroute")" == "$gateway_package/bin/omniroute.mjs" ]]
+[[ "$(readlink -f -- "$gateway_prefix/bin/omniroute")" == "$gateway_package/bin/omniroute.mjs" ]]
+node -e '"'"'if (require(process.argv[1]).version !== "3.8.51") process.exit(1)'"'"' "$gateway_package/package.json"
+[[ "$(cat "$gateway_package/dist/BUILD_SHA")" == "5f4b3d577" ]]
+printf '"'"'%s  %s\n'"'"' "672063a12174d46f7065ae7bb9adf1ed268c958cd264f64a25d0af3f74ae45bc" "$gateway_prefix/omniroute-serve.sh" "b6ae900224df3dc73fff2a50b3d7206d78895c6147e93e80b62e66d423e69854" "$gateway_prefix/shim/lsof" | sha256sum --check --status
+for gateway_name in omniroute.service omniroute.service.d/10-show-log.conf; do gateway_target="$HOME/.config/systemd/user/$gateway_name"; [[ -f "$gateway_target" && ! -L "$gateway_target" ]]; cmp -s -- "$plan_dir/config/$gateway_name" "$gateway_target"; done
+for gateway_name in gpt-gateway-topology.json gpt-gateway-client-accept.sh; do [[ -f "$config_root/$gateway_name" && ! -L "$config_root/$gateway_name" ]]; cmp -s -- "$plan_dir/config/$gateway_name" "$config_root/$gateway_name"; done
+systemctl --user is-active --quiet omniroute.service
+[[ "$(systemctl --user show -p ExecStart --value omniroute.service)" == *"$gateway_prefix/omniroute-serve.sh"* ]]
+[[ "$(systemctl --user show -p DropInPaths --value omniroute.service)" == *"$HOME/.config/systemd/user/omniroute.service.d/10-show-log.conf"* ]]
 bash "$config_root/gpt-gateway-client-accept.sh"'
       ;;
     *) skipped gpt-gateway ;;
@@ -2351,9 +2376,9 @@ assert any(m["name"] == "gpt-runtime" for m in client.list_models()["models"])
 active = get_app_config().model_dump()
 model, = [m for m in active["models"] if m["name"] == "gpt-runtime"]
 assert model["use"] == "langchain_openai:ChatOpenAI"
-assert model["model"] == "cx/gpt-6.1-sol"
-assert model["supports_reasoning_effort"] is True
-assert model["reasoning_effort"] == "xhigh"
+assert model["model"] == "cx/gpt-6.1-sol-max", {"expected_model": "cx/gpt-6.1-sol-max", "actual_model": model["model"]}
+assert model["supports_reasoning_effort"] is False
+assert model.get("reasoning_effort") is None
 assert model["base_url"] == "http://127.0.0.1:21128/v1"
 search, = [tool for tool in active["tools"] if tool["name"] == "web_search"]
 assert search["use"] == "deerflow.community.ddg_search.tools:web_search_tool"
@@ -2586,7 +2611,18 @@ cd "$tool_root/skillspector-source-2.12.0"
       ;;
     after_sign_in)
       # Kind: smoke; Source: https://github.com/NVIDIA/skillspector/blob/c7958a3268d9498644b22edb75d0f051bbc8cbfc/src/skillspector/cli.py#L560
-      check skill-vetting smoke 'codex login status >/dev/null
+      check skill-vetting smoke 'SKILLSPECTOR_MODEL="$(python3 - "$plan_dir/config/gpt-gateway-topology.json" <<'"'"'PY'"'"'
+import json, sys
+topology = json.load(open(sys.argv[1]))
+route = topology["sol_max"]
+assert route["model_provider"] == "openai", "SkillSpector codex_cli needs the native OpenAI route"
+model = route["model"]
+assert isinstance(model, str) and model.strip(), "Canonical native model must be a nonempty string"
+print(model)
+PY
+)"
+export SKILLSPECTOR_MODEL
+codex login status >/dev/null
 umask 077
 state="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/skill-vetting"
 install -d -m 0700 -- "$state"
@@ -2594,7 +2630,7 @@ run="$(mktemp -d "$state/semantic.XXXXXXXX")"
 bad_rc=0
 SKILLSPECTOR_PROVIDER=codex_cli skillspector scan "$tool_root/skillspector-source-2.12.0/tests/fixtures/malicious_skill" --format json --output "$run/bad-report.json" --fail-on-findings --fail-on-incomplete || bad_rc=$?
 [[ "$bad_rc" -ne 0 ]]
-jq -e '"'"'.analysis_completeness.is_complete == true and .execution_successful == true and (.findings | length > 0)'"'"' "$run/bad-report.json" >/dev/null
+jq -e '"'"'.analysis_completeness.is_complete == true and .execution_successful == true and (.issues | type == "array") and (.issues | length > 0) and .metadata.llm_requested == true and .metadata.llm_available == true and .metadata.meta_analysis_applied == true and (.metadata.llm_calls_attempted | type == "number") and .metadata.llm_calls_attempted > 0 and (.metadata.llm_calls_attempted | floor) == .metadata.llm_calls_attempted and .metadata.llm_calls_succeeded == .metadata.llm_calls_attempted and (.metadata.llm_degraded // false) == false'"'"' "$run/bad-report.json" >/dev/null
 SKILLSPECTOR_PROVIDER=codex_cli skillspector scan "$tool_root/skillspector-source-2.12.0/tests/fixtures/safe_skill" --format json --output "$run/report.json" --fail-on-incomplete
 "$(uv tool dir)/skillspector/bin/python" - "$run/report.json" <<'"'"'PY'"'"'
 import json, sys
@@ -2603,7 +2639,14 @@ assert report["analysis_completeness"]["is_complete"] is True
 assert report["execution_successful"] is True
 assert report["metadata"]["llm_requested"] is True
 assert report["metadata"]["llm_available"] is True
-assert report["metadata"]["meta_analysis_applied"] is True
+assert isinstance(report["issues"], list) and not report["issues"]
+attempted = report["metadata"]["llm_calls_attempted"]
+succeeded = report["metadata"]["llm_calls_succeeded"]
+assert type(attempted) is int and attempted > 0
+assert type(succeeded) is int and succeeded == attempted
+assert report["metadata"].get("llm_degraded", False) is False
+# Tagged meta_analyzer returns not_applicable for the empty-findings path.
+# Native successful-call counters prove semantic execution without requiring it.
 PY'
       ;;
     *) skipped skill-vetting ;;
@@ -2615,15 +2658,20 @@ trajectory-analysis() {
   case "$stage" in
     post_install)
       # Kind: smoke; Source: https://github.com/meridianlabs-ai/inspect_scout/blob/0.5.3/tests/sources/atif_source/test_integration.py#L44
-      check trajectory-analysis smoke 'tool_python="$(uv tool dir)/inspect-ai/bin/python"
+      check trajectory-analysis smoke 'export HARBOR_TELEMETRY=off
+tool_python="$(uv tool dir)/inspect-scout/bin/python"
 "$tool_python" - <<'"'"'PY'"'"'
 from importlib.metadata import version
+from packaging.version import Version
 assert version("inspect-ai") == "0.3.273"
-assert version("openai") == "3.24.0"
+assert Version("2.20.0") <= Version(version("openai")) < Version("3.0.0")
+assert version("litellm") == "1.92.0"
 assert version("inspect-scout") == "0.5.3"
 assert version("harbor") == "0.23.0"
+from harbor.models.trajectories import Trajectory  # Require ATIF coverage before importorskip tests.
 PY
-[[ "$(readlink -f "$(command -v scout)")" == "$(readlink -f "$(uv tool dir)/inspect-ai/bin/scout")" ]]
+uv pip check --python "$tool_python"
+[[ "$(readlink -f "$(command -v scout)")" == "$(readlink -f "$(uv tool dir)/inspect-scout/bin/scout")" ]]
 cd "$tool_root/inspect-scout-source-0.5.3"
 "$tool_python" -m pytest -q -n 0 tests/grep_scanner/test_grep_scanner.py tests/sources/claude_code_source/test_integration.py tests/sources/atif_source/test_integration.py'
       ;;
@@ -2643,7 +2691,7 @@ scout import claude_code -P "path=$SCOUT_CLAUDE_SESSION_FILE" -T "$run/claude/db
 scout import atif -P "path=$SCOUT_HARBOR_ATIF_FILE" -T "$run/harbor/db" --fail-on-error
 for source in claude harbor; do
   scout scan "$config_root/scout-round2-delegation.py" --transcripts "$run/$source/db" --scans "$run/$source/scans" --max-processes 1 --fail-on-error
-  "$(uv tool dir)/inspect-ai/bin/python" - "$run/$source/scans" "$source" "$run/$source-summary.json" <<'"'"'PY'"'"'
+  "$(uv tool dir)/inspect-scout/bin/python" - "$run/$source/scans" "$source" "$run/$source-summary.json" <<'"'"'PY'"'"'
 import json, sys
 from pathlib import Path
 from inspect_scout import scan_list, scan_results_df
@@ -2672,35 +2720,11 @@ mcp-protocol-conformance() {
   case "$stage" in
     post_install)
       # Kind: smoke; Source: https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/.github/workflows/ci.yml#L33
-      check mcp-protocol-conformance smoke 'cd "$tool_root/mcp-conformance-source-0.2.0-alpha.11"
-npm ci
-npm run check
-npm run build
-npm test
-npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 list --requirements 2026-07-28'
+      check mcp-protocol-conformance smoke 'bash "$plan_dir/config/mcp-conformance-accept.sh" post_install'
       ;;
     after_sign_in)
       # Kind: smoke; Source: https://github.com/modelcontextprotocol/conformance/blob/c321dd32035556e6769d3724a8ee97d87c3faaac/README.md#L59
-      check mcp-protocol-conformance smoke 'if [[ -z "${MCP_CONFORMANCE_SERVER_URL:-}" && -z "${MCP_CONFORMANCE_CLIENT_COMMAND:-}" ]]; then
-  printf '"'"'Select MCP_CONFORMANCE_SERVER_URL and/or MCP_CONFORMANCE_CLIENT_COMMAND for on-demand conformance acceptance.\n'"'"' >&2
-  exit 78
-fi
-extra=()
-if [[ -n "${MCP_CONFORMANCE_EXPECTED_FAILURES:-}" ]]; then
-  [[ -f "$MCP_CONFORMANCE_EXPECTED_FAILURES" ]]
-  extra+=(--expected-failures "$MCP_CONFORMANCE_EXPECTED_FAILURES")
-fi
-umask 077
-state="${XDG_STATE_HOME:-$HOME/.local/state}/new-wsl-native-stack/acceptance/mcp-protocol-conformance"
-install -d -m 0700 -- "$state"
-run="$(mktemp -d "$state/conformance.XXXXXXXX")"
-cd "$run"
-if [[ -n "${MCP_CONFORMANCE_SERVER_URL:-}" ]]; then
-  npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 server --url "$MCP_CONFORMANCE_SERVER_URL" --requirements 2026-07-28 "${extra[@]}"
-fi
-if [[ -n "${MCP_CONFORMANCE_CLIENT_COMMAND:-}" ]]; then
-  npx --yes @modelcontextprotocol/conformance@0.2.0-alpha.11 client --command "$MCP_CONFORMANCE_CLIENT_COMMAND" --requirements 2026-07-28 "${extra[@]}"
-fi'
+      check mcp-protocol-conformance smoke 'bash "$plan_dir/config/mcp-conformance-accept.sh" after_sign_in'
       ;;
     *) skipped mcp-protocol-conformance ;;
   esac
