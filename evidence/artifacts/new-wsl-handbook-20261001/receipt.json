@@ -6,8 +6,8 @@
   "generator_sha256": "6e6ee9cfb4d697b3bea2d7684e042e638be20634792f43e517b205463b1967f9",
   "profile_sha256": "7504e55c2e66730d5e0b0ead2be5abef39f3989afc69e1c3640e6709bdb3db04",
   "outputs": {
-    "docs/new-wsl-handbook.md": "41fd677124836481cf669e7b92632c165f0766d01f8d81afe6dbac7c162646a7",
-    "docs/new-wsl-handbook.json": "36768f00f8a0438603d834dbd856458fa4c130dafe6419c1de3aa668f2cefbda"
+    "docs/new-wsl-handbook.md": "a303f757972e2693cbc86ef255576f377e8002c591f0c39a64236b0eeb9581fe",
+    "docs/new-wsl-handbook.json": "edd979e21820c7d89f28e7a54d6d46f107d9fdc99076059e156a9fbea3083e6f"
   },
   "inventory": {
     "layers": 37,
@@ -261,6 +261,17 @@
       "native_exit_code": 0,
       "check": "python3 scripts/build_new_wsl_handbook.py --check",
       "repair_evidence": "evidence/artifacts/codex-service-tier-migration-20261005/ci-validate-repair-20261006.json"
+    },
+    {
+      "date": "2026-10-06",
+      "command": "python3 scripts/build_new_wsl_handbook.py --write",
+      "cause": "PR #771 (hcom relaxation) updated the source record behind the agent-messaging row (evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json, wave5: the retired deny gate and usage rule replaced, a dated marker on the Opus residual), regenerated definitive-manifest.json with assemble_manifest.py, and revised the hashed WSL distro recipe's exec-rules sentence. Regenerated through the unchanged native builder, so the handbook no longer states the retired 2026-10-04 deny posture.",
+      "previous_outputs": {
+        "docs/new-wsl-handbook.md": "41fd677124836481cf669e7b92632c165f0766d01f8d81afe6dbac7c162646a7",
+        "docs/new-wsl-handbook.json": "36768f00f8a0438603d834dbd856458fa4c130dafe6419c1de3aa668f2cefbda"
+      },
+      "native_exit_code": 0,
+      "check": "python3 scripts/build_new_wsl_handbook.py --check"
     }
   ]
 }

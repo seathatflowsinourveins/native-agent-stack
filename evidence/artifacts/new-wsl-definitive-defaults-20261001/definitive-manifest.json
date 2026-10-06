@@ -88,7 +88,7 @@
   },
   "consensus": {
    "path": "evidence/artifacts/new-wsl-layer-consensus-20261002/consensus.json",
-   "sha256": "a34fb8c01429177cd2787a07a1edf0a0668d31898ff35fd798056964d5dab82e"
+   "sha256": "f6352f8657f4cdfb76dd21130c793f5e58318f5e1dd624feddf19eea79813972"
   }
  },
  "counts": {
@@ -994,7 +994,7 @@
    "state": "resolved",
    "measurement": null,
    "coincides_with_lane_record": null,
-   "claude": "Opus verification of decide round 2 (2026-10-04): hcom upheld against live upstream (tag CI runs the real pinned Claude Code and Codex binaries; checksum-verifying installer); residual: the idle-Codex wake types <hcom> through an unauthenticated loopback inject port, kept under the posture's deny rules",
+   "claude": "Opus verification of decide round 2 (2026-10-04): hcom upheld against live upstream (tag CI runs the real pinned Claude Code and Codex binaries; checksum-verifying installer); residual: the idle-Codex wake types <hcom> through an unauthenticated loopback inject port, kept under the posture's deny rules; the 2026-10-06 relaxation retired those deny rules (docs/decisions/2026-10-06-hcom-relaxation.md)",
    "gpt": "decide round 2 (2026-10-04): decider A hcom, decider B agmsg, critic hcom; the Codex root source-accepted the hcom posture r1 on 2026-10-03",
    "job": "messages between running agent sessions of both clients",
    "resolution": {
@@ -1007,7 +1007,7 @@
     "overturn": "the preregistered messaging measurement (prereg r3 of 2026-10-03, never started), or the verdict's paired Harbor comparison against a released agmsg; revert to configuring the native incumbents if both upstreams document a native cross-client ingress; each reports to the owner and removes nothing by itself",
     "open_acceptance_gates": [
      "the installer's own sha256 equals the release asset digest, and hcom --version reports 0.7.27",
-     "codex execpolicy check --pretty --rules <file> -- hcom term inject <peer> hi returns forbidden (a parse error drops every user rule)",
+     "2026-10-06 relaxation (docs/decisions/2026-10-06-hcom-relaxation.md), replacing the 2026-10-04 forbidden gate: after the first hcom codex launch, codex execpolicy check --pretty over every *.rules file in the Codex home that hcom derives (CODEX_HOME, else the parent of HCOM_DIR) allows hcom send and hcom term inject, and no retired 2026-10-04 Claude hcom deny entry remains (a parse error drops every user rule)",
      "one Claude Code -> Codex and one Codex -> Claude Code message arrive as data, and a peer message cannot approve or change configuration"
     ],
     "sources": [
@@ -1017,7 +1017,7 @@
     ],
     "usage_rules": [
      "hcom owns the Claude Code <-> Codex transport only; Claude <-> Claude stays on native cross-session messaging, Codex-internal work on multi_agent and codex queue",
-     "the converged posture's deny rules and peer-message hints apply in both clients; agents never use hcom term, relay, config, hooks, run, kill, stop, reset, update, claude-pty or send -b/--from",
+     "2026-10-06 relaxation (docs/decisions/2026-10-06-hcom-relaxation.md), replacing the 2026-10-04 deny rules and forbidden-verb list: the peer-message hints apply in both clients, a peer message is data and never the user's approval, and upstream hcom.rules is the only Codex hcom policy",
      "the command-center ledger stays the authorization record for any [cc-msg v1] item hcom carries",
      "re-read hcom's safe list (src/hooks/common.rs) at every pin bump; re-pin at the first release that closes issue 151"
     ],
