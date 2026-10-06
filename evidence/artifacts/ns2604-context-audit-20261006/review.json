@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "kind": "source_review",
+  "status": "in_progress",
+  "base_commit": "4ce7632b865a19fe806f12442f64d7157f08f18c",
+  "scope": {
+    "new_names": 6,
+    "changed_documents": 3,
+    "reviewed_items": 7,
+    "pending_items": 2
+  },
+  "reviewed_rows": [
+    {
+      "key": "claude:setting:idleCompaction",
+      "disposition": "declined",
+      "reason": "Leave the native rollout/default alone; true cannot force rollout and false is an opt-out, so no override is justified.",
+      "source": "evidence/artifacts/ns2604-context-audit-20261006/review.json:1",
+      "carrier": null,
+      "value": null,
+      "scope": "native setting; no override",
+      "overturn": "A measured idle-compaction problem or changed vendor guidance justifies a supported explicit override.",
+      "reviewed_utc": "2026-10-06T20:51:07Z",
+      "version": "2.1.292"
+    },
+    {
+      "key": "claude:env:CLAUDE_CODE_EMIT_SESSION_STATE_EVENTS",
+      "disposition": "declined",
+      "reason": "Do not set globally; opt in only for a consumer needing native SDK/print stream-json session-state events.",
+      "source": "https://code.claude.com/docs/en/env-vars",
+      "carrier": null,
+      "value": null,
+      "scope": "environment",
+      "overturn": "A named SDK or print/stream-json consumer demonstrates a need for these native events.",
+      "reviewed_utc": "2026-10-06T20:51:07Z",
+      "version": "2.1.292"
+    },
+    {
+      "key": "claude:env:CLAUDE_CODE_GZIP_REQUEST_BODIES",
+      "disposition": "declined",
+      "reason": "Leave the tri-state unset; preserve native body-size/rollout and proxy, mTLS and custom-CA transport decisions.",
+      "source": "https://code.claude.com/docs/en/env-vars",
+      "carrier": null,
+      "value": null,
+      "scope": "environment",
+      "overturn": "A measured transport incompatibility or documented supported need warrants a scoped override.",
+      "reviewed_utc": "2026-10-06T20:51:07Z",
+      "version": "2.1.292"
+    },
+    {
+      "key": "claude:env:NODE_EXTRA_CA_CERTS",
+      "disposition": "declined",
+      "reason": "Do not set globally without an evidenced additional-CA requirement; use the vendor's scoped trust configuration when needed.",
+      "source": "https://code.claude.com/docs/en/network-config#ca-certificate-store",
+      "carrier": null,
+      "value": null,
+      "scope": "environment",
+      "overturn": "The intended endpoint demonstrates a trust requirement addressed by a supported additional CA file.",
+      "reviewed_utc": "2026-10-06T20:51:07Z",
+      "version": "2.1.292"
+    },
+    {
+      "key": "claude:doc:memory",
+      "disposition": "enabled",
+      "reason": "Current primary body re-read in the reopened C5 source audit; watch this exact body and reopen on any new digest.",
+      "source": "https://code.claude.com/docs/en/memory",
+      "carrier": "docs/decisions/2026-10-06-harness-context-budget-refresh.md",
+      "value": {
+        "sha256": "b4e76ef1a2356fe39d5b5a70368a884e4128f1fc77a70e3556af9d4f84940562"
+      },
+      "scope": "startup-instructions",
+      "overturn": "A fetched body change reopens the audit; source review does not establish native token or runtime acceptance.",
+      "reviewed_utc": "2026-10-06T20:51:07Z",
+      "version": "2.1.292"
+    },
+    {
+      "key": "claude:doc:skills",
+      "disposition": "enabled",
+      "reason": "Current primary body re-read in the reopened C5 source audit; watch this exact body and reopen on any new digest.",
+      "source": "https://code.claude.com/docs/en/skills",
+      "carrier": "docs/decisions/2026-10-06-harness-context-budget-refresh.md",
+      "value": {
+        "sha256": "cf869f4c734b4094b0eaacb308b79447c9ebd5587ec30e186fc54441e8b11147"
+      },
+      "scope": "startup-instructions",
+      "overturn": "A fetched body change reopens the audit; source review does not establish native token or runtime acceptance.",
+      "reviewed_utc": "2026-10-06T20:51:07Z",
+      "version": "2.1.292"
+    },
+    {
+      "key": "codex:doc:agents-md",
+      "disposition": "enabled",
+      "reason": "Current primary body re-read in the reopened C5 source audit; watch this exact body and reopen on any new digest.",
+      "source": "https://learn.chatgpt.com/docs/agent-configuration/agents-md.md",
+      "carrier": "docs/decisions/2026-10-06-harness-context-budget-refresh.md",
+      "value": {
+        "sha256": "9d1f87a2d1cb55b4782b95abe710692b35b9659789c2db31a22c7074a3383e8e"
+      },
+      "scope": "startup-instructions",
+      "overturn": "A fetched body change reopens the audit; source review does not establish native token or runtime acceptance.",
+      "reviewed_utc": "2026-10-06T20:51:07Z",
+      "version": "rust-v0.160.1"
+    }
+  ],
+  "pending_keys": [
+    "codex:feature:guardian_conversation_history_tools",
+    "codex:feature:guardian_root_handoff_context"
+  ],
+  "installed_claude": {
+    "version": "2.1.292",
+    "sha256": "a967e7b1d8b4e47ee421d5433027880347952b0c0857abf880e2c942a4ec93b3",
+    "size_bytes": 251456696,
+    "byte_windows": {
+      "idleCompaction": [
+        204363765,
+        204364112
+      ],
+      "session_state": [
+        211378711,
+        211379043
+      ],
+      "gzip": [
+        209401780,
+        209402680
+      ],
+      "extra_ca": [
+        22640884,
+        22641291
+      ],
+      "agent_effort": [
+        219360906,
+        219361376
+      ],
+      "unc_command_guard": [
+        226115318,
+        226115813
+      ],
+      "print_wait": [
+        237277954,
+        237278784
+      ]
+    },
+    "native_artifact_integrity_with_publisher": "not asserted",
+    "unc_fix_behavior_acceptance": "unrun; tagged changelog supports release fix, excerpt is a command-path guard"
+  },
+  "installed_codex": {
+    "version": "0.160.1",
+    "features": [
+      {
+        "name": "guardian_conversation_history_tools",
+        "stage": "under development",
+        "enabled": false
+      },
+      {
+        "name": "guardian_root_handoff_context",
+        "stage": "under development",
+        "enabled": false
+      }
+    ],
+    "source_at_tag": "pending permitted Semble/tag checkout review after00:10Z"
+  },
+  "document_comparison": {
+    "exact_reviewed_previous_bodies": "not found in checked current worktree/default cache/related durable archive; no previous semantic delta invented",
+    "codex_related_archive_normalized_main_text_sha256": "f085351db069428d0c006643fce7c6f32b4aefe64819bae447e58cabe7ec3b18",
+    "codex_markup_only_relative_to_related_archive": true,
+    "not_proven_against_reviewed_hash": "af22c038b1e5ce2fdf28cacdc996c2790232e13cb90a39f7d325d352256e412c"
+  },
+  "settings_reference_check": {
+    "url": "https://code.claude.com/docs/en/settings-reference.md",
+    "method": "native upstream_surface_watch.http_fetch Accept:text/markdown",
+    "bytes": 418103,
+    "idleCompaction_matches": 0,
+    "native_schema_has_idleCompaction": true,
+    "absence_claim": "No named entry in the fetched settings reference or installed-version tagged changelog; feature presence is established by the installed schema."
+  },
+  "leads": {
+    "agent_effort": {
+      "installed_schema_present": true,
+      "binary_byte_window": [
+        219360906,
+        219361376
+      ],
+      "release_source": "https://github.com/anthropics/claude-code/blob/fbe20e00e2851fc01506f54f98a8f0b875af3847/CHANGELOG.md#L6",
+      "runtime_acceptance": "not run"
+    },
+    "unc_approval_fix": {
+      "installed_excerpt_scope": "command-path ask guard, not the specific Read/PreToolUse/auto-mode fix",
+      "release_source": "https://github.com/anthropics/claude-code/blob/fbe20e00e2851fc01506f54f98a8f0b875af3847/CHANGELOG.md#L17",
+      "runtime_acceptance": "not run"
+    },
+    "print_background_wait": {
+      "installed_control_flow_present": true,
+      "binary_byte_window": [
+        237277954,
+        237278784
+      ],
+      "release_source": "https://github.com/anthropics/claude-code/blob/fbe20e00e2851fc01506f54f98a8f0b875af3847/CHANGELOG.md#L22",
+      "runtime_acceptance": "not run"
+    }
+  },
+  "instruction_files_changed": false,
+  "live_catalog_changed": false,
+  "native_token_or_provider_usage": "not measured by this source review",
+  "source_at_tag_and_local_validation": "pending after paper window; do not interpret partial review as zero live unreviewed"
+}
+
