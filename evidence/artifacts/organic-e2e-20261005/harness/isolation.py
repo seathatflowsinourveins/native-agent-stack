@@ -1560,7 +1560,9 @@ def network_probes(plans: dict) -> dict:
 
 def qdrant_listing_probe(plan_: dict) -> dict:
     """Round 6d (P2): GET /collections inside the trial's namespace names only its own collections, while the same
-    listing outside holds others' (the control). Counts only; no name is kept."""
+    listing outside holds others' (the control). Counts only; no name is kept. Round 6e: the request inside asks for
+    compression, as SocratiCode's client does (Node's fetch sends Accept-Encoding by default), so the probe fails
+    unless the forward still answers with a listing it could read and filter."""
     prefix = plan_["network"]["qdrant_prefix"]
 
     def names(text):
@@ -1569,7 +1571,8 @@ def qdrant_listing_probe(plan_: dict) -> dict:
         except (ValueError, KeyError, TypeError):
             return None
 
-    inside, _ = run_wrapped(plan_, ["curl", "-s", "-m", "20", "http://127.0.0.1:21633/collections"], timeout=60)
+    inside, _ = run_wrapped(plan_, ["curl", "-s", "-m", "20", "-H", "Accept-Encoding: gzip, deflate",
+                                    "http://127.0.0.1:21633/collections"], timeout=60)
     try:
         outside = subprocess.run(["curl", "-s", "-m", "20", "http://127.0.0.1:21633/collections"], capture_output=True,
                                  text=True, timeout=60).stdout
@@ -1578,7 +1581,7 @@ def qdrant_listing_probe(plan_: dict) -> dict:
     seen_in, seen_out = names(inside.stdout), names(outside)
     return {"foreign_inside": None if seen_in is None else sum(1 for n in seen_in if not n.startswith(prefix)),
             "foreign_outside": None if seen_out is None else sum(1 for n in seen_out if not n.startswith(prefix)),
-            "envelope_kept": seen_in is not None}
+            "envelope_kept": seen_in is not None, "asked_compressed": True}
 
 
 def _client_checks(plans: dict, fixture: Path, hidden_probe: list[Path]) -> dict:

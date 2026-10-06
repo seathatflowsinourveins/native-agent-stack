@@ -198,6 +198,14 @@ This extends the Gate 0 network amendment above. Each forward serves a tool unde
      - A refused G1 rerun stops the retries.
      - A record that does not pass gets its one fresh read, on the retry path and on a resume of the initial path.
      - The initial path runs the same sequence.
+3. **Found while measuring the read's compression gap, fixed in a commit of its own: the listing answered 502 to a client that asks for compression.** Round 6d's listing filter reads the upstream answer as JSON. The read noted that it does not decode `Content-Encoding` while `Accept-Encoding` is forwarded, and left the deployed server's behaviour to validate.
+   - **Measured on this host, 2026-10-06:**
+     - Qdrant 1.19.1 answers GET `/collections` with `Content-Encoding: gzip` when asked for gzip, with `br` when that is offered, and uncompressed otherwise.
+     - Node v24.21.0's `fetch`, which `@qdrant/js-client-rest` 1.18.0 uses, asks by default: its own request to that route was answered with `gzip`.
+   - **Effect before the fix:** the filter could not read the compressed listing and answered 502. No foreign name passed. But SocratiCode's `getCollections` would have failed in every Codex cell, while the self-test's probe, which sent no `Accept-Encoding`, reported the tool testable.
+   - **Fix** (`netfilter.Filter.http`): a request whose answer the filter rewrites goes upstream without `Accept-Encoding`. An answer that arrives compressed anyway is refused with 502 (`Filter._rewrite_listing`), never passed through unread. Other routes are relayed as before.
+   - **The required probe now asks as the client does:** `isolation.qdrant_listing_probe` sends `Accept-Encoding: gzip, deflate`. So "qdrant: foreign collection names absent from the listing" fails unless the listing was read and filtered. The two-trial test asks the same way.
+   - **Not established:** SocratiCode itself was not started inside a trial. Its indexing and search through the forwards stay unverified, as the read notes.
 
 ### Round 6d: the GPT read of 50752dde (CHANGES_REQUESTED, one P1 and three P2s)
 
@@ -772,14 +780,17 @@ That read requested changes for seven P2 findings (`cc-reads-20261005/pr786/GPT-
 
 ## Verification (offline; no pilot or smoke)
 
-- **Round 6e** (the GPT read of b2d44f73): the focused module runs 108 tests and passes, with 1 skipped: the client-start test (`ISOLATION_SKIP_CLIENTS=1`).
+- **Round 6e** (the GPT read of b2d44f73): the focused module runs 109 tests and passes, with 1 skipped: the client-start test (`ISOLATION_SKIP_CLIENTS=1`). The two P2s' commit alone runs 108.
   - **Not run in this round: the client starts.** `isolation.py selftest --clients` and the module's client-start test start `codex`, and no Codex process may run on this host during the co-op's Codex window. The wrapper-only self-test (hidden locations, forwards and network probes, no client) ran inside the module and passed. A later run of the client checks at this head is reported in the pull request, not in this file.
-  - **Red run.** On the round-6d head (b2d44f73), the four test classes this round touches hold 39 tests: 10 are red and 29 pass.
-    - 8 fail on behaviour:
+  - **Red run.** On the round-6d head (b2d44f73), the five test classes this round touches hold 46 tests: 12 are red and 34 pass.
+    - 9 fail on behaviour:
       - the access log's summary holds 1 of 4 admitted model calls (2 of 4 in the fixed-log case);
       - a calibration record with a call without an id passes;
-      - on the retry path the prompted test runs first, and with only that check failed it runs with no calibration check at all.
-    - 2 error because they pass this round's new arguments to the old functions.
+      - on the retry path the prompted test runs first, and with only that check failed it runs with no calibration check at all;
+      - a listing asked for with `Accept-Encoding` is answered 502 (the compression commit's test).
+    - 3 error:
+      - 2 pass this round's new arguments to the old functions;
+      - the two-trial test cannot parse the 502 it gets for a listing asked for with `Accept-Encoding`.
   - **The read's counterexample, reproduced on b2d44f73** in that head's own terms: 2 admitted model calls, 1 request id in the summary, coverage `ok`, G11 true, and the calibration passed.
 - **Round 6d** (the GPT read of 50752dde): the focused module passes 100 of 100 tests, client starts included.
   - **Red run.** On the round-6c head, exactly its 6 tests are red (3 fail, 3 error), and the other 94 pass. There, the two-trial test fails because trial B sees trial A's collection; its clean-up removed that collection.

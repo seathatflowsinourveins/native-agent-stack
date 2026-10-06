@@ -25,6 +25,8 @@
     and the calibration (netfilter's own Filter in front of a stand-in gateway, then collection and grading);
   - stage 2's control flow in pilot.py, driven through pilot.main with a recording step (PilotStage2): the calibration
     is run, collected and checked before any other cell or retry. These start no client and no process.
+  - in a commit of its own: the collection listing is read and filtered when the client asks for compression, as
+    Node's fetch does (a stand-in Qdrant behind the Filter, and the two-trial test against this host's Qdrant).
 These are local integration checks of this harness, not upstream acceptance."""
 from __future__ import annotations
 
@@ -132,6 +134,65 @@ def _relay_log(tmp: Path, answers) -> Path:
 
     asyncio.run(scenario())
     return log
+
+
+def _relay_qdrant(tmp: Path, prefix: str, requests_, always_compressed: bool = False) -> list:
+    """netfilter's own Filter in front of a stand-in Qdrant on this host's loopback. The stand-in compresses its answer
+    when the request it receives asks for gzip (as Qdrant 1.19.1 does), or always. Each (method, path, headers) is
+    sent in turn; returns each answer's status, headers (lower-case names) and body, and the request head the
+    stand-in received (None when the filter contacted no upstream)."""
+    import asyncio
+    import gzip
+    import isolation
+    import netfilter
+    names = [prefix + "own", "ns2604_trial_other_x", "socraticode_metadata"]
+    listing = json.dumps({"result": {"collections": [{"name": n} for n in names]}, "status": "ok", "time": 0.001}).encode()
+    single = json.dumps({"result": {"status": "green"}, "status": "ok", "time": 0.001}).encode()
+    received, answers = [], []
+
+    async def scenario():
+        async def qdrant(reader, writer):
+            try:
+                head = (await reader.readuntil(b"\r\n\r\n")).decode("latin-1")
+                received.append(head)
+                body, extra = (listing if head.split(" ", 2)[1] == "/collections" else single), b""
+                if always_compressed or "accept-encoding: gzip" in head.lower():
+                    body, extra = gzip.compress(body), b"Content-Encoding: gzip\r\n"
+                writer.write(b"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n" + extra
+                             + f"Content-Length: {len(body)}\r\n\r\n".encode() + body)
+                await writer.drain()
+            finally:
+                writer.close()
+
+        upstream = await asyncio.start_server(qdrant, "127.0.0.1", 0)
+        forward = {**isolation.NET_FORWARDS["qdrant"], "qdrant_prefix": prefix,
+                   "upstream": ["127.0.0.1", upstream.sockets[0].getsockname()[1]]}
+        filt = netfilter.Filter({"access_log": str(tmp / "access.jsonl"), "scope": {}})
+        tasks = []
+
+        def handler(reader, writer):
+            tasks.append(asyncio.ensure_future(filt.handle("qdrant", forward, reader, writer)))
+
+        front = await asyncio.start_unix_server(handler, path=str(tmp / "qdrant.sock"), limit=netfilter.MAX_HEAD)
+        for method, path, headers in requests_:
+            before = len(received)
+            reader, writer = await asyncio.open_unix_connection(str(tmp / "qdrant.sock"))
+            writer.write((f"{method} {path} HTTP/1.1\r\nHost: qdrant\r\n"
+                          + "".join(f"{k}: {v}\r\n" for k, v in headers) + "\r\n").encode())
+            await writer.drain()
+            head, _, body = (await reader.read()).partition(b"\r\n\r\n")
+            writer.close()
+            lines = head.decode("latin-1").split("\r\n")
+            answers.append({"status": int(lines[0].split(" ")[1]), "body": body,
+                            "headers": {k.strip().lower(): v.strip() for k, _, v in (ln.partition(":") for ln in lines[1:])},
+                            "received": received[-1] if len(received) > before else None})
+        await asyncio.gather(*tasks, return_exceptions=True)
+        front.close()
+        upstream.close()
+        filt.log.close()
+
+    asyncio.run(scenario())
+    return answers
 
 
 @unittest.skipUnless(HOST_READY, "needs /usr/bin/bwrap and the experiment's roots on this host")
@@ -785,10 +846,32 @@ class NetFilterRules(unittest.TestCase):
         self.assertEqual((out["status"], out["time"]), ("ok", 0.001))
         with self.assertRaises(ValueError):
             netfilter.filter_collection_list(b'{"result": []}', "x")
-        # A compressed listing is not passed through unread: it cannot be filtered, so the forward answers 502.
+        # A compressed listing cannot be filtered: the function refuses it instead of passing it on unread.
         import gzip
         with self.assertRaises(ValueError):
             netfilter.filter_collection_list(gzip.compress(body), "ns2604_trial_a_")
+
+    def test_the_listing_is_read_and_filtered_when_the_client_asks_for_compression(self):
+        """Round 6e: Qdrant 1.19.1 compresses when asked, and Node's fetch asks by default. Through netfilter's own
+        Filter and a stand-in Qdrant: the listing request goes upstream without Accept-Encoding, so the answer is read
+        and filtered. Another admitted route keeps the header. A listing that arrives compressed anyway is refused."""
+        import gzip
+        prefix = "ns2604_trial_a_"
+        ask = [("Accept-Encoding", "gzip, deflate")]
+        with tempfile.TemporaryDirectory() as tmp:
+            listing, single = _relay_qdrant(Path(tmp), prefix, [("GET", "/collections", ask),
+                                                                ("GET", f"/collections/{prefix}own", ask)])
+        self.assertEqual(listing["status"], 200, listing)
+        self.assertNotIn("content-encoding", listing["headers"])
+        self.assertEqual([c["name"] for c in json.loads(listing["body"])["result"]["collections"]], [prefix + "own"])
+        self.assertEqual(int(listing["headers"]["content-length"]), len(listing["body"]))
+        self.assertNotIn("accept-encoding", listing["received"].lower())
+        self.assertIn("accept-encoding: gzip, deflate", single["received"].lower())
+        self.assertEqual((single["status"], single["headers"].get("content-encoding")), (200, "gzip"))
+        self.assertEqual(json.loads(gzip.decompress(single["body"]))["status"], "ok")
+        with tempfile.TemporaryDirectory() as tmp:
+            forced, = _relay_qdrant(Path(tmp), prefix, [("GET", "/collections", ask)], always_compressed=True)
+        self.assertEqual((forced["status"], forced["body"]), (502, b"502 Bad Gateway\n"), forced)
 
     def test_vllm_admits_embeddings_and_models_only(self):
         import isolation
@@ -1742,7 +1825,10 @@ class NetworkNamespace(unittest.TestCase):
             self.assertEqual(made.stdout.strip(), "200", made.stdout)
 
             def listing(plan_):
-                out, _ = isolation.run_wrapped(plan_, ["curl", "-s", "-m", "20", f"{qd}/collections"], timeout=60)
+                # Round 6e: asked as SocratiCode's client asks (Node's fetch sends Accept-Encoding by default). Qdrant
+                # compresses on request, and the filter must still answer with a listing it has read and filtered.
+                out, _ = isolation.run_wrapped(plan_, ["curl", "-s", "-m", "20", "-H", "Accept-Encoding: gzip, deflate",
+                                                       f"{qd}/collections"], timeout=60)
                 return [c["name"] for c in json.loads(out.stdout)["result"]["collections"]]
 
             self.assertIn(name, listing(a))

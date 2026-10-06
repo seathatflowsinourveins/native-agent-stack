@@ -387,7 +387,11 @@ class Filter:
             await _respond(writer, 502, "Bad Gateway")
             self.record(forward=name, method=method, path=path, decision="upstream-unreachable", conn=conn)
             return
-        kept = [(k, v) for k, v in headers if k.lower() not in HOP_BY_HOP]
+        # Round 6e: an answer this filter rewrites must arrive uncompressed, so its request goes upstream without
+        # Accept-Encoding. Qdrant 1.19.1 on this host compresses the listing when asked (measured 2026-10-06: gzip and
+        # br), and Node's fetch, which @qdrant/js-client-rest 1.18.0 uses, asks by default.
+        unsent = HOP_BY_HOP | ({"accept-encoding"} if rule.get("rewrite") else frozenset())
+        kept = [(k, v) for k, v in headers if k.lower() not in unsent]
         up_writer.write(f"{method} {target} {version}\r\n".encode("ascii")
                         + b"".join(f"{k}: {v}\r\n".encode("latin-1") for k, v in kept) + b"Connection: close\r\n\r\n")
 
@@ -431,10 +435,14 @@ class Filter:
 
     async def _rewrite_listing(self, head: bytes, up_reader, writer, prefix: str) -> None:
         """Read the whole upstream response (Content-Length, chunked or until close), filter its collection names to
-        the trial's prefix, and answer with the same status and a recomputed Content-Length."""
+        the trial's prefix, and answer with the same status and a recomputed Content-Length. An answer that arrives
+        compressed although none was asked for cannot be filtered: it is refused with 502, never passed through."""
         lines = head[:-4].split(b"\r\n")
         headers = [line.partition(b":") for line in lines[1:]]
         lowered = {k.decode("latin-1").strip().lower(): v.decode("latin-1").strip() for k, _, v in headers}
+        if lowered.get("content-encoding", "identity").lower() not in ("", "identity"):
+            await _respond(writer, 502, "Bad Gateway")
+            return
         if lowered.get("transfer-encoding", "").lower() == "chunked":
             body = b""
             while True:
