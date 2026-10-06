@@ -184,7 +184,7 @@ class RendererTests(unittest.TestCase):
     STUB = """#!/bin/sh
 printf 'call|%s|%s\\n' "$(basename "$PWD")" "$*" >> "$STUB_LOG"
 if [ "$1 $2" = "test rules" ]; then
-  sha256sum prometheus-alerts.yaml prometheus-alerts.test.yaml >> "$STUB_LOG"
+  cp prometheus-alerts.yaml prometheus-alerts.test.yaml "$STUB_CAPTURE/"
   exit "${STUB_TEST_EXIT:-0}"
 fi
 exit 0
@@ -201,11 +201,13 @@ exit 0
         stub.write_text(self.STUB)
         stub.chmod(0o700)
         self.log = self.root / "promtool.log"
+        self.capture = self.root / "tested"  # what the stub's `test rules` saw in its working directory
+        self.capture.mkdir()
 
     def render(self, **extra):
         env = {"PATH": os.environ["PATH"], "HOME": str(self.root), "XDG_CONFIG_HOME": str(self.root / "xdg"),
                "NS2604_OBSERVABILITY_DATA": str(self.root / "data"), "tool_root": str(self.root / "tools"),
-               "STUB_LOG": str(self.log), **extra}
+               "STUB_LOG": str(self.log), "STUB_CAPTURE": str(self.capture), **extra}
         return subprocess.run([sys.executable, str(CONFIG / "observability_config.py"), "alerting",
                                "--config-root", str(self.config), "--source-root", str(CONFIG)],
                               env=env, capture_output=True, text=True, timeout=120)
@@ -225,9 +227,8 @@ exit 0
         self.assertEqual([call[2].split(" ")[:2] for call in calls],
                          [["test", "rules"], ["check", "rules"], ["check", "config"]])
         self.assertTrue(calls[0][1].startswith(".g4-validate-"))  # the scratch directory, not the live root
-        tested = dict(reversed(line.split("  ")) for line in self.log.read_text().splitlines() if "  " in line)
-        self.assertEqual(tested["prometheus-alerts.yaml"], self.digest(CONFIG / "prometheus-alerts.yaml"))
-        self.assertEqual(tested["prometheus-alerts.test.yaml"], self.digest(CONFIG / "prometheus-alerts.test.yaml"))
+        for name in ("prometheus-alerts.yaml", "prometheus-alerts.test.yaml"):
+            self.assertEqual(self.digest(self.capture / name), self.digest(CONFIG / name))
         self.assertEqual(sorted(p.name for p in self.config.iterdir() if p.name.startswith(".g4-validate")), [])
 
     def test_a_plan_owned_older_pair_is_replaced(self):
