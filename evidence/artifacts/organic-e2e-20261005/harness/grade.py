@@ -1749,11 +1749,20 @@ def grade_run(root: Path) -> dict:
     gate_rows["G9"] = [len(ids) == len(set(ids)) and attempts_ok]
     oir = {f"{item}|{cell}": {**v, "oir": round(v["used"] / v["n"], 4) if v["n"] else None, "wilson95": wilson(v["used"], v["n"])}
            for (item, cell), v in per_item.items()}
+    # A verified negative (G15): a valid trial on a control task (R4: G1-G6' are should_not for every item) whose joins
+    # and stream-Loki agreement hold, so its non-use of each item is checked against the raw sources. Items it did use
+    # are listed as should_not uses: a measurement, not an instrumentation failure.
+    negatives = [{"trial_id": r["trial_id"], "cell": r.get("cell"), "task": r.get("task"),
+                  "items_used": sorted({u["item"] for u in r.get("uses") or [] if u.get("item")
+                                        and u.get("kind") in ("mcp", "skill-consultation", "cli")
+                                        and u.get("level") in ("completion", "completed-ctx")})}
+                 for r in table if r.get("valid") and str(r.get("task") or "").startswith("control/")
+                 and (r.get("agreement") or {}).get("pass")]
     observed = {
         "skill consultation": any(u["kind"] == "skill-consultation" and u["level"] in ("completion", "completed-ctx") for r in table for u in r.get("uses", [])),
         "MCP execution": any(u["kind"] == "mcp" and u["level"] == "completion" for r in table for u in r.get("uses", [])),
         "CLI execution": any(u["kind"] == "cli" and u["level"] in ("completion", "completed-ctx") for r in table for u in r.get("uses", [])),
-        "verified negative": None,
+        "verified negative": bool(negatives),
         "child or subagent representation": any(u.get("actor", "main") != "main" for r in table for u in r.get("uses", [])),
     }
     gates = {g: {"pass": all(v) if v else None, "n": len(v)} for g, v in gate_rows.items()}
@@ -1778,7 +1787,7 @@ def grade_run(root: Path) -> dict:
     gates["G10"] = sdk_parity(cfg, graded_by)
     g12 = cfg.get("oracles_reproduce") or {}
     gates["G12"] = {"pass": g12.get("pass"), "differing": g12.get("differing"), "tests_run": g12.get("tests_run")}
-    gates["G15"] = {"observed": observed, "gaps": [k for k, v in observed.items() if not v]}
+    gates["G15"] = {"observed": observed, "gaps": [k for k, v in observed.items() if not v], "negatives": negatives}
     return {"graded_at": utc_now(), "run_id": cfg["run_id"], "grader_sha256": sha256_file(Path(__file__)),
             "common_sha256": sha256_file(HERE / "common.py"), "trials": table, "oir": oir, "gates": gates, "gaps": gaps,
             "carried_forward": carried_forward, "registry_status": (cfg.get("registry") or {}).get("status"),
