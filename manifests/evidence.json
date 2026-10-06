@@ -17062,6 +17062,11 @@
       "bytes": 22253
     },
     {
+      "path": "docs/decisions/2026-10-05-codex-service-tier-migration.md",
+      "sha256": "a4d7c6c98e86be419af3bd673e374b529e62b80287556e5cb42cda5c19961fb1",
+      "bytes": 6420
+    },
+    {
       "path": "docs/decisions/2026-10-05-dagu-mise-pin-move.md",
       "sha256": "c1eaaffe72e840c7655e05a44e71116174dc1701675d2e08730ba54a8c9a6e87",
       "bytes": 135389
@@ -18660,6 +18665,11 @@
       "path": "evidence/artifacts/codex-01592-qualification-20260930/qualification.json",
       "sha256": "7d634ff5a9195a589923f9be2bf64070fe507bf50b2efc82629150e967ec896e",
       "bytes": 14536
+    },
+    {
+      "path": "evidence/artifacts/codex-service-tier-migration-20261005/receipt.json",
+      "sha256": "8cce957f20f41260d26910c3695b7dec0ffc585be98e4ba84e33f3e977124512",
+      "bytes": 8318
     },
     {
       "path": "evidence/artifacts/codex-shell-snapshot-cleanup-20260930/listing_diff.py.txt",
@@ -54783,8 +54793,8 @@
     },
     {
       "path": "tests/test_new_wsl_client_config.py",
-      "sha256": "52dc24297f5f2caca8b1cffb6c43701f20ba640d138415335af169423f9101e0",
-      "bytes": 282993
+      "sha256": "d94c94f8a6f9202af35853126264caa65012f1aa3f652f456279572959360a30",
+      "bytes": 292017
     },
     {
       "path": "tests/test_new_wsl_definitive_defaults.py",
@@ -55263,8 +55273,8 @@
     },
     {
       "path": "tools/adoption/new_wsl_client_config.py",
-      "sha256": "ae8f67fd2ed4028998bbf7524dc758491ba98c2b9c2b6ed82312c50b9faa4127",
-      "bytes": 153006
+      "sha256": "f2c155b7a60527a27e0a4629a542d4846173c5684d94e216a15f23dbcb3a8053",
+      "bytes": 160229
     },
     {
       "path": "tools/adoption/prove_codex_lane.py",
